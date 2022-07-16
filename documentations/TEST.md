@@ -1,5 +1,9 @@
 # Test
 
+```shell
+flutter test ../test ../integration_test
+```
+
 ## Unit test
 
 ```shell
@@ -34,4 +38,10 @@ FIXME IntelliJ IDEA上でこのファイルから実行しようとするとパ�
 
 ```shell
 flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_test.dart -d web-server
+```
+
+## With coverage
+
+```shell
+flutter test ../test ../integration_test --coverage
 ```
