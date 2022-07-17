@@ -1,4 +1,4 @@
-package com.example.mem
+package zin.playground.mem
 
 import io.flutter.embedding.android.FlutterActivity
 
