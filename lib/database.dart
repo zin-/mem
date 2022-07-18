@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:sqflite/sqflite.dart' as sqflite;
+import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
 
 class Database {
   final String name;
@@ -15,8 +17,15 @@ class Database {
   ) async =>
       await Database._(name, version, tables)._open();
 
-  static Future<void> delete(String name) async =>
-      sqflite.deleteDatabase(await _getDatabasePath(name));
+  static Future<void> delete(String name) async {
+    final path = await _getDatabasePath(name);
+    if (Platform.isAndroid) {
+      sqflite.deleteDatabase(path);
+    } else if (Platform.isWindows) {
+      var databaseFactory = sqflite_ffi.databaseFactoryFfi;
+      databaseFactory.deleteDatabase(path);
+    }
+  }
 
   Database._(this.name, this.version, this.tables);
 
@@ -25,29 +34,50 @@ class Database {
   Future<Database> _open() async {
     print('Platform is ${Platform.operatingSystem}');
 
+    final path = await _getDatabasePath(name);
     if (Platform.isAndroid) {
       _database = await sqflite.openDatabase(
-        await _getDatabasePath(name),
+        path,
         version: version,
-        onCreate: (db, version) {
-          for (var table in tables) {
-            db.execute(table.buildCreateSql());
-          }
-        },
+        onCreate: (db, version) => _onCreate(db, version, tables),
+      );
+    } else if (Platform.isWindows) {
+      var databaseFactory = sqflite_ffi.databaseFactoryFfi;
+      _database = await databaseFactory.openDatabase(
+        path,
+        options: sqflite.OpenDatabaseOptions(
+          version: version,
+          onCreate: (db, version) => _onCreate(db, version, tables),
+        ),
       );
     }
 
     return this;
   }
 
+  _onCreate(sqflite.Database db, int version, List<TableDefinition> tables) {
+    for (var table in tables) {
+      db.execute(table.buildCreateSql());
+    }
+  }
+
   static Future<String> _getDatabasePath(String name) async {
+    print('Platform is ${Platform.operatingSystem}');
+
+    late final String directoryPath;
     if (Platform.isAndroid) {
-      return path.join(await sqflite.getDatabasesPath(), name);
+      directoryPath = path.join(await sqflite.getDatabasesPath(), name);
+    } else if (Platform.isWindows) {
+      sqflite_ffi.sqfliteFfiInit();
+      final directory = await path_provider.getApplicationSupportDirectory();
+      directoryPath = directory.path;
     } else {
       throw DatabaseException(
         'Unsupported platform: ${Platform.operatingSystem}',
       );
     }
+
+    return path.join(directoryPath, name);
   }
 }
 

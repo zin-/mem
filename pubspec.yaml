@@ -37,6 +37,8 @@ dependencies:
   # for Database
   sqflite:
   path:
+  sqflite_common_ffi:
+  path_provider:
 
 dev_dependencies:
   integration_test:
