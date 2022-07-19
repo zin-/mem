@@ -8,7 +8,7 @@ void main() {
 
   group('Open database', () {
     test(
-      'create new.',
+      ': create new.',
       () async {
         const dbName = 'test.db';
         const dbVersion = 1;
@@ -55,9 +55,8 @@ void main() {
             .update(db, {textFieldName: updatedText}, {'id': inserted});
         expect(updated, 1);
 
-        final selectedById = await table.selectWhere(db, {'id': inserted});
-        expect(selectedById.length, 1);
-        expect(selectedById[0][textFieldName], updatedText);
+        final selectedById = await table.selectById(db, inserted);
+        expect(selectedById[textFieldName], updatedText);
 
         final deleted = await table.delete(db, {'id': inserted});
         expect(deleted, 1);

@@ -18,6 +18,18 @@ Desktop, Webの対応についても[記述している](https://pub.dev/package
 
 全プラットフォーム対応っぽい
 
+## [hive](https://pub.dev/packages/hive)
+
+早いらしい
+勉強のためにログとか統計解析に使いたいかも
+
+## [Shared preferences plugin](https://pub.dev/packages/shared_preferences)
+
+機能が少ないが高速で手軽というイメージ
+ユーザキャッシュや設定値のような揮発してもよいデータを入れると良いかも
+
+ホームウィジェットで利用しているフシがある
+
 ## References
 
 - [のんびり精進](https://kabochapo.hateblo.jp/entry/2020/02/01/144411)

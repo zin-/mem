@@ -39,6 +39,7 @@ dependencies:
   path:
   sqflite_common_ffi:
   path_provider:
+  idb_shim:
 
 dev_dependencies:
   integration_test:
