@@ -9,6 +9,28 @@ import 'package:flutter/foundation.dart';
 import 'package:idb_shim/idb_browser.dart' as idb_browser;
 import 'package:idb_shim/idb.dart' as idb_shim;
 
+abstract class Database {
+  final String name;
+  final int version;
+  final List<TableDefinition> tables;
+
+  Database(this.name, this.version, this.tables);
+
+  Future<Database> open();
+
+  Future<bool> delete();
+
+  Future<int> insert(DefT table, Map<String, dynamic> value);
+
+  Future<List<Map<String, dynamic>>> select(DefT table);
+
+  Future<Map<String, dynamic>> selectById(DefT table, dynamic id);
+
+  Future<int> updateById(DefT table, Map<String, dynamic> value, dynamic id);
+
+  Future<int> deleteById(DefT table, dynamic id);
+}
+
 class OldDatabase {
   final String name;
   final int version;
