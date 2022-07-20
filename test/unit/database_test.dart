@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:mem/database.dart';
+import 'package:mem/database/database.dart';
 
 void main() {
   group('DatabaseTableDefinition', () {

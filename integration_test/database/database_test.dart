@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
-import 'package:mem/database.dart';
+import 'package:mem/database/database.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -14,7 +14,7 @@ void main() {
         const dbVersion = 1;
         const tableName = 'tests';
 
-        await Database.delete(dbName);
+        await OldDatabase.delete(dbName);
         const integerPkName = 'id';
         const textFieldName = 'text';
         final table = DefT(
@@ -24,7 +24,7 @@ void main() {
             DefF(textFieldName, TypeF.text),
           ],
         );
-        final db = await Database.open(
+        final db = await OldDatabase.open(
           dbName,
           dbVersion,
           [

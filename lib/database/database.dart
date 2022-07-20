@@ -9,7 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:idb_shim/idb_browser.dart' as idb_browser;
 import 'package:idb_shim/idb.dart' as idb_shim;
 
-class Database {
+class OldDatabase {
   final String name;
   final int version;
   final List<TableDefinition> tables;
@@ -33,19 +33,19 @@ class Database {
     }
   }
 
-  static Future<Database> open(
+  static Future<OldDatabase> open(
     String name,
     int version,
     List<TableDefinition> tables,
   ) async =>
-      await Database._(name, version, tables)._open();
+      await OldDatabase._(name, version, tables)._open();
 
-  Database._(this.name, this.version, this.tables);
+  OldDatabase._(this.name, this.version, this.tables);
 
   late final sqflite.Database _database;
   late final idb_shim.Database _idb;
 
-  Future<Database> _open() async {
+  Future<OldDatabase> _open() async {
     if (kIsWeb) {
       print('Platform is web');
 
@@ -128,7 +128,7 @@ class TableDefinition {
     }
   }
 
-  Future<int> insert(Database database, Map<String, dynamic> values) async {
+  Future<int> insert(OldDatabase database, Map<String, dynamic> values) async {
     if (kIsWeb) {
       final txn = database._idb.transaction(name, idb_shim.idbModeReadWrite);
       final store = txn.objectStore(name);
@@ -141,7 +141,7 @@ class TableDefinition {
     }
   }
 
-  Future<List<Map<String, dynamic>>> select(Database database) async {
+  Future<List<Map<String, dynamic>>> select(OldDatabase database) async {
     if (kIsWeb) {
       final txn = database._idb.transaction(name, idb_shim.idbModeReadOnly);
       final objects = await txn.objectStore(name).getAll();
@@ -156,7 +156,7 @@ class TableDefinition {
   }
 
   Future<Map<String, dynamic>> selectById(
-    Database database,
+    OldDatabase database,
     dynamic id,
   ) async {
     if (kIsWeb) {
@@ -174,7 +174,7 @@ class TableDefinition {
   }
 
   Future<int> update(
-    Database database,
+    OldDatabase database,
     Map<String, dynamic> values,
     Map<String, dynamic> where,
   ) async {
@@ -194,7 +194,7 @@ class TableDefinition {
   }
 
   Future<int> delete(
-    Database database,
+    OldDatabase database,
     Map<String, dynamic> where,
   ) async {
     if (kIsWeb) {
