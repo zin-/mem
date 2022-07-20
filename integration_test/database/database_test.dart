@@ -6,66 +6,35 @@ import 'package:mem/database/database.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  group('Open database', () {
-    test(
-      ': create new.',
-      () async {
-        const dbName = 'test.db';
-        const dbVersion = 1;
-        const tableName = 'tests';
+  test(
+    'Open database.',
+    () async {
+      const dbName = 'test.db';
+      const dbVersion = 1;
+      const tableName = 'tests';
 
-        await OldDatabase.delete(dbName);
-        const integerPkName = 'id';
-        const textFieldName = 'text';
-        final table = DefT(
-          tableName,
-          [
-            DefPK(integerPkName, TypeF.integer, autoincrement: true),
-            DefF(textFieldName, TypeF.text),
-          ],
-        );
-        final db = await OldDatabase.open(
-          dbName,
-          dbVersion,
-          [
-            table,
-          ],
-        );
+      const integerPkName = 'id';
+      const textFieldName = 'text';
+      final table = DefT(
+        tableName,
+        [
+          DefPK(integerPkName, TypeF.integer, autoincrement: true),
+          DefF(textFieldName, TypeF.text),
+        ],
+      );
 
-        expect(db.name, dbName);
-        expect(db.version, dbVersion);
-        expect(db.tables.length, 1);
-        expect(db.tables[0].toString(), contains(tableName));
+      final database = await DatabaseFactory.open(
+        dbName,
+        dbVersion,
+        [
+          table,
+        ],
+      );
 
-        const text = 'test text';
-        final inserted = await table.insert(db, {textFieldName: text});
-        expect(inserted, 1);
-        const text2 = 'test text 2';
-        final inserted2 = await table.insert(db, {textFieldName: text2});
-        expect(inserted2, 2);
-
-        final selected = await table.select(db);
-        expect(selected, [
-          {integerPkName: inserted, textFieldName: text},
-          {integerPkName: inserted2, textFieldName: text2},
-        ]);
-
-        const updatedText = 'updated text';
-        final updated = await table
-            .update(db, {textFieldName: updatedText}, {'id': inserted});
-        expect(updated, 1);
-
-        final selectedById = await table.selectById(db, inserted);
-        expect(selectedById[textFieldName], updatedText);
-
-        final deleted = await table.delete(db, {'id': inserted});
-        expect(deleted, 1);
-
-        final selectedWithoutDeleted = await table.select(db);
-        expect(selectedWithoutDeleted, [
-          {integerPkName: inserted2, textFieldName: text2},
-        ]);
-      },
-    );
-  });
+      expect(database.name, dbName);
+      expect(database.version, dbVersion);
+      expect(database.tables.length, 1);
+      expect(database.tables[0].toString(), contains(tableName));
+    },
+  );
 }
