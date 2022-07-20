@@ -41,6 +41,9 @@ dependencies:
   path_provider:
   idb_shim:
 
+  # for View state management
+  flutter_riverpod:
+
 dev_dependencies:
   integration_test:
       sdk: flutter
