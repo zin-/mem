@@ -28,6 +28,7 @@ abstract class Database {
 
   Future<int> updateById(DefT table, Map<String, dynamic> value, dynamic id);
 
+  // FIXME delete()と干渉して嫌だ
   Future<int> deleteById(DefT table, dynamic id);
 }
 
