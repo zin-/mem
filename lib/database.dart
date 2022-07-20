@@ -21,7 +21,11 @@ class Database {
     } else {
       final path = await _getDatabasePath(name);
       if (Platform.isAndroid) {
-        sqflite.deleteDatabase(path);
+        if (await sqflite.databaseExists(path)) {
+          sqflite.deleteDatabase(path);
+        } else {
+          print('Database does not exist. path: $path');
+        }
       } else if (Platform.isWindows) {
         var databaseFactory = sqflite_ffi.databaseFactoryFfi;
         databaseFactory.deleteDatabase(path);
@@ -91,7 +95,7 @@ class Database {
 
     late final String directoryPath;
     if (Platform.isAndroid) {
-      directoryPath = path.join(await sqflite.getDatabasesPath(), name);
+      directoryPath = await sqflite.getDatabasesPath();
     } else if (Platform.isWindows) {
       sqflite_ffi.sqfliteFfiInit();
       final directory = await path_provider.getApplicationSupportDirectory();
