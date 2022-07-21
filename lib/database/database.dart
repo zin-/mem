@@ -90,10 +90,11 @@ typedef DefF = FieldDefinition;
 class FieldDefinition {
   final String name;
   final FieldType type;
+  final bool notNull;
 
-  FieldDefinition(this.name, this.type);
+  FieldDefinition(this.name, this.type, {this.notNull = true});
 
-  String buildFieldSql() => '$name ${type.value}';
+  String buildFieldSql() => '$name ${type.value}${notNull ? ' NOT NULL' : ''}';
 }
 
 typedef DefPK = PrimaryKeyDefinition;
@@ -115,10 +116,14 @@ class PrimaryKeyDefinition extends FieldDefinition {
 
 typedef TypeF = FieldType;
 
-enum FieldType { integer, text }
+enum FieldType { integer, text, datetime }
 
 extension on FieldType {
-  static final values = {FieldType.integer: 'INTEGER', FieldType.text: 'TEXT'};
+  static final values = {
+    FieldType.integer: 'INTEGER',
+    FieldType.text: 'TEXT',
+    FieldType.datetime: 'TIMESTAMP',
+  };
 
   String get value => values[this]!;
 }

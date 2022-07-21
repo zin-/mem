@@ -53,12 +53,17 @@ void main() {
         [
           PrimaryKeyDefinition('id', FieldType.integer, autoincrement: true),
           FieldDefinition('text', FieldType.text),
+          FieldDefinition('datetime', FieldType.datetime, notNull: false),
         ],
       );
 
       expect(
         tableDefinition.buildCreateSql(),
-        'CREATE TABLE tests ( id INTEGER PRIMARY KEY AUTOINCREMENT, text TEXT )',
+        'CREATE TABLE tests ('
+        ' id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,'
+        ' text TEXT NOT NULL,'
+        ' datetime TIMESTAMP'
+        ' )',
       );
     });
   });
