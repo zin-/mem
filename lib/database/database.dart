@@ -99,6 +99,26 @@ class FieldDefinition {
   FieldDefinition(this.name, this.type, {this.notNull = true});
 
   String buildFieldSql() => '$name ${type.value}${notNull ? ' NOT NULL' : ''}';
+
+  dynamic convertForDatabase(dynamic value) {
+    switch (type) {
+      case FieldType.integer:
+      case FieldType.text:
+        return value;
+      case FieldType.datetime:
+        return value == null ? null : (value as DateTime).toIso8601String();
+    }
+  }
+
+  dynamic convertFromDatabase(dynamic value) {
+    switch (type) {
+      case FieldType.integer:
+      case FieldType.text:
+        return value;
+      case FieldType.datetime:
+        return value == null ? null : DateTime.parse(value);
+    }
+  }
 }
 
 typedef DefPK = PrimaryKeyDefinition;
