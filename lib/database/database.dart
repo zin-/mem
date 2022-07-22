@@ -22,8 +22,11 @@ abstract class Database {
 
   Future<int> updateById(DefT table, Map<String, dynamic> value, dynamic id);
 
-  // FIXME delete()と干渉して嫌だ
+  // TODO delete()と干渉して嫌だ
   Future<int> deleteById(DefT table, dynamic id);
+
+  // TODO delete()と干渉して嫌だ
+  Future<int> deleteAll(DefT table);
 }
 
 class DatabaseFactory {
@@ -32,9 +35,10 @@ class DatabaseFactory {
     int version,
     List<TableDefinition> tables,
   ) async =>
-      kIsWeb
-          ? IndexedDatabase(name, version, tables)
-          : SqliteDatabase(name, version, tables);
+      await (kIsWeb
+              ? IndexedDatabase(name, version, tables)
+              : SqliteDatabase(name, version, tables))
+          .open();
 }
 
 typedef DefT = TableDefinition;

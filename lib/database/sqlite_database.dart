@@ -80,6 +80,9 @@ class SqliteDatabase extends Database {
         whereArgs: [id],
       );
 
+  @override
+  Future<int> deleteAll(DefT table) => _database.delete(table.name);
+
   _buildWhereId(DefT table) =>
       '${table.fields.whereType<DefPK>().first.name} = ?';
 

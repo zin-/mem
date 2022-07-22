@@ -114,6 +114,9 @@ void main() {
           datetimeFieldName: nowDatetimeString,
         },
       ]);
+
+      final deletedCount = await database.deleteAll(testTable);
+      expect(deletedCount, 1);
     },
   );
 }

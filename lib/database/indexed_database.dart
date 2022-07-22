@@ -80,6 +80,15 @@ class IndexedDatabase extends Database {
     return await txn.completed.then((value) => 1);
   }
 
+  @override
+  Future<int> deleteAll(DefT table) async {
+    final txn = _database.transaction(table.name, idb_shim.idbModeReadWrite);
+    final store = txn.objectStore(table.name);
+    final count = await store.count();
+    await store.clear();
+    return await txn.completed.then((value) => count);
+  }
+
   Map<String, dynamic> _convertIntoMap(Object? object, DefT table) {
     final json = jsonDecode(jsonEncode(object));
     return Map.fromEntries(
