@@ -44,6 +44,9 @@ dependencies:
   # for View state management
   flutter_riverpod:
 
+  # for basic operations
+  collection:
+
 dev_dependencies:
   integration_test:
       sdk: flutter
