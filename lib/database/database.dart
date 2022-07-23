@@ -1,3 +1,25 @@
+import 'package:mem/database/definitions.dart';
+
+abstract class DatabaseV2 {
+  final DefD definition;
+  late final List<TableV2> tables;
+
+  DatabaseV2(this.definition);
+
+  Future<DatabaseV2> open();
+
+  close();
+
+  Future<void> delete();
+}
+
+abstract class TableV2 {
+  final DatabaseV2 databaseV2;
+  final DefTV2 definition;
+
+  TableV2(this.databaseV2, this.definition);
+}
+
 abstract class Database {
   final String name;
   final int version;

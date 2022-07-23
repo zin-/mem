@@ -4,6 +4,47 @@ import 'package:idb_shim/idb.dart' as idb_shim;
 import 'package:idb_shim/idb_browser.dart' as idb_browser;
 
 import 'package:mem/database/database.dart';
+import 'package:mem/database/definitions.dart';
+
+class IndexedDatabaseV2 extends DatabaseV2 {
+  IndexedDatabaseV2(super.definition);
+
+  final idb_shim.IdbFactory _factory = idb_browser.idbFactoryBrowser;
+  late final idb_shim.Database _database;
+
+  @override
+  Future<DatabaseV2> open() async {
+    _database = await _factory.open(
+      definition.name,
+      version: definition.version,
+      onUpgradeNeeded: (event) {
+        for (var tableDefinition in definition.tableDefinitions) {
+          event.database.createObjectStore(
+            tableDefinition.name,
+            autoIncrement: tableDefinition.columns
+                .whereType<DefPKV2>()
+                .first
+                .autoincrement,
+          );
+        }
+      },
+    );
+
+    return this;
+  }
+
+  @override
+  close() {
+    // TODO: implement close
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> delete() async {
+    _database.close();
+    await _factory.deleteDatabase(definition.name);
+  }
+}
 
 class IndexedDatabase extends Database {
   IndexedDatabase(super.name, super.version, super.tables);
