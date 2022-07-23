@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:mem/app.dart';
 import 'package:mem/database/database.dart';
+import 'package:mem/database/database_factory.dart';
 
 void main() async {
   await _openDatabase();
