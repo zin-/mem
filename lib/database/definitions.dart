@@ -76,6 +76,26 @@ class ColumnDefinition {
 
   String _onSQL() => '$name ${type._onSQL}${notNull ? ' NOT NULL' : ''}';
 
+  dynamic toTuple(dynamic value) {
+    switch (type) {
+      case ColumnType.integer:
+      case ColumnType.text:
+        return value;
+      case ColumnType.datetime:
+        return value == null ? null : (value as DateTime).toIso8601String();
+    }
+  }
+
+  dynamic fromTuple(dynamic value) {
+    switch (type) {
+      case ColumnType.integer:
+      case ColumnType.text:
+        return value;
+      case ColumnType.datetime:
+        return value == null ? null : DateTime.parse(value);
+    }
+  }
+
   @override
   String toString() => 'Column definition. { name: $name }';
 }

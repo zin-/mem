@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:mem/database/definitions.dart';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
@@ -24,15 +25,22 @@ class SqliteDatabaseV2 extends DatabaseV2 {
       await _pathFuture,
       options: sqflite.OpenDatabaseOptions(
         version: definition.version,
-        onCreate: (db, version) {
+        onCreate: (db, version) async {
           print('Create Database. $definition }');
           for (var tableDefinition in definition.tableDefinitions) {
             print('Create table. $tableDefinition');
-            db.execute(tableDefinition.buildCreateTableSql());
+            await db.execute(tableDefinition.buildCreateTableSql());
           }
         },
       ),
     );
+
+    for (var tableDefinition in definition.tableDefinitions) {
+      tables.putIfAbsent(
+        tableDefinition.name,
+        () => SqliteTable(tableDefinition, _database),
+      );
+    }
 
     return this;
   }
@@ -77,6 +85,52 @@ class SqliteDatabaseV2 extends DatabaseV2 {
     _pathFuture = databaseDirectoryPath
         .then((value) => path.join(value, definition.name));
   }
+}
+
+class SqliteTable extends TableV2 {
+  final sqflite.Database _database;
+
+  SqliteTable(super.definition, this._database);
+
+  @override
+  Future<int> insert(Map<String, dynamic> value) =>
+      _database.insert(definition.name, convertTo(value));
+
+  @override
+  Future<List<Map<String, dynamic>>> select() async =>
+      (await _database.query(definition.name))
+          .map((e) => convertFrom(e))
+          .toList();
+
+  @override
+  Future<Map<String, dynamic>> selectByPk(pk) async =>
+      convertFrom((await _database.query(
+        definition.name,
+        where: _buildWhereId(),
+        whereArgs: [pk],
+      ))
+          .first);
+
+  @override
+  Future<int> updateByPk(pk, Map<String, dynamic> value) => _database.update(
+        definition.name,
+        convertTo(value),
+        where: _buildWhereId(),
+        whereArgs: [pk],
+      );
+
+  @override
+  Future<int> deleteByPk(pk) => _database.delete(
+        definition.name,
+        where: _buildWhereId(),
+        whereArgs: [pk],
+      );
+
+  @override
+  Future<int> delete() => _database.delete(definition.name);
+
+  String _buildWhereId() =>
+      '${definition.columns.whereType<DefPKV2>().first.name} = ?';
 }
 
 class SqliteDatabase extends Database {
