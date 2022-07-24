@@ -45,7 +45,16 @@ class MemRepository {
 
   static MemRepository? _instance;
 
-  factory MemRepository(Table memTable) {
+  factory MemRepository() {
+    var tmp = _instance;
+    if (tmp == null) {
+      throw RepositoryException('Call initialize');
+    } else {
+      return tmp;
+    }
+  }
+
+  factory MemRepository.initialize(Table memTable) {
     var tmp = _instance;
     if (tmp == null) {
       tmp = MemRepository._(memTable);
@@ -65,3 +74,12 @@ final memTable = DefT(
     DefC('archivedAt', TypeC.datetime, notNull: false),
   ],
 );
+
+class RepositoryException implements Exception {
+  final String message;
+
+  RepositoryException(this.message);
+
+  @override
+  String toString() => message;
+}

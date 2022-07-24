@@ -12,6 +12,7 @@ class MemDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Consumer(
         builder: (context, ref, child) {
+          ref.read(fetchMemById(_memId));
           final mem = ref.watch(memProvider(_memId));
 
           return Scaffold(
@@ -25,6 +26,7 @@ class MemDetailPage extends StatelessWidget {
                 child: Column(
                   children: [
                     TextFormField(
+                      initialValue: mem['name'],
                       validator: (value) {
                         if (value?.isEmpty ?? false) {
                           return 'Name is required.';
@@ -44,9 +46,11 @@ class MemDetailPage extends StatelessWidget {
             ),
             floatingActionButton: FloatingActionButton(
               child: const Icon(Icons.save_alt),
-              onPressed: () {
+              onPressed: () async {
                 if (_formKey.currentState?.validate() ?? false) {
                   _formKey.currentState?.save();
+
+                  await ref.read(save(mem));
                 }
               },
             ),

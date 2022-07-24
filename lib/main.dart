@@ -4,6 +4,7 @@ import 'package:mem/app.dart';
 import 'package:mem/database/database.dart';
 import 'package:mem/database/database_factory.dart';
 import 'package:mem/database/definitions.dart';
+import 'package:mem/repositories/mem_repository.dart';
 
 void main() async {
   await _openDatabase();
@@ -17,8 +18,12 @@ Future<Database> _openDatabase() async {
   final database = await DatabaseManager().open(DefD(
     'mem.db',
     1,
-    [],
+    [
+      memTable,
+    ],
   ));
+
+  MemRepository.initialize(database.getTable(memTable.name));
 
   return database;
 }

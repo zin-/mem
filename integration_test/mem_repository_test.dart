@@ -14,7 +14,7 @@ void main() async {
 
   setUpAll(() async {
     database = await DatabaseManager().open(DefD('test_mem.db', 1, [memTable]));
-    memRepository = MemRepository(database.getTable(memTable.name));
+    memRepository = MemRepository.initialize(database.getTable(memTable.name));
   });
   tearDown(() async {
     await memRepository.removeAll();
