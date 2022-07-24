@@ -29,10 +29,10 @@ void main() {
         const tableName = 'tests';
         const columnName = 'test';
 
-        final tableDefinition = TableDefinitionV2(
+        final tableDefinition = TableDefinition(
           tableName,
           [
-            PrimaryKeyDefinitionV2(columnName, ColumnType.integer),
+            PrimaryKeyDefinition(columnName, ColumnType.integer),
           ],
         );
 
@@ -41,7 +41,7 @@ void main() {
       });
       test('empty name.', () {
         expect(
-          () => TableDefinitionV2(
+          () => TableDefinition(
             '',
             [],
           ),
@@ -52,7 +52,7 @@ void main() {
       });
       test('no columns.', () {
         expect(
-          () => TableDefinitionV2(
+          () => TableDefinition(
             'tests',
             [],
           ),
@@ -63,7 +63,7 @@ void main() {
       });
       test('no primary key.', () {
         expect(
-          () => TableDefinitionV2('tests', [
+          () => TableDefinition('tests', [
             ColumnDefinition('test', ColumnType.text),
           ]),
           throwsA((e) =>
@@ -73,9 +73,9 @@ void main() {
       });
       test('two primary key.', () {
         expect(
-          () => TableDefinitionV2('tests', [
-            PrimaryKeyDefinitionV2('pk1', ColumnType.text),
-            PrimaryKeyDefinitionV2('pk2', ColumnType.text),
+          () => TableDefinition('tests', [
+            PrimaryKeyDefinition('pk1', ColumnType.text),
+            PrimaryKeyDefinition('pk2', ColumnType.text),
           ]),
           throwsA((e) =>
               e is DatabaseDefinitionException &&
@@ -84,10 +84,10 @@ void main() {
       });
       test('duplicate columns.', () {
         expect(
-          () => TableDefinitionV2(
+          () => TableDefinition(
             'tests',
             [
-              PrimaryKeyDefinitionV2('pk', ColumnType.text),
+              PrimaryKeyDefinition('pk', ColumnType.text),
               ColumnDefinition('dup', ColumnType.text),
               ColumnDefinition('dup', ColumnType.text),
             ],
@@ -102,10 +102,10 @@ void main() {
     test('buildCreateSql', () {
       const tableName = 'tests';
 
-      final tableDefinition = TableDefinitionV2(
+      final tableDefinition = TableDefinition(
         tableName,
         [
-          PrimaryKeyDefinitionV2('id', ColumnType.integer, autoincrement: true),
+          PrimaryKeyDefinition('id', ColumnType.integer, autoincrement: true),
           ColumnDefinition('text', ColumnType.text),
           ColumnDefinition('datetime', ColumnType.datetime, notNull: false),
         ],
@@ -129,9 +129,9 @@ void main() {
         const dbVersion = 1;
         const tableName = 'tests';
         const pkName = 'test_pk';
-        final pk = PrimaryKeyDefinitionV2(pkName, ColumnType.text);
+        final pk = PrimaryKeyDefinition(pkName, ColumnType.text);
         final tableDefinitions = [
-          TableDefinitionV2(tableName, [pk])
+          TableDefinition(tableName, [pk])
         ];
 
         final databaseDefinition =

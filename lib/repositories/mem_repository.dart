@@ -2,8 +2,8 @@ import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
 import 'package:mem/mem.dart';
 
-class MemRepositoryV2 {
-  final TableV2 _memTable;
+class MemRepository {
+  final Table _memTable;
 
   Future<Mem> receive(Map<String, dynamic> value) async {
     final createdAt = DateTime.now();
@@ -41,27 +41,27 @@ class MemRepositoryV2 {
 
   Future<int> removeAll() async => _memTable.delete();
 
-  MemRepositoryV2._(this._memTable);
+  MemRepository._(this._memTable);
 
-  static MemRepositoryV2? _instance;
+  static MemRepository? _instance;
 
-  factory MemRepositoryV2(TableV2 memTable) {
+  factory MemRepository(Table memTable) {
     var tmp = _instance;
     if (tmp == null) {
-      tmp = MemRepositoryV2._(memTable);
+      tmp = MemRepository._(memTable);
       _instance = tmp;
     }
     return tmp;
   }
 }
 
-final memTableV2 = DefTV2(
+final memTable = DefT(
   'mems',
   [
-    DefPKV2('id', TypeCV2.integer, autoincrement: true),
-    DefC('name', TypeCV2.text),
-    DefC('createdAt', TypeCV2.datetime),
-    DefC('updatedAt', TypeCV2.datetime, notNull: false),
-    DefC('archivedAt', TypeCV2.datetime, notNull: false),
+    DefPK('id', TypeC.integer, autoincrement: true),
+    DefC('name', TypeC.text),
+    DefC('createdAt', TypeC.datetime),
+    DefC('updatedAt', TypeC.datetime, notNull: false),
+    DefC('archivedAt', TypeC.datetime, notNull: false),
   ],
 );

@@ -7,7 +7,7 @@ typedef DefD = DatabaseDefinition;
 class DatabaseDefinition {
   final String name;
   final int version;
-  final List<TableDefinitionV2> tableDefinitions;
+  final List<DefT> tableDefinitions;
 
   DatabaseDefinition(this.name, this.version, this.tableDefinitions) {
     if (name.isEmpty) {
@@ -26,20 +26,20 @@ class DatabaseDefinition {
       ' }';
 }
 
-typedef DefTV2 = TableDefinitionV2;
+typedef DefT = TableDefinition;
 
-class TableDefinitionV2 {
+class TableDefinition {
   final String name;
   final List<ColumnDefinition> columns;
 
-  TableDefinitionV2(this.name, this.columns) {
+  TableDefinition(this.name, this.columns) {
     if (name.isEmpty) {
       throw DatabaseDefinitionException('Table name is required.');
     } else if (columns.isEmpty) {
       throw DatabaseDefinitionException('Table columns are required.');
-    } else if (columns.whereType<PrimaryKeyDefinitionV2>().isEmpty) {
+    } else if (columns.whereType<PrimaryKeyDefinition>().isEmpty) {
       throw DatabaseDefinitionException('Primary key is required.');
-    } else if (columns.whereType<PrimaryKeyDefinitionV2>().length > 1) {
+    } else if (columns.whereType<PrimaryKeyDefinition>().length > 1) {
       throw DatabaseDefinitionException('Only one primary key is allowed.');
     } else if (columns.groupListsBy((c) => c.name).length != columns.length) {
       throw DatabaseDefinitionException(
@@ -100,12 +100,12 @@ class ColumnDefinition {
   String toString() => 'Column definition. { name: $name }';
 }
 
-typedef DefPKV2 = PrimaryKeyDefinitionV2;
+typedef DefPK = PrimaryKeyDefinition;
 
-class PrimaryKeyDefinitionV2 extends ColumnDefinition {
+class PrimaryKeyDefinition extends ColumnDefinition {
   final bool autoincrement;
 
-  PrimaryKeyDefinitionV2(
+  PrimaryKeyDefinition(
     super.name,
     super.type, {
     this.autoincrement = false,
@@ -117,7 +117,7 @@ class PrimaryKeyDefinitionV2 extends ColumnDefinition {
       '${autoincrement ? ' AUTOINCREMENT' : ''}';
 }
 
-typedef TypeCV2 = ColumnType;
+typedef TypeC = ColumnType;
 
 enum ColumnType { integer, text, datetime }
 

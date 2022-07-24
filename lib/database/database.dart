@@ -1,16 +1,16 @@
 import 'package:mem/database/definitions.dart';
 
-abstract class DatabaseV2 {
+abstract class Database {
   final DefD definition;
-  final tables = <String, TableV2>{};
+  final tables = <String, Table>{};
 
-  DatabaseV2(this.definition);
+  Database(this.definition);
 
-  Future<DatabaseV2> open();
+  Future<Database> open();
 
   Future<bool> delete();
 
-  TableV2 getTable(String name) {
+  Table getTable(String name) {
     if (tables.containsKey(name)) {
       return tables[name]!;
     } else {
@@ -20,10 +20,10 @@ abstract class DatabaseV2 {
   }
 }
 
-abstract class TableV2 {
-  final DefTV2 definition;
+abstract class Table {
+  final DefT definition;
 
-  TableV2(this.definition);
+  Table(this.definition);
 
   Future<int> insert(Map<String, dynamic> value);
 

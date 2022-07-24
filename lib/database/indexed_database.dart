@@ -6,14 +6,14 @@ import 'package:idb_shim/idb_browser.dart' as idb_browser;
 import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
 
-class IndexedDatabaseV2 extends DatabaseV2 {
-  IndexedDatabaseV2(super.definition);
+class IndexedDatabase extends Database {
+  IndexedDatabase(super.definition);
 
   final idb_shim.IdbFactory _factory = idb_browser.idbFactoryBrowser;
   late final idb_shim.Database _database;
 
   @override
-  Future<DatabaseV2> open() async {
+  Future<Database> open() async {
     _database = await _factory.open(
       definition.name,
       version: definition.version,
@@ -22,7 +22,7 @@ class IndexedDatabaseV2 extends DatabaseV2 {
           event.database.createObjectStore(
             tableDefinition.name,
             autoIncrement: tableDefinition.columns
-                .whereType<DefPKV2>()
+                .whereType<DefPK>()
                 .first
                 .autoincrement,
           );
@@ -48,12 +48,12 @@ class IndexedDatabaseV2 extends DatabaseV2 {
   }
 }
 
-class ObjectStore extends TableV2 {
+class ObjectStore extends Table {
   final idb_shim.Database _database;
 
   ObjectStore(super.definition, this._database);
 
-  late final _pkColumn = definition.columns.whereType<DefPKV2>().first;
+  late final _pkColumn = definition.columns.whereType<DefPK>().first;
 
   @override
   Future<int> insert(Map<String, dynamic> value) async {

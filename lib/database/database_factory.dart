@@ -6,9 +6,9 @@ import 'package:mem/database/indexed_database.dart';
 import 'package:mem/database/sqlite_database.dart';
 
 class DatabaseManager {
-  final _databases = <String, DatabaseV2>{};
+  final _databases = <String, Database>{};
 
-  Future<DatabaseV2> open(
+  Future<Database> open(
     DatabaseDefinition definition,
   ) async {
     if (_databases.containsKey(definition.name)) {
@@ -16,8 +16,8 @@ class DatabaseManager {
     } else {
       print('Open database. name: ${definition.name}');
       final database = await (kIsWeb
-              ? IndexedDatabaseV2(definition)
-              : SqliteDatabaseV2(definition))
+              ? IndexedDatabase(definition)
+              : SqliteDatabase(definition))
           .open();
       _databases.putIfAbsent(definition.name, () => database);
     }

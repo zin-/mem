@@ -15,9 +15,9 @@ void main() {
     final db = await DatabaseManager().open(DefD(dbName, 1, []));
 
     if (!kIsWeb) {
-      expect(db, isA<SqliteDatabaseV2>());
+      expect(db, isA<SqliteDatabase>());
     } else {
-      expect(db, isA<IndexedDatabaseV2>());
+      expect(db, isA<IndexedDatabase>());
     }
 
     final openedDb = await DatabaseManager().open(DefD(dbName, 1, []));

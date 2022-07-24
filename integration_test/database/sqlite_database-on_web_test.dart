@@ -17,7 +17,7 @@ void main() {
     'Error on Chrome',
     () async {
       expect(
-        () => SqliteDatabaseV2(DefD(dbName, dbVersion, [])),
+        () => SqliteDatabase(DefD(dbName, dbVersion, [])),
         throwsA((e) => e is DatabaseException),
       );
     },

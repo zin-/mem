@@ -9,8 +9,8 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
 import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
 
-class SqliteDatabaseV2 extends DatabaseV2 {
-  SqliteDatabaseV2(super.definition) {
+class SqliteDatabase extends Database {
+  SqliteDatabase(super.definition) {
     _initialize();
   }
 
@@ -19,7 +19,7 @@ class SqliteDatabaseV2 extends DatabaseV2 {
   late final sqflite.Database _database;
 
   @override
-  Future<DatabaseV2> open() async {
+  Future<Database> open() async {
     _database = await _factory.openDatabase(
       await _pathFuture,
       options: sqflite.OpenDatabaseOptions(
@@ -80,7 +80,7 @@ class SqliteDatabaseV2 extends DatabaseV2 {
   }
 }
 
-class SqliteTable extends TableV2 {
+class SqliteTable extends Table {
   final sqflite.Database _database;
 
   SqliteTable(super.definition, this._database);
@@ -123,5 +123,5 @@ class SqliteTable extends TableV2 {
   Future<int> delete() => _database.delete(definition.name);
 
   String _buildWhereId() =>
-      '${definition.columns.whereType<DefPKV2>().first.name} = ?';
+      '${definition.columns.whereType<DefPK>().first.name} = ?';
 }

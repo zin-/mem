@@ -14,16 +14,16 @@ void main() {
 
   const dbName = 'test.db';
   const dbVersion = 1;
-  final testTable = DefTV2(
+  final testTable = DefT(
     tableName,
     [
-      DefPKV2(pkName, TypeCV2.integer, autoincrement: true),
-      DefC(textFieldName, TypeCV2.integer),
-      DefC(datetimeFieldName, TypeCV2.datetime),
+      DefPK(pkName, TypeC.integer, autoincrement: true),
+      DefC(textFieldName, TypeC.integer),
+      DefC(datetimeFieldName, TypeC.datetime),
     ],
   );
   final tableDefinitions = [testTable];
-  DatabaseV2 database;
+  Database database;
 
   tearDown(() async {
     await DatabaseManager().delete(dbName);
