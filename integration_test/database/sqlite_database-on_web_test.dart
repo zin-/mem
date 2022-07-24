@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
 import 'package:mem/database/database.dart';
+import 'package:mem/database/definitions.dart';
 import 'package:mem/database/sqlite_database.dart';
 
 void main() {
@@ -16,7 +17,7 @@ void main() {
     'Error on Chrome',
     () async {
       expect(
-        () => SqliteDatabase(dbName, dbVersion, []),
+        () => SqliteDatabaseV2(DefD(dbName, dbVersion, [])),
         throwsA((e) => e is DatabaseException),
       );
     },
