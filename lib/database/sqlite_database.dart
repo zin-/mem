@@ -96,13 +96,22 @@ class SqliteTable extends Table {
           .toList();
 
   @override
-  Future<Map<String, dynamic>> selectByPk(pk) async =>
-      convertFrom((await _database.query(
+  Future<Map<String, dynamic>> selectByPk(pk) async {
+    final selectedByPk = await _database.query(
+      definition.name,
+      where: _buildWhereId(),
+      whereArgs: [pk],
+    );
+
+    if (selectedByPk.length == 1) {
+      return convertFrom(selectedByPk.first);
+    } else {
+      throw NotFoundException(
         definition.name,
-        where: _buildWhereId(),
-        whereArgs: [pk],
-      ))
-          .first);
+        _buildWhereId().replaceFirst('?', pk.toString()),
+      );
+    }
+  }
 
   @override
   Future<int> updateByPk(pk, Map<String, dynamic> value) => _database.update(

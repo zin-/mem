@@ -95,27 +95,58 @@ void main() {
     },
   );
 
-  test(
+  group(
     'selectByPk',
-    () async {
-      database = await DatabaseManager().open(DefD(
-        dbName,
-        dbVersion,
-        tableDefinitions,
-      ));
-      final table = database.getTable(tableName);
+    () {
+      test(
+        ': found.',
+        () async {
+          database = await DatabaseManager().open(DefD(
+            dbName,
+            dbVersion,
+            tableDefinitions,
+          ));
+          final table = database.getTable(tableName);
 
-      final datetime = DateTime.now();
-      final test = {
-        textFieldName: 'test text',
-        datetimeFieldName: datetime,
-      };
-      final inserted = await table.insert(test);
+          final datetime = DateTime.now();
+          final test = {
+            textFieldName: 'test text',
+            datetimeFieldName: datetime,
+          };
+          final inserted = await table.insert(test);
 
-      final selectedById = await table.selectByPk(inserted);
-      expect(
-        selectedById,
-        test..putIfAbsent(pkName, () => inserted),
+          final selectedById = await table.selectByPk(inserted);
+          expect(
+            selectedById,
+            test..putIfAbsent(pkName, () => inserted),
+          );
+        },
+      );
+      test(
+        ': not found.',
+        () async {
+          database = await DatabaseManager().open(DefD(
+            dbName,
+            dbVersion,
+            tableDefinitions,
+          ));
+          final table = database.getTable(tableName);
+
+          const findCondition = 1;
+          expect(
+            () => table.selectByPk(findCondition),
+            throwsA(
+              (e) =>
+                  e is NotFoundException &&
+                  e.toString() ==
+                      'Not found.'
+                          ' {'
+                          ' target: $tableName'
+                          ', conditions: { $pkName = $findCondition }'
+                          ' }',
+            ),
+          );
+        },
       );
     },
   );

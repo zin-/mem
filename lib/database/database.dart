@@ -61,3 +61,14 @@ class DatabaseException implements Exception {
   @override
   String toString() => message;
 }
+
+class NotFoundException extends DatabaseException {
+  NotFoundException(String targetName, String conditions)
+      : super(
+          'Not found.'
+          ' {'
+          ' target: $targetName'
+          ', conditions: { $conditions }'
+          ' }',
+        );
+}
