@@ -37,4 +37,7 @@ class Mem {
       archivedAt: null,
     );
   }
+
+  @override
+  String toString() => toMap().toString();
 }

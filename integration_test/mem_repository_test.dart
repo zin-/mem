@@ -2,24 +2,26 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/database/database.dart';
 import 'package:mem/database/database_factory.dart';
+import 'package:mem/database/definitions.dart';
 import 'package:mem/mem.dart';
 import 'package:mem/repositories/mem_repository.dart';
 
 void main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  late final Database database;
-  late final MemRepository memRepository;
+  late final DatabaseV2 databaseV2;
+  late final MemRepositoryV2 memRepositoryV2;
 
   setUpAll(() async {
-    database = await DatabaseFactory.open('test_mems.db', 1, [memTable]);
-    memRepository = MemRepository(database);
+    databaseV2 =
+        await DatabaseManager.open(DefD('test_mem.db', 1, [memTableV2]));
+    memRepositoryV2 = MemRepositoryV2(databaseV2.getTable(memTableV2.name));
   });
   tearDown(() async {
-    await memRepository.removeAll();
+    await memRepositoryV2.removeAll();
   });
   tearDownAll(() async {
-    database.delete();
+    await databaseV2.delete();
   });
 
   test(
@@ -28,7 +30,7 @@ void main() async {
       const memName = 'test mem name';
       final memMap = <String, dynamic>{'name': memName};
 
-      final receivedMem = await memRepository.receive(memMap);
+      final receivedMem = await memRepositoryV2.receive(memMap);
 
       expect(receivedMem.id, 1);
       expect(receivedMem.name, memName);
@@ -39,70 +41,59 @@ void main() async {
   );
 
   test(
-    'removeAll',
+    'selectAll',
     () async {
-      final memMap = <String, dynamic>{'name': 'test mem name'};
-      await memRepository.receive(memMap);
-      await memRepository.receive(memMap);
+      const memName1 = 'test mem name 1';
+      final memMap = <String, dynamic>{'name': memName1};
+      final receivedMem1 = await memRepositoryV2.receive(memMap);
+      const memName2 = 'test mem name 2';
+      final memMap2 = <String, dynamic>{'name': memName2};
+      final receivedMem2 = await memRepositoryV2.receive(memMap2);
 
-      final removedCount = await memRepository.removeAll();
+      final selectedMemList = await memRepositoryV2.selectAll();
 
-      expect(removedCount, 2);
+      expect(selectedMemList.length, 2);
+      expect(
+        selectedMemList.map((mem) => mem.toMap()),
+        [receivedMem1.toMap(), receivedMem2.toMap()],
+      );
     },
   );
 
   test(
     'selectById',
     () async {
-      const memName = 'test mem name';
-      final memMap = <String, dynamic>{'name': memName};
-      final receivedMem = await memRepository.receive(memMap);
-
-      final selectedMem = await memRepository.selectById(receivedMem.id);
-
-      expect(selectedMem.id, receivedMem.id);
-      expect(selectedMem.name, memName);
-      expect(selectedMem.createdAt, const TypeMatcher<DateTime>());
-      expect(selectedMem.updatedAt, null);
-      expect(selectedMem.archivedAt, null);
-    },
-  );
-
-  test(
-    'select',
-    () async {
-      const memName = 'test mem name';
-      final memMap = <String, dynamic>{'name': memName};
-      final receivedMem = await memRepository.receive(memMap);
-      const memName2 = 'test mem name';
+      const memName1 = 'test mem name 1';
+      final memMap = <String, dynamic>{'name': memName1};
+      final receivedMem1 = await memRepositoryV2.receive(memMap);
+      const memName2 = 'test mem name 2';
       final memMap2 = <String, dynamic>{'name': memName2};
-      final receivedMem2 = await memRepository.receive(memMap2);
+      await memRepositoryV2.receive(memMap2);
 
-      final selectedMemList = await memRepository.select();
+      final selectedMem = await memRepositoryV2.selectById(receivedMem1.id);
 
-      expect(selectedMemList.length, 2);
-      expect(
-        selectedMemList.map((e) => e.id),
-        [receivedMem.id, receivedMem2.id],
-      );
+      expect(selectedMem.toMap(), receivedMem1.toMap());
     },
   );
 
   test(
-    'updateWhereId',
+    'update',
     () async {
-      const memName = 'test mem name';
-      final memMap = <String, dynamic>{'name': memName};
-      final receivedMem = await memRepository.receive(memMap);
+      const memName1 = 'test mem name 1';
+      final memMap = <String, dynamic>{'name': memName1};
+      final receivedMem1 = await memRepositoryV2.receive(memMap);
+      const memName2 = 'test mem name 2';
+      final memMap2 = <String, dynamic>{'name': memName2};
+      await memRepositoryV2.receive(memMap2);
 
-      final map = receivedMem.toMap();
+      final map = receivedMem1.toMap();
       const updateMemName = 'update mem name';
 
-      final updatedMem = await memRepository.update(
+      final updatedMem = await memRepositoryV2.update(
         Mem.fromMap(map..['name'] = updateMemName),
       );
 
-      expect(updatedMem.id, receivedMem.id);
+      expect(updatedMem.id, receivedMem1.id);
       expect(updatedMem.name, updateMemName);
       expect(updatedMem.createdAt, const TypeMatcher<DateTime>());
       expect(updatedMem.updatedAt, const TypeMatcher<DateTime>());
@@ -111,23 +102,45 @@ void main() async {
         greaterThan(updatedMem.createdAt.millisecondsSinceEpoch),
       );
       expect(updatedMem.archivedAt, null);
+
+      final selectedByIdUpdatedMem =
+          await memRepositoryV2.selectById(receivedMem1.id);
+      expect(selectedByIdUpdatedMem.toMap(), updatedMem.toMap());
     },
   );
 
   test(
     'removeById',
     () async {
-      const memName = 'test mem name';
-      final memMap = <String, dynamic>{'name': memName};
-      final receivedMem = await memRepository.receive(memMap);
-      final receivedMem2 = await memRepository.receive(memMap);
+      const memName1 = 'test mem name 1';
+      final memMap = <String, dynamic>{'name': memName1};
+      final receivedMem1 = await memRepositoryV2.receive(memMap);
+      const memName2 = 'test mem name 2';
+      final memMap2 = <String, dynamic>{'name': memName2};
+      final receivedMem2 = await memRepositoryV2.receive(memMap2);
 
-      final removeResult = await memRepository.removeById(receivedMem.id);
+      final removeResult = await memRepositoryV2.removeById(receivedMem1.id);
       expect(removeResult, true);
 
-      final selectedAll = await memRepository.select();
-      expect(selectedAll.length, 1);
-      expect(selectedAll.map((e) => e.id), [receivedMem2.id]);
+      final selectedMemList = await memRepositoryV2.selectAll();
+      expect(selectedMemList.length, 1);
+      expect(selectedMemList.map((mem) => mem.toMap()), [receivedMem2.toMap()]);
+    },
+  );
+
+  test(
+    'removeAll',
+    () async {
+      final memMap = <String, dynamic>{'name': 'test mem name'};
+      await memRepositoryV2.receive(memMap);
+      await memRepositoryV2.receive(memMap);
+
+      final removedCount = await memRepositoryV2.removeAll();
+
+      expect(removedCount, 2);
+
+      final selected = await memRepositoryV2.selectAll();
+      expect(selected.length, 0);
     },
   );
 }
