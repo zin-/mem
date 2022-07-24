@@ -41,15 +41,10 @@ class IndexedDatabaseV2 extends DatabaseV2 {
   }
 
   @override
-  close() {
-    // TODO: implement close
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> delete() async {
+  Future<bool> delete() async {
     _database.close();
     await _factory.deleteDatabase(definition.name);
+    return true;
   }
 }
 

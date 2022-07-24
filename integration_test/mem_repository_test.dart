@@ -14,7 +14,7 @@ void main() async {
 
   setUpAll(() async {
     databaseV2 =
-        await DatabaseManager.open(DefD('test_mem.db', 1, [memTableV2]));
+        await DatabaseManager().open(DefD('test_mem.db', 1, [memTableV2]));
     memRepositoryV2 = MemRepositoryV2(databaseV2.getTable(memTableV2.name));
   });
   tearDown(() async {

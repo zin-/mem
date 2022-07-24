@@ -8,9 +8,7 @@ abstract class DatabaseV2 {
 
   Future<DatabaseV2> open();
 
-  close();
-
-  Future<void> delete();
+  Future<bool> delete();
 
   TableV2 getTable(String name) {
     if (tables.containsKey(name)) {

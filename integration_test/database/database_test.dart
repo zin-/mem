@@ -26,13 +26,30 @@ void main() {
   DatabaseV2 database;
 
   tearDown(() async {
-    await DatabaseManager.delete(dbName);
+    await DatabaseManager().delete(dbName);
+  });
+
+  test('find undefined table', () async {
+    database = await DatabaseManager().open(DefD(
+      dbName,
+      dbVersion,
+      tableDefinitions,
+    ));
+
+    const undefinedTableName = 'undefined table name';
+    expect(
+      () => database.getTable(undefinedTableName),
+      throwsA((e) =>
+          e is DatabaseException &&
+          e.toString() ==
+              'Table: $undefinedTableName does not exist on Database: $dbName.'),
+    );
   });
 
   test(
     'insert',
     () async {
-      database = await DatabaseManager.open(DefD(
+      database = await DatabaseManager().open(DefD(
         dbName,
         dbVersion,
         tableDefinitions,
@@ -50,7 +67,7 @@ void main() {
   test(
     'select',
     () async {
-      database = await DatabaseManager.open(DefD(
+      database = await DatabaseManager().open(DefD(
         dbName,
         dbVersion,
         tableDefinitions,
@@ -81,7 +98,7 @@ void main() {
   test(
     'selectByPk',
     () async {
-      database = await DatabaseManager.open(DefD(
+      database = await DatabaseManager().open(DefD(
         dbName,
         dbVersion,
         tableDefinitions,
@@ -106,7 +123,7 @@ void main() {
   test(
     'updateByPk',
     () async {
-      database = await DatabaseManager.open(DefD(
+      database = await DatabaseManager().open(DefD(
         dbName,
         dbVersion,
         tableDefinitions,
@@ -140,7 +157,7 @@ void main() {
   test(
     'deleteById',
     () async {
-      database = await DatabaseManager.open(DefD(
+      database = await DatabaseManager().open(DefD(
         dbName,
         dbVersion,
         tableDefinitions,
@@ -169,7 +186,7 @@ void main() {
   test(
     'deleteAll',
     () async {
-      database = await DatabaseManager.open(DefD(
+      database = await DatabaseManager().open(DefD(
         dbName,
         dbVersion,
         tableDefinitions,

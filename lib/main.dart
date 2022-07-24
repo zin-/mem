@@ -14,7 +14,7 @@ void main() async {
 Future<DatabaseV2> _openDatabase() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final database = await DatabaseManager.open(DefD(
+  final database = await DatabaseManager().open(DefD(
     'mem.db',
     1,
     [],

@@ -6,11 +6,9 @@ import 'package:mem/database/indexed_database.dart';
 import 'package:mem/database/sqlite_database.dart';
 
 class DatabaseManager {
-  DatabaseManager._();
+  final _databases = <String, DatabaseV2>{};
 
-  static final _databases = <String, DatabaseV2>{};
-
-  static Future<DatabaseV2> open(
+  Future<DatabaseV2> open(
     DatabaseDefinition definition,
   ) async {
     if (_databases.containsKey(definition.name)) {
@@ -26,7 +24,7 @@ class DatabaseManager {
     return _databases[definition.name]!;
   }
 
-  static Future<void> delete(String name) async {
+  Future<void> delete(String name) async {
     if (_databases.containsKey(name)) {
       print('Delete database. name: $name');
       await _databases[name]!.delete();
@@ -34,5 +32,18 @@ class DatabaseManager {
     } else {
       print('I do not have database. name: $name');
     }
+  }
+
+  DatabaseManager._();
+
+  static DatabaseManager? _instance;
+
+  factory DatabaseManager() {
+    var tmp = _instance;
+    if (tmp == null) {
+      tmp = DatabaseManager._();
+      _instance = tmp;
+    }
+    return tmp;
   }
 }

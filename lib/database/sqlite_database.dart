@@ -1,7 +1,5 @@
 import 'dart:io';
-
 import 'package:flutter/foundation.dart';
-import 'package:mem/database/definitions.dart';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
@@ -9,6 +7,7 @@ import 'package:path/path.dart' as path;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
 
 import 'package:mem/database/database.dart';
+import 'package:mem/database/definitions.dart';
 
 class SqliteDatabaseV2 extends DatabaseV2 {
   SqliteDatabaseV2(super.definition) {
@@ -43,12 +42,6 @@ class SqliteDatabaseV2 extends DatabaseV2 {
     }
 
     return this;
-  }
-
-  @override
-  close() {
-    // TODO: implement close
-    throw UnimplementedError();
   }
 
   @override
