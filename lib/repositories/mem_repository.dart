@@ -62,6 +62,11 @@ class MemRepository {
     }
     return tmp;
   }
+
+  factory MemRepository.withMock(MemRepository mock) {
+    _instance = mock;
+    return mock;
+  }
 }
 
 final memTable = DefT(

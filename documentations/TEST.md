@@ -4,6 +4,13 @@
 flutter test ../test ../integration_test
 ```
 
+## Generate mocks
+
+```shell
+cd ../
+flutter pub run build_runner build
+```
+
 ## Unit test
 
 ```shell
