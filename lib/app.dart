@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/mem_detail/mem_detail_page.dart';
+import 'package:mem/views/mem_detail/mem_detail_page.dart';
 
 class MemApplication extends StatelessWidget {
   const MemApplication({Key? key}) : super(key: key);

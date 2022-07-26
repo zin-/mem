@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:mem/mem.dart';
-import 'package:mem/mem_detail/state_notifier.dart';
+import 'package:mem/views/state_notifier.dart';
 import 'package:mem/repositories/mem_repository.dart';
 
 class MemState extends ValueStateNotifier<Map<String, dynamic>> {
@@ -31,7 +32,8 @@ final fetchMemById = Provider.family<Future, int?>((ref, memId) async {
   }
 });
 
-final save = Provider.family<Future, Map<String, dynamic>>((ref, mem) async {
+final save =
+    Provider.family<Future<bool>, Map<String, dynamic>>((ref, mem) async {
   if (mem.containsKey('id')) {
     final updated = await MemRepository().update(Mem.fromMap(mem));
     ref.read(memProvider(updated.id).notifier).updatedBy(updated.toMap());
@@ -39,4 +41,6 @@ final save = Provider.family<Future, Map<String, dynamic>>((ref, mem) async {
     final received = await MemRepository().receive(mem);
     ref.read(memProvider(received.id).notifier).updatedBy(received.toMap());
   }
+
+  return true;
 });

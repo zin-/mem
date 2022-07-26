@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/database/database.dart';
 import 'package:mem/mem.dart';
-import 'package:mem/mem_detail/mem_detail_page.dart';
+import 'package:mem/views/mem_detail/mem_detail_page.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mockito/mockito.dart';
 
@@ -91,6 +91,9 @@ void main() {
 
       await widgetTester.enterText(memNameFinder, enteringMemName);
       await widgetTester.tap(saveFabFinder);
+      await widgetTester.pump();
+
+      expect(find.text('Save success. $enteringMemName'), findsOneWidget);
 
       verifyNever(mockedMemRepository.selectById(null));
       verify(mockedMemRepository.receive(any)).called(1);
@@ -131,6 +134,9 @@ void main() {
 
       await widgetTester.enterText(memNameFinder, enteringMemName);
       await widgetTester.tap(saveFabFinder);
+      await widgetTester.pump();
+
+      expect(find.text('Save success. $enteringMemName'), findsOneWidget);
 
       verify(mockedMemRepository.selectById(memId)).called(1);
       verify(mockedMemRepository.update(any)).called(1);
