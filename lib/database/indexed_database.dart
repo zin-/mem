@@ -92,6 +92,7 @@ class IndexedDatabase extends Database {
   ) async {
     try {
       // FIXME トランザクションを開始するために、最低1つのストアが必要な仕様になっている
+      // idb_shimにデータベースが存在しているかを確認するAPIがないため
       await _database
           .transaction(tables.keys.first, idb_shim.idbModeReadOnly)
           .completed;
