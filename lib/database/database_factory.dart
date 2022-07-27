@@ -24,13 +24,31 @@ class DatabaseManager {
     return _databases[definition.name]!;
   }
 
-  Future<void> delete(String name) async {
+  Future<bool> close(String name) async {
     if (_databases.containsKey(name)) {
-      print('Delete database. name: $name');
-      await _databases[name]!.delete();
+      print('Close database. name: $name');
+      final closeResult = await _databases[name]!.close();
       _databases.remove(name);
+      return closeResult;
     } else {
       print('I do not have database. name: $name');
+      return false;
+    }
+  }
+
+  Future<bool> delete(String name) async {
+    if (_databases.containsKey(name)) {
+      print('Delete database. name: $name');
+      final deleteResult = await _databases[name]!.delete();
+      if (deleteResult) {
+        _databases.remove(name);
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      print('I do not have database. name: $name');
+      return false;
     }
   }
 

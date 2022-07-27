@@ -7,7 +7,9 @@ import 'package:mem/main.dart' as app;
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/constants.dart';
 
-import '../test/widget/mem_detail_test.dart';
+// FIXME mem_detail_testと同じ定義。共通化したい
+final memNameFinder = find.byType(TextFormField).at(0);
+final saveFabFinder = find.byIcon(Icons.save_alt).at(0);
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();

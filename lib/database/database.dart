@@ -1,14 +1,24 @@
+import 'dart:async';
+
 import 'package:mem/database/definitions.dart';
 
 abstract class Database {
   final DefD definition;
+  var isOpen = false;
   final tables = <String, Table>{};
 
   Database(this.definition);
 
   Future<Database> open();
 
+  Future<bool> close();
+
   Future<bool> delete();
+
+  Future<T> checkExists<T>(
+    FutureOr<T> Function() onTrue,
+    FutureOr<T> Function() onFalse,
+  );
 
   Table getTable(String name) {
     if (tables.containsKey(name)) {
@@ -18,6 +28,12 @@ abstract class Database {
           'Table: $name does not exist on Database: ${definition.name}.');
     }
   }
+
+  Future<T> onOpened<T>(
+    FutureOr<T> Function() onTrue,
+    FutureOr<T> Function() onFalse,
+  ) async =>
+      isOpen ? await checkExists(onTrue, onFalse) : await onFalse();
 }
 
 abstract class Table {
@@ -70,5 +86,13 @@ class NotFoundException extends DatabaseException {
           ' target: $targetName'
           ', conditions: { $conditions }'
           ' }',
+        );
+}
+
+class DatabaseDoesNotExistException extends DatabaseException {
+  DatabaseDoesNotExistException(String databaseName)
+      : super(
+          'Database does not exist or closed.'
+          ' databaseName: $databaseName',
         );
 }

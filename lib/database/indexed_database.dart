@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:idb_shim/idb.dart' as idb_shim;
@@ -7,7 +8,12 @@ import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
 
 class IndexedDatabase extends Database {
-  IndexedDatabase(super.definition);
+  IndexedDatabase(super.definition) {
+    if (definition.tableDefinitions.isEmpty) {
+      // FIXME DBの存在チェックのため最低1つのストアが必要な仕様になっている
+      throw DatabaseException('Requires at least 1 table.');
+    }
+  }
 
   final idb_shim.IdbFactory _factory = idb_browser.idbFactoryBrowser;
   late final idb_shim.Database _database;
@@ -21,10 +27,8 @@ class IndexedDatabase extends Database {
         for (var tableDefinition in definition.tableDefinitions) {
           event.database.createObjectStore(
             tableDefinition.name,
-            autoIncrement: tableDefinition.columns
-                .whereType<DefPK>()
-                .first
-                .autoincrement,
+            autoIncrement:
+                tableDefinition.columns.whereType<DefPK>().first.autoincrement,
           );
         }
       },
@@ -33,114 +37,185 @@ class IndexedDatabase extends Database {
     for (var tableDefinition in definition.tableDefinitions) {
       tables.putIfAbsent(
         tableDefinition.name,
-        () => ObjectStore(tableDefinition, _database),
+        () => ObjectStore(tableDefinition, this),
       );
     }
 
+    isOpen = true;
     return this;
   }
 
   @override
-  Future<bool> delete() async {
-    _database.close();
-    await _factory.deleteDatabase(definition.name);
-    return true;
+  Future<bool> close() async => await onOpened(
+        () {
+          _database.close();
+          isOpen = false;
+          return true;
+        },
+        () {
+          print(
+            'Close failed.'
+            ' Database does not exist.'
+            ' databaseName: ${definition.name}',
+          );
+          return false;
+        },
+      );
+
+  @override
+  Future<bool> delete() async => await checkExists(
+        () async {
+          await close();
+          await _factory.deleteDatabase(
+            definition.name,
+            onBlocked: (event) {
+              print('onBlocked');
+              print('event: $event');
+            },
+          );
+          return true;
+        },
+        () async {
+          print(
+            'Delete failed.'
+            ' Database does not exist.'
+            ' databaseName: ${definition.name}',
+          );
+          return false;
+        },
+      );
+
+  @override
+  Future<T> checkExists<T>(
+    FutureOr<T> Function() onTrue,
+    FutureOr<T> Function() onFalse,
+  ) async {
+    try {
+      // FIXME トランザクションを開始するために、最低1つのストアが必要な仕様になっている
+      await _database
+          .transaction(tables.keys.first, idb_shim.idbModeReadOnly)
+          .completed;
+      return await onTrue();
+    } catch (e) {
+      print(e);
+      return await onFalse();
+    }
   }
 }
 
 class ObjectStore extends Table {
-  final idb_shim.Database _database;
+  final IndexedDatabase _database;
 
   ObjectStore(super.definition, this._database);
 
   late final _pkColumn = definition.columns.whereType<DefPK>().first;
 
   @override
-  Future<int> insert(Map<String, dynamic> value) async {
-    final txn =
-        _database.transaction(definition.name, idb_shim.idbModeReadWrite);
+  Future<int> insert(Map<String, dynamic> value) async =>
+      await _database.onOpened(
+        () async {
+          final txn = _database._database
+              .transaction(definition.name, idb_shim.idbModeReadWrite);
 
-    final store = txn.objectStore(definition.name);
-    final generatedPk = await store.add(convertTo(value));
-    // TODO 更新数が1かを確認した方が良いかも
-    await store.put(
-      convertTo(value..putIfAbsent(_pkColumn.name, () => generatedPk)),
-      generatedPk,
-    );
+          final store = txn.objectStore(definition.name);
+          final generatedPk = await store.add(convertTo(value));
+          // TODO 更新数が1かを確認した方が良いかも
+          await store.put(
+            convertTo(value..putIfAbsent(_pkColumn.name, () => generatedPk)),
+            generatedPk,
+          );
 
-    await txn.completed;
+          await txn.completed;
 
-    return int.parse(generatedPk.toString());
-  }
-
-  @override
-  Future<List<Map<String, dynamic>>> select() async {
-    final txn =
-        _database.transaction(definition.name, idb_shim.idbModeReadOnly);
-
-    final objects = await txn.objectStore(definition.name).getAll();
-
-    await txn.completed;
-
-    return objects
-        .map((object) => convertFrom(_convertIntoMap(object)))
-        .toList();
-  }
+          return int.parse(generatedPk.toString());
+        },
+        () => throw DatabaseDoesNotExistException(_database.definition.name),
+      );
 
   @override
-  Future<Map<String, dynamic>> selectByPk(pk) async {
-    final txn =
-        _database.transaction(definition.name, idb_shim.idbModeReadOnly);
+  Future<List<Map<String, dynamic>>> select() async => await _database.onOpened(
+        () async {
+          final txn = _database._database
+              .transaction(definition.name, idb_shim.idbModeReadOnly);
 
-    final object = await txn.objectStore(definition.name).getObject(pk);
+          final objects = await txn.objectStore(definition.name).getAll();
 
-    await txn.completed;
+          await txn.completed;
 
-    return convertFrom(_convertIntoMap(object));
-  }
-
-  @override
-  Future<int> updateByPk(pk, Map<String, dynamic> value) async {
-    final txn =
-        _database.transaction(definition.name, idb_shim.idbModeReadWrite);
-    final store = txn.objectStore(definition.name);
-
-    final saved = _convertIntoMap(await store.getObject(pk));
-    value.forEach((key, value) {
-      saved[key] = value;
-    });
-    final putCount =
-        await txn.objectStore(definition.name).put(convertTo(saved), pk);
-    await txn.completed;
-
-    return int.parse(putCount.toString());
-  }
+          return objects
+              .map((object) => convertFrom(_convertIntoMap(object)))
+              .toList();
+        },
+        () => throw DatabaseDoesNotExistException(_database.definition.name),
+      );
 
   @override
-  Future<int> deleteByPk(pk) async {
-    final txn =
-        _database.transaction(definition.name, idb_shim.idbModeReadWrite);
+  Future<Map<String, dynamic>> selectByPk(pk) async => await _database.onOpened(
+        () async {
+          final txn = _database._database
+              .transaction(definition.name, idb_shim.idbModeReadOnly);
 
-    await txn.objectStore(definition.name).delete(pk);
+          final object = await txn.objectStore(definition.name).getObject(pk);
 
-    await txn.completed;
+          await txn.completed;
 
-    return 1;
-  }
+          return convertFrom(_convertIntoMap(object));
+        },
+        () => throw DatabaseDoesNotExistException(_database.definition.name),
+      );
 
   @override
-  Future<int> delete() async {
-    final txn =
-        _database.transaction(definition.name, idb_shim.idbModeReadWrite);
-    final store = txn.objectStore(definition.name);
+  Future<int> updateByPk(pk, Map<String, dynamic> value) async =>
+      await _database.onOpened(
+        () async {
+          final txn = _database._database
+              .transaction(definition.name, idb_shim.idbModeReadWrite);
+          final store = txn.objectStore(definition.name);
 
-    final count = await store.count();
-    await store.clear();
+          final saved = _convertIntoMap(await store.getObject(pk));
+          value.forEach((key, value) {
+            saved[key] = value;
+          });
+          final putCount =
+              await txn.objectStore(definition.name).put(convertTo(saved), pk);
+          await txn.completed;
 
-    await txn.completed;
+          return int.parse(putCount.toString());
+        },
+        () => throw DatabaseDoesNotExistException(_database.definition.name),
+      );
 
-    return count;
-  }
+  @override
+  Future<int> deleteByPk(pk) async => await _database.onOpened(
+        () async {
+          final txn = _database._database
+              .transaction(definition.name, idb_shim.idbModeReadWrite);
+
+          await txn.objectStore(definition.name).delete(pk);
+
+          await txn.completed;
+
+          return 1;
+        },
+        () => throw DatabaseDoesNotExistException(_database.definition.name),
+      );
+
+  @override
+  Future<int> delete() async => await _database.onOpened(
+        () async {
+          final txn = _database._database
+              .transaction(definition.name, idb_shim.idbModeReadWrite);
+          final store = txn.objectStore(definition.name);
+
+          final count = await store.count();
+          await store.clear();
+
+          await txn.completed;
+
+          return count;
+        },
+        () => throw DatabaseDoesNotExistException(_database.definition.name),
+      );
 
   Map<String, dynamic> _convertIntoMap(Object? object) {
     final json = jsonDecode(jsonEncode(object));

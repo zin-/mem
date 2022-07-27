@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 
@@ -11,6 +12,7 @@ import 'package:mem/database/definitions.dart';
 
 class SqliteDatabase extends Database {
   SqliteDatabase(super.definition) {
+    if (kIsWeb) throw DatabaseException('Unsupported platform. Platform: Web');
     _initialize();
   }
 
@@ -37,31 +39,49 @@ class SqliteDatabase extends Database {
     for (var tableDefinition in definition.tableDefinitions) {
       tables.putIfAbsent(
         tableDefinition.name,
-        () => SqliteTable(tableDefinition, _database),
+        () => SqliteTable(tableDefinition, _database, this),
       );
     }
 
+    isOpen = true;
     return this;
   }
 
   @override
-  Future<bool> delete() async {
-    if (await _factory.databaseExists(await _pathFuture)) {
-      await _factory.deleteDatabase(await _pathFuture);
-      return true;
-    } else {
-      print(
-        'Delete failed.'
-        ' Database does not exist.'
-        ' databasePath: $_pathFuture',
+  Future<bool> close() async => await onOpened(
+        () async {
+          await _database.close();
+          isOpen = false;
+          return true;
+        },
+        () async {
+          print(
+            'Close failed.'
+            ' Database does not exist.'
+            ' databasePath: ${await _pathFuture}',
+          );
+          return false;
+        },
       );
-      return false;
-    }
-  }
+
+  @override
+  Future<bool> delete() async => await onOpened(
+        () async {
+          await _factory.deleteDatabase(await _pathFuture);
+          isOpen = false;
+          return true;
+        },
+        () async {
+          print(
+            'Delete failed.'
+            ' Database does not exist.'
+            ' databasePath: ${await _pathFuture}',
+          );
+          return false;
+        },
+      );
 
   void _initialize() {
-    if (kIsWeb) throw DatabaseException('Unsupported platform. Platform: Web');
-
     Future<String> databaseDirectoryPath;
     if (Platform.isAndroid) {
       _factory = sqflite.databaseFactory;
@@ -78,58 +98,92 @@ class SqliteDatabase extends Database {
     _pathFuture = databaseDirectoryPath
         .then((value) => path.join(value, definition.name));
   }
+
+  @override
+  Future<T> checkExists<T>(
+    FutureOr<T> Function() onTrue,
+    FutureOr<T> Function() onFalse,
+  ) async {
+    if (await _factory.databaseExists(await _pathFuture)) {
+      return await onTrue();
+    } else {
+      return await onFalse();
+    }
+  }
 }
 
 class SqliteTable extends Table {
+  final SqliteDatabase _database2;
   final sqflite.Database _database;
 
-  SqliteTable(super.definition, this._database);
+  SqliteTable(super.definition, this._database, this._database2);
 
   @override
-  Future<int> insert(Map<String, dynamic> value) =>
-      _database.insert(definition.name, convertTo(value));
+  Future<int> insert(Map<String, dynamic> value) async =>
+      await _database2.onOpened(
+        () async => await _database.insert(definition.name, convertTo(value)),
+        () => throw DatabaseDoesNotExistException(_database2.definition.name),
+      );
 
   @override
   Future<List<Map<String, dynamic>>> select() async =>
-      (await _database.query(definition.name))
-          .map((e) => convertFrom(e))
-          .toList();
+      await _database2.onOpened(
+        () async => (await _database.query(definition.name))
+            .map((e) => convertFrom(e))
+            .toList(),
+        () => throw DatabaseDoesNotExistException(_database2.definition.name),
+      );
 
   @override
   Future<Map<String, dynamic>> selectByPk(pk) async {
-    final selectedByPk = await _database.query(
-      definition.name,
-      where: _buildWhereId(),
-      whereArgs: [pk],
-    );
+    return await _database2.onOpened(
+      () async {
+        final selectedByPk = await _database.query(
+          definition.name,
+          where: _buildWhereId(),
+          whereArgs: [pk],
+        );
 
-    if (selectedByPk.length == 1) {
-      return convertFrom(selectedByPk.first);
-    } else {
-      throw NotFoundException(
-        definition.name,
-        _buildWhereId().replaceFirst('?', pk.toString()),
-      );
-    }
+        if (selectedByPk.length == 1) {
+          return convertFrom(selectedByPk.first);
+        } else {
+          throw NotFoundException(
+            definition.name,
+            _buildWhereId().replaceFirst('?', pk.toString()),
+          );
+        }
+      },
+      () => throw DatabaseDoesNotExistException(_database2.definition.name),
+    );
   }
 
   @override
-  Future<int> updateByPk(pk, Map<String, dynamic> value) => _database.update(
-        definition.name,
-        convertTo(value),
-        where: _buildWhereId(),
-        whereArgs: [pk],
+  Future<int> updateByPk(pk, Map<String, dynamic> value) async =>
+      await _database2.onOpened(
+        () async => await _database.update(
+          definition.name,
+          convertTo(value),
+          where: _buildWhereId(),
+          whereArgs: [pk],
+        ),
+        () => throw DatabaseDoesNotExistException(_database2.definition.name),
       );
 
   @override
-  Future<int> deleteByPk(pk) => _database.delete(
-        definition.name,
-        where: _buildWhereId(),
-        whereArgs: [pk],
+  Future<int> deleteByPk(pk) async => await _database2.onOpened(
+        () async => await _database.delete(
+          definition.name,
+          where: _buildWhereId(),
+          whereArgs: [pk],
+        ),
+        () => throw DatabaseDoesNotExistException(_database2.definition.name),
       );
 
   @override
-  Future<int> delete() => _database.delete(definition.name);
+  Future<int> delete() async => await _database2.onOpened(
+        () async => await _database.delete(definition.name),
+        () => throw DatabaseDoesNotExistException(_database2.definition.name),
+      );
 
   String _buildWhereId() =>
       '${definition.columns.whereType<DefPK>().first.name} = ?';
