@@ -67,6 +67,8 @@ class MemRepository {
     _instance = mock;
     return mock;
   }
+
+  static clear() => _instance = null;
 }
 
 const memTableName = 'mems';

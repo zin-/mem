@@ -19,6 +19,8 @@ void main() {
     // TODO openしなくてもdeleteできるようにする
     await DatabaseManager().open(app.databaseDefinition);
     await DatabaseManager().delete(app.databaseDefinition.name);
+
+    MemRepository.clear();
   });
 
   group(
@@ -29,7 +31,7 @@ void main() {
         (widgetTester) async {
           const enteringMemName = 'entering mem name';
 
-          app.main();
+          await app.main();
           await widgetTester.pumpAndSettle();
 
           expect(
@@ -51,20 +53,23 @@ void main() {
           expect(find.text('Save success. $enteringMemName'), findsNothing);
         },
       );
+
       testWidgets(
         ': show saved mem and update.',
         (widgetTester) async {
           const savedMemName = 'saved mem name';
           final database = await DatabaseManager().open(app.databaseDefinition);
           final memTable = database.getTable(memTableName);
-          await memTable.insert({
+          final savedMemId = await memTable.insert({
             'name': savedMemName,
             'createdAt': DateTime.now(),
           });
+          assert(savedMemId == 1);
+          await DatabaseManager().close(app.databaseDefinition.name);
 
           const enteringMemName = 'entering mem name';
 
-          app.main();
+          await app.main();
           await widgetTester.pumpAndSettle();
 
           expect(

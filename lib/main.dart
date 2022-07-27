@@ -14,7 +14,7 @@ final databaseDefinition = DefD(
   ],
 );
 
-void main() async {
+Future<void> main() async {
   await _openDatabase();
 
   runApp(const MemApplication());

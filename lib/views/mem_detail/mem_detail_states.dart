@@ -21,13 +21,12 @@ final memProvider =
 
 final fetchMemById = Provider.family<Future, int?>((ref, memId) async {
   try {
-    if (memId == null) {
-      ref.read(memProvider(memId).notifier).updatedBy({});
-    } else {
+    if (memId != null) {
       final mem = await MemRepository().selectById(memId);
       ref.read(memProvider(memId).notifier).updatedBy(mem.toMap());
     }
   } catch (e) {
+    print(e);
     ref.read(memProvider(memId).notifier).updatedBy({});
   }
 });
