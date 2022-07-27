@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/views/constants.dart';
 
 import 'package:mem/views/mem_detail/mem_detail_states.dart';
 
@@ -55,7 +56,9 @@ class MemDetailPage extends StatelessWidget {
                     if (saveSuccess) {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text('Save success. ${mem['name']}'),
-                        duration: const Duration(seconds: 3),
+                        duration: const Duration(
+                          seconds: defaultDismissDurationSeconds,
+                        ),
                         dismissDirection: DismissDirection.horizontal,
                       ));
                     }

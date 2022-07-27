@@ -69,8 +69,9 @@ class MemRepository {
   }
 }
 
+const memTableName = 'mems';
 final memTable = DefT(
-  'mems',
+  memTableName,
   [
     DefPK('id', TypeC.integer, autoincrement: true),
     DefC('name', TypeC.text),

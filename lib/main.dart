@@ -6,6 +6,14 @@ import 'package:mem/database/database_factory.dart';
 import 'package:mem/database/definitions.dart';
 import 'package:mem/repositories/mem_repository.dart';
 
+final databaseDefinition = DefD(
+  'mem.db',
+  1,
+  [
+    memTable,
+  ],
+);
+
 void main() async {
   await _openDatabase();
 
@@ -15,13 +23,7 @@ void main() async {
 Future<Database> _openDatabase() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final database = await DatabaseManager().open(DefD(
-    'mem.db',
-    1,
-    [
-      memTable,
-    ],
-  ));
+  final database = await DatabaseManager().open(databaseDefinition);
 
   MemRepository.initialize(database.getTable(memTable.name));
 

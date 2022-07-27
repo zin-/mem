@@ -1,35 +1,89 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:mem/database/database_factory.dart';
 
 import 'package:mem/main.dart' as app;
+import 'package:mem/repositories/mem_repository.dart';
+import 'package:mem/views/constants.dart';
+
+import '../test/widget/mem_detail_test.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
+  setUp(() async {
+    // FIXME なんか変じゃない？
+    // TODO openしなくてもdeleteできるようにする
+    await DatabaseManager().open(app.databaseDefinition);
+    await DatabaseManager().delete(app.databaseDefinition.name);
+  });
+
   group(
-    'end-to-end test',
+    'Basic scenario',
     () {
-      testWidgets('tap on the floating action button, verify counter',
-          (tester) async {
-        app.main();
-        await tester.pumpAndSettle();
+      testWidgets(
+        ': show new(empty) mem and create.',
+        (widgetTester) async {
+          const enteringMemName = 'entering mem name';
 
-        // Verify the counter starts at 0.
-        expect(find.text('0'), findsOneWidget);
+          app.main();
+          await widgetTester.pumpAndSettle();
 
-        // Finds the floating action button to tap on.
-        final Finder fab = find.byTooltip('Increment');
+          expect(
+            (widgetTester.widget(memNameFinder) as TextFormField).initialValue,
+            '',
+          );
 
-        // Emulate a tap on the floating action button.
-        await tester.tap(fab);
+          await widgetTester.enterText(memNameFinder, enteringMemName);
+          await widgetTester.tap(saveFabFinder);
+          await widgetTester.pumpAndSettle();
 
-        // Trigger a frame.
-        await tester.pumpAndSettle();
+          expect(find.text('Save success. $enteringMemName'), findsOneWidget);
 
-        // Verify the counter increments by 1.
-        expect(find.text('1'), findsOneWidget);
-      });
+          await Future.delayed(
+            const Duration(seconds: defaultDismissDurationSeconds),
+          );
+          await widgetTester.pumpAndSettle();
+
+          expect(find.text('Save success. $enteringMemName'), findsNothing);
+        },
+      );
+      testWidgets(
+        ': show saved mem and update.',
+        (widgetTester) async {
+          const savedMemName = 'saved mem name';
+          final database = await DatabaseManager().open(app.databaseDefinition);
+          final memTable = database.getTable(memTableName);
+          await memTable.insert({
+            'name': savedMemName,
+            'createdAt': DateTime.now(),
+          });
+
+          const enteringMemName = 'entering mem name';
+
+          app.main();
+          await widgetTester.pumpAndSettle();
+
+          expect(
+            (widgetTester.widget(memNameFinder) as TextFormField).initialValue,
+            savedMemName,
+          );
+
+          await widgetTester.enterText(memNameFinder, enteringMemName);
+          await widgetTester.tap(saveFabFinder);
+          await widgetTester.pumpAndSettle();
+
+          expect(find.text('Save success. $enteringMemName'), findsOneWidget);
+
+          await Future.delayed(
+            const Duration(seconds: defaultDismissDurationSeconds),
+          );
+          await widgetTester.pumpAndSettle();
+
+          expect(find.text('Save success. $enteringMemName'), findsNothing);
+        },
+      );
     },
-    skip: true,
   );
 }
