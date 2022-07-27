@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+
 import 'package:mem/database/database.dart';
 import 'package:mem/database/database_factory.dart';
 import 'package:mem/database/definitions.dart';
@@ -16,12 +17,21 @@ void main() async {
     database = await DatabaseManager().open(DefD('test_mem.db', 1, [memTable]));
     memRepository = MemRepository.initialize(database.getTable(memTable.name));
   });
-  tearDown(() async {
+  setUp(() async {
     await memRepository.removeAll();
   });
-  tearDownAll(() async {
-    await database.delete();
-  });
+
+  test(
+    'new before initialize',
+    () {
+      expect(
+        MemRepository(),
+        throwsA(((e) => e is RepositoryException)),
+      );
+    },
+    // FIXME factory内のテストはできない？
+    skip: true,
+  );
 
   test(
     'receive',
@@ -31,7 +41,6 @@ void main() async {
 
       final receivedMem = await memRepository.receive(memMap);
 
-      expect(receivedMem.id, 1);
       expect(receivedMem.name, memName);
       expect(receivedMem.createdAt, const TypeMatcher<DateTime>());
       expect(receivedMem.updatedAt, null);

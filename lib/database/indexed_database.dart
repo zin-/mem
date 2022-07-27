@@ -1,3 +1,5 @@
+// coverage:ignore-file
+// WEBでテストするときにカバレッジを取得する方法がないため
 import 'dart:async';
 import 'dart:convert';
 

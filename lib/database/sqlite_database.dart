@@ -12,7 +12,11 @@ import 'package:mem/database/definitions.dart';
 
 class SqliteDatabase extends Database {
   SqliteDatabase(super.definition) {
-    if (kIsWeb) throw DatabaseException('Unsupported platform. Platform: Web');
+    if (kIsWeb) {
+      throw DatabaseException(
+          'Unsupported platform. Platform: Web'); // coverage:ignore-line
+      // WEBでテストするときにカバレッジを取得する方法がないため
+    }
     _initialize();
   }
 
@@ -92,8 +96,11 @@ class SqliteDatabase extends Database {
       databaseDirectoryPath =
           getApplicationSupportDirectory().then((value) => value.path);
     } else {
+      // coverage:ignore-start
+      // WEBでテストするときにカバレッジを取得する方法がないため
       throw DatabaseException(
           'Unsupported platform. platform: ${Platform.operatingSystem}');
+      // coverage:ignore-end
     }
     _pathFuture = databaseDirectoryPath
         .then((value) => path.join(value, definition.name));

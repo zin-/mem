@@ -48,7 +48,7 @@ class MemRepository {
   factory MemRepository() {
     var tmp = _instance;
     if (tmp == null) {
-      throw RepositoryException('Call initialize');
+      throw RepositoryException('Call initialize'); // coverage:ignore-line
     } else {
       return tmp;
     }

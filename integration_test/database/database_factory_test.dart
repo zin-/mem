@@ -18,6 +18,7 @@ void main() {
   ]);
   tearDown(() async => await DatabaseManager().delete(dbDef.name));
 
+  // FIXME Windowsで実行すると画面がないせいなのかFailedになる
   test(
     'Open database twice.',
     () async {

@@ -16,7 +16,8 @@ class DatabaseManager {
     } else {
       print('Open database. name: ${definition.name}');
       final database = await (kIsWeb
-              ? IndexedDatabase(definition)
+              ? IndexedDatabase(definition) // coverage:ignore-line
+              // WEBでテストするときにカバレッジを取得する方法がないため
               : SqliteDatabase(definition))
           .open();
       _databases.putIfAbsent(definition.name, () => database);
