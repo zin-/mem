@@ -97,10 +97,10 @@ class SqliteDatabase extends Database {
           getApplicationSupportDirectory().then((value) => value.path);
     } else {
       // coverage:ignore-start
-      // WEBでテストするときにカバレッジを取得する方法がないため
       throw DatabaseException(
           'Unsupported platform. platform: ${Platform.operatingSystem}');
       // coverage:ignore-end
+      // WEBでテストするときにカバレッジを取得する方法がないため
     }
     _pathFuture = databaseDirectoryPath
         .then((value) => path.join(value, definition.name));
