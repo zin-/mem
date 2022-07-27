@@ -45,6 +45,9 @@ void main() {
       final closeResult2 = await DatabaseManager().close(dbDef.name);
       expect(closeResult2, false);
 
+      final directCloseResult = await db.close();
+      expect(directCloseResult, false);
+
       expect(
         () => table.insert({}),
         throwsA((e) => e is DatabaseDoesNotExistException),
@@ -82,6 +85,9 @@ void main() {
       expect(deleteResult1, true);
       final deleteResult2 = await DatabaseManager().delete(dbDef.name);
       expect(deleteResult2, false);
+
+      final directDeleteResult = await db.delete();
+      expect(directDeleteResult, false);
 
       expect(
         () => table.insert({}),

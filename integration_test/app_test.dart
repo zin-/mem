@@ -15,8 +15,8 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() async {
-    // FIXME なんか変じゃない？
-    // TODO openしなくてもdeleteできるようにする
+    // FIXME openしないとdeleteできないのは、実際のDatabaseと挙動が異なる
+    // 今の実装だと難しいっぽい。いつかチャレンジする
     await DatabaseManager().open(app.databaseDefinition);
     await DatabaseManager().delete(app.databaseDefinition.name);
 
