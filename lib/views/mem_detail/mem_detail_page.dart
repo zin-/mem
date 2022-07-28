@@ -4,7 +4,7 @@ import 'package:mem/views/constants.dart';
 
 import 'package:mem/views/mem_detail/mem_detail_states.dart';
 
-class MemDetailPage extends StatelessWidget {
+class MemDetailPage extends ConsumerWidget {
   final _formKey = GlobalKey<FormState>();
 
   final int? _memId;
@@ -12,63 +12,60 @@ class MemDetailPage extends StatelessWidget {
   MemDetailPage(this._memId, {Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => Consumer(
-        builder: (context, ref, child) {
-          ref.read(fetchMemById(_memId));
-          final mem = ref.watch(memProvider(_memId));
+  Widget build(BuildContext context, WidgetRef ref) {
+    final memMapAsyncValue = ref.watch(fetchMemById(_memId));
 
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text('Detail'),
-            ),
-            body: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    TextFormField(
-                      initialValue: mem['name'],
-                      validator: (value) {
-                        if (value?.isEmpty ?? false) {
-                          return 'Name is required.';
-                        } else {
-                          return null;
-                        }
-                      },
-                      onSaved: (value) {
-                        ref
-                            .read(memProvider(_memId).notifier)
-                            .updatedBy(mem..['name'] = value);
-                      },
-                    ),
-                  ],
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Detail'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: memMapAsyncValue.when(
+            data: (memDataMap) => Column(
+              children: [
+                TextFormField(
+                  initialValue: memDataMap['name'] ?? '',
+                  validator: (value) =>
+                      (value?.isEmpty ?? false) ? 'Name is required.' : null,
+                  onChanged: (value) => ref
+                      .read(memMapProvider(_memId).notifier)
+                      .updatedBy(memDataMap..['name'] = value),
                 ),
-              ),
+              ],
             ),
-            floatingActionButton: FloatingActionButton(
-              child: const Icon(Icons.save_alt),
-              onPressed: () {
-                if (_formKey.currentState?.validate() ?? false) {
-                  _formKey.currentState?.save();
-                  ScaffoldMessenger.of(context);
-                  ref.read(save(mem)).then((saveSuccess) {
-                    if (saveSuccess) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text('Save success. ${mem['name']}'),
-                        duration: const Duration(
-                          seconds: defaultDismissDurationSeconds,
-                        ),
-                        dismissDirection: DismissDirection.horizontal,
-                      ));
-                    }
-                  });
-                }
-              },
-            ),
-            floatingActionButtonLocation:
-                FloatingActionButtonLocation.centerFloat,
+            error: (e, s) => Text('error'),
+            loading: () => Text('loading'),
+          ),
+        ),
+      ),
+      floatingActionButton: Consumer(
+        builder: (context, ref, child) {
+          return FloatingActionButton(
+            child: const Icon(Icons.save_alt),
+            onPressed: () {
+              final memMap = ref.watch(memMapProvider(_memId));
+
+              if (_formKey.currentState?.validate() ?? false) {
+                ref.read(saveMem(memMap)).then((saveSuccess) {
+                  if (saveSuccess) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text('Save success. ${memMap['name']}'),
+                      duration: const Duration(
+                        seconds: defaultDismissDurationSeconds,
+                      ),
+                      dismissDirection: DismissDirection.horizontal,
+                    ));
+                  }
+                });
+              }
+            },
           );
         },
-      );
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
+  }
 }

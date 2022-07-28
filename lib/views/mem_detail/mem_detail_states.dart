@@ -4,42 +4,39 @@ import 'package:mem/mem.dart';
 import 'package:mem/views/state_notifier.dart';
 import 'package:mem/repositories/mem_repository.dart';
 
-class MemState extends ValueStateNotifier<Map<String, dynamic>> {
-  MemState(super.state);
-
-  @override
-  Map<String, dynamic> updatedBy(Map<String, dynamic> value) {
-    final newValue = Map.of(value);
-    return super.updatedBy(newValue);
-  }
-}
-
-final memProvider =
-    StateNotifierProvider.family<MemState, Map<String, dynamic>, int?>(
-  (ref, memId) => MemState({}),
-);
-
-final fetchMemById = Provider.family<Future, int?>((ref, memId) async {
-  try {
-    if (memId != null) {
-      final mem = await MemRepository().selectById(memId);
-      ref.read(memProvider(memId).notifier).updatedBy(mem.toMap());
+final fetchMemById =
+    FutureProvider.family<Map<String, dynamic>, int?>((ref, memId) async {
+  Mem? mem;
+  if (memId == null) {
+    mem = null;
+  } else {
+    try {
+      mem = await MemRepository().selectById(memId);
+      print('fetchedMem: $mem');
+    } catch (e) {
+      print(e);
+      mem = null;
     }
-  } catch (e) {
-    print(e);
-    ref.read(memProvider(memId).notifier).updatedBy({});
   }
+
+  final memMap = mem?.toMap() ?? {};
+  ref.watch(memMapProvider(memId).notifier).updatedBy(memMap);
+
+  return memMap;
 });
 
-final save =
+final memMapProvider = StateNotifierProvider.family<
+    ValueStateNotifier<Map<String, dynamic>>, Map<String, dynamic>, int?>(
+  (ref, memId) => ValueStateNotifier({}),
+);
+
+final saveMem =
     Provider.family<Future<bool>, Map<String, dynamic>>((ref, mem) async {
-  if (mem.containsKey('id')) {
-    final updated = await MemRepository().update(Mem.fromMap(mem));
-    ref.read(memProvider(updated.id).notifier).updatedBy(updated.toMap());
-  } else {
-    final received = await MemRepository().receive(mem);
-    ref.read(memProvider(received.id).notifier).updatedBy(received.toMap());
-  }
+  Mem saved = mem.containsKey('id')
+      ? await MemRepository().update(Mem.fromMap(mem))
+      : await MemRepository().receive(mem);
+
+  ref.read(memMapProvider(saved.id).notifier).updatedBy(saved.toMap());
 
   return true;
 });
