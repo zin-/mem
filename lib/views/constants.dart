@@ -1,0 +1,1 @@
+const defaultDismissDurationSeconds = 3;
