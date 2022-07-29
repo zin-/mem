@@ -47,6 +47,9 @@ dependencies:
   # for basic operations
   collection:
 
+  # for Logger
+  logger:
+
 dev_dependencies:
   integration_test:
       sdk: flutter
