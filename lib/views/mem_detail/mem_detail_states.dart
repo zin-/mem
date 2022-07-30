@@ -15,7 +15,6 @@ final fetchMemById = FutureProvider.family<Map<String, dynamic>, int?>(
       } else {
         try {
           mem = await MemRepository().selectById(memId);
-          print('fetchedMem: $mem');
         } catch (e) {
           print(e);
           mem = null;

@@ -13,7 +13,7 @@ class MemDetailPage extends ConsumerWidget {
   MemDetailPage(this._memId, {Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => v(
+  Widget build(BuildContext context, WidgetRef ref) => t(
         {},
         () {
           final memMapAsyncValue = ref.watch(fetchMemById(_memId));
