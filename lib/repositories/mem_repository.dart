@@ -1,5 +1,6 @@
 import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
+import 'package:mem/logger.dart';
 import 'package:mem/mem.dart';
 
 class MemRepository {
@@ -15,16 +16,21 @@ class MemRepository {
   Future<List<Mem>> selectAll() async =>
       (await _memTable.select()).map((e) => Mem.fromMap(e)).toList();
 
-  Future<Mem> selectById(dynamic id) async =>
-      Mem.fromMap(await _memTable.selectByPk(id));
+  Future<Mem> selectById(dynamic id) => v(
+        {'id': id},
+        () async => Mem.fromMap(await _memTable.selectByPk(id)),
+      );
 
-  Future<Mem> update(Mem mem) async {
-    final value = mem.toMap();
-    value['updatedAt'] = DateTime.now();
-    // TODO 更新数が1かを確認した方が良いかも
-    await _memTable.updateByPk(mem.id, value);
-    return Mem.fromMap(value);
-  }
+  Future<Mem> update(Mem mem) => v(
+        {'mem': mem},
+        () async {
+          final value = mem.toMap();
+          value['updatedAt'] = DateTime.now();
+          // TODO 更新数が1かを確認した方が良いかも
+          await _memTable.updateByPk(mem.id, value);
+          return Mem.fromMap(value);
+        },
+      );
 
   // TODO implement
   // patchWhereId(dynamic id, Map<String, dynamic> value) {}

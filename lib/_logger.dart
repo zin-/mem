@@ -4,7 +4,7 @@ import 'package:logger/logger.dart' as External;
 final filePath = 'mem/_logger.dart';
 
 @deprecated
-T dev<T>(T message) {
+T _dev<T>(T message) {
   Logger()._log(
     External.Level.debug,
     message,
@@ -14,34 +14,34 @@ T dev<T>(T message) {
 }
 
 @deprecated
-T d<T>(dynamic arguments, T Function() function) => Logger()._functionLog(
+T _d<T>(dynamic arguments, T Function() function) => Logger()._functionLog(
       External.Level.debug,
       function,
       arguments,
     );
 
-T v<T>(
+T _v<T>(
   dynamic arguments,
   T Function() function, {
   @deprecated bool debug = false,
 }) =>
     debug
         // ignore: deprecated_member_use_from_same_package
-        ? d(arguments, function)
+        ? _d(arguments, function)
         : Logger()._functionLog(
             External.Level.verbose,
             function,
             arguments,
           );
 
-T i<T>(
+T _i<T>(
   dynamic arguments,
   T Function() function, {
   @deprecated bool debug = false,
 }) =>
     debug
         // ignore: deprecated_member_use_from_same_package
-        ? d(arguments, function)
+        ? _d(arguments, function)
         : Logger()._functionLog(
             External.Level.info,
             function,
