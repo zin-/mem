@@ -2,12 +2,15 @@ import 'package:logger/logger.dart' as ex;
 
 const filePath = 'mem/logger';
 
-@Deprecated('Allow under develop only')
-T d<T>(
+T v<T>(
   dynamic arguments,
-  T Function() function,
-) =>
-    Logger()._functionLog(Level.debug, function, arguments);
+  T Function() function, {
+  @Deprecated('Allow under develop only') bool debug = false,
+}) =>
+    debug
+        // ignore: deprecated_member_use_from_same_package
+        ? d(arguments, function)
+        : Logger()._functionLog(Level.verbose, function, arguments);
 
 T t<T>(
   dynamic arguments,
@@ -19,19 +22,21 @@ T t<T>(
         ? d(arguments, function)
         : Logger()._functionLog(Level.trace, function, arguments);
 
-T v<T>(
+@Deprecated('Allow under develop only')
+T d<T>(
   dynamic arguments,
-  T Function() function, {
-  @Deprecated('Allow under develop only') bool debug = false,
-}) =>
-    debug
-        // ignore: deprecated_member_use_from_same_package
-        ? d(arguments, function)
-        : Logger()._functionLog(Level.verbose, function, arguments);
+  T Function()? function,
+) =>
+    Logger().log(Level.debug, arguments, function);
+
+T warning<T>(T arguments) => Logger().log(Level.warning, arguments, null);
+
+T dev<T>(T arguments) => Logger().log(Level.debug, arguments, null);
 
 enum Level {
   verbose,
   trace,
+  warning,
   debug,
 }
 
@@ -42,6 +47,8 @@ extension on Level {
         return ex.Level.verbose;
       case Level.trace:
         return ex.Level.info;
+      case Level.warning:
+        return ex.Level.warning;
       case Level.debug:
         return ex.Level.debug;
     }
@@ -51,22 +58,41 @@ extension on Level {
 class Logger {
   final ex.Logger _logger;
 
+  log<T>(Level level, dynamic object, T Function()? function) {
+    final stackTrace = StackTrace.current;
+    if (function == null) {
+      if (object is Future) {
+        _futureLog(level, 'base', object, stackTrace);
+      } else if (object is Exception) {
+        if (level == Level.warning) {
+          _messageLog(level, _buildMessageWithValue('Warning', object));
+        } else {
+          _exceptionLog(level, 'Error', object);
+        }
+      } else {
+        _messageLog(level, object.toString(), stackTrace: stackTrace);
+      }
+    } else {
+      _functionLog(level, function, object);
+    }
+  }
+
   T _functionLog<T>(
     Level level,
     T Function() function,
     dynamic arguments,
   ) {
     final stackTrace = StackTrace.current;
-    _objectLog(
+    _messageLog(
       level,
       _buildMessageWithValue('start', arguments),
       stackTrace: stackTrace,
     );
     final result = function();
     if (result is Future) {
-      _futureLog(level, 'future => end', result, stackTrace);
+      _futureLog(level, 'end', result, stackTrace);
     } else {
-      _objectLog(
+      _messageLog(
         level,
         _buildMessageWithValue('end', result),
         stackTrace: stackTrace,
@@ -75,18 +101,22 @@ class Logger {
     return result;
   }
 
-  _futureLog(
-      Level level, String base, Future future, StackTrace stackTrace) async {
+  Future<T> _futureLog<T>(
+      Level level, String base, Future<T> future, StackTrace stackTrace) async {
     final result = await future;
-    _objectLog(
+    _messageLog(
       level,
-      _buildMessageWithValue(base, result),
+      'future => ${_buildMessageWithValue(base, result)}',
       stackTrace: stackTrace,
     );
+    return result;
   }
 
-  void _objectLog(Level level, Object object, {StackTrace? stackTrace}) =>
-      _logger.log(level._convertIntoEx(), object, null, stackTrace);
+  void _messageLog(Level level, String message, {StackTrace? stackTrace}) =>
+      _logger.log(level._convertIntoEx(), message, null, stackTrace);
+
+  void _exceptionLog(Level level, String message, Exception exception) =>
+      _logger.log(level._convertIntoEx(), message, exception);
 
   String _buildMessageWithValue(String base, dynamic arguments) =>
       arguments == null ||
@@ -129,7 +159,7 @@ class _LogFilter extends ex.LogFilter {
       var lines = event.stackTrace.toString().split('\n');
 
       for (var line in lines) {
-        shouldLog = _discardDeviceStacktraceLine(line);
+        shouldLog = _checkUnderDevelopOnParents(line);
         if (shouldLog) {
           break;
         }
@@ -139,7 +169,7 @@ class _LogFilter extends ex.LogFilter {
     return shouldLog;
   }
 
-  bool _discardDeviceStacktraceLine(String line) {
+  bool _checkUnderDevelopOnParents(String line) {
     var match = _deviceStackTraceRegex.matchAsPrefix(line);
     if (match == null) {
       return false;
