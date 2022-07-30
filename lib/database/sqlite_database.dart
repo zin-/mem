@@ -123,13 +123,10 @@ class SqliteDatabase extends Database {
   Future<T> checkExists<T>(
     FutureOr<T> Function() onTrue,
     FutureOr<T> Function() onFalse,
-  ) =>
-      v(
-        {'onTrue': onTrue, 'onFalse': onFalse},
-        () async => (await _factory.databaseExists(await _pathFuture))
-            ? await onTrue()
-            : await onFalse(),
-      );
+  ) async =>
+      (await _factory.databaseExists(await _pathFuture))
+          ? await onTrue()
+          : await onFalse();
 }
 
 class SqliteTable extends Table {
