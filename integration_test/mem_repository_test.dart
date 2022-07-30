@@ -49,7 +49,7 @@ void main() async {
   );
 
   test(
-    'selectAll',
+    'shipAll',
     () async {
       const memName1 = 'test mem name 1';
       final memMap = <String, dynamic>{'name': memName1};
@@ -69,7 +69,7 @@ void main() async {
   );
 
   test(
-    'selectById',
+    'shipWhereIdIs',
     () async {
       const memName1 = 'test mem name 1';
       final memMap = <String, dynamic>{'name': memName1};
@@ -118,7 +118,7 @@ void main() async {
   );
 
   test(
-    'removeById',
+    'discardWhereIdIs',
     () async {
       const memName1 = 'test mem name 1';
       final memMap = <String, dynamic>{'name': memName1};
@@ -137,7 +137,7 @@ void main() async {
   );
 
   test(
-    'removeAll',
+    'discardAll',
     () async {
       final memMap = <String, dynamic>{'name': 'test mem name'};
       await memRepository.receive(memMap);
