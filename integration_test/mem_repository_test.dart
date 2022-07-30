@@ -18,7 +18,7 @@ void main() async {
     memRepository = MemRepository.initialize(database.getTable(memTable.name));
   });
   setUp(() async {
-    await memRepository.removeAll();
+    await memRepository.discardAll();
   });
 
   test(
@@ -58,7 +58,7 @@ void main() async {
       final memMap2 = <String, dynamic>{'name': memName2};
       final receivedMem2 = await memRepository.receive(memMap2);
 
-      final selectedMemList = await memRepository.selectAll();
+      final selectedMemList = await memRepository.shipAll();
 
       expect(selectedMemList.length, 2);
       expect(
@@ -78,7 +78,7 @@ void main() async {
       final memMap2 = <String, dynamic>{'name': memName2};
       await memRepository.receive(memMap2);
 
-      final selectedMem = await memRepository.selectById(receivedMem1.id);
+      final selectedMem = await memRepository.shipWhereIdIs(receivedMem1.id);
 
       expect(selectedMem.toMap(), receivedMem1.toMap());
     },
@@ -112,7 +112,7 @@ void main() async {
       expect(updatedMem.archivedAt, null);
 
       final selectedByIdUpdatedMem =
-          await memRepository.selectById(receivedMem1.id);
+          await memRepository.shipWhereIdIs(receivedMem1.id);
       expect(selectedByIdUpdatedMem.toMap(), updatedMem.toMap());
     },
   );
@@ -127,10 +127,10 @@ void main() async {
       final memMap2 = <String, dynamic>{'name': memName2};
       final receivedMem2 = await memRepository.receive(memMap2);
 
-      final removeResult = await memRepository.removeById(receivedMem1.id);
+      final removeResult = await memRepository.discardWhereIdIs(receivedMem1.id);
       expect(removeResult, true);
 
-      final selectedMemList = await memRepository.selectAll();
+      final selectedMemList = await memRepository.shipAll();
       expect(selectedMemList.length, 1);
       expect(selectedMemList.map((mem) => mem.toMap()), [receivedMem2.toMap()]);
     },
@@ -143,11 +143,11 @@ void main() async {
       await memRepository.receive(memMap);
       await memRepository.receive(memMap);
 
-      final removedCount = await memRepository.removeAll();
+      final removedCount = await memRepository.discardAll();
 
       expect(removedCount, 2);
 
-      final selected = await memRepository.selectAll();
+      final selected = await memRepository.shipAll();
       expect(selected.length, 0);
     },
   );

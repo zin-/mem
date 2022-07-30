@@ -15,7 +15,7 @@ void main() {
 
   group('new', () {
     testWidgets(': not found.', (widgetTester) async {
-      when(mockedMemRepository.selectById(any))
+      when(mockedMemRepository.shipWhereIdIs(any))
           .thenThrow(NotFoundException('test target', 'test condition'));
 
       await widgetTester.pumpWidget(
@@ -35,12 +35,12 @@ void main() {
       );
       expect(saveFabFinder, findsOneWidget);
 
-      verify(mockedMemRepository.selectById(1)).called(1);
+      verify(mockedMemRepository.shipWhereIdIs(1)).called(1);
     });
     testWidgets(': found.', (widgetTester) async {
       const memId = 1;
       const memName = 'test mem name';
-      when(mockedMemRepository.selectById(any))
+      when(mockedMemRepository.shipWhereIdIs(any))
           .thenAnswer((realInvocation) async => Mem(
                 id: memId,
                 name: memName,
@@ -64,7 +64,7 @@ void main() {
       );
       expect(saveFabFinder, findsOneWidget);
 
-      verify(mockedMemRepository.selectById(memId)).called(1);
+      verify(mockedMemRepository.shipWhereIdIs(memId)).called(1);
     });
   });
 
@@ -95,7 +95,7 @@ void main() {
 
       expect(find.text('Save success. $enteringMemName'), findsOneWidget);
 
-      verifyNever(mockedMemRepository.selectById(null));
+      verifyNever(mockedMemRepository.shipWhereIdIs(null));
       verify(mockedMemRepository.receive(any)).called(1);
     });
     testWidgets('update', (widgetTester) async {
@@ -103,7 +103,7 @@ void main() {
       const memName = 'test mem name';
       const enteringMemName = 'entering mem name';
 
-      when(mockedMemRepository.selectById(any))
+      when(mockedMemRepository.shipWhereIdIs(any))
           .thenAnswer((realInvocation) async => Mem(
                 id: memId,
                 name: memName,
@@ -138,7 +138,7 @@ void main() {
 
       expect(find.text('Save success. $enteringMemName'), findsOneWidget);
 
-      verify(mockedMemRepository.selectById(memId)).called(1);
+      verify(mockedMemRepository.shipWhereIdIs(memId)).called(1);
       verify(mockedMemRepository.update(any)).called(1);
     });
   });

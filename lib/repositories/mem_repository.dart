@@ -16,13 +16,13 @@ class MemRepository {
         },
       );
 
-  Future<List<Mem>> selectAll() => v(
+  Future<List<Mem>> shipAll() => v(
         {},
         () async =>
             (await _memTable.select()).map((e) => Mem.fromMap(e)).toList(),
       );
 
-  Future<Mem> selectById(dynamic id) => v(
+  Future<Mem> shipWhereIdIs(dynamic id) => v(
         {'id': id},
         () async => Mem.fromMap(await _memTable.selectByPk(id)),
       );
@@ -42,7 +42,7 @@ class MemRepository {
   // patchWhereId(dynamic id, Map<String, dynamic> value) {}
   // archiveWhereId(dynamic id) async {}
 
-  Future<bool> removeById(dynamic id) => v(
+  Future<bool> discardWhereIdIs(dynamic id) => v(
         {'id': id},
         () async {
           int deletedCount = await _memTable.deleteByPk(id);
@@ -54,7 +54,7 @@ class MemRepository {
         },
       );
 
-  Future<int> removeAll() => v(
+  Future<int> discardAll() => v(
         {},
         () async => _memTable.delete(),
       );
