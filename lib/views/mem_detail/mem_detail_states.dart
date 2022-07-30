@@ -16,7 +16,7 @@ final fetchMemById = FutureProvider.family<Map<String, dynamic>, int?>(
         try {
           mem = await MemRepository().selectById(memId);
         } catch (e) {
-          warning(e);
+          warn(e);
           mem = null;
         }
       }
@@ -31,7 +31,10 @@ final fetchMemById = FutureProvider.family<Map<String, dynamic>, int?>(
 
 final memMapProvider = StateNotifierProvider.family<
     ValueStateNotifier<Map<String, dynamic>>, Map<String, dynamic>, int?>(
-  (ref, memId) => ValueStateNotifier({}),
+  (ref, memId) => v(
+    {'memId': memId},
+    () => ValueStateNotifier({}),
+  ),
 );
 
 final saveMem = Provider.family<Future<bool>, Map<String, dynamic>>(

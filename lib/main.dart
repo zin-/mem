@@ -15,7 +15,8 @@ final databaseDefinition = DefD(
   ],
 );
 
-Future<void> main() => t({},
+Future<void> main() => t(
+      {},
       () async {
         await _openDatabase();
 
@@ -23,12 +24,15 @@ Future<void> main() => t({},
       },
     );
 
-Future<Database> _openDatabase() async {
-  WidgetsFlutterBinding.ensureInitialized();
+Future<Database> _openDatabase() => t(
+      {},
+      () async {
+        WidgetsFlutterBinding.ensureInitialized();
 
-  final database = await DatabaseManager().open(databaseDefinition);
+        final database = await DatabaseManager().open(databaseDefinition);
 
-  MemRepository.initialize(database.getTable(memTable.name));
+        MemRepository.initialize(database.getTable(memTable.name));
 
-  return database;
-}
+        return database;
+      },
+    );

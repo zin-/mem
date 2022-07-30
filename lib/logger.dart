@@ -25,13 +25,17 @@ T t<T>(
 @Deprecated('Allow under develop only')
 T d<T>(
   dynamic arguments,
-  T Function()? function,
+  T Function() function,
 ) =>
-    Logger().log(Level.debug, arguments, function);
+    Logger()._functionLog(Level.debug, function, arguments);
 
-T warning<T>(T arguments) => Logger().log(Level.warning, arguments, null);
+T verbose<T>(T arguments) => Logger().log(Level.verbose, arguments);
 
-T dev<T>(T arguments) => Logger().log(Level.debug, arguments, null);
+T trace<T>(T arguments) => Logger().log(Level.trace, arguments);
+
+T warn<T>(T arguments) => Logger().log(Level.warning, arguments);
+
+T dev<T>(T arguments) => Logger().log(Level.debug, arguments);
 
 enum Level {
   verbose,
@@ -58,23 +62,20 @@ extension on Level {
 class Logger {
   final ex.Logger _logger;
 
-  log<T>(Level level, dynamic object, T Function()? function) {
+  T log<T>(Level level, T object) {
     final stackTrace = StackTrace.current;
-    if (function == null) {
-      if (object is Future) {
-        _futureLog(level, 'base', object, stackTrace);
-      } else if (object is Exception) {
-        if (level == Level.warning) {
-          _messageLog(level, _buildMessageWithValue('Warning', object));
-        } else {
-          _exceptionLog(level, 'Error', object);
-        }
+    if (object is Future) {
+      _futureLog(level, 'base', object, stackTrace);
+    } else if (object is Exception) {
+      if (level == Level.warning) {
+        _messageLog(level, _buildMessageWithValue('Warning', object));
       } else {
-        _messageLog(level, object.toString(), stackTrace: stackTrace);
+        _exceptionLog(level, 'Error', object);
       }
     } else {
-      _functionLog(level, function, object);
+      _messageLog(level, object.toString(), stackTrace: stackTrace);
     }
+    return object;
   }
 
   T _functionLog<T>(
@@ -101,7 +102,7 @@ class Logger {
     return result;
   }
 
-  Future<T> _futureLog<T>(
+  void _futureLog<T>(
       Level level, String base, Future<T> future, StackTrace stackTrace) async {
     final result = await future;
     _messageLog(
@@ -109,7 +110,6 @@ class Logger {
       'future => ${_buildMessageWithValue(base, result)}',
       stackTrace: stackTrace,
     );
-    return result;
   }
 
   void _messageLog(Level level, String message, {StackTrace? stackTrace}) =>

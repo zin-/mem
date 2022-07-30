@@ -6,15 +6,21 @@ import 'package:mem/mem.dart';
 class MemRepository {
   final Table _memTable;
 
-  Future<Mem> receive(Map<String, dynamic> value) async {
-    final createdAt = DateTime.now();
-    int id = await _memTable
-        .insert(value..putIfAbsent('createdAt', () => createdAt));
-    return Mem(id: id, name: value['name'], createdAt: createdAt);
-  }
+  Future<Mem> receive(Map<String, dynamic> value) => v(
+        {'value': value},
+        () async {
+          final createdAt = DateTime.now();
+          int id = await _memTable
+              .insert(value..putIfAbsent('createdAt', () => createdAt));
+          return Mem(id: id, name: value['name'], createdAt: createdAt);
+        },
+      );
 
-  Future<List<Mem>> selectAll() async =>
-      (await _memTable.select()).map((e) => Mem.fromMap(e)).toList();
+  Future<List<Mem>> selectAll() => v(
+        {},
+        () async =>
+            (await _memTable.select()).map((e) => Mem.fromMap(e)).toList(),
+      );
 
   Future<Mem> selectById(dynamic id) => v(
         {'id': id},
@@ -36,16 +42,22 @@ class MemRepository {
   // patchWhereId(dynamic id, Map<String, dynamic> value) {}
   // archiveWhereId(dynamic id) async {}
 
-  Future<bool> removeById(dynamic id) async {
-    int deletedCount = await _memTable.deleteByPk(id);
-    if (deletedCount == 1) {
-      return true;
-    } else {
-      return false;
-    }
-  }
+  Future<bool> removeById(dynamic id) => v(
+        {'id': id},
+        () async {
+          int deletedCount = await _memTable.deleteByPk(id);
+          if (deletedCount == 1) {
+            return true;
+          } else {
+            return false;
+          }
+        },
+      );
 
-  Future<int> removeAll() async => _memTable.delete();
+  Future<int> removeAll() => v(
+        {},
+        () async => _memTable.delete(),
+      );
 
   MemRepository._(this._memTable);
 
