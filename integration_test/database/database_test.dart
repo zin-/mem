@@ -3,8 +3,11 @@ import 'package:integration_test/integration_test.dart';
 import 'package:mem/database/database.dart';
 import 'package:mem/database/database_factory.dart';
 import 'package:mem/database/definitions.dart';
+import 'package:mem/logger.dart';
 
 void main() {
+  Logger(level: Level.verbose);
+
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   const tableName = 'tests';
@@ -153,7 +156,7 @@ void main() {
 
   group('updateByPk', () {
     test(
-      'success',
+      ': success',
       () async {
         database = await DatabaseManager().open(DefD(
           dbName,
@@ -186,7 +189,7 @@ void main() {
       },
     );
     test(
-      'target is nothing',
+      ': target is nothing',
       () async {
         database = await DatabaseManager().open(DefD(
           dbName,

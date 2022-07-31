@@ -140,7 +140,6 @@ void main() {
         expect(databaseDefinition.toString(), contains(dbName));
         expect(databaseDefinition.toString(), contains(dbVersion.toString()));
         expect(databaseDefinition.toString(), contains(tableName));
-        expect(databaseDefinition.toString(), contains(pkName));
       });
     });
     test('empty name.', () {

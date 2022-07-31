@@ -10,7 +10,7 @@ T v<T>(
     debug
         // ignore: deprecated_member_use_from_same_package
         ? d(arguments, function)
-        : Logger()._functionLog(Level.verbose, function, arguments);
+        : Logger().functionLog(Level.verbose, function, arguments);
 
 T t<T>(
   dynamic arguments,
@@ -20,22 +20,22 @@ T t<T>(
     debug
         // ignore: deprecated_member_use_from_same_package
         ? d(arguments, function)
-        : Logger()._functionLog(Level.trace, function, arguments);
+        : Logger().functionLog(Level.trace, function, arguments);
 
 @Deprecated('Allow under develop only')
 T d<T>(
   dynamic arguments,
   T Function() function,
 ) =>
-    Logger()._functionLog(Level.debug, function, arguments);
+    Logger().functionLog(Level.debug, function, arguments);
 
-T verbose<T>(T arguments) => Logger().log(Level.verbose, arguments);
+T verbose<T>(T object) => Logger().log(Level.verbose, object);
 
-T trace<T>(T arguments) => Logger().log(Level.trace, arguments);
+T trace<T>(T object) => Logger().log(Level.trace, object);
 
-T warn<T>(T arguments) => Logger().log(Level.warning, arguments);
+T warn<T>(T object) => Logger().log(Level.warning, object);
 
-T dev<T>(T arguments) => Logger().log(Level.debug, arguments);
+T dev<T>(T object) => Logger().log(Level.debug, object);
 
 enum Level {
   verbose,
@@ -62,67 +62,64 @@ extension on Level {
 class Logger {
   final ex.Logger _logger;
 
-  T log<T>(Level level, T object) {
-    final stackTrace = StackTrace.current;
+  T log<T>(Level level, T object, {String? message, StackTrace? stackTrace}) {
     if (object is Future) {
-      _futureLog(level, 'base', object, stackTrace);
-    } else if (object is Exception) {
-      if (level == Level.warning) {
-        _messageLog(level, _buildMessageWithValue('Warning', object));
-      } else {
-        _exceptionLog(level, 'Error', object);
-      }
-    } else {
-      _messageLog(level, object.toString(), stackTrace: stackTrace);
-    }
-    return object;
-  }
-
-  T _functionLog<T>(
-    Level level,
-    T Function() function,
-    dynamic arguments,
-  ) {
-    final stackTrace = StackTrace.current;
-    _messageLog(
-      level,
-      _buildMessageWithValue('start', arguments),
-      stackTrace: stackTrace,
-    );
-    final result = function();
-    if (result is Future) {
-      _futureLog(level, 'end', result, stackTrace);
+      _futureLog(level, object, message, stackTrace ?? StackTrace.current);
+    } else if (object is Function()) {
+      warn('Use functionLog. I try auto cast.');
+      functionLog(level, object, {});
     } else {
       _messageLog(
         level,
-        _buildMessageWithValue('end', result),
+        message == null ? object : _buildMessageWithValue(message, object),
         stackTrace: stackTrace,
       );
     }
+
+    return object;
+  }
+
+  T functionLog<T>(
+    Level level,
+    T Function() function,
+    dynamic arguments, {
+    String? message,
+  }) {
+    final stackTrace = StackTrace.current;
+    log(level, arguments, message: 'start', stackTrace: stackTrace);
+    final result = function();
+    log(level, result, message: 'end', stackTrace: stackTrace);
     return result;
   }
 
-  void _futureLog<T>(
-      Level level, String base, Future<T> future, StackTrace stackTrace) async {
-    final result = await future;
-    _messageLog(
-      level,
-      'future => ${_buildMessageWithValue(base, result)}',
-      stackTrace: stackTrace,
+  void _futureLog(
+    Level level,
+    Future future,
+    dynamic message,
+    StackTrace stackTrace,
+  ) {
+    future.then(
+      (value) {
+        log(level, value,
+            message: 'Future => $message', stackTrace: stackTrace);
+      },
+      onError: (e) {
+        log(
+          level,
+          e,
+          message: 'Future => Error => $message',
+          stackTrace: stackTrace,
+        );
+      },
     );
   }
 
-  void _messageLog(Level level, String message, {StackTrace? stackTrace}) =>
-      _logger.log(level._convertIntoEx(), message, null, stackTrace);
+  void _messageLog(Level level, dynamic message, {StackTrace? stackTrace}) {
+    _logger.log(level._convertIntoEx(), message.toString(), null, stackTrace);
+  }
 
-  void _exceptionLog(Level level, String message, Exception exception) =>
-      _logger.log(level._convertIntoEx(), message, exception);
-
-  String _buildMessageWithValue(String base, dynamic arguments) =>
-      arguments == null ||
-              ((arguments is Iterable || arguments is Map) && arguments.isEmpty)
-          ? base
-          : '$base :: $arguments';
+  String _buildMessageWithValue(String base, dynamic value) =>
+      value == null ? base : '$base :: $value';
 
   static Logger? _instance;
 
