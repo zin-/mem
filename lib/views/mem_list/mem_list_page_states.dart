@@ -10,6 +10,5 @@ final fetchAllMem = FutureProvider<List<Mem>>(
       final mems = MemRepository().shipAll();
       return mems;
     },
-    debug: true,
   ),
 );
