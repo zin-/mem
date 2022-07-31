@@ -166,14 +166,13 @@ class SqliteTable extends Table {
               whereArgs: [pk],
             );
 
-            // TODO 間違ってるので修正する
-            if (selectedByPk.length == 1) {
-              return convertFrom(selectedByPk.first);
-            } else {
+            if (selectedByPk.isEmpty) {
               throw NotFoundException(
                 definition.name,
                 _buildWhereId().replaceFirst('?', pk.toString()),
               );
+            } else {
+              return convertFrom(selectedByPk.first);
             }
           },
           () => throw DatabaseDoesNotExistException(_database.definition.name),
