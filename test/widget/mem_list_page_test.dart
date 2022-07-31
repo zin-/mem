@@ -13,7 +13,7 @@ void main() {
   final mockedMemRepository = MockMemRepository();
   MemRepository.withMock(mockedMemRepository);
 
-  testWidgets('new', (widgetTester) async {
+  testWidgets('Show saved mem list', (widgetTester) async {
     final mems = List.generate(
       10,
       (index) => Mem(
@@ -25,6 +25,9 @@ void main() {
 
     when(mockedMemRepository.shipAll()).thenAnswer(
       (realInvocation) async => mems,
+    );
+    when(mockedMemRepository.shipWhereIdIs(0)).thenAnswer(
+      (realInvocation) async => mems[0],
     );
 
     await widgetTester.pumpWidget(
@@ -38,10 +41,38 @@ void main() {
     await widgetTester.pump();
 
     mems.asMap().forEach((index, mem) {
-      final listTile = find.byType(ListTile).at(index);
+      final listTile = memListTile.at(index);
       final memListTileNameText = widgetTester.widget(
           find.descendant(of: listTile, matching: find.byType(Text))) as Text;
       expect(memListTileNameText.data, mem.name);
     });
+    await widgetTester.tap(memListTile.at(0));
+    await widgetTester.pump();
+
+    verify(mockedMemRepository.shipAll()).called(1);
+    verify(mockedMemRepository.shipWhereIdIs(0)).called(1);
+  });
+
+  testWidgets('Transit new MemDetailPage', (widgetTester) async {
+    when(mockedMemRepository.shipAll()).thenAnswer(
+      (realInvocation) async => [],
+    );
+
+    await widgetTester.pumpWidget(
+      const ProviderScope(
+        child: MaterialApp(
+          title: 'test',
+          home: MemListPage(),
+        ),
+      ),
+    );
+    await widgetTester.pump();
+
+    expect(showNewMemFabFinder, findsOneWidget);
+    await widgetTester.tap(showNewMemFabFinder);
+    await widgetTester.pump();
   });
 }
+
+final memListTile = find.byType(ListTile);
+final showNewMemFabFinder = find.byType(FloatingActionButton);

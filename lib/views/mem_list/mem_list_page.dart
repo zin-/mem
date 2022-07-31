@@ -34,6 +34,13 @@ class MemListPage extends StatelessWidget {
                   },
                 ),
               ),
+              floatingActionButton: FloatingActionButton(
+                child: const Icon(Icons.save_alt),
+                onPressed: () =>
+                    Navigator.of(context).push(buildRouteToMemDetailPage(null)),
+              ),
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.centerFloat,
             ),
           ),
         ),
