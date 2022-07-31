@@ -29,7 +29,9 @@ class IndexedDatabase extends Database {
             definition.name,
             version: definition.version,
             onUpgradeNeeded: (event) {
+              trace('Create Database. $definition');
               for (var tableDefinition in definition.tableDefinitions) {
+                trace('Create object. $tableDefinition');
                 event.database.createObjectStore(
                   tableDefinition.name,
                   autoIncrement: tableDefinition.columns

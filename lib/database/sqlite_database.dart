@@ -34,9 +34,9 @@ class SqliteDatabase extends Database {
             options: sqflite.OpenDatabaseOptions(
               version: definition.version,
               onCreate: (db, version) async {
-                print('Create Database. $definition }');
+                trace('Create Database. $definition');
                 for (var tableDefinition in definition.tableDefinitions) {
-                  print('Create table. $tableDefinition');
+                  trace('Create table. $tableDefinition');
                   await db.execute(tableDefinition.buildCreateTableSql());
                 }
               },
