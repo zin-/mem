@@ -68,7 +68,7 @@ class Logger {
     } else if (object is Function()) {
       warn('Use functionLog. I try auto cast.');
       functionLog(level, object, {});
-    } else if (object is Map) {
+    } else if (object is Map && object.isNotEmpty) {
       object.forEach((key, value) {
         log(level, value, message: message, stackTrace: stackTrace);
       });
