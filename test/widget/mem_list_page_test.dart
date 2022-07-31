@@ -14,15 +14,17 @@ void main() {
   MemRepository.withMock(mockedMemRepository);
 
   testWidgets('new', (widgetTester) async {
-    when(mockedMemRepository.shipAll()).thenAnswer(
-      (realInvocation) async => List.generate(
-        10,
-        (index) => Mem(
-          id: index,
-          name: 'Test $index',
-          createdAt: DateTime.now(),
-        ),
+    final mems = List.generate(
+      10,
+      (index) => Mem(
+        id: index,
+        name: 'Test $index',
+        createdAt: DateTime.now(),
       ),
+    );
+
+    when(mockedMemRepository.shipAll()).thenAnswer(
+      (realInvocation) async => mems,
     );
 
     await widgetTester.pumpWidget(
@@ -34,5 +36,12 @@ void main() {
       ),
     );
     await widgetTester.pump();
+
+    mems.asMap().forEach((index, mem) {
+      final listTile = find.byType(ListTile).at(index);
+      final memListTileNameText = widgetTester.widget(
+          find.descendant(of: listTile, matching: find.byType(Text))) as Text;
+      expect(memListTileNameText.data, mem.name);
+    });
   });
 }
