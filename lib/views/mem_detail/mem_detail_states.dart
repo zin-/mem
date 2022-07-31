@@ -9,20 +9,17 @@ final fetchMemById = FutureProvider.family<Map<String, dynamic>, int?>(
   (ref, memId) => v(
     {'memId': memId},
     () async {
-      Mem? mem;
-      if (memId == null) {
-        mem = null;
-      } else {
+      var memMap = ref.read(memMapProvider(memId));
+
+      if (memId != null && !Mem.isSaved(memMap)) {
         try {
-          mem = await MemRepository().shipWhereIdIs(memId);
+          final mem = await MemRepository().shipWhereIdIs(memId);
+          ref.read(memMapProvider(memId).notifier).updatedBy(mem.toMap());
+          memMap = mem.toMap();
         } catch (e) {
           warn(e);
-          mem = null;
         }
       }
-
-      final memMap = mem?.toMap() ?? {};
-      ref.watch(memMapProvider(memId).notifier).updatedBy(memMap);
 
       return memMap;
     },
@@ -38,12 +35,12 @@ final memMapProvider = StateNotifierProvider.family<
 );
 
 final saveMem = Provider.family<Future<bool>, Map<String, dynamic>>(
-  (ref, mem) => v(
-    {'mem': mem},
+  (ref, memMap) => v(
+    {'mem': memMap},
     () async {
-      Mem saved = mem.containsKey('id')
-          ? await MemRepository().update(Mem.fromMap(mem))
-          : await MemRepository().receive(mem);
+      Mem saved = memMap.containsKey('id')
+          ? await MemRepository().update(Mem.fromMap(memMap))
+          : await MemRepository().receive(memMap);
 
       ref.read(memMapProvider(saved.id).notifier).updatedBy(saved.toMap());
 
