@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/database/database_factory.dart';
+import 'package:mem/logger.dart';
 
 import 'package:mem/main.dart' as app;
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/constants.dart';
 
-// FIXME mem_detail_testと同じ定義。共通化したい
-final memNameFinder = find.byType(TextFormField).at(0);
-final saveFabFinder = find.byIcon(Icons.save_alt).at(0);
+import '../test/widget/mem_detail_test.dart';
+import '../test/widget/mem_list_page_test.dart';
 
 void main() {
+  Logger(level: Level.verbose);
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() async {
@@ -30,16 +31,22 @@ void main() {
         ': show new(empty) mem and create.',
         (widgetTester) async {
           const enteringMemName = 'entering mem name';
+          const enteringMemNameSecond = 'second';
 
           await app.main();
           await widgetTester.pumpAndSettle();
 
+          await widgetTester.tap(showNewMemFabFinder);
+          await widgetTester.pumpAndSettle();
+
           expect(
-            (widgetTester.widget(memNameFinder) as TextFormField).initialValue,
+            (widgetTester.widget(memNameTextFormFieldFinder) as TextFormField)
+                .initialValue,
             '',
           );
 
-          await widgetTester.enterText(memNameFinder, enteringMemName);
+          await widgetTester.enterText(
+              memNameTextFormFieldFinder, enteringMemName);
           await widgetTester.tap(saveFabFinder);
           await widgetTester.pumpAndSettle();
 
@@ -51,6 +58,22 @@ void main() {
           await widgetTester.pumpAndSettle();
 
           expect(find.text('Save success. $enteringMemName'), findsNothing);
+
+          await widgetTester.enterText(
+            memNameTextFormFieldFinder,
+            enteringMemNameSecond,
+          );
+          await widgetTester.tap(saveFabFinder);
+          await widgetTester.pumpAndSettle();
+
+          await widgetTester.pageBack();
+          await widgetTester.pumpAndSettle();
+
+          expect(find.text(enteringMemName), findsNothing);
+          expect(
+            getMemNameTextOnListAt(widgetTester, 0).data,
+            enteringMemNameSecond,
+          );
         },
       );
 
@@ -68,16 +91,22 @@ void main() {
           await DatabaseManager().close(app.databaseDefinition.name);
 
           const enteringMemName = 'entering mem name';
+          const enteringMemNameSecond = 'second';
 
           await app.main();
           await widgetTester.pumpAndSettle();
 
+          await widgetTester.tap(memListTileFinder.at(0));
+          await widgetTester.pumpAndSettle();
+
           expect(
-            (widgetTester.widget(memNameFinder) as TextFormField).initialValue,
+            (widgetTester.widget(memNameTextFormFieldFinder) as TextFormField)
+                .initialValue,
             savedMemName,
           );
 
-          await widgetTester.enterText(memNameFinder, enteringMemName);
+          await widgetTester.enterText(
+              memNameTextFormFieldFinder, enteringMemName);
           await widgetTester.tap(saveFabFinder);
           await widgetTester.pumpAndSettle();
 
@@ -89,6 +118,22 @@ void main() {
           await widgetTester.pumpAndSettle();
 
           expect(find.text('Save success. $enteringMemName'), findsNothing);
+
+          await widgetTester.enterText(
+            memNameTextFormFieldFinder,
+            enteringMemNameSecond,
+          );
+          await widgetTester.tap(saveFabFinder);
+          await widgetTester.pumpAndSettle();
+
+          await widgetTester.pageBack();
+          await widgetTester.pumpAndSettle();
+
+          expect(find.text(enteringMemName), findsNothing);
+          expect(
+            getMemNameTextOnListAt(widgetTester, 0).data,
+            enteringMemNameSecond,
+          );
         },
       );
     },

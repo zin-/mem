@@ -23,9 +23,9 @@ class MemListPage extends StatelessWidget {
               body: AsyncValueView(
                 ref.watch(fetchAllMem),
                 (List<Mem> allMem) => ListView.builder(
-                  itemCount: allMem.length,
+                  itemCount: ref.watch(memsProvider).length,
                   itemBuilder: (context, index) {
-                    final mem = allMem[index];
+                    final mem = ref.watch(memsProvider)[index];
                     return ListTile(
                       title: Text(mem.name),
                       onTap: () => Navigator.of(context)
@@ -35,7 +35,7 @@ class MemListPage extends StatelessWidget {
                 ),
               ),
               floatingActionButton: FloatingActionButton(
-                child: const Icon(Icons.save_alt),
+                child: const Icon(Icons.add),
                 onPressed: () =>
                     Navigator.of(context).push(buildRouteToMemDetailPage(null)),
               ),

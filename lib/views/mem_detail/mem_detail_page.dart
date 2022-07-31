@@ -19,58 +19,63 @@ class MemDetailPage extends StatelessWidget {
         () => Consumer(
           builder: (context, ref, child) => v(
             {},
-            () => Scaffold(
-              appBar: AppBar(
-                title: const Text('Detail'),
-              ),
-              body: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Form(
+            () {
+              final memMap = ref.watch(memMapProvider(_memId));
+
+              return Scaffold(
+                appBar: AppBar(
+                  title: const Text('Detail'),
+                ),
+                body: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Form(
                     key: _formKey,
                     child: AsyncValueView(
-                        ref.watch(fetchMemById(_memId)),
-                        (Map<String, dynamic> memDataMap) => Column(
-                              children: [
-                                TextFormField(
-                                  initialValue: memDataMap['name'] ?? '',
-                                  validator: (value) =>
-                                      (value?.isEmpty ?? false)
-                                          ? 'Name is required.'
-                                          : null,
-                                  onChanged: (value) => ref
-                                      .read(memMapProvider(_memId).notifier)
-                                      .updatedBy(memDataMap..['name'] = value),
+                      ref.watch(fetchMemById(_memId)),
+                      (Map<String, dynamic> memDataMap) => Column(
+                        children: [
+                          TextFormField(
+                            initialValue: memMap['name'] ?? '',
+                            validator: (value) => (value?.isEmpty ?? false)
+                                ? 'Name is required.'
+                                : null,
+                            onChanged: (value) => ref
+                                .read(memMapProvider(_memId).notifier)
+                                .updatedBy(Map.of(memMap..['name'] = value)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                floatingActionButton: Consumer(
+                  builder: (context, ref, child) {
+                    return FloatingActionButton(
+                      child: const Icon(Icons.save_alt),
+                      onPressed: () {
+                        if (_formKey.currentState?.validate() ?? false) {
+                          ref.read(saveMem(memMap)).then((saveSuccess) {
+                            if (saveSuccess) {
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(SnackBar(
+                                content:
+                                    Text('Save success. ${memMap['name']}'),
+                                duration: const Duration(
+                                  seconds: defaultDismissDurationSeconds,
                                 ),
-                              ],
-                            ))),
-              ),
-              floatingActionButton: Consumer(
-                builder: (context, ref, child) {
-                  return FloatingActionButton(
-                    child: const Icon(Icons.save_alt),
-                    onPressed: () {
-                      final memMap = ref.watch(memMapProvider(_memId));
-
-                      if (_formKey.currentState?.validate() ?? false) {
-                        ref.read(saveMem(memMap)).then((saveSuccess) {
-                          if (saveSuccess) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text('Save success. ${memMap['name']}'),
-                              duration: const Duration(
-                                seconds: defaultDismissDurationSeconds,
-                              ),
-                              dismissDirection: DismissDirection.horizontal,
-                            ));
-                          }
-                        });
-                      }
-                    },
-                  );
-                },
-              ),
-              floatingActionButtonLocation:
-                  FloatingActionButtonLocation.centerFloat,
-            ),
+                                dismissDirection: DismissDirection.horizontal,
+                              ));
+                            }
+                          });
+                        }
+                      },
+                    );
+                  },
+                ),
+                floatingActionButtonLocation:
+                    FloatingActionButtonLocation.centerFloat,
+              );
+            },
           ),
         ),
       );

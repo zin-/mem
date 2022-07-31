@@ -41,12 +41,9 @@ void main() {
     await widgetTester.pump();
 
     mems.asMap().forEach((index, mem) {
-      final listTile = memListTile.at(index);
-      final memListTileNameText = widgetTester.widget(
-          find.descendant(of: listTile, matching: find.byType(Text))) as Text;
-      expect(memListTileNameText.data, mem.name);
+      expect(getMemNameTextOnListAt(widgetTester, index).data, mem.name);
     });
-    await widgetTester.tap(memListTile.at(0));
+    await widgetTester.tap(memListTileFinder.at(0));
     await widgetTester.pump();
 
     verify(mockedMemRepository.shipAll()).called(1);
@@ -74,5 +71,11 @@ void main() {
   });
 }
 
-final memListTile = find.byType(ListTile);
+final memListTileFinder = find.byType(ListTile);
 final showNewMemFabFinder = find.byType(FloatingActionButton);
+
+Finder findMemNameTextOnListAt(int index) => find.descendant(
+    of: memListTileFinder.at(index), matching: find.byType(Text));
+
+Text getMemNameTextOnListAt(WidgetTester widgetTester, int index) =>
+    widgetTester.widget(findMemNameTextOnListAt(index)) as Text;

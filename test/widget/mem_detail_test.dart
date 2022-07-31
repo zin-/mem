@@ -30,9 +30,9 @@ void main() {
       );
       await widgetTester.pump();
 
-      expect(memNameFinder, findsOneWidget);
+      expect(memNameTextFormFieldFinder, findsOneWidget);
       expect(
-        (widgetTester.widget(memNameFinder) as TextFormField).initialValue,
+        (widgetTester.widget(memNameTextFormFieldFinder) as TextFormField).initialValue,
         '',
       );
       expect(saveFabFinder, findsOneWidget);
@@ -59,9 +59,9 @@ void main() {
       );
       await widgetTester.pump();
 
-      expect(memNameFinder, findsOneWidget);
+      expect(memNameTextFormFieldFinder, findsOneWidget);
       expect(
-        (widgetTester.widget(memNameFinder) as TextFormField).initialValue,
+        (widgetTester.widget(memNameTextFormFieldFinder) as TextFormField).initialValue,
         memName,
       );
       expect(saveFabFinder, findsOneWidget);
@@ -91,7 +91,7 @@ void main() {
       );
       await widgetTester.pump();
 
-      await widgetTester.enterText(memNameFinder, enteringMemName);
+      await widgetTester.enterText(memNameTextFormFieldFinder, enteringMemName);
       await widgetTester.tap(saveFabFinder);
       await widgetTester.pump();
 
@@ -134,7 +134,7 @@ void main() {
       );
       await widgetTester.pump();
 
-      await widgetTester.enterText(memNameFinder, enteringMemName);
+      await widgetTester.enterText(memNameTextFormFieldFinder, enteringMemName);
       await widgetTester.tap(saveFabFinder);
       await widgetTester.pump();
 
@@ -146,5 +146,5 @@ void main() {
   });
 }
 
-final memNameFinder = find.byType(TextFormField).at(0);
+final memNameTextFormFieldFinder = find.byType(TextFormField).at(0);
 final saveFabFinder = find.byIcon(Icons.save_alt).at(0);
