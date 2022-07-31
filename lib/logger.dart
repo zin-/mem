@@ -68,6 +68,10 @@ class Logger {
     } else if (object is Function()) {
       warn('Use functionLog. I try auto cast.');
       functionLog(level, object, {});
+    } else if (object is Map) {
+      object.forEach((key, value) {
+        log(level, value, message: message, stackTrace: stackTrace);
+      });
     } else {
       _messageLog(
         level,
@@ -115,7 +119,12 @@ class Logger {
   }
 
   void _messageLog(Level level, dynamic message, {StackTrace? stackTrace}) {
-    _logger.log(level._convertIntoEx(), message.toString(), null, stackTrace);
+    _logger.log(
+      level._convertIntoEx(),
+      message.toString().split('\n').first,
+      null,
+      stackTrace,
+    );
   }
 
   String _buildMessageWithValue(String base, dynamic value) =>
