@@ -29,7 +29,7 @@ void main() {
     await DatabaseManager().delete(dbName);
   });
 
-  test('find undefined table', () async {
+  test('get undefined table', () async {
     database = await DatabaseManager().open(DefD(
       dbName,
       dbVersion,
