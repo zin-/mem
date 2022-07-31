@@ -183,13 +183,24 @@ class SqliteTable extends Table {
   @override
   Future<int> updateByPk(pk, Map<String, dynamic> value) => v(
         {'pk': pk, 'value': value},
-        () async => await _database.onOpened(
-          () async => await _database._database.update(
-            definition.name,
-            convertTo(value),
-            where: _buildWhereId(),
-            whereArgs: [pk],
-          ),
+        () => _database.onOpened(
+          () async {
+            final updateCount = await _database._database.update(
+              definition.name,
+              convertTo(value),
+              where: _buildWhereId(),
+              whereArgs: [pk],
+            );
+
+            if (updateCount == 0) {
+              throw NotFoundException(
+                definition.name,
+                _buildWhereId().replaceFirst('?', pk.toString()),
+              );
+            } else {
+              return updateCount;
+            }
+          },
           () => throw DatabaseDoesNotExistException(_database.definition.name),
         ),
       );

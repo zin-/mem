@@ -151,39 +151,69 @@ void main() {
     },
   );
 
-  test(
-    'updateByPk',
-    () async {
-      database = await DatabaseManager().open(DefD(
-        dbName,
-        dbVersion,
-        tableDefinitions,
-      ));
-      final table = database.getTable(tableName);
+  group('updateByPk', () {
+    test(
+      'success',
+      () async {
+        database = await DatabaseManager().open(DefD(
+          dbName,
+          dbVersion,
+          tableDefinitions,
+        ));
+        final table = database.getTable(tableName);
 
-      final datetime = DateTime.now();
-      final test = {
-        textFieldName: 'test text',
-        datetimeFieldName: datetime,
-      };
-      final inserted = await table.insert(test);
+        final datetime = DateTime.now();
+        final test = {
+          textFieldName: 'test text',
+          datetimeFieldName: datetime,
+        };
+        final inserted = await table.insert(test);
 
-      const updateText = 'update text';
-      final updatedByPk = await table.updateByPk(
-        inserted,
-        test..update(textFieldName, (value) => updateText),
-      );
-      expect(updatedByPk, 1);
+        const updateText = 'update text';
+        final updatedByPk = await table.updateByPk(
+          inserted,
+          test..update(textFieldName, (value) => updateText),
+        );
+        expect(updatedByPk, 1);
 
-      final selectedById = await table.selectByPk(inserted);
-      expect(
-        selectedById,
-        test
-          ..putIfAbsent(pkName, () => inserted)
-          ..update(textFieldName, (value) => updateText),
-      );
-    },
-  );
+        final selectedById = await table.selectByPk(inserted);
+        expect(
+          selectedById,
+          test
+            ..putIfAbsent(pkName, () => inserted)
+            ..update(textFieldName, (value) => updateText),
+        );
+      },
+    );
+    test(
+      'target is nothing',
+      () async {
+        database = await DatabaseManager().open(DefD(
+          dbName,
+          dbVersion,
+          tableDefinitions,
+        ));
+        final table = database.getTable(tableName);
+
+        final beforeUpdate = await table.select();
+        assert(beforeUpdate.isEmpty);
+
+        final datetime = DateTime.now();
+        final test = {
+          textFieldName: 'test text',
+          datetimeFieldName: datetime,
+        };
+
+        expect(
+          () async => await table.updateByPk(1, test),
+          throwsA((e) => e is NotFoundException),
+        );
+
+        final afterUpdateFail = await table.select();
+        expect(afterUpdateFail.length, 0);
+      },
+    );
+  });
 
   test(
     'deleteById',

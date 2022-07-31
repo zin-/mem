@@ -32,7 +32,6 @@ class MemRepository {
         () async {
           final value = mem.toMap();
           value['updatedAt'] = DateTime.now();
-          // TODO 更新数が1かを確認した方が良いかも
           await _memTable.updateByPk(mem.id, value);
           return Mem.fromMap(value);
         },
