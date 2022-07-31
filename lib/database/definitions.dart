@@ -22,7 +22,7 @@ class DatabaseDefinition {
       ' {'
       ' name: $name,'
       ' version: $version,'
-      ' tables: $tableDefinitions'
+      ' tables: ${tableDefinitions.map((defT) => defT.name)}'
       ' }';
 }
 
