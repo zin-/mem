@@ -34,10 +34,9 @@ class Mem {
       updatedAt: (map['updatedAt'] is DateTime?)
           ? map['updatedAt']
           : DateTime.parse(map['updatedAt']),
-      // archivedAt: (map['archivedAt'] is DateTime?)
-      //     ? map['archivedAt']
-      //     : DateTime.parse(map['archivedAt']),
-      archivedAt: null,
+      archivedAt: (map['archivedAt'] is DateTime?)
+          ? map['archivedAt']
+          : DateTime.parse(map['archivedAt']),
     );
   }
 

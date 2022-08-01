@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/database/database_factory.dart';
@@ -6,9 +5,8 @@ import 'package:mem/logger.dart';
 
 import 'package:mem/main.dart' as app;
 import 'package:mem/repositories/mem_repository.dart';
-import 'package:mem/views/constants.dart';
 
-import '../test/widget/mem_detail_test.dart';
+import '../test/widget/mem_detail_page_test.dart';
 import '../test/widget/mem_list_page_test.dart';
 
 void main() {
@@ -39,41 +37,25 @@ void main() {
           await widgetTester.tap(showNewMemFabFinder);
           await widgetTester.pumpAndSettle();
 
-          expect(
-            (widgetTester.widget(memNameTextFormFieldFinder) as TextFormField)
-                .initialValue,
-            '',
-          );
+          expectMemNameOnMemDetail(widgetTester, '');
 
-          await widgetTester.enterText(
-              memNameTextFormFieldFinder, enteringMemName);
-          await widgetTester.tap(saveFabFinder);
-          await widgetTester.pumpAndSettle();
+          await enterMemNameAndSave(widgetTester, enteringMemName);
 
-          expect(find.text('Save success. $enteringMemName'), findsOneWidget);
+          await checkSavedSnackBarAndDismiss(widgetTester, enteringMemName);
 
-          await Future.delayed(
-            const Duration(seconds: defaultDismissDurationSeconds),
-          );
-          await widgetTester.pumpAndSettle();
-
-          expect(find.text('Save success. $enteringMemName'), findsNothing);
-
-          await widgetTester.enterText(
-            memNameTextFormFieldFinder,
-            enteringMemNameSecond,
-          );
-          await widgetTester.tap(saveFabFinder);
-          await widgetTester.pumpAndSettle();
+          await enterMemNameAndSave(widgetTester, enteringMemNameSecond);
 
           await widgetTester.pageBack();
           await widgetTester.pumpAndSettle();
 
           expect(find.text(enteringMemName), findsNothing);
-          expect(
-            getMemNameTextOnListAt(widgetTester, 0).data,
-            enteringMemNameSecond,
-          );
+          expectMemNameTextOnListAt(widgetTester, 0, enteringMemNameSecond);
+
+          await widgetTester.tap(showNewMemFabFinder);
+          await widgetTester.pumpAndSettle();
+
+          const archiveMemName = 'archive mem name';
+          await enterMemNameAndSave(widgetTester, archiveMemName);
         },
       );
 
@@ -99,32 +81,13 @@ void main() {
           await widgetTester.tap(memListTileFinder.at(0));
           await widgetTester.pumpAndSettle();
 
-          expect(
-            (widgetTester.widget(memNameTextFormFieldFinder) as TextFormField)
-                .initialValue,
-            savedMemName,
-          );
+          expectMemNameOnMemDetail(widgetTester, savedMemName);
 
-          await widgetTester.enterText(
-              memNameTextFormFieldFinder, enteringMemName);
-          await widgetTester.tap(saveFabFinder);
-          await widgetTester.pumpAndSettle();
+          await enterMemNameAndSave(widgetTester, enteringMemName);
 
-          expect(find.text('Save success. $enteringMemName'), findsOneWidget);
+          await checkSavedSnackBarAndDismiss(widgetTester, enteringMemName);
 
-          await Future.delayed(
-            const Duration(seconds: defaultDismissDurationSeconds),
-          );
-          await widgetTester.pumpAndSettle();
-
-          expect(find.text('Save success. $enteringMemName'), findsNothing);
-
-          await widgetTester.enterText(
-            memNameTextFormFieldFinder,
-            enteringMemNameSecond,
-          );
-          await widgetTester.tap(saveFabFinder);
-          await widgetTester.pumpAndSettle();
+          await enterMemNameAndSave(widgetTester, enteringMemNameSecond);
 
           await widgetTester.pageBack();
           await widgetTester.pumpAndSettle();

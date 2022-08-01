@@ -8,6 +8,7 @@ import 'package:mem/database/database.dart';
 import 'package:mem/mem.dart';
 import 'package:mem/views/mem_detail/mem_detail_page.dart';
 import 'package:mem/repositories/mem_repository.dart';
+import 'package:mem/views/constants.dart';
 
 import '../mocks.mocks.dart';
 
@@ -30,15 +31,13 @@ void main() {
       );
       await widgetTester.pump();
 
-      expect(memNameTextFormFieldFinder, findsOneWidget);
-      expect(
-        (widgetTester.widget(memNameTextFormFieldFinder) as TextFormField).initialValue,
-        '',
-      );
+      expectMemNameOnMemDetail(widgetTester, '');
       expect(saveFabFinder, findsOneWidget);
+      expect(archiveButtonFinder, findsOneWidget);
 
       verify(mockedMemRepository.shipWhereIdIs(1)).called(1);
     });
+
     testWidgets(': found.', (widgetTester) async {
       const memId = 1;
       const memName = 'test mem name';
@@ -59,12 +58,9 @@ void main() {
       );
       await widgetTester.pump();
 
-      expect(memNameTextFormFieldFinder, findsOneWidget);
-      expect(
-        (widgetTester.widget(memNameTextFormFieldFinder) as TextFormField).initialValue,
-        memName,
-      );
+      expectMemNameOnMemDetail(widgetTester, memName);
       expect(saveFabFinder, findsOneWidget);
+      expect(archiveButtonFinder, findsOneWidget);
 
       verify(mockedMemRepository.shipWhereIdIs(memId)).called(1);
     });
@@ -91,11 +87,9 @@ void main() {
       );
       await widgetTester.pump();
 
-      await widgetTester.enterText(memNameTextFormFieldFinder, enteringMemName);
-      await widgetTester.tap(saveFabFinder);
-      await widgetTester.pump();
+      await enterMemNameAndSave(widgetTester, enteringMemName);
 
-      expect(find.text('Save success. $enteringMemName'), findsOneWidget);
+      checkSavedSnackBarAndDismiss(widgetTester, enteringMemName);
 
       verifyNever(mockedMemRepository.shipWhereIdIs(null));
       verify(mockedMemRepository.receive(any)).called(1);
@@ -134,11 +128,9 @@ void main() {
       );
       await widgetTester.pump();
 
-      await widgetTester.enterText(memNameTextFormFieldFinder, enteringMemName);
-      await widgetTester.tap(saveFabFinder);
-      await widgetTester.pump();
+      await enterMemNameAndSave(widgetTester, enteringMemName);
 
-      expect(find.text('Save success. $enteringMemName'), findsOneWidget);
+      checkSavedSnackBarAndDismiss(widgetTester, enteringMemName);
 
       verify(mockedMemRepository.shipWhereIdIs(memId)).called(1);
       verify(mockedMemRepository.update(any)).called(1);
@@ -148,3 +140,37 @@ void main() {
 
 final memNameTextFormFieldFinder = find.byType(TextFormField).at(0);
 final saveFabFinder = find.byIcon(Icons.save_alt).at(0);
+final archiveButtonFinder = find.byIcon(Icons.archive);
+
+void expectMemNameOnMemDetail(
+  WidgetTester widgetTester,
+  String memName,
+) =>
+    expect(
+      (widgetTester.widget(memNameTextFormFieldFinder) as TextFormField)
+          .initialValue,
+      memName,
+    );
+
+Future<void> enterMemNameAndSave(
+  WidgetTester widgetTester,
+  String enteringText,
+) async {
+  await widgetTester.enterText(memNameTextFormFieldFinder, enteringText);
+  await widgetTester.tap(saveFabFinder);
+  await widgetTester.pumpAndSettle();
+}
+
+Future<void> checkSavedSnackBarAndDismiss(
+  WidgetTester widgetTester,
+  String memName,
+) async {
+  expect(find.text('Save success. $memName'), findsOneWidget);
+
+  await Future.delayed(
+    const Duration(seconds: defaultDismissDurationSeconds),
+  );
+  await widgetTester.pumpAndSettle();
+
+  expect(find.text('Save success. $memName'), findsNothing);
+}

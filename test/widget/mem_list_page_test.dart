@@ -41,7 +41,7 @@ void main() {
     await widgetTester.pump();
 
     mems.asMap().forEach((index, mem) {
-      expect(getMemNameTextOnListAt(widgetTester, index).data, mem.name);
+      expectMemNameTextOnListAt(widgetTester, index, mem.name);
     });
     await widgetTester.tap(memListTileFinder.at(0));
     await widgetTester.pump();
@@ -79,3 +79,13 @@ Finder findMemNameTextOnListAt(int index) => find.descendant(
 
 Text getMemNameTextOnListAt(WidgetTester widgetTester, int index) =>
     widgetTester.widget(findMemNameTextOnListAt(index)) as Text;
+
+void expectMemNameTextOnListAt(
+  WidgetTester widgetTester,
+  int index,
+  String memName,
+) =>
+    expect(
+      getMemNameTextOnListAt(widgetTester, 0).data,
+      memName,
+    );

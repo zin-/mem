@@ -16,7 +16,7 @@ class MemApplication extends StatelessWidget {
             theme: ThemeData(
               primarySwatch: Colors.blue,
             ),
-            home: MemListPage(),
+            home: const MemListPage(),
           ),
         ),
       );
