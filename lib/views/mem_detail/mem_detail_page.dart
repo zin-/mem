@@ -25,6 +25,15 @@ class MemDetailPage extends StatelessWidget {
               return Scaffold(
                 appBar: AppBar(
                   title: const Text('Detail'),
+                  actions: [
+                    IconButton(
+                      icon: const Icon(Icons.archive),
+                      color: Colors.white,
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    )
+                  ],
                 ),
                 body: Padding(
                   padding: const EdgeInsets.all(16.0),

@@ -13,7 +13,7 @@ final fetchMemById =
     () async {
       var memMap = ref.read(memMapProvider(memId));
 
-      if (memId != null && !Mem.isSaved(memMap)) {
+      if (memId != null && !Mem.isSavedMap(memMap)) {
         try {
           final mem = await MemRepository().shipWhereIdIs(memId);
           ref.read(memMapProvider(memId).notifier).updatedBy(mem.toMap());
@@ -43,7 +43,7 @@ final saveMem = Provider.autoDispose.family<Future<bool>, Map<String, dynamic>>(
       Mem saved;
 
       final memsNotifier = ref.read(memsProvider.notifier);
-      if (Mem.isSaved(memMap)) {
+      if (Mem.isSavedMap(memMap)) {
         saved = await MemRepository().update(Mem.fromMap(memMap));
         memsNotifier.updateWhere(saved, (mem) => mem.id == saved.id);
       } else {
