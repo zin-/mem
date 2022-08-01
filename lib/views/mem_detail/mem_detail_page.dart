@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:mem/logger.dart';
+import 'package:mem/mem.dart';
 import 'package:mem/views/async_value_view.dart';
 import 'package:mem/views/constants.dart';
 import 'package:mem/views/mem_detail/mem_detail_states.dart';
@@ -30,6 +31,7 @@ class MemDetailPage extends StatelessWidget {
                       icon: const Icon(Icons.archive),
                       color: Colors.white,
                       onPressed: () {
+                        ref.read(archiveMem(Mem.fromMap(memMap)));
                         Navigator.of(context).pop();
                       },
                     )

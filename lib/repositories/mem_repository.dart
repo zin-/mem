@@ -39,7 +39,16 @@ class MemRepository {
 
   // TODO implement
   // patchWhereId(dynamic id, Map<String, dynamic> value) {}
-  // archiveWhereId(dynamic id) async {}
+
+  Future<Mem> archive(Mem mem) => v(
+        {'mem': mem},
+        () async {
+          final memMap = mem.toMap();
+          memMap['archivedAt'] = DateTime.now();
+          await _memTable.updateByPk(mem.id, memMap);
+          return Mem.fromMap(memMap);
+        },
+      );
 
   Future<bool> discardWhereIdIs(dynamic id) => v(
         {'id': id},

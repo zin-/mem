@@ -58,3 +58,18 @@ final saveMem = Provider.autoDispose.family<Future<bool>, Map<String, dynamic>>(
     },
   ),
 );
+
+final archiveMem = Provider.autoDispose.family<void, Mem>(
+  (ref, mem) => v(
+    {'mem': mem},
+    () {
+      if (mem.isSaved()) {
+        MemRepository().archive(mem).then((archived) {
+          ref.read(memMapProvider(mem.id).notifier).updatedBy(archived.toMap());
+        });
+      } else {
+        ref.read(memMapProvider(mem.id).notifier).updatedBy({});
+      }
+    },
+  ),
+);
