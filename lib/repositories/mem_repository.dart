@@ -16,10 +16,25 @@ class MemRepository {
         },
       );
 
-  Future<List<Mem>> shipAll() => v(
-        {},
-        () async =>
-            (await _memTable.select()).map((e) => Mem.fromMap(e)).toList(),
+  Future<List<Mem>> ship(bool? archived) => v(
+        {'showArchived': archived},
+        () async {
+          final where = <String>[];
+          final whereArgs = <Object?>[];
+
+          if (archived != null) {
+            archived
+                ? where.add('archivedAt IS NOT NULL')
+                : where.add('archivedAt IS NULL');
+          }
+
+          return (await _memTable.select(
+            where: where.isEmpty ? null : where.join(', '),
+            whereArgs: whereArgs.isEmpty ? null : whereArgs,
+          ))
+              .map((e) => Mem.fromMap(e))
+              .toList();
+        },
       );
 
   Future<Mem> shipWhereIdIs(dynamic id) => v(

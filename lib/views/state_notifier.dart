@@ -7,19 +7,29 @@ class ValueStateNotifier<T> extends StateNotifier<T> {
 }
 
 class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
-  ListValueStateNotifier(super.state);
+  final bool Function(T item)? filter;
 
-  add(T item) {
+  ListValueStateNotifier(super.state, {this.filter});
+
+  void add(T item) {
     final tmp = List.of(state);
     tmp.add(item);
-    state = tmp;
+    state = tmp
+        .where(
+          (element) => filter?.call(element) ?? true,
+        )
+        .toList();
   }
 
-  updateWhere(T item, bool Function(T item) where) {
+  void updateWhere(T item, bool Function(T item) where) {
     final index = state.indexWhere(where);
 
     final tmp = List.of(state);
     tmp.replaceRange(index, index + 1, [item]);
-    state = tmp;
+    state = tmp
+        .where(
+          (element) => filter?.call(element) ?? true,
+        )
+        .toList();
   }
 }

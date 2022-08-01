@@ -151,10 +151,15 @@ class ObjectStore extends Table {
       );
 
   @override
-  Future<List<Map<String, dynamic>>> select() => v(
-        {},
+  Future<List<Map<String, dynamic>>> select({
+    String? where,
+    List<Object?>? whereArgs,
+  }) =>
+      v(
+        {'where': where, 'whereArgs': whereArgs},
         () async => await _database.onOpened(
           () async {
+            // TODO implements where
             final txn = _database._database
                 .transaction(definition.name, idb_shim.idbModeReadOnly);
 

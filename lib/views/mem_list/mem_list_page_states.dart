@@ -6,11 +6,14 @@ import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/mem_detail/mem_detail_states.dart';
 import 'package:mem/views/state_notifier.dart';
 
-final fetchAllMem = FutureProvider<List<Mem>>(
+final fetchMems = FutureProvider<List<Mem>>(
   (ref) => v(
     {},
     () async {
-      final mems = await MemRepository().shipAll();
+      final showArchived = ref.watch(showArchivedProvider);
+
+      final mems = await MemRepository().ship(showArchived);
+
       ref.read(memsProvider.notifier).updatedBy(mems);
       mems.map((mem) =>
           ref.read(memMapProvider(mem.id).notifier).updatedBy(mem.toMap()));
@@ -23,6 +26,22 @@ final memsProvider =
     StateNotifierProvider<ListValueStateNotifier<Mem>, List<Mem>>(
   (ref) => v(
     {},
-    () => ListValueStateNotifier<Mem>([]),
+    () => ListValueStateNotifier<Mem>(
+      [],
+      filter: (item) {
+        final showArchived = ref.watch(showArchivedProvider);
+        if (showArchived != null) {
+          if (showArchived) {
+            return item.archivedAt != null;
+          } else {
+            return item.archivedAt == null;
+          }
+        } else {
+          return true;
+        }
+      },
+    ),
   ),
 );
+
+final showArchivedProvider = Provider<bool?>((ref) => false);

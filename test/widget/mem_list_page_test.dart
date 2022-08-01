@@ -23,7 +23,7 @@ void main() {
       ),
     );
 
-    when(mockedMemRepository.shipAll()).thenAnswer(
+    when(mockedMemRepository.ship(any)).thenAnswer(
       (realInvocation) async => mems,
     );
     when(mockedMemRepository.shipWhereIdIs(0)).thenAnswer(
@@ -46,12 +46,12 @@ void main() {
     await widgetTester.tap(memListTileFinder.at(0));
     await widgetTester.pump();
 
-    verify(mockedMemRepository.shipAll()).called(1);
+    verify(mockedMemRepository.ship(false)).called(1);
     verify(mockedMemRepository.shipWhereIdIs(0)).called(1);
   });
 
   testWidgets('Transit new MemDetailPage', (widgetTester) async {
-    when(mockedMemRepository.shipAll()).thenAnswer(
+    when(mockedMemRepository.ship(any)).thenAnswer(
       (realInvocation) async => [],
     );
 
@@ -68,6 +68,9 @@ void main() {
     expect(showNewMemFabFinder, findsOneWidget);
     await widgetTester.tap(showNewMemFabFinder);
     await widgetTester.pump();
+
+    verify(mockedMemRepository.ship(false)).called(1);
+    verify(mockedMemRepository.shipWhereIdIs(0)).called(1);
   });
 }
 

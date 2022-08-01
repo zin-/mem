@@ -43,7 +43,10 @@ abstract class Table {
 
   Future<int> insert(Map<String, dynamic> value);
 
-  Future<List<Map<String, dynamic>>> select();
+  Future<List<Map<String, dynamic>>> select({
+    String? where,
+    List<Object?>? whereArgs,
+  });
 
   Future<Map<String, dynamic>> selectByPk(dynamic pk);
 

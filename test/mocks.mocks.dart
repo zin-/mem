@@ -34,8 +34,8 @@ class MockMemRepository extends _i1.Mock implements _i3.MemRepository {
               returnValue: Future<_i2.Mem>.value(_FakeMem_0()))
           as _i4.Future<_i2.Mem>);
   @override
-  _i4.Future<List<_i2.Mem>> shipAll() =>
-      (super.noSuchMethod(Invocation.method(#shipAll, []),
+  _i4.Future<List<_i2.Mem>> ship(bool? archived) =>
+      (super.noSuchMethod(Invocation.method(#ship, [archived]),
               returnValue: Future<List<_i2.Mem>>.value(<_i2.Mem>[]))
           as _i4.Future<List<_i2.Mem>>);
   @override
@@ -45,6 +45,10 @@ class MockMemRepository extends _i1.Mock implements _i3.MemRepository {
   @override
   _i4.Future<_i2.Mem> update(_i2.Mem? mem) => (super.noSuchMethod(
       Invocation.method(#update, [mem]),
+      returnValue: Future<_i2.Mem>.value(_FakeMem_0())) as _i4.Future<_i2.Mem>);
+  @override
+  _i4.Future<_i2.Mem> archive(_i2.Mem? mem) => (super.noSuchMethod(
+      Invocation.method(#archive, [mem]),
       returnValue: Future<_i2.Mem>.value(_FakeMem_0())) as _i4.Future<_i2.Mem>);
   @override
   _i4.Future<bool> discardWhereIdIs(dynamic id) =>

@@ -21,7 +21,7 @@ class MemListPage extends StatelessWidget {
                 title: const Text('List'),
               ),
               body: AsyncValueView(
-                ref.watch(fetchAllMem),
+                ref.watch(fetchMems),
                 (List<Mem> allMem) => ListView.builder(
                   itemCount: ref.watch(memsProvider).length,
                   itemBuilder: (context, index) {

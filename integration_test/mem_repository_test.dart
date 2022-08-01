@@ -58,7 +58,7 @@ void main() async {
       final memMap2 = <String, dynamic>{'name': memName2};
       final receivedMem2 = await memRepository.receive(memMap2);
 
-      final selectedMemList = await memRepository.shipAll();
+      final selectedMemList = await memRepository.ship(null);
 
       expect(selectedMemList.length, 2);
       expect(
@@ -127,10 +127,11 @@ void main() async {
       final memMap2 = <String, dynamic>{'name': memName2};
       final receivedMem2 = await memRepository.receive(memMap2);
 
-      final removeResult = await memRepository.discardWhereIdIs(receivedMem1.id);
+      final removeResult =
+          await memRepository.discardWhereIdIs(receivedMem1.id);
       expect(removeResult, true);
 
-      final selectedMemList = await memRepository.shipAll();
+      final selectedMemList = await memRepository.ship(null);
       expect(selectedMemList.length, 1);
       expect(selectedMemList.map((mem) => mem.toMap()), [receivedMem2.toMap()]);
     },
@@ -147,7 +148,7 @@ void main() async {
 
       expect(removedCount, 2);
 
-      final selected = await memRepository.shipAll();
+      final selected = await memRepository.ship(null);
       expect(selected.length, 0);
     },
   );
