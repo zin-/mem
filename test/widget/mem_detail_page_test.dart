@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/logger.dart';
 import 'package:mockito/mockito.dart';
 
 import 'package:mem/database/database.dart';
@@ -13,6 +14,8 @@ import 'package:mem/views/constants.dart';
 import '../mocks.mocks.dart';
 
 void main() {
+  Logger(level: Level.verbose);
+
   final mockedMemRepository = MockMemRepository();
   MemRepository.withMock(mockedMemRepository);
 
@@ -89,11 +92,12 @@ void main() {
 
       await enterMemNameAndSave(widgetTester, enteringMemName);
 
-      checkSavedSnackBarAndDismiss(widgetTester, enteringMemName);
+      await checkSavedSnackBarAndDismiss(widgetTester, enteringMemName);
 
-      verifyNever(mockedMemRepository.shipWhereIdIs(null));
+      verifyNever(mockedMemRepository.shipWhereIdIs(any));
       verify(mockedMemRepository.receive(any)).called(1);
     });
+
     testWidgets('update', (widgetTester) async {
       const memId = 1;
       const memName = 'test mem name';
@@ -167,10 +171,9 @@ Future<void> checkSavedSnackBarAndDismiss(
 ) async {
   expect(find.text('Save success. $memName'), findsOneWidget);
 
-  await Future.delayed(
+  await widgetTester.pumpAndSettle(
     const Duration(seconds: defaultDismissDurationSeconds),
   );
-  await widgetTester.pumpAndSettle();
 
   expect(find.text('Save success. $memName'), findsNothing);
 }
