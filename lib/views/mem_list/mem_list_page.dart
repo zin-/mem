@@ -21,11 +21,11 @@ class MemListPage extends StatelessWidget {
                 title: const Text('List'),
               ),
               body: AsyncValueView(
-                ref.watch(fetchMems),
+                ref.watch(fetchMemList),
                 (List<Mem> allMem) => ListView.builder(
-                  itemCount: ref.watch(memsProvider).length,
+                  itemCount: ref.watch(memListProvider).length,
                   itemBuilder: (context, index) {
-                    final mem = ref.watch(memsProvider)[index];
+                    final mem = ref.watch(memListProvider)[index];
                     return ListTile(
                       title: Text(mem.name),
                       onTap: () => Navigator.of(context)

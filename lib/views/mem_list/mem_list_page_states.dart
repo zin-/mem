@@ -6,7 +6,7 @@ import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/mem_detail/mem_detail_states.dart';
 import 'package:mem/views/state_notifier.dart';
 
-final fetchMems = FutureProvider<List<Mem>>(
+final fetchMemList = FutureProvider<List<Mem>>(
   (ref) => v(
     {},
     () async {
@@ -14,7 +14,7 @@ final fetchMems = FutureProvider<List<Mem>>(
 
       final mems = await MemRepository().ship(showArchived);
 
-      ref.read(memsProvider.notifier).updatedBy(mems);
+      ref.read(memListProvider.notifier).updatedBy(mems);
       mems.map((mem) =>
           ref.read(memMapProvider(mem.id).notifier).updatedBy(mem.toMap()));
       return mems;
@@ -22,7 +22,7 @@ final fetchMems = FutureProvider<List<Mem>>(
   ),
 );
 
-final memsProvider =
+final memListProvider =
     StateNotifierProvider<ListValueStateNotifier<Mem>, List<Mem>>(
   (ref) => v(
     {},

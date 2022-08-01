@@ -42,7 +42,7 @@ final saveMem = Provider.autoDispose.family<Future<bool>, Map<String, dynamic>>(
     () async {
       Mem saved;
 
-      final memsNotifier = ref.read(memsProvider.notifier);
+      final memsNotifier = ref.read(memListProvider.notifier);
       if (Mem.isSavedMap(memMap)) {
         saved = await MemRepository().update(Mem.fromMap(memMap));
         // FIXME DetailからListのStateを見てるのがおかしい（Testでおかしなことになる）
