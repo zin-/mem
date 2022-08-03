@@ -15,8 +15,10 @@ final fetchMemList = FutureProvider<List<Mem>>(
       final mems = await MemRepository().ship(showArchived);
 
       ref.read(memListProvider.notifier).updatedBy(mems);
-      mems.map((mem) =>
-          ref.read(memMapProvider(mem.id).notifier).updatedBy(mem.toMap()));
+      for (var mem in mems) {
+        ref.read(memMapProvider(mem.id).notifier).updatedBy(mem.toMap());
+      }
+
       return mems;
     },
   ),
@@ -26,22 +28,30 @@ final memListProvider =
     StateNotifierProvider<ListValueStateNotifier<Mem>, List<Mem>>(
   (ref) => v(
     {},
-    () => ListValueStateNotifier<Mem>(
-      [],
-      filter: (item) {
-        final showArchived = ref.watch(showArchivedProvider);
-        if (showArchived != null) {
-          if (showArchived) {
-            return item.archivedAt != null;
+    // TODO ListValueStateは要素が変更されたらリスナーに通知して欲しい
+    // これは、Viewがそれぞれに要素を見るという話ではなく、ListValueStateが持っていて欲しい
+    () {
+      final listValueState = ListValueStateNotifier<Mem>(
+        [],
+        // FIXME filterはstateが持つものじゃない気がする
+        filter: (item) {
+          final showArchived = ref.watch(showArchivedProvider);
+          if (showArchived != null) {
+            if (showArchived) {
+              return item.archivedAt != null;
+            } else {
+              return item.archivedAt == null;
+            }
           } else {
-            return item.archivedAt == null;
+            return true;
           }
-        } else {
-          return true;
-        }
-      },
-    ),
+        },
+      );
+
+      return listValueState;
+    },
   ),
 );
 
-final showArchivedProvider = Provider<bool?>((ref) => false);
+final showArchivedProvider = Provider<bool?>((ref) => v({}, () => false));
+final handleMemDetailResult = Provider((ref) => v({}, () => null));

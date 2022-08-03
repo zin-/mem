@@ -23,68 +23,78 @@ class MemDetailPage extends StatelessWidget {
             () {
               final memMap = ref.watch(memMapProvider(_memId));
 
-              return Scaffold(
-                appBar: AppBar(
-                  title: const Text('Detail'),
-                  actions: [
-                    IconButton(
-                      icon: const Icon(Icons.archive),
-                      color: Colors.white,
-                      onPressed: () {
-                        ref.read(archiveMem(Mem.fromMap(memMap)));
-                        Navigator.of(context).pop();
-                      },
-                    )
-                  ],
-                ),
-                body: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Form(
-                    key: _formKey,
-                    child: AsyncValueView(
-                      ref.watch(fetchMemById(_memId)),
-                      (Map<String, dynamic> memDataMap) => Column(
-                        children: [
-                          TextFormField(
-                            initialValue: memMap['name'] ?? '',
-                            validator: (value) => (value?.isEmpty ?? false)
-                                ? 'Name is required.'
-                                : null,
-                            onChanged: (value) => ref
-                                .read(memMapProvider(_memId).notifier)
-                                .updatedBy(Map.of(memMap..['name'] = value)),
-                          ),
-                        ],
+              return WillPopScope(
+                child: Scaffold(
+                  appBar: AppBar(
+                    title: const Text('Detail'),
+                    actions: [
+                      IconButton(
+                        icon: const Icon(Icons.archive),
+                        color: Colors.white,
+                        onPressed: () {
+                          if (Mem.isSavedMap(memMap)) {
+                            ref.read(archiveMem(memMap)).then((archived) =>
+                                Navigator.of(context).pop(archived));
+                          } else {
+                            Navigator.of(context).pop(null);
+                          }
+                        },
+                      )
+                    ],
+                  ),
+                  body: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Form(
+                      key: _formKey,
+                      child: AsyncValueView(
+                        ref.watch(fetchMemById(_memId)),
+                        (Map<String, dynamic> memDataMap) => Column(
+                          children: [
+                            TextFormField(
+                              initialValue: memMap['name'] ?? '',
+                              validator: (value) => (value?.isEmpty ?? false)
+                                  ? 'Name is required.'
+                                  : null,
+                              onChanged: (value) => ref
+                                  .read(memMapProvider(_memId).notifier)
+                                  .updatedBy(Map.of(memMap..['name'] = value)),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
+                  floatingActionButton: Consumer(
+                    builder: (context, ref, child) {
+                      return FloatingActionButton(
+                        child: const Icon(Icons.save_alt),
+                        onPressed: () {
+                          if (_formKey.currentState?.validate() ?? false) {
+                            ref.read(saveMem(memMap)).then((saveSuccess) {
+                              if (saveSuccess) {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(SnackBar(
+                                  content:
+                                      Text('Save success. ${memMap['name']}'),
+                                  duration: const Duration(
+                                    seconds: defaultDismissDurationSeconds,
+                                  ),
+                                  dismissDirection: DismissDirection.horizontal,
+                                ));
+                              }
+                            });
+                          }
+                        },
+                      );
+                    },
+                  ),
+                  floatingActionButtonLocation:
+                      FloatingActionButtonLocation.centerFloat,
                 ),
-                floatingActionButton: Consumer(
-                  builder: (context, ref, child) {
-                    return FloatingActionButton(
-                      child: const Icon(Icons.save_alt),
-                      onPressed: () {
-                        if (_formKey.currentState?.validate() ?? false) {
-                          ref.read(saveMem(memMap)).then((saveSuccess) {
-                            if (saveSuccess) {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(SnackBar(
-                                content:
-                                    Text('Save success. ${memMap['name']}'),
-                                duration: const Duration(
-                                  seconds: defaultDismissDurationSeconds,
-                                ),
-                                dismissDirection: DismissDirection.horizontal,
-                              ));
-                            }
-                          });
-                        }
-                      },
-                    );
-                  },
-                ),
-                floatingActionButtonLocation:
-                    FloatingActionButtonLocation.centerFloat,
+                onWillPop: () async {
+                  Navigator.of(context).pop(Mem.fromMap(memMap));
+                  return true;
+                },
               );
             },
           ),
