@@ -8,6 +8,7 @@ import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/mem_list/mem_list_page.dart';
 
 import '../mocks.mocks.dart';
+import 'mem_detail_page_test.dart';
 
 void main() {
   final mockedMemRepository = MockMemRepository();
@@ -50,27 +51,63 @@ void main() {
     verify(mockedMemRepository.shipWhereIdIs(0)).called(1);
   });
 
-  testWidgets('Transit new MemDetailPage', (widgetTester) async {
-    when(mockedMemRepository.ship(any)).thenAnswer(
-      (realInvocation) async => [],
-    );
+  group('Transit', () {
+    testWidgets(': new MemDetailPage', (widgetTester) async {
+      when(mockedMemRepository.ship(any)).thenAnswer(
+        (realInvocation) async => [],
+      );
 
-    await widgetTester.pumpWidget(
-      const ProviderScope(
-        child: MaterialApp(
-          title: 'test',
-          home: MemListPage(),
+      await widgetTester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(
+            title: 'test',
+            home: MemListPage(),
+          ),
         ),
-      ),
-    );
-    await widgetTester.pump();
+      );
+      await widgetTester.pump();
 
-    expect(showNewMemFabFinder, findsOneWidget);
-    await widgetTester.tap(showNewMemFabFinder);
-    await widgetTester.pump();
+      expect(showNewMemFabFinder, findsOneWidget);
+      await widgetTester.tap(showNewMemFabFinder);
+      await widgetTester.pumpAndSettle();
 
-    verify(mockedMemRepository.ship(false)).called(1);
-    verify(mockedMemRepository.shipWhereIdIs(0)).called(1);
+      expectMemNameOnMemDetail(widgetTester, '');
+
+      verify(mockedMemRepository.ship(false)).called(1);
+      verifyNever(mockedMemRepository.shipWhereIdIs(any));
+    });
+
+    testWidgets(': saved MemDetailPage', (widgetTester) async {
+      final savedMem1 =
+          Mem(id: 1, name: 'mem detail', createdAt: DateTime.now());
+      final savedMem2 = Mem(id: 2, name: 'mem list', createdAt: DateTime.now());
+      when(mockedMemRepository.ship(any)).thenAnswer(
+        (realInvocation) async => [savedMem1, savedMem2],
+      );
+
+      await widgetTester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(
+            title: 'test',
+            home: MemListPage(),
+          ),
+        ),
+      );
+      await widgetTester.pumpAndSettle();
+
+      await widgetTester.tap(memListTileFinder.at(0));
+      await widgetTester.pumpAndSettle();
+
+      expectMemNameOnMemDetail(widgetTester, savedMem1.name);
+      expect(
+        (widgetTester.widget(memNameTextFormFieldFinder) as TextFormField)
+            .initialValue,
+        isNot(savedMem2.name),
+      );
+
+      verify(mockedMemRepository.ship(false)).called(1);
+      verifyNever(mockedMemRepository.shipWhereIdIs(any));
+    });
   });
 }
 

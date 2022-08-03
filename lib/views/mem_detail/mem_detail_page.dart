@@ -92,7 +92,11 @@ class MemDetailPage extends StatelessWidget {
                       FloatingActionButtonLocation.centerFloat,
                 ),
                 onWillPop: () async {
-                  Navigator.of(context).pop(Mem.fromMap(memMap));
+                  if (Mem.isSavedMap(memMap)) {
+                    Navigator.of(context).pop(Mem.fromMap(memMap));
+                  } else {
+                    Navigator.of(context).pop(null);
+                  }
                   return true;
                 },
               );

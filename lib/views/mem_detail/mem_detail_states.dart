@@ -5,7 +5,7 @@ import 'package:mem/mem.dart';
 import 'package:mem/views/state_notifier.dart';
 import 'package:mem/repositories/mem_repository.dart';
 
-final memMapProvider = StateNotifierProvider.autoDispose.family<
+final memMapProvider = StateNotifierProvider.family<
     ValueStateNotifier<Map<String, dynamic>>, Map<String, dynamic>, int?>(
   (ref, memId) => v(
     {'memId': memId},

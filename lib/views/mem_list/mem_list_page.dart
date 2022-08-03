@@ -30,11 +30,12 @@ class MemListPage extends StatelessWidget {
                   (List<Mem> _) => ListView.builder(
                     itemCount: memList.length,
                     itemBuilder: (context, index) {
-                      final memMap = memList[index].toMap();
+                      final mem = memList[index];
+                      // dev(ref.watch(memMapProvider(mem.id)));
                       return ListTile(
-                        title: Text(memMap['name'] ?? ''),
+                        title: Text(mem.toMap()['name'] ?? ''),
                         onTap: () =>
-                            showMemDetailPage(context, ref, memMap['id']),
+                            showMemDetailPage(context, ref, mem.toMap()['id']),
                       );
                     },
                   ),
@@ -62,13 +63,14 @@ showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) => child))
             .then((result) {
-          dev(result);
-          dev(ref.watch(memDetailPageStateProvider(memId)));
           if (result != null) {
             ref.read(memListProvider.notifier).updateWhere(
                   result,
                   (item) => item.id == result.id,
                 );
+          }
+          if (memId == null) {
+            ref.read(memMapProvider(memId).notifier).updatedBy({});
           }
         });
       },
