@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/mem.dart';
 import 'package:mockito/mockito.dart';
 
+import 'package:mem/logger.dart';
+import 'package:mem/mem.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/mem_list/mem_list_page.dart';
 
@@ -11,6 +12,8 @@ import '../mocks.mocks.dart';
 import 'mem_detail_page_test.dart';
 
 void main() {
+  Logger(level: Level.verbose);
+
   final mockedMemRepository = MockMemRepository();
   MemRepository.withMock(mockedMemRepository);
 
@@ -27,9 +30,9 @@ void main() {
     when(mockedMemRepository.ship(any)).thenAnswer(
       (realInvocation) async => mems,
     );
-    when(mockedMemRepository.shipWhereIdIs(0)).thenAnswer(
-      (realInvocation) async => mems[0],
-    );
+    // when(mockedMemRepository.shipWhereIdIs(0)).thenAnswer(
+    //   (realInvocation) async => mems[0],
+    // );
 
     await widgetTester.pumpWidget(
       const ProviderScope(
@@ -39,7 +42,7 @@ void main() {
         ),
       ),
     );
-    await widgetTester.pump();
+    await widgetTester.pumpAndSettle();
 
     mems.asMap().forEach((index, mem) {
       expectMemNameTextOnListAt(widgetTester, index, mem.name);
@@ -48,7 +51,7 @@ void main() {
     await widgetTester.pump();
 
     verify(mockedMemRepository.ship(false)).called(1);
-    verify(mockedMemRepository.shipWhereIdIs(0)).called(1);
+    verifyNever(mockedMemRepository.shipWhereIdIs(any));
   });
 
   group('Transit', () {
@@ -126,6 +129,6 @@ void expectMemNameTextOnListAt(
   String memName,
 ) =>
     expect(
-      getMemNameTextOnListAt(widgetTester, 0).data,
+      getMemNameTextOnListAt(widgetTester, index).data,
       memName,
     );

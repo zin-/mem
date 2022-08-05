@@ -53,7 +53,7 @@ class MemListPage extends StatelessWidget {
       );
 }
 
-showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
+void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
       {'context': context, 'memId': memId},
       () {
         Navigator.of(context)
