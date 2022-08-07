@@ -49,8 +49,6 @@ void main() {
           await widgetTester.tap(showNewMemFabFinder);
           await widgetTester.pumpAndSettle();
 
-          expectMemNameOnMemDetail(widgetTester, '');
-
           await enterMemNameAndSave(widgetTester, enteringMemName);
 
           await checkSavedSnackBarAndDismiss(widgetTester, enteringMemName);
@@ -92,8 +90,6 @@ void main() {
 
           await widgetTester.tap(memListTileFinder.at(0));
           await widgetTester.pumpAndSettle();
-
-          expectMemNameOnMemDetail(widgetTester, savedMemName);
 
           await enterMemNameAndSave(widgetTester, enteringMemName);
 
