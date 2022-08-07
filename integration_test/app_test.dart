@@ -37,6 +37,12 @@ void main() {
           await widgetTester.tap(showNewMemFabFinder);
           await widgetTester.pumpAndSettle();
 
+          await widgetTester.pageBack();
+          await widgetTester.pumpAndSettle();
+
+          await widgetTester.tap(showNewMemFabFinder);
+          await widgetTester.pumpAndSettle();
+
           await widgetTester.tap(archiveButtonFinder);
           await widgetTester.pumpAndSettle();
 
