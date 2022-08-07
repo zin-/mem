@@ -54,4 +54,3 @@ final memListProvider =
 );
 
 final showArchivedProvider = Provider<bool?>((ref) => v({}, () => false));
-final handleMemDetailResult = Provider((ref) => v({}, () => null));

@@ -70,7 +70,7 @@ void main() {
       );
 
       testWidgets(
-        ': show saved mem and update.',
+        ': show saved mem and update and archive.',
         (widgetTester) async {
           const savedMemName = 'saved mem name';
           final database = await DatabaseManager().open(app.databaseDefinition);
@@ -105,6 +105,15 @@ void main() {
             getMemNameTextOnListAt(widgetTester, 0).data,
             enteringMemNameSecond,
           );
+
+          await widgetTester.tap(memListTileFinder.at(0));
+          await widgetTester.pumpAndSettle();
+
+          await widgetTester.tap(archiveButtonFinder);
+          await widgetTester.pumpAndSettle();
+
+          expect(find.text(enteringMemName), findsNothing);
+          expect(find.text(enteringMemNameSecond), findsNothing);
         },
       );
     },
