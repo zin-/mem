@@ -19,7 +19,7 @@ void main() {
   final mockedMemRepository = MockMemRepository();
   MemRepository.withMock(mockedMemRepository);
 
-  group('new', () {
+  group('New', () {
     testWidgets(': not found.', (widgetTester) async {
       when(mockedMemRepository.shipWhereIdIs(any))
           .thenThrow(NotFoundException('test target', 'test condition'));
@@ -69,8 +69,8 @@ void main() {
     });
   });
 
-  group('save', () {
-    testWidgets('create', (widgetTester) async {
+  group('Save', () {
+    testWidgets(': create.', (widgetTester) async {
       const enteringMemName = 'entering mem name';
 
       when(mockedMemRepository.receive(any)).thenAnswer((realInvocation) async {
@@ -98,7 +98,7 @@ void main() {
       verify(mockedMemRepository.receive(any)).called(1);
     });
 
-    testWidgets('update', (widgetTester) async {
+    testWidgets(': update.', (widgetTester) async {
       const memId = 1;
       const memName = 'test mem name';
       const enteringMemName = 'entering mem name';
