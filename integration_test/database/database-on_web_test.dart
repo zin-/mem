@@ -14,30 +14,33 @@ void main() {
   const dbName = 'test_sqlite.db';
   const dbVersion = 1;
 
-  test(
-    'SQLite database: Error on Chrome.',
-    () async {
-      expect(
-        () => SqliteDatabase(DefD(dbName, dbVersion, [])),
-        throwsA(
-          (e) =>
-              e is DatabaseException &&
-              e.message == 'Unsupported platform. Platform: Web',
-        ),
-      );
-    },
-  );
-  test(
-    'Indexed database: require at least 1 table.',
-    () async {
-      expect(
-        () => IndexedDatabase(DefD(dbName, dbVersion, [])),
-        throwsA(
-          (e) =>
-              e is DatabaseException &&
-              e.message == 'Requires at least 1 table.',
-        ),
-      );
-    },
-  );
+  group('Database on web', () {
+    test(
+      'SQLite database: Error on Chrome.',
+      () async {
+        expect(
+          () => SqliteDatabase(DefD(dbName, dbVersion, [])),
+          throwsA(
+            (e) =>
+                e is DatabaseException &&
+                e.message == 'Unsupported platform. Platform: Web',
+          ),
+        );
+      },
+    );
+
+    test(
+      'Indexed database: require at least 1 table.',
+      () async {
+        expect(
+          () => IndexedDatabase(DefD(dbName, dbVersion, [])),
+          throwsA(
+            (e) =>
+                e is DatabaseException &&
+                e.message == 'Requires at least 1 table.',
+          ),
+        );
+      },
+    );
+  });
 }

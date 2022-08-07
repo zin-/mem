@@ -18,102 +18,103 @@ void main() {
   ]);
   tearDown(() async => await DatabaseManager().delete(dbDef.name));
 
-  // FIXME Windowsで実行すると画面がないせいなのかFailedになる
-  test(
-    'Open database twice.',
-    () async {
-      final db = await DatabaseManager().open(dbDef);
-      if (kIsWeb) {
-        expect(db, isA<IndexedDatabase>());
-      } else {
-        expect(db, isA<SqliteDatabase>());
-      }
+  group('Database factory', () {
+    test(
+      'Open database twice.',
+      () async {
+        final db = await DatabaseManager().open(dbDef);
+        if (kIsWeb) {
+          expect(db, isA<IndexedDatabase>());
+        } else {
+          expect(db, isA<SqliteDatabase>());
+        }
 
-      final openedDb = await DatabaseManager().open(dbDef);
-      expect(openedDb, db);
-    },
-  );
+        final openedDb = await DatabaseManager().open(dbDef);
+        expect(openedDb, db);
+      },
+    );
 
-  test(
-    'Open and close database.',
-    () async {
-      const tName = 'tests';
-      final db = await DatabaseManager().open(dbDef);
-      final table = db.getTable(tName);
+    test(
+      'Open and close database.',
+      () async {
+        const tName = 'tests';
+        final db = await DatabaseManager().open(dbDef);
+        final table = db.getTable(tName);
 
-      final closeResult1 = await DatabaseManager().close(dbDef.name);
-      expect(closeResult1, true);
-      final closeResult2 = await DatabaseManager().close(dbDef.name);
-      expect(closeResult2, false);
+        final closeResult1 = await DatabaseManager().close(dbDef.name);
+        expect(closeResult1, true);
+        final closeResult2 = await DatabaseManager().close(dbDef.name);
+        expect(closeResult2, false);
 
-      final directCloseResult = await db.close();
-      expect(directCloseResult, false);
+        final directCloseResult = await db.close();
+        expect(directCloseResult, false);
 
-      expect(
-        () => table.insert({}),
-        throwsA((e) => e is DatabaseDoesNotExistException),
-      );
-      expect(
-        () => table.select(),
-        throwsA((e) => e is DatabaseDoesNotExistException),
-      );
-      expect(
-        () => table.selectByPk(1),
-        throwsA((e) => e is DatabaseDoesNotExistException),
-      );
-      expect(
-        () => table.updateByPk(1, {}),
-        throwsA((e) => e is DatabaseDoesNotExistException),
-      );
-      expect(
-        () => table.delete(),
-        throwsA((e) => e is DatabaseDoesNotExistException),
-      );
-      expect(
-        () => table.deleteByPk(1),
-        throwsA((e) => e is DatabaseDoesNotExistException),
-      );
-    },
-  );
+        expect(
+          () => table.insert({}),
+          throwsA((e) => e is DatabaseDoesNotExistException),
+        );
+        expect(
+          () => table.select(),
+          throwsA((e) => e is DatabaseDoesNotExistException),
+        );
+        expect(
+          () => table.selectByPk(1),
+          throwsA((e) => e is DatabaseDoesNotExistException),
+        );
+        expect(
+          () => table.updateByPk(1, {}),
+          throwsA((e) => e is DatabaseDoesNotExistException),
+        );
+        expect(
+          () => table.delete(),
+          throwsA((e) => e is DatabaseDoesNotExistException),
+        );
+        expect(
+          () => table.deleteByPk(1),
+          throwsA((e) => e is DatabaseDoesNotExistException),
+        );
+      },
+    );
 
-  test(
-    'Open and delete database.',
-    () async {
-      final db = await DatabaseManager().open(dbDef);
-      final table = db.getTable(tableName);
+    test(
+      'Open and delete database.',
+      () async {
+        final db = await DatabaseManager().open(dbDef);
+        final table = db.getTable(tableName);
 
-      final deleteResult1 = await DatabaseManager().delete(dbDef.name);
-      expect(deleteResult1, true);
-      final deleteResult2 = await DatabaseManager().delete(dbDef.name);
-      expect(deleteResult2, false);
+        final deleteResult1 = await DatabaseManager().delete(dbDef.name);
+        expect(deleteResult1, true);
+        final deleteResult2 = await DatabaseManager().delete(dbDef.name);
+        expect(deleteResult2, false);
 
-      final directDeleteResult = await db.delete();
-      expect(directDeleteResult, false);
+        final directDeleteResult = await db.delete();
+        expect(directDeleteResult, false);
 
-      expect(
-        () => table.insert({}),
-        throwsA((e) => e is DatabaseDoesNotExistException),
-      );
-      expect(
-        () => table.select(),
-        throwsA((e) => e is DatabaseDoesNotExistException),
-      );
-      expect(
-        () => table.selectByPk(1),
-        throwsA((e) => e is DatabaseDoesNotExistException),
-      );
-      expect(
-        () => table.updateByPk(1, {}),
-        throwsA((e) => e is DatabaseDoesNotExistException),
-      );
-      expect(
-        () => table.delete(),
-        throwsA((e) => e is DatabaseDoesNotExistException),
-      );
-      expect(
-        () => table.deleteByPk(1),
-        throwsA((e) => e is DatabaseDoesNotExistException),
-      );
-    },
-  );
+        expect(
+          () => table.insert({}),
+          throwsA((e) => e is DatabaseDoesNotExistException),
+        );
+        expect(
+          () => table.select(),
+          throwsA((e) => e is DatabaseDoesNotExistException),
+        );
+        expect(
+          () => table.selectByPk(1),
+          throwsA((e) => e is DatabaseDoesNotExistException),
+        );
+        expect(
+          () => table.updateByPk(1, {}),
+          throwsA((e) => e is DatabaseDoesNotExistException),
+        );
+        expect(
+          () => table.delete(),
+          throwsA((e) => e is DatabaseDoesNotExistException),
+        );
+        expect(
+          () => table.deleteByPk(1),
+          throwsA((e) => e is DatabaseDoesNotExistException),
+        );
+      },
+    );
+  });
 }
