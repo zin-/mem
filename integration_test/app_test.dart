@@ -29,10 +29,10 @@ void main() {
         ': show new(empty) mem and create.',
         (widgetTester) async {
           const enteringMemName = 'entering mem name';
-          const enteringMemNameSecond = 'second';
+          const enteringMemNameSecond = 'entering mem name second';
 
           await app.main();
-          await widgetTester.pumpAndSettle();
+          await widgetTester.pump();
 
           await widgetTester.tap(showNewMemFabFinder);
           await widgetTester.pumpAndSettle();
@@ -64,8 +64,7 @@ void main() {
           await widgetTester.tap(showNewMemFabFinder);
           await widgetTester.pumpAndSettle();
 
-          const archiveMemName = 'archive mem name';
-          await enterMemNameAndSave(widgetTester, archiveMemName);
+          expect(find.text(enteringMemNameSecond), findsNothing);
         },
       );
 
@@ -83,7 +82,7 @@ void main() {
           await DatabaseManager().close(app.databaseDefinition.name);
 
           const enteringMemName = 'entering mem name';
-          const enteringMemNameSecond = 'second';
+          const enteringMemNameSecond = 'entering mem name second';
 
           await app.main();
           await widgetTester.pumpAndSettle();
