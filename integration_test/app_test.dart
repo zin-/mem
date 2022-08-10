@@ -25,6 +25,7 @@ void main() {
   group(
     'Basic scenario',
     () {
+      // FIXME 1つのテストで色々やろうとし過ぎかも
       testWidgets(
         ': show new(empty) mem and create.',
         (widgetTester) async {
