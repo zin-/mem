@@ -56,6 +56,10 @@ abstract class Table {
 
   Future<int> delete();
 
+  // TODO implement
+  // bulkInsert();
+  // bulkUpdate();
+
   Map<String, dynamic> convertTo(Map<String, dynamic> value) =>
       value.map((key, value) => MapEntry(
             key,

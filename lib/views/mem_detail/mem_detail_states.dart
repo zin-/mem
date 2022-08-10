@@ -9,17 +9,15 @@ final memMapProvider = StateNotifierProvider.family<
     ValueStateNotifier<Map<String, dynamic>>, Map<String, dynamic>, int?>(
   (ref, memId) => v(
     {'memId': memId},
-    () => ValueStateNotifier({}),
+    () => ValueStateNotifier(ref.watch(memProvider(memId))?.toMap() ?? {}),
   ),
 );
 
-enum MemDetailPageState { newer, fetched, archived }
-
-final memDetailPageStateProvider = StateNotifierProvider.family<
-    ValueStateNotifier<MemDetailPageState>, MemDetailPageState, int?>(
+final memProvider =
+    StateNotifierProvider.family<ValueStateNotifier<Mem?>, Mem?, int?>(
   (ref, memId) => v(
     {'memId': memId},
-    () => ValueStateNotifier(MemDetailPageState.newer),
+    () => ValueStateNotifier(null),
   ),
 );
 
@@ -33,7 +31,7 @@ final fetchMemById =
       if (memId != null && !Mem.isSavedMap(memMap)) {
         try {
           final mem = await MemRepository().shipWhereIdIs(memId);
-          ref.read(memMapProvider(memId).notifier).updatedBy(mem.toMap());
+          ref.read(memProvider(memId).notifier).updatedBy(mem);
           memMap = mem.toMap();
         } catch (e) {
           warn(e);
@@ -54,10 +52,10 @@ final saveMem = Provider.autoDispose.family<Future<bool>, Map<String, dynamic>>(
         saved = await MemRepository().update(Mem.fromMap(memMap));
       } else {
         saved = await MemRepository().receive(memMap);
-        ref.read(memMapProvider(null).notifier).updatedBy(saved.toMap());
+        ref.read(memProvider(null).notifier).updatedBy(saved);
       }
 
-      ref.read(memMapProvider(saved.id).notifier).updatedBy(saved.toMap());
+      ref.read(memProvider(saved.id).notifier).updatedBy(saved);
 
       return true;
     },
@@ -69,12 +67,7 @@ final archiveMem = Provider.family<Future<Mem>, Map<String, dynamic>>(
     {'memMap': memMap},
     () async {
       final archived = await MemRepository().archive(Mem.fromMap(memMap));
-      ref
-          .read(memMapProvider(archived.id).notifier)
-          .updatedBy(archived.toMap());
-      ref
-          .read(memDetailPageStateProvider(archived.id).notifier)
-          .updatedBy(MemDetailPageState.archived);
+      ref.read(memProvider(archived.id).notifier).updatedBy(archived);
       return archived;
     },
   ),

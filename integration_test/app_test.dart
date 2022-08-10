@@ -72,6 +72,7 @@ void main() {
         ': show saved mem and update and archive.',
         (widgetTester) async {
           const savedMemName = 'saved mem name';
+          const updatingMemName = 'updating mem name';
           final database = await DatabaseManager().open(app.databaseDefinition);
           final memTable = database.getTable(memTableName);
           final savedMemId = await memTable.insert({
@@ -79,6 +80,11 @@ void main() {
             'createdAt': DateTime.now(),
           });
           assert(savedMemId == 1);
+          final updatingMemId = await memTable.insert({
+            'name': updatingMemName,
+            'createdAt': DateTime.now(),
+          });
+          assert(updatingMemId == 2);
           await DatabaseManager().close(app.databaseDefinition.name);
 
           const enteringMemName = 'entering mem name';
@@ -87,22 +93,45 @@ void main() {
           await app.main();
           await widgetTester.pumpAndSettle();
 
-          await widgetTester.tap(memListTileFinder.at(0));
+          await widgetTester.tap(memListTileFinder.at(1));
           await widgetTester.pumpAndSettle();
 
           await enterMemNameAndSave(widgetTester, enteringMemName);
 
           await checkSavedSnackBarAndDismiss(widgetTester, enteringMemName);
 
-          await enterMemNameAndSave(widgetTester, enteringMemNameSecond);
-
           await widgetTester.pageBack();
           await widgetTester.pumpAndSettle();
 
-          expect(find.text(enteringMemName), findsNothing);
+          expect(find.text(updatingMemName), findsNothing);
           expect(
             getMemNameTextOnListAt(widgetTester, 0).data,
+            savedMemName,
+          );
+          expect(
+            getMemNameTextOnListAt(widgetTester, 1).data,
+            enteringMemName,
+          );
+
+          await widgetTester.tap(memListTileFinder.at(0));
+          await widgetTester.pumpAndSettle();
+
+          await widgetTester.enterText(
+            memNameTextFormFieldFinder,
             enteringMemNameSecond,
+          );
+          await widgetTester.pageBack();
+          await widgetTester.pumpAndSettle();
+
+          expect(find.text(updatingMemName), findsNothing);
+          expect(find.text(enteringMemNameSecond), findsNothing);
+          expect(
+            getMemNameTextOnListAt(widgetTester, 0).data,
+            savedMemName,
+          );
+          expect(
+            getMemNameTextOnListAt(widgetTester, 1).data,
+            enteringMemName,
           );
 
           await widgetTester.tap(memListTileFinder.at(0));
@@ -111,8 +140,13 @@ void main() {
           await widgetTester.tap(archiveButtonFinder);
           await widgetTester.pumpAndSettle();
 
-          expect(find.text(enteringMemName), findsNothing);
+          expect(find.text(updatingMemName), findsNothing);
           expect(find.text(enteringMemNameSecond), findsNothing);
+          expect(find.text(savedMemName), findsNothing);
+          expect(
+            getMemNameTextOnListAt(widgetTester, 0).data,
+            enteringMemName,
+          );
         },
       );
     },

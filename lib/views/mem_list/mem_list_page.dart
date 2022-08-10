@@ -62,16 +62,21 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
                     MemDetailPage(memId),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) => child))
-            .then((result) {
-          if (result != null) {
-            ref.read(memListProvider.notifier).updateWhere(
-                  result,
-                  (item) => item.id == result.id,
-                );
-          }
-          if (memId == null) {
-            ref.read(memMapProvider(memId).notifier).updatedBy({});
-          }
-        });
+            .then(
+              (result) => v(
+                {'result': result},
+                () {
+                  if (result != null) {
+                    ref.read(memListProvider.notifier).updateWhere(
+                          result,
+                          (item) => item.id == result.id,
+                        );
+                  }
+                  if (memId == null) {
+                    ref.read(memMapProvider(memId).notifier).updatedBy({});
+                  }
+                },
+              ),
+            );
       },
     );

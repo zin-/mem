@@ -16,7 +16,7 @@ final fetchMemList = FutureProvider<List<Mem>>(
 
       ref.read(memListProvider.notifier).updatedBy(mems);
       for (var mem in mems) {
-        ref.read(memMapProvider(mem.id).notifier).updatedBy(mem.toMap());
+        ref.read(memProvider(mem.id).notifier).updatedBy(mem);
       }
 
       return mems;
