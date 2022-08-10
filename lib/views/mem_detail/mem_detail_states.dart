@@ -64,7 +64,7 @@ final saveMem = Provider.autoDispose.family<Future<bool>, Map<String, dynamic>>(
 
 final archiveMem = Provider.family<Future<Mem>, Map<String, dynamic>>(
   (ref, memMap) => v(
-    {'memMap': memMap},
+    {'memMap': memMap}, // FIXME 引数としては不要な気がする
     () async {
       final archived = await MemRepository().archive(Mem.fromMap(memMap));
       ref.read(memProvider(archived.id).notifier).updatedBy(archived);
