@@ -21,6 +21,7 @@ class MemDetailPage extends StatelessWidget {
           builder: (context, ref, child) => v(
             {},
             () {
+              final mem = ref.watch(memProvider(_memId));
               final memMap = ref.watch(memMapProvider(_memId));
 
               return WillPopScope(
@@ -68,9 +69,9 @@ class MemDetailPage extends StatelessWidget {
                     builder: (context, ref, child) {
                       return FloatingActionButton(
                         child: const Icon(Icons.save_alt),
-                        onPressed: () {
+                        onPressed: () async {
                           if (_formKey.currentState?.validate() ?? false) {
-                            ref.read(saveMem(memMap)).then((saveSuccess) {
+                            await ref.read(saveMem(memMap)).then((saveSuccess) {
                               if (saveSuccess) {
                                 ScaffoldMessenger.of(context)
                                     .showSnackBar(SnackBar(
@@ -92,7 +93,6 @@ class MemDetailPage extends StatelessWidget {
                       FloatingActionButtonLocation.centerFloat,
                 ),
                 onWillPop: () async {
-                  final mem = ref.watch(memProvider(_memId));
                   Navigator.of(context).pop(mem);
                   return true;
                 },

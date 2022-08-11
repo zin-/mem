@@ -55,6 +55,10 @@ void main() {
           await checkSavedSnackBarAndDismiss(widgetTester, enteringMemName);
 
           await enterMemNameAndSave(widgetTester, enteringMemNameSecond);
+          await checkSavedSnackBarAndDismiss(
+            widgetTester,
+            enteringMemNameSecond,
+          );
 
           await widgetTester.pageBack();
           await widgetTester.pumpAndSettle();

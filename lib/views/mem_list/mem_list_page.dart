@@ -31,7 +31,6 @@ class MemListPage extends StatelessWidget {
                     itemCount: memList.length,
                     itemBuilder: (context, index) {
                       final mem = memList[index];
-                      // dev(ref.watch(memMapProvider(mem.id)));
                       return ListTile(
                         title: Text(mem.toMap()['name'] ?? ''),
                         onTap: () =>

@@ -5,11 +5,14 @@ import 'package:mem/mem.dart';
 import 'package:mem/views/state_notifier.dart';
 import 'package:mem/repositories/mem_repository.dart';
 
+const _memIdKey = '_memId';
+
 final memMapProvider = StateNotifierProvider.family<
     ValueStateNotifier<Map<String, dynamic>>, Map<String, dynamic>, int?>(
   (ref, memId) => v(
     {'memId': memId},
-    () => ValueStateNotifier(ref.watch(memProvider(memId))?.toMap() ?? {}),
+    () => ValueStateNotifier(
+        (ref.watch(memProvider(memId))?.toMap() ?? {})..[_memIdKey] = memId),
   ),
 );
 
@@ -47,15 +50,21 @@ final saveMem = Provider.autoDispose.family<Future<bool>, Map<String, dynamic>>(
   (ref, memMap) => v(
     {'memMap': memMap},
     () async {
+      final memId = memMap.remove(_memIdKey);
+
       Mem saved;
       if (Mem.isSavedMap(memMap)) {
         saved = await MemRepository().update(Mem.fromMap(memMap));
       } else {
         saved = await MemRepository().receive(memMap);
-        ref.read(memProvider(null).notifier).updatedBy(saved);
+        ref
+            .read(memProvider(saved.id).notifier)
+            .updatedBy(Mem.fromMap(saved.toMap()));
       }
 
-      ref.read(memProvider(saved.id).notifier).updatedBy(saved);
+      ref
+          .read(memProvider(memId).notifier)
+          .updatedBy(Mem.fromMap(saved.toMap()));
 
       return true;
     },
