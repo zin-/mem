@@ -35,6 +35,7 @@ T trace<T>(T object) => Logger().log(Level.trace, object);
 
 T warn<T>(T object) => Logger().log(Level.warning, object);
 
+@Deprecated('Allow under develop only')
 T dev<T>(T object) => Logger().log(Level.debug, object);
 
 enum Level {
