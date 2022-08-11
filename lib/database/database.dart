@@ -43,7 +43,10 @@ abstract class Table {
 
   Future<int> insert(Map<String, dynamic> value);
 
-  Future<List<Map<String, dynamic>>> select();
+  Future<List<Map<String, dynamic>>> select({
+    String? where,
+    List<Object?>? whereArgs,
+  });
 
   Future<Map<String, dynamic>> selectByPk(dynamic pk);
 
@@ -52,6 +55,10 @@ abstract class Table {
   Future<int> deleteByPk(dynamic pk);
 
   Future<int> delete();
+
+  // TODO implement
+  // bulkInsert();
+  // bulkUpdate();
 
   Map<String, dynamic> convertTo(Map<String, dynamic> value) =>
       value.map((key, value) => MapEntry(

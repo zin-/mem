@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/logger.dart';
-import 'package:mem/views/constants.dart';
 
+import 'package:mem/logger.dart';
+import 'package:mem/mem.dart';
+import 'package:mem/views/async_value_view.dart';
+import 'package:mem/views/constants.dart';
 import 'package:mem/views/mem_detail/mem_detail_states.dart';
 
-class MemDetailPage extends ConsumerWidget {
+class MemDetailPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
 
   final int? _memId;
@@ -13,65 +15,90 @@ class MemDetailPage extends ConsumerWidget {
   MemDetailPage(this._memId, {Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => t(
+  Widget build(BuildContext context) => t(
         {},
-        () {
-          final memMapAsyncValue = ref.watch(fetchMemById(_memId));
+        () => Consumer(
+          builder: (context, ref, child) => v(
+            {},
+            () {
+              final mem = ref.watch(memProvider(_memId));
+              final memMap = ref.watch(memMapProvider(_memId));
 
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text('Detail'),
-            ),
-            body: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Form(
-                key: _formKey,
-                child: memMapAsyncValue.when(
-                  data: (memDataMap) => Column(
-                    children: [
-                      TextFormField(
-                        initialValue: memDataMap['name'] ?? '',
-                        validator: (value) => (value?.isEmpty ?? false)
-                            ? 'Name is required.'
-                            : null,
-                        onChanged: (value) => ref
-                            .read(memMapProvider(_memId).notifier)
-                            .updatedBy(memDataMap..['name'] = value),
-                      ),
+              return WillPopScope(
+                child: Scaffold(
+                  appBar: AppBar(
+                    title: const Text('Detail'),
+                    actions: [
+                      IconButton(
+                        icon: const Icon(Icons.archive),
+                        color: Colors.white,
+                        onPressed: () {
+                          if (Mem.isSavedMap(memMap)) {
+                            ref.read(archiveMem(memMap)).then((archived) =>
+                                Navigator.of(context).pop(archived));
+                          } else {
+                            Navigator.of(context).pop(null);
+                          }
+                        },
+                      )
                     ],
                   ),
-                  error: (e, s) => const Text('error'),
-                  loading: () => const Text('loading'),
-                ),
-              ),
-            ),
-            floatingActionButton: Consumer(
-              builder: (context, ref, child) {
-                return FloatingActionButton(
-                  child: const Icon(Icons.save_alt),
-                  onPressed: () {
-                    final memMap = ref.watch(memMapProvider(_memId));
-
-                    if (_formKey.currentState?.validate() ?? false) {
-                      ref.read(saveMem(memMap)).then((saveSuccess) {
-                        if (saveSuccess) {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text('Save success. ${memMap['name']}'),
-                            duration: const Duration(
-                              seconds: defaultDismissDurationSeconds,
+                  body: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Form(
+                      key: _formKey,
+                      child: AsyncValueView(
+                        ref.watch(fetchMemById(_memId)),
+                        (Map<String, dynamic> memDataMap) => Column(
+                          children: [
+                            TextFormField(
+                              initialValue: memMap['name'] ?? '',
+                              validator: (value) => (value?.isEmpty ?? false)
+                                  ? 'Name is required.'
+                                  : null,
+                              onChanged: (value) => ref
+                                  .read(memMapProvider(_memId).notifier)
+                                  .updatedBy(Map.of(memMap..['name'] = value)),
                             ),
-                            dismissDirection: DismissDirection.horizontal,
-                          ));
-                        }
-                      });
-                    }
-                  },
-                );
-              },
-            ),
-            floatingActionButtonLocation:
-                FloatingActionButtonLocation.centerFloat,
-          );
-        },
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  floatingActionButton: Consumer(
+                    builder: (context, ref, child) {
+                      return FloatingActionButton(
+                        child: const Icon(Icons.save_alt),
+                        onPressed: () async {
+                          if (_formKey.currentState?.validate() ?? false) {
+                            await ref.read(saveMem(memMap)).then((saveSuccess) {
+                              if (saveSuccess) {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(SnackBar(
+                                  content:
+                                      Text('Save success. ${memMap['name']}'),
+                                  duration: const Duration(
+                                    seconds: defaultDismissDurationSeconds,
+                                  ),
+                                  dismissDirection: DismissDirection.horizontal,
+                                ));
+                              }
+                            });
+                          }
+                        },
+                      );
+                    },
+                  ),
+                  floatingActionButtonLocation:
+                      FloatingActionButtonLocation.centerFloat,
+                ),
+                onWillPop: () async {
+                  Navigator.of(context).pop(mem);
+                  return true;
+                },
+              );
+            },
+          ),
+        ),
       );
 }

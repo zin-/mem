@@ -1,17 +1,16 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+
+import 'package:mem/logger.dart';
 import 'package:mem/database/database_factory.dart';
-
-import 'package:mem/main.dart' as app;
 import 'package:mem/repositories/mem_repository.dart';
-import 'package:mem/views/constants.dart';
+import 'package:mem/main.dart' as app;
 
-// FIXME mem_detail_testと同じ定義。共通化したい
-final memNameFinder = find.byType(TextFormField).at(0);
-final saveFabFinder = find.byIcon(Icons.save_alt).at(0);
+import '../test/widget/mem_detail_page_test.dart';
+import '../test/widget/mem_list_page_test.dart';
 
 void main() {
+  Logger(level: Level.verbose);
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() async {
@@ -26,38 +25,59 @@ void main() {
   group(
     'Basic scenario',
     () {
+      // FIXME 1つのテストで色々やろうとし過ぎかも
       testWidgets(
         ': show new(empty) mem and create.',
         (widgetTester) async {
           const enteringMemName = 'entering mem name';
+          const enteringMemNameSecond = 'entering mem name second';
 
           await app.main();
+          await widgetTester.pump();
+
+          await widgetTester.tap(showNewMemFabFinder);
           await widgetTester.pumpAndSettle();
 
-          expect(
-            (widgetTester.widget(memNameFinder) as TextFormField).initialValue,
-            '',
+          await widgetTester.pageBack();
+          await widgetTester.pumpAndSettle();
+
+          await widgetTester.tap(showNewMemFabFinder);
+          await widgetTester.pumpAndSettle();
+
+          await widgetTester.tap(archiveButtonFinder);
+          await widgetTester.pumpAndSettle();
+
+          await widgetTester.tap(showNewMemFabFinder);
+          await widgetTester.pumpAndSettle();
+
+          await enterMemNameAndSave(widgetTester, enteringMemName);
+
+          await checkSavedSnackBarAndDismiss(widgetTester, enteringMemName);
+
+          await enterMemNameAndSave(widgetTester, enteringMemNameSecond);
+          await checkSavedSnackBarAndDismiss(
+            widgetTester,
+            enteringMemNameSecond,
           );
 
-          await widgetTester.enterText(memNameFinder, enteringMemName);
-          await widgetTester.tap(saveFabFinder);
+          await widgetTester.pageBack();
           await widgetTester.pumpAndSettle();
 
-          expect(find.text('Save success. $enteringMemName'), findsOneWidget);
+          expect(find.text(enteringMemName), findsNothing);
+          expectMemNameTextOnListAt(widgetTester, 0, enteringMemNameSecond);
 
-          await Future.delayed(
-            const Duration(seconds: defaultDismissDurationSeconds),
-          );
+          await widgetTester.tap(showNewMemFabFinder);
           await widgetTester.pumpAndSettle();
 
-          expect(find.text('Save success. $enteringMemName'), findsNothing);
+          expect(find.text(enteringMemNameSecond), findsNothing);
         },
       );
 
       testWidgets(
-        ': show saved mem and update.',
+        ': show saved mem and update and archive.',
         (widgetTester) async {
           const savedMemName = 'saved mem name';
+          const updatingMemName = 'updating mem name';
           final database = await DatabaseManager().open(app.databaseDefinition);
           final memTable = database.getTable(memTableName);
           final savedMemId = await memTable.insert({
@@ -65,30 +85,73 @@ void main() {
             'createdAt': DateTime.now(),
           });
           assert(savedMemId == 1);
+          final updatingMemId = await memTable.insert({
+            'name': updatingMemName,
+            'createdAt': DateTime.now(),
+          });
+          assert(updatingMemId == 2);
           await DatabaseManager().close(app.databaseDefinition.name);
 
           const enteringMemName = 'entering mem name';
+          const enteringMemNameSecond = 'entering mem name second';
 
           await app.main();
           await widgetTester.pumpAndSettle();
 
+          await widgetTester.tap(memListTileFinder.at(1));
+          await widgetTester.pumpAndSettle();
+
+          await enterMemNameAndSave(widgetTester, enteringMemName);
+
+          await checkSavedSnackBarAndDismiss(widgetTester, enteringMemName);
+
+          await widgetTester.pageBack();
+          await widgetTester.pumpAndSettle();
+
+          expect(find.text(updatingMemName), findsNothing);
           expect(
-            (widgetTester.widget(memNameFinder) as TextFormField).initialValue,
+            getMemNameTextOnListAt(widgetTester, 0).data,
             savedMemName,
           );
-
-          await widgetTester.enterText(memNameFinder, enteringMemName);
-          await widgetTester.tap(saveFabFinder);
-          await widgetTester.pumpAndSettle();
-
-          expect(find.text('Save success. $enteringMemName'), findsOneWidget);
-
-          await Future.delayed(
-            const Duration(seconds: defaultDismissDurationSeconds),
+          expect(
+            getMemNameTextOnListAt(widgetTester, 1).data,
+            enteringMemName,
           );
+
+          await widgetTester.tap(memListTileFinder.at(0));
           await widgetTester.pumpAndSettle();
 
-          expect(find.text('Save success. $enteringMemName'), findsNothing);
+          await widgetTester.enterText(
+            memNameTextFormFieldFinder,
+            enteringMemNameSecond,
+          );
+          await widgetTester.pageBack();
+          await widgetTester.pumpAndSettle();
+
+          expect(find.text(updatingMemName), findsNothing);
+          expect(find.text(enteringMemNameSecond), findsNothing);
+          expect(
+            getMemNameTextOnListAt(widgetTester, 0).data,
+            savedMemName,
+          );
+          expect(
+            getMemNameTextOnListAt(widgetTester, 1).data,
+            enteringMemName,
+          );
+
+          await widgetTester.tap(memListTileFinder.at(0));
+          await widgetTester.pumpAndSettle();
+
+          await widgetTester.tap(archiveButtonFinder);
+          await widgetTester.pumpAndSettle();
+
+          expect(find.text(updatingMemName), findsNothing);
+          expect(find.text(enteringMemNameSecond), findsNothing);
+          expect(find.text(savedMemName), findsNothing);
+          expect(
+            getMemNameTextOnListAt(widgetTester, 0).data,
+            enteringMemName,
+          );
         },
       );
     },

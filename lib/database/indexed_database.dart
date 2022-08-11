@@ -29,7 +29,9 @@ class IndexedDatabase extends Database {
             definition.name,
             version: definition.version,
             onUpgradeNeeded: (event) {
+              trace('Create Database. $definition');
               for (var tableDefinition in definition.tableDefinitions) {
+                trace('Create object. $tableDefinition');
                 event.database.createObjectStore(
                   tableDefinition.name,
                   autoIncrement: tableDefinition.columns
@@ -149,10 +151,15 @@ class ObjectStore extends Table {
       );
 
   @override
-  Future<List<Map<String, dynamic>>> select() => v(
-        {},
+  Future<List<Map<String, dynamic>>> select({
+    String? where,
+    List<Object?>? whereArgs,
+  }) =>
+      v(
+        {'where': where, 'whereArgs': whereArgs},
         () async => await _database.onOpened(
           () async {
+            // TODO implements where
             final txn = _database._database
                 .transaction(definition.name, idb_shim.idbModeReadOnly);
 

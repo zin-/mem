@@ -34,9 +34,9 @@ class SqliteDatabase extends Database {
             options: sqflite.OpenDatabaseOptions(
               version: definition.version,
               onCreate: (db, version) async {
-                print('Create Database. $definition }');
+                trace('Create Database. $definition');
                 for (var tableDefinition in definition.tableDefinitions) {
-                  print('Create table. $tableDefinition');
+                  trace('Create table. $tableDefinition');
                   await db.execute(tableDefinition.buildCreateTableSql());
                 }
               },
@@ -145,10 +145,18 @@ class SqliteTable extends Table {
       );
 
   @override
-  Future<List<Map<String, dynamic>>> select() => v(
-        {},
+  Future<List<Map<String, dynamic>>> select({
+    String? where,
+    List<Object?>? whereArgs,
+  }) =>
+      v(
+        {'where': where, 'whereArgs': whereArgs},
         () async => await _database.onOpened(
-          () async => (await _database._database.query(definition.name))
+          () async => (await _database._database.query(
+            definition.name,
+            where: where,
+            whereArgs: whereArgs,
+          ))
               .map((e) => convertFrom(e))
               .toList(),
           () => throw DatabaseDoesNotExistException(_database.definition.name),
@@ -166,14 +174,13 @@ class SqliteTable extends Table {
               whereArgs: [pk],
             );
 
-            // TODO 間違ってるので修正する
-            if (selectedByPk.length == 1) {
-              return convertFrom(selectedByPk.first);
-            } else {
+            if (selectedByPk.isEmpty) {
               throw NotFoundException(
                 definition.name,
                 _buildWhereId().replaceFirst('?', pk.toString()),
               );
+            } else {
+              return convertFrom(selectedByPk.first);
             }
           },
           () => throw DatabaseDoesNotExistException(_database.definition.name),
@@ -183,13 +190,24 @@ class SqliteTable extends Table {
   @override
   Future<int> updateByPk(pk, Map<String, dynamic> value) => v(
         {'pk': pk, 'value': value},
-        () async => await _database.onOpened(
-          () async => await _database._database.update(
-            definition.name,
-            convertTo(value),
-            where: _buildWhereId(),
-            whereArgs: [pk],
-          ),
+        () => _database.onOpened(
+          () async {
+            final updateCount = await _database._database.update(
+              definition.name,
+              convertTo(value),
+              where: _buildWhereId(),
+              whereArgs: [pk],
+            );
+
+            if (updateCount == 0) {
+              throw NotFoundException(
+                definition.name,
+                _buildWhereId().replaceFirst('?', pk.toString()),
+              );
+            } else {
+              return updateCount;
+            }
+          },
           () => throw DatabaseDoesNotExistException(_database.definition.name),
         ),
       );

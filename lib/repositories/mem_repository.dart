@@ -16,13 +16,28 @@ class MemRepository {
         },
       );
 
-  Future<List<Mem>> selectAll() => v(
-        {},
-        () async =>
-            (await _memTable.select()).map((e) => Mem.fromMap(e)).toList(),
+  Future<List<Mem>> ship(bool? archived) => v(
+        {'showArchived': archived},
+        () async {
+          final where = <String>[];
+          final whereArgs = <Object?>[];
+
+          if (archived != null) {
+            archived
+                ? where.add('archivedAt IS NOT NULL')
+                : where.add('archivedAt IS NULL');
+          }
+
+          return (await _memTable.select(
+            where: where.isEmpty ? null : where.join(', '),
+            whereArgs: whereArgs.isEmpty ? null : whereArgs,
+          ))
+              .map((e) => Mem.fromMap(e))
+              .toList();
+        },
       );
 
-  Future<Mem> selectById(dynamic id) => v(
+  Future<Mem> shipWhereIdIs(dynamic id) => v(
         {'id': id},
         () async => Mem.fromMap(await _memTable.selectByPk(id)),
       );
@@ -32,7 +47,6 @@ class MemRepository {
         () async {
           final value = mem.toMap();
           value['updatedAt'] = DateTime.now();
-          // TODO 更新数が1かを確認した方が良いかも
           await _memTable.updateByPk(mem.id, value);
           return Mem.fromMap(value);
         },
@@ -40,9 +54,18 @@ class MemRepository {
 
   // TODO implement
   // patchWhereId(dynamic id, Map<String, dynamic> value) {}
-  // archiveWhereId(dynamic id) async {}
 
-  Future<bool> removeById(dynamic id) => v(
+  Future<Mem> archive(Mem mem) => v(
+        {'mem': mem},
+        () async {
+          final memMap = mem.toMap();
+          memMap['archivedAt'] = DateTime.now();
+          await _memTable.updateByPk(mem.id, memMap);
+          return Mem.fromMap(memMap);
+        },
+      );
+
+  Future<bool> discardWhereIdIs(dynamic id) => v(
         {'id': id},
         () async {
           int deletedCount = await _memTable.deleteByPk(id);
@@ -54,7 +77,7 @@ class MemRepository {
         },
       );
 
-  Future<int> removeAll() => v(
+  Future<int> discardAll() => v(
         {},
         () async => _memTable.delete(),
       );

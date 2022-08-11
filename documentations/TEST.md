@@ -1,7 +1,7 @@
 # Test
 
 ```shell
-flutter test ../test ../integration_test
+flutter test ../test ../integration_test/all.dart
 ```
 
 ## Generate mocks
@@ -34,7 +34,7 @@ UIにフォーカスしたテストを記述するため、Flutter以外の依�
 ## Integration test
 
 ```shell
-flutter test ../integration_test
+flutter test ../integration_test/all.dart
 ```
 
 `Integrration test`では実端末でのテストを記述する  
@@ -44,7 +44,7 @@ flutter test ../integration_test
 ### On real platform
 
 ```shell
-flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_test.dart
+flutter drive --driver=test_driver/integration_test.dart --target=integration_test/all.dart
 ```
 
 テスト端末を選択する
@@ -62,5 +62,5 @@ flutter drive --driver=test_driver/integration_test.dart --target=integration_te
 ## With coverage
 
 ```shell
-flutter test ../test ../integration_test --coverage
+flutter test ../test ../integration_test/all.dart --coverage
 ```
