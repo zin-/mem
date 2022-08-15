@@ -10,17 +10,22 @@ final fetchMemList = FutureProvider<List<Mem>>(
   (ref) => v(
     {},
     () async {
+      final showNotArchived = ref.watch(showNotArchivedProvider);
       final showArchived = ref.watch(showArchivedProvider);
 
-      final mems = await MemRepository().ship(showArchived);
+      final mems = await MemRepository().ship(showNotArchived, showArchived);
 
-      ref.read(memListProvider.notifier).updatedBy(mems);
       for (var mem in mems) {
+        ref.read(memListProvider.notifier).add(
+              mem,
+              (item) => item.id == mem.id,
+            );
         ref.read(memProvider(mem.id).notifier).updatedBy(mem);
       }
 
       return mems;
     },
+    debug: true,
   ),
 );
 
@@ -35,22 +40,31 @@ final memListProvider =
         [],
         // FIXME filterはstateが持つものじゃない気がする
         filter: (item) {
-          final showArchived = ref.watch(showArchivedProvider);
-          if (showArchived != null) {
-            if (showArchived) {
-              return item.archivedAt != null;
-            } else {
-              return item.archivedAt == null;
-            }
+          if (item.archivedAt == null) {
+            return ref.watch(showNotArchivedProvider);
           } else {
-            return true;
+            return ref.watch(showArchivedProvider);
           }
         },
       );
 
       return listValueState;
     },
+    debug: true,
   ),
 );
 
-final showArchivedProvider = Provider<bool?>((ref) => v({}, () => false));
+final showNotArchivedProvider =
+    StateNotifierProvider<ValueStateNotifier<bool>, bool>(
+  (ref) => v(
+    {},
+    () => ValueStateNotifier(true),
+  ),
+);
+final showArchivedProvider =
+    StateNotifierProvider<ValueStateNotifier<bool>, bool>(
+  (ref) => v(
+    {},
+    () => ValueStateNotifier(false),
+  ),
+);

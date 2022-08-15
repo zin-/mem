@@ -16,20 +16,25 @@ class MemRepository {
         },
       );
 
-  Future<List<Mem>> ship(bool? archived) => v(
-        {'showArchived': archived},
+  Future<List<Mem>> ship(bool showNotArchived, bool showArchived) => v(
+        {'showNotArchived': showNotArchived, 'showArchived': showArchived},
         () async {
           final where = <String>[];
           final whereArgs = <Object?>[];
 
-          if (archived != null) {
-            archived
-                ? where.add('archivedAt IS NOT NULL')
-                : where.add('archivedAt IS NULL');
+          final whereArchived = <String>[];
+          if (showNotArchived) {
+            whereArchived.add('archivedAt IS NULL');
+          }
+          if (showArchived) {
+            whereArchived.add('archivedAt IS NOT NULL');
+          }
+          if (whereArchived.isNotEmpty) {
+            where.add(whereArchived.join(' OR '));
           }
 
           return (await _memTable.select(
-            where: where.isEmpty ? null : where.join(', '),
+            where: where.isEmpty ? null : where.join(' AND '),
             whereArgs: whereArgs.isEmpty ? null : whereArgs,
           ))
               .map((e) => Mem.fromMap(e))

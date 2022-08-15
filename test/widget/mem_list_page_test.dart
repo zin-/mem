@@ -19,7 +19,7 @@ void main() {
 
   testWidgets('Show saved mem list', (widgetTester) async {
     final mems = List.generate(
-      10,
+      5,
       (index) => Mem(
         id: index,
         name: 'Test $index',
@@ -27,12 +27,9 @@ void main() {
       ),
     );
 
-    when(mockedMemRepository.ship(any)).thenAnswer(
+    when(mockedMemRepository.ship(any, any)).thenAnswer(
       (realInvocation) async => mems,
     );
-    // when(mockedMemRepository.shipWhereIdIs(0)).thenAnswer(
-    //   (realInvocation) async => mems[0],
-    // );
 
     await widgetTester.pumpWidget(
       const ProviderScope(
@@ -44,19 +41,19 @@ void main() {
     );
     await widgetTester.pumpAndSettle();
 
-    mems.asMap().forEach((index, mem) {
-      expectMemNameTextOnListAt(widgetTester, index, mem.name);
-    });
+    for (var mem in mems) {
+      expectMemNameTextOnListAt(widgetTester, mem.id, mem.name);
+    }
     await widgetTester.tap(memListTileFinder.at(0));
     await widgetTester.pump();
 
-    verify(mockedMemRepository.ship(false)).called(1);
+    verify(mockedMemRepository.ship(true, false)).called(1);
     verifyNever(mockedMemRepository.shipWhereIdIs(any));
   });
 
   group('Transit', () {
     testWidgets(': new MemDetailPage', (widgetTester) async {
-      when(mockedMemRepository.ship(any)).thenAnswer(
+      when(mockedMemRepository.ship(any, any)).thenAnswer(
         (realInvocation) async => [],
       );
 
@@ -76,7 +73,7 @@ void main() {
 
       expectMemNameOnMemDetail(widgetTester, '');
 
-      verify(mockedMemRepository.ship(false)).called(1);
+      verify(mockedMemRepository.ship(true, false)).called(1);
       verifyNever(mockedMemRepository.shipWhereIdIs(any));
     });
 
@@ -84,7 +81,7 @@ void main() {
       final savedMem1 =
           Mem(id: 1, name: 'mem detail', createdAt: DateTime.now());
       final savedMem2 = Mem(id: 2, name: 'mem list', createdAt: DateTime.now());
-      when(mockedMemRepository.ship(any)).thenAnswer(
+      when(mockedMemRepository.ship(any, any)).thenAnswer(
         (realInvocation) async => [savedMem1, savedMem2],
       );
 
@@ -108,8 +105,57 @@ void main() {
         isNot(savedMem2.name),
       );
 
-      verify(mockedMemRepository.ship(false)).called(1);
+      verify(mockedMemRepository.ship(true, false)).called(1);
       verifyNever(mockedMemRepository.shipWhereIdIs(any));
+    });
+  });
+
+  group('Filter', () {
+    testWidgets(': default.', (widgetTester) async {
+      final notArchived = Mem(
+        id: 1,
+        name: 'not archived',
+        createdAt: DateTime.now(),
+        archivedAt: null,
+      );
+      final archived = Mem(
+        id: 1,
+        name: 'archived',
+        createdAt: DateTime.now(),
+        archivedAt: DateTime.now(),
+      );
+      when(mockedMemRepository.ship(any, any)).thenAnswer(
+        (realInvocation) async => [notArchived],
+      );
+
+      await widgetTester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(
+            title: 'test',
+            home: MemListPage(),
+          ),
+        ),
+      );
+      await widgetTester.pumpAndSettle();
+
+      expectMemNameTextOnListAt(widgetTester, 0, notArchived.name);
+      expect(find.text(archived.name), findsNothing);
+
+      await widgetTester.tap(find.byIcon(Icons.filter_list));
+      await widgetTester.pump();
+
+      expect(
+        (widgetTester.widgetList(find.byType(Switch)).elementAt(0) as Switch)
+            .value,
+        true,
+      );
+      expect(
+        (widgetTester.widgetList(find.byType(Switch)).elementAt(1) as Switch)
+            .value,
+        false,
+      );
+
+      verify(mockedMemRepository.ship(true, false)).called(1);
     });
   });
 }
@@ -118,7 +164,9 @@ final memListTileFinder = find.byType(ListTile);
 final showNewMemFabFinder = find.byType(FloatingActionButton);
 
 Finder findMemNameTextOnListAt(int index) => find.descendant(
-    of: memListTileFinder.at(index), matching: find.byType(Text));
+      of: memListTileFinder.at(index),
+      matching: find.byType(Text),
+    );
 
 Text getMemNameTextOnListAt(WidgetTester widgetTester, int index) =>
     widgetTester.widget(findMemNameTextOnListAt(index)) as Text;

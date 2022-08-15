@@ -25,29 +25,29 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
     return super.updatedBy(filtered);
   }
 
-  void add(T item) {
+  // void add(T item) {
+  //   final tmp = List.of(state);
+  //   tmp.add(item);
+  //   updatedBy(tmp
+  //       .where(
+  //         (element) => filter?.call(element) ?? true,
+  //       )
+  //       .toList());
+  // }
+
+  void add(T item, bool Function(T item) where) {
     final tmp = List.of(state);
-    tmp.add(item);
+
+    final index = state.indexWhere(where);
+    if (index == -1) {
+      tmp.add(item);
+    } else {
+      tmp.replaceRange(index, index + 1, [item]);
+    }
     updatedBy(tmp
         .where(
           (element) => filter?.call(element) ?? true,
         )
         .toList());
-  }
-
-  void updateWhere(T item, bool Function(T item) where) {
-    final tmp = List.of(state);
-
-    final index = state.indexWhere(where);
-    if (index == -1) {
-      add(item);
-    } else {
-      tmp.replaceRange(index, index + 1, [item]);
-      updatedBy(tmp
-          .where(
-            (element) => filter?.call(element) ?? true,
-          )
-          .toList());
-    }
   }
 }

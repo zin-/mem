@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/colors.dart';
 
 import 'package:mem/logger.dart';
 import 'package:mem/mem.dart';
 import 'package:mem/views/async_value_view.dart';
 import 'package:mem/views/mem_detail/mem_detail_page.dart';
 import 'package:mem/views/mem_detail/mem_detail_states.dart';
+import 'package:mem/views/mem_list/mem_list_filter.dart';
 import 'package:mem/views/mem_list/mem_list_page_states.dart';
 
 class MemListPage extends StatelessWidget {
@@ -39,12 +41,29 @@ class MemListPage extends StatelessWidget {
                     },
                   ),
                 ),
+                bottomNavigationBar: BottomAppBar(
+                  shape: const CircularNotchedRectangle(),
+                  child: IconTheme(
+                    data: const IconThemeData(color: iconOnPrimaryColor),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.filter_list),
+                          onPressed: () => showModalBottomSheet(
+                            context: context,
+                            builder: (context) => const MemListFilter(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 floatingActionButton: FloatingActionButton(
                   child: const Icon(Icons.add),
                   onPressed: () => showMemDetailPage(context, ref, null),
                 ),
                 floatingActionButtonLocation:
-                    FloatingActionButtonLocation.centerFloat,
+                    FloatingActionButtonLocation.centerDocked,
               );
             },
           ),
@@ -66,7 +85,7 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
                 {'result': result},
                 () {
                   if (result != null) {
-                    ref.read(memListProvider.notifier).updateWhere(
+                    ref.read(memListProvider.notifier).add(
                           result,
                           (item) => item.id == result.id,
                         );
