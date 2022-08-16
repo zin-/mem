@@ -13,7 +13,8 @@ final fetchMemList = FutureProvider<List<Mem>>(
       final showNotArchived = ref.watch(showNotArchivedProvider);
       final showArchived = ref.watch(showArchivedProvider);
 
-      final mems = await MemRepository().ship(showNotArchived, showArchived);
+      final archived = showNotArchived == showArchived ? null : showArchived;
+      final mems = await MemRepository().ship(archived);
 
       for (var mem in mems) {
         ref.read(memListProvider.notifier).add(
@@ -40,11 +41,30 @@ final memListProvider =
         [],
         // FIXME filterはstateが持つものじゃない気がする
         filter: (item) {
+          final showNotArchived = ref.watch(showNotArchivedProvider);
+          final showArchived = ref.watch(showArchivedProvider);
+
+          if (showNotArchived == showArchived) {
+            return true;
+          } else {}
           if (item.archivedAt == null) {
             return ref.watch(showNotArchivedProvider);
           } else {
             return ref.watch(showArchivedProvider);
           }
+        },
+        compare: (item1, item2) {
+          if (item1.archivedAt != item2.archivedAt) {
+            if (item1.archivedAt == null) {
+              return -1;
+            }
+            if (item2.archivedAt == null) {
+              return 1;
+            }
+            return item1.archivedAt!.compareTo(item2.archivedAt!);
+          }
+
+          return item1.id.compareTo(item2.id);
         },
       );
 

@@ -34,9 +34,8 @@ class MockMemRepository extends _i1.Mock implements _i3.MemRepository {
               returnValue: Future<_i2.Mem>.value(_FakeMem_0()))
           as _i4.Future<_i2.Mem>);
   @override
-  _i4.Future<List<_i2.Mem>> ship(bool? showNotArchived, bool? showArchived) =>
-      (super.noSuchMethod(
-              Invocation.method(#ship, [showNotArchived, showArchived]),
+  _i4.Future<List<_i2.Mem>> ship(bool? archived) =>
+      (super.noSuchMethod(Invocation.method(#ship, [archived]),
               returnValue: Future<List<_i2.Mem>>.value(<_i2.Mem>[]))
           as _i4.Future<List<_i2.Mem>>);
   @override
