@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/views/dimens.dart';
 
 import 'package:mem/logger.dart';
 import 'package:mem/mem.dart';
+
+import 'package:mem/views/dimens.dart';
 import 'package:mem/views/atoms/async_value_view.dart';
 import 'package:mem/views/constants.dart';
 import 'package:mem/views/mem_detail/mem_detail_states.dart';
+import 'package:mem/views/mem_name.dart';
 
 class MemDetailPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
@@ -48,22 +50,13 @@ class MemDetailPage extends StatelessWidget {
                     padding: pagePadding,
                     child: Form(
                       key: _formKey,
-                      child: AsyncValueView(
-                        ref.watch(fetchMemById(_memId)),
-                        (Map<String, dynamic> memDataMap) => Column(
-                          children: [
-                            TextFormField(
-                              initialValue: memMap['name'] ?? '',
-                              validator: (value) => (value?.isEmpty ?? false)
-                                  ? 'Name is required.'
-                                  : null,
-                              onChanged: (value) => ref
-                                  .read(memMapProvider(_memId).notifier)
-                                  .updatedBy(Map.of(memMap..['name'] = value)),
-                            ),
-                          ],
-                        ),
-                      ),
+                      child: memMap.length < 2
+                          ? AsyncValueView(
+                              ref.watch(fetchMemById(_memId)),
+                              (Map<String, dynamic> memDataMap) =>
+                                  _buildBody(ref, memMap),
+                            )
+                          : _buildBody(ref, memMap),
                     ),
                   ),
                   floatingActionButton: Consumer(
@@ -78,9 +71,7 @@ class MemDetailPage extends StatelessWidget {
                                     .showSnackBar(SnackBar(
                                   content:
                                       Text('Save success. ${memMap['name']}'),
-                                  duration: const Duration(
-                                    seconds: defaultDismissDurationSeconds,
-                                  ),
+                                  duration: defaultDismissDuration,
                                   dismissDirection: DismissDirection.horizontal,
                                 ));
                               }
@@ -102,4 +93,19 @@ class MemDetailPage extends StatelessWidget {
           ),
         ),
       );
+
+  Widget _buildBody(WidgetRef ref, Map<String, dynamic> memMap) {
+    return Column(
+      children: [
+        MemNameTextFormField(
+          memMap['name'] ?? '',
+          memMap['id'],
+          (value) => (value?.isEmpty ?? false) ? 'Name is required.' : null,
+          (value) => ref
+              .read(memMapProvider(_memId).notifier)
+              .updatedBy(Map.of(memMap..['name'] = value)),
+        ),
+      ],
+    );
+  }
 }
