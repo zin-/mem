@@ -11,9 +11,7 @@ class MemNameText extends StatelessWidget {
   @override
   Widget build(BuildContext context) => v(
         {'_memName': _memName, '_memId': _memId},
-        () {
-          return HeroView(memNameTag(_memId), Text(_memName));
-        },
+        () => HeroView(memNameTag(_memId), Text(_memName)),
       );
 }
 
@@ -39,15 +37,13 @@ class MemNameTextFormField extends StatelessWidget {
           '_validator': _validator,
           '_onChanged': _onChanged,
         },
-        () {
-          return HeroView(
-              memNameTag(_memId),
-              TextFormField(
-                initialValue: _memName,
-                validator: _validator,
-                onChanged: _onChanged,
-              ));
-        },
+        () => HeroView(
+            memNameTag(_memId),
+            TextFormField(
+              initialValue: _memName,
+              validator: _validator,
+              onChanged: _onChanged,
+            )),
       );
 }
 
