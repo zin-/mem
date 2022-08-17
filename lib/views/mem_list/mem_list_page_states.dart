@@ -26,7 +26,6 @@ final fetchMemList = FutureProvider<List<Mem>>(
 
       return mems;
     },
-    debug: true,
   ),
 );
 
@@ -70,7 +69,6 @@ final memListProvider =
 
       return listValueState;
     },
-    debug: true,
   ),
 );
 

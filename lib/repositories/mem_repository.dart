@@ -35,7 +35,6 @@ class MemRepository {
               .map((e) => Mem.fromMap(e))
               .toList();
         },
-        debug: true,
       );
 
   Future<Mem> shipWhereIdIs(dynamic id) => v(

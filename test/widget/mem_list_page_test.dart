@@ -164,7 +164,7 @@ void main() {
         archivedAt: null,
       );
       final archived = Mem(
-        id: 1,
+        id: 2,
         name: 'archived',
         createdAt: DateTime.now(),
         archivedAt: DateTime.now(),
@@ -215,9 +215,9 @@ void main() {
       await widgetTester.pumpAndSettle();
 
       expectMemNameTextOnListAt(widgetTester, 0, notArchived.name);
-      // expectMemNameTextOnListAt(widgetTester, 1, archived.name);
+      expectMemNameTextOnListAt(widgetTester, 1, archived.name);
 
-      // verify(mockedMemRepository.ship(true, false)).called(1);
+      verify(mockedMemRepository.ship(any)).called(4);
     });
   });
 }

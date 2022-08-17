@@ -19,11 +19,9 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
   }) : super(state);
 
   @override
-  List<T> updatedBy(List<T> value) {
-    final filtered = List.of(value).where(filter ?? (_) => true).toList();
-    final sorted = filtered.sorted(compare ?? (a, b) => 0);
-    return super.updatedBy(sorted);
-  }
+  List<T> updatedBy(List<T> value) =>
+      super.updatedBy(List.of(value.where(filter ?? (_) => true))
+          .sorted(compare ?? (a, b) => 0));
 
   // void add(T item) {
   //   final tmp = List.of(state);

@@ -50,6 +50,5 @@ class MemListFilter extends StatelessWidget {
             ),
           ),
         ),
-        debug: true,
       );
 }
