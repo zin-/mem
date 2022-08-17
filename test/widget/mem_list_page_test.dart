@@ -19,7 +19,7 @@ void main() {
 
   testWidgets('Show saved mem list', (widgetTester) async {
     final mems = List.generate(
-      10,
+      5,
       (index) => Mem(
         id: index,
         name: 'Test $index',
@@ -30,9 +30,6 @@ void main() {
     when(mockedMemRepository.ship(any)).thenAnswer(
       (realInvocation) async => mems,
     );
-    // when(mockedMemRepository.shipWhereIdIs(0)).thenAnswer(
-    //   (realInvocation) async => mems[0],
-    // );
 
     await widgetTester.pumpWidget(
       const ProviderScope(
@@ -44,9 +41,9 @@ void main() {
     );
     await widgetTester.pumpAndSettle();
 
-    mems.asMap().forEach((index, mem) {
-      expectMemNameTextOnListAt(widgetTester, index, mem.name);
-    });
+    for (var mem in mems) {
+      expectMemNameTextOnListAt(widgetTester, mem.id, mem.name);
+    }
     await widgetTester.tap(memListTileFinder.at(0));
     await widgetTester.pump();
 
@@ -112,13 +109,126 @@ void main() {
       verifyNever(mockedMemRepository.shipWhereIdIs(any));
     });
   });
+
+  group('Filter', () {
+    testWidgets(': default.', (widgetTester) async {
+      final notArchived = Mem(
+        id: 1,
+        name: 'not archived',
+        createdAt: DateTime.now(),
+        archivedAt: null,
+      );
+      final archived = Mem(
+        id: 1,
+        name: 'archived',
+        createdAt: DateTime.now(),
+        archivedAt: DateTime.now(),
+      );
+      when(mockedMemRepository.ship(any)).thenAnswer(
+        (realInvocation) async => [notArchived],
+      );
+
+      await widgetTester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(
+            title: 'test',
+            home: MemListPage(),
+          ),
+        ),
+      );
+      await widgetTester.pumpAndSettle();
+
+      expectMemNameTextOnListAt(widgetTester, 0, notArchived.name);
+      expect(find.text(archived.name), findsNothing);
+
+      await widgetTester.tap(find.byIcon(Icons.filter_list));
+      await widgetTester.pump();
+
+      expect(
+        (widgetTester.widget(findShowNotArchiveSwitch) as Switch).value,
+        true,
+      );
+      expect(
+        (widgetTester.widget(findShowArchiveSwitch) as Switch).value,
+        false,
+      );
+
+      verify(mockedMemRepository.ship(false)).called(1);
+    });
+
+    testWidgets(': change.', (widgetTester) async {
+      final notArchived = Mem(
+        id: 1,
+        name: 'not archived',
+        createdAt: DateTime.now(),
+        archivedAt: null,
+      );
+      final archived = Mem(
+        id: 2,
+        name: 'archived',
+        createdAt: DateTime.now(),
+        archivedAt: DateTime.now(),
+      );
+      final returns = <List<Mem>>[
+        [notArchived],
+        [],
+        [archived],
+        [notArchived, archived],
+      ];
+      when(mockedMemRepository.ship(any)).thenAnswer(
+        (realInvocation) async => returns.removeAt(0),
+      );
+
+      await widgetTester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(
+            title: 'test',
+            home: MemListPage(),
+          ),
+        ),
+      );
+      await widgetTester.pumpAndSettle();
+
+      // showNotArchived: true, showArchived: false
+      expectMemNameTextOnListAt(widgetTester, 0, notArchived.name);
+      expect(find.text(archived.name), findsNothing);
+
+      await widgetTester.tap(find.byIcon(Icons.filter_list));
+      await widgetTester.pumpAndSettle();
+
+      // showNotArchived: false, showArchived: false
+      await widgetTester.tap(findShowNotArchiveSwitch);
+      await widgetTester.pumpAndSettle();
+
+      expect(find.text(notArchived.name), findsNothing);
+      expect(find.text(archived.name), findsNothing);
+
+      // showNotArchived: false, showArchived: true
+      await widgetTester.tap(findShowArchiveSwitch);
+      await widgetTester.pumpAndSettle();
+
+      expect(find.text(notArchived.name), findsNothing);
+      expectMemNameTextOnListAt(widgetTester, 0, archived.name);
+
+      // showNotArchived: true, showArchived: true
+      await widgetTester.tap(findShowNotArchiveSwitch);
+      await widgetTester.pumpAndSettle();
+
+      expectMemNameTextOnListAt(widgetTester, 0, notArchived.name);
+      expectMemNameTextOnListAt(widgetTester, 1, archived.name);
+
+      verify(mockedMemRepository.ship(any)).called(4);
+    });
+  });
 }
 
 final memListTileFinder = find.byType(ListTile);
 final showNewMemFabFinder = find.byType(FloatingActionButton);
 
 Finder findMemNameTextOnListAt(int index) => find.descendant(
-    of: memListTileFinder.at(index), matching: find.byType(Text));
+      of: memListTileFinder.at(index),
+      matching: find.byType(Text),
+    );
 
 Text getMemNameTextOnListAt(WidgetTester widgetTester, int index) =>
     widgetTester.widget(findMemNameTextOnListAt(index)) as Text;
@@ -132,3 +242,6 @@ void expectMemNameTextOnListAt(
       getMemNameTextOnListAt(widgetTester, index).data,
       memName,
     );
+
+final findShowNotArchiveSwitch = find.byType(Switch).at(0);
+final findShowArchiveSwitch = find.byType(Switch).at(1);

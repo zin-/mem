@@ -17,7 +17,7 @@ class MemRepository {
       );
 
   Future<List<Mem>> ship(bool? archived) => v(
-        {'showArchived': archived},
+        {'archived': archived},
         () async {
           final where = <String>[];
           final whereArgs = <Object?>[];
@@ -29,7 +29,7 @@ class MemRepository {
           }
 
           return (await _memTable.select(
-            where: where.isEmpty ? null : where.join(', '),
+            where: where.isEmpty ? null : where.join(' AND '),
             whereArgs: whereArgs.isEmpty ? null : whereArgs,
           ))
               .map((e) => Mem.fromMap(e))
