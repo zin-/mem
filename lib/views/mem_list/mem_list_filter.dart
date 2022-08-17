@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/views/dimens.dart';
+
+import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
+import 'package:mem/views/dimens.dart';
 import 'package:mem/views/mem_list/mem_list_page_states.dart';
 
 const height = 250.0;
@@ -23,13 +25,11 @@ class MemListFilter extends StatelessWidget {
                   children: [
                     Switch(
                       value: ref.watch(showNotArchivedProvider),
-                      onChanged: (value) {
-                        ref
-                            .read(showNotArchivedProvider.notifier)
-                            .updatedBy(value);
-                      },
+                      onChanged: (value) => ref
+                          .read(showNotArchivedProvider.notifier)
+                          .updatedBy(value),
                     ),
-                    const Text('Show Not Archived'),
+                    Text(L10n().showNotArchivedLabel()),
                   ],
                 ),
                 Row(
@@ -37,13 +37,11 @@ class MemListFilter extends StatelessWidget {
                   children: [
                     Switch(
                       value: ref.watch(showArchivedProvider),
-                      onChanged: (value) {
-                        ref
-                            .read(showArchivedProvider.notifier)
-                            .updatedBy(value);
-                      },
+                      onChanged: (value) => ref
+                          .read(showArchivedProvider.notifier)
+                          .updatedBy(value),
                     ),
-                    const Text('Show Archived'),
+                    Text(L10n().showArchivedLabel()),
                   ],
                 ),
               ],

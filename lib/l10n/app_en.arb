@@ -1,0 +1,14 @@
+{
+  "appTitle": "Mem",
+  "memListPageTitle": "List",
+  "memDetailPageTitle": "Detail",
+  "saveMemSuccessMessage": "Save success. {memName}",
+  "@saveMemSuccessMessage": {
+    "placeholders": {
+      "memName": {}
+    }
+  },
+  "memNameIsRequiredWarn": "Name is required.",
+  "showNotArchivedLabel": "Show not archived",
+  "showArchivedLabel": "Show archived"
+}
