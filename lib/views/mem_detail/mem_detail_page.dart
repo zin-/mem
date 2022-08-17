@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/views/dimens.dart';
 
 import 'package:mem/logger.dart';
 import 'package:mem/mem.dart';
+
+import 'package:mem/views/dimens.dart';
 import 'package:mem/views/atoms/async_value_view.dart';
 import 'package:mem/views/constants.dart';
 import 'package:mem/views/mem_detail/mem_detail_states.dart';
@@ -70,9 +71,7 @@ class MemDetailPage extends StatelessWidget {
                                     .showSnackBar(SnackBar(
                                   content:
                                       Text('Save success. ${memMap['name']}'),
-                                  duration: const Duration(
-                                    seconds: defaultDismissDurationSeconds,
-                                  ),
+                                  duration: defaultDismissDuration,
                                   dismissDirection: DismissDirection.horizontal,
                                 ));
                               }

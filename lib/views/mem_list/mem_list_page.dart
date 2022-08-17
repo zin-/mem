@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/views/colors.dart';
 
 import 'package:mem/logger.dart';
 import 'package:mem/mem.dart';
+
+import 'package:mem/views/colors.dart';
 import 'package:mem/views/atoms/async_value_view.dart';
+import 'package:mem/views/constants.dart';
 import 'package:mem/views/mem_detail/mem_detail_page.dart';
 import 'package:mem/views/mem_detail/mem_detail_states.dart';
 import 'package:mem/views/mem_list/mem_list_filter.dart';
@@ -82,15 +84,16 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
                 pageBuilder: (context, animation, secondaryAnimation) =>
                     MemDetailPage(memId),
                 transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                  return SlideTransition(
-                    position: Tween<Offset>(
-                      begin: const Offset(1, 0),
-                      end: Offset.zero,
-                    ).animate(animation),
-                    child: child,
-                  );
-                },
+                    (context, animation, secondaryAnimation, child) =>
+                        SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(1, 0),
+                    end: Offset.zero,
+                  ).animate(animation),
+                  child: child,
+                ),
+                transitionDuration: defaultTransitionDuration,
+                reverseTransitionDuration: defaultTransitionDuration,
               ),
             )
             .then(

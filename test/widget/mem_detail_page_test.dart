@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/logger.dart';
 import 'package:mockito/mockito.dart';
 
-import 'package:mem/database/database.dart';
+import 'package:mem/logger.dart';
 import 'package:mem/mem.dart';
-import 'package:mem/views/mem_detail/mem_detail_page.dart';
+import 'package:mem/database/database.dart';
 import 'package:mem/repositories/mem_repository.dart';
+import 'package:mem/views/mem_detail/mem_detail_page.dart';
 import 'package:mem/views/constants.dart';
 
 import '../mocks.mocks.dart';
@@ -171,9 +170,7 @@ Future<void> checkSavedSnackBarAndDismiss(
 ) async {
   expect(find.text('Save success. $memName'), findsOneWidget);
 
-  await widgetTester.pumpAndSettle(
-    const Duration(seconds: defaultDismissDurationSeconds),
-  );
+  await widgetTester.pumpAndSettle(defaultDismissDuration);
 
   expect(find.text('Save success. $memName'), findsNothing);
 }
