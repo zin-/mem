@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:mem/logger.dart';
 import 'package:mem/mem.dart';
-import 'package:mem/views/state_notifier.dart';
+import 'package:mem/views/atoms/state_notifier.dart';
 import 'package:mem/repositories/mem_repository.dart';
 
 const _memIdKey = '_memId';

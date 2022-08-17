@@ -169,11 +169,23 @@ void main() {
         createdAt: DateTime.now(),
         archivedAt: DateTime.now(),
       );
+      final notArchived2 = Mem(
+        id: 3,
+        name: 'not archived 2',
+        createdAt: DateTime.now(),
+        archivedAt: null,
+      );
+      final archived2 = Mem(
+        id: 4,
+        name: 'archived 2',
+        createdAt: DateTime.now(),
+        archivedAt: DateTime.now().add(const Duration(microseconds: 1)),
+      );
       final returns = <List<Mem>>[
-        [notArchived],
+        [notArchived2, notArchived],
         [],
-        [archived],
-        [notArchived, archived],
+        [archived2, archived],
+        [notArchived2, archived2, notArchived, archived],
       ];
       when(mockedMemRepository.ship(any)).thenAnswer(
         (realInvocation) async => returns.removeAt(0),
@@ -215,7 +227,9 @@ void main() {
       await widgetTester.pumpAndSettle();
 
       expectMemNameTextOnListAt(widgetTester, 0, notArchived.name);
-      expectMemNameTextOnListAt(widgetTester, 1, archived.name);
+      expectMemNameTextOnListAt(widgetTester, 1, notArchived2.name);
+      expectMemNameTextOnListAt(widgetTester, 2, archived.name);
+      expectMemNameTextOnListAt(widgetTester, 3, archived2.name);
 
       verify(mockedMemRepository.ship(any)).called(4);
     });

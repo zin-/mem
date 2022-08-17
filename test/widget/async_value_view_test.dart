@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/views/async_value_view.dart';
+import 'package:mem/views/atoms/async_value_view.dart';
 
 void main() {
   Logger(level: Level.verbose);
