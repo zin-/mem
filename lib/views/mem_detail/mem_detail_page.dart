@@ -49,7 +49,7 @@ class MemDetailPage extends StatelessWidget {
                     padding: pagePadding,
                     child: Form(
                       key: _formKey,
-                      child: memMap.isEmpty
+                      child: memMap.length < 2
                           ? AsyncValueView(
                               ref.watch(fetchMemById(_memId)),
                               (Map<String, dynamic> memDataMap) =>
