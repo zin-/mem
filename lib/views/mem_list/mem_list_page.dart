@@ -76,7 +76,6 @@ class MemListPage extends StatelessWidget {
 void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
       {'context': context, 'memId': memId},
       () {
-        // MaterialPageRoute<Mem?>(builder: (context) => MemDetailPage(memId));
         Navigator.of(context)
             .push<Mem?>(
               PageRouteBuilder(
@@ -91,7 +90,6 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
                     ).animate(animation),
                     child: child,
                   );
-                  return child;
                 },
               ),
             )

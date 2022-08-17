@@ -14,7 +14,6 @@ class MemNameText extends StatelessWidget {
         () {
           return HeroView(memNameTag(_memId), Text(_memName));
         },
-        debug: true,
       );
 }
 
@@ -49,7 +48,6 @@ class MemNameTextFormField extends StatelessWidget {
                 onChanged: _onChanged,
               ));
         },
-        debug: true,
       );
 }
 

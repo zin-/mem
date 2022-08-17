@@ -49,23 +49,13 @@ class MemDetailPage extends StatelessWidget {
                     padding: pagePadding,
                     child: Form(
                       key: _formKey,
-                      child: AsyncValueView(
-                        ref.watch(fetchMemById(_memId)),
-                        (Map<String, dynamic> memDataMap) => Column(
-                          children: [
-                            MemNameTextFormField(
-                              memMap['name'] ?? '',
-                              memMap['id'],
-                              (value) => (value?.isEmpty ?? false)
-                                  ? 'Name is required.'
-                                  : null,
-                              (value) => ref
-                                  .read(memMapProvider(_memId).notifier)
-                                  .updatedBy(Map.of(memMap..['name'] = value)),
-                            ),
-                          ],
-                        ),
-                      ),
+                      child: memMap.isEmpty
+                          ? AsyncValueView(
+                              ref.watch(fetchMemById(_memId)),
+                              (Map<String, dynamic> memDataMap) =>
+                                  _buildBody(ref, memMap),
+                            )
+                          : _buildBody(ref, memMap),
                     ),
                   ),
                   floatingActionButton: Consumer(
@@ -104,4 +94,19 @@ class MemDetailPage extends StatelessWidget {
           ),
         ),
       );
+
+  Widget _buildBody(WidgetRef ref, Map<String, dynamic> memMap) {
+    return Column(
+      children: [
+        MemNameTextFormField(
+          memMap['name'] ?? '',
+          memMap['id'],
+          (value) => (value?.isEmpty ?? false) ? 'Name is required.' : null,
+          (value) => ref
+              .read(memMapProvider(_memId).notifier)
+              .updatedBy(Map.of(memMap..['name'] = value)),
+        ),
+      ],
+    );
+  }
 }
