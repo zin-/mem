@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/mem.dart';
-
 import 'package:mem/views/colors.dart';
 import 'package:mem/views/atoms/async_value_view.dart';
 import 'package:mem/views/constants.dart';
@@ -28,7 +28,7 @@ class MemListPage extends StatelessWidget {
 
               return Scaffold(
                 appBar: AppBar(
-                  title: const Text('List'),
+                  title: Text(L10n().memListPageTitle()),
                 ),
                 body: AsyncValueView(
                   memListAsyncValue,

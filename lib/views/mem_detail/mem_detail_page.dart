@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/mem.dart';
-
 import 'package:mem/views/dimens.dart';
 import 'package:mem/views/atoms/async_value_view.dart';
 import 'package:mem/views/constants.dart';
@@ -30,7 +30,7 @@ class MemDetailPage extends StatelessWidget {
               return WillPopScope(
                 child: Scaffold(
                   appBar: AppBar(
-                    title: const Text('Detail'),
+                    title: Text(L10n().memDetailPageTitle()),
                     actions: [
                       IconButton(
                         icon: const Icon(Icons.archive),
@@ -69,8 +69,8 @@ class MemDetailPage extends StatelessWidget {
                               if (saveSuccess) {
                                 ScaffoldMessenger.of(context)
                                     .showSnackBar(SnackBar(
-                                  content:
-                                      Text('Save success. ${memMap['name']}'),
+                                  content: Text(L10n()
+                                      .saveMemSuccessMessage(memMap['name'])),
                                   duration: defaultDismissDuration,
                                   dismissDirection: DismissDirection.horizontal,
                                 ));
@@ -100,7 +100,8 @@ class MemDetailPage extends StatelessWidget {
         MemNameTextFormField(
           memMap['name'] ?? '',
           memMap['id'],
-          (value) => (value?.isEmpty ?? false) ? 'Name is required.' : null,
+          (value) =>
+              (value?.isEmpty ?? false) ? L10n().memNameIsRequiredWarn() : null,
           (value) => ref
               .read(memMapProvider(_memId).notifier)
               .updatedBy(Map.of(memMap..['name'] = value)),
