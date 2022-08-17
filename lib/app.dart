@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/colors.dart';
+import 'package:mem/views/colors.dart';
 
 import 'package:mem/logger.dart';
 import 'package:mem/views/mem_list/mem_list_page.dart';

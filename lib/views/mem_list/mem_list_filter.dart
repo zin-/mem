@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/dimens.dart';
+import 'package:mem/views/dimens.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/views/mem_list/mem_list_page_states.dart';
 
