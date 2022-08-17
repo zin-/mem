@@ -1,3 +1,3 @@
 ```shell
-flutter gen-l10n
+flutter gen-l10n l10n.yaml
 ```

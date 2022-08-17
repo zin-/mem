@@ -15,7 +15,6 @@ class MemApplication extends StatelessWidget {
         {},
         () => ProviderScope(
           child: MaterialApp(
-            // title: 'Mem',
             onGenerateTitle: (context) => L10n(context).appTitle(),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,

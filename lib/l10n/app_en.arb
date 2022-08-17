@@ -8,5 +8,7 @@
       "memName": {}
     }
   },
-  "memNameIsRequiredWarn": "Name is required."
+  "memNameIsRequiredWarn": "Name is required.",
+  "showNotArchivedLabel": "Show not archived",
+  "showArchivedLabel": "Show archived"
 }

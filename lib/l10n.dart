@@ -15,6 +15,10 @@ class L10n {
 
   String memNameIsRequiredWarn() => _appLocalizations.memNameIsRequiredWarn;
 
+  String showNotArchivedLabel() => _appLocalizations.showNotArchivedLabel;
+
+  String showArchivedLabel() => _appLocalizations.showArchivedLabel;
+
   L10n._(this._appLocalizations);
 
   static L10n? _instance;
@@ -22,7 +26,7 @@ class L10n {
   factory L10n([BuildContext? context]) {
     var tmp = _instance;
     if (tmp == null && context != null) {
-      tmp = L10n._(AppLocalizations.of(context)!);
+      tmp = L10n._(AppLocalizations.of(context));
       _instance = tmp;
     }
     return tmp!;
