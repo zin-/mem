@@ -7,6 +7,7 @@ import 'package:mem/mem.dart';
 import 'package:mem/views/atoms/async_value_view.dart';
 import 'package:mem/views/constants.dart';
 import 'package:mem/views/mem_detail/mem_detail_states.dart';
+import 'package:mem/views/mem_name.dart';
 
 class MemDetailPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
@@ -52,12 +53,13 @@ class MemDetailPage extends StatelessWidget {
                         ref.watch(fetchMemById(_memId)),
                         (Map<String, dynamic> memDataMap) => Column(
                           children: [
-                            TextFormField(
-                              initialValue: memMap['name'] ?? '',
-                              validator: (value) => (value?.isEmpty ?? false)
+                            MemNameTextFormField(
+                              memMap['name'] ?? '',
+                              memMap['id'],
+                              (value) => (value?.isEmpty ?? false)
                                   ? 'Name is required.'
                                   : null,
-                              onChanged: (value) => ref
+                              (value) => ref
                                   .read(memMapProvider(_memId).notifier)
                                   .updatedBy(Map.of(memMap..['name'] = value)),
                             ),
