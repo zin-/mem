@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
+import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/mem.dart';
 import 'package:mem/repositories/mem_repository.dart';
@@ -12,6 +13,20 @@ import '../mocks.mocks.dart';
 import 'mem_detail_page_test.dart';
 
 void main() {
+  Future pumpMemListPage(WidgetTester widgetTester) async {
+    await widgetTester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp(
+          onGenerateTitle: (context) => L10n(context).memListPageTitle(),
+          localizationsDelegates: L10n.localizationsDelegates,
+          supportedLocales: L10n.supportedLocales,
+          home: const MemListPage(),
+        ),
+      ),
+    );
+    await widgetTester.pumpAndSettle();
+  }
+
   Logger(level: Level.verbose);
 
   final mockedMemRepository = MockMemRepository();
@@ -31,15 +46,7 @@ void main() {
       (realInvocation) async => mems,
     );
 
-    await widgetTester.pumpWidget(
-      const ProviderScope(
-        child: MaterialApp(
-          title: 'test',
-          home: MemListPage(),
-        ),
-      ),
-    );
-    await widgetTester.pumpAndSettle();
+    await pumpMemListPage(widgetTester);
 
     for (var mem in mems) {
       expectMemNameTextOnListAt(widgetTester, mem.id, mem.name);
@@ -57,15 +64,7 @@ void main() {
         (realInvocation) async => [],
       );
 
-      await widgetTester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            title: 'test',
-            home: MemListPage(),
-          ),
-        ),
-      );
-      await widgetTester.pump();
+      await pumpMemListPage(widgetTester);
 
       expect(showNewMemFabFinder, findsOneWidget);
       await widgetTester.tap(showNewMemFabFinder);
@@ -85,15 +84,7 @@ void main() {
         (realInvocation) async => [savedMem1, savedMem2],
       );
 
-      await widgetTester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            title: 'test',
-            home: MemListPage(),
-          ),
-        ),
-      );
-      await widgetTester.pumpAndSettle();
+      await pumpMemListPage(widgetTester);
 
       await widgetTester.tap(memListTileFinder.at(0));
       await widgetTester.pumpAndSettle();
@@ -128,15 +119,7 @@ void main() {
         (realInvocation) async => [notArchived],
       );
 
-      await widgetTester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            title: 'test',
-            home: MemListPage(),
-          ),
-        ),
-      );
-      await widgetTester.pumpAndSettle();
+      await pumpMemListPage(widgetTester);
 
       expectMemNameTextOnListAt(widgetTester, 0, notArchived.name);
       expect(find.text(archived.name), findsNothing);
@@ -191,15 +174,7 @@ void main() {
         (realInvocation) async => returns.removeAt(0),
       );
 
-      await widgetTester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            title: 'test',
-            home: MemListPage(),
-          ),
-        ),
-      );
-      await widgetTester.pumpAndSettle();
+      await pumpMemListPage(widgetTester);
 
       // showNotArchived: true, showArchived: false
       expectMemNameTextOnListAt(widgetTester, 0, notArchived.name);

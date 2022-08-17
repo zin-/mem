@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
@@ -16,8 +15,8 @@ class MemApplication extends StatelessWidget {
         () => ProviderScope(
           child: MaterialApp(
             onGenerateTitle: (context) => L10n(context).appTitle(),
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
+            localizationsDelegates: L10n.localizationsDelegates,
+            supportedLocales: L10n.supportedLocales,
             theme: ThemeData(
               primarySwatch: primaryColor,
               bottomAppBarTheme: const BottomAppBarTheme(

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
+import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/mem.dart';
 import 'package:mem/database/database.dart';
@@ -13,6 +14,20 @@ import 'package:mem/views/constants.dart';
 import '../mocks.mocks.dart';
 
 void main() {
+  Future pumpMemDetailPage(WidgetTester widgetTester, int? memId) async {
+    await widgetTester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp(
+          onGenerateTitle: (context) => L10n(context).memDetailPageTitle(),
+          localizationsDelegates: L10n.localizationsDelegates,
+          supportedLocales: L10n.supportedLocales,
+          home: MemDetailPage(memId),
+        ),
+      ),
+    );
+    await widgetTester.pump();
+  }
+
   Logger(level: Level.verbose);
 
   final mockedMemRepository = MockMemRepository();
@@ -23,15 +38,7 @@ void main() {
       when(mockedMemRepository.shipWhereIdIs(any))
           .thenThrow(NotFoundException('test target', 'test condition'));
 
-      await widgetTester.pumpWidget(
-        ProviderScope(
-          child: MaterialApp(
-            title: 'test',
-            home: MemDetailPage(1),
-          ),
-        ),
-      );
-      await widgetTester.pump();
+      await pumpMemDetailPage(widgetTester, 1);
 
       expectMemNameOnMemDetail(widgetTester, '');
       expect(saveFabFinder, findsOneWidget);
@@ -50,15 +57,7 @@ void main() {
                 createdAt: DateTime.now(),
               ));
 
-      await widgetTester.pumpWidget(
-        ProviderScope(
-          child: MaterialApp(
-            title: 'test',
-            home: MemDetailPage(memId),
-          ),
-        ),
-      );
-      await widgetTester.pump();
+      await pumpMemDetailPage(widgetTester, memId);
 
       expectMemNameOnMemDetail(widgetTester, memName);
       expect(saveFabFinder, findsOneWidget);
@@ -79,15 +78,7 @@ void main() {
         return Mem(id: 1, name: value['name'], createdAt: DateTime.now());
       });
 
-      await widgetTester.pumpWidget(
-        ProviderScope(
-          child: MaterialApp(
-            title: 'test',
-            home: MemDetailPage(null),
-          ),
-        ),
-      );
-      await widgetTester.pump();
+      await pumpMemDetailPage(widgetTester, null);
 
       await enterMemNameAndSave(widgetTester, enteringMemName);
 
@@ -120,6 +111,8 @@ void main() {
           updatedAt: DateTime.now(),
         );
       });
+
+      await pumpMemDetailPage(widgetTester, memId);
 
       await widgetTester.pumpWidget(
         ProviderScope(
