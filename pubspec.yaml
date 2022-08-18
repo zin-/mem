@@ -65,8 +65,8 @@ flutter_icons:
     generate: true
     image_path: "assets/icon/web_hi_res_512.png"
     icon_size: 256
-#  web:
-#    generate: true
-#    image_path: "assets/icon/launcher_icon.png"
-#    background_color: "#03A9F4"
-#    theme_color: "#000000"
+  web:
+    generate: true
+    image_path: "assets/icon/web_hi_res_512.png"
+    background_color: "#03A9F4"
+    theme_color: "#000000"
