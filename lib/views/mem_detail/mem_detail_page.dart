@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/mem.dart';
+import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/dimens.dart';
 import 'package:mem/views/atoms/async_value_view.dart';
 import 'package:mem/views/constants.dart';
@@ -43,7 +44,67 @@ class MemDetailPage extends StatelessWidget {
                             Navigator.of(context).pop(null);
                           }
                         },
-                      )
+                      ),
+                      PopupMenuButton(
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            value: 1,
+                            child: Row(
+                              children: [
+                                const Icon(Icons.delete, color: Colors.black),
+                                Text(L10n().removeAction())
+                              ],
+                            ),
+                          ),
+                        ],
+                        onSelected: (value) {
+                          if (value == 1) {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  content: Text(L10n().removeConfirmation()),
+                                  actions: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        ElevatedButton(
+                                          onPressed: () async {
+                                            if (Mem.isSavedMap(memMap)) {
+                                              MemRepository()
+                                                  .discardWhereIdIs(
+                                                      memMap['id'])
+                                                  .then((value) =>
+                                                      Navigator.of(context)
+                                                        ..pop()
+                                                        ..pop(null));
+                                            } else {
+                                              Navigator.of(context)
+                                                ..pop()
+                                                ..pop(null);
+                                            }
+                                          },
+                                          child: Text(L10n().okAction()),
+                                        ),
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            primary: Colors.white,
+                                            onPrimary: Colors.black,
+                                          ),
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(),
+                                          child: Text(L10n().cancelAction()),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          }
+                        },
+                      ),
                     ],
                   ),
                   body: Padding(
