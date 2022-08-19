@@ -4,6 +4,7 @@ import 'package:mem/l10n.dart';
 
 import 'package:mem/logger.dart';
 import 'package:mem/mem.dart';
+import 'package:mem/views/constants.dart';
 import 'package:mem/views/mem_detail/mem_detail_states.dart';
 
 enum MenuOption { remove }
@@ -33,9 +34,9 @@ class MemDetailMenu extends StatelessWidget {
           color: Colors.white,
           onPressed: () {
             if (Mem.isSavedMap(_memMap)) {
-              ref
-                  .read(archiveMem(_memMap))
-                  .then((archived) => Navigator.of(context).pop(archived));
+              ref.read(archiveMem(_memMap)).then((archived) {
+                Navigator.of(context).pop(archived);
+              });
             } else {
               Navigator.of(context).pop(null);
             }
@@ -66,7 +67,6 @@ class MemDetailMenu extends StatelessWidget {
             }
           },
         ),
-        debug: true,
       );
 
   AlertDialog _buildRemoveMemAlertDialog(BuildContext context, WidgetRef ref) =>
@@ -81,7 +81,18 @@ class MemDetailMenu extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () async {
                     if (Mem.isSavedMap(_memMap)) {
-                      ref.read(removeMem(_memMap['id']));
+                      ref.read(removeMem(_memMap['id'])).then((result) {
+                        if (result) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(L10n()
+                                  .removeMemSuccessMessage(_memMap['name'])),
+                              duration: defaultDismissDuration,
+                              dismissDirection: DismissDirection.horizontal,
+                            ),
+                          );
+                        }
+                      });
                     }
                     Navigator.of(context)
                       ..pop()
@@ -101,6 +112,5 @@ class MemDetailMenu extends StatelessWidget {
             ),
           ],
         ),
-        debug: true,
       );
 }

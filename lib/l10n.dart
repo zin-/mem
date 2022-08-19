@@ -30,6 +30,9 @@ class L10n {
 
   String cancelAction() => _appLocalizations.cancelAction;
 
+  String removeMemSuccessMessage(String memName) =>
+      _appLocalizations.removeMemSuccessMessage(memName);
+
   L10n._(this._appLocalizations);
 
   static L10n? _instance;

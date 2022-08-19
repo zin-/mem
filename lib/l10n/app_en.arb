@@ -13,6 +13,12 @@
   "showArchivedLabel": "Show archived",
   "removeAction": "Remove",
   "removeConfirmation": "Can I remove this?",
+  "removeMemSuccessMessage": "Remove success. {memName}",
+  "@removeMemSuccessMessage": {
+    "placeholders": {
+      "memName": {}
+    }
+  },
   "okAction": "OK",
   "cancelAction": "Cancel"
 }
