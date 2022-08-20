@@ -28,14 +28,10 @@ void main() {
   testWidgets('Show remove confirmation dialog', (widgetTester) async {
     await pumpMemDetailPage(widgetTester, 1);
 
-    await widgetTester.tap(memDetailMenuButtonFinder);
-    await widgetTester.pumpAndSettle();
-
-    await widgetTester.tap(removeButtonFinder);
-    await widgetTester.pump();
+    await showRemoveMemConfirmDialog(widgetTester);
 
     expect(removeConfirmationFinder, findsOneWidget);
-    expect(find.text('OK'), findsOneWidget);
+    expect(okButtonFinder, findsOneWidget);
     expect(cancelButtonFinder, findsOneWidget);
 
     await widgetTester.tap(cancelButtonFinder);
@@ -55,6 +51,15 @@ final memDetailMenuButtonFinder = find.descendant(
   matching: find.byIcon(Icons.more_vert),
 );
 
+Future<void> showRemoveMemConfirmDialog(WidgetTester widgetTester) async {
+  await widgetTester.tap(memDetailMenuButtonFinder);
+  await widgetTester.pumpAndSettle();
+
+  await widgetTester.tap(removeButtonFinder);
+  await widgetTester.pump();
+}
+
 final removeButtonFinder = find.byIcon(Icons.delete);
 final removeConfirmationFinder = find.text('Can I remove this?');
 final cancelButtonFinder = find.text('Cancel');
+final okButtonFinder = find.text('OK');

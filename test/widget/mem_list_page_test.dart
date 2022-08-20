@@ -124,7 +124,7 @@ void main() {
       expectMemNameTextOnListAt(widgetTester, 0, notArchived.name);
       expect(find.text(archived.name), findsNothing);
 
-      await widgetTester.tap(find.byIcon(Icons.filter_list));
+      await widgetTester.tap(memListFilterButton);
       await widgetTester.pump();
 
       expect(
@@ -180,7 +180,7 @@ void main() {
       expectMemNameTextOnListAt(widgetTester, 0, notArchived.name);
       expect(find.text(archived.name), findsNothing);
 
-      await widgetTester.tap(find.byIcon(Icons.filter_list));
+      await widgetTester.tap(memListFilterButton);
       await widgetTester.pumpAndSettle();
 
       // showNotArchived: false, showArchived: false
@@ -232,5 +232,12 @@ void expectMemNameTextOnListAt(
       memName,
     );
 
+final memListFilterButton = find.byIcon(Icons.filter_list);
 final findShowNotArchiveSwitch = find.byType(Switch).at(0);
 final findShowArchiveSwitch = find.byType(Switch).at(1);
+
+Future closeMemListFilter(WidgetTester widgetTester) async {
+  // FIXME なんか変な気がする
+  await widgetTester.tapAt(const Offset(0, 0));
+  await widgetTester.pumpAndSettle();
+}
