@@ -34,14 +34,14 @@ void main() {
     await widgetTester.tap(removeButtonFinder);
     await widgetTester.pump();
 
-    expect(find.text('Can I remove this?'), findsOneWidget);
+    expect(removeConfirmationFinder, findsOneWidget);
     expect(find.text('OK'), findsOneWidget);
     expect(cancelButtonFinder, findsOneWidget);
 
     await widgetTester.tap(cancelButtonFinder);
     await widgetTester.pumpAndSettle();
 
-    expect(find.text('Can I remove this?'), findsNothing);
+    expect(removeConfirmationFinder, findsNothing);
   });
 }
 
@@ -56,4 +56,5 @@ final memDetailMenuButtonFinder = find.descendant(
 );
 
 final removeButtonFinder = find.byIcon(Icons.delete);
+final removeConfirmationFinder = find.text('Can I remove this?');
 final cancelButtonFinder = find.text('Cancel');
