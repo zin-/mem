@@ -14,20 +14,6 @@ import 'package:mem/views/constants.dart';
 import '../mocks.mocks.dart';
 
 void main() {
-  Future pumpMemDetailPage(WidgetTester widgetTester, int? memId) async {
-    await widgetTester.pumpWidget(
-      ProviderScope(
-        child: MaterialApp(
-          onGenerateTitle: (context) => L10n(context).memDetailPageTitle(),
-          localizationsDelegates: L10n.localizationsDelegates,
-          supportedLocales: L10n.supportedLocales,
-          home: MemDetailPage(memId),
-        ),
-      ),
-    );
-    await widgetTester.pump();
-  }
-
   Logger(level: Level.verbose);
 
   final mockedMemRepository = MockMemRepository();
@@ -42,6 +28,7 @@ void main() {
 
       expectMemNameOnMemDetail(widgetTester, '');
       expect(saveFabFinder, findsOneWidget);
+      expect(appBarFinder, findsOneWidget);
       expect(archiveButtonFinder, findsOneWidget);
 
       verify(mockedMemRepository.shipWhereIdIs(1)).called(1);
@@ -134,9 +121,27 @@ void main() {
   });
 }
 
+Future pumpMemDetailPage(WidgetTester widgetTester, int? memId) async {
+  await widgetTester.pumpWidget(
+    ProviderScope(
+      child: MaterialApp(
+        onGenerateTitle: (context) => L10n(context).memDetailPageTitle(),
+        localizationsDelegates: L10n.localizationsDelegates,
+        supportedLocales: L10n.supportedLocales,
+        home: MemDetailPage(memId),
+      ),
+    ),
+  );
+  await widgetTester.pump();
+}
+
 final memNameTextFormFieldFinder = find.byType(TextFormField).at(0);
 final saveFabFinder = find.byIcon(Icons.save_alt).at(0);
-final archiveButtonFinder = find.byIcon(Icons.archive);
+final appBarFinder = find.byType(AppBar);
+final archiveButtonFinder = find.descendant(
+  of: appBarFinder,
+  matching: find.byIcon(Icons.archive),
+);
 
 void expectMemNameOnMemDetail(
   WidgetTester widgetTester,
