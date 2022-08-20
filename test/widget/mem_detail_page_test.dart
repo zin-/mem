@@ -160,9 +160,12 @@ Future<void> checkSavedSnackBarAndDismiss(
   WidgetTester widgetTester,
   String memName,
 ) async {
-  expect(find.text('Save success. $memName'), findsOneWidget);
+  expect(saveMemSuccessFinder(memName), findsOneWidget);
 
   await widgetTester.pumpAndSettle(defaultDismissDuration);
 
-  expect(find.text('Save success. $memName'), findsNothing);
+  expect(saveMemSuccessFinder(memName), findsNothing);
 }
+
+Finder saveMemSuccessFinder(String memName) =>
+    find.text('Save success. $memName');

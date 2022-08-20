@@ -23,6 +23,57 @@ void main() {
     MemRepository.clear();
   });
 
+  group('Basic scenario', () {
+    testWidgets(': create.', (widgetTester) async {
+      const enteringMemName = 'entering mem name';
+
+      await app.main();
+      await widgetTester.pumpAndSettle();
+
+      await widgetTester.tap(showNewMemFabFinder);
+      await widgetTester.pumpAndSettle();
+
+      await enterMemNameAndSave(widgetTester, enteringMemName);
+
+      await widgetTester.pageBack();
+      await widgetTester.pump();
+
+      expectMemNameTextOnListAt(widgetTester, 0, enteringMemName);
+    });
+
+    testWidgets(': update.', (widgetTester) async {
+      const savedMemName = 'saved mem name';
+      final database = await DatabaseManager().open(app.databaseDefinition);
+      final memTable = database.getTable(memTableName);
+      final savedMemId = await memTable.insert({
+        'name': savedMemName,
+        'createdAt': DateTime.now(),
+      });
+      assert(savedMemId == 1);
+      await DatabaseManager().close(app.databaseDefinition.name);
+
+      const enteringMemName = 'entering mem name';
+
+      await app.main();
+      await widgetTester.pumpAndSettle();
+
+      expectMemNameTextOnListAt(widgetTester, 0, savedMemName);
+
+      await widgetTester.tap(memListTileFinder.at(0));
+      await widgetTester.pumpAndSettle();
+
+      await enterMemNameAndSave(widgetTester, enteringMemName);
+
+      expect(saveMemSuccessFinder(enteringMemName), findsOneWidget);
+
+      await widgetTester.pageBack();
+      await widgetTester.pumpAndSettle();
+
+      expectMemNameTextOnListAt(widgetTester, 0, enteringMemName);
+      expect(find.text(savedMemName), findsNothing);
+    });
+  });
+
   group(
     'Basic scenario',
     () {
@@ -156,5 +207,6 @@ void main() {
         },
       );
     },
+    skip: true,
   );
 }
