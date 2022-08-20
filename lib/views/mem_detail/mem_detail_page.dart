@@ -19,10 +19,10 @@ class MemDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => t(
-        {},
+        {'_memId': _memId},
         () => Consumer(
           builder: (context, ref, child) => v(
-            {},
+            {'_memId': _memId},
             () {
               final mem = ref.watch(memProvider(_memId));
               final memMap = ref.watch(memMapProvider(_memId));
@@ -83,19 +83,21 @@ class MemDetailPage extends StatelessWidget {
         ),
       );
 
-  Widget _buildBody(WidgetRef ref, Map<String, dynamic> memMap) {
-    return Column(
-      children: [
-        MemNameTextFormField(
-          memMap['name'] ?? '',
-          memMap['id'],
-          (value) =>
-              (value?.isEmpty ?? false) ? L10n().memNameIsRequiredWarn() : null,
-          (value) => ref
-              .read(memMapProvider(_memId).notifier)
-              .updatedBy(Map.of(memMap..['name'] = value)),
+  Widget _buildBody(WidgetRef ref, Map<String, dynamic> memMap) => v(
+        {'ref': ref, 'memMap': memMap},
+        () => Column(
+          children: [
+            MemNameTextFormField(
+              memMap['name'] ?? '',
+              memMap['id'],
+              (value) => (value?.isEmpty ?? false)
+                  ? L10n().memNameIsRequiredWarn()
+                  : null,
+              (value) => ref
+                  .read(memMapProvider(_memId).notifier)
+                  .updatedBy(Map.of(memMap..['name'] = value)),
+            ),
+          ],
         ),
-      ],
-    );
-  }
+      );
 }

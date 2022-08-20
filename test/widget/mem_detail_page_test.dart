@@ -137,13 +137,15 @@ final memNameTextFormFieldFinder = find.byType(TextFormField).at(0);
 final saveFabFinder = find.byIcon(Icons.save_alt).at(0);
 final appBarFinder = find.byType(AppBar);
 
+TextFormField memNameTextFormField(WidgetTester widgetTester) =>
+    (widgetTester.widget(memNameTextFormFieldFinder) as TextFormField);
+
 void expectMemNameOnMemDetail(
   WidgetTester widgetTester,
   String memName,
 ) =>
     expect(
-      (widgetTester.widget(memNameTextFormFieldFinder) as TextFormField)
-          .initialValue,
+      memNameTextFormField(widgetTester).initialValue,
       memName,
     );
 
