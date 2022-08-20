@@ -52,6 +52,16 @@ void main() {
     });
   });
 
+  testWidgets('Edit', (widgetTester) async {
+    await pumpMemDetailPage(widgetTester, null);
+
+    final noFocus = memNameTextFormField(widgetTester);
+
+    await widgetTester.tap(memNameTextFormFieldFinder);
+
+    final focused = memNameTextFormField(widgetTester);
+  });
+
   group('Save', () {
     testWidgets(': create.', (widgetTester) async {
       const enteringMemName = 'entering mem name';
