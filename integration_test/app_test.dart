@@ -6,6 +6,7 @@ import 'package:mem/database/database_factory.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/main.dart' as app;
 
+import '../test/widget/mem_detail_menu_test.dart';
 import '../test/widget/mem_detail_page_test.dart';
 import '../test/widget/mem_list_page_test.dart';
 

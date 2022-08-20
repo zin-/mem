@@ -29,7 +29,6 @@ void main() {
       expectMemNameOnMemDetail(widgetTester, '');
       expect(saveFabFinder, findsOneWidget);
       expect(appBarFinder, findsOneWidget);
-      expect(archiveButtonFinder, findsOneWidget);
 
       verify(mockedMemRepository.shipWhereIdIs(1)).called(1);
     });
@@ -48,7 +47,6 @@ void main() {
 
       expectMemNameOnMemDetail(widgetTester, memName);
       expect(saveFabFinder, findsOneWidget);
-      expect(archiveButtonFinder, findsOneWidget);
 
       verify(mockedMemRepository.shipWhereIdIs(memId)).called(1);
     });
@@ -138,10 +136,6 @@ Future pumpMemDetailPage(WidgetTester widgetTester, int? memId) async {
 final memNameTextFormFieldFinder = find.byType(TextFormField).at(0);
 final saveFabFinder = find.byIcon(Icons.save_alt).at(0);
 final appBarFinder = find.byType(AppBar);
-final archiveButtonFinder = find.descendant(
-  of: appBarFinder,
-  matching: find.byIcon(Icons.archive),
-);
 
 void expectMemNameOnMemDetail(
   WidgetTester widgetTester,
