@@ -100,7 +100,13 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
               (result) => v(
                 {'result': result},
                 () {
-                  if (result != null) {
+                  if (result == null) {
+                    if (memId != null) {
+                      ref.read(memListProvider.notifier).remove(
+                            (item) => item.id == memId,
+                          );
+                    }
+                  } else {
                     ref.read(memListProvider.notifier).add(
                           result,
                           (item) => item.id == result.id,

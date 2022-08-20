@@ -14,20 +14,6 @@ import 'package:mem/views/constants.dart';
 import '../mocks.mocks.dart';
 
 void main() {
-  Future pumpMemDetailPage(WidgetTester widgetTester, int? memId) async {
-    await widgetTester.pumpWidget(
-      ProviderScope(
-        child: MaterialApp(
-          onGenerateTitle: (context) => L10n(context).memDetailPageTitle(),
-          localizationsDelegates: L10n.localizationsDelegates,
-          supportedLocales: L10n.supportedLocales,
-          home: MemDetailPage(memId),
-        ),
-      ),
-    );
-    await widgetTester.pump();
-  }
-
   Logger(level: Level.verbose);
 
   final mockedMemRepository = MockMemRepository();
@@ -42,7 +28,7 @@ void main() {
 
       expectMemNameOnMemDetail(widgetTester, '');
       expect(saveFabFinder, findsOneWidget);
-      expect(archiveButtonFinder, findsOneWidget);
+      expect(appBarFinder, findsOneWidget);
 
       verify(mockedMemRepository.shipWhereIdIs(1)).called(1);
     });
@@ -61,7 +47,6 @@ void main() {
 
       expectMemNameOnMemDetail(widgetTester, memName);
       expect(saveFabFinder, findsOneWidget);
-      expect(archiveButtonFinder, findsOneWidget);
 
       verify(mockedMemRepository.shipWhereIdIs(memId)).called(1);
     });
@@ -134,9 +119,23 @@ void main() {
   });
 }
 
+Future pumpMemDetailPage(WidgetTester widgetTester, int? memId) async {
+  await widgetTester.pumpWidget(
+    ProviderScope(
+      child: MaterialApp(
+        onGenerateTitle: (context) => L10n(context).memDetailPageTitle(),
+        localizationsDelegates: L10n.localizationsDelegates,
+        supportedLocales: L10n.supportedLocales,
+        home: MemDetailPage(memId),
+      ),
+    ),
+  );
+  await widgetTester.pump();
+}
+
 final memNameTextFormFieldFinder = find.byType(TextFormField).at(0);
 final saveFabFinder = find.byIcon(Icons.save_alt).at(0);
-final archiveButtonFinder = find.byIcon(Icons.archive);
+final appBarFinder = find.byType(AppBar);
 
 void expectMemNameOnMemDetail(
   WidgetTester widgetTester,
@@ -161,9 +160,12 @@ Future<void> checkSavedSnackBarAndDismiss(
   WidgetTester widgetTester,
   String memName,
 ) async {
-  expect(find.text('Save success. $memName'), findsOneWidget);
+  expect(saveMemSuccessFinder(memName), findsOneWidget);
 
   await widgetTester.pumpAndSettle(defaultDismissDuration);
 
-  expect(find.text('Save success. $memName'), findsNothing);
+  expect(saveMemSuccessFinder(memName), findsNothing);
 }
+
+Finder saveMemSuccessFinder(String memName) =>
+    find.text('Save success. $memName');

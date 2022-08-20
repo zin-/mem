@@ -3,10 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/mem.dart';
 import 'package:mem/views/dimens.dart';
 import 'package:mem/views/atoms/async_value_view.dart';
 import 'package:mem/views/constants.dart';
+import 'package:mem/views/mem_detail/mem_detail_menu.dart';
 import 'package:mem/views/mem_detail/mem_detail_states.dart';
 import 'package:mem/views/mem_name.dart';
 
@@ -32,18 +32,7 @@ class MemDetailPage extends StatelessWidget {
                   appBar: AppBar(
                     title: Text(L10n().memDetailPageTitle()),
                     actions: [
-                      IconButton(
-                        icon: const Icon(Icons.archive),
-                        color: Colors.white,
-                        onPressed: () {
-                          if (Mem.isSavedMap(memMap)) {
-                            ref.read(archiveMem(memMap)).then((archived) =>
-                                Navigator.of(context).pop(archived));
-                          } else {
-                            Navigator.of(context).pop(null);
-                          }
-                        },
-                      )
+                      MemDetailMenu(memMap),
                     ],
                   ),
                   body: Padding(
