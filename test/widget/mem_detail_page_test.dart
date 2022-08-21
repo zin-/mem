@@ -52,6 +52,39 @@ void main() {
     });
   });
 
+  testWidgets(
+    'Edit: keep focus mem name.',
+    (widgetTester) async {
+      // final focusNode = FocusNode();
+      // // focusNode.addListener(() {
+      // //   dev('object');
+      // //   dev(focusNode.hasFocus);
+      // //   dev(focusNode.hasPrimaryFocus);
+      // //   if (focusNode.hasFocus && focusNode.hasPrimaryFocus) {
+      // //   } else {
+      // //     fail('out of focus on mem name');
+      // //   }
+      // // });
+      // await pumpMemDetailPage(widgetTester, null, memNameFocusNode: focusNode);
+      //
+      // expect(focusNode.hasPrimaryFocus, false);
+      //
+      // await widgetTester.tap(memNameTextFormFieldFinder);
+      //
+      // expect(focusNode.hasPrimaryFocus, true);
+      //
+      // await widgetTester.enterText(
+      //   memNameTextFormFieldFinder,
+      //   'entering mem name',
+      // );
+      // await widgetTester.pumpAndSettle();
+      //
+      // ここで、フォーカスがはずれていることを確認したかったが、確認できなかった
+      // expect(focusNode.hasPrimaryFocus, true);
+    },
+    skip: true,
+  );
+
   group('Save', () {
     testWidgets(': create.', (widgetTester) async {
       const enteringMemName = 'entering mem name';
@@ -98,15 +131,6 @@ void main() {
       });
 
       await pumpMemDetailPage(widgetTester, memId);
-
-      await widgetTester.pumpWidget(
-        ProviderScope(
-          child: MaterialApp(
-            title: 'test',
-            home: MemDetailPage(memId),
-          ),
-        ),
-      );
       await widgetTester.pump();
 
       await enterMemNameAndSave(widgetTester, enteringMemName);
@@ -119,7 +143,10 @@ void main() {
   });
 }
 
-Future pumpMemDetailPage(WidgetTester widgetTester, int? memId) async {
+Future pumpMemDetailPage(
+  WidgetTester widgetTester,
+  int? memId,
+) async {
   await widgetTester.pumpWidget(
     ProviderScope(
       child: MaterialApp(
@@ -137,13 +164,15 @@ final memNameTextFormFieldFinder = find.byType(TextFormField).at(0);
 final saveFabFinder = find.byIcon(Icons.save_alt).at(0);
 final appBarFinder = find.byType(AppBar);
 
+TextFormField memNameTextFormField(WidgetTester widgetTester) =>
+    (widgetTester.widget(memNameTextFormFieldFinder) as TextFormField);
+
 void expectMemNameOnMemDetail(
   WidgetTester widgetTester,
   String memName,
 ) =>
     expect(
-      (widgetTester.widget(memNameTextFormFieldFinder) as TextFormField)
-          .initialValue,
+      memNameTextFormField(widgetTester).initialValue,
       memName,
     );
 

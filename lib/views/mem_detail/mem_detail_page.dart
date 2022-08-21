@@ -15,14 +15,17 @@ class MemDetailPage extends StatelessWidget {
 
   final int? _memId;
 
-  MemDetailPage(this._memId, {Key? key}) : super(key: key);
+  MemDetailPage(
+    this._memId, {
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) => t(
-        {},
+        {'_memId': _memId},
         () => Consumer(
           builder: (context, ref, child) => v(
-            {},
+            {'_memId': _memId},
             () {
               final mem = ref.watch(memProvider(_memId));
               final memMap = ref.watch(memMapProvider(_memId));
@@ -39,7 +42,7 @@ class MemDetailPage extends StatelessWidget {
                     padding: pagePadding,
                     child: Form(
                       key: _formKey,
-                      child: memMap.length < 2
+                      child: _memId != null && memMap.length < 2
                           ? AsyncValueView(
                               ref.watch(fetchMemById(_memId)),
                               (Map<String, dynamic> memDataMap) =>
@@ -83,19 +86,25 @@ class MemDetailPage extends StatelessWidget {
         ),
       );
 
-  Widget _buildBody(WidgetRef ref, Map<String, dynamic> memMap) {
-    return Column(
-      children: [
-        MemNameTextFormField(
-          memMap['name'] ?? '',
-          memMap['id'],
-          (value) =>
-              (value?.isEmpty ?? false) ? L10n().memNameIsRequiredWarn() : null,
-          (value) => ref
-              .read(memMapProvider(_memId).notifier)
-              .updatedBy(Map.of(memMap..['name'] = value)),
+  Widget _buildBody(
+    WidgetRef ref,
+    Map<String, dynamic> memMap,
+  ) =>
+      v(
+        {'memMap': memMap, 'ref': ref},
+        () => Column(
+          children: [
+            MemNameTextFormField(
+              memMap['name'] ?? '',
+              memMap['id'],
+              (value) => (value?.isEmpty ?? false)
+                  ? L10n().memNameIsRequiredWarn()
+                  : null,
+              (value) => ref
+                  .read(memMapProvider(_memId).notifier)
+                  .updatedBy(Map.of(memMap..['name'] = value)),
+            ),
+          ],
         ),
-      ],
-    );
-  }
+      );
 }
