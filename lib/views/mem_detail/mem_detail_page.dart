@@ -27,9 +27,8 @@ class MemDetailPage extends StatelessWidget {
           builder: (context, ref, child) => v(
             {'_memId': _memId},
             () {
-              // dev fetchMemByIdするのと、編集を監視するためのwatchMemMapする範囲が間違っている
-              final mem = dev(ref.watch(memProvider(_memId)));
-              final memMap = dev(ref.watch(memMapProvider(_memId)));
+              final mem = ref.watch(memProvider(_memId));
+              final memMap = ref.watch(memMapProvider(_memId));
 
               return WillPopScope(
                 child: Scaffold(
@@ -43,14 +42,12 @@ class MemDetailPage extends StatelessWidget {
                     padding: pagePadding,
                     child: Form(
                       key: _formKey,
-                      child: memMap.length < 2
-                          // dev まずこっちを通ってる
+                      child: _memId != null && memMap.length < 2
                           ? AsyncValueView(
                               ref.watch(fetchMemById(_memId)),
                               (Map<String, dynamic> memDataMap) =>
                                   _buildBody(ref, memMap),
                             )
-                          // dev で、編集されたときはすでにmemMapがあるのでこっち？
                           : _buildBody(ref, memMap),
                     ),
                   ),
@@ -85,7 +82,6 @@ class MemDetailPage extends StatelessWidget {
                 },
               );
             },
-            debug: true,
           ),
         ),
       );
@@ -110,6 +106,5 @@ class MemDetailPage extends StatelessWidget {
             ),
           ],
         ),
-        debug: true,
       );
 }
