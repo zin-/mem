@@ -15,7 +15,10 @@ class MemDetailPage extends StatelessWidget {
 
   final int? _memId;
 
-  MemDetailPage(this._memId, {Key? key}) : super(key: key);
+  MemDetailPage(
+    this._memId, {
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) => t(
@@ -87,8 +90,12 @@ class MemDetailPage extends StatelessWidget {
         ),
       );
 
-  Widget _buildBody(WidgetRef ref, Map<String, dynamic> memMap) => v(
-        {'ref': ref, 'memMap': memMap},
+  Widget _buildBody(
+    WidgetRef ref,
+    Map<String, dynamic> memMap,
+  ) =>
+      v(
+        {'memMap': memMap, 'ref': ref},
         () => Column(
           children: [
             MemNameTextFormField(
