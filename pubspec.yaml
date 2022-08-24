@@ -16,9 +16,6 @@ dependencies:
 
   cupertino_icons: ^1.0.2
 
-  # for UI
-  scroll_bottom_navigation_bar:
-
   # for Database
   sqflite:
   path:
