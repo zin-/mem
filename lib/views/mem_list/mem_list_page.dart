@@ -25,7 +25,7 @@ class MemListPage extends StatelessWidget {
           builder: (context, ref, child) => v(
             {},
             () {
-              ref.read(fetchMemList);
+              ref.watch(fetchMemList);
               final memList = ref.watch(memListProvider);
 
               return Scaffold(
