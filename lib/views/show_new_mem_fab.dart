@@ -20,28 +20,13 @@ class _ShowNewMemFabState extends State<ShowNewMemFab>
   bool _show = true;
 
   @override
-  void initState() {
-    super.initState();
-    // FIXME 開発中、保存するとこの関数は実行されないので、listenerが失われる
-    widget._scrollController.addListener(() => v(
-          {'_show': _show},
-          () {
-            if (widget._scrollController.position.userScrollDirection ==
-                    ScrollDirection.forward &&
-                !_show) {
-              setState(() {
-                _show = true;
-              });
-            } else if (widget._scrollController.position.userScrollDirection ==
-                    ScrollDirection.reverse &&
-                _show) {
-              setState(() {
-                _show = false;
-              });
-            }
-          },
-        ));
-  }
+  void didUpdateWidget(covariant ShowNewMemFab oldWidget) => v(
+        {'oldWidget': oldWidget},
+        () {
+          super.didUpdateWidget(oldWidget);
+          _addListener();
+        },
+      );
 
   @override
   Widget build(BuildContext context) => v(
@@ -62,5 +47,28 @@ class _ShowNewMemFabState extends State<ShowNewMemFab>
             ),
           ),
         ),
+      );
+
+  void _addListener() => v(
+        {},
+        () => widget._scrollController.addListener(() => v(
+              {'_show': _show},
+              () {
+                if (widget._scrollController.position.userScrollDirection ==
+                        ScrollDirection.forward &&
+                    !_show) {
+                  setState(() {
+                    _show = true;
+                  });
+                } else if (widget
+                            ._scrollController.position.userScrollDirection ==
+                        ScrollDirection.reverse &&
+                    _show) {
+                  setState(() {
+                    _show = false;
+                  });
+                }
+              },
+            )),
       );
 }
