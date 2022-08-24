@@ -20,7 +20,7 @@ void main() {
           onGenerateTitle: (context) => L10n(context).memListPageTitle(),
           localizationsDelegates: L10n.localizationsDelegates,
           supportedLocales: L10n.supportedLocales,
-          home: const MemListPage(),
+          home: MemListPage(),
         ),
       ),
     );
@@ -209,9 +209,48 @@ void main() {
       verify(mockedMemRepository.ship(any)).called(4);
     });
   });
+
+  testWidgets('Hide fab on scroll.', (widgetTester) async {
+    final mems = List.generate(
+      20,
+      (index) => Mem(
+        id: index,
+        name: 'Test $index',
+        createdAt: DateTime.now(),
+      ),
+    );
+
+    when(mockedMemRepository.ship(any)).thenAnswer(
+      (realInvocation) async => mems,
+    );
+
+    await pumpMemListPage(widgetTester);
+
+    await widgetTester.dragUntilVisible(
+      find.text('Test 10'),
+      memListFinder,
+      const Offset(0, -500),
+    );
+    await widgetTester.pumpAndSettle();
+
+    expect(showNewMemFabFinder.hitTestable(), findsNothing);
+
+    await widgetTester.dragUntilVisible(
+      find.text('Test 0'),
+      memListFinder,
+      const Offset(0, 500),
+    );
+    await widgetTester.pumpAndSettle();
+
+    expect(showNewMemFabFinder.hitTestable(), findsOneWidget);
+  });
 }
 
-final memListTileFinder = find.byType(ListTile);
+final memListFinder = find.byType(CustomScrollView);
+final memListTileFinder = find.descendant(
+  of: memListFinder,
+  matching: find.byType(ListTile),
+);
 final showNewMemFabFinder = find.byType(FloatingActionButton);
 
 Finder findMemNameTextOnListAt(int index) => find.descendant(

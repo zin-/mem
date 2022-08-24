@@ -5,16 +5,18 @@ import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/mem.dart';
 import 'package:mem/views/colors.dart';
-import 'package:mem/views/atoms/async_value_view.dart';
 import 'package:mem/views/constants.dart';
 import 'package:mem/views/mem_detail/mem_detail_page.dart';
 import 'package:mem/views/mem_detail/mem_detail_states.dart';
 import 'package:mem/views/mem_list/mem_list_filter.dart';
 import 'package:mem/views/mem_list/mem_list_page_states.dart';
 import 'package:mem/views/mem_name.dart';
+import 'package:mem/views/show_new_mem_fab.dart';
 
 class MemListPage extends StatelessWidget {
-  const MemListPage({Key? key}) : super(key: key);
+  final _scrollController = ScrollController();
+
+  MemListPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => t(
@@ -23,51 +25,54 @@ class MemListPage extends StatelessWidget {
           builder: (context, ref, child) => v(
             {},
             () {
-              final memListAsyncValue = ref.watch(fetchMemList);
+              ref.watch(fetchMemList);
               final memList = ref.watch(memListProvider);
 
               return Scaffold(
-                appBar: AppBar(
-                  title: Text(L10n().memListPageTitle()),
-                ),
-                body: AsyncValueView(
-                  memListAsyncValue,
-                  (List<Mem> _) => ListView.builder(
-                    itemCount: memList.length,
-                    itemBuilder: (context, index) {
-                      final mem = memList[index];
-                      final memMap = mem.toMap();
-                      return ListTile(
-                        title: MemNameText(memMap['name'] ?? '', memMap['id']),
-                        onTap: () =>
-                            showMemDetailPage(context, ref, mem.toMap()['id']),
-                      );
-                    },
-                  ),
-                ),
-                bottomNavigationBar: BottomAppBar(
-                  shape: const CircularNotchedRectangle(),
-                  child: IconTheme(
-                    data: const IconThemeData(color: iconOnPrimaryColor),
-                    child: Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.filter_list),
-                          onPressed: () => showModalBottomSheet(
-                            context: context,
-                            builder: (context) => const MemListFilter(),
+                body: CustomScrollView(
+                  controller: _scrollController,
+                  slivers: [
+                    SliverAppBar(
+                      title: Text(L10n().memListPageTitle()),
+                      floating: true,
+                      actions: [
+                        IconTheme(
+                          data: const IconThemeData(color: iconOnPrimaryColor),
+                          child: Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.filter_list),
+                                onPressed: () => showModalBottomSheet(
+                                  context: context,
+                                  builder: (context) => const MemListFilter(),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                  ),
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final mem = memList[index];
+                          return ListTile(
+                            title: MemNameText(mem.name, mem.id),
+                            onTap: () => showMemDetailPage(
+                              context,
+                              ref,
+                              mem.id,
+                            ),
+                          );
+                        },
+                        childCount: memList.length,
+                      ),
+                    ),
+                  ],
                 ),
-                floatingActionButton: FloatingActionButton(
-                  child: const Icon(Icons.add),
-                  onPressed: () => showMemDetailPage(context, ref, null),
-                ),
+                floatingActionButton: ShowNewMemFab(_scrollController),
                 floatingActionButtonLocation:
-                    FloatingActionButtonLocation.centerDocked,
+                    FloatingActionButtonLocation.centerFloat,
               );
             },
           ),

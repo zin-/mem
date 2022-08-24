@@ -23,7 +23,7 @@ class MemApplication extends StatelessWidget {
                 color: primaryColor,
               ),
             ),
-            home: const MemListPage(),
+            home: MemListPage(),
           ),
         ),
       );
