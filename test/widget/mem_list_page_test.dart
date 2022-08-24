@@ -20,7 +20,7 @@ void main() {
           onGenerateTitle: (context) => L10n(context).memListPageTitle(),
           localizationsDelegates: L10n.localizationsDelegates,
           supportedLocales: L10n.supportedLocales,
-          home: const MemListPage(),
+          home: MemListPage(),
         ),
       ),
     );

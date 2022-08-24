@@ -72,6 +72,9 @@ final memListProvider =
   ),
 );
 
+final onScrollReversedProvider = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
+    (ref) => ValueStateNotifier(false));
+
 final showNotArchivedProvider =
     StateNotifierProvider<ValueStateNotifier<bool>, bool>(
   (ref) => v(
