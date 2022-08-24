@@ -23,43 +23,44 @@ class _ShowNewMemFabState extends State<ShowNewMemFab>
   void initState() {
     super.initState();
     // FIXME 開発中、保存するとこの関数は実行されないので、listenerが失われる
-    widget._scrollController.addListener(() {
-      if (widget._scrollController.position.userScrollDirection ==
-              ScrollDirection.forward &&
-          !_show) {
-        setState(() {
-          _show = true;
-        });
-      } else if (widget._scrollController.position.userScrollDirection ==
-              ScrollDirection.reverse &&
-          _show) {
-        setState(() {
-          _show = false;
-        });
-      }
-    });
+    widget._scrollController.addListener(() => v(
+          {'_show': _show},
+          () {
+            if (widget._scrollController.position.userScrollDirection ==
+                    ScrollDirection.forward &&
+                !_show) {
+              setState(() {
+                _show = true;
+              });
+            } else if (widget._scrollController.position.userScrollDirection ==
+                    ScrollDirection.reverse &&
+                _show) {
+              setState(() {
+                _show = false;
+              });
+            }
+          },
+        ));
   }
 
   @override
   Widget build(BuildContext context) => v(
         {'_show': _show},
-        () {
-          return AnimatedSlide(
-            offset: _show ? Offset.zero : const Offset(0, 1),
+        () => AnimatedSlide(
+          offset: _show ? Offset.zero : const Offset(0, 1),
+          duration: defaultTransitionDuration,
+          child: AnimatedOpacity(
+            opacity: _show ? 1 : 0,
             duration: defaultTransitionDuration,
-            child: AnimatedOpacity(
-              opacity: _show ? 1 : 0,
-              duration: defaultTransitionDuration,
-              child: Consumer(
-                builder: (context, ref, child) {
-                  return FloatingActionButton(
-                    onPressed: () => showMemDetailPage(context, ref, null),
-                    child: const Icon(Icons.add),
-                  );
-                },
-              ),
+            child: Consumer(
+              builder: (context, ref, child) {
+                return FloatingActionButton(
+                  onPressed: () => showMemDetailPage(context, ref, null),
+                  child: const Icon(Icons.add),
+                );
+              },
             ),
-          );
-        },
+          ),
+        ),
       );
 }
