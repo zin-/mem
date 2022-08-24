@@ -25,25 +25,7 @@ class MemListPage extends StatelessWidget {
           builder: (context, ref, child) => v(
             {},
             () {
-              // final onScrollReversed = ref.watch(onScrollReversedProvider);
-
-              // scrollController.addListener(() {
-              //   final onScrollReversedProviderNotifier =
-              //       ref.read(onScrollReversedProvider.notifier);
-              //   if (scrollController.position.userScrollDirection ==
-              //           ScrollDirection.forward &&
-              //       onScrollReversed) {
-              //     // onScrollReversedProviderNotifier.updatedBy(false);
-              //     dev(1);
-              //   } else if (scrollController.position.userScrollDirection ==
-              //           ScrollDirection.reverse &&
-              //       !onScrollReversed) {
-              //     onScrollReversedProviderNotifier.updatedBy(true);
-              //     dev(2);
-              //   }
-              // });
-
-              final memListAsyncValue = ref.read(fetchMemList);
+              ref.read(fetchMemList);
               final memList = ref.watch(memListProvider);
 
               return Scaffold(
@@ -89,78 +71,13 @@ class MemListPage extends StatelessWidget {
                   ],
                 ),
                 floatingActionButton: ShowNewMemFab(_scrollController),
-                // floatingActionButton: _buildFab(context, ref),
-                // floatingActionButton: FloatingActionButton(
-                //   onPressed: () => showMemDetailPage(context, ref, null),
-                //   child: const Icon(Icons.add),
-                // ),
                 floatingActionButtonLocation:
                     FloatingActionButtonLocation.centerFloat,
-              );
-              return Scaffold(
-                appBar: AppBar(
-                  title: Text(L10n().memListPageTitle()),
-                ),
-                body: AsyncValueView(
-                  memListAsyncValue,
-                  (List<Mem> _) => ListView.builder(
-                    itemCount: memList.length,
-                    itemBuilder: (context, index) {
-                      final mem = memList[index];
-                      final memMap = mem.toMap();
-                      return ListTile(
-                        title: MemNameText(memMap['name'] ?? '', memMap['id']),
-                        onTap: () =>
-                            showMemDetailPage(context, ref, mem.toMap()['id']),
-                      );
-                    },
-                  ),
-                ),
-                bottomNavigationBar: BottomAppBar(
-                  shape: const CircularNotchedRectangle(),
-                  child: IconTheme(
-                    data: const IconThemeData(color: iconOnPrimaryColor),
-                    child: Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.filter_list),
-                          onPressed: () => showModalBottomSheet(
-                            context: context,
-                            builder: (context) => const MemListFilter(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                floatingActionButton: FloatingActionButton(
-                  child: const Icon(Icons.add),
-                  onPressed: () => showMemDetailPage(context, ref, null),
-                ),
-                floatingActionButtonLocation:
-                    FloatingActionButtonLocation.centerDocked,
               );
             },
           ),
         ),
       );
-
-  Widget _buildFab(BuildContext context, WidgetRef ref) {
-    const duration = Duration(milliseconds: 750);
-    final showFab = !ref.watch(onScrollReversedProvider);
-    return AnimatedSlide(
-      offset: showFab ? Offset.zero : Offset(0, 2),
-      duration: duration,
-      child: AnimatedOpacity(
-        opacity: showFab ? 1 : 0,
-        duration: duration,
-        child: FloatingActionButton(
-          onPressed: () => showMemDetailPage(context, ref, null),
-          child: const Icon(Icons.add),
-        ),
-      ),
-    );
-  }
 }
 
 void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
