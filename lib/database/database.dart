@@ -25,7 +25,7 @@ abstract class Database {
       return tables[name]!;
     } else {
       throw DatabaseException(
-          'Table: $name does not exist on Database: ${definition.name}.');
+          'Table: $name does not exist on Database: "${definition.name}".');
     }
   }
 

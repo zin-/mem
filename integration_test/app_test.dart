@@ -12,6 +12,8 @@ import '../test/widget/mem_list_page_test.dart';
 
 void main() {
   Logger(level: Level.verbose);
+  DatabaseManager(onTest: true);
+
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() async {
