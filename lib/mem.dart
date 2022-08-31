@@ -1,3 +1,4 @@
+// TODO 必須の項目の変数名を定数化する（createdAtとか）
 class Mem {
   final int id;
   final String name;
