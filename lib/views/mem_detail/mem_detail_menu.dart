@@ -35,6 +35,7 @@ class MemDetailMenu extends StatelessWidget {
           onPressed: () {
             if (Mem.isSavedMap(_memMap)) {
               ref.read(archiveMem(_memMap)).then((archived) {
+                // TODO ここでMemDetailPageのwillPopを呼べれば、archivedを返却する必要はなくなる
                 Navigator.of(context).pop(archived);
               });
             } else {
