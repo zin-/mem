@@ -122,6 +122,28 @@ void main() async {
   );
 
   test(
+    'archive',
+    () async {
+      const memName1 = 'test mem name 1';
+      final memMap = <String, dynamic>{'name': memName1};
+      final receivedMem1 = await memRepository.receive(memMap);
+      const memName2 = 'test mem name 2';
+      final memMap2 = <String, dynamic>{'name': memName2};
+      final receivedMem2 = await memRepository.receive(memMap2);
+
+      final archived = await memRepository.archive(receivedMem1);
+      expect(archived.archivedAt, isNotNull);
+
+      final selectedByIdArchivedMem =
+          await memRepository.shipWhereIdIs(receivedMem1.id);
+      expect(selectedByIdArchivedMem.toMap(), archived.toMap());
+      final selectedByIdNotArchivedMem =
+          await memRepository.shipWhereIdIs(receivedMem2.id);
+      expect(selectedByIdNotArchivedMem.archivedAt, isNull);
+    },
+  );
+
+  test(
     'discardWhereIdIs',
     () async {
       const memName1 = 'test mem name 1';

@@ -55,7 +55,6 @@ class MemRepository {
   // TODO implement
   // patchWhereId(dynamic id, Map<String, dynamic> value) {}
 
-  // TODO patchを使うことで、引数をidのみにする
   Future<Mem> archive(Mem mem) => v(
         {'mem': mem},
         () async {
