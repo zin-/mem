@@ -9,6 +9,7 @@ class ValueStateNotifier<T> extends StateNotifier<T> {
 }
 
 class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
+  // FIXME filterはstateが持つものじゃない気がする
   final bool Function(T item)? filter;
   final int Function(T item1, T item2)? compare;
 
