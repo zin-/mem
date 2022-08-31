@@ -65,6 +65,16 @@ class MemRepository {
         },
       );
 
+  Future<Mem> unarchive(Mem mem) => v(
+        {'mem': mem},
+        () async {
+          final memMap = mem.toMap();
+          memMap['archivedAt'] = null;
+          await _memTable.updateByPk(mem.id, memMap);
+          return Mem.fromMap(memMap);
+        },
+      );
+
   Future<bool> discardWhereIdIs(dynamic id) => v(
         {'id': id},
         () async {
