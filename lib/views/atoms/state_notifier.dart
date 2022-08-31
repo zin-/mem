@@ -24,6 +24,7 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
       super.updatedBy(List.of(value.where(filter ?? (_) => true))
           .sorted(compare ?? (a, b) => 0));
 
+  // TODO naming
   void add(T item, bool Function(T item) where) {
     final tmp = List.of(state);
 
