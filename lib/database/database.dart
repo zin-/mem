@@ -52,6 +52,8 @@ abstract class Table {
 
   Future<int> updateByPk(dynamic pk, Map<String, dynamic> value);
 
+  Future<int> patchByPk(dynamic pk, Map<String, dynamic> value);
+
   Future<int> deleteByPk(dynamic pk);
 
   Future<int> delete();
