@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/logger.dart';
+import 'package:mem/mem.dart';
 import 'package:mem/repositories/mem_repository.dart';
+import 'package:mem/views/colors.dart';
+import 'package:mockito/mockito.dart';
 
 import '../mocks.mocks.dart';
 import 'mem_detail_page_test.dart';
@@ -12,10 +15,15 @@ void main() {
   final mockedMemRepository = MockMemRepository();
   MemRepository.withMock(mockedMemRepository);
 
+  tearDown(() {
+    reset(mockedMemRepository);
+  });
+
   testWidgets('Open menu', (widgetTester) async {
     await pumpMemDetailPage(widgetTester, null);
 
     expect(archiveButtonFinder, findsOneWidget);
+    expect(unarchiveButtonFinder, findsNothing);
     expect(memDetailMenuButtonFinder, findsOneWidget);
 
     await widgetTester.tap(memDetailMenuButtonFinder);
@@ -39,11 +47,47 @@ void main() {
 
     expect(removeConfirmationFinder, findsNothing);
   });
+
+  testWidgets('Show archived', (widgetTester) async {
+    const memId = 1;
+    const memName = 'test mem name';
+    final mem = Mem(
+      id: memId,
+      name: memName,
+      createdAt: DateTime.now(),
+      archivedAt: DateTime.now(),
+    );
+
+    when(mockedMemRepository.shipWhereIdIs(any))
+        .thenAnswer((realInvocation) async => mem);
+    when(mockedMemRepository.unarchive(mem)).thenAnswer((realInvocation) async {
+      final mem = realInvocation.positionalArguments[0] as Mem;
+
+      return Mem.fromMap(mem.toMap()..['archivedAt'] = null);
+    });
+
+    await pumpMemDetailPage(widgetTester, memId);
+
+    expect(archiveButtonFinder, findsNothing);
+    expect(unarchiveButtonFinder, findsOneWidget);
+
+    await widgetTester.tap(unarchiveButtonFinder);
+    final appBar = widgetTester.widget(appBarFinder) as AppBar;
+    expect(appBar.backgroundColor, archivedColor);
+
+    verify(mockedMemRepository.shipWhereIdIs(memId)).called(1);
+    verify(mockedMemRepository.unarchive(any)).called(1);
+  });
 }
 
 final archiveButtonFinder = find.descendant(
   of: appBarFinder,
   matching: find.byIcon(Icons.archive),
+);
+
+final unarchiveButtonFinder = find.descendant(
+  of: appBarFinder,
+  matching: find.byIcon(Icons.unarchive),
 );
 
 final memDetailMenuButtonFinder = find.descendant(

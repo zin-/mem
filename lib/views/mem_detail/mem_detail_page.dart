@@ -81,10 +81,13 @@ class MemDetailPage extends StatelessWidget {
                   floatingActionButtonLocation:
                       FloatingActionButtonLocation.centerFloat,
                 ),
-                onWillPop: () async {
-                  Navigator.of(context).pop(mem);
-                  return true;
-                },
+                onWillPop: () async => v(
+                  {},
+                  () {
+                    Navigator.of(context).pop(mem);
+                    return true;
+                  },
+                ),
               );
             },
           ),

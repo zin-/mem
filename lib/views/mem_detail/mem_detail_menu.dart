@@ -16,11 +16,13 @@ class MemDetailMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => v(
-        {},
+        {'_memMap': _memMap},
         () => Consumer(
           builder: (context, ref, child) => Row(
             children: [
-              _buildArchiveButton(context, ref),
+              Mem.isArchivedMap(_memMap)
+                  ? _buildUnArchiveButton(context, ref)
+                  : _buildArchiveButton(context, ref),
               _buildMenu(context, ref),
             ],
           ),
@@ -41,6 +43,17 @@ class MemDetailMenu extends StatelessWidget {
             } else {
               Navigator.of(context).pop(null);
             }
+          },
+        ),
+      );
+
+  Widget _buildUnArchiveButton(BuildContext context, WidgetRef ref) => v(
+        {},
+        () => IconButton(
+          icon: const Icon(Icons.unarchive),
+          color: Colors.white,
+          onPressed: () {
+            ref.read(unarchiveMem(_memMap));
           },
         ),
       );
