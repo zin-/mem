@@ -13,7 +13,7 @@ void main() {
   MemRepository.withMock(mockedMemRepository);
 
   testWidgets('Open menu', (widgetTester) async {
-    await pumpMemDetailPage(widgetTester, 1);
+    await pumpMemDetailPage(widgetTester, null);
 
     expect(archiveButtonFinder, findsOneWidget);
     expect(memDetailMenuButtonFinder, findsOneWidget);
@@ -26,7 +26,7 @@ void main() {
   });
 
   testWidgets('Show remove confirmation dialog', (widgetTester) async {
-    await pumpMemDetailPage(widgetTester, 1);
+    await pumpMemDetailPage(widgetTester, null);
 
     await showRemoveMemConfirmDialog(widgetTester);
 
