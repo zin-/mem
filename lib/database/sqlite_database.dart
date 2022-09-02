@@ -213,6 +213,12 @@ class SqliteTable extends Table {
       );
 
   @override
+  Future<int> patchByPk(pk, Map<String, dynamic> value) {
+    // TODO: implement patchByPk
+    throw UnimplementedError();
+  }
+
+  @override
   Future<int> deleteByPk(pk) => v(
         {'pk': pk},
         () async => await _database.onOpened(

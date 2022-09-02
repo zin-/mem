@@ -25,7 +25,7 @@ abstract class Database {
       return tables[name]!;
     } else {
       throw DatabaseException(
-          'Table: $name does not exist on Database: ${definition.name}.');
+          'Table: $name does not exist on Database: "${definition.name}".');
     }
   }
 
@@ -51,6 +51,8 @@ abstract class Table {
   Future<Map<String, dynamic>> selectByPk(dynamic pk);
 
   Future<int> updateByPk(dynamic pk, Map<String, dynamic> value);
+
+  Future<int> patchByPk(dynamic pk, Map<String, dynamic> value);
 
   Future<int> deleteByPk(dynamic pk);
 

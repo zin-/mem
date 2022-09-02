@@ -7,6 +7,7 @@ import 'package:mem/database/sqlite_database.dart';
 import 'package:mem/logger.dart';
 
 class DatabaseManager {
+  final bool _onTest;
   final _databases = <String, Database>{};
 
   Future<Database> open(
@@ -15,57 +16,65 @@ class DatabaseManager {
       v(
         {'definition': definition},
         () async {
-          if (_databases.containsKey(definition.name)) {
-            warn('Database: ${definition.name} is opened.');
+          final dbName = _dbName(definition.name);
+          final dbDefinition =
+              DefD(dbName, definition.version, definition.tableDefinitions);
+
+          if (_databases.containsKey(dbName)) {
+            warn('Database: $dbName is opened.');
           } else {
-            trace('Open database. name: ${definition.name}');
+            trace('Open database. name: $dbName');
             final database = await (kIsWeb
-                    ? IndexedDatabase(definition) // coverage:ignore-line
+                    ? IndexedDatabase(dbDefinition) // coverage:ignore-line
                     // WEBでテストするときにカバレッジを取得する方法がないため
-                    : SqliteDatabase(definition))
+                    : SqliteDatabase(dbDefinition))
                 .open();
-            _databases.putIfAbsent(definition.name, () => database);
+            _databases.putIfAbsent(dbName, () => database);
           }
-          return _databases[definition.name]!;
+          return _databases[dbName]!;
         },
       );
 
   Future<bool> close(String name) async {
-    if (_databases.containsKey(name)) {
-      trace('Close database. name: $name');
-      final closeResult = await _databases[name]!.close();
-      _databases.remove(name);
+    final dbName = _dbName(name);
+    if (_databases.containsKey(dbName)) {
+      trace('Close database. name: $dbName');
+      final closeResult = await _databases[dbName]!.close();
+      _databases.remove(dbName);
       return closeResult;
     } else {
-      warn('I do not have database. name: $name');
+      warn('I do not have database. name: $dbName');
       return false;
     }
   }
 
   Future<bool> delete(String name) async {
-    if (_databases.containsKey(name)) {
-      trace('Delete database. name: $name');
-      final deleteResult = await _databases[name]!.delete();
+    final dbName = _dbName(name);
+    if (_databases.containsKey(dbName)) {
+      trace('Delete database. name: $dbName');
+      final deleteResult = await _databases[dbName]!.delete();
       if (deleteResult) {
-        _databases.remove(name);
+        _databases.remove(dbName);
         return true;
       } else {
         return false;
       }
     } else {
-      warn('I do not have database. name: $name');
+      warn('I do not have database. name: $dbName');
       return false;
     }
   }
 
-  DatabaseManager._();
+  String _dbName(name) => _onTest ? 'test-$name' : name;
+
+  DatabaseManager._(this._onTest);
 
   static DatabaseManager? _instance;
 
-  factory DatabaseManager() {
+  factory DatabaseManager({bool onTest = false}) {
     var tmp = _instance;
     if (tmp == null) {
-      tmp = DatabaseManager._();
+      tmp = DatabaseManager._(onTest);
       _instance = tmp;
     }
     return tmp;

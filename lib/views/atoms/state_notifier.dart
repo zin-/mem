@@ -9,6 +9,7 @@ class ValueStateNotifier<T> extends StateNotifier<T> {
 }
 
 class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
+  // FIXME filterはstateが持つものじゃない気がする
   final bool Function(T item)? filter;
   final int Function(T item1, T item2)? compare;
 
@@ -23,6 +24,7 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
       super.updatedBy(List.of(value.where(filter ?? (_) => true))
           .sorted(compare ?? (a, b) => 0));
 
+  // TODO naming
   void add(T item, bool Function(T item) where) {
     final tmp = List.of(state);
 

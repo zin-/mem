@@ -38,7 +38,6 @@ final memListProvider =
     () {
       final listValueState = ListValueStateNotifier<Mem>(
         [],
-        // FIXME filterはstateが持つものじゃない気がする
         filter: (item) {
           final showNotArchived = ref.watch(showNotArchivedProvider);
           final showArchived = ref.watch(showArchivedProvider);

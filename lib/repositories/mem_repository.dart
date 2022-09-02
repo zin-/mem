@@ -55,12 +55,21 @@ class MemRepository {
   // TODO implement
   // patchWhereId(dynamic id, Map<String, dynamic> value) {}
 
-  // TODO patchを使うことで、引数をidのみにする
   Future<Mem> archive(Mem mem) => v(
         {'mem': mem},
         () async {
           final memMap = mem.toMap();
           memMap['archivedAt'] = DateTime.now();
+          await _memTable.updateByPk(mem.id, memMap);
+          return Mem.fromMap(memMap);
+        },
+      );
+
+  Future<Mem> unarchive(Mem mem) => v(
+        {'mem': mem},
+        () async {
+          final memMap = mem.toMap();
+          memMap['archivedAt'] = null;
           await _memTable.updateByPk(mem.id, memMap);
           return Mem.fromMap(memMap);
         },

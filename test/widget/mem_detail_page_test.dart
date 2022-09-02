@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/views/colors.dart';
 import 'package:mockito/mockito.dart';
 
 import 'package:mem/l10n.dart';
@@ -19,37 +20,70 @@ void main() {
   final mockedMemRepository = MockMemRepository();
   MemRepository.withMock(mockedMemRepository);
 
-  group('New', () {
-    testWidgets(': not found.', (widgetTester) async {
-      when(mockedMemRepository.shipWhereIdIs(any))
-          .thenThrow(NotFoundException('test target', 'test condition'));
+  tearDown(() {
+    reset(mockedMemRepository);
+  });
 
-      await pumpMemDetailPage(widgetTester, 1);
+  group('Show', () {
+    group(': new', () {
+      testWidgets(': not found.', (widgetTester) async {
+        when(mockedMemRepository.shipWhereIdIs(any))
+            .thenThrow(NotFoundException('test target', 'test condition'));
 
-      expectMemNameOnMemDetail(widgetTester, '');
-      expect(saveFabFinder, findsOneWidget);
-      expect(appBarFinder, findsOneWidget);
+        await pumpMemDetailPage(widgetTester, 1);
 
-      verify(mockedMemRepository.shipWhereIdIs(1)).called(1);
+        expectMemNameOnMemDetail(widgetTester, '');
+        expect(saveFabFinder, findsOneWidget);
+        final appBar = widgetTester.widget(appBarFinder) as AppBar;
+        expect(appBar.backgroundColor, primaryColor);
+
+        verify(mockedMemRepository.shipWhereIdIs(1)).called(1);
+      });
+
+      testWidgets(': found.', (widgetTester) async {
+        const memId = 1;
+        const memName = 'test mem name';
+        when(mockedMemRepository.shipWhereIdIs(any))
+            .thenAnswer((realInvocation) async => Mem(
+                  id: memId,
+                  name: memName,
+                  createdAt: DateTime.now(),
+                ));
+
+        await pumpMemDetailPage(widgetTester, memId);
+
+        expectMemNameOnMemDetail(widgetTester, memName);
+        expect(saveFabFinder, findsOneWidget);
+        final appBar = widgetTester.widget(appBarFinder) as AppBar;
+        expect(appBar.backgroundColor, primaryColor);
+
+        verify(mockedMemRepository.shipWhereIdIs(memId)).called(1);
+      });
     });
 
-    testWidgets(': found.', (widgetTester) async {
-      const memId = 1;
-      const memName = 'test mem name';
-      when(mockedMemRepository.shipWhereIdIs(any))
-          .thenAnswer((realInvocation) async => Mem(
-                id: memId,
-                name: memName,
-                createdAt: DateTime.now(),
-              ));
+    testWidgets(
+      ': archived',
+      (widgetTester) async {
+        const memId = 1;
+        const memName = 'test mem name';
 
-      await pumpMemDetailPage(widgetTester, memId);
+        when(mockedMemRepository.shipWhereIdIs(any))
+            .thenAnswer((realInvocation) async => Mem(
+                  id: memId,
+                  name: memName,
+                  createdAt: DateTime.now(),
+                  archivedAt: DateTime.now(),
+                ));
 
-      expectMemNameOnMemDetail(widgetTester, memName);
-      expect(saveFabFinder, findsOneWidget);
+        await pumpMemDetailPage(widgetTester, memId);
+        await widgetTester.pump();
 
-      verify(mockedMemRepository.shipWhereIdIs(memId)).called(1);
-    });
+        final appBar = widgetTester.widget(appBarFinder) as AppBar;
+        expect(appBar.backgroundColor, archivedColor);
+
+        verify(mockedMemRepository.shipWhereIdIs(memId)).called(1);
+      },
+    );
   });
 
   testWidgets(
@@ -79,7 +113,7 @@ void main() {
       // );
       // await widgetTester.pumpAndSettle();
       //
-      // ここで、フォーカスがはずれていることを確認したかったが、確認できなかった
+      // TODO ここで、フォーカスがはずれていることを確認したかったが、確認できなかった
       // expect(focusNode.hasPrimaryFocus, true);
     },
     skip: true,
