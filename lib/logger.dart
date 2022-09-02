@@ -115,14 +115,13 @@ class Logger {
     );
   }
 
-  void _messageLog(Level level, dynamic message, {StackTrace? stackTrace}) {
-    _logger.log(
-      level._convertIntoEx(),
-      message.toString().split('\n').first,
-      null,
-      stackTrace,
-    );
-  }
+  void _messageLog(Level level, dynamic message, {StackTrace? stackTrace}) =>
+      _logger.log(
+        level._convertIntoEx(),
+        message.toString().split('\n').first,
+        null,
+        stackTrace,
+      );
 
   String _buildMessageWithValue(String base, dynamic value) =>
       value == null ? base : '$base :: $value';
