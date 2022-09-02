@@ -25,66 +25,64 @@ void main() {
   });
 
   group('Show', () {
-    group(': new', () {
-      testWidgets(': not found.', (widgetTester) async {
-        when(mockedMemRepository.shipWhereIdIs(any))
-            .thenThrow(NotFoundException('test target', 'test condition'));
+    testWidgets(': not found.', (widgetTester) async {
+      when(mockedMemRepository.shipWhereIdIs(any))
+          .thenThrow(NotFoundException('test target', 'test condition'));
 
-        await pumpMemDetailPage(widgetTester, 1);
+      await pumpMemDetailPage(widgetTester, 1);
 
-        expectMemNameOnMemDetail(widgetTester, '');
-        expect(saveFabFinder, findsOneWidget);
-        final appBar = widgetTester.widget(appBarFinder) as AppBar;
-        expect(appBar.backgroundColor, primaryColor);
+      expectMemNameOnMemDetail(widgetTester, '');
+      expect(saveFabFinder, findsOneWidget);
+      final appBar = widgetTester.widget(appBarFinder) as AppBar;
+      expect(appBar.backgroundColor, primaryColor);
 
-        verify(mockedMemRepository.shipWhereIdIs(1)).called(1);
-      });
-
-      testWidgets(': found.', (widgetTester) async {
-        const memId = 1;
-        const memName = 'test mem name';
-        when(mockedMemRepository.shipWhereIdIs(any))
-            .thenAnswer((realInvocation) async => Mem(
-                  id: memId,
-                  name: memName,
-                  createdAt: DateTime.now(),
-                ));
-
-        await pumpMemDetailPage(widgetTester, memId);
-
-        expectMemNameOnMemDetail(widgetTester, memName);
-        expect(saveFabFinder, findsOneWidget);
-        final appBar = widgetTester.widget(appBarFinder) as AppBar;
-        expect(appBar.backgroundColor, primaryColor);
-
-        verify(mockedMemRepository.shipWhereIdIs(memId)).called(1);
-      });
+      verify(mockedMemRepository.shipWhereIdIs(1)).called(1);
     });
 
-    testWidgets(
-      ': archived',
-      (widgetTester) async {
-        const memId = 1;
-        const memName = 'test mem name';
+    testWidgets(': found.', (widgetTester) async {
+      const memId = 1;
+      const memName = 'test mem name';
+      when(mockedMemRepository.shipWhereIdIs(any))
+          .thenAnswer((realInvocation) async => Mem(
+                id: memId,
+                name: memName,
+                createdAt: DateTime.now(),
+              ));
 
-        when(mockedMemRepository.shipWhereIdIs(any))
-            .thenAnswer((realInvocation) async => Mem(
-                  id: memId,
-                  name: memName,
-                  createdAt: DateTime.now(),
-                  archivedAt: DateTime.now(),
-                ));
+      await pumpMemDetailPage(widgetTester, memId);
 
-        await pumpMemDetailPage(widgetTester, memId);
-        await widgetTester.pump();
+      expectMemNameOnMemDetail(widgetTester, memName);
+      expect(saveFabFinder, findsOneWidget);
+      final appBar = widgetTester.widget(appBarFinder) as AppBar;
+      expect(appBar.backgroundColor, primaryColor);
 
-        final appBar = widgetTester.widget(appBarFinder) as AppBar;
-        expect(appBar.backgroundColor, archivedColor);
-
-        verify(mockedMemRepository.shipWhereIdIs(memId)).called(1);
-      },
-    );
+      verify(mockedMemRepository.shipWhereIdIs(memId)).called(1);
+    });
   });
+
+  testWidgets(
+    ': archived.',
+    (widgetTester) async {
+      const memId = 1;
+      const memName = 'test mem name';
+
+      when(mockedMemRepository.shipWhereIdIs(any))
+          .thenAnswer((realInvocation) async => Mem(
+                id: memId,
+                name: memName,
+                createdAt: DateTime.now(),
+                archivedAt: DateTime.now(),
+              ));
+
+      await pumpMemDetailPage(widgetTester, memId);
+      await widgetTester.pump();
+
+      final appBar = widgetTester.widget(appBarFinder) as AppBar;
+      expect(appBar.backgroundColor, archivedColor);
+
+      verify(mockedMemRepository.shipWhereIdIs(memId)).called(1);
+    },
+  );
 
   testWidgets(
     'Edit: keep focus mem name.',
