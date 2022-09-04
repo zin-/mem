@@ -7,20 +7,20 @@ import 'package:mem/repositories/mem_repository.dart';
 
 const _memIdKey = '_memId';
 
+final memProvider =
+    StateNotifierProvider.family<ValueStateNotifier<Mem?>, Mem?, int?>(
+  (ref, memId) => v(
+    {'memId': memId},
+    () => ValueStateNotifier(null),
+  ),
+);
+
 final memMapProvider = StateNotifierProvider.family<
     ValueStateNotifier<Map<String, dynamic>>, Map<String, dynamic>, int?>(
   (ref, memId) => v(
     {'memId': memId},
     () => ValueStateNotifier(
         (ref.watch(memProvider(memId))?.toMap() ?? {})..[_memIdKey] = memId),
-  ),
-);
-
-final memProvider =
-    StateNotifierProvider.family<ValueStateNotifier<Mem?>, Mem?, int?>(
-  (ref, memId) => v(
-    {'memId': memId},
-    () => ValueStateNotifier(null),
   ),
 );
 
@@ -71,6 +71,7 @@ final saveMem = Provider.autoDispose.family<Future<bool>, Map<String, dynamic>>(
   ),
 );
 
+// FIXME memMapを受け取ると変更途中で更新していない項目も受け取ってしまうのでは？
 final archiveMem = Provider.family<Future<Mem>, Map<String, dynamic>>(
   (ref, memMap) => v(
     {'memMap': memMap},

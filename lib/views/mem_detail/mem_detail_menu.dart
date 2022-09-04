@@ -36,13 +36,18 @@ class MemDetailMenu extends StatelessWidget {
           color: Colors.white,
           onPressed: () {
             if (Mem.isSavedMap(_memMap)) {
-              ref.read(archiveMem(_memMap)).then((archived) {
-                // TODO ここでMemDetailPageのwillPopを呼べれば、archivedを返却する必要はなくなる
-                Navigator.of(context).pop(archived);
-              });
-            } else {
-              Navigator.of(context).pop(null);
+              ref.read(archiveMem(_memMap)).then(
+                    (archived) => ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                            L10n().archiveMemSuccessMessage(archived.name)),
+                        duration: defaultDismissDuration,
+                        dismissDirection: DismissDirection.horizontal,
+                      ),
+                    ),
+                  );
             }
+            Navigator.of(context).pop(null);
           },
         ),
       );
@@ -52,9 +57,16 @@ class MemDetailMenu extends StatelessWidget {
         () => IconButton(
           icon: const Icon(Icons.unarchive),
           color: Colors.white,
-          onPressed: () {
-            ref.read(unarchiveMem(_memMap));
-          },
+          onPressed: () => ref.read(unarchiveMem(_memMap)).then(
+                (archived) => ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content:
+                        Text(L10n().unarchiveMemSuccessMessage(archived.name)),
+                    duration: defaultDismissDuration,
+                    dismissDirection: DismissDirection.horizontal,
+                  ),
+                ),
+              ),
         ),
       );
 

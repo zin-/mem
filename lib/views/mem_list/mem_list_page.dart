@@ -82,46 +82,41 @@ class MemListPage extends StatelessWidget {
 
 void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
       {'context': context, 'memId': memId},
-      () {
-        Navigator.of(context)
-            .push<Mem?>(
-              PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    MemDetailPage(memId),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) =>
-                        SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(1, 0),
-                    end: Offset.zero,
-                  ).animate(animation),
-                  child: child,
-                ),
-                transitionDuration: defaultTransitionDuration,
-                reverseTransitionDuration: defaultTransitionDuration,
+      () => Navigator.of(context)
+          .push<Mem?>(
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  MemDetailPage(memId),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) =>
+                      SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(1, 0),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
               ),
-            )
-            .then(
-              (result) => v(
-                {'result': result},
-                () {
+              transitionDuration: defaultTransitionDuration,
+              reverseTransitionDuration: defaultTransitionDuration,
+            ),
+          )
+          .then(
+            (result) => v(
+              {'result': result},
+              () {
+                if (memId == null) {
+                  ref.read(memProvider(memId).notifier).updatedBy(null);
+                  if (result != null) {
+                    ref.read(memListProvider.notifier).add(result);
+                  }
+                } else {
                   if (result == null) {
-                    if (memId != null) {
-                      ref.read(memListProvider.notifier).remove(
-                            (item) => item.id == memId,
-                          );
-                    }
-                  } else {
-                    ref.read(memListProvider.notifier).add(
-                          result,
-                          (item) => item.id == result.id,
+                    ref.read(memListProvider.notifier).remove(
+                          (item) => item.id == memId,
                         );
                   }
-                  if (memId == null) {
-                    ref.read(memMapProvider(memId).notifier).updatedBy({});
-                  }
-                },
-              ),
-            );
-      },
+                }
+              },
+            ),
+          ),
     );

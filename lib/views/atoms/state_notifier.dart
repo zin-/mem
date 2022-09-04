@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/logger.dart';
 
 class ValueStateNotifier<T> extends StateNotifier<T> {
   ValueStateNotifier(super.state);
@@ -20,22 +21,37 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
   }) : super(state);
 
   @override
-  List<T> updatedBy(List<T> value) =>
-      super.updatedBy(List.of(value.where(filter ?? (_) => true))
-          .sorted(compare ?? (a, b) => 0));
+  List<T> updatedBy(List<T> value) => v(
+        {'value': value},
+        () => super.updatedBy(
+          List.of(value.where(filter ?? (_) => true))
+              .sorted(compare ?? (a, b) => 0),
+        ),
+      );
 
-  // TODO naming
-  void add(T item, bool Function(T item) where) {
-    final tmp = List.of(state);
+  void add(T item) => v(
+        {'item': item},
+        () {
+          final tmp = List.of(state);
+          tmp.add(item);
+          updatedBy(tmp);
+        },
+      );
 
-    final index = state.indexWhere(where);
-    if (index == -1) {
-      tmp.add(item);
-    } else {
-      tmp.replaceRange(index, index + 1, [item]);
-    }
-    updatedBy(tmp);
-  }
+  void update(T item, bool Function(T item) where) => v(
+        {'item': item, 'where': where},
+        () {
+          final tmp = List.of(state);
+
+          final index = state.indexWhere(where);
+          if (index > -1) {
+            tmp.replaceRange(index, index + 1, [item]);
+            updatedBy(tmp);
+          } else {
+            add(item);
+          }
+        },
+      );
 
   void remove(bool Function(T item) where) {
     final tmp = List.of(state);

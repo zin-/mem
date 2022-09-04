@@ -11,6 +11,18 @@
   "memNameIsRequiredWarn": "Name is required.",
   "showNotArchivedLabel": "Show not archived",
   "showArchivedLabel": "Show archived",
+  "archiveMemSuccessMessage": "Archive success. {memName}",
+  "@archiveMemSuccessMessage": {
+    "placeholders": {
+      "memName": {}
+    }
+  },
+  "unarchiveMemSuccessMessage": "Unarchive success. {memName}",
+  "@unarchiveMemSuccessMessage": {
+    "placeholders": {
+      "memName": {}
+    }
+  },
   "removeAction": "Remove",
   "removeConfirmation": "Can I remove this?",
   "removeMemSuccessMessage": "Remove success. {memName}",
