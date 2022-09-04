@@ -105,23 +105,13 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
               (result) => v(
                 {'result': result},
                 () {
-                  // TODO 全体的に構造を変えたほうがよいかも
                   if (memId == null) {
                     ref.read(memProvider(memId).notifier).updatedBy(null);
                     if (result != null) {
                       ref.read(memListProvider.notifier).addV2(result);
                     }
                   } else {
-                    // memId != nullのときは保存済みなので、
-                    //   更新されている場合、そもそもmemListProviderが見ているべき
-                    //     archiveも更新に含まれるし、その後表示するかどうかはfilter次第
-                    //   削除されている場合、nullが返ってくるのでmemListProviderから削除
-                    //     詳細からもクリア
-                    dev('memId is not null');
-                  }
-
-                  if (result == null) {
-                    if (memId != null) {
+                    if (result == null) {
                       ref.read(memListProvider.notifier).remove(
                             (item) => item.id == memId,
                           );
