@@ -68,7 +68,6 @@ final saveMem = Provider.autoDispose.family<Future<bool>, Map<String, dynamic>>(
 
       return true;
     },
-    debug: true,
   ),
 );
 

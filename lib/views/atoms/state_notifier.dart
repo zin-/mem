@@ -21,9 +21,13 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
   }) : super(state);
 
   @override
-  List<T> updatedBy(List<T> value) =>
-      super.updatedBy(List.of(value.where(filter ?? (_) => true))
-          .sorted(compare ?? (a, b) => 0));
+  List<T> updatedBy(List<T> value) => v(
+        {'value': value},
+        () => super.updatedBy(
+          List.of(value.where(filter ?? (_) => true))
+              .sorted(compare ?? (a, b) => 0),
+        ),
+      );
 
   void addV2(T item) => v(
         {'item': item},
@@ -32,7 +36,6 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
           tmp.add(item);
           updatedBy(tmp);
         },
-        debug: true,
       );
 
   void update(T item, bool Function(T item) where) => v(
@@ -45,26 +48,10 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
             tmp.replaceRange(index, index + 1, [item]);
             updatedBy(tmp);
           } else {
-            warn('Item not found. So I call add.');
             addV2(item);
           }
         },
-        debug: true,
       );
-
-  // TODO naming
-  @Deprecated('dev')
-  void add(T item, bool Function(T item) where) {
-    final tmp = List.of(state);
-
-    final index = state.indexWhere(where);
-    if (index == -1) {
-      tmp.add(item);
-    } else {
-      tmp.replaceRange(index, index + 1, [item]);
-    }
-    updatedBy(tmp);
-  }
 
   void remove(bool Function(T item) where) {
     final tmp = List.of(state);
