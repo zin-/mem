@@ -72,6 +72,7 @@ final saveMem = Provider.autoDispose.family<Future<bool>, Map<String, dynamic>>(
   ),
 );
 
+// FIXME memMapを受け取ると変更途中で更新していない項目も受け取ってしまうのでは？
 final archiveMem = Provider.family<Future<Mem>, Map<String, dynamic>>(
   (ref, memMap) => v(
     {'memMap': memMap},
