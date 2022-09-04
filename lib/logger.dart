@@ -187,6 +187,7 @@ class _LogPrinter extends ex.PrettyPrinter {
   @override
   String? formatStackTrace(StackTrace? stackTrace, int methodCount) {
     var lines = stackTrace.toString().split('\n');
+    // FIXME naming
     var discarded = <String>[];
     for (var line in lines) {
       if (line.isEmpty ||
