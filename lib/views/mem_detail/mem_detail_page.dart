@@ -31,7 +31,7 @@ class MemDetailPage extends StatelessWidget {
             () {
               final mem = ref.watch(memProvider(_memId));
               final memMap = ref.watch(memMapProvider(_memId));
-
+              dev({'mem': mem, 'memMap': memMap});
               return WillPopScope(
                 child: Scaffold(
                   appBar: AppBar(
