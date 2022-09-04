@@ -17,7 +17,7 @@ final fetchMemList = FutureProvider<List<Mem>>(
       final mems = await MemRepository().ship(archived);
 
       for (var mem in mems) {
-        ref.read(memListProvider.notifier).add(
+        ref.read(memListProvider.notifier).update(
               mem,
               (item) => item.id == mem.id,
             );

@@ -118,6 +118,9 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
                   if (memId == null) {
                     dev('memId is null');
                     ref.read(memProvider(memId).notifier).updatedBy(null);
+                    if (result != null) {
+                      ref.read(memListProvider.notifier).addV2(result);
+                    }
                   } else {
                     dev('memId is not null');
                   }
@@ -128,14 +131,13 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
                           );
                     }
                   } else {
-                    ref.read(memListProvider.notifier).add(
-                          result,
-                          (item) => item.id == result.id,
-                        );
+                    if (memId != null) {
+                      ref.read(memListProvider.notifier).add(
+                            result,
+                            (item) => item.id == result.id,
+                          );
+                    }
                   }
-                  // if (memId == null) {
-                  //   ref.read(memMapProvider(memId).notifier).updatedBy({});
-                  // }
                 },
                 debug: true,
               ),

@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/logger.dart';
 
 class ValueStateNotifier<T> extends StateNotifier<T> {
   ValueStateNotifier(super.state);
@@ -24,7 +25,35 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
       super.updatedBy(List.of(value.where(filter ?? (_) => true))
           .sorted(compare ?? (a, b) => 0));
 
+  void addV2(T item) => v(
+        {'item': item},
+        () {
+          final tmp = List.of(state);
+          tmp.add(item);
+          updatedBy(tmp);
+        },
+        debug: true,
+      );
+
+  void update(T item, bool Function(T item) where) => v(
+        {'item': item, 'where': where},
+        () {
+          final tmp = List.of(state);
+
+          final index = state.indexWhere(where);
+          if (index > -1) {
+            tmp.replaceRange(index, index + 1, [item]);
+            updatedBy(tmp);
+          } else {
+            warn('Item not found. So I call add.');
+            addV2(item);
+          }
+        },
+        debug: true,
+      );
+
   // TODO naming
+  @Deprecated('dev')
   void add(T item, bool Function(T item) where) {
     final tmp = List.of(state);
 
