@@ -221,7 +221,9 @@ class _LogPrinter extends ex.PrettyPrinter {
   bool _discardWebStacktraceLine(String line) {
     var match = _webStackTraceRegex.matchAsPrefix(line);
     if (match == null) {
-      return false;
+      return line.contains('dart-sdk') ||
+          line.contains('flutter_web_sdk') ||
+          line.contains('web_entrypoint');
     }
     return match.group(1)!.startsWith('packages/$filePath');
   }
@@ -237,5 +239,5 @@ class _LogPrinter extends ex.PrettyPrinter {
 
 // Copied from package:logger/logger/printers/pretty_printer.dart
 final _deviceStackTraceRegex = RegExp(r'#[0-9]+\s+(.+) \((\S+)\)');
-final _webStackTraceRegex = RegExp(r'^((packages|dart-sdk)/\S+/)');
+final _webStackTraceRegex = RegExp(r'^((packages|dart-sdk)/\S+/\S+)');
 final _browserStackTraceRegex = RegExp(r'^(?:package:)?(dart:\S+|\S+)');
