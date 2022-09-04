@@ -22,6 +22,12 @@ class L10n {
 
   String showArchivedLabel() => _appLocalizations.showArchivedLabel;
 
+  String archiveMemSuccessMessage(String memName) =>
+      _appLocalizations.archiveMemSuccessMessage(memName);
+
+  String unarchiveMemSuccessMessage(String memName) =>
+      _appLocalizations.unarchiveMemSuccessMessage(memName);
+
   String removeAction() => _appLocalizations.removeAction;
 
   String removeConfirmation() => _appLocalizations.removeConfirmation;
