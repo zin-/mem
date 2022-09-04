@@ -108,7 +108,7 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
                   if (memId == null) {
                     ref.read(memProvider(memId).notifier).updatedBy(null);
                     if (result != null) {
-                      ref.read(memListProvider.notifier).addV2(result);
+                      ref.read(memListProvider.notifier).add(result);
                     }
                   } else {
                     if (result == null) {

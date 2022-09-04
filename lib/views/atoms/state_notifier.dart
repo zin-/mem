@@ -29,7 +29,7 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
         ),
       );
 
-  void addV2(T item) => v(
+  void add(T item) => v(
         {'item': item},
         () {
           final tmp = List.of(state);
@@ -48,7 +48,7 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
             tmp.replaceRange(index, index + 1, [item]);
             updatedBy(tmp);
           } else {
-            addV2(item);
+            add(item);
           }
         },
       );
