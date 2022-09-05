@@ -9,5 +9,7 @@ jobs:
         run: ./.github/workflows/scripts/install-flutter.sh
       - name: flutter pub get
         run: flutter pub get
+      - name: build
+        run: ./.github/workflows/scripts/build.sh
       - name: Analyze
         run: flutter analyze
