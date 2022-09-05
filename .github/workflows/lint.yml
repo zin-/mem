@@ -1,7 +1,7 @@
 name: Lint
 on: [push]
 jobs:
-  Unit-test:
+  Lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2.3.4
