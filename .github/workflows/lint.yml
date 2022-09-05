@@ -1,4 +1,4 @@
-name: Unit test
+name: Lint
 on: [push]
 jobs:
   Unit-test:
