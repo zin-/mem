@@ -10,4 +10,4 @@ jobs:
       - name: flutter pub get
         run: flutter pub get
       - name: Analyze
-        run: dart analyze . --fatal-infos
+        run: flutter analyze
