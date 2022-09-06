@@ -10,3 +10,8 @@ jobs:
         uses: ./.github/actions/setup-flutters
       - name: test
         run: flutter test --coverage --coverage-path=~/coverage/lcov.info
+  Integration-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test
+        run: flutter doctor
