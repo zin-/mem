@@ -7,7 +7,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       - name: Setup Flutter
-        uses: ./.github/actions/setup-flutters
+        uses: ./.github/actions/setup-flutter
       - name: test
         run: flutter test --coverage --coverage-path=~/coverage/lcov.info
   Integration-test:
