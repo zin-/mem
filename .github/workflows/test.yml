@@ -11,4 +11,4 @@ jobs:
       - name: Test
         run: flutter test --coverage --coverage-path=~/coverage/lcov.info
       - name: Integration test on Linux
-        run: flutter test --machine -d Chrome integration_test\all.dart
+        run: flutter test --machine -d linux integration_test\all.dart
