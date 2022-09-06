@@ -4,9 +4,9 @@ jobs:
   Unit-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.3.4
-      - name: Install Flutter
-        run: ./.github/workflows/scripts/install-flutter.sh
-      - name: build
-        run: ./.github/workflows/scripts/build.sh
-      - run: flutter test --coverage --coverage-path=~/coverage/lcov.info
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup Flutter
+        uses: ./.github/actions/setup-flutters
+      - name: test
+        run: flutter test --coverage --coverage-path=~/coverage/lcov.info
