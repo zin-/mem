@@ -35,16 +35,16 @@ dependencies:
   intl:
 
 dev_dependencies:
+  # for Test mock
+  test:
   integration_test:
-      sdk: flutter
+    sdk: flutter
   flutter_test:
     sdk: flutter
-
-  flutter_lints: ^2.0.0
-
-  # for Test mock
   mockito:
   build_runner:
+
+  flutter_lints: ^2.0.0
 
   # for Icon
   flutter_launcher_icons:
