@@ -14,11 +14,10 @@ jobs:
           flutter-version: '3.0.3'
           channel: 'stable'
           cache: true
-      - name: flutter doctor
+      - name: Flutter Doctor
         run: flutter doctor -v
       - name: Install dependencies
         run: flutter pub get
-      - run: flutter packages get
       - name: Build
         run: ./.github/workflows/scripts/build.sh
       - name: Analyze
