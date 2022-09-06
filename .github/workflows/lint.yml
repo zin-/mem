@@ -13,7 +13,6 @@ jobs:
         with:
           flutter-version: '3.0.3'
           channel: 'stable'
-          fetch-depth: 1
           cache: true
       - name: Flutter Doctor
         run: flutter doctor -v
