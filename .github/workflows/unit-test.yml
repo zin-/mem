@@ -1,7 +1,7 @@
-name: Unit test
+name: Test
 on: [push]
 jobs:
-  Unit-test:
+  Test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
