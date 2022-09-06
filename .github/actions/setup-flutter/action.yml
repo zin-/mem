@@ -10,10 +10,14 @@ runs:
         flutter-version: '3.0.3'
         channel: 'stable'
         cache: true
+      shell: bash
     - name: Flutter Doctor
       run: flutter doctor -v
+      shell: bash
     - name: Install dependencies
       run: flutter pub get
+      shell: bash
     - name: Build
       run: ./.github/workflows/scripts/build.sh
+      shell: bash
 
