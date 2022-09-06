@@ -6,8 +6,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-#      - name: Install Flutter
-#        run: ./.github/workflows/scripts/install-flutter.sh
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
