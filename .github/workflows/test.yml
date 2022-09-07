@@ -9,14 +9,14 @@ jobs:
       - name: Setup Flutter
         uses: ./.github/actions/setup-flutter
       - name: Unit test
-        run: flutter test --coverage --coverage-path=~/coverage/lcov.info
+        run: flutter test --coverage --coverage-path=~/coverage/lcov-unittests.info
 #      - name: Integration test on Windows
 #        run: flutter test --machine -d windows --coverage ./integration_test/all.dart
       - name: Upload coverage
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage/lcov.info
+          files: ./coverage/lcov-unittests.info
           flags: unittests
           fail_ci_if_error: true
           verbose: true
