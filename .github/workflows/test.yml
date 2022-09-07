@@ -8,8 +8,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Setup Flutter
         uses: ./.github/actions/setup-flutter
-#        時間短縮のため一旦コメントアウト
-#      - name: Test
-#        run: flutter test --coverage --coverage-path=~/coverage/lcov.info
+      - name: Test
+        run: flutter test --coverage --coverage-path=~/coverage/lcov.info
       - name: Integration test on Windows
         run: flutter test --machine -d windows --coverage ./integration_test/all.dart
