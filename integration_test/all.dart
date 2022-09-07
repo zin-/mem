@@ -4,7 +4,7 @@ import 'package:mem/database/database_factory.dart';
 import 'package:mem/logger.dart';
 import 'database/database_test.dart' as database_test;
 import 'database/database_factory_test.dart' as database_factory_test;
-import 'database/database-on_web_test.dart' as database_on_web_test;
+import 'database/database_on_web_test.dart' as database_on_web_test;
 
 import 'mem_repository_test.dart' as mem_repository_test;
 import 'app_test.dart' as app_test;

@@ -60,7 +60,7 @@ void main() {
 
     when(mockedMemRepository.shipWhereIdIs(any))
         .thenAnswer((realInvocation) async => mem);
-    when(mockedMemRepository.unarchive(mem)).thenAnswer((realInvocation) async {
+    when(mockedMemRepository.unarchive(any)).thenAnswer((realInvocation) async {
       final mem = realInvocation.positionalArguments[0] as Mem;
 
       return Mem.fromMap(mem.toMap()..['archivedAt'] = null);
