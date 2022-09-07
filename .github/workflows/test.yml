@@ -13,12 +13,6 @@ jobs:
         with:
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
       - name: Integration test on Windows
-        run: flutter test ./integration_test/all.dart --machine -d windows --coverage --coverage-path=./coverage/lcov-integration_tests-windows.info
-      - name: Upload Windows integration test coverage
-        uses: codecov/codecov-action@v3
+        uses: ./.github/actions/integration-test-on-windows
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage/lcov-integration_tests-windows.info
-          flags: windows-integration_tests
-          fail_ci_if_error: true
-          verbose: true
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}

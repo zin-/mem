@@ -14,5 +14,3 @@ runs:
         token: ${{ inputs.codecov-token }}
         files: ./coverage/lcov-unit_tests.info
         flags: unit_tests
-        fail_ci_if_error: true
-        verbose: true

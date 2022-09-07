@@ -43,4 +43,3 @@ runs:
       name: Build
       run: ./.github/workflows/scripts/build.sh
       shell: bash
-
