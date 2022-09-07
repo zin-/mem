@@ -39,7 +39,8 @@ runs:
         key: build-${{ hashFiles('**/pubspec.lock') }}
         restore-keys: |
           build-
-    - name: Build
+    - if: ${{ steps.cahce-build.outputs.cache-hit != 'true' }}
+      name: Build
       run: ./.github/workflows/scripts/build.sh
       shell: bash
 
