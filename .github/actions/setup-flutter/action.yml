@@ -23,8 +23,9 @@ runs:
           **/.dart_tool/package_config.json
         key: install-dependencies-${{ hashFiles('**/pubspec.lock') }}
         restore-keys: |
-          build-pubspec-
-    - name: Install dependencies
+          install-dependencies-
+    - if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
+      name: Install dependencies
       run: flutter pub get
       shell: bash
     - name: Build
