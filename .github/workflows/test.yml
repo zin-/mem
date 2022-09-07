@@ -9,9 +9,9 @@ jobs:
       - name: Setup Flutter
         uses: ./.github/actions/setup-flutter
       - name: Unit test
-        run: flutter test --coverage --coverage-path=~/coverage/lcov-unit_tests.info
+        run: flutter test --coverage --coverage-path=./coverage/lcov-unit_tests.info
       - name: Integration test on Windows
-        run: flutter test ./integration_test/all.dart --machine -d windows --coverage --coverage-path=~/coverage/lcov-integration_tests-windows.info
+        run: flutter test ./integration_test/all.dart --machine -d windows --coverage --coverage-path=./coverage/lcov-integration_tests-windows.info
       - name: Upload unit test coverage
         uses: codecov/codecov-action@v3
         with:
