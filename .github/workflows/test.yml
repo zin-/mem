@@ -11,5 +11,5 @@ jobs:
 #        時間短縮のため一旦コメントアウト
 #      - name: Test
 #        run: flutter test --coverage --coverage-path=~/coverage/lcov.info
-      - name: Integration test on Linux
-        run: flutter test --machine -d windows ./integration_test/all.dart
+      - name: Integration test on Windows
+        run: flutter test --machine -d windows --coverage ./integration_test/all.dart
