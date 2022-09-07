@@ -10,6 +10,8 @@ jobs:
         uses: ./.github/actions/setup-flutter
       - name: Unit test
         uses: ./.github/actions/unit-test
+        with:
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
       - name: Integration test on Windows
         run: flutter test ./integration_test/all.dart --machine -d windows --coverage --coverage-path=./coverage/lcov-integration_tests-windows.info
       - name: Upload Windows integration test coverage

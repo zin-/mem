@@ -1,4 +1,7 @@
 name: Unit test
+inputs:
+  codecov-token:
+    required: true
 runs:
   using: "composite"
   steps:
@@ -8,7 +11,7 @@ runs:
     - name: Upload unit test coverage
       uses: codecov/codecov-action@v3
       with:
-        token: ${{ secrets.CODECOV_TOKEN }}
+        token: ${{ inputs.codecov-token }}
         files: ./coverage/lcov-unit_tests.info
         flags: unit_tests
         fail_ci_if_error: true
