@@ -28,6 +28,17 @@ runs:
       name: Install dependencies
       run: flutter pub get
       shell: bash
+    - name: Cache build
+      id: cahce-build
+      uses: actions/cache@v3
+      with:
+        path: |
+          **/.dart_tool/build
+          **/.dart_tool/flutter_gen
+          **/test/mocks.mocks.dart
+        key: build-${{ hashFiles('**/pubspec.lock') }}
+        restore-keys: |
+          build-
     - name: Build
       run: ./.github/workflows/scripts/build.sh
       shell: bash
