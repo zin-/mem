@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'package:logger/logger.dart' as ex;
 
 const filePath = 'mem/logger';
