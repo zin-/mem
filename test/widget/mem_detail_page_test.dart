@@ -118,6 +118,17 @@ void main() {
   );
 
   group('Save', () {
+    testWidgets(': name is required.', (widgetTester) async {
+      await pumpMemDetailPage(widgetTester, null);
+
+      await widgetTester.tap(saveFabFinder);
+
+      expect(find.text('Name is required'), findsNothing);
+
+      verifyNever(mockedMemRepository.shipWhereIdIs(any));
+      verifyNever(mockedMemRepository.receive(any));
+    });
+
     testWidgets(': create.', (widgetTester) async {
       const enteringMemName = 'entering mem name';
 
