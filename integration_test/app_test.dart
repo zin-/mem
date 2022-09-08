@@ -133,6 +133,13 @@ void main() {
       await closeMemListFilter(widgetTester);
 
       expect(find.text(savedMemName), findsNothing);
+
+      expect(removeMemSuccessFinder(savedMemName), findsOneWidget);
+
+      await widgetTester.tap(undoButtonFinder);
+      await widgetTester.pumpAndSettle();
+
+      expectMemNameTextOnListAt(widgetTester, 0, savedMemName);
     });
   });
 }
@@ -210,6 +217,9 @@ Future<void> checkSavedSnackBarAndDismiss(
 Finder saveMemSuccessFinder(String memName) =>
     find.text('Save success. $memName');
 
+Finder removeMemSuccessFinder(String memName) =>
+    find.text('Remove success. $memName');
+
 final archiveButtonFinder = find.descendant(
   of: appBarFinder,
   matching: find.byIcon(Icons.archive),
@@ -230,5 +240,6 @@ Future<void> showRemoveMemConfirmDialog(WidgetTester widgetTester) async {
 
 final removeButtonFinder = find.byIcon(Icons.delete);
 final removeConfirmationFinder = find.text('Can I remove this?');
+final undoButtonFinder = find.text('Undo');
 final cancelButtonFinder = find.text('Cancel');
 final okButtonFinder = find.text('OK');
