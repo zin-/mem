@@ -107,19 +107,7 @@ class MemDetailMenu extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () async {
                     if (Mem.isSavedMap(_memMap)) {
-                      final scaffoldMessenger = ScaffoldMessenger.of(context);
-                      ref.read(removeMem(_memMap['id'])).then((result) {
-                        if (result) {
-                          scaffoldMessenger.showSnackBar(
-                            SnackBar(
-                              content: Text(L10n()
-                                  .removeMemSuccessMessage(_memMap['name'])),
-                              duration: defaultDismissDuration,
-                              dismissDirection: DismissDirection.horizontal,
-                            ),
-                          );
-                        }
-                      });
+                      ref.read(removeMem(_memMap['id']));
                     }
                     Navigator.of(context)
                       ..pop()

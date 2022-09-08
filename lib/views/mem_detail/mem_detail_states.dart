@@ -46,27 +46,35 @@ final fetchMemById =
   ),
 );
 
-final saveMem = Provider.autoDispose.family<Future<bool>, Map<String, dynamic>>(
+final createMem =
+    Provider.autoDispose.family<Future<Mem>, Map<String, dynamic>>(
   (ref, memMap) => v(
     {'memMap': memMap},
     () async {
-      final memId = memMap.remove(_memIdKey);
+      memMap.remove(_memIdKey);
 
-      Mem saved;
-      if (Mem.isSavedMap(memMap)) {
-        saved = await MemRepository().update(Mem.fromMap(memMap));
-      } else {
-        saved = await MemRepository().receive(memMap);
-        ref
-            .read(memProvider(saved.id).notifier)
-            .updatedBy(Mem.fromMap(saved.toMap()));
-      }
+      final received = await MemRepository().receive(memMap);
 
-      ref
-          .read(memProvider(memId).notifier)
-          .updatedBy(Mem.fromMap(saved.toMap()));
+      ref.read(memProvider(received.id).notifier).updatedBy(received);
+      ref.read(memProvider(null).notifier).updatedBy(received);
 
-      return true;
+      return received;
+    },
+  ),
+);
+
+final updateMem =
+    Provider.autoDispose.family<Future<Mem>, Map<String, dynamic>>(
+  (ref, memMap) => v(
+    {'memMap': memMap},
+    () async {
+      memMap.remove(_memIdKey);
+
+      final updated = await MemRepository().update(Mem.fromMap(memMap));
+
+      ref.read(memProvider(updated.id).notifier).updatedBy(updated);
+
+      return updated;
     },
   ),
 );
@@ -97,10 +105,6 @@ final unarchiveMem = Provider.family<Future<Mem>, Map<String, dynamic>>(
 final removeMem = Provider.family<Future<bool>, int?>(
   (ref, memId) => v(
     {'memId': memId},
-    () async {
-      final result = await MemRepository().discardWhereIdIs(memId);
-      ref.read(memProvider(memId).notifier).updatedBy(null);
-      return result;
-    },
+    () async => await MemRepository().discardWhereIdIs(memId),
   ),
 );

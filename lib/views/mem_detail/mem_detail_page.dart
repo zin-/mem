@@ -60,21 +60,26 @@ class MemDetailPage extends StatelessWidget {
                     builder: (context, ref, child) {
                       return FloatingActionButton(
                         child: const Icon(Icons.save_alt),
-                        onPressed: () async {
-                          if (_formKey.currentState?.validate() ?? false) {
-                            await ref.read(saveMem(memMap)).then((saveSuccess) {
-                              if (saveSuccess) {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(SnackBar(
-                                  content: Text(L10n()
-                                      .saveMemSuccessMessage(memMap['name'])),
-                                  duration: defaultDismissDuration,
-                                  dismissDirection: DismissDirection.horizontal,
-                                ));
-                              }
-                            });
-                          }
-                        },
+                        onPressed: () => v(
+                          {},
+                          () async {
+                            if (_formKey.currentState?.validate() ?? false) {
+                              final savedFuture =
+                                  _memId == null && mem?.isSaved() != true
+                                      ? ref.read(createMem(memMap))
+                                      : ref.read(updateMem(memMap));
+
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(SnackBar(
+                                content: Text(L10n().saveMemSuccessMessage(
+                                  (await savedFuture).name,
+                                )),
+                                duration: defaultDismissDuration,
+                                dismissDirection: DismissDirection.horizontal,
+                              ));
+                            }
+                          },
+                        ),
                       );
                     },
                   ),

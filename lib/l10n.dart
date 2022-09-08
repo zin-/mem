@@ -32,6 +32,8 @@ class L10n {
 
   String removeConfirmation() => _appLocalizations.removeConfirmation;
 
+  String undoAction() => _appLocalizations.undoAction;
+
   String okAction() => _appLocalizations.okAction;
 
   String cancelAction() => _appLocalizations.cancelAction;
