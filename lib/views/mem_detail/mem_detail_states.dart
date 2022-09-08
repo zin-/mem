@@ -46,6 +46,23 @@ final fetchMemById =
   ),
 );
 
+final createMem =
+    Provider.autoDispose.family<Future<Mem>, Map<String, dynamic>>(
+  (ref, memMap) => v(
+    {'memMap': memMap},
+    () async {
+      memMap.remove(_memIdKey);
+
+      final received = await MemRepository().receive(memMap);
+
+      ref.read(memProvider(received.id).notifier).updatedBy(received);
+      ref.read(memProvider(null).notifier).updatedBy(received);
+
+      return received;
+    },
+  ),
+);
+
 final saveMem = Provider.autoDispose.family<Future<bool>, Map<String, dynamic>>(
   (ref, memMap) => v(
     {'memMap': memMap},

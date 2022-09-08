@@ -60,21 +60,45 @@ class MemDetailPage extends StatelessWidget {
                     builder: (context, ref, child) {
                       return FloatingActionButton(
                         child: const Icon(Icons.save_alt),
-                        onPressed: () async {
-                          if (_formKey.currentState?.validate() ?? false) {
-                            await ref.read(saveMem(memMap)).then((saveSuccess) {
-                              if (saveSuccess) {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(SnackBar(
-                                  content: Text(L10n()
-                                      .saveMemSuccessMessage(memMap['name'])),
-                                  duration: defaultDismissDuration,
-                                  dismissDirection: DismissDirection.horizontal,
-                                ));
+                        onPressed: () => v(
+                          {},
+                          () async {
+                            if (_formKey.currentState?.validate() ?? false) {
+                              final scaffoldMessenger =
+                                  ScaffoldMessenger.of(context);
+                              Mem saved;
+                              if (_memId == null || mem?.isSaved() == false) {
+                                saved = await ref.read(createMem(memMap));
+                                scaffoldMessenger.showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      L10n().saveMemSuccessMessage(saved.name),
+                                    ),
+                                    duration: defaultDismissDuration,
+                                    dismissDirection:
+                                        DismissDirection.horizontal,
+                                  ),
+                                );
+                              } else {
+                                await ref
+                                    .read(saveMem(memMap))
+                                    .then((saveSuccess) {
+                                  if (saveSuccess) {
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(SnackBar(
+                                      content: Text(L10n()
+                                          .saveMemSuccessMessage(
+                                              memMap['name'])),
+                                      duration: defaultDismissDuration,
+                                      dismissDirection:
+                                          DismissDirection.horizontal,
+                                    ));
+                                  }
+                                });
                               }
-                            });
-                          }
-                        },
+                            }
+                          },
+                        ),
                       );
                     },
                   ),
