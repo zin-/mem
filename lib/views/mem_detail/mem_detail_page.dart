@@ -64,38 +64,21 @@ class MemDetailPage extends StatelessWidget {
                           {},
                           () async {
                             if (_formKey.currentState?.validate() ?? false) {
-                              final scaffoldMessenger =
-                                  ScaffoldMessenger.of(context);
-                              Mem saved;
-                              if (_memId == null || mem?.isSaved() == false) {
-                                saved = await ref.read(createMem(memMap));
-                                scaffoldMessenger.showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      L10n().saveMemSuccessMessage(saved.name),
-                                    ),
-                                    duration: defaultDismissDuration,
-                                    dismissDirection:
-                                        DismissDirection.horizontal,
+                              final savedFuture =
+                                  _memId == null && mem?.isSaved() != true
+                                      ? ref.read(createMem(memMap))
+                                      : ref.read(updateMem(memMap));
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    L10n().saveMemSuccessMessage(
+                                        (await savedFuture).name),
                                   ),
-                                );
-                              } else {
-                                await ref
-                                    .read(saveMem(memMap))
-                                    .then((saveSuccess) {
-                                  if (saveSuccess) {
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(SnackBar(
-                                      content: Text(L10n()
-                                          .saveMemSuccessMessage(
-                                              memMap['name'])),
-                                      duration: defaultDismissDuration,
-                                      dismissDirection:
-                                          DismissDirection.horizontal,
-                                    ));
-                                  }
-                                });
-                              }
+                                  duration: defaultDismissDuration,
+                                  dismissDirection: DismissDirection.horizontal,
+                                ),
+                              );
                             }
                           },
                         ),
