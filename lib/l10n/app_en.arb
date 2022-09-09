@@ -2,6 +2,7 @@
   "appTitle": "Mem",
   "memListPageTitle": "List",
   "memDetailPageTitle": "Detail",
+  "memNameLabel": "Name *",
   "saveMemSuccessMessage": "Save success. {memName}",
   "@saveMemSuccessMessage": {
     "placeholders": {
