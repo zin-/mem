@@ -105,19 +105,32 @@ class MemDetailPage extends StatelessWidget {
   ) =>
       v(
         {'memMap': memMap, 'ref': ref},
-        () => Column(
-          children: [
-            MemNameTextFormField(
-              memMap['name'] ?? '',
-              memMap['id'],
-              (value) => (value?.isEmpty ?? false)
-                  ? L10n().memNameIsRequiredWarn()
-                  : null,
-              (value) => ref
-                  .read(memMapProvider(_memId).notifier)
-                  .updatedBy(Map.of(memMap..['name'] = value)),
-            ),
-          ],
+        () => SingleChildScrollView(
+          child: Column(
+            // () => Column(
+            children: [
+              MemNameTextFormField(
+                memMap['name'] ?? '',
+                memMap['id'],
+                (value) => (value?.isEmpty ?? false)
+                    ? L10n().memNameIsRequiredWarn()
+                    : null,
+                (value) => ref
+                    .read(memMapProvider(_memId).notifier)
+                    .updatedBy(memMap..['name'] = value),
+              ),
+              TextFormField(
+                decoration: InputDecoration(
+                  icon: const Icon(Icons.subject),
+                  labelText: L10n().memMemoTitle(),
+                ),
+                maxLines: null,
+                onChanged: (value) => ref
+                    .read(memMapProvider(_memId).notifier)
+                    .updatedBy(memMap..['memo'] = value),
+              ),
+            ],
+          ),
         ),
       );
 }

@@ -3,6 +3,7 @@
   "memListPageTitle": "List",
   "memDetailPageTitle": "Detail",
   "memNameLabel": "Name *",
+  "memMemoLabel": "Memo",
   "saveMemSuccessMessage": "Save success. {memName}",
   "@saveMemSuccessMessage": {
     "placeholders": {
