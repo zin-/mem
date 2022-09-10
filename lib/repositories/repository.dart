@@ -80,6 +80,15 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
         },
       );
 
+  Future<bool> discardById(dynamic id) => v(
+        {'id': id},
+        () async {
+          int deletedCount = await table.deleteByPk(id);
+
+          return deletedCount == 1;
+        },
+      );
+
   Entity fromMap(Map<String, dynamic> valueMap) => v(
         {'valueMap': valueMap},
         () => throw UnimplementedError(),

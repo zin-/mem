@@ -66,7 +66,7 @@ void main() async {
 
   group('ship', () {
     test(
-      'all',
+      ': all',
       () async {
         final received1 = await testRepository.receive({
           archivedAtColumnName: null,
@@ -84,7 +84,7 @@ void main() async {
     );
 
     test(
-      'archived',
+      ': archived',
       () async {
         await testRepository.receive({
           archivedAtColumnName: null,
@@ -101,7 +101,7 @@ void main() async {
     );
 
     test(
-      'not archived',
+      ': not archived',
       () async {
         final received1 = await testRepository.receive({
           archivedAtColumnName: null,
@@ -163,4 +163,28 @@ void main() async {
       expect(updated.archivedAt, isNull);
     },
   );
+
+  group('discardById', () {
+    test(
+      ': success',
+      () async {
+        final received = await testRepository.receive({
+          archivedAtColumnName: DateTime.now(),
+        });
+
+        final discardResult = await testRepository.discardById(received.id);
+
+        expect(discardResult, true);
+      },
+    );
+
+    test(
+      ': fail',
+      () async {
+        final discardResult = await testRepository.discardById(0);
+
+        expect(discardResult, false);
+      },
+    );
+  });
 }
