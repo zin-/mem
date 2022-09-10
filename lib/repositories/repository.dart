@@ -7,7 +7,7 @@ const createdAtColumnName = 'createdAt';
 const updatedAtColumnName = 'updatedAt';
 const archivedAtColumnName = 'archivedAt';
 
-class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
+abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
   Future<Entity> receive(Map<String, dynamic> valueMap) => v(
         {'valueMap': valueMap},
         () async {
@@ -17,6 +17,25 @@ class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
           final id = await table.insert(insertingMap);
 
           return fromMap(insertingMap..putIfAbsent(idColumnName, () => id));
+        },
+      );
+
+  Future<List<Entity>> ship({bool? archived}) => v(
+        {'archived': archived},
+        () async {
+          final where = <String>[];
+
+          if (archived != null) {
+            archived
+                ? where.add('archivedAt IS NOT NULL')
+                : where.add('archivedAt IS NULL');
+          }
+
+          return (await table.select(
+            where: where.isEmpty ? null : where.join(' AND '),
+          ))
+              .map((e) => fromMap(e))
+              .toList();
         },
       );
 
@@ -31,17 +50,26 @@ class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
 }
 
 abstract class DatabaseTableEntity {
-  final dynamic id;
-  final DateTime createdAt;
-  final DateTime? updatedAt;
-  final DateTime? archivedAt;
+  late dynamic id;
+  late DateTime createdAt;
+  late DateTime? updatedAt;
+  late DateTime? archivedAt;
 
-  DatabaseTableEntity({
-    required this.id,
-    required this.createdAt,
-    this.updatedAt,
-    this.archivedAt,
-  });
+  DatabaseTableEntity.fromMap(Map<String, dynamic> valueMap)
+      : id = valueMap[idColumnName],
+        createdAt = valueMap[createdAtColumnName],
+        updatedAt = valueMap[updatedAtColumnName],
+        archivedAt = valueMap[archivedAtColumnName];
+
+  Map<String, dynamic> toMap() => {
+        idColumnName: id,
+        createdAtColumnName: createdAt,
+        updatedAtColumnName: updatedAt,
+        archivedAtColumnName: archivedAt,
+      };
+
+  @override
+  String toString() => toMap().toString();
 }
 
 final defaultColumnDefinitions = [

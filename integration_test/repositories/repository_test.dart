@@ -6,32 +6,9 @@ import 'package:mem/database/definitions.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/repositories/repository.dart';
 
-class TestEntity implements DatabaseTableEntity {
+class TestEntity extends DatabaseTableEntity {
   @override
-  final int id;
-  @override
-  final DateTime createdAt;
-  @override
-  final DateTime? updatedAt;
-  @override
-  final DateTime? archivedAt;
-
-  TestEntity({
-    required this.id,
-    required this.createdAt,
-    this.updatedAt,
-    this.archivedAt,
-  });
-
-  factory TestEntity.fromMap(Map<String, dynamic> valueMap) => v(
-        {'valueMap': valueMap},
-        () => TestEntity(
-          id: valueMap[idColumnName],
-          createdAt: valueMap[createdAtColumnName],
-          updatedAt: valueMap[updatedAtColumnName],
-          archivedAt: valueMap[archivedAtColumnName],
-        ),
-      );
+  TestEntity.fromMap(Map<String, dynamic> valueMap) : super.fromMap(valueMap);
 }
 
 class TestRepository extends DatabaseTableRepository<TestEntity> {
@@ -54,14 +31,14 @@ void main() async {
 
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  late final TestRepository testRepository;
+  late TestRepository testRepository;
 
-  setUpAll(() async {
+  setUp(() async {
     testRepository = TestRepository(
       (await DatabaseManager().open(testDatabase)).getTable(testTable.name),
     );
   });
-  tearDownAll(() async {
+  tearDown(() async {
     await DatabaseManager().delete(testDatabase.name);
   });
 
@@ -86,4 +63,58 @@ void main() async {
       expect(result.archivedAt, isNull);
     },
   );
+
+  group('ship', () {
+    test(
+      'all',
+      () async {
+        final received1 = await testRepository.receive({
+          archivedAtColumnName: null,
+        });
+        final received2 = await testRepository.receive({
+          archivedAtColumnName: DateTime.now(),
+        });
+
+        final shipped = await testRepository.ship();
+
+        expect(shipped.length, 2);
+        expect(shipped[0].toMap(), received1.toMap());
+        expect(shipped[1].toMap(), received2.toMap());
+      },
+    );
+
+    test(
+      'archived',
+      () async {
+        await testRepository.receive({
+          archivedAtColumnName: null,
+        });
+        final received2 = await testRepository.receive({
+          archivedAtColumnName: DateTime.now(),
+        });
+
+        final shipped = await testRepository.ship(archived: true);
+
+        expect(shipped.length, 1);
+        expect(shipped[0].toMap(), received2.toMap());
+      },
+    );
+
+    test(
+      'not archived',
+      () async {
+        final received1 = await testRepository.receive({
+          archivedAtColumnName: null,
+        });
+        await testRepository.receive({
+          archivedAtColumnName: DateTime.now(),
+        });
+
+        final shipped = await testRepository.ship(archived: false);
+
+        expect(shipped.length, 1);
+        expect(shipped[0].toMap(), received1.toMap());
+      },
+    );
+  });
 }
