@@ -135,11 +135,11 @@ class SqliteTable extends Table {
   SqliteTable(super.definition, this._database);
 
   @override
-  Future<int> insert(Map<String, dynamic> value) => v(
-        {'value': value},
+  Future<int> insert(Map<String, dynamic> valueMap) => v(
+        {'valueMap': valueMap},
         () async => await _database.onOpened(
           () async => await _database._database
-              .insert(definition.name, convertTo(value)),
+              .insert(definition.name, convertTo(valueMap)),
           () => throw DatabaseDoesNotExistException(_database.definition.name),
         ),
       );

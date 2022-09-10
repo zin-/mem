@@ -41,7 +41,7 @@ abstract class Table {
 
   Table(this.definition);
 
-  Future<int> insert(Map<String, dynamic> value);
+  Future<int> insert(Map<String, dynamic> valueMap);
 
   Future<List<Map<String, dynamic>>> select({
     String? where,
