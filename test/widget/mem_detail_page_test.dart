@@ -84,38 +84,50 @@ void main() {
     },
   );
 
-  testWidgets(
-    'Edit: keep focus mem name.',
-    (widgetTester) async {
-      // final focusNode = FocusNode();
-      // // focusNode.addListener(() {
-      // //   dev('object');
-      // //   dev(focusNode.hasFocus);
-      // //   dev(focusNode.hasPrimaryFocus);
-      // //   if (focusNode.hasFocus && focusNode.hasPrimaryFocus) {
-      // //   } else {
-      // //     fail('out of focus on mem name');
-      // //   }
-      // // });
-      // await pumpMemDetailPage(widgetTester, null, memNameFocusNode: focusNode);
-      //
-      // expect(focusNode.hasPrimaryFocus, false);
-      //
-      // await widgetTester.tap(memNameTextFormFieldFinder);
-      //
-      // expect(focusNode.hasPrimaryFocus, true);
-      //
-      // await widgetTester.enterText(
-      //   memNameTextFormFieldFinder,
-      //   'entering mem name',
-      // );
-      // await widgetTester.pumpAndSettle();
-      //
-      // TODO ここで、フォーカスがはずれていることを確認したかったが、確認できなかった
-      // expect(focusNode.hasPrimaryFocus, true);
-    },
-    skip: true,
-  );
+  group('Edit', () {
+    testWidgets(
+      ': keep focus mem name.',
+      (widgetTester) async {
+        // final focusNode = FocusNode();
+        // // focusNode.addListener(() {
+        // //   dev('object');
+        // //   dev(focusNode.hasFocus);
+        // //   dev(focusNode.hasPrimaryFocus);
+        // //   if (focusNode.hasFocus && focusNode.hasPrimaryFocus) {
+        // //   } else {
+        // //     fail('out of focus on mem name');
+        // //   }
+        // // });
+        // await pumpMemDetailPage(widgetTester, null, memNameFocusNode: focusNode);
+        //
+        // expect(focusNode.hasPrimaryFocus, false);
+        //
+        // await widgetTester.tap(memNameTextFormFieldFinder);
+        //
+        // expect(focusNode.hasPrimaryFocus, true);
+        //
+        // await widgetTester.enterText(
+        //   memNameTextFormFieldFinder,
+        //   'entering mem name',
+        // );
+        // await widgetTester.pumpAndSettle();
+        //
+        // FIXME ここで、フォーカスがはずれていることを確認したかったが、確認できなかった
+        // expect(focusNode.hasPrimaryFocus, true);
+      },
+      skip: true,
+    );
+
+    testWidgets(': memo', (widgetTester) async {
+      await pumpMemDetailPage(widgetTester, null);
+
+      expect(memMemoTextFormFieldFinder, findsOneWidget);
+      const enteringMemMemo = 'test mem memo';
+      await widgetTester.enterText(memMemoTextFormFieldFinder, enteringMemMemo);
+
+      expect(find.text(enteringMemMemo), findsOneWidget);
+    });
+  });
 
   group('Save', () {
     testWidgets(': name is required.', (widgetTester) async {
@@ -204,6 +216,7 @@ Future pumpMemDetailPage(
 }
 
 final memNameTextFormFieldFinder = find.byType(TextFormField).at(0);
+final memMemoTextFormFieldFinder = find.byType(TextFormField).at(1);
 final saveFabFinder = find.byIcon(Icons.save_alt).at(0);
 final appBarFinder = find.byType(AppBar);
 
