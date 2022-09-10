@@ -1,23 +1,43 @@
 import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
+import 'package:mem/logger.dart';
 
-// Repositoryというのは保存方法を隠蔽するためのもの
-// 画一的な変換までは行う
-// 外からみたときの型は型変数で渡す
-// 保存方法にかかわる変数は初期化で渡す
-abstract class DatabaseTableRepository<Entity> {
-  // FIXME DatabaseTableEntityを実装してるやつだけにげ限定する
+const idColumnName = 'id';
+const createdAtColumnName = 'createdAt';
+const updatedAtColumnName = 'updatedAt';
+const archivedAtColumnName = 'archivedAt';
+
+class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
+  Future<Entity> receive(Map<String, dynamic> valueMap) => v(
+        {'valueMap': valueMap},
+        () async {
+          final insertingMap = valueMap
+            ..putIfAbsent(createdAtColumnName, () => DateTime.now());
+
+          final id = await table.insert(insertingMap);
+
+          return fromMap(insertingMap..putIfAbsent(idColumnName, () => id));
+        },
+      );
+
+  Entity fromMap(Map<String, dynamic> valueMap) => v(
+        {'valueMap': valueMap},
+        () => throw UnimplementedError(),
+      );
+
   Table table; // FIXME be private
 
   DatabaseTableRepository(this.table);
 }
 
 abstract class DatabaseTableEntity {
+  final dynamic id;
   final DateTime createdAt;
   final DateTime? updatedAt;
   final DateTime? archivedAt;
 
   DatabaseTableEntity({
+    required this.id,
     required this.createdAt,
     this.updatedAt,
     this.archivedAt,
@@ -25,7 +45,7 @@ abstract class DatabaseTableEntity {
 }
 
 final defaultColumnDefinitions = [
-  DefC('createdAt', TypeC.datetime),
-  DefC('updatedAt', TypeC.datetime, notNull: false),
-  DefC('archivedAt', TypeC.datetime, notNull: false),
+  DefC(createdAtColumnName, TypeC.datetime),
+  DefC(updatedAtColumnName, TypeC.datetime, notNull: false),
+  DefC(archivedAtColumnName, TypeC.datetime, notNull: false),
 ];
