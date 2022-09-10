@@ -39,6 +39,11 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
         },
       );
 
+  Future<Entity> shipById(dynamic id) => v(
+        {'id': id},
+        () async => fromMap(await table.selectByPk(id)),
+      );
+
   Entity fromMap(Map<String, dynamic> valueMap) => v(
         {'valueMap': valueMap},
         () => throw UnimplementedError(),

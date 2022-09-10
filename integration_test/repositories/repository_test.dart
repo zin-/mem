@@ -117,4 +117,17 @@ void main() async {
       },
     );
   });
+
+  test(
+    'shipById',
+    () async {
+      final received = await testRepository.receive({
+        archivedAtColumnName: null,
+      });
+
+      final shipped = await testRepository.shipById(received.id);
+
+      expect(shipped.toMap(), received.toMap());
+    },
+  );
 }
