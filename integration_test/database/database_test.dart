@@ -55,7 +55,7 @@ void main() {
 
     group('Operations', () {
       test(
-        'insert',
+        ': insert',
         () async {
           database = await DatabaseManager().open(DefD(
             dbName,
@@ -73,7 +73,7 @@ void main() {
       );
 
       test(
-        'select',
+        ': select',
         () async {
           database = await DatabaseManager().open(DefD(
             dbName,
@@ -104,7 +104,7 @@ void main() {
       );
 
       group(
-        'selectByPk',
+        ': selectByPk',
         () {
           test(
             ': found.',
@@ -159,7 +159,7 @@ void main() {
         },
       );
 
-      group('updateByPk', () {
+      group(': updateByPk', () {
         test(
           ': success',
           () async {
@@ -224,7 +224,7 @@ void main() {
       });
 
       test(
-        'deleteById',
+        ': deleteById',
         () async {
           database = await DatabaseManager().open(DefD(
             dbName,
@@ -253,7 +253,7 @@ void main() {
       );
 
       test(
-        'deleteAll',
+        ': deleteAll',
         () async {
           database = await DatabaseManager().open(DefD(
             dbName,
