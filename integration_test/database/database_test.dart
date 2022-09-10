@@ -6,6 +6,7 @@ import 'package:mem/database/database.dart';
 import 'package:mem/database/database_factory.dart';
 import 'package:mem/database/definitions.dart';
 
+// TODO このファイルは削除して、indexed_database_testを作る
 void main() {
   Logger(level: Level.verbose);
   DatabaseManager(onTest: true);
