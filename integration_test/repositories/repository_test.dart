@@ -150,4 +150,17 @@ void main() async {
       expect(updated.archivedAt, isNotNull);
     },
   );
+
+  test(
+    'unarchive',
+    () async {
+      final received = await testRepository.receive({
+        archivedAtColumnName: DateTime.now(),
+      });
+
+      final updated = await testRepository.unarchive(received);
+
+      expect(updated.archivedAt, isNull);
+    },
+  );
 }

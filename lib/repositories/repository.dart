@@ -68,6 +68,18 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
         },
       );
 
+  Future<Entity> unarchive(Entity entity) => v(
+        {'entity': entity},
+        () async {
+          final valueMap = entity.toMap();
+          valueMap[archivedAtColumnName] = null;
+
+          await table.updateByPk(entity.id, valueMap);
+
+          return fromMap(valueMap);
+        },
+      );
+
   Entity fromMap(Map<String, dynamic> valueMap) => v(
         {'valueMap': valueMap},
         () => throw UnimplementedError(),
