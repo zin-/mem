@@ -168,9 +168,7 @@ void main() async {
     test(
       ': success',
       () async {
-        final received = await testRepository.receive({
-          archivedAtColumnName: DateTime.now(),
-        });
+        final received = await testRepository.receive({});
 
         final discardResult = await testRepository.discardById(received.id);
 
@@ -187,4 +185,16 @@ void main() async {
       },
     );
   });
+
+  test(
+    'discardAll',
+    () async {
+      await testRepository.receive({});
+      await testRepository.receive({});
+
+      final discardedCount = await testRepository.discardAll();
+
+      expect(discardedCount, 2);
+    },
+  );
 }

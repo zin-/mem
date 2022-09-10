@@ -89,6 +89,11 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
         },
       );
 
+  Future<int> discardAll() => v(
+        {},
+        () async => table.delete(),
+      );
+
   Entity fromMap(Map<String, dynamic> valueMap) => v(
         {'valueMap': valueMap},
         () => throw UnimplementedError(),
