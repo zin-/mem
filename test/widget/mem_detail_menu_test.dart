@@ -13,7 +13,7 @@ void main() {
   Logger(level: Level.verbose);
 
   final mockedMemRepository = MockMemRepository();
-  MemRepository.withMock(mockedMemRepository);
+  MemRepositoryV1.withMock(mockedMemRepository);
 
   tearDown(() {
     reset(mockedMemRepository);

@@ -2,8 +2,73 @@ import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/mem.dart';
+import 'package:mem/repositories/repository.dart';
 
-class MemRepository {
+class MemEntity extends DatabaseTableEntity {
+  final String name;
+
+  MemEntity({
+    required int id,
+    required this.name,
+    required DateTime createdAt,
+    DateTime? updatedAt,
+    DateTime? archivedAt,
+  }) : super(
+          id: id,
+          createdAt: createdAt,
+          updatedAt: updatedAt,
+          archivedAt: archivedAt,
+        );
+
+  Mem toDomain() => Mem.fromMap(toMap());
+
+  @override
+  MemEntity.fromMap(Map<String, dynamic> valueMap)
+      : name = valueMap['name'],
+        super.fromMap(valueMap);
+
+  @override
+  Map<String, dynamic> toMap() => {
+        'name': name,
+      }..addAll(super.toMap());
+}
+
+class MemRepositoryV2 extends DatabaseTableRepository<MemEntity> {
+  @override
+  MemEntity fromMap(Map<String, dynamic> valueMap) =>
+      MemEntity.fromMap(valueMap);
+
+  static MemRepositoryV2? _instance;
+
+  MemRepositoryV2._(super.table);
+
+  factory MemRepositoryV2() {
+    var tmp = _instance;
+    if (tmp == null) {
+      throw RepositoryException('Call initialize'); // coverage:ignore-line
+    } else {
+      return tmp;
+    }
+  }
+
+  factory MemRepositoryV2.initialize(Table memTable) {
+    var tmp = _instance;
+    if (tmp == null) {
+      tmp = MemRepositoryV2._(memTable);
+      _instance = tmp;
+    }
+    return tmp;
+  }
+
+  factory MemRepositoryV2.withMock(MemRepositoryV2 mock) {
+    _instance = mock;
+    return mock;
+  }
+
+  static clear() => _instance = null;
+}
+
+class MemRepositoryV1 {
   final Table _memTable;
 
   Future<Mem> receive(Map<String, dynamic> value) => v(
@@ -92,11 +157,11 @@ class MemRepository {
         () async => _memTable.delete(),
       );
 
-  MemRepository._(this._memTable);
+  MemRepositoryV1._(this._memTable);
 
-  static MemRepository? _instance;
+  static MemRepositoryV1? _instance;
 
-  factory MemRepository() {
+  factory MemRepositoryV1() {
     var tmp = _instance;
     if (tmp == null) {
       throw RepositoryException('Call initialize'); // coverage:ignore-line
@@ -105,16 +170,16 @@ class MemRepository {
     }
   }
 
-  factory MemRepository.initialize(Table memTable) {
+  factory MemRepositoryV1.initialize(Table memTable) {
     var tmp = _instance;
     if (tmp == null) {
-      tmp = MemRepository._(memTable);
+      tmp = MemRepositoryV1._(memTable);
       _instance = tmp;
     }
     return tmp;
   }
 
-  factory MemRepository.withMock(MemRepository mock) {
+  factory MemRepositoryV1.withMock(MemRepositoryV1 mock) {
     _instance = mock;
     return mock;
   }

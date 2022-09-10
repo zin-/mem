@@ -14,7 +14,7 @@ final fetchMemList = FutureProvider<List<Mem>>(
       final showArchived = ref.watch(showArchivedProvider);
 
       final archived = showNotArchived == showArchived ? null : showArchived;
-      final mems = await MemRepository().ship(archived);
+      final mems = await MemRepositoryV1().ship(archived);
 
       for (var mem in mems) {
         ref.read(memProvider(mem.id).notifier).updatedBy(mem);

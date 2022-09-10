@@ -94,10 +94,7 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
         () async => table.delete(),
       );
 
-  Entity fromMap(Map<String, dynamic> valueMap) => v(
-        {'valueMap': valueMap},
-        () => throw UnimplementedError(),
-      );
+  Entity fromMap(Map<String, dynamic> valueMap);
 
   Table table; // FIXME be private
 
@@ -109,6 +106,13 @@ abstract class DatabaseTableEntity {
   late DateTime createdAt;
   late DateTime? updatedAt;
   late DateTime? archivedAt;
+
+  DatabaseTableEntity({
+    required int id,
+    required DateTime createdAt,
+    DateTime? updatedAt,
+    DateTime? archivedAt,
+  });
 
   DatabaseTableEntity.fromMap(Map<String, dynamic> valueMap)
       : id = valueMap[idColumnName],

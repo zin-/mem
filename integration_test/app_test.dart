@@ -20,7 +20,7 @@ void main() {
     await DatabaseManager().open(app.databaseDefinition);
     await DatabaseManager().delete(app.databaseDefinition.name);
 
-    MemRepository.clear();
+    MemRepositoryV1.clear();
   });
 
   group('Basic scenario', () {

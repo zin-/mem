@@ -14,11 +14,11 @@ void main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   late final Database database;
-  late final MemRepository memRepository;
+  late final MemRepositoryV1 memRepository;
 
   setUpAll(() async {
     database = await DatabaseManager().open(DefD('test_mem.db', 1, [memTable]));
-    memRepository = MemRepository.initialize(database.getTable(memTable.name));
+    memRepository = MemRepositoryV1.initialize(database.getTable(memTable.name));
   });
   setUp(() async {
     await memRepository.discardAll();
@@ -28,7 +28,7 @@ void main() async {
     'new before initialize',
     () {
       expect(
-        MemRepository(),
+        MemRepositoryV1(),
         throwsA(((e) => e is RepositoryException)),
       );
     },

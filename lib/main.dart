@@ -31,7 +31,7 @@ Future<Database> _openDatabase() => t(
 
         final database = await DatabaseManager().open(databaseDefinition);
 
-        MemRepository.initialize(database.getTable(memTable.name));
+        MemRepositoryV1.initialize(database.getTable(memTable.name));
 
         return database;
       },
