@@ -121,13 +121,22 @@ void main() async {
   test(
     'shipById',
     () async {
-      final received = await testRepository.receive({
-        archivedAtColumnName: null,
-      });
+      final received = await testRepository.receive({});
 
       final shipped = await testRepository.shipById(received.id);
 
       expect(shipped.toMap(), received.toMap());
+    },
+  );
+
+  test(
+    'update',
+    () async {
+      final received = await testRepository.receive({});
+
+      final updated = await testRepository.update(received);
+
+      expect(updated.updatedAt, isNotNull);
     },
   );
 }

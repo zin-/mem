@@ -44,6 +44,18 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
         () async => fromMap(await table.selectByPk(id)),
       );
 
+  Future<Entity> update(Entity entity) => v(
+        {'entity': entity},
+        () async {
+          final valueMap = entity.toMap();
+          valueMap['updatedAt'] = DateTime.now();
+
+          await table.updateByPk(entity.id, valueMap);
+
+          return fromMap(valueMap);
+        },
+      );
+
   Entity fromMap(Map<String, dynamic> valueMap) => v(
         {'valueMap': valueMap},
         () => throw UnimplementedError(),
