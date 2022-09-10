@@ -2,6 +2,41 @@ import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/mem.dart';
+import 'package:mem/repositories/repository.dart';
+
+class MemRepositoryV2 implements DatabaseTableRepository {
+  @override
+  Table table;
+
+  MemRepositoryV2._(this.table);
+
+  static MemRepositoryV2? _instance;
+
+  factory MemRepositoryV2() {
+    var tmp = _instance;
+    if (tmp == null) {
+      throw RepositoryException('Call initialize'); // coverage:ignore-line
+    } else {
+      return tmp;
+    }
+  }
+
+  factory MemRepositoryV2.initialize(Table table) {
+    var tmp = _instance;
+    if (tmp == null) {
+      tmp = MemRepositoryV2._(table);
+      _instance = tmp;
+    }
+    return tmp;
+  }
+
+  factory MemRepositoryV2.withMock(MemRepositoryV2 mock) {
+    _instance = mock;
+    return mock;
+  }
+
+  static clear() => _instance = null;
+}
 
 class MemRepository {
   final Table _memTable;
