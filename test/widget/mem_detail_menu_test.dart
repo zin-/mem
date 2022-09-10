@@ -12,7 +12,7 @@ import 'mem_detail_page_test.dart';
 void main() {
   Logger(level: Level.verbose);
 
-  final mockedMemRepository = MockMemRepository();
+  final mockedMemRepository = MockMemRepositoryV1();
   MemRepositoryV1.withMock(mockedMemRepository);
 
   tearDown(() {
