@@ -84,8 +84,6 @@ void main() async {
       expect(result.createdAt, const TypeMatcher<DateTime>());
       expect(result.updatedAt, isNull);
       expect(result.archivedAt, isNull);
-
-      // FIXME データベースに直接アクセスして保存されているか確認する
     },
   );
 }
