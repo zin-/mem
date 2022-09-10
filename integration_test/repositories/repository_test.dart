@@ -139,4 +139,15 @@ void main() async {
       expect(updated.updatedAt, isNotNull);
     },
   );
+
+  test(
+    'archive',
+    () async {
+      final received = await testRepository.receive({});
+
+      final updated = await testRepository.archive(received);
+
+      expect(updated.archivedAt, isNotNull);
+    },
+  );
 }

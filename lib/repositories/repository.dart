@@ -48,7 +48,19 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
         {'entity': entity},
         () async {
           final valueMap = entity.toMap();
-          valueMap['updatedAt'] = DateTime.now();
+          valueMap[updatedAtColumnName] = DateTime.now();
+
+          await table.updateByPk(entity.id, valueMap);
+
+          return fromMap(valueMap);
+        },
+      );
+
+  Future<Entity> archive(Entity entity) => v(
+        {'entity': entity},
+        () async {
+          final valueMap = entity.toMap();
+          valueMap[archivedAtColumnName] = DateTime.now();
 
           await table.updateByPk(entity.id, valueMap);
 
