@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/repositories/mem_detail_repository.dart';
+import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/views/colors.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mem/l10n.dart';
@@ -19,7 +19,7 @@ void main() {
   final mockedMemRepository = MockMemRepository();
   MemRepository.withMock(mockedMemRepository);
   final mockedMemDetailRepository = MockMemDetailRepository();
-  MemDetailRepository.withMock(mockedMemDetailRepository);
+  MemItemRepository.withMock(mockedMemDetailRepository);
 
   tearDown(() {
     reset(mockedMemRepository);
@@ -33,6 +33,10 @@ void main() {
       await pumpMemDetailPage(widgetTester, 1);
 
       expectMemNameOnMemDetail(widgetTester, '');
+      expect(
+          (widgetTester.widget(memMemoTextFormFieldFinder) as TextFormField)
+              .initialValue,
+          '');
       expect(saveFabFinder, findsOneWidget);
       final appBar = widgetTester.widget(appBarFinder) as AppBar;
       expect(appBar.backgroundColor, primaryColor);
@@ -164,7 +168,7 @@ void main() {
         expect(value[memDetailTypeColumnName], MemDetailType.memo.toString());
         expect(value[memDetailValueColumnName], enteringMemMemo);
 
-        return MemDetailEntity(
+        return MemItemEntity(
           id: 1,
           memId: memId,
           type: MemDetailType.memo,

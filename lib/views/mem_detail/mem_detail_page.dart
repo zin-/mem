@@ -5,7 +5,6 @@ import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 
 // FIXME repositoryを見るのはおかしい気がする
-import 'package:mem/repositories/mem_detail_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/repositories/repository.dart';
 import 'package:mem/views/colors.dart';
@@ -108,33 +107,40 @@ class MemDetailPage extends StatelessWidget {
   ) =>
       v(
         {'memMap': memMap, 'ref': ref},
-        () => SingleChildScrollView(
-          child: Column(
-            // () => Column(
-            children: [
-              MemNameTextFormField(
-                memMap[memNameColumnName] ?? '',
-                memMap[idColumnName],
-                (value) => (value?.isEmpty ?? false)
-                    ? L10n().memNameIsRequiredWarn()
-                    : null,
-                (value) => ref
-                    .read(memMapProvider(_memId).notifier)
-                    .updatedBy(memMap..[memNameColumnName] = value),
-              ),
-              TextFormField(
-                decoration: InputDecoration(
-                  icon: const Icon(Icons.subject),
-                  labelText: L10n().memMemoTitle(),
+        () {
+          final memItems = ref.watch(memItemsProvider(_memId));
+
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                MemNameTextFormField(
+                  memMap[memNameColumnName] ?? '',
+                  memMap[idColumnName],
+                  (value) => (value?.isEmpty ?? false)
+                      ? L10n().memNameIsRequiredWarn()
+                      : null,
+                  (value) => ref
+                      .read(memMapProvider(_memId).notifier)
+                      .updatedBy(memMap..[memNameColumnName] = value),
                 ),
-                maxLines: null,
-                initialValue: memMap[memMemoName],
-                onChanged: (value) => ref
-                    .read(memMapProvider(_memId).notifier)
-                    .updatedBy(memMap..[memMemoName] = value),
-              ),
-            ],
-          ),
-        ),
+                ...memItems.map((memItem) {
+                  return TextFormField(
+                    decoration: InputDecoration(
+                      icon: const Icon(Icons.subject),
+                      labelText: L10n().memMemoTitle(),
+                    ),
+                    maxLines: null,
+                    initialValue: memItem.value,
+                    onChanged: (value) =>
+                        ref.read(memItemsProvider(_memId).notifier).update(
+                              memItem..value = value,
+                              (item) => item.id == memItem.id,
+                            ),
+                  );
+                }),
+              ],
+            ),
+          );
+        },
       );
 }

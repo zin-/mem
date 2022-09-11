@@ -1,5 +1,6 @@
 import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
+import 'package:mem/logger.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/repositories/repository.dart';
 
@@ -7,8 +8,8 @@ const memIdColumnName = 'mems_id';
 const memDetailTypeColumnName = 'type';
 const memDetailValueColumnName = 'value';
 
-final memDetailTableDefinition = DefT(
-  'mem_details',
+final memItemTableDefinition = DefT(
+  'mem_items',
   [
     DefPK(idColumnName, TypeC.integer, autoincrement: true),
     DefC(memDetailTypeColumnName, TypeC.text),
@@ -18,27 +19,27 @@ final memDetailTableDefinition = DefT(
   ],
 );
 
-class MemDetailEntity extends DatabaseTableEntity {
-  int memId;
+class MemItemEntity extends DatabaseTableEntity {
+  int? memId;
   MemDetailType type;
   dynamic value;
 
-  MemDetailEntity({
+  MemItemEntity({
     required this.memId,
     required this.type,
     this.value,
-    required int id,
-    required DateTime createdAt,
+    int? id,
+    DateTime? createdAt,
     DateTime? updatedAt,
     DateTime? archivedAt,
   }) : super(
           id: id,
-          createdAt: createdAt,
+          createdAt: createdAt ?? DateTime.now(),
           updatedAt: updatedAt,
           archivedAt: archivedAt,
         );
 
-  MemDetailEntity.fromMap(super.valueMap)
+  MemItemEntity.fromMap(super.valueMap)
       : memId = valueMap[memIdColumnName],
         type = valueMap[memDetailTypeColumnName],
         value = valueMap[memDetailValueColumnName],
@@ -52,16 +53,25 @@ class MemDetailEntity extends DatabaseTableEntity {
       }..addAll(super.toMap());
 }
 
-class MemDetailRepository extends DatabaseTableRepository<MemDetailEntity> {
+class MemItemRepository extends DatabaseTableRepository<MemItemEntity> {
+  Future<List<MemItemEntity>> shipByMemId(int memId) => v(
+        {'memId': memId},
+        () => ship(
+          archived: false,
+          where: [memIdColumnName],
+          whereArgs: [memId],
+        ),
+      );
+
   @override
-  MemDetailEntity fromMap(Map<String, dynamic> valueMap) =>
-      MemDetailEntity.fromMap(valueMap);
+  MemItemEntity fromMap(Map<String, dynamic> valueMap) =>
+      MemItemEntity.fromMap(valueMap);
 
-  static MemDetailRepository? _instance;
+  static MemItemRepository? _instance;
 
-  MemDetailRepository._(super.table);
+  MemItemRepository._(super.table);
 
-  factory MemDetailRepository() {
+  factory MemItemRepository() {
     var tmp = _instance;
     if (tmp == null) {
       throw Exception('Call initialize'); // coverage:ignore-line
@@ -70,16 +80,16 @@ class MemDetailRepository extends DatabaseTableRepository<MemDetailEntity> {
     }
   }
 
-  factory MemDetailRepository.initialize(Table table) {
+  factory MemItemRepository.initialize(Table table) {
     var tmp = _instance;
     if (tmp == null) {
-      tmp = MemDetailRepository._(table);
+      tmp = MemItemRepository._(table);
       _instance = tmp;
     }
     return tmp;
   }
 
-  factory MemDetailRepository.withMock(MemDetailRepository mock) {
+  factory MemItemRepository.withMock(MemItemRepository mock) {
     _instance = mock;
     return mock;
   }

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/mem_service.dart';
+import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/atoms/state_notifier.dart';
 
@@ -24,6 +25,20 @@ final memMapProvider = StateNotifierProvider.family<
   ),
 );
 
+final memItemsProvider = StateNotifierProvider.family<
+    ListValueStateNotifier<MemItemEntity>, List<MemItemEntity>, int?>(
+  (ref, memId) => v(
+    {'memId': memId},
+    () => ListValueStateNotifier<MemItemEntity>([
+      MemItemEntity(
+        memId: memId,
+        type: MemDetailType.memo,
+        id: null,
+      ),
+    ]),
+  ),
+);
+
 final fetchMemById =
     FutureProvider.autoDispose.family<Map<String, dynamic>, int?>(
   (ref, memId) => v(
@@ -33,6 +48,13 @@ final fetchMemById =
         try {
           final mem = await MemRepository().shipById(memId);
           ref.read(memProvider(memId).notifier).updatedBy(mem);
+          final memItems = await MemItemRepository().shipByMemId(mem.id);
+          for (var memItem in memItems) {
+            ref.read(memItemsProvider(memId).notifier).update(
+                  memItem,
+                  (item) => item.memId == memItem.memId,
+                );
+          }
           return mem.toMap();
         } catch (e) {
           warn(e);
@@ -50,8 +72,9 @@ final createMem =
     {'memMap': memMap},
     () async {
       memMap.remove(_memIdKey);
+      final memItems = ref.read(memItemsProvider(null));
 
-      final receivedMem = await MemService().create(memMap);
+      final receivedMem = await MemService().create(memMap, memItems);
 
       ref.read(memProvider(receivedMem.id).notifier).updatedBy(receivedMem);
       ref.read(memProvider(null).notifier).updatedBy(receivedMem);

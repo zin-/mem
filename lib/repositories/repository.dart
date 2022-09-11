@@ -58,19 +58,25 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
         },
       );
 
-  Future<List<Entity>> ship({bool? archived}) => v(
-        {'archived': archived},
+  Future<List<Entity>> ship({
+    bool? archived,
+    List<String>? where,
+    List<dynamic>? whereArgs,
+  }) =>
+      v(
+        {'archived': archived, 'where': where, 'whereArgs': whereArgs},
         () async {
-          final where = <String>[];
-
+          final whereStrings = List.from(where ?? [], growable: true);
+          final whereArgStrings = List.from(whereArgs ?? [], growable: true);
           if (archived != null) {
             archived
-                ? where.add('archivedAt IS NOT NULL')
-                : where.add('archivedAt IS NULL');
+                ? whereStrings.add('archivedAt IS NOT NULL')
+                : whereStrings.add('archivedAt IS NULL');
           }
 
           return (await table.select(
-            where: where.isEmpty ? null : where.join(' AND '),
+            where: whereStrings.isEmpty ? null : whereStrings.join(' AND '),
+            whereArgs: whereArgStrings.isEmpty ? null : whereArgs,
           ))
               .map((e) => fromMap(e))
               .toList();
