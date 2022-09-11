@@ -28,32 +28,16 @@ class SqliteDatabase extends Database {
   late final sqflite.Database _database;
 
   @override
-  Future<Database> open() => v(
+  Future<SqliteDatabase> open() => v(
         {},
         () async {
           _database = await _factory.openDatabase(
             await _pathFuture,
             options: sqflite.OpenDatabaseOptions(
               version: definition.version,
-              onCreate: (db, version) async {
-                trace('Create Database. $definition');
-                for (var tableDefinition in definition.tableDefinitions) {
-                  trace('Create table. $tableDefinition');
-                  await db.execute(tableDefinition.buildCreateTableSql());
-                }
-              },
-              onConfigure: (db) async {
-                for (var tableDefinition in definition.tableDefinitions) {
-                  if (!foreignKeyIsEnabled &&
-                      tableDefinition.columns
-                          .whereType<ForeignKeyDefinition>()
-                          .isNotEmpty) {
-                    trace('Enable foreign key');
-                    await db.execute('PRAGMA foreign_keys=true');
-                    foreignKeyIsEnabled = true;
-                  }
-                }
-              },
+              onCreate: _onCreate,
+              onConfigure: _onConfigure,
+              onUpgrade: _onUpgrade,
             ),
           );
 
@@ -141,6 +125,50 @@ class SqliteDatabase extends Database {
       (await _factory.databaseExists(await _pathFuture))
           ? await onTrue()
           : await onFalse();
+
+  _onCreate(db, version) => v(
+        {'db': db, 'version': version},
+        () async {
+          trace('Create Database. $definition');
+          for (var tableDefinition in definition.tableDefinitions) {
+            trace('Create table. $tableDefinition');
+            await db.execute(tableDefinition.buildCreateTableSql());
+          }
+        },
+      );
+
+  _onConfigure(db) => v(
+        {'db': db},
+        () async {
+          for (var tableDefinition in definition.tableDefinitions) {
+            if (!foreignKeyIsEnabled &&
+                tableDefinition.columns
+                    .whereType<ForeignKeyDefinition>()
+                    .isNotEmpty) {
+              trace('Enable foreign key');
+              await db.execute('PRAGMA foreign_keys=true');
+              foreignKeyIsEnabled = true;
+            }
+          }
+        },
+      );
+
+  _onUpgrade(db, oldVersion, newVersion) => v(
+        {
+          'db': db,
+          'oldVersion': oldVersion,
+          'newVersion': newVersion,
+        },
+        () async {
+          if (oldVersion == 1 && newVersion == 2) {
+            trace('Upgrade Database. $definition from version: $oldVersion');
+
+            final creatingTable = definition.tableDefinitions.last;
+            trace('Create table. $creatingTable');
+            await db.execute(creatingTable.buildCreateTableSql());
+          }
+        },
+      );
 }
 
 class SqliteTable extends Table {

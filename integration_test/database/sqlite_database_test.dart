@@ -5,6 +5,7 @@ import 'package:mem/database/database.dart';
 import 'package:mem/database/sqlite_database.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/database/definitions.dart';
+import 'package:mem/repositories/repository.dart';
 
 void main() {
   Logger(level: Level.verbose);
@@ -42,10 +43,38 @@ void main() {
   late SqliteDatabase sqliteDatabase;
 
   setUp(() async {
-    sqliteDatabase = await SqliteDatabase(defD).open() as SqliteDatabase;
+    sqliteDatabase = await SqliteDatabase(defD).open();
   });
   tearDown(() async {
     await sqliteDatabase.delete();
+  });
+
+  test('Migrate: upgrade: add table', () async {
+    await sqliteDatabase.close();
+
+    final addingTableDefinition = DefT(
+      'added_table',
+      [
+        DefPK(idColumnName, TypeC.integer, autoincrement: true),
+        DefC('test', TypeC.text),
+      ],
+    );
+    final upgradingDefD = DefD(
+      defD.name,
+      2,
+      [
+        ...defD.tableDefinitions,
+        addingTableDefinition,
+      ],
+    );
+
+    final upgraded = await SqliteDatabase(upgradingDefD).open();
+
+    final addedTable = upgraded.getTable(addingTableDefinition.name);
+    expect(addedTable, isNotNull);
+
+    final insertedId = await addedTable.insert({'test': 'test'});
+    expect(insertedId, isNotNull);
   });
 
   group('Insert', () {
