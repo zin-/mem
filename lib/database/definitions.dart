@@ -1,5 +1,4 @@
 import "package:collection/collection.dart";
-
 import 'package:mem/database/database.dart';
 
 typedef DefD = DatabaseDefinition;
@@ -18,8 +17,8 @@ class DatabaseDefinition {
   }
 
   @override
-  String toString() => 'Database definition.'
-      ' {'
+  String toString() => 'Database definition'
+      ' :: {'
       ' name: $name,'
       ' version: $version,'
       ' tables: ${tableDefinitions.map((defT) => defT.name)}'
@@ -53,9 +52,12 @@ class TableDefinition {
       ' ${columns.map((column) => column._onSQL()).join(', ')}'
       ' )';
 
+  PrimaryKeyDefinition get primaryKey =>
+      columns.whereType<PrimaryKeyDefinition>().first;
+
   @override
-  String toString() => 'Table definition.'
-      ' {'
+  String toString() => 'Table definition'
+      ' :: {'
       ' name: $name'
       ', columns: $columns'
       ' }';
@@ -97,7 +99,7 @@ class ColumnDefinition {
   }
 
   @override
-  String toString() => 'Column definition. { name: $name }';
+  String toString() => 'Column definition :: { name: $name }';
 }
 
 typedef DefPK = PrimaryKeyDefinition;
@@ -115,6 +117,30 @@ class PrimaryKeyDefinition extends ColumnDefinition {
   String _onSQL() => '${super._onSQL()}'
       ' PRIMARY KEY'
       '${autoincrement ? ' AUTOINCREMENT' : ''}';
+
+  @override
+  String toString() => 'Primary key definition :: { name: $name }';
+}
+
+class ForeignKeyDefinition extends ColumnDefinition {
+  final TableDefinition _parentTableDefinition;
+
+  ForeignKeyDefinition(this._parentTableDefinition)
+      : super(
+          [
+            _parentTableDefinition.name,
+            _parentTableDefinition.primaryKey.name,
+          ].join('_'),
+          _parentTableDefinition.primaryKey.type,
+        );
+
+  @override
+  String _onSQL() => 'FOREIGN KEY ($name)'
+      ' REFERENCES ${_parentTableDefinition.name}'
+      '(${_parentTableDefinition.primaryKey.name})';
+
+  @override
+  String toString() => 'Foreign key definition :: { name: $name }';
 }
 
 typedef TypeC = ColumnType;

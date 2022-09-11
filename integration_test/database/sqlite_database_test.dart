@@ -15,7 +15,6 @@ void main() {
   const pkName = 'id';
   const textFieldName = 'text';
   const datetimeFieldName = 'datetime';
-
   final testTable = DefT(
     tableName,
     [
