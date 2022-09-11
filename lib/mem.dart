@@ -14,13 +14,8 @@ class Mem {
     this.archivedAt,
   });
 
-  bool isSaved() => isSavedMap(toMap());
-
   static bool isSavedMap(Map<String, dynamic> memMap) =>
       memMap['id'] != null && memMap['createdAt'] != null;
-
-  static bool isArchivedMap(Map<String, dynamic> memMap) =>
-      memMap['archivedAt'] != null;
 
   Map<String, dynamic> toMap() => {
         'id': id,

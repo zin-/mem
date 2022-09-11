@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/mem.dart';
 import 'package:mem/views/colors.dart';
 import 'package:mem/views/dimens.dart';
 import 'package:mem/views/atoms/async_value_view.dart';
@@ -37,9 +36,9 @@ class MemDetailPage extends StatelessWidget {
                   appBar: AppBar(
                     title: Text(L10n().memDetailPageTitle()),
                     actions: [
-                      MemDetailMenu(memMap),
+                      MemDetailMenu(_memId),
                     ],
-                    backgroundColor: Mem.isArchivedMap(memMap)
+                    backgroundColor: mem?.isArchived() ?? false
                         ? archivedColor
                         : primaryColor,
                   ),
