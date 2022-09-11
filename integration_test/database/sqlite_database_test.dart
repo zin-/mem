@@ -23,10 +23,20 @@ void main() {
       DefC(datetimeFieldName, TypeC.datetime),
     ],
   );
+  final testChildTable = DefT(
+    'test_children',
+    [
+      DefPK(pkName, TypeC.integer, autoincrement: true),
+      ForeignKeyDefinition(testTable),
+    ],
+  );
   final defD = DefD(
     'test.db',
     1,
-    [testTable],
+    [
+      testTable,
+      testChildTable,
+    ],
   );
 
   late SqliteDatabase sqliteDatabase;
@@ -38,18 +48,54 @@ void main() {
     await sqliteDatabase.delete();
   });
 
-  test(
-    'insert',
-    () async {
-      final table = sqliteDatabase.getTable(tableName);
+  group('Insert', () {
+    test(
+      ': testTable',
+      () async {
+        final table = sqliteDatabase.getTable(tableName);
 
-      final insertedId = await table.insert({
-        textFieldName: 'test text',
-        datetimeFieldName: DateTime.now(),
-      });
-      expect(insertedId, 1);
-    },
-  );
+        final insertedId = await table.insert({
+          textFieldName: 'test text',
+          datetimeFieldName: DateTime.now(),
+        });
+        expect(insertedId, 1);
+      },
+    );
+
+    group('testChildTable', () {
+      test(
+        ': no parent',
+        () async {
+          final table = sqliteDatabase.getTable(testChildTable.name);
+
+          expect(
+            () async => await table.insert({
+              'tests_id': 1,
+            }),
+            // FIXME 固有の例外に置き換えたい
+            throwsA((e) => e is Exception),
+          );
+        },
+      );
+
+      test(
+        ': success',
+        () async {
+          final table = sqliteDatabase.getTable(testTable.name);
+          final childTable = sqliteDatabase.getTable(testChildTable.name);
+
+          final insertedChildId = await childTable.insert({
+            'tests_id': await table.insert({
+              textFieldName: 'test text',
+              datetimeFieldName: DateTime.now(),
+            }),
+          });
+
+          expect(insertedChildId, 1);
+        },
+      );
+    });
+  });
 
   test(
     'select',

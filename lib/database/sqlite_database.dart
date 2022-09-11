@@ -12,6 +12,8 @@ import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
 
 class SqliteDatabase extends Database {
+  bool foreignKeyIsEnabled = false;
+
   SqliteDatabase(super.definition) {
     if (kIsWeb) {
       throw DatabaseException(
@@ -38,6 +40,18 @@ class SqliteDatabase extends Database {
                 for (var tableDefinition in definition.tableDefinitions) {
                   trace('Create table. $tableDefinition');
                   await db.execute(tableDefinition.buildCreateTableSql());
+                }
+              },
+              onConfigure: (db) async {
+                for (var tableDefinition in definition.tableDefinitions) {
+                  if (!foreignKeyIsEnabled &&
+                      tableDefinition.columns
+                          .whereType<ForeignKeyDefinition>()
+                          .isNotEmpty) {
+                    trace('Enable foreign key');
+                    await db.execute('PRAGMA foreign_keys=true');
+                    foreignKeyIsEnabled = true;
+                  }
                 }
               },
             ),
