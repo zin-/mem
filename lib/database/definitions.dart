@@ -122,6 +122,8 @@ class PrimaryKeyDefinition extends ColumnDefinition {
   String toString() => 'Primary key definition :: { name: $name }';
 }
 
+typedef DefFK = ForeignKeyDefinition;
+
 class ForeignKeyDefinition extends ColumnDefinition {
   final TableDefinition _parentTableDefinition;
 
