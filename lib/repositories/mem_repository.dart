@@ -4,6 +4,8 @@ import 'package:mem/logger.dart';
 import 'package:mem/mem.dart';
 import 'package:mem/repositories/repository.dart';
 
+const memNameColumnName = 'name';
+
 class MemEntity extends DatabaseTableEntity {
   final String name;
 
@@ -20,16 +22,14 @@ class MemEntity extends DatabaseTableEntity {
           archivedAt: archivedAt,
         );
 
-  Mem toDomain() => Mem.fromMap(toMap());
-
   @override
   MemEntity.fromMap(Map<String, dynamic> valueMap)
-      : name = valueMap['name'],
+      : name = valueMap[memNameColumnName],
         super.fromMap(valueMap);
 
   @override
   Map<String, dynamic> toMap() => {
-        'name': name,
+        memNameColumnName: name,
       }..addAll(super.toMap());
 }
 
@@ -45,7 +45,7 @@ class MemRepositoryV2 extends DatabaseTableRepository<MemEntity> {
   factory MemRepositoryV2() {
     var tmp = _instance;
     if (tmp == null) {
-      throw RepositoryException('Call initialize'); // coverage:ignore-line
+      throw Exception('Call initialize'); // coverage:ignore-line
     } else {
       return tmp;
     }
@@ -68,6 +68,7 @@ class MemRepositoryV2 extends DatabaseTableRepository<MemEntity> {
   static clear() => _instance = null;
 }
 
+@Deprecated('Use V2')
 class MemRepositoryV1 {
   final Table _memTable;
 
@@ -187,18 +188,16 @@ class MemRepositoryV1 {
   static clear() => _instance = null;
 }
 
-const memTableName = 'mems';
-final memTable = DefT(
-  memTableName,
+final memTableDefinition = DefT(
+  'mems',
   [
     DefPK('id', TypeC.integer, autoincrement: true),
-    DefC('name', TypeC.text),
-    DefC('createdAt', TypeC.datetime),
-    DefC('updatedAt', TypeC.datetime, notNull: false),
-    DefC('archivedAt', TypeC.datetime, notNull: false),
+    DefC(memNameColumnName, TypeC.text),
+    ...defaultColumnDefinitions
   ],
 );
 
+@Deprecated('Drop')
 class RepositoryException implements Exception {
   final String message;
 

@@ -17,8 +17,8 @@ void main() async {
   late final MemRepositoryV1 memRepository;
 
   setUpAll(() async {
-    database = await DatabaseManager().open(DefD('test_mem.db', 1, [memTable]));
-    memRepository = MemRepositoryV1.initialize(database.getTable(memTable.name));
+    database = await DatabaseManager().open(DefD('test_mem.db', 1, [memTableDefinition]));
+    memRepository = MemRepositoryV1.initialize(database.getTable(memTableDefinition.name));
   });
   setUp(() async {
     await memRepository.discardAll();

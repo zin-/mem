@@ -11,7 +11,7 @@ final databaseDefinition = DefD(
   'mem.db',
   1,
   [
-    memTable,
+    memTableDefinition,
   ],
 );
 
@@ -31,7 +31,7 @@ Future<Database> _openDatabase() => t(
 
         final database = await DatabaseManager().open(databaseDefinition);
 
-        MemRepositoryV1.initialize(database.getTable(memTable.name));
+        MemRepositoryV1.initialize(database.getTable(memTableDefinition.name));
 
         return database;
       },

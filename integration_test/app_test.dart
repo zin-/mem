@@ -44,7 +44,7 @@ void main() {
     testWidgets(': update.', (widgetTester) async {
       const savedMemName = 'saved mem name';
       final database = await DatabaseManager().open(app.databaseDefinition);
-      final memTable = database.getTable(memTableName);
+      final memTable = database.getTable(memTableDefinition.name);
       final savedMemId = await memTable.insert({
         'name': savedMemName,
         'createdAt': DateTime.now(),
@@ -103,7 +103,7 @@ void main() {
     testWidgets(': remove.', (widgetTester) async {
       const savedMemName = 'saved mem name';
       final database = await DatabaseManager().open(app.databaseDefinition);
-      final memTable = database.getTable(memTableName);
+      final memTable = database.getTable(memTableDefinition.name);
       final savedMemId = await memTable.insert({
         'name': savedMemName,
         'createdAt': DateTime.now(),

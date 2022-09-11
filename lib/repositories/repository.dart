@@ -7,6 +7,42 @@ const createdAtColumnName = 'createdAt';
 const updatedAtColumnName = 'updatedAt';
 const archivedAtColumnName = 'archivedAt';
 
+abstract class DatabaseTableEntity {
+  late dynamic id;
+  late DateTime createdAt;
+  late DateTime? updatedAt;
+  late DateTime? archivedAt;
+
+  DatabaseTableEntity({
+    required int id,
+    required DateTime createdAt,
+    DateTime? updatedAt,
+    DateTime? archivedAt,
+  });
+
+  DatabaseTableEntity.fromMap(Map<String, dynamic> valueMap)
+      : id = valueMap[idColumnName],
+        createdAt = valueMap[createdAtColumnName],
+        updatedAt = valueMap[updatedAtColumnName],
+        archivedAt = valueMap[archivedAtColumnName];
+
+  Map<String, dynamic> toMap() => {
+        idColumnName: id,
+        createdAtColumnName: createdAt,
+        updatedAtColumnName: updatedAt,
+        archivedAtColumnName: archivedAt,
+      };
+
+  @override
+  String toString() => toMap().toString();
+}
+
+final defaultColumnDefinitions = [
+  DefC(createdAtColumnName, TypeC.datetime),
+  DefC(updatedAtColumnName, TypeC.datetime, notNull: false),
+  DefC(archivedAtColumnName, TypeC.datetime, notNull: false),
+];
+
 abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
   Future<Entity> receive(Map<String, dynamic> valueMap) => v(
         {'valueMap': valueMap},
@@ -100,39 +136,3 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
 
   DatabaseTableRepository(this.table);
 }
-
-abstract class DatabaseTableEntity {
-  late dynamic id;
-  late DateTime createdAt;
-  late DateTime? updatedAt;
-  late DateTime? archivedAt;
-
-  DatabaseTableEntity({
-    required int id,
-    required DateTime createdAt,
-    DateTime? updatedAt,
-    DateTime? archivedAt,
-  });
-
-  DatabaseTableEntity.fromMap(Map<String, dynamic> valueMap)
-      : id = valueMap[idColumnName],
-        createdAt = valueMap[createdAtColumnName],
-        updatedAt = valueMap[updatedAtColumnName],
-        archivedAt = valueMap[archivedAtColumnName];
-
-  Map<String, dynamic> toMap() => {
-        idColumnName: id,
-        createdAtColumnName: createdAt,
-        updatedAtColumnName: updatedAt,
-        archivedAtColumnName: archivedAt,
-      };
-
-  @override
-  String toString() => toMap().toString();
-}
-
-final defaultColumnDefinitions = [
-  DefC(createdAtColumnName, TypeC.datetime),
-  DefC(updatedAtColumnName, TypeC.datetime, notNull: false),
-  DefC(archivedAtColumnName, TypeC.datetime, notNull: false),
-];
