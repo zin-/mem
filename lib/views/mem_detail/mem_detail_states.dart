@@ -4,6 +4,7 @@ import 'package:mem/mem_service.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/atoms/state_notifier.dart';
 
+// FIXME 消せそう
 const _memIdKey = '_memId';
 
 final memProvider = StateNotifierProvider.family<ValueStateNotifier<MemEntity?>,
