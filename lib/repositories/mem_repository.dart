@@ -1,7 +1,5 @@
 import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
-import 'package:mem/logger.dart';
-import 'package:mem/mem.dart';
 import 'package:mem/repositories/repository.dart';
 
 const memNameColumnName = 'name';
@@ -68,126 +66,6 @@ class MemRepositoryV2 extends DatabaseTableRepository<MemEntity> {
   static clear() => _instance = null;
 }
 
-@Deprecated('Use V2')
-class MemRepositoryV1 {
-  final Table _memTable;
-
-  Future<Mem> receive(Map<String, dynamic> value) => v(
-        {'value': value},
-        () async {
-          final createdAt = DateTime.now();
-          int id = await _memTable
-              .insert(value..putIfAbsent('createdAt', () => createdAt));
-          return Mem(id: id, name: value['name'], createdAt: createdAt);
-        },
-      );
-
-  Future<List<Mem>> ship(bool? archived) => v(
-        {'archived': archived},
-        () async {
-          final where = <String>[];
-          final whereArgs = <Object?>[];
-
-          if (archived != null) {
-            archived
-                ? where.add('archivedAt IS NOT NULL')
-                : where.add('archivedAt IS NULL');
-          }
-
-          return (await _memTable.select(
-            where: where.isEmpty ? null : where.join(' AND '),
-            whereArgs: whereArgs.isEmpty ? null : whereArgs,
-          ))
-              .map((e) => Mem.fromMap(e))
-              .toList();
-        },
-      );
-
-  Future<Mem> shipWhereIdIs(dynamic id) => v(
-        {'id': id},
-        () async => Mem.fromMap(await _memTable.selectByPk(id)),
-      );
-
-  Future<Mem> update(Mem mem) => v(
-        {'mem': mem},
-        () async {
-          final value = mem.toMap();
-          value['updatedAt'] = DateTime.now();
-          await _memTable.updateByPk(mem.id, value);
-          return Mem.fromMap(value);
-        },
-      );
-
-  // TODO implement
-  // patchWhereId(dynamic id, Map<String, dynamic> value) {}
-
-  Future<Mem> archive(Mem mem) => v(
-        {'mem': mem},
-        () async {
-          final memMap = mem.toMap();
-          memMap['archivedAt'] = DateTime.now();
-          await _memTable.updateByPk(mem.id, memMap);
-          return Mem.fromMap(memMap);
-        },
-      );
-
-  Future<Mem> unarchive(Mem mem) => v(
-        {'mem': mem},
-        () async {
-          final memMap = mem.toMap();
-          memMap['archivedAt'] = null;
-          await _memTable.updateByPk(mem.id, memMap);
-          return Mem.fromMap(memMap);
-        },
-      );
-
-  Future<bool> discardWhereIdIs(dynamic id) => v(
-        {'id': id},
-        () async {
-          int deletedCount = await _memTable.deleteByPk(id);
-          if (deletedCount == 1) {
-            return true;
-          } else {
-            return false;
-          }
-        },
-      );
-
-  Future<int> discardAll() => v(
-        {},
-        () async => _memTable.delete(),
-      );
-
-  MemRepositoryV1._(this._memTable);
-
-  static MemRepositoryV1? _instance;
-
-  factory MemRepositoryV1() {
-    var tmp = _instance;
-    if (tmp == null) {
-      throw RepositoryException('Call initialize'); // coverage:ignore-line
-    } else {
-      return tmp;
-    }
-  }
-
-  factory MemRepositoryV1.initialize(Table memTable) {
-    var tmp = _instance;
-    if (tmp == null) {
-      tmp = MemRepositoryV1._(memTable);
-      _instance = tmp;
-    }
-    return tmp;
-  }
-
-  factory MemRepositoryV1.withMock(MemRepositoryV1 mock) {
-    _instance = mock;
-    return mock;
-  }
-
-  static clear() => _instance = null;
-}
-
 final memTableDefinition = DefT(
   'mems',
   [
@@ -196,13 +74,3 @@ final memTableDefinition = DefT(
     ...defaultColumnDefinitions
   ],
 );
-
-@Deprecated('Drop')
-class RepositoryException implements Exception {
-  final String message;
-
-  RepositoryException(this.message);
-
-  @override
-  String toString() => message;
-}
