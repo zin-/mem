@@ -33,8 +33,8 @@ class _FakeMemEntity_1 extends _i1.SmartFake implements _i3.MemEntity {
 /// A class which mocks [MemRepositoryV2].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockMemRepositoryV2 extends _i1.Mock implements _i3.MemRepositoryV2 {
-  MockMemRepositoryV2() {
+class MockMemRepository extends _i1.Mock implements _i3.MemRepository {
+  MockMemRepository() {
     _i1.throwOnMissingStub(this);
   }
 

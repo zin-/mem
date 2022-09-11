@@ -33,7 +33,7 @@ final fetchMemById =
 
       if (memId != null && !Mem.isSavedMap(memMap)) {
         try {
-          final mem = await MemRepositoryV2().shipById(memId);
+          final mem = await MemRepository().shipById(memId);
           ref.read(memProvider(memId).notifier).updatedBy(mem);
           memMap = mem.toMap();
         } catch (e) {
@@ -53,7 +53,7 @@ final createMem =
     () async {
       memMap.remove(_memIdKey);
 
-      final received = await MemRepositoryV2().receive(memMap);
+      final received = await MemRepository().receive(memMap);
 
       ref.read(memProvider(received.id).notifier).updatedBy(received);
       ref.read(memProvider(null).notifier).updatedBy(received);
@@ -70,7 +70,7 @@ final updateMem =
     () async {
       memMap.remove(_memIdKey);
 
-      final updated = await MemRepositoryV2().update(MemEntity.fromMap(memMap));
+      final updated = await MemRepository().update(MemEntity.fromMap(memMap));
 
       ref.read(memProvider(updated.id).notifier).updatedBy(updated);
 
@@ -85,7 +85,7 @@ final archiveMem = Provider.family<Future<MemEntity>, Map<String, dynamic>>(
     {'memMap': memMap},
     () async {
       final archived =
-          await MemRepositoryV2().archive(MemEntity.fromMap(memMap));
+          await MemRepository().archive(MemEntity.fromMap(memMap));
       ref.read(memProvider(archived.id).notifier).updatedBy(archived);
       return archived;
     },
@@ -97,7 +97,7 @@ final unarchiveMem = Provider.family<Future<MemEntity>, Map<String, dynamic>>(
     {'memMap': memMap},
     () async {
       final unarchived =
-          await MemRepositoryV2().unarchive(MemEntity.fromMap(memMap));
+          await MemRepository().unarchive(MemEntity.fromMap(memMap));
       ref.read(memProvider(unarchived.id).notifier).updatedBy(unarchived);
       return unarchived;
     },
@@ -107,6 +107,6 @@ final unarchiveMem = Provider.family<Future<MemEntity>, Map<String, dynamic>>(
 final removeMem = Provider.family<Future<bool>, int?>(
   (ref, memId) => v(
     {'memId': memId},
-    () async => await MemRepositoryV2().discardById(memId),
+    () async => await MemRepository().discardById(memId),
   ),
 );

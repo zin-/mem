@@ -16,8 +16,8 @@ import '../mocks.mocks.dart';
 void main() {
   Logger(level: Level.verbose);
 
-  final mockedMemRepository = MockMemRepositoryV2();
-  MemRepositoryV2.withMock(mockedMemRepository);
+  final mockedMemRepository = MockMemRepository();
+  MemRepository.withMock(mockedMemRepository);
 
   tearDown(() {
     reset(mockedMemRepository);

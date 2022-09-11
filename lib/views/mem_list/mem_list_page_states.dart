@@ -12,7 +12,7 @@ final fetchMemList = FutureProvider<List<MemEntity>>(
       final showNotArchived = ref.watch(showNotArchivedProvider);
       final showArchived = ref.watch(showArchivedProvider);
 
-      final mems = await MemRepositoryV2().ship(
+      final mems = await MemRepository().ship(
         archived: showNotArchived == showArchived ? null : showArchived,
       );
 

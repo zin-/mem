@@ -31,16 +31,16 @@ class MemEntity extends DatabaseTableEntity {
       }..addAll(super.toMap());
 }
 
-class MemRepositoryV2 extends DatabaseTableRepository<MemEntity> {
+class MemRepository extends DatabaseTableRepository<MemEntity> {
   @override
   MemEntity fromMap(Map<String, dynamic> valueMap) =>
       MemEntity.fromMap(valueMap);
 
-  static MemRepositoryV2? _instance;
+  static MemRepository? _instance;
 
-  MemRepositoryV2._(super.table);
+  MemRepository._(super.table);
 
-  factory MemRepositoryV2() {
+  factory MemRepository() {
     var tmp = _instance;
     if (tmp == null) {
       throw Exception('Call initialize'); // coverage:ignore-line
@@ -49,16 +49,16 @@ class MemRepositoryV2 extends DatabaseTableRepository<MemEntity> {
     }
   }
 
-  factory MemRepositoryV2.initialize(Table memTable) {
+  factory MemRepository.initialize(Table memTable) {
     var tmp = _instance;
     if (tmp == null) {
-      tmp = MemRepositoryV2._(memTable);
+      tmp = MemRepository._(memTable);
       _instance = tmp;
     }
     return tmp;
   }
 
-  factory MemRepositoryV2.withMock(MemRepositoryV2 mock) {
+  factory MemRepository.withMock(MemRepository mock) {
     _instance = mock;
     return mock;
   }

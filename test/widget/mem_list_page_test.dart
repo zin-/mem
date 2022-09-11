@@ -28,8 +28,8 @@ void main() {
 
   Logger(level: Level.verbose);
 
-  final mockedMemRepository = MockMemRepositoryV2();
-  MemRepositoryV2.withMock(mockedMemRepository);
+  final mockedMemRepository = MockMemRepository();
+  MemRepository.withMock(mockedMemRepository);
 
   testWidgets('Show saved mem list', (widgetTester) async {
     final mems = List.generate(
