@@ -20,4 +20,17 @@ class MemService {
           return receivedMem;
         },
       );
+
+  Future<MemEntity> update(MemEntity memEntity, List<MemItemEntity> memItems) =>
+      t(
+        {'memEntity': memEntity, 'memItems': memItems},
+        () async {
+          final receivedMem = await MemRepository().update(memEntity);
+          for (var memItem in memItems) {
+            await MemItemRepository().update(memItem);
+          }
+
+          return receivedMem;
+        },
+      );
 }

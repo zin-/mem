@@ -32,7 +32,7 @@ final memItemsProvider = StateNotifierProvider.family<
     () => ListValueStateNotifier<MemItemEntity>([
       MemItemEntity(
         memId: memId,
-        type: MemDetailType.memo,
+        type: MemItemType.memo,
         id: null,
       ),
     ]),
@@ -91,7 +91,9 @@ final updateMem =
     () async {
       memMap.remove(_memIdKey);
 
-      final updated = await MemRepository().update(MemEntity.fromMap(memMap));
+      final memItems = ref.read(memItemsProvider(memMap['id']));
+      final updated =
+          await MemService().update(MemEntity.fromMap(memMap), memItems);
 
       ref.read(memProvider(updated.id).notifier).updatedBy(updated);
 

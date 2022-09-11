@@ -21,7 +21,7 @@ final memItemTableDefinition = DefT(
 
 class MemItemEntity extends DatabaseTableEntity {
   int? memId;
-  MemDetailType type;
+  MemItemType type;
   dynamic value;
 
   MemItemEntity({
@@ -99,6 +99,6 @@ class MemItemRepository extends DatabaseTableRepository<MemItemEntity> {
 
 const memMemoName = 'memo';
 
-enum MemDetailType {
+enum MemItemType {
   memo,
 }
