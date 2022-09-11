@@ -16,8 +16,6 @@ void main() {
   const textFieldName = 'text';
   const datetimeFieldName = 'datetime';
 
-  const dbName = 'test.db';
-  const dbVersion = 1;
   final testTable = DefT(
     tableName,
     [
@@ -26,11 +24,10 @@ void main() {
       DefC(datetimeFieldName, TypeC.datetime),
     ],
   );
-  final tableDefinitions = [testTable];
   final defD = DefD(
-    dbName,
-    dbVersion,
-    tableDefinitions,
+    'test.db',
+    1,
+    [testTable],
   );
 
   late SqliteDatabase sqliteDatabase;
