@@ -4,6 +4,15 @@ import 'package:mem/repositories/repository.dart';
 
 const memNameColumnName = 'name';
 
+final memTableDefinition = DefT(
+  'mems',
+  [
+    DefPK(idColumnName, TypeC.integer, autoincrement: true),
+    DefC(memNameColumnName, TypeC.text),
+    ...defaultColumnDefinitions
+  ],
+);
+
 class MemEntity extends DatabaseTableEntity {
   final String name;
 
@@ -65,12 +74,3 @@ class MemRepository extends DatabaseTableRepository<MemEntity> {
 
   static clear() => _instance = null;
 }
-
-final memTableDefinition = DefT(
-  'mems',
-  [
-    DefPK(idColumnName, TypeC.integer, autoincrement: true),
-    DefC(memNameColumnName, TypeC.text),
-    ...defaultColumnDefinitions
-  ],
-);
