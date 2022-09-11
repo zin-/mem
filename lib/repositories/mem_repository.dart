@@ -45,9 +45,9 @@ class MemRepository extends DatabaseTableRepository<MemEntity> {
   MemEntity fromMap(Map<String, dynamic> valueMap) =>
       MemEntity.fromMap(valueMap);
 
-  static MemRepository? _instance;
-
   MemRepository._(super.table);
+
+  static MemRepository? _instance;
 
   factory MemRepository() {
     var tmp = _instance;
