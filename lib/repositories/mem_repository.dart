@@ -69,7 +69,7 @@ class MemRepository extends DatabaseTableRepository<MemEntity> {
 final memTableDefinition = DefT(
   'mems',
   [
-    DefPK('id', TypeC.integer, autoincrement: true),
+    DefPK(idColumnName, TypeC.integer, autoincrement: true),
     DefC(memNameColumnName, TypeC.text),
     ...defaultColumnDefinitions
   ],
