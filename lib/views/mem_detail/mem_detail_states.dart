@@ -119,7 +119,7 @@ final unarchiveMem = Provider.family<Future<MemEntity>, Map<String, dynamic>>(
     {'memMap': memMap},
     () async {
       final unarchived =
-          await MemRepository().unarchive(MemEntity.fromMap(memMap));
+          await MemService().unarchive(MemEntity.fromMap(memMap));
       ref.read(memProvider(unarchived.id).notifier).updatedBy(unarchived);
       return unarchived;
     },
@@ -129,6 +129,6 @@ final unarchiveMem = Provider.family<Future<MemEntity>, Map<String, dynamic>>(
 final removeMem = Provider.family<Future<bool>, int?>(
   (ref, memId) => v(
     {'memId': memId},
-    () async => await MemRepository().discardById(memId),
+    () async => await MemService().remove(memId!),
   ),
 );

@@ -43,4 +43,24 @@ class MemService {
           return receivedMem;
         },
       );
+
+  Future<MemEntity> unarchive(MemEntity memEntity) => t(
+        {'memEntity': memEntity},
+        () async {
+          final receivedMem = await MemRepository().unarchive(memEntity);
+          await MemItemRepository().archiveByMemId(receivedMem.id);
+
+          return receivedMem;
+        },
+      );
+
+  Future<bool> remove(int memId) => t(
+        {'memId': memId},
+        () async {
+          final removeResult = await MemRepository().discardById(memId);
+          await MemItemRepository().discardByMemId(memId);
+
+          return removeResult;
+        },
+      );
 }

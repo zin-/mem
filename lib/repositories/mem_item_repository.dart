@@ -67,11 +67,32 @@ class MemItemRepository extends DatabaseTableRepository<MemItemEntity> {
         {'memId': memId},
         () async {
           return await Future.wait((await ship(
-            archived: false,
             where: [memIdColumnName],
             whereArgs: [memId],
           ))
               .map((archiving) => archive(archiving)));
+        },
+      );
+
+  Future<List<MemItemEntity>> unarchiveByMemId(int memId) => v(
+        {'memId': memId},
+        () async {
+          return await Future.wait((await ship(
+            where: [memIdColumnName],
+            whereArgs: [memId],
+          ))
+              .map((unarchiving) => unarchive(unarchiving)));
+        },
+      );
+
+  Future<List<bool>> discardByMemId(int memId) => v(
+        {'memId': memId},
+        () async {
+          return await Future.wait((await ship(
+            where: [memIdColumnName],
+            whereArgs: [memId],
+          ))
+              .map((discarding) => discardById(discarding.id)));
         },
       );
 
