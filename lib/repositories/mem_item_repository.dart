@@ -63,6 +63,18 @@ class MemItemRepository extends DatabaseTableRepository<MemItemEntity> {
         ),
       );
 
+  Future<List<MemItemEntity>> archiveByMemId(int memId) => v(
+        {'memId': memId},
+        () async {
+          return await Future.wait((await ship(
+            archived: false,
+            where: [memIdColumnName],
+            whereArgs: [memId],
+          ))
+              .map((archiving) => archive(archiving)));
+        },
+      );
+
   @override
   MemItemEntity fromMap(Map<String, dynamic> valueMap) =>
       MemItemEntity.fromMap(valueMap);

@@ -107,7 +107,7 @@ final archiveMem = Provider.family<Future<MemEntity>, Map<String, dynamic>>(
   (ref, memMap) => v(
     {'memMap': memMap},
     () async {
-      final archived = await MemRepository().archive(MemEntity.fromMap(memMap));
+      final archived = await MemService().archive(MemEntity.fromMap(memMap));
       ref.read(memProvider(archived.id).notifier).updatedBy(archived);
       return archived;
     },
