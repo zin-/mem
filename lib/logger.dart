@@ -43,6 +43,7 @@ enum Level {
   verbose,
   trace,
   warning,
+  error,
   debug,
 }
 
@@ -55,6 +56,8 @@ extension on Level {
         return ex.Level.info;
       case Level.warning:
         return ex.Level.warning;
+      case Level.error:
+        return ex.Level.error;
       case Level.debug:
         return ex.Level.debug;
     }
@@ -107,7 +110,7 @@ class Logger {
       },
       onError: (e) {
         log(
-          level,
+          Level.error,
           e,
           message: 'Future => Error => $message',
           stackTrace: stackTrace,
