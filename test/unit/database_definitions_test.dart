@@ -141,6 +141,7 @@ void main() {
           childTableDefinition.buildCreateTableSql(),
           'CREATE TABLE ${childTableDefinition.name} ('
           ' id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,'
+          ' tests_id INTEGER NOT NULL,'
           ' FOREIGN KEY (tests_id) REFERENCES tests(id)'
           ' )',
         );

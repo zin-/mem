@@ -135,9 +135,12 @@ class ForeignKeyDefinition extends ColumnDefinition {
         );
 
   @override
-  String _onSQL() => 'FOREIGN KEY ($name)'
-      ' REFERENCES ${_parentTableDefinition.name}'
-      '(${_parentTableDefinition.primaryKey.name})';
+  String _onSQL() => [
+        super._onSQL(),
+        'FOREIGN KEY ($name)'
+            ' REFERENCES ${_parentTableDefinition.name}'
+            '(${_parentTableDefinition.primaryKey.name})'
+      ].join(', ');
 
   @override
   String toString() => 'Foreign key definition :: { name: $name }';
