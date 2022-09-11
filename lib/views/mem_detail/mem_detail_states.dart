@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger.dart';
+import 'package:mem/mem_service.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/atoms/state_notifier.dart';
 
@@ -49,12 +50,12 @@ final createMem =
     () async {
       memMap.remove(_memIdKey);
 
-      final received = await MemRepository().receive(memMap);
+      final receivedMem = await MemService().create(memMap);
 
-      ref.read(memProvider(received.id).notifier).updatedBy(received);
-      ref.read(memProvider(null).notifier).updatedBy(received);
+      ref.read(memProvider(receivedMem.id).notifier).updatedBy(receivedMem);
+      ref.read(memProvider(null).notifier).updatedBy(receivedMem);
 
-      return received;
+      return receivedMem;
     },
   ),
 );

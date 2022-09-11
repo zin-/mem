@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/repositories/mem_detail_repository.dart';
 import 'package:mem/views/colors.dart';
 import 'package:mockito/mockito.dart';
-
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/database/database.dart';
@@ -19,6 +18,8 @@ void main() {
 
   final mockedMemRepository = MockMemRepository();
   MemRepository.withMock(mockedMemRepository);
+  final mockedMemDetailRepository = MockMemDetailRepository();
+  MemDetailRepository.withMock(mockedMemDetailRepository);
 
   tearDown(() {
     reset(mockedMemRepository);
@@ -144,15 +145,30 @@ void main() {
     testWidgets(': create.', (widgetTester) async {
       const enteringMemName = 'entering mem name';
       const enteringMemMemo = 'test mem memo';
+      const memId = 1;
 
       when(mockedMemRepository.receive(any)).thenAnswer((realInvocation) async {
         final value = realInvocation.positionalArguments[0];
         expect(value[memNameColumnName], enteringMemName);
-        expect(value[memMemoName], enteringMemMemo);
 
         return MemEntity(
-          id: 1,
+          id: memId,
           name: value[memNameColumnName],
+          createdAt: DateTime.now(),
+        );
+      });
+      when(mockedMemDetailRepository.receive(any))
+          .thenAnswer((realInvocation) async {
+        final value = realInvocation.positionalArguments[0];
+        expect(value[memIdColumnName], memId);
+        expect(value[memDetailTypeColumnName], MemDetailType.memo.toString());
+        expect(value[memDetailValueColumnName], enteringMemMemo);
+
+        return MemDetailEntity(
+          id: 1,
+          memId: memId,
+          type: MemDetailType.memo,
+          value: enteringMemMemo,
           createdAt: DateTime.now(),
         );
       });
@@ -166,6 +182,7 @@ void main() {
 
       verifyNever(mockedMemRepository.shipById(any));
       verify(mockedMemRepository.receive(any)).called(1);
+      verify(mockedMemDetailRepository.receive(any)).called(1);
     });
 
     testWidgets(': update.', (widgetTester) async {

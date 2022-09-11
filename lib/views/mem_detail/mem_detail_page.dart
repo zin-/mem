@@ -3,6 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
+
+// FIXME repositoryを見るのはおかしい気がする
+import 'package:mem/repositories/mem_detail_repository.dart';
+import 'package:mem/repositories/mem_repository.dart';
+import 'package:mem/repositories/repository.dart';
 import 'package:mem/views/colors.dart';
 import 'package:mem/views/dimens.dart';
 import 'package:mem/views/atoms/async_value_view.dart';
@@ -108,14 +113,14 @@ class MemDetailPage extends StatelessWidget {
             // () => Column(
             children: [
               MemNameTextFormField(
-                memMap['name'] ?? '',
-                memMap['id'],
+                memMap[memNameColumnName] ?? '',
+                memMap[idColumnName],
                 (value) => (value?.isEmpty ?? false)
                     ? L10n().memNameIsRequiredWarn()
                     : null,
                 (value) => ref
                     .read(memMapProvider(_memId).notifier)
-                    .updatedBy(memMap..['name'] = value),
+                    .updatedBy(memMap..[memNameColumnName] = value),
               ),
               TextFormField(
                 decoration: InputDecoration(
@@ -123,9 +128,10 @@ class MemDetailPage extends StatelessWidget {
                   labelText: L10n().memMemoTitle(),
                 ),
                 maxLines: null,
+                initialValue: memMap[memMemoName],
                 onChanged: (value) => ref
                     .read(memMapProvider(_memId).notifier)
-                    .updatedBy(memMap..['memo'] = value),
+                    .updatedBy(memMap..[memMemoName] = value),
               ),
             ],
           ),

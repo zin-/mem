@@ -3,24 +3,53 @@ import 'package:mem/database/definitions.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/repositories/repository.dart';
 
+const memIdColumnName = 'mems_id';
 const memDetailTypeColumnName = 'type';
+const memDetailValueColumnName = 'value';
 
 final memDetailTableDefinition = DefT(
   'mem_details',
   [
     DefPK(idColumnName, TypeC.integer, autoincrement: true),
     DefC(memDetailTypeColumnName, TypeC.text),
+    DefC(memDetailValueColumnName, TypeC.text),
     DefFK(memTableDefinition),
     ...defaultColumnDefinitions,
   ],
 );
 
 class MemDetailEntity extends DatabaseTableEntity {
+  int memId;
   MemDetailType type;
+  dynamic value;
+
+  MemDetailEntity({
+    required this.memId,
+    required this.type,
+    this.value,
+    required int id,
+    required DateTime createdAt,
+    DateTime? updatedAt,
+    DateTime? archivedAt,
+  }) : super(
+          id: id,
+          createdAt: createdAt,
+          updatedAt: updatedAt,
+          archivedAt: archivedAt,
+        );
 
   MemDetailEntity.fromMap(super.valueMap)
-      : type = valueMap[memDetailTypeColumnName],
+      : memId = valueMap[memIdColumnName],
+        type = valueMap[memDetailTypeColumnName],
+        value = valueMap[memDetailValueColumnName],
         super.fromMap();
+
+  @override
+  Map<String, dynamic> toMap() => {
+        memIdColumnName: memId,
+        memDetailTypeColumnName: type,
+        memDetailValueColumnName: value,
+      }..addAll(super.toMap());
 }
 
 class MemDetailRepository extends DatabaseTableRepository<MemDetailEntity> {
