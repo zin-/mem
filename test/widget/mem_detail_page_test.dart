@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/repositories/mem_detail_repository.dart';
 import 'package:mem/views/colors.dart';
 import 'package:mockito/mockito.dart';
 
@@ -142,10 +143,12 @@ void main() {
 
     testWidgets(': create.', (widgetTester) async {
       const enteringMemName = 'entering mem name';
+      const enteringMemMemo = 'test mem memo';
 
       when(mockedMemRepository.receive(any)).thenAnswer((realInvocation) async {
         final value = realInvocation.positionalArguments[0];
         expect(value[memNameColumnName], enteringMemName);
+        expect(value[memMemoName], enteringMemMemo);
 
         return MemEntity(
           id: 1,
@@ -156,6 +159,7 @@ void main() {
 
       await pumpMemDetailPage(widgetTester, null);
 
+      await widgetTester.enterText(memMemoTextFormFieldFinder, enteringMemMemo);
       await enterMemNameAndSave(widgetTester, enteringMemName);
 
       await checkSavedSnackBarAndDismiss(widgetTester, enteringMemName);
