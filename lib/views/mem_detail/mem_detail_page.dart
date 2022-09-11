@@ -64,10 +64,9 @@ class MemDetailPage extends StatelessWidget {
                           {},
                           () async {
                             if (_formKey.currentState?.validate() ?? false) {
-                              final savedFuture =
-                                  _memId == null && mem?.isSaved() != true
-                                      ? ref.read(createMem(memMap))
-                                      : ref.read(updateMem(memMap));
+                              final savedFuture = _memId == null && mem == null
+                                  ? ref.read(createMem(memMap))
+                                  : ref.read(updateMem(memMap));
 
                               ScaffoldMessenger.of(context)
                                   .showSnackBar(SnackBar(

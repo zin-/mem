@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/mem.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/colors.dart';
 import 'package:mockito/mockito.dart';
@@ -12,8 +11,8 @@ import 'mem_detail_page_test.dart';
 void main() {
   Logger(level: Level.verbose);
 
-  final mockedMemRepository = MockMemRepositoryV1();
-  MemRepositoryV1.withMock(mockedMemRepository);
+  final mockedMemRepository = MockMemRepositoryV2();
+  MemRepositoryV2.withMock(mockedMemRepository);
 
   tearDown(() {
     reset(mockedMemRepository);
@@ -51,19 +50,19 @@ void main() {
   testWidgets('Show archived', (widgetTester) async {
     const memId = 1;
     const memName = 'test mem name';
-    final mem = Mem(
+    final mem = MemEntity(
       id: memId,
       name: memName,
       createdAt: DateTime.now(),
       archivedAt: DateTime.now(),
     );
 
-    when(mockedMemRepository.shipWhereIdIs(any))
+    when(mockedMemRepository.shipById(any))
         .thenAnswer((realInvocation) async => mem);
     when(mockedMemRepository.unarchive(any)).thenAnswer((realInvocation) async {
-      final mem = realInvocation.positionalArguments[0] as Mem;
+      final mem = realInvocation.positionalArguments[0] as MemEntity;
 
-      return Mem.fromMap(mem.toMap()..['archivedAt'] = null);
+      return MemEntity.fromMap(mem.toMap()..['archivedAt'] = null);
     });
 
     await pumpMemDetailPage(widgetTester, memId);
@@ -75,7 +74,7 @@ void main() {
     final appBar = widgetTester.widget(appBarFinder) as AppBar;
     expect(appBar.backgroundColor, archivedColor);
 
-    verify(mockedMemRepository.shipWhereIdIs(memId)).called(1);
+    verify(mockedMemRepository.shipById(memId)).called(1);
     verify(mockedMemRepository.unarchive(any)).called(1);
   });
 }

@@ -9,7 +9,6 @@ import 'database/database_test.dart' as database_test;
 import 'database/sqlite_database_test.dart' as sqlite_database_test;
 
 import 'repositories/repository_test.dart' as repository_test;
-import 'repositories/mem_repository_test.dart' as mem_repository_test;
 
 import 'app_test.dart' as app_test;
 
@@ -25,7 +24,6 @@ void main() async {
   }
 
   repository_test.main();
-  mem_repository_test.main();
 
   app_test.main();
 }

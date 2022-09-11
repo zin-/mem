@@ -6,7 +6,6 @@ import 'package:mockito/mockito.dart';
 
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/mem.dart';
 import 'package:mem/database/database.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/mem_detail/mem_detail_page.dart';
@@ -17,8 +16,8 @@ import '../mocks.mocks.dart';
 void main() {
   Logger(level: Level.verbose);
 
-  final mockedMemRepository = MockMemRepositoryV1();
-  MemRepositoryV1.withMock(mockedMemRepository);
+  final mockedMemRepository = MockMemRepositoryV2();
+  MemRepositoryV2.withMock(mockedMemRepository);
 
   tearDown(() {
     reset(mockedMemRepository);
@@ -26,7 +25,7 @@ void main() {
 
   group('Show', () {
     testWidgets(': not found.', (widgetTester) async {
-      when(mockedMemRepository.shipWhereIdIs(any))
+      when(mockedMemRepository.shipById(any))
           .thenThrow(NotFoundException('test target', 'test condition'));
 
       await pumpMemDetailPage(widgetTester, 1);
@@ -36,14 +35,14 @@ void main() {
       final appBar = widgetTester.widget(appBarFinder) as AppBar;
       expect(appBar.backgroundColor, primaryColor);
 
-      verify(mockedMemRepository.shipWhereIdIs(1)).called(1);
+      verify(mockedMemRepository.shipById(1)).called(1);
     });
 
     testWidgets(': found.', (widgetTester) async {
       const memId = 1;
       const memName = 'test mem name';
-      when(mockedMemRepository.shipWhereIdIs(any))
-          .thenAnswer((realInvocation) async => Mem(
+      when(mockedMemRepository.shipById(any))
+          .thenAnswer((realInvocation) async => MemEntity(
                 id: memId,
                 name: memName,
                 createdAt: DateTime.now(),
@@ -56,7 +55,7 @@ void main() {
       final appBar = widgetTester.widget(appBarFinder) as AppBar;
       expect(appBar.backgroundColor, primaryColor);
 
-      verify(mockedMemRepository.shipWhereIdIs(memId)).called(1);
+      verify(mockedMemRepository.shipById(memId)).called(1);
     });
   });
 
@@ -66,8 +65,8 @@ void main() {
       const memId = 1;
       const memName = 'test mem name';
 
-      when(mockedMemRepository.shipWhereIdIs(any))
-          .thenAnswer((realInvocation) async => Mem(
+      when(mockedMemRepository.shipById(any))
+          .thenAnswer((realInvocation) async => MemEntity(
                 id: memId,
                 name: memName,
                 createdAt: DateTime.now(),
@@ -80,7 +79,7 @@ void main() {
       final appBar = widgetTester.widget(appBarFinder) as AppBar;
       expect(appBar.backgroundColor, archivedColor);
 
-      verify(mockedMemRepository.shipWhereIdIs(memId)).called(1);
+      verify(mockedMemRepository.shipById(memId)).called(1);
     },
   );
 
@@ -88,32 +87,32 @@ void main() {
     testWidgets(
       ': keep focus mem name.',
       (widgetTester) async {
-        // final focusNode = FocusNode();
-        // // focusNode.addListener(() {
-        // //   dev('object');
-        // //   dev(focusNode.hasFocus);
-        // //   dev(focusNode.hasPrimaryFocus);
-        // //   if (focusNode.hasFocus && focusNode.hasPrimaryFocus) {
-        // //   } else {
-        // //     fail('out of focus on mem name');
-        // //   }
-        // // });
-        // await pumpMemDetailPage(widgetTester, null, memNameFocusNode: focusNode);
-        //
-        // expect(focusNode.hasPrimaryFocus, false);
-        //
-        // await widgetTester.tap(memNameTextFormFieldFinder);
-        //
-        // expect(focusNode.hasPrimaryFocus, true);
-        //
-        // await widgetTester.enterText(
-        //   memNameTextFormFieldFinder,
-        //   'entering mem name',
-        // );
-        // await widgetTester.pumpAndSettle();
-        //
+        final focusNode = FocusNode();
+        focusNode.addListener(() {
+          // dev('object');
+          // dev(focusNode.hasFocus);
+          // dev(focusNode.hasPrimaryFocus);
+          if (focusNode.hasFocus && focusNode.hasPrimaryFocus) {
+          } else {
+            fail('out of focus on mem name');
+          }
+        });
+        await pumpMemDetailPage(widgetTester, null);
+
+        expect(focusNode.hasPrimaryFocus, false);
+
+        await widgetTester.tap(memNameTextFormFieldFinder);
+
+        expect(focusNode.hasPrimaryFocus, true);
+
+        await widgetTester.enterText(
+          memNameTextFormFieldFinder,
+          'entering mem name',
+        );
+        await widgetTester.pumpAndSettle();
+
         // FIXME ここで、フォーカスがはずれていることを確認したかったが、確認できなかった
-        // expect(focusNode.hasPrimaryFocus, true);
+        expect(focusNode.hasPrimaryFocus, true);
       },
       skip: true,
     );
@@ -137,7 +136,7 @@ void main() {
 
       expect(find.text('Name is required'), findsNothing);
 
-      verifyNever(mockedMemRepository.shipWhereIdIs(any));
+      verifyNever(mockedMemRepository.shipById(any));
       verifyNever(mockedMemRepository.receive(any));
     });
 
@@ -146,9 +145,13 @@ void main() {
 
       when(mockedMemRepository.receive(any)).thenAnswer((realInvocation) async {
         final value = realInvocation.positionalArguments[0];
-        expect(value['name'], enteringMemName);
+        expect(value[memNameColumnName], enteringMemName);
 
-        return Mem(id: 1, name: value['name'], createdAt: DateTime.now());
+        return MemEntity(
+          id: 1,
+          name: value[memNameColumnName],
+          createdAt: DateTime.now(),
+        );
       });
 
       await pumpMemDetailPage(widgetTester, null);
@@ -157,7 +160,7 @@ void main() {
 
       await checkSavedSnackBarAndDismiss(widgetTester, enteringMemName);
 
-      verifyNever(mockedMemRepository.shipWhereIdIs(any));
+      verifyNever(mockedMemRepository.shipById(any));
       verify(mockedMemRepository.receive(any)).called(1);
     });
 
@@ -166,8 +169,8 @@ void main() {
       const memName = 'test mem name';
       const enteringMemName = 'entering mem name';
 
-      when(mockedMemRepository.shipWhereIdIs(any))
-          .thenAnswer((realInvocation) async => Mem(
+      when(mockedMemRepository.shipById(any))
+          .thenAnswer((realInvocation) async => MemEntity(
                 id: memId,
                 name: memName,
                 createdAt: DateTime.now(),
@@ -177,7 +180,7 @@ void main() {
         expect(value.id, memId);
         expect(value.name, enteringMemName);
 
-        return Mem(
+        return MemEntity(
           id: value.id,
           name: value.name,
           createdAt: value.createdAt,
@@ -192,7 +195,7 @@ void main() {
 
       checkSavedSnackBarAndDismiss(widgetTester, enteringMemName);
 
-      verify(mockedMemRepository.shipWhereIdIs(memId)).called(1);
+      verify(mockedMemRepository.shipById(memId)).called(1);
       verify(mockedMemRepository.update(any)).called(1);
     });
   });

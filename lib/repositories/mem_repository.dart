@@ -10,8 +10,8 @@ class MemEntity extends DatabaseTableEntity {
   final String name;
 
   MemEntity({
-    required int id,
     required this.name,
+    required int id,
     required DateTime createdAt,
     DateTime? updatedAt,
     DateTime? archivedAt,

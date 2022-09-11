@@ -5,7 +5,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i4;
 
-import 'package:mem/mem.dart' as _i2;
+import 'package:mem/database/database.dart' as _i2;
 import 'package:mem/repositories/mem_repository.dart' as _i3;
 import 'package:mockito/mockito.dart' as _i1;
 
@@ -20,57 +20,75 @@ import 'package:mockito/mockito.dart' as _i1;
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
-class _FakeMem_0 extends _i1.SmartFake implements _i2.Mem {
-  _FakeMem_0(Object parent, Invocation parentInvocation)
+class _FakeTable_0 extends _i1.SmartFake implements _i2.Table {
+  _FakeTable_0(Object parent, Invocation parentInvocation)
       : super(parent, parentInvocation);
 }
 
-/// A class which mocks [MemRepositoryV1].
+class _FakeMemEntity_1 extends _i1.SmartFake implements _i3.MemEntity {
+  _FakeMemEntity_1(Object parent, Invocation parentInvocation)
+      : super(parent, parentInvocation);
+}
+
+/// A class which mocks [MemRepositoryV2].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockMemRepositoryV1 extends _i1.Mock implements _i3.MemRepositoryV1 {
-  MockMemRepositoryV1() {
+class MockMemRepositoryV2 extends _i1.Mock implements _i3.MemRepositoryV2 {
+  MockMemRepositoryV2() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Future<_i2.Mem> receive(Map<String, dynamic>? value) =>
-      (super.noSuchMethod(Invocation.method(#receive, [value]),
-              returnValue: _i4.Future<_i2.Mem>.value(
-                  _FakeMem_0(this, Invocation.method(#receive, [value]))))
-          as _i4.Future<_i2.Mem>);
+  _i2.Table get table => (super.noSuchMethod(Invocation.getter(#table),
+      returnValue: _FakeTable_0(this, Invocation.getter(#table))) as _i2.Table);
   @override
-  _i4.Future<List<_i2.Mem>> ship(bool? archived) =>
-      (super.noSuchMethod(Invocation.method(#ship, [archived]),
-              returnValue: _i4.Future<List<_i2.Mem>>.value(<_i2.Mem>[]))
-          as _i4.Future<List<_i2.Mem>>);
+  set table(_i2.Table? _table) =>
+      super.noSuchMethod(Invocation.setter(#table, _table),
+          returnValueForMissingStub: null);
   @override
-  _i4.Future<_i2.Mem> shipWhereIdIs(dynamic id) =>
-      (super.noSuchMethod(Invocation.method(#shipWhereIdIs, [id]),
-              returnValue: _i4.Future<_i2.Mem>.value(
-                  _FakeMem_0(this, Invocation.method(#shipWhereIdIs, [id]))))
-          as _i4.Future<_i2.Mem>);
+  _i3.MemEntity fromMap(Map<String, dynamic>? valueMap) => (super.noSuchMethod(
+          Invocation.method(#fromMap, [valueMap]),
+          returnValue:
+              _FakeMemEntity_1(this, Invocation.method(#fromMap, [valueMap])))
+      as _i3.MemEntity);
   @override
-  _i4.Future<_i2.Mem> update(_i2.Mem? mem) =>
-      (super.noSuchMethod(Invocation.method(#update, [mem]),
-              returnValue: _i4.Future<_i2.Mem>.value(
-                  _FakeMem_0(this, Invocation.method(#update, [mem]))))
-          as _i4.Future<_i2.Mem>);
+  _i4.Future<_i3.MemEntity> receive(Map<String, dynamic>? valueMap) =>
+      (super.noSuchMethod(Invocation.method(#receive, [valueMap]),
+              returnValue: _i4.Future<_i3.MemEntity>.value(_FakeMemEntity_1(
+                  this, Invocation.method(#receive, [valueMap]))))
+          as _i4.Future<_i3.MemEntity>);
   @override
-  _i4.Future<_i2.Mem> archive(_i2.Mem? mem) =>
-      (super.noSuchMethod(Invocation.method(#archive, [mem]),
-              returnValue: _i4.Future<_i2.Mem>.value(
-                  _FakeMem_0(this, Invocation.method(#archive, [mem]))))
-          as _i4.Future<_i2.Mem>);
+  _i4.Future<List<_i3.MemEntity>> ship({bool? archived}) => (super.noSuchMethod(
+          Invocation.method(#ship, [], {#archived: archived}),
+          returnValue: _i4.Future<List<_i3.MemEntity>>.value(<_i3.MemEntity>[]))
+      as _i4.Future<List<_i3.MemEntity>>);
   @override
-  _i4.Future<_i2.Mem> unarchive(_i2.Mem? mem) =>
-      (super.noSuchMethod(Invocation.method(#unarchive, [mem]),
-              returnValue: _i4.Future<_i2.Mem>.value(
-                  _FakeMem_0(this, Invocation.method(#unarchive, [mem]))))
-          as _i4.Future<_i2.Mem>);
+  _i4.Future<_i3.MemEntity> shipById(dynamic id) =>
+      (super.noSuchMethod(Invocation.method(#shipById, [id]),
+              returnValue: _i4.Future<_i3.MemEntity>.value(
+                  _FakeMemEntity_1(this, Invocation.method(#shipById, [id]))))
+          as _i4.Future<_i3.MemEntity>);
   @override
-  _i4.Future<bool> discardWhereIdIs(dynamic id) =>
-      (super.noSuchMethod(Invocation.method(#discardWhereIdIs, [id]),
+  _i4.Future<_i3.MemEntity> update(_i3.MemEntity? entity) =>
+      (super.noSuchMethod(Invocation.method(#update, [entity]),
+              returnValue: _i4.Future<_i3.MemEntity>.value(
+                  _FakeMemEntity_1(this, Invocation.method(#update, [entity]))))
+          as _i4.Future<_i3.MemEntity>);
+  @override
+  _i4.Future<_i3.MemEntity> archive(_i3.MemEntity? entity) =>
+      (super.noSuchMethod(Invocation.method(#archive, [entity]),
+              returnValue: _i4.Future<_i3.MemEntity>.value(_FakeMemEntity_1(
+                  this, Invocation.method(#archive, [entity]))))
+          as _i4.Future<_i3.MemEntity>);
+  @override
+  _i4.Future<_i3.MemEntity> unarchive(_i3.MemEntity? entity) =>
+      (super.noSuchMethod(Invocation.method(#unarchive, [entity]),
+              returnValue: _i4.Future<_i3.MemEntity>.value(_FakeMemEntity_1(
+                  this, Invocation.method(#unarchive, [entity]))))
+          as _i4.Future<_i3.MemEntity>);
+  @override
+  _i4.Future<bool> discardById(dynamic id) =>
+      (super.noSuchMethod(Invocation.method(#discardById, [id]),
           returnValue: _i4.Future<bool>.value(false)) as _i4.Future<bool>);
   @override
   _i4.Future<int> discardAll() =>

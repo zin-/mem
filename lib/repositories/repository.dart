@@ -14,10 +14,10 @@ abstract class DatabaseTableEntity {
   late DateTime? archivedAt;
 
   DatabaseTableEntity({
-    required int id,
-    required DateTime createdAt,
-    DateTime? updatedAt,
-    DateTime? archivedAt,
+    required this.id,
+    required this.createdAt,
+    this.updatedAt,
+    this.archivedAt,
   });
 
   DatabaseTableEntity.fromMap(Map<String, dynamic> valueMap)

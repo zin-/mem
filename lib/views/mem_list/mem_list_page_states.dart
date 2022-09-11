@@ -1,20 +1,20 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:mem/logger.dart';
-import 'package:mem/mem.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/mem_detail/mem_detail_states.dart';
 import 'package:mem/views/atoms/state_notifier.dart';
 
-final fetchMemList = FutureProvider<List<Mem>>(
+final fetchMemList = FutureProvider<List<MemEntity>>(
   (ref) => v(
     {},
     () async {
       final showNotArchived = ref.watch(showNotArchivedProvider);
       final showArchived = ref.watch(showArchivedProvider);
 
-      final archived = showNotArchived == showArchived ? null : showArchived;
-      final mems = await MemRepositoryV1().ship(archived);
+      final mems = await MemRepositoryV2().ship(
+        archived: showNotArchived == showArchived ? null : showArchived,
+      );
 
       for (var mem in mems) {
         ref.read(memProvider(mem.id).notifier).updatedBy(mem);
@@ -30,13 +30,13 @@ final fetchMemList = FutureProvider<List<Mem>>(
 );
 
 final memListProvider =
-    StateNotifierProvider<ListValueStateNotifier<Mem>, List<Mem>>(
+    StateNotifierProvider<ListValueStateNotifier<MemEntity>, List<MemEntity>>(
   (ref) => v(
     {},
     // TODO ListValueStateは要素が変更されたらリスナーに通知して欲しい
     // これは、Viewがそれぞれに要素を見るという話ではなく、ListValueStateが持っていて欲しい
     () {
-      final listValueState = ListValueStateNotifier<Mem>(
+      final listValueState = ListValueStateNotifier<MemEntity>(
         [],
         filter: (item) {
           final showNotArchived = ref.watch(showNotArchivedProvider);
