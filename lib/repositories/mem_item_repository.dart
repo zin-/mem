@@ -14,8 +14,8 @@ final memItemTableDefinition = DefT(
     DefPK(idColumnName, TypeC.integer, autoincrement: true),
     DefC(memDetailTypeColumnName, TypeC.text),
     DefC(memDetailValueColumnName, TypeC.text),
-    DefFK(memTableDefinition),
     ...defaultColumnDefinitions,
+    DefFK(memTableDefinition),
   ],
 );
 
