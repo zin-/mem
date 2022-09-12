@@ -64,8 +64,8 @@ class MemService {
   Future<bool> remove(int memId) => t(
         {'memId': memId},
         () async {
-          final removeResult = await MemRepository().discardById(memId);
           await MemItemRepository().discardByMemId(memId);
+          final removeResult = await MemRepository().discardById(memId);
 
           return removeResult;
         },
