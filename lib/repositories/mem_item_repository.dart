@@ -41,14 +41,15 @@ class MemItemEntity extends DatabaseTableEntity {
 
   MemItemEntity.fromMap(super.valueMap)
       : memId = valueMap[memIdColumnName],
-        type = valueMap[memDetailTypeColumnName],
+        type = MemItemType.values.firstWhere(
+            (element) => element.name == valueMap[memDetailTypeColumnName]),
         value = valueMap[memDetailValueColumnName],
         super.fromMap();
 
   @override
   Map<String, dynamic> toMap() => {
         memIdColumnName: memId,
-        memDetailTypeColumnName: type,
+        memDetailTypeColumnName: type.name,
         memDetailValueColumnName: value,
       }..addAll(super.toMap());
 }
@@ -58,7 +59,7 @@ class MemItemRepository extends DatabaseTableRepository<MemItemEntity> {
         {'memId': memId},
         () => ship(
           archived: false,
-          where: [memIdColumnName],
+          whereColumns: [memIdColumnName],
           whereArgs: [memId],
         ),
       );
@@ -67,7 +68,7 @@ class MemItemRepository extends DatabaseTableRepository<MemItemEntity> {
         {'memId': memId},
         () async {
           return await Future.wait((await ship(
-            where: [memIdColumnName],
+            whereColumns: [memIdColumnName],
             whereArgs: [memId],
           ))
               .map((archiving) => archive(archiving)));
@@ -78,7 +79,7 @@ class MemItemRepository extends DatabaseTableRepository<MemItemEntity> {
         {'memId': memId},
         () async {
           return await Future.wait((await ship(
-            where: [memIdColumnName],
+            whereColumns: [memIdColumnName],
             whereArgs: [memId],
           ))
               .map((unarchiving) => unarchive(unarchiving)));
@@ -89,7 +90,7 @@ class MemItemRepository extends DatabaseTableRepository<MemItemEntity> {
         {'memId': memId},
         () async {
           return await Future.wait((await ship(
-            where: [memIdColumnName],
+            whereColumns: [memIdColumnName],
             whereArgs: [memId],
           ))
               .map((discarding) => discardById(discarding.id)));

@@ -60,13 +60,20 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
 
   Future<List<Entity>> ship({
     bool? archived,
-    List<String>? where,
+    List<String>? whereColumns,
     List<dynamic>? whereArgs,
   }) =>
       v(
-        {'archived': archived, 'where': where, 'whereArgs': whereArgs},
+        {
+          'archived': archived,
+          'whereColumns': whereColumns,
+          'whereArgs': whereArgs
+        },
         () async {
-          final whereStrings = List.from(where ?? [], growable: true);
+          final whereStrings = List.from(
+            (whereColumns ?? []).map((whereColumn) => '$whereColumn = ?'),
+            growable: true,
+          );
           final whereArgStrings = List.from(whereArgs ?? [], growable: true);
           if (archived != null) {
             archived
