@@ -73,6 +73,13 @@ class Logger {
     } else if (object is Function()) {
       warn('Use functionLog. I try auto cast.');
       functionLog(level, object, {});
+    } else if (object is Error || object is Exception) {
+      _messageLog(
+        level,
+        message == null ? object : _buildMessageWithValue(message, object),
+        error: object,
+        stackTrace: stackTrace,
+      );
     } else {
       _messageLog(
         level,
@@ -119,16 +126,21 @@ class Logger {
     );
   }
 
-  void _messageLog(Level level, dynamic message, {StackTrace? stackTrace}) =>
+  void _messageLog(
+    Level level,
+    dynamic message, {
+    dynamic error,
+    StackTrace? stackTrace,
+  }) =>
       _logger.log(
         level._convertIntoEx(),
         message.toString().split('\n').first,
-        null,
+        error,
         stackTrace,
       );
 
-  String _buildMessageWithValue(String base, dynamic value) =>
-      value == null ? base : '$base :: $value';
+  String _buildMessageWithValue(String message, dynamic object) =>
+      object == null ? message : '$message :: $object';
 
   static Logger? _instance;
 
