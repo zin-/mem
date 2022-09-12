@@ -9,19 +9,12 @@ class MemService {
         {'memMap': memMap, 'memItems': memItems},
         () async {
           final receivedMem = await MemRepository().receive(memMap);
-          try {
-            for (var memItem in memItems) {
-              await MemItemRepository().receive({
-                memIdColumnName: receivedMem.id,
-                memDetailTypeColumnName: memItem.type.name,
-                memDetailValueColumnName: memItem.value,
-              });
-            }
-          } catch (e) {
-            warn('Roll back');
-            await MemItemRepository().discardByMemId(receivedMem.id);
-            await MemRepository().discardById(receivedMem.id);
-            rethrow;
+          for (var memItem in memItems) {
+            await MemItemRepository().receive({
+              memIdColumnName: receivedMem.id,
+              memDetailTypeColumnName: memItem.type.name,
+              memDetailValueColumnName: memItem.value,
+            });
           }
 
           return receivedMem;
