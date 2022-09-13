@@ -21,6 +21,7 @@ class AsyncValueView<T> extends StatelessWidget {
                   child: Column(
                     children: [
                       Text(error.toString()),
+                      // TODO show error details
                       // ...stackTrace
                       //     .toString()
                       //     .split('\n')
