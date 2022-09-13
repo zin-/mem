@@ -65,10 +65,15 @@ class MockMemRepository extends _i1.Mock implements _i3.MemRepository {
           as _i5.Future<_i3.MemEntity>);
   @override
   _i5.Future<List<_i3.MemEntity>> ship(
-          {bool? archived, List<String>? whereColumns, List<dynamic>? whereArgs}) =>
+          {bool? archived,
+          List<String>? whereColumns,
+          List<dynamic>? whereArgs}) =>
       (super.noSuchMethod(
-              Invocation.method(#ship, [],
-                  {#archived: archived, #where: whereColumns, #whereArgs: whereArgs}),
+              Invocation.method(#ship, [], {
+                #archived: archived,
+                #whereColumns: whereColumns,
+                #whereArgs: whereArgs
+              }),
               returnValue:
                   _i5.Future<List<_i3.MemEntity>>.value(<_i3.MemEntity>[]))
           as _i5.Future<List<_i3.MemEntity>>);
@@ -127,6 +132,21 @@ class MockMemItemRepository extends _i1.Mock implements _i4.MemItemRepository {
           returnValue: _i5.Future<List<_i4.MemItemEntity>>.value(
               <_i4.MemItemEntity>[])) as _i5.Future<List<_i4.MemItemEntity>>);
   @override
+  _i5.Future<List<_i4.MemItemEntity>> archiveByMemId(int? memId) =>
+      (super.noSuchMethod(Invocation.method(#archiveByMemId, [memId]),
+          returnValue: _i5.Future<List<_i4.MemItemEntity>>.value(
+              <_i4.MemItemEntity>[])) as _i5.Future<List<_i4.MemItemEntity>>);
+  @override
+  _i5.Future<List<_i4.MemItemEntity>> unarchiveByMemId(int? memId) =>
+      (super.noSuchMethod(Invocation.method(#unarchiveByMemId, [memId]),
+          returnValue: _i5.Future<List<_i4.MemItemEntity>>.value(
+              <_i4.MemItemEntity>[])) as _i5.Future<List<_i4.MemItemEntity>>);
+  @override
+  _i5.Future<List<bool>> discardByMemId(int? memId) =>
+      (super.noSuchMethod(Invocation.method(#discardByMemId, [memId]),
+              returnValue: _i5.Future<List<bool>>.value(<bool>[]))
+          as _i5.Future<List<bool>>);
+  @override
   _i4.MemItemEntity fromMap(Map<String, dynamic>? valueMap) =>
       (super.noSuchMethod(Invocation.method(#fromMap, [valueMap]),
               returnValue: _FakeMemItemEntity_2(
@@ -140,10 +160,15 @@ class MockMemItemRepository extends _i1.Mock implements _i4.MemItemRepository {
           .Future<_i4.MemItemEntity>);
   @override
   _i5.Future<List<_i4.MemItemEntity>> ship(
-          {bool? archived, List<String>? whereColumns, List<dynamic>? whereArgs}) =>
+          {bool? archived,
+          List<String>? whereColumns,
+          List<dynamic>? whereArgs}) =>
       (super.noSuchMethod(
-          Invocation.method(#ship, [],
-              {#archived: archived, #where: whereColumns, #whereArgs: whereArgs}),
+          Invocation.method(#ship, [], {
+            #archived: archived,
+            #whereColumns: whereColumns,
+            #whereArgs: whereArgs
+          }),
           returnValue: _i5.Future<List<_i4.MemItemEntity>>.value(
               <_i4.MemItemEntity>[])) as _i5.Future<List<_i4.MemItemEntity>>);
   @override

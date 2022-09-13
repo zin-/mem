@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/logger.dart';
+import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/colors.dart';
 import 'package:mockito/mockito.dart';
@@ -13,6 +14,8 @@ void main() {
 
   final mockedMemRepository = MockMemRepository();
   MemRepository.withMock(mockedMemRepository);
+  final mockedMemItemRepository = MockMemItemRepository();
+  MemItemRepository.withMock(mockedMemItemRepository);
 
   tearDown(() {
     reset(mockedMemRepository);
@@ -47,9 +50,10 @@ void main() {
     expect(removeConfirmationFinder, findsNothing);
   });
 
-  testWidgets('Show archived', (widgetTester) async {
+  testWidgets('Show archived and unarchive', (widgetTester) async {
     const memId = 1;
     const memName = 'test mem name';
+    const memMemo = 'test mem memo';
     final mem = MemEntity(
       id: memId,
       name: memName,
@@ -59,10 +63,32 @@ void main() {
 
     when(mockedMemRepository.shipById(any))
         .thenAnswer((realInvocation) async => mem);
+    when(mockedMemItemRepository.shipByMemId(any))
+        .thenAnswer((realInvocation) async => [
+              MemItemEntity(
+                memId: memId,
+                type: MemItemType.memo,
+                value: memMemo,
+                createdAt: DateTime.now(),
+                archivedAt: DateTime.now(),
+              ),
+            ]);
     when(mockedMemRepository.unarchive(any)).thenAnswer((realInvocation) async {
       final mem = realInvocation.positionalArguments[0] as MemEntity;
 
       return MemEntity.fromMap(mem.toMap()..['archivedAt'] = null);
+    });
+    when(mockedMemItemRepository.unarchiveByMemId(memId))
+        .thenAnswer((realInvocation) async {
+      return [
+        MemItemEntity(
+          memId: memId,
+          type: MemItemType.memo,
+          value: memMemo,
+          createdAt: DateTime.now(),
+          archivedAt: null,
+        ),
+      ];
     });
 
     await pumpMemDetailPage(widgetTester, memId);

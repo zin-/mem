@@ -48,7 +48,7 @@ class MemService {
         {'memEntity': memEntity},
         () async {
           final receivedMem = await MemRepository().unarchive(memEntity);
-          await MemItemRepository().archiveByMemId(receivedMem.id);
+          await MemItemRepository().unarchiveByMemId(receivedMem.id);
 
           return receivedMem;
         },
