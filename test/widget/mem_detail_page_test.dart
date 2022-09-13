@@ -165,7 +165,7 @@ void main() {
           .thenAnswer((realInvocation) async {
         final value = realInvocation.positionalArguments[0];
         expect(value[memIdColumnName], memId);
-        expect(value[memDetailTypeColumnName], MemItemType.memo.toString());
+        expect(value[memDetailTypeColumnName], MemItemType.memo.name);
         expect(value[memDetailValueColumnName], enteringMemMemo);
 
         return MemItemEntity(
