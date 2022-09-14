@@ -138,7 +138,7 @@ class MemDetailPage extends StatelessWidget {
                     maxLines: null,
                     initialValue: memItem.value,
                     onChanged: (value) =>
-                        ref.read(memItemsProvider(_memId).notifier).update(
+                        ref.read(memItemsProvider(_memId).notifier).upsert(
                               memItem..value = value,
                               (item) => item.id == memItem.id,
                             ),
