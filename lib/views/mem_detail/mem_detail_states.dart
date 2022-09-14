@@ -38,20 +38,14 @@ final fetchMemById =
   (ref, memId) => v(
     {'memId': memId},
     () async {
-      if (memId != null && ref.read(memProvider(memId)) == null) {
-        try {
+      if (memId != null) {
+        if (ref.read(memProvider(memId)) == null) {
           final mem = await MemRepository().shipById(memId);
           ref.read(memProvider(memId).notifier).updatedBy(mem);
-          final memItems = await MemItemRepository().shipByMemId(mem.id);
-          for (var memItem in memItems) {
-            ref.read(memItemsProvider(memId).notifier).update(
-                  memItem,
-                  (item) => item.memId == memItem.memId,
-                );
-          }
-          return mem.toMap();
-        } catch (e) {
-          warn(e);
+        }
+        if (ref.read(memItemsProvider(memId)) == null) {
+          final memItems = await MemItemRepository().shipByMemId(memId);
+          ref.read(memItemsProvider(memId).notifier).updatedBy(memItems);
         }
       }
 
@@ -66,8 +60,8 @@ final createMem =
     {'memMap': memMap},
     () async {
       final memId = memMap.remove(_memIdKey);
-      final memItems = ref.read(memItemsProvider(memId));
-      final memDetail = MemDetail(MemEntity.fromMap(memMap), memItems ?? []);
+      final memItems = ref.read(memItemsProvider(memId)) ?? [];
+      final memDetail = MemDetail(MemEntity.fromMap(memMap), memItems);
 
       final receivedMemDetail = await MemService().create(memDetail);
 
@@ -94,15 +88,21 @@ final updateMem =
   (ref, memMap) => v(
     {'memMap': memMap},
     () async {
-      memMap.remove(_memIdKey);
+      final memId = memMap.remove(_memIdKey);
 
-      final memItems = ref.read(memItemsProvider(memMap['id']));
-      final updated =
-          await MemService().update(MemEntity.fromMap(memMap), memItems ?? []);
+      final memItemEntities = ref.read(memItemsProvider(memId)) ?? [];
+      final memDetail = MemDetail(MemEntity.fromMap(memMap), memItemEntities);
 
-      ref.read(memProvider(updated.id).notifier).updatedBy(updated);
+      final updatedMemDetail = await MemService().update(memDetail);
 
-      return updated;
+      ref
+          .read(memProvider(updatedMemDetail.memEntity.id).notifier)
+          .updatedBy(updatedMemDetail.memEntity);
+      ref
+          .read(memItemsProvider(updatedMemDetail.memEntity.id).notifier)
+          .updatedBy(updatedMemDetail.memItemEntities);
+
+      return updatedMemDetail.memEntity;
     },
   ),
 );
