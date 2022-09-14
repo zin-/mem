@@ -86,14 +86,12 @@ final createMem = Provider.autoDispose.family<Future<MemEntity>, int?>(
   ),
 );
 
-final updateMem =
-    Provider.autoDispose.family<Future<MemEntity>, Map<String, dynamic>>(
-  (ref, memMap) => v(
-    {'memMap': memMap},
+final updateMem = Provider.autoDispose.family<Future<MemEntity>, int?>(
+  (ref, memId) => v(
+    {'memId': memId},
     () async {
-      final memId = memMap.remove(_memIdKey);
-
       final memItemEntities = ref.read(memItemsProvider(memId)) ?? [];
+      final memMap = ref.read(memMapProvider(memId));
       final memDetail = MemDetail(MemEntity.fromMap(memMap), memItemEntities);
 
       final updatedMemDetail = await MemService().update(memDetail);
