@@ -26,7 +26,7 @@ class MemListPage extends StatelessWidget {
             {},
             () {
               ref.watch(fetchMemList);
-              final memList = ref.watch(memListProvider);
+              final filteredMemList = ref.watch(filteredMemListProvider);
 
               return Scaffold(
                 body: CustomScrollView(
@@ -55,7 +55,7 @@ class MemListPage extends StatelessWidget {
                     SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
-                          final mem = (memList ?? [])[index];
+                          final mem = (filteredMemList)[index];
                           return ListTile(
                             title: MemNameText(mem.name, mem.id),
                             onTap: () => showMemDetailPage(
@@ -65,7 +65,7 @@ class MemListPage extends StatelessWidget {
                             ),
                           );
                         },
-                        childCount: (memList ?? []).length,
+                        childCount: filteredMemList.length,
                       ),
                     ),
                   ],

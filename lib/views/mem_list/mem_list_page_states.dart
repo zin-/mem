@@ -16,13 +16,10 @@ final fetchMemList = FutureProvider<List<MemEntity>>(
         archived: showNotArchived == showArchived ? null : showArchived,
       );
 
+      final memListNotifier = ref.read(memListProvider.notifier);
       for (var mem in mems) {
         ref.read(memProvider(mem.id).notifier).updatedBy(mem);
-        ref.read(memListProvider.notifier).upsert(
-              // FIXME 毎回fetchするのは効率悪い
-              ref.watch(memProvider(mem.id))!,
-              (item) => item.id == mem.id,
-            );
+        memListNotifier.upsert(mem, (item) => item.id == mem.id);
       }
 
       return mems;
@@ -38,20 +35,7 @@ final memListProvider =
     // これは、Viewがそれぞれに要素を見るという話ではなく、ListValueStateが持っていて欲しい
     () {
       final listValueState = ListValueStateNotifier<MemEntity>(
-        [],
-        filter: (item) {
-          final showNotArchived = ref.watch(showNotArchivedProvider);
-          final showArchived = ref.watch(showArchivedProvider);
-
-          if (showNotArchived == showArchived) {
-            return true;
-          }
-          if (item.archivedAt == null) {
-            return ref.watch(showNotArchivedProvider);
-          } else {
-            return ref.watch(showArchivedProvider);
-          }
-        },
+        null,
         compare: (item1, item2) {
           if (item1.archivedAt != item2.archivedAt) {
             if (item1.archivedAt == null) {
@@ -69,6 +53,33 @@ final memListProvider =
 
       return listValueState;
     },
+  ),
+);
+
+final filteredMemListProvider =
+    StateNotifierProvider<ValueStateNotifier<List<MemEntity>>, List<MemEntity>>(
+  (ref) => v(
+    {},
+    () {
+      final memList = ref.watch(memListProvider) ?? [];
+
+      final showNotArchived = ref.watch(showNotArchivedProvider);
+      final showArchived = ref.watch(showArchivedProvider);
+
+      final filteredMemList = memList.where((item) {
+        if (showNotArchived == showArchived) {
+          return true;
+        }
+        if (item.archivedAt == null) {
+          return showNotArchived;
+        } else {
+          return showArchived;
+        }
+      }).toList();
+
+      return ValueStateNotifier(filteredMemList);
+    },
+    debug: true,
   ),
 );
 

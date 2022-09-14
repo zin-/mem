@@ -10,13 +10,10 @@ class ValueStateNotifier<T> extends StateNotifier<T> {
 }
 
 class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>?> {
-  // FIXME filterはstateが持つものじゃない気がする
-  final bool Function(T item)? filter;
   final int Function(T item1, T item2)? compare;
 
   ListValueStateNotifier(
     List<T>? state, {
-    this.filter,
     this.compare,
   }) : super(state);
 
@@ -24,10 +21,7 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>?> {
   List<T>? updatedBy(List<T>? value) => v(
         {'value': value},
         () => super.updatedBy(
-          value == null
-              ? value
-              : List.of(value.where(filter ?? (_) => true))
-                  .sorted(compare ?? (a, b) => 0),
+          value == null ? value : List.of(value).sorted(compare ?? (a, b) => 0),
         ),
       );
 
@@ -35,7 +29,9 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>?> {
         {'item': item},
         () {
           final tmp = List.of(state ?? <T>[]);
+
           tmp.add(item);
+
           updatedBy(tmp);
         },
       );
