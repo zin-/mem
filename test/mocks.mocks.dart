@@ -58,10 +58,16 @@ class MockMemRepository extends _i1.Mock implements _i3.MemRepository {
               _FakeMemEntity_1(this, Invocation.method(#fromMap, [valueMap])))
       as _i3.MemEntity);
   @override
-  _i5.Future<_i3.MemEntity> receive(Map<String, dynamic>? valueMap) =>
-      (super.noSuchMethod(Invocation.method(#receive, [valueMap]),
+  _i5.Future<_i3.MemEntity> receive(_i3.MemEntity? entity) =>
+      (super.noSuchMethod(Invocation.method(#receive, [entity]),
               returnValue: _i5.Future<_i3.MemEntity>.value(_FakeMemEntity_1(
-                  this, Invocation.method(#receive, [valueMap]))))
+                  this, Invocation.method(#receive, [entity]))))
+          as _i5.Future<_i3.MemEntity>);
+  @override
+  _i5.Future<_i3.MemEntity> receiveV1(Map<String, dynamic>? valueMap) =>
+      (super.noSuchMethod(Invocation.method(#receiveV1, [valueMap]),
+              returnValue: _i5.Future<_i3.MemEntity>.value(_FakeMemEntity_1(
+                  this, Invocation.method(#receiveV1, [valueMap]))))
           as _i5.Future<_i3.MemEntity>);
   @override
   _i5.Future<List<_i3.MemEntity>> ship(
@@ -153,10 +159,16 @@ class MockMemItemRepository extends _i1.Mock implements _i4.MemItemRepository {
                   this, Invocation.method(#fromMap, [valueMap])))
           as _i4.MemItemEntity);
   @override
-  _i5.Future<_i4.MemItemEntity> receive(Map<String, dynamic>? valueMap) =>
-      (super.noSuchMethod(Invocation.method(#receive, [valueMap]),
+  _i5.Future<_i4.MemItemEntity> receive(_i4.MemItemEntity? entity) =>
+      (super.noSuchMethod(Invocation.method(#receive, [entity]),
           returnValue: _i5.Future<_i4.MemItemEntity>.value(_FakeMemItemEntity_2(
-              this, Invocation.method(#receive, [valueMap])))) as _i5
+              this, Invocation.method(#receive, [entity])))) as _i5
+          .Future<_i4.MemItemEntity>);
+  @override
+  _i5.Future<_i4.MemItemEntity> receiveV1(Map<String, dynamic>? valueMap) =>
+      (super.noSuchMethod(Invocation.method(#receiveV1, [valueMap]),
+          returnValue: _i5.Future<_i4.MemItemEntity>.value(_FakeMemItemEntity_2(
+              this, Invocation.method(#receiveV1, [valueMap])))) as _i5
           .Future<_i4.MemItemEntity>);
   @override
   _i5.Future<List<_i4.MemItemEntity>> ship(

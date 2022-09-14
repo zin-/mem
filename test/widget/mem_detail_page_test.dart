@@ -143,7 +143,7 @@ void main() {
       expect(find.text('Name is required'), findsNothing);
 
       verifyNever(mockedMemRepository.shipById(any));
-      verifyNever(mockedMemRepository.receive(any));
+      verifyNever(mockedMemRepository.receiveV1(any));
     });
 
     testWidgets(': create.', (widgetTester) async {
@@ -151,7 +151,7 @@ void main() {
       const enteringMemMemo = 'test mem memo';
       const memId = 1;
 
-      when(mockedMemRepository.receive(any)).thenAnswer((realInvocation) async {
+      when(mockedMemRepository.receiveV1(any)).thenAnswer((realInvocation) async {
         final value = realInvocation.positionalArguments[0];
         expect(value[memNameColumnName], enteringMemName);
 
@@ -161,7 +161,7 @@ void main() {
           createdAt: DateTime.now(),
         );
       });
-      when(mockedMemItemRepository.receive(any))
+      when(mockedMemItemRepository.receiveV1(any))
           .thenAnswer((realInvocation) async {
         final value = realInvocation.positionalArguments[0];
         expect(value[memIdColumnName], memId);
@@ -185,8 +185,8 @@ void main() {
       await checkSavedSnackBarAndDismiss(widgetTester, enteringMemName);
 
       verifyNever(mockedMemRepository.shipById(any));
-      verify(mockedMemRepository.receive(any)).called(1);
-      verify(mockedMemItemRepository.receive(any)).called(1);
+      verify(mockedMemRepository.receiveV1(any)).called(1);
+      verify(mockedMemItemRepository.receiveV1(any)).called(1);
     });
 
     testWidgets(': update.', (widgetTester) async {
@@ -278,6 +278,9 @@ final appBarFinder = find.byType(AppBar);
 TextFormField memNameTextFormField(WidgetTester widgetTester) =>
     (widgetTester.widget(memNameTextFormFieldFinder) as TextFormField);
 
+TextFormField memMemoTextFormField(WidgetTester widgetTester) =>
+    (widgetTester.widget(memMemoTextFormFieldFinder) as TextFormField);
+
 void expectMemNameOnMemDetail(
   WidgetTester widgetTester,
   String memName,
@@ -285,6 +288,15 @@ void expectMemNameOnMemDetail(
     expect(
       memNameTextFormField(widgetTester).initialValue,
       memName,
+    );
+
+void expectMemMemoOnMemDetail(
+  WidgetTester widgetTester,
+  String memMemo,
+) =>
+    expect(
+      memMemoTextFormField(widgetTester).initialValue,
+      memMemo,
     );
 
 Future<void> enterMemNameAndSave(

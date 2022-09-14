@@ -9,13 +9,13 @@ const archivedAtColumnName = 'archivedAt';
 
 abstract class DatabaseTableEntity {
   late dynamic id;
-  late DateTime createdAt;
+  late DateTime? createdAt;
   late DateTime? updatedAt;
   late DateTime? archivedAt;
 
   DatabaseTableEntity({
     required this.id,
-    required this.createdAt,
+    this.createdAt,
     this.updatedAt,
     this.archivedAt,
   });
@@ -46,7 +46,20 @@ final defaultColumnDefinitions = [
 ];
 
 abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
-  Future<Entity> receive(Map<String, dynamic> valueMap) => v(
+  Future<Entity> receive(Entity entity) => v(
+        {'entity': entity},
+        () async {
+          final insertingMap = entity.toMap()
+            ..[createdAtColumnName] = entity.createdAt ?? DateTime.now();
+
+          final id = await table.insert(insertingMap);
+
+          return fromMap(insertingMap..[idColumnName] = id);
+        },
+      );
+
+  // FIXME drop
+  Future<Entity> receiveV1(Map<String, dynamic> valueMap) => v(
         {'valueMap': valueMap},
         () async {
           final insertingMap = valueMap

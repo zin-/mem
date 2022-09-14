@@ -30,7 +30,7 @@ final fetchMemList = FutureProvider<List<MemEntity>>(
 );
 
 final memListProvider =
-    StateNotifierProvider<ListValueStateNotifier<MemEntity>, List<MemEntity>>(
+    StateNotifierProvider<ListValueStateNotifier<MemEntity>, List<MemEntity>?>(
   (ref) => v(
     {},
     // TODO ListValueStateは要素が変更されたらリスナーに通知して欲しい

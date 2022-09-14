@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
+import 'package:mem/repositories/mem_item_repository.dart'; // FIXME repositoryを見るのはおかしい気がする
 import 'package:mem/repositories/mem_repository.dart'; // FIXME repositoryを見るのはおかしい気がする
 import 'package:mem/repositories/repository.dart'; // FIXME repositoryを見るのはおかしい気がする
 import 'package:mem/views/colors.dart';
@@ -121,7 +122,14 @@ class MemDetailPage extends StatelessWidget {
                       .read(memMapProvider(_memId).notifier)
                       .updatedBy(memMap..[memNameColumnName] = value),
                 ),
-                ...memItems.map((memItem) {
+                ...(memItems ??
+                        [
+                          MemItemEntity(
+                            memId: _memId,
+                            type: MemItemType.memo,
+                          ),
+                        ])
+                    .map((memItem) {
                   return TextFormField(
                     decoration: InputDecoration(
                       icon: const Icon(Icons.subject),

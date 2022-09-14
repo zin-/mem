@@ -55,7 +55,7 @@ class MemListPage extends StatelessWidget {
                     SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
-                          final mem = memList[index];
+                          final mem = (memList ?? [])[index];
                           return ListTile(
                             title: MemNameText(mem.name, mem.id),
                             onTap: () => showMemDetailPage(
@@ -65,7 +65,7 @@ class MemListPage extends StatelessWidget {
                             ),
                           );
                         },
-                        childCount: memList.length,
+                        childCount: (memList ?? []).length,
                       ),
                     ),
                   ],
@@ -106,6 +106,7 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
               () {
                 if (memId == null) {
                   ref.read(memProvider(memId).notifier).updatedBy(null);
+                  ref.read(memItemsProvider(memId).notifier).updatedBy(null);
                   if (result != null) {
                     ref.read(memListProvider.notifier).add(result);
                   }

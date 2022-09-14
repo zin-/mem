@@ -26,16 +26,10 @@ final memMapProvider = StateNotifierProvider.family<
 );
 
 final memItemsProvider = StateNotifierProvider.family<
-    ListValueStateNotifier<MemItemEntity>, List<MemItemEntity>, int?>(
+    ListValueStateNotifier<MemItemEntity>, List<MemItemEntity>?, int?>(
   (ref, memId) => v(
     {'memId': memId},
-    () => ListValueStateNotifier<MemItemEntity>([
-      MemItemEntity(
-        memId: memId,
-        type: MemItemType.memo,
-        id: null,
-      ),
-    ]),
+    () => ListValueStateNotifier<MemItemEntity>(null),
   ),
 );
 
@@ -73,13 +67,24 @@ final createMem =
     () async {
       final memId = memMap.remove(_memIdKey);
       final memItems = ref.read(memItemsProvider(memId));
+      final memDetail = MemDetail(MemEntity.fromMap(memMap), memItems ?? []);
 
-      final receivedMem = await MemService().create(memMap, memItems);
+      final receivedMemDetail = await MemService().create(memDetail);
 
-      ref.read(memProvider(receivedMem.id).notifier).updatedBy(receivedMem);
-      ref.read(memProvider(memId).notifier).updatedBy(receivedMem);
+      ref
+          .read(memProvider(null).notifier)
+          .updatedBy(receivedMemDetail.memEntity);
+      ref
+          .read(memItemsProvider(null).notifier)
+          .updatedBy(receivedMemDetail.memItemEntities);
+      ref
+          .read(memProvider(receivedMemDetail.memEntity.id).notifier)
+          .updatedBy(receivedMemDetail.memEntity);
+      ref
+          .read(memItemsProvider(receivedMemDetail.memEntity.id).notifier)
+          .updatedBy(receivedMemDetail.memItemEntities);
 
-      return receivedMem;
+      return receivedMemDetail.memEntity;
     },
   ),
 );
@@ -93,7 +98,7 @@ final updateMem =
 
       final memItems = ref.read(memItemsProvider(memMap['id']));
       final updated =
-          await MemService().update(MemEntity.fromMap(memMap), memItems);
+          await MemService().update(MemEntity.fromMap(memMap), memItems ?? []);
 
       ref.read(memProvider(updated.id).notifier).updatedBy(updated);
 

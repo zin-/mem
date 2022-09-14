@@ -34,7 +34,7 @@ class MemItemEntity extends DatabaseTableEntity {
     DateTime? archivedAt,
   }) : super(
           id: id,
-          createdAt: createdAt ?? DateTime.now(),
+          createdAt: createdAt,
           updatedAt: updatedAt,
           archivedAt: archivedAt,
         );

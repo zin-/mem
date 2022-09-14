@@ -55,7 +55,7 @@ void main() async {
   test(
     'receive',
     () async {
-      final result = await testRepository.receive({});
+      final result = await testRepository.receiveV1({});
 
       expect(result.id, isNotNull);
       expect(result.createdAt, const TypeMatcher<DateTime>());
@@ -68,10 +68,10 @@ void main() async {
     test(
       ': all',
       () async {
-        final received1 = await testRepository.receive({
+        final received1 = await testRepository.receiveV1({
           archivedAtColumnName: null,
         });
-        final received2 = await testRepository.receive({
+        final received2 = await testRepository.receiveV1({
           archivedAtColumnName: DateTime.now(),
         });
 
@@ -86,10 +86,10 @@ void main() async {
     test(
       ': archived',
       () async {
-        await testRepository.receive({
+        await testRepository.receiveV1({
           archivedAtColumnName: null,
         });
-        final received2 = await testRepository.receive({
+        final received2 = await testRepository.receiveV1({
           archivedAtColumnName: DateTime.now(),
         });
 
@@ -103,10 +103,10 @@ void main() async {
     test(
       ': not archived',
       () async {
-        final received1 = await testRepository.receive({
+        final received1 = await testRepository.receiveV1({
           archivedAtColumnName: null,
         });
-        await testRepository.receive({
+        await testRepository.receiveV1({
           archivedAtColumnName: DateTime.now(),
         });
 
@@ -121,7 +121,7 @@ void main() async {
   test(
     'shipById',
     () async {
-      final received = await testRepository.receive({});
+      final received = await testRepository.receiveV1({});
 
       final shipped = await testRepository.shipById(received.id);
 
@@ -132,7 +132,7 @@ void main() async {
   test(
     'update',
     () async {
-      final received = await testRepository.receive({});
+      final received = await testRepository.receiveV1({});
 
       final updated = await testRepository.update(received);
 
@@ -143,7 +143,7 @@ void main() async {
   test(
     'archive',
     () async {
-      final received = await testRepository.receive({});
+      final received = await testRepository.receiveV1({});
 
       final updated = await testRepository.archive(received);
 
@@ -154,7 +154,7 @@ void main() async {
   test(
     'unarchive',
     () async {
-      final received = await testRepository.receive({
+      final received = await testRepository.receiveV1({
         archivedAtColumnName: DateTime.now(),
       });
 
@@ -168,7 +168,7 @@ void main() async {
     test(
       ': success',
       () async {
-        final received = await testRepository.receive({});
+        final received = await testRepository.receiveV1({});
 
         final discardResult = await testRepository.discardById(received.id);
 
@@ -189,8 +189,8 @@ void main() async {
   test(
     'discardAll',
     () async {
-      await testRepository.receive({});
-      await testRepository.receive({});
+      await testRepository.receiveV1({});
+      await testRepository.receiveV1({});
 
       final discardedCount = await testRepository.discardAll();
 

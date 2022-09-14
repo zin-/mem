@@ -11,21 +11,21 @@ import 'package:mem/views/mem_list/mem_list_page.dart';
 import '../mocks.mocks.dart';
 import 'mem_detail_page_test.dart';
 
-void main() {
-  Future pumpMemListPage(WidgetTester widgetTester) async {
-    await widgetTester.pumpWidget(
-      ProviderScope(
-        child: MaterialApp(
-          onGenerateTitle: (context) => L10n(context).memListPageTitle(),
-          localizationsDelegates: L10n.localizationsDelegates,
-          supportedLocales: L10n.supportedLocales,
-          home: MemListPage(),
-        ),
+Future pumpMemListPage(WidgetTester widgetTester) async {
+  await widgetTester.pumpWidget(
+    ProviderScope(
+      child: MaterialApp(
+        onGenerateTitle: (context) => L10n(context).memListPageTitle(),
+        localizationsDelegates: L10n.localizationsDelegates,
+        supportedLocales: L10n.supportedLocales,
+        home: MemListPage(),
       ),
-    );
-    await widgetTester.pumpAndSettle();
-  }
+    ),
+  );
+  await widgetTester.pumpAndSettle();
+}
 
+void main() {
   Logger(level: Level.verbose);
 
   final mockedMemRepository = MockMemRepository();

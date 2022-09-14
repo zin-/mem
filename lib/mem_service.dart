@@ -2,24 +2,31 @@ import 'package:mem/logger.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 
-class MemService {
-  Future<MemEntity> create(
-    Map<String, dynamic> memMap,
-    List<MemItemEntity> memItems,
-  ) =>
-      t(
-        {'memMap': memMap, 'memItems': memItems},
-        () async {
-          final receivedMem = await MemRepository().receive(memMap);
-          for (var memItem in memItems) {
-            await MemItemRepository().receive({
-              memIdColumnName: receivedMem.id,
-              memDetailTypeColumnName: memItem.type.name,
-              memDetailValueColumnName: memItem.value,
-            });
-          }
+class MemDetail {
+  final MemEntity memEntity;
+  final List<MemItemEntity> memItemEntities;
 
-          return receivedMem;
+  MemDetail(this.memEntity, this.memItemEntities);
+
+  @override
+  String toString() => '{'
+      ' memEntity: $memEntity'
+      ', memItemEntities: $memItemEntities'
+      ' }';
+}
+
+class MemService {
+  Future<MemDetail> create(MemDetail memDetail) => t(
+        {'memDetail': memDetail},
+        () async {
+          final receivedMemEntity =
+              await MemRepository().receive(memDetail.memEntity);
+          final receivedMemItemEntities = await Future.wait(memDetail
+              .memItemEntities
+              .map((e) => e..memId = receivedMemEntity.id)
+              .map((e) => MemItemRepository().receive(e)));
+
+          return MemDetail(receivedMemEntity, receivedMemItemEntities);
         },
       );
 

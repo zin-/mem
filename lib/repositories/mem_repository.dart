@@ -18,8 +18,8 @@ class MemEntity extends DatabaseTableEntity {
 
   MemEntity({
     required this.name,
-    required int id,
-    required DateTime createdAt,
+    required int? id,
+    DateTime? createdAt,
     DateTime? updatedAt,
     DateTime? archivedAt,
   }) : super(
