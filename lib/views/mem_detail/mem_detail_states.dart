@@ -71,13 +71,13 @@ final createMem =
   (ref, memMap) => v(
     {'memMap': memMap},
     () async {
-      memMap.remove(_memIdKey);
-      final memItems = ref.read(memItemsProvider(null));
+      final memId = memMap.remove(_memIdKey);
+      final memItems = ref.read(memItemsProvider(memId));
 
       final receivedMem = await MemService().create(memMap, memItems);
 
       ref.read(memProvider(receivedMem.id).notifier).updatedBy(receivedMem);
-      ref.read(memProvider(null).notifier).updatedBy(receivedMem);
+      ref.read(memProvider(memId).notifier).updatedBy(receivedMem);
 
       return receivedMem;
     },
