@@ -30,16 +30,16 @@ class MemService {
         },
       );
 
-  Future<MemEntity> update(MemEntity memEntity, List<MemItemEntity> memItems) =>
-      t(
-        {'memEntity': memEntity, 'memItems': memItems},
+  Future<MemDetail> update(MemDetail memDetail) => t(
+        {'memDetail': memDetail},
         () async {
-          final receivedMem = await MemRepository().update(memEntity);
-          for (var memItem in memItems) {
-            await MemItemRepository().update(memItem);
-          }
+          final updatedMem = await MemRepository().update(memDetail.memEntity);
+          final updatedMemItemEntities = await Future.wait(
+              memDetail.memItemEntities.map((e) => e.isSaved()
+                  ? MemItemRepository().update(e)
+                  : MemItemRepository().receive(e..memId = updatedMem.id)));
 
-          return receivedMem;
+          return MemDetail(updatedMem, updatedMemItemEntities);
         },
       );
 

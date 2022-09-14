@@ -20,7 +20,9 @@ abstract class DatabaseTableEntity {
     this.archivedAt,
   });
 
-  bool isArchived() => archivedAt != null;
+  bool isSaved() => id != null && createdAt != null;
+
+  bool isArchived() => isSaved() && archivedAt != null;
 
   DatabaseTableEntity.fromMap(Map<String, dynamic> valueMap)
       : id = valueMap[idColumnName],
