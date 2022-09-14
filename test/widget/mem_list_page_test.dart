@@ -140,7 +140,7 @@ void main() {
       verify(mockedMemRepository.ship(archived: false)).called(1);
     });
 
-    testWidgets(': change.', (widgetTester) async {
+    testWidgets(': onChanged.', (widgetTester) async {
       final notArchived = MemEntity(
         id: 1,
         name: 'not archived',
@@ -166,8 +166,8 @@ void main() {
         archivedAt: DateTime.now().add(const Duration(microseconds: 1)),
       );
       final returns = <List<MemEntity>>[
-        [notArchived2, notArchived],
-        [],
+        [notArchived2],
+        [archived2],
         [archived2, archived],
         [notArchived2, archived2, notArchived, archived],
       ];
@@ -178,8 +178,11 @@ void main() {
       await pumpMemListPage(widgetTester);
 
       // showNotArchived: true, showArchived: false
-      expectMemNameTextOnListAt(widgetTester, 0, notArchived.name);
+      expect(widgetTester.widgetList(memListTileFinder).length, 1);
+      expectMemNameTextOnListAt(widgetTester, 0, notArchived2.name);
+      expect(find.text(notArchived.name), findsNothing);
       expect(find.text(archived.name), findsNothing);
+      expect(find.text(archived2.name), findsNothing);
 
       await widgetTester.tap(memListFilterButton);
       await widgetTester.pumpAndSettle();
@@ -188,6 +191,9 @@ void main() {
       await widgetTester.tap(findShowNotArchiveSwitch);
       await widgetTester.pumpAndSettle();
 
+      expect(widgetTester.widgetList(memListTileFinder).length, 2);
+      expectMemNameTextOnListAt(widgetTester, 0, notArchived2.name);
+      expectMemNameTextOnListAt(widgetTester, 1, archived2.name);
       expect(find.text(notArchived.name), findsNothing);
       expect(find.text(archived.name), findsNothing);
 
@@ -195,13 +201,17 @@ void main() {
       await widgetTester.tap(findShowArchiveSwitch);
       await widgetTester.pumpAndSettle();
 
-      expect(find.text(notArchived.name), findsNothing);
+      expect(widgetTester.widgetList(memListTileFinder).length, 2);
       expectMemNameTextOnListAt(widgetTester, 0, archived.name);
+      expectMemNameTextOnListAt(widgetTester, 1, archived2.name);
+      expect(find.text(notArchived.name), findsNothing);
+      expect(find.text(notArchived2.name), findsNothing);
 
       // showNotArchived: true, showArchived: true
       await widgetTester.tap(findShowNotArchiveSwitch);
       await widgetTester.pumpAndSettle();
 
+      expect(widgetTester.widgetList(memListTileFinder).length, 4);
       expectMemNameTextOnListAt(widgetTester, 0, notArchived.name);
       expectMemNameTextOnListAt(widgetTester, 1, notArchived2.name);
       expectMemNameTextOnListAt(widgetTester, 2, archived.name);
