@@ -54,7 +54,7 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
           final insertingMap = entity.toMap()
             ..[createdAtColumnName] = entity.createdAt ?? DateTime.now();
 
-          final id = await table.insert(insertingMap);
+          final id = await _table.insert(insertingMap);
 
           return fromMap(insertingMap..[idColumnName] = id);
         },
@@ -83,7 +83,7 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
                 : whereStrings.add('archivedAt IS NULL');
           }
 
-          return (await table.select(
+          return (await _table.select(
             where: whereStrings.isEmpty ? null : whereStrings.join(' AND '),
             whereArgs: whereArgStrings.isEmpty ? null : whereArgs,
           ))
@@ -94,7 +94,7 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
 
   Future<Entity> shipById(dynamic id) => v(
         {'id': id},
-        () async => fromMap(await table.selectByPk(id)),
+        () async => fromMap(await _table.selectByPk(id)),
       );
 
   Future<Entity> update(Entity entity) => v(
@@ -103,7 +103,7 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
           final valueMap = entity.toMap();
           valueMap[updatedAtColumnName] = DateTime.now();
 
-          await table.updateByPk(entity.id, valueMap);
+          await _table.updateByPk(entity.id, valueMap);
 
           return fromMap(valueMap);
         },
@@ -115,7 +115,7 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
           final valueMap = entity.toMap();
           valueMap[archivedAtColumnName] = DateTime.now();
 
-          await table.updateByPk(entity.id, valueMap);
+          await _table.updateByPk(entity.id, valueMap);
 
           return fromMap(valueMap);
         },
@@ -127,7 +127,7 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
           final valueMap = entity.toMap();
           valueMap[archivedAtColumnName] = null;
 
-          await table.updateByPk(entity.id, valueMap);
+          await _table.updateByPk(entity.id, valueMap);
 
           return fromMap(valueMap);
         },
@@ -136,7 +136,7 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
   Future<bool> discardById(dynamic id) => v(
         {'id': id},
         () async {
-          int deletedCount = await table.deleteByPk(id);
+          int deletedCount = await _table.deleteByPk(id);
 
           return deletedCount == 1;
         },
@@ -144,12 +144,12 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
 
   Future<int> discardAll() => v(
         {},
-        () async => table.delete(),
+        () async => _table.delete(),
       );
 
   Entity fromMap(Map<String, dynamic> valueMap);
 
-  Table table; // FIXME be private
+  final Table _table;
 
-  DatabaseTableRepository(this.table);
+  DatabaseTableRepository(this._table);
 }

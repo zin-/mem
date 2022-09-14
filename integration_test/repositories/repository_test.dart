@@ -51,9 +51,7 @@ void main() async {
     'new',
     () async {
       final database = await DatabaseManager().open(testDatabase);
-      final testRepository = TestRepository(database.getTable(testTable.name));
-
-      expect(testRepository.table.definition, testTable);
+      TestRepository(database.getTable(testTable.name));
     },
   );
 
