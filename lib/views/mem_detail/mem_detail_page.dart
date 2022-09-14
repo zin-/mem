@@ -129,7 +129,7 @@ class MemDetailPage extends StatelessWidget {
         },
       );
 
-  _buildMemItemViews(memItems) => v(
+  _buildMemItemViews(List<MemItemEntity>? memItems) => v(
         {},
         () {
           return Consumer(
@@ -137,13 +137,14 @@ class MemDetailPage extends StatelessWidget {
               return SingleChildScrollView(
                 child: Column(
                   children: [
-                    ...(memItems ??
-                            [
-                              MemItemEntity(
-                                memId: _memId,
-                                type: MemItemType.memo,
-                              ),
-                            ])
+                    ...(memItems == null || memItems.isEmpty
+                            ? [
+                                MemItemEntity(
+                                  memId: _memId,
+                                  type: MemItemType.memo,
+                                ),
+                              ]
+                            : memItems)
                         .map((memItem) {
                       return TextFormField(
                         decoration: InputDecoration(
