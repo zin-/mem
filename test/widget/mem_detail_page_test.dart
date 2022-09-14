@@ -65,8 +65,12 @@ void main() {
       verify(mockedMemRepository.shipById(savedMemEntity.id)).called(1);
       verify(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).called(1);
 
+      await widgetTester.pumpAndSettle();
+
       expectMemNameOnMemDetail(widgetTester, savedMemEntity.name);
       expectMemMemoOnMemDetail(widgetTester, savedMemoMemItemEntity.value);
+      expect(find.text(savedMemEntity.name), findsOneWidget);
+      expect(find.text(savedMemoMemItemEntity.value), findsOneWidget);
       expect(saveFabFinder, findsOneWidget);
     });
   });
@@ -275,7 +279,7 @@ Future pumpMemDetailPage(
       ),
     ),
   );
-  await widgetTester.pump();
+  await widgetTester.pumpAndSettle();
 }
 
 final memNameTextFormFieldFinder = find.byType(TextFormField).at(0);

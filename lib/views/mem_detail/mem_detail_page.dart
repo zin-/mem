@@ -5,6 +5,7 @@ import 'package:mem/logger.dart';
 import 'package:mem/repositories/mem_item_repository.dart'; // FIXME repositoryを見るのはおかしい気がする
 import 'package:mem/repositories/mem_repository.dart'; // FIXME repositoryを見るのはおかしい気がする
 import 'package:mem/repositories/repository.dart'; // FIXME repositoryを見るのはおかしい気がする
+import 'package:mem/views/atoms/async_value_view.dart';
 import 'package:mem/views/colors.dart';
 import 'package:mem/views/dimens.dart';
 import 'package:mem/views/constants.dart';
@@ -29,7 +30,6 @@ class MemDetailPage extends StatelessWidget {
           builder: (context, ref, child) => v(
             {'_memId': _memId},
             () {
-              ref.read(fetchMemById(_memId));
               final mem = ref.watch(memProvider(_memId));
               final memMap = ref.watch(memMapProvider(_memId));
 
@@ -48,7 +48,13 @@ class MemDetailPage extends StatelessWidget {
                     padding: pagePadding,
                     child: Form(
                       key: _formKey,
-                      child: _buildBody(ref, memMap),
+                      child: _memId != null && memMap.length < 2
+                          ? AsyncValueView(
+                              ref.watch(fetchMemById(_memId)),
+                              (Map<String, dynamic> memDataMap) =>
+                                  _buildBody(ref, memMap),
+                            )
+                          : _buildBody(ref, memMap),
                     ),
                   ),
                   floatingActionButton: Consumer(

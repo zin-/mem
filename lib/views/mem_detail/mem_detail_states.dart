@@ -38,15 +38,19 @@ final fetchMemById =
   (ref, memId) => v(
     {'memId': memId},
     () async {
-      if (memId != null) {
-        if (ref.read(memProvider(memId)) == null) {
-          final mem = await MemRepository().shipById(memId);
-          ref.read(memProvider(memId).notifier).updatedBy(mem);
+      try {
+        if (memId != null) {
+          if (ref.read(memProvider(memId)) == null) {
+            final mem = await MemRepository().shipById(memId);
+            ref.read(memProvider(memId).notifier).updatedBy(mem);
+          }
+          if (ref.read(memItemsProvider(memId)) == null) {
+            final memItems = await MemItemRepository().shipByMemId(memId);
+            ref.read(memItemsProvider(memId).notifier).updatedBy(memItems);
+          }
         }
-        if (ref.read(memItemsProvider(memId)) == null) {
-          final memItems = await MemItemRepository().shipByMemId(memId);
-          ref.read(memItemsProvider(memId).notifier).updatedBy(memItems);
-        }
+      } catch (e) {
+        warn(e);
       }
 
       return ref.read(memMapProvider(memId));
