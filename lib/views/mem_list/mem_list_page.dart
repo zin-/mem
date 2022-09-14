@@ -130,7 +130,7 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
                             onPressed: () => v(
                               {},
                               () {
-                                ref.read(createMem(mem.toMap()));
+                                ref.read(createMem(memId));
                                 scaffoldMessenger.showSnackBar(
                                   SnackBar(
                                     content: Text(
