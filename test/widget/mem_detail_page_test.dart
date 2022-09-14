@@ -23,6 +23,7 @@ void main() {
 
   tearDown(() {
     reset(mockedMemRepository);
+    reset(mockedMemItemRepository);
   });
 
   group('Show', () {
@@ -192,63 +193,68 @@ void main() {
     testWidgets(': update.', (widgetTester) async {
       const memId = 1;
       const memName = 'test mem name';
-      const memMemo = 'test mem memo';
-      const enteringMemName = 'entering mem name';
-      const enteringMemMemo = 'entering mem memo';
-
       when(mockedMemRepository.shipById(any))
           .thenAnswer((realInvocation) async => MemEntity(
-                id: memId,
                 name: memName,
+                id: memId,
                 createdAt: DateTime.now(),
               ));
+      const memItemId = 1;
+      const memMemo = 'test mem memo';
       when(mockedMemItemRepository.shipByMemId(any))
           .thenAnswer((realInvocation) async => [
                 MemItemEntity(
                   memId: memId,
                   type: MemItemType.memo,
                   value: memMemo,
+                  id: memItemId,
+                  createdAt: DateTime.now(),
                 )
               ]);
-      when(mockedMemRepository.update(any)).thenAnswer((realInvocation) async {
-        final value = realInvocation.positionalArguments[0];
-        expect(value.id, memId);
-        expect(value.name, enteringMemName);
-
-        return MemEntity(
-          id: value.id,
-          name: value.name,
-          createdAt: value.createdAt,
-          updatedAt: DateTime.now(),
-        );
-      });
-      when(mockedMemItemRepository.update(any))
-          .thenAnswer((realInvocation) async {
-        final value = realInvocation.positionalArguments[0];
-        expect(value.memId, memId);
-        expect(value.type, MemItemType.memo);
-        expect(value.value, enteringMemMemo);
-
-        return MemItemEntity(
-          memId: memId,
-          type: value.type,
-          value: value.value,
-          createdAt: value.createdAt,
-          updatedAt: DateTime.now(),
-        );
-      });
 
       await pumpMemDetailPage(widgetTester, memId);
       await widgetTester.pump();
 
-      await widgetTester.enterText(memMemoTextFormFieldFinder, enteringMemMemo);
-      await enterMemNameAndSave(widgetTester, enteringMemName);
-
-      checkSavedSnackBarAndDismiss(widgetTester, enteringMemName);
-
       verify(mockedMemRepository.shipById(memId)).called(1);
+      verify(mockedMemItemRepository.shipByMemId(memId)).called(1);
+
+      const enteringMemName = 'entering mem name';
+      const enteringMemMemo = 'entering mem memo';
+
+      await widgetTester.enterText(memNameTextFormFieldFinder, enteringMemName);
+      await widgetTester.enterText(memMemoTextFormFieldFinder, enteringMemMemo);
+
+      when(mockedMemRepository.update(any)).thenAnswer((realInvocation) async {
+        final memEntity = realInvocation.positionalArguments[0] as MemEntity;
+        expect(memEntity.id, memId);
+        expect(memEntity.name, enteringMemName);
+        expect(memEntity.createdAt, isNotNull);
+        expect(memEntity.updatedAt, isNull);
+        expect(memEntity.archivedAt, isNull);
+
+        return memEntity..updatedAt = DateTime.now();
+      });
+      when(mockedMemItemRepository.update(any))
+          .thenAnswer((realInvocation) async {
+        final memItemEntity =
+            realInvocation.positionalArguments[0] as MemItemEntity;
+        expect(memItemEntity.memId, memId);
+        expect(memItemEntity.type, MemItemType.memo);
+        expect(memItemEntity.value, enteringMemMemo);
+        expect(memItemEntity.createdAt, isNotNull);
+        expect(memItemEntity.updatedAt, isNull);
+        expect(memItemEntity.archivedAt, isNull);
+
+        return memItemEntity..updatedAt = DateTime.now();
+      });
+
+      await widgetTester.tap(saveFabFinder);
+      await widgetTester.pumpAndSettle();
+
       verify(mockedMemRepository.update(any)).called(1);
       verify(mockedMemItemRepository.update(any)).called(1);
+
+      checkSavedSnackBarAndDismiss(widgetTester, enteringMemName);
     });
   });
 }
