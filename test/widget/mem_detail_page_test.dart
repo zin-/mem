@@ -151,22 +151,22 @@ void main() {
       const enteringMemMemo = 'test mem memo';
       const memId = 1;
 
-      when(mockedMemRepository.receiveV1(any)).thenAnswer((realInvocation) async {
-        final value = realInvocation.positionalArguments[0];
-        expect(value[memNameColumnName], enteringMemName);
+      when(mockedMemRepository.receive(any)).thenAnswer((realInvocation) async {
+        final value = realInvocation.positionalArguments[0] as MemEntity;
+        expect(value.name, enteringMemName);
 
         return MemEntity(
           id: memId,
-          name: value[memNameColumnName],
+          name: value.name,
           createdAt: DateTime.now(),
         );
       });
-      when(mockedMemItemRepository.receiveV1(any))
+      when(mockedMemItemRepository.receive(any))
           .thenAnswer((realInvocation) async {
-        final value = realInvocation.positionalArguments[0];
-        expect(value[memIdColumnName], memId);
-        expect(value[memDetailTypeColumnName], MemItemType.memo.name);
-        expect(value[memDetailValueColumnName], enteringMemMemo);
+        final value = realInvocation.positionalArguments[0] as MemItemEntity;
+        expect(value.memId, memId);
+        expect(value.type, MemItemType.memo);
+        expect(value.value, enteringMemMemo);
 
         return MemItemEntity(
           id: 1,
@@ -185,8 +185,8 @@ void main() {
       await checkSavedSnackBarAndDismiss(widgetTester, enteringMemName);
 
       verifyNever(mockedMemRepository.shipById(any));
-      verify(mockedMemRepository.receiveV1(any)).called(1);
-      verify(mockedMemItemRepository.receiveV1(any)).called(1);
+      verify(mockedMemRepository.receive(any)).called(1);
+      verify(mockedMemItemRepository.receive(any)).called(1);
     });
 
     testWidgets(': update.', (widgetTester) async {
