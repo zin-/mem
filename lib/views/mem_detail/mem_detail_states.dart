@@ -5,9 +5,6 @@ import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/atoms/state_notifier.dart';
 
-// FIXME 消せそう
-const _memIdKey = '_memId';
-
 final memProvider = StateNotifierProvider.family<ValueStateNotifier<MemEntity?>,
     MemEntity?, int?>(
   (ref, memId) => v(
@@ -23,15 +20,6 @@ final editingMemProvider = StateNotifierProvider.family<
     () => ValueStateNotifier(
       ref.watch(memProvider(memId)) ?? MemEntity(name: '', id: null),
     ),
-  ),
-);
-
-final memMapProvider = StateNotifierProvider.family<
-    ValueStateNotifier<Map<String, dynamic>>, Map<String, dynamic>, int?>(
-  (ref, memId) => v(
-    {'memId': memId},
-    () => ValueStateNotifier(
-        (ref.watch(memProvider(memId))?.toMap() ?? {})..[_memIdKey] = memId),
   ),
 );
 
