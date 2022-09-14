@@ -4,7 +4,9 @@ import 'package:mem/repositories/mem_repository.dart';
 
 class MemService {
   Future<MemEntity> create(
-          Map<String, dynamic> memMap, List<MemItemEntity> memItems) =>
+    Map<String, dynamic> memMap,
+    List<MemItemEntity> memItems,
+  ) =>
       t(
         {'memMap': memMap, 'memItems': memItems},
         () async {
