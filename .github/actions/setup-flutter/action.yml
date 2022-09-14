@@ -36,7 +36,11 @@ runs:
           **/.dart_tool/build
           **/.dart_tool/flutter_gen
           **/test/mocks.mocks.dart
-        key: build-${{ hashFiles('**/pubspec.lock') }}-${{ hashFiles ('**/lib/l10n/app_en.arb') }}-${{ hashFiles('**/test/mocks.dart') }}
+        key: build-${{ hashFiles( |
+          '**/pubspec.lock'
+          , '**/lib/l10n/app_en.arb'
+          , '**/test/mocks.dart'
+          ) }}
         restore-keys: |
           build-
     - if: ${{ steps.cahce-build.outputs.cache-hit != 'true' }}
