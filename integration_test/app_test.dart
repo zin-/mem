@@ -77,7 +77,7 @@ void main() {
       expect(find.text(savedMemName), findsNothing);
     });
 
-    testWidgets(': archive.', (widgetTester) async {
+    testWidgets(': archive', (widgetTester) async {
       const savedMemName = 'saved mem name';
       const savedMemMemo = 'saved mem memo';
       await prepareSavedData(savedMemName, savedMemMemo);
@@ -88,7 +88,7 @@ void main() {
       await widgetTester.tap(find.text(savedMemName));
       await widgetTester.pumpAndSettle();
 
-      await widgetTester.tap(archiveButtonFinder);
+      await widgetTester.tap(find.byIcon(Icons.archive));
       await widgetTester.pumpAndSettle();
 
       expect(find.text(savedMemName), findsNothing);
@@ -101,7 +101,42 @@ void main() {
       expect(find.text(savedMemName), findsOneWidget);
     });
 
-    testWidgets(': remove.', (widgetTester) async {
+    testWidgets(': unarchive', (widgetTester) async {
+      const savedMemName = 'archived mem name';
+      const savedMemMemo = 'archived mem memo';
+      await prepareSavedData(savedMemName, savedMemMemo, isArchived: true);
+
+      await app.main();
+      await widgetTester.pumpAndSettle();
+
+      await widgetTester.tap(memListFilterButton);
+      await widgetTester.pumpAndSettle();
+      await widgetTester.tap(findShowArchiveSwitch);
+      await widgetTester.tap(findShowNotArchiveSwitch);
+      await closeMemListFilter(widgetTester);
+      await widgetTester.pumpAndSettle();
+
+      await widgetTester.tap(find.text(savedMemName));
+      await widgetTester.pumpAndSettle();
+
+      await widgetTester.tap(find.byIcon(Icons.unarchive));
+      await widgetTester.pumpAndSettle();
+
+      await widgetTester.pageBack();
+      await widgetTester.pumpAndSettle();
+
+      expect(find.text(savedMemName), findsNothing);
+
+      await widgetTester.tap(memListFilterButton);
+      await widgetTester.pumpAndSettle();
+      await widgetTester.tap(findShowNotArchiveSwitch);
+      await closeMemListFilter(widgetTester);
+      await widgetTester.pumpAndSettle();
+
+      expect(find.text(savedMemName), findsOneWidget);
+    });
+
+    testWidgets(': remove', (widgetTester) async {
       const savedMemName = 'saved mem name';
       const savedMemMemo = 'saved mem memo';
       await prepareSavedData(savedMemName, savedMemMemo);
@@ -212,14 +247,6 @@ Future<void> checkSavedSnackBarAndDismiss(
 Finder saveMemSuccessFinder(String memName) =>
     find.text('Save success. $memName');
 
-Finder removeMemSuccessFinder(String memName) =>
-    find.text('Remove success. $memName');
-
-final archiveButtonFinder = find.descendant(
-  of: appBarFinder,
-  matching: find.byIcon(Icons.archive),
-);
-
 final memDetailMenuButtonFinder = find.descendant(
   of: appBarFinder,
   matching: find.byIcon(Icons.more_vert),
@@ -239,12 +266,17 @@ final undoButtonFinder = find.text('Undo');
 final cancelButtonFinder = find.text('Cancel');
 final okButtonFinder = find.text('OK');
 
-Future<void> prepareSavedData(String memName, String memMemo) async {
+Future<void> prepareSavedData(
+  String memName,
+  String memMemo, {
+  bool isArchived = false,
+}) async {
   final database = await DatabaseManager().open(app.databaseDefinition);
   final memTable = database.getTable(memTableDefinition.name);
   final savedMemId = await memTable.insert({
     memNameColumnName: memName,
     createdAtColumnName: DateTime.now(),
+    archivedAtColumnName: isArchived ? DateTime.now() : null,
   });
   assert(savedMemId == 1);
   final memItemTable = database.getTable(memItemTableDefinition.name);
@@ -253,6 +285,7 @@ Future<void> prepareSavedData(String memName, String memMemo) async {
     memItemTypeColumnName: MemItemType.memo.name,
     memItemValueColumnName: memMemo,
     createdAtColumnName: DateTime.now(),
+    archivedAtColumnName: isArchived ? DateTime.now() : null,
   });
   await DatabaseManager().close(app.databaseDefinition.name);
 }
