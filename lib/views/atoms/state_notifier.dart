@@ -40,7 +40,7 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>?> {
         },
       );
 
-  void update(T item, bool Function(T item) where) => v(
+  void upsert(T item, bool Function(T item) where) => v(
         {'item': item, 'where': where},
         () {
           final tmp = List.of(state ?? <T>[]);

@@ -18,7 +18,8 @@ final fetchMemList = FutureProvider<List<MemEntity>>(
 
       for (var mem in mems) {
         ref.read(memProvider(mem.id).notifier).updatedBy(mem);
-        ref.read(memListProvider.notifier).update(
+        ref.read(memListProvider.notifier).upsert(
+              // FIXME 毎回fetchするのは効率悪い
               ref.watch(memProvider(mem.id))!,
               (item) => item.id == mem.id,
             );
