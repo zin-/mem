@@ -6,6 +6,9 @@ class ValueStateNotifier<T> extends StateNotifier<T> {
 
   // TODO performance 値が変わっていたら通知する形にしたい
   T updatedBy(T value) => state = value;
+
+  @override
+  String toString() => 'state: $state';
 }
 
 class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>?> {

@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:mem/logger.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/mem_detail/mem_detail_states.dart';
@@ -47,22 +46,31 @@ final memListProvider =
     StateNotifierProvider<ListValueStateNotifier<MemEntity>, List<MemEntity>?>(
   (ref) => v(
     {},
-    // TODO ListValueStateは要素が変更されたらリスナーに通知して欲しい
-    // これは、Viewがそれぞれに要素を見るという話ではなく、ListValueStateが持っていて欲しい
-    () {
-      final listValueState = ListValueStateNotifier<MemEntity>(null);
-
-      return listValueState;
-    },
+    () => ListValueStateNotifier<MemEntity>(null),
   ),
 );
-
-final filteredMemListProvider =
+final reactiveMemListProvider =
     StateNotifierProvider<ValueStateNotifier<List<MemEntity>>, List<MemEntity>>(
   (ref) => v(
     {},
     () {
       final memList = ref.watch(memListProvider) ?? [];
+
+      final reactiveMemList = memList
+          .map((e) => ref.watch(memProvider(e.id)))
+          .whereType<MemEntity>()
+          .toList();
+
+      return ValueStateNotifier(reactiveMemList);
+    },
+  ),
+);
+final filteredMemListProvider =
+    StateNotifierProvider<ValueStateNotifier<List<MemEntity>>, List<MemEntity>>(
+  (ref) => v(
+    {},
+    () {
+      final memList = ref.watch(reactiveMemListProvider);
 
       final showNotArchived = ref.watch(showNotArchivedProvider);
       final showArchived = ref.watch(showArchivedProvider);

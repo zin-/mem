@@ -121,4 +121,101 @@ void main() {
       expectMemMemoOnMemDetail(widgetTester, '');
     },
   );
+
+  testWidgets(
+    'Update mem',
+    (widgetTester) async {
+      final savedMemEntity = MemEntity(
+        name: 'saved mem entity',
+        id: 1,
+        createdAt: DateTime.now(),
+      );
+      when(mockedMemRepository.ship(archived: false))
+          .thenAnswer((realInvocation) => Future.value([savedMemEntity]));
+
+      await pumpMemListPage(widgetTester);
+
+      verify(mockedMemRepository.ship(archived: false)).called(1);
+
+      final savedMemoMemItemEntity = MemItemEntity(
+        memId: savedMemEntity.id,
+        type: MemItemType.memo,
+        value: 'saved memo mem item entity',
+        id: 1,
+        createdAt: DateTime.now(),
+      );
+      when(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).thenAnswer(
+          (realInvocation) => Future.value([savedMemoMemItemEntity]));
+
+      await widgetTester.tap(memListTileFinder.at(0));
+      await widgetTester.pumpAndSettle();
+
+      expectMemNameOnMemDetail(widgetTester, savedMemEntity.name);
+      expectMemMemoOnMemDetail(widgetTester, savedMemoMemItemEntity.value);
+
+      verifyNever(mockedMemRepository.shipById(any));
+      verify(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).called(1);
+
+      const enteringMemName = 'updating mem name';
+      const enteringMemMemo = 'updating mem memo';
+
+      await widgetTester.enterText(memNameTextFormFieldFinder, enteringMemName);
+      await widgetTester.enterText(memMemoTextFormFieldFinder, enteringMemMemo);
+
+      when(mockedMemRepository.update(any)).thenAnswer((realInvocation) {
+        final memEntity = realInvocation.positionalArguments[0] as MemEntity;
+
+        expect(memEntity.name, enteringMemName);
+        expect(memEntity.id, savedMemEntity.id);
+        expect(memEntity.createdAt, savedMemEntity.createdAt);
+        expect(memEntity.updatedAt, null);
+        expect(memEntity.archivedAt, null);
+
+        return Future.value(MemEntity(
+          name: memEntity.name,
+          id: memEntity.id,
+          createdAt: memEntity.createdAt,
+          updatedAt: memEntity.updatedAt,
+        ));
+      });
+      when(mockedMemItemRepository.update(any)).thenAnswer((realInvocation) {
+        final memItemEntity =
+            realInvocation.positionalArguments[0] as MemItemEntity;
+
+        expect(memItemEntity.memId, savedMemoMemItemEntity.memId);
+        expect(memItemEntity.type, savedMemoMemItemEntity.type);
+        expect(memItemEntity.value, enteringMemMemo);
+        expect(memItemEntity.id, savedMemoMemItemEntity.id);
+        expect(memItemEntity.createdAt, savedMemoMemItemEntity.createdAt);
+        expect(memItemEntity.updatedAt, null);
+        expect(memItemEntity.archivedAt, null);
+
+        return Future.value(MemItemEntity(
+          memId: memItemEntity.memId,
+          type: memItemEntity.type,
+          value: memItemEntity.value,
+          id: savedMemoMemItemEntity.id,
+          createdAt: savedMemoMemItemEntity.createdAt,
+          updatedAt: DateTime.now(),
+        ));
+      });
+
+      await widgetTester.tap(saveFabFinder);
+
+      verify(mockedMemRepository.update(any)).called(1);
+      verify(mockedMemItemRepository.update(any)).called(1);
+
+      await widgetTester.pageBack();
+      await widgetTester.pumpAndSettle();
+
+      verifyNever(mockedMemRepository.ship(
+        archived: anyNamed('archived'),
+        whereColumns: anyNamed('whereColumns'),
+        whereArgs: anyNamed('whereArgs'),
+      ));
+
+      expect(widgetTester.widgetList(memListTileFinder).length, 1);
+      expectMemNameTextOnListAt(widgetTester, 0, enteringMemName);
+    },
+  );
 }
