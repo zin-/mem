@@ -274,4 +274,49 @@ void main() {
       expect(widgetTester.widgetList(memListTileFinder).length, 0);
     },
   );
+
+  testWidgets(
+    'Remove mem',
+    (widgetTester) async {
+      final savedMemEntity = MemEntity(
+        name: 'saved mem entity',
+        id: 1,
+        createdAt: DateTime.now(),
+      );
+      when(mockedMemRepository.ship(archived: false))
+          .thenAnswer((realInvocation) => Future.value([savedMemEntity]));
+
+      await pumpMemListPage(widgetTester);
+
+      final savedMemoMemItemEntity = MemItemEntity(
+        memId: savedMemEntity.id,
+        type: MemItemType.memo,
+        value: 'saved memo mem item entity',
+        id: 1,
+        createdAt: DateTime.now(),
+      );
+      when(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).thenAnswer(
+          (realInvocation) => Future.value([savedMemoMemItemEntity]));
+
+      await widgetTester.tap(memListTileFinder.at(0));
+      await widgetTester.pumpAndSettle();
+
+      when(mockedMemItemRepository.discardByMemId(savedMemEntity.id))
+          .thenAnswer((realInvocation) => Future.value([true]));
+      when(mockedMemRepository.discardById(savedMemEntity.id))
+          .thenAnswer((realInvocation) => Future.value(true));
+
+      await widgetTester.tap(memDetailMenuButtonFinder);
+      await widgetTester.pumpAndSettle();
+      await widgetTester.tap(removeButtonFinder);
+      await widgetTester.pump();
+      await widgetTester.tap(okButtonFinder);
+
+      verify(mockedMemItemRepository.discardByMemId(savedMemEntity.id))
+          .called(1);
+      verify(mockedMemRepository.discardById(any)).called(1);
+
+      expect(widgetTester.widgetList(memListTileFinder).length, 0);
+    },
+  );
 }
