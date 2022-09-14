@@ -5,15 +5,15 @@ import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/repositories/repository.dart';
 
 const memIdColumnName = 'mems_id';
-const memDetailTypeColumnName = 'type';
-const memDetailValueColumnName = 'value';
+const memItemTypeColumnName = 'type';
+const memItemValueColumnName = 'value';
 
 final memItemTableDefinition = DefT(
   'mem_items',
   [
     DefPK(idColumnName, TypeC.integer, autoincrement: true),
-    DefC(memDetailTypeColumnName, TypeC.text),
-    DefC(memDetailValueColumnName, TypeC.text),
+    DefC(memItemTypeColumnName, TypeC.text),
+    DefC(memItemValueColumnName, TypeC.text),
     ...defaultColumnDefinitions,
     DefFK(memTableDefinition),
   ],
@@ -42,15 +42,15 @@ class MemItemEntity extends DatabaseTableEntity {
   MemItemEntity.fromMap(super.valueMap)
       : memId = valueMap[memIdColumnName],
         type = MemItemType.values.firstWhere(
-            (element) => element.name == valueMap[memDetailTypeColumnName]),
-        value = valueMap[memDetailValueColumnName],
+            (element) => element.name == valueMap[memItemTypeColumnName]),
+        value = valueMap[memItemValueColumnName],
         super.fromMap();
 
   @override
   Map<String, dynamic> toMap() => {
         memIdColumnName: memId,
-        memDetailTypeColumnName: type.name,
-        memDetailValueColumnName: value,
+        memItemTypeColumnName: type.name,
+        memItemValueColumnName: value,
       }..addAll(super.toMap());
 }
 
@@ -125,8 +125,6 @@ class MemItemRepository extends DatabaseTableRepository<MemItemEntity> {
     _instance = mock;
     return mock;
   }
-
-  static clear() => _instance = null;
 }
 
 const memMemoName = 'memo';
