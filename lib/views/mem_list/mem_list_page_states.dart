@@ -45,7 +45,7 @@ final memListProvider =
 
           if (showNotArchived == showArchived) {
             return true;
-          } else {}
+          }
           if (item.archivedAt == null) {
             return ref.watch(showNotArchivedProvider);
           } else {
