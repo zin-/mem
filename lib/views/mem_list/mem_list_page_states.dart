@@ -1,9 +1,25 @@
+import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:mem/logger.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/mem_detail/mem_detail_states.dart';
 import 'package:mem/views/atoms/state_notifier.dart';
+
+final showNotArchivedProvider =
+    StateNotifierProvider<ValueStateNotifier<bool>, bool>(
+  (ref) => v(
+    {},
+    () => ValueStateNotifier(true),
+  ),
+);
+final showArchivedProvider =
+    StateNotifierProvider<ValueStateNotifier<bool>, bool>(
+  (ref) => v(
+    {},
+    () => ValueStateNotifier(false),
+  ),
+);
 
 final fetchMemList = FutureProvider<List<MemEntity>>(
   (ref) => v(
@@ -34,22 +50,7 @@ final memListProvider =
     // TODO ListValueStateは要素が変更されたらリスナーに通知して欲しい
     // これは、Viewがそれぞれに要素を見るという話ではなく、ListValueStateが持っていて欲しい
     () {
-      final listValueState = ListValueStateNotifier<MemEntity>(
-        null,
-        compare: (item1, item2) {
-          if (item1.archivedAt != item2.archivedAt) {
-            if (item1.archivedAt == null) {
-              return -1;
-            }
-            if (item2.archivedAt == null) {
-              return 1;
-            }
-            return item1.archivedAt!.compareTo(item2.archivedAt!);
-          }
-
-          return item1.id.compareTo(item2.id);
-        },
-      );
+      final listValueState = ListValueStateNotifier<MemEntity>(null);
 
       return listValueState;
     },
@@ -79,21 +80,30 @@ final filteredMemListProvider =
 
       return ValueStateNotifier(filteredMemList);
     },
-    debug: true,
   ),
 );
+final sortedMemList =
+    StateNotifierProvider<ValueStateNotifier<List<MemEntity>>, List<MemEntity>>(
+  (ref) => v(
+    {},
+    () {
+      final filteredMemList = ref.watch(filteredMemListProvider);
 
-final showNotArchivedProvider =
-    StateNotifierProvider<ValueStateNotifier<bool>, bool>(
-  (ref) => v(
-    {},
-    () => ValueStateNotifier(true),
-  ),
-);
-final showArchivedProvider =
-    StateNotifierProvider<ValueStateNotifier<bool>, bool>(
-  (ref) => v(
-    {},
-    () => ValueStateNotifier(false),
+      final sortedMemList = filteredMemList.sorted((item1, item2) {
+        if (item1.archivedAt != item2.archivedAt) {
+          if (item1.archivedAt == null) {
+            return -1;
+          }
+          if (item2.archivedAt == null) {
+            return 1;
+          }
+          return item1.archivedAt!.compareTo(item2.archivedAt!);
+        }
+
+        return item1.id.compareTo(item2.id);
+      });
+
+      return ValueStateNotifier(sortedMemList);
+    },
   ),
 );

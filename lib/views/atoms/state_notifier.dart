@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger.dart';
 
@@ -10,20 +9,7 @@ class ValueStateNotifier<T> extends StateNotifier<T> {
 }
 
 class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>?> {
-  final int Function(T item1, T item2)? compare;
-
-  ListValueStateNotifier(
-    List<T>? state, {
-    this.compare,
-  }) : super(state);
-
-  @override
-  List<T>? updatedBy(List<T>? value) => v(
-        {'value': value},
-        () => super.updatedBy(
-          value == null ? value : List.of(value).sorted(compare ?? (a, b) => 0),
-        ),
-      );
+  ListValueStateNotifier(List<T>? state) : super(state);
 
   void add(T item) => v(
         {'item': item},
