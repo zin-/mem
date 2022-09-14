@@ -19,8 +19,6 @@ void main() {
     // 今の実装だと難しいっぽい。いつかチャレンジする
     await DatabaseManager().open(app.databaseDefinition);
     await DatabaseManager().delete(app.databaseDefinition.name);
-
-    MemRepository.clear();
   });
 
   group('Basic scenario', () {

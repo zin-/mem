@@ -115,11 +115,9 @@ class MemItemRepository extends DatabaseTableRepository<MemItemEntity> {
   }
 
   factory MemItemRepository.initialize(Table table) {
-    var tmp = _instance;
-    if (tmp == null) {
-      tmp = MemItemRepository._(table);
-      _instance = tmp;
-    }
+    var tmp = MemItemRepository._(table);
+
+    _instance = tmp;
     return tmp;
   }
 

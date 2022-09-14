@@ -58,12 +58,10 @@ class MemRepository extends DatabaseTableRepository<MemEntity> {
     }
   }
 
-  factory MemRepository.initialize(Table memTable) {
-    var tmp = _instance;
-    if (tmp == null) {
-      tmp = MemRepository._(memTable);
-      _instance = tmp;
-    }
+  factory MemRepository.initialize(Table table) {
+    var tmp = MemRepository._(table);
+
+    _instance = tmp;
     return tmp;
   }
 
@@ -71,6 +69,4 @@ class MemRepository extends DatabaseTableRepository<MemEntity> {
     _instance = mock;
     return mock;
   }
-
-  static clear() => _instance = null;
 }
