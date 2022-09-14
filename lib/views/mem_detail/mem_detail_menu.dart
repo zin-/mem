@@ -34,25 +34,25 @@ class MemDetailMenu extends StatelessWidget {
         {},
         () => Consumer(
           builder: (context, ref, child) {
-            final mem = ref.watch(memProvider(_memId));
-
             return IconButton(
               icon: const Icon(Icons.unarchive),
               color: Colors.white,
               onPressed: () {
-                if (mem != null) {
-                  ref.read(unarchiveMem(mem.toMap())).then(
-                        (archived) =>
-                            ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(L10n()
-                                .unarchiveMemSuccessMessage(archived.name)),
-                            duration: defaultDismissDuration,
-                            dismissDirection: DismissDirection.horizontal,
-                          ),
+                ref.read(unarchiveMem(_memId)).then(
+                  (archived) {
+                    if (archived != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(L10n().unarchiveMemSuccessMessage(
+                            archived.memEntity.name,
+                          )),
+                          duration: defaultDismissDuration,
+                          dismissDirection: DismissDirection.horizontal,
                         ),
                       );
-                }
+                    }
+                  },
+                );
               },
             );
           },
@@ -63,28 +63,25 @@ class MemDetailMenu extends StatelessWidget {
         {},
         () => Consumer(
           builder: (context, ref, child) {
-            final mem = ref.watch(memProvider(_memId));
-
             return IconButton(
               icon: const Icon(Icons.archive),
               color: Colors.white,
               onPressed: () {
-                if (mem != null) {
-                  ref.read(archiveMem(_memId)).then(
-                    (archivedMemDetail) {
-                      if (archivedMemDetail != null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(L10n().archiveMemSuccessMessage(
-                                archivedMemDetail.memEntity.name)),
-                            duration: defaultDismissDuration,
-                            dismissDirection: DismissDirection.horizontal,
-                          ),
-                        );
-                      }
-                    },
-                  );
-                }
+                ref.read(archiveMem(_memId)).then(
+                  (archivedMemDetail) {
+                    if (archivedMemDetail != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(L10n().archiveMemSuccessMessage(
+                            archivedMemDetail.memEntity.name,
+                          )),
+                          duration: defaultDismissDuration,
+                          dismissDirection: DismissDirection.horizontal,
+                        ),
+                      );
+                    }
+                  },
+                );
                 Navigator.of(context).pop(null);
               },
             );

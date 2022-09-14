@@ -113,32 +113,45 @@ final archiveMem = Provider.family<Future<MemDetail?>, int?>(
     {'memId': memId},
     () async {
       final mem = ref.read(memProvider(memId));
-      if (mem != null) {
-        final archivedMemDetail = await MemService().archive(mem);
 
-        ref
-            .read(memProvider(archivedMemDetail.memEntity.id).notifier)
-            .updatedBy(archivedMemDetail.memEntity);
-        ref
-            .read(memItemsProvider(archivedMemDetail.memEntity.id).notifier)
-            .updatedBy(archivedMemDetail.memItemEntities);
-
-        return archivedMemDetail;
-      } else {
+      if (mem == null) {
         return null;
+      } else {
+        final archived = await MemService().archive(mem);
+
+        ref
+            .read(memProvider(archived.memEntity.id).notifier)
+            .updatedBy(archived.memEntity);
+        ref
+            .read(memItemsProvider(archived.memEntity.id).notifier)
+            .updatedBy(archived.memItemEntities);
+
+        return archived;
       }
     },
   ),
 );
 
-final unarchiveMem = Provider.family<Future<MemEntity>, Map<String, dynamic>>(
-  (ref, memMap) => v(
-    {'memMap': memMap},
+final unarchiveMem = Provider.family<Future<MemDetail?>, int?>(
+  (ref, memId) => v(
+    {'memId': memId},
     () async {
-      final unarchived =
-          await MemService().unarchive(MemEntity.fromMap(memMap));
-      ref.read(memProvider(unarchived.id).notifier).updatedBy(unarchived);
-      return unarchived;
+      final mem = ref.read(memProvider(memId));
+
+      if (mem == null) {
+        return null;
+      } else {
+        final unarchived = await MemService().unarchive(mem);
+
+        ref
+            .read(memProvider(unarchived.memEntity.id).notifier)
+            .updatedBy(unarchived.memEntity);
+        ref
+            .read(memItemsProvider(unarchived.memEntity.id).notifier)
+            .updatedBy(unarchived.memItemEntities);
+
+        return unarchived;
+      }
     },
   ),
 );
