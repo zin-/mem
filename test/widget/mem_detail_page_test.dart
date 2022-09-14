@@ -150,7 +150,7 @@ void main() {
       expect(find.text('Name is required'), findsNothing);
 
       verifyNever(mockedMemRepository.shipById(any));
-      verifyNever(mockedMemRepository.receiveV1(any));
+      verifyNever(mockedMemRepository.receive(any));
     });
 
     testWidgets(': create.', (widgetTester) async {

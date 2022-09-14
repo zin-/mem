@@ -60,19 +60,6 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
         },
       );
 
-  // FIXME drop
-  Future<Entity> receiveV1(Map<String, dynamic> valueMap) => v(
-        {'valueMap': valueMap},
-        () async {
-          final insertingMap = valueMap
-            ..putIfAbsent(createdAtColumnName, () => DateTime.now());
-
-          final id = await table.insert(insertingMap);
-
-          return fromMap(insertingMap..putIfAbsent(idColumnName, () => id));
-        },
-      );
-
   Future<List<Entity>> ship({
     bool? archived,
     List<String>? whereColumns,

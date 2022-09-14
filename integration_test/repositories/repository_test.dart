@@ -7,6 +7,11 @@ import 'package:mem/logger.dart';
 import 'package:mem/repositories/repository.dart';
 
 class TestEntity extends DatabaseTableEntity {
+  TestEntity({
+    int? id,
+    DateTime? archivedAt,
+  }) : super(id: id, archivedAt: archivedAt);
+
   @override
   TestEntity.fromMap(Map<String, dynamic> valueMap) : super.fromMap(valueMap);
 }
@@ -55,7 +60,9 @@ void main() async {
   test(
     'receive',
     () async {
-      final result = await testRepository.receiveV1({});
+      final result = await testRepository.receive(
+        TestEntity(),
+      );
 
       expect(result.id, isNotNull);
       expect(result.createdAt, const TypeMatcher<DateTime>());
@@ -68,12 +75,12 @@ void main() async {
     test(
       ': all',
       () async {
-        final received1 = await testRepository.receiveV1({
-          archivedAtColumnName: null,
-        });
-        final received2 = await testRepository.receiveV1({
-          archivedAtColumnName: DateTime.now(),
-        });
+        final received1 = await testRepository.receive(
+          TestEntity(archivedAt: null),
+        );
+        final received2 = await testRepository.receive(
+          TestEntity(archivedAt: DateTime.now()),
+        );
 
         final shipped = await testRepository.ship();
 
@@ -86,12 +93,12 @@ void main() async {
     test(
       ': archived',
       () async {
-        await testRepository.receiveV1({
-          archivedAtColumnName: null,
-        });
-        final received2 = await testRepository.receiveV1({
-          archivedAtColumnName: DateTime.now(),
-        });
+        await testRepository.receive(
+          TestEntity(archivedAt: null),
+        );
+        final received2 = await testRepository.receive(
+          TestEntity(archivedAt: DateTime.now()),
+        );
 
         final shipped = await testRepository.ship(archived: true);
 
@@ -103,12 +110,12 @@ void main() async {
     test(
       ': not archived',
       () async {
-        final received1 = await testRepository.receiveV1({
-          archivedAtColumnName: null,
-        });
-        await testRepository.receiveV1({
-          archivedAtColumnName: DateTime.now(),
-        });
+        final received1 = await testRepository.receive(
+          TestEntity(archivedAt: null),
+        );
+        await testRepository.receive(
+          TestEntity(archivedAt: DateTime.now()),
+        );
 
         final shipped = await testRepository.ship(archived: false);
 
@@ -121,7 +128,9 @@ void main() async {
   test(
     'shipById',
     () async {
-      final received = await testRepository.receiveV1({});
+      final received = await testRepository.receive(
+        TestEntity(),
+      );
 
       final shipped = await testRepository.shipById(received.id);
 
@@ -132,7 +141,9 @@ void main() async {
   test(
     'update',
     () async {
-      final received = await testRepository.receiveV1({});
+      final received = await testRepository.receive(
+        TestEntity(),
+      );
 
       final updated = await testRepository.update(received);
 
@@ -143,7 +154,9 @@ void main() async {
   test(
     'archive',
     () async {
-      final received = await testRepository.receiveV1({});
+      final received = await testRepository.receive(
+        TestEntity(),
+      );
 
       final updated = await testRepository.archive(received);
 
@@ -154,9 +167,9 @@ void main() async {
   test(
     'unarchive',
     () async {
-      final received = await testRepository.receiveV1({
-        archivedAtColumnName: DateTime.now(),
-      });
+      final received = await testRepository.receive(
+        TestEntity(archivedAt: DateTime.now()),
+      );
 
       final updated = await testRepository.unarchive(received);
 
@@ -168,7 +181,9 @@ void main() async {
     test(
       ': success',
       () async {
-        final received = await testRepository.receiveV1({});
+        final received = await testRepository.receive(
+          TestEntity(),
+        );
 
         final discardResult = await testRepository.discardById(received.id);
 
@@ -189,8 +204,12 @@ void main() async {
   test(
     'discardAll',
     () async {
-      await testRepository.receiveV1({});
-      await testRepository.receiveV1({});
+      await testRepository.receive(
+        TestEntity(),
+      );
+      await testRepository.receive(
+        TestEntity(),
+      );
 
       final discardedCount = await testRepository.discardAll();
 
