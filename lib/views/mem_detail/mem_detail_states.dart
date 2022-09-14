@@ -108,14 +108,25 @@ final updateMem = Provider.autoDispose.family<Future<MemEntity>, int?>(
   ),
 );
 
-// FIXME memMapを受け取ると変更途中で更新していない項目も受け取ってしまうのでは？
-final archiveMem = Provider.family<Future<MemEntity>, Map<String, dynamic>>(
-  (ref, memMap) => v(
-    {'memMap': memMap},
+final archiveMem = Provider.family<Future<MemDetail?>, int?>(
+  (ref, memId) => v(
+    {'memId': memId},
     () async {
-      final archived = await MemService().archive(MemEntity.fromMap(memMap));
-      ref.read(memProvider(archived.id).notifier).updatedBy(archived);
-      return archived;
+      final mem = ref.read(memProvider(memId));
+      if (mem != null) {
+        final archivedMemDetail = await MemService().archive(mem);
+
+        ref
+            .read(memProvider(archivedMemDetail.memEntity.id).notifier)
+            .updatedBy(archivedMemDetail.memEntity);
+        ref
+            .read(memItemsProvider(archivedMemDetail.memEntity.id).notifier)
+            .updatedBy(archivedMemDetail.memItemEntities);
+
+        return archivedMemDetail;
+      } else {
+        return null;
+      }
     },
   ),
 );

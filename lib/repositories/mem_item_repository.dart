@@ -71,7 +71,7 @@ class MemItemRepository extends DatabaseTableRepository<MemItemEntity> {
             whereColumns: [memIdColumnName],
             whereArgs: [memId],
           ))
-              .map((archiving) => archive(archiving)));
+              .map((target) => archive(target)));
         },
       );
 

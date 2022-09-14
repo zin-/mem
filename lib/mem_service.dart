@@ -43,13 +43,14 @@ class MemService {
         },
       );
 
-  Future<MemEntity> archive(MemEntity memEntity) => t(
+  Future<MemDetail> archive(MemEntity memEntity) => t(
         {'memEntity': memEntity},
         () async {
-          final receivedMem = await MemRepository().archive(memEntity);
-          await MemItemRepository().archiveByMemId(receivedMem.id);
+          final archivedMem = await MemRepository().archive(memEntity);
+          final archivedMemItems =
+              await MemItemRepository().archiveByMemId(archivedMem.id);
 
-          return receivedMem;
+          return MemDetail(archivedMem, archivedMemItems);
         },
       );
 

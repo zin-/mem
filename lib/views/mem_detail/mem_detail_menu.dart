@@ -70,17 +70,20 @@ class MemDetailMenu extends StatelessWidget {
               color: Colors.white,
               onPressed: () {
                 if (mem != null) {
-                  ref.read(archiveMem(mem.toMap())).then(
-                        (archived) =>
-                            ScaffoldMessenger.of(context).showSnackBar(
+                  ref.read(archiveMem(_memId)).then(
+                    (archivedMemDetail) {
+                      if (archivedMemDetail != null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(
-                                L10n().archiveMemSuccessMessage(archived.name)),
+                            content: Text(L10n().archiveMemSuccessMessage(
+                                archivedMemDetail.memEntity.name)),
                             duration: defaultDismissDuration,
                             dismissDirection: DismissDirection.horizontal,
                           ),
-                        ),
-                      );
+                        );
+                      }
+                    },
+                  );
                 }
                 Navigator.of(context).pop(null);
               },
