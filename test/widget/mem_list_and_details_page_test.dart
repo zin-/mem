@@ -34,20 +34,12 @@ void main() {
 
       await pumpMemListPage(widgetTester);
 
-      verify(mockedMemRepository.ship(archived: false)).called(1);
-
       await widgetTester.tap(showNewMemFabFinder);
       await widgetTester.pumpAndSettle();
-
-      expectMemNameOnMemDetail(widgetTester, '');
-      expectMemMemoOnMemDetail(widgetTester, '');
 
       await widgetTester.enterText(memNameTextFormFieldFinder, enteringMemName);
       await widgetTester.enterText(memMemoTextFormFieldFinder, enteringMemMemo);
       await widgetTester.pump();
-
-      expectMemNameOnMemDetail(widgetTester, enteringMemName);
-      expectMemMemoOnMemDetail(widgetTester, enteringMemMemo);
 
       const memId = 1;
       when(mockedMemRepository.receive(any)).thenAnswer((realInvocation) {
@@ -89,9 +81,6 @@ void main() {
 
       await widgetTester.tap(saveFabFinder);
       await widgetTester.pump();
-
-      verify(mockedMemRepository.receive(any)).called(1);
-      verify(mockedMemItemRepository.receive(any)).called(1);
 
       await widgetTester.pageBack();
       await widgetTester.pumpAndSettle();
@@ -150,9 +139,6 @@ void main() {
 
       await widgetTester.tap(memListTileFinder.at(0));
       await widgetTester.pumpAndSettle();
-
-      expectMemNameOnMemDetail(widgetTester, savedMemEntity.name);
-      expectMemMemoOnMemDetail(widgetTester, savedMemoMemItemEntity.value);
 
       verifyNever(mockedMemRepository.shipById(any));
       verify(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).called(1);

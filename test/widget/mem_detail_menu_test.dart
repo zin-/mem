@@ -97,13 +97,14 @@ void main() {
     expect(unarchiveButtonFinder, findsOneWidget);
 
     await widgetTester.tap(unarchiveButtonFinder);
-    final appBar = widgetTester.widget(appBarFinder) as AppBar;
-    expect(appBar.backgroundColor, archivedColor);
+    expect(memDetailAppBar(widgetTester).backgroundColor, archivedColor);
 
     verify(mockedMemRepository.shipById(memId)).called(1);
     verify(mockedMemRepository.unarchive(any)).called(1);
   });
 }
+
+final appBarFinder = find.byType(AppBar);
 
 final archiveButtonFinder = find.descendant(
   of: appBarFinder,
@@ -114,6 +115,9 @@ final unarchiveButtonFinder = find.descendant(
   of: appBarFinder,
   matching: find.byIcon(Icons.unarchive),
 );
+
+AppBar memDetailAppBar(WidgetTester widgetTester) =>
+    (widgetTester.widget(appBarFinder)) as AppBar;
 
 final memDetailMenuButtonFinder = find.descendant(
   of: appBarFinder,

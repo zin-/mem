@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
-import 'package:mem/views/colors.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
@@ -28,41 +27,47 @@ void main() {
 
   group('Show', () {
     testWidgets(': not found.', (widgetTester) async {
-      when(mockedMemRepository.shipById(any))
-          .thenThrow(NotFoundException('test target', 'test condition'));
-
-      await pumpMemDetailPage(widgetTester, 1);
-
-      expectMemNameOnMemDetail(widgetTester, '');
-      expect(
-          (widgetTester.widget(memMemoTextFormFieldFinder) as TextFormField)
-              .initialValue,
-          '');
-      expect(saveFabFinder, findsOneWidget);
-      final appBar = widgetTester.widget(appBarFinder) as AppBar;
-      expect(appBar.backgroundColor, primaryColor);
-
-      verify(mockedMemRepository.shipById(1)).called(1);
-    });
-
-    testWidgets(': found.', (widgetTester) async {
       const memId = 1;
-      const memName = 'test mem name';
-      when(mockedMemRepository.shipById(any))
-          .thenAnswer((realInvocation) async => MemEntity(
-                id: memId,
-                name: memName,
-                createdAt: DateTime.now(),
-              ));
+
+      when(mockedMemRepository.shipById(memId))
+          .thenThrow(NotFoundException('test target', 'test condition'));
 
       await pumpMemDetailPage(widgetTester, memId);
 
-      expectMemNameOnMemDetail(widgetTester, memName);
-      expect(saveFabFinder, findsOneWidget);
-      final appBar = widgetTester.widget(appBarFinder) as AppBar;
-      expect(appBar.backgroundColor, primaryColor);
-
       verify(mockedMemRepository.shipById(memId)).called(1);
+      verifyNever(mockedMemItemRepository.shipByMemId(any));
+
+      expectMemNameOnMemDetail(widgetTester, '');
+      expectMemMemoOnMemDetail(widgetTester, '');
+      expect(saveFabFinder, findsOneWidget);
+    });
+
+    testWidgets(': found.', (widgetTester) async {
+      final savedMemEntity = MemEntity(
+        name: 'saved mem entity',
+        id: 1,
+        createdAt: DateTime.now(),
+      );
+      when(mockedMemRepository.shipById(savedMemEntity.id))
+          .thenAnswer((realInvocation) async => savedMemEntity);
+      final savedMemoMemItemEntity = MemItemEntity(
+        memId: savedMemEntity.id,
+        type: MemItemType.memo,
+        value: 'saved memo mem item entity',
+        id: 1,
+        createdAt: DateTime.now(),
+      );
+      when(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).thenAnswer(
+          (realInvocation) => Future.value([savedMemoMemItemEntity]));
+
+      await pumpMemDetailPage(widgetTester, savedMemEntity.id);
+
+      verify(mockedMemRepository.shipById(savedMemEntity.id)).called(1);
+      verify(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).called(1);
+
+      expectMemNameOnMemDetail(widgetTester, savedMemEntity.name);
+      expectMemMemoOnMemDetail(widgetTester, savedMemoMemItemEntity.value);
+      expect(saveFabFinder, findsOneWidget);
     });
   });
 
@@ -82,9 +87,6 @@ void main() {
 
       await pumpMemDetailPage(widgetTester, memId);
       await widgetTester.pump();
-
-      final appBar = widgetTester.widget(appBarFinder) as AppBar;
-      expect(appBar.backgroundColor, archivedColor);
 
       verify(mockedMemRepository.shipById(memId)).called(1);
     },
@@ -279,7 +281,6 @@ Future pumpMemDetailPage(
 final memNameTextFormFieldFinder = find.byType(TextFormField).at(0);
 final memMemoTextFormFieldFinder = find.byType(TextFormField).at(1);
 final saveFabFinder = find.byIcon(Icons.save_alt).at(0);
-final appBarFinder = find.byType(AppBar);
 
 TextFormField memNameTextFormField(WidgetTester widgetTester) =>
     (widgetTester.widget(memNameTextFormFieldFinder) as TextFormField);
