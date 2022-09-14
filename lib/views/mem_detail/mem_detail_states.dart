@@ -16,6 +16,16 @@ final memProvider = StateNotifierProvider.family<ValueStateNotifier<MemEntity?>,
   ),
 );
 
+final editingMemProvider = StateNotifierProvider.family<
+    ValueStateNotifier<MemEntity>, MemEntity, int?>(
+  (ref, memId) => v(
+    {'memId': memId},
+    () => ValueStateNotifier(
+      ref.watch(memProvider(memId)) ?? MemEntity(name: '', id: null),
+    ),
+  ),
+);
+
 final memMapProvider = StateNotifierProvider.family<
     ValueStateNotifier<Map<String, dynamic>>, Map<String, dynamic>, int?>(
   (ref, memId) => v(
@@ -33,8 +43,7 @@ final memItemsProvider = StateNotifierProvider.family<
   ),
 );
 
-final fetchMemById =
-    FutureProvider.autoDispose.family<Map<String, dynamic>, int?>(
+final fetchMemById = FutureProvider.autoDispose.family<void, int?>(
   (ref, memId) => v(
     {'memId': memId},
     () async {
@@ -52,8 +61,6 @@ final fetchMemById =
       } catch (e) {
         warn(e);
       }
-
-      return ref.read(memMapProvider(memId));
     },
   ),
 );
@@ -62,26 +69,24 @@ final createMem = Provider.autoDispose.family<Future<MemEntity>, int?>(
   (ref, memId) => v(
     {'memId': memId},
     () async {
-      final memItems = ref.read(memItemsProvider(memId)) ?? [];
-      final memMap = ref.read(memMapProvider(memId));
-      final memDetail = MemDetail(MemEntity.fromMap(memMap), memItems);
+      final memItemEntities = ref.read(memItemsProvider(memId)) ?? [];
+      final editingMemEntity = ref.watch(editingMemProvider(memId));
+      final memDetail = MemDetail(editingMemEntity, memItemEntities);
 
-      final receivedMemDetail = await MemService().create(memDetail);
+      final received = await MemService().create(memDetail);
 
-      ref
-          .read(memProvider(null).notifier)
-          .updatedBy(receivedMemDetail.memEntity);
+      ref.read(memProvider(null).notifier).updatedBy(received.memEntity);
       ref
           .read(memItemsProvider(null).notifier)
-          .updatedBy(receivedMemDetail.memItemEntities);
+          .updatedBy(received.memItemEntities);
       ref
-          .read(memProvider(receivedMemDetail.memEntity.id).notifier)
-          .updatedBy(receivedMemDetail.memEntity);
+          .read(memProvider(received.memEntity.id).notifier)
+          .updatedBy(received.memEntity);
       ref
-          .read(memItemsProvider(receivedMemDetail.memEntity.id).notifier)
-          .updatedBy(receivedMemDetail.memItemEntities);
+          .read(memItemsProvider(received.memEntity.id).notifier)
+          .updatedBy(received.memItemEntities);
 
-      return receivedMemDetail.memEntity;
+      return received.memEntity;
     },
   ),
 );
@@ -91,19 +96,19 @@ final updateMem = Provider.autoDispose.family<Future<MemEntity>, int?>(
     {'memId': memId},
     () async {
       final memItemEntities = ref.read(memItemsProvider(memId)) ?? [];
-      final memMap = ref.read(memMapProvider(memId));
-      final memDetail = MemDetail(MemEntity.fromMap(memMap), memItemEntities);
+      final editingMemEntity = ref.watch(editingMemProvider(memId));
+      final memDetail = MemDetail(editingMemEntity, memItemEntities);
 
-      final updatedMemDetail = await MemService().update(memDetail);
+      final updated = await MemService().update(memDetail);
 
       ref
-          .read(memProvider(updatedMemDetail.memEntity.id).notifier)
-          .updatedBy(updatedMemDetail.memEntity);
+          .read(memProvider(updated.memEntity.id).notifier)
+          .updatedBy(updated.memEntity);
       ref
-          .read(memItemsProvider(updatedMemDetail.memEntity.id).notifier)
-          .updatedBy(updatedMemDetail.memItemEntities);
+          .read(memItemsProvider(updated.memEntity.id).notifier)
+          .updatedBy(updated.memItemEntities);
 
-      return updatedMemDetail.memEntity;
+      return updated.memEntity;
     },
   ),
 );

@@ -3,8 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/repositories/mem_item_repository.dart'; // FIXME repositoryを見るのはおかしい気がする
-import 'package:mem/repositories/mem_repository.dart'; // FIXME repositoryを見るのはおかしい気がする
-import 'package:mem/repositories/repository.dart'; // FIXME repositoryを見るのはおかしい気がする
 import 'package:mem/views/atoms/async_value_view.dart';
 import 'package:mem/views/colors.dart';
 import 'package:mem/views/dimens.dart';
@@ -31,109 +29,123 @@ class MemDetailPage extends StatelessWidget {
             {'_memId': _memId},
             () {
               final mem = ref.watch(memProvider(_memId));
-              final memMap = ref.watch(memMapProvider(_memId));
 
-              return WillPopScope(
-                child: Scaffold(
-                  appBar: AppBar(
-                    title: Text(L10n().memDetailPageTitle()),
-                    actions: [
-                      MemDetailMenu(_memId),
-                    ],
-                    backgroundColor: mem?.isArchived() ?? false
-                        ? archivedColor
-                        : primaryColor,
-                  ),
-                  body: Padding(
-                    padding: pagePadding,
-                    child: Form(
-                      key: _formKey,
-                      child: mem == null
-                          ? AsyncValueView(
-                              ref.watch(fetchMemById(_memId)),
-                              (Map<String, dynamic> memDataMap) =>
-                                  _buildBody(ref, memMap),
-                            )
-                          : _buildBody(ref, memMap),
-                    ),
-                  ),
-                  floatingActionButton: Consumer(
-                    builder: (context, ref, child) {
-                      return FloatingActionButton(
-                        child: const Icon(Icons.save_alt),
-                        onPressed: () => v(
-                          {},
-                          () async {
-                            if (_formKey.currentState?.validate() ?? false) {
-                              final savedFuture = _memId == null && mem == null
-                                  ? ref.read(createMem(_memId))
-                                  : ref.read(updateMem(_memId));
-
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(L10n().saveMemSuccessMessage(
-                                    (await savedFuture).name,
-                                  )),
-                                  duration: defaultDismissDuration,
-                                  dismissDirection: DismissDirection.horizontal,
-                                ),
-                              );
-                            }
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                  floatingActionButtonLocation:
-                      FloatingActionButtonLocation.centerFloat,
-                ),
-                onWillPop: () async => v(
-                  {},
-                  () {
-                    Navigator.of(context).pop(mem);
-                    return true;
-                  },
-                ),
-              );
+              return mem == null
+                  ? AsyncValueView(
+                      ref.watch(fetchMemById(_memId)),
+                      (value) => _build(),
+                    )
+                  : _build();
             },
           ),
         ),
       );
 
-  Widget _buildBody(
-    WidgetRef ref,
-    Map<String, dynamic> memMap,
-  ) =>
-      v(
-        {'memMap': memMap, 'ref': ref},
-        () {
-          return Column(
-            children: [
-              MemNameTextFormField(
-                memMap[memNameColumnName] ?? '',
-                memMap[idColumnName],
-                (value) => (value?.isEmpty ?? false)
-                    ? L10n().memNameIsRequiredWarn()
-                    : null,
-                (value) => ref
-                    .read(memMapProvider(_memId).notifier)
-                    .updatedBy(memMap..[memNameColumnName] = value),
+  _build() => v(
+        {},
+        () => Consumer(
+          builder: (context, ref, child) {
+            final mem = ref.watch(memProvider(_memId));
+
+            return WillPopScope(
+              child: Scaffold(
+                appBar: AppBar(
+                  title: Text(L10n().memDetailPageTitle()),
+                  actions: [
+                    MemDetailMenu(_memId),
+                  ],
+                  backgroundColor:
+                      mem?.isArchived() ?? false ? archivedColor : primaryColor,
+                ),
+                body: Padding(
+                  padding: pagePadding,
+                  child: Form(
+                    key: _formKey,
+                    child: _buildBody(),
+                  ),
+                ),
+                floatingActionButton: Consumer(
+                  builder: (context, ref, child) {
+                    return FloatingActionButton(
+                      child: const Icon(Icons.save_alt),
+                      onPressed: () => v(
+                        {},
+                        () async {
+                          if (_formKey.currentState?.validate() ?? false) {
+                            final savedFuture = _memId == null && mem == null
+                                ? ref.read(createMem(_memId))
+                                : ref.read(updateMem(_memId));
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(L10n().saveMemSuccessMessage(
+                                  (await savedFuture).name,
+                                )),
+                                duration: defaultDismissDuration,
+                                dismissDirection: DismissDirection.horizontal,
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    );
+                  },
+                ),
+                floatingActionButtonLocation:
+                    FloatingActionButtonLocation.centerFloat,
               ),
-              AsyncValueView(
-                ref.watch(fetchMemById(_memId)),
-                (value) =>
-                    _buildMemItemViews(ref.watch(memItemsProvider(_memId))),
+              onWillPop: () async => v(
+                {},
+                () {
+                  Navigator.of(context).pop(mem);
+                  return true;
+                },
               ),
-            ],
-          );
-        },
+            );
+          },
+        ),
       );
 
-  _buildMemItemViews(List<MemItemEntity>? memItems) => v(
+  Widget _buildBody() => v(
         {},
         () {
           return Consumer(
             builder: (context, ref, child) {
+              final editingMem = ref.watch(editingMemProvider(_memId));
+              final memItems = ref.watch(memItemsProvider(_memId));
+
+              return Column(
+                children: [
+                  MemNameTextFormField(
+                    editingMem.name,
+                    editingMem.id,
+                    (value) => (value?.isEmpty ?? false)
+                        ? L10n().memNameIsRequiredWarn()
+                        : null,
+                    (value) => ref
+                        .read(editingMemProvider(_memId).notifier)
+                        .updatedBy(editingMem..name = value),
+                  ),
+                  memItems == null
+                      ? AsyncValueView(
+                          ref.watch(fetchMemById(_memId)),
+                          (value) => _buildMemItemViews(),
+                        )
+                      : _buildMemItemViews(),
+                ],
+              );
+            },
+          );
+        },
+      );
+
+  Widget _buildMemItemViews() => v(
+        {},
+        () {
+          return Consumer(
+            builder: (context, ref, child) {
+              final memItems = ref.watch(memItemsProvider(_memId));
+
               return SingleChildScrollView(
                 child: Column(
                   children: [

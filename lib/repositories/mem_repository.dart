@@ -14,7 +14,7 @@ final memTableDefinition = DefT(
 );
 
 class MemEntity extends DatabaseTableEntity {
-  final String name;
+  String name;
 
   MemEntity({
     required this.name,
