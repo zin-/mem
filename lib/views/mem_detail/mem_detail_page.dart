@@ -68,14 +68,15 @@ class MemDetailPage extends StatelessWidget {
                                   ? ref.read(createMem(memMap))
                                   : ref.read(updateMem(memMap));
 
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(SnackBar(
-                                content: Text(L10n().saveMemSuccessMessage(
-                                  (await savedFuture).name,
-                                )),
-                                duration: defaultDismissDuration,
-                                dismissDirection: DismissDirection.horizontal,
-                              ));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(L10n().saveMemSuccessMessage(
+                                    (await savedFuture).name,
+                                  )),
+                                  duration: defaultDismissDuration,
+                                  dismissDirection: DismissDirection.horizontal,
+                                ),
+                              );
                             }
                           },
                         ),
