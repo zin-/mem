@@ -7,6 +7,7 @@ import 'package:mockito/mockito.dart';
 import '../mocks.mocks.dart';
 import 'mem_detail_page_test.dart';
 import 'mem_list_page_test.dart';
+import 'mem_detail_menu_test.dart';
 
 void main() {
   Logger(level: Level.verbose);
@@ -216,6 +217,61 @@ void main() {
 
       expect(widgetTester.widgetList(memListTileFinder).length, 1);
       expectMemNameTextOnListAt(widgetTester, 0, enteringMemName);
+    },
+  );
+
+  testWidgets(
+    'Archive mem',
+    (widgetTester) async {
+      final savedMemEntity = MemEntity(
+        name: 'saved mem entity',
+        id: 1,
+        createdAt: DateTime.now(),
+      );
+      when(mockedMemRepository.ship(archived: false))
+          .thenAnswer((realInvocation) => Future.value([savedMemEntity]));
+
+      await pumpMemListPage(widgetTester);
+
+      final savedMemoMemItemEntity = MemItemEntity(
+        memId: savedMemEntity.id,
+        type: MemItemType.memo,
+        value: 'saved memo mem item entity',
+        id: 1,
+        createdAt: DateTime.now(),
+      );
+      when(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).thenAnswer(
+          (realInvocation) => Future.value([savedMemoMemItemEntity]));
+
+      await widgetTester.tap(memListTileFinder.at(0));
+      await widgetTester.pumpAndSettle();
+
+      when(mockedMemRepository.archive(any)).thenAnswer((realInvocation) {
+        final memEntity = realInvocation.positionalArguments[0] as MemEntity;
+
+        expect(memEntity.toMap(), savedMemEntity.toMap());
+
+        return Future.value(memEntity..archivedAt = DateTime.now());
+      });
+      when(mockedMemItemRepository.archiveByMemId(savedMemEntity.id))
+          .thenAnswer((realInvocation) {
+        final memId = realInvocation.positionalArguments[0] as int;
+
+        expect(memId, savedMemEntity.id);
+
+        return Future.value([savedMemoMemItemEntity]
+            .map((e) => e..archivedAt = DateTime.now())
+            .toList());
+      });
+
+      await widgetTester.tap(archiveButtonFinder);
+      await widgetTester.pumpAndSettle();
+
+      verify(mockedMemRepository.archive(any)).called(1);
+      verify(mockedMemItemRepository.archiveByMemId(savedMemEntity.id))
+          .called(1);
+
+      expect(widgetTester.widgetList(memListTileFinder).length, 0);
     },
   );
 }
