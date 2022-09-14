@@ -34,6 +34,8 @@ void main() {
 
       await pumpMemListPage(widgetTester);
 
+      verify(mockedMemRepository.ship(archived: false)).called(1);
+
       await widgetTester.tap(showNewMemFabFinder);
       await widgetTester.pumpAndSettle();
 

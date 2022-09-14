@@ -30,6 +30,7 @@ class MemDetailPage extends StatelessWidget {
           builder: (context, ref, child) => v(
             {'_memId': _memId},
             () {
+              ref.watch(fetchMemById(_memId));
               final mem = ref.watch(memProvider(_memId));
               final memMap = ref.watch(memMapProvider(_memId));
 
