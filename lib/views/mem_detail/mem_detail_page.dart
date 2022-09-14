@@ -30,7 +30,6 @@ class MemDetailPage extends StatelessWidget {
           builder: (context, ref, child) => v(
             {'_memId': _memId},
             () {
-              ref.watch(fetchMemById(_memId));
               final mem = ref.watch(memProvider(_memId));
               final memMap = ref.watch(memMapProvider(_memId));
 
@@ -49,7 +48,7 @@ class MemDetailPage extends StatelessWidget {
                     padding: pagePadding,
                     child: Form(
                       key: _formKey,
-                      child: _memId != null && memMap.length < 2
+                      child: mem == null
                           ? AsyncValueView(
                               ref.watch(fetchMemById(_memId)),
                               (Map<String, dynamic> memDataMap) =>
@@ -108,45 +107,62 @@ class MemDetailPage extends StatelessWidget {
       v(
         {'memMap': memMap, 'ref': ref},
         () {
-          final memItems = ref.watch(memItemsProvider(_memId));
+          return Column(
+            children: [
+              MemNameTextFormField(
+                memMap[memNameColumnName] ?? '',
+                memMap[idColumnName],
+                (value) => (value?.isEmpty ?? false)
+                    ? L10n().memNameIsRequiredWarn()
+                    : null,
+                (value) => ref
+                    .read(memMapProvider(_memId).notifier)
+                    .updatedBy(memMap..[memNameColumnName] = value),
+              ),
+              AsyncValueView(
+                ref.watch(fetchMemById(_memId)),
+                (value) =>
+                    _buildMemItemViews(ref.watch(memItemsProvider(_memId))),
+              ),
+            ],
+          );
+        },
+      );
 
-          return SingleChildScrollView(
-            child: Column(
-              children: [
-                MemNameTextFormField(
-                  memMap[memNameColumnName] ?? '',
-                  memMap[idColumnName],
-                  (value) => (value?.isEmpty ?? false)
-                      ? L10n().memNameIsRequiredWarn()
-                      : null,
-                  (value) => ref
-                      .read(memMapProvider(_memId).notifier)
-                      .updatedBy(memMap..[memNameColumnName] = value),
+  _buildMemItemViews(memItems) => v(
+        {},
+        () {
+          return Consumer(
+            builder: (context, ref, child) {
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    ...(memItems ??
+                            [
+                              MemItemEntity(
+                                memId: _memId,
+                                type: MemItemType.memo,
+                              ),
+                            ])
+                        .map((memItem) {
+                      return TextFormField(
+                        decoration: InputDecoration(
+                          icon: const Icon(Icons.subject),
+                          labelText: L10n().memMemoTitle(),
+                        ),
+                        maxLines: null,
+                        initialValue: memItem.value,
+                        onChanged: (value) =>
+                            ref.read(memItemsProvider(_memId).notifier).upsert(
+                                  memItem..value = value,
+                                  (item) => item.id == memItem.id,
+                                ),
+                      );
+                    }),
+                  ],
                 ),
-                ...(memItems ??
-                        [
-                          MemItemEntity(
-                            memId: _memId,
-                            type: MemItemType.memo,
-                          ),
-                        ])
-                    .map((memItem) {
-                  return TextFormField(
-                    decoration: InputDecoration(
-                      icon: const Icon(Icons.subject),
-                      labelText: L10n().memMemoTitle(),
-                    ),
-                    maxLines: null,
-                    initialValue: memItem.value,
-                    onChanged: (value) =>
-                        ref.read(memItemsProvider(_memId).notifier).upsert(
-                              memItem..value = value,
-                              (item) => item.id == memItem.id,
-                            ),
-                  );
-                }),
-              ],
-            ),
+              );
+            },
           );
         },
       );

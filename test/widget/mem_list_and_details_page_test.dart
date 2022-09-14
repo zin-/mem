@@ -145,6 +145,11 @@ void main() {
       verifyNever(mockedMemRepository.shipById(any));
       verify(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).called(1);
 
+      expectMemNameOnMemDetail(widgetTester, savedMemEntity.name);
+      expectMemMemoOnMemDetail(widgetTester, savedMemoMemItemEntity.value);
+      expect(find.text(savedMemEntity.name), findsOneWidget);
+      expect(find.text(savedMemoMemItemEntity.value), findsOneWidget);
+
       const enteringMemName = 'updating mem name';
       const enteringMemMemo = 'updating mem memo';
 
