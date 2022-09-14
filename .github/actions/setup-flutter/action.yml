@@ -45,5 +45,5 @@ runs:
           build-
     - if: ${{ steps.cahce-build.outputs.cache-hit != 'true' }}
       name: Build
-      run: ./.github/workflows/scripts/build.sh
+      run: ./.github/scripts/build.sh
       shell: bash
