@@ -3,74 +3,93 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/l10n.dart';
 
 import 'package:mem/logger.dart';
-import 'package:mem/mem.dart';
 import 'package:mem/views/constants.dart';
 import 'package:mem/views/mem_detail/mem_detail_states.dart';
 
 enum MenuOption { remove }
 
 class MemDetailMenu extends StatelessWidget {
-  final Map<String, dynamic> _memMap;
+  final int? _memId;
 
-  const MemDetailMenu(this._memMap, {Key? key}) : super(key: key);
+  const MemDetailMenu(this._memId, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => v(
-        {'_memMap': _memMap},
-        () => Consumer(
-          builder: (context, ref, child) => Row(
+        {'_memId': _memId},
+        () => Consumer(builder: (context, ref, child) {
+          final mem = ref.watch(memProvider(_memId));
+
+          return Row(
             children: [
-              Mem.isArchivedMap(_memMap)
-                  ? _buildUnArchiveButton(context, ref)
-                  : _buildArchiveButton(context, ref),
-              _buildMenu(context, ref),
+              mem?.isArchived() ?? false
+                  ? _buildUnArchiveButton(context)
+                  : _buildArchiveButton(context),
+              _buildMenu(context),
             ],
-          ),
-        ),
+          );
+        }),
       );
 
-  Widget _buildArchiveButton(BuildContext context, WidgetRef ref) => v(
+  Widget _buildUnArchiveButton(BuildContext context) => v(
         {},
-        () => IconButton(
-          icon: const Icon(Icons.archive),
-          color: Colors.white,
-          onPressed: () {
-            if (Mem.isSavedMap(_memMap)) {
-              ref.read(archiveMem(_memMap)).then(
-                    (archived) => ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                            L10n().archiveMemSuccessMessage(archived.name)),
-                        duration: defaultDismissDuration,
-                        dismissDirection: DismissDirection.horizontal,
-                      ),
-                    ),
-                  );
-            }
-            Navigator.of(context).pop(null);
+        () => Consumer(
+          builder: (context, ref, child) {
+            return IconButton(
+              icon: const Icon(Icons.unarchive),
+              color: Colors.white,
+              onPressed: () {
+                ref.read(unarchiveMem(_memId)).then(
+                  (archived) {
+                    if (archived != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(L10n().unarchiveMemSuccessMessage(
+                            archived.memEntity.name,
+                          )),
+                          duration: defaultDismissDuration,
+                          dismissDirection: DismissDirection.horizontal,
+                        ),
+                      );
+                    }
+                  },
+                );
+              },
+            );
           },
         ),
       );
 
-  Widget _buildUnArchiveButton(BuildContext context, WidgetRef ref) => v(
+  Widget _buildArchiveButton(BuildContext context) => v(
         {},
-        () => IconButton(
-          icon: const Icon(Icons.unarchive),
-          color: Colors.white,
-          onPressed: () => ref.read(unarchiveMem(_memMap)).then(
-                (archived) => ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content:
-                        Text(L10n().unarchiveMemSuccessMessage(archived.name)),
-                    duration: defaultDismissDuration,
-                    dismissDirection: DismissDirection.horizontal,
-                  ),
-                ),
-              ),
+        () => Consumer(
+          builder: (context, ref, child) {
+            return IconButton(
+              icon: const Icon(Icons.archive),
+              color: Colors.white,
+              onPressed: () {
+                ref.read(archiveMem(_memId)).then(
+                  (archivedMemDetail) {
+                    if (archivedMemDetail != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(L10n().archiveMemSuccessMessage(
+                            archivedMemDetail.memEntity.name,
+                          )),
+                          duration: defaultDismissDuration,
+                          dismissDirection: DismissDirection.horizontal,
+                        ),
+                      );
+                    }
+                  },
+                );
+                Navigator.of(context).pop(null);
+              },
+            );
+          },
         ),
       );
 
-  Widget _buildMenu(BuildContext context, WidgetRef ref) => v(
+  Widget _buildMenu(BuildContext context) => v(
         {},
         () => PopupMenuButton(
           itemBuilder: (context) => [
@@ -88,15 +107,14 @@ class MemDetailMenu extends StatelessWidget {
             if (value == MenuOption.remove) {
               showDialog(
                 context: context,
-                builder: (context) => _buildRemoveMemAlertDialog(context, ref),
+                builder: (context) => _buildRemoveMemAlertDialog(context),
               );
             }
           },
         ),
       );
 
-  AlertDialog _buildRemoveMemAlertDialog(BuildContext context, WidgetRef ref) =>
-      v(
+  AlertDialog _buildRemoveMemAlertDialog(BuildContext context) => v(
         {},
         () => AlertDialog(
           content: Text(L10n().removeConfirmation()),
@@ -104,16 +122,22 @@ class MemDetailMenu extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                ElevatedButton(
-                  onPressed: () async {
-                    if (Mem.isSavedMap(_memMap)) {
-                      ref.read(removeMem(_memMap['id']));
-                    }
-                    Navigator.of(context)
-                      ..pop()
-                      ..pop(null);
+                Consumer(
+                  builder: (context, ref, child) {
+                    final mem = ref.watch(memProvider(_memId));
+
+                    return ElevatedButton(
+                      onPressed: () async {
+                        if (mem != null) {
+                          ref.read(removeMem(mem.id));
+                        }
+                        Navigator.of(context)
+                          ..pop()
+                          ..pop(null);
+                      },
+                      child: Text(L10n().okAction()),
+                    );
                   },
-                  child: Text(L10n().okAction()),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(

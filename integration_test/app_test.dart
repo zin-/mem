@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-
 import 'package:mem/logger.dart';
 import 'package:mem/database/database_factory.dart';
+import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/main.dart' as app;
+import 'package:mem/repositories/repository.dart';
 import 'package:mem/views/constants.dart';
 
 void main() {
@@ -19,127 +20,154 @@ void main() {
     // 今の実装だと難しいっぽい。いつかチャレンジする
     await DatabaseManager().open(app.databaseDefinition);
     await DatabaseManager().delete(app.databaseDefinition.name);
-
-    MemRepository.clear();
   });
 
   group('Basic scenario', () {
-    testWidgets(': create.', (widgetTester) async {
-      const enteringMemName = 'entering mem name';
-
+    testWidgets(': create', (widgetTester) async {
       await app.main();
       await widgetTester.pumpAndSettle();
 
       await widgetTester.tap(showNewMemFabFinder);
       await widgetTester.pumpAndSettle();
 
-      await enterMemNameAndSave(widgetTester, enteringMemName);
+      const enteringMemName = 'entering mem name';
+      const enteringMemMemo = 'entering mem memo';
+
+      await widgetTester.enterText(memNameTextFormFieldFinder, enteringMemName);
+      await widgetTester.enterText(memMemoTextFormFieldFinder, enteringMemMemo);
+
+      await widgetTester.tap(saveFabFinder);
+      await widgetTester.pumpAndSettle();
 
       await widgetTester.pageBack();
       await widgetTester.pumpAndSettle();
 
-      expectMemNameTextOnListAt(widgetTester, 0, enteringMemName);
+      expect(find.text(enteringMemName), findsOneWidget);
+      expect(find.text(enteringMemMemo), findsNothing);
     });
 
-    testWidgets(': update.', (widgetTester) async {
+    testWidgets(': update', (widgetTester) async {
       const savedMemName = 'saved mem name';
-      final database = await DatabaseManager().open(app.databaseDefinition);
-      final memTable = database.getTable(memTableName);
-      final savedMemId = await memTable.insert({
-        'name': savedMemName,
-        'createdAt': DateTime.now(),
-      });
-      assert(savedMemId == 1);
-      await DatabaseManager().close(app.databaseDefinition.name);
-
-      const enteringMemName = 'entering mem name';
+      const savedMemMemo = 'saved mem memo';
+      await prepareSavedData(savedMemName, savedMemMemo);
 
       await app.main();
       await widgetTester.pumpAndSettle();
 
-      expectMemNameTextOnListAt(widgetTester, 0, savedMemName);
-
-      await widgetTester.tap(memListTileFinder.at(0));
+      await widgetTester.tap(find.text(savedMemName));
       await widgetTester.pumpAndSettle();
 
-      await enterMemNameAndSave(widgetTester, enteringMemName);
+      const enteringMemName = 'entering mem name';
+      const enteringMemMemo = 'entering mem memo';
+
+      await widgetTester.enterText(memNameTextFormFieldFinder, enteringMemName);
+      await widgetTester.enterText(memMemoTextFormFieldFinder, enteringMemMemo);
+
+      await widgetTester.tap(saveFabFinder);
+      await widgetTester.pumpAndSettle();
 
       expect(saveMemSuccessFinder(enteringMemName), findsOneWidget);
 
       await widgetTester.pageBack();
       await widgetTester.pumpAndSettle();
 
-      expectMemNameTextOnListAt(widgetTester, 0, enteringMemName);
+      expect(find.text(enteringMemName), findsOneWidget);
+      expect(find.text(enteringMemMemo), findsNothing);
       expect(find.text(savedMemName), findsNothing);
     });
 
-    testWidgets(': archive.', (widgetTester) async {
-      const enteringMemName = 'entering mem name';
+    testWidgets(': archive', (widgetTester) async {
+      const savedMemName = 'saved mem name';
+      const savedMemMemo = 'saved mem memo';
+      await prepareSavedData(savedMemName, savedMemMemo);
 
       await app.main();
       await widgetTester.pumpAndSettle();
 
-      await widgetTester.tap(showNewMemFabFinder);
+      await widgetTester.tap(find.text(savedMemName));
       await widgetTester.pumpAndSettle();
 
-      await enterMemNameAndSave(widgetTester, enteringMemName);
-
-      await widgetTester.tap(archiveButtonFinder);
+      await widgetTester.tap(find.byIcon(Icons.archive));
       await widgetTester.pumpAndSettle();
 
-      expect(find.text(enteringMemName), findsNothing);
+      expect(find.text(savedMemName), findsNothing);
 
       await widgetTester.tap(memListFilterButton);
       await widgetTester.pumpAndSettle();
-
       await widgetTester.tap(findShowArchiveSwitch);
       await widgetTester.pumpAndSettle();
 
-      await closeMemListFilter(widgetTester);
-
-      expectMemNameTextOnListAt(widgetTester, 0, enteringMemName);
+      expect(find.text(savedMemName), findsOneWidget);
     });
 
-    testWidgets(': remove.', (widgetTester) async {
-      const savedMemName = 'saved mem name';
-      final database = await DatabaseManager().open(app.databaseDefinition);
-      final memTable = database.getTable(memTableName);
-      final savedMemId = await memTable.insert({
-        'name': savedMemName,
-        'createdAt': DateTime.now(),
-      });
-      assert(savedMemId == 1);
-      await DatabaseManager().close(app.databaseDefinition.name);
+    testWidgets(': unarchive', (widgetTester) async {
+      const savedMemName = 'archived mem name';
+      const savedMemMemo = 'archived mem memo';
+      await prepareSavedData(savedMemName, savedMemMemo, isArchived: true);
 
       await app.main();
       await widgetTester.pumpAndSettle();
 
-      await widgetTester.tap(memListTileFinder.at(0));
+      await widgetTester.tap(memListFilterButton);
+      await widgetTester.pumpAndSettle();
+      await widgetTester.tap(findShowArchiveSwitch);
+      await widgetTester.tap(findShowNotArchiveSwitch);
+      await closeMemListFilter(widgetTester);
       await widgetTester.pumpAndSettle();
 
-      await showRemoveMemConfirmDialog(widgetTester);
+      await widgetTester.tap(find.text(savedMemName));
+      await widgetTester.pumpAndSettle();
 
+      await widgetTester.tap(find.byIcon(Icons.unarchive));
+      await widgetTester.pumpAndSettle();
+
+      await widgetTester.pageBack();
+      await widgetTester.pumpAndSettle();
+
+      expect(find.text(savedMemName), findsNothing);
+
+      await widgetTester.tap(memListFilterButton);
+      await widgetTester.pumpAndSettle();
+      await widgetTester.tap(findShowNotArchiveSwitch);
+      await closeMemListFilter(widgetTester);
+      await widgetTester.pumpAndSettle();
+
+      expect(find.text(savedMemName), findsOneWidget);
+    });
+
+    testWidgets(': remove', (widgetTester) async {
+      const savedMemName = 'saved mem name';
+      const savedMemMemo = 'saved mem memo';
+      await prepareSavedData(savedMemName, savedMemMemo);
+
+      await app.main();
+      await widgetTester.pumpAndSettle();
+
+      await widgetTester.tap(find.text(savedMemName));
+      await widgetTester.pumpAndSettle();
+
+      await widgetTester.tap(memDetailMenuButtonFinder);
+      await widgetTester.pumpAndSettle();
+      await widgetTester.tap(removeButtonFinder);
+      await widgetTester.pump();
       await widgetTester.tap(okButtonFinder);
       await widgetTester.pumpAndSettle();
 
       expect(find.text(savedMemName), findsNothing);
+      expect(find.text('Remove success. $savedMemName'), findsOneWidget);
 
       await widgetTester.tap(memListFilterButton);
       await widgetTester.pumpAndSettle();
-
       await widgetTester.tap(findShowArchiveSwitch);
       await widgetTester.pumpAndSettle();
-
       await closeMemListFilter(widgetTester);
 
       expect(find.text(savedMemName), findsNothing);
 
-      expect(removeMemSuccessFinder(savedMemName), findsOneWidget);
-
       await widgetTester.tap(undoButtonFinder);
       await widgetTester.pumpAndSettle();
 
-      expectMemNameTextOnListAt(widgetTester, 0, savedMemName);
+      expect(find.text(savedMemName), findsOneWidget);
     });
   });
 }
@@ -179,6 +207,7 @@ Future closeMemListFilter(WidgetTester widgetTester) async {
 }
 
 final memNameTextFormFieldFinder = find.byType(TextFormField).at(0);
+final memMemoTextFormFieldFinder = find.byType(TextFormField).at(1);
 final saveFabFinder = find.byIcon(Icons.save_alt).at(0);
 final appBarFinder = find.byType(AppBar);
 
@@ -217,14 +246,6 @@ Future<void> checkSavedSnackBarAndDismiss(
 Finder saveMemSuccessFinder(String memName) =>
     find.text('Save success. $memName');
 
-Finder removeMemSuccessFinder(String memName) =>
-    find.text('Remove success. $memName');
-
-final archiveButtonFinder = find.descendant(
-  of: appBarFinder,
-  matching: find.byIcon(Icons.archive),
-);
-
 final memDetailMenuButtonFinder = find.descendant(
   of: appBarFinder,
   matching: find.byIcon(Icons.more_vert),
@@ -243,3 +264,27 @@ final removeConfirmationFinder = find.text('Can I remove this?');
 final undoButtonFinder = find.text('Undo');
 final cancelButtonFinder = find.text('Cancel');
 final okButtonFinder = find.text('OK');
+
+Future<void> prepareSavedData(
+  String memName,
+  String memMemo, {
+  bool isArchived = false,
+}) async {
+  final database = await DatabaseManager().open(app.databaseDefinition);
+  final memTable = database.getTable(memTableDefinition.name);
+  final savedMemId = await memTable.insert({
+    memNameColumnName: memName,
+    createdAtColumnName: DateTime.now(),
+    archivedAtColumnName: isArchived ? DateTime.now() : null,
+  });
+  assert(savedMemId == 1);
+  final memItemTable = database.getTable(memItemTableDefinition.name);
+  await memItemTable.insert({
+    memIdColumnName: savedMemId,
+    memItemTypeColumnName: MemItemType.memo.name,
+    memItemValueColumnName: memMemo,
+    createdAtColumnName: DateTime.now(),
+    archivedAtColumnName: isArchived ? DateTime.now() : null,
+  });
+  await DatabaseManager().close(app.databaseDefinition.name);
+}

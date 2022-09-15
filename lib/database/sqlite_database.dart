@@ -12,6 +12,8 @@ import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
 
 class SqliteDatabase extends Database {
+  bool foreignKeyIsEnabled = false;
+
   SqliteDatabase(super.definition) {
     if (kIsWeb) {
       throw DatabaseException(
@@ -26,20 +28,16 @@ class SqliteDatabase extends Database {
   late final sqflite.Database _database;
 
   @override
-  Future<Database> open() => v(
+  Future<SqliteDatabase> open() => v(
         {},
         () async {
           _database = await _factory.openDatabase(
             await _pathFuture,
             options: sqflite.OpenDatabaseOptions(
               version: definition.version,
-              onCreate: (db, version) async {
-                trace('Create Database. $definition');
-                for (var tableDefinition in definition.tableDefinitions) {
-                  trace('Create table. $tableDefinition');
-                  await db.execute(tableDefinition.buildCreateTableSql());
-                }
-              },
+              onCreate: _onCreate,
+              onConfigure: _onConfigure,
+              onUpgrade: _onUpgrade,
             ),
           );
 
@@ -127,6 +125,50 @@ class SqliteDatabase extends Database {
       (await _factory.databaseExists(await _pathFuture))
           ? await onTrue()
           : await onFalse();
+
+  _onCreate(db, version) => v(
+        {'db': db, 'version': version},
+        () async {
+          trace('Create Database. $definition');
+          for (var tableDefinition in definition.tableDefinitions) {
+            trace('Create table. $tableDefinition');
+            await db.execute(tableDefinition.buildCreateTableSql());
+          }
+        },
+      );
+
+  _onConfigure(db) => v(
+        {'db': db},
+        () async {
+          for (var tableDefinition in definition.tableDefinitions) {
+            if (!foreignKeyIsEnabled &&
+                tableDefinition.columns
+                    .whereType<ForeignKeyDefinition>()
+                    .isNotEmpty) {
+              trace('Enable foreign key');
+              await db.execute('PRAGMA foreign_keys=true');
+              foreignKeyIsEnabled = true;
+            }
+          }
+        },
+      );
+
+  _onUpgrade(db, oldVersion, newVersion) => v(
+        {
+          'db': db,
+          'oldVersion': oldVersion,
+          'newVersion': newVersion,
+        },
+        () async {
+          if (oldVersion == 1 && newVersion == 2) {
+            trace('Upgrade Database. $definition from version: $oldVersion');
+
+            final creatingTable = definition.tableDefinitions.last;
+            trace('Create table. $creatingTable');
+            await db.execute(creatingTable.buildCreateTableSql());
+          }
+        },
+      );
 }
 
 class SqliteTable extends Table {
@@ -135,11 +177,11 @@ class SqliteTable extends Table {
   SqliteTable(super.definition, this._database);
 
   @override
-  Future<int> insert(Map<String, dynamic> value) => v(
-        {'value': value},
+  Future<int> insert(Map<String, dynamic> valueMap) => v(
+        {'valueMap': valueMap},
         () async => await _database.onOpened(
           () async => await _database._database
-              .insert(definition.name, convertTo(value)),
+              .insert(definition.name, convertTo(valueMap)),
           () => throw DatabaseDoesNotExistException(_database.definition.name),
         ),
       );

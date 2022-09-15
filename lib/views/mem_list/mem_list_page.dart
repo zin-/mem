@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/mem.dart';
+import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/colors.dart';
 import 'package:mem/views/constants.dart';
 import 'package:mem/views/mem_detail/mem_detail_page.dart';
@@ -26,7 +26,7 @@ class MemListPage extends StatelessWidget {
             {},
             () {
               ref.watch(fetchMemList);
-              final memList = ref.watch(memListProvider);
+              final memList = ref.watch(sortedMemList);
 
               return Scaffold(
                 body: CustomScrollView(
@@ -83,7 +83,7 @@ class MemListPage extends StatelessWidget {
 void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
       {'context': context, 'memId': memId},
       () => Navigator.of(context)
-          .push<Mem?>(
+          .push<MemEntity?>(
             PageRouteBuilder(
               pageBuilder: (context, animation, secondaryAnimation) =>
                   MemDetailPage(memId),
@@ -106,6 +106,7 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
               () {
                 if (memId == null) {
                   ref.read(memProvider(memId).notifier).updatedBy(null);
+                  ref.read(memItemsProvider(memId).notifier).updatedBy(null);
                   if (result != null) {
                     ref.read(memListProvider.notifier).add(result);
                   }
@@ -129,7 +130,7 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
                             onPressed: () => v(
                               {},
                               () {
-                                ref.read(createMem(mem.toMap()));
+                                ref.read(createMem(memId));
                                 scaffoldMessenger.showSnackBar(
                                   SnackBar(
                                     content: Text(

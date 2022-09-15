@@ -36,10 +36,17 @@ runs:
           **/.dart_tool/build
           **/.dart_tool/flutter_gen
           **/test/mocks.mocks.dart
-        key: build-${{ hashFiles('**/pubspec.lock') }}-${{ hashFiles('**/lib/l10n/app_en.arb') }}
+        key: build-${{ hashFiles(
+          '**/pubspec.lock'
+          , '**/lib/l10n/app_en.arb'
+          , '**/test/mocks.dart'
+          ) }}
         restore-keys: |
           build-
     - if: ${{ steps.cahce-build.outputs.cache-hit != 'true' }}
       name: Build
-      run: ./.github/workflows/scripts/build.sh
+      run: ./.github/scripts/build.sh
+      shell: bash
+    - name: Build
+      run: flutter pub run build_runner build --delete-conflicting-outputs
       shell: bash

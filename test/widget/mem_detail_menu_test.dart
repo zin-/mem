@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/mem.dart';
+import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/colors.dart';
 import 'package:mockito/mockito.dart';
@@ -14,6 +14,8 @@ void main() {
 
   final mockedMemRepository = MockMemRepository();
   MemRepository.withMock(mockedMemRepository);
+  final mockedMemItemRepository = MockMemItemRepository();
+  MemItemRepository.withMock(mockedMemItemRepository);
 
   tearDown(() {
     reset(mockedMemRepository);
@@ -48,22 +50,45 @@ void main() {
     expect(removeConfirmationFinder, findsNothing);
   });
 
-  testWidgets('Show archived', (widgetTester) async {
+  testWidgets('Show archived and unarchive', (widgetTester) async {
     const memId = 1;
     const memName = 'test mem name';
-    final mem = Mem(
+    const memMemo = 'test mem memo';
+    final mem = MemEntity(
       id: memId,
       name: memName,
       createdAt: DateTime.now(),
       archivedAt: DateTime.now(),
     );
 
-    when(mockedMemRepository.shipWhereIdIs(any))
+    when(mockedMemRepository.shipById(any))
         .thenAnswer((realInvocation) async => mem);
+    when(mockedMemItemRepository.shipByMemId(any))
+        .thenAnswer((realInvocation) async => [
+              MemItemEntity(
+                memId: memId,
+                type: MemItemType.memo,
+                value: memMemo,
+                createdAt: DateTime.now(),
+                archivedAt: DateTime.now(),
+              ),
+            ]);
     when(mockedMemRepository.unarchive(any)).thenAnswer((realInvocation) async {
-      final mem = realInvocation.positionalArguments[0] as Mem;
+      final mem = realInvocation.positionalArguments[0] as MemEntity;
 
-      return Mem.fromMap(mem.toMap()..['archivedAt'] = null);
+      return MemEntity.fromMap(mem.toMap()..['archivedAt'] = null);
+    });
+    when(mockedMemItemRepository.unarchiveByMemId(memId))
+        .thenAnswer((realInvocation) async {
+      return [
+        MemItemEntity(
+          memId: memId,
+          type: MemItemType.memo,
+          value: memMemo,
+          createdAt: DateTime.now(),
+          archivedAt: null,
+        ),
+      ];
     });
 
     await pumpMemDetailPage(widgetTester, memId);
@@ -72,13 +97,14 @@ void main() {
     expect(unarchiveButtonFinder, findsOneWidget);
 
     await widgetTester.tap(unarchiveButtonFinder);
-    final appBar = widgetTester.widget(appBarFinder) as AppBar;
-    expect(appBar.backgroundColor, archivedColor);
+    expect(memDetailAppBar(widgetTester).backgroundColor, archivedColor);
 
-    verify(mockedMemRepository.shipWhereIdIs(memId)).called(1);
+    verify(mockedMemRepository.shipById(memId)).called(1);
     verify(mockedMemRepository.unarchive(any)).called(1);
   });
 }
+
+final appBarFinder = find.byType(AppBar);
 
 final archiveButtonFinder = find.descendant(
   of: appBarFinder,
@@ -89,6 +115,9 @@ final unarchiveButtonFinder = find.descendant(
   of: appBarFinder,
   matching: find.byIcon(Icons.unarchive),
 );
+
+AppBar memDetailAppBar(WidgetTester widgetTester) =>
+    (widgetTester.widget(appBarFinder)) as AppBar;
 
 final memDetailMenuButtonFinder = find.descendant(
   of: appBarFinder,

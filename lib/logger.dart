@@ -43,6 +43,7 @@ enum Level {
   verbose,
   trace,
   warning,
+  error,
   debug,
 }
 
@@ -55,6 +56,8 @@ extension on Level {
         return ex.Level.info;
       case Level.warning:
         return ex.Level.warning;
+      case Level.error:
+        return ex.Level.error;
       case Level.debug:
         return ex.Level.debug;
     }
@@ -70,6 +73,13 @@ class Logger {
     } else if (object is Function()) {
       warn('Use functionLog. I try auto cast.');
       functionLog(level, object, {});
+    } else if (object is Error || object is Exception) {
+      _messageLog(
+        level,
+        message == null ? object : _buildMessageWithValue(message, object),
+        error: object,
+        stackTrace: stackTrace,
+      );
     } else {
       _messageLog(
         level,
@@ -107,7 +117,7 @@ class Logger {
       },
       onError: (e) {
         log(
-          level,
+          Level.error,
           e,
           message: 'Future => Error => $message',
           stackTrace: stackTrace,
@@ -116,16 +126,21 @@ class Logger {
     );
   }
 
-  void _messageLog(Level level, dynamic message, {StackTrace? stackTrace}) =>
+  void _messageLog(
+    Level level,
+    dynamic message, {
+    dynamic error,
+    StackTrace? stackTrace,
+  }) =>
       _logger.log(
         level._convertIntoEx(),
         message.toString().split('\n').first,
-        null,
+        error,
         stackTrace,
       );
 
-  String _buildMessageWithValue(String base, dynamic value) =>
-      value == null ? base : '$base :: $value';
+  String _buildMessageWithValue(String message, dynamic object) =>
+      object == null ? message : '$message :: $object';
 
   static Logger? _instance;
 

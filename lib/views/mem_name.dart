@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/views/atoms/hero_view.dart';
 
@@ -38,12 +39,16 @@ class MemNameTextFormField extends StatelessWidget {
           '_onChanged': _onChanged,
         },
         () => HeroView(
-            memNameTag(_memId),
-            TextFormField(
-              initialValue: _memName,
-              validator: _validator,
-              onChanged: _onChanged,
-            )),
+          memNameTag(_memId),
+          TextFormField(
+            decoration: InputDecoration(
+              labelText: L10n().memNameTitle(),
+            ),
+            initialValue: _memName,
+            validator: _validator,
+            onChanged: _onChanged,
+          ),
+        ),
       );
 }
 

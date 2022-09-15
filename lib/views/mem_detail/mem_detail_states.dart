@@ -1,103 +1,150 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:mem/logger.dart';
-import 'package:mem/mem.dart';
-import 'package:mem/views/atoms/state_notifier.dart';
+import 'package:mem/mem_service.dart';
+import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
+import 'package:mem/views/atoms/state_notifier.dart';
 
-const _memIdKey = '_memId';
-
-final memProvider =
-    StateNotifierProvider.family<ValueStateNotifier<Mem?>, Mem?, int?>(
+final memProvider = StateNotifierProvider.family<ValueStateNotifier<MemEntity?>,
+    MemEntity?, int?>(
   (ref, memId) => v(
     {'memId': memId},
     () => ValueStateNotifier(null),
   ),
 );
 
-final memMapProvider = StateNotifierProvider.family<
-    ValueStateNotifier<Map<String, dynamic>>, Map<String, dynamic>, int?>(
+final editingMemProvider = StateNotifierProvider.family<
+    ValueStateNotifier<MemEntity>, MemEntity, int?>(
   (ref, memId) => v(
     {'memId': memId},
     () => ValueStateNotifier(
-        (ref.watch(memProvider(memId))?.toMap() ?? {})..[_memIdKey] = memId),
+      ref.watch(memProvider(memId)) ?? MemEntity(name: '', id: null),
+    ),
   ),
 );
 
-final fetchMemById =
-    FutureProvider.autoDispose.family<Map<String, dynamic>, int?>(
+final memItemsProvider = StateNotifierProvider.family<
+    ListValueStateNotifier<MemItemEntity>, List<MemItemEntity>?, int?>(
+  (ref, memId) => v(
+    {'memId': memId},
+    () => ListValueStateNotifier<MemItemEntity>(null),
+  ),
+);
+
+final fetchMemById = FutureProvider.autoDispose.family<void, int?>(
   (ref, memId) => v(
     {'memId': memId},
     () async {
-      var memMap = ref.read(memMapProvider(memId));
-
-      if (memId != null && !Mem.isSavedMap(memMap)) {
-        try {
-          final mem = await MemRepository().shipWhereIdIs(memId);
-          ref.read(memProvider(memId).notifier).updatedBy(mem);
-          memMap = mem.toMap();
-        } catch (e) {
-          warn(e);
+      try {
+        if (memId != null) {
+          if (ref.read(memProvider(memId)) == null) {
+            final mem = await MemRepository().shipById(memId);
+            ref.read(memProvider(memId).notifier).updatedBy(mem);
+          }
+          if (ref.read(memItemsProvider(memId)) == null) {
+            final memItems = await MemItemRepository().shipByMemId(memId);
+            ref.read(memItemsProvider(memId).notifier).updatedBy(memItems);
+          }
         }
+      } catch (e) {
+        warn(e);
       }
-
-      return memMap;
     },
   ),
 );
 
-final createMem =
-    Provider.autoDispose.family<Future<Mem>, Map<String, dynamic>>(
-  (ref, memMap) => v(
-    {'memMap': memMap},
+final createMem = Provider.autoDispose.family<Future<MemEntity>, int?>(
+  (ref, memId) => v(
+    {'memId': memId},
     () async {
-      memMap.remove(_memIdKey);
+      final memItemEntities = ref.read(memItemsProvider(memId)) ?? [];
+      final editingMemEntity = ref.watch(editingMemProvider(memId));
+      final memDetail = MemDetail(editingMemEntity, memItemEntities);
 
-      final received = await MemRepository().receive(memMap);
+      final received = await MemService().create(memDetail);
 
-      ref.read(memProvider(received.id).notifier).updatedBy(received);
-      ref.read(memProvider(null).notifier).updatedBy(received);
+      ref.read(memProvider(null).notifier).updatedBy(received.memEntity);
+      ref
+          .read(memItemsProvider(null).notifier)
+          .updatedBy(received.memItemEntities);
+      ref
+          .read(memProvider(received.memEntity.id).notifier)
+          .updatedBy(received.memEntity);
+      ref
+          .read(memItemsProvider(received.memEntity.id).notifier)
+          .updatedBy(received.memItemEntities);
 
-      return received;
+      return received.memEntity;
     },
   ),
 );
 
-final updateMem =
-    Provider.autoDispose.family<Future<Mem>, Map<String, dynamic>>(
-  (ref, memMap) => v(
-    {'memMap': memMap},
+final updateMem = Provider.autoDispose.family<Future<MemEntity>, int?>(
+  (ref, memId) => v(
+    {'memId': memId},
     () async {
-      memMap.remove(_memIdKey);
+      final memItemEntities = ref.read(memItemsProvider(memId)) ?? [];
+      final editingMemEntity = ref.watch(editingMemProvider(memId));
+      final memDetail = MemDetail(editingMemEntity, memItemEntities);
 
-      final updated = await MemRepository().update(Mem.fromMap(memMap));
+      final updated = await MemService().update(memDetail);
 
-      ref.read(memProvider(updated.id).notifier).updatedBy(updated);
+      ref
+          .read(memProvider(updated.memEntity.id).notifier)
+          .updatedBy(updated.memEntity);
+      ref
+          .read(memItemsProvider(updated.memEntity.id).notifier)
+          .updatedBy(updated.memItemEntities);
 
-      return updated;
+      return updated.memEntity;
     },
   ),
 );
 
-// FIXME memMapを受け取ると変更途中で更新していない項目も受け取ってしまうのでは？
-final archiveMem = Provider.family<Future<Mem>, Map<String, dynamic>>(
-  (ref, memMap) => v(
-    {'memMap': memMap},
+final archiveMem = Provider.family<Future<MemDetail?>, int?>(
+  (ref, memId) => v(
+    {'memId': memId},
     () async {
-      final archived = await MemRepository().archive(Mem.fromMap(memMap));
-      ref.read(memProvider(archived.id).notifier).updatedBy(archived);
-      return archived;
+      final mem = ref.read(memProvider(memId));
+
+      if (mem == null) {
+        return null;
+      } else {
+        final archived = await MemService().archive(mem);
+
+        ref
+            .read(memProvider(archived.memEntity.id).notifier)
+            .updatedBy(archived.memEntity);
+        ref
+            .read(memItemsProvider(archived.memEntity.id).notifier)
+            .updatedBy(archived.memItemEntities);
+
+        return archived;
+      }
     },
   ),
 );
 
-final unarchiveMem = Provider.family<Future<Mem>, Map<String, dynamic>>(
-  (ref, memMap) => v(
-    {'memMap': memMap},
+final unarchiveMem = Provider.family<Future<MemDetail?>, int?>(
+  (ref, memId) => v(
+    {'memId': memId},
     () async {
-      final unarchived = await MemRepository().unarchive(Mem.fromMap(memMap));
-      ref.read(memProvider(unarchived.id).notifier).updatedBy(unarchived);
-      return unarchived;
+      final mem = ref.read(memProvider(memId));
+
+      if (mem == null) {
+        return null;
+      } else {
+        final unarchived = await MemService().unarchive(mem);
+
+        ref
+            .read(memProvider(unarchived.memEntity.id).notifier)
+            .updatedBy(unarchived.memEntity);
+        ref
+            .read(memItemsProvider(unarchived.memEntity.id).notifier)
+            .updatedBy(unarchived.memItemEntities);
+
+        return unarchived;
+      }
     },
   ),
 );
@@ -105,6 +152,6 @@ final unarchiveMem = Provider.family<Future<Mem>, Map<String, dynamic>>(
 final removeMem = Provider.family<Future<bool>, int?>(
   (ref, memId) => v(
     {'memId': memId},
-    () async => await MemRepository().discardWhereIdIs(memId),
+    () async => await MemService().remove(memId!),
   ),
 );

@@ -5,28 +5,27 @@ import 'package:mockito/mockito.dart';
 
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/mem.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/mem_list/mem_list_page.dart';
 
 import '../mocks.mocks.dart';
 import 'mem_detail_page_test.dart';
 
-void main() {
-  Future pumpMemListPage(WidgetTester widgetTester) async {
-    await widgetTester.pumpWidget(
-      ProviderScope(
-        child: MaterialApp(
-          onGenerateTitle: (context) => L10n(context).memListPageTitle(),
-          localizationsDelegates: L10n.localizationsDelegates,
-          supportedLocales: L10n.supportedLocales,
-          home: MemListPage(),
-        ),
+Future pumpMemListPage(WidgetTester widgetTester) async {
+  await widgetTester.pumpWidget(
+    ProviderScope(
+      child: MaterialApp(
+        onGenerateTitle: (context) => L10n(context).memListPageTitle(),
+        localizationsDelegates: L10n.localizationsDelegates,
+        supportedLocales: L10n.supportedLocales,
+        home: MemListPage(),
       ),
-    );
-    await widgetTester.pumpAndSettle();
-  }
+    ),
+  );
+  await widgetTester.pumpAndSettle();
+}
 
+void main() {
   Logger(level: Level.verbose);
 
   final mockedMemRepository = MockMemRepository();
@@ -35,32 +34,33 @@ void main() {
   testWidgets('Show saved mem list', (widgetTester) async {
     final mems = List.generate(
       5,
-      (index) => Mem(
+      (index) => MemEntity(
         id: index,
         name: 'Test $index',
         createdAt: DateTime.now(),
       ),
     );
 
-    when(mockedMemRepository.ship(any)).thenAnswer(
+    when(mockedMemRepository.ship(archived: anyNamed('archived'))).thenAnswer(
       (realInvocation) async => mems,
     );
 
     await pumpMemListPage(widgetTester);
 
-    for (var mem in mems) {
-      expectMemNameTextOnListAt(widgetTester, mem.id, mem.name);
-    }
+    mems.asMap().forEach((index, mem) {
+      expectMemNameTextOnListAt(widgetTester, index, mem.name);
+    });
+
     await widgetTester.tap(memListTileFinder.at(0));
     await widgetTester.pump();
 
-    verify(mockedMemRepository.ship(false)).called(1);
-    verifyNever(mockedMemRepository.shipWhereIdIs(any));
+    verify(mockedMemRepository.ship(archived: false)).called(1);
+    verifyNever(mockedMemRepository.shipById(any));
   });
 
   group('Transit', () {
     testWidgets(': new MemDetailPage', (widgetTester) async {
-      when(mockedMemRepository.ship(any)).thenAnswer(
+      when(mockedMemRepository.ship(archived: anyNamed('archived'))).thenAnswer(
         (realInvocation) async => [],
       );
 
@@ -72,15 +72,16 @@ void main() {
 
       expectMemNameOnMemDetail(widgetTester, '');
 
-      verify(mockedMemRepository.ship(false)).called(1);
-      verifyNever(mockedMemRepository.shipWhereIdIs(any));
+      verify(mockedMemRepository.ship(archived: false)).called(1);
+      verifyNever(mockedMemRepository.shipById(any));
     });
 
     testWidgets(': saved MemDetailPage', (widgetTester) async {
       final savedMem1 =
-          Mem(id: 1, name: 'mem detail', createdAt: DateTime.now());
-      final savedMem2 = Mem(id: 2, name: 'mem list', createdAt: DateTime.now());
-      when(mockedMemRepository.ship(any)).thenAnswer(
+          MemEntity(id: 1, name: 'mem detail', createdAt: DateTime.now());
+      final savedMem2 =
+          MemEntity(id: 2, name: 'mem list', createdAt: DateTime.now());
+      when(mockedMemRepository.ship(archived: anyNamed('archived'))).thenAnswer(
         (realInvocation) async => [savedMem1, savedMem2],
       );
 
@@ -96,26 +97,26 @@ void main() {
         isNot(savedMem2.name),
       );
 
-      verify(mockedMemRepository.ship(false)).called(1);
-      verifyNever(mockedMemRepository.shipWhereIdIs(any));
+      verify(mockedMemRepository.ship(archived: false)).called(1);
+      verifyNever(mockedMemRepository.shipById(any));
     });
   });
 
   group('Filter', () {
     testWidgets(': default.', (widgetTester) async {
-      final notArchived = Mem(
+      final notArchived = MemEntity(
         id: 1,
         name: 'not archived',
         createdAt: DateTime.now(),
         archivedAt: null,
       );
-      final archived = Mem(
+      final archived = MemEntity(
         id: 1,
         name: 'archived',
         createdAt: DateTime.now(),
         archivedAt: DateTime.now(),
       );
-      when(mockedMemRepository.ship(any)).thenAnswer(
+      when(mockedMemRepository.ship(archived: anyNamed('archived'))).thenAnswer(
         (realInvocation) async => [notArchived],
       );
 
@@ -136,49 +137,52 @@ void main() {
         false,
       );
 
-      verify(mockedMemRepository.ship(false)).called(1);
+      verify(mockedMemRepository.ship(archived: false)).called(1);
     });
 
-    testWidgets(': change.', (widgetTester) async {
-      final notArchived = Mem(
+    testWidgets(': onChanged.', (widgetTester) async {
+      final notArchived = MemEntity(
         id: 1,
         name: 'not archived',
         createdAt: DateTime.now(),
         archivedAt: null,
       );
-      final archived = Mem(
+      final archived = MemEntity(
         id: 2,
         name: 'archived',
         createdAt: DateTime.now(),
         archivedAt: DateTime.now(),
       );
-      final notArchived2 = Mem(
+      final notArchived2 = MemEntity(
         id: 3,
         name: 'not archived 2',
         createdAt: DateTime.now(),
         archivedAt: null,
       );
-      final archived2 = Mem(
+      final archived2 = MemEntity(
         id: 4,
         name: 'archived 2',
         createdAt: DateTime.now(),
         archivedAt: DateTime.now().add(const Duration(microseconds: 1)),
       );
-      final returns = <List<Mem>>[
-        [notArchived2, notArchived],
-        [],
+      final returns = <List<MemEntity>>[
+        [notArchived2],
+        [archived2],
         [archived2, archived],
         [notArchived2, archived2, notArchived, archived],
       ];
-      when(mockedMemRepository.ship(any)).thenAnswer(
+      when(mockedMemRepository.ship(archived: anyNamed('archived'))).thenAnswer(
         (realInvocation) async => returns.removeAt(0),
       );
 
       await pumpMemListPage(widgetTester);
 
       // showNotArchived: true, showArchived: false
-      expectMemNameTextOnListAt(widgetTester, 0, notArchived.name);
+      expect(widgetTester.widgetList(memListTileFinder).length, 1);
+      expectMemNameTextOnListAt(widgetTester, 0, notArchived2.name);
+      expect(find.text(notArchived.name), findsNothing);
       expect(find.text(archived.name), findsNothing);
+      expect(find.text(archived2.name), findsNothing);
 
       await widgetTester.tap(memListFilterButton);
       await widgetTester.pumpAndSettle();
@@ -187,6 +191,9 @@ void main() {
       await widgetTester.tap(findShowNotArchiveSwitch);
       await widgetTester.pumpAndSettle();
 
+      expect(widgetTester.widgetList(memListTileFinder).length, 2);
+      expectMemNameTextOnListAt(widgetTester, 0, notArchived2.name);
+      expectMemNameTextOnListAt(widgetTester, 1, archived2.name);
       expect(find.text(notArchived.name), findsNothing);
       expect(find.text(archived.name), findsNothing);
 
@@ -194,33 +201,38 @@ void main() {
       await widgetTester.tap(findShowArchiveSwitch);
       await widgetTester.pumpAndSettle();
 
-      expect(find.text(notArchived.name), findsNothing);
+      expect(widgetTester.widgetList(memListTileFinder).length, 2);
       expectMemNameTextOnListAt(widgetTester, 0, archived.name);
+      expectMemNameTextOnListAt(widgetTester, 1, archived2.name);
+      expect(find.text(notArchived.name), findsNothing);
+      expect(find.text(notArchived2.name), findsNothing);
 
       // showNotArchived: true, showArchived: true
       await widgetTester.tap(findShowNotArchiveSwitch);
       await widgetTester.pumpAndSettle();
 
+      expect(widgetTester.widgetList(memListTileFinder).length, 4);
       expectMemNameTextOnListAt(widgetTester, 0, notArchived.name);
       expectMemNameTextOnListAt(widgetTester, 1, notArchived2.name);
       expectMemNameTextOnListAt(widgetTester, 2, archived.name);
       expectMemNameTextOnListAt(widgetTester, 3, archived2.name);
 
-      verify(mockedMemRepository.ship(any)).called(4);
+      verify(mockedMemRepository.ship(archived: anyNamed('archived')))
+          .called(4);
     });
   });
 
   testWidgets('Hide fab on scroll.', (widgetTester) async {
     final mems = List.generate(
       20,
-      (index) => Mem(
+      (index) => MemEntity(
         id: index,
         name: 'Test $index',
         createdAt: DateTime.now(),
       ),
     );
 
-    when(mockedMemRepository.ship(any)).thenAnswer(
+    when(mockedMemRepository.ship(archived: anyNamed('archived'))).thenAnswer(
       (realInvocation) async => mems,
     );
 

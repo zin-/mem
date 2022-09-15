@@ -127,18 +127,20 @@ class ObjectStore extends Table {
   late final _pkColumn = definition.columns.whereType<DefPK>().first;
 
   @override
-  Future<int> insert(Map<String, dynamic> value) => v(
-        {'value': value},
+  Future<int> insert(Map<String, dynamic> valueMap) => v(
+        {'valueMap': valueMap},
         () async => await _database.onOpened(
           () async {
             final txn = _database._database
                 .transaction(definition.name, idb_shim.idbModeReadWrite);
 
             final store = txn.objectStore(definition.name);
-            final generatedPk = await store.add(convertTo(value));
+            final generatedPk = await store.add(convertTo(valueMap));
             // TODO 更新数が1かを確認した方が良いかも
             await store.put(
-              convertTo(value..putIfAbsent(_pkColumn.name, () => generatedPk)),
+              convertTo(
+                valueMap..putIfAbsent(_pkColumn.name, () => generatedPk),
+              ),
               generatedPk,
             );
 

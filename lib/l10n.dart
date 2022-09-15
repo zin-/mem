@@ -13,6 +13,10 @@ class L10n {
 
   String memDetailPageTitle() => _appLocalizations.memDetailPageTitle;
 
+  String memNameTitle() => _appLocalizations.memNameLabel;
+
+  String memMemoTitle() => _appLocalizations.memMemoLabel;
+
   String saveMemSuccessMessage(String memName) =>
       _appLocalizations.saveMemSuccessMessage(memName);
 
