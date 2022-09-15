@@ -1,0 +1,39 @@
+{
+  "appTitle": "Mem",
+  "memListPageTitle": "List",
+  "memDetailPageTitle": "Detail",
+  "memNameLabel": "Name *",
+  "memMemoLabel": "Memo",
+  "saveMemSuccessMessage": "Save success. {memName}",
+  "@saveMemSuccessMessage": {
+    "placeholders": {
+      "memName": {}
+    }
+  },
+  "memNameIsRequiredWarn": "Name is required.",
+  "showNotArchivedLabel": "Show not archived",
+  "showArchivedLabel": "Show archived",
+  "archiveMemSuccessMessage": "Archive success. {memName}",
+  "@archiveMemSuccessMessage": {
+    "placeholders": {
+      "memName": {}
+    }
+  },
+  "unarchiveMemSuccessMessage": "Unarchive success. {memName}",
+  "@unarchiveMemSuccessMessage": {
+    "placeholders": {
+      "memName": {}
+    }
+  },
+  "removeAction": "Remove",
+  "removeConfirmation": "Can I remove this?",
+  "removeMemSuccessMessage": "Remove success. {memName}",
+  "@removeMemSuccessMessage": {
+    "placeholders": {
+      "memName": {}
+    }
+  },
+  "undoAction": "Undo",
+  "okAction": "OK",
+  "cancelAction": "Cancel"
+}

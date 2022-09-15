@@ -1,0 +1,52 @@
+name: 'Setup Flutter'
+runs:
+  using: "composite"
+  steps:
+    - name: Install Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.0.3'
+        channel: 'stable'
+        cache: true
+    - name: Flutter Doctor
+      run: flutter doctor -v
+      shell: bash
+    - name: Cache dependencies
+      id: cache-dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ${{ env.FLUTTER_HOME }}/.pub-cache
+          **/.packages
+          **/.flutter-plugins
+          **/.flutter-plugin-dependencies
+          **/.dart_tool/package_config.json
+        key: install-dependencies-${{ hashFiles('**/pubspec.lock') }}
+        restore-keys: |
+          install-dependencies-
+    - if: ${{ steps.cache-dependencies.outputs.cache-hit != 'true' }}
+      name: Install dependencies
+      run: flutter pub get
+      shell: bash
+    - name: Cache build
+      id: cahce-build
+      uses: actions/cache@v3
+      with:
+        path: |
+          **/.dart_tool/build
+          **/.dart_tool/flutter_gen
+          **/test/mocks.mocks.dart
+        key: build-${{ hashFiles(
+          '**/pubspec.lock'
+          , '**/lib/l10n/app_en.arb'
+          , '**/test/mocks.dart'
+          ) }}
+        restore-keys: |
+          build-
+    - if: ${{ steps.cahce-build.outputs.cache-hit != 'true' }}
+      name: Build
+      run: ./.github/scripts/build.sh
+      shell: bash
+    - name: Build
+      run: flutter pub run build_runner build --delete-conflicting-outputs
+      shell: bash

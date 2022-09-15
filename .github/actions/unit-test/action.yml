@@ -1,0 +1,16 @@
+name: Unit test
+inputs:
+  codecov-token:
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Unit test
+      run: flutter test --coverage --coverage-path=./coverage/lcov-unit_tests.info
+      shell: bash
+    - name: Upload unit test coverage
+      uses: codecov/codecov-action@v3
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: ./coverage/lcov-unit_tests.info
+        flags: unit_tests
