@@ -1,0 +1,19 @@
+name: 'Integration test(Windows Desktop)'
+inputs:
+  codecov-token:
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: 'Flutter Doctor'
+      run: flutter doctor -v
+      shell: bash
+    - name: 'Integration test(Window Desktop)'
+      run: flutter test ./integration_test/all.dart --machine -d windows --coverage --coverage-path=./coverage/lcov-integration_test-windows.info
+      shell: bash
+    - name: 'Upload coverage'
+      uses: codecov/codecov-action@v3
+      with:
+        token: ${{ inputs.codecov-token }}
+        files: ./coverage/lcov-integration_test-windows.info
+        flags: integration_test-windows

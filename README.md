@@ -14,3 +14,4 @@ Manage any.
 - [TEST](./documentations/TEST.md)
 - [L10n](./documentations/LOCALIZATION.md)
 - [Icon](./documentations/ICON.md)
+- [CI/CD](./documentations/Continuous_Integration-Continuous_Delivery.md)

@@ -1,0 +1,28 @@
+name: 'Integration test(Android)'
+on:
+  push:
+    branches-ignore:
+      - '**'
+env:
+  flutter-version: '3.0.3'
+  android-api-level: 30
+jobs:
+  IT_Android:
+    runs-on: macos-latest
+    steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v3
+      - name: 'Install Flutter'
+        uses: ./.github/actions/install-flutter-with_cache
+        with:
+          version: ${{ env.flutter-version }}
+      - name: 'Build Application'
+        uses: ./.github/actions/build-application
+      - name: 'Install Android emulator'
+        uses: ./.github/actions/install-android_emulator
+      - name: 'Integration test(Android)'
+        uses: ./.github/actions/integration_test-android
+        with:
+          api-level: ${{ env.android-api-level }}
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}
+
