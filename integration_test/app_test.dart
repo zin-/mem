@@ -7,7 +7,6 @@ import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/main.dart' as app;
 import 'package:mem/repositories/repository.dart';
-import 'package:mem/views/constants.dart';
 
 void main() {
   Logger(level: Level.verbose);
@@ -76,8 +75,6 @@ void main() {
         await widgetTester.tap(saveFabFinder);
         await widgetTester.pumpAndSettle();
 
-        expect(saveMemSuccessFinder(enteringMemName), findsOneWidget);
-
         await widgetTester.pageBack();
         await widgetTester.pumpAndSettle();
 
@@ -104,7 +101,13 @@ void main() {
         await widgetTester.tap(find.byIcon(Icons.archive));
         await widgetTester.pumpAndSettle();
 
-        expect(find.text(savedMemName), findsNothing);
+        expect(
+          find.descendant(
+            of: find.byType(Text),
+            matching: find.text(savedMemName),
+          ),
+          findsNothing,
+        );
 
         await widgetTester.tap(memListFilterButton);
         await widgetTester.pumpAndSettle();
@@ -176,7 +179,6 @@ void main() {
         await widgetTester.pumpAndSettle();
 
         expect(find.text(savedMemName), findsNothing);
-        expect(find.text('Remove success. $savedMemName'), findsOneWidget);
 
         await widgetTester.tap(memListFilterButton);
         await widgetTester.pumpAndSettle();
@@ -185,11 +187,6 @@ void main() {
         await closeMemListFilter(widgetTester);
 
         expect(find.text(savedMemName), findsNothing);
-
-        await widgetTester.tap(undoButtonFinder);
-        await widgetTester.pumpAndSettle();
-
-        expect(find.text(savedMemName), findsOneWidget);
       },
       tags: 'Medium',
     );
@@ -315,20 +312,6 @@ Future<void> enterMemNameAndSave(
   await widgetTester.tap(saveFabFinder);
   await widgetTester.pumpAndSettle();
 }
-
-Future<void> checkSavedSnackBarAndDismiss(
-  WidgetTester widgetTester,
-  String memName,
-) async {
-  expect(saveMemSuccessFinder(memName), findsOneWidget);
-
-  await widgetTester.pumpAndSettle(defaultDismissDuration);
-
-  expect(saveMemSuccessFinder(memName), findsNothing);
-}
-
-Finder saveMemSuccessFinder(String memName) =>
-    find.text('Save success. $memName');
 
 final memDetailMenuButtonFinder = find.descendant(
   of: appBarFinder,

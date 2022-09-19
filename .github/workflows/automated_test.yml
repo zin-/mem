@@ -55,6 +55,66 @@ jobs:
           files: ./coverage/lcov.info
           flags: medium_test
 
+  integration_test-android:
+    needs: small_test
+    name: 'Integration test(Android)'
+    env:
+      android-api-level: 30
+      android-tag: 'default'
+      android-abi: 'x86_64'
+      java-distribution: 'temurin'
+      java-version: 17
+    runs-on: macos-latest
+    steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v3
+      - name: 'Install Flutter'
+        uses: ./.github/actions/install-flutter
+        with:
+          version: ${{ env.flutter-version }}
+          channel: ${{ env.flutter-channel }}
+      - name: 'Install Android SDK'
+        uses: malinskiy/action-android/install-sdk@release/0.1.3
+      - name: 'Add env: android-system-images-key'
+        run: echo "android-system-images-key=${{ env.android-api-level }}-${{ env.android-tag }}-${{ env.android-abi }}" >> $GITHUB_ENV
+      - name: 'Install Android platform tools'
+        run: sdkmanager platform-tools
+      - id: system_images-cache
+        name: 'Cache System images'
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.ANDROID_SDK_ROOT }}/system-images/android-${{ env.android-api-level }}/${{ env.android-tag }}/${{ env.android-abi }}
+          key: system_images-${{ env.android-system-images-key }}
+      - name: 'Install System images'
+        if: steps.system_images-cache.outputs.cache-hit != 'true'
+        run: sdkmanager "system-images;android-${{ env.android-api-level }};${{ env.android-tag }};${{ env.android-abi }}"
+# TODO キャッシュしたい。4~6mかかっている
+      - name: 'Create Android emulator'
+        uses: malinskiy/action-android/emulator-run-cmd@release/0.1.3
+        with:
+          cmd: flutter doctor -v
+          api: ${{ env.android-api-level }}
+          tag: ${{ env.android-tag }}
+          abi: ${{ env.android-abi }}
+      - name: 'Run Android emulator'
+        run: $ANDROID_SDK_ROOT/emulator/emulator @emulator -no-snapshot-save -noaudio -no-boot-anim &
+      - name: 'Generate Localization code'
+        uses: ./.github/actions/generate-localization_code
+      - name: 'Install Java'
+        uses: actions/setup-java@v3
+        with:
+          distribution: ${{ env.java-distribution }}
+          java-version: ${{ env.java-version }}
+      - name: 'Build for Android'
+        run: flutter build apk --debug
+      - run: flutter test integration_test/app_test.dart -d android --coverage
+      - name: 'Upload coverage'
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          flags: integration_test-android
+
   integration_test-windows_desktop:
     needs: small_test
     name: 'Integration test(Windows Desktop)'
