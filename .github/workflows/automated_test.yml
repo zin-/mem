@@ -1,0 +1,16 @@
+name: 'Automated test'
+on: push
+env:
+  flutter-version: 3.0.3
+  flutter-channel: 'stable'
+jobs:
+  small-test:
+    name: 'Small test'
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v3
+      - run: ls
