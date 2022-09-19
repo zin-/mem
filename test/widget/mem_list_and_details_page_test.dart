@@ -112,6 +112,7 @@ void main() {
       expectMemNameOnMemDetail(widgetTester, '');
       expectMemMemoOnMemDetail(widgetTester, '');
     },
+    tags: 'Small',
   );
 
   testWidgets(
@@ -211,6 +212,7 @@ void main() {
       expect(widgetTester.widgetList(memListTileFinder).length, 1);
       expectMemNameTextOnListAt(widgetTester, 0, enteringMemName);
     },
+    tags: 'Small',
   );
 
   testWidgets(
@@ -266,6 +268,7 @@ void main() {
 
       expect(widgetTester.widgetList(memListTileFinder).length, 0);
     },
+    tags: 'Small',
   );
 
   testWidgets(
@@ -311,5 +314,6 @@ void main() {
 
       expect(widgetTester.widgetList(memListTileFinder).length, 0);
     },
+    tags: 'Small',
   );
 }

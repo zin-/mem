@@ -6,10 +6,7 @@ env:
 jobs:
   small_test:
     name: 'Small test'
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
       - name: 'Checkout code'
         uses: actions/checkout@v3
@@ -24,10 +21,61 @@ jobs:
         uses: ./.github/actions/generate-localization_code
       - name: 'Flutter Doctor'
         run: flutter doctor -v
-      - run: flutter test --coverage
+      - run: flutter test --tags Small --coverage
       - name: 'Upload coverage'
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
-          flags: unit_test
+          flags: small_test
+
+  medium_test:
+    needs: small_test
+    name: 'Medium test'
+    runs-on: windows-latest
+    steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v3
+      - name: 'Install Flutter'
+        uses: ./.github/actions/install-flutter
+        with:
+          version: ${{ env.flutter-version }}
+          channel: ${{ env.flutter-channel }}
+      - name: 'Build Mocks'
+        uses: ./.github/actions/build-mocks
+      - name: 'Generate Localization code'
+        uses: ./.github/actions/generate-localization_code
+      - name: 'Flutter Doctor'
+        run: flutter doctor -v
+      - run: flutter test --tags Medium --coverage
+      - name: 'Upload coverage'
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          flags: medium_test
+
+  integration_test-windows_desktop:
+    needs: small_test
+    name: 'Integration test(Windows Desktop)'
+    runs-on: windows-latest
+    steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v3
+      - name: 'Install Flutter'
+        uses: ./.github/actions/install-flutter
+        with:
+          version: ${{ env.flutter-version }}
+          channel: ${{ env.flutter-channel }}
+      - name: 'Generate Localization code'
+        uses: ./.github/actions/generate-localization_code
+      - name: 'Flutter Doctor'
+        run: flutter doctor -v
+      - name: 'Integration test(Window Desktop)'
+        run: flutter test integration_test/app_test.dart -d windows --coverage
+      - name: 'Upload coverage'
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          flags: integration_test-windows

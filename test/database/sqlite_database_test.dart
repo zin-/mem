@@ -1,16 +1,13 @@
-@TestOn('vm || android || windows')
+@TestOn('android || windows')
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test/integration_test.dart';
 import 'package:mem/database/database.dart';
+import 'package:mem/database/definitions.dart';
 import 'package:mem/database/sqlite_database.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/database/definitions.dart';
 import 'package:mem/repositories/repository.dart';
 
 void main() {
   Logger(level: Level.verbose);
-
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   const tableName = 'tests';
   const pkName = 'id';
@@ -49,33 +46,37 @@ void main() {
     await sqliteDatabase.delete();
   });
 
-  test('Migrate: upgrade: add table', () async {
-    await sqliteDatabase.close();
+  test(
+    'Migrate: upgrade: add table',
+    () async {
+      await sqliteDatabase.close();
 
-    final addingTableDefinition = DefT(
-      'added_table',
-      [
-        DefPK(idColumnName, TypeC.integer, autoincrement: true),
-        DefC('test', TypeC.text),
-      ],
-    );
-    final upgradingDefD = DefD(
-      defD.name,
-      2,
-      [
-        ...defD.tableDefinitions,
-        addingTableDefinition,
-      ],
-    );
+      final addingTableDefinition = DefT(
+        'added_table',
+        [
+          DefPK(idColumnName, TypeC.integer, autoincrement: true),
+          DefC('test', TypeC.text),
+        ],
+      );
+      final upgradingDefD = DefD(
+        defD.name,
+        2,
+        [
+          ...defD.tableDefinitions,
+          addingTableDefinition,
+        ],
+      );
 
-    final upgraded = await SqliteDatabase(upgradingDefD).open();
+      final upgraded = await SqliteDatabase(upgradingDefD).open();
 
-    final addedTable = upgraded.getTable(addingTableDefinition.name);
-    expect(addedTable, isNotNull);
+      final addedTable = upgraded.getTable(addingTableDefinition.name);
+      expect(addedTable, isNotNull);
 
-    final insertedId = await addedTable.insert({'test': 'test'});
-    expect(insertedId, isNotNull);
-  });
+      final insertedId = await addedTable.insert({'test': 'test'});
+      expect(insertedId, isNotNull);
+    },
+    tags: 'Medium',
+  );
 
   group('Insert', () {
     test(
@@ -89,6 +90,7 @@ void main() {
         });
         expect(insertedId, 1);
       },
+      tags: 'Medium',
     );
 
     group('testChildTable', () {
@@ -105,6 +107,7 @@ void main() {
             throwsA((e) => e is Exception),
           );
         },
+        tags: 'Medium',
       );
 
       test(
@@ -122,6 +125,7 @@ void main() {
 
           expect(insertedChildId, 1);
         },
+        tags: 'Medium',
       );
     });
   });
@@ -150,6 +154,7 @@ void main() {
         test2..putIfAbsent(pkName, () => inserted2),
       ]);
     },
+    tags: 'Medium',
   );
 
   group(
@@ -173,7 +178,9 @@ void main() {
             test..putIfAbsent(pkName, () => inserted),
           );
         },
+        tags: 'Medium',
       );
+
       test(
         ': not found.',
         () async {
@@ -194,6 +201,7 @@ void main() {
             ),
           );
         },
+        tags: 'Medium',
       );
     },
   );
@@ -226,7 +234,9 @@ void main() {
             ..update(textFieldName, (value) => updateText),
         );
       },
+      tags: 'Medium',
     );
+
     test(
       ': target is nothing',
       () async {
@@ -249,6 +259,7 @@ void main() {
         final afterUpdateFail = await table.select();
         expect(afterUpdateFail.length, 0);
       },
+      tags: 'Medium',
     );
   });
 
@@ -274,6 +285,7 @@ void main() {
       final selected = await table.select();
       expect(selected.length, 1);
     },
+    tags: 'Medium',
   );
 
   test(
@@ -298,5 +310,6 @@ void main() {
       final selected = await table.select();
       expect(selected.length, 0);
     },
+    tags: 'Medium',
   );
 }

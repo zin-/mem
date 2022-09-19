@@ -1,15 +1,14 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
-import 'package:mem/logger.dart';
-
-import 'package:path_provider/path_provider.dart';
-import 'package:sqflite/sqflite.dart' as sqflite;
-import 'package:path/path.dart' as path;
-import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
-
 import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
+import 'package:mem/logger.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
+import 'package:sqflite/sqflite.dart' as sqflite;
+import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
 
 class SqliteDatabase extends Database {
   bool foreignKeyIsEnabled = false;
@@ -142,9 +141,7 @@ class SqliteDatabase extends Database {
         () async {
           for (var tableDefinition in definition.tableDefinitions) {
             if (!foreignKeyIsEnabled &&
-                tableDefinition.columns
-                    .whereType<ForeignKeyDefinition>()
-                    .isNotEmpty) {
+                tableDefinition.columns.whereType<DefFK>().isNotEmpty) {
               trace('Enable foreign key');
               await db.execute('PRAGMA foreign_keys=true');
               foreignKeyIsEnabled = true;

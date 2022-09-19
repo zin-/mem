@@ -32,6 +32,7 @@ void main() {
       expect(find.byType(Text), findsOneWidget);
       expect(find.text('test value'), findsOneWidget);
     },
+    tags: 'Small',
   );
 
   testWidgets(
@@ -61,6 +62,7 @@ void main() {
       // FIXME なぜ表示されないんだろう？
       // expect(find.text('Exception test error'), findsOneWidget);
     },
+    tags: 'Small',
   );
 }
 

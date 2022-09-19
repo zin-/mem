@@ -1,4 +1,4 @@
-import "package:collection/collection.dart";
+import 'package:collection/collection.dart';
 import 'package:mem/database/database.dart';
 
 typedef DefD = DatabaseDefinition;

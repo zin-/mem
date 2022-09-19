@@ -15,7 +15,7 @@ runs:
       shell: bash
     - uses: malinskiy/action-android/emulator-run-cmd@release/0.1.3
       with:
-        cmd: flutter test integration_test/edge_test.dart
+        cmd: flutter test integration_test/app_test.dart
         api: ${{ inputs.api-level }}
         tag: ${{ inputs.tag }}
         abi: ${{ inputs.arch }}

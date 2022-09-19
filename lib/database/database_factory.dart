@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-
 import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
 import 'package:mem/database/indexed_database.dart';
