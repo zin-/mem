@@ -14,13 +14,12 @@ jobs:
       - name: 'Checkout code'
         uses: actions/checkout@v3
       - name: 'Install Flutter'
-        uses: subosito/flutter-action@v2
+        uses: ./.github/actions/install-flutter
         with:
-          flutter-version: ${{ env.flutter-version }}
+          version: ${{ env.flutter-version }}
           channel: ${{ env.flutter-channel }}
-          cache: true
-      - name: 'Generate Localization codes'
-        run: flutter gen-l10n l10n.yaml
+      - name: 'Generate Localization code'
+        uses: ./.github/actions/generate-localization_code
       - name: 'Flutter Doctor'
         run: flutter doctor -v
       - name: 'Analyze Production code'
@@ -36,15 +35,12 @@ jobs:
       - name: 'Checkout code'
         uses: actions/checkout@v3
       - name: 'Install Flutter'
-        uses: subosito/flutter-action@v2
+        uses: ./.github/actions/install-flutter
         with:
-          flutter-version: ${{ env.flutter-version }}
+          version: ${{ env.flutter-version }}
           channel: ${{ env.flutter-channel }}
-          cache: true
-      - name: 'Install Dependencies'
-        run: flutter packages pub get
-      - name: 'Build mocks'
-        run: flutter pub run build_runner build
+      - name: 'Build Mocks'
+        uses: ./.github/actions/build-mocks
       - name: 'Flutter Doctor'
         run: flutter doctor -v
       - name: 'Analyze Test code'

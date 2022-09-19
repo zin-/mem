@@ -4,7 +4,7 @@ env:
   flutter-version: 3.0.3
   flutter-channel: 'stable'
 jobs:
-  small-test:
+  small_test:
     name: 'Small test'
     strategy:
       matrix:
@@ -13,4 +13,21 @@ jobs:
     steps:
       - name: 'Checkout code'
         uses: actions/checkout@v3
-      - run: ls
+      - name: 'Install Flutter'
+        uses: ./.github/actions/install-flutter
+        with:
+          version: ${{ env.flutter-version }}
+          channel: ${{ env.flutter-channel }}
+      - name: 'Build Mocks'
+        uses: ./.github/actions/build-mocks
+      - name: 'Generate Localization code'
+        uses: ./.github/actions/generate-localization_code
+      - name: 'Flutter Doctor'
+        run: flutter doctor -v
+      - run: flutter test --coverage
+      - name: 'Upload coverage'
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          flags: unit_test
