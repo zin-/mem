@@ -1,0 +1,47 @@
+name: 'Static code analysis'
+on: push
+env:
+  flutter-version: 3.0.3
+  flutter-channel: 'stable'
+jobs:
+  analyze-production_code:
+    name: 'Analyze Production code'
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v3
+      - name: 'Install Flutter'
+        uses: ./.github/actions/install-flutter
+        with:
+          version: ${{ env.flutter-version }}
+          channel: ${{ env.flutter-channel }}
+      - name: 'Generate Localization code'
+        uses: ./.github/actions/generate-localization_code
+      - name: 'Flutter Doctor'
+        run: flutter doctor -v
+      - name: 'Analyze Production code'
+        run: flutter analyze lib
+
+  analyze-test_code:
+    name: 'Analyze Test code'
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v3
+      - name: 'Install Flutter'
+        uses: ./.github/actions/install-flutter
+        with:
+          version: ${{ env.flutter-version }}
+          channel: ${{ env.flutter-channel }}
+      - name: 'Build Mocks'
+        uses: ./.github/actions/build-mocks
+      - name: 'Flutter Doctor'
+        run: flutter doctor -v
+      - name: 'Analyze Test code'
+        run: flutter analyze test integration_test

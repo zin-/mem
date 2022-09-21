@@ -1,4 +1,4 @@
-name: Lint
+name: 'Unit test'
 on:
   push:
     branches-ignore:
@@ -6,8 +6,8 @@ on:
 env:
   flutter-version: '3.0.3'
 jobs:
-  Lint:
-    runs-on: ubuntu-latest
+  UT:
+    runs-on: windows-latest
     steps:
       - name: 'Checkout code'
         uses: actions/checkout@v3
@@ -17,5 +17,7 @@ jobs:
           flutter-version: ${{ env.flutter-version }}
       - name: 'Build Application'
         uses: ./.github/actions/build-application
-      - name: 'Analyze'
-        run: flutter analyze
+      - name: 'Unit test'
+        uses: ./.github/actions/unit_test
+        with:
+          codecov-token: ${{ secrets.CODECOV_TOKEN }}

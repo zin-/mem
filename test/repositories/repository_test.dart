@@ -1,5 +1,5 @@
+@TestOn('android || windows')
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test/integration_test.dart';
 import 'package:mem/database/database.dart';
 import 'package:mem/database/database_factory.dart';
 import 'package:mem/database/definitions.dart';
@@ -34,8 +34,6 @@ void main() async {
   Logger(level: Level.verbose);
   DatabaseManager(onTest: true);
 
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
   late TestRepository testRepository;
 
   setUp(() async {
@@ -53,6 +51,7 @@ void main() async {
       final database = await DatabaseManager().open(testDatabase);
       TestRepository(database.getTable(testTable.name));
     },
+    tags: 'Medium',
   );
 
   test(
@@ -67,6 +66,7 @@ void main() async {
       expect(result.updatedAt, isNull);
       expect(result.archivedAt, isNull);
     },
+    tags: 'Medium',
   );
 
   group('ship', () {
@@ -86,6 +86,7 @@ void main() async {
         expect(shipped[0].toMap(), received1.toMap());
         expect(shipped[1].toMap(), received2.toMap());
       },
+      tags: 'Medium',
     );
 
     test(
@@ -103,6 +104,7 @@ void main() async {
         expect(shipped.length, 1);
         expect(shipped[0].toMap(), received2.toMap());
       },
+      tags: 'Medium',
     );
 
     test(
@@ -120,6 +122,7 @@ void main() async {
         expect(shipped.length, 1);
         expect(shipped[0].toMap(), received1.toMap());
       },
+      tags: 'Medium',
     );
   });
 
@@ -134,6 +137,7 @@ void main() async {
 
       expect(shipped.toMap(), received.toMap());
     },
+    tags: 'Medium',
   );
 
   test(
@@ -147,6 +151,7 @@ void main() async {
 
       expect(updated.updatedAt, isNotNull);
     },
+    tags: 'Medium',
   );
 
   test(
@@ -160,6 +165,7 @@ void main() async {
 
       expect(updated.archivedAt, isNotNull);
     },
+    tags: 'Medium',
   );
 
   test(
@@ -173,6 +179,7 @@ void main() async {
 
       expect(updated.archivedAt, isNull);
     },
+    tags: 'Medium',
   );
 
   group('discardById', () {
@@ -187,6 +194,7 @@ void main() async {
 
         expect(discardResult, true);
       },
+      tags: 'Medium',
     );
 
     test(
@@ -196,6 +204,7 @@ void main() async {
 
         expect(discardResult, false);
       },
+      tags: 'Medium',
     );
   });
 
@@ -213,5 +222,6 @@ void main() async {
 
       expect(discardedCount, 2);
     },
+    tags: 'Medium',
   );
 }

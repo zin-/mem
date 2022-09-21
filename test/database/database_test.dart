@@ -1,17 +1,14 @@
+@TestOn('android || windows')
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test/integration_test.dart';
-
-import 'package:mem/logger.dart';
 import 'package:mem/database/database.dart';
 import 'package:mem/database/database_factory.dart';
 import 'package:mem/database/definitions.dart';
+import 'package:mem/logger.dart';
 
 // TODO このファイルは削除して、indexed_database_testを作る
 void main() {
   Logger(level: Level.verbose);
   DatabaseManager(onTest: true);
-
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   const tableName = 'tests';
   const pkName = 'id';
@@ -38,22 +35,26 @@ void main() {
   group(
     'Database',
     () {
-      test('get undefined table', () async {
-        database = await DatabaseManager().open(DefD(
-          dbName,
-          dbVersion,
-          tableDefinitions,
-        ));
+      test(
+        'get undefined table',
+        () async {
+          database = await DatabaseManager().open(DefD(
+            dbName,
+            dbVersion,
+            tableDefinitions,
+          ));
 
-        const undefinedTableName = 'undefined table name';
-        expect(
-          () => database.getTable(undefinedTableName),
-          throwsA((e) =>
-              e is DatabaseException &&
-              e.toString() ==
-                  'Table: $undefinedTableName does not exist on Database: "test-$dbName".'),
-        );
-      });
+          const undefinedTableName = 'undefined table name';
+          expect(
+            () => database.getTable(undefinedTableName),
+            throwsA((e) =>
+                e is DatabaseException &&
+                e.toString() ==
+                    'Table: $undefinedTableName does not exist on Database: "test-$dbName".'),
+          );
+        },
+        tags: 'Medium',
+      );
 
       group(
         'Operations',
@@ -74,6 +75,7 @@ void main() {
               });
               expect(inserted, 1);
             },
+            tags: 'Medium',
           );
 
           test(
@@ -105,6 +107,7 @@ void main() {
                 test2..putIfAbsent(pkName, () => inserted2),
               ]);
             },
+            tags: 'Medium',
           );
 
           group(
@@ -133,7 +136,9 @@ void main() {
                     test..putIfAbsent(pkName, () => inserted),
                   );
                 },
+                tags: 'Medium',
               );
+
               test(
                 ': not found.',
                 () async {
@@ -159,6 +164,7 @@ void main() {
                     ),
                   );
                 },
+                tags: 'Medium',
               );
             },
           );
@@ -196,7 +202,9 @@ void main() {
                     ..update(textFieldName, (value) => updateText),
                 );
               },
+              tags: 'Medium',
             );
+
             test(
               ': target is nothing',
               () async {
@@ -224,6 +232,7 @@ void main() {
                 final afterUpdateFail = await table.select();
                 expect(afterUpdateFail.length, 0);
               },
+              tags: 'Medium',
             );
           });
 
@@ -254,6 +263,7 @@ void main() {
               final selected = await table.select();
               expect(selected.length, 1);
             },
+            tags: 'Medium',
           );
 
           test(
@@ -283,6 +293,7 @@ void main() {
               final selected = await table.select();
               expect(selected.length, 0);
             },
+            tags: 'Medium',
           );
         },
         skip: true,

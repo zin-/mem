@@ -1,7 +1,7 @@
 # Test
 
 ```shell
-flutter test ../test ../integration_test/all.dart
+flutter test ../test ../integration_test/app_test.dart
 ```
 
 ## Generate mocks
@@ -38,7 +38,7 @@ flutter test ../test/widget
 シナリオテストも兼ねる実装とする
 
 ```shell
-flutter test ../integration_test/all.dart
+flutter test ../integration_test/app_test.dart
 ```
 
 ### Basic scenario
@@ -56,7 +56,7 @@ TODO naming
 ### On real platform
 
 ```shell
-flutter drive --driver=test_driver/integration_test.dart --target=integration_test/all.dart
+flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_test.dart
 ```
 
 テスト端末を選択する
@@ -68,11 +68,11 @@ chromedriver --port=4444
 ```
 
 ```shell
-flutter drive --driver=test_driver/integration_test.dart --target=integration_test/all.dart -d web-server
+flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_test.dart -d web-server
 ```
 
 ## With coverage
 
 ```shell
-flutter test ../test ../integration_test/all.dart --coverage
+flutter test ../test ../integration_test/app_test.dart --coverage
 ```

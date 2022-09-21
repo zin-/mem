@@ -1,0 +1,10 @@
+name: 'Build Mocks'
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Get Packages'
+      run: flutter packages pub get
+      shell: bash
+    - name: 'Build Mocks'
+      run: flutter pub run build_runner build
+      shell: bash

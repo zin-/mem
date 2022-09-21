@@ -1,0 +1,15 @@
+name: 'Install Flutter'
+inputs:
+  version:
+    required: true
+  channel:
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Install Flutter'
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ inputs.version }}
+        channel: ${{ inputs.channel }}
+        cache: true

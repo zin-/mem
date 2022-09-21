@@ -7,7 +7,6 @@ import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/main.dart' as app;
 import 'package:mem/repositories/repository.dart';
-import 'package:mem/views/constants.dart';
 
 void main() {
   Logger(level: Level.verbose);
@@ -23,152 +22,234 @@ void main() {
   });
 
   group('Basic scenario', () {
-    testWidgets(': create', (widgetTester) async {
-      await app.main();
-      await widgetTester.pumpAndSettle();
+    testWidgets(
+      ': create',
+      (widgetTester) async {
+        await app.main();
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      await widgetTester.tap(showNewMemFabFinder);
-      await widgetTester.pumpAndSettle();
+        await widgetTester.tap(showNewMemFabFinder);
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      const enteringMemName = 'entering mem name';
-      const enteringMemMemo = 'entering mem memo';
+        const enteringMemName = 'entering mem name';
+        const enteringMemMemo = 'entering mem memo';
 
-      await widgetTester.enterText(memNameTextFormFieldFinder, enteringMemName);
-      await widgetTester.enterText(memMemoTextFormFieldFinder, enteringMemMemo);
+        await widgetTester.enterText(
+            memNameTextFormFieldFinder, enteringMemName);
+        await widgetTester.enterText(
+            memMemoTextFormFieldFinder, enteringMemMemo);
 
-      await widgetTester.tap(saveFabFinder);
-      await widgetTester.pumpAndSettle();
+        await widgetTester.tap(saveFabFinder);
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      await widgetTester.pageBack();
-      await widgetTester.pumpAndSettle();
+        await widgetTester.pageBack();
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      expect(find.text(enteringMemName), findsOneWidget);
-      expect(find.text(enteringMemMemo), findsNothing);
-    });
+        expect(find.text(enteringMemName), findsOneWidget);
+        expect(find.text(enteringMemMemo), findsNothing);
+      },
+      tags: 'Medium',
+    );
 
-    testWidgets(': update', (widgetTester) async {
-      const savedMemName = 'saved mem name';
-      const savedMemMemo = 'saved mem memo';
-      await prepareSavedData(savedMemName, savedMemMemo);
+    testWidgets(
+      ': update',
+      (widgetTester) async {
+        const savedMemName = 'saved mem name';
+        const savedMemMemo = 'saved mem memo';
+        await prepareSavedData(savedMemName, savedMemMemo);
 
-      await app.main();
-      await widgetTester.pumpAndSettle();
+        await app.main();
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      await widgetTester.tap(find.text(savedMemName));
-      await widgetTester.pumpAndSettle();
+        await widgetTester.tap(find.text(savedMemName));
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      const enteringMemName = 'entering mem name';
-      const enteringMemMemo = 'entering mem memo';
+        const enteringMemName = 'entering mem name';
+        const enteringMemMemo = 'entering mem memo';
 
-      await widgetTester.enterText(memNameTextFormFieldFinder, enteringMemName);
-      await widgetTester.enterText(memMemoTextFormFieldFinder, enteringMemMemo);
+        await widgetTester.enterText(
+            memNameTextFormFieldFinder, enteringMemName);
+        await widgetTester.enterText(
+            memMemoTextFormFieldFinder, enteringMemMemo);
 
-      await widgetTester.tap(saveFabFinder);
-      await widgetTester.pumpAndSettle();
+        await widgetTester.tap(saveFabFinder);
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      expect(saveMemSuccessFinder(enteringMemName), findsOneWidget);
+        await widgetTester.pageBack();
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      await widgetTester.pageBack();
-      await widgetTester.pumpAndSettle();
+        expect(find.text(enteringMemName), findsOneWidget);
+        expect(find.text(enteringMemMemo), findsNothing);
+        expect(find.text(savedMemName), findsNothing);
+      },
+      tags: 'Medium',
+    );
 
-      expect(find.text(enteringMemName), findsOneWidget);
-      expect(find.text(enteringMemMemo), findsNothing);
-      expect(find.text(savedMemName), findsNothing);
-    });
+    testWidgets(
+      ': archive',
+      (widgetTester) async {
+        const savedMemName = 'saved mem name';
+        const savedMemMemo = 'saved mem memo';
+        await prepareSavedData(savedMemName, savedMemMemo);
 
-    testWidgets(': archive', (widgetTester) async {
-      const savedMemName = 'saved mem name';
-      const savedMemMemo = 'saved mem memo';
-      await prepareSavedData(savedMemName, savedMemMemo);
+        await app.main();
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      await app.main();
-      await widgetTester.pumpAndSettle();
+        await widgetTester.tap(find.text(savedMemName));
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      await widgetTester.tap(find.text(savedMemName));
-      await widgetTester.pumpAndSettle();
+        await widgetTester.tap(find.byIcon(Icons.archive));
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      await widgetTester.tap(find.byIcon(Icons.archive));
-      await widgetTester.pumpAndSettle();
+        expect(
+          find.descendant(
+            of: find.byType(Text),
+            matching: find.text(savedMemName),
+          ),
+          findsNothing,
+        );
 
-      expect(find.text(savedMemName), findsNothing);
+        await widgetTester.tap(memListFilterButton);
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
+        await widgetTester.tap(findShowArchiveSwitch);
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      await widgetTester.tap(memListFilterButton);
-      await widgetTester.pumpAndSettle();
-      await widgetTester.tap(findShowArchiveSwitch);
-      await widgetTester.pumpAndSettle();
+        expect(find.text(savedMemName), findsOneWidget);
+      },
+      tags: 'Medium',
+    );
 
-      expect(find.text(savedMemName), findsOneWidget);
-    });
+    testWidgets(
+      ': unarchive',
+      (widgetTester) async {
+        const savedMemName = 'archived mem name';
+        const savedMemMemo = 'archived mem memo';
+        await prepareSavedData(savedMemName, savedMemMemo, isArchived: true);
 
-    testWidgets(': unarchive', (widgetTester) async {
-      const savedMemName = 'archived mem name';
-      const savedMemMemo = 'archived mem memo';
-      await prepareSavedData(savedMemName, savedMemMemo, isArchived: true);
+        await app.main();
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      await app.main();
-      await widgetTester.pumpAndSettle();
+        await widgetTester.tap(memListFilterButton);
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
+        await widgetTester.tap(findShowArchiveSwitch);
+        await widgetTester.tap(findShowNotArchiveSwitch);
+        await closeMemListFilter(widgetTester);
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      await widgetTester.tap(memListFilterButton);
-      await widgetTester.pumpAndSettle();
-      await widgetTester.tap(findShowArchiveSwitch);
-      await widgetTester.tap(findShowNotArchiveSwitch);
-      await closeMemListFilter(widgetTester);
-      await widgetTester.pumpAndSettle();
+        await widgetTester.tap(find.text(savedMemName));
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      await widgetTester.tap(find.text(savedMemName));
-      await widgetTester.pumpAndSettle();
+        await widgetTester.tap(find.byIcon(Icons.unarchive));
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      await widgetTester.tap(find.byIcon(Icons.unarchive));
-      await widgetTester.pumpAndSettle();
+        await widgetTester.pageBack();
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      await widgetTester.pageBack();
-      await widgetTester.pumpAndSettle();
+        expect(find.text(savedMemName), findsNothing);
 
-      expect(find.text(savedMemName), findsNothing);
+        await widgetTester.tap(memListFilterButton);
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
+        await widgetTester.tap(findShowNotArchiveSwitch);
+        await closeMemListFilter(widgetTester);
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      await widgetTester.tap(memListFilterButton);
-      await widgetTester.pumpAndSettle();
-      await widgetTester.tap(findShowNotArchiveSwitch);
-      await closeMemListFilter(widgetTester);
-      await widgetTester.pumpAndSettle();
+        expect(find.text(savedMemName), findsOneWidget);
+      },
+      tags: 'Medium',
+    );
 
-      expect(find.text(savedMemName), findsOneWidget);
-    });
+    testWidgets(
+      ': remove',
+      (widgetTester) async {
+        const savedMemName = 'saved mem name';
+        const savedMemMemo = 'saved mem memo';
+        await prepareSavedData(savedMemName, savedMemMemo);
 
-    testWidgets(': remove', (widgetTester) async {
-      const savedMemName = 'saved mem name';
-      const savedMemMemo = 'saved mem memo';
-      await prepareSavedData(savedMemName, savedMemMemo);
+        await app.main();
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      await app.main();
-      await widgetTester.pumpAndSettle();
+        await widgetTester.tap(find.text(savedMemName));
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      await widgetTester.tap(find.text(savedMemName));
-      await widgetTester.pumpAndSettle();
+        await widgetTester.tap(memDetailMenuButtonFinder);
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
+        await widgetTester.tap(removeButtonFinder);
+        await widgetTester.pump();
+        await widgetTester.tap(okButtonFinder);
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      await widgetTester.tap(memDetailMenuButtonFinder);
-      await widgetTester.pumpAndSettle();
-      await widgetTester.tap(removeButtonFinder);
-      await widgetTester.pump();
-      await widgetTester.tap(okButtonFinder);
-      await widgetTester.pumpAndSettle();
+        expect(find.text(savedMemName), findsNothing);
 
-      expect(find.text(savedMemName), findsNothing);
-      expect(find.text('Remove success. $savedMemName'), findsOneWidget);
+        await widgetTester.tap(memListFilterButton);
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
+        await widgetTester.tap(findShowArchiveSwitch);
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
+        await closeMemListFilter(widgetTester);
 
-      await widgetTester.tap(memListFilterButton);
-      await widgetTester.pumpAndSettle();
-      await widgetTester.tap(findShowArchiveSwitch);
-      await widgetTester.pumpAndSettle();
-      await closeMemListFilter(widgetTester);
+        expect(find.text(savedMemName), findsNothing);
+      },
+      tags: 'Medium',
+    );
+  });
 
-      expect(find.text(savedMemName), findsNothing);
+  group('Edge scenario', () {
+    testWidgets(
+      'MemItem is archived',
+      (widgetTester) async {
+        const savedMemName = 'saved mem name';
+        final database = await DatabaseManager().open(app.databaseDefinition);
+        final memTable = database.getTable(memTableDefinition.name);
+        final savedMemId = await memTable.insert({
+          memNameColumnName: savedMemName,
+          createdAtColumnName: DateTime.now(),
+          archivedAtColumnName: null,
+        });
+        assert(savedMemId == 1);
+        final memItemTable = database.getTable(memItemTableDefinition.name);
+        const archivedMemMemo = 'archived mem memo';
+        await memItemTable.insert({
+          memIdColumnName: savedMemId,
+          memItemTypeColumnName: MemItemType.memo.name,
+          memItemValueColumnName: archivedMemMemo,
+          createdAtColumnName: DateTime.now(),
+          archivedAtColumnName: DateTime.now(),
+        });
 
-      await widgetTester.tap(undoButtonFinder);
-      await widgetTester.pumpAndSettle();
+        await app.main();
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      expect(find.text(savedMemName), findsOneWidget);
-    });
+        await widgetTester.tap(find.text(savedMemName));
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
+
+        expect(find.text(savedMemName), findsOneWidget);
+        expect(find.text(archivedMemMemo), findsOneWidget);
+      },
+      tags: 'Medium',
+    );
+
+    testWidgets(
+      'MemItem is nothing',
+      (widgetTester) async {
+        const savedMemName = 'saved mem name';
+        final database = await DatabaseManager().open(app.databaseDefinition);
+        final memTable = database.getTable(memTableDefinition.name);
+        await memTable.insert({
+          memNameColumnName: savedMemName,
+          createdAtColumnName: DateTime.now(),
+          archivedAtColumnName: null,
+        });
+
+        await app.main();
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
+
+        await widgetTester.tap(find.text(savedMemName));
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
+
+        expect(find.text(savedMemName), findsOneWidget);
+        expect(widgetTester.widgetList(find.byType(TextFormField)).length, 2);
+      },
+      tags: 'Medium',
+    );
   });
 }
 
@@ -203,7 +284,7 @@ final findShowArchiveSwitch = find.byType(Switch).at(1);
 
 Future closeMemListFilter(WidgetTester widgetTester) async {
   await widgetTester.tapAt(const Offset(0, 0));
-  await widgetTester.pumpAndSettle();
+  await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 }
 
 final memNameTextFormFieldFinder = find.byType(TextFormField).at(0);
@@ -229,22 +310,8 @@ Future<void> enterMemNameAndSave(
 ) async {
   await widgetTester.enterText(memNameTextFormFieldFinder, enteringText);
   await widgetTester.tap(saveFabFinder);
-  await widgetTester.pumpAndSettle();
+  await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 }
-
-Future<void> checkSavedSnackBarAndDismiss(
-  WidgetTester widgetTester,
-  String memName,
-) async {
-  expect(saveMemSuccessFinder(memName), findsOneWidget);
-
-  await widgetTester.pumpAndSettle(defaultDismissDuration);
-
-  expect(saveMemSuccessFinder(memName), findsNothing);
-}
-
-Finder saveMemSuccessFinder(String memName) =>
-    find.text('Save success. $memName');
 
 final memDetailMenuButtonFinder = find.descendant(
   of: appBarFinder,
@@ -253,7 +320,7 @@ final memDetailMenuButtonFinder = find.descendant(
 
 Future<void> showRemoveMemConfirmDialog(WidgetTester widgetTester) async {
   await widgetTester.tap(memDetailMenuButtonFinder);
-  await widgetTester.pumpAndSettle();
+  await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
   await widgetTester.tap(removeButtonFinder);
   await widgetTester.pump();

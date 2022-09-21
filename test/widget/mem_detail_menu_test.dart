@@ -21,87 +21,100 @@ void main() {
     reset(mockedMemRepository);
   });
 
-  testWidgets('Open menu', (widgetTester) async {
-    await pumpMemDetailPage(widgetTester, null);
+  testWidgets(
+    'Open menu',
+    (widgetTester) async {
+      await pumpMemDetailPage(widgetTester, null);
 
-    expect(archiveButtonFinder, findsOneWidget);
-    expect(unarchiveButtonFinder, findsNothing);
-    expect(memDetailMenuButtonFinder, findsOneWidget);
+      expect(archiveButtonFinder, findsOneWidget);
+      expect(unarchiveButtonFinder, findsNothing);
+      expect(memDetailMenuButtonFinder, findsOneWidget);
 
-    await widgetTester.tap(memDetailMenuButtonFinder);
-    await widgetTester.pump();
+      await widgetTester.tap(memDetailMenuButtonFinder);
+      await widgetTester.pump();
 
-    expect(removeButtonFinder, findsOneWidget);
-    expect(find.text('Remove'), findsOneWidget);
-  });
+      expect(removeButtonFinder, findsOneWidget);
+      expect(find.text('Remove'), findsOneWidget);
+    },
+    tags: 'Small',
+  );
 
-  testWidgets('Show remove confirmation dialog', (widgetTester) async {
-    await pumpMemDetailPage(widgetTester, null);
+  testWidgets(
+    'Show remove confirmation dialog',
+    (widgetTester) async {
+      await pumpMemDetailPage(widgetTester, null);
 
-    await showRemoveMemConfirmDialog(widgetTester);
+      await showRemoveMemConfirmDialog(widgetTester);
 
-    expect(removeConfirmationFinder, findsOneWidget);
-    expect(okButtonFinder, findsOneWidget);
-    expect(cancelButtonFinder, findsOneWidget);
+      expect(removeConfirmationFinder, findsOneWidget);
+      expect(okButtonFinder, findsOneWidget);
+      expect(cancelButtonFinder, findsOneWidget);
 
-    await widgetTester.tap(cancelButtonFinder);
-    await widgetTester.pumpAndSettle();
+      await widgetTester.tap(cancelButtonFinder);
+      await widgetTester.pumpAndSettle();
 
-    expect(removeConfirmationFinder, findsNothing);
-  });
+      expect(removeConfirmationFinder, findsNothing);
+    },
+    tags: 'Small',
+  );
 
-  testWidgets('Show archived and unarchive', (widgetTester) async {
-    const memId = 1;
-    const memName = 'test mem name';
-    const memMemo = 'test mem memo';
-    final mem = MemEntity(
-      id: memId,
-      name: memName,
-      createdAt: DateTime.now(),
-      archivedAt: DateTime.now(),
-    );
+  testWidgets(
+    'Show archived and unarchive',
+    (widgetTester) async {
+      const memId = 1;
+      const memName = 'test mem name';
+      const memMemo = 'test mem memo';
+      final mem = MemEntity(
+        id: memId,
+        name: memName,
+        createdAt: DateTime.now(),
+        archivedAt: DateTime.now(),
+      );
 
-    when(mockedMemRepository.shipById(any))
-        .thenAnswer((realInvocation) async => mem);
-    when(mockedMemItemRepository.shipByMemId(any))
-        .thenAnswer((realInvocation) async => [
-              MemItemEntity(
-                memId: memId,
-                type: MemItemType.memo,
-                value: memMemo,
-                createdAt: DateTime.now(),
-                archivedAt: DateTime.now(),
-              ),
-            ]);
-    when(mockedMemRepository.unarchive(any)).thenAnswer((realInvocation) async {
-      final mem = realInvocation.positionalArguments[0] as MemEntity;
+      when(mockedMemRepository.shipById(any))
+          .thenAnswer((realInvocation) async => mem);
+      when(mockedMemItemRepository.shipByMemId(any))
+          .thenAnswer((realInvocation) async => [
+                MemItemEntity(
+                  memId: memId,
+                  type: MemItemType.memo,
+                  value: memMemo,
+                  createdAt: DateTime.now(),
+                  archivedAt: DateTime.now(),
+                ),
+              ]);
+      when(mockedMemRepository.unarchive(any))
+          .thenAnswer((realInvocation) async {
+        final mem = realInvocation.positionalArguments[0] as MemEntity;
 
-      return MemEntity.fromMap(mem.toMap()..['archivedAt'] = null);
-    });
-    when(mockedMemItemRepository.unarchiveByMemId(memId))
-        .thenAnswer((realInvocation) async {
-      return [
-        MemItemEntity(
-          memId: memId,
-          type: MemItemType.memo,
-          value: memMemo,
-          createdAt: DateTime.now(),
-          archivedAt: null,
-        ),
-      ];
-    });
+        return MemEntity.fromMap(mem.toMap()..['archivedAt'] = null);
+      });
+      when(mockedMemItemRepository.unarchiveByMemId(memId))
+          .thenAnswer((realInvocation) async {
+        return [
+          MemItemEntity(
+            memId: memId,
+            type: MemItemType.memo,
+            value: memMemo,
+            createdAt: DateTime.now(),
+            archivedAt: null,
+          ),
+        ];
+      });
 
-    await pumpMemDetailPage(widgetTester, memId);
+      await pumpMemDetailPage(widgetTester, memId);
 
-    expect(archiveButtonFinder, findsNothing);
-    expect(unarchiveButtonFinder, findsOneWidget);
+      expect(archiveButtonFinder, findsNothing);
+      expect(unarchiveButtonFinder, findsOneWidget);
 
-    await widgetTester.tap(unarchiveButtonFinder);
-    expect(memDetailAppBar(widgetTester).backgroundColor, archivedColor);
+      await widgetTester.tap(unarchiveButtonFinder);
+      expect(memDetailAppBar(widgetTester).backgroundColor, archivedColor);
 
-    verify(mockedMemRepository.shipById(memId)).called(1);
-    verify(mockedMemRepository.unarchive(any)).called(1);
-  });
+      verify(mockedMemRepository.shipById(memId)).called(1);
+      verify(mockedMemRepository.unarchive(any)).called(1);
+    },
+    tags: 'Small',
+  );
 }
 
 final appBarFinder = find.byType(AppBar);

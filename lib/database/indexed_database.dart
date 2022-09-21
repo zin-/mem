@@ -5,7 +5,6 @@ import 'dart:convert';
 
 import 'package:idb_shim/idb.dart' as idb_shim;
 import 'package:idb_shim/idb_browser.dart' as idb_browser;
-
 import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
 import 'package:mem/logger.dart';

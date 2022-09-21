@@ -26,53 +26,62 @@ void main() {
   });
 
   group('Show', () {
-    testWidgets(': not found.', (widgetTester) async {
-      const memId = 1;
+    testWidgets(
+      ': not found.',
+      (widgetTester) async {
+        const memId = 1;
 
-      when(mockedMemRepository.shipById(memId))
-          .thenThrow(NotFoundException('test target', 'test condition'));
+        when(mockedMemRepository.shipById(memId))
+            .thenThrow(NotFoundException('test target', 'test condition'));
 
-      await pumpMemDetailPage(widgetTester, memId);
+        await pumpMemDetailPage(widgetTester, memId);
 
-      verify(mockedMemRepository.shipById(memId)).called(1);
-      verifyNever(mockedMemItemRepository.shipByMemId(any));
+        verify(mockedMemRepository.shipById(memId)).called(1);
+        verifyNever(mockedMemItemRepository.shipByMemId(any));
 
-      expectMemNameOnMemDetail(widgetTester, '');
-      expectMemMemoOnMemDetail(widgetTester, '');
-      expect(saveFabFinder, findsOneWidget);
-    });
+        expectMemNameOnMemDetail(widgetTester, '');
+        expectMemMemoOnMemDetail(widgetTester, '');
+        expect(saveFabFinder, findsOneWidget);
+      },
+      tags: 'Small',
+    );
 
-    testWidgets(': found.', (widgetTester) async {
-      final savedMemEntity = MemEntity(
-        name: 'saved mem entity',
-        id: 1,
-        createdAt: DateTime.now(),
-      );
-      when(mockedMemRepository.shipById(savedMemEntity.id))
-          .thenAnswer((realInvocation) async => savedMemEntity);
-      final savedMemoMemItemEntity = MemItemEntity(
-        memId: savedMemEntity.id,
-        type: MemItemType.memo,
-        value: 'saved memo mem item entity',
-        id: 1,
-        createdAt: DateTime.now(),
-      );
-      when(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).thenAnswer(
-          (realInvocation) => Future.value([savedMemoMemItemEntity]));
+    testWidgets(
+      ': found.',
+      (widgetTester) async {
+        final savedMemEntity = MemEntity(
+          name: 'saved mem entity',
+          id: 1,
+          createdAt: DateTime.now(),
+        );
+        when(mockedMemRepository.shipById(savedMemEntity.id))
+            .thenAnswer((realInvocation) async => savedMemEntity);
+        final savedMemoMemItemEntity = MemItemEntity(
+          memId: savedMemEntity.id,
+          type: MemItemType.memo,
+          value: 'saved memo mem item entity',
+          id: 1,
+          createdAt: DateTime.now(),
+        );
+        when(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).thenAnswer(
+            (realInvocation) => Future.value([savedMemoMemItemEntity]));
 
-      await pumpMemDetailPage(widgetTester, savedMemEntity.id);
+        await pumpMemDetailPage(widgetTester, savedMemEntity.id);
 
-      verify(mockedMemRepository.shipById(savedMemEntity.id)).called(1);
-      verify(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).called(1);
+        verify(mockedMemRepository.shipById(savedMemEntity.id)).called(1);
+        verify(mockedMemItemRepository.shipByMemId(savedMemEntity.id))
+            .called(1);
 
-      await widgetTester.pumpAndSettle();
+        await widgetTester.pumpAndSettle();
 
-      expectMemNameOnMemDetail(widgetTester, savedMemEntity.name);
-      expectMemMemoOnMemDetail(widgetTester, savedMemoMemItemEntity.value);
-      expect(find.text(savedMemEntity.name), findsOneWidget);
-      expect(find.text(savedMemoMemItemEntity.value), findsOneWidget);
-      expect(saveFabFinder, findsOneWidget);
-    });
+        expectMemNameOnMemDetail(widgetTester, savedMemEntity.name);
+        expectMemMemoOnMemDetail(widgetTester, savedMemoMemItemEntity.value);
+        expect(find.text(savedMemEntity.name), findsOneWidget);
+        expect(find.text(savedMemoMemItemEntity.value), findsOneWidget);
+        expect(saveFabFinder, findsOneWidget);
+      },
+      tags: 'Small',
+    );
   });
 
   testWidgets(
@@ -94,6 +103,7 @@ void main() {
 
       verify(mockedMemRepository.shipById(memId)).called(1);
     },
+    tags: 'Small',
   );
 
   group('Edit', () {
@@ -127,141 +137,164 @@ void main() {
         // FIXME ここで、フォーカスがはずれていることを確認したかったが、確認できなかった
         expect(focusNode.hasPrimaryFocus, true);
       },
+      tags: 'Small',
       skip: true,
     );
 
-    testWidgets(': memo', (widgetTester) async {
-      await pumpMemDetailPage(widgetTester, null);
+    testWidgets(
+      ': memo',
+      (widgetTester) async {
+        await pumpMemDetailPage(widgetTester, null);
 
-      expect(memMemoTextFormFieldFinder, findsOneWidget);
-      const enteringMemMemo = 'test mem memo';
-      await widgetTester.enterText(memMemoTextFormFieldFinder, enteringMemMemo);
+        expect(memMemoTextFormFieldFinder, findsOneWidget);
+        const enteringMemMemo = 'test mem memo';
+        await widgetTester.enterText(
+            memMemoTextFormFieldFinder, enteringMemMemo);
 
-      expect(find.text(enteringMemMemo), findsOneWidget);
-    });
+        expect(find.text(enteringMemMemo), findsOneWidget);
+      },
+      tags: 'Small',
+    );
   });
 
   group('Save', () {
-    testWidgets(': name is required.', (widgetTester) async {
-      await pumpMemDetailPage(widgetTester, null);
+    testWidgets(
+      ': name is required.',
+      (widgetTester) async {
+        await pumpMemDetailPage(widgetTester, null);
 
-      await widgetTester.tap(saveFabFinder);
+        await widgetTester.tap(saveFabFinder);
 
-      expect(find.text('Name is required'), findsNothing);
+        expect(find.text('Name is required'), findsNothing);
 
-      verifyNever(mockedMemRepository.shipById(any));
-      verifyNever(mockedMemRepository.receive(any));
-    });
+        verifyNever(mockedMemRepository.shipById(any));
+        verifyNever(mockedMemRepository.receive(any));
+      },
+      tags: 'Small',
+    );
 
-    testWidgets(': create.', (widgetTester) async {
-      const enteringMemName = 'entering mem name';
-      const enteringMemMemo = 'test mem memo';
-      const memId = 1;
+    testWidgets(
+      ': create.',
+      (widgetTester) async {
+        const enteringMemName = 'entering mem name';
+        const enteringMemMemo = 'test mem memo';
+        const memId = 1;
 
-      when(mockedMemRepository.receive(any)).thenAnswer((realInvocation) async {
-        final value = realInvocation.positionalArguments[0] as MemEntity;
-        expect(value.name, enteringMemName);
+        when(mockedMemRepository.receive(any))
+            .thenAnswer((realInvocation) async {
+          final value = realInvocation.positionalArguments[0] as MemEntity;
+          expect(value.name, enteringMemName);
 
-        return MemEntity(
-          id: memId,
-          name: value.name,
-          createdAt: DateTime.now(),
-        );
-      });
-      when(mockedMemItemRepository.receive(any))
-          .thenAnswer((realInvocation) async {
-        final value = realInvocation.positionalArguments[0] as MemItemEntity;
-        expect(value.memId, memId);
-        expect(value.type, MemItemType.memo);
-        expect(value.value, enteringMemMemo);
+          return MemEntity(
+            id: memId,
+            name: value.name,
+            createdAt: DateTime.now(),
+          );
+        });
+        when(mockedMemItemRepository.receive(any))
+            .thenAnswer((realInvocation) async {
+          final value = realInvocation.positionalArguments[0] as MemItemEntity;
+          expect(value.memId, memId);
+          expect(value.type, MemItemType.memo);
+          expect(value.value, enteringMemMemo);
 
-        return MemItemEntity(
-          id: 1,
-          memId: memId,
-          type: MemItemType.memo,
-          value: enteringMemMemo,
-          createdAt: DateTime.now(),
-        );
-      });
+          return MemItemEntity(
+            id: 1,
+            memId: memId,
+            type: MemItemType.memo,
+            value: enteringMemMemo,
+            createdAt: DateTime.now(),
+          );
+        });
 
-      await pumpMemDetailPage(widgetTester, null);
+        await pumpMemDetailPage(widgetTester, null);
 
-      await widgetTester.enterText(memMemoTextFormFieldFinder, enteringMemMemo);
-      await enterMemNameAndSave(widgetTester, enteringMemName);
+        await widgetTester.enterText(
+            memMemoTextFormFieldFinder, enteringMemMemo);
+        await enterMemNameAndSave(widgetTester, enteringMemName);
 
-      await checkSavedSnackBarAndDismiss(widgetTester, enteringMemName);
+        await checkSavedSnackBarAndDismiss(widgetTester, enteringMemName);
 
-      verifyNever(mockedMemRepository.shipById(any));
-      verify(mockedMemRepository.receive(any)).called(1);
-      verify(mockedMemItemRepository.receive(any)).called(1);
-    });
+        verifyNever(mockedMemRepository.shipById(any));
+        verify(mockedMemRepository.receive(any)).called(1);
+        verify(mockedMemItemRepository.receive(any)).called(1);
+      },
+      tags: 'Small',
+    );
 
-    testWidgets(': update.', (widgetTester) async {
-      const memId = 1;
-      const memName = 'test mem name';
-      when(mockedMemRepository.shipById(any))
-          .thenAnswer((realInvocation) async => MemEntity(
-                name: memName,
-                id: memId,
-                createdAt: DateTime.now(),
-              ));
-      const memItemId = 1;
-      const memMemo = 'test mem memo';
-      when(mockedMemItemRepository.shipByMemId(any))
-          .thenAnswer((realInvocation) async => [
-                MemItemEntity(
-                  memId: memId,
-                  type: MemItemType.memo,
-                  value: memMemo,
-                  id: memItemId,
+    testWidgets(
+      ': update.',
+      (widgetTester) async {
+        const memId = 1;
+        const memName = 'test mem name';
+        when(mockedMemRepository.shipById(any))
+            .thenAnswer((realInvocation) async => MemEntity(
+                  name: memName,
+                  id: memId,
                   createdAt: DateTime.now(),
-                )
-              ]);
+                ));
+        const memItemId = 1;
+        const memMemo = 'test mem memo';
+        when(mockedMemItemRepository.shipByMemId(any))
+            .thenAnswer((realInvocation) async => [
+                  MemItemEntity(
+                    memId: memId,
+                    type: MemItemType.memo,
+                    value: memMemo,
+                    id: memItemId,
+                    createdAt: DateTime.now(),
+                  )
+                ]);
 
-      await pumpMemDetailPage(widgetTester, memId);
-      await widgetTester.pump();
+        await pumpMemDetailPage(widgetTester, memId);
+        await widgetTester.pump();
 
-      verify(mockedMemRepository.shipById(memId)).called(1);
-      verify(mockedMemItemRepository.shipByMemId(memId)).called(1);
+        verify(mockedMemRepository.shipById(memId)).called(1);
+        verify(mockedMemItemRepository.shipByMemId(memId)).called(1);
 
-      const enteringMemName = 'entering mem name';
-      const enteringMemMemo = 'entering mem memo';
+        const enteringMemName = 'entering mem name';
+        const enteringMemMemo = 'entering mem memo';
 
-      await widgetTester.enterText(memNameTextFormFieldFinder, enteringMemName);
-      await widgetTester.enterText(memMemoTextFormFieldFinder, enteringMemMemo);
+        await widgetTester.enterText(
+            memNameTextFormFieldFinder, enteringMemName);
+        await widgetTester.enterText(
+            memMemoTextFormFieldFinder, enteringMemMemo);
 
-      when(mockedMemRepository.update(any)).thenAnswer((realInvocation) async {
-        final memEntity = realInvocation.positionalArguments[0] as MemEntity;
-        expect(memEntity.id, memId);
-        expect(memEntity.name, enteringMemName);
-        expect(memEntity.createdAt, isNotNull);
-        expect(memEntity.updatedAt, isNull);
-        expect(memEntity.archivedAt, isNull);
+        when(mockedMemRepository.update(any))
+            .thenAnswer((realInvocation) async {
+          final memEntity = realInvocation.positionalArguments[0] as MemEntity;
+          expect(memEntity.id, memId);
+          expect(memEntity.name, enteringMemName);
+          expect(memEntity.createdAt, isNotNull);
+          expect(memEntity.updatedAt, isNull);
+          expect(memEntity.archivedAt, isNull);
 
-        return memEntity..updatedAt = DateTime.now();
-      });
-      when(mockedMemItemRepository.update(any))
-          .thenAnswer((realInvocation) async {
-        final memItemEntity =
-            realInvocation.positionalArguments[0] as MemItemEntity;
-        expect(memItemEntity.memId, memId);
-        expect(memItemEntity.type, MemItemType.memo);
-        expect(memItemEntity.value, enteringMemMemo);
-        expect(memItemEntity.createdAt, isNotNull);
-        expect(memItemEntity.updatedAt, isNull);
-        expect(memItemEntity.archivedAt, isNull);
+          return memEntity..updatedAt = DateTime.now();
+        });
+        when(mockedMemItemRepository.update(any))
+            .thenAnswer((realInvocation) async {
+          final memItemEntity =
+              realInvocation.positionalArguments[0] as MemItemEntity;
+          expect(memItemEntity.memId, memId);
+          expect(memItemEntity.type, MemItemType.memo);
+          expect(memItemEntity.value, enteringMemMemo);
+          expect(memItemEntity.createdAt, isNotNull);
+          expect(memItemEntity.updatedAt, isNull);
+          expect(memItemEntity.archivedAt, isNull);
 
-        return memItemEntity..updatedAt = DateTime.now();
-      });
+          return memItemEntity..updatedAt = DateTime.now();
+        });
 
-      await widgetTester.tap(saveFabFinder);
-      await widgetTester.pumpAndSettle();
+        await widgetTester.tap(saveFabFinder);
+        await widgetTester.pumpAndSettle();
 
-      verify(mockedMemRepository.update(any)).called(1);
-      verify(mockedMemItemRepository.update(any)).called(1);
+        verify(mockedMemRepository.update(any)).called(1);
+        verify(mockedMemItemRepository.update(any)).called(1);
 
-      checkSavedSnackBarAndDismiss(widgetTester, enteringMemName);
-    });
+        checkSavedSnackBarAndDismiss(widgetTester, enteringMemName);
+      },
+      tags: 'Small',
+    );
   });
 }
 

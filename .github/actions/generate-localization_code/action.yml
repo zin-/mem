@@ -1,0 +1,7 @@
+name: 'Generate Localization code'
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Genarate Localization code'
+      run: flutter gen-l10n
+      shell: bash
