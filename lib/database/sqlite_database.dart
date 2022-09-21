@@ -150,19 +150,35 @@ class SqliteDatabase extends Database {
         },
       );
 
-  _onUpgrade(db, oldVersion, newVersion) => v(
+  _onUpgrade(sqflite.Database db, int oldVersion, int newVersion) => v(
         {
           'db': db,
           'oldVersion': oldVersion,
           'newVersion': newVersion,
         },
         () async {
-          if (oldVersion == 1 && newVersion == 2) {
-            trace('Upgrade Database. $definition from version: $oldVersion');
+          trace('Upgrade Database. $definition from version: $oldVersion');
 
-            final creatingTable = definition.tableDefinitions.last;
-            trace('Create table. $creatingTable');
-            await db.execute(creatingTable.buildCreateTableSql());
+          final sqlMap = {
+            for (var e in await db.query(
+              'sqlite_master',
+              columns: ['name', 'sql'],
+              where: 'type = ?',
+              whereArgs: ['table'],
+            ))
+              e['name']: e['sql']
+          };
+
+          for (var tableDefinition in definition.tableDefinitions) {
+            if (sqlMap.containsKey(tableDefinition.name)) {
+              final sql = sqlMap[tableDefinition.name];
+              if (tableDefinition.buildCreateTableSql() != sql) {
+                trace('Alter table. $tableDefinition');
+              }
+            } else {
+              trace('Create table. $tableDefinition');
+              await db.execute(tableDefinition.buildCreateTableSql());
+            }
           }
         },
       );
