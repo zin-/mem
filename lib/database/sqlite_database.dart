@@ -157,29 +157,51 @@ class SqliteDatabase extends Database {
           'newVersion': newVersion,
         },
         () async {
+          const tmpPrefix = 'tmp_';
+
           trace('Upgrade Database. $definition from version: $oldVersion');
 
-          final sqlMap = {
-            for (var e in await db.query(
-              'sqlite_master',
-              columns: ['name', 'sql'],
-              where: 'type = ?',
-              whereArgs: ['table'],
-            ))
-              e['name']: e['sql']
-          };
-
           for (var tableDefinition in definition.tableDefinitions) {
-            if (sqlMap.containsKey(tableDefinition.name)) {
-              final sql = sqlMap[tableDefinition.name];
-              if (tableDefinition.buildCreateTableSql() != sql) {
-                trace('Alter table. $tableDefinition');
-              }
-            } else {
+            final master = await db.query(
+              'sqlite_master',
+              where: 'type = ? AND name = ?',
+              whereArgs: ['table', tableDefinition.name],
+            );
+            if (master.isEmpty) {
               trace('Create table. $tableDefinition');
               await db.execute(tableDefinition.buildCreateTableSql());
+            } else {
+              if (tableDefinition.buildCreateTableSql() !=
+                  master.single['sql']) {
+                trace('Alter table. $tableDefinition');
+
+                final rows = await db.query(tableDefinition.name);
+
+                final tmpTableName = '$tmpPrefix${tableDefinition.name}';
+
+                final batch = db.batch();
+                batch.execute(
+                  'ALTER TABLE ${tableDefinition.name} RENAME TO $tmpTableName',
+                );
+                batch.execute(tableDefinition.buildCreateTableSql());
+                for (var row in rows) {
+                  batch.insert(tableDefinition.name, row);
+                }
+                await batch.commit();
+              }
             }
           }
+
+          final tmpTableMasters = await db.query(
+            'sqlite_master',
+            where: 'type = ? AND name like ?',
+            whereArgs: ['table', '$tmpPrefix%'],
+          );
+          final batch = db.batch();
+          for (var tmpTableMaster in tmpTableMasters.reversed) {
+            batch.execute('DROP TABLE ${tmpTableMaster['name']}');
+          }
+          await batch.commit();
         },
       );
 }
