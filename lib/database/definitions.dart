@@ -11,6 +11,8 @@ class DatabaseDefinition {
   DatabaseDefinition(this.name, this.version, this.tableDefinitions) {
     if (name.isEmpty) {
       throw DatabaseDefinitionException('Database name is required.');
+    } else if (name.contains(' ')) {
+      throw DatabaseDefinitionException('Database name contains " ".');
     } else if (version < 1) {
       throw DatabaseDefinitionException('Minimum version is 1.');
     }
@@ -34,6 +36,8 @@ class TableDefinition {
   TableDefinition(this.name, this.columns) {
     if (name.isEmpty) {
       throw DatabaseDefinitionException('Table name is required.');
+    } else if (name.contains(' ')) {
+      throw DatabaseDefinitionException('Table name contains " ".');
     } else if (columns.isEmpty) {
       throw DatabaseDefinitionException('Table columns are required.');
     } else if (columns.whereType<PrimaryKeyDefinition>().isEmpty) {
@@ -73,6 +77,8 @@ class ColumnDefinition {
   ColumnDefinition(this.name, this.type, {this.notNull = true}) {
     if (name.isEmpty) {
       throw DatabaseDefinitionException('Column name is required.');
+    } else if (name.contains(' ')) {
+      throw DatabaseDefinitionException('Column name contains " ".');
     }
   }
 
