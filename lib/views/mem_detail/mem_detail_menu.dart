@@ -67,10 +67,11 @@ class MemDetailMenu extends StatelessWidget {
               icon: const Icon(Icons.archive),
               color: Colors.white,
               onPressed: () {
+                final scaffoldManager = ScaffoldMessenger.of(context);
                 ref.read(archiveMem(_memId)).then(
                   (archivedMemDetail) {
                     if (archivedMemDetail != null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      scaffoldManager.showSnackBar(
                         SnackBar(
                           content: Text(L10n().archiveMemSuccessMessage(
                             archivedMemDetail.memEntity.name,
