@@ -13,6 +13,7 @@ import 'package:mem/views/constants.dart';
 
 import '../../minimum.dart';
 import '../../mocks.mocks.dart';
+import 'mem_detail_body_test.dart';
 
 void main() {
   Logger(level: Level.verbose);
@@ -118,9 +119,16 @@ void main() {
 
         await widgetTester.enterText(
             memMemoTextFormFieldFinder, enteringMemMemo);
-        await enterMemNameAndSave(widgetTester, enteringMemName);
+        await widgetTester.enterText(
+            memNameTextFormFieldFinder, enteringMemName);
+        await widgetTester.tap(saveFabFinder);
+        await widgetTester.pumpAndSettle();
 
-        await checkSavedSnackBarAndDismiss(widgetTester, enteringMemName);
+        expect(saveMemSuccessFinder(enteringMemName), findsOneWidget);
+
+        await widgetTester.pumpAndSettle(defaultDismissDuration);
+
+        expect(saveMemSuccessFinder(enteringMemName), findsNothing);
 
         verifyNever(mockedMemRepository.shipById(any));
         verify(mockedMemRepository.receive(any)).called(1);
@@ -182,7 +190,11 @@ void main() {
         verify(mockedMemRepository.update(any)).called(1);
         verify(mockedMemItemRepository.update(any)).called(1);
 
-        checkSavedSnackBarAndDismiss(widgetTester, enteringMemName);
+        expect(saveMemSuccessFinder(enteringMemName), findsOneWidget);
+
+        await widgetTester.pumpAndSettle(defaultDismissDuration);
+
+        expect(saveMemSuccessFinder(enteringMemName), findsNothing);
       },
       tags: 'Small',
     );
@@ -206,53 +218,7 @@ Future pumpMemDetailPage(
   await widgetTester.pumpAndSettle();
 }
 
-final memNameTextFormFieldFinder = find.byType(TextFormField).at(0);
-final memMemoTextFormFieldFinder = find.byType(TextFormField).at(1);
 final saveFabFinder = find.byIcon(Icons.save_alt).at(0);
-
-TextFormField memNameTextFormField(WidgetTester widgetTester) =>
-    (widgetTester.widget(memNameTextFormFieldFinder) as TextFormField);
-
-TextFormField memMemoTextFormField(WidgetTester widgetTester) =>
-    (widgetTester.widget(memMemoTextFormFieldFinder) as TextFormField);
-
-void expectMemNameOnMemDetail(
-  WidgetTester widgetTester,
-  String memName,
-) =>
-    expect(
-      memNameTextFormField(widgetTester).initialValue,
-      memName,
-    );
-
-void expectMemMemoOnMemDetail(
-  WidgetTester widgetTester,
-  String memMemo,
-) =>
-    expect(
-      memMemoTextFormField(widgetTester).initialValue,
-      memMemo,
-    );
-
-Future<void> enterMemNameAndSave(
-  WidgetTester widgetTester,
-  String enteringText,
-) async {
-  await widgetTester.enterText(memNameTextFormFieldFinder, enteringText);
-  await widgetTester.tap(saveFabFinder);
-  await widgetTester.pumpAndSettle();
-}
-
-Future<void> checkSavedSnackBarAndDismiss(
-  WidgetTester widgetTester,
-  String memName,
-) async {
-  expect(saveMemSuccessFinder(memName), findsOneWidget);
-
-  await widgetTester.pumpAndSettle(defaultDismissDuration);
-
-  expect(saveMemSuccessFinder(memName), findsNothing);
-}
 
 Finder saveMemSuccessFinder(String memName) =>
     find.text('Save success. $memName');

@@ -12,7 +12,6 @@ import 'package:mockito/mockito.dart';
 
 import '../../minimum.dart';
 import '../../mocks.mocks.dart';
-import 'mem_detail_page_test.dart';
 
 void main() {
   Logger(level: Level.verbose);
@@ -208,3 +207,30 @@ void main() {
     );
   });
 }
+
+final memNameTextFormFieldFinder = find.byType(TextFormField).at(0);
+final memMemoTextFormFieldFinder = find.byType(TextFormField).at(1);
+
+TextFormField memNameTextFormField(WidgetTester widgetTester) =>
+    (widgetTester.widget(memNameTextFormFieldFinder) as TextFormField);
+
+TextFormField memMemoTextFormField(WidgetTester widgetTester) =>
+    (widgetTester.widget(memMemoTextFormFieldFinder) as TextFormField);
+
+void expectMemNameOnMemDetail(
+  WidgetTester widgetTester,
+  String memName,
+) =>
+    expect(
+      memNameTextFormField(widgetTester).initialValue,
+      memName,
+    );
+
+void expectMemMemoOnMemDetail(
+  WidgetTester widgetTester,
+  String memMemo,
+) =>
+    expect(
+      memMemoTextFormField(widgetTester).initialValue,
+      memMemo,
+    );

@@ -271,15 +271,6 @@ void expectMemNameOnMemDetail(
       memName,
     );
 
-Future<void> enterMemNameAndSave(
-  WidgetTester widgetTester,
-  String enteringText,
-) async {
-  await widgetTester.enterText(memNameTextFormFieldFinder, enteringText);
-  await widgetTester.tap(saveFabFinder);
-  await widgetTester.pumpAndSettle(const Duration(seconds: 1));
-}
-
 final memDetailMenuButtonFinder = find.descendant(
   of: appBarFinder,
   matching: find.byIcon(Icons.more_vert),
