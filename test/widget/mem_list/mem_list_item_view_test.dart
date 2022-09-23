@@ -15,14 +15,19 @@ import '../../mocks.mocks.dart';
 void main() {
   Logger(level: Level.verbose);
 
-  Future pumpMemListItemView(WidgetTester widgetTester, int memId) async {
+  Future pumpMemListItemView(
+    WidgetTester widgetTester,
+    int memId, {
+    MemEntity? memEntity,
+  }) async {
     await widgetTester.pumpWidget(
       ProviderScope(
         overrides: [
           memProvider.overrideWithProvider((argument) {
             expect(argument, memId);
 
-            return StateNotifierProvider((ref) => ValueStateNotifier(null));
+            return StateNotifierProvider(
+                (ref) => ValueStateNotifier(memEntity));
           })
         ],
         child: MaterialApp(
@@ -70,5 +75,30 @@ void main() {
           .data,
       savedMemEntity.name,
     );
+  });
+
+  testWidgets('Done', (widgetTester) async {
+    final savedMemEntity = minSavedMemEntity(1)
+      ..name = 'saved mem entity name'
+      ..doneAt = null;
+
+    await pumpMemListItemView(
+      widgetTester,
+      savedMemEntity.id,
+      memEntity: savedMemEntity,
+    );
+    await widgetTester.pump();
+
+    when(mockedMemRepository.update(any)).thenAnswer((realInvocation) async {
+      final arg1 = realInvocation.positionalArguments[0] as MemEntity;
+
+      expect(arg1.doneAt, isNotNull);
+
+      return MemEntity.fromMap(arg1.toMap())..updatedAt = DateTime.now();
+    });
+
+    await widgetTester.tap(find.byType(Checkbox));
+
+    verify(mockedMemRepository.update(any)).called(1);
   });
 }
