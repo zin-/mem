@@ -9,7 +9,7 @@ import 'package:mem/repositories/mem_repository.dart';
 
 final databaseDefinition = DefD(
   'mem.db',
-  2,
+  3,
   [
     memTableDefinition,
     memItemTableDefinition,
