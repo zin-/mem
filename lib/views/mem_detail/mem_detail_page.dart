@@ -27,19 +27,16 @@ class MemDetailPage extends StatelessWidget {
   Widget build(BuildContext context) => t(
         {'_memId': _memId},
         () => Consumer(
-          builder: (context, ref, child) => v(
-            {'_memId': _memId},
-            () {
-              final mem = ref.watch(memProvider(_memId));
+          builder: (context, ref, child) {
+            final mem = ref.watch(memProvider(_memId));
 
-              return mem == null
-                  ? AsyncValueView(
-                      ref.watch(fetchMemById(_memId)),
-                      (value) => _build(),
-                    )
-                  : _build();
-            },
-          ),
+            return mem == null
+                ? AsyncValueView(
+                    ref.watch(fetchMemById(_memId)),
+                    (value) => _build(),
+                  )
+                : _build();
+          },
         ),
       );
 
