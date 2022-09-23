@@ -30,6 +30,8 @@ void main() {
   final mockedMemRepository = MockMemRepository();
   MemRepository.withMock(mockedMemRepository);
 
+  tearDown(() => reset(mockedMemRepository));
+
   testWidgets(
     'Show saved mem list',
     (widgetTester) async {

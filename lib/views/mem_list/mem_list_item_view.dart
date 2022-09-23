@@ -18,8 +18,8 @@ class MemListItemView extends StatelessWidget {
             final mem = ref.watch(memProvider(_memId));
 
             if (mem == null) {
-              ref.watch(fetchMemById(_memId));
-              return const CircularProgressIndicator();
+              ref.watch(fetchMemByIdV2(_memId));
+              return const SizedBox.shrink();
             } else {
               return ListTile(
                 title: MemNameText(mem.name, mem.id),

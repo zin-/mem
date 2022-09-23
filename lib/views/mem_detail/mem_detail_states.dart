@@ -33,6 +33,19 @@ final memItemsProvider = StateNotifierProvider.family<
   ),
 );
 
+final fetchMemByIdV2 = FutureProvider.autoDispose.family<void, int>(
+  (ref, memId) => v(
+    {'memId': memId},
+    () async {
+      if (ref.read(memProvider(memId)) == null) {
+        final mem = await MemRepository().shipById(memId);
+
+        ref.read(memProvider(memId).notifier).updatedBy(mem);
+      }
+    },
+  ),
+);
+
 final fetchMemById = FutureProvider.autoDispose.family<void, int?>(
   (ref, memId) => v(
     {'memId': memId},
