@@ -7,7 +7,6 @@ import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/mem_list/mem_list_page.dart';
 import 'package:mockito/mockito.dart';
 
-import '../../../integration_test/app_test.dart';
 import '../../mocks.mocks.dart';
 
 Future pumpMemListPage(WidgetTester widgetTester) async {
@@ -62,60 +61,6 @@ void main() {
     },
     tags: 'Small',
   );
-
-  group('Transit', () {
-    testWidgets(
-      ': new MemDetailPage',
-      (widgetTester) async {
-        when(mockedMemRepository.ship(archived: anyNamed('archived')))
-            .thenAnswer(
-          (realInvocation) async => [],
-        );
-
-        await pumpMemListPage(widgetTester);
-
-        expect(showNewMemFabFinder, findsOneWidget);
-        await widgetTester.tap(showNewMemFabFinder);
-        await widgetTester.pumpAndSettle();
-
-        expectMemNameOnMemDetail(widgetTester, '');
-
-        verify(mockedMemRepository.ship(archived: false)).called(1);
-        verifyNever(mockedMemRepository.shipById(any));
-      },
-      tags: 'Small',
-    );
-
-    testWidgets(
-      ': saved MemDetailPage',
-      (widgetTester) async {
-        final savedMem1 =
-            MemEntity(id: 1, name: 'mem detail', createdAt: DateTime.now());
-        final savedMem2 =
-            MemEntity(id: 2, name: 'mem list', createdAt: DateTime.now());
-        when(mockedMemRepository.ship(archived: anyNamed('archived')))
-            .thenAnswer(
-          (realInvocation) async => [savedMem1, savedMem2],
-        );
-
-        await pumpMemListPage(widgetTester);
-
-        await widgetTester.tap(memListTileFinder.at(0));
-        await widgetTester.pumpAndSettle();
-
-        expectMemNameOnMemDetail(widgetTester, savedMem1.name);
-        expect(
-          (widgetTester.widget(memNameTextFormFieldFinder) as TextFormField)
-              .initialValue,
-          isNot(savedMem2.name),
-        );
-
-        verify(mockedMemRepository.ship(archived: false)).called(1);
-        verifyNever(mockedMemRepository.shipById(any));
-      },
-      tags: 'Small',
-    );
-  });
 
   group('Filter', () {
     testWidgets(

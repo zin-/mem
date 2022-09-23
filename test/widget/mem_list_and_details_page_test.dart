@@ -92,7 +92,7 @@ void main() {
       expectMemNameTextOnListAt(widgetTester, 0, enteringMemName);
 
       await widgetTester.tap(memListTileFinder.at(0));
-      await widgetTester.pumpAndSettle();
+      await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
       expectMemNameOnMemDetail(widgetTester, enteringMemName);
       expectMemMemoOnMemDetail(widgetTester, enteringMemMemo);
@@ -142,7 +142,7 @@ void main() {
           (realInvocation) => Future.value([savedMemoMemItemEntity]));
 
       await widgetTester.tap(memListTileFinder.at(0));
-      await widgetTester.pumpAndSettle();
+      await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
       verifyNever(mockedMemRepository.shipById(any));
       verify(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).called(1);
@@ -240,7 +240,7 @@ void main() {
           (realInvocation) => Future.value([savedMemoMemItemEntity]));
 
       await widgetTester.tap(memListTileFinder.at(0));
-      await widgetTester.pumpAndSettle();
+      await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
       when(mockedMemRepository.archive(any)).thenAnswer((realInvocation) {
         final memEntity = realInvocation.positionalArguments[0] as MemEntity;
@@ -296,7 +296,7 @@ void main() {
           (realInvocation) => Future.value([savedMemoMemItemEntity]));
 
       await widgetTester.tap(memListTileFinder.at(0));
-      await widgetTester.pumpAndSettle();
+      await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
       when(mockedMemItemRepository.discardByMemId(savedMemEntity.id))
           .thenAnswer((realInvocation) => Future.value([true]));

@@ -3,7 +3,7 @@ import 'package:mem/logger.dart';
 import 'package:mem/views/atoms/hero_view.dart';
 
 class MemDoneCheckbox extends StatelessWidget {
-  final int _memId;
+  final int? _memId;
   final bool _memDone;
   final Function(bool? value) _onChanged;
 
