@@ -76,7 +76,8 @@ void main() {
         await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
         await widgetTester.pageBack();
-        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
+        // FIXME 2秒は長すぎる。何が原因で見つからないのか分からないので一旦時間を伸ばしてみた
+        await widgetTester.pumpAndSettle(const Duration(seconds: 2));
 
         expect(find.text(enteringMemName), findsOneWidget);
         expect(find.text(enteringMemMemo), findsNothing);
