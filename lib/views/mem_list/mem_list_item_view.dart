@@ -25,6 +25,7 @@ class MemListItemView extends StatelessWidget {
             } else {
               return ListTile(
                 leading: MemDoneCheckbox(
+                  mem.id,
                   mem.doneAt != null,
                   (value) {
                     ref.read(memProvider(_memId).notifier).updatedBy(

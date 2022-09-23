@@ -35,6 +35,7 @@ class MemDetailBody extends StatelessWidget {
                           ),
                     ),
                     MemDoneCheckbox(
+                      editingMem.id,
                       editingMem.doneAt != null,
                       (value) => ref
                           .read(editingMemProvider(_memId).notifier)
