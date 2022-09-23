@@ -19,7 +19,6 @@ class MemDetailBody extends StatelessWidget {
           return Consumer(
             builder: (context, ref, child) {
               final editingMem = ref.watch(editingMemProvider(_memId));
-              final memItems = ref.watch(memItemsProvider(_memId));
 
               return Column(
                 children: [
@@ -30,12 +29,10 @@ class MemDetailBody extends StatelessWidget {
                         .read(editingMemProvider(_memId).notifier)
                         .updatedBy(editingMem..name = value),
                   ),
-                  memItems == null
-                      ? AsyncValueView(
-                          ref.watch(fetchMemById(_memId)),
-                          (value) => _buildMemItemViews(_memId),
-                        )
-                      : _buildMemItemViews(_memId),
+                  AsyncValueView(
+                    ref.watch(fetchMemById(_memId)),
+                    (value) => _buildMemItemViews(_memId),
+                  )
                 ],
               );
             },
@@ -61,21 +58,19 @@ class MemDetailBody extends StatelessWidget {
                                 ),
                               ]
                             : memItems)
-                        .map((memItem) {
-                      return TextFormField(
+                        .map(
+                      (memItem) => TextFormField(
                         decoration: InputDecoration(
                           icon: const Icon(Icons.subject),
                           labelText: L10n().memMemoTitle(),
                         ),
                         maxLines: null,
                         initialValue: memItem.value,
-                        onChanged: (value) =>
-                            ref.read(memItemsProvider(_memId).notifier).upsert(
-                                  memItem..value = value,
-                                  (item) => item.id == memItem.id,
-                                ),
-                      );
-                    }),
+                        onChanged: (value) => ref
+                            .read(memItemsProvider(_memId).notifier)
+                            .updatedBy([memItem..value = value]),
+                      ),
+                    ),
                   ],
                 ),
               );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
+import 'package:mem/views/mem_detail/mem_detail_body.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
@@ -28,7 +29,7 @@ void main() {
 
   group('Show', () {
     testWidgets(
-      ': not found Mem.',
+      ': not found Mem',
       (widgetTester) async {
         const memId = 1;
 
@@ -38,17 +39,15 @@ void main() {
         await pumpMemDetailPage(widgetTester, memId);
 
         verify(mockedMemRepository.shipById(memId)).called(1);
-        verifyNever(mockedMemItemRepository.shipByMemId(any));
 
-        expectMemNameOnMemDetail(widgetTester, '');
-        expectMemMemoOnMemDetail(widgetTester, '');
+        expect(find.byType(MemDetailBody), findsOneWidget);
         expect(saveFabFinder, findsOneWidget);
       },
       tags: 'Small',
     );
 
     testWidgets(
-      ': found Mem.',
+      ': found Mem',
       (widgetTester) async {
         final savedMemEntity = minSavedMemEntity(1);
         when(mockedMemRepository.shipById(savedMemEntity.id))
@@ -66,101 +65,8 @@ void main() {
 
         await widgetTester.pumpAndSettle();
 
-        expectMemNameOnMemDetail(widgetTester, savedMemEntity.name);
-        expectMemMemoOnMemDetail(widgetTester, savedMemoMemItemEntity.value);
-        expect(find.text(savedMemEntity.name), findsOneWidget);
-        expect(find.text(savedMemoMemItemEntity.value), findsOneWidget);
+        expect(find.byType(MemDetailBody), findsOneWidget);
         expect(saveFabFinder, findsOneWidget);
-      },
-      tags: 'Small',
-    );
-
-    testWidgets(
-      ': found archived Mem.',
-      (widgetTester) async {
-        final archivedMemEntity = minSavedMemEntity(1)
-          ..archivedAt = DateTime.now();
-
-        when(mockedMemRepository.shipById(any))
-            .thenAnswer((realInvocation) async => archivedMemEntity);
-
-        await pumpMemDetailPage(widgetTester, archivedMemEntity.id);
-        await widgetTester.pumpAndSettle();
-
-        expect(find.text(archivedMemEntity.name), findsOneWidget);
-
-        verify(mockedMemRepository.shipById(archivedMemEntity.id)).called(1);
-      },
-      tags: 'Small',
-    );
-
-    testWidgets(
-      ': found unarchived Mem with archived MemItems.',
-      (widgetTester) async {
-        final savedMemEntity = minSavedMemEntity(1);
-        when(mockedMemRepository.shipById(savedMemEntity.id))
-            .thenAnswer((realInvocation) async => savedMemEntity);
-        final archivedMemoMemItemEntity =
-            minSavedMemoMemItemEntity(savedMemEntity.id, 1)
-              ..archivedAt = DateTime.now();
-        when(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).thenAnswer(
-            (realInvocation) => Future.value([archivedMemoMemItemEntity]));
-
-        await pumpMemDetailPage(widgetTester, savedMemEntity.id);
-        await widgetTester.pumpAndSettle();
-
-        expect(find.text(archivedMemoMemItemEntity.value), findsOneWidget);
-      },
-      tags: 'Small',
-    );
-  });
-
-  group('Edit', () {
-    testWidgets(
-      ': keep focus mem name.',
-      (widgetTester) async {
-        final focusNode = FocusNode();
-        focusNode.addListener(() {
-          // dev('object');
-          // dev(focusNode.hasFocus);
-          // dev(focusNode.hasPrimaryFocus);
-          if (focusNode.hasFocus && focusNode.hasPrimaryFocus) {
-          } else {
-            fail('out of focus on mem name');
-          }
-        });
-        await pumpMemDetailPage(widgetTester, null);
-
-        expect(focusNode.hasPrimaryFocus, false);
-
-        await widgetTester.tap(memNameTextFormFieldFinder);
-
-        expect(focusNode.hasPrimaryFocus, true);
-
-        await widgetTester.enterText(
-          memNameTextFormFieldFinder,
-          'entering mem name',
-        );
-        await widgetTester.pumpAndSettle();
-
-        // FIXME ここで、フォーカスがはずれていることを確認したかったが、確認できなかった
-        expect(focusNode.hasPrimaryFocus, true);
-      },
-      tags: 'Small',
-      skip: true,
-    );
-
-    testWidgets(
-      ': memo',
-      (widgetTester) async {
-        await pumpMemDetailPage(widgetTester, null);
-
-        expect(memMemoTextFormFieldFinder, findsOneWidget);
-        const enteringMemMemo = 'test mem memo';
-        await widgetTester.enterText(
-            memMemoTextFormFieldFinder, enteringMemMemo);
-
-        expect(find.text(enteringMemMemo), findsOneWidget);
       },
       tags: 'Small',
     );
