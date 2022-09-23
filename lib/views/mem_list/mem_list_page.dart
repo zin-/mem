@@ -9,8 +9,8 @@ import 'package:mem/views/constants.dart';
 import 'package:mem/views/mem_detail/mem_detail_page.dart';
 import 'package:mem/views/mem_detail/mem_detail_states.dart';
 import 'package:mem/views/mem_list/mem_list_filter.dart';
+import 'package:mem/views/mem_list/mem_list_item_view.dart';
 import 'package:mem/views/mem_list/mem_list_page_states.dart';
-import 'package:mem/views/mem_name.dart';
 import 'package:mem/views/show_new_mem_fab.dart';
 
 class MemListPage extends StatelessWidget {
@@ -56,14 +56,7 @@ class MemListPage extends StatelessWidget {
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
                           final mem = memList[index];
-                          return ListTile(
-                            title: MemNameText(mem.name, mem.id),
-                            onTap: () => showMemDetailPage(
-                              context,
-                              ref,
-                              mem.id,
-                            ),
-                          );
+                          return MemListItemView(mem.id);
                         },
                         childCount: memList.length,
                       ),

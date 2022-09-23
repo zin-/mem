@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
-
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/mem_list/mem_list_page.dart';
+import 'package:mockito/mockito.dart';
 
-import '../mocks.mocks.dart';
-import 'mem_detail/mem_detail_body_test.dart';
+import '../../../integration_test/app_test.dart';
+import '../../mocks.mocks.dart';
 
 Future pumpMemListPage(WidgetTester widgetTester) async {
   await widgetTester.pumpWidget(
