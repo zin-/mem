@@ -6,6 +6,7 @@ import 'package:mem/repositories/mem_item_repository.dart'; // TODO repositories
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/atoms/async_value_view.dart';
 import 'package:mem/views/mem_detail/mem_detail_states.dart';
+import 'package:mem/views/mem_done_checkbox.dart';
 import 'package:mem/views/mem_name.dart';
 
 class MemDetailBody extends StatelessWidget {
@@ -33,9 +34,9 @@ class MemDetailBody extends StatelessWidget {
                             MemEntity.fromMap(editingMem.toMap())..name = value,
                           ),
                     ),
-                    Checkbox(
-                      value: editingMem.doneAt != null,
-                      onChanged: (value) => ref
+                    MemDoneCheckbox(
+                      editingMem.doneAt != null,
+                      (value) => ref
                           .read(editingMemProvider(_memId).notifier)
                           .updatedBy(
                             MemEntity.fromMap(editingMem.toMap())
