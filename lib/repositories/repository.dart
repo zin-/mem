@@ -60,6 +60,31 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
         },
       );
 
+  Future<List<Entity>> shipV2({
+    Map<String, String?>? whereMap,
+  }) =>
+      v(
+        {'whereMap': whereMap},
+        () async {
+          return (await _table.select(
+            where: whereMap?.keys.join(' AND '),
+            whereArgs:
+                whereMap?.values.where((value) => value != null).toList(),
+          ))
+              .map((e) => fromMap(e))
+              .toList();
+        },
+      );
+
+  Map<String, String?>? buildNullableWhere(String columnName, bool? nullable) {
+    if (nullable == null) {
+      return null;
+    } else {
+      final a = nullable ? '$columnName IS NOT NULL' : '$columnName IS NULL';
+      return {a: null};
+    }
+  }
+
   Future<List<Entity>> ship({
     bool? archived,
     List<String>? whereColumns,

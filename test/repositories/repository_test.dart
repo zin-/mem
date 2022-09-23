@@ -69,6 +69,85 @@ void main() async {
     tags: 'Medium',
   );
 
+  group('shipV2', () {
+    test(
+      'all',
+      () async {
+        final received1 = await testRepository.receive(
+          TestEntity(archivedAt: null),
+        );
+        final received2 = await testRepository.receive(
+          TestEntity(archivedAt: DateTime.now()),
+        );
+
+        final shipped = await testRepository.shipV2();
+
+        expect(shipped.length, 2);
+        expect(shipped[0].toMap(), received1.toMap());
+        expect(shipped[1].toMap(), received2.toMap());
+
+        final shipped2 = await testRepository.shipV2(
+          whereMap: testRepository.buildNullableWhere(
+            archivedAtColumnName,
+            null,
+          ),
+        );
+
+        expect(
+          shipped2.map((e) => e.toMap()).toString(),
+          shipped.map((e) => e.toMap()).toString(),
+        );
+      },
+      tags: 'Medium',
+    );
+
+    test(
+      'archive',
+      () async {
+        await testRepository.receive(
+          TestEntity(archivedAt: null),
+        );
+        final received2 = await testRepository.receive(
+          TestEntity(archivedAt: DateTime.now()),
+        );
+
+        final shipped = await testRepository.shipV2(
+          whereMap: testRepository.buildNullableWhere(
+            archivedAtColumnName,
+            true,
+          ),
+        );
+
+        expect(shipped.length, 1);
+        expect(shipped[0].toMap(), received2.toMap());
+      },
+      tags: 'Medium',
+    );
+
+    test(
+      'unarchive',
+      () async {
+        final received1 = await testRepository.receive(
+          TestEntity(archivedAt: null),
+        );
+        await testRepository.receive(
+          TestEntity(archivedAt: DateTime.now()),
+        );
+
+        final shipped = await testRepository.shipV2(
+          whereMap: testRepository.buildNullableWhere(
+            archivedAtColumnName,
+            false,
+          ),
+        );
+
+        expect(shipped.length, 1);
+        expect(shipped[0].toMap(), received1.toMap());
+      },
+      tags: 'Medium',
+    );
+  });
+
   group('ship', () {
     test(
       ': all',
