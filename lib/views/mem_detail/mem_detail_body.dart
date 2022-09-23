@@ -16,26 +16,28 @@ class MemDetailBody extends StatelessWidget {
   Widget build(BuildContext context) => t(
         {'_memId': _memId},
         () {
-          return Consumer(
-            builder: (context, ref, child) {
-              final editingMem = ref.watch(editingMemProvider(_memId));
+          return SingleChildScrollView(
+            child: Consumer(
+              builder: (context, ref, child) {
+                final editingMem = ref.watch(editingMemProvider(_memId));
 
-              return Column(
-                children: [
-                  MemNameTextFormField(
-                    editingMem.name,
-                    editingMem.id,
-                    (value) => ref
-                        .read(editingMemProvider(_memId).notifier)
-                        .updatedBy(editingMem..name = value),
-                  ),
-                  AsyncValueView(
-                    ref.watch(fetchMemById(_memId)),
-                    (value) => _buildMemItemViews(_memId),
-                  )
-                ],
-              );
-            },
+                return Column(
+                  children: [
+                    MemNameTextFormField(
+                      editingMem.name,
+                      editingMem.id,
+                      (value) => ref
+                          .read(editingMemProvider(_memId).notifier)
+                          .updatedBy(editingMem..name = value),
+                    ),
+                    AsyncValueView(
+                      ref.watch(fetchMemById(_memId)),
+                      (value) => _buildMemItemViews(_memId),
+                    )
+                  ],
+                );
+              },
+            ),
           );
         },
       );
