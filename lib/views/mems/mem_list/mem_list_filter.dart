@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/views/dimens.dart';
-import 'package:mem/views/mem_list/mem_list_page_states.dart';
+import 'package:mem/views/mems/mem_list/mem_list_page_states.dart';
 
 const height = 250.0;
 

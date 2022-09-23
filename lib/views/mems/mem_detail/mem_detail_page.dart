@@ -6,9 +6,9 @@ import 'package:mem/views/atoms/async_value_view.dart';
 import 'package:mem/views/colors.dart';
 import 'package:mem/views/dimens.dart';
 import 'package:mem/views/constants.dart';
-import 'package:mem/views/mem_detail/mem_detail_body.dart';
-import 'package:mem/views/mem_detail/mem_detail_menu.dart';
-import 'package:mem/views/mem_detail/mem_detail_states.dart';
+import 'package:mem/views/mems/mem_detail/mem_detail_body.dart';
+import 'package:mem/views/mems/mem_detail/mem_detail_menu.dart';
+import 'package:mem/views/mems/mem_detail/mem_detail_states.dart';
 
 class MemDetailPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();

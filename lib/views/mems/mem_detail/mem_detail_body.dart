@@ -5,9 +5,9 @@ import 'package:mem/logger.dart';
 import 'package:mem/repositories/mem_item_repository.dart'; // TODO repositoriesへの依存を排除する
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/atoms/async_value_view.dart';
-import 'package:mem/views/mem_detail/mem_detail_states.dart';
-import 'package:mem/views/mem_done_checkbox.dart';
-import 'package:mem/views/mem_name.dart';
+import 'package:mem/views/mems/mem_done_checkbox.dart';
+import 'package:mem/views/mems/mem_name.dart';
+import 'package:mem/views/mems/mem_detail/mem_detail_states.dart';
 
 class MemDetailBody extends StatelessWidget {
   final int? _memId;

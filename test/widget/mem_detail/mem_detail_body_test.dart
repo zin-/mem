@@ -6,8 +6,8 @@ import 'package:mem/logger.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/atoms/state_notifier.dart';
-import 'package:mem/views/mem_detail/mem_detail_body.dart';
-import 'package:mem/views/mem_detail/mem_detail_states.dart';
+import 'package:mem/views/mems/mem_detail/mem_detail_body.dart';
+import 'package:mem/views/mems/mem_detail/mem_detail_states.dart';
 import 'package:mockito/mockito.dart';
 
 import '../../minimum.dart';
