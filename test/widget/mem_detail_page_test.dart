@@ -10,6 +10,7 @@ import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/mem_detail/mem_detail_page.dart';
 import 'package:mem/views/constants.dart';
 
+import '../minimum.dart';
 import '../mocks.mocks.dart';
 
 void main() {
@@ -27,7 +28,7 @@ void main() {
 
   group('Show', () {
     testWidgets(
-      ': not found.',
+      ': not found Mem.',
       (widgetTester) async {
         const memId = 1;
 
@@ -47,22 +48,13 @@ void main() {
     );
 
     testWidgets(
-      ': found.',
+      ': found Mem.',
       (widgetTester) async {
-        final savedMemEntity = MemEntity(
-          name: 'saved mem entity',
-          id: 1,
-          createdAt: DateTime.now(),
-        );
+        final savedMemEntity = minSavedMemEntity(1);
         when(mockedMemRepository.shipById(savedMemEntity.id))
             .thenAnswer((realInvocation) async => savedMemEntity);
-        final savedMemoMemItemEntity = MemItemEntity(
-          memId: savedMemEntity.id,
-          type: MemItemType.memo,
-          value: 'saved memo mem item entity',
-          id: 1,
-          createdAt: DateTime.now(),
-        );
+        final savedMemoMemItemEntity =
+            minSavedMemoMemItemEntity(savedMemEntity.id, 1);
         when(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).thenAnswer(
             (realInvocation) => Future.value([savedMemoMemItemEntity]));
 
@@ -82,29 +74,46 @@ void main() {
       },
       tags: 'Small',
     );
+
+    testWidgets(
+      ': found archived Mem.',
+      (widgetTester) async {
+        final archivedMemEntity = minSavedMemEntity(1)
+          ..archivedAt = DateTime.now();
+
+        when(mockedMemRepository.shipById(any))
+            .thenAnswer((realInvocation) async => archivedMemEntity);
+
+        await pumpMemDetailPage(widgetTester, archivedMemEntity.id);
+        await widgetTester.pumpAndSettle();
+
+        expect(find.text(archivedMemEntity.name), findsOneWidget);
+
+        verify(mockedMemRepository.shipById(archivedMemEntity.id)).called(1);
+      },
+      tags: 'Small',
+    );
+
+    testWidgets(
+      ': found unarchived Mem with archived MemItems.',
+      (widgetTester) async {
+        final savedMemEntity = minSavedMemEntity(1);
+        when(mockedMemRepository.shipById(savedMemEntity.id))
+            .thenAnswer((realInvocation) async => savedMemEntity);
+        final archivedMemoMemItemEntity =
+            minSavedMemoMemItemEntity(savedMemEntity.id, 1)
+              ..archivedAt = DateTime.now();
+        when(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).thenAnswer(
+            (realInvocation) => Future.value([archivedMemoMemItemEntity]));
+
+        await pumpMemDetailPage(widgetTester, savedMemEntity.id);
+        await widgetTester.pumpAndSettle();
+
+        expect(find.text(archivedMemoMemItemEntity.value), findsOneWidget);
+      },
+      tags: 'Small',
+    );
   });
-
-  testWidgets(
-    ': archived.',
-    (widgetTester) async {
-      const memId = 1;
-      const memName = 'test mem name';
-
-      when(mockedMemRepository.shipById(any))
-          .thenAnswer((realInvocation) async => MemEntity(
-                id: memId,
-                name: memName,
-                createdAt: DateTime.now(),
-                archivedAt: DateTime.now(),
-              ));
-
-      await pumpMemDetailPage(widgetTester, memId);
-      await widgetTester.pump();
-
-      verify(mockedMemRepository.shipById(memId)).called(1);
-    },
-    tags: 'Small',
-  );
 
   group('Edit', () {
     testWidgets(
@@ -185,11 +194,7 @@ void main() {
           final value = realInvocation.positionalArguments[0] as MemEntity;
           expect(value.name, enteringMemName);
 
-          return MemEntity(
-            id: memId,
-            name: value.name,
-            createdAt: DateTime.now(),
-          );
+          return minSavedMemEntity(memId)..name = value.name;
         });
         when(mockedMemItemRepository.receive(any))
             .thenAnswer((realInvocation) async {
@@ -198,13 +203,9 @@ void main() {
           expect(value.type, MemItemType.memo);
           expect(value.value, enteringMemMemo);
 
-          return MemItemEntity(
-            id: 1,
-            memId: memId,
-            type: MemItemType.memo,
-            value: enteringMemMemo,
-            createdAt: DateTime.now(),
-          );
+          return minSavedMemoMemItemEntity(memId, 1)
+            ..type = value.type
+            ..value = value.value;
         });
 
         await pumpMemDetailPage(widgetTester, null);
@@ -225,32 +226,16 @@ void main() {
     testWidgets(
       ': update.',
       (widgetTester) async {
-        const memId = 1;
-        const memName = 'test mem name';
-        when(mockedMemRepository.shipById(any))
-            .thenAnswer((realInvocation) async => MemEntity(
-                  name: memName,
-                  id: memId,
-                  createdAt: DateTime.now(),
-                ));
-        const memItemId = 1;
-        const memMemo = 'test mem memo';
+        final savedMemEntity = minSavedMemEntity(1);
+        when(mockedMemRepository.shipById(savedMemEntity.id))
+            .thenAnswer((realInvocation) async => savedMemEntity);
+        final savedMemoMemItemEntity =
+            minSavedMemoMemItemEntity(savedMemEntity.id, 1);
         when(mockedMemItemRepository.shipByMemId(any))
-            .thenAnswer((realInvocation) async => [
-                  MemItemEntity(
-                    memId: memId,
-                    type: MemItemType.memo,
-                    value: memMemo,
-                    id: memItemId,
-                    createdAt: DateTime.now(),
-                  )
-                ]);
+            .thenAnswer((realInvocation) async => [savedMemoMemItemEntity]);
 
-        await pumpMemDetailPage(widgetTester, memId);
+        await pumpMemDetailPage(widgetTester, savedMemEntity.id);
         await widgetTester.pump();
-
-        verify(mockedMemRepository.shipById(memId)).called(1);
-        verify(mockedMemItemRepository.shipByMemId(memId)).called(1);
 
         const enteringMemName = 'entering mem name';
         const enteringMemMemo = 'entering mem memo';
@@ -263,11 +248,11 @@ void main() {
         when(mockedMemRepository.update(any))
             .thenAnswer((realInvocation) async {
           final memEntity = realInvocation.positionalArguments[0] as MemEntity;
-          expect(memEntity.id, memId);
+          expect(memEntity.id, minMemEntity.id);
           expect(memEntity.name, enteringMemName);
-          expect(memEntity.createdAt, isNotNull);
-          expect(memEntity.updatedAt, isNull);
-          expect(memEntity.archivedAt, isNull);
+          expect(memEntity.createdAt, minMemEntity.createdAt);
+          expect(memEntity.updatedAt, minMemEntity.updatedAt);
+          expect(memEntity.archivedAt, minMemEntity.archivedAt);
 
           return memEntity..updatedAt = DateTime.now();
         });
@@ -275,12 +260,12 @@ void main() {
             .thenAnswer((realInvocation) async {
           final memItemEntity =
               realInvocation.positionalArguments[0] as MemItemEntity;
-          expect(memItemEntity.memId, memId);
-          expect(memItemEntity.type, MemItemType.memo);
+          expect(memItemEntity.memId, savedMemoMemItemEntity.memId);
+          expect(memItemEntity.type, savedMemoMemItemEntity.type);
           expect(memItemEntity.value, enteringMemMemo);
-          expect(memItemEntity.createdAt, isNotNull);
-          expect(memItemEntity.updatedAt, isNull);
-          expect(memItemEntity.archivedAt, isNull);
+          expect(memItemEntity.createdAt, savedMemoMemItemEntity.createdAt);
+          expect(memItemEntity.updatedAt, savedMemoMemItemEntity.updatedAt);
+          expect(memItemEntity.archivedAt, savedMemoMemItemEntity.archivedAt);
 
           return memItemEntity..updatedAt = DateTime.now();
         });

@@ -195,40 +195,6 @@ void main() {
 
   group('Edge scenario', () {
     testWidgets(
-      'MemItem is archived',
-      (widgetTester) async {
-        const savedMemName = 'saved mem name';
-        final database = await DatabaseManager().open(app.databaseDefinition);
-        final memTable = database.getTable(memTableDefinition.name);
-        final savedMemId = await memTable.insert({
-          memNameColumnName: savedMemName,
-          createdAtColumnName: DateTime.now(),
-          archivedAtColumnName: null,
-        });
-        assert(savedMemId == 1);
-        final memItemTable = database.getTable(memItemTableDefinition.name);
-        const archivedMemMemo = 'archived mem memo';
-        await memItemTable.insert({
-          memIdColumnName: savedMemId,
-          memItemTypeColumnName: MemItemType.memo.name,
-          memItemValueColumnName: archivedMemMemo,
-          createdAtColumnName: DateTime.now(),
-          archivedAtColumnName: DateTime.now(),
-        });
-
-        await app.main();
-        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
-
-        await widgetTester.tap(find.text(savedMemName));
-        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
-
-        expect(find.text(savedMemName), findsOneWidget);
-        expect(find.text(archivedMemMemo), findsOneWidget);
-      },
-      tags: 'Medium',
-    );
-
-    testWidgets(
       'MemItem is nothing',
       (widgetTester) async {
         const savedMemName = 'saved mem name';
