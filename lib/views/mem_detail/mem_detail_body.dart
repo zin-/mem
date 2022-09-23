@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/repositories/mem_item_repository.dart'; // TODO repositoriesへの依存を排除する
+import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/atoms/async_value_view.dart';
 import 'package:mem/views/mem_detail/mem_detail_states.dart';
 import 'package:mem/views/mem_name.dart';
@@ -28,7 +29,18 @@ class MemDetailBody extends StatelessWidget {
                       editingMem.id,
                       (value) => ref
                           .read(editingMemProvider(_memId).notifier)
-                          .updatedBy(editingMem..name = value),
+                          .updatedBy(
+                            MemEntity.fromMap(editingMem.toMap())..name = value,
+                          ),
+                    ),
+                    Checkbox(
+                      value: editingMem.doneAt != null,
+                      onChanged: (value) => ref
+                          .read(editingMemProvider(_memId).notifier)
+                          .updatedBy(
+                            MemEntity.fromMap(editingMem.toMap())
+                              ..doneAt = value == true ? DateTime.now() : null,
+                          ),
                     ),
                     AsyncValueView(
                       ref.watch(fetchMemById(_memId)),

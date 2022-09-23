@@ -5,6 +5,8 @@ import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/atoms/state_notifier.dart';
 
+final initialMemEntity = MemEntity(name: '', doneAt: null, id: null);
+
 final memProvider = StateNotifierProvider.family<ValueStateNotifier<MemEntity?>,
     MemEntity?, int?>(
   (ref, memId) => v(
@@ -18,7 +20,7 @@ final editingMemProvider = StateNotifierProvider.family<
   (ref, memId) => v(
     {'memId': memId},
     () => ValueStateNotifier(
-      ref.watch(memProvider(memId)) ?? MemEntity(name: '', id: null),
+      ref.watch(memProvider(memId)) ?? initialMemEntity,
     ),
   ),
 );

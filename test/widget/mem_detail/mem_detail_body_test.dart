@@ -68,7 +68,9 @@ void main() {
     testWidgets(
       ': empty',
       (widgetTester) async {
-        final memEntity = minMemEntity..name = '';
+        final memEntity = minMemEntity
+          ..name = ''
+          ..doneAt = null;
 
         await pumpMemDetailBody(widgetTester, null, memEntity: memEntity);
 
@@ -78,6 +80,7 @@ void main() {
         await widgetTester.pumpAndSettle();
 
         expectMemNameOnMemDetail(widgetTester, memEntity.name);
+        expectMemDoneOnMemDetail(widgetTester, false);
         expectMemMemoOnMemDetail(widgetTester, '');
       },
       tags: 'Small',
@@ -86,7 +89,10 @@ void main() {
     testWidgets(
       ': saved',
       (widgetTester) async {
-        final savedMemEntity = minSavedMemEntity(1)..name = 'saved mem name';
+        final savedMemEntity = minSavedMemEntity(1)
+          ..name = 'saved mem name'
+          ..doneAt = DateTime.now();
+
         final savedMemoMemItemEntity =
             minSavedMemoMemItemEntity(savedMemEntity.id, 1);
         when(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).thenAnswer(
@@ -105,6 +111,7 @@ void main() {
         await widgetTester.pumpAndSettle();
 
         expectMemNameOnMemDetail(widgetTester, savedMemEntity.name);
+        expectMemDoneOnMemDetail(widgetTester, true);
         expectMemMemoOnMemDetail(widgetTester, savedMemoMemItemEntity.value);
       },
       tags: 'Small',
@@ -189,6 +196,24 @@ void main() {
     // );
 
     testWidgets(
+      ': done',
+      (widgetTester) async {
+        final memEntity = minMemEntity..doneAt = null;
+
+        await pumpMemDetailBody(widgetTester, null, memEntity: memEntity);
+        await widgetTester.pumpAndSettle();
+
+        expectMemDoneOnMemDetail(widgetTester, false);
+
+        await widgetTester.tap(memDoneCheckboxFinder);
+        await widgetTester.pump();
+
+        expectMemDoneOnMemDetail(widgetTester, true);
+      },
+      tags: 'Small',
+    );
+
+    testWidgets(
       ': memo',
       (widgetTester) async {
         await pumpMemDetailBody(widgetTester, null);
@@ -209,6 +234,7 @@ void main() {
 }
 
 final memNameTextFormFieldFinder = find.byType(TextFormField).at(0);
+final memDoneCheckboxFinder = find.byType(Checkbox);
 final memMemoTextFormFieldFinder = find.byType(TextFormField).at(1);
 
 TextFormField memNameTextFormField(WidgetTester widgetTester) =>
@@ -224,6 +250,15 @@ void expectMemNameOnMemDetail(
     expect(
       memNameTextFormField(widgetTester).initialValue,
       memName,
+    );
+
+void expectMemDoneOnMemDetail(
+  WidgetTester widgetTester,
+  bool memDone,
+) =>
+    expect(
+      (widgetTester.widget(memDoneCheckboxFinder) as Checkbox).value,
+      memDone,
     );
 
 void expectMemMemoOnMemDetail(
