@@ -24,10 +24,6 @@ class L10n {
 
   String requiredError() => _appLocalizations.requiredError;
 
-  String showNotArchivedLabel() => _appLocalizations.showNotArchivedLabel;
-
-  String showArchivedLabel() => _appLocalizations.showArchivedLabel;
-
   String archiveMemSuccessMessage(String memName) =>
       _appLocalizations.archiveMemSuccessMessage(memName);
 
@@ -46,6 +42,18 @@ class L10n {
 
   String removeMemSuccessMessage(String memName) =>
       _appLocalizations.removeMemSuccessMessage(memName);
+
+  String archiveFilterTitle() => _appLocalizations.archiveFilterTitle;
+
+  String showNotArchivedLabel() => _appLocalizations.showNotArchivedLabel;
+
+  String showArchivedLabel() => _appLocalizations.showArchivedLabel;
+
+  String doneFilterTitle() => _appLocalizations.doneFilterTitle;
+
+  String showNotDoneLabel() => _appLocalizations.showNotDoneLabel;
+
+  String showDoneLabel() => _appLocalizations.showDoneLabel;
 
   L10n._(this._appLocalizations);
 

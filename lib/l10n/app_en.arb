@@ -12,8 +12,6 @@
   },
   "required": "*Required",
   "requiredError": "Error: required",
-  "showNotArchivedLabel": "Show not archived",
-  "showArchivedLabel": "Show archived",
   "archiveMemSuccessMessage": "Archive success. {memName}",
   "@archiveMemSuccessMessage": {
     "placeholders": {
@@ -36,5 +34,11 @@
   },
   "undoAction": "Undo",
   "okAction": "OK",
-  "cancelAction": "Cancel"
+  "cancelAction": "Cancel",
+  "archiveFilterTitle": "Archive",
+  "showNotArchivedLabel": "Show not archived",
+  "showArchivedLabel": "Show archived",
+  "doneFilterTitle": "Done",
+  "showNotDoneLabel": "Show not done",
+  "showDoneLabel": "Show done"
 }

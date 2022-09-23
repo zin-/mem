@@ -19,6 +19,19 @@ final showArchivedProvider =
     () => ValueStateNotifier(false),
   ),
 );
+final showNotDoneProvider =
+    StateNotifierProvider<ValueStateNotifier<bool>, bool>(
+  (ref) => v(
+    {},
+    () => ValueStateNotifier(true),
+  ),
+);
+final showDoneProvider = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
+  (ref) => v(
+    {},
+    () => ValueStateNotifier(false),
+  ),
+);
 
 final fetchMemList = FutureProvider<List<MemEntity>>(
   (ref) => v(
@@ -26,6 +39,8 @@ final fetchMemList = FutureProvider<List<MemEntity>>(
     () async {
       final showNotArchived = ref.watch(showNotArchivedProvider);
       final showArchived = ref.watch(showArchivedProvider);
+      // final showNotDone = ref.watch(showNotDoneProvider);
+      // final showDone = ref.watch(showDoneProvider);
 
       final mems = await MemRepository().ship(
         archived: showNotArchived == showArchived ? null : showArchived,
@@ -74,6 +89,8 @@ final filteredMemListProvider =
 
       final showNotArchived = ref.watch(showNotArchivedProvider);
       final showArchived = ref.watch(showArchivedProvider);
+      // final showNotDone = ref.watch(showNotDoneProvider);
+      // final showDone = ref.watch(showDoneProvider);
 
       final filteredMemList = memList.where((item) {
         if (showNotArchived == showArchived) {
@@ -84,6 +101,14 @@ final filteredMemListProvider =
         } else {
           return showArchived;
         }
+        // if (showNotDone == showDone) {
+        //   return true;
+        // }
+        // if (item.doneAt == null) {
+        //   return showNotDone;
+        // } else {
+        //   return showDone;
+        // }
       }).toList();
 
       return ValueStateNotifier(filteredMemList);

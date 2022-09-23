@@ -14,25 +14,26 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  cupertino_icons: ^1.0.2
+  # for View
+  intl:
+  settings_ui:
 
-  # for Database
+  ## for View state management
+  flutter_riverpod:
+
+  # for Persistence
+  ## for Database
   sqflite:
   path:
   sqflite_common_ffi:
   path_provider:
   idb_shim:
 
-  # for View state management
-  flutter_riverpod:
+  ## for Logger
+  logger:
 
   # for basic operations
   collection:
-
-  # for Logger
-  logger:
-
-  intl:
 
 dev_dependencies:
   # for Test mock
