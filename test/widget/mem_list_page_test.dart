@@ -9,7 +9,7 @@ import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/mem_list/mem_list_page.dart';
 
 import '../mocks.mocks.dart';
-import 'mem_detail_page_test.dart';
+import 'mem_detail/mem_detail_page_test.dart';
 
 Future pumpMemListPage(WidgetTester widgetTester) async {
   await widgetTester.pumpWidget(

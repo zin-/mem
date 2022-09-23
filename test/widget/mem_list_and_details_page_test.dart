@@ -5,9 +5,9 @@ import 'package:mem/repositories/mem_repository.dart';
 import 'package:mockito/mockito.dart';
 
 import '../mocks.mocks.dart';
-import 'mem_detail_page_test.dart';
+import 'mem_detail/mem_detail_page_test.dart';
 import 'mem_list_page_test.dart';
-import 'mem_detail_menu_test.dart';
+import 'mem_detail/mem_detail_menu_test.dart';
 
 void main() {
   Logger(level: Level.verbose);

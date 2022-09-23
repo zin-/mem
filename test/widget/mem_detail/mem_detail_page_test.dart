@@ -10,8 +10,8 @@ import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/mem_detail/mem_detail_page.dart';
 import 'package:mem/views/constants.dart';
 
-import '../minimum.dart';
-import '../mocks.mocks.dart';
+import '../../minimum.dart';
+import '../../mocks.mocks.dart';
 
 void main() {
   Logger(level: Level.verbose);
