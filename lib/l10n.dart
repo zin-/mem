@@ -20,7 +20,9 @@ class L10n {
   String saveMemSuccessMessage(String memName) =>
       _appLocalizations.saveMemSuccessMessage(memName);
 
-  String memNameIsRequiredWarn() => _appLocalizations.memNameIsRequiredWarn;
+  String required() => _appLocalizations.required;
+
+  String requiredError() => _appLocalizations.requiredError;
 
   String showNotArchivedLabel() => _appLocalizations.showNotArchivedLabel;
 

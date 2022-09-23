@@ -26,9 +26,6 @@ class MemDetailBody extends StatelessWidget {
                   MemNameTextFormField(
                     editingMem.name,
                     editingMem.id,
-                    (value) => (value?.isEmpty ?? false)
-                        ? L10n().memNameIsRequiredWarn()
-                        : null,
                     (value) => ref
                         .read(editingMemProvider(_memId).notifier)
                         .updatedBy(editingMem..name = value),

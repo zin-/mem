@@ -2,7 +2,7 @@
   "appTitle": "Mem",
   "memListPageTitle": "List",
   "memDetailPageTitle": "Detail",
-  "memNameLabel": "Name *",
+  "memNameLabel": "Name",
   "memMemoLabel": "Memo",
   "saveMemSuccessMessage": "Save success. {memName}",
   "@saveMemSuccessMessage": {
@@ -10,7 +10,8 @@
       "memName": {}
     }
   },
-  "memNameIsRequiredWarn": "Name is required.",
+  "required": "*Required",
+  "requiredError": "Error: required",
   "showNotArchivedLabel": "Show not archived",
   "showArchivedLabel": "Show archived",
   "archiveMemSuccessMessage": "Archive success. {memName}",
