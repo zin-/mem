@@ -8,6 +8,7 @@ import 'package:mem/repositories/repository.dart';
 import 'package:mem/views/mems/mem_list/mem_list_page.dart';
 import 'package:mockito/mockito.dart';
 
+import '../../minimum.dart';
 import '../../mocks.mocks.dart';
 
 Future pumpMemListPage(WidgetTester widgetTester) async {
@@ -21,7 +22,6 @@ Future pumpMemListPage(WidgetTester widgetTester) async {
       ),
     ),
   );
-  await widgetTester.pumpAndSettle();
 }
 
 void main() {
@@ -30,7 +30,7 @@ void main() {
   final mockedMemRepository = MockMemRepository();
   MemRepository.withMock(mockedMemRepository);
 
-  tearDown(() => reset(mockedMemRepository));
+  tearDownAll(() => reset(mockedMemRepository));
 
   testWidgets(
     'Show saved mem list',
@@ -44,20 +44,23 @@ void main() {
         ),
       );
 
-      when(mockedMemRepository.ship(whereMap: anyNamed('whereMap')))
-          .thenAnswer(
+      when(mockedMemRepository.ship(whereMap: anyNamed('whereMap'))).thenAnswer(
         (realInvocation) => Future.value(mems),
       );
 
       await pumpMemListPage(widgetTester);
 
+      verify(mockedMemRepository.ship(whereMap: {
+        '$archivedAtColumnName IS NULL': null,
+        '$memDoneAtColumnName IS NULL': null,
+      })).called(1);
+
+      await widgetTester.pumpAndSettle();
+
       mems.asMap().forEach((index, mem) {
         expectMemNameTextOnListAt(widgetTester, index, mem.name);
       });
 
-      verify(mockedMemRepository.ship(whereMap: {
-        '$archivedAtColumnName IS NULL': null,
-      })).called(1);
       verifyNever(mockedMemRepository.shipById(any));
     },
     tags: 'Small',
@@ -65,29 +68,39 @@ void main() {
 
   group('Filter', () {
     testWidgets(
-      ': default.',
+      ': default',
       (widgetTester) async {
-        final notArchived = MemEntity(
-          id: 1,
-          name: 'not archived',
-          createdAt: DateTime.now(),
-          archivedAt: null,
-        );
-        final archived = MemEntity(
-          id: 1,
-          name: 'archived',
-          createdAt: DateTime.now(),
-          archivedAt: DateTime.now(),
-        );
+        final notArchived = minSavedMemEntity(1)
+          ..name = 'not archived'
+          ..archivedAt = null;
+        final archived = minSavedMemEntity(2)
+          ..name = 'archived'
+          ..archivedAt = DateTime.now();
+        final notDone = minSavedMemEntity(3)
+          ..name = 'not done'
+          ..doneAt = null;
+        final done = minSavedMemEntity(4)
+          ..name = 'done'
+          ..doneAt = DateTime.now();
+
         when(mockedMemRepository.ship(whereMap: anyNamed('whereMap')))
             .thenAnswer(
-          (realInvocation) => Future.value([notArchived]),
+          (realInvocation) => Future.value([notArchived, notDone]),
         );
 
         await pumpMemListPage(widgetTester);
 
+        verify(mockedMemRepository.ship(whereMap: {
+          '$archivedAtColumnName IS NULL': null,
+          '$memDoneAtColumnName IS NULL': null,
+        })).called(1);
+
+        await widgetTester.pumpAndSettle();
+
         expectMemNameTextOnListAt(widgetTester, 0, notArchived.name);
         expect(find.text(archived.name), findsNothing);
+        expectMemNameTextOnListAt(widgetTester, 1, notDone.name);
+        expect(find.text(done.name), findsNothing);
 
         await widgetTester.tap(memListFilterButton);
         await widgetTester.pump();
@@ -100,99 +113,86 @@ void main() {
           (widgetTester.widget(findShowArchiveSwitch) as Switch).value,
           false,
         );
-
-        verify(mockedMemRepository.ship(whereMap: {
-          '$archivedAtColumnName IS NULL': null,
-        })).called(1);
       },
       tags: 'Small',
     );
 
-    testWidgets(
-      ': onChanged.',
-      (widgetTester) async {
-        final notArchived = MemEntity(
-          id: 1,
-          name: 'not archived',
-          createdAt: DateTime.now(),
-          archivedAt: null,
-        );
-        final archived = MemEntity(
-          id: 2,
-          name: 'archived',
-          createdAt: DateTime.now(),
-          archivedAt: DateTime.now(),
-        );
-        final notArchived2 = MemEntity(
-          id: 3,
-          name: 'not archived 2',
-          createdAt: DateTime.now(),
-          archivedAt: null,
-        );
-        final archived2 = MemEntity(
-          id: 4,
-          name: 'archived 2',
-          createdAt: DateTime.now(),
-          archivedAt: DateTime.now().add(const Duration(microseconds: 1)),
-        );
-        final returns = <List<MemEntity>>[
-          [notArchived2],
-          [archived2],
-          [archived2, archived],
-          [notArchived2, archived2, notArchived, archived],
-        ];
-        when(mockedMemRepository.ship(whereMap: anyNamed('whereMap')))
-            .thenAnswer(
-          (realInvocation) => Future.value(returns.removeAt(0)),
-        );
+    group(': onChanged', () {
+      testWidgets(
+        ': archive',
+        (widgetTester) async {
+          final notArchived = minSavedMemEntity(1)
+            ..archivedAt = null
+            ..name = 'not archived';
+          final archived = minSavedMemEntity(2)
+            ..archivedAt = DateTime.now()
+            ..name = 'archived';
+          final notArchived2 = minSavedMemEntity(3)
+            ..archivedAt = null
+            ..name = 'not archived 2';
+          final archived2 = minSavedMemEntity(4)
+            ..archivedAt = DateTime.now().add(const Duration(microseconds: 1))
+            ..name = 'archived 2';
+          final returns = <List<MemEntity>>[
+            [notArchived2],
+            [archived2],
+            [archived2, archived],
+            [notArchived2, archived2, notArchived, archived],
+          ];
+          when(mockedMemRepository.ship(whereMap: anyNamed('whereMap')))
+              .thenAnswer(
+            (realInvocation) => Future.value(returns.removeAt(0)),
+          );
 
-        await pumpMemListPage(widgetTester);
+          await pumpMemListPage(widgetTester);
+          await widgetTester.pumpAndSettle();
 
-        // showNotArchived: true, showArchived: false
-        expect(widgetTester.widgetList(memListTileFinder).length, 1);
-        expectMemNameTextOnListAt(widgetTester, 0, notArchived2.name);
-        expect(find.text(notArchived.name), findsNothing);
-        expect(find.text(archived.name), findsNothing);
-        expect(find.text(archived2.name), findsNothing);
+          // showNotArchived: true, showArchived: false
+          expect(widgetTester.widgetList(memListTileFinder).length, 1);
+          expectMemNameTextOnListAt(widgetTester, 0, notArchived2.name);
+          expect(find.text(notArchived.name), findsNothing);
+          expect(find.text(archived.name), findsNothing);
+          expect(find.text(archived2.name), findsNothing);
 
-        await widgetTester.tap(memListFilterButton);
-        await widgetTester.pumpAndSettle();
+          await widgetTester.tap(memListFilterButton);
+          await widgetTester.pumpAndSettle();
 
-        // showNotArchived: false, showArchived: false
-        await widgetTester.tap(findShowNotArchiveSwitch);
-        await widgetTester.pumpAndSettle();
+          // showNotArchived: false, showArchived: false
+          await widgetTester.tap(findShowNotArchiveSwitch);
+          await widgetTester.pumpAndSettle();
 
-        expect(widgetTester.widgetList(memListTileFinder).length, 2);
-        expectMemNameTextOnListAt(widgetTester, 0, notArchived2.name);
-        expectMemNameTextOnListAt(widgetTester, 1, archived2.name);
-        expect(find.text(notArchived.name), findsNothing);
-        expect(find.text(archived.name), findsNothing);
+          expect(widgetTester.widgetList(memListTileFinder).length, 2);
+          expectMemNameTextOnListAt(widgetTester, 0, notArchived2.name);
+          expectMemNameTextOnListAt(widgetTester, 1, archived2.name);
+          expect(find.text(notArchived.name), findsNothing);
+          expect(find.text(archived.name), findsNothing);
 
-        // showNotArchived: false, showArchived: true
-        await widgetTester.tap(findShowArchiveSwitch);
-        await widgetTester.pumpAndSettle();
+          // showNotArchived: false, showArchived: true
+          await widgetTester.tap(findShowArchiveSwitch);
+          await widgetTester.pumpAndSettle();
 
-        expect(widgetTester.widgetList(memListTileFinder).length, 2);
-        expectMemNameTextOnListAt(widgetTester, 0, archived.name);
-        expectMemNameTextOnListAt(widgetTester, 1, archived2.name);
-        expect(find.text(notArchived.name), findsNothing);
-        expect(find.text(notArchived2.name), findsNothing);
+          expect(widgetTester.widgetList(memListTileFinder).length, 2);
+          expectMemNameTextOnListAt(widgetTester, 0, archived.name);
+          expectMemNameTextOnListAt(widgetTester, 1, archived2.name);
+          expect(find.text(notArchived.name), findsNothing);
+          expect(find.text(notArchived2.name), findsNothing);
 
-        // showNotArchived: true, showArchived: true
-        await widgetTester.tap(findShowNotArchiveSwitch);
-        await widgetTester.pumpAndSettle();
+          // showNotArchived: true, showArchived: true
+          await widgetTester.tap(findShowNotArchiveSwitch);
+          await widgetTester.pumpAndSettle();
 
-        expect(widgetTester.widgetList(memListTileFinder).length, 4);
-        expectMemNameTextOnListAt(widgetTester, 0, notArchived.name);
-        expectMemNameTextOnListAt(widgetTester, 1, notArchived2.name);
-        expectMemNameTextOnListAt(widgetTester, 2, archived.name);
-        expectMemNameTextOnListAt(widgetTester, 3, archived2.name);
+          expect(widgetTester.widgetList(memListTileFinder).length, 4);
+          expectMemNameTextOnListAt(widgetTester, 0, notArchived.name);
+          expectMemNameTextOnListAt(widgetTester, 1, notArchived2.name);
+          expectMemNameTextOnListAt(widgetTester, 2, archived.name);
+          expectMemNameTextOnListAt(widgetTester, 3, archived2.name);
 
-        verify(mockedMemRepository.ship(whereMap: anyNamed('whereMap')))
-            .called(4);
-      },
-      tags: 'Small',
-    );
+          verify(mockedMemRepository.ship(whereMap: anyNamed('whereMap')))
+              .called(4);
+        },
+        tags: 'Small',
+      );
+    });
   });
 
   testWidgets(
@@ -207,12 +207,12 @@ void main() {
         ),
       );
 
-      when(mockedMemRepository.ship(whereMap: anyNamed('whereMap')))
-          .thenAnswer(
+      when(mockedMemRepository.ship(whereMap: anyNamed('whereMap'))).thenAnswer(
         (realInvocation) => Future.value(mems),
       );
 
       await pumpMemListPage(widgetTester);
+      await widgetTester.pumpAndSettle();
 
       await widgetTester.dragUntilVisible(
         find.text('Test 10'),

@@ -44,7 +44,7 @@ void main() {
             expect(argument, memId);
 
             return StateNotifierProvider(
-                (ref) => ValueStateNotifier(memEntity ?? minMemEntity));
+                (ref) => ValueStateNotifier(memEntity ?? minMemEntity()));
           }),
           memItemsProvider.overrideWithProvider((argument) {
             expect(argument, memId);
@@ -68,7 +68,7 @@ void main() {
     testWidgets(
       ': empty',
       (widgetTester) async {
-        final memEntity = minMemEntity
+        final memEntity = minMemEntity()
           ..name = ''
           ..doneAt = null;
 
@@ -198,7 +198,7 @@ void main() {
     testWidgets(
       ': done',
       (widgetTester) async {
-        final memEntity = minMemEntity..doneAt = null;
+        final memEntity = minMemEntity()..doneAt = null;
 
         await pumpMemDetailBody(widgetTester, null, memEntity: memEntity);
         await widgetTester.pumpAndSettle();

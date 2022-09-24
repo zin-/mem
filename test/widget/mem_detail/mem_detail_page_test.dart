@@ -162,11 +162,12 @@ void main() {
         when(mockedMemRepository.update(any))
             .thenAnswer((realInvocation) async {
           final memEntity = realInvocation.positionalArguments[0] as MemEntity;
-          expect(memEntity.id, minMemEntity.id);
+
+          expect(memEntity.id, savedMemEntity.id);
           expect(memEntity.name, enteringMemName);
-          expect(memEntity.createdAt, minMemEntity.createdAt);
-          expect(memEntity.updatedAt, minMemEntity.updatedAt);
-          expect(memEntity.archivedAt, minMemEntity.archivedAt);
+          expect(memEntity.createdAt, savedMemEntity.createdAt);
+          expect(memEntity.updatedAt, savedMemEntity.updatedAt);
+          expect(memEntity.archivedAt, savedMemEntity.archivedAt);
 
           return memEntity..updatedAt = DateTime.now();
         });

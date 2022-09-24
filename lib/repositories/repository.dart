@@ -66,10 +66,12 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
       v(
         {'whereMap': whereMap},
         () async {
+          final where = whereMap?.keys.join(' AND ');
+          final whereArgs =
+              whereMap?.values.where((value) => value != null).toList();
           return (await _table.select(
-            where: whereMap?.keys.join(' AND '),
-            whereArgs:
-                whereMap?.values.where((value) => value != null).toList(),
+            where: where?.isEmpty == true ? null : where,
+            whereArgs: whereArgs?.isEmpty == true ? null : whereArgs,
           ))
               .map((e) => fromMap(e))
               .toList();
@@ -138,12 +140,11 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
   DatabaseTableRepository(this._table);
 }
 
-Map<String, String?>? buildNullableWhere(String columnName, bool? nullable) =>
-    v(
+Map<String, String?> buildNullableWhere(String columnName, bool? nullable) => v(
       {'columnName': columnName, 'nullable': nullable},
       () {
         if (nullable == null) {
-          return null;
+          return {};
         } else {
           final a =
               nullable ? '$columnName IS NOT NULL' : '$columnName IS NULL';

@@ -46,6 +46,7 @@ final fetchMemByIdV2 = FutureProvider.autoDispose.family<void, int>(
   ),
 );
 
+@Deprecated('use fetchMemByIdV2')
 final fetchMemById = FutureProvider.autoDispose.family<void, int?>(
   (ref, memId) => v(
     {'memId': memId},

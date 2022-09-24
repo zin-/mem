@@ -5,6 +5,7 @@ import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/repositories/repository.dart';
 import 'package:mockito/mockito.dart';
 
+import '../minimum.dart';
 import '../mocks.mocks.dart';
 import 'mem_detail/mem_detail_page_test.dart';
 import 'mem_list/mem_list_page_test.dart';
@@ -36,6 +37,7 @@ void main() {
       })).thenAnswer((realInvocation) => Future.value([]));
 
       await pumpMemListPage(widgetTester);
+      await widgetTester.pumpAndSettle();
 
       verify(mockedMemRepository.ship(whereMap: anyNamed('whereMap')))
           .called(1);
@@ -118,33 +120,29 @@ void main() {
   testWidgets(
     'Update mem',
     (widgetTester) async {
-      final savedMemEntity = MemEntity(
-        name: 'saved mem entity',
-        id: 1,
-        createdAt: DateTime.now(),
-      );
+      final savedMemEntity = minSavedMemEntity(1)..name = 'saved mem entity';
       when(mockedMemRepository.ship(whereMap: {
         '$archivedAtColumnName IS NULL': null,
+        '$memDoneAtColumnName IS NULL': null,
       })).thenAnswer((realInvocation) => Future.value([savedMemEntity]));
 
       await pumpMemListPage(widgetTester);
-
       verify(mockedMemRepository.ship(whereMap: anyNamed('whereMap')))
           .called(1);
 
-      final savedMemoMemItemEntity = MemItemEntity(
-        memId: savedMemEntity.id,
-        type: MemItemType.memo,
-        value: 'saved memo mem item entity',
-        id: 1,
-        createdAt: DateTime.now(),
-      );
+      await widgetTester.pumpAndSettle(const Duration(seconds: 1));
+
+      final savedMemoMemItemEntity = minSavedMemoMemItemEntity(
+        savedMemEntity.id,
+        1,
+      )
+        ..type = MemItemType.memo
+        ..value = 'saved memo mem item entity';
       when(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).thenAnswer(
           (realInvocation) => Future.value([savedMemoMemItemEntity]));
 
-      await widgetTester.tap(memListTileFinder.at(0));
+      await widgetTester.tap(find.text(savedMemEntity.name));
       await widgetTester.pumpAndSettle(const Duration(seconds: 1));
-
       verifyNever(mockedMemRepository.shipById(any));
       verify(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).called(1);
 
@@ -216,28 +214,25 @@ void main() {
   testWidgets(
     'Archive mem',
     (widgetTester) async {
-      final savedMemEntity = MemEntity(
-        name: 'saved mem entity',
-        id: 1,
-        createdAt: DateTime.now(),
-      );
+      final savedMemEntity = minSavedMemEntity(1)..name = 'saved mem entity';
       when(mockedMemRepository.ship(whereMap: {
         '$archivedAtColumnName IS NULL': null,
+        '$memDoneAtColumnName IS NULL': null,
       })).thenAnswer((realInvocation) => Future.value([savedMemEntity]));
 
       await pumpMemListPage(widgetTester);
+      await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      final savedMemoMemItemEntity = MemItemEntity(
-        memId: savedMemEntity.id,
-        type: MemItemType.memo,
-        value: 'saved memo mem item entity',
-        id: 1,
-        createdAt: DateTime.now(),
-      );
+      final savedMemoMemItemEntity =
+          minSavedMemoMemItemEntity(savedMemEntity.id, 1)
+            ..type = MemItemType.memo
+            ..value = 'saved memo mem item entity';
       when(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).thenAnswer(
           (realInvocation) => Future.value([savedMemoMemItemEntity]));
 
-      await widgetTester.tap(memListTileFinder.at(0));
+      await widgetTester.tap(find.text(savedMemEntity.name));
+      verify(mockedMemRepository.ship(whereMap: anyNamed('whereMap')))
+          .called(1);
       await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
       when(mockedMemRepository.archive(any)).thenAnswer((realInvocation) {
@@ -273,24 +268,19 @@ void main() {
   testWidgets(
     'Remove mem',
     (widgetTester) async {
-      final savedMemEntity = MemEntity(
-        name: 'saved mem entity',
-        id: 1,
-        createdAt: DateTime.now(),
-      );
+      final savedMemEntity = minSavedMemEntity(1)..name = 'saved mem entity';
       when(mockedMemRepository.ship(whereMap: {
         '$archivedAtColumnName IS NULL': null,
+        '$memDoneAtColumnName IS NULL': null,
       })).thenAnswer((realInvocation) => Future.value([savedMemEntity]));
 
       await pumpMemListPage(widgetTester);
+      await widgetTester.pumpAndSettle();
 
-      final savedMemoMemItemEntity = MemItemEntity(
-        memId: savedMemEntity.id,
-        type: MemItemType.memo,
-        value: 'saved memo mem item entity',
-        id: 1,
-        createdAt: DateTime.now(),
-      );
+      final savedMemoMemItemEntity =
+          minSavedMemoMemItemEntity(savedMemEntity.id, 1)
+            ..type = MemItemType.memo
+            ..value = 'saved memo mem item entity';
       when(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).thenAnswer(
           (realInvocation) => Future.value([savedMemoMemItemEntity]));
 

@@ -56,7 +56,7 @@ void main() {
 
       expect(arg1, savedMemEntity.id);
 
-      return Future.value(minSavedMemEntity(arg1));
+      return Future.value(savedMemEntity);
     });
 
     await pumpMemListItemView(widgetTester, savedMemEntity.id);
