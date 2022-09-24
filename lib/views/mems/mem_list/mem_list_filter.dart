@@ -13,10 +13,10 @@ class MemListFilter extends StatelessWidget {
   Widget build(BuildContext context) => t(
         {},
         () {
-          final sections = [
-            Consumer(
-              builder: (context, ref, child) {
-                return Column(
+          return Consumer(
+            builder: (context, ref, child) {
+              final sectionsV2 = [
+                Column(
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -51,14 +51,50 @@ class MemListFilter extends StatelessWidget {
                       ],
                     ),
                   ],
-                );
-              },
-            ),
-          ];
-          return ListView.builder(
-            itemCount: sections.length,
-            itemBuilder: (context, index) {
-              return sections[index];
+                ),
+                Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(L10n().doneFilterTitle()),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.check_box_outline_blank),
+                        Text(L10n().showNotDoneLabel()),
+                        Switch(
+                          value: ref.watch(showNotDoneProvider),
+                          onChanged: (value) => ref
+                              .read(showNotDoneProvider.notifier)
+                              .updatedBy(value),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.check_box),
+                        Text(L10n().showDoneLabel()),
+                        Switch(
+                          value: ref.watch(showDoneProvider),
+                          onChanged: (value) => ref
+                              .read(showDoneProvider.notifier)
+                              .updatedBy(value),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ];
+              return ListView.builder(
+                itemCount: sectionsV2.length,
+                itemBuilder: (context, index) {
+                  return sectionsV2[index];
+                },
+              );
             },
           );
         },

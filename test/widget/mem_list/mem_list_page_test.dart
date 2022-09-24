@@ -192,6 +192,81 @@ void main() {
         },
         tags: 'Small',
       );
+
+      testWidgets(
+        ': done',
+        (widgetTester) async {
+          final notDone = minSavedMemEntity(1)
+            ..doneAt = null
+            ..name = 'not done';
+          final done = minSavedMemEntity(2)
+            ..doneAt = DateTime.now()
+            ..name = 'done';
+          final notDone2 = minSavedMemEntity(3)
+            ..doneAt = null
+            ..name = 'not done 2';
+          final done2 = minSavedMemEntity(4)
+            ..doneAt = DateTime.now().add(const Duration(microseconds: 1))
+            ..name = 'done 2';
+          final returns = <List<MemEntity>>[
+            [notDone2],
+            [done2],
+            [done2, done],
+            [notDone2, done2, notDone, done],
+          ];
+          when(mockedMemRepository.ship(whereMap: anyNamed('whereMap')))
+              .thenAnswer(
+            (realInvocation) => Future.value(returns.removeAt(0)),
+          );
+
+          await pumpMemListPage(widgetTester);
+          await widgetTester.pumpAndSettle();
+
+          // showNotDone: true, showDone: false
+          expect(widgetTester.widgetList(memListTileFinder).length, 1);
+          expectMemNameTextOnListAt(widgetTester, 0, notDone2.name);
+          expect(find.text(notDone.name), findsNothing);
+          expect(find.text(done.name), findsNothing);
+          expect(find.text(done2.name), findsNothing);
+
+          await widgetTester.tap(memListFilterButton);
+          await widgetTester.pumpAndSettle();
+
+          // showNotDone: false, showDone: false
+          await widgetTester.tap(findShowNotDoneSwitch);
+          await widgetTester.pumpAndSettle();
+
+          expect(widgetTester.widgetList(memListTileFinder).length, 2);
+          expectMemNameTextOnListAt(widgetTester, 0, notDone2.name);
+          expectMemNameTextOnListAt(widgetTester, 1, done2.name);
+          expect(find.text(notDone.name), findsNothing);
+          expect(find.text(done.name), findsNothing);
+
+          // showNotDone: false, showDone: true
+          await widgetTester.tap(findShowDoneSwitch);
+          await widgetTester.pumpAndSettle();
+
+          expect(widgetTester.widgetList(memListTileFinder).length, 2);
+          expectMemNameTextOnListAt(widgetTester, 0, done.name);
+          expectMemNameTextOnListAt(widgetTester, 1, done2.name);
+          expect(find.text(notDone.name), findsNothing);
+          expect(find.text(notDone2.name), findsNothing);
+
+          // showNotDone: true, showDone: true
+          await widgetTester.tap(findShowNotDoneSwitch);
+          await widgetTester.pumpAndSettle();
+
+          expect(widgetTester.widgetList(memListTileFinder).length, 4);
+          expectMemNameTextOnListAt(widgetTester, 0, notDone.name);
+          expectMemNameTextOnListAt(widgetTester, 1, notDone2.name);
+          expectMemNameTextOnListAt(widgetTester, 2, done.name);
+          expectMemNameTextOnListAt(widgetTester, 3, done2.name);
+
+          verify(mockedMemRepository.ship(whereMap: anyNamed('whereMap')))
+              .called(4);
+        },
+        tags: 'Small',
+      );
     });
   });
 
@@ -264,6 +339,8 @@ void expectMemNameTextOnListAt(
 final memListFilterButton = find.byIcon(Icons.filter_list);
 final findShowNotArchiveSwitch = find.byType(Switch).at(0);
 final findShowArchiveSwitch = find.byType(Switch).at(1);
+final findShowNotDoneSwitch = find.byType(Switch).at(2);
+final findShowDoneSwitch = find.byType(Switch).at(3);
 
 Future closeMemListFilter(WidgetTester widgetTester) async {
   // FIXME なんか変な気がする

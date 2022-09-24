@@ -98,26 +98,22 @@ final filteredMemListProvider =
 
       final showNotArchived = ref.watch(showNotArchivedProvider);
       final showArchived = ref.watch(showArchivedProvider);
-      // final showNotDone = ref.watch(showNotDoneProvider);
-      // final showDone = ref.watch(showDoneProvider);
+      final showNotDone = ref.watch(showNotDoneProvider);
+      final showDone = ref.watch(showDoneProvider);
 
       final filteredMemList = memList.where((item) {
-        if (showNotArchived == showArchived) {
-          return true;
-        }
-        if (item.archivedAt == null) {
-          return showNotArchived;
-        } else {
-          return showArchived;
-        }
-        // if (showNotDone == showDone) {
-        //   return true;
-        // }
-        // if (item.doneAt == null) {
-        //   return showNotDone;
-        // } else {
-        //   return showDone;
-        // }
+        final archive = showNotArchived == showArchived
+            ? true
+            : item.archivedAt == null
+                ? showNotArchived
+                : showArchived;
+        final done = showNotDone == showDone
+            ? true
+            : item.doneAt == null
+                ? showNotDone
+                : showDone;
+
+        return archive && done;
       }).toList();
 
       return ValueStateNotifier(filteredMemList);
@@ -132,6 +128,16 @@ final sortedMemList =
       final filteredMemList = ref.watch(filteredMemListProvider);
 
       final sortedMemList = filteredMemList.sorted((item1, item2) {
+        if (item1.doneAt != item2.doneAt) {
+          if (item1.doneAt == null) {
+            return -1;
+          }
+          if (item2.doneAt == null) {
+            return 1;
+          }
+          return item1.doneAt!.compareTo(item2.doneAt!);
+        }
+
         if (item1.archivedAt != item2.archivedAt) {
           if (item1.archivedAt == null) {
             return -1;
