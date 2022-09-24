@@ -16,7 +16,6 @@ dependencies:
 
   # for View
   intl:
-  settings_ui:
 
   ## for View state management
   flutter_riverpod:
