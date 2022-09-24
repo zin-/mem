@@ -66,7 +66,9 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
       v(
         {'whereMap': whereMap},
         () async {
-          final where = whereMap?.keys.join(' AND ');
+          final where = whereMap?.entries
+              .map((e) => e.value == null ? e.key : '${e.key} = ?')
+              .join(' AND ');
           final whereArgs =
               whereMap?.values.where((value) => value != null).toList();
           return (await _table.select(
@@ -76,6 +78,7 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
               .map((e) => fromMap(e))
               .toList();
         },
+        debug: true,
       );
 
   Future<Entity> shipById(dynamic id) => v(
