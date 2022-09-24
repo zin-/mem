@@ -7,7 +7,6 @@ import 'package:mem/views/mems/mem_detail/mem_detail_page.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/database/database.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/constants.dart';
 
@@ -29,24 +28,6 @@ void main() {
   });
 
   group('Show', () {
-    testWidgets(
-      ': not found Mem',
-      (widgetTester) async {
-        const memId = 1;
-
-        when(mockedMemRepository.shipById(memId))
-            .thenThrow(NotFoundException('test target', 'test condition'));
-
-        await pumpMemDetailPage(widgetTester, memId);
-
-        verify(mockedMemRepository.shipById(memId)).called(1);
-
-        expect(find.byType(MemDetailBody), findsOneWidget);
-        expect(saveFabFinder, findsOneWidget);
-      },
-      tags: 'Small',
-    );
-
     testWidgets(
       ': found Mem',
       (widgetTester) async {

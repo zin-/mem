@@ -45,7 +45,7 @@ class MemDetailBody extends StatelessWidget {
                           ),
                     ),
                     AsyncValueView(
-                      ref.watch(fetchMemById(_memId)),
+                      ref.watch(fetchMemItemByMemIdV2(_memId)),
                       (value) => _buildMemItemViews(_memId),
                     )
                   ],

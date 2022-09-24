@@ -29,7 +29,7 @@ class MemDetailPage extends StatelessWidget {
 
             return mem == null
                 ? AsyncValueView(
-                    ref.watch(fetchMemById(_memId)),
+                    ref.watch(fetchMemByIdV2(_memId)),
                     (value) => _build(),
                   )
                 : _build();

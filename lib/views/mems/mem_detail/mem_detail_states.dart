@@ -33,11 +33,11 @@ final memItemsProvider = StateNotifierProvider.family<
   ),
 );
 
-final fetchMemByIdV2 = FutureProvider.autoDispose.family<void, int>(
+final fetchMemByIdV2 = FutureProvider.autoDispose.family<void, int?>(
   (ref, memId) => v(
     {'memId': memId},
     () async {
-      if (ref.read(memProvider(memId)) == null) {
+      if (memId != null && ref.read(memProvider(memId)) == null) {
         final mem = await MemRepository().shipById(memId);
 
         ref.read(memProvider(memId).notifier).updatedBy(mem);
@@ -46,24 +46,14 @@ final fetchMemByIdV2 = FutureProvider.autoDispose.family<void, int>(
   ),
 );
 
-@Deprecated('use fetchMemByIdV2')
-final fetchMemById = FutureProvider.autoDispose.family<void, int?>(
+final fetchMemItemByMemIdV2 = FutureProvider.autoDispose.family<void, int?>(
   (ref, memId) => v(
     {'memId': memId},
     () async {
-      try {
-        if (memId != null) {
-          if (ref.read(memProvider(memId)) == null) {
-            final mem = await MemRepository().shipById(memId);
-            ref.read(memProvider(memId).notifier).updatedBy(mem);
-          }
-          if (ref.read(memItemsProvider(memId)) == null) {
-            final memItems = await MemItemRepository().shipByMemId(memId);
-            ref.read(memItemsProvider(memId).notifier).updatedBy(memItems);
-          }
-        }
-      } catch (e) {
-        warn(e);
+      if (memId != null && ref.read(memItemsProvider(memId)) == null) {
+        final memItems = await MemItemRepository().shipByMemId(memId);
+
+        ref.read(memItemsProvider(memId).notifier).updatedBy(memItems);
       }
     },
   ),
