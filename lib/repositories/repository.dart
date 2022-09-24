@@ -85,6 +85,7 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
     }
   }
 
+  @Deprecated('use shipV2')
   Future<List<Entity>> ship({
     bool? archived,
     List<String>? whereColumns,
