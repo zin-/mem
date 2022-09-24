@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/repositories/mem_repository.dart';
+import 'package:mem/repositories/repository.dart';
 import 'package:mem/views/atoms/state_notifier.dart';
 import 'package:mem/views/mems/mem_detail/mem_detail_states.dart';
 
@@ -42,8 +43,11 @@ final fetchMemList = FutureProvider<List<MemEntity>>(
       // final showNotDone = ref.watch(showNotDoneProvider);
       // final showDone = ref.watch(showDoneProvider);
 
-      final mems = await MemRepository().ship(
-        archived: showNotArchived == showArchived ? null : showArchived,
+      final mems = await MemRepository().shipV2(
+        whereMap: buildNullableWhere(
+          archivedAtColumnName,
+          showNotArchived == showArchived ? null : showArchived,
+        ),
       );
 
       final memListNotifier = ref.read(memListProvider.notifier);

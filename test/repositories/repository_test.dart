@@ -89,7 +89,7 @@ void main() async {
         expect(shipped[1].toMap(), received2.toMap());
 
         final shipped2 = await testRepository.shipV2(
-          whereMap: testRepository.buildNullableWhere(
+          whereMap: buildNullableWhere(
             archivedAtColumnName,
             null,
           ),
@@ -114,7 +114,7 @@ void main() async {
         );
 
         final shipped = await testRepository.shipV2(
-          whereMap: testRepository.buildNullableWhere(
+          whereMap: buildNullableWhere(
             archivedAtColumnName,
             true,
           ),
@@ -137,68 +137,11 @@ void main() async {
         );
 
         final shipped = await testRepository.shipV2(
-          whereMap: testRepository.buildNullableWhere(
+          whereMap: buildNullableWhere(
             archivedAtColumnName,
             false,
           ),
         );
-
-        expect(shipped.length, 1);
-        expect(shipped[0].toMap(), received1.toMap());
-      },
-      tags: 'Medium',
-    );
-  });
-
-  group('ship', () {
-    test(
-      ': all',
-      () async {
-        final received1 = await testRepository.receive(
-          TestEntity(archivedAt: null),
-        );
-        final received2 = await testRepository.receive(
-          TestEntity(archivedAt: DateTime.now()),
-        );
-
-        final shipped = await testRepository.ship();
-
-        expect(shipped.length, 2);
-        expect(shipped[0].toMap(), received1.toMap());
-        expect(shipped[1].toMap(), received2.toMap());
-      },
-      tags: 'Medium',
-    );
-
-    test(
-      ': archived',
-      () async {
-        await testRepository.receive(
-          TestEntity(archivedAt: null),
-        );
-        final received2 = await testRepository.receive(
-          TestEntity(archivedAt: DateTime.now()),
-        );
-
-        final shipped = await testRepository.ship(archived: true);
-
-        expect(shipped.length, 1);
-        expect(shipped[0].toMap(), received2.toMap());
-      },
-      tags: 'Medium',
-    );
-
-    test(
-      ': not archived',
-      () async {
-        final received1 = await testRepository.receive(
-          TestEntity(archivedAt: null),
-        );
-        await testRepository.receive(
-          TestEntity(archivedAt: DateTime.now()),
-        );
-
-        final shipped = await testRepository.ship(archived: false);
 
         expect(shipped.length, 1);
         expect(shipped[0].toMap(), received1.toMap());

@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/repositories/mem_repository.dart';
+import 'package:mem/repositories/repository.dart';
 import 'package:mem/views/mems/mem_list/mem_list_page.dart';
 import 'package:mockito/mockito.dart';
 
@@ -43,8 +44,9 @@ void main() {
         ),
       );
 
-      when(mockedMemRepository.ship(archived: anyNamed('archived'))).thenAnswer(
-        (realInvocation) async => mems,
+      when(mockedMemRepository.shipV2(whereMap: anyNamed('whereMap')))
+          .thenAnswer(
+        (realInvocation) => Future.value(mems),
       );
 
       await pumpMemListPage(widgetTester);
@@ -53,10 +55,9 @@ void main() {
         expectMemNameTextOnListAt(widgetTester, index, mem.name);
       });
 
-      await widgetTester.tap(memListTileFinder.at(0));
-      await widgetTester.pump();
-
-      verify(mockedMemRepository.ship(archived: false)).called(1);
+      verify(mockedMemRepository.shipV2(whereMap: {
+        '$archivedAtColumnName IS NULL': null,
+      })).called(1);
       verifyNever(mockedMemRepository.shipById(any));
     },
     tags: 'Small',
@@ -78,9 +79,9 @@ void main() {
           createdAt: DateTime.now(),
           archivedAt: DateTime.now(),
         );
-        when(mockedMemRepository.ship(archived: anyNamed('archived')))
+        when(mockedMemRepository.shipV2(whereMap: anyNamed('whereMap')))
             .thenAnswer(
-          (realInvocation) async => [notArchived],
+          (realInvocation) => Future.value([notArchived]),
         );
 
         await pumpMemListPage(widgetTester);
@@ -100,7 +101,9 @@ void main() {
           false,
         );
 
-        verify(mockedMemRepository.ship(archived: false)).called(1);
+        verify(mockedMemRepository.shipV2(whereMap: {
+          '$archivedAtColumnName IS NULL': null,
+        })).called(1);
       },
       tags: 'Small',
     );
@@ -138,9 +141,9 @@ void main() {
           [archived2, archived],
           [notArchived2, archived2, notArchived, archived],
         ];
-        when(mockedMemRepository.ship(archived: anyNamed('archived')))
+        when(mockedMemRepository.shipV2(whereMap: anyNamed('whereMap')))
             .thenAnswer(
-          (realInvocation) async => returns.removeAt(0),
+          (realInvocation) => Future.value(returns.removeAt(0)),
         );
 
         await pumpMemListPage(widgetTester);
@@ -185,7 +188,7 @@ void main() {
         expectMemNameTextOnListAt(widgetTester, 2, archived.name);
         expectMemNameTextOnListAt(widgetTester, 3, archived2.name);
 
-        verify(mockedMemRepository.ship(archived: anyNamed('archived')))
+        verify(mockedMemRepository.shipV2(whereMap: anyNamed('whereMap')))
             .called(4);
       },
       tags: 'Small',
@@ -204,8 +207,9 @@ void main() {
         ),
       );
 
-      when(mockedMemRepository.ship(archived: anyNamed('archived'))).thenAnswer(
-        (realInvocation) async => mems,
+      when(mockedMemRepository.shipV2(whereMap: anyNamed('whereMap')))
+          .thenAnswer(
+        (realInvocation) => Future.value(mems),
       );
 
       await pumpMemListPage(widgetTester);

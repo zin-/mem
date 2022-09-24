@@ -57,42 +57,31 @@ class MemItemEntity extends DatabaseTableEntity {
 class MemItemRepository extends DatabaseTableRepository<MemItemEntity> {
   Future<List<MemItemEntity>> shipByMemId(int memId) => v(
         {'memId': memId},
-        () => ship(
-          archived: null,
-          whereColumns: [memIdColumnName],
-          whereArgs: [memId],
+        () => shipV2(
+          whereMap: {memIdColumnName: memId},
         ),
       );
 
   Future<List<MemItemEntity>> archiveByMemId(int memId) => v(
         {'memId': memId},
         () async {
-          return await Future.wait((await ship(
-            whereColumns: [memIdColumnName],
-            whereArgs: [memId],
-          ))
-              .map((target) => archive(target)));
+          return await Future.wait(
+              (await shipByMemId(memId)).map((target) => archive(target)));
         },
       );
 
   Future<List<MemItemEntity>> unarchiveByMemId(int memId) => v(
         {'memId': memId},
         () async {
-          return await Future.wait((await ship(
-            whereColumns: [memIdColumnName],
-            whereArgs: [memId],
-          ))
-              .map((target) => unarchive(target)));
+          return await Future.wait(
+              (await shipByMemId(memId)).map((target) => unarchive(target)));
         },
       );
 
   Future<List<bool>> discardByMemId(int memId) => v(
         {'memId': memId},
         () async {
-          return await Future.wait((await ship(
-            whereColumns: [memIdColumnName],
-            whereArgs: [memId],
-          ))
+          return await Future.wait((await shipByMemId(memId))
               .map((discarding) => discardById(discarding.id)));
         },
       );
