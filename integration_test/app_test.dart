@@ -30,7 +30,7 @@ void main() {
         await app.main();
         await widgetTester.pumpAndSettle(defaultDuration);
 
-        await widgetTester.tap(showNewMemFabFinder);
+        await widgetTester.tap(find.byIcon(Icons.add));
         await widgetTester.pumpAndSettle(defaultDuration);
 
         const enteringMemName = 'entering mem name';
@@ -174,11 +174,16 @@ void main() {
         await widgetTester.tap(find.text(savedMemName));
         await widgetTester.pumpAndSettle(defaultDuration);
 
-        await widgetTester.tap(memDetailMenuButtonFinder);
+        await widgetTester.tap(
+          find.descendant(
+            of: find.byType(AppBar),
+            matching: find.byIcon(Icons.more_vert),
+          ),
+        );
         await widgetTester.pumpAndSettle(defaultDuration);
-        await widgetTester.tap(removeButtonFinder);
+        await widgetTester.tap(find.byIcon(Icons.delete));
         await widgetTester.pumpAndSettle(defaultDuration);
-        await widgetTester.tap(okButtonFinder);
+        await widgetTester.tap(find.text('OK'));
         await widgetTester.pumpAndSettle(defaultDuration);
 
         expect(find.text(savedMemName), findsNothing);
@@ -222,31 +227,6 @@ void main() {
   });
 }
 
-final memListFinder = find.byType(CustomScrollView);
-final memListTileFinder = find.descendant(
-  of: memListFinder,
-  matching: find.byType(ListTile),
-);
-final showNewMemFabFinder = find.byType(FloatingActionButton);
-
-Finder findMemNameTextOnListAt(int index) => find.descendant(
-      of: memListTileFinder.at(index),
-      matching: find.byType(Text),
-    );
-
-Text getMemNameTextOnListAt(WidgetTester widgetTester, int index) =>
-    widgetTester.widget(findMemNameTextOnListAt(index)) as Text;
-
-void expectMemNameTextOnListAt(
-  WidgetTester widgetTester,
-  int index,
-  String memName,
-) =>
-    expect(
-      getMemNameTextOnListAt(widgetTester, index).data,
-      memName,
-    );
-
 final memListFilterButton = find.byIcon(Icons.filter_list);
 final findShowNotArchiveSwitch = find.byType(Switch).at(0);
 final findShowArchiveSwitch = find.byType(Switch).at(1);
@@ -259,38 +239,9 @@ Future closeMemListFilter(WidgetTester widgetTester) async {
 final memNameTextFormFieldFinder = find.byType(TextFormField).at(0);
 final memMemoTextFormFieldFinder = find.byType(TextFormField).at(1);
 final saveFabFinder = find.byIcon(Icons.save_alt).at(0);
-final appBarFinder = find.byType(AppBar);
 
 TextFormField memNameTextFormField(WidgetTester widgetTester) =>
     (widgetTester.widget(memNameTextFormFieldFinder) as TextFormField);
-
-void expectMemNameOnMemDetail(
-  WidgetTester widgetTester,
-  String memName,
-) =>
-    expect(
-      memNameTextFormField(widgetTester).initialValue,
-      memName,
-    );
-
-final memDetailMenuButtonFinder = find.descendant(
-  of: appBarFinder,
-  matching: find.byIcon(Icons.more_vert),
-);
-
-Future<void> showRemoveMemConfirmDialog(WidgetTester widgetTester) async {
-  await widgetTester.tap(memDetailMenuButtonFinder);
-  await widgetTester.pumpAndSettle(defaultDuration);
-
-  await widgetTester.tap(removeButtonFinder);
-  await widgetTester.pumpAndSettle(defaultDuration);
-}
-
-final removeButtonFinder = find.byIcon(Icons.delete);
-final removeConfirmationFinder = find.text('Can I remove this?');
-final undoButtonFinder = find.text('Undo');
-final cancelButtonFinder = find.text('Cancel');
-final okButtonFinder = find.text('OK');
 
 Future<void> prepareSavedData(
   String memName,
