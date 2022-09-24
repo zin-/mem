@@ -2,7 +2,7 @@
   "appTitle": "Mem",
   "memListPageTitle": "List",
   "memDetailPageTitle": "Detail",
-  "memNameLabel": "Name *",
+  "memNameLabel": "Name",
   "memMemoLabel": "Memo",
   "saveMemSuccessMessage": "Save success. {memName}",
   "@saveMemSuccessMessage": {
@@ -10,9 +10,8 @@
       "memName": {}
     }
   },
-  "memNameIsRequiredWarn": "Name is required.",
-  "showNotArchivedLabel": "Show not archived",
-  "showArchivedLabel": "Show archived",
+  "required": "*Required",
+  "requiredError": "Error: required",
   "archiveMemSuccessMessage": "Archive success. {memName}",
   "@archiveMemSuccessMessage": {
     "placeholders": {
@@ -35,5 +34,11 @@
   },
   "undoAction": "Undo",
   "okAction": "OK",
-  "cancelAction": "Cancel"
+  "cancelAction": "Cancel",
+  "archiveFilterTitle": "Archive",
+  "showNotArchivedLabel": "Show not archived",
+  "showArchivedLabel": "Show archived",
+  "doneFilterTitle": "Done",
+  "showNotDoneLabel": "Show not done",
+  "showDoneLabel": "Show done"
 }

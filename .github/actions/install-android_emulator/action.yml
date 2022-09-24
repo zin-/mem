@@ -1,5 +1,0 @@
-name: 'Install Android emulator with cache'
-runs:
-  using: 'composite'
-  steps:
-    - uses: malinskiy/action-android/install-sdk@release/0.1.3

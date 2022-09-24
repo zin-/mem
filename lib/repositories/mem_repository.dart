@@ -3,21 +3,25 @@ import 'package:mem/database/definitions.dart';
 import 'package:mem/repositories/repository.dart';
 
 const memNameColumnName = 'name';
+const memDoneAtColumnName = 'doneAt';
 
 final memTableDefinition = DefT(
   'mems',
   [
     DefPK(idColumnName, TypeC.integer, autoincrement: true),
     DefC(memNameColumnName, TypeC.text),
+    DefC(memDoneAtColumnName, TypeC.datetime, notNull: false),
     ...defaultColumnDefinitions
   ],
 );
 
 class MemEntity extends DatabaseTableEntity {
   String name;
+  DateTime? doneAt;
 
   MemEntity({
     required this.name,
+    this.doneAt,
     required int? id,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -32,11 +36,13 @@ class MemEntity extends DatabaseTableEntity {
   @override
   MemEntity.fromMap(Map<String, dynamic> valueMap)
       : name = valueMap[memNameColumnName],
+        doneAt = valueMap[memDoneAtColumnName],
         super.fromMap(valueMap);
 
   @override
   Map<String, dynamic> toMap() => {
         memNameColumnName: name,
+        memDoneAtColumnName: doneAt,
       }..addAll(super.toMap());
 }
 

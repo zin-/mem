@@ -30,7 +30,7 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>?> {
         () {
           final tmp = List.of(state ?? <T>[]);
 
-          final index = state?.indexWhere(where) ?? -1;
+          final index = tmp.indexWhere(where);
           if (index > -1) {
             tmp.replaceRange(index, index + 1, [item]);
             updatedBy(tmp);

@@ -6,7 +6,7 @@ import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/colors.dart';
 import 'package:mockito/mockito.dart';
 
-import '../mocks.mocks.dart';
+import '../../mocks.mocks.dart';
 import 'mem_detail_page_test.dart';
 
 void main() {

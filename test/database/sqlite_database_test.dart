@@ -46,37 +46,85 @@ void main() {
     await sqliteDatabase.delete();
   });
 
-  test(
-    'Migrate: upgrade: add table',
-    () async {
-      await sqliteDatabase.close();
+  group('Migrate: upgrade', () {
+    test(
+      ': add table',
+      () async {
+        await sqliteDatabase.close();
 
-      final addingTableDefinition = DefT(
-        'added_table',
-        [
-          DefPK(idColumnName, TypeC.integer, autoincrement: true),
-          DefC('test', TypeC.text),
-        ],
-      );
-      final upgradingDefD = DefD(
-        defD.name,
-        2,
-        [
-          ...defD.tableDefinitions,
-          addingTableDefinition,
-        ],
-      );
+        final addingTableDefinition = DefT(
+          'added_table',
+          [
+            DefPK(idColumnName, TypeC.integer, autoincrement: true),
+            DefC('test', TypeC.text),
+          ],
+        );
+        final upgradingDefD = DefD(
+          defD.name,
+          2,
+          [
+            ...defD.tableDefinitions,
+            addingTableDefinition,
+          ],
+        );
 
-      final upgraded = await SqliteDatabase(upgradingDefD).open();
+        final upgraded = await SqliteDatabase(upgradingDefD).open();
 
-      final addedTable = upgraded.getTable(addingTableDefinition.name);
-      expect(addedTable, isNotNull);
+        final addedTable = upgraded.getTable(addingTableDefinition.name);
+        expect(addedTable, isNotNull);
 
-      final insertedId = await addedTable.insert({'test': 'test'});
-      expect(insertedId, isNotNull);
-    },
-    tags: 'Medium',
-  );
+        final insertedId = await addedTable.insert({'test': 'test'});
+        expect(insertedId, isNotNull);
+      },
+      tags: 'Medium',
+    );
+
+    test(
+      ': add column',
+      () async {
+        final test = {
+          textFieldName: 'test text',
+          datetimeFieldName: DateTime.now(),
+        };
+
+        final insertedId =
+            await sqliteDatabase.getTable(testTable.name).insert(test);
+        final insertedChildrenId =
+            await sqliteDatabase.getTable(testChildTable.name).insert({
+          'tests_id': insertedId,
+        });
+        await sqliteDatabase.close();
+
+        final upgradingDefD = DefD(
+          defD.name,
+          2,
+          [
+            DefT(
+              testTable.name,
+              [
+                ...testTable.columns,
+                DefC('adding_column', TypeC.datetime, notNull: false),
+              ],
+            ),
+            testChildTable,
+          ],
+        );
+
+        final upgraded = await SqliteDatabase(upgradingDefD).open();
+
+        final tests = await upgraded.getTable(testTable.name).select();
+        expect(tests, [
+          {'id': insertedId, 'adding_column': null, ...test}
+        ]);
+        final testChildren =
+            await upgraded.getTable(testChildTable.name).select();
+        expect(testChildren, [
+          {'id': insertedChildrenId, 'tests_id': insertedId}
+        ]);
+      },
+      tags: 'Medium',
+    );
+  });
 
   group('Insert', () {
     test(

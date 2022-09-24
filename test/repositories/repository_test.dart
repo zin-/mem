@@ -65,13 +65,15 @@ void main() async {
       expect(result.createdAt, const TypeMatcher<DateTime>());
       expect(result.updatedAt, isNull);
       expect(result.archivedAt, isNull);
+
+      expect(result.isSaved(), true);
     },
     tags: 'Medium',
   );
 
   group('ship', () {
     test(
-      ': all',
+      'all',
       () async {
         final received1 = await testRepository.receive(
           TestEntity(archivedAt: null),
@@ -85,12 +87,24 @@ void main() async {
         expect(shipped.length, 2);
         expect(shipped[0].toMap(), received1.toMap());
         expect(shipped[1].toMap(), received2.toMap());
+
+        final shipped2 = await testRepository.ship(
+          whereMap: buildNullableWhere(
+            archivedAtColumnName,
+            null,
+          ),
+        );
+
+        expect(
+          shipped2.map((e) => e.toMap()).toString(),
+          shipped.map((e) => e.toMap()).toString(),
+        );
       },
       tags: 'Medium',
     );
 
     test(
-      ': archived',
+      'archived',
       () async {
         await testRepository.receive(
           TestEntity(archivedAt: null),
@@ -99,7 +113,12 @@ void main() async {
           TestEntity(archivedAt: DateTime.now()),
         );
 
-        final shipped = await testRepository.ship(archived: true);
+        final shipped = await testRepository.ship(
+          whereMap: buildNullableWhere(
+            archivedAtColumnName,
+            true,
+          ),
+        );
 
         expect(shipped.length, 1);
         expect(shipped[0].toMap(), received2.toMap());
@@ -108,7 +127,7 @@ void main() async {
     );
 
     test(
-      ': not archived',
+      'unarchived',
       () async {
         final received1 = await testRepository.receive(
           TestEntity(archivedAt: null),
@@ -117,7 +136,12 @@ void main() async {
           TestEntity(archivedAt: DateTime.now()),
         );
 
-        final shipped = await testRepository.ship(archived: false);
+        final shipped = await testRepository.ship(
+          whereMap: buildNullableWhere(
+            archivedAtColumnName,
+            false,
+          ),
+        );
 
         expect(shipped.length, 1);
         expect(shipped[0].toMap(), received1.toMap());
@@ -161,9 +185,9 @@ void main() async {
         TestEntity(),
       );
 
-      final updated = await testRepository.archive(received);
+      final archived = await testRepository.archive(received);
 
-      expect(updated.archivedAt, isNotNull);
+      expect(archived.isArchived(), true);
     },
     tags: 'Medium',
   );
@@ -175,9 +199,9 @@ void main() async {
         TestEntity(archivedAt: DateTime.now()),
       );
 
-      final updated = await testRepository.unarchive(received);
+      final unarchived = await testRepository.unarchive(received);
 
-      expect(updated.archivedAt, isNull);
+      expect(unarchived.isArchived(), false);
     },
     tags: 'Medium',
   );

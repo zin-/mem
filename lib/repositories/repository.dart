@@ -61,31 +61,19 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
       );
 
   Future<List<Entity>> ship({
-    bool? archived,
-    List<String>? whereColumns,
-    List<dynamic>? whereArgs,
+    Map<String, dynamic>? whereMap,
   }) =>
       v(
-        {
-          'archived': archived,
-          'whereColumns': whereColumns,
-          'whereArgs': whereArgs
-        },
+        {'whereMap': whereMap},
         () async {
-          final whereStrings = List.from(
-            (whereColumns ?? []).map((whereColumn) => '$whereColumn = ?'),
-            growable: true,
-          );
-          final whereArgStrings = List.from(whereArgs ?? [], growable: true);
-          if (archived != null) {
-            archived
-                ? whereStrings.add('archivedAt IS NOT NULL')
-                : whereStrings.add('archivedAt IS NULL');
-          }
-
+          final where = whereMap?.entries
+              .map((e) => e.value == null ? e.key : '${e.key} = ?')
+              .join(' AND ');
+          final whereArgs =
+              whereMap?.values.where((value) => value != null).toList();
           return (await _table.select(
-            where: whereStrings.isEmpty ? null : whereStrings.join(' AND '),
-            whereArgs: whereArgStrings.isEmpty ? null : whereArgs,
+            where: where?.isEmpty == true ? null : where,
+            whereArgs: whereArgs?.isEmpty == true ? null : whereArgs,
           ))
               .map((e) => fromMap(e))
               .toList();
@@ -153,3 +141,16 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
 
   DatabaseTableRepository(this._table);
 }
+
+Map<String, String?> buildNullableWhere(String columnName, bool? nullable) => v(
+      {'columnName': columnName, 'nullable': nullable},
+      () {
+        if (nullable == null) {
+          return {};
+        } else {
+          final a =
+              nullable ? '$columnName IS NOT NULL' : '$columnName IS NULL';
+          return {a: null};
+        }
+      },
+    );

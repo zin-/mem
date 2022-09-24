@@ -2,8 +2,9 @@ import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/repositories/mem_repository.dart';
-import 'package:mem/views/mem_detail/mem_detail_states.dart';
+import 'package:mem/repositories/repository.dart';
 import 'package:mem/views/atoms/state_notifier.dart';
+import 'package:mem/views/mems/mem_detail/mem_detail_states.dart';
 
 final showNotArchivedProvider =
     StateNotifierProvider<ValueStateNotifier<bool>, bool>(
@@ -19,6 +20,19 @@ final showArchivedProvider =
     () => ValueStateNotifier(false),
   ),
 );
+final showNotDoneProvider =
+    StateNotifierProvider<ValueStateNotifier<bool>, bool>(
+  (ref) => v(
+    {},
+    () => ValueStateNotifier(true),
+  ),
+);
+final showDoneProvider = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
+  (ref) => v(
+    {},
+    () => ValueStateNotifier(false),
+  ),
+);
 
 final fetchMemList = FutureProvider<List<MemEntity>>(
   (ref) => v(
@@ -26,9 +40,19 @@ final fetchMemList = FutureProvider<List<MemEntity>>(
     () async {
       final showNotArchived = ref.watch(showNotArchivedProvider);
       final showArchived = ref.watch(showArchivedProvider);
+      final showNotDone = ref.watch(showNotDoneProvider);
+      final showDone = ref.watch(showDoneProvider);
 
       final mems = await MemRepository().ship(
-        archived: showNotArchived == showArchived ? null : showArchived,
+        whereMap: {}
+          ..addAll(buildNullableWhere(
+            archivedAtColumnName,
+            showNotArchived == showArchived ? null : showArchived,
+          ))
+          ..addAll(buildNullableWhere(
+            memDoneAtColumnName,
+            showNotDone == showDone ? null : showDone,
+          )),
       );
 
       final memListNotifier = ref.read(memListProvider.notifier);
@@ -74,16 +98,22 @@ final filteredMemListProvider =
 
       final showNotArchived = ref.watch(showNotArchivedProvider);
       final showArchived = ref.watch(showArchivedProvider);
+      final showNotDone = ref.watch(showNotDoneProvider);
+      final showDone = ref.watch(showDoneProvider);
 
       final filteredMemList = memList.where((item) {
-        if (showNotArchived == showArchived) {
-          return true;
-        }
-        if (item.archivedAt == null) {
-          return showNotArchived;
-        } else {
-          return showArchived;
-        }
+        final archive = showNotArchived == showArchived
+            ? true
+            : item.archivedAt == null
+                ? showNotArchived
+                : showArchived;
+        final done = showNotDone == showDone
+            ? true
+            : item.doneAt == null
+                ? showNotDone
+                : showDone;
+
+        return archive && done;
       }).toList();
 
       return ValueStateNotifier(filteredMemList);
@@ -98,6 +128,16 @@ final sortedMemList =
       final filteredMemList = ref.watch(filteredMemListProvider);
 
       final sortedMemList = filteredMemList.sorted((item1, item2) {
+        if (item1.doneAt != item2.doneAt) {
+          if (item1.doneAt == null) {
+            return -1;
+          }
+          if (item2.doneAt == null) {
+            return 1;
+          }
+          return item1.doneAt!.compareTo(item2.doneAt!);
+        }
+
         if (item1.archivedAt != item2.archivedAt) {
           if (item1.archivedAt == null) {
             return -1;

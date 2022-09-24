@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/l10n.dart';
-
 import 'package:mem/logger.dart';
 import 'package:mem/views/constants.dart';
-import 'package:mem/views/mem_detail/mem_detail_states.dart';
+import 'package:mem/views/mems/mem_detail/mem_detail_states.dart';
 
 enum MenuOption { remove }
 
@@ -67,10 +66,11 @@ class MemDetailMenu extends StatelessWidget {
               icon: const Icon(Icons.archive),
               color: Colors.white,
               onPressed: () {
+                final scaffoldManager = ScaffoldMessenger.of(context);
                 ref.read(archiveMem(_memId)).then(
                   (archivedMemDetail) {
                     if (archivedMemDetail != null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      scaffoldManager.showSnackBar(
                         SnackBar(
                           content: Text(L10n().archiveMemSuccessMessage(
                             archivedMemDetail.memEntity.name,

@@ -3,28 +3,76 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/database/definitions.dart';
 
 void main() {
-  group('Column', () {
-    group('new', () {
+  group('Database', () {
+    group(': new', () {
       test(
-        'success.',
+        ': success.',
         () {
-          const columnName = 'test';
+          const dbName = 'test.db';
+          const dbVersion = 1;
+          const tableName = 'tests';
+          const pkName = 'test_pk';
+          final pk = PrimaryKeyDefinition(pkName, ColumnType.text);
+          final tableDefinitions = [
+            TableDefinition(tableName, [pk])
+          ];
 
-          final columnDefinition =
-              ColumnDefinition(columnName, ColumnType.text);
+          final databaseDefinition =
+              DatabaseDefinition(dbName, dbVersion, tableDefinitions);
 
-          expect(columnDefinition.toString(), contains(columnName));
+          expect(databaseDefinition.toString(), contains(dbName));
+          expect(databaseDefinition.toString(), contains(dbVersion.toString()));
+          expect(databaseDefinition.toString(), contains(tableName));
         },
         tags: 'Small',
       );
+
       test(
-        'empty name.',
+        ': empty name.',
         () {
           expect(
-            () => ColumnDefinition('', ColumnType.text),
+            () => DatabaseDefinition(
+              '',
+              1,
+              [],
+            ),
             throwsA((e) =>
                 e is DatabaseDefinitionException &&
-                e.toString() == 'Column name is required.'),
+                e.toString() == 'Database name is required.'),
+          );
+        },
+        tags: 'Small',
+      );
+
+      test(
+        ': contains space.',
+        () {
+          expect(
+            () => DatabaseDefinition(
+              'test database',
+              1,
+              [],
+            ),
+            throwsA((e) =>
+                e is DatabaseDefinitionException &&
+                e.toString() == 'Database name contains " ".'),
+          );
+        },
+        tags: 'Small',
+      );
+
+      test(
+        ': version is less than 1.',
+        () {
+          expect(
+            () => DatabaseDefinition(
+              'test.db',
+              0,
+              [],
+            ),
+            throwsA((e) =>
+                e is DatabaseDefinitionException &&
+                e.toString() == 'Minimum version is 1.'),
           );
         },
         tags: 'Small',
@@ -64,6 +112,22 @@ void main() {
             throwsA((e) =>
                 e is DatabaseDefinitionException &&
                 e.toString() == 'Table name is required.'),
+          );
+        },
+        tags: 'Small',
+      );
+
+      test(
+        ': contains space.',
+        () {
+          expect(
+            () => TableDefinition(
+              'test table',
+              [],
+            ),
+            throwsA((e) =>
+                e is DatabaseDefinitionException &&
+                e.toString() == 'Table name contains " ".'),
           );
         },
         tags: 'Small',
@@ -198,63 +262,50 @@ void main() {
     });
   });
 
-  group('Database', () {
-    group('new', () {
+  group('Column', () {
+    group(': new', () {
       test(
-        'success.',
+        ': success.',
         () {
-          const dbName = 'test.db';
-          const dbVersion = 1;
-          const tableName = 'tests';
-          const pkName = 'test_pk';
-          final pk = PrimaryKeyDefinition(pkName, ColumnType.text);
-          final tableDefinitions = [
-            TableDefinition(tableName, [pk])
-          ];
+          const columnName = 'test';
 
-          final databaseDefinition =
-              DatabaseDefinition(dbName, dbVersion, tableDefinitions);
+          final columnDefinition =
+              ColumnDefinition(columnName, ColumnType.text);
 
-          expect(databaseDefinition.toString(), contains(dbName));
-          expect(databaseDefinition.toString(), contains(dbVersion.toString()));
-          expect(databaseDefinition.toString(), contains(tableName));
+          expect(columnDefinition.toString(), contains(columnName));
+        },
+        tags: 'Small',
+      );
+
+      test(
+        ': empty name.',
+        () {
+          expect(
+            () => ColumnDefinition('', ColumnType.text),
+            throwsA(
+              (e) =>
+                  e is DatabaseDefinitionException &&
+                  e.toString() == 'Column name is required.',
+            ),
+          );
+        },
+        tags: 'Small',
+      );
+
+      test(
+        ': contains space.',
+        () {
+          expect(
+            () => ColumnDefinition('test column', ColumnType.text),
+            throwsA(
+              (e) =>
+                  e is DatabaseDefinitionException &&
+                  e.toString() == 'Column name contains " ".',
+            ),
+          );
         },
         tags: 'Small',
       );
     });
-
-    test(
-      'empty name.',
-      () {
-        expect(
-          () => DatabaseDefinition(
-            '',
-            1,
-            [],
-          ),
-          throwsA((e) =>
-              e is DatabaseDefinitionException &&
-              e.toString() == 'Database name is required.'),
-        );
-      },
-      tags: 'Small',
-    );
-
-    test(
-      'version is less than 1.',
-      () {
-        expect(
-          () => DatabaseDefinition(
-            'test.db',
-            0,
-            [],
-          ),
-          throwsA((e) =>
-              e is DatabaseDefinitionException &&
-              e.toString() == 'Minimum version is 1.'),
-        );
-      },
-      tags: 'Small',
-    );
   });
 }
