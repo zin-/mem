@@ -57,7 +57,7 @@ class MemItemEntity extends DatabaseTableEntity {
 class MemItemRepository extends DatabaseTableRepository<MemItemEntity> {
   Future<List<MemItemEntity>> shipByMemId(int memId) => v(
         {'memId': memId},
-        () => shipV2(
+        () => ship(
           whereMap: {memIdColumnName: memId},
         ),
       );

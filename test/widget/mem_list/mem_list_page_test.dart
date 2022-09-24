@@ -44,7 +44,7 @@ void main() {
         ),
       );
 
-      when(mockedMemRepository.shipV2(whereMap: anyNamed('whereMap')))
+      when(mockedMemRepository.ship(whereMap: anyNamed('whereMap')))
           .thenAnswer(
         (realInvocation) => Future.value(mems),
       );
@@ -55,7 +55,7 @@ void main() {
         expectMemNameTextOnListAt(widgetTester, index, mem.name);
       });
 
-      verify(mockedMemRepository.shipV2(whereMap: {
+      verify(mockedMemRepository.ship(whereMap: {
         '$archivedAtColumnName IS NULL': null,
       })).called(1);
       verifyNever(mockedMemRepository.shipById(any));
@@ -79,7 +79,7 @@ void main() {
           createdAt: DateTime.now(),
           archivedAt: DateTime.now(),
         );
-        when(mockedMemRepository.shipV2(whereMap: anyNamed('whereMap')))
+        when(mockedMemRepository.ship(whereMap: anyNamed('whereMap')))
             .thenAnswer(
           (realInvocation) => Future.value([notArchived]),
         );
@@ -101,7 +101,7 @@ void main() {
           false,
         );
 
-        verify(mockedMemRepository.shipV2(whereMap: {
+        verify(mockedMemRepository.ship(whereMap: {
           '$archivedAtColumnName IS NULL': null,
         })).called(1);
       },
@@ -141,7 +141,7 @@ void main() {
           [archived2, archived],
           [notArchived2, archived2, notArchived, archived],
         ];
-        when(mockedMemRepository.shipV2(whereMap: anyNamed('whereMap')))
+        when(mockedMemRepository.ship(whereMap: anyNamed('whereMap')))
             .thenAnswer(
           (realInvocation) => Future.value(returns.removeAt(0)),
         );
@@ -188,7 +188,7 @@ void main() {
         expectMemNameTextOnListAt(widgetTester, 2, archived.name);
         expectMemNameTextOnListAt(widgetTester, 3, archived2.name);
 
-        verify(mockedMemRepository.shipV2(whereMap: anyNamed('whereMap')))
+        verify(mockedMemRepository.ship(whereMap: anyNamed('whereMap')))
             .called(4);
       },
       tags: 'Small',
@@ -207,7 +207,7 @@ void main() {
         ),
       );
 
-      when(mockedMemRepository.shipV2(whereMap: anyNamed('whereMap')))
+      when(mockedMemRepository.ship(whereMap: anyNamed('whereMap')))
           .thenAnswer(
         (realInvocation) => Future.value(mems),
       );

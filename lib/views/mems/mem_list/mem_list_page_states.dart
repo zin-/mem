@@ -43,7 +43,7 @@ final fetchMemList = FutureProvider<List<MemEntity>>(
       // final showNotDone = ref.watch(showNotDoneProvider);
       // final showDone = ref.watch(showDoneProvider);
 
-      final mems = await MemRepository().shipV2(
+      final mems = await MemRepository().ship(
         whereMap: buildNullableWhere(
           archivedAtColumnName,
           showNotArchived == showArchived ? null : showArchived,

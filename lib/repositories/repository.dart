@@ -60,7 +60,7 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
         },
       );
 
-  Future<List<Entity>> shipV2({
+  Future<List<Entity>> ship({
     Map<String, dynamic>? whereMap,
   }) =>
       v(

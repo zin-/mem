@@ -71,7 +71,7 @@ void main() async {
     tags: 'Medium',
   );
 
-  group('shipV2', () {
+  group('ship', () {
     test(
       'all',
       () async {
@@ -82,13 +82,13 @@ void main() async {
           TestEntity(archivedAt: DateTime.now()),
         );
 
-        final shipped = await testRepository.shipV2();
+        final shipped = await testRepository.ship();
 
         expect(shipped.length, 2);
         expect(shipped[0].toMap(), received1.toMap());
         expect(shipped[1].toMap(), received2.toMap());
 
-        final shipped2 = await testRepository.shipV2(
+        final shipped2 = await testRepository.ship(
           whereMap: buildNullableWhere(
             archivedAtColumnName,
             null,
@@ -113,7 +113,7 @@ void main() async {
           TestEntity(archivedAt: DateTime.now()),
         );
 
-        final shipped = await testRepository.shipV2(
+        final shipped = await testRepository.ship(
           whereMap: buildNullableWhere(
             archivedAtColumnName,
             true,
@@ -136,7 +136,7 @@ void main() async {
           TestEntity(archivedAt: DateTime.now()),
         );
 
-        final shipped = await testRepository.shipV2(
+        final shipped = await testRepository.ship(
           whereMap: buildNullableWhere(
             archivedAtColumnName,
             false,
