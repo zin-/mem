@@ -48,36 +48,6 @@ void main() {
   tearDown(() => reset(mockedMemRepository));
 
   testWidgets('Show', (widgetTester) async {
-    final savedMemEntity = minSavedMemEntity(1)..name = 'saved mem entity name';
-
-    when(mockedMemRepository.shipById(savedMemEntity.id))
-        .thenAnswer((realInvocation) {
-      final arg1 = realInvocation.positionalArguments[0];
-
-      expect(arg1, savedMemEntity.id);
-
-      return Future.value(savedMemEntity);
-    });
-
-    await pumpMemListItemView(widgetTester, savedMemEntity.id);
-
-    verify(mockedMemRepository.shipById(savedMemEntity.id)).called(1);
-
-    await widgetTester.pump();
-
-    expect(
-      (widgetTester.widget(
-        find.descendant(
-          of: find.byType(ListTile),
-          matching: find.byType(Text),
-        ),
-      ) as Text)
-          .data,
-      savedMemEntity.name,
-    );
-  });
-
-  testWidgets('Done', (widgetTester) async {
     final savedMemEntity = minSavedMemEntity(1)
       ..name = 'saved mem entity name'
       ..doneAt = null;
