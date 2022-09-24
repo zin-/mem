@@ -65,6 +65,8 @@ void main() async {
       expect(result.createdAt, const TypeMatcher<DateTime>());
       expect(result.updatedAt, isNull);
       expect(result.archivedAt, isNull);
+
+      expect(result.isSaved(), true);
     },
     tags: 'Medium',
   );
@@ -102,7 +104,7 @@ void main() async {
     );
 
     test(
-      'archive',
+      'archived',
       () async {
         await testRepository.receive(
           TestEntity(archivedAt: null),
@@ -125,7 +127,7 @@ void main() async {
     );
 
     test(
-      'unarchive',
+      'unarchived',
       () async {
         final received1 = await testRepository.receive(
           TestEntity(archivedAt: null),
@@ -240,9 +242,9 @@ void main() async {
         TestEntity(),
       );
 
-      final updated = await testRepository.archive(received);
+      final archived = await testRepository.archive(received);
 
-      expect(updated.archivedAt, isNotNull);
+      expect(archived.isArchived(), true);
     },
     tags: 'Medium',
   );
@@ -254,9 +256,9 @@ void main() async {
         TestEntity(archivedAt: DateTime.now()),
       );
 
-      final updated = await testRepository.unarchive(received);
+      final unarchived = await testRepository.unarchive(received);
 
-      expect(updated.archivedAt, isNull);
+      expect(unarchived.isArchived(), false);
     },
     tags: 'Medium',
   );
