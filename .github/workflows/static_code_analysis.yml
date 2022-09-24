@@ -6,10 +6,7 @@ env:
 jobs:
   analyze-production_code:
     name: 'Analyze Production code'
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
       - name: 'Checkout code'
         uses: actions/checkout@v3
@@ -27,10 +24,7 @@ jobs:
 
   analyze-test_code:
     name: 'Analyze Test code'
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
       - name: 'Checkout code'
         uses: actions/checkout@v3
