@@ -17,31 +17,26 @@ class MemListItemView extends StatelessWidget {
         {'_memId': _memId},
         () => Consumer(
           builder: (context, ref, child) {
-            final mem = ref.watch(memProvider(_memId));
+            final mem = ref.watch(memProvider(_memId))!;
 
-            if (mem == null) {
-              ref.watch(fetchMemByIdV2(_memId));
-              return const SizedBox.shrink();
-            } else {
-              return ListTile(
-                leading: MemDoneCheckbox(
-                  mem.id,
-                  mem.doneAt != null,
-                  (value) {
-                    ref.read(memProvider(_memId).notifier).updatedBy(
-                        MemEntity.fromMap(mem.toMap())
-                          ..doneAt = value == true ? DateTime.now() : null);
-                    ref.read(updateMem(_memId));
-                  },
-                ),
-                title: MemNameText(mem.name, mem.id),
-                onTap: () => showMemDetailPage(
-                  context,
-                  ref,
-                  mem.id,
-                ),
-              );
-            }
+            return ListTile(
+              leading: MemDoneCheckbox(
+                mem.id,
+                mem.doneAt != null,
+                (value) {
+                  ref.read(memProvider(_memId).notifier).updatedBy(
+                      MemEntity.fromMap(mem.toMap())
+                        ..doneAt = value == true ? DateTime.now() : null);
+                  ref.read(updateMem(_memId));
+                },
+              ),
+              title: MemNameText(mem.name, mem.id),
+              onTap: () => showMemDetailPage(
+                context,
+                ref,
+                mem.id,
+              ),
+            );
           },
         ),
       );

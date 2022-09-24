@@ -23,7 +23,7 @@ void main() {
     await DatabaseManager().delete(app.databaseDefinition.name);
   });
 
-  group('Basic scenario', () {
+  group('Memo scenario', () {
     testWidgets(
       ': create',
       (widgetTester) async {
@@ -195,6 +195,33 @@ void main() {
         await closeMemListFilter(widgetTester);
 
         expect(find.text(savedMemName), findsNothing);
+      },
+      tags: 'Medium',
+    );
+  });
+
+  group('Todo scenario', () {
+    testWidgets(
+      ': done',
+      (widgetTester) async {
+        const savedMemName = 'saved mem name';
+        const savedMemMemo = 'saved mem memo';
+        await prepareSavedData(savedMemName, savedMemMemo);
+
+        await app.main();
+        await widgetTester.pumpAndSettle(defaultDuration);
+
+        await widgetTester.tap(find.byType(Checkbox));
+        await widgetTester.pumpAndSettle(defaultDuration);
+
+        expect(find.text(savedMemName), findsNothing);
+
+        await widgetTester.tap(memListFilterButton);
+        await widgetTester.pumpAndSettle(defaultDuration);
+        await widgetTester.tap(find.byType(Switch).at(3));
+        await closeMemListFilter(widgetTester);
+
+        expect(find.text(savedMemName), findsOneWidget);
       },
       tags: 'Medium',
     );
