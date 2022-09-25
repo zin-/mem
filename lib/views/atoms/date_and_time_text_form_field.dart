@@ -5,17 +5,15 @@ import 'package:mem/logger.dart';
 
 class DateAndTimeTextFormField extends StatelessWidget {
   final DateTime? _date;
-  final DateFormat? _dateFormat;
+  final DateFormat _dateFormat = DateFormat.yMd();
   final TimeOfDay? _timeOfDay;
 
-  const DateAndTimeTextFormField({
+  DateAndTimeTextFormField({
     required DateTime? date,
     required TimeOfDay? timeOfDay,
-    DateFormat? dateFormat,
     Key? key,
   })  : _date = date,
         _timeOfDay = timeOfDay,
-        _dateFormat = dateFormat,
         super(key: key);
 
   @override
@@ -30,12 +28,9 @@ class DateAndTimeTextFormField extends StatelessWidget {
                 child: TextFormField(
                   decoration: InputDecoration(
                     icon: const Icon(Icons.calendar_month),
-                    hintText: L10n().yyyyMMdd(),
+                    hintText: _dateFormat.pattern,
                   ),
-                  initialValue: _date == null
-                      ? ''
-                      : (_dateFormat ?? DateFormat(L10n().yyyyMMdd()))
-                          .format(_date!),
+                  initialValue: _date == null ? '' : _dateFormat.format(_date!),
                 ),
               ),
               allDay
@@ -45,7 +40,7 @@ class DateAndTimeTextFormField extends StatelessWidget {
                         decoration: InputDecoration(
                           hintText: L10n().yyyyMMdd(),
                         ),
-                        initialValue: _timeOfDay!.format(context),
+                        initialValue: _timeOfDay?.format(context),
                       ),
                     ),
               Switch(

@@ -67,11 +67,45 @@ void main() {
           widgetTester
               .widget<TextFormField>(find.byType(TextFormField))
               .initialValue,
-          DateFormat('yyyy/MM/dd').format(date),
+          DateFormat.yMd().format(date),
         );
         expect(
           widgetTester.widget<Switch>(find.byType(Switch)).value,
           true,
+        );
+      },
+      tags: 'Small',
+    );
+
+    testWidgets(
+      'With date and time of day',
+      (widgetTester) async {
+        final date = DateTime.now();
+        final timeOfDay = TimeOfDay.fromDateTime(date);
+
+        await pumpDateTimeTextField(widgetTester, date, timeOfDay);
+
+        expect(widgetTester.widgetList(find.byType(TextFormField)).length, 2);
+        expect(widgetTester.widgetList(find.byType(Switch)).length, 1);
+        expect(widgetTester.widgetList(find.byType(IconButton)).length, 1);
+
+        expect(
+          widgetTester
+              .widget<TextFormField>(find.byType(TextFormField).at(0))
+              .initialValue,
+          DateFormat.yMd().format(date),
+        );
+        final BuildContext context =
+            widgetTester.element(find.byType(DateAndTimeTextFormField));
+        expect(
+          widgetTester
+              .widget<TextFormField>(find.byType(TextFormField).at(1))
+              .initialValue,
+          timeOfDay.format(context),
+        );
+        expect(
+          widgetTester.widget<Switch>(find.byType(Switch)).value,
+          false,
         );
       },
       tags: 'Small',
