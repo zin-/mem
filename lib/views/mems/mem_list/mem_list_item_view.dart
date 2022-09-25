@@ -8,33 +8,31 @@ import 'package:mem/views/mems/mem_list/mem_list_page.dart';
 import 'package:mem/views/mems/mem_name.dart';
 
 class MemListItemView extends StatelessWidget {
-  final int _memId;
+  final MemEntity _memEntity;
 
-  const MemListItemView(this._memId, {Key? key}) : super(key: key);
+  const MemListItemView(this._memEntity, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => t(
-        {'_memId': _memId},
+        {'_memEntity': _memEntity},
         () => Consumer(
           builder: (context, ref, child) {
-            final mem = ref.watch(memProvider(_memId))!;
-
             return ListTile(
               leading: MemDoneCheckbox(
-                mem.id,
-                mem.doneAt != null,
+                _memEntity.id,
+                _memEntity.doneAt != null,
                 (value) {
-                  ref.read(memProvider(_memId).notifier).updatedBy(
-                      MemEntity.fromMap(mem.toMap())
+                  ref.read(memProvider(_memEntity.id).notifier).updatedBy(
+                      MemEntity.fromMap(_memEntity.toMap())
                         ..doneAt = value == true ? DateTime.now() : null);
-                  ref.read(updateMem(_memId));
+                  ref.read(updateMem(_memEntity.id));
                 },
               ),
-              title: MemNameText(mem.name, mem.id),
+              title: MemNameText(_memEntity.name, _memEntity.id),
               onTap: () => showMemDetailPage(
                 context,
                 ref,
-                mem.id,
+                _memEntity.id,
               ),
             );
           },

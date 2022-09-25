@@ -17,14 +17,13 @@ void main() {
 
   Future pumpMemListItemView(
     WidgetTester widgetTester,
-    int memId, {
-    MemEntity? memEntity,
-  }) async {
+    MemEntity memEntity,
+  ) async {
     await widgetTester.pumpWidget(
       ProviderScope(
         overrides: [
           memProvider.overrideWithProvider((argument) {
-            expect(argument, memId);
+            expect(argument, memEntity.id);
 
             return StateNotifierProvider(
                 (ref) => ValueStateNotifier(memEntity));
@@ -35,7 +34,7 @@ void main() {
           localizationsDelegates: L10n.localizationsDelegates,
           supportedLocales: L10n.supportedLocales,
           home: Scaffold(
-            body: MemListItemView(memId),
+            body: MemListItemView(memEntity),
           ),
         ),
       ),
@@ -54,8 +53,7 @@ void main() {
 
     await pumpMemListItemView(
       widgetTester,
-      savedMemEntity.id,
-      memEntity: savedMemEntity,
+      savedMemEntity,
     );
     await widgetTester.pump();
 
