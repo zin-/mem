@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/views/atoms/date_and_time_text_form_field.dart';
@@ -29,7 +30,7 @@ void main() {
 
   group('Show', () {
     testWidgets(
-      'No date and time',
+      'No date and time of day',
       (widgetTester) async {
         await pumpDateTimeTextField(widgetTester, null, null);
 
@@ -42,6 +43,31 @@ void main() {
               .widget<TextFormField>(find.byType(TextFormField))
               .initialValue,
           '',
+        );
+        expect(
+          widgetTester.widget<Switch>(find.byType(Switch)).value,
+          true,
+        );
+      },
+      tags: 'Small',
+    );
+
+    testWidgets(
+      'No time of day',
+      (widgetTester) async {
+        final date = DateTime.now();
+
+        await pumpDateTimeTextField(widgetTester, date, null);
+
+        expect(widgetTester.widgetList(find.byType(TextFormField)).length, 1);
+        expect(widgetTester.widgetList(find.byType(Switch)).length, 1);
+        expect(widgetTester.widgetList(find.byType(IconButton)).length, 1);
+
+        expect(
+          widgetTester
+              .widget<TextFormField>(find.byType(TextFormField))
+              .initialValue,
+          DateFormat('yyyy/MM/dd').format(date),
         );
         expect(
           widgetTester.widget<Switch>(find.byType(Switch)).value,
