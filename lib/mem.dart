@@ -1,6 +1,7 @@
 class Mem {
+  final int id;
   String name;
   DateTime? doneAt;
 
-  Mem(this.name, this.doneAt);
+  Mem(this.id, this.name, this.doneAt);
 }
