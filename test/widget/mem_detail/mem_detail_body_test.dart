@@ -43,8 +43,8 @@ void main() {
           editingMemProvider.overrideWithProvider((argument) {
             expect(argument, memId);
 
-            return StateNotifierProvider(
-                (ref) => ValueStateNotifier(memEntity ?? minMemEntity()));
+            return StateNotifierProvider((ref) =>
+                ValueStateNotifier((memEntity ?? minMemEntity()).toDomain()));
           }),
           memItemsProvider.overrideWithProvider((argument) {
             expect(argument, memId);

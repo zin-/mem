@@ -1,5 +1,6 @@
 import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
+import 'package:mem/mem.dart';
 import 'package:mem/repositories/repository.dart';
 
 const memNameColumnName = 'name';
@@ -44,6 +45,18 @@ class MemEntity extends DatabaseTableEntity {
         memNameColumnName: name,
         memDoneAtColumnName: doneAt,
       }..addAll(super.toMap());
+
+  Mem toDomain() => Mem(id, name, doneAt, createdAt, updatedAt, archivedAt);
+
+  MemEntity.fromDomain(Mem mem)
+      : name = mem.name,
+        doneAt = mem.doneAt,
+        super(
+          id: mem.id,
+          createdAt: mem.createdAt,
+          updatedAt: mem.updatedAt,
+          archivedAt: mem.archivedAt,
+        );
 }
 
 class MemRepository extends DatabaseTableRepository<MemEntity> {

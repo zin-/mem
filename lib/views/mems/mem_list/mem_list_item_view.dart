@@ -24,7 +24,7 @@ class MemListItemView extends StatelessWidget {
                 (value) {
                   ref
                       .read(editingMemProvider(_memEntity.id).notifier)
-                      .updatedBy(MemEntity.fromMap(_memEntity.toMap())
+                      .updatedBy(_memEntity.toDomain()
                         ..doneAt = value == true ? DateTime.now() : null);
                   ref.read(updateMem(_memEntity.id));
                 },

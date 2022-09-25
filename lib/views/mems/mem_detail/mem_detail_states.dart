@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger.dart';
+import 'package:mem/mem.dart';
 import 'package:mem/mem_service.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
@@ -15,12 +16,12 @@ final memProvider = StateNotifierProvider.family<ValueStateNotifier<MemEntity?>,
   ),
 );
 
-final editingMemProvider = StateNotifierProvider.family<
-    ValueStateNotifier<MemEntity>, MemEntity, int?>(
+final editingMemProvider =
+    StateNotifierProvider.family<ValueStateNotifier<Mem>, Mem, int?>(
   (ref, memId) => v(
     {'memId': memId},
     () => ValueStateNotifier(
-      ref.watch(memProvider(memId)) ?? initialMemEntity,
+      (ref.watch(memProvider(memId)) ?? initialMemEntity).toDomain(),
     ),
   ),
 );
@@ -65,7 +66,10 @@ final createMem = Provider.autoDispose.family<Future<MemEntity>, int?>(
     () async {
       final memItemEntities = ref.read(memItemsProvider(memId)) ?? [];
       final editingMemEntity = ref.watch(editingMemProvider(memId));
-      final memDetail = MemDetail(editingMemEntity, memItemEntities);
+      final memDetail = MemDetail(
+        MemEntity.fromDomain(editingMemEntity),
+        memItemEntities,
+      );
 
       final received = await MemService().create(memDetail);
 
@@ -91,7 +95,10 @@ final updateMem = Provider.autoDispose.family<Future<MemEntity>, int?>(
     () async {
       final memItemEntities = ref.read(memItemsProvider(memId)) ?? [];
       final editingMemEntity = ref.watch(editingMemProvider(memId));
-      final memDetail = MemDetail(editingMemEntity, memItemEntities);
+      final memDetail = MemDetail(
+        MemEntity.fromDomain(editingMemEntity),
+        memItemEntities,
+      );
 
       final updated = await MemService().update(memDetail);
 
