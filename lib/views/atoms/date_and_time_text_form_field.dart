@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
+import 'package:mem/views/atoms/date_text_form_field.dart';
+import 'package:mem/views/atoms/time_of_day_text_form_field.dart';
 
 class DateAndTimeTextFormField extends StatelessWidget {
   final DateTime? _date;
-  final DateFormat _dateFormat = DateFormat.yMd();
   final TimeOfDay? _timeOfDay;
 
-  DateAndTimeTextFormField({
+  const DateAndTimeTextFormField({
     required DateTime? date,
     required TimeOfDay? timeOfDay,
     Key? key,
@@ -25,22 +24,17 @@ class DateAndTimeTextFormField extends StatelessWidget {
           return Row(
             children: [
               Expanded(
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    icon: const Icon(Icons.calendar_month),
-                    hintText: _dateFormat.pattern,
-                  ),
-                  initialValue: _date == null ? '' : _dateFormat.format(_date!),
+                child: DateTextFormField(
+                  date: _date,
+                  onChanged: (a) {},
                 ),
               ),
               allDay
                   ? const SizedBox.shrink()
                   : Expanded(
-                      child: TextFormField(
-                        decoration: InputDecoration(
-                          hintText: L10n().yyyyMMdd(),
-                        ),
-                        initialValue: _timeOfDay?.format(context),
+                      child: TimeOfDayTextFormField(
+                        timeOfDay: _timeOfDay,
+                        onChanged: (a) {},
                       ),
                     ),
               Switch(

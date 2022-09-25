@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:intl/intl.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/views/atoms/date_and_time_text_form_field.dart';
+import 'package:mem/views/atoms/date_text_form_field.dart';
+import 'package:mem/views/atoms/time_of_day_text_form_field.dart';
 
 void main() {
   Logger(level: Level.verbose);
@@ -34,15 +35,16 @@ void main() {
       (widgetTester) async {
         await pumpDateTimeTextField(widgetTester, null, null);
 
-        expect(widgetTester.widgetList(find.byType(TextFormField)).length, 1);
-        expect(widgetTester.widgetList(find.byType(Switch)).length, 1);
-        expect(widgetTester.widgetList(find.byType(IconButton)).length, 0);
+        expect(find.byType(DateTextFormField), findsOneWidget);
+        expect(find.byType(TimeOfDayTextFormField), findsNothing);
+        expect(find.byType(Switch), findsOneWidget);
+        expect(find.byIcon(Icons.clear), findsNothing);
 
         expect(
           widgetTester
-              .widget<TextFormField>(find.byType(TextFormField))
-              .initialValue,
-          '',
+              .widget<DateTextFormField>(find.byType(DateTextFormField))
+              .date,
+          isNull,
         );
         expect(
           widgetTester.widget<Switch>(find.byType(Switch)).value,
@@ -59,15 +61,16 @@ void main() {
 
         await pumpDateTimeTextField(widgetTester, date, null);
 
-        expect(widgetTester.widgetList(find.byType(TextFormField)).length, 1);
-        expect(widgetTester.widgetList(find.byType(Switch)).length, 1);
-        expect(widgetTester.widgetList(find.byType(IconButton)).length, 1);
+        expect(find.byType(DateTextFormField), findsOneWidget);
+        expect(find.byType(TimeOfDayTextFormField), findsNothing);
+        expect(find.byType(Switch), findsOneWidget);
+        expect(find.byIcon(Icons.clear), findsOneWidget);
 
         expect(
           widgetTester
-              .widget<TextFormField>(find.byType(TextFormField))
-              .initialValue,
-          DateFormat.yMd().format(date),
+              .widget<DateTextFormField>(find.byType(DateTextFormField))
+              .date,
+          date,
         );
         expect(
           widgetTester.widget<Switch>(find.byType(Switch)).value,
@@ -85,23 +88,23 @@ void main() {
 
         await pumpDateTimeTextField(widgetTester, date, timeOfDay);
 
-        expect(widgetTester.widgetList(find.byType(TextFormField)).length, 2);
-        expect(widgetTester.widgetList(find.byType(Switch)).length, 1);
-        expect(widgetTester.widgetList(find.byType(IconButton)).length, 1);
+        expect(find.byType(DateTextFormField), findsOneWidget);
+        expect(find.byType(TimeOfDayTextFormField), findsOneWidget);
+        expect(find.byType(Switch), findsOneWidget);
+        expect(find.byIcon(Icons.clear), findsOneWidget);
 
         expect(
           widgetTester
-              .widget<TextFormField>(find.byType(TextFormField).at(0))
-              .initialValue,
-          DateFormat.yMd().format(date),
+              .widget<DateTextFormField>(find.byType(DateTextFormField))
+              .date,
+          date,
         );
-        final BuildContext context =
-            widgetTester.element(find.byType(DateAndTimeTextFormField));
         expect(
           widgetTester
-              .widget<TextFormField>(find.byType(TextFormField).at(1))
-              .initialValue,
-          timeOfDay.format(context),
+              .widget<TimeOfDayTextFormField>(
+                  find.byType(TimeOfDayTextFormField))
+              .timeOfDay,
+          timeOfDay,
         );
         expect(
           widgetTester.widget<Switch>(find.byType(Switch)).value,
@@ -111,4 +114,10 @@ void main() {
       tags: 'Small',
     );
   });
+
+  testWidgets(
+    'Edit',
+    (widgetTester) async {},
+    tags: 'Small',
+  );
 }
