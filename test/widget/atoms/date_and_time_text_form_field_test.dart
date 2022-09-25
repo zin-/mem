@@ -12,7 +12,9 @@ void main() {
   Future pumpDateTimeTextField(
     WidgetTester widgetTester,
     DateTime? date,
+    Function(DateTime? pickedDate)? onDateChanged,
     TimeOfDay? timeOfDay,
+    Function(TimeOfDay? pickedtimeOfDay)? onTimeOfDayChanged,
   ) async {
     await widgetTester.pumpWidget(
       MaterialApp(
@@ -21,9 +23,10 @@ void main() {
         supportedLocales: L10n.supportedLocales,
         home: Scaffold(
           body: DateAndTimeTextFormField(
-            date: date,
-            timeOfDay: timeOfDay,
-          ),
+              date: date,
+              onDateChanged: onDateChanged ?? (pickedDate) {},
+              timeOfDay: timeOfDay,
+              onTimeOfDayChanged: onTimeOfDayChanged ?? (pickedTimeOfDay) {}),
         ),
       ),
     );
@@ -33,7 +36,7 @@ void main() {
     testWidgets(
       'No date and time of day',
       (widgetTester) async {
-        await pumpDateTimeTextField(widgetTester, null, null);
+        await pumpDateTimeTextField(widgetTester, null, null, null, null);
 
         expect(find.byType(DateTextFormField), findsOneWidget);
         expect(find.byType(TimeOfDayTextFormField), findsNothing);
@@ -59,7 +62,7 @@ void main() {
       (widgetTester) async {
         final date = DateTime.now();
 
-        await pumpDateTimeTextField(widgetTester, date, null);
+        await pumpDateTimeTextField(widgetTester, date, null, null, null);
 
         expect(find.byType(DateTextFormField), findsOneWidget);
         expect(find.byType(TimeOfDayTextFormField), findsNothing);
@@ -86,7 +89,7 @@ void main() {
         final date = DateTime.now();
         final timeOfDay = TimeOfDay.fromDateTime(date);
 
-        await pumpDateTimeTextField(widgetTester, date, timeOfDay);
+        await pumpDateTimeTextField(widgetTester, date, null, timeOfDay, null);
 
         expect(find.byType(DateTextFormField), findsOneWidget);
         expect(find.byType(TimeOfDayTextFormField), findsOneWidget);

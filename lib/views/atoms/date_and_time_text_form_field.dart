@@ -4,47 +4,56 @@ import 'package:mem/views/atoms/date_text_form_field.dart';
 import 'package:mem/views/atoms/time_of_day_text_form_field.dart';
 
 class DateAndTimeTextFormField extends StatelessWidget {
-  final DateTime? _date;
-  final TimeOfDay? _timeOfDay;
+  final DateTime? date;
+  final Function(DateTime? pickedDate) onDateChanged;
+  final TimeOfDay? timeOfDay;
+  final Function(TimeOfDay? pickedtimeOfDay) onTimeOfDayChanged;
 
   const DateAndTimeTextFormField({
-    required DateTime? date,
-    required TimeOfDay? timeOfDay,
+    required this.date,
+    required this.onDateChanged,
+    required this.timeOfDay,
+    required this.onTimeOfDayChanged,
     Key? key,
-  })  : _date = date,
-        _timeOfDay = timeOfDay,
-        super(key: key);
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) => t(
-        {'_date': _date, '_timeOfDay': _timeOfDay},
+        {'date': date, 'timeOfDay': timeOfDay},
         () {
-          final allDay = _timeOfDay == null;
+          final allDay = timeOfDay == null;
 
           return Row(
             children: [
               Expanded(
                 child: DateTextFormField(
-                  date: _date,
-                  onChanged: (a) {},
+                  date: date,
+                  onChanged: onDateChanged,
                 ),
               ),
               allDay
                   ? const SizedBox.shrink()
                   : Expanded(
                       child: TimeOfDayTextFormField(
-                        timeOfDay: _timeOfDay,
-                        onChanged: (a) {},
+                        timeOfDay: timeOfDay,
+                        onChanged: onTimeOfDayChanged,
                       ),
                     ),
               Switch(
                 value: allDay,
-                onChanged: (value) {},
+                onChanged: (value) {
+                  if (value) {
+                    onTimeOfDayChanged(null);
+                  }
+                },
               ),
-              _date == null && _timeOfDay == null
+              date == null && timeOfDay == null
                   ? const SizedBox.shrink()
                   : IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        onDateChanged(null);
+                        onTimeOfDayChanged(null);
+                      },
                       icon: const Icon(Icons.clear),
                     ),
             ],
