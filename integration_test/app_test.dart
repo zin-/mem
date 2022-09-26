@@ -27,7 +27,7 @@ void main() {
     testWidgets(
       ': create',
       (widgetTester) async {
-        await app.main();
+        await app.main(languageCode: 'en');
         await widgetTester.pumpAndSettle(defaultDuration);
 
         await widgetTester.tap(find.byIcon(Icons.add));
@@ -60,7 +60,7 @@ void main() {
         const savedMemMemo = 'saved mem memo';
         await prepareSavedData(savedMemName, savedMemMemo);
 
-        await app.main();
+        await app.main(languageCode: 'en');
         await widgetTester.pumpAndSettle(defaultDuration);
 
         await widgetTester.tap(find.text(savedMemName));
@@ -95,7 +95,7 @@ void main() {
         const savedMemMemo = 'saved mem memo';
         await prepareSavedData(savedMemName, savedMemMemo);
 
-        await app.main();
+        await app.main(languageCode: 'en');
         await widgetTester.pumpAndSettle(defaultDuration);
 
         await widgetTester.tap(find.text(savedMemName));
@@ -129,7 +129,7 @@ void main() {
         const savedMemMemo = 'archived mem memo';
         await prepareSavedData(savedMemName, savedMemMemo, isArchived: true);
 
-        await app.main();
+        await app.main(languageCode: 'en');
         await widgetTester.pumpAndSettle(defaultDuration);
 
         await widgetTester.tap(memListFilterButton);
@@ -168,7 +168,7 @@ void main() {
         const savedMemMemo = 'saved mem memo';
         await prepareSavedData(savedMemName, savedMemMemo);
 
-        await app.main();
+        await app.main(languageCode: 'en');
         await widgetTester.pumpAndSettle(defaultDuration);
 
         await widgetTester.tap(find.text(savedMemName));
@@ -208,7 +208,7 @@ void main() {
         const savedMemMemo = 'saved mem memo';
         await prepareSavedData(savedMemName, savedMemMemo);
 
-        await app.main();
+        await app.main(languageCode: 'en');
         await widgetTester.pumpAndSettle(defaultDuration);
 
         await widgetTester.tap(find.byType(Checkbox));
@@ -240,7 +240,7 @@ void main() {
           archivedAtColumnName: null,
         });
 
-        await app.main();
+        await app.main(languageCode: 'en');
         await widgetTester.pumpAndSettle(defaultDuration);
 
         await widgetTester.tap(find.text(savedMemName));
