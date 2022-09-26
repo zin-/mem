@@ -35,7 +35,7 @@ final showDoneProvider = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
   ),
 );
 
-final fetchMemList = FutureProvider<List<MemEntity>>(
+final fetchMemList = FutureProvider<void>(
   (ref) => v(
     {},
     () async {
@@ -61,8 +61,6 @@ final fetchMemList = FutureProvider<List<MemEntity>>(
         ref.read(memProvider(mem.id).notifier).updatedBy(mem);
         memListNotifier.upsert(mem.toDomain(), (item) => item.id == mem.id);
       }
-
-      return memEntities;
     },
   ),
 );
