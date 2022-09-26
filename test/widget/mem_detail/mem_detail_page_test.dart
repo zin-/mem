@@ -10,7 +10,7 @@ import 'package:mem/logger.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/constants.dart';
 
-import '../../minimum.dart';
+import '../../samples.dart';
 import '../../mocks.mocks.dart';
 import 'mem_detail_body_test.dart';
 

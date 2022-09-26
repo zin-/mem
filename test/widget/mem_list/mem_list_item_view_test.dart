@@ -9,7 +9,7 @@ import 'package:mem/views/mems/mem_detail/mem_detail_states.dart';
 import 'package:mem/views/mems/mem_list/mem_list_item_view.dart';
 import 'package:mockito/mockito.dart';
 
-import '../../minimum.dart';
+import '../../samples.dart';
 import '../../mocks.mocks.dart';
 
 void main() {

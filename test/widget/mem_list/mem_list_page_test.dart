@@ -8,7 +8,7 @@ import 'package:mem/repositories/repository.dart';
 import 'package:mem/views/mems/mem_list/mem_list_page.dart';
 import 'package:mockito/mockito.dart';
 
-import '../../minimum.dart';
+import '../../samples.dart';
 import '../../mocks.mocks.dart';
 
 Future pumpMemListPage(WidgetTester widgetTester) async {
