@@ -42,7 +42,6 @@
   "doneFilterTitle": "Done",
   "showNotDoneLabel": "Show not done",
   "showDoneLabel": "Show done",
-  "yyyyMMdd": "yyyy/MM/dd",
   "dev": "Under development",
   "test": "Under test"
 }
