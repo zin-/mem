@@ -65,9 +65,9 @@ final createMem = Provider.autoDispose.family<Future<MemEntity>, int?>(
     {'memId': memId},
     () async {
       final memItemEntities = ref.read(memItemsProvider(memId)) ?? [];
-      final editingMemEntity = ref.watch(editingMemProvider(memId));
+      final editingMem = ref.watch(editingMemProvider(memId));
       final memDetail = MemDetail(
-        MemEntity.fromDomain(editingMemEntity),
+        MemEntity.fromDomain(editingMem),
         memItemEntities,
       );
 
@@ -94,9 +94,9 @@ final updateMem = Provider.autoDispose.family<Future<MemEntity>, int?>(
     {'memId': memId},
     () async {
       final memItemEntities = ref.read(memItemsProvider(memId)) ?? [];
-      final editingMemEntity = ref.watch(editingMemProvider(memId));
+      final editingMem = ref.watch(editingMemProvider(memId));
       final memDetail = MemDetail(
-        MemEntity.fromDomain(editingMemEntity),
+        MemEntity.fromDomain(editingMem),
         memItemEntities,
       );
 
