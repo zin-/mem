@@ -31,7 +31,7 @@ class MemDetailBody extends StatelessWidget {
                       (value) => ref
                           .read(editingMemProvider(_memId).notifier)
                           .updatedBy(
-                            Mem.copiedFrom(editingMem..name = value),
+                            Mem.copyFrom(editingMem..name = value),
                           ),
                     ),
                     MemDoneCheckbox(
@@ -40,7 +40,7 @@ class MemDetailBody extends StatelessWidget {
                       (value) => ref
                           .read(editingMemProvider(_memId).notifier)
                           .updatedBy(
-                            Mem.copiedFrom(editingMem
+                            Mem.copyFrom(editingMem
                               ..doneAt = value == true ? DateTime.now() : null),
                           ),
                     ),

@@ -16,7 +16,7 @@ class Mem {
   );
 
   // FIXME エレガントじゃない気がする
-  Mem.copiedFrom(Mem mem)
+  Mem.copyFrom(Mem mem)
       : id = mem.id,
         name = mem.name,
         doneAt = mem.doneAt,
