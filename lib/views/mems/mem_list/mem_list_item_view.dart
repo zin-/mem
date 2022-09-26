@@ -1,39 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/repositories/mem_repository.dart';
+import 'package:mem/mem.dart';
 import 'package:mem/views/mems/mem_detail/mem_detail_states.dart';
 import 'package:mem/views/mems/mem_done_checkbox.dart';
 import 'package:mem/views/mems/mem_list/mem_list_page.dart';
 import 'package:mem/views/mems/mem_name.dart';
 
 class MemListItemView extends StatelessWidget {
-  final MemEntity _memEntity;
+  final Mem _mem;
 
-  const MemListItemView(this._memEntity, {Key? key}) : super(key: key);
+  const MemListItemView(this._mem, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => t(
-        {'_memEntity': _memEntity},
+        {'_mem': _mem},
         () => Consumer(
           builder: (context, ref, child) {
             return ListTile(
               leading: MemDoneCheckbox(
-                _memEntity.id,
-                _memEntity.doneAt != null,
+                _mem.id,
+                _mem.doneAt != null,
                 (value) {
-                  ref
-                      .read(editingMemProvider(_memEntity.id).notifier)
-                      .updatedBy(_memEntity.toDomain()
-                        ..doneAt = value == true ? DateTime.now() : null);
-                  ref.read(updateMem(_memEntity.id));
+                  ref.read(editingMemProvider(_mem.id).notifier).updatedBy(
+                      _mem..doneAt = value == true ? DateTime.now() : null);
+                  ref.read(updateMem(_mem.id));
                 },
               ),
-              title: MemNameText(_memEntity.name, _memEntity.id),
+              title: MemNameText(_mem.name, _mem.id),
               onTap: () => showMemDetailPage(
                 context,
                 ref,
-                _memEntity.id,
+                _mem.id,
               ),
             );
           },

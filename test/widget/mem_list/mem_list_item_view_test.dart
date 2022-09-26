@@ -34,7 +34,7 @@ void main() {
           localizationsDelegates: L10n.localizationsDelegates,
           supportedLocales: L10n.supportedLocales,
           home: Scaffold(
-            body: MemListItemView(memEntity),
+            body: MemListItemView(memEntity.toDomain()),
           ),
         ),
       ),
