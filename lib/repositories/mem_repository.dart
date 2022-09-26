@@ -61,6 +61,24 @@ class MemEntity extends DatabaseTableEntity {
 
 class MemRepository extends DatabaseTableRepository<MemEntity> {
   @override
+  Future<List<MemEntity>> ship({
+    Map<String, dynamic>? whereMap,
+    bool? archive,
+    bool? done,
+  }) {
+    return super.ship(
+        whereMap: whereMap ?? {}
+          ..addAll(buildNullableWhere(
+            archivedAtColumnName,
+            archive,
+          ))
+          ..addAll(buildNullableWhere(
+            memDoneAtColumnName,
+            done,
+          )));
+  }
+
+  @override
   MemEntity fromMap(Map<String, dynamic> valueMap) =>
       MemEntity.fromMap(valueMap);
 
