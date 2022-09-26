@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/repositories/mem_repository.dart';
+import 'package:mem/mem.dart';
 import 'package:mem/views/colors.dart';
 import 'package:mem/views/constants.dart';
 import 'package:mem/views/mems/mem_detail/mem_detail_states.dart';
@@ -76,7 +76,7 @@ class MemListPage extends StatelessWidget {
 void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
       {'context': context, 'memId': memId},
       () => Navigator.of(context)
-          .push<MemEntity?>(
+          .push<Mem?>(
             PageRouteBuilder(
               pageBuilder: (context, animation, secondaryAnimation) =>
                   MemDetailPage(memId),
@@ -101,7 +101,7 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
                   ref.read(memProvider(memId).notifier).updatedBy(null);
                   ref.read(memItemsProvider(memId).notifier).updatedBy(null);
                   if (result != null) {
-                    ref.read(memListProvider.notifier).add(result.toDomain());
+                    ref.read(memListProvider.notifier).add(result);
                   }
                 } else {
                   if (result == null) {

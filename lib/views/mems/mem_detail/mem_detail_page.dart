@@ -93,7 +93,7 @@ class MemDetailPage extends StatelessWidget {
               onWillPop: () async => v(
                 {},
                 () {
-                  Navigator.of(context).pop(mem);
+                  Navigator.of(context).pop(mem?.toDomain());
                   return true;
                 },
               ),
