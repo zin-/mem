@@ -56,7 +56,7 @@ class MemListPage extends StatelessWidget {
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
                           final mem = memList[index];
-                          return MemListItemView(mem);
+                          return MemListItemView(MemEntity.fromDomain(mem));
                         },
                         childCount: memList.length,
                       ),

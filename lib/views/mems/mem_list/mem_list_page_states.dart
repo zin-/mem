@@ -75,15 +75,15 @@ final memListProvider =
   ),
 );
 final reactiveMemListProvider =
-    StateNotifierProvider<ValueStateNotifier<List<MemEntity>>, List<MemEntity>>(
+    StateNotifierProvider<ValueStateNotifier<List<Mem>>, List<Mem>>(
   (ref) => v(
     {},
     () {
       final memList = ref.watch(memListProvider) ?? [];
 
       final reactiveMemList = memList
-          .map((e) => ref.watch(memProvider(e.id)))
-          .whereType<MemEntity>()
+          .map((e) => ref.watch(memProvider(e.id))?.toDomain())
+          .whereType<Mem>()
           .toList();
 
       return ValueStateNotifier(reactiveMemList);
@@ -91,18 +91,18 @@ final reactiveMemListProvider =
   ),
 );
 final filteredMemListProvider =
-    StateNotifierProvider<ValueStateNotifier<List<MemEntity>>, List<MemEntity>>(
+    StateNotifierProvider<ValueStateNotifier<List<Mem>>, List<Mem>>(
   (ref) => v(
     {},
     () {
-      final memList = ref.watch(reactiveMemListProvider);
+      final reactiveMemList = ref.watch(reactiveMemListProvider);
 
       final showNotArchived = ref.watch(showNotArchivedProvider);
       final showArchived = ref.watch(showArchivedProvider);
       final showNotDone = ref.watch(showNotDoneProvider);
       final showDone = ref.watch(showDoneProvider);
 
-      final filteredMemList = memList.where((item) {
+      final filteredMemList = reactiveMemList.where((item) {
         final archive = showNotArchived == showArchived
             ? true
             : item.archivedAt == null
@@ -122,7 +122,7 @@ final filteredMemListProvider =
   ),
 );
 final sortedMemList =
-    StateNotifierProvider<ValueStateNotifier<List<MemEntity>>, List<MemEntity>>(
+    StateNotifierProvider<ValueStateNotifier<List<Mem>>, List<Mem>>(
   (ref) => v(
     {},
     () {
@@ -149,7 +149,13 @@ final sortedMemList =
           return item1.archivedAt!.compareTo(item2.archivedAt!);
         }
 
-        return item1.id.compareTo(item2.id);
+        if (item1.id == null) {
+          return -1;
+        }
+        if (item2.id == null) {
+          return 1;
+        }
+        return item1.id!.compareTo(item2.id!);
       });
 
       return ValueStateNotifier(sortedMemList);
