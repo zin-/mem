@@ -108,13 +108,13 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
                     ref.read(memListProvider.notifier).remove(
                           (item) => item.id == memId,
                         );
-                    final memEntity = ref.read(memProvider(memId));
-                    if (memEntity != null) {
+                    final mem = ref.read(memProvider(memId));
+                    if (mem != null) {
                       final scaffoldMessenger = ScaffoldMessenger.of(context);
                       scaffoldMessenger.showSnackBar(
                         SnackBar(
                           content: Text(
-                            L10n().removeMemSuccessMessage(memEntity.name),
+                            L10n().removeMemSuccessMessage(mem.name),
                           ),
                           duration: defaultDismissDuration,
                           dismissDirection: DismissDirection.horizontal,
@@ -127,17 +127,14 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
                                 scaffoldMessenger.showSnackBar(
                                   SnackBar(
                                     content: Text(
-                                      L10n().saveMemSuccessMessage(
-                                          memEntity.name),
+                                      L10n().saveMemSuccessMessage(mem.name),
                                     ),
                                     duration: infiniteDismissDuration,
                                     dismissDirection:
                                         DismissDirection.horizontal,
                                   ),
                                 );
-                                ref
-                                    .read(memListProvider.notifier)
-                                    .add(memEntity.toDomain());
+                                ref.read(memListProvider.notifier).add(mem);
                               },
                             ),
                           ),

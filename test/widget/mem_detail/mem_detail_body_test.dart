@@ -38,7 +38,7 @@ void main() {
             expect(argument, memId);
 
             return StateNotifierProvider(
-                (ref) => ValueStateNotifier(memEntity));
+                (ref) => ValueStateNotifier(memEntity?.toDomain()));
           }),
           editingMemProvider.overrideWithProvider((argument) {
             expect(argument, memId);

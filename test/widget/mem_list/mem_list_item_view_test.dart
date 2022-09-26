@@ -26,7 +26,7 @@ void main() {
             expect(argument, memEntity.id);
 
             return StateNotifierProvider(
-                (ref) => ValueStateNotifier(memEntity));
+                (ref) => ValueStateNotifier(memEntity.toDomain()));
           })
         ],
         child: MaterialApp(

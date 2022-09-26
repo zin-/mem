@@ -49,9 +49,12 @@ final fetchMemList = FutureProvider<void>(
       );
 
       final memListNotifier = ref.read(memListProvider.notifier);
-      for (var mem in memEntities) {
-        ref.read(memProvider(mem.id).notifier).updatedBy(mem);
-        memListNotifier.upsert(mem.toDomain(), (item) => item.id == mem.id);
+      for (var memEntity in memEntities) {
+        ref
+            .read(memProvider(memEntity.id).notifier)
+            .updatedBy(memEntity.toDomain());
+        memListNotifier.upsert(
+            memEntity.toDomain(), (item) => item.id == memEntity.id);
       }
     },
   ),
@@ -72,7 +75,7 @@ final reactiveMemListProvider =
       final memList = ref.watch(memListProvider) ?? [];
 
       final reactiveMemList = memList
-          .map((e) => ref.watch(memProvider(e.id))?.toDomain())
+          .map((e) => ref.watch(memProvider(e.id)))
           .whereType<Mem>()
           .toList();
 

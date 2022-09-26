@@ -15,6 +15,8 @@ class Mem {
     this.archivedAt,
   );
 
+  bool isArchived() => id != null && createdAt != null && archivedAt != null;
+
   // FIXME エレガントじゃない気がする
   Mem.copyFrom(Mem mem)
       : id = mem.id,
