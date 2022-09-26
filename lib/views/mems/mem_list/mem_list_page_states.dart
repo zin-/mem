@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger.dart';
+import 'package:mem/mem.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/repositories/repository.dart';
 import 'package:mem/views/atoms/state_notifier.dart';
@@ -43,7 +44,7 @@ final fetchMemList = FutureProvider<List<MemEntity>>(
       final showNotDone = ref.watch(showNotDoneProvider);
       final showDone = ref.watch(showDoneProvider);
 
-      final mems = await MemRepository().ship(
+      final memEntities = await MemRepository().ship(
         whereMap: {}
           ..addAll(buildNullableWhere(
             archivedAtColumnName,
@@ -56,21 +57,21 @@ final fetchMemList = FutureProvider<List<MemEntity>>(
       );
 
       final memListNotifier = ref.read(memListProvider.notifier);
-      for (var mem in mems) {
+      for (var mem in memEntities) {
         ref.read(memProvider(mem.id).notifier).updatedBy(mem);
-        memListNotifier.upsert(mem, (item) => item.id == mem.id);
+        memListNotifier.upsert(mem.toDomain(), (item) => item.id == mem.id);
       }
 
-      return mems;
+      return memEntities;
     },
   ),
 );
 
 final memListProvider =
-    StateNotifierProvider<ListValueStateNotifier<MemEntity>, List<MemEntity>?>(
+    StateNotifierProvider<ListValueStateNotifier<Mem>, List<Mem>?>(
   (ref) => v(
     {},
-    () => ListValueStateNotifier<MemEntity>(null),
+    () => ListValueStateNotifier<Mem>(null),
   ),
 );
 final reactiveMemListProvider =

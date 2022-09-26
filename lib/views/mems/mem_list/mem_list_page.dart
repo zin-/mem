@@ -101,20 +101,20 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
                   ref.read(memProvider(memId).notifier).updatedBy(null);
                   ref.read(memItemsProvider(memId).notifier).updatedBy(null);
                   if (result != null) {
-                    ref.read(memListProvider.notifier).add(result);
+                    ref.read(memListProvider.notifier).add(result.toDomain());
                   }
                 } else {
                   if (result == null) {
                     ref.read(memListProvider.notifier).remove(
                           (item) => item.id == memId,
                         );
-                    final mem = ref.read(memProvider(memId));
-                    if (mem != null) {
+                    final memEntity = ref.read(memProvider(memId));
+                    if (memEntity != null) {
                       final scaffoldMessenger = ScaffoldMessenger.of(context);
                       scaffoldMessenger.showSnackBar(
                         SnackBar(
                           content: Text(
-                            L10n().removeMemSuccessMessage(mem.name),
+                            L10n().removeMemSuccessMessage(memEntity.name),
                           ),
                           duration: defaultDismissDuration,
                           dismissDirection: DismissDirection.horizontal,
@@ -127,14 +127,17 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
                                 scaffoldMessenger.showSnackBar(
                                   SnackBar(
                                     content: Text(
-                                      L10n().saveMemSuccessMessage(mem.name),
+                                      L10n().saveMemSuccessMessage(
+                                          memEntity.name),
                                     ),
                                     duration: infiniteDismissDuration,
                                     dismissDirection:
                                         DismissDirection.horizontal,
                                   ),
                                 );
-                                ref.read(memListProvider.notifier).add(mem);
+                                ref
+                                    .read(memListProvider.notifier)
+                                    .add(memEntity.toDomain());
                               },
                             ),
                           ),
