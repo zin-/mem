@@ -1,5 +1,6 @@
 import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
+import 'package:mem/logger.dart';
 import 'package:mem/mem.dart';
 import 'package:mem/repositories/repository.dart';
 
@@ -72,18 +73,26 @@ class MemRepository extends DatabaseTableRepository<MemEntity> {
     Map<String, dynamic>? whereMap,
     bool? archive,
     bool? done,
-  }) {
-    return super.ship(
-        whereMap: whereMap ?? {}
-          ..addAll(buildNullableWhere(
-            archivedAtColumnName,
-            archive,
-          ))
-          ..addAll(buildNullableWhere(
-            memDoneAtColumnName,
-            done,
-          )));
-  }
+  }) =>
+      v(
+        {
+          'whereMap': whereMap,
+          'archive': archive,
+          'done': done,
+        },
+        () async {
+          return super.ship(
+              whereMap: whereMap ?? {}
+                ..addAll(buildNullableWhere(
+                  archivedAtColumnName,
+                  archive,
+                ))
+                ..addAll(buildNullableWhere(
+                  memDoneAtColumnName,
+                  done,
+                )));
+        },
+      );
 
   @override
   MemEntity fromMap(Map<String, dynamic> valueMap) =>
