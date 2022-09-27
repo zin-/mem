@@ -6,7 +6,7 @@ import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/atoms/state_notifier.dart';
 
-final initialMemEntity = MemEntity(name: '', doneAt: null, id: null);
+final initialMem = Mem(name: '');
 
 final memProvider =
     StateNotifierProvider.family<ValueStateNotifier<Mem?>, Mem?, int?>(
@@ -21,7 +21,7 @@ final editingMemProvider =
   (ref, memId) => v(
     {'memId': memId},
     () => ValueStateNotifier(
-      ref.watch(memProvider(memId)) ?? initialMemEntity.toDomain(),
+      ref.watch(memProvider(memId)) ?? Mem.copyFrom(initialMem),
     ),
   ),
 );

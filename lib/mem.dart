@@ -6,14 +6,14 @@ class Mem {
   DateTime? updatedAt;
   DateTime? archivedAt;
 
-  Mem(
+  Mem({
     this.id,
-    this.name,
+    required this.name,
     this.doneAt,
     this.createdAt,
     this.updatedAt,
     this.archivedAt,
-  );
+  });
 
   bool isArchived() => id != null && createdAt != null && archivedAt != null;
 

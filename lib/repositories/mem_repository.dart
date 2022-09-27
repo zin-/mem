@@ -46,7 +46,14 @@ class MemEntity extends DatabaseTableEntity {
         memDoneAtColumnName: doneAt,
       }..addAll(super.toMap());
 
-  Mem toDomain() => Mem(id, name, doneAt, createdAt, updatedAt, archivedAt);
+  Mem toDomain() => Mem(
+        id: id,
+        name: name,
+        doneAt: doneAt,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+        archivedAt: archivedAt,
+      );
 
   MemEntity.fromDomain(Mem mem)
       : name = mem.name,
