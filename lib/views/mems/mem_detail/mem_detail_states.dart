@@ -34,7 +34,7 @@ final memItemsProvider = StateNotifierProvider.family<
   ),
 );
 
-final fetchMemByIdV2 = FutureProvider.autoDispose.family<void, int?>(
+final fetchMemById = FutureProvider.autoDispose.family<void, int?>(
   (ref, memId) => v(
     {'memId': memId},
     () async {
@@ -47,7 +47,7 @@ final fetchMemByIdV2 = FutureProvider.autoDispose.family<void, int?>(
   ),
 );
 
-final fetchMemItemByMemIdV2 = FutureProvider.autoDispose.family<void, int?>(
+final fetchMemItemByMemId = FutureProvider.autoDispose.family<void, int?>(
   (ref, memId) => v(
     {'memId': memId},
     () async {
