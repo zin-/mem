@@ -59,7 +59,7 @@ class MemService {
       );
 
   Future<MemDetail> archive(Mem mem) => t(
-        {'memEntity': mem},
+        {'mem': mem},
         () async {
           final archivedMemEntity =
               await MemRepository().archive(MemEntity.fromDomain(mem));
@@ -76,7 +76,7 @@ class MemService {
       );
 
   Future<MemDetail> unarchive(Mem mem) => t(
-        {'memEntity': mem},
+        {'mem': mem},
         () async {
           final unarchivedMemEntity =
               await MemRepository().unarchive(MemEntity.fromDomain(mem));
