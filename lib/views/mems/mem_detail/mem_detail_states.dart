@@ -62,7 +62,7 @@ final fetchMemItemByMemId = FutureProvider.autoDispose.family<void, int?>(
   ),
 );
 
-final createMem = Provider.autoDispose.family<Future<MemEntity>, int?>(
+final createMem = Provider.autoDispose.family<Future<Mem>, int?>(
   (ref, memId) => v(
     {'memId': memId},
     () async {
@@ -82,12 +82,12 @@ final createMem = Provider.autoDispose.family<Future<MemEntity>, int?>(
           .read(memItemsProvider(received.mem.id).notifier)
           .updatedBy(received.memItems);
 
-      return MemEntity.fromDomain(received.mem);
+      return received.mem;
     },
   ),
 );
 
-final updateMem = Provider.autoDispose.family<Future<MemEntity>, int?>(
+final updateMem = Provider.autoDispose.family<Future<Mem>, int?>(
   (ref, memId) => v(
     {'memId': memId},
     () async {
@@ -102,7 +102,7 @@ final updateMem = Provider.autoDispose.family<Future<MemEntity>, int?>(
           .read(memItemsProvider(updated.mem.id).notifier)
           .updatedBy(updated.memItems);
 
-      return MemEntity.fromDomain(updated.mem);
+      return updated.mem;
     },
   ),
 );

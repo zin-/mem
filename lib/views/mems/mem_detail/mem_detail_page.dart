@@ -68,7 +68,8 @@ class MemDetailPage extends StatelessWidget {
                         {},
                         () async {
                           if (_formKey.currentState?.validate() ?? false) {
-                            final savedMemFuture = _memId == null && mem == null
+                            final savedMemFuture = _memId == null && mem ==
+                          null
                                 ? ref.read(createMem(_memId))
                                 : ref.read(updateMem(_memId));
 
