@@ -1,16 +1,17 @@
 import 'package:mem/logger.dart';
+import 'package:mem/mem.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 
 class MemDetail {
-  final MemEntity memEntity;
+  final Mem mem;
   final List<MemItemEntity> memItemEntities;
 
-  MemDetail(this.memEntity, this.memItemEntities);
+  MemDetail(this.mem, this.memItemEntities);
 
   @override
   String toString() => '{'
-      ' memEntity: $memEntity'
+      ' mem: $mem'
       ', memItemEntities: $memItemEntities'
       ' }';
 }
@@ -19,27 +20,31 @@ class MemService {
   Future<MemDetail> create(MemDetail memDetail) => t(
         {'memDetail': memDetail},
         () async {
-          final receivedMemEntity =
-              await MemRepository().receive(memDetail.memEntity);
+          final receivedMemEntity = await MemRepository()
+              .receive(MemEntity.fromDomain(memDetail.mem));
           final receivedMemItemEntities = await Future.wait(memDetail
               .memItemEntities
               .map((e) => e..memId = receivedMemEntity.id)
               .map((e) => MemItemRepository().receive(e)));
 
-          return MemDetail(receivedMemEntity, receivedMemItemEntities);
+          return MemDetail(
+            receivedMemEntity.toDomain(),
+            receivedMemItemEntities,
+          );
         },
       );
 
   Future<MemDetail> update(MemDetail memDetail) => t(
         {'memDetail': memDetail},
         () async {
-          final updatedMem = await MemRepository().update(memDetail.memEntity);
+          final updatedMem =
+              await MemRepository().update(MemEntity.fromDomain(memDetail.mem));
           final updatedMemItemEntities = await Future.wait(
               memDetail.memItemEntities.map((e) => e.isSaved()
                   ? MemItemRepository().update(e)
                   : MemItemRepository().receive(e..memId = updatedMem.id)));
 
-          return MemDetail(updatedMem, updatedMemItemEntities);
+          return MemDetail(updatedMem.toDomain(), updatedMemItemEntities);
         },
       );
 
@@ -50,7 +55,7 @@ class MemService {
           final archivedMemItems =
               await MemItemRepository().archiveByMemId(archivedMem.id);
 
-          return MemDetail(archivedMem, archivedMemItems);
+          return MemDetail(archivedMem.toDomain(), archivedMemItems);
         },
       );
 
@@ -61,7 +66,7 @@ class MemService {
           final unarchivedMemItems =
               await MemItemRepository().unarchiveByMemId(unarchivedMem.id);
 
-          return MemDetail(unarchivedMem, unarchivedMemItems);
+          return MemDetail(unarchivedMem.toDomain(), unarchivedMemItems);
         },
       );
 
