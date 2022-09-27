@@ -142,14 +142,14 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
   DatabaseTableRepository(this._table);
 }
 
-Map<String, String?> buildNullableWhere(String columnName, bool? nullable) => v(
-      {'columnName': columnName, 'nullable': nullable},
+Map<String, String?> buildNullableWhere(String columnName, bool? hasValue) => v(
+      {'columnName': columnName, 'hasValue': hasValue},
       () {
-        if (nullable == null) {
+        if (hasValue == null) {
           return {};
         } else {
           final a =
-              nullable ? '$columnName IS NOT NULL' : '$columnName IS NULL';
+              hasValue ? '$columnName IS NOT NULL' : '$columnName IS NULL';
           return {a: null};
         }
       },
