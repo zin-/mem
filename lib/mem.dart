@@ -26,3 +26,27 @@ class Mem {
         updatedAt = mem.updatedAt,
         archivedAt = mem.archivedAt;
 }
+
+enum MemItemType {
+  memo,
+}
+
+class MemItem {
+  final int? id;
+  int? memId;
+  final MemItemType type;
+  dynamic value;
+  DateTime? createdAt;
+  DateTime? updatedAt;
+  DateTime? archivedAt;
+
+  MemItem({
+    this.id,
+    this.memId,
+    required this.type,
+    this.value,
+    this.createdAt,
+    this.updatedAt,
+    this.archivedAt,
+  });
+}

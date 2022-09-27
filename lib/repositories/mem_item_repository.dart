@@ -1,6 +1,7 @@
 import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
 import 'package:mem/logger.dart';
+import 'package:mem/mem.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/repositories/repository.dart';
 
@@ -52,6 +53,27 @@ class MemItemEntity extends DatabaseTableEntity {
         memItemTypeColumnName: type.name,
         memItemValueColumnName: value,
       }..addAll(super.toMap());
+
+  MemItem toDomain() => MemItem(
+        id: id,
+        memId: memId,
+        type: type,
+        value: value,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+        archivedAt: archivedAt,
+      );
+
+  MemItemEntity.fromDomain(MemItem memItem)
+      : memId = memItem.memId,
+        type = memItem.type,
+        value = memItem.value,
+        super(
+          id: memItem.id,
+          createdAt: memItem.createdAt,
+          updatedAt: memItem.updatedAt,
+          archivedAt: memItem.archivedAt,
+        );
 }
 
 class MemItemRepository extends DatabaseTableRepository<MemItemEntity> {
@@ -114,10 +136,4 @@ class MemItemRepository extends DatabaseTableRepository<MemItemEntity> {
     _instance = mock;
     return mock;
   }
-}
-
-const memMemoName = 'memo';
-
-enum MemItemType {
-  memo,
 }

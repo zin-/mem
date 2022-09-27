@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/mem.dart';
-import 'package:mem/repositories/mem_item_repository.dart'; // TODO repositoriesへの依存を排除する
 import 'package:mem/views/atoms/async_value_view.dart';
 import 'package:mem/views/mems/mem_done_checkbox.dart';
 import 'package:mem/views/mems/mem_name.dart';
@@ -67,7 +66,7 @@ class MemDetailBody extends StatelessWidget {
                 children: [
                   ...(memItems == null || memItems.isEmpty
                           ? [
-                              MemItemEntity(
+                              MemItem(
                                 memId: memId,
                                 type: MemItemType.memo,
                               ),
