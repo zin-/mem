@@ -138,8 +138,7 @@ final unarchiveMem = Provider.family<Future<MemDetail?>, int?>(
       if (mem == null) {
         return null;
       } else {
-        final unarchived =
-            await MemService().unarchive(MemEntity.fromDomain(mem));
+        final unarchived = await MemService().unarchive(mem);
 
         ref
             .read(memProvider(unarchived.mem.id).notifier)

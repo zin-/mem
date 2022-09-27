@@ -75,18 +75,18 @@ class MemService {
         },
       );
 
-  Future<MemDetail> unarchive(MemEntity memEntity) => t(
-        {'memEntity': memEntity},
+  Future<MemDetail> unarchive(Mem mem) => t(
+        {'memEntity': mem},
         () async {
-          final unarchivedMem =
-              (await MemRepository().unarchive(memEntity)).toDomain();
-          final unarchivedMemItems =
-              (await MemItemRepository().unarchiveByMemId(memEntity.id))
-                  .map((e) => e.toDomain())
-                  .toList();
+          final unarchivedMemEntity =
+              await MemRepository().unarchive(MemEntity.fromDomain(mem));
+          final unarchivedMemItems = (await MemItemRepository()
+                  .unarchiveByMemId(unarchivedMemEntity.id))
+              .map((e) => e.toDomain())
+              .toList();
 
           return MemDetail(
-            unarchivedMem,
+            unarchivedMemEntity.toDomain(),
             unarchivedMemItems,
           );
         },
