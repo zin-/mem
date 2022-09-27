@@ -39,9 +39,9 @@ final fetchMemByIdV2 = FutureProvider.autoDispose.family<void, int?>(
     {'memId': memId},
     () async {
       if (memId != null && ref.read(memProvider(memId)) == null) {
-        final memEntity = await MemRepository().shipById(memId);
+        final mem = (await MemRepository().shipById(memId)).toDomain();
 
-        ref.read(memProvider(memId).notifier).updatedBy(memEntity.toDomain());
+        ref.read(memProvider(memId).notifier).updatedBy(mem);
       }
     },
   ),

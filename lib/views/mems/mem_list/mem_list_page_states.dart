@@ -43,18 +43,17 @@ final fetchMemList = FutureProvider<void>(
       final showNotDone = ref.watch(showNotDoneProvider);
       final showDone = ref.watch(showDoneProvider);
 
-      final memEntities = await MemRepository().ship(
+      final mems = (await MemRepository().ship(
         archive: showNotArchived == showArchived ? null : showArchived,
         done: showNotDone == showDone ? null : showDone,
-      );
+      ))
+          .map((e) => e.toDomain())
+          .toList();
 
       final memListNotifier = ref.read(memListProvider.notifier);
-      for (var memEntity in memEntities) {
-        ref
-            .read(memProvider(memEntity.id).notifier)
-            .updatedBy(memEntity.toDomain());
-        memListNotifier.upsert(
-            memEntity.toDomain(), (item) => item.id == memEntity.id);
+      for (var mem in mems) {
+        ref.read(memProvider(mem.id).notifier).updatedBy(mem);
+        memListNotifier.upsert(mem, (item) => item.id == mem.id);
       }
     },
   ),
