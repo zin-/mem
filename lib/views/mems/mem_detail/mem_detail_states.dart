@@ -116,7 +116,7 @@ final archiveMem = Provider.family<Future<MemDetail?>, int?>(
       if (mem == null) {
         return null;
       } else {
-        final archived = await MemService().archive(MemEntity.fromDomain(mem));
+        final archived = await MemService().archive(mem);
 
         ref.read(memProvider(archived.mem.id).notifier).updatedBy(archived.mem);
         ref

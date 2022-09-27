@@ -58,18 +58,18 @@ class MemService {
         },
       );
 
-  Future<MemDetail> archive(MemEntity memEntity) => t(
-        {'memEntity': memEntity},
+  Future<MemDetail> archive(Mem mem) => t(
+        {'memEntity': mem},
         () async {
-          final archivedMem =
-              (await MemRepository().archive(memEntity)).toDomain();
+          final archivedMemEntity =
+              await MemRepository().archive(MemEntity.fromDomain(mem));
           final archivedMemItems =
-              (await MemItemRepository().archiveByMemId(memEntity.id))
+              (await MemItemRepository().archiveByMemId(archivedMemEntity.id))
                   .map((e) => e.toDomain())
                   .toList();
 
           return MemDetail(
-            archivedMem,
+            archivedMemEntity.toDomain(),
             archivedMemItems,
           );
         },
