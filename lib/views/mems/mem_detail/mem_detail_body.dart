@@ -65,6 +65,7 @@ class MemDetailBody extends StatelessWidget {
               return Column(
                 children: [
                   ...(memItems == null || memItems.isEmpty
+                          // FIXME ここきもすぎる
                           ? [
                               MemItem(
                                 memId: memId,
