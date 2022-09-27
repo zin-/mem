@@ -66,21 +66,21 @@ final createMem = Provider.autoDispose.family<Future<MemEntity>, int?>(
   (ref, memId) => v(
     {'memId': memId},
     () async {
-      final memItemEntities = ref.read(memItemsProvider(memId)) ?? [];
+      final memItems = ref.read(memItemsProvider(memId)) ?? [];
       final editingMem = ref.watch(editingMemProvider(memId));
       final memDetail = MemDetail(
         editingMem,
-        memItemEntities.map((e) => MemItemEntity.fromDomain(e)).toList(),
+        memItems,
       );
 
       final received = await MemService().create(memDetail);
 
       ref.read(memProvider(null).notifier).updatedBy(received.mem);
-      ref.read(memItemsProvider(null).notifier).updatedBy(
-          received.memItemEntities.map((e) => e.toDomain()).toList());
+      ref.read(memItemsProvider(null).notifier).updatedBy(received.memItems);
       ref.read(memProvider(received.mem.id).notifier).updatedBy(received.mem);
-      ref.read(memItemsProvider(received.mem.id).notifier).updatedBy(
-          received.memItemEntities.map((e) => e.toDomain()).toList());
+      ref
+          .read(memItemsProvider(received.mem.id).notifier)
+          .updatedBy(received.memItems);
 
       return MemEntity.fromDomain(received.mem);
     },
@@ -91,19 +91,16 @@ final updateMem = Provider.autoDispose.family<Future<MemEntity>, int?>(
   (ref, memId) => v(
     {'memId': memId},
     () async {
-      final memItemEntities = ref.read(memItemsProvider(memId)) ?? [];
+      final memItems = ref.read(memItemsProvider(memId)) ?? [];
       final editingMem = ref.watch(editingMemProvider(memId));
-      final memDetail = MemDetail(
-        editingMem,
-        memItemEntities.map((e) => MemItemEntity.fromDomain(e)).toList(),
-      );
+      final memDetail = MemDetail(editingMem, memItems);
 
       final updated = await MemService().update(memDetail);
 
       ref.read(memProvider(updated.mem.id).notifier).updatedBy(updated.mem);
       ref
           .read(memItemsProvider(updated.mem.id).notifier)
-          .updatedBy(updated.memItemEntities.map((e) => e.toDomain()).toList());
+          .updatedBy(updated.memItems);
 
       return MemEntity.fromDomain(updated.mem);
     },
@@ -122,8 +119,9 @@ final archiveMem = Provider.family<Future<MemDetail?>, int?>(
         final archived = await MemService().archive(MemEntity.fromDomain(mem));
 
         ref.read(memProvider(archived.mem.id).notifier).updatedBy(archived.mem);
-        ref.read(memItemsProvider(archived.mem.id).notifier).updatedBy(
-            archived.memItemEntities.map((e) => e.toDomain()).toList());
+        ref
+            .read(memItemsProvider(archived.mem.id).notifier)
+            .updatedBy(archived.memItems);
 
         return archived;
       }
@@ -146,8 +144,9 @@ final unarchiveMem = Provider.family<Future<MemDetail?>, int?>(
         ref
             .read(memProvider(unarchived.mem.id).notifier)
             .updatedBy(unarchived.mem);
-        ref.read(memItemsProvider(unarchived.mem.id).notifier).updatedBy(
-            unarchived.memItemEntities.map((e) => e.toDomain()).toList());
+        ref
+            .read(memItemsProvider(unarchived.mem.id).notifier)
+            .updatedBy(unarchived.memItems);
 
         return unarchived;
       }

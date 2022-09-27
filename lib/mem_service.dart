@@ -5,14 +5,14 @@ import 'package:mem/repositories/mem_repository.dart';
 
 class MemDetail {
   final Mem mem;
-  final List<MemItemEntity> memItemEntities;
+  final List<MemItem> memItems;
 
-  MemDetail(this.mem, this.memItemEntities);
+  MemDetail(this.mem, this.memItems);
 
   @override
   String toString() => '{'
       ' mem: $mem'
-      ', memItemEntities: $memItemEntities'
+      ', memItems: $memItems'
       ' }';
 }
 
@@ -20,16 +20,19 @@ class MemService {
   Future<MemDetail> create(MemDetail memDetail) => t(
         {'memDetail': memDetail},
         () async {
-          final receivedMemEntity = await MemRepository()
-              .receive(MemEntity.fromDomain(memDetail.mem));
-          final receivedMemItemEntities = await Future.wait(memDetail
-              .memItemEntities
-              .map((e) => e..memId = receivedMemEntity.id)
-              .map((e) => MemItemRepository().receive(e)));
+          final receivedMem = (await MemRepository()
+                  .receive(MemEntity.fromDomain(memDetail.mem)))
+              .toDomain();
+          final receivedMemItems = (await Future.wait(memDetail.memItems
+                  .map((e) => e..memId = receivedMem.id)
+                  .map((e) => MemItemRepository()
+                      .receive(MemItemEntity.fromDomain(e)))))
+              .map((e) => e.toDomain())
+              .toList();
 
           return MemDetail(
-            receivedMemEntity.toDomain(),
-            receivedMemItemEntities,
+            receivedMem,
+            receivedMemItems,
           );
         },
       );
@@ -37,36 +40,55 @@ class MemService {
   Future<MemDetail> update(MemDetail memDetail) => t(
         {'memDetail': memDetail},
         () async {
-          final updatedMem =
-              await MemRepository().update(MemEntity.fromDomain(memDetail.mem));
-          final updatedMemItemEntities = await Future.wait(
-              memDetail.memItemEntities.map((e) => e.isSaved()
-                  ? MemItemRepository().update(e)
-                  : MemItemRepository().receive(e..memId = updatedMem.id)));
+          final updatedMem = (await MemRepository()
+                  .update(MemEntity.fromDomain(memDetail.mem)))
+              .toDomain();
+          final updatedMemItems =
+              (await Future.wait(memDetail.memItems.map((e) {
+            final memItemEntity = MemItemEntity.fromDomain(e);
+            return memItemEntity.isSaved()
+                ? MemItemRepository().update(memItemEntity)
+                : MemItemRepository()
+                    .receive(memItemEntity..memId = updatedMem.id);
+          })))
+                  .map((e) => e.toDomain())
+                  .toList();
 
-          return MemDetail(updatedMem.toDomain(), updatedMemItemEntities);
+          return MemDetail(updatedMem, updatedMemItems);
         },
       );
 
   Future<MemDetail> archive(MemEntity memEntity) => t(
         {'memEntity': memEntity},
         () async {
-          final archivedMem = await MemRepository().archive(memEntity);
+          final archivedMem =
+              (await MemRepository().archive(memEntity)).toDomain();
           final archivedMemItems =
-              await MemItemRepository().archiveByMemId(archivedMem.id);
+              (await MemItemRepository().archiveByMemId(memEntity.id))
+                  .map((e) => e.toDomain())
+                  .toList();
 
-          return MemDetail(archivedMem.toDomain(), archivedMemItems);
+          return MemDetail(
+            archivedMem,
+            archivedMemItems,
+          );
         },
       );
 
   Future<MemDetail> unarchive(MemEntity memEntity) => t(
         {'memEntity': memEntity},
         () async {
-          final unarchivedMem = await MemRepository().unarchive(memEntity);
+          final unarchivedMem =
+              (await MemRepository().unarchive(memEntity)).toDomain();
           final unarchivedMemItems =
-              await MemItemRepository().unarchiveByMemId(unarchivedMem.id);
+              (await MemItemRepository().unarchiveByMemId(memEntity.id))
+                  .map((e) => e.toDomain())
+                  .toList();
 
-          return MemDetail(unarchivedMem.toDomain(), unarchivedMemItems);
+          return MemDetail(
+            unarchivedMem,
+            unarchivedMemItems,
+          );
         },
       );
 
