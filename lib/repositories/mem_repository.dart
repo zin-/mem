@@ -59,7 +59,7 @@ class MemEntity extends DatabaseTupleEntity {
       }..addAll(super.toMap());
 }
 
-class MemRepository extends DatabaseTableRepository<MemEntity> {
+class MemRepository extends DatabaseTupleRepository<MemEntity> {
   @override
   Future<List<MemEntity>> ship({
     Map<String, dynamic>? whereMap,

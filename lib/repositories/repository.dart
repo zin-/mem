@@ -47,7 +47,7 @@ final defaultColumnDefinitions = [
   DefC(archivedAtColumnName, TypeC.datetime, notNull: false),
 ];
 
-abstract class DatabaseTableRepository<Entity extends DatabaseTupleEntity> {
+abstract class DatabaseTupleRepository<Entity extends DatabaseTupleEntity> {
   Future<Entity> receive(Entity entity) => v(
         {'entity': entity},
         () async {
@@ -139,7 +139,7 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTupleEntity> {
 
   final Table _table;
 
-  DatabaseTableRepository(this._table);
+  DatabaseTupleRepository(this._table);
 }
 
 Map<String, String?> buildNullableWhere(String columnName, bool? hasValue) => v(

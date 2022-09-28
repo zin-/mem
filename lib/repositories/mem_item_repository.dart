@@ -55,7 +55,7 @@ class MemItemEntity extends DatabaseTupleEntity {
       }..addAll(super.toMap());
 }
 
-class MemItemRepository extends DatabaseTableRepository<MemItemEntity> {
+class MemItemRepository extends DatabaseTupleRepository<MemItemEntity> {
   Future<List<MemItemEntity>> shipByMemId(int memId) => v(
         {'memId': memId},
         () => ship(

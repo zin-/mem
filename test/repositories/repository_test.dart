@@ -16,7 +16,7 @@ class TestEntity extends DatabaseTupleEntity {
   TestEntity.fromMap(Map<String, dynamic> valueMap) : super.fromMap(valueMap);
 }
 
-class TestRepository extends DatabaseTableRepository<TestEntity> {
+class TestRepository extends DatabaseTupleRepository<TestEntity> {
   TestRepository(Table table) : super(table);
 
   @override
