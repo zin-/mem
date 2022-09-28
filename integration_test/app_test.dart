@@ -248,7 +248,7 @@ void main() {
         await widgetTester.pumpAndSettle(defaultDuration);
 
         expect(find.text(savedMemName), findsOneWidget);
-        expect(widgetTester.widgetList(find.byType(TextFormField)).length, 2);
+        expect(widgetTester.widgetList(find.byType(TextFormField)).length, 3);
       },
       tags: 'Medium',
     );
