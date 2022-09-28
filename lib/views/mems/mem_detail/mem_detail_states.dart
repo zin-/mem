@@ -3,7 +3,6 @@ import 'package:mem/logger.dart';
 import 'package:mem/mem.dart';
 import 'package:mem/mem_service.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
-import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/atoms/state_notifier.dart';
 
 final initialMem = Mem(name: '');
@@ -39,7 +38,7 @@ final fetchMemById = FutureProvider.autoDispose.family<void, int?>(
     {'memId': memId},
     () async {
       if (memId != null && ref.read(memProvider(memId)) == null) {
-        final mem = (await MemRepository().shipById(memId)).toDomain();
+        final mem = await MemService().fetchMemById(memId);
 
         ref.read(memProvider(memId).notifier).updatedBy(mem);
       }

@@ -37,6 +37,15 @@ class MemService {
         },
       );
 
+  Future<Mem> fetchMemById(int memId) => t(
+        {'memId': memId},
+        () async {
+          final memEntity = await MemRepository().shipById(memId);
+
+          return memEntity.toDomain();
+        },
+      );
+
   Future<MemDetail> update(MemDetail memDetail) => t(
         {'memDetail': memDetail},
         () async {

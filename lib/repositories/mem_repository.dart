@@ -47,6 +47,7 @@ class MemEntity extends DatabaseTupleEntity {
         memDoneAtColumnName: doneAt,
       }..addAll(super.toMap());
 
+  @Deprecated('move MemService')
   Mem toDomain() => Mem(
         id: id,
         name: name,
