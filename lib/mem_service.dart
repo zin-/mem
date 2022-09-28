@@ -18,42 +18,26 @@ class MemDetail {
 }
 
 class MemService {
-  Future<MemDetail> create(MemDetail memDetail) => t(
+  Future<MemDetail> save(MemDetail memDetail) => t(
         {'memDetail': memDetail},
         () async {
-          final receivedMem = convertMemFromEntity(await MemRepository()
-              .receive(convertMemIntoEntity(memDetail.mem)));
-          final receivedMemItems = (await Future.wait(memDetail.memItems
-                  .map((e) => e..memId = receivedMem.id)
-                  .map((e) => MemItemRepository()
-                      .receive(convertMemItemIntoEntity(e)))))
+          final savedMem = convertMemFromEntity(await (memDetail.mem.isSaved()
+                  ? MemRepository().update
+                  : MemRepository().receive)
+              .call(convertMemIntoEntity(memDetail.mem)));
+
+          final savedMemItems = (await Future.wait(memDetail.memItems.map((e) =>
+                  (e.isSaved()
+                          ? MemItemRepository().update
+                          : MemItemRepository().receive)
+                      .call(convertMemItemIntoEntity(e)..memId = savedMem.id))))
               .map((e) => convertMemItemFromEntity(e))
               .toList();
 
           return MemDetail(
-            receivedMem,
-            receivedMemItems,
+            savedMem,
+            savedMemItems,
           );
-        },
-      );
-
-  Future<MemDetail> update(MemDetail memDetail) => t(
-        {'memDetail': memDetail},
-        () async {
-          final updatedMem = convertMemFromEntity(await MemRepository()
-              .update(convertMemIntoEntity(memDetail.mem)));
-          final updatedMemItems =
-              (await Future.wait(memDetail.memItems.map((e) {
-            final memItemEntity = convertMemItemIntoEntity(e);
-            return memItemEntity.isSaved()
-                ? MemItemRepository().update(memItemEntity)
-                : MemItemRepository()
-                    .receive(memItemEntity..memId = updatedMem.id);
-          })))
-                  .map((e) => convertMemItemFromEntity(e))
-                  .toList();
-
-          return MemDetail(updatedMem, updatedMemItems);
         },
       );
 

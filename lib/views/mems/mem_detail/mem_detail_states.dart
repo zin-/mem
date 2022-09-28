@@ -66,7 +66,7 @@ final createMem = Provider.autoDispose.family<Future<Mem>, int?>(
       final editingMem = ref.watch(editingMemProvider(memId));
       final memDetail = MemDetail(editingMem, memItems);
 
-      final received = await MemService().create(memDetail);
+      final received = await MemService().save(memDetail);
 
       ref.read(memProvider(null).notifier).updatedBy(received.mem);
       ref.read(memItemsProvider(null).notifier).updatedBy(received.memItems);
@@ -88,7 +88,7 @@ final updateMem = Provider.autoDispose.family<Future<Mem>, int?>(
       final editingMem = ref.watch(editingMemProvider(memId));
       final memDetail = MemDetail(editingMem, memItems);
 
-      final updated = await MemService().update(memDetail);
+      final updated = await MemService().save(memDetail);
 
       ref.read(memProvider(updated.mem.id).notifier).updatedBy(updated.mem);
       ref
