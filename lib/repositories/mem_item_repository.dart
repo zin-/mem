@@ -53,29 +53,6 @@ class MemItemEntity extends DatabaseTupleEntity {
         memItemTypeColumnName: type.name,
         memItemValueColumnName: value,
       }..addAll(super.toMap());
-
-  @Deprecated('move MemService')
-  MemItem toDomain() => MemItem(
-        id: id,
-        memId: memId,
-        type: type,
-        value: value,
-        createdAt: createdAt,
-        updatedAt: updatedAt,
-        archivedAt: archivedAt,
-      );
-
-  @Deprecated('move MemService')
-  MemItemEntity.fromDomain(MemItem memItem)
-      : memId = memItem.memId,
-        type = memItem.type,
-        value = memItem.value,
-        super(
-          id: memItem.id,
-          createdAt: memItem.createdAt,
-          updatedAt: memItem.updatedAt,
-          archivedAt: memItem.archivedAt,
-        );
 }
 
 class MemItemRepository extends DatabaseTableRepository<MemItemEntity> {

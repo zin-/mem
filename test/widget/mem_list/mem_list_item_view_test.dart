@@ -3,9 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
+import 'package:mem/mem.dart';
 import 'package:mem/repositories/mem_repository.dart';
-import 'package:mem/views/atoms/state_notifier.dart';
-import 'package:mem/views/mems/mem_detail/mem_detail_states.dart';
 import 'package:mem/views/mems/mem_list/mem_list_item_view.dart';
 import 'package:mockito/mockito.dart';
 
@@ -17,24 +16,16 @@ void main() {
 
   Future pumpMemListItemView(
     WidgetTester widgetTester,
-    MemEntity memEntity,
+    Mem mem,
   ) async {
     await widgetTester.pumpWidget(
       ProviderScope(
-        overrides: [
-          memProvider.overrideWithProvider((argument) {
-            expect(argument, memEntity.id);
-
-            return StateNotifierProvider(
-                (ref) => ValueStateNotifier(memEntity.toDomain()));
-          })
-        ],
         child: MaterialApp(
           onGenerateTitle: (context) => L10n(context).memListPageTitle(),
           localizationsDelegates: L10n.localizationsDelegates,
           supportedLocales: L10n.supportedLocales,
           home: Scaffold(
-            body: MemListItemView(memEntity.toDomain()),
+            body: MemListItemView(mem),
           ),
         ),
       ),
@@ -47,13 +38,13 @@ void main() {
   tearDown(() => reset(mockedMemRepository));
 
   testWidgets('Show', (widgetTester) async {
-    final savedMemEntity = minSavedMemEntity(1)
+    final savedMem = minSavedMem(1)
       ..name = 'saved mem entity name'
       ..doneAt = null;
 
     await pumpMemListItemView(
       widgetTester,
-      savedMemEntity,
+      savedMem,
     );
     await widgetTester.pump();
 

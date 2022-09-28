@@ -1,7 +1,6 @@
 import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/mem.dart';
 import 'package:mem/repositories/repository.dart';
 
 const memNameColumnName = 'name';
@@ -46,27 +45,6 @@ class MemEntity extends DatabaseTupleEntity {
         memNameColumnName: name,
         memDoneAtColumnName: doneAt,
       }..addAll(super.toMap());
-
-  @Deprecated('move MemService')
-  Mem toDomain() => Mem(
-        id: id,
-        name: name,
-        doneAt: doneAt,
-        createdAt: createdAt,
-        updatedAt: updatedAt,
-        archivedAt: archivedAt,
-      );
-
-  @Deprecated('move MemService')
-  MemEntity.fromDomain(Mem mem)
-      : name = mem.name,
-        doneAt = mem.doneAt,
-        super(
-          id: mem.id,
-          createdAt: mem.createdAt,
-          updatedAt: mem.updatedAt,
-          archivedAt: mem.archivedAt,
-        );
 }
 
 class MemRepository extends DatabaseTableRepository<MemEntity> {
