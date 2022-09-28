@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class Mem {
-  final int? id;
   String name;
   DateTime? doneAt;
   DateTime? notifyOn;
   TimeOfDay? notifyAt;
+  final int? id;
   DateTime? createdAt;
   DateTime? updatedAt;
   DateTime? archivedAt;
@@ -22,6 +22,18 @@ class Mem {
   });
 
   bool isArchived() => id != null && createdAt != null && archivedAt != null;
+
+  @override
+  String toString() => {
+        'name': name,
+        'doneAt': doneAt,
+        'notifyOn': notifyOn,
+        'notifyAt': notifyAt,
+        'id': id,
+        'createdAt': createdAt,
+        'updatedAt': updatedAt,
+        'archivedAt': archivedAt,
+      }.toString();
 
   // FIXME エレガントじゃない
   Mem copied() => Mem(
@@ -41,21 +53,32 @@ enum MemItemType {
 }
 
 class MemItem {
-  final int? id;
   int? memId;
   final MemItemType type;
   dynamic value;
+  final int? id;
   DateTime? createdAt;
   DateTime? updatedAt;
   DateTime? archivedAt;
 
   MemItem({
-    this.id,
     this.memId,
     required this.type,
     this.value,
+    this.id,
     this.createdAt,
     this.updatedAt,
     this.archivedAt,
   });
+
+  @override
+  String toString() => {
+        'memId': memId,
+        'MemItemType': MemItemType,
+        'value': value,
+        'id': id,
+        'createdAt': createdAt,
+        'updatedAt': updatedAt,
+        'archivedAt': archivedAt,
+      }.toString();
 }
