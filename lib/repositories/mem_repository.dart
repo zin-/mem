@@ -17,7 +17,7 @@ final memTableDefinition = DefT(
   ],
 );
 
-class MemEntity extends DatabaseTableEntity {
+class MemEntity extends DatabaseTupleEntity {
   String name;
   DateTime? doneAt;
 

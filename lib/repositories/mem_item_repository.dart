@@ -20,7 +20,7 @@ final memItemTableDefinition = DefT(
   ],
 );
 
-class MemItemEntity extends DatabaseTableEntity {
+class MemItemEntity extends DatabaseTupleEntity {
   int? memId;
   MemItemType type;
   dynamic value;

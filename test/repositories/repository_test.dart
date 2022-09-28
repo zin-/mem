@@ -6,7 +6,7 @@ import 'package:mem/database/definitions.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/repositories/repository.dart';
 
-class TestEntity extends DatabaseTableEntity {
+class TestEntity extends DatabaseTupleEntity {
   TestEntity({
     int? id,
     DateTime? archivedAt,
