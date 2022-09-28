@@ -2,22 +2,28 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mem/logger.dart';
 
 const _androidDefaultIconPath = 'ic_launcher_foreground';
-// const _androidDefaultIconPath = '@drawable/ic_launcher_foreground.png';
-// const _notificationDetails = NotificationDetails(
-//   android: AndroidNotificationDetails(
-//     'channelId',
-//     'channelName',
-//   ),
-// );
+const _notificationDetails = NotificationDetails(
+  android: AndroidNotificationDetails(
+    'channelId',
+    'channelName',
+  ),
+);
 
 class NotificationRepository {
-  receive() => v(
-        {},
-        () {},
-      );
-
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
+
+  Future<void> receive() => v(
+        {},
+        () {
+          return _flutterLocalNotificationsPlugin.show(
+            1,
+            'title',
+            'body',
+            _notificationDetails,
+          );
+        },
+      );
 
   static NotificationRepository? _instance;
 

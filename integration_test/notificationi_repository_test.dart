@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/logger.dart';
@@ -32,4 +33,24 @@ void main() {
       tags: 'Medium',
     );
   });
+
+  group('Operating', () {
+    final notificationRepository = NotificationRepository.initialize();
+
+    testWidgets(
+      ': receive',
+      (widgetTester) async {
+        runEmptyApplication();
+        widgetTester.pump();
+
+        await notificationRepository.receive();
+
+        // dev(result);
+        // TODO 通知されていることをcheckする
+      },
+      tags: 'Medium',
+    );
+  });
 }
+
+void runEmptyApplication() => runApp(const MaterialApp(home: Text('empty')));
