@@ -57,6 +57,7 @@ class MemEntity extends DatabaseTupleEntity {
         archivedAt: archivedAt,
       );
 
+  @Deprecated('move MemService')
   MemEntity.fromDomain(Mem mem)
       : name = mem.name,
         doneAt = mem.doneAt,

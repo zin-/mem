@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/mem.dart';
 import 'package:mem/mem_service.dart';
-import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/views/atoms/state_notifier.dart';
 
 final initialMem = Mem(name: '');
@@ -51,11 +50,9 @@ final fetchMemItemByMemId = FutureProvider.autoDispose.family<void, int?>(
     {'memId': memId},
     () async {
       if (memId != null && ref.read(memItemsProvider(memId)) == null) {
-        final memItems = await MemItemRepository().shipByMemId(memId);
+        final memItems = await MemService().fetchMemItemsByMemId(memId);
 
-        ref
-            .read(memItemsProvider(memId).notifier)
-            .updatedBy(memItems.map((e) => e.toDomain()).toList());
+        ref.read(memItemsProvider(memId).notifier).updatedBy(memItems);
       }
     },
   ),

@@ -54,6 +54,7 @@ class MemItemEntity extends DatabaseTupleEntity {
         memItemValueColumnName: value,
       }..addAll(super.toMap());
 
+  @Deprecated('move MemService')
   MemItem toDomain() => MemItem(
         id: id,
         memId: memId,
@@ -64,6 +65,7 @@ class MemItemEntity extends DatabaseTupleEntity {
         archivedAt: archivedAt,
       );
 
+  @Deprecated('move MemService')
   MemItemEntity.fromDomain(MemItem memItem)
       : memId = memItem.memId,
         type = memItem.type,

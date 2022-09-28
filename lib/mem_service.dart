@@ -20,14 +20,13 @@ class MemService {
   Future<MemDetail> create(MemDetail memDetail) => t(
         {'memDetail': memDetail},
         () async {
-          final receivedMem = (await MemRepository()
-                  .receive(MemEntity.fromDomain(memDetail.mem)))
-              .toDomain();
+          final receivedMem = convertMemFromEntity(await MemRepository()
+              .receive(convertMemIntoEntity(memDetail.mem)));
           final receivedMemItems = (await Future.wait(memDetail.memItems
                   .map((e) => e..memId = receivedMem.id)
                   .map((e) => MemItemRepository()
-                      .receive(MemItemEntity.fromDomain(e)))))
-              .map((e) => e.toDomain())
+                      .receive(convertMemItemIntoEntity(e)))))
+              .map((e) => convertMemItemFromEntity(e))
               .toList();
 
           return MemDetail(
@@ -37,30 +36,63 @@ class MemService {
         },
       );
 
+  Future<List<Mem>> fetchMems(
+    bool showNotArchived,
+    bool showArchived,
+    bool showNotDone,
+    bool showDone,
+  ) =>
+      t(
+        {
+          'showNotArchived': showNotArchived,
+          'showArchived': showArchived,
+          'showNotDone': showNotDone,
+          'showDone': showDone,
+        },
+        () async {
+          final memEntities = (await MemRepository().ship(
+            archive: showNotArchived == showArchived ? null : showArchived,
+            done: showNotDone == showDone ? null : showDone,
+          ));
+
+          return memEntities.map((e) => convertMemFromEntity(e)).toList();
+        },
+      );
+
   Future<Mem> fetchMemById(int memId) => t(
         {'memId': memId},
         () async {
           final memEntity = await MemRepository().shipById(memId);
 
-          return memEntity.toDomain();
+          return convertMemFromEntity(memEntity);
+        },
+      );
+
+  Future<List<MemItem>> fetchMemItemsByMemId(int memId) => t(
+        {'memId': memId},
+        () async {
+          final memItemEntities = await MemItemRepository().shipByMemId(memId);
+
+          return memItemEntities
+              .map((e) => convertMemItemFromEntity(e))
+              .toList();
         },
       );
 
   Future<MemDetail> update(MemDetail memDetail) => t(
         {'memDetail': memDetail},
         () async {
-          final updatedMem = (await MemRepository()
-                  .update(MemEntity.fromDomain(memDetail.mem)))
-              .toDomain();
+          final updatedMem = convertMemFromEntity(await MemRepository()
+              .update(convertMemIntoEntity(memDetail.mem)));
           final updatedMemItems =
               (await Future.wait(memDetail.memItems.map((e) {
-            final memItemEntity = MemItemEntity.fromDomain(e);
+            final memItemEntity = convertMemItemIntoEntity(e);
             return memItemEntity.isSaved()
                 ? MemItemRepository().update(memItemEntity)
                 : MemItemRepository()
                     .receive(memItemEntity..memId = updatedMem.id);
           })))
-                  .map((e) => e.toDomain())
+                  .map((e) => convertMemItemFromEntity(e))
                   .toList();
 
           return MemDetail(updatedMem, updatedMemItems);
@@ -71,14 +103,14 @@ class MemService {
         {'mem': mem},
         () async {
           final archivedMemEntity =
-              await MemRepository().archive(MemEntity.fromDomain(mem));
+              await MemRepository().archive(convertMemIntoEntity(mem));
           final archivedMemItems =
               (await MemItemRepository().archiveByMemId(archivedMemEntity.id))
-                  .map((e) => e.toDomain())
+                  .map((e) => convertMemItemFromEntity(e))
                   .toList();
 
           return MemDetail(
-            archivedMemEntity.toDomain(),
+            convertMemFromEntity(archivedMemEntity),
             archivedMemItems,
           );
         },
@@ -88,14 +120,14 @@ class MemService {
         {'mem': mem},
         () async {
           final unarchivedMemEntity =
-              await MemRepository().unarchive(MemEntity.fromDomain(mem));
+              await MemRepository().unarchive(convertMemIntoEntity(mem));
           final unarchivedMemItems = (await MemItemRepository()
                   .unarchiveByMemId(unarchivedMemEntity.id))
-              .map((e) => e.toDomain())
+              .map((e) => convertMemItemFromEntity(e))
               .toList();
 
           return MemDetail(
-            unarchivedMemEntity.toDomain(),
+            convertMemFromEntity(unarchivedMemEntity),
             unarchivedMemItems,
           );
         },
@@ -109,5 +141,55 @@ class MemService {
 
           return removeResult;
         },
+      );
+
+  Mem convertMemFromEntity(MemEntity memEntity) => v(
+        {'memEntity': memEntity},
+        () => Mem(
+          name: memEntity.name,
+          doneAt: memEntity.doneAt,
+          id: memEntity.id,
+          createdAt: memEntity.createdAt,
+          updatedAt: memEntity.updatedAt,
+          archivedAt: memEntity.archivedAt,
+        ),
+      );
+
+  MemEntity convertMemIntoEntity(Mem mem) => v(
+        {'mem': mem},
+        () => MemEntity(
+          name: mem.name,
+          doneAt: mem.doneAt,
+          id: mem.id,
+          createdAt: mem.createdAt,
+          updatedAt: mem.updatedAt,
+          archivedAt: mem.archivedAt,
+        ),
+      );
+
+  MemItem convertMemItemFromEntity(MemItemEntity memItemEntity) => v(
+        {'memItemEntity': memItemEntity},
+        () => MemItem(
+          memId: memItemEntity.memId,
+          type: memItemEntity.type,
+          value: memItemEntity.value,
+          id: memItemEntity.id,
+          createdAt: memItemEntity.createdAt,
+          updatedAt: memItemEntity.updatedAt,
+          archivedAt: memItemEntity.archivedAt,
+        ),
+      );
+
+  MemItemEntity convertMemItemIntoEntity(MemItem memItem) => v(
+        {'memItem': memItem},
+        () => MemItemEntity(
+          memId: memItem.memId,
+          type: memItem.type,
+          value: memItem.value,
+          id: memItem.id,
+          createdAt: memItem.createdAt,
+          updatedAt: memItem.updatedAt,
+          archivedAt: memItem.archivedAt,
+        ),
       );
 }
