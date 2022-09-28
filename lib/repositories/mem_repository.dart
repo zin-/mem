@@ -5,6 +5,8 @@ import 'package:mem/repositories/repository.dart';
 
 const memNameColumnName = 'name';
 const memDoneAtColumnName = 'doneAt';
+const memNotifyOnColumnName = 'notifyOn';
+const memNotifyAtColumnName = 'notifyAt';
 
 final memTableDefinition = DefT(
   'mems',
@@ -12,6 +14,8 @@ final memTableDefinition = DefT(
     DefPK(idColumnName, TypeC.integer, autoincrement: true),
     DefC(memNameColumnName, TypeC.text),
     DefC(memDoneAtColumnName, TypeC.datetime, notNull: false),
+    DefC(memNotifyOnColumnName, TypeC.datetime, notNull: false),
+    DefC(memNotifyAtColumnName, TypeC.datetime, notNull: false),
     ...defaultColumnDefinitions
   ],
 );
@@ -19,10 +23,14 @@ final memTableDefinition = DefT(
 class MemEntity extends DatabaseTupleEntity {
   String name;
   DateTime? doneAt;
+  DateTime? notifyOn;
+  DateTime? notifyAt;
 
   MemEntity({
     required this.name,
     this.doneAt,
+    this.notifyOn,
+    this.notifyAt,
     required int? id,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -38,12 +46,16 @@ class MemEntity extends DatabaseTupleEntity {
   MemEntity.fromMap(Map<String, dynamic> valueMap)
       : name = valueMap[memNameColumnName],
         doneAt = valueMap[memDoneAtColumnName],
+        notifyOn = valueMap[memNotifyOnColumnName],
+        notifyAt = valueMap[memNotifyAtColumnName],
         super.fromMap(valueMap);
 
   @override
   Map<String, dynamic> toMap() => {
         memNameColumnName: name,
         memDoneAtColumnName: doneAt,
+        memNotifyOnColumnName: notifyOn,
+        memNotifyAtColumnName: notifyAt,
       }..addAll(super.toMap());
 }
 

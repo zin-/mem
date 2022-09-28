@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/mem.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
@@ -148,6 +149,10 @@ class MemService {
         () => Mem(
           name: memEntity.name,
           doneAt: memEntity.doneAt,
+          notifyOn: memEntity.notifyOn,
+          notifyAt: memEntity.notifyAt == null
+              ? null
+              : TimeOfDay.fromDateTime(memEntity.notifyAt!),
           id: memEntity.id,
           createdAt: memEntity.createdAt,
           updatedAt: memEntity.updatedAt,
@@ -160,6 +165,13 @@ class MemService {
         () => MemEntity(
           name: mem.name,
           doneAt: mem.doneAt,
+          notifyOn: mem.notifyOn,
+          notifyAt: mem.notifyAt == null
+              ? null
+              : mem.notifyOn?.add(Duration(
+                  hours: mem.notifyAt!.hour,
+                  minutes: mem.notifyAt!.minute,
+                )),
           id: mem.id,
           createdAt: mem.createdAt,
           updatedAt: mem.updatedAt,
