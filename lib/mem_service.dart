@@ -37,6 +37,26 @@ class MemService {
         },
       );
 
+  Future<MemDetail> update(MemDetail memDetail) => t(
+        {'memDetail': memDetail},
+        () async {
+          final updatedMem = convertMemFromEntity(await MemRepository()
+              .update(convertMemIntoEntity(memDetail.mem)));
+          final updatedMemItems =
+              (await Future.wait(memDetail.memItems.map((e) {
+            final memItemEntity = convertMemItemIntoEntity(e);
+            return memItemEntity.isSaved()
+                ? MemItemRepository().update(memItemEntity)
+                : MemItemRepository()
+                    .receive(memItemEntity..memId = updatedMem.id);
+          })))
+                  .map((e) => convertMemItemFromEntity(e))
+                  .toList();
+
+          return MemDetail(updatedMem, updatedMemItems);
+        },
+      );
+
   Future<List<Mem>> fetchMems(
     bool showNotArchived,
     bool showArchived,
@@ -77,26 +97,6 @@ class MemService {
           return memItemEntities
               .map((e) => convertMemItemFromEntity(e))
               .toList();
-        },
-      );
-
-  Future<MemDetail> update(MemDetail memDetail) => t(
-        {'memDetail': memDetail},
-        () async {
-          final updatedMem = convertMemFromEntity(await MemRepository()
-              .update(convertMemIntoEntity(memDetail.mem)));
-          final updatedMemItems =
-              (await Future.wait(memDetail.memItems.map((e) {
-            final memItemEntity = convertMemItemIntoEntity(e);
-            return memItemEntity.isSaved()
-                ? MemItemRepository().update(memItemEntity)
-                : MemItemRepository()
-                    .receive(memItemEntity..memId = updatedMem.id);
-          })))
-                  .map((e) => convertMemItemFromEntity(e))
-                  .toList();
-
-          return MemDetail(updatedMem, updatedMemItems);
         },
       );
 

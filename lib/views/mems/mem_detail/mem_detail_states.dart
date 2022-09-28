@@ -64,10 +64,7 @@ final createMem = Provider.autoDispose.family<Future<Mem>, int?>(
     () async {
       final memItems = ref.read(memItemsProvider(memId)) ?? [];
       final editingMem = ref.watch(editingMemProvider(memId));
-      final memDetail = MemDetail(
-        editingMem,
-        memItems,
-      );
+      final memDetail = MemDetail(editingMem, memItems);
 
       final received = await MemService().create(memDetail);
 
