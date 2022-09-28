@@ -17,7 +17,9 @@ class TimeOfDayTextFormField extends StatelessWidget {
         {},
         () {
           return TextFormField(
-            initialValue: timeOfDay?.format(context) ?? '',
+            controller: TextEditingController(
+              text: timeOfDay?.format(context) ?? '',
+            ),
             decoration: InputDecoration(
               hintText: 'Cant show format. ${L10n().dev()}',
               suffixIcon: IconButton(

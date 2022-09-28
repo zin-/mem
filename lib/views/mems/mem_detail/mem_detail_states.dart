@@ -19,7 +19,7 @@ final editingMemProvider =
   (ref, memId) => v(
     {'memId': memId},
     () => ValueStateNotifier(
-      ref.watch(memProvider(memId)) ?? Mem.copyFrom(initialMem),
+      ref.watch(memProvider(memId)) ?? initialMem.copied(),
     ),
   ),
 );

@@ -5,20 +5,18 @@ import 'package:mem/views/atoms/time_of_day_text_form_field.dart';
 
 class DateAndTimeTextFormField extends StatelessWidget {
   final DateTime? date;
-  final Function(DateTime? pickedDate) onDateChanged;
   final TimeOfDay? timeOfDay;
-  final Function(TimeOfDay? pickedtimeOfDay) onTimeOfDayChanged;
+  final Function(DateTime? pickedDate, TimeOfDay? pickedtimeOfDay) onChanged;
 
   const DateAndTimeTextFormField({
     required this.date,
-    required this.onDateChanged,
     required this.timeOfDay,
-    required this.onTimeOfDayChanged,
+    required this.onChanged,
     Key? key,
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => t(
+  Widget build(BuildContext context) => v(
         {'date': date, 'timeOfDay': timeOfDay},
         () {
           final allDay = timeOfDay == null;
@@ -28,7 +26,7 @@ class DateAndTimeTextFormField extends StatelessWidget {
               Expanded(
                 child: DateTextFormField(
                   date: date,
-                  onChanged: onDateChanged,
+                  onChanged: (date) => onChanged(date, timeOfDay),
                 ),
               ),
               allDay
@@ -36,24 +34,23 @@ class DateAndTimeTextFormField extends StatelessWidget {
                   : Expanded(
                       child: TimeOfDayTextFormField(
                         timeOfDay: timeOfDay,
-                        onChanged: onTimeOfDayChanged,
+                        onChanged: (timeOfDay) => onChanged(date, timeOfDay),
                       ),
                     ),
               Switch(
                 value: allDay,
                 onChanged: (value) {
                   if (value) {
-                    onTimeOfDayChanged(null);
+                    onChanged(date, null);
+                  } else {
+                    onChanged(date, TimeOfDay.now());
                   }
                 },
               ),
               date == null && timeOfDay == null
                   ? const SizedBox.shrink()
                   : IconButton(
-                      onPressed: () {
-                        onDateChanged(null);
-                        onTimeOfDayChanged(null);
-                      },
+                      onPressed: () => onChanged(null, null),
                       icon: const Icon(Icons.clear),
                     ),
             ],

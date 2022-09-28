@@ -16,9 +16,12 @@ class DateTextFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => v(
-        {},
+        {'date': date},
         () {
           return TextFormField(
+            controller: TextEditingController(
+              text: date == null ? '' : _dateFormat.format(date!),
+            ),
             decoration: InputDecoration(
               hintText: _dateFormat.pattern,
               suffixIcon: IconButton(
@@ -43,7 +46,6 @@ class DateTextFormField extends StatelessWidget {
               ),
             ),
             keyboardType: TextInputType.datetime,
-            initialValue: date == null ? '' : _dateFormat.format(date!),
           );
         },
       );

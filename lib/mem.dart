@@ -1,15 +1,21 @@
+import 'package:flutter/material.dart';
+
 class Mem {
   final int? id;
   String name;
   DateTime? doneAt;
+  DateTime? notifyOn;
+  TimeOfDay? notifyAt;
   DateTime? createdAt;
   DateTime? updatedAt;
   DateTime? archivedAt;
 
   Mem({
-    this.id,
     required this.name,
     this.doneAt,
+    this.notifyOn,
+    this.notifyAt,
+    this.id,
     this.createdAt,
     this.updatedAt,
     this.archivedAt,
@@ -17,14 +23,17 @@ class Mem {
 
   bool isArchived() => id != null && createdAt != null && archivedAt != null;
 
-  // FIXME エレガントじゃない気がする
-  Mem.copyFrom(Mem mem)
-      : id = mem.id,
-        name = mem.name,
-        doneAt = mem.doneAt,
-        createdAt = mem.createdAt,
-        updatedAt = mem.updatedAt,
-        archivedAt = mem.archivedAt;
+  // FIXME エレガントじゃない
+  Mem copied() => Mem(
+        name: name,
+        doneAt: doneAt,
+        notifyOn: notifyOn,
+        notifyAt: notifyAt,
+        id: id,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+        archivedAt: archivedAt,
+      );
 }
 
 enum MemItemType {
