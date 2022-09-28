@@ -234,7 +234,7 @@ void main() {
 
 final memNameTextFormFieldFinder = find.byType(TextFormField).at(0);
 final memDoneCheckboxFinder = find.byType(Checkbox);
-final memMemoTextFormFieldFinder = find.byType(TextFormField).at(1);
+final memMemoTextFormFieldFinder = find.byType(TextFormField).at(2);
 
 TextFormField memNameTextFormField(WidgetTester widgetTester) =>
     (widgetTester.widget(memNameTextFormFieldFinder) as TextFormField);
