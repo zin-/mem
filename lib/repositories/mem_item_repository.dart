@@ -3,7 +3,7 @@ import 'package:mem/database/definitions.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/mem.dart';
 import 'package:mem/repositories/mem_repository.dart';
-import 'package:mem/repositories/repository.dart';
+import 'package:mem/repositories/database_tuple_repository.dart';
 
 const memIdColumnName = 'mems_id';
 const memItemTypeColumnName = 'type';

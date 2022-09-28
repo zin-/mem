@@ -4,7 +4,7 @@ import 'package:mem/database/database.dart';
 import 'package:mem/database/database_factory.dart';
 import 'package:mem/database/definitions.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/repositories/repository.dart';
+import 'package:mem/repositories/database_tuple_repository.dart';
 
 class TestEntity extends DatabaseTupleEntity {
   TestEntity({
