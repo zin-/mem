@@ -22,6 +22,7 @@ dependencies:
 
   # for Notification
   flutter_local_notifications:
+  timezone:
 
   # for Persistence
   ## for Database

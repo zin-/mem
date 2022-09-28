@@ -6,6 +6,7 @@ import 'package:mem/database/definitions.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
+import 'package:mem/repositories/notification_repository.dart';
 
 final databaseDefinition = DefD(
   'mem.db',
@@ -35,6 +36,8 @@ Future<Database> _openDatabase() => t(
         MemRepository.initialize(database.getTable(memTableDefinition.name));
         MemItemRepository.initialize(
             database.getTable(memItemTableDefinition.name));
+
+        NotificationRepository.initialize();
 
         return database;
       },

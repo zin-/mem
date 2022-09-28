@@ -43,7 +43,11 @@ void main() {
         runEmptyApplication();
         widgetTester.pump();
 
-        await notificationRepository.receive();
+        await notificationRepository.receive(
+          1,
+          'title',
+          DateTime.now(),
+        );
 
         // dev(result);
         // TODO 通知されていることをcheckする

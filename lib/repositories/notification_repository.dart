@@ -1,5 +1,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mem/logger.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 const _androidDefaultIconPath = 'ic_launcher_foreground';
 const _notificationDetails = NotificationDetails(
@@ -9,25 +11,33 @@ const _notificationDetails = NotificationDetails(
   ),
 );
 
+class NotificationEntity {}
+
 class NotificationRepository {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  Future<void> receive() => v(
-        {},
+  Future<void> receive(int id, String title, DateTime notifyAt) => v(
+        {'id': id, 'title': title, 'notifyAt': notifyAt},
         () {
-          return _flutterLocalNotificationsPlugin.show(
-            1,
-            'title',
-            'body',
+          return _flutterLocalNotificationsPlugin.zonedSchedule(
+            id,
+            title,
+            null,
+            tz.TZDateTime.from(notifyAt, tz.local),
             _notificationDetails,
+            uiLocalNotificationDateInterpretation:
+                UILocalNotificationDateInterpretation.absoluteTime,
+            androidAllowWhileIdle: true,
           );
         },
       );
 
   static NotificationRepository? _instance;
 
-  NotificationRepository._();
+  NotificationRepository._() {
+    _initialize();
+  }
 
   factory NotificationRepository() {
     var tmp = _instance;
@@ -43,19 +53,22 @@ class NotificationRepository {
 
     _instance = tmp;
 
-    t(
-      {},
-      () => tmp._flutterLocalNotificationsPlugin.initialize(
-        const InitializationSettings(
-          android: AndroidInitializationSettings(
-            _androidDefaultIconPath,
-          ),
-        ),
-      ),
-    );
-
     return tmp;
   }
+
+  _initialize() => v(
+        {},
+        () async {
+          tz.initializeTimeZones();
+          _flutterLocalNotificationsPlugin.initialize(
+            const InitializationSettings(
+              android: AndroidInitializationSettings(
+                _androidDefaultIconPath,
+              ),
+            ),
+          );
+        },
+      );
 
   factory NotificationRepository.withMock(NotificationRepository mock) {
     _instance = mock;
