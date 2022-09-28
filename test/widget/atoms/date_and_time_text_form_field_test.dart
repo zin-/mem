@@ -13,7 +13,7 @@ void main() {
     WidgetTester widgetTester,
     DateTime? date,
     TimeOfDay? timeOfDay,
-    Function(DateTime? pickedDate, TimeOfDay? pickedtimeOfDay)? onChanged,
+    Function(DateTime? pickedDate, TimeOfDay? pickedTimeOfDay)? onChanged,
   ) async {
     await widgetTester.pumpWidget(
       MaterialApp(
@@ -117,9 +117,105 @@ void main() {
     );
   });
 
-  testWidgets(
-    'Edit',
-    (widgetTester) async {},
-    tags: 'Small',
-  );
+  group('onChanged', () {
+    testWidgets(
+      ': date',
+      (widgetTester) async {
+        await pumpDateTimeTextField(
+          widgetTester,
+          null,
+          null,
+          (pickedDate, pickedTimeOfDay) {
+            expect(pickedTimeOfDay, isNull);
+          },
+        );
+
+        await widgetTester.tap(find.byIcon(Icons.calendar_month));
+        await widgetTester.pump();
+
+        await widgetTester.tap(find.text('OK'));
+      },
+      tags: 'Small',
+    );
+
+    testWidgets(
+      ': timeOfDay',
+      (widgetTester) async {
+        await pumpDateTimeTextField(
+          widgetTester,
+          null,
+          TimeOfDay.now(),
+          (pickedDate, pickedTimeOfDay) {
+            expect(pickedDate.runtimeType, DateTime);
+          },
+        );
+
+        await widgetTester.tap(find.byIcon(Icons.calendar_month));
+        await widgetTester.pump();
+
+        await widgetTester.tap(find.text('OK'));
+      },
+      tags: 'Small',
+    );
+
+    group(
+      'all day',
+      () {
+        testWidgets(
+          ': be false',
+          (widgetTester) async {
+            await pumpDateTimeTextField(
+              widgetTester,
+              null,
+              null,
+              (pickedDate, pickedTimeOfDay) {
+                expect(pickedTimeOfDay.runtimeType, TimeOfDay);
+              },
+            );
+
+            await widgetTester.tap(find.byType(Switch));
+            await widgetTester.pump();
+          },
+          tags: 'Small',
+        );
+
+        testWidgets(
+          ': be true',
+          (widgetTester) async {
+            await pumpDateTimeTextField(
+              widgetTester,
+              null,
+              TimeOfDay.now(),
+              (pickedDate, pickedTimeOfDay) {
+                expect(pickedTimeOfDay, isNull);
+              },
+            );
+
+            await widgetTester.tap(find.byType(Switch));
+            await widgetTester.pump();
+          },
+          tags: 'Small',
+        );
+      },
+    );
+
+    testWidgets(
+      ': clear',
+      (widgetTester) async {
+        await pumpDateTimeTextField(
+          widgetTester,
+          DateTime.now(),
+          TimeOfDay.now(),
+          (pickedDate, pickedTimeOfDay) {
+            expect(pickedDate, isNull);
+            expect(pickedTimeOfDay, isNull);
+          },
+        );
+
+        await widgetTester.tap(find.byIcon(Icons.clear));
+        await widgetTester.pump();
+      },
+      tags: 'Small',
+    );
+  });
 }

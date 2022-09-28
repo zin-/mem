@@ -6,7 +6,7 @@ import 'package:mem/views/atoms/time_of_day_text_form_field.dart';
 class DateAndTimeTextFormField extends StatelessWidget {
   final DateTime? date;
   final TimeOfDay? timeOfDay;
-  final Function(DateTime? pickedDate, TimeOfDay? pickedtimeOfDay) onChanged;
+  final Function(DateTime? pickedDate, TimeOfDay? pickedTimeOfDay) onChanged;
 
   const DateAndTimeTextFormField({
     required this.date,
