@@ -1,14 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/database/database_factory.dart';
-import 'package:mem/mem.dart';
-import 'package:mem/repositories/mem_item_repository.dart';
-import 'package:mem/repositories/mem_repository.dart';
-import 'package:mem/main.dart' as app;
-import 'package:mem/repositories/database_tuple_repository.dart';
 
+import '_edge_scenario.dart';
 import '_memo_scenario.dart';
 import '_notification_repository.dart';
 import '_todo_scenario.dart';
@@ -16,89 +10,15 @@ import '_todo_scenario.dart';
 const defaultDuration = Duration(seconds: 1);
 
 void main() {
-  Logger(level: Level.verbose);
-  DatabaseManager(onTest: true);
-
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  setUp(() async {
-    // FIXME openしないとdeleteできないのは、実際のDatabaseと挙動が異なる
-    // 今の実装だと難しいっぽい。いつかチャレンジする
-    await DatabaseManager().open(app.databaseDefinition);
-    await DatabaseManager().delete(app.databaseDefinition.name);
-  });
+  Logger(level: Level.verbose);
+  DatabaseManager(onTest: true);
 
   testNotificationRepository();
 
   testMemoScenario();
   testTodoScenario();
 
-  group(
-    'Edge scenario',
-    () {
-      testWidgets(
-        'MemItem is nothing',
-        (widgetTester) async {
-          const savedMemName = 'saved mem name';
-          final database = await DatabaseManager().open(app.databaseDefinition);
-          final memTable = database.getTable(memTableDefinition.name);
-          await memTable.insert({
-            memNameColumnName: savedMemName,
-            createdAtColumnName: DateTime.now(),
-            archivedAtColumnName: null,
-          });
-
-          await app.main(languageCode: 'en');
-          await widgetTester.pumpAndSettle(defaultDuration);
-
-          await widgetTester.tap(find.text(savedMemName));
-          await widgetTester.pumpAndSettle(defaultDuration);
-
-          expect(find.text(savedMemName), findsOneWidget);
-          expect(widgetTester.widgetList(find.byType(TextFormField)).length, 3);
-        },
-        tags: 'Medium',
-      );
-    },
-  );
-}
-
-final memListFilterButton = find.byIcon(Icons.filter_list);
-final findShowNotArchiveSwitch = find.byType(Switch).at(0);
-final findShowArchiveSwitch = find.byType(Switch).at(1);
-
-Future closeMemListFilter(WidgetTester widgetTester) async {
-  await widgetTester.tapAt(const Offset(0, 0));
-  await widgetTester.pumpAndSettle(defaultDuration);
-}
-
-final memNameTextFormFieldFinder = find.byType(TextFormField).at(0);
-final memMemoTextFormFieldFinder = find.byType(TextFormField).at(1);
-final saveFabFinder = find.byIcon(Icons.save_alt).at(0);
-
-TextFormField memNameTextFormField(WidgetTester widgetTester) =>
-    (widgetTester.widget(memNameTextFormFieldFinder) as TextFormField);
-
-Future<void> prepareSavedData(
-  String memName,
-  String memMemo, {
-  bool isArchived = false,
-}) async {
-  final database = await DatabaseManager().open(app.databaseDefinition);
-  final memTable = database.getTable(memTableDefinition.name);
-  final savedMemId = await memTable.insert({
-    memNameColumnName: memName,
-    createdAtColumnName: DateTime.now(),
-    archivedAtColumnName: isArchived ? DateTime.now() : null,
-  });
-  assert(savedMemId == 1);
-  final memItemTable = database.getTable(memItemTableDefinition.name);
-  await memItemTable.insert({
-    memIdColumnName: savedMemId,
-    memItemTypeColumnName: MemItemType.memo.name,
-    memItemValueColumnName: memMemo,
-    createdAtColumnName: DateTime.now(),
-    archivedAtColumnName: isArchived ? DateTime.now() : null,
-  });
-  await DatabaseManager().close(app.databaseDefinition.name);
+  testEdgeScenario();
 }
