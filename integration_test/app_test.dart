@@ -9,7 +9,7 @@ import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/main.dart' as app;
 import 'package:mem/repositories/database_tuple_repository.dart';
 
-import 'notification_repository.dart';
+import '_notification_repository.dart';
 
 const defaultDuration = Duration(seconds: 1);
 
