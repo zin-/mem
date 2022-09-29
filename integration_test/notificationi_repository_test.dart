@@ -35,7 +35,11 @@ void main() {
   });
 
   group('Operating', () {
-    final notificationRepository = NotificationRepository.initialize();
+    late NotificationRepository notificationRepository;
+
+    setUpAll(() {
+      notificationRepository = NotificationRepository.initialize();
+    });
 
     testWidgets(
       ': receive',
@@ -46,7 +50,7 @@ void main() {
         await notificationRepository.receive(
           1,
           'title',
-          DateTime.now(),
+          DateTime.now().add(const Duration(days: 1)),
         );
 
         // dev(result);
