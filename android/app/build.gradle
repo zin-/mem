@@ -26,7 +26,9 @@ apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
-  compileSdkVersion flutter.compileSdkVersion
+  // FIXME 直接書き換えるといつか問題が起こりそう。プロジェクトごとに設定できるようにしたい
+  compileSdkVersion 33
+  // compileSdkVersion flutter.compileSdkVersion
   ndkVersion flutter.ndkVersion
 
   compileOptions {
