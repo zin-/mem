@@ -5,7 +5,6 @@ env:
   flutter-channel: 'stable'
 jobs:
   integration_test:
-      needs: small_test
       strategy:
         fail-fast: false
         matrix:
