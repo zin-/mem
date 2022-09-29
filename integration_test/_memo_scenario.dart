@@ -4,8 +4,6 @@ import 'package:integration_test/integration_test.dart';
 import 'package:logger/logger.dart';
 import 'package:mem/database/database_factory.dart';
 
-import 'package:mem/main.dart' as app;
-
 import '_helpers.dart';
 
 void main() {
@@ -20,17 +18,12 @@ void main() {
 void testMemoScenario() => group(
       'Memo scenario',
       () {
-        setUp(() async {
-          // FIXME openしないとdeleteできないのは、実際のDatabaseと挙動が異なる
-          // 今の実装だと難しいっぽい。いつかチャレンジする
-          await DatabaseManager().open(app.databaseDefinition);
-          await DatabaseManager().delete(app.databaseDefinition.name);
-        });
+        setUp(() async => await clearDatabase());
 
         testWidgets(
           ': create',
           (widgetTester) async {
-            await app.main(languageCode: 'en');
+            await pumpApplication(languageCode: 'en');
             await widgetTester.pumpAndSettle(defaultDuration);
 
             await widgetTester.tap(find.byIcon(Icons.add));
@@ -63,7 +56,7 @@ void testMemoScenario() => group(
             const savedMemMemo = 'saved mem memo';
             await prepareSavedData(savedMemName, savedMemMemo);
 
-            await app.main(languageCode: 'en');
+            await pumpApplication(languageCode: 'en');
             await widgetTester.pumpAndSettle(defaultDuration);
 
             await widgetTester.tap(find.text(savedMemName));
@@ -98,7 +91,7 @@ void testMemoScenario() => group(
             const savedMemMemo = 'saved mem memo';
             await prepareSavedData(savedMemName, savedMemMemo);
 
-            await app.main(languageCode: 'en');
+            await pumpApplication(languageCode: 'en');
             await widgetTester.pumpAndSettle(defaultDuration);
 
             await widgetTester.tap(find.text(savedMemName));
@@ -133,7 +126,7 @@ void testMemoScenario() => group(
             await prepareSavedData(savedMemName, savedMemMemo,
                 isArchived: true);
 
-            await app.main(languageCode: 'en');
+            await pumpApplication(languageCode: 'en');
             await widgetTester.pumpAndSettle(defaultDuration);
 
             await widgetTester.tap(memListFilterButton);
@@ -172,7 +165,7 @@ void testMemoScenario() => group(
             const savedMemMemo = 'saved mem memo';
             await prepareSavedData(savedMemName, savedMemMemo);
 
-            await app.main(languageCode: 'en');
+            await pumpApplication(languageCode: 'en');
             await widgetTester.pumpAndSettle(defaultDuration);
 
             await widgetTester.tap(find.text(savedMemName));

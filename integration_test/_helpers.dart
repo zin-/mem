@@ -9,6 +9,16 @@ import 'package:mem/repositories/mem_repository.dart';
 
 const defaultDuration = Duration(seconds: 1);
 
+Future clearDatabase() async {
+  // FIXME openしないとdeleteできないのは、実際のDatabaseと挙動が異なる
+  // 今の実装だと難しいっぽい。いつかチャレンジする
+  await DatabaseManager().open(app.databaseDefinition);
+  await DatabaseManager().delete(app.databaseDefinition.name);
+}
+
+Future<void> pumpApplication({String? languageCode}) =>
+    app.main(languageCode: languageCode);
+
 final memListFilterButton = find.byIcon(Icons.filter_list);
 final findShowNotArchiveSwitch = find.byType(Switch).at(0);
 final findShowArchiveSwitch = find.byType(Switch).at(1);

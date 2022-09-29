@@ -11,6 +11,7 @@ import 'package:mem/repositories/database_tuple_repository.dart';
 
 import '_memo_scenario.dart';
 import '_notification_repository.dart';
+import '_todo_scenario.dart';
 
 const defaultDuration = Duration(seconds: 1);
 
@@ -30,36 +31,7 @@ void main() {
   testNotificationRepository();
 
   testMemoScenario();
-
-  group(
-    'Todo scenario',
-    () {
-      testWidgets(
-        ': done',
-        (widgetTester) async {
-          const savedMemName = 'saved mem name';
-          const savedMemMemo = 'saved mem memo';
-          await prepareSavedData(savedMemName, savedMemMemo);
-
-          await app.main(languageCode: 'en');
-          await widgetTester.pumpAndSettle(defaultDuration);
-
-          await widgetTester.tap(find.byType(Checkbox));
-          await widgetTester.pumpAndSettle(defaultDuration);
-
-          expect(find.text(savedMemName), findsNothing);
-
-          await widgetTester.tap(memListFilterButton);
-          await widgetTester.pumpAndSettle(defaultDuration);
-          await widgetTester.tap(find.byType(Switch).at(3));
-          await closeMemListFilter(widgetTester);
-
-          expect(find.text(savedMemName), findsOneWidget);
-        },
-        tags: 'Medium',
-      );
-    },
-  );
+  testTodoScenario();
 
   group(
     'Edge scenario',
