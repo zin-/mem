@@ -9,6 +9,8 @@ import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/main.dart' as app;
 import 'package:mem/repositories/database_tuple_repository.dart';
 
+import 'notification_repository.dart';
+
 const defaultDuration = Duration(seconds: 1);
 
 void main() {
@@ -24,235 +26,246 @@ void main() {
     await DatabaseManager().delete(app.databaseDefinition.name);
   });
 
-  group('Memo scenario', () {
-    testWidgets(
-      ': create',
-      (widgetTester) async {
-        await app.main(languageCode: 'en');
-        await widgetTester.pumpAndSettle(defaultDuration);
+  testNotificationRepository();
 
-        await widgetTester.tap(find.byIcon(Icons.add));
-        await widgetTester.pumpAndSettle(defaultDuration);
+  group(
+    'Memo scenario',
+    () {
+      testWidgets(
+        ': create',
+        (widgetTester) async {
+          await app.main(languageCode: 'en');
+          await widgetTester.pumpAndSettle(defaultDuration);
 
-        const enteringMemName = 'entering mem name';
-        const enteringMemMemo = 'entering mem memo';
+          await widgetTester.tap(find.byIcon(Icons.add));
+          await widgetTester.pumpAndSettle(defaultDuration);
 
-        await widgetTester.enterText(
-            memNameTextFormFieldFinder, enteringMemName);
-        await widgetTester.enterText(
-            memMemoTextFormFieldFinder, enteringMemMemo);
+          const enteringMemName = 'entering mem name';
+          const enteringMemMemo = 'entering mem memo';
 
-        await widgetTester.tap(saveFabFinder);
-        await widgetTester.pumpAndSettle(defaultDuration);
+          await widgetTester.enterText(
+              memNameTextFormFieldFinder, enteringMemName);
+          await widgetTester.enterText(
+              memMemoTextFormFieldFinder, enteringMemMemo);
 
-        await widgetTester.pageBack();
-        await widgetTester.pumpAndSettle(defaultDuration);
+          await widgetTester.tap(saveFabFinder);
+          await widgetTester.pumpAndSettle(defaultDuration);
 
-        expect(find.text(enteringMemName), findsOneWidget);
-        expect(find.text(enteringMemMemo), findsNothing);
-      },
-      tags: 'Medium',
-    );
+          await widgetTester.pageBack();
+          await widgetTester.pumpAndSettle(defaultDuration);
 
-    testWidgets(
-      ': update',
-      (widgetTester) async {
-        const savedMemName = 'saved mem name';
-        const savedMemMemo = 'saved mem memo';
-        await prepareSavedData(savedMemName, savedMemMemo);
+          expect(find.text(enteringMemName), findsOneWidget);
+          expect(find.text(enteringMemMemo), findsNothing);
+        },
+        tags: 'Medium',
+      );
 
-        await app.main(languageCode: 'en');
-        await widgetTester.pumpAndSettle(defaultDuration);
+      testWidgets(
+        ': update',
+        (widgetTester) async {
+          const savedMemName = 'saved mem name';
+          const savedMemMemo = 'saved mem memo';
+          await prepareSavedData(savedMemName, savedMemMemo);
 
-        await widgetTester.tap(find.text(savedMemName));
-        await widgetTester.pumpAndSettle(defaultDuration);
+          await app.main(languageCode: 'en');
+          await widgetTester.pumpAndSettle(defaultDuration);
 
-        const enteringMemName = 'entering mem name';
-        const enteringMemMemo = 'entering mem memo';
+          await widgetTester.tap(find.text(savedMemName));
+          await widgetTester.pumpAndSettle(defaultDuration);
 
-        await widgetTester.enterText(
-            memNameTextFormFieldFinder, enteringMemName);
-        await widgetTester.enterText(
-            memMemoTextFormFieldFinder, enteringMemMemo);
+          const enteringMemName = 'entering mem name';
+          const enteringMemMemo = 'entering mem memo';
 
-        await widgetTester.tap(saveFabFinder);
-        await widgetTester.pumpAndSettle(defaultDuration);
+          await widgetTester.enterText(
+              memNameTextFormFieldFinder, enteringMemName);
+          await widgetTester.enterText(
+              memMemoTextFormFieldFinder, enteringMemMemo);
 
-        await widgetTester.pageBack();
-        // FIXME 2秒は長すぎる。何が原因で見つからないのか分からないので一旦時間を伸ばしてみた
-        await widgetTester.pumpAndSettle(const Duration(seconds: 2));
+          await widgetTester.tap(saveFabFinder);
+          await widgetTester.pumpAndSettle(defaultDuration);
 
-        expect(find.text(enteringMemName), findsOneWidget);
-        expect(find.text(enteringMemMemo), findsNothing);
-        expect(find.text(savedMemName), findsNothing);
-      },
-      tags: 'Medium',
-    );
+          await widgetTester.pageBack();
+          // FIXME 2秒は長すぎる。何が原因で見つからないのか分からないので一旦時間を伸ばしてみた
+          await widgetTester.pumpAndSettle(const Duration(seconds: 2));
 
-    testWidgets(
-      ': archive',
-      (widgetTester) async {
-        const savedMemName = 'saved mem name';
-        const savedMemMemo = 'saved mem memo';
-        await prepareSavedData(savedMemName, savedMemMemo);
+          expect(find.text(enteringMemName), findsOneWidget);
+          expect(find.text(enteringMemMemo), findsNothing);
+          expect(find.text(savedMemName), findsNothing);
+        },
+        tags: 'Medium',
+      );
 
-        await app.main(languageCode: 'en');
-        await widgetTester.pumpAndSettle(defaultDuration);
+      testWidgets(
+        ': archive',
+        (widgetTester) async {
+          const savedMemName = 'saved mem name';
+          const savedMemMemo = 'saved mem memo';
+          await prepareSavedData(savedMemName, savedMemMemo);
 
-        await widgetTester.tap(find.text(savedMemName));
-        await widgetTester.pumpAndSettle(defaultDuration);
+          await app.main(languageCode: 'en');
+          await widgetTester.pumpAndSettle(defaultDuration);
 
-        await widgetTester.tap(find.byIcon(Icons.archive));
-        await widgetTester.pumpAndSettle(defaultDuration);
+          await widgetTester.tap(find.text(savedMemName));
+          await widgetTester.pumpAndSettle(defaultDuration);
 
-        expect(
-          find.descendant(
-            of: find.byType(Text),
-            matching: find.text(savedMemName),
-          ),
-          findsNothing,
-        );
+          await widgetTester.tap(find.byIcon(Icons.archive));
+          await widgetTester.pumpAndSettle(defaultDuration);
 
-        await widgetTester.tap(memListFilterButton);
-        await widgetTester.pumpAndSettle(defaultDuration);
-        await widgetTester.tap(findShowArchiveSwitch);
-        await widgetTester.pumpAndSettle(defaultDuration);
+          expect(
+            find.descendant(
+              of: find.byType(Text),
+              matching: find.text(savedMemName),
+            ),
+            findsNothing,
+          );
 
-        expect(find.text(savedMemName), findsOneWidget);
-      },
-      tags: 'Medium',
-    );
+          await widgetTester.tap(memListFilterButton);
+          await widgetTester.pumpAndSettle(defaultDuration);
+          await widgetTester.tap(findShowArchiveSwitch);
+          await widgetTester.pumpAndSettle(defaultDuration);
 
-    testWidgets(
-      ': unarchive',
-      (widgetTester) async {
-        const savedMemName = 'archived mem name';
-        const savedMemMemo = 'archived mem memo';
-        await prepareSavedData(savedMemName, savedMemMemo, isArchived: true);
+          expect(find.text(savedMemName), findsOneWidget);
+        },
+        tags: 'Medium',
+      );
 
-        await app.main(languageCode: 'en');
-        await widgetTester.pumpAndSettle(defaultDuration);
+      testWidgets(
+        ': unarchive',
+        (widgetTester) async {
+          const savedMemName = 'archived mem name';
+          const savedMemMemo = 'archived mem memo';
+          await prepareSavedData(savedMemName, savedMemMemo, isArchived: true);
 
-        await widgetTester.tap(memListFilterButton);
-        await widgetTester.pumpAndSettle(defaultDuration);
-        await widgetTester.tap(findShowArchiveSwitch);
-        await widgetTester.tap(findShowNotArchiveSwitch);
-        await closeMemListFilter(widgetTester);
-        await widgetTester.pumpAndSettle(defaultDuration);
+          await app.main(languageCode: 'en');
+          await widgetTester.pumpAndSettle(defaultDuration);
 
-        await widgetTester.tap(find.text(savedMemName));
-        await widgetTester.pumpAndSettle(defaultDuration);
+          await widgetTester.tap(memListFilterButton);
+          await widgetTester.pumpAndSettle(defaultDuration);
+          await widgetTester.tap(findShowArchiveSwitch);
+          await widgetTester.tap(findShowNotArchiveSwitch);
+          await closeMemListFilter(widgetTester);
+          await widgetTester.pumpAndSettle(defaultDuration);
 
-        await widgetTester.tap(find.byIcon(Icons.unarchive));
-        await widgetTester.pumpAndSettle(defaultDuration);
+          await widgetTester.tap(find.text(savedMemName));
+          await widgetTester.pumpAndSettle(defaultDuration);
 
-        await widgetTester.pageBack();
-        await widgetTester.pumpAndSettle(defaultDuration);
+          await widgetTester.tap(find.byIcon(Icons.unarchive));
+          await widgetTester.pumpAndSettle(defaultDuration);
 
-        expect(find.text(savedMemName), findsNothing);
+          await widgetTester.pageBack();
+          await widgetTester.pumpAndSettle(defaultDuration);
 
-        await widgetTester.tap(memListFilterButton);
-        await widgetTester.pumpAndSettle(defaultDuration);
-        await widgetTester.tap(findShowNotArchiveSwitch);
-        await closeMemListFilter(widgetTester);
-        await widgetTester.pumpAndSettle(defaultDuration);
+          expect(find.text(savedMemName), findsNothing);
 
-        expect(find.text(savedMemName), findsOneWidget);
-      },
-      tags: 'Medium',
-    );
+          await widgetTester.tap(memListFilterButton);
+          await widgetTester.pumpAndSettle(defaultDuration);
+          await widgetTester.tap(findShowNotArchiveSwitch);
+          await closeMemListFilter(widgetTester);
+          await widgetTester.pumpAndSettle(defaultDuration);
 
-    testWidgets(
-      ': remove',
-      (widgetTester) async {
-        const savedMemName = 'saved mem name';
-        const savedMemMemo = 'saved mem memo';
-        await prepareSavedData(savedMemName, savedMemMemo);
+          expect(find.text(savedMemName), findsOneWidget);
+        },
+        tags: 'Medium',
+      );
 
-        await app.main(languageCode: 'en');
-        await widgetTester.pumpAndSettle(defaultDuration);
+      testWidgets(
+        ': remove',
+        (widgetTester) async {
+          const savedMemName = 'saved mem name';
+          const savedMemMemo = 'saved mem memo';
+          await prepareSavedData(savedMemName, savedMemMemo);
 
-        await widgetTester.tap(find.text(savedMemName));
-        await widgetTester.pumpAndSettle(defaultDuration);
+          await app.main(languageCode: 'en');
+          await widgetTester.pumpAndSettle(defaultDuration);
 
-        await widgetTester.tap(
-          find.descendant(
-            of: find.byType(AppBar),
-            matching: find.byIcon(Icons.more_vert),
-          ),
-        );
-        await widgetTester.pumpAndSettle(defaultDuration);
-        await widgetTester.tap(find.byIcon(Icons.delete));
-        await widgetTester.pumpAndSettle(defaultDuration);
-        await widgetTester.tap(find.text('OK'));
-        await widgetTester.pumpAndSettle(defaultDuration);
+          await widgetTester.tap(find.text(savedMemName));
+          await widgetTester.pumpAndSettle(defaultDuration);
 
-        expect(find.text(savedMemName), findsNothing);
+          await widgetTester.tap(
+            find.descendant(
+              of: find.byType(AppBar),
+              matching: find.byIcon(Icons.more_vert),
+            ),
+          );
+          await widgetTester.pumpAndSettle(defaultDuration);
+          await widgetTester.tap(find.byIcon(Icons.delete));
+          await widgetTester.pumpAndSettle(defaultDuration);
+          await widgetTester.tap(find.text('OK'));
+          await widgetTester.pumpAndSettle(defaultDuration);
 
-        await widgetTester.tap(memListFilterButton);
-        await widgetTester.pumpAndSettle(defaultDuration);
-        await widgetTester.tap(findShowArchiveSwitch);
-        await widgetTester.pumpAndSettle(defaultDuration);
-        await closeMemListFilter(widgetTester);
+          expect(find.text(savedMemName), findsNothing);
 
-        expect(find.text(savedMemName), findsNothing);
-      },
-      tags: 'Medium',
-    );
-  });
+          await widgetTester.tap(memListFilterButton);
+          await widgetTester.pumpAndSettle(defaultDuration);
+          await widgetTester.tap(findShowArchiveSwitch);
+          await widgetTester.pumpAndSettle(defaultDuration);
+          await closeMemListFilter(widgetTester);
 
-  group('Todo scenario', () {
-    testWidgets(
-      ': done',
-      (widgetTester) async {
-        const savedMemName = 'saved mem name';
-        const savedMemMemo = 'saved mem memo';
-        await prepareSavedData(savedMemName, savedMemMemo);
+          expect(find.text(savedMemName), findsNothing);
+        },
+        tags: 'Medium',
+      );
+    },
+  );
 
-        await app.main(languageCode: 'en');
-        await widgetTester.pumpAndSettle(defaultDuration);
+  group(
+    'Todo scenario',
+    () {
+      testWidgets(
+        ': done',
+        (widgetTester) async {
+          const savedMemName = 'saved mem name';
+          const savedMemMemo = 'saved mem memo';
+          await prepareSavedData(savedMemName, savedMemMemo);
 
-        await widgetTester.tap(find.byType(Checkbox));
-        await widgetTester.pumpAndSettle(defaultDuration);
+          await app.main(languageCode: 'en');
+          await widgetTester.pumpAndSettle(defaultDuration);
 
-        expect(find.text(savedMemName), findsNothing);
+          await widgetTester.tap(find.byType(Checkbox));
+          await widgetTester.pumpAndSettle(defaultDuration);
 
-        await widgetTester.tap(memListFilterButton);
-        await widgetTester.pumpAndSettle(defaultDuration);
-        await widgetTester.tap(find.byType(Switch).at(3));
-        await closeMemListFilter(widgetTester);
+          expect(find.text(savedMemName), findsNothing);
 
-        expect(find.text(savedMemName), findsOneWidget);
-      },
-      tags: 'Medium',
-    );
-  });
+          await widgetTester.tap(memListFilterButton);
+          await widgetTester.pumpAndSettle(defaultDuration);
+          await widgetTester.tap(find.byType(Switch).at(3));
+          await closeMemListFilter(widgetTester);
 
-  group('Edge scenario', () {
-    testWidgets(
-      'MemItem is nothing',
-      (widgetTester) async {
-        const savedMemName = 'saved mem name';
-        final database = await DatabaseManager().open(app.databaseDefinition);
-        final memTable = database.getTable(memTableDefinition.name);
-        await memTable.insert({
-          memNameColumnName: savedMemName,
-          createdAtColumnName: DateTime.now(),
-          archivedAtColumnName: null,
-        });
+          expect(find.text(savedMemName), findsOneWidget);
+        },
+        tags: 'Medium',
+      );
+    },
+  );
 
-        await app.main(languageCode: 'en');
-        await widgetTester.pumpAndSettle(defaultDuration);
+  group(
+    'Edge scenario',
+    () {
+      testWidgets(
+        'MemItem is nothing',
+        (widgetTester) async {
+          const savedMemName = 'saved mem name';
+          final database = await DatabaseManager().open(app.databaseDefinition);
+          final memTable = database.getTable(memTableDefinition.name);
+          await memTable.insert({
+            memNameColumnName: savedMemName,
+            createdAtColumnName: DateTime.now(),
+            archivedAtColumnName: null,
+          });
 
-        await widgetTester.tap(find.text(savedMemName));
-        await widgetTester.pumpAndSettle(defaultDuration);
+          await app.main(languageCode: 'en');
+          await widgetTester.pumpAndSettle(defaultDuration);
 
-        expect(find.text(savedMemName), findsOneWidget);
-        expect(widgetTester.widgetList(find.byType(TextFormField)).length, 3);
-      },
-      tags: 'Medium',
-    );
-  });
+          await widgetTester.tap(find.text(savedMemName));
+          await widgetTester.pumpAndSettle(defaultDuration);
+
+          expect(find.text(savedMemName), findsOneWidget);
+          expect(widgetTester.widgetList(find.byType(TextFormField)).length, 3);
+        },
+        tags: 'Medium',
+      );
+    },
+  );
 }
 
 final memListFilterButton = find.byIcon(Icons.filter_list);
