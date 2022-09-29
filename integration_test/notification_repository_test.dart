@@ -1,10 +1,11 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/repositories/notification_repository.dart';
+
+import '_helpers.dart';
 
 void main() {
   if (Platform.isAndroid) {
@@ -16,6 +17,8 @@ void main() {
       test(
         ': no initialized',
         () {
+          runEmptyApplication();
+
           expect(
             () => NotificationRepository(),
             throwsA((e) => e is Exception),
@@ -27,6 +30,8 @@ void main() {
       test(
         ': initialized',
         () {
+          runEmptyApplication();
+
           final initialized = NotificationRepository.initialize();
 
           final notificationRepository = NotificationRepository();
@@ -48,7 +53,6 @@ void main() {
         ': receive',
         (widgetTester) async {
           runEmptyApplication();
-          widgetTester.pump();
 
           await notificationRepository.receive(
             1,
@@ -64,5 +68,3 @@ void main() {
     });
   }
 }
-
-void runEmptyApplication() => runApp(const MaterialApp(home: Text('empty')));
