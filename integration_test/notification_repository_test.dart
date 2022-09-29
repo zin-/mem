@@ -1,4 +1,5 @@
-@TestOn('android')
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -6,60 +7,62 @@ import 'package:mem/logger.dart';
 import 'package:mem/repositories/notification_repository.dart';
 
 void main() {
-  Logger(level: Level.verbose);
+  if (Platform.isAndroid) {
+    Logger(level: Level.verbose);
 
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+    IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  group('Create instance', () {
-    test(
-      ': no initialized',
-      () {
-        expect(
-          () => NotificationRepository(),
-          throwsA((e) => e is Exception),
-        );
-      },
-      tags: 'Medium',
-    );
+    group('Create instance', () {
+      test(
+        ': no initialized',
+        () {
+          expect(
+            () => NotificationRepository(),
+            throwsA((e) => e is Exception),
+          );
+        },
+        tags: 'Medium',
+      );
 
-    test(
-      ': initialized',
-      () {
-        final initialized = NotificationRepository.initialize();
+      test(
+        ': initialized',
+        () {
+          final initialized = NotificationRepository.initialize();
 
-        final notificationRepository = NotificationRepository();
+          final notificationRepository = NotificationRepository();
 
-        expect(notificationRepository, initialized);
-      },
-      tags: 'Medium',
-    );
-  });
-
-  group('Operating', () {
-    late NotificationRepository notificationRepository;
-
-    setUpAll(() {
-      notificationRepository = NotificationRepository.initialize();
+          expect(notificationRepository, initialized);
+        },
+        tags: 'Medium',
+      );
     });
 
-    testWidgets(
-      ': receive',
-      (widgetTester) async {
-        runEmptyApplication();
-        widgetTester.pump();
+    group('Operating', () {
+      late NotificationRepository notificationRepository;
 
-        await notificationRepository.receive(
-          1,
-          'title',
-          DateTime.now().add(const Duration(days: 1)),
-        );
+      setUpAll(() {
+        notificationRepository = NotificationRepository.initialize();
+      });
 
-        // dev(result);
-        // TODO 通知されていることをcheckする
-      },
-      tags: 'Medium',
-    );
-  });
+      testWidgets(
+        ': receive',
+        (widgetTester) async {
+          runEmptyApplication();
+          widgetTester.pump();
+
+          await notificationRepository.receive(
+            1,
+            'title',
+            DateTime.now().add(const Duration(days: 1)),
+          );
+
+          // dev(result);
+          // TODO 通知されていることをcheckする
+        },
+        tags: 'Medium',
+      );
+    });
+  }
 }
 
 void runEmptyApplication() => runApp(const MaterialApp(home: Text('empty')));
