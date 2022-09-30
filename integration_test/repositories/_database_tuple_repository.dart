@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/database/database.dart';
-import 'package:mem/database/database_factory.dart';
+import 'package:mem/database/database_manager.dart';
 import 'package:mem/database/definitions.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/repositories/database_tuple_repository.dart';

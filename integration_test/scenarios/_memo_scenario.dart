@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:logger/logger.dart';
-import 'package:mem/database/database_factory.dart';
+import 'package:mem/database/database_manager.dart';
 
 import '../_helpers.dart';
 

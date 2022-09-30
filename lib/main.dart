@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mem/app.dart';
 import 'package:mem/database/database.dart';
-import 'package:mem/database/database_factory.dart';
+import 'package:mem/database/database_manager.dart';
 import 'package:mem/database/definitions.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
