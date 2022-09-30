@@ -4,6 +4,7 @@ import 'package:mem/logger.dart';
 import 'package:mem/database/database_manager.dart';
 
 import 'database/_database_manager.dart';
+import 'database/_database_on_web.dart';
 import 'repositories/_database_tuple_repository.dart';
 import 'scenarios/_edge_scenario.dart';
 import 'scenarios/_memo_scenario.dart';
@@ -19,7 +20,9 @@ void main() {
   DatabaseManager(onTest: true);
 
   group('Database test', () {
-    testDatabaseFactory();
+    testDatabaseManager();
+
+    testDatabaseOnWeb();
   });
 
   group('Repository test', () {
