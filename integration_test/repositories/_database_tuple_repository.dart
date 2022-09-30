@@ -32,16 +32,16 @@ class TestRepository extends DatabaseTupleRepository<TestEntity> {
       TestEntity.fromMap(valueMap);
 }
 
-final testTable = DefT('tests', [
-  DefPK('id', TypeC.integer, autoincrement: true),
-  ...defaultColumnDefinitions,
-]);
-final testDatabase = DefD('test.db', 1, [testTable]);
-
 void testDatabaseTupleRepository() => group(
       'DatabaseTupleRepository test',
       () {
         if (Platform.isAndroid || Platform.isWindows) {
+          final testTable = DefT('tests', [
+            DefPK('id', TypeC.integer, autoincrement: true),
+            ...defaultColumnDefinitions,
+          ]);
+          final testDatabase = DefD('test.db', 1, [testTable]);
+
           late TestRepository testRepository;
 
           setUp(() async {
