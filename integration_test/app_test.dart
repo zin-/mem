@@ -3,6 +3,7 @@ import 'package:integration_test/integration_test.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/database/database_factory.dart';
 
+import 'database/_database_factory.dart';
 import 'repositories/_database_tuple_repository.dart';
 import 'scenarios/_edge_scenario.dart';
 import 'scenarios/_memo_scenario.dart';
@@ -16,6 +17,10 @@ void main() {
 
   Logger(level: Level.verbose);
   DatabaseManager(onTest: true);
+
+  group('Database test', () {
+    testDatabaseFactory();
+  });
 
   group('Repository test', () {
     testDatabaseTupleRepository();
