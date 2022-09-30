@@ -1,3 +1,4 @@
+import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/database/database_factory.dart';
@@ -16,8 +17,10 @@ void main() {
   Logger(level: Level.verbose);
   DatabaseManager(onTest: true);
 
-  testDatabaseTupleRepository();
-  testNotificationRepository();
+  group('Repository test', () {
+    testDatabaseTupleRepository();
+    testNotificationRepository();
+  });
 
   testMemoScenario();
   testTodoScenario();
