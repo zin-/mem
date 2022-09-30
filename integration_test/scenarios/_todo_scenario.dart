@@ -4,7 +4,7 @@ import 'package:integration_test/integration_test.dart';
 import 'package:mem/database/database_factory.dart';
 import 'package:mem/logger.dart';
 
-import '_helpers.dart';
+import '../_helpers.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();

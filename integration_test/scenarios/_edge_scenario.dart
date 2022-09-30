@@ -7,7 +7,7 @@ import 'package:mem/main.dart' as app;
 import 'package:mem/repositories/database_tuple_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 
-import '_helpers.dart';
+import '../_helpers.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
