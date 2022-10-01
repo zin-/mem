@@ -21,7 +21,7 @@ class IndexedDatabase extends Database {
   late final idb_shim.Database _database;
 
   @override
-  Future<Database> open() => v(
+  Future<IndexedDatabase> open() => v(
         {},
         () async {
           _database = await _factory.open(

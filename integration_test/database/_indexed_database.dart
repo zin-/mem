@@ -15,6 +15,79 @@ void main() {
 void testIndexedDatabase() => group(
       'IndexedDatabase test',
       () {
+        group('Database operation', () {
+          test(
+            'open',
+            () async {
+              final created = await IndexedDatabase(defD).open();
+
+              expect(created.definition.name, defD.name);
+              expect(created.tables.length, defD.tableDefinitions.length);
+            },
+            tags: 'Medium',
+          );
+
+          group('Migrate: upgrade', () {
+            late IndexedDatabase indexedDatabase;
+
+            setUp(() async {
+              await (await IndexedDatabase(defD).open()).delete();
+              indexedDatabase = await IndexedDatabase(defD).open();
+            });
+
+            test(
+              ': add table',
+              () async {
+                await indexedDatabase.close();
+
+                final upgraded =
+                    await IndexedDatabase(upgradingByAddTableDefD).open();
+
+                final addedTable =
+                    upgraded.getTable(addingTableDefinition.name);
+                expect(addedTable, isNotNull);
+
+                final insertedId = await addedTable.insert({'test': 'test'});
+                expect(insertedId, isNotNull);
+              },
+              tags: 'Medium',
+            );
+
+            test(
+              ': add column',
+              () async {
+                final test = {
+                  textFieldName: 'test text',
+                  datetimeFieldName: DateTime.now(),
+                };
+
+                final insertedId =
+                    await indexedDatabase.getTable(testTable.name).insert(test);
+                final insertedChildrenId =
+                    await indexedDatabase.getTable(testChildTable.name).insert({
+                  'tests_id': insertedId,
+                });
+
+                await indexedDatabase.close();
+
+                final upgraded =
+                    await IndexedDatabase(upgradingByAddColumnDefD).open();
+
+                final tests = await upgraded.getTable(testTable.name).select();
+                expect(tests, [
+                  {'id': insertedId, 'adding_column': null, ...test}
+                ]);
+                final testChildren =
+                    await upgraded.getTable(testChildTable.name).select();
+                expect(testChildren, [
+                  {'id': insertedChildrenId, 'tests_id': insertedId}
+                ]);
+              },
+              tags: 'Medium',
+            );
+          });
+        });
+
         test(
           'Indexed database: require at least 1 table.',
           () async {
