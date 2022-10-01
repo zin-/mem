@@ -8,6 +8,8 @@ import 'package:mem/database/sqlite_database.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/repositories/database_tuple_repository.dart';
 
+import 'definitions.dart';
+
 void main() {
   Logger(level: Level.verbose);
 
@@ -18,34 +20,6 @@ void testSqliteDatabase() => group(
       'SqliteDatabase test',
       () {
         if (Platform.isAndroid || Platform.isWindows) {
-          const tableName = 'tests';
-          const pkName = 'id';
-          const textFieldName = 'text';
-          const datetimeFieldName = 'datetime';
-          final testTable = DefT(
-            tableName,
-            [
-              DefPK(pkName, TypeC.integer, autoincrement: true),
-              DefC(textFieldName, TypeC.integer),
-              DefC(datetimeFieldName, TypeC.datetime),
-            ],
-          );
-          final testChildTable = DefT(
-            'test_children',
-            [
-              DefPK(pkName, TypeC.integer, autoincrement: true),
-              ForeignKeyDefinition(testTable),
-            ],
-          );
-          final defD = DefD(
-            'test.db',
-            1,
-            [
-              testTable,
-              testChildTable,
-            ],
-          );
-
           late SqliteDatabase sqliteDatabase;
 
           setUp(() async {
