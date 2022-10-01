@@ -12,8 +12,8 @@ class DatabaseManager {
   Future<Database> open(
     DatabaseDefinition definition,
   ) =>
-      v(
-        {'definition': definition},
+      t(
+        {'definition': definition, 'name': _dbName(definition.name)},
         () async {
           final dbName = _dbName(definition.name);
           final dbDefinition =
@@ -34,35 +34,41 @@ class DatabaseManager {
         },
       );
 
-  Future<bool> close(String name) async {
-    final dbName = _dbName(name);
-    if (_databases.containsKey(dbName)) {
-      trace('Close database. name: $dbName');
-      final closeResult = await _databases[dbName]!.close();
-      _databases.remove(dbName);
-      return closeResult;
-    } else {
-      warn('I do not have database. name: $dbName');
-      return false;
-    }
-  }
+  Future<bool> close(String name) => t(
+        {'name': _dbName(name)},
+        () async {
+          final dbName = _dbName(name);
+          if (_databases.containsKey(dbName)) {
+            trace('Close database. name: $dbName');
+            final closeResult = await _databases[dbName]!.close();
+            _databases.remove(dbName);
+            return closeResult;
+          } else {
+            warn('I do not have database. name: $dbName');
+            return false;
+          }
+        },
+      );
 
-  Future<bool> delete(String name) async {
-    final dbName = _dbName(name);
-    if (_databases.containsKey(dbName)) {
-      trace('Delete database. name: $dbName');
-      final deleteResult = await _databases[dbName]!.delete();
-      if (deleteResult) {
-        _databases.remove(dbName);
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      warn('I do not have database. name: $dbName');
-      return false;
-    }
-  }
+  Future<bool> delete(String name) => t(
+        {'name': _dbName(name)},
+        () async {
+          final dbName = _dbName(name);
+          if (_databases.containsKey(dbName)) {
+            trace('Delete database. name: $dbName');
+            final deleteResult = await _databases[dbName]!.delete();
+            if (deleteResult) {
+              _databases.remove(dbName);
+              return true;
+            } else {
+              return false;
+            }
+          } else {
+            warn('I do not have database. name: $dbName');
+            return false;
+          }
+        },
+      );
 
   String _dbName(name) => _onTest ? 'test-$name' : name;
 

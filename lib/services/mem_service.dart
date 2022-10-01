@@ -227,4 +227,8 @@ class MemService {
           archivedAt: memItem.archivedAt,
         ),
       );
+
+  static void reset(MemService? memService) {
+    _instance = memService;
+  }
 }

@@ -32,8 +32,10 @@ void main() {
     testNotificationRepository();
   });
 
-  testMemoScenario();
-  testTodoScenario();
+  group('Scenario test', () {
+    testMemoScenario();
+    testTodoScenario();
 
-  testEdgeScenario();
+    testEdgeScenario();
+  });
 }

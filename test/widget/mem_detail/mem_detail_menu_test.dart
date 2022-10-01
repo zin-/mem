@@ -14,9 +14,9 @@ void main() {
   Logger(level: Level.verbose);
 
   final mockedMemRepository = MockMemRepository();
-  MemRepository.withMock(mockedMemRepository);
+  MemRepository.reset(mockedMemRepository);
   final mockedMemItemRepository = MockMemItemRepository();
-  MemItemRepository.withMock(mockedMemItemRepository);
+  MemItemRepository.reset(mockedMemItemRepository);
 
   tearDown(() {
     reset(mockedMemRepository);

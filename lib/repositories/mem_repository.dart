@@ -106,8 +106,7 @@ class MemRepository extends DatabaseTupleRepository<MemEntity> {
     return tmp;
   }
 
-  factory MemRepository.withMock(MemRepository mock) {
-    _instance = mock;
-    return mock;
+  static void reset(MemRepository? memRepository) {
+    _instance = memRepository;
   }
 }

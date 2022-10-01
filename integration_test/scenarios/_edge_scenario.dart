@@ -19,7 +19,7 @@ void main() {
 }
 
 void testEdgeScenario() => group(
-      'Todo scenario',
+      'Edge scenario',
       () {
         setUp(() async => await clearDatabase());
 

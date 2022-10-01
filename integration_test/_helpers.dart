@@ -6,6 +6,7 @@ import 'package:mem/mem.dart';
 import 'package:mem/repositories/database_tuple_repository.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
+import 'package:mem/services/mem_service.dart';
 
 const defaultDuration = Duration(seconds: 1);
 
@@ -14,6 +15,11 @@ Future clearDatabase() async {
   // 今の実装だと難しいっぽい。いつかチャレンジする
   await DatabaseManager().open(app.databaseDefinition);
   await DatabaseManager().delete(app.databaseDefinition.name);
+
+  MemRepository.reset(null);
+  MemItemRepository.reset(null);
+
+  MemService.reset(null);
 }
 
 Future<void> pumpApplication({String? languageCode}) =>
