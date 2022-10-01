@@ -39,7 +39,8 @@ class MemService {
             hours: savedMem.notifyAt?.hour ?? 5,
             minutes: savedMem.notifyAt?.minute ?? 0,
           ));
-          if (notifyAt != null) {
+
+          if (notifyAt != null && notifyAt.isAfter(DateTime.now())) {
             NotificationRepository().receive(
               savedMem.id,
               savedMem.name,
