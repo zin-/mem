@@ -31,8 +31,10 @@ void testIndexedDatabase() => group(
             late IndexedDatabase indexedDatabase;
 
             setUp(() async {
-              await (await IndexedDatabase(defD).open()).delete();
               indexedDatabase = await IndexedDatabase(defD).open();
+            });
+            tearDown(() async {
+              await indexedDatabase.delete();
             });
 
             test(

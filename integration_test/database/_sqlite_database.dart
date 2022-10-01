@@ -23,8 +23,10 @@ void testSqliteDatabase() => group(
           late SqliteDatabase sqliteDatabase;
 
           setUp(() async {
-            await (await SqliteDatabase(defD).open()).delete();
             sqliteDatabase = await SqliteDatabase(defD).open();
+          });
+          tearDown(() async {
+            await sqliteDatabase.delete();
           });
 
           group('Migrate: upgrade', () {
