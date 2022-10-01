@@ -4,7 +4,7 @@ import 'package:mem/logger.dart';
 import 'package:mem/database/database_manager.dart';
 
 import 'database/_database_manager.dart';
-import 'database/_database_on_web.dart';
+import 'database/_indexed_database.dart';
 import 'database/_sqlite_database.dart';
 import 'repositories/_database_tuple_repository.dart';
 import 'scenarios/_edge_scenario.dart';
@@ -22,7 +22,7 @@ void main() {
 
   group('Database test', () {
     testSqliteDatabase();
-    testDatabaseOnWeb();
+    testIndexedDatabase();
 
     testDatabaseManager();
   });
