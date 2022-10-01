@@ -32,10 +32,10 @@ Future<Database> _openDatabase() => t(
 
         final database = await DatabaseManager().open(databaseDefinition);
 
-        MemRepository.initialize(
+        MemRepository(
           database.getTable(memTableDefinition.name),
         );
-        MemItemRepository.initialize(
+        MemItemRepository(
           database.getTable(memItemTableDefinition.name),
         );
 

@@ -19,18 +19,43 @@ class MemDetail {
 }
 
 class MemService {
+  final MemRepository _memRepository;
+  final MemItemRepository _memItemRepository;
+
+  MemService._(
+    this._memRepository,
+    this._memItemRepository,
+  );
+
+  static MemService? _instance;
+
+  factory MemService({
+    MemRepository? memRepository,
+    MemItemRepository? memItemRepository,
+  }) {
+    var tmp = _instance;
+    if (tmp == null) {
+      tmp = MemService._(
+        memRepository ?? MemRepository(),
+        memItemRepository ?? MemItemRepository(),
+      );
+      _instance = tmp;
+    }
+    return tmp;
+  }
+
   Future<MemDetail> save(MemDetail memDetail) => t(
         {'memDetail': memDetail},
         () async {
           final savedMem = convertMemFromEntity(await (memDetail.mem.isSaved()
-                  ? MemRepository().update
-                  : MemRepository().receive)
+                  ? _memRepository.update
+                  : _memRepository.receive)
               .call(convertMemIntoEntity(memDetail.mem)));
 
           final savedMemItems = (await Future.wait(memDetail.memItems.map((e) =>
                   (e.isSaved()
-                          ? MemItemRepository().update
-                          : MemItemRepository().receive)
+                          ? _memItemRepository.update
+                          : _memItemRepository.receive)
                       .call(convertMemItemIntoEntity(e)..memId = savedMem.id))))
               .map((e) => convertMemItemFromEntity(e))
               .toList();
@@ -69,7 +94,7 @@ class MemService {
           'showDone': showDone,
         },
         () async {
-          final memEntities = (await MemRepository().ship(
+          final memEntities = (await _memRepository.ship(
             archive: showNotArchived == showArchived ? null : showArchived,
             done: showNotDone == showDone ? null : showDone,
           ));
@@ -81,7 +106,7 @@ class MemService {
   Future<Mem> fetchMemById(int memId) => t(
         {'memId': memId},
         () async {
-          final memEntity = await MemRepository().shipById(memId);
+          final memEntity = await _memRepository.shipById(memId);
 
           return convertMemFromEntity(memEntity);
         },
@@ -90,7 +115,7 @@ class MemService {
   Future<List<MemItem>> fetchMemItemsByMemId(int memId) => t(
         {'memId': memId},
         () async {
-          final memItemEntities = await MemItemRepository().shipByMemId(memId);
+          final memItemEntities = await _memItemRepository.shipByMemId(memId);
 
           return memItemEntities
               .map((e) => convertMemItemFromEntity(e))
@@ -102,9 +127,9 @@ class MemService {
         {'mem': mem},
         () async {
           final archivedMemEntity =
-              await MemRepository().archive(convertMemIntoEntity(mem));
+              await _memRepository.archive(convertMemIntoEntity(mem));
           final archivedMemItems =
-              (await MemItemRepository().archiveByMemId(archivedMemEntity.id))
+              (await _memItemRepository.archiveByMemId(archivedMemEntity.id))
                   .map((e) => convertMemItemFromEntity(e))
                   .toList();
 
@@ -119,8 +144,8 @@ class MemService {
         {'mem': mem},
         () async {
           final unarchivedMemEntity =
-              await MemRepository().unarchive(convertMemIntoEntity(mem));
-          final unarchivedMemItems = (await MemItemRepository()
+              await _memRepository.unarchive(convertMemIntoEntity(mem));
+          final unarchivedMemItems = (await _memItemRepository
                   .unarchiveByMemId(unarchivedMemEntity.id))
               .map((e) => convertMemItemFromEntity(e))
               .toList();
@@ -135,8 +160,8 @@ class MemService {
   Future<bool> remove(int memId) => t(
         {'memId': memId},
         () async {
-          await MemItemRepository().discardByMemId(memId);
-          final removeResult = await MemRepository().discardById(memId);
+          await _memItemRepository.discardByMemId(memId);
+          final removeResult = await _memRepository.discardById(memId);
 
           return removeResult;
         },

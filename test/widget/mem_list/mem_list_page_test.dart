@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
+import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/mems/mem_list/mem_list_page.dart';
 import 'package:mockito/mockito.dart';
@@ -28,6 +29,7 @@ void main() {
 
   final mockedMemRepository = MockMemRepository();
   MemRepository.withMock(mockedMemRepository);
+  MemItemRepository.withMock(MockMemItemRepository());
 
   tearDown(() {
     reset(mockedMemRepository);

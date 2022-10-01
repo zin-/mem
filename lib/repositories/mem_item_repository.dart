@@ -95,19 +95,15 @@ class MemItemRepository extends DatabaseTupleRepository<MemItemEntity> {
 
   MemItemRepository._(super.table);
 
-  factory MemItemRepository() {
+  factory MemItemRepository([Table? memItemTable]) {
     var tmp = _instance;
     if (tmp == null) {
-      throw Exception('Call initialize'); // coverage:ignore-line
-    } else {
-      return tmp;
+      if (memItemTable == null) {
+        throw Exception('Call initialize');
+      }
+      tmp = MemItemRepository._(memItemTable);
+      _instance = tmp;
     }
-  }
-
-  factory MemItemRepository.initialize(Table table) {
-    var tmp = MemItemRepository._(table);
-
-    _instance = tmp;
     return tmp;
   }
 
