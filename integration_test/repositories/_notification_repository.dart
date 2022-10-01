@@ -20,26 +20,13 @@ void testNotificationRepository() => group(
             'Create instance',
             () {
               test(
-                ': no initialized',
+                ': create instance',
                 () {
-                  expect(
-                    () => NotificationRepository(),
-                    throwsA((e) => e is Exception),
-                  );
+                  final initialized = NotificationRepository();
+
+                  expect(initialized, isA<NotificationRepository>());
                 },
-                tags: 'Medium',
-              );
-
-              test(
-                ': initialized',
-                () {
-                  final initialized = NotificationRepository.initialize();
-
-                  final notificationRepository = NotificationRepository();
-
-                  expect(notificationRepository, initialized);
-                },
-                tags: 'Medium',
+                tags: 'Small',
               );
             },
           );
@@ -50,7 +37,8 @@ void testNotificationRepository() => group(
               late NotificationRepository notificationRepository;
 
               setUpAll(() {
-                notificationRepository = NotificationRepository.initialize();
+                notificationRepository = NotificationRepository();
+                notificationRepository.initialize();
               });
 
               testWidgets(
