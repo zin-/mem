@@ -73,8 +73,14 @@ class ColumnDefinition {
   final String name;
   final ColumnType type;
   final bool notNull;
+  final dynamic defaultValue;
 
-  ColumnDefinition(this.name, this.type, {this.notNull = true}) {
+  ColumnDefinition(
+    this.name,
+    this.type, {
+    this.notNull = true,
+    this.defaultValue,
+  }) {
     if (name.isEmpty) {
       throw DatabaseDefinitionException('Column name is required.');
     } else if (name.contains(' ')) {
@@ -82,7 +88,10 @@ class ColumnDefinition {
     }
   }
 
-  String _onSQL() => '$name ${type._onSQL}${notNull ? ' NOT NULL' : ''}';
+  String _onSQL() => '$name ${type._onSQL}'
+      '${notNull ? ' NOT NULL' : ''}'
+      // FIXME defaultValueがDateTimeなどの場合、動かない気がする
+      '${defaultValue == null ? notNull ? '' : ' DEFAULT NULL' : ' DEFAULT $defaultValue'}';
 
   dynamic toTuple(dynamic value) {
     switch (type) {
