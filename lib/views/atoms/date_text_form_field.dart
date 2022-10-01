@@ -30,7 +30,7 @@ class DateTextFormField extends StatelessWidget {
                   () async {
                     final currentDate = DateTime.now();
                     final initialDate = date ?? currentDate;
-                    const maxDuration = Duration(days: 999999999999999999);
+                    const maxDuration = Duration(days: 1000000000000000000);
 
                     final pickedDate = await showDatePicker(
                       context: context,
