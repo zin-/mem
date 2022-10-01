@@ -140,23 +140,23 @@ class PrimaryKeyDefinition extends ColumnDefinition {
 typedef DefFK = ForeignKeyDefinition;
 
 class ForeignKeyDefinition extends ColumnDefinition {
-  final TableDefinition _parentTableDefinition;
+  final TableDefinition parentTableDefinition;
 
-  ForeignKeyDefinition(this._parentTableDefinition)
+  ForeignKeyDefinition(this.parentTableDefinition)
       : super(
           [
-            _parentTableDefinition.name,
-            _parentTableDefinition.primaryKey.name,
+            parentTableDefinition.name,
+            parentTableDefinition.primaryKey.name,
           ].join('_'),
-          _parentTableDefinition.primaryKey.type,
+          parentTableDefinition.primaryKey.type,
         );
 
   @override
   String _onSQL() => [
         super._onSQL(),
         'FOREIGN KEY ($name)'
-            ' REFERENCES ${_parentTableDefinition.name}'
-            '(${_parentTableDefinition.primaryKey.name})'
+            ' REFERENCES ${parentTableDefinition.name}'
+            '(${parentTableDefinition.primaryKey.name})'
       ].join(', ');
 
   @override

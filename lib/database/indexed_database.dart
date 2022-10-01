@@ -113,6 +113,9 @@ class IndexedDatabase extends Database {
       return await onTrue();
     } catch (e) {
       warn(e);
+      if (e is DatabaseException) {
+        rethrow;
+      }
       return await onFalse();
     }
   }
@@ -130,8 +133,29 @@ class ObjectStore extends Table {
         {'valueMap': valueMap},
         () async => await _database.onOpened(
           () async {
-            final txn = _database._database
-                .transaction(definition.name, idb_shim.idbModeReadWrite);
+            final defFks = definition.columns.whereType<DefFK>();
+
+            final txn = _database._database.transaction(
+                defFks.isEmpty
+                    ? definition.name
+                    : [
+                        definition.name,
+                        ...defFks.map((e) => e.parentTableDefinition.name)
+                      ],
+                idb_shim.idbModeReadWrite);
+
+            for (var defFk in defFks) {
+              final parentStoreName = defFk.parentTableDefinition.name;
+              final parentStore = txn.objectStore(parentStoreName);
+              final parentKey = valueMap[defFk.name];
+              final parentExists = await parentStore.count(parentKey) > 0;
+              if (!parentExists) {
+                throw ParentNotFoundException(
+                  parentStoreName,
+                  'id = $parentKey',
+                );
+              }
+            }
 
             final store = txn.objectStore(definition.name);
             final generatedPk = await store.add(convertTo(valueMap));
@@ -188,6 +212,13 @@ class ObjectStore extends Table {
 
             await txn.completed;
 
+            if (object == null) {
+              throw NotFoundException(
+                definition.name,
+                'id = $pk',
+              );
+            }
+
             return convertFrom(_convertIntoMap(object));
           },
           () => throw DatabaseDoesNotExistException(_database.definition.name),
@@ -203,7 +234,15 @@ class ObjectStore extends Table {
                 .transaction(definition.name, idb_shim.idbModeReadWrite);
             final store = txn.objectStore(definition.name);
 
-            final saved = _convertIntoMap(await store.getObject(pk));
+            final savedObject = await store.getObject(pk);
+            if (savedObject == null) {
+              await txn.completed;
+              throw NotFoundException(
+                definition.name,
+                'id = $pk',
+              );
+            }
+            final saved = _convertIntoMap(savedObject);
             value.forEach((key, value) {
               saved[key] = value;
             });

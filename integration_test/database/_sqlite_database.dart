@@ -137,8 +137,11 @@ void testSqliteDatabase() => group(
                       () async => await table.insert({
                         'tests_id': 1,
                       }),
-                      // FIXME 固有の例外に置き換えたい
-                      throwsA((e) => e is Exception),
+                      throwsA((e) {
+                        // FIXME 固有の例外に置き換えたい
+                        expect(e, isA<Exception>());
+                        return true;
+                      }),
                     );
                   },
                   tags: 'Medium',
