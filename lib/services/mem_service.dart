@@ -4,6 +4,7 @@ import 'package:mem/mem.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/repositories/notification_repository.dart';
+import 'package:mem/services/notification_service.dart';
 
 class MemDetail {
   final Mem mem;
@@ -21,10 +22,12 @@ class MemDetail {
 class MemService {
   final MemRepository _memRepository;
   final MemItemRepository _memItemRepository;
+  final NotificationService _notificationService;
 
   MemService._(
     this._memRepository,
     this._memItemRepository,
+    this._notificationService,
   );
 
   static MemService? _instance;
@@ -32,12 +35,14 @@ class MemService {
   factory MemService({
     MemRepository? memRepository,
     MemItemRepository? memItemRepository,
+    NotificationService? notificationService,
   }) {
     var tmp = _instance;
     if (tmp == null) {
       tmp = MemService._(
         memRepository ?? MemRepository(),
         memItemRepository ?? MemItemRepository(),
+        notificationService ?? NotificationService(),
       );
       _instance = tmp;
     }
@@ -60,18 +65,7 @@ class MemService {
               .map((e) => convertMemItemFromEntity(e))
               .toList();
 
-          final notifyAt = savedMem.notifyOn?.add(Duration(
-            hours: savedMem.notifyAt?.hour ?? 5,
-            minutes: savedMem.notifyAt?.minute ?? 0,
-          ));
-
-          if (notifyAt != null && notifyAt.isAfter(DateTime.now())) {
-            NotificationRepository().receive(
-              savedMem.id,
-              savedMem.name,
-              notifyAt,
-            );
-          }
+          _notificationService.memReminder(savedMem);
 
           return MemDetail(
             savedMem,
@@ -133,8 +127,11 @@ class MemService {
                   .map((e) => convertMemItemFromEntity(e))
                   .toList();
 
+          final archivedMem = convertMemFromEntity(archivedMemEntity);
+          _notificationService.memReminder(archivedMem);
+
           return MemDetail(
-            convertMemFromEntity(archivedMemEntity),
+            archivedMem,
             archivedMemItems,
           );
         },
@@ -150,6 +147,9 @@ class MemService {
               .map((e) => convertMemItemFromEntity(e))
               .toList();
 
+          final unarchivedMem = convertMemFromEntity(unarchivedMemEntity);
+          _notificationService.memReminder(unarchivedMem);
+
           return MemDetail(
             convertMemFromEntity(unarchivedMemEntity),
             unarchivedMemItems,
@@ -162,6 +162,10 @@ class MemService {
         () async {
           await _memItemRepository.discardByMemId(memId);
           final removeResult = await _memRepository.discardById(memId);
+
+          // FIXME 関数内でMemを保持していないためRepositoryを参照している
+          // discardされた時点でMemは存在しなくなるため、どちらにせよ無理筋かも
+          NotificationRepository().discard(memId);
 
           return removeResult;
         },

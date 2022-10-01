@@ -7,11 +7,6 @@ class Mem extends EntityValue {
   DateTime? notifyOn;
   TimeOfDay? notifyAt;
 
-  // final int? id;
-  // DateTime? createdAt;
-  // DateTime? updatedAt;
-  // DateTime? archivedAt;
-
   Mem({
     required this.name,
     this.doneAt,
@@ -27,6 +22,8 @@ class Mem extends EntityValue {
           updatedAt: updatedAt,
           archivedAt: archivedAt,
         );
+
+  bool isDone() => isSaved() && doneAt != null;
 
   @override
   String toString() => {

@@ -76,6 +76,11 @@ class NotificationRepository {
         },
       );
 
+  Future<void> discard(int id) => v(
+        {'id': id},
+        () async => _flutterLocalNotificationsPlugin.cancel(id),
+      );
+
   NotificationRepository._();
 
   static NotificationRepository? _instance;
