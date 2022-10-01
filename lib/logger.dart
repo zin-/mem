@@ -97,6 +97,7 @@ class Logger {
     dynamic arguments, {
     String? message,
   }) {
+    // TODO levelを見て早めにリターンしたい
     final stackTrace = StackTrace.current;
     log(level, arguments, message: 'start', stackTrace: stackTrace);
     final result = function();
