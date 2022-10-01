@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
@@ -371,6 +372,25 @@ void testSqliteDatabase() => group(
               tags: 'Medium',
             );
           });
+        }
+
+        if (kIsWeb) {
+          final defD = DefD('test_sqlite.db', 1, []);
+
+          test(
+            'Error on Chrome.',
+            () async {
+              expect(
+                () => SqliteDatabase(defD),
+                throwsA(
+                  (e) =>
+                      e is DatabaseException &&
+                      e.message == 'Unsupported platform. Platform: Web',
+                ),
+              );
+            },
+            tags: 'Medium',
+          );
         }
       },
     );

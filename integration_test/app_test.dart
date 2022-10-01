@@ -22,10 +22,9 @@ void main() {
 
   group('Database test', () {
     testSqliteDatabase();
+    testDatabaseOnWeb();
 
     testDatabaseManager();
-
-    testDatabaseOnWeb();
   });
 
   group('Repository test', () {
