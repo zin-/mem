@@ -15,7 +15,7 @@ class MemDoneCheckbox extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => t(
+  Widget build(BuildContext context) => v(
         {'_memId': _memId, '_memDone': _memDone, '_onChanged': _onChanged},
         () => HeroView(
           heroTag('mem-done', _memId),

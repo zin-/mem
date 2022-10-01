@@ -6,6 +6,7 @@ import 'package:mem/views/mems/mem_detail/mem_detail_states.dart';
 import 'package:mem/views/mems/mem_done_checkbox.dart';
 import 'package:mem/views/mems/mem_list/mem_list_page.dart';
 import 'package:mem/views/mems/mem_name.dart';
+import 'package:mem/views/mems/mem_notify_at.dart';
 
 class MemListItemView extends StatelessWidget {
   final Mem _mem;
@@ -13,7 +14,7 @@ class MemListItemView extends StatelessWidget {
   const MemListItemView(this._mem, {Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => t(
+  Widget build(BuildContext context) => v(
         {'_mem': _mem},
         () => Consumer(
           builder: (context, ref, child) {
@@ -28,6 +29,7 @@ class MemListItemView extends StatelessWidget {
                 },
               ),
               title: MemNameText(_mem.name, _mem.id),
+              subtitle: buildMemNotifyAtText(_mem),
               onTap: () => showMemDetailPage(
                 context,
                 ref,
