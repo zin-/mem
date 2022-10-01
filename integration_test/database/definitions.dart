@@ -19,9 +19,12 @@ final testChildTable = DefT(
     ForeignKeyDefinition(testTable),
   ],
 );
+
+const dbName = 'test.db';
+const dbVersion = 1;
 final defD = DefD(
-  'test.db',
-  1,
+  dbName,
+  dbVersion,
   [
     testTable,
     testChildTable,
