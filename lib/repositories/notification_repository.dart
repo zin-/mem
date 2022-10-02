@@ -2,18 +2,25 @@ import 'dart:convert';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mem/logger.dart';
+import 'package:mem/main.dart';
+import 'package:mem/services/mem_service.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 const _androidDefaultIconPath = 'ic_launcher_foreground';
-const _notificationDetails = NotificationDetails(
+
+const _doneActionId = 'done';
+
+const _reminderNotification = NotificationDetails(
   android: AndroidNotificationDetails(
-    'channelId',
-    'channelName',
+    'reminder',
+    'Reminder',
+    channelDescription: 'To remind at specific time.',
+    actions: [
+      AndroidNotificationAction(_doneActionId, 'Done'),
+    ],
   ),
 );
-
-class NotificationEntity {}
 
 const memIdKey = 'memId';
 
@@ -37,6 +44,8 @@ class NotificationRepository {
               onDidReceiveNotificationResponse: showMemDetailPage == null
                   ? null
                   : buildOnDidReceiveNotificationResponse(showMemDetailPage),
+              onDidReceiveBackgroundNotificationResponse:
+                  notificationTapBackground,
             );
 
             final notificationAppLaunchDetails =
@@ -67,7 +76,7 @@ class NotificationRepository {
             title,
             null,
             tz.TZDateTime.from(notifyAt, tz.local),
-            _notificationDetails,
+            _reminderNotification,
             uiLocalNotificationDateInterpretation:
                 UILocalNotificationDateInterpretation.absoluteTime,
             androidAllowWhileIdle: true,
@@ -112,13 +121,45 @@ void notificationAction(NotificationResponse response, Function action) => t(
         'payload': response.payload
       },
       () {
-        final payload = response.payload;
-        if (payload != null) {
-          final Map payloadMap = json.decode(payload);
-          final memId = payloadMap[memIdKey];
-          if (memId != null) {
-            action.call(memId);
+        if (response.notificationResponseType ==
+            NotificationResponseType.selectedNotification) {
+          final payload = response.payload;
+          if (payload != null) {
+            final Map payloadMap = json.decode(payload);
+            final memId = payloadMap[memIdKey];
+            if (memId != null) {
+              action.call(memId);
+            }
+          }
+        } else {
+          final actionId = response.actionId;
+          if (actionId == _doneActionId) {
+            final payload = response.payload;
+            if (payload != null) {
+              final Map payloadMap = json.decode(payload);
+              final memId = payloadMap[memIdKey];
+              if (memId != null) {
+                action.call(memId);
+              }
+            }
           }
         }
       },
     );
+
+@pragma('vm:entry-point')
+void notificationTapBackground(NotificationResponse notificationResponse) {
+  notificationAction(
+    notificationResponse,
+    (int memId) async {
+      await openDatabase();
+
+      MemService().save(
+        MemDetail(
+          (await MemService().fetchMemById(memId))..doneAt = DateTime.now(),
+          await MemService().fetchMemItemsByMemId(memId),
+        ),
+      );
+    },
+  );
+}

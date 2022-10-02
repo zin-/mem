@@ -19,13 +19,13 @@ final databaseDefinition = DefD(
 Future<void> main({String? languageCode}) => t(
       {},
       () async {
-        await _openDatabase();
+        await openDatabase();
 
         runApp(MemApplication(languageCode));
       },
     );
 
-Future<Database> _openDatabase() => t(
+Future<Database> openDatabase() => t(
       {},
       () async {
         WidgetsFlutterBinding.ensureInitialized();
