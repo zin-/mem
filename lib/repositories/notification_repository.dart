@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/services/mem_service.dart';
@@ -33,10 +32,6 @@ const memIdKey = 'memId';
 
 class NotificationRepository {
   final FlutterLocalNotificationsWrapper _flutterLocalNotificationsWrapper;
-
-  // var initialized = false;
-  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
 
   Future<bool> initialize([Function(int memId)? showMemDetailPage]) => v(
         {},
@@ -95,7 +90,7 @@ class NotificationRepository {
 
   Future<void> discard(int id) => v(
         {'id': id},
-        () async => _flutterLocalNotificationsPlugin.cancel(id),
+        () async => _flutterLocalNotificationsWrapper.cancel(id),
       );
 
   NotificationRepository._(this._flutterLocalNotificationsWrapper);

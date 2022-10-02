@@ -7,11 +7,11 @@ import 'package:mem/repositories/notification_repository.dart';
 import 'package:timezone/timezone.dart';
 
 typedef OnNotificationTappedCallback = Function(
-  int notificationId,
+  int id,
   Map<dynamic, dynamic> payload,
 );
 typedef OnNotificationActionTappedCallback = Function(
-  int notificationId,
+  int id,
   String actionId,
   String? input,
   Map<dynamic, dynamic> payload,
@@ -82,7 +82,7 @@ class FlutterLocalNotificationsWrapper {
       );
 
   Future<void> zonedSchedule(
-    int notificationId,
+    int id,
     String title,
     TZDateTime tzDateTime,
     String payload,
@@ -93,7 +93,7 @@ class FlutterLocalNotificationsWrapper {
   ) =>
       v(
         {
-          'notificationId': notificationId,
+          'id': id,
           'title': title,
           'tzDateTime': tzDateTime,
           'payload': payload,
@@ -103,7 +103,7 @@ class FlutterLocalNotificationsWrapper {
         },
         () {
           return _flutterLocalNotificationsPlugin.zonedSchedule(
-            notificationId,
+            id,
             title,
             null,
             tzDateTime,
@@ -123,6 +123,13 @@ class FlutterLocalNotificationsWrapper {
             payload: payload,
           );
         },
+      );
+
+  cancel(int id) => v(
+        {
+          'id': id,
+        },
+        () => _flutterLocalNotificationsPlugin.cancel(id),
       );
 
   FlutterLocalNotificationsWrapper._();
@@ -147,10 +154,9 @@ void onNotificationTappedBackground(NotificationResponse response) => t(
 
         await _notificationResponseHandler(
           response,
-          (notificationId, payload) => null,
-          (notificationId, actionId, input, payload) =>
-              notificationActionHandler(
-            notificationId,
+          (id, payload) => null,
+          (id, actionId, input, payload) => notificationActionHandler(
+            id,
             actionId,
             input,
             payload,
@@ -164,8 +170,8 @@ _notificationResponseHandler(
   OnNotificationTappedCallback onNotificationTapped,
   OnNotificationActionTappedCallback? onNotificationActionTappedCallback,
 ) {
-  final notificationId = notificationResponse.id;
-  if (notificationId == null) {
+  final id = notificationResponse.id;
+  if (id == null) {
     return;
   }
 
@@ -176,7 +182,7 @@ _notificationResponseHandler(
   switch (notificationResponse.notificationResponseType) {
     case NotificationResponseType.selectedNotification:
       onNotificationTapped(
-        notificationId,
+        id,
         payload,
       );
       break;
@@ -191,7 +197,7 @@ _notificationResponseHandler(
       }
 
       onNotificationActionTappedCallback(
-        notificationId,
+        id,
         actionId,
         notificationResponse.input,
         payload,
