@@ -68,6 +68,7 @@ void testNotificationRepository() => group(
                     1,
                     'title',
                     DateTime.now().add(const Duration(days: 1)),
+                    [],
                   );
 
                   // dev(result);
