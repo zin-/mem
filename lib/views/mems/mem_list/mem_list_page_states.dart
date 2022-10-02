@@ -128,7 +128,6 @@ final sortedMemList =
           if (item2.doneAt == null) {
             return 1;
           }
-          return item1.doneAt!.compareTo(item2.doneAt!);
         }
 
         if (item1.archivedAt != item2.archivedAt) {
@@ -139,6 +138,29 @@ final sortedMemList =
             return 1;
           }
           return item1.archivedAt!.compareTo(item2.archivedAt!);
+        }
+
+        if (item1.notifyOn != item2.notifyOn) {
+          if (item1.notifyOn == null) {
+            return 1;
+          }
+          if (item2.notifyOn == null) {
+            return -1;
+          }
+          return item1.notifyOn!.compareTo(item2.notifyOn!);
+        }
+
+        if (item1.notifyOn != null) {
+          if (item1.notifyAt != item2.notifyAt) {
+            if (item1.notifyAt == null) {
+              return 1;
+            }
+            if (item2.notifyAt == null) {
+              return -1;
+            }
+            return item1.notifyAt!.periodOffset
+                .compareTo(item2.notifyAt!.periodOffset);
+          }
         }
 
         if (item1.id == null) {
