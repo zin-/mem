@@ -1,3 +1,4 @@
+// FIXME プラットフォームとの連携なので、Repositoryにする
 // coverage:ignore-file
 import 'package:logger/logger.dart' as ex;
 
