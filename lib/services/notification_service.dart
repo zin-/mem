@@ -14,6 +14,7 @@ class NotificationService {
         {'mem': mem},
         () {
           final notifyAt = mem.notifyOn?.add(Duration(
+            // TODO 時間がないときのデフォルト値を設定から取得する
             hours: mem.notifyAt?.hour ?? 5,
             minutes: mem.notifyAt?.minute ?? 0,
           ));
