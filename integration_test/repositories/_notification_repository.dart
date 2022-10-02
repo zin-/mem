@@ -7,6 +7,7 @@ import 'package:mem/repositories/notification_repository.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
   Logger(level: Level.verbose);
 
   testNotificationRepository();
@@ -16,20 +17,39 @@ void testNotificationRepository() => group(
       'NotificationRepository test',
       () {
         if (Platform.isAndroid) {
-          group(
+          test(
             'Create instance',
             () {
-              test(
-                ': create instance',
-                () {
-                  final initialized = NotificationRepository();
+              final instance = NotificationRepository();
 
-                  expect(initialized, isA<NotificationRepository>());
-                },
-                tags: 'Small',
-              );
+              expect(instance, isA<NotificationRepository>());
             },
+            tags: 'Small',
           );
+
+          group('Initialize', () {
+            test(
+              ': success',
+              () async {
+                final initialized = await NotificationRepository().initialize();
+
+                expect(initialized, true);
+              },
+              tags: 'Small',
+            );
+
+            test(
+              ': twice',
+              () async {
+                final initialized = await NotificationRepository().initialize();
+                final initialized2 =
+                    await NotificationRepository().initialize();
+
+                expect(initialized, initialized2);
+              },
+              tags: 'Small',
+            );
+          });
 
           group(
             'Operating',
