@@ -1,6 +1,8 @@
+import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/domains/mem.dart';
 import 'package:mem/repositories/notification_repository.dart';
+import 'package:mem/services/mem_service.dart';
 
 class NotificationService {
   final NotificationRepository _notificationRepository;
@@ -27,6 +29,9 @@ class NotificationService {
                 mem.id,
                 mem.name,
                 notifyAt,
+                [
+                  NotificationActionEntity(_doneActionId, L10n().doneLabel),
+                ],
               );
             }
           }
@@ -50,3 +55,40 @@ class NotificationService {
     return tmp;
   }
 }
+
+const _doneActionId = 'done';
+
+Future<void> _doneAction(int memId) async {
+  // FIXME 一つの関数を呼び出すだけで完結したい
+  MemService().save(
+    MemDetail(
+      (await MemService().fetchMemById(memId))..doneAt = DateTime.now(),
+      await MemService().fetchMemItemsByMemId(memId),
+    ),
+  );
+}
+
+Future<void> notificationActionHandler(
+  int notificationId,
+  String actionId,
+  String? input,
+  Map<dynamic, dynamic> payload,
+) =>
+    v(
+      {
+        'id': notificationId,
+        'actionId': actionId,
+        'input': input,
+        'payload': payload
+      },
+      () async {
+        if (actionId == _doneActionId) {
+          if (payload.containsKey(memIdKey)) {
+            final memId = payload[memIdKey];
+            if (memId is int) {
+              await _doneAction(memId);
+            }
+          }
+        }
+      },
+    );

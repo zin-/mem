@@ -2,24 +2,12 @@ import 'dart:convert';
 
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/services/mem_service.dart';
+import 'package:mem/services/notification_service.dart'; // FIXME repositoryからserviceを参照するのはNG
 import 'package:mem/wrappers/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 const _androidDefaultIconPath = 'ic_launcher_foreground';
-
-const _doneActionId = 'done';
-
-doneAction(int memId) async {
-  // FIXME 一つの関数を呼び出すだけで完結したい
-  MemService().save(
-    MemDetail(
-      (await MemService().fetchMemById(memId))..doneAt = DateTime.now(),
-      await MemService().fetchMemItemsByMemId(memId),
-    ),
-  );
-}
 
 class NotificationActionEntity {
   final String id;
@@ -69,9 +57,10 @@ class NotificationRepository {
     int id,
     String title,
     DateTime notifyAt,
+    List<NotificationActionEntity> actions,
   ) =>
       v(
-        {'id': id, 'title': title, 'notifyAt': notifyAt},
+        {'id': id, 'title': title, 'notifyAt': notifyAt, 'actions': actions},
         () {
           return _flutterLocalNotificationsWrapper.zonedSchedule(
             id,
@@ -81,9 +70,7 @@ class NotificationRepository {
             'reminder',
             L10n().reminderName,
             L10n().reminderDescription,
-            [
-              NotificationActionEntity(_doneActionId, L10n().doneLabel),
-            ],
+            actions,
           );
         },
       );
@@ -110,28 +97,3 @@ class NotificationRepository {
     return tmp;
   }
 }
-
-Future<void> notificationActionHandler(
-  int notificationId,
-  String actionId,
-  String? input,
-  Map<dynamic, dynamic> payload,
-) =>
-    v(
-      {
-        'id': notificationId,
-        'actionId': actionId,
-        'input': input,
-        'payload': payload
-      },
-      () async {
-        if (actionId == _doneActionId) {
-          if (payload.containsKey(memIdKey)) {
-            final memId = payload[memIdKey];
-            if (memId is int) {
-              await doneAction(memId);
-            }
-          }
-        }
-      },
-    );

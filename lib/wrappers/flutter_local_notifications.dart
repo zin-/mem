@@ -4,6 +4,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/main.dart';
 import 'package:mem/repositories/notification_repository.dart';
+import 'package:mem/services/notification_service.dart';
 import 'package:timezone/timezone.dart';
 
 typedef OnNotificationTappedCallback = Function(
