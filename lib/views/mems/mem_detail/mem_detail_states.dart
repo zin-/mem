@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/mem.dart';
+import 'package:mem/domains/mem.dart';
 import 'package:mem/services/mem_service.dart';
 import 'package:mem/views/atoms/state_notifier.dart';
 

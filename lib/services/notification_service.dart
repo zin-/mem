@@ -1,5 +1,5 @@
 import 'package:mem/logger.dart';
-import 'package:mem/mem.dart';
+import 'package:mem/domains/mem.dart';
 import 'package:mem/repositories/notification_repository.dart';
 
 class NotificationService {

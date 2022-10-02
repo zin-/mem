@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/mem.dart';
+import 'package:mem/domains/mem.dart';
 
 Widget? buildMemNotifyAtText(Mem mem) {
   if (mem.notifyOn == null) {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/mem.dart';
+import 'package:mem/domains/mem.dart';
 import 'package:mem/views/atoms/async_value_view.dart';
 import 'package:mem/views/molecules/date_and_time_text_form_field.dart';
 import 'package:mem/views/mems/mem_done_checkbox.dart';

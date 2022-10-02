@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/database/database_manager.dart';
 import 'package:mem/main.dart' as app;
-import 'package:mem/mem.dart';
+import 'package:mem/domains/mem.dart';
 import 'package:mem/repositories/database_tuple_repository.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
