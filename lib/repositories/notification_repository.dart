@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/services/mem_service.dart';
 import 'package:mem/wrappers/flutter_local_notifications.dart';
@@ -21,41 +22,12 @@ doneAction(int memId) async {
   );
 }
 
-const _reminderNotification = NotificationDetails(
-  android: AndroidNotificationDetails(
-    'reminder',
-    'Reminder',
-    channelDescription: 'To remind at specific time.',
-    actions: [
-      AndroidNotificationAction(_doneActionId, 'Done'),
-    ],
-  ),
-);
+class NotificationActionEntity {
+  final String id;
+  final String title;
 
-Future<void> notificationActionHandler(
-  int notificationId,
-  String actionId,
-  String? input,
-  Map<dynamic, dynamic> payload,
-) =>
-    v(
-      {
-        'id': notificationId,
-        'actionId': actionId,
-        'input': input,
-        'payload': payload
-      },
-      () async {
-        if (actionId == _doneActionId) {
-          if (payload.containsKey(memIdKey)) {
-            final memId = payload[memIdKey];
-            if (memId is int) {
-              await doneAction(memId);
-            }
-          }
-        }
-      },
-    );
+  NotificationActionEntity(this.id, this.title);
+}
 
 const memIdKey = 'memId';
 
@@ -98,19 +70,25 @@ class NotificationRepository {
         },
       );
 
-  Future<void> receive(int id, String title, DateTime notifyAt) => v(
+  Future<void> receive(
+    int id,
+    String title,
+    DateTime notifyAt,
+  ) =>
+      v(
         {'id': id, 'title': title, 'notifyAt': notifyAt},
         () {
-          return _flutterLocalNotificationsPlugin.zonedSchedule(
+          return _flutterLocalNotificationsWrapper.zonedSchedule(
             id,
             title,
-            null,
             tz.TZDateTime.from(notifyAt, tz.local),
-            _reminderNotification,
-            uiLocalNotificationDateInterpretation:
-                UILocalNotificationDateInterpretation.absoluteTime,
-            androidAllowWhileIdle: true,
-            payload: json.encode({memIdKey: id}),
+            json.encode({memIdKey: id}),
+            'reminder',
+            L10n().reminderName,
+            L10n().reminderDescription,
+            [
+              NotificationActionEntity(_doneActionId, L10n().doneLabel),
+            ],
           );
         },
       );
@@ -137,3 +115,28 @@ class NotificationRepository {
     return tmp;
   }
 }
+
+Future<void> notificationActionHandler(
+  int notificationId,
+  String actionId,
+  String? input,
+  Map<dynamic, dynamic> payload,
+) =>
+    v(
+      {
+        'id': notificationId,
+        'actionId': actionId,
+        'input': input,
+        'payload': payload
+      },
+      () async {
+        if (actionId == _doneActionId) {
+          if (payload.containsKey(memIdKey)) {
+            final memId = payload[memIdKey];
+            if (memId is int) {
+              await doneAction(memId);
+            }
+          }
+        }
+      },
+    );

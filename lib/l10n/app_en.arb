@@ -42,6 +42,12 @@
   "doneFilterTitle": "Done",
   "showNotDoneLabel": "Show not done",
   "showDoneLabel": "Show done",
+
+  "done_label": "Done",
+
+  "reminder_name": "Reminder",
+  "reminder_description": "To remind at specific time.",
+
   "dev": "Under development",
   "test": "Under test"
 }

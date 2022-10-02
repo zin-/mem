@@ -4,6 +4,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/main.dart';
 import 'package:mem/repositories/notification_repository.dart';
+import 'package:timezone/timezone.dart';
 
 typedef OnNotificationTappedCallback = Function(
   int notificationId,
@@ -17,6 +18,9 @@ typedef OnNotificationActionTappedCallback = Function(
 );
 
 class FlutterLocalNotificationsWrapper {
+  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
   Future<bool> initialize(
     String androidDefaultIconPath,
     OnNotificationTappedCallback onNotificationTappedCallback,
@@ -77,8 +81,49 @@ class FlutterLocalNotificationsWrapper {
         },
       );
 
-  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  Future<void> zonedSchedule(
+    int notificationId,
+    String title,
+    TZDateTime tzDateTime,
+    String payload,
+    String channelId,
+    String channelName,
+    String channelDescription,
+    List<NotificationActionEntity> actions,
+  ) =>
+      v(
+        {
+          'notificationId': notificationId,
+          'title': title,
+          'tzDateTime': tzDateTime,
+          'payload': payload,
+          'channelId': channelId,
+          'channelName': channelName,
+          'channelDescription': channelDescription,
+        },
+        () {
+          return _flutterLocalNotificationsPlugin.zonedSchedule(
+            notificationId,
+            title,
+            null,
+            tzDateTime,
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                channelId,
+                channelName,
+                channelDescription: channelDescription,
+                actions: actions
+                    .map((e) => AndroidNotificationAction(e.id, e.title))
+                    .toList(),
+              ),
+            ),
+            uiLocalNotificationDateInterpretation:
+                UILocalNotificationDateInterpretation.absoluteTime,
+            androidAllowWhileIdle: true,
+            payload: payload,
+          );
+        },
+      );
 
   FlutterLocalNotificationsWrapper._();
 
@@ -140,13 +185,12 @@ _notificationResponseHandler(
       if (onNotificationActionTappedCallback == null) {
         return;
       }
-
       final actionId = notificationResponse.actionId;
       if (actionId == null) {
         return;
       }
 
-      onNotificationActionTappedCallback.call(
+      onNotificationActionTappedCallback(
         notificationId,
         actionId,
         notificationResponse.input,
