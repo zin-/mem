@@ -6,7 +6,9 @@ import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
 import 'package:mem/database/sqlite_database.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/repositories/database_tuple_repository.dart';
+
+// FIXME integration testでrepositoryを参照するのはNG
+import 'package:mem/repositories/_database_tuple_repository.dart';
 
 import 'definitions.dart';
 
