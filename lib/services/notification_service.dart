@@ -9,7 +9,10 @@ class NotificationService {
 
   Future initialize({Function(int memId)? showMemDetailPage}) => t(
         {},
-        () async => await _notificationRepository.initialize(showMemDetailPage),
+        () async => await _notificationRepository.initialize(
+          notificationActionHandler,
+          showMemDetailPage,
+        ),
       );
 
   memReminder(Mem mem) => t(

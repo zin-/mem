@@ -31,7 +31,10 @@ void testNotificationRepository() => group(
             test(
               ': success',
               () async {
-                final initialized = await NotificationRepository().initialize();
+                final initialized = await NotificationRepository().initialize(
+                  (id, actionId, input, payload) {},
+                  null,
+                );
 
                 expect(initialized, true);
               },
@@ -41,9 +44,14 @@ void testNotificationRepository() => group(
             test(
               ': twice',
               () async {
-                final initialized = await NotificationRepository().initialize();
-                final initialized2 =
-                    await NotificationRepository().initialize();
+                final initialized = await NotificationRepository().initialize(
+                  (id, actionId, input, payload) {},
+                  null,
+                );
+                final initialized2 = await NotificationRepository().initialize(
+                  (id, actionId, input, payload) {},
+                  null,
+                );
 
                 expect(initialized, initialized2);
               },
@@ -58,7 +66,10 @@ void testNotificationRepository() => group(
 
               setUpAll(() {
                 notificationRepository = NotificationRepository();
-                notificationRepository.initialize();
+                notificationRepository.initialize(
+                  (id, actionId, input, payload) {},
+                  null,
+                );
               });
 
               testWidgets(

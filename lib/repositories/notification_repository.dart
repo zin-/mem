@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/services/notification_service.dart'; // FIXME repositoryからserviceを参照するのはNG
 import 'package:mem/wrappers/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -21,7 +20,11 @@ const memIdKey = 'memId';
 class NotificationRepository {
   final FlutterLocalNotificationsWrapper _flutterLocalNotificationsWrapper;
 
-  Future<bool> initialize([Function(int memId)? showMemDetailPage]) => v(
+  Future<bool> initialize(
+    OnNotificationActionTappedCallback notificationActionHandler,
+    Function(int memId)? showMemDetailPage,
+  ) =>
+      v(
         {},
         () async {
           showMemDetailPageHandler(Map<dynamic, dynamic> payload) {
