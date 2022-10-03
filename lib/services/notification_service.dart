@@ -35,6 +35,9 @@ class NotificationService {
                 [
                   NotificationActionEntity(_doneActionId, L10n().doneLabel),
                 ],
+                'reminder',
+                L10n().reminderName,
+                L10n().reminderDescription,
               );
             }
           }

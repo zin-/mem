@@ -87,10 +87,10 @@ class FlutterLocalNotificationsWrapper {
     String title,
     TZDateTime tzDateTime,
     String payload,
+    List<NotificationActionEntity> actions,
     String channelId,
     String channelName,
     String channelDescription,
-    List<NotificationActionEntity> actions,
   ) =>
       v(
         {

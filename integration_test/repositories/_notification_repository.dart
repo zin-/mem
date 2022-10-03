@@ -80,6 +80,9 @@ void testNotificationRepository() => group(
                     'title',
                     DateTime.now().add(const Duration(days: 1)),
                     [],
+                    'test channelId',
+                    'test channelName',
+                    'test channelDescription',
                   );
 
                   // dev(result);

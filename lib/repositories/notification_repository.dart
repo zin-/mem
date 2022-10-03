@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/wrappers/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -61,19 +60,30 @@ class NotificationRepository {
     String title,
     DateTime notifyAt,
     List<NotificationActionEntity> actions,
+    String channelId,
+    String channelName,
+    String channelDescription,
   ) =>
       v(
-        {'id': id, 'title': title, 'notifyAt': notifyAt, 'actions': actions},
+        {
+          'id': id,
+          'title': title,
+          'notifyAt': notifyAt,
+          'actions': actions,
+          'channelId': channelId,
+          'channelName': channelName,
+          'channelDescription': channelDescription,
+        },
         () {
           return _flutterLocalNotificationsWrapper.zonedSchedule(
             id,
             title,
             tz.TZDateTime.from(notifyAt, tz.local),
             json.encode({memIdKey: id}),
-            'reminder',
-            L10n().reminderName,
-            L10n().reminderDescription,
             actions,
+            channelId,
+            channelName,
+            channelDescription,
           );
         },
       );
