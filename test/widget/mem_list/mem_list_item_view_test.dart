@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/domains/mem.dart';
@@ -43,21 +44,44 @@ void main() {
     reset(mockedMemItemRepository);
   });
 
-  testWidgets('Show', (widgetTester) async {
-    final savedMem = minSavedMem(1)
-      ..name = 'saved mem entity name'
-      ..doneAt = null;
+  group('Show', () {
+    testWidgets(
+      ': default',
+      (widgetTester) async {
+        final savedMem = minSavedMem(1)
+          ..name = 'saved mem entity name'
+          ..doneAt = null;
 
-    await pumpMemListItemView(
-      widgetTester,
-      savedMem,
+        await pumpMemListItemView(
+          widgetTester,
+          savedMem,
+        );
+        await widgetTester.pump();
+
+        expect(find.text(savedMem.name), findsOneWidget);
+        expect(
+          widgetTester.widget<Checkbox>(find.byType(Checkbox)).value,
+          false,
+        );
+      },
     );
-    await widgetTester.pump();
 
-    expect(find.text(savedMem.name), findsOneWidget);
-    expect(
-      widgetTester.widget<Checkbox>(find.byType(Checkbox)).value,
-      false,
+    testWidgets(
+      ': notifyAt',
+      (widgetTester) async {
+        final savedMem = minSavedMem(1)..notifyOn = DateTime.now();
+
+        await pumpMemListItemView(
+          widgetTester,
+          savedMem,
+        );
+        await widgetTester.pump();
+
+        expect(
+          find.text(DateFormat.yMd().format(savedMem.notifyOn!)),
+          findsOneWidget,
+        );
+      },
     );
   });
 
