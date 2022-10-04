@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/domains/mem.dart';
+import 'package:mem/views/atoms/hero_view.dart';
 import 'package:mem/views/molecules/date_and_time_text_form_field.dart';
 
 Widget? buildMemNotifyAtText(Mem mem) {
@@ -11,6 +12,8 @@ Widget? buildMemNotifyAtText(Mem mem) {
     return MemNotifyAtText(mem);
   }
 }
+
+String memNotifyAtTag(int? memId) => heroTag('mem-notifyAt', memId);
 
 class MemNotifyAtText extends StatelessWidget {
   final Mem _mem;
@@ -25,10 +28,13 @@ class MemNotifyAtText extends StatelessWidget {
           final notifyOnText = _dateFormat.format(_mem.notifyOn!);
           final notifyAtText = _mem.notifyAt?.format(context);
 
-          return Text(
-            [notifyOnText, notifyAtText]
-                .where((element) => element != null)
-                .join(' '),
+          return HeroView(
+            memNotifyAtTag(_mem.id),
+            Text(
+              [notifyOnText, notifyAtText]
+                  .where((element) => element != null)
+                  .join(' '),
+            ),
           );
         },
       );
@@ -47,10 +53,13 @@ class MemNotifyAtTextFormField extends StatelessWidget {
   Widget build(BuildContext context) => v(
         {'_mem': _mem, '_onChanged': _onChanged},
         () {
-          return DateAndTimeTextFormField(
-            date: _mem.notifyOn,
-            timeOfDay: _mem.notifyAt,
-            onChanged: _onChanged,
+          return HeroView(
+            memNotifyAtTag(_mem.id),
+            DateAndTimeTextFormField(
+              date: _mem.notifyOn,
+              timeOfDay: _mem.notifyAt,
+              onChanged: _onChanged,
+            ),
           );
         },
       );
