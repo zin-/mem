@@ -4,7 +4,7 @@ import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/domains/mem.dart';
 import 'package:mem/views/atoms/async_value_view.dart';
-import 'package:mem/views/molecules/date_and_time_text_form_field.dart';
+import 'package:mem/views/mems/mem_notify_at.dart';
 import 'package:mem/views/mems/mem_done_checkbox.dart';
 import 'package:mem/views/mems/mem_name.dart';
 import 'package:mem/views/mems/mem_detail/mem_detail_states.dart';
@@ -44,10 +44,9 @@ class MemDetailBody extends StatelessWidget {
                               ..doneAt = value == true ? DateTime.now() : null,
                           ),
                     ),
-                    DateAndTimeTextFormField(
-                      date: editingMem.notifyOn,
-                      timeOfDay: editingMem.notifyAt,
-                      onChanged: (dateTime, timeOfDay) => ref
+                    MemNotifyAtTextFormField(
+                      editingMem,
+                      (dateTime, timeOfDay) => ref
                           .read(editingMemProvider(_memId).notifier)
                           .updatedBy(
                             editingMem.copied()
