@@ -53,6 +53,5 @@ class MemNotifyAtTextFormField extends StatelessWidget {
             onChanged: _onChanged,
           );
         },
-        debug: true,
       );
 }
