@@ -51,9 +51,9 @@ final fetchMemList = FutureProvider<void>(
       ));
 
       final memListNotifier = ref.read(memListProvider.notifier);
+      memListNotifier.upsertAll(mems, (tmp, item) => tmp.id == item.id);
       for (var mem in mems) {
         ref.read(memProvider(mem.id).notifier).updatedBy(mem);
-        memListNotifier.upsert(mem, (item) => item.id == mem.id);
       }
     },
   ),
@@ -163,12 +163,6 @@ final sortedMemList =
           }
         }
 
-        if (item1.id == null) {
-          return -1;
-        }
-        if (item2.id == null) {
-          return 1;
-        }
         return item1.id!.compareTo(item2.id!);
       });
 
