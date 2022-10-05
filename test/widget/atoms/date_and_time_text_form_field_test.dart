@@ -130,10 +130,7 @@ void main() {
           },
         );
 
-        await widgetTester.tap(find.byIcon(Icons.calendar_month));
-        await widgetTester.pump();
-
-        await widgetTester.tap(find.text('OK'));
+        await pickNowDate(widgetTester);
       },
       tags: 'Small',
     );
@@ -150,10 +147,7 @@ void main() {
           },
         );
 
-        await widgetTester.tap(find.byIcon(Icons.calendar_month));
-        await widgetTester.pump();
-
-        await widgetTester.tap(find.text('OK'));
+        pickNowTimeOfDay(widgetTester);
       },
       tags: 'Small',
     );
@@ -173,8 +167,7 @@ void main() {
               },
             );
 
-            await widgetTester.tap(find.byType(Switch));
-            await widgetTester.pump();
+            tapAllDaySwitch(widgetTester);
           },
           tags: 'Small',
         );
@@ -191,8 +184,7 @@ void main() {
               },
             );
 
-            await widgetTester.tap(find.byType(Switch));
-            await widgetTester.pump();
+            await tapAllDaySwitch(widgetTester);
           },
           tags: 'Small',
         );
@@ -212,10 +204,45 @@ void main() {
           },
         );
 
-        await widgetTester.tap(find.byIcon(Icons.clear));
-        await widgetTester.pump();
+        await tapClear(widgetTester);
       },
       tags: 'Small',
     );
   });
+}
+
+pickNowDate(WidgetTester widgetTester) async {
+  await widgetTester.tap(find.descendant(
+    of: find.byType(DateAndTimeTextFormField),
+    matching: find.byIcon(Icons.calendar_month),
+  ));
+  await widgetTester.pump();
+
+  await widgetTester.tap(find.text('OK'));
+}
+
+pickNowTimeOfDay(WidgetTester widgetTester) async {
+  await widgetTester.tap(find.descendant(
+    of: find.byType(DateAndTimeTextFormField),
+    matching: find.byIcon(Icons.access_time_outlined),
+  ));
+  await widgetTester.pump();
+
+  await widgetTester.tap(find.text('OK'));
+}
+
+tapAllDaySwitch(WidgetTester widgetTester) async {
+  await widgetTester.tap(find.descendant(
+    of: find.byType(DateAndTimeTextFormField),
+    matching: find.byType(Switch),
+  ));
+  await widgetTester.pump();
+}
+
+tapClear(WidgetTester widgetTester) async {
+  await widgetTester.tap(find.descendant(
+    of: find.byType(DateAndTimeTextFormField),
+    matching: find.byIcon(Icons.clear),
+  ));
+  await widgetTester.pump();
 }

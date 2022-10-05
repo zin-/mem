@@ -13,6 +13,7 @@ import 'package:mem/views/constants.dart';
 
 import '../../samples.dart';
 import '../../mocks.mocks.dart';
+import '../atoms/date_and_time_text_form_field_test.dart';
 import 'mem_detail_body_test.dart';
 
 void main() {
@@ -56,21 +57,6 @@ void main() {
   });
 
   group('Save', () {
-    testWidgets(
-      ': name is required.',
-      (widgetTester) async {
-        await pumpMemDetailPage(widgetTester, null);
-
-        await widgetTester.tap(saveFabFinder);
-
-        expect(find.text('Name is required'), findsNothing);
-
-        verifyNever(mockedMemRepository.shipById(any));
-        verifyNever(mockedMemRepository.receive(any));
-      },
-      tags: 'Small',
-    );
-
     testWidgets(
       ': create.',
       (widgetTester) async {
@@ -141,6 +127,9 @@ void main() {
         await widgetTester.enterText(
             memMemoTextFormFieldFinder, enteringMemMemo);
 
+        await pickNowDate(widgetTester);
+        await widgetTester.pump();
+
         when(mockedMemRepository.update(any))
             .thenAnswer((realInvocation) async {
           final memEntity = realInvocation.positionalArguments[0] as MemEntity;
@@ -178,6 +167,21 @@ void main() {
         await widgetTester.pumpAndSettle(defaultDismissDuration);
 
         expect(saveMemSuccessFinder(enteringMemName), findsNothing);
+      },
+      tags: 'Small',
+    );
+
+    testWidgets(
+      ': name is required.',
+      (widgetTester) async {
+        await pumpMemDetailPage(widgetTester, null);
+
+        await widgetTester.tap(saveFabFinder);
+
+        expect(find.text('Name is required'), findsNothing);
+
+        verifyNever(mockedMemRepository.shipById(any));
+        verifyNever(mockedMemRepository.receive(any));
       },
       tags: 'Small',
     );
