@@ -86,9 +86,16 @@ void main() {
         await pumpMemDetailPage(widgetTester, null);
 
         await widgetTester.enterText(
-            memMemoTextFormFieldFinder, enteringMemMemo);
-        await widgetTester.enterText(
             memNameTextFormFieldFinder, enteringMemName);
+        await widgetTester.enterText(
+            memMemoTextFormFieldFinder, enteringMemMemo);
+
+        await pickNowDate(widgetTester);
+        await widgetTester.pump();
+        await tapAllDaySwitch(widgetTester);
+        await pickNowTimeOfDay(widgetTester);
+        await widgetTester.pump();
+
         await widgetTester.tap(saveFabFinder);
         await widgetTester.pumpAndSettle();
 
@@ -126,9 +133,6 @@ void main() {
             memNameTextFormFieldFinder, enteringMemName);
         await widgetTester.enterText(
             memMemoTextFormFieldFinder, enteringMemMemo);
-
-        await pickNowDate(widgetTester);
-        await widgetTester.pump();
 
         when(mockedMemRepository.update(any))
             .thenAnswer((realInvocation) async {

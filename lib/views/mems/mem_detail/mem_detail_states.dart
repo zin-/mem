@@ -45,15 +45,33 @@ final fetchMemById = FutureProvider.autoDispose.family<void, int?>(
   ),
 );
 
-final fetchMemItemByMemId = FutureProvider.autoDispose.family<void, int?>(
+final loadMemItems = FutureProvider.autoDispose.family<Iterable<MemItem>, int?>(
   (ref, memId) => v(
     {'memId': memId},
     () async {
-      if (memId != null && ref.read(memItemsProvider(memId)) == null) {
-        final memItems = await MemService().fetchMemItemsByMemId(memId);
+      final memItemsState = ref.read(memItemsProvider(memId));
+
+      if (memItemsState == null) {
+        final defaultMemItems = [
+          MemItem(memId: memId, type: MemItemType.memo, value: ''),
+        ];
+
+        Future<List<MemItem>> memItemsFuture;
+        if (memId == null) {
+          memItemsFuture = Future.value(List.empty());
+        } else {
+          memItemsFuture = MemService().fetchMemItemsByMemId(memId);
+        }
+
+        final memItems = (await memItemsFuture).isEmpty
+            ? defaultMemItems
+            : await memItemsFuture;
 
         ref.read(memItemsProvider(memId).notifier).updatedBy(memItems);
+        return memItems;
       }
+
+      return memItemsState;
     },
   ),
 );

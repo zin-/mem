@@ -9,6 +9,9 @@ import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/atoms/state_notifier.dart';
 import 'package:mem/views/mems/mem_detail/mem_detail_body.dart';
 import 'package:mem/views/mems/mem_detail/mem_detail_states.dart';
+import 'package:mem/views/mems/mem_detail/mem_items_view.dart';
+import 'package:mem/views/mems/mem_done_checkbox.dart';
+import 'package:mem/views/mems/mem_name.dart';
 import 'package:mockito/mockito.dart';
 
 import '../../samples.dart';
@@ -232,9 +235,27 @@ void main() {
   });
 }
 
-final memNameTextFormFieldFinder = find.byType(TextFormField).at(0);
-final memDoneCheckboxFinder = find.byType(Checkbox);
-final memMemoTextFormFieldFinder = find.byType(TextFormField).at(2);
+final memNameTextFormFieldFinder = find.descendant(
+  of: find.descendant(
+    of: find.byType(MemDetailBody),
+    matching: find.byType(MemNameTextFormField),
+  ),
+  matching: find.byType(TextFormField),
+);
+final memDoneCheckboxFinder = find.descendant(
+  of: find.descendant(
+    of: find.byType(MemDetailBody),
+    matching: find.byType(MemDoneCheckbox),
+  ),
+  matching: find.byType(Checkbox),
+);
+final memMemoTextFormFieldFinder = find.descendant(
+  of: find.descendant(
+    of: find.byType(MemDetailBody),
+    matching: find.byType(MemItemsViewComponent),
+  ),
+  matching: find.byType(TextFormField),
+);
 
 TextFormField memNameTextFormField(WidgetTester widgetTester) =>
     (widgetTester.widget(memNameTextFormFieldFinder) as TextFormField);
