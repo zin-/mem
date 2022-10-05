@@ -7,6 +7,7 @@ import 'package:mem/views/colors.dart';
 import 'package:mem/views/constants.dart';
 import 'package:mem/views/mems/mem_detail/mem_detail_states.dart';
 import 'package:mem/views/mems/mem_detail/mem_detail_page.dart';
+import 'package:mem/views/mems/mem_list/mem_list_actions.dart';
 import 'package:mem/views/mems/mem_list/mem_list_filter.dart';
 import 'package:mem/views/mems/mem_list/mem_list_item_view.dart';
 import 'package:mem/views/mems/mem_list/show_new_mem_fab.dart';
@@ -65,7 +66,14 @@ class MemListPage extends StatelessWidget {
                           delegate: SliverChildBuilderDelegate(
                             (context, index) {
                               final mem = memList[index];
-                              return MemListItemView(mem);
+                              return MemListItemView(
+                                mem,
+                                () => showMemDetailPage(
+                                  context,
+                                  ref,
+                                  mem.id,
+                                ),
+                              );
                             },
                             childCount: memList.length,
                           ),
@@ -134,7 +142,7 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
                             onPressed: () => v(
                               {},
                               () {
-                                ref.read(createMem(memId));
+                                ref.read(undoRemoveMem(memId));
                                 scaffoldMessenger.showSnackBar(
                                   SnackBar(
                                     content: Text(

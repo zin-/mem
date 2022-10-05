@@ -279,7 +279,7 @@ void main() {
   );
 
   testWidgets(
-    'Remove mem',
+    'Remove mem and undo',
     (widgetTester) async {
       final savedMemEntity = minSavedMemEntity(1)..name = 'saved mem entity';
       when(mockedMemRepository.ship(
@@ -311,12 +311,49 @@ void main() {
       await widgetTester.tap(removeButtonFinder);
       await widgetTester.pump();
       await widgetTester.tap(okButtonFinder);
-
-      verify(mockedMemItemRepository.discardByMemId(savedMemEntity.id))
-          .called(1);
-      verify(mockedMemRepository.discardById(any)).called(1);
+      await widgetTester.pump(); // start animation
+      await widgetTester.pump();
+      await widgetTester.pumpAndSettle(const Duration(seconds: 1));
+      await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
       expect(widgetTester.widgetList(memListTileFinder).length, 0);
+      expect(find.text(savedMemEntity.name), findsNothing);
+      expect(
+        find.text('Remove success. ${savedMemEntity.name}'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('Undo'),
+        findsOneWidget,
+      );
+
+      when(mockedMemRepository.receive(any)).thenAnswer((realInvocation) {
+        final arg1 = realInvocation.positionalArguments[0];
+
+        expect(arg1, isA<MemEntity>());
+        expect(arg1.id, savedMemEntity.id);
+
+        return Future.value(savedMemEntity);
+      });
+      when(mockedMemItemRepository.receive(any)).thenAnswer((realInvocation) {
+        final arg1 = realInvocation.positionalArguments[0];
+
+        expect(arg1, isA<MemItemEntity>());
+        expect(arg1.id, savedMemoMemItemEntity.id);
+
+        return Future.value(savedMemoMemItemEntity);
+      });
+
+      await widgetTester.tap(find.text('Undo'));
+      await widgetTester.pump();
+      await widgetTester.pumpAndSettle();
+
+      expect(widgetTester.widgetList(memListTileFinder).length, 1);
+      expect(find.text(savedMemEntity.name), findsOneWidget);
+      expect(
+        find.text('Save success. ${savedMemEntity.name}'),
+        findsOneWidget,
+      );
     },
     tags: 'Small',
   );

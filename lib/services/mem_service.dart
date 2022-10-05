@@ -49,16 +49,17 @@ class MemService {
     return tmp;
   }
 
-  Future<MemDetail> save(MemDetail memDetail) => t(
+  Future<MemDetail> save(MemDetail memDetail, {bool undo = false}) => t(
         {'memDetail': memDetail},
         () async {
-          final savedMem = convertMemFromEntity(await (memDetail.mem.isSaved()
-                  ? _memRepository.update
-                  : _memRepository.receive)
-              .call(convertMemIntoEntity(memDetail.mem)));
+          final savedMem = convertMemFromEntity(
+              await (memDetail.mem.isSaved() && !undo
+                      ? _memRepository.update
+                      : _memRepository.receive)
+                  .call(convertMemIntoEntity(memDetail.mem)));
 
           final savedMemItems = (await Future.wait(memDetail.memItems.map((e) =>
-                  (e.isSaved()
+                  (e.isSaved() && !undo
                           ? _memItemRepository.update
                           : _memItemRepository.receive)
                       .call(convertMemItemIntoEntity(e)..memId = savedMem.id))))

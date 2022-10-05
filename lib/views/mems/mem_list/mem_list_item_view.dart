@@ -4,14 +4,14 @@ import 'package:mem/logger.dart';
 import 'package:mem/domains/mem.dart';
 import 'package:mem/views/mems/mem_detail/mem_detail_states.dart';
 import 'package:mem/views/mems/mem_done_checkbox.dart';
-import 'package:mem/views/mems/mem_list/mem_list_page.dart';
 import 'package:mem/views/mems/mem_name.dart';
 import 'package:mem/views/mems/mem_notify_at.dart';
 
 class MemListItemView extends StatelessWidget {
   final Mem _mem;
+  final Function() _onTap;
 
-  const MemListItemView(this._mem, {Key? key}) : super(key: key);
+  const MemListItemView(this._mem, this._onTap, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => v(
@@ -30,11 +30,12 @@ class MemListItemView extends StatelessWidget {
               ),
               title: MemNameText(_mem.name, _mem.id),
               subtitle: buildMemNotifyAtText(_mem),
-              onTap: () => showMemDetailPage(
-                context,
-                ref,
-                _mem.id,
-              ),
+              onTap: _onTap,
+              // onTap: () => showMemDetailPage(
+              //   context,
+              //   ref,
+              //   _mem.id,
+              // ),
             );
           },
         ),
