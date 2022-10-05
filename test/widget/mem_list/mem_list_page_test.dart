@@ -346,7 +346,7 @@ void main() {
           ..name = 'notifyOn is one day later'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyOn = nowDate;
+          ..notifyOn = nowDate.add(const Duration(days: 1));
         final notifyOnIsNow2 = minSavedMemEntity(5)
           ..name = 'notifyOn is now 2'
           ..doneAt = null
