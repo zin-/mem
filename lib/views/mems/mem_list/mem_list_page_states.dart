@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/domains/mem.dart';
@@ -150,16 +151,16 @@ final sortedMemList =
           return item1.notifyOn!.compareTo(item2.notifyOn!);
         }
 
-        if (item1.notifyOn != null) {
+        if (item1.notifyOn != null && item2.notifyOn != null) {
           if (item1.notifyAt != item2.notifyAt) {
             if (item1.notifyAt == null) {
-              return 1;
-            }
-            if (item2.notifyAt == null) {
               return -1;
             }
-            return item1.notifyAt!.periodOffset
-                .compareTo(item2.notifyAt!.periodOffset);
+            if (item2.notifyAt == null) {
+              return 1;
+            }
+
+            return item1.notifyAt!.compareTo(item2.notifyAt!);
           }
         }
 
@@ -170,3 +171,15 @@ final sortedMemList =
     },
   ),
 );
+
+extension TimeOfDayExtension on TimeOfDay {
+  int compareTo(TimeOfDay other) {
+    if (hour != other.hour) {
+      return hour.compareTo(other.hour);
+    }
+    if (minute != other.minute) {
+      return minute.compareTo(other.minute);
+    }
+    return 0;
+  }
+}

@@ -325,6 +325,8 @@ void main() {
       ': notifyOn',
       (widgetTester) async {
         final now = DateTime.now();
+        final nowDate = DateTime(now.year, now.month, now.day);
+
         final notifyOnIsNull = minSavedMemEntity(1)
           ..name = 'notifyOn is null'
           ..doneAt = null
@@ -334,17 +336,17 @@ void main() {
           ..name = 'notifyOn is now'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyOn = DateTime(now.year, now.month, now.day);
+          ..notifyOn = nowDate;
         final notifyOnIsOneDayAgo = minSavedMemEntity(3)
           ..name = 'notifyOn is one day ago'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyOn = DateTime(now.year, now.month, now.day - 1);
+          ..notifyOn = nowDate.add(const Duration(days: -1));
         final notifyOnIsOneDayLater = minSavedMemEntity(4)
           ..name = 'notifyOn is one day later'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyOn = DateTime(now.year, now.month, now.day + 1);
+          ..notifyOn = nowDate;
         final notifyOnIsNow2 = minSavedMemEntity(5)
           ..name = 'notifyOn is now 2'
           ..doneAt = null
@@ -354,12 +356,12 @@ void main() {
           ..name = 'notifyOn is one day ago 2'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyOn = DateTime(now.year, now.month, now.day - 1);
+          ..notifyOn = nowDate.add(const Duration(days: -1));
         final notifyOnIsOneDayLater2 = minSavedMemEntity(7)
           ..name = 'notifyOn is one day later 2'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyOn = DateTime(now.year, now.month, now.day + 1);
+          ..notifyOn = nowDate.add(const Duration(days: 1));
 
         when(mockedMemRepository.ship(
                 whereMap: anyNamed('whereMap'),
@@ -385,6 +387,69 @@ void main() {
         expectMemNameTextOnListAt(widgetTester, 3, notifyOnIsNow2.name);
         expectMemNameTextOnListAt(widgetTester, 1, notifyOnIsOneDayAgo2.name);
         expectMemNameTextOnListAt(widgetTester, 5, notifyOnIsOneDayLater2.name);
+      },
+    );
+
+    testWidgets(
+      ': notifyAt',
+      (widgetTester) async {
+        final now = DateTime.now();
+        final nowDate = DateTime(now.year, now.month, now.day);
+        final nowDateTime =
+            DateTime(now.year, now.month, now.day, now.hour, now.minute);
+
+        final notifyOnIsNull = minSavedMemEntity(1)
+          ..name = 'notifyOn is null'
+          ..doneAt = null
+          ..archivedAt = null
+          ..notifyOn = null
+          ..notifyAt = null;
+        final notifyAtIsNull = minSavedMemEntity(2)
+          ..name = 'notifyAt is null'
+          ..doneAt = null
+          ..archivedAt = null
+          ..notifyOn = nowDate
+          ..notifyAt = null;
+        final notifyAtIsNow = minSavedMemEntity(3)
+          ..name = 'notifyAt is now'
+          ..doneAt = null
+          ..archivedAt = null
+          ..notifyOn = nowDate
+          ..notifyAt = nowDateTime;
+        final notifyAtIsOneHourAgo = minSavedMemEntity(4)
+          ..name = 'notifyAt is one hour ago'
+          ..doneAt = null
+          ..archivedAt = null
+          ..notifyOn = nowDate
+          ..notifyAt = nowDateTime.add(const Duration(hours: -1));
+        final notifyAtIsOneMinuteLater = minSavedMemEntity(5)
+          ..name = 'notifyAt is one minute later'
+          ..doneAt = null
+          ..archivedAt = null
+          ..notifyOn = nowDate
+          ..notifyAt = nowDateTime.add(const Duration(minutes: 1));
+
+        when(mockedMemRepository.ship(
+                whereMap: anyNamed('whereMap'),
+                archive: anyNamed('archive'),
+                done: anyNamed('done')))
+            .thenAnswer((realInvocation) => Future.value([
+                  notifyOnIsNull,
+                  notifyAtIsNull,
+                  notifyAtIsNow,
+                  notifyAtIsOneHourAgo,
+                  notifyAtIsOneMinuteLater,
+                ]));
+
+        await pumpMemListPage(widgetTester);
+        await widgetTester.pumpAndSettle();
+
+        expectMemNameTextOnListAt(widgetTester, 4, notifyOnIsNull.name);
+        expectMemNameTextOnListAt(widgetTester, 0, notifyAtIsNull.name);
+        expectMemNameTextOnListAt(widgetTester, 2, notifyAtIsNow.name);
+        expectMemNameTextOnListAt(widgetTester, 1, notifyAtIsOneHourAgo.name);
+        expectMemNameTextOnListAt(
+            widgetTester, 3, notifyAtIsOneMinuteLater.name);
       },
     );
   });
