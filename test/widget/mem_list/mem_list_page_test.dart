@@ -320,72 +320,74 @@ void main() {
     });
   });
 
-  testWidgets(
-    'Sort: notifyOn',
-    (widgetTester) async {
-      final now = DateTime.now();
-      final notifyOnIsNull = minSavedMemEntity(1)
-        ..name = 'notifyOn is null'
-        ..doneAt = null
-        ..archivedAt = null
-        ..notifyOn = null;
-      final notifyOnIsNow = minSavedMemEntity(2)
-        ..name = 'notifyOn is now'
-        ..doneAt = null
-        ..archivedAt = null
-        ..notifyOn = DateTime(now.year, now.month, now.day);
-      final notifyOnIsOneDayAgo = minSavedMemEntity(3)
-        ..name = 'notifyOn is one day ago'
-        ..doneAt = null
-        ..archivedAt = null
-        ..notifyOn = DateTime(now.year, now.month, now.day - 1);
-      final notifyOnIsOneDayLater = minSavedMemEntity(4)
-        ..name = 'notifyOn is one day later'
-        ..doneAt = null
-        ..archivedAt = null
-        ..notifyOn = DateTime(now.year, now.month, now.day + 1);
-      final notifyOnIsNow2 = minSavedMemEntity(5)
-        ..name = 'notifyOn is now 2'
-        ..doneAt = null
-        ..archivedAt = null
-        ..notifyOn = DateTime(now.year, now.month, now.day);
-      final notifyOnIsOneDayAgo2 = minSavedMemEntity(6)
-        ..name = 'notifyOn is one day ago 2'
-        ..doneAt = null
-        ..archivedAt = null
-        ..notifyOn = DateTime(now.year, now.month, now.day - 1);
-      final notifyOnIsOneDayLater2 = minSavedMemEntity(7)
-        ..name = 'notifyOn is one day later 2'
-        ..doneAt = null
-        ..archivedAt = null
-        ..notifyOn = DateTime(now.year, now.month, now.day + 1);
+  group('Sort', () {
+    testWidgets(
+      ': notifyOn',
+      (widgetTester) async {
+        final now = DateTime.now();
+        final notifyOnIsNull = minSavedMemEntity(1)
+          ..name = 'notifyOn is null'
+          ..doneAt = null
+          ..archivedAt = null
+          ..notifyOn = null;
+        final notifyOnIsNow = minSavedMemEntity(2)
+          ..name = 'notifyOn is now'
+          ..doneAt = null
+          ..archivedAt = null
+          ..notifyOn = DateTime(now.year, now.month, now.day);
+        final notifyOnIsOneDayAgo = minSavedMemEntity(3)
+          ..name = 'notifyOn is one day ago'
+          ..doneAt = null
+          ..archivedAt = null
+          ..notifyOn = DateTime(now.year, now.month, now.day - 1);
+        final notifyOnIsOneDayLater = minSavedMemEntity(4)
+          ..name = 'notifyOn is one day later'
+          ..doneAt = null
+          ..archivedAt = null
+          ..notifyOn = DateTime(now.year, now.month, now.day + 1);
+        final notifyOnIsNow2 = minSavedMemEntity(5)
+          ..name = 'notifyOn is now 2'
+          ..doneAt = null
+          ..archivedAt = null
+          ..notifyOn = DateTime(now.year, now.month, now.day);
+        final notifyOnIsOneDayAgo2 = minSavedMemEntity(6)
+          ..name = 'notifyOn is one day ago 2'
+          ..doneAt = null
+          ..archivedAt = null
+          ..notifyOn = DateTime(now.year, now.month, now.day - 1);
+        final notifyOnIsOneDayLater2 = minSavedMemEntity(7)
+          ..name = 'notifyOn is one day later 2'
+          ..doneAt = null
+          ..archivedAt = null
+          ..notifyOn = DateTime(now.year, now.month, now.day + 1);
 
-      when(mockedMemRepository.ship(
-              whereMap: anyNamed('whereMap'),
-              archive: anyNamed('archive'),
-              done: anyNamed('done')))
-          .thenAnswer((realInvocation) => Future.value([
-                notifyOnIsNull,
-                notifyOnIsNow,
-                notifyOnIsOneDayAgo,
-                notifyOnIsOneDayLater,
-                notifyOnIsNow2,
-                notifyOnIsOneDayAgo2,
-                notifyOnIsOneDayLater2,
-              ]));
+        when(mockedMemRepository.ship(
+                whereMap: anyNamed('whereMap'),
+                archive: anyNamed('archive'),
+                done: anyNamed('done')))
+            .thenAnswer((realInvocation) => Future.value([
+                  notifyOnIsNull,
+                  notifyOnIsNow,
+                  notifyOnIsOneDayAgo,
+                  notifyOnIsOneDayLater,
+                  notifyOnIsNow2,
+                  notifyOnIsOneDayAgo2,
+                  notifyOnIsOneDayLater2,
+                ]));
 
-      await pumpMemListPage(widgetTester);
-      await widgetTester.pumpAndSettle();
+        await pumpMemListPage(widgetTester);
+        await widgetTester.pumpAndSettle();
 
-      expectMemNameTextOnListAt(widgetTester, 6, notifyOnIsNull.name);
-      expectMemNameTextOnListAt(widgetTester, 2, notifyOnIsNow.name);
-      expectMemNameTextOnListAt(widgetTester, 0, notifyOnIsOneDayAgo.name);
-      expectMemNameTextOnListAt(widgetTester, 4, notifyOnIsOneDayLater.name);
-      expectMemNameTextOnListAt(widgetTester, 3, notifyOnIsNow2.name);
-      expectMemNameTextOnListAt(widgetTester, 1, notifyOnIsOneDayAgo2.name);
-      expectMemNameTextOnListAt(widgetTester, 5, notifyOnIsOneDayLater2.name);
-    },
-  );
+        expectMemNameTextOnListAt(widgetTester, 6, notifyOnIsNull.name);
+        expectMemNameTextOnListAt(widgetTester, 2, notifyOnIsNow.name);
+        expectMemNameTextOnListAt(widgetTester, 0, notifyOnIsOneDayAgo.name);
+        expectMemNameTextOnListAt(widgetTester, 4, notifyOnIsOneDayLater.name);
+        expectMemNameTextOnListAt(widgetTester, 3, notifyOnIsNow2.name);
+        expectMemNameTextOnListAt(widgetTester, 1, notifyOnIsOneDayAgo2.name);
+        expectMemNameTextOnListAt(widgetTester, 5, notifyOnIsOneDayLater2.name);
+      },
+    );
+  });
 
   testWidgets(
     'Hide fab on scroll.',
