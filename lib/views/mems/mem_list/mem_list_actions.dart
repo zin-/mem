@@ -13,8 +13,6 @@ final undoRemoveMem = Provider.autoDispose.family<void, int>(
 
       final received = await MemService().save(memDetail, undo: true);
 
-      ref.read(memProvider(null).notifier).updatedBy(received.mem);
-      ref.read(memItemsProvider(null).notifier).updatedBy(received.memItems);
       ref.read(memProvider(received.mem.id).notifier).updatedBy(received.mem);
       ref
           .read(memItemsProvider(received.mem.id).notifier)
