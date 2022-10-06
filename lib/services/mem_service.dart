@@ -172,6 +172,8 @@ class MemService {
         },
       );
 
+  // FIXME convert系は別のクラスに分割する
+  // できれば自動生成したい
   Mem convertMemFromEntity(MemEntity memEntity) => v(
         {'memEntity': memEntity},
         () => Mem(
