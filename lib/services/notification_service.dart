@@ -4,6 +4,8 @@ import 'package:mem/domains/mem.dart';
 import 'package:mem/repositories/notification_repository.dart';
 import 'package:mem/services/mem_service.dart';
 
+const memReminderChannelId = 'reminder';
+
 class NotificationService {
   final NotificationRepository _notificationRepository;
 
@@ -35,7 +37,7 @@ class NotificationService {
                 [
                   NotificationActionEntity(_doneActionId, L10n().doneLabel),
                 ],
-                'reminder',
+                memReminderChannelId,
                 L10n().reminderName,
                 L10n().reminderDescription,
               );
