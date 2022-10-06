@@ -60,9 +60,22 @@ void main() {
     testWidgets(
       ': create.',
       (widgetTester) async {
+        const memId = 1;
+
+        await pumpMemDetailPage(widgetTester, null);
+
         const enteringMemName = 'entering mem name';
         const enteringMemMemo = 'test mem memo';
-        const memId = 1;
+        await widgetTester.enterText(
+            memNameTextFormFieldFinder, enteringMemName);
+        await widgetTester.enterText(
+            memMemoTextFormFieldFinder, enteringMemMemo);
+
+        await pickNowDate(widgetTester);
+        await widgetTester.pump();
+        await tapAllDaySwitch(widgetTester);
+        await pickNowTimeOfDay(widgetTester);
+        await widgetTester.pump();
 
         when(mockedMemRepository.receive(any))
             .thenAnswer((realInvocation) async {
@@ -82,19 +95,6 @@ void main() {
             ..type = value.type
             ..value = value.value;
         });
-
-        await pumpMemDetailPage(widgetTester, null);
-
-        await widgetTester.enterText(
-            memNameTextFormFieldFinder, enteringMemName);
-        await widgetTester.enterText(
-            memMemoTextFormFieldFinder, enteringMemMemo);
-
-        await pickNowDate(widgetTester);
-        await widgetTester.pump();
-        await tapAllDaySwitch(widgetTester);
-        await pickNowTimeOfDay(widgetTester);
-        await widgetTester.pump();
 
         await widgetTester.tap(saveFabFinder);
         await widgetTester.pumpAndSettle();
