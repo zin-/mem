@@ -22,99 +22,161 @@ void main() {
 void testSqliteDatabase() => group(
       'SqliteDatabase test',
       () {
-        if (Platform.isAndroid || Platform.isWindows) {
-          late SqliteDatabase sqliteDatabase;
-
-          setUp(() async {
-            sqliteDatabase = await SqliteDatabase(defD).open();
-          });
-          tearDown(() async {
-            await sqliteDatabase.delete();
-          });
-
-          group('Migrate: upgrade', () {
+        group('Database operation', () {
+          if (Platform.isAndroid || Platform.isWindows) {
             test(
-              ': add table',
+              ': open',
               () async {
-                await sqliteDatabase.close();
+                final created = await SqliteDatabase(defD).open();
 
-                final addingTableDefinition = DefT(
-                  'added_table',
-                  [
-                    DefPK(idColumnName, TypeC.integer, autoincrement: true),
-                    DefC('test', TypeC.text),
-                  ],
-                );
-                final upgradingDefD = DefD(
-                  defD.name,
-                  2,
-                  [
-                    ...defD.tableDefinitions,
-                    addingTableDefinition,
-                  ],
-                );
-
-                final upgraded = await SqliteDatabase(upgradingDefD).open();
-
-                final addedTable =
-                    upgraded.getTable(addingTableDefinition.name);
-                expect(addedTable, isNotNull);
-
-                final insertedId = await addedTable.insert({'test': 'test'});
-                expect(insertedId, isNotNull);
+                expect(created.definition.name, defD.name);
+                expect(created.tables.length, defD.tableDefinitions.length);
               },
               tags: TestSize.medium,
             );
 
             test(
-              ': add column',
+              'getTable: not found',
               () async {
-                final test = {
-                  textFieldName: 'test text',
-                  datetimeFieldName: DateTime.now(),
-                };
+                final created = await SqliteDatabase(defD).open();
 
-                final insertedId =
-                    await sqliteDatabase.getTable(testTable.name).insert(test);
-                final insertedChildrenId =
-                    await sqliteDatabase.getTable(testChildTable.name).insert({
-                  'tests_id': insertedId,
-                });
-
-                await sqliteDatabase.close();
-
-                final upgradingDefD = DefD(
-                  defD.name,
-                  2,
-                  [
-                    DefT(
-                      testTable.name,
-                      [
-                        ...testTable.columns,
-                        DefC('adding_column', TypeC.datetime, notNull: false),
-                      ],
-                    ),
-                    testChildTable,
-                  ],
+                expect(
+                  () => created.getTable('not_found'),
+                  throwsA((e) {
+                    expect(e, isA<DatabaseException>());
+                    return true;
+                  }),
                 );
-
-                final upgraded = await SqliteDatabase(upgradingDefD).open();
-
-                final tests = await upgraded.getTable(testTable.name).select();
-                expect(tests, [
-                  {'id': insertedId, 'adding_column': null, ...test}
-                ]);
-                final testChildren =
-                    await upgraded.getTable(testChildTable.name).select();
-                expect(testChildren, [
-                  {'id': insertedChildrenId, 'tests_id': insertedId}
-                ]);
               },
               tags: TestSize.medium,
             );
-          });
 
-          group(('Operating'), () {
+            group('Migrate: upgrade', () {
+              late SqliteDatabase sqliteDatabase;
+
+              setUp(() async {
+                sqliteDatabase = await SqliteDatabase(defD).open();
+              });
+              tearDown(() async {
+                await sqliteDatabase.delete();
+              });
+
+              test(
+                ': add table',
+                () async {
+                  await sqliteDatabase.close();
+
+                  final addingTableDefinition = DefT(
+                    'added_table',
+                    [
+                      DefPK(idColumnName, TypeC.integer, autoincrement: true),
+                      DefC('test', TypeC.text),
+                    ],
+                  );
+                  final upgradingDefD = DefD(
+                    defD.name,
+                    2,
+                    [
+                      ...defD.tableDefinitions,
+                      addingTableDefinition,
+                    ],
+                  );
+
+                  final upgraded = await SqliteDatabase(upgradingDefD).open();
+
+                  final addedTable =
+                      upgraded.getTable(addingTableDefinition.name);
+                  expect(addedTable, isNotNull);
+
+                  final insertedId = await addedTable.insert({'test': 'test'});
+                  expect(insertedId, isNotNull);
+                },
+                tags: TestSize.medium,
+              );
+
+              test(
+                ': add column',
+                () async {
+                  final test = {
+                    textFieldName: 'test text',
+                    datetimeFieldName: DateTime.now(),
+                  };
+
+                  final insertedId = await sqliteDatabase
+                      .getTable(testTable.name)
+                      .insert(test);
+                  final insertedChildrenId = await sqliteDatabase
+                      .getTable(testChildTable.name)
+                      .insert({
+                    'tests_id': insertedId,
+                  });
+
+                  await sqliteDatabase.close();
+
+                  final upgradingDefD = DefD(
+                    defD.name,
+                    2,
+                    [
+                      DefT(
+                        testTable.name,
+                        [
+                          ...testTable.columns,
+                          DefC('adding_column', TypeC.datetime, notNull: false),
+                        ],
+                      ),
+                      testChildTable,
+                    ],
+                  );
+
+                  final upgraded = await SqliteDatabase(upgradingDefD).open();
+
+                  final tests =
+                      await upgraded.getTable(testTable.name).select();
+                  expect(tests, [
+                    {'id': insertedId, 'adding_column': null, ...test}
+                  ]);
+                  final testChildren =
+                      await upgraded.getTable(testChildTable.name).select();
+                  expect(testChildren, [
+                    {'id': insertedChildrenId, 'tests_id': insertedId}
+                  ]);
+                },
+                tags: TestSize.medium,
+              );
+            });
+          }
+
+          if (kIsWeb) {
+            final defD = DefD('test_sqlite.db', 1, []);
+
+            test(
+              'Error on Chrome.',
+              () async {
+                expect(
+                  () => SqliteDatabase(defD),
+                  throwsA(
+                    (e) =>
+                        e is DatabaseException &&
+                        e.message == 'Unsupported platform. Platform: Web',
+                  ),
+                );
+              },
+              tags: TestSize.medium,
+            );
+          }
+        });
+
+        group('Table Operating', () {
+          if (Platform.isAndroid || Platform.isWindows) {
+            late SqliteDatabase sqliteDatabase;
+
+            setUp(() async {
+              sqliteDatabase = await SqliteDatabase(defD).open();
+            });
+            tearDown(() async {
+              await sqliteDatabase.delete();
+            });
+
             group(': insert', () {
               test(
                 ': testTable',
@@ -353,26 +415,7 @@ void testSqliteDatabase() => group(
               },
               tags: TestSize.medium,
             );
-          });
-        }
-
-        if (kIsWeb) {
-          final defD = DefD('test_sqlite.db', 1, []);
-
-          test(
-            'Error on Chrome.',
-            () async {
-              expect(
-                () => SqliteDatabase(defD),
-                throwsA(
-                  (e) =>
-                      e is DatabaseException &&
-                      e.message == 'Unsupported platform. Platform: Web',
-                ),
-              );
-            },
-            tags: TestSize.medium,
-          );
-        }
+          }
+        });
       },
     );
