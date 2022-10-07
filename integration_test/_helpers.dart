@@ -10,6 +10,13 @@ import 'package:mem/repositories/_database_tuple_repository.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 
+class TestSize {
+  static const small = 'Small';
+  static const medium = 'Medium';
+
+  TestSize._();
+}
+
 const defaultDuration = Duration(seconds: 1);
 
 Future clearDatabase() async {

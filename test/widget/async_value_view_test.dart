@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/views/atoms/async_value_view.dart';
 
-import '../helpers.dart';
+import '../_helpers.dart';
 
 void main() {
   Logger(level: Level.verbose);

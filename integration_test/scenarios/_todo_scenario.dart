@@ -45,7 +45,7 @@ void testTodoScenario() => group(
 
                 expect(find.text(savedMemName), findsOneWidget);
               },
-              tags: 'Medium',
+              tags: TestSize.medium,
             );
           },
         );

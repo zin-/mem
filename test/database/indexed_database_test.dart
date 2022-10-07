@@ -4,7 +4,7 @@ import 'package:mem/database/definitions.dart';
 import 'package:mem/database/indexed_database.dart';
 import 'package:mem/logger.dart';
 
-import '../helpers.dart';
+import '../_helpers.dart';
 
 void main() {
   Logger(level: Level.verbose);

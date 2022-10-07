@@ -14,7 +14,7 @@ import 'package:mem/views/mems/mem_done_checkbox.dart';
 import 'package:mem/views/mems/mem_name.dart';
 import 'package:mockito/mockito.dart';
 
-import '../../helpers.dart';
+import '../../_helpers.dart';
 import '../../samples.dart';
 import '../../mocks.mocks.dart';
 

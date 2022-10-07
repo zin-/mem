@@ -9,7 +9,7 @@ import 'package:mem/views/mems/mem_list/mem_list_page.dart';
 import 'package:mem/views/mems/mem_name.dart';
 import 'package:mockito/mockito.dart';
 
-import '../../helpers.dart';
+import '../../_helpers.dart';
 import '../../samples.dart';
 import '../../mocks.mocks.dart';
 

@@ -46,7 +46,7 @@ void testMemoScenario() => group(
             expect(find.text(enteringMemName), findsOneWidget);
             expect(find.text(enteringMemMemo), findsNothing);
           },
-          tags: 'Medium',
+          tags: TestSize.medium,
         );
 
         testWidgets(
@@ -81,7 +81,7 @@ void testMemoScenario() => group(
             expect(find.text(enteringMemMemo), findsNothing);
             expect(find.text(savedMemName), findsNothing);
           },
-          tags: 'Medium',
+          tags: TestSize.medium,
         );
 
         testWidgets(
@@ -115,7 +115,7 @@ void testMemoScenario() => group(
 
             expect(find.text(savedMemName), findsOneWidget);
           },
-          tags: 'Medium',
+          tags: TestSize.medium,
         );
 
         testWidgets(
@@ -155,7 +155,7 @@ void testMemoScenario() => group(
 
             expect(find.text(savedMemName), findsOneWidget);
           },
-          tags: 'Medium',
+          tags: TestSize.medium,
         );
 
         testWidgets(
@@ -193,7 +193,7 @@ void testMemoScenario() => group(
 
             expect(find.text(savedMemName), findsNothing);
           },
-          tags: 'Medium',
+          tags: TestSize.medium,
         );
       },
     );

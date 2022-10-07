@@ -7,6 +7,8 @@ import 'package:mem/database/definitions.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/repositories/_database_tuple_repository.dart';
 
+import '../_helpers.dart';
+
 void main() async {
   Logger(level: Level.verbose);
   DatabaseManager(onTest: true);
@@ -60,7 +62,7 @@ void testDatabaseTupleRepository() => group(
               final database = await DatabaseManager().open(testDatabase);
               TestRepository(database.getTable(testTable.name));
             },
-            tags: 'Medium',
+            tags: TestSize.medium,
           );
 
           test(
@@ -77,7 +79,7 @@ void testDatabaseTupleRepository() => group(
 
               expect(result.isSaved(), true);
             },
-            tags: 'Medium',
+            tags: TestSize.medium,
           );
 
           group(
@@ -111,7 +113,7 @@ void testDatabaseTupleRepository() => group(
                     shipped.map((e) => e.toMap()).toString(),
                   );
                 },
-                tags: 'Medium',
+                tags: TestSize.medium,
               );
 
               test(
@@ -134,7 +136,7 @@ void testDatabaseTupleRepository() => group(
                   expect(shipped.length, 1);
                   expect(shipped[0].toMap(), received2.toMap());
                 },
-                tags: 'Medium',
+                tags: TestSize.medium,
               );
 
               test(
@@ -157,7 +159,7 @@ void testDatabaseTupleRepository() => group(
                   expect(shipped.length, 1);
                   expect(shipped[0].toMap(), received1.toMap());
                 },
-                tags: 'Medium',
+                tags: TestSize.medium,
               );
             },
           );
@@ -173,7 +175,7 @@ void testDatabaseTupleRepository() => group(
 
               expect(shipped.toMap(), received.toMap());
             },
-            tags: 'Medium',
+            tags: TestSize.medium,
           );
 
           test(
@@ -187,7 +189,7 @@ void testDatabaseTupleRepository() => group(
 
               expect(updated.updatedAt, isNotNull);
             },
-            tags: 'Medium',
+            tags: TestSize.medium,
           );
 
           test(
@@ -201,7 +203,7 @@ void testDatabaseTupleRepository() => group(
 
               expect(archived.isArchived(), true);
             },
-            tags: 'Medium',
+            tags: TestSize.medium,
           );
 
           test(
@@ -215,7 +217,7 @@ void testDatabaseTupleRepository() => group(
 
               expect(unarchived.isArchived(), false);
             },
-            tags: 'Medium',
+            tags: TestSize.medium,
           );
 
           group(
@@ -233,7 +235,7 @@ void testDatabaseTupleRepository() => group(
 
                   expect(discardResult, true);
                 },
-                tags: 'Medium',
+                tags: TestSize.medium,
               );
 
               test(
@@ -243,7 +245,7 @@ void testDatabaseTupleRepository() => group(
 
                   expect(discardResult, false);
                 },
-                tags: 'Medium',
+                tags: TestSize.medium,
               );
             },
           );
@@ -262,7 +264,7 @@ void testDatabaseTupleRepository() => group(
 
               expect(discardedCount, 2);
             },
-            tags: 'Medium',
+            tags: TestSize.medium,
           );
         }
       },
