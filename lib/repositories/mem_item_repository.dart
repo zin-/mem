@@ -99,7 +99,7 @@ class MemItemRepository extends DatabaseTupleRepository<MemItemEntity> {
     var tmp = _instance;
     if (tmp == null) {
       if (memItemTable == null) {
-        throw Exception('Call initialize');
+        throw Exception('Call initialize'); // coverage:ignore-line
       }
       tmp = MemItemRepository._(memItemTable);
       _instance = tmp;

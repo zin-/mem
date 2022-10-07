@@ -26,6 +26,8 @@ class NotificationRepository {
       v(
         {},
         () async {
+// FIXME 現時点では、通知に対する操作をテストで実行できない
+// coverage:ignore-start
           showMemDetailPageHandler(Map<dynamic, dynamic> payload) {
             if (showMemDetailPage != null && payload.containsKey(memIdKey)) {
               final memId = payload[memIdKey];
@@ -34,20 +36,27 @@ class NotificationRepository {
               }
             }
           }
+// coverage:ignore-end
 
           tz.initializeTimeZones();
 
           final initialized =
               await _flutterLocalNotificationsWrapper.initialize(
             _androidDefaultIconPath,
-            (notificationId, payload) => showMemDetailPageHandler(payload),
-            notificationActionHandler,
+// FIXME 現時点では、通知に対する操作をテストで実行できない
+// coverage:ignore-start
+                (notificationId, payload) => showMemDetailPageHandler(payload),
+// coverage:ignore-end
+                notificationActionHandler,
           );
 
           if (initialized) {
             await _flutterLocalNotificationsWrapper
                 .receiveOnLaunchAppNotification(
-              (notificationId, payload) => showMemDetailPageHandler(payload),
+// FIXME 現時点では、通知に対する操作をテストで実行できない
+// coverage:ignore-start
+            (notificationId, payload) => showMemDetailPageHandler(payload),
+// coverage:ignore-end
             );
           }
 
