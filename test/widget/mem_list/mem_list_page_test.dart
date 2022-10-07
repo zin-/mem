@@ -368,8 +368,8 @@ void main() {
                 archive: anyNamed('archive'),
                 done: anyNamed('done')))
             .thenAnswer((realInvocation) => Future.value([
-                  notifyOnIsNull,
                   notifyOnIsNow,
+                  notifyOnIsNull,
                   notifyOnIsOneDayAgo,
                   notifyOnIsOneDayLater,
                   notifyOnIsNow2,
