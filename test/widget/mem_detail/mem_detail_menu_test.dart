@@ -7,6 +7,7 @@ import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/colors.dart';
 import 'package:mockito/mockito.dart';
 
+import '../../helpers.dart';
 import '../../mocks.mocks.dart';
 import 'mem_detail_page_test.dart';
 
@@ -37,7 +38,7 @@ void main() {
       expect(removeButtonFinder, findsOneWidget);
       expect(find.text('Remove'), findsOneWidget);
     },
-    tags: 'Small',
+    tags: TestSize.small,
   );
 
   testWidgets(
@@ -56,7 +57,7 @@ void main() {
 
       expect(removeConfirmationFinder, findsNothing);
     },
-    tags: 'Small',
+    tags: TestSize.small,
   );
 
   testWidgets(
@@ -114,7 +115,7 @@ void main() {
       verify(mockedMemRepository.shipById(memId)).called(1);
       verify(mockedMemRepository.unarchive(any)).called(1);
     },
-    tags: 'Small',
+    tags: TestSize.small,
   );
 }
 

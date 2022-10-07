@@ -6,6 +6,8 @@ import 'package:mem/views/molecules/date_and_time_text_form_field.dart';
 import 'package:mem/views/atoms/date_text_form_field.dart';
 import 'package:mem/views/atoms/time_of_day_text_form_field.dart';
 
+import '../../helpers.dart';
+
 void main() {
   Logger(level: Level.verbose);
 
@@ -53,7 +55,7 @@ void main() {
           true,
         );
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
 
     testWidgets(
@@ -79,7 +81,7 @@ void main() {
           true,
         );
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
 
     testWidgets(
@@ -113,7 +115,7 @@ void main() {
           false,
         );
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
   });
 
@@ -132,7 +134,7 @@ void main() {
 
         await pickNowDate(widgetTester);
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
 
     testWidgets(
@@ -149,7 +151,7 @@ void main() {
 
         pickNowTimeOfDay(widgetTester);
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
 
     group(
@@ -169,7 +171,7 @@ void main() {
 
             tapAllDaySwitch(widgetTester);
           },
-          tags: 'Small',
+          tags: TestSize.small,
         );
 
         testWidgets(
@@ -186,7 +188,7 @@ void main() {
 
             await tapAllDaySwitch(widgetTester);
           },
-          tags: 'Small',
+          tags: TestSize.small,
         );
       },
     );
@@ -206,7 +208,7 @@ void main() {
 
         await tapClear(widgetTester);
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
   });
 }

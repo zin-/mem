@@ -11,6 +11,7 @@ import 'package:mem/repositories/notification_repository.dart';
 import 'package:mem/views/mems/mem_list/mem_list_item_view.dart';
 import 'package:mockito/mockito.dart';
 
+import '../../helpers.dart';
 import '../../samples.dart';
 import '../../mocks.mocks.dart';
 
@@ -68,6 +69,7 @@ void main() {
           false,
         );
       },
+      tags: TestSize.small,
     );
 
     testWidgets(
@@ -86,6 +88,7 @@ void main() {
           findsOneWidget,
         );
       },
+      tags: TestSize.small,
     );
   });
 
@@ -143,6 +146,7 @@ void main() {
           verify(mockedNotificationRepository.discard(any)).called(1);
           verifyNever(mockedMemItemRepository.update(any));
         },
+        tags: TestSize.small,
       );
 
       testWidgets(
@@ -196,6 +200,7 @@ void main() {
           verify(mockedMemRepository.update(any)).called(1);
           verifyNever(mockedMemItemRepository.update(any));
         },
+        tags: TestSize.small,
       );
     },
   );

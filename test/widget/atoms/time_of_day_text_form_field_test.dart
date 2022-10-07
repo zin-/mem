@@ -4,6 +4,8 @@ import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/views/atoms/time_of_day_text_form_field.dart';
 
+import '../../helpers.dart';
+
 void main() {
   Logger(level: Level.verbose);
 
@@ -42,7 +44,7 @@ void main() {
           '',
         );
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
 
     testWidgets(
@@ -63,7 +65,7 @@ void main() {
           timeOfDay.format(context),
         );
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
   });
 
@@ -84,7 +86,7 @@ void main() {
 
         await widgetTester.tap(find.text('CANCEL'));
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
 
     testWidgets(
@@ -103,7 +105,7 @@ void main() {
 
         await widgetTester.tap(find.text('OK'));
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
   });
 }

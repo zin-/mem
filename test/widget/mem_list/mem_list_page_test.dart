@@ -9,6 +9,7 @@ import 'package:mem/views/mems/mem_list/mem_list_page.dart';
 import 'package:mem/views/mems/mem_name.dart';
 import 'package:mockito/mockito.dart';
 
+import '../../helpers.dart';
 import '../../samples.dart';
 import '../../mocks.mocks.dart';
 
@@ -72,7 +73,7 @@ void main() {
 
       verifyNever(mockedMemRepository.shipById(any));
     },
-    tags: 'Small',
+    tags: TestSize.small,
   );
 
   group('Filter', () {
@@ -125,7 +126,7 @@ void main() {
           false,
         );
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
 
     group(': onChanged', () {
@@ -221,7 +222,7 @@ void main() {
           expectMemNameTextOnListAt(widgetTester, 2, archived.name);
           expectMemNameTextOnListAt(widgetTester, 3, archived2.name);
         },
-        tags: 'Small',
+        tags: TestSize.small,
       );
 
       testWidgets(
@@ -315,7 +316,7 @@ void main() {
           expectMemNameTextOnListAt(widgetTester, 2, done.name);
           expectMemNameTextOnListAt(widgetTester, 3, done2.name);
         },
-        tags: 'Small',
+        tags: TestSize.small,
       );
     });
   });
@@ -388,6 +389,7 @@ void main() {
         expectMemNameTextOnListAt(widgetTester, 1, notifyOnIsOneDayAgo2.name);
         expectMemNameTextOnListAt(widgetTester, 5, notifyOnIsOneDayLater2.name);
       },
+      tags: TestSize.small,
     );
 
     testWidgets(
@@ -451,6 +453,7 @@ void main() {
         expectMemNameTextOnListAt(
             widgetTester, 3, notifyAtIsOneMinuteLater.name);
       },
+      tags: TestSize.small,
     );
   });
 
@@ -495,7 +498,7 @@ void main() {
 
       expect(showNewMemFabFinder.hitTestable(), findsOneWidget);
     },
-    tags: 'Small',
+    tags: TestSize.small,
   );
 }
 

@@ -14,6 +14,7 @@ import 'package:mem/views/mems/mem_done_checkbox.dart';
 import 'package:mem/views/mems/mem_name.dart';
 import 'package:mockito/mockito.dart';
 
+import '../../helpers.dart';
 import '../../samples.dart';
 import '../../mocks.mocks.dart';
 
@@ -86,7 +87,7 @@ void main() {
         expectMemDoneOnMemDetail(widgetTester, false);
         expectMemMemoOnMemDetail(widgetTester, '');
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
 
     testWidgets(
@@ -116,7 +117,7 @@ void main() {
         expectMemDoneOnMemDetail(widgetTester, true);
         expectMemMemoOnMemDetail(widgetTester, savedMemoMemItemEntity.value);
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
 
     testWidgets(
@@ -139,7 +140,7 @@ void main() {
 
         expectMemMemoOnMemDetail(widgetTester, savedMemoMemItemEntity.value);
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
   });
 
@@ -160,7 +161,7 @@ void main() {
 
         expect(find.text(enteringMemMemo), findsOneWidget);
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
 
     // testWidgets(
@@ -193,7 +194,7 @@ void main() {
     //     // FIXME ここで、フォーカスがはずれていることを確認したかったが、確認できなかった
     //     expect(focusNode.hasPrimaryFocus, true);
     //   },
-    //   tags: 'Small',
+    //   tags: TestSize.small,
     //   skip: true,
     // );
 
@@ -212,7 +213,7 @@ void main() {
 
         expectMemDoneOnMemDetail(widgetTester, true);
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
 
     testWidgets(
@@ -230,7 +231,7 @@ void main() {
 
         expect(find.text(enteringMemMemo), findsOneWidget);
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
   });
 }

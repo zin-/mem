@@ -2,6 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mem/database/definitions.dart';
 
+import '../helpers.dart';
+
 void main() {
   group('Database', () {
     group(': new', () {
@@ -24,7 +26,7 @@ void main() {
           expect(databaseDefinition.toString(), contains(dbVersion.toString()));
           expect(databaseDefinition.toString(), contains(tableName));
         },
-        tags: 'Small',
+        tags: TestSize.small,
       );
 
       test(
@@ -41,7 +43,7 @@ void main() {
                 e.toString() == 'Database name is required.'),
           );
         },
-        tags: 'Small',
+        tags: TestSize.small,
       );
 
       test(
@@ -58,7 +60,7 @@ void main() {
                 e.toString() == 'Database name contains " ".'),
           );
         },
-        tags: 'Small',
+        tags: TestSize.small,
       );
 
       test(
@@ -75,7 +77,7 @@ void main() {
                 e.toString() == 'Minimum version is 1.'),
           );
         },
-        tags: 'Small',
+        tags: TestSize.small,
       );
     });
   });
@@ -98,7 +100,7 @@ void main() {
           expect(tableDefinition.toString(), contains(tableName));
           expect(tableDefinition.toString(), contains(columnName));
         },
-        tags: 'Small',
+        tags: TestSize.small,
       );
 
       test(
@@ -114,7 +116,7 @@ void main() {
                 e.toString() == 'Table name is required.'),
           );
         },
-        tags: 'Small',
+        tags: TestSize.small,
       );
 
       test(
@@ -130,7 +132,7 @@ void main() {
                 e.toString() == 'Table name contains " ".'),
           );
         },
-        tags: 'Small',
+        tags: TestSize.small,
       );
 
       test(
@@ -146,7 +148,7 @@ void main() {
                 e.toString() == 'Table columns are required.'),
           );
         },
-        tags: 'Small',
+        tags: TestSize.small,
       );
 
       test(
@@ -161,7 +163,7 @@ void main() {
                 e.toString() == 'Primary key is required.'),
           );
         },
-        tags: 'Small',
+        tags: TestSize.small,
       );
 
       test(
@@ -177,7 +179,7 @@ void main() {
                 e.toString() == 'Only one primary key is allowed.'),
           );
         },
-        tags: 'Small',
+        tags: TestSize.small,
       );
 
       test(
@@ -197,7 +199,7 @@ void main() {
                 e.toString() == 'Duplicated column names are not allowed.'),
           );
         },
-        tags: 'Small',
+        tags: TestSize.small,
       );
     });
 
@@ -226,7 +228,7 @@ void main() {
             ' )',
           );
         },
-        tags: 'Small',
+        tags: TestSize.small,
       );
 
       test(
@@ -257,7 +259,7 @@ void main() {
             ' )',
           );
         },
-        tags: 'Small',
+        tags: TestSize.small,
       );
     });
   });
@@ -274,7 +276,7 @@ void main() {
 
           expect(columnDefinition.toString(), contains(columnName));
         },
-        tags: 'Small',
+        tags: TestSize.small,
       );
 
       test(
@@ -289,7 +291,7 @@ void main() {
             ),
           );
         },
-        tags: 'Small',
+        tags: TestSize.small,
       );
 
       test(
@@ -304,7 +306,7 @@ void main() {
             ),
           );
         },
-        tags: 'Small',
+        tags: TestSize.small,
       );
     });
   });

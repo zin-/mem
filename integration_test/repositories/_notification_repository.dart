@@ -24,7 +24,7 @@ void testNotificationRepository() => group(
 
               expect(instance, isA<NotificationRepository>());
             },
-            tags: 'Small',
+            tags: TestSize.small,
           );
 
           group('Initialize', () {
@@ -38,7 +38,7 @@ void testNotificationRepository() => group(
 
                 expect(initialized, true);
               },
-              tags: 'Small',
+              tags: TestSize.small,
             );
 
             test(
@@ -55,7 +55,7 @@ void testNotificationRepository() => group(
 
                 expect(initialized, initialized2);
               },
-              tags: 'Small',
+              tags: TestSize.small,
             );
           });
 

@@ -5,6 +5,8 @@ import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/views/atoms/date_text_form_field.dart';
 
+import '../../helpers.dart';
+
 void main() {
   Logger(level: Level.verbose);
 
@@ -43,7 +45,7 @@ void main() {
           '',
         );
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
 
     testWidgets(
@@ -62,7 +64,7 @@ void main() {
           DateFormat.yMd().format(date),
         );
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
   });
 
@@ -83,7 +85,7 @@ void main() {
 
         await widgetTester.tap(find.text('CANCEL'));
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
 
     testWidgets(
@@ -102,7 +104,7 @@ void main() {
 
         await widgetTester.tap(find.text('OK'));
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
   });
 }
