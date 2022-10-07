@@ -7,6 +7,7 @@ import 'package:mem/logger.dart';
 import 'package:mem/domains/mem.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
+import 'package:mem/repositories/notification_repository.dart';
 import 'package:mem/views/mems/mem_list/mem_list_item_view.dart';
 import 'package:mockito/mockito.dart';
 
@@ -38,10 +39,13 @@ void main() {
   MemRepository.reset(mockedMemRepository);
   final mockedMemItemRepository = MockMemItemRepository();
   MemItemRepository.reset(mockedMemItemRepository);
+  final mockedNotificationRepository = MockNotificationRepository();
+  NotificationRepository.reset(mockedNotificationRepository);
 
   setUp(() {
     reset(mockedMemRepository);
     reset(mockedMemItemRepository);
+    reset(mockedNotificationRepository);
   });
 
   group('Show', () {
@@ -85,31 +89,114 @@ void main() {
     );
   });
 
-  testWidgets(
-    'Undone',
-    (widgetTester) async {
-      final savedMem = minSavedMem(1)
-        ..name = 'saved mem entity name'
-        ..doneAt = DateTime.now();
+  group(
+    'Action',
+    () {
+      testWidgets(
+        ': done',
+        (widgetTester) async {
+          final savedMem = minSavedMem(1)
+            ..name = 'saved mem entity name'
+            ..doneAt = null;
 
-      await pumpMemListItemView(
-        widgetTester,
-        savedMem,
+          await pumpMemListItemView(
+            widgetTester,
+            savedMem,
+          );
+          await widgetTester.pump();
+
+          final savedMemEntity = minSavedMemEntity(savedMem.id)
+            ..name = savedMem.name
+            ..doneAt = savedMem.doneAt;
+          when(mockedMemRepository.shipById(any))
+              .thenAnswer((realInvocation) async {
+            final arg1 = realInvocation.positionalArguments[0];
+
+            expect(arg1, savedMem.id);
+
+            return savedMemEntity;
+          });
+          when(mockedMemRepository.update(any))
+              .thenAnswer((realInvocation) async {
+            final arg1 = realInvocation.positionalArguments[0];
+
+            expect(arg1, isA<MemEntity>());
+            expect(arg1.id, savedMem.id);
+
+            expect(arg1.doneAt, isNotNull);
+
+            return MemEntity.fromMap(arg1.toMap())..updatedAt = DateTime.now();
+          });
+          when(mockedNotificationRepository.discard(any))
+              .thenAnswer((realInvocation) {
+            final arg1 = realInvocation.positionalArguments[0];
+
+            expect(arg1, savedMem.id);
+
+            return Future.value(null);
+          });
+
+          await widgetTester.tap(find.byType(Checkbox));
+
+          verify(mockedMemRepository.shipById(any)).called(1);
+          verify(mockedMemRepository.update(any)).called(1);
+          verify(mockedNotificationRepository.discard(any)).called(1);
+          verifyNever(mockedMemItemRepository.update(any));
+        },
       );
-      await widgetTester.pump();
 
-      when(mockedMemRepository.update(any)).thenAnswer((realInvocation) async {
-        final arg1 = realInvocation.positionalArguments[0] as MemEntity;
+      testWidgets(
+        ': undone',
+        (widgetTester) async {
+          final savedMem = minSavedMem(1)
+            ..name = 'saved mem entity name'
+            ..doneAt = DateTime.now();
 
-        expect(arg1.doneAt, isNotNull);
+          await pumpMemListItemView(
+            widgetTester,
+            savedMem,
+          );
+          await widgetTester.pump();
 
-        return MemEntity.fromMap(arg1.toMap())..updatedAt = DateTime.now();
-      });
+          final savedMemEntity = minSavedMemEntity(savedMem.id)
+            ..name = savedMem.name
+            ..doneAt = savedMem.doneAt;
+          when(mockedMemRepository.shipById(any))
+              .thenAnswer((realInvocation) async {
+            final arg1 = realInvocation.positionalArguments[0];
 
-      await widgetTester.tap(find.byType(Checkbox));
+            expect(arg1, savedMem.id);
 
-      verify(mockedMemRepository.update(any)).called(1);
-      verifyNever(mockedMemItemRepository.update(any));
+            return savedMemEntity;
+          });
+          when(mockedMemRepository.update(any))
+              .thenAnswer((realInvocation) async {
+            final arg1 = realInvocation.positionalArguments[0];
+
+            expect(arg1, isA<MemEntity>());
+            expect(arg1.id, savedMem.id);
+
+            expect(arg1.doneAt, isNull);
+
+            return MemEntity.fromMap(arg1.toMap())..updatedAt = DateTime.now();
+          });
+          when(mockedNotificationRepository.receive(
+                  any, any, any, any, any, any, any))
+              .thenAnswer((realInvocation) {
+            final arg1 = realInvocation.positionalArguments[0];
+
+            expect(arg1, savedMem.id);
+
+            return Future.value(null);
+          });
+
+          await widgetTester.tap(find.byType(Checkbox));
+
+          verify(mockedMemRepository.shipById(any)).called(1);
+          verify(mockedMemRepository.update(any)).called(1);
+          verifyNever(mockedMemItemRepository.update(any));
+        },
+      );
     },
   );
 }

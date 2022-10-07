@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/domains/mem.dart';
-import 'package:mem/views/mems/mem_detail/mem_detail_states.dart';
 import 'package:mem/views/mems/mem_done_checkbox.dart';
+import 'package:mem/views/mems/mem_list/mem_list_item_actions.dart';
 import 'package:mem/views/mems/mem_name.dart';
 import 'package:mem/views/mems/mem_notify_at.dart';
 
@@ -23,19 +23,14 @@ class MemListItemView extends StatelessWidget {
                 _mem.id,
                 _mem.doneAt != null,
                 (value) {
-                  ref.read(editingMemProvider(_mem.id).notifier).updatedBy(
-                      _mem..doneAt = value == true ? DateTime.now() : null);
-                  ref.read(updateMem(_mem.id));
+                  value == true
+                      ? ref.read(doneMem(_mem.id))
+                      : ref.read(undoneMem(_mem.id));
                 },
               ),
               title: MemNameText(_mem.name, _mem.id),
               subtitle: buildMemNotifyAtText(_mem),
               onTap: _onTap,
-              // onTap: () => showMemDetailPage(
-              //   context,
-              //   ref,
-              //   _mem.id,
-              // ),
             );
           },
         ),

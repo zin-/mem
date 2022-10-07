@@ -55,6 +55,7 @@ class NotificationRepository {
         },
       );
 
+  // FIXME 引数が多すぎる。entityに押し込む
   Future<void> receive(
     int id,
     String title,

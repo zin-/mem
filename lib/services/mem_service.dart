@@ -75,6 +75,22 @@ class MemService {
         },
       );
 
+  Future<MemDetail> doneByMemId(int memId) => t(
+        {'memId': memId},
+        () async => save(MemDetail(
+          (await fetchMemById(memId))..doneAt = DateTime.now(),
+          [],
+        )),
+      );
+
+  Future<MemDetail> undoneByMemId(int memId) => t(
+        {'memId': memId},
+        () async => save(MemDetail(
+          (await fetchMemById(memId))..doneAt = null,
+          [],
+        )),
+      );
+
   Future<List<Mem>> fetchMems(
     bool showNotArchived,
     bool showArchived,
