@@ -66,16 +66,8 @@ class NotificationService {
 
 const _doneActionId = 'done';
 
-Future<void> _doneAction(int memId) async {
-  // FIXME 一つの関数を呼び出すだけで完結したい
-  MemService().save(
-    MemDetail(
-      (await MemService().fetchMemById(memId))..doneAt = DateTime.now(),
-      await MemService().fetchMemItemsByMemId(memId),
-    ),
-  );
-}
-
+// FIXME 現時点では、通知に対する操作をテストで実行できない
+// coverage:ignore-start
 Future<void> notificationActionHandler(
   int notificationId,
   String actionId,
@@ -94,9 +86,10 @@ Future<void> notificationActionHandler(
           if (payload.containsKey(memIdKey)) {
             final memId = payload[memIdKey];
             if (memId is int) {
-              await _doneAction(memId);
+              await MemService().doneByMemId(memId);
             }
           }
         }
       },
     );
+// coverage:ignore-end
