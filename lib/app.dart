@@ -6,7 +6,9 @@ import 'package:mem/views/colors.dart';
 import 'package:mem/views/mems/mem_list/mem_list_page.dart';
 
 class MemApplication extends StatelessWidget {
-  const MemApplication({Key? key}) : super(key: key);
+  final String? languageCode;
+
+  const MemApplication(this.languageCode, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => t(
@@ -16,6 +18,7 @@ class MemApplication extends StatelessWidget {
             onGenerateTitle: (context) => L10n(context).appTitle(),
             localizationsDelegates: L10n.localizationsDelegates,
             supportedLocales: L10n.supportedLocales,
+            locale: languageCode == null ? null : Locale(languageCode!),
             theme: ThemeData(
               primarySwatch: primaryColor,
               bottomAppBarTheme: const BottomAppBarTheme(

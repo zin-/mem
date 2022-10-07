@@ -7,13 +7,13 @@ const createdAtColumnName = 'createdAt';
 const updatedAtColumnName = 'updatedAt';
 const archivedAtColumnName = 'archivedAt';
 
-abstract class DatabaseTableEntity {
+abstract class DatabaseTupleEntity {
   late dynamic id;
   late DateTime? createdAt;
   late DateTime? updatedAt;
   late DateTime? archivedAt;
 
-  DatabaseTableEntity({
+  DatabaseTupleEntity({
     required this.id,
     this.createdAt,
     this.updatedAt,
@@ -24,7 +24,7 @@ abstract class DatabaseTableEntity {
 
   bool isArchived() => isSaved() && archivedAt != null;
 
-  DatabaseTableEntity.fromMap(Map<String, dynamic> valueMap)
+  DatabaseTupleEntity.fromMap(Map<String, dynamic> valueMap)
       : id = valueMap[idColumnName],
         createdAt = valueMap[createdAtColumnName],
         updatedAt = valueMap[updatedAtColumnName],
@@ -47,7 +47,7 @@ final defaultColumnDefinitions = [
   DefC(archivedAtColumnName, TypeC.datetime, notNull: false),
 ];
 
-abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
+abstract class DatabaseTupleRepository<Entity extends DatabaseTupleEntity> {
   Future<Entity> receive(Entity entity) => v(
         {'entity': entity},
         () async {
@@ -139,17 +139,17 @@ abstract class DatabaseTableRepository<Entity extends DatabaseTableEntity> {
 
   final Table _table;
 
-  DatabaseTableRepository(this._table);
+  DatabaseTupleRepository(this._table);
 }
 
-Map<String, String?> buildNullableWhere(String columnName, bool? nullable) => v(
-      {'columnName': columnName, 'nullable': nullable},
+Map<String, String?> buildNullableWhere(String columnName, bool? hasValue) => v(
+      {'columnName': columnName, 'hasValue': hasValue},
       () {
-        if (nullable == null) {
+        if (hasValue == null) {
           return {};
         } else {
           final a =
-              nullable ? '$columnName IS NOT NULL' : '$columnName IS NULL';
+              hasValue ? '$columnName IS NOT NULL' : '$columnName IS NULL';
           return {a: null};
         }
       },

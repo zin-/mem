@@ -20,6 +20,10 @@ dependencies:
   ## for View state management
   flutter_riverpod:
 
+  # for Notification
+  flutter_local_notifications:
+  timezone:
+
   # for Persistence
   ## for Database
   sqflite:

@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/repositories/mem_repository.dart';
+import 'package:mem/domains/mem.dart';
 import 'package:mem/views/colors.dart';
 import 'package:mem/views/constants.dart';
 import 'package:mem/views/mems/mem_detail/mem_detail_states.dart';
 import 'package:mem/views/mems/mem_detail/mem_detail_page.dart';
+import 'package:mem/views/mems/mem_list/mem_list_actions.dart';
 import 'package:mem/views/mems/mem_list/mem_list_filter.dart';
 import 'package:mem/views/mems/mem_list/mem_list_item_view.dart';
 import 'package:mem/views/mems/mem_list/show_new_mem_fab.dart';
+import 'package:mem/views/mems/mems_action.dart';
 
 import 'mem_list_page_states.dart';
 
@@ -22,53 +24,70 @@ class MemListPage extends StatelessWidget {
   Widget build(BuildContext context) => t(
         {},
         () => Consumer(
-          builder: (context, ref, child) => v(
-            {},
-            () {
-              ref.watch(fetchMemList);
-              final memList = ref.watch(sortedMemList);
+          builder: (context, ref, child) {
+            ref.read(
+              initialize((memId) => showMemDetailPage(context, ref, memId)),
+            );
 
-              return Scaffold(
-                body: CustomScrollView(
-                  controller: _scrollController,
-                  slivers: [
-                    SliverAppBar(
-                      title: Text(L10n().memListPageTitle()),
-                      floating: true,
-                      actions: [
-                        IconTheme(
-                          data: const IconThemeData(color: iconOnPrimaryColor),
-                          child: Row(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.filter_list),
-                                onPressed: () => showModalBottomSheet(
-                                  context: context,
-                                  builder: (context) => const MemListFilter(),
-                                ),
+            return Consumer(
+              builder: (context, ref, child) => v(
+                {},
+                () {
+                  ref.watch(fetchMemList);
+                  final memList = ref.watch(sortedMemList);
+
+                  return Scaffold(
+                    body: CustomScrollView(
+                      controller: _scrollController,
+                      slivers: [
+                        SliverAppBar(
+                          title: Text(L10n().memListPageTitle()),
+                          floating: true,
+                          actions: [
+                            IconTheme(
+                              data: const IconThemeData(
+                                  color: iconOnPrimaryColor),
+                              child: Row(
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.filter_list),
+                                    onPressed: () => showModalBottomSheet(
+                                      context: context,
+                                      builder: (context) =>
+                                          const MemListFilter(),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
+                          ],
+                        ),
+                        SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              final mem = memList[index];
+                              return MemListItemView(
+                                mem,
+                                () => showMemDetailPage(
+                                  context,
+                                  ref,
+                                  mem.id,
+                                ),
+                              );
+                            },
+                            childCount: memList.length,
                           ),
                         ),
                       ],
                     ),
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final mem = memList[index];
-                          return MemListItemView(mem.id);
-                        },
-                        childCount: memList.length,
-                      ),
-                    ),
-                  ],
-                ),
-                floatingActionButton: ShowNewMemFab(_scrollController),
-                floatingActionButtonLocation:
-                    FloatingActionButtonLocation.centerFloat,
-              );
-            },
-          ),
+                    floatingActionButton: ShowNewMemFab(_scrollController),
+                    floatingActionButtonLocation:
+                        FloatingActionButtonLocation.centerFloat,
+                  );
+                },
+              ),
+            );
+          },
         ),
       );
 }
@@ -76,7 +95,7 @@ class MemListPage extends StatelessWidget {
 void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
       {'context': context, 'memId': memId},
       () => Navigator.of(context)
-          .push<MemEntity?>(
+          .push<Mem?>(
             PageRouteBuilder(
               pageBuilder: (context, animation, secondaryAnimation) =>
                   MemDetailPage(memId),
@@ -123,7 +142,7 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
                             onPressed: () => v(
                               {},
                               () {
-                                ref.read(createMem(memId));
+                                ref.read(undoRemoveMem(memId));
                                 scaffoldMessenger.showSnackBar(
                                   SnackBar(
                                     content: Text(

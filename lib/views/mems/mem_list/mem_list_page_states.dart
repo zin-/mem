@@ -1,8 +1,9 @@
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/repositories/mem_repository.dart';
-import 'package:mem/repositories/repository.dart';
+import 'package:mem/domains/mem.dart';
+import 'package:mem/services/mem_service.dart';
 import 'package:mem/views/atoms/state_notifier.dart';
 import 'package:mem/views/mems/mem_detail/mem_detail_states.dart';
 
@@ -34,7 +35,7 @@ final showDoneProvider = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
   ),
 );
 
-final fetchMemList = FutureProvider<List<MemEntity>>(
+final fetchMemList = FutureProvider<void>(
   (ref) => v(
     {},
     () async {
@@ -43,38 +44,31 @@ final fetchMemList = FutureProvider<List<MemEntity>>(
       final showNotDone = ref.watch(showNotDoneProvider);
       final showDone = ref.watch(showDoneProvider);
 
-      final mems = await MemRepository().ship(
-        whereMap: {}
-          ..addAll(buildNullableWhere(
-            archivedAtColumnName,
-            showNotArchived == showArchived ? null : showArchived,
-          ))
-          ..addAll(buildNullableWhere(
-            memDoneAtColumnName,
-            showNotDone == showDone ? null : showDone,
-          )),
-      );
+      final mems = (await MemService().fetchMems(
+        showNotArchived,
+        showArchived,
+        showNotDone,
+        showDone,
+      ));
 
       final memListNotifier = ref.read(memListProvider.notifier);
+      memListNotifier.upsertAll(mems, (tmp, item) => tmp.id == item.id);
       for (var mem in mems) {
         ref.read(memProvider(mem.id).notifier).updatedBy(mem);
-        memListNotifier.upsert(mem, (item) => item.id == mem.id);
       }
-
-      return mems;
     },
   ),
 );
 
 final memListProvider =
-    StateNotifierProvider<ListValueStateNotifier<MemEntity>, List<MemEntity>?>(
+    StateNotifierProvider<ListValueStateNotifier<Mem>, List<Mem>?>(
   (ref) => v(
     {},
-    () => ListValueStateNotifier<MemEntity>(null),
+    () => ListValueStateNotifier<Mem>(null),
   ),
 );
 final reactiveMemListProvider =
-    StateNotifierProvider<ValueStateNotifier<List<MemEntity>>, List<MemEntity>>(
+    StateNotifierProvider<ValueStateNotifier<List<Mem>>, List<Mem>>(
   (ref) => v(
     {},
     () {
@@ -82,7 +76,7 @@ final reactiveMemListProvider =
 
       final reactiveMemList = memList
           .map((e) => ref.watch(memProvider(e.id)))
-          .whereType<MemEntity>()
+          .whereType<Mem>()
           .toList();
 
       return ValueStateNotifier(reactiveMemList);
@@ -90,18 +84,18 @@ final reactiveMemListProvider =
   ),
 );
 final filteredMemListProvider =
-    StateNotifierProvider<ValueStateNotifier<List<MemEntity>>, List<MemEntity>>(
+    StateNotifierProvider<ValueStateNotifier<List<Mem>>, List<Mem>>(
   (ref) => v(
     {},
     () {
-      final memList = ref.watch(reactiveMemListProvider);
+      final reactiveMemList = ref.watch(reactiveMemListProvider);
 
       final showNotArchived = ref.watch(showNotArchivedProvider);
       final showArchived = ref.watch(showArchivedProvider);
       final showNotDone = ref.watch(showNotDoneProvider);
       final showDone = ref.watch(showDoneProvider);
 
-      final filteredMemList = memList.where((item) {
+      final filteredMemList = reactiveMemList.where((item) {
         final archive = showNotArchived == showArchived
             ? true
             : item.archivedAt == null
@@ -121,7 +115,7 @@ final filteredMemListProvider =
   ),
 );
 final sortedMemList =
-    StateNotifierProvider<ValueStateNotifier<List<MemEntity>>, List<MemEntity>>(
+    StateNotifierProvider<ValueStateNotifier<List<Mem>>, List<Mem>>(
   (ref) => v(
     {},
     () {
@@ -135,7 +129,6 @@ final sortedMemList =
           if (item2.doneAt == null) {
             return 1;
           }
-          return item1.doneAt!.compareTo(item2.doneAt!);
         }
 
         if (item1.archivedAt != item2.archivedAt) {
@@ -148,10 +141,45 @@ final sortedMemList =
           return item1.archivedAt!.compareTo(item2.archivedAt!);
         }
 
-        return item1.id.compareTo(item2.id);
+        if (item1.notifyOn != item2.notifyOn) {
+          if (item1.notifyOn == null) {
+            return 1;
+          }
+          if (item2.notifyOn == null) {
+            return -1;
+          }
+          return item1.notifyOn!.compareTo(item2.notifyOn!);
+        }
+
+        if (item1.notifyOn != null && item2.notifyOn != null) {
+          if (item1.notifyAt != item2.notifyAt) {
+            if (item1.notifyAt == null) {
+              return -1;
+            }
+            if (item2.notifyAt == null) {
+              return 1;
+            }
+
+            return item1.notifyAt!.compareTo(item2.notifyAt!);
+          }
+        }
+
+        return item1.id!.compareTo(item2.id!);
       });
 
       return ValueStateNotifier(sortedMemList);
     },
   ),
 );
+
+extension TimeOfDayExtension on TimeOfDay {
+  int compareTo(TimeOfDay other) {
+    if (hour != other.hour) {
+      return hour.compareTo(other.hour);
+    }
+    if (minute != other.minute) {
+      return minute.compareTo(other.minute);
+    }
+    return 0;
+  }
+}

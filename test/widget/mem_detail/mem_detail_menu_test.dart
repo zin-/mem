@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/logger.dart';
+import 'package:mem/domains/mem.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/colors.dart';
 import 'package:mockito/mockito.dart';
 
+import '../../_helpers.dart';
 import '../../mocks.mocks.dart';
 import 'mem_detail_page_test.dart';
 
@@ -13,9 +15,9 @@ void main() {
   Logger(level: Level.verbose);
 
   final mockedMemRepository = MockMemRepository();
-  MemRepository.withMock(mockedMemRepository);
+  MemRepository.reset(mockedMemRepository);
   final mockedMemItemRepository = MockMemItemRepository();
-  MemItemRepository.withMock(mockedMemItemRepository);
+  MemItemRepository.reset(mockedMemItemRepository);
 
   tearDown(() {
     reset(mockedMemRepository);
@@ -36,7 +38,7 @@ void main() {
       expect(removeButtonFinder, findsOneWidget);
       expect(find.text('Remove'), findsOneWidget);
     },
-    tags: 'Small',
+    tags: TestSize.small,
   );
 
   testWidgets(
@@ -55,7 +57,7 @@ void main() {
 
       expect(removeConfirmationFinder, findsNothing);
     },
-    tags: 'Small',
+    tags: TestSize.small,
   );
 
   testWidgets(
@@ -113,7 +115,7 @@ void main() {
       verify(mockedMemRepository.shipById(memId)).called(1);
       verify(mockedMemRepository.unarchive(any)).called(1);
     },
-    tags: 'Small',
+    tags: TestSize.small,
   );
 }
 

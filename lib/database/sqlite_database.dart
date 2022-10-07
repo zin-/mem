@@ -178,7 +178,6 @@ class SqliteDatabase extends Database {
                 final rows = await db.query(tableDefinition.name);
 
                 final tmpTableName = '$tmpPrefix${tableDefinition.name}';
-
                 final batch = db.batch();
                 batch.execute(
                   'ALTER TABLE ${tableDefinition.name} RENAME TO $tmpTableName',
@@ -188,6 +187,10 @@ class SqliteDatabase extends Database {
                   batch.insert(tableDefinition.name, row);
                 }
                 await batch.commit();
+                // FIXME 以下を実行することで、NULLで返却されるようになる
+                // SQLiteのバグに見える
+                // 一度アクセスしないとDEFAULT NULLの値が設定されない
+                db.query(tableDefinition.name);
               }
             }
           }

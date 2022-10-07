@@ -1,9 +1,12 @@
 import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
-import 'package:mem/repositories/repository.dart';
+import 'package:mem/logger.dart';
+import 'package:mem/repositories/_database_tuple_repository.dart';
 
 const memNameColumnName = 'name';
 const memDoneAtColumnName = 'doneAt';
+const memNotifyOnColumnName = 'notifyOn';
+const memNotifyAtColumnName = 'notifyAt';
 
 final memTableDefinition = DefT(
   'mems',
@@ -11,17 +14,23 @@ final memTableDefinition = DefT(
     DefPK(idColumnName, TypeC.integer, autoincrement: true),
     DefC(memNameColumnName, TypeC.text),
     DefC(memDoneAtColumnName, TypeC.datetime, notNull: false),
+    DefC(memNotifyOnColumnName, TypeC.datetime, notNull: false),
+    DefC(memNotifyAtColumnName, TypeC.datetime, notNull: false),
     ...defaultColumnDefinitions
   ],
 );
 
-class MemEntity extends DatabaseTableEntity {
+class MemEntity extends DatabaseTupleEntity {
   String name;
   DateTime? doneAt;
+  DateTime? notifyOn;
+  DateTime? notifyAt;
 
   MemEntity({
     required this.name,
     this.doneAt,
+    this.notifyOn,
+    this.notifyAt,
     required int? id,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -37,16 +46,46 @@ class MemEntity extends DatabaseTableEntity {
   MemEntity.fromMap(Map<String, dynamic> valueMap)
       : name = valueMap[memNameColumnName],
         doneAt = valueMap[memDoneAtColumnName],
+        notifyOn = valueMap[memNotifyOnColumnName],
+        notifyAt = valueMap[memNotifyAtColumnName],
         super.fromMap(valueMap);
 
   @override
   Map<String, dynamic> toMap() => {
         memNameColumnName: name,
         memDoneAtColumnName: doneAt,
+        memNotifyOnColumnName: notifyOn,
+        memNotifyAtColumnName: notifyAt,
       }..addAll(super.toMap());
 }
 
-class MemRepository extends DatabaseTableRepository<MemEntity> {
+class MemRepository extends DatabaseTupleRepository<MemEntity> {
+  @override
+  Future<List<MemEntity>> ship({
+    Map<String, dynamic>? whereMap,
+    bool? archive,
+    bool? done,
+  }) =>
+      v(
+        {
+          'whereMap': whereMap,
+          'archive': archive,
+          'done': done,
+        },
+        () async {
+          return super.ship(
+              whereMap: whereMap ?? {}
+                ..addAll(buildNullableWhere(
+                  archivedAtColumnName,
+                  archive,
+                ))
+                ..addAll(buildNullableWhere(
+                  memDoneAtColumnName,
+                  done,
+                )));
+        },
+      );
+
   @override
   MemEntity fromMap(Map<String, dynamic> valueMap) =>
       MemEntity.fromMap(valueMap);
@@ -55,24 +94,19 @@ class MemRepository extends DatabaseTableRepository<MemEntity> {
 
   static MemRepository? _instance;
 
-  factory MemRepository() {
+  factory MemRepository([Table? memTable]) {
     var tmp = _instance;
     if (tmp == null) {
-      throw Exception('Call initialize'); // coverage:ignore-line
-    } else {
-      return tmp;
+      if (memTable == null) {
+        throw Exception('Call initialize'); // coverage:ignore-line
+      }
+      tmp = MemRepository._(memTable);
+      _instance = tmp;
     }
-  }
-
-  factory MemRepository.initialize(Table table) {
-    var tmp = MemRepository._(table);
-
-    _instance = tmp;
     return tmp;
   }
 
-  factory MemRepository.withMock(MemRepository mock) {
-    _instance = mock;
-    return mock;
+  static void reset(MemRepository? memRepository) {
+    _instance = memRepository;
   }
 }

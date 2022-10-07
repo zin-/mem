@@ -1,8 +1,9 @@
 import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
 import 'package:mem/logger.dart';
+import 'package:mem/domains/mem.dart';
 import 'package:mem/repositories/mem_repository.dart';
-import 'package:mem/repositories/repository.dart';
+import 'package:mem/repositories/_database_tuple_repository.dart';
 
 const memIdColumnName = 'mems_id';
 const memItemTypeColumnName = 'type';
@@ -19,7 +20,7 @@ final memItemTableDefinition = DefT(
   ],
 );
 
-class MemItemEntity extends DatabaseTableEntity {
+class MemItemEntity extends DatabaseTupleEntity {
   int? memId;
   MemItemType type;
   dynamic value;
@@ -54,7 +55,7 @@ class MemItemEntity extends DatabaseTableEntity {
       }..addAll(super.toMap());
 }
 
-class MemItemRepository extends DatabaseTableRepository<MemItemEntity> {
+class MemItemRepository extends DatabaseTupleRepository<MemItemEntity> {
   Future<List<MemItemEntity>> shipByMemId(int memId) => v(
         {'memId': memId},
         () => ship(
@@ -94,30 +95,19 @@ class MemItemRepository extends DatabaseTableRepository<MemItemEntity> {
 
   MemItemRepository._(super.table);
 
-  factory MemItemRepository() {
+  factory MemItemRepository([Table? memItemTable]) {
     var tmp = _instance;
     if (tmp == null) {
-      throw Exception('Call initialize'); // coverage:ignore-line
-    } else {
-      return tmp;
+      if (memItemTable == null) {
+        throw Exception('Call initialize'); // coverage:ignore-line
+      }
+      tmp = MemItemRepository._(memItemTable);
+      _instance = tmp;
     }
-  }
-
-  factory MemItemRepository.initialize(Table table) {
-    var tmp = MemItemRepository._(table);
-
-    _instance = tmp;
     return tmp;
   }
 
-  factory MemItemRepository.withMock(MemItemRepository mock) {
-    _instance = mock;
-    return mock;
+  static void reset(MemItemRepository? memRepository) {
+    _instance = memRepository;
   }
-}
-
-const memMemoName = 'memo';
-
-enum MemItemType {
-  memo,
 }

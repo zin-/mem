@@ -43,7 +43,7 @@ class MemDetailMenu extends StatelessWidget {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(L10n().unarchiveMemSuccessMessage(
-                            archived.memEntity.name,
+                            archived.mem.name,
                           )),
                           duration: defaultDismissDuration,
                           dismissDirection: DismissDirection.horizontal,
@@ -73,7 +73,7 @@ class MemDetailMenu extends StatelessWidget {
                       scaffoldManager.showSnackBar(
                         SnackBar(
                           content: Text(L10n().archiveMemSuccessMessage(
-                            archivedMemDetail.memEntity.name,
+                            archivedMemDetail.mem.name,
                           )),
                           duration: defaultDismissDuration,
                           dismissDirection: DismissDirection.horizontal,

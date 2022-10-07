@@ -55,6 +55,17 @@ class L10n {
 
   String showDoneLabel() => _appLocalizations.showDoneLabel;
 
+  late String doneLabel = _appLocalizations.done_label;
+
+  // Notification
+  late String reminderName = _appLocalizations.reminder_name;
+  late String reminderDescription = _appLocalizations.reminder_description;
+
+  // Under development
+  String dev() => _appLocalizations.dev;
+
+  String test() => _appLocalizations.test;
+
   L10n._(this._appLocalizations);
 
   static L10n? _instance;

@@ -3,23 +3,28 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
+import 'package:mem/domains/mem.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/atoms/state_notifier.dart';
 import 'package:mem/views/mems/mem_detail/mem_detail_body.dart';
 import 'package:mem/views/mems/mem_detail/mem_detail_states.dart';
+import 'package:mem/views/mems/mem_detail/mem_items_view.dart';
+import 'package:mem/views/mems/mem_done_checkbox.dart';
+import 'package:mem/views/mems/mem_name.dart';
 import 'package:mockito/mockito.dart';
 
-import '../../minimum.dart';
+import '../../_helpers.dart';
+import '../../samples.dart';
 import '../../mocks.mocks.dart';
 
 void main() {
   Logger(level: Level.verbose);
 
   final mockedMemRepository = MockMemRepository();
-  MemRepository.withMock(mockedMemRepository);
+  MemRepository.reset(mockedMemRepository);
   final mockedMemItemRepository = MockMemItemRepository();
-  MemItemRepository.withMock(mockedMemItemRepository);
+  MemItemRepository.reset(mockedMemItemRepository);
 
   tearDown(() {
     reset(mockedMemRepository);
@@ -29,7 +34,7 @@ void main() {
   Future pumpMemDetailBody(
     WidgetTester widgetTester,
     int? memId, {
-    MemEntity? memEntity,
+    Mem? mem,
   }) async {
     await widgetTester.pumpWidget(
       ProviderScope(
@@ -37,14 +42,13 @@ void main() {
           memProvider.overrideWithProvider((argument) {
             expect(argument, memId);
 
-            return StateNotifierProvider(
-                (ref) => ValueStateNotifier(memEntity));
+            return StateNotifierProvider((ref) => ValueStateNotifier(mem));
           }),
           editingMemProvider.overrideWithProvider((argument) {
             expect(argument, memId);
 
             return StateNotifierProvider(
-                (ref) => ValueStateNotifier(memEntity ?? minMemEntity()));
+                (ref) => ValueStateNotifier(mem ?? minMem()));
           }),
           memItemsProvider.overrideWithProvider((argument) {
             expect(argument, memId);
@@ -68,76 +72,75 @@ void main() {
     testWidgets(
       ': empty',
       (widgetTester) async {
-        final memEntity = minMemEntity()
+        final mem = minMem()
           ..name = ''
           ..doneAt = null;
 
-        await pumpMemDetailBody(widgetTester, null, memEntity: memEntity);
+        await pumpMemDetailBody(widgetTester, null, mem: mem);
 
         verifyNever(mockedMemRepository.shipById(any));
         verifyNever(mockedMemItemRepository.shipByMemId(any));
 
         await widgetTester.pumpAndSettle();
 
-        expectMemNameOnMemDetail(widgetTester, memEntity.name);
+        expectMemNameOnMemDetail(widgetTester, mem.name);
         expectMemDoneOnMemDetail(widgetTester, false);
         expectMemMemoOnMemDetail(widgetTester, '');
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
 
     testWidgets(
       ': saved',
       (widgetTester) async {
-        final savedMemEntity = minSavedMemEntity(1)
+        const memId = 1;
+        final savedMem = minSavedMem(memId)
           ..name = 'saved mem name'
           ..doneAt = DateTime.now();
 
-        final savedMemoMemItemEntity =
-            minSavedMemoMemItemEntity(savedMemEntity.id, 1);
-        when(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).thenAnswer(
+        final savedMemoMemItemEntity = minSavedMemoMemItemEntity(memId, 1);
+        when(mockedMemItemRepository.shipByMemId(savedMem.id)).thenAnswer(
             (realInvocation) => Future.value([savedMemoMemItemEntity]));
 
         await pumpMemDetailBody(
           widgetTester,
-          savedMemEntity.id,
-          memEntity: savedMemEntity,
+          savedMem.id,
+          mem: savedMem,
         );
 
         verifyNever(mockedMemRepository.shipById(any));
-        verify(mockedMemItemRepository.shipByMemId(savedMemEntity.id))
-            .called(1);
+        verify(mockedMemItemRepository.shipByMemId(savedMem.id)).called(1);
 
         await widgetTester.pumpAndSettle();
 
-        expectMemNameOnMemDetail(widgetTester, savedMemEntity.name);
+        expectMemNameOnMemDetail(widgetTester, savedMem.name);
         expectMemDoneOnMemDetail(widgetTester, true);
         expectMemMemoOnMemDetail(widgetTester, savedMemoMemItemEntity.value);
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
 
     testWidgets(
       ': found unarchived Mem with archived MemItems',
       (widgetTester) async {
-        final savedMemEntity = minSavedMemEntity(1)..name = 'saved mem name';
-        final savedMemoMemItemEntity =
-            minSavedMemoMemItemEntity(savedMemEntity.id, 1)
-              ..archivedAt = DateTime.now();
-        when(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).thenAnswer(
+        const memId = 1;
+        final savedMem = minSavedMem(memId)..name = 'saved mem name';
+        final savedMemoMemItemEntity = minSavedMemoMemItemEntity(memId, 1)
+          ..archivedAt = DateTime.now();
+        when(mockedMemItemRepository.shipByMemId(savedMem.id)).thenAnswer(
             (realInvocation) => Future.value([savedMemoMemItemEntity]));
 
         await pumpMemDetailBody(
           widgetTester,
-          savedMemEntity.id,
-          memEntity: savedMemEntity,
+          savedMem.id,
+          mem: savedMem,
         );
 
         await widgetTester.pumpAndSettle();
 
         expectMemMemoOnMemDetail(widgetTester, savedMemoMemItemEntity.value);
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
   });
 
@@ -158,7 +161,7 @@ void main() {
 
         expect(find.text(enteringMemMemo), findsOneWidget);
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
 
     // testWidgets(
@@ -191,16 +194,16 @@ void main() {
     //     // FIXME ここで、フォーカスがはずれていることを確認したかったが、確認できなかった
     //     expect(focusNode.hasPrimaryFocus, true);
     //   },
-    //   tags: 'Small',
+    //   tags: TestSize.small,
     //   skip: true,
     // );
 
     testWidgets(
       ': done',
       (widgetTester) async {
-        final memEntity = minMemEntity()..doneAt = null;
+        final mem = minMem()..doneAt = null;
 
-        await pumpMemDetailBody(widgetTester, null, memEntity: memEntity);
+        await pumpMemDetailBody(widgetTester, null, mem: mem);
         await widgetTester.pumpAndSettle();
 
         expectMemDoneOnMemDetail(widgetTester, false);
@@ -210,7 +213,7 @@ void main() {
 
         expectMemDoneOnMemDetail(widgetTester, true);
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
 
     testWidgets(
@@ -228,14 +231,32 @@ void main() {
 
         expect(find.text(enteringMemMemo), findsOneWidget);
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
   });
 }
 
-final memNameTextFormFieldFinder = find.byType(TextFormField).at(0);
-final memDoneCheckboxFinder = find.byType(Checkbox);
-final memMemoTextFormFieldFinder = find.byType(TextFormField).at(1);
+final memNameTextFormFieldFinder = find.descendant(
+  of: find.descendant(
+    of: find.byType(MemDetailBody),
+    matching: find.byType(MemNameTextFormField),
+  ),
+  matching: find.byType(TextFormField),
+);
+final memDoneCheckboxFinder = find.descendant(
+  of: find.descendant(
+    of: find.byType(MemDetailBody),
+    matching: find.byType(MemDoneCheckbox),
+  ),
+  matching: find.byType(Checkbox),
+);
+final memMemoTextFormFieldFinder = find.descendant(
+  of: find.descendant(
+    of: find.byType(MemDetailBody),
+    matching: find.byType(MemItemsViewComponent),
+  ),
+  matching: find.byType(TextFormField),
+);
 
 TextFormField memNameTextFormField(WidgetTester widgetTester) =>
     (widgetTester.widget(memNameTextFormFieldFinder) as TextFormField);

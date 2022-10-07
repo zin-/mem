@@ -29,32 +29,6 @@ jobs:
           files: ./coverage/lcov.info
           flags: small_test
 
-  medium_test:
-    needs: small_test
-    name: 'Medium test'
-    runs-on: windows-latest
-    steps:
-      - name: 'Checkout code'
-        uses: actions/checkout@v3
-      - name: 'Install Flutter'
-        uses: ./.github/actions/install-flutter
-        with:
-          version: ${{ env.flutter-version }}
-          channel: ${{ env.flutter-channel }}
-      - name: 'Build Mocks'
-        uses: ./.github/actions/build-mocks
-      - name: 'Generate Localization code'
-        uses: ./.github/actions/generate-localization_code
-      - name: 'Flutter Doctor'
-        run: flutter doctor -v
-      - run: flutter test --tags Medium --coverage
-      - name: 'Upload coverage'
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage/lcov.info
-          flags: medium_test
-
   integration_test:
     needs: small_test
     strategy:

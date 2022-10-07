@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/domains/mem.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
+import 'package:mem/repositories/notification_repository.dart';
+import 'package:mem/services/notification_service.dart';
 import 'package:mem/views/mems/mem_detail/mem_detail_body.dart';
 import 'package:mem/views/mems/mem_detail/mem_detail_page.dart';
 import 'package:mockito/mockito.dart';
@@ -10,21 +13,26 @@ import 'package:mem/logger.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/constants.dart';
 
-import '../../minimum.dart';
+import '../../_helpers.dart';
+import '../../samples.dart';
 import '../../mocks.mocks.dart';
+import '../atoms/date_and_time_text_form_field_test.dart';
 import 'mem_detail_body_test.dart';
 
 void main() {
   Logger(level: Level.verbose);
 
   final mockedMemRepository = MockMemRepository();
-  MemRepository.withMock(mockedMemRepository);
+  MemRepository.reset(mockedMemRepository);
   final mockedMemItemRepository = MockMemItemRepository();
-  MemItemRepository.withMock(mockedMemItemRepository);
+  MemItemRepository.reset(mockedMemItemRepository);
+  final mockedNotificationRepository = MockNotificationRepository();
+  NotificationRepository.reset(mockedNotificationRepository);
 
   tearDown(() {
     reset(mockedMemRepository);
     reset(mockedMemItemRepository);
+    reset(mockedNotificationRepository);
   });
 
   group('Show', () {
@@ -50,60 +58,81 @@ void main() {
         expect(find.byType(MemDetailBody), findsOneWidget);
         expect(saveFabFinder, findsOneWidget);
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
   });
 
   group('Save', () {
     testWidgets(
-      ': name is required.',
-      (widgetTester) async {
-        await pumpMemDetailPage(widgetTester, null);
-
-        await widgetTester.tap(saveFabFinder);
-
-        expect(find.text('Name is required'), findsNothing);
-
-        verifyNever(mockedMemRepository.shipById(any));
-        verifyNever(mockedMemRepository.receive(any));
-      },
-      tags: 'Small',
-    );
-
-    testWidgets(
       ': create.',
       (widgetTester) async {
+        const memId = 1;
+
+        when(mockedNotificationRepository.initialize(any, any))
+            .thenAnswer((realInvocation) => Future.value(true));
+
+        await pumpMemDetailPage(widgetTester, null);
+
         const enteringMemName = 'entering mem name';
         const enteringMemMemo = 'test mem memo';
-        const memId = 1;
+        await widgetTester.enterText(
+            memNameTextFormFieldFinder, enteringMemName);
+        await widgetTester.enterText(
+            memMemoTextFormFieldFinder, enteringMemMemo);
+
+        await pickNowDate(widgetTester);
+        await widgetTester.pump();
+        await tapAllDaySwitch(widgetTester);
+        await pickNowTimeOfDay(widgetTester);
+        await widgetTester.pump();
 
         when(mockedMemRepository.receive(any))
             .thenAnswer((realInvocation) async {
-          final value = realInvocation.positionalArguments[0] as MemEntity;
-          expect(value.name, enteringMemName);
+          final value = realInvocation.positionalArguments[0];
 
-          return minSavedMemEntity(memId)..name = value.name;
+          expect(value.name, enteringMemName);
+          expect(value.notifyOn, isNotNull);
+          expect(value.notifyAt, isNotNull);
+
+          return value
+            ..id = memId
+            ..createdAt = DateTime.now()
+            // 通知の確認をしたいので、将来日付を返却する
+            ..notifyOn = DateTime.now().add(const Duration(days: 1));
         });
         when(mockedMemItemRepository.receive(any))
             .thenAnswer((realInvocation) async {
-          final value = realInvocation.positionalArguments[0] as MemItemEntity;
+          final value = realInvocation.positionalArguments[0];
+
           expect(value.memId, memId);
           expect(value.type, MemItemType.memo);
           expect(value.value, enteringMemMemo);
 
-          return minSavedMemoMemItemEntity(memId, 1)
-            ..type = value.type
-            ..value = value.value;
+          return value
+            ..memId = memId
+            ..id = 1
+            ..createdAt = DateTime.now();
+        });
+        when(mockedNotificationRepository.receive(
+          memId,
+          enteringMemName,
+          any,
+          any,
+          memReminderChannelId,
+          any,
+          any,
+        )).thenAnswer((realInvocation) {
+          return Future.value(null);
         });
 
-        await pumpMemDetailPage(widgetTester, null);
-
-        await widgetTester.enterText(
-            memMemoTextFormFieldFinder, enteringMemMemo);
-        await widgetTester.enterText(
-            memNameTextFormFieldFinder, enteringMemName);
         await widgetTester.tap(saveFabFinder);
         await widgetTester.pumpAndSettle();
+
+        verify(mockedMemRepository.receive(any)).called(1);
+        verify(mockedMemItemRepository.receive(any)).called(1);
+        verify(mockedNotificationRepository.receive(
+                any, any, any, any, any, any, any))
+            .called(1);
 
         expect(saveMemSuccessFinder(enteringMemName), findsOneWidget);
 
@@ -112,10 +141,8 @@ void main() {
         expect(saveMemSuccessFinder(enteringMemName), findsNothing);
 
         verifyNever(mockedMemRepository.shipById(any));
-        verify(mockedMemRepository.receive(any)).called(1);
-        verify(mockedMemItemRepository.receive(any)).called(1);
       },
-      tags: 'Small',
+      tags: TestSize.small,
     );
 
     testWidgets(
@@ -178,7 +205,22 @@ void main() {
 
         expect(saveMemSuccessFinder(enteringMemName), findsNothing);
       },
-      tags: 'Small',
+      tags: TestSize.small,
+    );
+
+    testWidgets(
+      ': name is required.',
+      (widgetTester) async {
+        await pumpMemDetailPage(widgetTester, null);
+
+        await widgetTester.tap(saveFabFinder);
+
+        expect(find.text('Name is required'), findsNothing);
+
+        verifyNever(mockedMemRepository.shipById(any));
+        verifyNever(mockedMemRepository.receive(any));
+      },
+      tags: TestSize.small,
     );
   });
 }

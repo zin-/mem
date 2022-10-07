@@ -9,6 +9,8 @@ import 'package:mem/views/constants.dart';
 import 'package:mem/views/mems/mem_detail/mem_detail_body.dart';
 import 'package:mem/views/mems/mem_detail/mem_detail_menu.dart';
 import 'package:mem/views/mems/mem_detail/mem_detail_states.dart';
+import 'package:mem/views/mems/mem_list/mem_list_page.dart';
+import 'package:mem/views/mems/mems_action.dart';
 
 class MemDetailPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
@@ -25,14 +27,22 @@ class MemDetailPage extends StatelessWidget {
         {'_memId': _memId},
         () => Consumer(
           builder: (context, ref, child) {
-            final mem = ref.watch(memProvider(_memId));
+            ref.read(
+              initialize((memId) => showMemDetailPage(context, ref, memId)),
+            );
 
-            return mem == null
-                ? AsyncValueView(
-                    ref.watch(fetchMemByIdV2(_memId)),
-                    (value) => _build(),
-                  )
-                : _build();
+            return Consumer(
+              builder: (context, ref, child) {
+                final mem = ref.watch(memProvider(_memId));
+
+                return mem == null
+                    ? AsyncValueView(
+                        ref.watch(fetchMemById(_memId)),
+                        (value) => _build(),
+                      )
+                    : _build();
+              },
+            );
           },
         ),
       );
@@ -68,14 +78,14 @@ class MemDetailPage extends StatelessWidget {
                         {},
                         () async {
                           if (_formKey.currentState?.validate() ?? false) {
-                            final savedFuture = _memId == null && mem == null
+                            final savedMemFuture = _memId == null && mem == null
                                 ? ref.read(createMem(_memId))
                                 : ref.read(updateMem(_memId));
 
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(L10n().saveMemSuccessMessage(
-                                  (await savedFuture).name,
+                                  (await savedMemFuture).name,
                                 )),
                                 duration: defaultDismissDuration,
                                 dismissDirection: DismissDirection.horizontal,
