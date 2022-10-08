@@ -28,6 +28,12 @@ extension on repository.Level {
     switch (this) {
       case repository.Level.verbose:
         return Level.verbose;
+      case repository.Level.trace:
+        return Level.info;
+      case repository.Level.warning:
+        return Level.warning;
+      case repository.Level.error:
+        return Level.error;
       case repository.Level.debug:
         return Level.debug;
     }

@@ -18,15 +18,25 @@ void testLogRepository() => group('LogRepository test', () {
         tags: TestSize.small,
       );
 
-      test(
-        'Operation: receive',
+      group(
+        'Operation',
         () {
           final logRepository = LogRepository();
 
-          final log = LogEntity(Level.verbose, 'test message');
+          for (final level in Level.values) {
+            test(
+              'receive: log level is $level',
+              () {
+                final log = LogEntity(
+                  Level.verbose,
+                  'test message: level is $level',
+                );
 
-          logRepository.receive(log);
+                logRepository.receive(log);
+              },
+              tags: TestSize.small,
+            );
+          }
         },
-        tags: TestSize.small,
       );
     });

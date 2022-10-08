@@ -27,6 +27,9 @@ class LogRepository extends Repository<LogEntity, void> {
 
 enum Level {
   verbose,
+  trace,
+  warning,
+  error,
   debug,
 }
 
