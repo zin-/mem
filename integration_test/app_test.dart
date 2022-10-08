@@ -7,6 +7,7 @@ import 'database/_database_manager.dart';
 import 'database/_indexed_database.dart';
 import 'database/_sqlite_database.dart';
 import 'repositories/_database_tuple_repository.dart';
+import 'repositories/_log_repository.dart';
 import 'scenarios/_edge_scenario.dart';
 import 'scenarios/_memo_scenario.dart';
 import 'repositories/_notification_repository.dart';
@@ -19,6 +20,8 @@ void main() {
 
   Logger(level: Level.verbose);
   DatabaseManager(onTest: true);
+
+  testLogRepository();
 
   group('Database test', () {
     testSqliteDatabase();
