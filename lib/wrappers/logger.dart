@@ -11,15 +11,22 @@ class LoggerWrapper {
 
   static LoggerWrapper? _instance;
 
-  factory LoggerWrapper() {
+  factory LoggerWrapper(repository.Level level) {
     var tmp = _instance;
     if (tmp == null) {
       tmp = LoggerWrapper._(
-        Logger(),
+        Logger(
+          level: level._convert(),
+        ),
       );
       _instance = tmp;
     }
     return tmp;
+  }
+
+  factory LoggerWrapper.reset(repository.Level level) {
+    _instance = null;
+    return LoggerWrapper(level);
   }
 }
 

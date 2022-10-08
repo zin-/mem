@@ -21,21 +21,25 @@ void testLogRepository() => group('LogRepository test', () {
       group(
         'Operation',
         () {
-          final logRepository = LogRepository();
+          for (final logLevel in Level.values) {
+            group(': receive: log level is $logLevel', () {
+              final logRepository = LogRepository.reset(logLevel);
 
-          for (final level in Level.values) {
-            test(
-              'receive: log level is $level',
-              () {
-                final log = LogEntity(
-                  Level.verbose,
-                  'test message: level is $level',
+              for (final level in Level.values) {
+                test(
+                  ': message level is $level',
+                  () {
+                    final log = LogEntity(
+                      level,
+                      'test message: level is $level',
+                    );
+
+                    logRepository.receive(log);
+                  },
+                  tags: TestSize.small,
                 );
-
-                logRepository.receive(log);
-              },
-              tags: TestSize.small,
-            );
+              }
+            });
           }
         },
       );

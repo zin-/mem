@@ -13,15 +13,23 @@ class LogRepository extends Repository<LogEntity, void> {
 
   static LogRepository? _instance;
 
-  factory LogRepository() {
+  factory LogRepository([Level? level, LoggerWrapper? loggerWrapper]) {
     var tmp = _instance;
     if (tmp == null) {
       tmp = LogRepository._(
-        LoggerWrapper(),
+        loggerWrapper ?? LoggerWrapper(level ?? Level.debug),
       );
       _instance = tmp;
     }
     return tmp;
+  }
+
+  factory LogRepository.reset([Level? level]) {
+    _instance = null;
+    return LogRepository(
+      level,
+      LoggerWrapper.reset(level ?? Level.debug),
+    );
   }
 }
 
