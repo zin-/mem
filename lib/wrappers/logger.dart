@@ -1,6 +1,8 @@
 import 'package:logger/logger.dart';
 import 'package:mem/repositories/log_repository.dart' as repository;
 
+const _filePath = 'mem/wrappers/logger.dart';
+
 class LoggerWrapper {
   Logger _logger;
 
@@ -11,11 +13,15 @@ class LoggerWrapper {
 
   static LoggerWrapper? _instance;
 
-  factory LoggerWrapper(repository.Level level) {
+  factory LoggerWrapper(
+    repository.Level level,
+    bool Function(String line, String filePath)? shouldOutputStackTraceLine,
+  ) {
     var tmp = _instance;
     if (tmp == null) {
       tmp = LoggerWrapper._(
         Logger(
+          printer: _LogPrinter(shouldOutputStackTraceLine),
           level: level._convert(),
         ),
       );
@@ -24,9 +30,27 @@ class LoggerWrapper {
     return tmp;
   }
 
-  factory LoggerWrapper.reset(repository.Level level) {
-    _instance = null;
-    return LoggerWrapper(level);
+  static reset() => _instance = null;
+}
+
+class _LogPrinter extends PrettyPrinter {
+  final bool Function(String line, String filePath)?
+      _shouldOutputStackTraceLine;
+
+  _LogPrinter(this._shouldOutputStackTraceLine)
+      : super(methodCount: 1, errorMethodCount: 1);
+
+  @override
+  String? formatStackTrace(StackTrace? stackTrace, int methodCount) {
+    const n = '\n';
+    final stackTraceLines = stackTrace.toString().split(n);
+    final shouldOutputStackTraceLines = stackTraceLines.where(
+      (line) => _shouldOutputStackTraceLine?.call(line, _filePath) ?? true,
+    );
+    return super.formatStackTrace(
+      StackTrace.fromString(shouldOutputStackTraceLines.join(n)),
+      methodCount,
+    );
   }
 }
 

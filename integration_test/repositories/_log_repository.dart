@@ -23,7 +23,8 @@ void testLogRepository() => group('LogRepository test', () {
         () {
           for (final logLevel in Level.values) {
             group(': receive: log level is $logLevel', () {
-              final logRepository = LogRepository.reset(logLevel);
+              LogRepository.reset();
+              final logRepository = LogRepository(logLevel);
 
               for (final level in Level.values) {
                 test(
