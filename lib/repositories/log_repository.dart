@@ -15,12 +15,12 @@ class LogRepository extends Repository<LogEntity, void> {
 
   static LogRepository? _instance;
 
-  factory LogRepository([Level? level]) {
+  factory LogRepository(Level level) {
     var tmp = _instance;
     if (tmp == null) {
       tmp = LogRepository._(
         LoggerWrapper(
-          level ?? Level.debug,
+          level,
           _shouldOutputDeviceStacktraceLine,
         ),
       );

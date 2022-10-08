@@ -11,7 +11,7 @@ void testLogRepository() => group('LogRepository test', () {
       test(
         'Create instance',
         () {
-          final logRepository = LogRepository();
+          final logRepository = LogRepository(Level.error);
 
           expect(logRepository, isA<LogRepository>());
         },
