@@ -66,27 +66,30 @@ extension on Level {
 }
 
 class Logger {
+  final Level _level;
   final ex.Logger _logger;
 
   T log<T>(Level level, T object, {String? message, StackTrace? stackTrace}) {
-    if (object is Future) {
-      _futureLog(level, object, message, stackTrace ?? StackTrace.current);
-    } else if (object is Function()) {
-      warn('Use functionLog. I try auto cast.');
-      functionLog(level, object, {});
-    } else if (object is Error || object is Exception) {
-      _messageLog(
-        level,
-        message == null ? object : _buildMessageWithValue(message, object),
-        error: object,
-        stackTrace: stackTrace,
-      );
-    } else {
-      _messageLog(
-        level,
-        message == null ? object : _buildMessageWithValue(message, object),
-        stackTrace: stackTrace,
-      );
+    if (level.index >= _level.index) {
+      if (object is Future) {
+        _futureLog(level, object, message, stackTrace ?? StackTrace.current);
+      } else if (object is Function()) {
+        warn('Use functionLog. I try auto cast.');
+        functionLog(level, object, {});
+      } else if (object is Error || object is Exception) {
+        _messageLog(
+          level,
+          message == null ? object : _buildMessageWithValue(message, object),
+          error: object,
+          stackTrace: stackTrace,
+        );
+      } else {
+        _messageLog(
+          level,
+          message == null ? object : _buildMessageWithValue(message, object),
+          stackTrace: stackTrace,
+        );
+      }
     }
 
     return object;
@@ -98,12 +101,14 @@ class Logger {
     dynamic arguments, {
     String? message,
   }) {
-    // TODO levelを見て早めにリターンしたい
-    final stackTrace = StackTrace.current;
-    log(level, arguments, message: 'start', stackTrace: stackTrace);
-    final result = function();
-    log(level, result, message: 'end', stackTrace: stackTrace);
-    return result;
+    if (level.index >= _level.index) {
+      final stackTrace = StackTrace.current;
+      log(level, arguments, message: 'start', stackTrace: stackTrace);
+      final result = function();
+      log(level, result, message: 'end', stackTrace: stackTrace);
+      return result;
+    }
+    return function();
   }
 
   void _futureLog(
@@ -146,11 +151,11 @@ class Logger {
 
   static Logger? _instance;
 
-  Logger._(Level level)
+  Logger._(this._level)
       : _logger = ex.Logger(
           filter: _LogFilter(),
           printer: _LogPrinter(),
-          level: level._convertIntoEx(),
+          level: _level._convertIntoEx(),
         );
 
   factory Logger({Level level = Level.trace}) {
