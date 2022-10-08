@@ -23,7 +23,7 @@ void testLogRepository() => group('LogRepository test', () {
         () {
           final logRepository = LogRepository();
 
-          final log = LogEntity();
+          final log = LogEntity(Level.verbose, 'test message');
 
           logRepository.receive(log);
         },
