@@ -15,13 +15,15 @@ class LogRepository extends Repository<LogEntity, void> {
 
   static LogRepository? _instance;
 
-  factory LogRepository(Level level) {
+  factory LogRepository(Level level, [Iterable<String>? ignoreFilePaths]) {
     var tmp = _instance;
     if (tmp == null) {
       tmp = LogRepository._(
         LoggerWrapper(
           level,
-          _shouldOutputDeviceStacktraceLine,
+          _shouldOutputDeviceStacktraceLine(
+            [_filePath, ...ignoreFilePaths ?? []],
+          ),
         ),
       );
       _instance = tmp;
@@ -34,24 +36,29 @@ class LogRepository extends Repository<LogEntity, void> {
     _instance = null;
   }
 
-  static bool _shouldOutputDeviceStacktraceLine(String line, String filePath) {
-    // FIXME おそらくWebだと抽出方法が異なる
-    var match = RegExp(r'#[0-9]+\s+(.+) \((\S+)\)').matchAsPrefix(line);
-    if (match == null) {
-      return false;
-    }
-    final reference = match.group(2);
-
-    if (reference == null) {
-      return true;
-    }
-    for (final filePath in [filePath, _filePath]) {
-      final startsWith = reference.startsWith('package:$filePath');
-      if (startsWith) {
+  static bool Function(
+    String line,
+    String ignoreFilePath,
+  ) _shouldOutputDeviceStacktraceLine(Iterable<String> ignoreFilePaths) {
+    return (String line, String ignoreFilePath) {
+      // FIXME おそらくWebだと抽出方法が異なる
+      var match = RegExp(r'#[0-9]+\s+(.+) \((\S+)\)').matchAsPrefix(line);
+      if (match == null) {
         return false;
       }
-    }
-    return true;
+      final reference = match.group(2);
+
+      if (reference == null) {
+        return true;
+      }
+      for (final filePath in [ignoreFilePath, ...ignoreFilePaths]) {
+        final startsWith = reference.startsWith('package:$filePath');
+        if (startsWith) {
+          return false;
+        }
+      }
+      return true;
+    };
   }
 }
 
