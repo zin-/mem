@@ -108,6 +108,20 @@ void main() {
   });
 
   group('functionLog', () {
+    test('message level is less than log level', () {
+      LogService.reset();
+      final logService = LogService(
+        Level.error,
+        mockedLogRepository,
+      );
+
+      void testFunction() {}
+
+      logService.functionLog(testFunction, level: Level.verbose);
+
+      verifyNever(mockedLogRepository.receive(any));
+    });
+
     LogService.reset();
     final logService = LogService(
       Level.verbose,
