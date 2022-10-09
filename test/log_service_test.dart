@@ -340,11 +340,11 @@ void main() {
       LogService.reset();
       final logService = LogService(
         Level.trace,
-        // mockedLogRepository,
+        mockedLogRepository,
       );
 
       test(
-        'description',
+        'child functions become debug under debug function',
         () {
           void verboseFunction() => logService.functionLog(
                 () {},
@@ -358,8 +358,9 @@ void main() {
               );
 
           debugFunction();
+          verboseFunction();
 
-          verifyNever(mockedLogRepository.receive(any));
+          verify(mockedLogRepository.receive(any)).called(4);
         },
         tags: TestSize.small,
       );

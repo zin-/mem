@@ -5,6 +5,7 @@ const _filePath = 'mem/services/log_service.dart';
 class LogService {
   final Level _level;
   final LogRepository _logRepository;
+  bool _debug = false;
 
   LogService._(this._level, this._logRepository);
 
@@ -25,28 +26,39 @@ class LogService {
     Map<String, dynamic>? args,
     Level? level,
   }) {
-    if (_shouldLog(level)) {
+    if (_shouldLog(level) || _debug) {
+      if (_debug) level = Level.debug;
+
       final current = StackTrace.current;
 
       log(
+        '${_debug ? '[AUTO DEBUG] ' : ''}'
         'start${args == null ? '' : ' :: $args'}',
         level: level,
         stackTrace: current,
       );
+
+      if (level == Level.debug) _debug = true;
 
       try {
         final result = function();
 
         if (result is Future) {
           result.then((value) => log(
+                '${_debug ? '[AUTO DEBUG] ' : ''}'
                 'end => Future${value == null ? '' : ' => $value'}',
                 level: level,
                 stackTrace: current,
               ));
         } else {
-          log('end${result == null ? '' : ' => $result'}', level: level);
+          log(
+            '${_debug ? '[AUTO DEBUG] ' : ''}'
+            'end${result == null ? '' : ' => $result'}',
+            level: level,
+          );
         }
 
+        if (level == Level.debug) _debug = false;
         return result;
       } catch (e) {
         log('Caught', error: e, stackTrace: current);
