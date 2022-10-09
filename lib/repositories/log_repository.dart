@@ -78,11 +78,4 @@ class LogEntity extends Entity {
   LogEntity(this.message, {this.error, Level? level}) {
     this.level = level ?? (error is Error ? Level.error : Level.verbose);
   }
-
-  @override
-  Map<String, dynamic> toMap() => {
-        'level': level,
-        'message': message,
-        'error': error,
-      };
 }
