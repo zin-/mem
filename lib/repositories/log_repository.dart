@@ -71,10 +71,10 @@ enum Level {
 }
 
 class LogEntity extends Entity {
+  dynamic message; // FIXME dynamicで良いのか？
   Level level;
-  dynamic message;
 
-  LogEntity(this.level, this.message);
+  LogEntity(this.message, [this.level = Level.verbose]);
 
   @override
   Map<String, dynamic> toMap() => {

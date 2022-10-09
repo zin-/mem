@@ -10,7 +10,7 @@ class LogService {
 
   log(Level level, dynamic message) {
     if (level.index >= _level.index) {
-      _logRepository.receive(LogEntity(level, message));
+      _logRepository.receive(LogEntity(message, level));
     }
   }
 

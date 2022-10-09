@@ -8,6 +8,10 @@ void main() {
 }
 
 void testLogRepository() => group('LogRepository test', () {
+      tearDown(() {
+        LogRepository.reset();
+      });
+
       test(
         'Create instance',
         () {
@@ -21,27 +25,40 @@ void testLogRepository() => group('LogRepository test', () {
       group(
         'Operation',
         () {
-          for (final logLevel in Level.values) {
-            group(': receive: log level is $logLevel', () {
-              LogRepository.reset();
-              final logRepository = LogRepository(logLevel);
+          group(': receive', () {
+            for (final logLevel in Level.values) {
+              group(': log level is $logLevel', () {
+                final logRepository = LogRepository(logLevel);
 
-              for (final level in Level.values) {
-                test(
-                  ': message level is $level',
-                  () {
-                    final log = LogEntity(
-                      level,
-                      'test message: level is $level',
-                    );
+                for (final level in Level.values) {
+                  test(
+                    ': message level is $level',
+                    () {
+                      final log = LogEntity(
+                        'test message: level is $level',
+                        level,
+                      );
 
-                    logRepository.receive(log);
-                  },
-                  tags: TestSize.small,
-                );
-              }
-            });
-          }
+                      logRepository.receive(log);
+                    },
+                    tags: TestSize.small,
+                  );
+                }
+              });
+            }
+
+            test(
+              ': default level is verbose',
+              () {
+                final logRepository = LogRepository(Level.verbose);
+
+                final log = LogEntity('default level is verbose');
+
+                logRepository.receive(log);
+              },
+              tags: TestSize.small,
+            );
+          });
         },
       );
     });
