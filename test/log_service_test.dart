@@ -108,19 +108,23 @@ void main() {
   });
 
   group('functionLog', () {
-    test('message level is less than log level', () {
-      LogService.reset();
-      final logService = LogService(
-        Level.error,
-        mockedLogRepository,
-      );
+    test(
+      'message level is less than log level',
+      () {
+        LogService.reset();
+        final logService = LogService(
+          Level.error,
+          mockedLogRepository,
+        );
 
-      void testFunction() {}
+        void testFunction() {}
 
-      logService.functionLog(testFunction, level: Level.verbose);
+        logService.functionLog(testFunction, level: Level.verbose);
 
-      verifyNever(mockedLogRepository.receive(any));
-    });
+        verifyNever(mockedLogRepository.receive(any));
+      },
+      tags: TestSize.small,
+    );
 
     LogService.reset();
     final logService = LogService(
@@ -298,5 +302,38 @@ void main() {
         );
       });
     });
+
+    test(
+      'Exception occurred',
+      () {
+        final thrownException = Exception('test exception');
+        void throwsException() => throw thrownException;
+
+        final expectedMessages = ['start', 'Caught'];
+        final expectedExceptions = [null, thrownException];
+
+        when(mockedLogRepository.receive(any)).thenAnswer((realInvocation) {
+          expect(realInvocation.positionalArguments.length, 1);
+
+          final arg1 = realInvocation.positionalArguments[0];
+          expect(arg1, isA<LogEntity>());
+          expect(arg1.message, expectedMessages.removeAt(0));
+          expect(arg1.error, expectedExceptions.removeAt(0));
+        });
+
+        expect(
+          () => logService.functionLog(throwsException),
+          throwsA((e) {
+            expect(e, thrownException);
+            return true;
+          }),
+        );
+
+        verify(mockedLogRepository.receive(any)).called(2);
+
+        expect(expectedMessages.length, 0);
+      },
+      tags: TestSize.small,
+    );
   });
 }

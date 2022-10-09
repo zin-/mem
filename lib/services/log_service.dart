@@ -34,19 +34,24 @@ class LogService {
         stackTrace: current,
       );
 
-      final result = function();
+      try {
+        final result = function();
 
-      if (result is Future) {
-        result.then((value) => log(
-              'end => Future${value == null ? '' : ' => $value'}',
-              level: level,
-              stackTrace: current,
-            ));
-      } else {
-        log('end${result == null ? '' : ' => $result'}', level: level);
+        if (result is Future) {
+          result.then((value) => log(
+                'end => Future${value == null ? '' : ' => $value'}',
+                level: level,
+                stackTrace: current,
+              ));
+        } else {
+          log('end${result == null ? '' : ' => $result'}', level: level);
+        }
+
+        return result;
+      } catch (e) {
+        log('Caught', error: e, stackTrace: current);
+        rethrow;
       }
-
-      return result;
     }
 
     return function();
