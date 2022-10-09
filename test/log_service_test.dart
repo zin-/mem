@@ -20,6 +20,12 @@ void main() {
     reset(mockedLogRepository);
   });
 
+  test('Create instance', () {
+    final logService = LogService();
+
+    expect(logService, isA<LogService>());
+  });
+
   group('log', () {
     group(': call when message level is greater than log level', () {
       final logService = LogService(
