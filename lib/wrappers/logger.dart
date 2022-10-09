@@ -26,6 +26,7 @@ class LoggerWrapper {
     if (tmp == null) {
       tmp = LoggerWrapper._(
         Logger(
+          filter: _LogFilter(),
           printer: _LogPrinter(shouldOutputStackTraceLine),
           level: level._convert(),
         ),
@@ -36,6 +37,17 @@ class LoggerWrapper {
   }
 
   static reset() => _instance = null;
+}
+
+class _LogFilter extends DevelopmentFilter {
+  @override
+  bool shouldLog(LogEvent event) {
+    if (event.level == Level.debug) {
+      return true;
+    }
+
+    return super.shouldLog(event);
+  }
 }
 
 class _LogPrinter extends PrettyPrinter {

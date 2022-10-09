@@ -335,5 +335,34 @@ void main() {
       },
       tags: TestSize.small,
     );
+
+    group('Under debug', () {
+      LogService.reset();
+      final logService = LogService(
+        Level.trace,
+        // mockedLogRepository,
+      );
+
+      test(
+        'description',
+        () {
+          void verboseFunction() => logService.functionLog(
+                () {},
+                level: Level.verbose,
+              );
+          void debugFunction() => logService.functionLog(
+                () {
+                  verboseFunction();
+                },
+                level: Level.debug,
+              );
+
+          debugFunction();
+
+          verifyNever(mockedLogRepository.receive(any));
+        },
+        tags: TestSize.small,
+      );
+    });
   });
 }
