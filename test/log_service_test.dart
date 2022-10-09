@@ -206,7 +206,7 @@ void main() {
           });
 
           logService.functionLog(
-            args: testArgMap,
+            arguments: testArgMap,
             () => testFunction(testArg1),
           );
 

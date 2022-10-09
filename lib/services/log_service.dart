@@ -1,5 +1,33 @@
 import 'package:mem/repositories/log_repository.dart';
 
+T v<T>(
+  Map<String, dynamic>? arguments,
+  T Function() function, {
+  @Deprecated('Allow under develop only') bool debug = false,
+}) =>
+    LogService().functionLog(
+      function,
+      arguments: arguments,
+      level: debug ? Level.debug : Level.verbose,
+    );
+
+T t<T>(
+  Map<String, dynamic>? args,
+  T Function() function, {
+  @Deprecated('Allow under develop only') bool debug = false,
+}) =>
+    LogService().functionLog(
+      function,
+      arguments: args,
+      level: debug ? Level.debug : Level.trace,
+    );
+
+@Deprecated('Allow under develop only')
+T dev<T>(T object) {
+  LogService().log(object, level: Level.debug);
+  return object;
+}
+
 const _filePath = 'mem/services/log_service.dart';
 
 class LogService {
@@ -23,7 +51,7 @@ class LogService {
 
   T functionLog<T>(
     T Function() function, {
-    Map<String, dynamic>? args,
+    Map<String, dynamic>? arguments,
     Level? level,
   }) {
     if (_shouldLog(level) || _debug) {
@@ -33,7 +61,7 @@ class LogService {
 
       log(
         '${_debug ? '[AUTO DEBUG] ' : ''}'
-        'start${args == null ? '' : ' :: $args'}',
+        'start${arguments == null ? '' : ' :: $arguments'}',
         level: level,
         stackTrace: current,
       );
