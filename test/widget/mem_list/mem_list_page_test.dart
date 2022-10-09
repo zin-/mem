@@ -333,32 +333,32 @@ void main() {
           ..doneAt = null
           ..archivedAt = null
           ..notifyOn = null;
-        final notifyOnIsNow = minSavedMemEntity(2)
+        final notifyOnNow = minSavedMemEntity(2)
           ..name = 'notifyOn is now'
           ..doneAt = null
           ..archivedAt = null
           ..notifyOn = nowDate;
-        final notifyOnIsOneDayAgo = minSavedMemEntity(3)
+        final notifyOnOneDayAgo = minSavedMemEntity(3)
           ..name = 'notifyOn is one day ago'
           ..doneAt = null
           ..archivedAt = null
           ..notifyOn = nowDate.add(const Duration(days: -1));
-        final notifyOnIsOneDayLater = minSavedMemEntity(4)
+        final notifyOnOneDayLater = minSavedMemEntity(4)
           ..name = 'notifyOn is one day later'
           ..doneAt = null
           ..archivedAt = null
           ..notifyOn = nowDate.add(const Duration(days: 1));
-        final notifyOnIsNow2 = minSavedMemEntity(5)
+        final notifyOnNow2 = minSavedMemEntity(5)
           ..name = 'notifyOn is now 2'
           ..doneAt = null
           ..archivedAt = null
           ..notifyOn = DateTime(now.year, now.month, now.day);
-        final notifyOnIsOneDayAgo2 = minSavedMemEntity(6)
+        final notifyOnOneDayAgo2 = minSavedMemEntity(6)
           ..name = 'notifyOn is one day ago 2'
           ..doneAt = null
           ..archivedAt = null
           ..notifyOn = nowDate.add(const Duration(days: -1));
-        final notifyOnIsOneDayLater2 = minSavedMemEntity(7)
+        final notifyOnOneDayLater2 = minSavedMemEntity(7)
           ..name = 'notifyOn is one day later 2'
           ..doneAt = null
           ..archivedAt = null
@@ -369,25 +369,25 @@ void main() {
                 archive: anyNamed('archive'),
                 done: anyNamed('done')))
             .thenAnswer((realInvocation) => Future.value([
-                  notifyOnIsNow,
+                  notifyOnNow,
                   notifyOnIsNull,
-                  notifyOnIsOneDayAgo,
-                  notifyOnIsOneDayLater,
-                  notifyOnIsNow2,
-                  notifyOnIsOneDayAgo2,
-                  notifyOnIsOneDayLater2,
+                  notifyOnOneDayAgo,
+                  notifyOnOneDayLater,
+                  notifyOnNow2,
+                  notifyOnOneDayAgo2,
+                  notifyOnOneDayLater2,
                 ]));
 
         await pumpMemListPage(widgetTester);
         await widgetTester.pumpAndSettle();
 
+        expectMemNameTextOnListAt(widgetTester, 0, notifyOnOneDayAgo.name);
+        expectMemNameTextOnListAt(widgetTester, 1, notifyOnOneDayAgo2.name);
+        expectMemNameTextOnListAt(widgetTester, 2, notifyOnNow.name);
+        expectMemNameTextOnListAt(widgetTester, 3, notifyOnNow2.name);
+        expectMemNameTextOnListAt(widgetTester, 4, notifyOnOneDayLater.name);
+        expectMemNameTextOnListAt(widgetTester, 5, notifyOnOneDayLater2.name);
         expectMemNameTextOnListAt(widgetTester, 6, notifyOnIsNull.name);
-        expectMemNameTextOnListAt(widgetTester, 2, notifyOnIsNow.name);
-        expectMemNameTextOnListAt(widgetTester, 0, notifyOnIsOneDayAgo.name);
-        expectMemNameTextOnListAt(widgetTester, 4, notifyOnIsOneDayLater.name);
-        expectMemNameTextOnListAt(widgetTester, 3, notifyOnIsNow2.name);
-        expectMemNameTextOnListAt(widgetTester, 1, notifyOnIsOneDayAgo2.name);
-        expectMemNameTextOnListAt(widgetTester, 5, notifyOnIsOneDayLater2.name);
       },
       tags: TestSize.small,
     );
@@ -412,19 +412,19 @@ void main() {
           ..archivedAt = null
           ..notifyOn = nowDate
           ..notifyAt = null;
-        final notifyAtIsNow = minSavedMemEntity(3)
+        final notifyAtNow = minSavedMemEntity(3)
           ..name = 'notifyAt is now'
           ..doneAt = null
           ..archivedAt = null
           ..notifyOn = nowDate
           ..notifyAt = nowDateTime;
-        final notifyAtIsOneHourAgo = minSavedMemEntity(4)
+        final notifyAtOneHourAgo = minSavedMemEntity(4)
           ..name = 'notifyAt is one hour ago'
           ..doneAt = null
           ..archivedAt = null
           ..notifyOn = nowDate
           ..notifyAt = nowDateTime.add(const Duration(hours: -1));
-        final notifyAtIsOneMinuteLater = minSavedMemEntity(5)
+        final notifyAtOneMinuteLater = minSavedMemEntity(5)
           ..name = 'notifyAt is one minute later'
           ..doneAt = null
           ..archivedAt = null
@@ -438,20 +438,19 @@ void main() {
             .thenAnswer((realInvocation) => Future.value([
                   notifyOnIsNull,
                   notifyAtIsNull,
-                  notifyAtIsNow,
-                  notifyAtIsOneHourAgo,
-                  notifyAtIsOneMinuteLater,
+                  notifyAtNow,
+                  notifyAtOneHourAgo,
+                  notifyAtOneMinuteLater,
                 ]));
 
         await pumpMemListPage(widgetTester);
         await widgetTester.pumpAndSettle();
 
-        expectMemNameTextOnListAt(widgetTester, 4, notifyOnIsNull.name);
         expectMemNameTextOnListAt(widgetTester, 0, notifyAtIsNull.name);
-        expectMemNameTextOnListAt(widgetTester, 2, notifyAtIsNow.name);
-        expectMemNameTextOnListAt(widgetTester, 1, notifyAtIsOneHourAgo.name);
-        expectMemNameTextOnListAt(
-            widgetTester, 3, notifyAtIsOneMinuteLater.name);
+        expectMemNameTextOnListAt(widgetTester, 1, notifyAtOneHourAgo.name);
+        expectMemNameTextOnListAt(widgetTester, 2, notifyAtNow.name);
+        expectMemNameTextOnListAt(widgetTester, 3, notifyAtOneMinuteLater.name);
+        expectMemNameTextOnListAt(widgetTester, 4, notifyOnIsNull.name);
       },
       tags: TestSize.small,
     );
