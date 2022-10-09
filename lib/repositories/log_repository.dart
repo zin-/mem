@@ -10,7 +10,12 @@ class LogRepository extends Repository<LogEntity, void> {
 
   @override
   void receive(LogEntity entity) {
-    _loggerWrapper.log(entity.level, entity.message, entity.error);
+    _loggerWrapper.log(
+      entity.level,
+      entity.message,
+      entity.error,
+      entity.stackTrace,
+    );
   }
 
   static LogRepository? _instance;
@@ -73,9 +78,11 @@ enum Level {
 class LogEntity extends Entity {
   final dynamic message; // FIXME dynamicで良いのか？
   final dynamic error;
-  late Level level;
+  late final StackTrace stackTrace;
+  late final Level level;
 
-  LogEntity(this.message, {this.error, Level? level}) {
+  LogEntity(this.message, {StackTrace? stackTrace, this.error, Level? level}) {
+    this.stackTrace = stackTrace ?? StackTrace.current;
     this.level = level ??
         (error is Error
             ? Level.error

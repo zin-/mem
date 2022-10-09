@@ -129,6 +129,51 @@ void testLogRepository() => group('LogRepository test', () {
                 tags: TestSize.small,
               );
             });
+
+            group(': with StackTrace', () {
+              test(
+                ': default StackTrace',
+                () {
+                  final logRepository = LogRepository(Level.verbose);
+
+                  final log = LogEntity('default StackTrace');
+
+                  logRepository.receive(log);
+                },
+                tags: TestSize.small,
+              );
+
+              test(
+                ': specify StackTrace',
+                () {
+                  final logRepository = LogRepository(Level.verbose);
+
+                  final log = LogEntity(
+                    'default StackTrace',
+                    stackTrace: StackTrace.current,
+                  );
+
+                  logRepository.receive(log);
+                },
+                tags: TestSize.small,
+              );
+
+              test(
+                ': specify StackTrace and Exception',
+                () {
+                  final logRepository = LogRepository(Level.verbose);
+
+                  final log = LogEntity(
+                    'default StackTrace',
+                    stackTrace: StackTrace.current,
+                    error: Exception('exception message with StackTrace'),
+                  );
+
+                  logRepository.receive(log);
+                },
+                tags: TestSize.small,
+              );
+            });
           });
         },
       );
