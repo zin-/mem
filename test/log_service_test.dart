@@ -33,7 +33,7 @@ void main() {
           const level = Level.debug;
           const message = 'test message';
 
-          logService.log(level, message);
+          logService.log(message, level: level);
 
           verify(mockedLogRepository.receive(any)).called(1);
         },
@@ -46,7 +46,7 @@ void main() {
           const level = Level.error;
           const message = 'test message';
 
-          logService.log(level, message);
+          logService.log(message, level: level);
 
           verify(mockedLogRepository.receive(any)).called(1);
         },
@@ -59,7 +59,7 @@ void main() {
           const level = Level.warning;
           const message = 'test message';
 
-          logService.log(level, message);
+          logService.log(message, level: level);
 
           verifyNever(mockedLogRepository.receive(any));
         },
