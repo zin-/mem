@@ -106,4 +106,98 @@ void main() {
       );
     });
   });
+
+  group('functionLog', () {
+    LogService.reset();
+    final logService = LogService(
+      Level.verbose,
+      mockedLogRepository,
+    );
+
+    group(': sync function', () {
+      group(': no args', () {
+        test(
+          ': no returns',
+          () {
+            void testFunction() {}
+
+            final expectedMessages = ['start', 'end'];
+
+            when(mockedLogRepository.receive(any)).thenAnswer((realInvocation) {
+              expect(realInvocation.positionalArguments.length, 1);
+
+              final arg1 = realInvocation.positionalArguments[0];
+              expect(arg1, isA<LogEntity>());
+              expect(arg1.message, expectedMessages.removeAt(0));
+            });
+
+            logService.functionLog(testFunction);
+
+            verify(mockedLogRepository.receive(any)).called(2);
+
+            expect(expectedMessages.length, 0);
+          },
+          tags: TestSize.small,
+        );
+
+        test(
+          ': returns bool',
+          () {
+            const expectedResult = true;
+
+            bool testFunction() => expectedResult;
+
+            final expectedMessages = ['start', 'end => $expectedResult'];
+
+            when(mockedLogRepository.receive(any)).thenAnswer((realInvocation) {
+              expect(realInvocation.positionalArguments.length, 1);
+
+              final arg1 = realInvocation.positionalArguments[0];
+              expect(arg1, isA<LogEntity>());
+              expect(arg1.message, expectedMessages.removeAt(0));
+            });
+
+            final result = logService.functionLog(testFunction);
+
+            verify(mockedLogRepository.receive(any)).called(2);
+
+            expect(result, expectedResult);
+
+            expect(expectedMessages.length, 0);
+          },
+          tags: TestSize.small,
+        );
+      });
+
+      test(
+        ': with args',
+        () {
+          const testArg1 = 'test arg1';
+          const testArgMap = {'testArg1': testArg1};
+
+          void testFunction(String arg1) {}
+
+          final expectedMessages = ['start :: $testArgMap', 'end'];
+
+          when(mockedLogRepository.receive(any)).thenAnswer((realInvocation) {
+            expect(realInvocation.positionalArguments.length, 1);
+
+            final arg1 = realInvocation.positionalArguments[0];
+            expect(arg1, isA<LogEntity>());
+            expect(arg1.message, expectedMessages.removeAt(0));
+          });
+
+          logService.functionLog(
+            args: testArgMap,
+            () => testFunction(testArg1),
+          );
+
+          verify(mockedLogRepository.receive(any)).called(2);
+
+          expect(expectedMessages.length, 0);
+        },
+        tags: TestSize.small,
+      );
+    });
+  });
 }

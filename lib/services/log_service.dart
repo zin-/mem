@@ -10,10 +10,28 @@ class LogService {
 
   log(dynamic message, {dynamic error, Level? level}) {
     final log = LogEntity(message, error: error, level: level);
-    if (log.level.index >= _level.index) {
+    if (_shouldLog(log.level)) {
       _logRepository.receive(log);
     }
   }
+
+  T functionLog<T>(
+    T Function() function, {
+    Map<String, dynamic>? args,
+    Level? level,
+  }) {
+    if (_shouldLog(level)) {
+      log('start${args == null ? '' : ' :: $args'}', level: level);
+      final result = function();
+      log('end${result == null ? '' : ' => $result'}', level: level);
+
+      return result;
+    }
+
+    return function();
+  }
+
+  bool _shouldLog(Level? level) => _level.index <= (level?.index ?? 0);
 
   static LogService? _instance;
 
