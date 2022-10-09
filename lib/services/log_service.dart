@@ -9,17 +9,19 @@ class LogService {
   LogService._(this._level, this._logRepository);
 
   log(Level level, dynamic message) {
-    _logRepository.receive(LogEntity(level, message));
+    if (level.index >= _level.index) {
+      _logRepository.receive(LogEntity(level, message));
+    }
   }
 
   static LogService? _instance;
 
-  factory LogService([Level? level]) {
+  factory LogService([Level? level, LogRepository? logRepository]) {
     var tmp = _instance;
     if (tmp == null) {
       tmp = LogService._(
         level ?? Level.error,
-        LogRepository(level ?? Level.error, [_filePath]),
+        logRepository ?? LogRepository(level ?? Level.error, [_filePath]),
       );
       _instance = tmp;
     }

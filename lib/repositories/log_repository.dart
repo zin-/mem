@@ -75,4 +75,10 @@ class LogEntity extends Entity {
   dynamic message;
 
   LogEntity(this.level, this.message);
+
+  @override
+  Map<String, dynamic> toMap() => {
+        'level': level,
+        'message': message,
+      };
 }
