@@ -8,7 +8,7 @@ void main() {
 }
 
 void testLogRepository() => group('LogRepository test', () {
-      tearDown(() {
+      tearDownAll(() {
         LogRepository.reset();
       });
 
@@ -28,6 +28,7 @@ void testLogRepository() => group('LogRepository test', () {
           group(': receive', () {
             for (final logLevel in Level.values) {
               group(': log level is $logLevel', () {
+                LogRepository.reset();
                 final logRepository = LogRepository(logLevel);
 
                 for (final level in Level.values) {
@@ -36,7 +37,7 @@ void testLogRepository() => group('LogRepository test', () {
                     () {
                       final log = LogEntity(
                         'test message: level is $level',
-                        level,
+                        level: level,
                       );
 
                       logRepository.receive(log);
@@ -47,8 +48,12 @@ void testLogRepository() => group('LogRepository test', () {
               });
             }
 
+            setUp(() {
+              LogRepository.reset();
+            });
+
             test(
-              ': default level is verbose',
+              ': default message level is verbose',
               () {
                 final logRepository = LogRepository(Level.verbose);
 
@@ -58,6 +63,39 @@ void testLogRepository() => group('LogRepository test', () {
               },
               tags: TestSize.small,
             );
+
+            group(': with Error', () {
+              test(
+                ': default message level is error',
+                () {
+                  final logRepository = LogRepository(Level.verbose);
+
+                  final log = LogEntity(
+                    'default level is error',
+                    error: Error(),
+                  );
+
+                  logRepository.receive(log);
+                },
+                tags: TestSize.small,
+              );
+
+              test(
+                ': specify message level is verbose',
+                () {
+                  final logRepository = LogRepository(Level.verbose);
+
+                  final log = LogEntity(
+                    'specify level is verbose',
+                    error: Error(),
+                    level: Level.verbose,
+                  );
+
+                  logRepository.receive(log);
+                },
+                tags: TestSize.small,
+              );
+            });
           });
         },
       );

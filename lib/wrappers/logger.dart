@@ -8,8 +8,8 @@ class LoggerWrapper {
 
   LoggerWrapper._(this._logger);
 
-  void log(repository.Level level, dynamic message) =>
-      _logger.log(level._convert(), message);
+  void log(repository.Level level, dynamic message, [dynamic error]) =>
+      _logger.log(level._convert(), message, error);
 
   static LoggerWrapper? _instance;
 
