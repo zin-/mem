@@ -2,14 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:mem/l10n.dart';
-import 'package:mem/logger.dart';
 import 'package:mem/views/atoms/date_text_form_field.dart';
 
 import '../../_helpers.dart';
 
 void main() {
-  Logger(level: Level.verbose);
-
   Future pumpDateTextFormField(
     WidgetTester widgetTester,
     DateTime? date,

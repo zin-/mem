@@ -6,14 +6,11 @@ import 'package:mem/database/database.dart';
 import 'package:mem/database/database_manager.dart';
 import 'package:mem/database/indexed_database.dart';
 import 'package:mem/database/sqlite_database.dart';
-import 'package:mem/logger.dart';
 
 import '../_helpers.dart';
 import 'definitions.dart';
 
 void main() {
-  Logger(level: Level.verbose);
-
   testDatabaseManager();
 }
 

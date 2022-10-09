@@ -2,13 +2,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
 import 'package:mem/database/indexed_database.dart';
-import 'package:mem/logger.dart';
 
 import '../_helpers.dart';
 
 void main() {
-  Logger(level: Level.verbose);
-
   test(
     'Indexed database: require at least 1 table.',
     () async {

@@ -5,7 +5,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
 import 'package:mem/database/sqlite_database.dart';
-import 'package:mem/logger.dart';
 
 // FIXME integration testでrepositoryを参照するのはNG
 import 'package:mem/repositories/_database_tuple_repository.dart';
@@ -14,8 +13,6 @@ import '../_helpers.dart';
 import 'definitions.dart';
 
 void main() {
-  Logger(level: Level.verbose);
-
   testSqliteDatabase();
 }
 

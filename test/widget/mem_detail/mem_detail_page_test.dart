@@ -9,7 +9,6 @@ import 'package:mem/views/mems/mem_detail/mem_detail_body.dart';
 import 'package:mem/views/mems/mem_detail/mem_detail_page.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mem/l10n.dart';
-import 'package:mem/logger.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/views/constants.dart';
 
@@ -20,8 +19,6 @@ import '../atoms/date_and_time_text_form_field_test.dart';
 import 'mem_detail_body_test.dart';
 
 void main() {
-  Logger(level: Level.verbose);
-
   final mockedMemRepository = MockMemRepository();
   MemRepository.reset(mockedMemRepository);
   final mockedMemItemRepository = MockMemItemRepository();
@@ -46,6 +43,9 @@ void main() {
             minSavedMemoMemItemEntity(savedMemEntity.id, 1);
         when(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).thenAnswer(
             (realInvocation) => Future.value([savedMemoMemItemEntity]));
+
+        when(mockedNotificationRepository.initialize(any, any))
+            .thenAnswer((realInvocation) => Future.value(true));
 
         await pumpMemDetailPage(widgetTester, savedMemEntity.id);
 
@@ -156,6 +156,9 @@ void main() {
         when(mockedMemItemRepository.shipByMemId(any))
             .thenAnswer((realInvocation) async => [savedMemoMemItemEntity]);
 
+        when(mockedNotificationRepository.initialize(any, any))
+            .thenAnswer((realInvocation) => Future.value(true));
+
         await pumpMemDetailPage(widgetTester, savedMemEntity.id);
         await widgetTester.pump();
 
@@ -211,6 +214,9 @@ void main() {
     testWidgets(
       ': name is required.',
       (widgetTester) async {
+        when(mockedNotificationRepository.initialize(any, any))
+            .thenAnswer((realInvocation) => Future.value(true));
+
         await pumpMemDetailPage(widgetTester, null);
 
         await widgetTester.tap(saveFabFinder);

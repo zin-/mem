@@ -4,13 +4,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/database/database.dart';
 import 'package:mem/database/database_manager.dart';
 import 'package:mem/database/definitions.dart';
-import 'package:mem/logger.dart';
 import 'package:mem/repositories/_database_tuple_repository.dart';
 
 import '../_helpers.dart';
 
 void main() async {
-  Logger(level: Level.verbose);
   DatabaseManager(onTest: true);
 
   testDatabaseTupleRepository();
