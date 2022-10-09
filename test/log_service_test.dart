@@ -14,11 +14,10 @@ import 'log_service_test.mocks.dart';
 void main() {
   final mockedLogRepository = MockLogRepository();
 
-  LogService.reset();
-
   setUp(() {
-    reset(mockedLogRepository);
     LogService.reset();
+
+    reset(mockedLogRepository);
   });
 
   group('log', () {

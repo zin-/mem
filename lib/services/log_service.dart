@@ -3,7 +3,7 @@ import 'package:mem/repositories/log_repository.dart';
 const _filePath = 'mem/services/log_service.dart';
 
 class LogService {
-  final Level _level; // TODO ここから
+  final Level _level;
   final LogRepository _logRepository;
 
   LogService._(this._level, this._logRepository);
