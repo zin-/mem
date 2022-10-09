@@ -8,10 +8,9 @@ class LogService {
 
   LogService._(this._level, this._logRepository);
 
-  log(dynamic message, {Level? level}) {
-    final log = LogEntity(message, level: level);
+  log(dynamic message, {dynamic error, Level? level}) {
+    final log = LogEntity(message, error: error, level: level);
     if (log.level.index >= _level.index) {
-      // TODO error
       _logRepository.receive(log);
     }
   }

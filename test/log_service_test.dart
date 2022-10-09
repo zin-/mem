@@ -39,6 +39,17 @@ void main() {
           const level = Level.debug;
           const message = 'test message';
 
+          when(mockedLogRepository.receive(any)).thenAnswer((realInvocation) {
+            expect(realInvocation.positionalArguments.length, 1);
+
+            final arg1 = realInvocation.positionalArguments[0];
+
+            expect(arg1, isA<LogEntity>());
+            expect(arg1.message, message);
+            expect(arg1.level, level);
+            expect(arg1.error, null);
+          });
+
           logService.log(message, level: level);
 
           verify(mockedLogRepository.receive(any)).called(1);
@@ -49,10 +60,21 @@ void main() {
       test(
         ': message level error',
         () {
-          const level = Level.error;
           const message = 'test message';
+          final error = Error();
 
-          logService.log(message, level: level);
+          when(mockedLogRepository.receive(any)).thenAnswer((realInvocation) {
+            expect(realInvocation.positionalArguments.length, 1);
+
+            final arg1 = realInvocation.positionalArguments[0];
+
+            expect(arg1, isA<LogEntity>());
+            expect(arg1.message, message);
+            expect(arg1.level, Level.error);
+            expect(arg1.error, error);
+          });
+
+          logService.log(message, error: error);
 
           verify(mockedLogRepository.receive(any)).called(1);
         },
@@ -62,10 +84,21 @@ void main() {
       test(
         ': message level warning',
         () {
-          const level = Level.warning;
           const message = 'test message';
+          final exception = Exception('test exception message');
 
-          logService.log(message, level: level);
+          when(mockedLogRepository.receive(any)).thenAnswer((realInvocation) {
+            expect(realInvocation.positionalArguments.length, 1);
+
+            final arg1 = realInvocation.positionalArguments[0];
+
+            expect(arg1, isA<LogEntity>());
+            expect(arg1.message, message);
+            expect(arg1.level, Level.warning);
+            expect(arg1.error, exception);
+          });
+
+          logService.log(message, error: exception);
 
           verifyNever(mockedLogRepository.receive(any));
         },
