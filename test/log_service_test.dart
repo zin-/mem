@@ -199,5 +199,90 @@ void main() {
         tags: TestSize.small,
       );
     });
+
+    group(': async function', () {
+      test(
+        ': no await',
+        () {
+          Future<void> testFunction() async {}
+
+          final expectedMessages = ['start', 'end => Future'];
+
+          when(mockedLogRepository.receive(any)).thenAnswer((realInvocation) {
+            expect(realInvocation.positionalArguments.length, 1);
+
+            final arg1 = realInvocation.positionalArguments[0];
+            expect(arg1, isA<LogEntity>());
+            expect(arg1.message, expectedMessages.removeAt(0));
+          });
+
+          final resultFuture = logService.functionLog(testFunction);
+
+          expect(resultFuture, isA<Future>());
+
+          verify(mockedLogRepository.receive(any)).called(1);
+
+          expect(expectedMessages.length, 1);
+        },
+        tags: TestSize.small,
+      );
+
+      group(': await', () {
+        test(
+          ': no returns',
+          () async {
+            Future<void> testFunction() async {}
+
+            final expectedMessages = ['start', 'end => Future'];
+
+            when(mockedLogRepository.receive(any)).thenAnswer((realInvocation) {
+              expect(realInvocation.positionalArguments.length, 1);
+
+              final arg1 = realInvocation.positionalArguments[0];
+              expect(arg1, isA<LogEntity>());
+              expect(arg1.message, expectedMessages.removeAt(0));
+            });
+
+            await logService.functionLog(testFunction);
+
+            verify(mockedLogRepository.receive(any)).called(2);
+
+            expect(expectedMessages.length, 0);
+          },
+          tags: TestSize.small,
+        );
+
+        test(
+          ': returns bool',
+          () async {
+            const expectedResult = true;
+
+            Future<bool> testFunction() async => expectedResult;
+
+            final expectedMessages = [
+              'start',
+              'end => Future => $expectedResult',
+            ];
+
+            when(mockedLogRepository.receive(any)).thenAnswer((realInvocation) {
+              expect(realInvocation.positionalArguments.length, 1);
+
+              final arg1 = realInvocation.positionalArguments[0];
+              expect(arg1, isA<LogEntity>());
+              expect(arg1.message, expectedMessages.removeAt(0));
+            });
+
+            final result = await logService.functionLog(testFunction);
+
+            verify(mockedLogRepository.receive(any)).called(2);
+
+            expect(result, expectedResult);
+
+            expect(expectedMessages.length, 0);
+          },
+          tags: TestSize.small,
+        );
+      });
+    });
   });
 }

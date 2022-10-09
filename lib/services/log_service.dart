@@ -8,8 +8,13 @@ class LogService {
 
   LogService._(this._level, this._logRepository);
 
-  log(dynamic message, {dynamic error, Level? level}) {
-    final log = LogEntity(message, error: error, level: level);
+  log(dynamic message, {dynamic error, Level? level, StackTrace? stackTrace}) {
+    final log = LogEntity(
+      message,
+      error: error,
+      level: level,
+      stackTrace: stackTrace,
+    );
     if (_shouldLog(log.level)) {
       _logRepository.receive(log);
     }
@@ -21,9 +26,25 @@ class LogService {
     Level? level,
   }) {
     if (_shouldLog(level)) {
-      log('start${args == null ? '' : ' :: $args'}', level: level);
+      final current = StackTrace.current;
+
+      log(
+        'start${args == null ? '' : ' :: $args'}',
+        level: level,
+        stackTrace: current,
+      );
+
       final result = function();
-      log('end${result == null ? '' : ' => $result'}', level: level);
+
+      if (result is Future) {
+        result.then((value) => log(
+              'end => Future${value == null ? '' : ' => $value'}',
+              level: level,
+              stackTrace: current,
+            ));
+      } else {
+        log('end${result == null ? '' : ' => $result'}', level: level);
+      }
 
       return result;
     }
