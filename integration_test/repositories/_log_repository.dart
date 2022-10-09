@@ -96,6 +96,39 @@ void testLogRepository() => group('LogRepository test', () {
                 tags: TestSize.small,
               );
             });
+
+            group(': with Exception', () {
+              test(
+                ': default message level is warning',
+                () {
+                  final logRepository = LogRepository(Level.verbose);
+
+                  final log = LogEntity(
+                    'default level is warning',
+                    error: Exception('test exception message'),
+                  );
+
+                  logRepository.receive(log);
+                },
+                tags: TestSize.small,
+              );
+
+              test(
+                ': specify message level is verbose',
+                () {
+                  final logRepository = LogRepository(Level.verbose);
+
+                  final log = LogEntity(
+                    'specify level is verbose',
+                    error: Exception('test exception message'),
+                    level: Level.verbose,
+                  );
+
+                  logRepository.receive(log);
+                },
+                tags: TestSize.small,
+              );
+            });
           });
         },
       );

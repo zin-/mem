@@ -76,6 +76,11 @@ class LogEntity extends Entity {
   late Level level;
 
   LogEntity(this.message, {this.error, Level? level}) {
-    this.level = level ?? (error is Error ? Level.error : Level.verbose);
+    this.level = level ??
+        (error is Error
+            ? Level.error
+            : error is Exception
+                ? Level.warning
+                : Level.verbose);
   }
 }
