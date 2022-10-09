@@ -1,6 +1,6 @@
 import 'package:mem/repositories/log_repository.dart';
 
-const filePath = 'mem/services/log_service.dart';
+const _filePath = 'mem/services/log_service.dart';
 
 class LogService {
   final Level _level; // TODO ここから
@@ -19,7 +19,7 @@ class LogService {
     if (tmp == null) {
       tmp = LogService._(
         level ?? Level.error,
-        LogRepository(level ?? Level.error, [filePath]),
+        LogRepository(level ?? Level.error, [_filePath]),
       );
       _instance = tmp;
     }
