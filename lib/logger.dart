@@ -6,11 +6,10 @@ const _filePath = 'mem/logger';
 
 LogService _logService = LogService(Level.error);
 
-void initializeLogger() {
-  const level = kDebugMode ? Level.trace : Level.error;
+void initializeLogger([Level? logLevel]) {
   LogService.reset();
   _logService = LogService(
-    level,
+    logLevel ?? (kDebugMode ? Level.trace : Level.error),
     ignoreFilePaths: [_filePath],
   );
 }

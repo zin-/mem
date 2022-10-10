@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/database/database_manager.dart';
+import 'package:mem/logger.dart';
+import 'package:mem/repositories/log_repository.dart';
 
 import 'database/_database_manager.dart';
 import 'database/_indexed_database.dart';
@@ -17,9 +19,9 @@ const defaultDuration = Duration(seconds: 1);
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  DatabaseManager(onTest: true);
-
   testLogRepository();
+
+  initializeLogger(Level.error);
 
   group('Database test', () {
     testSqliteDatabase();
@@ -32,6 +34,8 @@ void main() {
     testDatabaseTupleRepository();
     testNotificationRepository();
   });
+
+  DatabaseManager(onTest: true);
 
   group('Scenario test', () {
     testMemoScenario();

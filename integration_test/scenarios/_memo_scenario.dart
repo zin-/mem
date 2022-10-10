@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/database/database_manager.dart';
+import 'package:mem/logger.dart';
+import 'package:mem/repositories/log_repository.dart';
 
 import '../_helpers.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
+  initializeLogger(Level.verbose);
   DatabaseManager(onTest: true);
 
   testMemoScenario();
