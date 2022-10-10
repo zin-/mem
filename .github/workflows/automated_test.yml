@@ -30,7 +30,6 @@ jobs:
           flags: small_test
 
   integration_test:
-    needs: small_test
     strategy:
       fail-fast: false
       matrix:
