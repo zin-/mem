@@ -47,7 +47,7 @@ T warn<T>(T object) {
 }
 
 @Deprecated('Allow under develop only')
-T dev<T>(T object) {
-  _logService.log(object, level: Level.debug);
+T? dev<T>([T? object]) {
+  _logService.log(object ?? 'Under development.', level: Level.debug);
   return object;
 }
