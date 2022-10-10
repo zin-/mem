@@ -46,18 +46,18 @@ void testDatabaseTupleRepository() => group(
 
           setUp(() async {
             testRepository = TestRepository(
-              (await DatabaseManager().open(testDatabase))
+              (await DatabaseManager(onTest: true).open(testDatabase))
                   .getTable(testTable.name),
             );
           });
           tearDown(() async {
-            await DatabaseManager().delete(testDatabase.name);
+            await DatabaseManager(onTest: true).delete(testDatabase.name);
           });
 
           test(
             'new',
             () async {
-              final database = await DatabaseManager().open(testDatabase);
+              final database = await DatabaseManager(onTest: true).open(testDatabase);
               TestRepository(database.getTable(testTable.name));
             },
             tags: TestSize.medium,

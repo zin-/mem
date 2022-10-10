@@ -31,7 +31,7 @@ void testEdgeScenario() => group(
               (widgetTester) async {
                 const savedMemName = 'saved mem name';
                 final database =
-                    await DatabaseManager().open(app.databaseDefinition);
+                    await DatabaseManager(onTest: true).open(app.databaseDefinition);
                 final memTable = database.getTable(memTableDefinition.name);
                 await memTable.insert({
                   memNameColumnName: savedMemName,

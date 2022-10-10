@@ -25,8 +25,8 @@ const defaultDuration = Duration(seconds: 1);
 Future clearDatabase() async {
   // FIXME openしないとdeleteできないのは、実際のDatabaseと挙動が異なる
   // 今の実装だと難しいっぽい。いつかチャレンジする
-  await DatabaseManager().open(app.databaseDefinition);
-  await DatabaseManager().delete(app.databaseDefinition.name);
+  await DatabaseManager(onTest: true).open(app.databaseDefinition);
+  await DatabaseManager(onTest: true).delete(app.databaseDefinition.name);
 
   MemRepository.reset(null);
   MemItemRepository.reset(null);
@@ -70,7 +70,7 @@ Future<void> prepareSavedData(
   String memMemo, {
   bool isArchived = false,
 }) async {
-  final database = await DatabaseManager().open(app.databaseDefinition);
+  final database = await DatabaseManager(onTest: true).open(app.databaseDefinition);
   final memTable = database.getTable(memTableDefinition.name);
   final savedMemId = await memTable.insert({
     memNameColumnName: memName,
@@ -86,5 +86,5 @@ Future<void> prepareSavedData(
     createdAtColumnName: DateTime.now(),
     archivedAtColumnName: isArchived ? DateTime.now() : null,
   });
-  await DatabaseManager().close(app.databaseDefinition.name);
+  await DatabaseManager(onTest: true).close(app.databaseDefinition.name);
 }
