@@ -4,6 +4,9 @@ import 'package:mem/database/database_manager.dart';
 import 'package:mem/main.dart' as app;
 import 'package:mem/domains/mem.dart';
 import 'package:mem/services/mem_service.dart';
+import 'package:mem/views/mems/mem_detail/mem_detail_body.dart';
+import 'package:mem/views/mems/mem_detail/mem_items_view.dart';
+import 'package:mem/views/mems/mem_name.dart';
 
 // FIXME integration testでrepositoryを参照するのはNG
 import 'package:mem/repositories/_database_tuple_repository.dart';
@@ -43,8 +46,20 @@ Future closeMemListFilter(WidgetTester widgetTester) async {
   await widgetTester.pumpAndSettle(defaultDuration);
 }
 
-final memNameTextFormFieldFinder = find.byType(TextFormField).at(0);
-final memMemoTextFormFieldFinder = find.byType(TextFormField).at(1);
+final memNameTextFormFieldFinder = find.descendant(
+  of: find.descendant(
+    of: find.byType(MemDetailBody),
+    matching: find.byType(MemNameTextFormField),
+  ),
+  matching: find.byType(TextFormField),
+);
+final memMemoTextFormFieldFinder = find.descendant(
+  of: find.descendant(
+    of: find.byType(MemDetailBody),
+    matching: find.byType(MemItemsViewComponent),
+  ),
+  matching: find.byType(TextFormField),
+);
 final saveFabFinder = find.byIcon(Icons.save_alt).at(0);
 
 TextFormField memNameTextFormField(WidgetTester widgetTester) =>
