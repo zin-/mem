@@ -3,7 +3,7 @@ import 'package:mem/services/log_service.dart';
 
 const _filePath = 'mem/logger';
 
-final logService = LogService(Level.trace, null, [_filePath]);
+final logService = LogService(Level.trace, ignoreFilePaths: [_filePath]);
 
 T v<T>(
   Map<String, dynamic>? arguments,

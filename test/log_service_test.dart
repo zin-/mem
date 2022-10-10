@@ -30,7 +30,7 @@ void main() {
     group(': call when message level is greater than log level', () {
       final logService = LogService(
         Level.error,
-        mockedLogRepository,
+        logRepository: mockedLogRepository,
       );
 
       test(
@@ -114,7 +114,7 @@ void main() {
         LogService.reset();
         final logService = LogService(
           Level.error,
-          mockedLogRepository,
+          logRepository: mockedLogRepository,
         );
 
         void testFunction() {}
@@ -129,7 +129,7 @@ void main() {
     LogService.reset();
     final logService = LogService(
       Level.verbose,
-      mockedLogRepository,
+      logRepository: mockedLogRepository,
     );
 
     group(': sync function', () {
@@ -340,7 +340,7 @@ void main() {
       LogService.reset();
       final logService = LogService(
         Level.trace,
-        mockedLogRepository,
+        logRepository: mockedLogRepository,
       );
 
       test(
