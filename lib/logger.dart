@@ -36,18 +36,18 @@ T t<T>(
       level: debug ? Level.debug : Level.trace,
     );
 
-T trace<T>(T object) {
-  _logService.log(object, level: Level.trace);
-  return object;
+T trace<T>(T message) {
+  _logService.log(message, level: Level.trace);
+  return message;
 }
 
-T warn<T>(T object) {
-  _logService.log(object, level: Level.warning);
-  return object;
+T warn<T>(T message) {
+  _logService.log(message, level: Level.warning);
+  return message;
 }
 
 @Deprecated('Allow under develop only')
-T? dev<T>([T? object]) {
-  _logService.log(object ?? 'Under development.', level: Level.debug);
-  return object;
+T? dev<T>([T? message]) {
+  _logService.log(message ?? 'Under development.', level: Level.debug);
+  return message;
 }
