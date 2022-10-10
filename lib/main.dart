@@ -16,14 +16,11 @@ final databaseDefinition = DefD(
   ],
 );
 
-Future<void> main({String? languageCode}) => t(
-      {},
-      () async {
-        await openDatabase();
+Future<void> main({String? languageCode}) async {
+  await openDatabase();
 
-        runApp(MemApplication(languageCode));
-      },
-    );
+  runApp(MemApplication(languageCode));
+}
 
 Future<Database> openDatabase() => t(
       {},
