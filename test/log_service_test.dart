@@ -21,7 +21,7 @@ void main() {
   });
 
   test('Create instance', () {
-    final logService = LogService();
+    final logService = LogService(Level.error);
 
     expect(logService, isA<LogService>());
   });

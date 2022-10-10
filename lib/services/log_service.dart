@@ -73,18 +73,18 @@ class LogService {
 
   static LogService? _instance;
 
-  factory LogService([
-    Level? level,
+  factory LogService(
+    Level level, [
     LogRepository? logRepository,
     Iterable<String>? ignoreFilePaths,
   ]) {
     var tmp = _instance;
     if (tmp == null) {
       tmp = LogService._(
-        level ?? Level.error,
+        level,
         logRepository ??
             LogRepository(
-              level ?? Level.error,
+              level,
               [_filePath, ...ignoreFilePaths ?? []],
             ),
       );
