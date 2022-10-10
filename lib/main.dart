@@ -17,6 +17,11 @@ final databaseDefinition = DefD(
 );
 
 Future<void> main({String? languageCode}) async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  initializeLogger();
+  trace({'languageCode': languageCode});
+
   await openDatabase();
 
   runApp(MemApplication(languageCode));
@@ -25,8 +30,6 @@ Future<void> main({String? languageCode}) async {
 Future<Database> openDatabase() => t(
       {},
       () async {
-        WidgetsFlutterBinding.ensureInitialized();
-
         final database = await DatabaseManager().open(databaseDefinition);
 
         MemRepository(

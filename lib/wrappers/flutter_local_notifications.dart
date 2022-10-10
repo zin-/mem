@@ -1,6 +1,7 @@
 // coverage:ignore-file
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/main.dart';
@@ -149,23 +150,25 @@ class FlutterLocalNotificationsWrapper {
 }
 
 @pragma('vm:entry-point')
-void onNotificationTappedBackground(NotificationResponse response) => t(
-      {'response': response},
-      () async {
-        await openDatabase();
+void onNotificationTappedBackground(NotificationResponse response) async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-        await _notificationResponseHandler(
-          response,
-          (id, payload) => null,
-          (id, actionId, input, payload) => notificationActionHandler(
-            id,
-            actionId,
-            input,
-            payload,
-          ),
-        );
-      },
-    );
+  initializeLogger();
+  trace({'response': response});
+
+  await openDatabase();
+
+  await _notificationResponseHandler(
+    response,
+    (id, payload) => null,
+    (id, actionId, input, payload) => notificationActionHandler(
+      id,
+      actionId,
+      input,
+      payload,
+    ),
+  );
+}
 
 _notificationResponseHandler(
   NotificationResponse notificationResponse,
