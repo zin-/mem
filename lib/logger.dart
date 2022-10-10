@@ -36,6 +36,11 @@ T t<T>(
       level: debug ? Level.debug : Level.trace,
     );
 
+T verbose<T>(T message) {
+  _logService.log(message, level: Level.verbose);
+  return message;
+}
+
 T trace<T>(T message) {
   _logService.log(message, level: Level.trace);
   return message;

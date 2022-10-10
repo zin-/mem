@@ -26,18 +26,15 @@ Future<void> main({String? languageCode}) async {
   runApp(MemApplication(languageCode));
 }
 
-Future<Database> openDatabase() => t(
-      {},
-      () async {
-        final database = await DatabaseManager().open(databaseDefinition);
+Future<Database> openDatabase() async {
+  final database = await DatabaseManager().open(databaseDefinition);
 
-        MemRepository(
-          database.getTable(memTableDefinition.name),
-        );
-        MemItemRepository(
-          database.getTable(memItemTableDefinition.name),
-        );
+  MemRepository(
+    database.getTable(memTableDefinition.name),
+  );
+  MemItemRepository(
+    database.getTable(memItemTableDefinition.name),
+  );
 
-        return database;
-      },
-    );
+  return database;
+}
