@@ -20,7 +20,6 @@ Future<void> main({String? languageCode}) async {
   WidgetsFlutterBinding.ensureInitialized();
 
   initializeLogger();
-  trace({'languageCode': languageCode});
 
   await openDatabase();
 
