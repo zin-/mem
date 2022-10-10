@@ -1,5 +1,6 @@
 // coverage:ignore-file
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -36,21 +37,27 @@ class FlutterLocalNotificationsWrapper {
           'onNotificationActionTappedCallback':
               onNotificationActionTappedCallback,
         },
-        () async =>
-            (await _flutterLocalNotificationsPlugin.initialize(
-              InitializationSettings(
-                android: AndroidInitializationSettings(androidDefaultIconPath),
-              ),
-              onDidReceiveNotificationResponse: (details) =>
-                  _notificationResponseHandler(
-                details,
-                onNotificationTappedCallback,
-                onNotificationActionTappedCallback,
-              ),
-              onDidReceiveBackgroundNotificationResponse:
-                  onNotificationTappedBackground,
-            )) ==
-            true,
+        () async {
+          if (Platform.isAndroid) {
+            return (await _flutterLocalNotificationsPlugin.initialize(
+                  InitializationSettings(
+                    android:
+                        AndroidInitializationSettings(androidDefaultIconPath),
+                  ),
+                  onDidReceiveNotificationResponse: (details) =>
+                      _notificationResponseHandler(
+                    details,
+                    onNotificationTappedCallback,
+                    onNotificationActionTappedCallback,
+                  ),
+                  onDidReceiveBackgroundNotificationResponse:
+                      onNotificationTappedBackground,
+                )) ==
+                true;
+          }
+
+          return false;
+        },
       );
 
   Future<void> receiveOnLaunchAppNotification(
@@ -61,26 +68,29 @@ class FlutterLocalNotificationsWrapper {
           'onNotificationTapped': onNotificationTapped,
         },
         () async {
-          final notificationAppLaunchDetails =
-              await _flutterLocalNotificationsPlugin
-                  .getNotificationAppLaunchDetails();
+          if (Platform.isAndroid) {
+            final notificationAppLaunchDetails =
+                await _flutterLocalNotificationsPlugin
+                    .getNotificationAppLaunchDetails();
 
-          if (notificationAppLaunchDetails?.didNotificationLaunchApp == false) {
-            return;
+            if (notificationAppLaunchDetails?.didNotificationLaunchApp ==
+                false) {
+              return;
+            }
+
+            final notificationResponse =
+                notificationAppLaunchDetails?.notificationResponse;
+
+            if (notificationResponse == null) {
+              return;
+            }
+
+            _notificationResponseHandler(
+              notificationResponse,
+              onNotificationTapped,
+              null,
+            );
           }
-
-          final notificationResponse =
-              notificationAppLaunchDetails?.notificationResponse;
-
-          if (notificationResponse == null) {
-            return;
-          }
-
-          _notificationResponseHandler(
-            notificationResponse,
-            onNotificationTapped,
-            null,
-          );
         },
       );
 
@@ -104,27 +114,29 @@ class FlutterLocalNotificationsWrapper {
           'channelName': channelName,
           'channelDescription': channelDescription,
         },
-        () {
-          return _flutterLocalNotificationsPlugin.zonedSchedule(
-            id,
-            title,
-            null,
-            tzDateTime,
-            NotificationDetails(
-              android: AndroidNotificationDetails(
-                channelId,
-                channelName,
-                channelDescription: channelDescription,
-                actions: actions
-                    .map((e) => AndroidNotificationAction(e.id, e.title))
-                    .toList(),
+        () async {
+          if (Platform.isAndroid) {
+            return _flutterLocalNotificationsPlugin.zonedSchedule(
+              id,
+              title,
+              null,
+              tzDateTime,
+              NotificationDetails(
+                android: AndroidNotificationDetails(
+                  channelId,
+                  channelName,
+                  channelDescription: channelDescription,
+                  actions: actions
+                      .map((e) => AndroidNotificationAction(e.id, e.title))
+                      .toList(),
+                ),
               ),
-            ),
-            uiLocalNotificationDateInterpretation:
-                UILocalNotificationDateInterpretation.absoluteTime,
-            androidAllowWhileIdle: true,
-            payload: payload,
-          );
+              uiLocalNotificationDateInterpretation:
+                  UILocalNotificationDateInterpretation.absoluteTime,
+              androidAllowWhileIdle: true,
+              payload: payload,
+            );
+          }
         },
       );
 
@@ -132,7 +144,11 @@ class FlutterLocalNotificationsWrapper {
         {
           'id': id,
         },
-        () => _flutterLocalNotificationsPlugin.cancel(id),
+        () {
+          if (Platform.isAndroid) {
+            _flutterLocalNotificationsPlugin.cancel(id);
+          }
+        },
       );
 
   FlutterLocalNotificationsWrapper._();
