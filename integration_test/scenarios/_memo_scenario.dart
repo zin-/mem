@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:intl/intl.dart';
 import 'package:mem/database/database_manager.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/repositories/log_repository.dart';
@@ -19,33 +20,62 @@ void main() {
 void testMemoScenario() => group(
       'Memo scenario',
       () {
-        setUp(() async => await clearDatabase());
+        setUp(() async {
+          await clearDatabase();
+        });
 
         testWidgets(
-          ': create',
+          ': create new Mem',
           (widgetTester) async {
-            await pumpApplication(languageCode: 'en');
-            await widgetTester.pumpAndSettle(defaultDuration);
+            await runApplication();
+            await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.byIcon(Icons.add));
-            await widgetTester.pumpAndSettle(defaultDuration);
+            await widgetTester.tap(newMemFabFinder);
+            await widgetTester.pumpAndSettle();
 
-            const enteringMemName = 'entering mem name';
-            const enteringMemMemo = 'entering mem memo';
-
+            const enteringMemName = 'entering mem name : create new Mem';
             await widgetTester.enterText(
-                memNameTextFormFieldFinder, enteringMemName);
-            await widgetTester.enterText(
-                memMemoTextFormFieldFinder, enteringMemMemo);
+              memNameTextFormFieldFinder,
+              enteringMemName,
+            );
+            await widgetTester.pump();
 
-            await widgetTester.tap(saveFabFinder);
-            await widgetTester.pumpAndSettle(defaultDuration);
+            await widgetTester.tap(showDatePickerIconFinder);
+            await widgetTester.pumpAndSettle();
+            await widgetTester.tap(okFinder);
+            await widgetTester.pumpAndSettle();
+
+            await widgetTester.tap(allDaySwitchFinder);
+            await widgetTester.pumpAndSettle();
+
+            await widgetTester.tap(showTimePickerIconFinder);
+            await widgetTester.pumpAndSettle();
+            await widgetTester.tap(okFinder);
+            await widgetTester.pumpAndSettle();
+
+            const enteringMemMemo = 'entering mem memo : create new Mem';
+            await widgetTester.enterText(
+              memMemoTextFormFieldFinder,
+              enteringMemMemo,
+            );
+            await widgetTester.pump();
+
+            await widgetTester.tap(saveMemFabFinder);
+            await widgetTester.pumpAndSettle();
 
             await widgetTester.pageBack();
-            await widgetTester.pumpAndSettle(defaultDuration);
+            await widgetTester.pump();
 
             expect(find.text(enteringMemName), findsOneWidget);
             expect(find.text(enteringMemMemo), findsNothing);
+            final now = DateTime.now();
+            final dateAndTime = '${DateFormat.yMd().format(now)}'
+                ' '
+                '${DateFormat('h:mm a').format(now)}';
+            expect(
+              find.text(dateAndTime),
+              findsOneWidget,
+            );
           },
           tags: TestSize.medium,
         );
@@ -71,7 +101,7 @@ void testMemoScenario() => group(
             await widgetTester.enterText(
                 memMemoTextFormFieldFinder, enteringMemMemo);
 
-            await widgetTester.tap(saveFabFinder);
+            await widgetTester.tap(saveMemFabFinder);
             await widgetTester.pumpAndSettle(defaultDuration);
 
             await widgetTester.pageBack();
