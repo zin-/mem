@@ -1,42 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/domains/mem.dart';
 import 'package:mem/views/atoms/hero_view.dart';
 import 'package:mem/views/molecules/date_and_time_text_form_field.dart';
-
-Widget? buildMemNotifyAtText(Mem mem) {
-  if (mem.notifyOn == null) {
-    return null;
-  } else {
-    return MemNotifyAtText(mem);
-  }
-}
+import 'package:mem/views/molecules/date_and_time_view.dart';
 
 String memNotifyAtTag(int? memId) => heroTag('mem-notifyAt', memId);
 
+Widget? buildMemNotifyAtText(Mem mem) =>
+    mem.notifyOn == null ? null : MemNotifyAtText(mem);
+
 class MemNotifyAtText extends StatelessWidget {
   final Mem _mem;
-  final DateFormat _dateFormat = DateFormat.yMd();
 
-  MemNotifyAtText(this._mem, {super.key});
+  const MemNotifyAtText(this._mem, {super.key});
 
   @override
   Widget build(BuildContext context) => v(
         {'_mem': _mem},
-        () {
-          final notifyOnText = _dateFormat.format(_mem.notifyOn!);
-          final notifyAtText = _mem.notifyAt?.format(context);
-
-          return HeroView(
-            memNotifyAtTag(_mem.id),
-            Text(
-              [notifyOnText, notifyAtText]
-                  .where((element) => element != null)
-                  .join(' '),
-            ),
-          );
-        },
+        () => HeroView(
+          memNotifyAtTag(_mem.id),
+          DateAndTimeText(_mem.notifyOn, _mem.notifyAt),
+        ),
       );
 }
 
@@ -52,15 +37,13 @@ class MemNotifyAtTextFormField extends StatelessWidget {
   @override
   Widget build(BuildContext context) => v(
         {'_mem': _mem, '_onChanged': _onChanged},
-        () {
-          return HeroView(
-            memNotifyAtTag(_mem.id),
-            DateAndTimeTextFormField(
-              date: _mem.notifyOn,
-              timeOfDay: _mem.notifyAt,
-              onChanged: _onChanged,
-            ),
-          );
-        },
+        () => HeroView(
+          memNotifyAtTag(_mem.id),
+          DateAndTimeTextFormField(
+            date: _mem.notifyOn,
+            timeOfDay: _mem.notifyAt,
+            onChanged: _onChanged,
+          ),
+        ),
       );
 }
