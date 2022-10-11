@@ -38,10 +38,10 @@ class LogService {
         stackTrace: current,
       );
 
-      if (level == Level.debug) _debug = true;
-
       try {
+        if (level == Level.debug) _debug = true;
         final result = function();
+        if (level == Level.debug) _debug = false;
 
         if (result is Future) {
           result.then((value) => log(
@@ -58,7 +58,6 @@ class LogService {
           );
         }
 
-        if (level == Level.debug) _debug = false;
         return result;
       } catch (e) {
         log('Caught', error: e, stackTrace: current);
