@@ -33,7 +33,7 @@ void testMemoScenario() => group(
             await widgetTester.tap(newMemFabFinder);
             await widgetTester.pumpAndSettle();
 
-            const enteringMemName = 'entering mem name : create new Mem';
+            const enteringMemName = 'entering mem name: create new Mem';
             await widgetTester.enterText(
               memNameTextFormFieldFinder,
               enteringMemName,
@@ -53,7 +53,7 @@ void testMemoScenario() => group(
             await widgetTester.tap(okFinder);
             await widgetTester.pumpAndSettle();
 
-            const enteringMemMemo = 'entering mem memo : create new Mem';
+            const enteringMemMemo = 'entering mem memo: create new Mem';
             await widgetTester.enterText(
               memMemoTextFormFieldFinder,
               enteringMemMemo,
@@ -71,11 +71,8 @@ void testMemoScenario() => group(
             final now = DateTime.now();
             final dateAndTime = '${DateFormat.yMd().format(now)}'
                 ' '
-                '${DateFormat('h:mm a').format(now)}';
-            expect(
-              find.text(dateAndTime),
-              findsOneWidget,
-            );
+                '${DateFormat('hh:mm').format(now)}';
+            expect(find.text(dateAndTime), findsOneWidget);
           },
           tags: TestSize.medium,
         );
