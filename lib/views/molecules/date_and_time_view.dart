@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 
-final _dateFormat = DateFormat.yMd();
+final _dateFormat = DateFormat.yMd(L10n().local);
 final _dateAndTimeFormat = _dateFormat.add_Hm();
 
 class DateAndTimeText extends StatelessWidget {
