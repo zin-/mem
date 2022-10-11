@@ -75,7 +75,7 @@ class TestSize {
   TestSize._();
 }
 
-Future<void> runApplication() => app.main();
+Future<void> runApplication() => app.main(languageCode: 'en');
 
 final newMemFabFinder = find.byIcon(Icons.add);
 final memNameTextFormFieldFinder = find.descendant(
