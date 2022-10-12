@@ -71,7 +71,6 @@ void testMemoScenario() => group(
             await widgetTester.pump();
 
             expect(find.text(enteringMemName), findsOneWidget);
-            expect(find.text(enteringMemMemo), findsNothing);
             // FIXME シナリオテストでここまでしないといけないのはなんとかしたい
             try {
               expect(
@@ -91,6 +90,8 @@ void testMemoScenario() => group(
                     .format(now.subtract(const Duration(minutes: 1))),
               );
             }
+
+            expect(find.text(enteringMemMemo), findsNothing);
           },
           tags: TestSize.medium,
         );
