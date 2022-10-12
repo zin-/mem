@@ -40,10 +40,9 @@ class MemNameTextFormField extends StatelessWidget {
         () => HeroView(
           memNameTag(_memId),
           TextFormField(
-            initialValue: _memName,
+            controller: TextEditingController(text: _memName),
             decoration: InputDecoration(
               labelText: L10n().memNameTitle(),
-              helperText: L10n().required(),
             ),
             validator: (value) =>
                 (value?.isEmpty ?? false) ? L10n().requiredError() : null,
