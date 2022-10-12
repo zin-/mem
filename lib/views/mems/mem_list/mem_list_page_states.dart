@@ -143,41 +143,39 @@ final sortedMemList =
 
         final notifyOn1 = item1.notifyOn;
         final notifyOn2 = item2.notifyOn;
-        if (notifyOn1 != notifyOn2) {
-          if (notifyOn1 == null) {
-            return 1;
-          }
-          if (notifyOn2 == null) {
+        if (notifyOn1 == null) {
+          return 1;
+        }
+        if (notifyOn2 == null) {
+          return -1;
+        }
+
+        final comparedNotifyOn = notifyOn1.compareTo(notifyOn2);
+
+        if (comparedNotifyOn != 0) {
+          return comparedNotifyOn;
+        }
+
+        final notifyAt1 = item1.notifyAt;
+        final notifyAt2 = item2.notifyAt;
+
+        if (notifyAt1 != notifyAt2) {
+          if (notifyAt1 == null) {
             return -1;
           }
-
-          final comparedNotifyOn = notifyOn1.compareTo(notifyOn2);
-
-          if (comparedNotifyOn != 0) {
-            return comparedNotifyOn;
+          if (notifyAt2 == null) {
+            return 1;
           }
 
-          final notifyAt1 = item1.notifyAt;
-          final notifyAt2 = item2.notifyAt;
-
-          if (notifyAt1 != notifyAt2) {
-            if (notifyAt1 == null) {
-              return -1;
-            }
-            if (notifyAt2 == null) {
-              return 1;
-            }
-
-            return notifyOn1
-                .add(Duration(
-                  hours: notifyAt1.hour,
-                  minutes: notifyAt1.minute,
-                ))
-                .compareTo(notifyOn2.add(Duration(
-                  hours: notifyAt2.hour,
-                  minutes: notifyAt2.minute,
-                )));
-          }
+          return notifyOn1
+              .add(Duration(
+                hours: notifyAt1.hour,
+                minutes: notifyAt1.minute,
+              ))
+              .compareTo(notifyOn2.add(Duration(
+                hours: notifyAt2.hour,
+                minutes: notifyAt2.minute,
+              )));
         }
 
         return item1.id!.compareTo(item2.id!);
