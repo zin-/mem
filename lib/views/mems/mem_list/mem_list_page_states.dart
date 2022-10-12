@@ -122,60 +122,66 @@ final sortedMemList =
       final filteredMemList = ref.watch(filteredMemListProvider);
 
       final sortedMemList = filteredMemList.sorted((item1, item2) {
-        if (item1.doneAt != item2.doneAt) {
-          if (item1.doneAt == null) {
-            return -1;
-          }
-          if (item2.doneAt == null) {
+        if (item1.isDone() != item2.isDone()) {
+          if (item1.isDone()) {
             return 1;
+          }
+          if (item2.isDone()) {
+            return -1;
           }
         }
 
-        if (item1.archivedAt != item2.archivedAt) {
-          if (item1.archivedAt == null) {
-            return -1;
-          }
-          if (item2.archivedAt == null) {
+        if (item1.isArchived() != item2.isArchived()) {
+          if (item1.isArchived()) {
             return 1;
           }
-          return item1.archivedAt!.compareTo(item2.archivedAt!);
+          if (item2.isArchived()) {
+            return -1;
+          }
         }
 
         final notifyOn1 = item1.notifyOn;
         final notifyOn2 = item2.notifyOn;
-        if (notifyOn1 == null) {
-          return 1;
-        }
-        if (notifyOn2 == null) {
-          return -1;
-        }
-
-        final comparedNotifyOn = notifyOn1.compareTo(notifyOn2);
-
-        if (comparedNotifyOn != 0) {
-          return comparedNotifyOn;
-        }
-
-        final notifyAt1 = item1.notifyAt;
-        final notifyAt2 = item2.notifyAt;
-
-        if (notifyAt1 != notifyAt2) {
-          if (notifyAt1 == null) {
-            return -1;
-          }
-          if (notifyAt2 == null) {
+        if (notifyOn1 != notifyOn2) {
+          if (notifyOn1 == null) {
             return 1;
           }
+          if (notifyOn2 == null) {
+            return -1;
+          }
+        }
 
-          return notifyOn1
-              .add(Duration(
-                hours: notifyAt1.hour,
-                minutes: notifyAt1.minute,
+        if (notifyOn1 != null && notifyOn2 != null) {
+          final notifyAt1 = notifyOn1
+              .subtract(Duration(
+                hours: notifyOn1.hour,
+                minutes: notifyOn1.minute,
+                seconds: notifyOn1.second,
+                milliseconds: notifyOn1.millisecond,
+                microseconds: notifyOn1.microsecond,
               ))
-              .compareTo(notifyOn2.add(Duration(
-                hours: notifyAt2.hour,
-                minutes: notifyAt2.minute,
-              )));
+              .add(Duration(
+                hours: item1.notifyAt?.hour ?? 0,
+                minutes: item1.notifyAt?.minute ?? 0,
+              ));
+          final notifyAt2 = notifyOn2
+              .subtract(Duration(
+                hours: notifyOn2.hour,
+                minutes: notifyOn2.minute,
+                seconds: notifyOn2.second,
+                milliseconds: notifyOn2.millisecond,
+                microseconds: notifyOn2.microsecond,
+              ))
+              .add(Duration(
+                hours: item2.notifyAt?.hour ?? 0,
+                minutes: item2.notifyAt?.minute ?? 0,
+              ));
+
+          final comparedNotifyAt = notifyAt1.compareTo(notifyAt2);
+
+          if (comparedNotifyAt != 0) {
+            return comparedNotifyAt;
+          }
         }
 
         return item1.id!.compareTo(item2.id!);
