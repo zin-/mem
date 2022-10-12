@@ -140,6 +140,7 @@ final sortedMemList =
           }
         }
 
+        // FIXME ここきもすぎない？
         final notifyOn1 = item1.notifyOn;
         final notifyOn2 = item2.notifyOn;
         if (notifyOn1 != notifyOn2) {
