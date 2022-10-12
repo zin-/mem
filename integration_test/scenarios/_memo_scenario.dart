@@ -72,9 +72,7 @@ void testMemoScenario() => group(
             expect(find.text(enteringMemName), findsOneWidget);
             expect(find.text(enteringMemMemo), findsNothing);
             expect(
-              widgetTester
-                  .widget<MemNotifyAtText>(memNotifyAtTextFinder)
-                  .data,
+              widgetTester.widget<MemNotifyAtText>(memNotifyAtTextFinder).data,
               DateFormat.yMd('en').add_Hm().format(DateTime.now()),
             );
           },
