@@ -10,7 +10,6 @@ class MemDoneCheckbox extends StatelessWidget {
   const MemDoneCheckbox(
     this._mem,
     this._onChanged, {
-    DateTime? memArchivedAt,
     super.key,
   });
 
