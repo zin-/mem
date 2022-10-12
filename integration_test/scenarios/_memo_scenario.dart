@@ -69,7 +69,7 @@ void testMemoScenario() => group(
             expect(find.text(enteringMemName), findsOneWidget);
             expect(find.text(enteringMemMemo), findsNothing);
             expect(
-              find.text(DateFormat.yMd().add_Hm().format(DateTime.now())),
+              find.text(DateFormat.yMd('en').add_Hm().format(DateTime.now())),
               findsOneWidget,
             );
           },
@@ -143,7 +143,6 @@ void testMemoScenario() => group(
             expect(find.text(savedMemName), findsOneWidget);
           },
           tags: TestSize.medium,
-          skip: true,
         );
 
         testWidgets(
@@ -184,7 +183,6 @@ void testMemoScenario() => group(
             expect(find.text(savedMemName), findsOneWidget);
           },
           tags: TestSize.medium,
-          skip: true,
         );
 
         testWidgets(
@@ -223,7 +221,6 @@ void testMemoScenario() => group(
             expect(find.text(savedMemName), findsNothing);
           },
           tags: TestSize.medium,
-          skip: true,
         );
       },
     );
