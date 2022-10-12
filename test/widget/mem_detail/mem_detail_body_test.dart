@@ -161,40 +161,6 @@ void main() {
       tags: TestSize.small,
     );
 
-    // testWidgets(
-    //   ': keep focus mem name.',
-    //   (widgetTester) async {
-    //     final focusNode = FocusNode();
-    //     focusNode.addListener(() {
-    //       // dev('object');
-    //       // dev(focusNode.hasFocus);
-    //       // dev(focusNode.hasPrimaryFocus);
-    //       if (focusNode.hasFocus && focusNode.hasPrimaryFocus) {
-    //       } else {
-    //         fail('out of focus on mem name');
-    //       }
-    //     });
-    //     await pumpMemDetailPage(widgetTester, null);
-    //
-    //     expect(focusNode.hasPrimaryFocus, false);
-    //
-    //     await widgetTester.tap(memNameTextFormFieldFinder);
-    //
-    //     expect(focusNode.hasPrimaryFocus, true);
-    //
-    //     await widgetTester.enterText(
-    //       memNameTextFormFieldFinder,
-    //       'entering mem name',
-    //     );
-    //     await widgetTester.pumpAndSettle();
-    //
-    //     // FIXME ここで、フォーカスがはずれていることを確認したかったが、確認できなかった
-    //     expect(focusNode.hasPrimaryFocus, true);
-    //   },
-    //   tags: TestSize.small,
-    //   skip: true,
-    // );
-
     testWidgets(
       ': done',
       (widgetTester) async {
