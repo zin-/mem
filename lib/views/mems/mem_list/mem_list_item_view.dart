@@ -20,13 +20,13 @@ class MemListItemView extends StatelessWidget {
           builder: (context, ref, child) {
             return ListTile(
               leading: MemDoneCheckbox(
-                _mem.id,
-                _mem.doneAt != null,
+                _mem,
                 (value) {
                   value == true
                       ? ref.read(doneMem(_mem.id))
                       : ref.read(undoneMem(_mem.id));
                 },
+                memArchivedAt: _mem.archivedAt,
               ),
               title: MemNameText(_mem.name, _mem.id),
               subtitle: buildMemNotifyAtText(_mem),

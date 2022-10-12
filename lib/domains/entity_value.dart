@@ -13,5 +13,5 @@ abstract class EntityValue {
 
   bool isSaved() => id != null && createdAt != null;
 
-  bool isArchived() => isSaved() && archivedAt != null;
+  bool isArchived() => archivedAt != null;
 }
