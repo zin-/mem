@@ -49,6 +49,7 @@ void testMemoScenario() => group(
             await widgetTester.tap(allDaySwitchFinder);
             await widgetTester.pumpAndSettle();
 
+            final now = DateTime.now();
             await widgetTester.tap(showTimePickerIconFinder);
             await widgetTester.pumpAndSettle();
             // FIXME 特定の時間を選択する
@@ -71,10 +72,25 @@ void testMemoScenario() => group(
 
             expect(find.text(enteringMemName), findsOneWidget);
             expect(find.text(enteringMemMemo), findsNothing);
-            expect(
-              widgetTester.widget<MemNotifyAtText>(memNotifyAtTextFinder).data,
-              DateFormat.yMd('en').add_Hm().format(DateTime.now()),
-            );
+            // FIXME シナリオテストでここまでしないといけないのはなんとかしたい
+            try {
+              expect(
+                widgetTester
+                    .widget<MemNotifyAtText>(memNotifyAtTextFinder)
+                    .data,
+                DateFormat.yMd('en').add_Hm().format(now),
+              );
+            } catch (e) {
+              warn(e);
+              expect(
+                widgetTester
+                    .widget<MemNotifyAtText>(memNotifyAtTextFinder)
+                    .data,
+                DateFormat.yMd('en')
+                    .add_Hm()
+                    .format(now.subtract(const Duration(minutes: 1))),
+              );
+            }
           },
           tags: TestSize.medium,
         );
