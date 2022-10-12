@@ -13,7 +13,7 @@ class MemDetailBody extends StatelessWidget {
   const MemDetailBody(this._memId, {Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => t(
+  Widget build(BuildContext context) => v(
         {'_memId': _memId},
         () {
           return SingleChildScrollView(
