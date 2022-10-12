@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
+import 'package:mem/views/mems/mem_list/mem_list_item_view.dart';
 import 'package:mem/views/mems/mem_list/mem_list_page.dart';
 import 'package:mem/views/mems/mem_name.dart';
 import 'package:mockito/mockito.dart';
@@ -501,7 +502,7 @@ void main() {
 final memListFinder = find.byType(CustomScrollView);
 final memListTileFinder = find.descendant(
   of: memListFinder,
-  matching: find.byType(ListTile),
+  matching: find.byType(MemListItemView),
 );
 final showNewMemFabFinder = find.byType(FloatingActionButton);
 

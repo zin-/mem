@@ -23,7 +23,7 @@ class Mem extends EntityValue {
           archivedAt: archivedAt,
         );
 
-  bool isDone() => isSaved() && doneAt != null;
+  bool isDone() => doneAt != null;
 
   @override
   String toString() => {
