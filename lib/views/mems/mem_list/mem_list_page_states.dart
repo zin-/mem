@@ -122,6 +122,8 @@ final sortedMemList =
       final filteredMemList = ref.watch(filteredMemListProvider);
 
       final sortedMemList = filteredMemList.sorted((item1, item2) {
+        dev({'item1': item1, 'item2': item2});
+
         if (item1.doneAt != item2.doneAt) {
           if (item1.doneAt == null) {
             return -1;

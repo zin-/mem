@@ -513,16 +513,13 @@ Finder findMemNameTextOnListAt(int index) => find.descendant(
       matching: find.byType(Text),
     );
 
-Text getMemNameTextOnListAt(WidgetTester widgetTester, int index) =>
-    widgetTester.widget(findMemNameTextOnListAt(index)) as Text;
-
 void expectMemNameTextOnListAt(
   WidgetTester widgetTester,
   int index,
   String memName,
 ) =>
     expect(
-      getMemNameTextOnListAt(widgetTester, index).data,
+      widgetTester.widget<Text>(findMemNameTextOnListAt(index)).data,
       memName,
     );
 
