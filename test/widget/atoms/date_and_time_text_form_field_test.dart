@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/l10n.dart';
-import 'package:mem/logger.dart';
 import 'package:mem/views/molecules/date_and_time_text_form_field.dart';
 import 'package:mem/views/atoms/date_text_form_field.dart';
 import 'package:mem/views/atoms/time_of_day_text_form_field.dart';
@@ -9,8 +8,6 @@ import 'package:mem/views/atoms/time_of_day_text_form_field.dart';
 import '../../_helpers.dart';
 
 void main() {
-  Logger(level: Level.verbose);
-
   Future pumpDateTimeTextField(
     WidgetTester widgetTester,
     DateTime? date,
@@ -128,6 +125,7 @@ void main() {
           null,
           null,
           (pickedDate, pickedTimeOfDay) {
+            expect(pickedDate, isA<DateTime>());
             expect(pickedTimeOfDay, isNull);
           },
         );
@@ -145,7 +143,8 @@ void main() {
           null,
           TimeOfDay.now(),
           (pickedDate, pickedTimeOfDay) {
-            expect(pickedDate.runtimeType, DateTime);
+            expect(pickedDate, isNull);
+            expect(pickedTimeOfDay, isA<TimeOfDay>());
           },
         );
 

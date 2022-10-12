@@ -6,14 +6,11 @@ import 'package:mem/database/database.dart';
 import 'package:mem/database/database_manager.dart';
 import 'package:mem/database/indexed_database.dart';
 import 'package:mem/database/sqlite_database.dart';
-import 'package:mem/logger.dart';
 
 import '../_helpers.dart';
 import 'definitions.dart';
 
 void main() {
-  Logger(level: Level.verbose);
-
   testDatabaseManager();
 }
 
@@ -22,20 +19,20 @@ void testDatabaseManager() => group(
       () {
         if (Platform.isAndroid || Platform.isWindows) {
           setUp(() async {
-            await DatabaseManager().delete(defD.name);
+            await DatabaseManager(onTest: true).delete(defD.name);
           });
 
           test(
             'Open database twice.',
             () async {
-              final db = await DatabaseManager().open(defD);
+              final db = await DatabaseManager(onTest: true).open(defD);
               if (kIsWeb) {
                 expect(db, isA<IndexedDatabase>());
               } else {
                 expect(db, isA<SqliteDatabase>());
               }
 
-              final openedDb = await DatabaseManager().open(defD);
+              final openedDb = await DatabaseManager(onTest: true).open(defD);
               expect(openedDb, db);
             },
             tags: TestSize.medium,
@@ -45,12 +42,12 @@ void testDatabaseManager() => group(
             'Open and close database.',
             () async {
               const tName = 'tests';
-              final db = await DatabaseManager().open(defD);
+              final db = await DatabaseManager(onTest: true).open(defD);
               final table = db.getTable(tName);
 
-              final closeResult1 = await DatabaseManager().close(defD.name);
+              final closeResult1 = await DatabaseManager(onTest: true).close(defD.name);
               expect(closeResult1, true);
-              final closeResult2 = await DatabaseManager().close(defD.name);
+              final closeResult2 = await DatabaseManager(onTest: true).close(defD.name);
               expect(closeResult2, false);
 
               final directCloseResult = await db.close();
@@ -87,12 +84,12 @@ void testDatabaseManager() => group(
           test(
             'Open and delete database.',
             () async {
-              final db = await DatabaseManager().open(defD);
+              final db = await DatabaseManager(onTest: true).open(defD);
               final table = db.getTable(tableName);
 
-              final deleteResult1 = await DatabaseManager().delete(defD.name);
+              final deleteResult1 = await DatabaseManager(onTest: true).delete(defD.name);
               expect(deleteResult1, true);
-              final deleteResult2 = await DatabaseManager().delete(defD.name);
+              final deleteResult2 = await DatabaseManager(onTest: true).delete(defD.name);
               expect(deleteResult2, false);
 
               final directDeleteResult = await db.delete();

@@ -4,13 +4,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/database/database.dart';
 import 'package:mem/database/database_manager.dart';
 import 'package:mem/database/definitions.dart';
-import 'package:mem/logger.dart';
 import 'package:mem/repositories/_database_tuple_repository.dart';
 
 import '../_helpers.dart';
 
 void main() async {
-  Logger(level: Level.verbose);
   DatabaseManager(onTest: true);
 
   testDatabaseTupleRepository();
@@ -48,18 +46,18 @@ void testDatabaseTupleRepository() => group(
 
           setUp(() async {
             testRepository = TestRepository(
-              (await DatabaseManager().open(testDatabase))
+              (await DatabaseManager(onTest: true).open(testDatabase))
                   .getTable(testTable.name),
             );
           });
           tearDown(() async {
-            await DatabaseManager().delete(testDatabase.name);
+            await DatabaseManager(onTest: true).delete(testDatabase.name);
           });
 
           test(
             'new',
             () async {
-              final database = await DatabaseManager().open(testDatabase);
+              final database = await DatabaseManager(onTest: true).open(testDatabase);
               TestRepository(database.getTable(testTable.name));
             },
             tags: TestSize.medium,

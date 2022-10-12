@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class L10n {
-  static const localizationsDelegates = AppLocalizations.localizationsDelegates;
-  static const supportedLocales = AppLocalizations.supportedLocales;
-
   final AppLocalizations _appLocalizations;
+
+  L10n._(this._appLocalizations);
+
+  late String local = _appLocalizations.localeName;
 
   String appTitle() => _appLocalizations.appTitle;
 
@@ -19,8 +20,6 @@ class L10n {
 
   String saveMemSuccessMessage(String memName) =>
       _appLocalizations.saveMemSuccessMessage(memName);
-
-  String required() => _appLocalizations.required;
 
   String requiredError() => _appLocalizations.requiredError;
 
@@ -66,7 +65,8 @@ class L10n {
 
   String test() => _appLocalizations.test;
 
-  L10n._(this._appLocalizations);
+  static const localizationsDelegates = AppLocalizations.localizationsDelegates;
+  static const supportedLocales = AppLocalizations.supportedLocales;
 
   static L10n? _instance;
 

@@ -16,29 +16,25 @@ final databaseDefinition = DefD(
   ],
 );
 
-Future<void> main({String? languageCode}) => t(
-      {},
-      () async {
-        await openDatabase();
+Future<void> main({String? languageCode}) async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-        runApp(MemApplication(languageCode));
-      },
-    );
+  initializeLogger();
 
-Future<Database> openDatabase() => t(
-      {},
-      () async {
-        WidgetsFlutterBinding.ensureInitialized();
+  await openDatabase();
 
-        final database = await DatabaseManager().open(databaseDefinition);
+  runApp(MemApplication(languageCode));
+}
 
-        MemRepository(
-          database.getTable(memTableDefinition.name),
-        );
-        MemItemRepository(
-          database.getTable(memItemTableDefinition.name),
-        );
+Future<Database> openDatabase() async {
+  final database = await DatabaseManager().open(databaseDefinition);
 
-        return database;
-      },
-    );
+  MemRepository(
+    database.getTable(memTableDefinition.name),
+  );
+  MemItemRepository(
+    database.getTable(memItemTableDefinition.name),
+  );
+
+  return database;
+}

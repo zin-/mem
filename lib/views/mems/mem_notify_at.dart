@@ -1,42 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/domains/mem.dart';
 import 'package:mem/views/atoms/hero_view.dart';
 import 'package:mem/views/molecules/date_and_time_text_form_field.dart';
-
-Widget? buildMemNotifyAtText(Mem mem) {
-  if (mem.notifyOn == null) {
-    return null;
-  } else {
-    return MemNotifyAtText(mem);
-  }
-}
+import 'package:mem/views/molecules/date_and_time_view.dart';
 
 String memNotifyAtTag(int? memId) => heroTag('mem-notifyAt', memId);
 
-class MemNotifyAtText extends StatelessWidget {
-  final Mem _mem;
-  final DateFormat _dateFormat = DateFormat.yMd();
+Widget? buildMemNotifyAtText(Mem mem) => v(
+      {'mem': mem},
+      () {
+        final memNotifyOn = mem.notifyOn;
+        return memNotifyOn == null
+            ? null
+            : MemNotifyAtText(mem.id, memNotifyOn, mem.notifyAt);
+      },
+    );
 
-  MemNotifyAtText(this._mem, {super.key});
+class MemNotifyAtText extends DateAndTimeText {
+  final int _memId;
+
+  MemNotifyAtText(
+    this._memId,
+    DateTime memNotifyOn,
+    TimeOfDay? memNotifyAt, {
+    super.key,
+  }) : super(memNotifyOn, memNotifyAt);
 
   @override
   Widget build(BuildContext context) => v(
-        {'_mem': _mem},
-        () {
-          final notifyOnText = _dateFormat.format(_mem.notifyOn!);
-          final notifyAtText = _mem.notifyAt?.format(context);
-
-          return HeroView(
-            memNotifyAtTag(_mem.id),
-            Text(
-              [notifyOnText, notifyAtText]
-                  .where((element) => element != null)
-                  .join(' '),
-            ),
-          );
-        },
+        {'_memId': _memId},
+        () => HeroView(
+          memNotifyAtTag(_memId),
+          super.build(context),
+        ),
       );
 }
 
@@ -52,15 +49,13 @@ class MemNotifyAtTextFormField extends StatelessWidget {
   @override
   Widget build(BuildContext context) => v(
         {'_mem': _mem, '_onChanged': _onChanged},
-        () {
-          return HeroView(
-            memNotifyAtTag(_mem.id),
-            DateAndTimeTextFormField(
-              date: _mem.notifyOn,
-              timeOfDay: _mem.notifyAt,
-              onChanged: _onChanged,
-            ),
-          );
-        },
+        () => HeroView(
+          memNotifyAtTag(_mem.id),
+          DateAndTimeTextFormField(
+            date: _mem.notifyOn,
+            timeOfDay: _mem.notifyAt,
+            onChanged: _onChanged,
+          ),
+        ),
       );
 }

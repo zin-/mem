@@ -36,9 +36,6 @@ abstract class DatabaseTupleEntity {
         updatedAtColumnName: updatedAt,
         archivedAtColumnName: archivedAt,
       };
-
-  @override
-  String toString() => toMap().toString();
 }
 
 final defaultColumnDefinitions = [

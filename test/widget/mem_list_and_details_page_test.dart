@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/logger.dart';
 import 'package:mem/domains/mem.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
@@ -14,8 +13,6 @@ import 'mem_detail/mem_detail_menu_test.dart';
 import 'mem_detail/mem_detail_body_test.dart';
 
 void main() {
-  Logger(level: Level.verbose);
-
   final mockedMemRepository = MockMemRepository();
   MemRepository.reset(mockedMemRepository);
   final mockedMemItemRepository = MockMemItemRepository();

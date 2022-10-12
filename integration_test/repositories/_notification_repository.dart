@@ -2,15 +2,12 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:logger/logger.dart';
 import 'package:mem/repositories/notification_repository.dart';
 
 import '../_helpers.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
-  Logger(level: Level.verbose);
 
   testNotificationRepository();
 }

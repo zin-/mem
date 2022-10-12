@@ -142,7 +142,7 @@ class SqliteDatabase extends Database {
           for (var tableDefinition in definition.tableDefinitions) {
             if (!foreignKeyIsEnabled &&
                 tableDefinition.columns.whereType<DefFK>().isNotEmpty) {
-              trace('Enable foreign key');
+              verbose('Enable foreign key');
               await db.execute('PRAGMA foreign_keys=true');
               foreignKeyIsEnabled = true;
             }

@@ -1,5 +1,4 @@
 import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/domains/mem.dart';
@@ -122,45 +121,66 @@ final sortedMemList =
       final filteredMemList = ref.watch(filteredMemListProvider);
 
       final sortedMemList = filteredMemList.sorted((item1, item2) {
-        if (item1.doneAt != item2.doneAt) {
-          if (item1.doneAt == null) {
-            return -1;
-          }
-          if (item2.doneAt == null) {
+        if (item1.isDone() != item2.isDone()) {
+          if (item1.isDone()) {
             return 1;
+          }
+          if (item2.isDone()) {
+            return -1;
           }
         }
 
-        if (item1.archivedAt != item2.archivedAt) {
-          if (item1.archivedAt == null) {
-            return -1;
-          }
-          if (item2.archivedAt == null) {
+        if (item1.isArchived() != item2.isArchived()) {
+          if (item1.isArchived()) {
             return 1;
           }
-          return item1.archivedAt!.compareTo(item2.archivedAt!);
-        }
-
-        if (item1.notifyOn != item2.notifyOn) {
-          if (item1.notifyOn == null) {
-            return 1;
-          }
-          if (item2.notifyOn == null) {
+          if (item2.isArchived()) {
             return -1;
           }
-          return item1.notifyOn!.compareTo(item2.notifyOn!);
         }
 
-        if (item1.notifyOn != null && item2.notifyOn != null) {
-          if (item1.notifyAt != item2.notifyAt) {
-            if (item1.notifyAt == null) {
-              return -1;
-            }
-            if (item2.notifyAt == null) {
-              return 1;
-            }
+        // FIXME ここきもすぎない？
+        final notifyOn1 = item1.notifyOn;
+        final notifyOn2 = item2.notifyOn;
+        if (notifyOn1 != notifyOn2) {
+          if (notifyOn1 == null) {
+            return 1;
+          }
+          if (notifyOn2 == null) {
+            return -1;
+          }
+        }
 
-            return item1.notifyAt!.compareTo(item2.notifyAt!);
+        if (notifyOn1 != null && notifyOn2 != null) {
+          final notifyAt1 = notifyOn1
+              .subtract(Duration(
+                hours: notifyOn1.hour,
+                minutes: notifyOn1.minute,
+                seconds: notifyOn1.second,
+                milliseconds: notifyOn1.millisecond,
+                microseconds: notifyOn1.microsecond,
+              ))
+              .add(Duration(
+                hours: item1.notifyAt?.hour ?? 0,
+                minutes: item1.notifyAt?.minute ?? 0,
+              ));
+          final notifyAt2 = notifyOn2
+              .subtract(Duration(
+                hours: notifyOn2.hour,
+                minutes: notifyOn2.minute,
+                seconds: notifyOn2.second,
+                milliseconds: notifyOn2.millisecond,
+                microseconds: notifyOn2.microsecond,
+              ))
+              .add(Duration(
+                hours: item2.notifyAt?.hour ?? 0,
+                minutes: item2.notifyAt?.minute ?? 0,
+              ));
+
+          final comparedNotifyAt = notifyAt1.compareTo(notifyAt2);
+
+          if (comparedNotifyAt != 0) {
+            return comparedNotifyAt;
           }
         }
 
@@ -171,15 +191,3 @@ final sortedMemList =
     },
   ),
 );
-
-extension TimeOfDayExtension on TimeOfDay {
-  int compareTo(TimeOfDay other) {
-    if (hour != other.hour) {
-      return hour.compareTo(other.hour);
-    }
-    if (minute != other.minute) {
-      return minute.compareTo(other.minute);
-    }
-    return 0;
-  }
-}

@@ -5,7 +5,10 @@ import 'package:mem/database/indexed_database.dart';
 import 'package:mem/database/sqlite_database.dart';
 import 'package:mem/logger.dart';
 
+// FIXME Managerであることが分からない実装にしたい
+// 具体的には、Databaseクラスのfactoryだけで完結させたい
 class DatabaseManager {
+  // FIXME Managerがテスト中かどうかを保持するのは正しいか？
   final bool _onTest;
   final _databases = <String, Database>{};
 
@@ -13,20 +16,20 @@ class DatabaseManager {
     DatabaseDefinition definition,
   ) =>
       t(
-        {'definition': definition, 'name': _dbName(definition.name)},
+        {'definition': definition},
         () async {
-          final dbName = _dbName(definition.name);
-          final dbDefinition =
+          // FIXME ログの出し方が気持ち悪い
+          final dbName = trace(_dbName(definition.name));
+          definition =
               DefD(dbName, definition.version, definition.tableDefinitions);
 
           if (_databases.containsKey(dbName)) {
             warn('Database: $dbName is opened.');
           } else {
-            trace('Open database. name: $dbName');
             final database = await (kIsWeb
-                    ? IndexedDatabase(dbDefinition) // coverage:ignore-line
+                    ? IndexedDatabase(definition) // coverage:ignore-line
                     // WEBでテストするときにカバレッジを取得する方法がないため
-                    : SqliteDatabase(dbDefinition))
+                    : SqliteDatabase(definition))
                 .open();
             _databases.putIfAbsent(dbName, () => database);
           }
