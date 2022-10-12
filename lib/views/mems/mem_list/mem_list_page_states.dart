@@ -122,8 +122,6 @@ final sortedMemList =
       final filteredMemList = ref.watch(filteredMemListProvider);
 
       final sortedMemList = filteredMemList.sorted((item1, item2) {
-        dev({'item1': item1, 'item2': item2});
-
         if (item1.doneAt != item2.doneAt) {
           if (item1.doneAt == null) {
             return -1;
@@ -143,26 +141,39 @@ final sortedMemList =
           return item1.archivedAt!.compareTo(item2.archivedAt!);
         }
 
-        if (item1.notifyOn != item2.notifyOn) {
-          if (item1.notifyOn == null) {
+        final notifyOn1 = item1.notifyOn;
+        final notifyOn2 = item2.notifyOn;
+        if (notifyOn1 != notifyOn2) {
+          if (notifyOn1 == null) {
             return 1;
           }
-          if (item2.notifyOn == null) {
+          if (notifyOn2 == null) {
             return -1;
           }
-          return item1.notifyOn!.compareTo(item2.notifyOn!);
+          return notifyOn1.compareTo(notifyOn2);
         }
 
-        if (item1.notifyOn != null && item2.notifyOn != null) {
-          if (item1.notifyAt != item2.notifyAt) {
-            if (item1.notifyAt == null) {
+        if (notifyOn1 != null && notifyOn2 != null) {
+          final notifyAt1 = item1.notifyAt;
+          final notifyAt2 = item2.notifyAt;
+
+          if (notifyAt1 != notifyAt2) {
+            if (notifyAt1 == null) {
               return -1;
             }
-            if (item2.notifyAt == null) {
+            if (notifyAt2 == null) {
               return 1;
             }
 
-            return item1.notifyAt!.compareTo(item2.notifyAt!);
+            return notifyOn1
+                .add(Duration(
+                  hours: notifyAt1.hour,
+                  minutes: notifyAt1.minute,
+                ))
+                .compareTo(notifyOn2.add(Duration(
+                  hours: notifyAt2.hour,
+                  minutes: notifyAt2.minute,
+                )));
           }
         }
 
