@@ -150,10 +150,13 @@ final sortedMemList =
           if (notifyOn2 == null) {
             return -1;
           }
-          return notifyOn1.compareTo(notifyOn2);
-        }
 
-        if (notifyOn1 != null && notifyOn2 != null) {
+          final comparedNotifyOn = notifyOn1.compareTo(notifyOn2);
+
+          if (comparedNotifyOn != 0) {
+            return comparedNotifyOn;
+          }
+
           final notifyAt1 = item1.notifyAt;
           final notifyAt2 = item2.notifyAt;
 
