@@ -51,6 +51,8 @@ void testMemoScenario() => group(
 
             await widgetTester.tap(showTimePickerIconFinder);
             await widgetTester.pumpAndSettle();
+            // FIXME 特定の時間を選択する
+            // 現状だと現在時刻が選択され、タイミングによってはテストが失敗する
             await widgetTester.tap(okFinder);
             await widgetTester.pumpAndSettle();
 
