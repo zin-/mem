@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/domains/mem.dart';
+import 'package:mem/views/colors.dart';
 import 'package:mem/views/mems/mem_done_checkbox.dart';
 import 'package:mem/views/mems/mem_list/mem_list_item_actions.dart';
 import 'package:mem/views/mems/mem_name.dart';
@@ -24,5 +25,6 @@ class MemListItemView extends ListTile {
           title: MemNameText(mem.name, mem.id),
           subtitle: buildMemNotifyAtText(mem),
           onTap: onTap,
+          tileColor: mem.isArchived() ? archivedColor : null,
         );
 }
