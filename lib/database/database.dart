@@ -100,9 +100,6 @@ class NotFoundException extends DatabaseException {
 
 class ParentNotFoundException extends NotFoundException {
   ParentNotFoundException(super.targetName, super.conditions);
-
-  @override
-  String toString() => 'Parent ${super.toString()}';
 }
 
 class DatabaseDoesNotExistException extends DatabaseException {

@@ -21,8 +21,6 @@ class L10n {
   String saveMemSuccessMessage(String memName) =>
       _appLocalizations.saveMemSuccessMessage(memName);
 
-  String required() => _appLocalizations.required;
-
   String requiredError() => _appLocalizations.requiredError;
 
   String archiveMemSuccessMessage(String memName) =>

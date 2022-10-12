@@ -1,5 +1,4 @@
 import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/domains/mem.dart';
@@ -192,15 +191,3 @@ final sortedMemList =
     },
   ),
 );
-
-extension TimeOfDayExtension on TimeOfDay {
-  int compareTo(TimeOfDay other) {
-    if (hour != other.hour) {
-      return hour.compareTo(other.hour);
-    }
-    if (minute != other.minute) {
-      return minute.compareTo(other.minute);
-    }
-    return 0;
-  }
-}
