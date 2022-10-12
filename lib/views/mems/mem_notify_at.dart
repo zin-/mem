@@ -7,20 +7,32 @@ import 'package:mem/views/molecules/date_and_time_view.dart';
 
 String memNotifyAtTag(int? memId) => heroTag('mem-notifyAt', memId);
 
-Widget? buildMemNotifyAtText(Mem mem) =>
-    mem.notifyOn == null ? null : MemNotifyAtText(mem);
+Widget? buildMemNotifyAtText(Mem mem) => v(
+      {'mem': mem},
+      () {
+        final memNotifyOn = mem.notifyOn;
+        return memNotifyOn == null
+            ? null
+            : MemNotifyAtText(mem.id, memNotifyOn, mem.notifyAt);
+      },
+    );
 
-class MemNotifyAtText extends StatelessWidget {
-  final Mem _mem;
+class MemNotifyAtText extends DateAndTimeText {
+  final int _memId;
 
-  const MemNotifyAtText(this._mem, {super.key});
+  MemNotifyAtText(
+    this._memId,
+    DateTime memNotifyOn,
+    TimeOfDay? memNotifyAt, {
+    super.key,
+  }) : super(memNotifyOn, memNotifyAt);
 
   @override
   Widget build(BuildContext context) => v(
-        {'_mem': _mem},
+        {'_memId': _memId},
         () => HeroView(
-          memNotifyAtTag(_mem.id),
-          DateAndTimeText(_mem.notifyOn, _mem.notifyAt),
+          memNotifyAtTag(_memId),
+          super.build(context),
         ),
       );
 }

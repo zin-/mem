@@ -1,37 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mem/l10n.dart';
-import 'package:mem/logger.dart';
 
 final _dateFormat = DateFormat.yMd(L10n().local);
-final _dateAndTimeFormat = _dateFormat.add_Hm();
+final _dateAndTimeFormat = DateFormat(_dateFormat.pattern).add_Hm();
 
-class DateAndTimeText extends StatelessWidget {
-  final DateTime? _date;
-  final TimeOfDay? _timeOfDay;
-
-  const DateAndTimeText(this._date, this._timeOfDay, {super.key});
-
-  @override
-  Widget build(BuildContext context) => v(
-        {'_date': _date, '_timeOfDay': _timeOfDay},
-        () {
-          final date = _date;
-          if (date == null) return const SizedBox.shrink();
-
-          final timeOfDay = _timeOfDay;
-          if (timeOfDay == null) return Text(_dateFormat.format(date));
-
-          return Text(
-            _dateAndTimeFormat.format(
-              date.add(
-                Duration(
+class DateAndTimeText extends Text {
+  DateAndTimeText(DateTime date, TimeOfDay? timeOfDay, {super.key})
+      : super(timeOfDay == null
+            ? _dateFormat.format(date)
+            : _dateAndTimeFormat.format(
+                date.add(Duration(
                   hours: timeOfDay.hour,
                   minutes: timeOfDay.minute,
-                ),
-              ),
-            ),
-          );
-        },
-      );
+                )),
+              ));
 }

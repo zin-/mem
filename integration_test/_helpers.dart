@@ -5,7 +5,9 @@ import 'package:mem/main.dart' as app;
 import 'package:mem/domains/mem.dart';
 import 'package:mem/services/mem_service.dart';
 import 'package:mem/views/mems/mem_detail/mem_items_view.dart';
+import 'package:mem/views/mems/mem_list/mem_list_item_view.dart';
 import 'package:mem/views/mems/mem_name.dart';
+import 'package:mem/views/mems/mem_notify_at.dart';
 import 'package:mem/views/molecules/date_and_time_text_form_field.dart';
 
 // FIXME integration testでrepositoryを参照するのはNG
@@ -103,6 +105,10 @@ final showTimePickerIconFinder = find.descendant(
 final clearDateAndTimeIconFinder = find.descendant(
   of: find.byType(DateAndTimeTextFormField),
   matching: find.byIcon(Icons.clear),
+);
+final memNotifyAtTextFinder = find.descendant(
+  of: find.byType(MemListItemView),
+  matching: find.byType(MemNotifyAtText),
 );
 
 Future<void> prepareSavedMem(

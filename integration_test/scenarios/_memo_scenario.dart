@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:mem/database/database_manager.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/repositories/log_repository.dart';
+import 'package:mem/views/mems/mem_notify_at.dart';
 
 import '../_helpers.dart';
 
@@ -69,8 +70,10 @@ void testMemoScenario() => group(
             expect(find.text(enteringMemName), findsOneWidget);
             expect(find.text(enteringMemMemo), findsNothing);
             expect(
-              find.text(DateFormat.yMd('en').add_Hm().format(DateTime.now())),
-              findsOneWidget,
+              widgetTester
+                  .widget<MemNotifyAtText>(memNotifyAtTextFinder)
+                  .data,
+              DateFormat.yMd('en').add_Hm().format(DateTime.now()),
             );
           },
           tags: TestSize.medium,
