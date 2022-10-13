@@ -4,7 +4,10 @@ import 'package:mem/services/log_service.dart';
 
 const _filePath = 'mem/logger';
 
-LogService _logService = LogService(Level.error);
+LogService _logService = LogService(
+  (kDebugMode ? Level.trace : Level.error),
+  ignoreFilePaths: [_filePath],
+);
 
 void initializeLogger([Level? logLevel]) {
   LogService.reset();
