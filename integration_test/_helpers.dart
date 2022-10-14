@@ -107,8 +107,11 @@ final clearDateAndTimeIconFinder = find.descendant(
   matching: find.byIcon(Icons.clear),
 );
 final memNotifyAtTextFinder = find.descendant(
-  of: find.byType(MemListItemView),
-  matching: find.byType(MemNotifyAtText),
+  of: find.descendant(
+    of: find.byType(MemListItemView),
+    matching: find.byType(MemNotifyAtText),
+  ),
+  matching: find.byType(Text),
 );
 
 Future<void> prepareSavedMem(

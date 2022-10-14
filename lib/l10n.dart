@@ -6,7 +6,7 @@ class L10n {
 
   L10n._(this._appLocalizations);
 
-  late String local = _appLocalizations.localeName;
+  late String locale = _appLocalizations.localeName;
 
   String appTitle() => _appLocalizations.appTitle;
 
@@ -72,10 +72,12 @@ class L10n {
 
   factory L10n([BuildContext? context]) {
     var tmp = _instance;
-    if (tmp == null && context != null) {
+    if (tmp == null) {
+      if (context == null) throw Error();
+
       tmp = L10n._(AppLocalizations.of(context));
       _instance = tmp;
     }
-    return tmp!;
+    return tmp;
   }
 }

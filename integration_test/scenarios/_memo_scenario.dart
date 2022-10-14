@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 import 'package:mem/database/database_manager.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/repositories/log_repository.dart';
-import 'package:mem/views/mems/mem_notify_at.dart';
 
 import '../_helpers.dart';
 
@@ -74,17 +73,13 @@ void testMemoScenario() => group(
             // FIXME シナリオテストでここまでしないといけないのはなんとかしたい
             try {
               expect(
-                widgetTester
-                    .widget<MemNotifyAtText>(memNotifyAtTextFinder)
-                    .data,
+                widgetTester.widget<Text>(memNotifyAtTextFinder).data,
                 DateFormat.yMd('en').add_Hm().format(now),
               );
             } catch (e) {
               warn(e);
               expect(
-                widgetTester
-                    .widget<MemNotifyAtText>(memNotifyAtTextFinder)
-                    .data,
+                widgetTester.widget<Text>(memNotifyAtTextFinder).data,
                 DateFormat.yMd('en')
                     .add_Hm()
                     .format(now.subtract(const Duration(minutes: 1))),

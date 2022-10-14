@@ -20,7 +20,7 @@ Widget? buildMemNotifyAtText(Mem mem) => v(
 class MemNotifyAtText extends DateAndTimeText {
   final int _memId;
 
-  MemNotifyAtText(
+  const MemNotifyAtText(
     this._memId,
     DateTime memNotifyOn,
     TimeOfDay? memNotifyAt, {

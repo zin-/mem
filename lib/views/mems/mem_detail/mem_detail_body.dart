@@ -6,7 +6,7 @@ import 'package:mem/views/mems/mem_notify_at.dart';
 import 'package:mem/views/mems/mem_done_checkbox.dart';
 import 'package:mem/views/mems/mem_name.dart';
 import 'package:mem/views/mems/mem_detail/mem_detail_states.dart';
-import 'package:mem/views/molecules/date_and_time_period.dart';
+// import 'package:mem/views/molecules/date_and_time_period.dart';
 
 class MemDetailBody extends StatelessWidget {
   final int? _memId;
@@ -52,7 +52,7 @@ class MemDetailBody extends StatelessWidget {
                               ..notifyAt = timeOfDay,
                           ),
                     ),
-                    DateAndTimePeriodFields(),
+                    // DateAndTimePeriodFields(),
                     MemItemsView(_memId),
                   ],
                 );
