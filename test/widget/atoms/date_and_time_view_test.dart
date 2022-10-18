@@ -85,6 +85,31 @@ void main() {
       tags: TestSize.small,
     );
   });
+
+  group('DateTextFormField', () {
+    group('Appearance', () {
+      testWidgets(
+        ': input null',
+        (widgetTester) async {
+          await runWidget(
+            widgetTester,
+            DateTextFormFieldV2(
+              date: null, /*onChanged: (pickedDate) {}*/
+            ),
+          );
+          await widgetTester.pump();
+
+          expect(
+            widgetTester
+                .widget<TextFormField>(find.byType(TextFormField))
+                .initialValue,
+            '',
+          );
+        },
+        tags: TestSize.small,
+      );
+    });
+  });
 }
 
 final dateAndTimeTextFinder = find.byType(DateAndTimeText);

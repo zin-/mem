@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mem/logger.dart';
 
+@Deprecated('use V2')
 class DateTextFormField extends StatelessWidget {
   final DateTime? date;
   final Function(DateTime? pickedDate) onChanged;
