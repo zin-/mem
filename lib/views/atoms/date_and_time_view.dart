@@ -18,12 +18,10 @@ class DateAndTimeText extends StatelessWidget {
   @override
   Widget build(BuildContext context) => v(
         {'_dateAndTime': _dateAndTime},
-        () {
-          return Text(
-            _dateAndTime.isAllDay
-                ? buildDateFormat(context).format(_dateAndTime)
-                : buildDateAndTimeFormat(context).format(_dateAndTime),
-          );
-        },
+        () => Text(
+          _dateAndTime.isAllDay
+              ? buildDateFormat(context).format(_dateAndTime)
+              : buildDateAndTimeFormat(context).format(_dateAndTime),
+        ),
       );
 }

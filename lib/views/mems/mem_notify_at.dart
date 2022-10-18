@@ -4,7 +4,7 @@ import 'package:mem/logger.dart';
 import 'package:mem/domains/mem.dart';
 import 'package:mem/views/atoms/hero_view.dart';
 import 'package:mem/views/molecules/date_and_time_text_form_field.dart';
-import 'package:mem/views/molecules/date_and_time_view.dart';
+import 'package:mem/views/atoms/date_and_time_view.dart';
 
 String memNotifyAtTag(int? memId) => heroTag('mem-notifyAt', memId);
 
