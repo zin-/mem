@@ -65,13 +65,16 @@ class L10n {
   String formatDate(DateTime date) =>
       _materialLocalizations.formatCompactDate(date);
 
+  String formatTimeOfDay(TimeOfDay timeOfDay) =>
+      _materialLocalizations.formatTimeOfDay(
+        timeOfDay,
+        alwaysUse24HourFormat: true,
+      );
+
   String formatDateTime(DateTime dateTime) {
     return [
       formatDate(dateTime),
-      _materialLocalizations.formatTimeOfDay(
-        TimeOfDay.fromDateTime(dateTime),
-        alwaysUse24HourFormat: true,
-      )
+      formatTimeOfDay(TimeOfDay.fromDateTime(dateTime))
     ].join(' ');
   }
 

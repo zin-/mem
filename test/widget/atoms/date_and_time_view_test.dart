@@ -237,11 +237,11 @@ void main() {
 
   group('TimeOfDayTextFormFieldV2', () {
     group(': Appearance', () {
-      const timeOfDay = null;
-
       testWidgets(
         'time of day is null',
         (widgetTester) async {
+          const timeOfDay = null;
+
           await runWidget(
             widgetTester,
             const TimeOfDayTextFormFieldV2(timeOfDay),
@@ -252,6 +252,26 @@ void main() {
                 .widget<TextFormField>(find.byType(TextFormField))
                 .initialValue,
             '',
+          );
+        },
+        tags: TestSize.small,
+      );
+
+      testWidgets(
+        'time of day is not null',
+        (widgetTester) async {
+          const timeOfDay = TimeOfDay(hour: 13, minute: 32);
+
+          await runWidget(
+            widgetTester,
+            const TimeOfDayTextFormFieldV2(timeOfDay),
+          );
+
+          expect(
+            widgetTester
+                .widget<TextFormField>(find.byType(TextFormField))
+                .initialValue,
+            '13:32',
           );
         },
         tags: TestSize.small,

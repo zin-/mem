@@ -78,7 +78,13 @@ class TimeOfDayTextFormFieldV2 extends StatelessWidget {
   Widget build(BuildContext context) => v(
         {'_timeOfDay': _timeOfDay},
         () {
-          return TextFormField();
+          final l10n = L10n(context);
+          final timeOfDay = _timeOfDay;
+
+          return TextFormField(
+            initialValue:
+                timeOfDay == null ? '' : l10n.formatTimeOfDay(timeOfDay),
+          );
         },
       );
 }
