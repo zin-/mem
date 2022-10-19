@@ -71,9 +71,24 @@ class DateAndTimeTextFormFieldV2 extends StatelessWidget {
   Widget build(BuildContext context) => v(
         {'_dateAndTime': _dateAndTime},
         () {
+          final dateAndTime = _dateAndTime;
+
           return Row(
             children: [
-              Expanded(child: DateTextFormFieldV2(null, (pickedDate) {})),
+              Expanded(
+                child: DateTextFormFieldV2(
+                  dateAndTime,
+                  (pickedDate) {},
+                ),
+              ),
+              dateAndTime == null || dateAndTime.isAllDay
+                  ? const SizedBox.shrink()
+                  : Expanded(
+                      child: TimeOfDayTextFormFieldV2(
+                        TimeOfDay.fromDateTime(dateAndTime),
+                        (pickedTimeOfDay) {},
+                      ),
+                    )
             ],
           );
         },
