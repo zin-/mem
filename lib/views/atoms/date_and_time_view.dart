@@ -68,3 +68,17 @@ class DateTextFormFieldV2 extends StatelessWidget {
         },
       );
 }
+
+class TimeOfDayTextFormFieldV2 extends StatelessWidget {
+  final TimeOfDay? _timeOfDay;
+
+  const TimeOfDayTextFormFieldV2(this._timeOfDay, {super.key});
+
+  @override
+  Widget build(BuildContext context) => v(
+        {'_timeOfDay': _timeOfDay},
+        () {
+          return TextFormField();
+        },
+      );
+}

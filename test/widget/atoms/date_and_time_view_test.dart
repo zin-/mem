@@ -234,6 +234,30 @@ void main() {
       });
     });
   });
+
+  group('TimeOfDayTextFormFieldV2', () {
+    group(': Appearance', () {
+      const timeOfDay = null;
+
+      testWidgets(
+        'time of day is null',
+        (widgetTester) async {
+          await runWidget(
+            widgetTester,
+            const TimeOfDayTextFormFieldV2(timeOfDay),
+          );
+
+          expect(
+            widgetTester
+                .widget<TextFormField>(find.byType(TextFormField))
+                .initialValue,
+            '',
+          );
+        },
+        tags: TestSize.small,
+      );
+    });
+  });
 }
 
 final dateAndTimeTextFinder = find.byType(DateAndTimeText);
