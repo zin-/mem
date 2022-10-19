@@ -27,23 +27,28 @@ class DateAndTimeText extends StatelessWidget {
 }
 
 class DateTextFormFieldV2 extends StatelessWidget {
-  final DateTime? date;
+  final DateTime? _date;
 
   // final Function(DateTime? pickedDate) onChanged;
 
   // final DateFormat _dateFormat = DateFormat.yMd();
 
-  DateTextFormFieldV2({
-    required this.date,
+  DateTextFormFieldV2(
+    this._date, {
     // required this.onChanged,
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) => v(
-        {'date': date},
+        {'_date': _date},
         () {
-          return TextFormField();
+          final date = _date;
+
+          return TextFormField(
+            initialValue:
+                date == null ? '' : buildDateFormat(context).format(date),
+          );
           // return TextFormField(
           //   controller: TextEditingController(
           //     text: date == null ? '' : _dateFormat.format(date!),

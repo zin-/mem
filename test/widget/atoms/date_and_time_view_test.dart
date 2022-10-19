@@ -86,15 +86,18 @@ void main() {
     );
   });
 
-  group('DateTextFormField', () {
+  group('DateTextFormFieldV2', () {
     group('Appearance', () {
       testWidgets(
-        ': input null',
+        ': date is null',
         (widgetTester) async {
+          const date = null;
+
           await runWidget(
             widgetTester,
             DateTextFormFieldV2(
-              date: null, /*onChanged: (pickedDate) {}*/
+              date,
+              // onChanged: (pickedDate) {}
             ),
           );
           await widgetTester.pump();
@@ -104,6 +107,30 @@ void main() {
                 .widget<TextFormField>(find.byType(TextFormField))
                 .initialValue,
             '',
+          );
+        },
+        tags: TestSize.small,
+      );
+
+      testWidgets(
+        ': date is not null',
+        (widgetTester) async {
+          final date = DateTime(2022, 2, 29);
+
+          await runWidget(
+            widgetTester,
+            DateTextFormFieldV2(
+              date,
+              // onChanged: (pickedDate) {}
+            ),
+          );
+          await widgetTester.pump();
+
+          expect(
+            widgetTester
+                .widget<TextFormField>(find.byType(TextFormField))
+                .initialValue,
+            '3/1/2022',
           );
         },
         tags: TestSize.small,
