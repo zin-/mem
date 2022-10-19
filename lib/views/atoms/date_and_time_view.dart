@@ -1,16 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:mem/domains/date_and_time.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
-
-@Deprecated('use L10n')
-DateFormat buildDateFormat(BuildContext context) =>
-    DateFormat.yMd(L10n(context).locale);
-
-@Deprecated('use L10n')
-DateFormat buildDateAndTimeFormat(BuildContext context) =>
-    buildDateFormat(context).add_Hm();
 
 class DateAndTimeText extends StatelessWidget {
   final DateAndTime _dateAndTime;
@@ -20,11 +11,15 @@ class DateAndTimeText extends StatelessWidget {
   @override
   Widget build(BuildContext context) => v(
         {'_dateAndTime': _dateAndTime},
-        () => Text(
-          _dateAndTime.isAllDay
-              ? buildDateFormat(context).format(_dateAndTime)
-              : buildDateAndTimeFormat(context).format(_dateAndTime),
-        ),
+        () {
+          final l10n = L10n(context);
+
+          return Text(
+            _dateAndTime.isAllDay
+                ? l10n.formatDate(_dateAndTime)
+                : l10n.formatDateTime(_dateAndTime),
+          );
+        },
       );
 }
 
@@ -34,7 +29,7 @@ class DateTextFormFieldV2 extends StatelessWidget {
   final DateTime? _date;
   final Function(DateTime? pickedDate) _onChanged;
 
-  DateTextFormFieldV2(
+  const DateTextFormFieldV2(
     this._date,
     this._onChanged, {
     Key? key,
