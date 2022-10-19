@@ -64,8 +64,13 @@ class DateAndTimeTextFormField extends StatelessWidget {
 
 class DateAndTimeTextFormFieldV2 extends StatelessWidget {
   final DateAndTime? _dateAndTime;
+  final void Function(DateAndTime? pickedDateAndTime) _onChanged;
 
-  const DateAndTimeTextFormFieldV2(this._dateAndTime, {super.key});
+  const DateAndTimeTextFormFieldV2(
+    this._dateAndTime,
+    this._onChanged, {
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) => v(
@@ -88,7 +93,13 @@ class DateAndTimeTextFormFieldV2 extends StatelessWidget {
                         TimeOfDay.fromDateTime(dateAndTime),
                         (pickedTimeOfDay) {},
                       ),
-                    )
+                    ),
+              dateAndTime == null
+                  ? const SizedBox.shrink()
+                  : IconButton(
+                      onPressed: () => _onChanged(null),
+                      icon: const Icon(Icons.clear),
+                    ),
             ],
           );
         },
