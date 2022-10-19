@@ -238,7 +238,7 @@ void main() {
   group('TimeOfDayTextFormFieldV2', () {
     group(': Appearance', () {
       testWidgets(
-        'time of day is null',
+        ': time of day is null',
         (widgetTester) async {
           const timeOfDay = null;
 
@@ -253,12 +253,13 @@ void main() {
                 .initialValue,
             '',
           );
+          expect(pickTimeIconFinder, findsOneWidget);
         },
         tags: TestSize.small,
       );
 
       testWidgets(
-        'time of day is not null',
+        ': time of day is not null',
         (widgetTester) async {
           const timeOfDay = TimeOfDay(hour: 13, minute: 32);
 
@@ -276,6 +277,25 @@ void main() {
         },
         tags: TestSize.small,
       );
+
+      testWidgets(
+        ': show time picker',
+        (widgetTester) async {
+          const timeOfDay = null;
+
+          await runWidget(
+            widgetTester,
+            const TimeOfDayTextFormFieldV2(timeOfDay),
+          );
+
+          await widgetTester.tap(pickTimeIconFinder);
+          await widgetTester.pump();
+
+          expect(okFinder, findsOneWidget);
+          expect(cancelFinder, findsOneWidget);
+        },
+        tags: TestSize.small,
+      );
     });
   });
 }
@@ -283,5 +303,6 @@ void main() {
 final dateAndTimeTextFinder = find.byType(DateAndTimeText);
 
 final pickDateIconFinder = find.byIcon(Icons.calendar_month);
+final pickTimeIconFinder = find.byIcon(Icons.access_time);
 final okFinder = find.text('OK');
 final cancelFinder = find.text('CANCEL');

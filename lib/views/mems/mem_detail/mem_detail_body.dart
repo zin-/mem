@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger.dart';
+import 'package:mem/views/atoms/date_and_time_view.dart';
 import 'package:mem/views/mems/mem_detail/mem_items_view.dart';
 import 'package:mem/views/mems/mem_notify_at.dart';
 import 'package:mem/views/mems/mem_done_checkbox.dart';
 import 'package:mem/views/mems/mem_name.dart';
 import 'package:mem/views/mems/mem_detail/mem_detail_states.dart';
-// import 'package:mem/views/molecules/date_and_time_period.dart';
 
 class MemDetailBody extends StatelessWidget {
   final int? _memId;
@@ -52,8 +52,9 @@ class MemDetailBody extends StatelessWidget {
                               ..notifyAt = timeOfDay,
                           ),
                     ),
-                    // DateAndTimePeriodFields(),
                     MemItemsView(_memId),
+                    TimeOfDayTextFormFieldV2(null),
+                    TimeOfDayTextFormFieldV2(TimeOfDay.now()),
                   ],
                 );
               },

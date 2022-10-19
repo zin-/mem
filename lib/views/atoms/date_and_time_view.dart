@@ -84,6 +84,17 @@ class TimeOfDayTextFormFieldV2 extends StatelessWidget {
           return TextFormField(
             initialValue:
                 timeOfDay == null ? '' : l10n.formatTimeOfDay(timeOfDay),
+            decoration: InputDecoration(
+              suffixIcon: IconButton(
+                onPressed: () async {
+                  await showTimePicker(
+                    context: context,
+                    initialTime: _timeOfDay ?? TimeOfDay.now(),
+                  );
+                },
+                icon: const Icon(Icons.access_time),
+              ),
+            ),
           );
         },
       );
