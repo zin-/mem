@@ -23,6 +23,7 @@ void main() {
 
         expect(dateTextFormFieldFinder, findsOneWidget);
         expect(timeOfDayTextFormFieldFinder, findsNothing);
+        expect(allDaySwitchFinder, findsNothing);
         expect(clearButtonFinder, findsNothing);
       },
       tags: TestSize.small,
@@ -43,7 +44,10 @@ void main() {
 
         expect(dateTextFormFieldFinder, findsOneWidget);
         expect(timeOfDayTextFormFieldFinder, findsNothing);
+        expect(allDaySwitchFinder, findsOneWidget);
         expect(clearButtonFinder, findsOneWidget);
+
+        expect(widgetTester.widget<Switch>(allDaySwitchFinder).value, true);
       },
       tags: TestSize.small,
     );
@@ -63,7 +67,10 @@ void main() {
 
         expect(dateTextFormFieldFinder, findsOneWidget);
         expect(timeOfDayTextFormFieldFinder, findsOneWidget);
+        expect(allDaySwitchFinder, findsOneWidget);
         expect(clearButtonFinder, findsOneWidget);
+
+        expect(widgetTester.widget<Switch>(allDaySwitchFinder).value, false);
       },
       tags: TestSize.small,
     );
@@ -89,9 +96,66 @@ void main() {
       },
       tags: TestSize.small,
     );
+
+    group(': All day', () {
+      testWidgets(
+        ': into not all day',
+        (widgetTester) async {
+          final dateAndTime = DateAndTime.now(allDay: true);
+
+          await runWidget(
+            widgetTester,
+            DateAndTimeTextFormFieldV2(
+              dateAndTime,
+              (pickedDateAndTime) {
+                expect(pickedDateAndTime?.isAllDay, false);
+              },
+            ),
+          );
+
+          await widgetTester.tap(allDaySwitchFinder);
+          await widgetTester.pump();
+        },
+        tags: TestSize.small,
+      );
+
+      testWidgets(
+        ': into all day',
+        (widgetTester) async {
+          final dateAndTime = DateAndTime.now(allDay: false);
+
+          await runWidget(
+            widgetTester,
+            DateAndTimeTextFormFieldV2(
+              dateAndTime,
+              (pickedDateAndTime) {
+                expect(pickedDateAndTime?.isAllDay, true);
+              },
+            ),
+          );
+
+          await widgetTester.tap(allDaySwitchFinder);
+          await widgetTester.pump();
+        },
+        tags: TestSize.small,
+      );
+    });
   });
 }
 
-final dateTextFormFieldFinder = find.byType(DateTextFormFieldV2);
-final timeOfDayTextFormFieldFinder = find.byType(TimeOfDayTextFormFieldV2);
-final clearButtonFinder = find.byIcon(Icons.clear);
+final dateTextFormFieldFinder = find.descendant(
+  of: find.byType(DateAndTimeTextFormFieldV2),
+  matching: find.byType(DateTextFormFieldV2),
+);
+final timeOfDayTextFormFieldFinder = find.descendant(
+  of: find.byType(DateAndTimeTextFormFieldV2),
+  matching: find.byType(TimeOfDayTextFormFieldV2),
+);
+final allDaySwitchFinder = find.descendant(
+  of: find.byType(DateAndTimeTextFormFieldV2),
+  matching: find.byType(Switch),
+);
+final clearButtonFinder = find.descendant(
+  of: find.byType(DateAndTimeTextFormFieldV2),
+  matching: find.byIcon(Icons.clear),
+);
