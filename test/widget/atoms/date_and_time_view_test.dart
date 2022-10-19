@@ -96,7 +96,6 @@ void main() {
               (pickedDate) => fail('should not be called'),
             ),
           );
-          await widgetTester.pump();
 
           expect(
             widgetTester
@@ -121,7 +120,6 @@ void main() {
               (pickedDate) => fail('should not be called'),
             ),
           );
-          await widgetTester.pump();
 
           expect(
             widgetTester
@@ -145,7 +143,6 @@ void main() {
               (pickedDate) => fail('should not be called'),
             ),
           );
-          await widgetTester.pump();
 
           await widgetTester.tap(pickDateIconFinder);
           await widgetTester.pump();
@@ -182,7 +179,6 @@ void main() {
                 },
               ),
             );
-            await widgetTester.pump();
 
             await widgetTester.tap(pickDateIconFinder);
             await widgetTester.pump();
@@ -204,7 +200,6 @@ void main() {
                 (pickedDate) => fail('should not be called'),
               ),
             );
-            await widgetTester.pump();
 
             await widgetTester.tap(pickDateIconFinder);
             await widgetTester.pump();
@@ -228,7 +223,6 @@ void main() {
                 },
               ),
             );
-            await widgetTester.pump();
 
             await widgetTester.tap(pickDateIconFinder);
             await widgetTester.pump();
