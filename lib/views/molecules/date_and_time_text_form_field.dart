@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:mem/domains/date_and_time.dart';
 import 'package:mem/logger.dart';
+import 'package:mem/views/atoms/date_and_time_view.dart';
 import 'package:mem/views/atoms/date_text_form_field.dart';
 import 'package:mem/views/atoms/time_of_day_text_form_field.dart';
 
+@Deprecated('use V2')
 class DateAndTimeTextFormField extends StatelessWidget {
   final DateTime? date;
   final TimeOfDay? timeOfDay;
@@ -53,6 +56,24 @@ class DateAndTimeTextFormField extends StatelessWidget {
                       onPressed: () => onChanged(null, null),
                       icon: const Icon(Icons.clear),
                     ),
+            ],
+          );
+        },
+      );
+}
+
+class DateAndTimeTextFormFieldV2 extends StatelessWidget {
+  final DateAndTime? _dateAndTime;
+
+  const DateAndTimeTextFormFieldV2(this._dateAndTime, {super.key});
+
+  @override
+  Widget build(BuildContext context) => v(
+        {'_dateAndTime': _dateAndTime},
+        () {
+          return Row(
+            children: [
+              Expanded(child: DateTextFormFieldV2(null, (pickedDate) {})),
             ],
           );
         },
