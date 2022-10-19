@@ -3,8 +3,9 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class L10n {
   final AppLocalizations _appLocalizations;
+  final MaterialLocalizations _materialLocalizations;
 
-  L10n._(this._appLocalizations);
+  L10n._(this._appLocalizations, this._materialLocalizations);
 
   late String locale = _appLocalizations.localeName;
 
@@ -60,6 +61,11 @@ class L10n {
   late String reminderName = _appLocalizations.reminder_name;
   late String reminderDescription = _appLocalizations.reminder_description;
 
+  // Date
+  String formatDate(DateTime date) =>
+      _materialLocalizations.formatCompactDate(date);
+  late String dateHelpText = _materialLocalizations.dateHelpText;
+
   // Under development
   String dev() => _appLocalizations.dev;
 
@@ -75,7 +81,10 @@ class L10n {
     if (tmp == null) {
       if (context == null) throw Error();
 
-      tmp = L10n._(AppLocalizations.of(context));
+      tmp = L10n._(
+        AppLocalizations.of(context),
+        MaterialLocalizations.of(context),
+      );
       _instance = tmp;
     }
     return tmp;
