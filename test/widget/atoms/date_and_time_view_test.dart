@@ -244,7 +244,10 @@ void main() {
 
           await runWidget(
             widgetTester,
-            const TimeOfDayTextFormFieldV2(timeOfDay),
+            TimeOfDayTextFormFieldV2(
+              timeOfDay,
+              (pickedTimeOfDay) => fail('should not be called'),
+            ),
           );
 
           expect(
@@ -265,7 +268,10 @@ void main() {
 
           await runWidget(
             widgetTester,
-            const TimeOfDayTextFormFieldV2(timeOfDay),
+            TimeOfDayTextFormFieldV2(
+              timeOfDay,
+              (pickedTimeOfDay) => fail('should not be called'),
+            ),
           );
 
           expect(
@@ -285,7 +291,10 @@ void main() {
 
           await runWidget(
             widgetTester,
-            const TimeOfDayTextFormFieldV2(timeOfDay),
+            TimeOfDayTextFormFieldV2(
+              timeOfDay,
+              (pickedTimeOfDay) => fail('should not be called'),
+            ),
           );
 
           await widgetTester.tap(pickTimeIconFinder);
@@ -296,6 +305,81 @@ void main() {
         },
         tags: TestSize.small,
       );
+    });
+
+    group(': Operation', () {
+      group(': Pick time', () {
+        testWidgets(
+          ': now',
+          (widgetTester) async {
+            const timeOfDay = null;
+
+            await runWidget(
+              widgetTester,
+              TimeOfDayTextFormFieldV2(
+                timeOfDay,
+                (pickedTimeOfDay) {
+                  expect(pickedTimeOfDay, isNotNull);
+
+                  final now = TimeOfDay.now();
+                  expect(pickedTimeOfDay?.hour, now.hour);
+                  expect(pickedTimeOfDay?.minute, now.minute);
+                },
+              ),
+            );
+
+            await widgetTester.tap(pickTimeIconFinder);
+            await widgetTester.pump();
+
+            await widgetTester.tap(okFinder);
+          },
+          tags: TestSize.small,
+        );
+
+        testWidgets(
+          ': initial time is null and cancel',
+          (widgetTester) async {
+            const timeOfDay = null;
+
+            await runWidget(
+              widgetTester,
+              TimeOfDayTextFormFieldV2(
+                timeOfDay,
+                (pickedDate) => fail('should not be called'),
+              ),
+            );
+
+            await widgetTester.tap(pickTimeIconFinder);
+            await widgetTester.pump();
+
+            await widgetTester.tap(cancelFinder);
+          },
+          tags: TestSize.small,
+        );
+
+        testWidgets(
+          ': initial time is not null and cancel',
+          (widgetTester) async {
+            const timeOfDay = TimeOfDay(hour: 13, minute: 32);
+
+            await runWidget(
+              widgetTester,
+              TimeOfDayTextFormFieldV2(
+                timeOfDay,
+                (pickedTimeOfDay) {
+                  expect(pickedTimeOfDay, null);
+                },
+              ),
+            );
+
+            await widgetTester.tap(pickTimeIconFinder);
+            await widgetTester.pump();
+
+            await widgetTester.tap(cancelFinder);
+          },
+          tags: TestSize.small,
+        );
+      });
     });
   });
 }

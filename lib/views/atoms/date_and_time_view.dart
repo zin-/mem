@@ -27,7 +27,7 @@ const maxDuration = Duration(days: 1000000000000000000);
 
 class DateTextFormFieldV2 extends StatelessWidget {
   final DateTime? _date;
-  final Function(DateTime? pickedDate) _onChanged;
+  final void Function(DateTime? pickedDate) _onChanged;
 
   const DateTextFormFieldV2(
     this._date,
@@ -57,7 +57,7 @@ class DateTextFormFieldV2 extends StatelessWidget {
                     lastDate: initialDate.add(maxDuration),
                   );
 
-                  if (_date != pickedDate) {
+                  if (date != pickedDate) {
                     _onChanged(pickedDate);
                   }
                 },
@@ -71,8 +71,9 @@ class DateTextFormFieldV2 extends StatelessWidget {
 
 class TimeOfDayTextFormFieldV2 extends StatelessWidget {
   final TimeOfDay? _timeOfDay;
+  final void Function(TimeOfDay? pickedTimeOfDay) _onChanged;
 
-  const TimeOfDayTextFormFieldV2(this._timeOfDay, {super.key});
+  const TimeOfDayTextFormFieldV2(this._timeOfDay, this._onChanged, {super.key});
 
   @override
   Widget build(BuildContext context) => v(
@@ -87,10 +88,14 @@ class TimeOfDayTextFormFieldV2 extends StatelessWidget {
             decoration: InputDecoration(
               suffixIcon: IconButton(
                 onPressed: () async {
-                  await showTimePicker(
+                  final pickedTimeOfDay = await showTimePicker(
                     context: context,
                     initialTime: _timeOfDay ?? TimeOfDay.now(),
                   );
+
+                  if (_timeOfDay != pickedTimeOfDay) {
+                    _onChanged(pickedTimeOfDay);
+                  }
                 },
                 icon: const Icon(Icons.access_time),
               ),
