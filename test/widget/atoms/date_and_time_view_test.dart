@@ -7,83 +7,79 @@ import '../../_helpers.dart';
 
 void main() {
   group('DateAndTimeText', () {
-    testWidgets(
-      ': date only',
-      (widgetTester) async {
-        final allDayDateAndTime = DateAndTime(2022, 10, 14);
+    group(': Appearance', () {
+      testWidgets(
+        ': date only',
+        (widgetTester) async {
+          final allDayDateAndTime = DateAndTime(2022, 10, 14);
 
-        await runWidget(
-          widgetTester,
-          DateAndTimeText(allDayDateAndTime),
-        );
+          await runWidget(
+            widgetTester,
+            DateAndTimeText(allDayDateAndTime),
+          );
 
-        expect(dateAndTimeTextFinder, findsOneWidget);
-        expect(_textFinder, findsOneWidget);
+          expect(dateAndTimeTextFinder, findsOneWidget);
+          expect(find.byType(Text), findsOneWidget);
 
-        expect(
-          widgetTester
-              .widget<Text>(find.descendant(
-                of: dateAndTimeTextFinder,
-                matching: _textFinder,
-              ))
-              .data,
-          '10/14/2022', // in locale is en
-        );
-      },
-      tags: TestSize.small,
-    );
+          expect(
+            widgetTester
+                .widget<Text>(find.descendant(
+                  of: dateAndTimeTextFinder,
+                  matching: find.byType(Text),
+                ))
+                .data,
+            '10/14/2022', // in locale is en
+          );
+        },
+        tags: TestSize.small,
+      );
 
-    testWidgets(
-      ': date and time',
-      (widgetTester) async {
-        final dateAndTime = DateAndTime(2022, 10, 14, 13, 31);
+      testWidgets(
+        ': date and time',
+        (widgetTester) async {
+          final dateAndTime = DateAndTime(2022, 10, 14, 13, 31);
 
-        await runWidget(
-          widgetTester,
-          DateAndTimeText(dateAndTime),
-        );
+          await runWidget(
+            widgetTester,
+            DateAndTimeText(dateAndTime),
+          );
 
-        expect(dateAndTimeTextFinder, findsOneWidget);
-        expect(_textFinder, findsOneWidget);
+          expect(
+            widgetTester
+                .widget<Text>(find.descendant(
+                  of: dateAndTimeTextFinder,
+                  matching: find.byType(Text),
+                ))
+                .data,
+            '10/14/2022 13:31', // in locale is en
+          );
+        },
+        tags: TestSize.small,
+      );
 
-        expect(
-          widgetTester
-              .widget<Text>(find.descendant(
-                of: dateAndTimeTextFinder,
-                matching: _textFinder,
-              ))
-              .data,
-          '10/14/2022 13:31', // in locale is en
-        );
-      },
-      tags: TestSize.small,
-    );
+      testWidgets(
+        ': 00:00',
+        (widgetTester) async {
+          final dateAndTime = DateAndTime(2022, 10, 14, 0, 0);
 
-    testWidgets(
-      ': 00:00',
-      (widgetTester) async {
-        final dateAndTime = DateAndTime(2022, 10, 14, 0, 0);
+          await runWidget(
+            widgetTester,
+            DateAndTimeText(dateAndTime),
+          );
 
-        await runWidget(
-          widgetTester,
-          DateAndTimeText(dateAndTime),
-        );
-
-        expect(dateAndTimeTextFinder, findsOneWidget);
-        expect(_textFinder, findsOneWidget);
-
-        expect(
-          widgetTester
-              .widget<Text>(find.descendant(
-                of: dateAndTimeTextFinder,
-                matching: _textFinder,
-              ))
-              .data,
-          '10/14/2022 00:00', // in locale is en
-        );
-      },
-      tags: TestSize.small,
-    );
+          expect(
+            widgetTester
+                .widget<Text>(find.descendant(
+                  of: dateAndTimeTextFinder,
+                  matching: find.byType(Text),
+                ))
+                .data,
+            '10/14/2022 00:00', // in locale is en
+          );
+        },
+        tags: TestSize.small,
+      );
+    });
   });
 
   group('DateTextFormFieldV2', () {
@@ -131,7 +127,7 @@ void main() {
             widgetTester
                 .widget<TextFormField>(find.byType(TextFormField))
                 .initialValue,
-            '3/1/2022', // on en locale
+            '3/1/2022', // in locale is en
           );
         },
         tags: TestSize.small,
@@ -247,7 +243,6 @@ void main() {
 }
 
 final dateAndTimeTextFinder = find.byType(DateAndTimeText);
-final _textFinder = find.byType(Text);
 
 final pickDateIconFinder = find.byIcon(Icons.calendar_month);
 final okFinder = find.text('OK');
