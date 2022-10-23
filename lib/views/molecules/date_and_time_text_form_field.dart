@@ -83,24 +83,31 @@ class DateAndTimeTextFormFieldV2 extends StatelessWidget {
               Expanded(
                 child: DateTextFormFieldV2(
                   dateAndTime,
-                  (pickedDate) {},
+                  (pickedDate) => _onChanged(DateAndTime.from(
+                    pickedDate,
+                    timeOfDay: dateAndTime?.timeOfDay,
+                  )),
                 ),
               ),
               dateAndTime == null || dateAndTime.isAllDay
                   ? const SizedBox.shrink()
                   : Expanded(
                       child: TimeOfDayTextFormFieldV2(
-                        TimeOfDay.fromDateTime(dateAndTime),
-                        (pickedTimeOfDay) {},
+                        dateAndTime.timeOfDay,
+                        (pickedTimeOfDay) {
+                          _onChanged(DateAndTime.from(
+                            dateAndTime.dateTime,
+                            timeOfDay: pickedTimeOfDay,
+                          ));
+                        },
                       ),
                     ),
               dateAndTime == null
                   ? const SizedBox.shrink()
                   : Switch(
                       value: dateAndTime.isAllDay,
-                      onChanged: (value) {
-                        _onChanged(dateAndTime..isAllDay = value);
-                      },
+                      onChanged: (allDay) =>
+                          _onChanged(dateAndTime..isAllDay = allDay),
                     ),
               dateAndTime == null
                   ? const SizedBox.shrink()

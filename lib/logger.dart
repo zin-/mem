@@ -56,8 +56,8 @@ T warn<T>(T message) {
 
 // coverage:ignore-start
 @Deprecated('Allow under develop only')
-T? dev<T>([T? message]) {
+T dev<T>([T? message]) {
   _logService.log(message ?? 'Under development.', level: Level.debug);
-  return message;
+  return message as T;
 }
 // coverage:ignore-end

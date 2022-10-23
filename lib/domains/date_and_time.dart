@@ -3,10 +3,6 @@ import 'package:flutter/material.dart';
 class DateAndTime extends DateTime {
   bool isAllDay = false;
 
-  DateAndTime.now({bool allDay = false})
-      : isAllDay = allDay,
-        super.now();
-
   DateAndTime(int year,
       [int month = 1,
       int day = 1,
@@ -31,12 +27,29 @@ class DateAndTime extends DateTime {
           microsecond ?? 0,
         );
 
-  DateAndTime.fromDateTimeAndTimeOfDay(
-    DateTime dateTime,
+  DateAndTime.from(
+    DateTime dateTime, {
     TimeOfDay? timeOfDay,
-  ) : super.now();
+  }) : this(
+          dateTime.year,
+          dateTime.month,
+          dateTime.day,
+          timeOfDay?.hour,
+          timeOfDay?.minute,
+          null,
+          null,
+          null,
+        );
 
-  TimeOfDay? time() => isAllDay ? null : TimeOfDay.fromDateTime(this);
+  DateAndTime.now({bool allDay = false})
+      : this.from(
+          DateTime.now(),
+          timeOfDay: allDay ? null : TimeOfDay.now(),
+        );
+
+  DateTime get dateTime => DateTime(year, month, day);
+
+  TimeOfDay? get timeOfDay => isAllDay ? null : TimeOfDay.fromDateTime(this);
 
   @override
   String toString() => '${super.toString()}, isAllDay: $isAllDay';

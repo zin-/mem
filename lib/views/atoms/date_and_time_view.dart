@@ -27,7 +27,7 @@ const maxDuration = Duration(days: 1000000000000000000);
 
 class DateTextFormFieldV2 extends StatelessWidget {
   final DateTime? _date;
-  final void Function(DateTime? pickedDate) _onChanged;
+  final void Function(DateTime pickedDate) _onChanged;
 
   const DateTextFormFieldV2(
     this._date,
@@ -57,7 +57,7 @@ class DateTextFormFieldV2 extends StatelessWidget {
                     lastDate: initialDate.add(maxDuration),
                   );
 
-                  if (date != pickedDate) {
+                  if (pickedDate != null) {
                     _onChanged(pickedDate);
                   }
                 },
@@ -71,7 +71,7 @@ class DateTextFormFieldV2 extends StatelessWidget {
 
 class TimeOfDayTextFormFieldV2 extends StatelessWidget {
   final TimeOfDay? _timeOfDay;
-  final void Function(TimeOfDay? pickedTimeOfDay) _onChanged;
+  final void Function(TimeOfDay pickedTimeOfDay) _onChanged;
 
   const TimeOfDayTextFormFieldV2(this._timeOfDay, this._onChanged, {super.key});
 
@@ -93,7 +93,7 @@ class TimeOfDayTextFormFieldV2 extends StatelessWidget {
                     initialTime: _timeOfDay ?? TimeOfDay.now(),
                   );
 
-                  if (_timeOfDay != pickedTimeOfDay) {
+                  if (pickedTimeOfDay != null) {
                     _onChanged(pickedTimeOfDay);
                   }
                 },

@@ -169,13 +169,13 @@ void main() {
                   expect(pickedDate, isNotNull);
 
                   final now = DateTime.now();
-                  expect(pickedDate?.year, now.year);
-                  expect(pickedDate?.month, now.month);
-                  expect(pickedDate?.day, now.day);
-                  expect(pickedDate?.hour, 0);
-                  expect(pickedDate?.minute, 0);
-                  expect(pickedDate?.millisecond, 0);
-                  expect(pickedDate?.microsecond, 0);
+                  expect(pickedDate.year, now.year);
+                  expect(pickedDate.month, now.month);
+                  expect(pickedDate.day, now.day);
+                  expect(pickedDate.hour, 0);
+                  expect(pickedDate.minute, 0);
+                  expect(pickedDate.millisecond, 0);
+                  expect(pickedDate.microsecond, 0);
                 },
               ),
             );
@@ -189,7 +189,7 @@ void main() {
         );
 
         testWidgets(
-          ': initial date is null and cancel',
+          ': pick cancel',
           (widgetTester) async {
             const date = null;
 
@@ -198,29 +198,6 @@ void main() {
               DateTextFormFieldV2(
                 date,
                 (pickedDate) => fail('should not be called'),
-              ),
-            );
-
-            await widgetTester.tap(pickDateIconFinder);
-            await widgetTester.pump();
-
-            await widgetTester.tap(cancelFinder);
-          },
-          tags: TestSize.small,
-        );
-
-        testWidgets(
-          ': initial date is not null and cancel',
-          (widgetTester) async {
-            final date = DateTime.now();
-
-            await runWidget(
-              widgetTester,
-              DateTextFormFieldV2(
-                date,
-                (pickedDate) {
-                  expect(pickedDate, null);
-                },
               ),
             );
 
@@ -322,8 +299,8 @@ void main() {
                   expect(pickedTimeOfDay, isNotNull);
 
                   final now = TimeOfDay.now();
-                  expect(pickedTimeOfDay?.hour, now.hour);
-                  expect(pickedTimeOfDay?.minute, now.minute);
+                  expect(pickedTimeOfDay.hour, now.hour);
+                  expect(pickedTimeOfDay.minute, now.minute);
                 },
               ),
             );
@@ -337,7 +314,7 @@ void main() {
         );
 
         testWidgets(
-          ': initial time is null and cancel',
+          ': pick cancel',
           (widgetTester) async {
             const timeOfDay = null;
 
@@ -346,29 +323,6 @@ void main() {
               TimeOfDayTextFormFieldV2(
                 timeOfDay,
                 (pickedDate) => fail('should not be called'),
-              ),
-            );
-
-            await widgetTester.tap(pickTimeIconFinder);
-            await widgetTester.pump();
-
-            await widgetTester.tap(cancelFinder);
-          },
-          tags: TestSize.small,
-        );
-
-        testWidgets(
-          ': initial time is not null and cancel',
-          (widgetTester) async {
-            const timeOfDay = TimeOfDay(hour: 13, minute: 32);
-
-            await runWidget(
-              widgetTester,
-              TimeOfDayTextFormFieldV2(
-                timeOfDay,
-                (pickedTimeOfDay) {
-                  expect(pickedTimeOfDay, null);
-                },
               ),
             );
 

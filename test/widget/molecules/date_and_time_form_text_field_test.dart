@@ -5,6 +5,7 @@ import 'package:mem/views/atoms/date_and_time_view.dart';
 import 'package:mem/views/molecules/date_and_time_text_form_field.dart';
 
 import '../../_helpers.dart';
+import '../atoms/date_and_time_view_test.dart';
 
 void main() {
   group('Appearance', () {
@@ -78,23 +79,54 @@ void main() {
 
   group('Operation', () {
     testWidgets(
-      ': clear',
+      ': pick date',
       (widgetTester) async {
-        final dateAndTime = DateAndTime.now(allDay: true);
+        const dateAndTime = null;
 
         await runWidget(
           widgetTester,
           DateAndTimeTextFormFieldV2(
             dateAndTime,
             (pickedDateAndTime) {
-              expect(pickedDateAndTime, null);
+              expect(pickedDateAndTime?.isAllDay, true);
+
+              final now = DateTime.now();
+              expect(pickedDateAndTime?.year, now.year);
+              expect(pickedDateAndTime?.month, now.month);
+              expect(pickedDateAndTime?.day, now.day);
             },
           ),
         );
 
-        await widgetTester.tap(clearButtonFinder);
+        await widgetTester.tap(pickDateIconFinder);
+        await widgetTester.pump();
+        await widgetTester.tap(okFinder);
       },
-      tags: TestSize.small,
+    );
+
+    testWidgets(
+      ': pick time',
+      (widgetTester) async {
+        final dateAndTime = DateAndTime.now(allDay: false);
+
+        await runWidget(
+          widgetTester,
+          DateAndTimeTextFormFieldV2(
+            dateAndTime,
+            (pickedDateAndTime) {
+              expect(pickedDateAndTime?.isAllDay, false);
+
+              final now = TimeOfDay.now();
+              expect(pickedDateAndTime?.hour, now.hour);
+              expect(pickedDateAndTime?.minute, now.minute);
+            },
+          ),
+        );
+
+        await widgetTester.tap(pickTimeIconFinder);
+        await widgetTester.pump();
+        await widgetTester.tap(okFinder);
+      },
     );
 
     group(': All day', () {
@@ -140,6 +172,26 @@ void main() {
         tags: TestSize.small,
       );
     });
+
+    testWidgets(
+      ': clear',
+      (widgetTester) async {
+        final dateAndTime = DateAndTime.now(allDay: true);
+
+        await runWidget(
+          widgetTester,
+          DateAndTimeTextFormFieldV2(
+            dateAndTime,
+            (pickedDateAndTime) {
+              expect(pickedDateAndTime, null);
+            },
+          ),
+        );
+
+        await widgetTester.tap(clearButtonFinder);
+      },
+      tags: TestSize.small,
+    );
   });
 }
 
