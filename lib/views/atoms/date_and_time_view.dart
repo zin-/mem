@@ -43,7 +43,9 @@ class DateTextFormFieldV2 extends StatelessWidget {
           final date = _date;
 
           return TextFormField(
-            initialValue: date == null ? '' : l10n.formatDate(date),
+            controller: TextEditingController(
+              text: date == null ? '' : l10n.formatDate(date),
+            ),
             decoration: InputDecoration(
               hintText: l10n.dateHelpText,
               suffixIcon: IconButton(
@@ -83,8 +85,9 @@ class TimeOfDayTextFormFieldV2 extends StatelessWidget {
           final timeOfDay = _timeOfDay;
 
           return TextFormField(
-            initialValue:
-                timeOfDay == null ? '' : l10n.formatTimeOfDay(timeOfDay),
+            controller: TextEditingController(
+              text: timeOfDay == null ? '' : l10n.formatTimeOfDay(timeOfDay),
+            ),
             decoration: InputDecoration(
               suffixIcon: IconButton(
                 onPressed: () async {

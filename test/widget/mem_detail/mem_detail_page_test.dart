@@ -15,7 +15,8 @@ import 'package:mem/views/constants.dart';
 import '../../_helpers.dart';
 import '../../samples.dart';
 import '../../mocks.mocks.dart';
-import '../atoms/date_and_time_text_form_field_test.dart';
+import '../atoms/date_and_time_view_test.dart';
+import '../molecules/date_and_time_form_text_field_test.dart';
 import 'mem_detail_body_test.dart';
 
 void main() {
@@ -80,10 +81,15 @@ void main() {
         await widgetTester.enterText(
             memMemoTextFormFieldFinder, enteringMemMemo);
 
-        await pickNowDate(widgetTester);
+        await widgetTester.tap(pickDateIconFinder);
         await widgetTester.pump();
-        await tapAllDaySwitch(widgetTester);
-        await pickNowTimeOfDay(widgetTester);
+        await widgetTester.tap(okFinder);
+        await widgetTester.pump();
+        await widgetTester.tap(allDaySwitchFinder);
+        await widgetTester.pump();
+        await widgetTester.tap(pickTimeIconFinder);
+        await widgetTester.pump();
+        await widgetTester.tap(okFinder);
         await widgetTester.pump();
 
         when(mockedMemRepository.receive(any))

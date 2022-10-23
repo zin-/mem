@@ -56,13 +56,26 @@ class MemNotifyAtTextFormField extends StatelessWidget {
   @override
   Widget build(BuildContext context) => v(
         {'_mem': _mem, '_onChanged': _onChanged},
-        () => HeroView(
-          memNotifyAtTag(_mem.id),
-          DateAndTimeTextFormField(
-            date: _mem.notifyOn,
-            timeOfDay: _mem.notifyAt,
-            onChanged: _onChanged,
-          ),
-        ),
+        () {
+          final memNotifyOn = _mem.notifyOn;
+
+          return HeroView(
+            memNotifyAtTag(_mem.id),
+            DateAndTimeTextFormFieldV2(
+              memNotifyOn == null
+                  ? null
+                  : DateAndTime.from(
+                      memNotifyOn,
+                      timeOfDay: _mem.notifyAt,
+                    ),
+              (pickedDateAndTime) {
+                _onChanged(
+                  pickedDateAndTime?.dateTime,
+                  pickedDateAndTime?.timeOfDay,
+                );
+              },
+            ),
+          );
+        },
       );
 }
