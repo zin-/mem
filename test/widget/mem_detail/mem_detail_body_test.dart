@@ -5,7 +5,7 @@ import 'package:mem/l10n.dart';
 import 'package:mem/domains/mem.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
-import 'package:mem/views/atoms/state_notifier.dart';
+import 'package:mem/views/_atoms/state_notifier.dart';
 import 'package:mem/views/mems/mem_detail/mem_detail_body.dart';
 import 'package:mem/views/mems/mem_detail/mem_detail_states.dart';
 import 'package:mem/views/mems/mem_detail/mem_items_view.dart';

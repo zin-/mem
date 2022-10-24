@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/views/atoms/async_value_view.dart';
+import 'package:mem/views/_atoms/async_value_view.dart';
 
 import '../_helpers.dart';
 

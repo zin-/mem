@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mem/domains/mem.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/views/atoms/hero_view.dart';
+import 'package:mem/views/_atoms/hero_view.dart';
 
 class MemDoneCheckbox extends StatelessWidget {
   final Mem _mem;

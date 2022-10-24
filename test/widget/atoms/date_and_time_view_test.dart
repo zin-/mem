@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/domains/date_and_time.dart';
-import 'package:mem/views/atoms/date_and_time_view.dart';
+import 'package:mem/views/_atoms/date_and_time_view.dart';
 
 import '../../_helpers.dart';
 
