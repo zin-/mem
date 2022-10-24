@@ -61,7 +61,7 @@ class MemNotifyAtTextFormField extends StatelessWidget {
 
           return HeroView(
             memNotifyAtTag(_mem.id),
-            DateAndTimeTextFormFieldV2(
+            DateAndTimeTextFormField(
               memNotifyOn == null
                   ? null
                   : DateAndTime.from(

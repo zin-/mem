@@ -16,7 +16,7 @@ void main() {
 
         await runWidget(
           widgetTester,
-          DateAndTimeTextFormFieldV2(
+          DateAndTimeTextFormField(
             dateAndTime,
             (pickedDateAndTime) => fail('should not be called'),
           ),
@@ -37,7 +37,7 @@ void main() {
 
         await runWidget(
           widgetTester,
-          DateAndTimeTextFormFieldV2(
+          DateAndTimeTextFormField(
             dateAndTime,
             (pickedDateAndTime) => fail('should not be called'),
           ),
@@ -60,7 +60,7 @@ void main() {
 
         await runWidget(
           widgetTester,
-          DateAndTimeTextFormFieldV2(
+          DateAndTimeTextFormField(
             dateAndTime,
             (pickedDateAndTime) => fail('should not be called'),
           ),
@@ -85,7 +85,7 @@ void main() {
 
         await runWidget(
           widgetTester,
-          DateAndTimeTextFormFieldV2(
+          DateAndTimeTextFormField(
             dateAndTime,
             (pickedDateAndTime) {
               expect(pickedDateAndTime?.isAllDay, false);
@@ -111,7 +111,7 @@ void main() {
 
         await runWidget(
           widgetTester,
-          DateAndTimeTextFormFieldV2(
+          DateAndTimeTextFormField(
             dateAndTime,
             (pickedDateAndTime) {
               expect(pickedDateAndTime?.isAllDay, false);
@@ -137,7 +137,7 @@ void main() {
 
           await runWidget(
             widgetTester,
-            DateAndTimeTextFormFieldV2(
+            DateAndTimeTextFormField(
               dateAndTime,
               (pickedDateAndTime) {
                 expect(pickedDateAndTime?.isAllDay, false);
@@ -158,7 +158,7 @@ void main() {
 
           await runWidget(
             widgetTester,
-            DateAndTimeTextFormFieldV2(
+            DateAndTimeTextFormField(
               dateAndTime,
               (pickedDateAndTime) {
                 expect(pickedDateAndTime?.isAllDay, true);
@@ -180,7 +180,7 @@ void main() {
 
         await runWidget(
           widgetTester,
-          DateAndTimeTextFormFieldV2(
+          DateAndTimeTextFormField(
             dateAndTime,
             (pickedDateAndTime) {
               expect(pickedDateAndTime, null);
@@ -196,18 +196,18 @@ void main() {
 }
 
 final dateTextFormFieldFinder = find.descendant(
-  of: find.byType(DateAndTimeTextFormFieldV2),
-  matching: find.byType(DateTextFormFieldV2),
+  of: find.byType(DateAndTimeTextFormField),
+  matching: find.byType(DateTextFormField),
 );
 final timeOfDayTextFormFieldFinder = find.descendant(
-  of: find.byType(DateAndTimeTextFormFieldV2),
-  matching: find.byType(TimeOfDayTextFormFieldV2),
+  of: find.byType(DateAndTimeTextFormField),
+  matching: find.byType(TimeOfDayTextFormField),
 );
 final allDaySwitchFinder = find.descendant(
-  of: find.byType(DateAndTimeTextFormFieldV2),
+  of: find.byType(DateAndTimeTextFormField),
   matching: find.byType(Switch),
 );
 final clearButtonFinder = find.descendant(
-  of: find.byType(DateAndTimeTextFormFieldV2),
+  of: find.byType(DateAndTimeTextFormField),
   matching: find.byIcon(Icons.clear),
 );

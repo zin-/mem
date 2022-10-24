@@ -3,11 +3,11 @@ import 'package:mem/domains/date_and_time.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/views/atoms/date_and_time_view.dart';
 
-class DateAndTimeTextFormFieldV2 extends StatelessWidget {
+class DateAndTimeTextFormField extends StatelessWidget {
   final DateAndTime? _dateAndTime;
   final void Function(DateAndTime? pickedDateAndTime) _onChanged;
 
-  const DateAndTimeTextFormFieldV2(
+  const DateAndTimeTextFormField(
     this._dateAndTime,
     this._onChanged, {
     super.key,
@@ -22,7 +22,7 @@ class DateAndTimeTextFormFieldV2 extends StatelessWidget {
           return Row(
             children: [
               Expanded(
-                child: DateTextFormFieldV2(
+                child: DateTextFormField(
                   dateAndTime,
                   (pickedDate) => _onChanged(DateAndTime.from(
                     pickedDate,
@@ -33,7 +33,7 @@ class DateAndTimeTextFormFieldV2 extends StatelessWidget {
               dateAndTime == null || dateAndTime.isAllDay
                   ? const SizedBox.shrink()
                   : Expanded(
-                      child: TimeOfDayTextFormFieldV2(
+                      child: TimeOfDayTextFormField(
                         dateAndTime.timeOfDay,
                         (pickedTimeOfDay) {
                           _onChanged(DateAndTime.from(

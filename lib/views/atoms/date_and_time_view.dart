@@ -25,11 +25,11 @@ class DateAndTimeText extends StatelessWidget {
 
 const maxDuration = Duration(days: 1000000000000000000);
 
-class DateTextFormFieldV2 extends StatelessWidget {
+class DateTextFormField extends StatelessWidget {
   final DateTime? _date;
   final void Function(DateTime pickedDate) _onChanged;
 
-  const DateTextFormFieldV2(
+  const DateTextFormField(
     this._date,
     this._onChanged, {
     Key? key,
@@ -71,11 +71,11 @@ class DateTextFormFieldV2 extends StatelessWidget {
       );
 }
 
-class TimeOfDayTextFormFieldV2 extends StatelessWidget {
+class TimeOfDayTextFormField extends StatelessWidget {
   final TimeOfDay? _timeOfDay;
   final void Function(TimeOfDay pickedTimeOfDay) _onChanged;
 
-  const TimeOfDayTextFormFieldV2(this._timeOfDay, this._onChanged, {super.key});
+  const TimeOfDayTextFormField(this._timeOfDay, this._onChanged, {super.key});
 
   @override
   Widget build(BuildContext context) => v(

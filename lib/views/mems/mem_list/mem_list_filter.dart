@@ -15,7 +15,7 @@ class MemListFilter extends StatelessWidget {
         () {
           return Consumer(
             builder: (context, ref, child) {
-              final sectionsV2 = [
+              final sections = [
                 Column(
                   children: [
                     Row(
@@ -90,9 +90,9 @@ class MemListFilter extends StatelessWidget {
                 ),
               ];
               return ListView.builder(
-                itemCount: sectionsV2.length,
+                itemCount: sections.length,
                 itemBuilder: (context, index) {
-                  return sectionsV2[index];
+                  return sections[index];
                 },
               );
             },

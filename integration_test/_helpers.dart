@@ -90,20 +90,20 @@ final memMemoTextFormFieldFinder = find.descendant(
 );
 final saveMemFabFinder = find.byIcon(Icons.save_alt);
 final showDatePickerIconFinder = find.descendant(
-  of: find.byType(DateAndTimeTextFormFieldV2),
+  of: find.byType(DateAndTimeTextFormField),
   matching: find.byIcon(Icons.calendar_month),
 );
 final okFinder = find.text('OK');
 final allDaySwitchFinder = find.descendant(
-  of: find.byType(DateAndTimeTextFormFieldV2),
+  of: find.byType(DateAndTimeTextFormField),
   matching: find.byType(Switch),
 );
 final showTimePickerIconFinder = find.descendant(
-  of: find.byType(DateAndTimeTextFormFieldV2),
+  of: find.byType(DateAndTimeTextFormField),
   matching: find.byIcon(Icons.access_time),
 );
 final clearDateAndTimeIconFinder = find.descendant(
-  of: find.byType(DateAndTimeTextFormFieldV2),
+  of: find.byType(DateAndTimeTextFormField),
   matching: find.byIcon(Icons.clear),
 );
 final memNotifyAtTextFinder = find.descendant(

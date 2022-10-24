@@ -82,7 +82,7 @@ void main() {
     });
   });
 
-  group('DateTextFormFieldV2', () {
+  group('DateTextFormField', () {
     group(': Appearance', () {
       testWidgets(
         ': date is null',
@@ -91,7 +91,7 @@ void main() {
 
           await runWidget(
             widgetTester,
-            DateTextFormFieldV2(
+            DateTextFormField(
               date,
               (pickedDate) => fail('should not be called'),
             ),
@@ -115,7 +115,7 @@ void main() {
 
           await runWidget(
             widgetTester,
-            DateTextFormFieldV2(
+            DateTextFormField(
               date,
               (pickedDate) => fail('should not be called'),
             ),
@@ -138,7 +138,7 @@ void main() {
 
           await runWidget(
             widgetTester,
-            DateTextFormFieldV2(
+            DateTextFormField(
               date,
               (pickedDate) => fail('should not be called'),
             ),
@@ -163,7 +163,7 @@ void main() {
 
             await runWidget(
               widgetTester,
-              DateTextFormFieldV2(
+              DateTextFormField(
                 date,
                 (pickedDate) {
                   expect(pickedDate, isNotNull);
@@ -195,7 +195,7 @@ void main() {
 
             await runWidget(
               widgetTester,
-              DateTextFormFieldV2(
+              DateTextFormField(
                 date,
                 (pickedDate) => fail('should not be called'),
               ),
@@ -212,7 +212,7 @@ void main() {
     });
   });
 
-  group('TimeOfDayTextFormFieldV2', () {
+  group('TimeOfDayTextFormField', () {
     group(': Appearance', () {
       testWidgets(
         ': time of day is null',
@@ -221,7 +221,7 @@ void main() {
 
           await runWidget(
             widgetTester,
-            TimeOfDayTextFormFieldV2(
+            TimeOfDayTextFormField(
               timeOfDay,
               (pickedTimeOfDay) => fail('should not be called'),
             ),
@@ -245,7 +245,7 @@ void main() {
 
           await runWidget(
             widgetTester,
-            TimeOfDayTextFormFieldV2(
+            TimeOfDayTextFormField(
               timeOfDay,
               (pickedTimeOfDay) => fail('should not be called'),
             ),
@@ -268,7 +268,7 @@ void main() {
 
           await runWidget(
             widgetTester,
-            TimeOfDayTextFormFieldV2(
+            TimeOfDayTextFormField(
               timeOfDay,
               (pickedTimeOfDay) => fail('should not be called'),
             ),
@@ -293,7 +293,7 @@ void main() {
 
             await runWidget(
               widgetTester,
-              TimeOfDayTextFormFieldV2(
+              TimeOfDayTextFormField(
                 timeOfDay,
                 (pickedTimeOfDay) {
                   expect(pickedTimeOfDay, isNotNull);
@@ -320,7 +320,7 @@ void main() {
 
             await runWidget(
               widgetTester,
-              TimeOfDayTextFormFieldV2(
+              TimeOfDayTextFormField(
                 timeOfDay,
                 (pickedDate) => fail('should not be called'),
               ),
