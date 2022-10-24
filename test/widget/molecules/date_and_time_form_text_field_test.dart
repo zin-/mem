@@ -81,14 +81,14 @@ void main() {
     testWidgets(
       ': pick date',
       (widgetTester) async {
-        const dateAndTime = null;
+        final dateAndTime = DateAndTime.now(allDay: false);
 
         await runWidget(
           widgetTester,
           DateAndTimeTextFormFieldV2(
             dateAndTime,
             (pickedDateAndTime) {
-              expect(pickedDateAndTime?.isAllDay, true);
+              expect(pickedDateAndTime?.isAllDay, false);
 
               final now = DateTime.now();
               expect(pickedDateAndTime?.year, now.year);

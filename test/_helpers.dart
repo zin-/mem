@@ -17,7 +17,7 @@ Future<void> runWidget(
     v(
       {'widgetTester': widgetTester, 'widget': widget},
       () => widgetTester.pumpWidget(MaterialApp(
-        onGenerateTitle: (context) => L10n(context).test(),
+        onGenerateTitle: (context) => L10n(context).test,
         localizationsDelegates: L10n.localizationsDelegates,
         supportedLocales: L10n.supportedLocales,
         locale: Locale(languageCode),

@@ -80,10 +80,9 @@ class L10n {
 
   late String dateHelpText = _materialLocalizations.dateHelpText;
 
-  // Under development
-  String dev() => _appLocalizations.dev;
-
-  String test() => _appLocalizations.test;
+  // For development
+  late String dev = _appLocalizations.dev; // coverage:ignore-line
+  late String test = _appLocalizations.test;
 
   static const localizationsDelegates = AppLocalizations.localizationsDelegates;
   static const supportedLocales = AppLocalizations.supportedLocales;
@@ -93,7 +92,7 @@ class L10n {
   factory L10n([BuildContext? context]) {
     var tmp = _instance;
     if (tmp == null) {
-      if (context == null) throw Error();
+      if (context == null) throw Error(); // coverage:ignore-line
 
       tmp = L10n._(
         AppLocalizations.of(context),
