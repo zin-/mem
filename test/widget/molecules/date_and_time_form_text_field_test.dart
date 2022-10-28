@@ -81,6 +81,30 @@ void main() {
     testWidgets(
       ': pick date',
       (widgetTester) async {
+        await runWidget(
+          widgetTester,
+          DateAndTimeTextFormField(
+            null,
+            (pickedDateAndTime) {
+              expect(pickedDateAndTime?.isAllDay, true);
+
+              final now = DateTime.now();
+              expect(pickedDateAndTime?.year, now.year);
+              expect(pickedDateAndTime?.month, now.month);
+              expect(pickedDateAndTime?.day, now.day);
+            },
+          ),
+        );
+
+        await widgetTester.tap(pickDateIconFinder);
+        await widgetTester.pump();
+        await widgetTester.tap(okFinder);
+      },
+    );
+
+    testWidgets(
+      ': pick date with time',
+      (widgetTester) async {
         final dateAndTime = DateAndTime.now(allDay: false);
 
         await runWidget(
@@ -88,7 +112,7 @@ void main() {
           DateAndTimeTextFormField(
             dateAndTime,
             (pickedDateAndTime) {
-              expect(pickedDateAndTime?.isAllDay, false);
+              expect(pickedDateAndTime?.isAllDay, dateAndTime.isAllDay);
 
               final now = DateTime.now();
               expect(pickedDateAndTime?.year, now.year);
