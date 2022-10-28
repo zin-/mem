@@ -39,4 +39,32 @@ void main() {
       );
     });
   });
+
+  group('DateAndTimePeriod', () {
+    group('Create Instance', () {
+      test(
+        'Both null',
+        () {
+          final dateAndTimePeriod = DateAndTimePeriod(null, null);
+
+          expect(dateAndTimePeriod.toString(), '{start: null, end: null}');
+        },
+      );
+
+      test(
+        'Start is after end',
+        () {
+          final now = DateTime.now();
+
+          expect(
+            () => DateAndTimePeriod(
+              DateAndTime.from(now.add(const Duration(days: 1))),
+              DateAndTime.from(now),
+            ),
+            throwsA((e) => e is AssertionError),
+          );
+        },
+      );
+    });
+  });
 }

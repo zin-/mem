@@ -54,3 +54,22 @@ class DateAndTime extends DateTime {
   @override
   String toString() => '${super.toString()}, isAllDay: $isAllDay';
 }
+
+class DateAndTimePeriod {
+  final DateAndTime? start;
+  final DateAndTime? end;
+
+  DateAndTimePeriod(this.start, this.end) {
+    if (start != null && end != null) {
+      assert(start!.isBefore(end!));
+    }
+  }
+
+  @override
+  String toString() {
+    return {
+      'start': start,
+      'end': end,
+    }.toString();
+  }
+}
