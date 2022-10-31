@@ -5,7 +5,7 @@ import 'package:mem/views/_atoms/date_and_time_view.dart';
 import 'package:mem/views/_molecules/date_and_time_text_form_field.dart';
 
 import '../../_helpers.dart';
-import '../atoms/date_and_time_view_test.dart';
+import '../_atoms/date_and_time_view_test.dart';
 
 void main() {
   group('Appearance', () {
