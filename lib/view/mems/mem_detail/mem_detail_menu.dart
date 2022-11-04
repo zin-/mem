@@ -141,8 +141,8 @@ class MemDetailMenu extends StatelessWidget {
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.white,
-                    onPrimary: Colors.black,
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
                   ),
                   onPressed: () => Navigator.of(context).pop(),
                   child: Text(L10n().cancelAction()),
