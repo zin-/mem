@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/view/atoms/date_text_form_field.dart';
-import 'package:mem/view/atoms/time_of_day_text_form_field.dart';
+import 'package:mem/view/_atom/date_text_form_field.dart';
+import 'package:mem/view/_atom/time_of_day_text_form_field.dart';
 
 class DateAndTimeTextFormField extends StatelessWidget {
   final DateTime? date;

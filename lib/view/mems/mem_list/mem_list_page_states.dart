@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/domain/mem.dart';
 import 'package:mem/services/mem_service.dart';
-import 'package:mem/view/atoms/state_notifier.dart';
+import 'package:mem/view/_atom/state_notifier.dart';
 import 'package:mem/view/mems/mem_detail/mem_detail_states.dart';
 
 final showNotArchivedProvider =

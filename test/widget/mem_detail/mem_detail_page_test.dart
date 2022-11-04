@@ -15,7 +15,7 @@ import 'package:mem/view/constants.dart';
 import '../../_helpers.dart';
 import '../../samples.dart';
 import '../../mocks.mocks.dart';
-import '../atoms/date_and_time_text_form_field_test.dart';
+import '../_atom/date_and_time_text_form_field_test.dart';
 import 'mem_detail_body_test.dart';
 
 void main() {

@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:mem/l10n.dart';
-import 'package:mem/view/atoms/time_of_day_text_form_field.dart';
+import 'package:mem/view/_atom/date_text_form_field.dart';
 
 import '../../_helpers.dart';
 
 void main() {
-  Future pumpTimeOfDayTextFormField(
+  Future pumpDateTextFormField(
     WidgetTester widgetTester,
-    TimeOfDay? timeOfDay,
-    Function(TimeOfDay? pickedDate)? onChanged,
+    DateTime? date,
+    Function(DateTime? pickedDate)? onChanged,
   ) async {
     await widgetTester.pumpWidget(
       MaterialApp(
@@ -17,8 +18,8 @@ void main() {
         localizationsDelegates: L10n.localizationsDelegates,
         supportedLocales: L10n.supportedLocales,
         home: Scaffold(
-          body: TimeOfDayTextFormField(
-            timeOfDay: timeOfDay,
+          body: DateTextFormField(
+            date: date,
             onChanged: onChanged ?? (pickedDate) {},
           ),
         ),
@@ -30,7 +31,7 @@ void main() {
     testWidgets(
       ': input null',
       (widgetTester) async {
-        await pumpTimeOfDayTextFormField(widgetTester, null, null);
+        await pumpDateTextFormField(widgetTester, null, null);
 
         expect(widgetTester.widgetList(find.byType(TextFormField)).length, 1);
 
@@ -47,19 +48,17 @@ void main() {
     testWidgets(
       ': input now',
       (widgetTester) async {
-        final timeOfDay = TimeOfDay.now();
+        final date = DateTime.now();
 
-        await pumpTimeOfDayTextFormField(widgetTester, timeOfDay, null);
+        await pumpDateTextFormField(widgetTester, date, null);
 
         expect(widgetTester.widgetList(find.byType(TextFormField)).length, 1);
 
-        final BuildContext context =
-            widgetTester.element(find.byType(TimeOfDayTextFormField));
         expect(
           widgetTester
               .widget<TextFormField>(find.byType(TextFormField))
               .initialValue,
-          timeOfDay.format(context),
+          DateFormat.yMd().format(date),
         );
       },
       tags: TestSize.small,
@@ -70,15 +69,15 @@ void main() {
     testWidgets(
       ': cancel',
       (widgetTester) async {
-        await pumpTimeOfDayTextFormField(
+        await pumpDateTextFormField(
           widgetTester,
           null,
-          (pickedTimeOfDay) {
-            expect(pickedTimeOfDay, isNull);
+          (pickedDate) {
+            expect(pickedDate, isNull);
           },
         );
 
-        await widgetTester.tap(find.byIcon(Icons.access_time_outlined));
+        await widgetTester.tap(find.byIcon(Icons.calendar_month));
         await widgetTester.pump();
 
         await widgetTester.tap(find.text('CANCEL'));
@@ -89,15 +88,15 @@ void main() {
     testWidgets(
       ': pick',
       (widgetTester) async {
-        await pumpTimeOfDayTextFormField(
+        await pumpDateTextFormField(
           widgetTester,
           null,
-          (pickedTimeOfDay) {
-            expect(pickedTimeOfDay, isNotNull);
+          (pickedDate) {
+            expect(pickedDate, isNotNull);
           },
         );
 
-        await widgetTester.tap(find.byIcon(Icons.access_time_outlined));
+        await widgetTester.tap(find.byIcon(Icons.calendar_month));
         await widgetTester.pump();
 
         await widgetTester.tap(find.text('OK'));
