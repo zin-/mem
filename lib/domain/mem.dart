@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mem/domains/entity_value.dart';
+import 'package:mem/domain/entity_value.dart';
 
 class Mem extends EntityValue {
   String name;

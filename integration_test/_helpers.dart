@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/database/database_manager.dart';
 import 'package:mem/main.dart' as app;
-import 'package:mem/domains/mem.dart';
+import 'package:mem/domain/mem.dart';
 import 'package:mem/services/mem_service.dart';
 import 'package:mem/views/mems/mem_detail/mem_items_view.dart';
 import 'package:mem/views/mems/mem_list/mem_list_item_view.dart';
