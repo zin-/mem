@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/services/mem_service.dart';
-import 'package:mem/views/mems/mem_detail/mem_detail_states.dart';
+import 'package:mem/view/mems/mem_detail/mem_detail_states.dart';
 
 final doneMem = Provider.autoDispose.family<Future<MemDetail>, int>(
   (ref, memId) => v(

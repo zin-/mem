@@ -4,11 +4,11 @@ import 'package:mem/database/database_manager.dart';
 import 'package:mem/main.dart' as app;
 import 'package:mem/domain/mem.dart';
 import 'package:mem/services/mem_service.dart';
-import 'package:mem/views/mems/mem_detail/mem_items_view.dart';
-import 'package:mem/views/mems/mem_list/mem_list_item_view.dart';
-import 'package:mem/views/mems/mem_name.dart';
-import 'package:mem/views/mems/mem_notify_at.dart';
-import 'package:mem/views/molecules/date_and_time_text_form_field.dart';
+import 'package:mem/view/mems/mem_detail/mem_items_view.dart';
+import 'package:mem/view/mems/mem_list/mem_list_item_view.dart';
+import 'package:mem/view/mems/mem_name.dart';
+import 'package:mem/view/mems/mem_notify_at.dart';
+import 'package:mem/view/molecules/date_and_time_text_form_field.dart';
 
 // FIXME integration testでrepositoryを参照するのはNG
 import 'package:mem/repositories/_database_tuple_repository.dart';

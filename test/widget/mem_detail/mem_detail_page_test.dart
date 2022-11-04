@@ -5,12 +5,12 @@ import 'package:mem/domain/mem.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/notification_repository.dart';
 import 'package:mem/services/notification_service.dart';
-import 'package:mem/views/mems/mem_detail/mem_detail_body.dart';
-import 'package:mem/views/mems/mem_detail/mem_detail_page.dart';
+import 'package:mem/view/mems/mem_detail/mem_detail_body.dart';
+import 'package:mem/view/mems/mem_detail/mem_detail_page.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/repositories/mem_repository.dart';
-import 'package:mem/views/constants.dart';
+import 'package:mem/view/constants.dart';
 
 import '../../_helpers.dart';
 import '../../samples.dart';

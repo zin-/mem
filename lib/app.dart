@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/views/colors.dart';
-import 'package:mem/views/mems/mem_list/mem_list_page.dart';
+import 'package:mem/view/colors.dart';
+import 'package:mem/view/mems/mem_list/mem_list_page.dart';
 
 class MemApplication extends StatelessWidget {
   final String? languageCode;

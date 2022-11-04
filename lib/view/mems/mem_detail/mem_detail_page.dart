@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/views/atoms/async_value_view.dart';
-import 'package:mem/views/colors.dart';
-import 'package:mem/views/dimens.dart';
-import 'package:mem/views/constants.dart';
-import 'package:mem/views/mems/mem_detail/mem_detail_body.dart';
-import 'package:mem/views/mems/mem_detail/mem_detail_menu.dart';
-import 'package:mem/views/mems/mem_detail/mem_detail_states.dart';
-import 'package:mem/views/mems/mem_list/mem_list_page.dart';
-import 'package:mem/views/mems/mems_action.dart';
+import 'package:mem/view/atoms/async_value_view.dart';
+import 'package:mem/view/colors.dart';
+import 'package:mem/view/dimens.dart';
+import 'package:mem/view/constants.dart';
+import 'package:mem/view/mems/mem_detail/mem_detail_body.dart';
+import 'package:mem/view/mems/mem_detail/mem_detail_menu.dart';
+import 'package:mem/view/mems/mem_detail/mem_detail_states.dart';
+import 'package:mem/view/mems/mem_list/mem_list_page.dart';
+import 'package:mem/view/mems/mems_action.dart';
 
 class MemDetailPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();

@@ -3,15 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/domain/mem.dart';
-import 'package:mem/views/colors.dart';
-import 'package:mem/views/constants.dart';
-import 'package:mem/views/mems/mem_detail/mem_detail_states.dart';
-import 'package:mem/views/mems/mem_detail/mem_detail_page.dart';
-import 'package:mem/views/mems/mem_list/mem_list_actions.dart';
-import 'package:mem/views/mems/mem_list/mem_list_filter.dart';
-import 'package:mem/views/mems/mem_list/mem_list_item_view.dart';
-import 'package:mem/views/mems/mem_list/show_new_mem_fab.dart';
-import 'package:mem/views/mems/mems_action.dart';
+import 'package:mem/view/colors.dart';
+import 'package:mem/view/constants.dart';
+import 'package:mem/view/mems/mem_detail/mem_detail_states.dart';
+import 'package:mem/view/mems/mem_detail/mem_detail_page.dart';
+import 'package:mem/view/mems/mem_list/mem_list_actions.dart';
+import 'package:mem/view/mems/mem_list/mem_list_filter.dart';
+import 'package:mem/view/mems/mem_list/mem_list_item_view.dart';
+import 'package:mem/view/mems/mem_list/show_new_mem_fab.dart';
+import 'package:mem/view/mems/mems_action.dart';
 
 import 'mem_list_page_states.dart';
 
