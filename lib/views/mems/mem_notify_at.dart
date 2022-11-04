@@ -3,6 +3,7 @@ import 'package:mem/domains/date_and_time.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/domains/mem.dart';
 import 'package:mem/views/_atoms/hero_view.dart';
+import 'package:mem/views/_molecules/date_and_time_period_view.dart';
 import 'package:mem/views/_molecules/date_and_time_text_form_field.dart';
 import 'package:mem/views/_atoms/date_and_time_view.dart';
 
@@ -12,9 +13,25 @@ Widget? buildMemNotifyAtText(Mem mem) => v(
       {'mem': mem},
       () {
         final memNotifyOn = mem.notifyOn;
-        return memNotifyOn == null
-            ? null
-            : MemNotifyAtText(mem.id, memNotifyOn, mem.notifyAt);
+        final memNotifyAt = mem.notifyAt;
+
+        if (memNotifyOn == null) {
+          return null;
+        } else {
+          final dateAndTimePeriod = DateAndTimePeriod(
+            DateAndTime(
+              memNotifyOn.year,
+              memNotifyOn.month,
+              memNotifyOn.day,
+              memNotifyAt?.hour,
+              memNotifyAt?.minute,
+            ),
+            null,
+          );
+
+          return buildDateAndTimePeriodView(dateAndTimePeriod);
+          // return MemNotifyAtText(mem.id, memNotifyOn, mem.notifyAt);
+        }
       },
     );
 
