@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/view/mems/mem_detail/mem_items_view.dart';
 import 'package:mem/listAndDetails/mem_notify_at.dart';
-import 'package:mem/view/mems/mem_done_checkbox.dart';
+import 'package:mem/listAndDetails/mem_done_checkbox.dart';
 import 'package:mem/listAndDetails/mem_name.dart';
 import 'package:mem/view/mems/mem_detail/mem_detail_states.dart';
 
