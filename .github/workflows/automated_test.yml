@@ -1,7 +1,7 @@
 name: 'Automated test'
 on: push
 env:
-  flutter-version: 3.0.3
+  flutter-version: 3.3.4
   flutter-channel: 'stable'
 jobs:
   small_test:
