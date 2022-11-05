@@ -14,17 +14,13 @@ class MemNotifyAtText extends DateAndTimeText {
 
   MemNotifyAtText(
     this._memId,
-    // TODO 引数をDateAndTimeにする
-    DateTime memNotifyOn,
-    TimeOfDay? memNotifyAt, {
+    DateAndTime memNotifyAt, {
     super.key,
   }) : super(
-          DateAndTime.from(memNotifyOn, timeOfDay: memNotifyAt),
+          memNotifyAt,
           style: TextStyle(
-            color: DateAndTime.from(memNotifyOn, timeOfDay: memNotifyAt)
-                    .isBefore(DateTime.now())
-                ? aposematicColor
-                : null,
+            color:
+                memNotifyAt.isBefore(DateTime.now()) ? aposematicColor : null,
           ),
         );
 

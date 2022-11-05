@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/domain/date_and_time.dart';
 import 'package:mem/domain/mem.dart';
 import 'package:mem/listAndDetails/colors.dart';
 import 'package:mem/view/mems/mem_done_checkbox.dart';
@@ -26,11 +27,8 @@ class MemListItemView extends ListTile {
           title: MemNameText(mem.name, mem.id),
           subtitle: mem.notifyOn == null
               ? null
-              : MemNotifyAtText(
-                  mem.id,
-                  mem.notifyOn!,
-                  mem.notifyAt,
-                ),
+              : MemNotifyAtText(mem.id,
+                  DateAndTime.from(mem.notifyOn!, timeOfDay: mem.notifyAt)),
           onTap: onTap,
           tileColor: mem.isArchived() ? archivedColor : null,
         );
