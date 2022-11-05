@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/view/_atom/hero_view.dart';
+
+import 'hero_view.dart';
 
 String memNameTag(int? memId) => heroTag('mem-name', memId);
 
