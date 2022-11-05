@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/listAndDetails/date_and_time_text_form_field.dart';
-import 'package:mem/view/_atom/date_text_form_field.dart';
-import 'package:mem/view/_atom/time_of_day_text_form_field.dart';
+import 'package:mem/listAndDetails/date_text_form_field.dart';
+import 'package:mem/listAndDetails/time_of_day_text_form_field.dart';
 
 import '../../_helpers.dart';
 
