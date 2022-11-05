@@ -5,7 +5,6 @@ import 'package:mem/main.dart' as app;
 import 'package:mem/domain/mem.dart';
 import 'package:mem/services/mem_service.dart';
 import 'package:mem/view/mems/mem_detail/mem_items_view.dart';
-import 'package:mem/listAndDetails//mem_list_item_view.dart';
 import 'package:mem/view/mems/mem_name.dart';
 import 'package:mem/listAndDetails/mem_notify_at.dart';
 import 'package:mem/view/molecules/date_and_time_text_form_field.dart';
@@ -106,10 +105,7 @@ final clearDateAndTimeIconFinder = find.descendant(
   of: find.byType(DateAndTimeTextFormField),
   matching: find.byIcon(Icons.clear),
 );
-final memNotifyAtTextFinder = find.descendant(
-  of: find.byType(MemListItemView),
-  matching: find.byType(MemNotifyAtText),
-);
+final memNotifyAtTextFinder = find.byType(MemNotifyAtText);
 
 Future<void> prepareSavedMem(
   String memName,
