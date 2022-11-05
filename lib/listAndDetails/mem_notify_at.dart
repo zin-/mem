@@ -8,17 +8,6 @@ import 'package:mem/listAndDetails/date_and_time_view.dart';
 
 String memNotifyAtTag(int? memId) => heroTag('mem-notifyAt', memId);
 
-// FIXME どちらかというとMemListItemViewの仕様なので、ここに定義するのはおかしい
-Widget? buildMemNotifyAtText(Mem mem) => v(
-      {'mem': mem},
-      () {
-        final memNotifyOn = mem.notifyOn;
-        return memNotifyOn == null
-            ? null
-            : MemNotifyAtText(mem.id, memNotifyOn, mem.notifyAt);
-      },
-    );
-
 class MemNotifyAtText extends DateAndTimeText {
   final int _memId;
 

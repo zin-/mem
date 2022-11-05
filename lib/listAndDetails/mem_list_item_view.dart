@@ -24,7 +24,13 @@ class MemListItemView extends ListTile {
             },
           ),
           title: MemNameText(mem.name, mem.id),
-          subtitle: buildMemNotifyAtText(mem),
+          subtitle: mem.notifyOn == null
+              ? null
+              : MemNotifyAtText(
+                  mem.id,
+                  mem.notifyOn!,
+                  mem.notifyAt,
+                ),
           onTap: onTap,
           tileColor: mem.isArchived() ? archivedColor : null,
         );
