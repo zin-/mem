@@ -8,7 +8,7 @@ void main() {
     group(': now', () {
       test(
         ': allDay is false',
-            () {
+        () {
           final dateAndTime = DateAndTime.now();
           final dateTime = DateTime.fromMicrosecondsSinceEpoch(
               dateAndTime.microsecondsSinceEpoch);
@@ -24,7 +24,7 @@ void main() {
 
       test(
         ': allDay is true',
-            () {
+        () {
           final dateAndTime = DateAndTime.now(allDay: true);
           final dateTime = DateTime.fromMicrosecondsSinceEpoch(
               dateAndTime.microsecondsSinceEpoch);
@@ -36,34 +36,6 @@ void main() {
           expect(string, '${dateTime.toString()}, isAllDay: true');
         },
         tags: TestSize.small,
-      );
-    });
-  });
-
-  group('DateAndTimePeriod', () {
-    group('Create Instance', () {
-      test(
-        'Both null',
-            () {
-          final dateAndTimePeriod = DateAndTimePeriod(null, null);
-
-          expect(dateAndTimePeriod.toString(), '{start: null, end: null}');
-        },
-      );
-
-      test(
-        'Start is after end',
-            () {
-          final now = DateTime.now();
-
-          expect(
-                () => DateAndTimePeriod(
-              DateAndTime.from(now.add(const Duration(days: 1))),
-              DateAndTime.from(now),
-            ),
-            throwsA((e) => e is AssertionError),
-          );
-        },
       );
     });
   });

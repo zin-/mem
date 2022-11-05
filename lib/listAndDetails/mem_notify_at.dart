@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mem/domain/date_and_time.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/domain/mem.dart';
 import 'package:mem/view/_atom/hero_view.dart';
@@ -26,7 +27,7 @@ class MemNotifyAtText extends DateAndTimeText {
     DateTime memNotifyOn,
     TimeOfDay? memNotifyAt, {
     super.key,
-  }) : super(memNotifyOn, memNotifyAt);
+  }) : super(DateAndTime.from(memNotifyOn, timeOfDay: memNotifyAt));
 
   @override
   Widget build(BuildContext context) => v(
