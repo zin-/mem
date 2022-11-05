@@ -8,7 +8,7 @@ import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/listAndDetails/mem_list_item_view.dart';
 import 'package:mem/view/mems/mem_list/mem_list_page.dart';
-import 'package:mem/view/mems/mem_name.dart';
+import 'package:mem/listAndDetails/mem_name.dart';
 import 'package:mockito/mockito.dart';
 
 import '../../_helpers.dart';
