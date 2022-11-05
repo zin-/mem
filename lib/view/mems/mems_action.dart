@@ -3,6 +3,7 @@ import 'package:mem/logger.dart';
 import 'package:mem/services/notification_service.dart';
 import 'package:mem/view/mems/mems_state.dart';
 
+// FIXME ログで見たときこの関数名だと分かりづらい
 final initialize = Provider.family<Future<void>, Function(int memId)>(
   (ref, showMemDetailPage) => v(
     {},

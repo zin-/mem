@@ -25,6 +25,11 @@ T v<T>(
       level: debug ? Level.debug : Level.verbose,
     );
 
+// TODO 引数もログに表示されるようにしたい
+// T vV2<T>(T Function() function) {
+//   return function();
+// }
+
 T t<T>(
   Map<String, dynamic>? args,
   T Function() function, {
