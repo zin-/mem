@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mem/logger.dart';
+import 'package:mem/logger/api.dart';
 
 class HeroView extends StatelessWidget {
   final String _tag;

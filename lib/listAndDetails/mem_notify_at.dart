@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mem/domain/date_and_time.dart';
-import 'package:mem/logger.dart';
 import 'package:mem/domain/mem.dart';
+import 'package:mem/logger/api.dart';
 
 import 'colors.dart';
 import 'date_and_time_view.dart';
