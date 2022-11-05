@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:mem/database/database_manager.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/repositories/log_repository.dart';
-import 'package:mem/view/mems/mem_notify_at.dart';
+import 'package:mem/listAndDetails/mem_notify_at.dart';
 
 import '../_helpers.dart';
 

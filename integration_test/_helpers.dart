@@ -7,7 +7,7 @@ import 'package:mem/services/mem_service.dart';
 import 'package:mem/view/mems/mem_detail/mem_items_view.dart';
 import 'package:mem/listAndDetails//mem_list_item_view.dart';
 import 'package:mem/view/mems/mem_name.dart';
-import 'package:mem/view/mems/mem_notify_at.dart';
+import 'package:mem/listAndDetails/mem_notify_at.dart';
 import 'package:mem/view/molecules/date_and_time_text_form_field.dart';
 
 // FIXME integration testでrepositoryを参照するのはNG

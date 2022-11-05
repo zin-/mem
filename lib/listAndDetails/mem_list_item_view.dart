@@ -4,9 +4,9 @@ import 'package:mem/domain/mem.dart';
 import 'package:mem/view/colors.dart';
 import 'package:mem/view/mems/mem_done_checkbox.dart';
 import 'package:mem/view/mems/mem_name.dart';
-import 'package:mem/view/mems/mem_notify_at.dart';
 
 import 'mem_list_item_actions.dart';
+import 'mem_notify_at.dart';
 
 class MemListItemView extends ListTile {
   MemListItemView(Mem mem, void Function() onTap, {super.key})
