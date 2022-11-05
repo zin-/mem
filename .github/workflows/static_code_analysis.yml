@@ -1,7 +1,7 @@
 name: 'Static code analysis'
 on: push
 env:
-  flutter-version: 3.0.3
+  flutter-version: 3.3.4
   flutter-channel: 'stable'
 jobs:
   analyze-production_code:

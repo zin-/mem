@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/l10n.dart';
+import 'package:mem/logger.dart';
+import 'package:mem/repositories/log_repository.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
-import 'package:mem/views/mems/mem_list/mem_list_item_view.dart';
-import 'package:mem/views/mems/mem_list/mem_list_page.dart';
-import 'package:mem/views/mems/mem_name.dart';
+import 'package:mem/listAndDetails/mem_list_item_view.dart';
+import 'package:mem/view/mems/mem_list/mem_list_page.dart';
+import 'package:mem/listAndDetails/mem_name.dart';
 import 'package:mockito/mockito.dart';
 
 import '../../_helpers.dart';
@@ -393,6 +395,8 @@ void main() {
     testWidgets(
       ': notifyAt',
       (widgetTester) async {
+        initializeLogger(Level.verbose);
+
         final now = DateTime.now();
         final nowDate = DateTime(now.year, now.month, now.day);
         final nowDateTime =
@@ -449,6 +453,8 @@ void main() {
         expectMemNameTextOnListAt(widgetTester, 2, notifyAtNow.name);
         expectMemNameTextOnListAt(widgetTester, 3, notifyAtOneMinuteLater.name);
         expectMemNameTextOnListAt(widgetTester, 4, notifyOnIsNull.name);
+
+        initializeLogger(Level.error);
       },
       tags: TestSize.small,
     );

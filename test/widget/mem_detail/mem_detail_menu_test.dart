@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/domains/mem.dart';
+import 'package:mem/domain/mem.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
-import 'package:mem/views/colors.dart';
+import 'package:mem/listAndDetails/colors.dart';
 import 'package:mockito/mockito.dart';
 
 import '../../_helpers.dart';

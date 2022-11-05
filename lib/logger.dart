@@ -5,6 +5,8 @@ import 'package:mem/services/log_service.dart';
 const _filePath = 'mem/logger';
 
 LogService _logService = LogService(Level.error);
+// FIXME Functional architectureへ移行するための一時的な対応
+LogService logService = _logService;
 
 void initializeLogger([Level? logLevel]) {
   LogService.reset();
@@ -24,6 +26,11 @@ T v<T>(
       arguments: arguments,
       level: debug ? Level.debug : Level.verbose,
     );
+
+// TODO 引数もログに表示されるようにしたい
+// T vV2<T>(T Function() function) {
+//   return function();
+// }
 
 T t<T>(
   Map<String, dynamic>? args,
