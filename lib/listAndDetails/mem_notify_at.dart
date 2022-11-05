@@ -3,6 +3,7 @@ import 'package:mem/domain/date_and_time.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/domain/mem.dart';
 import 'package:mem/view/_atom/hero_view.dart';
+import 'package:mem/listAndDetails/colors.dart';
 import 'package:mem/view/molecules/date_and_time_text_form_field.dart';
 import 'package:mem/listAndDetails/date_and_time_view.dart';
 
@@ -13,10 +14,19 @@ class MemNotifyAtText extends DateAndTimeText {
 
   MemNotifyAtText(
     this._memId,
+    // TODO 引数をDateAndTimeにする
     DateTime memNotifyOn,
     TimeOfDay? memNotifyAt, {
     super.key,
-  }) : super(DateAndTime.from(memNotifyOn, timeOfDay: memNotifyAt));
+  }) : super(
+          DateAndTime.from(memNotifyOn, timeOfDay: memNotifyAt),
+          style: TextStyle(
+            color: DateAndTime.from(memNotifyOn, timeOfDay: memNotifyAt)
+                    .isBefore(DateTime.now())
+                ? aposematicColor
+                : null,
+          ),
+        );
 
   @override
   Widget build(BuildContext context) => v(

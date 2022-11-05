@@ -49,7 +49,7 @@ class DateAndTime extends DateTime {
 
   DateTime get dateTime => DateTime(year, month, day);
 
-  TimeOfDay? get timeOfDay => isAllDay ? null : TimeOfDay.fromDateTime(this);
+  // TimeOfDay? get timeOfDay => isAllDay ? null : TimeOfDay.fromDateTime(this);
 
   @override
   String toString() => '${super.toString()}, isAllDay: $isAllDay';
