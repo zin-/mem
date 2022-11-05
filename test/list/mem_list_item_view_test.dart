@@ -7,12 +7,12 @@ import 'package:mem/domain/mem.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/repositories/notification_repository.dart';
-import 'package:mem/view/mems/mem_list/mem_list_item_view.dart';
+import 'package:mem/list/mem_list_item_view.dart';
 import 'package:mockito/mockito.dart';
 
-import '../../_helpers.dart';
-import '../../samples.dart';
-import '../../mocks.mocks.dart';
+import '../_helpers.dart';
+import '../samples.dart';
+import '../mocks.mocks.dart';
 
 void main() {
   Future pumpMemListItemView(
