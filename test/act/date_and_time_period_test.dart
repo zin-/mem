@@ -52,4 +52,18 @@ void main() {
       expect(dateAndTimePeriod.end, null);
     });
   });
+
+  test('toString', () {
+    final now = DateAndTime.now();
+
+    final dateAndTimePeriod = DateAndTimePeriod(start: null, end: now);
+
+    expect(
+      dateAndTimePeriod.toString(),
+      '{'
+      'start: ${dateAndTimePeriod.start.toString()}'
+      ', end: ${dateAndTimePeriod.end.toString()}'
+      '}',
+    );
+  });
 }

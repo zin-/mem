@@ -15,4 +15,9 @@ class DateAndTimePeriod {
               ? DateAndTime.now()
               : DateAndTime.now(allDay: allDay),
         );
+
+  Map<String, dynamic> toMap() => {'start': start, 'end': end};
+
+  @override
+  String toString() => toMap().toString();
 }

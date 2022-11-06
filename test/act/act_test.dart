@@ -11,4 +11,11 @@ void main() {
       expect(act.period, actPeriod);
     });
   });
+
+  test('toString', () {
+    final actPeriod = DateAndTimePeriod.startNow();
+    final act = Act(actPeriod);
+
+    expect(act.toString(), '{period: ${actPeriod.toString()}}');
+  });
 }
