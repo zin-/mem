@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/domain/mem.dart';
 import 'package:mem/l10n.dart';
 import 'package:mem/logger.dart';
-import 'package:mem/view/_atom/async_value_view.dart';
+import 'package:mem/gui/async_value_view.dart';
 import 'package:mem/view/mems/mem_detail/mem_detail_states.dart';
 
 class MemItemsView extends ConsumerWidget {
