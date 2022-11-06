@@ -8,4 +8,11 @@ class DateAndTimePeriod {
     assert(start != null || end != null);
     if (start != null && end != null) assert(start!.compareTo(end!) <= 0);
   }
+
+  DateAndTimePeriod.startNow({bool? allDay})
+      : this(
+          start: allDay == null
+              ? DateAndTime.now()
+              : DateAndTime.now(allDay: allDay),
+        );
 }

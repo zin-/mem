@@ -42,5 +42,14 @@ void main() {
         throwsAssertionError,
       );
     });
+
+    test(': startNow', () {
+      final now = DateAndTime.now();
+
+      final dateAndTimePeriod = DateAndTimePeriod.startNow();
+
+      expect(dateAndTimePeriod.start, now);
+      expect(dateAndTimePeriod.end, null);
+    });
   });
 }
