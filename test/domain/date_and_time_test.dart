@@ -46,12 +46,16 @@ void main() {
     });
   });
 
-  test('toString', () {
-    final dateAndTime = DateAndTime(2022, 11, 6, 14, 49);
+  test(
+    'toString',
+    () {
+      final dateAndTime = DateAndTime(2022, 11, 6, 14, 49);
 
-    expect(
-      dateAndTime.toString(),
-      '{_: 2022-11-06 14:49:00.000, isAllDay: false}',
-    );
-  });
+      expect(
+        dateAndTime.toString(),
+        '{_: 2022-11-06 14:49:00.000, isAllDay: false}',
+      );
+    },
+    tags: TestSize.small,
+  );
 }

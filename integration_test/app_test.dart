@@ -4,6 +4,7 @@ import 'package:mem/database/database_manager.dart';
 import 'package:mem/logger.dart';
 import 'package:mem/repositories/log_repository.dart';
 
+import 'act/_act_list_page.dart';
 import 'database/_database_manager.dart';
 import 'database/_indexed_database.dart';
 import 'database/_sqlite_database.dart';
@@ -42,5 +43,9 @@ void main() {
     testTodoScenario();
 
     testEdgeScenario();
+  });
+
+  group('Act test', () {
+    testActListPage();
   });
 }

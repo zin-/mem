@@ -7,6 +7,8 @@ import 'package:mem/l10n.dart';
 import 'package:mem/logger/api.dart';
 import 'package:mem/repositories/log_repository.dart';
 
+import '../_helpers.dart';
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -23,6 +25,7 @@ void testActListPage() => group('ActListPage test', () {
 
           expect(find.byType(ActListPage), findsOneWidget);
         },
+        tags: TestSize.small,
       );
     });
 
