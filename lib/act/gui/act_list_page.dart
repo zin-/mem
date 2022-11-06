@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/gui/async_value_view.dart';
 import 'package:mem/logger/api.dart';
 
+import '../domain/act.dart';
+
+import 'act_list_page_actions.dart';
 import 'act_list_page_states.dart';
 import 'act_list_view.dart';
 
@@ -12,11 +16,29 @@ class ActListPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => t(
         {},
         () {
-          final actList = ref.watch(actListProvider)!;
-
           return Scaffold(
-            body: ActListView(actList),
+            body: buildBody(ref, (List<Act> actList) => ActListView(actList)),
           );
+        },
+      );
+
+  Widget buildBody(
+    WidgetRef ref,
+    Widget Function(List<Act> actList) buildFunction,
+  ) =>
+      v(
+        {},
+        () {
+          final actList = ref.watch(actListProvider);
+          if (actList == null) {
+            final fetchedActList = ref.watch(fetchActList);
+            return AsyncValueView<List<Act>>(
+              fetchedActList,
+              (value) => buildFunction(value),
+            );
+          } else {
+            return buildFunction(actList);
+          }
         },
       );
 }
