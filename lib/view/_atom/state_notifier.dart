@@ -29,7 +29,7 @@ class ValueStateNotifier<T> extends StateNotifier<T> {
 }
 
 class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>?> {
-  ListValueStateNotifier(List<T>? initialState) : super(initialState);
+  ListValueStateNotifier(super.state);
 
   void add(T item) => v(
         {'item': item},
