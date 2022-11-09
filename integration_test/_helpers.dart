@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/database/database_manager.dart';
+import 'package:mem/l10n.dart';
 import 'package:mem/main.dart' as app;
 import 'package:mem/domain/mem.dart';
 import 'package:mem/services/mem_service.dart';
@@ -130,3 +131,13 @@ Future<void> prepareSavedMem(
 
   MemRepository.reset(null);
 }
+
+Future<void> runTestWidget(WidgetTester widgetTester, Widget widget) =>
+    widgetTester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: L10n.localizationsDelegates,
+        supportedLocales: L10n.supportedLocales,
+        onGenerateTitle: (context) => L10n(context).test(),
+        home: widget,
+      ),
+    );
