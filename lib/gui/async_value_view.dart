@@ -1,46 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/logger.dart';
+import 'package:mem/logger/api.dart';
+
+const stackTraceFontSize = 16.0;
 
 class AsyncValueView<T> extends StatelessWidget {
   final AsyncValue<T> _asyncValue;
-  final Widget Function(T value) _viewBuilder;
-  final Widget Function() _loadingViewBuilder;
-  final Widget Function(Object error, StackTrace? stackTrace) _errorViewBuilder;
+  final Widget Function(T data) _viewBuilder;
 
-  AsyncValueView(
-    this._asyncValue,
-    this._viewBuilder, {
-    Widget Function()? loadingViewBuilder,
-    Widget Function(Object error, StackTrace? stackTrace)? errorViewBuilder,
-    Key? key,
-  })  : _loadingViewBuilder =
-            loadingViewBuilder ?? (() => const CircularProgressIndicator()),
-        _errorViewBuilder = errorViewBuilder ??
-            ((error, stackTrace) => SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Text(error.toString()),
-                      // TODO show error details
-                      // ...stackTrace
-                      //     .toString()
-                      //     .split('\n')
-                      //     .slice(0, 5)
-                      //     .map((element) => Text(element))
-                    ],
-                  ),
-                )),
-        super(key: key);
+  const AsyncValueView(this._asyncValue, this._viewBuilder, {super.key});
 
   @override
   Widget build(BuildContext context) => v(
-        {'asyncValue': _asyncValue},
-        () {
-          return _asyncValue.when(
-            data: _viewBuilder,
-            loading: _loadingViewBuilder,
-            error: _errorViewBuilder,
-          );
-        },
+        {'_asyncValue': _asyncValue},
+        () => _asyncValue.when(
+          loading: () => const CircularProgressIndicator(),
+          data: (data) => _viewBuilder(data),
+          error: (error, stackTrace) => SingleChildScrollView(
+            child: Column(
+              children: [
+                Text(error.toString()),
+                Text(
+                  stackTrace.toString(),
+                  style: const TextStyle(fontSize: stackTraceFontSize),
+                ),
+              ],
+            ),
+          ),
+        ),
       );
 }

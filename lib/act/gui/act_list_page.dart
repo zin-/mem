@@ -31,10 +31,9 @@ class ActListPage extends ConsumerWidget {
         () {
           final actList = ref.watch(actListProvider);
           if (actList == null) {
-            final fetchedActList = ref.watch(fetchActList);
-            return AsyncValueView<List<Act>>(
-              fetchedActList,
-              (value) => buildFunction(value),
+            return AsyncValueView(
+              ref.watch(fetchActList),
+              (List<Act> data) => buildFunction(data),
             );
           } else {
             return buildFunction(actList);

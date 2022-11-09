@@ -14,9 +14,9 @@ class MemItemsView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         {'_memId': _memId},
-        () => AsyncValueView<Iterable<MemItem>>(
+        () => AsyncValueView(
           ref.watch(loadMemItems(_memId)),
-          (memItems) => MemItemsViewComponent(
+          (Iterable<MemItem> memItems) => MemItemsViewComponent(
             memItems,
             (value, memItem) => ref
                 .read(memItemsProvider(_memId).notifier)
