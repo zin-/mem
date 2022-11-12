@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger/api.dart';
-import 'package:mem/view/_atom/state_notifier.dart'; // TODO move
+import 'package:mem/gui/state_notifier.dart';
 
 import '../domain/act.dart';
 import '../domain/date_and_time_period.dart';
