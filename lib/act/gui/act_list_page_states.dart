@@ -13,7 +13,7 @@ final actListProvider =
       final actList = ListValueStateNotifier<Act>(null);
 
       Future.delayed(
-        const Duration(seconds: 20),
+        const Duration(seconds: 1),
         () => List.generate(
           20,
           (index) => Act(
