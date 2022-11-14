@@ -121,7 +121,7 @@ final sortedMemList =
       final filteredMemList = ref.watch(filteredMemListProvider);
 
       final sortedMemList = filteredMemList.sorted(
-        (item1, item2) => t(
+        (item1, item2) => v(
           {'item1': item1, 'item2': item2},
           () {
             if (item1.isDone() != item2.isDone()) {
@@ -189,6 +189,7 @@ final sortedMemList =
 
             return item1.id!.compareTo(item2.id!);
           },
+          debug: true,
         ),
       );
 
