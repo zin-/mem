@@ -1,20 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:mem/repositories/log_repository.dart';
 import 'package:mem/services/log_service.dart';
 
-const _filePath = 'mem/logger';
-
 LogService _logService = LogService(Level.error);
-// FIXME Functional architectureへ移行するための一時的な対応
-LogService logService = _logService;
-
-void initializeLogger([Level? logLevel]) {
-  LogService.reset();
-  _logService = LogService(
-    logLevel ?? (kDebugMode ? Level.trace : Level.error),
-    ignoreFilePaths: [_filePath],
-  );
-}
 
 T v<T>(
   Map<String, dynamic>? arguments,

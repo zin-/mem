@@ -29,15 +29,25 @@ T v<T>(
     );
 
 T t<T>(
-    Map<String, dynamic>? args,
-    T Function() function, {
-      @Deprecated('Allow under develop only') bool debug = false,
-    }) =>
+  Map<String, dynamic>? args,
+  T Function() function, {
+  @Deprecated('Allow under develop only') bool debug = false,
+}) =>
     _logService.functionLog(
       function,
       arguments: args,
       level: debug ? Level.debug : Level.trace,
     );
+
+T trace<T>(T message) {
+  _logService.log(message, level: Level.trace);
+  return message;
+}
+
+T warn<T>(T message) {
+  _logService.log(message, level: Level.warning);
+  return message;
+}
 
 // coverage:ignore-start
 @Deprecated('Allow under develop only')
