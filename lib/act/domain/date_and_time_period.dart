@@ -9,11 +9,9 @@ class DateAndTimePeriod {
     if (start != null && end != null) assert(start!.compareTo(end!) <= 0);
   }
 
-  DateAndTimePeriod.startNow({bool? allDay})
+  DateAndTimePeriod.startNow({bool allDay = false})
       : this(
-          start: allDay == null
-              ? DateAndTime.now()
-              : DateAndTime.now(allDay: allDay),
+          start: DateAndTime.now(allDay: allDay),
         );
 
   Map<String, dynamic> toMap() => {'start': start, 'end': end};

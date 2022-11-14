@@ -19,6 +19,7 @@ void main() {
       },
       tags: TestSize.small,
     );
+
     test(
       ': with end',
       () {
@@ -32,6 +33,7 @@ void main() {
       },
       tags: TestSize.small,
     );
+
     test(
       ': with start and end',
       () {
@@ -40,23 +42,6 @@ void main() {
 
         expect(dateAndTimePeriod.start, now);
         expect(dateAndTimePeriod.end, now);
-      },
-      tags: TestSize.small,
-    );
-
-    test(': start and end are null', () {
-      expect(() => DateAndTimePeriod(), throwsAssertionError);
-    });
-    test(
-      ': start is after end',
-      () {
-        final start = DateAndTime.now();
-        final end = DateAndTime.from(start.subtract(const Duration(days: 1)));
-
-        expect(
-          () => DateAndTimePeriod(start: start, end: end),
-          throwsAssertionError,
-        );
       },
       tags: TestSize.small,
     );
@@ -73,6 +58,26 @@ void main() {
       },
       tags: TestSize.small,
     );
+
+    group(': throw error', () {
+      test(': start and end are null', () {
+        expect(() => DateAndTimePeriod(), throwsAssertionError);
+      });
+
+      test(
+        ': start is after end',
+        () {
+          final start = DateAndTime.now();
+          final end = DateAndTime.from(start.subtract(const Duration(days: 1)));
+
+          expect(
+            () => DateAndTimePeriod(start: start, end: end),
+            throwsAssertionError,
+          );
+        },
+        tags: TestSize.small,
+      );
+    });
   });
 
   test(
