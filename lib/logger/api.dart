@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:mem/repositories/log_repository.dart';
-import 'package:mem/services/log_service.dart';
+import 'package:mem/logger/log_repository.dart';
+import 'package:mem/logger/log_service.dart';
 
 const _filePath = 'mem/logger/api.dart';
 
@@ -28,6 +28,11 @@ T v<T>(
       level: debug ? Level.debug : Level.verbose,
     );
 
+// TODO argumentsを渡さなくても引数がログに表示されるようにしたい
+// T vV2<T>(T Function() function) {
+//   return function();
+// }
+
 T t<T>(
   Map<String, dynamic>? args,
   T Function() function, {
@@ -38,6 +43,11 @@ T t<T>(
       arguments: args,
       level: debug ? Level.debug : Level.trace,
     );
+
+T verbose<T>(T message) {
+  _logService.log(message, level: Level.verbose);
+  return message;
+}
 
 T trace<T>(T message) {
   _logService.log(message, level: Level.trace);

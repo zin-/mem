@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mem/l10n.dart';
-import 'package:mem/logger.dart';
+import 'package:mem/logger/api.dart';
 
 class TimeOfDayTextFormField extends StatelessWidget {
   final TimeOfDay? timeOfDay;

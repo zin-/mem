@@ -1,4 +1,4 @@
-import 'package:mem/repositories/log_repository.dart';
+import 'package:mem/logger/log_repository.dart';
 
 const _filePath = 'mem/services/log_service.dart';
 

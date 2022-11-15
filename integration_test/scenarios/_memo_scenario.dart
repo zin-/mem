@@ -4,7 +4,7 @@ import 'package:integration_test/integration_test.dart';
 import 'package:intl/intl.dart';
 import 'package:mem/database/database_manager.dart';
 import 'package:mem/logger/api.dart';
-import 'package:mem/repositories/log_repository.dart';
+import 'package:mem/logger/log_repository.dart';
 import 'package:mem/listAndDetails/mem_notify_at.dart';
 
 import '../_helpers.dart';

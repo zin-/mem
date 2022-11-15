@@ -1,5 +1,5 @@
 import 'package:mem/repositories/_repository.dart';
-import 'package:mem/wrappers/logger.dart';
+import 'package:mem/logger/logger.dart';
 
 const _filePath = 'mem/repositories/log_repository.dart';
 
