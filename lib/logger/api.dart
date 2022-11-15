@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:mem/logger/log_repository.dart';
 import 'package:mem/logger/log_service.dart';
+
+import 'i/type.dart';
 
 const _filePath = 'mem/logger/api.dart';
 

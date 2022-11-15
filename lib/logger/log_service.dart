@@ -1,5 +1,7 @@
 import 'package:mem/logger/log_repository.dart';
 
+import 'i/type.dart';
+
 const _filePath = 'mem/services/log_service.dart';
 
 class LogService {

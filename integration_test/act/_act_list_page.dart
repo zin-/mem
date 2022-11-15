@@ -3,15 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/act/gui/act_list_page.dart';
-import 'package:mem/logger/api.dart';
-import 'package:mem/logger/log_repository.dart';
 
 import '../_helpers.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
-  initializeLogger(Level.trace);
 
   testActListPage();
 }

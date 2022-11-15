@@ -1,5 +1,6 @@
 import 'package:logger/logger.dart';
-import 'package:mem/logger/log_repository.dart' as repository;
+
+import 'i/type.dart' as i;
 
 const _filePath = 'mem/wrappers/logger.dart';
 
@@ -9,7 +10,7 @@ class LoggerWrapper {
   LoggerWrapper._(this._logger);
 
   void log(
-    repository.Level level,
+    i.Level level,
     dynamic message, [
     dynamic error,
     StackTrace? stackTrace,
@@ -19,7 +20,7 @@ class LoggerWrapper {
   static LoggerWrapper? _instance;
 
   factory LoggerWrapper(
-    repository.Level level,
+    i.Level level,
     bool Function(String line, String filePath)? shouldOutputStackTraceLine,
   ) {
     var tmp = _instance;
@@ -71,18 +72,18 @@ class _LogPrinter extends PrettyPrinter {
   }
 }
 
-extension on repository.Level {
+extension on i.Level {
   Level _convert() {
     switch (this) {
-      case repository.Level.verbose:
+      case i.Level.verbose:
         return Level.verbose;
-      case repository.Level.trace:
+      case i.Level.trace:
         return Level.info;
-      case repository.Level.warning:
+      case i.Level.warning:
         return Level.warning;
-      case repository.Level.error:
+      case i.Level.error:
         return Level.error;
-      case repository.Level.debug:
+      case i.Level.debug:
         return Level.debug;
     }
   }
