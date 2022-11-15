@@ -4,6 +4,8 @@ import 'package:mem/domain/entity_value.dart';
 class Mem extends EntityValue {
   String name;
   DateTime? doneAt;
+
+  // TODO notifyOnとnotifyAtをDateAndTimeに置き換える
   DateTime? notifyOn;
   TimeOfDay? notifyAt;
 
