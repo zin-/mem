@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:mem/logger/api.dart';
+import 'package:mem/logger/i/api.dart';
 import 'package:mem/main.dart';
 import 'package:mem/repositories/notification_repository.dart';
 import 'package:mem/services/notification_service.dart';

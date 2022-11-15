@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/logger/api.dart';
+import 'package:mem/logger/i/api.dart';
 import 'package:mem/gui/state_notifier.dart';
 
 import '../domain/act.dart';

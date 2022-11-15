@@ -6,7 +6,7 @@ import 'package:mem/database/definitions.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 
-import 'logger/api.dart';
+import 'logger/i/api.dart';
 
 final databaseDefinition = DefD(
   'mem.db',

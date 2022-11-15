@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/logger/api.dart';
+import 'package:mem/logger/i/api.dart';
 
 const stackTraceFontSize = 16.0;
 

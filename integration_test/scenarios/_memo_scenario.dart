@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:intl/intl.dart';
 import 'package:mem/database/database_manager.dart';
-import 'package:mem/logger/api.dart';
+import 'package:mem/logger/i/api.dart';
 import 'package:mem/listAndDetails/mem_notify_at.dart';
 
 import '../_helpers.dart';

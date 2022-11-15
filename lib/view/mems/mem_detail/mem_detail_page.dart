@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/l10n.dart';
-import 'package:mem/logger/api.dart';
+import 'package:mem/logger/i/api.dart';
 import 'package:mem/gui/async_value_view.dart';
 import 'package:mem/listAndDetails/colors.dart';
 import 'package:mem/view/dimens.dart';

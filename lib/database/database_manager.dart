@@ -3,7 +3,7 @@ import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
 import 'package:mem/database/indexed_database.dart';
 import 'package:mem/database/sqlite_database.dart';
-import 'package:mem/logger/api.dart';
+import 'package:mem/logger/i/api.dart';
 
 // FIXME Managerであることが分からない実装にしたい
 // 具体的には、Databaseクラスのfactoryだけで完結させたい

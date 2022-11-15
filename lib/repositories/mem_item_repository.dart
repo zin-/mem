@@ -1,6 +1,6 @@
 import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
-import 'package:mem/logger/api.dart';
+import 'package:mem/logger/i/api.dart';
 import 'package:mem/domain/mem.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/repositories/_database_tuple_repository.dart';

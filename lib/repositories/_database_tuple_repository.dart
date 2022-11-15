@@ -1,6 +1,6 @@
 import 'package:mem/database/database.dart';
 import 'package:mem/database/definitions.dart';
-import 'package:mem/logger/api.dart';
+import 'package:mem/logger/i/api.dart';
 
 const idColumnName = 'id';
 const createdAtColumnName = 'createdAt';
