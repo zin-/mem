@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/act/domain/act.dart';
-import 'package:mem/act/domain/date_and_time_period.dart';
+import 'package:mem/act/core/act.dart';
+import 'package:mem/act/core/date_and_time_period.dart';
 import 'package:mem/act/gui/act_list_item_view.dart';
 import 'package:mem/act/gui/act_list_page_states.dart';
 import 'package:mem/act/gui/act_list_view.dart';

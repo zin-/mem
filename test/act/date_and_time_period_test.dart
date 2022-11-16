@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/act/domain/date_and_time_period.dart';
+import 'package:mem/act/core/date_and_time_period.dart';
 import 'package:mem/domain/date_and_time.dart';
 
 import '../_helpers.dart';

@@ -1,4 +1,4 @@
-import 'package:mem/act/domain/date_and_time_period.dart';
+import 'package:mem/act/core/date_and_time_period.dart';
 
 class Act {
   final DateAndTimePeriod period;
