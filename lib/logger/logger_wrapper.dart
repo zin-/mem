@@ -2,7 +2,7 @@ import 'package:logger/logger.dart';
 
 import 'i/type.dart' as i;
 
-const _filePath = 'mem/wrappers/loggerWrapper.dart';
+const _filePath = 'mem/wrappers/logger_wrapper.dart';
 
 class LoggerWrapper {
   Logger _logger;
