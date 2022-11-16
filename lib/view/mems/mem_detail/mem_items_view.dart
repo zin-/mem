@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/domain/mem.dart';
 import 'package:mem/l10n.dart';
-import 'package:mem/logger.dart';
-import 'package:mem/view/_atom/async_value_view.dart';
+import 'package:mem/logger/i/api.dart';
+import 'package:mem/gui/async_value_view.dart';
 import 'package:mem/view/mems/mem_detail/mem_detail_states.dart';
 
 class MemItemsView extends ConsumerWidget {
@@ -14,9 +14,9 @@ class MemItemsView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         {'_memId': _memId},
-        () => AsyncValueView<Iterable<MemItem>>(
+        () => AsyncValueView(
           ref.watch(loadMemItems(_memId)),
-          (memItems) => MemItemsViewComponent(
+          (Iterable<MemItem> memItems) => MemItemsViewComponent(
             memItems,
             (value, memItem) => ref
                 .read(memItemsProvider(_memId).notifier)

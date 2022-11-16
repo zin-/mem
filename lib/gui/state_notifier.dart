@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/logger.dart';
+import 'package:mem/logger/i/api.dart';
 
 const _jsonEncoderIndent = '  ';
 
@@ -29,7 +29,7 @@ class ValueStateNotifier<T> extends StateNotifier<T> {
 }
 
 class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>?> {
-  ListValueStateNotifier(List<T>? state) : super(state);
+  ListValueStateNotifier(super.state);
 
   void add(T item) => v(
         {'item': item},

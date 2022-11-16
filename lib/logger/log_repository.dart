@@ -1,7 +1,9 @@
 import 'package:mem/repositories/_repository.dart';
-import 'package:mem/wrappers/logger.dart';
+import 'package:mem/logger/logger_wrapper.dart';
 
-const _filePath = 'mem/repositories/log_repository.dart';
+import 'i/type.dart';
+
+const _filePath = 'mem/logger/log_repository.dart';
 
 class LogRepository extends Repository<LogEntity, void> {
   final LoggerWrapper _loggerWrapper;
@@ -65,14 +67,6 @@ class LogRepository extends Repository<LogEntity, void> {
       return true;
     };
   }
-}
-
-enum Level {
-  verbose,
-  trace,
-  warning,
-  error,
-  debug,
 }
 
 class LogEntity extends Entity {

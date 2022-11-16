@@ -16,8 +16,11 @@ void main() {
           expect(dateAndTime, isA<DateAndTime>());
           expect(dateAndTime, isA<DateTime>());
 
-          final string = dateAndTime.toString();
-          expect(string, '${dateTime.toString()}, isAllDay: false');
+          expect(
+            dateAndTime.microsecondsSinceEpoch,
+            dateTime.microsecondsSinceEpoch,
+          );
+          expect(dateAndTime.isAllDay, false);
         },
         tags: TestSize.small,
       );
@@ -32,11 +35,27 @@ void main() {
           expect(dateAndTime, isA<DateAndTime>());
           expect(dateAndTime, isA<DateTime>());
 
-          final string = dateAndTime.toString();
-          expect(string, '${dateTime.toString()}, isAllDay: true');
+          expect(
+            dateAndTime.microsecondsSinceEpoch,
+            dateTime.microsecondsSinceEpoch,
+          );
+          expect(dateAndTime.isAllDay, true);
         },
         tags: TestSize.small,
       );
     });
   });
+
+  test(
+    'toString',
+    () {
+      final dateAndTime = DateAndTime(2022, 11, 6, 14, 49);
+
+      expect(
+        dateAndTime.toString(),
+        '{_: 2022-11-06 14:49:00.000, isAllDay: false}',
+      );
+    },
+    tags: TestSize.small,
+  );
 }

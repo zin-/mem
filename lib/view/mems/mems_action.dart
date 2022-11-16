@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/logger.dart';
+import 'package:mem/logger/i/api.dart';
 import 'package:mem/services/notification_service.dart';
 import 'package:mem/view/mems/mems_state.dart';
 

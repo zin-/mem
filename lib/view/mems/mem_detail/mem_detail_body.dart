@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/logger.dart';
+import 'package:mem/logger/i/api.dart';
 import 'package:mem/view/mems/mem_detail/mem_items_view.dart';
 import 'package:mem/listAndDetails/mem_notify_at.dart';
 import 'package:mem/listAndDetails/mem_done_checkbox.dart';

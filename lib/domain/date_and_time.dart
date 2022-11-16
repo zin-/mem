@@ -51,6 +51,11 @@ class DateAndTime extends DateTime {
 
   // TimeOfDay? get timeOfDay => isAllDay ? null : TimeOfDay.fromDateTime(this);
 
+  Map<String, dynamic> toMap() => {
+        '_': super.toString(),
+        'isAllDay': isAllDay,
+      };
+
   @override
-  String toString() => '${super.toString()}, isAllDay: $isAllDay';
+  String toString() => toMap().toString();
 }

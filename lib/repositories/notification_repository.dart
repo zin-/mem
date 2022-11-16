@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:mem/logger.dart';
+import 'package:mem/logger/i/api.dart';
 import 'package:mem/wrappers/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;

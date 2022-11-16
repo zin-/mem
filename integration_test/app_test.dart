@@ -1,9 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/database/database_manager.dart';
-import 'package:mem/logger.dart';
-import 'package:mem/repositories/log_repository.dart';
+import 'package:mem/logger/i/api.dart';
+import 'package:mem/logger/i/type.dart';
 
+import 'act/_act_list_page.dart';
 import 'database/_database_manager.dart';
 import 'database/_indexed_database.dart';
 import 'database/_sqlite_database.dart';
@@ -42,5 +43,9 @@ void main() {
     testTodoScenario();
 
     testEdgeScenario();
+  });
+
+  group('Act test', () {
+    testActListPage();
   });
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/l10n.dart';
-import 'package:mem/logger.dart';
+import 'package:mem/logger/i/api.dart';
 import 'package:mem/view/constants.dart';
 import 'package:mem/view/mems/mem_detail/mem_detail_states.dart';
 

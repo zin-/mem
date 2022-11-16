@@ -1,12 +1,14 @@
 import 'package:flutter/foundation.dart';
-import 'package:mem/repositories/log_repository.dart';
-import 'package:mem/services/log_service.dart';
+import 'package:mem/logger/log_service.dart';
 
-const _filePath = 'mem/logger';
+import 'type.dart';
 
-LogService _logService = LogService(Level.error);
-// FIXME Functional architectureへ移行するための一時的な対応
-LogService logService = _logService;
+const _filePath = 'mem/logger/api.dart';
+
+LogService _logService = LogService(
+  Level.error,
+  ignoreFilePaths: [_filePath],
+);
 
 void initializeLogger([Level? logLevel]) {
   LogService.reset();
@@ -27,7 +29,7 @@ T v<T>(
       level: debug ? Level.debug : Level.verbose,
     );
 
-// TODO 引数もログに表示されるようにしたい
+// TODO argumentsを渡さなくても引数がログに表示されるようにしたい
 // T vV2<T>(T Function() function) {
 //   return function();
 // }
