@@ -2,8 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/gui/state_notifier.dart';
 
-import '../core/act.dart';
-import '../core/date_and_time_period.dart';
+import '../../core/act.dart';
+import '../../core/date_and_time_period.dart';
 
 final actListProvider =
     StateNotifierProvider<ListValueStateNotifier<Act>, List<Act>?>(
