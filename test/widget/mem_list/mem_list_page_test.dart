@@ -420,9 +420,7 @@ void main() {
           ..name = 'notifyAt is one hour ago'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyOn = nowDateTime.hour < 1
-              ? nowDate.subtract(const Duration(days: 1))
-              : nowDate
+          ..notifyOn = nowDate
           ..notifyAt = nowDateTime.add(const Duration(hours: -1));
         final notifyAtOneMinuteLater = minSavedMemEntity(5)
           ..name = 'notifyAt is one minute later'

@@ -189,7 +189,6 @@ final sortedMemList =
 
             return item1.id!.compareTo(item2.id!);
           },
-          debug: true,
         ),
       );
 
