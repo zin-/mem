@@ -1,4 +1,4 @@
-import 'package:mem/gui/state_notifier.dart';
+import 'package:mem/gui/value_state_notifier.dart';
 import 'package:mem/logger/i/api.dart';
 
 class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>?> {

@@ -3,7 +3,7 @@ import 'package:mem/gui/list_value_state_notifier.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/domain/mem.dart';
 import 'package:mem/services/mem_service.dart';
-import 'package:mem/gui/state_notifier.dart';
+import 'package:mem/gui/value_state_notifier.dart';
 
 final initialMem = Mem(name: '');
 
