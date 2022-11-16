@@ -6,7 +6,7 @@ import 'package:mem/act/core/date_and_time_period.dart';
 import 'package:mem/act/i/gui/act_list_item_view.dart';
 import 'package:mem/act/i/gui/act_list_page_states.dart';
 import 'package:mem/act/i/gui/act_list_view.dart';
-import 'package:mem/gui/state_notifier.dart';
+import 'package:mem/gui/list_value_state_notifier.dart';
 
 import '../../_helpers.dart';
 
