@@ -3,7 +3,7 @@ import 'package:mem/logger/loggerWrapper.dart';
 
 import 'i/type.dart';
 
-const _filePath = 'mem/repositories/log_repository.dart';
+const _filePath = 'mem/logger/log_repository.dart';
 
 class LogRepository extends Repository<LogEntity, void> {
   final LoggerWrapper _loggerWrapper;

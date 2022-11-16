@@ -2,7 +2,7 @@ import 'package:mem/logger/log_repository.dart';
 
 import 'i/type.dart';
 
-const _filePath = 'mem/services/log_service.dart';
+const _filePath = 'mem/logger/log_service.dart';
 
 class LogService {
   final Level _level;
