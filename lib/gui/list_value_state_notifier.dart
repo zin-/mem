@@ -15,50 +15,37 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>?> {
         },
       );
 
-  // いつか使いそうなので残す
-  // void upsert(T item, bool Function(T item) where) => v(
-  //       {'item': item, 'where': where},
-  //       () {
-  //         final tmp = List.of(state ?? <T>[]);
-  //
-  //         final index = tmp.indexWhere(where);
-  //         if (index > -1) {
-  //           tmp.replaceRange(index, index + 1, [item]);
-  //           updatedBy(tmp);
-  //         } else {
-  //           add(item);
-  //         }
-  //       },
-  //     );
-
   void upsertAll(Iterable<T> items, bool Function(T tmp, T item) where) => v(
         {'items': items},
         () {
-          final tmpList = List.of(state ?? <T>[]);
+          final tmp = List.of(state ?? <T>[]);
 
           for (var item in items) {
-            final index = tmpList.indexWhere(
+            final index = tmp.indexWhere(
               (tmpElement) => where(tmpElement, item),
             );
             if (index > -1) {
-              tmpList.replaceRange(index, index + 1, [item]);
+              tmp.replaceRange(index, index + 1, [item]);
             } else {
-              tmpList.add(item);
+              tmp.add(item);
             }
           }
 
-          updatedBy(tmpList);
+          updatedBy(tmp);
         },
       );
 
-  void remove(bool Function(T item) where) {
-    final tmp = List.of(state ?? <T>[]);
+  void removeWhere(bool Function(T item) where) => v(
+        {},
+        () {
+          final tmp = List.of(state ?? <T>[]);
 
-    final index = state?.indexWhere(where) ?? -1;
-    if (index != -1) {
-      tmp.removeAt(index);
-    }
+          final index = state?.indexWhere(where) ?? -1;
+          if (index != -1) {
+            tmp.removeAt(index);
+          }
 
-    updatedBy(tmp);
-  }
+          updatedBy(tmp);
+        },
+      );
 }

@@ -124,7 +124,7 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
                   }
                 } else {
                   if (result == null) {
-                    ref.read(memListProvider.notifier).remove(
+                    ref.read(memListProvider.notifier).removeWhere(
                           (item) => item.id == memId,
                         );
                     final mem = ref.read(memProvider(memId));
