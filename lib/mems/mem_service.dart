@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/i/api.dart';
+import 'package:mem/notifications/notification_repository.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
-import 'package:mem/repositories/notification_repository.dart';
-import 'package:mem/services/notification_service.dart';
+import 'package:mem/notifications/notification_service.dart';
 
 class MemDetail {
   final Mem mem;

@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:mem/logger/i/api.dart';
-import 'package:mem/wrappers/flutter_local_notifications.dart';
+import 'package:mem/notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -45,9 +45,9 @@ class NotificationRepository {
             _androidDefaultIconPath,
 // FIXME 現時点では、通知に対する操作をテストで実行できない
 // coverage:ignore-start
-                (notificationId, payload) => showMemDetailPageHandler(payload),
+            (notificationId, payload) => showMemDetailPageHandler(payload),
 // coverage:ignore-end
-                notificationActionHandler,
+            notificationActionHandler,
           );
 
           if (initialized) {
@@ -55,7 +55,7 @@ class NotificationRepository {
                 .receiveOnLaunchAppNotification(
 // FIXME 現時点では、通知に対する操作をテストで実行できない
 // coverage:ignore-start
-            (notificationId, payload) => showMemDetailPageHandler(payload),
+              (notificationId, payload) => showMemDetailPageHandler(payload),
 // coverage:ignore-end
             );
           }

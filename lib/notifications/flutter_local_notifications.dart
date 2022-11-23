@@ -6,9 +6,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/main.dart';
-import 'package:mem/repositories/notification_repository.dart';
-import 'package:mem/services/notification_service.dart';
+import 'package:mem/notifications/notification_service.dart';
 import 'package:timezone/timezone.dart';
+
+import 'notification_repository.dart';
 
 typedef OnNotificationTappedCallback = Function(
   int id,

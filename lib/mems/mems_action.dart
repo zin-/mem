@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger/i/api.dart';
-import 'package:mem/services/notification_service.dart';
+import 'package:mem/notifications/notification_service.dart';
 import 'package:mem/mems/mems_state.dart';
 
 // FIXME ログで見たときこの関数名だと分かりづらい
