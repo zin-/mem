@@ -1,6 +1,6 @@
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/logger/i/api.dart';
-import 'package:mem/domain/mem.dart';
+import 'package:mem/core/mem.dart';
 import 'package:mem/repositories/notification_repository.dart';
 import 'package:mem/mems/mem_service.dart';
 

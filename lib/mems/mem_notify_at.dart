@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mem/domain/date_and_time.dart';
-import 'package:mem/domain/mem.dart';
+import 'package:mem/core/date_and_time.dart';
+import 'package:mem/core/mem.dart';
 import 'package:mem/gui/colors.dart';
 import 'package:mem/gui/date_and_time_text_form_field.dart';
 import 'package:mem/gui/date_and_time_view.dart';

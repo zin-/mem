@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/acts/core/act.dart';
-import 'package:mem/acts/core/date_and_time_period.dart';
+import 'package:mem/core/act.dart';
+import 'package:mem/core/date_and_time_period.dart';
 import 'package:mem/gui/list_value_state_notifier.dart';
 import 'package:mem/logger/i/api.dart';
 

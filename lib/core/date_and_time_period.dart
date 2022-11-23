@@ -1,4 +1,4 @@
-import 'package:mem/domain/date_and_time.dart';
+import 'date_and_time.dart';
 
 class DateAndTimePeriod {
   final DateAndTime? start;

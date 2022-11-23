@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mem/logger/i/api.dart';
 
-import '../core/act.dart';
+import '../../core/act.dart';
 
 class ActListItemView extends StatelessWidget {
   final Act act;

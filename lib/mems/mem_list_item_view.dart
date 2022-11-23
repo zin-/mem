@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/domain/date_and_time.dart';
-import 'package:mem/domain/mem.dart';
+import 'package:mem/core/date_and_time.dart';
+import 'package:mem/core/mem.dart';
 import 'package:mem/gui/colors.dart';
 
 import '../mems/mem_done_checkbox.dart';

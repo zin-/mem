@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mem/domain/mem.dart';
+import 'package:mem/core/mem.dart';
 import 'package:mem/gui/hero_view.dart';
 import 'package:mem/logger/i/api.dart';
 
