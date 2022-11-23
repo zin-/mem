@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger/i/api.dart';
 
-import '../../core/act.dart';
-
+import '../core/act.dart';
 import 'act_list_item_view.dart';
 import 'act_list_page_states.dart';
 
