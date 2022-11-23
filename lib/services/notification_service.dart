@@ -2,7 +2,7 @@ import 'package:mem/l10n.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/domain/mem.dart';
 import 'package:mem/repositories/notification_repository.dart';
-import 'package:mem/services/mem_service.dart';
+import 'package:mem/mems/mem_service.dart';
 
 const memReminderChannelId = 'reminder';
 
