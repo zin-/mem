@@ -177,11 +177,11 @@ class ObjectStore extends Table {
 
   @override
   Future<List<Map<String, dynamic>>> select({
-    String? where,
+    String? whereString,
     List<Object?>? whereArgs,
   }) =>
       v(
-        {'where': where, 'whereArgs': whereArgs},
+        {'where': whereString, 'whereArgs': whereArgs},
         () async => await _database.onOpened(
           () async {
             // TODO implements where
