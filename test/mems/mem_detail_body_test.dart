@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/gui/list_value_state_notifier.dart';
-import 'package:mem/l10n.dart';
+import 'package:mem/gui/l10n.dart';
 import 'package:mem/domain/mem.dart';
 import 'package:mem/mems/mem_detail_states.dart';
 import 'package:mem/mems/mem_items_view.dart';

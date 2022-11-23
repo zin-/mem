@@ -8,7 +8,7 @@ import 'package:mem/services/notification_service.dart';
 import 'package:mem/mems/mem_detail_body.dart';
 import 'package:mem/mems/mem_detail_page.dart';
 import 'package:mockito/mockito.dart';
-import 'package:mem/l10n.dart';
+import 'package:mem/gui/l10n.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/gui/constants.dart';
 

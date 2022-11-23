@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/l10n.dart';
+import 'package:mem/gui/l10n.dart';
 
 class TestSize {
   static const small = 'Small';

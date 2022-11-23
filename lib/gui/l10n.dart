@@ -73,8 +73,11 @@ class L10n {
   factory L10n([BuildContext? context]) {
     var tmp = _instance;
     if (tmp == null && context != null) {
-      tmp = L10n._(AppLocalizations.of(context));
-      _instance = tmp;
+      final appLocalizations = AppLocalizations.of(context);
+      if (appLocalizations != null) {
+        tmp = L10n._(appLocalizations);
+        _instance = tmp;
+      }
     }
     return tmp!;
   }

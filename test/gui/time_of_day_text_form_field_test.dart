@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/gui/time_of_day_text_form_field.dart';
-import 'package:mem/l10n.dart';
+import 'package:mem/gui/l10n.dart';
 
 import '../_helpers.dart';
 
