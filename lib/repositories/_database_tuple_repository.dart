@@ -69,7 +69,7 @@ abstract class DatabaseTupleRepository<Entity extends DatabaseTupleEntity> {
           final whereArgs =
               whereMap?.values.where((value) => value != null).toList();
           return (await _table.select(
-            where: where?.isEmpty == true ? null : where,
+            whereString: where?.isEmpty == true ? null : where,
             whereArgs: whereArgs?.isEmpty == true ? null : whereArgs,
           ))
               .map((e) => fromMap(e))
