@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:mem/database/database.dart';
+import 'package:mem/database/definitions/table_definition.dart';
 import 'package:mem/database/i/types.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:path/path.dart' as path;
@@ -173,28 +174,12 @@ class SqliteDatabase extends Database {
             } else {
               if (tableDefinition.buildCreateTableSql() !=
                   master.single['sql']) {
-                trace('Alter table. $tableDefinition');
-
-                final rows = await db.query(tableDefinition.name);
-
-                final tmpTableName = '$tmpPrefix${tableDefinition.name}';
-                final batch = db.batch();
-                batch.execute(
-                  'ALTER TABLE ${tableDefinition.name} RENAME TO $tmpTableName',
-                );
-                batch.execute(tableDefinition.buildCreateTableSql());
-                for (var row in rows) {
-                  batch.insert(tableDefinition.name, row);
-                }
-                await batch.commit();
-                // FIXME 以下を実行することで、NULLで返却されるようになる
-                // SQLiteのバグに見える
-                // 一度アクセスしないとDEFAULT NULLの値が設定されない
-                db.query(tableDefinition.name);
+                await _alterTable(db, tableDefinition, tmpPrefix);
               }
             }
           }
 
+          // tmpテーブルには外部キーがある場合、
           final tmpTableMasters = await db.query(
             'sqlite_master',
             where: 'type = ? AND name like ?',
@@ -207,6 +192,31 @@ class SqliteDatabase extends Database {
           await batch.commit();
         },
       );
+
+  Future<void> _alterTable(
+    sqflite.Database db,
+    TableDefinition tableDefinition,
+    String tmpPrefix,
+  ) async {
+    trace('Alter table. $tableDefinition');
+
+    final rows = await db.query(tableDefinition.name);
+
+    final tmpTableName = '$tmpPrefix${tableDefinition.name}';
+    final batch = db.batch();
+    batch.execute(
+      'ALTER TABLE ${tableDefinition.name} RENAME TO $tmpTableName',
+    );
+    batch.execute(tableDefinition.buildCreateTableSql());
+    for (var row in rows) {
+      batch.insert(tableDefinition.name, row);
+    }
+    await batch.commit();
+    // FIXME 以下を実行することで、NULLで返却されるようになる
+    // SQLiteのバグに見える
+    // 一度アクセスしないとDEFAULT NULLの値が設定されない
+    db.query(tableDefinition.name);
+  }
 }
 
 class SqliteTable extends Table {
