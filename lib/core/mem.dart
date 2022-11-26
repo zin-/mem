@@ -1,24 +1,18 @@
 import 'package:flutter/material.dart';
 
-import 'date_and_time.dart';
 import 'entity_value.dart';
 
 class Mem extends EntityValue {
   String name;
   DateTime? doneAt;
-
-  @Deprecated('use notifyAtV2')
   DateTime? notifyOn;
-  @Deprecated('use notifyAtV2')
   TimeOfDay? notifyAt;
-  DateAndTime? notifyAtV2;
 
   Mem({
     required this.name,
     this.doneAt,
     this.notifyOn,
     this.notifyAt,
-    this.notifyAtV2,
     int? id,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -38,7 +32,6 @@ class Mem extends EntityValue {
         'doneAt': doneAt,
         'notifyOn': notifyOn,
         'notifyAt': notifyAt,
-        'notifyAtV2': notifyAtV2,
       }.toString();
 
   // FIXME エレガントじゃない
@@ -47,7 +40,6 @@ class Mem extends EntityValue {
         doneAt: doneAt,
         notifyOn: notifyOn,
         notifyAt: notifyAt,
-        notifyAtV2: notifyAtV2,
         id: id,
         createdAt: createdAt,
         updatedAt: updatedAt,
