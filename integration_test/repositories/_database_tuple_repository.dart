@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/database/database.dart';
 import 'package:mem/database/database_manager.dart';
-import 'package:mem/database/definitions.dart';
+import 'package:mem/database/i/types.dart';
 import 'package:mem/repositories/_database_tuple_repository.dart';
 
 import '../_helpers.dart';
@@ -57,7 +57,8 @@ void testDatabaseTupleRepository() => group(
           test(
             'new',
             () async {
-              final database = await DatabaseManager(onTest: true).open(testDatabase);
+              final database =
+                  await DatabaseManager(onTest: true).open(testDatabase);
               TestRepository(database.getTable(testTable.name));
             },
             tags: TestSize.medium,

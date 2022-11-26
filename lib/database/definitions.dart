@@ -1,12 +1,10 @@
 import 'package:collection/collection.dart';
 import 'package:mem/database/database.dart';
 
-typedef DefD = DatabaseDefinition;
-
 class DatabaseDefinition {
   final String name;
   final int version;
-  final List<DefT> tableDefinitions;
+  final List<TableDefinition> tableDefinitions;
 
   DatabaseDefinition(this.name, this.version, this.tableDefinitions) {
     if (name.isEmpty) {
@@ -26,8 +24,6 @@ class DatabaseDefinition {
       ' tables: ${tableDefinitions.map((defT) => defT.name)}'
       ' }';
 }
-
-typedef DefT = TableDefinition;
 
 class TableDefinition {
   final String name;
@@ -66,8 +62,6 @@ class TableDefinition {
       ', columns: $columns'
       ' }';
 }
-
-typedef DefC = ColumnDefinition;
 
 class ColumnDefinition {
   final String name;
@@ -117,8 +111,6 @@ class ColumnDefinition {
   String toString() => 'Column definition :: { name: $name }';
 }
 
-typedef DefPK = PrimaryKeyDefinition;
-
 class PrimaryKeyDefinition extends ColumnDefinition {
   final bool autoincrement;
 
@@ -136,8 +128,6 @@ class PrimaryKeyDefinition extends ColumnDefinition {
   @override
   String toString() => 'Primary key definition :: { name: $name }';
 }
-
-typedef DefFK = ForeignKeyDefinition;
 
 class ForeignKeyDefinition extends ColumnDefinition {
   final TableDefinition parentTableDefinition;
@@ -162,8 +152,6 @@ class ForeignKeyDefinition extends ColumnDefinition {
   @override
   String toString() => 'Foreign key definition :: { name: $name }';
 }
-
-typedef TypeC = ColumnType;
 
 enum ColumnType { integer, text, datetime }
 

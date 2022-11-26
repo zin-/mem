@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:mem/database/definitions.dart';
 
 abstract class Database {
-  final DefD definition;
+  final DatabaseDefinition definition;
   var isOpen = false;
   final tables = <String, Table>{};
 
@@ -37,7 +37,7 @@ abstract class Database {
 }
 
 abstract class Table {
-  final DefT definition;
+  final TableDefinition definition;
 
   Table(this.definition);
 

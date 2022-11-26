@@ -4,25 +4,25 @@ const tableName = 'tests';
 const pkName = 'id';
 const textFieldName = 'text';
 const datetimeFieldName = 'datetime';
-final testTable = DefT(
+final testTable = TableDefinition(
   tableName,
   [
-    DefPK(pkName, TypeC.integer, autoincrement: true),
-    DefC(textFieldName, TypeC.integer),
-    DefC(datetimeFieldName, TypeC.datetime),
+    PrimaryKeyDefinition(pkName, ColumnType.integer, autoincrement: true),
+    ColumnDefinition(textFieldName, ColumnType.integer),
+    ColumnDefinition(datetimeFieldName, ColumnType.datetime),
   ],
 );
-final testChildTable = DefT(
+final testChildTable = TableDefinition(
   'test_children',
   [
-    DefPK(pkName, TypeC.integer, autoincrement: true),
+    PrimaryKeyDefinition(pkName, ColumnType.integer, autoincrement: true),
     ForeignKeyDefinition(testTable),
   ],
 );
 
 const dbName = 'test.db';
 const dbVersion = 1;
-final defD = DefD(
+final defD = DatabaseDefinition(
   dbName,
   dbVersion,
   [
@@ -31,15 +31,15 @@ final defD = DefD(
   ],
 );
 
-final addingTableDefinition = DefT(
+final addingTableDefinition = TableDefinition(
   'added_table',
   [
-    DefPK('id', TypeC.integer, autoincrement: true),
-    DefC('test', TypeC.text),
+    PrimaryKeyDefinition('id', ColumnType.integer, autoincrement: true),
+    ColumnDefinition('test', ColumnType.text),
   ],
 );
 
-final upgradingByAddTableDefD = DefD(
+final upgradingByAddTableDefD = DatabaseDefinition(
   defD.name,
   2,
   [
@@ -48,15 +48,15 @@ final upgradingByAddTableDefD = DefD(
   ],
 );
 
-final upgradingByAddColumnDefD = DefD(
+final upgradingByAddColumnDefD = DatabaseDefinition(
   defD.name,
   2,
   [
-    DefT(
+    TableDefinition(
       testTable.name,
       [
         ...testTable.columns,
-        DefC('adding_column', TypeC.datetime, notNull: false),
+        ColumnDefinition('adding_column', ColumnType.datetime, notNull: false),
       ],
     ),
     testChildTable,

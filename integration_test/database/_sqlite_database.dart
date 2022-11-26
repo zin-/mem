@@ -63,14 +63,15 @@ void testSqliteDatabase() => group(
                 () async {
                   await sqliteDatabase.close();
 
-                  final addingTableDefinition = DefT(
+                  final addingTableDefinition = TableDefinition(
                     'added_table',
                     [
-                      DefPK(idColumnName, TypeC.integer, autoincrement: true),
-                      DefC('test', TypeC.text),
+                      PrimaryKeyDefinition(idColumnName, ColumnType.integer,
+                          autoincrement: true),
+                      ColumnDefinition('test', ColumnType.text),
                     ],
                   );
-                  final upgradingDefD = DefD(
+                  final upgradingDefD = DatabaseDefinition(
                     defD.name,
                     2,
                     [
@@ -110,15 +111,16 @@ void testSqliteDatabase() => group(
 
                   await sqliteDatabase.close();
 
-                  final upgradingDefD = DefD(
+                  final upgradingDefD = DatabaseDefinition(
                     defD.name,
                     2,
                     [
-                      DefT(
+                      TableDefinition(
                         testTable.name,
                         [
                           ...testTable.columns,
-                          DefC('adding_column', TypeC.datetime, notNull: false),
+                          ColumnDefinition('adding_column', ColumnType.datetime,
+                              notNull: false),
                         ],
                       ),
                       testChildTable,
@@ -144,7 +146,7 @@ void testSqliteDatabase() => group(
           }
 
           if (kIsWeb) {
-            final defD = DefD('test_sqlite.db', 1, []);
+            final defD = DatabaseDefinition('test_sqlite.db', 1, []);
 
             test(
               'Error on Chrome.',

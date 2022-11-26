@@ -1,5 +1,5 @@
 import 'package:mem/database/database.dart';
-import 'package:mem/database/definitions.dart';
+import 'package:mem/database/i/types.dart';
 import 'package:mem/logger/i/api.dart';
 
 const idColumnName = 'id';
