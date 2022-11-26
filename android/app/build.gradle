@@ -27,7 +27,7 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
   // FIXME 直接書き換えるといつか問題が起こりそう。プロジェクトごとに設定できるようにしたい
-  compileSdkVersion 33
+  compileSdkVersion 33 // 直接書き換えた
   // compileSdkVersion flutter.compileSdkVersion
   ndkVersion flutter.ndkVersion
 
