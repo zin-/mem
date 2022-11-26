@@ -179,7 +179,6 @@ class SqliteDatabase extends Database {
             }
           }
 
-          // tmpテーブルには外部キーがある場合、
           final tmpTableMasters = await db.query(
             'sqlite_master',
             where: 'type = ? AND name like ?',
