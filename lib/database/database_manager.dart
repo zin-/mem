@@ -20,8 +20,8 @@ class DatabaseManager {
         () async {
           // FIXME ログの出し方が気持ち悪い
           final dbName = trace(_dbName(definition.name));
-          definition =
-              DefD(dbName, definition.version, definition.tableDefinitions);
+          definition = DatabaseDefinition(
+              dbName, definition.version, definition.tableDefinitions);
 
           if (_databases.containsKey(dbName)) {
             warn('Database: $dbName is opened.');

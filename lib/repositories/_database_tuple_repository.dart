@@ -1,5 +1,5 @@
 import 'package:mem/database/database.dart';
-import 'package:mem/database/definitions.dart';
+import 'package:mem/database/i/types.dart';
 import 'package:mem/logger/i/api.dart';
 
 const idColumnName = 'id';
@@ -69,7 +69,7 @@ abstract class DatabaseTupleRepository<Entity extends DatabaseTupleEntity> {
           final whereArgs =
               whereMap?.values.where((value) => value != null).toList();
           return (await _table.select(
-            where: where?.isEmpty == true ? null : where,
+            whereString: where?.isEmpty == true ? null : where,
             whereArgs: whereArgs?.isEmpty == true ? null : whereArgs,
           ))
               .map((e) => fromMap(e))

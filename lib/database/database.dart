@@ -1,9 +1,10 @@
 import 'dart:async';
 
 import 'package:mem/database/definitions.dart';
+import 'package:mem/database/definitions/table_definition.dart';
 
 abstract class Database {
-  final DefD definition;
+  final DatabaseDefinition definition;
   var isOpen = false;
   final tables = <String, Table>{};
 
@@ -37,14 +38,14 @@ abstract class Database {
 }
 
 abstract class Table {
-  final DefT definition;
+  final TableDefinition definition;
 
   Table(this.definition);
 
   Future<int> insert(Map<String, dynamic> valueMap);
 
   Future<List<Map<String, dynamic>>> select({
-    String? where,
+    String? whereString,
     List<Object?>? whereArgs,
   });
 

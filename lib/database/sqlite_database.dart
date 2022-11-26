@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:mem/database/database.dart';
-import 'package:mem/database/definitions.dart';
+import 'package:mem/database/i/types.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -226,15 +226,15 @@ class SqliteTable extends Table {
 
   @override
   Future<List<Map<String, dynamic>>> select({
-    String? where,
+    String? whereString,
     List<Object?>? whereArgs,
   }) =>
       v(
-        {'where': where, 'whereArgs': whereArgs},
+        {'where': whereString, 'whereArgs': whereArgs},
         () async => await _database.onOpened(
           () async => (await _database._database.query(
             definition.name,
-            where: where,
+            where: whereString,
             whereArgs: whereArgs,
           ))
               .map((e) => convertFrom(e))

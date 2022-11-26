@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'package:idb_shim/idb.dart' as idb_shim;
 import 'package:idb_shim/idb_browser.dart' as idb_browser;
 import 'package:mem/database/database.dart';
-import 'package:mem/database/definitions.dart';
+import 'package:mem/database/i/types.dart';
 import 'package:mem/logger/i/api.dart';
 
 class IndexedDatabase extends Database {
@@ -177,11 +177,11 @@ class ObjectStore extends Table {
 
   @override
   Future<List<Map<String, dynamic>>> select({
-    String? where,
+    String? whereString,
     List<Object?>? whereArgs,
   }) =>
       v(
-        {'where': where, 'whereArgs': whereArgs},
+        {'where': whereString, 'whereArgs': whereArgs},
         () async => await _database.onOpened(
           () async {
             // TODO implements where

@@ -9,7 +9,7 @@ void main() {
   test(
     'Indexed database: require at least 1 table.',
     () async {
-      final defD = DefD('test.db', 1, []);
+      final defD = DatabaseDefinition('test.db', 1, []);
       expect(
         () => IndexedDatabase(defD),
         throwsA(
