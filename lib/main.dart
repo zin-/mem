@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mem/acts/act_entity.dart';
 import 'package:mem/database/i/types.dart';
 import 'package:mem/gui/app.dart';
 import 'package:mem/database/database.dart';
@@ -10,10 +11,11 @@ import 'logger/i/api.dart';
 
 final databaseDefinition = DefD(
   'mem.db',
-  4,
+  5,
   [
     memTableDefinition,
     memItemTableDefinition,
+    actTableDefinition,
   ],
 );
 
