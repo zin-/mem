@@ -27,8 +27,9 @@ class DatabaseManager {
             warn('Database: $dbName is opened.');
           } else {
             final database = await (kIsWeb
-                    ? IndexedDatabase(definition) // coverage:ignore-line
-                    // WEBでテストするときにカバレッジを取得する方法がないため
+                    ?
+                    // WEBでテストするときにカバレッジを計測する方法がないため
+                    IndexedDatabase(definition) // coverage:ignore-line
                     : SqliteDatabase(definition))
                 .open();
             _databases.putIfAbsent(dbName, () => database);
