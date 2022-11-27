@@ -14,6 +14,7 @@ class DatabaseDefinition {
     } else if (version < 1) {
       throw DatabaseDefinitionException('Minimum version is 1.');
     }
+    // TODO: implement when name has no ".db" extension
   }
 
   @override
