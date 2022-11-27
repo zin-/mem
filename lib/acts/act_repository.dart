@@ -25,13 +25,13 @@ class ActRepository extends DatabaseTupleRepositoryV2<ActEntity, Act> {
               ? null
               : DateAndTime.from(
                   unpackedPayload[defActStart.name],
-                  isAllDay: unpackedPayload[defActStartIsAllDay.name] == 1,
+                  allDay: unpackedPayload[defActStartIsAllDay.name] == 1,
                 ),
           end: unpackedPayload[defActEnd.name] == null
               ? null
               : DateAndTime.from(
                   unpackedPayload[defActEnd.name],
-                  isAllDay: unpackedPayload[defActEndIsAllDay.name] == 1,
+                  allDay: unpackedPayload[defActEndIsAllDay.name] == 1,
                 ),
         ),
         id: unpackedPayload[idColumnName],

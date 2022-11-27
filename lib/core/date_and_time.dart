@@ -30,17 +30,17 @@ class DateAndTime extends DateTime {
   DateAndTime.from(
     DateTime dateTime, {
     TimeOfDay? timeOfDay,
-    bool isAllDay = false,
+    bool allDay = false,
   }) : this(
           dateTime.year,
           dateTime.month,
           dateTime.day,
-          isAllDay
+          allDay
               ? null
               : timeOfDay != null
                   ? timeOfDay.hour
                   : dateTime.hour,
-          isAllDay
+          allDay
               ? null
               : timeOfDay != null
                   ? timeOfDay.minute
@@ -54,6 +54,7 @@ class DateAndTime extends DateTime {
       : this.from(
           DateTime.now(),
           timeOfDay: allDay ? null : TimeOfDay.now(),
+          allDay: allDay,
         );
 
   DateTime get dateTime => DateTime(year, month, day);
