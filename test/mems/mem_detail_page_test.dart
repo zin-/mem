@@ -106,7 +106,7 @@ void main() {
 
           expect(value.memId, memId);
           expect(value.type, MemItemType.memo);
-          expect(value.value, enteringMemMemo);
+          expect(value._value, enteringMemMemo);
 
           return value
             ..memId = memId
