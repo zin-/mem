@@ -16,10 +16,12 @@ void testActListPage() => group('ActListPage test', () {
       testWidgets(
         ': build',
         (widgetTester) async {
+          const memId = 1;
+
           await runTestWidget(
             widgetTester,
             const ProviderScope(
-              child: ActListPage(),
+              child: ActListPage(memId),
             ),
           );
 

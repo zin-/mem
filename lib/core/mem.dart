@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'entity_value.dart';
 
+typedef MemId = int;
+
 class Mem extends EntityValue {
   String name;
   DateTime? doneAt;
