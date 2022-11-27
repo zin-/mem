@@ -5,26 +5,31 @@ import 'package:mem/core/date_and_time_period.dart';
 import '../_helpers.dart';
 
 void main() {
-  group('Create instance', () {
-    test(
-      ': success',
-      () {
-        final actPeriod = DateAndTimePeriod.startNow();
-        final act = Act(actPeriod);
+  test(
+    'Create instance',
+    () {
+      const memId = 1;
+      final actPeriod = DateAndTimePeriod.startNow();
+      final act = Act(memId, actPeriod);
 
-        expect(act.period, actPeriod);
-      },
-      tags: TestSize.small,
-    );
-  });
+      expect(act.memId, same(memId));
+      expect(act.period, same(actPeriod));
+    },
+    tags: TestSize.small,
+  );
 
   test(
     'toString',
     () {
+      const memId = 2;
       final actPeriod = DateAndTimePeriod.startNow();
-      final act = Act(actPeriod);
+      final act = Act(memId, actPeriod);
 
-      expect(act.toString(), '{period: ${actPeriod.toString()}}');
+      expect(
+        act.toString(),
+        equals('{memId: ${memId.toString()}'
+            ', period: ${actPeriod.toString()}}'),
+      );
     },
     tags: TestSize.small,
   );
