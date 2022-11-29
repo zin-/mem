@@ -9,8 +9,6 @@ import 'package:mem/logger/i/api.dart';
 import 'package:mem/repositories/i/_database_tuple_repository_v2.dart';
 import 'package:mem/repositories/i/conditions.dart';
 
-import '../repositories/i/_database_tuple_entity_v2.dart';
-
 class ActRepository extends DatabaseTupleRepositoryV2<ActEntity, Act> {
   Future<List<Act>> shipByMemId(MemId memId) => v(
         {'memId': memId},
@@ -18,27 +16,29 @@ class ActRepository extends DatabaseTupleRepositoryV2<ActEntity, Act> {
       );
 
   @override
-  Act pack(UnpackedPayload unpackedPayload) => Act(
-        unpackedPayload[fkDefMemId.name],
-        DateAndTimePeriod(
-          start: unpackedPayload[defActStart.name] == null
-              ? null
-              : DateAndTime.from(
-                  unpackedPayload[defActStart.name],
-                  allDay: unpackedPayload[defActStartIsAllDay.name] == 1,
-                ),
-          end: unpackedPayload[defActEnd.name] == null
-              ? null
-              : DateAndTime.from(
-                  unpackedPayload[defActEnd.name],
-                  allDay: unpackedPayload[defActEndIsAllDay.name] == 1,
-                ),
+  Act pack(UnpackedPayload unpackedPayload) {
+    final actEntity = ActEntity.fromMap(unpackedPayload);
+
+    return Act(
+      actEntity.memId,
+      DateAndTimePeriod(
+        start: DateAndTime.from(
+          actEntity.start,
+          allDay: actEntity.startIsAllDay,
         ),
-        id: unpackedPayload[idColumnName],
-        createdAt: unpackedPayload[createdAtColumnName],
-        updatedAt: unpackedPayload[updatedAtColumnName],
-        archivedAt: unpackedPayload[archivedAtColumnName],
-      );
+        end: actEntity.end == null
+            ? null
+            : DateAndTime.from(
+                actEntity.end!,
+                allDay: actEntity.endIsAllDay!,
+              ),
+      ),
+      id: actEntity.id,
+      createdAt: actEntity.createdAt,
+      updatedAt: actEntity.updatedAt,
+      archivedAt: actEntity.archivedAt,
+    );
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
