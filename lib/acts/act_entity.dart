@@ -1,6 +1,7 @@
 import 'package:mem/core/mem.dart';
 import 'package:mem/database/i/types.dart';
 import 'package:mem/repositories/i/_database_tuple_entity_v2.dart';
+import 'package:mem/repositories/i/types.dart';
 import 'package:mem/repositories/mem_repository.dart';
 
 final defActId = DefPK(idColumnName, TypeC.integer, autoincrement: true);
@@ -36,7 +37,7 @@ class ActEntity extends DatabaseTupleEntityV2 {
     this.startIsAllDay,
     this.end,
     this.endIsAllDay,
-    int id,
+    int? id,
     DateTime? createdAt,
     DateTime? updatedAt,
     DateTime? archivedAt,
@@ -56,4 +57,13 @@ class ActEntity extends DatabaseTupleEntityV2 {
             ? null
             : valueMap[defActEndIsAllDay.name] == 1,
         super.fromMap(valueMap);
+
+  @override
+  Map<AttributeName, dynamic> toMap() => {
+        fkDefMemId.name: memId,
+        defActStart.name: start,
+        defActStartIsAllDay.name: startIsAllDay ? 1 : 0,
+        defActEnd.name: end,
+        defActEndIsAllDay.name: endIsAllDay ?? false ? 1 : 0,
+      }..addAll(super.toMap());
 }

@@ -18,7 +18,9 @@ class AddActFab extends ConsumerWidget {
             onPressed: () => v(
               {'_memId': _memId},
               () async {
-                ref.read(actListProvider(_memId))?.add(await add(_memId));
+                ref
+                    .read(actListProvider(_memId).notifier)
+                    .add(await add(_memId));
               },
             ),
           );

@@ -8,7 +8,7 @@ class Act extends EntityValue {
   final DateAndTimePeriod period;
 
   @override
-  int get id => super.id;
+  int? get id => super.id;
 
   Act(
     this.memId,

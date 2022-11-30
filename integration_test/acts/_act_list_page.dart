@@ -3,6 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/acts/act_list_page.dart';
+import 'package:mem/acts/act_list_page_states.dart';
+import 'package:mem/core/act.dart';
+import 'package:mem/core/date_and_time_period.dart';
+import 'package:mem/gui/list_value_state_notifier.dart';
 
 import '../_helpers.dart';
 
@@ -20,8 +24,21 @@ void testActListPage() => group('ActListPage test', () {
 
           await runTestWidget(
             widgetTester,
-            const ProviderScope(
-              child: ActListPage(memId),
+            ProviderScope(
+              overrides: [
+                actListProvider.overrideWithProvider((argument) {
+                  return StateNotifierProvider<ListValueStateNotifier<Act>,
+                          List<Act>?>(
+                      (ref) => ListValueStateNotifier<Act>(List.generate(
+                            20,
+                            (index) => Act(
+                              memId,
+                              DateAndTimePeriod.startNow(),
+                            ),
+                          )));
+                }),
+              ],
+              child: const ActListPage(memId),
             ),
           );
 

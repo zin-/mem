@@ -41,6 +41,23 @@ class ActRepository extends DatabaseTupleRepositoryV2<ActEntity, Act> {
   }
 
   @override
+  UnpackedPayload unpack(Act payload) {
+    final actEntity = ActEntity(
+      payload.memId,
+      payload.period.start!.dateTime,
+      payload.period.start!.isAllDay,
+      payload.period.end?.dateTime,
+      payload.period.end?.isAllDay,
+      payload.id,
+      payload.createdAt,
+      payload.updatedAt,
+      payload.archivedAt,
+    );
+
+    return actEntity.toMap();
+  }
+
+  @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 
   ActRepository._(super.table);
