@@ -23,7 +23,7 @@ class MemDetailMenu extends StatelessWidget {
           final menu = <Widget>[];
 
           if (mem?.isSaved() ?? false) {
-            menu.add(_buildShowActPage(context, _memId as MemId));
+            menu.add(_buildShowActPage(context, mem?.id as MemId));
           }
 
           if (mem?.isArchived() ?? false) {
@@ -32,7 +32,9 @@ class MemDetailMenu extends StatelessWidget {
             menu.add(_buildArchiveButton(context));
           }
 
-          return Row(children: menu..add(_buildMenu(context)));
+          menu.add(_buildMenu(context));
+
+          return Row(children: menu);
         }),
       );
 
