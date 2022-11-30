@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mem/acts/act_entity.dart';
+import 'package:mem/acts/act_repository.dart';
 import 'package:mem/database/i/types.dart';
 import 'package:mem/gui/app.dart';
 import 'package:mem/database/database.dart';
@@ -37,6 +38,9 @@ Future<Database> openDatabase() async {
   );
   MemItemRepository(
     database.getTable(memItemTableDefinition.name),
+  );
+  ActRepository(
+    database.getTable(actTableDefinition.name),
   );
 
   return database;
