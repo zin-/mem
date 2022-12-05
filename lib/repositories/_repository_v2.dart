@@ -1,10 +1,13 @@
 import 'i/_entity_v2.dart';
-import 'i/types.dart';
+import 'i/conditions.dart';
 
 abstract class RepositoryV2<E extends EntityV2, Payload> {
   Future<Payload> receive(Payload payload);
 
-  Future<List<Payload>> ship(Conditions conditions);
+  Future<List<Payload>> ship(Condition condition);
+
+  // TODO: 必要になったら実装する
+  // Future<List<Payload>> ship(Conditions conditions);
 
   Future<Payload> replace(Payload payload);
 

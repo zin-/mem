@@ -3,7 +3,7 @@ import 'package:mem/logger/log_service.dart';
 
 import 'type.dart';
 
-const _filePath = 'mem/logger/api.dart';
+const _filePath = 'mem/logger/i/api.dart';
 
 LogService _logService = LogService(
   Level.error,

@@ -27,8 +27,13 @@ class MemListItemView extends ListTile {
           title: MemNameText(mem.name, mem.id),
           subtitle: mem.notifyOn == null
               ? null
-              : MemNotifyAtText(mem.id,
-                  DateAndTime.from(mem.notifyOn!, timeOfDay: mem.notifyAt)),
+              : MemNotifyAtText(
+                  mem.id,
+                  DateAndTime.from(
+                    mem.notifyOn!,
+                    timeOfDay: mem.notifyAt,
+                    allDay: mem.notifyAt == null,
+                  )),
           onTap: onTap,
           tileColor: mem.isArchived() ? archivedColor : null,
         );

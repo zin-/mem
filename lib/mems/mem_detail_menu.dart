@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/acts/act_list_page.dart';
+import 'package:mem/core/mem.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/gui/constants.dart';
@@ -18,14 +20,21 @@ class MemDetailMenu extends StatelessWidget {
         () => Consumer(builder: (context, ref, child) {
           final mem = ref.watch(memProvider(_memId));
 
-          return Row(
-            children: [
-              mem?.isArchived() ?? false
-                  ? _buildUnArchiveButton(context)
-                  : _buildArchiveButton(context),
-              _buildMenu(context),
-            ],
-          );
+          final menu = <Widget>[];
+
+          if (mem?.isSaved() ?? false) {
+            menu.add(_buildShowActPage(context, mem?.id as MemId));
+          }
+
+          if (mem?.isArchived() ?? false) {
+            menu.add(_buildUnArchiveButton(context));
+          } else {
+            menu.add(_buildArchiveButton(context));
+          }
+
+          menu.add(_buildMenu(context));
+
+          return Row(children: menu);
         }),
       );
 
@@ -87,6 +96,24 @@ class MemDetailMenu extends StatelessWidget {
             );
           },
         ),
+      );
+
+  Widget _buildShowActPage(BuildContext context, MemId memId) => v(
+        {},
+        () {
+          return IconButton(
+            onPressed: () => v({'memId': memId}, () {
+              Navigator.of(context).push(PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    ActListPage(memId),
+              ));
+            }),
+            icon: const Icon(
+              Icons.play_arrow,
+              color: Colors.white,
+            ),
+          );
+        },
       );
 
   Widget _buildMenu(BuildContext context) => v(

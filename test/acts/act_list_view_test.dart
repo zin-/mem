@@ -15,13 +15,16 @@ void main() {
     testWidgets(
       ': fetching',
       (WidgetTester widgetTester) async {
+        const memId = 1;
+
         await runTestWidget(
           widgetTester,
           ProviderScope(
             overrides: [
-              actListProvider.overrideWithValue(ListValueStateNotifier(null))
+              actListProvider.overrideWithProvider((argument) =>
+                  StateNotifierProvider((ref) => ListValueStateNotifier(null))),
             ],
-            child: const ActListView(),
+            child: const ActListView(memId),
           ),
         );
 
@@ -35,15 +38,17 @@ void main() {
       testWidgets(
         ': empty',
         (WidgetTester widgetTester) async {
+          const memId = 2;
+
           await runTestWidget(
             widgetTester,
             ProviderScope(
               overrides: [
-                actListProvider.overrideWithValue(ListValueStateNotifier(
-                  List.empty(),
-                ))
+                actListProvider.overrideWithProvider((argument) =>
+                    StateNotifierProvider(
+                        (ref) => ListValueStateNotifier(List.empty()))),
               ],
-              child: const ActListView(),
+              child: const ActListView(memId),
             ),
           );
 
@@ -56,18 +61,21 @@ void main() {
       testWidgets(
         ': 2 acts',
         (WidgetTester widgetTester) async {
+          const memId = 3;
+
           await runTestWidget(
             widgetTester,
             ProviderScope(
               overrides: [
-                actListProvider.overrideWithValue(ListValueStateNotifier(
-                  List.generate(
-                    2,
-                    (index) => Act(DateAndTimePeriod.startNow()),
-                  ),
-                ))
+                actListProvider.overrideWithProvider((argument) =>
+                    StateNotifierProvider((ref) => ListValueStateNotifier(
+                          List.generate(
+                            2,
+                            (index) => Act(memId, DateAndTimePeriod.startNow()),
+                          ),
+                        ))),
               ],
-              child: const ActListView(),
+              child: const ActListView(memId),
             ),
           );
 

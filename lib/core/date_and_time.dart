@@ -1,3 +1,4 @@
+// FIXME TimeOfDayを排除したい
 import 'package:flutter/material.dart';
 
 class DateAndTime extends DateTime {
@@ -30,12 +31,21 @@ class DateAndTime extends DateTime {
   DateAndTime.from(
     DateTime dateTime, {
     TimeOfDay? timeOfDay,
+    bool allDay = false,
   }) : this(
           dateTime.year,
           dateTime.month,
           dateTime.day,
-          timeOfDay?.hour,
-          timeOfDay?.minute,
+          allDay
+              ? null
+              : timeOfDay != null
+                  ? timeOfDay.hour
+                  : dateTime.hour,
+          allDay
+              ? null
+              : timeOfDay != null
+                  ? timeOfDay.minute
+                  : dateTime.minute,
           null,
           null,
           null,
@@ -45,6 +55,7 @@ class DateAndTime extends DateTime {
       : this.from(
           DateTime.now(),
           timeOfDay: allDay ? null : TimeOfDay.now(),
+          allDay: allDay,
         );
 
   DateTime get dateTime => DateTime(year, month, day);

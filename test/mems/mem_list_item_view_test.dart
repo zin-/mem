@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/mems/mem_list_item_view.dart';
+import 'package:mem/mems/mem_notify_at.dart';
 import 'package:mem/notifications/notification_repository.dart';
 
 import 'package:mem/repositories/mem_item_repository.dart';
@@ -81,9 +82,12 @@ void main() {
         );
         await widgetTester.pump();
 
+        final memNotifyAt = widgetTester.widget(find.byType(MemNotifyAtText))
+            as MemNotifyAtText;
+
         expect(
-          find.text(DateFormat.yMd().format(savedMem.notifyOn!)),
-          findsOneWidget,
+          memNotifyAt.data,
+          DateFormat.yMd().format(savedMem.notifyOn!),
         );
       },
       tags: TestSize.small,

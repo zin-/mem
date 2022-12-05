@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/core/mem.dart';
 import 'package:mem/logger/i/api.dart';
 
 import '../../core/act.dart';
@@ -7,13 +8,15 @@ import 'act_list_item_view.dart';
 import 'act_list_page_states.dart';
 
 class ActListView extends ConsumerWidget {
-  const ActListView({super.key});
+  final MemId _memId;
+
+  const ActListView(this._memId, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         {},
         () {
-          final actList = ref.watch(actListProvider);
+          final actList = ref.watch(actListProvider(_memId));
 
           if (actList == null) {
             return const Center(child: CircularProgressIndicator());
