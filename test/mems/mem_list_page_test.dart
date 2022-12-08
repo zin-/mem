@@ -445,6 +445,12 @@ void main() {
         await widgetTester.pumpAndSettle();
 
         expectMemNameTextOnListAt(widgetTester, 0, notifyAtIsNull.name);
+        // FIXME failed
+        //  ```
+        //  Expected: 'notifyAt is one hour ago'
+        //    Actual: 'notifyAt is now'
+        //  ```
+        //  https://github.com/zin-/mem/actions/runs/3615921908/jobs/6093404947#step:7:147
         expectMemNameTextOnListAt(widgetTester, 1, notifyAtOneHourAgo.name);
         expectMemNameTextOnListAt(widgetTester, 2, notifyAtNow.name);
         expectMemNameTextOnListAt(widgetTester, 3, notifyAtOneMinuteLater.name);

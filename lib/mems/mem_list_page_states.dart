@@ -195,5 +195,6 @@ final sortedMemList =
 
       return ValueStateNotifier(sortedMemList);
     },
+    debug: true,
   ),
 );
