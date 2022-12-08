@@ -1,5 +1,4 @@
 import 'package:mem/database/database.dart';
-import 'package:mem/database/i/types.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/repositories/_database_tuple_repository.dart';
 
@@ -7,18 +6,6 @@ const memNameColumnName = 'name';
 const memDoneAtColumnName = 'doneAt';
 const memNotifyOnColumnName = 'notifyOn';
 const memNotifyAtColumnName = 'notifyAt';
-
-final memTableDefinition = DefT(
-  'mems',
-  [
-    DefPK(idColumnName, TypeC.integer, autoincrement: true),
-    DefC(memNameColumnName, TypeC.text),
-    DefC(memDoneAtColumnName, TypeC.datetime, notNull: false),
-    DefC(memNotifyOnColumnName, TypeC.datetime, notNull: false),
-    DefC(memNotifyAtColumnName, TypeC.datetime, notNull: false),
-    ...defaultColumnDefinitions
-  ],
-);
 
 class MemEntity extends DatabaseTupleEntity {
   String name;

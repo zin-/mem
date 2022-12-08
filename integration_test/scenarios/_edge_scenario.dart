@@ -6,6 +6,7 @@ import 'package:mem/main.dart' as app;
 
 // FIXME integration testでrepositoryを参照するのはNG
 import 'package:mem/repositories/_database_tuple_repository.dart';
+import 'package:mem/repositories/mem_entity.dart';
 import 'package:mem/repositories/mem_repository.dart';
 
 import '../_helpers.dart';

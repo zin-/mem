@@ -9,6 +9,7 @@ import 'package:mem/database/database.dart';
 import 'package:mem/database/database_manager.dart';
 import 'package:mem/database/i/types.dart';
 import 'package:mem/repositories/i/_database_tuple_entity_v2.dart';
+import 'package:mem/repositories/mem_entity.dart';
 import 'package:mem/repositories/mem_repository.dart';
 
 void main() async {

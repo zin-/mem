@@ -12,6 +12,7 @@ import 'package:mem/gui/date_and_time_text_form_field.dart';
 
 // FIXME integration testでrepositoryを参照するのはNG
 import 'package:mem/repositories/_database_tuple_repository.dart';
+import 'package:mem/repositories/mem_entity.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 
