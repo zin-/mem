@@ -7,6 +7,7 @@ const memDoneAtColumnName = 'doneAt';
 const memNotifyOnColumnName = 'notifyOn';
 const memNotifyAtColumnName = 'notifyAt';
 
+@Deprecated('use ./mem_entity.dart')
 class MemEntity extends DatabaseTupleEntity {
   String name;
   DateTime? doneAt;
@@ -46,6 +47,7 @@ class MemEntity extends DatabaseTupleEntity {
       }..addAll(super.toMap());
 }
 
+@Deprecated('use package:mem/mems/mem_repository_v2.dart')
 class MemRepository extends DatabaseTupleRepository<MemEntity> {
   @override
   Future<List<MemEntity>> ship({

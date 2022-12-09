@@ -5,6 +5,7 @@ import 'package:mem/database/i/types.dart';
 import 'package:mem/gui/app.dart';
 import 'package:mem/database/database.dart';
 import 'package:mem/database/database_manager.dart';
+import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/repositories/mem_entity.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
@@ -35,6 +36,9 @@ Future<Database> openDatabase() async {
   final database = await DatabaseManager().open(databaseDefinition);
 
   MemRepository(
+    database.getTable(memTableDefinition.name),
+  );
+  MemRepositoryV2(
     database.getTable(memTableDefinition.name),
   );
   MemItemRepository(

@@ -19,3 +19,18 @@ final memTableDefinition = DefT(
     ...defaultColumnDefinitions
   ],
 );
+
+class MemEntityV2 extends DatabaseTupleEntityV2 {
+  final String name;
+  final DateTime? doneAt;
+  final DateTime? notifyOn;
+  final DateTime? notifyAt;
+
+  MemEntityV2(
+    this.name, {
+    this.doneAt,
+    this.notifyOn,
+    this.notifyAt,
+    int? super.id,
+  });
+}
