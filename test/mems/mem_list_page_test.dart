@@ -451,6 +451,11 @@ void main() {
         //    Actual: 'notifyAt is now'
         //  ```
         //  https://github.com/zin-/mem/actions/runs/3615921908/jobs/6093404947#step:7:147
+        //  0900-1000JSTにマージされた場合、github上では0000-0100UTCとなる
+        //  notifyAtOneHourAgoはnotifyAtを-1hしているだけのため、
+        //  日付はそのままで時間のみが1周して2300台となってしまう
+        //  このため、notifyAtNow -> notifyAtOneMinuteLater -> notifyAtOneHourAgo
+        //  の順番となり、テストが失敗している
         expectMemNameTextOnListAt(widgetTester, 1, notifyAtOneHourAgo.name);
         expectMemNameTextOnListAt(widgetTester, 2, notifyAtNow.name);
         expectMemNameTextOnListAt(widgetTester, 3, notifyAtOneMinuteLater.name);
