@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/core/mem.dart';
+import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/gui/colors.dart';
@@ -13,6 +14,8 @@ import 'mem_detail_page_test.dart';
 void main() {
   final mockedMemRepository = MockMemRepository();
   MemRepository.reset(mockedMemRepository);
+  final mockedMemRepositoryV2 = MockMemRepositoryV2();
+  MemRepositoryV2.setInstance(mockedMemRepositoryV2);
   final mockedMemItemRepository = MockMemItemRepository();
   MemItemRepository.reset(mockedMemItemRepository);
 

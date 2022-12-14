@@ -6,6 +6,7 @@ import 'package:mem/gui/l10n.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/mems/mem_list_item_view.dart';
 import 'package:mem/mems/mem_notify_at.dart';
+import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/notifications/notification_repository.dart';
 
 import 'package:mem/repositories/mem_item_repository.dart';
@@ -37,6 +38,8 @@ void main() {
 
   final mockedMemRepository = MockMemRepository();
   MemRepository.reset(mockedMemRepository);
+  final mockedMemRepositoryV2 = MockMemRepositoryV2();
+  MemRepositoryV2.setInstance(mockedMemRepositoryV2);
   final mockedMemItemRepository = MockMemItemRepository();
   MemItemRepository.reset(mockedMemItemRepository);
   final mockedNotificationRepository = MockNotificationRepository();

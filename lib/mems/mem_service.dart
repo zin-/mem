@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/i/api.dart';
+import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/notifications/notification_repository.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
@@ -21,11 +22,13 @@ class MemDetail {
 
 class MemService {
   final MemRepository _memRepository;
+  final MemRepositoryV2 _memRepositoryV2;
   final MemItemRepository _memItemRepository;
   final NotificationService _notificationService;
 
   MemService._(
     this._memRepository,
+    this._memRepositoryV2,
     this._memItemRepository,
     this._notificationService,
   );
@@ -34,6 +37,7 @@ class MemService {
 
   factory MemService({
     MemRepository? memRepository,
+    MemRepositoryV2? memRepositoryV2,
     MemItemRepository? memItemRepository,
     NotificationService? notificationService,
   }) {
@@ -41,6 +45,7 @@ class MemService {
     if (tmp == null) {
       tmp = MemService._(
         memRepository ?? MemRepository(),
+        memRepositoryV2 ?? MemRepositoryV2(),
         memItemRepository ?? MemItemRepository(),
         notificationService ?? NotificationService(),
       );

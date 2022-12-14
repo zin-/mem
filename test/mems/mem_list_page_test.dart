@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/mems/mem_list_item_view.dart';
 import 'package:mem/mems/mem_name.dart';
+import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/mems/mem_list_page.dart';
@@ -29,6 +30,8 @@ Future pumpMemListPage(WidgetTester widgetTester) async {
 void main() {
   final mockedMemRepository = MockMemRepository();
   MemRepository.reset(mockedMemRepository);
+  final mockedMemRepositoryV2 = MockMemRepositoryV2();
+  MemRepositoryV2.setInstance(mockedMemRepositoryV2);
   MemItemRepository.reset(MockMemItemRepository());
 
   tearDown(() {
