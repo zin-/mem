@@ -109,14 +109,10 @@ class MemService {
           'showNotDone': showNotDone,
           'showDone': showDone,
         },
-        () async {
-          final memEntities = (await _memRepository.ship(
-            archive: showNotArchived == showArchived ? null : showArchived,
-            done: showNotDone == showDone ? null : showDone,
-          ));
-
-          return memEntities.map((e) => convertMemFromEntity(e)).toList();
-        },
+        () => _memRepositoryV2.shipByCondition(
+          showNotArchived == showArchived ? null : showArchived,
+          showNotDone == showDone ? null : showDone,
+        ),
       );
 
   Future<Mem> fetchMemById(int memId) => t(
@@ -195,6 +191,7 @@ class MemService {
 
   // FIXME convert系は別のクラスに分割する
   // できれば自動生成したい
+  @Deprecated('use RepositoryV2')
   Mem convertMemFromEntity(MemEntity memEntity) => v(
         {'memEntity': memEntity},
         () => Mem(

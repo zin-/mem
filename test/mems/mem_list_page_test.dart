@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/core/mem.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/mems/mem_list_item_view.dart';
 import 'package:mem/mems/mem_name.dart';
@@ -41,7 +42,7 @@ void main() {
   testWidgets(
     'Show saved mem list',
     (widgetTester) async {
-      final mems = List.generate(
+      final memEntities = List.generate(
         5,
         (index) => MemEntity(
           id: index,
@@ -49,26 +50,43 @@ void main() {
           createdAt: DateTime.now(),
         ),
       );
+      final mems = memEntities
+          .map((e) => Mem(
+                name: e.name,
+                id: e.id,
+                createdAt: e.createdAt,
+              ))
+          .toList();
 
-      when(mockedMemRepository.ship(
-        whereMap: anyNamed('whereMap'),
-        archive: anyNamed('archive'),
-        done: anyNamed('done'),
-      )).thenAnswer(
+      // when(mockedMemRepository.ship(
+      //   whereMap: anyNamed('whereMap'),
+      //   archive: anyNamed('archive'),
+      //   done: anyNamed('done'),
+      // )).thenAnswer(
+      //   (realInvocation) => Future.value(memEntities),
+      // );
+      when(mockedMemRepositoryV2.shipByCondition(any, any)).thenAnswer(
         (realInvocation) => Future.value(mems),
       );
 
       await pumpMemListPage(widgetTester);
 
-      verify(mockedMemRepository.ship(
-        whereMap: null,
-        archive: false,
-        done: false,
-      )).called(1);
+      // verify(mockedMemRepository.ship(
+      //   whereMap: null,
+      //   archive: false,
+      //   done: false,
+      // )).called(1);
+      expect(
+        verify(mockedMemRepositoryV2.shipByCondition(
+          captureAny,
+          captureAny,
+        )).captured,
+        [false, false],
+      );
 
       await widgetTester.pumpAndSettle();
 
-      mems.asMap().forEach((index, mem) {
+      memEntities.asMap().forEach((index, mem) {
         expectMemNameTextOnListAt(widgetTester, index, mem.name);
       });
 

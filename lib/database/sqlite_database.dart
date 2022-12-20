@@ -243,8 +243,8 @@ class SqliteTable extends Table {
         () async => await _database.onOpened(
           () async => (await _database._database.query(
             definition.name,
-            where: whereString,
-            whereArgs: whereArgs,
+            where: whereString?.isEmpty == true ? null : whereString,
+            whereArgs: whereArgs?.isEmpty == true ? null : whereArgs,
           ))
               .map((e) => convertFrom(e))
               .toList(),

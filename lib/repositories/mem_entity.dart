@@ -33,4 +33,11 @@ class MemEntityV2 extends DatabaseTupleEntityV2 {
     this.notifyAt,
     int? super.id,
   });
+
+  MemEntityV2.fromMap(Map<String, dynamic> valueMap)
+      : name = valueMap[defMemName.name],
+        doneAt = valueMap[defMemDoneAt.name],
+        notifyOn = valueMap[defMemNotifyOn.name],
+        notifyAt = valueMap[defMemNotifyAt.name],
+        super.fromMap(valueMap);
 }
