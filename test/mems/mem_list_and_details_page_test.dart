@@ -211,43 +211,34 @@ void main() {
   testWidgets(
     'Archive mem',
     (widgetTester) async {
-      final savedMemEntity = minSavedMemEntity(1)..name = 'saved mem entity';
-      when(mockedMemRepository.ship(
-        whereMap: anyNamed('whereMap'),
-        archive: anyNamed('archive'),
-        done: anyNamed('done'),
-      )).thenAnswer((realInvocation) => Future.value([savedMemEntity]));
+      final savedMem = minSavedMem(1)..name = 'saved mem entity';
+      when(mockedMemRepositoryV2.shipByCondition(any, any))
+          .thenAnswer((realInvocation) => Future.value([savedMem]));
 
       await pumpMemListPage(widgetTester);
       await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      final savedMemoMemItemEntity =
-          minSavedMemoMemItemEntity(savedMemEntity.id, 1)
-            ..type = MemItemType.memo
-            ..value = 'saved memo mem item entity';
-      when(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).thenAnswer(
+      final savedMemoMemItemEntity = minSavedMemoMemItemEntity(savedMem.id, 1)
+        ..type = MemItemType.memo
+        ..value = 'saved memo mem item entity';
+      when(mockedMemItemRepository.shipByMemId(savedMem.id)).thenAnswer(
           (realInvocation) => Future.value([savedMemoMemItemEntity]));
 
-      await widgetTester.tap(find.text(savedMemEntity.name));
+      await widgetTester.tap(find.text(savedMem.name));
       await widgetTester.pumpAndSettle(const Duration(seconds: 1));
-      verify(mockedMemRepository.ship(
-        whereMap: anyNamed('whereMap'),
-        archive: anyNamed('archive'),
-        done: anyNamed('done'),
-      )).called(1);
+
+      verify(mockedMemRepositoryV2.shipByCondition(false, false)).called(1);
 
       when(mockedMemRepository.archive(any)).thenAnswer((realInvocation) {
         final memEntity = realInvocation.positionalArguments[0] as MemEntity;
 
-        expect(memEntity.toMap(), savedMemEntity.toMap());
-
         return Future.value(memEntity..archivedAt = DateTime.now());
       });
-      when(mockedMemItemRepository.archiveByMemId(savedMemEntity.id))
+      when(mockedMemItemRepository.archiveByMemId(savedMem.id))
           .thenAnswer((realInvocation) {
         final memId = realInvocation.positionalArguments[0] as int;
 
-        expect(memId, savedMemEntity.id);
+        expect(memId, savedMem.id);
 
         return Future.value([savedMemoMemItemEntity]
             .map((e) => e..archivedAt = DateTime.now())
@@ -258,8 +249,7 @@ void main() {
       await widgetTester.pumpAndSettle();
 
       verify(mockedMemRepository.archive(any)).called(1);
-      verify(mockedMemItemRepository.archiveByMemId(savedMemEntity.id))
-          .called(1);
+      verify(mockedMemItemRepository.archiveByMemId(savedMem.id)).called(1);
 
       expect(widgetTester.widgetList(memListTileFinder).length, 0);
     },
