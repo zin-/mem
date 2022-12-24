@@ -39,7 +39,7 @@ abstract class DatabaseTupleRepositoryV2<E extends DatabaseTupleEntityV2, P>
         {'condition': condition},
         () async => (await _table.select(
           whereString: condition?.whereString(),
-          whereArgs: [...condition?.whereArg()],
+          whereArgs: condition == null ? null : [...condition.whereArgs()],
         ))
             .map((e) => pack(e))
             .toList(),

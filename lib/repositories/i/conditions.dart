@@ -3,7 +3,7 @@ import 'types.dart';
 abstract class Condition {
   String whereString();
 
-  dynamic whereArg();
+  Iterable<dynamic> whereArgs();
 }
 
 typedef Conditions = Iterable<Condition>;
@@ -18,7 +18,7 @@ class Equals extends Condition {
   String whereString() => '$_key = ?';
 
   @override
-  dynamic whereArg() => _value;
+  Iterable<dynamic> whereArgs() => [_value];
 
   @override
   String toString() => '$_key = $_value';
@@ -31,14 +31,10 @@ class IsNull extends Condition {
   IsNull(this._key);
 
   @override
-  String whereString() {
-    return '$_key $_operator';
-  }
+  String whereString() => '$_key $_operator';
 
   @override
-  whereArg() {
-    return null;
-  }
+  Iterable<dynamic> whereArgs() => [null];
 
   @override
   String toString() {
@@ -58,9 +54,7 @@ class IsNotNull extends Condition {
   }
 
   @override
-  whereArg() {
-    return null;
-  }
+  Iterable<dynamic> whereArgs() => [null];
 
   @override
   String toString() {
@@ -76,17 +70,13 @@ class And extends Condition {
   And(this._conditions) : super();
 
   @override
-  String whereString() {
-    return _conditions.map((e) => e.whereString()).join(_operator);
-  }
+  String whereString() =>
+      _conditions.map((e) => e.whereString()).join(_operator);
 
   @override
-  Iterable<Object> whereArg() {
-    return _conditions.map((e) => e.whereArg()).whereType<Object>();
-  }
+  Iterable<Object> whereArgs() =>
+      _conditions.map((e) => e.whereArgs()).whereType<Object>();
 
   @override
-  String toString() {
-    return _conditions.map((e) => e.toString()).join(_operator);
-  }
+  String toString() => _conditions.map((e) => e.toString()).join(_operator);
 }
