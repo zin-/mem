@@ -69,6 +69,6 @@ class MemRepositoryV2 extends DatabaseTupleRepositoryV2<MemEntityV2, Mem> {
     return tmp;
   }
 
-  static setInstance(MemRepositoryV2? memRepository) =>
+  static resetWith(MemRepositoryV2? memRepository) =>
       _instance = memRepository;
 }

@@ -23,7 +23,7 @@ void main() {
   final mockedMemRepository = MockMemRepository();
   MemRepository.reset(mockedMemRepository);
   final mockedMemRepositoryV2 = MockMemRepositoryV2();
-  MemRepositoryV2.setInstance(mockedMemRepositoryV2);
+  MemRepositoryV2.resetWith(mockedMemRepositoryV2);
   final mockedMemItemRepository = MockMemItemRepository();
   MemItemRepository.reset(mockedMemItemRepository);
   final mockedNotificationRepository = MockNotificationRepository();

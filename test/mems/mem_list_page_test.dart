@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/core/mem.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/mems/mem_list_item_view.dart';
 import 'package:mem/mems/mem_name.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
-import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/mems/mem_list_page.dart';
+import 'package:mem/repositories/mem_repository.dart';
 import 'package:mockito/mockito.dart';
 
 import '../_helpers.dart';
@@ -32,31 +31,24 @@ void main() {
   final mockedMemRepository = MockMemRepository();
   MemRepository.reset(mockedMemRepository);
   final mockedMemRepositoryV2 = MockMemRepositoryV2();
-  MemRepositoryV2.setInstance(mockedMemRepositoryV2);
-  MemItemRepository.reset(MockMemItemRepository());
+  MemRepositoryV2.resetWith(mockedMemRepositoryV2);
+  final mockedMemItemRepository = MockMemItemRepository();
+  MemItemRepository.reset(mockedMemItemRepository);
 
   tearDown(() {
-    reset(mockedMemRepository);
+    reset(mockedMemRepositoryV2);
+    reset(mockedMemItemRepository);
   });
 
   testWidgets(
     'Show saved mem list',
     (widgetTester) async {
-      final memEntities = List.generate(
+      final mems = List.generate(
         5,
-        (index) => MemEntity(
-          id: index,
-          name: 'Test $index',
-          createdAt: DateTime.now(),
-        ),
+        (index) => minSavedMem(index)
+          ..name = 'Test $index'
+          ..createdAt = DateTime.now(),
       );
-      final mems = memEntities
-          .map((e) => Mem(
-                name: e.name,
-                id: e.id,
-                createdAt: e.createdAt,
-              ))
-          .toList();
 
       // when(mockedMemRepository.ship(
       //   whereMap: anyNamed('whereMap'),
@@ -86,11 +78,9 @@ void main() {
 
       await widgetTester.pumpAndSettle();
 
-      memEntities.asMap().forEach((index, mem) {
+      mems.asMap().forEach((index, mem) {
         expectMemNameTextOnListAt(widgetTester, index, mem.name);
       });
-
-      verifyNever(mockedMemRepository.shipById(any));
     },
     tags: TestSize.small,
   );
@@ -99,33 +89,28 @@ void main() {
     testWidgets(
       ': default',
       (widgetTester) async {
-        final notArchived = minSavedMemEntity(1)
+        final notArchived = minSavedMem(1)
           ..name = 'not archived'
           ..archivedAt = null;
         final archived = minSavedMemEntity(2)
           ..name = 'archived'
           ..archivedAt = DateTime.now();
-        final notDone = minSavedMemEntity(3)
+        final notDone = minSavedMem(3)
           ..name = 'not done'
           ..doneAt = null;
         final done = minSavedMemEntity(4)
           ..name = 'done'
           ..doneAt = DateTime.now();
 
-        when(mockedMemRepository.ship(
-          whereMap: anyNamed('whereMap'),
-          archive: anyNamed('archive'),
-          done: anyNamed('done'),
-        )).thenAnswer(
+        when(mockedMemRepositoryV2.shipByCondition(any, any)).thenAnswer(
           (realInvocation) => Future.value([notArchived, notDone]),
         );
 
         await pumpMemListPage(widgetTester);
         await widgetTester.pumpAndSettle();
-        verify(mockedMemRepository.ship(
-          whereMap: null,
-          archive: false,
-          done: false,
+        verify(mockedMemRepositoryV2.shipByCondition(
+          false,
+          false,
         )).called(1);
 
         expectMemNameTextOnListAt(widgetTester, 0, notArchived.name);
@@ -152,39 +137,34 @@ void main() {
       testWidgets(
         ': archive',
         (widgetTester) async {
-          final notArchived = minSavedMemEntity(1)
+          final notArchived = minSavedMem(1)
             ..archivedAt = null
             ..name = 'not archived';
-          final archived = minSavedMemEntity(2)
+          final archived = minSavedMem(2)
             ..archivedAt = DateTime.now()
             ..name = 'archived';
-          final notArchived2 = minSavedMemEntity(3)
+          final notArchived2 = minSavedMem(3)
             ..archivedAt = null
             ..name = 'not archived 2';
-          final archived2 = minSavedMemEntity(4)
+          final archived2 = minSavedMem(4)
             ..archivedAt = DateTime.now().add(const Duration(microseconds: 1))
             ..name = 'archived 2';
-          final returns = <List<MemEntity>>[
+          final returns = [
             [notArchived2],
             [archived2],
             [archived2, archived],
             [notArchived2, archived2, notArchived, archived],
           ];
 
-          when(mockedMemRepository.ship(
-            whereMap: anyNamed('whereMap'),
-            archive: anyNamed('archive'),
-            done: anyNamed('done'),
-          )).thenAnswer(
+          when(mockedMemRepositoryV2.shipByCondition(any, any)).thenAnswer(
             (realInvocation) => Future.value(returns.removeAt(0)),
           );
 
           await pumpMemListPage(widgetTester);
           await widgetTester.pumpAndSettle();
-          verify(mockedMemRepository.ship(
-            whereMap: null,
-            archive: false,
-            done: false,
+          verify(mockedMemRepositoryV2.shipByCondition(
+            false,
+            false,
           )).called(1);
 
           // showNotArchived: true, showArchived: false
@@ -199,10 +179,9 @@ void main() {
           await widgetTester.pumpAndSettle();
           await widgetTester.tap(findShowNotArchiveSwitch);
           await widgetTester.pumpAndSettle();
-          verify(mockedMemRepository.ship(
-            whereMap: null,
-            archive: null,
-            done: false,
+          verify(mockedMemRepositoryV2.shipByCondition(
+            null,
+            false,
           )).called(1);
 
           expect(widgetTester.widgetList(memListTileFinder).length, 2);
@@ -214,10 +193,9 @@ void main() {
           // showNotArchived: false, showArchived: true
           await widgetTester.tap(findShowArchiveSwitch);
           await widgetTester.pumpAndSettle();
-          verify(mockedMemRepository.ship(
-            whereMap: null,
-            archive: true,
-            done: false,
+          verify(mockedMemRepositoryV2.shipByCondition(
+            true,
+            false,
           )).called(1);
 
           expect(widgetTester.widgetList(memListTileFinder).length, 2);
@@ -229,10 +207,9 @@ void main() {
           // showNotArchived: true, showArchived: true
           await widgetTester.tap(findShowNotArchiveSwitch);
           await widgetTester.pumpAndSettle();
-          verify(mockedMemRepository.ship(
-            whereMap: null,
-            archive: null,
-            done: false,
+          verify(mockedMemRepositoryV2.shipByCondition(
+            null,
+            false,
           )).called(1);
 
           expect(widgetTester.widgetList(memListTileFinder).length, 4);
@@ -247,38 +224,33 @@ void main() {
       testWidgets(
         ': done',
         (widgetTester) async {
-          final notDone = minSavedMemEntity(1)
+          final notDone = minSavedMem(1)
             ..doneAt = null
             ..name = 'not done';
-          final done = minSavedMemEntity(2)
+          final done = minSavedMem(2)
             ..doneAt = DateTime.now()
             ..name = 'done';
-          final notDone2 = minSavedMemEntity(3)
+          final notDone2 = minSavedMem(3)
             ..doneAt = null
             ..name = 'not done 2';
-          final done2 = minSavedMemEntity(4)
+          final done2 = minSavedMem(4)
             ..doneAt = DateTime.now().add(const Duration(microseconds: 1))
             ..name = 'done 2';
-          final returns = <List<MemEntity>>[
+          final returns = [
             [notDone2],
             [done2],
             [done2, done],
             [notDone2, done2, notDone, done],
           ];
-          when(mockedMemRepository.ship(
-            whereMap: anyNamed('whereMap'),
-            archive: anyNamed('archive'),
-            done: anyNamed('done'),
-          )).thenAnswer(
+          when(mockedMemRepositoryV2.shipByCondition(any, any)).thenAnswer(
             (realInvocation) => Future.value(returns.removeAt(0)),
           );
 
           await pumpMemListPage(widgetTester);
           await widgetTester.pumpAndSettle();
-          verify(mockedMemRepository.ship(
-            whereMap: anyNamed('whereMap'),
-            archive: anyNamed('archive'),
-            done: false,
+          verify(mockedMemRepositoryV2.shipByCondition(
+            false,
+            false,
           )).called(1);
 
           // showNotDone: true, showDone: false
@@ -293,10 +265,9 @@ void main() {
           await widgetTester.pumpAndSettle();
           await widgetTester.tap(findShowNotDoneSwitch);
           await widgetTester.pumpAndSettle();
-          verify(mockedMemRepository.ship(
-            whereMap: anyNamed('whereMap'),
-            archive: anyNamed('archive'),
-            done: null,
+          verify(mockedMemRepositoryV2.shipByCondition(
+            false,
+            null,
           )).called(1);
 
           expect(widgetTester.widgetList(memListTileFinder).length, 2);
@@ -308,10 +279,9 @@ void main() {
           // showNotDone: false, showDone: true
           await widgetTester.tap(findShowDoneSwitch);
           await widgetTester.pumpAndSettle();
-          verify(mockedMemRepository.ship(
-            whereMap: anyNamed('whereMap'),
-            archive: anyNamed('archive'),
-            done: true,
+          verify(mockedMemRepositoryV2.shipByCondition(
+            false,
+            true,
           )).called(1);
 
           expect(widgetTester.widgetList(memListTileFinder).length, 2);
@@ -323,10 +293,9 @@ void main() {
           // showNotDone: true, showDone: true
           await widgetTester.tap(findShowNotDoneSwitch);
           await widgetTester.pumpAndSettle();
-          verify(mockedMemRepository.ship(
-            whereMap: anyNamed('whereMap'),
-            archive: anyNamed('archive'),
-            done: null,
+          verify(mockedMemRepositoryV2.shipByCondition(
+            false,
+            null,
           )).called(1);
 
           expect(widgetTester.widgetList(memListTileFinder).length, 4);
@@ -347,46 +316,43 @@ void main() {
         final now = DateTime.now();
         final nowDate = DateTime(now.year, now.month, now.day);
 
-        final notifyOnIsNull = minSavedMemEntity(1)
+        final notifyOnIsNull = minSavedMem(1)
           ..name = 'notifyOn is null'
           ..doneAt = null
           ..archivedAt = null
           ..notifyOn = null;
-        final notifyOnNow = minSavedMemEntity(2)
+        final notifyOnNow = minSavedMem(2)
           ..name = 'notifyOn is now'
           ..doneAt = null
           ..archivedAt = null
           ..notifyOn = nowDate;
-        final notifyOnOneDayAgo = minSavedMemEntity(3)
+        final notifyOnOneDayAgo = minSavedMem(3)
           ..name = 'notifyOn is one day ago'
           ..doneAt = null
           ..archivedAt = null
           ..notifyOn = nowDate.add(const Duration(days: -1));
-        final notifyOnOneDayLater = minSavedMemEntity(4)
+        final notifyOnOneDayLater = minSavedMem(4)
           ..name = 'notifyOn is one day later'
           ..doneAt = null
           ..archivedAt = null
           ..notifyOn = nowDate.add(const Duration(days: 1));
-        final notifyOnNow2 = minSavedMemEntity(5)
+        final notifyOnNow2 = minSavedMem(5)
           ..name = 'notifyOn is now 2'
           ..doneAt = null
           ..archivedAt = null
           ..notifyOn = DateTime(now.year, now.month, now.day);
-        final notifyOnOneDayAgo2 = minSavedMemEntity(6)
+        final notifyOnOneDayAgo2 = minSavedMem(6)
           ..name = 'notifyOn is one day ago 2'
           ..doneAt = null
           ..archivedAt = null
           ..notifyOn = nowDate.add(const Duration(days: -1));
-        final notifyOnOneDayLater2 = minSavedMemEntity(7)
+        final notifyOnOneDayLater2 = minSavedMem(7)
           ..name = 'notifyOn is one day later 2'
           ..doneAt = null
           ..archivedAt = null
           ..notifyOn = nowDate.add(const Duration(days: 1));
 
-        when(mockedMemRepository.ship(
-                whereMap: anyNamed('whereMap'),
-                archive: anyNamed('archive'),
-                done: anyNamed('done')))
+        when(mockedMemRepositoryV2.shipByCondition(any, any))
             .thenAnswer((realInvocation) => Future.value([
                   notifyOnNow,
                   notifyOnIsNull,
@@ -419,41 +385,40 @@ void main() {
         final nowDateTime =
             DateTime(now.year, now.month, now.day, now.hour, now.minute);
 
-        final notifyOnIsNull = minSavedMemEntity(1)
+        final notifyOnIsNull = minSavedMem(1)
           ..name = 'notifyOn is null'
           ..doneAt = null
           ..archivedAt = null
           ..notifyOn = null
           ..notifyAt = null;
-        final notifyAtIsNull = minSavedMemEntity(2)
+        final notifyAtIsNull = minSavedMem(2)
           ..name = 'notifyAt is null'
           ..doneAt = null
           ..archivedAt = null
           ..notifyOn = nowDate
           ..notifyAt = null;
-        final notifyAtNow = minSavedMemEntity(3)
+        final notifyAtNow = minSavedMem(3)
           ..name = 'notifyAt is now'
           ..doneAt = null
           ..archivedAt = null
           ..notifyOn = nowDate
-          ..notifyAt = nowDateTime;
-        final notifyAtOneHourAgo = minSavedMemEntity(4)
+          ..notifyAt = TimeOfDay.fromDateTime(nowDateTime);
+        final notifyAtOneHourAgo = minSavedMem(4)
           ..name = 'notifyAt is one hour ago'
           ..doneAt = null
           ..archivedAt = null
           ..notifyOn = nowDate
-          ..notifyAt = nowDateTime.add(const Duration(hours: -1));
-        final notifyAtOneMinuteLater = minSavedMemEntity(5)
+          ..notifyAt = TimeOfDay.fromDateTime(
+              nowDateTime.add(const Duration(hours: -1)));
+        final notifyAtOneMinuteLater = minSavedMem(5)
           ..name = 'notifyAt is one minute later'
           ..doneAt = null
           ..archivedAt = null
           ..notifyOn = nowDate
-          ..notifyAt = nowDateTime.add(const Duration(minutes: 1));
+          ..notifyAt = TimeOfDay.fromDateTime(
+              nowDateTime.add(const Duration(minutes: 1)));
 
-        when(mockedMemRepository.ship(
-                whereMap: anyNamed('whereMap'),
-                archive: anyNamed('archive'),
-                done: anyNamed('done')))
+        when(mockedMemRepositoryV2.shipByCondition(any, any))
             .thenAnswer((realInvocation) => Future.value([
                   notifyOnIsNull,
                   notifyAtIsNull,
@@ -491,18 +456,12 @@ void main() {
     (widgetTester) async {
       final mems = List.generate(
         20,
-        (index) => MemEntity(
-          id: index,
-          name: 'Test $index',
-          createdAt: DateTime.now(),
-        ),
+        (index) => minSavedMem(index)
+          ..name = 'Test $index'
+          ..createdAt = DateTime.now(),
       );
 
-      when(mockedMemRepository.ship(
-        whereMap: anyNamed('whereMap'),
-        archive: anyNamed('archive'),
-        done: anyNamed('done'),
-      )).thenAnswer(
+      when(mockedMemRepositoryV2.shipByCondition(any, any)).thenAnswer(
         (realInvocation) => Future.value(mems),
       );
 
