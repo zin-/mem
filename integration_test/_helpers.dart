@@ -7,6 +7,7 @@ import 'package:mem/core/mem.dart';
 import 'package:mem/mems/mem_items_view.dart';
 import 'package:mem/mems/mem_name.dart';
 import 'package:mem/mems/mem_notify_at.dart';
+import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/mems/mem_service.dart';
 import 'package:mem/gui/date_and_time_text_form_field.dart';
 
@@ -25,6 +26,7 @@ Future clearDatabase() async {
   await DatabaseManager(onTest: true).delete(app.databaseDefinition.name);
 
   MemRepository.reset(null);
+  MemRepositoryV2.resetWith(null);
   MemItemRepository.reset(null);
 
   MemService.reset(null);

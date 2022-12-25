@@ -113,7 +113,6 @@ class MemService {
           showNotArchived == showArchived ? null : showArchived,
           showNotDone == showDone ? null : showDone,
         ),
-        debug: true,
       );
 
   Future<Mem> fetchMemById(int memId) => t(

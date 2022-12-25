@@ -51,8 +51,9 @@ final fetchMemList = FutureProvider<void>(
         showDone,
       ));
 
-      final memListNotifier = ref.read(memListProvider.notifier);
-      memListNotifier.upsertAll(mems, (tmp, item) => tmp.id == item.id);
+      ref
+          .read(memListProvider.notifier)
+          .upsertAll(mems, (tmp, item) => tmp.id == item.id);
       for (var mem in mems) {
         ref.read(memProvider(mem.id).notifier).updatedBy(mem);
       }

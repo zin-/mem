@@ -19,13 +19,13 @@ class MemRepositoryV2 extends DatabaseTupleRepositoryV2<MemEntityV2, Mem> {
                   archived == null
                       ? null
                       : archived
-                          ? IsNull(archivedAtColumnName)
-                          : IsNotNull(archivedAtColumnName),
+                          ? IsNotNull(archivedAtColumnName)
+                          : IsNull(archivedAtColumnName),
                   done == null
                       ? null
                       : done
-                          ? IsNull(defMemDoneAt.name)
-                          : IsNotNull(defMemDoneAt.name),
+                          ? IsNotNull(defMemDoneAt.name)
+                          : IsNull(defMemDoneAt.name),
                 ].whereType<Condition>()),
               ));
 
@@ -45,8 +45,6 @@ class MemRepositoryV2 extends DatabaseTupleRepositoryV2<MemEntityV2, Mem> {
       updatedAt: memEntity.updatedAt,
       archivedAt: memEntity.archivedAt,
     );
-    // TODO: implement pack
-    throw UnimplementedError();
   }
 
   @override
@@ -69,6 +67,5 @@ class MemRepositoryV2 extends DatabaseTupleRepositoryV2<MemEntityV2, Mem> {
     return tmp;
   }
 
-  static resetWith(MemRepositoryV2? memRepository) =>
-      _instance = memRepository;
+  static resetWith(MemRepositoryV2? memRepository) => _instance = memRepository;
 }

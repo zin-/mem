@@ -46,7 +46,7 @@ abstract class Table {
 
   Future<List<Map<String, dynamic>>> select({
     String? whereString,
-    List<Object?>? whereArgs,
+    Iterable<dynamic>? whereArgs,
   });
 
   Future<Map<String, dynamic>> selectByPk(dynamic pk);

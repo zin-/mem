@@ -178,7 +178,7 @@ class ObjectStore extends Table {
   @override
   Future<List<Map<String, dynamic>>> select({
     String? whereString,
-    List<Object?>? whereArgs,
+    Iterable<dynamic>? whereArgs,
   }) =>
       v(
         {'where': whereString, 'whereArgs': whereArgs},
