@@ -53,9 +53,9 @@ class DateAndTime extends DateTime {
         );
 
   DateAndTime.fromV2(
-    DateTime dateTime,
+    DateTime dateTime, {
     DateTime? timeOfDay,
-  ) : this(
+  }) : this(
           dateTime.year,
           dateTime.month,
           dateTime.day,
@@ -69,7 +69,8 @@ class DateAndTime extends DateTime {
   DateAndTime.now({bool allDay = false})
       : this.fromV2(
           DateTime.now(),
-          allDay ? null : DateTime.now(),
+          // FIXME 同じnowを使う
+          timeOfDay: allDay ? null : DateTime.now(),
         );
 
   DateTime get dateTime => DateTime(year, month, day);

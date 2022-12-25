@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/core/date_and_time.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/mems/mem_list_item_view.dart';
 import 'package:mem/mems/mem_name.dart';
@@ -320,12 +321,14 @@ void main() {
           ..name = 'notifyOn is null'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyOn = null;
+          ..notifyOn = null
+          ..notifyAtV2 = null;
         final notifyOnNow = minSavedMem(2)
           ..name = 'notifyOn is now'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyOn = nowDate;
+          ..notifyOn = nowDate
+          ..notifyAtV2 = DateAndTime.fromV2(nowDate);
         final notifyOnOneDayAgo = minSavedMem(3)
           ..name = 'notifyOn is one day ago'
           ..doneAt = null
