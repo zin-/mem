@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:mem/core/date_and_time.dart';
 import 'package:mem/core/errors.dart';
 import 'package:mem/core/mem.dart';
@@ -39,10 +38,6 @@ class MemRepositoryV2 extends DatabaseTupleRepositoryV2<MemEntityV2, Mem> {
     return Mem(
       name: memEntity.name,
       doneAt: memEntity.doneAt,
-      notifyOn: memEntity.notifyOn,
-      notifyAt: memEntity.notifyAt == null
-          ? null
-          : TimeOfDay.fromDateTime(memEntity.notifyAt!),
       notifyAtV2: notifyOn == null
           ? null
           : DateAndTime.fromV2(notifyOn, timeOfDay: memEntity.notifyAt),

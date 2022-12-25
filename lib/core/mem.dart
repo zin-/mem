@@ -8,7 +8,9 @@ typedef MemId = int;
 class Mem extends EntityValue {
   String name;
   DateTime? doneAt;
+  @Deprecated('use notifyAtV2')
   DateTime? notifyOn;
+  @Deprecated('use notifyAtV2')
   TimeOfDay? notifyAt;
   DateAndTime? notifyAtV2;
 
