@@ -30,7 +30,8 @@ void main() {
         () {
           final dateAndTime = DateAndTime.now(allDay: true);
           final dateTime = DateTime.fromMicrosecondsSinceEpoch(
-              dateAndTime.microsecondsSinceEpoch);
+            dateAndTime.microsecondsSinceEpoch,
+          );
 
           expect(dateAndTime, isA<DateAndTime>());
           expect(dateAndTime, isA<DateTime>());

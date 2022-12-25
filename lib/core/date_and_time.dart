@@ -28,6 +28,7 @@ class DateAndTime extends DateTime {
           microsecond ?? 0,
         );
 
+  @Deprecated('use fromV2')
   DateAndTime.from(
     DateTime dateTime, {
     TimeOfDay? timeOfDay,
@@ -51,16 +52,27 @@ class DateAndTime extends DateTime {
           null,
         );
 
+  DateAndTime.fromV2(
+    DateTime dateTime,
+    DateTime? timeOfDay,
+  ) : this(
+          dateTime.year,
+          dateTime.month,
+          dateTime.day,
+          timeOfDay?.hour,
+          timeOfDay?.minute,
+          null,
+          null,
+          null,
+        );
+
   DateAndTime.now({bool allDay = false})
-      : this.from(
+      : this.fromV2(
           DateTime.now(),
-          timeOfDay: allDay ? null : TimeOfDay.now(),
-          allDay: allDay,
+          allDay ? null : DateTime.now(),
         );
 
   DateTime get dateTime => DateTime(year, month, day);
-
-  // TimeOfDay? get timeOfDay => isAllDay ? null : TimeOfDay.fromDateTime(this);
 
   Map<String, dynamic> toMap() => {
         '_': super.toString(),
