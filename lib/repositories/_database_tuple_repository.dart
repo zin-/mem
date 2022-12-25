@@ -7,7 +7,7 @@ const createdAtColumnName = 'createdAt';
 const updatedAtColumnName = 'updatedAt';
 const archivedAtColumnName = 'archivedAt';
 
-@Deprecated('use ../i/_database_tuple_entity_v2.dart')
+@Deprecated('use DatabaseTupleRepositoryV2')
 abstract class DatabaseTupleEntity {
   late dynamic id;
   late DateTime? createdAt;
@@ -45,7 +45,7 @@ final defaultColumnDefinitions = [
   DefC(archivedAtColumnName, TypeC.datetime, notNull: false),
 ];
 
-@Deprecated('use ../i/_database_tuple_entity_v2.dart')
+@Deprecated('use DatabaseTupleEntityV2')
 abstract class DatabaseTupleRepository<Entity extends DatabaseTupleEntity> {
   Future<Entity> receive(Entity entity) => v(
         {'entity': entity},

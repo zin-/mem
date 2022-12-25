@@ -101,7 +101,7 @@ void main() {
       expectMemNameOnMemDetail(widgetTester, enteringMemName);
       expectMemMemoOnMemDetail(widgetTester, enteringMemMemo);
 
-      verifyNever(mockedMemRepository.ship(whereMap: anyNamed('whereMap')));
+      verifyNever(mockedMemRepositoryV2.shipByCondition(any, any));
       verifyNever(mockedMemItemRepository.shipByMemId(any));
 
       await widgetTester.pageBack();
@@ -200,7 +200,7 @@ void main() {
       await widgetTester.pageBack();
       await widgetTester.pumpAndSettle();
 
-      verifyNever(mockedMemRepository.ship(whereMap: anyNamed('whereMap')));
+      verifyNever(mockedMemRepositoryV2.shipByCondition(any, any));
 
       expect(widgetTester.widgetList(memListTileFinder).length, 1);
       expectMemNameTextOnListAt(widgetTester, 0, enteringMemName);
