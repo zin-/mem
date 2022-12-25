@@ -144,48 +144,19 @@ final sortedMemList =
               }
             }
 
-            // FIXME ここきもすぎない？
-            final notifyOn1 = item1.notifyOn;
-            final notifyOn2 = item2.notifyOn;
-            if (notifyOn1 != notifyOn2) {
-              if (notifyOn1 == null) {
+            final notifyAtV2_1 = item1.notifyAtV2;
+            final notifyAtV2_2 = item2.notifyAtV2;
+            if (notifyAtV2_1 != notifyAtV2_2) {
+              if (notifyAtV2_1 == null) {
                 return 1;
               }
-              if (notifyOn2 == null) {
+              if (notifyAtV2_2 == null) {
                 return -1;
               }
-            }
 
-            if (notifyOn1 != null && notifyOn2 != null) {
-              final notifyAt1 = notifyOn1
-                  .subtract(Duration(
-                    hours: notifyOn1.hour,
-                    minutes: notifyOn1.minute,
-                    seconds: notifyOn1.second,
-                    milliseconds: notifyOn1.millisecond,
-                    microseconds: notifyOn1.microsecond,
-                  ))
-                  .add(Duration(
-                    hours: item1.notifyAt?.hour ?? 0,
-                    minutes: item1.notifyAt?.minute ?? 0,
-                  ));
-              final notifyAt2 = notifyOn2
-                  .subtract(Duration(
-                    hours: notifyOn2.hour,
-                    minutes: notifyOn2.minute,
-                    seconds: notifyOn2.second,
-                    milliseconds: notifyOn2.millisecond,
-                    microseconds: notifyOn2.microsecond,
-                  ))
-                  .add(Duration(
-                    hours: item2.notifyAt?.hour ?? 0,
-                    minutes: item2.notifyAt?.minute ?? 0,
-                  ));
-
-              final comparedNotifyAt = notifyAt1.compareTo(notifyAt2);
-
-              if (comparedNotifyAt != 0) {
-                return comparedNotifyAt;
+              final comparedNotifyAtV2 = notifyAtV2_1.compareTo(notifyAtV2_2);
+              if (comparedNotifyAtV2 != 0) {
+                return comparedNotifyAtV2;
               }
             }
 

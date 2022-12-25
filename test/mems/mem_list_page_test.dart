@@ -333,27 +333,42 @@ void main() {
           ..name = 'notifyOn is one day ago'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyOn = nowDate.add(const Duration(days: -1));
+          ..notifyOn = nowDate.add(const Duration(days: -1))
+          ..notifyAtV2 = DateAndTime.fromV2(
+            nowDate.add(const Duration(days: -1)),
+          );
         final notifyOnOneDayLater = minSavedMem(4)
           ..name = 'notifyOn is one day later'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyOn = nowDate.add(const Duration(days: 1));
+          ..notifyOn = nowDate.add(const Duration(days: 1))
+          ..notifyAtV2 = DateAndTime.fromV2(
+            nowDate.add(const Duration(days: 1)),
+          );
         final notifyOnNow2 = minSavedMem(5)
           ..name = 'notifyOn is now 2'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyOn = DateTime(now.year, now.month, now.day);
+          ..notifyOn = DateTime(now.year, now.month, now.day)
+          ..notifyAtV2 = DateAndTime.fromV2(
+            DateTime(now.year, now.month, now.day),
+          );
         final notifyOnOneDayAgo2 = minSavedMem(6)
           ..name = 'notifyOn is one day ago 2'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyOn = nowDate.add(const Duration(days: -1));
+          ..notifyOn = nowDate.add(const Duration(days: -1))
+          ..notifyAtV2 = DateAndTime.fromV2(
+            nowDate.add(const Duration(days: -1)),
+          );
         final notifyOnOneDayLater2 = minSavedMem(7)
           ..name = 'notifyOn is one day later 2'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyOn = nowDate.add(const Duration(days: 1));
+          ..notifyOn = nowDate.add(const Duration(days: 1))
+          ..notifyAtV2 = DateAndTime.fromV2(
+            nowDate.add(const Duration(days: 1)),
+          );
 
         when(mockedMemRepositoryV2.shipByCondition(any, any))
             .thenAnswer((realInvocation) => Future.value([
@@ -393,33 +408,50 @@ void main() {
           ..doneAt = null
           ..archivedAt = null
           ..notifyOn = null
-          ..notifyAt = null;
+          ..notifyAt = null
+          ..notifyAtV2 = null;
         final notifyAtIsNull = minSavedMem(2)
           ..name = 'notifyAt is null'
           ..doneAt = null
           ..archivedAt = null
           ..notifyOn = nowDate
-          ..notifyAt = null;
+          ..notifyAt = null
+          ..notifyAtV2 = DateAndTime.fromV2(
+            nowDate,
+            timeOfDay: null,
+          );
         final notifyAtNow = minSavedMem(3)
           ..name = 'notifyAt is now'
           ..doneAt = null
           ..archivedAt = null
           ..notifyOn = nowDate
-          ..notifyAt = TimeOfDay.fromDateTime(nowDateTime);
+          ..notifyAt = TimeOfDay.fromDateTime(nowDateTime)
+          ..notifyAtV2 = DateAndTime.fromV2(
+            nowDate,
+            timeOfDay: nowDateTime,
+          );
         final notifyAtOneHourAgo = minSavedMem(4)
           ..name = 'notifyAt is one hour ago'
           ..doneAt = null
           ..archivedAt = null
           ..notifyOn = nowDate
-          ..notifyAt = TimeOfDay.fromDateTime(
-              nowDateTime.add(const Duration(hours: -1)));
+          ..notifyAt =
+              TimeOfDay.fromDateTime(nowDateTime.add(const Duration(hours: -1)))
+          ..notifyAtV2 = DateAndTime.fromV2(
+            nowDate,
+            timeOfDay: nowDateTime,
+          ).add(const Duration(hours: -1));
         final notifyAtOneMinuteLater = minSavedMem(5)
           ..name = 'notifyAt is one minute later'
           ..doneAt = null
           ..archivedAt = null
           ..notifyOn = nowDate
           ..notifyAt = TimeOfDay.fromDateTime(
-              nowDateTime.add(const Duration(minutes: 1)));
+              nowDateTime.add(const Duration(minutes: 1)))
+          ..notifyAtV2 = DateAndTime.fromV2(
+            nowDate,
+            timeOfDay: nowDateTime,
+          ).add(const Duration(minutes: 1));
 
         when(mockedMemRepositoryV2.shipByCondition(any, any))
             .thenAnswer((realInvocation) => Future.value([

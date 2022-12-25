@@ -45,7 +45,7 @@ class MemRepositoryV2 extends DatabaseTupleRepositoryV2<MemEntityV2, Mem> {
           : TimeOfDay.fromDateTime(memEntity.notifyAt!),
       notifyAtV2: notifyOn == null
           ? null
-          : DateAndTime.fromV2(notifyOn, memEntity.notifyAt),
+          : DateAndTime.fromV2(notifyOn, timeOfDay: memEntity.notifyAt),
       id: memEntity.id,
       createdAt: memEntity.createdAt,
       updatedAt: memEntity.updatedAt,

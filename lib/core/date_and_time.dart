@@ -75,6 +75,19 @@ class DateAndTime extends DateTime {
 
   DateTime get dateTime => DateTime(year, month, day);
 
+  @override
+  DateAndTime add(Duration duration) {
+    final added = super.add(duration);
+
+    return DateAndTime(
+      added.year,
+      added.month,
+      added.day,
+      added.hour,
+      added.minute,
+    );
+  }
+
   Map<String, dynamic> toMap() => {
         '_': super.toString(),
         'isAllDay': isAllDay,
