@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/core/mem.dart';
+import 'package:mem/core/mem_item.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/notifications/notification_repository.dart';
 import 'package:mem/repositories/mem_item_repository.dart';

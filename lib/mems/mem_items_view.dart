@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/core/mem.dart';
+import 'package:mem/core/mem_item.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/gui/async_value_view.dart';
