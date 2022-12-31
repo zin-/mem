@@ -311,34 +311,37 @@ void main() {
   });
 
   group('Sort', () {
-    testWidgets(': notifyAtV2 is null and now(is not allDay)', (widgetTester) async {
-      final notifyOnIsNull = minSavedMem(1)
-        ..name = 'notifyAtV2 is null'
-        ..notifyAtV2 = null;
-      final notifyOnIsNow = minSavedMem(2)
-        ..name = 'notifyAtV2 is now(is not allDay)'
-        ..notifyAtV2 = DateAndTime.now();
+    testWidgets(
+      ': notifyAtV2 is null and now(is not allDay)',
+      (widgetTester) async {
+        final notifyOnIsNull = minSavedMem(1)
+          ..name = 'notifyAtV2 is null'
+          ..notifyAtV2 = null;
+        final notifyOnIsNow = minSavedMem(2)
+          ..name = 'notifyAtV2 is now(is not allDay)'
+          ..notifyAtV2 = DateAndTime.now();
 
-      when(mockedMemRepositoryV2.shipByCondition(any, any))
-          .thenAnswer((realInvocation) => Future.value([
-                notifyOnIsNull,
-                notifyOnIsNow,
-              ]));
+        when(mockedMemRepositoryV2.shipByCondition(any, any))
+            .thenAnswer((realInvocation) => Future.value([
+                  notifyOnIsNull,
+                  notifyOnIsNow,
+                ]));
 
-      await runTestWidgetWithProvider(widgetTester, MemListPage());
-      await widgetTester.pump();
+        await runTestWidgetWithProvider(widgetTester, MemListPage());
+        await widgetTester.pump();
 
-      expectMemNameTextOnListAt(widgetTester, 0, notifyOnIsNow.name);
-      expectMemNameTextOnListAt(widgetTester, 1, notifyOnIsNull.name);
+        expectMemNameTextOnListAt(widgetTester, 0, notifyOnIsNow.name);
+        expectMemNameTextOnListAt(widgetTester, 1, notifyOnIsNull.name);
 
-      expect(
-        verify(mockedMemRepositoryV2.shipByCondition(
-          captureAny,
-          captureAny,
-        )).captured,
-        [false, false],
-      );
-    });
+        expect(
+          verify(mockedMemRepositoryV2.shipByCondition(
+            captureAny,
+            captureAny,
+          )).captured,
+          [false, false],
+        );
+      },
+    );
     testWidgets(
       ': notifyOn',
       (widgetTester) async {
