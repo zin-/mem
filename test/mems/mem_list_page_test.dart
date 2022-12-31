@@ -342,6 +342,7 @@ void main() {
         );
       },
     );
+
     testWidgets(
       ': notifyOn',
       (widgetTester) async {
