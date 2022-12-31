@@ -87,6 +87,18 @@ class DateAndTime extends DateTime {
       added.minute,
     );
   }
+  @override
+  DateAndTime subtract(Duration duration) {
+    final subtracted = super.subtract(duration);
+
+    return DateAndTime(
+      subtracted.year,
+      subtracted.month,
+      subtracted.day,
+      subtracted.hour,
+      subtracted.minute,
+    );
+  }
 
   Map<String, dynamic> toMap() => {
         '_': super.toString(),

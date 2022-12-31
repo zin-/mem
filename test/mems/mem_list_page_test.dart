@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -312,38 +315,6 @@ void main() {
 
   group('Sort', () {
     testWidgets(
-      ': notifyAtV2 is null and now(is not allDay)',
-      (widgetTester) async {
-        final notifyOnIsNull = minSavedMem(1)
-          ..name = 'notifyAtV2 is null'
-          ..notifyAtV2 = null;
-        final notifyOnIsNow = minSavedMem(2)
-          ..name = 'notifyAtV2 is now(is not allDay)'
-          ..notifyAtV2 = DateAndTime.now();
-
-        when(mockedMemRepositoryV2.shipByCondition(any, any))
-            .thenAnswer((realInvocation) => Future.value([
-                  notifyOnIsNull,
-                  notifyOnIsNow,
-                ]));
-
-        await runTestWidgetWithProvider(widgetTester, MemListPage());
-        await widgetTester.pump();
-
-        expectMemNameTextOnListAt(widgetTester, 0, notifyOnIsNow.name);
-        expectMemNameTextOnListAt(widgetTester, 1, notifyOnIsNull.name);
-
-        expect(
-          verify(mockedMemRepositoryV2.shipByCondition(
-            captureAny,
-            captureAny,
-          )).captured,
-          [false, false],
-        );
-      },
-    );
-
-    testWidgets(
       ': notifyOn',
       (widgetTester) async {
         final now = DateTime.now();
@@ -353,19 +324,16 @@ void main() {
           ..name = 'notifyOn is null'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyOn = null
           ..notifyAtV2 = null;
         final notifyOnNow = minSavedMem(2)
           ..name = 'notifyOn is now'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyOn = nowDate
           ..notifyAtV2 = DateAndTime.fromV2(nowDate);
         final notifyOnOneDayAgo = minSavedMem(3)
           ..name = 'notifyOn is one day ago'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyOn = nowDate.add(const Duration(days: -1))
           ..notifyAtV2 = DateAndTime.fromV2(
             nowDate.add(const Duration(days: -1)),
           );
@@ -373,7 +341,6 @@ void main() {
           ..name = 'notifyOn is one day later'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyOn = nowDate.add(const Duration(days: 1))
           ..notifyAtV2 = DateAndTime.fromV2(
             nowDate.add(const Duration(days: 1)),
           );
@@ -381,7 +348,6 @@ void main() {
           ..name = 'notifyOn is now 2'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyOn = DateTime(now.year, now.month, now.day)
           ..notifyAtV2 = DateAndTime.fromV2(
             DateTime(now.year, now.month, now.day),
           );
@@ -389,7 +355,6 @@ void main() {
           ..name = 'notifyOn is one day ago 2'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyOn = nowDate.add(const Duration(days: -1))
           ..notifyAtV2 = DateAndTime.fromV2(
             nowDate.add(const Duration(days: -1)),
           );
@@ -397,7 +362,6 @@ void main() {
           ..name = 'notifyOn is one day later 2'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyOn = nowDate.add(const Duration(days: 1))
           ..notifyAtV2 = DateAndTime.fromV2(
             nowDate.add(const Duration(days: 1)),
           );
@@ -427,95 +391,139 @@ void main() {
       tags: TestSize.small,
     );
 
-    testWidgets(
-      ': notifyAt',
-      (widgetTester) async {
-        final now = DateTime.now();
-        final nowDate = DateTime(now.year, now.month, now.day);
-        final nowDateTime =
-            DateTime(now.year, now.month, now.day, now.hour, now.minute);
+    group('notifyAtV2', () {
+      testWidgets(
+        'null and now(not allDay)',
+        (widgetTester) async {
+          final notifyAV2tIsNull = minSavedMem(1)
+            ..name = 'notifyAtV2 is null'
+            ..doneAt = null
+            ..archivedAt = null
+            ..notifyAtV2 = null;
+          final notifyAtV2IsNowNotAllDay = minSavedMem(2)
+            ..name = 'notifyAt is now'
+            ..doneAt = null
+            ..archivedAt = null
+            ..notifyAtV2 = DateAndTime.now();
 
-        final notifyOnIsNull = minSavedMem(1)
-          ..name = 'notifyOn is null'
-          ..doneAt = null
-          ..archivedAt = null
-          ..notifyOn = null
-          ..notifyAt = null
-          ..notifyAtV2 = null;
-        final notifyAtIsNull = minSavedMem(2)
-          ..name = 'notifyAt is null'
-          ..doneAt = null
-          ..archivedAt = null
-          ..notifyOn = nowDate
-          ..notifyAt = null
-          ..notifyAtV2 = DateAndTime.fromV2(
-            nowDate,
-            timeOfDay: null,
+          when(mockedMemRepositoryV2.shipByCondition(any, any))
+              .thenAnswer((realInvocation) => Future.value([
+                    notifyAV2tIsNull,
+                    notifyAtV2IsNowNotAllDay,
+                  ].sorted((a, b) => Random().nextInt(2) - 1)));
+
+          await pumpMemListPage(widgetTester);
+          await widgetTester.pumpAndSettle();
+
+          expectMemNameTextOnListAt(
+              widgetTester, 0, notifyAtV2IsNowNotAllDay.name);
+          expectMemNameTextOnListAt(widgetTester, 1, notifyAV2tIsNull.name);
+        },
+        tags: TestSize.small,
+      );
+      testWidgets(
+        'now(not allDay) and 23 hour ago',
+        (widgetTester) async {
+          final notifyOnIs23HoursAgo = minSavedMem(1)
+            ..name = 'notifyAtV2 is 23 hour ago'
+            ..notifyAtV2 = DateAndTime.now(allDay: true)
+                .subtract(const Duration(hours: 23));
+          final notifyOnIsNowNotAllDay = minSavedMem(2)
+            ..name = 'notifyAtV2 is now(is not allDay)'
+            ..notifyAtV2 = DateAndTime.now();
+
+          when(mockedMemRepositoryV2.shipByCondition(any, any))
+              .thenAnswer((realInvocation) => Future.value([
+                    notifyOnIs23HoursAgo,
+                    notifyOnIsNowNotAllDay,
+                  ].sorted((a, b) => Random().nextInt(2) - 1)));
+
+          await runTestWidgetWithProvider(widgetTester, MemListPage());
+          await widgetTester.pump();
+
+          expectMemNameTextOnListAt(widgetTester, 0, notifyOnIs23HoursAgo.name);
+          expectMemNameTextOnListAt(
+              widgetTester, 1, notifyOnIsNowNotAllDay.name);
+
+          expect(
+            verify(mockedMemRepositoryV2.shipByCondition(
+              captureAny,
+              captureAny,
+            )).captured,
+            [false, false],
           );
-        final notifyAtNow = minSavedMem(3)
-          ..name = 'notifyAt is now'
-          ..doneAt = null
-          ..archivedAt = null
-          ..notifyOn = nowDate
-          ..notifyAt = TimeOfDay.fromDateTime(nowDateTime)
-          ..notifyAtV2 = DateAndTime.fromV2(
-            nowDate,
-            timeOfDay: nowDateTime,
+        },
+        tags: TestSize.small,
+      );
+      testWidgets(
+        'now(not allDay) and 23 hour later',
+        (widgetTester) async {
+          final notifyOnIs23HoursLater = minSavedMem(1)
+            ..name = 'notifyAtV2 is 23 hour later'
+            ..notifyAtV2 =
+                DateAndTime.now(allDay: true).add(const Duration(hours: 23));
+          final notifyOnIsNowNotAllDay = minSavedMem(2)
+            ..name = 'notifyAtV2 is now(is not allDay)'
+            ..notifyAtV2 = DateAndTime.now();
+
+          when(mockedMemRepositoryV2.shipByCondition(any, any))
+              .thenAnswer((realInvocation) => Future.value([
+                    notifyOnIs23HoursLater,
+                    notifyOnIsNowNotAllDay,
+                  ].sorted((a, b) => Random().nextInt(2) - 1)));
+
+          await runTestWidgetWithProvider(widgetTester, MemListPage());
+          await widgetTester.pump();
+
+          expectMemNameTextOnListAt(
+              widgetTester, 1, notifyOnIs23HoursLater.name);
+          expectMemNameTextOnListAt(
+              widgetTester, 0, notifyOnIsNowNotAllDay.name);
+
+          expect(
+            verify(mockedMemRepositoryV2.shipByCondition(
+              captureAny,
+              captureAny,
+            )).captured,
+            [false, false],
           );
-        final notifyAtOneHourAgo = minSavedMem(4)
-          ..name = 'notifyAt is one hour ago'
-          ..doneAt = null
-          ..archivedAt = null
-          ..notifyOn = nowDate
-          ..notifyAt =
-              TimeOfDay.fromDateTime(nowDateTime.add(const Duration(hours: -1)))
-          ..notifyAtV2 = DateAndTime.fromV2(
-            nowDate,
-            timeOfDay: nowDateTime,
-          ).add(const Duration(hours: -1));
-        final notifyAtOneMinuteLater = minSavedMem(5)
-          ..name = 'notifyAt is one minute later'
-          ..doneAt = null
-          ..archivedAt = null
-          ..notifyOn = nowDate
-          ..notifyAt = TimeOfDay.fromDateTime(
-              nowDateTime.add(const Duration(minutes: 1)))
-          ..notifyAtV2 = DateAndTime.fromV2(
-            nowDate,
-            timeOfDay: nowDateTime,
-          ).add(const Duration(minutes: 1));
+        },
+        tags: TestSize.small,
+      );
+      testWidgets(
+        'now(not allDay) and now(allDay)',
+        (widgetTester) async {
+          final notifyOnIsNowAllDay = minSavedMem(1)
+            ..name = 'notifyAtV2 is now(allDay)'
+            ..notifyAtV2 = DateAndTime.now(allDay: true);
+          final notifyOnIsNowNotAllDay = minSavedMem(2)
+            ..name = 'notifyAtV2 is now(is not allDay)'
+            ..notifyAtV2 = DateAndTime.now();
 
-        when(mockedMemRepositoryV2.shipByCondition(any, any))
-            .thenAnswer((realInvocation) => Future.value([
-                  notifyOnIsNull,
-                  notifyAtIsNull,
-                  notifyAtNow,
-                  notifyAtOneHourAgo,
-                  notifyAtOneMinuteLater,
-                ]));
+          when(mockedMemRepositoryV2.shipByCondition(any, any))
+              .thenAnswer((realInvocation) => Future.value([
+                    notifyOnIsNowAllDay,
+                    notifyOnIsNowNotAllDay,
+                  ].sorted((a, b) => Random().nextInt(2) - 1)));
 
-        await pumpMemListPage(widgetTester);
-        await widgetTester.pumpAndSettle();
+          await runTestWidgetWithProvider(widgetTester, MemListPage());
+          await widgetTester.pump();
 
-        expectMemNameTextOnListAt(widgetTester, 0, notifyAtIsNull.name);
-        // FIXME failed
-        //  ```
-        //  Expected: 'notifyAt is one hour ago'
-        //    Actual: 'notifyAt is now'
-        //  ```
-        //  https://github.com/zin-/mem/actions/runs/3615921908/jobs/6093404947#step:7:147
-        //  0900-1000JSTにマージされた場合、github上では0000-0100UTCとなる
-        //  notifyAtOneHourAgoはnotifyAtを-1hしているだけのため、
-        //  日付はそのままで時間のみが1周して2300台となってしまう
-        //  このため、notifyAtNow -> notifyAtOneMinuteLater -> notifyAtOneHourAgo
-        //  の順番となり、テストが失敗している
-        expectMemNameTextOnListAt(widgetTester, 1, notifyAtOneHourAgo.name);
-        expectMemNameTextOnListAt(widgetTester, 2, notifyAtNow.name);
-        expectMemNameTextOnListAt(widgetTester, 3, notifyAtOneMinuteLater.name);
-        expectMemNameTextOnListAt(widgetTester, 4, notifyOnIsNull.name);
-      },
-      tags: TestSize.small,
-    );
+          expectMemNameTextOnListAt(widgetTester, 0, notifyOnIsNowAllDay.name);
+          expectMemNameTextOnListAt(
+              widgetTester, 1, notifyOnIsNowNotAllDay.name);
+
+          expect(
+            verify(mockedMemRepositoryV2.shipByCondition(
+              captureAny,
+              captureAny,
+            )).captured,
+            [false, false],
+          );
+        },
+        tags: TestSize.small,
+      );
+    });
   });
 
   testWidgets(
