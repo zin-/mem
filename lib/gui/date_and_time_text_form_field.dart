@@ -5,6 +5,7 @@ import 'package:mem/logger/i/api.dart';
 import 'time_of_day_text_form_field.dart';
 
 class DateAndTimeTextFormField extends StatelessWidget {
+  // TODO DateAndTimeを使う
   final DateTime? date;
   final TimeOfDay? timeOfDay;
   final Function(DateTime? pickedDate, TimeOfDay? pickedTimeOfDay) onChanged;

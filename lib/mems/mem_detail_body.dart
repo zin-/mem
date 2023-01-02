@@ -49,8 +49,6 @@ class MemDetailBody extends StatelessWidget {
                           .read(editingMemProvider(_memId).notifier)
                           .updatedBy(
                             editingMem.copied()
-                              ..notifyOn = dateTime
-                              ..notifyAt = timeOfDay
                               ..notifyAtV2 = dateTime == null
                                   ? null
                                   : DateAndTime(
