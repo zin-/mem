@@ -47,4 +47,21 @@ abstract class DatabaseTupleRepositoryV2<E extends DatabaseTupleEntityV2, P>
               .toList();
         },
       );
+
+  @override
+  Future<P> replace(P payload) => v(
+        {'payload': payload},
+        () async {
+          final entityMap = unpack(payload);
+
+          entityMap[createdAtColumnName] = DateTime.now();
+
+          await _table.updateByPk(
+            entityMap[idColumnName],
+            entityMap,
+          );
+
+          return pack(entityMap);
+        },
+      );
 }

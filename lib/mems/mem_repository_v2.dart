@@ -30,6 +30,19 @@ class MemRepositoryV2 extends DatabaseTupleRepositoryV2<MemEntityV2, Mem> {
               ));
 
   @override
+  UnpackedPayload unpack(Mem payload) => {
+        defMemName.name: payload.name,
+        defMemDoneAt.name: payload.doneAt,
+        defMemNotifyOn.name: payload.notifyAtV2,
+        defMemNotifyAt.name:
+            payload.notifyAtV2?.isAllDay == false ? payload.notifyAtV2 : null,
+        idColumnName: payload.id,
+        createdAtColumnName: payload.createdAt,
+        updatedAtColumnName: payload.updatedAt,
+        archivedAtColumnName: payload.archivedAt,
+      };
+
+  @override
   Mem pack(UnpackedPayload unpackedPayload) {
     final memEntity = MemEntityV2.fromMap(unpackedPayload);
 

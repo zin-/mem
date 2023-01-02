@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
@@ -49,17 +50,17 @@ void main() {
       await widgetTester.pump();
 
       const memId = 1;
-      when(mockedMemRepository.receive(any)).thenAnswer((realInvocation) {
-        final memEntity = realInvocation.positionalArguments[0] as MemEntity;
+      when(mockedMemRepositoryV2.receive(any)).thenAnswer((realInvocation) {
+        final mem = realInvocation.positionalArguments[0] as Mem;
 
-        expect(memEntity.name, enteringMemName);
-        expect(memEntity.id, null);
-        expect(memEntity.createdAt, null);
-        expect(memEntity.updatedAt, null);
-        expect(memEntity.archivedAt, null);
+        expect(mem.name, enteringMemName);
+        expect(mem.id, null);
+        expect(mem.createdAt, null);
+        expect(mem.updatedAt, null);
+        expect(mem.archivedAt, null);
 
-        return Future.value(MemEntity(
-          name: memEntity.name,
+        return Future.value(Mem(
+          name: mem.name,
           id: memId,
           createdAt: DateTime.now(),
         ));
@@ -154,20 +155,20 @@ void main() {
       await widgetTester.enterText(memNameTextFormFieldFinder, enteringMemName);
       await widgetTester.enterText(memMemoTextFormFieldFinder, enteringMemMemo);
 
-      when(mockedMemRepository.update(any)).thenAnswer((realInvocation) {
-        final memEntity = realInvocation.positionalArguments[0] as MemEntity;
+      when(mockedMemRepositoryV2.replace(any)).thenAnswer((realInvocation) {
+        final mem = realInvocation.positionalArguments[0] as Mem;
 
-        expect(memEntity.name, enteringMemName);
-        expect(memEntity.id, savedMem.id);
-        expect(memEntity.createdAt, savedMem.createdAt);
-        expect(memEntity.updatedAt, null);
-        expect(memEntity.archivedAt, null);
+        expect(mem.name, enteringMemName);
+        expect(mem.id, savedMem.id);
+        expect(mem.createdAt, savedMem.createdAt);
+        expect(mem.updatedAt, null);
+        expect(mem.archivedAt, null);
 
-        return Future.value(MemEntity(
-          name: memEntity.name,
-          id: memEntity.id,
-          createdAt: memEntity.createdAt,
-          updatedAt: memEntity.updatedAt,
+        return Future.value(Mem(
+          name: mem.name,
+          id: mem.id,
+          createdAt: mem.createdAt,
+          updatedAt: mem.updatedAt,
         ));
       });
       when(mockedMemItemRepository.update(any)).thenAnswer((realInvocation) {
@@ -194,7 +195,7 @@ void main() {
 
       await widgetTester.tap(saveFabFinder);
 
-      verify(mockedMemRepository.update(any)).called(1);
+      verify(mockedMemRepositoryV2.replace(any)).called(1);
       verify(mockedMemItemRepository.update(any)).called(1);
 
       await widgetTester.pageBack();
@@ -301,14 +302,10 @@ void main() {
         findsOneWidget,
       );
 
-      when(mockedMemRepository.receive(any)).thenAnswer((realInvocation) {
+      when(mockedMemRepositoryV2.receive(any)).thenAnswer((realInvocation) {
         final arg1 = realInvocation.positionalArguments[0];
 
-        expect(arg1, isA<MemEntity>());
-        expect(arg1.id, savedMem.id);
-
-        return Future.value(
-            minSavedMemEntity(savedMem.id)..name = savedMem.name);
+        return Future.value(minSavedMem(arg1.id)..name = arg1.name);
       });
       when(mockedMemItemRepository.receive(any)).thenAnswer((realInvocation) {
         final arg1 = realInvocation.positionalArguments[0];

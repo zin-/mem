@@ -124,16 +124,20 @@ void main() {
 
             return savedMemEntity;
           });
-          when(mockedMemRepository.update(any))
+          when(mockedMemRepositoryV2.replace(any))
               .thenAnswer((realInvocation) async {
-            final arg1 = realInvocation.positionalArguments[0];
+            final arg1 = realInvocation.positionalArguments[0] as Mem;
 
-            expect(arg1, isA<MemEntity>());
+            expect(arg1, isA<Mem>());
             expect(arg1.id, savedMem.id);
-
             expect(arg1.doneAt, isNotNull);
 
-            return MemEntity.fromMap(arg1.toMap())..updatedAt = DateTime.now();
+            return Mem(
+              name: arg1.name,
+              doneAt: arg1.doneAt,
+              id: arg1.id,
+              updatedAt: DateTime.now(),
+            );
           });
           when(mockedNotificationRepository.discard(any))
               .thenAnswer((realInvocation) {
@@ -147,7 +151,7 @@ void main() {
           await widgetTester.tap(find.byType(Checkbox));
 
           verify(mockedMemRepository.shipById(any)).called(1);
-          verify(mockedMemRepository.update(any)).called(1);
+          verify(mockedMemRepositoryV2.replace(any)).called(1);
           verify(mockedNotificationRepository.discard(any)).called(1);
           verifyNever(mockedMemItemRepository.update(any));
         },
@@ -178,16 +182,19 @@ void main() {
 
             return savedMemEntity;
           });
-          when(mockedMemRepository.update(any))
+          when(mockedMemRepositoryV2.replace(any))
               .thenAnswer((realInvocation) async {
             final arg1 = realInvocation.positionalArguments[0];
 
-            expect(arg1, isA<MemEntity>());
+            expect(arg1, isA<Mem>());
             expect(arg1.id, savedMem.id);
-
             expect(arg1.doneAt, isNull);
-
-            return MemEntity.fromMap(arg1.toMap())..updatedAt = DateTime.now();
+            return Mem(
+              name: arg1.name,
+              doneAt: arg1.doneAt,
+              id: arg1.id,
+              updatedAt: DateTime.now(),
+            );
           });
           when(mockedNotificationRepository.receive(
                   any, any, any, any, any, any, any))
@@ -202,7 +209,7 @@ void main() {
           await widgetTester.tap(find.byType(Checkbox));
 
           verify(mockedMemRepository.shipById(any)).called(1);
-          verify(mockedMemRepository.update(any)).called(1);
+          verify(mockedMemRepositoryV2.replace(any)).called(1);
           verifyNever(mockedMemItemRepository.update(any));
         },
         tags: TestSize.small,

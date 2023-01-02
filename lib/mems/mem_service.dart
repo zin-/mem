@@ -59,11 +59,12 @@ class MemService {
   Future<MemDetail> save(MemDetail memDetail, {bool undo = false}) => t(
         {'memDetail': memDetail},
         () async {
-          final savedMem = convertMemFromEntity(
-              await (memDetail.mem.isSaved() && !undo
-                      ? _memRepository.update
-                      : _memRepository.receive)
-                  .call(convertMemIntoEntity(memDetail.mem)));
+          Mem savedMem;
+          if (memDetail.mem.isSaved() && !undo) {
+            savedMem = await _memRepositoryV2.replace(memDetail.mem);
+          } else {
+            savedMem = await _memRepositoryV2.receive(memDetail.mem);
+          }
 
           final savedMemItems = (await Future.wait(memDetail.memItems.map((e) =>
                   (e.isSaved() && !undo

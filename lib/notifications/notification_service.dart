@@ -1,3 +1,4 @@
+import 'package:mem/core/date_and_time.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/core/mem.dart';
@@ -21,11 +22,14 @@ class NotificationService {
   memReminder(Mem mem) => t(
         {'mem': mem},
         () {
-          final notifyAt = mem.notifyOn?.add(Duration(
+          DateAndTime? notifyAt;
+          if (mem.notifyAtV2?.isAllDay == true) {
             // TODO 時間がないときのデフォルト値を設定から取得する
-            hours: mem.notifyAt?.hour ?? 5,
-            minutes: mem.notifyAt?.minute ?? 0,
-          ));
+            notifyAt =
+                mem.notifyAtV2?.add(const Duration(hours: 5, minutes: 0));
+          } else {
+            notifyAt = mem.notifyAtV2;
+          }
 
           if (mem.isArchived() || mem.isDone()) {
             _notificationRepository.discard(mem.id);
