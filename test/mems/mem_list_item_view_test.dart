@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
+import 'package:mem/core/date_and_time.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/mems/mem_list_item_view.dart';
@@ -77,7 +78,8 @@ void main() {
     testWidgets(
       ': notifyAt',
       (widgetTester) async {
-        final savedMem = minSavedMem(1)..notifyOn = DateTime.now();
+        final savedMem = minSavedMem(1)
+          ..notifyAtV2 = DateAndTime.now(allDay: true);
 
         await pumpMemListItemView(
           widgetTester,
@@ -90,7 +92,7 @@ void main() {
 
         expect(
           memNotifyAt.data,
-          DateFormat.yMd().format(savedMem.notifyOn!),
+          DateFormat.yMd().format(savedMem.notifyAtV2!),
         );
       },
       tags: TestSize.small,
