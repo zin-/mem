@@ -37,8 +37,6 @@ class Mem extends EntityValue {
   String toString() => {
         'name': name,
         'doneAt': doneAt,
-        'notifyOn': notifyOn,
-        'notifyAt': notifyAt,
         'notifyAtV2': notifyAtV2,
       }.toString();
 
@@ -46,8 +44,6 @@ class Mem extends EntityValue {
   Mem copied() => Mem(
         name: name,
         doneAt: doneAt,
-        notifyOn: notifyOn,
-        notifyAt: notifyAt,
         notifyAtV2: notifyAtV2,
         id: id,
         createdAt: createdAt,
