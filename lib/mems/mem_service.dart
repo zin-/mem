@@ -172,7 +172,7 @@ class MemService {
           _notificationService.memReminder(unarchivedMem);
 
           return MemDetail(
-            convertMemFromEntity(unarchivedMemEntity),
+            unarchivedMem,
             unarchivedMemItems,
           );
         },
