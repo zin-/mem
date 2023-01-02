@@ -28,7 +28,6 @@ class DateAndTime extends DateTime {
           microsecond ?? 0,
         );
 
-  @Deprecated('use fromV2')
   DateAndTime.from(
     DateTime dateTime, {
     TimeOfDay? timeOfDay,
@@ -87,6 +86,7 @@ class DateAndTime extends DateTime {
       added.minute,
     );
   }
+
   @override
   DateAndTime subtract(Duration duration) {
     final subtracted = super.subtract(duration);
