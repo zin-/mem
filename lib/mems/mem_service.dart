@@ -159,14 +159,12 @@ class MemService {
   Future<MemDetail> unarchive(Mem mem) => t(
         {'mem': mem},
         () async {
-          final unarchivedMemEntity =
-              await _memRepository.unarchive(convertMemIntoEntity(mem));
-          final unarchivedMemItems = (await _memItemRepository
-                  .unarchiveByMemId(unarchivedMemEntity.id))
-              .map((e) => convertMemItemFromEntity(e))
-              .toList();
+          final unarchivedMem = await _memRepositoryV2.unarchive(mem);
+          final unarchivedMemItems =
+              (await _memItemRepository.unarchiveByMemId(unarchivedMem.id))
+                  .map((e) => convertMemItemFromEntity(e))
+                  .toList();
 
-          final unarchivedMem = convertMemFromEntity(unarchivedMemEntity);
           _notificationService.memReminder(unarchivedMem);
 
           return MemDetail(

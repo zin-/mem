@@ -81,4 +81,21 @@ abstract class DatabaseTupleRepositoryV2<E extends DatabaseTupleEntityV2, P>
           return pack(entityMap);
         },
       );
+
+  @override
+  Future<P> unarchive(P payload) => v(
+        {'payload': payload},
+        () async {
+          final entityMap = unpack(payload);
+
+          entityMap[archivedAtColumnName] = null;
+
+          await _table.updateByPk(
+            entityMap[idColumnName],
+            entityMap,
+          );
+
+          return pack(entityMap);
+        },
+      );
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
@@ -85,11 +86,11 @@ void main() {
                   archivedAt: DateTime.now(),
                 ),
               ]);
-      when(mockedMemRepository.unarchive(any))
+      when(mockedMemRepositoryV2.unarchive(any))
           .thenAnswer((realInvocation) async {
-        final mem = realInvocation.positionalArguments[0] as MemEntity;
+        final mem = realInvocation.positionalArguments[0] as Mem;
 
-        return MemEntity.fromMap(mem.toMap()..['archivedAt'] = null);
+        return mem..archivedAt = null;
       });
       when(mockedMemItemRepository.unarchiveByMemId(memId))
           .thenAnswer((realInvocation) async {
@@ -113,7 +114,7 @@ void main() {
       expect(memDetailAppBar(widgetTester).backgroundColor, archivedColor);
 
       verify(mockedMemRepository.shipById(memId)).called(1);
-      verify(mockedMemRepository.unarchive(any)).called(1);
+      verify(mockedMemRepositoryV2.unarchive(any)).called(1);
     },
     tags: TestSize.small,
   );
