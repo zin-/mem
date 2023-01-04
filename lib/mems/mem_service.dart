@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:mem/core/date_and_time.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/logger/i/api.dart';
@@ -181,37 +179,6 @@ class MemService {
           NotificationRepository().discard(memId);
 
           return removeResult;
-        },
-      );
-
-  // FIXME convert系は別のクラスに分割する
-  // できれば自動生成したい
-  Mem convertMemFromEntity(MemEntity memEntity) => v(
-        {'memEntity': memEntity},
-        () {
-          final notifyOn = memEntity.notifyOn;
-
-          return Mem(
-            name: memEntity.name,
-            doneAt: memEntity.doneAt,
-            notifyOn: memEntity.notifyOn,
-            notifyAt: memEntity.notifyAt == null
-                ? null
-                : TimeOfDay.fromDateTime(memEntity.notifyAt!),
-            notifyAtV2: notifyOn == null
-                ? null
-                : DateAndTime(
-                    notifyOn.year,
-                    notifyOn.month,
-                    notifyOn.day,
-                    memEntity.notifyAt?.hour,
-                    memEntity.notifyAt?.minute,
-                  ),
-            id: memEntity.id,
-            createdAt: memEntity.createdAt,
-            updatedAt: memEntity.updatedAt,
-            archivedAt: memEntity.archivedAt,
-          );
         },
       );
 
