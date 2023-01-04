@@ -219,25 +219,6 @@ class MemService {
         },
       );
 
-  MemEntity convertMemIntoEntity(Mem mem) => v(
-        {'mem': mem},
-        () => MemEntity(
-          name: mem.name,
-          doneAt: mem.doneAt,
-          notifyOn: mem.notifyOn,
-          notifyAt: mem.notifyAt == null
-              ? null
-              : mem.notifyOn?.add(Duration(
-                  hours: mem.notifyAt!.hour,
-                  minutes: mem.notifyAt!.minute,
-                )),
-          id: mem.id,
-          createdAt: mem.createdAt,
-          updatedAt: mem.updatedAt,
-          archivedAt: mem.archivedAt,
-        ),
-      );
-
   MemItem convertMemItemFromEntity(MemItemEntity memItemEntity) => v(
         {'memItemEntity': memItemEntity},
         () => MemItem(
