@@ -230,10 +230,10 @@ void main() {
 
       verify(mockedMemRepositoryV2.shipByCondition(false, false)).called(1);
 
-      when(mockedMemRepository.archive(any)).thenAnswer((realInvocation) {
-        final memEntity = realInvocation.positionalArguments[0] as MemEntity;
+      when(mockedMemRepositoryV2.archive(any)).thenAnswer((realInvocation) {
+        final mem = realInvocation.positionalArguments[0] as Mem;
 
-        return Future.value(memEntity..archivedAt = DateTime.now());
+        return Future.value(mem..archivedAt = DateTime.now());
       });
       when(mockedMemItemRepository.archiveByMemId(savedMem.id))
           .thenAnswer((realInvocation) {
@@ -249,7 +249,7 @@ void main() {
       await widgetTester.tap(archiveButtonFinder);
       await widgetTester.pumpAndSettle();
 
-      verify(mockedMemRepository.archive(any)).called(1);
+      verify(mockedMemRepositoryV2.archive(any)).called(1);
       verify(mockedMemItemRepository.archiveByMemId(savedMem.id)).called(1);
 
       expect(widgetTester.widgetList(memListTileFinder).length, 0);

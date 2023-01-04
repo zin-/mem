@@ -141,14 +141,12 @@ class MemService {
   Future<MemDetail> archive(Mem mem) => t(
         {'mem': mem},
         () async {
-          final archivedMemEntity =
-              await _memRepository.archive(convertMemIntoEntity(mem));
+          final archivedMem = await _memRepositoryV2.archive(mem);
           final archivedMemItems =
-              (await _memItemRepository.archiveByMemId(archivedMemEntity.id))
+              (await _memItemRepository.archiveByMemId(archivedMem.id))
                   .map((e) => convertMemItemFromEntity(e))
                   .toList();
 
-          final archivedMem = convertMemFromEntity(archivedMemEntity);
           _notificationService.memReminder(archivedMem);
 
           return MemDetail(
