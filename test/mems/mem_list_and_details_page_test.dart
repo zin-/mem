@@ -278,8 +278,8 @@ void main() {
 
       when(mockedMemItemRepository.discardByMemId(savedMem.id))
           .thenAnswer((realInvocation) => Future.value([true]));
-      when(mockedMemRepository.discardById(savedMem.id))
-          .thenAnswer((realInvocation) => Future.value(true));
+      when(mockedMemRepositoryV2.wasteById(savedMem.id))
+          .thenAnswer((realInvocation) => Future.value(savedMem));
 
       await widgetTester.tap(memDetailMenuButtonFinder);
       await widgetTester.pumpAndSettle();

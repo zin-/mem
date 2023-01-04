@@ -15,4 +15,6 @@ abstract class RepositoryV2<E extends EntityV2, Payload> {
   Future<Payload> unarchive(Payload payload);
 
   Future<List<Payload>> waste(Conditions conditions);
+
+  Future<Payload> wasteById(dynamic id);
 }

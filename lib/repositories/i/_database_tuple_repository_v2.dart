@@ -104,4 +104,14 @@ abstract class DatabaseTupleRepositoryV2<E extends DatabaseTupleEntityV2, P>
           return pack(entityMap);
         },
       );
+
+  @override
+  Future<P> wasteById(id) => v(
+        {'id': id},
+        () async {
+          final payload = await _table.selectByPk(id);
+          await _table.deleteByPk(id);
+          return pack(payload);
+        },
+      );
 }
