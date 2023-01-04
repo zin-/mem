@@ -10,6 +10,7 @@ import 'package:mockito/mockito.dart';
 
 import '../_helpers.dart';
 import '../mocks.mocks.dart';
+import '../samples.dart';
 import 'mem_detail_page_test.dart';
 
 void main() {
@@ -67,14 +68,12 @@ void main() {
       const memId = 1;
       const memName = 'test mem name';
       const memMemo = 'test mem memo';
-      final mem = MemEntity(
-        id: memId,
-        name: memName,
-        createdAt: DateTime.now(),
-        archivedAt: DateTime.now(),
-      );
+      final mem = minSavedMem(memId)
+        ..name = memName
+        ..createdAt = DateTime.now()
+        ..archivedAt = DateTime.now();
 
-      when(mockedMemRepository.shipById(any))
+      when(mockedMemRepositoryV2.shipById(any))
           .thenAnswer((realInvocation) async => mem);
       when(mockedMemItemRepository.shipByMemId(any))
           .thenAnswer((realInvocation) async => [
@@ -113,7 +112,7 @@ void main() {
       await widgetTester.tap(unarchiveButtonFinder);
       expect(memDetailAppBar(widgetTester).backgroundColor, archivedColor);
 
-      verify(mockedMemRepository.shipById(memId)).called(1);
+      verify(mockedMemRepositoryV2.shipById(memId)).called(1);
       verify(mockedMemRepositoryV2.unarchive(any)).called(1);
     },
     tags: TestSize.small,

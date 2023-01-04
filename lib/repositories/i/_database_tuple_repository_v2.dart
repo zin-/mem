@@ -49,6 +49,12 @@ abstract class DatabaseTupleRepositoryV2<E extends DatabaseTupleEntityV2, P>
       );
 
   @override
+  Future<P> shipById(id) => v(
+        {'id': id},
+        () async => pack(await _table.selectByPk(id)),
+      );
+
+  @override
   Future<P> replace(P payload) => v(
         {'payload': payload},
         () async {

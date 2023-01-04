@@ -120,11 +120,7 @@ class MemService {
 
   Future<Mem> fetchMemById(int memId) => t(
         {'memId': memId},
-        () async {
-          final memEntity = await _memRepository.shipById(memId);
-
-          return convertMemFromEntity(memEntity);
-        },
+        () => _memRepositoryV2.shipById(memId),
       );
 
   Future<List<MemItem>> fetchMemItemsByMemId(int memId) => t(

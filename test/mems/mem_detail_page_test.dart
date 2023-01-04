@@ -40,22 +40,21 @@ void main() {
     testWidgets(
       ': found Mem',
       (widgetTester) async {
-        final savedMemEntity = minSavedMemEntity(1);
-        when(mockedMemRepository.shipById(savedMemEntity.id))
-            .thenAnswer((realInvocation) async => savedMemEntity);
+        final savedMem = minSavedMem(1);
+        when(mockedMemRepositoryV2.shipById(savedMem.id))
+            .thenAnswer((realInvocation) async => savedMem);
         final savedMemoMemItemEntity =
-            minSavedMemoMemItemEntity(savedMemEntity.id, 1);
-        when(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).thenAnswer(
+            minSavedMemoMemItemEntity(savedMem.id, 1);
+        when(mockedMemItemRepository.shipByMemId(savedMem.id)).thenAnswer(
             (realInvocation) => Future.value([savedMemoMemItemEntity]));
 
         when(mockedNotificationRepository.initialize(any, any))
             .thenAnswer((realInvocation) => Future.value(true));
 
-        await pumpMemDetailPage(widgetTester, savedMemEntity.id);
+        await pumpMemDetailPage(widgetTester, savedMem.id);
 
-        verify(mockedMemRepository.shipById(savedMemEntity.id)).called(1);
-        verify(mockedMemItemRepository.shipByMemId(savedMemEntity.id))
-            .called(1);
+        verify(mockedMemRepositoryV2.shipById(savedMem.id)).called(1);
+        verify(mockedMemItemRepository.shipByMemId(savedMem.id)).called(1);
 
         await widgetTester.pumpAndSettle();
 
@@ -96,8 +95,6 @@ void main() {
           return Future.value(Mem(
             name: mem.name,
             doneAt: mem.doneAt,
-            notifyOn: mem.notifyOn,
-            notifyAt: mem.notifyAt,
             notifyAtV2: mem.notifyAtV2,
             id: 1,
             createdAt: mem.createdAt,
@@ -154,18 +151,23 @@ void main() {
     testWidgets(
       ': update.',
       (widgetTester) async {
-        final savedMemEntity = minSavedMemEntity(1);
-        when(mockedMemRepository.shipById(savedMemEntity.id))
-            .thenAnswer((realInvocation) async => savedMemEntity);
+        const memId = 1;
+
+        final savedMem = minSavedMem(memId);
+        when(mockedMemRepositoryV2.shipById(any))
+            .thenAnswer((realInvocation) async => savedMem);
         final savedMemoMemItemEntity =
-            minSavedMemoMemItemEntity(savedMemEntity.id, 1);
+            minSavedMemoMemItemEntity(savedMem.id, 1);
         when(mockedMemItemRepository.shipByMemId(any))
             .thenAnswer((realInvocation) async => [savedMemoMemItemEntity]);
 
         when(mockedNotificationRepository.initialize(any, any))
             .thenAnswer((realInvocation) => Future.value(true));
 
-        await pumpMemDetailPage(widgetTester, savedMemEntity.id);
+        await pumpMemDetailPage(widgetTester, savedMem.id);
+
+        verify(mockedMemRepositoryV2.shipById(savedMem.id)).called(1);
+
         await widgetTester.pump();
 
         const enteringMemName = 'entering mem name';
@@ -180,11 +182,11 @@ void main() {
             .thenAnswer((realInvocation) async {
           final mem = realInvocation.positionalArguments[0] as Mem;
 
-          expect(mem.id, savedMemEntity.id);
+          expect(mem.id, savedMem.id);
           expect(mem.name, enteringMemName);
-          expect(mem.createdAt, savedMemEntity.createdAt);
-          expect(mem.updatedAt, savedMemEntity.updatedAt);
-          expect(mem.archivedAt, savedMemEntity.archivedAt);
+          expect(mem.createdAt, savedMem.createdAt);
+          expect(mem.updatedAt, savedMem.updatedAt);
+          expect(mem.archivedAt, savedMem.archivedAt);
 
           return mem..updatedAt = DateTime.now();
         });

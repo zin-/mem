@@ -115,16 +115,13 @@ void main() {
           );
           await widgetTester.pump();
 
-          final savedMemEntity = minSavedMemEntity(savedMem.id)
-            ..name = savedMem.name
-            ..doneAt = savedMem.doneAt;
-          when(mockedMemRepository.shipById(any))
+          when(mockedMemRepositoryV2.shipById(any))
               .thenAnswer((realInvocation) async {
             final arg1 = realInvocation.positionalArguments[0];
 
             expect(arg1, savedMem.id);
 
-            return savedMemEntity;
+            return savedMem;
           });
           when(mockedMemRepositoryV2.replace(any))
               .thenAnswer((realInvocation) async {
@@ -152,7 +149,7 @@ void main() {
 
           await widgetTester.tap(find.byType(Checkbox));
 
-          verify(mockedMemRepository.shipById(any)).called(1);
+          verify(mockedMemRepositoryV2.shipById(any)).called(1);
           verify(mockedMemRepositoryV2.replace(any)).called(1);
           verify(mockedNotificationRepository.discard(any)).called(1);
           verifyNever(mockedMemItemRepository.update(any));
@@ -173,16 +170,13 @@ void main() {
           );
           await widgetTester.pump();
 
-          final savedMemEntity = minSavedMemEntity(savedMem.id)
-            ..name = savedMem.name
-            ..doneAt = savedMem.doneAt;
-          when(mockedMemRepository.shipById(any))
+          when(mockedMemRepositoryV2.shipById(any))
               .thenAnswer((realInvocation) async {
             final arg1 = realInvocation.positionalArguments[0];
 
             expect(arg1, savedMem.id);
 
-            return savedMemEntity;
+            return savedMem;
           });
           when(mockedMemRepositoryV2.replace(any))
               .thenAnswer((realInvocation) async {
@@ -210,7 +204,7 @@ void main() {
 
           await widgetTester.tap(find.byType(Checkbox));
 
-          verify(mockedMemRepository.shipById(any)).called(1);
+          verify(mockedMemRepositoryV2.shipById(savedMem.id)).called(1);
           verify(mockedMemRepositoryV2.replace(any)).called(1);
           verifyNever(mockedMemItemRepository.update(any));
         },
