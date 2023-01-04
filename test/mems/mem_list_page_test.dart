@@ -93,13 +93,13 @@ void main() {
         final notArchived = minSavedMem(1)
           ..name = 'not archived'
           ..archivedAt = null;
-        final archived = minSavedMemEntity(2)
+        final archived = minSavedMem(2)
           ..name = 'archived'
           ..archivedAt = DateTime.now();
         final notDone = minSavedMem(3)
           ..name = 'not done'
           ..doneAt = null;
-        final done = minSavedMemEntity(4)
+        final done = minSavedMem(4)
           ..name = 'done'
           ..doneAt = DateTime.now();
 

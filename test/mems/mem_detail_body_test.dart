@@ -9,7 +9,6 @@ import 'package:mem/mems/mem_items_view.dart';
 import 'package:mem/mems/mem_name.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
-import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/gui/value_state_notifier.dart';
 import 'package:mem/mems/mem_detail_body.dart';
 import 'package:mem/mems/mem_done_checkbox.dart';
@@ -20,15 +19,13 @@ import '../samples.dart';
 import '../mocks.mocks.dart';
 
 void main() {
-  final mockedMemRepository = MockMemRepository();
-  MemRepository.reset(mockedMemRepository);
   final mockedMemRepositoryV2 = MockMemRepositoryV2();
   MemRepositoryV2.resetWith(mockedMemRepositoryV2);
   final mockedMemItemRepository = MockMemItemRepository();
   MemItemRepository.reset(mockedMemItemRepository);
 
   tearDown(() {
-    reset(mockedMemRepository);
+    reset(mockedMemRepositoryV2);
     reset(mockedMemItemRepository);
   });
 
@@ -79,7 +76,7 @@ void main() {
 
         await pumpMemDetailBody(widgetTester, null, mem: mem);
 
-        verifyNever(mockedMemRepository.shipById(any));
+        verifyNever(mockedMemRepositoryV2.shipById(any));
         verifyNever(mockedMemItemRepository.shipByMemId(any));
 
         await widgetTester.pumpAndSettle();
@@ -109,7 +106,7 @@ void main() {
           mem: savedMem,
         );
 
-        verifyNever(mockedMemRepository.shipById(any));
+        verifyNever(mockedMemRepositoryV2.shipById(any));
         verify(mockedMemItemRepository.shipByMemId(savedMem.id)).called(1);
 
         await widgetTester.pumpAndSettle();

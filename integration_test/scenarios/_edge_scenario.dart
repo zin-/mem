@@ -7,7 +7,6 @@ import 'package:mem/main.dart' as app;
 // FIXME integration testでrepositoryを参照するのはNG
 import 'package:mem/repositories/_database_tuple_repository.dart';
 import 'package:mem/repositories/mem_entity.dart';
-import 'package:mem/repositories/mem_repository.dart';
 
 import '../_helpers.dart';
 
@@ -31,11 +30,11 @@ void testEdgeScenario() => group(
               'MemItem is nothing',
               (widgetTester) async {
                 const savedMemName = 'saved mem name';
-                final database =
-                    await DatabaseManager(onTest: true).open(app.databaseDefinition);
+                final database = await DatabaseManager(onTest: true)
+                    .open(app.databaseDefinition);
                 final memTable = database.getTable(memTableDefinition.name);
                 await memTable.insert({
-                  memNameColumnName: savedMemName,
+                  defMemName.name: savedMemName,
                   createdAtColumnName: DateTime.now(),
                   archivedAtColumnName: null,
                 });

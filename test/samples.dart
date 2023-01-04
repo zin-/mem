@@ -1,7 +1,6 @@
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
-import 'package:mem/repositories/mem_repository.dart';
 
 Mem minMem({int? id}) => Mem(
       name: 'mem name',
@@ -21,16 +20,6 @@ MemItem minMemItem(int memId, {int? id}) => MemItem(
 
 MemItem minSavedMemItem(int memId, int id) =>
     minMemItem(memId, id: id)..value = 'saved memItem value';
-
-MemEntity minMemEntity() => MemEntity(
-      name: 'mem entity name',
-      doneAt: null,
-      id: null,
-    );
-
-MemEntity minSavedMemEntity(int id, {DateTime? createdAt}) => minMemEntity()
-  ..id = id
-  ..createdAt = createdAt ?? DateTime.now();
 
 MemItemEntity minMemoMemItemEntity() => MemItemEntity(
       memId: null,

@@ -11,7 +11,6 @@ import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/notifications/notification_repository.dart';
 
 import 'package:mem/repositories/mem_item_repository.dart';
-import 'package:mem/repositories/mem_repository.dart';
 import 'package:mockito/mockito.dart';
 
 import '../_helpers.dart';
@@ -37,8 +36,6 @@ void main() {
     );
   }
 
-  final mockedMemRepository = MockMemRepository();
-  MemRepository.reset(mockedMemRepository);
   final mockedMemRepositoryV2 = MockMemRepositoryV2();
   MemRepositoryV2.resetWith(mockedMemRepositoryV2);
   final mockedMemItemRepository = MockMemItemRepository();
@@ -47,7 +44,6 @@ void main() {
   NotificationRepository.reset(mockedNotificationRepository);
 
   setUp(() {
-    reset(mockedMemRepository);
     reset(mockedMemItemRepository);
     reset(mockedNotificationRepository);
   });

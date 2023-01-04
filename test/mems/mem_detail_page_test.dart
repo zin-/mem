@@ -11,7 +11,6 @@ import 'package:mem/mems/mem_detail_body.dart';
 import 'package:mem/mems/mem_detail_page.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mem/gui/l10n.dart';
-import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/gui/constants.dart';
 
 import '../_helpers.dart';
@@ -21,8 +20,6 @@ import '../gui/date_and_time_text_form_field_test.dart';
 import 'mem_detail_body_test.dart';
 
 void main() {
-  final mockedMemRepository = MockMemRepository();
-  MemRepository.reset(mockedMemRepository);
   final mockedMemRepositoryV2 = MockMemRepositoryV2();
   MemRepositoryV2.resetWith(mockedMemRepositoryV2);
   final mockedMemItemRepository = MockMemItemRepository();
@@ -31,7 +28,6 @@ void main() {
   NotificationRepository.reset(mockedNotificationRepository);
 
   tearDown(() {
-    reset(mockedMemRepository);
     reset(mockedMemItemRepository);
     reset(mockedNotificationRepository);
   });
@@ -143,7 +139,7 @@ void main() {
 
         expect(saveMemSuccessFinder(enteringMemName), findsNothing);
 
-        verifyNever(mockedMemRepository.shipById(any));
+        verifyNever(mockedMemRepositoryV2.shipById(memId));
       },
       tags: TestSize.small,
     );
@@ -231,8 +227,8 @@ void main() {
 
         expect(find.text('Name is required'), findsNothing);
 
-        verifyNever(mockedMemRepository.shipById(any));
-        verifyNever(mockedMemRepository.receive(any));
+        verifyNever(mockedMemRepositoryV2.shipById(any));
+        verifyNever(mockedMemRepositoryV2.receive(any));
       },
       tags: TestSize.small,
     );
