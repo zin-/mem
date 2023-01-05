@@ -6,6 +6,7 @@ import 'package:mem/core/mem_item.dart';
 import 'package:mem/database/database_manager.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/main.dart' as app;
+import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_items_view.dart';
 import 'package:mem/mems/mem_name.dart';
 import 'package:mem/mems/mem_notify_at.dart';
@@ -27,7 +28,7 @@ Future clearDatabase() async {
   await DatabaseManager(onTest: true).delete(app.databaseDefinition.name);
 
   MemRepositoryV2.resetWith(null);
-  MemItemRepository.reset(null);
+  MemItemRepositoryV2.resetWith(null);
 
   MemService.reset(null);
 }
