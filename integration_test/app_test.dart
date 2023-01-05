@@ -8,7 +8,6 @@ import 'acts/_act_list_page.dart';
 import 'database/_database_manager.dart';
 import 'database/_indexed_database.dart';
 import 'database/_sqlite_database.dart';
-import 'repositories/_database_tuple_repository.dart';
 import 'repositories/_log_repository.dart';
 import 'repositories/_act_repository.dart';
 import 'scenarios/_edge_scenario.dart';
@@ -33,7 +32,6 @@ void main() {
   });
 
   group('Repository test', () {
-    testDatabaseTupleRepository();
     testNotificationRepository();
     testActRepository();
   });
