@@ -37,7 +37,7 @@ class MemItemRepositoryV2
   @override
   UnpackedPayload unpack(MemItem payload) => {
         memIdColumnName: payload.memId,
-        memItemTypeColumnName: payload.type,
+        memItemTypeColumnName: payload.type.name,
         memItemValueColumnName: payload.value,
         idColumnName: payload.id,
         createdAtColumnName: payload.createdAt,
@@ -49,7 +49,9 @@ class MemItemRepositoryV2
   MemItem pack(UnpackedPayload unpackedPayload) {
     final memItemEntity = MemItemEntityV2(
       memId: unpackedPayload[memIdColumnName],
-      type: unpackedPayload[memItemTypeColumnName],
+      type: MemItemType.values.firstWhere((v) {
+        return v.name == unpackedPayload[memItemTypeColumnName];
+      }),
       value: unpackedPayload[memItemValueColumnName],
       id: unpackedPayload[idColumnName],
       createdAt: unpackedPayload[createdAtColumnName],
@@ -61,7 +63,7 @@ class MemItemRepositoryV2
       memId: memItemEntity.memId,
       type: memItemEntity.type,
       value: memItemEntity.value,
-      id: memItemEntity.value,
+      id: memItemEntity.id,
       createdAt: memItemEntity.createdAt,
       updatedAt: memItemEntity.updatedAt,
       archivedAt: memItemEntity.archivedAt,
