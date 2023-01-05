@@ -1,9 +1,9 @@
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/logger/i/api.dart';
+import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/notifications/notification_repository.dart';
-import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/notifications/notification_service.dart';
 
 class MemDetail {
@@ -21,12 +21,12 @@ class MemDetail {
 
 class MemService {
   final MemRepositoryV2 _memRepositoryV2;
-  final MemItemRepository _memItemRepository;
+  final MemItemRepositoryV2 _memItemRepositoryV2;
   final NotificationService _notificationService;
 
   MemService._(
     this._memRepositoryV2,
-    this._memItemRepository,
+    this._memItemRepositoryV2,
     this._notificationService,
   );
 
@@ -34,14 +34,14 @@ class MemService {
 
   factory MemService({
     MemRepositoryV2? memRepositoryV2,
-    MemItemRepository? memItemRepository,
+    MemItemRepositoryV2? memItemRepositoryV2,
     NotificationService? notificationService,
   }) {
     var tmp = _instance;
     if (tmp == null) {
       tmp = MemService._(
         memRepositoryV2 ?? MemRepositoryV2(),
-        memItemRepository ?? MemItemRepository(),
+        memItemRepositoryV2 ?? MemItemRepositoryV2(),
         notificationService ?? NotificationService(),
       );
       _instance = tmp;
@@ -61,10 +61,9 @@ class MemService {
 
           final savedMemItems = (await Future.wait(memDetail.memItems.map((e) =>
                   (e.isSaved() && !undo
-                          ? _memItemRepository.update
-                          : _memItemRepository.receive)
-                      .call(convertMemItemIntoEntity(e)..memId = savedMem.id))))
-              .map((e) => convertMemItemFromEntity(e))
+                          ? _memItemRepositoryV2.replace
+                          : _memItemRepositoryV2.receive)
+                      .call(e..memId = savedMem.id))))
               .toList();
 
           _notificationService.memReminder(savedMem);
@@ -118,13 +117,7 @@ class MemService {
 
   Future<List<MemItem>> fetchMemItemsByMemId(int memId) => t(
         {'memId': memId},
-        () async {
-          final memItemEntities = await _memItemRepository.shipByMemId(memId);
-
-          return memItemEntities
-              .map((e) => convertMemItemFromEntity(e))
-              .toList();
-        },
+        () async => (await _memItemRepositoryV2.shipByMemId(memId)).toList(),
       );
 
   Future<MemDetail> archive(Mem mem) => t(
@@ -132,8 +125,7 @@ class MemService {
         () async {
           final archivedMem = await _memRepositoryV2.archive(mem);
           final archivedMemItems =
-              (await _memItemRepository.archiveByMemId(archivedMem.id))
-                  .map((e) => convertMemItemFromEntity(e))
+              (await _memItemRepositoryV2.archiveByMemId(archivedMem.id))
                   .toList();
 
           _notificationService.memReminder(archivedMem);
@@ -150,8 +142,7 @@ class MemService {
         () async {
           final unarchivedMem = await _memRepositoryV2.unarchive(mem);
           final unarchivedMemItems =
-              (await _memItemRepository.unarchiveByMemId(unarchivedMem.id))
-                  .map((e) => convertMemItemFromEntity(e))
+              (await _memItemRepositoryV2.unarchiveByMemId(unarchivedMem.id))
                   .toList();
 
           _notificationService.memReminder(unarchivedMem);
@@ -166,7 +157,7 @@ class MemService {
   Future<bool> remove(int memId) => t(
         {'memId': memId},
         () async {
-          await _memItemRepository.discardByMemId(memId);
+          await _memItemRepositoryV2.wasteByMemId(memId);
           await _memRepositoryV2.wasteById(memId);
 
           // FIXME 関数内でMemを保持していないためRepositoryを参照している
@@ -175,32 +166,6 @@ class MemService {
 
           return true;
         },
-      );
-
-  MemItem convertMemItemFromEntity(MemItemEntity memItemEntity) => v(
-        {'memItemEntity': memItemEntity},
-        () => MemItem(
-          memId: memItemEntity.memId,
-          type: memItemEntity.type,
-          value: memItemEntity.value,
-          id: memItemEntity.id,
-          createdAt: memItemEntity.createdAt,
-          updatedAt: memItemEntity.updatedAt,
-          archivedAt: memItemEntity.archivedAt,
-        ),
-      );
-
-  MemItemEntity convertMemItemIntoEntity(MemItem memItem) => v(
-        {'memItem': memItem},
-        () => MemItemEntity(
-          memId: memItem.memId,
-          type: memItem.type,
-          value: memItem.value,
-          id: memItem.id,
-          createdAt: memItem.createdAt,
-          updatedAt: memItem.updatedAt,
-          archivedAt: memItem.archivedAt,
-        ),
       );
 
   static void reset(MemService? memService) {

@@ -20,6 +20,7 @@ final memItemTableDefinition = DefT(
   ],
 );
 
+@Deprecated('use V2')
 class MemItemEntity extends DatabaseTupleEntity {
   int? memId;
   MemItemType type;
@@ -55,6 +56,7 @@ class MemItemEntity extends DatabaseTupleEntity {
       }..addAll(super.toMap());
 }
 
+@Deprecated('use V2')
 class MemItemRepository extends DatabaseTupleRepository<MemItemEntity> {
   Future<List<MemItemEntity>> shipByMemId(int memId) => v(
         {'memId': memId},

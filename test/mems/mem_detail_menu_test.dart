@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/core/mem.dart';
-import 'package:mem/core/mem_item.dart';
+import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
-import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/gui/colors.dart';
 import 'package:mockito/mockito.dart';
 
@@ -15,8 +14,8 @@ import 'mem_detail_page_test.dart';
 void main() {
   final mockedMemRepositoryV2 = MockMemRepositoryV2();
   MemRepositoryV2.resetWith(mockedMemRepositoryV2);
-  final mockedMemItemRepository = MockMemItemRepository();
-  MemItemRepository.reset(mockedMemItemRepository);
+  final mockedMemItemRepository = MockMemItemRepositoryV2();
+  MemItemRepositoryV2.resetWith(mockedMemItemRepository);
 
   tearDown(() {
     reset(mockedMemRepositoryV2);
@@ -73,16 +72,9 @@ void main() {
 
       when(mockedMemRepositoryV2.shipById(any))
           .thenAnswer((realInvocation) async => mem);
-      when(mockedMemItemRepository.shipByMemId(any))
-          .thenAnswer((realInvocation) async => [
-                MemItemEntity(
-                  memId: memId,
-                  type: MemItemType.memo,
-                  value: memMemo,
-                  createdAt: DateTime.now(),
-                  archivedAt: DateTime.now(),
-                ),
-              ]);
+      when(mockedMemItemRepository.shipByMemId(any)).thenAnswer(
+          (realInvocation) async =>
+              [minSavedMemItem(memId, 1, value: memMemo)]);
       when(mockedMemRepositoryV2.unarchive(any))
           .thenAnswer((realInvocation) async {
         final mem = realInvocation.positionalArguments[0] as Mem;
@@ -92,13 +84,7 @@ void main() {
       when(mockedMemItemRepository.unarchiveByMemId(memId))
           .thenAnswer((realInvocation) async {
         return [
-          MemItemEntity(
-            memId: memId,
-            type: MemItemType.memo,
-            value: memMemo,
-            createdAt: DateTime.now(),
-            archivedAt: null,
-          ),
+          minSavedMemItem(memId, 1, value: memMemo)..archivedAt = DateTime.now()
         ];
       });
 

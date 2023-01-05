@@ -5,12 +5,12 @@ import 'package:intl/intl.dart';
 import 'package:mem/core/date_and_time.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/core/mem.dart';
+import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_list_item_view.dart';
 import 'package:mem/mems/mem_notify_at.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/notifications/notification_repository.dart';
 
-import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mockito/mockito.dart';
 
 import '../_helpers.dart';
@@ -38,8 +38,8 @@ void main() {
 
   final mockedMemRepositoryV2 = MockMemRepositoryV2();
   MemRepositoryV2.resetWith(mockedMemRepositoryV2);
-  final mockedMemItemRepository = MockMemItemRepository();
-  MemItemRepository.reset(mockedMemItemRepository);
+  final mockedMemItemRepository = MockMemItemRepositoryV2();
+  MemItemRepositoryV2.resetWith(mockedMemItemRepository);
   final mockedNotificationRepository = MockNotificationRepository();
   NotificationRepository.reset(mockedNotificationRepository);
 
@@ -148,7 +148,7 @@ void main() {
           verify(mockedMemRepositoryV2.shipById(any)).called(1);
           verify(mockedMemRepositoryV2.replace(any)).called(1);
           verify(mockedNotificationRepository.discard(any)).called(1);
-          verifyNever(mockedMemItemRepository.update(any));
+          verifyNever(mockedMemItemRepository.replace(any));
         },
         tags: TestSize.small,
       );
@@ -202,7 +202,7 @@ void main() {
 
           verify(mockedMemRepositoryV2.shipById(savedMem.id)).called(1);
           verify(mockedMemRepositoryV2.replace(any)).called(1);
-          verifyNever(mockedMemItemRepository.update(any));
+          verifyNever(mockedMemItemRepository.replace(any));
         },
         tags: TestSize.small,
       );
