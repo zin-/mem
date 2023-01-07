@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mem/act_counter/act_counter_configure.dart';
 import 'package:mem/act_counter/all.dart';
 import 'package:mem/acts/act_entity.dart';
 import 'package:mem/acts/act_repository.dart';
@@ -7,6 +8,7 @@ import 'package:mem/gui/app.dart';
 import 'package:mem/database/database.dart';
 import 'package:mem/database/database_manager.dart';
 import 'package:mem/mems/mem_item_repository_v2.dart';
+import 'package:mem/mems/mem_list_page.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/repositories/mem_entity.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
@@ -24,6 +26,15 @@ final databaseDefinition = DefD(
 );
 
 Future<void> main({String? languageCode}) async {
+  run(MemListPage(), languageCode: languageCode);
+}
+
+@pragma('vm:entry-point')
+launchActCounterConfigure() async {
+  run(const ActCounterConfigure());
+}
+
+Future<void> run(Widget home, {String? languageCode}) async {
   WidgetsFlutterBinding.ensureInitialized();
 
   initializeLogger();
@@ -33,7 +44,7 @@ Future<void> main({String? languageCode}) async {
   checkForWidgetLaunch();
   sendData();
 
-  runApp(MemApplication(languageCode));
+  runApp(MemApplication(home, languageCode));
 }
 
 Future<Database> openDatabase() async {
