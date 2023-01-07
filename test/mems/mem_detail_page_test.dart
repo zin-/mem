@@ -91,7 +91,8 @@ void main() {
           return Future.value(Mem(
             name: mem.name,
             doneAt: mem.doneAt,
-            notifyAtV2: mem.notifyAtV2,
+            // 通知を登録したいので、翌日を設定する
+            notifyAtV2: mem.notifyAtV2?.add(const Duration(days: 1)),
             id: 1,
             createdAt: DateTime.now(),
             updatedAt: mem.updatedAt,
@@ -125,10 +126,9 @@ void main() {
 
         verify(mockedMemRepositoryV2.receive(any)).called(1);
         verify(mockedMemItemRepository.receive(any)).called(1);
-        // FIXME 2023/01/09 check
-        // verify(mockedNotificationRepository.receive(
-        //         any, any, any, any, any, any, any))
-        //     .called(1);
+        verify(mockedNotificationRepository.receive(
+                any, any, any, any, any, any, any))
+            .called(1);
 
         expect(saveMemSuccessFinder(enteringMemName), findsOneWidget);
 
