@@ -458,7 +458,7 @@ void main() {
           final notifyOnIs23HoursLater = minSavedMem(1)
             ..name = 'notifyAtV2 is 23 hour later'
             ..notifyAtV2 =
-                DateAndTime.now(allDay: true).add(const Duration(hours: 23));
+                DateAndTime.now(allDay: false).add(const Duration(hours: 23));
           final notifyOnIsNowNotAllDay = minSavedMem(2)
             ..name = 'notifyAtV2 is now(is not allDay)'
             ..notifyAtV2 = DateAndTime.now();
