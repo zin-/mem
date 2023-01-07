@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/core/date_and_time.dart';
+import 'package:mem/core/mem.dart';
+import 'package:mem/core/mem_item.dart';
 import 'package:mem/database/database_manager.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/main.dart' as app;
-import 'package:mem/core/mem.dart';
+import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_items_view.dart';
 import 'package:mem/mems/mem_name.dart';
 import 'package:mem/mems/mem_notify_at.dart';
+import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/mems/mem_service.dart';
 import 'package:mem/gui/date_and_time_text_form_field.dart';
 
 // FIXME integration testでrepositoryを参照するのはNG
 import 'package:mem/repositories/_database_tuple_repository.dart';
+import 'package:mem/repositories/mem_entity.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
-import 'package:mem/repositories/mem_repository.dart';
 
 const defaultDuration = Duration(seconds: 1);
 
@@ -23,8 +27,8 @@ Future clearDatabase() async {
   await DatabaseManager(onTest: true).open(app.databaseDefinition);
   await DatabaseManager(onTest: true).delete(app.databaseDefinition.name);
 
-  MemRepository.reset(null);
-  MemItemRepository.reset(null);
+  MemRepositoryV2.resetWith(null);
+  MemItemRepositoryV2.resetWith(null);
 
   MemService.reset(null);
 }
@@ -53,7 +57,7 @@ Future<void> prepareSavedData(
       await DatabaseManager(onTest: true).open(app.databaseDefinition);
   final memTable = database.getTable(memTableDefinition.name);
   final savedMemId = await memTable.insert({
-    memNameColumnName: memName,
+    defMemName.name: memName,
     createdAtColumnName: DateTime.now(),
     archivedAtColumnName: isArchived ? DateTime.now() : null,
   });
@@ -117,19 +121,20 @@ Future<void> prepareSavedMem(
       (await DatabaseManager(onTest: true).open(app.databaseDefinition))
           .getTable(memTableDefinition.name);
 
-  await MemRepository(memTable).receive(MemEntity(
-    name: memName,
-    id: null,
-    notifyOn: memNotifyOn,
-    notifyAt: memNotifyOn.add(Duration(
-      hours: memNotifyAt.hour,
-      minutes: memNotifyAt.minute,
-    )),
-  ));
+  await MemRepositoryV2(memTable).receive(Mem(
+      name: memName,
+      id: null,
+      notifyAtV2: DateAndTime(
+        memNotifyOn.year,
+        memNotifyOn.month,
+        memNotifyOn.day,
+        memNotifyAt.hour,
+        memNotifyAt.minute,
+      )));
 
   await DatabaseManager(onTest: true).close(app.databaseDefinition.name);
 
-  MemRepository.reset(null);
+  MemRepositoryV2.resetWith(null);
 }
 
 Future<void> runTestWidget(WidgetTester widgetTester, Widget widget) =>

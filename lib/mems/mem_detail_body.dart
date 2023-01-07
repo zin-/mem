@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/core/date_and_time.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/mems/mem_done_checkbox.dart';
 import 'package:mem/mems/mem_detail_states.dart';
@@ -48,8 +49,15 @@ class MemDetailBody extends StatelessWidget {
                           .read(editingMemProvider(_memId).notifier)
                           .updatedBy(
                             editingMem.copied()
-                              ..notifyOn = dateTime
-                              ..notifyAt = timeOfDay,
+                              ..notifyAtV2 = dateTime == null
+                                  ? null
+                                  : DateAndTime(
+                                      dateTime.year,
+                                      dateTime.month,
+                                      dateTime.day,
+                                      timeOfDay?.hour,
+                                      timeOfDay?.minute,
+                                    ),
                           ),
                     ),
                     MemItemsView(_memId),

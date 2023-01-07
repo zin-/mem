@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/gui/l10n.dart';
 
@@ -39,5 +40,20 @@ Future<void> runTestWidget(WidgetTester widgetTester, Widget widget) =>
         supportedLocales: L10n.supportedLocales,
         onGenerateTitle: (context) => L10n(context).test(),
         home: widget,
+      ),
+    );
+
+Future<void> runTestWidgetWithProvider(
+  WidgetTester widgetTester,
+  Widget widget,
+) =>
+    widgetTester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp(
+          localizationsDelegates: L10n.localizationsDelegates,
+          supportedLocales: L10n.supportedLocales,
+          onGenerateTitle: (context) => L10n(context).test(),
+          home: widget,
+        ),
       ),
     );

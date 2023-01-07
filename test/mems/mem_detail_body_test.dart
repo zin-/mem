@@ -5,10 +5,10 @@ import 'package:mem/gui/list_value_state_notifier.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/mems/mem_detail_states.dart';
+import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_items_view.dart';
 import 'package:mem/mems/mem_name.dart';
-import 'package:mem/repositories/mem_item_repository.dart';
-import 'package:mem/repositories/mem_repository.dart';
+import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/gui/value_state_notifier.dart';
 import 'package:mem/mems/mem_detail_body.dart';
 import 'package:mem/mems/mem_done_checkbox.dart';
@@ -19,13 +19,13 @@ import '../samples.dart';
 import '../mocks.mocks.dart';
 
 void main() {
-  final mockedMemRepository = MockMemRepository();
-  MemRepository.reset(mockedMemRepository);
-  final mockedMemItemRepository = MockMemItemRepository();
-  MemItemRepository.reset(mockedMemItemRepository);
+  final mockedMemRepositoryV2 = MockMemRepositoryV2();
+  MemRepositoryV2.resetWith(mockedMemRepositoryV2);
+  final mockedMemItemRepository = MockMemItemRepositoryV2();
+  MemItemRepositoryV2.resetWith(mockedMemItemRepository);
 
   tearDown(() {
-    reset(mockedMemRepository);
+    reset(mockedMemRepositoryV2);
     reset(mockedMemItemRepository);
   });
 
@@ -76,7 +76,7 @@ void main() {
 
         await pumpMemDetailBody(widgetTester, null, mem: mem);
 
-        verifyNever(mockedMemRepository.shipById(any));
+        verifyNever(mockedMemRepositoryV2.shipById(any));
         verifyNever(mockedMemItemRepository.shipByMemId(any));
 
         await widgetTester.pumpAndSettle();
@@ -96,9 +96,10 @@ void main() {
           ..name = 'saved mem name'
           ..doneAt = DateTime.now();
 
-        final savedMemoMemItemEntity = minSavedMemoMemItemEntity(memId, 1);
-        when(mockedMemItemRepository.shipByMemId(savedMem.id)).thenAnswer(
-            (realInvocation) => Future.value([savedMemoMemItemEntity]));
+        final savedMemItem = minSavedMemItem(memId, 1)
+          ..value = 'saved mem item';
+        when(mockedMemItemRepository.shipByMemId(savedMem.id))
+            .thenAnswer((realInvocation) => Future.value([savedMemItem]));
 
         await pumpMemDetailBody(
           widgetTester,
@@ -106,14 +107,14 @@ void main() {
           mem: savedMem,
         );
 
-        verifyNever(mockedMemRepository.shipById(any));
+        verifyNever(mockedMemRepositoryV2.shipById(any));
         verify(mockedMemItemRepository.shipByMemId(savedMem.id)).called(1);
 
         await widgetTester.pumpAndSettle();
 
         expectMemNameOnMemDetail(widgetTester, savedMem.name);
         expectMemDoneOnMemDetail(widgetTester, true);
-        expectMemMemoOnMemDetail(widgetTester, savedMemoMemItemEntity.value);
+        expectMemMemoOnMemDetail(widgetTester, savedMemItem.value);
       },
       tags: TestSize.small,
     );
@@ -123,10 +124,11 @@ void main() {
       (widgetTester) async {
         const memId = 1;
         final savedMem = minSavedMem(memId)..name = 'saved mem name';
-        final savedMemoMemItemEntity = minSavedMemoMemItemEntity(memId, 1)
+        final savedMemItem = minSavedMemItem(memId, 1)
+          ..value = 'archived mem item'
           ..archivedAt = DateTime.now();
-        when(mockedMemItemRepository.shipByMemId(savedMem.id)).thenAnswer(
-            (realInvocation) => Future.value([savedMemoMemItemEntity]));
+        when(mockedMemItemRepository.shipByMemId(savedMem.id))
+            .thenAnswer((realInvocation) => Future.value([savedMemItem]));
 
         await pumpMemDetailBody(
           widgetTester,
@@ -136,7 +138,7 @@ void main() {
 
         await widgetTester.pumpAndSettle();
 
-        expectMemMemoOnMemDetail(widgetTester, savedMemoMemItemEntity.value);
+        expectMemMemoOnMemDetail(widgetTester, savedMemItem.value);
       },
       tags: TestSize.small,
     );

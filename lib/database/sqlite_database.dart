@@ -236,15 +236,15 @@ class SqliteTable extends Table {
   @override
   Future<List<Map<String, dynamic>>> select({
     String? whereString,
-    List<Object?>? whereArgs,
+    Iterable<dynamic>? whereArgs,
   }) =>
       v(
         {'where': whereString, 'whereArgs': whereArgs},
         () async => await _database.onOpened(
           () async => (await _database._database.query(
             definition.name,
-            where: whereString,
-            whereArgs: whereArgs,
+            where: whereString?.isEmpty == true ? null : whereString,
+            whereArgs: whereArgs?.isEmpty == true ? null : whereArgs?.toList(),
           ))
               .map((e) => convertFrom(e))
               .toList(),

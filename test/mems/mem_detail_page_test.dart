@@ -1,33 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/core/date_and_time.dart';
 import 'package:mem/core/mem.dart';
+import 'package:mem/core/mem_item.dart';
+import 'package:mem/mems/mem_item_repository_v2.dart';
+import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/notifications/notification_repository.dart';
-import 'package:mem/repositories/mem_item_repository.dart';
 import 'package:mem/notifications/notification_service.dart';
 import 'package:mem/mems/mem_detail_body.dart';
 import 'package:mem/mems/mem_detail_page.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mem/gui/l10n.dart';
-import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/gui/constants.dart';
 
 import '../_helpers.dart';
+import '../gui/time_of_day_text_form_field_test.dart';
 import '../samples.dart';
 import '../mocks.mocks.dart';
 import '../gui/date_and_time_text_form_field_test.dart';
 import 'mem_detail_body_test.dart';
 
 void main() {
-  final mockedMemRepository = MockMemRepository();
-  MemRepository.reset(mockedMemRepository);
-  final mockedMemItemRepository = MockMemItemRepository();
-  MemItemRepository.reset(mockedMemItemRepository);
+  final mockedMemRepositoryV2 = MockMemRepositoryV2();
+  MemRepositoryV2.resetWith(mockedMemRepositoryV2);
+  final mockedMemItemRepository = MockMemItemRepositoryV2();
+  MemItemRepositoryV2.resetWith(mockedMemItemRepository);
   final mockedNotificationRepository = MockNotificationRepository();
   NotificationRepository.reset(mockedNotificationRepository);
 
   tearDown(() {
-    reset(mockedMemRepository);
     reset(mockedMemItemRepository);
     reset(mockedNotificationRepository);
   });
@@ -36,22 +38,20 @@ void main() {
     testWidgets(
       ': found Mem',
       (widgetTester) async {
-        final savedMemEntity = minSavedMemEntity(1);
-        when(mockedMemRepository.shipById(savedMemEntity.id))
-            .thenAnswer((realInvocation) async => savedMemEntity);
-        final savedMemoMemItemEntity =
-            minSavedMemoMemItemEntity(savedMemEntity.id, 1);
-        when(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).thenAnswer(
+        final savedMem = minSavedMem(1);
+        when(mockedMemRepositoryV2.shipById(savedMem.id))
+            .thenAnswer((realInvocation) async => savedMem);
+        final savedMemoMemItemEntity = minSavedMemItem(savedMem.id, 1);
+        when(mockedMemItemRepository.shipByMemId(savedMem.id)).thenAnswer(
             (realInvocation) => Future.value([savedMemoMemItemEntity]));
 
         when(mockedNotificationRepository.initialize(any, any))
             .thenAnswer((realInvocation) => Future.value(true));
 
-        await pumpMemDetailPage(widgetTester, savedMemEntity.id);
+        await pumpMemDetailPage(widgetTester, savedMem.id);
 
-        verify(mockedMemRepository.shipById(savedMemEntity.id)).called(1);
-        verify(mockedMemItemRepository.shipByMemId(savedMemEntity.id))
-            .called(1);
+        verify(mockedMemRepositoryV2.shipById(savedMem.id)).called(1);
+        verify(mockedMemItemRepository.shipByMemId(savedMem.id)).called(1);
 
         await widgetTester.pumpAndSettle();
 
@@ -83,22 +83,22 @@ void main() {
         await pickNowDate(widgetTester);
         await widgetTester.pump();
         await tapAllDaySwitch(widgetTester);
-        await pickNowTimeOfDay(widgetTester);
+        await pickNowTimeOfDay(widgetTester, okButton);
         await widgetTester.pump();
 
-        when(mockedMemRepository.receive(any))
-            .thenAnswer((realInvocation) async {
-          final value = realInvocation.positionalArguments[0];
+        when(mockedMemRepositoryV2.receive(any)).thenAnswer((realInvocation) {
+          final mem = realInvocation.positionalArguments[0] as Mem;
 
-          expect(value.name, enteringMemName);
-          expect(value.notifyOn, isNotNull);
-          expect(value.notifyAt, isNotNull);
-
-          return value
-            ..id = memId
-            ..createdAt = DateTime.now()
-            // 通知の確認をしたいので、将来日付を返却する
-            ..notifyOn = DateTime.now().add(const Duration(days: 1));
+          return Future.value(Mem(
+            name: mem.name,
+            doneAt: mem.doneAt,
+            // 通知を登録したいので、翌日を設定する
+            notifyAtV2: mem.notifyAtV2?.add(const Duration(days: 1)),
+            id: 1,
+            createdAt: DateTime.now(),
+            updatedAt: mem.updatedAt,
+            archivedAt: mem.archivedAt,
+          ));
         });
         when(mockedMemItemRepository.receive(any))
             .thenAnswer((realInvocation) async {
@@ -108,10 +108,7 @@ void main() {
           expect(value.type, MemItemType.memo);
           expect(value.value, enteringMemMemo);
 
-          return value
-            ..memId = memId
-            ..id = 1
-            ..createdAt = DateTime.now();
+          return minSavedMemItem(value.memId, 1);
         });
         when(mockedNotificationRepository.receive(
           memId,
@@ -128,7 +125,7 @@ void main() {
         await widgetTester.tap(saveFabFinder);
         await widgetTester.pumpAndSettle();
 
-        verify(mockedMemRepository.receive(any)).called(1);
+        verify(mockedMemRepositoryV2.receive(any)).called(1);
         verify(mockedMemItemRepository.receive(any)).called(1);
         verify(mockedNotificationRepository.receive(
                 any, any, any, any, any, any, any))
@@ -140,7 +137,7 @@ void main() {
 
         expect(saveMemSuccessFinder(enteringMemName), findsNothing);
 
-        verifyNever(mockedMemRepository.shipById(any));
+        verifyNever(mockedMemRepositoryV2.shipById(memId));
       },
       tags: TestSize.small,
     );
@@ -148,18 +145,22 @@ void main() {
     testWidgets(
       ': update.',
       (widgetTester) async {
-        final savedMemEntity = minSavedMemEntity(1);
-        when(mockedMemRepository.shipById(savedMemEntity.id))
-            .thenAnswer((realInvocation) async => savedMemEntity);
-        final savedMemoMemItemEntity =
-            minSavedMemoMemItemEntity(savedMemEntity.id, 1);
+        const memId = 1;
+
+        final savedMem = minSavedMem(memId);
+        when(mockedMemRepositoryV2.shipById(any))
+            .thenAnswer((realInvocation) async => savedMem);
+        final savedMemoMemItemEntity = minSavedMemItem(savedMem.id, 1);
         when(mockedMemItemRepository.shipByMemId(any))
             .thenAnswer((realInvocation) async => [savedMemoMemItemEntity]);
 
         when(mockedNotificationRepository.initialize(any, any))
             .thenAnswer((realInvocation) => Future.value(true));
 
-        await pumpMemDetailPage(widgetTester, savedMemEntity.id);
+        await pumpMemDetailPage(widgetTester, savedMem.id);
+
+        verify(mockedMemRepositoryV2.shipById(savedMem.id)).called(1);
+
         await widgetTester.pump();
 
         const enteringMemName = 'entering mem name';
@@ -170,37 +171,56 @@ void main() {
         await widgetTester.enterText(
             memMemoTextFormFieldFinder, enteringMemMemo);
 
-        when(mockedMemRepository.update(any))
+        when(mockedMemRepositoryV2.replace(any))
             .thenAnswer((realInvocation) async {
-          final memEntity = realInvocation.positionalArguments[0] as MemEntity;
+          final mem = realInvocation.positionalArguments[0] as Mem;
 
-          expect(memEntity.id, savedMemEntity.id);
-          expect(memEntity.name, enteringMemName);
-          expect(memEntity.createdAt, savedMemEntity.createdAt);
-          expect(memEntity.updatedAt, savedMemEntity.updatedAt);
-          expect(memEntity.archivedAt, savedMemEntity.archivedAt);
+          expect(mem.id, savedMem.id);
+          expect(mem.name, enteringMemName);
+          expect(mem.createdAt, savedMem.createdAt);
+          expect(mem.updatedAt, savedMem.updatedAt);
+          expect(mem.archivedAt, savedMem.archivedAt);
 
-          return memEntity..updatedAt = DateTime.now();
+          return mem
+            ..updatedAt = DateTime.now()
+            ..
+                // 通知を登録したいので、翌日を設定する
+                notifyAtV2 =
+                DateAndTime.now(allDay: true).add(const Duration(days: 1));
         });
-        when(mockedMemItemRepository.update(any))
+        when(mockedMemItemRepository.replace(any))
             .thenAnswer((realInvocation) async {
-          final memItemEntity =
-              realInvocation.positionalArguments[0] as MemItemEntity;
-          expect(memItemEntity.memId, savedMemoMemItemEntity.memId);
-          expect(memItemEntity.type, savedMemoMemItemEntity.type);
-          expect(memItemEntity.value, enteringMemMemo);
-          expect(memItemEntity.createdAt, savedMemoMemItemEntity.createdAt);
-          expect(memItemEntity.updatedAt, savedMemoMemItemEntity.updatedAt);
-          expect(memItemEntity.archivedAt, savedMemoMemItemEntity.archivedAt);
+          final memItem = realInvocation.positionalArguments[0] as MemItem;
 
-          return memItemEntity..updatedAt = DateTime.now();
+          expect(memItem.memId, savedMemoMemItemEntity.memId);
+          expect(memItem.type, savedMemoMemItemEntity.type);
+          expect(memItem.value, enteringMemMemo);
+          expect(memItem.createdAt, savedMemoMemItemEntity.createdAt);
+          expect(memItem.updatedAt, savedMemoMemItemEntity.updatedAt);
+          expect(memItem.archivedAt, savedMemoMemItemEntity.archivedAt);
+
+          return memItem..updatedAt = DateTime.now();
+        });
+        when(mockedNotificationRepository.receive(
+          memId,
+          enteringMemName,
+          any,
+          any,
+          memReminderChannelId,
+          any,
+          any,
+        )).thenAnswer((realInvocation) {
+          return Future.value(null);
         });
 
         await widgetTester.tap(saveFabFinder);
         await widgetTester.pumpAndSettle();
 
-        verify(mockedMemRepository.update(any)).called(1);
-        verify(mockedMemItemRepository.update(any)).called(1);
+        verify(mockedMemRepositoryV2.replace(any)).called(1);
+        verify(mockedMemItemRepository.replace(any)).called(1);
+        verify(mockedNotificationRepository.receive(
+                any, any, any, any, any, any, any))
+            .called(1);
 
         expect(saveMemSuccessFinder(enteringMemName), findsOneWidget);
 
@@ -223,8 +243,8 @@ void main() {
 
         expect(find.text('Name is required'), findsNothing);
 
-        verifyNever(mockedMemRepository.shipById(any));
-        verifyNever(mockedMemRepository.receive(any));
+        verifyNever(mockedMemRepositoryV2.shipById(any));
+        verifyNever(mockedMemRepositoryV2.receive(any));
       },
       tags: TestSize.small,
     );

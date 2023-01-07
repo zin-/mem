@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/core/date_and_time.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/gui/colors.dart';
 
@@ -25,15 +24,12 @@ class MemListItemView extends ListTile {
             },
           ),
           title: MemNameText(mem.name, mem.id),
-          subtitle: mem.notifyOn == null
+          subtitle: mem.notifyAtV2 == null
               ? null
               : MemNotifyAtText(
                   mem.id,
-                  DateAndTime.from(
-                    mem.notifyOn!,
-                    timeOfDay: mem.notifyAt,
-                    allDay: mem.notifyAt == null,
-                  )),
+                  mem.notifyAtV2!,
+                ),
           onTap: onTap,
           tileColor: mem.isArchived() ? archivedColor : null,
         );

@@ -9,7 +9,7 @@ import 'package:mem/database/database.dart';
 import 'package:mem/database/database_manager.dart';
 import 'package:mem/database/i/types.dart';
 import 'package:mem/repositories/i/_database_tuple_entity_v2.dart';
-import 'package:mem/repositories/mem_repository.dart';
+import 'package:mem/repositories/mem_entity.dart';
 
 void main() async {
   final databaseManager = DatabaseManager(onTest: true);
@@ -56,7 +56,7 @@ void main() async {
 
     test('without act', () async {
       final memId = await memTable.insert({
-        memNameColumnName: 'with no data mem',
+        defMemName.name: 'with no data mem',
         createdAtColumnName: DateTime.now(),
       });
       assert(memId != withNoDataMemId);
@@ -74,7 +74,7 @@ void main() async {
 
     test('with act', () async {
       final memId = await memTable.insert({
-        memNameColumnName: 'with no data mem',
+        defMemName.name: 'with no data mem',
         createdAtColumnName: DateTime.now(),
       });
       assert(memId != withNoDataMemId);

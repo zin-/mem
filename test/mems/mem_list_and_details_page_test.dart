@@ -1,7 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/core/mem.dart';
-import 'package:mem/repositories/mem_item_repository.dart';
-import 'package:mem/repositories/mem_repository.dart';
+import 'package:mem/core/mem_item.dart';
+import 'package:mem/mems/mem_item_repository_v2.dart';
+import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mockito/mockito.dart';
 
 import '../_helpers.dart';
@@ -13,10 +14,10 @@ import 'mem_detail_menu_test.dart';
 import 'mem_detail_body_test.dart';
 
 void main() {
-  final mockedMemRepository = MockMemRepository();
-  MemRepository.reset(mockedMemRepository);
-  final mockedMemItemRepository = MockMemItemRepository();
-  MemItemRepository.reset(mockedMemItemRepository);
+  final mockedMemRepository = MockMemRepositoryV2();
+  MemRepositoryV2.resetWith(mockedMemRepository);
+  final mockedMemItemRepository = MockMemItemRepositoryV2();
+  MemItemRepositoryV2.resetWith(mockedMemItemRepository);
 
   tearDown(() {
     reset(mockedMemRepository);
@@ -30,20 +31,13 @@ void main() {
       const enteringMemName = 'entering mem name';
       const enteringMemMemo = 'entering mem memo';
 
-      when(mockedMemRepository.ship(
-        whereMap: anyNamed('whereMap'),
-        archive: anyNamed('archive'),
-        done: anyNamed('done'),
-      )).thenAnswer((realInvocation) => Future.value([]));
+      when(mockedMemRepository.shipByCondition(any, any))
+          .thenAnswer((realInvocation) => Future.value([]));
 
       await pumpMemListPage(widgetTester);
       await widgetTester.pumpAndSettle();
 
-      verify(mockedMemRepository.ship(
-        whereMap: anyNamed('whereMap'),
-        archive: anyNamed('archive'),
-        done: anyNamed('done'),
-      )).called(1);
+      verify(mockedMemRepository.shipByCondition(false, false)).called(1);
 
       await widgetTester.tap(showNewMemFabFinder);
       await widgetTester.pumpAndSettle();
@@ -54,40 +48,35 @@ void main() {
 
       const memId = 1;
       when(mockedMemRepository.receive(any)).thenAnswer((realInvocation) {
-        final memEntity = realInvocation.positionalArguments[0] as MemEntity;
+        final mem = realInvocation.positionalArguments[0] as Mem;
 
-        expect(memEntity.name, enteringMemName);
-        expect(memEntity.id, null);
-        expect(memEntity.createdAt, null);
-        expect(memEntity.updatedAt, null);
-        expect(memEntity.archivedAt, null);
+        expect(mem.name, enteringMemName);
+        expect(mem.id, null);
+        expect(mem.createdAt, null);
+        expect(mem.updatedAt, null);
+        expect(mem.archivedAt, null);
 
-        return Future.value(MemEntity(
-          name: memEntity.name,
+        return Future.value(Mem(
+          name: mem.name,
           id: memId,
           createdAt: DateTime.now(),
         ));
       });
       const memItemId = 1;
       when(mockedMemItemRepository.receive(any)).thenAnswer((realInvocation) {
-        final memItemEntity =
-            realInvocation.positionalArguments[0] as MemItemEntity;
+        final memItem = realInvocation.positionalArguments[0] as MemItem;
 
-        expect(memItemEntity.memId, memId);
-        expect(memItemEntity.type, MemItemType.memo);
-        expect(memItemEntity.value, enteringMemMemo);
-        expect(memItemEntity.id, null);
-        expect(memItemEntity.createdAt, null);
-        expect(memItemEntity.updatedAt, null);
-        expect(memItemEntity.archivedAt, null);
+        expect(memItem.memId, memId);
+        expect(memItem.type, MemItemType.memo);
+        expect(memItem.value, enteringMemMemo);
+        expect(memItem.id, null);
+        expect(memItem.createdAt, null);
+        expect(memItem.updatedAt, null);
+        expect(memItem.archivedAt, null);
 
-        return Future.value(MemItemEntity(
-          memId: memItemEntity.memId,
-          type: memItemEntity.type,
-          value: memItemEntity.value,
-          id: memItemId,
-          createdAt: DateTime.now(),
-        ));
+        return Future.value(minSavedMemItem(memId, memItemId)
+          ..value = enteringMemMemo
+          ..createdAt = DateTime.now());
       });
 
       await widgetTester.tap(saveFabFinder);
@@ -105,7 +94,7 @@ void main() {
       expectMemNameOnMemDetail(widgetTester, enteringMemName);
       expectMemMemoOnMemDetail(widgetTester, enteringMemMemo);
 
-      verifyNever(mockedMemRepository.ship(whereMap: anyNamed('whereMap')));
+      verifyNever(mockedMemRepository.shipByCondition(any, any));
       verifyNever(mockedMemItemRepository.shipByMemId(any));
 
       await widgetTester.pageBack();
@@ -123,40 +112,32 @@ void main() {
   testWidgets(
     'Update mem',
     (widgetTester) async {
-      final savedMemEntity = minSavedMemEntity(1)..name = 'saved mem entity';
-      when(mockedMemRepository.ship(
-        whereMap: anyNamed('whereMap'),
-        archive: anyNamed('archive'),
-        done: anyNamed('done'),
-      )).thenAnswer((realInvocation) => Future.value([savedMemEntity]));
+      final savedMem = minSavedMem(1);
+      when(mockedMemRepository.shipByCondition(any, any))
+          .thenAnswer((realInvocation) => Future.value([savedMem]));
 
       await pumpMemListPage(widgetTester);
-      verify(mockedMemRepository.ship(
-        whereMap: anyNamed('whereMap'),
-        archive: anyNamed('archive'),
-        done: anyNamed('done'),
-      )).called(1);
+
+      verify(mockedMemRepository.shipByCondition(false, false)).called(1);
 
       await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      final savedMemoMemItemEntity = minSavedMemoMemItemEntity(
-        savedMemEntity.id,
+      final savedMemItem = minSavedMemItem(
+        savedMem.id,
         1,
-      )
-        ..type = MemItemType.memo
-        ..value = 'saved memo mem item entity';
-      when(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).thenAnswer(
-          (realInvocation) => Future.value([savedMemoMemItemEntity]));
+      )..value = 'saved memo mem item entity';
+      when(mockedMemItemRepository.shipByMemId(any))
+          .thenAnswer((realInvocation) => Future.value([savedMemItem]));
 
-      await widgetTester.tap(find.text(savedMemEntity.name));
+      await widgetTester.tap(find.text(savedMem.name));
       await widgetTester.pumpAndSettle(const Duration(seconds: 1));
       verifyNever(mockedMemRepository.shipById(any));
-      verify(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).called(1);
+      verify(mockedMemItemRepository.shipByMemId(savedMem.id)).called(1);
 
-      expectMemNameOnMemDetail(widgetTester, savedMemEntity.name);
-      expectMemMemoOnMemDetail(widgetTester, savedMemoMemItemEntity.value);
-      expect(find.text(savedMemEntity.name), findsOneWidget);
-      expect(find.text(savedMemoMemItemEntity.value), findsOneWidget);
+      expectMemNameOnMemDetail(widgetTester, savedMem.name);
+      expectMemMemoOnMemDetail(widgetTester, savedMemItem.value);
+      expect(find.text(savedMem.name), findsOneWidget);
+      expect(find.text(savedMemItem.value), findsOneWidget);
 
       const enteringMemName = 'updating mem name';
       const enteringMemMemo = 'updating mem memo';
@@ -164,53 +145,50 @@ void main() {
       await widgetTester.enterText(memNameTextFormFieldFinder, enteringMemName);
       await widgetTester.enterText(memMemoTextFormFieldFinder, enteringMemMemo);
 
-      when(mockedMemRepository.update(any)).thenAnswer((realInvocation) {
-        final memEntity = realInvocation.positionalArguments[0] as MemEntity;
+      when(mockedMemRepository.replace(any)).thenAnswer((realInvocation) {
+        final mem = realInvocation.positionalArguments[0] as Mem;
 
-        expect(memEntity.name, enteringMemName);
-        expect(memEntity.id, savedMemEntity.id);
-        expect(memEntity.createdAt, savedMemEntity.createdAt);
-        expect(memEntity.updatedAt, null);
-        expect(memEntity.archivedAt, null);
+        expect(mem.name, enteringMemName);
+        expect(mem.id, savedMem.id);
+        expect(mem.createdAt, savedMem.createdAt);
+        expect(mem.updatedAt, null);
+        expect(mem.archivedAt, null);
 
-        return Future.value(MemEntity(
-          name: memEntity.name,
-          id: memEntity.id,
-          createdAt: memEntity.createdAt,
-          updatedAt: memEntity.updatedAt,
+        return Future.value(Mem(
+          name: mem.name,
+          id: mem.id,
+          createdAt: mem.createdAt,
+          updatedAt: mem.updatedAt,
         ));
       });
-      when(mockedMemItemRepository.update(any)).thenAnswer((realInvocation) {
-        final memItemEntity =
-            realInvocation.positionalArguments[0] as MemItemEntity;
+      when(mockedMemItemRepository.replace(any)).thenAnswer((realInvocation) {
+        final memItem = realInvocation.positionalArguments[0] as MemItem;
 
-        expect(memItemEntity.memId, savedMemoMemItemEntity.memId);
-        expect(memItemEntity.type, savedMemoMemItemEntity.type);
-        expect(memItemEntity.value, enteringMemMemo);
-        expect(memItemEntity.id, savedMemoMemItemEntity.id);
-        expect(memItemEntity.createdAt, savedMemoMemItemEntity.createdAt);
-        expect(memItemEntity.updatedAt, null);
-        expect(memItemEntity.archivedAt, null);
+        expect(memItem.memId, savedMemItem.memId);
+        expect(memItem.type, savedMemItem.type);
+        expect(memItem.value, enteringMemMemo);
+        expect(memItem.id, savedMemItem.id);
+        expect(memItem.createdAt, savedMemItem.createdAt);
+        expect(memItem.updatedAt, null);
+        expect(memItem.archivedAt, null);
 
-        return Future.value(MemItemEntity(
-          memId: memItemEntity.memId,
-          type: memItemEntity.type,
-          value: memItemEntity.value,
-          id: savedMemoMemItemEntity.id,
-          createdAt: savedMemoMemItemEntity.createdAt,
-          updatedAt: DateTime.now(),
-        ));
+        return Future.value(
+          minSavedMemItem(savedMemItem.memId!, savedMemItem.id)
+            ..value = memItem.value
+            ..createdAt = savedMemItem.createdAt
+            ..updatedAt = DateTime.now(),
+        );
       });
 
       await widgetTester.tap(saveFabFinder);
 
-      verify(mockedMemRepository.update(any)).called(1);
-      verify(mockedMemItemRepository.update(any)).called(1);
+      verify(mockedMemRepository.replace(any)).called(1);
+      verify(mockedMemItemRepository.replace(any)).called(1);
 
       await widgetTester.pageBack();
       await widgetTester.pumpAndSettle();
 
-      verifyNever(mockedMemRepository.ship(whereMap: anyNamed('whereMap')));
+      verifyNever(mockedMemRepository.shipByCondition(any, any));
 
       expect(widgetTester.widgetList(memListTileFinder).length, 1);
       expectMemNameTextOnListAt(widgetTester, 0, enteringMemName);
@@ -221,45 +199,35 @@ void main() {
   testWidgets(
     'Archive mem',
     (widgetTester) async {
-      final savedMemEntity = minSavedMemEntity(1)..name = 'saved mem entity';
-      when(mockedMemRepository.ship(
-        whereMap: anyNamed('whereMap'),
-        archive: anyNamed('archive'),
-        done: anyNamed('done'),
-      )).thenAnswer((realInvocation) => Future.value([savedMemEntity]));
+      final savedMem = minSavedMem(1)..name = 'saved mem entity';
+      when(mockedMemRepository.shipByCondition(any, any))
+          .thenAnswer((realInvocation) => Future.value([savedMem]));
 
       await pumpMemListPage(widgetTester);
       await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      final savedMemoMemItemEntity =
-          minSavedMemoMemItemEntity(savedMemEntity.id, 1)
-            ..type = MemItemType.memo
-            ..value = 'saved memo mem item entity';
-      when(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).thenAnswer(
-          (realInvocation) => Future.value([savedMemoMemItemEntity]));
+      final savedMemoMemItem = minSavedMemItem(savedMem.id, 1)
+        ..value = 'saved memo mem item entity';
+      when(mockedMemItemRepository.shipByMemId(savedMem.id))
+          .thenAnswer((realInvocation) => Future.value([savedMemoMemItem]));
 
-      await widgetTester.tap(find.text(savedMemEntity.name));
+      await widgetTester.tap(find.text(savedMem.name));
       await widgetTester.pumpAndSettle(const Duration(seconds: 1));
-      verify(mockedMemRepository.ship(
-        whereMap: anyNamed('whereMap'),
-        archive: anyNamed('archive'),
-        done: anyNamed('done'),
-      )).called(1);
+
+      verify(mockedMemRepository.shipByCondition(false, false)).called(1);
 
       when(mockedMemRepository.archive(any)).thenAnswer((realInvocation) {
-        final memEntity = realInvocation.positionalArguments[0] as MemEntity;
+        final mem = realInvocation.positionalArguments[0] as Mem;
 
-        expect(memEntity.toMap(), savedMemEntity.toMap());
-
-        return Future.value(memEntity..archivedAt = DateTime.now());
+        return Future.value(mem..archivedAt = DateTime.now());
       });
-      when(mockedMemItemRepository.archiveByMemId(savedMemEntity.id))
+      when(mockedMemItemRepository.archiveByMemId(savedMem.id))
           .thenAnswer((realInvocation) {
         final memId = realInvocation.positionalArguments[0] as int;
 
-        expect(memId, savedMemEntity.id);
+        expect(memId, savedMem.id);
 
-        return Future.value([savedMemoMemItemEntity]
+        return Future.value([savedMemoMemItem]
             .map((e) => e..archivedAt = DateTime.now())
             .toList());
       });
@@ -268,8 +236,7 @@ void main() {
       await widgetTester.pumpAndSettle();
 
       verify(mockedMemRepository.archive(any)).called(1);
-      verify(mockedMemItemRepository.archiveByMemId(savedMemEntity.id))
-          .called(1);
+      verify(mockedMemItemRepository.archiveByMemId(savedMem.id)).called(1);
 
       expect(widgetTester.widgetList(memListTileFinder).length, 0);
     },
@@ -279,30 +246,25 @@ void main() {
   testWidgets(
     'Remove mem and undo',
     (widgetTester) async {
-      final savedMemEntity = minSavedMemEntity(1)..name = 'saved mem entity';
-      when(mockedMemRepository.ship(
-        whereMap: anyNamed('whereMap'),
-        archive: anyNamed('archive'),
-        done: anyNamed('done'),
-      )).thenAnswer((realInvocation) => Future.value([savedMemEntity]));
+      final savedMem = minSavedMem(1)..name = 'saved mem entity';
+      when(mockedMemRepository.shipByCondition(any, any))
+          .thenAnswer((realInvocation) => Future.value([savedMem]));
 
       await pumpMemListPage(widgetTester);
       await widgetTester.pumpAndSettle();
 
-      final savedMemoMemItemEntity =
-          minSavedMemoMemItemEntity(savedMemEntity.id, 1)
-            ..type = MemItemType.memo
-            ..value = 'saved memo mem item entity';
-      when(mockedMemItemRepository.shipByMemId(savedMemEntity.id)).thenAnswer(
-          (realInvocation) => Future.value([savedMemoMemItemEntity]));
+      final savedMemItem = minSavedMemItem(savedMem.id, 1)
+        ..value = 'saved memo mem item entity';
+      when(mockedMemItemRepository.shipByMemId(savedMem.id))
+          .thenAnswer((realInvocation) => Future.value([savedMemItem]));
 
       await widgetTester.tap(memListTileFinder.at(0));
       await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-      when(mockedMemItemRepository.discardByMemId(savedMemEntity.id))
-          .thenAnswer((realInvocation) => Future.value([true]));
-      when(mockedMemRepository.discardById(savedMemEntity.id))
-          .thenAnswer((realInvocation) => Future.value(true));
+      when(mockedMemItemRepository.wasteByMemId(savedMem.id))
+          .thenAnswer((realInvocation) => Future.value([savedMemItem]));
+      when(mockedMemRepository.wasteById(savedMem.id))
+          .thenAnswer((realInvocation) => Future.value(savedMem));
 
       await widgetTester.tap(memDetailMenuButtonFinder);
       await widgetTester.pumpAndSettle();
@@ -315,9 +277,9 @@ void main() {
       await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
       expect(widgetTester.widgetList(memListTileFinder).length, 0);
-      expect(find.text(savedMemEntity.name), findsNothing);
+      expect(find.text(savedMem.name), findsNothing);
       expect(
-        find.text('Remove success. ${savedMemEntity.name}'),
+        find.text('Remove success. ${savedMem.name}'),
         findsOneWidget,
       );
       expect(
@@ -328,18 +290,15 @@ void main() {
       when(mockedMemRepository.receive(any)).thenAnswer((realInvocation) {
         final arg1 = realInvocation.positionalArguments[0];
 
-        expect(arg1, isA<MemEntity>());
-        expect(arg1.id, savedMemEntity.id);
-
-        return Future.value(savedMemEntity);
+        return Future.value(minSavedMem(arg1.id)..name = arg1.name);
       });
       when(mockedMemItemRepository.receive(any)).thenAnswer((realInvocation) {
         final arg1 = realInvocation.positionalArguments[0];
 
-        expect(arg1, isA<MemItemEntity>());
-        expect(arg1.id, savedMemoMemItemEntity.id);
+        expect(arg1, isA<MemItem>());
+        expect(arg1.id, savedMemItem.id);
 
-        return Future.value(savedMemoMemItemEntity);
+        return Future.value(savedMemItem);
       });
 
       await widgetTester.tap(find.text('Undo'));
@@ -347,9 +306,9 @@ void main() {
       await widgetTester.pumpAndSettle();
 
       expect(widgetTester.widgetList(memListTileFinder).length, 1);
-      expect(find.text(savedMemEntity.name), findsOneWidget);
+      expect(find.text(savedMem.name), findsOneWidget);
       expect(
-        find.text('Save success. ${savedMemEntity.name}'),
+        find.text('Save success. ${savedMem.name}'),
         findsOneWidget,
       );
     },

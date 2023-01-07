@@ -21,11 +21,20 @@ class NotificationService {
   memReminder(Mem mem) => t(
         {'mem': mem},
         () {
-          final notifyAt = mem.notifyOn?.add(Duration(
+          final notifyAtV2 = mem.notifyAtV2;
+          DateTime? notifyAt;
+          if (notifyAtV2 != null && notifyAtV2.isAllDay == true) {
             // TODO 時間がないときのデフォルト値を設定から取得する
-            hours: mem.notifyAt?.hour ?? 5,
-            minutes: mem.notifyAt?.minute ?? 0,
-          ));
+            notifyAt = DateTime(
+              notifyAtV2.year,
+              notifyAtV2.month,
+              notifyAtV2.day,
+              5,
+              0,
+            );
+          } else {
+            notifyAt = mem.notifyAtV2;
+          }
 
           if (mem.isArchived() || mem.isDone()) {
             _notificationRepository.discard(mem.id);

@@ -51,16 +51,54 @@ class DateAndTime extends DateTime {
           null,
         );
 
+  DateAndTime.fromV2(
+    DateTime dateTime, {
+    DateTime? timeOfDay,
+  }) : this(
+          dateTime.year,
+          dateTime.month,
+          dateTime.day,
+          timeOfDay?.hour,
+          timeOfDay?.minute,
+          null,
+          null,
+          null,
+        );
+
   DateAndTime.now({bool allDay = false})
-      : this.from(
+      : this.fromV2(
           DateTime.now(),
-          timeOfDay: allDay ? null : TimeOfDay.now(),
-          allDay: allDay,
+          // FIXME 同じnowを使う
+          timeOfDay: allDay ? null : DateTime.now(),
         );
 
   DateTime get dateTime => DateTime(year, month, day);
 
-  // TimeOfDay? get timeOfDay => isAllDay ? null : TimeOfDay.fromDateTime(this);
+  @override
+  DateAndTime add(Duration duration) {
+    final added = super.add(duration);
+
+    return DateAndTime(
+      added.year,
+      added.month,
+      added.day,
+      isAllDay ? null : added.hour,
+      isAllDay ? null : added.minute,
+    );
+  }
+
+  @override
+  DateAndTime subtract(Duration duration) {
+    final subtracted = super.subtract(duration);
+
+    return DateAndTime(
+      subtracted.year,
+      subtracted.month,
+      subtracted.day,
+      isAllDay ? null : subtracted.hour,
+      isAllDay ? null : subtracted.minute,
+    );
+  }
 
   Map<String, dynamic> toMap() => {
         '_': super.toString(),
