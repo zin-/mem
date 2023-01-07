@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+// TODO arbに追加するたびに関数を増やさなくても良いようにする
 class L10n {
   final AppLocalizations _appLocalizations;
 
@@ -13,6 +14,9 @@ class L10n {
   String memListPageTitle() => _appLocalizations.memListPageTitle;
 
   String memDetailPageTitle() => _appLocalizations.memDetailPageTitle;
+
+  String actCounterConfigureTitle() =>
+      _appLocalizations.actCounterConfigureTitle;
 
   String memNameTitle() => _appLocalizations.memNameLabel;
 

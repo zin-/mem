@@ -1,3 +1,3 @@
 ```shell
-flutter gen-l10n l10n.yaml
+../scripts/generate_l10n.sh
 ```
