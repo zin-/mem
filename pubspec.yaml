@@ -37,6 +37,7 @@ dependencies:
 
   # for basic operations
   collection:
+  home_widget: ^0.1.6
 
 dev_dependencies:
   # for Test mock
