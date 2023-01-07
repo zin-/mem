@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mem/act_counter/all.dart';
 import 'package:mem/acts/act_entity.dart';
 import 'package:mem/acts/act_repository.dart';
 import 'package:mem/database/i/types.dart';
@@ -26,8 +27,11 @@ Future<void> main({String? languageCode}) async {
   WidgetsFlutterBinding.ensureInitialized();
 
   initializeLogger();
-
   await openDatabase();
+  initializeActCounter();
+
+  checkForWidgetLaunch();
+  sendData();
 
   runApp(MemApplication(languageCode));
 }
