@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/core/date_and_time.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/mems/mem_item_repository_v2.dart';
@@ -180,7 +181,12 @@ void main() {
           expect(mem.updatedAt, savedMem.updatedAt);
           expect(mem.archivedAt, savedMem.archivedAt);
 
-          return mem..updatedAt = DateTime.now();
+          return mem
+            ..updatedAt = DateTime.now()
+            ..
+                // 通知を登録したいので、翌日を設定する
+                notifyAtV2 =
+                DateAndTime.now(allDay: true).add(const Duration(days: 1));
         });
         when(mockedMemItemRepository.replace(any))
             .thenAnswer((realInvocation) async {
@@ -195,12 +201,26 @@ void main() {
 
           return memItem..updatedAt = DateTime.now();
         });
+        when(mockedNotificationRepository.receive(
+          memId,
+          enteringMemName,
+          any,
+          any,
+          memReminderChannelId,
+          any,
+          any,
+        )).thenAnswer((realInvocation) {
+          return Future.value(null);
+        });
 
         await widgetTester.tap(saveFabFinder);
         await widgetTester.pumpAndSettle();
 
         verify(mockedMemRepositoryV2.replace(any)).called(1);
         verify(mockedMemItemRepository.replace(any)).called(1);
+        verify(mockedNotificationRepository.receive(
+                any, any, any, any, any, any, any))
+            .called(1);
 
         expect(saveMemSuccessFinder(enteringMemName), findsOneWidget);
 

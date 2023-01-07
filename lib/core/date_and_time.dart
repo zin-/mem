@@ -82,8 +82,8 @@ class DateAndTime extends DateTime {
       added.year,
       added.month,
       added.day,
-      added.hour,
-      added.minute,
+      isAllDay ? null : added.hour,
+      isAllDay ? null : added.minute,
     );
   }
 
@@ -95,8 +95,8 @@ class DateAndTime extends DateTime {
       subtracted.year,
       subtracted.month,
       subtracted.day,
-      subtracted.hour,
-      subtracted.minute,
+      isAllDay ? null : subtracted.hour,
+      isAllDay ? null : subtracted.minute,
     );
   }
 
