@@ -14,6 +14,7 @@ import 'package:mem/gui/l10n.dart';
 import 'package:mem/gui/constants.dart';
 
 import '../_helpers.dart';
+import '../gui/time_of_day_text_form_field_test.dart';
 import '../samples.dart';
 import '../mocks.mocks.dart';
 import '../gui/date_and_time_text_form_field_test.dart';
@@ -81,7 +82,7 @@ void main() {
         await pickNowDate(widgetTester);
         await widgetTester.pump();
         await tapAllDaySwitch(widgetTester);
-        await pickNowTimeOfDay(widgetTester);
+        await pickNowTimeOfDay(widgetTester, okButton);
         await widgetTester.pump();
 
         when(mockedMemRepositoryV2.receive(any)).thenAnswer((realInvocation) {
@@ -92,7 +93,7 @@ void main() {
             doneAt: mem.doneAt,
             notifyAtV2: mem.notifyAtV2,
             id: 1,
-            createdAt: mem.createdAt,
+            createdAt: DateTime.now(),
             updatedAt: mem.updatedAt,
             archivedAt: mem.archivedAt,
           ));

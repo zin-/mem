@@ -78,10 +78,7 @@ void main() {
           },
         );
 
-        await widgetTester.tap(find.byIcon(Icons.access_time_outlined));
-        await widgetTester.pump();
-
-        await widgetTester.tap(find.text('CANCEL'));
+        await pickNowTimeOfDay(widgetTester, cancelButton);
       },
       tags: TestSize.small,
     );
@@ -97,12 +94,29 @@ void main() {
           },
         );
 
-        await widgetTester.tap(find.byIcon(Icons.access_time_outlined));
-        await widgetTester.pump();
-
-        await widgetTester.tap(find.text('OK'));
+        await pickNowTimeOfDay(widgetTester, okButton);
       },
       tags: TestSize.small,
     );
   });
+}
+
+Finder okButton = find.text('OK');
+Finder cancelButton = find.text('CANCEL');
+
+Future<void> showTimeOfDayPicker(WidgetTester widgetTester) async {
+  await widgetTester.tap(find.descendant(
+    of: find.byType(TimeOfDayTextFormField),
+    matching: find.byIcon(Icons.access_time_outlined),
+  ));
+  await widgetTester.pump();
+}
+
+Future<void> pickNowTimeOfDay(
+  WidgetTester widgetTester,
+  Finder tapTarget,
+) async {
+  await showTimeOfDayPicker(widgetTester);
+
+  await widgetTester.tap(tapTarget);
 }

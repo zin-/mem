@@ -6,6 +6,7 @@ import 'package:mem/gui/l10n.dart';
 import 'package:mem/gui/date_and_time_text_form_field.dart';
 
 import '../_helpers.dart';
+import 'time_of_day_text_form_field_test.dart';
 
 void main() {
   Future pumpDateTimeTextField(
@@ -148,7 +149,7 @@ void main() {
           },
         );
 
-        pickNowTimeOfDay(widgetTester);
+        pickNowTimeOfDay(widgetTester, okButton);
       },
       tags: TestSize.small,
     );
@@ -216,16 +217,6 @@ pickNowDate(WidgetTester widgetTester) async {
   await widgetTester.tap(find.descendant(
     of: find.byType(DateAndTimeTextFormField),
     matching: find.byIcon(Icons.calendar_month),
-  ));
-  await widgetTester.pump();
-
-  await widgetTester.tap(find.text('OK'));
-}
-
-pickNowTimeOfDay(WidgetTester widgetTester) async {
-  await widgetTester.tap(find.descendant(
-    of: find.byType(DateAndTimeTextFormField),
-    matching: find.byIcon(Icons.access_time_outlined),
   ));
   await widgetTester.pump();
 
