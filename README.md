@@ -10,8 +10,8 @@ Manage any.
 
 ## Others
 
-- [BUILD_DEVELOPMENT_ENVIRONMENT](./documentations/BUILD_DEVELOPMENT_ENVIRONMENT.md)
-- [TEST](./documentations/TEST.md)
-- [L10n](./documentations/LOCALIZATION.md)
-- [Icon](./documentations/ICON.md)
-- [CI/CD](./documentations/Continuous_Integration-Continuous_Delivery.md)
+- [BUILD_DEVELOPMENT_ENVIRONMENT](docs/BUILD_DEVELOPMENT_ENVIRONMENT.md)
+- [TEST](docs/TEST.md)
+- [L10n](docs/LOCALIZATION.md)
+- [Icon](docs/ICON.md)
+- [CI/CD](docs/Continuous_Integration-Continuous_Delivery.md)
