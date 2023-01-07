@@ -31,8 +31,7 @@
         android:name="flutterEmbedding"
         android:value="2"/>
 
-    <!-- TODO exportedが何なのか調べる -->
-    <receiver android:name="ActCounterProvider" android:exported="true">
+    <receiver android:name="ActCounterProvider" android:exported="false">
       <intent-filter>
         <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
       </intent-filter>
