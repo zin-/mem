@@ -8,31 +8,57 @@ import 'package:mem/mems/mem_list_page_states.dart';
 
 class MemListView extends ConsumerWidget {
   final String _appBarTitle;
+  final ScrollController? _scrollController;
+  final List<Widget> _appBarActions;
+  final void Function(MemId memId)? _onItemTapped;
 
-  const MemListView(this._appBarTitle, {super.key});
+  MemListView(
+    this._appBarTitle, {
+    ScrollController? scrollController,
+    List<Widget>? appBarActions,
+    void Function(MemId memId)? onItemTapped,
+    super.key,
+  })  : _scrollController = scrollController,
+        _appBarActions = appBarActions ?? [],
+        _onItemTapped = onItemTapped;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return _MemListViewComponent(_appBarTitle, ref.watch(sortedMemList));
-  }
+  Widget build(BuildContext context, WidgetRef ref) => _MemListViewComponent(
+        _appBarTitle,
+        ref.watch(sortedMemList),
+        _scrollController,
+        _appBarActions,
+        _onItemTapped,
+      );
 }
 
 class _MemListViewComponent extends StatelessWidget {
   final String _appBarTitle;
   final List<Mem> _memList;
+  final ScrollController? _scrollController;
   final List<Widget> _appBarActions;
+  final void Function(MemId memId)? _onItemTapped;
 
-  _MemListViewComponent(
+  const _MemListViewComponent(
     this._appBarTitle,
-    this._memList, {
-    List<Widget>? appBarActions,
-  }) : _appBarActions = appBarActions ?? [];
+    this._memList,
+    this._scrollController,
+    this._appBarActions,
+    this._onItemTapped,
+  );
 
   @override
   Widget build(BuildContext context) => v(
-        {'_memList': _memList},
+        {
+          '_appBarTitle': _appBarTitle,
+          '_memList': _memList,
+          '_scrollController': _scrollController,
+          '_appBarActions': _appBarActions,
+          '_onItemTapped': _onItemTapped,
+        },
         () {
           return CustomScrollView(
+            controller: _scrollController,
             slivers: [
               SliverAppBar(
                 title: Text(_appBarTitle),
@@ -52,7 +78,7 @@ class _MemListViewComponent extends StatelessWidget {
                     final mem = _memList[index];
                     return MemListItemView(
                       mem,
-                      () => {},
+                      _onItemTapped,
                     );
                   },
                   childCount: _memList.length,

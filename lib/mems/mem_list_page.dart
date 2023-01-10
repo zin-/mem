@@ -68,10 +68,10 @@ class MemListPage extends StatelessWidget {
                               final mem = memList[index];
                               return MemListItemView(
                                 mem,
-                                () => showMemDetailPage(
+                                (memId) => showMemDetailPage(
                                   context,
                                   ref,
-                                  mem.id,
+                                  memId,
                                 ),
                               );
                             },
