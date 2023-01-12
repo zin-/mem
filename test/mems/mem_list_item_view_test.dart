@@ -29,7 +29,7 @@ void main() {
           localizationsDelegates: L10n.localizationsDelegates,
           supportedLocales: L10n.supportedLocales,
           home: Scaffold(
-            body: MemListItemView(mem, () {}),
+            body: MemListItemView(mem, (memId) {}),
           ),
         ),
       ),
