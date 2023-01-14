@@ -25,7 +25,10 @@ class _ActCounterConfigureComponent extends StatelessWidget {
         {},
         () {
           return Scaffold(
+            // TODO 選択できるようにする
             body: MemListView(L10n().actCounterConfigureTitle()),
+            // TODO 選択したら有効になるようにする
+            // TODO 選択を確定したらHome Widgetに情報を送る
             floatingActionButton: const SelectMem(),
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerFloat,
