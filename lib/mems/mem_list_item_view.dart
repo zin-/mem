@@ -32,6 +32,7 @@ class MemListItemView extends ConsumerWidget {
       );
 }
 
+// TODO privateにする
 class MemListItemViewComponent extends ListTile {
   MemListItemViewComponent(
     Mem mem,
