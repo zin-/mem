@@ -74,13 +74,7 @@ class _MemListViewComponent extends StatelessWidget {
               ),
               SliverList(
                 delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final mem = _memList[index];
-                    return MemListItemView(
-                      mem,
-                      _onItemTapped,
-                    );
-                  },
+                  (context, index) => MemListItemView(index, _onItemTapped),
                   childCount: _memList.length,
                 ),
               ),

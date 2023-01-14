@@ -45,10 +45,12 @@ Future<void> runTestWidget(WidgetTester widgetTester, Widget widget) =>
 
 Future<void> runTestWidgetWithProvider(
   WidgetTester widgetTester,
-  Widget widget,
-) =>
+  Widget widget, {
+  List<Override>? overrides,
+}) =>
     widgetTester.pumpWidget(
       ProviderScope(
+        overrides: overrides ?? [],
         child: MaterialApp(
           localizationsDelegates: L10n.localizationsDelegates,
           supportedLocales: L10n.supportedLocales,

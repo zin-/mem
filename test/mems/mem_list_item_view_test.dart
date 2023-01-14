@@ -5,8 +5,12 @@ import 'package:intl/intl.dart';
 import 'package:mem/core/date_and_time.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/core/mem.dart';
+import 'package:mem/gui/list_value_state_notifier.dart';
+import 'package:mem/gui/value_state_notifier.dart';
+import 'package:mem/mems/mem_detail_states.dart';
 import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_list_item_view.dart';
+import 'package:mem/mems/mem_list_page_states.dart';
 import 'package:mem/mems/mem_notify_at.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/notifications/notification_repository.dart';
@@ -29,7 +33,11 @@ void main() {
           localizationsDelegates: L10n.localizationsDelegates,
           supportedLocales: L10n.supportedLocales,
           home: Scaffold(
-            body: MemListItemView(mem, (memId) {}),
+            body: MemListItemViewComponent(
+              mem,
+              (memId) {},
+              (value, memId) {},
+            ),
           ),
         ),
       ),
@@ -44,6 +52,7 @@ void main() {
   NotificationRepository.reset(mockedNotificationRepository);
 
   setUp(() {
+    reset(mockedMemRepositoryV2);
     reset(mockedMemItemRepository);
     reset(mockedNotificationRepository);
   });
@@ -99,15 +108,27 @@ void main() {
     'Action',
     () {
       testWidgets(
-        ': done',
+        'done',
         (widgetTester) async {
-          final savedMem = minSavedMem(1)
-            ..name = 'saved mem entity name'
-            ..doneAt = null;
+          const memId = 1;
+          const index = 0;
 
-          await pumpMemListItemView(
+          final savedMem = minSavedMem(memId)
+            ..name = 'MemListItemViewTest: Action: done'
+            ..doneAt = null;
+          final memList = [savedMem];
+
+          await runTestWidgetWithProvider(
             widgetTester,
-            savedMem,
+            Scaffold(
+              body: MemListItemView(index, (memId) {}),
+            ),
+            overrides: [
+              memListProvider
+                  .overrideWithValue(ListValueStateNotifier(memList)),
+              memProvider(memId)
+                  .overrideWithValue(ValueStateNotifier(savedMem)),
+            ],
           );
           await widgetTester.pump();
 
@@ -115,7 +136,7 @@ void main() {
               .thenAnswer((realInvocation) async {
             final arg1 = realInvocation.positionalArguments[0];
 
-            expect(arg1, savedMem.id);
+            expect(arg1, memId);
 
             return savedMem;
           });
@@ -123,14 +144,14 @@ void main() {
               .thenAnswer((realInvocation) async {
             final arg1 = realInvocation.positionalArguments[0] as Mem;
 
-            expect(arg1, isA<Mem>());
-            expect(arg1.id, savedMem.id);
+            expect(arg1.id, memId);
             expect(arg1.doneAt, isNotNull);
 
             return Mem(
               name: arg1.name,
               doneAt: arg1.doneAt,
               id: arg1.id,
+              createdAt: arg1.createdAt,
               updatedAt: DateTime.now(),
             );
           });
@@ -145,9 +166,13 @@ void main() {
 
           await widgetTester.tap(find.byType(Checkbox));
 
-          verify(mockedMemRepositoryV2.shipById(any)).called(1);
-          verify(mockedMemRepositoryV2.replace(any)).called(1);
-          verify(mockedNotificationRepository.discard(any)).called(1);
+          verify(mockedMemRepositoryV2.shipById(memId)).called(1);
+          expect(
+            verify(mockedMemRepositoryV2.replace(captureAny)).captured,
+            [savedMem],
+          );
+          verify(mockedNotificationRepository.discard(memId)).called(1);
+
           verifyNever(mockedMemItemRepository.replace(any));
         },
         tags: TestSize.small,
@@ -156,13 +181,25 @@ void main() {
       testWidgets(
         ': undone',
         (widgetTester) async {
-          final savedMem = minSavedMem(1)
-            ..name = 'saved mem entity name'
-            ..doneAt = DateTime.now();
+          const memId = 1;
+          const index = 0;
 
-          await pumpMemListItemView(
+          final savedMem = minSavedMem(memId)
+            ..name = 'MemListItemViewTest: Action: done'
+            ..doneAt = DateTime.now();
+          final memList = [savedMem];
+
+          await runTestWidgetWithProvider(
             widgetTester,
-            savedMem,
+            Scaffold(
+              body: MemListItemView(index, (memId) {}),
+            ),
+            overrides: [
+              memListProvider
+                  .overrideWithValue(ListValueStateNotifier(memList)),
+              memProvider(memId)
+                  .overrideWithValue(ValueStateNotifier(savedMem)),
+            ],
           );
           await widgetTester.pump();
 
@@ -170,26 +207,26 @@ void main() {
               .thenAnswer((realInvocation) async {
             final arg1 = realInvocation.positionalArguments[0];
 
-            expect(arg1, savedMem.id);
+            expect(arg1, memId);
 
             return savedMem;
           });
           when(mockedMemRepositoryV2.replace(any))
               .thenAnswer((realInvocation) async {
-            final arg1 = realInvocation.positionalArguments[0];
+            final arg1 = realInvocation.positionalArguments[0] as Mem;
 
-            expect(arg1, isA<Mem>());
-            expect(arg1.id, savedMem.id);
-            expect(arg1.doneAt, isNull);
+            expect(arg1.id, memId);
+            expect(arg1.doneAt, isNotNull);
+
             return Mem(
               name: arg1.name,
               doneAt: arg1.doneAt,
               id: arg1.id,
+              createdAt: arg1.createdAt,
               updatedAt: DateTime.now(),
             );
           });
-          when(mockedNotificationRepository.receive(
-                  any, any, any, any, any, any, any))
+          when(mockedNotificationRepository.discard(any))
               .thenAnswer((realInvocation) {
             final arg1 = realInvocation.positionalArguments[0];
 
@@ -200,8 +237,13 @@ void main() {
 
           await widgetTester.tap(find.byType(Checkbox));
 
-          verify(mockedMemRepositoryV2.shipById(savedMem.id)).called(1);
-          verify(mockedMemRepositoryV2.replace(any)).called(1);
+          verify(mockedMemRepositoryV2.shipById(memId)).called(1);
+          expect(
+            verify(mockedMemRepositoryV2.replace(captureAny)).captured,
+            [savedMem],
+          );
+          verify(mockedNotificationRepository.discard(memId)).called(1);
+
           verifyNever(mockedMemItemRepository.replace(any));
         },
         tags: TestSize.small,
