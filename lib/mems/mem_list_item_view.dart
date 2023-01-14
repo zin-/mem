@@ -19,20 +19,16 @@ class MemListItemView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         {'_memId': _memId},
-        () {
-          final memList = ref.watch(reactiveMemListProvider);
-          final mem = memList.firstWhere((_) => _.id == _memId);
-          return MemListItemViewComponent(
-            mem,
-            _onTapped,
-            (bool? value, MemId memId) {
-              value == true
-                  ? ref.read(doneMem(memId))
-                  : ref.read(undoneMem(memId));
-            },
-            key: key,
-          );
-        },
+        () => MemListItemViewComponent(
+          ref.watch(reactiveMemListProvider).firstWhere((_) => _.id == _memId),
+          _onTapped,
+          (bool? value, MemId memId) {
+            value == true
+                ? ref.read(doneMem(_memId))
+                : ref.read(undoneMem(_memId));
+          },
+          key: key,
+        ),
       );
 }
 
