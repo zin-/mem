@@ -51,7 +51,7 @@ void main() {
   final mockedNotificationRepository = MockNotificationRepository();
   NotificationRepository.reset(mockedNotificationRepository);
 
-  setUp(() {
+  tearDown(() {
     reset(mockedMemRepositoryV2);
     reset(mockedMemItemRepository);
     reset(mockedNotificationRepository);

@@ -4,6 +4,7 @@ import 'package:mem/core/mem.dart';
 import 'package:mem/gui/colors.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/mems/mem_list_page_states.dart';
+import 'package:mem/mems/mem_list_view_state.dart';
 
 import '../mems/mem_done_checkbox.dart';
 import '../mems/mem_list_item_actions.dart';
@@ -19,16 +20,37 @@ class MemListItemView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         {'_memId': _memId},
-        () => MemListItemViewComponent(
-          ref.watch(reactiveMemListProvider).firstWhere((_) => _.id == _memId),
-          _onTapped,
-          (bool? value, MemId memId) {
-            value == true
-                ? ref.read(doneMem(_memId))
-                : ref.read(undoneMem(_memId));
-          },
-          key: key,
-        ),
+        () {
+          final mem = ref
+              .watch(reactiveMemListProvider)
+              .firstWhere((_) => _.id == _memId);
+
+          if (ref.watch(memListViewModeProvider) ==
+              MemListViewMode.singleSelection) {
+            return _SingleSelectableMemListItemComponent(
+              mem,
+              ref.watch(selectedMemIdsProvider)?.contains(_memId) ?? false,
+              (memId) => v(
+                {'memId': memId},
+                () => ref
+                    .read(selectedMemIdsProvider.notifier)
+                    .updatedBy([memId]),
+              ),
+              key: key,
+            );
+          } else {
+            return MemListItemViewComponent(
+              mem,
+              _onTapped,
+              (bool? value, MemId memId) {
+                value == true
+                    ? ref.read(doneMem(_memId))
+                    : ref.read(undoneMem(_memId));
+              },
+              key: key,
+            );
+          }
+        },
       );
 }
 
@@ -51,7 +73,32 @@ class MemListItemViewComponent extends ListTile {
                   mem.id,
                   mem.notifyAtV2!,
                 ),
-          onTap: onTap == null ? null : () => onTap(mem.id),
           tileColor: mem.isArchived() ? archivedColor : null,
+          onTap: onTap == null ? null : () => onTap(mem.id),
+        );
+}
+
+class _SingleSelectableMemListItemComponent extends ListTile {
+  _SingleSelectableMemListItemComponent(
+    Mem mem,
+    bool isSelected,
+    void Function(MemId value) select, {
+    super.key,
+  }) : super(
+          title: MemNameText(mem.name, mem.id),
+          subtitle: mem.notifyAtV2 == null
+              ? null
+              : MemNotifyAtText(
+                  mem.id,
+                  mem.notifyAtV2!,
+                ),
+          trailing: Radio<MemId>(
+            value: mem.id,
+            groupValue: isSelected ? mem.id : null,
+            onChanged: (value) => value != null ? select(value) : null,
+          ),
+          onTap: () {
+            select(mem.id);
+          },
         );
 }
