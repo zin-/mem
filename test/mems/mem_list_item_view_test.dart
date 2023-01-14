@@ -111,7 +111,6 @@ void main() {
         'done',
         (widgetTester) async {
           const memId = 1;
-          const index = 0;
 
           final savedMem = minSavedMem(memId)
             ..name = 'MemListItemViewTest: Action: done'
@@ -121,7 +120,7 @@ void main() {
           await runTestWidgetWithProvider(
             widgetTester,
             Scaffold(
-              body: MemListItemView(index, (memId) {}),
+              body: MemListItemView(memId, (memId) {}),
             ),
             overrides: [
               memListProvider
@@ -182,7 +181,6 @@ void main() {
         ': undone',
         (widgetTester) async {
           const memId = 1;
-          const index = 0;
 
           final savedMem = minSavedMem(memId)
             ..name = 'MemListItemViewTest: Action: done'
@@ -192,7 +190,7 @@ void main() {
           await runTestWidgetWithProvider(
             widgetTester,
             Scaffold(
-              body: MemListItemView(index, (memId) {}),
+              body: MemListItemView(memId, (memId) {}),
             ),
             overrides: [
               memListProvider
@@ -216,7 +214,7 @@ void main() {
             final arg1 = realInvocation.positionalArguments[0] as Mem;
 
             expect(arg1.id, memId);
-            expect(arg1.doneAt, isNotNull);
+            expect(arg1.doneAt, isNull);
 
             return Mem(
               name: arg1.name,
@@ -242,8 +240,8 @@ void main() {
             verify(mockedMemRepositoryV2.replace(captureAny)).captured,
             [savedMem],
           );
-          verify(mockedNotificationRepository.discard(memId)).called(1);
 
+          verifyNever(mockedNotificationRepository.discard(any));
           verifyNever(mockedMemItemRepository.replace(any));
         },
         tags: TestSize.small,

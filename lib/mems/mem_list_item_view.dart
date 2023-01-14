@@ -11,24 +11,28 @@ import 'mem_name.dart';
 import 'mem_notify_at.dart';
 
 class MemListItemView extends ConsumerWidget {
-  final int _index;
+  final MemId _memId;
   final void Function(MemId memId)? _onTapped;
 
-  const MemListItemView(this._index, this._onTapped, {super.key});
+  const MemListItemView(this._memId, this._onTapped, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        {'_index': _index},
-        () => MemListItemViewComponent(
-          ref.watch(sortedMemList)[_index],
-          _onTapped,
-          (bool? value, MemId memId) {
-            value == true
-                ? ref.read(doneMem(memId))
-                : ref.read(undoneMem(memId));
-          },
-          key: key,
-        ),
+        {'_memId': _memId},
+        () {
+          final memList = ref.watch(reactiveMemListProvider);
+          final mem = memList.firstWhere((_) => _.id == _memId);
+          return MemListItemViewComponent(
+            mem,
+            _onTapped,
+            (bool? value, MemId memId) {
+              value == true
+                  ? ref.read(doneMem(memId))
+                  : ref.read(undoneMem(memId));
+            },
+            key: key,
+          );
+        },
       );
 }
 
