@@ -75,6 +75,7 @@ final reactiveMemListProvider =
     () {
       final memList = ref.watch(memListProvider) ?? [];
 
+      // FIXME Single Source of Truthに反している
       final reactiveMemList = memList
           .map((e) => ref.watch(memProvider(e.id)))
           .whereType<Mem>()
