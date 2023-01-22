@@ -21,3 +21,8 @@ final selectedMemIdsProvider =
     () => ListValueStateNotifier<MemId>([]),
   ),
 );
+
+final selectMem = Provider.family<void, MemId>((ref, memId) => v(
+      {'memId': memId},
+      () {},
+    ));

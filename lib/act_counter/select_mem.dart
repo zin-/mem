@@ -1,36 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/gui/colors.dart';
 import 'package:mem/logger/i/api.dart';
+import 'package:mem/mems/mem_list_view_state.dart';
 
 class SelectMem extends ConsumerWidget {
   const SelectMem({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return const _SelectMemComponent(
-      // TODO refer selected
-      false,
+    final selectedMemIds = ref.watch(selectedMemIdsProvider);
+    return _SelectMemComponent(
+      selectedMemIds?.isNotEmpty ?? false,
+      () {
+        final selectedMemId = selectedMemIds?.single;
+        if (selectedMemId != null) {
+          ref.read(selectMem(selectedMemId));
+        } else {
+          throw Error();
+        }
+      },
     );
   }
 }
 
 class _SelectMemComponent extends StatelessWidget {
   final bool _selected;
+  final void Function() _onPressed;
 
-  const _SelectMemComponent(this._selected);
+  const _SelectMemComponent(this._selected, this._onPressed);
 
   @override
   Widget build(BuildContext context) => t(
         {'_selected': _selected},
-        () {
-          return FloatingActionButton(
-            onPressed: _selected
-                ? () {
-                    trace('on pressed');
-                  }
-                : null,
-            child: const Icon(Icons.check),
-          );
-        },
+        () => FloatingActionButton(
+          backgroundColor: _selected ? null : archivedColor,
+          onPressed: _selected ? _onPressed : null,
+          child: const Icon(
+            Icons.check,
+          ),
+        ),
       );
 }
