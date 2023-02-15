@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/act_counter/select_mem.dart';
+import 'package:mem/act_counter/select_mem_fab.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/mems/mem_list_page_states.dart';
@@ -30,8 +30,7 @@ class _ActCounterConfigureComponent extends StatelessWidget {
         () {
           return Scaffold(
             body: MemListView(L10n().actCounterConfigureTitle()),
-            // TODO 選択を確定したらHome Widgetに情報を送る
-            floatingActionButton: const SelectMem(),
+            floatingActionButton: const SelectMemFab(),
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerFloat,
           );

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/act_counter/act_counter_configure_states.dart';
+import 'package:mem/act_counter/act_counter_configure_actions.dart';
 import 'package:mem/gui/colors.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/mems/mem_list_view_state.dart';
 
-class SelectMem extends ConsumerWidget {
-  const SelectMem({super.key});
+class SelectMemFab extends ConsumerWidget {
+  const SelectMemFab({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
