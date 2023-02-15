@@ -124,9 +124,9 @@ void main() {
             ),
             overrides: [
               memListProvider
-                  .overrideWithValue(ListValueStateNotifier(memList)),
+                  .overrideWith((ref) => ListValueStateNotifier(memList)),
               memProvider(memId)
-                  .overrideWithValue(ValueStateNotifier(savedMem)),
+                  .overrideWith((ref) => ValueStateNotifier(savedMem)),
             ],
           );
           await widgetTester.pump();
@@ -194,9 +194,9 @@ void main() {
             ),
             overrides: [
               memListProvider
-                  .overrideWithValue(ListValueStateNotifier(memList)),
+                  .overrideWith((ref) => ListValueStateNotifier(memList)),
               memProvider(memId)
-                  .overrideWithValue(ValueStateNotifier(savedMem)),
+                  .overrideWith((ref) => ValueStateNotifier(savedMem)),
             ],
           );
           await widgetTester.pump();
