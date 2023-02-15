@@ -67,3 +67,7 @@ Future sendData() async {
     debugPrint('Error Sending Data. $exception');
   }
 }
+
+saveWidgetData(id, data) => HomeWidget.saveWidgetData(id, data);
+
+updateWidget() => HomeWidget.updateWidget(name: 'ActCounterProvider');
