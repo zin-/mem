@@ -1,3 +1,4 @@
+// TODO 保存済みの値は型の違いで表現する
 abstract class EntityValue {
   final dynamic id;
   DateTime? createdAt;
