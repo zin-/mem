@@ -6,6 +6,17 @@ import android.content.SharedPreferences
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetProvider
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.temporal.TemporalAccessor
+import java.util.Calendar
+import java.util.Date
+import java.util.concurrent.TimeUnit
 
 const val actCount = "act_count"
 const val defaultActCount = "?"
@@ -34,11 +45,19 @@ class ActCounterProvider : HomeWidgetProvider() {
                 )
                 setOnClickPendingIntent(R.id.widget_container, pendingIntent)
 
-                // Swap Title Text by calling Dart Code in the Background
+                val memId = widgetData.getInt(
+                    "memId-$appWidgetId",
+                    -1,
+                )
+
                 setTextViewText(
                     R.id.act_count,
-                    widgetData.getString(actCount, defaultActCount)
+                    widgetData.getInt(
+                        "actCount-$memId",
+                        -1,
+                    ).toString(),
                 )
+
 //                val backgroundIntent = HomeWidgetBackgroundIntent.getBroadcast(
 //                    context,
 //                    Uri.parse("${uriSchema}://titleClicked")
@@ -47,7 +66,23 @@ class ActCounterProvider : HomeWidgetProvider() {
 
                 setTextViewText(
                     R.id.last_act_time,
-                    widgetData.getString(lastActTime, defaultLastActTime)
+                    widgetData.getLong(
+                        "lastUpdatedAt-$memId",
+                        -1L,
+                    ).let {
+                        if (it == 0L) {
+                            "--:--"
+                        } else {
+
+                            Calendar.getInstance().apply {
+                                timeInMillis = it
+                            }.let {
+                                SimpleDateFormat
+                                    .getTimeInstance(DateFormat.SHORT)
+                                    .format(it.time)
+                            }
+                        }
+                    },
                 )
 //                // Detect App opened via Click inside Flutter
 //                val pendingIntentWithData = HomeWidgetLaunchIntent.getActivity(
@@ -62,7 +97,7 @@ class ActCounterProvider : HomeWidgetProvider() {
 
                 setTextViewText(
                     R.id.mem_name,
-                    widgetData.getString(memName, defaultMemName)
+                    widgetData.getString("memName-$memId", defaultMemName),
                 )
             }
 

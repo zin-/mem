@@ -3,7 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="4dp"
     android:orientation="vertical"
     android:background="@drawable/act_counter_background"
     android:padding="4dp"
@@ -15,7 +14,7 @@
       android:layout_height="0dp"
       android:layout_weight="1"
       android:gravity="center"
-      android:textSize="32sp"
+      android:textSize="30sp"
       android:textStyle="bold"
       android:textColor="@color/home_widget_text_color"
   />
@@ -25,7 +24,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:gravity="center"
-      android:textSize="16sp"
+      android:textSize="11sp"
       android:textColor="@color/home_widget_text_color"
   />
 
@@ -37,5 +36,7 @@
       android:gravity="center"
       android:textSize="11sp"
       android:textColor="@color/home_widget_text_color"
+      android:singleLine="true"
+      android:ellipsize="marquee"
   />
 </LinearLayout>

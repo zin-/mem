@@ -34,7 +34,7 @@ class ActCounterConfigure : FlutterActivity() {
     }
 
     private fun initialize(): Int {
-        val appWidgetId = intent?.extras?.getInt(
+        val appWidgetId = intent.extras?.getInt(
             AppWidgetManager.EXTRA_APPWIDGET_ID,
             AppWidgetManager.INVALID_APPWIDGET_ID
         ) ?: AppWidgetManager.INVALID_APPWIDGET_ID
@@ -53,6 +53,7 @@ class ActCounterConfigure : FlutterActivity() {
         }
 
         setResult(RESULT_OK)
+
         return appWidgetId
     }
 }
