@@ -19,7 +19,6 @@ class ActCounterService {
           const methodChannel = MethodChannel(methodChannelName);
           final homeWidgetId =
               await methodChannel.invokeMethod(initializeMethodName);
-          dev({'homeWidgetId': homeWidgetId});
           if (homeWidgetId != null) {
             await saveWidgetData(
               "memId-$homeWidgetId",
@@ -35,20 +34,18 @@ class ActCounterService {
             );
             final lastUpdatedAt = acts
                 .map((e) =>
-                    e.updatedAt?.millisecondsSinceEpoch ??
-                    e.createdAt!.millisecondsSinceEpoch)
+                    e.period.end?.millisecondsSinceEpoch ??
+                    e.period.start!.millisecondsSinceEpoch)
                 .fold<int>(
                   0,
                   (previousValue, element) =>
                       previousValue < element ? element : previousValue,
                 )
                 .toDouble();
-            dev(lastUpdatedAt);
-            final a = await saveWidgetData(
+            await saveWidgetData(
               "lastUpdatedAt-$memId",
               lastUpdatedAt,
             );
-            dev(a);
             await saveWidgetData(
               "memName-$memId",
               mem.name,
