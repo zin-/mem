@@ -37,6 +37,6 @@
       android:textSize="11sp"
       android:textColor="@color/home_widget_text_color"
       android:singleLine="true"
-      android:ellipsize="start"
+      android:ellipsize="end"
   />
 </LinearLayout>

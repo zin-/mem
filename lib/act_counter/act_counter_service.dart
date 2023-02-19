@@ -1,6 +1,9 @@
 import 'package:flutter/services.dart';
 import 'package:mem/act_counter/all.dart';
 import 'package:mem/acts/act_repository.dart';
+import 'package:mem/core/act.dart';
+import 'package:mem/core/date_and_time.dart';
+import 'package:mem/core/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
@@ -25,34 +28,55 @@ class ActCounterService {
               memId,
             );
 
-            final mem = await _memRepositoryV2.shipById(memId);
-            final acts = await _actRepository.shipByMemId(memId);
-
-            await saveWidgetData(
-              "actCount-$memId",
-              acts.length,
-            );
-            final lastUpdatedAt = acts
-                .map((e) =>
-                    e.period.end?.millisecondsSinceEpoch ??
-                    e.period.start!.millisecondsSinceEpoch)
-                .fold<int>(
-                  0,
-                  (previousValue, element) =>
-                      previousValue < element ? element : previousValue,
-                )
-                .toDouble();
-            await saveWidgetData(
-              "lastUpdatedAt-$memId",
-              lastUpdatedAt,
-            );
-            await saveWidgetData(
-              "memName-$memId",
-              mem.name,
-            );
-
-            await updateWidget();
+            await updateActCounter(memId);
           }
+        },
+      );
+
+  increment(int memId) => t(
+        {'memId': memId},
+        () async {
+          await _actRepository.receive(Act(
+              memId,
+              DateAndTimePeriod(
+                start: DateAndTime.now(),
+                end: DateAndTime.now(),
+              )));
+
+          await updateActCounter(memId);
+        },
+      );
+
+  updateActCounter(MemId memId) => v(
+        {'memId': memId},
+        () async {
+          final mem = await _memRepositoryV2.shipById(memId);
+          final acts = await _actRepository.shipByMemId(memId);
+
+          await saveWidgetData(
+            "actCount-$memId",
+            acts.length,
+          );
+          final lastUpdatedAt = acts
+              .map((e) =>
+                  e.period.end?.millisecondsSinceEpoch ??
+                  e.period.start!.millisecondsSinceEpoch)
+              .fold<int>(
+                0,
+                (previousValue, element) =>
+                    previousValue < element ? element : previousValue,
+              )
+              .toDouble();
+          await saveWidgetData(
+            "lastUpdatedAt-$memId",
+            lastUpdatedAt,
+          );
+          await saveWidgetData(
+            "memName-$memId",
+            mem.name,
+          );
+
+          await updateWidget();
         },
       );
 

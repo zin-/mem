@@ -10,7 +10,8 @@ import io.flutter.plugin.common.MethodChannel
  * {@see} lib/main.dart
  */
 const val entryPointFunctionName = "launchActCounterConfigure"
-const val methodChannelName = "zin.playground.mem/act_counter"
+const val appId = "zin.playground.mem"
+const val methodChannelName = "${appId}/act_counter"
 const val initializeMethodName = "initialize"
 
 class ActCounterConfigure : FlutterActivity() {
