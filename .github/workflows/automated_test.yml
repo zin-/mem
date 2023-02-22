@@ -33,11 +33,32 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [android, windows]
+        platform: [android_30, android_31, android_32, android_33, windows]
         include:
-          - platform: android
+          - platform: android_30
             os: macOS-12
             android-api-level: 30
+            android-tag: 'default'
+            android-abi: 'x86_64'
+            java-distribution: 'temurin'
+            java-version: 17
+          - platform: android_31
+            os: macOS-12
+            android-api-level: 31
+            android-tag: 'default'
+            android-abi: 'x86_64'
+            java-distribution: 'temurin'
+            java-version: 17
+          - platform: android_32
+            os: macOS-12
+            android-api-level: 32
+            android-tag: 'default'
+            android-abi: 'x86_64'
+            java-distribution: 'temurin'
+            java-version: 17
+          - platform: android_33
+            os: macOS-12
+            android-api-level: 33
             android-tag: 'default'
             android-abi: 'x86_64'
             java-distribution: 'temurin'
