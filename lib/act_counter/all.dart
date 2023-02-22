@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:home_widget/home_widget.dart';
 import 'package:mem/act_counter/act_counter_service.dart';
 import 'package:mem/logger/i/api.dart';
@@ -25,7 +27,9 @@ void backgroundCallback(Uri? uri) async {
 }
 
 void initializeActCounter() {
-  HomeWidget.registerBackgroundCallback(backgroundCallback);
+  if (!Platform.isWindows) {
+    HomeWidget.registerBackgroundCallback(backgroundCallback);
+  }
 }
 
 saveWidgetData(id, data) => HomeWidget.saveWidgetData(id, data);
