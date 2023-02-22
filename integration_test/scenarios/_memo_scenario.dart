@@ -25,6 +25,8 @@ void testMemoScenario() => group(
           (widgetTester) async {
             await runApplication();
             await widgetTester.pump();
+            await widgetTester.pump();
+            await widgetTester.pumpAndSettle();
             await widgetTester.pumpAndSettle();
 
             await widgetTester.tap(newMemFabFinder);
