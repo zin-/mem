@@ -72,7 +72,7 @@ class DateAndTime extends DateTime {
           timeOfDay: allDay ? null : DateTime.now(),
         );
 
-  DateTime get dateTime => DateTime(year, month, day);
+  DateTime get dateTime => DateTime(year, month, day, hour, minute);
 
   @override
   DateAndTime add(Duration duration) {
