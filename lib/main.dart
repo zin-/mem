@@ -41,9 +41,6 @@ Future<void> run(Widget home, {String? languageCode}) async {
   await openDatabase();
   initializeActCounter();
 
-  checkForWidgetLaunch();
-  sendData();
-
   runApp(MemApplication(home, languageCode));
 }
 
