@@ -49,9 +49,9 @@ void main() {
           widgetTester,
           ProviderScope(
             overrides: [
-              testAsyncValueProvider.overrideWithProvider(
-                FutureProvider((_) => throw Exception(errorMessage)),
-              ),
+              testAsyncValueProvider.overrideWith((ref) {
+                throw Exception(errorMessage);
+              }),
             ],
             child: Consumer(
               builder: (context, ref, child) => AsyncValueView(
