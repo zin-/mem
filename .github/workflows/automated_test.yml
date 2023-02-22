@@ -78,7 +78,10 @@ jobs:
       - name: 'Generate Localization code'
         uses: ./.github/actions/generate-localization_code
       - name: 'Prepare Test for Android'
-        if: ${{ matrix.platform == 'android' }}
+        if: ${{ matrix.platform == 'android_30'
+            || matrix.platform == 'android_31'
+            || matrix.platform == 'android_32'
+            || matrix.platform == 'android_33' }}
         uses: ./.github/actions/prepare-test_for-android
         with:
           android-api-level: ${{ matrix.android-api-level }}
