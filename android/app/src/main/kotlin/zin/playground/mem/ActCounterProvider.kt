@@ -6,19 +6,11 @@ import android.content.SharedPreferences
 import android.net.Uri
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetBackgroundIntent
-import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetProvider
 import java.text.DateFormat
 import java.text.SimpleDateFormat
-import java.time.Duration
 import java.time.Instant
-import java.time.LocalTime
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.temporal.TemporalAccessor
-import java.util.Calendar
-import java.util.Date
-import java.util.concurrent.TimeUnit
+import java.util.*
 
 const val actCount = "act_count"
 const val defaultActCount = "?"
@@ -63,21 +55,41 @@ class ActCounterProvider : HomeWidgetProvider() {
 
                 setTextViewText(
                     R.id.last_act_time,
-                    widgetData.getLong(
+                    widgetData.getInt(
                         "lastUpdatedAt-$memId",
-                        -1L,
+                        -1,
                     ).let {
-                        if (it == 0L) {
+                        if (it == 0) {
                             "--:--"
                         } else {
-
-                            Calendar.getInstance().apply {
-                                timeInMillis = it
-                            }.let {
-                                SimpleDateFormat
-                                    .getTimeInstance(DateFormat.SHORT)
-                                    .format(it.time)
-                            }
+//                            throw Error(it.toString())
+//                            it.toString()
+                            SimpleDateFormat
+                                .getTimeInstance(DateFormat.SHORT)
+                                .format(
+                                    Date.from(
+                                        Instant.ofEpochMilli(
+                                            it.toLong() * 1000
+                                        )
+                                    )
+//                                    ZonedDateTime.ofInstant(
+//                                        Instant.ofEpochMilli(it),
+//                                        ZoneId.systemDefault(),
+//                                    )
+                                )
+//                            SimpleDateFormat
+//                                .getTimeInstance(
+//                                    DateFormat.SHORT,
+//                                    Locale.getDefault(),
+//                                )
+//                                .format(it)
+//                            Calendar.getInstance().apply {
+//                                timeInMillis = it
+//                            }.let {
+//                                SimpleDateFormat
+//                                    .getTimeInstance(DateFormat.SHORT)
+//                                    .format(it.time)
+//                            }
                         }
                     },
                 )

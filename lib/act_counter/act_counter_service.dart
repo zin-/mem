@@ -58,18 +58,19 @@ class ActCounterService {
             acts.length,
           );
           final lastUpdatedAt = acts
-              .map((e) =>
-                  e.period.end?.millisecondsSinceEpoch ??
-                  e.period.start!.millisecondsSinceEpoch)
-              .fold<int>(
-                0,
-                (previousValue, element) =>
-                    previousValue < element ? element : previousValue,
-              )
-              .toDouble();
+                  .map((e) =>
+                      e.period.end?.millisecondsSinceEpoch ??
+                      e.period.start!.millisecondsSinceEpoch)
+                  .fold<int>(
+                    0,
+                    (previousValue, element) =>
+                        previousValue < element ? element : previousValue,
+                  )
+                  .toInt() /
+              1000;
           await saveWidgetData(
             "lastUpdatedAt-$memId",
-            lastUpdatedAt,
+            dev(lastUpdatedAt.toInt()),
           );
           await saveWidgetData(
             "memName-$memId",
