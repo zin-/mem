@@ -7,18 +7,22 @@ import android.net.Uri
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetBackgroundIntent
 import es.antonborri.home_widget.HomeWidgetProvider
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.time.Instant
-import java.util.*
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 const val actCount = "act_count"
 const val defaultActCount = "?"
 const val lastActTime = "last_act_time"
-const val defaultLastActTime = "??:??"
+const val defaultLastActTime = "--:--"
 const val memName = "mem_name"
 const val defaultMemName = "???"
 const val uriSchema = "mem"
+const val memIdIsNotFound = -11
+const val actCountIsNotFound = -12
+const val lastActTimeIsNotFound = -13L
 
 class ActCounterProvider : HomeWidgetProvider() {
     override fun onUpdate(
@@ -34,80 +38,65 @@ class ActCounterProvider : HomeWidgetProvider() {
             ).apply {
                 val memId = widgetData.getInt(
                     "memId-$appWidgetId",
-                    -1,
+                    memIdIsNotFound,
                 )
-                val backgroundIntent = HomeWidgetBackgroundIntent.getBroadcast(
-                    context,
-                    Uri.parse(
-                        "$uriSchema://${methodChannelName}s" +
-                                "?mem_id=$memId"
+                if (memId != memIdIsNotFound) {
+                    setOnClickPendingIntent(
+                        R.id.widget_container,
+                        HomeWidgetBackgroundIntent.getBroadcast(
+                            context,
+                            Uri.parse(
+                                "$uriSchema://${methodChannelName}s" +
+                                        "?mem_id=$memId"
+                            )
+                        )
                     )
-                )
-                setOnClickPendingIntent(R.id.widget_container, backgroundIntent)
 
-                setTextViewText(
-                    R.id.act_count,
-                    widgetData.getInt(
+                    val actCount = widgetData.getInt(
                         "actCount-$memId",
-                        -1,
-                    ).toString(),
-                )
+                        actCountIsNotFound,
+                    )
+                    setTextViewText(
+                        R.id.act_count,
+                        if (actCount == actCountIsNotFound)
+                            defaultActCount
+                        else
+                            actCount.toString(),
+                    )
 
-                setTextViewText(
-                    R.id.last_act_time,
-                    widgetData.getInt(
-                        "lastUpdatedAt-$memId",
-                        -1,
+                    val lastUpdatedAtSeconds = widgetData.getLong(
+                        "lastUpdatedAtSeconds-$memId",
+                        lastActTimeIsNotFound,
                     ).let {
-                        if (it == 0) {
-                            "--:--"
-                        } else {
-//                            throw Error(it.toString())
-//                            it.toString()
-                            SimpleDateFormat
-                                .getTimeInstance(DateFormat.SHORT)
-                                .format(
-                                    Date.from(
-                                        Instant.ofEpochMilli(
-                                            it.toLong() * 1000
-                                        )
-                                    )
-//                                    ZonedDateTime.ofInstant(
-//                                        Instant.ofEpochMilli(it),
-//                                        ZoneId.systemDefault(),
-//                                    )
+                        if (it == lastActTimeIsNotFound) null else java.lang.Double.longBitsToDouble(
+                            it
+                        ).toLong()
+                    }.let {
+                        if (it == null)
+                            defaultLastActTime
+                        else
+                            ZonedDateTime.ofInstant(
+                                Instant.ofEpochMilli(it),
+                                ZoneId.systemDefault(),
+                            ).format(
+                                DateTimeFormatter.ofLocalizedTime(
+                                    FormatStyle.SHORT
                                 )
-//                            SimpleDateFormat
-//                                .getTimeInstance(
-//                                    DateFormat.SHORT,
-//                                    Locale.getDefault(),
-//                                )
-//                                .format(it)
-//                            Calendar.getInstance().apply {
-//                                timeInMillis = it
-//                            }.let {
-//                                SimpleDateFormat
-//                                    .getTimeInstance(DateFormat.SHORT)
-//                                    .format(it.time)
-//                            }
-                        }
-                    },
-                )
-//                // Detect App opened via Click inside Flutter
-//                val pendingIntentWithData = HomeWidgetLaunchIntent.getActivity(
-//                    context,
-//                    MainActivity::class.java,
-//                    Uri.parse("${uriSchema}://message?message=$message")
-//                )
-//                setOnClickPendingIntent(
-//                    R.id.widget_message,
-//                    pendingIntentWithData
-//                )
+                            ).toString()
+                    }
+                    setTextViewText(
+                        R.id.last_act_time,
+                        lastUpdatedAtSeconds,
+                    )
 
-                setTextViewText(
-                    R.id.mem_name,
-                    widgetData.getString("memName-$memId", defaultMemName),
-                )
+                    setTextViewText(
+                        R.id.mem_name,
+                        widgetData.getString(
+                            "memName-$memId",
+                            defaultMemName,
+                        ),
+                    )
+                }
             }
 
             appWidgetManager.updateAppWidget(appWidgetId, views)

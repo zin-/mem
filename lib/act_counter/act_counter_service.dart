@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/services.dart';
 import 'package:mem/act_counter/all.dart';
 import 'package:mem/acts/act_repository.dart';
@@ -57,20 +58,21 @@ class ActCounterService {
             "actCount-$memId",
             acts.length,
           );
-          final lastUpdatedAt = acts
-                  .map((e) =>
-                      e.period.end?.millisecondsSinceEpoch ??
-                      e.period.start!.millisecondsSinceEpoch)
-                  .fold<int>(
-                    0,
-                    (previousValue, element) =>
-                        previousValue < element ? element : previousValue,
-                  )
-                  .toInt() /
-              1000;
+
+          final lastAct = acts
+              .sorted(
+                (a, b) => (a.updatedAt ?? a.createdAt!)
+                    .compareTo(b.updatedAt ?? b.createdAt!),
+              )
+              .lastOrNull;
+          final lastUpdatedAtSeconds = lastAct == null
+              ? null
+              : (lastAct.period.end ?? lastAct.period.start!)
+                  .millisecondsSinceEpoch
+                  .toDouble();
           await saveWidgetData(
-            "lastUpdatedAt-$memId",
-            dev(lastUpdatedAt.toInt()),
+            "lastUpdatedAtSeconds-$memId",
+            lastUpdatedAtSeconds,
           );
           await saveWidgetData(
             "memName-$memId",
