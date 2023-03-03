@@ -12,10 +12,12 @@ class ActCounterConfigure extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(fetchMemList);
-    ref
-        .read(memListViewModeProvider.notifier)
-        .updatedBy(MemListViewMode.singleSelection);
+    Future(() {
+      ref.watch(fetchMemList);
+      ref
+          .read(memListViewModeProvider.notifier)
+          .updatedBy(MemListViewMode.singleSelection);
+    });
 
     return const _ActCounterConfigureComponent();
   }
