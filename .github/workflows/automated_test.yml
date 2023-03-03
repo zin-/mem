@@ -36,7 +36,7 @@ jobs:
         platform: [android, windows]
         include:
           - platform: android
-            os: macOS-12
+            os: macos-latest
             android-api-level: 30
             android-tag: 'default'
             android-abi: 'x86_64'
