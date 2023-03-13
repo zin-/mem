@@ -91,7 +91,7 @@ void testActRepository() => group(
 
           test('with act', () async {
             final memId = await memTable.insert({
-              defMemName.name: 'with no data mem',
+              defMemName.name: 'with mem',
               createdAtColumnName: DateTime.now(),
             });
             assert(memId != withNoDataMemId);
