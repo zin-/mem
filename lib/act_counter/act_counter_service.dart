@@ -52,7 +52,22 @@ class ActCounterService {
         {'memId': memId},
         () async {
           final mem = await _memRepositoryV2.shipById(memId);
-          final acts = await _actRepository.shipByMemId(memId);
+
+          final now = DateAndTime.now();
+          DateAndTime start = DateAndTime(
+            now.year,
+            now.month,
+            now.hour < 5 ? now.day - 1 : now.day,
+            5,
+            0,
+          );
+          final acts = await _actRepository.shipByMemId(
+            memId,
+            period: DateAndTimePeriod(
+              start: start,
+              end: start.add(const Duration(days: 1)),
+            ),
+          );
 
           await saveWidgetData(
             "actCount-$memId",
