@@ -38,7 +38,8 @@ abstract class DatabaseTupleRepositoryV2<E extends DatabaseTupleEntityV2, P>
   Future<List<P>> ship([Condition? condition]) => v(
         {'condition': condition},
         () async {
-          final whereArgs = condition?.whereArgs();
+          final whereArgs =
+              condition?.whereArgs()?.expand((element) => element);
           return (await _table.select(
             whereString: condition?.whereString(),
             whereArgs: whereArgs,

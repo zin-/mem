@@ -1,3 +1,5 @@
+import 'package:mem/database/definitions/column_definition.dart';
+
 import 'types.dart';
 
 abstract class Condition {
@@ -79,4 +81,36 @@ class And extends Condition {
 
   @override
   String toString() => _conditions.map((e) => e.toString()).join(_operator);
+}
+
+class GraterThanOrEqual extends Condition {
+  final ColumnDefinition _columnDefinition;
+  final dynamic _value;
+
+  GraterThanOrEqual(this._columnDefinition, this._value);
+
+  @override
+  Iterable? whereArgs() => [_columnDefinition.toTuple(_value)];
+
+  @override
+  String whereString() => '? <= ${_columnDefinition.name}';
+
+  @override
+  String toString() => '$_value <= ${_columnDefinition.name}';
+}
+
+class LessThan extends Condition {
+  final ColumnDefinition _columnDefinition;
+  final dynamic _value;
+
+  LessThan(this._columnDefinition, this._value);
+
+  @override
+  Iterable? whereArgs() => [_columnDefinition.toTuple(_value)];
+
+  @override
+  String whereString() => '${_columnDefinition.name} < ?';
+
+  @override
+  String toString() => '${_columnDefinition.name} < $_value';
 }
