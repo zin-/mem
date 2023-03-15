@@ -77,7 +77,7 @@ class And extends Condition {
 
   @override
   Iterable<dynamic> whereArgs() =>
-      _conditions.map((e) => e.whereArgs()).whereType<Object>();
+      _conditions.map((e) => e.whereArgs()).expand((element) => element ?? []);
 
   @override
   String toString() => _conditions.map((e) => e.toString()).join(_operator);
