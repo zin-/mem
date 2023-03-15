@@ -20,28 +20,28 @@ class MemDetail {
 }
 
 class MemService {
-  final MemRepositoryV2 _memRepositoryV2;
-  final MemItemRepositoryV2 _memItemRepositoryV2;
+  final MemRepository _memRepository;
+  final MemItemRepository _memItemRepository;
   final NotificationService _notificationService;
 
   MemService._(
-    this._memRepositoryV2,
-    this._memItemRepositoryV2,
+    this._memRepository,
+    this._memItemRepository,
     this._notificationService,
   );
 
   static MemService? _instance;
 
   factory MemService({
-    MemRepositoryV2? memRepositoryV2,
-    MemItemRepositoryV2? memItemRepositoryV2,
+    MemRepository? memRepository,
+    MemItemRepository? memItemRepository,
     NotificationService? notificationService,
   }) {
     var tmp = _instance;
     if (tmp == null) {
       tmp = MemService._(
-        memRepositoryV2 ?? MemRepositoryV2(),
-        memItemRepositoryV2 ?? MemItemRepositoryV2(),
+        memRepository ?? MemRepository(),
+        memItemRepository ?? MemItemRepository(),
         notificationService ?? NotificationService(),
       );
       _instance = tmp;
@@ -54,15 +54,15 @@ class MemService {
         () async {
           Mem savedMem;
           if (memDetail.mem.isSaved() && !undo) {
-            savedMem = await _memRepositoryV2.replace(memDetail.mem);
+            savedMem = await _memRepository.replace(memDetail.mem);
           } else {
-            savedMem = await _memRepositoryV2.receive(memDetail.mem);
+            savedMem = await _memRepository.receive(memDetail.mem);
           }
 
           final savedMemItems = (await Future.wait(memDetail.memItems.map((e) =>
                   (e.isSaved() && !undo
-                          ? _memItemRepositoryV2.replace
-                          : _memItemRepositoryV2.receive)
+                          ? _memItemRepository.replace
+                          : _memItemRepository.receive)
                       .call(e..memId = savedMem.id))))
               .toList();
 
@@ -104,7 +104,7 @@ class MemService {
           'showNotDone': showNotDone,
           'showDone': showDone,
         },
-        () => _memRepositoryV2.shipByCondition(
+        () => _memRepository.shipByCondition(
           showNotArchived == showArchived ? null : showArchived,
           showNotDone == showDone ? null : showDone,
         ),
@@ -112,20 +112,20 @@ class MemService {
 
   Future<Mem> fetchMemById(int memId) => t(
         {'memId': memId},
-        () => _memRepositoryV2.shipById(memId),
+        () => _memRepository.shipById(memId),
       );
 
   Future<List<MemItem>> fetchMemItemsByMemId(int memId) => t(
         {'memId': memId},
-        () async => (await _memItemRepositoryV2.shipByMemId(memId)).toList(),
+        () async => (await _memItemRepository.shipByMemId(memId)).toList(),
       );
 
   Future<MemDetail> archive(Mem mem) => t(
         {'mem': mem},
         () async {
-          final archivedMem = await _memRepositoryV2.archive(mem);
+          final archivedMem = await _memRepository.archive(mem);
           final archivedMemItems =
-              (await _memItemRepositoryV2.archiveByMemId(archivedMem.id))
+              (await _memItemRepository.archiveByMemId(archivedMem.id))
                   .toList();
 
           _notificationService.memReminder(archivedMem);
@@ -140,9 +140,9 @@ class MemService {
   Future<MemDetail> unarchive(Mem mem) => t(
         {'mem': mem},
         () async {
-          final unarchivedMem = await _memRepositoryV2.unarchive(mem);
+          final unarchivedMem = await _memRepository.unarchive(mem);
           final unarchivedMemItems =
-              (await _memItemRepositoryV2.unarchiveByMemId(unarchivedMem.id))
+              (await _memItemRepository.unarchiveByMemId(unarchivedMem.id))
                   .toList();
 
           _notificationService.memReminder(unarchivedMem);
@@ -157,8 +157,8 @@ class MemService {
   Future<bool> remove(int memId) => t(
         {'memId': memId},
         () async {
-          await _memItemRepositoryV2.wasteByMemId(memId);
-          await _memRepositoryV2.wasteById(memId);
+          await _memItemRepository.wasteByMemId(memId);
+          await _memRepository.wasteById(memId);
 
           // FIXME 関数内でMemを保持していないためRepositoryを参照している
           // discardされた時点でMemは存在しなくなるため、どちらにせよ無理筋かも

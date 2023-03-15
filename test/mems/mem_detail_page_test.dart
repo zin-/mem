@@ -22,10 +22,10 @@ import '../gui/date_and_time_text_form_field_test.dart';
 import 'mem_detail_body_test.dart';
 
 void main() {
-  final mockedMemRepositoryV2 = MockMemRepositoryV2();
-  MemRepositoryV2.resetWith(mockedMemRepositoryV2);
-  final mockedMemItemRepository = MockMemItemRepositoryV2();
-  MemItemRepositoryV2.resetWith(mockedMemItemRepository);
+  final mockedMemRepository = MockMemRepository();
+  MemRepository.resetWith(mockedMemRepository);
+  final mockedMemItemRepository = MockMemItemRepository();
+  MemItemRepository.resetWith(mockedMemItemRepository);
   final mockedNotificationRepository = MockNotificationRepository();
   NotificationRepository.reset(mockedNotificationRepository);
 
@@ -39,7 +39,7 @@ void main() {
       ': found Mem',
       (widgetTester) async {
         final savedMem = minSavedMem(1);
-        when(mockedMemRepositoryV2.shipById(savedMem.id))
+        when(mockedMemRepository.shipById(savedMem.id))
             .thenAnswer((realInvocation) async => savedMem);
         final savedMemoMemItemEntity = minSavedMemItem(savedMem.id, 1);
         when(mockedMemItemRepository.shipByMemId(savedMem.id)).thenAnswer(
@@ -50,7 +50,7 @@ void main() {
 
         await pumpMemDetailPage(widgetTester, savedMem.id);
 
-        verify(mockedMemRepositoryV2.shipById(savedMem.id)).called(1);
+        verify(mockedMemRepository.shipById(savedMem.id)).called(1);
         verify(mockedMemItemRepository.shipByMemId(savedMem.id)).called(1);
 
         await widgetTester.pumpAndSettle();
@@ -86,7 +86,7 @@ void main() {
         await pickNowTimeOfDay(widgetTester, okButton);
         await widgetTester.pump();
 
-        when(mockedMemRepositoryV2.receive(any)).thenAnswer((realInvocation) {
+        when(mockedMemRepository.receive(any)).thenAnswer((realInvocation) {
           final mem = realInvocation.positionalArguments[0] as Mem;
 
           return Future.value(Mem(
@@ -125,7 +125,7 @@ void main() {
         await widgetTester.tap(saveFabFinder);
         await widgetTester.pumpAndSettle();
 
-        verify(mockedMemRepositoryV2.receive(any)).called(1);
+        verify(mockedMemRepository.receive(any)).called(1);
         verify(mockedMemItemRepository.receive(any)).called(1);
         verify(mockedNotificationRepository.receive(
                 any, any, any, any, any, any, any))
@@ -137,7 +137,7 @@ void main() {
 
         expect(saveMemSuccessFinder(enteringMemName), findsNothing);
 
-        verifyNever(mockedMemRepositoryV2.shipById(memId));
+        verifyNever(mockedMemRepository.shipById(memId));
       },
       tags: TestSize.small,
     );
@@ -148,7 +148,7 @@ void main() {
         const memId = 1;
 
         final savedMem = minSavedMem(memId);
-        when(mockedMemRepositoryV2.shipById(any))
+        when(mockedMemRepository.shipById(any))
             .thenAnswer((realInvocation) async => savedMem);
         final savedMemoMemItemEntity = minSavedMemItem(savedMem.id, 1);
         when(mockedMemItemRepository.shipByMemId(any))
@@ -159,7 +159,7 @@ void main() {
 
         await pumpMemDetailPage(widgetTester, savedMem.id);
 
-        verify(mockedMemRepositoryV2.shipById(savedMem.id)).called(1);
+        verify(mockedMemRepository.shipById(savedMem.id)).called(1);
 
         await widgetTester.pump();
 
@@ -171,7 +171,7 @@ void main() {
         await widgetTester.enterText(
             memMemoTextFormFieldFinder, enteringMemMemo);
 
-        when(mockedMemRepositoryV2.replace(any))
+        when(mockedMemRepository.replace(any))
             .thenAnswer((realInvocation) async {
           final mem = realInvocation.positionalArguments[0] as Mem;
 
@@ -216,7 +216,7 @@ void main() {
         await widgetTester.tap(saveFabFinder);
         await widgetTester.pumpAndSettle();
 
-        verify(mockedMemRepositoryV2.replace(any)).called(1);
+        verify(mockedMemRepository.replace(any)).called(1);
         verify(mockedMemItemRepository.replace(any)).called(1);
         verify(mockedNotificationRepository.receive(
                 any, any, any, any, any, any, any))
@@ -243,8 +243,8 @@ void main() {
 
         expect(find.text('Name is required'), findsNothing);
 
-        verifyNever(mockedMemRepositoryV2.shipById(any));
-        verifyNever(mockedMemRepositoryV2.receive(any));
+        verifyNever(mockedMemRepository.shipById(any));
+        verifyNever(mockedMemRepository.receive(any));
       },
       tags: TestSize.small,
     );

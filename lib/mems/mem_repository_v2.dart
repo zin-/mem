@@ -8,7 +8,7 @@ import 'package:mem/repositories/i/_database_tuple_repository_v2.dart';
 import 'package:mem/repositories/i/conditions.dart';
 import 'package:mem/repositories/mem_entity.dart';
 
-class MemRepositoryV2 extends DatabaseTupleRepositoryV2<MemEntityV2, Mem> {
+class MemRepository extends DatabaseTupleRepository<MemEntity, Mem> {
   Future<List<Mem>> shipByCondition(bool? archived, bool? done) => v(
           {
             'archived': archived,
@@ -44,7 +44,7 @@ class MemRepositoryV2 extends DatabaseTupleRepositoryV2<MemEntityV2, Mem> {
 
   @override
   Mem pack(UnpackedPayload unpackedPayload) {
-    final memEntity = MemEntityV2.fromMap(unpackedPayload);
+    final memEntity = MemEntity.fromMap(unpackedPayload);
 
     final notifyOn = memEntity.notifyOn;
 
@@ -64,22 +64,22 @@ class MemRepositoryV2 extends DatabaseTupleRepositoryV2<MemEntityV2, Mem> {
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 
-  MemRepositoryV2._(super.table);
+  MemRepository._(super.table);
 
-  static MemRepositoryV2? _instance;
+  static MemRepository? _instance;
 
-  factory MemRepositoryV2([db.Table? table]) {
+  factory MemRepository([db.Table? table]) {
     var tmp = _instance;
 
     if (tmp == null) {
       if (table == null) {
         throw InitializationError();
       }
-      _instance = tmp = MemRepositoryV2._(table);
+      _instance = tmp = MemRepository._(table);
     }
 
     return tmp;
   }
 
-  static resetWith(MemRepositoryV2? memRepository) => _instance = memRepository;
+  static resetWith(MemRepository? memRepository) => _instance = memRepository;
 }

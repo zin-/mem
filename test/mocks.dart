@@ -6,8 +6,8 @@ import 'package:mockito/annotations.dart';
 @GenerateMocks([
   // FIXME RepositoryではなくTableをmockする
   //  Repositoryはシステム固有の処理であるのに対して、Tableは永続仮想をラップする役割を持つため
-  MemRepositoryV2,
-  MemItemRepositoryV2,
+  MemRepository,
+  MemItemRepository,
   NotificationRepository,
 ])
 void main() {}

@@ -24,7 +24,7 @@ final actTableDefinition = DefT(
   ],
 );
 
-class ActEntity extends DatabaseTupleEntityV2 {
+class ActEntity extends DatabaseTupleEntity {
   final MemId memId;
   final DateTime start;
   final bool startIsAllDay;

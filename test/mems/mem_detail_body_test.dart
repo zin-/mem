@@ -19,13 +19,13 @@ import '../samples.dart';
 import '../mocks.mocks.dart';
 
 void main() {
-  final mockedMemRepositoryV2 = MockMemRepositoryV2();
-  MemRepositoryV2.resetWith(mockedMemRepositoryV2);
-  final mockedMemItemRepository = MockMemItemRepositoryV2();
-  MemItemRepositoryV2.resetWith(mockedMemItemRepository);
+  final mockedMemRepository = MockMemRepository();
+  MemRepository.resetWith(mockedMemRepository);
+  final mockedMemItemRepository = MockMemItemRepository();
+  MemItemRepository.resetWith(mockedMemItemRepository);
 
   tearDown(() {
-    reset(mockedMemRepositoryV2);
+    reset(mockedMemRepository);
     reset(mockedMemItemRepository);
   });
 
@@ -76,7 +76,7 @@ void main() {
 
         await pumpMemDetailBody(widgetTester, null, mem: mem);
 
-        verifyNever(mockedMemRepositoryV2.shipById(any));
+        verifyNever(mockedMemRepository.shipById(any));
         verifyNever(mockedMemItemRepository.shipByMemId(any));
 
         await widgetTester.pumpAndSettle();
@@ -107,7 +107,7 @@ void main() {
           mem: savedMem,
         );
 
-        verifyNever(mockedMemRepositoryV2.shipById(any));
+        verifyNever(mockedMemRepository.shipById(any));
         verify(mockedMemItemRepository.shipByMemId(savedMem.id)).called(1);
 
         await widgetTester.pumpAndSettle();

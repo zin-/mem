@@ -14,7 +14,7 @@ const methodChannelName = 'zin.playground.mem/act_counter';
 const initializeMethodName = 'initialize';
 
 class ActCounterService {
-  final MemRepositoryV2 _memRepositoryV2;
+  final MemRepository _memRepository;
   final ActRepository _actRepository;
 
   createNew(MemId memId) => t(
@@ -51,7 +51,7 @@ class ActCounterService {
   updateActCounter(MemId memId) => v(
         {'memId': memId},
         () async {
-          final mem = await _memRepositoryV2.shipById(memId);
+          final mem = await _memRepository.shipById(memId);
 
           final now = DateAndTime.now();
           DateAndTime start = DateAndTime(
@@ -98,18 +98,18 @@ class ActCounterService {
         },
       );
 
-  ActCounterService._(this._memRepositoryV2, this._actRepository);
+  ActCounterService._(this._memRepository, this._actRepository);
 
   static ActCounterService? _instance;
 
   factory ActCounterService({
-    MemRepositoryV2? memRepositoryV2,
+    MemRepository? memRepository,
     ActRepository? actRepository,
   }) {
     var tmp = _instance;
     if (tmp == null) {
       _instance = tmp = ActCounterService._(
-        memRepositoryV2 ?? MemRepositoryV2(),
+        memRepository ?? MemRepository(),
         actRepository ?? ActRepository(),
       );
     }

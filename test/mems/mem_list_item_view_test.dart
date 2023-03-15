@@ -44,15 +44,15 @@ void main() {
     );
   }
 
-  final mockedMemRepositoryV2 = MockMemRepositoryV2();
-  MemRepositoryV2.resetWith(mockedMemRepositoryV2);
-  final mockedMemItemRepository = MockMemItemRepositoryV2();
-  MemItemRepositoryV2.resetWith(mockedMemItemRepository);
+  final mockedMemRepository = MockMemRepository();
+  MemRepository.resetWith(mockedMemRepository);
+  final mockedMemItemRepository = MockMemItemRepository();
+  MemItemRepository.resetWith(mockedMemItemRepository);
   final mockedNotificationRepository = MockNotificationRepository();
   NotificationRepository.reset(mockedNotificationRepository);
 
   tearDown(() {
-    reset(mockedMemRepositoryV2);
+    reset(mockedMemRepository);
     reset(mockedMemItemRepository);
     reset(mockedNotificationRepository);
   });
@@ -131,7 +131,7 @@ void main() {
           );
           await widgetTester.pump();
 
-          when(mockedMemRepositoryV2.shipById(any))
+          when(mockedMemRepository.shipById(any))
               .thenAnswer((realInvocation) async {
             final arg1 = realInvocation.positionalArguments[0];
 
@@ -139,7 +139,7 @@ void main() {
 
             return savedMem;
           });
-          when(mockedMemRepositoryV2.replace(any))
+          when(mockedMemRepository.replace(any))
               .thenAnswer((realInvocation) async {
             final arg1 = realInvocation.positionalArguments[0] as Mem;
 
@@ -165,9 +165,9 @@ void main() {
 
           await widgetTester.tap(find.byType(Checkbox));
 
-          verify(mockedMemRepositoryV2.shipById(memId)).called(1);
+          verify(mockedMemRepository.shipById(memId)).called(1);
           expect(
-            verify(mockedMemRepositoryV2.replace(captureAny)).captured,
+            verify(mockedMemRepository.replace(captureAny)).captured,
             [savedMem],
           );
           verify(mockedNotificationRepository.discard(memId)).called(1);
@@ -201,7 +201,7 @@ void main() {
           );
           await widgetTester.pump();
 
-          when(mockedMemRepositoryV2.shipById(any))
+          when(mockedMemRepository.shipById(any))
               .thenAnswer((realInvocation) async {
             final arg1 = realInvocation.positionalArguments[0];
 
@@ -209,7 +209,7 @@ void main() {
 
             return savedMem;
           });
-          when(mockedMemRepositoryV2.replace(any))
+          when(mockedMemRepository.replace(any))
               .thenAnswer((realInvocation) async {
             final arg1 = realInvocation.positionalArguments[0] as Mem;
 
@@ -235,9 +235,9 @@ void main() {
 
           await widgetTester.tap(find.byType(Checkbox));
 
-          verify(mockedMemRepositoryV2.shipById(memId)).called(1);
+          verify(mockedMemRepository.shipById(memId)).called(1);
           expect(
-            verify(mockedMemRepositoryV2.replace(captureAny)).captured,
+            verify(mockedMemRepository.replace(captureAny)).captured,
             [savedMem],
           );
 

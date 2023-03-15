@@ -27,8 +27,8 @@ Future clearDatabase() async {
   await DatabaseManager(onTest: true).open(app.databaseDefinition);
   await DatabaseManager(onTest: true).delete(app.databaseDefinition.name);
 
-  MemRepositoryV2.resetWith(null);
-  MemItemRepositoryV2.resetWith(null);
+  MemRepository.resetWith(null);
+  MemItemRepository.resetWith(null);
 
   MemService.reset(null);
 }
@@ -121,7 +121,7 @@ Future<void> prepareSavedMem(
       (await DatabaseManager(onTest: true).open(app.databaseDefinition))
           .getTable(memTableDefinition.name);
 
-  await MemRepositoryV2(memTable).receive(Mem(
+  await MemRepository(memTable).receive(Mem(
       name: memName,
       id: null,
       notifyAtV2: DateAndTime(
@@ -134,7 +134,7 @@ Future<void> prepareSavedMem(
 
   await DatabaseManager(onTest: true).close(app.databaseDefinition.name);
 
-  MemRepositoryV2.resetWith(null);
+  MemRepository.resetWith(null);
 }
 
 Future<void> runTestWidget(WidgetTester widgetTester, Widget widget) =>

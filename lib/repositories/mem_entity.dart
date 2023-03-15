@@ -20,13 +20,13 @@ final memTableDefinition = DefT(
   ],
 );
 
-class MemEntityV2 extends DatabaseTupleEntityV2 {
+class MemEntity extends DatabaseTupleEntity {
   final String name;
   final DateTime? doneAt;
   final DateTime? notifyOn;
   final DateTime? notifyAt;
 
-  MemEntityV2(
+  MemEntity(
     this.name, {
     this.doneAt,
     this.notifyOn,
@@ -34,7 +34,7 @@ class MemEntityV2 extends DatabaseTupleEntityV2 {
     int? super.id,
   });
 
-  MemEntityV2.fromMap(Map<String, dynamic> valueMap)
+  MemEntity.fromMap(Map<String, dynamic> valueMap)
       : name = valueMap[defMemName.name],
         doneAt = valueMap[defMemDoneAt.name],
         notifyOn = valueMap[defMemNotifyOn.name],

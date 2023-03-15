@@ -47,10 +47,10 @@ Future<void> run(Widget home, {String? languageCode}) async {
 Future<Database> openDatabase() async {
   final database = await DatabaseManager().open(databaseDefinition);
 
-  MemRepositoryV2(
+  MemRepository(
     database.getTable(memTableDefinition.name),
   );
-  MemItemRepositoryV2(
+  MemItemRepository(
     database.getTable(memItemTableDefinition.name),
   );
   ActRepository(

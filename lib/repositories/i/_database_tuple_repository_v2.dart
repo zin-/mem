@@ -8,11 +8,11 @@ import 'conditions.dart';
 
 typedef UnpackedPayload = Map<AttributeName, dynamic>;
 
-abstract class DatabaseTupleRepositoryV2<E extends DatabaseTupleEntityV2, P>
+abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
     implements RepositoryV2<E, P> {
   final Table _table;
 
-  DatabaseTupleRepositoryV2(this._table);
+  DatabaseTupleRepository(this._table);
 
   UnpackedPayload unpack(P payload);
 

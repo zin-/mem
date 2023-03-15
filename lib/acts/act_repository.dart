@@ -9,7 +9,7 @@ import 'package:mem/logger/i/api.dart';
 import 'package:mem/repositories/i/_database_tuple_repository_v2.dart';
 import 'package:mem/repositories/i/conditions.dart';
 
-class ActRepository extends DatabaseTupleRepositoryV2<ActEntity, Act> {
+class ActRepository extends DatabaseTupleRepository<ActEntity, Act> {
   Future<List<Act>> shipByMemId(
     MemId memId, {
     DateAndTimePeriod? period,
