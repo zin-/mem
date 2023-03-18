@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/services.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:mem/act_counter/act_counter.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/repositories/_repository_v2.dart';
+
+import '../main.dart';
 
 // see android\app\src\main\kotlin\zin\playground\mem\ActCounterConfigure.kt
 const methodChannelName = 'zin.playground.mem/act_counter';
@@ -76,4 +80,10 @@ class ActCounterRepository extends RepositoryV2<ActCounter, ActCounter> {
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+void initializeActCounter() {
+  if (!Platform.isWindows) {
+    HomeWidget.registerBackgroundCallback(backgroundCallback);
+  }
 }
