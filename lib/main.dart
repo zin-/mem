@@ -27,23 +27,27 @@ final databaseDefinition = DefD(
 );
 
 Future<void> main({String? languageCode}) async {
+  initializeLogger();
   run(MemListPage(), languageCode: languageCode);
 }
 
 @pragma('vm:entry-point')
 launchActCounterConfigure() async {
+  initializeLogger();
   run(const ActCounterConfigure());
 }
 
-Future<void> run(Widget home, {String? languageCode}) async {
-  WidgetsFlutterBinding.ensureInitialized();
+Future<void> run(Widget home, {String? languageCode}) => t(
+      {'home': home, 'languageCode': languageCode},
+      () async {
+        WidgetsFlutterBinding.ensureInitialized();
 
-  initializeLogger();
-  await openDatabase();
-  initializeActCounter();
+        await openDatabase();
+        initializeActCounter();
 
-  runApp(MemApplication(home, languageCode));
-}
+        runApp(MemApplication(home, languageCode));
+      },
+    );
 
 Future<Database> openDatabase() async {
   final database = await DatabaseManager().open(databaseDefinition);
