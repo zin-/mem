@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
-import 'package:flutter/services.dart';
-import 'package:mem/act_counter/all.dart';
+import 'package:mem/act_counter/act_counter.dart';
+import 'package:mem/act_counter/act_counter_repository.dart';
 import 'package:mem/acts/act_repository.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time.dart';
@@ -9,28 +9,17 @@ import 'package:mem/core/mem.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 
-// see android\app\src\main\kotlin\zin\playground\mem\ActCounterConfigure.kt
-const methodChannelName = 'zin.playground.mem/act_counter';
-const initializeMethodName = 'initialize';
-
 class ActCounterService {
   final MemRepository _memRepository;
   final ActRepository _actRepository;
+  final ActCounterRepository _actCounterRepository;
 
   createNew(MemId memId) => t(
         {'memId': memId},
         () async {
-          const methodChannel = MethodChannel(methodChannelName);
-          final homeWidgetId =
-              await methodChannel.invokeMethod(initializeMethodName);
-          if (homeWidgetId != null) {
-            await saveWidgetData(
-              "memId-$homeWidgetId",
-              memId,
-            );
+          await _actCounterRepository.receive(ActCounter(memId));
 
-            await updateActCounter(memId);
-          }
+          await updateActCounter(memId);
         },
       );
 
@@ -69,48 +58,45 @@ class ActCounterService {
             ),
           );
 
-          await saveWidgetData(
-            "actCount-$memId",
-            acts.length,
-          );
-
           final lastAct = acts
               .sorted(
                 (a, b) => (a.updatedAt ?? a.createdAt!)
                     .compareTo(b.updatedAt ?? b.createdAt!),
               )
               .lastOrNull;
-          final lastUpdatedAtSeconds = lastAct == null
-              ? null
-              : (lastAct.period.end ?? lastAct.period.start!)
-                  .millisecondsSinceEpoch
-                  .toDouble();
-          await saveWidgetData(
-            "lastUpdatedAtSeconds-$memId",
-            lastUpdatedAtSeconds,
-          );
-          await saveWidgetData(
-            "memName-$memId",
-            mem.name,
+
+          final actCounter = ActCounter(
+            memId,
+            name: mem.name,
+            actCount: acts.length,
+            lastUpdatedAt: lastAct == null
+                ? null
+                : (lastAct.period.end ?? lastAct.period.start!),
           );
 
-          await updateWidget();
+          _actCounterRepository.replace(actCounter);
         },
       );
 
-  ActCounterService._(this._memRepository, this._actRepository);
+  ActCounterService._(
+    this._memRepository,
+    this._actRepository,
+    this._actCounterRepository,
+  );
 
   static ActCounterService? _instance;
 
   factory ActCounterService({
     MemRepository? memRepository,
     ActRepository? actRepository,
+    ActCounterRepository? actCounterRepository,
   }) {
     var tmp = _instance;
     if (tmp == null) {
       _instance = tmp = ActCounterService._(
         memRepository ?? MemRepository(),
         actRepository ?? ActRepository(),
+        actCounterRepository ?? ActCounterRepository(),
       );
     }
     return tmp;

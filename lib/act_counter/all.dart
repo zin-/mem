@@ -31,7 +31,3 @@ void initializeActCounter() {
     HomeWidget.registerBackgroundCallback(backgroundCallback);
   }
 }
-
-saveWidgetData(id, data) => HomeWidget.saveWidgetData(id, data);
-
-updateWidget() => HomeWidget.updateWidget(name: 'ActCounterProvider');
