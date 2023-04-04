@@ -1,5 +1,7 @@
 name: 'Automated test'
-on: push
+on:
+  - push
+  - workflow_dispatch
 env:
   flutter-version: 3.3.4
   flutter-channel: 'stable'

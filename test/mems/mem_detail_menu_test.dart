@@ -12,13 +12,13 @@ import '../samples.dart';
 import 'mem_detail_page_test.dart';
 
 void main() {
-  final mockedMemRepositoryV2 = MockMemRepositoryV2();
-  MemRepositoryV2.resetWith(mockedMemRepositoryV2);
-  final mockedMemItemRepository = MockMemItemRepositoryV2();
-  MemItemRepositoryV2.resetWith(mockedMemItemRepository);
+  final mockedMemRepository = MockMemRepository();
+  MemRepository.resetWith(mockedMemRepository);
+  final mockedMemItemRepository = MockMemItemRepository();
+  MemItemRepository.resetWith(mockedMemItemRepository);
 
   tearDown(() {
-    reset(mockedMemRepositoryV2);
+    reset(mockedMemRepository);
     reset(mockedMemItemRepository);
   });
 
@@ -70,12 +70,12 @@ void main() {
         ..createdAt = DateTime.now()
         ..archivedAt = DateTime.now();
 
-      when(mockedMemRepositoryV2.shipById(any))
+      when(mockedMemRepository.shipById(any))
           .thenAnswer((realInvocation) async => mem);
       when(mockedMemItemRepository.shipByMemId(any)).thenAnswer(
           (realInvocation) async =>
               [minSavedMemItem(memId, 1, value: memMemo)]);
-      when(mockedMemRepositoryV2.unarchive(any))
+      when(mockedMemRepository.unarchive(any))
           .thenAnswer((realInvocation) async {
         final mem = realInvocation.positionalArguments[0] as Mem;
 
@@ -96,8 +96,8 @@ void main() {
       await widgetTester.tap(unarchiveButtonFinder);
       expect(memDetailAppBar(widgetTester).backgroundColor, archivedColor);
 
-      verify(mockedMemRepositoryV2.shipById(memId)).called(1);
-      verify(mockedMemRepositoryV2.unarchive(any)).called(1);
+      verify(mockedMemRepository.shipById(memId)).called(1);
+      verify(mockedMemRepository.unarchive(any)).called(1);
     },
     tags: TestSize.small,
   );

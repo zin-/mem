@@ -1,12 +1,12 @@
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/repositories/i/_database_tuple_entity_v2.dart';
 
-class MemItemEntityV2 extends DatabaseTupleEntityV2 {
+class MemItemEntity extends DatabaseTupleEntity {
   int? memId;
   MemItemType type;
   dynamic value;
 
-  MemItemEntityV2({
+  MemItemEntity({
     required this.memId,
     required this.type,
     this.value,

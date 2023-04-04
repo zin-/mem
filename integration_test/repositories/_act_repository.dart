@@ -89,28 +89,89 @@ void testActRepository() => group(
             expect(actual.length, 0);
           });
 
-          test('with act', () async {
-            final memId = await memTable.insert({
-              defMemName.name: 'with no data mem',
-              createdAtColumnName: DateTime.now(),
-            });
-            assert(memId != withNoDataMemId);
-            final now = DateTime.now();
-            actTable.insert({
-              fkDefMemId.name: memId,
-              defActStart.name: now,
-              defActStartIsAllDay.name: 0,
-              createdAtColumnName: DateTime.now(),
+          group('with act', () {
+            test('only memId', () async {
+              final memId = await memTable.insert({
+                defMemName.name: 'with mem',
+                createdAtColumnName: DateTime.now(),
+              });
+              assert(memId != withNoDataMemId);
+              final now = DateTime.now();
+              await actTable.insert({
+                fkDefMemId.name: memId,
+                defActStart.name: now,
+                defActStartIsAllDay.name: 0,
+                createdAtColumnName: DateTime.now(),
+              });
+
+              final actual = await actRepository.shipByMemId(memId);
+
+              expect(
+                actual.toString(),
+                [
+                  Act(memId, DateAndTimePeriod(start: DateAndTime.from(now))),
+                ].toString(),
+              );
             });
 
-            final actual = await actRepository.shipByMemId(memId);
+            test(' and period', () async {
+              final memId = await memTable.insert({
+                defMemName.name: 'with mem',
+                createdAtColumnName: DateTime.now(),
+              });
+              assert(memId != withNoDataMemId);
+              final now = DateTime.now();
+              await actTable.insert({
+                fkDefMemId.name: memId,
+                defActStart.name: now,
+                defActStartIsAllDay.name: 0,
+                createdAtColumnName: DateTime.now(),
+              });
+              const diff = Duration(days: 1);
+              final yesterday = now.subtract(diff);
+              await actTable.insert({
+                fkDefMemId.name: memId,
+                defActStart.name: yesterday,
+                defActStartIsAllDay.name: 0,
+                createdAtColumnName: DateTime.now(),
+              });
+              await actTable.insert({
+                fkDefMemId.name: memId,
+                defActStart.name: yesterday.subtract(diff),
+                defActStartIsAllDay.name: 0,
+                createdAtColumnName: DateTime.now(),
+              });
+              final tomorrow = now.add(diff);
+              await actTable.insert({
+                fkDefMemId.name: memId,
+                defActStart.name: tomorrow,
+                defActStartIsAllDay.name: 0,
+                createdAtColumnName: DateTime.now(),
+              });
+              await actTable.insert({
+                fkDefMemId.name: memId,
+                defActStart.name: tomorrow.add(diff),
+                defActStartIsAllDay.name: 0,
+                createdAtColumnName: DateTime.now(),
+              });
 
-            expect(
-              actual.toString(),
-              [
-                Act(memId, DateAndTimePeriod(start: DateAndTime.from(now))),
-              ].toString(),
-            );
+              final actual = await actRepository.shipByMemId(
+                memId,
+                period: DateAndTimePeriod(
+                  start: DateAndTime.fromV2(yesterday, timeOfDay: yesterday),
+                  end: DateAndTime.fromV2(tomorrow, timeOfDay: tomorrow),
+                ),
+              );
+
+              expect(
+                actual.toString(),
+                [
+                  Act(memId, DateAndTimePeriod(start: DateAndTime.from(now))),
+                  Act(memId,
+                      DateAndTimePeriod(start: DateAndTime.from(yesterday))),
+                ].toString(),
+              );
+            });
           });
         });
       },

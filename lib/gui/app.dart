@@ -3,12 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/gui/colors.dart';
-import 'package:mem/mems/mem_list_page.dart';
 
 class MemApplication extends StatelessWidget {
+  final Widget home;
   final String? languageCode;
 
-  const MemApplication(this.languageCode, {Key? key}) : super(key: key);
+  const MemApplication(this.home, this.languageCode, {Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) => t(
@@ -25,7 +26,7 @@ class MemApplication extends StatelessWidget {
                 color: primaryColor,
               ),
             ),
-            home: MemListPage(),
+            home: home,
           ),
         ),
       );

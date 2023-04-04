@@ -31,13 +31,13 @@ Future pumpMemListPage(WidgetTester widgetTester) async {
 }
 
 void main() {
-  final mockedMemRepositoryV2 = MockMemRepositoryV2();
-  MemRepositoryV2.resetWith(mockedMemRepositoryV2);
-  final mockedMemItemRepository = MockMemItemRepositoryV2();
-  MemItemRepositoryV2.resetWith(mockedMemItemRepository);
+  final mockedMemRepository = MockMemRepository();
+  MemRepository.resetWith(mockedMemRepository);
+  final mockedMemItemRepository = MockMemItemRepository();
+  MemItemRepository.resetWith(mockedMemItemRepository);
 
   tearDown(() {
-    reset(mockedMemRepositoryV2);
+    reset(mockedMemRepository);
     reset(mockedMemItemRepository);
   });
 
@@ -58,7 +58,7 @@ void main() {
       // )).thenAnswer(
       //   (realInvocation) => Future.value(memEntities),
       // );
-      when(mockedMemRepositoryV2.shipByCondition(any, any)).thenAnswer(
+      when(mockedMemRepository.shipByCondition(any, any)).thenAnswer(
         (realInvocation) => Future.value(mems),
       );
 
@@ -70,7 +70,7 @@ void main() {
       //   done: false,
       // )).called(1);
       expect(
-        verify(mockedMemRepositoryV2.shipByCondition(
+        verify(mockedMemRepository.shipByCondition(
           captureAny,
           captureAny,
         )).captured,
@@ -103,13 +103,13 @@ void main() {
           ..name = 'done'
           ..doneAt = DateTime.now();
 
-        when(mockedMemRepositoryV2.shipByCondition(any, any)).thenAnswer(
+        when(mockedMemRepository.shipByCondition(any, any)).thenAnswer(
           (realInvocation) => Future.value([notArchived, notDone]),
         );
 
         await pumpMemListPage(widgetTester);
         await widgetTester.pumpAndSettle();
-        verify(mockedMemRepositoryV2.shipByCondition(
+        verify(mockedMemRepository.shipByCondition(
           false,
           false,
         )).called(1);
@@ -157,13 +157,13 @@ void main() {
             [notArchived2, archived2, notArchived, archived],
           ];
 
-          when(mockedMemRepositoryV2.shipByCondition(any, any)).thenAnswer(
+          when(mockedMemRepository.shipByCondition(any, any)).thenAnswer(
             (realInvocation) => Future.value(returns.removeAt(0)),
           );
 
           await pumpMemListPage(widgetTester);
           await widgetTester.pumpAndSettle();
-          verify(mockedMemRepositoryV2.shipByCondition(
+          verify(mockedMemRepository.shipByCondition(
             false,
             false,
           )).called(1);
@@ -180,7 +180,7 @@ void main() {
           await widgetTester.pumpAndSettle();
           await widgetTester.tap(findShowNotArchiveSwitch);
           await widgetTester.pumpAndSettle();
-          verify(mockedMemRepositoryV2.shipByCondition(
+          verify(mockedMemRepository.shipByCondition(
             null,
             false,
           )).called(1);
@@ -194,7 +194,7 @@ void main() {
           // showNotArchived: false, showArchived: true
           await widgetTester.tap(findShowArchiveSwitch);
           await widgetTester.pumpAndSettle();
-          verify(mockedMemRepositoryV2.shipByCondition(
+          verify(mockedMemRepository.shipByCondition(
             true,
             false,
           )).called(1);
@@ -208,7 +208,7 @@ void main() {
           // showNotArchived: true, showArchived: true
           await widgetTester.tap(findShowNotArchiveSwitch);
           await widgetTester.pumpAndSettle();
-          verify(mockedMemRepositoryV2.shipByCondition(
+          verify(mockedMemRepository.shipByCondition(
             null,
             false,
           )).called(1);
@@ -243,13 +243,13 @@ void main() {
             [done2, done],
             [notDone2, done2, notDone, done],
           ];
-          when(mockedMemRepositoryV2.shipByCondition(any, any)).thenAnswer(
+          when(mockedMemRepository.shipByCondition(any, any)).thenAnswer(
             (realInvocation) => Future.value(returns.removeAt(0)),
           );
 
           await pumpMemListPage(widgetTester);
           await widgetTester.pumpAndSettle();
-          verify(mockedMemRepositoryV2.shipByCondition(
+          verify(mockedMemRepository.shipByCondition(
             false,
             false,
           )).called(1);
@@ -266,7 +266,7 @@ void main() {
           await widgetTester.pumpAndSettle();
           await widgetTester.tap(findShowNotDoneSwitch);
           await widgetTester.pumpAndSettle();
-          verify(mockedMemRepositoryV2.shipByCondition(
+          verify(mockedMemRepository.shipByCondition(
             false,
             null,
           )).called(1);
@@ -280,7 +280,7 @@ void main() {
           // showNotDone: false, showDone: true
           await widgetTester.tap(findShowDoneSwitch);
           await widgetTester.pumpAndSettle();
-          verify(mockedMemRepositoryV2.shipByCondition(
+          verify(mockedMemRepository.shipByCondition(
             false,
             true,
           )).called(1);
@@ -294,7 +294,7 @@ void main() {
           // showNotDone: true, showDone: true
           await widgetTester.tap(findShowNotDoneSwitch);
           await widgetTester.pumpAndSettle();
-          verify(mockedMemRepositoryV2.shipByCondition(
+          verify(mockedMemRepository.shipByCondition(
             false,
             null,
           )).called(1);
@@ -363,7 +363,7 @@ void main() {
             nowDate.add(const Duration(days: 1)),
           );
 
-        when(mockedMemRepositoryV2.shipByCondition(any, any))
+        when(mockedMemRepository.shipByCondition(any, any))
             .thenAnswer((realInvocation) => Future.value([
                   notifyOnNow,
                   notifyOnIsNull,
@@ -403,7 +403,7 @@ void main() {
             ..archivedAt = null
             ..notifyAtV2 = DateAndTime.now();
 
-          when(mockedMemRepositoryV2.shipByCondition(any, any))
+          when(mockedMemRepository.shipByCondition(any, any))
               .thenAnswer((realInvocation) => Future.value([
                     notifyAV2tIsNull,
                     notifyAtV2IsNowNotAllDay,
@@ -429,7 +429,7 @@ void main() {
             ..name = 'notifyAtV2 is now(is not allDay)'
             ..notifyAtV2 = DateAndTime.now();
 
-          when(mockedMemRepositoryV2.shipByCondition(any, any))
+          when(mockedMemRepository.shipByCondition(any, any))
               .thenAnswer((realInvocation) => Future.value([
                     notifyOnIs23HoursAgo,
                     notifyOnIsNowNotAllDay,
@@ -443,7 +443,7 @@ void main() {
               widgetTester, 1, notifyOnIsNowNotAllDay.name);
 
           expect(
-            verify(mockedMemRepositoryV2.shipByCondition(
+            verify(mockedMemRepository.shipByCondition(
               captureAny,
               captureAny,
             )).captured,
@@ -463,7 +463,7 @@ void main() {
             ..name = 'notifyAtV2 is now(is not allDay)'
             ..notifyAtV2 = DateAndTime.now();
 
-          when(mockedMemRepositoryV2.shipByCondition(any, any))
+          when(mockedMemRepository.shipByCondition(any, any))
               .thenAnswer((realInvocation) => Future.value([
                     notifyOnIs23HoursLater,
                     notifyOnIsNowNotAllDay,
@@ -478,7 +478,7 @@ void main() {
               widgetTester, 0, notifyOnIsNowNotAllDay.name);
 
           expect(
-            verify(mockedMemRepositoryV2.shipByCondition(
+            verify(mockedMemRepository.shipByCondition(
               captureAny,
               captureAny,
             )).captured,
@@ -497,7 +497,7 @@ void main() {
             ..name = 'notifyAtV2 is now(is not allDay)'
             ..notifyAtV2 = DateAndTime.now();
 
-          when(mockedMemRepositoryV2.shipByCondition(any, any))
+          when(mockedMemRepository.shipByCondition(any, any))
               .thenAnswer((realInvocation) => Future.value([
                     notifyOnIsNowAllDay,
                     notifyOnIsNowNotAllDay,
@@ -511,7 +511,7 @@ void main() {
               widgetTester, 1, notifyOnIsNowNotAllDay.name);
 
           expect(
-            verify(mockedMemRepositoryV2.shipByCondition(
+            verify(mockedMemRepository.shipByCondition(
               captureAny,
               captureAny,
             )).captured,
@@ -533,7 +533,7 @@ void main() {
           ..createdAt = DateTime.now(),
       );
 
-      when(mockedMemRepositoryV2.shipByCondition(any, any)).thenAnswer(
+      when(mockedMemRepository.shipByCondition(any, any)).thenAnswer(
         (realInvocation) => Future.value(mems),
       );
 
@@ -565,7 +565,7 @@ void main() {
 final memListFinder = find.byType(CustomScrollView);
 final memListTileFinder = find.descendant(
   of: memListFinder,
-  matching: find.byType(MemListItemView),
+  matching: find.byType(MemListItemViewComponent),
 );
 final showNewMemFabFinder = find.byType(FloatingActionButton);
 

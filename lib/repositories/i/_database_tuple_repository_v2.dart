@@ -8,11 +8,11 @@ import 'conditions.dart';
 
 typedef UnpackedPayload = Map<AttributeName, dynamic>;
 
-abstract class DatabaseTupleRepositoryV2<E extends DatabaseTupleEntityV2, P>
+abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
     implements RepositoryV2<E, P> {
   final Table _table;
 
-  DatabaseTupleRepositoryV2(this._table);
+  DatabaseTupleRepository(this._table);
 
   UnpackedPayload unpack(P payload);
 
@@ -37,15 +37,12 @@ abstract class DatabaseTupleRepositoryV2<E extends DatabaseTupleEntityV2, P>
   @override
   Future<List<P>> ship([Condition? condition]) => v(
         {'condition': condition},
-        () async {
-          final whereArgs = condition?.whereArgs();
-          return (await _table.select(
-            whereString: condition?.whereString(),
-            whereArgs: whereArgs,
-          ))
-              .map((e) => pack(e))
-              .toList();
-        },
+        () async => (await _table.select(
+          whereString: condition?.whereString(),
+          whereArgs: condition?.whereArgs(),
+        ))
+            .map((e) => pack(e))
+            .toList(),
       );
 
   @override

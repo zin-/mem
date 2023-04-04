@@ -9,8 +9,8 @@ import 'package:mem/repositories/i/_database_tuple_repository_v2.dart';
 import 'package:mem/repositories/i/conditions.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 
-class MemItemRepositoryV2
-    extends DatabaseTupleRepositoryV2<MemItemEntityV2, MemItem> {
+class MemItemRepository
+    extends DatabaseTupleRepository<MemItemEntity, MemItem> {
   Future<Iterable<MemItem>> shipByMemId(MemId memId) => v(
         {'memId': memId},
         () => super.ship(Equals(memIdColumnName, memId)),
@@ -47,7 +47,7 @@ class MemItemRepositoryV2
 
   @override
   MemItem pack(UnpackedPayload unpackedPayload) {
-    final memItemEntity = MemItemEntityV2(
+    final memItemEntity = MemItemEntity(
       memId: unpackedPayload[memIdColumnName],
       type: MemItemType.values.firstWhere((v) {
         return v.name == unpackedPayload[memItemTypeColumnName];
@@ -73,22 +73,22 @@ class MemItemRepositoryV2
   @override
   noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 
-  MemItemRepositoryV2._(super.table);
+  MemItemRepository._(super.table);
 
-  factory MemItemRepositoryV2([Table? table]) {
+  factory MemItemRepository([Table? table]) {
     var tmp = _instance;
 
     if (tmp == null) {
       if (table == null) {
         throw InitializationError();
       }
-      _instance = tmp = MemItemRepositoryV2._(table);
+      _instance = tmp = MemItemRepository._(table);
     }
 
     return tmp;
   }
 
-  static MemItemRepositoryV2? _instance;
+  static MemItemRepository? _instance;
 
-  static resetWith(MemItemRepositoryV2? instance) => _instance = instance;
+  static resetWith(MemItemRepository? instance) => _instance = instance;
 }

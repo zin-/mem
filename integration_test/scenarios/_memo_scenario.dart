@@ -24,6 +24,9 @@ void testMemoScenario() => group(
           ': create new Mem',
           (widgetTester) async {
             await runApplication();
+            await widgetTester.pump();
+            await widgetTester.pump();
+            await widgetTester.pumpAndSettle();
             await widgetTester.pumpAndSettle();
 
             await widgetTester.tap(newMemFabFinder);

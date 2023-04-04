@@ -14,20 +14,20 @@ final defaultColumnDefinitions = [
   DefC(archivedAtColumnName, TypeC.datetime, notNull: false),
 ];
 
-abstract class DatabaseTupleEntityV2 implements EntityV2 {
+abstract class DatabaseTupleEntity implements EntityV2 {
   dynamic id;
   DateTime? createdAt;
   late DateTime? updatedAt;
   late DateTime? archivedAt;
 
-  DatabaseTupleEntityV2({
+  DatabaseTupleEntity({
     required this.id,
     this.createdAt,
     this.updatedAt,
     this.archivedAt,
   });
 
-  DatabaseTupleEntityV2.fromMap(Map<String, dynamic> valueMap)
+  DatabaseTupleEntity.fromMap(Map<String, dynamic> valueMap)
       : id = valueMap[idColumnName],
         createdAt = valueMap[createdAtColumnName],
         updatedAt = valueMap[updatedAtColumnName],

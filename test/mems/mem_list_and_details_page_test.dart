@@ -14,10 +14,10 @@ import 'mem_detail_menu_test.dart';
 import 'mem_detail_body_test.dart';
 
 void main() {
-  final mockedMemRepository = MockMemRepositoryV2();
-  MemRepositoryV2.resetWith(mockedMemRepository);
-  final mockedMemItemRepository = MockMemItemRepositoryV2();
-  MemItemRepositoryV2.resetWith(mockedMemItemRepository);
+  final mockedMemRepository = MockMemRepository();
+  MemRepository.resetWith(mockedMemRepository);
+  final mockedMemItemRepository = MockMemItemRepository();
+  MemItemRepository.resetWith(mockedMemItemRepository);
 
   tearDown(() {
     reset(mockedMemRepository);

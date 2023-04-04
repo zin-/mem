@@ -53,7 +53,10 @@ void main() {
 
         final dateAndTimePeriod = DateAndTimePeriod.startNow();
 
-        expect(dateAndTimePeriod.start, now);
+        expect(
+          dateAndTimePeriod.start?.microsecondsSinceEpoch,
+          greaterThanOrEqualTo(now.microsecondsSinceEpoch),
+        );
         expect(dateAndTimePeriod.end, null);
       },
       tags: TestSize.small,

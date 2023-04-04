@@ -31,7 +31,9 @@ class ColumnDefinition {
       case ColumnType.text:
         return value;
       case ColumnType.datetime:
-        return value == null ? null : (value as DateTime).toIso8601String();
+        return value == null
+            ? null
+            : (value as DateTime).toUtc().toIso8601String();
     }
   }
 
@@ -41,7 +43,7 @@ class ColumnDefinition {
       case ColumnType.text:
         return value;
       case ColumnType.datetime:
-        return value == null ? null : DateTime.parse(value);
+        return value == null ? null : DateTime.parse(value).toLocal();
     }
   }
 

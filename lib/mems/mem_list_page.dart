@@ -9,7 +9,7 @@ import 'package:mem/mems/mem_detail_page.dart';
 import 'package:mem/mems/mem_detail_states.dart';
 import 'package:mem/mems/mem_list_actions.dart';
 import 'package:mem/mems/mem_list_filter.dart';
-import 'package:mem/mems/mem_list_item_view.dart';
+import 'package:mem/mems/mem_list_view.dart';
 import 'package:mem/mems/show_new_mem_fab.dart';
 import 'package:mem/mems/mems_action.dart';
 
@@ -34,51 +34,32 @@ class MemListPage extends StatelessWidget {
                 {},
                 () {
                   ref.watch(fetchMemList);
-                  final memList = ref.watch(sortedMemList);
 
                   return Scaffold(
-                    body: CustomScrollView(
-                      controller: _scrollController,
-                      slivers: [
-                        SliverAppBar(
-                          title: Text(L10n().memListPageTitle()),
-                          floating: true,
-                          actions: [
-                            IconTheme(
-                              data: const IconThemeData(
-                                  color: iconOnPrimaryColor),
-                              child: Row(
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.filter_list),
-                                    onPressed: () => showModalBottomSheet(
-                                      context: context,
-                                      builder: (context) =>
-                                          const MemListFilter(),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) {
-                              final mem = memList[index];
-                              return MemListItemView(
-                                mem,
-                                () => showMemDetailPage(
-                                  context,
-                                  ref,
-                                  mem.id,
+                    body: MemListView(
+                      L10n().memListPageTitle(),
+                      scrollController: _scrollController,
+                      appBarActions: [
+                        IconTheme(
+                          data: const IconThemeData(color: iconOnPrimaryColor),
+                          child: Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.filter_list),
+                                onPressed: () => showModalBottomSheet(
+                                  context: context,
+                                  builder: (context) => const MemListFilter(),
                                 ),
-                              );
-                            },
-                            childCount: memList.length,
+                              ),
+                            ],
                           ),
                         ),
                       ],
+                      onItemTapped: (memId) => showMemDetailPage(
+                        context,
+                        ref,
+                        memId,
+                      ),
                     ),
                     floatingActionButton: ShowNewMemFab(_scrollController),
                     floatingActionButtonLocation:
@@ -92,6 +73,7 @@ class MemListPage extends StatelessWidget {
       );
 }
 
+// FIXME too long
 void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
       {'context': context, 'memId': memId},
       () => Navigator.of(context)

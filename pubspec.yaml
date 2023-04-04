@@ -38,6 +38,10 @@ dependencies:
   # for basic operations
   collection:
 
+  # for Home widgets
+  home_widget: ^0.2.0+1
+  workmanager: ^0.5.1
+
 dev_dependencies:
   # for Test mock
   test:

@@ -1,8 +1,11 @@
 {
   "@@locale": "ja",
   "appTitle": "Mem",
+
   "memListPageTitle": "List",
   "memDetailPageTitle": "Detail",
+  "actCounterConfigureTitle":"Select target",
+
   "memNameLabel": "Name",
   "memMemoLabel": "Memo",
   "saveMemSuccessMessage": "Save success. {memName}",

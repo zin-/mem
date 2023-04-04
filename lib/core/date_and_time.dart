@@ -46,9 +46,9 @@ class DateAndTime extends DateTime {
               : timeOfDay != null
                   ? timeOfDay.minute
                   : dateTime.minute,
-          null,
-          null,
-          null,
+          allDay ? null : dateTime.second,
+          allDay ? null : dateTime.millisecond,
+          allDay ? null : dateTime.microsecond,
         );
 
   DateAndTime.fromV2(
@@ -60,9 +60,9 @@ class DateAndTime extends DateTime {
           dateTime.day,
           timeOfDay?.hour,
           timeOfDay?.minute,
-          null,
-          null,
-          null,
+          timeOfDay?.second,
+          timeOfDay?.millisecond,
+          timeOfDay?.microsecond,
         );
 
   DateAndTime.now({bool allDay = false})
@@ -72,7 +72,16 @@ class DateAndTime extends DateTime {
           timeOfDay: allDay ? null : DateTime.now(),
         );
 
-  DateTime get dateTime => DateTime(year, month, day);
+  DateTime get dateTime => DateTime(
+        year,
+        month,
+        day,
+        hour,
+        minute,
+        second,
+        millisecond,
+        microsecond,
+      );
 
   @override
   DateAndTime add(Duration duration) {

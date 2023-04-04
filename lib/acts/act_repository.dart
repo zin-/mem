@@ -9,10 +9,24 @@ import 'package:mem/logger/i/api.dart';
 import 'package:mem/repositories/i/_database_tuple_repository_v2.dart';
 import 'package:mem/repositories/i/conditions.dart';
 
-class ActRepository extends DatabaseTupleRepositoryV2<ActEntity, Act> {
-  Future<List<Act>> shipByMemId(MemId memId) => v(
-        {'memId': memId},
-        () async => await ship(Equals(fkDefMemId.name, memId)),
+class ActRepository extends DatabaseTupleRepository<ActEntity, Act> {
+  Future<List<Act>> shipByMemId(
+    MemId memId, {
+    DateAndTimePeriod? period,
+  }) =>
+      v(
+        {'memId': memId, 'period': period},
+        () async {
+          if (period == null) {
+            return await ship(Equals(fkDefMemId.name, memId));
+          } else {
+            return await ship(And([
+              Equals(fkDefMemId.name, memId),
+              GraterThanOrEqual(defActStart, period.start),
+              LessThan(defActStart, period.end),
+            ]));
+          }
+        },
       );
 
   @override
