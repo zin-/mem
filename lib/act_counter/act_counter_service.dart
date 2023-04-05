@@ -14,12 +14,12 @@ class ActCounterService {
   final ActRepository _actRepository;
   final ActCounterRepository _actCounterRepository;
 
-  createNew(MemId memId) => t(
+  Future<void> createNew(MemId memId) => t(
         {'memId': memId},
         () async {
           await _actCounterRepository.receive(ActCounter(memId));
 
-          await updateActCounter(memId);
+          await _updateActCounter(memId);
         },
       );
 
@@ -33,11 +33,11 @@ class ActCounterService {
                 end: DateAndTime.now(),
               )));
 
-          await updateActCounter(memId);
+          await _updateActCounter(memId);
         },
       );
 
-  updateActCounter(MemId memId) => v(
+  Future<void> _updateActCounter(MemId memId) => v(
         {'memId': memId},
         () async {
           final mem = await _memRepository.shipById(memId);
