@@ -101,4 +101,8 @@ class ActCounterService {
     }
     return tmp;
   }
+
+  static resetWith(ActCounterService? instance) {
+    _instance = instance;
+  }
 }
