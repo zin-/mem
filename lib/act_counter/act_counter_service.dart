@@ -23,7 +23,7 @@ class ActCounterService {
         },
       );
 
-  increment(int memId) => t(
+  Future<void> increment(int memId) => t(
         {'memId': memId},
         () async {
           await _actRepository.receive(Act(

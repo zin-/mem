@@ -82,4 +82,66 @@ void main() {
       );
     },
   );
+
+  test(
+    ': increment',
+    () async {
+      const memId = 1;
+
+      final act = Act(memId, DateAndTimePeriod.startNow());
+      when(mockedActRepository.receive(any))
+          .thenAnswer((realInvocation) => Future.value(act));
+      final mem = Mem(name: 'createNew', id: memId);
+      when(mockedMemRepository.shipById(any))
+          .thenAnswer((realInvocation) => Future.value(mem));
+      final acts = <Act>[
+        Act(
+          memId,
+          DateAndTimePeriod.startNow(),
+          createdAt: DateTime.now(),
+        ),
+        Act(
+          memId,
+          DateAndTimePeriod(end: DateAndTime.now()),
+          createdAt: DateTime.now(),
+        ),
+      ];
+      when(mockedActRepository.shipByMemId(any, period: anyNamed('period')))
+          .thenAnswer((realInvocation) => Future.value(acts));
+      final actCounter = ActCounter(memId);
+      when(mockedActCounterRepository.replace(any))
+          .thenAnswer((realInvocation) => Future.value(actCounter));
+
+      await actCounterService.increment(memId);
+
+      expect(
+        verify(mockedActRepository.receive(captureAny)).captured[0].memId,
+        memId,
+      );
+      expect(
+        verify(mockedMemRepository.shipById(captureAny)).captured,
+        [memId],
+      );
+      expect(
+        verify(mockedActRepository.shipByMemId(
+          captureAny,
+          period: captureAnyNamed('period'),
+        )).captured[0],
+        memId,
+      );
+      expect(
+        verify(mockedActCounterRepository.replace(captureAny))
+            .captured
+            .toString(),
+        [
+          ActCounter(
+            memId,
+            actCount: acts.length,
+            lastUpdatedAt: acts.last.period.end,
+            name: mem.name,
+          ),
+        ].toString(),
+      );
+    },
+  );
 }
