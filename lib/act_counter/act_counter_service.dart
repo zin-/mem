@@ -17,6 +17,13 @@ class ActCounterService {
   Future<void> createNew(MemId memId) => t(
         {'memId': memId},
         () async {
+          // FIXME 何か違和感がある
+          //  ここのActCounterはrepositoryに渡すために生成されているだけで、意味があるものではない
+          //  HomeWidgetを生成するためにはmemIdのみがあればよい
+          //  repositoryとしては生成するHomeWidgetの情報が欲しいのでここで先に正しいActCounterを生成するべき？
+          //  そもそもRepositoryが個別のEntityを扱うというよりActCounter全体を扱う形になっている
+          //    `await HomeWidget.updateWidget(name: 'ActCounterProvider');`
+          //  最新のActCounterを渡して、それで生成されないとおかしい
           await _actCounterRepository.receive(ActCounter(memId));
 
           await _updateActCounter(memId);
