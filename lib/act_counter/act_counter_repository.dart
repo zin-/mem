@@ -60,7 +60,7 @@ class ActCounterRepository extends RepositoryV2<ActCounter, ActCounter> {
             payload.name,
           );
 
-          HomeWidget.updateWidget(name: 'ActCounterProvider');
+          await HomeWidget.updateWidget(name: 'ActCounterProvider');
 
           return payload;
         },
