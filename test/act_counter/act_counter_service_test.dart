@@ -1,37 +1,48 @@
+import 'dart:math' as math;
+
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/act_counter/act_counter.dart';
+import 'package:mem/act_counter/act_counter_repository.dart';
 import 'package:mem/act_counter/act_counter_service.dart';
+import 'package:mem/act_counter/home_widget_accessor.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time.dart';
 import 'package:mem/core/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
+import '../_helpers.dart';
 import '../mocks.mocks.dart';
+import 'act_counter_service_test.mocks.dart';
 
+@GenerateMocks([
+  HomeWidgetAccessor,
+])
 void main() {
   final mockedMemRepository = MockMemRepository();
   final mockedActRepository = MockActRepository();
-  final mockedActCounterRepository = MockActCounterRepository();
+
+  final mockedHomeWidgetAccessor = MockHomeWidgetAccessor();
+  ActCounterRepository(homeWidgetAccessor: mockedHomeWidgetAccessor);
 
   final actCounterService = ActCounterService(
     memRepository: mockedMemRepository,
     actRepository: mockedActRepository,
-    actCounterRepository: mockedActCounterRepository,
   );
+
+  const maxInt = 4294967296;
+  final random = math.Random();
 
   test(
     ': createNew',
     () async {
-      const memId = 1;
+      final memId = random.nextInt(maxInt);
 
-      final actCounter = ActCounter(memId);
-      when(mockedActCounterRepository.receive(any))
-          .thenAnswer((realInvocation) => Future.value(actCounter));
       final mem = Mem(name: 'createNew', id: memId);
       when(mockedMemRepository.shipById(any))
           .thenAnswer((realInvocation) => Future.value(mem));
-      final acts = <Act>[
+      final lastUpdatedAt = DateAndTime.now();
+      final acts = [
         Act(
           memId,
           DateAndTimePeriod.startNow(),
@@ -39,23 +50,24 @@ void main() {
         ),
         Act(
           memId,
-          DateAndTimePeriod(end: DateAndTime.now()),
+          DateAndTimePeriod(end: lastUpdatedAt),
           createdAt: DateTime.now(),
         ),
       ];
       when(mockedActRepository.shipByMemId(any, period: anyNamed('period')))
           .thenAnswer((realInvocation) => Future.value(acts));
-      when(mockedActCounterRepository.replace(any))
-          .thenAnswer((realInvocation) => Future.value(actCounter));
+      final homeWidgetId = random.nextInt(maxInt);
+      when(mockedHomeWidgetAccessor.initialize(
+        methodChannelName,
+        initializeMethodName,
+      )).thenAnswer((realInvocation) => Future.value(homeWidgetId));
+      when(mockedHomeWidgetAccessor.saveWidgetData(any, any))
+          .thenAnswer((realInvocation) => Future.value(true));
+      when(mockedHomeWidgetAccessor.updateWidget(widgetProviderName))
+          .thenAnswer((realInvocation) => Future.value(true));
 
       await actCounterService.createNew(memId);
 
-      expect(
-        verify(mockedActCounterRepository.receive(captureAny))
-            .captured
-            .toString(),
-        [actCounter].toString(),
-      );
       expect(
         verify(mockedMemRepository.shipById(captureAny)).captured,
         [memId],
@@ -67,26 +79,35 @@ void main() {
         )).captured[0],
         memId,
       );
+      verify(mockedHomeWidgetAccessor.initialize(any, any)).called(1);
       expect(
-        verify(mockedActCounterRepository.replace(captureAny))
-            .captured
-            .toString(),
+        verify(mockedHomeWidgetAccessor.saveWidgetData(captureAny, captureAny))
+            .captured,
         [
-          ActCounter(
-            memId,
-            actCount: acts.length,
-            lastUpdatedAt: acts.last.period.end,
-            name: mem.name,
-          ),
-        ].toString(),
+          'memId-$homeWidgetId',
+          memId,
+          'actCount-$memId',
+          acts.length,
+          'lastUpdatedAtSeconds-$memId',
+          lastUpdatedAt.millisecondsSinceEpoch.toDouble(),
+          'memName-$memId',
+          mem.name,
+        ],
       );
+      verify(mockedHomeWidgetAccessor.updateWidget(any)).called(1);
     },
+    tags: TestSize.small,
   );
 
   test(
     ': increment',
     () async {
-      const memId = 1;
+      final memId = random.nextInt(maxInt);
+
+      when(mockedHomeWidgetAccessor.saveWidgetData(any, any))
+          .thenAnswer((realInvocation) => Future.value(true));
+      when(mockedHomeWidgetAccessor.updateWidget(widgetProviderName))
+          .thenAnswer((realInvocation) => Future.value(true));
 
       final act = Act(memId, DateAndTimePeriod.startNow());
       when(mockedActRepository.receive(any))
@@ -108,9 +129,6 @@ void main() {
       ];
       when(mockedActRepository.shipByMemId(any, period: anyNamed('period')))
           .thenAnswer((realInvocation) => Future.value(acts));
-      final actCounter = ActCounter(memId);
-      when(mockedActCounterRepository.replace(any))
-          .thenAnswer((realInvocation) => Future.value(actCounter));
 
       await actCounterService.increment(memId);
 
@@ -129,19 +147,9 @@ void main() {
         )).captured[0],
         memId,
       );
-      expect(
-        verify(mockedActCounterRepository.replace(captureAny))
-            .captured
-            .toString(),
-        [
-          ActCounter(
-            memId,
-            actCount: acts.length,
-            lastUpdatedAt: acts.last.period.end,
-            name: mem.name,
-          ),
-        ].toString(),
-      );
+
+      verifyNever(mockedHomeWidgetAccessor.initialize(any, any));
     },
+    tags: TestSize.small,
   );
 }

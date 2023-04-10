@@ -24,9 +24,37 @@ class ActCounterService {
           //  そもそもRepositoryが個別のEntityを扱うというよりActCounter全体を扱う形になっている
           //    `await HomeWidget.updateWidget(name: 'ActCounterProvider');`
           //  最新のActCounterを渡して、それで生成されないとおかしい
-          await _actCounterRepository.receive(ActCounter(memId));
+          final mem = await _memRepository.shipById(memId);
+          final now = DateAndTime.now();
+          DateAndTime start = DateAndTime(
+            now.year,
+            now.month,
+            now.hour < 5 ? now.day - 1 : now.day,
+            5,
+            0,
+          );
+          final acts = await _actRepository.shipByMemId(
+            memId,
+            period: DateAndTimePeriod(
+              start: start,
+              end: start.add(const Duration(days: 1)),
+            ),
+          );
+          final lastAct = acts
+              .sorted(
+                (a, b) => (a.updatedAt ?? a.createdAt!)
+                    .compareTo(b.updatedAt ?? b.createdAt!),
+              )
+              .lastOrNull;
 
-          await _updateActCounter(memId);
+          await _actCounterRepository.receive(ActCounter(
+            memId,
+            name: mem.name,
+            actCount: acts.length,
+            lastUpdatedAt: lastAct == null
+                ? null
+                : (lastAct.period.end ?? lastAct.period.start!),
+          ));
         },
       );
 
