@@ -4,7 +4,7 @@ import 'package:mem/database/database_manager.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/logger/i/type.dart';
 
-import '_act_counter_configure.dart';
+import '_act_counter_configure_test.dart';
 import 'acts/_act_list_page.dart';
 import 'database/_database_manager.dart';
 import 'database/_indexed_database.dart';
