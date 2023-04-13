@@ -33,7 +33,7 @@ Future clearDatabase() async {
   MemService.reset(null);
 }
 
-Future<void> pumpApplication({String? languageCode}) =>
+Future<void> runApplication({String? languageCode}) =>
     app.main(languageCode: languageCode);
 
 final memListFilterButton = find.byIcon(Icons.filter_list);
@@ -80,8 +80,6 @@ class TestSize {
 
   TestSize._();
 }
-
-Future<void> runApplication() => app.main(languageCode: 'en');
 
 final newMemFabFinder = find.byIcon(Icons.add);
 final memNameTextFormFieldFinder = find.descendant(

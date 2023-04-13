@@ -23,11 +23,8 @@ void testMemoScenario() => group(
         testWidgets(
           ': create new Mem',
           (widgetTester) async {
-            await runApplication();
-            await widgetTester.pump();
-            await widgetTester.pump();
-            await widgetTester.pumpAndSettle();
-            await widgetTester.pumpAndSettle();
+            await runApplication(languageCode: 'en');
+            await widgetTester.pumpAndSettle(defaultDuration);
 
             await widgetTester.tap(newMemFabFinder);
             await widgetTester.pumpAndSettle();
@@ -94,13 +91,13 @@ void testMemoScenario() => group(
         );
 
         testWidgets(
-          ': update',
+          ': update saved Mem',
           (widgetTester) async {
             const savedMemName = 'saved mem name';
             const savedMemMemo = 'saved mem memo';
             await prepareSavedData(savedMemName, savedMemMemo);
 
-            await pumpApplication(languageCode: 'en');
+            await runApplication(languageCode: 'en');
             await widgetTester.pumpAndSettle(defaultDuration);
 
             await widgetTester.tap(find.text(savedMemName));
@@ -129,13 +126,13 @@ void testMemoScenario() => group(
         );
 
         testWidgets(
-          ': archive',
+          ': archive saved Mem',
           (widgetTester) async {
             const savedMemName = 'saved mem name';
             const savedMemMemo = 'saved mem memo';
             await prepareSavedData(savedMemName, savedMemMemo);
 
-            await pumpApplication(languageCode: 'en');
+            await runApplication(languageCode: 'en');
             await widgetTester.pumpAndSettle(defaultDuration);
 
             await widgetTester.tap(find.text(savedMemName));
@@ -163,14 +160,14 @@ void testMemoScenario() => group(
         );
 
         testWidgets(
-          ': unarchive',
+          ': unarchive archived Mem',
           (widgetTester) async {
             const savedMemName = 'archived mem name';
             const savedMemMemo = 'archived mem memo';
             await prepareSavedData(savedMemName, savedMemMemo,
                 isArchived: true);
 
-            await pumpApplication(languageCode: 'en');
+            await runApplication(languageCode: 'en');
             await widgetTester.pumpAndSettle(defaultDuration);
 
             await widgetTester.tap(memListFilterButton);
@@ -203,13 +200,13 @@ void testMemoScenario() => group(
         );
 
         testWidgets(
-          ': remove',
+          ': remove saved Mem',
           (widgetTester) async {
             const savedMemName = 'saved mem name';
             const savedMemMemo = 'saved mem memo';
             await prepareSavedData(savedMemName, savedMemMemo);
 
-            await pumpApplication(languageCode: 'en');
+            await runApplication(languageCode: 'en');
             await widgetTester.pumpAndSettle(defaultDuration);
 
             await widgetTester.tap(find.text(savedMemName));
