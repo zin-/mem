@@ -23,20 +23,17 @@ void main() {
   final mockedActRepository = MockActRepository();
 
   final mockedHomeWidgetAccessor = MockHomeWidgetAccessor();
-  ActCounterRepository(homeWidgetAccessor: mockedHomeWidgetAccessor);
+  HomeWidgetAccessor(instance: mockedHomeWidgetAccessor);
 
   final actCounterService = ActCounterService(
     memRepository: mockedMemRepository,
     actRepository: mockedActRepository,
   );
 
-  const maxInt = 4294967296;
-  final random = math.Random();
-
   test(
     ': createNew',
     () async {
-      final memId = random.nextInt(maxInt);
+      final memId = math.Random().nextInt(4294967296);
 
       final mem = Mem(name: 'createNew', id: memId);
       when(mockedMemRepository.shipById(any))
@@ -56,7 +53,7 @@ void main() {
       ];
       when(mockedActRepository.shipByMemId(any, period: anyNamed('period')))
           .thenAnswer((realInvocation) => Future.value(acts));
-      final homeWidgetId = random.nextInt(maxInt);
+      final homeWidgetId = math.Random().nextInt(4294967296);
       when(mockedHomeWidgetAccessor.initialize(
         methodChannelName,
         initializeMethodName,
@@ -102,7 +99,7 @@ void main() {
   test(
     ': increment',
     () async {
-      final memId = random.nextInt(maxInt);
+      final memId = math.Random().nextInt(4294967296);
 
       when(mockedHomeWidgetAccessor.saveWidgetData(any, any))
           .thenAnswer((realInvocation) => Future.value(true));

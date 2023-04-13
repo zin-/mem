@@ -86,11 +86,11 @@ class ActCounterRepository extends RepositoryV2<ActCounter, ActCounter> {
 
   static ActCounterRepository? _instance;
 
-  factory ActCounterRepository({HomeWidgetAccessor? homeWidgetAccessor}) {
+  factory ActCounterRepository() {
     var tmp = _instance;
     if (tmp == null) {
       _instance = tmp = ActCounterRepository._(
-        homeWidgetAccessor ?? HomeWidgetAccessor(),
+        HomeWidgetAccessor(),
       );
     }
     return tmp;

@@ -28,10 +28,10 @@ class HomeWidgetAccessor {
 
   static HomeWidgetAccessor? _instance;
 
-  factory HomeWidgetAccessor() {
+  factory HomeWidgetAccessor({HomeWidgetAccessor? instance}) {
     var tmp = _instance;
     if (tmp == null) {
-      _instance = tmp = HomeWidgetAccessor._();
+      _instance = tmp = instance ?? HomeWidgetAccessor._();
     }
     return tmp;
   }
