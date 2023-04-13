@@ -6,8 +6,6 @@ import 'package:mem/act_counter/home_widget_accessor.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/logger/i/type.dart';
 
-import '_helpers.dart';
-
 void main() {
   initializeLogger(Level.verbose);
 
@@ -39,7 +37,6 @@ void main() {
 
       expect(result, homeWidgetId);
     },
-    tags: TestSize.small,
   );
 
   testWidgets(
@@ -72,7 +69,6 @@ void main() {
 
       expect(result, returns);
     },
-    tags: TestSize.small,
   );
 
   testWidgets(
@@ -105,6 +101,5 @@ void main() {
 
       expect(result, returns);
     },
-    tags: TestSize.small,
   );
 }

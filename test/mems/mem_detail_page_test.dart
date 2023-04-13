@@ -14,7 +14,6 @@ import 'package:mockito/mockito.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/gui/constants.dart';
 
-import '../_helpers.dart';
 import '../gui/time_of_day_text_form_field_test.dart';
 import '../samples.dart';
 import '../mocks.mocks.dart';
@@ -58,7 +57,6 @@ void main() {
         expect(find.byType(MemDetailBody), findsOneWidget);
         expect(saveFabFinder, findsOneWidget);
       },
-      tags: TestSize.small,
     );
   });
 
@@ -139,7 +137,6 @@ void main() {
 
         verifyNever(mockedMemRepository.shipById(memId));
       },
-      tags: TestSize.small,
     );
 
     testWidgets(
@@ -228,7 +225,6 @@ void main() {
 
         expect(saveMemSuccessFinder(enteringMemName), findsNothing);
       },
-      tags: TestSize.small,
     );
 
     testWidgets(
@@ -246,7 +242,6 @@ void main() {
         verifyNever(mockedMemRepository.shipById(any));
         verifyNever(mockedMemRepository.receive(any));
       },
-      tags: TestSize.small,
     );
   });
 }

@@ -87,7 +87,6 @@ void testMemoScenario() => group(
             //   );
             // }
           },
-          tags: TestSize.medium,
         );
 
         testWidgets(
@@ -122,7 +121,6 @@ void testMemoScenario() => group(
             expect(find.text(enteringMemMemo), findsNothing);
             expect(find.text(savedMemName), findsNothing);
           },
-          tags: TestSize.medium,
         );
 
         testWidgets(
@@ -156,7 +154,6 @@ void testMemoScenario() => group(
 
             expect(find.text(savedMemName), findsOneWidget);
           },
-          tags: TestSize.medium,
         );
 
         testWidgets(
@@ -196,7 +193,6 @@ void testMemoScenario() => group(
 
             expect(find.text(savedMemName), findsOneWidget);
           },
-          tags: TestSize.medium,
         );
 
         testWidgets(
@@ -234,7 +230,6 @@ void testMemoScenario() => group(
 
             expect(find.text(savedMemName), findsNothing);
           },
-          tags: TestSize.medium,
         );
       },
     );

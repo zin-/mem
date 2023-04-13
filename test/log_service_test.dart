@@ -5,8 +5,6 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
-import '_helpers.dart';
-
 @GenerateNiceMocks([
   MockSpec<LogRepository>(),
 ])
@@ -55,7 +53,6 @@ void main() {
 
           verify(mockedLogRepository.receive(any)).called(1);
         },
-        tags: TestSize.small,
       );
 
       test(
@@ -79,7 +76,6 @@ void main() {
 
           verify(mockedLogRepository.receive(any)).called(1);
         },
-        tags: TestSize.small,
       );
 
       test(
@@ -103,7 +99,6 @@ void main() {
 
           verifyNever(mockedLogRepository.receive(any));
         },
-        tags: TestSize.small,
       );
     });
   });
@@ -124,7 +119,6 @@ void main() {
 
         verifyNever(mockedLogRepository.receive(any));
       },
-      tags: TestSize.small,
     );
 
     LogService.reset();
@@ -156,7 +150,6 @@ void main() {
 
             expect(expectedMessages.length, 0);
           },
-          tags: TestSize.small,
         );
 
         test(
@@ -184,7 +177,6 @@ void main() {
 
             expect(expectedMessages.length, 0);
           },
-          tags: TestSize.small,
         );
       });
 
@@ -215,7 +207,6 @@ void main() {
 
           expect(expectedMessages.length, 0);
         },
-        tags: TestSize.small,
       );
     });
 
@@ -243,7 +234,6 @@ void main() {
 
           expect(expectedMessages.length, 1);
         },
-        tags: TestSize.small,
       );
 
       group(': await', () {
@@ -268,7 +258,6 @@ void main() {
 
             expect(expectedMessages.length, 0);
           },
-          tags: TestSize.small,
         );
 
         test(
@@ -299,7 +288,6 @@ void main() {
 
             expect(expectedMessages.length, 0);
           },
-          tags: TestSize.small,
         );
       });
     });
@@ -334,7 +322,6 @@ void main() {
 
         expect(expectedMessages.length, 0);
       },
-      tags: TestSize.small,
     );
 
     group('Under debug', () {
@@ -363,7 +350,6 @@ void main() {
 
           verify(mockedLogRepository.receive(any)).called(4);
         },
-        tags: TestSize.small,
       );
     });
   });

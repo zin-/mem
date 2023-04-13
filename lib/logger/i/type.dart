@@ -3,6 +3,5 @@ enum Level {
   trace,
   warning,
   error,
-  @Deprecated('Under development only. Do not commit.')
   debug,
 }

@@ -5,8 +5,6 @@ import 'package:mem/logger/i/api.dart';
 import 'package:mem/logger/i/type.dart';
 import 'package:mem/main.dart';
 
-import '../test/_helpers.dart';
-
 void main() {
   initializeLogger(Level.verbose);
 
@@ -27,7 +25,6 @@ void testActCounterConfigure() => group(
             expect(find.text('Select target'), findsOneWidget);
             expect(find.byIcon(Icons.check), findsOneWidget);
           },
-          tags: TestSize.medium,
         );
       },
     );

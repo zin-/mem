@@ -83,7 +83,6 @@ void main() {
         expectMemNameTextOnListAt(widgetTester, index, mem.name);
       });
     },
-    tags: TestSize.small,
   );
 
   group('Filter', () {
@@ -131,7 +130,6 @@ void main() {
           false,
         );
       },
-      tags: TestSize.small,
     );
 
     group(': onChanged', () {
@@ -219,7 +217,6 @@ void main() {
           expectMemNameTextOnListAt(widgetTester, 2, archived.name);
           expectMemNameTextOnListAt(widgetTester, 3, archived2.name);
         },
-        tags: TestSize.small,
       );
 
       testWidgets(
@@ -305,7 +302,6 @@ void main() {
           expectMemNameTextOnListAt(widgetTester, 2, done.name);
           expectMemNameTextOnListAt(widgetTester, 3, done2.name);
         },
-        tags: TestSize.small,
       );
     });
   });
@@ -385,7 +381,6 @@ void main() {
         expectMemNameTextOnListAt(widgetTester, 5, notifyOnOneDayLater2.name);
         expectMemNameTextOnListAt(widgetTester, 6, notifyOnIsNull.name);
       },
-      tags: TestSize.small,
     );
 
     group('notifyAtV2', () {
@@ -416,7 +411,6 @@ void main() {
               widgetTester, 0, notifyAtV2IsNowNotAllDay.name);
           expectMemNameTextOnListAt(widgetTester, 1, notifyAV2tIsNull.name);
         },
-        tags: TestSize.small,
       );
       testWidgets(
         'now(not allDay) and 23 hour ago',
@@ -450,7 +444,6 @@ void main() {
             [false, false],
           );
         },
-        tags: TestSize.small,
       );
       testWidgets(
         'now(not allDay) and 23 hour later',
@@ -485,7 +478,6 @@ void main() {
             [false, false],
           );
         },
-        tags: TestSize.small,
       );
       testWidgets(
         'now(not allDay) and now(allDay)',
@@ -518,7 +510,6 @@ void main() {
             [false, false],
           );
         },
-        tags: TestSize.small,
       );
     });
   });
@@ -558,7 +549,6 @@ void main() {
 
       expect(showNewMemFabFinder.hitTestable(), findsOneWidget);
     },
-    tags: TestSize.small,
   );
 }
 

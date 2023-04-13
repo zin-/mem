@@ -2,8 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/core/date_and_time.dart';
 import 'package:mem/core/date_and_time_period.dart';
 
-import '../_helpers.dart';
-
 void main() {
   group('Create instance', () {
     test(
@@ -17,7 +15,6 @@ void main() {
         expect(dateAndTimePeriod.start, start);
         expect(dateAndTimePeriod.end, null);
       },
-      tags: TestSize.small,
     );
 
     test(
@@ -31,7 +28,6 @@ void main() {
         expect(dateAndTimePeriod.start, null);
         expect(dateAndTimePeriod.end, end);
       },
-      tags: TestSize.small,
     );
 
     test(
@@ -43,7 +39,6 @@ void main() {
         expect(dateAndTimePeriod.start, now);
         expect(dateAndTimePeriod.end, now);
       },
-      tags: TestSize.small,
     );
 
     test(
@@ -59,7 +54,6 @@ void main() {
         );
         expect(dateAndTimePeriod.end, null);
       },
-      tags: TestSize.small,
     );
 
     group(': throw error', () {
@@ -78,7 +72,6 @@ void main() {
             throwsAssertionError,
           );
         },
-        tags: TestSize.small,
       );
     });
   });
@@ -98,6 +91,5 @@ void main() {
         '}',
       );
     },
-    tags: TestSize.small,
   );
 }

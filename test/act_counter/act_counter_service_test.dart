@@ -11,7 +11,6 @@ import 'package:mem/core/mem.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
-import '../_helpers.dart';
 import '../mocks.mocks.dart';
 import 'act_counter_service_test.mocks.dart';
 
@@ -93,7 +92,6 @@ void main() {
       );
       verify(mockedHomeWidgetAccessor.updateWidget(any)).called(1);
     },
-    tags: TestSize.small,
   );
 
   test(
@@ -147,6 +145,5 @@ void main() {
 
       verifyNever(mockedHomeWidgetAccessor.initialize(any, any));
     },
-    tags: TestSize.small,
   );
 }

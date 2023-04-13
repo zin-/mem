@@ -3,8 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/gui/time_of_day_text_form_field.dart';
 import 'package:mem/gui/l10n.dart';
 
-import '../_helpers.dart';
-
 void main() {
   Future pumpTimeOfDayTextFormField(
     WidgetTester widgetTester,
@@ -41,7 +39,6 @@ void main() {
           '',
         );
       },
-      tags: TestSize.small,
     );
 
     testWidgets(
@@ -62,7 +59,6 @@ void main() {
           timeOfDay.format(context),
         );
       },
-      tags: TestSize.small,
     );
   });
 
@@ -80,7 +76,6 @@ void main() {
 
         await pickNowTimeOfDay(widgetTester, cancelButton);
       },
-      tags: TestSize.small,
     );
 
     testWidgets(
@@ -96,7 +91,6 @@ void main() {
 
         await pickNowTimeOfDay(widgetTester, okButton);
       },
-      tags: TestSize.small,
     );
   });
 }

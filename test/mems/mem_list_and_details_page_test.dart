@@ -5,7 +5,6 @@ import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mockito/mockito.dart';
 
-import '../_helpers.dart';
 import '../samples.dart';
 import '../mocks.mocks.dart';
 import 'mem_detail_page_test.dart';
@@ -106,7 +105,6 @@ void main() {
       expectMemNameOnMemDetail(widgetTester, '');
       expectMemMemoOnMemDetail(widgetTester, '');
     },
-    tags: TestSize.small,
   );
 
   testWidgets(
@@ -193,7 +191,6 @@ void main() {
       expect(widgetTester.widgetList(memListTileFinder).length, 1);
       expectMemNameTextOnListAt(widgetTester, 0, enteringMemName);
     },
-    tags: TestSize.small,
   );
 
   testWidgets(
@@ -240,7 +237,6 @@ void main() {
 
       expect(widgetTester.widgetList(memListTileFinder).length, 0);
     },
-    tags: TestSize.small,
   );
 
   testWidgets(
@@ -312,6 +308,5 @@ void main() {
         findsOneWidget,
       );
     },
-    tags: TestSize.small,
   );
 }

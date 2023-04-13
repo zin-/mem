@@ -2,8 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/database/definitions/column_definition.dart';
 import 'package:mem/database/definitions/table_definition.dart';
 
-import '../../_helpers.dart';
-
 void main() {
   group('Table', () {
     group(': new', () {
@@ -23,7 +21,6 @@ void main() {
           expect(tableDefinition.toString(), contains(tableName));
           expect(tableDefinition.toString(), contains(columnName));
         },
-        tags: TestSize.small,
       );
 
       test(
@@ -39,7 +36,6 @@ void main() {
                 e.toString() == 'Table name is required.'),
           );
         },
-        tags: TestSize.small,
       );
 
       test(
@@ -55,7 +51,6 @@ void main() {
                 e.toString() == 'Table name contains " ".'),
           );
         },
-        tags: TestSize.small,
       );
 
       test(
@@ -71,7 +66,6 @@ void main() {
                 e.toString() == 'Table columns are required.'),
           );
         },
-        tags: TestSize.small,
       );
 
       test(
@@ -86,7 +80,6 @@ void main() {
                 e.toString() == 'Primary key is required.'),
           );
         },
-        tags: TestSize.small,
       );
 
       test(
@@ -102,7 +95,6 @@ void main() {
                 e.toString() == 'Only one primary key is allowed.'),
           );
         },
-        tags: TestSize.small,
       );
 
       test(
@@ -122,7 +114,6 @@ void main() {
                 e.toString() == 'Duplicated column names are not allowed.'),
           );
         },
-        tags: TestSize.small,
       );
     });
 
@@ -151,7 +142,6 @@ void main() {
             ' )',
           );
         },
-        tags: TestSize.small,
       );
 
       test(
@@ -182,7 +172,6 @@ void main() {
             ' )',
           );
         },
-        tags: TestSize.small,
       );
     });
   });

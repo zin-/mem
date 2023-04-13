@@ -38,7 +38,6 @@ void main() {
           Colors.grey,
         );
       },
-      tags: TestSize.small,
     );
 
     testWidgets(
@@ -62,7 +61,6 @@ void main() {
           null,
         );
       },
-      tags: TestSize.small,
     );
   });
 
@@ -100,7 +98,6 @@ void main() {
 
         verify(mockedActCounterService.createNew(any)).called(1);
       },
-      tags: TestSize.small,
     );
   });
 }

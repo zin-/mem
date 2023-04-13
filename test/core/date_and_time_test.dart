@@ -1,8 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/core/date_and_time.dart';
 
-import '../_helpers.dart';
-
 void main() {
   group('Create instance', () {
     group(': now', () {
@@ -22,7 +20,6 @@ void main() {
           );
           expect(dateAndTime.isAllDay, false);
         },
-        tags: TestSize.small,
       );
 
       test(
@@ -42,7 +39,6 @@ void main() {
           );
           expect(dateAndTime.isAllDay, true);
         },
-        tags: TestSize.small,
       );
     });
   });
@@ -57,6 +53,5 @@ void main() {
         '{_: 2022-11-06 14:49:00.000, isAllDay: false}',
       );
     },
-    tags: TestSize.small,
   );
 }

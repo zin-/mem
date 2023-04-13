@@ -4,8 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:mem/gui/date_text_form_field.dart';
 import 'package:mem/gui/l10n.dart';
 
-import '../_helpers.dart';
-
 void main() {
   Future pumpDateTextFormField(
     WidgetTester widgetTester,
@@ -42,7 +40,6 @@ void main() {
           '',
         );
       },
-      tags: TestSize.small,
     );
 
     testWidgets(
@@ -61,7 +58,6 @@ void main() {
           DateFormat.yMd().format(date),
         );
       },
-      tags: TestSize.small,
     );
   });
 
@@ -82,7 +78,6 @@ void main() {
 
         await widgetTester.tap(find.text('CANCEL'));
       },
-      tags: TestSize.small,
     );
 
     testWidgets(
@@ -101,7 +96,6 @@ void main() {
 
         await widgetTester.tap(find.text('OK'));
       },
-      tags: TestSize.small,
     );
   });
 }

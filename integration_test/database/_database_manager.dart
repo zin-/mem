@@ -7,7 +7,6 @@ import 'package:mem/database/database_manager.dart';
 import 'package:mem/database/indexed_database.dart';
 import 'package:mem/database/sqlite_database.dart';
 
-import '../_helpers.dart';
 import 'definitions.dart';
 
 void main() {
@@ -35,7 +34,6 @@ void testDatabaseManager() => group(
               final openedDb = await DatabaseManager(onTest: true).open(defD);
               expect(openedDb, db);
             },
-            tags: TestSize.medium,
           );
 
           test(
@@ -45,9 +43,11 @@ void testDatabaseManager() => group(
               final db = await DatabaseManager(onTest: true).open(defD);
               final table = db.getTable(tName);
 
-              final closeResult1 = await DatabaseManager(onTest: true).close(defD.name);
+              final closeResult1 =
+                  await DatabaseManager(onTest: true).close(defD.name);
               expect(closeResult1, true);
-              final closeResult2 = await DatabaseManager(onTest: true).close(defD.name);
+              final closeResult2 =
+                  await DatabaseManager(onTest: true).close(defD.name);
               expect(closeResult2, false);
 
               final directCloseResult = await db.close();
@@ -78,7 +78,6 @@ void testDatabaseManager() => group(
                 throwsA((e) => e is DatabaseDoesNotExistException),
               );
             },
-            tags: TestSize.medium,
           );
 
           test(
@@ -87,9 +86,11 @@ void testDatabaseManager() => group(
               final db = await DatabaseManager(onTest: true).open(defD);
               final table = db.getTable(tableName);
 
-              final deleteResult1 = await DatabaseManager(onTest: true).delete(defD.name);
+              final deleteResult1 =
+                  await DatabaseManager(onTest: true).delete(defD.name);
               expect(deleteResult1, true);
-              final deleteResult2 = await DatabaseManager(onTest: true).delete(defD.name);
+              final deleteResult2 =
+                  await DatabaseManager(onTest: true).delete(defD.name);
               expect(deleteResult2, false);
 
               final directDeleteResult = await db.delete();
@@ -120,7 +121,6 @@ void testDatabaseManager() => group(
                 throwsA((e) => e is DatabaseDoesNotExistException),
               );
             },
-            tags: TestSize.medium,
           );
         }
       },
