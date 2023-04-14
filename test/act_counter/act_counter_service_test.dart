@@ -8,6 +8,8 @@ import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time.dart';
 import 'package:mem/core/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
+import 'package:mem/logger/i/api.dart';
+import 'package:mem/logger/i/type.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
@@ -18,6 +20,8 @@ import 'act_counter_service_test.mocks.dart';
   HomeWidgetAccessor,
 ])
 void main() {
+  initializeLogger(Level.verbose);
+
   final mockedMemRepository = MockMemRepository();
   final mockedActRepository = MockActRepository();
 
@@ -80,14 +84,14 @@ void main() {
         verify(mockedHomeWidgetAccessor.saveWidgetData(captureAny, captureAny))
             .captured,
         [
-          'memId-$homeWidgetId',
-          memId,
+          'memName-$memId',
+          mem.name,
           'actCount-$memId',
           acts.length,
           'lastUpdatedAtSeconds-$memId',
           lastUpdatedAt.millisecondsSinceEpoch.toDouble(),
-          'memName-$memId',
-          mem.name,
+          'memId-$homeWidgetId',
+          memId,
         ],
       );
       verify(mockedHomeWidgetAccessor.updateWidget(any)).called(1);
@@ -99,21 +103,17 @@ void main() {
     () async {
       final memId = math.Random().nextInt(4294967296);
 
-      when(mockedHomeWidgetAccessor.saveWidgetData(any, any))
-          .thenAnswer((realInvocation) => Future.value(true));
-      when(mockedHomeWidgetAccessor.updateWidget(widgetProviderName))
-          .thenAnswer((realInvocation) => Future.value(true));
-
       final act = Act(memId, DateAndTimePeriod.startNow());
       when(mockedActRepository.receive(any))
           .thenAnswer((realInvocation) => Future.value(act));
       final mem = Mem(name: 'createNew', id: memId);
       when(mockedMemRepository.shipById(any))
           .thenAnswer((realInvocation) => Future.value(mem));
+      final lastUpdatedAt = DateAndTime.now();
       final acts = <Act>[
         Act(
           memId,
-          DateAndTimePeriod.startNow(),
+          DateAndTimePeriod(end: lastUpdatedAt),
           createdAt: DateTime.now(),
         ),
         Act(
@@ -124,6 +124,10 @@ void main() {
       ];
       when(mockedActRepository.shipByMemId(any, period: anyNamed('period')))
           .thenAnswer((realInvocation) => Future.value(acts));
+      when(mockedHomeWidgetAccessor.saveWidgetData(any, any))
+          .thenAnswer((realInvocation) => Future.value(true));
+      when(mockedHomeWidgetAccessor.updateWidget(widgetProviderName))
+          .thenAnswer((realInvocation) => Future.value(true));
 
       await actCounterService.increment(memId);
 
@@ -144,6 +148,19 @@ void main() {
       );
 
       verifyNever(mockedHomeWidgetAccessor.initialize(any, any));
+      expect(
+        verify(mockedHomeWidgetAccessor.saveWidgetData(captureAny, captureAny))
+            .captured,
+        [
+          'memName-$memId',
+          mem.name,
+          'actCount-$memId',
+          acts.length,
+          'lastUpdatedAtSeconds-$memId',
+          lastUpdatedAt.millisecondsSinceEpoch.toDouble(),
+        ],
+      );
+      verify(mockedHomeWidgetAccessor.updateWidget(any)).called(1);
     },
   );
 }

@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:mem/act_counter/act_counter.dart';
 import 'package:mem/act_counter/act_counter_repository.dart';
 import 'package:mem/acts/act_repository.dart';
@@ -16,100 +15,39 @@ class ActCounterService {
 
   Future<void> createNew(MemId memId) => t(
         {'memId': memId},
-        () async {
-          // FIXME 何か違和感がある
-          //  ここのActCounterはrepositoryに渡すために生成されているだけで、意味があるものではない
-          //  HomeWidgetを生成するためにはmemIdのみがあればよい
-          //  repositoryとしては生成するHomeWidgetの情報が欲しいのでここで先に正しいActCounterを生成するべき？
-          //  そもそもRepositoryが個別のEntityを扱うというよりActCounter全体を扱う形になっている
-          //    `await HomeWidget.updateWidget(name: 'ActCounterProvider');`
-          //  最新のActCounterを渡して、それで生成されないとおかしい
-          final mem = await _memRepository.shipById(memId);
-          final now = DateAndTime.now();
-          DateAndTime start = DateAndTime(
-            now.year,
-            now.month,
-            now.hour < 5 ? now.day - 1 : now.day,
-            5,
-            0,
-          );
-          final acts = await _actRepository.shipByMemId(
-            memId,
-            period: DateAndTimePeriod(
-              start: start,
-              end: start.add(const Duration(days: 1)),
+        () async => await _actCounterRepository.receive(
+          ActCounter(
+            await _memRepository.shipById(memId),
+            await _actRepository.shipByMemId(
+              memId,
+              period: ActCounter.period(DateAndTime.now()),
             ),
-          );
-          final lastAct = acts
-              .sorted(
-                (a, b) => (a.updatedAt ?? a.createdAt!)
-                    .compareTo(b.updatedAt ?? b.createdAt!),
-              )
-              .lastOrNull;
-
-          await _actCounterRepository.receive(ActCounter(
-            memId,
-            name: mem.name,
-            actCount: acts.length,
-            lastUpdatedAt: lastAct == null
-                ? null
-                : (lastAct.period.end ?? lastAct.period.start!),
-          ));
-        },
+          ),
+        ),
       );
 
   Future<void> increment(int memId) => t(
         {'memId': memId},
         () async {
-          await _actRepository.receive(Act(
+          await _actRepository.receive(
+            Act(
               memId,
               DateAndTimePeriod(
                 start: DateAndTime.now(),
                 end: DateAndTime.now(),
-              )));
-
-          await _updateActCounter(memId);
-        },
-      );
-
-  Future<void> _updateActCounter(MemId memId) => v(
-        {'memId': memId},
-        () async {
-          final mem = await _memRepository.shipById(memId);
-
-          final now = DateAndTime.now();
-          DateAndTime start = DateAndTime(
-            now.year,
-            now.month,
-            now.hour < 5 ? now.day - 1 : now.day,
-            5,
-            0,
-          );
-          final acts = await _actRepository.shipByMemId(
-            memId,
-            period: DateAndTimePeriod(
-              start: start,
-              end: start.add(const Duration(days: 1)),
+              ),
             ),
           );
 
-          final lastAct = acts
-              .sorted(
-                (a, b) => (a.updatedAt ?? a.createdAt!)
-                    .compareTo(b.updatedAt ?? b.createdAt!),
-              )
-              .lastOrNull;
-
-          final actCounter = ActCounter(
-            memId,
-            name: mem.name,
-            actCount: acts.length,
-            lastUpdatedAt: lastAct == null
-                ? null
-                : (lastAct.period.end ?? lastAct.period.start!),
+          await _actCounterRepository.replace(
+            ActCounter(
+              await _memRepository.shipById(memId),
+              await _actRepository.shipByMemId(
+                memId,
+                period: ActCounter.period(DateAndTime.now()),
+              ),
+            ),
           );
-
-          _actCounterRepository.replace(actCounter);
         },
       );
 
