@@ -77,7 +77,6 @@ void main() {
           false,
         );
       },
-      tags: TestSize.small,
     );
 
     testWidgets(
@@ -100,7 +99,6 @@ void main() {
           DateFormat.yMd().format(savedMem.notifyAtV2!),
         );
       },
-      tags: TestSize.small,
     );
   });
 
@@ -174,7 +172,6 @@ void main() {
 
           verifyNever(mockedMemItemRepository.replace(any));
         },
-        tags: TestSize.small,
       );
 
       testWidgets(
@@ -244,7 +241,6 @@ void main() {
           verifyNever(mockedNotificationRepository.discard(any));
           verifyNever(mockedMemItemRepository.replace(any));
         },
-        tags: TestSize.small,
       );
     },
   );

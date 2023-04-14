@@ -47,6 +47,5 @@ void testActListPage() => group('ActListPage test', () {
           await widgetTester.pumpAndSettle();
           expect(find.byType(ListView), findsOneWidget);
         },
-        tags: TestSize.small,
       );
     });

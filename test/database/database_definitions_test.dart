@@ -4,8 +4,6 @@ import 'package:mem/database/definitions.dart';
 import 'package:mem/database/definitions/column_definition.dart';
 import 'package:mem/database/definitions/table_definition.dart';
 
-import '../_helpers.dart';
-
 void main() {
   group('Database', () {
     group(': new', () {
@@ -28,7 +26,6 @@ void main() {
           expect(databaseDefinition.toString(), contains(dbVersion.toString()));
           expect(databaseDefinition.toString(), contains(tableName));
         },
-        tags: TestSize.small,
       );
 
       test(
@@ -45,7 +42,6 @@ void main() {
                 e.toString() == 'Database name is required.'),
           );
         },
-        tags: TestSize.small,
       );
 
       test(
@@ -62,7 +58,6 @@ void main() {
                 e.toString() == 'Database name contains " ".'),
           );
         },
-        tags: TestSize.small,
       );
 
       test(
@@ -79,7 +74,6 @@ void main() {
                 e.toString() == 'Minimum version is 1.'),
           );
         },
-        tags: TestSize.small,
       );
     });
   });

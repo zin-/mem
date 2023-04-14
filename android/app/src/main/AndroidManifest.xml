@@ -26,6 +26,7 @@
       </intent-filter>
     </activity>
 
+    <!--  ActCounter  -->
     <activity
         android:name=".ActCounterConfigure"
         android:exported="true"
@@ -53,6 +54,7 @@
       />
     </receiver>
 
+    <!--  es.antonborri.home_widget  -->
     <receiver
         android:name="es.antonborri.home_widget.HomeWidgetBackgroundReceiver"
         android:exported="false">

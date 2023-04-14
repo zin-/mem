@@ -4,8 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/notifications/notification_repository.dart';
 
-import '../_helpers.dart';
-
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -23,7 +21,6 @@ void testNotificationRepository() => group(
 
               expect(instance, isA<NotificationRepository>());
             },
-            tags: TestSize.small,
           );
 
           group('Initialize', () {
@@ -37,7 +34,6 @@ void testNotificationRepository() => group(
 
                 expect(initialized, true);
               },
-              tags: TestSize.small,
             );
 
             test(
@@ -54,7 +50,6 @@ void testNotificationRepository() => group(
 
                 expect(initialized, initialized2);
               },
-              tags: TestSize.small,
             );
           });
 
@@ -87,7 +82,6 @@ void testNotificationRepository() => group(
                   // dev(result);
                   // TODO 通知されていることをcheckする
                 },
-                tags: TestSize.medium,
               );
             },
           );

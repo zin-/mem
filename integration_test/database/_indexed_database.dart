@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/database/database.dart';
 import 'package:mem/database/indexed_database.dart';
 
-import '../_helpers.dart';
 import 'definitions.dart';
 
 void main() {
@@ -21,7 +20,6 @@ void testIndexedDatabase() => group(
               expect(created.definition.name, defD.name);
               expect(created.tables.length, defD.tableDefinitions.length);
             },
-            tags: TestSize.medium,
           );
 
           group('Migrate: upgrade', () {
@@ -48,7 +46,6 @@ void testIndexedDatabase() => group(
                 final insertedId = await addedTable.insert({'test': 'test'});
                 expect(insertedId, isNotNull);
               },
-              tags: TestSize.medium,
             );
 
             test(
@@ -81,7 +78,6 @@ void testIndexedDatabase() => group(
                   {'id': insertedChildrenId, 'tests_id': insertedId}
                 ]);
               },
-              tags: TestSize.medium,
             );
           });
         });
@@ -107,7 +103,6 @@ void testIndexedDatabase() => group(
                 });
                 expect(insertedId, 1);
               },
-              tags: TestSize.medium,
             );
 
             group('testChildTable', () {
@@ -126,7 +121,6 @@ void testIndexedDatabase() => group(
                     }),
                   );
                 },
-                tags: TestSize.medium,
               );
 
               test(
@@ -145,7 +139,6 @@ void testIndexedDatabase() => group(
 
                   expect(insertedChildId, 1);
                 },
-                tags: TestSize.medium,
               );
             });
           });
@@ -174,7 +167,6 @@ void testIndexedDatabase() => group(
                 test2..putIfAbsent(pkName, () => inserted2),
               ]);
             },
-            tags: TestSize.medium,
           );
 
           group(
@@ -198,7 +190,6 @@ void testIndexedDatabase() => group(
                     test..putIfAbsent(pkName, () => inserted),
                   );
                 },
-                tags: TestSize.medium,
               );
 
               test(
@@ -215,7 +206,6 @@ void testIndexedDatabase() => group(
                     }),
                   );
                 },
-                tags: TestSize.medium,
               );
             },
           );
@@ -248,7 +238,6 @@ void testIndexedDatabase() => group(
                     ..update(textFieldName, (value) => updateText),
                 );
               },
-              tags: TestSize.medium,
             );
 
             test(
@@ -276,7 +265,6 @@ void testIndexedDatabase() => group(
                 final afterUpdateFail = await table.select();
                 expect(afterUpdateFail.length, 0);
               },
-              tags: TestSize.medium,
             );
           });
 
@@ -302,7 +290,6 @@ void testIndexedDatabase() => group(
               final selected = await table.select();
               expect(selected.length, 1);
             },
-            tags: TestSize.medium,
           );
 
           test(
@@ -327,7 +314,6 @@ void testIndexedDatabase() => group(
               final selected = await table.select();
               expect(selected.length, 0);
             },
-            tags: TestSize.medium,
           );
         });
       },

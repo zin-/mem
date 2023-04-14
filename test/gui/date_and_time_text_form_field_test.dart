@@ -5,7 +5,6 @@ import 'package:mem/gui/time_of_day_text_form_field.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/gui/date_and_time_text_form_field.dart';
 
-import '../_helpers.dart';
 import 'time_of_day_text_form_field_test.dart';
 
 void main() {
@@ -53,7 +52,6 @@ void main() {
           true,
         );
       },
-      tags: TestSize.small,
     );
 
     testWidgets(
@@ -79,7 +77,6 @@ void main() {
           true,
         );
       },
-      tags: TestSize.small,
     );
 
     testWidgets(
@@ -113,7 +110,6 @@ void main() {
           false,
         );
       },
-      tags: TestSize.small,
     );
   });
 
@@ -133,7 +129,6 @@ void main() {
 
         await pickNowDate(widgetTester);
       },
-      tags: TestSize.small,
     );
 
     testWidgets(
@@ -151,7 +146,6 @@ void main() {
 
         pickNowTimeOfDay(widgetTester, okButton);
       },
-      tags: TestSize.small,
     );
 
     group(
@@ -171,7 +165,6 @@ void main() {
 
             tapAllDaySwitch(widgetTester);
           },
-          tags: TestSize.small,
         );
 
         testWidgets(
@@ -188,7 +181,6 @@ void main() {
 
             await tapAllDaySwitch(widgetTester);
           },
-          tags: TestSize.small,
         );
       },
     );
@@ -208,7 +200,6 @@ void main() {
 
         await tapClear(widgetTester);
       },
-      tags: TestSize.small,
     );
   });
 }

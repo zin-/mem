@@ -13,14 +13,7 @@ class SelectMemFab extends ConsumerWidget {
     final selectedMemIds = ref.watch(selectedMemIdsProvider);
     return _SelectMemComponent(
       selectedMemIds?.isNotEmpty ?? false,
-      () {
-        final selectedMemId = selectedMemIds?.single;
-        if (selectedMemId != null) {
-          ref.read(selectMem(selectedMemId));
-        } else {
-          throw Error();
-        }
-      },
+      () => ref.read(selectMem((selectedMemIds?.single)!)),
     );
   }
 }

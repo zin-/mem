@@ -1,8 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/database/definitions/column_definition.dart';
 
-import '../../_helpers.dart';
-
 void main() {
   group('Column', () {
     group(': new', () {
@@ -16,7 +14,6 @@ void main() {
 
           expect(columnDefinition.toString(), contains(columnName));
         },
-        tags: TestSize.small,
       );
 
       test(
@@ -31,7 +28,6 @@ void main() {
             ),
           );
         },
-        tags: TestSize.small,
       );
 
       test(
@@ -46,7 +42,6 @@ void main() {
             ),
           );
         },
-        tags: TestSize.small,
       );
     });
   });

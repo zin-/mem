@@ -37,7 +37,6 @@ void main() {
         expect(find.byType(CircularProgressIndicator), findsNothing);
         expect(find.text(testValue), findsOneWidget);
       },
-      tags: TestSize.small,
     );
 
     testWidgets(
@@ -65,8 +64,6 @@ void main() {
         expect(find.text('Exception: $errorMessage'), findsOneWidget);
         expect(find.text(testValue), findsNothing);
       },
-      tags: TestSize.small,
-      // skip: true,
     );
   });
 }

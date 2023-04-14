@@ -31,7 +31,6 @@ void main() {
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
         expect(find.byType(ListView), findsNothing);
       },
-      tags: TestSize.small,
     );
 
     group(': fetched', () {
@@ -56,7 +55,6 @@ void main() {
           expect(find.byType(ListView), findsOneWidget);
           expect(find.byType(ActListItemView), findsNothing);
         },
-        tags: TestSize.small,
       );
       testWidgets(
         ': 2 acts',
@@ -83,7 +81,6 @@ void main() {
           expect(find.byType(ListView), findsOneWidget);
           expect(find.byType(ActListItemView), findsNWidgets(2));
         },
-        tags: TestSize.small,
       );
     });
   });

@@ -14,7 +14,6 @@ import 'package:mem/mems/mem_detail_body.dart';
 import 'package:mem/mems/mem_done_checkbox.dart';
 import 'package:mockito/mockito.dart';
 
-import '../_helpers.dart';
 import '../samples.dart';
 import '../mocks.mocks.dart';
 
@@ -85,7 +84,6 @@ void main() {
         expectMemDoneOnMemDetail(widgetTester, false);
         expectMemMemoOnMemDetail(widgetTester, '');
       },
-      tags: TestSize.small,
     );
 
     testWidgets(
@@ -116,7 +114,6 @@ void main() {
         expectMemDoneOnMemDetail(widgetTester, true);
         expectMemMemoOnMemDetail(widgetTester, savedMemItem.value);
       },
-      tags: TestSize.small,
     );
 
     testWidgets(
@@ -140,7 +137,6 @@ void main() {
 
         expectMemMemoOnMemDetail(widgetTester, savedMemItem.value);
       },
-      tags: TestSize.small,
     );
   });
 
@@ -161,7 +157,6 @@ void main() {
 
         expect(find.text(enteringMemMemo), findsOneWidget);
       },
-      tags: TestSize.small,
     );
 
     testWidgets(
@@ -179,7 +174,6 @@ void main() {
 
         expectMemDoneOnMemDetail(widgetTester, true);
       },
-      tags: TestSize.small,
     );
 
     testWidgets(
@@ -197,7 +191,6 @@ void main() {
 
         expect(find.text(enteringMemMemo), findsOneWidget);
       },
-      tags: TestSize.small,
     );
   });
 }

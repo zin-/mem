@@ -40,7 +40,6 @@ void testActScenario() => group('Act scenario', () {
 
           expect(actListItemFinder, findsOneWidget);
         },
-        tags: TestSize.medium,
       );
     });
 

@@ -33,6 +33,7 @@ abstract class DatabaseTupleEntity implements EntityV2 {
         updatedAt = valueMap[updatedAtColumnName],
         archivedAt = valueMap[archivedAtColumnName];
 
+  @override
   Map<AttributeName, dynamic> toMap() => {
         idColumnName: id,
         createdAtColumnName: createdAt,

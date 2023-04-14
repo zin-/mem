@@ -50,7 +50,6 @@ void testEdgeScenario() => group(
                     widgetTester.widgetList(find.byType(TextFormField)).length,
                     3);
               },
-              tags: TestSize.medium,
             );
           },
         );

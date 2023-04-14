@@ -2,8 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time_period.dart';
 
-import '../_helpers.dart';
-
 void main() {
   test(
     'Create instance',
@@ -15,7 +13,6 @@ void main() {
       expect(act.memId, same(memId));
       expect(act.period, same(actPeriod));
     },
-    tags: TestSize.small,
   );
 
   test(
@@ -31,6 +28,5 @@ void main() {
             ', period: ${actPeriod.toString()}}'),
       );
     },
-    tags: TestSize.small,
   );
 }

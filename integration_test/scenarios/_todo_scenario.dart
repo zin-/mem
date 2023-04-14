@@ -28,7 +28,7 @@ void testTodoScenario() => group(
                 const savedMemMemo = 'saved mem memo';
                 await prepareSavedData(savedMemName, savedMemMemo);
 
-                await pumpApplication(languageCode: 'en');
+                await runApplication(languageCode: 'en');
                 await widgetTester.pumpAndSettle(defaultDuration);
 
                 await widgetTester.tap(find.byType(Checkbox));
@@ -43,7 +43,6 @@ void testTodoScenario() => group(
 
                 expect(find.text(savedMemName), findsOneWidget);
               },
-              tags: TestSize.medium,
             );
           },
         );

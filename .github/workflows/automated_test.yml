@@ -23,7 +23,7 @@ jobs:
         uses: ./.github/actions/generate-localization_code
       - name: 'Flutter Doctor'
         run: flutter doctor -v
-      - run: flutter test --tags Small --coverage
+      - run: flutter test --coverage
       - name: 'Upload coverage'
         uses: codecov/codecov-action@v3
         with:

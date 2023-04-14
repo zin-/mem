@@ -11,7 +11,6 @@ import 'package:mem/database/sqlite_database.dart';
 // FIXME integration testでrepositoryを参照するのはNG
 import 'package:mem/repositories/_database_tuple_repository.dart';
 
-import '../_helpers.dart';
 import 'definitions.dart';
 
 void main() {
@@ -31,7 +30,6 @@ void testSqliteDatabase() => group(
                 expect(created.definition.name, defD.name);
                 expect(created.tables.length, defD.tableDefinitions.length);
               },
-              tags: TestSize.medium,
             );
 
             test(
@@ -47,7 +45,6 @@ void testSqliteDatabase() => group(
                   }),
                 );
               },
-              tags: TestSize.medium,
             );
 
             group('Migrate: upgrade', () {
@@ -91,7 +88,6 @@ void testSqliteDatabase() => group(
                   final insertedId = await addedTable.insert({'test': 'test'});
                   expect(insertedId, isNotNull);
                 },
-                tags: TestSize.medium,
               );
 
               test(
@@ -142,7 +138,6 @@ void testSqliteDatabase() => group(
                     {'id': insertedChildrenId, 'tests_id': insertedId}
                   ]);
                 },
-                tags: TestSize.medium,
               );
             });
           }
@@ -162,7 +157,6 @@ void testSqliteDatabase() => group(
                   ),
                 );
               },
-              tags: TestSize.medium,
             );
           }
         });
@@ -190,7 +184,6 @@ void testSqliteDatabase() => group(
                   });
                   expect(insertedId, 1);
                 },
-                tags: TestSize.medium,
               );
 
               group('testChildTable', () {
@@ -210,7 +203,6 @@ void testSqliteDatabase() => group(
                       }),
                     );
                   },
-                  tags: TestSize.medium,
                 );
 
                 test(
@@ -229,7 +221,6 @@ void testSqliteDatabase() => group(
 
                     expect(insertedChildId, 1);
                   },
-                  tags: TestSize.medium,
                 );
               });
             });
@@ -258,7 +249,6 @@ void testSqliteDatabase() => group(
                   test2..putIfAbsent(pkName, () => inserted2),
                 ]);
               },
-              tags: TestSize.medium,
             );
 
             group(
@@ -282,7 +272,6 @@ void testSqliteDatabase() => group(
                       test..putIfAbsent(pkName, () => inserted),
                     );
                   },
-                  tags: TestSize.medium,
                 );
 
                 test(
@@ -305,7 +294,6 @@ void testSqliteDatabase() => group(
                       ),
                     );
                   },
-                  tags: TestSize.medium,
                 );
               },
             );
@@ -338,7 +326,6 @@ void testSqliteDatabase() => group(
                       ..update(textFieldName, (value) => updateText),
                   );
                 },
-                tags: TestSize.medium,
               );
 
               test(
@@ -363,7 +350,6 @@ void testSqliteDatabase() => group(
                   final afterUpdateFail = await table.select();
                   expect(afterUpdateFail.length, 0);
                 },
-                tags: TestSize.medium,
               );
             });
 
@@ -389,7 +375,6 @@ void testSqliteDatabase() => group(
                 final selected = await table.select();
                 expect(selected.length, 1);
               },
-              tags: TestSize.medium,
             );
 
             test(
@@ -414,7 +399,6 @@ void testSqliteDatabase() => group(
                 final selected = await table.select();
                 expect(selected.length, 0);
               },
-              tags: TestSize.medium,
             );
           }
         });

@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:mem/act_counter/act_counter.dart';
 import 'package:mem/act_counter/act_counter_repository.dart';
 import 'package:mem/acts/act_repository.dart';
@@ -14,67 +13,41 @@ class ActCounterService {
   final ActRepository _actRepository;
   final ActCounterRepository _actCounterRepository;
 
-  createNew(MemId memId) => t(
+  Future<void> createNew(MemId memId) => t(
         {'memId': memId},
-        () async {
-          await _actCounterRepository.receive(ActCounter(memId));
-
-          await updateActCounter(memId);
-        },
+        () async => await _actCounterRepository.receive(
+          ActCounter(
+            await _memRepository.shipById(memId),
+            await _actRepository.shipByMemId(
+              memId,
+              period: ActCounter.period(DateAndTime.now()),
+            ),
+          ),
+        ),
       );
 
-  increment(int memId) => t(
+  Future<void> increment(int memId) => t(
         {'memId': memId},
         () async {
-          await _actRepository.receive(Act(
+          await _actRepository.receive(
+            Act(
               memId,
               DateAndTimePeriod(
                 start: DateAndTime.now(),
                 end: DateAndTime.now(),
-              )));
-
-          await updateActCounter(memId);
-        },
-      );
-
-  updateActCounter(MemId memId) => v(
-        {'memId': memId},
-        () async {
-          final mem = await _memRepository.shipById(memId);
-
-          final now = DateAndTime.now();
-          DateAndTime start = DateAndTime(
-            now.year,
-            now.month,
-            now.hour < 5 ? now.day - 1 : now.day,
-            5,
-            0,
-          );
-          final acts = await _actRepository.shipByMemId(
-            memId,
-            period: DateAndTimePeriod(
-              start: start,
-              end: start.add(const Duration(days: 1)),
+              ),
             ),
           );
 
-          final lastAct = acts
-              .sorted(
-                (a, b) => (a.updatedAt ?? a.createdAt!)
-                    .compareTo(b.updatedAt ?? b.createdAt!),
-              )
-              .lastOrNull;
-
-          final actCounter = ActCounter(
-            memId,
-            name: mem.name,
-            actCount: acts.length,
-            lastUpdatedAt: lastAct == null
-                ? null
-                : (lastAct.period.end ?? lastAct.period.start!),
+          await _actCounterRepository.replace(
+            ActCounter(
+              await _memRepository.shipById(memId),
+              await _actRepository.shipByMemId(
+                memId,
+                period: ActCounter.period(DateAndTime.now()),
+              ),
+            ),
           );
-
-          _actCounterRepository.replace(actCounter);
         },
       );
 
@@ -100,5 +73,9 @@ class ActCounterService {
       );
     }
     return tmp;
+  }
+
+  static resetWith(ActCounterService? instance) {
+    _instance = instance;
   }
 }

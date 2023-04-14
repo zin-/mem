@@ -2,8 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/logger/i/type.dart';
 import 'package:mem/logger/log_repository.dart';
 
-import '../_helpers.dart';
-
 void main() {
   testLogRepository();
 }
@@ -20,7 +18,6 @@ void testLogRepository() => group('LogRepository test', () {
 
           expect(logRepository, isA<LogRepository>());
         },
-        tags: TestSize.small,
       );
 
       group(
@@ -43,7 +40,6 @@ void testLogRepository() => group('LogRepository test', () {
 
                       logRepository.receive(log);
                     },
-                    tags: TestSize.small,
                   );
                 }
               });
@@ -62,7 +58,6 @@ void testLogRepository() => group('LogRepository test', () {
 
                 logRepository.receive(log);
               },
-              tags: TestSize.small,
             );
 
             group(': with Error', () {
@@ -78,7 +73,6 @@ void testLogRepository() => group('LogRepository test', () {
 
                   logRepository.receive(log);
                 },
-                tags: TestSize.small,
               );
 
               test(
@@ -94,7 +88,6 @@ void testLogRepository() => group('LogRepository test', () {
 
                   logRepository.receive(log);
                 },
-                tags: TestSize.small,
               );
             });
 
@@ -111,7 +104,6 @@ void testLogRepository() => group('LogRepository test', () {
 
                   logRepository.receive(log);
                 },
-                tags: TestSize.small,
               );
 
               test(
@@ -127,7 +119,6 @@ void testLogRepository() => group('LogRepository test', () {
 
                   logRepository.receive(log);
                 },
-                tags: TestSize.small,
               );
             });
 
@@ -141,7 +132,6 @@ void testLogRepository() => group('LogRepository test', () {
 
                   logRepository.receive(log);
                 },
-                tags: TestSize.small,
               );
 
               test(
@@ -156,7 +146,6 @@ void testLogRepository() => group('LogRepository test', () {
 
                   logRepository.receive(log);
                 },
-                tags: TestSize.small,
               );
 
               test(
@@ -172,7 +161,6 @@ void testLogRepository() => group('LogRepository test', () {
 
                   logRepository.receive(log);
                 },
-                tags: TestSize.small,
               );
             });
           });

@@ -23,11 +23,8 @@ void testMemoScenario() => group(
         testWidgets(
           ': create new Mem',
           (widgetTester) async {
-            await runApplication();
-            await widgetTester.pump();
-            await widgetTester.pump();
-            await widgetTester.pumpAndSettle();
-            await widgetTester.pumpAndSettle();
+            await runApplication(languageCode: 'en');
+            await widgetTester.pumpAndSettle(defaultDuration);
 
             await widgetTester.tap(newMemFabFinder);
             await widgetTester.pumpAndSettle();
@@ -90,17 +87,16 @@ void testMemoScenario() => group(
             //   );
             // }
           },
-          tags: TestSize.medium,
         );
 
         testWidgets(
-          ': update',
+          ': update saved Mem',
           (widgetTester) async {
             const savedMemName = 'saved mem name';
             const savedMemMemo = 'saved mem memo';
             await prepareSavedData(savedMemName, savedMemMemo);
 
-            await pumpApplication(languageCode: 'en');
+            await runApplication(languageCode: 'en');
             await widgetTester.pumpAndSettle(defaultDuration);
 
             await widgetTester.tap(find.text(savedMemName));
@@ -109,6 +105,10 @@ void testMemoScenario() => group(
             const enteringMemName = 'entering mem name';
             const enteringMemMemo = 'entering mem memo';
 
+            // FIXME 文字入力が動作しない場合がある
+            //  改善しようとしたが、`pump`や`pumpAndSettle`を前後に追加するだけでは改善しなかった
+            //    https://github.com/zin-/mem/issues/133
+            // プロダクションコードの方に問題がある可能性があるので、後続のリファクタリングと同時に解決を目指す
             await widgetTester.enterText(
                 memNameTextFormFieldFinder, enteringMemName);
             await widgetTester.enterText(
@@ -118,24 +118,23 @@ void testMemoScenario() => group(
             await widgetTester.pumpAndSettle(defaultDuration);
 
             await widgetTester.pageBack();
-            // FIXME 2秒は長すぎる。何が原因で見つからないのか分からないので一旦時間を伸ばしてみた
-            await widgetTester.pumpAndSettle(const Duration(seconds: 2));
+            await widgetTester.pumpAndSettle();
+            await widgetTester.pump();
 
             expect(find.text(enteringMemName), findsOneWidget);
             expect(find.text(enteringMemMemo), findsNothing);
             expect(find.text(savedMemName), findsNothing);
           },
-          tags: TestSize.medium,
         );
 
         testWidgets(
-          ': archive',
+          ': archive saved Mem',
           (widgetTester) async {
             const savedMemName = 'saved mem name';
             const savedMemMemo = 'saved mem memo';
             await prepareSavedData(savedMemName, savedMemMemo);
 
-            await pumpApplication(languageCode: 'en');
+            await runApplication(languageCode: 'en');
             await widgetTester.pumpAndSettle(defaultDuration);
 
             await widgetTester.tap(find.text(savedMemName));
@@ -159,18 +158,17 @@ void testMemoScenario() => group(
 
             expect(find.text(savedMemName), findsOneWidget);
           },
-          tags: TestSize.medium,
         );
 
         testWidgets(
-          ': unarchive',
+          ': unarchive archived Mem',
           (widgetTester) async {
             const savedMemName = 'archived mem name';
             const savedMemMemo = 'archived mem memo';
             await prepareSavedData(savedMemName, savedMemMemo,
                 isArchived: true);
 
-            await pumpApplication(languageCode: 'en');
+            await runApplication(languageCode: 'en');
             await widgetTester.pumpAndSettle(defaultDuration);
 
             await widgetTester.tap(memListFilterButton);
@@ -199,17 +197,16 @@ void testMemoScenario() => group(
 
             expect(find.text(savedMemName), findsOneWidget);
           },
-          tags: TestSize.medium,
         );
 
         testWidgets(
-          ': remove',
+          ': remove saved Mem',
           (widgetTester) async {
             const savedMemName = 'saved mem name';
             const savedMemMemo = 'saved mem memo';
             await prepareSavedData(savedMemName, savedMemMemo);
 
-            await pumpApplication(languageCode: 'en');
+            await runApplication(languageCode: 'en');
             await widgetTester.pumpAndSettle(defaultDuration);
 
             await widgetTester.tap(find.text(savedMemName));
@@ -237,7 +234,6 @@ void testMemoScenario() => group(
 
             expect(find.text(savedMemName), findsNothing);
           },
-          tags: TestSize.medium,
         );
       },
     );
