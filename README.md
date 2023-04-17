@@ -2,7 +2,7 @@
 
 [![codecov](https://codecov.io/gh/zin-/mem/branch/develop/graph/badge.svg?token=ROS2LI5RZ4)](https://codecov.io/gh/zin-/mem)
 
-Manage any.
+Manage all.
 
 ## Base
 
