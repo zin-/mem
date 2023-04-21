@@ -22,11 +22,6 @@ dynamic d(
 ]) =>
     LogServiceV2()._log(Level.debug, target, meta, null);
 
-/// 処理を記録する
-///
-/// # 検討
-/// ## ロガーを複数持つ
-/// 開発・デバッグ・テストのために出力したいログと、運用のために出力したいログは異なる
 class LogServiceV2 {
   final LogRepositoryV2 _logRepositoryV2;
   final Level _level;
@@ -35,16 +30,23 @@ class LogServiceV2 {
     Level level,
     dynamic target,
     dynamic meta,
-    // FIXME これいるか？
-    StackTrace? stackTrace,
-  ) {
+    StackTrace? stackTrace, [
+    List? prefixes,
+  ]) {
     if (target is Future) {
-      _futureLog(level, target, meta, stackTrace);
+      _futureLog(level, target, meta, stackTrace, prefixes);
       return target;
+    } else if (target is Function()) {
+      return _functionLog(level, target, meta);
     }
 
     if (_shouldLog(level)) {
-      _logRepositoryV2.receive(Log(level, target, meta, stackTrace));
+      final message = (prefixes ?? []
+        ..add(target.toString()));
+      if (DebugLoggableFunction._debug) {
+        message.insert(0, '[DEBUG]');
+      }
+      _logRepositoryV2.receive(Log(level, message.join(), meta, stackTrace));
     }
 
     return target;
@@ -54,18 +56,46 @@ class LogServiceV2 {
     Level level,
     Future<Result> target,
     dynamic meta,
-    StackTrace? stackTrace,
-  ) async {
+    StackTrace? stackTrace, [
+    List? prefixes,
+  ]) async {
     final currentStackTrace = StackTrace.current;
 
     await target.then((result) {
-      _log(level, '[future] $result', meta, currentStackTrace);
-    }).catchError((error) {
-      _log(Level.error, 'future error', error, currentStackTrace);
-      throw error;
+      _log(
+        level,
+        result,
+        meta,
+        currentStackTrace,
+        prefixes ?? []
+          ..add('[future] : '),
+      );
     });
 
     return target;
+  }
+
+  Result _functionLog<Result>(
+    Level level,
+    Result Function() function,
+    dynamic args,
+  ) {
+    try {
+      _log(level, args, null, null, ['[start] :: ']);
+      final result = function.callWithDebug(level == Level.debug);
+      const endPrefix = '[ end ] => ';
+      if (function is Null Function()) {
+        _log(level, 'void', null, null, [endPrefix]);
+      } else if (result is Future) {
+        _log(level, result, null, null, [endPrefix]);
+      } else {
+        _log(level, result, null, null, [endPrefix]);
+      }
+      return result;
+    } catch (e) {
+      _log(Level.error, 'Thrown is caught.', e, null);
+      rethrow;
+    }
   }
 
   bool _shouldLog(Level level) =>

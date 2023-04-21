@@ -59,10 +59,158 @@ void main() {
 
       verify(mockedLoggerWrapper.log(
         Level.info,
-        '[future] 2',
+        '[future] : 2',
         any,
         any,
       )).called(1);
+    });
+  });
+
+  group(': target is Function', () {
+    test(': simple.', () {
+      int target(int a, int b) => i(
+            () => a + b,
+            [a, b],
+          );
+
+      when(mockedLoggerWrapper.log(any, any, any, any)).thenReturn(null);
+
+      final result = target(2, 3);
+
+      expect(result, 5);
+
+      expect(
+        verify(mockedLoggerWrapper.log(any, captureAny, any, any)).captured,
+        [
+          '[start] :: [2, 3]',
+          '[ end ] => 5',
+        ],
+      );
+    });
+    test(': cascade.', () {
+      int childFuncInfo(int a, int b) => i(
+            () => a * b,
+            {a, b},
+          );
+      int childFuncVerbose(int a, int b) => v(
+            () => a + b,
+            {a, b},
+          );
+
+      int target(int a, int b) => d(
+            () {
+              final c = childFuncInfo(a, b);
+              final d = childFuncVerbose(a, b);
+
+              return c - d;
+            },
+            [a, b],
+          );
+
+      when(mockedLoggerWrapper.log(any, any, any, any)).thenReturn(null);
+
+      final result = target(4, 5);
+      childFuncVerbose(6, 7);
+
+      expect(result, 11);
+
+      expect(
+        verify(mockedLoggerWrapper.log(captureAny, captureAny, any, any))
+            .captured,
+        [
+          Level.debug,
+          '[start] :: [4, 5]',
+          Level.info,
+          '[DEBUG][start] :: {4, 5}',
+          Level.info,
+          '[DEBUG][ end ] => 20',
+          Level.verbose,
+          '[DEBUG][start] :: {4, 5}',
+          Level.verbose,
+          '[DEBUG][ end ] => 9',
+          Level.debug,
+          '[ end ] => 11',
+        ],
+      );
+    });
+
+    test(': result type is void.', () {
+      void target(int a, int b) => i(
+            () {
+              a + b;
+            },
+            [a, b],
+          );
+
+      when(mockedLoggerWrapper.log(any, any, any, any)).thenReturn(null);
+
+      target(2, 3);
+
+      expect(
+        verify(mockedLoggerWrapper.log(any, captureAny, any, any)).captured,
+        [
+          '[start] :: [2, 3]',
+          '[ end ] => void',
+        ],
+      );
+    });
+    test(': result type is Future.', () async {
+      Future<int> target(int a, int b) => i(
+            () => Future(() => a + b),
+            [a, b],
+          );
+
+      when(mockedLoggerWrapper.log(any, any, any, any)).thenReturn(null);
+
+      final result = await target(4, 5);
+
+      expect(result, 9);
+
+      expect(
+        verify(mockedLoggerWrapper.log(any, captureAny, any, any)).captured,
+        [
+          '[start] :: [4, 5]',
+          '[ end ] => [future] : 9',
+        ],
+      );
+    });
+
+    test(': error occurred.', () {
+      const a = 8;
+      const b = 9;
+
+      final thrown = Exception('test exception :: $a, $b');
+      int target(int a, int b) => i(
+            () {
+              throw thrown;
+            },
+            [a, b],
+          );
+
+      when(mockedLoggerWrapper.log(any, any, any, any)).thenReturn(null);
+
+      expect(
+        () => target(a, b),
+        throwsA(
+          (e) {
+            expect(e, thrown);
+            return true;
+          },
+        ),
+      );
+
+      expect(
+        verify(mockedLoggerWrapper.log(captureAny, captureAny, captureAny, any))
+            .captured,
+        [
+          Level.info,
+          '[start] :: [8, 9]',
+          null,
+          Level.error,
+          'Thrown is caught.',
+          thrown,
+        ],
+      );
     });
   });
 }
