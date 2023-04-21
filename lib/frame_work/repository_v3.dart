@@ -1,4 +1,3 @@
-import 'package:mem/frame_work/accessor.dart';
 import 'package:mem/frame_work/entity_v3.dart';
 
 /// # Repositoryの役割とは
@@ -27,6 +26,6 @@ import 'package:mem/frame_work/entity_v3.dart';
 /// Small testに収まる場合もある（MethodChannelなど
 ///
 /// 加えて、ライブラリを正しく使えているかのテストは利用者側で行う必要がある
-abstract class RepositoryV3<Payload extends EntityV3, Result> extends Accessor {
+abstract class RepositoryV3<Payload extends EntityV3, Result> {
   Result receive(Payload payload);
 }
