@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:mem/logger/log_entity.dart';
 import 'package:mem/logger/log_repository_v2.dart';
 import 'package:mem/logger/logger_wrapper_v2.dart';
@@ -29,7 +31,6 @@ class LogServiceV2 {
   final LogRepositoryV2 _logRepositoryV2;
   final Level _level;
 
-  /// TODO Futureの扱い
   dynamic _log(
     Level level,
     dynamic target,
@@ -37,9 +38,32 @@ class LogServiceV2 {
     // FIXME これいるか？
     StackTrace? stackTrace,
   ) {
+    if (target is Future) {
+      _futureLog(level, target, meta, stackTrace);
+      return target;
+    }
+
     if (_shouldLog(level)) {
       _logRepositoryV2.receive(Log(level, target, meta, stackTrace));
     }
+
+    return target;
+  }
+
+  Future<Result> _futureLog<Result>(
+    Level level,
+    Future<Result> target,
+    dynamic meta,
+    StackTrace? stackTrace,
+  ) async {
+    final currentStackTrace = StackTrace.current;
+
+    await target.then((result) {
+      _log(level, '[future] $result', meta, currentStackTrace);
+    }).catchError((error) {
+      _log(Level.error, 'future error', error, currentStackTrace);
+      throw error;
+    });
 
     return target;
   }

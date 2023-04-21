@@ -15,6 +15,10 @@ void main() {
   final mockedLoggerWrapper = MockLoggerWrapperV2();
   LogRepositoryV2(mockedLoggerWrapper);
 
+  setUp(() {
+    reset(mockedLoggerWrapper);
+  });
+
   test(': target is value.', () {
     const target = 1;
 
@@ -30,5 +34,35 @@ void main() {
       null,
       null,
     )).called(1);
+  });
+
+  group(': target is Future', () {
+    test(': sync.', () {
+      final target = Future.value(1);
+
+      when(mockedLoggerWrapper.log(any, any, any, any)).thenReturn(null);
+
+      final result = i(target);
+
+      expect(result, target);
+
+      verifyNever(mockedLoggerWrapper.log(any, any, any, any));
+    });
+    test(': await.', () async {
+      final target = Future.value(2);
+
+      when(mockedLoggerWrapper.log(any, any, any, any)).thenReturn(null);
+
+      final result = await i(target);
+
+      expect(result, 2);
+
+      verify(mockedLoggerWrapper.log(
+        Level.info,
+        '[future] 2',
+        any,
+        any,
+      )).called(1);
+    });
   });
 }
