@@ -35,4 +35,13 @@ flowchart TD
     Habit --> NotifyAtRepetition
 
     Project --> Relation
+
+    subgraph Notes
+        まったくやってない
+        e[[今やってる]]
+        c(ちょっとやった)
+        d([もうちょっとやった])
+        a((だいたいできた))
+        b(((完全にできた)))
+    end
 ```
