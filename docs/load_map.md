@@ -2,7 +2,11 @@
 
 ```mermaid
 flowchart TD
-    Mem ==> Memo
+    Mem --> Memo
+    Mem --> ToDo
+    Mem --> Task
+    Mem --> Habit
+    Mem --> Project
 
     Memo --> List
     Memo --> Save
@@ -17,22 +21,18 @@ flowchart TD
     Memo --> Remove
     List --> Search
 
-    Mem ==> ToDo
     ToDo --> Done
     Done --> Undone
     Done --> Sort
     Done --> Filter
 
-    Mem ==> Task
     Task --> NotifyAt
     NotifyAt --> Sort
     NotifyAt --> Expired
     NotifyAt --> Date
 
-    Mem ==> Habit
     Habit --> Counter
     Habit --> NotifyAtRepetition
 
-    Mem ==> Project
     Project --> Relation
 ```
