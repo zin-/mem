@@ -10,6 +10,8 @@ import 'package:mem/core/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/logger/i/type.dart';
+import 'package:mem/logger/log_entity.dart' as v2;
+import 'package:mem/logger/log_service_v2.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
@@ -21,6 +23,7 @@ import 'act_counter_service_test.mocks.dart';
 ])
 void main() {
   initializeLogger(Level.verbose);
+  LogServiceV2.initialize(v2.Level.verbose);
 
   final mockedMemRepository = MockMemRepository();
   final mockedActRepository = MockActRepository();
@@ -102,6 +105,7 @@ void main() {
     ': increment',
     () async {
       final memId = math.Random().nextInt(4294967296);
+      final now = DateAndTime.now();
 
       final act = Act(memId, DateAndTimePeriod.startNow());
       when(mockedActRepository.receive(any))
@@ -109,16 +113,15 @@ void main() {
       final mem = Mem(name: 'createNew', id: memId);
       when(mockedMemRepository.shipById(any))
           .thenAnswer((realInvocation) => Future.value(mem));
-      final lastUpdatedAt = DateAndTime.now();
       final acts = <Act>[
         Act(
           memId,
-          DateAndTimePeriod(end: lastUpdatedAt),
+          DateAndTimePeriod(end: now),
           createdAt: DateTime.now(),
         ),
         Act(
           memId,
-          DateAndTimePeriod(end: DateAndTime.now()),
+          DateAndTimePeriod(end: now),
           createdAt: DateTime.now(),
         ),
       ];
@@ -129,7 +132,7 @@ void main() {
       when(mockedHomeWidgetAccessor.updateWidget(widgetProviderName))
           .thenAnswer((realInvocation) => Future.value(true));
 
-      await actCounterService.increment(memId);
+      await actCounterService.increment(memId, now);
 
       expect(
         verify(mockedActRepository.receive(captureAny)).captured[0].memId,
@@ -157,7 +160,7 @@ void main() {
           'actCount-$memId',
           acts.length,
           'lastUpdatedAtSeconds-$memId',
-          lastUpdatedAt.millisecondsSinceEpoch.toDouble(),
+          now.millisecondsSinceEpoch.toDouble(),
         ],
       );
       verify(mockedHomeWidgetAccessor.updateWidget(any)).called(1);
