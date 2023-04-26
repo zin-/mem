@@ -63,14 +63,13 @@ class ActCounterService {
   factory ActCounterService({
     MemRepository? memRepository,
     ActRepository? actRepository,
-    ActCounterRepository? actCounterRepository,
   }) {
     var tmp = _instance;
     if (tmp == null) {
       _instance = tmp = ActCounterService._(
         memRepository ?? MemRepository(),
         actRepository ?? ActRepository(),
-        actCounterRepository ?? ActCounterRepository(),
+        ActCounterRepository(),
       );
     }
     return tmp;
