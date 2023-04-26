@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:mem/logger/i/api.dart';
+import 'package:mem/logger/log_service_v2.dart' as v2;
 
 /// # Home widget
 ///
@@ -30,14 +31,14 @@ class HomeWidgetAccessor {
             .invokeMethod<int>(initializeMethodName))!,
       );
 
-  Future<bool> saveWidgetData(String key, dynamic value) => v(
-        {'key': key, 'value': value},
+  Future<bool> saveWidgetData(String key, dynamic value) => v2.v(
         () async => (await HomeWidget.saveWidgetData(key, value))!,
+        {'key': key, 'value': value},
       );
 
-  Future<bool> updateWidget(String widgetName) => v(
-        {'widgetName': widgetName},
+  Future<bool> updateWidget(String widgetName) => v2.v(
         () async => (await HomeWidget.updateWidget(name: widgetName))!,
+        {'widgetName': widgetName},
       );
 
   HomeWidgetAccessor._();

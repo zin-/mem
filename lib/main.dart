@@ -4,10 +4,12 @@ import 'package:mem/act_counter/act_counter_repository.dart';
 import 'package:mem/act_counter/act_counter_service.dart';
 import 'package:mem/acts/act_entity.dart';
 import 'package:mem/acts/act_repository.dart';
+import 'package:mem/core/date_and_time.dart';
 import 'package:mem/database/i/types.dart';
 import 'package:mem/gui/app.dart';
 import 'package:mem/database/database.dart';
 import 'package:mem/database/database_manager.dart';
+import 'package:mem/logger/log_service_v2.dart' as v2;
 import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_list_page.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
@@ -70,8 +72,7 @@ const appId = 'zin.playground.mem';
 const actCounter = 'act_counters';
 const memIdParamName = 'mem_id';
 
-void backgroundCallback(Uri? uri) => t(
-      {'uri': uri},
+void backgroundCallback(Uri? uri) => v2.v(
       () async {
         if (uri != null && uri.scheme == uriSchema && uri.host == appId) {
           await openDatabase();
@@ -80,9 +81,13 @@ void backgroundCallback(Uri? uri) => t(
             final memId = uri.queryParameters[memIdParamName];
 
             if (memId != null) {
-              await ActCounterService().increment(int.parse(memId));
+              await ActCounterService().increment(
+                int.parse(memId),
+                DateAndTime.now(),
+              );
             }
           }
         }
       },
+      {'uri': uri},
     );
