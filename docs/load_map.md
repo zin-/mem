@@ -2,46 +2,91 @@
 
 ```mermaid
 flowchart TD
-    Mem --> Memo
-    Mem --> ToDo
-    Mem --> Task
-    Mem --> Habit
-    Mem --> Project
+    Mem --- Memo(((Memo)))
 
-    Memo --> List
-    Memo --> Save
-    Save --> Create
-    Save --> Update
-    Update --> Archive
-    Archive --> Unarchive
-    Archive --> Sort
-    List --> Sort
-    Archive --> Filter
-    List --> Filter
-    Memo --> Remove
-    List --> Search
+    Memo --> List((List))
+    Memo --> Save((Save))
+    Memo --> Remove((Remove))
+    List --> ListItem(ListItem)
+    Save --- Name[(Name)]
+    Save --> Create(Create)
+    Save --> Update(Update)
+    Create -.- CreatedAt[(CreatedAt)]
+    Update -.- UpdatedAt[(UpdatedAt)]
+    Update --- Archive(Archive)
+    Archive --- ArchivedAt[(ArchivedAt)]
+    Archive --> Unarchive(Unarchive)
+    Unarchive --- ArchivedAt
 
-    ToDo --> Done
+    List --> Filter(Filter)
+    List -.-> Search(Search)
+    Filter --- ArchivedAt
+    Search --- Name
+
+    Mem --- ToDo(((ToDo)))
+
+    ToDo --> Done((Done))
+    ListItem --> Done
+    Done --> Update
+    Done --- DoneAt[(DoneAt)]
     Done --> Undone
-    Done --> Sort
-    Done --> Filter
+    Undone --> Update
+    List --> Sort(Sort)
+    Sort --- DoneAt
+    Filter --- DoneAt
 
-    Task --> NotifyAt
-    NotifyAt --> Sort
-    NotifyAt --> Expired
-    NotifyAt --> Date
+    Mem --- Task(((Task)))
 
-    Habit --> Counter
-    Habit --> NotifyAtRepetition
+    Task --> Notify((Notify))
+    Task --- NotifyAt[(NotifyAt)]
+    Sort --- NotifyAt
+    ListItem --> Expired(Expired)
+    Expired --- NotifyAt
+    NotifyAt --- Date
+    NotifyAt --- Time
 
-    Project --> Relation
+    Mem --- Habit(((Habit)))
+
+    Habit --- Counter
+    Counter --- Act
+    Counter --- Name
+    Habit -.- NotifyAtRepetition
+
+    Mem -.- Project(((Project)))
+
+    Project -.- Relation
+
+    Mem ~~~ ThreePick
+    Mem ~~~ RandomPick
+    Mem ~~~ ConditionCheck
+    Mem ~~~ LogNothingTime[何もしていない時間を記録する]
 
     subgraph Notes
-        まったくやってない
-        e[[今やってる]]
-        c(ちょっとやった)
-        d([もうちょっとやった])
-        a((だいたいできた))
-        b(((完全にできた)))
+        subgraph Link
+            root -.- まったくやってない
+            root --- とりあえずできてる
+            root === 完全にできた
+            root ~~~ とりあえずのアイデア
+        end
+
+        subgraph Line head
+            func1 --- できているものとのつながり
+            func1 --> func2
+        %% なんかちょっと違和感ある
+        end
+
+        subgraph Shape
+            ex1(((大機能)))
+            ex2((中機能))
+            ex3(小機能)
+            ex4[(DBに保存する値)]
+        end
+    %% - できてないやつは簡単に追加したい
+    %%   - 装飾なし
+    %%     - 角
+    %% - できたやつは対比で丸？
+    %%   - 出来具合で丸くなってく？
+    %%     - 内容を表すために形を使うべきな気がしてきた
+    %%   - 線で出来具合を表した方が良い？
     end
 ```
