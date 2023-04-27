@@ -99,6 +99,7 @@ class LogServiceV2 {
     }
   }
 
+  // TODO Widgetのbuildを自動debugログの対象にする
   bool _shouldLog(Level level) =>
       DebugLoggableFunction._debug || _level.index <= level.index;
 
