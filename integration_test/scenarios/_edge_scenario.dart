@@ -47,8 +47,9 @@ void testEdgeScenario() => group(
 
                 expect(find.text(savedMemName), findsOneWidget);
                 expect(
-                    widgetTester.widgetList(find.byType(TextFormField)).length,
-                    3);
+                  widgetTester.widgetList(find.byType(TextFormField)).length,
+                  3,
+                );
               },
             );
           },
