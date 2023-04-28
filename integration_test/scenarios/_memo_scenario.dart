@@ -2,11 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/database/database_manager.dart';
+import 'package:mem/gui/constants.dart';
+import 'package:mem/logger/log_entity.dart';
+import 'package:mem/logger/log_service_v2.dart';
+import 'package:mem/main.dart';
+import 'package:mem/repositories/_database_tuple_repository.dart';
+import 'package:mem/repositories/mem_entity.dart';
 
 import '../_helpers.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  LogServiceV2.initialize(Level.verbose);
 
   DatabaseManager(onTest: true);
 
@@ -18,6 +25,94 @@ void testMemoScenario() => group(
       () {
         setUp(() async {
           await clearDatabase();
+        });
+
+        group(': V2', () {
+          const savedMemName = 'Memo scenario: V2: saved mem name';
+
+          setUp(() async {
+            final memTable =
+                (await DatabaseManager(onTest: true).open(databaseDefinition))
+                    .getTable(memTableDefinition.name);
+
+            await memTable.insert({
+              defMemName.name: savedMemName,
+              createdAtColumnName: DateTime.now(),
+            });
+          });
+
+          testWidgets(
+            ': List.',
+            (widgetTester) async {
+              await runApplication();
+              await widgetTester.pumpAndSettle();
+
+              expect(find.text(savedMemName), findsOneWidget);
+            },
+          );
+
+          group(': Save', () {
+            testWidgets(
+              ': Create.',
+              (widgetTester) async {
+                await runApplication();
+                await widgetTester.pumpAndSettle();
+
+                await widgetTester.tap(newMemFabFinder);
+                await widgetTester.pumpAndSettle();
+
+                expect(find.text(savedMemName), findsNothing);
+                expect(find.text('Name'), findsOneWidget);
+                const enteringMemNameText =
+                    'Memo scenario: Save: create. entering mem name';
+                const enteringMemMemoText =
+                    'Memo scenario: Save: create. entering mem memo';
+                await widgetTester.enterText(
+                  memNameTextFormFieldFinder,
+                  enteringMemNameText,
+                );
+                await widgetTester.enterText(
+                  memMemoTextFormFieldFinder,
+                  enteringMemMemoText,
+                );
+                await widgetTester.tap(saveMemFabFinder);
+                await widgetTester.pumpAndSettle();
+
+                const saveSuccessText = 'Save success. $enteringMemNameText';
+                expect(
+                  find.text(saveSuccessText),
+                  findsOneWidget,
+                );
+                await widgetTester.pumpAndSettle(defaultDismissDuration);
+
+                expect(
+                  find.text(saveSuccessText),
+                  findsNothing,
+                );
+                await widgetTester.pageBack();
+                await widgetTester.pumpAndSettle();
+
+                expect(find.text(savedMemName), findsOneWidget);
+                expect(find.text(enteringMemNameText), findsOneWidget);
+                expect(find.text(enteringMemMemoText), findsNothing);
+                await widgetTester.tap(find.text(enteringMemNameText));
+                await widgetTester.pumpAndSettle();
+
+                expect(find.text(savedMemName), findsNothing);
+                expect(
+                  memNameTextFormField(widgetTester).initialValue,
+                  enteringMemNameText,
+                );
+                expect(
+                  (widgetTester.widget(
+                    memMemoTextFormFieldFinder,
+                  ) as TextFormField)
+                      .initialValue,
+                  enteringMemMemoText,
+                );
+              },
+            );
+          });
         });
 
         testWidgets(
@@ -233,6 +328,33 @@ void testMemoScenario() => group(
             await closeMemListFilter(widgetTester);
 
             expect(find.text(savedMemName), findsNothing);
+          },
+        );
+
+        testWidgets(
+          'MemItem is nothing',
+          (widgetTester) async {
+            const savedMemName = 'saved mem name';
+            final database =
+                await DatabaseManager(onTest: true).open(databaseDefinition);
+            final memTable = database.getTable(memTableDefinition.name);
+            await memTable.insert({
+              defMemName.name: savedMemName,
+              createdAtColumnName: DateTime.now(),
+              archivedAtColumnName: null,
+            });
+
+            await runApplication(languageCode: 'en');
+            await widgetTester.pumpAndSettle(defaultDuration);
+
+            await widgetTester.tap(find.text(savedMemName));
+            await widgetTester.pumpAndSettle(defaultDuration);
+
+            expect(find.text(savedMemName), findsOneWidget);
+            expect(
+              widgetTester.widgetList(find.byType(TextFormField)).length,
+              4,
+            );
           },
         );
       },
