@@ -134,7 +134,7 @@ class FlutterLocalNotificationsWrapper {
               ),
               uiLocalNotificationDateInterpretation:
                   UILocalNotificationDateInterpretation.absoluteTime,
-              androidAllowWhileIdle: true,
+              androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
               payload: payload,
             );
           }
