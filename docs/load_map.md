@@ -43,8 +43,8 @@ flowchart TD
     Period -.- End_[(End)]
     Start -.- DateAndTime
     Start --> Notify
-    End_ --> Notify
     End_ -.- DateAndTime
+    End_ --> Notify
     Period --> Sort
     ListItem --> Expired(Expired)
     Period --> Expired
