@@ -59,6 +59,11 @@ flowchart TD
     Mem -.- Project(((Project)))
 
     Project -.- Relation
+    Relation -.- Parent-Child
+    Relation -.- Pre-Post
+    Project -.- Multi-User
+    Multi-User -.- Authorization
+    Multi-User -.- User-Action-Log
 
     Mem ~~~ ThreePick
     Mem ~~~ RandomPick
