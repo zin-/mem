@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/core/date_and_time.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/mems/mem_done_checkbox.dart';
 import 'package:mem/mems/mem_detail_states.dart';
 import 'package:mem/mems/mem_name.dart';
-import 'package:mem/mems/mem_notify_at.dart';
+import 'package:mem/mems/mem_period.dart';
 
 import 'mem_items_view.dart';
 
@@ -43,23 +42,25 @@ class MemDetailBody extends StatelessWidget {
                               ..doneAt = value == true ? DateTime.now() : null,
                           ),
                     ),
-                    MemNotifyAtTextFormField(
-                      editingMem,
-                      (dateTime, timeOfDay) => ref
-                          .read(editingMemProvider(_memId).notifier)
-                          .updatedBy(
-                            editingMem.copied()
-                              ..notifyAtV2 = dateTime == null
-                                  ? null
-                                  : DateAndTime(
-                                      dateTime.year,
-                                      dateTime.month,
-                                      dateTime.day,
-                                      timeOfDay?.hour,
-                                      timeOfDay?.minute,
-                                    ),
-                          ),
-                    ),
+                    // TODO replace MemPeriodTextFormFields
+                    // MemNotifyAtTextFormField(
+                    //   editingMem,
+                    //   (dateTime, timeOfDay) => ref
+                    //       .read(editingMemProvider(_memId).notifier)
+                    //       .updatedBy(
+                    //         editingMem.copied()
+                    //           ..notifyAtV2 = dateTime == null
+                    //               ? null
+                    //               : DateAndTime(
+                    //                   dateTime.year,
+                    //                   dateTime.month,
+                    //                   dateTime.day,
+                    //                   timeOfDay?.hour,
+                    //                   timeOfDay?.minute,
+                    //                 ),
+                    //       ),
+                    // ),
+                    MemPeriodTextFormFields(_memId),
                     MemItemsView(_memId),
                   ],
                 );

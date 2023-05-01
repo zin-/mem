@@ -15,6 +15,7 @@ import 'scenarios/_edge_scenario.dart';
 import 'scenarios/_memo_scenario.dart';
 import 'repositories/_notification_repository.dart';
 import 'scenarios/_todo_scenario.dart';
+import 'scenarios/task_scenario.dart';
 
 const defaultDuration = Duration(seconds: 1);
 
@@ -42,6 +43,7 @@ void main() {
   group('Scenario test', () {
     testMemoScenario();
     testTodoScenario();
+    testTaskScenario();
 
     testEdgeScenario();
   });
