@@ -16,6 +16,12 @@ dynamic i(
 ]) =>
     LogServiceV2()._log(Level.info, target, meta, null);
 
+dynamic w(
+  dynamic target, [
+  dynamic meta,
+]) =>
+    LogServiceV2()._log(Level.warning, target, meta, null);
+
 @Deprecated('For development only')
 dynamic d(
   dynamic target, [
