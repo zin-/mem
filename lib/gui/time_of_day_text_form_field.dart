@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mem/gui/l10n.dart';
 import 'package:mem/logger/i/api.dart';
 
 class TimeOfDayTextFormField extends StatelessWidget {
@@ -21,7 +20,6 @@ class TimeOfDayTextFormField extends StatelessWidget {
               text: timeOfDay?.format(context) ?? '',
             ),
             decoration: InputDecoration(
-              hintText: 'Cant show format. ${L10n().dev()}',
               suffixIcon: IconButton(
                 onPressed: () => v(
                   {},
