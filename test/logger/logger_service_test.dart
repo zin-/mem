@@ -59,7 +59,7 @@ void main() {
 
       verify(mockedLoggerWrapper.log(
         Level.info,
-        '[future] : 2',
+        '[future] => 2',
         any,
         any,
       )).called(1);
@@ -97,6 +97,7 @@ void main() {
             {a, b},
           );
 
+      // ignore: deprecated_member_use_from_same_package
       int target(int a, int b) => d(
             () {
               final c = childFuncInfo(a, b);
@@ -170,7 +171,7 @@ void main() {
         verify(mockedLoggerWrapper.log(any, captureAny, any, any)).captured,
         [
           '[start] :: [4, 5]',
-          '[ end ] => [future] : 9',
+          '[ end ] => [future] => 9',
         ],
       );
     });

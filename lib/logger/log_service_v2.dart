@@ -8,26 +8,26 @@ dynamic v(
   dynamic target, [
   dynamic meta,
 ]) =>
-    LogServiceV2()._log(Level.verbose, target, meta, null);
+    LogServiceV2()._log(Level.verbose, target, meta, null, []);
 
 dynamic i(
   dynamic target, [
   dynamic meta,
 ]) =>
-    LogServiceV2()._log(Level.info, target, meta, null);
+    LogServiceV2()._log(Level.info, target, meta, null, []);
 
 dynamic w(
   dynamic target, [
   dynamic meta,
 ]) =>
-    LogServiceV2()._log(Level.warning, target, meta, null);
+    LogServiceV2()._log(Level.warning, target, meta, null, []);
 
 @Deprecated('For development only')
 dynamic d(
   dynamic target, [
   dynamic meta,
 ]) =>
-    LogServiceV2()._log(Level.debug, target, meta, null);
+    LogServiceV2()._log(Level.debug, target, meta, null, []);
 
 class LogServiceV2 {
   final LogRepositoryV2 _logRepositoryV2;
@@ -37,9 +37,9 @@ class LogServiceV2 {
     Level level,
     dynamic target,
     dynamic meta,
-    StackTrace? stackTrace, [
-    List? prefixes,
-  ]) {
+    StackTrace? stackTrace,
+    List prefixes,
+  ) {
     if (target is Future) {
       _futureLog(level, target, meta, stackTrace, prefixes);
       return target;
@@ -48,12 +48,18 @@ class LogServiceV2 {
     }
 
     if (_shouldLog(level)) {
-      final message = (prefixes ?? []
-        ..add(target.toString()));
       if (DebugLoggableFunction._debug) {
-        message.insert(0, '[DEBUG]');
+        prefixes.insert(0, '[DEBUG]');
       }
-      _logRepositoryV2.receive(Log(level, message.join(), meta, stackTrace));
+
+      _logRepositoryV2.receive(Log(
+          level,
+          [
+            prefixes.join(),
+            target.toString(),
+          ].join(),
+          meta,
+          stackTrace));
     }
 
     return target;
@@ -75,7 +81,7 @@ class LogServiceV2 {
         meta,
         currentStackTrace,
         prefixes ?? []
-          ..add('[future] : '),
+          ..add('[future] => '),
       );
     });
 
@@ -100,7 +106,7 @@ class LogServiceV2 {
       }
       return result;
     } catch (e) {
-      _log(Level.error, 'Thrown is caught.', e, null);
+      _log(Level.error, 'Thrown is caught.', e, null, []);
       rethrow;
     }
   }
