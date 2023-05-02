@@ -1,231 +1,522 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/core/date_and_time.dart';
+import 'package:mem/core/date_and_time_period.dart';
 import 'package:mem/gui/date_text_form_field.dart';
 import 'package:mem/gui/time_of_day_text_form_field.dart';
-import 'package:mem/gui/l10n.dart';
 import 'package:mem/gui/date_and_time_text_form_field.dart';
 
-import 'time_of_day_text_form_field_test.dart';
-
 void main() {
-  Future pumpDateTimeTextField(
+  Future<void> showTarget(
     WidgetTester widgetTester,
-    DateTime? date,
-    TimeOfDay? timeOfDay,
-    Function(DateTime? pickedDate, TimeOfDay? pickedTimeOfDay)? onChanged,
-  ) async {
-    await widgetTester.pumpWidget(
-      MaterialApp(
-        onGenerateTitle: (context) => L10n(context).test(),
-        localizationsDelegates: L10n.localizationsDelegates,
-        supportedLocales: L10n.supportedLocales,
-        home: Scaffold(
-          body: DateAndTimeTextFormField(
-            date: date,
-            timeOfDay: timeOfDay,
-            onChanged: onChanged ?? (date, timeOfDay) {},
-          ),
+    DateAndTime? dateAndTime,
+    void Function(DateAndTime? pickedDateAndTime) onChanged, {
+    DateAndTimePeriod? selectableRange,
+  }) async {
+    await widgetTester.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: DateAndTimeTextFormFieldV2(
+          dateAndTime,
+          onChanged,
+          selectableRange: selectableRange,
         ),
       ),
-    );
+    ));
   }
 
+  final dateTextFormFieldFinder = find.byType(DateTextFormField);
+  final allDaySwitchFinder = find.byType(Switch);
+
   group('Show', () {
-    testWidgets(
-      'No date and time of day',
-      (widgetTester) async {
-        await pumpDateTimeTextField(widgetTester, null, null, null);
+    final timeOfDayTextFormFieldFinder = find.byType(TimeOfDayTextFormField);
+    final clearIconFinder = find.byIcon(Icons.clear);
 
-        expect(find.byType(DateTextFormField), findsOneWidget);
-        expect(find.byType(TimeOfDayTextFormField), findsNothing);
-        expect(find.byType(Switch), findsOneWidget);
-        expect(find.byIcon(Icons.clear), findsNothing);
+    testWidgets(
+      ': dateAndTime is null.',
+      (widgetTester) async {
+        const dateAndTime = null;
+
+        await showTarget(
+          widgetTester,
+          dateAndTime,
+          (pickedDateAndTime) {},
+        );
+
+        expect(dateTextFormFieldFinder, findsOneWidget);
+        expect(timeOfDayTextFormFieldFinder, findsNothing);
+        expect(allDaySwitchFinder, findsOneWidget);
+        expect(clearIconFinder, findsNothing);
 
         expect(
-          widgetTester
-              .widget<DateTextFormField>(find.byType(DateTextFormField))
+          (widgetTester.widget(dateTextFormFieldFinder) as DateTextFormField)
               .date,
-          isNull,
+          null,
         );
         expect(
-          widgetTester.widget<Switch>(find.byType(Switch)).value,
+          (widgetTester.widget(allDaySwitchFinder) as Switch).value,
           true,
         );
       },
     );
-
     testWidgets(
-      'With Date and no time of day',
+      ': dateAndTime is all day.',
       (widgetTester) async {
-        final date = DateTime.now();
+        final dateAndTime = DateAndTime(2023, 5, 2);
 
-        await pumpDateTimeTextField(widgetTester, date, null, null);
+        await showTarget(
+          widgetTester,
+          dateAndTime,
+          (pickedDateAndTime) {},
+        );
 
-        expect(find.byType(DateTextFormField), findsOneWidget);
-        expect(find.byType(TimeOfDayTextFormField), findsNothing);
-        expect(find.byType(Switch), findsOneWidget);
-        expect(find.byIcon(Icons.clear), findsOneWidget);
+        expect(dateTextFormFieldFinder, findsOneWidget);
+        expect(timeOfDayTextFormFieldFinder, findsNothing);
+        expect(allDaySwitchFinder, findsOneWidget);
+        expect(clearIconFinder, findsOneWidget);
 
         expect(
-          widgetTester
-              .widget<DateTextFormField>(find.byType(DateTextFormField))
+          (widgetTester.widget(dateTextFormFieldFinder) as DateTextFormField)
               .date,
-          date,
+          dateAndTime,
         );
         expect(
-          widgetTester.widget<Switch>(find.byType(Switch)).value,
+          (widgetTester.widget(allDaySwitchFinder) as Switch).value,
           true,
         );
       },
     );
-
     testWidgets(
-      'With date and time of day',
+      ': dateAndTime is not all day.',
       (widgetTester) async {
-        final date = DateTime.now();
-        final timeOfDay = TimeOfDay.fromDateTime(date);
+        final dateAndTime = DateAndTime(2023, 5, 2, 11, 34);
 
-        await pumpDateTimeTextField(widgetTester, date, timeOfDay, null);
+        await showTarget(
+          widgetTester,
+          dateAndTime,
+          (pickedDateAndTime) {},
+        );
 
-        expect(find.byType(DateTextFormField), findsOneWidget);
-        expect(find.byType(TimeOfDayTextFormField), findsOneWidget);
-        expect(find.byType(Switch), findsOneWidget);
-        expect(find.byIcon(Icons.clear), findsOneWidget);
+        expect(dateTextFormFieldFinder, findsOneWidget);
+        expect(timeOfDayTextFormFieldFinder, findsOneWidget);
+        expect(allDaySwitchFinder, findsOneWidget);
+        expect(clearIconFinder, findsOneWidget);
 
         expect(
-          widgetTester
-              .widget<DateTextFormField>(find.byType(DateTextFormField))
+          (widgetTester.widget(dateTextFormFieldFinder) as DateTextFormField)
               .date,
-          date,
+          dateAndTime,
         );
         expect(
-          widgetTester
-              .widget<TimeOfDayTextFormField>(
-                  find.byType(TimeOfDayTextFormField))
+          (widgetTester.widget(timeOfDayTextFormFieldFinder)
+                  as TimeOfDayTextFormField)
               .timeOfDay,
-          timeOfDay,
+          TimeOfDay.fromDateTime(dateAndTime),
         );
         expect(
-          widgetTester.widget<Switch>(find.byType(Switch)).value,
+          (widgetTester.widget(allDaySwitchFinder) as Switch).value,
           false,
         );
       },
     );
   });
 
-  group('onChanged', () {
-    testWidgets(
-      ': date',
-      (widgetTester) async {
-        await pumpDateTimeTextField(
-          widgetTester,
-          null,
-          null,
-          (pickedDate, pickedTimeOfDay) {
-            expect(pickedDate, isA<DateTime>());
-            expect(pickedTimeOfDay, isNull);
-          },
-        );
+  group('Action', () {
+    group(': Pick date', () {
+      testWidgets(
+        ': cancel.',
+        (widgetTester) async {
+          var count = 0;
 
-        await pickNowDate(widgetTester);
-      },
-    );
+          const dateAndTime = null;
 
-    testWidgets(
-      ': timeOfDay',
-      (widgetTester) async {
-        await pumpDateTimeTextField(
-          widgetTester,
-          null,
-          TimeOfDay.now(),
-          (pickedDate, pickedTimeOfDay) {
-            expect(pickedDate, isNull);
-            expect(pickedTimeOfDay, isA<TimeOfDay>());
-          },
-        );
+          await showTarget(
+            widgetTester,
+            dateAndTime,
+            (pickedDateAndTime) {
+              count++;
+            },
+          );
 
-        pickNowTimeOfDay(widgetTester, okButton);
-      },
-    );
+          await widgetTester.tap(find.byIcon(Icons.calendar_month));
+          await widgetTester.pump();
+          await widgetTester.tap(find.text('CANCEL'));
 
-    group(
-      'all day',
-      () {
+          expect(count, 0);
+        },
+      );
+
+      testWidgets(
+        ': pre value is null.',
+        (widgetTester) async {
+          var count = 0;
+
+          final now = DateTime.now();
+
+          const dateAndTime = null;
+          const selectDate = 1;
+
+          await showTarget(
+            widgetTester,
+            dateAndTime,
+            (pickedDateAndTime) {
+              expect(
+                pickedDateAndTime,
+                DateAndTime(
+                  now.year,
+                  now.month,
+                  selectDate,
+                ),
+              );
+              count++;
+            },
+          );
+
+          await widgetTester.tap(find.byIcon(Icons.calendar_month));
+          await widgetTester.pump();
+          await widgetTester.tap(find.text('$selectDate'));
+          await widgetTester.tap(find.text('OK'));
+
+          expect(count, 1);
+        },
+      );
+      testWidgets(
+        ': pre value is all day.',
+        (widgetTester) async {
+          var count = 0;
+
+          final now = DateTime.now();
+
+          final dateAndTime = DateAndTime.now(allDay: true);
+          const selectDate = 2;
+
+          await showTarget(
+            widgetTester,
+            dateAndTime,
+            (pickedDateAndTime) {
+              expect(
+                pickedDateAndTime,
+                DateAndTime(
+                  now.year,
+                  now.month,
+                  selectDate,
+                ),
+              );
+              count++;
+            },
+          );
+
+          await widgetTester.tap(find.byIcon(Icons.calendar_month));
+          await widgetTester.pump();
+          await widgetTester.tap(find.text('$selectDate'));
+          await widgetTester.tap(find.text('OK'));
+
+          expect(count, 1);
+        },
+      );
+      testWidgets(
+        ': pre value is not all day.',
+        (widgetTester) async {
+          var count = 0;
+
+          final dateAndTime = DateAndTime.now(allDay: false);
+          const selectDate = 3;
+
+          await showTarget(
+            widgetTester,
+            dateAndTime,
+            (pickedDateAndTime) {
+              expect(
+                pickedDateAndTime,
+                DateAndTime(
+                  dateAndTime.year,
+                  dateAndTime.month,
+                  selectDate,
+                  dateAndTime.hour,
+                  dateAndTime.minute,
+                  dateAndTime.second,
+                  dateAndTime.millisecond,
+                  dateAndTime.microsecond,
+                ),
+              );
+              count++;
+            },
+          );
+
+          await widgetTester.tap(find.byIcon(Icons.calendar_month));
+          await widgetTester.pump();
+          await widgetTester.tap(find.text('$selectDate'));
+          await widgetTester.tap(find.text('OK'));
+          await widgetTester.pump();
+
+          expect(count, 1);
+        },
+      );
+
+      group(': can not select date is out of range', () {
         testWidgets(
-          ': be false',
+          ': start.',
           (widgetTester) async {
-            await pumpDateTimeTextField(
+            var count = 0;
+
+            final dateTime = DateAndTime(2023, 5, 1);
+            const canNotSelectDate = 1;
+            const rangeEndDate = 2;
+
+            await showTarget(
               widgetTester,
-              null,
-              null,
-              (pickedDate, pickedTimeOfDay) {
-                expect(pickedTimeOfDay.runtimeType, TimeOfDay);
+              dateTime,
+              (pickedDateAndTime) {
+                expect(
+                  pickedDateAndTime,
+                  DateAndTime(
+                    dateTime.year,
+                    dateTime.month,
+                    rangeEndDate,
+                  ),
+                );
+                count++;
               },
+              selectableRange: DateAndTimePeriod(
+                start: DateAndTime(
+                  dateTime.year,
+                  dateTime.month,
+                  rangeEndDate,
+                ),
+              ),
             );
 
-            tapAllDaySwitch(widgetTester);
+            await widgetTester.tap(find.byIcon(Icons.calendar_month));
+            await widgetTester.pump();
+
+            await widgetTester.tap(find.text('$canNotSelectDate'));
+            await widgetTester.tap(find.text('OK'));
+            await widgetTester.pump();
+
+            expect(count, 1);
           },
         );
-
         testWidgets(
-          ': be true',
+          ': end.',
           (widgetTester) async {
-            await pumpDateTimeTextField(
+            var count = 0;
+
+            final now = DateTime.now();
+            const canNotSelectDate = 2;
+            const rangeEndDate = 1;
+
+            await showTarget(
               widgetTester,
               null,
-              TimeOfDay.now(),
-              (pickedDate, pickedTimeOfDay) {
-                expect(pickedTimeOfDay, isNull);
+              (pickedDateAndTime) {
+                expect(
+                  pickedDateAndTime,
+                  DateAndTime(
+                    now.year,
+                    now.month,
+                    rangeEndDate,
+                  ),
+                );
+                count++;
               },
+              selectableRange: DateAndTimePeriod(
+                end: DateAndTime(
+                  now.year,
+                  now.month,
+                  rangeEndDate,
+                ),
+              ),
             );
 
-            await tapAllDaySwitch(widgetTester);
+            await widgetTester.tap(find.byIcon(Icons.calendar_month));
+            await widgetTester.pump();
+
+            await widgetTester.tap(find.text('$canNotSelectDate'));
+            await widgetTester.tap(find.text('OK'));
+            await widgetTester.pump();
+
+            expect(count, 1);
           },
         );
-      },
-    );
+      });
+    });
+
+    group(': Switch all day', () {
+      testWidgets(
+        ': cancel.',
+        (widgetTester) async {
+          var count = 0;
+
+          const dateAndTime = null;
+
+          await showTarget(
+            widgetTester,
+            dateAndTime,
+            (pickedDateAndTime) {
+              count++;
+            },
+          );
+
+          await widgetTester.tap(allDaySwitchFinder);
+          await widgetTester.pump();
+
+          await widgetTester.tap(find.text('CANCEL'));
+          await widgetTester.pump();
+
+          expect(count, 0);
+        },
+      );
+
+      testWidgets(
+        ': pre value is all day.',
+        (widgetTester) async {
+          var count = 0;
+
+          final now = DateTime.now();
+          final dateAndTime = DateAndTime.now(allDay: true);
+
+          await showTarget(
+            widgetTester,
+            dateAndTime,
+            (pickedDateAndTime) {
+              expect(
+                pickedDateAndTime,
+                DateAndTime(
+                  dateAndTime.year,
+                  dateAndTime.month,
+                  dateAndTime.day,
+                  now.hour,
+                  now.minute,
+                ),
+              );
+
+              count++;
+            },
+          );
+
+          await widgetTester.tap(allDaySwitchFinder);
+          await widgetTester.pump();
+
+          await widgetTester.tap(find.text('OK'));
+
+          expect(count, 1);
+        },
+      );
+      testWidgets(
+        ': pre value is not all day.',
+        (widgetTester) async {
+          var count = 0;
+
+          final dateAndTime = DateAndTime.now(allDay: false);
+
+          await showTarget(
+            widgetTester,
+            dateAndTime,
+            (pickedDateAndTime) {
+              expect(
+                pickedDateAndTime,
+                DateAndTime(
+                  dateAndTime.year,
+                  dateAndTime.month,
+                  dateAndTime.day,
+                ),
+              );
+
+              count++;
+            },
+          );
+
+          await widgetTester.tap(allDaySwitchFinder);
+          await widgetTester.pump();
+
+          expect(count, 1);
+        },
+      );
+    });
+
+    group(': Pick time', () {
+      testWidgets(
+        ': cancel.',
+        (widgetTester) async {
+          var count = 0;
+
+          final dateAndTime = DateAndTime.now(allDay: false);
+
+          await showTarget(
+            widgetTester,
+            dateAndTime,
+            (pickedDateAndTime) {
+              count++;
+            },
+          );
+
+          await widgetTester.tap(find.byIcon(Icons.access_time_outlined));
+          await widgetTester.pump();
+
+          await widgetTester.tap(find.text('CANCEL'));
+          await widgetTester.pump();
+
+          expect(count, 0);
+        },
+      );
+
+      testWidgets(
+        ': pick.',
+        (widgetTester) async {
+          var count = 0;
+
+          final dateAndTime = DateAndTime.now(allDay: false);
+
+          await showTarget(
+            widgetTester,
+            dateAndTime,
+            (pickedDateAndTime) {
+              expect(
+                pickedDateAndTime,
+                DateAndTime(
+                  dateAndTime.year,
+                  dateAndTime.month,
+                  dateAndTime.day,
+                  dateAndTime.hour,
+                  dateAndTime.minute,
+                ),
+              );
+
+              count++;
+            },
+          );
+
+          await widgetTester.tap(find.byIcon(Icons.access_time_outlined));
+          await widgetTester.pump();
+
+          await widgetTester.tap(find.text('OK'));
+          await widgetTester.pump();
+
+          expect(count, 1);
+        },
+      );
+    });
 
     testWidgets(
-      ': clear',
+      ': Clear.',
       (widgetTester) async {
-        await pumpDateTimeTextField(
+        var count = 0;
+
+        final dateAndTime = DateAndTime.now();
+
+        await showTarget(
           widgetTester,
-          DateTime.now(),
-          TimeOfDay.now(),
-          (pickedDate, pickedTimeOfDay) {
-            expect(pickedDate, isNull);
-            expect(pickedTimeOfDay, isNull);
+          dateAndTime,
+          (pickedDateAndTime) {
+            expect(pickedDateAndTime, null);
+
+            count++;
           },
         );
 
-        await tapClear(widgetTester);
+        await widgetTester.tap(find.byIcon(Icons.clear));
+
+        expect(count, 1);
       },
     );
   });
-}
-
-pickNowDate(WidgetTester widgetTester) async {
-  await widgetTester.tap(find.descendant(
-    of: find.byType(DateAndTimeTextFormField),
-    matching: find.byIcon(Icons.calendar_month),
-  ));
-  await widgetTester.pump();
-
-  await widgetTester.tap(find.text('OK'));
-}
-
-tapAllDaySwitch(WidgetTester widgetTester) async {
-  await widgetTester.tap(find.descendant(
-    of: find.byType(DateAndTimeTextFormField),
-    matching: find.byType(Switch),
-  ));
-  await widgetTester.pump();
-}
-
-tapClear(WidgetTester widgetTester) async {
-  await widgetTester.tap(find.descendant(
-    of: find.byType(DateAndTimeTextFormField),
-    matching: find.byIcon(Icons.clear),
-  ));
-  await widgetTester.pump();
 }

@@ -5,18 +5,25 @@ import 'package:mem/logger/i/api.dart';
 class DateTextFormField extends StatelessWidget {
   final DateTime? date;
   final Function(DateTime? pickedDate) onChanged;
+  final DateTime? _firstDate;
+  final DateTime? _lastDate;
 
   final DateFormat _dateFormat = DateFormat.yMd();
+  final maxDuration = const Duration(days: 1000000000000000000);
 
   DateTextFormField({
     required this.date,
     required this.onChanged,
+    DateTime? firstDate,
+    DateTime? lastDate,
     Key? key,
-  }) : super(key: key);
+  })  : _firstDate = firstDate,
+        _lastDate = lastDate,
+        super(key: key);
 
   @override
   Widget build(BuildContext context) => v(
-        {'date': date},
+        {'date': date, 'firstDate': _firstDate, 'lastDate': _lastDate},
         () {
           return TextFormField(
             controller: TextEditingController(
@@ -28,15 +35,20 @@ class DateTextFormField extends StatelessWidget {
                 onPressed: () => v(
                   {},
                   () async {
-                    final currentDate = DateTime.now();
-                    final initialDate = date ?? currentDate;
-                    const maxDuration = Duration(days: 1000000000000000000);
+                    var initialDate = date ?? DateTime.now();
+                    if (_lastDate?.compareTo(initialDate) == -1) {
+                      initialDate = _lastDate!;
+                    }
+                    if (_firstDate?.compareTo(initialDate) == 1) {
+                      initialDate = _firstDate!;
+                    }
 
                     final pickedDate = await showDatePicker(
                       context: context,
                       initialDate: initialDate,
-                      firstDate: initialDate.subtract(maxDuration),
-                      lastDate: initialDate.add(maxDuration),
+                      firstDate:
+                          _firstDate ?? initialDate.subtract(maxDuration),
+                      lastDate: _lastDate ?? initialDate.add(maxDuration),
                     );
 
                     onChanged(pickedDate);

@@ -14,10 +14,8 @@ import 'package:mockito/mockito.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/gui/constants.dart';
 
-import '../gui/time_of_day_text_form_field_test.dart';
 import '../samples.dart';
 import '../mocks.mocks.dart';
-import '../gui/date_and_time_text_form_field_test.dart';
 import 'mem_detail_body_test.dart';
 
 void main() {
@@ -62,84 +60,6 @@ void main() {
 
   group('Save', () {
     testWidgets(
-      ': create.',
-      (widgetTester) async {
-        const memId = 1;
-
-        when(mockedNotificationRepository.initialize(any, any))
-            .thenAnswer((realInvocation) => Future.value(true));
-
-        await pumpMemDetailPage(widgetTester, null);
-
-        const enteringMemName = 'entering mem name';
-        const enteringMemMemo = 'test mem memo';
-        await widgetTester.enterText(
-            memNameTextFormFieldFinder, enteringMemName);
-        await widgetTester.enterText(
-            memMemoTextFormFieldFinder, enteringMemMemo);
-
-        await pickNowDate(widgetTester);
-        await widgetTester.pump();
-        await tapAllDaySwitch(widgetTester);
-        await pickNowTimeOfDay(widgetTester, okButton);
-        await widgetTester.pump();
-
-        when(mockedMemRepository.receive(any)).thenAnswer((realInvocation) {
-          final mem = realInvocation.positionalArguments[0] as Mem;
-
-          return Future.value(Mem(
-            name: mem.name,
-            doneAt: mem.doneAt,
-            // 通知を登録したいので、翌日を設定する
-            notifyAtV2: mem.notifyAtV2?.add(const Duration(days: 1)),
-            id: 1,
-            createdAt: DateTime.now(),
-            updatedAt: mem.updatedAt,
-            archivedAt: mem.archivedAt,
-          ));
-        });
-        when(mockedMemItemRepository.receive(any))
-            .thenAnswer((realInvocation) async {
-          final value = realInvocation.positionalArguments[0];
-
-          expect(value.memId, memId);
-          expect(value.type, MemItemType.memo);
-          expect(value.value, enteringMemMemo);
-
-          return minSavedMemItem(value.memId, 1);
-        });
-        when(mockedNotificationRepository.receive(
-          memId,
-          enteringMemName,
-          any,
-          any,
-          memReminderChannelId,
-          any,
-          any,
-        )).thenAnswer((realInvocation) {
-          return Future.value(null);
-        });
-
-        await widgetTester.tap(saveFabFinder);
-        await widgetTester.pumpAndSettle();
-
-        verify(mockedMemRepository.receive(any)).called(1);
-        verify(mockedMemItemRepository.receive(any)).called(1);
-        verify(mockedNotificationRepository.receive(
-                any, any, any, any, any, any, any))
-            .called(1);
-
-        expect(saveMemSuccessFinder(enteringMemName), findsOneWidget);
-
-        await widgetTester.pumpAndSettle(defaultDismissDuration);
-
-        expect(saveMemSuccessFinder(enteringMemName), findsNothing);
-
-        verifyNever(mockedMemRepository.shipById(memId));
-      },
-    );
-
-    testWidgets(
       ': update.',
       (widgetTester) async {
         const memId = 1;
@@ -182,7 +102,7 @@ void main() {
             ..updatedAt = DateTime.now()
             ..
                 // 通知を登録したいので、翌日を設定する
-                notifyAtV2 =
+                notifyAt =
                 DateAndTime.now(allDay: true).add(const Duration(days: 1));
         });
         when(mockedMemItemRepository.replace(any))

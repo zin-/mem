@@ -12,7 +12,6 @@ import 'package:mem/mems/mem_name.dart';
 import 'package:mem/mems/mem_notify_at.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/mems/mem_service.dart';
-import 'package:mem/gui/date_and_time_text_form_field.dart';
 
 // FIXME integration testでrepositoryを参照するのはNG
 import 'package:mem/repositories/_database_tuple_repository.dart';
@@ -116,23 +115,7 @@ final memMemoTextFormFieldFinder = find.descendant(
   matching: find.byType(TextFormField),
 );
 final saveMemFabFinder = find.byIcon(Icons.save_alt);
-final showDatePickerIconFinder = find.descendant(
-  of: find.byType(DateAndTimeTextFormField),
-  matching: find.byIcon(Icons.calendar_month),
-);
 final okFinder = find.text('OK');
-final allDaySwitchFinder = find.descendant(
-  of: find.byType(DateAndTimeTextFormField),
-  matching: find.byType(Switch),
-);
-final showTimePickerIconFinder = find.descendant(
-  of: find.byType(DateAndTimeTextFormField),
-  matching: find.byIcon(Icons.access_time_outlined),
-);
-final clearDateAndTimeIconFinder = find.descendant(
-  of: find.byType(DateAndTimeTextFormField),
-  matching: find.byIcon(Icons.clear),
-);
 final memNotifyAtTextFinder = find.byType(MemNotifyAtText);
 
 Future<void> prepareSavedMem(
