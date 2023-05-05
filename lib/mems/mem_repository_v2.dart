@@ -33,9 +33,9 @@ class MemRepository extends DatabaseTupleRepository<MemEntity, Mem> {
   UnpackedPayload unpack(Mem payload) => {
         defMemName.name: payload.name,
         defMemDoneAt.name: payload.doneAt,
-        defMemNotifyOn.name: payload.notifyAtV2,
+        defMemNotifyOn.name: payload.notifyAt,
         defMemNotifyAt.name:
-            payload.notifyAtV2?.isAllDay == false ? payload.notifyAtV2 : null,
+            payload.notifyAt?.isAllDay == false ? payload.notifyAt : null,
         idColumnName: payload.id,
         createdAtColumnName: payload.createdAt,
         updatedAtColumnName: payload.updatedAt,
@@ -51,7 +51,7 @@ class MemRepository extends DatabaseTupleRepository<MemEntity, Mem> {
     return Mem(
       name: memEntity.name,
       doneAt: memEntity.doneAt,
-      notifyAtV2: notifyOn == null
+      notifyAt: notifyOn == null
           ? null
           : DateAndTime.fromV2(notifyOn, timeOfDay: memEntity.notifyAt),
       id: memEntity.id,

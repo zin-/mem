@@ -18,12 +18,12 @@ class MemPeriodTextFormFields extends ConsumerWidget {
 
           return _MemPeriodTextFormFieldsComponent(
             // TODO Memにstartを持たせる
-            mem.notifyAtV2,
+            mem.notifyAt,
             (pickedStart) => v(
               () => ref
                   .read(editingMemProvider(_memId).notifier)
                   // TODO startを更新する
-                  .updatedBy(mem.copied()..notifyAtV2 = pickedStart),
+                  .updatedBy(mem.copied()..notifyAt = pickedStart),
               pickedStart,
             ),
             // TODO Memにendを持たせる
@@ -32,7 +32,7 @@ class MemPeriodTextFormFields extends ConsumerWidget {
               () => ref
                   .read(editingMemProvider(_memId).notifier)
                   // TODO endを更新する
-                  .updatedBy(mem.copied()..notifyAtV2 = pickedStart),
+                  .updatedBy(mem.copied()..notifyAt = pickedStart),
               pickedStart,
             ),
           );

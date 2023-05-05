@@ -317,45 +317,45 @@ void main() {
           ..name = 'notifyOn is null'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyAtV2 = null;
+          ..notifyAt = null;
         final notifyOnNow = minSavedMem(2)
           ..name = 'notifyOn is now'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyAtV2 = DateAndTime.fromV2(nowDate);
+          ..notifyAt = DateAndTime.fromV2(nowDate);
         final notifyOnOneDayAgo = minSavedMem(3)
           ..name = 'notifyOn is one day ago'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyAtV2 = DateAndTime.fromV2(
+          ..notifyAt = DateAndTime.fromV2(
             nowDate.add(const Duration(days: -1)),
           );
         final notifyOnOneDayLater = minSavedMem(4)
           ..name = 'notifyOn is one day later'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyAtV2 = DateAndTime.fromV2(
+          ..notifyAt = DateAndTime.fromV2(
             nowDate.add(const Duration(days: 1)),
           );
         final notifyOnNow2 = minSavedMem(5)
           ..name = 'notifyOn is now 2'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyAtV2 = DateAndTime.fromV2(
+          ..notifyAt = DateAndTime.fromV2(
             DateTime(now.year, now.month, now.day),
           );
         final notifyOnOneDayAgo2 = minSavedMem(6)
           ..name = 'notifyOn is one day ago 2'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyAtV2 = DateAndTime.fromV2(
+          ..notifyAt = DateAndTime.fromV2(
             nowDate.add(const Duration(days: -1)),
           );
         final notifyOnOneDayLater2 = minSavedMem(7)
           ..name = 'notifyOn is one day later 2'
           ..doneAt = null
           ..archivedAt = null
-          ..notifyAtV2 = DateAndTime.fromV2(
+          ..notifyAt = DateAndTime.fromV2(
             nowDate.add(const Duration(days: 1)),
           );
 
@@ -391,12 +391,12 @@ void main() {
             ..name = 'notifyAtV2 is null'
             ..doneAt = null
             ..archivedAt = null
-            ..notifyAtV2 = null;
+            ..notifyAt = null;
           final notifyAtV2IsNowNotAllDay = minSavedMem(2)
             ..name = 'notifyAt is now'
             ..doneAt = null
             ..archivedAt = null
-            ..notifyAtV2 = DateAndTime.now();
+            ..notifyAt = DateAndTime.now();
 
           when(mockedMemRepository.shipByCondition(any, any))
               .thenAnswer((realInvocation) => Future.value([
@@ -417,11 +417,11 @@ void main() {
         (widgetTester) async {
           final notifyOnIs23HoursAgo = minSavedMem(1)
             ..name = 'notifyAtV2 is 23 hour ago'
-            ..notifyAtV2 = DateAndTime.now(allDay: true)
+            ..notifyAt = DateAndTime.now(allDay: true)
                 .subtract(const Duration(hours: 23));
           final notifyOnIsNowNotAllDay = minSavedMem(2)
             ..name = 'notifyAtV2 is now(is not allDay)'
-            ..notifyAtV2 = DateAndTime.now();
+            ..notifyAt = DateAndTime.now();
 
           when(mockedMemRepository.shipByCondition(any, any))
               .thenAnswer((realInvocation) => Future.value([
@@ -450,11 +450,11 @@ void main() {
         (widgetTester) async {
           final notifyOnIs23HoursLater = minSavedMem(1)
             ..name = 'notifyAtV2 is 23 hour later'
-            ..notifyAtV2 =
+            ..notifyAt =
                 DateAndTime.now(allDay: false).add(const Duration(hours: 23));
           final notifyOnIsNowNotAllDay = minSavedMem(2)
             ..name = 'notifyAtV2 is now(is not allDay)'
-            ..notifyAtV2 = DateAndTime.now();
+            ..notifyAt = DateAndTime.now();
 
           when(mockedMemRepository.shipByCondition(any, any))
               .thenAnswer((realInvocation) => Future.value([
@@ -484,10 +484,10 @@ void main() {
         (widgetTester) async {
           final notifyOnIsNowAllDay = minSavedMem(1)
             ..name = 'notifyAtV2 is now(allDay)'
-            ..notifyAtV2 = DateAndTime.now(allDay: true);
+            ..notifyAt = DateAndTime.now(allDay: true);
           final notifyOnIsNowNotAllDay = minSavedMem(2)
             ..name = 'notifyAtV2 is now(is not allDay)'
-            ..notifyAtV2 = DateAndTime.now();
+            ..notifyAt = DateAndTime.now();
 
           when(mockedMemRepository.shipByCondition(any, any))
               .thenAnswer((realInvocation) => Future.value([

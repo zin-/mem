@@ -145,8 +145,8 @@ final sortedMemList =
               }
             }
 
-            final notifyAtV2_1 = item1.notifyAtV2;
-            final notifyAtV2_2 = item2.notifyAtV2;
+            final notifyAtV2_1 = item1.notifyAt;
+            final notifyAtV2_2 = item2.notifyAt;
             if (notifyAtV2_1 != notifyAtV2_2) {
               if (notifyAtV2_1 == null) {
                 return 1;

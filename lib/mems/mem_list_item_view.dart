@@ -67,11 +67,11 @@ class MemListItemViewComponent extends ListTile {
             (value) => onMemDoneCheckboxTapped(value, mem.id),
           ),
           title: MemNameText(mem.name, mem.id),
-          subtitle: mem.notifyAtV2 == null
+          subtitle: mem.notifyAt == null
               ? null
               : MemNotifyAtText(
                   mem.id,
-                  mem.notifyAtV2!,
+                  mem.notifyAt!,
                 ),
           tileColor: mem.isArchived() ? archivedColor : null,
           onTap: onTap == null ? null : () => onTap(mem.id),
@@ -86,11 +86,11 @@ class _SingleSelectableMemListItemComponent extends ListTile {
     super.key,
   }) : super(
           title: MemNameText(mem.name, mem.id),
-          subtitle: mem.notifyAtV2 == null
+          subtitle: mem.notifyAt == null
               ? null
               : MemNotifyAtText(
                   mem.id,
-                  mem.notifyAtV2!,
+                  mem.notifyAt!,
                 ),
           trailing: Radio<MemId>(
             value: mem.id,

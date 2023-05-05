@@ -130,7 +130,7 @@ Future<void> prepareSavedMem(
   await MemRepository(memTable).receive(Mem(
       name: memName,
       id: null,
-      notifyAtV2: DateAndTime(
+      notifyAt: DateAndTime(
         memNotifyOn.year,
         memNotifyOn.month,
         memNotifyOn.day,

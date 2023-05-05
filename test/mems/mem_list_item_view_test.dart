@@ -83,7 +83,7 @@ void main() {
       ': notifyAt',
       (widgetTester) async {
         final savedMem = minSavedMem(1)
-          ..notifyAtV2 = DateAndTime.now(allDay: true);
+          ..notifyAt = DateAndTime.now(allDay: true);
 
         await pumpMemListItemView(
           widgetTester,
@@ -96,7 +96,7 @@ void main() {
 
         expect(
           memNotifyAt.data,
-          DateFormat.yMd().format(savedMem.notifyAtV2!),
+          DateFormat.yMd().format(savedMem.notifyAt!),
         );
       },
     );
