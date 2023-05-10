@@ -17,16 +17,16 @@ void main() {
 
   DatabaseManager(onTest: true);
 
+  setUp(() async {
+    await clearDatabase();
+  });
+
   testMemoScenario();
 }
 
 void testMemoScenario() => group(
       'Memo scenario',
       () {
-        setUp(() async {
-          await clearDatabase();
-        });
-
         group(': V2', () {
           const savedMemName = 'Memo scenario: V2: saved mem name';
 

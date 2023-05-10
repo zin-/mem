@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/database/database_manager.dart';
+import 'package:integration_test/integration_test.dart';
 import 'package:mem/main.dart' as app;
 
 void main() {
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
+  setUp(() async {
+    clearDatabase();
+  });
+
   testTaskScenario();
 }
 
 void testTaskScenario() => group(
       'Task scenario',
       () {
-        setUp(() {
-          DatabaseManager(onTest: true);
-        });
-        tearDown(() async {
-          await DatabaseManager().delete(app.databaseDefinition.name);
-        });
-
         testWidgets(
           ': Set Period.',
           (widgetTester) async {

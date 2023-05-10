@@ -34,7 +34,7 @@ Future<void> main({String? languageCode}) async {
 }
 
 @pragma('vm:entry-point')
-launchActCounterConfigure() async {
+Future<void> launchActCounterConfigure() async {
   initializeLogger();
   run(const ActCounterConfigure());
 }
