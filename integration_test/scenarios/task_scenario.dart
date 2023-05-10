@@ -3,11 +3,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/main.dart' as app;
 
+import '../_helpers.dart';
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() async {
-    clearDatabase();
+    await clearDatabase();
   });
 
   testTaskScenario();
@@ -24,6 +26,7 @@ void testTaskScenario() => group(
             await app.main();
             await widgetTester.pumpAndSettle();
             await widgetTester.pumpAndSettle();
+            await widgetTester.pumpAndSettle();
 
             await widgetTester.tap(newMemFabFinder);
             await widgetTester.pumpAndSettle();
@@ -35,27 +38,67 @@ void testTaskScenario() => group(
             await widgetTester.tap(calendarIconFinder.at(0));
             await widgetTester.pumpAndSettle();
 
-            const selectDate = 2;
-            await widgetTester.tap(find.text('$selectDate'));
+            const pickingStartDate = 1;
+            await widgetTester.tap(find.text('$pickingStartDate'));
             await widgetTester.tap(find.text('OK'));
             await widgetTester.pumpAndSettle();
+
+            final startDate = '${now.month}/$pickingStartDate/${now.year}';
             expect(
-              find.text('${now.month}/$selectDate/${now.year}'),
-              findsOneWidget,
+              (widgetTester.widget(find.byType(TextFormField).at(1))
+                      as TextFormField)
+                  .initialValue,
+              startDate,
             );
-            // TODO fix DateAndTimeTextFormField
             expect(timeIconFinder, findsNothing);
 
             await widgetTester.tap(switchFinder.at(0));
             await widgetTester.pumpAndSettle();
+
             await widgetTester.tap(find.text('OK'));
             await widgetTester.pumpAndSettle();
-            final hour = now.hour > 12 ? now.hour - 12 : now.hour;
+
+            final start = DateTime.now();
+            final startTime =
+                '${now.hour == 0 ? 12 : now.hour > 12 ? now.hour - 12 : now.hour}'
+                ':${start.minute < 10 ? 0 : ''}${start.minute}'
+                ' ${start.hour > 12 ? 'PM' : 'AM'}';
             expect(
-              find.text('$hour:${now.minute} ${now.hour > 12 ? 'PM' : 'AM'}'),
-              findsOneWidget,
+              (widgetTester.widget(find.byType(TextFormField).at(2))
+                      as TextFormField)
+                  .initialValue,
+              startTime,
             );
             expect(timeIconFinder, findsOneWidget);
+
+            await widgetTester.tap(calendarIconFinder.at(1));
+            await widgetTester.pumpAndSettle();
+
+            await widgetTester.tap(find.byIcon(Icons.chevron_right).at(0));
+            await widgetTester.pumpAndSettle();
+
+            const pickingEndDate = 28;
+            await widgetTester.tap(find.text('$pickingEndDate'));
+            await widgetTester.tap(find.text('OK'));
+            await widgetTester.pumpAndSettle();
+
+            final endDate = '${now.month + 1}/$pickingEndDate/${now.year}';
+            expect(
+              (widgetTester.widget(find.byType(TextFormField).at(3))
+                      as TextFormField)
+                  .initialValue,
+              endDate,
+            );
+
+            await widgetTester.enterText(
+              memNameTextFormFieldFinder,
+              'Task scenario: Set Period. entering mem name',
+            );
+            await widgetTester.tap(saveMemFabFinder);
+            await widgetTester.pumpAndSettle();
+
+            await widgetTester.pageBack();
+            await widgetTester.pumpAndSettle();
 
             expect(1, 1);
           },

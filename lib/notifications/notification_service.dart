@@ -21,7 +21,7 @@ class NotificationService {
   memReminder(Mem mem) => t(
         {'mem': mem},
         () {
-          final notifyAtV2 = mem.notifyAt;
+          final notifyAtV2 = mem.period?.start;
           DateTime? notifyAt;
           if (notifyAtV2 != null && notifyAtV2.isAllDay == true) {
             // TODO 時間がないときのデフォルト値を設定から取得する
@@ -33,7 +33,7 @@ class NotificationService {
               0,
             );
           } else {
-            notifyAt = mem.notifyAt;
+            notifyAt = mem.period?.start;
           }
 
           if (mem.isArchived() || mem.isDone()) {

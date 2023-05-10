@@ -1,4 +1,4 @@
-import 'package:mem/core/date_and_time.dart';
+import 'package:mem/core/date_and_time_period.dart';
 
 import 'entity_value.dart';
 
@@ -7,12 +7,12 @@ typedef MemId = int;
 class Mem extends EntityValue {
   String name;
   DateTime? doneAt;
-  DateAndTime? notifyAt;
+  DateAndTimePeriod? period;
 
   Mem({
     required this.name,
     this.doneAt,
-    this.notifyAt,
+    this.period,
     int? id,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -30,14 +30,14 @@ class Mem extends EntityValue {
   String toString() => {
         'name': name,
         'doneAt': doneAt,
-        'notifyAt': notifyAt,
+        'period': period,
       }.toString();
 
   // FIXME エレガントじゃない
   Mem copied() => Mem(
         name: name,
         doneAt: doneAt,
-        notifyAt: notifyAt,
+        period: period,
         id: id,
         createdAt: createdAt,
         updatedAt: updatedAt,

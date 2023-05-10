@@ -72,6 +72,7 @@ void testNotificationRepository() => group(
                   await notificationRepository.receive(
                     1,
                     'title',
+                    'body',
                     DateTime.now().add(const Duration(days: 1)),
                     [],
                     'test channelId',

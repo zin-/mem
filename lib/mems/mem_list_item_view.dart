@@ -5,11 +5,11 @@ import 'package:mem/gui/colors.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/mems/mem_list_page_states.dart';
 import 'package:mem/mems/mem_list_view_state.dart';
+import 'package:mem/mems/mem_period.dart';
 
 import '../mems/mem_done_checkbox.dart';
 import '../mems/mem_list_item_actions.dart';
 import 'mem_name.dart';
-import 'mem_notify_at.dart';
 
 class MemListItemView extends ConsumerWidget {
   final MemId _memId;
@@ -67,12 +67,7 @@ class MemListItemViewComponent extends ListTile {
             (value) => onMemDoneCheckboxTapped(value, mem.id),
           ),
           title: MemNameText(mem.name, mem.id),
-          subtitle: mem.notifyAt == null
-              ? null
-              : MemNotifyAtText(
-                  mem.id,
-                  mem.notifyAt!,
-                ),
+          subtitle: mem.period == null ? null : MemPeriodTexts(mem.id),
           tileColor: mem.isArchived() ? archivedColor : null,
           onTap: onTap == null ? null : () => onTap(mem.id),
         );
@@ -86,12 +81,7 @@ class _SingleSelectableMemListItemComponent extends ListTile {
     super.key,
   }) : super(
           title: MemNameText(mem.name, mem.id),
-          subtitle: mem.notifyAt == null
-              ? null
-              : MemNotifyAtText(
-                  mem.id,
-                  mem.notifyAt!,
-                ),
+          subtitle: mem.period == null ? null : MemPeriodTexts(mem.id),
           trailing: Radio<MemId>(
             value: mem.id,
             groupValue: isSelected ? mem.id : null,

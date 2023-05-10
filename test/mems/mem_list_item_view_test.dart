@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:intl/intl.dart';
-import 'package:mem/core/date_and_time.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/gui/list_value_state_notifier.dart';
@@ -11,7 +9,6 @@ import 'package:mem/mems/mem_detail_states.dart';
 import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_list_item_view.dart';
 import 'package:mem/mems/mem_list_page_states.dart';
-import 'package:mem/mems/mem_notify_at.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/notifications/notification_repository.dart';
 
@@ -79,27 +76,6 @@ void main() {
       },
     );
 
-    testWidgets(
-      ': notifyAt',
-      (widgetTester) async {
-        final savedMem = minSavedMem(1)
-          ..notifyAt = DateAndTime.now(allDay: true);
-
-        await pumpMemListItemView(
-          widgetTester,
-          savedMem,
-        );
-        await widgetTester.pump();
-
-        final memNotifyAt = widgetTester.widget(find.byType(MemNotifyAtText))
-            as MemNotifyAtText;
-
-        expect(
-          memNotifyAt.data,
-          DateFormat.yMd().format(savedMem.notifyAt!),
-        );
-      },
-    );
   });
 
   group(

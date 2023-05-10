@@ -37,13 +37,13 @@ flowchart TD
 
     ToDo --> Task(((Task)))
 
-    Task -.- Period
+    Task --- Period
     Task --- Notify((Notify))
-    Period -.- Start[(Start)]
-    Period -.- End_[(End)]
-    Start -.- DateAndTime
+    Period --- Start[(Start)]
+    Period --- End_[(End)]
+    Start --- DateAndTime
     Start --> Notify
-    End_ -.- DateAndTime
+    End_ --- DateAndTime
     End_ --> Notify
     Period --> Sort
     ListItem --> Expired(Expired)

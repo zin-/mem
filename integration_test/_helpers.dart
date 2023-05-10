@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/core/date_and_time.dart';
+import 'package:mem/core/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/database/database_manager.dart';
@@ -9,7 +10,6 @@ import 'package:mem/main.dart' as app;
 import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_items_view.dart';
 import 'package:mem/mems/mem_name.dart';
-import 'package:mem/mems/mem_notify_at.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/mems/mem_service.dart';
 
@@ -116,7 +116,6 @@ final memMemoTextFormFieldFinder = find.descendant(
 );
 final saveMemFabFinder = find.byIcon(Icons.save_alt);
 final okFinder = find.text('OK');
-final memNotifyAtTextFinder = find.byType(MemNotifyAtText);
 
 Future<void> prepareSavedMem(
   String memName,
@@ -130,12 +129,14 @@ Future<void> prepareSavedMem(
   await MemRepository(memTable).receive(Mem(
       name: memName,
       id: null,
-      notifyAt: DateAndTime(
-        memNotifyOn.year,
-        memNotifyOn.month,
-        memNotifyOn.day,
-        memNotifyAt.hour,
-        memNotifyAt.minute,
+      period: DateAndTimePeriod(
+        start: DateAndTime(
+          memNotifyOn.year,
+          memNotifyOn.month,
+          memNotifyOn.day,
+          memNotifyAt.hour,
+          memNotifyAt.minute,
+        ),
       )));
 
   await DatabaseManager(onTest: true).close(app.databaseDefinition.name);

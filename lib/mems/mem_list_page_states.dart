@@ -145,8 +145,8 @@ final sortedMemList =
               }
             }
 
-            final notifyAtV2_1 = item1.notifyAt;
-            final notifyAtV2_2 = item2.notifyAt;
+            final notifyAtV2_1 = item1.period?.start;
+            final notifyAtV2_2 = item2.period?.start;
             if (notifyAtV2_1 != notifyAtV2_2) {
               if (notifyAtV2_1 == null) {
                 return 1;

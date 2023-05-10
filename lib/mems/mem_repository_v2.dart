@@ -1,4 +1,5 @@
 import 'package:mem/core/date_and_time.dart';
+import 'package:mem/core/date_and_time_period.dart';
 import 'package:mem/core/errors.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/database/database.dart' as db;
@@ -33,9 +34,13 @@ class MemRepository extends DatabaseTupleRepository<MemEntity, Mem> {
   UnpackedPayload unpack(Mem payload) => {
         defMemName.name: payload.name,
         defMemDoneAt.name: payload.doneAt,
-        defMemNotifyOn.name: payload.notifyAt,
-        defMemNotifyAt.name:
-            payload.notifyAt?.isAllDay == false ? payload.notifyAt : null,
+        defMemStartOn.name: payload.period?.start,
+        defMemStartAt.name: payload.period?.start?.isAllDay == false
+            ? payload.period?.start
+            : null,
+        defMemEndOn.name: payload.period?.end,
+        defMemEndAt.name:
+            payload.period?.end?.isAllDay == false ? payload.period?.end : null,
         idColumnName: payload.id,
         createdAtColumnName: payload.createdAt,
         updatedAtColumnName: payload.updatedAt,
@@ -47,13 +52,21 @@ class MemRepository extends DatabaseTupleRepository<MemEntity, Mem> {
     final memEntity = MemEntity.fromMap(unpackedPayload);
 
     final notifyOn = memEntity.notifyOn;
+    final endOn = memEntity.endOn;
 
     return Mem(
       name: memEntity.name,
       doneAt: memEntity.doneAt,
-      notifyAt: notifyOn == null
+      period: notifyOn == null && endOn == null
           ? null
-          : DateAndTime.fromV2(notifyOn, timeOfDay: memEntity.notifyAt),
+          : DateAndTimePeriod(
+              start: notifyOn == null
+                  ? null
+                  : DateAndTime.fromV2(notifyOn, timeOfDay: memEntity.notifyAt),
+              end: endOn == null
+                  ? null
+                  : DateAndTime.fromV2(endOn, timeOfDay: memEntity.endAt),
+            ),
       id: memEntity.id,
       createdAt: memEntity.createdAt,
       updatedAt: memEntity.updatedAt,
