@@ -39,7 +39,7 @@ class MemListItemView extends ConsumerWidget {
               key: key,
             );
           } else {
-            return MemListItemViewComponent(
+            return _MemListItemViewComponent(
               mem,
               _onTapped,
               (bool? value, MemId memId) {
@@ -54,9 +54,8 @@ class MemListItemView extends ConsumerWidget {
       );
 }
 
-// TODO privateにする
-class MemListItemViewComponent extends ListTile {
-  MemListItemViewComponent(
+class _MemListItemViewComponent extends ListTile {
+  _MemListItemViewComponent(
     Mem mem,
     void Function(MemId memId)? onTap,
     void Function(bool? value, MemId memId) onMemDoneCheckboxTapped, {

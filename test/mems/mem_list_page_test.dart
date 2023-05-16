@@ -342,7 +342,7 @@ void main() {
 final memListFinder = find.byType(CustomScrollView);
 final memListTileFinder = find.descendant(
   of: memListFinder,
-  matching: find.byType(MemListItemViewComponent),
+  matching: find.byType(MemListItemView),
 );
 final showNewMemFabFinder = find.byType(FloatingActionButton);
 

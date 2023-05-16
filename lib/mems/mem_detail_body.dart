@@ -42,24 +42,6 @@ class MemDetailBody extends StatelessWidget {
                               ..doneAt = value == true ? DateTime.now() : null,
                           ),
                     ),
-                    // TODO replace MemPeriodTextFormFields
-                    // MemNotifyAtTextFormField(
-                    //   editingMem,
-                    //   (dateTime, timeOfDay) => ref
-                    //       .read(editingMemProvider(_memId).notifier)
-                    //       .updatedBy(
-                    //         editingMem.copied()
-                    //           ..notifyAtV2 = dateTime == null
-                    //               ? null
-                    //               : DateAndTime(
-                    //                   dateTime.year,
-                    //                   dateTime.month,
-                    //                   dateTime.day,
-                    //                   timeOfDay?.hour,
-                    //                   timeOfDay?.minute,
-                    //                 ),
-                    //       ),
-                    // ),
                     MemPeriodTextFormFields(_memId),
                     MemItemsView(_memId),
                   ],
