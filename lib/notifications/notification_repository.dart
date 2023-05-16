@@ -1,7 +1,8 @@
-import 'dart:convert';
-
+import 'package:mem/frame_work/repository_v3.dart';
 import 'package:mem/logger/i/api.dart';
+import 'package:mem/logger/log_service_v2.dart' as v2;
 import 'package:mem/notifications/flutter_local_notifications.dart';
+import 'package:mem/notifications/notification.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -16,7 +17,7 @@ class NotificationActionEntity {
 
 const memIdKey = 'memId';
 
-class NotificationRepository {
+class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
   final FlutterLocalNotificationsWrapper _flutterLocalNotificationsWrapper;
 
   Future<bool> initialize(
@@ -64,38 +65,29 @@ class NotificationRepository {
         },
       );
 
-  // FIXME 引数が多すぎる。entityに押し込む
+  @override
   Future<void> receive(
-    int id,
-    String title,
-    DateTime notifyAt,
-    List<NotificationActionEntity> actions,
-    String channelId,
-    String channelName,
-    String channelDescription,
+    Notification payload,
   ) =>
-      v(
-        {
-          'id': id,
-          'title': title,
-          'notifyAt': notifyAt,
-          'actions': actions,
-          'channelId': channelId,
-          'channelName': channelName,
-          'channelDescription': channelDescription,
+      v2.v(
+        () async {
+          if (payload is OneTimeNotification) {
+            await _flutterLocalNotificationsWrapper.zonedSchedule(
+              payload.id,
+              payload.title,
+              payload.body,
+              tz.TZDateTime.from(payload.notifyAt, tz.local),
+              payload.payloadJson,
+              payload.actions,
+              payload.channelId,
+              payload.channelName,
+              payload.channelDescription,
+            );
+          } else if (payload is CancelNotification) {
+            await discard(payload.id);
+          }
         },
-        () {
-          return _flutterLocalNotificationsWrapper.zonedSchedule(
-            id,
-            title,
-            tz.TZDateTime.from(notifyAt, tz.local),
-            json.encode({memIdKey: id}),
-            actions,
-            channelId,
-            channelName,
-            channelDescription,
-          );
-        },
+        payload,
       );
 
   Future<void> discard(int id) => v(

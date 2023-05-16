@@ -10,6 +10,7 @@ import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_list_item_view.dart';
 import 'package:mem/mems/mem_list_page_states.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
+import 'package:mem/notifications/notification.dart';
 import 'package:mem/notifications/notification_repository.dart';
 
 import 'package:mockito/mockito.dart';
@@ -75,7 +76,6 @@ void main() {
         );
       },
     );
-
   });
 
   group(
@@ -128,14 +128,9 @@ void main() {
               updatedAt: DateTime.now(),
             );
           });
-          when(mockedNotificationRepository.discard(any))
-              .thenAnswer((realInvocation) {
-            final arg1 = realInvocation.positionalArguments[0];
-
-            expect(arg1, savedMem.id);
-
-            return Future.value(null);
-          });
+          when(mockedNotificationRepository.receive(any)).thenAnswer(
+            (realInvocation) => Future.value(null),
+          );
 
           await widgetTester.tap(find.byType(Checkbox));
 
@@ -144,7 +139,15 @@ void main() {
             verify(mockedMemRepository.replace(captureAny)).captured,
             [savedMem],
           );
-          verify(mockedNotificationRepository.discard(memId)).called(1);
+          expect(
+            verify(mockedNotificationRepository.receive(
+              captureAny,
+            )).captured.toString(),
+            [
+              CancelNotification(memId * 10 + 1),
+              CancelNotification(memId * 10 + 2),
+            ].toString(),
+          );
 
           verifyNever(mockedMemItemRepository.replace(any));
         },

@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:mem/notifications/notification.dart';
 import 'package:mem/notifications/notification_repository.dart';
 
 void main() {
@@ -70,14 +72,17 @@ void testNotificationRepository() => group(
                 ': receive',
                 (widgetTester) async {
                   await notificationRepository.receive(
-                    1,
-                    'title',
-                    'body',
-                    DateTime.now().add(const Duration(days: 1)),
-                    [],
-                    'test channelId',
-                    'test channelName',
-                    'test channelDescription',
+                    OneTimeNotification(
+                      1,
+                      'title',
+                      'body',
+                      DateTime.now().add(const Duration(days: 1)),
+                      jsonEncode({}),
+                      [],
+                      'test channelId',
+                      'test channelName',
+                      'test channelDescription',
+                    ),
                   );
 
                   // dev(result);
