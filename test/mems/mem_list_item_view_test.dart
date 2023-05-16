@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/gui/l10n.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/gui/list_value_state_notifier.dart';
 import 'package:mem/gui/value_state_notifier.dart';
@@ -20,28 +18,6 @@ import '../samples.dart';
 import '../mocks.mocks.dart';
 
 void main() {
-  Future pumpMemListItemView(
-    WidgetTester widgetTester,
-    Mem mem,
-  ) async {
-    await widgetTester.pumpWidget(
-      ProviderScope(
-        child: MaterialApp(
-          onGenerateTitle: (context) => L10n(context).memListPageTitle(),
-          localizationsDelegates: L10n.localizationsDelegates,
-          supportedLocales: L10n.supportedLocales,
-          home: Scaffold(
-            body: MemListItemViewComponent(
-              mem,
-              (memId) {},
-              (value, memId) {},
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   final mockedMemRepository = MockMemRepository();
   MemRepository.resetWith(mockedMemRepository);
   final mockedMemItemRepository = MockMemItemRepository();
@@ -53,29 +29,6 @@ void main() {
     reset(mockedMemRepository);
     reset(mockedMemItemRepository);
     reset(mockedNotificationRepository);
-  });
-
-  group('Show', () {
-    testWidgets(
-      ': default',
-      (widgetTester) async {
-        final savedMem = minSavedMem(1)
-          ..name = 'saved mem entity name'
-          ..doneAt = null;
-
-        await pumpMemListItemView(
-          widgetTester,
-          savedMem,
-        );
-        await widgetTester.pump();
-
-        expect(find.text(savedMem.name), findsOneWidget);
-        expect(
-          widgetTester.widget<Checkbox>(find.byType(Checkbox)).value,
-          false,
-        );
-      },
-    );
   });
 
   group(

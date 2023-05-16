@@ -5,7 +5,7 @@ import 'package:mem/logger/i/api.dart';
 import 'package:mem/logger/i/type.dart';
 import 'package:mem/main.dart';
 
-import '_act_counter_configure_test.dart';
+import 'scenarios/act_counter_scenario.dart';
 import '_helpers.dart';
 import 'acts/_act_list_page.dart';
 import 'database/_database_manager.dart';
