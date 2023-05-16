@@ -6,10 +6,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/main.dart';
+import 'package:mem/notifications/notification.dart';
 import 'package:mem/notifications/notification_service.dart';
 import 'package:timezone/timezone.dart';
-
-import 'notification_repository.dart';
 
 typedef OnNotificationTappedCallback = Function(
   int id,
@@ -98,9 +97,10 @@ class FlutterLocalNotificationsWrapper {
   Future<void> zonedSchedule(
     int id,
     String title,
+    String? body,
     TZDateTime tzDateTime,
     String payload,
-    List<NotificationActionEntity> actions,
+    List<NotificationAction> actions,
     String channelId,
     String channelName,
     String channelDescription,
@@ -109,6 +109,7 @@ class FlutterLocalNotificationsWrapper {
         {
           'id': id,
           'title': title,
+          'body': body,
           'tzDateTime': tzDateTime,
           'payload': payload,
           'channelId': channelId,
@@ -120,7 +121,7 @@ class FlutterLocalNotificationsWrapper {
             return _flutterLocalNotificationsPlugin.zonedSchedule(
               id,
               title,
-              null,
+              body,
               tzDateTime,
               NotificationDetails(
                 android: AndroidNotificationDetails(
@@ -134,7 +135,7 @@ class FlutterLocalNotificationsWrapper {
               ),
               uiLocalNotificationDateInterpretation:
                   UILocalNotificationDateInterpretation.absoluteTime,
-              androidAllowWhileIdle: true,
+              androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
               payload: payload,
             );
           }

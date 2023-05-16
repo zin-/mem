@@ -6,7 +6,9 @@ class DateAndTimePeriod {
 
   DateAndTimePeriod({this.start, this.end}) {
     assert(start != null || end != null);
-    if (start != null && end != null) assert(start!.compareTo(end!) <= 0);
+    if (start != null && end != null) {
+      assert(start!.compareTo(end!) <= 0);
+    }
   }
 
   DateAndTimePeriod.startNow({bool allDay = false})

@@ -16,8 +16,6 @@ void main() {
 void testTodoScenario() => group(
       'Todo scenario',
       () {
-        setUp(() async => await clearDatabase());
-
         group(
           'Todo scenario',
           () {

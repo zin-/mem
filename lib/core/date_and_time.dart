@@ -116,4 +116,14 @@ class DateAndTime extends DateTime {
 
   @override
   String toString() => toMap().toString();
+
+  @override
+  int compareTo(DateTime other) {
+    if (other is DateAndTime && isAllDay != other.isAllDay) {
+      return DateAndTime(year, month, day)
+          .compareTo(DateAndTime(other.year, other.month, other.day));
+    }
+
+    return super.compareTo(other);
+  }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/core/date_and_time.dart';
+import 'package:mem/core/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/database/database_manager.dart';
@@ -9,10 +10,8 @@ import 'package:mem/main.dart' as app;
 import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_items_view.dart';
 import 'package:mem/mems/mem_name.dart';
-import 'package:mem/mems/mem_notify_at.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/mems/mem_service.dart';
-import 'package:mem/gui/date_and_time_text_form_field.dart';
 
 // FIXME integration testでrepositoryを参照するのはNG
 import 'package:mem/repositories/_database_tuple_repository.dart';
@@ -116,24 +115,7 @@ final memMemoTextFormFieldFinder = find.descendant(
   matching: find.byType(TextFormField),
 );
 final saveMemFabFinder = find.byIcon(Icons.save_alt);
-final showDatePickerIconFinder = find.descendant(
-  of: find.byType(DateAndTimeTextFormField),
-  matching: find.byIcon(Icons.calendar_month),
-);
 final okFinder = find.text('OK');
-final allDaySwitchFinder = find.descendant(
-  of: find.byType(DateAndTimeTextFormField),
-  matching: find.byType(Switch),
-);
-final showTimePickerIconFinder = find.descendant(
-  of: find.byType(DateAndTimeTextFormField),
-  matching: find.byIcon(Icons.access_time_outlined),
-);
-final clearDateAndTimeIconFinder = find.descendant(
-  of: find.byType(DateAndTimeTextFormField),
-  matching: find.byIcon(Icons.clear),
-);
-final memNotifyAtTextFinder = find.byType(MemNotifyAtText);
 
 Future<void> prepareSavedMem(
   String memName,
@@ -147,12 +129,14 @@ Future<void> prepareSavedMem(
   await MemRepository(memTable).receive(Mem(
       name: memName,
       id: null,
-      notifyAtV2: DateAndTime(
-        memNotifyOn.year,
-        memNotifyOn.month,
-        memNotifyOn.day,
-        memNotifyAt.hour,
-        memNotifyAt.minute,
+      period: DateAndTimePeriod(
+        start: DateAndTime(
+          memNotifyOn.year,
+          memNotifyOn.month,
+          memNotifyOn.day,
+          memNotifyAt.hour,
+          memNotifyAt.minute,
+        ),
       )));
 
   await DatabaseManager(onTest: true).close(app.databaseDefinition.name);

@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:mem/core/date_and_time.dart';
+import 'package:mem/core/date_and_time_period.dart';
 
 import 'entity_value.dart';
 
@@ -8,18 +7,12 @@ typedef MemId = int;
 class Mem extends EntityValue {
   String name;
   DateTime? doneAt;
-  @Deprecated('use notifyAtV2')
-  DateTime? notifyOn;
-  @Deprecated('use notifyAtV2')
-  TimeOfDay? notifyAt;
-  DateAndTime? notifyAtV2;
+  DateAndTimePeriod? period;
 
   Mem({
     required this.name,
     this.doneAt,
-    this.notifyOn,
-    this.notifyAt,
-    this.notifyAtV2,
+    this.period,
     int? id,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -37,14 +30,14 @@ class Mem extends EntityValue {
   String toString() => {
         'name': name,
         'doneAt': doneAt,
-        'notifyAtV2': notifyAtV2,
+        'period': period,
       }.toString();
 
   // FIXME エレガントじゃない
   Mem copied() => Mem(
         name: name,
         doneAt: doneAt,
-        notifyAtV2: notifyAtV2,
+        period: period,
         id: id,
         createdAt: createdAt,
         updatedAt: updatedAt,
