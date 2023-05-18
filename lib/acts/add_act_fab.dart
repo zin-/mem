@@ -3,32 +3,51 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/act_actions.dart';
 import 'package:mem/acts/act_list_page_states.dart';
 import 'package:mem/core/mem.dart';
-import 'package:mem/logger/i/api.dart';
+import 'package:mem/logger/log_service_v2.dart';
 
-class AddActFab extends ConsumerWidget {
+class ActFab extends ConsumerWidget {
   final MemId _memId;
 
-  const AddActFab(this._memId, {super.key});
+  const ActFab(this._memId, {super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => v(
-        {'_memId': _memId},
-        () {
-          return _AddActFabView(
-            onPressed: () => v(
-              {'_memId': _memId},
-              () async {
-                ref
-                    .read(actListProvider(_memId).notifier)
-                    .add(await add(_memId));
-              },
-            ),
-          );
-        },
+  Widget build(BuildContext context, WidgetRef ref) {
+    final actList = ref.watch(actListProvider(_memId));
+
+    if (actList == null ||
+        actList.isEmpty ||
+        actList.first.period.end != null) {
+      return _StartActFab(
+        () => v(
+          () async {
+            ref.read(actListProvider(_memId).notifier).add(
+                  await start(_memId),
+                  index: 0,
+                );
+          },
+        ),
       );
+    } else {
+      return _FinishActFab(
+        () => v(
+          () async {
+            ref.read(actListProvider(_memId).notifier).upsertAll(
+              [await finish(actList.first)],
+              (tmp, item) => tmp.id == item.id,
+            );
+          },
+        ),
+      );
+    }
+  }
 }
 
-class _AddActFabView extends FloatingActionButton {
-  const _AddActFabView({required super.onPressed})
-      : super(child: const Icon(Icons.add));
+class _StartActFab extends FloatingActionButton {
+  const _StartActFab(onPressed)
+      : super(child: const Icon(Icons.play_arrow), onPressed: onPressed);
+}
+
+class _FinishActFab extends FloatingActionButton {
+  const _FinishActFab(onPressed)
+      : super(child: const Icon(Icons.stop), onPressed: onPressed);
 }

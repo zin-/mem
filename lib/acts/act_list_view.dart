@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/core/mem.dart';
@@ -21,7 +22,9 @@ class ActListView extends ConsumerWidget {
           if (actList == null) {
             return const Center(child: CircularProgressIndicator());
           } else {
-            return _ActListViewComponent(actList);
+            return _ActListViewComponent(actList.sorted(
+              (a, b) => b.id!.compareTo(a.id!),
+            ));
           }
         },
       );

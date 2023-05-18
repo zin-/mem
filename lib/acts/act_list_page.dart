@@ -16,7 +16,9 @@ class ActListPage extends ConsumerWidget {
         {},
         () => Scaffold(
           body: ActListView(_memId),
-          floatingActionButton: AddActFab(_memId),
+          floatingActionButton: ActFab(_memId),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerFloat,
         ),
       );
 }
