@@ -42,27 +42,29 @@ void main() {
   });
 
   group('Scenario test', () {
-    setUpAll(() async {
-      await DatabaseManager(onTest: true).open(databaseDefinition);
-    });
-    setUp(() async {
-      await clearDatabase();
-    });
-    tearDownAll(() async {
-      await DatabaseManager().delete(databaseDefinition.name);
-    });
+    testActScenario();
 
-    testMemoScenario();
-    testTodoScenario();
-    testTaskScenario();
+    group('V1', () {
+      setUpAll(() async {
+        await DatabaseManager(onTest: true).open(databaseDefinition);
+      });
+      setUp(() async {
+        await clearDatabase();
+      });
+      tearDownAll(() async {
+        await DatabaseManager().delete(databaseDefinition.name);
+      });
 
-    testEdgeScenario();
+      testMemoScenario();
+      testTodoScenario();
+      testTaskScenario();
 
-    group('Act test', () {
-      testActListPage();
-      testActCounterConfigure();
+      testEdgeScenario();
+
+      group('Act test', () {
+        testActListPage();
+        testActCounterConfigure();
+      });
     });
   });
-
-  testActScenario();
 }
