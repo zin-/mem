@@ -50,15 +50,24 @@ class DateAndTimePeriodTextFormFields extends StatelessWidget {
                   () => _onStartChanged(pickedDateAndTime),
                   pickedDateAndTime,
                 ),
-                selectableRange: _dateAndTimePeriod,
+                selectableRange: _dateAndTimePeriod?.end == null
+                    ? null
+                    : DateAndTimePeriod(
+                        end: _dateAndTimePeriod?.end,
+                      ),
               ),
               DateAndTimeTextFormFieldV2(
-                  _dateAndTimePeriod?.end,
-                  (pickedDateAndTime) => v(
-                        () => _onEndChanged(pickedDateAndTime),
-                        pickedDateAndTime,
+                _dateAndTimePeriod?.end,
+                (pickedDateAndTime) => v(
+                  () => _onEndChanged(pickedDateAndTime),
+                  pickedDateAndTime,
+                ),
+                selectableRange: _dateAndTimePeriod?.start == null
+                    ? null
+                    : DateAndTimePeriod(
+                        start: _dateAndTimePeriod?.start,
                       ),
-                  selectableRange: _dateAndTimePeriod),
+              ),
             ],
           );
         },
