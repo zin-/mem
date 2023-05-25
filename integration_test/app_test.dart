@@ -7,7 +7,6 @@ import 'package:mem/main.dart';
 
 import 'scenarios/act_counter_scenario.dart';
 import '_helpers.dart';
-import 'acts/_act_list_page.dart';
 import 'database/_database_manager.dart';
 import 'database/_indexed_database.dart';
 import 'database/_sqlite_database.dart';
@@ -17,6 +16,7 @@ import 'scenarios/_edge_scenario.dart';
 import 'scenarios/_memo_scenario.dart';
 import 'repositories/_notification_repository.dart';
 import 'scenarios/_todo_scenario.dart';
+import 'scenarios/act_scenario.dart';
 import 'scenarios/task_scenario.dart';
 
 const defaultDuration = Duration(seconds: 1);
@@ -41,25 +41,28 @@ void main() {
   });
 
   group('Scenario test', () {
-    setUpAll(() async {
-      await DatabaseManager(onTest: true).open(databaseDefinition);
-    });
-    setUp(() async {
-      await clearDatabase();
-    });
-    tearDownAll(() async {
-      await DatabaseManager().delete(databaseDefinition.name);
-    });
+    testActScenario();
 
-    testMemoScenario();
-    testTodoScenario();
-    testTaskScenario();
+    group('V1', () {
+      setUpAll(() async {
+        await DatabaseManager(onTest: true).open(databaseDefinition);
+      });
+      setUp(() async {
+        await clearDatabase();
+      });
+      tearDownAll(() async {
+        await DatabaseManager().delete(databaseDefinition.name);
+      });
 
-    testEdgeScenario();
+      testMemoScenario();
+      testTodoScenario();
+      testTaskScenario();
 
-    group('Act test', () {
-      testActListPage();
-      testActCounterConfigure();
+      testEdgeScenario();
+
+      group('Act test', () {
+        testActCounterConfigure();
+      });
     });
   });
 }

@@ -9,12 +9,20 @@ final actRepository = ActRepository();
 Future<List<Act>> fetchByMemIdIs(MemId memId) =>
     actRepository.shipByMemId(memId);
 
-Future<Act> add(MemId memId) => actRepository.receive(
+Future<Act> start(MemId memId) => actRepository.receive(
       Act(
         memId,
+        DateAndTimePeriod.startNow(),
+      ),
+    );
+
+Future<Act> finish(Act act) => actRepository.replace(
+      Act(
+        act.memId,
         DateAndTimePeriod(
-          start: DateAndTime.now(),
+          start: act.period.start,
           end: DateAndTime.now(),
         ),
+        id: act.id,
       ),
     );

@@ -4,12 +4,12 @@ import 'package:mem/logger/i/api.dart';
 class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>?> {
   ListValueStateNotifier(super.state);
 
-  void add(T item) => v(
+  void add(T item, {int? index}) => v(
         {'item': item},
         () {
           final tmp = List.of(state ?? <T>[]);
 
-          tmp.add(item);
+          tmp.insert(index ?? tmp.length, item);
 
           updatedBy(tmp);
         },
