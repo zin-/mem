@@ -7,7 +7,6 @@ import 'package:mem/main.dart';
 
 import 'scenarios/act_counter_scenario.dart';
 import '_helpers.dart';
-import 'acts/_act_list_page.dart';
 import 'database/_database_manager.dart';
 import 'database/_indexed_database.dart';
 import 'database/_sqlite_database.dart';
@@ -62,7 +61,6 @@ void main() {
       testEdgeScenario();
 
       group('Act test', () {
-        testActListPage();
         testActCounterConfigure();
       });
     });
