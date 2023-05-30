@@ -1,4 +1,5 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
 import 'package:mem/core/date_and_time.dart';
 import 'package:mem/core/date_and_time_period.dart';
 import 'package:mem/gui/date_and_time_text_form_field.dart';
@@ -49,15 +50,24 @@ class DateAndTimePeriodTextFormFields extends StatelessWidget {
                   () => _onStartChanged(pickedDateAndTime),
                   pickedDateAndTime,
                 ),
-                selectableRange: _dateAndTimePeriod,
+                selectableRange: _dateAndTimePeriod?.end == null
+                    ? null
+                    : DateAndTimePeriod(
+                        end: _dateAndTimePeriod?.end,
+                      ),
               ),
               DateAndTimeTextFormFieldV2(
-                  _dateAndTimePeriod?.end,
-                  (pickedDateAndTime) => v(
-                        () => _onEndChanged(pickedDateAndTime),
-                        pickedDateAndTime,
+                _dateAndTimePeriod?.end,
+                (pickedDateAndTime) => v(
+                  () => _onEndChanged(pickedDateAndTime),
+                  pickedDateAndTime,
+                ),
+                selectableRange: _dateAndTimePeriod?.start == null
+                    ? null
+                    : DateAndTimePeriod(
+                        start: _dateAndTimePeriod?.start,
                       ),
-                  selectableRange: _dateAndTimePeriod),
+              ),
             ],
           );
         },
