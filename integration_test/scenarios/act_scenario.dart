@@ -51,9 +51,11 @@ void testActScenario() => group('Act scenario', () {
           expect(find.byIcon(Icons.play_arrow), findsNothing);
           final now = DateTime.now();
           final nowHour = now.hour < 10 ? '0${now.hour}' : '${now.hour}';
+          final nowMinute =
+              now.minute < 10 ? '0${now.minute}' : '${now.minute}';
           expect(
             find.text(
-              '${now.month}/${now.day}/${now.year} $nowHour:${now.minute}',
+              '${now.month}/${now.day}/${now.year} $nowHour:$nowMinute',
             ),
             findsOneWidget,
           );
@@ -63,7 +65,7 @@ void testActScenario() => group('Act scenario', () {
 
           expect(
             find.text(
-              '${now.month}/${now.day}/${now.year} $nowHour:${now.minute}',
+              '${now.month}/${now.day}/${now.year} $nowHour:$nowMinute',
             ),
             findsNWidgets(2),
           );
@@ -74,7 +76,7 @@ void testActScenario() => group('Act scenario', () {
 
           expect(
             find.text(
-              '${now.month}/${now.day}/${now.year} $nowHour:${now.minute}',
+              '${now.month}/${now.day}/${now.year} $nowHour:$nowMinute',
             ),
             findsNWidgets(3),
           );
