@@ -3,6 +3,7 @@ import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time.dart';
 import 'package:mem/core/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
+import 'package:mem/logger/log_service_v2.dart';
 
 final actRepository = ActRepository();
 
@@ -25,4 +26,14 @@ Future<Act> finish(Act act) => actRepository.replace(
         ),
         id: act.id,
       ),
+    );
+
+Future<Act> save(Act act) => v(
+      () => actRepository.replace(act),
+      act,
+    );
+
+Future<Act> delete(int actId) => v(
+      () => actRepository.wasteById(actId),
+      actId,
     );
