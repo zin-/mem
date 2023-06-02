@@ -42,7 +42,9 @@ class DateAndTimePeriodTextFormFields extends StatelessWidget {
   @override
   Widget build(BuildContext context) => v(
         () {
-          return Column(
+          return Flex(
+            direction: Axis.vertical,
+            mainAxisSize: MainAxisSize.min,
             children: [
               DateAndTimeTextFormFieldV2(
                 _dateAndTimePeriod?.start,
