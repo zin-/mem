@@ -30,7 +30,7 @@ class DateAndTimePeriodTexts extends StatelessWidget {
 class DateAndTimePeriodTextFormFields extends StatelessWidget {
   final DateAndTimePeriod? _dateAndTimePeriod;
   final Function(DateAndTime? pickedStart) _onStartChanged;
-  final Function(DateAndTime? pickedStart) _onEndChanged;
+  final Function(DateAndTime? pickedEnd) _onEndChanged;
 
   const DateAndTimePeriodTextFormFields(
     this._dateAndTimePeriod,
