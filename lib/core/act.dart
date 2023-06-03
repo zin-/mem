@@ -26,4 +26,27 @@ class Act extends EntityValue {
 
   @override
   String toString() => _toMap().toString();
+
+  Act.copyWith(Act base, {DateAndTimePeriod? period})
+      : memId = base.memId,
+        period = period ?? base.period,
+        super(
+          id: base.id,
+          createdAt: base.createdAt,
+          updatedAt: base.updatedAt,
+          archivedAt: base.archivedAt,
+        );
+}
+
+class ActIdentifier {
+  final int id;
+  final int memId;
+
+  ActIdentifier(this.id, this.memId);
+
+  @override
+  int get hashCode => Object.hash(id, memId);
+
+  @override
+  bool operator ==(Object other) => hashCode == other.hashCode;
 }

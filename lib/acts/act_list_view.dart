@@ -42,7 +42,7 @@ class _ActListViewComponent extends StatelessWidget {
           return ListView.builder(
             itemCount: actList.length,
             itemBuilder: (context, index) {
-              return ActListItemView(actList[index]);
+              return ActListItemView(context, actList[index]);
             },
           );
         },

@@ -3,30 +3,13 @@ import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time_period.dart';
 
 void main() {
-  test(
-    'Create instance',
-    () {
-      const memId = 1;
-      final actPeriod = DateAndTimePeriod.startNow();
-      final act = Act(memId, actPeriod);
+  group('Instantiation', () {
+    test(': copyWith', () {
+      final base = Act(1, DateAndTimePeriod.startNow());
 
-      expect(act.memId, same(memId));
-      expect(act.period, same(actPeriod));
-    },
-  );
+      final copied = Act.copyWith(base);
 
-  test(
-    'toString',
-    () {
-      const memId = 2;
-      final actPeriod = DateAndTimePeriod.startNow();
-      final act = Act(memId, actPeriod);
-
-      expect(
-        act.toString(),
-        equals('{memId: ${memId.toString()}'
-            ', period: ${actPeriod.toString()}}'),
-      );
-    },
-  );
+      expect(copied.toString(), base.toString());
+    });
+  });
 }

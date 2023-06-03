@@ -24,7 +24,9 @@ class DateAndTimeTextFormFieldV2 extends StatelessWidget {
           final isAllDay =
               _dateAndTime == null ? true : _dateAndTime?.isAllDay ?? true;
 
-          return Row(
+          return Flex(
+            direction: Axis.horizontal,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Expanded(
                   child: DateTextFormField(

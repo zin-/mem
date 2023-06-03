@@ -30,7 +30,7 @@ class DateAndTimePeriodTexts extends StatelessWidget {
 class DateAndTimePeriodTextFormFields extends StatelessWidget {
   final DateAndTimePeriod? _dateAndTimePeriod;
   final Function(DateAndTime? pickedStart) _onStartChanged;
-  final Function(DateAndTime? pickedStart) _onEndChanged;
+  final Function(DateAndTime? pickedEnd) _onEndChanged;
 
   const DateAndTimePeriodTextFormFields(
     this._dateAndTimePeriod,
@@ -42,7 +42,9 @@ class DateAndTimePeriodTextFormFields extends StatelessWidget {
   @override
   Widget build(BuildContext context) => v(
         () {
-          return Column(
+          return Flex(
+            direction: Axis.vertical,
+            mainAxisSize: MainAxisSize.min,
             children: [
               DateAndTimeTextFormFieldV2(
                 _dateAndTimePeriod?.start,
