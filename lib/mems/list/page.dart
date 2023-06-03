@@ -13,7 +13,7 @@ import 'package:mem/mems/mem_list_view.dart';
 import 'package:mem/mems/show_new_mem_fab.dart';
 import 'package:mem/mems/mems_action.dart';
 
-import 'mem_list_page_states.dart';
+import '../mem_list_page_states.dart';
 
 class MemListPage extends StatelessWidget {
   final _scrollController = ScrollController();

@@ -3,7 +3,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/gui/constants.dart';
-import 'package:mem/mems/mem_list_page.dart';
+import 'package:mem/mems/list/page.dart';
 
 class ShowNewMemFab extends StatefulWidget {
   final ScrollController _scrollController;

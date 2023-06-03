@@ -6,7 +6,7 @@ import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_list_item_view.dart';
 import 'package:mem/mems/mem_name.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
-import 'package:mem/mems/mem_list_page.dart';
+import 'package:mem/mems/list/page.dart';
 import 'package:mockito/mockito.dart';
 
 import '../samples.dart';
