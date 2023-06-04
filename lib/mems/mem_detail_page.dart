@@ -27,6 +27,7 @@ class MemDetailPage extends StatelessWidget {
         {'_memId': _memId},
         () => Consumer(
           builder: (context, ref, child) {
+            // ISSUE #178
             ref.read(
               initialize((memId) => showMemDetailPage(context, ref, memId)),
             );
