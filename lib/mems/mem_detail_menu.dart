@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/act_list_page.dart';
+import 'package:mem/component/view/mem_list/states.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/logger/i/api.dart';
@@ -47,17 +48,20 @@ class MemDetailMenu extends StatelessWidget {
               color: Colors.white,
               onPressed: () {
                 ref.read(unarchiveMem(_memId)).then(
-                  (archived) {
-                    if (archived != null) {
+                  (unarchived) {
+                    if (unarchived != null) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(L10n().unarchiveMemSuccessMessage(
-                            archived.mem.name,
+                            unarchived.mem.name,
                           )),
                           duration: defaultDismissDuration,
                           dismissDirection: DismissDirection.horizontal,
                         ),
                       );
+
+                      ref.read(rawMemListProvider.notifier).upsertAll(
+                          [unarchived.mem], (tmp, item) => tmp.id == item.id);
                     }
                   },
                 );
@@ -88,6 +92,10 @@ class MemDetailMenu extends StatelessWidget {
                           dismissDirection: DismissDirection.horizontal,
                         ),
                       );
+
+                      ref.read(rawMemListProvider.notifier).upsertAll(
+                          [archivedMemDetail.mem],
+                          (tmp, item) => tmp.id == item.id);
                     }
                   },
                 );
