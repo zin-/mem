@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/component/view/mem_list/states.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/gui/colors.dart';
 import 'package:mem/logger/i/api.dart';
-import 'package:mem/mems/mem_list_page_states.dart';
 import 'package:mem/mems/mem_list_view_state.dart';
 import 'package:mem/mems/mem_period.dart';
 
@@ -21,9 +21,8 @@ class MemListItemView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         {'_memId': _memId},
         () {
-          final mem = ref
-              .watch(reactiveMemListProvider)
-              .firstWhere((_) => _.id == _memId);
+          final mem =
+              ref.watch(memListProviderV2).firstWhere((_) => _.id == _memId);
 
           if (ref.watch(memListViewModeProvider) ==
               MemListViewMode.singleSelection) {

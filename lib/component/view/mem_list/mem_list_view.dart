@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/component/view/mem_list/states.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/gui/colors.dart';
 import 'package:mem/logger/i/api.dart';
-import 'package:mem/mems/mem_list_page_states.dart';
 
 import 'mem_list_item_view.dart';
 
@@ -26,7 +26,7 @@ class MemListView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => _MemListViewComponent(
         _appBarTitle,
-        ref.watch(sortedMemList),
+        ref.watch(memListProviderV2),
         _scrollController,
         _appBarActions,
         _onItemTapped,

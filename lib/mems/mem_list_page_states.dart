@@ -68,6 +68,7 @@ final memListProvider =
     () => ListValueStateNotifier<Mem>(null),
   ),
 );
+// TODO drop
 final reactiveMemListProvider =
     StateNotifierProvider<ValueStateNotifier<List<Mem>>, List<Mem>>(
   (ref) => v(
