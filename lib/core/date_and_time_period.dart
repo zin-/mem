@@ -1,6 +1,6 @@
 import 'date_and_time.dart';
 
-class DateAndTimePeriod {
+class DateAndTimePeriod implements Comparable<DateAndTimePeriod> {
   final DateAndTime? start;
   final DateAndTime? end;
 
@@ -20,4 +20,34 @@ class DateAndTimePeriod {
 
   @override
   String toString() => toMap().toString();
+
+  @override
+  int compareTo(DateAndTimePeriod other) {
+    // TODO: implement compareTo
+    //  -|
+    // |-|
+    // |----|
+    // |-
+    // |-------|
+    //b   |---|
+    //      -|
+    //     |-|
+    //     |---|
+    //     |-
+    //          -|
+    //         |-|
+    //         |-
+    if (start != null) {
+      if (other.start != null) {
+        return start!.compareTo(other.start!);
+      }
+    }
+    if (end != null) {
+      if (other.end != null) {
+        return end!.compareTo(other.end!);
+      } else {}
+    }
+
+    return 0;
+  }
 }
