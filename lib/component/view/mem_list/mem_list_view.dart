@@ -3,8 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/gui/colors.dart';
 import 'package:mem/logger/i/api.dart';
-import 'package:mem/mems/mem_list_item_view.dart';
 import 'package:mem/mems/mem_list_page_states.dart';
+
+import 'mem_list_item_view.dart';
 
 class MemListView extends ConsumerWidget {
   final String _appBarTitle;

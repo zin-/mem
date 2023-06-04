@@ -7,9 +7,9 @@ import 'package:mem/mems/mem_list_page_states.dart';
 import 'package:mem/mems/mem_list_view_state.dart';
 import 'package:mem/mems/mem_period.dart';
 
-import '../mems/mem_done_checkbox.dart';
-import '../mems/mem_list_item_actions.dart';
-import 'mem_name.dart';
+import '../../../mems/mem_done_checkbox.dart';
+import '../../../mems/mem_list_item_actions.dart';
+import '../../../mems/mem_name.dart';
 
 class MemListItemView extends ConsumerWidget {
   final MemId _memId;

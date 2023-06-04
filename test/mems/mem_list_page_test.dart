@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/mems/mem_item_repository_v2.dart';
-import 'package:mem/mems/mem_list_item_view.dart';
+import 'package:mem/component/view/mem_list/mem_list_item_view.dart';
 import 'package:mem/mems/mem_name.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/mems/list/page.dart';
