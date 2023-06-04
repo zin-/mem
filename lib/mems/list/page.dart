@@ -9,7 +9,7 @@ import 'package:mem/mems/mem_detail_page.dart';
 import 'package:mem/mems/mem_detail_states.dart';
 import 'package:mem/mems/mem_list_actions.dart';
 import 'package:mem/mems/mem_list_filter.dart';
-import 'package:mem/mems/mem_list_view.dart';
+import 'package:mem/component/view/mem_list/mem_list_view.dart';
 import 'package:mem/mems/show_new_mem_fab.dart';
 import 'package:mem/mems/mems_action.dart';
 
