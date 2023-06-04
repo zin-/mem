@@ -26,7 +26,7 @@ class MemListPage extends ConsumerWidget {
           ref.read(
             initialize((memId) => showMemDetailPage(context, ref, memId)),
           );
-          ref.read(fetchMemListV2);
+          ref.watch(fetchMemListV2);
 
           return _MemListPageComponent(
             (memId) => showMemDetailPage(
