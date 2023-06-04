@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/component/view/mem_list/states.dart';
 import 'package:mem/gui/dimens.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/logger/i/api.dart';
@@ -91,6 +92,11 @@ class MemDetailPage extends StatelessWidget {
                                 duration: defaultDismissDuration,
                                 dismissDirection: DismissDirection.horizontal,
                               ),
+                            );
+
+                            ref.read(rawMemListProvider.notifier).upsertAll(
+                              [await savedMemFuture],
+                              (tmp, item) => tmp.id == item.id,
                             );
                           }
                         },
