@@ -10,67 +10,68 @@ import 'package:mem/mems/mem_detail_states.dart';
 import 'package:mem/mems/mem_list_actions.dart';
 import 'package:mem/mems/mem_list_filter.dart';
 import 'package:mem/component/view/mem_list/mem_list_view.dart';
-import 'package:mem/mems/show_new_mem_fab.dart';
 import 'package:mem/mems/mems_action.dart';
 
 import '../mem_list_page_states.dart';
+import 'show_new_mem_fab.dart';
 
-class MemListPage extends StatelessWidget {
-  final _scrollController = ScrollController();
-
-  MemListPage({Key? key}) : super(key: key);
+class MemListPage extends ConsumerWidget {
+  const MemListPage({super.key});
 
   @override
-  Widget build(BuildContext context) => t(
+  Widget build(BuildContext context, WidgetRef ref) => t(
         {},
-        () => Consumer(
-          builder: (context, ref, child) {
-            ref.read(
-              initialize((memId) => showMemDetailPage(context, ref, memId)),
-            );
+        () {
+          ref.read(
+            initialize((memId) => showMemDetailPage(context, ref, memId)),
+          );
+          ref.watch(fetchMemList);
 
-            return Consumer(
-              builder: (context, ref, child) => v(
-                {},
-                () {
-                  ref.watch(fetchMemList);
-
-                  return Scaffold(
-                    body: MemListView(
-                      L10n().memListPageTitle(),
-                      scrollController: _scrollController,
-                      appBarActions: [
-                        IconTheme(
-                          data: const IconThemeData(color: iconOnPrimaryColor),
-                          child: Row(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.filter_list),
-                                onPressed: () => showModalBottomSheet(
-                                  context: context,
-                                  builder: (context) => const MemListFilter(),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                      onItemTapped: (memId) => showMemDetailPage(
-                        context,
-                        ref,
-                        memId,
-                      ),
-                    ),
-                    floatingActionButton: ShowNewMemFab(_scrollController),
-                    floatingActionButtonLocation:
-                        FloatingActionButtonLocation.centerFloat,
-                  );
-                },
-              ),
-            );
-          },
-        ),
+          return _MemListPageComponent(
+            (memId) => showMemDetailPage(
+              context,
+              ref,
+              memId,
+            ),
+          );
+        },
       );
+}
+
+class _MemListPageComponent extends StatelessWidget {
+  final _scrollController = ScrollController();
+  final void Function(MemId memId)? _onItemTapped;
+
+  _MemListPageComponent(this._onItemTapped);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: MemListView(
+        L10n().memListPageTitle(),
+        scrollController: _scrollController,
+        appBarActions: [
+          IconTheme(
+            data: const IconThemeData(color: iconOnPrimaryColor),
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.filter_list),
+                  onPressed: () => showModalBottomSheet(
+                    context: context,
+                    builder: (context) => const MemListFilter(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+        onItemTapped: _onItemTapped,
+      ),
+      floatingActionButton: ShowNewMemFab(_scrollController),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
+  }
 }
 
 // FIXME too long
