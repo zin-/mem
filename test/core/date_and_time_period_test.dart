@@ -57,7 +57,7 @@ void main() {
 
       group(': throw error', () {
         test(': start and end are null.', () {
-          expect(() => DateAndTimePeriod(), throwsAssertionError);
+          expect(() => DateAndTimePeriod(), throwsArgumentError);
         });
 
         test(
@@ -69,7 +69,7 @@ void main() {
 
             expect(
               () => DateAndTimePeriod(start: start, end: end),
-              throwsAssertionError,
+              throwsArgumentError,
             );
           },
         );
@@ -110,23 +110,155 @@ void main() {
   );
 
   group('Comparable', () {
-    final now = DateAndTime.now();
+    final now = DateTime.now();
+    const oneDay = Duration(days: 1);
 
-    group(': start only', () {
-      final startOnly = DateAndTimePeriod(start: now);
+    final today = DateAndTime.from(now, allDay: false);
+    final yesterday = DateAndTime.from(now.subtract(oneDay), allDay: false);
+    final tomorrow = DateAndTime.from(now.add(oneDay), allDay: false);
 
-      test(': with start only', () {
-        final comparing = DateAndTimePeriod(
-          start: now.subtract(
-            const Duration(days: 1),
-          ),
-        );
+    final startOnly = DateAndTimePeriod(
+      start: today,
+    );
+    group(': start only $startOnly', () {
+      final startOnlyCase = {
+        //    |-
+        //o  |-
+        DateAndTimePeriod(start: yesterday): 1,
+        //o   |- same
+        DateAndTimePeriod(start: today): 0,
+        //o    |-
+        DateAndTimePeriod(start: tomorrow): -1,
+        //o -|
+        DateAndTimePeriod(end: yesterday): 1,
+        //o  -|
+        DateAndTimePeriod(end: today): 1,
+        //o   -|
+        DateAndTimePeriod(end: tomorrow): -1,
+        //o  |-|
+        DateAndTimePeriod(start: yesterday, end: tomorrow): 1,
+      };
+      startOnlyCase.forEach((input, expected) {
+        test(': with $input.', () {
+          final result = startOnly.compareTo(input);
 
-        expect(
-          startOnly.compareTo(comparing),
-          1,
-        );
+          expect(
+            result,
+            expected,
+            reason: {
+              startOnly,
+              input,
+            }.toString(),
+          );
+        });
       });
     });
+
+    final endOnly = DateAndTimePeriod(
+      end: DateAndTime.from(now, allDay: false),
+    );
+    group(': end only $endOnly', () {
+      final endOnlyCase = {
+        //   -|
+        //o  |-
+        DateAndTimePeriod(start: yesterday): 1,
+        //o   |-
+        DateAndTimePeriod(start: today): -1,
+        //o    |-
+        DateAndTimePeriod(start: tomorrow): -1,
+        //o -|
+        DateAndTimePeriod(end: yesterday): 1,
+        //o  -| same
+        DateAndTimePeriod(end: today): 0,
+        //o   -|
+        DateAndTimePeriod(end: tomorrow): -1,
+        //o  |-|
+        DateAndTimePeriod(start: yesterday, end: tomorrow): -1,
+      };
+      endOnlyCase.forEach((input, expected) {
+        test(': with $input.', () {
+          final result = endOnly.compareTo(input);
+
+          expect(
+            result,
+            expected,
+            reason: {
+              endOnly,
+              input,
+            }.toString(),
+          );
+        });
+      });
+    });
+
+    final twoDaysAgo = yesterday.subtract(oneDay);
+    final threeDaysAgo = twoDaysAgo.subtract(oneDay);
+    final twoDaysLater = tomorrow.add(oneDay);
+    final threeDaysLater = twoDaysLater.add(oneDay);
+    final startAndEnd = DateAndTimePeriod(
+      start: twoDaysAgo,
+      end: twoDaysLater,
+    );
+    group(': start and end $startAndEnd', () {
+      final inputs = {
+        //    |---|
+        //o  |-
+        DateAndTimePeriod(start: threeDaysAgo): 1,
+        //o   |-
+        DateAndTimePeriod(start: twoDaysAgo): -1,
+        //o     |-
+        DateAndTimePeriod(start: today): -1,
+        //o       |-
+        DateAndTimePeriod(start: twoDaysLater): -1,
+        //o        |-
+        DateAndTimePeriod(start: threeDaysLater): -1,
+        //o -|
+        DateAndTimePeriod(end: threeDaysAgo): 1,
+        //o  -|
+        DateAndTimePeriod(end: twoDaysAgo): 1,
+        //o    -|
+        DateAndTimePeriod(end: today): 1,
+        //o      -|
+        DateAndTimePeriod(end: twoDaysLater): -1,
+        //o       -|
+        DateAndTimePeriod(end: threeDaysLater): -1,
+        //o  ||
+        DateAndTimePeriod(start: threeDaysAgo, end: twoDaysAgo): 1,
+        //o  |--|
+        DateAndTimePeriod(start: threeDaysAgo, end: today): 1,
+        //o  |----|
+        DateAndTimePeriod(start: threeDaysAgo, end: twoDaysLater): 1,
+        //o  |-----|
+        DateAndTimePeriod(start: threeDaysAgo, end: threeDaysLater): 1,
+        //o   |-|
+        DateAndTimePeriod(start: twoDaysAgo, end: today): 1,
+        //o   |---| same
+        DateAndTimePeriod(start: twoDaysAgo, end: twoDaysLater): 0,
+        //o   |----|
+        DateAndTimePeriod(start: twoDaysAgo, end: threeDaysLater): -1,
+        //o    |-|
+        DateAndTimePeriod(start: yesterday, end: tomorrow): -1,
+        //o    |--|
+        DateAndTimePeriod(start: yesterday, end: twoDaysLater): -1,
+        //o    |---|
+        DateAndTimePeriod(start: yesterday, end: threeDaysLater): -1,
+      };
+      inputs.forEach((input, expected) {
+        test(': with $input.', () {
+          final result = startAndEnd.compareTo(input);
+
+          expect(
+            result,
+            expected,
+            reason: {
+              startAndEnd,
+              input,
+            }.toString(),
+          );
+        });
+      });
+    });
+    //e   -|
+    //   |-|
   });
 }
