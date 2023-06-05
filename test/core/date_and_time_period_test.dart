@@ -108,4 +108,25 @@ void main() {
       );
     },
   );
+
+  group('Comparable', () {
+    final now = DateAndTime.now();
+
+    group(': start only', () {
+      final startOnly = DateAndTimePeriod(start: now);
+
+      test(': with start only', () {
+        final comparing = DateAndTimePeriod(
+          start: now.subtract(
+            const Duration(days: 1),
+          ),
+        );
+
+        expect(
+          startOnly.compareTo(comparing),
+          1,
+        );
+      });
+    });
+  });
 }

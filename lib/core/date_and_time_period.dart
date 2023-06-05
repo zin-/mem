@@ -26,27 +26,25 @@ class DateAndTimePeriod implements Comparable<DateAndTimePeriod> {
     // TODO: implement compareTo
     //  -|
     // |-|
-    // |----|
-    // |-
-    // |-------|
-    //b   |---|
-    //      -|
+    //   |-
+    //   |--|
+    //    |---|
+    //     -|
     //     |-|
-    //     |---|
-    //     |-
-    //          -|
+    //      |--|
+    //      |-
+    //        -|
     //         |-|
     //         |-
-    if (start != null) {
-      if (other.start != null) {
+
+    if (end == null) {
+      if (other.end == null) {
         return start!.compareTo(other.start!);
+      } else {
+
       }
     }
-    if (end != null) {
-      if (other.end != null) {
-        return end!.compareTo(other.end!);
-      } else {}
-    }
+    if (start == null) {}
 
     return 0;
   }
