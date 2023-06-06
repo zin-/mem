@@ -73,6 +73,12 @@ final memListProviderV2 =
             activeActs?.singleWhereOrNull((act) => act.memId == b.id);
         if ((activeActOfA == null) ^ (activeActOfB == null)) {
           return activeActOfA == null ? 1 : -1;
+        } else if (activeActOfA != null && activeActOfB != null) {
+          final c =
+              activeActOfA.period.start!.compareTo(activeActOfB.period.start!);
+          if (c != 0) {
+            return c;
+          }
         }
 
         if (a.isArchived() != b.isArchived()) {
@@ -100,7 +106,7 @@ final memListProviderV2 =
 
 final activeActsProvider =
     StateNotifierProvider<ListValueStateNotifier<Act>, List<Act>?>(
-  (ref) => d(() {
+  (ref) => v(() {
     return ListValueStateNotifier<Act>(null);
   }),
 );
