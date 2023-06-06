@@ -164,11 +164,12 @@ class MemDetailMenu extends StatelessWidget {
                     return ElevatedButton(
                       onPressed: () async {
                         if (mem != null) {
-                          ref.read(removeMem(mem.id));
+                          ref
+                              .read(removeMem(mem.id))
+                              .then((value) => Navigator.of(context)
+                                ..pop()
+                                ..pop(null));
                         }
-                        Navigator.of(context)
-                          ..pop()
-                          ..pop(null);
                       },
                       child: Text(L10n().okAction()),
                     );

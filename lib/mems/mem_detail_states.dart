@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/component/view/mem_list/states.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/gui/list_value_state_notifier.dart';
 import 'package:mem/logger/i/api.dart';
+import 'package:mem/logger/log_service_v2.dart' as v2;
 import 'package:mem/mems/mem_service.dart';
 import 'package:mem/gui/value_state_notifier.dart';
 
@@ -166,9 +168,31 @@ final unarchiveMem = Provider.family<Future<MemDetail?>, int?>(
   ),
 );
 
+final removedMem =
+    StateNotifierProvider.family<ValueStateNotifier<Mem?>, Mem?, int>(
+  (ref, memId) => v2.v(
+    () => ValueStateNotifier<Mem?>(null),
+    memId,
+  ),
+);
+
 final removeMem = Provider.family<Future<bool>, int?>(
-  (ref, memId) => v(
-    {'memId': memId},
-    () async => await MemService().remove(memId!),
+  (ref, memId) => v2.v(
+    () async {
+      if (memId != null) {
+        final removeSuccess = await MemService().remove(memId);
+        if (removeSuccess) {
+          final removed = ref.watch(editingMemProvider(memId));
+          ref.read(removedMem(memId).notifier).updatedBy(removed);
+          ref
+              .read(rawMemListProvider.notifier)
+              .removeWhere((item) => item.id == memId);
+        }
+        return removeSuccess;
+      }
+
+      return false;
+    },
+    memId,
   ),
 );

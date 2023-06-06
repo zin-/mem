@@ -4,7 +4,30 @@ import 'package:mem/core/mem.dart';
 import 'package:mem/gui/list_value_state_notifier.dart';
 import 'package:mem/gui/value_state_notifier.dart';
 import 'package:mem/logger/log_service_v2.dart';
-import 'package:mem/mems/mem_list_page_states.dart';
+
+final showNotArchivedProvider =
+    StateNotifierProvider<ValueStateNotifier<bool>, bool>(
+  (ref) => v(
+    () => ValueStateNotifier(true),
+  ),
+);
+final showArchivedProvider =
+    StateNotifierProvider<ValueStateNotifier<bool>, bool>(
+  (ref) => v(
+    () => ValueStateNotifier(false),
+  ),
+);
+final showNotDoneProvider =
+    StateNotifierProvider<ValueStateNotifier<bool>, bool>(
+  (ref) => v(
+    () => ValueStateNotifier(true),
+  ),
+);
+final showDoneProvider = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
+  (ref) => v(
+    () => ValueStateNotifier(false),
+  ),
+);
 
 final rawMemListProvider =
     StateNotifierProvider<ListValueStateNotifier<Mem>, List<Mem>?>(
