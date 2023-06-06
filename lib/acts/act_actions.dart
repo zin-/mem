@@ -14,7 +14,7 @@ Future<List<Act>> fetchByMemIdIs(MemId memId) =>
     actRepository.shipByMemId(memId);
 
 final startAct = Provider.autoDispose.family<void, int>(
-  (ref, memId) => d(
+  (ref, memId) => v(
     () async {
       final received = await ActRepository().receive(
         Act(
@@ -31,7 +31,7 @@ final startAct = Provider.autoDispose.family<void, int>(
 );
 
 final finishAct = Provider.autoDispose.family<void, Act>(
-  (ref, act) => d(
+  (ref, act) => v(
     () async {
       final replaced = await actRepository.replace(
         Act(

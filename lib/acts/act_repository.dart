@@ -30,7 +30,7 @@ class ActRepository extends DatabaseTupleRepository<ActEntity, Act> {
         },
       );
 
-  Future<List<Act>> shipActive() => v2.d(
+  Future<List<Act>> shipActive() => v2.v(
         () async => await ship(IsNull(defActEnd.name)),
       );
 
