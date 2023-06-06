@@ -20,10 +20,7 @@ class ActFab extends ConsumerWidget {
       return _StartActFab(
         () => v(
           () async {
-            ref.read(actListProvider(_memId).notifier).add(
-                  await start(_memId),
-                  index: 0,
-                );
+            ref.read(startAct(_memId));
           },
         ),
       );
@@ -31,10 +28,7 @@ class ActFab extends ConsumerWidget {
       return _FinishActFab(
         () => v(
           () async {
-            ref.read(actListProvider(_memId).notifier).upsertAll(
-              [await finish(actList.first)],
-              (tmp, item) => tmp.id == item.id,
-            );
+            ref.read(finishAct(actList.first));
           },
         ),
       );

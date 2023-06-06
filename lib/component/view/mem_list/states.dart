@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/core/act.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/gui/list_value_state_notifier.dart';
 import 'package:mem/gui/value_state_notifier.dart';
@@ -63,7 +64,17 @@ final memListProviderV2 =
         }
       }).toList();
 
+      final activeActs = ref.watch(activeActsProvider);
+
       final sorted = filtered.sorted((a, b) {
+        final activeActOfA =
+            activeActs?.singleWhereOrNull((act) => act.memId == a.id);
+        final activeActOfB =
+            activeActs?.singleWhereOrNull((act) => act.memId == b.id);
+        if ((activeActOfA == null) ^ (activeActOfB == null)) {
+          return activeActOfA == null ? 1 : -1;
+        }
+
         if (a.isArchived() != b.isArchived()) {
           return a.isArchived() ? 1 : -1;
         }
@@ -85,4 +96,11 @@ final memListProviderV2 =
       return ValueStateNotifier(sorted);
     },
   ),
+);
+
+final activeActsProvider =
+    StateNotifierProvider<ListValueStateNotifier<Act>, List<Act>?>(
+  (ref) => d(() {
+    return ListValueStateNotifier<Act>(null);
+  }),
 );
