@@ -39,7 +39,7 @@ final rawMemListProvider =
   ),
 );
 
-final memListProviderV2 =
+final memListProvider =
     StateNotifierProvider<ValueStateNotifier<List<Mem>>, List<Mem>>(
   (ref) => v(
     () {

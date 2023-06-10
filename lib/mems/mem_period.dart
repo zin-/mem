@@ -16,7 +16,7 @@ class MemPeriodTexts extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
           final mem =
-              ref.watch(memListProviderV2).firstWhere((_) => _.id == _memId);
+              ref.watch(memListProvider).firstWhere((_) => _.id == _memId);
 
           return _MemPeriodTexts(mem.period!);
         },

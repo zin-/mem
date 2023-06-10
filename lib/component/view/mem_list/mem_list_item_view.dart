@@ -27,7 +27,7 @@ class MemListItemView extends ConsumerWidget {
         {'_memId': _memId},
         () {
           final mem =
-              ref.watch(memListProviderV2).firstWhere((_) => _.id == _memId);
+              ref.watch(memListProvider).firstWhere((_) => _.id == _memId);
 
           if (ref.watch(memListViewModeProvider) ==
               MemListViewMode.singleSelection) {

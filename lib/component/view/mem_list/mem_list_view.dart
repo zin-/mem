@@ -30,7 +30,7 @@ class MemListView extends ConsumerWidget {
 
     return _MemListViewComponent(
       _appBarTitle,
-      ref.watch(memListProviderV2),
+      ref.watch(memListProvider),
       _scrollController,
       _appBarActions,
       _onItemTapped,
