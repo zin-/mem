@@ -59,94 +59,98 @@ void testActScenario() => group(': Act scenario', () {
         return '${dateTime.month}/${dateTime.day}/${dateTime.year} $hour:$minute';
       }
 
-      testWidgets(
-        ': start & finish act.',
-        (widgetTester) async {
-          await showActListPage(widgetTester);
+      group(': ActListPage', () {
+        testWidgets(
+          ': start & finish act.',
+          (widgetTester) async {
+            await showActListPage(widgetTester);
 
-          expect(find.byIcon(Icons.stop), findsNothing);
-          await widgetTester.tap(find.byIcon(Icons.play_arrow));
-          await widgetTester.pumpAndSettle();
+            expect(find.byIcon(Icons.stop), findsNothing);
+            await widgetTester.tap(find.byIcon(Icons.play_arrow));
+            await widgetTester.pumpAndSettle();
 
-          expect(find.byIcon(Icons.play_arrow), findsNothing);
-          final now = DateTime.now();
-          expect(
-            find.text(dateTimeText(now)),
-            findsOneWidget,
-          );
+            expect(find.byIcon(Icons.play_arrow), findsNothing);
+            final now = DateTime.now();
+            expect(
+              find.text(dateTimeText(now)),
+              findsOneWidget,
+            );
 
-          await widgetTester.tap(find.byIcon(Icons.stop));
-          await widgetTester.pumpAndSettle();
+            await widgetTester.tap(find.byIcon(Icons.stop));
+            await widgetTester.pumpAndSettle();
 
-          expect(
-            find.text(dateTimeText(now)),
-            findsNWidgets(2),
-          );
+            expect(
+              find.text(dateTimeText(now)),
+              findsNWidgets(2),
+            );
 
-          expect(find.byIcon(Icons.stop), findsNothing);
-          await widgetTester.tap(find.byIcon(Icons.play_arrow));
-          await widgetTester.pumpAndSettle();
+            expect(find.byIcon(Icons.stop), findsNothing);
+            await widgetTester.tap(find.byIcon(Icons.play_arrow));
+            await widgetTester.pumpAndSettle();
 
-          expect(
-            find.text(dateTimeText(now)),
-            findsNWidgets(3),
-          );
-        },
-      );
+            expect(
+              find.text(dateTimeText(now)),
+              findsNWidgets(3),
+            );
+          },
+        );
 
-      group(': Edit act', () {
-        late DateTime createdAt;
+        group(': Edit act', () {
+          late DateTime createdAt;
 
-        setUp(() async {
-          createdAt = DateTime.now();
+          setUp(() async {
+            createdAt = DateTime.now();
 
-          await db.getTable(actTableDefinition.name).insert({
-            fkDefMemId.name: savedMemId,
-            defActStart.name: createdAt,
-            defActStartIsAllDay.name: 0,
-            createdAtColumnName: createdAt,
+            await db.getTable(actTableDefinition.name).insert({
+              fkDefMemId.name: savedMemId,
+              defActStart.name: createdAt,
+              defActStartIsAllDay.name: 0,
+              createdAtColumnName: createdAt,
+            });
+            await db.getTable(actTableDefinition.name).insert({
+              fkDefMemId.name: savedMemId,
+              defActStart.name: createdAt,
+              defActStartIsAllDay.name: 0,
+              createdAtColumnName: createdAt,
+            });
           });
-          await db.getTable(actTableDefinition.name).insert({
-            fkDefMemId.name: savedMemId,
-            defActStart.name: createdAt,
-            defActStartIsAllDay.name: 0,
-            createdAtColumnName: createdAt,
+
+          testWidgets(': save.', (widgetTester) async {
+            await showActListPage(widgetTester);
+
+            await widgetTester.longPress(
+              find.text(dateTimeText(createdAt)).at(1),
+            );
+            await widgetTester.pumpAndSettle();
+
+            await widgetTester.tap(find.byType(Switch).at(0));
+            await widgetTester.tap(find.byType(Switch).at(1));
+            await widgetTester.pumpAndSettle();
+
+            await widgetTester.tap(find.text('OK'));
+            await widgetTester.pumpAndSettle();
+
+            await widgetTester.tap(find.byIcon(Icons.save_alt));
+            await widgetTester.pumpAndSettle();
+
+            expect(find.text(dateTimeText(createdAt)), findsNWidgets(3));
           });
-        });
 
-        testWidgets(': save.', (widgetTester) async {
-          await showActListPage(widgetTester);
+          testWidgets(': delete.', (widgetTester) async {
+            await showActListPage(widgetTester);
 
-          await widgetTester.longPress(
-            find.text(dateTimeText(createdAt)).at(1),
-          );
-          await widgetTester.pumpAndSettle();
+            await widgetTester.longPress(
+              find.text(dateTimeText(createdAt)).at(0),
+            );
+            await widgetTester.pumpAndSettle();
 
-          await widgetTester.tap(find.byType(Switch).at(0));
-          await widgetTester.tap(find.byType(Switch).at(1));
-          await widgetTester.pumpAndSettle();
+            await widgetTester.tap(find.byIcon(Icons.delete));
+            await widgetTester.pumpAndSettle();
 
-          await widgetTester.tap(find.text('OK'));
-          await widgetTester.pumpAndSettle();
-
-          await widgetTester.tap(find.byIcon(Icons.save_alt));
-          await widgetTester.pumpAndSettle();
-
-          expect(find.text(dateTimeText(createdAt)), findsNWidgets(3));
-        });
-
-        testWidgets(': delete.', (widgetTester) async {
-          await showActListPage(widgetTester);
-
-          await widgetTester.longPress(
-            find.text(dateTimeText(createdAt)).at(0),
-          );
-          await widgetTester.pumpAndSettle();
-
-          await widgetTester.tap(find.byIcon(Icons.delete));
-          await widgetTester.pumpAndSettle();
-
-          expect(find.text(dateTimeText(createdAt)), findsOneWidget);
+            expect(find.text(dateTimeText(createdAt)), findsOneWidget);
+          });
         });
       });
+
+      group(' MemListPage', () {});
     });
