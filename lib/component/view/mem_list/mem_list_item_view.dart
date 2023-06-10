@@ -97,7 +97,7 @@ class _MemListItemViewComponent extends ListTile {
               : Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    MemNameText(mem.name, mem.id),
+                    Expanded(child: MemNameText(mem.name, mem.id)),
                     ElapsedTimeView(activeAct.period.start!),
                   ],
                 ),
