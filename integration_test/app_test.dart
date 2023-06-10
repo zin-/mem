@@ -55,8 +55,8 @@ void main() {
       });
 
       testMemoScenario();
-      testTodoScenario();
       testTaskScenario();
+      testTodoScenario();
 
       testEdgeScenario();
 
