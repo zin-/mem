@@ -26,7 +26,7 @@ class MemListView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(fetchMemListV2);
+    ref.watch(fetchMemList);
 
     return _MemListViewComponent(
       _appBarTitle,

@@ -5,7 +5,7 @@ import 'package:mem/mems/mem_detail_states.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/mems/mem_service.dart';
 
-final fetchMemListV2 = FutureProvider(
+final fetchMemList = FutureProvider(
   (ref) => v(
     () async {
       final showNotArchived = ref.watch(showNotArchivedProvider);
@@ -26,7 +26,7 @@ final fetchMemListV2 = FutureProvider(
   ),
 );
 
-final undoRemoveMemV2 = FutureProvider.family<void, int>(
+final undoRemoveMem = FutureProvider.family<void, int>(
   (ref, memId) => v(
     () async {
       final editingMem = ref.watch(editingMemProvider(memId));

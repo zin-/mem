@@ -114,14 +114,14 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
                             content: Text(
                               L10n().removeMemSuccessMessage(mem.name),
                             ),
-                            duration: defaultDismissDuration,
+                            duration: infiniteDismissDuration,
                             dismissDirection: DismissDirection.horizontal,
                             action: SnackBarAction(
                               label: L10n().undoAction(),
                               onPressed: () => v(
                                 {},
                                 () {
-                                  ref.read(undoRemoveMemV2(memId));
+                                  ref.read(undoRemoveMem(memId));
                                   scaffoldMessenger.showSnackBar(
                                     SnackBar(
                                       content: Text(

@@ -261,6 +261,11 @@ void testMemoScenario() => group(
             await closeMemListFilter(widgetTester);
 
             expect(find.text(savedMemName), findsNothing);
+
+            await widgetTester.tap(find.text('Undo'));
+            await widgetTester.pumpAndSettle();
+
+            expect(find.text(savedMemName), findsOneWidget);
           },
         );
 
