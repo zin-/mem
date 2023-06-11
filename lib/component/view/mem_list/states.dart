@@ -96,7 +96,7 @@ final memListProvider =
           return aPeriod == null ? 1 : -1;
         }
 
-        return a.id.compareTo(b.id);
+        return (a.id as int).compareTo(b.id);
       }).toList();
 
       return ValueStateNotifier(sorted);

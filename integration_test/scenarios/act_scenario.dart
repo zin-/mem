@@ -193,7 +193,7 @@ void testActScenario() => group(': Act scenario', () {
           expect(startIconFinder, findsNothing);
           expect(stopIconFinder, findsNWidgets(2));
 
-          await widgetTester.tap(stopIconFinder.at(1));
+          await widgetTester.tap(stopIconFinder.at(0));
           await widgetTester.pumpAndSettle();
 
           expect(startIconFinder, findsOneWidget);
