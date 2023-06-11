@@ -16,7 +16,7 @@ void main() {
 }
 
 void testTaskScenario() => group(
-      'Task scenario',
+      ': Task scenario',
       () {
         testWidgets(
           ': Set Period.',
@@ -92,15 +92,13 @@ void testTaskScenario() => group(
 
             await widgetTester.enterText(
               memNameTextFormFieldFinder,
-              'Task scenario: Set Period. entering mem name',
+              'Task scenario: Set Period. - entering mem name ',
             );
             await widgetTester.tap(saveMemFabFinder);
             await widgetTester.pumpAndSettle();
 
             await widgetTester.pageBack();
             await widgetTester.pumpAndSettle();
-
-            expect(1, 1);
           },
         );
       },
