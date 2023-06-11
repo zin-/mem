@@ -13,7 +13,7 @@ import 'database/_sqlite_database.dart';
 import 'repositories/_log_repository.dart';
 import 'repositories/_act_repository.dart';
 import 'scenarios/_edge_scenario.dart';
-import 'scenarios/_memo_scenario.dart';
+import 'scenarios/memo_scenario.dart';
 import 'repositories/_notification_repository.dart';
 import 'scenarios/todo_scenario.dart';
 import 'scenarios/act_scenario.dart';
