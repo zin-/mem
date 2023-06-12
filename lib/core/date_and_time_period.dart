@@ -62,7 +62,6 @@ class _WithEndOnly extends DateAndTimePeriod
 
   @override
   int compareTo(DateAndTimePeriod other) {
-    // TODO: implement compareTo
     if (other is _WithStartOnly) {
       return end.isAfter(other.start) ? 1 : -1;
     } else if (other is _WithEndOnly) {
