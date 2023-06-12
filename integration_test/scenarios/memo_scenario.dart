@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:mem/database/database.dart';
 import 'package:mem/database/database_manager.dart';
 import 'package:mem/gui/constants.dart';
 import 'package:mem/logger/log_entity.dart';
@@ -8,18 +9,14 @@ import 'package:mem/logger/log_service_v2.dart';
 import 'package:mem/main.dart';
 import 'package:mem/repositories/_database_tuple_repository.dart';
 import 'package:mem/repositories/mem_entity.dart';
+import 'package:mem/repositories/mem_item_repository.dart';
 
 import '../_helpers.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
   LogServiceV2.initialize(Level.verbose);
-
-  DatabaseManager(onTest: true);
-
-  setUp(() async {
-    await clearDatabase();
-  });
 
   testMemoScenario();
 }
@@ -29,16 +26,28 @@ void testMemoScenario() => group(
       () {
         group(': V2', () {
           const savedMemName = 'Memo scenario: V2: saved mem name';
+          late final Database db;
 
+          setUpAll(() async {
+            db = await DatabaseManager(onTest: true).open(databaseDefinition);
+          });
           setUp(() async {
-            final memTable =
-                (await DatabaseManager(onTest: true).open(databaseDefinition))
-                    .getTable(memTableDefinition.name);
+            final memTable = db.getTable(memTableDefinition.name);
 
             await memTable.insert({
               defMemName.name: savedMemName,
               createdAtColumnName: DateTime.now(),
             });
+          });
+          tearDown(() async {
+            final memItemTable = db.getTable(memItemTableDefinition.name);
+            final memTable = db.getTable(memTableDefinition.name);
+
+            await memItemTable.delete();
+            await memTable.delete();
+          });
+          tearDownAll(() async {
+            await DatabaseManager(onTest: true).delete(databaseDefinition.name);
           });
 
           testWidgets(
@@ -122,6 +131,7 @@ void testMemoScenario() => group(
                 await widgetTester.tap(find.text(savedMemName));
                 await widgetTester.pumpAndSettle();
 
+                await widgetTester.tap(find.text(savedMemName));
                 const enteringMemNameText =
                     'Memo scenario: Save: Update. entering mem name';
                 const enteringMemMemoText =
@@ -139,6 +149,17 @@ void testMemoScenario() => group(
                 await widgetTester.tap(saveMemFabFinder);
                 await widgetTester.pumpAndSettle();
 
+                const saveSuccessText = 'Save success. $enteringMemNameText';
+                expect(
+                  find.text(saveSuccessText),
+                  findsOneWidget,
+                );
+                await widgetTester.pumpAndSettle(defaultDismissDuration);
+
+                expect(
+                  find.text(saveSuccessText),
+                  findsNothing,
+                );
                 await widgetTester.pageBack();
                 await widgetTester.pumpAndSettle();
 
