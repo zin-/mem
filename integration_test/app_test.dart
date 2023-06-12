@@ -54,6 +54,7 @@ void main() {
     });
 
     testMemoScenario();
+    testTodoScenario();
     testActScenario();
 
     group('V1', () {
@@ -68,7 +69,6 @@ void main() {
       });
 
       testTaskScenario();
-      testTodoScenario();
 
       testEdgeScenario();
 
