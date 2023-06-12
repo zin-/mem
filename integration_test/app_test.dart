@@ -1,9 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:mem/acts/act_repository.dart';
 import 'package:mem/database/database_manager.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/logger/i/type.dart';
 import 'package:mem/main.dart';
+import 'package:mem/mems/mem_item_repository_v2.dart';
+import 'package:mem/mems/mem_repository_v2.dart';
+import 'package:mem/mems/mem_service.dart';
 
 import 'scenarios/act_counter_scenario.dart';
 import '_helpers.dart';
@@ -41,6 +45,15 @@ void main() {
   });
 
   group('Scenario test', () {
+    setUp(() {
+      MemRepository.resetWith(null);
+      MemItemRepository.resetWith(null);
+      ActRepository.reset();
+
+      MemService.reset(null);
+    });
+
+    testMemoScenario();
     testActScenario();
 
     group('V1', () {
@@ -54,7 +67,6 @@ void main() {
         await DatabaseManager().delete(databaseDefinition.name);
       });
 
-      testMemoScenario();
       testTaskScenario();
       testTodoScenario();
 
