@@ -21,11 +21,13 @@ void main() {
   testMemoScenario();
 }
 
+const scenarioName = 'Memo scenario';
+
 void testMemoScenario() => group(
-      'Memo scenario',
+      ': $scenarioName',
       () {
         group(': V2', () {
-          const savedMemName = 'Memo scenario: V2: saved mem name';
+          const savedMemName = '$scenarioName: V2: saved mem name';
           late final Database db;
 
           setUpAll(() async {
@@ -73,9 +75,9 @@ void testMemoScenario() => group(
                 expect(find.text(savedMemName), findsNothing);
                 expect(find.text('Name'), findsOneWidget);
                 const enteringMemNameText =
-                    'Memo scenario: Save: create. entering mem name';
+                    '$scenarioName: Save: create. entering mem name';
                 const enteringMemMemoText =
-                    'Memo scenario: Save: create. entering mem memo';
+                    '$scenarioName: Save: create. entering mem memo';
                 await widgetTester.enterText(
                   memNameTextFormFieldFinder,
                   enteringMemNameText,
@@ -135,9 +137,9 @@ void testMemoScenario() => group(
                 await widgetTester.pumpAndSettle();
 
                 const enteringMemNameText =
-                    'Memo scenario: Save: Update. entering mem name';
+                    '$scenarioName: Save: Update. entering mem name';
                 const enteringMemMemoText =
-                    'Memo scenario: Save: Update. entering mem memo';
+                    '$scenarioName: Save: Update. entering mem memo';
                 await widgetTester.enterText(
                   memNameTextFormFieldFinder,
                   enteringMemNameText,
@@ -178,7 +180,7 @@ void testMemoScenario() => group(
 
             group(': Archive', () {
               const unarchivedMemName =
-                  'Memo scenario: V2: Archive: unarchived';
+                  '$scenarioName: V2: Archive: unarchived';
               const archivedMemName = 'Memo scenario: V2: Archive: archived';
 
               setUp(() async {
@@ -268,8 +270,8 @@ void testMemoScenario() => group(
           testWidgets(
             ': remove saved Mem',
             (widgetTester) async {
-              const savedMemName = 'saved mem name';
-              const savedMemMemo = 'saved mem memo';
+              const savedMemName = '$scenarioName: saved mem name';
+              const savedMemMemo = '$scenarioName: saved mem memo';
               await prepareSavedData(savedMemName, savedMemMemo);
 
               await runApplication(languageCode: 'en');
@@ -310,7 +312,7 @@ void testMemoScenario() => group(
           testWidgets(
             'MemItem is nothing',
             (widgetTester) async {
-              const savedMemName = 'saved mem name';
+              const savedMemName = '$scenarioName: saved mem name';
               final database =
                   await DatabaseManager(onTest: true).open(databaseDefinition);
               final memTable = database.getTable(memTableDefinition.name);
