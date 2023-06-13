@@ -4,9 +4,6 @@ abstract class Notification extends EntityV3 {
   final int id;
 
   Notification(this.id);
-
-  @override
-  String toString() => {'id': id}.toString();
 }
 
 class OneTimeNotification extends Notification {
