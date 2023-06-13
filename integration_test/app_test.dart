@@ -16,7 +16,7 @@ import 'database/_indexed_database.dart';
 import 'database/_sqlite_database.dart';
 import 'repositories/_log_repository.dart';
 import 'repositories/_act_repository.dart';
-import 'scenarios/_edge_scenario.dart';
+import 'scenarios/edge_scenario.dart';
 import 'scenarios/memo_scenario.dart';
 import 'repositories/_notification_repository.dart';
 import 'scenarios/todo_scenario.dart';
@@ -57,6 +57,8 @@ void main() {
     testTodoScenario();
     testActScenario();
 
+    testEdgeScenario();
+
     group('V1', () {
       setUpAll(() async {
         await DatabaseManager(onTest: true).open(databaseDefinition);
@@ -69,8 +71,6 @@ void main() {
       });
 
       testTaskScenario();
-
-      testEdgeScenario();
 
       group('Act test', () {
         testActCounterConfigure();
