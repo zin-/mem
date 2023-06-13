@@ -55,6 +55,8 @@ void main() {
 
     testMemoScenario();
     testTodoScenario();
+    testTaskScenario();
+
     testActScenario();
 
     testEdgeScenario();
@@ -70,7 +72,6 @@ void main() {
         await DatabaseManager().delete(databaseDefinition.name);
       });
 
-      testTaskScenario();
 
       group('Act test', () {
         testActCounterConfigure();

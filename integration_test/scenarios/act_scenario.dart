@@ -7,6 +7,7 @@ import 'package:mem/database/database_manager.dart';
 import 'package:mem/main.dart' as app;
 import 'package:mem/repositories/i/_database_tuple_entity_v2.dart';
 import 'package:mem/repositories/mem_entity.dart';
+import 'package:mem/repositories/mem_item_repository.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -26,9 +27,11 @@ void testActScenario() => group(': Act scenario', () {
 
       setUpAll(() async {
         db = (await DatabaseManager(onTest: true).open(app.databaseDefinition));
-        final memTable = db.getTable(memTableDefinition.name);
 
+        await db.getTable(memItemTableDefinition.name).delete();
+        final memTable = db.getTable(memTableDefinition.name);
         await memTable.delete();
+
         savedMemId = await memTable.insert({
           defMemName.name: savedMemName,
           createdAtColumnName: DateTime.now(),
