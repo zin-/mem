@@ -4,8 +4,6 @@ import 'package:integration_test/integration_test.dart';
 import 'package:mem/database/database.dart';
 import 'package:mem/database/database_manager.dart';
 import 'package:mem/gui/constants.dart';
-import 'package:mem/logger/log_entity.dart';
-import 'package:mem/logger/log_service_v2.dart';
 import 'package:mem/main.dart';
 import 'package:mem/repositories/_database_tuple_repository.dart';
 import 'package:mem/repositories/mem_entity.dart';
@@ -15,8 +13,6 @@ import '../_helpers.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
-  LogServiceV2.initialize(Level.verbose);
 
   testMemoScenario();
 }
