@@ -48,7 +48,7 @@ void main() {
     setUp(() {
       MemRepository.resetWith(null);
       MemItemRepository.resetWith(null);
-      ActRepository.reset();
+      ActRepository.resetWith(null);
 
       MemService.reset(null);
     });

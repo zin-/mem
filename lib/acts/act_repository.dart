@@ -96,5 +96,5 @@ class ActRepository extends DatabaseTupleRepository<ActEntity, Act> {
     return tmp;
   }
 
-  static reset() => _instance = null;
+  static resetWith(ActRepository? instance) => _instance = instance;
 }

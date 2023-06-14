@@ -36,16 +36,16 @@ void testActRepository() => group(
         });
 
         tearDownAll(() async {
-          ActRepository.reset();
+          ActRepository.resetWith(null);
           await databaseManager.delete(defD.name);
         });
 
         group('Create instance', () {
           setUp(() {
-            ActRepository.reset();
+            ActRepository.resetWith(null);
           });
           tearDown(() {
-            ActRepository.reset();
+            ActRepository.resetWith(null);
           });
 
           test('Singleton', () {
