@@ -40,16 +40,16 @@ final rawMemListProvider =
 );
 
 final memListProvider =
-    StateNotifierProvider<ValueStateNotifier<List<Mem>>, List<Mem>>(
-  (ref) => v(
+    StateNotifierProvider<ValueStateNotifier<List<Mem>>, List<Mem>>((ref) {
+  final rawMemList = ref.watch(rawMemListProvider) ?? <Mem>[];
+
+  final showNotArchived = ref.watch(showNotArchivedProvider);
+  final showArchived = ref.watch(showArchivedProvider);
+  final showNotDone = ref.watch(showNotDoneProvider);
+  final showDone = ref.watch(showDoneProvider);
+
+  return v(
     () {
-      final rawMemList = ref.watch(rawMemListProvider) ?? <Mem>[];
-
-      final showNotArchived = ref.watch(showNotArchivedProvider);
-      final showArchived = ref.watch(showArchivedProvider);
-      final showNotDone = ref.watch(showNotDoneProvider);
-      final showDone = ref.watch(showDoneProvider);
-
       final filtered = rawMemList.where((mem) {
         if (showNotArchived == showArchived) {
           return true;
@@ -101,8 +101,9 @@ final memListProvider =
 
       return ValueStateNotifier(sorted);
     },
-  ),
-);
+    [rawMemList, showNotArchived, showArchived, showNotDone, showDone],
+  );
+});
 
 final activeActsProvider =
     StateNotifierProvider<ListValueStateNotifier<Act>, List<Act>?>(
