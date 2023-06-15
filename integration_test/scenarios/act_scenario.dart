@@ -4,6 +4,7 @@ import 'package:integration_test/integration_test.dart';
 import 'package:mem/acts/act_entity.dart';
 import 'package:mem/database/database.dart';
 import 'package:mem/database/database_manager.dart';
+import 'package:mem/database/v2/definitions.dart';
 import 'package:mem/main.dart' as app;
 import 'package:mem/repositories/i/_database_tuple_entity_v2.dart';
 import 'package:mem/repositories/mem_entity.dart';
@@ -26,7 +27,7 @@ void testActScenario() => group(': Act scenario', () {
       late final int insertedMemId;
 
       setUpAll(() async {
-        db = (await DatabaseManager(onTest: true).open(app.databaseDefinition));
+        db = (await DatabaseManager(onTest: true).open(databaseDefinition));
 
         await db.getTable(memItemTableDefinition.name).delete();
         await db.getTable(actTableDefinition.name).delete();
