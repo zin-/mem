@@ -1,0 +1,43 @@
+# buildは全体で同じものを使いたい
+# それぞれでbuildするのはもったいない
+# buildだけじゃなくて、ランタイムとかも同様
+# 全体とはいうがOSによって異なるのは許容というか理解できる
+
+# job単位で別のランナー（サーバ）になる
+# ので、依存関係がある場合には何かしらの方法で連携する必要がある
+
+# 最終的にはコード解析とテスト、デプロイまでやりたい
+# 現時点ではデプロイは不要
+# コード解析とテストを直列でやる必要はないので、並列でやる
+# コード解析はテストコードとプロダクションコード
+# テストもテストの種類によって必要な準備やOSが異なる
+# はずなので、それぞれランナーは分けたい=別jobで実行する
+# とはいえ、同じOSで良いこともあるのでそこは共通化したい
+
+# 概念として、一つのワークフローにまとめるべき
+# な気がしてきた
+
+# 外部のactionを使う場合のみに、actionを使う？
+# そういうわけじゃないか
+# buildとかでどのOSでも同じ命令になることはありえる
+
+name: 'Check'
+
+on:
+  push:
+
+env:
+  flutter-version: '3.10.3'
+  flutter-channel: 'stable'
+
+jobs:
+  build_on_ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: 'Install Flutter'
+        uses: ./.github/actions/install-flutter
+        with:
+          version: ${{ env.flutter-version }}
+          channel: ${{ env.flutter-channel }}
+      - run: ls
