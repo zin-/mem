@@ -4,6 +4,8 @@ import 'package:integration_test/integration_test.dart';
 import 'package:mem/acts/act_entity.dart';
 import 'package:mem/database/database.dart';
 import 'package:mem/database/database_manager.dart';
+import 'package:mem/logger/log_entity.dart';
+import 'package:mem/logger/log_service_v2.dart';
 import 'package:mem/main.dart' as app;
 import 'package:mem/repositories/i/_database_tuple_entity_v2.dart';
 import 'package:mem/repositories/mem_entity.dart';
@@ -106,6 +108,8 @@ void testActScenario() => group(': Act scenario', () {
         group(': Edit act', () {
           late DateTime createdAt;
 
+          // TODO remove
+          setUpAll(() => LogServiceV2.initialize(Level.verbose));
           setUp(() async {
             createdAt = DateTime.now();
 
@@ -122,6 +126,8 @@ void testActScenario() => group(': Act scenario', () {
               createdAtColumnName: createdAt,
             });
           });
+          // TODO remove
+          tearDownAll(() => LogServiceV2.initialize(Level.error));
 
           testWidgets(': save.', (widgetTester) async {
             await showActListPage(widgetTester);
