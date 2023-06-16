@@ -23,13 +23,18 @@ jobs:
         uses: ./.github/actions/generate-localization_code
       - name: 'Flutter Doctor'
         run: flutter doctor -v
-      - run: flutter test --coverage
+      - id: 'test_execution'
+        continue-on-error: true
+        run: flutter test --coverage
       - name: 'Upload coverage'
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
           flags: small_test
+      - name: 'Error handling'
+        if: ${{ steps.test_execution.outcome == 'failure' }}
+        run: exit 1
 
   integration_test:
     strategy:
@@ -70,10 +75,15 @@ jobs:
           java-version: ${{ matrix.java-version }}
       - name: 'Flutter doctor'
         run: flutter doctor -v
-      - run: flutter test integration_test/app_test.dart -d ${{ matrix.platform }} --coverage
+      - id: 'test_execution'
+        continue-on-error: true
+        run: flutter test integration_test/app_test.dart -d ${{ matrix.platform }} --coverage
       - name: 'Upload coverage'
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
           flags: integration_test-${{ matrix.platform}}
+      - name: 'Error handling'
+        if: ${{ steps.test_execution.outcome == 'failure' }}
+        run: exit 1

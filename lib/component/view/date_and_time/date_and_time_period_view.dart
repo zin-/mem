@@ -13,7 +13,7 @@ class DateAndTimePeriodTexts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => v(() {
-        return Row(
+        return Wrap(
           children: [
             _dateAndTimePeriod.start == null
                 ? const SizedBox.shrink()

@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/act_counter/act_counter_repository.dart';
 import 'package:mem/act_counter/act_counter_service.dart';
@@ -15,6 +13,7 @@ import 'package:mem/logger/log_service_v2.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
+import '../helpers.dart';
 import '../mocks.mocks.dart';
 import 'act_counter_service_test.mocks.dart';
 
@@ -39,7 +38,7 @@ void main() {
   test(
     ': createNew',
     () async {
-      final memId = math.Random().nextInt(4294967296);
+      final memId = randomInt();
 
       final mem = Mem(name: 'createNew', id: memId);
       when(mockedMemRepository.shipById(any))
@@ -59,7 +58,7 @@ void main() {
       ];
       when(mockedActRepository.shipByMemId(any, period: anyNamed('period')))
           .thenAnswer((realInvocation) => Future.value(acts));
-      final homeWidgetId = math.Random().nextInt(4294967296);
+      final homeWidgetId = randomInt();
       when(mockedHomeWidgetAccessor.initialize(
         methodChannelName,
         initializeMethodName,
@@ -104,7 +103,7 @@ void main() {
   test(
     ': increment',
     () async {
-      final memId = math.Random().nextInt(4294967296);
+      final memId = randomInt();
       final now = DateAndTime.now();
 
       final act = Act(memId, DateAndTimePeriod.startNow());

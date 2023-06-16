@@ -11,7 +11,7 @@ import 'package:mem/database/database.dart';
 import 'package:mem/database/database_manager.dart';
 import 'package:mem/logger/log_service_v2.dart' as v2;
 import 'package:mem/mems/mem_item_repository_v2.dart';
-import 'package:mem/mems/mem_list_page.dart';
+import 'package:mem/mems/list/page.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/repositories/mem_entity.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
@@ -30,7 +30,7 @@ final databaseDefinition = DefD(
 
 Future<void> main({String? languageCode}) async {
   initializeLogger();
-  run(MemListPage(), languageCode: languageCode);
+  run(const MemListPage(), languageCode: languageCode);
 }
 
 @pragma('vm:entry-point')

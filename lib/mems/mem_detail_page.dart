@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/component/view/mem_list/states.dart';
 import 'package:mem/gui/dimens.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/logger/i/api.dart';
@@ -9,7 +10,7 @@ import 'package:mem/gui/constants.dart';
 import 'package:mem/mems/mem_detail_body.dart';
 import 'package:mem/mems/mem_detail_menu.dart';
 import 'package:mem/mems/mem_detail_states.dart';
-import 'package:mem/mems/mem_list_page.dart';
+import 'package:mem/mems/list/page.dart';
 import 'package:mem/mems/mems_action.dart';
 
 class MemDetailPage extends StatelessWidget {
@@ -27,6 +28,7 @@ class MemDetailPage extends StatelessWidget {
         {'_memId': _memId},
         () => Consumer(
           builder: (context, ref, child) {
+            // ISSUE #178
             ref.read(
               initialize((memId) => showMemDetailPage(context, ref, memId)),
             );
@@ -90,6 +92,11 @@ class MemDetailPage extends StatelessWidget {
                                 duration: defaultDismissDuration,
                                 dismissDirection: DismissDirection.horizontal,
                               ),
+                            );
+
+                            ref.read(rawMemListProvider.notifier).upsertAll(
+                              [await savedMemFuture],
+                              (tmp, item) => tmp.id == item.id,
                             );
                           }
                         },

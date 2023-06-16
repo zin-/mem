@@ -91,25 +91,6 @@ class MemService {
         )),
       );
 
-  Future<List<Mem>> fetchMems(
-    bool showNotArchived,
-    bool showArchived,
-    bool showNotDone,
-    bool showDone,
-  ) =>
-      t(
-        {
-          'showNotArchived': showNotArchived,
-          'showArchived': showArchived,
-          'showNotDone': showNotDone,
-          'showDone': showDone,
-        },
-        () => _memRepository.shipByCondition(
-          showNotArchived == showArchived ? null : showArchived,
-          showNotDone == showDone ? null : showDone,
-        ),
-      );
-
   Future<Mem> fetchMemById(int memId) => t(
         {'memId': memId},
         () => _memRepository.shipById(memId),

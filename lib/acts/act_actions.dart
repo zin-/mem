@@ -1,4 +1,7 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/acts/act_list_page_states.dart';
 import 'package:mem/acts/act_repository.dart';
+import 'package:mem/component/view/mem_list/states.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time.dart';
 import 'package:mem/core/date_and_time_period.dart';
@@ -10,23 +13,47 @@ final actRepository = ActRepository();
 Future<List<Act>> fetchByMemIdIs(MemId memId) =>
     actRepository.shipByMemId(memId);
 
-Future<Act> start(MemId memId) => actRepository.receive(
-      Act(
-        memId,
-        DateAndTimePeriod.startNow(),
-      ),
-    );
-
-Future<Act> finish(Act act) => actRepository.replace(
-      Act(
-        act.memId,
-        DateAndTimePeriod(
-          start: act.period.start,
-          end: DateAndTime.now(),
+final startAct = Provider.autoDispose.family<void, int>(
+  (ref, memId) => v(
+    () async {
+      final received = await ActRepository().receive(
+        Act(
+          memId,
+          DateAndTimePeriod.startNow(),
         ),
-        id: act.id,
-      ),
-    );
+      );
+
+      ref.read(actListProvider(memId).notifier).add(received, index: 0);
+      ref.read(activeActsProvider.notifier).add(received);
+    },
+    memId,
+  ),
+);
+
+final finishAct = Provider.autoDispose.family<void, Act>(
+  (ref, act) => v(
+    () async {
+      final replaced = await actRepository.replace(
+        Act(
+          act.memId,
+          DateAndTimePeriod(
+            start: act.period.start,
+            end: DateAndTime.now(),
+          ),
+          id: act.id,
+        ),
+      );
+
+      ref
+          .read(actListProvider(replaced.memId).notifier)
+          .upsertAll([replaced], (tmp, item) => tmp.id == item.id);
+      ref.read(activeActsProvider.notifier).removeWhere(
+            (item) => item.id == replaced.id,
+          );
+    },
+    act,
+  ),
+);
 
 Future<Act> save(Act act) => v(
       () => actRepository.replace(act),

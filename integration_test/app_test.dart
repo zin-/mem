@@ -1,9 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:mem/acts/act_repository.dart';
 import 'package:mem/database/database_manager.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/logger/i/type.dart';
 import 'package:mem/main.dart';
+import 'package:mem/mems/mem_item_repository_v2.dart';
+import 'package:mem/mems/mem_repository_v2.dart';
+import 'package:mem/mems/mem_service.dart';
 
 import 'scenarios/act_counter_scenario.dart';
 import '_helpers.dart';
@@ -12,10 +16,10 @@ import 'database/_indexed_database.dart';
 import 'database/_sqlite_database.dart';
 import 'repositories/_log_repository.dart';
 import 'repositories/_act_repository.dart';
-import 'scenarios/_edge_scenario.dart';
-import 'scenarios/_memo_scenario.dart';
+import 'scenarios/edge_scenario.dart';
+import 'scenarios/memo_scenario.dart';
 import 'repositories/_notification_repository.dart';
-import 'scenarios/_todo_scenario.dart';
+import 'scenarios/todo_scenario.dart';
 import 'scenarios/act_scenario.dart';
 import 'scenarios/task_scenario.dart';
 
@@ -41,7 +45,21 @@ void main() {
   });
 
   group('Scenario test', () {
+    setUp(() {
+      MemRepository.resetWith(null);
+      MemItemRepository.resetWith(null);
+      ActRepository.resetWith(null);
+
+      MemService.reset(null);
+    });
+
+    testMemoScenario();
+    testTodoScenario();
+    testTaskScenario();
+
     testActScenario();
+
+    testEdgeScenario();
 
     group('V1', () {
       setUpAll(() async {
@@ -54,11 +72,6 @@ void main() {
         await DatabaseManager().delete(databaseDefinition.name);
       });
 
-      testMemoScenario();
-      testTodoScenario();
-      testTaskScenario();
-
-      testEdgeScenario();
 
       group('Act test', () {
         testActCounterConfigure();

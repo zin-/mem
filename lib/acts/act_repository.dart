@@ -6,6 +6,7 @@ import 'package:mem/core/errors.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/database/database.dart';
 import 'package:mem/logger/i/api.dart';
+import 'package:mem/logger/log_service_v2.dart' as v2;
 import 'package:mem/repositories/i/_database_tuple_repository_v2.dart';
 import 'package:mem/repositories/i/conditions.dart';
 
@@ -27,6 +28,10 @@ class ActRepository extends DatabaseTupleRepository<ActEntity, Act> {
             ]));
           }
         },
+      );
+
+  Future<List<Act>> shipActive() => v2.v(
+        () async => await ship(IsNull(defActEnd.name)),
       );
 
   @override
@@ -91,5 +96,5 @@ class ActRepository extends DatabaseTupleRepository<ActEntity, Act> {
     return tmp;
   }
 
-  static reset() => _instance = null;
+  static resetWith(ActRepository? instance) => _instance = instance;
 }

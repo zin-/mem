@@ -1,10 +1,10 @@
-import 'dart:math' as math;
-
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/act_counter/home_widget_accessor.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/logger/i/type.dart';
+
+import 'helpers.dart';
 
 void main() {
   initializeLogger(Level.verbose);
@@ -17,7 +17,7 @@ void main() {
       const channel = MethodChannel('test_channel');
       const initializeMethodName = 'test_method';
 
-      final homeWidgetId = math.Random().nextInt(4294967296);
+      final homeWidgetId = randomInt();
       widgetTester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
         channel,
         (methodCall) {
@@ -47,7 +47,7 @@ void main() {
 
       const channel = MethodChannel('home_widget');
       const methodName = 'saveWidgetData';
-      final returns = math.Random().nextBool();
+      final returns = randomBool();
       widgetTester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
         channel,
         (methodCall) {
@@ -78,7 +78,7 @@ void main() {
 
       const channel = MethodChannel('home_widget');
       const methodName = 'updateWidget';
-      final returns = math.Random().nextBool();
+      final returns = randomBool();
       widgetTester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
         channel,
         (methodCall) {

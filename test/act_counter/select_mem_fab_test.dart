@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/act_counter/act_counter_service.dart';
@@ -12,6 +10,7 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
 import '../_helpers.dart';
+import '../helpers.dart';
 import 'select_mem_fab_test.mocks.dart';
 
 @GenerateMocks([
@@ -71,7 +70,7 @@ void main() {
     testWidgets(
       ': tap',
       (widgetTester) async {
-        final selectedMemId = math.Random().nextInt(4294967296);
+        final selectedMemId = randomInt();
 
         when(mockedActCounterService.createNew(selectedMemId))
             .thenAnswer((realInvocation) => Future.value(null));

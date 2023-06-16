@@ -3,7 +3,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/gui/constants.dart';
-import 'package:mem/mems/mem_list_page.dart';
+import 'package:mem/mems/list/page.dart';
 
 class ShowNewMemFab extends StatefulWidget {
   final ScrollController _scrollController;
@@ -19,13 +19,27 @@ class _ShowNewMemFabState extends State<ShowNewMemFab>
   bool _show = true;
 
   @override
-  void didUpdateWidget(covariant ShowNewMemFab oldWidget) => v(
-        {'oldWidget': oldWidget},
-        () {
-          super.didUpdateWidget(oldWidget);
-          _addListener();
-        },
-      );
+  void initState() {
+    super.initState();
+    widget._scrollController.addListener(() => v(
+          {'_show': _show},
+          () {
+            if (widget._scrollController.position.userScrollDirection ==
+                    ScrollDirection.forward &&
+                !_show) {
+              setState(() {
+                _show = true;
+              });
+            } else if (widget._scrollController.position.userScrollDirection ==
+                    ScrollDirection.reverse &&
+                _show) {
+              setState(() {
+                _show = false;
+              });
+            }
+          },
+        ));
+  }
 
   @override
   Widget build(BuildContext context) => v(
@@ -46,28 +60,5 @@ class _ShowNewMemFabState extends State<ShowNewMemFab>
             ),
           ),
         ),
-      );
-
-  void _addListener() => v(
-        {},
-        () => widget._scrollController.addListener(() => v(
-              {'_show': _show},
-              () {
-                if (widget._scrollController.position.userScrollDirection ==
-                        ScrollDirection.forward &&
-                    !_show) {
-                  setState(() {
-                    _show = true;
-                  });
-                } else if (widget
-                            ._scrollController.position.userScrollDirection ==
-                        ScrollDirection.reverse &&
-                    _show) {
-                  setState(() {
-                    _show = false;
-                  });
-                }
-              },
-            )),
       );
 }
