@@ -1,4 +1,4 @@
-import 'package:mem/database/definitions.dart';
+import 'package:mem/framework/database/definition.dart';
 import 'package:mem/database/definitions/column_definition.dart';
 import 'package:mem/database/definitions/table_definition.dart';
 

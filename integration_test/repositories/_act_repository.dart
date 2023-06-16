@@ -7,7 +7,7 @@ import 'package:mem/core/date_and_time_period.dart';
 import 'package:mem/core/errors.dart';
 import 'package:mem/database/database.dart';
 import 'package:mem/database/database_manager.dart';
-import 'package:mem/database/i/types.dart';
+import 'package:mem/framework/database/definition.dart';
 import 'package:mem/repositories/i/_database_tuple_entity_v2.dart';
 import 'package:mem/repositories/mem_entity.dart';
 
@@ -20,7 +20,7 @@ void testActRepository() => group(
       () {
         final databaseManager = DatabaseManager(onTest: true);
 
-        final defD = DefD('atc_repository_test.db', 1, [
+        final defD = DatabaseDefinition('atc_repository_test.db', 1, [
           memTableDefinition,
           actTableDefinition,
         ]);

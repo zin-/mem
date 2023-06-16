@@ -1,9 +1,9 @@
 import 'package:mem/acts/act_entity.dart';
-import 'package:mem/database/i/types.dart';
+import 'package:mem/framework/database/definition.dart';
 import 'package:mem/repositories/mem_entity.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 
-final databaseDefinition = DefD(
+final databaseDefinition = DatabaseDefinition(
   'mem.db',
   5,
   [

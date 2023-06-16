@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/database/database.dart';
-import 'package:mem/database/definitions.dart';
+import 'package:mem/framework/database/definition.dart';
 import 'package:mem/database/indexed_database.dart';
 
 void main() {
