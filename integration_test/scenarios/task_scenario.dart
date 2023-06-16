@@ -4,6 +4,7 @@ import 'package:integration_test/integration_test.dart';
 import 'package:mem/acts/act_entity.dart';
 import 'package:mem/database/database.dart';
 import 'package:mem/database/database_manager.dart';
+import 'package:mem/database/v2/definitions.dart';
 import 'package:mem/main.dart' as app;
 import 'package:mem/repositories/_database_tuple_repository.dart';
 import 'package:mem/repositories/mem_entity.dart';
@@ -24,7 +25,7 @@ void testTaskScenario() => group(': $scenarioName', () {
       late final Database db;
 
       setUpAll(() async {
-        db = await DatabaseManager(onTest: true).open(app.databaseDefinition);
+        db = await DatabaseManager(onTest: true).open(databaseDefinition);
       });
       setUp(() async {
         await db.getTable(actTableDefinition.name).delete();
