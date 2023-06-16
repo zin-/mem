@@ -1,4 +1,4 @@
-import 'package:mem/frame_work/entity_v3.dart';
+import 'package:mem/framework/entity_v3.dart';
 
 /// # Logとは
 ///
