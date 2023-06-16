@@ -72,7 +72,6 @@ void main() {
         await DatabaseManager().delete(databaseDefinition.name);
       });
 
-
       group('Act test', () {
         testActCounterConfigure();
       });
