@@ -37,7 +37,7 @@ void testActScenario() => group(': Act scenario', () {
           createdAtColumnName: DateTime.now(),
         });
       });
-      setUp(() async {
+      tearDown(() async {
         await db.getTable(actTableDefinition.name).delete();
       });
       tearDownAll(() async {
