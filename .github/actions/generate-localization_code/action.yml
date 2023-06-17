@@ -2,6 +2,13 @@ name: 'Generate Localization code'
 runs:
   using: 'composite'
   steps:
+    - id: cache
+      name: 'Cache'
+      uses: actions/cache@v3
+      with:
+        path: .dart_tool/flutter_gen/gen_l10n/*
+        key: l10n-${{ runner.os }}-${{ hashFiles('lib/gui/l10n/*') }}
     - name: 'Genarate Localization code'
-      run: flutter gen-l10n
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: ./scripts/generate_l10n.sh
       shell: bash

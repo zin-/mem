@@ -31,7 +31,8 @@ env:
   flutter-channel: 'stable'
 
 jobs:
-  build_on_ubuntu:
+  build-on-ubuntu:
+    name: 'Build on ubuntu'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -40,4 +41,23 @@ jobs:
         with:
           version: ${{ env.flutter-version }}
           channel: ${{ env.flutter-channel }}
-      - run: ls
+      - name: 'Generate Localization code'
+        uses: ./.github/actions/generate-localization_code
+
+  analyze-production_code:
+    name: 'Analyze Production code'
+    needs: [build-on-ubuntu]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: 'Install Flutter'
+        uses: ./.github/actions/install-flutter
+        with:
+          version: ${{ env.flutter-version }}
+          channel: ${{ env.flutter-channel }}
+      - name: 'Generate Localization code'
+        uses: ./.github/actions/generate-localization_code
+      - name: 'Flutter Doctor'
+        run: flutter doctor -v
+      - name: 'Analyze Production code'
+        run: flutter analyze lib

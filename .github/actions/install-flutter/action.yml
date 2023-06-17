@@ -6,6 +6,7 @@ inputs:
   channel:
     type: string
     required: true
+
 runs:
   using: 'composite'
   steps:
