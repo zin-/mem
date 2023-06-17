@@ -9,8 +9,8 @@ import 'package:mem/mems/mem_detail_page.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mem/gui/l10n.dart';
 
+import '../helpers.mocks.dart';
 import '../samples.dart';
-import '../mocks.mocks.dart';
 
 void main() {
   final mockedMemRepository = MockMemRepository();

@@ -44,6 +44,21 @@ jobs:
       - name: 'Generate Localization code'
         uses: ./.github/actions/generate-localization_code
 
+  build_test-on-ubuntu:
+    name: 'Build test on ubuntu'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: 'Install Flutter'
+        uses: ./.github/actions/install-flutter
+        with:
+          version: ${{ env.flutter-version }}
+          channel: ${{ env.flutter-channel }}
+      - name: 'Install dependencies'
+        uses: ./.github/actions/install-dependencies
+      - name: 'Build Mocks'
+        uses: ./.github/actions/build-mocks
+
   analyze-production_code:
     name: 'Analyze Production code'
     needs: [build-on-ubuntu]
@@ -61,3 +76,24 @@ jobs:
         run: flutter doctor -v
       - name: 'Analyze Production code'
         run: flutter analyze lib
+
+  analyze-test_code:
+    name: 'Analyze Test code'
+    needs: [build_test-on-ubuntu]
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v3
+      - name: 'Install Flutter'
+        uses: ./.github/actions/install-flutter
+        with:
+          version: ${{ env.flutter-version }}
+          channel: ${{ env.flutter-channel }}
+      - name: 'Install dependencies'
+        uses: ./.github/actions/install-dependencies
+      - name: 'Build Mocks'
+        uses: ./.github/actions/build-mocks
+      - name: 'Flutter Doctor'
+        run: flutter doctor -v
+      - name: 'Analyze Test code'
+        run: flutter analyze test integration_test

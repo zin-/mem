@@ -2,13 +2,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/logger/i/type.dart';
 import 'package:mem/logger/log_repository.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
-@GenerateNiceMocks([
-  MockSpec<LogRepository>(),
-])
-import 'log_service_test.mocks.dart';
+import 'helpers.mocks.dart';
 
 void main() {
   final mockedLogRepository = MockLogRepository();

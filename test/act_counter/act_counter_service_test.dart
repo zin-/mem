@@ -10,16 +10,11 @@ import 'package:mem/logger/i/api.dart';
 import 'package:mem/logger/i/type.dart';
 import 'package:mem/logger/log_entity.dart' as v2;
 import 'package:mem/logger/log_service_v2.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
 import '../helpers.dart';
-import '../mocks.mocks.dart';
-import 'act_counter_service_test.mocks.dart';
+import '../helpers.mocks.dart';
 
-@GenerateMocks([
-  HomeWidgetAccessor,
-])
 void main() {
   initializeLogger(Level.verbose);
   LogServiceV2.initialize(v2.Level.verbose);

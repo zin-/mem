@@ -6,16 +6,12 @@ import 'package:mem/gui/list_value_state_notifier.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/logger/i/type.dart';
 import 'package:mem/mems/mem_list_view_state.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
 import '../_helpers.dart';
 import '../helpers.dart';
-import 'select_mem_fab_test.mocks.dart';
+import '../helpers.mocks.dart';
 
-@GenerateMocks([
-  ActCounterService,
-])
 void main() {
   initializeLogger(Level.error);
 

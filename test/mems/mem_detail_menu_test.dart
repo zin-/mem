@@ -6,7 +6,7 @@ import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/gui/colors.dart';
 import 'package:mockito/mockito.dart';
 
-import '../mocks.mocks.dart';
+import '../helpers.mocks.dart';
 import '../samples.dart';
 import 'mem_detail_page_test.dart';
 
