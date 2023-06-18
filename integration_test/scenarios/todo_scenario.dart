@@ -3,8 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/database/database.dart';
 import 'package:mem/database/database_manager.dart';
-import 'package:mem/logger/log_entity.dart';
-import 'package:mem/logger/log_service_v2.dart';
 import 'package:mem/main.dart' as app;
 import 'package:mem/repositories/_database_tuple_repository.dart';
 import 'package:mem/repositories/mem_entity.dart';
@@ -29,9 +27,6 @@ void testTodoScenario() => group(': $scenarioName', () {
       late final Database db;
 
       setUpAll(() async {
-        // TODO remove
-        LogServiceV2.initialize(Level.verbose);
-
         db = await DatabaseManager(onTest: true).open(app.databaseDefinition);
       });
       setUp(() async {
@@ -61,9 +56,6 @@ void testTodoScenario() => group(': $scenarioName', () {
       });
       tearDownAll(() async {
         await DatabaseManager(onTest: true).delete(app.databaseDefinition.name);
-
-        // TODO remove
-        LogServiceV2.initialize(Level.error);
       });
 
       group(': done & undone', () {
