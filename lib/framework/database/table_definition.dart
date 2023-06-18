@@ -1,5 +1,5 @@
 import 'package:collection/collection.dart';
-import 'package:mem/database/database.dart';
+import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/column_definition.dart';
 
 class TableDefinition {

@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:mem/database/database.dart';
+import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/table_definition.dart';
-import 'package:mem/database/i/types.dart';
+import 'package:mem/framework/database/types.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';

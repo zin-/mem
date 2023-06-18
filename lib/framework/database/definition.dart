@@ -1,4 +1,4 @@
-import 'package:mem/database/database.dart';
+import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/table_definition.dart';
 
 class DatabaseDefinition {

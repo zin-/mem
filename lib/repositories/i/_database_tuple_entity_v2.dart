@@ -1,4 +1,4 @@
-import 'package:mem/database/i/types.dart';
+import 'package:mem/framework/database/types.dart';
 
 import '_entity_v2.dart';
 import 'types.dart';

@@ -2,7 +2,7 @@ import 'package:mem/core/date_and_time.dart';
 import 'package:mem/core/date_and_time_period.dart';
 import 'package:mem/core/errors.dart';
 import 'package:mem/core/mem.dart';
-import 'package:mem/database/database.dart' as db;
+import 'package:mem/framework/database/database.dart' as db;
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/repositories/_database_tuple_repository.dart';
 import 'package:mem/repositories/i/_database_tuple_repository_v2.dart';

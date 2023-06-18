@@ -1,4 +1,4 @@
-import 'package:mem/database/database.dart';
+import 'package:mem/framework/database/database.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/repositories/_repository_v2.dart';
 import 'package:mem/repositories/i/types.dart';

@@ -1,4 +1,4 @@
-import 'package:mem/database/i/types.dart';
+import 'package:mem/framework/database/types.dart';
 import 'package:mem/repositories/_database_tuple_repository.dart';
 import 'package:mem/repositories/mem_entity.dart';
 

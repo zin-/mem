@@ -5,8 +5,8 @@ import 'dart:convert';
 
 import 'package:idb_shim/idb.dart' as idb_shim;
 import 'package:idb_shim/idb_browser.dart' as idb_browser;
-import 'package:mem/database/database.dart';
-import 'package:mem/database/i/types.dart';
+import 'package:mem/framework/database/database.dart';
+import 'package:mem/framework/database/types.dart';
 import 'package:mem/logger/i/api.dart';
 
 class IndexedDatabase extends Database {
