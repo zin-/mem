@@ -130,3 +130,58 @@ jobs:
       - name: 'Error handling'
         if: ${{ steps.test_execution.outcome == 'failure' }}
         run: exit 1
+
+  medium_test:
+    name: 'Medium test(${{ matrix.platform }})'
+    needs: [build_test-on-ubuntu]
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [android, windows]
+        include:
+          - platform: android
+            os: macos-latest
+            android-api-level: 30
+            android-tag: 'default'
+            android-abi: 'x86_64'
+            java-distribution: 'temurin'
+            java-version: 17
+          - platform: windows
+            os: windows-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v3
+      - name: 'Install Flutter'
+        uses: ./.github/actions/install-flutter
+        with:
+          version: ${{ env.flutter-version }}
+          channel: ${{ env.flutter-channel }}
+      - name: 'Install dependencies'
+        uses: ./.github/actions/install-dependencies
+      - name: 'Generate Localization code'
+        uses: ./.github/actions/generate-localization_code
+      - name: 'Prepare Test for Android'
+        if: ${{ matrix.platform == 'android' }}
+        uses: ./.github/actions/prepare-test_for-android
+        with:
+          android-api-level: ${{ matrix.android-api-level }}
+          android-tag: ${{ matrix.android-tag }}
+          android-abi: ${{ matrix.android-abi }}
+          android-sdk-root: ${{ matrix.android-sdk-root }}
+          java-distribution: ${{ matrix.java-distribution }}
+          java-version: ${{ matrix.java-version }}
+      - name: 'Flutter doctor'
+        run: flutter doctor -v
+      - id: 'test_execution'
+        continue-on-error: true
+        run: flutter test integration_test/app_test.dart -d ${{ matrix.platform }} --coverage
+      - name: 'Upload coverage'
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          flags: medium_test-${{ matrix.platform}}
+      - name: 'Error handling'
+        if: ${{ steps.test_execution.outcome == 'failure' }}
+        run: exit 1
