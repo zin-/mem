@@ -1,6 +1,6 @@
+import 'package:mem/database/tables/mems.dart';
 import 'package:mem/framework/database/types.dart';
 import 'package:mem/repositories/_database_tuple_repository.dart';
-import 'package:mem/repositories/mem_entity.dart';
 
 const memIdColumnName = 'mems_id';
 const memItemTypeColumnName = 'type';

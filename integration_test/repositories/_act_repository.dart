@@ -5,11 +5,11 @@ import 'package:mem/core/date_and_time.dart';
 import 'package:mem/core/date_and_time_period.dart';
 import 'package:mem/core/errors.dart';
 import 'package:mem/database/tables/acts.dart';
+import 'package:mem/database/tables/mems.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/framework/database/definition.dart';
 import 'package:mem/repositories/i/_database_tuple_entity_v2.dart';
-import 'package:mem/repositories/mem_entity.dart';
 
 void main() {
   testActRepository();

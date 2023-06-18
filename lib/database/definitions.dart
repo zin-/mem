@@ -1,6 +1,6 @@
 import 'package:mem/database/tables/acts.dart';
+import 'package:mem/database/tables/mems.dart';
 import 'package:mem/framework/database/definition.dart';
-import 'package:mem/repositories/mem_entity.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 
 final databaseDefinition = DatabaseDefinition(

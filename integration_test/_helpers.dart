@@ -5,6 +5,7 @@ import 'package:mem/core/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/database/definitions.dart';
+import 'package:mem/database/tables/mems.dart';
 import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/main.dart' as app;
@@ -15,7 +16,6 @@ import 'package:mem/mems/mem_service.dart';
 
 // FIXME integration testでrepositoryを参照するのはNG
 import 'package:mem/repositories/_database_tuple_repository.dart';
-import 'package:mem/repositories/mem_entity.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 
 const defaultDuration = Duration(seconds: 1);

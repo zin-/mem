@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:mem/database/tables/mems.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/database/definitions.dart';
 import 'package:mem/main.dart' as app;
 import 'package:mem/repositories/_database_tuple_repository.dart';
-import 'package:mem/repositories/mem_entity.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 
 import '../_helpers.dart';

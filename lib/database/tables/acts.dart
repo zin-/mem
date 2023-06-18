@@ -1,7 +1,7 @@
+import 'package:mem/database/tables/mems.dart';
 import 'package:mem/framework/database/column_definition.dart';
 import 'package:mem/framework/database/table_definition.dart';
 import 'package:mem/repositories/_database_tuple_repository.dart';
-import 'package:mem/repositories/mem_entity.dart';
 
 final defActId =
     PrimaryKeyDefinition(idColumnName, ColumnType.integer, autoincrement: true);
