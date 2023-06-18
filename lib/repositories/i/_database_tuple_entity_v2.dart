@@ -1,4 +1,4 @@
-import 'package:mem/framework/database/types.dart';
+import 'package:mem/framework/database/column_definition.dart';
 
 import '_entity_v2.dart';
 import 'types.dart';
@@ -9,9 +9,9 @@ const AttributeName updatedAtColumnName = 'updatedAt';
 const AttributeName archivedAtColumnName = 'archivedAt';
 
 final defaultColumnDefinitions = [
-  DefC(createdAtColumnName, TypeC.datetime),
-  DefC(updatedAtColumnName, TypeC.datetime, notNull: false),
-  DefC(archivedAtColumnName, TypeC.datetime, notNull: false),
+  ColumnDefinition(createdAtColumnName, ColumnType.datetime),
+  ColumnDefinition(updatedAtColumnName, ColumnType.datetime, notNull: false),
+  ColumnDefinition(archivedAtColumnName, ColumnType.datetime, notNull: false),
 ];
 
 abstract class DatabaseTupleEntity implements EntityV2 {
