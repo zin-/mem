@@ -1,5 +1,5 @@
 import 'package:mem/framework/database/definition.dart';
-import 'package:mem/database/definitions/table_definition.dart';
+import 'package:mem/framework/database/table_definition.dart';
 
 class ColumnDefinition {
   final String name;

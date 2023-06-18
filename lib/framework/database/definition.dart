@@ -1,5 +1,5 @@
 import 'package:mem/database/database.dart';
-import 'package:mem/database/definitions/table_definition.dart';
+import 'package:mem/framework/database/table_definition.dart';
 
 class DatabaseDefinition {
   final String name;

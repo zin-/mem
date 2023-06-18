@@ -1,6 +1,6 @@
 import 'package:mem/framework/database/definition.dart';
-import 'package:mem/database/definitions/column_definition.dart';
-import 'package:mem/database/definitions/table_definition.dart';
+import 'package:mem/framework/database/column_definition.dart';
+import 'package:mem/framework/database/table_definition.dart';
 
 const tableName = 'tests';
 const pkName = 'id';
