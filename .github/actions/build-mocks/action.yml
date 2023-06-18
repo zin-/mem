@@ -2,9 +2,13 @@ name: 'Build Mocks'
 runs:
   using: 'composite'
   steps:
-    - name: 'Get Packages'
-      run: flutter packages pub get
-      shell: bash
+    - id: cache
+      name: 'Cache'
+      uses: actions/cache@v3
+      with:
+        path: test/**.mocks.dart
+        key: mocks-${{ hashFiles('test/**.dart') }}
     - name: 'Build Mocks'
-      run: flutter pub run build_runner build
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: ./scripts/generate_mocks.sh
       shell: bash

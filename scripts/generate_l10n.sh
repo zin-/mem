@@ -1,1 +1,1 @@
-flutter gen-l10n l10n.yaml
+flutter gen-l10n

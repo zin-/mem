@@ -1,9 +1,12 @@
 name: 'Install Flutter'
 inputs:
   version:
+    type: string
     required: true
   channel:
+    type: string
     required: true
+
 runs:
   using: 'composite'
   steps:

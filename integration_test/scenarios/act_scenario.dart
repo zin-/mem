@@ -122,6 +122,9 @@ void testActScenario() => group(': Act scenario', () {
               createdAtColumnName: createdAt,
             });
           });
+          tearDown(() async {
+            await db.getTable(actTableDefinition.name).delete();
+          });
 
           testWidgets(': save.', (widgetTester) async {
             await showActListPage(widgetTester);

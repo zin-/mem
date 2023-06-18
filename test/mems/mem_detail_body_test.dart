@@ -14,8 +14,8 @@ import 'package:mem/mems/mem_detail_body.dart';
 import 'package:mem/mems/mem_done_checkbox.dart';
 import 'package:mockito/mockito.dart';
 
+import '../helpers.mocks.dart';
 import '../samples.dart';
-import '../mocks.mocks.dart';
 
 void main() {
   final mockedMemRepository = MockMemRepository();
