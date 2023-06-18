@@ -126,6 +126,9 @@ void testActScenario() => group(': Act scenario', () {
               createdAtColumnName: createdAt,
             });
           });
+          tearDown(() async {
+            await db.getTable(actTableDefinition.name).delete();
+          });
           // TODO remove
           tearDownAll(() => LogServiceV2.initialize(Level.error));
 
