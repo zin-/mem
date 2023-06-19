@@ -8,19 +8,6 @@ import 'package:mem/logger/log_service_v2.dart' as v2;
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/mem_service.dart';
 
-final fetchMemById = FutureProvider.autoDispose.family<void, int?>(
-  (ref, memId) => v(
-    {'memId': memId},
-    () async {
-      if (memId != null && ref.read(memProvider(memId)) == null) {
-        final mem = await MemService().fetchMemById(memId);
-
-        ref.read(memProvider(memId).notifier).updatedBy(mem);
-      }
-    },
-  ),
-);
-
 final loadMemItems = FutureProvider.autoDispose.family<Iterable<MemItem>, int?>(
   (ref, memId) => v(
     {'memId': memId},
@@ -52,47 +39,24 @@ final loadMemItems = FutureProvider.autoDispose.family<Iterable<MemItem>, int?>(
   ),
 );
 
-final createMem = Provider.autoDispose.family<Future<Mem>, int?>(
-  (ref, memId) => v(
-    {'memId': memId},
-    () async {
-      final memItems = ref.read(memItemsProvider(memId)) ?? [];
-      final editingMem = ref.watch(editingMemProvider(memId));
-      final memDetail = MemDetail(editingMem, memItems);
+final saveMem =
+    Provider.autoDispose.family<Future<Mem>, int?>((ref, memId) => v2.v(
+          () async {
+            final saved = await MemService().save(
+              MemDetail(
+                ref.watch(editingMemProvider(memId)),
+                ref.read(memItemsProvider(memId)) ?? [],
+              ),
+            );
 
-      final received = await MemService().save(memDetail);
+            ref
+                .read(rawMemListProvider.notifier)
+                .upsertAll([saved.mem], (tmp, item) => tmp.id == item.id);
 
-      ref.read(memProvider(null).notifier).updatedBy(received.mem);
-      ref.read(memItemsProvider(null).notifier).updatedBy(received.memItems);
-      ref.read(memProvider(received.mem.id).notifier).updatedBy(received.mem);
-      ref
-          .read(memItemsProvider(received.mem.id).notifier)
-          .updatedBy(received.memItems);
-
-      return received.mem;
-    },
-  ),
-);
-
-final updateMem = Provider.autoDispose.family<Future<Mem>, int?>(
-  (ref, memId) => v(
-    {'memId': memId},
-    () async {
-      final memItems = ref.read(memItemsProvider(memId)) ?? [];
-      final editingMem = ref.watch(editingMemProvider(memId));
-      final memDetail = MemDetail(editingMem, memItems);
-
-      final updated = await MemService().save(memDetail);
-
-      ref.read(memProvider(updated.mem.id).notifier).updatedBy(updated.mem);
-      ref
-          .read(memItemsProvider(updated.mem.id).notifier)
-          .updatedBy(updated.memItems);
-
-      return updated.mem;
-    },
-  ),
-);
+            return saved.mem;
+          },
+          memId,
+        ));
 
 final archiveMem = Provider.family<Future<MemDetail?>, int?>(
   (ref, memId) => v(

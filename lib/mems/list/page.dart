@@ -82,7 +82,7 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
           .push<Mem?>(
             PageRouteBuilder(
               pageBuilder: (context, animation, secondaryAnimation) =>
-                  MemDetailPage(memId),
+                  MemDetailPageV2(memId),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) =>
                       SlideTransition(
