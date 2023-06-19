@@ -69,19 +69,25 @@ void testMemoScenario() => group(
                 await widgetTester.pumpAndSettle();
 
                 expect(find.text(savedMemName), findsNothing);
-                expect(find.text('Name'), findsOneWidget);
+                expect(find.text(savedMemMemo), findsNothing);
                 const enteringMemNameText =
-                    '$scenarioName: Save: create. entering mem name';
-                const enteringMemMemoText =
-                    '$scenarioName: Save: create. entering mem memo';
+                    '$scenarioName: Save: Create - mem name - entering';
                 await widgetTester.enterText(
                   memNameTextFormFieldFinder,
                   enteringMemNameText,
                 );
+                await widgetTester.pumpAndSettle();
+
+                expect(find.text(enteringMemNameText), findsOneWidget);
+                const enteringMemMemoText =
+                    '$scenarioName: Save: Create - mem memo - entering';
                 await widgetTester.enterText(
                   memMemoTextFormFieldFinder,
                   enteringMemMemoText,
                 );
+                await widgetTester.pumpAndSettle();
+
+                expect(find.text(enteringMemMemoText), findsOneWidget);
                 await widgetTester.tap(saveMemFabFinder);
                 await widgetTester.pumpAndSettle();
 
@@ -92,10 +98,7 @@ void testMemoScenario() => group(
                 );
                 await widgetTester.pumpAndSettle(defaultDismissDuration);
 
-                expect(
-                  find.text(saveSuccessText),
-                  findsNothing,
-                );
+                expect(find.text(saveSuccessText), findsNothing);
                 await widgetTester.pageBack();
                 await widgetTester.pumpAndSettle();
 
@@ -106,17 +109,8 @@ void testMemoScenario() => group(
                 await widgetTester.pumpAndSettle();
 
                 expect(find.text(savedMemName), findsNothing);
-                expect(
-                  memNameTextFormField(widgetTester).initialValue,
-                  enteringMemNameText,
-                );
-                expect(
-                  (widgetTester.widget(
-                    memMemoTextFormFieldFinder,
-                  ) as TextFormField)
-                      .initialValue,
-                  enteringMemMemoText,
-                );
+                expect(find.text(enteringMemNameText), findsOneWidget);
+                expect(find.text(enteringMemMemoText), findsOneWidget);
               },
             );
 
