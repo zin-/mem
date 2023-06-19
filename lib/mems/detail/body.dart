@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/mems/mem_done_checkbox.dart';
-import 'package:mem/mems/detail/mem_detail_states.dart';
+import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/mem_name.dart';
 import 'package:mem/mems/mem_period.dart';
 
