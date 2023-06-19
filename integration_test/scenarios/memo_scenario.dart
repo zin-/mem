@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:mem/core/mem_item.dart';
 import 'package:mem/database/database.dart';
 import 'package:mem/database/database_manager.dart';
 import 'package:mem/gui/constants.dart';
@@ -23,17 +24,23 @@ void testMemoScenario() => group(
       ': $scenarioName',
       () {
         group(': V2', () {
-          const savedMemName = '$scenarioName: V2: saved mem name';
+          const savedMemName = '$scenarioName - mem name - saved';
+          const savedMemMemo = '$scenarioName - mem memo - saved';
           late final Database db;
 
           setUpAll(() async {
             db = await DatabaseManager(onTest: true).open(databaseDefinition);
           });
           setUp(() async {
-            final memTable = db.getTable(memTableDefinition.name);
-
-            await memTable.insert({
+            final insertedId =
+                await db.getTable(memTableDefinition.name).insert({
               defMemName.name: savedMemName,
+              createdAtColumnName: DateTime.now(),
+            });
+            await db.getTable(memItemTableDefinition.name).insert({
+              memIdColumnName: insertedId,
+              memItemTypeColumnName: MemItemType.memo.name,
+              memItemValueColumnName: savedMemMemo,
               createdAtColumnName: DateTime.now(),
             });
           });
@@ -127,19 +134,26 @@ void testMemoScenario() => group(
                 await widgetTester.pumpAndSettle();
 
                 const enteringMemNameText =
-                    '$scenarioName: Save: Update. entering mem name';
-                const enteringMemMemoText =
-                    '$scenarioName: Save: Update. entering mem memo';
+                    '$scenarioName: Save: Update - mem name - entering';
                 await widgetTester.enterText(
                   memNameTextFormFieldFinder,
                   enteringMemNameText,
                 );
+                await widgetTester.pumpAndSettle();
+
+                expect(find.text(enteringMemNameText), findsOneWidget);
+                await widgetTester.tap(find.text(savedMemMemo));
+                await widgetTester.pumpAndSettle();
+
+                const enteringMemMemoText =
+                    '$scenarioName: Save: Update - mem memo - entering';
                 await widgetTester.enterText(
                   memMemoTextFormFieldFinder,
                   enteringMemMemoText,
                 );
                 await widgetTester.pumpAndSettle();
 
+                expect(find.text(enteringMemMemoText), findsOneWidget);
                 await widgetTester.tap(saveMemFabFinder);
                 await widgetTester.pumpAndSettle();
 
