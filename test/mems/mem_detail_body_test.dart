@@ -4,13 +4,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/gui/list_value_state_notifier.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/core/mem.dart';
-import 'package:mem/mems/mem_detail_states.dart';
+import 'package:mem/mems/detail/mem_detail_states.dart';
 import 'package:mem/mems/mem_item_repository_v2.dart';
-import 'package:mem/mems/mem_items_view.dart';
+import 'package:mem/mems/detail/mem_items_view.dart';
 import 'package:mem/mems/mem_name.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/gui/value_state_notifier.dart';
-import 'package:mem/mems/mem_detail_body.dart';
+import 'package:mem/mems/detail/mem_detail_body.dart';
 import 'package:mem/mems/mem_done_checkbox.dart';
 import 'package:mockito/mockito.dart';
 

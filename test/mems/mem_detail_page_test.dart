@@ -4,8 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/notifications/notification_repository.dart';
-import 'package:mem/mems/mem_detail_body.dart';
-import 'package:mem/mems/mem_detail_page.dart';
+import 'package:mem/mems/detail/mem_detail_body.dart';
+import 'package:mem/mems/detail/mem_detail_page.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mem/gui/l10n.dart';
 
