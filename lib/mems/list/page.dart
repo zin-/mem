@@ -6,6 +6,7 @@ import 'package:mem/logger/i/api.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/gui/colors.dart';
 import 'package:mem/gui/constants.dart';
+import 'package:mem/mems/detail/actions.dart';
 import 'package:mem/mems/list/actions.dart';
 import 'package:mem/mems/detail/page.dart';
 import 'package:mem/mems/detail/states.dart';

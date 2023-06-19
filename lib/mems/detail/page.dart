@@ -7,6 +7,7 @@ import 'package:mem/logger/i/api.dart';
 import 'package:mem/gui/async_value_view.dart';
 import 'package:mem/gui/colors.dart';
 import 'package:mem/gui/constants.dart';
+import 'package:mem/mems/detail/actions.dart';
 import 'package:mem/mems/detail/body.dart';
 import 'package:mem/mems/detail/menu.dart';
 import 'package:mem/mems/detail/states.dart';
