@@ -24,35 +24,31 @@ void testMemoScenario() => group(
       ': $scenarioName',
       () {
         group(': V2', () {
-          const savedMemName = '$scenarioName - mem name - saved';
-          const savedMemMemo = '$scenarioName - mem memo - saved';
+          const insertedMemName = '$scenarioName - mem name - inserted';
+          const insertedMemMemo = '$scenarioName - mem memo - inserted';
           late final Database db;
 
           setUpAll(() async {
             db = await DatabaseManager(onTest: true).open(databaseDefinition);
           });
           setUp(() async {
-            final insertedId =
-                await db.getTable(memTableDefinition.name).insert({
-              defMemName.name: savedMemName,
-              createdAtColumnName: DateTime.now(),
-            });
-            await db.getTable(memItemTableDefinition.name).insert({
-              memIdColumnName: insertedId,
-              memItemTypeColumnName: MemItemType.memo.name,
-              memItemValueColumnName: savedMemMemo,
-              createdAtColumnName: DateTime.now(),
-            });
-          });
-          tearDown(() async {
             final memItemTable = db.getTable(memItemTableDefinition.name);
             final memTable = db.getTable(memTableDefinition.name);
 
             await memItemTable.delete();
             await memTable.delete();
-          });
-          tearDownAll(() async {
-            await DatabaseManager(onTest: true).delete(databaseDefinition.name);
+
+            final insertedMemId =
+                await db.getTable(memTableDefinition.name).insert({
+              defMemName.name: insertedMemName,
+              createdAtColumnName: DateTime.now(),
+            });
+            await db.getTable(memItemTableDefinition.name).insert({
+              memIdColumnName: insertedMemId,
+              memItemTypeColumnName: MemItemType.memo.name,
+              memItemValueColumnName: insertedMemMemo,
+              createdAtColumnName: DateTime.now(),
+            });
           });
 
           testWidgets(
@@ -61,7 +57,7 @@ void testMemoScenario() => group(
               await runApplication();
               await widgetTester.pumpAndSettle();
 
-              expect(find.text(savedMemName), findsOneWidget);
+              expect(find.text(insertedMemName), findsOneWidget);
             },
           );
 
@@ -75,8 +71,8 @@ void testMemoScenario() => group(
                 await widgetTester.tap(newMemFabFinder);
                 await widgetTester.pumpAndSettle();
 
-                expect(find.text(savedMemName), findsNothing);
-                expect(find.text(savedMemMemo), findsNothing);
+                expect(find.text(insertedMemName), findsNothing);
+                expect(find.text(insertedMemMemo), findsNothing);
                 const enteringMemNameText =
                     '$scenarioName: Save: Create - mem name - entering';
                 await widgetTester.enterText(
@@ -109,13 +105,13 @@ void testMemoScenario() => group(
                 await widgetTester.pageBack();
                 await widgetTester.pumpAndSettle();
 
-                expect(find.text(savedMemName), findsOneWidget);
+                expect(find.text(insertedMemName), findsOneWidget);
                 expect(find.text(enteringMemNameText), findsOneWidget);
                 expect(find.text(enteringMemMemoText), findsNothing);
                 await widgetTester.tap(find.text(enteringMemNameText));
                 await widgetTester.pumpAndSettle();
 
-                expect(find.text(savedMemName), findsNothing);
+                expect(find.text(insertedMemName), findsNothing);
                 expect(find.text(enteringMemNameText), findsOneWidget);
                 expect(find.text(enteringMemMemoText), findsOneWidget);
               },
@@ -127,10 +123,10 @@ void testMemoScenario() => group(
                 await runApplication();
                 await widgetTester.pumpAndSettle();
 
-                await widgetTester.tap(find.text(savedMemName));
+                await widgetTester.tap(find.text(insertedMemName));
                 await widgetTester.pumpAndSettle();
 
-                await widgetTester.tap(find.text(savedMemName));
+                await widgetTester.tap(find.text(insertedMemName));
                 await widgetTester.pumpAndSettle();
 
                 const enteringMemNameText =
@@ -142,7 +138,7 @@ void testMemoScenario() => group(
                 await widgetTester.pumpAndSettle();
 
                 expect(find.text(enteringMemNameText), findsOneWidget);
-                await widgetTester.tap(find.text(savedMemMemo));
+                await widgetTester.tap(find.text(insertedMemMemo));
                 await widgetTester.pumpAndSettle();
 
                 const enteringMemMemoText =
@@ -171,12 +167,12 @@ void testMemoScenario() => group(
                 await widgetTester.pageBack();
                 await widgetTester.pumpAndSettle();
 
-                expect(find.text(savedMemName), findsNothing);
+                expect(find.text(insertedMemName), findsNothing);
                 expect(find.text(enteringMemNameText), findsOneWidget);
                 await widgetTester.tap(find.text(enteringMemNameText));
                 await widgetTester.pumpAndSettle();
 
-                expect(find.text(savedMemName), findsNothing);
+                expect(find.text(insertedMemName), findsNothing);
                 expect(find.text(enteringMemNameText), findsOneWidget);
                 expect(find.text(enteringMemMemoText), findsOneWidget);
               },
@@ -210,14 +206,14 @@ void testMemoScenario() => group(
                   expect(find.text(unarchivedMemName), findsOneWidget);
                   expect(find.text(archivedMemName), findsNothing);
 
-                  await widgetTester.tap(find.text(savedMemName));
+                  await widgetTester.tap(find.text(insertedMemName));
                   await widgetTester.pumpAndSettle();
 
                   await widgetTester.tap(find.byIcon(Icons.archive));
                   await widgetTester.pumpAndSettle();
 
                   expect(
-                    find.text(savedMemName),
+                    find.text(insertedMemName),
                     findsNothing,
                   );
                   await widgetTester.tap(memListFilterButton);
@@ -231,7 +227,7 @@ void testMemoScenario() => group(
 
                   expect(find.text(unarchivedMemName), findsOneWidget);
                   expect(find.text(archivedMemName), findsOneWidget);
-                  await widgetTester.tap(find.text(savedMemName));
+                  await widgetTester.tap(find.text(insertedMemName));
                   await widgetTester.pumpAndSettle();
 
                   await widgetTester.tap(find.byIcon(Icons.unarchive));
@@ -251,13 +247,55 @@ void testMemoScenario() => group(
                   await closeMemListFilter(widgetTester);
                   await widgetTester.pumpAndSettle();
 
-                  expect(find.text(savedMemName), findsNothing);
+                  expect(find.text(insertedMemName), findsNothing);
                   expect(find.text(unarchivedMemName), findsNothing);
                   expect(find.text(archivedMemName), findsOneWidget);
                 },
               );
             });
           });
+
+          testWidgets(
+            ': Remove & undo.',
+            (widgetTester) async {
+              await runApplication();
+              await widgetTester.pumpAndSettle();
+
+              await widgetTester.tap(find.text(insertedMemName));
+              await widgetTester.pumpAndSettle();
+
+              await widgetTester.tap(find.byIcon(Icons.more_vert));
+              await widgetTester.pumpAndSettle();
+
+              await widgetTester.tap(find.byIcon(Icons.delete));
+              await widgetTester.pumpAndSettle();
+
+              await widgetTester.tap(find.text('OK'));
+              await widgetTester.pumpAndSettle();
+
+              expect(find.text(insertedMemName), findsNothing);
+
+              await widgetTester.tap(find.byIcon(Icons.filter_list));
+              await widgetTester.pumpAndSettle(defaultDuration);
+
+              await widgetTester.tap(find.byType(Switch).at(1));
+              await widgetTester.tap(find.byType(Switch).at(3));
+              await widgetTester.pumpAndSettle(defaultDuration);
+
+              await closeMemListFilter(widgetTester);
+              await widgetTester.pumpAndSettle(defaultDuration);
+
+              expect(find.text(insertedMemName), findsNothing);
+              await widgetTester.tap(find.text('Undo'));
+              await widgetTester.pumpAndSettle();
+
+              await widgetTester.tap(find.text(insertedMemName));
+              await widgetTester.pumpAndSettle();
+
+              expect(find.text(insertedMemName), findsOneWidget);
+              expect(find.text(insertedMemMemo), findsOneWidget);
+            },
+          );
         });
 
         group(': V1', () {
@@ -270,48 +308,6 @@ void testMemoScenario() => group(
           tearDownAll(() async {
             await DatabaseManager().delete(databaseDefinition.name);
           });
-
-          testWidgets(
-            ': remove saved Mem',
-            (widgetTester) async {
-              const savedMemName = '$scenarioName: saved mem name';
-              const savedMemMemo = '$scenarioName: saved mem memo';
-              await prepareSavedData(savedMemName, savedMemMemo);
-
-              await runApplication(languageCode: 'en');
-              await widgetTester.pumpAndSettle(defaultDuration);
-
-              await widgetTester.tap(find.text(savedMemName));
-              await widgetTester.pumpAndSettle(defaultDuration);
-
-              await widgetTester.tap(
-                find.descendant(
-                  of: find.byType(AppBar),
-                  matching: find.byIcon(Icons.more_vert),
-                ),
-              );
-              await widgetTester.pumpAndSettle(defaultDuration);
-              await widgetTester.tap(find.byIcon(Icons.delete));
-              await widgetTester.pumpAndSettle(defaultDuration);
-              await widgetTester.tap(find.text('OK'));
-              await widgetTester.pumpAndSettle(defaultDuration);
-
-              expect(find.text(savedMemName), findsNothing);
-
-              await widgetTester.tap(memListFilterButton);
-              await widgetTester.pumpAndSettle(defaultDuration);
-              await widgetTester.tap(findShowArchiveSwitch);
-              await widgetTester.pumpAndSettle(defaultDuration);
-              await closeMemListFilter(widgetTester);
-
-              expect(find.text(savedMemName), findsNothing);
-
-              await widgetTester.tap(find.text('Undo'));
-              await widgetTester.pumpAndSettle();
-
-              expect(find.text(savedMemName), findsOneWidget);
-            },
-          );
 
           testWidgets(
             'MemItem is nothing',

@@ -3,13 +3,13 @@ import 'package:mem/component/view/mem_list/states.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/gui/value_state_notifier.dart';
-import 'package:mem/logger/i/api.dart';
-import 'package:mem/logger/log_service_v2.dart' as v2;
+import 'package:mem/logger/i/api.dart' as v1;
+import 'package:mem/logger/log_service_v2.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/mem_service.dart';
 
 final loadMemItems = FutureProvider.autoDispose.family<Iterable<MemItem>, int?>(
-  (ref, memId) => v(
+  (ref, memId) => v1.v(
     {'memId': memId},
     () async {
       final memItemsState = ref.read(memItemsProvider(memId));
@@ -40,15 +40,16 @@ final loadMemItems = FutureProvider.autoDispose.family<Iterable<MemItem>, int?>(
 );
 
 final saveMem =
-    Provider.autoDispose.family<Future<Mem>, int?>((ref, memId) => v2.v(
+    Provider.autoDispose.family<Future<Mem>, int?>((ref, memId) => v(
           () async {
             final saved = await MemService().save(
               MemDetail(
-                ref.watch(editingMemProvider(memId)),
+                ref.read(editingMemProvider(memId)),
                 ref.read(memItemsProvider(memId)) ?? [],
               ),
             );
 
+            ref.read(editingMemProvider(memId).notifier).updatedBy(saved.mem);
             ref
                 .read(rawMemListProvider.notifier)
                 .upsertAll([saved.mem], (tmp, item) => tmp.id == item.id);
@@ -59,66 +60,57 @@ final saveMem =
         ));
 
 final archiveMem = Provider.family<Future<MemDetail?>, int?>(
-  (ref, memId) => v(
+  (ref, memId) => v1.v(
     {'memId': memId},
     () async {
-      final mem = ref.read(memProvider(memId));
+      final mem = ref.read(editingMemProvider(memId));
 
-      if (mem == null) {
-        return null;
-      } else {
-        final archived = await MemService().archive(mem);
+      final archived = await MemService().archive(mem);
 
-        ref.read(memProvider(archived.mem.id).notifier).updatedBy(archived.mem);
-        ref
-            .read(memItemsProvider(archived.mem.id).notifier)
-            .updatedBy(archived.memItems);
+      ref.read(editingMemProvider(memId).notifier).updatedBy(archived.mem);
+      ref
+          .read(rawMemListProvider.notifier)
+          .upsertAll([archived.mem], (tmp, item) => tmp.id == item.id);
 
-        return archived;
-      }
+      return archived;
     },
   ),
 );
 
 final unarchiveMem = Provider.family<Future<MemDetail?>, int?>(
-  (ref, memId) => v(
+  (ref, memId) => v1.v(
     {'memId': memId},
     () async {
-      final mem = ref.read(memProvider(memId));
+      final mem = ref.read(editingMemProvider(memId));
 
-      if (mem == null) {
-        return null;
-      } else {
-        final unarchived = await MemService().unarchive(mem);
+      final unarchived = await MemService().unarchive(mem);
 
-        ref
-            .read(memProvider(unarchived.mem.id).notifier)
-            .updatedBy(unarchived.mem);
-        ref
-            .read(memItemsProvider(unarchived.mem.id).notifier)
-            .updatedBy(unarchived.memItems);
+      ref.read(editingMemProvider(memId).notifier).updatedBy(unarchived.mem);
+      ref
+          .read(rawMemListProvider.notifier)
+          .upsertAll([unarchived.mem], (tmp, item) => tmp.id == item.id);
 
-        return unarchived;
-      }
+      return unarchived;
     },
   ),
 );
 
 final removedMem =
     StateNotifierProvider.family<ValueStateNotifier<Mem?>, Mem?, int>(
-  (ref, memId) => v2.v(
+  (ref, memId) => v(
     () => ValueStateNotifier<Mem?>(null),
     memId,
   ),
 );
 
 final removeMem = Provider.family<Future<bool>, int?>(
-  (ref, memId) => v2.v(
+  (ref, memId) => v(
     () async {
       if (memId != null) {
         final removeSuccess = await MemService().remove(memId);
         if (removeSuccess) {
           final removed = ref.watch(editingMemProvider(memId));
+
           ref.read(removedMem(memId).notifier).updatedBy(removed);
           ref
               .read(rawMemListProvider.notifier)

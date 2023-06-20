@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/component/view/mem_list/actions.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/gui/colors.dart';
 import 'package:mem/gui/constants.dart';
-import 'package:mem/mems/detail/actions.dart';
+import 'package:mem/mems/actions.dart';
 import 'package:mem/mems/list/actions.dart';
 import 'package:mem/mems/detail/page.dart';
-import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/mem_list_filter.dart';
 import 'package:mem/component/view/mem_list/mem_list_view.dart';
 import 'package:mem/mems/mems_action.dart';
@@ -79,7 +77,7 @@ class _MemListPageComponent extends StatelessWidget {
 void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
       {'context': context, 'memId': memId},
       () => Navigator.of(context)
-          .push<Mem?>(
+          .push<bool?>(
             PageRouteBuilder(
               pageBuilder: (context, animation, secondaryAnimation) =>
                   MemDetailPageV2(memId),
@@ -100,47 +98,32 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
             (result) => v(
               {'result': result},
               () {
-                if (memId == null) {
-                  ref.read(memProvider(memId).notifier).updatedBy(null);
-                  ref.read(memItemsProvider(memId).notifier).updatedBy(null);
-                } else {
-                  if (result == null) {
-                    final mem = ref.read(memProvider(memId));
-                    if (mem != null) {
-                      final removed = ref.watch(removedMem(memId));
-                      if (removed != null) {
-                        final scaffoldMessenger = ScaffoldMessenger.of(context);
-                        scaffoldMessenger.showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              L10n().removeMemSuccessMessage(mem.name),
-                            ),
-                            duration: infiniteDismissDuration,
-                            dismissDirection: DismissDirection.horizontal,
-                            action: SnackBarAction(
-                              label: L10n().undoAction(),
-                              onPressed: () => v(
-                                {},
-                                () {
-                                  ref.read(undoRemoveMem(memId));
-                                  scaffoldMessenger.showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        L10n().saveMemSuccessMessage(mem.name),
-                                      ),
-                                      duration: infiniteDismissDuration,
-                                      dismissDirection:
-                                          DismissDirection.horizontal,
-                                    ),
-                                  );
-                                },
+                if (memId != null && result == true) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        L10n().removeMemSuccessMessage('mem.name'),
+                      ),
+                      duration: infiniteDismissDuration,
+                      dismissDirection: DismissDirection.horizontal,
+                      action: SnackBarAction(
+                        label: L10n().undoAction(),
+                        onPressed: () {
+                          ref.read(undoRemoveMem(memId));
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                L10n().saveMemSuccessMessage('mem.name'),
                               ),
+                              duration: infiniteDismissDuration,
+                              dismissDirection: DismissDirection.horizontal,
                             ),
-                          ),
-                        );
-                      }
-                    }
-                  }
+                          );
+                        },
+                      ),
+                    ),
+                  );
                 }
               },
             ),
