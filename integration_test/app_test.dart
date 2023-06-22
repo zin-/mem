@@ -3,7 +3,9 @@ import 'package:integration_test/integration_test.dart';
 import 'package:mem/acts/act_repository.dart';
 import 'package:mem/database/database_manager.dart';
 import 'package:mem/logger/i/api.dart';
-import 'package:mem/logger/i/type.dart';
+import 'package:mem/logger/i/type.dart' as v1;
+import 'package:mem/logger/log_entity.dart';
+import 'package:mem/logger/log_service_v2.dart';
 import 'package:mem/main.dart';
 import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
@@ -30,7 +32,7 @@ void main() {
 
   testLogRepository();
 
-  initializeLogger(Level.error);
+  initializeLogger(v1.Level.error);
 
   group('Database test', () {
     testSqliteDatabase();
@@ -45,6 +47,9 @@ void main() {
   });
 
   group('Scenario test', () {
+    setUpAll(() {
+      LogServiceV2.initialize(Level.verbose);
+    });
     setUp(() {
       MemRepository.resetWith(null);
       MemItemRepository.resetWith(null);
