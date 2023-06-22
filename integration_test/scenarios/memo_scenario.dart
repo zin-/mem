@@ -270,9 +270,23 @@ void testMemoScenario() => group(
               await widgetTester.tap(find.byIcon(Icons.delete));
               await widgetTester.pumpAndSettle();
 
-              await widgetTester.tap(find.text('OK'));
+              await widgetTester.tap(find.text('Cancel'));
               await widgetTester.pumpAndSettle();
 
+              await widgetTester.tap(find.byIcon(Icons.more_vert));
+              await widgetTester.pumpAndSettle();
+
+              await widgetTester.tap(find.byIcon(Icons.delete));
+              await widgetTester.pumpAndSettle();
+
+              await widgetTester.tap(find.text('OK'));
+              await widgetTester.pumpAndSettle();
+              await widgetTester.pumpAndSettle();
+
+              expect(
+                find.text('Remove success. $insertedMemName'),
+                findsOneWidget,
+              );
               expect(find.text(insertedMemName), findsNothing);
 
               await widgetTester.tap(find.byIcon(Icons.filter_list));
@@ -286,9 +300,21 @@ void testMemoScenario() => group(
               await widgetTester.pumpAndSettle(defaultDuration);
 
               expect(find.text(insertedMemName), findsNothing);
+              expect(
+                find.text('Remove success. $insertedMemName'),
+                findsOneWidget,
+              );
               await widgetTester.tap(find.text('Undo'));
               await widgetTester.pumpAndSettle();
 
+              expect(
+                find.text('Remove success. $insertedMemName'),
+                findsNothing,
+              );
+              expect(
+                find.text('Save success. $insertedMemName'),
+                findsOneWidget,
+              );
               await widgetTester.tap(find.text(insertedMemName));
               await widgetTester.pumpAndSettle();
 
