@@ -12,36 +12,32 @@ import 'package:mem/repositories/mem_item_repository.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  DatabaseManager(onTest: true);
-
   testActScenario();
 }
 
 void testActScenario() => group(': Act scenario', () {
       final showActPageIconFinder = find.byIcon(Icons.play_arrow);
 
-      const savedMemName = 'Act scenario: saved mem name';
+      const insertedMemName = 'Act scenario: saved mem name';
 
       late final Database db;
-      late final int savedMemId;
+      late final int insertedMemId;
 
       setUpAll(() async {
         db = (await DatabaseManager(onTest: true).open(app.databaseDefinition));
 
         await db.getTable(memItemTableDefinition.name).delete();
+        await db.getTable(actTableDefinition.name).delete();
         final memTable = db.getTable(memTableDefinition.name);
         await memTable.delete();
 
-        savedMemId = await memTable.insert({
-          defMemName.name: savedMemName,
+        insertedMemId = await memTable.insert({
+          defMemName.name: insertedMemName,
           createdAtColumnName: DateTime.now(),
         });
       });
-      tearDown(() async {
+      setUp(() async {
         await db.getTable(actTableDefinition.name).delete();
-      });
-      tearDownAll(() async {
-        await DatabaseManager(onTest: true).delete(app.databaseDefinition.name);
       });
 
       String dateTimeText(DateTime dateTime) {
@@ -61,7 +57,7 @@ void testActScenario() => group(': Act scenario', () {
         Future<void> showActListPage(WidgetTester widgetTester) async {
           await showMemListPage(widgetTester);
 
-          await widgetTester.tap(find.text(savedMemName));
+          await widgetTester.tap(find.text(insertedMemName));
           await widgetTester.pumpAndSettle();
 
           await widgetTester.tap(showActPageIconFinder);
@@ -110,20 +106,17 @@ void testActScenario() => group(': Act scenario', () {
             createdAt = DateTime.now();
 
             await db.getTable(actTableDefinition.name).insert({
-              fkDefMemId.name: savedMemId,
+              fkDefMemId.name: insertedMemId,
               defActStart.name: createdAt,
               defActStartIsAllDay.name: 0,
               createdAtColumnName: createdAt,
             });
             await db.getTable(actTableDefinition.name).insert({
-              fkDefMemId.name: savedMemId,
+              fkDefMemId.name: insertedMemId,
               defActStart.name: createdAt,
               defActStartIsAllDay.name: 0,
               createdAtColumnName: createdAt,
             });
-          });
-          tearDown(() async {
-            await db.getTable(actTableDefinition.name).delete();
           });
 
           testWidgets(': save.', (widgetTester) async {
@@ -144,7 +137,19 @@ void testActScenario() => group(': Act scenario', () {
             await widgetTester.tap(find.byIcon(Icons.save_alt));
             await widgetTester.pumpAndSettle();
 
-            expect(find.text(dateTimeText(createdAt)), findsNWidgets(3));
+            final updatedActEnd =
+                (await db.getTable(actTableDefinition.name).select(
+              whereString: '${fkDefMemId.name} = ?',
+              whereArgs: [insertedMemId],
+            ))
+                    .singleWhere((element) =>
+                        element[updatedAtColumnName] != null)[defActEnd.name];
+            if (dateTimeText(createdAt) == dateTimeText(updatedActEnd)) {
+              expect(find.text(dateTimeText(createdAt)), findsNWidgets(3));
+            } else {
+              expect(find.text(dateTimeText(createdAt)), findsNWidgets(2));
+              expect(find.text(dateTimeText(updatedActEnd)), findsOneWidget);
+            }
           });
 
           testWidgets(': delete.', (widgetTester) async {
@@ -164,13 +169,13 @@ void testActScenario() => group(': Act scenario', () {
       });
 
       group(': MemListPage', () {
-        const savedMemName2 = '$savedMemName - 2';
+        const insertedMemName2 = '$insertedMemName - 2';
 
         setUpAll(() async {
           final memTable = db.getTable(memTableDefinition.name);
 
           await memTable.insert({
-            defMemName.name: savedMemName2,
+            defMemName.name: insertedMemName2,
             createdAtColumnName: DateTime.now(),
           });
         });

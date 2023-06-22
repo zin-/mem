@@ -16,7 +16,12 @@ abstract class DateAndTimePeriod implements Comparable<DateAndTimePeriod> {
       return _WithStartAndEnd(start, end);
     }
 
-    throw ArgumentError();
+    throw ArgumentError(
+      {
+        'start': start,
+        'end': end,
+      }.toString(),
+    );
   }
 
   factory DateAndTimePeriod.startNow({bool allDay = false}) {
@@ -82,7 +87,14 @@ class _WithStartAndEnd extends DateAndTimePeriod
   final DateAndTime end;
 
   _WithStartAndEnd(this.start, this.end) : super._() {
-    if (start.compareTo(end) > 0) throw ArgumentError();
+    if (start.compareTo(end) > 0) {
+      throw ArgumentError(
+        {
+          'start': start,
+          'end': end,
+        }.toString(),
+      );
+    }
   }
 
   @override
