@@ -12,9 +12,9 @@ import 'package:mem/logger/log_service_v2.dart' as v2;
 import 'package:mem/mems/mem_list_view_state.dart';
 import 'package:mem/mems/mem_period.dart';
 
-import '../../../mems/mem_done_checkbox.dart';
-import '../../../mems/mem_list_item_actions.dart';
-import '../../../mems/mem_name.dart';
+import '../../../../mems/mem_done_checkbox.dart';
+import 'actions.dart';
+import '../../../../mems/mem_name.dart';
 
 class MemListItemView extends ConsumerWidget {
   final MemId _memId;

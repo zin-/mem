@@ -110,11 +110,13 @@ final removeMem = Provider.family<Future<bool>, int?>(
         final removeSuccess = await MemService().remove(memId);
 
         ref.read(removedMem(memId).notifier).updatedBy(
-              ref.read(editingMemProvider(memId)),
+              ref
+                  .read(memListProvider)
+                  .firstWhere((element) => element.id == memId),
             );
         ref
             .read(rawMemListProvider.notifier)
-            .removeWhere((item) => item.id == memId);
+            .removeWhere((element) => element.id == memId);
 
         return removeSuccess;
       }

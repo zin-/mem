@@ -6,7 +6,7 @@ import 'package:mem/core/mem.dart';
 import 'package:mem/gui/colors.dart';
 import 'package:mem/logger/i/api.dart';
 
-import 'mem_list_item_view.dart';
+import 'item/view.dart';
 
 class MemListView extends ConsumerWidget {
   final String _appBarTitle;
