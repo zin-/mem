@@ -8,7 +8,6 @@ import 'package:mem/database/database_manager.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/main.dart' as app;
 import 'package:mem/mems/mem_item_repository_v2.dart';
-import 'package:mem/mems/detail/mem_items_view.dart';
 import 'package:mem/mems/mem_name.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/mems/mem_service.dart';
@@ -108,10 +107,6 @@ abstract class TestSize {
 final newMemFabFinder = find.byIcon(Icons.add);
 final memNameTextFormFieldFinder = find.descendant(
   of: find.byType(MemNameTextFormField),
-  matching: find.byType(TextFormField),
-);
-final memMemoTextFormFieldFinder = find.descendant(
-  of: find.byType(MemItemsViewComponent),
   matching: find.byType(TextFormField),
 );
 final saveMemFabFinder = find.byIcon(Icons.save_alt);

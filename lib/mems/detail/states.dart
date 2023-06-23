@@ -9,7 +9,7 @@ import 'package:mem/gui/value_state_notifier.dart';
 
 final editingMemProvider =
     StateNotifierProvider.family<ValueStateNotifier<Mem>, Mem, int?>(
-  (ref, memId) => v2.v(
+  (ref, memId) => v(
     () {
       final rawMemList = ref.read(rawMemListProvider);
       final memFromRawMemList =
@@ -27,5 +27,6 @@ final memItemsProvider = StateNotifierProvider.family<
     ListValueStateNotifier<MemItem>, List<MemItem>?, int?>(
   (ref, memId) => v(
     () => ListValueStateNotifier<MemItem>(null),
+    memId,
   ),
 );
