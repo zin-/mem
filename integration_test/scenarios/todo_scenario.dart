@@ -19,10 +19,10 @@ void main() {
 const scenarioName = 'Todo scenario';
 
 void testTodoScenario() => group(': $scenarioName', () {
-      const savedMemName = '$scenarioName: saved mem name';
+      const insertedMemName = '$scenarioName - mem name - inserted';
 
-      const undoneMemName = '$scenarioName: undone';
-      const doneMemName = '$scenarioName: done';
+      const undoneMemName = '$scenarioName - mem name - inserted - undone';
+      const doneMemName = '$scenarioName - mem name - inserted - done';
 
       late final Database db;
 
@@ -30,10 +30,13 @@ void testTodoScenario() => group(': $scenarioName', () {
         db = await DatabaseManager(onTest: true).open(app.databaseDefinition);
       });
       setUp(() async {
+        await (db.getTable(memItemTableDefinition.name)).delete();
+
         final memTable = db.getTable(memTableDefinition.name);
+        await memTable.delete();
 
         await memTable.insert({
-          defMemName.name: savedMemName,
+          defMemName.name: insertedMemName,
           createdAtColumnName: DateTime.now(),
         });
         await memTable.insert({
@@ -47,25 +50,15 @@ void testTodoScenario() => group(': $scenarioName', () {
           defMemDoneAt.name: DateTime.now(),
         });
       });
-      tearDown(() async {
-        final memItemTable = db.getTable(memItemTableDefinition.name);
-        await memItemTable.delete();
-
-        final memTable = db.getTable(memTableDefinition.name);
-        await memTable.delete();
-      });
-      tearDownAll(() async {
-        await DatabaseManager(onTest: true).delete(app.databaseDefinition.name);
-      });
 
       group(': done & undone', () {
-        testWidgets(': on detail.', (widgetTester) async {
+        testWidgets(': MemDetail.', (widgetTester) async {
           await app.main();
           await widgetTester.pumpAndSettle();
 
           expect(find.text(undoneMemName), findsOneWidget);
           expect(find.text(doneMemName), findsNothing);
-          await widgetTester.tap(find.text(savedMemName));
+          await widgetTester.tap(find.text(insertedMemName));
           await widgetTester.pumpAndSettle();
           await widgetTester.tap(find.byType(Checkbox));
           await widgetTester.pumpAndSettle();
@@ -74,7 +67,7 @@ void testTodoScenario() => group(': $scenarioName', () {
           await widgetTester.pageBack();
           await widgetTester.pumpAndSettle();
 
-          expect(find.text(savedMemName), findsNothing);
+          expect(find.text(insertedMemName), findsNothing);
           expect(find.text(undoneMemName), findsOneWidget);
           expect(find.text(doneMemName), findsNothing);
           await widgetTester.tap(memListFilterButton);
@@ -83,10 +76,10 @@ void testTodoScenario() => group(': $scenarioName', () {
           await closeMemListFilter(widgetTester);
           await widgetTester.pumpAndSettle();
 
-          expect(find.text(savedMemName), findsOneWidget);
+          expect(find.text(insertedMemName), findsOneWidget);
           expect(find.text(undoneMemName), findsOneWidget);
           expect(find.text(doneMemName), findsOneWidget);
-          await widgetTester.tap(find.text(savedMemName));
+          await widgetTester.tap(find.text(insertedMemName));
           await widgetTester.pumpAndSettle();
           await widgetTester.tap(find.byType(Checkbox));
           await widgetTester.pumpAndSettle();
@@ -100,24 +93,24 @@ void testTodoScenario() => group(': $scenarioName', () {
           await widgetTester.tap(find.byType(Switch).at(2));
           await closeMemListFilter(widgetTester);
           await widgetTester.pumpAndSettle();
-          expect(find.text(savedMemName), findsNothing);
+          expect(find.text(insertedMemName), findsNothing);
           expect(find.text(undoneMemName), findsNothing);
           expect(find.text(doneMemName), findsOneWidget);
         });
 
         testWidgets(
-          ': on list.',
+          ': MemList.',
           (widgetTester) async {
             await app.main();
             await widgetTester.pumpAndSettle();
 
-            expect(find.text(savedMemName), findsOneWidget);
+            expect(find.text(insertedMemName), findsOneWidget);
             expect(find.text(undoneMemName), findsOneWidget);
             expect(find.text(doneMemName), findsNothing);
             await widgetTester.tap(find.byType(Checkbox).at(0));
             await widgetTester.pumpAndSettle();
 
-            expect(find.text(savedMemName), findsNothing);
+            expect(find.text(insertedMemName), findsNothing);
             expect(find.text(undoneMemName), findsOneWidget);
             expect(find.text(doneMemName), findsNothing);
             await widgetTester.tap(memListFilterButton);
@@ -126,13 +119,13 @@ void testTodoScenario() => group(': $scenarioName', () {
             await closeMemListFilter(widgetTester);
             await widgetTester.pumpAndSettle();
 
-            expect(find.text(savedMemName), findsOneWidget);
+            expect(find.text(insertedMemName), findsOneWidget);
             expect(find.text(undoneMemName), findsOneWidget);
             expect(find.text(doneMemName), findsOneWidget);
             await widgetTester.tap(find.byType(Checkbox).at(1));
             await widgetTester.pumpAndSettle();
 
-            expect(find.text(savedMemName), findsOneWidget);
+            expect(find.text(insertedMemName), findsOneWidget);
             expect(find.text(undoneMemName), findsOneWidget);
             expect(find.text(doneMemName), findsOneWidget);
             await widgetTester.tap(memListFilterButton);
@@ -141,7 +134,7 @@ void testTodoScenario() => group(': $scenarioName', () {
             await closeMemListFilter(widgetTester);
             await widgetTester.pumpAndSettle();
 
-            expect(find.text(savedMemName), findsNothing);
+            expect(find.text(insertedMemName), findsNothing);
             expect(find.text(undoneMemName), findsNothing);
             expect(find.text(doneMemName), findsOneWidget);
           },
