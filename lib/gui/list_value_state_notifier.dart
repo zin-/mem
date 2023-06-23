@@ -35,12 +35,12 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>?> {
         },
       );
 
-  void removeWhere(bool Function(T item) where) => v(
+  void removeWhere(bool Function(T element) test) => v(
         {},
         () {
           final tmp = List.of(state ?? <T>[]);
 
-          final index = state?.indexWhere(where) ?? -1;
+          final index = state?.indexWhere(test) ?? -1;
           if (index != -1) {
             tmp.removeAt(index);
           }
