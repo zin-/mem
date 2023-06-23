@@ -9,6 +9,8 @@ import 'package:mem/repositories/i/_database_tuple_entity_v2.dart';
 import 'package:mem/repositories/mem_entity.dart';
 import 'package:mem/repositories/mem_item_repository.dart';
 
+import '../helpers.dart';
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -39,14 +41,6 @@ void testActScenario() => group(': Act scenario', () {
       setUp(() async {
         await db.getTable(actTableDefinition.name).delete();
       });
-
-      String dateTimeText(DateTime dateTime) {
-        final hour =
-            dateTime.hour < 10 ? '0${dateTime.hour}' : '${dateTime.hour}';
-        final minute =
-            dateTime.minute < 10 ? '0${dateTime.minute}' : '${dateTime.minute}';
-        return '${dateTime.month}/${dateTime.day}/${dateTime.year} $hour:$minute';
-      }
 
       Future<void> showMemListPage(WidgetTester widgetTester) async {
         await app.main();
