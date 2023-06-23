@@ -7,8 +7,8 @@ import 'package:mem/gui/list_value_state_notifier.dart';
 import 'package:mem/logger/log_service_v2.dart';
 import 'package:mem/gui/value_state_notifier.dart';
 
-final editingMemProvider =
-    StateNotifierProvider.family<ValueStateNotifier<Mem>, Mem, int?>(
+final editingMemProvider = StateNotifierProvider.autoDispose
+    .family<ValueStateNotifier<Mem>, Mem, int?>(
   (ref, memId) => v(
     () {
       final rawMemList = ref.read(rawMemListProvider);
@@ -23,8 +23,8 @@ final editingMemProvider =
   ),
 );
 
-final memItemsProvider = StateNotifierProvider.family<
-    ListValueStateNotifier<MemItem>, List<MemItem>?, int?>(
+final memItemsProvider = StateNotifierProvider.autoDispose
+    .family<ListValueStateNotifier<MemItem>, List<MemItem>?, int?>(
   (ref, memId) => v(
     () => ListValueStateNotifier<MemItem>(null),
     memId,

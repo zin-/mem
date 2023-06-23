@@ -8,39 +8,29 @@ import 'package:mem/logger/log_service_v2.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/mem_service.dart';
 
-final loadMemItems = FutureProvider.autoDispose.family<Iterable<MemItem>, int?>(
-  (ref, memId) => v1.v(
-    {'memId': memId},
+final loadMemItems = Provider.autoDispose.family<Future<List<MemItem>>, int?>(
+  (ref, memId) => d(
     () async {
-      final memItemsState = ref.read(memItemsProvider(memId));
+      List<MemItem> memItems = [];
 
-      if (memItemsState == null) {
-        final defaultMemItems = [
-          MemItem(memId: memId, type: MemItemType.memo, value: ''),
-        ];
-
-        Future<List<MemItem>> memItemsFuture;
-        if (memId == null) {
-          memItemsFuture = Future.value(List.empty());
-        } else {
-          memItemsFuture = MemService().fetchMemItemsByMemId(memId);
-        }
-
-        final memItems = (await memItemsFuture).isEmpty
-            ? defaultMemItems
-            : await memItemsFuture;
-
-        ref.read(memItemsProvider(memId).notifier).updatedBy(memItems);
-        return memItems;
+      if (memId != null) {
+        memItems = await MemService().fetchMemItemsByMemId(memId);
       }
 
-      return memItemsState;
+      if (memItems.isEmpty) {
+        memItems = [
+          MemItem(memId: memId, type: MemItemType.memo, value: ''),
+        ];
+      }
+
+      return memItems;
     },
+    memId,
   ),
 );
 
 final saveMem =
-    Provider.autoDispose.family<Future<Mem>, int?>((ref, memId) => v(
+    Provider.autoDispose.family<Future<MemDetail>, int?>((ref, memId) => d(
           () async {
             final saved = await MemService().save(
               MemDetail(
@@ -51,10 +41,22 @@ final saveMem =
 
             ref.read(editingMemProvider(memId).notifier).updatedBy(saved.mem);
             ref
+                .read(memItemsProvider(memId).notifier)
+                .updatedBy(saved.memItems);
+            if (memId == null) {
+              ref
+                  .read(editingMemProvider(saved.mem.id).notifier)
+                  .updatedBy(saved.mem);
+              ref
+                  .read(memItemsProvider(saved.mem.id).notifier)
+                  .updatedBy(saved.memItems);
+            }
+
+            ref
                 .read(rawMemListProvider.notifier)
                 .upsertAll([saved.mem], (tmp, item) => tmp.id == item.id);
 
-            return saved.mem;
+            return saved;
           },
           memId,
         ));

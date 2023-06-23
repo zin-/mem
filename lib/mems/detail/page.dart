@@ -11,6 +11,7 @@ import 'package:mem/mems/detail/body.dart';
 import 'package:mem/mems/detail/menu.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/list/page.dart';
+import 'package:mem/mems/mem_service.dart';
 import 'package:mem/mems/mems_action.dart';
 
 class MemDetailPageV2 extends ConsumerWidget {
@@ -27,6 +28,7 @@ class MemDetailPageV2 extends ConsumerWidget {
     final mem = ref.watch(editingMemProvider(_memId));
 
     return _MemDetailPageComponent(
+      _memId,
       mem,
       () => ref.read(saveMem(_memId)),
     );
@@ -35,10 +37,12 @@ class MemDetailPageV2 extends ConsumerWidget {
 
 class _MemDetailPageComponent extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
-  final Mem _mem;
-  final Future<Mem> Function() _saveMem;
 
-  _MemDetailPageComponent(this._mem, this._saveMem);
+  final int? _memId;
+  final Mem _mem;
+  final Future<MemDetail> Function() _saveMem;
+
+  _MemDetailPageComponent(this._memId, this._mem, this._saveMem);
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +50,7 @@ class _MemDetailPageComponent extends StatelessWidget {
       appBar: AppBar(
         title: Text(L10n().memDetailPageTitle()),
         actions: [
-          MemDetailMenu(_mem.id),
+          MemDetailMenu(_memId),
         ],
         backgroundColor: _mem.isArchived() ? archivedColor : primaryColor,
       ),
@@ -54,7 +58,7 @@ class _MemDetailPageComponent extends StatelessWidget {
         padding: pagePadding,
         child: Form(
           key: _formKey,
-          child: MemDetailBody(_mem.id),
+          child: MemDetailBody(_memId),
         ),
       ),
       floatingActionButton: FloatingActionButton(
