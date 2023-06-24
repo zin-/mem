@@ -36,6 +36,8 @@ class Act extends EntityValue {
           updatedAt: base.updatedAt,
           archivedAt: base.archivedAt,
         );
+
+  ActIdentifier get identifier => ActIdentifier(id!, memId);
 }
 
 class ActIdentifier {
