@@ -44,12 +44,7 @@ class EditingActDialog extends ConsumerWidget {
             ),
         pickedEnd,
       ),
-      () => v(() async {
-        final deleted = await delete(_act.id!);
-        ref
-            .read(actListProvider(_act.memId).notifier)
-            .removeWhere((item) => item.id == deleted.id);
-      }),
+      () => ref.read(deleteAct(_act.identifier)),
       () => v(() async {
         final saved = await save(editingAct);
         ref

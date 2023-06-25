@@ -1,11 +1,10 @@
 import 'package:mem/gui/value_state_notifier.dart';
-import 'package:mem/logger/i/api.dart';
+import 'package:mem/logger/log_service_v2.dart';
 
 class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>?> {
   ListValueStateNotifier(super.state);
 
   void add(T item, {int? index}) => v(
-        {'item': item},
         () {
           final tmp = List.of(state ?? <T>[]);
 
@@ -13,10 +12,10 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>?> {
 
           updatedBy(tmp);
         },
+        {'item': item},
       );
 
   void upsertAll(Iterable<T> items, bool Function(T tmp, T item) where) => v(
-        {'items': items},
         () {
           final tmp = List.of(state ?? <T>[]);
 
@@ -33,14 +32,14 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>?> {
 
           updatedBy(tmp);
         },
+        {'items': items},
       );
 
-  void removeWhere(bool Function(T item) where) => v(
-        {},
+  void removeWhere(bool Function(T element) test) => v(
         () {
           final tmp = List.of(state ?? <T>[]);
 
-          final index = state?.indexWhere(where) ?? -1;
+          final index = state?.indexWhere(test) ?? -1;
           if (index != -1) {
             tmp.removeAt(index);
           }

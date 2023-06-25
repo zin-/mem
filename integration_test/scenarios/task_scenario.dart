@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:mem/acts/act_entity.dart';
 import 'package:mem/database/database.dart';
 import 'package:mem/database/database_manager.dart';
 import 'package:mem/main.dart' as app;
 import 'package:mem/repositories/_database_tuple_repository.dart';
 import 'package:mem/repositories/mem_entity.dart';
+import 'package:mem/repositories/mem_item_repository.dart';
 
 import '../_helpers.dart';
+import '../helpers.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -24,24 +27,25 @@ void testTaskScenario() => group(': $scenarioName', () {
         db = await DatabaseManager(onTest: true).open(app.databaseDefinition);
       });
       setUp(() async {
+        await db.getTable(actTableDefinition.name).delete();
+        await db.getTable(memItemTableDefinition.name).delete();
         final memTable = db.getTable(memTableDefinition.name);
 
+        await memTable.delete();
+
         await memTable.insert({
-          defMemName.name: '$scenarioName: has period',
+          defMemName.name: '$scenarioName - mem name - has period',
           defMemStartOn.name: DateTime.now(),
           createdAtColumnName: DateTime.now(),
         });
         await memTable.insert({
-          defMemName.name: '$scenarioName: no period',
+          defMemName.name: '$scenarioName - mem name - no period',
           defMemStartOn.name: null,
           defMemStartAt.name: null,
           defMemEndOn.name: null,
           defMemEndAt.name: null,
           createdAtColumnName: DateTime.now(),
         });
-      });
-      tearDownAll(() async {
-        await DatabaseManager(onTest: true).delete(app.databaseDefinition.name);
       });
 
       testWidgets(
@@ -50,8 +54,6 @@ void testTaskScenario() => group(': $scenarioName', () {
           final now = DateTime.now();
 
           await app.main();
-          await widgetTester.pumpAndSettle();
-          await widgetTester.pumpAndSettle();
           await widgetTester.pumpAndSettle();
 
           await widgetTester.tap(newMemFabFinder);
@@ -88,7 +90,7 @@ void testTaskScenario() => group(': $scenarioName', () {
           final startTime =
               '${now.hour == 0 ? 12 : now.hour > 12 ? now.hour - 12 : now.hour}'
               ':${start.minute < 10 ? 0 : ''}${start.minute}'
-              ' ${start.hour > 12 ? 'PM' : 'AM'}';
+              ' ${start.hour > 11 ? 'PM' : 'AM'}';
           expect(
             (widgetTester.widget(find.byType(TextFormField).at(2))
                     as TextFormField)
@@ -116,15 +118,26 @@ void testTaskScenario() => group(': $scenarioName', () {
             endDate,
           );
 
+          const enteringMemName =
+              '$scenarioName: Set Period - mem name - entering';
           await widgetTester.enterText(
             memNameTextFormFieldFinder,
-            '$scenarioName: Set Period. - entering mem name ',
+            enteringMemName,
           );
           await widgetTester.tap(saveMemFabFinder);
           await widgetTester.pumpAndSettle();
 
           await widgetTester.pageBack();
           await widgetTester.pumpAndSettle();
+
+          expect(find.text(enteringMemName), findsOneWidget);
+          final savedMemStartAt =
+              (await db.getTable(memTableDefinition.name).select()).singleWhere(
+            (element) => element[defMemName.name] == enteringMemName,
+          )[defMemStartAt.name];
+
+          expect(find.text(dateTimeText(savedMemStartAt)), findsOneWidget);
+          expect(find.text(endDate), findsOneWidget);
         },
       );
     });

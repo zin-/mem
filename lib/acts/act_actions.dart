@@ -60,7 +60,15 @@ Future<Act> save(Act act) => v(
       act,
     );
 
-Future<Act> delete(int actId) => v(
-      () => actRepository.wasteById(actId),
-      actId,
-    );
+final deleteAct = Provider.autoDispose.family<void, ActIdentifier>(
+  (ref, actIdentifier) => v(
+    () async {
+      await ActRepository().wasteById(actIdentifier.id);
+
+      ref
+          .read(actListProvider(actIdentifier.memId).notifier)
+          .removeWhere((item) => item.id == actIdentifier.id);
+    },
+    actIdentifier,
+  ),
+);

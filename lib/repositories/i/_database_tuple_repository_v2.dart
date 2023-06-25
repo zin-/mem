@@ -57,7 +57,10 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
         () async {
           final entityMap = unpack(payload);
 
-          entityMap[createdAtColumnName] = DateTime.now();
+          if (entityMap[createdAtColumnName] == null) {
+            entityMap[createdAtColumnName] = DateTime.now();
+          }
+          entityMap[updatedAtColumnName] = DateTime.now();
 
           await _table.updateByPk(
             entityMap[idColumnName],
@@ -91,6 +94,7 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
         () async {
           final entityMap = unpack(payload);
 
+          entityMap[updatedAtColumnName] = DateTime.now();
           entityMap[archivedAtColumnName] = null;
 
           await _table.updateByPk(
