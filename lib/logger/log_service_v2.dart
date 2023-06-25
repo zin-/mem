@@ -6,30 +6,55 @@ import 'package:mem/logger/log_entity.dart';
 import 'package:mem/logger/log_repository_v2.dart';
 import 'package:mem/logger/logger_wrapper_v2.dart';
 
-dynamic v(
-  dynamic target, [
+T verbose<T>(
+  T target, [
   dynamic meta,
 ]) =>
     LogServiceV2()._log(Level.verbose, target, meta, null, []);
 
-dynamic i(
-  dynamic target, [
+T info<T>(
+  T target, [
   dynamic meta,
 ]) =>
     LogServiceV2()._log(Level.info, target, meta, null, []);
 
-dynamic w(
-  dynamic target, [
+T warn<T>(
+  T target, [
   dynamic meta,
 ]) =>
     LogServiceV2()._log(Level.warning, target, meta, null, []);
 
 @Deprecated('For development only')
-dynamic d(
-  dynamic target, [
+T debug<T>(
+  T target, [
   dynamic meta,
 ]) =>
     LogServiceV2()._log(Level.debug, target, meta, null, []);
+
+T v<T>(
+  T Function() target, [
+  dynamic meta,
+]) =>
+    LogServiceV2()._functionLog(Level.verbose, target, meta);
+
+T i<T>(
+  T Function() target, [
+  dynamic meta,
+]) =>
+    LogServiceV2()._functionLog(Level.info, target, meta);
+
+T w<T>(
+  T Function() target, [
+  dynamic meta,
+]) =>
+    LogServiceV2()._functionLog(Level.warning, target, meta);
+
+@Deprecated('For development only')
+T d<T>(
+  T Function() target, [
+  dynamic meta,
+]) =>
+    LogServiceV2()._functionLog(Level.debug, target, meta);
 
 class LogServiceV2 {
   final LogRepositoryV2 _logRepositoryV2;
@@ -42,14 +67,12 @@ class LogServiceV2 {
     StackTrace? stackTrace,
     List prefixes,
   ) {
-    if (target is Future) {
-      _futureLog(level, target, meta, stackTrace, prefixes);
-      return target;
-    } else if (target is Function()) {
-      return _functionLog(level, target, meta);
-    }
-
     if (_shouldLog(level)) {
+      if (target is Future) {
+        _futureLog(level, target, meta, stackTrace, prefixes);
+        return target;
+      }
+
       if (DebugLoggableFunction._debug) {
         prefixes.insert(0, '[DEBUG]');
       }
@@ -74,18 +97,18 @@ class LogServiceV2 {
     StackTrace? stackTrace, [
     List? prefixes,
   ]) async {
-    final currentStackTrace = StackTrace.current;
+    if (_shouldLog(level)) {
+      final currentStackTrace = StackTrace.current;
+      final result = await target;
 
-    await target.then((result) {
       _log(
         level,
         result,
         meta,
         currentStackTrace,
-        prefixes ?? []
-          ..add('[future] => '),
+        (prefixes ?? [])..add('[future] => '),
       );
-    });
+    }
 
     return target;
   }
@@ -96,15 +119,14 @@ class LogServiceV2 {
     dynamic args,
   ) {
     try {
-      _log(level, args, null, null, ['[start] :: ']);
+      if (_shouldLog(level)) {
+        _log(level, args, null, null, ['[start] :: ']);
+      }
+
       final result = function.callWithDebug(level == Level.debug);
-      const endPrefix = '[ end ] => ';
-      if (function is Null Function()) {
-        _log(level, 'void', null, null, [endPrefix]);
-      } else if (result is Future) {
-        _log(level, result, null, null, [endPrefix]);
-      } else {
-        _log(level, result, null, null, [endPrefix]);
+
+      if (_shouldLog(level)) {
+        _log(level, result, null, null, ['[ end ] => ']);
       }
       return result;
     } catch (e) {

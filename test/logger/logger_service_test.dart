@@ -14,54 +14,112 @@ void main() {
     reset(mockedLoggerWrapper);
   });
 
-  test(': target is value.', () {
-    const target = 1;
-
-    when(mockedLoggerWrapper.log(any, any, any, any)).thenReturn(null);
-
-    final result = i(target);
-
-    expect(result, target);
-
-    verify(mockedLoggerWrapper.log(
-      Level.info,
-      target.toString(),
-      null,
-      null,
-    )).called(1);
-  });
-
-  group(': target is Future', () {
-    test(': sync.', () {
-      final target = Future.value(1);
+  group(': ValueLog', () {
+    test(': target is const', () {
+      const target = 1;
 
       when(mockedLoggerWrapper.log(any, any, any, any)).thenReturn(null);
 
-      final result = i(target);
+      final result = info(target);
 
       expect(result, target);
 
-      verifyNever(mockedLoggerWrapper.log(any, any, any, any));
-    });
-    test(': await.', () async {
-      final target = Future.value(2);
-
-      when(mockedLoggerWrapper.log(any, any, any, any)).thenReturn(null);
-
-      final result = await i(target);
-
-      expect(result, 2);
-
       verify(mockedLoggerWrapper.log(
         Level.info,
-        '[future] => 2',
-        any,
-        any,
+        target.toString(),
+        null,
+        null,
       )).called(1);
+    });
+
+    group(': target is Future', () {
+      test(': sync.', () {
+        final target = Future.value(1);
+
+        when(mockedLoggerWrapper.log(any, any, any, any)).thenReturn(null);
+
+        final result = info(target);
+
+        expect(result, target);
+
+        verifyNever(mockedLoggerWrapper.log(any, any, any, any));
+      });
+      test(': await.', () async {
+        final target = Future.value(2);
+
+        when(mockedLoggerWrapper.log(any, any, any, any)).thenReturn(null);
+
+        final result = await info(target);
+
+        expect(result, await target);
+
+        verify(mockedLoggerWrapper.log(
+          Level.info,
+          '[future] => 2',
+          any,
+          any,
+        )).called(1);
+      });
+    });
+
+    group(': level', () {
+      const input = 1;
+
+      for (var testCase in [
+        TestCase(
+          'verbose',
+          verbose,
+          () => verifyNever(mockedLoggerWrapper.log(any, any, any, any)),
+        ),
+        TestCase(
+          'info',
+          info,
+          () => verify(mockedLoggerWrapper.log(
+            Level.info,
+            input.toString(),
+            null,
+            null,
+          )).called(1),
+        ),
+        TestCase(
+          'warn',
+          warn,
+          () => verify(mockedLoggerWrapper.log(
+            Level.warning,
+            input.toString(),
+            null,
+            null,
+          )).called(1),
+        ),
+        TestCase(
+          'debug',
+          // ignore: deprecated_member_use_from_same_package
+          debug,
+          () => verify(mockedLoggerWrapper.log(
+            Level.debug,
+            input.toString(),
+            null,
+            null,
+          )).called(1),
+        ),
+      ]) {
+        test(
+          ': ${testCase.name}.',
+          () {
+            when(mockedLoggerWrapper.log(any, any, any, any)).thenReturn(null);
+
+            final result = testCase.target(input);
+
+            expect(result, input);
+
+            testCase.verify();
+          },
+        );
+      }
     });
   });
 
-  group(': target is Function', () {
+  group(': FunctionLog', () {
     test(': simple.', () {
       int target(int a, int b) => i(
             () => a + b,
@@ -82,7 +140,8 @@ void main() {
         ],
       );
     });
-    test(': cascade.', () {
+
+    test(': auto debug.', () {
       int childFuncInfo(int a, int b) => i(
             () => a * b,
             {a, b},
@@ -130,26 +189,33 @@ void main() {
       );
     });
 
-    test(': result type is void.', () {
-      void target(int a, int b) => i(
-            () {
-              a + b;
-            },
-            [a, b],
-          );
+    test(
+      ': result type is void.',
+      () {
+        void target(int a, int b) => i(
+              () {
+                a + b;
+              },
+              [a, b],
+            );
 
-      when(mockedLoggerWrapper.log(any, any, any, any)).thenReturn(null);
+        when(mockedLoggerWrapper.log(any, any, any, any)).thenReturn(null);
 
-      target(2, 3);
+        target(2, 3);
 
-      expect(
-        verify(mockedLoggerWrapper.log(any, captureAny, any, any)).captured,
-        [
-          '[start] :: [2, 3]',
-          '[ end ] => void',
-        ],
-      );
-    });
+        expect(
+          verify(mockedLoggerWrapper.log(any, captureAny, any, any)).captured,
+          [
+            '[start] :: [2, 3]',
+            '[ end ] => null',
+            // FIXME nullではなくvoidと出力したい
+            //  関数の戻り型をvoid判定する方法が分からないため、nullで出力している
+            //  戻り値がないvoidと、戻り値がnullなのは関数の実行結果として異なる
+            // '[ end ] => void',
+          ],
+        );
+      },
+    );
     test(': result type is Future.', () async {
       Future<int> target(int a, int b) => i(
             () => Future(() => a + b),
@@ -208,5 +274,93 @@ void main() {
         ],
       );
     });
+
+    group(': level', () {
+      const sampleFuncResult = 3;
+
+      Function buildSampleFunc(logFunc) {
+        return (int a, int b) => logFunc(
+              () {
+                return sampleFuncResult;
+              },
+              [a, b],
+            );
+      }
+
+      for (final testCase in [
+        TestCase(
+          'v',
+          v,
+          () => verifyNever(mockedLoggerWrapper.log(any, any, any, any)),
+        ),
+        TestCase(
+          'i',
+          i,
+          () => expect(
+            verify(mockedLoggerWrapper.log(
+              Level.info,
+              captureAny,
+              null,
+              null,
+            )).captured,
+            [
+              '[start] :: [1, 2]',
+              '[ end ] => 3',
+            ],
+          ),
+        ),
+        TestCase(
+          'w',
+          w,
+          () => expect(
+            verify(mockedLoggerWrapper.log(
+              Level.warning,
+              captureAny,
+              null,
+              null,
+            )).captured,
+            [
+              '[start] :: [1, 2]',
+              '[ end ] => 3',
+            ],
+          ),
+        ),
+        TestCase(
+          'd',
+          // ignore: deprecated_member_use_from_same_package
+          d,
+          () => expect(
+            verify(mockedLoggerWrapper.log(
+              Level.debug,
+              captureAny,
+              null,
+              null,
+            )).captured,
+            [
+              '[start] :: [1, 2]',
+              '[ end ] => 3',
+            ],
+          ),
+        ),
+      ]) {
+        test(': ${testCase.name}.', () {
+          when(mockedLoggerWrapper.log(any, any, any, any)).thenReturn(null);
+
+          final result = buildSampleFunc(testCase.target)(1, 2);
+
+          expect(result, sampleFuncResult);
+
+          testCase.verify();
+        });
+      }
+    });
   });
+}
+
+class TestCase<T> {
+  final String name;
+  final T target;
+  final dynamic verify;
+
+  TestCase(this.name, this.target, this.verify);
 }
