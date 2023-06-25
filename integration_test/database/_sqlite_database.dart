@@ -2,14 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/database/tables/base.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/definition.dart';
 import 'package:mem/framework/database/column_definition.dart';
 import 'package:mem/framework/database/table_definition.dart';
 import 'package:mem/framework/database/sqlite_database.dart';
-
-// FIXME integration testでrepositoryを参照するのはNG
-import 'package:mem/repositories/_database_tuple_repository.dart';
 
 import 'definitions.dart';
 
@@ -65,8 +63,7 @@ void testSqliteDatabase() => group(
                   final addingTableDefinition = TableDefinition(
                     'added_table',
                     [
-                      PrimaryKeyDefinition(idColumnName, ColumnType.integer,
-                          autoincrement: true),
+                      idPKDef,
                       ColumnDefinition('test', ColumnType.text),
                     ],
                   );

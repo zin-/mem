@@ -3,13 +3,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/database/tables/acts.dart';
+import 'package:mem/database/tables/base.dart';
 import 'package:mem/database/tables/mem_items.dart';
 import 'package:mem/database/tables/mems.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/database/definitions.dart';
 import 'package:mem/gui/constants.dart';
-import 'package:mem/repositories/_database_tuple_repository.dart';
 
 import '../_helpers.dart';
 
@@ -41,13 +41,13 @@ void testMemoScenario() => group(
 
           final insertedMemId = await memTable.insert({
             defMemName.name: insertedMemName,
-            createdAtColumnName: DateTime.now(),
+            createdAtColDef.name: DateTime.now(),
           });
           await memItemTable.insert({
-            memIdColumnName: insertedMemId,
-            memItemTypeColumnName: MemItemType.memo.name,
-            memItemValueColumnName: insertedMemMemo,
-            createdAtColumnName: DateTime.now(),
+            memIdFkDef.name: insertedMemId,
+            memItemTypeColDef.name: MemItemType.memo.name,
+            memItemValueColDef.name: insertedMemMemo,
+            createdAtColDef.name: DateTime.now(),
           });
         });
 
@@ -187,12 +187,12 @@ void testMemoScenario() => group(
 
               await memTable.insert({
                 defMemName.name: unarchivedMemName,
-                createdAtColumnName: DateTime.now(),
+                createdAtColDef.name: DateTime.now(),
               });
               await memTable.insert({
                 defMemName.name: archivedMemName,
-                createdAtColumnName: DateTime.now(),
-                archivedAtColumnName: DateTime.now(),
+                createdAtColDef.name: DateTime.now(),
+                archivedAtColDef.name: DateTime.now(),
               });
             });
 
@@ -380,12 +380,12 @@ void testMemoScenario() => group(
                 .single;
             final memItems =
                 await db.getTable(memItemTableDefinition.name).select(
-              whereString: '$memIdColumnName = ?',
+              whereString: '${memIdFkDef.name} = ?',
               whereArgs: [mem['id']],
             );
             expect(memItems.length, 1);
             expect(
-              memItems.single[memItemValueColumnName],
+              memItems.single[memItemValueColDef.name],
               enteringMemMemoText2,
             );
           });

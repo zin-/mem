@@ -5,6 +5,7 @@ import 'package:mem/core/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/database/definitions.dart';
+import 'package:mem/database/tables/base.dart';
 import 'package:mem/database/tables/mem_items.dart';
 import 'package:mem/database/tables/mems.dart';
 import 'package:mem/framework/database/database_manager.dart';
@@ -14,9 +15,6 @@ import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_name.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/mems/mem_service.dart';
-
-// FIXME integration testでrepositoryを参照するのはNG
-import 'package:mem/repositories/_database_tuple_repository.dart';
 
 const defaultDuration = Duration(seconds: 1);
 
@@ -56,17 +54,17 @@ Future<void> prepareSavedData(
   final memTable = database.getTable(memTableDefinition.name);
   final savedMemId = await memTable.insert({
     defMemName.name: memName,
-    createdAtColumnName: DateTime.now(),
-    archivedAtColumnName: isArchived ? DateTime.now() : null,
+    createdAtColDef.name: DateTime.now(),
+    archivedAtColDef.name: isArchived ? DateTime.now() : null,
   });
   assert(savedMemId == 1);
   final memItemTable = database.getTable(memItemTableDefinition.name);
   await memItemTable.insert({
-    memIdColumnName: savedMemId,
-    memItemTypeColumnName: MemItemType.memo.name,
-    memItemValueColumnName: memMemo,
-    createdAtColumnName: DateTime.now(),
-    archivedAtColumnName: isArchived ? DateTime.now() : null,
+    memIdFkDef.name: savedMemId,
+    memItemTypeColDef.name: MemItemType.memo.name,
+    memItemValueColDef.name: memMemo,
+    createdAtColDef.name: DateTime.now(),
+    archivedAtColDef.name: isArchived ? DateTime.now() : null,
   });
   await DatabaseManager(onTest: true).close(databaseDefinition.name);
 }

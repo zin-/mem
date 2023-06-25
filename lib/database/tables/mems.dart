@@ -1,9 +1,7 @@
+import 'package:mem/database/tables/base.dart';
 import 'package:mem/framework/database/column_definition.dart';
 import 'package:mem/framework/database/table_definition.dart';
-import 'package:mem/repositories/_database_tuple_repository.dart';
 
-final defMemId =
-    PrimaryKeyDefinition(idColumnName, ColumnType.integer, autoincrement: true);
 final defMemName = ColumnDefinition('name', ColumnType.text);
 final defMemDoneAt =
     ColumnDefinition('doneAt', ColumnType.datetime, notNull: false);
@@ -19,7 +17,6 @@ final defMemEndAt =
 final memTableDefinition = TableDefinition(
   'mems',
   [
-    defMemId,
     defMemName,
     defMemDoneAt,
     defMemStartOn,

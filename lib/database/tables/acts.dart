@@ -1,10 +1,8 @@
+import 'package:mem/database/tables/base.dart';
 import 'package:mem/database/tables/mems.dart';
 import 'package:mem/framework/database/column_definition.dart';
 import 'package:mem/framework/database/table_definition.dart';
-import 'package:mem/repositories/_database_tuple_repository.dart';
 
-final defActId =
-    PrimaryKeyDefinition(idColumnName, ColumnType.integer, autoincrement: true);
 final defActStart = ColumnDefinition('start', ColumnType.datetime);
 final defActStartIsAllDay =
     ColumnDefinition('start_is_all_day', ColumnType.integer);
@@ -16,7 +14,6 @@ final fkDefMemId = ForeignKeyDefinition(memTableDefinition);
 final actTableDefinition = TableDefinition(
   'acts',
   [
-    defActId,
     defActStart,
     defActStartIsAllDay,
     defActEnd,

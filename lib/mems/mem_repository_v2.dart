@@ -2,10 +2,10 @@ import 'package:mem/core/date_and_time.dart';
 import 'package:mem/core/date_and_time_period.dart';
 import 'package:mem/core/errors.dart';
 import 'package:mem/core/mem.dart';
+import 'package:mem/database/tables/base.dart';
 import 'package:mem/database/tables/mems.dart';
 import 'package:mem/framework/database/database.dart' as db;
 import 'package:mem/logger/i/api.dart';
-import 'package:mem/repositories/_database_tuple_repository.dart';
 import 'package:mem/repositories/i/_database_tuple_repository_v2.dart';
 import 'package:mem/repositories/i/conditions.dart';
 import 'package:mem/repositories/mem_entity.dart';
@@ -21,8 +21,8 @@ class MemRepository extends DatabaseTupleRepository<MemEntity, Mem> {
                   archived == null
                       ? null
                       : archived
-                          ? IsNotNull(archivedAtColumnName)
-                          : IsNull(archivedAtColumnName),
+                          ? IsNotNull(archivedAtColDef.name)
+                          : IsNull(archivedAtColDef.name),
                   done == null
                       ? null
                       : done
@@ -42,10 +42,10 @@ class MemRepository extends DatabaseTupleRepository<MemEntity, Mem> {
         defMemEndOn.name: payload.period?.end,
         defMemEndAt.name:
             payload.period?.end?.isAllDay == false ? payload.period?.end : null,
-        idColumnName: payload.id,
-        createdAtColumnName: payload.createdAt,
-        updatedAtColumnName: payload.updatedAt,
-        archivedAtColumnName: payload.archivedAt,
+        idPKDef.name: payload.id,
+        createdAtColDef.name: payload.createdAt,
+        updatedAtColDef.name: payload.updatedAt,
+        archivedAtColDef.name: payload.archivedAt,
       };
 
   @override

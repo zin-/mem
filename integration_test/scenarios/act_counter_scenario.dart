@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/core/mem.dart';
+import 'package:mem/database/tables/base.dart';
 import 'package:mem/database/tables/mems.dart';
 import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/database/definitions.dart';
 import 'package:mem/logger/i/type.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
-import 'package:mem/repositories/_database_tuple_repository.dart';
 
 import '../_helpers.dart';
 
@@ -37,7 +37,7 @@ void testActCounterConfigure() => group(
 
           savedMemId = await memTable.insert({
             defMemName.name: savedMemName,
-            createdAtColumnName: DateTime.now(),
+            createdAtColDef.name: DateTime.now(),
           });
         });
 

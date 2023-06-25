@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/database/tables/acts.dart';
+import 'package:mem/database/tables/base.dart';
+import 'package:mem/database/tables/mem_items.dart';
 import 'package:mem/database/tables/mems.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/database/definitions.dart';
 import 'package:mem/main.dart' as app;
-import 'package:mem/repositories/_database_tuple_repository.dart';
-import 'package:mem/repositories/mem_item_repository.dart';
 
 import '../_helpers.dart';
 import '../helpers.dart';
@@ -37,7 +37,7 @@ void testTaskScenario() => group(': $scenarioName', () {
         await memTable.insert({
           defMemName.name: '$scenarioName - mem name - has period',
           defMemStartOn.name: DateTime.now(),
-          createdAtColumnName: DateTime.now(),
+          createdAtColDef.name: DateTime.now(),
         });
         await memTable.insert({
           defMemName.name: '$scenarioName - mem name - no period',
@@ -45,7 +45,7 @@ void testTaskScenario() => group(': $scenarioName', () {
           defMemStartAt.name: null,
           defMemEndOn.name: null,
           defMemEndAt.name: null,
-          createdAtColumnName: DateTime.now(),
+          createdAtColDef.name: DateTime.now(),
         });
       });
 

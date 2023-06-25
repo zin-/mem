@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/database/tables/acts.dart';
+import 'package:mem/database/tables/base.dart';
 import 'package:mem/database/tables/mem_items.dart';
 import 'package:mem/database/tables/mems.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/database/definitions.dart';
 import 'package:mem/main.dart' as app;
-import 'package:mem/repositories/i/_database_tuple_entity_v2.dart';
 
 import '../helpers.dart';
 
@@ -36,7 +36,7 @@ void testActScenario() => group(': Act scenario', () {
 
         insertedMemId = await memTable.insert({
           defMemName.name: insertedMemName,
-          createdAtColumnName: DateTime.now(),
+          createdAtColDef.name: DateTime.now(),
         });
       });
       setUp(() async {
@@ -104,13 +104,13 @@ void testActScenario() => group(': Act scenario', () {
               fkDefMemId.name: insertedMemId,
               defActStart.name: createdAt,
               defActStartIsAllDay.name: 0,
-              createdAtColumnName: createdAt,
+              createdAtColDef.name: createdAt,
             });
             await db.getTable(actTableDefinition.name).insert({
               fkDefMemId.name: insertedMemId,
               defActStart.name: createdAt,
               defActStartIsAllDay.name: 0,
-              createdAtColumnName: createdAt,
+              createdAtColDef.name: createdAt,
             });
           });
 
@@ -138,7 +138,7 @@ void testActScenario() => group(': Act scenario', () {
               whereArgs: [insertedMemId],
             ))
                     .singleWhere((element) =>
-                        element[updatedAtColumnName] != null)[defActEnd.name];
+                        element[updatedAtColDef.name] != null)[defActEnd.name];
             if (dateTimeText(createdAt) == dateTimeText(updatedActEnd)) {
               expect(find.text(dateTimeText(createdAt)), findsNWidgets(3));
             } else {
@@ -171,7 +171,7 @@ void testActScenario() => group(': Act scenario', () {
 
           await memTable.insert({
             defMemName.name: insertedMemName2,
-            createdAtColumnName: DateTime.now(),
+            createdAtColDef.name: DateTime.now(),
           });
         });
 
