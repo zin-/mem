@@ -1,15 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/acts/act_entity.dart';
 import 'package:mem/acts/act_repository.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time.dart';
 import 'package:mem/core/date_and_time_period.dart';
 import 'package:mem/core/errors.dart';
-import 'package:mem/database/database.dart';
-import 'package:mem/database/database_manager.dart';
-import 'package:mem/database/i/types.dart';
-import 'package:mem/repositories/i/_database_tuple_entity_v2.dart';
-import 'package:mem/repositories/mem_entity.dart';
+import 'package:mem/database/table_definitions/acts.dart';
+import 'package:mem/database/table_definitions/base.dart';
+import 'package:mem/database/table_definitions/mems.dart';
+import 'package:mem/framework/database/database.dart';
+import 'package:mem/framework/database/database_manager.dart';
+import 'package:mem/framework/database/definitions/definition.dart';
 
 void main() {
   testActRepository();
@@ -20,7 +20,7 @@ void testActRepository() => group(
       () {
         final databaseManager = DatabaseManager(onTest: true);
 
-        final defD = DefD('atc_repository_test.db', 1, [
+        final defD = DatabaseDefinition('atc_repository_test.db', 1, [
           memTableDefinition,
           actTableDefinition,
         ]);
@@ -74,14 +74,14 @@ void testActRepository() => group(
           test('without act', () async {
             final memId = await memTable.insert({
               defMemName.name: 'with no data mem',
-              createdAtColumnName: DateTime.now(),
+              createdAtColDef.name: DateTime.now(),
             });
             assert(memId != withNoDataMemId);
             actTable.insert({
               fkDefMemId.name: memId,
               defActStart.name: DateTime.now(),
               defActStartIsAllDay.name: 0,
-              createdAtColumnName: DateTime.now(),
+              createdAtColDef.name: DateTime.now(),
             });
 
             final actual = await actRepository.shipByMemId(withNoDataMemId);
@@ -93,7 +93,7 @@ void testActRepository() => group(
             test('only memId', () async {
               final memId = await memTable.insert({
                 defMemName.name: 'with mem',
-                createdAtColumnName: DateTime.now(),
+                createdAtColDef.name: DateTime.now(),
               });
               assert(memId != withNoDataMemId);
               final now = DateTime.now();
@@ -101,7 +101,7 @@ void testActRepository() => group(
                 fkDefMemId.name: memId,
                 defActStart.name: now,
                 defActStartIsAllDay.name: 0,
-                createdAtColumnName: DateTime.now(),
+                createdAtColDef.name: DateTime.now(),
               });
 
               final actual = await actRepository.shipByMemId(memId);
@@ -117,7 +117,7 @@ void testActRepository() => group(
             test(' and period', () async {
               final memId = await memTable.insert({
                 defMemName.name: 'with mem',
-                createdAtColumnName: DateTime.now(),
+                createdAtColDef.name: DateTime.now(),
               });
               assert(memId != withNoDataMemId);
               final now = DateTime.now();
@@ -125,7 +125,7 @@ void testActRepository() => group(
                 fkDefMemId.name: memId,
                 defActStart.name: now,
                 defActStartIsAllDay.name: 0,
-                createdAtColumnName: DateTime.now(),
+                createdAtColDef.name: DateTime.now(),
               });
               const diff = Duration(days: 1);
               final yesterday = now.subtract(diff);
@@ -133,26 +133,26 @@ void testActRepository() => group(
                 fkDefMemId.name: memId,
                 defActStart.name: yesterday,
                 defActStartIsAllDay.name: 0,
-                createdAtColumnName: DateTime.now(),
+                createdAtColDef.name: DateTime.now(),
               });
               await actTable.insert({
                 fkDefMemId.name: memId,
                 defActStart.name: yesterday.subtract(diff),
                 defActStartIsAllDay.name: 0,
-                createdAtColumnName: DateTime.now(),
+                createdAtColDef.name: DateTime.now(),
               });
               final tomorrow = now.add(diff);
               await actTable.insert({
                 fkDefMemId.name: memId,
                 defActStart.name: tomorrow,
                 defActStartIsAllDay.name: 0,
-                createdAtColumnName: DateTime.now(),
+                createdAtColDef.name: DateTime.now(),
               });
               await actTable.insert({
                 fkDefMemId.name: memId,
                 defActStart.name: tomorrow.add(diff),
                 defActStartIsAllDay.name: 0,
-                createdAtColumnName: DateTime.now(),
+                createdAtColDef.name: DateTime.now(),
               });
 
               final actual = await actRepository.shipByMemId(

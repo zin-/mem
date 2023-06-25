@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:mem/database/database.dart';
-import 'package:mem/database/database_manager.dart';
+import 'package:mem/database/table_definitions/base.dart';
+import 'package:mem/database/table_definitions/mem_items.dart';
+import 'package:mem/database/table_definitions/mems.dart';
+import 'package:mem/framework/database/database.dart';
+import 'package:mem/framework/database/database_manager.dart';
+import 'package:mem/database/definition.dart';
 import 'package:mem/main.dart' as app;
-import 'package:mem/repositories/_database_tuple_repository.dart';
-import 'package:mem/repositories/mem_entity.dart';
-import 'package:mem/repositories/mem_item_repository.dart';
 
 import '../_helpers.dart';
 
@@ -27,7 +28,7 @@ void testTodoScenario() => group(': $scenarioName', () {
       late final Database db;
 
       setUpAll(() async {
-        db = await DatabaseManager(onTest: true).open(app.databaseDefinition);
+        db = await DatabaseManager(onTest: true).open(databaseDefinition);
       });
       setUp(() async {
         await (db.getTable(memItemTableDefinition.name)).delete();
@@ -37,16 +38,16 @@ void testTodoScenario() => group(': $scenarioName', () {
 
         await memTable.insert({
           defMemName.name: insertedMemName,
-          createdAtColumnName: DateTime.now(),
+          createdAtColDef.name: DateTime.now(),
         });
         await memTable.insert({
           defMemName.name: undoneMemName,
-          createdAtColumnName: DateTime.now(),
+          createdAtColDef.name: DateTime.now(),
           defMemDoneAt.name: null,
         });
         await memTable.insert({
           defMemName.name: doneMemName,
-          createdAtColumnName: DateTime.now(),
+          createdAtColDef.name: DateTime.now(),
           defMemDoneAt.name: DateTime.now(),
         });
       });

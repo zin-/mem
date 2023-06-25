@@ -4,7 +4,11 @@ import 'package:mem/core/date_and_time.dart';
 import 'package:mem/core/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_item.dart';
-import 'package:mem/database/database_manager.dart';
+import 'package:mem/database/definition.dart';
+import 'package:mem/database/table_definitions/base.dart';
+import 'package:mem/database/table_definitions/mem_items.dart';
+import 'package:mem/database/table_definitions/mems.dart';
+import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/main.dart' as app;
 import 'package:mem/mems/mem_item_repository_v2.dart';
@@ -12,18 +16,13 @@ import 'package:mem/mems/mem_name.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/mems/mem_service.dart';
 
-// FIXME integration testでrepositoryを参照するのはNG
-import 'package:mem/repositories/_database_tuple_repository.dart';
-import 'package:mem/repositories/mem_entity.dart';
-import 'package:mem/repositories/mem_item_repository.dart';
-
 const defaultDuration = Duration(seconds: 1);
 
 Future clearDatabase() async {
   // FIXME openしないとdeleteできないのは、実際のDatabaseと挙動が異なる
   // 今の実装だと難しいっぽい。いつかチャレンジする
-  await DatabaseManager(onTest: true).open(app.databaseDefinition);
-  await DatabaseManager(onTest: true).delete(app.databaseDefinition.name);
+  await DatabaseManager(onTest: true).open(databaseDefinition);
+  await DatabaseManager(onTest: true).delete(databaseDefinition.name);
 
   MemRepository.resetWith(null);
   MemItemRepository.resetWith(null);
@@ -51,24 +50,23 @@ Future<void> prepareSavedData(
   String memMemo, {
   bool isArchived = false,
 }) async {
-  final database =
-      await DatabaseManager(onTest: true).open(app.databaseDefinition);
+  final database = await DatabaseManager(onTest: true).open(databaseDefinition);
   final memTable = database.getTable(memTableDefinition.name);
   final savedMemId = await memTable.insert({
     defMemName.name: memName,
-    createdAtColumnName: DateTime.now(),
-    archivedAtColumnName: isArchived ? DateTime.now() : null,
+    createdAtColDef.name: DateTime.now(),
+    archivedAtColDef.name: isArchived ? DateTime.now() : null,
   });
   assert(savedMemId == 1);
   final memItemTable = database.getTable(memItemTableDefinition.name);
   await memItemTable.insert({
-    memIdColumnName: savedMemId,
-    memItemTypeColumnName: MemItemType.memo.name,
-    memItemValueColumnName: memMemo,
-    createdAtColumnName: DateTime.now(),
-    archivedAtColumnName: isArchived ? DateTime.now() : null,
+    memIdFkDef.name: savedMemId,
+    memItemTypeColDef.name: MemItemType.memo.name,
+    memItemValueColDef.name: memMemo,
+    createdAtColDef.name: DateTime.now(),
+    archivedAtColDef.name: isArchived ? DateTime.now() : null,
   });
-  await DatabaseManager(onTest: true).close(app.databaseDefinition.name);
+  await DatabaseManager(onTest: true).close(databaseDefinition.name);
 }
 
 // V2
@@ -118,7 +116,7 @@ Future<void> prepareSavedMem(
   TimeOfDay memNotifyAt,
 ) async {
   final memTable =
-      (await DatabaseManager(onTest: true).open(app.databaseDefinition))
+      (await DatabaseManager(onTest: true).open(databaseDefinition))
           .getTable(memTableDefinition.name);
 
   await MemRepository(memTable).receive(Mem(
@@ -134,7 +132,7 @@ Future<void> prepareSavedMem(
         ),
       )));
 
-  await DatabaseManager(onTest: true).close(app.databaseDefinition.name);
+  await DatabaseManager(onTest: true).close(databaseDefinition.name);
 
   MemRepository.resetWith(null);
 }

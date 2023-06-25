@@ -1,18 +1,7 @@
-import 'package:mem/database/i/types.dart';
+import 'package:mem/database/table_definitions/base.dart';
 
 import '_entity_v2.dart';
 import 'types.dart';
-
-const AttributeName idColumnName = 'id';
-const AttributeName createdAtColumnName = 'createdAt';
-const AttributeName updatedAtColumnName = 'updatedAt';
-const AttributeName archivedAtColumnName = 'archivedAt';
-
-final defaultColumnDefinitions = [
-  DefC(createdAtColumnName, TypeC.datetime),
-  DefC(updatedAtColumnName, TypeC.datetime, notNull: false),
-  DefC(archivedAtColumnName, TypeC.datetime, notNull: false),
-];
 
 abstract class DatabaseTupleEntity implements EntityV2 {
   dynamic id;
@@ -28,16 +17,16 @@ abstract class DatabaseTupleEntity implements EntityV2 {
   });
 
   DatabaseTupleEntity.fromMap(Map<String, dynamic> valueMap)
-      : id = valueMap[idColumnName],
-        createdAt = valueMap[createdAtColumnName],
-        updatedAt = valueMap[updatedAtColumnName],
-        archivedAt = valueMap[archivedAtColumnName];
+      : id = valueMap[idPKDef.name],
+        createdAt = valueMap[createdAtColDef.name],
+        updatedAt = valueMap[updatedAtColDef.name],
+        archivedAt = valueMap[archivedAtColDef.name];
 
   @override
   Map<AttributeName, dynamic> toMap() => {
-        idColumnName: id,
-        createdAtColumnName: createdAt,
-        updatedAtColumnName: updatedAt,
-        archivedAtColumnName: archivedAt,
+        idPKDef.name: id,
+        createdAtColDef.name: createdAt,
+        updatedAtColDef.name: updatedAt,
+        archivedAtColDef.name: archivedAt,
       };
 }

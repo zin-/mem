@@ -2,31 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:mem/act_counter/act_counter_configure.dart';
 import 'package:mem/act_counter/act_counter_repository.dart';
 import 'package:mem/act_counter/act_counter_service.dart';
-import 'package:mem/acts/act_entity.dart';
 import 'package:mem/acts/act_repository.dart';
 import 'package:mem/core/date_and_time.dart';
-import 'package:mem/database/i/types.dart';
+import 'package:mem/database/table_definitions/acts.dart';
+import 'package:mem/database/table_definitions/mem_items.dart';
+import 'package:mem/database/table_definitions/mems.dart';
+import 'package:mem/framework/database/database_manager.dart';
+import 'package:mem/database/definition.dart';
 import 'package:mem/gui/app.dart';
-import 'package:mem/database/database.dart';
-import 'package:mem/database/database_manager.dart';
 import 'package:mem/logger/log_service_v2.dart' as v2;
 import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/list/page.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
-import 'package:mem/repositories/mem_entity.dart';
-import 'package:mem/repositories/mem_item_repository.dart';
 
 import 'logger/i/api.dart';
-
-final databaseDefinition = DefD(
-  'mem.db',
-  5,
-  [
-    memTableDefinition,
-    memItemTableDefinition,
-    actTableDefinition,
-  ],
-);
 
 Future<void> main({String? languageCode}) async {
   initializeLogger();
@@ -51,7 +40,7 @@ Future<void> run(Widget home, {String? languageCode}) => t(
       },
     );
 
-Future<Database> openDatabase() async {
+Future<void> openDatabase() async {
   final database = await DatabaseManager().open(databaseDefinition);
 
   MemRepository(
@@ -63,8 +52,6 @@ Future<Database> openDatabase() async {
   ActRepository(
     database.getTable(actTableDefinition.name),
   );
-
-  return database;
 }
 
 const uriSchema = 'mem';

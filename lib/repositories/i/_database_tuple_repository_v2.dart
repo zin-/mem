@@ -1,4 +1,5 @@
-import 'package:mem/database/database.dart';
+import 'package:mem/database/table_definitions/base.dart';
+import 'package:mem/framework/database/database.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/repositories/_repository_v2.dart';
 import 'package:mem/repositories/i/types.dart';
@@ -24,11 +25,11 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
         () async {
           final entityMap = unpack(payload);
 
-          entityMap[createdAtColumnName] = DateTime.now();
+          entityMap[createdAtColDef.name] = DateTime.now();
 
           final id = await _table.insert(entityMap);
 
-          entityMap[idColumnName] = id;
+          entityMap[idPKDef.name] = id;
 
           return pack(entityMap);
         },
@@ -57,13 +58,13 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
         () async {
           final entityMap = unpack(payload);
 
-          if (entityMap[createdAtColumnName] == null) {
-            entityMap[createdAtColumnName] = DateTime.now();
+          if (entityMap[createdAtColDef.name] == null) {
+            entityMap[createdAtColDef.name] = DateTime.now();
           }
-          entityMap[updatedAtColumnName] = DateTime.now();
+          entityMap[updatedAtColDef.name] = DateTime.now();
 
           await _table.updateByPk(
-            entityMap[idColumnName],
+            entityMap[idPKDef.name],
             entityMap,
           );
 
@@ -77,10 +78,10 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
         () async {
           final entityMap = unpack(payload);
 
-          entityMap[archivedAtColumnName] = DateTime.now();
+          entityMap[archivedAtColDef.name] = DateTime.now();
 
           await _table.updateByPk(
-            entityMap[idColumnName],
+            entityMap[idPKDef.name],
             entityMap,
           );
 
@@ -94,11 +95,11 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
         () async {
           final entityMap = unpack(payload);
 
-          entityMap[updatedAtColumnName] = DateTime.now();
-          entityMap[archivedAtColumnName] = null;
+          entityMap[updatedAtColDef.name] = DateTime.now();
+          entityMap[archivedAtColDef.name] = null;
 
           await _table.updateByPk(
-            entityMap[idColumnName],
+            entityMap[idPKDef.name],
             entityMap,
           );
 

@@ -1,28 +1,6 @@
-import 'package:mem/database/i/types.dart';
+import 'package:mem/database/table_definitions/mems.dart';
 
 import 'i/_database_tuple_entity_v2.dart';
-
-final defMemId = DefPK(idColumnName, TypeC.integer, autoincrement: true);
-final defMemName = DefC('name', TypeC.text);
-final defMemDoneAt = DefC('doneAt', TypeC.datetime, notNull: false);
-final defMemStartOn = DefC('notifyOn', TypeC.datetime, notNull: false);
-final defMemStartAt = DefC('notifyAt', TypeC.datetime, notNull: false);
-final defMemEndOn = DefC('endOn', TypeC.datetime, notNull: false);
-final defMemEndAt = DefC('endAt', TypeC.datetime, notNull: false);
-
-final memTableDefinition = DefT(
-  'mems',
-  [
-    defMemId,
-    defMemName,
-    defMemDoneAt,
-    defMemStartOn,
-    defMemStartAt,
-    defMemEndOn,
-    defMemEndAt,
-    ...defaultColumnDefinitions
-  ],
-);
 
 class MemEntity extends DatabaseTupleEntity {
   final String name;

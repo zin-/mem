@@ -1,5 +1,5 @@
-import 'package:mem/database/database.dart';
-import 'package:mem/database/definitions/table_definition.dart';
+import 'package:mem/framework/database/database.dart';
+import 'package:mem/framework/database/definitions/table_definition.dart';
 
 class DatabaseDefinition {
   final String name;
@@ -11,10 +11,11 @@ class DatabaseDefinition {
       throw DatabaseDefinitionException('Database name is required.');
     } else if (name.contains(' ')) {
       throw DatabaseDefinitionException('Database name contains " ".');
-    } else if (version < 1) {
+    }
+
+    if (version < 1) {
       throw DatabaseDefinitionException('Minimum version is 1.');
     }
-    // TODO: implement when name has no ".db" extension
   }
 
   @override

@@ -5,8 +5,8 @@ import 'dart:convert';
 
 import 'package:idb_shim/idb.dart' as idb_shim;
 import 'package:idb_shim/idb_browser.dart' as idb_browser;
-import 'package:mem/database/database.dart';
-import 'package:mem/database/i/types.dart';
+import 'package:mem/framework/database/definitions/column_definition.dart';
+import 'package:mem/framework/database/database.dart';
 import 'package:mem/logger/i/api.dart';
 
 class IndexedDatabase extends Database {
@@ -34,7 +34,7 @@ class IndexedDatabase extends Database {
                 event.database.createObjectStore(
                   tableDefinition.name,
                   autoIncrement: tableDefinition.columns
-                      .whereType<DefPK>()
+                      .whereType<PrimaryKeyDefinition>()
                       .first
                       .autoincrement,
                 );
@@ -126,14 +126,14 @@ class ObjectStore extends Table {
 
   ObjectStore(super.definition, this._database);
 
-  late final _pkColumn = definition.columns.whereType<DefPK>().first;
+  late final _pkColumn = definition.columns.whereType<PrimaryKeyDefinition>().first;
 
   @override
   Future<int> insert(Map<String, dynamic> valueMap) => v(
         {'valueMap': valueMap},
         () async => await _database.onOpened(
           () async {
-            final defFks = definition.columns.whereType<DefFK>();
+            final defFks = definition.columns.whereType<ForeignKeyDefinition>();
 
             final txn = _database._database.transaction(
                 defFks.isEmpty

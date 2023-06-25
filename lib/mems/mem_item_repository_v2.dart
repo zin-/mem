@@ -1,19 +1,19 @@
 import 'package:mem/core/errors.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_item.dart';
-import 'package:mem/database/database.dart';
+import 'package:mem/database/table_definitions/base.dart';
+import 'package:mem/database/table_definitions/mem_items.dart';
+import 'package:mem/framework/database/database.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/mems/mem_item_entity_v2.dart';
-import 'package:mem/repositories/i/_database_tuple_entity_v2.dart';
 import 'package:mem/repositories/i/_database_tuple_repository_v2.dart';
 import 'package:mem/repositories/i/conditions.dart';
-import 'package:mem/repositories/mem_item_repository.dart';
 
 class MemItemRepository
     extends DatabaseTupleRepository<MemItemEntity, MemItem> {
   Future<Iterable<MemItem>> shipByMemId(MemId memId) => v(
         {'memId': memId},
-        () => super.ship(Equals(memIdColumnName, memId)),
+        () => super.ship(Equals(memIdFkDef.name, memId)),
       );
 
   Future<Iterable<MemItem>> archiveByMemId(MemId memId) => v(
@@ -36,27 +36,27 @@ class MemItemRepository
 
   @override
   UnpackedPayload unpack(MemItem payload) => {
-        memIdColumnName: payload.memId,
-        memItemTypeColumnName: payload.type.name,
-        memItemValueColumnName: payload.value,
-        idColumnName: payload.id,
-        createdAtColumnName: payload.createdAt,
-        updatedAtColumnName: payload.updatedAt,
-        archivedAtColumnName: payload.archivedAt,
+        memIdFkDef.name: payload.memId,
+        memItemTypeColDef.name: payload.type.name,
+    memItemValueColDef.name: payload.value,
+        idPKDef.name: payload.id,
+        createdAtColDef.name: payload.createdAt,
+        updatedAtColDef.name: payload.updatedAt,
+        archivedAtColDef.name: payload.archivedAt,
       };
 
   @override
   MemItem pack(UnpackedPayload unpackedPayload) {
     final memItemEntity = MemItemEntity(
-      memId: unpackedPayload[memIdColumnName],
+      memId: unpackedPayload[memIdFkDef.name],
       type: MemItemType.values.firstWhere((v) {
-        return v.name == unpackedPayload[memItemTypeColumnName];
+        return v.name == unpackedPayload[memItemTypeColDef.name];
       }),
-      value: unpackedPayload[memItemValueColumnName],
-      id: unpackedPayload[idColumnName],
-      createdAt: unpackedPayload[createdAtColumnName],
-      updatedAt: unpackedPayload[updatedAtColumnName],
-      archivedAt: unpackedPayload[archivedAtColumnName],
+      value: unpackedPayload[memItemValueColDef.name],
+      id: unpackedPayload[idPKDef.name],
+      createdAt: unpackedPayload[createdAtColDef.name],
+      updatedAt: unpackedPayload[updatedAtColDef.name],
+      archivedAt: unpackedPayload[archivedAtColDef.name],
     );
 
     return MemItem(
