@@ -5,7 +5,7 @@ import 'package:mem/core/mem.dart';
 import 'package:mem/database/tables/base.dart';
 import 'package:mem/database/tables/mems.dart';
 import 'package:mem/framework/database/database_manager.dart';
-import 'package:mem/database/definitions.dart';
+import 'package:mem/database/definition.dart';
 import 'package:mem/logger/i/type.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';

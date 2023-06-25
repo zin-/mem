@@ -6,7 +6,7 @@ import 'package:mem/database/tables/mem_items.dart';
 import 'package:mem/database/tables/mems.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/database_manager.dart';
-import 'package:mem/database/definitions.dart';
+import 'package:mem/database/definition.dart';
 import 'package:mem/main.dart' as app;
 
 import '../_helpers.dart';

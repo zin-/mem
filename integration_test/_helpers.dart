@@ -4,7 +4,7 @@ import 'package:mem/core/date_and_time.dart';
 import 'package:mem/core/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_item.dart';
-import 'package:mem/database/definitions.dart';
+import 'package:mem/database/definition.dart';
 import 'package:mem/database/tables/base.dart';
 import 'package:mem/database/tables/mem_items.dart';
 import 'package:mem/database/tables/mems.dart';

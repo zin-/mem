@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/acts/act_repository.dart';
-import 'package:mem/database/definitions.dart';
+import 'package:mem/database/definition.dart';
 import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/logger/i/type.dart' as v1;

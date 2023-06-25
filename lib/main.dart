@@ -8,7 +8,7 @@ import 'package:mem/database/tables/acts.dart';
 import 'package:mem/database/tables/mem_items.dart';
 import 'package:mem/database/tables/mems.dart';
 import 'package:mem/framework/database/database_manager.dart';
-import 'package:mem/database/definitions.dart';
+import 'package:mem/database/definition.dart';
 import 'package:mem/gui/app.dart';
 import 'package:mem/logger/log_service_v2.dart' as v2;
 import 'package:mem/mems/mem_item_repository_v2.dart';
