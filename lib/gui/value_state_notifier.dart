@@ -1,14 +1,19 @@
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/logger/log_service_v2.dart';
 
 const _jsonEncoderIndent = '  ';
 
 class ValueStateNotifier<T> extends StateNotifier<T> {
   ValueStateNotifier(super.state);
 
-  // TODO performance 値が変わっていたら通知する形にしたい
-  T updatedBy(T value) => state = value;
+  T updatedBy(T value) => v(
+        () {
+          return state = value;
+        },
+        {'state': state, 'value': value},
+      );
 
 // coverage:ignore-start
   @override
