@@ -1,5 +1,5 @@
-import 'package:mem/database/tables/base.dart';
-import 'package:mem/database/tables/mems.dart';
+import 'package:mem/database/table_definitions/base.dart';
+import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/column_definition.dart';
 import 'package:mem/framework/database/table_definition.dart';
 

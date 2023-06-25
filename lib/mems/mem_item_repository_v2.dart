@@ -1,8 +1,8 @@
 import 'package:mem/core/errors.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_item.dart';
-import 'package:mem/database/tables/base.dart';
-import 'package:mem/database/tables/mem_items.dart';
+import 'package:mem/database/table_definitions/base.dart';
+import 'package:mem/database/table_definitions/mem_items.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:mem/mems/mem_item_entity_v2.dart';

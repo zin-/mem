@@ -1,4 +1,4 @@
-import 'package:mem/database/tables/mems.dart';
+import 'package:mem/database/table_definitions/mems.dart';
 
 import 'i/_database_tuple_entity_v2.dart';
 
