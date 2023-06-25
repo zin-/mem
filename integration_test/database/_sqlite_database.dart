@@ -4,9 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/database/table_definitions/base.dart';
 import 'package:mem/framework/database/database.dart';
-import 'package:mem/framework/database/definition.dart';
-import 'package:mem/framework/database/column_definition.dart';
-import 'package:mem/framework/database/table_definition.dart';
+import 'package:mem/framework/database/definitions/column_definition.dart';
+import 'package:mem/framework/database/definitions/definition.dart';
+import 'package:mem/framework/database/definitions/table_definition.dart';
 import 'package:mem/framework/database/sqlite_database.dart';
 
 import 'definitions.dart';

@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:mem/framework/database/database.dart';
-import 'package:mem/framework/database/column_definition.dart';
+import 'package:mem/framework/database/definitions/column_definition.dart';
 
 class TableDefinition {
   final String name;

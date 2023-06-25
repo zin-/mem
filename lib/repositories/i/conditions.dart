@@ -1,4 +1,4 @@
-import 'package:mem/framework/database/column_definition.dart';
+import 'package:mem/framework/database/definitions/column_definition.dart';
 
 import 'types.dart';
 

@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:mem/framework/database/column_definition.dart';
 import 'package:mem/framework/database/database.dart';
-import 'package:mem/framework/database/table_definition.dart';
+import 'package:mem/framework/database/definitions/column_definition.dart';
+import 'package:mem/framework/database/definitions/table_definition.dart';
 import 'package:mem/logger/i/api.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -142,7 +142,9 @@ class SqliteDatabase extends Database {
         () async {
           for (var tableDefinition in definition.tableDefinitions) {
             if (!foreignKeyIsEnabled &&
-                tableDefinition.columns.whereType<ForeignKeyDefinition>().isNotEmpty) {
+                tableDefinition.columns
+                    .whereType<ForeignKeyDefinition>()
+                    .isNotEmpty) {
               verbose('Enable foreign key');
               await db.execute('PRAGMA foreign_keys=true');
               foreignKeyIsEnabled = true;

@@ -1,7 +1,7 @@
 import 'package:mem/database/table_definitions/base.dart';
 import 'package:mem/database/table_definitions/mems.dart';
-import 'package:mem/framework/database/column_definition.dart';
-import 'package:mem/framework/database/table_definition.dart';
+import 'package:mem/framework/database/definitions/column_definition.dart';
+import 'package:mem/framework/database/definitions/table_definition.dart';
 
 final defActStart = ColumnDefinition('start', ColumnType.datetime);
 final defActStartIsAllDay =

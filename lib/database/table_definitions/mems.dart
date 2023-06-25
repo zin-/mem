@@ -1,6 +1,6 @@
 import 'package:mem/database/table_definitions/base.dart';
-import 'package:mem/framework/database/column_definition.dart';
-import 'package:mem/framework/database/table_definition.dart';
+import 'package:mem/framework/database/definitions/column_definition.dart';
+import 'package:mem/framework/database/definitions/table_definition.dart';
 
 final defMemName = ColumnDefinition('name', ColumnType.text);
 final defMemDoneAt =
