@@ -100,7 +100,7 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
               {'result': result},
               () {
                 if (memId != null && result == true) {
-                  final removed = ref.read(removedMem(memId));
+                  final removed = ref.read(removedMemProvider(memId));
 
                   if (removed != null) {
                     ScaffoldMessenger.of(context).showSnackBar(

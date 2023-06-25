@@ -9,7 +9,7 @@ import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/mem_service.dart';
 
 final loadMemItems = Provider.autoDispose.family<Future<List<MemItem>>, int?>(
-  (ref, memId) => d(
+  (ref, memId) => v(
     () async {
       List<MemItem> memItems = [];
 
@@ -30,7 +30,7 @@ final loadMemItems = Provider.autoDispose.family<Future<List<MemItem>>, int?>(
 );
 
 final saveMem =
-    Provider.autoDispose.family<Future<MemDetail>, int?>((ref, memId) => d(
+    Provider.autoDispose.family<Future<MemDetail>, int?>((ref, memId) => v(
           () async {
             final saved = await MemService().save(
               MemDetail(
@@ -97,10 +97,17 @@ final unarchiveMem = Provider.family<Future<MemDetail?>, int?>(
   ),
 );
 
-final removedMem =
+final removedMemProvider =
     StateNotifierProvider.family<ValueStateNotifier<Mem?>, Mem?, int>(
   (ref, memId) => v(
     () => ValueStateNotifier<Mem?>(null),
+    memId,
+  ),
+);
+final removedMemItemsProvider = StateNotifierProvider.family<
+    ValueStateNotifier<List<MemItem>?>, List<MemItem>?, int>(
+  (ref, memId) => v(
+    () => ValueStateNotifier<List<MemItem>?>(null),
     memId,
   ),
 );
@@ -111,11 +118,15 @@ final removeMem = Provider.family<Future<bool>, int?>(
       if (memId != null) {
         final removeSuccess = await MemService().remove(memId);
 
-        ref.read(removedMem(memId).notifier).updatedBy(
+        ref.read(removedMemProvider(memId).notifier).updatedBy(
               ref
                   .read(memListProvider)
                   .firstWhere((element) => element.id == memId),
             );
+        ref.read(removedMemItemsProvider(memId).notifier).updatedBy(
+              ref.read(memItemsProvider(memId)),
+            );
+
         ref
             .read(rawMemListProvider.notifier)
             .removeWhere((element) => element.id == memId);

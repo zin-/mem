@@ -8,11 +8,11 @@ import 'package:mem/mems/mem_service.dart';
 final undoRemoveMem = FutureProvider.autoDispose.family<void, int>(
   (ref, memId) => v(
     () async {
-      final removed = ref.watch(removedMem(memId));
+      final removedMem = ref.watch(removedMemProvider(memId));
 
-      if (removed != null) {
-        final memItems = ref.read(memItemsProvider(memId)) ?? [];
-        final memDetail = MemDetail(removed, memItems);
+      if (removedMem != null) {
+        final removedMemItems = ref.read(removedMemItemsProvider(memId)) ?? [];
+        final memDetail = MemDetail(removedMem, removedMemItems);
 
         final removeUndone = await MemService().save(memDetail, undo: true);
 
