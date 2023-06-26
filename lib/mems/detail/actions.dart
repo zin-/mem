@@ -3,7 +3,7 @@ import 'package:mem/component/view/mem_list/states.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/gui/value_state_notifier.dart';
-import 'package:mem/logger/log_service_v2.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/mem_service.dart';
 

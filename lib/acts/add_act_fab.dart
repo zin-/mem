@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/act_actions.dart';
 import 'package:mem/acts/act_list_page_states.dart';
 import 'package:mem/core/mem.dart';
-import 'package:mem/logger/log_service_v2.dart';
+import 'package:mem/logger/log_service.dart';
 
 class ActFab extends ConsumerWidget {
   final MemId _memId;

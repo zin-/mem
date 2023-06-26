@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/logger/log_entity.dart';
-import 'package:mem/logger/logger_wrapper_v2.dart';
+import 'package:mem/logger/logger_wrapper.dart';
 
 void main() {
-  final loggerWrapper = LoggerWrapperV2();
+  final loggerWrapper = LoggerWrapper();
 
   for (var level in Level.values) {
     group('level: $level', () {

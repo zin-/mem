@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:home_widget/home_widget.dart';
 import 'package:mem/act_counter/act_counter.dart';
 import 'package:mem/act_counter/home_widget_accessor.dart';
-import 'package:mem/logger/log_service_v2.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/_repository_v2.dart';
 
 import '../main.dart';

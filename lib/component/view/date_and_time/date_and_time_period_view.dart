@@ -4,7 +4,7 @@ import 'package:mem/core/date_and_time.dart';
 import 'package:mem/core/date_and_time_period.dart';
 import 'package:mem/gui/date_and_time_text_form_field.dart';
 import 'package:mem/gui/date_and_time_view.dart';
-import 'package:mem/logger/log_service_v2.dart';
+import 'package:mem/logger/log_service.dart';
 
 class DateAndTimePeriodTexts extends StatelessWidget {
   final DateAndTimePeriod _dateAndTimePeriod;

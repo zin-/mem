@@ -2,7 +2,7 @@ import 'package:logger/logger.dart';
 
 import 'log_entity.dart' as log_entity;
 
-class LoggerWrapperV2 {
+class LoggerWrapper {
   final Logger _logger;
 
   void log(
@@ -18,7 +18,7 @@ class LoggerWrapperV2 {
         stackTrace,
       );
 
-  LoggerWrapperV2()
+  LoggerWrapper()
       : _logger = Logger(
           filter: DevelopmentFilter(),
           printer: _LogPrinter(),

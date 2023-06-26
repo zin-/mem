@@ -1,9 +1,9 @@
 import 'package:mem/framework/repository_v3.dart';
 import 'package:mem/logger/log_entity.dart';
-import 'package:mem/logger/logger_wrapper_v2.dart';
+import 'package:mem/logger/logger_wrapper.dart';
 
-class LogRepositoryV2 extends RepositoryV3<Log, void> {
-  LoggerWrapperV2 _loggerWrapper;
+class LogRepository extends RepositoryV3<Log, void> {
+  LoggerWrapper _loggerWrapper;
 
   @override
   void receive(Log payload) => _loggerWrapper.log(
@@ -13,16 +13,16 @@ class LogRepositoryV2 extends RepositoryV3<Log, void> {
         payload.stackTrace,
       );
 
-  LogRepositoryV2._(this._loggerWrapper);
+  LogRepository._(this._loggerWrapper);
 
-  static LogRepositoryV2? _instance;
+  static LogRepository? _instance;
 
-  factory LogRepositoryV2(LoggerWrapperV2 loggerWrapperV2) {
+  factory LogRepository(LoggerWrapper loggerWrapper) {
     var tmp = _instance;
 
     if (tmp == null) {
-      _instance = tmp = LogRepositoryV2._(
-        loggerWrapperV2,
+      _instance = tmp = LogRepository._(
+        loggerWrapper,
       );
     }
 

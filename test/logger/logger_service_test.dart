@@ -1,14 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/logger/log_entity.dart';
-import 'package:mem/logger/log_repository_v2.dart';
-import 'package:mem/logger/log_service_v2.dart';
+import 'package:mem/logger/log_repository.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mockito/mockito.dart';
 
 import '../helpers.mocks.dart';
 
 void main() {
-  final mockedLoggerWrapper = MockLoggerWrapperV2();
-  LogRepositoryV2(mockedLoggerWrapper);
+  final mockedLoggerWrapper = MockLoggerWrapper();
+  LogRepository(mockedLoggerWrapper);
 
   setUp(() {
     reset(mockedLoggerWrapper);

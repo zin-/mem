@@ -5,7 +5,7 @@ import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time.dart';
 import 'package:mem/core/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
-import 'package:mem/logger/log_service_v2.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 
 class ActCounterService {

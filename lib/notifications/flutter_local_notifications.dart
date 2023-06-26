@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:mem/logger/log_service_v2.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
 import 'package:mem/notifications/notification.dart';
 import 'package:mem/notifications/notification_service.dart';

@@ -1,5 +1,5 @@
 import 'package:mem/framework/repository_v3.dart';
-import 'package:mem/logger/log_service_v2.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/flutter_local_notifications.dart';
 import 'package:mem/notifications/notification.dart';
 import 'package:timezone/data/latest_all.dart' as tz;

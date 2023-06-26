@@ -7,7 +7,7 @@ import 'package:mem/component/view/timer.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/gui/colors.dart';
-import 'package:mem/logger/log_service_v2.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_list_view_state.dart';
 import 'package:mem/mems/mem_period.dart';
 

@@ -1,61 +1,61 @@
 import 'dart:async';
 
 import 'package:mem/logger/log_entity.dart';
-import 'package:mem/logger/log_repository_v2.dart';
-import 'package:mem/logger/logger_wrapper_v2.dart';
+import 'package:mem/logger/log_repository.dart';
+import 'package:mem/logger/logger_wrapper.dart';
 
 T verbose<T>(
   T target, [
   dynamic meta,
 ]) =>
-    LogServiceV2()._log(Level.verbose, target, meta, null, []);
+    LogService()._log(Level.verbose, target, meta, null, []);
 
 T info<T>(
   T target, [
   dynamic meta,
 ]) =>
-    LogServiceV2()._log(Level.info, target, meta, null, []);
+    LogService()._log(Level.info, target, meta, null, []);
 
 T warn<T>(
   T target, [
   dynamic meta,
 ]) =>
-    LogServiceV2()._log(Level.warning, target, meta, null, []);
+    LogService()._log(Level.warning, target, meta, null, []);
 
 @Deprecated('For development only')
 T debug<T>(
   T target, [
   dynamic meta,
 ]) =>
-    LogServiceV2()._log(Level.debug, target, meta, null, []);
+    LogService()._log(Level.debug, target, meta, null, []);
 
 T v<T>(
   T Function() target, [
   dynamic meta,
 ]) =>
-    LogServiceV2()._functionLog(Level.verbose, target, meta);
+    LogService()._functionLog(Level.verbose, target, meta);
 
 T i<T>(
   T Function() target, [
   dynamic meta,
 ]) =>
-    LogServiceV2()._functionLog(Level.info, target, meta);
+    LogService()._functionLog(Level.info, target, meta);
 
 T w<T>(
   T Function() target, [
   dynamic meta,
 ]) =>
-    LogServiceV2()._functionLog(Level.warning, target, meta);
+    LogService()._functionLog(Level.warning, target, meta);
 
 @Deprecated('For development only')
 T d<T>(
   T Function() target, [
   dynamic meta,
 ]) =>
-    LogServiceV2()._functionLog(Level.debug, target, meta);
+    LogService()._functionLog(Level.debug, target, meta);
 
-class LogServiceV2 {
-  final LogRepositoryV2 _logRepositoryV2;
+class LogService {
+  final LogRepository _logRepository;
   final Level _level;
 
   dynamic _log(
@@ -75,7 +75,7 @@ class LogServiceV2 {
         prefixes.insert(0, '[DEBUG]');
       }
 
-      _logRepositoryV2.receive(Log(
+      _logRepository.receive(Log(
           level,
           [
             prefixes.join(),
@@ -137,22 +137,22 @@ class LogServiceV2 {
   bool _shouldLog(Level level) =>
       DebugLoggableFunction._debug || _level.index <= level.index;
 
-  LogServiceV2._(this._logRepositoryV2, this._level);
+  LogService._(this._logRepository, this._level);
 
-  static LogServiceV2? _instance;
+  static LogService? _instance;
 
-  factory LogServiceV2.initialize(Level level) {
-    return _instance = LogServiceV2._(
-      LogRepositoryV2(LoggerWrapperV2()),
+  factory LogService.initialize(Level level) {
+    return _instance = LogService._(
+      LogRepository(LoggerWrapper()),
       level,
     );
   }
 
-  factory LogServiceV2() {
+  factory LogService() {
     var tmp = _instance;
 
     if (tmp == null) {
-      return LogServiceV2.initialize(Level.info);
+      return LogService.initialize(Level.info);
     } else {
       return tmp;
     }

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/act_counter/select_mem_fab.dart';
 import 'package:mem/gui/l10n.dart';
 import 'package:mem/component/view/mem_list/view.dart';
-import 'package:mem/logger/log_service_v2.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_list_view_state.dart';
 
 class ActCounterConfigure extends ConsumerWidget {

@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:mem/logger/log_service_v2.dart';
+import 'package:mem/logger/log_service.dart';
 
 /// # Home widget
 ///

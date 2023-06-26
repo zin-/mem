@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/definitions/column_definition.dart';
 import 'package:mem/framework/database/definitions/table_definition.dart';
-import 'package:mem/logger/log_service_v2.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;

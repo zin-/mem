@@ -4,7 +4,7 @@ import 'package:mem/gui/l10n.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/gui/colors.dart';
 import 'package:mem/gui/constants.dart';
-import 'package:mem/logger/log_service_v2.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/actions.dart';
 import 'package:mem/mems/detail/actions.dart';
 import 'package:mem/mems/list/actions.dart';

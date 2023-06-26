@@ -1,5 +1,5 @@
 import 'package:mem/core/mem.dart';
-import 'package:mem/logger/log_service_v2.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_notifications.dart';
 import 'package:mem/mems/mem_service.dart';
 
