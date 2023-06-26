@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:mem/logger/i/api.dart';
+import 'package:mem/logger/log_service_v2.dart';
 
 class DateTextFormField extends StatelessWidget {
   final DateTime? date;
@@ -23,7 +23,6 @@ class DateTextFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => v(
-        {'date': date, 'firstDate': _firstDate, 'lastDate': _lastDate},
         () {
           return TextFormField(
             controller: TextEditingController(
@@ -33,7 +32,6 @@ class DateTextFormField extends StatelessWidget {
               hintText: _dateFormat.pattern,
               suffixIcon: IconButton(
                 onPressed: () => v(
-                  {},
                   () async {
                     var initialDate = date ?? DateTime.now();
                     if (_lastDate?.compareTo(initialDate) == -1) {
@@ -60,5 +58,6 @@ class DateTextFormField extends StatelessWidget {
             keyboardType: TextInputType.datetime,
           );
         },
+        {'date': date, 'firstDate': _firstDate, 'lastDate': _lastDate},
       );
 }

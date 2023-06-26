@@ -3,7 +3,6 @@ import 'package:mem/component/view/mem_list/states.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/gui/value_state_notifier.dart';
-import 'package:mem/logger/i/api.dart' as v1;
 import 'package:mem/logger/log_service_v2.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/mem_service.dart';
@@ -62,8 +61,7 @@ final saveMem =
         ));
 
 final archiveMem = Provider.family<Future<MemDetail?>, int?>(
-  (ref, memId) => v1.v(
-    {'memId': memId},
+  (ref, memId) => v(
     () async {
       final mem = ref.read(editingMemProvider(memId));
 
@@ -76,12 +74,12 @@ final archiveMem = Provider.family<Future<MemDetail?>, int?>(
 
       return archived;
     },
+    {'memId': memId},
   ),
 );
 
 final unarchiveMem = Provider.family<Future<MemDetail?>, int?>(
-  (ref, memId) => v1.v(
-    {'memId': memId},
+  (ref, memId) => v(
     () async {
       final mem = ref.read(editingMemProvider(memId));
 
@@ -94,6 +92,7 @@ final unarchiveMem = Provider.family<Future<MemDetail?>, int?>(
 
       return unarchived;
     },
+    {'memId': memId},
   ),
 );
 

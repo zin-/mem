@@ -7,7 +7,7 @@ import 'package:idb_shim/idb.dart' as idb_shim;
 import 'package:idb_shim/idb_browser.dart' as idb_browser;
 import 'package:mem/framework/database/definitions/column_definition.dart';
 import 'package:mem/framework/database/database.dart';
-import 'package:mem/logger/i/api.dart';
+import 'package:mem/logger/log_service_v2.dart';
 
 class IndexedDatabase extends Database {
   IndexedDatabase(super.definition) {
@@ -22,15 +22,14 @@ class IndexedDatabase extends Database {
 
   @override
   Future<IndexedDatabase> open() => v(
-        {},
         () async {
           _database = await _factory.open(
             definition.name,
             version: definition.version,
             onUpgradeNeeded: (event) {
-              trace('Create Database. $definition');
+              info('Create Database. $definition');
               for (var tableDefinition in definition.tableDefinitions) {
-                trace('Create object. $tableDefinition');
+                info('Create object. $tableDefinition');
                 event.database.createObjectStore(
                   tableDefinition.name,
                   autoIncrement: tableDefinition.columns
@@ -56,7 +55,6 @@ class IndexedDatabase extends Database {
 
   @override
   Future<bool> close() => v(
-        {},
         () async => await onOpened(
           () {
             _database.close();
@@ -76,7 +74,6 @@ class IndexedDatabase extends Database {
 
   @override
   Future<bool> delete() => v(
-        {},
         () async => await checkExists(
           () async {
             await close();
@@ -126,11 +123,11 @@ class ObjectStore extends Table {
 
   ObjectStore(super.definition, this._database);
 
-  late final _pkColumn = definition.columns.whereType<PrimaryKeyDefinition>().first;
+  late final _pkColumn =
+      definition.columns.whereType<PrimaryKeyDefinition>().first;
 
   @override
   Future<int> insert(Map<String, dynamic> valueMap) => v(
-        {'valueMap': valueMap},
         () async => await _database.onOpened(
           () async {
             final defFks = definition.columns.whereType<ForeignKeyDefinition>();
@@ -173,6 +170,7 @@ class ObjectStore extends Table {
           },
           () => throw DatabaseDoesNotExistException(_database.definition.name),
         ),
+        {'valueMap': valueMap},
       );
 
   @override
@@ -181,7 +179,6 @@ class ObjectStore extends Table {
     Iterable<dynamic>? whereArgs,
   }) =>
       v(
-        {'where': whereString, 'whereArgs': whereArgs},
         () async => await _database.onOpened(
           () async {
             // TODO implements where
@@ -198,11 +195,11 @@ class ObjectStore extends Table {
           },
           () => throw DatabaseDoesNotExistException(_database.definition.name),
         ),
+        {'where': whereString, 'whereArgs': whereArgs},
       );
 
   @override
   Future<Map<String, dynamic>> selectByPk(pk) => v(
-        {'pk': pk},
         () async => await _database.onOpened(
           () async {
             final txn = _database._database
@@ -223,11 +220,11 @@ class ObjectStore extends Table {
           },
           () => throw DatabaseDoesNotExistException(_database.definition.name),
         ),
+        {'pk': pk},
       );
 
   @override
   Future<int> updateByPk(pk, Map<String, dynamic> value) => v(
-        {'pk': pk, 'value': value},
         () async => await _database.onOpened(
           () async {
             final txn = _database._database
@@ -255,6 +252,7 @@ class ObjectStore extends Table {
           },
           () => throw DatabaseDoesNotExistException(_database.definition.name),
         ),
+        {'pk': pk, 'value': value},
       );
 
   @override
@@ -265,7 +263,6 @@ class ObjectStore extends Table {
 
   @override
   Future<int> deleteByPk(pk) => v(
-        {'pk': pk},
         () async => await _database.onOpened(
           () async {
             final txn = _database._database
@@ -279,11 +276,11 @@ class ObjectStore extends Table {
           },
           () => throw DatabaseDoesNotExistException(_database.definition.name),
         ),
+        {'pk': pk},
       );
 
   @override
   Future<int> delete() => v(
-        {},
         () async => await _database.onOpened(
           () async {
             final txn = _database._database

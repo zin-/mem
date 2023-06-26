@@ -1,6 +1,5 @@
 import 'package:mem/framework/repository_v3.dart';
-import 'package:mem/logger/i/api.dart';
-import 'package:mem/logger/log_service_v2.dart' as v2;
+import 'package:mem/logger/log_service_v2.dart';
 import 'package:mem/notifications/flutter_local_notifications.dart';
 import 'package:mem/notifications/notification.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -25,7 +24,6 @@ class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
     Function(int memId)? showMemDetailPage,
   ) =>
       v(
-        {},
         () async {
 // FIXME 現時点では、通知に対する操作をテストで実行できない
 // coverage:ignore-start
@@ -69,7 +67,7 @@ class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
   Future<void> receive(
     Notification payload,
   ) =>
-      v2.v(
+      v(
         () async {
           if (payload is OneTimeNotification) {
             await _flutterLocalNotificationsWrapper.zonedSchedule(
@@ -91,8 +89,8 @@ class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
       );
 
   Future<void> discard(int id) => v(
-        {'id': id},
         () async => _flutterLocalNotificationsWrapper.cancel(id),
+        {'id': id},
       );
 
   NotificationRepository._(this._flutterLocalNotificationsWrapper);

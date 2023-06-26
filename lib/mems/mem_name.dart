@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mem/gui/hero_view.dart';
 import 'package:mem/gui/l10n.dart';
-import 'package:mem/logger/i/api.dart';
+import 'package:mem/logger/log_service_v2.dart';
 
 String memNameTag(int? memId) => heroTag('mem-name', memId);
 
@@ -13,7 +13,6 @@ class MemNameText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => v(
-        {'_memName': _memName, '_memId': _memId},
         () => HeroView(
           memNameTag(_memId),
           Text(
@@ -22,6 +21,7 @@ class MemNameText extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
         ),
+        {'_memName': _memName, '_memId': _memId},
       );
 }
 
@@ -39,11 +39,6 @@ class MemNameTextFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => v(
-        {
-          '_memName': _memName,
-          '_memId': _memId,
-          '_onChanged': _onChanged,
-        },
         () => HeroView(
           memNameTag(_memId),
           TextFormField(
@@ -56,5 +51,10 @@ class MemNameTextFormField extends StatelessWidget {
             onChanged: _onChanged,
           ),
         ),
+        {
+          '_memName': _memName,
+          '_memId': _memId,
+          '_onChanged': _onChanged,
+        },
       );
 }

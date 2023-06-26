@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/logger/i/api.dart';
 import 'package:mem/gui/constants.dart';
+import 'package:mem/logger/log_service_v2.dart';
 import 'package:mem/mems/list/page.dart';
 
 class ShowNewMemFab extends StatefulWidget {
@@ -22,7 +22,6 @@ class _ShowNewMemFabState extends State<ShowNewMemFab>
   void initState() {
     super.initState();
     widget._scrollController.addListener(() => v(
-          {'_show': _show},
           () {
             if (widget._scrollController.position.userScrollDirection ==
                     ScrollDirection.forward &&
@@ -38,12 +37,12 @@ class _ShowNewMemFabState extends State<ShowNewMemFab>
               });
             }
           },
+          {'_show': _show},
         ));
   }
 
   @override
   Widget build(BuildContext context) => v(
-        {'_show': _show},
         () => AnimatedSlide(
           offset: _show ? Offset.zero : const Offset(0, 1),
           duration: defaultTransitionDuration,
@@ -60,5 +59,6 @@ class _ShowNewMemFabState extends State<ShowNewMemFab>
             ),
           ),
         ),
+        {'_show': _show},
       );
 }

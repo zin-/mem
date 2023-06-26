@@ -4,7 +4,7 @@ import 'package:mem/core/mem_item.dart';
 import 'package:mem/database/table_definitions/base.dart';
 import 'package:mem/database/table_definitions/mem_items.dart';
 import 'package:mem/framework/database/database.dart';
-import 'package:mem/logger/i/api.dart';
+import 'package:mem/logger/log_service_v2.dart';
 import 'package:mem/mems/mem_item_entity_v2.dart';
 import 'package:mem/repositories/i/_database_tuple_repository_v2.dart';
 import 'package:mem/repositories/i/conditions.dart';
@@ -12,33 +12,33 @@ import 'package:mem/repositories/i/conditions.dart';
 class MemItemRepository
     extends DatabaseTupleRepository<MemItemEntity, MemItem> {
   Future<Iterable<MemItem>> shipByMemId(MemId memId) => v(
-        {'memId': memId},
         () => super.ship(Equals(memIdFkDef.name, memId)),
+        {'memId': memId},
       );
 
   Future<Iterable<MemItem>> archiveByMemId(MemId memId) => v(
-        {'memId': memId},
         () async => Future.wait(
             (await shipByMemId(memId)).map((e) => super.archive(e))),
+        {'memId': memId},
       );
 
   Future<Iterable<MemItem>> unarchiveByMemId(MemId memId) => v(
-        {'memId': memId},
         () async => Future.wait(
             (await shipByMemId(memId)).map((e) => super.unarchive(e))),
+        {'memId': memId},
       );
 
   Future<Iterable<MemItem>> wasteByMemId(MemId memId) => v(
-        {'memId': memId},
         () async => Future.wait(
             (await shipByMemId(memId)).map((e) => super.wasteById(e.id))),
+        {'memId': memId},
       );
 
   @override
   UnpackedPayload unpack(MemItem payload) => {
         memIdFkDef.name: payload.memId,
         memItemTypeColDef.name: payload.type.name,
-    memItemValueColDef.name: payload.value,
+        memItemValueColDef.name: payload.value,
         idPKDef.name: payload.id,
         createdAtColDef.name: payload.createdAt,
         updatedAtColDef.name: payload.updatedAt,

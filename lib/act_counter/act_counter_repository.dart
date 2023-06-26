@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:home_widget/home_widget.dart';
 import 'package:mem/act_counter/act_counter.dart';
 import 'package:mem/act_counter/home_widget_accessor.dart';
-import 'package:mem/logger/i/api.dart';
+import 'package:mem/logger/log_service_v2.dart';
 import 'package:mem/repositories/_repository_v2.dart';
 
 import '../main.dart';
@@ -18,7 +18,6 @@ class ActCounterRepository extends RepositoryV2<ActCounter, ActCounter> {
 
   @override
   Future<ActCounter> receive(ActCounter payload) => v(
-        {'payload': payload},
         () async {
           final homeWidgetId = await _homeWidgetAccessor.initialize(
             methodChannelName,
@@ -35,11 +34,11 @@ class ActCounterRepository extends RepositoryV2<ActCounter, ActCounter> {
 
           return payload;
         },
+        {'payload': payload},
       );
 
   @override
   Future<ActCounter> replace(ActCounter payload) => v(
-        {'payload': payload},
         () async {
           payload.widgetData().forEach((key, value) async {
             await _homeWidgetAccessor.saveWidgetData(key, value);
@@ -49,6 +48,7 @@ class ActCounterRepository extends RepositoryV2<ActCounter, ActCounter> {
 
           return payload;
         },
+        {'payload': payload},
       );
 
   ActCounterRepository._(this._homeWidgetAccessor);
