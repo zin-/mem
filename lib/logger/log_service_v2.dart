@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:mem/logger/i/api.dart';
-import 'package:mem/logger/i/type.dart' as v1;
 import 'package:mem/logger/log_entity.dart';
 import 'package:mem/logger/log_repository_v2.dart';
 import 'package:mem/logger/logger_wrapper_v2.dart';
@@ -144,10 +142,6 @@ class LogServiceV2 {
   static LogServiceV2? _instance;
 
   factory LogServiceV2.initialize(Level level) {
-    if (level == Level.verbose) {
-      initializeLogger(v1.Level.verbose);
-    }
-
     return _instance = LogServiceV2._(
       LogRepositoryV2(LoggerWrapperV2()),
       level,
