@@ -1,6 +1,6 @@
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_item.dart';
-import 'package:mem/logger/i/api.dart';
+import 'package:mem/logger/log_service_v2.dart';
 import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/notifications/notification_repository.dart';
@@ -49,8 +49,7 @@ class MemService {
     return tmp;
   }
 
-  Future<MemDetail> save(MemDetail memDetail, {bool undo = false}) => t(
-        {'memDetail': memDetail},
+  Future<MemDetail> save(MemDetail memDetail, {bool undo = false}) => i(
         () async {
           Mem savedMem;
           if (memDetail.mem.isSaved() && !undo) {
@@ -73,36 +72,36 @@ class MemService {
             savedMemItems,
           );
         },
+        {'memDetail': memDetail},
       );
 
-  Future<MemDetail> doneByMemId(int memId) => t(
-        {'memId': memId},
+  Future<MemDetail> doneByMemId(int memId) => i(
         () async => save(MemDetail(
           (await fetchMemById(memId))..doneAt = DateTime.now(),
           [],
         )),
+        {'memId': memId},
       );
 
-  Future<MemDetail> undoneByMemId(int memId) => t(
-        {'memId': memId},
+  Future<MemDetail> undoneByMemId(int memId) => i(
         () async => save(MemDetail(
           (await fetchMemById(memId))..doneAt = null,
           [],
         )),
+        {'memId': memId},
       );
 
-  Future<Mem> fetchMemById(int memId) => t(
-        {'memId': memId},
+  Future<Mem> fetchMemById(int memId) => i(
         () => _memRepository.shipById(memId),
-      );
-
-  Future<List<MemItem>> fetchMemItemsByMemId(int memId) => t(
         {'memId': memId},
-        () async => (await _memItemRepository.shipByMemId(memId)).toList(),
       );
 
-  Future<MemDetail> archive(Mem mem) => t(
-        {'mem': mem},
+  Future<List<MemItem>> fetchMemItemsByMemId(int memId) => i(
+        () async => (await _memItemRepository.shipByMemId(memId)).toList(),
+        {'memId': memId},
+      );
+
+  Future<MemDetail> archive(Mem mem) => i(
         () async {
           final archivedMem = await _memRepository.archive(mem);
           final archivedMemItems =
@@ -116,10 +115,10 @@ class MemService {
             archivedMemItems,
           );
         },
+        {'mem': mem},
       );
 
-  Future<MemDetail> unarchive(Mem mem) => t(
-        {'mem': mem},
+  Future<MemDetail> unarchive(Mem mem) => i(
         () async {
           final unarchivedMem = await _memRepository.unarchive(mem);
           final unarchivedMemItems =
@@ -133,10 +132,10 @@ class MemService {
             unarchivedMemItems,
           );
         },
+        {'mem': mem},
       );
 
-  Future<bool> remove(int memId) => t(
-        {'memId': memId},
+  Future<bool> remove(int memId) => i(
         () async {
           await _memItemRepository.wasteByMemId(memId);
           await _memRepository.wasteById(memId);
@@ -147,6 +146,7 @@ class MemService {
 
           return true;
         },
+        {'memId': memId},
       );
 
   static void reset(MemService? memService) {

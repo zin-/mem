@@ -18,22 +18,6 @@ void initializeLogger([Level? logLevel]) {
   );
 }
 
-// TODO argumentsを渡さなくても引数がログに表示されるようにしたい
-// T vV2<T>(T Function() function) {
-//   return function();
-// }
-
-T t<T>(
-  Map<String, dynamic>? args,
-  T Function() function, {
-  @Deprecated('Allow under develop only') bool debug = false,
-}) =>
-    _logService.functionLog(
-      function,
-      arguments: args,
-      level: debug ? Level.debug : Level.trace,
-    );
-
 T verbose<T>(T message) {
   _logService.log(message, level: Level.verbose);
   return message;

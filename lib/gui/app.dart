@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/gui/l10n.dart';
-import 'package:mem/logger/i/api.dart';
 import 'package:mem/gui/colors.dart';
+import 'package:mem/logger/log_service_v2.dart';
 
 class MemApplication extends StatelessWidget {
   final Widget home;
@@ -12,8 +12,7 @@ class MemApplication extends StatelessWidget {
       : super(key: key);
 
   @override
-  Widget build(BuildContext context) => t(
-        {},
+  Widget build(BuildContext context) => i(
         () => ProviderScope(
           child: MaterialApp(
             onGenerateTitle: (context) => L10n(context).appTitle(),

@@ -3,7 +3,7 @@ import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/definitions/definition.dart';
 import 'package:mem/framework/database/indexed_database.dart';
 import 'package:mem/framework/database/sqlite_database.dart';
-import 'package:mem/logger/i/api.dart';
+import 'package:mem/logger/log_service_v2.dart';
 
 // FIXME Managerであることが分からない実装にしたい
 // 具体的には、Databaseクラスのfactoryだけで完結させたい
@@ -15,11 +15,10 @@ class DatabaseManager {
   Future<Database> open(
     DatabaseDefinition definition,
   ) =>
-      t(
-        {'definition': definition},
+      i(
         () async {
           // FIXME ログの出し方が気持ち悪い
-          final dbName = trace(_dbName(definition.name));
+          final dbName = info(_dbName(definition.name));
           definition = DatabaseDefinition(
               dbName, definition.version, definition.tableDefinitions);
 
@@ -36,14 +35,14 @@ class DatabaseManager {
           }
           return _databases[dbName]!;
         },
+        {'definition': definition},
       );
 
-  Future<bool> close(String name) => t(
-        {'name': _dbName(name)},
+  Future<bool> close(String name) => i(
         () async {
           final dbName = _dbName(name);
           if (_databases.containsKey(dbName)) {
-            trace('Close database. name: $dbName');
+            info('Close database. name: $dbName');
             final closeResult = await _databases[dbName]!.close();
             _databases.remove(dbName);
             return closeResult;
@@ -52,14 +51,14 @@ class DatabaseManager {
             return false;
           }
         },
+        {'name': _dbName(name)},
       );
 
-  Future<bool> delete(String name) => t(
-        {'name': _dbName(name)},
+  Future<bool> delete(String name) => i(
         () async {
           final dbName = _dbName(name);
           if (_databases.containsKey(dbName)) {
-            trace('Delete database. name: $dbName');
+            info('Delete database. name: $dbName');
             final deleteResult = await _databases[dbName]!.delete();
             if (deleteResult) {
               _databases.remove(dbName);
@@ -72,6 +71,7 @@ class DatabaseManager {
             return false;
           }
         },
+        {'name': _dbName(name)},
       );
 
   String _dbName(name) => _onTest ? 'test-$name' : name;
