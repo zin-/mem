@@ -6,8 +6,7 @@ import 'package:mem/core/errors.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/database/table_definitions/acts.dart';
 import 'package:mem/framework/database/database.dart';
-import 'package:mem/logger/i/api.dart';
-import 'package:mem/logger/log_service_v2.dart' as v2;
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/i/_database_tuple_repository_v2.dart';
 import 'package:mem/repositories/i/conditions.dart';
 
@@ -17,7 +16,6 @@ class ActRepository extends DatabaseTupleRepository<ActEntity, Act> {
     DateAndTimePeriod? period,
   }) =>
       v(
-        {'memId': memId, 'period': period},
         () async {
           if (period == null) {
             return await ship(Equals(fkDefMemId.name, memId));
@@ -29,9 +27,10 @@ class ActRepository extends DatabaseTupleRepository<ActEntity, Act> {
             ]));
           }
         },
+        {'memId': memId, 'period': period},
       );
 
-  Future<List<Act>> shipActive() => v2.v(
+  Future<List<Act>> shipActive() => v(
         () async => await ship(IsNull(defActEnd.name)),
       );
 

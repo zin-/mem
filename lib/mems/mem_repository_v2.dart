@@ -5,31 +5,32 @@ import 'package:mem/core/mem.dart';
 import 'package:mem/database/table_definitions/base.dart';
 import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/database.dart' as db;
-import 'package:mem/logger/i/api.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/i/_database_tuple_repository_v2.dart';
 import 'package:mem/repositories/i/conditions.dart';
 import 'package:mem/repositories/mem_entity.dart';
 
 class MemRepository extends DatabaseTupleRepository<MemEntity, Mem> {
   Future<List<Mem>> shipByCondition(bool? archived, bool? done) => v(
-          {
-            'archived': archived,
-            'done': done,
-          },
-          () => super.ship(
-                And([
-                  archived == null
-                      ? null
-                      : archived
-                          ? IsNotNull(archivedAtColDef.name)
-                          : IsNull(archivedAtColDef.name),
-                  done == null
-                      ? null
-                      : done
-                          ? IsNotNull(defMemDoneAt.name)
-                          : IsNull(defMemDoneAt.name),
-                ].whereType<Condition>()),
-              ));
+        () => super.ship(
+          And([
+            archived == null
+                ? null
+                : archived
+                    ? IsNotNull(archivedAtColDef.name)
+                    : IsNull(archivedAtColDef.name),
+            done == null
+                ? null
+                : done
+                    ? IsNotNull(defMemDoneAt.name)
+                    : IsNull(defMemDoneAt.name),
+          ].whereType<Condition>()),
+        ),
+        {
+          'archived': archived,
+          'done': done,
+        },
+      );
 
   @override
   UnpackedPayload unpack(Mem payload) => {

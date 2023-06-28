@@ -6,18 +6,15 @@ import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time.dart';
 import 'package:mem/core/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
-import 'package:mem/logger/i/api.dart';
-import 'package:mem/logger/i/type.dart';
-import 'package:mem/logger/log_entity.dart' as v2;
-import 'package:mem/logger/log_service_v2.dart';
+import 'package:mem/logger/log_entity.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mockito/mockito.dart';
 
 import '../helpers.dart';
 import '../helpers.mocks.dart';
 
 void main() {
-  initializeLogger(Level.verbose);
-  LogServiceV2.initialize(v2.Level.verbose);
+  LogService.initialize(Level.verbose);
 
   final mockedMemRepository = MockMemRepository();
   final mockedActRepository = MockActRepository();

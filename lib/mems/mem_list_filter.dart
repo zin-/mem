@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/component/view/mem_list/states.dart';
 import 'package:mem/gui/l10n.dart';
-import 'package:mem/logger/i/api.dart';
+import 'package:mem/logger/log_service.dart';
 
 const height = 250.0;
 
@@ -10,8 +10,7 @@ class MemListFilter extends StatelessWidget {
   const MemListFilter({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => t(
-        {},
+  Widget build(BuildContext context) => i(
         () {
           return Consumer(
             builder: (context, ref, child) {

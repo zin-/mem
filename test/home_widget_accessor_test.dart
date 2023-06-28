@@ -1,14 +1,10 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/act_counter/home_widget_accessor.dart';
-import 'package:mem/logger/i/api.dart';
-import 'package:mem/logger/i/type.dart';
 
 import 'helpers.dart';
 
 void main() {
-  initializeLogger(Level.verbose);
-
   final homeWidgetAccessor = HomeWidgetAccessor();
 
   testWidgets(

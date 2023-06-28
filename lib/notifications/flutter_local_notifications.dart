@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:mem/logger/i/api.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
 import 'package:mem/notifications/notification.dart';
 import 'package:mem/notifications/notification_service.dart';
@@ -31,12 +31,6 @@ class FlutterLocalNotificationsWrapper {
     OnNotificationActionTappedCallback? onNotificationActionTappedCallback,
   ) =>
       v(
-        {
-          'androidDefaultIconPath': androidDefaultIconPath,
-          'onNotificationTappedCallback': onNotificationTappedCallback,
-          'onNotificationActionTappedCallback':
-              onNotificationActionTappedCallback,
-        },
         () async {
           if (Platform.isAndroid) {
             return (await _flutterLocalNotificationsPlugin.initialize(
@@ -58,15 +52,18 @@ class FlutterLocalNotificationsWrapper {
 
           return false;
         },
+        {
+          'androidDefaultIconPath': androidDefaultIconPath,
+          'onNotificationTappedCallback': onNotificationTappedCallback,
+          'onNotificationActionTappedCallback':
+              onNotificationActionTappedCallback,
+        },
       );
 
   Future<void> receiveOnLaunchAppNotification(
     OnNotificationTappedCallback onNotificationTapped,
   ) =>
       v(
-        {
-          'onNotificationTapped': onNotificationTapped,
-        },
         () async {
           if (Platform.isAndroid) {
             final notificationAppLaunchDetails =
@@ -92,6 +89,9 @@ class FlutterLocalNotificationsWrapper {
             );
           }
         },
+        {
+          'onNotificationTapped': onNotificationTapped,
+        },
       );
 
   Future<void> zonedSchedule(
@@ -106,16 +106,6 @@ class FlutterLocalNotificationsWrapper {
     String channelDescription,
   ) =>
       v(
-        {
-          'id': id,
-          'title': title,
-          'body': body,
-          'tzDateTime': tzDateTime,
-          'payload': payload,
-          'channelId': channelId,
-          'channelName': channelName,
-          'channelDescription': channelDescription,
-        },
         () async {
           if (Platform.isAndroid) {
             return _flutterLocalNotificationsPlugin.zonedSchedule(
@@ -140,16 +130,26 @@ class FlutterLocalNotificationsWrapper {
             );
           }
         },
+        {
+          'id': id,
+          'title': title,
+          'body': body,
+          'tzDateTime': tzDateTime,
+          'payload': payload,
+          'channelId': channelId,
+          'channelName': channelName,
+          'channelDescription': channelDescription,
+        },
       );
 
   cancel(int id) => v(
-        {
-          'id': id,
-        },
         () {
           if (Platform.isAndroid) {
             _flutterLocalNotificationsPlugin.cancel(id);
           }
+        },
+        {
+          'id': id,
         },
       );
 
@@ -171,8 +171,7 @@ class FlutterLocalNotificationsWrapper {
 void onNotificationTappedBackground(NotificationResponse response) async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  initializeLogger();
-  trace({'response': response});
+  info({'response': response});
 
   await openDatabase();
 

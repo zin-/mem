@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/gui/dimens.dart';
 import 'package:mem/gui/l10n.dart';
-import 'package:mem/logger/i/api.dart';
 import 'package:mem/gui/colors.dart';
 import 'package:mem/gui/constants.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/actions.dart';
 import 'package:mem/mems/detail/body.dart';
 import 'package:mem/mems/detail/menu.dart';
@@ -64,7 +64,6 @@ class _MemDetailPageComponent extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.save_alt),
         onPressed: () => v(
-          {},
           () async {
             if (_formKey.currentState?.validate() ?? false) {
               _saveMem();

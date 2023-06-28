@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mem/logger/i/api.dart';
+import 'package:mem/logger/log_service.dart';
 
 class HeroView extends StatelessWidget {
   final String _tag;
@@ -9,7 +9,6 @@ class HeroView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => v(
-        {'_tag': _tag, '_child': _child},
         () => Hero(
           tag: _tag,
           child: Material(
@@ -17,6 +16,7 @@ class HeroView extends StatelessWidget {
             child: _child,
           ),
         ),
+        {'_tag': _tag, '_child': _child},
       );
 }
 

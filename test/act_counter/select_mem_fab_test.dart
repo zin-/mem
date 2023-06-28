@@ -3,8 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/act_counter/act_counter_service.dart';
 import 'package:mem/act_counter/select_mem_fab.dart';
 import 'package:mem/gui/list_value_state_notifier.dart';
-import 'package:mem/logger/i/api.dart';
-import 'package:mem/logger/i/type.dart';
 import 'package:mem/mems/mem_list_view_state.dart';
 import 'package:mockito/mockito.dart';
 
@@ -13,8 +11,6 @@ import '../helpers.dart';
 import '../helpers.mocks.dart';
 
 void main() {
-  initializeLogger(Level.error);
-
   group('Appearance', () {
     testWidgets(
       'selectedMemIds is empty',

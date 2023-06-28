@@ -1,6 +1,6 @@
 import 'package:mem/database/table_definitions/base.dart';
 import 'package:mem/framework/database/database.dart';
-import 'package:mem/logger/i/api.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/_repository_v2.dart';
 import 'package:mem/repositories/i/types.dart';
 
@@ -21,7 +21,6 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
 
   @override
   Future<P> receive(P payload) => v(
-        {'payload': payload},
         () async {
           final entityMap = unpack(payload);
 
@@ -33,28 +32,28 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
 
           return pack(entityMap);
         },
+        {'payload': payload},
       );
 
   @override
   Future<List<P>> ship([Condition? condition]) => v(
-        {'condition': condition},
         () async => (await _table.select(
           whereString: condition?.whereString(),
           whereArgs: condition?.whereArgs(),
         ))
             .map((e) => pack(e))
             .toList(),
+        {'condition': condition},
       );
 
   @override
   Future<P> shipById(id) => v(
-        {'id': id},
         () async => pack(await _table.selectByPk(id)),
+        {'id': id},
       );
 
   @override
   Future<P> replace(P payload) => v(
-        {'payload': payload},
         () async {
           final entityMap = unpack(payload);
 
@@ -70,11 +69,11 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
 
           return pack(entityMap);
         },
+        {'payload': payload},
       );
 
   @override
   Future<P> archive(P payload) => v(
-        {'payload': payload},
         () async {
           final entityMap = unpack(payload);
 
@@ -87,11 +86,11 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
 
           return pack(entityMap);
         },
+        {'payload': payload},
       );
 
   @override
   Future<P> unarchive(P payload) => v(
-        {'payload': payload},
         () async {
           final entityMap = unpack(payload);
 
@@ -105,15 +104,16 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
 
           return pack(entityMap);
         },
+        {'payload': payload},
       );
 
   @override
   Future<P> wasteById(id) => v(
-        {'id': id},
         () async {
           final payload = await _table.selectByPk(id);
           await _table.deleteByPk(id);
           return pack(payload);
         },
+        {'id': id},
       );
 }

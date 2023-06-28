@@ -1,6 +1,5 @@
-import 'package:mem/logger/i/api.dart';
 import 'package:mem/core/mem.dart';
-import 'package:mem/logger/log_service_v2.dart' as v2;
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_notifications.dart';
 import 'package:mem/mems/mem_service.dart';
 
@@ -11,15 +10,14 @@ const memReminderChannelId = 'reminder';
 class NotificationService {
   final NotificationRepository _notificationRepository;
 
-  Future initialize({Function(int memId)? showMemDetailPage}) => t(
-        {},
+  Future initialize({Function(int memId)? showMemDetailPage}) => i(
         () async => await _notificationRepository.initialize(
           notificationActionHandler,
           showMemDetailPage,
         ),
       );
 
-  Future<void> memReminder(Mem mem) => v2.i(
+  Future<void> memReminder(Mem mem) => i(
         () async {
           // TODO 時間がないときのデフォルト値を設定から取得する
           final memNotifications = MemNotifications(mem, 5, 0);
@@ -60,12 +58,6 @@ Future<void> notificationActionHandler(
   Map<dynamic, dynamic> payload,
 ) =>
     v(
-      {
-        'id': notificationId,
-        'actionId': actionId,
-        'input': input,
-        'payload': payload
-      },
       () async {
         if (actionId == _doneActionId) {
           if (payload.containsKey(memIdKey)) {
@@ -75,6 +67,12 @@ Future<void> notificationActionHandler(
             }
           }
         }
+      },
+      {
+        'id': notificationId,
+        'actionId': actionId,
+        'input': input,
+        'payload': payload
       },
     );
 // coverage:ignore-end

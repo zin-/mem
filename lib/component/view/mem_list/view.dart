@@ -4,7 +4,7 @@ import 'package:mem/component/view/mem_list/actions.dart';
 import 'package:mem/component/view/mem_list/states.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/gui/colors.dart';
-import 'package:mem/logger/i/api.dart';
+import 'package:mem/logger/log_service.dart';
 
 import 'item/view.dart';
 
@@ -55,13 +55,6 @@ class _MemListViewComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => v(
-        {
-          '_appBarTitle': _appBarTitle,
-          '_memList': _memList,
-          '_scrollController': _scrollController,
-          '_appBarActions': _appBarActions,
-          '_onItemTapped': _onItemTapped,
-        },
         () {
           return CustomScrollView(
             controller: _scrollController,
@@ -89,6 +82,13 @@ class _MemListViewComponent extends StatelessWidget {
               ),
             ],
           );
+        },
+        {
+          '_appBarTitle': _appBarTitle,
+          '_memList': _memList,
+          '_scrollController': _scrollController,
+          '_appBarActions': _appBarActions,
+          '_onItemTapped': _onItemTapped,
         },
       );
 }

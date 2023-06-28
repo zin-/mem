@@ -1,90 +1,67 @@
 import 'package:logger/logger.dart';
 
-import 'i/type.dart' as i;
-
-const _filePath = 'mem/wrappers/logger_wrapper.dart';
+import 'log_entity.dart' as log_entity;
 
 class LoggerWrapper {
-  Logger _logger;
-
-  LoggerWrapper._(this._logger);
+  final Logger _logger;
 
   void log(
-    i.Level level,
+    log_entity.Level level,
     dynamic message, [
     dynamic error,
     StackTrace? stackTrace,
   ]) =>
-      _logger.log(level._convert(), message, error, stackTrace);
-
-  static LoggerWrapper? _instance;
-
-  factory LoggerWrapper(
-    i.Level level,
-    bool Function(String line, String filePath)? shouldOutputStackTraceLine,
-  ) {
-    var tmp = _instance;
-    if (tmp == null) {
-      tmp = LoggerWrapper._(
-        Logger(
-          filter: _LogFilter(),
-          printer: _LogPrinter(shouldOutputStackTraceLine),
-          level: level._convert(),
-        ),
+      _logger.log(
+        level._transform(),
+        message,
+        error,
+        stackTrace,
       );
-      _instance = tmp;
-    }
-    return tmp;
-  }
 
-  static reset() => _instance = null;
-}
-
-class _LogFilter extends DevelopmentFilter {
-  @override
-  bool shouldLog(LogEvent event) {
-    if (event.level == Level.debug) {
-      return true;
-    }
-
-    return super.shouldLog(event);
-  }
+  LoggerWrapper()
+      : _logger = Logger(
+          filter: DevelopmentFilter(),
+          printer: _LogPrinter(),
+        );
 }
 
 class _LogPrinter extends PrettyPrinter {
-  final bool Function(String line, String filePath)?
-      _shouldOutputStackTraceLine;
-
-  _LogPrinter(this._shouldOutputStackTraceLine)
-      : super(methodCount: 1, errorMethodCount: 1);
+  _LogPrinter()
+      : super(
+          methodCount: 1,
+          errorMethodCount: 10,
+          printTime: true,
+        );
 
   @override
   String? formatStackTrace(StackTrace? stackTrace, int methodCount) {
-    const n = '\n';
-    final stackTraceLines = stackTrace.toString().split(n);
-    final shouldOutputStackTraceLines = stackTraceLines.where(
-      (line) => _shouldOutputStackTraceLine?.call(line, _filePath) ?? true,
-    );
+    const lineBreak = '\n';
     return super.formatStackTrace(
-      StackTrace.fromString(shouldOutputStackTraceLines.join(n)),
+      StackTrace.fromString(stackTrace
+          .toString()
+          .split(lineBreak)
+          .where(
+            (line) => !line.contains('package:mem/logger'),
+          )
+          .join(lineBreak)),
       methodCount,
     );
   }
 }
 
-extension on i.Level {
-  Level _convert() {
+extension on log_entity.Level {
+  Level _transform() {
     switch (this) {
-      case i.Level.verbose:
+      case log_entity.Level.verbose:
         return Level.verbose;
-      case i.Level.trace:
-        return Level.info;
-      case i.Level.warning:
-        return Level.warning;
-      case i.Level.error:
-        return Level.error;
-      case i.Level.debug:
+      case log_entity.Level.debug:
         return Level.debug;
+      case log_entity.Level.info:
+        return Level.info;
+      case log_entity.Level.warning:
+        return Level.warning;
+      case log_entity.Level.error:
+        return Level.error;
     }
   }
 }

@@ -6,15 +6,11 @@ import 'package:mem/database/table_definitions/base.dart';
 import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/database/definition.dart';
-import 'package:mem/logger/i/type.dart';
-import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
 
 import '../_helpers.dart';
 
 void main() {
-  LogService(Level.verbose);
-
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() async {

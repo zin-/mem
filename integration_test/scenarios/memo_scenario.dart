@@ -92,7 +92,7 @@ void testMemoScenario() => group(
 
               expect(find.text(enteringMemMemoText), findsOneWidget);
               await widgetTester.tap(saveMemFabFinder);
-              await widgetTester.pumpAndSettle();
+              await widgetTester.pump(defaultTransitionDuration);
 
               const saveSuccessText = 'Save success. $enteringMemNameText';
               expect(

@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/definitions/column_definition.dart';
 import 'package:mem/framework/database/definitions/table_definition.dart';
-import 'package:mem/logger/i/api.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
@@ -29,7 +29,6 @@ class SqliteDatabase extends Database {
 
   @override
   Future<SqliteDatabase> open() => v(
-        {},
         () async {
           _database = await _factory.openDatabase(
             await _pathFuture,
@@ -55,7 +54,6 @@ class SqliteDatabase extends Database {
 
   @override
   Future<bool> close() => v(
-        {},
         () async => await onOpened(
           () async {
             await _database.close();
@@ -75,7 +73,6 @@ class SqliteDatabase extends Database {
 
   @override
   Future<bool> delete() => v(
-        {},
         () async => await checkExists(
           () async {
             await _factory.deleteDatabase(await _pathFuture);
@@ -94,7 +91,6 @@ class SqliteDatabase extends Database {
       );
 
   void _initialize() => v(
-        {},
         () {
           Future<String> databaseDirectoryPath;
           if (Platform.isAndroid) {
@@ -127,18 +123,17 @@ class SqliteDatabase extends Database {
           : await onFalse();
 
   _onCreate(db, version) => v(
-        {'db': db, 'version': version},
         () async {
-          trace('Create Database. $definition');
+          info('Create Database. $definition');
           for (var tableDefinition in definition.tableDefinitions) {
-            trace('Create table. $tableDefinition');
+            info('Create table. $tableDefinition');
             await db.execute(tableDefinition.buildCreateTableSql());
           }
         },
+        {'db': db, 'version': version},
       );
 
   _onConfigure(db) => v(
-        {'db': db},
         () async {
           for (var tableDefinition in definition.tableDefinitions) {
             if (!foreignKeyIsEnabled &&
@@ -151,18 +146,14 @@ class SqliteDatabase extends Database {
             }
           }
         },
+        {'db': db},
       );
 
   _onUpgrade(sqflite.Database db, int oldVersion, int newVersion) => v(
-        {
-          'db': db,
-          'oldVersion': oldVersion,
-          'newVersion': newVersion,
-        },
         () async {
           const tmpPrefix = 'tmp_';
 
-          trace('Upgrade Database. $definition from version: $oldVersion');
+          info('Upgrade Database. $definition from version: $oldVersion');
 
           for (var tableDefinition in definition.tableDefinitions) {
             final master = await db.query(
@@ -171,7 +162,7 @@ class SqliteDatabase extends Database {
               whereArgs: ['table', tableDefinition.name],
             );
             if (master.isEmpty) {
-              trace('Create table. $tableDefinition');
+              info('Create table. $tableDefinition');
               await db.execute(tableDefinition.buildCreateTableSql());
             } else {
               if (tableDefinition.buildCreateTableSql() !=
@@ -192,6 +183,11 @@ class SqliteDatabase extends Database {
           }
           await batch.commit();
         },
+        {
+          'db': db,
+          'oldVersion': oldVersion,
+          'newVersion': newVersion,
+        },
       );
 
   Future<void> _alterTable(
@@ -199,7 +195,7 @@ class SqliteDatabase extends Database {
     TableDefinition tableDefinition,
     String tmpPrefix,
   ) async {
-    trace('Alter table. $tableDefinition');
+    info('Alter table. $tableDefinition');
 
     final rows = await db.query(tableDefinition.name);
 
@@ -227,12 +223,12 @@ class SqliteTable extends Table {
 
   @override
   Future<int> insert(Map<String, dynamic> valueMap) => v(
-        {'valueMap': valueMap},
         () async => await _database.onOpened(
           () async => await _database._database
               .insert(definition.name, convertTo(valueMap)),
           () => throw DatabaseDoesNotExistException(_database.definition.name),
         ),
+        {'valueMap': valueMap},
       );
 
   @override
@@ -241,7 +237,6 @@ class SqliteTable extends Table {
     Iterable<dynamic>? whereArgs,
   }) =>
       v(
-        {'where': whereString, 'whereArgs': whereArgs},
         () async => await _database.onOpened(
           () async => (await _database._database.query(
             definition.name,
@@ -253,11 +248,11 @@ class SqliteTable extends Table {
               .toList(),
           () => throw DatabaseDoesNotExistException(_database.definition.name),
         ),
+        {'where': whereString, 'whereArgs': whereArgs},
       );
 
   @override
   Future<Map<String, dynamic>> selectByPk(pk) => v(
-        {'pk': pk},
         () async => await _database.onOpened(
           () async {
             final selectedByPk = await _database._database.query(
@@ -277,11 +272,11 @@ class SqliteTable extends Table {
           },
           () => throw DatabaseDoesNotExistException(_database.definition.name),
         ),
+        {'pk': pk},
       );
 
   @override
   Future<int> updateByPk(pk, Map<String, dynamic> value) => v(
-        {'pk': pk, 'value': value},
         () => _database.onOpened(
           () async {
             final updateCount = await _database._database.update(
@@ -302,6 +297,7 @@ class SqliteTable extends Table {
           },
           () => throw DatabaseDoesNotExistException(_database.definition.name),
         ),
+        {'pk': pk, 'value': value},
       );
 
   @override
@@ -312,7 +308,6 @@ class SqliteTable extends Table {
 
   @override
   Future<int> deleteByPk(pk) => v(
-        {'pk': pk},
         () async => await _database.onOpened(
           () async => await _database._database.delete(
             definition.name,
@@ -321,11 +316,11 @@ class SqliteTable extends Table {
           ),
           () => throw DatabaseDoesNotExistException(_database.definition.name),
         ),
+        {'pk': pk},
       );
 
   @override
   Future<int> delete() => v(
-        {},
         () async => await _database.onOpened(
           () async => await _database._database.delete(definition.name),
           () => throw DatabaseDoesNotExistException(_database.definition.name),

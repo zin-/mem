@@ -7,8 +7,7 @@ import 'package:mem/component/view/timer.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/gui/colors.dart';
-import 'package:mem/logger/i/api.dart';
-import 'package:mem/logger/log_service_v2.dart' as v2;
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_list_view_state.dart';
 import 'package:mem/mems/mem_period.dart';
 
@@ -24,7 +23,6 @@ class MemListItemView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        {'_memId': _memId},
         () {
           final mem =
               ref.watch(memListProvider).firstWhere((_) => _.id == _memId);
@@ -35,10 +33,10 @@ class MemListItemView extends ConsumerWidget {
               mem,
               ref.watch(selectedMemIdsProvider)?.contains(_memId) ?? false,
               (memId) => v(
-                {'memId': memId},
                 () => ref
                     .read(selectedMemIdsProvider.notifier)
                     .updatedBy([memId]),
+                {'memId': memId},
               ),
               key: key,
             );
@@ -54,7 +52,7 @@ class MemListItemView extends ConsumerWidget {
               ref.watch(activeActsProvider)?.singleWhereOrNull(
                     (act) => act.memId == mem.id,
                   ),
-              (activeAct) => v2.v(
+              (activeAct) => v(
                 () async {
                   if (activeAct == null) {
                     ref.read(startAct(_memId));
@@ -68,6 +66,7 @@ class MemListItemView extends ConsumerWidget {
             );
           }
         },
+        {'_memId': _memId},
       );
 }
 

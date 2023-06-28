@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/gui/l10n.dart';
-import 'package:mem/logger/i/api.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/gui/colors.dart';
 import 'package:mem/gui/constants.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/actions.dart';
 import 'package:mem/mems/detail/actions.dart';
 import 'package:mem/mems/list/actions.dart';
@@ -19,8 +19,7 @@ class MemListPage extends ConsumerWidget {
   const MemListPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => t(
-        {},
+  Widget build(BuildContext context, WidgetRef ref) => i(
         () {
           ref.read(
             initialize((memId) => showMemDetailPage(context, ref, memId)),
@@ -76,7 +75,6 @@ class _MemListPageComponent extends StatelessWidget {
 
 // FIXME too long
 void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
-      {'context': context, 'memId': memId},
       () => Navigator.of(context)
           .push<bool?>(
             PageRouteBuilder(
@@ -97,7 +95,6 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
           )
           .then(
             (result) => v(
-              {'result': result},
               () {
                 if (memId != null && result == true) {
                   final removed = ref.read(removedMemProvider(memId));
@@ -131,6 +128,8 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
                   }
                 }
               },
+              {'result': result},
             ),
           ),
+      {'context': context, 'memId': memId},
     );

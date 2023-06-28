@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/act_counter/act_counter_configure_actions.dart';
 import 'package:mem/gui/colors.dart';
-import 'package:mem/logger/i/api.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_list_view_state.dart';
 
 class SelectMemFab extends ConsumerWidget {
@@ -25,8 +25,7 @@ class _SelectMemComponent extends StatelessWidget {
   const _SelectMemComponent(this._selected, this._onPressed);
 
   @override
-  Widget build(BuildContext context) => t(
-        {'_selected': _selected},
+  Widget build(BuildContext context) => i(
         () => FloatingActionButton(
           backgroundColor: _selected ? null : archivedColor,
           onPressed: _selected ? _onPressed : null,
@@ -34,5 +33,6 @@ class _SelectMemComponent extends StatelessWidget {
             Icons.check,
           ),
         ),
+        {'_selected': _selected},
       );
 }
