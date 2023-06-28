@@ -27,3 +27,11 @@ int randomInt([int max = 4294967296]) => Random().nextInt(max);
   ActCounterService,
 ])
 void main() {}
+
+class TestCase<T> {
+  final String name;
+  final T input;
+  final Function(T input) verify;
+
+  TestCase(this.name, this.input, this.verify);
+}

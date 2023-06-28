@@ -1,168 +1,154 @@
-import 'dart:async';
-
 import 'package:mem/logger/log_entity.dart';
 import 'package:mem/logger/log_repository.dart';
 import 'package:mem/logger/logger_wrapper.dart';
 
-T verbose<T>(
-  T target, [
-  dynamic meta,
-]) =>
-    LogService()._log(Level.verbose, target, meta, null, []);
+T verbose<T>(T target) => LogService().valueLog(Level.verbose, target);
 
-T info<T>(
-  T target, [
-  dynamic meta,
-]) =>
-    LogService()._log(Level.info, target, meta, null, []);
+T info<T>(T target) => LogService().valueLog(Level.info, target);
 
-T warn<T>(
-  T target, [
-  dynamic meta,
-]) =>
-    LogService()._log(Level.warning, target, meta, null, []);
+T warn<T>(T target) => LogService().valueLog(Level.warning, target);
 
 @Deprecated('For development only')
-T debug<T>(
-  T target, [
-  dynamic meta,
-]) =>
-    LogService()._log(Level.debug, target, meta, null, []);
+T debug<T>(T target) => LogService().valueLog(Level.debug, target);
 
 T v<T>(
   T Function() target, [
-  dynamic meta,
+  dynamic args,
 ]) =>
-    LogService()._functionLog(Level.verbose, target, meta);
+    LogService().functionLog(Level.verbose, target, args);
 
 T i<T>(
   T Function() target, [
-  dynamic meta,
+  dynamic args,
 ]) =>
-    LogService()._functionLog(Level.info, target, meta);
+    LogService().functionLog(Level.info, target, args);
 
 T w<T>(
   T Function() target, [
-  dynamic meta,
+  dynamic args,
 ]) =>
-    LogService()._functionLog(Level.warning, target, meta);
+    LogService().functionLog(Level.warning, target, args);
 
 @Deprecated('For development only')
 T d<T>(
   T Function() target, [
-  dynamic meta,
+  dynamic args,
 ]) =>
-    LogService()._functionLog(Level.debug, target, meta);
+    LogService().functionLog(Level.debug, target, args);
 
 class LogService {
-  final LogRepository _logRepository;
+  final LogRepository _repository;
   final Level _level;
 
-  dynamic _log(
+  T valueLog<T>(
     Level level,
-    dynamic target,
-    dynamic meta,
+    T target, {
+    List<String>? prefixes,
     StackTrace? stackTrace,
-    List prefixes,
-  ) {
-    if (_shouldLog(level)) {
-      if (target is Future) {
-        _futureLog(level, target, meta, stackTrace, prefixes);
-        return target;
-      }
-
-      if (DebugLoggableFunction._debug) {
-        prefixes.insert(0, '[DEBUG]');
-      }
-
-      _logRepository.receive(Log(
+    bool autoDebug = false,
+  }) {
+    final tmpPrefixes = prefixes ?? [];
+    if (target is Future) {
+      _futureLog(level, target, tmpPrefixes);
+    } else {
+      if (autoDebug || _shouldLog(level)) {
+        if (autoDebug || _DebugLoggableFunction._debug) {
+          tmpPrefixes.insert(0, '** [AUTO DEBUG] ** ');
+        }
+        _repository.receive(Log(
           level,
           [
-            prefixes.join(),
-            target.toString(),
+            tmpPrefixes.join(),
+            target ?? 'no message.',
           ].join(),
-          meta,
-          stackTrace));
+          null,
+          stackTrace,
+        ));
+      }
     }
 
     return target;
   }
 
-  Future<Result> _futureLog<Result>(
-    Level level,
-    Future<Result> target,
-    dynamic meta,
-    StackTrace? stackTrace, [
-    List? prefixes,
-  ]) async {
-    if (_shouldLog(level)) {
-      final currentStackTrace = StackTrace.current;
-      final result = await target;
+  T functionLog<T>(Level level, T Function() function, [dynamic args]) {
+    valueLog(level, args.toString(), prefixes: ['[start] :: ']);
 
-      _log(
-        level,
-        result,
-        meta,
-        currentStackTrace,
-        (prefixes ?? [])..add('[future] => '),
-      );
-    }
-
-    return target;
-  }
-
-  Result _functionLog<Result>(
-    Level level,
-    Result Function() function,
-    dynamic args,
-  ) {
     try {
-      if (_shouldLog(level)) {
-        _log(level, args, null, null, ['[start] :: ']);
-      }
+      final result = function._callWithDebug(level == Level.debug);
 
-      final result = function.callWithDebug(level == Level.debug);
+      valueLog(level, result, prefixes: ['[end] => ']);
 
-      if (_shouldLog(level)) {
-        _log(level, result, null, null, ['[ end ] => ']);
-      }
       return result;
-    } catch (e) {
-      _log(Level.error, 'Thrown is caught.', e, null, []);
+    } catch (e, stackTrace) {
+      _errorLog(e, stackTrace);
       rethrow;
     }
   }
 
-  // TODO Widgetのbuildを自動debugログの対象にする
-  bool _shouldLog(Level level) =>
-      DebugLoggableFunction._debug || _level.index <= level.index;
+  void _futureLog<T>(
+    Level level,
+    Future<T> target,
+    List<String>? prefixes,
+  ) {
+    if (_shouldLog(level)) {
+      final currentStackTrace = StackTrace.current;
+      final autoDebug = _DebugLoggableFunction._debug;
 
-  LogService._(this._logRepository, this._level);
+      target.then(
+        (value) => valueLog(
+          level,
+          value,
+          prefixes: (prefixes ?? [])..add('[future] >> '),
+          stackTrace: currentStackTrace,
+          autoDebug: autoDebug,
+        ),
+        onError: (error, stackTrace) => _errorLog(error, stackTrace),
+      );
+    } else {
+      target.then(
+        (value) {},
+        onError: (error, stackTrace) => _errorLog(error, stackTrace),
+      );
+    }
+  }
+
+  _errorLog(dynamic e, [StackTrace? stackTrace]) => _repository.receive(
+        Log(
+          Level.error,
+          '[error] !!',
+          e,
+          stackTrace,
+        ),
+      );
+
+  bool _shouldLog(Level level) =>
+      _DebugLoggableFunction._debug || level.index >= _level.index;
+
+  LogService._(this._repository, this._level);
 
   static LogService? _instance;
 
-  factory LogService.initialize(Level level) {
-    return _instance = LogService._(
-      LogRepository(LoggerWrapper()),
-      level,
-    );
-  }
+  factory LogService.initialize([Level level = Level.info]) =>
+      _instance = LogService._(
+        LogRepository(LoggerWrapper()),
+        level,
+      );
 
   factory LogService() {
     var tmp = _instance;
 
     if (tmp == null) {
-      return LogService.initialize(Level.info);
+      return LogService.initialize();
     } else {
       return tmp;
     }
   }
 }
 
-extension DebugLoggableFunction on Function {
+extension _DebugLoggableFunction on Function {
   static bool _debug = false;
 
-  callWithDebug(bool debug) {
+  _callWithDebug(bool debug) {
     _debug = _debug || debug;
     final result = call();
     if (debug) _debug = false;
