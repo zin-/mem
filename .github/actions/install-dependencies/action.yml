@@ -8,12 +8,12 @@ runs:
       uses: actions/cache@v3
       with:
         path: |
-          .flutter-plugins
-          .flutter-plugin-dependencies
-          .dart_tool/package_config.json
-          ${{ env.PUB_CACHE }}/.pub-cache
-          .packages
-        key: dependencies-${{ hashFiles('pubspec.lock') }}---
+          **/.flutter-plugins
+          **/.flutter-plugin-dependencies
+          **/.dart_tool/package_config.json
+          ${{ env.PUB_CACHE }}
+          **/.packages
+        key: dependencies-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
     - name: 'Get Packages'
       if: steps.cache.outputs.cache-hit != 'true'
       run: flutter packages pub get

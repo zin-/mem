@@ -16,3 +16,6 @@ runs:
         flutter-version: ${{ inputs.version }}
         channel: ${{ inputs.channel }}
         cache: true
+    - name: 'Flutter Doctor'
+      run: flutter doctor -v
+      shell: bash
