@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
-import 'package:mem/component/view/date_and_time/date_text_form_field.dart';
+import 'package:mem/component/view/date_and_time/date_view.dart';
 import 'package:mem/gui/l10n.dart';
 
 void main() {
@@ -17,8 +17,8 @@ void main() {
         supportedLocales: L10n.supportedLocales,
         home: Scaffold(
           body: DateTextFormField(
-            date: date,
-            onChanged: onChanged ?? (pickedDate) {},
+            date,
+            onChanged ?? (pickedDate) {},
           ),
         ),
       ),

@@ -1,6 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:mem/logger/log_service.dart';
 
+class TimeOfDayText extends StatelessWidget {
+  final TimeOfDay _timeOfDay;
+
+  const TimeOfDayText(
+    this._timeOfDay, {
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) => v(
+        () => Text(_timeOfDay.format(context)),
+        _timeOfDay,
+      );
+}
+
 class TimeOfDayTextFormField extends StatelessWidget {
   final TimeOfDay? timeOfDay;
   final Function(TimeOfDay? pickedTimeOfDay) onChanged;

@@ -1,19 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:mem/component/view/date_and_time/date_view.dart';
+import 'package:mem/component/view/date_and_time/time_of_day_view.dart';
 import 'package:mem/core/date_and_time.dart';
-import 'package:mem/gui/l10n.dart';
 
-final _dateFormat = DateFormat.yMd(L10n().local);
-final _dateAndTimeFormat = DateFormat(_dateFormat.pattern).add_Hm();
+class DateAndTimeText extends StatelessWidget {
+  final DateAndTime _dateAndTime;
 
-class DateAndTimeText extends Text {
-  DateAndTimeText(
-    DateAndTime dateAndTime, {
+  const DateAndTimeText(
+    this._dateAndTime, {
     super.key,
-    super.style,
-  }) : super(
-          dateAndTime.isAllDay
-              ? _dateFormat.format(dateAndTime.dateTime)
-              : _dateAndTimeFormat.format(dateAndTime),
-        );
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (_dateAndTime.isAllDay) {
+      return DateText(_dateAndTime);
+    } else {
+      return Flex(
+        direction: Axis.horizontal,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          DateText(_dateAndTime),
+          const Text(' '),
+          TimeOfDayText(TimeOfDay.fromDateTime(_dateAndTime)),
+        ],
+      );
+    }
+  }
 }

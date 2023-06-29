@@ -88,10 +88,7 @@ void testTaskScenario() => group(': $scenarioName', () {
           await widgetTester.pumpAndSettle();
 
           final start = DateTime.now();
-          final startTime =
-              '${now.hour == 0 ? 12 : now.hour > 12 ? now.hour - 12 : now.hour}'
-              ':${start.minute < 10 ? 0 : ''}${start.minute}'
-              ' ${start.hour > 11 ? 'PM' : 'AM'}';
+          final startTime = timeText(start);
           expect(
             (widgetTester.widget(find.byType(TextFormField).at(2))
                     as TextFormField)
@@ -111,7 +108,8 @@ void testTaskScenario() => group(': $scenarioName', () {
           await widgetTester.tap(find.text('OK'));
           await widgetTester.pumpAndSettle();
 
-          final endDate = '${now.month + 1}/$pickingEndDate/${now.year}';
+          final endDate =
+              dateText(DateTime(now.year, now.month + 1, pickingEndDate));
           expect(
             (widgetTester.widget(find.byType(TextFormField).at(3))
                     as TextFormField)
@@ -137,7 +135,8 @@ void testTaskScenario() => group(': $scenarioName', () {
             (element) => element[defMemName.name] == enteringMemName,
           )[defMemStartAt.name];
 
-          expect(find.text(dateTimeText(savedMemStartAt)), findsOneWidget);
+          expect(find.text(dateText(savedMemStartAt)), findsOneWidget);
+          expect(find.text(timeText(savedMemStartAt)), findsOneWidget);
           expect(find.text(endDate), findsOneWidget);
         },
       );

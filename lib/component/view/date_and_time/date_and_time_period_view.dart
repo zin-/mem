@@ -18,7 +18,7 @@ class DateAndTimePeriodTexts extends StatelessWidget {
             _dateAndTimePeriod.start == null
                 ? const SizedBox.shrink()
                 : DateAndTimeText(_dateAndTimePeriod.start!),
-            const Text(' ~ '),
+            const Text('~'),
             _dateAndTimePeriod.end == null
                 ? const SizedBox.shrink()
                 : DateAndTimeText(_dateAndTimePeriod.end!),

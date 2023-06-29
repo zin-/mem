@@ -2,18 +2,42 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mem/logger/log_service.dart';
 
+final DateFormat _dateFormat = DateFormat.yMd();
+
+String Function(DateTime dateTime) _buildFormatFunction(BuildContext context) {
+  assert(debugCheckHasMediaQuery(context));
+  assert(debugCheckHasMaterialLocalizations(context));
+  final MaterialLocalizations localizations = MaterialLocalizations.of(context);
+
+  return localizations.formatCompactDate;
+}
+
+class DateText extends StatelessWidget {
+  final DateTime _dateTime;
+
+  const DateText(
+    this._dateTime, {
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) => v(
+        () => Text(_buildFormatFunction(context)(_dateTime)),
+        _dateTime,
+      );
+}
+
 class DateTextFormField extends StatelessWidget {
   final DateTime? date;
   final Function(DateTime? pickedDate) onChanged;
   final DateTime? _firstDate;
   final DateTime? _lastDate;
 
-  final DateFormat _dateFormat = DateFormat.yMd();
   final maxDuration = const Duration(days: 1000000000000000000);
 
-  DateTextFormField({
-    required this.date,
-    required this.onChanged,
+  const DateTextFormField(
+    this.date,
+    this.onChanged, {
     DateTime? firstDate,
     DateTime? lastDate,
     Key? key,
@@ -26,7 +50,7 @@ class DateTextFormField extends StatelessWidget {
         () {
           return TextFormField(
             controller: TextEditingController(
-              text: date == null ? '' : _dateFormat.format(date!),
+              text: date == null ? '' : _buildFormatFunction(context)(date!),
             ),
             decoration: InputDecoration(
               hintText: _dateFormat.pattern,
