@@ -9,7 +9,7 @@ import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/database/definition.dart';
 import 'package:mem/main.dart' as app;
 
-import '../helpers.dart';
+import 'helpers.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();

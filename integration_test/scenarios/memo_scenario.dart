@@ -11,7 +11,7 @@ import 'package:mem/database/definition.dart';
 import 'package:mem/gui/constants.dart';
 
 import '../_helpers.dart';
-import '../helpers.dart';
+import 'helpers.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
