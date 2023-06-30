@@ -7,8 +7,6 @@ class L10n {
 
   L10n._(this._appLocalizations);
 
-  late String local = _appLocalizations.localeName;
-
   String appTitle() => _appLocalizations.appTitle;
 
   String memListPageTitle() => _appLocalizations.memListPageTitle;
@@ -63,9 +61,6 @@ class L10n {
   // Notification
   late String reminderName = _appLocalizations.reminder_name;
   late String reminderDescription = _appLocalizations.reminder_description;
-
-  // Under development
-  String dev() => _appLocalizations.dev;
 
   String test() => _appLocalizations.test;
 
