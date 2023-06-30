@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:mem/database/table_definitions/acts.dart';
 import 'package:mem/database/table_definitions/base.dart';
-import 'package:mem/database/table_definitions/mem_items.dart';
 import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/database_manager.dart';
@@ -28,12 +26,9 @@ void testTaskScenario() => group(': $scenarioName', () {
         db = await DatabaseManager(onTest: true).open(databaseDefinition);
       });
       setUp(() async {
-        await db.getTable(actTableDefinition.name).delete();
-        await db.getTable(memItemTableDefinition.name).delete();
+        await resetDatabase(db);
+
         final memTable = db.getTable(memTableDefinition.name);
-
-        await memTable.delete();
-
         await memTable.insert({
           defMemName.name: '$scenarioName - mem name - has period',
           defMemStartOn.name: DateTime.now(),

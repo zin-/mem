@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/database/table_definitions/acts.dart';
 import 'package:mem/database/table_definitions/base.dart';
-import 'package:mem/database/table_definitions/mem_items.dart';
 import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/database_manager.dart';
@@ -31,12 +30,9 @@ void testActScenario() => group(': $scenarioName', () {
       setUpAll(() async {
         db = (await DatabaseManager(onTest: true).open(databaseDefinition));
 
-        await db.getTable(memItemTableDefinition.name).delete();
-        await db.getTable(actTableDefinition.name).delete();
-        final memTable = db.getTable(memTableDefinition.name);
-        await memTable.delete();
+        await resetDatabase(db);
 
-        insertedMemId = await memTable.insert({
+        insertedMemId = await db.getTable(memTableDefinition.name).insert({
           defMemName.name: insertedMemName,
           createdAtColDef.name: DateTime.now(),
         });
