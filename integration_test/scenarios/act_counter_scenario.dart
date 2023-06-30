@@ -9,6 +9,7 @@ import 'package:mem/database/definition.dart';
 import 'package:mem/main.dart';
 
 import '../_helpers.dart';
+import 'helpers.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -27,11 +28,12 @@ void testActCounterConfigure() => group(
         late int savedMemId;
 
         setUp(() async {
-          final memTable =
-              (await DatabaseManager(onTest: true).open(databaseDefinition))
-                  .getTable(memTableDefinition.name);
+          final db =
+              await DatabaseManager(onTest: true).open(databaseDefinition);
 
-          savedMemId = await memTable.insert({
+          await resetDatabase(db);
+
+          savedMemId = await db.getTable(memTableDefinition.name).insert({
             defMemName.name: savedMemName,
             createdAtColDef.name: DateTime.now(),
           });

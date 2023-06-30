@@ -3,14 +3,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/database/table_definitions/acts.dart';
 import 'package:mem/database/table_definitions/base.dart';
-import 'package:mem/database/table_definitions/mem_items.dart';
 import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/database/definition.dart';
 import 'package:mem/main.dart' as app;
 
-import '../helpers.dart';
+import 'helpers.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -18,10 +17,12 @@ void main() {
   testActScenario();
 }
 
-void testActScenario() => group(': Act scenario', () {
+const scenarioName = 'Act scenario';
+
+void testActScenario() => group(': $scenarioName', () {
       final showActPageIconFinder = find.byIcon(Icons.play_arrow);
 
-      const insertedMemName = 'Act scenario: saved mem name';
+      const insertedMemName = '$scenarioName: saved mem name';
 
       late final Database db;
       late final int insertedMemId;
@@ -29,12 +30,9 @@ void testActScenario() => group(': Act scenario', () {
       setUpAll(() async {
         db = (await DatabaseManager(onTest: true).open(databaseDefinition));
 
-        await db.getTable(memItemTableDefinition.name).delete();
-        await db.getTable(actTableDefinition.name).delete();
-        final memTable = db.getTable(memTableDefinition.name);
-        await memTable.delete();
+        await resetDatabase(db);
 
-        insertedMemId = await memTable.insert({
+        insertedMemId = await db.getTable(memTableDefinition.name).insert({
           defMemName.name: insertedMemName,
           createdAtColDef.name: DateTime.now(),
         });
@@ -71,15 +69,22 @@ void testActScenario() => group(': Act scenario', () {
             expect(find.byIcon(Icons.play_arrow), findsNothing);
             final now = DateTime.now();
             expect(
-              find.text(dateTimeText(now)),
+              find.text(dateText(now)),
               findsOneWidget,
             );
-
+            expect(
+              find.text(timeText(now)),
+              findsOneWidget,
+            );
             await widgetTester.tap(find.byIcon(Icons.stop));
             await widgetTester.pumpAndSettle();
 
             expect(
-              find.text(dateTimeText(now)),
+              find.text(dateText(now)),
+              findsNWidgets(2),
+            );
+            expect(
+              find.text(timeText(now)),
               findsNWidgets(2),
             );
 
@@ -88,29 +93,33 @@ void testActScenario() => group(': Act scenario', () {
             await widgetTester.pumpAndSettle();
 
             expect(
-              find.text(dateTimeText(now)),
+              find.text(dateText(now)),
+              findsNWidgets(3),
+            );
+            expect(
+              find.text(timeText(now)),
               findsNWidgets(3),
             );
           },
         );
 
         group(': Edit act', () {
-          late DateTime createdAt;
+          late DateTime now;
 
           setUp(() async {
-            createdAt = DateTime.now();
+            now = DateTime.now();
 
             await db.getTable(actTableDefinition.name).insert({
               fkDefMemId.name: insertedMemId,
-              defActStart.name: createdAt,
+              defActStart.name: now,
               defActStartIsAllDay.name: 0,
-              createdAtColDef.name: createdAt,
+              createdAtColDef.name: now,
             });
             await db.getTable(actTableDefinition.name).insert({
               fkDefMemId.name: insertedMemId,
-              defActStart.name: createdAt,
+              defActStart.name: now,
               defActStartIsAllDay.name: 0,
-              createdAtColDef.name: createdAt,
+              createdAtColDef.name: now,
             });
           });
 
@@ -118,7 +127,7 @@ void testActScenario() => group(': Act scenario', () {
             await showActListPage(widgetTester);
 
             await widgetTester.longPress(
-              find.text(dateTimeText(createdAt)).at(1),
+              find.text(dateText(now)).at(1),
             );
             await widgetTester.pumpAndSettle();
 
@@ -139,26 +148,31 @@ void testActScenario() => group(': Act scenario', () {
             ))
                     .singleWhere((element) =>
                         element[updatedAtColDef.name] != null)[defActEnd.name];
-            if (dateTimeText(createdAt) == dateTimeText(updatedActEnd)) {
-              expect(find.text(dateTimeText(createdAt)), findsNWidgets(3));
+            expect(find.text(dateText(now)), findsNWidgets(3));
+            if (dateTimeText(now) == dateTimeText(updatedActEnd)) {
+              expect(find.text(timeText(now)), findsNWidgets(3));
             } else {
-              expect(find.text(dateTimeText(createdAt)), findsNWidgets(2));
-              expect(find.text(dateTimeText(updatedActEnd)), findsOneWidget);
+              expect(find.text(timeText(now)), findsNWidgets(2));
+              expect(find.text(timeText(updatedActEnd)), findsOneWidget);
             }
           });
 
           testWidgets(': delete.', (widgetTester) async {
             await showActListPage(widgetTester);
 
+            expect(find.text(dateText(now)), findsNWidgets(2));
+            expect(find.text(timeText(now)), findsNWidgets(2));
+
             await widgetTester.longPress(
-              find.text(dateTimeText(createdAt)).at(0),
+              find.text(dateText(now)).at(0),
             );
             await widgetTester.pumpAndSettle();
 
             await widgetTester.tap(find.byIcon(Icons.delete));
             await widgetTester.pumpAndSettle();
 
-            expect(find.text(dateTimeText(createdAt)), findsOneWidget);
+            expect(find.text(dateText(now)), findsOneWidget);
+            expect(find.text(timeText(now)), findsOneWidget);
           });
         });
       });

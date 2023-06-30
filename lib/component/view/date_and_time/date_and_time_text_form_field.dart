@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:mem/component/view/date_and_time/date_view.dart';
+import 'package:mem/component/view/date_and_time/time_of_day_view.dart';
 import 'package:mem/core/date_and_time.dart';
 import 'package:mem/core/date_and_time_period.dart';
-import 'package:mem/gui/date_text_form_field.dart';
 import 'package:mem/logger/log_service.dart';
 
-import 'time_of_day_text_form_field.dart';
 
 class DateAndTimeTextFormFieldV2 extends StatelessWidget {
   final DateAndTime? _dateAndTime;
@@ -30,8 +30,8 @@ class DateAndTimeTextFormFieldV2 extends StatelessWidget {
             children: [
               Expanded(
                   child: DateTextFormField(
-                date: _dateAndTime,
-                onChanged: (pickedDate) => v(
+                _dateAndTime,
+                (pickedDate) => v(
                   () {
                     if (pickedDate != null) {
                       if (isAllDay) {

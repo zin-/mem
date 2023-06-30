@@ -27,13 +27,17 @@ on:
   push:
 
 env:
-  flutter-version: '3.10.3'
+  flutter-version: '3.10.5'
   flutter-channel: 'stable'
 
 jobs:
-  build-on-ubuntu:
-    name: 'Build on ubuntu'
-    runs-on: ubuntu-latest
+  build:
+    name: 'Build on ${{ matrix.os }}'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
       - name: 'Install Flutter'
@@ -41,11 +45,15 @@ jobs:
         with:
           version: ${{ env.flutter-version }}
           channel: ${{ env.flutter-channel }}
+      - name: 'Install dependencies'
+        uses: ./.github/actions/install-dependencies
       - name: 'Generate Localization code'
         uses: ./.github/actions/generate-localization_code
+      - name: 'Build Mocks'
+        uses: ./.github/actions/build-mocks
 
-  build_test-on-ubuntu:
-    name: 'Build test on ubuntu'
+  analyze-production_code:
+    name: 'Analyze Production code'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -56,20 +64,6 @@ jobs:
           channel: ${{ env.flutter-channel }}
       - name: 'Install dependencies'
         uses: ./.github/actions/install-dependencies
-      - name: 'Build Mocks'
-        uses: ./.github/actions/build-mocks
-
-  analyze-production_code:
-    name: 'Analyze Production code'
-    needs: [build-on-ubuntu]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: 'Install Flutter'
-        uses: ./.github/actions/install-flutter
-        with:
-          version: ${{ env.flutter-version }}
-          channel: ${{ env.flutter-channel }}
       - name: 'Generate Localization code'
         uses: ./.github/actions/generate-localization_code
       - name: 'Flutter Doctor'
@@ -79,7 +73,6 @@ jobs:
 
   analyze-test_code:
     name: 'Analyze Test code'
-    needs: [build_test-on-ubuntu]
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout code'
@@ -100,7 +93,6 @@ jobs:
 
   small_test:
     name: 'Small test'
-    needs: [build_test-on-ubuntu]
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout code'
@@ -133,7 +125,6 @@ jobs:
 
   medium_test:
     name: 'Medium test(${{ matrix.platform }})'
-    needs: [build_test-on-ubuntu]
     strategy:
       fail-fast: false
       matrix:

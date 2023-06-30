@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/core/mem_item.dart';
-import 'package:mem/database/table_definitions/acts.dart';
 import 'package:mem/database/table_definitions/base.dart';
 import 'package:mem/database/table_definitions/mem_items.dart';
 import 'package:mem/database/table_definitions/mems.dart';
@@ -12,6 +11,7 @@ import 'package:mem/database/definition.dart';
 import 'package:mem/gui/constants.dart';
 
 import '../_helpers.dart';
+import 'helpers.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -32,17 +32,15 @@ void testMemoScenario() => group(
           db = await DatabaseManager(onTest: true).open(databaseDefinition);
         });
         setUp(() async {
-          await db.getTable(actTableDefinition.name).delete();
-          final memItemTable = db.getTable(memItemTableDefinition.name);
+          await resetDatabase(db);
+
           final memTable = db.getTable(memTableDefinition.name);
-
-          await memItemTable.delete();
-          await memTable.delete();
-
           final insertedMemId = await memTable.insert({
             defMemName.name: insertedMemName,
             createdAtColDef.name: DateTime.now(),
           });
+
+          final memItemTable = db.getTable(memItemTableDefinition.name);
           await memItemTable.insert({
             memIdFkDef.name: insertedMemId,
             memItemTypeColDef.name: MemItemType.memo.name,
