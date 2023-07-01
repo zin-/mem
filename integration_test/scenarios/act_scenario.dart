@@ -7,6 +7,7 @@ import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/database/definition.dart';
+import 'package:mem/gui/constants.dart';
 import 'package:mem/main.dart' as app;
 
 import 'helpers.dart';
@@ -63,42 +64,68 @@ void testActScenario() => group(': $scenarioName', () {
             await showActListPage(widgetTester);
 
             expect(find.byIcon(Icons.stop), findsNothing);
+            final startTime = DateTime.now();
             await widgetTester.tap(find.byIcon(Icons.play_arrow));
-            await widgetTester.pumpAndSettle();
+            await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
             expect(find.byIcon(Icons.play_arrow), findsNothing);
-            final now = DateTime.now();
             expect(
-              find.text(dateText(now)),
-              findsOneWidget,
+              (widgetTester.widget(find.byType(Text).at(0)) as Text).data,
+              dateText(startTime),
             );
             expect(
-              find.text(timeText(now)),
-              findsOneWidget,
+              (widgetTester.widget(find.byType(Text).at(2)) as Text).data,
+              timeText(startTime),
             );
+            final stopTime = DateTime.now();
             await widgetTester.tap(find.byIcon(Icons.stop));
-            await widgetTester.pumpAndSettle();
+            await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
             expect(
-              find.text(dateText(now)),
-              findsNWidgets(2),
+              (widgetTester.widget(find.byType(Text).at(0)) as Text).data,
+              dateText(startTime),
             );
             expect(
-              find.text(timeText(now)),
-              findsNWidgets(2),
+              (widgetTester.widget(find.byType(Text).at(2)) as Text).data,
+              timeText(startTime),
+            );
+            expect(
+              (widgetTester.widget(find.byType(Text).at(4)) as Text).data,
+              dateText(stopTime),
+            );
+            expect(
+              (widgetTester.widget(find.byType(Text).at(6)) as Text).data,
+              timeText(stopTime),
             );
 
             expect(find.byIcon(Icons.stop), findsNothing);
+            final startTime2 = DateTime.now();
             await widgetTester.tap(find.byIcon(Icons.play_arrow));
-            await widgetTester.pumpAndSettle();
+            await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
             expect(
-              find.text(dateText(now)),
-              findsNWidgets(3),
+              (widgetTester.widget(find.byType(Text).at(0)) as Text).data,
+              dateText(startTime2),
             );
             expect(
-              find.text(timeText(now)),
-              findsNWidgets(3),
+              (widgetTester.widget(find.byType(Text).at(2)) as Text).data,
+              timeText(startTime2),
+            );
+            expect(
+              (widgetTester.widget(find.byType(Text).at(4)) as Text).data,
+              dateText(startTime),
+            );
+            expect(
+              (widgetTester.widget(find.byType(Text).at(6)) as Text).data,
+              timeText(startTime),
+            );
+            expect(
+              (widgetTester.widget(find.byType(Text).at(8)) as Text).data,
+              dateText(stopTime),
+            );
+            expect(
+              (widgetTester.widget(find.byType(Text).at(10)) as Text).data,
+              timeText(stopTime),
             );
           },
         );
@@ -201,7 +228,10 @@ void testActScenario() => group(': $scenarioName', () {
           await widgetTester.tap(startIconFinder.at(1));
           await widgetTester.pumpAndSettle();
 
-          expect(find.text('00:00:00'), findsOneWidget);
+          expect(
+            (widgetTester.widget(find.byType(Text).at(2)) as Text).data,
+            '00:00:00',
+          );
           expect(startIconFinder, findsOneWidget);
           expect(stopIconFinder, findsOneWidget);
           await widgetTester.pump(const Duration(seconds: 1));
