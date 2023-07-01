@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/mems/detail/repeated_notification_view.dart';
 import 'package:mem/mems/mem_done_checkbox.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/mem_name.dart';
@@ -63,6 +64,7 @@ class _MemDetailBodyComponent extends StatelessWidget {
                 _onMemDoneChanged,
               ),
               MemPeriodTextFormFields(_memId),
+              RepeatedNotificationWidget(_memId),
               MemItemsFormFields(_memId),
             ],
           ),

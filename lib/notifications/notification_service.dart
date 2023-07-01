@@ -1,7 +1,12 @@
+import 'dart:convert';
+
 import 'package:mem/core/mem.dart';
+import 'package:mem/core/mem_repeated_notification.dart';
+import 'package:mem/gui/l10n.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_notifications.dart';
 import 'package:mem/mems/mem_service.dart';
+import 'package:mem/notifications/notification.dart';
 
 import 'notification_repository.dart';
 
@@ -27,6 +32,50 @@ class NotificationService {
           }
         },
         mem,
+      );
+
+  Future<void> memRepeatedReminder(
+    Mem mem,
+    MemRepeatedNotification? memRepeatedNotification,
+  ) =>
+      i(
+        () async {
+          // TODO refactoring
+          if (memRepeatedNotification == null) {
+            await _notificationRepository.receive(
+              CancelNotification(mem.id * 10 + 3),
+            );
+          } else {
+            final now = DateTime.now();
+            var notifyFirstAt = DateTime(
+              now.year,
+              now.month,
+              now.day,
+              memRepeatedNotification.timeOfDay.hour,
+              memRepeatedNotification.timeOfDay.minute,
+              memRepeatedNotification.timeOfDay.second,
+            );
+            if (notifyFirstAt.isBefore(now)) {
+              notifyFirstAt = notifyFirstAt.add(const Duration(days: 1));
+            }
+
+            final repeatedNotification = RepeatedNotification(
+              memRepeatedNotification.memId! * 10 + 3,
+              mem.name,
+              'Repeat',
+              notifyFirstAt,
+              json.encode({'memId': memRepeatedNotification.memId}),
+              [],
+              'reminder',
+              L10n().reminderName,
+              L10n().reminderDescription,
+              NotificationInterval.perDay,
+            );
+
+            await _notificationRepository.receive(repeatedNotification);
+          }
+        },
+        {mem, memRepeatedNotification},
       );
 
   NotificationService._(this._notificationRepository);

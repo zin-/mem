@@ -69,7 +69,20 @@ class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
   ) =>
       v(
         () async {
-          if (payload is OneTimeNotification) {
+          if (payload is RepeatedNotification) {
+            await _flutterLocalNotificationsWrapper.zonedSchedule(
+              payload.id,
+              payload.title,
+              payload.body,
+              tz.TZDateTime.from(payload.notifyAt, tz.local),
+              payload.payloadJson,
+              payload.actions,
+              payload.channelId,
+              payload.channelName,
+              payload.channelDescription,
+              payload.interval,
+            );
+          } else if (payload is OneTimeNotification) {
             await _flutterLocalNotificationsWrapper.zonedSchedule(
               payload.id,
               payload.title,

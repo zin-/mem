@@ -3,6 +3,7 @@ import 'package:mem/core/mem_detail.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_item_repository_v2.dart';
+import 'package:mem/mems/mem_repeated_notification_repository.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/notifications/notification_repository.dart';
 import 'package:mem/notifications/notification_service.dart';
@@ -10,11 +11,13 @@ import 'package:mem/notifications/notification_service.dart';
 class MemService {
   final MemRepository _memRepository;
   final MemItemRepository _memItemRepository;
+  final MemRepeatedNotificationRepository _memRepeatedNotificationRepository;
   final NotificationService _notificationService;
 
   MemService._(
     this._memRepository,
     this._memItemRepository,
+    this._memRepeatedNotificationRepository,
     this._notificationService,
   );
 
@@ -23,6 +26,7 @@ class MemService {
   factory MemService({
     MemRepository? memRepository,
     MemItemRepository? memItemRepository,
+    MemRepeatedNotificationRepository? memRepeatedNotificationRepository,
     NotificationService? notificationService,
   }) {
     var tmp = _instance;
@@ -30,6 +34,8 @@ class MemService {
       tmp = MemService._(
         memRepository ?? MemRepository(),
         memItemRepository ?? MemItemRepository(),
+        memRepeatedNotificationRepository ??
+            MemRepeatedNotificationRepository(),
         notificationService ?? NotificationService(),
       );
       _instance = tmp;
@@ -45,6 +51,7 @@ class MemService {
           } else {
             savedMem = await _memRepository.receive(memDetail.mem);
           }
+          _notificationService.memReminder(savedMem);
 
           final savedMemItems = (await Future.wait(memDetail.memItems.map((e) =>
                   (e.isSaved() && !undo
@@ -53,11 +60,26 @@ class MemService {
                       .call(e..memId = savedMem.id))))
               .toList();
 
-          _notificationService.memReminder(savedMem);
+          final savedMemRepeatedNotification = await (memDetail
+                      .repeatedNotification ==
+                  null
+              ? () {
+                  _memRepeatedNotificationRepository.wasteByMemId(savedMem.id);
+                }()
+              : (memDetail.repeatedNotification?.isSaved() == true && !undo
+                      ? _memRepeatedNotificationRepository.replace
+                      : _memRepeatedNotificationRepository.receive)
+                  .call(
+                      (memDetail.repeatedNotification!..memId = savedMem.id)));
+          _notificationService.memRepeatedReminder(
+            savedMem,
+            savedMemRepeatedNotification,
+          );
 
           return MemDetail(
             savedMem,
             savedMemItems,
+            savedMemRepeatedNotification,
           );
         },
         {'memDetail': memDetail},

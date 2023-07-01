@@ -4,6 +4,7 @@ import 'package:mem/core/mem_detail.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
+import 'package:mem/mems/mem_repeated_notification_repository.dart';
 import 'package:mem/mems/mem_service.dart';
 import 'package:mem/mems/states.dart';
 
@@ -27,6 +28,24 @@ final loadMemItems = Provider.autoDispose.family<Future<List<MemItem>>, int?>(
     memId,
   ),
 );
+final loadMemRepeatedNotification =
+    FutureProvider.autoDispose.family<void, int?>(
+  (ref, memId) => v(
+    () async {
+      if (memId != null) {
+        final memRepeatedNotifications =
+            await MemRepeatedNotificationRepository().shipByMemId(memId);
+
+        if (memRepeatedNotifications.length == 1) {
+          ref
+              .watch(memRepeatedNotificationProvider(memId).notifier)
+              .updatedBy(memRepeatedNotifications.single);
+        }
+      }
+    },
+    memId,
+  ),
+);
 
 final saveMem =
     Provider.autoDispose.family<Future<MemDetail>, int?>((ref, memId) => v(
@@ -39,6 +58,10 @@ final saveMem =
             ref
                 .read(memItemsProvider(memId).notifier)
                 .updatedBy(saved.memItems);
+            ref
+                .read(memRepeatedNotificationProvider(memId).notifier)
+                .updatedBy(saved.repeatedNotification);
+
             if (memId == null) {
               ref
                   .read(editingMemProvider(saved.mem.id).notifier)
@@ -46,6 +69,9 @@ final saveMem =
               ref
                   .read(memItemsProvider(saved.mem.id).notifier)
                   .updatedBy(saved.memItems);
+              ref
+                  .read(memRepeatedNotificationProvider(saved.mem.id).notifier)
+                  .updatedBy(saved.repeatedNotification);
             }
 
             ref

@@ -29,6 +29,25 @@ class OneTimeNotification extends Notification {
   );
 }
 
+class RepeatedNotification extends OneTimeNotification {
+  final NotificationInterval interval;
+
+  RepeatedNotification(
+    super.id,
+    super.title,
+    super.body,
+    super.notifyAt,
+    super.payloadJson,
+    super.actions,
+    super.channelId,
+    super.channelName,
+    super.channelDescription,
+    this.interval,
+  );
+}
+
+enum NotificationInterval { perDay, perWeek, perMonth, perYear }
+
 class CancelNotification extends Notification {
   CancelNotification(super.id);
 }

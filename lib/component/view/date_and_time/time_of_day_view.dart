@@ -19,11 +19,13 @@ class TimeOfDayText extends StatelessWidget {
 class TimeOfDayTextFormField extends StatelessWidget {
   final TimeOfDay? timeOfDay;
   final Function(TimeOfDay? pickedTimeOfDay) onChanged;
+  final Widget? icon;
 
   const TimeOfDayTextFormField({
     required this.timeOfDay,
     required this.onChanged,
     Key? key,
+    this.icon,
   }) : super(key: key);
 
   @override
@@ -34,6 +36,7 @@ class TimeOfDayTextFormField extends StatelessWidget {
               text: timeOfDay?.format(context) ?? '',
             ),
             decoration: InputDecoration(
+              icon: icon,
               suffixIcon: IconButton(
                 onPressed: () => v(
                   () async {

@@ -74,7 +74,7 @@ void testMemoScenario() => group(
               const enteringMemNameText =
                   '$scenarioName: Save: Create - mem name - entering';
               await widgetTester.enterText(
-                memNameTextFormFieldFinder,
+                memNameOnDetailPageFinder,
                 enteringMemNameText,
               );
               await widgetTester.pumpAndSettle();
@@ -83,7 +83,7 @@ void testMemoScenario() => group(
               const enteringMemMemoText =
                   '$scenarioName: Save: Create - mem memo - entering';
               await widgetTester.enterText(
-                find.byType(TextFormField).at(3),
+                memMemoOnDetailPageFinder(),
                 enteringMemMemoText,
               );
               await widgetTester.pumpAndSettle();
@@ -130,7 +130,7 @@ void testMemoScenario() => group(
               const enteringMemNameText =
                   '$scenarioName: Save: Update - mem name - entering';
               await widgetTester.enterText(
-                memNameTextFormFieldFinder,
+                memNameOnDetailPageFinder,
                 enteringMemNameText,
               );
               await widgetTester.pumpAndSettle();
@@ -142,7 +142,7 @@ void testMemoScenario() => group(
               const enteringMemMemoText =
                   '$scenarioName: Save: Update - mem memo - entering';
               await widgetTester.enterText(
-                find.byType(TextFormField).at(3),
+                memMemoOnDetailPageFinder(),
                 enteringMemMemoText,
               );
               await widgetTester.pumpAndSettle();
@@ -335,7 +335,7 @@ void testMemoScenario() => group(
             const enteringMemNameText =
                 '$scenarioName: MemItemsView: save twice on create - mem name - entering';
             await widgetTester.enterText(
-              memNameTextFormFieldFinder,
+              memNameOnDetailPageFinder,
               enteringMemNameText,
             );
             await widgetTester.pumpAndSettle();
@@ -344,7 +344,7 @@ void testMemoScenario() => group(
                 '$scenarioName: MemItemsView: save twice on create - mem memo - entering';
             const enteringMemMemoText1 = '$enteringMemMemoText - 1';
             await widgetTester.enterText(
-              find.byType(TextFormField).at(3),
+              memMemoOnDetailPageFinder(),
               enteringMemMemoText1,
             );
             await widgetTester.pump(defaultTransitionDuration);
@@ -357,7 +357,7 @@ void testMemoScenario() => group(
 
             const enteringMemMemoText2 = '$enteringMemMemoText - 2';
             await widgetTester.enterText(
-              find.byType(TextFormField).at(3),
+              memMemoOnDetailPageFinder(),
               enteringMemMemoText2,
             );
             await widgetTester.pump(defaultTransitionDuration);
