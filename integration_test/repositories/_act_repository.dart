@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/acts/act_repository.dart';
 import 'package:mem/core/act.dart';
-import 'package:mem/core/date_and_time.dart';
-import 'package:mem/core/date_and_time_period.dart';
+import 'package:mem/core/date_and_time/date_and_time.dart';
+import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/core/errors.dart';
 import 'package:mem/database/table_definitions/acts.dart';
 import 'package:mem/database/table_definitions/base.dart';
@@ -10,6 +10,8 @@ import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/framework/database/definitions/definition.dart';
+import 'package:mem/logger/log_entity.dart';
+import 'package:mem/logger/log_service.dart';
 
 void main() {
   testActRepository();
@@ -91,6 +93,7 @@ void testActRepository() => group(
 
           group('with act', () {
             test('only memId', () async {
+              LogService.initialize(Level.verbose);
               final memId = await memTable.insert({
                 defMemName.name: 'with mem',
                 createdAtColDef.name: DateTime.now(),
@@ -109,7 +112,14 @@ void testActRepository() => group(
               expect(
                 actual.toString(),
                 [
-                  Act(memId, DateAndTimePeriod(start: DateAndTime.from(now))),
+                  Act(
+                      memId,
+                      DateAndTimePeriod(
+                        start: DateAndTime.from(
+                          now,
+                          timeOfDay: now,
+                        ),
+                      )),
                 ].toString(),
               );
             });
@@ -158,17 +168,27 @@ void testActRepository() => group(
               final actual = await actRepository.shipByMemId(
                 memId,
                 period: DateAndTimePeriod(
-                  start: DateAndTime.fromV2(yesterday, timeOfDay: yesterday),
-                  end: DateAndTime.fromV2(tomorrow, timeOfDay: tomorrow),
+                  start: DateAndTime.from(yesterday, timeOfDay: yesterday),
+                  end: DateAndTime.from(tomorrow, timeOfDay: tomorrow),
                 ),
               );
 
               expect(
                 actual.toString(),
                 [
-                  Act(memId, DateAndTimePeriod(start: DateAndTime.from(now))),
-                  Act(memId,
-                      DateAndTimePeriod(start: DateAndTime.from(yesterday))),
+                  Act(
+                      memId,
+                      DateAndTimePeriod(
+                        start: DateAndTime.from(now, timeOfDay: now),
+                      )),
+                  Act(
+                      memId,
+                      DateAndTimePeriod(
+                        start: DateAndTime.from(
+                          yesterday,
+                          timeOfDay: yesterday,
+                        ),
+                      )),
                 ].toString(),
               );
             });

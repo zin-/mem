@@ -1,5 +1,5 @@
-import 'package:mem/core/date_and_time.dart';
-import 'package:mem/core/date_and_time_period.dart';
+import 'package:mem/core/date_and_time/date_and_time.dart';
+import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/core/errors.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/database/table_definitions/base.dart';
@@ -64,10 +64,10 @@ class MemRepository extends DatabaseTupleRepository<MemEntity, Mem> {
           : DateAndTimePeriod(
               start: notifyOn == null
                   ? null
-                  : DateAndTime.fromV2(notifyOn, timeOfDay: memEntity.notifyAt),
+                  : DateAndTime.from(notifyOn, timeOfDay: memEntity.notifyAt),
               end: endOn == null
                   ? null
-                  : DateAndTime.fromV2(endOn, timeOfDay: memEntity.endAt),
+                  : DateAndTime.from(endOn, timeOfDay: memEntity.endAt),
             ),
       id: memEntity.id,
       createdAt: memEntity.createdAt,

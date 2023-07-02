@@ -8,7 +8,8 @@ String dateText(DateTime dateTime) {
 }
 
 String timeText(DateTime dateTime) {
-  return '${dateTime.hour > 11 ? dateTime.hour - 12 : dateTime.hour}'
+  final hourOfPeriod = dateTime.hour > 11 ? dateTime.hour - 12 : dateTime.hour;
+  return '${hourOfPeriod == 0 ? 12 : hourOfPeriod}'
       ':${dateTime.minute < 10 ? 0 : ''}${dateTime.minute}'
       ' ${dateTime.hour > 11 ? 'PM' : 'AM'}';
 }

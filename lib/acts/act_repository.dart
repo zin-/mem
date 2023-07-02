@@ -1,7 +1,7 @@
 import 'package:mem/acts/act_entity.dart';
 import 'package:mem/core/act.dart';
-import 'package:mem/core/date_and_time.dart';
-import 'package:mem/core/date_and_time_period.dart';
+import 'package:mem/core/date_and_time/date_and_time.dart';
+import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/core/errors.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/database/table_definitions/acts.dart';
@@ -43,13 +43,13 @@ class ActRepository extends DatabaseTupleRepository<ActEntity, Act> {
       DateAndTimePeriod(
         start: DateAndTime.from(
           actEntity.start,
-          allDay: actEntity.startIsAllDay,
+          timeOfDay: actEntity.startIsAllDay ? null : actEntity.start,
         ),
         end: actEntity.end == null
             ? null
             : DateAndTime.from(
                 actEntity.end!,
-                allDay: actEntity.endIsAllDay!,
+                timeOfDay: actEntity.endIsAllDay == true ? null : actEntity.end,
               ),
       ),
       id: actEntity.id,

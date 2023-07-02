@@ -1,6 +1,3 @@
-// FIXME TimeOfDayを排除したい
-import 'package:flutter/material.dart';
-
 class DateAndTime extends DateTime {
   bool isAllDay = false;
 
@@ -30,29 +27,6 @@ class DateAndTime extends DateTime {
 
   DateAndTime.from(
     DateTime dateTime, {
-    TimeOfDay? timeOfDay,
-    bool allDay = false,
-  }) : this(
-          dateTime.year,
-          dateTime.month,
-          dateTime.day,
-          allDay
-              ? null
-              : timeOfDay != null
-                  ? timeOfDay.hour
-                  : dateTime.hour,
-          allDay
-              ? null
-              : timeOfDay != null
-                  ? timeOfDay.minute
-                  : dateTime.minute,
-          allDay ? null : dateTime.second,
-          allDay ? null : dateTime.millisecond,
-          allDay ? null : dateTime.microsecond,
-        );
-
-  DateAndTime.fromV2(
-    DateTime dateTime, {
     DateTime? timeOfDay,
   }) : this(
           dateTime.year,
@@ -65,12 +39,13 @@ class DateAndTime extends DateTime {
           timeOfDay?.microsecond,
         );
 
-  DateAndTime.now({bool allDay = false})
-      : this.fromV2(
-          DateTime.now(),
-          // FIXME 同じnowを使う
-          timeOfDay: allDay ? null : DateTime.now(),
-        );
+  factory DateAndTime.now({bool allDay = false}) {
+    final now = DateTime.now();
+    return DateAndTime.from(
+      now,
+      timeOfDay: allDay ? null : now,
+    );
+  }
 
   DateTime get dateTime => DateTime(
         year,
@@ -119,9 +94,9 @@ class DateAndTime extends DateTime {
 
   @override
   int compareTo(DateTime other) {
-    if (other is DateAndTime && isAllDay != other.isAllDay) {
-      return DateAndTime(year, month, day)
-          .compareTo(DateAndTime(other.year, other.month, other.day));
+    if (other is DateAndTime && (isAllDay || other.isAllDay)) {
+      return DateTime(year, month, day)
+          .compareTo(DateTime(other.year, other.month, other.day));
     }
 
     return super.compareTo(other);

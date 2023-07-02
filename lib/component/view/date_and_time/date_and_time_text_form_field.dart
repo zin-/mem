@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mem/component/view/date_and_time/date_view.dart';
 import 'package:mem/component/view/date_and_time/time_of_day_view.dart';
-import 'package:mem/core/date_and_time.dart';
-import 'package:mem/core/date_and_time_period.dart';
+import 'package:mem/core/date_and_time/date_and_time.dart';
+import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
-
 
 class DateAndTimeTextFormFieldV2 extends StatelessWidget {
   final DateAndTime? _dateAndTime;
@@ -35,9 +34,9 @@ class DateAndTimeTextFormFieldV2 extends StatelessWidget {
                   () {
                     if (pickedDate != null) {
                       if (isAllDay) {
-                        _onChanged(DateAndTime.fromV2(pickedDate));
+                        _onChanged(DateAndTime.from(pickedDate));
                       } else {
-                        _onChanged(DateAndTime.fromV2(
+                        _onChanged(DateAndTime.from(
                           pickedDate,
                           timeOfDay: _dateAndTime,
                         ));
@@ -65,6 +64,7 @@ class DateAndTimeTextFormFieldV2 extends StatelessWidget {
                               _.day,
                               timeOfDay.hour,
                               timeOfDay.minute,
+                              _.second,
                             ));
                           }
                         },
@@ -81,14 +81,21 @@ class DateAndTimeTextFormFieldV2 extends StatelessWidget {
                       );
 
                       if (pickedTimeOfDay != null) {
+                        final dateAndTime = _dateAndTime ?? DateAndTime.now();
                         _onChanged(DateAndTime.from(
-                          _dateAndTime ?? DateAndTime.now(),
-                          timeOfDay: pickedTimeOfDay,
-                          allDay: false,
+                          dateAndTime,
+                          timeOfDay: DateAndTime(
+                            dateAndTime.year,
+                            dateAndTime.month,
+                            dateAndTime.minute,
+                            pickedTimeOfDay.hour,
+                            pickedTimeOfDay.minute,
+                            dateAndTime.second,
+                          ),
                         ));
                       }
                     } else {
-                      _onChanged(DateAndTime.fromV2(
+                      _onChanged(DateAndTime.from(
                         _dateAndTime!,
                         timeOfDay: null,
                       ));

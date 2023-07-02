@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/component/view/date_and_time/date_view.dart';
 import 'package:mem/component/view/date_and_time/time_of_day_view.dart';
-import 'package:mem/core/date_and_time.dart';
-import 'package:mem/core/date_and_time_period.dart';
+import 'package:mem/core/date_and_time/date_and_time.dart';
+import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/component/view/date_and_time/date_and_time_text_form_field.dart';
 
 void main() {
@@ -478,6 +478,7 @@ void main() {
                   dateAndTime.day,
                   dateAndTime.hour,
                   dateAndTime.minute,
+                  dateAndTime.second,
                 ),
               );
 

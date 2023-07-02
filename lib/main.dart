@@ -3,7 +3,7 @@ import 'package:mem/act_counter/act_counter_configure.dart';
 import 'package:mem/act_counter/act_counter_repository.dart';
 import 'package:mem/act_counter/act_counter_service.dart';
 import 'package:mem/acts/act_repository.dart';
-import 'package:mem/core/date_and_time.dart';
+import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/database/table_definitions/acts.dart';
 import 'package:mem/database/table_definitions/mem_items.dart';
 import 'package:mem/database/table_definitions/mems.dart';
