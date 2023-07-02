@@ -54,7 +54,7 @@ Future pumpMemDetailPage(
         onGenerateTitle: (context) => L10n(context).memDetailPageTitle(),
         localizationsDelegates: L10n.localizationsDelegates,
         supportedLocales: L10n.supportedLocales,
-        home: MemDetailPageV2(memId),
+        home: MemDetailPage(memId),
       ),
     ),
   );

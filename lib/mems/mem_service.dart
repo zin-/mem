@@ -1,23 +1,11 @@
 import 'package:mem/core/mem.dart';
+import 'package:mem/core/mem_detail.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/notifications/notification_repository.dart';
 import 'package:mem/notifications/notification_service.dart';
-
-class MemDetail {
-  final Mem mem;
-  final List<MemItem> memItems;
-
-  MemDetail(this.mem, this.memItems);
-
-  @override
-  String toString() => '{'
-      ' mem: $mem'
-      ', memItems: $memItems'
-      ' }';
-}
 
 class MemService {
   final MemRepository _memRepository;

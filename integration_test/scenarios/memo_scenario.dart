@@ -347,20 +347,25 @@ void testMemoScenario() => group(
               find.byType(TextFormField).at(3),
               enteringMemMemoText1,
             );
-            await widgetTester.pumpAndSettle();
+            await widgetTester.pump(defaultTransitionDuration);
 
             await widgetTester.tap(saveMemFabFinder);
-            await widgetTester.pumpAndSettle();
+            await widgetTester.pump(defaultTransitionDuration);
+
+            await widgetTester.tap(find.text(enteringMemMemoText1));
+            await widgetTester.pump(defaultTransitionDuration);
 
             const enteringMemMemoText2 = '$enteringMemMemoText - 2';
             await widgetTester.enterText(
               find.byType(TextFormField).at(3),
               enteringMemMemoText2,
             );
-            await widgetTester.pumpAndSettle();
+            await widgetTester.pump(defaultTransitionDuration);
 
+            expect(find.text(enteringMemMemoText1), findsNothing);
+            expect(find.text(enteringMemMemoText2), findsOneWidget);
             await widgetTester.tap(saveMemFabFinder);
-            await widgetTester.pumpAndSettle();
+            await widgetTester.pump(defaultTransitionDuration);
 
             await widgetTester.pageBack();
             await widgetTester.pumpAndSettle();

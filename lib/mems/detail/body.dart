@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/core/mem.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_done_checkbox.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/mem_name.dart';
@@ -14,20 +15,24 @@ class MemDetailBody extends ConsumerWidget {
   const MemDetailBody(this._memId, {super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final editingMem = ref.watch(editingMemProvider(_memId));
+  Widget build(BuildContext context, WidgetRef ref) => v(
+        () {
+          final editingMem = ref.watch(editingMemProvider(_memId));
 
-    return _MemDetailBodyComponent(
-      _memId,
-      editingMem,
-      (value) => ref.read(editingMemProvider(_memId).notifier).updatedBy(
-            editingMem.copied()..name = value,
-          ),
-      (value) => ref.read(editingMemProvider(_memId).notifier).updatedBy(
-            editingMem.copied()..doneAt = value == true ? DateTime.now() : null,
-          ),
-    );
-  }
+          return _MemDetailBodyComponent(
+            _memId,
+            editingMem,
+            (value) => ref.read(editingMemProvider(_memId).notifier).updatedBy(
+                  editingMem.copied()..name = value,
+                ),
+            (value) => ref.read(editingMemProvider(_memId).notifier).updatedBy(
+                  editingMem.copied()
+                    ..doneAt = value == true ? DateTime.now() : null,
+                ),
+          );
+        },
+        _memId.toString(),
+      );
 }
 
 class _MemDetailBodyComponent extends StatelessWidget {
@@ -44,21 +49,24 @@ class _MemDetailBodyComponent extends StatelessWidget {
   );
 
   @override
-  Widget build(BuildContext context) => SingleChildScrollView(
-        child: Column(
-          children: [
-            MemNameTextFormField(
-              _mem.name,
-              _memId,
-              _onMemNameChanged,
-            ),
-            MemDoneCheckbox(
-              _mem,
-              _onMemDoneChanged,
-            ),
-            MemPeriodTextFormFields(_memId),
-            MemItemsFormFields(_memId),
-          ],
+  Widget build(BuildContext context) => v(
+        () => SingleChildScrollView(
+          child: Column(
+            children: [
+              MemNameTextFormField(
+                _mem.name,
+                _memId,
+                _onMemNameChanged,
+              ),
+              MemDoneCheckbox(
+                _mem,
+                _onMemDoneChanged,
+              ),
+              MemPeriodTextFormFields(_memId),
+              MemItemsFormFields(_memId),
+            ],
+          ),
         ),
+        {_memId.toString(), _mem},
       );
 }
