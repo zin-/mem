@@ -7,7 +7,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: test/**.mocks.dart
-        key: mocks-${{ runner.os }}-${{ hashFiles('test/**') }}
+        key: mocks-${{ runner.os }}-${{ hashFiles('test/**', 'lib/**') }}
     - name: 'Build Mocks'
       if: steps.cache.outputs.cache-hit != 'true'
       run: ./scripts/generate_mocks.sh

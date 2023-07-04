@@ -108,6 +108,28 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
       );
 
   @override
+  Future<List<P>> waste([Condition? condition]) => v(
+        () async {
+          final payloads = (await _table.select(
+            whereString: condition?.whereString(),
+            whereArgs: condition?.whereArgs(),
+          ))
+              .map((e) => pack(e))
+              .toList();
+
+          final count = await _table.delete(
+            whereString: condition?.whereString(),
+            whereArgs: condition?.whereArgs(),
+          );
+
+          assert(count == payloads.length);
+
+          return payloads;
+        },
+        {'condition': condition},
+      );
+
+  @override
   Future<P> wasteById(id) => v(
         () async {
           final payload = await _table.selectByPk(id);
