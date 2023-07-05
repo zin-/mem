@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/framework/database/definitions/column_definition.dart';
-import 'package:mem/framework/database/definitions/table_definition.dart';
+import 'package:mem/framework/database/definition/column_definition.dart';
+import 'package:mem/framework/database/definition/table_definition.dart';
 
 void main() {
   group('Table', () {

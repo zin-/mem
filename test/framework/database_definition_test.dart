@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:mem/framework/database/definitions/database_definition.dart';
+import 'package:mem/framework/database/definition/database_definition.dart';
+import 'package:mem/framework/database/definition/exceptions.dart';
 
 void main() {
   group('Throws exception', () {

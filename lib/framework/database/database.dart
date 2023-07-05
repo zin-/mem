@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:mem/framework/database/definitions/database_definition.dart';
-import 'package:mem/framework/database/definitions/table_definition.dart';
+import 'package:mem/framework/database/definition/database_definition.dart';
+import 'package:mem/framework/database/definition/table_definition.dart';
 
 abstract class Database {
   final DatabaseDefinition definition;
