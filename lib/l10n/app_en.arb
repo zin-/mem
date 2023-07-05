@@ -49,6 +49,8 @@
 
   "reminder_name": "Reminder",
   "reminder_description": "To remind at specific time.",
+  "repeated_reminder_name": "Repeated Reminder",
+  "repeated_reminder_description": "To remind at specific time per day.",
 
   "dev": "Under development",
   "test": "Under test"

@@ -1,16 +1,15 @@
 import 'dart:convert';
 
-import 'package:mem/components/l10n.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_repeated_notification.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/mem_notifications.dart';
 import 'package:mem/mems/mem_service.dart';
-import 'package:mem/notifications/notification.dart';
 
+import 'channels.dart';
+import 'mem_notifications.dart';
+import 'notification.dart';
+import 'notification_ids.dart';
 import 'notification_repository.dart';
-
-const memReminderChannelId = 'reminder';
 
 class NotificationService {
   final NotificationRepository _notificationRepository;
@@ -40,10 +39,9 @@ class NotificationService {
   ) =>
       i(
         () async {
-          // TODO refactoring
           if (memRepeatedNotification == null) {
             await _notificationRepository.receive(
-              CancelNotification(mem.id * 10 + 3),
+              CancelNotification(memRepeatedNotificationId(mem.id)),
             );
           } else {
             final now = DateTime.now();
@@ -60,16 +58,14 @@ class NotificationService {
             }
 
             final repeatedNotification = RepeatedNotification(
-              memRepeatedNotification.memId! * 10 + 3,
+              memRepeatedNotificationId(mem.id),
               mem.name,
               'Repeat',
               notifyFirstAt,
               json.encode({'memId': memRepeatedNotification.memId}),
               [],
-              'reminder',
-              L10n().reminderName,
-              L10n().reminderDescription,
               NotificationInterval.perDay,
+              repeatedReminderChannel,
             );
 
             await _notificationRepository.receive(repeatedNotification);
@@ -96,8 +92,6 @@ class NotificationService {
   }
 }
 
-const _doneActionId = 'done';
-
 // FIXME 現時点では、通知に対する操作をテストで実行できない
 // coverage:ignore-start
 Future<void> notificationActionHandler(
@@ -108,7 +102,7 @@ Future<void> notificationActionHandler(
 ) =>
     v(
       () async {
-        if (actionId == _doneActionId) {
+        if (actionId == doneActionId) {
           if (payload.containsKey(memIdKey)) {
             final memId = payload[memIdKey];
             if (memId is int) {

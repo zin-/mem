@@ -1,9 +1,11 @@
 import 'package:mem/framework/repository_v3.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/notifications/flutter_local_notifications.dart';
-import 'package:mem/notifications/notification.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+
+import 'flutter_local_notifications.dart';
+import 'mem_notifications.dart';
+import 'notification.dart';
 
 const _androidDefaultIconPath = 'ic_launcher_foreground';
 
@@ -13,8 +15,6 @@ class NotificationActionEntity {
 
   NotificationActionEntity(this.id, this.title);
 }
-
-const memIdKey = 'memId';
 
 class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
   final FlutterLocalNotificationsWrapper _flutterLocalNotificationsWrapper;
@@ -77,9 +77,9 @@ class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
               tz.TZDateTime.from(payload.notifyAt, tz.local),
               payload.payloadJson,
               payload.actions,
-              payload.channelId,
-              payload.channelName,
-              payload.channelDescription,
+              payload.channel.id,
+              payload.channel.name,
+              payload.channel.description,
               payload.interval,
             );
           } else if (payload is OneTimeNotification) {
@@ -90,9 +90,9 @@ class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
               tz.TZDateTime.from(payload.notifyAt, tz.local),
               payload.payloadJson,
               payload.actions,
-              payload.channelId,
-              payload.channelName,
-              payload.channelDescription,
+              payload.channel.id,
+              payload.channel.name,
+              payload.channel.description,
             );
           } else if (payload is CancelNotification) {
             await discard(payload.id);
