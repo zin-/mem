@@ -1,0 +1,57 @@
+{
+  "@@locale": "en",
+  "appTitle": "Mem",
+
+  "memListPageTitle": "List",
+  "memDetailPageTitle": "Detail",
+  "actCounterConfigureTitle":"Select target",
+
+  "memNameLabel": "Name",
+  "memMemoLabel": "Memo",
+  "saveMemSuccessMessage": "Save success. {memName}",
+  "@saveMemSuccessMessage": {
+    "placeholders": {
+      "memName": {}
+    }
+  },
+  "requiredError": "Error: required",
+  "archiveMemSuccessMessage": "Archive success. {memName}",
+  "@archiveMemSuccessMessage": {
+    "placeholders": {
+      "memName": {}
+    }
+  },
+  "unarchiveMemSuccessMessage": "Unarchive success. {memName}",
+  "@unarchiveMemSuccessMessage": {
+    "placeholders": {
+      "memName": {}
+    }
+  },
+  "removeAction": "Remove",
+  "removeConfirmation": "Can I remove this?",
+  "removeMemSuccessMessage": "Remove success. {memName}",
+  "@removeMemSuccessMessage": {
+    "placeholders": {
+      "memName": {}
+    }
+  },
+  "undoAction": "Undo",
+  "okAction": "OK",
+  "cancelAction": "Cancel",
+  "archiveFilterTitle": "Archive",
+  "showNotArchivedLabel": "Show not archived",
+  "showArchivedLabel": "Show archived",
+  "doneFilterTitle": "Done",
+  "showNotDoneLabel": "Show not done",
+  "showDoneLabel": "Show done",
+
+  "done_label": "Done",
+
+  "reminder_name": "Reminder",
+  "reminder_description": "To remind at specific time.",
+  "repeated_reminder_name": "Repeated Reminder",
+  "repeated_reminder_description": "To remind at specific time per day.",
+
+  "dev": "Under development",
+  "test": "Under test"
+}

@@ -15,6 +15,7 @@ import 'database/_indexed_database.dart';
 import 'database/_sqlite_database.dart';
 import 'repositories/_act_repository.dart';
 import 'scenarios/edge_scenario.dart';
+import 'scenarios/habit_scenario.dart';
 import 'scenarios/memo_scenario.dart';
 import 'repositories/_notification_repository.dart';
 import 'scenarios/todo_scenario.dart';
@@ -52,6 +53,7 @@ void main() {
     testMemoScenario();
     testTodoScenario();
     testTaskScenario();
+    testHabitScenario();
 
     testActScenario();
 

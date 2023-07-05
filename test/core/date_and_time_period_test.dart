@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/core/date_and_time.dart';
-import 'package:mem/core/date_and_time_period.dart';
+import 'package:mem/core/date_and_time/date_and_time.dart';
+import 'package:mem/core/date_and_time/date_and_time_period.dart';
 
 void main() {
   group('Create instance', () {
@@ -113,9 +113,9 @@ void main() {
     final now = DateTime.now();
     const oneDay = Duration(days: 1);
 
-    final today = DateAndTime.from(now, allDay: false);
-    final yesterday = DateAndTime.from(now.subtract(oneDay), allDay: false);
-    final tomorrow = DateAndTime.from(now.add(oneDay), allDay: false);
+    final today = DateAndTime.from(now, timeOfDay: now);
+    final yesterday = DateAndTime.from(now.subtract(oneDay), timeOfDay: now);
+    final tomorrow = DateAndTime.from(now.add(oneDay), timeOfDay: now);
 
     final startOnly = DateAndTimePeriod(
       start: today,
@@ -155,7 +155,7 @@ void main() {
     });
 
     final endOnly = DateAndTimePeriod(
-      end: DateAndTime.from(now, allDay: false),
+      end: DateAndTime.from(now, timeOfDay: now),
     );
     group(': end only $endOnly', () {
       final endOnlyCase = {

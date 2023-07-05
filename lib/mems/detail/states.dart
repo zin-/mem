@@ -1,11 +1,28 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/component/view/mem_list/states.dart';
+import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/core/mem.dart';
+import 'package:mem/core/mem_detail.dart';
 import 'package:mem/core/mem_item.dart';
-import 'package:mem/gui/list_value_state_notifier.dart';
+import 'package:mem/core/mem_repeated_notification.dart';
+import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/gui/value_state_notifier.dart';
+import 'package:mem/components/value_state_notifier.dart';
+
+final memDetailProvider = StateNotifierProvider.autoDispose
+    .family<ValueStateNotifier<MemDetail>, MemDetail, int?>(
+  (ref, memId) => v(
+    () {
+      return ValueStateNotifier(
+        MemDetail(
+          ref.watch(editingMemProvider(memId)),
+          ref.watch(memItemsProvider(memId)) ?? [],
+          ref.watch(memRepeatedNotificationProvider(memId)),
+        ),
+      );
+    },
+  ),
+);
 
 final editingMemProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<Mem>, Mem, int?>(
@@ -23,10 +40,31 @@ final editingMemProvider = StateNotifierProvider.autoDispose
   ),
 );
 
+final memIsArchivedProvider = StateNotifierProvider.autoDispose
+    .family<ValueStateNotifier<bool>, bool, int?>(
+  (ref, memId) => v(
+    () {
+      final mem = ref.watch(editingMemProvider(memId));
+
+      return ValueStateNotifier(mem.isArchived());
+    },
+    memId,
+  ),
+);
+
 final memItemsProvider = StateNotifierProvider.autoDispose
     .family<ListValueStateNotifier<MemItem>, List<MemItem>?, int?>(
   (ref, memId) => v(
     () => ListValueStateNotifier<MemItem>(null),
+    memId,
+  ),
+);
+
+final memRepeatedNotificationProvider = StateNotifierProvider.autoDispose
+    .family<ValueStateNotifier<MemRepeatedNotification?>,
+        MemRepeatedNotification?, int?>(
+  (ref, memId) => v(
+    () => ValueStateNotifier(null),
     memId,
   ),
 );

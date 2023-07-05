@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/notifications/notification.dart';
+import 'package:mem/notifications/notification_channel.dart';
 import 'package:mem/notifications/notification_repository.dart';
 
 void main() {
@@ -79,9 +80,11 @@ void testNotificationRepository() => group(
                       DateTime.now().add(const Duration(days: 1)),
                       jsonEncode({}),
                       [],
-                      'test channelId',
-                      'test channelName',
-                      'test channelDescription',
+                      NotificationChannel(
+                        'test channelId',
+                        'test channelName',
+                        'test channelDescription',
+                      ),
                     ),
                   );
 

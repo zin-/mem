@@ -57,7 +57,10 @@ abstract class Table {
 
   Future<int> deleteByPk(dynamic pk);
 
-  Future<int> delete();
+  Future<int> delete({
+    String? whereString,
+    Iterable<dynamic>? whereArgs,
+  });
 
   // TODO implement
   // bulkInsert();

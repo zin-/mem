@@ -1,4 +1,5 @@
 import 'package:mem/framework/entity_v3.dart';
+import 'package:mem/notifications/notification_channel.dart';
 
 abstract class Notification extends EntityV3 {
   final int id;
@@ -12,9 +13,7 @@ class OneTimeNotification extends Notification {
   final DateTime notifyAt;
   final String payloadJson;
   final List<NotificationAction> actions;
-  final String channelId;
-  final String channelName;
-  final String channelDescription;
+  final NotificationChannel channel;
 
   OneTimeNotification(
     super.id,
@@ -23,11 +22,26 @@ class OneTimeNotification extends Notification {
     this.notifyAt,
     this.payloadJson,
     this.actions,
-    this.channelId,
-    this.channelName,
-    this.channelDescription,
+    this.channel,
   );
 }
+
+class RepeatedNotification extends OneTimeNotification {
+  final NotificationInterval interval;
+
+  RepeatedNotification(
+    super.id,
+    super.title,
+    super.body,
+    super.notifyAt,
+    super.payloadJson,
+    super.actions,
+    this.interval,
+    super.channel,
+  );
+}
+
+enum NotificationInterval { perDay, perWeek, perMonth, perYear }
 
 class CancelNotification extends Notification {
   CancelNotification(super.id);

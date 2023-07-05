@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/gui/l10n.dart';
+import 'package:mem/components/l10n.dart';
+import 'package:mem/components/mem/list/view.dart';
 import 'package:mem/core/mem.dart';
-import 'package:mem/gui/colors.dart';
-import 'package:mem/gui/constants.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/actions.dart';
-import 'package:mem/mems/detail/actions.dart';
 import 'package:mem/mems/list/actions.dart';
 import 'package:mem/mems/detail/page.dart';
-import 'package:mem/mems/mem_list_filter.dart';
-import 'package:mem/component/view/mem_list/view.dart';
+import 'package:mem/components/mem/list/filter.dart';
 import 'package:mem/mems/mems_action.dart';
+import 'package:mem/mems/states.dart';
+import 'package:mem/values/colors.dart';
+import 'package:mem/values/durations.dart';
 
 import 'show_new_mem_fab.dart';
 
@@ -79,7 +79,7 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
           .push<bool?>(
             PageRouteBuilder(
               pageBuilder: (context, animation, secondaryAnimation) =>
-                  MemDetailPageV2(memId),
+                  MemDetailPage(memId),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) =>
                       SlideTransition(

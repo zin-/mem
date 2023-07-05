@@ -11,9 +11,10 @@ runs:
           **/.flutter-plugins
           **/.flutter-plugin-dependencies
           **/.dart_tool/package_config.json
+          **/.dart_tool/flutter_gen/pubspec.yaml
           ${{ env.PUB_CACHE }}
           **/.packages
-        key: dependencies-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+        key: -dependencies-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
     - name: 'Get Packages'
       if: steps.cache.outputs.cache-hit != 'true'
       run: flutter packages pub get

@@ -8,7 +8,6 @@ import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/database/definition.dart';
 import 'package:mem/main.dart' as app;
 
-import '../_helpers.dart';
 import 'helpers.dart';
 
 void main() {
@@ -58,7 +57,7 @@ void testTaskScenario() => group(': $scenarioName', () {
           expect(find.text('M/d/y'), findsNWidgets(2));
           expect(calendarIconFinder, findsNWidgets(2));
           expect(switchFinder, findsNWidgets(2));
-          expect(timeIconFinder, findsNothing);
+          expect(timeIconFinder, findsOneWidget);
           await widgetTester.tap(calendarIconFinder.at(0));
           await widgetTester.pumpAndSettle();
 
@@ -74,7 +73,7 @@ void testTaskScenario() => group(': $scenarioName', () {
                 .initialValue,
             startDate,
           );
-          expect(timeIconFinder, findsNothing);
+          expect(timeIconFinder, findsOneWidget);
 
           await widgetTester.tap(switchFinder.at(0));
           await widgetTester.pumpAndSettle();
@@ -90,7 +89,7 @@ void testTaskScenario() => group(': $scenarioName', () {
                 .initialValue,
             startTime,
           );
-          expect(timeIconFinder, findsOneWidget);
+          expect(timeIconFinder, findsNWidgets(2));
 
           await widgetTester.tap(calendarIconFinder.at(1));
           await widgetTester.pumpAndSettle();
@@ -115,7 +114,7 @@ void testTaskScenario() => group(': $scenarioName', () {
           const enteringMemName =
               '$scenarioName: Set Period - mem name - entering';
           await widgetTester.enterText(
-            memNameTextFormFieldFinder,
+            memNameOnDetailPageFinder,
             enteringMemName,
           );
           await widgetTester.tap(saveMemFabFinder);
@@ -136,8 +135,3 @@ void testTaskScenario() => group(': $scenarioName', () {
         },
       );
     });
-
-final newMemFabFinder = find.byIcon(Icons.add);
-final calendarIconFinder = find.byIcon(Icons.calendar_month);
-final switchFinder = find.byType(Switch);
-final timeIconFinder = find.byIcon(Icons.access_time_outlined);

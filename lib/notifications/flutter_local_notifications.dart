@@ -103,8 +103,9 @@ class FlutterLocalNotificationsWrapper {
     List<NotificationAction> actions,
     String channelId,
     String channelName,
-    String channelDescription,
-  ) =>
+    String channelDescription, [
+    NotificationInterval? interval,
+  ]) =>
       v(
         () async {
           if (Platform.isAndroid) {
@@ -127,6 +128,7 @@ class FlutterLocalNotificationsWrapper {
                   UILocalNotificationDateInterpretation.absoluteTime,
               androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
               payload: payload,
+              matchDateTimeComponents: interval?.convert(),
             );
           }
         },
@@ -164,6 +166,21 @@ class FlutterLocalNotificationsWrapper {
       _instance = tmp;
     }
     return tmp;
+  }
+}
+
+extension on NotificationInterval {
+  DateTimeComponents convert() {
+    switch (this) {
+      case NotificationInterval.perDay:
+        return DateTimeComponents.time;
+      case NotificationInterval.perWeek:
+        return DateTimeComponents.dayOfWeekAndTime;
+      case NotificationInterval.perMonth:
+        return DateTimeComponents.dayOfMonthAndTime;
+      case NotificationInterval.perYear:
+        return DateTimeComponents.dateAndTime;
+    }
   }
 }
 

@@ -280,7 +280,11 @@ class ObjectStore extends Table {
       );
 
   @override
-  Future<int> delete() => v(
+  Future<int> delete({
+    String? whereString,
+    Iterable<dynamic>? whereArgs,
+  }) =>
+      v(
         () async => await _database.onOpened(
           () async {
             final txn = _database._database
@@ -296,6 +300,7 @@ class ObjectStore extends Table {
           },
           () => throw DatabaseDoesNotExistException(_database.definition.name),
         ),
+        {whereString, whereArgs},
       );
 
   Map<String, dynamic> _convertIntoMap(Object? object) {

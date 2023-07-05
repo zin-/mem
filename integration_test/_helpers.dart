@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/core/date_and_time.dart';
-import 'package:mem/core/date_and_time_period.dart';
+import 'package:mem/components/l10n.dart';
+import 'package:mem/core/date_and_time/date_and_time.dart';
+import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/database/definition.dart';
@@ -9,12 +10,11 @@ import 'package:mem/database/table_definitions/base.dart';
 import 'package:mem/database/table_definitions/mem_items.dart';
 import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/database_manager.dart';
-import 'package:mem/gui/l10n.dart';
-import 'package:mem/main.dart' as app;
 import 'package:mem/mems/mem_item_repository_v2.dart';
-import 'package:mem/mems/mem_name.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/mems/mem_service.dart';
+
+import 'scenarios/helpers.dart';
 
 const defaultDuration = Duration(seconds: 1);
 
@@ -30,9 +30,6 @@ Future clearDatabase() async {
   MemService.reset(null);
 }
 
-Future<void> runApplication({String? languageCode}) =>
-    app.main(languageCode: languageCode);
-
 final memListFilterButton = find.byIcon(Icons.filter_list);
 final findShowNotArchiveSwitch = find.byType(Switch).at(0);
 final findShowArchiveSwitch = find.byType(Switch).at(1);
@@ -43,7 +40,7 @@ Future closeMemListFilter(WidgetTester widgetTester) async {
 }
 
 TextFormField memNameTextFormField(WidgetTester widgetTester) =>
-    (widgetTester.widget(memNameTextFormFieldFinder) as TextFormField);
+    (widgetTester.widget(memNameOnDetailPageFinder) as TextFormField);
 
 Future<void> prepareSavedData(
   String memName,
@@ -101,14 +98,6 @@ abstract class TestSize {
 
   TestSize._();
 }
-
-final newMemFabFinder = find.byIcon(Icons.add);
-final memNameTextFormFieldFinder = find.descendant(
-  of: find.byType(MemNameTextFormField),
-  matching: find.byType(TextFormField),
-);
-final saveMemFabFinder = find.byIcon(Icons.save_alt);
-final okFinder = find.text('OK');
 
 Future<void> prepareSavedMem(
   String memName,

@@ -320,11 +320,21 @@ class SqliteTable extends Table {
       );
 
   @override
-  Future<int> delete() => v(
+  Future<int> delete({
+    String? whereString,
+    Iterable<dynamic>? whereArgs,
+  }) =>
+      v(
         () async => await _database.onOpened(
-          () async => await _database._database.delete(definition.name),
+          () async => await _database._database.delete(
+            definition.name,
+            where: whereString?.isNotEmpty == true ? whereString : null,
+            whereArgs:
+                whereArgs?.isNotEmpty == true ? whereArgs?.toList() : null,
+          ),
           () => throw DatabaseDoesNotExistException(_database.definition.name),
         ),
+        {whereString, whereArgs},
       );
 
   String _buildWhereId() =>
