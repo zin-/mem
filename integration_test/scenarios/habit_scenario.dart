@@ -6,7 +6,7 @@ import 'package:mem/database/table_definitions/mem_repeated_notifications.dart';
 import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/database_manager.dart';
-import 'package:mem/gui/constants.dart';
+import 'package:mem/values/durations.dart';
 
 import 'helpers.dart';
 

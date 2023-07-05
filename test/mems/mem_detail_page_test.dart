@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/components/l10n.dart';
 import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/notifications/notification_repository.dart';
 import 'package:mem/mems/detail/page.dart';
 import 'package:mockito/mockito.dart';
-import 'package:mem/gui/l10n.dart';
 
 import '../helpers.mocks.dart';
 

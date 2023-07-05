@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/component/view/mem_list/actions.dart';
-import 'package:mem/component/view/mem_list/states.dart';
+import 'package:mem/components/l10n.dart';
+import 'package:mem/components/mem/list/actions.dart';
+import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/framework/database/database_manager.dart';
-import 'package:mem/gui/l10n.dart';
-import 'package:mem/gui/list_value_state_notifier.dart';
+import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/mems/list/actions.dart';
 import 'package:mem/mems/list/page.dart';
 

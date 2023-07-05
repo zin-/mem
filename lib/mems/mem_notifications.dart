@@ -1,8 +1,8 @@
 import 'dart:convert';
 
+import 'package:mem/components/l10n.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/mem.dart';
-import 'package:mem/gui/l10n.dart';
 import 'package:mem/notifications/notification.dart';
 
 const _memIdKey = 'memId';

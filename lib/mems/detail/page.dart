@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/gui/dimens.dart';
-import 'package:mem/gui/l10n.dart';
-import 'package:mem/gui/colors.dart';
+import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/body.dart';
 import 'package:mem/mems/detail/fab.dart';
@@ -10,6 +8,8 @@ import 'package:mem/mems/detail/menu.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/list/page.dart';
 import 'package:mem/mems/mems_action.dart';
+import 'package:mem/values/colors.dart';
+import 'package:mem/values/dimens.dart';
 
 class MemDetailPage extends ConsumerWidget {
   final int? _memId;

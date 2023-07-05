@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/component/view/date_and_time/time_of_day_view.dart';
+import 'package:mem/components/date_and_time/time_of_day_view.dart';
 import 'package:mem/core/mem_repeated_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/actions.dart';

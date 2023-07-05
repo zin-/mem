@@ -10,7 +10,7 @@ import 'package:mem/database/table_definitions/mem_repeated_notifications.dart';
 import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/database/definition.dart';
-import 'package:mem/gui/app.dart';
+import 'package:mem/components/app.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/list/page.dart';

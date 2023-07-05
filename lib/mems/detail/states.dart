@@ -1,13 +1,13 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/component/view/mem_list/states.dart';
+import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_detail.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/core/mem_repeated_notification.dart';
-import 'package:mem/gui/list_value_state_notifier.dart';
+import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/gui/value_state_notifier.dart';
+import 'package:mem/components/value_state_notifier.dart';
 
 final memDetailProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<MemDetail>, MemDetail, int?>(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/gui/l10n.dart';
+import 'package:mem/components/l10n.dart';
 
 Future<void> runTestWidget(WidgetTester widgetTester, Widget widget) =>
     widgetTester.pumpWidget(

@@ -2,18 +2,18 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/act_actions.dart';
-import 'package:mem/component/view/mem_list/states.dart';
-import 'package:mem/component/view/timer.dart';
+import 'package:mem/components/mem/list/states.dart';
+import 'package:mem/components/mem/mem_done_checkbox.dart';
+import 'package:mem/components/mem/mem_name.dart';
+import 'package:mem/components/mem/mem_period.dart';
+import 'package:mem/components/timer.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/mem.dart';
-import 'package:mem/gui/colors.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/mem_list_view_state.dart';
-import 'package:mem/mems/mem_period.dart';
+import 'package:mem/values/colors.dart';
 
-import '../../../../mems/mem_done_checkbox.dart';
 import 'actions.dart';
-import '../../../../mems/mem_name.dart';
+import 'states.dart';
 
 class MemListItemView extends ConsumerWidget {
   final MemId _memId;

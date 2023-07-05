@@ -1,8 +1,8 @@
 import 'dart:convert';
 
+import 'package:mem/components/l10n.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_repeated_notification.dart';
-import 'package:mem/gui/l10n.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_notifications.dart';
 import 'package:mem/mems/mem_service.dart';

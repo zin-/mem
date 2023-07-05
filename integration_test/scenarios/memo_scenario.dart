@@ -8,7 +8,7 @@ import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/database/definition.dart';
-import 'package:mem/gui/constants.dart';
+import 'package:mem/values/durations.dart';
 
 import '../_helpers.dart';
 import 'helpers.dart';

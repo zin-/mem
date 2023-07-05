@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/components/l10n.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
@@ -9,7 +10,6 @@ import 'package:mem/database/table_definitions/base.dart';
 import 'package:mem/database/table_definitions/mem_items.dart';
 import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/database_manager.dart';
-import 'package:mem/gui/l10n.dart';
 import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/mems/mem_service.dart';
