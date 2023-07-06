@@ -1,5 +1,6 @@
 import 'package:mem/framework/database/definition/column_definition.dart';
 import 'package:mem/framework/database/definition/database_definition.dart';
+import 'package:mem/framework/database/definition/primary_key_definition.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
 
 const tableName = 'tests';

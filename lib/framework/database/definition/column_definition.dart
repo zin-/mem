@@ -51,24 +51,6 @@ class ColumnDefinition {
   String toString() => 'Column definition :: { name: $name }';
 }
 
-class PrimaryKeyDefinition extends ColumnDefinition {
-  final bool autoincrement;
-
-  PrimaryKeyDefinition(
-    super.name,
-    super.type, {
-    this.autoincrement = false,
-  });
-
-  @override
-  String onSQL() => '${super.onSQL()}'
-      ' PRIMARY KEY'
-      '${autoincrement ? ' AUTOINCREMENT' : ''}';
-
-  @override
-  String toString() => 'Primary key definition :: { name: $name }';
-}
-
 class ForeignKeyDefinition extends ColumnDefinition {
   final TableDefinition parentTableDefinition;
 
@@ -104,5 +86,3 @@ extension on ColumnType {
 
   String get _onSQL => _onSQLs[this]!;
 }
-
-

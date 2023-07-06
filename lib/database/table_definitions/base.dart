@@ -1,4 +1,5 @@
 import 'package:mem/framework/database/definition/column_definition.dart';
+import 'package:mem/framework/database/definition/primary_key_definition.dart';
 
 final idPKDef =
     PrimaryKeyDefinition('id', ColumnType.integer, autoincrement: true);
