@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'package:idb_shim/idb.dart' as idb_shim;
 import 'package:idb_shim/idb_browser.dart' as idb_browser;
 import 'package:mem/framework/database/database.dart';
-import 'package:mem/framework/database/definition/column_definition.dart';
+import 'package:mem/framework/database/definition/foreign_key_definition.dart';
 import 'package:mem/framework/database/definition/primary_key_definition.dart';
 import 'package:mem/logger/log_service.dart';
 

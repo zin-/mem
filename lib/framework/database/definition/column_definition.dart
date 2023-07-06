@@ -1,5 +1,4 @@
 import 'package:mem/framework/database/definition/exceptions.dart';
-import 'package:mem/framework/database/definition/table_definition.dart';
 
 class ColumnDefinition {
   final String name;
@@ -49,30 +48,6 @@ class ColumnDefinition {
 
   @override
   String toString() => 'Column definition :: { name: $name }';
-}
-
-class ForeignKeyDefinition extends ColumnDefinition {
-  final TableDefinition parentTableDefinition;
-
-  ForeignKeyDefinition(this.parentTableDefinition)
-      : super(
-          [
-            parentTableDefinition.name,
-            parentTableDefinition.primaryKey.name,
-          ].join('_'),
-          parentTableDefinition.primaryKey.type,
-        );
-
-  @override
-  String onSQL() => [
-        super.onSQL(),
-        'FOREIGN KEY ($name)'
-            ' REFERENCES ${parentTableDefinition.name}'
-            '(${parentTableDefinition.primaryKey.name})'
-      ].join(', ');
-
-  @override
-  String toString() => 'Foreign key definition :: { name: $name }';
 }
 
 enum ColumnType { integer, text, datetime }
