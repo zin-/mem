@@ -13,7 +13,7 @@ class ColumnDefinition {
     this.defaultValue,
   }) {
     if (name.isEmpty) {
-      throw ColumnDefinitionException('Column name is required.');
+      throw ColumnDefinitionException('Column name is empty.');
     } else if (name.contains(' ')) {
       throw ColumnDefinitionException('Column name contains " ".');
     }
