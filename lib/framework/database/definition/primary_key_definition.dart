@@ -12,7 +12,7 @@ class PrimaryKeyDefinition extends ColumnDefinition {
   });
 
   @override
-  String onSQL() => '${super.onSQL()}'
+  String buildCreateTableSql() => '${super.buildCreateTableSql()}'
       ' PRIMARY KEY'
       '${autoincrement ? ' AUTOINCREMENT' : ''}';
 

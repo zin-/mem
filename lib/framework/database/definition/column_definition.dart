@@ -19,10 +19,11 @@ class ColumnDefinition {
     }
   }
 
-  String onSQL() => '$name ${type._onSQL}'
+  String buildCreateTableSql() => '$name'
+      ' ${type._buildCreateTableSql}'
       '${notNull ? ' NOT NULL' : ''}'
       // FIXME defaultValueがDateTimeなどの場合、動かない気がする
-      '${defaultValue == null ? notNull ? '' : ' DEFAULT NULL' : ' DEFAULT $defaultValue'}';
+      '${defaultValue == null ? (notNull ? '' : ' DEFAULT NULL') : ' DEFAULT $defaultValue'}';
 
   dynamic toTuple(dynamic value) {
     switch (type) {
@@ -59,5 +60,5 @@ extension on ColumnType {
     ColumnType.datetime: 'TIMESTAMP',
   };
 
-  String get _onSQL => _onSQLs[this]!;
+  String get _buildCreateTableSql => _onSQLs[this]!;
 }

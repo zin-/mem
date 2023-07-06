@@ -27,7 +27,7 @@ class TableDefinition {
   String buildCreateTableSql() => 'CREATE TABLE'
       ' $name'
       ' ('
-      ' ${columns.map((column) => column.onSQL()).join(', ')}'
+      ' ${columns.map((column) => column.buildCreateTableSql()).join(', ')}'
       ' )';
 
   PrimaryKeyDefinition get primaryKey =>

@@ -17,8 +17,8 @@ class ForeignKeyDefinition extends ColumnDefinition {
         );
 
   @override
-  String onSQL() => [
-        super.onSQL(),
+  String buildCreateTableSql() => [
+        super.buildCreateTableSql(),
         'FOREIGN KEY ($name)'
             ' REFERENCES ${parentTableDefinition.name}'
             '(${parentTableDefinition.primaryKey.name})'
