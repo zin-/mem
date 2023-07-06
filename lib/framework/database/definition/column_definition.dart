@@ -105,6 +105,4 @@ extension on ColumnType {
   String get _onSQL => _onSQLs[this]!;
 }
 
-class ColumnDefinitionException extends DatabaseDefinitionException {
-  ColumnDefinitionException(super.message);
-}
+
