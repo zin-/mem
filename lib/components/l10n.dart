@@ -1,25 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-BuildContext? _context;
-
-AppLocalizations buildL10n([BuildContext? context]) {
-  if (context == null) {
-    if (_context == null) {
-      return lookupAppLocalizations(const Locale('en'));
-    } else {
-      return AppLocalizations.of(_context!) ??
-          lookupAppLocalizations(const Locale('en'));
-    }
-  } else {
-    _context ??= context;
-
-    return AppLocalizations.of(context) ??
-        lookupAppLocalizations(const Locale('en'));
-  }
-}
+AppLocalizations buildL10n(BuildContext context) =>
+    AppLocalizations.of(context) ?? lookupAppLocalizations(const Locale('en'));
 
 // TODO arbに追加するたびに関数を増やさなくても良いようにする
+// TODO @Deprecated('Use buildL10n instead.')
 class L10n {
   final AppLocalizations _appLocalizations;
 

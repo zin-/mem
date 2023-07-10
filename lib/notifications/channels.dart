@@ -1,14 +1,30 @@
+import 'package:flutter/material.dart';
 import 'package:mem/components/l10n.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/notification_channel.dart';
 
-final reminderChannel = NotificationChannel(
-  'reminder',
-  buildL10n().reminder_name,
-  buildL10n().reminder_description,
-);
+late final NotificationChannel reminderChannel;
 
-final repeatedReminderChannel = NotificationChannel(
-  'repeated-reminder',
-  buildL10n().repeated_reminder_name,
-  buildL10n().repeated_reminder_description,
-);
+late final NotificationChannel repeatedReminderChannel;
+
+var _initialized = false;
+
+void buildNotificationChannels(BuildContext context) => i(
+      () {
+        if (!_initialized) {
+          reminderChannel = NotificationChannel(
+            'reminder',
+            buildL10n(context).reminder_name,
+            buildL10n(context).reminder_description,
+          );
+          repeatedReminderChannel = NotificationChannel(
+            'repeated-reminder',
+            buildL10n(context).repeated_reminder_name,
+            buildL10n(context).repeated_reminder_description,
+          );
+
+          _initialized = true;
+        }
+      },
+      {context, _initialized},
+    );
