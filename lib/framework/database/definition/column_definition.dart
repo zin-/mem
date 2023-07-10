@@ -22,9 +22,12 @@ class ColumnDefinition {
   String buildCreateTableSql() => '$name'
       ' ${type._buildCreateTableSql}'
       '${notNull ? ' NOT NULL' : ''}'
-      // FIXME defaultValueがDateTimeなどの場合、動かない気がする
+      // FIXME defaultValueがDateTimeなどの場合、動かない
       '${defaultValue == null ? (notNull ? '' : ' DEFAULT NULL') : ' DEFAULT $defaultValue'}';
 
+  // ISSUE 209
+  //  ここで定義されるべきものか？
+  //  Databaseごとに変わる気もするし、ここではない気がする
   dynamic toTuple(dynamic value) {
     switch (type) {
       case ColumnType.integer:
@@ -57,6 +60,7 @@ extension on ColumnType {
   static final _onSQLs = {
     ColumnType.integer: 'INTEGER',
     ColumnType.text: 'TEXT',
+    // FIXME TIMESTAMPは2038年問題があるのでDATETIMEに変更する
     ColumnType.datetime: 'TIMESTAMP',
   };
 
