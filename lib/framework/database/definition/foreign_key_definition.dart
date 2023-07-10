@@ -7,7 +7,6 @@ class ForeignKeyDefinition extends ColumnDefinition {
   ForeignKeyDefinition(
     this.parentTableDefinition, {
     super.notNull,
-    super.defaultValue,
   }) : super(
           [
             parentTableDefinition.name,

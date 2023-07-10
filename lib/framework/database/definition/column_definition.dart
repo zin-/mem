@@ -4,13 +4,11 @@ class ColumnDefinition {
   final String name;
   final ColumnType type;
   final bool notNull;
-  final dynamic defaultValue;
 
   ColumnDefinition(
     this.name,
     this.type, {
     this.notNull = true,
-    this.defaultValue,
   }) {
     if (name.isEmpty) {
       throw ColumnDefinitionException('Column name is empty.');
@@ -21,9 +19,7 @@ class ColumnDefinition {
 
   String buildCreateTableSql() => '$name'
       ' ${type._buildCreateTableSql}'
-      '${notNull ? ' NOT NULL' : ''}'
-      // FIXME defaultValueがDateTimeなどの場合、動かない
-      '${defaultValue == null ? (notNull ? '' : ' DEFAULT NULL') : ' DEFAULT $defaultValue'}';
+      '${notNull ? ' NOT NULL' : ''}';
 
   // ISSUE 209
   //  ここで定義されるべきものか？

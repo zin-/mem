@@ -7,7 +7,6 @@ class PrimaryKeyDefinition extends ColumnDefinition {
     super.name,
     super.type, {
     super.notNull,
-    super.defaultValue,
     this.autoincrement = false,
   });
 
