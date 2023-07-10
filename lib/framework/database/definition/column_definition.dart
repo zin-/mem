@@ -1,3 +1,4 @@
+import 'package:mem/framework/database/definition/column_type.dart';
 import 'package:mem/framework/database/definition/exceptions.dart';
 
 class ColumnDefinition {
@@ -49,8 +50,6 @@ class ColumnDefinition {
   @override
   String toString() => 'Column definition :: { name: $name }';
 }
-
-enum ColumnType { integer, text, datetime }
 
 extension on ColumnType {
   String _buildCreateTableSql() {

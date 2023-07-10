@@ -1,4 +1,5 @@
 import 'package:mem/framework/database/definition/column_definition.dart';
+import 'package:mem/framework/database/definition/column_type.dart';
 import 'package:mem/framework/database/definition/database_definition.dart';
 import 'package:mem/framework/database/definition/foreign_key_definition.dart';
 import 'package:mem/framework/database/definition/primary_key_definition.dart';
