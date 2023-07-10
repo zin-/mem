@@ -6,11 +6,13 @@ import 'package:mem/database/table_definitions/mem_repeated_notifications.dart';
 import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/database_manager.dart';
-import 'package:mem/values/durations.dart';
+import 'package:mem/logger/log_entity.dart';
+import 'package:mem/logger/log_service.dart';
 
 import 'helpers.dart';
 
 void main() {
+  LogService.initialize(Level.verbose);
   testHabitScenario();
 }
 
@@ -51,14 +53,14 @@ void testHabitScenario() => group(': $_scenarioName', () {
         await widgetTester.pumpAndSettle();
 
         await widgetTester.tap(find.text(insertedMemName));
-        await widgetTester.pumpAndSettle(defaultTransitionDuration);
+        await widgetTester.pumpAndSettle();
 
         final pickTime = DateTime.now();
         await widgetTester.tap(timeIconFinder);
         await widgetTester.pump();
 
         await widgetTester.tap(okFinder);
-        await widgetTester.pumpAndSettle(defaultTransitionDuration);
+        await widgetTester.pump();
 
         expect(
           (widgetTester.widget(memRepeatedNotificationOnDetailPageFinder())
@@ -67,40 +69,60 @@ void testHabitScenario() => group(': $_scenarioName', () {
           timeText(pickTime),
         );
         await widgetTester.tap(saveMemFabFinder);
-        await widgetTester.pumpAndSettle(defaultTransitionDuration);
+        await widgetTester.pump();
 
         await widgetTester.tap(timeIconFinder);
         await widgetTester.pump();
 
         await widgetTester.tap(okFinder);
-        await widgetTester.pumpAndSettle(defaultTransitionDuration);
+        await widgetTester.pumpAndSettle();
 
         await widgetTester.tap(saveMemFabFinder);
-        await widgetTester.pumpAndSettle(defaultTransitionDuration);
+        await widgetTester.pumpAndSettle();
 
-        final memRepeatedNotifications = (await db
-            .getTable(memRepeatedNotificationTableDefinition.name)
-            .select(
-          whereString: '${memIdFkDef.name} = ?',
-          whereArgs: [insertedMemId],
-        ));
-        expect(memRepeatedNotifications.length, 1);
-        final timeOfDay = TimeOfDay.fromDateTime(pickTime);
-        expect(
-          memRepeatedNotifications[0][timeOfDaySecondsColDef.name],
-          ((timeOfDay.hour * 60) + timeOfDay.minute) * 60,
-        );
-        expect(
-          memRepeatedNotifications[0][memIdFkDef.name],
-          insertedMemId,
-        );
+        await Future(() async {
+          late final Map<String, dynamic> inserted;
+
+          await expectLater(
+            inserted = (await db
+                    .getTable(memRepeatedNotificationTableDefinition.name)
+                    .select(
+              whereString: '${memIdFkDef.name} = ?',
+              whereArgs: [insertedMemId],
+            ))
+                .single,
+            isNotNull,
+          );
+          final timeOfDay = TimeOfDay.fromDateTime(pickTime);
+          await expectLater(
+            inserted[timeOfDaySecondsColDef.name],
+            ((timeOfDay.hour * 60) + timeOfDay.minute) * 60,
+          );
+          await expectLater(
+            inserted[createdAtColDef.name],
+            isNotNull,
+          );
+          await expectLater(
+            inserted[updatedAtColDef.name],
+            isNotNull,
+          );
+          await expectLater(
+            inserted[archivedAtColDef.name],
+            isNull,
+          );
+          await expectLater(
+            inserted[memIdFkDef.name],
+            insertedMemId,
+          );
+        });
       });
+
       testWidgets(': Unset repeated notification.', (widgetTester) async {
         await runApplication();
         await widgetTester.pumpAndSettle();
 
         await widgetTester.tap(find.text(withRepeatedMemName));
-        await widgetTester.pumpAndSettle(defaultTransitionDuration);
+        await widgetTester.pumpAndSettle();
 
         expect(
           (widgetTester.widget(memRepeatedNotificationOnDetailPageFinder())
@@ -118,14 +140,18 @@ void testHabitScenario() => group(': $_scenarioName', () {
           '',
         );
         await widgetTester.tap(saveMemFabFinder);
-        await widgetTester.pumpAndSettle(defaultTransitionDuration);
+        await widgetTester.pumpAndSettle();
 
-        final memRepeatedNotifications = (await db
-            .getTable(memRepeatedNotificationTableDefinition.name)
-            .select(
-          whereString: '${memIdFkDef.name} = ?',
-          whereArgs: [withRepeatedMemId],
-        ));
-        expect(memRepeatedNotifications.length, 0);
+        await Future(
+          () async {
+            final memRepeatedNotifications = (await db
+                .getTable(memRepeatedNotificationTableDefinition.name)
+                .select(
+              whereString: '${memIdFkDef.name} = ?',
+              whereArgs: [withRepeatedMemId],
+            ));
+            await expectLater(memRepeatedNotifications.length, 0);
+          },
+        );
       });
     });
