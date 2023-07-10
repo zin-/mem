@@ -18,7 +18,7 @@ class ColumnDefinition {
   }
 
   String buildCreateTableSql() => '$name'
-      ' ${type._buildCreateTableSql}'
+      ' ${type._buildCreateTableSql()}'
       '${notNull ? ' NOT NULL' : ''}';
 
   // ISSUE 209
@@ -53,12 +53,15 @@ class ColumnDefinition {
 enum ColumnType { integer, text, datetime }
 
 extension on ColumnType {
-  static final _onSQLs = {
-    ColumnType.integer: 'INTEGER',
-    ColumnType.text: 'TEXT',
-    // FIXME TIMESTAMPは2038年問題があるのでDATETIMEに変更する
-    ColumnType.datetime: 'TIMESTAMP',
-  };
-
-  String get _buildCreateTableSql => _onSQLs[this]!;
+  String _buildCreateTableSql() {
+    switch (this) {
+      case ColumnType.integer:
+        return 'INTEGER';
+      case ColumnType.text:
+        return 'TEXT';
+      case ColumnType.datetime:
+        // FIXME TIMESTAMPは2038年問題があるのでDATETIMEに変更する
+        return 'TIMESTAMP';
+    }
+  }
 }
