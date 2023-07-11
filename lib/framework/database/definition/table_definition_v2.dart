@@ -1,13 +1,15 @@
 import 'package:collection/collection.dart';
+import 'package:mem/framework/database/definition/column/foreign_key_definition.dart';
 import 'package:mem/framework/database/definition/exceptions.dart';
 
 import 'column/column_definition.dart';
 
 class TableDefinitionV2 {
   final String name;
+  final String? singularName;
   final Iterable<ColumnDefinition> columnDefinitions;
 
-  TableDefinitionV2(this.name, this.columnDefinitions) {
+  TableDefinitionV2(this.name, this.columnDefinitions, {this.singularName}) {
     if (name.isEmpty) {
       throw TableDefinitionException('Table name is required.');
     } else if (name.contains(' ')) {
@@ -26,9 +28,8 @@ class TableDefinitionV2 {
     }
   }
 
-  // TODO fkの扱い
   String buildCreateTableSql() {
-    final pks = columnDefinitions.where((element) => element.isPrimaryKey);
+    final foreignKeys = columnDefinitions.whereType<ForeignKeyDefinition>();
 
     return [
       'CREATE TABLE',
@@ -38,13 +39,19 @@ class TableDefinitionV2 {
         columnDefinitions
             .map((columnDefinition) => columnDefinition.buildCreateTableSql())
             .join(', '),
-        pks.isEmpty
+        primaryKeys.isEmpty
             ? null
-            : 'PRIMARY KEY ( ${pks.map((e) => e.name).join(', ')} )',
+            : 'PRIMARY KEY ( ${primaryKeys.map((e) => e.name).join(', ')} )',
+        foreignKeys.isEmpty
+            ? null
+            : foreignKeys.map((e) => e.buildForeignKeySql()).join(', '),
       ].where((element) => element != null).join(', '),
       ')',
     ].join(' ');
   }
+
+  Iterable<ColumnDefinition> get primaryKeys =>
+      columnDefinitions.where((element) => element.isPrimaryKey);
 
   @override
   String toString() => 'TableDefinition'

@@ -65,11 +65,22 @@ void testDatabaseV2() => group(': $_scenarioName', () {
             'sqlite_master',
             where: 'name = ?',
             whereArgs: [
-              testTableName,
+              testTableDefinition.name,
             ],
           ))
               .single['sql'],
           testTableDefinition.buildCreateTableSql(),
+        );
+        expect(
+          (await database.query(
+            'sqlite_master',
+            where: 'name = ?',
+            whereArgs: [
+              testChildTableDefinition.name,
+            ],
+          ))
+              .single['sql'],
+          testChildTableDefinition.buildCreateTableSql(),
         );
       });
     });

@@ -34,4 +34,4 @@ abstract class ColumnDefinition {
       ' }';
 }
 
-// TODO add FK
+// TODO add datetime

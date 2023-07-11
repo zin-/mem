@@ -1,12 +1,11 @@
+import 'package:mem/framework/database/definition/column/foreign_key_definition.dart';
 import 'package:mem/framework/database/definition/column/integer_column_definition.dart';
 import 'package:mem/framework/database/definition/column/text_column_definition.dart';
 import 'package:mem/framework/database/definition/database_definition_v2.dart';
 import 'package:mem/framework/database/definition/table_definition_v2.dart';
 
-const testTableName = 'test_table';
-
 final testTableDefinition = TableDefinitionV2(
-  testTableName,
+  'test_table',
   [
     IntegerColumnDefinition('test_integer'),
     TextColumnDefinition('test_text'),
@@ -14,6 +13,14 @@ final testTableDefinition = TableDefinitionV2(
       'test_pk_integer',
       isPrimaryKey: true,
     ),
+  ],
+  singularName: 'test_table_singular_name',
+);
+
+final testChildTableDefinition = TableDefinitionV2(
+  'test_child_table',
+  [
+    ForeignKeyDefinition(testTableDefinition),
   ],
 );
 
@@ -25,5 +32,6 @@ final testDatabaseDefinition = DatabaseDefinitionV2(
   testDatabaseVersion,
   [
     testTableDefinition,
+    testChildTableDefinition,
   ],
 );
