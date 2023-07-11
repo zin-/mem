@@ -1,8 +1,8 @@
 import 'package:collection/collection.dart';
-import 'package:mem/framework/database/definition/column/foreign_key_definition.dart';
-import 'package:mem/framework/database/definition/exceptions.dart';
 
 import 'column/column_definition.dart';
+import 'column/foreign_key_definition.dart';
+import 'exceptions.dart';
 
 class TableDefinitionV2 {
   final String name;

@@ -8,8 +8,6 @@ class TableDefinition {
   final List<ColumnDefinition> columns;
 
   TableDefinition(this.name, this.columns) {
-    // TODO divide name and columns checks
-    // TODO add avoid "-" check
     if (name.isEmpty) {
       throw TableDefinitionException('Table name is required.');
     } else if (name.contains(' ')) {
@@ -26,7 +24,6 @@ class TableDefinition {
     }
   }
 
-  // TODO fkの扱い
   String buildCreateTableSql() => 'CREATE TABLE'
       ' $name'
       ' ('
