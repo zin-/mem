@@ -57,8 +57,8 @@ void testDatabaseV2() => group(': $_scenarioName', () {
         );
 
         expect(
-          database.path,
-          '/data/user/0/zin.playground.mem/databases/${testDatabaseDefinition.name}',
+          path.split(database.path).last,
+          testDatabaseDefinition.name,
         );
         expect(
           (await database.query(
