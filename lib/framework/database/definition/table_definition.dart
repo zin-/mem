@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
-import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/definition/column_definition.dart';
+import 'package:mem/framework/database/definition/exceptions.dart';
 import 'package:mem/framework/database/definition/primary_key_definition.dart';
 
 class TableDefinition {
@@ -42,8 +42,4 @@ class TableDefinition {
       ' name: $name'
       ', columns: $columns'
       ' }';
-}
-
-class TableDefinitionException extends DatabaseException {
-  TableDefinitionException(super.message);
 }
