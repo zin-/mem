@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
-import 'package:mem/framework/database/database.dart';
-import 'package:mem/framework/database/definitions/column_definition.dart';
+import 'package:mem/framework/database/definition/column_definition.dart';
+import 'package:mem/framework/database/definition/exceptions.dart';
+import 'package:mem/framework/database/definition/primary_key_definition.dart';
 
 class TableDefinition {
   final String name;
@@ -26,7 +27,7 @@ class TableDefinition {
   String buildCreateTableSql() => 'CREATE TABLE'
       ' $name'
       ' ('
-      ' ${columns.map((column) => column.onSQL()).join(', ')}'
+      ' ${columns.map((column) => column.buildCreateTableSql()).join(', ')}'
       ' )';
 
   PrimaryKeyDefinition get primaryKey =>
@@ -38,8 +39,4 @@ class TableDefinition {
       ' name: $name'
       ', columns: $columns'
       ' }';
-}
-
-class TableDefinitionException extends DatabaseException {
-  TableDefinitionException(super.message);
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/notifications/channels.dart';
 import 'package:mem/values/colors.dart';
 
 class MemApplication extends StatelessWidget {
@@ -13,20 +14,24 @@ class MemApplication extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => i(
-        () => ProviderScope(
-          child: MaterialApp(
-            onGenerateTitle: (context) => L10n(context).appTitle(),
-            localizationsDelegates: L10n.localizationsDelegates,
-            supportedLocales: L10n.supportedLocales,
-            locale: languageCode == null ? null : Locale(languageCode!),
-            theme: ThemeData(
-              primarySwatch: primaryColor,
-              bottomAppBarTheme: const BottomAppBarTheme(
-                color: primaryColor,
+        () {
+          buildNotificationChannels(context);
+
+          return ProviderScope(
+            child: MaterialApp(
+              onGenerateTitle: (context) => L10n(context).appTitle(),
+              localizationsDelegates: L10n.localizationsDelegates,
+              supportedLocales: L10n.supportedLocales,
+              locale: languageCode == null ? null : Locale(languageCode!),
+              theme: ThemeData(
+                primarySwatch: primaryColor,
+                bottomAppBarTheme: const BottomAppBarTheme(
+                  color: primaryColor,
+                ),
               ),
+              home: home,
             ),
-            home: home,
-          ),
-        ),
+          );
+        },
       );
 }

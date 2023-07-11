@@ -1,6 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/framework/database/definitions/column_definition.dart';
-import 'package:mem/framework/database/definitions/table_definition.dart';
+import 'package:mem/framework/database/definition/column_definition.dart';
+import 'package:mem/framework/database/definition/column_type.dart';
+import 'package:mem/framework/database/definition/exceptions.dart';
+import 'package:mem/framework/database/definition/foreign_key_definition.dart';
+import 'package:mem/framework/database/definition/primary_key_definition.dart';
+import 'package:mem/framework/database/definition/table_definition.dart';
 
 void main() {
   group('Table', () {
@@ -138,7 +142,7 @@ void main() {
             'CREATE TABLE tests ('
             ' id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,'
             ' text TEXT NOT NULL,'
-            ' datetime TIMESTAMP DEFAULT NULL'
+            ' datetime TIMESTAMP'
             ' )',
           );
         },

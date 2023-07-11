@@ -1,5 +1,5 @@
-import 'package:mem/framework/database/database.dart';
-import 'package:mem/framework/database/definitions/table_definition.dart';
+import 'package:mem/framework/database/definition/exceptions.dart';
+import 'package:mem/framework/database/definition/table_definition.dart';
 
 class DatabaseDefinition {
   final String name;
@@ -25,8 +25,4 @@ class DatabaseDefinition {
       ' version: $version,'
       ' tables: ${tableDefinitions.map((defT) => defT.name)}'
       ' }';
-}
-
-class DatabaseDefinitionException extends DatabaseException {
-  DatabaseDefinitionException(super.message);
 }

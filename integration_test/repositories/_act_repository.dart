@@ -9,7 +9,7 @@ import 'package:mem/database/table_definitions/base.dart';
 import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/database_manager.dart';
-import 'package:mem/framework/database/definitions/definition.dart';
+import 'package:mem/framework/database/definition/database_definition.dart';
 import 'package:mem/logger/log_entity.dart';
 import 'package:mem/logger/log_service.dart';
 

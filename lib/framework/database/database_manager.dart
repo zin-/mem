@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:mem/framework/database/database.dart';
-import 'package:mem/framework/database/definitions/definition.dart';
+import 'package:mem/framework/database/definition/database_definition.dart';
 import 'package:mem/framework/database/indexed_database.dart';
 import 'package:mem/framework/database/sqlite_database.dart';
 import 'package:mem/logger/log_service.dart';
