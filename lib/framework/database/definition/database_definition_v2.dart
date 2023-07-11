@@ -8,13 +8,15 @@ class DatabaseDefinitionV2 {
 
   DatabaseDefinitionV2(this.name, this.version, this.tableDefinitions) {
     if (name.isEmpty) {
-      throw DatabaseDefinitionException('Database name is required.');
+      throw DatabaseDefinitionException('Database name is empty.');
     } else if (name.contains(' ')) {
       throw DatabaseDefinitionException('Database name contains " ".');
+    } else if (name.contains('-')) {
+      throw DatabaseDefinitionException('Database name contains "-".');
     }
 
     if (version < 1) {
-      throw DatabaseDefinitionException('Minimum version is 1.');
+      throw DatabaseDefinitionException('Version is less than 1.');
     }
   }
 

@@ -6,12 +6,12 @@ import 'exceptions.dart';
 
 class TableDefinitionV2 {
   final String name;
-  final String? singularName;
   final Iterable<ColumnDefinition> columnDefinitions;
+  final String? singularName;
 
   TableDefinitionV2(this.name, this.columnDefinitions, {this.singularName}) {
     if (name.isEmpty) {
-      throw TableDefinitionException('Table name is required.');
+      throw TableDefinitionException('Table name is empty.');
     } else if (name.contains(' ')) {
       throw TableDefinitionException('Table name contains " ".');
     } else if (name.contains('-')) {
@@ -22,9 +22,7 @@ class TableDefinitionV2 {
       throw TableDefinitionException('ColumnDefinitions are empty.');
     } else if (columnDefinitions.groupListsBy((c) => c.name).length !=
         columnDefinitions.length) {
-      throw TableDefinitionException(
-        'Duplicated column names are not allowed.',
-      );
+      throw TableDefinitionException('Duplicate column name.');
     }
   }
 
@@ -54,9 +52,12 @@ class TableDefinitionV2 {
       columnDefinitions.where((element) => element.isPrimaryKey);
 
   @override
-  String toString() => 'TableDefinition'
-      ' : {'
-      ' name: $name'
-      ', columnDefinitions: ${columnDefinitions.map((e) => e.name)}'
-      ' }';
+  String toString() => [
+        'TableDefinition',
+        {
+          'name': name,
+          'columnDefinitions': columnDefinitions,
+          'singularName': singularName,
+        },
+      ].join(': ');
 }

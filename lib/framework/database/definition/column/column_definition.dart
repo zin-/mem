@@ -12,10 +12,16 @@ abstract class ColumnDefinition {
     this.notNull = true,
     this.isPrimaryKey = false,
   }) {
-    if (name.isEmpty) {
-      throw ColumnDefinitionException('Column name is empty.');
-    } else if (name.contains(' ')) {
-      throw ColumnDefinitionException('Column name contains " ".');
+    // ISSUE #209
+    //  以下のチェックは、CREATE文だけではエラーにならなかった
+    //  テーブル操作をした際にエラーになる可能性があるため、コメントアウトで残しておく
+    // if (name.isEmpty) {
+    //   throw ColumnDefinitionException('Column name is empty.');
+    // } else if (name.contains(' ')) {
+    //   throw ColumnDefinitionException('Column name contains " ".');
+    // } else
+    if (name.contains('-')) {
+      throw ColumnDefinitionException('Column name contains "-".');
     }
   }
 
@@ -26,10 +32,13 @@ abstract class ColumnDefinition {
       ].where((element) => element != null).join(' ');
 
   @override
-  String toString() => 'ColumnDefinition'
-      ' : {'
-      'name: $name'
-      ', type: $type'
-      ', notNull: $notNull'
-      ' }';
+  String toString() => [
+        'ColumnDefinition',
+        {
+          'name': name,
+          'type': type,
+          'notNull': notNull,
+          'isPrimaryKey': isPrimaryKey,
+        },
+      ].join(': ');
 }

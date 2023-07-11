@@ -26,12 +26,9 @@ final testChildTableDefinition = TableDefinitionV2(
   ],
 );
 
-const testDatabaseName = 'test_database.db';
-const testDatabaseVersion = 1;
-
 final testDatabaseDefinition = DatabaseDefinitionV2(
-  testDatabaseName,
-  testDatabaseVersion,
+  'test_database.db',
+  1,
   [
     testTableDefinition,
     testChildTableDefinition,
