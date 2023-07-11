@@ -8,6 +8,7 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/mems/mem_service.dart';
+import 'framework/database.dart';
 import 'scenarios/act_counter_scenario.dart';
 import '_helpers.dart';
 import 'database/_database_manager.dart';
@@ -28,6 +29,11 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   LogService.initialize(Level.verbose);
+
+  // app_testではないので、分けた方が良いかも？
+  group('Framework test', () {
+    testDatabaseV2();
+  });
 
   group('Database test', () {
     testSqliteDatabase();

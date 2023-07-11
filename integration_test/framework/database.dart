@@ -60,5 +60,16 @@ void testDatabaseV2() => group(': $_scenarioName', () {
           database.path,
           '/data/user/0/zin.playground.mem/databases/${testDatabaseDefinition.name}',
         );
+        expect(
+          (await database.query(
+            'sqlite_master',
+            where: 'name = ?',
+            whereArgs: [
+              testTableName,
+            ],
+          ))
+              .single['sql'],
+          testTableDefinition.buildCreateTableSql(),
+        );
       });
     });

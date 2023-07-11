@@ -10,6 +10,10 @@ final testTableDefinition = TableDefinitionV2(
   [
     IntegerColumnDefinition('test_integer'),
     TextColumnDefinition('test_text'),
+    IntegerColumnDefinition(
+      'test_pk_integer',
+      isPrimaryKey: true,
+    ),
   ],
 );
 

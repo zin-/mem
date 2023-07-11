@@ -27,14 +27,24 @@ class TableDefinitionV2 {
   }
 
   // TODO fkの扱い
-  String buildCreateTableSql() => 'CREATE TABLE'
-      ' $name'
-      ' ('
-      ' ${columnDefinitions.map((columnDefinition) => columnDefinition.buildCreateTableSql()).join(', ')}'
-      ' )';
+  String buildCreateTableSql() {
+    final pks = columnDefinitions.where((element) => element.isPrimaryKey);
 
-  // PrimaryKeyDefinition get primaryKey =>
-  //     columns.whereType<PrimaryKeyDefinition>().first;
+    return [
+      'CREATE TABLE',
+      name,
+      '(',
+      [
+        columnDefinitions
+            .map((columnDefinition) => columnDefinition.buildCreateTableSql())
+            .join(', '),
+        pks.isEmpty
+            ? null
+            : 'PRIMARY KEY ( ${pks.map((e) => e.name).join(', ')} )',
+      ].where((element) => element != null).join(', '),
+      ')',
+    ].join(' ');
+  }
 
   @override
   String toString() => 'TableDefinition'
