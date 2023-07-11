@@ -33,5 +33,3 @@ abstract class ColumnDefinition {
       ', notNull: $notNull'
       ' }';
 }
-
-// TODO add datetime
