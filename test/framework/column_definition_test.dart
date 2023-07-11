@@ -26,7 +26,7 @@ void main() {
             throwsA(
               (e) =>
                   e is ColumnDefinitionException &&
-                  e.toString() == 'Column name is required.',
+                  e.toString() == 'Column name is empty.',
             ),
           );
         },

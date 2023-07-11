@@ -142,7 +142,7 @@ void main() {
             'CREATE TABLE tests ('
             ' id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,'
             ' text TEXT NOT NULL,'
-            ' datetime TIMESTAMP DEFAULT NULL'
+            ' datetime TIMESTAMP'
             ' )',
           );
         },
