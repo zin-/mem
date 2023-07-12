@@ -30,8 +30,7 @@ void main() {
 
   const onCICD = bool.fromEnvironment('CICD', defaultValue: false);
   info({'onCICD': onCICD});
-  // TODO 受け渡す
-  LogService.initialize(Level.verbose);
+  LogService.initialize(Level.verbose, onCICD);
 
   // app_testではないので、分けた方が良いかも？
   group('Framework test', () {

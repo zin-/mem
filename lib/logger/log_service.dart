@@ -128,7 +128,10 @@ class LogService {
 
   static LogService? _instance;
 
-  factory LogService.initialize([Level level = Level.info]) =>
+  factory LogService.initialize([
+    Level level = Level.info,
+    bool enableSimpleLog = false,
+  ]) =>
       _instance = LogService._(
         LogRepository(
             // TODO CICDであることを受け渡す
