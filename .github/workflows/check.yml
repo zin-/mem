@@ -166,7 +166,7 @@ jobs:
         run: flutter doctor -v
       - id: 'test_execution'
         continue-on-error: true
-        run: flutter test integration_test/app_test.dart -d ${{ matrix.platform }} --coverage
+        run: flutter test integration_test/app_test.dart -d ${{ matrix.platform }} --coverage --dart-define=CICD=true
       - name: 'Upload coverage'
         uses: codecov/codecov-action@v3
         with:

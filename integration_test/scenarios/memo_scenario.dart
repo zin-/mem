@@ -259,13 +259,13 @@ void testMemoScenario() => group(
             await widgetTester.pumpAndSettle();
 
             await widgetTester.tap(find.text(insertedMemName));
-            await widgetTester.pumpAndSettle();
+            await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
             await widgetTester.tap(find.byIcon(Icons.more_vert));
             await widgetTester.pumpAndSettle();
 
             await widgetTester.tap(find.byIcon(Icons.delete));
-            await widgetTester.pumpAndSettle();
+            await widgetTester.pump();
 
             await widgetTester.tap(find.text('Cancel'));
             await widgetTester.pumpAndSettle();
@@ -278,23 +278,22 @@ void testMemoScenario() => group(
 
             await widgetTester.tap(find.text('OK'));
             await widgetTester.pumpAndSettle();
-            await widgetTester.pumpAndSettle();
+            await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
             expect(
               find.text('Remove success. $insertedMemName'),
               findsOneWidget,
             );
             expect(find.text(insertedMemName), findsNothing);
-
             await widgetTester.tap(find.byIcon(Icons.filter_list));
-            await widgetTester.pumpAndSettle(defaultDuration);
+            await widgetTester.pump();
 
             await widgetTester.tap(find.byType(Switch).at(1));
             await widgetTester.tap(find.byType(Switch).at(3));
-            await widgetTester.pumpAndSettle(defaultDuration);
+            await widgetTester.pump();
 
             await closeMemListFilter(widgetTester);
-            await widgetTester.pumpAndSettle(defaultDuration);
+            await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
             expect(find.text(insertedMemName), findsNothing);
             expect(
@@ -313,7 +312,7 @@ void testMemoScenario() => group(
               findsOneWidget,
             );
             await widgetTester.tap(find.text(insertedMemName));
-            await widgetTester.pumpAndSettle();
+            await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
             expect(find.text(insertedMemName), findsOneWidget);
             expect(find.text(insertedMemMemo), findsOneWidget);

@@ -18,12 +18,15 @@ class LoggerWrapper {
         stackTrace,
       );
 
-  LoggerWrapper()
+  LoggerWrapper([bool enableSimpleMode = false])
       : _logger = Logger(
           filter: DevelopmentFilter(),
-          printer: _LogPrinter(),
+          printer: enableSimpleMode ? _SimplePrinter() : _LogPrinter(),
         );
 }
+
+const lineBreak = '\n';
+const loggerPackagePath = 'package:mem/logger';
 
 class _LogPrinter extends PrettyPrinter {
   _LogPrinter()
@@ -35,17 +38,33 @@ class _LogPrinter extends PrettyPrinter {
 
   @override
   String? formatStackTrace(StackTrace? stackTrace, int methodCount) {
-    const lineBreak = '\n';
     return super.formatStackTrace(
       StackTrace.fromString(stackTrace
           .toString()
           .split(lineBreak)
-          .where(
-            (line) => !line.contains('package:mem/logger'),
-          )
+          .where((line) => !line.contains(loggerPackagePath))
           .join(lineBreak)),
       methodCount,
     );
+  }
+}
+
+class _SimplePrinter extends SimplePrinter {
+  _SimplePrinter() : super(printTime: true);
+
+  @override
+  List<String> log(LogEvent event) {
+    return super.log(LogEvent(
+      event.level,
+      '${RegExp(r'#[0-9]+\s+(.+) \((\S+)\)').matchAsPrefix((event.stackTrace ?? StackTrace.current).toString().split(lineBreak).where(
+            (line) =>
+                !line.contains(loggerPackagePath) &&
+                !line.contains('package:logger'),
+          ).first)?.group(1) ?? '???'}'
+      ' ${event.message}',
+      event.error,
+      event.stackTrace,
+    ));
   }
 }
 

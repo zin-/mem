@@ -28,7 +28,9 @@ const defaultDuration = Duration(seconds: 1);
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  LogService.initialize(Level.verbose);
+  const onCICD = bool.fromEnvironment('CICD', defaultValue: false);
+  LogService.initialize(Level.verbose, onCICD);
+  info({'onCICD': onCICD});
 
   // app_testではないので、分けた方が良いかも？
   group('Framework test', () {
