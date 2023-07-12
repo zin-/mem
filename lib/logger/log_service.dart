@@ -130,7 +130,10 @@ class LogService {
 
   factory LogService.initialize([Level level = Level.info]) =>
       _instance = LogService._(
-        LogRepository(LoggerWrapper()),
+        LogRepository(
+            // TODO CICDであることを受け渡す
+            LoggerWrapper()
+        ),
         level,
       );
 

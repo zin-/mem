@@ -28,6 +28,7 @@ const defaultDuration = Duration(seconds: 1);
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
+  // TODO CICDであることを判定し受け渡す
   LogService.initialize(Level.verbose);
 
   // app_testではないので、分けた方が良いかも？

@@ -166,6 +166,7 @@ jobs:
         run: flutter doctor -v
       - id: 'test_execution'
         continue-on-error: true
+        # TODO dart-defineと使ってCICD=trueを設定する
         run: flutter test integration_test/app_test.dart -d ${{ matrix.platform }} --coverage
       - name: 'Upload coverage'
         uses: codecov/codecov-action@v3

@@ -21,6 +21,8 @@ class LoggerWrapper {
   LoggerWrapper()
       : _logger = Logger(
           filter: DevelopmentFilter(),
+          // TODO ここでprinter切り替える
+          // TODO 必要な情報を出力するためのPrinterを実装する
           printer: _LogPrinter(),
         );
 }
