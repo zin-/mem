@@ -133,10 +133,7 @@ class LogService {
     bool enableSimpleLog = false,
   ]) =>
       _instance = LogService._(
-        LogRepository(
-            // TODO CICDであることを受け渡す
-            LoggerWrapper()
-        ),
+        LogRepository(LoggerWrapper(enableSimpleLog)),
         level,
       );
 

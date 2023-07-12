@@ -18,12 +18,11 @@ class LoggerWrapper {
         stackTrace,
       );
 
-  LoggerWrapper()
+  LoggerWrapper([bool enableSimpleMode = false])
       : _logger = Logger(
           filter: DevelopmentFilter(),
-          // TODO ここでprinter切り替える
           // TODO 必要な情報を出力するためのPrinterを実装する
-          printer: _LogPrinter(),
+          printer: enableSimpleMode ? SimplePrinter() : _LogPrinter(),
         );
 }
 

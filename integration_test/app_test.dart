@@ -29,8 +29,8 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   const onCICD = bool.fromEnvironment('CICD', defaultValue: false);
-  info({'onCICD': onCICD});
   LogService.initialize(Level.verbose, onCICD);
+  info({'onCICD': onCICD});
 
   // app_testではないので、分けた方が良いかも？
   group('Framework test', () {
