@@ -53,6 +53,16 @@ class _MemDetailBodyComponent extends StatelessWidget {
   Widget build(BuildContext context) => v(
         () => SingleChildScrollView(
           child: Column(
+            // TODO ここに追加する
+            // TODO RiverpodのAsyncValueを扱うWidgetを実装する
+            //  Memに指定されたメッセージがあればそれも取ってくる
+            //  RepeatedNotificationWidgetを参考にする
+            // TODO 開始後、指定された時間後に通知する
+            //  時間（何分後みたいな）とメッセージ（止めようみたいな）を保存する
+            //  どんなデータにするかは考え中
+            //  とりあえずmemsではない
+            //  mem_itemsに入れてもいいけど、値が2つなので想定外？
+            //  とりあえず、何分後かとメッセージで一つずつしか持たせないとすれば、入るっちゃ入る
             children: [
               MemNameTextFormField(
                 _mem.name,
