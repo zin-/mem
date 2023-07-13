@@ -16,6 +16,8 @@ Future<List<Act>> fetchByMemIdIs(MemId memId) =>
 final startAct = Provider.autoDispose.family<void, int>(
   (ref, memId) => v(
     () async {
+      // TODO ActServiceを実装する
+      // TODO 開始したときに、通知を表示する
       final received = await ActRepository().receive(
         Act(
           memId,

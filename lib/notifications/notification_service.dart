@@ -74,6 +74,9 @@ class NotificationService {
         {mem, memRepeatedNotification},
       );
 
+  // TODO 有効なActがあることを通知する
+  //  通知というがどちらかというと状態を表すような感じ
+  //  有効なActが記録され続けていることを表すため、この通知は消せないようにする
   NotificationService._(this._notificationRepository);
 
   static NotificationService? _instance;
