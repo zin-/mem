@@ -3,7 +3,7 @@ import 'package:mem/logger/log_service.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-import 'flutter_local_notifications.dart';
+import 'wrapper.dart';
 import 'mem_notifications.dart';
 import 'notification.dart';
 
@@ -17,7 +17,7 @@ class NotificationActionEntity {
 }
 
 class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
-  final FlutterLocalNotificationsWrapper _flutterLocalNotificationsWrapper;
+  final NotificationsWrapper _flutterLocalNotificationsWrapper;
 
   Future<bool> initialize(
     OnNotificationActionTappedCallback notificationActionHandler,
@@ -111,12 +111,12 @@ class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
   static NotificationRepository? _instance;
 
   factory NotificationRepository({
-    FlutterLocalNotificationsWrapper? flutterLocalNotificationsWrapper,
+    NotificationsWrapper? flutterLocalNotificationsWrapper,
   }) {
     var tmp = _instance;
     if (tmp == null) {
       tmp = NotificationRepository._(
-        flutterLocalNotificationsWrapper ?? FlutterLocalNotificationsWrapper(),
+        flutterLocalNotificationsWrapper ?? NotificationsWrapper(),
       );
       _instance = tmp;
     }

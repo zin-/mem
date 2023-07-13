@@ -21,7 +21,7 @@ typedef OnNotificationActionTappedCallback = Function(
   Map<dynamic, dynamic> payload,
 );
 
-class FlutterLocalNotificationsWrapper {
+class NotificationsWrapper {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
@@ -155,14 +155,14 @@ class FlutterLocalNotificationsWrapper {
         },
       );
 
-  FlutterLocalNotificationsWrapper._();
+  NotificationsWrapper._();
 
-  static FlutterLocalNotificationsWrapper? _instance;
+  static NotificationsWrapper? _instance;
 
-  factory FlutterLocalNotificationsWrapper() {
+  factory NotificationsWrapper() {
     var tmp = _instance;
     if (tmp == null) {
-      tmp = FlutterLocalNotificationsWrapper._();
+      tmp = NotificationsWrapper._();
       _instance = tmp;
     }
     return tmp;
