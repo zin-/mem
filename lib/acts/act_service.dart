@@ -1,5 +1,6 @@
 import 'package:mem/acts/act_repository.dart';
 import 'package:mem/core/act.dart';
+import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
@@ -41,6 +42,27 @@ class ActService {
           return received;
         },
         memId,
+      );
+
+  Future<Act> finish(Act act) => i(
+        () async {
+          final finished = await _actRepository.replace(
+            Act(
+              act.memId,
+              DateAndTimePeriod(
+                start: act.period.start,
+                end: DateAndTime.now(),
+              ),
+              id: act.id,
+            ),
+          );
+
+          await _notificationRepository
+              .discard(activeActNotificationId(act.memId));
+
+          return finished;
+        },
+        act,
       );
 
   ActService._(

@@ -4,8 +4,6 @@ import 'package:mem/acts/act_repository.dart';
 import 'package:mem/acts/act_service.dart';
 import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/core/act.dart';
-import 'package:mem/core/date_and_time/date_and_time.dart';
-import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
 
@@ -29,17 +27,7 @@ final startAct = Provider.autoDispose.family<void, int>(
 final finishAct = Provider.autoDispose.family<void, Act>(
   (ref, act) => v(
     () async {
-      // TODO 終了したときに、通知を消す
-      final replaced = await actRepository.replace(
-        Act(
-          act.memId,
-          DateAndTimePeriod(
-            start: act.period.start,
-            end: DateAndTime.now(),
-          ),
-          id: act.id,
-        ),
-      );
+      final replaced = await ActService().finish(act);
 
       ref
           .read(actListProvider(replaced.memId).notifier)
