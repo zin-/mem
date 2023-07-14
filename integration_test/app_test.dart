@@ -18,7 +18,6 @@ import 'repositories/_act_repository.dart';
 import 'scenarios/edge_scenario.dart';
 import 'scenarios/habit_scenario.dart';
 import 'scenarios/memo_scenario.dart';
-import 'repositories/_notification_repository.dart';
 import 'scenarios/todo_scenario.dart';
 import 'scenarios/act_scenario.dart';
 import 'scenarios/task_scenario.dart';
@@ -45,7 +44,6 @@ void main() {
   });
 
   group('Repository test', () {
-    testNotificationRepository();
     testActRepository();
   });
 

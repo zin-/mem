@@ -29,7 +29,7 @@ void main() {
       ': name is required.',
       (widgetTester) async {
         when(mockedNotificationRepository.initialize(any, any))
-            .thenAnswer((realInvocation) => Future.value(true));
+            .thenAnswer((realInvocation) => Future.value(null));
 
         await pumpMemDetailPage(widgetTester, null);
 

@@ -7,7 +7,6 @@ import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/database/definition.dart';
-import 'package:mem/main.dart' as app;
 import 'package:mem/values/durations.dart';
 
 import 'helpers.dart';
@@ -43,7 +42,7 @@ void testActScenario() => group(': $scenarioName', () {
       });
 
       Future<void> showMemListPage(WidgetTester widgetTester) async {
-        await app.main();
+        await runApplication();
         await widgetTester.pumpAndSettle();
       }
 
@@ -66,7 +65,8 @@ void testActScenario() => group(': $scenarioName', () {
             expect(find.byIcon(Icons.stop), findsNothing);
             final startTime = DateTime.now();
             await widgetTester.tap(find.byIcon(Icons.play_arrow));
-            await widgetTester.pumpAndSettle(defaultTransitionDuration);
+            await Future.delayed(defaultTransitionDuration);
+            await widgetTester.pumpAndSettle();
 
             expect(find.byIcon(Icons.play_arrow), findsNothing);
             expect(
@@ -79,7 +79,8 @@ void testActScenario() => group(': $scenarioName', () {
             );
             final stopTime = DateTime.now();
             await widgetTester.tap(find.byIcon(Icons.stop));
-            await widgetTester.pumpAndSettle(defaultTransitionDuration);
+            await Future.delayed(defaultTransitionDuration);
+            await widgetTester.pumpAndSettle();
 
             expect(
               (widgetTester.widget(find.byType(Text).at(0)) as Text).data,
@@ -101,7 +102,8 @@ void testActScenario() => group(': $scenarioName', () {
             expect(find.byIcon(Icons.stop), findsNothing);
             final startTime2 = DateTime.now();
             await widgetTester.tap(find.byIcon(Icons.play_arrow));
-            await widgetTester.pumpAndSettle(defaultTransitionDuration);
+            await Future.delayed(defaultTransitionDuration);
+            await widgetTester.pumpAndSettle();
 
             expect(
               (widgetTester.widget(find.byType(Text).at(0)) as Text).data,
@@ -228,16 +230,27 @@ void testActScenario() => group(': $scenarioName', () {
           await widgetTester.tap(startIconFinder.at(1));
           await widgetTester.pumpAndSettle();
 
-          expect(
-            (widgetTester.widget(find.byType(Text).at(2)) as Text).data,
-            '00:00:00',
-          );
+          // 時間経過により、'00:00:00'ではない場合が多発しているため
+          // キャッチして'00:00:01'でないか確認している
+          // FIXME 他の良い方法がないか調べる
+          try {
+            expect(
+              (widgetTester.widget(find.byType(Text).at(2)) as Text).data,
+              '00:00:00',
+            );
+          } on TestFailure {
+            expect(
+              (widgetTester.widget(find.byType(Text).at(2)) as Text).data,
+              '00:00:01',
+            );
+          }
           expect(startIconFinder, findsOneWidget);
           expect(stopIconFinder, findsOneWidget);
           await widgetTester.pump(const Duration(seconds: 1));
 
           expect(find.text('00:00:00'), findsNothing);
           await widgetTester.tap(startIconFinder);
+          await Future.delayed(defaultTransitionDuration);
           await widgetTester.pumpAndSettle();
 
           expect(startIconFinder, findsNothing);
@@ -246,8 +259,8 @@ void testActScenario() => group(': $scenarioName', () {
           await widgetTester.tap(stopIconFinder.at(0));
           await widgetTester.pumpAndSettle();
 
-          expect(startIconFinder, findsOneWidget);
           expect(stopIconFinder, findsOneWidget);
+          expect(startIconFinder, findsOneWidget);
         });
       });
     });

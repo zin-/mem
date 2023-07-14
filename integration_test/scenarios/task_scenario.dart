@@ -6,7 +6,6 @@ import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/database/definition.dart';
-import 'package:mem/main.dart' as app;
 
 import 'helpers.dart';
 
@@ -48,7 +47,7 @@ void testTaskScenario() => group(': $scenarioName', () {
         (widgetTester) async {
           final now = DateTime.now();
 
-          await app.main();
+          await runApplication();
           await widgetTester.pumpAndSettle();
 
           await widgetTester.tap(newMemFabFinder);

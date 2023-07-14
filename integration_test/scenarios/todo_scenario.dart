@@ -6,7 +6,6 @@ import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/database/definition.dart';
-import 'package:mem/main.dart' as app;
 
 import '../_helpers.dart';
 import 'helpers.dart';
@@ -52,7 +51,7 @@ void testTodoScenario() => group(': $scenarioName', () {
 
       group(': done & undone', () {
         testWidgets(': MemDetail.', (widgetTester) async {
-          await app.main();
+          await runApplication();
           await widgetTester.pumpAndSettle();
 
           expect(find.text(undoneMemName), findsOneWidget);
@@ -100,7 +99,7 @@ void testTodoScenario() => group(': $scenarioName', () {
         testWidgets(
           ': MemList.',
           (widgetTester) async {
-            await app.main();
+            await runApplication();
             await widgetTester.pumpAndSettle();
 
             expect(find.text(insertedMemName), findsOneWidget);

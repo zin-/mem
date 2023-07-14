@@ -15,13 +15,6 @@ import 'notification_repository.dart';
 class NotificationService {
   final NotificationRepository _notificationRepository;
 
-  Future initialize({Function(int memId)? showMemDetailPage}) => i(
-        () async => await _notificationRepository.initialize(
-          notificationActionHandler,
-          showMemDetailPage,
-        ),
-      );
-
   Future<void> memReminder(Mem mem) => i(
         () async {
           // TODO 時間がないときのデフォルト値を設定から取得する
@@ -96,7 +89,7 @@ class NotificationService {
   }
 }
 
-// FIXME 現時点では、通知に対する操作をテストで実行できない
+// ISSUE #225
 // coverage:ignore-start
 Future<void> notificationActionHandler(
   int notificationId,

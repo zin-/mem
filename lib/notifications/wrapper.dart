@@ -35,25 +35,21 @@ class NotificationsWrapper {
   ) =>
       v(
         () async {
-          if (Platform.isAndroid) {
-            return (await _flutterLocalNotificationsPlugin.initialize(
-                  InitializationSettings(
-                    android:
-                        AndroidInitializationSettings(androidDefaultIconPath),
-                  ),
-                  onDidReceiveNotificationResponse: (details) =>
-                      _notificationResponseHandler(
-                    details,
-                    onNotificationTappedCallback,
-                    onNotificationActionTappedCallback,
-                  ),
-                  onDidReceiveBackgroundNotificationResponse:
-                      onNotificationTappedBackground,
-                )) ==
-                true;
-          }
-
-          return false;
+          return (await _flutterLocalNotificationsPlugin.initialize(
+                InitializationSettings(
+                  android:
+                      AndroidInitializationSettings(androidDefaultIconPath),
+                ),
+                onDidReceiveNotificationResponse: (details) =>
+                    _notificationResponseHandler(
+                  details,
+                  onNotificationTappedCallback,
+                  onNotificationActionTappedCallback,
+                ),
+                onDidReceiveBackgroundNotificationResponse:
+                    onNotificationTappedBackground,
+              )) ==
+              true;
         },
         {
           'androidDefaultIconPath': androidDefaultIconPath,

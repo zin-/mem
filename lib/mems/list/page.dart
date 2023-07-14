@@ -22,7 +22,7 @@ class MemListPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => i(
         () {
           ref.read(
-            initialize((memId) => showMemDetailPage(context, ref, memId)),
+            initializeNotification((memId) => showMemDetailPage(context, ref, memId)),
           );
           ref.read(fetchActiveActs);
 

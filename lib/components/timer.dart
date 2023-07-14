@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:mem/logger/log_service.dart';
 
 class ElapsedTimeView extends StatefulWidget {
   final DateTime _start;
@@ -29,8 +30,11 @@ class _ElapsedTimeState extends State<ElapsedTimeView> {
   }
 
   @override
-  Widget build(BuildContext context) => Text(
-        (elapsedTime ?? DateTime.now().difference(widget._start)).format(),
+  Widget build(BuildContext context) => v(
+        () => Text(
+          (elapsedTime ?? DateTime.now().difference(widget._start)).format(),
+        ),
+        elapsedTime,
       );
 
   @override
