@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/act_list_page_states.dart';
 import 'package:mem/acts/act_repository.dart';
+import 'package:mem/acts/act_service.dart';
 import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
@@ -16,17 +17,10 @@ Future<List<Act>> fetchByMemIdIs(MemId memId) =>
 final startAct = Provider.autoDispose.family<void, int>(
   (ref, memId) => v(
     () async {
-      // TODO ActServiceを実装する
-      // TODO 開始したときに、通知を表示する
-      final received = await ActRepository().receive(
-        Act(
-          memId,
-          DateAndTimePeriod.startNow(),
-        ),
-      );
+      final started = await ActService().startBy(memId);
 
-      ref.read(actListProvider(memId).notifier).add(received, index: 0);
-      ref.read(activeActsProvider.notifier).add(received);
+      ref.read(actListProvider(memId).notifier).add(started, index: 0);
+      ref.read(activeActsProvider.notifier).add(started);
     },
     memId,
   ),
@@ -35,6 +29,7 @@ final startAct = Provider.autoDispose.family<void, int>(
 final finishAct = Provider.autoDispose.family<void, Act>(
   (ref, act) => v(
     () async {
+      // TODO 終了したときに、通知を消す
       final replaced = await actRepository.replace(
         Act(
           act.memId,
