@@ -103,6 +103,7 @@ class NotificationsWrapper {
     String? body,
     List<NotificationAction> actions,
     NotificationChannel channel,
+    String? payload,
   ) =>
       v(
         () => _flutterLocalNotificationsPlugin.show(
@@ -113,6 +114,7 @@ class NotificationsWrapper {
             channel,
             actions,
           ),
+          payload: payload,
         ),
         {
           id,
@@ -120,6 +122,7 @@ class NotificationsWrapper {
           body.toString(),
           actions,
           channel,
+          payload,
         },
       );
 
@@ -128,7 +131,7 @@ class NotificationsWrapper {
     String title,
     String? body,
     TZDateTime tzDateTime,
-    String payload,
+    String? payload,
     List<NotificationAction> actions,
     NotificationChannel channel, [
     NotificationInterval? interval,

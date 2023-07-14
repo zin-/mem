@@ -6,6 +6,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'notification/cancel_notification.dart';
 import 'notification/one_time_notification.dart';
 import 'notification/repeated_notification.dart';
+import 'notification/show_notification.dart';
 import 'wrapper.dart';
 import 'mem_notifications.dart';
 import 'notification/notification.dart';
@@ -85,6 +86,15 @@ class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
               payload.payloadJson,
               payload.actions,
               payload.channel,
+            );
+          } else if (payload is ShowNotification) {
+            await _flutterLocalNotificationsWrapper.show(
+              payload.id,
+              payload.title,
+              payload.body,
+              payload.actions,
+              payload.channel,
+              payload.payloadJson,
             );
           } else if (payload is CancelNotification) {
             await discard(payload.id);
