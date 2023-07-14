@@ -7,7 +7,8 @@ import 'package:mem/mems/mem_service.dart';
 
 import 'channels.dart';
 import 'mem_notifications.dart';
-import 'notification.dart';
+import 'notification/cancel_notification.dart';
+import 'notification/repeated_notification.dart';
 import 'notification_ids.dart';
 import 'notification_repository.dart';
 

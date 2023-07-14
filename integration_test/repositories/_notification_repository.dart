@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:mem/notifications/notification.dart';
+import 'package:mem/notifications/notification/one_time_notification.dart';
 import 'package:mem/notifications/notification_channel.dart';
 import 'package:mem/notifications/notification_repository.dart';
 

@@ -6,10 +6,12 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
-import 'package:mem/notifications/notification.dart';
 import 'package:mem/notifications/notification_channel.dart';
 import 'package:mem/notifications/notification_service.dart';
 import 'package:timezone/timezone.dart';
+
+import 'notification/notification_action.dart';
+import 'notification/repeated_notification.dart';
 
 typedef OnNotificationTappedCallback = Function(
   int id,
