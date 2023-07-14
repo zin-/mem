@@ -12,7 +12,7 @@ late final NotificationChannel reminderChannel;
 late final NotificationChannel repeatedReminderChannel;
 late final NotificationChannel activeActNotificationChannel;
 
-void prepareNotifications(BuildContext context) => i(
+void prepareNotifications([BuildContext? context]) => i(
       () {
         if (!_initialized) {
           final l10n = buildL10n(context);

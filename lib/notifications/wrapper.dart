@@ -195,14 +195,10 @@ class NotificationsWrapper {
 
   static NotificationsWrapper? _instance;
 
-  factory NotificationsWrapper() {
-    var tmp = _instance;
-    if (tmp == null) {
-      tmp = NotificationsWrapper._();
-      _instance = tmp;
-    }
-    return tmp;
-  }
+  factory NotificationsWrapper() =>
+      _instance ??= _instance = NotificationsWrapper._();
+
+  static resetWith(NotificationsWrapper? instance) => _instance = instance;
 }
 
 extension on NotificationInterval {
