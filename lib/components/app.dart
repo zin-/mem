@@ -15,7 +15,7 @@ class MemApplication extends StatelessWidget {
   @override
   Widget build(BuildContext context) => i(
         () {
-          buildNotificationChannels(context);
+          prepareNotifications(context);
 
           return ProviderScope(
             child: MaterialApp(

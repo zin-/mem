@@ -1,9 +1,12 @@
 import 'dart:convert';
 
+import 'package:mem/acts/act_repository.dart';
+import 'package:mem/acts/act_service.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_repeated_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_service.dart';
+import 'package:mem/notifications/actions.dart';
 
 import 'channels.dart';
 import 'mem_notifications.dart';
@@ -99,12 +102,20 @@ Future<void> notificationActionHandler(
 ) =>
     v(
       () async {
-        if (actionId == doneActionId) {
+        if (actionId == doneMemActionId) {
           if (payload.containsKey(memIdKey)) {
             final memId = payload[memIdKey];
             if (memId is int) {
               await MemService().doneByMemId(memId);
             }
+          }
+        } else if (actionId == finishActiveActActionId) {
+          final memId = payload[memIdKey];
+          if (memId is int) {
+            final act = (await ActRepository().shipActive())
+                .where((element) => element.memId == memId)
+                .single;
+            await ActService().finish(act);
           }
         }
       },

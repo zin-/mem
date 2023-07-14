@@ -1,10 +1,14 @@
+import 'dart:convert';
+
 import 'package:mem/acts/act_repository.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
+import 'package:mem/notifications/actions.dart';
 import 'package:mem/notifications/channels.dart';
+import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/show_notification.dart';
 import 'package:mem/notifications/notification_ids.dart';
 import 'package:mem/notifications/notification_repository.dart';
@@ -27,15 +31,12 @@ class ActService {
             ShowNotification(
               activeActNotificationId(memId),
               (await _memRepository.shipById(memId)).name,
-              // TODO l10n
-              'body',
-              // TODO mem詳細を表示する
-              'payloadJson',
+              'Running',
+              json.encode({memIdKey: memId}),
               [
-                // TODO finishAct
+                finishActiveActAction,
               ],
               activeActNotificationChannel,
-              // TODO 音はない方がいい
             ),
           );
 

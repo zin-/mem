@@ -1,17 +1,15 @@
 import 'dart:convert';
 
-import 'package:mem/components/l10n.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/mem.dart';
 
+import 'actions.dart';
 import 'channels.dart';
 import 'notification/cancel_notification.dart';
 import 'notification/notification.dart';
-import 'notification/action.dart';
 import 'notification/one_time_notification.dart';
 import 'notification_ids.dart';
 
-const doneActionId = 'done';
 const memIdKey = 'memId';
 
 const _startNotificationBody = 'start';
@@ -74,7 +72,7 @@ class MemNotifications {
       body,
       json.encode({memIdKey: memId}),
       [
-        NotificationAction(doneActionId, L10n().doneLabel),
+        doneMemAction,
       ],
       reminderChannel,
       notifyAt.isAllDay == true

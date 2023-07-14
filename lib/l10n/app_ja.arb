@@ -46,6 +46,7 @@
   "showDoneLabel": "Show done",
 
   "done_label": "Done",
+  "finish_label": "終了",
 
   "reminder_name": "Reminder",
   "reminder_description": "To remind at specific time.",
