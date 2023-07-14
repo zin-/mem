@@ -94,6 +94,38 @@ class NotificationsWrapper {
         },
       );
 
+  Future<void> show(
+    int id,
+    String title,
+    String? body,
+    List<NotificationAction> actions,
+    String channelId,
+    String channelName,
+    String channelDescription,
+  ) =>
+      v(
+        () => _flutterLocalNotificationsPlugin.show(
+          id,
+          title,
+          body,
+          _buildNotificationDetails(
+            channelId,
+            channelName,
+            channelDescription,
+            actions,
+          ),
+        ),
+        {
+          id,
+          title,
+          body.toString(),
+          actions,
+          channelId,
+          channelName,
+          channelDescription,
+        },
+      );
+
   Future<void> zonedSchedule(
     int id,
     String title,
@@ -114,15 +146,11 @@ class NotificationsWrapper {
               title,
               body,
               tzDateTime,
-              NotificationDetails(
-                android: AndroidNotificationDetails(
-                  channelId,
-                  channelName,
-                  channelDescription: channelDescription,
-                  actions: actions
-                      .map((e) => AndroidNotificationAction(e.id, e.title))
-                      .toList(),
-                ),
+              _buildNotificationDetails(
+                channelId,
+                channelName,
+                channelDescription,
+                actions,
               ),
               uiLocalNotificationDateInterpretation:
                   UILocalNotificationDateInterpretation.absoluteTime,
@@ -153,6 +181,23 @@ class NotificationsWrapper {
         {
           'id': id,
         },
+      );
+
+  NotificationDetails _buildNotificationDetails(
+    String channelId,
+    String channelName,
+    String channelDescription,
+    List<NotificationAction> actions,
+  ) =>
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          channelId,
+          channelName,
+          channelDescription: channelDescription,
+          actions: actions
+              .map((e) => AndroidNotificationAction(e.id, e.title))
+              .toList(),
+        ),
       );
 
   NotificationsWrapper._();
