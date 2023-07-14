@@ -1,6 +1,6 @@
-import '../notification_channel.dart';
+import 'channel.dart';
 import 'notification.dart';
-import 'notification_action.dart';
+import 'action.dart';
 
 class OneTimeNotification extends Notification {
   final String title;

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/notifications/notification_channel.dart';
+
+import 'notification/channel.dart';
 
 late final NotificationChannel reminderChannel;
 

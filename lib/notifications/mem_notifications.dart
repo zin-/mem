@@ -7,7 +7,7 @@ import 'package:mem/core/mem.dart';
 import 'channels.dart';
 import 'notification/cancel_notification.dart';
 import 'notification/notification.dart';
-import 'notification/notification_action.dart';
+import 'notification/action.dart';
 import 'notification/one_time_notification.dart';
 import 'notification_ids.dart';
 
