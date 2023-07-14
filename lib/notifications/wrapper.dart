@@ -185,6 +185,8 @@ class NotificationsWrapper {
           actions: actions
               .map((e) => AndroidNotificationAction(e.id, e.title))
               .toList(),
+          usesChronometer: channel.usesChronometer,
+          ongoing: channel.ongoing,
         ),
       );
 

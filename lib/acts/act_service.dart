@@ -27,14 +27,12 @@ class ActService {
               activeActNotificationId(memId),
               (await _memRepository.shipById(memId)).name,
               // TODO l10n
-              // TODO 開始してからの時間を表示したい
               'body',
               // TODO mem詳細を表示する
               'payloadJson',
               [
                 // TODO finishAct
               ],
-              // TODO スワイプで消せないようにする
               activeActNotificationChannel,
               // TODO 音はない方がいい
             ),

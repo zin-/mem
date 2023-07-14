@@ -27,6 +27,8 @@ void buildNotificationChannels(BuildContext context) => i(
             'active_act-notification',
             buildL10n(context).active_act_notification,
             buildL10n(context).active_act_notification_description,
+            usesChronometer: true,
+            ongoing: true,
           );
 
           _initialized = true;
