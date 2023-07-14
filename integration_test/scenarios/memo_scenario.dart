@@ -346,6 +346,7 @@ void testMemoScenario() => group(
             );
             await widgetTester.tap(saveMemFabFinder);
             await widgetTester.pump(defaultTransitionDuration);
+            await widgetTester.pump(defaultTransitionDuration);
 
             await widgetTester.tap(find.text(enteringMemMemoText1));
             await widgetTester.pump(defaultTransitionDuration);
