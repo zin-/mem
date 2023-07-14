@@ -51,6 +51,8 @@
   "reminder_description": "To remind at specific time.",
   "repeated_reminder_name": "繰り返し通知",
   "repeated_reminder_description": "1日の指定された時間に通知します。",
+  "active_act_notification": "実施中のAct",
+  "active_act_notification_description": "開始済みのActを表示します。",
 
   "dev": "Under development",
   "test": "Under test"

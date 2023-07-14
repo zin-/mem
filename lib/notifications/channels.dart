@@ -4,11 +4,11 @@ import 'package:mem/logger/log_service.dart';
 
 import 'notification/channel.dart';
 
+var _initialized = false;
+
 late final NotificationChannel reminderChannel;
 late final NotificationChannel repeatedReminderChannel;
 late final NotificationChannel activeActNotificationChannel;
-
-var _initialized = false;
 
 void buildNotificationChannels(BuildContext context) => i(
       () {
@@ -24,11 +24,9 @@ void buildNotificationChannels(BuildContext context) => i(
             buildL10n(context).repeated_reminder_description,
           );
           activeActNotificationChannel = NotificationChannel(
-            'active-act-notification',
-            // TODO l10n
-            buildL10n(context).repeated_reminder_name,
-            // TODO l10n
-            buildL10n(context).repeated_reminder_description,
+            'active_act-notification',
+            buildL10n(context).active_act_notification,
+            buildL10n(context).active_act_notification_description,
           );
 
           _initialized = true;
