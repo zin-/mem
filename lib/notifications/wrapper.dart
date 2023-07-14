@@ -187,6 +187,7 @@ class NotificationsWrapper {
               .toList(),
           usesChronometer: channel.usesChronometer,
           ongoing: channel.ongoing,
+          autoCancel: channel.autoCancel,
         ),
       );
 

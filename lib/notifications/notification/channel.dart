@@ -4,6 +4,7 @@ class NotificationChannel {
   final String description;
   final bool usesChronometer;
   final bool ongoing;
+  final bool autoCancel;
 
   NotificationChannel(
     this.id,
@@ -11,6 +12,7 @@ class NotificationChannel {
     this.description, {
     this.usesChronometer = false,
     this.ongoing = false,
+    this.autoCancel = true,
   });
 
   @override
@@ -20,5 +22,6 @@ class NotificationChannel {
         'description': description,
         'usesChronometer': usesChronometer,
         'ongoing': ongoing,
+        'autoCancel': autoCancel,
       }.toString();
 }

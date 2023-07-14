@@ -33,6 +33,7 @@ void prepareNotifications(BuildContext context) => i(
             l10n.active_act_notification_description,
             usesChronometer: true,
             ongoing: true,
+            autoCancel: false,
           );
 
           doneMemAction = NotificationAction(doneMemActionId, l10n.done_label);
