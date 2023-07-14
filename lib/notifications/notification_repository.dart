@@ -77,9 +77,7 @@ class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
               tz.TZDateTime.from(payload.notifyAt, tz.local),
               payload.payloadJson,
               payload.actions,
-              payload.channel.id,
-              payload.channel.name,
-              payload.channel.description,
+              payload.channel,
               payload.interval,
             );
           } else if (payload is OneTimeNotification) {
@@ -90,9 +88,7 @@ class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
               tz.TZDateTime.from(payload.notifyAt, tz.local),
               payload.payloadJson,
               payload.actions,
-              payload.channel.id,
-              payload.channel.name,
-              payload.channel.description,
+              payload.channel,
             );
           } else if (payload is CancelNotification) {
             await discard(payload.id);

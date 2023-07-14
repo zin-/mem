@@ -7,6 +7,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
 import 'package:mem/notifications/notification.dart';
+import 'package:mem/notifications/notification_channel.dart';
 import 'package:mem/notifications/notification_service.dart';
 import 'package:timezone/timezone.dart';
 
@@ -99,9 +100,7 @@ class NotificationsWrapper {
     String title,
     String? body,
     List<NotificationAction> actions,
-    String channelId,
-    String channelName,
-    String channelDescription,
+    NotificationChannel channel,
   ) =>
       v(
         () => _flutterLocalNotificationsPlugin.show(
@@ -109,9 +108,7 @@ class NotificationsWrapper {
           title,
           body,
           _buildNotificationDetails(
-            channelId,
-            channelName,
-            channelDescription,
+            channel,
             actions,
           ),
         ),
@@ -120,9 +117,7 @@ class NotificationsWrapper {
           title,
           body.toString(),
           actions,
-          channelId,
-          channelName,
-          channelDescription,
+          channel,
         },
       );
 
@@ -133,9 +128,7 @@ class NotificationsWrapper {
     TZDateTime tzDateTime,
     String payload,
     List<NotificationAction> actions,
-    String channelId,
-    String channelName,
-    String channelDescription, [
+    NotificationChannel channel, [
     NotificationInterval? interval,
   ]) =>
       v(
@@ -147,9 +140,7 @@ class NotificationsWrapper {
               body,
               tzDateTime,
               _buildNotificationDetails(
-                channelId,
-                channelName,
-                channelDescription,
+                channel,
                 actions,
               ),
               uiLocalNotificationDateInterpretation:
@@ -166,9 +157,7 @@ class NotificationsWrapper {
           'body': body,
           'tzDateTime': tzDateTime,
           'payload': payload,
-          'channelId': channelId,
-          'channelName': channelName,
-          'channelDescription': channelDescription,
+          'channel': channel,
         },
       );
 
@@ -184,16 +173,14 @@ class NotificationsWrapper {
       );
 
   NotificationDetails _buildNotificationDetails(
-    String channelId,
-    String channelName,
-    String channelDescription,
+    NotificationChannel channel,
     List<NotificationAction> actions,
   ) =>
       NotificationDetails(
         android: AndroidNotificationDetails(
-          channelId,
-          channelName,
-          channelDescription: channelDescription,
+          channel.id,
+          channel.name,
+          channelDescription: channel.description,
           actions: actions
               .map((e) => AndroidNotificationAction(e.id, e.title))
               .toList(),

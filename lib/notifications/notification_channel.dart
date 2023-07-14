@@ -4,4 +4,11 @@ class NotificationChannel {
   final String description;
 
   NotificationChannel(this.id, this.name, this.description);
+
+  @override
+  String toString() => {
+        'id': id,
+        'name': name,
+        'description': description,
+      }.toString();
 }
