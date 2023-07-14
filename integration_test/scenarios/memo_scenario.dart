@@ -326,7 +326,7 @@ void testMemoScenario() => group(
 
           testWidgets(': save twice on create.', (widgetTester) async {
             await runApplication();
-            await widgetTester.pumpAndSettle();
+            await widgetTester.pump();
 
             await widgetTester.tap(newMemFabFinder);
             await widgetTester.pumpAndSettle();
@@ -337,8 +337,6 @@ void testMemoScenario() => group(
               memNameOnDetailPageFinder,
               enteringMemNameText,
             );
-            await widgetTester.pumpAndSettle();
-
             const enteringMemMemoText =
                 '$scenarioName: MemItemsView: save twice on create - mem memo - entering';
             const enteringMemMemoText1 = '$enteringMemMemoText - 1';
@@ -346,8 +344,6 @@ void testMemoScenario() => group(
               memMemoOnDetailPageFinder(),
               enteringMemMemoText1,
             );
-            await widgetTester.pump(defaultTransitionDuration);
-
             await widgetTester.tap(saveMemFabFinder);
             await widgetTester.pump(defaultTransitionDuration);
 
@@ -364,8 +360,6 @@ void testMemoScenario() => group(
             expect(find.text(enteringMemMemoText1), findsNothing);
             expect(find.text(enteringMemMemoText2), findsOneWidget);
             await widgetTester.tap(saveMemFabFinder);
-            await widgetTester.pump(defaultTransitionDuration);
-
             await widgetTester.pageBack();
             await widgetTester.pumpAndSettle();
 
