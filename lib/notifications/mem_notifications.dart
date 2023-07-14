@@ -72,6 +72,11 @@ class MemNotifications {
       id,
       title,
       body,
+      json.encode({memIdKey: memId}),
+      [
+        NotificationAction(doneActionId, L10n().doneLabel),
+      ],
+      reminderChannel,
       notifyAt.isAllDay == true
           ? DateTime(
               notifyAt.year,
@@ -81,11 +86,6 @@ class MemNotifications {
               startMinuteOfDay,
             )
           : notifyAt,
-      json.encode({memIdKey: memId}),
-      [
-        NotificationAction(doneActionId, L10n().doneLabel),
-      ],
-      reminderChannel,
     );
   }
 }

@@ -1,22 +1,15 @@
-import 'channel.dart';
-import 'notification.dart';
-import 'action.dart';
+import 'show_notification.dart';
 
-class OneTimeNotification extends Notification {
-  final String title;
-  final String body;
+class OneTimeNotification extends ShowNotification {
   final DateTime notifyAt;
-  final String payloadJson;
-  final List<NotificationAction> actions;
-  final NotificationChannel channel;
 
   OneTimeNotification(
     super.id,
-    this.title,
-    this.body,
+    super.title,
+    super.body,
+    super.payloadJson,
+    super.actions,
+    super.channel,
     this.notifyAt,
-    this.payloadJson,
-    this.actions,
-    this.channel,
   );
 }

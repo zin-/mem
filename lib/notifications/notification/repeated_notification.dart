@@ -1,17 +1,18 @@
-import 'one_time_notification.dart';
+import 'show_notification.dart';
 
-class RepeatedNotification extends OneTimeNotification {
+class RepeatedNotification extends ShowNotification {
+  final DateTime notifyFirstAt;
   final NotificationInterval interval;
 
   RepeatedNotification(
     super.id,
     super.title,
     super.body,
-    super.notifyAt,
     super.payloadJson,
     super.actions,
-    this.interval,
     super.channel,
+    this.notifyFirstAt,
+    this.interval,
   );
 }
 

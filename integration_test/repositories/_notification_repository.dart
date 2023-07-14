@@ -77,7 +77,6 @@ void testNotificationRepository() => group(
                       1,
                       'title',
                       'body',
-                      DateTime.now().add(const Duration(days: 1)),
                       jsonEncode({}),
                       [],
                       NotificationChannel(
@@ -85,6 +84,7 @@ void testNotificationRepository() => group(
                         'test channelName',
                         'test channelDescription',
                       ),
+                      DateTime.now().add(const Duration(days: 1)),
                     ),
                   );
 

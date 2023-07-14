@@ -62,11 +62,11 @@ class NotificationService {
               memRepeatedNotificationId(mem.id),
               mem.name,
               'Repeat',
-              notifyFirstAt,
               json.encode({'memId': memRepeatedNotification.memId}),
               [],
-              NotificationInterval.perDay,
               repeatedReminderChannel,
+              notifyFirstAt,
+              NotificationInterval.perDay,
             );
 
             await _notificationRepository.receive(repeatedNotification);

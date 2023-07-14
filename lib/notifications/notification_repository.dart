@@ -70,7 +70,7 @@ class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
               payload.id,
               payload.title,
               payload.body,
-              tz.TZDateTime.from(payload.notifyAt, tz.local),
+              tz.TZDateTime.from(payload.notifyFirstAt, tz.local),
               payload.payloadJson,
               payload.actions,
               payload.channel,
