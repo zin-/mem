@@ -61,6 +61,8 @@ class ActService {
           await _notificationRepository
               .discard(activeActNotificationId(act.memId));
 
+          // ISSUE #226
+
           return finished;
         },
         act,
