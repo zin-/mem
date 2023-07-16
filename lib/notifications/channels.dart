@@ -37,6 +37,8 @@ void prepareNotifications([BuildContext? context]) => i(
           );
 
           doneMemAction = NotificationAction(doneMemActionId, l10n.done_label);
+          startActAction =
+              NotificationAction(startActActionId, l10n.start_label);
           finishActiveActAction =
               NotificationAction(finishActiveActActionId, l10n.finish_label);
 

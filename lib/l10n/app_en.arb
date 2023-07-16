@@ -47,6 +47,7 @@
 
   "done_label": "Done",
   "finish_label": "Finish",
+  "start_label": "Start",
 
   "reminder_name": "Reminder",
   "reminder_description": "To remind at specific time.",

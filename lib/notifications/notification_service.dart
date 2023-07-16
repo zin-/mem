@@ -59,7 +59,9 @@ class NotificationService {
               mem.name,
               'Repeat',
               json.encode({'memId': memRepeatedNotification.memId}),
-              [],
+              [
+                startActAction,
+              ],
               repeatedReminderChannel,
               notifyFirstAt,
               NotificationInterval.perDay,
@@ -106,12 +108,16 @@ Future<void> notificationActionHandler(
               await MemService().doneByMemId(memId);
             }
           }
+        } else if (actionId == startActActionId) {
+          final memId = payload[memIdKey];
+          if (memId is int) {
+            await ActService().startBy(memId);
+          }
         } else if (actionId == finishActiveActActionId) {
           final memId = payload[memIdKey];
           if (memId is int) {
             final act = (await ActRepository().shipActive())
-                .where((element) => element.memId == memId)
-                .single;
+                .lastWhere((element) => element.memId == memId);
             await ActService().finish(act);
           }
         }

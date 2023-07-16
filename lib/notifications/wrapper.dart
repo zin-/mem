@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
+import 'package:mem/notifications/channels.dart';
 import 'package:mem/notifications/notification_service.dart';
 import 'package:timezone/timezone.dart';
 
@@ -146,7 +147,7 @@ class NotificationsWrapper {
               ),
               uiLocalNotificationDateInterpretation:
                   UILocalNotificationDateInterpretation.absoluteTime,
-              androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+              androidScheduleMode: AndroidScheduleMode.exact,
               payload: payload,
               matchDateTimeComponents: interval?.convert(),
             );
@@ -223,6 +224,9 @@ void onNotificationTappedBackground(NotificationResponse response) async {
   info({'response': response});
 
   await openDatabase();
+
+  // ここで呼び出すと、デバイスのcontextがないのでen固定になるかもしれない
+  prepareNotifications();
 
   await _notificationResponseHandler(
     response,
