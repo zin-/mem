@@ -27,8 +27,10 @@ class _ActCounterConfigureComponent extends StatelessWidget {
   @override
   Widget build(BuildContext context) => i(
         () {
+          final l10n = buildL10n(context);
+
           return Scaffold(
-            body: MemListView(L10n().actCounterConfigureTitle()),
+            body: MemListView(l10n.actCounterConfigureTitle),
             floatingActionButton: const SelectMemFab(),
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerFloat,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
@@ -15,13 +16,14 @@ class MemApplication extends StatelessWidget {
   @override
   Widget build(BuildContext context) => i(
         () {
-          buildNotificationChannels(context);
+          prepareNotifications(context);
+          final l10n = buildL10n(context);
 
           return ProviderScope(
             child: MaterialApp(
-              onGenerateTitle: (context) => L10n(context).appTitle(),
-              localizationsDelegates: L10n.localizationsDelegates,
-              supportedLocales: L10n.supportedLocales,
+              onGenerateTitle: (context) => l10n.appTitle,
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
               locale: languageCode == null ? null : Locale(languageCode!),
               theme: ThemeData(
                 primarySwatch: primaryColor,

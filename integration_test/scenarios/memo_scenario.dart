@@ -220,7 +220,7 @@ void testMemoScenario() => group(
                 await widgetTester.pumpAndSettle();
 
                 await closeMemListFilter(widgetTester);
-                await widgetTester.pumpAndSettle();
+                await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
                 expect(find.text(unarchivedMemName), findsOneWidget);
                 expect(find.text(archivedMemName), findsOneWidget);
@@ -242,7 +242,7 @@ void testMemoScenario() => group(
                 await widgetTester.pumpAndSettle();
 
                 await closeMemListFilter(widgetTester);
-                await widgetTester.pumpAndSettle();
+                await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
                 expect(find.text(insertedMemName), findsNothing);
                 expect(find.text(unarchivedMemName), findsNothing);
@@ -277,8 +277,8 @@ void testMemoScenario() => group(
             await widgetTester.pumpAndSettle();
 
             await widgetTester.tap(find.text('OK'));
+            await Future.delayed(defaultTransitionDuration);
             await widgetTester.pumpAndSettle();
-            await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
             expect(
               find.text('Remove success. $insertedMemName'),
@@ -326,7 +326,7 @@ void testMemoScenario() => group(
 
           testWidgets(': save twice on create.', (widgetTester) async {
             await runApplication();
-            await widgetTester.pumpAndSettle();
+            await widgetTester.pump();
 
             await widgetTester.tap(newMemFabFinder);
             await widgetTester.pumpAndSettle();
@@ -337,8 +337,6 @@ void testMemoScenario() => group(
               memNameOnDetailPageFinder,
               enteringMemNameText,
             );
-            await widgetTester.pumpAndSettle();
-
             const enteringMemMemoText =
                 '$scenarioName: MemItemsView: save twice on create - mem memo - entering';
             const enteringMemMemoText1 = '$enteringMemMemoText - 1';
@@ -346,9 +344,8 @@ void testMemoScenario() => group(
               memMemoOnDetailPageFinder(),
               enteringMemMemoText1,
             );
-            await widgetTester.pump(defaultTransitionDuration);
-
             await widgetTester.tap(saveMemFabFinder);
+            await widgetTester.pump(defaultTransitionDuration);
             await widgetTester.pump(defaultTransitionDuration);
 
             await widgetTester.tap(find.text(enteringMemMemoText1));
@@ -364,8 +361,6 @@ void testMemoScenario() => group(
             expect(find.text(enteringMemMemoText1), findsNothing);
             expect(find.text(enteringMemMemoText2), findsOneWidget);
             await widgetTester.tap(saveMemFabFinder);
-            await widgetTester.pump(defaultTransitionDuration);
-
             await widgetTester.pageBack();
             await widgetTester.pumpAndSettle();
 

@@ -46,11 +46,15 @@
   "showDoneLabel": "Show done",
 
   "done_label": "Done",
+  "finish_label": "Finish",
+  "start_label": "Start",
 
   "reminder_name": "Reminder",
   "reminder_description": "To remind at specific time.",
   "repeated_reminder_name": "Repeated Reminder",
   "repeated_reminder_description": "To remind at specific time per day.",
+  "active_act_notification": "Active act",
+  "active_act_notification_description": "To show active act.",
 
   "dev": "Under development",
   "test": "Under test"

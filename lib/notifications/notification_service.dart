@@ -1,25 +1,22 @@
 import 'dart:convert';
 
+import 'package:mem/acts/act_repository.dart';
+import 'package:mem/acts/act_service.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_repeated_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_service.dart';
+import 'package:mem/notifications/actions.dart';
 
 import 'channels.dart';
 import 'mem_notifications.dart';
-import 'notification.dart';
+import 'notification/cancel_notification.dart';
+import 'notification/repeated_notification.dart';
 import 'notification_ids.dart';
 import 'notification_repository.dart';
 
 class NotificationService {
   final NotificationRepository _notificationRepository;
-
-  Future initialize({Function(int memId)? showMemDetailPage}) => i(
-        () async => await _notificationRepository.initialize(
-          notificationActionHandler,
-          showMemDetailPage,
-        ),
-      );
 
   Future<void> memReminder(Mem mem) => i(
         () async {
@@ -61,11 +58,13 @@ class NotificationService {
               memRepeatedNotificationId(mem.id),
               mem.name,
               'Repeat',
-              notifyFirstAt,
               json.encode({'memId': memRepeatedNotification.memId}),
-              [],
-              NotificationInterval.perDay,
+              [
+                startActAction,
+              ],
               repeatedReminderChannel,
+              notifyFirstAt,
+              NotificationInterval.perDay,
             );
 
             await _notificationRepository.receive(repeatedNotification);
@@ -92,7 +91,7 @@ class NotificationService {
   }
 }
 
-// FIXME 現時点では、通知に対する操作をテストで実行できない
+// ISSUE #225
 // coverage:ignore-start
 Future<void> notificationActionHandler(
   int notificationId,
@@ -102,12 +101,24 @@ Future<void> notificationActionHandler(
 ) =>
     v(
       () async {
-        if (actionId == doneActionId) {
+        if (actionId == doneMemActionId) {
           if (payload.containsKey(memIdKey)) {
             final memId = payload[memIdKey];
             if (memId is int) {
               await MemService().doneByMemId(memId);
             }
+          }
+        } else if (actionId == startActActionId) {
+          final memId = payload[memIdKey];
+          if (memId is int) {
+            await ActService().startBy(memId);
+          }
+        } else if (actionId == finishActiveActActionId) {
+          final memId = payload[memIdKey];
+          if (memId is int) {
+            final act = (await ActRepository().shipActive())
+                .lastWhere((element) => element.memId == memId);
+            await ActService().finish(act);
           }
         }
       },

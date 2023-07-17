@@ -1,65 +1,63 @@
+import 'package:flutter/foundation.dart';
 import 'package:mem/framework/repository_v3.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-import 'flutter_local_notifications.dart';
+import 'notification/cancel_notification.dart';
+import 'notification/one_time_notification.dart';
+import 'notification/repeated_notification.dart';
+import 'notification/show_notification.dart';
+import 'wrapper.dart';
 import 'mem_notifications.dart';
-import 'notification.dart';
+import 'notification/notification.dart';
 
 const _androidDefaultIconPath = 'ic_launcher_foreground';
 
-class NotificationActionEntity {
-  final String id;
-  final String title;
-
-  NotificationActionEntity(this.id, this.title);
-}
-
 class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
-  final FlutterLocalNotificationsWrapper _flutterLocalNotificationsWrapper;
+  final NotificationsWrapper? _flutterLocalNotificationsWrapper;
 
-  Future<bool> initialize(
+  Future<void> initialize(
     OnNotificationActionTappedCallback notificationActionHandler,
     Function(int memId)? showMemDetailPage,
   ) =>
       v(
         () async {
-// FIXME 現時点では、通知に対する操作をテストで実行できない
+          if (defaultTargetPlatform == TargetPlatform.android) {
+            // ISSUE #225
 // coverage:ignore-start
-          showMemDetailPageHandler(Map<dynamic, dynamic> payload) {
-            if (showMemDetailPage != null && payload.containsKey(memIdKey)) {
-              final memId = payload[memIdKey];
-              if (memId is int) {
-                showMemDetailPage(memId);
+            showMemDetailPageHandler(Map<dynamic, dynamic> payload) {
+              if (showMemDetailPage != null && payload.containsKey(memIdKey)) {
+                final memId = payload[memIdKey];
+                if (memId is int) {
+                  showMemDetailPage(memId);
+                }
               }
             }
-          }
 // coverage:ignore-end
 
-          tz.initializeTimeZones();
+            tz.initializeTimeZones();
 
-          final initialized =
-              await _flutterLocalNotificationsWrapper.initialize(
-            _androidDefaultIconPath,
-// FIXME 現時点では、通知に対する操作をテストで実行できない
-// coverage:ignore-start
-            (notificationId, payload) => showMemDetailPageHandler(payload),
-// coverage:ignore-end
-            notificationActionHandler,
-          );
-
-          if (initialized) {
-            await _flutterLocalNotificationsWrapper
-                .receiveOnLaunchAppNotification(
-// FIXME 現時点では、通知に対する操作をテストで実行できない
+            final initialized =
+                await _flutterLocalNotificationsWrapper?.initialize(
+              _androidDefaultIconPath,
+              // ISSUE #225
 // coverage:ignore-start
               (notificationId, payload) => showMemDetailPageHandler(payload),
 // coverage:ignore-end
+              notificationActionHandler,
             );
-          }
 
-          return initialized;
+            if (initialized ?? false) {
+              await _flutterLocalNotificationsWrapper
+                  ?.receiveOnLaunchAppNotification(
+                // ISSUE #225
+// coverage:ignore-start
+                (notificationId, payload) => showMemDetailPageHandler(payload),
+// coverage:ignore-end
+              );
+            }
+          }
         },
       );
 
@@ -70,29 +68,34 @@ class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
       v(
         () async {
           if (payload is RepeatedNotification) {
-            await _flutterLocalNotificationsWrapper.zonedSchedule(
+            await _flutterLocalNotificationsWrapper?.zonedSchedule(
               payload.id,
               payload.title,
               payload.body,
-              tz.TZDateTime.from(payload.notifyAt, tz.local),
+              tz.TZDateTime.from(payload.notifyFirstAt, tz.local),
               payload.payloadJson,
               payload.actions,
-              payload.channel.id,
-              payload.channel.name,
-              payload.channel.description,
+              payload.channel,
               payload.interval,
             );
           } else if (payload is OneTimeNotification) {
-            await _flutterLocalNotificationsWrapper.zonedSchedule(
+            await _flutterLocalNotificationsWrapper?.zonedSchedule(
               payload.id,
               payload.title,
               payload.body,
               tz.TZDateTime.from(payload.notifyAt, tz.local),
               payload.payloadJson,
               payload.actions,
-              payload.channel.id,
-              payload.channel.name,
-              payload.channel.description,
+              payload.channel,
+            );
+          } else if (payload is ShowNotification) {
+            await _flutterLocalNotificationsWrapper?.show(
+              payload.id,
+              payload.title,
+              payload.body,
+              payload.actions,
+              payload.channel,
+              payload.payloadJson,
             );
           } else if (payload is CancelNotification) {
             await discard(payload.id);
@@ -102,26 +105,20 @@ class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
       );
 
   Future<void> discard(int id) => v(
-        () async => _flutterLocalNotificationsWrapper.cancel(id),
-        {'id': id},
+        () async => _flutterLocalNotificationsWrapper?.cancel(id),
+        id,
       );
 
   NotificationRepository._(this._flutterLocalNotificationsWrapper);
 
   static NotificationRepository? _instance;
 
-  factory NotificationRepository({
-    FlutterLocalNotificationsWrapper? flutterLocalNotificationsWrapper,
-  }) {
-    var tmp = _instance;
-    if (tmp == null) {
-      tmp = NotificationRepository._(
-        flutterLocalNotificationsWrapper ?? FlutterLocalNotificationsWrapper(),
+  factory NotificationRepository() =>
+      _instance ??= _instance = NotificationRepository._(
+        defaultTargetPlatform == TargetPlatform.android
+            ? NotificationsWrapper()
+            : null,
       );
-      _instance = tmp;
-    }
-    return tmp;
-  }
 
   static void reset(NotificationRepository? notificationRepository) {
     _instance = notificationRepository;

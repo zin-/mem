@@ -6,9 +6,13 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
-import 'package:mem/notifications/notification.dart';
+import 'package:mem/notifications/channels.dart';
 import 'package:mem/notifications/notification_service.dart';
 import 'package:timezone/timezone.dart';
+
+import 'notification/action.dart';
+import 'notification/channel.dart';
+import 'notification/repeated_notification.dart';
 
 typedef OnNotificationTappedCallback = Function(
   int id,
@@ -21,7 +25,7 @@ typedef OnNotificationActionTappedCallback = Function(
   Map<dynamic, dynamic> payload,
 );
 
-class FlutterLocalNotificationsWrapper {
+class NotificationsWrapper {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
@@ -32,25 +36,21 @@ class FlutterLocalNotificationsWrapper {
   ) =>
       v(
         () async {
-          if (Platform.isAndroid) {
-            return (await _flutterLocalNotificationsPlugin.initialize(
-                  InitializationSettings(
-                    android:
-                        AndroidInitializationSettings(androidDefaultIconPath),
-                  ),
-                  onDidReceiveNotificationResponse: (details) =>
-                      _notificationResponseHandler(
-                    details,
-                    onNotificationTappedCallback,
-                    onNotificationActionTappedCallback,
-                  ),
-                  onDidReceiveBackgroundNotificationResponse:
-                      onNotificationTappedBackground,
-                )) ==
-                true;
-          }
-
-          return false;
+          return (await _flutterLocalNotificationsPlugin.initialize(
+                InitializationSettings(
+                  android:
+                      AndroidInitializationSettings(androidDefaultIconPath),
+                ),
+                onDidReceiveNotificationResponse: (details) =>
+                    _notificationResponseHandler(
+                  details,
+                  onNotificationTappedCallback,
+                  onNotificationActionTappedCallback,
+                ),
+                onDidReceiveBackgroundNotificationResponse:
+                    onNotificationTappedBackground,
+              )) ==
+              true;
         },
         {
           'androidDefaultIconPath': androidDefaultIconPath,
@@ -94,16 +94,43 @@ class FlutterLocalNotificationsWrapper {
         },
       );
 
+  Future<void> show(
+    int id,
+    String title,
+    String? body,
+    List<NotificationAction> actions,
+    NotificationChannel channel,
+    String? payload,
+  ) =>
+      v(
+        () => _flutterLocalNotificationsPlugin.show(
+          id,
+          title,
+          body,
+          _buildNotificationDetails(
+            channel,
+            actions,
+          ),
+          payload: payload,
+        ),
+        {
+          id,
+          title,
+          body.toString(),
+          actions,
+          channel,
+          payload,
+        },
+      );
+
   Future<void> zonedSchedule(
     int id,
     String title,
     String? body,
     TZDateTime tzDateTime,
-    String payload,
+    String? payload,
     List<NotificationAction> actions,
-    String channelId,
-    String channelName,
-    String channelDescription, [
+    NotificationChannel channel, [
     NotificationInterval? interval,
   ]) =>
       v(
@@ -114,19 +141,13 @@ class FlutterLocalNotificationsWrapper {
               title,
               body,
               tzDateTime,
-              NotificationDetails(
-                android: AndroidNotificationDetails(
-                  channelId,
-                  channelName,
-                  channelDescription: channelDescription,
-                  actions: actions
-                      .map((e) => AndroidNotificationAction(e.id, e.title))
-                      .toList(),
-                ),
+              _buildNotificationDetails(
+                channel,
+                actions,
               ),
               uiLocalNotificationDateInterpretation:
                   UILocalNotificationDateInterpretation.absoluteTime,
-              androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+              androidScheduleMode: AndroidScheduleMode.exact,
               payload: payload,
               matchDateTimeComponents: interval?.convert(),
             );
@@ -138,9 +159,7 @@ class FlutterLocalNotificationsWrapper {
           'body': body,
           'tzDateTime': tzDateTime,
           'payload': payload,
-          'channelId': channelId,
-          'channelName': channelName,
-          'channelDescription': channelDescription,
+          'channel': channel,
         },
       );
 
@@ -155,18 +174,32 @@ class FlutterLocalNotificationsWrapper {
         },
       );
 
-  FlutterLocalNotificationsWrapper._();
+  NotificationDetails _buildNotificationDetails(
+    NotificationChannel channel,
+    List<NotificationAction> actions,
+  ) =>
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          channel.id,
+          channel.name,
+          channelDescription: channel.description,
+          actions: actions
+              .map((e) => AndroidNotificationAction(e.id, e.title))
+              .toList(),
+          usesChronometer: channel.usesChronometer,
+          ongoing: channel.ongoing,
+          autoCancel: channel.autoCancel,
+        ),
+      );
 
-  static FlutterLocalNotificationsWrapper? _instance;
+  NotificationsWrapper._();
 
-  factory FlutterLocalNotificationsWrapper() {
-    var tmp = _instance;
-    if (tmp == null) {
-      tmp = FlutterLocalNotificationsWrapper._();
-      _instance = tmp;
-    }
-    return tmp;
-  }
+  static NotificationsWrapper? _instance;
+
+  factory NotificationsWrapper() =>
+      _instance ??= _instance = NotificationsWrapper._();
+
+  static resetWith(NotificationsWrapper? instance) => _instance = instance;
 }
 
 extension on NotificationInterval {
@@ -191,6 +224,9 @@ void onNotificationTappedBackground(NotificationResponse response) async {
   info({'response': response});
 
   await openDatabase();
+
+  // ここで呼び出すと、デバイスのcontextがないのでen固定になるかもしれない
+  prepareNotifications();
 
   await _notificationResponseHandler(
     response,

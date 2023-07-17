@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
@@ -34,10 +35,8 @@ final memListFilterButton = find.byIcon(Icons.filter_list);
 final findShowNotArchiveSwitch = find.byType(Switch).at(0);
 final findShowArchiveSwitch = find.byType(Switch).at(1);
 
-Future closeMemListFilter(WidgetTester widgetTester) async {
-  await widgetTester.tapAt(const Offset(0, 0));
-  await widgetTester.pumpAndSettle(defaultDuration);
-}
+Future closeMemListFilter(WidgetTester widgetTester) async =>
+    await widgetTester.tapAt(const Offset(0, 0));
 
 TextFormField memNameTextFormField(WidgetTester widgetTester) =>
     (widgetTester.widget(memNameOnDetailPageFinder) as TextFormField);
@@ -129,9 +128,9 @@ Future<void> prepareSavedMem(
 Future<void> runTestWidget(WidgetTester widgetTester, Widget widget) =>
     widgetTester.pumpWidget(
       MaterialApp(
-        localizationsDelegates: L10n.localizationsDelegates,
-        supportedLocales: L10n.supportedLocales,
-        onGenerateTitle: (context) => L10n(context).test(),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        onGenerateTitle: (context) => buildL10n(context).test,
         home: widget,
       ),
     );

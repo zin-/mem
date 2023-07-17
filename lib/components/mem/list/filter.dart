@@ -12,6 +12,8 @@ class MemListFilter extends StatelessWidget {
   @override
   Widget build(BuildContext context) => i(
         () {
+          final l10n = buildL10n(context);
+
           return Consumer(
             builder: (context, ref, child) {
               final sections = [
@@ -20,14 +22,14 @@ class MemListFilter extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(L10n().archiveFilterTitle()),
+                        Text(l10n.archiveFilterTitle),
                       ],
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Icon(Icons.unarchive),
-                        Text(L10n().showNotArchivedLabel()),
+                        Text(l10n.showNotArchivedLabel),
                         Switch(
                           value: ref.watch(showNotArchivedProvider),
                           onChanged: (value) => ref
@@ -40,7 +42,7 @@ class MemListFilter extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Icon(Icons.archive),
-                        Text(L10n().showArchivedLabel()),
+                        Text(l10n.showArchivedLabel),
                         Switch(
                           value: ref.watch(showArchivedProvider),
                           onChanged: (value) => ref
@@ -56,14 +58,14 @@ class MemListFilter extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(L10n().doneFilterTitle()),
+                        Text(l10n.doneFilterTitle),
                       ],
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Icon(Icons.check_box_outline_blank),
-                        Text(L10n().showNotDoneLabel()),
+                        Text(l10n.showNotDoneLabel),
                         Switch(
                           value: ref.watch(showNotDoneProvider),
                           onChanged: (value) => ref
@@ -76,7 +78,7 @@ class MemListFilter extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Icon(Icons.check_box),
-                        Text(L10n().showDoneLabel()),
+                        Text(l10n.showDoneLabel),
                         Switch(
                           value: ref.watch(showDoneProvider),
                           onChanged: (value) => ref

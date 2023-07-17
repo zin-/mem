@@ -8,17 +8,19 @@ import 'package:mem/logger/logger_wrapper.dart';
 import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/notifications/notification_repository.dart';
+import 'package:mem/notifications/wrapper.dart';
 import 'package:mockito/annotations.dart';
 
 bool randomBool() => Random().nextBool();
 
-int randomInt([int max = 4294967296]) => Random().nextInt(max);
+int randomInt([int max = 42949671]) => Random().nextInt(max);
 
 @GenerateMocks([
   // FIXME RepositoryではなくTableをmockする
   //  Repositoryはシステム固有の処理であるのに対して、Tableは永続仮想をラップする役割を持つため
   HomeWidgetAccessor,
   LoggerWrapper,
+  NotificationsWrapper,
   MemRepository,
   MemItemRepository,
   NotificationRepository,

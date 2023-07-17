@@ -8,7 +8,7 @@ Future<void> runTestWidget(WidgetTester widgetTester, Widget widget) {
     MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      onGenerateTitle: (context) => L10n(context).test(),
+      onGenerateTitle: (context) => buildL10n(context).test,
       home: Scaffold(
         body: widget,
       ),

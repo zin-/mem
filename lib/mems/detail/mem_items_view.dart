@@ -45,13 +45,15 @@ class _MemItemsFormFieldsComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = buildL10n(context);
+
     return Column(
       children: [
         ..._memItems.map(
           (memItem) => TextFormField(
             decoration: InputDecoration(
               icon: const Icon(Icons.subject),
-              labelText: L10n().memMemoTitle(),
+              labelText: l10n.memMemoLabel,
             ),
             maxLines: null,
             initialValue: memItem.value,

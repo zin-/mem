@@ -21,7 +21,7 @@ class MemDetailPage extends ConsumerWidget {
         () {
           // ISSUE #178
           ref.read(
-            initialize((memId) => showMemDetailPage(context, ref, memId)),
+            initializeNotification((memId) => showMemDetailPage(context, ref, memId)),
           );
           final memIsArchived = ref.watch(memIsArchivedProvider(_memId));
 

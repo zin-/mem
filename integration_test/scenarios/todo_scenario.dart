@@ -6,7 +6,7 @@ import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/database/definition.dart';
-import 'package:mem/main.dart' as app;
+import 'package:mem/values/durations.dart';
 
 import '../_helpers.dart';
 import 'helpers.dart';
@@ -52,7 +52,7 @@ void testTodoScenario() => group(': $scenarioName', () {
 
       group(': done & undone', () {
         testWidgets(': MemDetail.', (widgetTester) async {
-          await app.main();
+          await runApplication();
           await widgetTester.pumpAndSettle();
 
           expect(find.text(undoneMemName), findsOneWidget);
@@ -73,7 +73,7 @@ void testTodoScenario() => group(': $scenarioName', () {
           await widgetTester.pumpAndSettle();
           await widgetTester.tap(find.byType(Switch).at(3));
           await closeMemListFilter(widgetTester);
-          await widgetTester.pumpAndSettle();
+          await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
           expect(find.text(insertedMemName), findsOneWidget);
           expect(find.text(undoneMemName), findsOneWidget);
@@ -91,7 +91,8 @@ void testTodoScenario() => group(': $scenarioName', () {
           await widgetTester.pumpAndSettle();
           await widgetTester.tap(find.byType(Switch).at(2));
           await closeMemListFilter(widgetTester);
-          await widgetTester.pumpAndSettle();
+          await widgetTester.pumpAndSettle(defaultTransitionDuration);
+
           expect(find.text(insertedMemName), findsNothing);
           expect(find.text(undoneMemName), findsNothing);
           expect(find.text(doneMemName), findsOneWidget);
@@ -100,7 +101,7 @@ void testTodoScenario() => group(': $scenarioName', () {
         testWidgets(
           ': MemList.',
           (widgetTester) async {
-            await app.main();
+            await runApplication();
             await widgetTester.pumpAndSettle();
 
             expect(find.text(insertedMemName), findsOneWidget);
@@ -116,7 +117,7 @@ void testTodoScenario() => group(': $scenarioName', () {
             await widgetTester.pumpAndSettle();
             await widgetTester.tap(find.byType(Switch).at(2));
             await closeMemListFilter(widgetTester);
-            await widgetTester.pumpAndSettle();
+            await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
             expect(find.text(insertedMemName), findsOneWidget);
             expect(find.text(undoneMemName), findsOneWidget);
@@ -131,7 +132,7 @@ void testTodoScenario() => group(': $scenarioName', () {
             await widgetTester.pumpAndSettle();
             await widgetTester.tap(find.byType(Switch).at(3));
             await closeMemListFilter(widgetTester);
-            await widgetTester.pumpAndSettle();
+            await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
             expect(find.text(insertedMemName), findsNothing);
             expect(find.text(undoneMemName), findsNothing);
