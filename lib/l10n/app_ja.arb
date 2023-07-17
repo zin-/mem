@@ -36,6 +36,12 @@
     }
   },
   "undoAction": "Undo",
+  "undoMemSuccessMessage": "\"{memName}\"の削除取り消しが完了しました。",
+  "@undoMemSuccessMessage": {
+    "placeholders": {
+      "memName": {}
+    }
+  },
   "okAction": "OK",
   "cancelAction": "Cancel",
   "archiveFilterTitle": "Archive",

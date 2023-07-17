@@ -83,7 +83,7 @@ final saveMem =
           memId,
         ));
 
-final archiveMem = Provider.family<Future<MemDetail?>, int?>(
+final archiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
   (ref, memId) => v(
     () async {
       final mem = ref.read(editingMemProvider(memId));
@@ -101,7 +101,7 @@ final archiveMem = Provider.family<Future<MemDetail?>, int?>(
   ),
 );
 
-final unarchiveMem = Provider.family<Future<MemDetail?>, int?>(
+final unarchiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
   (ref, memId) => v(
     () async {
       final mem = ref.read(editingMemProvider(memId));
@@ -119,7 +119,7 @@ final unarchiveMem = Provider.family<Future<MemDetail?>, int?>(
   ),
 );
 
-final removeMem = Provider.family<Future<bool>, int?>(
+final removeMem = Provider.autoDispose.family<Future<bool>, int?>(
   (ref, memId) => v(
     () async {
       if (memId != null) {

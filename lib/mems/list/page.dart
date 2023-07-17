@@ -121,9 +121,9 @@ void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
-                                    l10n.saveMemSuccessMessage(removed.name),
+                                    l10n.undoMemSuccessMessage(removed.name),
                                   ),
-                                  duration: infiniteDismissDuration,
+                                  duration: defaultDismissDuration,
                                   dismissDirection: DismissDirection.horizontal,
                                 ),
                               );
