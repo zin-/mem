@@ -81,11 +81,13 @@ class _MemDetailMenuComponent extends StatelessWidget {
         icon: const Icon(Icons.unarchive),
         color: Colors.white,
         onPressed: () {
+          final l10n = buildL10n(context);
+
           _unarchiveMem();
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(L10n().unarchiveMemSuccessMessage(
+              content: Text(l10n.unarchiveMemSuccessMessage(
                 _mem.name,
               )),
               duration: defaultDismissDuration,
@@ -99,11 +101,13 @@ class _MemDetailMenuComponent extends StatelessWidget {
         icon: const Icon(Icons.archive),
         color: Colors.white,
         onPressed: () {
+          final l10n = buildL10n(context);
+
           _archiveMem();
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(L10n().archiveMemSuccessMessage(
+              content: Text(l10n.archiveMemSuccessMessage(
                 _mem.name,
               )),
               duration: defaultDismissDuration,
@@ -115,27 +119,31 @@ class _MemDetailMenuComponent extends StatelessWidget {
         },
       );
 
-  Widget _menu(BuildContext context) => PopupMenuButton(
-        itemBuilder: (context) => [
-          PopupMenuItem(
-            value: MenuOption.remove,
-            child: Row(
-              children: [
-                const Icon(Icons.delete, color: Colors.black),
-                Text(L10n().removeAction())
-              ],
-            ),
+  Widget _menu(BuildContext context) {
+    final l10n = buildL10n(context);
+
+    return PopupMenuButton(
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          value: MenuOption.remove,
+          child: Row(
+            children: [
+              const Icon(Icons.delete, color: Colors.black),
+              Text(l10n.removeAction)
+            ],
           ),
-        ],
-        onSelected: (value) {
-          if (value == MenuOption.remove) {
-            showDialog(
-              context: context,
-              builder: (context) => _RemoveMemAlertDialog(_removeMem),
-            );
-          }
-        },
-      );
+        ),
+      ],
+      onSelected: (value) {
+        if (value == MenuOption.remove) {
+          showDialog(
+            context: context,
+            builder: (context) => _RemoveMemAlertDialog(_removeMem),
+          );
+        }
+      },
+    );
+  }
 }
 
 class _RemoveMemAlertDialog extends StatelessWidget {
@@ -144,34 +152,38 @@ class _RemoveMemAlertDialog extends StatelessWidget {
   const _RemoveMemAlertDialog(this._removeMem);
 
   @override
-  Widget build(BuildContext context) => AlertDialog(
-        content: Text(L10n().removeConfirmation()),
-        actions: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              ElevatedButton(
-                onPressed: () async {
-                  if (await _removeMem()) {
-                    if (context.mounted) {
-                      Navigator.of(context)
-                        ..pop()
-                        ..pop(true);
-                    }
+  Widget build(BuildContext context) {
+    final l10n = buildL10n(context);
+
+    return AlertDialog(
+      content: Text(l10n.removeConfirmation),
+      actions: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            ElevatedButton(
+              onPressed: () async {
+                if (await _removeMem()) {
+                  if (context.mounted) {
+                    Navigator.of(context)
+                      ..pop()
+                      ..pop(true);
                   }
-                },
-                child: Text(L10n().okAction()),
+                }
+              },
+              child: Text(l10n.okAction),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black,
               ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                ),
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(L10n().cancelAction()),
-              ),
-            ],
-          ),
-        ],
-      );
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(l10n.cancelAction),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 }

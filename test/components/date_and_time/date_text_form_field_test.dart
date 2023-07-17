@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:mem/components/date_and_time/date_view.dart';
@@ -12,9 +13,9 @@ void main() {
   ) async {
     await widgetTester.pumpWidget(
       MaterialApp(
-        onGenerateTitle: (context) => L10n(context).test(),
-        localizationsDelegates: L10n.localizationsDelegates,
-        supportedLocales: L10n.supportedLocales,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        onGenerateTitle: (context) => buildL10n(context).test,
         home: Scaffold(
           body: DateTextFormField(
             date,

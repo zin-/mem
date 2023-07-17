@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/components/l10n.dart';
@@ -33,9 +34,9 @@ void main() {
             .overrideWith((ref) => ListValueStateNotifier(samples)),
       ],
       child: MaterialApp(
-        onGenerateTitle: (context) => L10n(context).memDetailPageTitle(),
-        localizationsDelegates: L10n.localizationsDelegates,
-        supportedLocales: L10n.supportedLocales,
+        onGenerateTitle: (context) => buildL10n(context).memDetailPageTitle,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: const MemListPage(),
       ),
     ));

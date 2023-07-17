@@ -22,7 +22,8 @@ class MemListPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => i(
         () {
           ref.read(
-            initializeNotification((memId) => showMemDetailPage(context, ref, memId)),
+            initializeNotification(
+                (memId) => showMemDetailPage(context, ref, memId)),
           );
           ref.read(fetchActiveActs);
 
@@ -45,9 +46,11 @@ class _MemListPageComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = buildL10n(context);
+
     return Scaffold(
       body: MemListView(
-        L10n().memListPageTitle(),
+        l10n.memListPageTitle,
         scrollController: _scrollController,
         appBarActions: [
           IconTheme(
@@ -75,61 +78,65 @@ class _MemListPageComponent extends StatelessWidget {
 
 // FIXME too long
 void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
-      () => Navigator.of(context)
-          .push<bool?>(
-            PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) =>
-                  MemDetailPage(memId),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) =>
-                      SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(1, 0),
-                  end: Offset.zero,
-                ).animate(animation),
-                child: child,
+      () {
+        final l10n = buildL10n(context);
+
+        Navigator.of(context)
+            .push<bool?>(
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    MemDetailPage(memId),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) =>
+                        SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(1, 0),
+                    end: Offset.zero,
+                  ).animate(animation),
+                  child: child,
+                ),
+                transitionDuration: defaultTransitionDuration,
+                reverseTransitionDuration: defaultTransitionDuration,
               ),
-              transitionDuration: defaultTransitionDuration,
-              reverseTransitionDuration: defaultTransitionDuration,
-            ),
-          )
-          .then(
-            (result) => v(
-              () {
-                if (memId != null && result == true) {
-                  final removed = ref.read(removedMemProvider(memId));
+            )
+            .then(
+              (result) => v(
+                () {
+                  if (memId != null && result == true) {
+                    final removed = ref.read(removedMemProvider(memId));
 
-                  if (removed != null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          L10n().removeMemSuccessMessage(removed.name),
-                        ),
-                        duration: infiniteDismissDuration,
-                        dismissDirection: DismissDirection.horizontal,
-                        action: SnackBarAction(
-                          label: L10n().undoAction(),
-                          onPressed: () {
-                            ref.read(undoRemoveMem(memId));
+                    if (removed != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            l10n.removeMemSuccessMessage(removed.name),
+                          ),
+                          duration: infiniteDismissDuration,
+                          dismissDirection: DismissDirection.horizontal,
+                          action: SnackBarAction(
+                            label: l10n.undoAction,
+                            onPressed: () {
+                              ref.read(undoRemoveMem(memId));
 
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  L10n().saveMemSuccessMessage(removed.name),
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    l10n.saveMemSuccessMessage(removed.name),
+                                  ),
+                                  duration: infiniteDismissDuration,
+                                  dismissDirection: DismissDirection.horizontal,
                                 ),
-                                duration: infiniteDismissDuration,
-                                dismissDirection: DismissDirection.horizontal,
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                    );
+                      );
+                    }
                   }
-                }
-              },
-              {'result': result},
-            ),
-          ),
+                },
+                {'result': result},
+              ),
+            );
+      },
       {'context': context, 'memId': memId},
     );

@@ -39,18 +39,22 @@ class MemNameTextFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => v(
-        () => HeroView(
-          memNameTag(_memId),
-          TextFormField(
-            initialValue: _memName,
-            decoration: InputDecoration(
-              labelText: L10n().memNameTitle(),
+        () {
+          final l10n = buildL10n(context);
+
+          return HeroView(
+            memNameTag(_memId),
+            TextFormField(
+              initialValue: _memName,
+              decoration: InputDecoration(
+                labelText: l10n.memNameLabel,
+              ),
+              validator: (value) =>
+                  (value?.isEmpty ?? false) ? l10n.requiredError : null,
+              onChanged: _onChanged,
             ),
-            validator: (value) =>
-                (value?.isEmpty ?? false) ? L10n().requiredError() : null,
-            onChanged: _onChanged,
-          ),
-        ),
+          );
+        },
         {
           '_memName': _memName,
           '_memId': _memId,
