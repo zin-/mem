@@ -220,7 +220,7 @@ void testMemoScenario() => group(
                 await widgetTester.pumpAndSettle();
 
                 await closeMemListFilter(widgetTester);
-                await widgetTester.pumpAndSettle();
+                await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
                 expect(find.text(unarchivedMemName), findsOneWidget);
                 expect(find.text(archivedMemName), findsOneWidget);
@@ -242,7 +242,7 @@ void testMemoScenario() => group(
                 await widgetTester.pumpAndSettle();
 
                 await closeMemListFilter(widgetTester);
-                await widgetTester.pumpAndSettle();
+                await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
                 expect(find.text(insertedMemName), findsNothing);
                 expect(find.text(unarchivedMemName), findsNothing);
@@ -277,8 +277,8 @@ void testMemoScenario() => group(
             await widgetTester.pumpAndSettle();
 
             await widgetTester.tap(find.text('OK'));
+            await Future.delayed(defaultTransitionDuration);
             await widgetTester.pumpAndSettle();
-            await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
             expect(
               find.text('Remove success. $insertedMemName'),

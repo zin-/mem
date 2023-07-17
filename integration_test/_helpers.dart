@@ -34,10 +34,8 @@ final memListFilterButton = find.byIcon(Icons.filter_list);
 final findShowNotArchiveSwitch = find.byType(Switch).at(0);
 final findShowArchiveSwitch = find.byType(Switch).at(1);
 
-Future closeMemListFilter(WidgetTester widgetTester) async {
-  await widgetTester.tapAt(const Offset(0, 0));
-  await widgetTester.pumpAndSettle(defaultDuration);
-}
+Future closeMemListFilter(WidgetTester widgetTester) async =>
+    await widgetTester.tapAt(const Offset(0, 0));
 
 TextFormField memNameTextFormField(WidgetTester widgetTester) =>
     (widgetTester.widget(memNameOnDetailPageFinder) as TextFormField);
