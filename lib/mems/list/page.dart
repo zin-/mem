@@ -23,7 +23,11 @@ class MemListPage extends ConsumerWidget {
         () {
           ref.read(
             initializeNotification(
-                (memId) => showMemDetailPage(context, ref, memId)),
+// ISSUE #225
+// coverage:ignore-start
+              (memId) => showMemDetailPage(context, ref, memId),
+// coverage:ignore-end
+            ),
           );
           ref.read(fetchActiveActs);
 
