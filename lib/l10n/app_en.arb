@@ -36,6 +36,12 @@
     }
   },
   "undoAction": "Undo",
+  "undoMemSuccessMessage": "Undo success. {memName}",
+  "@undoMemSuccessMessage": {
+    "placeholders": {
+      "memName": {}
+    }
+  },
   "okAction": "OK",
   "cancelAction": "Cancel",
   "archiveFilterTitle": "Archive",

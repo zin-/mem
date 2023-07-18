@@ -308,7 +308,7 @@ void testMemoScenario() => group(
               findsNothing,
             );
             expect(
-              find.text('Save success. $insertedMemName'),
+              find.text('Undo success. $insertedMemName'),
               findsOneWidget,
             );
             await widgetTester.tap(find.text(insertedMemName));
