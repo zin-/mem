@@ -27,7 +27,7 @@ void main() {
 
     await widgetTester.pumpWidget(ProviderScope(
       overrides: [
-        fetchMemList.overrideWith((ref) => null),
+        loadMemList.overrideWith((ref) => null),
         fetchActiveActs.overrideWith((ref) => Future.value(null)),
         activeActsProvider.overrideWith((ref) => ListValueStateNotifier([])),
         rawMemListProvider

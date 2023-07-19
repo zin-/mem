@@ -4,7 +4,7 @@ import 'package:mem/logger/log_service.dart';
 
 class AsyncValueView<D> extends ConsumerWidget {
   final ProviderListenable<AsyncValue<D>> _asyncValueProvider;
-  final Widget Function(D data) _builder;
+  final Widget Function(D loaded) _builder;
 
   const AsyncValueView(this._asyncValueProvider, this._builder, {super.key});
 

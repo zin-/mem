@@ -14,9 +14,7 @@ class ActFab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final actList = ref.watch(actListProvider(_memId));
 
-    if (actList == null ||
-        actList.isEmpty ||
-        actList.first.period.end != null) {
+    if (actList!.isEmpty || actList.first.period.end != null) {
       return _StartActFab(
         () => v(
           () async {

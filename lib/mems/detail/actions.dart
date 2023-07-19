@@ -8,22 +8,20 @@ import 'package:mem/mems/mem_repeated_notification_repository.dart';
 import 'package:mem/mems/mem_service.dart';
 import 'package:mem/mems/states.dart';
 
-final loadMemItems = Provider.autoDispose.family<Future<List<MemItem>>, int?>(
+final loadMemItems = FutureProvider.autoDispose.family<List<MemItem>, int?>(
   (ref, memId) => v(
     () async {
-      List<MemItem> memItems = [];
-
       if (memId != null) {
-        memItems = await MemService().fetchMemItemsByMemId(memId);
+        final memItems = await MemService().fetchMemItemsByMemId(memId);
+
+        if (memItems.isNotEmpty) {
+          ref.watch(memItemsProvider(memId).notifier).updatedBy(memItems);
+        }
+
+        return memItems;
       }
 
-      if (memItems.isEmpty) {
-        memItems = [
-          MemItem(memId: memId, type: MemItemType.memo, value: ''),
-        ];
-      }
-
-      return memItems;
+      return [];
     },
     memId,
   ),

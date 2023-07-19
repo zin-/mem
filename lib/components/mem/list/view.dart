@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/components/async_value_view.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/values/colors.dart';
@@ -25,17 +26,16 @@ class MemListView extends ConsumerWidget {
         _onItemTapped = onItemTapped;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(fetchMemList);
-
-    return _MemListViewComponent(
-      _appBarTitle,
-      ref.watch(memListProvider),
-      _scrollController,
-      _appBarActions,
-      _onItemTapped,
-    );
-  }
+  Widget build(BuildContext context, WidgetRef ref) => AsyncValueView(
+        loadMemList,
+        (data) => _MemListViewComponent(
+          _appBarTitle,
+          ref.watch(memListProvider),
+          _scrollController,
+          _appBarActions,
+          _onItemTapped,
+        ),
+      );
 }
 
 class _MemListViewComponent extends StatelessWidget {
