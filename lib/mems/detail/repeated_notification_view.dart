@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/components/async_value_view.dart';
 import 'package:mem/components/date_and_time/time_of_day_view.dart';
 import 'package:mem/core/mem_repeated_notification.dart';
 import 'package:mem/logger/log_service.dart';
@@ -14,38 +15,33 @@ class RepeatedNotificationWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () {
-          return ref.watch(loadMemRepeatedNotification(_memId)).when(
-                data: (data) {
-                  final repeatedNotification =
-                      ref.watch(memRepeatedNotificationProvider(_memId));
+        () => AsyncValueView(
+          loadMemRepeatedNotification(_memId),
+          (loaded) {
+            final repeatedNotification =
+                ref.watch(memRepeatedNotificationProvider(_memId));
 
-                  return _RepeatedNotificationWidgetComponent(
-                    repeatedNotification?.timeOfDay.convert(),
-                    (pickedTimeOfDay) {
-                      ref
-                          .read(
-                              memRepeatedNotificationProvider(_memId).notifier)
-                          .updatedBy(
-                            pickedTimeOfDay == null
-                                ? null
-                                : MemRepeatedNotification(
-                                    pickedTimeOfDay.convert(),
-                                    memId: _memId,
-                                    id: repeatedNotification?.id,
-                                    createdAt: repeatedNotification?.createdAt,
-                                    updatedAt: repeatedNotification?.updatedAt,
-                                    archivedAt:
-                                        repeatedNotification?.archivedAt,
-                                  ),
-                          );
-                    },
-                  );
-                },
-                error: (error, stackTrace) => throw error,
-                loading: () => const CircularProgressIndicator(),
-              );
-        },
+            return _RepeatedNotificationWidgetComponent(
+              repeatedNotification?.timeOfDay.convert(),
+              (pickedTimeOfDay) {
+                ref
+                    .read(memRepeatedNotificationProvider(_memId).notifier)
+                    .updatedBy(
+                      pickedTimeOfDay == null
+                          ? null
+                          : MemRepeatedNotification(
+                              pickedTimeOfDay.convert(),
+                              memId: _memId,
+                              id: repeatedNotification?.id,
+                              createdAt: repeatedNotification?.createdAt,
+                              updatedAt: repeatedNotification?.updatedAt,
+                              archivedAt: repeatedNotification?.archivedAt,
+                            ),
+                    );
+              },
+            );
+          },
+        ),
         _memId,
       );
 }
