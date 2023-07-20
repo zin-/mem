@@ -27,7 +27,7 @@ class MemItem extends EntityValue {
   @override
   String toString() => {
         'memId': memId,
-        'MemItemType': MemItemType,
+        'MemItemType': type,
         'value': value,
       }.toString();
 }
