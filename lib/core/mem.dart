@@ -27,11 +27,13 @@ class Mem extends EntityValue {
   bool isDone() => doneAt != null;
 
   @override
-  String toString() => {
+  String toString() =>
+      {
         'name': name,
         'doneAt': doneAt,
         'period': period,
-      }.toString();
+      }.toString() +
+      super.toString();
 
   // FIXME エレガントじゃない
   Mem copied() => Mem(

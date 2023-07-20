@@ -12,39 +12,37 @@ import 'package:mem/core/date_and_time/time_of_day.dart' as core;
 //  時間（何分後みたいな）とメッセージ（止めようみたいな）を保存する
 //  TODO mem_repeated_notificationsをmem_notificationsに変更して、type
 //  とmessageを持たせる
-class NotificationWidget extends ConsumerWidget {
+class NotificationsWidget extends ConsumerWidget {
   final int? _memId;
 
-  const NotificationWidget(this._memId, {super.key});
+  const NotificationsWidget(this._memId, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => AsyncValueView(
-          loadMemNotification(_memId),
-          (loaded) {
-            final repeatedNotification =
-                ref.watch(memNotificationProvider(_memId));
-
-            return _RepeatedNotificationWidgetComponent(
-              repeatedNotification?.timeOfDay.convert(),
-              (pickedTimeOfDay) {
-                ref.read(memNotificationProvider(_memId).notifier).updatedBy(
-                      pickedTimeOfDay == null
-                          ? null
-                          : MemNotification(
-                              MemNotificationType.repeat,
-                              pickedTimeOfDay.convert(),
-                              'Repeat',
-                              memId: _memId,
-                              id: repeatedNotification?.id,
-                              createdAt: repeatedNotification?.createdAt,
-                              updatedAt: repeatedNotification?.updatedAt,
-                              archivedAt: repeatedNotification?.archivedAt,
-                            ),
-                    );
-              },
-            );
-          },
+          loadMemNotifications(_memId),
+          (loaded) => Column(
+            children:
+                ref.watch(memDetailProvider(_memId)).notifications!.map((e) {
+              return _RepeatedNotificationWidgetComponent(
+                e.timeOfDay?.convert(),
+                (pickedTimeOfDay) => ref
+                    .read(memNotificationsProvider(_memId).notifier)
+                    .updatedBy([
+                  MemNotification(
+                    e.type,
+                    pickedTimeOfDay?.convert(),
+                    e.message,
+                    memId: e.memId,
+                    id: e.id,
+                    createdAt: e.createdAt,
+                    updatedAt: e.updatedAt,
+                    archivedAt: e.archivedAt,
+                  ),
+                ]),
+              );
+            }).toList(),
+          ),
         ),
         _memId,
       );

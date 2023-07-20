@@ -24,7 +24,6 @@ class MemDoneCheckbox extends StatelessWidget {
         ),
         {
           '_mem': _mem,
-          '_onChanged': _onChanged,
         },
       );
 }

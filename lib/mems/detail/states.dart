@@ -12,15 +12,14 @@ import 'package:mem/components/value_state_notifier.dart';
 final memDetailProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<MemDetail>, MemDetail, int?>(
   (ref, memId) => v(
-    () {
-      return ValueStateNotifier(
-        MemDetail(
-          ref.watch(editingMemProvider(memId)),
-          ref.watch(memItemsProvider(memId))!,
-          ref.watch(memNotificationProvider(memId)),
-        ),
-      );
-    },
+    () => ValueStateNotifier(
+      MemDetail(
+        ref.watch(editingMemProvider(memId)),
+        ref.watch(memItemsProvider(memId))!,
+        ref.watch(memNotificationsProvider(memId)),
+      ),
+    ),
+    memId,
   ),
 );
 
@@ -43,11 +42,8 @@ final editingMemProvider = StateNotifierProvider.autoDispose
 final memIsArchivedProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<bool>, bool, int?>(
   (ref, memId) => v(
-    () {
-      final mem = ref.watch(editingMemProvider(memId));
-
-      return ValueStateNotifier(mem.isArchived());
-    },
+    () => ValueStateNotifier(
+        ref.watch(memDetailProvider(memId)).mem.isArchived()),
     memId,
   ),
 );
@@ -62,11 +58,17 @@ final memItemsProvider = StateNotifierProvider.autoDispose
   ),
 );
 
-final memNotificationProvider = StateNotifierProvider.autoDispose
-    .family<ValueStateNotifier<MemNotification?>,
-        MemNotification?, int?>(
+final memNotificationsProvider = StateNotifierProvider.autoDispose.family<
+    ListValueStateNotifier<MemNotification>, List<MemNotification>?, int?>(
   (ref, memId) => v(
-    () => ValueStateNotifier(null),
+    () => ListValueStateNotifier([
+      MemNotification(
+        MemNotificationType.repeat,
+        null,
+        'Repeat',
+        memId: memId,
+      ),
+    ]),
     memId,
   ),
 );

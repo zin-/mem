@@ -5,14 +5,14 @@ import 'package:mem/core/mem_notification.dart';
 class MemDetail {
   final Mem mem;
   final List<MemItem> memItems;
-  final MemNotification? notification;
+  final List<MemNotification>? notifications;
 
-  MemDetail(this.mem, this.memItems, [this.notification]);
+  MemDetail(this.mem, this.memItems, [this.notifications]);
 
   @override
-  String toString() => '{'
-      ' mem: $mem'
-      ', memItems: $memItems'
-      ', repeatedNotification: $notification'
-      ' }';
+  String toString() => {
+        'mem': mem,
+        'memItems': memItems,
+        'notifications': notifications,
+      }.toString();
 }

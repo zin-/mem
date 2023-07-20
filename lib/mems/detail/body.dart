@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/detail/repeated_notification_view.dart';
+import 'package:mem/mems/detail/notifications_view.dart';
 import 'package:mem/components/mem/mem_done_checkbox.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/components/mem/mem_name.dart';
@@ -18,7 +18,7 @@ class MemDetailBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
-          final editingMem = ref.watch(editingMemProvider(_memId));
+          final editingMem = ref.watch(memDetailProvider(_memId)).mem;
 
           return _MemDetailBodyComponent(
             _memId,
@@ -64,7 +64,7 @@ class _MemDetailBodyComponent extends StatelessWidget {
                 _onMemDoneChanged,
               ),
               MemPeriodTextFormFields(_memId),
-              NotificationWidget(_memId),
+              NotificationsWidget(_memId),
               MemItemsFormFields(_memId),
             ],
           ),

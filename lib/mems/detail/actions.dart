@@ -26,17 +26,17 @@ final loadMemItems = FutureProvider.autoDispose.family<List<MemItem>, int?>(
     memId,
   ),
 );
-final loadMemNotification = FutureProvider.autoDispose.family<void, int?>(
+final loadMemNotifications = FutureProvider.autoDispose.family<void, int?>(
   (ref, memId) => v(
     () async {
       if (memId != null) {
         final memNotifications =
             await MemNotificationRepository().shipByMemId(memId);
 
-        if (memNotifications.length == 1) {
+        if (memNotifications.isNotEmpty) {
           ref
-              .watch(memNotificationProvider(memId).notifier)
-              .updatedBy(memNotifications.single);
+              .watch(memNotificationsProvider(memId).notifier)
+              .updatedBy(memNotifications.toList());
         }
       }
     },
@@ -45,7 +45,7 @@ final loadMemNotification = FutureProvider.autoDispose.family<void, int?>(
 );
 
 final saveMem =
-    Provider.autoDispose.family<Future<MemDetail>, int?>((ref, memId) => v(
+    Provider.autoDispose.family<Future<MemDetail>, int?>((ref, memId) => i(
           () async {
             final saved = await MemService().save(
               ref.watch(memDetailProvider(memId)),
@@ -56,20 +56,8 @@ final saveMem =
                 .read(memItemsProvider(memId).notifier)
                 .updatedBy(saved.memItems);
             ref
-                .read(memNotificationProvider(memId).notifier)
-                .updatedBy(saved.notification);
-
-            if (memId == null) {
-              ref
-                  .read(editingMemProvider(saved.mem.id).notifier)
-                  .updatedBy(saved.mem);
-              ref
-                  .read(memItemsProvider(saved.mem.id).notifier)
-                  .updatedBy(saved.memItems);
-              ref
-                  .read(memNotificationProvider(saved.mem.id).notifier)
-                  .updatedBy(saved.notification);
-            }
+                .read(memNotificationsProvider(memId).notifier)
+                .updatedBy(saved.notifications);
 
             ref
                 .read(rawMemListProvider.notifier)
@@ -83,7 +71,7 @@ final saveMem =
 final archiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
   (ref, memId) => v(
     () async {
-      final mem = ref.read(editingMemProvider(memId));
+      final mem = ref.read(memDetailProvider(memId)).mem;
 
       final archived = await MemService().archive(mem);
 
@@ -101,7 +89,7 @@ final archiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
 final unarchiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
   (ref, memId) => v(
     () async {
-      final mem = ref.read(editingMemProvider(memId));
+      final mem = ref.read(memDetailProvider(memId)).mem;
 
       final unarchived = await MemService().unarchive(mem);
 

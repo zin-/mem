@@ -1,5 +1,4 @@
 import 'package:mem/core/date_and_time/time_of_day.dart';
-import 'package:mem/core/errors.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/database/table_definitions/mem_notifications.dart';
 import 'package:mem/framework/database/database.dart';
@@ -12,11 +11,6 @@ class MemNotificationRepository
     extends DatabaseTupleRepository<MemNotificationEntity, MemNotification> {
   Future<Iterable<MemNotification>> shipByMemId(int memId) => v(
         () => super.ship(Equals(memIdFkDef.name, memId)),
-        memId,
-      );
-
-  Future<Iterable<MemNotification>> wasteByMemId(int memId) => v(
-        () => super.waste(Equals(memIdFkDef.name, memId)),
         memId,
       );
 
@@ -41,7 +35,7 @@ class MemNotificationRepository
     final entity = MemNotificationEntity(
       payload.memId!,
       payload.type.name,
-      payload.timeOfDay.toSeconds(),
+      payload.timeOfDay?.toSeconds() ?? 0,
       payload.message,
       payload.id,
       payload.createdAt,
@@ -56,17 +50,6 @@ class MemNotificationRepository
 
   static MemNotificationRepository? _instance;
 
-  factory MemNotificationRepository([Table? table]) {
-    var tmp = _instance;
-
-    if (tmp == null) {
-      if (table == null) {
-        throw InitializationError();
-      } else {
-        _instance = tmp = MemNotificationRepository._(table);
-      }
-    }
-
-    return tmp;
-  }
+  factory MemNotificationRepository([Table? table]) =>
+      _instance ??= _instance = MemNotificationRepository._(table!);
 }

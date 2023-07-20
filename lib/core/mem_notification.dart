@@ -4,7 +4,7 @@ import 'package:mem/core/entity_value.dart';
 class MemNotification extends EntityValue {
   int? memId;
   final MemNotificationType type;
-  final TimeOfDay timeOfDay;
+  final TimeOfDay? timeOfDay;
   final String message;
 
   MemNotification(
@@ -24,16 +24,14 @@ class MemNotification extends EntityValue {
         );
 
   @override
-  String toString() => {
+  String toString() =>
+      {
         'memId': memId,
         'type': type,
         'timeOfDay': timeOfDay,
         'message': message,
-        'id': id,
-        'createdAt': createdAt,
-        'updatedAt': updatedAt,
-        'archivedAt': archivedAt,
-      }.toString();
+      }.toString() +
+      super.toString();
 }
 
 enum MemNotificationType {

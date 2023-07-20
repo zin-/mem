@@ -46,9 +46,9 @@ class NotificationService {
               now.year,
               now.month,
               now.day,
-              memNotification.timeOfDay.hour,
-              memNotification.timeOfDay.minute,
-              memNotification.timeOfDay.second,
+              memNotification.timeOfDay!.hour,
+              memNotification.timeOfDay!.minute,
+              memNotification.timeOfDay!.second,
             );
             if (notifyFirstAt.isBefore(now)) {
               notifyFirstAt = notifyFirstAt.add(const Duration(days: 1));

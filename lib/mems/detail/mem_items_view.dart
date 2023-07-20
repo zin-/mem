@@ -16,10 +16,10 @@ class MemItemsFormFields extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => AsyncValueView(
         loadMemItems(_memId),
         (data) => _MemItemsFormFieldsComponent(
-          ref.watch(memItemsProvider(_memId))!,
+          ref.watch(memDetailProvider(_memId)).memItems,
           (value, memItem) => v(
             () {
-              ref.read(memItemsProvider(_memId).notifier).upsertAll(
+              ref.watch(memItemsProvider(_memId).notifier).upsertAll(
                 [memItem..value = value],
                 (tmp, item) => tmp.id == item.id && tmp.type == item.type,
               );
