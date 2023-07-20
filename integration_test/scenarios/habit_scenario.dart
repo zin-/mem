@@ -39,7 +39,7 @@ void testHabitScenario() => group(': $_scenarioName', () {
           createdAtColDef.name: DateTime.now(),
         });
         await db.getTable(memNotificationTableDefinition.name).insert({
-          timeOfDaySecondsColDef.name: timeOfDaySeconds,
+          timeColDef.name: timeOfDaySeconds,
           memIdFkDef.name: withRepeatedMemId,
           createdAtColDef.name: DateTime.now(),
         });
@@ -95,7 +95,7 @@ void testHabitScenario() => group(': $_scenarioName', () {
             final timeOfDay = TimeOfDay.fromDateTime(pickTime);
             await expectLater(
               [
-                inserted[timeOfDaySecondsColDef.name],
+                inserted[timeColDef.name],
                 inserted[createdAtColDef.name],
                 inserted[updatedAtColDef.name],
                 inserted[archivedAtColDef.name],

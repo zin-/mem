@@ -3,11 +3,11 @@ import 'package:mem/repositories/i/_database_tuple_entity_v2.dart';
 
 class MemNotificationEntity extends DatabaseTupleEntity {
   final int memId;
-  final int timeOfDaySeconds;
+  final int time;
 
   MemNotificationEntity(
     this.memId,
-    this.timeOfDaySeconds,
+    this.time,
     int? id,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -21,12 +21,12 @@ class MemNotificationEntity extends DatabaseTupleEntity {
 
   MemNotificationEntity.fromMap(Map<String, dynamic> valueMap)
       : memId = valueMap[memIdFkDef.name],
-        timeOfDaySeconds = valueMap[timeOfDaySecondsColDef.name],
+        time = valueMap[timeColDef.name],
         super.fromMap(valueMap);
 
   @override
   Map<String, dynamic> toMap() => {
         memIdFkDef.name: memId,
-        timeOfDaySecondsColDef.name: timeOfDaySeconds,
+        timeColDef.name: time,
       }..addAll(super.toMap());
 }

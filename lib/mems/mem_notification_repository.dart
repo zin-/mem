@@ -25,7 +25,7 @@ class MemNotificationRepository extends DatabaseTupleRepository<
     final entity = MemNotificationEntity.fromMap(unpackedPayload);
 
     return MemNotification(
-      TimeOfDay.fromSeconds(entity.timeOfDaySeconds),
+      TimeOfDay.fromSeconds(entity.time),
       memId: entity.memId,
       id: entity.id,
       createdAt: entity.createdAt,

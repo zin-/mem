@@ -6,7 +6,7 @@ import 'package:mem/framework/database/definition/foreign_key_definition.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
 
 final memIdFkDef = ForeignKeyDefinition(memTableDefinition);
-final timeOfDaySecondsColDef = ColumnDefinition(
+final timeColDef = ColumnDefinition(
   // ISSUE #230 change name to "time"
   'time_of_day_seconds',
   ColumnType.integer,
@@ -16,7 +16,7 @@ final memNotificationTableDefinition = TableDefinition(
   // ISSUE #230 change name to "mem_notifications"
   'mem_repeated_notifications',
   [
-    timeOfDaySecondsColDef,
+    timeColDef,
     ...defaultColumnDefinitions,
     memIdFkDef,
   ],
