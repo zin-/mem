@@ -4,7 +4,7 @@ import 'package:mem/core/mem_detail.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
-import 'package:mem/mems/mem_repeated_notification_repository.dart';
+import 'package:mem/mems/mem_notification_repository.dart';
 import 'package:mem/mems/mem_service.dart';
 import 'package:mem/mems/states.dart';
 
@@ -26,18 +26,17 @@ final loadMemItems = FutureProvider.autoDispose.family<List<MemItem>, int?>(
     memId,
   ),
 );
-final loadMemRepeatedNotification =
-    FutureProvider.autoDispose.family<void, int?>(
+final loadMemNotification = FutureProvider.autoDispose.family<void, int?>(
   (ref, memId) => v(
     () async {
       if (memId != null) {
-        final memRepeatedNotifications =
-            await MemRepeatedNotificationRepository().shipByMemId(memId);
+        final memNotifications =
+            await MemNotificationRepository().shipByMemId(memId);
 
-        if (memRepeatedNotifications.length == 1) {
+        if (memNotifications.length == 1) {
           ref
-              .watch(memRepeatedNotificationProvider(memId).notifier)
-              .updatedBy(memRepeatedNotifications.single);
+              .watch(memNotificationProvider(memId).notifier)
+              .updatedBy(memNotifications.single);
         }
       }
     },
@@ -57,8 +56,8 @@ final saveMem =
                 .read(memItemsProvider(memId).notifier)
                 .updatedBy(saved.memItems);
             ref
-                .read(memRepeatedNotificationProvider(memId).notifier)
-                .updatedBy(saved.repeatedNotification);
+                .read(memNotificationProvider(memId).notifier)
+                .updatedBy(saved.notification);
 
             if (memId == null) {
               ref
@@ -68,8 +67,8 @@ final saveMem =
                   .read(memItemsProvider(saved.mem.id).notifier)
                   .updatedBy(saved.memItems);
               ref
-                  .read(memRepeatedNotificationProvider(saved.mem.id).notifier)
-                  .updatedBy(saved.repeatedNotification);
+                  .read(memNotificationProvider(saved.mem.id).notifier)
+                  .updatedBy(saved.notification);
             }
 
             ref

@@ -1,11 +1,11 @@
 import 'package:mem/core/date_and_time/time_of_day.dart';
 import 'package:mem/core/entity_value.dart';
 
-class MemRepeatedNotification extends EntityValue {
+class MemNotification extends EntityValue {
   int? memId;
   final TimeOfDay timeOfDay;
 
-  MemRepeatedNotification(
+  MemNotification(
     this.timeOfDay, {
     this.memId,
     int? id,

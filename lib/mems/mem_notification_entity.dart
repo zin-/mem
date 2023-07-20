@@ -1,11 +1,11 @@
-import 'package:mem/database/table_definitions/mem_repeated_notifications.dart';
+import 'package:mem/database/table_definitions/mem_notifications.dart';
 import 'package:mem/repositories/i/_database_tuple_entity_v2.dart';
 
-class MemRepeatedNotificationEntity extends DatabaseTupleEntity {
+class MemNotificationEntity extends DatabaseTupleEntity {
   final int memId;
   final int timeOfDaySeconds;
 
-  MemRepeatedNotificationEntity(
+  MemNotificationEntity(
     this.memId,
     this.timeOfDaySeconds,
     int? id,
@@ -19,7 +19,7 @@ class MemRepeatedNotificationEntity extends DatabaseTupleEntity {
           archivedAt: archivedAt,
         );
 
-  MemRepeatedNotificationEntity.fromMap(Map<String, dynamic> valueMap)
+  MemNotificationEntity.fromMap(Map<String, dynamic> valueMap)
       : memId = valueMap[memIdFkDef.name],
         timeOfDaySeconds = valueMap[timeOfDaySecondsColDef.name],
         super.fromMap(valueMap);

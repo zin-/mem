@@ -17,7 +17,7 @@ final memDetailProvider = StateNotifierProvider.autoDispose
         MemDetail(
           ref.watch(editingMemProvider(memId)),
           ref.watch(memItemsProvider(memId))!,
-          ref.watch(memRepeatedNotificationProvider(memId)),
+          ref.watch(memNotificationProvider(memId)),
         ),
       );
     },
@@ -62,9 +62,9 @@ final memItemsProvider = StateNotifierProvider.autoDispose
   ),
 );
 
-final memRepeatedNotificationProvider = StateNotifierProvider.autoDispose
-    .family<ValueStateNotifier<MemRepeatedNotification?>,
-        MemRepeatedNotification?, int?>(
+final memNotificationProvider = StateNotifierProvider.autoDispose
+    .family<ValueStateNotifier<MemNotification?>,
+        MemNotification?, int?>(
   (ref, memId) => v(
     () => ValueStateNotifier(null),
     memId,

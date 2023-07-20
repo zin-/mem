@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/database/table_definitions/acts.dart';
 import 'package:mem/database/table_definitions/mem_items.dart';
-import 'package:mem/database/table_definitions/mem_repeated_notifications.dart';
+import 'package:mem/database/table_definitions/mem_notifications.dart';
 import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/main.dart';
@@ -29,7 +29,7 @@ String dateTimeText(DateTime dateTime) {
 Future<void> resetDatabase(Database database) async {
   await database.getTable(actTableDefinition.name).delete();
   await database.getTable(memItemTableDefinition.name).delete();
-  await database.getTable(memRepeatedNotificationTableDefinition.name).delete();
+  await database.getTable(memNotificationTableDefinition.name).delete();
   await database.getTable(memTableDefinition.name).delete();
 }
 
@@ -42,7 +42,7 @@ final switchFinder = find.byType(Switch);
 final clearIconFinder = find.byIcon(Icons.clear);
 final okFinder = find.text('OK');
 
-Finder memRepeatedNotificationOnDetailPageFinder() {
+Finder memNotificationOnDetailPageFinder() {
   switch (find.byType(TextFormField).evaluate().length) {
     case 5:
       // period does not have time

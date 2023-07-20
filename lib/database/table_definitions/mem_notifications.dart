@@ -12,7 +12,7 @@ final timeOfDaySecondsColDef = ColumnDefinition(
   ColumnType.integer,
 );
 
-final memRepeatedNotificationTableDefinition = TableDefinition(
+final memNotificationTableDefinition = TableDefinition(
   // ISSUE #230 change name to "mem_notifications"
   'mem_repeated_notifications',
   [

@@ -12,28 +12,26 @@ import 'package:mem/core/date_and_time/time_of_day.dart' as core;
 //  時間（何分後みたいな）とメッセージ（止めようみたいな）を保存する
 //  TODO mem_repeated_notificationsをmem_notificationsに変更して、type
 //  とmessageを持たせる
-class RepeatedNotificationWidget extends ConsumerWidget {
+class NotificationWidget extends ConsumerWidget {
   final int? _memId;
 
-  const RepeatedNotificationWidget(this._memId, {super.key});
+  const NotificationWidget(this._memId, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => AsyncValueView(
-          loadMemRepeatedNotification(_memId),
+          loadMemNotification(_memId),
           (loaded) {
             final repeatedNotification =
-                ref.watch(memRepeatedNotificationProvider(_memId));
+                ref.watch(memNotificationProvider(_memId));
 
             return _RepeatedNotificationWidgetComponent(
               repeatedNotification?.timeOfDay.convert(),
               (pickedTimeOfDay) {
-                ref
-                    .read(memRepeatedNotificationProvider(_memId).notifier)
-                    .updatedBy(
+                ref.read(memNotificationProvider(_memId).notifier).updatedBy(
                       pickedTimeOfDay == null
                           ? null
-                          : MemRepeatedNotification(
+                          : MemNotification(
                               pickedTimeOfDay.convert(),
                               memId: _memId,
                               id: repeatedNotification?.id,

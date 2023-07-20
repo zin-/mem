@@ -32,11 +32,11 @@ class NotificationService {
 
   Future<void> memRepeatedReminder(
     Mem mem,
-    MemRepeatedNotification? memRepeatedNotification,
+    MemNotification? memNotification,
   ) =>
       i(
         () async {
-          if (memRepeatedNotification == null) {
+          if (memNotification == null) {
             await _notificationRepository.receive(
               CancelNotification(memRepeatedNotificationId(mem.id)),
             );
@@ -46,9 +46,9 @@ class NotificationService {
               now.year,
               now.month,
               now.day,
-              memRepeatedNotification.timeOfDay.hour,
-              memRepeatedNotification.timeOfDay.minute,
-              memRepeatedNotification.timeOfDay.second,
+              memNotification.timeOfDay.hour,
+              memNotification.timeOfDay.minute,
+              memNotification.timeOfDay.second,
             );
             if (notifyFirstAt.isBefore(now)) {
               notifyFirstAt = notifyFirstAt.add(const Duration(days: 1));
@@ -58,7 +58,7 @@ class NotificationService {
               memRepeatedNotificationId(mem.id),
               mem.name,
               'Repeat',
-              json.encode({'memId': memRepeatedNotification.memId}),
+              json.encode({'memId': memNotification.memId}),
               [
                 startActAction,
               ],
@@ -70,7 +70,7 @@ class NotificationService {
             await _notificationRepository.receive(repeatedNotification);
           }
         },
-        {mem, memRepeatedNotification},
+        {mem, memNotification},
       );
 
   NotificationService._(this._notificationRepository);

@@ -1,30 +1,30 @@
 import 'package:mem/core/date_and_time/time_of_day.dart';
 import 'package:mem/core/errors.dart';
 import 'package:mem/core/mem_repeated_notification.dart';
-import 'package:mem/database/table_definitions/mem_repeated_notifications.dart';
+import 'package:mem/database/table_definitions/mem_notifications.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/mem_repeated_notification_entity.dart';
+import 'package:mem/mems/mem_notification_entity.dart';
 import 'package:mem/repositories/i/_database_tuple_repository_v2.dart';
 import 'package:mem/repositories/i/conditions.dart';
 
-class MemRepeatedNotificationRepository extends DatabaseTupleRepository<
-    MemRepeatedNotificationEntity, MemRepeatedNotification> {
-  Future<Iterable<MemRepeatedNotification>> shipByMemId(int memId) => v(
+class MemNotificationRepository extends DatabaseTupleRepository<
+    MemNotificationEntity, MemNotification> {
+  Future<Iterable<MemNotification>> shipByMemId(int memId) => v(
         () => super.ship(Equals(memIdFkDef.name, memId)),
         memId,
       );
 
-  Future<Iterable<MemRepeatedNotification>> wasteByMemId(int memId) => v(
+  Future<Iterable<MemNotification>> wasteByMemId(int memId) => v(
         () => super.waste(Equals(memIdFkDef.name, memId)),
         memId,
       );
 
   @override
-  MemRepeatedNotification pack(Map<String, dynamic> unpackedPayload) {
-    final entity = MemRepeatedNotificationEntity.fromMap(unpackedPayload);
+  MemNotification pack(Map<String, dynamic> unpackedPayload) {
+    final entity = MemNotificationEntity.fromMap(unpackedPayload);
 
-    return MemRepeatedNotification(
+    return MemNotification(
       TimeOfDay.fromSeconds(entity.timeOfDaySeconds),
       memId: entity.memId,
       id: entity.id,
@@ -35,8 +35,8 @@ class MemRepeatedNotificationRepository extends DatabaseTupleRepository<
   }
 
   @override
-  UnpackedPayload unpack(MemRepeatedNotification payload) {
-    final entity = MemRepeatedNotificationEntity(
+  UnpackedPayload unpack(MemNotification payload) {
+    final entity = MemNotificationEntity(
       payload.memId!,
       payload.timeOfDay.toSeconds(),
       payload.id,
@@ -48,18 +48,18 @@ class MemRepeatedNotificationRepository extends DatabaseTupleRepository<
     return entity.toMap();
   }
 
-  MemRepeatedNotificationRepository._(super.table);
+  MemNotificationRepository._(super.table);
 
-  static MemRepeatedNotificationRepository? _instance;
+  static MemNotificationRepository? _instance;
 
-  factory MemRepeatedNotificationRepository([Table? table]) {
+  factory MemNotificationRepository([Table? table]) {
     var tmp = _instance;
 
     if (tmp == null) {
       if (table == null) {
         throw InitializationError();
       } else {
-        _instance = tmp = MemRepeatedNotificationRepository._(table);
+        _instance = tmp = MemNotificationRepository._(table);
       }
     }
 

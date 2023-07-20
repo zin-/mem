@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/database/definition.dart';
 import 'package:mem/database/table_definitions/base.dart';
-import 'package:mem/database/table_definitions/mem_repeated_notifications.dart';
+import 'package:mem/database/table_definitions/mem_notifications.dart';
 import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/database_manager.dart';
@@ -38,7 +38,7 @@ void testHabitScenario() => group(': $_scenarioName', () {
           defMemName.name: withRepeatedMemName,
           createdAtColDef.name: DateTime.now(),
         });
-        await db.getTable(memRepeatedNotificationTableDefinition.name).insert({
+        await db.getTable(memNotificationTableDefinition.name).insert({
           timeOfDaySecondsColDef.name: timeOfDaySeconds,
           memIdFkDef.name: withRepeatedMemId,
           createdAtColDef.name: DateTime.now(),
@@ -60,7 +60,7 @@ void testHabitScenario() => group(': $_scenarioName', () {
         await widgetTester.pump();
 
         expect(
-          (widgetTester.widget(memRepeatedNotificationOnDetailPageFinder())
+          (widgetTester.widget(memNotificationOnDetailPageFinder())
                   as TextFormField)
               .initialValue,
           timeText(pickTime),
@@ -84,7 +84,7 @@ void testHabitScenario() => group(': $_scenarioName', () {
 
             await expectLater(
               inserted = (await db
-                      .getTable(memRepeatedNotificationTableDefinition.name)
+                      .getTable(memNotificationTableDefinition.name)
                       .select(
                 whereString: '${memIdFkDef.name} = ?',
                 whereArgs: [insertedMemId],
@@ -121,7 +121,7 @@ void testHabitScenario() => group(': $_scenarioName', () {
         await widgetTester.pumpAndSettle();
 
         expect(
-          (widgetTester.widget(memRepeatedNotificationOnDetailPageFinder())
+          (widgetTester.widget(memNotificationOnDetailPageFinder())
                   as TextFormField)
               .initialValue,
           '12:16 AM',
@@ -130,7 +130,7 @@ void testHabitScenario() => group(': $_scenarioName', () {
         await widgetTester.pump();
 
         expect(
-          (widgetTester.widget(memRepeatedNotificationOnDetailPageFinder())
+          (widgetTester.widget(memNotificationOnDetailPageFinder())
                   as TextFormField)
               .initialValue,
           '',
@@ -141,9 +141,8 @@ void testHabitScenario() => group(': $_scenarioName', () {
         await Future.delayed(
           waitSideEffectDuration,
           () async {
-            final memNotifications = (await db
-                .getTable(memRepeatedNotificationTableDefinition.name)
-                .select(
+            final memNotifications =
+                (await db.getTable(memNotificationTableDefinition.name).select(
               whereString: '${memIdFkDef.name} = ?',
               whereArgs: [withRepeatedMemId],
             ));
