@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:mem/acts/act_repository.dart';
 import 'package:mem/acts/act_service.dart';
 import 'package:mem/core/mem.dart';
-import 'package:mem/core/mem_repeated_notification.dart';
+import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_service.dart';
 import 'package:mem/notifications/actions.dart';
@@ -57,10 +57,11 @@ class NotificationService {
             final repeatedNotification = RepeatedNotification(
               memRepeatedNotificationId(mem.id),
               mem.name,
-              'Repeat',
+              memNotification.message,
               json.encode({'memId': memNotification.memId}),
               [
                 startActAction,
+                finishActiveActAction,
               ],
               repeatedReminderChannel,
               notifyFirstAt,

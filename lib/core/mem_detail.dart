@@ -1,6 +1,6 @@
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_item.dart';
-import 'package:mem/core/mem_repeated_notification.dart';
+import 'package:mem/core/mem_notification.dart';
 
 class MemDetail {
   final Mem mem;

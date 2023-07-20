@@ -4,7 +4,7 @@ import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_detail.dart';
 import 'package:mem/core/mem_item.dart';
-import 'package:mem/core/mem_repeated_notification.dart';
+import 'package:mem/core/mem_notification.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/components/value_state_notifier.dart';

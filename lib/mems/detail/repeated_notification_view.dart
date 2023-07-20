@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/async_value_view.dart';
 import 'package:mem/components/date_and_time/time_of_day_view.dart';
-import 'package:mem/core/mem_repeated_notification.dart';
+import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/actions.dart';
 import 'package:mem/mems/detail/states.dart';
@@ -32,7 +32,9 @@ class NotificationWidget extends ConsumerWidget {
                       pickedTimeOfDay == null
                           ? null
                           : MemNotification(
+                              MemNotificationType.repeat,
                               pickedTimeOfDay.convert(),
+                              'Repeat',
                               memId: _memId,
                               id: repeatedNotification?.id,
                               createdAt: repeatedNotification?.createdAt,
