@@ -14,11 +14,15 @@ final timeColDef = ColumnDefinition(
 final memNotificationTypeColDef = ColumnDefinition(
   'type',
   ColumnType.text,
+  // ISSUE #230 remove
+  //  本来はmigration定義に含まれるべきだが、実装していないのでこれで対応している
   defaultValue: 'repeat',
 );
 final memNotificationMessageColDef = ColumnDefinition(
   'message',
   ColumnType.text,
+  // ISSUE #230 remove
+  //  本来はmigration定義に含まれるべきだが、実装していないのでこれで対応している
   defaultValue: 'Repeat',
 );
 
