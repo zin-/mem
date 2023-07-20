@@ -8,6 +8,10 @@ import 'package:mem/mems/detail/actions.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/core/date_and_time/time_of_day.dart' as core;
 
+// TODO 開始後、指定された時間後に通知する
+//  時間（何分後みたいな）とメッセージ（止めようみたいな）を保存する
+//  TODO mem_repeated_notificationsをmem_notificationsに変更して、type
+//  とmessageを持たせる
 class RepeatedNotificationWidget extends ConsumerWidget {
   final int? _memId;
 

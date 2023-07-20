@@ -42,10 +42,6 @@ class _MemItemsFormFieldsComponent extends StatelessWidget {
           final l10n = buildL10n(context);
 
           return Column(
-            // TODO 開始後、指定された時間後に通知する
-            //  時間（何分後みたいな）とメッセージ（止めようみたいな）を保存する
-            //  TODO mem_repeated_notificationsをmem_notificationsに変更して、type
-            //  とmessageを持たせる
             children: [
               ..._memItems.map(
                 (memItem) => TextFormField(
