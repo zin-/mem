@@ -11,12 +11,24 @@ final timeColDef = ColumnDefinition(
   'time_of_day_seconds',
   ColumnType.integer,
 );
+final memNotificationTypeColDef = ColumnDefinition(
+  'type',
+  ColumnType.text,
+  defaultValue: 'repeat',
+);
+final memNotificationMessageColDef = ColumnDefinition(
+  'message',
+  ColumnType.text,
+  defaultValue: 'Repeat',
+);
 
 final memNotificationTableDefinition = TableDefinition(
   // ISSUE #230 change name to "mem_notifications"
   'mem_repeated_notifications',
   [
     timeColDef,
+    memNotificationTypeColDef,
+    memNotificationMessageColDef,
     ...defaultColumnDefinitions,
     memIdFkDef,
   ],

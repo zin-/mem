@@ -5,11 +5,13 @@ class ColumnDefinition {
   final String name;
   final ColumnType type;
   final bool notNull;
+  final dynamic defaultValue;
 
   ColumnDefinition(
     this.name,
     this.type, {
     this.notNull = true,
+    this.defaultValue,
   }) {
     if (name.isEmpty) {
       throw ColumnDefinitionException('Column name is empty.');
@@ -20,7 +22,8 @@ class ColumnDefinition {
 
   String buildCreateTableSql() => '$name'
       ' ${type._buildCreateTableSql()}'
-      '${notNull ? ' NOT NULL' : ''}';
+      '${notNull ? ' NOT NULL' : ''}'
+      '${defaultValue == null ? '' : ' DEFAULT ${toTuple(defaultValue)}'}';
 
   // ISSUE 209
   //  ここで定義されるべきものか？
