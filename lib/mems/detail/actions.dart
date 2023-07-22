@@ -34,9 +34,10 @@ final loadMemNotifications = FutureProvider.autoDispose.family<void, int?>(
             await MemNotificationRepository().shipByMemId(memId);
 
         if (memNotifications.isNotEmpty) {
-          ref
-              .watch(memNotificationsProvider(memId).notifier)
-              .updatedBy(memNotifications.toList());
+          ref.watch(memNotificationsProvider(memId).notifier).upsertAll(
+                memNotifications.toList(),
+                (tmp, item) => tmp.type == item.type,
+              );
         }
       }
     },

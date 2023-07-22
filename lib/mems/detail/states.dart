@@ -68,6 +68,12 @@ final memNotificationsProvider = StateNotifierProvider.autoDispose.family<
         'Repeat',
         memId: memId,
       ),
+      MemNotification(
+        MemNotificationType.afterActStarted,
+        null,
+        'Finish?',
+        memId: memId,
+      ),
     ]),
     memId,
   ),

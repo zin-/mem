@@ -36,32 +36,13 @@ Future<void> resetDatabase(Database database) async {
 final newMemFabFinder = find.byIcon(Icons.add);
 
 final memNameOnDetailPageFinder = find.byType(TextFormField).at(0);
+final memNotificationOnDetailPageFinder = find.byType(TextFormField).at(3);
+final afterActStartedNotificationOnDetailPageFinder =
+    find.byType(TextFormField).at(4);
+final memMemoOnDetailPageFinder = find.byType(TextFormField).at(6);
+final saveMemFabFinder = find.byIcon(Icons.save_alt);
 final calendarIconFinder = find.byIcon(Icons.calendar_month);
 final timeIconFinder = find.byIcon(Icons.access_time_outlined);
 final switchFinder = find.byType(Switch);
 final clearIconFinder = find.byIcon(Icons.clear);
 final okFinder = find.text('OK');
-
-Finder memNotificationOnDetailPageFinder() {
-  switch (find.byType(TextFormField).evaluate().length) {
-    case 5:
-      // period does not have time
-      return find.byType(TextFormField).at(3);
-
-    default:
-      throw Exception('on test.');
-  }
-}
-
-Finder memMemoOnDetailPageFinder() {
-  switch (find.byType(TextFormField).evaluate().length) {
-    case 5:
-      // period does not have time
-      return find.byType(TextFormField).at(4);
-
-    default:
-      throw Exception('on test.');
-  }
-}
-
-final saveMemFabFinder = find.byIcon(Icons.save_alt);

@@ -9,6 +9,7 @@ import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_entity.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/mems/mem_notification_repository.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/notifications/channels.dart';
 import 'package:mem/notifications/wrapper.dart';
@@ -28,7 +29,8 @@ void main() {
   HomeWidgetAccessor(instance: mockedHomeWidgetAccessor);
   final mockedNotificationWrapper = MockNotificationsWrapper();
   NotificationsWrapper.resetWith(mockedNotificationWrapper);
-
+  final mockedMemNotificationRepository = MockMemNotificationRepository();
+  MemNotificationRepository.resetWith(mockedMemNotificationRepository);
   final actCounterService = ActCounterService();
 
   test(
@@ -126,6 +128,8 @@ void main() {
           .thenAnswer((realInvocation) => Future.value(acts));
       when(mockedActRepository.replace(any))
           .thenAnswer((realInvocation) => Future.value(act));
+      when(mockedMemNotificationRepository.shipByMemIdAndAfterActStarted(memId))
+          .thenAnswer((realInvocation) => Future.value([]));
 
       when(mockedHomeWidgetAccessor.saveWidgetData(any, any))
           .thenAnswer((realInvocation) => Future.value(true));
@@ -152,6 +156,9 @@ void main() {
         )).captured[0],
         memId,
       );
+      verify(mockedMemNotificationRepository.shipByMemIdAndAfterActStarted(
+        memId,
+      )).called(1);
 
       verifyNever(mockedHomeWidgetAccessor.initialize(any, any));
       expect(

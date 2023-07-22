@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
@@ -21,7 +22,9 @@ class MemDetailPage extends ConsumerWidget {
         () {
           // ISSUE #178
           ref.read(
-            initializeNotification((memId) => showMemDetailPage(context, ref, memId)),
+            initializeNotification(
+              (memId) => showMemDetailPage(context, ref, memId),
+            ),
           );
           final memIsArchived = ref.watch(memIsArchivedProvider(_memId));
 
@@ -34,13 +37,35 @@ class MemDetailPage extends ConsumerWidget {
       );
 }
 
-class _MemDetailPageComponent extends StatelessWidget {
-  final _formKey = GlobalKey<FormState>();
-
+class _MemDetailPageComponent extends StatefulWidget {
   final int? _memId;
   final bool _memIsArchived;
 
-  _MemDetailPageComponent(this._memId, this._memIsArchived);
+  const _MemDetailPageComponent(this._memId, this._memIsArchived);
+
+  @override
+  State<StatefulWidget> createState() => _MemDetailPageComponentState();
+}
+
+class _MemDetailPageComponentState extends State<_MemDetailPageComponent> {
+  final _formKey = GlobalKey<FormState>();
+  final _keyboardVisibilityController = KeyboardVisibilityController();
+
+  late int? _memId;
+  late bool _memIsArchived = false;
+
+  bool _isKeyboardShown = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _memId = widget._memId;
+    _memIsArchived = widget._memIsArchived;
+
+    _isKeyboardShown = _keyboardVisibilityController.isVisible;
+    _keyboardVisibilityController.onChange.listen(
+        (bool isVisible) => setState(() => _isKeyboardShown = isVisible));
+  }
 
   @override
   Widget build(BuildContext context) => v(
@@ -63,10 +88,11 @@ class _MemDetailPageComponent extends StatelessWidget {
               ),
             ),
             floatingActionButton: MemDetailFab(_formKey, _memId),
-            floatingActionButtonLocation:
-                FloatingActionButtonLocation.centerFloat,
+            floatingActionButtonLocation: _isKeyboardShown
+                ? FloatingActionButtonLocation.endFloat
+                : FloatingActionButtonLocation.centerFloat,
           );
         },
-        {_memId.toString(), _memIsArchived},
+        [_memId.toString(), _memIsArchived, _isKeyboardShown],
       );
 }

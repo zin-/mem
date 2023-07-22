@@ -61,6 +61,8 @@
   "repeated_reminder_description": "To remind at specific time per day.",
   "active_act_notification": "Active act",
   "active_act_notification_description": "To show active act.",
+  "after_act_started_notification": "After act started",
+  "after_act_started_notification_description": "To remind specific amount of time after act started.",
 
   "dev": "Under development",
   "test": "Under test"

@@ -1,6 +1,7 @@
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_detail.dart';
 import 'package:mem/core/mem_item.dart';
+import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_notification_repository.dart';
@@ -59,12 +60,13 @@ class MemService {
           final savedMemNotifications = memDetail.notifications == null
               ? null
               : await Future.wait(memDetail.notifications!.map((e) {
-                  if (e.timeOfDay == null) {
+                  if (e.time == null) {
                     if (e.isSaved()) {
                       _memNotificationRepository.wasteById(e.id);
                     }
                     _notificationService.memRepeatedReminder(savedMem, null);
-                    return Future(() => e);
+                    return Future(
+                        () => MemNotification(e.type, e.time, e.message));
                   } else {
                     return (e.isSaved() && !undo
                         ? _memNotificationRepository

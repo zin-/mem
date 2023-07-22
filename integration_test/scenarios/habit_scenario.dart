@@ -60,7 +60,7 @@ void testHabitScenario() => group(': $_scenarioName', () {
         await widgetTester.pump();
 
         expect(
-          (widgetTester.widget(memNotificationOnDetailPageFinder())
+          (widgetTester.widget(memNotificationOnDetailPageFinder)
                   as TextFormField)
               .initialValue,
           timeText(pickTime),
@@ -121,7 +121,7 @@ void testHabitScenario() => group(': $_scenarioName', () {
         await widgetTester.pumpAndSettle();
 
         expect(
-          (widgetTester.widget(memNotificationOnDetailPageFinder())
+          (widgetTester.widget(memNotificationOnDetailPageFinder)
                   as TextFormField)
               .initialValue,
           '12:16 AM',
@@ -130,7 +130,7 @@ void testHabitScenario() => group(': $_scenarioName', () {
         await widgetTester.pump();
 
         expect(
-          (widgetTester.widget(memNotificationOnDetailPageFinder())
+          (widgetTester.widget(memNotificationOnDetailPageFinder)
                   as TextFormField)
               .initialValue,
           '',

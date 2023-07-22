@@ -1,4 +1,3 @@
-import 'package:mem/core/date_and_time/time_of_day.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/database/table_definitions/mem_notifications.dart';
 import 'package:mem/framework/database/database.dart';
@@ -14,13 +13,25 @@ class MemNotificationRepository
         memId,
       );
 
+  Future<Iterable<MemNotification>> shipByMemIdAndAfterActStarted(int memId) =>
+      v(
+        () => super.ship(And([
+          Equals(memIdFkDef.name, memId),
+          Equals(
+            memNotificationTypeColDef.name,
+            MemNotificationType.afterActStarted.name,
+          ),
+        ])),
+        memId,
+      );
+
   @override
   MemNotification pack(Map<String, dynamic> unpackedPayload) {
     final entity = MemNotificationEntity.fromMap(unpackedPayload);
 
     return MemNotification(
       MemNotificationType.fromName(entity.type),
-      TimeOfDay.fromSeconds(entity.time),
+      entity.time,
       entity.message,
       memId: entity.memId,
       id: entity.id,
@@ -35,7 +46,7 @@ class MemNotificationRepository
     final entity = MemNotificationEntity(
       payload.memId!,
       payload.type.name,
-      payload.timeOfDay?.toSeconds() ?? 0,
+      payload.time!,
       payload.message,
       payload.id,
       payload.createdAt,
@@ -52,4 +63,6 @@ class MemNotificationRepository
 
   factory MemNotificationRepository([Table? table]) =>
       _instance ??= _instance = MemNotificationRepository._(table!);
+
+  static resetWith(MemNotificationRepository? instance) => _instance = instance;
 }

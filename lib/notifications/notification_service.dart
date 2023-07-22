@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:mem/acts/act_repository.dart';
 import 'package:mem/acts/act_service.dart';
+import 'package:mem/core/date_and_time/time_of_day.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
@@ -42,13 +43,14 @@ class NotificationService {
             );
           } else {
             final now = DateTime.now();
+            final timeOfDay = TimeOfDay.fromSeconds(memNotification.time!);
             var notifyFirstAt = DateTime(
               now.year,
               now.month,
               now.day,
-              memNotification.timeOfDay!.hour,
-              memNotification.timeOfDay!.minute,
-              memNotification.timeOfDay!.second,
+              timeOfDay.hour,
+              timeOfDay.minute,
+              timeOfDay.second,
             );
             if (notifyFirstAt.isBefore(now)) {
               notifyFirstAt = notifyFirstAt.add(const Duration(days: 1));
