@@ -45,7 +45,7 @@ final loadMemNotifications = FutureProvider.autoDispose.family<void, int?>(
 );
 
 final saveMem =
-    Provider.autoDispose.family<Future<MemDetail>, int?>((ref, memId) => i(
+    Provider.autoDispose.family<Future<MemDetail>, int?>((ref, memId) => v(
           () async {
             final saved = await MemService().save(
               ref.watch(memDetailProvider(memId)),
