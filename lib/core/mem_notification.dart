@@ -22,10 +22,10 @@ class MemNotification extends EntityValue {
           archivedAt: archivedAt,
         );
 
-  MemNotification copyWith(int? time, String? message) => MemNotification(
+  MemNotification copyWith(int? time, String message) => MemNotification(
         type,
         time,
-        message ?? this.message,
+        message,
         memId: memId,
         id: id,
         createdAt: createdAt,

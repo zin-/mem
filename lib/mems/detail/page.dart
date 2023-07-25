@@ -23,7 +23,10 @@ class MemDetailPage extends ConsumerWidget {
           // ISSUE #178
           ref.read(
             initializeNotification(
+// ISSUE #225
+// coverage:ignore-start
               (memId) => showMemDetailPage(context, ref, memId),
+// coverage:ignore-end
             ),
           );
           final memIsArchived = ref.watch(memIsArchivedProvider(_memId));
@@ -52,7 +55,7 @@ class _MemDetailPageComponentState extends State<_MemDetailPageComponent> {
   final _keyboardVisibilityController = KeyboardVisibilityController();
 
   late int? _memId;
-  late bool _memIsArchived = false;
+  late bool _memIsArchived;
 
   bool _isKeyboardShown = false;
 
@@ -64,7 +67,11 @@ class _MemDetailPageComponentState extends State<_MemDetailPageComponent> {
 
     _isKeyboardShown = _keyboardVisibilityController.isVisible;
     _keyboardVisibilityController.onChange.listen(
-        (bool isVisible) => setState(() => _isKeyboardShown = isVisible));
+      (bool isVisible) => v(
+        () => setState(() => _isKeyboardShown = isVisible),
+        isVisible,
+      ),
+    );
   }
 
   @override

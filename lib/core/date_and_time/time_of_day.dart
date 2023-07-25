@@ -17,7 +17,4 @@ class TimeOfDay {
   }
 
   int toSeconds() => ((hour * 60) + minute) * 60 + second;
-
-  @override
-  String toString() => '$hour:$minute${second == 0 ? '' : ':$second'}';
 }

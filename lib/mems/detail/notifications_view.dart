@@ -35,7 +35,7 @@ class NotificationsWidget extends ConsumerWidget {
 
 class _NotificationsWidgetComponent extends StatelessWidget {
   final List<MemNotification> _notifications;
-  final Function(int? pickedTimeOfDay, String? message) Function(
+  final Function(int? pickedTimeOfDay, String message) Function(
       MemNotification current) _onChanged;
 
   const _NotificationsWidgetComponent(this._notifications, this._onChanged);
@@ -101,8 +101,8 @@ class _RepeatedNotificationWidgetComponent extends StatelessWidget {
 
 class _AfterActStartedNotificationWidgetComponent extends StatelessWidget {
   final int? _time;
-  final String? _message;
-  final Function(int? time, String? message) _onChanged;
+  final String _message;
+  final Function(int? time, String message) _onChanged;
 
   const _AfterActStartedNotificationWidgetComponent(
     this._time,

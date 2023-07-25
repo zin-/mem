@@ -37,8 +37,10 @@ final newMemFabFinder = find.byIcon(Icons.add);
 
 final memNameOnDetailPageFinder = find.byType(TextFormField).at(0);
 final memNotificationOnDetailPageFinder = find.byType(TextFormField).at(3);
-final afterActStartedNotificationOnDetailPageFinder =
+final afterActStartedNotificationTimeOnDetailPageFinder =
     find.byType(TextFormField).at(4);
+final afterActStartedNotificationMessageOnDetailPageFinder =
+    find.byType(TextFormField).at(5);
 final memMemoOnDetailPageFinder = find.byType(TextFormField).at(6);
 final saveMemFabFinder = find.byIcon(Icons.save_alt);
 final calendarIconFinder = find.byIcon(Icons.calendar_month);

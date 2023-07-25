@@ -35,18 +35,19 @@ class TimeTextFormField extends StatelessWidget {
                 icon: const Icon(Icons.add),
                 onPressed: () async {
                   final picked = await Picker(
+                    confirmText: 'OK',
                     adapter: NumberPickerAdapter(data: [
                       NumberPickerColumn(
                         begin: 0,
                         end: 99,
                         suffix: const Text('h'),
-                        initValue: hours,
+                        initValue: hours ?? 1,
                       ),
                       NumberPickerColumn(
                         begin: 0,
                         end: 59,
                         suffix: const Text('m'),
-                        initValue: minutes,
+                        initValue: minutes ?? 0,
                       ),
                     ]),
                   ).showModal(context);
