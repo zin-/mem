@@ -5,4 +5,10 @@ class NotificationAction extends EntityV3 {
   final String title;
 
   NotificationAction(this.id, this.title);
+
+  @override
+  String toString() => {
+        'id': id,
+        'title': title,
+      }.toString();
 }
