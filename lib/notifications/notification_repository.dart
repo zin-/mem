@@ -16,6 +16,7 @@ import 'wrapper.dart';
 class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
   final NotificationsWrapper? _flutterLocalNotificationsWrapper;
 
+  // TODO factoryにする
   Future<void> initialize(
     OnNotificationActionTappedCallback notificationActionHandler,
     Function(int memId)? showMemDetailPage,

@@ -21,6 +21,8 @@ class MemListPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => i(
         () {
+          // TODO 消す
+          //  contextが不要になるはずなので、削除する
           ref.read(
             initializeNotification(
 // ISSUE #225
@@ -80,6 +82,8 @@ class _MemListPageComponent extends StatelessWidget {
   }
 }
 
+// TODO 通知から呼び出すのをこれじゃなくする
+//  直接run(MemDetailPage())する
 // FIXME too long
 void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
       () {

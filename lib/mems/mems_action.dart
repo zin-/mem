@@ -4,6 +4,7 @@ import 'package:mem/notifications/notification_repository.dart';
 import 'package:mem/notifications/notification_service.dart';
 import 'package:mem/mems/mems_state.dart';
 
+// TODO 削除する
 final initializeNotification =
     Provider.family<Future<void>, Function(int memId)>(
   (ref, showMemDetailPage) => v(
