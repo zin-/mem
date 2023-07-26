@@ -4,13 +4,9 @@ import 'package:mem/acts/act_repository.dart';
 import 'package:mem/acts/act_service.dart';
 import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/core/act.dart';
-import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
 
 final actRepository = ActRepository();
-
-Future<List<Act>> fetchByMemIdIs(MemId memId) =>
-    actRepository.shipByMemId(memId);
 
 final startAct = Provider.autoDispose.family<void, int>(
   (ref, memId) => v(

@@ -12,4 +12,11 @@ class OneTimeNotification extends ShowNotification {
     super.channel,
     this.notifyAt,
   );
+
+  @override
+  String toString() =>
+      {
+        'notifyAt': notifyAt,
+      }.toString() +
+      super.toString();
 }

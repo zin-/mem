@@ -17,4 +17,15 @@ class ShowNotification extends Notification {
     this.actions,
     this.channel,
   );
+
+  @override
+  String toString() =>
+      {
+        'title': title,
+        'body': body,
+        'payloadJson': payloadJson,
+        'actions': actions,
+        'channel': channel,
+      }.toString() +
+      super.toString();
 }

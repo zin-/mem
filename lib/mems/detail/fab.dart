@@ -14,7 +14,7 @@ class MemDetailFab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mem = ref.watch(editingMemProvider(_memId));
+    final mem = ref.watch(memDetailProvider(_memId)).mem;
 
     return _MemDetailFabComponent(
       _formKey,
@@ -32,26 +32,29 @@ class _MemDetailFabComponent extends StatelessWidget {
   const _MemDetailFabComponent(this._formKey, this._saveMem, this._memName);
 
   @override
-  Widget build(BuildContext context) {
-    final l10n = buildL10n(context);
+  Widget build(BuildContext context) => v(
+        () {
+          final l10n = buildL10n(context);
 
-    return FloatingActionButton(
-      child: const Icon(Icons.save_alt),
-      onPressed: () => v(() {
-        if (_formKey.currentState?.validate() ?? false) {
-          _saveMem();
+          return FloatingActionButton(
+            child: const Icon(Icons.save_alt),
+            onPressed: () => v(() {
+              if (_formKey.currentState?.validate() ?? false) {
+                _saveMem();
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.saveMemSuccessMessage(
-                _memName,
-              )),
-              duration: defaultDismissDuration,
-              dismissDirection: DismissDirection.horizontal,
-            ),
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(l10n.saveMemSuccessMessage(
+                      _memName,
+                    )),
+                    duration: defaultDismissDuration,
+                    dismissDirection: DismissDirection.horizontal,
+                  ),
+                );
+              }
+            }),
           );
-        }
-      }),
-    );
-  }
+        },
+        _memName,
+      );
 }

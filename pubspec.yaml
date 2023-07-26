@@ -16,6 +16,7 @@ dependencies:
 
   # for View
   intl:
+  flutter_picker: ^2.1.0
 
   ## for View state management
   flutter_riverpod:
@@ -41,6 +42,7 @@ dependencies:
   # for Home widgets
   home_widget: ^0.2.0+1
   workmanager: ^0.5.1
+  flutter_keyboard_visibility: ^5.4.1
 
 dev_dependencies:
   # for Test mock

@@ -14,6 +14,14 @@ class RepeatedNotification extends ShowNotification {
     this.notifyFirstAt,
     this.interval,
   );
+
+  @override
+  String toString() =>
+      {
+        'notifyFirstAt': notifyFirstAt,
+        'interval': interval,
+      }.toString() +
+      super.toString();
 }
 
 enum NotificationInterval { perDay, perWeek, perMonth, perYear }

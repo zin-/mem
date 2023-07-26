@@ -45,7 +45,7 @@ class TimeOfDayTextFormField extends StatelessWidget {
                       initialTime: timeOfDay ?? TimeOfDay.now(),
                     );
 
-                    onChanged(pickedTimeOfDay);
+                    if (pickedTimeOfDay != null) onChanged(pickedTimeOfDay);
                   },
                 ),
                 icon: const Icon(Icons.access_time_outlined),

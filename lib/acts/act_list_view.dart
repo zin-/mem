@@ -1,6 +1,8 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/acts/act_list_actions.dart';
+import 'package:mem/components/async_value_view.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
 
@@ -14,17 +16,14 @@ class ActListView extends ConsumerWidget {
   const ActListView(this._memId, {super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => v(
-        () {
+  Widget build(BuildContext context, WidgetRef ref) => AsyncValueView(
+        loadActList(_memId),
+        (data) {
           final actList = ref.watch(actListProvider(_memId));
 
-          if (actList == null) {
-            return const Center(child: CircularProgressIndicator());
-          } else {
-            return _ActListViewComponent(actList.sorted(
-              (a, b) => b.id!.compareTo(a.id!),
-            ));
-          }
+          return _ActListViewComponent(actList!.sorted(
+            (a, b) => b.id!.compareTo(a.id!),
+          ));
         },
       );
 }

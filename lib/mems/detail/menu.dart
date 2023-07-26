@@ -17,7 +17,7 @@ class MemDetailMenu extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mem = ref.watch(editingMemProvider(_memId));
+    final mem = ref.watch(memDetailProvider(_memId)).mem;
 
     return _MemDetailMenuComponent(
       mem,

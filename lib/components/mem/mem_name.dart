@@ -58,7 +58,6 @@ class MemNameTextFormField extends StatelessWidget {
         {
           '_memName': _memName,
           '_memId': _memId,
-          '_onChanged': _onChanged,
         },
       );
 }

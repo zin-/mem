@@ -25,9 +25,11 @@ class MemItem extends EntityValue {
         );
 
   @override
-  String toString() => {
+  String toString() =>
+      {
         'memId': memId,
-        'MemItemType': MemItemType,
+        'MemItemType': type,
         'value': value,
-      }.toString();
+      }.toString() +
+      super.toString();
 }

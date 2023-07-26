@@ -29,8 +29,7 @@ class MemItemRepository
       );
 
   Future<Iterable<MemItem>> wasteByMemId(MemId memId) => v(
-        () async => Future.wait(
-            (await shipByMemId(memId)).map((e) => super.wasteById(e.id))),
+        () async => await super.waste(Equals(memIdFkDef.name, memId)),
         {'memId': memId},
       );
 

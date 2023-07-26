@@ -6,7 +6,7 @@ import 'package:mem/acts/act_repository.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/database/table_definitions/acts.dart';
 import 'package:mem/database/table_definitions/mem_items.dart';
-import 'package:mem/database/table_definitions/mem_repeated_notifications.dart';
+import 'package:mem/database/table_definitions/mem_notifications.dart';
 import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/database/definition.dart';
@@ -14,7 +14,7 @@ import 'package:mem/components/app.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/list/page.dart';
-import 'package:mem/mems/mem_repeated_notification_repository.dart';
+import 'package:mem/mems/mem_notification_repository.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/notifications/channels.dart';
 
@@ -51,8 +51,8 @@ Future<void> openDatabase() async {
   ActRepository(
     database.getTable(actTableDefinition.name),
   );
-  MemRepeatedNotificationRepository(
-    database.getTable(memRepeatedNotificationTableDefinition.name),
+  MemNotificationRepository(
+    database.getTable(memNotificationTableDefinition.name),
   );
 }
 

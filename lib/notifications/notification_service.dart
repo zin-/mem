@@ -2,8 +2,9 @@ import 'dart:convert';
 
 import 'package:mem/acts/act_repository.dart';
 import 'package:mem/acts/act_service.dart';
+import 'package:mem/core/date_and_time/time_of_day.dart';
 import 'package:mem/core/mem.dart';
-import 'package:mem/core/mem_repeated_notification.dart';
+import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_service.dart';
 import 'package:mem/notifications/actions.dart';
@@ -32,23 +33,24 @@ class NotificationService {
 
   Future<void> memRepeatedReminder(
     Mem mem,
-    MemRepeatedNotification? memRepeatedNotification,
+    MemNotification? memNotification,
   ) =>
       i(
         () async {
-          if (memRepeatedNotification == null) {
+          if (memNotification == null) {
             await _notificationRepository.receive(
               CancelNotification(memRepeatedNotificationId(mem.id)),
             );
           } else {
             final now = DateTime.now();
+            final timeOfDay = TimeOfDay.fromSeconds(memNotification.time!);
             var notifyFirstAt = DateTime(
               now.year,
               now.month,
               now.day,
-              memRepeatedNotification.timeOfDay.hour,
-              memRepeatedNotification.timeOfDay.minute,
-              memRepeatedNotification.timeOfDay.second,
+              timeOfDay.hour,
+              timeOfDay.minute,
+              timeOfDay.second,
             );
             if (notifyFirstAt.isBefore(now)) {
               notifyFirstAt = notifyFirstAt.add(const Duration(days: 1));
@@ -57,10 +59,11 @@ class NotificationService {
             final repeatedNotification = RepeatedNotification(
               memRepeatedNotificationId(mem.id),
               mem.name,
-              'Repeat',
-              json.encode({'memId': memRepeatedNotification.memId}),
+              memNotification.message,
+              json.encode({'memId': memNotification.memId}),
               [
                 startActAction,
+                finishActiveActAction,
               ],
               repeatedReminderChannel,
               notifyFirstAt,
@@ -70,7 +73,7 @@ class NotificationService {
             await _notificationRepository.receive(repeatedNotification);
           }
         },
-        {mem, memRepeatedNotification},
+        {mem, memNotification},
       );
 
   NotificationService._(this._notificationRepository);

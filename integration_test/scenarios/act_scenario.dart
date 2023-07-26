@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:mem/core/mem_notification.dart';
 import 'package:mem/database/table_definitions/acts.dart';
 import 'package:mem/database/table_definitions/base.dart';
+import 'package:mem/database/table_definitions/mem_notifications.dart';
 import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/database_manager.dart';
@@ -34,6 +36,15 @@ void testActScenario() => group(': $scenarioName', () {
 
         insertedMemId = await db.getTable(memTableDefinition.name).insert({
           defMemName.name: insertedMemName,
+          createdAtColDef.name: DateTime.now(),
+        });
+        await db.getTable(memNotificationTableDefinition.name).insert({
+          memIdFkDef.name: insertedMemId,
+          timeColDef.name: 1,
+          memNotificationTypeColDef.name:
+              MemNotificationType.afterActStarted.name,
+          memNotificationMessageColDef.name:
+              '$scenarioName: mem notification message',
           createdAtColDef.name: DateTime.now(),
         });
       });

@@ -43,7 +43,7 @@ class MemPeriodTextFormFields extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
-          final mem = ref.watch(editingMemProvider(_memId));
+          final mem = ref.watch(memDetailProvider(_memId)).mem;
 
           return _MemPeriodTextFormFieldsComponent(
             mem.period,

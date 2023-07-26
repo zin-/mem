@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/core/mem.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/components/value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
@@ -14,8 +13,8 @@ final memListViewModeProvider = StateNotifierProvider<
 );
 
 final selectedMemIdsProvider =
-    StateNotifierProvider<ListValueStateNotifier<MemId>, List<MemId>?>(
+    StateNotifierProvider<ListValueStateNotifier<int>, List<int>?>(
   (ref) => v(
-    () => ListValueStateNotifier<MemId>([]),
+    () => ListValueStateNotifier<int>([]),
   ),
 );

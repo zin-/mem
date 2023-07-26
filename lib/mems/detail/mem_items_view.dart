@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/components/async_value_view.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/logger/log_service.dart';
@@ -12,55 +13,50 @@ class MemItemsFormFields extends ConsumerWidget {
   const MemItemsFormFields(this._memId, {super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final memItems = ref.watch(memItemsProvider(_memId));
-
-    if (memItems == null) {
-      ref.read(loadMemItems(_memId)).then((value) {
-        ref.read(memItemsProvider(_memId).notifier).updatedBy(value);
-      });
-      return const CircularProgressIndicator();
-    } else {
-      return _MemItemsFormFieldsComponent(
-        memItems,
-        (value, memItem) => v(
-          () {
-            ref.read(memItemsProvider(_memId).notifier).upsertAll(
-              [memItem..value = value],
-              (tmp, item) => tmp.id == item.id,
-            );
-          },
-          {value, memItem},
+  Widget build(BuildContext context, WidgetRef ref) => AsyncValueView(
+        loadMemItems(_memId),
+        (data) => _MemItemsFormFieldsComponent(
+          ref.watch(memDetailProvider(_memId)).memItems,
+          (value, memItem) => v(
+            () {
+              ref.watch(memItemsProvider(_memId).notifier).upsertAll(
+                [memItem..value = value],
+                (tmp, item) => tmp.id == item.id && tmp.type == item.type,
+              );
+            },
+            {value, memItem},
+          ),
         ),
       );
-    }
-  }
 }
 
 class _MemItemsFormFieldsComponent extends StatelessWidget {
   final List<MemItem> _memItems;
-  final Function(String value, MemItem memItem) _onChanged;
+  final Function(dynamic value, MemItem memItem) _onChanged;
 
   const _MemItemsFormFieldsComponent(this._memItems, this._onChanged);
 
   @override
-  Widget build(BuildContext context) {
-    final l10n = buildL10n(context);
+  Widget build(BuildContext context) => v(
+        () {
+          final l10n = buildL10n(context);
 
-    return Column(
-      children: [
-        ..._memItems.map(
-          (memItem) => TextFormField(
-            decoration: InputDecoration(
-              icon: const Icon(Icons.subject),
-              labelText: l10n.memMemoLabel,
-            ),
-            maxLines: null,
-            initialValue: memItem.value,
-            onChanged: (value) => _onChanged(value, memItem),
-          ),
-        ),
-      ],
-    );
-  }
+          return Column(
+            children: [
+              ..._memItems.map(
+                (memItem) => TextFormField(
+                  decoration: InputDecoration(
+                    icon: const Icon(Icons.subject),
+                    labelText: l10n.memMemoLabel,
+                  ),
+                  maxLines: null,
+                  initialValue: memItem.value,
+                  onChanged: (value) => _onChanged(value, memItem),
+                ),
+              ),
+            ],
+          );
+        },
+        _memItems,
+      );
 }

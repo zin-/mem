@@ -11,6 +11,7 @@ var _initialized = false;
 late final NotificationChannel reminderChannel;
 late final NotificationChannel repeatedReminderChannel;
 late final NotificationChannel activeActNotificationChannel;
+late final NotificationChannel afterActStartedNotificationChannel;
 
 void prepareNotifications([BuildContext? context]) => i(
       () {
@@ -33,6 +34,13 @@ void prepareNotifications([BuildContext? context]) => i(
             l10n.active_act_notification_description,
             usesChronometer: true,
             ongoing: true,
+            autoCancel: false,
+          );
+          afterActStartedNotificationChannel = NotificationChannel(
+            'after_act_started-notification',
+            l10n.after_act_started_notification,
+            l10n.after_act_started_notification_description,
+            usesChronometer: true,
             autoCancel: false,
           );
 
