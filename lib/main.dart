@@ -18,16 +18,13 @@ import 'package:mem/mems/mem_notification_repository.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/notifications/channels.dart';
 
-Future<void> main({String? languageCode}) async {
-  run(const MemListPage(), languageCode: languageCode);
-}
+Future<void> main({String? languageCode}) =>
+    _run(const MemListPage(), languageCode: languageCode);
 
 @pragma('vm:entry-point')
-Future<void> launchActCounterConfigure() async {
-  run(const ActCounterConfigure());
-}
+Future<void> launchActCounterConfigure() => _run(const ActCounterConfigure());
 
-Future<void> run(Widget home, {String? languageCode}) => i(
+Future<void> _run(Widget home, {String? languageCode}) => i(
       () async {
         WidgetsFlutterBinding.ensureInitialized();
 
@@ -36,7 +33,7 @@ Future<void> run(Widget home, {String? languageCode}) => i(
 
         runApp(MemApplication(home, languageCode));
       },
-      {'home': home, 'languageCode': languageCode},
+      [home, languageCode],
     );
 
 Future<void> openDatabase() async {
