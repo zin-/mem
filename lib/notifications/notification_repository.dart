@@ -1,18 +1,17 @@
 import 'package:flutter/foundation.dart';
 import 'package:mem/framework/repository_v3.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:timezone/data/latest_all.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest_all.dart';
+import 'package:timezone/timezone.dart';
 
+import 'icons.dart';
+import 'mem_notifications.dart';
 import 'notification/cancel_notification.dart';
+import 'notification/notification.dart';
 import 'notification/one_time_notification.dart';
 import 'notification/repeated_notification.dart';
 import 'notification/show_notification.dart';
 import 'wrapper.dart';
-import 'mem_notifications.dart';
-import 'notification/notification.dart';
-
-const _androidDefaultIconPath = 'ic_launcher_foreground';
 
 class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
   final NotificationsWrapper? _flutterLocalNotificationsWrapper;
@@ -36,11 +35,11 @@ class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
             }
 // coverage:ignore-end
 
-            tz.initializeTimeZones();
+            initializeTimeZones();
 
             final initialized =
                 await _flutterLocalNotificationsWrapper?.initialize(
-              _androidDefaultIconPath,
+              androidDefaultIconPath,
               // ISSUE #225
 // coverage:ignore-start
               (notificationId, payload) => showMemDetailPageHandler(payload),
@@ -72,7 +71,7 @@ class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
               payload.id,
               payload.title,
               payload.body,
-              tz.TZDateTime.from(payload.notifyFirstAt, tz.local),
+              TZDateTime.from(payload.notifyFirstAt, local),
               payload.payloadJson,
               payload.actions,
               payload.channel,
@@ -83,7 +82,7 @@ class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
               payload.id,
               payload.title,
               payload.body,
-              tz.TZDateTime.from(payload.notifyAt, tz.local),
+              TZDateTime.from(payload.notifyAt, local),
               payload.payloadJson,
               payload.actions,
               payload.channel,
