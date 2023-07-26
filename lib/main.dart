@@ -12,19 +12,30 @@ import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/database/definition.dart';
 import 'package:mem/components/app.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/mems/detail/page.dart';
 import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/list/page.dart';
 import 'package:mem/mems/mem_notification_repository.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/notifications/channels.dart';
 
-Future<void> main({String? languageCode}) =>
-    _run(const MemListPage(), languageCode: languageCode);
+Future<void> main({String? languageCode}) => i(
+      () => _runApplication(const MemListPage(), languageCode: languageCode),
+      {'languageCode': languageCode},
+    );
 
 @pragma('vm:entry-point')
-Future<void> launchActCounterConfigure() => _run(const ActCounterConfigure());
+Future<void> launchMemDetailPage(int memId) => i(
+      () => _runApplication(MemDetailPage(memId)),
+      {'memId': memId},
+    );
 
-Future<void> _run(Widget home, {String? languageCode}) => i(
+@pragma('vm:entry-point')
+Future<void> launchActCounterConfigure() => i(
+      () => _runApplication(const ActCounterConfigure()),
+    );
+
+Future<void> _runApplication(Widget home, {String? languageCode}) => i(
       () async {
         WidgetsFlutterBinding.ensureInitialized();
 

@@ -8,7 +8,6 @@ import 'package:mem/mems/actions.dart';
 import 'package:mem/mems/list/actions.dart';
 import 'package:mem/mems/detail/page.dart';
 import 'package:mem/components/mem/list/filter.dart';
-import 'package:mem/mems/mems_action.dart';
 import 'package:mem/mems/states.dart';
 import 'package:mem/values/colors.dart';
 import 'package:mem/values/durations.dart';
@@ -21,16 +20,6 @@ class MemListPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => i(
         () {
-          // TODO 消す
-          //  contextが不要になるはずなので、削除する
-          ref.read(
-            initializeNotification(
-// ISSUE #225
-// coverage:ignore-start
-              (memId) => showMemDetailPage(context, ref, memId),
-// coverage:ignore-end
-            ),
-          );
           ref.read(fetchActiveActs);
 
           return _MemListPageComponent(

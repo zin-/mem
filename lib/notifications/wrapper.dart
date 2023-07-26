@@ -4,95 +4,23 @@ import 'dart:io';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:mem/acts/act_repository.dart';
+import 'package:mem/acts/act_service.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
-import 'package:mem/notifications/channels.dart';
-import 'package:mem/notifications/notification_service.dart';
+import 'package:mem/mems/mem_service.dart';
+import 'package:mem/notifications/actions.dart';
+import 'package:mem/notifications/mem_notifications.dart';
 import 'package:timezone/timezone.dart';
 
+import 'channels.dart';
 import 'notification/action.dart';
 import 'notification/channel.dart';
 import 'notification/repeated_notification.dart';
 
-typedef OnNotificationTappedCallback = Function(
-  int id,
-  Map<dynamic, dynamic> payload,
-);
-typedef OnNotificationActionTappedCallback = Function(
-  int id,
-  String actionId,
-  String? input,
-  Map<dynamic, dynamic> payload,
-);
-
 class NotificationsWrapper {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
-
-  Future<bool> initialize(
-    String androidDefaultIconPath,
-    OnNotificationTappedCallback onNotificationTappedCallback,
-    OnNotificationActionTappedCallback? onNotificationActionTappedCallback,
-  ) =>
-      v(
-        () async {
-          return (await _flutterLocalNotificationsPlugin.initialize(
-                InitializationSettings(
-                  android:
-                      AndroidInitializationSettings(androidDefaultIconPath),
-                ),
-                onDidReceiveNotificationResponse: (details) =>
-                    _notificationResponseHandler(
-                  details,
-                  onNotificationTappedCallback,
-                  onNotificationActionTappedCallback,
-                ),
-                onDidReceiveBackgroundNotificationResponse:
-                    onNotificationTappedBackground,
-              )) ==
-              true;
-        },
-        {
-          'androidDefaultIconPath': androidDefaultIconPath,
-          'onNotificationTappedCallback': onNotificationTappedCallback,
-          'onNotificationActionTappedCallback':
-              onNotificationActionTappedCallback,
-        },
-      );
-
-  Future<void> receiveOnLaunchAppNotification(
-    OnNotificationTappedCallback onNotificationTapped,
-  ) =>
-      v(
-        () async {
-          if (Platform.isAndroid) {
-            final notificationAppLaunchDetails =
-                await _flutterLocalNotificationsPlugin
-                    .getNotificationAppLaunchDetails();
-
-            if (notificationAppLaunchDetails?.didNotificationLaunchApp ==
-                false) {
-              return;
-            }
-
-            final notificationResponse =
-                notificationAppLaunchDetails?.notificationResponse;
-
-            if (notificationResponse == null) {
-              return;
-            }
-
-            _notificationResponseHandler(
-              notificationResponse,
-              onNotificationTapped,
-              null,
-            );
-          }
-        },
-        {
-          'onNotificationTapped': onNotificationTapped,
-        },
-      );
 
   Future<void> show(
     int id,
@@ -192,12 +120,34 @@ class NotificationsWrapper {
         ),
       );
 
-  NotificationsWrapper._();
+  NotificationsWrapper._(
+    // onNotificationTappedBackgroundで直接参照するしか無いので、
+    // ここで引数にすることに意味がない？
+    String androidDefaultIconPath,
+  ) {
+    i(
+      () {
+        _flutterLocalNotificationsPlugin.initialize(
+          InitializationSettings(
+            android: AndroidInitializationSettings(androidDefaultIconPath),
+          ),
+          // アプリが起動中はこっちが呼ばれる
+          // つまりdatabaseやRepositoryの初期化が不要（済んでいる）
+          onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
+          // アプリが起動中でない場合はこちらが呼ばれる
+          // つまりもろもろの初期化が必要
+          onDidReceiveBackgroundNotificationResponse:
+              onDidReceiveNotificationResponse,
+        );
+      },
+      androidDefaultIconPath,
+    );
+  }
 
   static NotificationsWrapper? _instance;
 
-  factory NotificationsWrapper() =>
-      _instance ??= _instance = NotificationsWrapper._();
+  factory NotificationsWrapper(String androidDefaultIconPath) =>
+      _instance ??= _instance = NotificationsWrapper._(androidDefaultIconPath);
 
   static resetWith(NotificationsWrapper? instance) => _instance = instance;
 }
@@ -217,66 +167,70 @@ extension on NotificationInterval {
   }
 }
 
+// 分かりやすさのために、entry-pointはすべてmain.dartに定義したいが、
+// NotificationResponseがライブラリの型なので、ここで定義する
+// ライブラリから呼び出されるentry-pointなのでprivateにすることもできない
 @pragma('vm:entry-point')
-void onNotificationTappedBackground(NotificationResponse response) async {
-  WidgetsFlutterBinding.ensureInitialized();
+void onDidReceiveNotificationResponse(NotificationResponse details) => i(
+      () async {
+        WidgetsFlutterBinding.ensureInitialized();
 
-  info({'response': response});
+        await openDatabase();
+        prepareNotifications();
 
-  await openDatabase();
+        final id = details.id;
+        if (id == null) {
+          return;
+        }
 
-  // ここで呼び出すと、デバイスのcontextがないのでen固定になるかもしれない
-  prepareNotifications();
+        final notificationPayload = details.payload;
+        final payload =
+            notificationPayload == null ? {} : json.decode(notificationPayload);
 
-  await _notificationResponseHandler(
-    response,
-    (id, payload) => null,
-    (id, actionId, input, payload) => notificationActionHandler(
-      id,
-      actionId,
-      input,
-      payload,
-    ),
-  );
-}
+        switch (details.notificationResponseType) {
+          case NotificationResponseType.selectedNotification:
+            if (payload.containsKey(memIdKey)) {
+              final memId = payload[memIdKey];
+              if (memId is int) {
+                await launchMemDetailPage(memId);
+              }
+            }
+            break;
 
-_notificationResponseHandler(
-  NotificationResponse notificationResponse,
-  OnNotificationTappedCallback onNotificationTapped,
-  OnNotificationActionTappedCallback? onNotificationActionTappedCallback,
-) {
-  final id = notificationResponse.id;
-  if (id == null) {
-    return;
-  }
+          case NotificationResponseType.selectedNotificationAction:
+            final actionId = details.actionId;
+            if (actionId == null) {
+              return;
+            }
 
-  final notificationPayload = notificationResponse.payload;
-  final payload =
-      notificationPayload == null ? {} : json.decode(notificationPayload);
-
-  switch (notificationResponse.notificationResponseType) {
-    case NotificationResponseType.selectedNotification:
-      onNotificationTapped(
-        id,
-        payload,
-      );
-      break;
-
-    case NotificationResponseType.selectedNotificationAction:
-      if (onNotificationActionTappedCallback == null) {
-        return;
-      }
-      final actionId = notificationResponse.actionId;
-      if (actionId == null) {
-        return;
-      }
-
-      onNotificationActionTappedCallback(
-        id,
-        actionId,
-        notificationResponse.input,
-        payload,
-      );
-      break;
-  }
-}
+            if (actionId == doneMemActionId) {
+              if (payload.containsKey(memIdKey)) {
+                final memId = payload[memIdKey];
+                if (memId is int) {
+                  await MemService().doneByMemId(memId);
+                }
+              }
+            } else if (actionId == startActActionId) {
+              final memId = payload[memIdKey];
+              if (memId is int) {
+                await ActService().startBy(memId);
+              }
+            } else if (actionId == finishActiveActActionId) {
+              final memId = payload[memIdKey];
+              if (memId is int) {
+                final act = (await ActRepository().shipActive())
+                    .lastWhere((element) => element.memId == memId);
+                await ActService().finish(act);
+              }
+            }
+            break;
+        }
+      },
+      {
+        'notificationResponseType': details.notificationResponseType,
+        'id': details.id,
+        'actionId': details.actionId,
+        'input': details.input,
+        'payload': details.payload,
+      },
+    );

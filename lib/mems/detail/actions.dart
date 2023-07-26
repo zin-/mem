@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/core/mem_detail.dart';
@@ -52,6 +53,10 @@ final saveMem =
               ref.watch(memDetailProvider(memId)),
             );
 
+            ref
+                .read(rawMemListProvider.notifier)
+                .upsertAll([saved.mem], (tmp, item) => tmp.id == item.id);
+
             ref.read(editingMemProvider(memId).notifier).updatedBy(saved.mem);
             ref
                 .read(memItemsProvider(memId).notifier)
@@ -59,10 +64,6 @@ final saveMem =
             ref
                 .read(memNotificationsProvider(memId).notifier)
                 .updatedBy(saved.notifications);
-
-            ref
-                .read(rawMemListProvider.notifier)
-                .upsertAll([saved.mem], (tmp, item) => tmp.id == item.id);
 
             return saved;
           },
@@ -113,8 +114,8 @@ final removeMem = Provider.autoDispose.family<Future<bool>, int?>(
 
         ref.read(removedMemProvider(memId).notifier).updatedBy(
               ref
-                  .read(memListProvider)
-                  .firstWhere((element) => element.id == memId),
+                  .read(rawMemListProvider)
+                  ?.singleWhereOrNull((element) => element.id == memId),
             );
         ref.read(removedMemItemsProvider(memId).notifier).updatedBy(
               ref.read(memItemsProvider(memId)),

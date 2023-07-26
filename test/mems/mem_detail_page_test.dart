@@ -29,9 +29,6 @@ void main() {
     testWidgets(
       ': name is required.',
       (widgetTester) async {
-        when(mockedNotificationRepository.initialize(any, any))
-            .thenAnswer((realInvocation) => Future.value(null));
-
         await pumpMemDetailPage(widgetTester, null);
 
         await widgetTester.tap(saveFabFinder);

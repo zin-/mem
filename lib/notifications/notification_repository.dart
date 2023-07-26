@@ -5,7 +5,6 @@ import 'package:timezone/data/latest_all.dart';
 import 'package:timezone/timezone.dart';
 
 import 'icons.dart';
-import 'mem_notifications.dart';
 import 'notification/cancel_notification.dart';
 import 'notification/notification.dart';
 import 'notification/one_time_notification.dart';
@@ -15,51 +14,6 @@ import 'wrapper.dart';
 
 class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
   final NotificationsWrapper? _flutterLocalNotificationsWrapper;
-
-  // TODO factoryにする
-  Future<void> initialize(
-    OnNotificationActionTappedCallback notificationActionHandler,
-    Function(int memId)? showMemDetailPage,
-  ) =>
-      v(
-        () async {
-          if (defaultTargetPlatform == TargetPlatform.android) {
-            // ISSUE #225
-// coverage:ignore-start
-            showMemDetailPageHandler(Map<dynamic, dynamic> payload) {
-              if (showMemDetailPage != null && payload.containsKey(memIdKey)) {
-                final memId = payload[memIdKey];
-                if (memId is int) {
-                  showMemDetailPage(memId);
-                }
-              }
-            }
-// coverage:ignore-end
-
-            initializeTimeZones();
-
-            final initialized =
-                await _flutterLocalNotificationsWrapper?.initialize(
-              androidDefaultIconPath,
-              // ISSUE #225
-// coverage:ignore-start
-              (notificationId, payload) => showMemDetailPageHandler(payload),
-// coverage:ignore-end
-              notificationActionHandler,
-            );
-
-            if (initialized ?? false) {
-              await _flutterLocalNotificationsWrapper
-                  ?.receiveOnLaunchAppNotification(
-                // ISSUE #225
-// coverage:ignore-start
-                (notificationId, payload) => showMemDetailPageHandler(payload),
-// coverage:ignore-end
-              );
-            }
-          }
-        },
-      );
 
   @override
   Future<void> receive(
@@ -104,21 +58,24 @@ class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
         payload,
       );
 
-  Future<void> discard(int id) => v(
-        () async => _flutterLocalNotificationsWrapper?.cancel(id),
-        id,
+  Future<void> discard(int notificationId) => v(
+        () async => _flutterLocalNotificationsWrapper?.cancel(notificationId),
+        notificationId,
       );
 
   NotificationRepository._(this._flutterLocalNotificationsWrapper);
 
   static NotificationRepository? _instance;
 
-  factory NotificationRepository() =>
-      _instance ??= _instance = NotificationRepository._(
-        defaultTargetPlatform == TargetPlatform.android
-            ? NotificationsWrapper()
-            : null,
-      );
+  factory NotificationRepository() {
+    initializeTimeZones();
+
+    return _instance ??= _instance = NotificationRepository._(
+      defaultTargetPlatform == TargetPlatform.android
+          ? NotificationsWrapper(androidDefaultIconPath)
+          : null,
+    );
+  }
 
   static void reset(NotificationRepository? notificationRepository) {
     _instance = notificationRepository;

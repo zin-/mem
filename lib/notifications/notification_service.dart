@@ -1,14 +1,11 @@
 import 'dart:convert';
 
-import 'package:mem/acts/act_repository.dart';
-import 'package:mem/acts/act_service.dart';
 import 'package:mem/core/date_and_time/time_of_day.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/mem_service.dart';
-import 'package:mem/notifications/actions.dart';
 
+import 'actions.dart';
 import 'channels.dart';
 import 'mem_notifications.dart';
 import 'notification/cancel_notification.dart';
@@ -93,43 +90,3 @@ class NotificationService {
     return tmp;
   }
 }
-
-// ISSUE #225
-// coverage:ignore-start
-Future<void> notificationActionHandler(
-  int notificationId,
-  String actionId,
-  String? input,
-  Map<dynamic, dynamic> payload,
-) =>
-    v(
-      () async {
-        if (actionId == doneMemActionId) {
-          if (payload.containsKey(memIdKey)) {
-            final memId = payload[memIdKey];
-            if (memId is int) {
-              await MemService().doneByMemId(memId);
-            }
-          }
-        } else if (actionId == startActActionId) {
-          final memId = payload[memIdKey];
-          if (memId is int) {
-            await ActService().startBy(memId);
-          }
-        } else if (actionId == finishActiveActActionId) {
-          final memId = payload[memIdKey];
-          if (memId is int) {
-            final act = (await ActRepository().shipActive())
-                .lastWhere((element) => element.memId == memId);
-            await ActService().finish(act);
-          }
-        }
-      },
-      {
-        'id': notificationId,
-        'actionId': actionId,
-        'input': input,
-        'payload': payload
-      },
-    );
-// coverage:ignore-end
