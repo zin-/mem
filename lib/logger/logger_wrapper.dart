@@ -14,8 +14,8 @@ class LoggerWrapper {
       _logger.log(
         level._transform(),
         message,
-        error,
-        stackTrace,
+        error: error,
+        stackTrace: stackTrace,
       );
 
   LoggerWrapper([bool enableSimpleMode = false])
@@ -37,7 +37,7 @@ class _LogPrinter extends PrettyPrinter {
         );
 
   @override
-  String? formatStackTrace(StackTrace? stackTrace, int methodCount) {
+  String? formatStackTrace(StackTrace? stackTrace, int? methodCount) {
     return super.formatStackTrace(
       StackTrace.fromString(stackTrace
           .toString()
@@ -62,8 +62,8 @@ class _SimplePrinter extends SimplePrinter {
                 !line.contains('package:logger'),
           ).first)?.group(1) ?? '???'}'
       ' ${event.message}',
-      event.error,
-      event.stackTrace,
+      error: event.error,
+      stackTrace: event.stackTrace,
     ));
   }
 }
@@ -72,7 +72,7 @@ extension on log_entity.Level {
   Level _transform() {
     switch (this) {
       case log_entity.Level.verbose:
-        return Level.verbose;
+        return Level.trace;
       case log_entity.Level.debug:
         return Level.debug;
       case log_entity.Level.info:
