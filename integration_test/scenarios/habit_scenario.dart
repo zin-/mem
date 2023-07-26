@@ -6,13 +6,10 @@ import 'package:mem/database/table_definitions/mem_repeated_notifications.dart';
 import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/database_manager.dart';
-import 'package:mem/logger/log_entity.dart';
-import 'package:mem/logger/log_service.dart';
 
 import 'helpers.dart';
 
 void main() {
-  LogService.initialize(Level.verbose);
   testHabitScenario();
 }
 
@@ -69,7 +66,7 @@ void testHabitScenario() => group(': $_scenarioName', () {
           timeText(pickTime),
         );
         await widgetTester.tap(saveMemFabFinder);
-        await widgetTester.pump();
+        await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
         await widgetTester.tap(timeIconFinder);
         await widgetTester.pump();
@@ -80,41 +77,40 @@ void testHabitScenario() => group(': $_scenarioName', () {
         await widgetTester.tap(saveMemFabFinder);
         await widgetTester.pumpAndSettle();
 
-        await Future(() async {
-          late final Map<String, dynamic> inserted;
+        await Future.delayed(
+          waitSideEffectDuration,
+          () async {
+            late final Map<String, dynamic> inserted;
 
-          await expectLater(
-            inserted = (await db
-                    .getTable(memRepeatedNotificationTableDefinition.name)
-                    .select(
-              whereString: '${memIdFkDef.name} = ?',
-              whereArgs: [insertedMemId],
-            ))
-                .single,
-            isNotNull,
-          );
-          final timeOfDay = TimeOfDay.fromDateTime(pickTime);
-          await expectLater(
-            inserted[timeOfDaySecondsColDef.name],
-            ((timeOfDay.hour * 60) + timeOfDay.minute) * 60,
-          );
-          await expectLater(
-            inserted[createdAtColDef.name],
-            isNotNull,
-          );
-          await expectLater(
-            inserted[updatedAtColDef.name],
-            isNotNull,
-          );
-          await expectLater(
-            inserted[archivedAtColDef.name],
-            isNull,
-          );
-          await expectLater(
-            inserted[memIdFkDef.name],
-            insertedMemId,
-          );
-        });
+            await expectLater(
+              inserted = (await db
+                      .getTable(memRepeatedNotificationTableDefinition.name)
+                      .select(
+                whereString: '${memIdFkDef.name} = ?',
+                whereArgs: [insertedMemId],
+              ))
+                  .single,
+              isNotNull,
+            );
+            final timeOfDay = TimeOfDay.fromDateTime(pickTime);
+            await expectLater(
+              [
+                inserted[timeOfDaySecondsColDef.name],
+                inserted[createdAtColDef.name],
+                inserted[updatedAtColDef.name],
+                inserted[archivedAtColDef.name],
+                inserted[memIdFkDef.name],
+              ],
+              [
+                ((timeOfDay.hour * 60) + timeOfDay.minute) * 60,
+                isNotNull,
+                isNotNull,
+                isNull,
+                insertedMemId,
+              ],
+            );
+          },
+        );
       });
 
       testWidgets(': Unset repeated notification.', (widgetTester) async {
@@ -142,15 +138,16 @@ void testHabitScenario() => group(': $_scenarioName', () {
         await widgetTester.tap(saveMemFabFinder);
         await widgetTester.pumpAndSettle();
 
-        await Future(
+        await Future.delayed(
+          waitSideEffectDuration,
           () async {
-            final memRepeatedNotifications = (await db
+            final memNotifications = (await db
                 .getTable(memRepeatedNotificationTableDefinition.name)
                 .select(
               whereString: '${memIdFkDef.name} = ?',
               whereArgs: [withRepeatedMemId],
             ));
-            await expectLater(memRepeatedNotifications.length, 0);
+            await expectLater(memNotifications.length, 0);
           },
         );
       });

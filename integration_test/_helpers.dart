@@ -17,8 +17,6 @@ import 'package:mem/mems/mem_service.dart';
 
 import 'scenarios/helpers.dart';
 
-const defaultDuration = Duration(seconds: 1);
-
 Future clearDatabase() async {
   // FIXME openしないとdeleteできないのは、実際のDatabaseと挙動が異なる
   // 今の実装だと難しいっぽい。いつかチャレンジする
