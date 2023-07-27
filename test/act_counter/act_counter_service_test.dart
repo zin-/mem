@@ -137,7 +137,7 @@ void main() {
           .thenAnswer((realInvocation) => Future.value(true));
 
       when(mockedNotificationWrapper.cancel(any))
-          .thenAnswer((realInvocation) => null);
+          .thenAnswer((realInvocation) => Future.value(null));
 
       await actCounterService.increment(memId, now);
 

@@ -1,6 +1,5 @@
 // coverage:ignore-file
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -59,25 +58,21 @@ class NotificationsWrapper {
     NotificationInterval? interval,
   ]) =>
       v(
-        () async {
-          if (Platform.isAndroid) {
-            return _flutterLocalNotificationsPlugin.zonedSchedule(
-              id,
-              title,
-              body,
-              tzDateTime,
-              _buildNotificationDetails(
-                channel,
-                actions,
-              ),
-              uiLocalNotificationDateInterpretation:
-                  UILocalNotificationDateInterpretation.absoluteTime,
-              androidScheduleMode: AndroidScheduleMode.exact,
-              payload: payload,
-              matchDateTimeComponents: interval?.convert(),
-            );
-          }
-        },
+        () => _flutterLocalNotificationsPlugin.zonedSchedule(
+          id,
+          title,
+          body,
+          tzDateTime,
+          _buildNotificationDetails(
+            channel,
+            actions,
+          ),
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.absoluteTime,
+          androidScheduleMode: AndroidScheduleMode.exact,
+          payload: payload,
+          matchDateTimeComponents: interval?.convert(),
+        ),
         {
           'id': id,
           'title': title,
@@ -88,15 +83,9 @@ class NotificationsWrapper {
         },
       );
 
-  cancel(int id) => v(
-        () {
-          if (Platform.isAndroid) {
-            _flutterLocalNotificationsPlugin.cancel(id);
-          }
-        },
-        {
-          'id': id,
-        },
+  Future<void> cancel(int notificationId) => v(
+        () => _flutterLocalNotificationsPlugin.cancel(notificationId),
+        {'notificationId': notificationId},
       );
 
   NotificationDetails _buildNotificationDetails(
