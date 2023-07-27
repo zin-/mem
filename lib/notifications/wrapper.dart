@@ -1,4 +1,3 @@
-// coverage:ignore-file
 import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
