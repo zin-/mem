@@ -10,16 +10,6 @@ class MemEntity extends DatabaseTupleEntity {
   final DateTime? endOn;
   final DateTime? endAt;
 
-  MemEntity(
-    this.name, {
-    this.doneAt,
-    this.notifyOn,
-    this.notifyAt,
-    this.endOn,
-    this.endAt,
-    int? super.id,
-  });
-
   MemEntity.fromMap(Map<String, dynamic> valueMap)
       : name = valueMap[defMemName.name],
         doneAt = valueMap[defMemDoneAt.name],

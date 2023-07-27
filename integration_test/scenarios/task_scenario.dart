@@ -60,12 +60,15 @@ void testTaskScenario() => group(': $scenarioName', () {
           await widgetTester.tap(calendarIconFinder.at(0));
           await widgetTester.pumpAndSettle();
 
+          await widgetTester.tap(find.byIcon(Icons.chevron_right).at(0));
+          await widgetTester.pumpAndSettle();
+
           const pickingStartDate = 1;
           await widgetTester.tap(find.text('$pickingStartDate'));
           await widgetTester.tap(find.text('OK'));
           await widgetTester.pumpAndSettle();
 
-          final startDate = '${now.month}/$pickingStartDate/${now.year}';
+          final startDate = '${now.month + 1}/$pickingStartDate/${now.year}';
           expect(
             (widgetTester.widget(find.byType(TextFormField).at(1))
                     as TextFormField)
@@ -102,7 +105,7 @@ void testTaskScenario() => group(': $scenarioName', () {
           await widgetTester.pumpAndSettle();
 
           final endDate =
-              dateText(DateTime(now.year, now.month + 1, pickingEndDate));
+              dateText(DateTime(now.year, now.month + 2, pickingEndDate));
           expect(
             (widgetTester.widget(find.byType(TextFormField).at(3))
                     as TextFormField)

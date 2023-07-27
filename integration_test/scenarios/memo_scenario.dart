@@ -277,8 +277,8 @@ void testMemoScenario() => group(
             await widgetTester.pumpAndSettle();
 
             await widgetTester.tap(find.text('OK'));
-            await Future.delayed(defaultTransitionDuration);
-            await widgetTester.pumpAndSettle();
+            await Future.delayed(waitSideEffectDuration);
+            await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
             expect(
               find.text('Remove success. $insertedMemName'),
@@ -286,7 +286,7 @@ void testMemoScenario() => group(
             );
             expect(find.text(insertedMemName), findsNothing);
             await widgetTester.tap(find.byIcon(Icons.filter_list));
-            await widgetTester.pump();
+            await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
             await widgetTester.tap(find.byType(Switch).at(1));
             await widgetTester.tap(find.byType(Switch).at(3));
