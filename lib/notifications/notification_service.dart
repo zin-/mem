@@ -77,16 +77,8 @@ class NotificationService {
 
   static NotificationService? _instance;
 
-  factory NotificationService({
-    NotificationRepository? notificationRepository,
-  }) {
-    var tmp = _instance;
-    if (tmp == null) {
-      tmp = NotificationService._(
-        notificationRepository ?? NotificationRepository(),
+  factory NotificationService() =>
+      _instance ??= _instance = NotificationService._(
+        NotificationRepository(),
       );
-      _instance = tmp;
-    }
-    return tmp;
-  }
 }
