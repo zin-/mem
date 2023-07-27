@@ -7,3 +7,9 @@ const finishActiveActActionId = 'finish-active_act';
 late final NotificationAction doneMemAction;
 late final NotificationAction startActAction;
 late final NotificationAction finishActiveActAction;
+
+final notificationActions = [
+  doneMemAction,
+  startActAction,
+  finishActiveActAction,
+];

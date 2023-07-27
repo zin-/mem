@@ -4,16 +4,13 @@ import 'dart:io';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:mem/acts/act_repository.dart';
-import 'package:mem/acts/act_service.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
-import 'package:mem/mems/mem_service.dart';
-import 'package:mem/notifications/actions.dart';
-import 'package:mem/notifications/mem_notifications.dart';
 import 'package:timezone/timezone.dart';
 
+import 'actions.dart';
 import 'channels.dart';
+import 'mem_notifications.dart';
 import 'notification/action.dart';
 import 'notification/channel.dart';
 import 'notification/repeated_notification.dart';
@@ -197,25 +194,12 @@ void onDidReceiveNotificationResponse(NotificationResponse details) => i(
               return;
             }
 
-            // TODO それぞれのactionの処理はaction側で定義したい
-            if (actionId == doneMemActionId) {
-              if (payload.containsKey(memIdKey)) {
-                final memId = payload[memIdKey];
-                if (memId is int) {
-                  await MemService().doneByMemId(memId);
-                }
-              }
-            } else if (actionId == startActActionId) {
+            if (payload.containsKey(memIdKey)) {
               final memId = payload[memIdKey];
               if (memId is int) {
-                await ActService().startBy(memId);
-              }
-            } else if (actionId == finishActiveActActionId) {
-              final memId = payload[memIdKey];
-              if (memId is int) {
-                final act = (await ActRepository().shipActive())
-                    .lastWhere((element) => element.memId == memId);
-                await ActService().finish(act);
+                await notificationActions
+                    .singleWhere((element) => element.id == actionId)
+                    .onTapped(memId);
               }
             }
             break;
