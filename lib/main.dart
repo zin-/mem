@@ -36,6 +36,7 @@ Future<void> _run(Widget home, {String? languageCode}) => i(
       [home, languageCode],
     );
 
+// FIXME Databaseに関わるRepositoryの初期化処理で勝手に読み込まれるべき
 Future<void> openDatabase() async {
   final database = await DatabaseManager().open(databaseDefinition);
 
@@ -53,6 +54,7 @@ Future<void> openDatabase() async {
   );
 }
 
+// FIXME HomeWidget関連の処理、場所が適切ではない
 const uriSchema = 'mem';
 const appId = 'zin.playground.mem';
 const actCounter = 'act_counters';
