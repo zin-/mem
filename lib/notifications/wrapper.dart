@@ -121,8 +121,6 @@ class NotificationsWrapper {
       );
 
   NotificationsWrapper._(
-    // onNotificationTappedBackgroundで直接参照するしか無いので、
-    // ここで引数にすることに意味がない？
     String androidDefaultIconPath,
   ) {
     i(
@@ -131,11 +129,7 @@ class NotificationsWrapper {
           InitializationSettings(
             android: AndroidInitializationSettings(androidDefaultIconPath),
           ),
-          // アプリが起動中はこっちが呼ばれる
-          // つまりdatabaseやRepositoryの初期化が不要（済んでいる）
           onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
-          // アプリが起動中でない場合はこちらが呼ばれる
-          // つまりもろもろの初期化が必要
           onDidReceiveBackgroundNotificationResponse:
               onDidReceiveNotificationResponse,
         );
@@ -203,6 +197,7 @@ void onDidReceiveNotificationResponse(NotificationResponse details) => i(
               return;
             }
 
+            // TODO それぞれのactionの処理はaction側で定義したい
             if (actionId == doneMemActionId) {
               if (payload.containsKey(memIdKey)) {
                 final memId = payload[memIdKey];
