@@ -16,6 +16,7 @@ late final NotificationChannel repeatedReminderChannel;
 late final NotificationChannel activeActNotificationChannel;
 late final NotificationChannel afterActStartedNotificationChannel;
 
+// TODO repository（かな？service？）の初期化のタイミングでこれも初期化したい
 void prepareNotifications([BuildContext? context]) => i(
       () {
         if (!_initialized) {
