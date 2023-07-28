@@ -15,6 +15,10 @@ import 'wrapper.dart';
 class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
   final NotificationsWrapper? _flutterLocalNotificationsWrapper;
 
+  Future<bool?> checkNotification() => v(
+        () async => _flutterLocalNotificationsWrapper?.handleAppLaunchDetails(),
+      );
+
   @override
   Future<void> receive(
     Notification payload,

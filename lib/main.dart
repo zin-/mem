@@ -18,27 +18,40 @@ import 'package:mem/mems/list/page.dart';
 import 'package:mem/mems/mem_notification_repository.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/notifications/channels.dart';
+import 'package:mem/notifications/notification_repository.dart';
 
 Future<void> main({String? languageCode}) => i(
-      () => _runApplication(const MemListPage(), languageCode: languageCode),
+      () async {
+        WidgetsFlutterBinding.ensureInitialized();
+
+        await NotificationRepository().checkNotification();
+
+        return _runApplication(const MemListPage(), languageCode: languageCode);
+      },
       {'languageCode': languageCode},
     );
 
 @pragma('vm:entry-point')
 Future<void> launchMemDetailPage(int memId) => i(
-      () => _runApplication(MemDetailPage(memId)),
+      () {
+        WidgetsFlutterBinding.ensureInitialized();
+
+        return _runApplication(MemDetailPage(memId));
+      },
       {'memId': memId},
     );
 
 @pragma('vm:entry-point')
 Future<void> launchActCounterConfigure() => i(
-      () => _runApplication(const ActCounterConfigure()),
+      () {
+        WidgetsFlutterBinding.ensureInitialized();
+
+        return _runApplication(const ActCounterConfigure());
+      },
     );
 
 Future<void> _runApplication(Widget home, {String? languageCode}) => i(
       () async {
-        WidgetsFlutterBinding.ensureInitialized();
-
         await openDatabase();
         initializeActCounter();
 

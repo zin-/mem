@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
@@ -16,6 +17,8 @@ import 'notification/repeated_notification.dart';
 class NotificationsWrapper {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
+
+  late final Future<bool?> _pluginIsInitialized;
 
   Future<void> show(
     int id,
@@ -105,12 +108,35 @@ class NotificationsWrapper {
         ),
       );
 
+  Future<bool> handleAppLaunchDetails() => v(
+        () async => _pluginIsInitialized.then((value) async {
+          final appLaunchDetails = await _flutterLocalNotificationsPlugin
+              .getNotificationAppLaunchDetails();
+
+          if (appLaunchDetails?.didNotificationLaunchApp == false) {
+            return false;
+          }
+// アプリが停止状態で、通知から起動される必要があるため現状テストする方法がない
+// coverage:ignore-start
+          final details = appLaunchDetails?.notificationResponse;
+
+          if (details == null) {
+            return false;
+          }
+
+          onDidReceiveNotificationResponse(details);
+
+          return true;
+// coverage:ignore-end
+        }),
+      );
+
   NotificationsWrapper._(
     String androidDefaultIconPath,
   ) {
     i(
       () {
-        _flutterLocalNotificationsPlugin.initialize(
+        _pluginIsInitialized = _flutterLocalNotificationsPlugin.initialize(
           InitializationSettings(
             android: AndroidInitializationSettings(androidDefaultIconPath),
           ),
@@ -150,7 +176,8 @@ extension on NotificationInterval {
 // NotificationResponseがライブラリの型なので、ここで定義する
 // ライブラリから呼び出されるentry-pointなのでprivateにすることもできない
 @pragma('vm:entry-point')
-void onDidReceiveNotificationResponse(NotificationResponse details) => i(
+Future<void> onDidReceiveNotificationResponse(NotificationResponse details) =>
+    i(
       () async {
         WidgetsFlutterBinding.ensureInitialized();
 

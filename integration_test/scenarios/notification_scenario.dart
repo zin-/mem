@@ -55,7 +55,7 @@ void testNotificationScenario() => group(": $_scenarioName", () {
             payload: json.encode({memIdKey: insertedMemId}),
           );
 
-          onDidReceiveNotificationResponse(details);
+          await onDidReceiveNotificationResponse(details);
 
           await Future.delayed(
             defaultTransitionDuration,
@@ -85,7 +85,7 @@ void testNotificationScenario() => group(": $_scenarioName", () {
               actionId: doneMemActionId,
             );
 
-            onDidReceiveNotificationResponse(details);
+            await onDidReceiveNotificationResponse(details);
 
             await Future.delayed(
               waitSideEffectDuration,
@@ -136,7 +136,7 @@ void testNotificationScenario() => group(": $_scenarioName", () {
               actionId: startActActionId,
             );
 
-            onDidReceiveNotificationResponse(details);
+            await onDidReceiveNotificationResponse(details);
 
             await Future.delayed(
               waitSideEffectDuration,
@@ -185,7 +185,7 @@ void testNotificationScenario() => group(": $_scenarioName", () {
               actionId: finishActiveActActionId,
             );
 
-            onDidReceiveNotificationResponse(details);
+            await onDidReceiveNotificationResponse(details);
 
             await Future.delayed(
               waitSideEffectDuration,
