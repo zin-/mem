@@ -48,15 +48,20 @@ class LogService {
     bool autoDebug = false,
   }) {
     final tmpPrefixes = prefixes ?? [];
+
     if (target is Future) {
       _futureLog(level, target, tmpPrefixes);
     } else {
       if (autoDebug || _shouldLog(level)) {
+        Level tmpLevel = level;
+
         if (autoDebug || _DebugLoggableFunction._debug) {
           tmpPrefixes.insert(0, '** [AUTO DEBUG] ** ');
+          tmpLevel = Level.debug;
         }
+
         _repository.receive(Log(
-          level,
+          tmpLevel,
           [
             tmpPrefixes.join(),
             target ?? 'no message.',

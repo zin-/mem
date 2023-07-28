@@ -258,7 +258,7 @@ void main() {
               [
                 Level.debug,
                 '[start] :: $args',
-                Level.verbose,
+                Level.debug,
                 '** [AUTO DEBUG] ** verbose log',
                 Level.debug,
                 '[end] => ${sampleFunc(arg1, arg2)}',
@@ -299,7 +299,7 @@ void main() {
                   '[start] :: $args',
                   Level.debug,
                   '[end] => ${sampleFunc(arg1, arg2)}',
-                  Level.verbose,
+                  Level.debug,
                   '** [AUTO DEBUG] ** [future] >> future verbose log',
                 ],
               );
@@ -347,9 +347,9 @@ void main() {
               [
                 Level.debug,
                 '[start] :: [2, 3]',
-                Level.verbose,
+                Level.debug,
                 '** [AUTO DEBUG] ** [start] :: {c: 2, d: 3}',
-                Level.verbose,
+                Level.debug,
                 '** [AUTO DEBUG] ** [end] => 6',
                 Level.debug,
                 '[end] => 8',
@@ -396,7 +396,7 @@ void main() {
                 [
                   Level.debug,
                   '[start] :: [2, 3]',
-                  Level.verbose,
+                  Level.debug,
                   '** [AUTO DEBUG] ** [start] :: {c: 2, d: 3}',
                   Level.debug,
                   '[end] => 5',
@@ -520,7 +520,7 @@ void main() {
                 [
                   Level.debug,
                   '[start] :: [1, 2]',
-                  Level.verbose,
+                  Level.debug,
                   '** [AUTO DEBUG] ** [future] >> future verbose log',
                   Level.debug,
                   '[end] => [future] >> 3',
@@ -570,9 +570,9 @@ void main() {
                 [
                   Level.debug,
                   '[start] :: [2, 3]',
-                  Level.verbose,
+                  Level.debug,
                   '** [AUTO DEBUG] ** [start] :: {c: 2, d: 3}',
-                  Level.verbose,
+                  Level.debug,
                   '** [AUTO DEBUG] ** [end] => [future] >> 6',
                   Level.debug,
                   '[end] => [future] >> 8',
