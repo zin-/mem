@@ -57,7 +57,7 @@ class NotificationService {
               memRepeatedNotificationId(mem.id),
               mem.name,
               memNotification.message,
-              json.encode({'memId': memNotification.memId}),
+              json.encode({memIdKey: memNotification.memId}),
               [
                 startActAction,
                 finishActiveActAction,
