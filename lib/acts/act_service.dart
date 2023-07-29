@@ -23,9 +23,54 @@ class ActService {
   // FIXME ここに定義されるのはおかしい
   final NotificationClient _notificationClient;
 
+  Future<Act> startV2(Act startingAct) => i(
+        () async {
+          final receivedAct = await _actRepository.receive(startingAct);
+
+          final mem = await _memRepository.shipById(startingAct.memId);
+
+          _notificationRepository.receive(
+            ShowNotification(
+              activeActNotificationId(startingAct.memId),
+              mem.name,
+              'Running',
+              json.encode({memIdKey: startingAct.memId}),
+              [
+                _notificationClient.finishActiveActAction,
+              ],
+              _notificationClient.activeActNotificationChannel,
+            ),
+          );
+
+          final afterActStartedNotifications = await _memNotificationRepository
+              .shipByMemIdAndAfterActStarted(startingAct.memId);
+
+          if (afterActStartedNotifications.isNotEmpty) {
+            for (var notification in afterActStartedNotifications) {
+              _notificationRepository.receive(
+                OneTimeNotification(
+                  afterActStartedNotificationId(startingAct.memId),
+                  mem.name,
+                  notification.message,
+                  json.encode({memIdKey: startingAct.memId}),
+                  [
+                    _notificationClient.finishActiveActAction,
+                  ],
+                  _notificationClient.afterActStartedNotificationChannel,
+                  DateTime.now().add(Duration(seconds: notification.time!)),
+                ),
+              );
+            }
+          }
+
+          return receivedAct;
+        },
+        startingAct,
+      );
+
   Future<Act> startBy(int memId) => i(
         () async {
-          final received = await _actRepository.receive(
+          final receivedAct = await _actRepository.receive(
             Act(
               memId,
               DateAndTimePeriod.startNow(),
@@ -34,7 +79,7 @@ class ActService {
 
           final mem = await _memRepository.shipById(memId);
 
-          await _notificationRepository.receive(
+          _notificationRepository.receive(
             ShowNotification(
               activeActNotificationId(memId),
               mem.name,
@@ -52,7 +97,7 @@ class ActService {
 
           if (afterActStartedNotifications.isNotEmpty) {
             for (var notification in afterActStartedNotifications) {
-              await _notificationRepository.receive(
+              _notificationRepository.receive(
                 OneTimeNotification(
                   afterActStartedNotificationId(memId),
                   mem.name,
@@ -68,7 +113,7 @@ class ActService {
             }
           }
 
-          return received;
+          return receivedAct;
         },
         memId,
       );

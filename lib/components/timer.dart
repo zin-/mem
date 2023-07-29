@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:mem/logger/log_service.dart';
 
+const elapsePeriod = Duration(seconds: 1);
+
 class ElapsedTimeView extends StatefulWidget {
   final DateTime _start;
 
@@ -20,7 +22,7 @@ class _ElapsedTimeState extends State<ElapsedTimeView> {
   void initState() {
     super.initState();
     _timer = Timer.periodic(
-      const Duration(seconds: 1),
+      elapsePeriod,
       (timer) {
         setState(() {
           elapsedTime = DateTime.now().difference(widget._start);
@@ -39,8 +41,8 @@ class _ElapsedTimeState extends State<ElapsedTimeView> {
 
   @override
   void dispose() {
-    super.dispose();
     _timer?.cancel();
+    super.dispose();
   }
 }
 

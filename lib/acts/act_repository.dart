@@ -2,7 +2,6 @@ import 'package:mem/acts/act_entity.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
-import 'package:mem/core/errors.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/database/table_definitions/acts.dart';
 import 'package:mem/framework/database/database.dart';
@@ -83,18 +82,8 @@ class ActRepository extends DatabaseTupleRepository<ActEntity, Act> {
 
   static ActRepository? _instance;
 
-  factory ActRepository([Table? table]) {
-    var tmp = _instance;
-
-    if (tmp == null) {
-      if (table == null) {
-        throw InitializationError();
-      }
-      _instance = tmp = ActRepository._(table);
-    }
-
-    return tmp;
-  }
+  factory ActRepository([Table? table]) =>
+      _instance ??= ActRepository._(table!);
 
   static resetWith(ActRepository? instance) => _instance = instance;
 }

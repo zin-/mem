@@ -55,9 +55,15 @@ class MemListItemView extends ConsumerWidget {
               (activeAct) => v(
                 () async {
                   if (activeAct == null) {
-                    ref.read(startAct(_memId));
+                    ref
+                        .read(activeActsProvider.notifier)
+                        .add(ref.read(startActV2(_memId)));
                   } else {
-                    ref.read(finishAct(activeAct));
+                    ref.read(activeActsProvider.notifier).removeWhere(
+                          (element) =>
+                              element.id ==
+                              ref.read(finishActV2(activeAct.memId)).id,
+                        );
                   }
                 },
                 activeAct,

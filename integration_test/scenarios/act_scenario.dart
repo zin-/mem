@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:mem/components/timer.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/database/table_definitions/acts.dart';
 import 'package:mem/database/table_definitions/base.dart';
@@ -19,12 +20,12 @@ void main() {
   testActScenario();
 }
 
-const scenarioName = 'Act scenario';
+const _scenarioName = 'Act scenario';
 
-void testActScenario() => group(': $scenarioName', () {
+void testActScenario() => group(': $_scenarioName', () {
       final showActPageIconFinder = find.byIcon(Icons.play_arrow);
 
-      const insertedMemName = '$scenarioName: saved mem name';
+      const insertedMemName = '$_scenarioName: saved mem name';
 
       late final Database db;
       late final int insertedMemId;
@@ -44,7 +45,7 @@ void testActScenario() => group(': $scenarioName', () {
           memNotificationTypeColDef.name:
               MemNotificationType.afterActStarted.name,
           memNotificationMessageColDef.name:
-              '$scenarioName: mem notification message',
+              '$_scenarioName: mem notification message',
           createdAtColDef.name: DateTime.now(),
         });
       });
@@ -239,29 +240,18 @@ void testActScenario() => group(': $scenarioName', () {
           expect(stopIconFinder, findsNothing);
 
           await widgetTester.tap(startIconFinder.at(1));
-          await widgetTester.pumpAndSettle();
+          await widgetTester.pump();
 
-          // 時間経過により、'00:00:00'ではない場合が多発しているため
-          // キャッチして'00:00:01'でないか確認している
-          // FIXME 他の良い方法がないか調べる
-          try {
-            expect(
-              (widgetTester.widget(find.byType(Text).at(2)) as Text).data,
-              '00:00:00',
-            );
-          } on TestFailure {
-            expect(
-              (widgetTester.widget(find.byType(Text).at(2)) as Text).data,
-              '00:00:01',
-            );
-          }
+          expect(
+            (widgetTester.widget(find.byType(Text).at(2)) as Text).data,
+            '00:00:00',
+          );
           expect(startIconFinder, findsOneWidget);
           expect(stopIconFinder, findsOneWidget);
-          await widgetTester.pump(const Duration(seconds: 1));
+          await widgetTester.pump(elapsePeriod);
 
           expect(find.text('00:00:00'), findsNothing);
           await widgetTester.tap(startIconFinder);
-          await Future.delayed(defaultTransitionDuration);
           await widgetTester.pumpAndSettle();
 
           expect(startIconFinder, findsNothing);
