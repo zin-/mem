@@ -16,7 +16,24 @@ late final NotificationChannel repeatedReminderChannel;
 late final NotificationChannel activeActNotificationChannel;
 late final NotificationChannel afterActStartedNotificationChannel;
 
-// TODO repository（かな？service？）の初期化のタイミングでこれも初期化したい
+/// TODO repository（かな？service？）の初期化のタイミングでこれも初期化したい
+///  Serviceへの参照があるのでRepositoryではない
+/// Serviceに移動するとなると、BuildContextをどうするかという問題がある
+///   Serviceはバックエンドに持っていく可能性があるので、BuildContextを参照したくない
+///     そもそもなんでBuildContextを参照しているのか？
+///       ユーザへの表示をする際に、言語を特定するため
+///         これはServiceの役割ではない
+/// 一時的に（#212）NotificationClientを実装してこの役割を担わせるか？
+/// Clientとした場合にはどうなる？
+///   Repositoryを見るのはOKだろう
+///   BuildContextを見るのもそのために定義するのだしOK
+///   Clientの定義はRepositoryの一種（デバイス側で動作するRepository）という扱い？
+///     データを扱うのはそうで、アルゴリズムを定義するわけではないのでRepositoryとしては合ってる
+///   Repositoryの一種だと考えるとServiceを見るのがNGかも
+///     各Actionの定義でServiceを見るのがおかしいのであれば
+///     Actionをdomainとしてアルゴリズムとして定義してしまえば解決する？
+///       ここ（Client）では文字列の設定のみを行う形
+///       これでいくか
 void prepareNotifications([BuildContext? context]) => i(
       () {
         if (!_initialized) {
