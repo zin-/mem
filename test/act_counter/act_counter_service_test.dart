@@ -9,9 +9,10 @@ import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_entity.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_notification_repository.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
-import 'package:mem/notifications/channels.dart';
+import 'package:mem/notifications/client.dart';
 import 'package:mem/notifications/wrapper.dart';
 import 'package:mockito/mockito.dart';
 
@@ -25,12 +26,16 @@ void main() {
   MemRepository.resetWith(mockedMemRepository);
   final mockedActRepository = MockActRepository();
   ActRepository.resetWith(mockedActRepository);
+  final mockedMemItemRepository = MockMemItemRepository();
+  MemItemRepository.resetWith(mockedMemItemRepository);
+  final mockedMemNotificationRepository = MockMemNotificationRepository();
+  MemNotificationRepository.resetWith(mockedMemNotificationRepository);
+
   final mockedHomeWidgetAccessor = MockHomeWidgetAccessor();
   HomeWidgetAccessor(instance: mockedHomeWidgetAccessor);
   final mockedNotificationWrapper = MockNotificationsWrapper();
   NotificationsWrapper.resetWith(mockedNotificationWrapper);
-  final mockedMemNotificationRepository = MockMemNotificationRepository();
-  MemNotificationRepository.resetWith(mockedMemNotificationRepository);
+
   final actCounterService = ActCounterService();
 
   test(
@@ -101,7 +106,7 @@ void main() {
   test(
     ': increment',
     () async {
-      prepareNotifications();
+      NotificationClient();
 
       final memId = randomInt();
       final now = DateAndTime.now();

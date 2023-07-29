@@ -5,8 +5,7 @@ import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 
-import 'actions.dart';
-import 'channels.dart';
+import 'client.dart';
 import 'mem_notifications.dart';
 import 'notification/cancel_notification.dart';
 import 'notification/repeated_notification.dart';
@@ -15,6 +14,9 @@ import 'notification_repository.dart';
 
 class NotificationService {
   final NotificationRepository _notificationRepository;
+
+  // FIXME ここにあるのはおかしい
+  final NotificationClient _notificationClient;
 
   Future<void> memReminder(Mem mem) => i(
         () async {
@@ -59,10 +61,10 @@ class NotificationService {
               memNotification.message,
               json.encode({memIdKey: memNotification.memId}),
               [
-                startActAction,
-                finishActiveActAction,
+                _notificationClient.startActAction,
+                _notificationClient.finishActiveActAction,
               ],
-              repeatedReminderChannel,
+              _notificationClient.repeatedReminderChannel,
               notifyFirstAt,
               NotificationInterval.perDay,
             );
@@ -73,12 +75,10 @@ class NotificationService {
         {mem, memNotification},
       );
 
-  NotificationService._(this._notificationRepository);
+  NotificationService._(this._notificationRepository, this._notificationClient);
 
   static NotificationService? _instance;
 
-  factory NotificationService() =>
-      _instance ??= _instance = NotificationService._(
-        NotificationRepository(),
-      );
+  factory NotificationService() => _instance ??= _instance =
+      NotificationService._(NotificationRepository(), NotificationClient());
 }

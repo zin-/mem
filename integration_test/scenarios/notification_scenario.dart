@@ -10,7 +10,7 @@ import 'package:mem/database/table_definitions/base.dart';
 import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/database_manager.dart';
-import 'package:mem/notifications/actions.dart';
+import 'package:mem/notifications/client.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification_ids.dart';
 import 'package:mem/notifications/wrapper.dart';
@@ -82,7 +82,7 @@ void testNotificationScenario() => group(": $_scenarioName", () {
                   NotificationResponseType.selectedNotificationAction,
               id: memStartNotificationId(insertedMemId!),
               payload: json.encode({memIdKey: insertedMemId}),
-              actionId: doneMemActionId,
+              actionId: NotificationClient().doneMemAction.id,
             );
 
             await onDidReceiveNotificationResponse(details);
@@ -133,7 +133,7 @@ void testNotificationScenario() => group(": $_scenarioName", () {
                   NotificationResponseType.selectedNotificationAction,
               id: memRepeatedNotificationId(insertedMemId!),
               payload: json.encode({memIdKey: insertedMemId}),
-              actionId: startActActionId,
+              actionId: NotificationClient().startActAction.id,
             );
 
             await onDidReceiveNotificationResponse(details);
@@ -182,7 +182,7 @@ void testNotificationScenario() => group(": $_scenarioName", () {
                   NotificationResponseType.selectedNotificationAction,
               id: memRepeatedNotificationId(insertedMemId!),
               payload: json.encode({memIdKey: insertedMemId}),
-              actionId: finishActiveActActionId,
+              actionId: NotificationClient().finishActiveActAction.id,
             );
 
             await onDidReceiveNotificationResponse(details);

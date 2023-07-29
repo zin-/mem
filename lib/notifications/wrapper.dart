@@ -7,8 +7,7 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
 import 'package:timezone/timezone.dart';
 
-import 'actions.dart';
-import 'channels.dart';
+import 'client.dart';
 import 'mem_notifications.dart';
 import 'notification/action.dart';
 import 'notification/channel.dart';
@@ -182,7 +181,7 @@ Future<void> onDidReceiveNotificationResponse(NotificationResponse details) =>
         WidgetsFlutterBinding.ensureInitialized();
 
         await openDatabase();
-        prepareNotifications();
+        NotificationClient();
 
         final id = details.id;
         if (id == null) {
@@ -212,7 +211,8 @@ Future<void> onDidReceiveNotificationResponse(NotificationResponse details) =>
             if (payload.containsKey(memIdKey)) {
               final memId = payload[memIdKey];
               if (memId is int) {
-                await notificationActions
+                await NotificationClient()
+                    .notificationActions
                     .singleWhere((element) => element.id == actionId)
                     .onTapped(memId);
               }

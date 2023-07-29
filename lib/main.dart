@@ -17,7 +17,7 @@ import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/list/page.dart';
 import 'package:mem/mems/mem_notification_repository.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
-import 'package:mem/notifications/channels.dart';
+import 'package:mem/notifications/client.dart';
 import 'package:mem/notifications/notification_repository.dart';
 
 Future<void> main({String? languageCode}) => i(
@@ -86,7 +86,7 @@ const memIdParamName = 'mem_id';
 
 void backgroundCallback(Uri? uri) => v(
       () async {
-        prepareNotifications();
+        NotificationClient();
 
         if (uri != null && uri.scheme == uriSchema && uri.host == appId) {
           await openDatabase();
