@@ -71,8 +71,6 @@ class _MemListPageComponent extends StatelessWidget {
   }
 }
 
-// TODO 通知から呼び出すのをこれじゃなくする
-//  直接run(MemDetailPage())する
 // FIXME too long
 void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
       () {
