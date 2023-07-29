@@ -12,33 +12,55 @@ import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/database/definition.dart';
 import 'package:mem/components/app.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/mems/detail/page.dart';
 import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/list/page.dart';
 import 'package:mem/mems/mem_notification_repository.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
-import 'package:mem/notifications/channels.dart';
+import 'package:mem/notifications/client.dart';
+import 'package:mem/notifications/notification_repository.dart';
 
-Future<void> main({String? languageCode}) async {
-  run(const MemListPage(), languageCode: languageCode);
-}
-
-@pragma('vm:entry-point')
-Future<void> launchActCounterConfigure() async {
-  run(const ActCounterConfigure());
-}
-
-Future<void> run(Widget home, {String? languageCode}) => i(
+Future<void> main({String? languageCode}) => i(
       () async {
         WidgetsFlutterBinding.ensureInitialized();
 
+        await NotificationRepository().checkNotification();
+
+        return _runApplication(const MemListPage(), languageCode: languageCode);
+      },
+      {'languageCode': languageCode},
+    );
+
+@pragma('vm:entry-point')
+Future<void> launchMemDetailPage(int memId) => i(
+      () {
+        WidgetsFlutterBinding.ensureInitialized();
+
+        return _runApplication(MemDetailPage(memId));
+      },
+      {'memId': memId},
+    );
+
+@pragma('vm:entry-point')
+Future<void> launchActCounterConfigure() => i(
+      () {
+        WidgetsFlutterBinding.ensureInitialized();
+
+        return _runApplication(const ActCounterConfigure());
+      },
+    );
+
+Future<void> _runApplication(Widget home, {String? languageCode}) => i(
+      () async {
         await openDatabase();
         initializeActCounter();
 
         runApp(MemApplication(home, languageCode));
       },
-      {'home': home, 'languageCode': languageCode},
+      [home, languageCode],
     );
 
+// FIXME Databaseに関わるRepositoryの初期化処理で勝手に読み込まれるべき
 Future<void> openDatabase() async {
   final database = await DatabaseManager().open(databaseDefinition);
 
@@ -56,6 +78,7 @@ Future<void> openDatabase() async {
   );
 }
 
+// FIXME HomeWidget関連の処理、場所が適切ではない
 const uriSchema = 'mem';
 const appId = 'zin.playground.mem';
 const actCounter = 'act_counters';
@@ -63,7 +86,7 @@ const memIdParamName = 'mem_id';
 
 void backgroundCallback(Uri? uri) => v(
       () async {
-        prepareNotifications();
+        NotificationClient();
 
         if (uri != null && uri.scheme == uriSchema && uri.host == appId) {
           await openDatabase();

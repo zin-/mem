@@ -8,6 +8,7 @@ import 'package:mem/core/mem_notification.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/components/value_state_notifier.dart';
+import 'package:mem/mems/mem_repository_v2.dart';
 
 final memDetailProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<MemDetail>, MemDetail, int?>(
@@ -27,9 +28,17 @@ final editingMemProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<Mem>, Mem, int?>(
   (ref, memId) => v(
     () {
-      final rawMemList = ref.read(rawMemListProvider);
+      final rawMemList = ref.watch(rawMemListProvider);
       final memFromRawMemList =
           rawMemList?.singleWhereOrNull((element) => element.id == memId);
+
+      if (memId != null && rawMemList == null) {
+        MemRepository().shipById(memId).then((value) {
+          ref
+              .read(rawMemListProvider.notifier)
+              .upsertAll([value], (tmp, item) => tmp.id == item.id);
+        });
+      }
 
       return ValueStateNotifier(
         memFromRawMemList ?? Mem(name: ''),

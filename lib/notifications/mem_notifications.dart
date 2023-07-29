@@ -3,8 +3,7 @@ import 'dart:convert';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/mem.dart';
 
-import 'actions.dart';
-import 'channels.dart';
+import 'client.dart';
 import 'notification/cancel_notification.dart';
 import 'notification/notification.dart';
 import 'notification/one_time_notification.dart';
@@ -66,15 +65,17 @@ class MemNotifications {
     startHourOfDay,
     startMinuteOfDay,
   ) {
+    final notificationClient = NotificationClient();
+
     return OneTimeNotification(
       id,
       title,
       body,
       json.encode({memIdKey: memId}),
       [
-        doneMemAction,
+        notificationClient.doneMemAction,
       ],
-      reminderChannel,
+      notificationClient.reminderChannel,
       notifyAt.isAllDay == true
           ? DateTime(
               notifyAt.year,

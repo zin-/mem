@@ -14,34 +14,15 @@ class MemService {
   final MemItemRepository _memItemRepository;
   final MemNotificationRepository _memNotificationRepository;
   final NotificationService _notificationService;
+  final NotificationRepository _notificationRepository;
 
   MemService._(
     this._memRepository,
     this._memItemRepository,
     this._memNotificationRepository,
     this._notificationService,
+    this._notificationRepository,
   );
-
-  static MemService? _instance;
-
-  factory MemService({
-    MemRepository? memRepository,
-    MemItemRepository? memItemRepository,
-    MemNotificationRepository? memNotificationRepository,
-    NotificationService? notificationService,
-  }) {
-    var tmp = _instance;
-    if (tmp == null) {
-      tmp = MemService._(
-        memRepository ?? MemRepository(),
-        memItemRepository ?? MemItemRepository(),
-        memNotificationRepository ?? MemNotificationRepository(),
-        notificationService ?? NotificationService(),
-      );
-      _instance = tmp;
-    }
-    return tmp;
-  }
 
   Future<MemDetail> save(MemDetail memDetail, {bool undo = false}) => i(
         () async {
@@ -154,15 +135,25 @@ class MemService {
   Future<bool> remove(int memId) => i(
         () async {
           await _memItemRepository.wasteByMemId(memId);
-          await _memRepository.wasteById(memId);
-
           // FIXME 関数内でMemを保持していないためRepositoryを参照している
           // discardされた時点でMemは存在しなくなるため、どちらにせよ無理筋かも
-          NotificationRepository().discard(memId);
+          await _memRepository.wasteById(memId);
+
+          _notificationRepository.discard(memId);
 
           return true;
         },
         {'memId': memId},
+      );
+
+  static MemService? _instance;
+
+  factory MemService() => _instance ??= _instance = MemService._(
+        MemRepository(),
+        MemItemRepository(),
+        MemNotificationRepository(),
+        NotificationService(),
+        NotificationRepository(),
       );
 
   static void reset(MemService? memService) {

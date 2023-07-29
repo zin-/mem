@@ -17,13 +17,13 @@ void main() {
   testTodoScenario();
 }
 
-const scenarioName = 'Todo scenario';
+const _scenarioName = 'Todo scenario';
 
-void testTodoScenario() => group(': $scenarioName', () {
-      const insertedMemName = '$scenarioName - mem name - inserted';
+void testTodoScenario() => group(': $_scenarioName', () {
+      const insertedMemName = '$_scenarioName - mem name - inserted';
 
-      const undoneMemName = '$scenarioName - mem name - inserted - undone';
-      const doneMemName = '$scenarioName - mem name - inserted - done';
+      const undoneMemName = '$_scenarioName - mem name - inserted - undone';
+      const doneMemName = '$_scenarioName - mem name - inserted - done';
 
       late final Database db;
 

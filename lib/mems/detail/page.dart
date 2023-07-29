@@ -7,8 +7,6 @@ import 'package:mem/mems/detail/body.dart';
 import 'package:mem/mems/detail/fab.dart';
 import 'package:mem/mems/detail/menu.dart';
 import 'package:mem/mems/detail/states.dart';
-import 'package:mem/mems/list/page.dart';
-import 'package:mem/mems/mems_action.dart';
 import 'package:mem/values/colors.dart';
 import 'package:mem/values/dimens.dart';
 
@@ -20,15 +18,6 @@ class MemDetailPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
-          // ISSUE #178
-          ref.read(
-            initializeNotification(
-// ISSUE #225
-// coverage:ignore-start
-              (memId) => showMemDetailPage(context, ref, memId),
-// coverage:ignore-end
-            ),
-          );
           final memIsArchived = ref.watch(memIsArchivedProvider(_memId));
 
           return _MemDetailPageComponent(

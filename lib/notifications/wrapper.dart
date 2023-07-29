@@ -1,98 +1,23 @@
-// coverage:ignore-file
+import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
-import 'package:mem/notifications/channels.dart';
-import 'package:mem/notifications/notification_service.dart';
 import 'package:timezone/timezone.dart';
 
+import 'client.dart';
+import 'mem_notifications.dart';
 import 'notification/action.dart';
 import 'notification/channel.dart';
 import 'notification/repeated_notification.dart';
-
-typedef OnNotificationTappedCallback = Function(
-  int id,
-  Map<dynamic, dynamic> payload,
-);
-typedef OnNotificationActionTappedCallback = Function(
-  int id,
-  String actionId,
-  String? input,
-  Map<dynamic, dynamic> payload,
-);
 
 class NotificationsWrapper {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  Future<bool> initialize(
-    String androidDefaultIconPath,
-    OnNotificationTappedCallback onNotificationTappedCallback,
-    OnNotificationActionTappedCallback? onNotificationActionTappedCallback,
-  ) =>
-      v(
-        () async {
-          return (await _flutterLocalNotificationsPlugin.initialize(
-                InitializationSettings(
-                  android:
-                      AndroidInitializationSettings(androidDefaultIconPath),
-                ),
-                onDidReceiveNotificationResponse: (details) =>
-                    _notificationResponseHandler(
-                  details,
-                  onNotificationTappedCallback,
-                  onNotificationActionTappedCallback,
-                ),
-                onDidReceiveBackgroundNotificationResponse:
-                    onNotificationTappedBackground,
-              )) ==
-              true;
-        },
-        {
-          'androidDefaultIconPath': androidDefaultIconPath,
-          'onNotificationTappedCallback': onNotificationTappedCallback,
-          'onNotificationActionTappedCallback':
-              onNotificationActionTappedCallback,
-        },
-      );
-
-  Future<void> receiveOnLaunchAppNotification(
-    OnNotificationTappedCallback onNotificationTapped,
-  ) =>
-      v(
-        () async {
-          if (Platform.isAndroid) {
-            final notificationAppLaunchDetails =
-                await _flutterLocalNotificationsPlugin
-                    .getNotificationAppLaunchDetails();
-
-            if (notificationAppLaunchDetails?.didNotificationLaunchApp ==
-                false) {
-              return;
-            }
-
-            final notificationResponse =
-                notificationAppLaunchDetails?.notificationResponse;
-
-            if (notificationResponse == null) {
-              return;
-            }
-
-            _notificationResponseHandler(
-              notificationResponse,
-              onNotificationTapped,
-              null,
-            );
-          }
-        },
-        {
-          'onNotificationTapped': onNotificationTapped,
-        },
-      );
+  late final Future<bool?> _pluginIsInitialized;
 
   Future<void> show(
     int id,
@@ -134,25 +59,21 @@ class NotificationsWrapper {
     NotificationInterval? interval,
   ]) =>
       v(
-        () async {
-          if (Platform.isAndroid) {
-            return _flutterLocalNotificationsPlugin.zonedSchedule(
-              id,
-              title,
-              body,
-              tzDateTime,
-              _buildNotificationDetails(
-                channel,
-                actions,
-              ),
-              uiLocalNotificationDateInterpretation:
-                  UILocalNotificationDateInterpretation.absoluteTime,
-              androidScheduleMode: AndroidScheduleMode.exact,
-              payload: payload,
-              matchDateTimeComponents: interval?.convert(),
-            );
-          }
-        },
+        () => _flutterLocalNotificationsPlugin.zonedSchedule(
+          id,
+          title,
+          body,
+          tzDateTime,
+          _buildNotificationDetails(
+            channel,
+            actions,
+          ),
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.absoluteTime,
+          androidScheduleMode: AndroidScheduleMode.exact,
+          payload: payload,
+          matchDateTimeComponents: interval?.convert(),
+        ),
         {
           'id': id,
           'title': title,
@@ -163,15 +84,9 @@ class NotificationsWrapper {
         },
       );
 
-  cancel(int id) => v(
-        () {
-          if (Platform.isAndroid) {
-            _flutterLocalNotificationsPlugin.cancel(id);
-          }
-        },
-        {
-          'id': id,
-        },
+  Future<void> cancel(int notificationId) => v(
+        () => _flutterLocalNotificationsPlugin.cancel(notificationId),
+        {'notificationId': notificationId},
       );
 
   NotificationDetails _buildNotificationDetails(
@@ -192,12 +107,51 @@ class NotificationsWrapper {
         ),
       );
 
-  NotificationsWrapper._();
+  Future<bool> handleAppLaunchDetails() => v(
+        () async => _pluginIsInitialized.then((value) async {
+          final appLaunchDetails = await _flutterLocalNotificationsPlugin
+              .getNotificationAppLaunchDetails();
+
+          if (appLaunchDetails?.didNotificationLaunchApp == false) {
+            return false;
+          }
+// アプリが停止状態で、通知から起動される必要があるため現状テストする方法がない
+// coverage:ignore-start
+          final details = appLaunchDetails?.notificationResponse;
+
+          if (details == null) {
+            return false;
+          }
+
+          onDidReceiveNotificationResponse(details);
+
+          return true;
+// coverage:ignore-end
+        }),
+      );
+
+  NotificationsWrapper._(
+    String androidDefaultIconPath,
+  ) {
+    i(
+      () {
+        _pluginIsInitialized = _flutterLocalNotificationsPlugin.initialize(
+          InitializationSettings(
+            android: AndroidInitializationSettings(androidDefaultIconPath),
+          ),
+          onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
+          onDidReceiveBackgroundNotificationResponse:
+              onDidReceiveNotificationResponse,
+        );
+      },
+      androidDefaultIconPath,
+    );
+  }
 
   static NotificationsWrapper? _instance;
 
-  factory NotificationsWrapper() =>
-      _instance ??= _instance = NotificationsWrapper._();
+  factory NotificationsWrapper(String androidDefaultIconPath) =>
+      _instance ??= _instance = NotificationsWrapper._(androidDefaultIconPath);
 
   static resetWith(NotificationsWrapper? instance) => _instance = instance;
 }
@@ -217,66 +171,60 @@ extension on NotificationInterval {
   }
 }
 
+// 分かりやすさのために、entry-pointはすべてmain.dartに定義したいが、
+// NotificationResponseがライブラリの型なので、ここで定義する
+// ライブラリから呼び出されるentry-pointなのでprivateにすることもできない
 @pragma('vm:entry-point')
-void onNotificationTappedBackground(NotificationResponse response) async {
-  WidgetsFlutterBinding.ensureInitialized();
+Future<void> onDidReceiveNotificationResponse(NotificationResponse details) =>
+    i(
+      () async {
+        WidgetsFlutterBinding.ensureInitialized();
 
-  info({'response': response});
+        await openDatabase();
+        NotificationClient();
 
-  await openDatabase();
+        final id = details.id;
+        if (id == null) {
+          return;
+        }
 
-  // ここで呼び出すと、デバイスのcontextがないのでen固定になるかもしれない
-  prepareNotifications();
+        final notificationPayload = details.payload;
+        final payload =
+            notificationPayload == null ? {} : json.decode(notificationPayload);
 
-  await _notificationResponseHandler(
-    response,
-    (id, payload) => null,
-    (id, actionId, input, payload) => notificationActionHandler(
-      id,
-      actionId,
-      input,
-      payload,
-    ),
-  );
-}
+        switch (details.notificationResponseType) {
+          case NotificationResponseType.selectedNotification:
+            if (payload.containsKey(memIdKey)) {
+              final memId = payload[memIdKey];
+              if (memId is int) {
+                await launchMemDetailPage(memId);
+              }
+            }
+            break;
 
-_notificationResponseHandler(
-  NotificationResponse notificationResponse,
-  OnNotificationTappedCallback onNotificationTapped,
-  OnNotificationActionTappedCallback? onNotificationActionTappedCallback,
-) {
-  final id = notificationResponse.id;
-  if (id == null) {
-    return;
-  }
+          case NotificationResponseType.selectedNotificationAction:
+            final actionId = details.actionId;
+            if (actionId == null) {
+              return;
+            }
 
-  final notificationPayload = notificationResponse.payload;
-  final payload =
-      notificationPayload == null ? {} : json.decode(notificationPayload);
-
-  switch (notificationResponse.notificationResponseType) {
-    case NotificationResponseType.selectedNotification:
-      onNotificationTapped(
-        id,
-        payload,
-      );
-      break;
-
-    case NotificationResponseType.selectedNotificationAction:
-      if (onNotificationActionTappedCallback == null) {
-        return;
-      }
-      final actionId = notificationResponse.actionId;
-      if (actionId == null) {
-        return;
-      }
-
-      onNotificationActionTappedCallback(
-        id,
-        actionId,
-        notificationResponse.input,
-        payload,
-      );
-      break;
-  }
-}
+            if (payload.containsKey(memIdKey)) {
+              final memId = payload[memIdKey];
+              if (memId is int) {
+                await NotificationClient()
+                    .notificationActions
+                    .singleWhere((element) => element.id == actionId)
+                    .onTapped(memId);
+              }
+            }
+            break;
+        }
+      },
+      {
+        'notificationResponseType': details.notificationResponseType,
+        'id': details.id,
+        'actionId': details.actionId,
+        'input': details.input,
+        'payload': details.payload,
+      },
+    );

@@ -7,8 +7,7 @@ import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_notification_repository.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
-import 'package:mem/notifications/actions.dart';
-import 'package:mem/notifications/channels.dart';
+import 'package:mem/notifications/client.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/one_time_notification.dart';
 import 'package:mem/notifications/notification/show_notification.dart';
@@ -20,6 +19,9 @@ class ActService {
   final MemRepository _memRepository;
   final MemNotificationRepository _memNotificationRepository;
   final NotificationRepository _notificationRepository;
+
+  // FIXME ここに定義されるのはおかしい
+  final NotificationClient _notificationClient;
 
   Future<Act> startBy(int memId) => i(
         () async {
@@ -39,9 +41,9 @@ class ActService {
               'Running',
               json.encode({memIdKey: memId}),
               [
-                finishActiveActAction,
+                _notificationClient.finishActiveActAction,
               ],
-              activeActNotificationChannel,
+              _notificationClient.activeActNotificationChannel,
             ),
           );
 
@@ -57,9 +59,9 @@ class ActService {
                   notification.message,
                   json.encode({memIdKey: memId}),
                   [
-                    finishActiveActAction,
+                    _notificationClient.finishActiveActAction,
                   ],
-                  afterActStartedNotificationChannel,
+                  _notificationClient.afterActStartedNotificationChannel,
                   DateTime.now().add(Duration(seconds: notification.time!)),
                 ),
               );
@@ -101,6 +103,7 @@ class ActService {
     this._memRepository,
     this._memNotificationRepository,
     this._notificationRepository,
+    this._notificationClient,
   );
 
   static ActService? _instance;
@@ -110,5 +113,6 @@ class ActService {
         MemRepository(),
         MemNotificationRepository(),
         NotificationRepository(),
+        NotificationClient(),
       );
 }
