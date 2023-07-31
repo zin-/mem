@@ -8,7 +8,7 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/mems/mem_service.dart';
-import 'framework/database.dart';
+import 'framework/database_factory.dart';
 import 'scenarios/act_counter_scenario.dart';
 import '_helpers.dart';
 import 'database/_database_manager.dart';
@@ -33,7 +33,7 @@ void main() {
 
   // app_testではないので、分けた方が良いかも？
   group('Framework test', () {
-    testDatabaseV2();
+    testDatabaseFactoryV2();
   });
 
   group('Database test', () {

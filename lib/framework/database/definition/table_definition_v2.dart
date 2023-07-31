@@ -57,7 +57,7 @@ class TableDefinitionV2 {
         'TableDefinition',
         {
           'name': name,
-          'columnDefinitions': columnDefinitions,
+          'columnDefinitions': columnDefinitions.map((e) => e.toString()),
           'singularName': singularName,
         },
       ].join(': ');

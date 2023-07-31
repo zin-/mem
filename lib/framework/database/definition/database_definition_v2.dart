@@ -25,6 +25,6 @@ class DatabaseDefinitionV2 {
       ' : {'
       ' name: $name,'
       ' version: $version,'
-      ' tableDefinitions: ${tableDefinitions.map((defT) => defT.name)}'
+      ' tableDefinitions: ${tableDefinitions.map((e) => e.toString())}'
       ' }';
 }

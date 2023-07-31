@@ -27,7 +27,7 @@ final testChildTableDefinition = TableDefinitionV2(
 );
 
 final testDatabaseDefinition = DatabaseDefinitionV2(
-  'test_database.db',
+  'sample_database.db',
   1,
   [
     testTableDefinition,
