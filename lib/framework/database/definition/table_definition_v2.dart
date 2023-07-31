@@ -26,30 +26,31 @@ class TableDefinitionV2 {
     }
   }
 
-  String buildCreateTableSql() {
-    final foreignKeys = columnDefinitions.whereType<ForeignKeyDefinition>();
+  String buildCreateTableSql() => [
+        'CREATE TABLE',
+        name,
+        '(',
+        [
+          columnDefinitions
+              .map((columnDefinition) => columnDefinition.buildCreateTableSql())
+              .join(', '),
+          primaryKeyDefinitions.isEmpty
+              ? null
+              : 'PRIMARY KEY ( ${primaryKeyDefinitions.map((e) => e.name).join(', ')} )',
+          foreignKeyDefinitions.isEmpty
+              ? null
+              : foreignKeyDefinitions
+                  .map((e) => e.buildForeignKeySql())
+                  .join(', '),
+        ].where((element) => element != null).join(', '),
+        ')',
+      ].join(' ');
 
-    return [
-      'CREATE TABLE',
-      name,
-      '(',
-      [
-        columnDefinitions
-            .map((columnDefinition) => columnDefinition.buildCreateTableSql())
-            .join(', '),
-        primaryKeys.isEmpty
-            ? null
-            : 'PRIMARY KEY ( ${primaryKeys.map((e) => e.name).join(', ')} )',
-        foreignKeys.isEmpty
-            ? null
-            : foreignKeys.map((e) => e.buildForeignKeySql()).join(', '),
-      ].where((element) => element != null).join(', '),
-      ')',
-    ].join(' ');
-  }
-
-  Iterable<ColumnDefinition> get primaryKeys =>
+  Iterable<ColumnDefinition> get primaryKeyDefinitions =>
       columnDefinitions.where((element) => element.isPrimaryKey);
+
+  Iterable<ForeignKeyDefinition> get foreignKeyDefinitions =>
+      columnDefinitions.whereType<ForeignKeyDefinition>();
 
   @override
   String toString() => [
