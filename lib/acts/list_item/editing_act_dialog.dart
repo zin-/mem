@@ -31,12 +31,10 @@ class EditingActDialog extends ConsumerWidget {
         pickedPeriod,
       ),
       () => ref.read(deleteAct(_act.identifier)),
-      () => v(() async {
-        final saved = await save(editingAct);
-        ref
-            .read(actListProvider(_act.memId).notifier)
-            .upsertAll([saved], (tmp, item) => tmp.id == item.id);
-      }),
+      () => v(() => ref.read(actListProvider(_act.memId).notifier).upsertAll(
+            [ref.read(saveAct(_act.identifier))],
+            (tmp, item) => tmp.id == item.id,
+          )),
     );
   }
 }

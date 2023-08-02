@@ -41,14 +41,17 @@ class Act extends EntityValue {
 }
 
 class ActIdentifier {
-  final int id;
+  final int actId;
   final int memId;
 
-  ActIdentifier(this.id, this.memId);
+  ActIdentifier(this.actId, this.memId);
 
   @override
-  int get hashCode => Object.hash(id, memId);
+  int get hashCode => Object.hash(actId, memId);
 
   @override
   bool operator ==(Object other) => hashCode == other.hashCode;
+
+  @override
+  String toString() => {'actId': actId, 'memId': memId}.toString();
 }

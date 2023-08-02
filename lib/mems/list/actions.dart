@@ -5,9 +5,8 @@ import 'package:mem/logger/log_service.dart';
 
 final fetchActiveActs = Provider(
   (ref) => v(
-    () async => ref.read(activeActsProvider.notifier).upsertAll(
+    () async => ref.read(activeActsProvider.notifier).updatedBy(
           await ActRepository().shipActive(),
-          (tmp, item) => tmp.id == item.id,
         ),
   ),
 );

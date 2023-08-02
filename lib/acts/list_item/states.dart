@@ -10,7 +10,7 @@ final editingActProvider = StateNotifierProvider.autoDispose
     () => ValueStateNotifier(
       ref
           .read(actListProvider(actId.memId))!
-          .singleWhere((element) => element.id == actId.id),
+          .singleWhere((act) => act.id == actId.actId),
     ),
     actId,
   ),

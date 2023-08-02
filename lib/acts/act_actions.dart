@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/act_list_page_states.dart';
 import 'package:mem/acts/act_repository.dart';
 import 'package:mem/acts/act_service.dart';
+import 'package:mem/acts/list_item/states.dart';
 import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
@@ -81,19 +82,30 @@ final finishAct = Provider.autoDispose.family<void, Act>(
   ),
 );
 
-Future<Act> save(Act act) => v(
-      () => ActRepository().replace(act),
-      act,
-    );
+final saveAct = Provider.autoDispose.family<Act, ActIdentifier>(
+  (ref, actIdentifier) => v(
+    () {
+      final editingAct = ref.watch(editingActProvider(actIdentifier));
+
+      // TODO serviceにして、notificationについても考慮する
+      ActRepository().replace(editingAct).then((replacedAct) => ref
+          .read(actListProvider(actIdentifier.memId).notifier)
+          .upsertAll([replacedAct], (tmp, item) => tmp.id == item.id));
+
+      return editingAct;
+    },
+    actIdentifier,
+  ),
+);
 
 final deleteAct = Provider.autoDispose.family<void, ActIdentifier>(
   (ref, actIdentifier) => v(
     () async {
-      await ActRepository().wasteById(actIdentifier.id);
+      await ActRepository().wasteById(actIdentifier.actId);
 
       ref
           .read(actListProvider(actIdentifier.memId).notifier)
-          .removeWhere((item) => item.id == actIdentifier.id);
+          .removeWhere((item) => item.id == actIdentifier.actId);
     },
     actIdentifier,
   ),

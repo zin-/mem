@@ -145,76 +145,63 @@ void testActScenario() => group(': $_scenarioName', () {
         );
 
         group(': Edit act', () {
-          late DateTime now;
+          final zeroDate = DateTime(1);
 
           setUp(() async {
-            now = DateTime.now();
-
             await db.getTable(actTableDefinition.name).insert({
               fkDefMemId.name: insertedMemId,
-              defActStart.name: now,
+              defActStart.name: zeroDate,
               defActStartIsAllDay.name: 0,
-              createdAtColDef.name: now,
-            });
-            await db.getTable(actTableDefinition.name).insert({
-              fkDefMemId.name: insertedMemId,
-              defActStart.name: now,
-              defActStartIsAllDay.name: 0,
-              createdAtColDef.name: now,
+              createdAtColDef.name: zeroDate,
             });
           });
 
           testWidgets(': save.', (widgetTester) async {
             await showActListPage(widgetTester);
 
-            await widgetTester.longPress(
-              find.text(dateText(now)).at(1),
-            );
+            await widgetTester.longPress(find.text(dateText(zeroDate)));
             await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.byType(Switch).at(0));
             await widgetTester.tap(find.byType(Switch).at(1));
             await widgetTester.pumpAndSettle();
 
+            final pickedDate = DateTime.now();
             await widgetTester.tap(find.text('OK'));
             await widgetTester.pumpAndSettle();
 
             await widgetTester.tap(find.byIcon(Icons.save_alt));
             await widgetTester.pumpAndSettle();
 
-            final updatedActEnd =
-                (await db.getTable(actTableDefinition.name).select(
-              whereString: '${fkDefMemId.name} = ?',
-              whereArgs: [insertedMemId],
-            ))
-                    .singleWhere((element) =>
-                        element[updatedAtColDef.name] != null)[defActEnd.name];
-            // FIXME failed test
-            expect(find.text(dateText(now)), findsNWidgets(3));
-            if (dateTimeText(now) == dateTimeText(updatedActEnd)) {
-              expect(find.text(timeText(now)), findsNWidgets(3));
-            } else {
-              expect(find.text(timeText(now)), findsNWidgets(2));
-              expect(find.text(timeText(updatedActEnd)), findsOneWidget);
-            }
+            expect(
+              (widgetTester.widget(find.byType(Text).at(0)) as Text).data,
+              dateText(zeroDate),
+            );
+            expect(
+              (widgetTester.widget(find.byType(Text).at(2)) as Text).data,
+              timeText(zeroDate),
+            );
+            expect(
+              // FIXME failed test
+              (widgetTester.widget(find.byType(Text).at(4)) as Text).data,
+              dateText(pickedDate),
+            );
+            expect(
+              (widgetTester.widget(find.byType(Text).at(6)) as Text).data,
+              timeText(pickedDate),
+            );
           });
 
           testWidgets(': delete.', (widgetTester) async {
             await showActListPage(widgetTester);
 
-            expect(find.text(dateText(now)), findsNWidgets(2));
-            expect(find.text(timeText(now)), findsNWidgets(2));
-
-            await widgetTester.longPress(
-              find.text(dateText(now)).at(0),
-            );
+            await widgetTester.longPress(find.text(dateText(zeroDate)));
             await widgetTester.pumpAndSettle();
 
             await widgetTester.tap(find.byIcon(Icons.delete));
             await widgetTester.pumpAndSettle();
 
-            expect(find.text(dateText(now)), findsOneWidget);
-            expect(find.text(timeText(now)), findsOneWidget);
+            expect(find.text(dateText(zeroDate)), findsNothing);
+            expect(find.text(timeText(zeroDate)), findsNothing);
           });
         });
       });
