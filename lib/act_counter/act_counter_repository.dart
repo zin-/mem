@@ -51,6 +51,9 @@ class ActCounterRepository extends RepositoryV2<ActCounter, ActCounter> {
         {'payload': payload},
       );
 
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+
   ActCounterRepository._(this._homeWidgetAccessor);
 
   static ActCounterRepository? _instance;
@@ -58,9 +61,6 @@ class ActCounterRepository extends RepositoryV2<ActCounter, ActCounter> {
   factory ActCounterRepository() => _instance ??= ActCounterRepository._(
         HomeWidgetAccessor(),
       );
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 void initializeActCounter() {
