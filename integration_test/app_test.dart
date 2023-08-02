@@ -1,8 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
-import 'package:mem/database/definition.dart';
-import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/logger/log_entity.dart';
 import 'package:mem/logger/log_service.dart';
 
@@ -47,20 +45,8 @@ void main() {
     testActScenario();
 
     testNotificationScenario();
+    testActCounterConfigure();
 
     testEdgeScenario();
-
-    group('V1', () {
-      setUpAll(() async {
-        await DatabaseManager(onTest: true).open(databaseDefinition);
-      });
-      tearDownAll(() async {
-        await DatabaseManager(onTest: true).delete(databaseDefinition.name);
-      });
-
-      group('Act test', () {
-        testActCounterConfigure();
-      });
-    });
   });
 }
