@@ -6,7 +6,6 @@ import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/logger/log_entity.dart';
 import 'package:mem/logger/log_service.dart';
 
-import '_helpers.dart';
 import 'database/_database_manager.dart';
 import 'database/_indexed_database.dart';
 import 'database/_sqlite_database.dart';
@@ -55,11 +54,8 @@ void main() {
       setUpAll(() async {
         await DatabaseManager(onTest: true).open(databaseDefinition);
       });
-      setUp(() async {
-        await clearDatabase();
-      });
       tearDownAll(() async {
-        await DatabaseManager().delete(databaseDefinition.name);
+        await DatabaseManager(onTest: true).delete(databaseDefinition.name);
       });
 
       group('Act test', () {

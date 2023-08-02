@@ -11,23 +11,9 @@ import 'package:mem/database/table_definitions/base.dart';
 import 'package:mem/database/table_definitions/mem_items.dart';
 import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/database_manager.dart';
-import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
-import 'package:mem/mems/mem_service.dart';
 
 import 'scenarios/helpers.dart';
-
-Future clearDatabase() async {
-  // FIXME openしないとdeleteできないのは、実際のDatabaseと挙動が異なる
-  // 今の実装だと難しいっぽい。いつかチャレンジする
-  await DatabaseManager(onTest: true).open(databaseDefinition);
-  await DatabaseManager(onTest: true).delete(databaseDefinition.name);
-
-  MemRepository.resetWith(null);
-  MemItemRepository.resetWith(null);
-
-  MemService.reset(null);
-}
 
 final memListFilterButton = find.byIcon(Icons.filter_list);
 final findShowNotArchiveSwitch = find.byType(Switch).at(0);
