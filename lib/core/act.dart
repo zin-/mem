@@ -25,7 +25,7 @@ class Act extends EntityValue {
       };
 
   @override
-  String toString() => _toMap().toString();
+  String toString() => _toMap().toString() + super.toString();
 
   Act.copyWith(Act base, {DateAndTimePeriod? period})
       : memId = base.memId,

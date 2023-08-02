@@ -1,11 +1,12 @@
-import 'package:mem/act_counter/act_counter.dart';
-import 'package:mem/act_counter/act_counter_repository.dart';
 import 'package:mem/acts/act_repository.dart';
 import 'package:mem/acts/act_service.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
+
+import 'act_counter.dart';
+import 'act_counter_repository.dart';
 
 class ActCounterService {
   final ActService _actService;
@@ -52,7 +53,7 @@ class ActCounterService {
 
   static ActCounterService? _instance;
 
-  factory ActCounterService() => _instance ??= _instance = ActCounterService._(
+  factory ActCounterService() => _instance ??= ActCounterService._(
         ActService(),
         MemRepository(),
         ActRepository(),

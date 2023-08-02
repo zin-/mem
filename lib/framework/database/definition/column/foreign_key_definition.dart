@@ -10,8 +10,8 @@ class ForeignKeyDefinition extends ColumnDefinition {
     this.parentTableDefinition,
   ) : super(
           'fk_${parentTableDefinition.singularName ?? (throw ColumnDefinitionException('Parent table: "${parentTableDefinition.name}" does not have singular name.'))}_id',
-          parentTableDefinition.primaryKeys.length == 1
-              ? parentTableDefinition.primaryKeys.single.type
+          parentTableDefinition.primaryKeyDefinitions.length == 1
+              ? parentTableDefinition.primaryKeyDefinitions.single.type
               : throw UnimplementedError(
                   'Parent table: "${parentTableDefinition.name}" has multiple primary keys.',
                 ),
@@ -20,5 +20,5 @@ class ForeignKeyDefinition extends ColumnDefinition {
 
   String buildForeignKeySql() => 'FOREIGN KEY ($name)'
       ' REFERENCES ${parentTableDefinition.name}'
-      '(${parentTableDefinition.primaryKeys.single.name})';
+      '(${parentTableDefinition.primaryKeyDefinitions.single.name})';
 }

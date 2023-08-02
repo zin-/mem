@@ -74,7 +74,7 @@ class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
   factory NotificationRepository() {
     initializeTimeZones();
 
-    return _instance ??= _instance = NotificationRepository._(
+    return _instance ??= NotificationRepository._(
       defaultTargetPlatform == TargetPlatform.android
           ? NotificationsWrapper(androidDefaultIconPath)
           : null,

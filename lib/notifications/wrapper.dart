@@ -1,7 +1,6 @@
-import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
@@ -151,7 +150,7 @@ class NotificationsWrapper {
   static NotificationsWrapper? _instance;
 
   factory NotificationsWrapper(String androidDefaultIconPath) =>
-      _instance ??= _instance = NotificationsWrapper._(androidDefaultIconPath);
+      _instance ??= NotificationsWrapper._(androidDefaultIconPath);
 
   static resetWith(NotificationsWrapper? instance) => _instance = instance;
 }

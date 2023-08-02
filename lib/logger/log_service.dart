@@ -1,6 +1,6 @@
-import 'package:mem/logger/log_entity.dart';
-import 'package:mem/logger/log_repository.dart';
-import 'package:mem/logger/logger_wrapper.dart';
+import 'log_entity.dart';
+import 'log_repository.dart';
+import 'logger_wrapper.dart';
 
 T verbose<T>(T target) => LogService().valueLog(Level.verbose, target);
 
@@ -142,15 +142,7 @@ class LogService {
         level,
       );
 
-  factory LogService() {
-    var tmp = _instance;
-
-    if (tmp == null) {
-      return LogService.initialize();
-    } else {
-      return tmp;
-    }
-  }
+  factory LogService() => _instance ??= LogService.initialize();
 }
 
 extension _DebugLoggableFunction on Function {

@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:mem/acts/act_repository.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
@@ -14,6 +13,8 @@ import 'package:mem/notifications/notification/show_notification.dart';
 import 'package:mem/notifications/notification_ids.dart';
 import 'package:mem/notifications/notification_repository.dart';
 
+import 'act_repository.dart';
+
 class ActService {
   final ActRepository _actRepository;
   final MemRepository _memRepository;
@@ -23,9 +24,54 @@ class ActService {
   // FIXME ここに定義されるのはおかしい
   final NotificationClient _notificationClient;
 
+  Future<Act> startV2(Act startingAct) => i(
+        () async {
+          final receivedAct = await _actRepository.receive(startingAct);
+
+          final mem = await _memRepository.shipById(startingAct.memId);
+
+          _notificationRepository.receive(
+            ShowNotification(
+              activeActNotificationId(startingAct.memId),
+              mem.name,
+              'Running',
+              json.encode({memIdKey: startingAct.memId}),
+              [
+                _notificationClient.finishActiveActAction,
+              ],
+              _notificationClient.activeActNotificationChannel,
+            ),
+          );
+
+          final afterActStartedNotifications = await _memNotificationRepository
+              .shipByMemIdAndAfterActStarted(startingAct.memId);
+
+          if (afterActStartedNotifications.isNotEmpty) {
+            for (var notification in afterActStartedNotifications) {
+              _notificationRepository.receive(
+                OneTimeNotification(
+                  afterActStartedNotificationId(startingAct.memId),
+                  mem.name,
+                  notification.message,
+                  json.encode({memIdKey: startingAct.memId}),
+                  [
+                    _notificationClient.finishActiveActAction,
+                  ],
+                  _notificationClient.afterActStartedNotificationChannel,
+                  DateTime.now().add(Duration(seconds: notification.time!)),
+                ),
+              );
+            }
+          }
+
+          return receivedAct;
+        },
+        startingAct,
+      );
+
   Future<Act> startBy(int memId) => i(
         () async {
-          final received = await _actRepository.receive(
+          final receivedAct = await _actRepository.receive(
             Act(
               memId,
               DateAndTimePeriod.startNow(),
@@ -34,7 +80,7 @@ class ActService {
 
           final mem = await _memRepository.shipById(memId);
 
-          await _notificationRepository.receive(
+          _notificationRepository.receive(
             ShowNotification(
               activeActNotificationId(memId),
               mem.name,
@@ -52,7 +98,7 @@ class ActService {
 
           if (afterActStartedNotifications.isNotEmpty) {
             for (var notification in afterActStartedNotifications) {
-              await _notificationRepository.receive(
+              _notificationRepository.receive(
                 OneTimeNotification(
                   afterActStartedNotificationId(memId),
                   mem.name,
@@ -68,7 +114,7 @@ class ActService {
             }
           }
 
-          return received;
+          return receivedAct;
         },
         memId,
       );
@@ -108,7 +154,7 @@ class ActService {
 
   static ActService? _instance;
 
-  factory ActService() => _instance ??= _instance = ActService._(
+  factory ActService() => _instance ??= ActService._(
         ActRepository(),
         MemRepository(),
         MemNotificationRepository(),

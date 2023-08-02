@@ -1,12 +1,12 @@
 import 'dart:io';
 
 import 'package:home_widget/home_widget.dart';
-import 'package:mem/act_counter/act_counter.dart';
-import 'package:mem/act_counter/home_widget_accessor.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/main.dart';
 import 'package:mem/repositories/_repository_v2.dart';
 
-import '../main.dart';
+import 'act_counter.dart';
+import 'home_widget_accessor.dart';
 
 // see android\app\src\main\kotlin\zin\playground\mem\ActCounterConfigure.kt
 const methodChannelName = 'zin.playground.mem/act_counter';
@@ -51,22 +51,16 @@ class ActCounterRepository extends RepositoryV2<ActCounter, ActCounter> {
         {'payload': payload},
       );
 
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+
   ActCounterRepository._(this._homeWidgetAccessor);
 
   static ActCounterRepository? _instance;
 
-  factory ActCounterRepository() {
-    var tmp = _instance;
-    if (tmp == null) {
-      _instance = tmp = ActCounterRepository._(
+  factory ActCounterRepository() => _instance ??= ActCounterRepository._(
         HomeWidgetAccessor(),
       );
-    }
-    return tmp;
-  }
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 void initializeActCounter() {

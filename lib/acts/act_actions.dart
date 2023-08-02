@@ -4,9 +4,32 @@ import 'package:mem/acts/act_repository.dart';
 import 'package:mem/acts/act_service.dart';
 import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/core/act.dart';
+import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
 
-final actRepository = ActRepository();
+final startActV2 = Provider.autoDispose.family<Act, int>(
+  (ref, memId) => v(
+    () {
+      final startingAct = Act(memId, DateAndTimePeriod.startNow());
+
+      ActService().startV2(startingAct).then((startedAct) => v(
+            () {
+              ref.read(activeActsProvider.notifier).upsertAll(
+                [startedAct],
+                (tmp, item) =>
+                    tmp.memId == memId &&
+                    tmp.id == null &&
+                    tmp.period.end == null,
+              );
+            },
+            startedAct,
+          ));
+
+      return startingAct;
+    },
+    memId,
+  ),
+);
 
 final startAct = Provider.autoDispose.family<void, int>(
   (ref, memId) => v(
@@ -15,6 +38,28 @@ final startAct = Provider.autoDispose.family<void, int>(
 
       ref.read(actListProvider(memId).notifier).add(started, index: 0);
       ref.read(activeActsProvider.notifier).add(started);
+    },
+    memId,
+  ),
+);
+
+final finishActV2 = Provider.autoDispose.family<Act, int>(
+  (ref, memId) => v(
+    () {
+      final finishingAct = ref.read(activeActsProvider)!.singleWhere(
+            (act) => act.memId == memId,
+          );
+
+      ActService().finish(finishingAct).then((finishedAct) => v(
+            () {
+              ref.read(activeActsProvider.notifier).removeWhere(
+                    (element) => element.id == finishedAct.id,
+                  );
+            },
+            finishedAct,
+          ));
+
+      return finishingAct;
     },
     memId,
   ),
@@ -37,7 +82,7 @@ final finishAct = Provider.autoDispose.family<void, Act>(
 );
 
 Future<Act> save(Act act) => v(
-      () => actRepository.replace(act),
+      () => ActRepository().replace(act),
       act,
     );
 

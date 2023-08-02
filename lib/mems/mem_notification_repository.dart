@@ -2,9 +2,10 @@ import 'package:mem/core/mem_notification.dart';
 import 'package:mem/database/table_definitions/mem_notifications.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/mem_notification_entity.dart';
 import 'package:mem/repositories/i/_database_tuple_repository_v2.dart';
 import 'package:mem/repositories/i/conditions.dart';
+
+import 'mem_notification_entity.dart';
 
 class MemNotificationRepository
     extends DatabaseTupleRepository<MemNotificationEntity, MemNotification> {
@@ -62,7 +63,7 @@ class MemNotificationRepository
   static MemNotificationRepository? _instance;
 
   factory MemNotificationRepository([Table? table]) =>
-      _instance ??= _instance = MemNotificationRepository._(table!);
+      _instance ??= MemNotificationRepository._(table!);
 
   static resetWith(MemNotificationRepository? instance) => _instance = instance;
 }

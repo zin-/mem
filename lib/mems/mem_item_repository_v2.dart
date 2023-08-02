@@ -1,13 +1,13 @@
-import 'package:mem/core/errors.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/database/table_definitions/base.dart';
 import 'package:mem/database/table_definitions/mem_items.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/mem_item_entity_v2.dart';
 import 'package:mem/repositories/i/_database_tuple_repository_v2.dart';
 import 'package:mem/repositories/i/conditions.dart';
+
+import 'mem_item_entity_v2.dart';
 
 class MemItemRepository
     extends DatabaseTupleRepository<MemItemEntity, MemItem> {
@@ -74,20 +74,10 @@ class MemItemRepository
 
   MemItemRepository._(super.table);
 
-  factory MemItemRepository([Table? table]) {
-    var tmp = _instance;
-
-    if (tmp == null) {
-      if (table == null) {
-        throw InitializationError();
-      }
-      _instance = tmp = MemItemRepository._(table);
-    }
-
-    return tmp;
-  }
-
   static MemItemRepository? _instance;
+
+  factory MemItemRepository([Table? table]) =>
+      _instance ??= MemItemRepository._(table!);
 
   static resetWith(MemItemRepository? instance) => _instance = instance;
 }

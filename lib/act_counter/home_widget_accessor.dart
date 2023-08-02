@@ -44,11 +44,6 @@ class HomeWidgetAccessor {
 
   static HomeWidgetAccessor? _instance;
 
-  factory HomeWidgetAccessor({HomeWidgetAccessor? instance}) {
-    var tmp = _instance;
-    if (tmp == null) {
-      _instance = tmp = instance ?? HomeWidgetAccessor._();
-    }
-    return tmp;
-  }
+  factory HomeWidgetAccessor({HomeWidgetAccessor? instance}) =>
+      _instance ??= instance ?? HomeWidgetAccessor._();
 }

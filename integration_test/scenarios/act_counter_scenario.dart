@@ -4,19 +4,15 @@ import 'package:integration_test/integration_test.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/database/table_definitions/base.dart';
 import 'package:mem/database/table_definitions/mems.dart';
+import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/database/definition.dart';
 import 'package:mem/main.dart';
 
-import '../_helpers.dart';
 import 'helpers.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
-  setUp(() async {
-    await clearDatabase();
-  });
 
   testActCounterConfigure();
 }
@@ -27,10 +23,12 @@ void testActCounterConfigure() => group(
         const savedMemName = 'ActCounter test: saved mem name';
         late int savedMemId;
 
-        setUp(() async {
-          final db =
-              await DatabaseManager(onTest: true).open(databaseDefinition);
+        late final Database db;
 
+        setUpAll(() async {
+          db = await DatabaseManager(onTest: true).open(databaseDefinition);
+        });
+        setUp(() async {
           await resetDatabase(db);
 
           savedMemId = await db.getTable(memTableDefinition.name).insert({
