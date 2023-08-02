@@ -8,21 +8,20 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/mems/mem_service.dart';
-import 'framework/database_factory.dart';
-import 'scenarios/act_counter_scenario.dart';
+
 import '_helpers.dart';
 import 'database/_database_manager.dart';
 import 'database/_indexed_database.dart';
 import 'database/_sqlite_database.dart';
+import 'framework/database_factory.dart';
+import 'scenarios/act_counter_scenario.dart';
+import 'scenarios/act_scenario.dart';
 import 'scenarios/edge_scenario.dart';
 import 'scenarios/habit_scenario.dart';
 import 'scenarios/memo_scenario.dart';
 import 'scenarios/notification_scenario.dart';
-import 'scenarios/todo_scenario.dart';
-import 'scenarios/act_scenario.dart';
 import 'scenarios/task_scenario.dart';
-
-const defaultDuration = Duration(seconds: 1);
+import 'scenarios/todo_scenario.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();

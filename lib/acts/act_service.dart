@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:mem/acts/act_repository.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
@@ -13,6 +12,8 @@ import 'package:mem/notifications/notification/one_time_notification.dart';
 import 'package:mem/notifications/notification/show_notification.dart';
 import 'package:mem/notifications/notification_ids.dart';
 import 'package:mem/notifications/notification_repository.dart';
+
+import 'act_repository.dart';
 
 class ActService {
   final ActRepository _actRepository;
@@ -153,7 +154,7 @@ class ActService {
 
   static ActService? _instance;
 
-  factory ActService() => _instance ??= _instance = ActService._(
+  factory ActService() => _instance ??= ActService._(
         ActRepository(),
         MemRepository(),
         MemNotificationRepository(),

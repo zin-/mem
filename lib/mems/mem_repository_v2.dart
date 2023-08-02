@@ -1,10 +1,9 @@
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
-import 'package:mem/core/errors.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/database/table_definitions/base.dart';
 import 'package:mem/database/table_definitions/mems.dart';
-import 'package:mem/framework/database/database.dart' as db;
+import 'package:mem/framework/database/database.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/i/_database_tuple_repository_v2.dart';
 import 'package:mem/repositories/i/conditions.dart';
@@ -83,18 +82,8 @@ class MemRepository extends DatabaseTupleRepository<MemEntity, Mem> {
 
   static MemRepository? _instance;
 
-  factory MemRepository([db.Table? table]) {
-    var tmp = _instance;
-
-    if (tmp == null) {
-      if (table == null) {
-        throw InitializationError();
-      }
-      _instance = tmp = MemRepository._(table);
-    }
-
-    return tmp;
-  }
+  factory MemRepository([Table? table]) =>
+      _instance ??= MemRepository._(table!);
 
   static resetWith(MemRepository? memRepository) => _instance = memRepository;
 }

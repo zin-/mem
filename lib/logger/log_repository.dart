@@ -1,6 +1,7 @@
 import 'package:mem/framework/repository_v3.dart';
-import 'package:mem/logger/log_entity.dart';
-import 'package:mem/logger/logger_wrapper.dart';
+
+import 'log_entity.dart';
+import 'logger_wrapper.dart';
 
 class LogRepository extends RepositoryV3<Log, void> {
   LoggerWrapper _loggerWrapper;
@@ -17,15 +18,8 @@ class LogRepository extends RepositoryV3<Log, void> {
 
   static LogRepository? _instance;
 
-  factory LogRepository(LoggerWrapper loggerWrapper) {
-    var tmp = _instance;
-
-    if (tmp == null) {
-      _instance = tmp = LogRepository._(
+  factory LogRepository(LoggerWrapper loggerWrapper) =>
+      _instance ??= LogRepository._(
         loggerWrapper,
       );
-    }
-
-    return tmp;
-  }
 }
