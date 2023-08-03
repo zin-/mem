@@ -25,6 +25,16 @@ class MemService {
     this._notificationRepository,
   );
 
+  Future<Mem> fetchMemById(int memId) => i(
+        () => _memRepository.shipById(memId),
+        {'memId': memId},
+      );
+
+  Future<List<MemItem>> fetchMemItemsByMemId(int memId) => i(
+        () async => (await _memItemRepository.shipByMemId(memId)).toList(),
+        {'memId': memId},
+      );
+
   Future<MemDetail> save(MemDetail memDetail, {bool undo = false}) => i(
         () async {
           final savedMem = memDetail.mem.isSaved() && !undo
@@ -86,16 +96,6 @@ class MemService {
           (await fetchMemById(memId))..doneAt = null,
           [],
         )),
-        {'memId': memId},
-      );
-
-  Future<Mem> fetchMemById(int memId) => i(
-        () => _memRepository.shipById(memId),
-        {'memId': memId},
-      );
-
-  Future<List<MemItem>> fetchMemItemsByMemId(int memId) => i(
-        () async => (await _memItemRepository.shipByMemId(memId)).toList(),
         {'memId': memId},
       );
 
