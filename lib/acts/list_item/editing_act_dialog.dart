@@ -4,7 +4,6 @@ import 'package:mem/acts/act_actions.dart';
 import 'package:mem/acts/act_list_page_states.dart';
 import 'package:mem/components/date_and_time/date_and_time_period_view.dart';
 import 'package:mem/core/act.dart';
-import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
 
@@ -22,29 +21,14 @@ class EditingActDialog extends ConsumerWidget {
 
     return _EditingActDialogComponent(
       editingAct,
-      (pickedStart) => v(
+      (pickedPeriod) => v(
         () => ref.read(editingActProvider(actId).notifier).updatedBy(
               Act.copyWith(
                 _act,
-                period: DateAndTimePeriod(
-                  start: pickedStart,
-                  end: editingAct.period.end,
-                ),
+                period: pickedPeriod,
               ),
             ),
-        pickedStart,
-      ),
-      (pickedEnd) => v(
-        () => ref.read(editingActProvider(actId).notifier).updatedBy(
-              Act.copyWith(
-                _act,
-                period: DateAndTimePeriod(
-                  start: editingAct.period.start,
-                  end: pickedEnd,
-                ),
-              ),
-            ),
-        pickedEnd,
+        pickedPeriod,
       ),
       () => ref.read(deleteAct(_act.identifier)),
       () => v(() async {
@@ -59,48 +43,48 @@ class EditingActDialog extends ConsumerWidget {
 
 class _EditingActDialogComponent extends StatelessWidget {
   final Act _editingAct;
-  final Function(DateAndTime? pickedStart) _onStartChanged;
-  final Function(DateAndTime? pickedEnd) _onEndChanged;
+  final Function(DateAndTimePeriod? picked) _onPeriodChanged;
   final Function() _onDeleteTapped;
   final Function() _onSaveTapped;
 
   const _EditingActDialogComponent(
     this._editingAct,
-    this._onStartChanged,
-    this._onEndChanged,
+    this._onPeriodChanged,
     this._onDeleteTapped,
     this._onSaveTapped,
   );
 
   @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      content: DateAndTimePeriodTextFormFields(
-        _editingAct.period,
-        _onStartChanged,
-        _onEndChanged,
-      ),
-      actions: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            IconButton(
-              onPressed: () {
-                _onDeleteTapped();
-                Navigator.pop(context);
-              },
-              icon: const Icon(Icons.delete),
+  Widget build(BuildContext context) => v(
+        () {
+          return AlertDialog(
+            content: DateAndTimePeriodTextFormFields(
+              _editingAct.period,
+              _onPeriodChanged,
             ),
-            IconButton(
-              onPressed: () {
-                _onSaveTapped();
-                Navigator.pop(context);
-              },
-              icon: const Icon(Icons.save_alt),
-            ),
-          ],
-        )
-      ],
-    );
-  }
+            actions: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      _onDeleteTapped();
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(Icons.delete),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      _onSaveTapped();
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(Icons.save_alt),
+                  ),
+                ],
+              )
+            ],
+          );
+        },
+        _editingAct,
+      );
 }
