@@ -25,6 +25,10 @@ class MemNotifications {
     if (mem.isDone() || mem.isArchived()) {
       notifications.add(CancelNotification(memStartNotificationId(mem.id)));
       notifications.add(CancelNotification(memEndNotificationId(mem.id)));
+      notifications.add(CancelNotification(memRepeatedNotificationId(mem.id)));
+      notifications.add(CancelNotification(activeActNotificationId(mem.id)));
+      notifications
+          .add(CancelNotification(afterActStartedNotificationId(mem.id)));
     } else {
       final now = DateTime.now();
 
