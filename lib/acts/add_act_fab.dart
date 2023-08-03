@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/acts/act_actions.dart';
-import 'package:mem/acts/act_list_page_states.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
+
+import 'act_actions.dart';
+import 'act_list_states.dart';
 
 class ActFab extends ConsumerWidget {
   final MemId _memId;
