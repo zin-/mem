@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/act_list_actions.dart';
@@ -18,13 +17,9 @@ class ActListView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => AsyncValueView(
         loadActList(_memId),
-        (data) {
-          final actList = ref.watch(actListProvider(_memId));
-
-          return _ActListViewComponent(actList!.sorted(
-            (a, b) => b.id!.compareTo(a.id!),
-          ));
-        },
+        (data) => _ActListViewComponent(
+          ref.watch(actListProvider(_memId)) ?? [],
+        ),
       );
 }
 
@@ -35,14 +30,11 @@ class _ActListViewComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => v(
-        () {
-          return ListView.builder(
-            itemCount: actList.length,
-            itemBuilder: (context, index) {
-              return ActListItemView(context, actList[index]);
-            },
-          );
-        },
+        () => ListView.builder(
+          itemCount: actList.length,
+          itemBuilder: (context, index) =>
+              ActListItemView(context, actList[index]),
+        ),
         {'actListLength': actList.length, 'actList': actList},
       );
 }

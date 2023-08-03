@@ -13,23 +13,15 @@ class ActFab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final actList = ref.watch(actListProvider(_memId));
+    final actList = ref.watch(actListProvider(_memId)) ?? [];
 
-    if (actList!.isEmpty || actList.first.period.end != null) {
+    if (actList.isEmpty || actList.first.period.end != null) {
       return _StartActFab(
-        () => v(
-          () async {
-            ref.read(startAct(_memId));
-          },
-        ),
+        () => v(() async => ref.read(startAct(_memId))),
       );
     } else {
       return _FinishActFab(
-        () => v(
-          () async {
-            ref.read(finishAct(actList.first));
-          },
-        ),
+        () => v(() async => ref.read(finishAct(actList.first))),
       );
     }
   }

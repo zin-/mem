@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/acts/states.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
@@ -40,7 +41,8 @@ final rawMemListProvider =
 );
 
 final memListProvider =
-    StateNotifierProvider<ValueStateNotifier<List<Mem>>, List<Mem>>((ref) {
+    StateNotifierProvider.autoDispose<ValueStateNotifier<List<Mem>>, List<Mem>>(
+        (ref) {
   final rawMemList = ref.watch(rawMemListProvider) ?? <Mem>[];
 
   final showNotArchived = ref.watch(showNotArchivedProvider);
@@ -106,8 +108,11 @@ final memListProvider =
 });
 
 final activeActsProvider =
-    StateNotifierProvider<ListValueStateNotifier<Act>, List<Act>?>(
-  (ref) => v(() {
-    return ListValueStateNotifier<Act>(null);
-  }),
+    StateNotifierProvider.autoDispose<ListValueStateNotifier<Act>, List<Act>?>(
+  (ref) => v(() => ListValueStateNotifier<Act>(
+        ref
+            .watch(actsProvider)
+            ?.where((act) => act.period.end == null)
+            .toList(),
+      )),
 );

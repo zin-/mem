@@ -24,6 +24,7 @@ const _scenarioName = 'Act scenario';
 
 void testActScenario() => group(': $_scenarioName', () {
       final showActPageIconFinder = find.byIcon(Icons.play_arrow);
+      final zeroDate = DateTime(1);
 
       const insertedMemName = '$_scenarioName: saved mem name';
 
@@ -51,6 +52,15 @@ void testActScenario() => group(': $_scenarioName', () {
       });
       setUp(() async {
         await db.getTable(actTableDefinition.name).delete();
+
+        await db.getTable(actTableDefinition.name).insert({
+          fkDefMemId.name: insertedMemId,
+          defActStart.name: zeroDate,
+          defActStartIsAllDay.name: 0,
+          defActEnd.name: zeroDate,
+          defActEndIsAllDay.name: 0,
+          createdAtColDef.name: zeroDate,
+        });
       });
 
       Future<void> showMemListPage(WidgetTester widgetTester) async {
@@ -68,6 +78,50 @@ void testActScenario() => group(': $_scenarioName', () {
           await widgetTester.tap(showActPageIconFinder);
           await widgetTester.pumpAndSettle();
         }
+
+        group(": show inserted acts", () {
+          setUp(() async {
+            await db.getTable(actTableDefinition.name).insert({
+              fkDefMemId.name: insertedMemId,
+              defActStart.name: zeroDate,
+              defActStartIsAllDay.name: 0,
+              createdAtColDef.name: zeroDate,
+            });
+          });
+
+          testWidgets(
+            ": check.",
+            (widgetTester) async {
+              await showActListPage(widgetTester);
+
+              expect(
+                (widgetTester.widget(find.byType(Text).at(0)) as Text).data,
+                dateText(zeroDate),
+              );
+              expect(
+                (widgetTester.widget(find.byType(Text).at(2)) as Text).data,
+                timeText(zeroDate),
+              );
+              expect(
+                (widgetTester.widget(find.byType(Text).at(4)) as Text).data,
+                dateText(zeroDate),
+              );
+              expect(
+                (widgetTester.widget(find.byType(Text).at(6)) as Text).data,
+                timeText(zeroDate),
+              );
+              expect(
+                (widgetTester.widget(find.byType(Text).at(8)) as Text).data,
+                dateText(zeroDate),
+              );
+              expect(
+                (widgetTester.widget(find.byType(Text).at(10)) as Text).data,
+                timeText(zeroDate),
+              );
+              expect(find.byIcon(Icons.stop), findsOneWidget);
+            },
+          );
+        });
 
         testWidgets(
           ': start & finish act.',
@@ -145,8 +199,6 @@ void testActScenario() => group(': $_scenarioName', () {
         );
 
         group(': Edit act', () {
-          final zeroDate = DateTime(1);
-
           setUp(() async {
             await db.getTable(actTableDefinition.name).insert({
               fkDefMemId.name: insertedMemId,
@@ -159,7 +211,7 @@ void testActScenario() => group(': $_scenarioName', () {
           testWidgets(': save.', (widgetTester) async {
             await showActListPage(widgetTester);
 
-            await widgetTester.longPress(find.text(dateText(zeroDate)));
+            await widgetTester.longPress(find.text(dateText(zeroDate)).at(0));
             await widgetTester.pumpAndSettle();
 
             await widgetTester.tap(find.byType(Switch).at(1));
@@ -194,14 +246,14 @@ void testActScenario() => group(': $_scenarioName', () {
           testWidgets(': delete.', (widgetTester) async {
             await showActListPage(widgetTester);
 
-            await widgetTester.longPress(find.text(dateText(zeroDate)));
+            await widgetTester.longPress(find.text(dateText(zeroDate)).at(0));
             await widgetTester.pumpAndSettle();
 
             await widgetTester.tap(find.byIcon(Icons.delete));
             await widgetTester.pumpAndSettle();
 
-            expect(find.text(dateText(zeroDate)), findsNothing);
-            expect(find.text(timeText(zeroDate)), findsNothing);
+            expect(find.text(dateText(zeroDate)), findsNWidgets(2));
+            expect(find.text(timeText(zeroDate)), findsNWidgets(2));
           });
         });
       });
