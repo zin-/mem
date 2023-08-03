@@ -3,6 +3,7 @@ import 'package:mem/core/mem_detail.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification_repository.dart';
 import 'package:mem/notifications/notification_service.dart';
 
@@ -135,12 +136,14 @@ class MemService {
 
   Future<bool> remove(int memId) => i(
         () async {
+          await _memNotificationRepository.wasteByMemId(memId);
           await _memItemRepository.wasteByMemId(memId);
-          // FIXME 関数内でMemを保持していないためRepositoryを参照している
-          // discardされた時点でMemは存在しなくなるため、どちらにせよ無理筋かも
           await _memRepository.wasteById(memId);
 
-          _notificationRepository.discard(memId);
+          CancelAllMemNotifications.of(memId).forEach(
+            (cancelNotification) =>
+                _notificationRepository.receive(cancelNotification),
+          );
 
           return true;
         },
