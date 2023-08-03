@@ -20,10 +20,13 @@ class NotificationService {
 
   Future<void> memReminder(Mem mem) => i(
         () async {
-          // TODO 時間がないときのデフォルト値を設定から取得する
-          final memNotifications = MemNotifications(mem, 5, 0);
+          final memNotifications = MemNotifications.of(
+            mem,
+            // TODO 時間がないときのデフォルト値を設定から取得する
+            TimeOfDay(5, 0),
+          );
 
-          for (var element in memNotifications.notifications) {
+          for (var element in memNotifications) {
             await _notificationRepository.receive(element);
           }
         },

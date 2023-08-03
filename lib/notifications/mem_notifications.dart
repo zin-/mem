@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:mem/core/date_and_time/date_and_time.dart';
+import 'package:mem/core/date_and_time/time_of_day.dart';
 import 'package:mem/core/mem.dart';
 
 import 'client.dart';
@@ -15,21 +16,14 @@ const _startNotificationBody = 'start';
 const _endNotificationBody = 'end';
 
 class MemNotifications {
-  final List<Notification> notifications;
-
-  MemNotifications(
+  static List<Notification> of(
     Mem mem,
-    int startHourOfDay,
-    int startMinuteOfDay,
-  ) : notifications = List.empty(growable: true) {
+    TimeOfDay startOfDay,
+  ) {
     if (mem.isDone() || mem.isArchived()) {
-      notifications.add(CancelNotification(memStartNotificationId(mem.id)));
-      notifications.add(CancelNotification(memEndNotificationId(mem.id)));
-      notifications.add(CancelNotification(memRepeatedNotificationId(mem.id)));
-      notifications.add(CancelNotification(activeActNotificationId(mem.id)));
-      notifications
-          .add(CancelNotification(afterActStartedNotificationId(mem.id)));
+      return CancelAllMemNotifications.of(mem.id);
     } else {
+      final notifications = <Notification>[];
       final now = DateTime.now();
 
       final periodStart = mem.period?.start;
@@ -40,8 +34,7 @@ class MemNotifications {
           _startNotificationBody,
           periodStart,
           mem.id,
-          startHourOfDay,
-          startMinuteOfDay,
+          startOfDay,
         ));
       }
 
@@ -53,21 +46,21 @@ class MemNotifications {
           _endNotificationBody,
           periodEnd,
           mem.id,
-          startHourOfDay,
-          startMinuteOfDay,
+          startOfDay,
         ));
       }
+
+      return notifications;
     }
   }
 
-  Notification _createNotificationAt(
+  static Notification _createNotificationAt(
     id,
     title,
     body,
     DateAndTime notifyAt,
     int memId,
-    startHourOfDay,
-    startMinuteOfDay,
+    TimeOfDay startOfDay,
   ) {
     final notificationClient = NotificationClient();
 
@@ -85,10 +78,20 @@ class MemNotifications {
               notifyAt.year,
               notifyAt.month,
               notifyAt.day,
-              startHourOfDay,
-              startMinuteOfDay,
+              startOfDay.hour,
+              startOfDay.minute,
             )
           : notifyAt,
     );
   }
+}
+
+class CancelAllMemNotifications {
+  static List<Notification> of(int memId) => [
+        CancelNotification(memStartNotificationId(memId)),
+        CancelNotification(memEndNotificationId(memId)),
+        CancelNotification(memRepeatedNotificationId(memId)),
+        CancelNotification(activeActNotificationId(memId)),
+        CancelNotification(afterActStartedNotificationId(memId)),
+      ];
 }
