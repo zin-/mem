@@ -24,7 +24,6 @@ const _scenarioName = 'Act scenario';
 
 void testActScenario() => group(': $_scenarioName', () {
       final showActPageIconFinder = find.byIcon(Icons.play_arrow);
-      final zeroDate = DateTime(1);
 
       const insertedMemName = '$_scenarioName: saved mem name';
 

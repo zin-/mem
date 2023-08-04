@@ -10,6 +10,7 @@ import 'package:mem/main.dart';
 Future<void> runApplication() => main(languageCode: 'en');
 
 const waitSideEffectDuration = Duration(milliseconds: 2800);
+final zeroDate = DateTime(1);
 
 String dateText(DateTime dateTime) {
   return '${dateTime.month}/${dateTime.day}/${dateTime.year}';

@@ -36,17 +36,17 @@ void testTodoScenario() => group(': $_scenarioName', () {
         final memTable = db.getTable(memTableDefinition.name);
         await memTable.insert({
           defMemName.name: insertedMemName,
-          createdAtColDef.name: DateTime.now(),
+          createdAtColDef.name: zeroDate,
         });
         await memTable.insert({
           defMemName.name: undoneMemName,
-          createdAtColDef.name: DateTime.now(),
           defMemDoneAt.name: null,
+          createdAtColDef.name: zeroDate,
         });
         await memTable.insert({
           defMemName.name: doneMemName,
-          createdAtColDef.name: DateTime.now(),
-          defMemDoneAt.name: DateTime.now(),
+          defMemDoneAt.name: zeroDate,
+          createdAtColDef.name: zeroDate,
         });
       });
 
