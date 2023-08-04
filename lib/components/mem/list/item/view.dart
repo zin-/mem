@@ -10,6 +10,7 @@ import 'package:mem/components/timer.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/mems/states.dart';
 import 'package:mem/values/colors.dart';
 
 import 'actions.dart';
@@ -44,10 +45,15 @@ class MemListItemView extends ConsumerWidget {
             return _MemListItemViewComponent(
               mem,
               _onTapped,
-              (bool? value, MemId memId) {
-                value == true
-                    ? ref.read(doneMem(_memId))
-                    : ref.read(undoneMem(_memId));
+              (bool? value, MemId memId) async {
+                ref.read(memsProvider.notifier).upsertAll(
+                  [
+                    value == true
+                        ? ref.read(doneMem(_memId))
+                        : await ref.read(undoneMem(_memId))
+                  ],
+                  (tmp, item) => tmp.id == item.id,
+                );
               },
               ref.watch(activeActsProvider)?.singleWhereOrNull(
                     (act) => act.memId == mem.id,

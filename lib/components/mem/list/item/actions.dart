@@ -1,24 +1,31 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/core/mem_detail.dart';
+import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_service.dart';
 import 'package:mem/mems/states.dart';
 
-final doneMem = Provider.autoDispose.family<Future<MemDetail>, int>(
+final doneMem = Provider.autoDispose.family<Mem, int>(
   (ref, memId) => v(
-    () async {
-      final doneMemDetail = await MemService().doneByMemId(memId);
+    () {
+      final mem = ref
+          .read(memsProvider)!
+          .singleWhere((mem) => mem.id == memId)
+          .copied()
+        ..doneAt = DateTime.now();
 
-      ref
-          .read(memsProvider.notifier)
-          .upsertAll([doneMemDetail.mem], (tmp, item) => tmp.id == item.id);
+      MemService().doneByMemId(memId).then(
+            (doneMem) => ref.read(memsProvider.notifier).upsertAll(
+              [doneMem.mem],
+              (tmp, item) => tmp.id == item.id,
+            ),
+          );
 
-      return doneMemDetail;
+      return mem;
     },
-    {'memId': memId},
+    memId,
   ),
 );
-final undoneMem = Provider.autoDispose.family<Future<MemDetail>, int>(
+final undoneMem = Provider.autoDispose.family<Future<Mem>, int>(
   (ref, memId) => v(
     () async {
       final undoneMemDetail = await MemService().undoneByMemId(memId);
@@ -27,7 +34,7 @@ final undoneMem = Provider.autoDispose.family<Future<MemDetail>, int>(
           .read(memsProvider.notifier)
           .upsertAll([undoneMemDetail.mem], (tmp, item) => tmp.id == item.id);
 
-      return undoneMemDetail;
+      return undoneMemDetail.mem;
     },
     {'memId': memId},
   ),
