@@ -26,6 +26,11 @@ class MemNotificationRepository
         memId,
       );
 
+  Future<Iterable<MemNotification>> wasteByMemId(int memId) => v(
+        () async => await super.waste(Equals(memIdFkDef.name, memId)),
+        memId,
+      );
+
   @override
   MemNotification pack(Map<String, dynamic> unpackedPayload) {
     final entity = MemNotificationEntity.fromMap(unpackedPayload);

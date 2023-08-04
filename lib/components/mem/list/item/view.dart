@@ -16,7 +16,7 @@ import 'actions.dart';
 import 'states.dart';
 
 class MemListItemView extends ConsumerWidget {
-  final MemId _memId;
+  final int _memId;
   final void Function(MemId memId)? _onTapped;
 
   const MemListItemView(this._memId, this._onTapped, {super.key});
@@ -60,8 +60,8 @@ class MemListItemView extends ConsumerWidget {
                         .add(ref.read(startActV2(_memId)));
                   } else {
                     ref.read(activeActsProvider.notifier).removeWhere(
-                          (element) =>
-                              element.id ==
+                          (act) =>
+                              act.id ==
                               ref.read(finishActV2(activeAct.memId)).id,
                         );
                   }

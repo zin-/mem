@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/date_and_time/date_and_time_period_view.dart';
 import 'package:mem/components/mem/list/states.dart';
-import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
@@ -47,29 +46,11 @@ class MemPeriodTextFormFields extends ConsumerWidget {
 
           return _MemPeriodTextFormFieldsComponent(
             mem.period,
-            (pickedStart) => v(
+            (pickedPeriod) => v(
               () => ref
                   .read(editingMemProvider(_memId).notifier)
-                  .updatedBy(mem.copied()
-                    ..period = pickedStart == null && mem.period?.end == null
-                        ? null
-                        : DateAndTimePeriod(
-                            start: pickedStart,
-                            end: mem.period?.end,
-                          )),
-              pickedStart,
-            ),
-            (pickedEnd) => v(
-              () => ref
-                  .read(editingMemProvider(_memId).notifier)
-                  .updatedBy(mem.copied()
-                    ..period = pickedEnd == null && mem.period?.start == null
-                        ? null
-                        : DateAndTimePeriod(
-                            start: mem.period?.start,
-                            end: pickedEnd,
-                          )),
-              pickedEnd,
+                  .updatedBy(mem.copied()..period = pickedPeriod),
+              pickedPeriod,
             ),
           );
         },
@@ -78,21 +59,18 @@ class MemPeriodTextFormFields extends ConsumerWidget {
 
 class _MemPeriodTextFormFieldsComponent extends StatelessWidget {
   final DateAndTimePeriod? _dateAndTimePeriod;
-  final Function(DateAndTime? pickedStart) _onStartChanged;
-  final Function(DateAndTime? pickedStart) _onEndChanged;
+  final Function(DateAndTimePeriod? pickedPeriod) _onPeriodChanged;
 
   const _MemPeriodTextFormFieldsComponent(
     this._dateAndTimePeriod,
-    this._onStartChanged,
-    this._onEndChanged,
+    this._onPeriodChanged,
   );
 
   @override
   Widget build(BuildContext context) => v(
         () => DateAndTimePeriodTextFormFields(
           _dateAndTimePeriod,
-          _onStartChanged,
-          _onEndChanged,
+          _onPeriodChanged,
         ),
       );
 }

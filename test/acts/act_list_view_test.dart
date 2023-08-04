@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/acts/act_list_item_view.dart';
-import 'package:mem/acts/act_list_page_states.dart';
+import 'package:mem/acts/list_item/view.dart';
+import 'package:mem/acts/act_list_states.dart';
 import 'package:mem/acts/act_list_view.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/core/act.dart';

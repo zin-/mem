@@ -3,6 +3,7 @@ import 'package:mem/core/mem_detail.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification_repository.dart';
 import 'package:mem/notifications/notification_service.dart';
 
@@ -24,6 +25,16 @@ class MemService {
     this._notificationService,
     this._notificationRepository,
   );
+
+  Future<Mem> fetchMemById(int memId) => i(
+        () => _memRepository.shipById(memId),
+        {'memId': memId},
+      );
+
+  Future<List<MemItem>> fetchMemItemsByMemId(int memId) => i(
+        () async => (await _memItemRepository.shipByMemId(memId)).toList(),
+        {'memId': memId},
+      );
 
   Future<MemDetail> save(MemDetail memDetail, {bool undo = false}) => i(
         () async {
@@ -89,16 +100,6 @@ class MemService {
         {'memId': memId},
       );
 
-  Future<Mem> fetchMemById(int memId) => i(
-        () => _memRepository.shipById(memId),
-        {'memId': memId},
-      );
-
-  Future<List<MemItem>> fetchMemItemsByMemId(int memId) => i(
-        () async => (await _memItemRepository.shipByMemId(memId)).toList(),
-        {'memId': memId},
-      );
-
   Future<MemDetail> archive(Mem mem) => i(
         () async {
           final archivedMem = await _memRepository.archive(mem);
@@ -135,12 +136,14 @@ class MemService {
 
   Future<bool> remove(int memId) => i(
         () async {
+          await _memNotificationRepository.wasteByMemId(memId);
           await _memItemRepository.wasteByMemId(memId);
-          // FIXME 関数内でMemを保持していないためRepositoryを参照している
-          // discardされた時点でMemは存在しなくなるため、どちらにせよ無理筋かも
           await _memRepository.wasteById(memId);
 
-          _notificationRepository.discard(memId);
+          CancelAllMemNotifications.of(memId).forEach(
+            (cancelNotification) =>
+                _notificationRepository.receive(cancelNotification),
+          );
 
           return true;
         },
