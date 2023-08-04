@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/mem_service.dart';
@@ -14,7 +13,7 @@ final undoRemoveMem = FutureProvider.autoDispose.family<void, int>(
         final removeUndone =
             await MemService().save(removedMemDetail, undo: true);
 
-        ref.read(rawMemListProvider.notifier).add(removeUndone.mem);
+        ref.read(memsProvider.notifier).add(removeUndone.mem);
         ref
             .read(memItemsProvider(removeUndone.mem.id).notifier)
             .updatedBy(removeUndone.memItems);

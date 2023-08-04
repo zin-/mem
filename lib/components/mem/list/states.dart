@@ -6,6 +6,7 @@ import 'package:mem/core/mem.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/components/value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/mems/states.dart';
 
 final showNotArchivedProvider =
     StateNotifierProvider<ValueStateNotifier<bool>, bool>(
@@ -31,19 +32,10 @@ final showDoneProvider = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
   ),
 );
 
-final rawMemListProvider =
-    StateNotifierProvider<ListValueStateNotifier<Mem>, List<Mem>?>(
-  (ref) => v(
-    () {
-      return ListValueStateNotifier<Mem>(null);
-    },
-  ),
-);
-
 final memListProvider =
     StateNotifierProvider.autoDispose<ValueStateNotifier<List<Mem>>, List<Mem>>(
         (ref) {
-  final rawMemList = ref.watch(rawMemListProvider) ?? <Mem>[];
+  final rawMemList = ref.watch(memsProvider) ?? <Mem>[];
 
   final showNotArchived = ref.watch(showNotArchivedProvider);
   final showArchived = ref.watch(showArchivedProvider);

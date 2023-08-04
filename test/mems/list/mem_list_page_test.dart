@@ -10,6 +10,7 @@ import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/mems/list/actions.dart';
 import 'package:mem/mems/list/page.dart';
+import 'package:mem/mems/states.dart';
 
 void main() {
   setUpAll(() {
@@ -30,8 +31,7 @@ void main() {
         loadMemList.overrideWith((ref) => null),
         fetchActiveActs.overrideWith((ref) => Future.value(null)),
         activeActsProvider.overrideWith((ref) => ListValueStateNotifier([])),
-        rawMemListProvider
-            .overrideWith((ref) => ListValueStateNotifier(samples)),
+        memsProvider.overrideWith((ref) => ListValueStateNotifier(samples)),
       ],
       child: MaterialApp(
         onGenerateTitle: (context) => buildL10n(context).memDetailPageTitle,

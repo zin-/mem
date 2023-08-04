@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_detail.dart';
 import 'package:mem/core/mem_item.dart';
@@ -9,6 +8,7 @@ import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/components/value_state_notifier.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
+import 'package:mem/mems/states.dart';
 
 final memDetailProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<MemDetail>, MemDetail, int?>(
@@ -28,14 +28,14 @@ final editingMemProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<Mem>, Mem, int?>(
   (ref, memId) => v(
     () {
-      final rawMemList = ref.watch(rawMemListProvider);
+      final rawMemList = ref.watch(memsProvider);
       final memFromRawMemList =
           rawMemList?.singleWhereOrNull((element) => element.id == memId);
 
       if (memId != null && rawMemList == null) {
         MemRepository().shipById(memId).then((value) {
           ref
-              .read(rawMemListProvider.notifier)
+              .read(memsProvider.notifier)
               .upsertAll([value], (tmp, item) => tmp.id == item.id);
         });
       }
