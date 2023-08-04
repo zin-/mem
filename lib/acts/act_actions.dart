@@ -75,16 +75,15 @@ final finishAct = Provider.autoDispose.family<void, Act>(
   ),
 );
 
-final saveAct = Provider.autoDispose.family<Act, ActIdentifier>(
+final editAct = Provider.autoDispose.family<Act, ActIdentifier>(
   (ref, actIdentifier) => v(
     () {
       final editingAct = ref.watch(editingActProvider(actIdentifier));
 
-      // TODO serviceにして、notificationについても考慮する
-      ActRepository()
-          .replace(editingAct)
-          .then((replacedAct) => ref.read(actsProvider.notifier).upsertAll(
-                [replacedAct],
+      ActService()
+          .edit(editingAct)
+          .then((editedAct) => ref.read(actsProvider.notifier).upsertAll(
+                [editedAct],
                 (tmp, item) => tmp.id == item.id,
               ));
 

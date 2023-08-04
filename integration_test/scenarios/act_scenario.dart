@@ -233,12 +233,45 @@ void testActScenario() => group(': $_scenarioName', () {
               timeText(zeroDate),
             );
             expect(
-              // FIXME failed test
               (widgetTester.widget(find.byType(Text).at(4)) as Text).data,
               dateText(pickedDate),
             );
             expect(
               (widgetTester.widget(find.byType(Text).at(6)) as Text).data,
+              timeText(pickedDate),
+            );
+
+            await widgetTester.longPress(find.text(dateText(zeroDate)).at(1));
+            await widgetTester.pumpAndSettle();
+
+            await widgetTester.tap(find.byIcon(Icons.clear).at(1));
+            await widgetTester.pumpAndSettle();
+
+            await widgetTester.tap(find.byIcon(Icons.save_alt));
+            await widgetTester.pumpAndSettle();
+
+            expect(
+              (widgetTester.widget(find.byType(Text).at(0)) as Text).data,
+              dateText(zeroDate),
+            );
+            expect(
+              (widgetTester.widget(find.byType(Text).at(2)) as Text).data,
+              timeText(zeroDate),
+            );
+            expect(
+              (widgetTester.widget(find.byType(Text).at(4)) as Text).data,
+              dateText(zeroDate),
+            );
+            expect(
+              (widgetTester.widget(find.byType(Text).at(6)) as Text).data,
+              timeText(zeroDate),
+            );
+            expect(
+              (widgetTester.widget(find.byType(Text).at(8)) as Text).data,
+              dateText(pickedDate),
+            );
+            expect(
+              (widgetTester.widget(find.byType(Text).at(10)) as Text).data,
               timeText(pickedDate),
             );
           });

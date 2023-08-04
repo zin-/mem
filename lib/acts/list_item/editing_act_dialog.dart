@@ -32,7 +32,7 @@ class EditingActDialog extends ConsumerWidget {
       ),
       () => ref.read(deleteAct(_act.identifier)),
       () => v(() => ref.read(actsProvider.notifier).upsertAll(
-            [ref.read(saveAct(_act.identifier))],
+            [ref.read(editAct(_act.identifier))],
             (tmp, item) => tmp.id == item.id,
           )),
     );

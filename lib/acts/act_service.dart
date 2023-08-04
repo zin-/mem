@@ -28,41 +28,7 @@ class ActService {
         () async {
           final receivedAct = await _actRepository.receive(startingAct);
 
-          final mem = await _memRepository.shipById(startingAct.memId);
-
-          _notificationRepository.receive(
-            ShowNotification(
-              activeActNotificationId(startingAct.memId),
-              mem.name,
-              'Running',
-              json.encode({memIdKey: startingAct.memId}),
-              [
-                _notificationClient.finishActiveActAction,
-              ],
-              _notificationClient.activeActNotificationChannel,
-            ),
-          );
-
-          final afterActStartedNotifications = await _memNotificationRepository
-              .shipByMemIdAndAfterActStarted(startingAct.memId);
-
-          if (afterActStartedNotifications.isNotEmpty) {
-            for (var notification in afterActStartedNotifications) {
-              _notificationRepository.receive(
-                OneTimeNotification(
-                  afterActStartedNotificationId(startingAct.memId),
-                  mem.name,
-                  notification.message,
-                  json.encode({memIdKey: startingAct.memId}),
-                  [
-                    _notificationClient.finishActiveActAction,
-                  ],
-                  _notificationClient.afterActStartedNotificationChannel,
-                  DateTime.now().add(Duration(seconds: notification.time!)),
-                ),
-              );
-            }
-          }
+          _registerStartNotifications(receivedAct.memId);
 
           return receivedAct;
         },
@@ -78,6 +44,52 @@ class ActService {
             ),
           );
 
+          _registerStartNotifications(receivedAct.memId);
+
+          return receivedAct;
+        },
+        memId,
+      );
+
+  Future<Act> finish(Act act) => i(
+        () async {
+          final finished = await _actRepository.replace(
+            Act(
+              act.memId,
+              DateAndTimePeriod(
+                start: act.period.start,
+                end: DateAndTime.now(),
+              ),
+              id: act.id,
+            ),
+          );
+
+          _cancelNotifications(act.memId);
+
+          // ISSUE #226
+
+          return finished;
+        },
+        act,
+      );
+
+  Future<Act> edit(Act editingAct) => i(
+        () async {
+          final replaced = await _actRepository.replace(editingAct);
+
+          if (replaced.period.end == null) {
+            _registerStartNotifications(replaced.memId);
+          } else {
+            _cancelNotifications(replaced.memId);
+          }
+
+          return replaced;
+        },
+        editingAct,
+      );
+
+  Future _registerStartNotifications(int memId) => v(
+        () async {
           final mem = await _memRepository.shipById(memId);
 
           _notificationRepository.receive(
@@ -113,35 +125,17 @@ class ActService {
               );
             }
           }
-
-          return receivedAct;
         },
         memId,
       );
 
-  Future<Act> finish(Act act) => i(
+  Future _cancelNotifications(int memId) => v(
         () async {
-          final finished = await _actRepository.replace(
-            Act(
-              act.memId,
-              DateAndTimePeriod(
-                start: act.period.start,
-                end: DateAndTime.now(),
-              ),
-              id: act.id,
-            ),
-          );
-
+          await _notificationRepository.discard(activeActNotificationId(memId));
           await _notificationRepository
-              .discard(activeActNotificationId(act.memId));
-          await _notificationRepository
-              .discard(afterActStartedNotificationId(act.memId));
-
-          // ISSUE #226
-
-          return finished;
+              .discard(afterActStartedNotificationId(memId));
         },
-        act,
+        memId,
       );
 
   ActService._(
