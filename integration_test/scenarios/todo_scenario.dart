@@ -113,6 +113,7 @@ void testTodoScenario() => group(': $_scenarioName', () {
             await widgetTester.tap(find.byType(Checkbox).at(0));
             await widgetTester.pumpAndSettle();
 
+            // FIXME failed test
             expect(find.text(insertedMemName), findsNothing);
             expect(find.text(undoneMemName), findsOneWidget);
             expect(find.text(doneMemName), findsNothing);
