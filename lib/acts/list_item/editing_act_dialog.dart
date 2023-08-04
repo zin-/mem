@@ -30,7 +30,12 @@ class EditingActDialog extends ConsumerWidget {
             ),
         pickedPeriod,
       ),
-      () => ref.read(deleteAct(_act.identifier)),
+      () => v(() {
+        ref.read(deleteAct(_act.identifier));
+        ref.read(actsProvider.notifier).removeWhere(
+              (act) => act.id == _act.memId,
+            );
+      }),
       () => v(() => ref.read(actsProvider.notifier).upsertAll(
             [ref.read(editAct(_act.identifier))],
             (tmp, item) => tmp.id == item.id,

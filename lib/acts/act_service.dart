@@ -88,6 +88,17 @@ class ActService {
         editingAct,
       );
 
+  Future<Act> delete(int id) => i(
+        () async {
+          final wasted = await ActRepository().wasteById(id);
+
+          _cancelNotifications(wasted.memId);
+
+          return wasted;
+        },
+        id,
+      );
+
   Future _registerStartNotifications(int memId) => v(
         () async {
           final mem = await _memRepository.shipById(memId);

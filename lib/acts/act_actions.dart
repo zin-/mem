@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/acts/act_repository.dart';
 import 'package:mem/acts/act_service.dart';
 import 'package:mem/acts/list_item/states.dart';
 import 'package:mem/components/mem/list/states.dart';
@@ -96,11 +95,11 @@ final editAct = Provider.autoDispose.family<Act, ActIdentifier>(
 final deleteAct = Provider.autoDispose.family<void, ActIdentifier>(
   (ref, actIdentifier) => v(
     () async {
-      await ActRepository().wasteById(actIdentifier.actId);
-
-      ref
-          .read(actsProvider.notifier)
-          .removeWhere((item) => item.id == actIdentifier.actId);
+      ActService().delete(actIdentifier.actId).then((value) {
+        ref
+            .read(actsProvider.notifier)
+            .removeWhere((item) => item.id == value.id);
+      });
     },
     actIdentifier,
   ),
