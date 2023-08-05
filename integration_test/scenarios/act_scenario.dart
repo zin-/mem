@@ -50,9 +50,10 @@ void testActScenario() => group(': $_scenarioName', () {
         });
       });
       setUp(() async {
-        await db.getTable(actTableDefinition.name).delete();
+        final actsTable = db.getTable(actTableDefinition.name);
 
-        await db.getTable(actTableDefinition.name).insert({
+        await actsTable.delete();
+        await actsTable.insert({
           fkDefMemId.name: insertedMemId,
           defActStart.name: zeroDate,
           defActStartIsAllDay.name: 0,
@@ -288,6 +289,54 @@ void testActScenario() => group(': $_scenarioName', () {
             expect(find.text(timeText(zeroDate)), findsNWidgets(2));
           });
         });
+      });
+
+      group(": ActLineChartPage", () {
+        setUp(() async {
+          final actsTable = db.getTable(actTableDefinition.name);
+
+          await actsTable.delete();
+
+          final now = DateTime.now();
+
+          await actsTable.insert({
+            fkDefMemId.name: insertedMemId,
+            defActStart.name: DateTime(now.year, now.month - 1, 28),
+            defActStartIsAllDay.name: 0,
+            defActEnd.name: now,
+            defActEndIsAllDay.name: 0,
+            createdAtColDef.name: zeroDate,
+          });
+
+          for (int i = 0; i < 6; i++) {
+            final start = now.subtract(Duration(days: i));
+            for (int j = 0; j < randomInt(5); j++) {
+              await actsTable.insert({
+                fkDefMemId.name: insertedMemId,
+                defActStart.name: start,
+                defActStartIsAllDay.name: 0,
+                defActEnd.name: now,
+                defActEndIsAllDay.name: 0,
+                createdAtColDef.name: zeroDate,
+              });
+            }
+          }
+        });
+
+        testWidgets(
+          ": show chart",
+          (widgetTester) async {
+            await showMemListPage(widgetTester);
+
+            await widgetTester.tap(find.text(insertedMemName));
+            await widgetTester.pumpAndSettle();
+
+            await widgetTester.tap(find.byIcon(Icons.show_chart));
+            await widgetTester.pumpAndSettle();
+
+            expect(true, isTrue);
+          },
+        );
       });
 
       group(': MemListPage', () {
