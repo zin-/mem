@@ -28,6 +28,7 @@ class MemListItemView extends ConsumerWidget {
           final mem =
               ref.watch(memListProvider).firstWhere((_) => _.id == _memId);
 
+          // TODO separate _SingleSelectableMemListItemComponent and somethings
           if (ref.watch(memListViewModeProvider) ==
               MemListViewMode.singleSelection) {
             return _SingleSelectableMemListItemComponent(
@@ -50,7 +51,7 @@ class MemListItemView extends ConsumerWidget {
                   [
                     value == true
                         ? ref.read(doneMem(_memId))
-                        : await ref.read(undoneMem(_memId))
+                        : ref.read(undoneMem(_memId))
                   ],
                   (tmp, item) => tmp.id == item.id,
                 );

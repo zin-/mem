@@ -14,8 +14,8 @@ final doneMem = Provider.autoDispose.family<Mem, int>(
         ..doneAt = DateTime.now();
 
       MemService().doneByMemId(memId).then(
-            (doneMem) => ref.read(memsProvider.notifier).upsertAll(
-              [doneMem.mem],
+            (doneMemDetail) => ref.read(memsProvider.notifier).upsertAll(
+              [doneMemDetail.mem],
               (tmp, item) => tmp.id == item.id,
             ),
           );
@@ -25,17 +25,25 @@ final doneMem = Provider.autoDispose.family<Mem, int>(
     memId,
   ),
 );
-final undoneMem = Provider.autoDispose.family<Future<Mem>, int>(
+
+final undoneMem = Provider.autoDispose.family<Mem, int>(
   (ref, memId) => v(
-    () async {
-      final undoneMemDetail = await MemService().undoneByMemId(memId);
+    () {
+      final mem = ref
+          .read(memsProvider)!
+          .singleWhere((mem) => mem.id == memId)
+          .copied()
+        ..doneAt = null;
 
-      ref
-          .read(memsProvider.notifier)
-          .upsertAll([undoneMemDetail.mem], (tmp, item) => tmp.id == item.id);
+      MemService().undoneByMemId(memId).then(
+            (undoneMemDetail) => ref.read(memsProvider.notifier).upsertAll(
+              [undoneMemDetail.mem],
+              (tmp, item) => tmp.id == item.id,
+            ),
+          );
 
-      return undoneMemDetail.mem;
+      return mem;
     },
-    {'memId': memId},
+    memId,
   ),
 );
