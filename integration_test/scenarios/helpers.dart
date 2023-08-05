@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/database/table_definitions/acts.dart';
@@ -11,6 +13,7 @@ Future<void> runApplication() => main(languageCode: 'en');
 
 const waitSideEffectDuration = Duration(milliseconds: 2800);
 final zeroDate = DateTime(1);
+int randomInt([int max = 42949671]) => Random().nextInt(max);
 
 String dateText(DateTime dateTime) {
   return '${dateTime.month}/${dateTime.day}/${dateTime.year}';

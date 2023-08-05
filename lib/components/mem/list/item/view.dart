@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/act_actions.dart';
+import 'package:mem/components/mem/list/item/single_selectable_mem_list_item.dart';
 import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/components/mem/mem_done_checkbox.dart';
 import 'package:mem/components/mem/mem_name.dart';
@@ -31,17 +32,7 @@ class MemListItemView extends ConsumerWidget {
           // TODO separate _SingleSelectableMemListItemComponent and somethings
           if (ref.watch(memListViewModeProvider) ==
               MemListViewMode.singleSelection) {
-            return _SingleSelectableMemListItemComponent(
-              mem,
-              ref.watch(selectedMemIdsProvider)?.contains(_memId) ?? false,
-              (memId) => v(
-                () => ref
-                    .read(selectedMemIdsProvider.notifier)
-                    .updatedBy([memId]),
-                {'memId': memId},
-              ),
-              key: key,
-            );
+            return SingleSelectableMemListItem(_memId);
           } else {
             return _MemListItemViewComponent(
               mem,
@@ -116,25 +107,5 @@ class _MemListItemViewComponent extends ListTile {
           subtitle: mem.period == null ? null : MemPeriodTexts(mem.id),
           tileColor: mem.isArchived() ? archivedColor : null,
           onTap: onTap == null ? null : () => onTap(mem.id),
-        );
-}
-
-class _SingleSelectableMemListItemComponent extends ListTile {
-  _SingleSelectableMemListItemComponent(
-    Mem mem,
-    bool isSelected,
-    void Function(MemId value) select, {
-    super.key,
-  }) : super(
-          title: MemNameText(mem.name, mem.id),
-          subtitle: mem.period == null ? null : MemPeriodTexts(mem.id),
-          trailing: Radio<MemId>(
-            value: mem.id,
-            groupValue: isSelected ? mem.id : null,
-            onChanged: (value) => value != null ? select(value) : null,
-          ),
-          onTap: () {
-            select(mem.id);
-          },
         );
 }

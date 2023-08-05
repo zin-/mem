@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/main.dart';
 
 /// # Home widget
 ///
@@ -40,7 +41,9 @@ class HomeWidgetAccessor {
         {'widgetName': widgetName},
       );
 
-  HomeWidgetAccessor._();
+  HomeWidgetAccessor._() {
+    HomeWidget.registerBackgroundCallback(backgroundCallback);
+  }
 
   static HomeWidgetAccessor? _instance;
 
