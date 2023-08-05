@@ -25,52 +25,43 @@ class MemListItemView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () {
-          final mem =
-              ref.watch(memListProvider).firstWhere((_) => _.id == _memId);
-
-          // TODO separate _SingleSelectableMemListItemComponent and somethings
-          if (ref.watch(memListViewModeProvider) ==
-              MemListViewMode.singleSelection) {
-            return SingleSelectableMemListItem(_memId);
-          } else {
-            return _MemListItemViewComponent(
-              mem,
-              _onTapped,
-              (bool? value, MemId memId) async {
-                ref.read(memsProvider.notifier).upsertAll(
-                  [
-                    value == true
-                        ? ref.read(doneMem(_memId))
-                        : ref.read(undoneMem(_memId))
-                  ],
-                  (tmp, item) => tmp.id == item.id,
-                );
-              },
-              ref.watch(activeActsProvider)?.singleWhereOrNull(
-                    (act) => act.memId == mem.id,
-                  ),
-              (activeAct) => v(
-                () async {
-                  if (activeAct == null) {
-                    ref
-                        .read(activeActsProvider.notifier)
-                        .add(ref.read(startActV2(_memId)));
-                  } else {
-                    ref.read(activeActsProvider.notifier).removeWhere(
-                          (act) =>
-                              act.id ==
-                              ref.read(finishActV2(activeAct.memId)).id,
-                        );
-                  }
+        () => ref.read(memListViewModeProvider) ==
+                MemListViewMode.singleSelection
+            ? SingleSelectableMemListItem(_memId)
+            : _MemListItemViewComponent(
+                ref.watch(memListProvider).firstWhere((_) => _.id == _memId),
+                _onTapped,
+                (bool? value, MemId memId) async {
+                  ref.read(memsProvider.notifier).upsertAll(
+                    [
+                      value == true
+                          ? ref.read(doneMem(_memId))
+                          : ref.read(undoneMem(_memId))
+                    ],
+                    (tmp, item) => tmp.id == item.id,
+                  );
                 },
-                activeAct,
+                ref.watch(activeActsProvider)?.singleWhereOrNull(
+                      (act) => act.memId == _memId,
+                    ),
+                (activeAct) => v(
+                  () async {
+                    if (activeAct == null) {
+                      ref
+                          .read(activeActsProvider.notifier)
+                          .add(ref.read(startActV2(_memId)));
+                    } else {
+                      ref.read(activeActsProvider.notifier).removeWhere(
+                            (act) =>
+                                act.id ==
+                                ref.read(finishActV2(activeAct.memId)).id,
+                          );
+                    }
+                  },
+                  activeAct,
+                ),
               ),
-              key: key,
-            );
-          }
-        },
-        {'_memId': _memId},
+        _memId,
       );
 }
 
@@ -80,9 +71,8 @@ class _MemListItemViewComponent extends ListTile {
     void Function(MemId memId)? onTap,
     void Function(bool? value, MemId memId) onMemDoneCheckboxTapped,
     Act? activeAct,
-    void Function(Act? act) onActButtonTapped, {
-    super.key,
-  }) : super(
+    void Function(Act? act) onActButtonTapped,
+  ) : super(
           leading: activeAct == null
               ? MemDoneCheckbox(
                   mem,
@@ -107,5 +97,7 @@ class _MemListItemViewComponent extends ListTile {
           subtitle: mem.period == null ? null : MemPeriodTexts(mem.id),
           tileColor: mem.isArchived() ? archivedColor : null,
           onTap: onTap == null ? null : () => onTap(mem.id),
-        );
+        ) {
+    verbose({'mem': mem, 'activeAct': activeAct});
+  }
 }
