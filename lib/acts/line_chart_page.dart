@@ -1,10 +1,9 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:mem/acts/act_list_actions.dart';
 import 'package:mem/acts/act_list_states.dart';
 import 'package:mem/acts/acts_summary.dart';
+import 'package:mem/acts/line_chart_wrapper.dart';
 import 'package:mem/components/async_value_view.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
@@ -27,116 +26,13 @@ class ActLineChartPage extends ConsumerWidget {
               padding: pagePadding,
               child: AsyncValueView(
                 loadActList(_memId),
-                (loaded) {
-                  final actsSummary = ActsSummary(
+                (loaded) => LineChartWrapper(
+                  ActsSummary(
                     ref
                         .watch(actListProvider(_memId))!
                         .where((element) => element.memId == _memId),
-                  );
-
-                  const yAxisTitles = AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      interval: 1,
-                    ),
-                  );
-                  final min = actsSummary.min;
-                  final max = actsSummary.max;
-
-                  return LineChart(
-                    LineChartData(
-                      gridData: FlGridData(
-                        drawVerticalLine: false,
-                        horizontalInterval:
-                            max == min ? 1 : ((max - min) / 4).ceilToDouble(),
-                      ),
-                      minY: min > 0 ? min - 1 : 0,
-                      maxY: max + 1,
-                      titlesData: FlTitlesData(
-                        topTitles: const AxisTitles(),
-                        leftTitles: yAxisTitles,
-                        rightTitles: yAxisTitles,
-                        bottomTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            interval: const Duration(days: 1)
-                                .inMilliseconds
-                                .toDouble(),
-                            getTitlesWidget: (value, meta) {
-                              final dateTime =
-                                  DateTime.fromMillisecondsSinceEpoch(
-                                value.toInt(),
-                              );
-                              if (value == meta.min ||
-                                  value == meta.max ||
-                                  dateTime.month == 1) {
-                                return Text(
-                                  DateFormat.yMd().format(
-                                    dateTime,
-                                  ),
-                                );
-                              } else if (dateTime.day == 1) {
-                                return Text(DateFormat.Md().format(
-                                  dateTime,
-                                ));
-                              } else if (dateTime.day == 5 ||
-                                  dateTime.day == 10 ||
-                                  dateTime.day == 15 ||
-                                  dateTime.day == 20 ||
-                                  dateTime.day == 25) {
-                                return Text(DateFormat.d().format(
-                                  dateTime,
-                                ));
-                              } else {
-                                return const Text('');
-                              }
-                            },
-                          ),
-                        ),
-                      ),
-                      lineBarsData: [
-                        LineChartBarData(
-                          spots: actsSummary
-                              .simpleMovingAverage(5)
-                              .entries
-                              .map(
-                                (e) => FlSpot(
-                                  e.key.millisecondsSinceEpoch.toDouble(),
-                                  e.value,
-                                ),
-                              )
-                              .toList(),
-                          isCurved: true,
-                          dotData: const FlDotData(show: false),
-                          color: Colors.teal,
-                        ),
-                        LineChartBarData(
-                          spots: actsSummary
-                              .linearWeightedMovingAverage(5)
-                              .entries
-                              .map(
-                                (e) => FlSpot(
-                                  e.key.millisecondsSinceEpoch.toDouble(),
-                                  e.value,
-                                ),
-                              )
-                              .toList(),
-                          isCurved: true,
-                          dotData: const FlDotData(show: false),
-                          color: Colors.tealAccent,
-                        ),
-                        LineChartBarData(
-                          spots: actsSummary.groupedListByDate.entries
-                              .map((e) => FlSpot(
-                                    e.key.millisecondsSinceEpoch.toDouble(),
-                                    e.value.length.toDouble(),
-                                  ))
-                              .toList(),
-                        ),
-                      ],
-                    ),
-                  );
-                },
+                  ),
+                ),
               ),
             ),
           );
