@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/core/mem_detail.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/logger/log_service.dart';
@@ -54,7 +53,7 @@ final saveMem =
             );
 
             ref
-                .read(rawMemListProvider.notifier)
+                .read(memsProvider.notifier)
                 .upsertAll([saved.mem], (tmp, item) => tmp.id == item.id);
 
             ref.read(editingMemProvider(memId).notifier).updatedBy(saved.mem);
@@ -79,7 +78,7 @@ final archiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
 
       ref.read(editingMemProvider(memId).notifier).updatedBy(archived.mem);
       ref
-          .read(rawMemListProvider.notifier)
+          .read(memsProvider.notifier)
           .upsertAll([archived.mem], (tmp, item) => tmp.id == item.id);
 
       return archived;
@@ -97,7 +96,7 @@ final unarchiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
 
       ref.read(editingMemProvider(memId).notifier).updatedBy(unarchived.mem);
       ref
-          .read(rawMemListProvider.notifier)
+          .read(memsProvider.notifier)
           .upsertAll([unarchived.mem], (tmp, item) => tmp.id == item.id);
 
       return unarchived;
@@ -114,7 +113,7 @@ final removeMem = Provider.autoDispose.family<Future<bool>, int?>(
 
         ref.read(removedMemProvider(memId).notifier).updatedBy(
               ref
-                  .read(rawMemListProvider)
+                  .read(memsProvider)
                   ?.singleWhereOrNull((element) => element.id == memId),
             );
         ref.read(removedMemItemsProvider(memId).notifier).updatedBy(
@@ -122,7 +121,7 @@ final removeMem = Provider.autoDispose.family<Future<bool>, int?>(
             );
 
         ref
-            .read(rawMemListProvider.notifier)
+            .read(memsProvider.notifier)
             .removeWhere((element) => element.id == memId);
 
         return removeSuccess;

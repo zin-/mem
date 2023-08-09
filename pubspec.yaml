@@ -43,6 +43,7 @@ dependencies:
   home_widget: ^0.2.0+1
   workmanager: ^0.5.1
   flutter_keyboard_visibility: ^5.4.1
+  fl_chart: ^0.63.0
 
 dev_dependencies:
   # for Test mock

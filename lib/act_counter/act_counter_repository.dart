@@ -1,8 +1,5 @@
-import 'dart:io';
-
-import 'package:home_widget/home_widget.dart';
+import 'package:flutter/foundation.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/main.dart';
 import 'package:mem/repositories/_repository_v2.dart';
 
 import 'act_counter.dart';
@@ -14,23 +11,25 @@ const initializeMethodName = 'initialize';
 const widgetProviderName = 'ActCounterProvider';
 
 class ActCounterRepository extends RepositoryV2<ActCounter, ActCounter> {
-  final HomeWidgetAccessor _homeWidgetAccessor;
+  final HomeWidgetAccessor? _homeWidgetAccessor;
 
   @override
   Future<ActCounter> receive(ActCounter payload) => v(
         () async {
-          final homeWidgetId = await _homeWidgetAccessor.initialize(
+          final homeWidgetId = await _homeWidgetAccessor?.initialize(
             methodChannelName,
             initializeMethodName,
           );
 
-          InitializedActCounter(homeWidgetId, payload)
-              .widgetData()
-              .forEach((key, value) async {
-            await _homeWidgetAccessor.saveWidgetData(key, value);
-          });
+          if (homeWidgetId != null) {
+            InitializedActCounter(homeWidgetId, payload)
+                .widgetData()
+                .forEach((key, value) async {
+              await _homeWidgetAccessor?.saveWidgetData(key, value);
+            });
 
-          await _homeWidgetAccessor.updateWidget(widgetProviderName);
+            await _homeWidgetAccessor?.updateWidget(widgetProviderName);
+          }
 
           return payload;
         },
@@ -41,10 +40,10 @@ class ActCounterRepository extends RepositoryV2<ActCounter, ActCounter> {
   Future<ActCounter> replace(ActCounter payload) => v(
         () async {
           payload.widgetData().forEach((key, value) async {
-            await _homeWidgetAccessor.saveWidgetData(key, value);
+            await _homeWidgetAccessor?.saveWidgetData(key, value);
           });
 
-          await _homeWidgetAccessor.updateWidget(widgetProviderName);
+          await _homeWidgetAccessor?.updateWidget(widgetProviderName);
 
           return payload;
         },
@@ -59,12 +58,8 @@ class ActCounterRepository extends RepositoryV2<ActCounter, ActCounter> {
   static ActCounterRepository? _instance;
 
   factory ActCounterRepository() => _instance ??= ActCounterRepository._(
-        HomeWidgetAccessor(),
+        defaultTargetPlatform == TargetPlatform.android
+            ? HomeWidgetAccessor()
+            : null,
       );
-}
-
-void initializeActCounter() {
-  if (!Platform.isWindows) {
-    HomeWidget.registerBackgroundCallback(backgroundCallback);
-  }
 }

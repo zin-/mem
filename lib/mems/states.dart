@@ -1,9 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_detail.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/components/value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
+
+final memsProvider =
+    StateNotifierProvider<ListValueStateNotifier<Mem>, List<Mem>?>(
+        (ref) => v(() => ListValueStateNotifier<Mem>(null)));
 
 final removedMemDetailProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<MemDetail?>, MemDetail?, int>(

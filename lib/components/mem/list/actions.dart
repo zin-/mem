@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
+import 'package:mem/mems/states.dart';
 
 final loadMemList = FutureProvider(
   (ref) => v(
@@ -24,7 +25,7 @@ final loadMemList = FutureProvider(
         },
       );
 
-      ref.read(rawMemListProvider.notifier).upsertAll(
+      ref.read(memsProvider.notifier).upsertAll(
             mems,
             (tmp, item) => tmp.id == item.id,
           );

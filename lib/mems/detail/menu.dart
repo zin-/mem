@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/act_list_page.dart';
+import 'package:mem/acts/line_chart_page.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_detail.dart';
@@ -46,6 +47,7 @@ class _MemDetailMenuComponent extends StatelessWidget {
     final menu = <Widget>[];
 
     if (_mem.isSaved()) {
+      menu.add(_showActChartIconButton(Navigator.of(context), _mem.id));
       menu.add(_showActIconButton(context, _mem.id));
 
       if (_mem.isArchived()) {
@@ -61,6 +63,25 @@ class _MemDetailMenuComponent extends StatelessWidget {
       children: menu,
     );
   }
+
+  IconButton _showActChartIconButton(
+    NavigatorState navigatorState,
+    int memId,
+  ) =>
+      IconButton(
+        onPressed: () {
+          navigatorState.push(
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  ActLineChartPage(memId),
+            ),
+          );
+        },
+        icon: const Icon(
+          Icons.show_chart,
+          color: Colors.white,
+        ),
+      );
 
   IconButton _showActIconButton(BuildContext context, int memId) => IconButton(
         onPressed: () {

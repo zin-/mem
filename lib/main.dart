@@ -53,7 +53,7 @@ Future<void> launchActCounterConfigure() => i(
 Future<void> _runApplication(Widget home, {String? languageCode}) => i(
       () async {
         await openDatabase();
-        initializeActCounter();
+        ActCounterRepository();
 
         runApp(MemApplication(home, languageCode));
       },

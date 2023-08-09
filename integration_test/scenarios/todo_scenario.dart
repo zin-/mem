@@ -36,70 +36,73 @@ void testTodoScenario() => group(': $_scenarioName', () {
         final memTable = db.getTable(memTableDefinition.name);
         await memTable.insert({
           defMemName.name: insertedMemName,
-          createdAtColDef.name: DateTime.now(),
+          createdAtColDef.name: zeroDate,
         });
         await memTable.insert({
           defMemName.name: undoneMemName,
-          createdAtColDef.name: DateTime.now(),
           defMemDoneAt.name: null,
+          createdAtColDef.name: zeroDate,
         });
         await memTable.insert({
           defMemName.name: doneMemName,
-          createdAtColDef.name: DateTime.now(),
-          defMemDoneAt.name: DateTime.now(),
+          defMemDoneAt.name: zeroDate,
+          createdAtColDef.name: zeroDate,
         });
       });
 
       group(': done & undone', () {
-        testWidgets(': MemDetail.', (widgetTester) async {
-          await runApplication();
-          await widgetTester.pumpAndSettle();
+        testWidgets(
+          ': MemDetailPage.',
+          (widgetTester) async {
+            await runApplication();
+            await widgetTester.pumpAndSettle();
 
-          expect(find.text(undoneMemName), findsOneWidget);
-          expect(find.text(doneMemName), findsNothing);
-          await widgetTester.tap(find.text(insertedMemName));
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(find.byType(Checkbox));
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(saveMemFabFinder);
-          await widgetTester.pumpAndSettle();
-          await widgetTester.pageBack();
-          await widgetTester.pumpAndSettle();
+            expect(find.text(undoneMemName), findsOneWidget);
+            expect(find.text(doneMemName), findsNothing);
+            await widgetTester.tap(find.text(insertedMemName));
+            await widgetTester.pumpAndSettle();
+            await widgetTester.tap(find.byType(Checkbox));
+            await widgetTester.pumpAndSettle();
+            await widgetTester.tap(saveMemFabFinder);
+            await widgetTester.pumpAndSettle();
+            await widgetTester.pageBack();
+            await widgetTester.pumpAndSettle();
 
-          expect(find.text(insertedMemName), findsNothing);
-          expect(find.text(undoneMemName), findsOneWidget);
-          expect(find.text(doneMemName), findsNothing);
-          await widgetTester.tap(memListFilterButton);
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(find.byType(Switch).at(3));
-          await closeMemListFilter(widgetTester);
-          await widgetTester.pumpAndSettle(defaultTransitionDuration);
+            expect(find.text(insertedMemName), findsNothing);
+            expect(find.text(undoneMemName), findsOneWidget);
+            expect(find.text(doneMemName), findsNothing);
+            await widgetTester.tap(memListFilterButton);
+            await widgetTester.pumpAndSettle();
+            await widgetTester.tap(find.byType(Switch).at(3));
+            await closeMemListFilter(widgetTester);
+            await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-          expect(find.text(insertedMemName), findsOneWidget);
-          expect(find.text(undoneMemName), findsOneWidget);
-          expect(find.text(doneMemName), findsOneWidget);
-          await widgetTester.tap(find.text(insertedMemName));
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(find.byType(Checkbox));
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(saveMemFabFinder);
-          await widgetTester.pumpAndSettle();
-          await widgetTester.pageBack();
-          await widgetTester.pumpAndSettle();
+            expect(find.text(insertedMemName), findsOneWidget);
+            expect(find.text(undoneMemName), findsOneWidget);
+            expect(find.text(doneMemName), findsOneWidget);
+            await widgetTester.tap(find.text(insertedMemName));
+            await widgetTester.pumpAndSettle();
+            await widgetTester.tap(find.byType(Checkbox));
+            await widgetTester.pumpAndSettle();
+            await widgetTester.tap(saveMemFabFinder);
+            await widgetTester.pumpAndSettle();
+            await widgetTester.pageBack();
+            await widgetTester.pumpAndSettle();
 
-          await widgetTester.tap(memListFilterButton);
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(find.byType(Switch).at(2));
-          await closeMemListFilter(widgetTester);
-          await widgetTester.pumpAndSettle(defaultTransitionDuration);
+            await widgetTester.tap(memListFilterButton);
+            await widgetTester.pumpAndSettle();
+            await widgetTester.tap(find.byType(Switch).at(2));
+            await closeMemListFilter(widgetTester);
+            await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-          expect(find.text(insertedMemName), findsNothing);
-          expect(find.text(undoneMemName), findsNothing);
-          expect(find.text(doneMemName), findsOneWidget);
-        });
+            expect(find.text(insertedMemName), findsNothing);
+            expect(find.text(undoneMemName), findsNothing);
+            expect(find.text(doneMemName), findsOneWidget);
+          },
+        );
 
         testWidgets(
-          ': MemList.',
+          ': MemListPage.',
           (widgetTester) async {
             await runApplication();
             await widgetTester.pumpAndSettle();
