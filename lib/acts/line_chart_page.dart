@@ -17,7 +17,6 @@ class ActLineChartPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
-          // TODO: divide
           final mem = ref.read(memDetailProvider(_memId)).mem;
 
           return Scaffold(
