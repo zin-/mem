@@ -37,7 +37,7 @@ class ActService {
         [memId, when],
       );
 
-  Future finishV2(int actId, DateAndTime when) => i(
+  Future finish(int actId, DateAndTime when) => i(
         () async {
           final finishingAct = await _actRepository.shipById(actId);
 

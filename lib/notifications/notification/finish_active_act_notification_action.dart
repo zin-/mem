@@ -14,7 +14,7 @@ class FinishActiveActNotificationAction extends NotificationAction {
                 .where((element) => element.memId == memId);
 
             final now = DateAndTime.now();
-            ActService().finishV2(
+            ActService().finish(
               (activeActs.isEmpty
                       ? await ActService().start(memId, now)
                       : activeActs

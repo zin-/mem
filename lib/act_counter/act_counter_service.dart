@@ -29,7 +29,7 @@ class ActCounterService {
 
   Future<void> increment(int memId, DateAndTime now) => i(
         () async {
-          await _actService.finishV2(
+          await _actService.finish(
             (await _actService.start(memId, now)).id!,
             now,
           );
