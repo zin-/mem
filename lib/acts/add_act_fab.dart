@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/logger/log_service.dart';
 
 import 'actions.dart';
 import 'states.dart';
@@ -12,9 +11,10 @@ class ActFab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final actList = ref.watch(actListProvider(_memId)) ?? [];
+    final activeActList = (ref.watch(actListProvider(_memId)) ?? [])
+        .where((element) => element.period.end == null);
 
-    if (actList.isEmpty || actList.first.period.end != null) {
+    if (activeActList.isEmpty) {
       return _StartActFab(
         () async => ref.read(actListProvider(_memId).notifier).upsertAll(
           [ref.read(startActV2(_memId))],
@@ -23,7 +23,7 @@ class ActFab extends ConsumerWidget {
       );
     } else {
       return _FinishActFab(
-        () => v(() async => ref.read(finishAct(actList.first))),
+        () async => ref.read(finishActV2(activeActList.last.memId)),
       );
     }
   }

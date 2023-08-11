@@ -62,17 +62,3 @@ final finishActV2 = Provider.autoDispose.family<Act, int>(
     memId,
   ),
 );
-
-final finishAct = Provider.autoDispose.family<void, Act>(
-  (ref, act) => v(
-    () async {
-      final finished = await ActService().finish(act);
-
-      ref.read(actsProvider.notifier).upsertAll(
-        [finished],
-        (tmp, item) => tmp.id == item.id,
-      );
-    },
-    act,
-  ),
-);
