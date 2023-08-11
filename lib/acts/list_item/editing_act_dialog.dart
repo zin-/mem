@@ -31,11 +31,11 @@ class EditingActDialog extends ConsumerWidget {
       ),
       () => v(() {
         ref.read(deleteAct(_act.id!));
-        ref.read(actsProvider.notifier).removeWhere(
+        ref.read(actListProvider(_act.memId).notifier).removeWhere(
               (act) => act.id == _act.memId,
             );
       }),
-      () => v(() => ref.read(actsProvider.notifier).upsertAll(
+      () => v(() => ref.read(actListProvider(_act.memId).notifier).upsertAll(
             [ref.read(editAct(_act.id!))],
             (tmp, item) => tmp.id == item.id,
           )),
