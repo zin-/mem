@@ -106,16 +106,3 @@ final editAct = Provider.autoDispose.family<Act, ActIdentifier>(
     actIdentifier,
   ),
 );
-
-final deleteAct = Provider.autoDispose.family<void, ActIdentifier>(
-  (ref, actIdentifier) => v(
-    () async {
-      ActService().delete(actIdentifier.actId).then((value) {
-        ref
-            .read(actsProvider.notifier)
-            .removeWhere((item) => item.id == value.id);
-      });
-    },
-    actIdentifier,
-  ),
-);
