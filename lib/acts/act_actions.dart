@@ -33,7 +33,6 @@ final startAct = Provider.autoDispose.family<void, int>(
       final started = await ActService().startBy(memId);
 
       ref.read(actsProvider.notifier).add(started);
-      ref.read(activeActsProvider.notifier).add(started);
     },
     memId,
   ),
