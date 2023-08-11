@@ -7,7 +7,7 @@ import 'package:mem/logger/log_service.dart';
 
 import 'actions.dart';
 import 'list_item/view.dart';
-import 'act_list_states.dart';
+import 'states.dart';
 
 class ActListView extends ConsumerWidget {
   final MemId _memId;

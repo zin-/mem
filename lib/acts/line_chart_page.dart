@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/acts/act_list_states.dart';
 import 'package:mem/acts/acts_summary.dart';
 import 'package:mem/acts/line_chart_wrapper.dart';
 import 'package:mem/components/async_value_view.dart';
@@ -9,6 +8,7 @@ import 'package:mem/mems/detail/states.dart';
 import 'package:mem/values/dimens.dart';
 
 import 'actions.dart';
+import 'states.dart';
 
 class ActLineChartPage extends ConsumerWidget {
   final int _memId;
