@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:mem/acts/act_repository.dart';
 import 'package:mem/acts/act_service.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
@@ -9,12 +10,18 @@ class FinishActiveActNotificationAction extends NotificationAction {
           id,
           title,
           (memId) async {
-            final acts = (await ActRepository().shipByMemId(memId));
+            final activeActs = (await ActRepository().shipActive())
+                .where((element) => element.memId == memId);
 
-            await ActService().finish(
-              acts.isEmpty
-                  ? await ActService().start(memId, DateAndTime.now())
-                  : acts.last,
+            final now = DateAndTime.now();
+            ActService().finishV2(
+              (activeActs.isEmpty
+                      ? await ActService().start(memId, now)
+                      : activeActs
+                          .sorted((a, b) => a.period.compareTo(b.period))
+                          .first)
+                  .id!,
+              now,
             );
           },
         );

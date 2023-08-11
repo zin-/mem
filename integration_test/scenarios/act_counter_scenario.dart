@@ -115,12 +115,15 @@ void testActCounterConfigure() => group(
                   saveWidgetDataCount++;
                   return Future.value(true);
                 } else if (message.method == 'updateWidget') {
-                  expect(message.arguments, {
-                    'name': "ActCounterProvider",
-                    'android': null,
-                    'ios': null,
-                    'qualifiedAndroidName': null,
-                  });
+                  expect(
+                    message.arguments,
+                    {
+                      'name': "ActCounterProvider",
+                      'android': null,
+                      'ios': null,
+                      'qualifiedAndroidName': null,
+                    },
+                  );
 
                   updateWidgetCount++;
                   return Future.value(true);
@@ -182,6 +185,81 @@ void testActCounterConfigure() => group(
               await expectLater(updateWidgetCount, 1);
             } else {
               await expectLater(initializeCount, 0);
+              await expectLater(saveWidgetDataCount, 0);
+              await expectLater(updateWidgetCount, 0);
+            }
+          },
+        );
+
+        testWidgets(
+          ": increment.",
+          (widgetTester) async {
+            final uri = Uri(
+              scheme: uriSchema,
+              host: appId,
+              pathSegments: [actCounter],
+              queryParameters: {
+                memIdParamName: insertedMemId.toString(),
+              },
+            );
+
+            var saveWidgetDataCount = 0;
+            var updateWidgetCount = 0;
+
+            final saveWidgetDataArgs = {
+              0: {
+                'id': "memName-$insertedMemId",
+                'data': insertedMemName,
+              },
+              1: {
+                'id': "actCount-$insertedMemId",
+                // length of inserted acts
+                'data': 2,
+              },
+              2: {
+                'id': "lastUpdatedAtSeconds-$insertedMemId",
+                'data': isNotNull,
+              },
+            };
+            widgetTester.binding.defaultBinaryMessenger
+                .setMockMethodCallHandler(
+              const MethodChannel('home_widget'),
+              (message) {
+                if (message.method == 'registerBackgroundCallback') {
+                  return Future.value(true);
+                } else if (message.method == 'saveWidgetData') {
+                  expect(
+                    message.arguments,
+                    saveWidgetDataArgs[saveWidgetDataCount],
+                  );
+
+                  saveWidgetDataCount++;
+                  return Future.value(true);
+                } else if (message.method == 'updateWidget') {
+                  expect(
+                    message.arguments,
+                    {
+                      'name': "ActCounterProvider",
+                      'android': null,
+                      'ios': null,
+                      'qualifiedAndroidName': null,
+                    },
+                  );
+
+                  updateWidgetCount++;
+                  return Future.value(true);
+                }
+
+                throw UnimplementedError();
+              },
+            );
+
+            await backgroundCallback(uri);
+
+            if (defaultTargetPlatform == TargetPlatform.android) {
+              await expectLater(saveWidgetDataCount, 3);
+              await expectLater(updateWidgetCount, 1);
+            } else {
               await expectLater(saveWidgetDataCount, 0);
               await expectLater(updateWidgetCount, 0);
             }

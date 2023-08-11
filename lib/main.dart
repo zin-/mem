@@ -84,7 +84,7 @@ const appId = 'zin.playground.mem';
 const actCounter = 'act_counters';
 const memIdParamName = 'mem_id';
 
-void backgroundCallback(Uri? uri) => v(
+Future<void> backgroundCallback(Uri? uri) => i(
       () async {
         NotificationClient();
 

@@ -37,26 +37,26 @@ class ActService {
         [memId, when],
       );
 
-  Future<Act> finish(Act act) => i(
+  Future finishV2(int actId, DateAndTime when) => i(
         () async {
-          final finished = await _actRepository.replace(
-            Act(
-              act.memId,
+          final finishingAct = await _actRepository.shipById(actId);
+
+          final replaced = await _actRepository.replace(
+            finishingAct.copiedWith(
               DateAndTimePeriod(
-                start: act.period.start,
-                end: DateAndTime.now(),
+                start: finishingAct.period.start,
+                end: when,
               ),
-              id: act.id,
             ),
           );
 
-          _cancelNotifications(act.memId);
+          _cancelNotifications(replaced.memId);
 
           // ISSUE #226
 
-          return finished;
+          return replaced;
         },
-        act,
+        [actId, when],
       );
 
   Future<Act> edit(Act editingAct) => i(
