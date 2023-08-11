@@ -35,22 +35,6 @@ class ActService {
         startingAct,
       );
 
-  Future<Act> startBy(int memId) => i(
-        () async {
-          final receivedAct = await _actRepository.receive(
-            Act(
-              memId,
-              DateAndTimePeriod.startNow(),
-            ),
-          );
-
-          _registerStartNotifications(receivedAct.memId);
-
-          return receivedAct;
-        },
-        memId,
-      );
-
   Future<Act> finish(Act act) => i(
         () async {
           final finished = await _actRepository.replace(
