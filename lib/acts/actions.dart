@@ -28,7 +28,7 @@ final startActBy = Provider.autoDispose.family<Act, int>(
     () {
       final startingAct = Act(memId, DateAndTimePeriod.startNow());
 
-      ActService().startV2(startingAct).then((startedAct) => v(
+      ActService().start(startingAct).then((startedAct) => v(
             () => ref.read(actsProvider.notifier).upsertAll(
               [startedAct],
               (tmp, item) => tmp.id == item.id,

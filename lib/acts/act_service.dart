@@ -24,7 +24,7 @@ class ActService {
   // FIXME ここに定義されるのはおかしい
   final NotificationClient _notificationClient;
 
-  Future<Act> startV2(Act startingAct) => i(
+  Future<Act> start(Act startingAct) => i(
         () async {
           final receivedAct = await _actRepository.receive(startingAct);
 

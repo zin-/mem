@@ -8,7 +8,7 @@ class StartActNotificationAction extends NotificationAction {
       : super(
           id,
           title,
-          (memId) => ActService().startV2(
+          (memId) => ActService().start(
             Act(memId, DateAndTimePeriod.startNow()),
           ),
         );

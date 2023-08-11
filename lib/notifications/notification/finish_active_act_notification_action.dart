@@ -14,7 +14,7 @@ class FinishActiveActNotificationAction extends NotificationAction {
 
             await ActService().finish(
               acts.isEmpty
-                  ? await ActService().startV2(
+                  ? await ActService().start(
                       Act(memId, DateAndTimePeriod.startNow()),
                     )
                   : acts.last,
