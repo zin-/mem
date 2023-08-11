@@ -17,13 +17,13 @@ class ActFab extends ConsumerWidget {
     if (activeActList.isEmpty) {
       return _StartActFab(
         () async => ref.read(actListProvider(_memId).notifier).upsertAll(
-          [ref.read(startActV2(_memId))],
+          [ref.read(startActBy(_memId))],
           (tmp, item) => tmp.id == item.id,
         ),
       );
     } else {
       return _FinishActFab(
-        () async => ref.read(finishActV2(activeActList.last.memId)),
+        () async => ref.read(finishActBy(activeActList.last.memId)),
       );
     }
   }

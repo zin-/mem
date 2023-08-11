@@ -23,7 +23,7 @@ final loadActList = FutureProvider.autoDispose.family<List<Act>, int>(
   ),
 );
 
-final startActV2 = Provider.autoDispose.family<Act, int>(
+final startActBy = Provider.autoDispose.family<Act, int>(
   (ref, memId) => v(
     () {
       final startingAct = Act(memId, DateAndTimePeriod.startNow());
@@ -42,7 +42,7 @@ final startActV2 = Provider.autoDispose.family<Act, int>(
   ),
 );
 
-final finishActV2 = Provider.autoDispose.family<Act, int>(
+final finishActBy = Provider.autoDispose.family<Act, int>(
   (ref, memId) => v(
     () {
       final finishingAct = ref.read(activeActsProvider)!.singleWhere(

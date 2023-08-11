@@ -49,12 +49,12 @@ class MemListItemView extends ConsumerWidget {
                     if (activeAct == null) {
                       ref
                           .read(activeActsProvider.notifier)
-                          .add(ref.read(startActV2(_memId)));
+                          .add(ref.read(startActBy(_memId)));
                     } else {
                       ref.read(activeActsProvider.notifier).removeWhere(
                             (act) =>
                                 act.id ==
-                                ref.read(finishActV2(activeAct.memId)).id,
+                                ref.read(finishActBy(activeAct.memId)).id,
                           );
                     }
                   },
