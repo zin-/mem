@@ -6,7 +6,23 @@ import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
 
+import 'act_repository.dart';
 import 'states.dart';
+
+final loadActList = FutureProvider.autoDispose.family<List<Act>, int>(
+  (ref, memId) => v(
+    () async {
+      final acts = await ActRepository().shipByMemId(memId);
+
+      ref.watch(actsProvider.notifier).upsertAll(
+            acts,
+            (tmp, item) => tmp.id == item.id,
+          );
+
+      return acts;
+    },
+  ),
+);
 
 final startActV2 = Provider.autoDispose.family<Act, int>(
   (ref, memId) => v(
