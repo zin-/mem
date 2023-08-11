@@ -16,14 +16,18 @@ class ActFab extends ConsumerWidget {
 
     if (activeActList.isEmpty) {
       return _StartActFab(
-        () async => ref.read(actListProvider(_memId).notifier).upsertAll(
+        () => ref.read(actListProvider(_memId).notifier).upsertAll(
           [ref.read(startActBy(_memId))],
           (tmp, item) => tmp.id == item.id,
         ),
       );
     } else {
       return _FinishActFab(
-        () async => ref.read(finishActBy(activeActList.last.memId)),
+        () => ref.read(actListProvider(_memId).notifier).removeWhere(
+              (element) =>
+                  element.id ==
+                  ref.read(finishActBy(activeActList.last.memId)).id,
+            ),
       );
     }
   }
