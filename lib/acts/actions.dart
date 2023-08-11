@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/core/act.dart';
+import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
 
@@ -26,9 +27,9 @@ final loadActList = FutureProvider.autoDispose.family<List<Act>, int>(
 final startActBy = Provider.autoDispose.family<Act, int>(
   (ref, memId) => v(
     () {
-      final startingAct = Act(memId, DateAndTimePeriod.startNow());
+      final now = DateAndTime.now();
 
-      ActService().start(startingAct).then((startedAct) => v(
+      ActService().start(memId, now).then((startedAct) => v(
             () => ref.read(actsProvider.notifier).upsertAll(
               [startedAct],
               (tmp, item) => tmp.id == item.id,
@@ -36,7 +37,7 @@ final startActBy = Provider.autoDispose.family<Act, int>(
             startedAct,
           ));
 
-      return startingAct;
+      return Act(memId, DateAndTimePeriod(start: now));
     },
     memId,
   ),

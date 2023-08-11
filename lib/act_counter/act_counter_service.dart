@@ -1,8 +1,6 @@
 import 'package:mem/acts/act_repository.dart';
 import 'package:mem/acts/act_service.dart';
-import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
-import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
@@ -31,9 +29,7 @@ class ActCounterService {
 
   Future<void> increment(int memId, DateAndTime now) => i(
         () async {
-          await _actService.finish(await _actService.start(
-            Act(memId, DateAndTimePeriod(start: now)),
-          ));
+          await _actService.finish(await _actService.start(memId, now));
 
           await _actCounterRepository.replace(
             ActCounter(
