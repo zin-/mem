@@ -6,10 +6,10 @@ import 'package:mem/logger/log_service.dart';
 
 import 'states.dart';
 
-final editAct = Provider.autoDispose.family<Act, ActIdentifier>(
-  (ref, actIdentifier) => v(
+final editAct = Provider.autoDispose.family<Act, int>(
+  (ref, actId) => v(
     () {
-      final editingAct = ref.watch(editingActProvider(actIdentifier));
+      final editingAct = ref.watch(editingActProvider(actId));
 
       ActService()
           .edit(editingAct)
@@ -20,19 +20,19 @@ final editAct = Provider.autoDispose.family<Act, ActIdentifier>(
 
       return editingAct;
     },
-    actIdentifier,
+    actId,
   ),
 );
 
-final deleteAct = Provider.autoDispose.family<void, ActIdentifier>(
-  (ref, actIdentifier) => v(
+final deleteAct = Provider.autoDispose.family<void, int>(
+  (ref, actId) => v(
     () async {
-      ActService().delete(actIdentifier.actId).then((value) {
+      ActService().delete(actId).then((value) {
         ref
             .read(actsProvider.notifier)
             .removeWhere((item) => item.id == value.id);
       });
     },
-    actIdentifier,
+    actId,
   ),
 );

@@ -36,22 +36,4 @@ class Act extends EntityValue {
           updatedAt: base.updatedAt,
           archivedAt: base.archivedAt,
         );
-
-  ActIdentifier get identifier => ActIdentifier(id!, memId);
-}
-
-class ActIdentifier {
-  final int actId;
-  final int memId;
-
-  ActIdentifier(this.actId, this.memId);
-
-  @override
-  int get hashCode => Object.hash(actId, memId);
-
-  @override
-  bool operator ==(Object other) => hashCode == other.hashCode;
-
-  @override
-  String toString() => {'actId': actId, 'memId': memId}.toString();
 }

@@ -4,13 +4,11 @@ import 'package:mem/components/value_state_notifier.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/logger/log_service.dart';
 
-final editingActProvider = StateNotifierProvider.autoDispose
-    .family<ValueStateNotifier<Act>, Act, ActIdentifier>(
+final editingActProvider =
+    StateNotifierProvider.autoDispose.family<ValueStateNotifier<Act>, Act, int>(
   (ref, actId) => v(
     () => ValueStateNotifier(
-      ref
-          .read(actListProvider(actId.memId))!
-          .singleWhere((act) => act.id == actId.actId),
+      ref.read(actsProvider)!.singleWhere((act) => act.id == actId),
     ),
     actId,
   ),

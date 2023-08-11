@@ -16,13 +16,12 @@ class EditingActDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final actId = ActIdentifier(_act.id!, _act.memId);
-    final editingAct = ref.watch(editingActProvider(actId));
+    final editingAct = ref.watch(editingActProvider(_act.id!));
 
     return _EditingActDialogComponent(
       editingAct,
       (pickedPeriod) => v(
-        () => ref.read(editingActProvider(actId).notifier).updatedBy(
+        () => ref.read(editingActProvider(_act.id!).notifier).updatedBy(
               Act.copyWith(
                 _act,
                 period: pickedPeriod,
@@ -31,13 +30,13 @@ class EditingActDialog extends ConsumerWidget {
         pickedPeriod,
       ),
       () => v(() {
-        ref.read(deleteAct(_act.identifier));
+        ref.read(deleteAct(_act.id!));
         ref.read(actsProvider.notifier).removeWhere(
               (act) => act.id == _act.memId,
             );
       }),
       () => v(() => ref.read(actsProvider.notifier).upsertAll(
-            [ref.read(editAct(_act.identifier))],
+            [ref.read(editAct(_act.id!))],
             (tmp, item) => tmp.id == item.id,
           )),
     );
