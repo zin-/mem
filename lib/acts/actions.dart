@@ -42,17 +42,6 @@ final startActV2 = Provider.autoDispose.family<Act, int>(
   ),
 );
 
-final startAct = Provider.autoDispose.family<void, int>(
-  (ref, memId) => v(
-    () async {
-      final started = await ActService().startBy(memId);
-
-      ref.read(actsProvider.notifier).add(started);
-    },
-    memId,
-  ),
-);
-
 final finishActV2 = Provider.autoDispose.family<Act, int>(
   (ref, memId) => v(
     () {
