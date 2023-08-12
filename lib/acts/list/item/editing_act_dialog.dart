@@ -24,7 +24,7 @@ class EditingActDialog extends ConsumerWidget {
         () => ref.read(editingActProvider(_act.id!).notifier).updatedBy(
               _act.copiedWith(
                 // FIXME avoid '!'
-                //  null担った場合のエラーを表示するべき
+                //  nullになった場合のエラーを表示するべき
                 //  エラー表示は責務としては、対象のコンポーネントのはず
                 //  そうすると型の解決ができない？
                 pickedPeriod!,
