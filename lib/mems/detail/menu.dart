@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/acts/act_list_page.dart';
-import 'package:mem/acts/line_chart_page.dart';
+import 'package:mem/acts/list/page.dart';
+import 'package:mem/acts/line_chart/line_chart_page.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_detail.dart';

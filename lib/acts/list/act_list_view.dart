@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/acts/actions.dart';
+import 'package:mem/acts/states.dart';
 import 'package:mem/components/async_value_view.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
 
-import 'actions.dart';
-import 'list_item/view.dart';
-import 'states.dart';
+import 'item/view.dart';
 
 class ActListView extends ConsumerWidget {
   final MemId _memId;
