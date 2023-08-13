@@ -174,53 +174,150 @@ void testNotificationScenario() => group(": $_scenarioName", () {
           },
         );
 
-        testWidgets(
-          ': finish active Act.',
-          (widgetTester) async {
-            final details = NotificationResponse(
-              notificationResponseType:
-                  NotificationResponseType.selectedNotificationAction,
-              id: memRepeatedNotificationId(insertedMemId!),
-              payload: json.encode({memIdKey: insertedMemId}),
-              actionId: NotificationClient().finishActiveActAction.id,
-            );
+        group(": finish active Act", () {
+          testWidgets(
+            ': no active Act.',
+            (widgetTester) async {
+              final details = NotificationResponse(
+                notificationResponseType:
+                    NotificationResponseType.selectedNotificationAction,
+                id: memRepeatedNotificationId(insertedMemId!),
+                payload: json.encode({memIdKey: insertedMemId}),
+                actionId: NotificationClient().finishActiveActAction.id,
+              );
 
-            await onDidReceiveNotificationResponse(details);
+              await onDidReceiveNotificationResponse(details);
 
-            await Future.delayed(
-              waitSideEffectDuration,
-              () async {
-                final acts =
-                    await db.getTable(actTableDefinition.name).select();
+              await Future.delayed(
+                waitSideEffectDuration,
+                () async {
+                  final acts =
+                      await db.getTable(actTableDefinition.name).select();
 
-                expect(acts.length, 1);
-                expect(
-                  [
-                    acts[0][defActStart.name],
-                    acts[0][defActStartIsAllDay.name],
-                    acts[0][defActEnd.name],
-                    acts[0][defActEndIsAllDay.name],
-                    acts[0][idPKDef.name],
-                    acts[0][createdAtColDef.name],
-                    acts[0][updatedAtColDef.name],
-                    acts[0][archivedAtColDef.name],
-                    acts[0][fkDefMemId.name],
-                  ],
-                  [
-                    isNotNull,
-                    0,
-                    isNotNull,
-                    0,
-                    isNotNull,
-                    isNotNull,
-                    isNotNull,
-                    isNull,
-                    insertedMemId,
-                  ],
+                  expect(acts.length, 1);
+                  expect(
+                    [
+                      acts[0][defActStart.name],
+                      acts[0][defActStartIsAllDay.name],
+                      acts[0][defActEnd.name],
+                      acts[0][defActEndIsAllDay.name],
+                      acts[0][idPKDef.name],
+                      acts[0][createdAtColDef.name],
+                      acts[0][updatedAtColDef.name],
+                      acts[0][archivedAtColDef.name],
+                      acts[0][fkDefMemId.name],
+                    ],
+                    [
+                      isNotNull,
+                      0,
+                      isNotNull,
+                      0,
+                      isNotNull,
+                      isNotNull,
+                      isNotNull,
+                      isNull,
+                      insertedMemId,
+                    ],
+                  );
+                },
+              );
+            },
+          );
+
+          group("2 active Acts.", () {
+            late final int insertedActId;
+            late final int insertedActId2;
+
+            setUp(() async {
+              final actsTable = db.getTable(actTableDefinition.name);
+
+              insertedActId = await actsTable.insert({
+                fkDefMemId.name: insertedMemId,
+                defActStart.name: zeroDate.add(const Duration(minutes: 1)),
+                defActStartIsAllDay.name: 0,
+                createdAtColDef.name: zeroDate,
+              });
+              insertedActId2 = await actsTable.insert({
+                fkDefMemId.name: insertedMemId,
+                defActStart.name: zeroDate,
+                defActStartIsAllDay.name: 0,
+                createdAtColDef.name: zeroDate,
+              });
+            });
+
+            testWidgets(
+              ': 2 active Acts.',
+              (widgetTester) async {
+                final details = NotificationResponse(
+                  notificationResponseType:
+                      NotificationResponseType.selectedNotificationAction,
+                  id: memRepeatedNotificationId(insertedMemId!),
+                  payload: json.encode({memIdKey: insertedMemId}),
+                  actionId: NotificationClient().finishActiveActAction.id,
+                );
+
+                await onDidReceiveNotificationResponse(details);
+
+                await Future.delayed(
+                  waitSideEffectDuration,
+                  () async {
+                    final acts =
+                        await db.getTable(actTableDefinition.name).select();
+
+                    expect(acts.length, 2);
+                    expect(
+                      [
+                        acts[0][defActStart.name],
+                        acts[0][defActStartIsAllDay.name],
+                        acts[0][defActEnd.name],
+                        acts[0][defActEndIsAllDay.name],
+                        acts[0][idPKDef.name],
+                        acts[0][createdAtColDef.name],
+                        acts[0][updatedAtColDef.name],
+                        acts[0][archivedAtColDef.name],
+                        acts[0][fkDefMemId.name],
+                      ],
+                      [
+                        isNotNull,
+                        0,
+                        isNull,
+                        isNull,
+                        insertedActId,
+                        isNotNull,
+                        isNull,
+                        isNull,
+                        insertedMemId,
+                      ],
+                    );
+                    expect(
+                      [
+                        acts[1][defActStart.name],
+                        acts[1][defActStartIsAllDay.name],
+                        acts[1][defActEnd.name],
+                        acts[1][defActEndIsAllDay.name],
+                        acts[1][idPKDef.name],
+                        acts[1][createdAtColDef.name],
+                        acts[1][updatedAtColDef.name],
+                        acts[1][archivedAtColDef.name],
+                        acts[1][fkDefMemId.name],
+                      ],
+                      [
+                        isNotNull,
+                        0,
+                        isNotNull,
+                        0,
+                        insertedActId2,
+                        isNotNull,
+                        isNotNull,
+                        isNull,
+                        insertedMemId,
+                      ],
+                    );
+                  },
                 );
               },
             );
-          },
-        );
+          });
+        });
       });
     });

@@ -12,7 +12,6 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_item_repository_v2.dart';
 import 'package:mem/mems/mem_notification_repository.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
-import 'package:mem/notifications/client.dart';
 import 'package:mem/notifications/wrapper.dart';
 import 'package:mockito/mockito.dart';
 
@@ -97,85 +96,6 @@ void main() {
           lastUpdatedAt.millisecondsSinceEpoch.toDouble(),
           'memId-$homeWidgetId',
           memId,
-        ],
-      );
-      verify(mockedHomeWidgetAccessor.updateWidget(any)).called(1);
-    },
-  );
-
-  test(
-    ': increment',
-    () async {
-      NotificationClient();
-
-      final memId = randomInt();
-      final now = DateAndTime.now();
-
-      final act = Act(memId, DateAndTimePeriod.startNow());
-      when(mockedActRepository.receive(any))
-          .thenAnswer((realInvocation) => Future.value(act));
-      final mem = Mem(name: 'createNew', id: memId);
-      when(mockedMemRepository.shipById(any))
-          .thenAnswer((realInvocation) => Future.value(mem));
-      final acts = <Act>[
-        Act(
-          memId,
-          DateAndTimePeriod(end: now),
-          createdAt: DateTime.now(),
-        ),
-        Act(
-          memId,
-          DateAndTimePeriod(end: now),
-          createdAt: DateTime.now(),
-        ),
-      ];
-      when(mockedActRepository.shipByMemId(any, period: anyNamed('period')))
-          .thenAnswer((realInvocation) => Future.value(acts));
-      when(mockedActRepository.replace(any))
-          .thenAnswer((realInvocation) => Future.value(act));
-      when(mockedMemNotificationRepository.shipByMemIdAndAfterActStarted(memId))
-          .thenAnswer((realInvocation) => Future.value([]));
-
-      when(mockedHomeWidgetAccessor.saveWidgetData(any, any))
-          .thenAnswer((realInvocation) => Future.value(true));
-      when(mockedHomeWidgetAccessor.updateWidget(widgetProviderName))
-          .thenAnswer((realInvocation) => Future.value(true));
-
-      when(mockedNotificationWrapper.cancel(any))
-          .thenAnswer((realInvocation) => Future.value(null));
-
-      await actCounterService.increment(memId, now);
-
-      expect(
-        verify(mockedActRepository.receive(captureAny)).captured[0].memId,
-        memId,
-      );
-      expect(
-        verify(mockedMemRepository.shipById(captureAny)).captured,
-        [memId, memId],
-      );
-      expect(
-        verify(mockedActRepository.shipByMemId(
-          captureAny,
-          period: captureAnyNamed('period'),
-        )).captured[0],
-        memId,
-      );
-      verify(mockedMemNotificationRepository.shipByMemIdAndAfterActStarted(
-        memId,
-      )).called(1);
-
-      verifyNever(mockedHomeWidgetAccessor.initialize(any, any));
-      expect(
-        verify(mockedHomeWidgetAccessor.saveWidgetData(captureAny, captureAny))
-            .captured,
-        [
-          'memName-$memId',
-          mem.name,
-          'actCount-$memId',
-          acts.length,
-          'lastUpdatedAtSeconds-$memId',
-          now.millisecondsSinceEpoch.toDouble(),
         ],
       );
       verify(mockedHomeWidgetAccessor.updateWidget(any)).called(1);

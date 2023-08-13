@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/acts/act_actions.dart';
 import 'package:mem/acts/states.dart';
 import 'package:mem/components/date_and_time/date_and_time_period_view.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
 
+import 'actions.dart';
 import 'states.dart';
 
 class EditingActDialog extends ConsumerWidget {
@@ -16,28 +16,30 @@ class EditingActDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final actId = ActIdentifier(_act.id!, _act.memId);
-    final editingAct = ref.watch(editingActProvider(actId));
+    final editingAct = ref.watch(editingActProvider(_act.id!));
 
     return _EditingActDialogComponent(
       editingAct,
       (pickedPeriod) => v(
-        () => ref.read(editingActProvider(actId).notifier).updatedBy(
-              Act.copyWith(
-                _act,
-                period: pickedPeriod,
+        () => ref.read(editingActProvider(_act.id!).notifier).updatedBy(
+              _act.copiedWith(
+                // FIXME avoid '!'
+                //  nullになった場合のエラーを表示するべき
+                //  エラー表示は責務としては、対象のコンポーネントのはず
+                //  そうすると型の解決ができない？
+                pickedPeriod!,
               ),
             ),
         pickedPeriod,
       ),
       () => v(() {
-        ref.read(deleteAct(_act.identifier));
-        ref.read(actsProvider.notifier).removeWhere(
+        ref.read(deleteAct(_act.id!));
+        ref.read(actListProvider(_act.memId).notifier).removeWhere(
               (act) => act.id == _act.memId,
             );
       }),
-      () => v(() => ref.read(actsProvider.notifier).upsertAll(
-            [ref.read(editAct(_act.identifier))],
+      () => v(() => ref.read(actListProvider(_act.memId).notifier).upsertAll(
+            [ref.read(editAct(_act.id!))],
             (tmp, item) => tmp.id == item.id,
           )),
     );

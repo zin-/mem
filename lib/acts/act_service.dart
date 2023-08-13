@@ -24,53 +24,39 @@ class ActService {
   // FIXME ここに定義されるのはおかしい
   final NotificationClient _notificationClient;
 
-  Future<Act> startV2(Act startingAct) => i(
-        () async {
-          final receivedAct = await _actRepository.receive(startingAct);
-
-          _registerStartNotifications(receivedAct.memId);
-
-          return receivedAct;
-        },
-        startingAct,
-      );
-
-  Future<Act> startBy(int memId) => i(
+  Future<Act> start(int memId, DateAndTime when) => i(
         () async {
           final receivedAct = await _actRepository.receive(
-            Act(
-              memId,
-              DateAndTimePeriod.startNow(),
-            ),
+            Act(memId, DateAndTimePeriod(start: when)),
           );
 
           _registerStartNotifications(receivedAct.memId);
 
           return receivedAct;
         },
-        memId,
+        [memId, when],
       );
 
-  Future<Act> finish(Act act) => i(
+  Future finish(int actId, DateAndTime when) => i(
         () async {
-          final finished = await _actRepository.replace(
-            Act(
-              act.memId,
+          final finishingAct = await _actRepository.shipById(actId);
+
+          final replaced = await _actRepository.replace(
+            finishingAct.copiedWith(
               DateAndTimePeriod(
-                start: act.period.start,
-                end: DateAndTime.now(),
+                start: finishingAct.period.start,
+                end: when,
               ),
-              id: act.id,
             ),
           );
 
-          _cancelNotifications(act.memId);
+          _cancelNotifications(replaced.memId);
 
           // ISSUE #226
 
-          return finished;
+          return replaced;
         },
-        act,
+        [actId, when],
       );
 
   Future<Act> edit(Act editingAct) => i(

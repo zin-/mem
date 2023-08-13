@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/acts/act_actions.dart';
+import 'package:mem/acts/actions.dart';
 import 'package:mem/components/mem/list/item/single_selectable_mem_list_item.dart';
 import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/components/mem/mem_done_checkbox.dart';
@@ -49,12 +49,12 @@ class MemListItemView extends ConsumerWidget {
                     if (activeAct == null) {
                       ref
                           .read(activeActsProvider.notifier)
-                          .add(ref.read(startActV2(_memId)));
+                          .add(ref.read(startActBy(_memId)));
                     } else {
                       ref.read(activeActsProvider.notifier).removeWhere(
                             (act) =>
                                 act.id ==
-                                ref.read(finishActV2(activeAct.memId)).id,
+                                ref.read(finishActBy(activeAct.memId)).id,
                           );
                     }
                   },
