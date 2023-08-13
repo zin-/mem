@@ -10,15 +10,15 @@ import 'package:mem/database/table_definitions/mem_notifications.dart';
 import 'package:mem/database/table_definitions/mems.dart';
 import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/database/definition.dart';
-import 'package:mem/components/app.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/page.dart';
 import 'package:mem/mems/mem_item_repository_v2.dart';
-import 'package:mem/mems/list/page.dart';
 import 'package:mem/mems/mem_notification_repository.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/notifications/client.dart';
 import 'package:mem/notifications/notification_repository.dart';
+
+import 'application.dart';
 
 Future<void> main({String? languageCode}) => i(
       () async {
@@ -26,7 +26,7 @@ Future<void> main({String? languageCode}) => i(
 
         await NotificationRepository().checkNotification();
 
-        return _runApplication(const MemListPage(), languageCode: languageCode);
+        return _runApplication(languageCode: languageCode);
       },
       {'languageCode': languageCode},
     );
@@ -36,7 +36,7 @@ Future<void> launchMemDetailPage(int memId) => i(
       () {
         WidgetsFlutterBinding.ensureInitialized();
 
-        return _runApplication(MemDetailPage(memId));
+        return _runApplication(home: MemDetailPage(memId));
       },
       {'memId': memId},
     );
@@ -46,16 +46,16 @@ Future<void> launchActCounterConfigure() => i(
       () {
         WidgetsFlutterBinding.ensureInitialized();
 
-        return _runApplication(const ActCounterConfigure());
+        return _runApplication(home: const ActCounterConfigure());
       },
     );
 
-Future<void> _runApplication(Widget home, {String? languageCode}) => i(
+Future<void> _runApplication({Widget? home, String? languageCode}) => i(
       () async {
         await openDatabase();
         ActCounterRepository();
 
-        runApp(MemApplication(home, languageCode));
+        runApp(MemApplication(languageCode, home: home));
       },
       [home, languageCode],
     );
