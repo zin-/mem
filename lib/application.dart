@@ -43,8 +43,6 @@ class _HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     // TODO ScaffoldからNavigationBarまでの制御をここで行う
     //  ScrollControllerもここになる
-    //  単純に移動するとonItemTappedもここになるが、それはおかしい
-    //    のでまずはそっちを移す
     return const MemListPage();
   }
 }

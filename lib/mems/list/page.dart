@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/components/mem/list/view.dart';
-import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/actions.dart';
 import 'package:mem/mems/list/actions.dart';
@@ -22,22 +21,15 @@ class MemListPage extends ConsumerWidget {
         () {
           ref.read(fetchActiveActs);
 
-          return _MemListPageComponent(
-            (memId) => showMemDetailPage(
-              context,
-              ref,
-              memId,
-            ),
-          );
+          return _MemListPageComponent();
         },
       );
 }
 
 class _MemListPageComponent extends StatelessWidget {
   final _scrollController = ScrollController();
-  final void Function(MemId memId)? _onItemTapped;
 
-  _MemListPageComponent(this._onItemTapped);
+  _MemListPageComponent();
 
   @override
   Widget build(BuildContext context) {
@@ -63,8 +55,6 @@ class _MemListPageComponent extends StatelessWidget {
             ),
           ),
         ],
-        // FIXME これを消したい
-        onItemTapped: _onItemTapped,
       ),
       floatingActionButton: ShowNewMemFab(_scrollController),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -72,67 +62,72 @@ class _MemListPageComponent extends StatelessWidget {
   }
 }
 
-// FIXME too long
 void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
-      () {
-        final l10n = buildL10n(context);
-
-        Navigator.of(context)
-            .push<bool?>(
-              PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    MemDetailPage(memId),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) =>
-                        SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(1, 0),
-                    end: Offset.zero,
-                  ).animate(animation),
-                  child: child,
-                ),
-                transitionDuration: defaultTransitionDuration,
-                reverseTransitionDuration: defaultTransitionDuration,
+      () => Navigator.of(context)
+          .push<bool?>(
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  MemDetailPage(memId),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) =>
+                      SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(1, 0),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
               ),
-            )
-            .then(
-              (result) => v(
-                () {
-                  if (memId != null && result == true) {
-                    final removed = ref.read(removedMemProvider(memId));
+              transitionDuration: defaultTransitionDuration,
+              reverseTransitionDuration: defaultTransitionDuration,
+            ),
+          )
+          .then(
+            (result) => _handleRemoved(context, ref, memId, result),
+          ),
+      [context, ref, memId],
+    );
 
-                    if (removed != null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            l10n.removeMemSuccessMessage(removed.name),
-                          ),
-                          duration: infiniteDismissDuration,
-                          dismissDirection: DismissDirection.horizontal,
-                          action: SnackBarAction(
-                            label: l10n.undoAction,
-                            onPressed: () {
-                              ref.read(undoRemoveMem(memId));
+void _handleRemoved(
+  BuildContext context,
+  WidgetRef ref,
+  int? memId,
+  bool? result,
+) =>
+    v(
+      () {
+        if (memId != null && result == true) {
+          final removed = ref.read(removedMemProvider(memId));
 
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    l10n.undoMemSuccessMessage(removed.name),
-                                  ),
-                                  duration: defaultDismissDuration,
-                                  dismissDirection: DismissDirection.horizontal,
-                                ),
-                              );
-                            },
-                          ),
+          if (removed != null) {
+            final l10n = buildL10n(context);
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  l10n.removeMemSuccessMessage(removed.name),
+                ),
+                duration: infiniteDismissDuration,
+                dismissDirection: DismissDirection.horizontal,
+                action: SnackBarAction(
+                  label: l10n.undoAction,
+                  onPressed: () {
+                    ref.read(undoRemoveMem(memId));
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          l10n.undoMemSuccessMessage(removed.name),
                         ),
-                      );
-                    }
-                  }
-                },
-                {'result': result},
+                        duration: defaultDismissDuration,
+                        dismissDirection: DismissDirection.horizontal,
+                      ),
+                    );
+                  },
+                ),
               ),
             );
+          }
+        }
       },
-      {'context': context, 'memId': memId},
+      [context, ref, memId, result],
     );
