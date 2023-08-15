@@ -3,7 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/list/page.dart';
+import 'package:mem/mems/list/body.dart';
 import 'package:mem/mems/list/show_new_mem_fab.dart';
 import 'package:mem/notifications/client.dart';
 import 'package:mem/values/colors.dart';
@@ -46,7 +46,7 @@ class _HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     // TODO ScaffoldからNavigationBarまでの制御をここで行う
     return Scaffold(
-      body: MemListPage(_scrollController),
+      body: MemListBody(_scrollController),
       floatingActionButton: ShowNewMemFab(_scrollController),
     );
   }

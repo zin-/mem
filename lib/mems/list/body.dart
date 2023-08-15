@@ -11,25 +11,25 @@ import 'package:mem/mems/states.dart';
 import 'package:mem/values/colors.dart';
 import 'package:mem/values/durations.dart';
 
-class MemListPage extends ConsumerWidget {
+class MemListBody extends ConsumerWidget {
   final ScrollController _scrollController;
 
-  const MemListPage(this._scrollController, {super.key});
+  const MemListBody(this._scrollController, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => i(
         () {
           ref.read(fetchActiveActs);
 
-          return _MemListPageComponent(_scrollController);
+          return _MemListBodyComponent(_scrollController);
         },
       );
 }
 
-class _MemListPageComponent extends StatelessWidget {
+class _MemListBodyComponent extends StatelessWidget {
   final ScrollController _scrollController;
 
-  const _MemListPageComponent(this._scrollController);
+  const _MemListBodyComponent(this._scrollController);
 
   @override
   Widget build(BuildContext context) {
