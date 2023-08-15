@@ -11,53 +11,49 @@ import 'package:mem/mems/states.dart';
 import 'package:mem/values/colors.dart';
 import 'package:mem/values/durations.dart';
 
-import 'show_new_mem_fab.dart';
-
 class MemListPage extends ConsumerWidget {
-  const MemListPage({super.key});
+  final ScrollController _scrollController;
+
+  const MemListPage(this._scrollController, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => i(
         () {
           ref.read(fetchActiveActs);
 
-          return _MemListPageComponent();
+          return _MemListPageComponent(_scrollController);
         },
       );
 }
 
 class _MemListPageComponent extends StatelessWidget {
-  final _scrollController = ScrollController();
+  final ScrollController _scrollController;
 
-  _MemListPageComponent();
+  const _MemListPageComponent(this._scrollController);
 
   @override
   Widget build(BuildContext context) {
     final l10n = buildL10n(context);
 
-    return Scaffold(
-      body: MemListView(
-        l10n.memListPageTitle,
-        scrollController: _scrollController,
-        appBarActions: [
-          IconTheme(
-            data: const IconThemeData(color: iconOnPrimaryColor),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.filter_list),
-                  onPressed: () => showModalBottomSheet(
-                    context: context,
-                    builder: (context) => const MemListFilter(),
-                  ),
+    return MemListView(
+      l10n.memListPageTitle,
+      scrollController: _scrollController,
+      appBarActions: [
+        IconTheme(
+          data: const IconThemeData(color: iconOnPrimaryColor),
+          child: Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.filter_list),
+                onPressed: () => showModalBottomSheet(
+                  context: context,
+                  builder: (context) => const MemListFilter(),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
-      floatingActionButton: ShowNewMemFab(_scrollController),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        ),
+      ],
     );
   }
 }
