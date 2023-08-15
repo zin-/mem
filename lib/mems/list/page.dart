@@ -63,6 +63,7 @@ class _MemListPageComponent extends StatelessWidget {
             ),
           ),
         ],
+        // FIXME これを消したい
         onItemTapped: _onItemTapped,
       ),
       floatingActionButton: ShowNewMemFab(_scrollController),
