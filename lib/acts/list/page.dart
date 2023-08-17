@@ -14,7 +14,7 @@ class ActListPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => i(
         () => Scaffold(
-          body: ActListView(_memId),
+          body: ActListView(memId: _memId),
           floatingActionButton: ActFab(_memId),
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerFloat,

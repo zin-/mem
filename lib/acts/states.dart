@@ -9,16 +9,19 @@ final actsProvider =
   (ref) => v(() => ListValueStateNotifier(null)),
 );
 
+// FIXME loadActListと同じIFな気がする、統一できるのではないか？
 final actListProvider = StateNotifierProvider.autoDispose
-    .family<ListValueStateNotifier<Act>, List<Act>?, int>(
+    .family<ListValueStateNotifier<Act>, List<Act>?, int?>(
   (ref, memId) => v(
-    () => ListValueStateNotifier(
-      ref
-          .watch(actsProvider)
-          ?.where((act) => act.memId == memId)
-          .toList()
-          .sorted((a, b) => b.period.compareTo(a.period)),
-    ),
+    () {
+      final acts = ref.watch(actsProvider);
+      return ListValueStateNotifier(
+        (memId == null
+                ? acts
+                : acts?.where((act) => act.memId == memId).toList())
+            ?.sorted((a, b) => b.period.compareTo(a.period)),
+      );
+    },
     memId,
   ),
 );
