@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/async_value_view.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/mems/list/body.dart';
 import 'package:mem/values/colors.dart';
 
 import 'actions.dart';
@@ -13,17 +14,14 @@ class MemListView extends ConsumerWidget {
   final String _appBarTitle;
   final ScrollController? _scrollController;
   final List<Widget> _appBarActions;
-  final void Function(MemId memId)? _onItemTapped;
 
   MemListView(
     this._appBarTitle, {
     ScrollController? scrollController,
     List<Widget>? appBarActions,
-    void Function(MemId memId)? onItemTapped,
     super.key,
   })  : _scrollController = scrollController,
-        _appBarActions = appBarActions ?? [],
-        _onItemTapped = onItemTapped;
+        _appBarActions = appBarActions ?? [];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => AsyncValueView(
@@ -33,7 +31,7 @@ class MemListView extends ConsumerWidget {
           ref.watch(memListProvider),
           _scrollController,
           _appBarActions,
-          _onItemTapped,
+          (memId) => showMemDetailPage(context, ref, memId),
         ),
       );
 }

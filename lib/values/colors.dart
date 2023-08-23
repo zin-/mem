@@ -5,3 +5,5 @@ const iconOnPrimaryColor = Colors.white;
 
 const archivedColor = Colors.grey;
 const aposematicColor = Colors.deepOrange;
+
+const secondaryGreyColor = Colors.grey;

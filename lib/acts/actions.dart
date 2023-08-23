@@ -9,10 +9,14 @@ import 'act_repository.dart';
 import 'act_service.dart';
 import 'states.dart';
 
-final loadActList = FutureProvider.autoDispose.family<List<Act>, int>(
+final loadActList = FutureProvider.autoDispose.family<List<Act>, int?>(
   (ref, memId) => v(
     () async {
-      final acts = await ActRepository().shipByMemId(memId);
+      // TODO 全件取得する場合、件数的な不安がある
+      //  1週間分とかにしとくか？
+      final acts = memId == null
+          ? await ActRepository().ship()
+          : await ActRepository().shipByMemId(memId);
 
       ref.watch(actsProvider.notifier).upsertAll(
             acts,

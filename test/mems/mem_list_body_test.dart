@@ -9,7 +9,8 @@ import 'package:mem/core/mem.dart';
 import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/mems/list/actions.dart';
-import 'package:mem/mems/list/page.dart';
+import 'package:mem/mems/list/body.dart';
+import 'package:mem/mems/list/show_new_mem_fab.dart';
 import 'package:mem/mems/states.dart';
 
 void main() {
@@ -18,6 +19,7 @@ void main() {
   });
 
   testWidgets('Hide & show ShowNewMemFab.', (widgetTester) async {
+    final scrollController = ScrollController();
     final samples = List.generate(
       20,
       (index) => Mem(
@@ -37,7 +39,10 @@ void main() {
         onGenerateTitle: (context) => buildL10n(context).memDetailPageTitle,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: const MemListPage(),
+        home: Scaffold(
+          body: MemListBody(scrollController),
+          floatingActionButton: ShowNewMemFab(scrollController),
+        ),
       ),
     ));
     // await widgetTester.pumpAndSettle();

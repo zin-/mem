@@ -3,15 +3,17 @@ import 'package:mem/logger/log_service.dart';
 
 class TimeOfDayText extends StatelessWidget {
   final TimeOfDay _timeOfDay;
+  final TextStyle? _style;
 
-  const TimeOfDayText(
-    this._timeOfDay, {
-    super.key,
-  });
+  const TimeOfDayText(this._timeOfDay, {super.key, TextStyle? style})
+      : _style = style;
 
   @override
   Widget build(BuildContext context) => v(
-        () => Text(_timeOfDay.format(context)),
+        () => Text(
+          _timeOfDay.format(context),
+          style: _style,
+        ),
         _timeOfDay,
       );
 }

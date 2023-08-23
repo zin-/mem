@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -24,8 +25,10 @@ const _scenarioName = 'Act scenario';
 
 void testActScenario() => group(': $_scenarioName', () {
       final showActPageIconFinder = find.byIcon(Icons.play_arrow);
+      final startIconFinder = find.byIcon(Icons.play_arrow);
+      final stopIconFinder = find.byIcon(Icons.stop);
 
-      const insertedMemName = '$_scenarioName: saved mem name';
+      const insertedMemName = '$_scenarioName: inserted mem - name';
 
       late final Database db;
       late final int insertedMemId;
@@ -37,6 +40,10 @@ void testActScenario() => group(': $_scenarioName', () {
 
         insertedMemId = await db.getTable(memTableDefinition.name).insert({
           defMemName.name: insertedMemName,
+          createdAtColDef.name: DateTime.now(),
+        });
+        await db.getTable(memTableDefinition.name).insert({
+          defMemName.name: "$insertedMemName - 2",
           createdAtColDef.name: DateTime.now(),
         });
         await db.getTable(memNotificationTableDefinition.name).insert({
@@ -79,214 +86,302 @@ void testActScenario() => group(': $_scenarioName', () {
           await widgetTester.pumpAndSettle();
         }
 
-        group(": show inserted acts", () {
-          setUp(() async {
-            await db.getTable(actTableDefinition.name).insert({
-              fkDefMemId.name: insertedMemId,
-              defActStart.name: zeroDate,
-              defActStartIsAllDay.name: 0,
-              createdAtColDef.name: zeroDate,
+        group(": All", () {
+          testWidgets(': show inserted acts.', (widgetTester) async {
+            await runApplication();
+            await widgetTester.pumpAndSettle();
+
+            await widgetTester.tap(find.byIcon(Icons.playlist_play));
+            await widgetTester.pumpAndSettle();
+
+            [
+              "Acts",
+              dateText(zeroDate),
+              "1",
+              dateText(zeroDate),
+              " ",
+              timeText(zeroDate),
+              "~",
+              dateText(zeroDate),
+              " ",
+              timeText(zeroDate),
+              insertedMemName,
+            ].forEachIndexed((index, t) {
+              expect(
+                (widgetTester.widget(find.byType(Text).at(index)) as Text).data,
+                t,
+              );
             });
+            expect(startIconFinder, findsNothing);
+            expect(stopIconFinder, findsNothing);
+          });
+        });
+
+        group(": by Mem", () {
+          group(": show inserted acts", () {
+            setUp(() async {
+              await db.getTable(actTableDefinition.name).insert({
+                fkDefMemId.name: insertedMemId,
+                defActStart.name: zeroDate,
+                defActStartIsAllDay.name: 0,
+                createdAtColDef.name: zeroDate,
+              });
+            });
+
+            testWidgets(
+              ": check.",
+              (widgetTester) async {
+                await showActListPage(widgetTester);
+
+                [
+                  insertedMemName,
+                  dateText(zeroDate),
+                  "2",
+                  dateText(zeroDate),
+                  " ",
+                  timeText(zeroDate),
+                  "~",
+                  dateText(zeroDate),
+                  " ",
+                  timeText(zeroDate),
+                  "~",
+                  dateText(zeroDate),
+                  " ",
+                  timeText(zeroDate),
+                ].forEachIndexed((index, t) {
+                  expect(
+                    (widgetTester.widget(find.byType(Text).at(index)) as Text)
+                        .data,
+                    t,
+                  );
+                });
+                expect(stopIconFinder, findsOneWidget);
+              },
+            );
           });
 
           testWidgets(
-            ": check.",
+            ': start & finish act.',
             (widgetTester) async {
               await showActListPage(widgetTester);
 
-              expect(
-                (widgetTester.widget(find.byType(Text).at(0)) as Text).data,
+              expect(stopIconFinder, findsNothing);
+              final startTime = DateTime.now();
+              await widgetTester.tap(startIconFinder);
+              await Future.delayed(defaultTransitionDuration);
+              await widgetTester.pumpAndSettle();
+
+              expect(startIconFinder, findsNothing);
+              [
+                insertedMemName,
+                dateText(startTime),
+                "1",
+                dateText(startTime),
+                " ",
+                timeText(startTime),
+                "~",
                 dateText(zeroDate),
-              );
-              expect(
-                (widgetTester.widget(find.byType(Text).at(2)) as Text).data,
-                timeText(zeroDate),
-              );
-              expect(
-                (widgetTester.widget(find.byType(Text).at(4)) as Text).data,
+                "1",
                 dateText(zeroDate),
-              );
-              expect(
-                (widgetTester.widget(find.byType(Text).at(6)) as Text).data,
+                " ",
                 timeText(zeroDate),
-              );
-              expect(
-                (widgetTester.widget(find.byType(Text).at(8)) as Text).data,
+                "~",
                 dateText(zeroDate),
-              );
-              expect(
-                (widgetTester.widget(find.byType(Text).at(10)) as Text).data,
+                " ",
                 timeText(zeroDate),
-              );
-              expect(find.byIcon(Icons.stop), findsOneWidget);
+              ].forEachIndexed((index, t) {
+                expect(
+                  (widgetTester.widget(find.byType(Text).at(index)) as Text)
+                      .data,
+                  t,
+                );
+              });
+              final stopTime = DateTime.now();
+              await widgetTester.tap(stopIconFinder);
+              await Future.delayed(defaultTransitionDuration);
+              await widgetTester.pumpAndSettle();
+
+              [
+                insertedMemName,
+                dateText(startTime),
+                "1",
+                dateText(startTime),
+                " ",
+                timeText(startTime),
+                "~",
+                dateText(stopTime),
+                " ",
+                timeText(stopTime),
+                dateText(zeroDate),
+                "1",
+                dateText(zeroDate),
+                " ",
+                timeText(zeroDate),
+                "~",
+                dateText(zeroDate),
+                " ",
+                timeText(zeroDate),
+              ].forEachIndexed((index, t) {
+                expect(
+                  (widgetTester.widget(find.byType(Text).at(index)) as Text)
+                      .data,
+                  t,
+                );
+              });
+
+              expect(stopIconFinder, findsNothing);
+              final startTime2 = DateTime.now();
+              await widgetTester.tap(startIconFinder);
+              await Future.delayed(defaultTransitionDuration);
+              await widgetTester.pumpAndSettle();
+
+              [
+                insertedMemName,
+                dateText(startTime2),
+                "2",
+                dateText(startTime2),
+                " ",
+                timeText(startTime2),
+                "~",
+                dateText(startTime),
+                " ",
+                timeText(startTime),
+                "~",
+                dateText(stopTime),
+                " ",
+                timeText(stopTime),
+                dateText(zeroDate),
+                "1",
+                dateText(zeroDate),
+                " ",
+                timeText(zeroDate),
+                "~",
+                dateText(zeroDate),
+                " ",
+                timeText(zeroDate),
+              ].forEachIndexed((index, t) {
+                expect(
+                  (widgetTester.widget(find.byType(Text).at(index)) as Text)
+                      .data,
+                  t,
+                );
+              });
             },
           );
-        });
 
-        testWidgets(
-          ': start & finish act.',
-          (widgetTester) async {
-            await showActListPage(widgetTester);
-
-            expect(find.byIcon(Icons.stop), findsNothing);
-            final startTime = DateTime.now();
-            await widgetTester.tap(find.byIcon(Icons.play_arrow));
-            await Future.delayed(defaultTransitionDuration);
-            await widgetTester.pumpAndSettle();
-
-            expect(find.byIcon(Icons.play_arrow), findsNothing);
-            expect(
-              (widgetTester.widget(find.byType(Text).at(0)) as Text).data,
-              dateText(startTime),
-            );
-            expect(
-              (widgetTester.widget(find.byType(Text).at(2)) as Text).data,
-              timeText(startTime),
-            );
-            final stopTime = DateTime.now();
-            await widgetTester.tap(find.byIcon(Icons.stop));
-            await Future.delayed(defaultTransitionDuration);
-            await widgetTester.pumpAndSettle();
-
-            expect(
-              (widgetTester.widget(find.byType(Text).at(0)) as Text).data,
-              dateText(startTime),
-            );
-            expect(
-              (widgetTester.widget(find.byType(Text).at(2)) as Text).data,
-              timeText(startTime),
-            );
-            expect(
-              (widgetTester.widget(find.byType(Text).at(4)) as Text).data,
-              dateText(stopTime),
-            );
-            expect(
-              (widgetTester.widget(find.byType(Text).at(6)) as Text).data,
-              timeText(stopTime),
-            );
-
-            expect(find.byIcon(Icons.stop), findsNothing);
-            final startTime2 = DateTime.now();
-            await widgetTester.tap(find.byIcon(Icons.play_arrow));
-            await Future.delayed(defaultTransitionDuration);
-            await widgetTester.pumpAndSettle();
-
-            expect(
-              (widgetTester.widget(find.byType(Text).at(0)) as Text).data,
-              dateText(startTime2),
-            );
-            expect(
-              (widgetTester.widget(find.byType(Text).at(2)) as Text).data,
-              timeText(startTime2),
-            );
-            expect(
-              (widgetTester.widget(find.byType(Text).at(4)) as Text).data,
-              dateText(startTime),
-            );
-            expect(
-              (widgetTester.widget(find.byType(Text).at(6)) as Text).data,
-              timeText(startTime),
-            );
-            expect(
-              (widgetTester.widget(find.byType(Text).at(8)) as Text).data,
-              dateText(stopTime),
-            );
-            expect(
-              (widgetTester.widget(find.byType(Text).at(10)) as Text).data,
-              timeText(stopTime),
-            );
-          },
-        );
-
-        group(': Edit act', () {
-          setUp(() async {
-            await db.getTable(actTableDefinition.name).insert({
-              fkDefMemId.name: insertedMemId,
-              defActStart.name: zeroDate,
-              defActStartIsAllDay.name: 0,
-              createdAtColDef.name: zeroDate,
+          group(': Edit act', () {
+            setUp(() async {
+              await db.getTable(actTableDefinition.name).insert({
+                fkDefMemId.name: insertedMemId,
+                defActStart.name: zeroDate,
+                defActStartIsAllDay.name: 0,
+                createdAtColDef.name: zeroDate,
+              });
             });
-          });
 
-          testWidgets(': save.', (widgetTester) async {
-            await showActListPage(widgetTester);
+            testWidgets(': save.', (widgetTester) async {
+              await showActListPage(widgetTester);
 
-            await widgetTester.longPress(find.text(dateText(zeroDate)).at(0));
-            await widgetTester.pumpAndSettle();
+              await widgetTester.longPress(find.text(dateText(zeroDate)).at(1));
+              await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.byType(Switch).at(1));
-            await widgetTester.pumpAndSettle();
+              await widgetTester.tap(find.byType(Switch).at(1));
+              await widgetTester.pumpAndSettle();
 
-            final pickedDate = DateTime.now();
-            await widgetTester.tap(find.text('OK'));
-            await widgetTester.pumpAndSettle();
+              final pickedDate = DateTime.now();
+              await widgetTester.tap(find.text('OK'));
+              await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.byIcon(Icons.save_alt));
-            await widgetTester.pumpAndSettle();
+              await widgetTester.tap(find.byIcon(Icons.save_alt));
+              await widgetTester.pumpAndSettle();
 
-            expect(
-              (widgetTester.widget(find.byType(Text).at(0)) as Text).data,
-              dateText(zeroDate),
-            );
-            expect(
-              (widgetTester.widget(find.byType(Text).at(2)) as Text).data,
-              timeText(zeroDate),
-            );
-            expect(
-              (widgetTester.widget(find.byType(Text).at(4)) as Text).data,
-              dateText(pickedDate),
-            );
-            expect(
-              (widgetTester.widget(find.byType(Text).at(6)) as Text).data,
-              timeText(pickedDate),
-            );
+              [
+                insertedMemName,
+                dateText(zeroDate),
+                "2",
+                dateText(zeroDate),
+                " ",
+                timeText(zeroDate),
+                "~",
+                dateText(pickedDate),
+                " ",
+                timeText(pickedDate),
+                dateText(zeroDate),
+                " ",
+                timeText(zeroDate),
+                "~",
+                dateText(zeroDate),
+                " ",
+                timeText(zeroDate),
+              ].forEachIndexed((index, t) {
+                expect(
+                  (widgetTester.widget(find.byType(Text).at(index)) as Text)
+                      .data,
+                  t,
+                );
+              });
 
-            await widgetTester.longPress(find.text(dateText(zeroDate)).at(1));
-            await widgetTester.pumpAndSettle();
+              await widgetTester.longPress(find.text(dateText(zeroDate)).at(2));
+              await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.byIcon(Icons.clear).at(1));
-            await widgetTester.pumpAndSettle();
+              await widgetTester.tap(find.byIcon(Icons.clear).at(1));
+              await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.byIcon(Icons.save_alt));
-            await widgetTester.pumpAndSettle();
+              await widgetTester.tap(find.byIcon(Icons.save_alt));
+              await widgetTester.pumpAndSettle();
 
-            expect(
-              (widgetTester.widget(find.byType(Text).at(0)) as Text).data,
-              dateText(zeroDate),
-            );
-            expect(
-              (widgetTester.widget(find.byType(Text).at(2)) as Text).data,
-              timeText(zeroDate),
-            );
-            expect(
-              (widgetTester.widget(find.byType(Text).at(4)) as Text).data,
-              dateText(zeroDate),
-            );
-            expect(
-              (widgetTester.widget(find.byType(Text).at(6)) as Text).data,
-              timeText(zeroDate),
-            );
-            expect(
-              (widgetTester.widget(find.byType(Text).at(8)) as Text).data,
-              dateText(pickedDate),
-            );
-            expect(
-              (widgetTester.widget(find.byType(Text).at(10)) as Text).data,
-              timeText(pickedDate),
-            );
-          });
+              [
+                insertedMemName,
+                dateText(zeroDate),
+                "2",
+                dateText(zeroDate),
+                " ",
+                timeText(zeroDate),
+                "~",
+                dateText(zeroDate),
+                " ",
+                timeText(zeroDate),
+                "~",
+                dateText(pickedDate),
+                " ",
+                timeText(pickedDate),
+              ].forEachIndexed((index, t) {
+                expect(
+                  (widgetTester.widget(find.byType(Text).at(index)) as Text)
+                      .data,
+                  t,
+                );
+              });
+            });
 
-          testWidgets(': delete.', (widgetTester) async {
-            await showActListPage(widgetTester);
+            testWidgets(': delete.', (widgetTester) async {
+              await showActListPage(widgetTester);
 
-            await widgetTester.longPress(find.text(dateText(zeroDate)).at(0));
-            await widgetTester.pumpAndSettle();
+              await widgetTester.longPress(find.text(dateText(zeroDate)).at(1));
+              await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.byIcon(Icons.delete));
-            await widgetTester.pumpAndSettle();
+              await widgetTester.tap(find.byIcon(Icons.delete));
+              await widgetTester.pumpAndSettle();
 
-            expect(find.text(dateText(zeroDate)), findsNWidgets(2));
-            expect(find.text(timeText(zeroDate)), findsNWidgets(2));
+              [
+                insertedMemName,
+                dateText(zeroDate),
+                "1",
+                dateText(zeroDate),
+                " ",
+                timeText(zeroDate),
+                "~",
+                dateText(zeroDate),
+                " ",
+                timeText(zeroDate),
+              ].forEachIndexed((index, t) {
+                expect(
+                  (widgetTester.widget(find.byType(Text).at(index)) as Text)
+                      .data,
+                  t,
+                );
+              });
+            });
           });
         });
       });
@@ -340,20 +435,6 @@ void testActScenario() => group(': $_scenarioName', () {
       });
 
       group(': MemListPage', () {
-        const insertedMemName2 = '$insertedMemName - 2';
-
-        setUpAll(() async {
-          final memTable = db.getTable(memTableDefinition.name);
-
-          await memTable.insert({
-            defMemName.name: insertedMemName2,
-            createdAtColDef.name: DateTime.now(),
-          });
-        });
-
-        final startIconFinder = find.byIcon(Icons.play_arrow);
-        final stopIconFinder = find.byIcon(Icons.stop);
-
         testWidgets(': start & finish act.', (widgetTester) async {
           await showMemListPage(widgetTester);
 

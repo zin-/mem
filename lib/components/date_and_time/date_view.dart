@@ -14,15 +14,17 @@ String Function(DateTime dateTime) _buildFormatFunction(BuildContext context) {
 
 class DateText extends StatelessWidget {
   final DateTime _dateTime;
+  final TextStyle? _style;
 
-  const DateText(
-    this._dateTime, {
-    super.key,
-  });
+  const DateText(this._dateTime, {super.key, TextStyle? style})
+      : _style = style;
 
   @override
   Widget build(BuildContext context) => v(
-        () => Text(_buildFormatFunction(context)(_dateTime)),
+        () => Text(
+          _buildFormatFunction(context)(_dateTime),
+          style: _style,
+        ),
         _dateTime,
       );
 }
