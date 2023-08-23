@@ -19,9 +19,9 @@ final loadActList = FutureProvider.autoDispose.family<List<Act>, int?>(
           : await ActRepository().shipByMemId(memId);
 
       ref.watch(actsProvider.notifier).upsertAll(
-        acts,
+            acts,
             (tmp, item) => tmp.id == item.id,
-      );
+          );
 
       return acts;
     },
