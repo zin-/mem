@@ -97,6 +97,8 @@ void testActScenario() => group(': $_scenarioName', () {
             [
               "Acts",
               dateText(zeroDate),
+              "1",
+              dateText(zeroDate),
               " ",
               timeText(zeroDate),
               "~",
@@ -133,6 +135,8 @@ void testActScenario() => group(': $_scenarioName', () {
 
                 [
                   insertedMemName,
+                  dateText(zeroDate),
+                  "2",
                   dateText(zeroDate),
                   " ",
                   timeText(zeroDate),
@@ -171,9 +175,13 @@ void testActScenario() => group(': $_scenarioName', () {
               [
                 insertedMemName,
                 dateText(startTime),
+                "1",
+                dateText(startTime),
                 " ",
                 timeText(startTime),
                 "~",
+                dateText(zeroDate),
+                "1",
                 dateText(zeroDate),
                 " ",
                 timeText(zeroDate),
@@ -196,12 +204,16 @@ void testActScenario() => group(': $_scenarioName', () {
               [
                 insertedMemName,
                 dateText(startTime),
+                "1",
+                dateText(startTime),
                 " ",
                 timeText(startTime),
                 "~",
                 dateText(stopTime),
                 " ",
                 timeText(stopTime),
+                dateText(zeroDate),
+                "1",
                 dateText(zeroDate),
                 " ",
                 timeText(zeroDate),
@@ -226,6 +238,8 @@ void testActScenario() => group(': $_scenarioName', () {
               [
                 insertedMemName,
                 dateText(startTime2),
+                "2",
+                dateText(startTime2),
                 " ",
                 timeText(startTime2),
                 "~",
@@ -236,6 +250,8 @@ void testActScenario() => group(': $_scenarioName', () {
                 dateText(stopTime),
                 " ",
                 timeText(stopTime),
+                dateText(zeroDate),
+                "1",
                 dateText(zeroDate),
                 " ",
                 timeText(zeroDate),
@@ -266,7 +282,7 @@ void testActScenario() => group(': $_scenarioName', () {
             testWidgets(': save.', (widgetTester) async {
               await showActListPage(widgetTester);
 
-              await widgetTester.longPress(find.text(dateText(zeroDate)).at(0));
+              await widgetTester.longPress(find.text(dateText(zeroDate)).at(1));
               await widgetTester.pumpAndSettle();
 
               await widgetTester.tap(find.byType(Switch).at(1));
@@ -281,6 +297,8 @@ void testActScenario() => group(': $_scenarioName', () {
 
               [
                 insertedMemName,
+                dateText(zeroDate),
+                "2",
                 dateText(zeroDate),
                 " ",
                 timeText(zeroDate),
@@ -303,7 +321,7 @@ void testActScenario() => group(': $_scenarioName', () {
                 );
               });
 
-              await widgetTester.longPress(find.text(dateText(zeroDate)).at(1));
+              await widgetTester.longPress(find.text(dateText(zeroDate)).at(2));
               await widgetTester.pumpAndSettle();
 
               await widgetTester.tap(find.byIcon(Icons.clear).at(1));
@@ -314,6 +332,8 @@ void testActScenario() => group(': $_scenarioName', () {
 
               [
                 insertedMemName,
+                dateText(zeroDate),
+                "2",
                 dateText(zeroDate),
                 " ",
                 timeText(zeroDate),
@@ -337,7 +357,7 @@ void testActScenario() => group(': $_scenarioName', () {
             testWidgets(': delete.', (widgetTester) async {
               await showActListPage(widgetTester);
 
-              await widgetTester.longPress(find.text(dateText(zeroDate)).at(0));
+              await widgetTester.longPress(find.text(dateText(zeroDate)).at(1));
               await widgetTester.pumpAndSettle();
 
               await widgetTester.tap(find.byIcon(Icons.delete));
@@ -345,6 +365,8 @@ void testActScenario() => group(': $_scenarioName', () {
 
               [
                 insertedMemName,
+                dateText(zeroDate),
+                "1",
                 dateText(zeroDate),
                 " ",
                 timeText(zeroDate),

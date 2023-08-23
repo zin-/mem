@@ -1,13 +1,18 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:mem/acts/actions.dart';
 import 'package:mem/acts/states.dart';
 import 'package:mem/components/async_value_view.dart';
+import 'package:mem/components/date_and_time/date_and_time_view.dart';
 import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/core/act.dart';
+import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/values/colors.dart';
+import 'package:mem/values/dimens.dart';
 
 import 'item/view.dart';
 
@@ -33,7 +38,15 @@ class ActListView extends ConsumerWidget {
           return AsyncValueView(
             loadActList(_memId),
             (data) => _ActListViewComponent(
-              actList,
+              actList.groupListsBy((element) {
+                final dateAndTime = element.period.start!.dateTime;
+
+                return DateTime(
+                  dateAndTime.year,
+                  dateAndTime.month,
+                  dateAndTime.day,
+                );
+              }),
               mems,
             ),
           );
@@ -43,10 +56,15 @@ class ActListView extends ConsumerWidget {
 }
 
 class _ActListViewComponent extends StatelessWidget {
-  final List<Act> _actList;
+  final subHeaderTextStyle = const TextStyle(color: secondaryGreyColor);
+
+  final Map<DateTime, List<Act>> _groupedActList;
   final List<Mem> _mems;
 
-  const _ActListViewComponent(this._actList, this._mems);
+  const _ActListViewComponent(
+    this._groupedActList,
+    this._mems,
+  );
 
   @override
   Widget build(BuildContext context) => v(
@@ -57,24 +75,47 @@ class _ActListViewComponent extends StatelessWidget {
                 title: Text(_mems.length == 1 ? _mems.single.name : "Acts"),
                 floating: true,
               ),
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  childCount: _actList.length,
-                  // TODO 日付ごとのサブヘッダを追加する
-                  (context, index) => ActListItemView(
-                    context,
-                    _actList[index],
-                    mem: _mems.length > 1
-                        ? _mems.singleWhereOrNull(
-                            (element) => element.id == _actList[index].memId,
-                          )
-                        : null,
+              ..._groupedActList.entries.map(
+                (e) => SliverStickyHeader(
+                  header: Container(
+                    padding: pagePadding,
+                    color: Colors.white,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        DateAndTimeText(
+                          DateAndTime.from(e.key),
+                          style: subHeaderTextStyle,
+                        ),
+                        Text(
+                          e.value.length.toString(),
+                          style: subHeaderTextStyle,
+                        )
+                      ],
+                    ),
+                  ),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      childCount: e.value.length,
+                      (context, index) {
+                        final act = e.value.toList()[index];
+                        return ActListItemView(
+                          context,
+                          act,
+                          mem: _mems.length > 1
+                              ? _mems.singleWhereOrNull(
+                                  (element) => element.id == act.memId,
+                                )
+                              : null,
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
             ],
           );
         },
-        [_actList, _mems],
+        [_groupedActList, _mems],
       );
 }

@@ -44,6 +44,7 @@ dependencies:
   workmanager: ^0.5.1
   flutter_keyboard_visibility: ^5.4.1
   fl_chart: ^0.63.0
+  flutter_sticky_header: ^0.6.5
 
 dev_dependencies:
   # for Test mock
