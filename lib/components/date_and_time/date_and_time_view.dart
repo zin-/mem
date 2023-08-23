@@ -5,11 +5,10 @@ import 'package:mem/core/date_and_time/date_and_time.dart';
 
 class DateAndTimeText extends StatelessWidget {
   final DateAndTime _dateAndTime;
+  final TextStyle? _style;
 
-  const DateAndTimeText(
-    this._dateAndTime, {
-    super.key,
-  });
+  const DateAndTimeText(this._dateAndTime, {super.key, TextStyle? style})
+      : _style = style;
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +19,9 @@ class DateAndTimeText extends StatelessWidget {
         direction: Axis.horizontal,
         mainAxisSize: MainAxisSize.min,
         children: [
-          DateText(_dateAndTime),
+          DateText(_dateAndTime, style: _style),
           const Text(' '),
-          TimeOfDayText(TimeOfDay.fromDateTime(_dateAndTime)),
+          TimeOfDayText(TimeOfDay.fromDateTime(_dateAndTime), style: _style),
         ],
       );
     }
