@@ -25,6 +25,9 @@ class MemListItemView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemListItemViewComponent(
           ref.watch(memListProvider).firstWhere((_) => _.id == _memId),
+          ref.watch(activeActsProvider)?.singleWhereOrNull(
+                (act) => act.memId == _memId,
+              ),
           _onTapped,
           (bool? value, int memId) async {
             ref.read(memsProvider.notifier).upsertAll(
@@ -36,9 +39,6 @@ class MemListItemView extends ConsumerWidget {
               (tmp, item) => tmp.id == item.id,
             );
           },
-          ref.watch(activeActsProvider)?.singleWhereOrNull(
-                (act) => act.memId == _memId,
-              ),
           (activeAct) => v(
             () async {
               if (activeAct == null) {
@@ -62,9 +62,9 @@ class MemListItemView extends ConsumerWidget {
 class _MemListItemViewComponent extends ListTile {
   _MemListItemViewComponent(
     Mem mem,
+    Act? activeAct,
     void Function(int memId) onTap,
     void Function(bool? value, int memId) onMemDoneCheckboxTapped,
-    Act? activeAct,
     void Function(Act? act) onActButtonTapped,
   ) : super(
           // TODO 繰り返しのMemは表示しない
