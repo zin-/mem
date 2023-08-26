@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/list/body.dart';
+import 'package:mem/mems/transitions.dart';
 import 'package:mem/values/durations.dart';
 
 class ShowNewMemFab extends StatefulWidget {
