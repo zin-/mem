@@ -67,18 +67,21 @@ class _MemListItemViewComponent extends ListTile {
     Act? activeAct,
     void Function(Act? act) onActButtonTapped,
   ) : super(
+          // TODO 繰り返しのMemは表示しない
           leading: activeAct == null
               ? MemDoneCheckbox(
                   mem,
                   (value) => onMemDoneCheckboxTapped(value, mem.id),
                 )
               : null,
-          trailing: IconButton(
-            onPressed: () => onActButtonTapped(activeAct),
-            icon: activeAct == null
-                ? const Icon(Icons.play_arrow)
-                : const Icon(Icons.stop),
-          ),
+          trailing: mem.isDone()
+              ? null
+              : IconButton(
+                  onPressed: () => onActButtonTapped(activeAct),
+                  icon: activeAct == null
+                      ? const Icon(Icons.play_arrow)
+                      : const Icon(Icons.stop),
+                ),
           title: activeAct == null
               ? MemNameText(mem)
               : Row(
