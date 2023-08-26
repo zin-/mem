@@ -80,11 +80,11 @@ class _MemListItemViewComponent extends ListTile {
                 : const Icon(Icons.stop),
           ),
           title: activeAct == null
-              ? MemNameText(mem.name, mem.id)
+              ? MemNameText(mem)
               : Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(child: MemNameText(mem.name, mem.id)),
+                    Expanded(child: MemNameText(mem)),
                     ElapsedTimeView(activeAct.period.start!),
                   ],
                 ),

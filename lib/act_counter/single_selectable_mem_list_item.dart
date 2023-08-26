@@ -35,7 +35,7 @@ class _SingleSelectableMemListItemComponent extends ListTile {
     bool isSelected,
     void Function(int? memId) onSelected,
   ) : super(
-          title: MemNameText(mem.name, mem.id),
+          title: MemNameText(mem),
           subtitle: mem.period == null ? null : MemPeriodTexts(mem.id),
           trailing: Radio<int>(
             value: mem.id,
