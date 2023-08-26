@@ -4,50 +4,43 @@ import 'package:mem/components/async_value_view.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/transitions.dart';
-import 'package:mem/values/colors.dart';
 
 import 'actions.dart';
 import 'item/view.dart';
 import 'states.dart';
 
 class MemListView extends ConsumerWidget {
-  final String _appBarTitle;
+  final Widget _appBar;
   final ScrollController? _scrollController;
-  final List<Widget> _appBarActions;
 
-  MemListView(
-    this._appBarTitle, {
+  const MemListView(
+    this._appBar, {
     ScrollController? scrollController,
-    List<Widget>? appBarActions,
     super.key,
-  })  : _scrollController = scrollController,
-        _appBarActions = appBarActions ?? [];
+  }) : _scrollController = scrollController;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => AsyncValueView(
         loadMemList,
         (data) => _MemListViewComponent(
-          _appBarTitle,
+          _appBar,
           ref.watch(memListProvider),
           _scrollController,
-          _appBarActions,
           (memId) => showMemDetailPage(context, ref, memId),
         ),
       );
 }
 
 class _MemListViewComponent extends StatelessWidget {
-  final String _appBarTitle;
+  final Widget _appBar;
   final List<Mem> _memList;
   final ScrollController? _scrollController;
-  final List<Widget> _appBarActions;
   final void Function(MemId memId)? _onItemTapped;
 
   const _MemListViewComponent(
-    this._appBarTitle,
+    this._appBar,
     this._memList,
     this._scrollController,
-    this._appBarActions,
     this._onItemTapped,
   );
 
@@ -57,18 +50,7 @@ class _MemListViewComponent extends StatelessWidget {
           return CustomScrollView(
             controller: _scrollController,
             slivers: [
-              SliverAppBar(
-                title: Text(_appBarTitle),
-                floating: true,
-                actions: [
-                  IconTheme(
-                    data: const IconThemeData(color: iconOnPrimaryColor),
-                    child: Row(
-                      children: _appBarActions,
-                    ),
-                  ),
-                ],
-              ),
+              _appBar,
               SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (context, index) => MemListItemView(
@@ -82,10 +64,9 @@ class _MemListViewComponent extends StatelessWidget {
           );
         },
         {
-          '_appBarTitle': _appBarTitle,
+          '_appBar': _appBar,
           '_memList': _memList,
           '_scrollController': _scrollController,
-          '_appBarActions': _appBarActions,
           '_onItemTapped': _onItemTapped,
         },
       );

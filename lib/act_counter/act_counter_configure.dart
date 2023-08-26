@@ -30,7 +30,11 @@ class _ActCounterConfigureComponent extends StatelessWidget {
           final l10n = buildL10n(context);
 
           return Scaffold(
-            body: MemListView(l10n.actCounterConfigureTitle),
+            body: MemListView(
+              SliverAppBar(
+                title: Text(l10n.actCounterConfigureTitle),
+              ),
+            ),
             floatingActionButton: const SelectMemFab(),
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerFloat,
