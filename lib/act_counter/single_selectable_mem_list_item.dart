@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/components/mem/list/item/states.dart';
 import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/components/mem/mem_name.dart';
 import 'package:mem/components/mem/mem_period.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
+
+import 'states.dart';
 
 class SingleSelectableMemListItem extends ConsumerWidget {
   final int _memId;

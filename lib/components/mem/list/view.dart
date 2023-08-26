@@ -3,18 +3,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/async_value_view.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/transitions.dart';
 
 import 'actions.dart';
-import 'item/view.dart';
 import 'states.dart';
 
 class MemListView extends ConsumerWidget {
   final Widget _appBar;
   final ScrollController? _scrollController;
+  final Widget Function(int memId) _itemBuilder;
 
   const MemListView(
-    this._appBar, {
+    this._appBar,
+    this._itemBuilder, {
     ScrollController? scrollController,
     super.key,
   }) : _scrollController = scrollController;
@@ -23,25 +23,25 @@ class MemListView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => AsyncValueView(
         loadMemList,
         (data) => _MemListViewComponent(
-          _appBar,
           ref.watch(memListProvider),
+          _appBar,
+          _itemBuilder,
           _scrollController,
-          (memId) => showMemDetailPage(context, ref, memId),
         ),
       );
 }
 
 class _MemListViewComponent extends StatelessWidget {
-  final Widget _appBar;
   final List<Mem> _memList;
+  final Widget _appBar;
+  final Widget Function(int memId) _itemBuilder;
   final ScrollController? _scrollController;
-  final void Function(MemId memId)? _onItemTapped;
 
   const _MemListViewComponent(
-    this._appBar,
     this._memList,
+    this._appBar,
+    this._itemBuilder,
     this._scrollController,
-    this._onItemTapped,
   );
 
   @override
@@ -53,10 +53,7 @@ class _MemListViewComponent extends StatelessWidget {
               _appBar,
               SliverList(
                 delegate: SliverChildBuilderDelegate(
-                  (context, index) => MemListItemView(
-                    _memList[index].id,
-                    _onItemTapped,
-                  ),
+                  (context, index) => _itemBuilder(_memList[index].id),
                   childCount: _memList.length,
                 ),
               ),
@@ -64,10 +61,9 @@ class _MemListViewComponent extends StatelessWidget {
           );
         },
         {
-          '_appBar': _appBar,
           '_memList': _memList,
+          '_appBar': _appBar,
           '_scrollController': _scrollController,
-          '_onItemTapped': _onItemTapped,
         },
       );
 }
