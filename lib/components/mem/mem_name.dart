@@ -4,7 +4,7 @@ import 'package:mem/components/l10n.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
 
-String memNameTag(int? memId) => heroTag('mem-name', memId);
+String _memNameTag(int? memId) => heroTag('mem-name', memId);
 
 class MemNameText extends StatelessWidget {
   final Mem _mem;
@@ -14,7 +14,7 @@ class MemNameText extends StatelessWidget {
   @override
   Widget build(BuildContext context) => v(
         () => HeroView(
-          memNameTag(_mem.id),
+          _memNameTag(_mem.id),
           Text(
             _mem.name,
             maxLines: 2,
@@ -46,7 +46,7 @@ class MemNameTextFormField extends StatelessWidget {
           final l10n = buildL10n(context);
 
           return HeroView(
-            memNameTag(_memId),
+            _memNameTag(_memId),
             TextFormField(
               initialValue: _memName,
               decoration: InputDecoration(
