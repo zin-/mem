@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/components/mem/list/view.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/list/actions.dart';
@@ -16,6 +17,9 @@ class MemListBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => i(
         () {
+          ref.read(fetchMemNotifications(
+            ref.watch(memListProvider).map((e) => e.id),
+          ));
           ref.read(fetchActiveActs);
 
           return _MemListBodyComponent(

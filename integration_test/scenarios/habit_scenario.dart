@@ -216,6 +216,7 @@ void testHabitScenario() => group(': $_scenarioName', () {
                   inserted[memIdFkDef.name],
                   inserted[timeColDef.name],
                   inserted[memNotificationTypeColDef.name],
+                  // FIXME
                   inserted[memNotificationMessageColDef.name],
                   inserted[createdAtColDef.name],
                   inserted[updatedAtColDef.name],

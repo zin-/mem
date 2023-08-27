@@ -26,7 +26,8 @@ final loadMemItems = FutureProvider.autoDispose.family<List<MemItem>, int?>(
     memId,
   ),
 );
-final loadMemNotifications = FutureProvider.autoDispose.family<void, int?>(
+final loadMemNotificationsByMemId =
+    FutureProvider.autoDispose.family<void, int?>(
   (ref, memId) => v(
     () async {
       if (memId != null) {
@@ -34,9 +35,9 @@ final loadMemNotifications = FutureProvider.autoDispose.family<void, int?>(
             await MemNotificationRepository().shipByMemId(memId);
 
         if (memNotifications.isNotEmpty) {
-          ref.watch(memNotificationsProvider(memId).notifier).upsertAll(
+          ref.watch(memNotificationsProvider.notifier).upsertAll(
                 memNotifications.toList(),
-                (tmp, item) => tmp.type == item.type,
+                (tmp, item) => tmp.id == item.id,
               );
         }
       }
@@ -60,9 +61,11 @@ final saveMem =
             ref
                 .read(memItemsProvider(memId).notifier)
                 .updatedBy(saved.memItems);
-            ref
-                .read(memNotificationsProvider(memId).notifier)
-                .updatedBy(saved.notifications);
+            ref.read(memNotificationsProvider.notifier).upsertAll(
+                  // TODO
+                  saved.notifications ?? [],
+                  (tmp, item) => tmp.id == item.id,
+                );
 
             return saved;
           },

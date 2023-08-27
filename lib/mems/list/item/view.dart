@@ -9,7 +9,9 @@ import 'package:mem/components/mem/mem_period.dart';
 import 'package:mem/components/timer.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/mem.dart';
+import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/states.dart';
 import 'package:mem/values/colors.dart';
 
@@ -27,6 +29,11 @@ class MemListItemView extends ConsumerWidget {
           ref.watch(memListProvider).firstWhere((_) => _.id == _memId),
           ref.watch(activeActsProvider)?.singleWhereOrNull(
                 (act) => act.memId == _memId,
+              ),
+          ref.watch(memNotificationsByMemIdProvider(_memId))?.singleWhereOrNull(
+                (element) =>
+                    element.isSaved() &&
+                    element.type == MemNotificationType.repeat,
               ),
           _onTapped,
           (bool? value, int memId) async {
@@ -63,16 +70,18 @@ class _MemListItemViewComponent extends ListTile {
   _MemListItemViewComponent(
     Mem mem,
     Act? activeAct,
+    MemNotification? memRepeatedNotifications,
     void Function(int memId) onTap,
     void Function(bool? value, int memId) onMemDoneCheckboxTapped,
     void Function(Act? act) onActButtonTapped,
   ) : super(
-          // TODO 繰り返しのMemは表示しない
-          leading: activeAct == null
-              ? MemDoneCheckbox(
-                  mem,
-                  (value) => onMemDoneCheckboxTapped(value, mem.id),
-                )
+          leading: memRepeatedNotifications == null
+              ? activeAct == null
+                  ? MemDoneCheckbox(
+                      mem,
+                      (value) => onMemDoneCheckboxTapped(value, mem.id),
+                    )
+                  : null
               : null,
           trailing: mem.isDone()
               ? null
@@ -95,6 +104,10 @@ class _MemListItemViewComponent extends ListTile {
           tileColor: mem.isArchived() ? archivedColor : null,
           onTap: () => onTap(mem.id),
         ) {
-    verbose({'mem': mem, 'activeAct': activeAct});
+    verbose({
+      'mem': mem,
+      'activeAct': activeAct,
+      'memRepeatedNotifications': memRepeatedNotifications,
+    });
   }
 }

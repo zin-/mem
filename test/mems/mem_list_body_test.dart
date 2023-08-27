@@ -32,6 +32,7 @@ void main() {
       overrides: [
         loadMemList.overrideWith((ref) => null),
         fetchActiveActs.overrideWith((ref) => Future.value(null)),
+        fetchMemNotifications.overrideWith((ref, arg) => Future(() => [])),
         activeActsProvider.overrideWith((ref) => ListValueStateNotifier([])),
         memsProvider.overrideWith((ref) => ListValueStateNotifier(samples)),
       ],
