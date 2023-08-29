@@ -450,7 +450,7 @@ void testActScenario() => group(': $_scenarioName', () {
           );
           expect(startIconFinder, findsOneWidget);
           expect(stopIconFinder, findsOneWidget);
-          await widgetTester.pump(elapsePeriod);
+          await widgetTester.pumpAndSettle(elapsePeriod);
 
           expect(find.text('00:00:00'), findsNothing);
           await widgetTester.tap(startIconFinder);
