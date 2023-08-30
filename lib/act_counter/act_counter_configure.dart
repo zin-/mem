@@ -2,23 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/act_counter/select_mem_fab.dart';
 import 'package:mem/components/l10n.dart';
-import 'package:mem/components/mem/list/item/states.dart';
 import 'package:mem/components/mem/list/view.dart';
 import 'package:mem/logger/log_service.dart';
+
+import 'single_selectable_mem_list_item.dart';
 
 class ActCounterConfigure extends ConsumerWidget {
   const ActCounterConfigure({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    Future(() {
-      ref
-          .read(memListViewModeProvider.notifier)
-          .updatedBy(MemListViewMode.singleSelection);
-    });
-
-    return const _ActCounterConfigureComponent();
-  }
+  Widget build(BuildContext context, WidgetRef ref) =>
+      const _ActCounterConfigureComponent();
 }
 
 class _ActCounterConfigureComponent extends StatelessWidget {
@@ -30,7 +24,12 @@ class _ActCounterConfigureComponent extends StatelessWidget {
           final l10n = buildL10n(context);
 
           return Scaffold(
-            body: MemListView(l10n.actCounterConfigureTitle),
+            body: MemListView(
+              SliverAppBar(
+                title: Text(l10n.actCounterConfigureTitle),
+              ),
+              (memId) => SingleSelectableMemListItem(memId),
+            ),
             floatingActionButton: const SelectMemFab(),
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerFloat,

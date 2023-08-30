@@ -17,11 +17,11 @@ class NotificationsWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => AsyncValueView(
-          loadMemNotifications(_memId),
+          loadMemNotificationsByMemId(_memId),
           (loaded) => _NotificationsWidgetComponent(
             ref.watch(memDetailProvider(_memId)).notifications!,
             (current) => (time, message) =>
-                ref.read(memNotificationsProvider(_memId).notifier).upsertAll(
+                ref.read(memNotificationsByMemIdProvider(_memId).notifier).upsertAll(
                   [
                     current.copyWith(time, message),
                   ],

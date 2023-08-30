@@ -17,7 +17,7 @@ final memDetailProvider = StateNotifierProvider.autoDispose
       MemDetail(
         ref.watch(editingMemProvider(memId)),
         ref.watch(memItemsProvider(memId))!,
-        ref.watch(memNotificationsProvider(memId)),
+        ref.watch(memNotificationsByMemIdProvider(memId)),
       ),
     ),
     memId,
@@ -67,23 +67,44 @@ final memItemsProvider = StateNotifierProvider.autoDispose
   ),
 );
 
-final memNotificationsProvider = StateNotifierProvider.autoDispose.family<
-    ListValueStateNotifier<MemNotification>, List<MemNotification>?, int?>(
+MemNotification _initialRepeatMemNotification(int? memId) => MemNotification(
+      MemNotificationType.repeat,
+      null,
+      'Repeat',
+      memId: memId,
+    );
+
+MemNotification _initialAfterActStartedMemNotification(int? memId) =>
+    MemNotification(
+      MemNotificationType.afterActStarted,
+      null,
+      'Finish?',
+      memId: memId,
+    );
+
+final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
+    .family<ListValueStateNotifier<MemNotification>, List<MemNotification>?,
+        int?>(
   (ref, memId) => v(
-    () => ListValueStateNotifier([
-      MemNotification(
-        MemNotificationType.repeat,
-        null,
-        'Repeat',
-        memId: memId,
-      ),
-      MemNotification(
-        MemNotificationType.afterActStarted,
-        null,
-        'Finish?',
-        memId: memId,
-      ),
-    ]),
+    () {
+      final memNotificationsByMemId = ref
+          .watch(memNotificationsProvider)
+          ?.where((element) => element.memId == memId);
+      final memRepeatedNotification =
+          memNotificationsByMemId?.singleWhereOrNull(
+              (element) => element.type == MemNotificationType.repeat);
+      final memAfterActStartedNotification =
+          memNotificationsByMemId?.singleWhereOrNull(
+              (element) => element.type == MemNotificationType.afterActStarted);
+
+      return ListValueStateNotifier(
+        [
+          memRepeatedNotification ?? _initialRepeatMemNotification(memId),
+          memAfterActStartedNotification ??
+              _initialAfterActStartedMemNotification(memId),
+        ],
+      );
+    },
     memId,
   ),
 );
