@@ -8,7 +8,7 @@ class In extends Condition {
   In(this._key, this._values);
 
   @override
-  String whereString() => '$_key IN ${_values.toString()}';
+  String whereString() => '$_key IN ( ${_values.join(', ')} )';
 
   @override
   Iterable? whereArgs() => null;

@@ -8,7 +8,6 @@ import 'package:mem/mems/detail/fab.dart';
 import 'package:mem/mems/detail/menu.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/values/colors.dart';
-import 'package:mem/values/dimens.dart';
 
 class MemDetailPage extends ConsumerWidget {
   final int? _memId;
@@ -76,12 +75,9 @@ class _MemDetailPageComponentState extends State<_MemDetailPageComponent> {
               ],
               backgroundColor: _memIsArchived ? archivedColor : primaryColor,
             ),
-            body: Padding(
-              padding: pagePadding,
-              child: Form(
-                key: _formKey,
-                child: MemDetailBody(_memId),
-              ),
+            body: Form(
+              key: _formKey,
+              child: MemDetailBody(_memId),
             ),
             floatingActionButton: MemDetailFab(_formKey, _memId),
             floatingActionButtonLocation: _isKeyboardShown
