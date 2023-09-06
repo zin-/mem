@@ -1,5 +1,5 @@
 import 'package:mem/core/mem.dart';
-import 'package:mem/database/table_definitions/acts.dart';
+import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/repositories/i/_database_tuple_entity_v2.dart';
 import 'package:mem/repositories/i/types.dart';
 

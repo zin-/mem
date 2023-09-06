@@ -1,4 +1,4 @@
-import 'package:mem/database/table_definitions/base.dart';
+import 'package:mem/databases/table_definitions/base.dart';
 
 import '_entity_v2.dart';
 import 'types.dart';

@@ -1,4 +1,4 @@
-import 'package:mem/database/table_definitions/mem_notifications.dart';
+import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/repositories/i/_database_tuple_entity_v2.dart';
 
 class MemNotificationEntity extends DatabaseTupleEntity {

@@ -6,10 +6,10 @@ import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_item.dart';
-import 'package:mem/database/definition.dart';
-import 'package:mem/database/table_definitions/base.dart';
-import 'package:mem/database/table_definitions/mem_items.dart';
-import 'package:mem/database/table_definitions/mems.dart';
+import 'package:mem/databases/definition.dart';
+import 'package:mem/databases/table_definitions/base.dart';
+import 'package:mem/databases/table_definitions/mem_items.dart';
+import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/mems/mem_repository_v2.dart';
 

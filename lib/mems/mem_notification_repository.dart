@@ -1,5 +1,5 @@
 import 'package:mem/core/mem_notification.dart';
-import 'package:mem/database/table_definitions/mem_notifications.dart';
+import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/i/_database_tuple_repository_v2.dart';

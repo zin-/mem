@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/core/mem_item.dart';
-import 'package:mem/database/table_definitions/base.dart';
-import 'package:mem/database/table_definitions/mem_items.dart';
-import 'package:mem/database/table_definitions/mems.dart';
+import 'package:mem/databases/table_definitions/base.dart';
+import 'package:mem/databases/table_definitions/mem_items.dart';
+import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/framework/database/database_manager.dart';
-import 'package:mem/database/definition.dart';
+import 'package:mem/databases/definition.dart';
 import 'package:mem/values/durations.dart';
 
 import '../_helpers.dart';
