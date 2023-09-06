@@ -110,6 +110,7 @@ void testActScenario() => group(': $_scenarioName', () {
               expect(
                 (widgetTester.widget(find.byType(Text).at(index)) as Text).data,
                 t,
+                reason: "Index is \"$index\".",
               );
             });
             expect(startIconFinder, findsNothing);
@@ -153,6 +154,7 @@ void testActScenario() => group(': $_scenarioName', () {
                     (widgetTester.widget(find.byType(Text).at(index)) as Text)
                         .data,
                     t,
+                    reason: "Index is \"$index\".",
                   );
                 });
                 expect(stopIconFinder, findsOneWidget);
@@ -194,12 +196,13 @@ void testActScenario() => group(': $_scenarioName', () {
                   (widgetTester.widget(find.byType(Text).at(index)) as Text)
                       .data,
                   t,
+                  reason: "Index is \"$index\".",
                 );
               });
               final stopTime = DateTime.now();
               await widgetTester.tap(stopIconFinder);
               await Future.delayed(defaultTransitionDuration);
-              await widgetTester.pumpAndSettle();
+              await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
               [
                 insertedMemName,
@@ -226,6 +229,7 @@ void testActScenario() => group(': $_scenarioName', () {
                   (widgetTester.widget(find.byType(Text).at(index)) as Text)
                       .data,
                   t,
+                  reason: "Index is \"$index\".",
                 );
               });
 
@@ -233,7 +237,7 @@ void testActScenario() => group(': $_scenarioName', () {
               final startTime2 = DateTime.now();
               await widgetTester.tap(startIconFinder);
               await Future.delayed(defaultTransitionDuration);
-              await widgetTester.pumpAndSettle();
+              await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
               [
                 insertedMemName,
@@ -264,6 +268,7 @@ void testActScenario() => group(': $_scenarioName', () {
                   (widgetTester.widget(find.byType(Text).at(index)) as Text)
                       .data,
                   t,
+                  reason: "Index is \"$index\".",
                 );
               });
             },
@@ -318,6 +323,7 @@ void testActScenario() => group(': $_scenarioName', () {
                   (widgetTester.widget(find.byType(Text).at(index)) as Text)
                       .data,
                   t,
+                  reason: "Index is \"$index\".",
                 );
               });
 
@@ -350,6 +356,7 @@ void testActScenario() => group(': $_scenarioName', () {
                   (widgetTester.widget(find.byType(Text).at(index)) as Text)
                       .data,
                   t,
+                  reason: "Index is \"$index\".",
                 );
               });
             });
@@ -379,6 +386,7 @@ void testActScenario() => group(': $_scenarioName', () {
                   (widgetTester.widget(find.byType(Text).at(index)) as Text)
                       .data,
                   t,
+                  reason: "Index is \"$index\".",
                 );
               });
             });
