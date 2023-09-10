@@ -30,6 +30,7 @@ void testDatabaseFactoryV2() => group(": $_scenarioName", () {
           () async {
             final database =
                 (await DatabaseFactory.open(testDatabaseDefinition))
+                    // ignore: deprecated_member_use_from_same_package
                     .nativeDatabase;
 
             expect(
@@ -72,9 +73,11 @@ void testDatabaseFactoryV2() => group(": $_scenarioName", () {
             () async {
               final database =
                   (await DatabaseFactory.open(testDatabaseDefinition))
+                      // ignore: deprecated_member_use_from_same_package
                       .nativeDatabase;
               final database2 =
                   (await DatabaseFactory.open(testDatabaseDefinitionAddedTable))
+                      // ignore: deprecated_member_use_from_same_package
                       .nativeDatabase;
 
               expect(database, database2);
@@ -90,6 +93,7 @@ void testDatabaseFactoryV2() => group(": $_scenarioName", () {
             () async {
               final database =
                   (await DatabaseFactory.open(testDatabaseDefinition))
+                      // ignore: deprecated_member_use_from_same_package
                       .nativeDatabase;
 
               // 対象のDBがopenedの場合、upgrade処理が実行されないためcloseする
@@ -97,6 +101,7 @@ void testDatabaseFactoryV2() => group(": $_scenarioName", () {
 
               final database2 =
                   (await DatabaseFactory.open(testDatabaseDefinitionAddedTable))
+                      // ignore: deprecated_member_use_from_same_package
                       .nativeDatabase;
 
               expect(database.isOpen, false);
@@ -129,6 +134,7 @@ void testDatabaseFactoryV2() => group(": $_scenarioName", () {
             () async {
               final database =
                   (await DatabaseFactory.open(testDatabaseDefinitionAddedTable))
+                      // ignore: deprecated_member_use_from_same_package
                       .nativeDatabase;
 
               // データ移行が行われるかの確認のためデータを挿入する
@@ -149,6 +155,7 @@ void testDatabaseFactoryV2() => group(": $_scenarioName", () {
 
               final database2 = (await DatabaseFactory.open(
                       testDatabaseDefinitionAddedColumn))
+                  // ignore: deprecated_member_use_from_same_package
                   .nativeDatabase;
 
               expect(database.isOpen, false);

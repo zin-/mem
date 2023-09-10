@@ -22,9 +22,15 @@ class DatabaseFactory {
             final databaseAccessor =
                 _databaseAccessors[databaseDefinition.name];
 
-            if (databaseAccessor!.nativeDatabase.isOpen) {
+            if (databaseAccessor!
+                // ignore: deprecated_member_use_from_same_package
+                .nativeDatabase
+                .isOpen) {
               try {
-                await databaseAccessor.nativeDatabase.getVersion();
+                await databaseAccessor
+                    // ignore: deprecated_member_use_from_same_package
+                    .nativeDatabase
+                    .getVersion();
 
                 return databaseAccessor;
               } on sqflite_api.DatabaseException catch (e) {
@@ -39,7 +45,10 @@ class DatabaseFactory {
                   // 本来ならこのクラスではなく、sqflite_apiの責務だと考えているが、
                   // 考慮されていないのでここで対処する
                   _databaseAccessors.remove(databaseDefinition.name);
-                  await databaseAccessor.nativeDatabase.close();
+                  await databaseAccessor
+                      // ignore: deprecated_member_use_from_same_package
+                      .nativeDatabase
+                      .close();
                 } else {
                   rethrow;
                 }
