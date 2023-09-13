@@ -14,11 +14,10 @@ class CreatedAndUpdatedAtTexts extends StatelessWidget {
   Widget build(BuildContext context) => v(
         () {
           if (_entity.isSaved()) {
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            return Wrap(
+              direction: Axis.horizontal,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     const Icon(
                       Icons.more_time,
