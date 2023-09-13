@@ -3,13 +3,15 @@ import 'package:flutter/foundation.dart';
 import 'package:mem/framework/database/definition/table_definition_v2.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:path/path.dart' as path;
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqlite_api.dart' as sqflite_api;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite;
 import 'accessor.dart';
 import 'definition/database_definition_v2.dart';
 
 class DatabaseFactory {
+  // FIXME Factoryに生成されたものがあるのは正しいのか？
+  //  Factoryは生成するだけのクラスでなくてはならない
+  //  -> Repositoryに移譲する
   static final _databaseAccessors = <String, DatabaseAccessor>{};
 
   // TODO add on test
@@ -18,65 +20,34 @@ class DatabaseFactory {
   ) =>
       i(
         () async {
-          if (_databaseAccessors.containsKey(databaseDefinition.name)) {
-            final databaseAccessor =
-                _databaseAccessors[databaseDefinition.name];
+          final contained = _databaseAccessors[databaseDefinition.name];
 
-            if (databaseAccessor!
-                // ignore: deprecated_member_use_from_same_package
-                .nativeDatabase
-                .isOpen) {
-              try {
-                await databaseAccessor
-                    // ignore: deprecated_member_use_from_same_package
-                    .nativeDatabase
-                    .getVersion();
-
-                return databaseAccessor;
-              } on sqflite_api.DatabaseException catch (e) {
-                final exceptionMessage = e.toString();
-                if (exceptionMessage.startsWith(
-                      "DatabaseException(database_closed ",
-                    ) ||
-                    exceptionMessage.startsWith(
-                      "SqfliteFfiException(error, Bad state: This database has already been closed})",
-                    )) {
-                  // nativeDatabaseがcloseされずに直接deleteされた場合にこの状況になる
-                  // 本来ならこのクラスではなく、sqflite_apiの責務だと考えているが、
-                  // 考慮されていないのでここで対処する
-                  _databaseAccessors.remove(databaseDefinition.name);
-                  await databaseAccessor
-                      // ignore: deprecated_member_use_from_same_package
-                      .nativeDatabase
-                      .close();
-                } else {
-                  rethrow;
-                }
-              }
-            }
-          }
-
-          final databaseAccessor = DatabaseAccessor(
-            await nativeFactory.openDatabase(
-              await buildDatabasePath(databaseDefinition.name),
-              options: sqflite.OpenDatabaseOptions(
-                version: databaseDefinition.version,
-                onConfigure: _onConfigure(databaseDefinition),
-                onCreate: _onCreate(databaseDefinition),
-                onUpgrade: _onUpgrade(databaseDefinition),
+          if (await contained?.isOpened() ?? false) {
+            return contained!;
+          } else {
+            final databaseAccessor = DatabaseAccessor(
+              await nativeFactory.openDatabase(
+                await buildDatabasePath(databaseDefinition.name),
+                options: sqflite.OpenDatabaseOptions(
+                  version: databaseDefinition.version,
+                  onConfigure: _onConfigure(databaseDefinition),
+                  onCreate: _onCreate(databaseDefinition),
+                  onUpgrade: _onUpgrade(databaseDefinition),
+                ),
               ),
-            ),
-          );
+            );
 
-          return _databaseAccessors.update(
-            databaseDefinition.name,
-            (value) => databaseAccessor,
-            ifAbsent: () => databaseAccessor,
-          );
+            return _databaseAccessors.update(
+              databaseDefinition.name,
+              (value) => databaseAccessor,
+              ifAbsent: () => databaseAccessor,
+            );
+          }
         },
         databaseDefinition,
       );
 
+  // TODO late sqflite.DatabaseFactory _nativeFactory
   static sqflite.DatabaseFactory get nativeFactory {
     if (defaultTargetPlatform == TargetPlatform.windows) {
       sqflite.sqfliteFfiInit();
