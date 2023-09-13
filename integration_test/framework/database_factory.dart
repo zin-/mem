@@ -18,7 +18,10 @@ void testDatabaseFactoryV2() => group(": $_scenarioName", () {
           testDatabaseDefinitionAddedTable,
           testDatabaseDefinitionAddedColumn,
         ]) {
-          await DatabaseFactory.nativeFactory.deleteDatabase(
+          await DatabaseFactory
+              // ignore: deprecated_member_use_from_same_package
+              .nativeFactory
+              .deleteDatabase(
             await DatabaseFactory.buildDatabasePath(testDefDatabase.name),
           );
         }

@@ -37,8 +37,10 @@ void testDatabaseAccessor() => group(": $_scenarioName", () {
 
         group(": when deleted", () {
           setUp(() async {
-            await DatabaseFactory.nativeFactory.deleteDatabase(
-                await DatabaseFactory.buildDatabasePath(
+            await DatabaseFactory
+                // ignore: deprecated_member_use_from_same_package
+                .nativeFactory
+                .deleteDatabase(await DatabaseFactory.buildDatabasePath(
                     testDatabaseDefinition.name));
           });
 

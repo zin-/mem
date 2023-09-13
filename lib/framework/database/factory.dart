@@ -9,6 +9,16 @@ import 'accessor.dart';
 import 'definition/database_definition_v2.dart';
 
 class DatabaseFactory {
+  static final _nativeFactory = defaultTargetPlatform == TargetPlatform.windows
+      ? () {
+          sqflite.sqfliteFfiInit();
+          return sqflite.databaseFactoryFfi;
+        }()
+      : sqflite.databaseFactory;
+
+  @Deprecated("Use only for developing or test.")
+  static sqflite.DatabaseFactory get nativeFactory => _nativeFactory;
+
   // FIXME Factoryに生成されたものがあるのは正しいのか？
   //  Factoryは生成するだけのクラスでなくてはならない
   //  -> Repositoryに移譲する
@@ -26,7 +36,7 @@ class DatabaseFactory {
             return contained!;
           } else {
             final databaseAccessor = DatabaseAccessor(
-              await nativeFactory.openDatabase(
+              await _nativeFactory.openDatabase(
                 await buildDatabasePath(databaseDefinition.name),
                 options: sqflite.OpenDatabaseOptions(
                   version: databaseDefinition.version,
@@ -47,19 +57,9 @@ class DatabaseFactory {
         databaseDefinition,
       );
 
-  // TODO late sqflite.DatabaseFactory _nativeFactory
-  static sqflite.DatabaseFactory get nativeFactory {
-    if (defaultTargetPlatform == TargetPlatform.windows) {
-      sqflite.sqfliteFfiInit();
-      return sqflite.databaseFactoryFfi;
-    }
-
-    return sqflite.databaseFactory;
-  }
-
   static Future<String> buildDatabasePath(String databaseName) async =>
       path.join(
-        await nativeFactory.getDatabasesPath(),
+        await _nativeFactory.getDatabasesPath(),
         databaseName,
       );
 
