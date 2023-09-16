@@ -119,5 +119,15 @@ void testDatabaseAccessor() => group(": $_scenarioName", () {
 
           expect(updatedCount, 1);
         });
+
+        test(": delete.", () async {
+          final updatedCount = await databaseAccessor.delete(
+            sampleDefTable,
+            where: "${sampleDefPk.name} = ?",
+            whereArgs: [inserted[sampleDefPk.name]],
+          );
+
+          expect(updatedCount, 1);
+        });
       });
     });

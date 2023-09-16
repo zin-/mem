@@ -3,7 +3,6 @@ import 'package:mem/logger/log_service.dart';
 import 'package:sqflite/sqlite_api.dart';
 
 // ISSUE #209
-//  TODO implement delete
 class DatabaseAccessor {
   final Database _nativeDatabase;
 
@@ -82,6 +81,24 @@ class DatabaseAccessor {
         [
           tableDefinition,
           value,
+          where,
+          whereArgs,
+        ],
+      );
+
+  Future<int> delete(
+    TableDefinitionV2 tableDefinition, {
+    String? where,
+    List<Object?>? whereArgs,
+  }) =>
+      v(
+        () => _nativeDatabase.delete(
+          tableDefinition.name,
+          where: where,
+          whereArgs: whereArgs,
+        ),
+        [
+          tableDefinition,
           where,
           whereArgs,
         ],
