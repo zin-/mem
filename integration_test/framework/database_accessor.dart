@@ -56,6 +56,8 @@ void testDatabaseAccessor() => group(": $_scenarioName", () {
           sampleDefPk.name: 0,
           sampleDefColInteger.name: 0,
           sampleDefColText.name: "$_scenarioName: operations: inserted",
+          sampleDefColTimeStamp.name: DateTime(0),
+          sampleDefColBoolean.name: false,
         };
 
         late final DatabaseAccessor databaseAccessor;
@@ -73,7 +75,14 @@ void testDatabaseAccessor() => group(": $_scenarioName", () {
           await databaseAccessor
               // ignore: deprecated_member_use_from_same_package
               .nativeDatabase
-              .insert(sampleDefTable.name, inserted);
+              .insert(sampleDefTable.name, {
+            ...inserted,
+            sampleDefColTimeStamp.name:
+                (inserted[sampleDefColTimeStamp.name] as DateTime)
+                    .toIso8601String(),
+            sampleDefColBoolean.name:
+                (inserted[sampleDefColBoolean.name] as bool) ? 1 : 0,
+          });
 
           maxPkInsertedId = ((await databaseAccessor
                       // ignore: deprecated_member_use_from_same_package
@@ -91,6 +100,8 @@ void testDatabaseAccessor() => group(": $_scenarioName", () {
           final insertedId = await databaseAccessor.insert(sampleDefTable, {
             sampleDefColInteger.name: 1,
             sampleDefColText.name: "$_scenarioName: operations: insert",
+            sampleDefColTimeStamp.name: DateTime.now(),
+            sampleDefColBoolean.name: true,
           });
 
           expect(insertedId, maxPkInsertedId + 1);
@@ -112,6 +123,7 @@ void testDatabaseAccessor() => group(": $_scenarioName", () {
             {
               sampleDefColInteger.name: 999,
               sampleDefColText.name: "$_scenarioName: operations: update",
+              sampleDefColBoolean.name: false,
             },
             where: "${sampleDefPk.name} = ?",
             whereArgs: [inserted[sampleDefPk.name]],

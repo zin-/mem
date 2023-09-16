@@ -34,10 +34,9 @@ void testDatabaseFactoryV2() => group(": $_scenarioName", () {
         test(
           ": once.",
           () async {
-            final database =
-                (await DatabaseFactory.open(sampleDefDb, true))
-                    // ignore: deprecated_member_use_from_same_package
-                    .nativeDatabase;
+            final database = (await DatabaseFactory.open(sampleDefDb, true))
+                // ignore: deprecated_member_use_from_same_package
+                .nativeDatabase;
 
             expect(
               path.split(database.path).last,
@@ -48,8 +47,7 @@ void testDatabaseFactoryV2() => group(": $_scenarioName", () {
               'sqlite_master',
               columns: ["name", "sql"],
             );
-            for (var tableDefinition
-                in sampleDefDb.tableDefinitions) {
+            for (var tableDefinition in sampleDefDb.tableDefinitions) {
               for (var table in tables) {
                 if (table["name"] == tableDefinition.name) {
                   expect(
@@ -65,10 +63,9 @@ void testDatabaseFactoryV2() => group(": $_scenarioName", () {
         test(
           ": as no onTest.",
           () async {
-            final database =
-                (await DatabaseFactory.open(sampleDefDb, false))
-                    // ignore: deprecated_member_use_from_same_package
-                    .nativeDatabase;
+            final database = (await DatabaseFactory.open(sampleDefDb, false))
+                // ignore: deprecated_member_use_from_same_package
+                .nativeDatabase;
 
             expect(
               path.split(database.path).last,
@@ -92,14 +89,13 @@ void testDatabaseFactoryV2() => group(": $_scenarioName", () {
           test(
             ": do not upgrade if have not been closed.",
             () async {
-              final database =
-                  (await DatabaseFactory.open(sampleDefDb, true))
-                      // ignore: deprecated_member_use_from_same_package
-                      .nativeDatabase;
-              final database2 = (await DatabaseFactory.open(
-                      sampleDefDBAddedTable, true))
+              final database = (await DatabaseFactory.open(sampleDefDb, true))
                   // ignore: deprecated_member_use_from_same_package
                   .nativeDatabase;
+              final database2 =
+                  (await DatabaseFactory.open(sampleDefDBAddedTable, true))
+                      // ignore: deprecated_member_use_from_same_package
+                      .nativeDatabase;
 
               expect(database, database2);
               expect(
@@ -112,18 +108,17 @@ void testDatabaseFactoryV2() => group(": $_scenarioName", () {
           test(
             ": add table.",
             () async {
-              final database =
-                  (await DatabaseFactory.open(sampleDefDb, true))
-                      // ignore: deprecated_member_use_from_same_package
-                      .nativeDatabase;
+              final database = (await DatabaseFactory.open(sampleDefDb, true))
+                  // ignore: deprecated_member_use_from_same_package
+                  .nativeDatabase;
 
               // 対象のDBがopenedの場合、upgrade処理が実行されないためcloseする
               await database.close();
 
-              final database2 = (await DatabaseFactory.open(
-                      sampleDefDBAddedTable, true))
-                  // ignore: deprecated_member_use_from_same_package
-                  .nativeDatabase;
+              final database2 =
+                  (await DatabaseFactory.open(sampleDefDBAddedTable, true))
+                      // ignore: deprecated_member_use_from_same_package
+                      .nativeDatabase;
 
               expect(database.isOpen, false);
               expect(database, isNot(database2));
@@ -153,31 +148,32 @@ void testDatabaseFactoryV2() => group(": $_scenarioName", () {
           test(
             ": add column.",
             () async {
-              final database = (await DatabaseFactory.open(
-                      sampleDefDBAddedTable, true))
-                  // ignore: deprecated_member_use_from_same_package
-                  .nativeDatabase;
+              final database =
+                  (await DatabaseFactory.open(sampleDefDBAddedTable, true))
+                      // ignore: deprecated_member_use_from_same_package
+                      .nativeDatabase;
 
               // データ移行が行われるかの確認のためデータを挿入する
               final testId = await database.insert(sampleDefTable.name, {
                 sampleDefColInteger.name: 999,
                 sampleDefColText.name: 'sample text',
+                sampleDefColTimeStamp.name: DateTime.now().toIso8601String(),
+                sampleDefColBoolean.name: 0,
               });
               await database.insert(
                 sampleDefTableChild.name,
                 {
-                  sampleDefFk.name: testId,
-                  sampleDefColTimeStamp.name: DateTime.now().toIso8601String(),
+                  sampleDefFkChild.name: testId,
                 },
               );
 
               // 対象のDBがopenedの場合、upgrade処理が実行されないためcloseする
               await database.close();
 
-              final database2 = (await DatabaseFactory.open(
-                      sampleDefDBAddedColumn, true))
-                  // ignore: deprecated_member_use_from_same_package
-                  .nativeDatabase;
+              final database2 =
+                  (await DatabaseFactory.open(sampleDefDBAddedColumn, true))
+                      // ignore: deprecated_member_use_from_same_package
+                      .nativeDatabase;
 
               expect(database.isOpen, false);
               expect(database, isNot(database2));

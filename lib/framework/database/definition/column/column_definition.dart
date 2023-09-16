@@ -33,7 +33,7 @@ abstract class ColumnDefinition {
 
   @override
   String toString() => [
-        'ColumnDefinition',
+        runtimeType.toString(),
         {
           'name': name,
           'type': type,

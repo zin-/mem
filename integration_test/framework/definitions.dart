@@ -1,3 +1,4 @@
+import 'package:mem/framework/database/definition/column/boolean_column_definition.dart';
 import 'package:mem/framework/database/definition/column/foreign_key_definition.dart';
 import 'package:mem/framework/database/definition/column/integer_column_definition.dart';
 import 'package:mem/framework/database/definition/column/text_column_definition.dart';
@@ -5,28 +6,36 @@ import 'package:mem/framework/database/definition/column/timestamp_column_defini
 import 'package:mem/framework/database/definition/database_definition_v2.dart';
 import 'package:mem/framework/database/definition/table_definition_v2.dart';
 
-final sampleDefColInteger = IntegerColumnDefinition('sample_integer');
-final sampleDefColText = TextColumnDefinition('sample_text');
 final sampleDefPk = IntegerColumnDefinition(
   'sample_pk_integer',
   isPrimaryKey: true,
 );
+final sampleDefColInteger = IntegerColumnDefinition('sample_integer');
+final sampleDefColText = TextColumnDefinition('sample_text');
+final sampleDefColTimeStamp = TimestampColumnDefinition('sample_timestamp');
+final sampleDefColBoolean = BooleanColumnDefinition('sample_boolean');
 final sampleDefTable = TableDefinitionV2(
   'sample_table',
   [
+    sampleDefPk,
     sampleDefColInteger,
     sampleDefColText,
-    sampleDefPk,
+    sampleDefColTimeStamp,
+    sampleDefColBoolean,
   ],
   singularName: 'sample_table_singular_name',
 );
-final sampleDefFk = ForeignKeyDefinition(sampleDefTable);
-final sampleDefColTimeStamp = TimestampColumnDefinition('sample_timestamp');
+final sampleDefPkChild = IntegerColumnDefinition(
+  'sample_pk_child',
+  isPrimaryKey: true,
+);
+final sampleDefFkChild = ForeignKeyDefinition(sampleDefTable);
+
 final sampleDefTableChild = TableDefinitionV2(
   'sample_child_table',
   [
-    sampleDefFk,
-    sampleDefColTimeStamp,
+    sampleDefPkChild,
+    sampleDefFkChild,
   ],
 );
 final sampleDefDb = DatabaseDefinitionV2(

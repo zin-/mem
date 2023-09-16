@@ -1,10 +1,12 @@
-import 'package:mem/framework/database/definition/table_definition_v2.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:sqflite/sqlite_api.dart';
 
-// ISSUE #209
+import 'converter.dart';
+import 'definition/table_definition_v2.dart';
+
 class DatabaseAccessor {
   final Database _nativeDatabase;
+  final DatabaseConverter _converter = DatabaseConverter();
 
   @Deprecated("Use only for developing or test.")
   Database get nativeDatabase => _nativeDatabase;
@@ -34,11 +36,14 @@ class DatabaseAccessor {
 
   Future<int> insert(
     TableDefinitionV2 tableDefinition,
-    Map<String, Object?> value,
+    Map<String, Object?> values,
   ) =>
       v(
-        () => _nativeDatabase.insert(tableDefinition.name, value),
-        [tableDefinition, value],
+        () => _nativeDatabase.insert(
+          tableDefinition.name,
+          _converter.to(values, tableDefinition),
+        ),
+        [tableDefinition, values],
       );
 
   Future<List<Map<String, Object?>>> select(
@@ -49,13 +54,16 @@ class DatabaseAccessor {
     int? limit,
   }) =>
       v(
-        () => _nativeDatabase.query(
-          tableDefinition.name,
-          where: where,
-          whereArgs: whereArgs,
-          orderBy: orderBy,
-          limit: limit,
-        ),
+        () => _nativeDatabase
+            .query(
+              tableDefinition.name,
+              where: where,
+              whereArgs: whereArgs,
+              orderBy: orderBy,
+              limit: limit,
+            )
+            .then((value) =>
+                value.map((e) => _converter.from(e, tableDefinition)).toList()),
         [
           tableDefinition,
           where,
@@ -74,7 +82,7 @@ class DatabaseAccessor {
       v(
         () => _nativeDatabase.update(
           tableDefinition.name,
-          value,
+          _converter.to(value, tableDefinition),
           where: where,
           whereArgs: whereArgs,
         ),
