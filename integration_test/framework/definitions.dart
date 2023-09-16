@@ -5,56 +5,58 @@ import 'package:mem/framework/database/definition/column/timestamp_column_defini
 import 'package:mem/framework/database/definition/database_definition_v2.dart';
 import 'package:mem/framework/database/definition/table_definition_v2.dart';
 
-final testDefInteger = IntegerColumnDefinition('test_integer');
-final testDefText = TextColumnDefinition('test_text');
-final testTableDefinition = TableDefinitionV2(
-  'test_table',
-  [
-    testDefInteger,
-    testDefText,
-    IntegerColumnDefinition(
-      'test_pk_integer',
-      isPrimaryKey: true,
-    ),
-  ],
-  singularName: 'test_table_singular_name',
+final sampleDefColInteger = IntegerColumnDefinition('sample_integer');
+final sampleDefColText = TextColumnDefinition('sample_text');
+final sampleDefPk = IntegerColumnDefinition(
+  'sample_pk_integer',
+  isPrimaryKey: true,
 );
-final testDefFk = ForeignKeyDefinition(testTableDefinition);
-final testDefTimeStamp = TimestampColumnDefinition('test_timestamp');
-final testChildTableDefinition = TableDefinitionV2(
-  'test_child_table',
+final sampleDefTable = TableDefinitionV2(
+  'sample_table',
   [
-    testDefFk,
-    testDefTimeStamp,
+    sampleDefColInteger,
+    sampleDefColText,
+    sampleDefPk,
+  ],
+  singularName: 'sample_table_singular_name',
+);
+
+final sampleDefFk = ForeignKeyDefinition(sampleDefTable);
+final sampleDefColTimeStamp = TimestampColumnDefinition('sample_timestamp');
+final sampleDefTableChild = TableDefinitionV2(
+  'sample_child_table',
+  [
+    sampleDefFk,
+    sampleDefColTimeStamp,
   ],
 );
-final testDatabaseDefinition = DatabaseDefinitionV2(
+final sampleDefDb = DatabaseDefinitionV2(
   'sample_database.db',
   1,
   [
-    testTableDefinition,
-    testChildTableDefinition,
+    sampleDefTable,
+    sampleDefTableChild,
   ],
 );
 
-final testAddedTableDefinition = TableDefinitionV2(
+final sampleDefTableAdded = TableDefinitionV2(
   'added_table',
   [
     IntegerColumnDefinition('test_integer'),
   ],
 );
-final testDatabaseDefinitionAddedTable = DatabaseDefinitionV2(
-  testDatabaseDefinition.name,
-  testDatabaseDefinition.version + 1,
+final sampleDefDBAddedTable = DatabaseDefinitionV2(
+  sampleDefDb.name,
+  sampleDefDb.version + 1,
   [
-    ...testDatabaseDefinition.tableDefinitions,
-    testAddedTableDefinition,
+    ...sampleDefDb.tableDefinitions,
+    sampleDefTableAdded,
   ],
 );
 
-final testAddedColumnChildTableDefinition = TableDefinitionV2(
-  testChildTableDefinition.name,
-  testChildTableDefinition.columnDefinitions.toList(growable: true)
+final sampleDefTableChildAddedColumn = TableDefinitionV2(
+  sampleDefTableChild.name,
+  sampleDefTableChild.columnDefinitions.toList(growable: true)
     ..add(IntegerColumnDefinition(
       'test_integer',
       // FIXME Nullableで定義しないとデータ移行が行なえない
@@ -62,12 +64,12 @@ final testAddedColumnChildTableDefinition = TableDefinitionV2(
       notNull: false,
     )),
 );
-final testDatabaseDefinitionAddedColumn = DatabaseDefinitionV2(
-  testDatabaseDefinitionAddedTable.name,
-  testDatabaseDefinitionAddedTable.version + 1,
+final sampleDefDBAddedColumn = DatabaseDefinitionV2(
+  sampleDefDBAddedTable.name,
+  sampleDefDBAddedTable.version + 1,
   [
-    testTableDefinition,
-    testAddedColumnChildTableDefinition,
-    testAddedTableDefinition,
+    sampleDefTable,
+    sampleDefTableChildAddedColumn,
+    sampleDefTableAdded,
   ],
 );
