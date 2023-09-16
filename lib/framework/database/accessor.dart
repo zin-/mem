@@ -2,6 +2,7 @@ import 'package:mem/logger/log_service.dart';
 import 'package:sqflite/sqlite_api.dart';
 
 // ISSUE #209
+//  implement insert, select, update, delete
 class DatabaseAccessor {
   final Database _nativeDatabase;
 

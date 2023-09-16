@@ -8,6 +8,8 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite;
 import 'accessor.dart';
 import 'definition/database_definition_v2.dart';
 
+const _testDatabasePrefix = "test_";
+
 class DatabaseFactory {
   static final _nativeFactory = defaultTargetPlatform == TargetPlatform.windows
       ? () {
@@ -19,48 +21,32 @@ class DatabaseFactory {
   @Deprecated("Use only for developing or test.")
   static sqflite.DatabaseFactory get nativeFactory => _nativeFactory;
 
-  // FIXME Factoryに生成されたものがあるのは正しいのか？
-  //  Factoryは生成するだけのクラスでなくてはならない
-  //  -> Repositoryに移譲する
-  static final _databaseAccessors = <String, DatabaseAccessor>{};
-
-  // TODO add on test
   static Future<DatabaseAccessor> open(
     DatabaseDefinitionV2 databaseDefinition,
+    bool onTest,
   ) =>
       i(
-        () async {
-          final contained = _databaseAccessors[databaseDefinition.name];
-
-          if (await contained?.isOpened() ?? false) {
-            return contained!;
-          } else {
-            final databaseAccessor = DatabaseAccessor(
-              await _nativeFactory.openDatabase(
-                await buildDatabasePath(databaseDefinition.name),
-                options: sqflite.OpenDatabaseOptions(
-                  version: databaseDefinition.version,
-                  onConfigure: _onConfigure(databaseDefinition),
-                  onCreate: _onCreate(databaseDefinition),
-                  onUpgrade: _onUpgrade(databaseDefinition),
-                ),
-              ),
-            );
-
-            return _databaseAccessors.update(
-              databaseDefinition.name,
-              (value) => databaseAccessor,
-              ifAbsent: () => databaseAccessor,
-            );
-          }
-        },
+        () async => DatabaseAccessor(
+          await _nativeFactory.openDatabase(
+            await buildDatabasePath(databaseDefinition.name, onTest),
+            options: sqflite.OpenDatabaseOptions(
+              version: databaseDefinition.version,
+              onConfigure: _onConfigure(databaseDefinition),
+              onCreate: _onCreate(databaseDefinition),
+              onUpgrade: _onUpgrade(databaseDefinition),
+            ),
+          ),
+        ),
         databaseDefinition,
       );
 
-  static Future<String> buildDatabasePath(String databaseName) async =>
+  static Future<String> buildDatabasePath(
+    String databaseName,
+    bool onTest,
+  ) async =>
       path.join(
         await _nativeFactory.getDatabasesPath(),
-        databaseName,
+        "${onTest ? _testDatabasePrefix : ""}$databaseName",
       );
 
   static _onConfigure(DatabaseDefinitionV2 databaseDefinition) =>

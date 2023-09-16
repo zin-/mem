@@ -15,7 +15,8 @@ void testDatabaseAccessor() => group(": $_scenarioName", () {
         late DatabaseAccessor databaseAccessor;
 
         setUp(() async {
-          databaseAccessor = await DatabaseFactory.open(testDatabaseDefinition);
+          databaseAccessor =
+              await DatabaseFactory.open(testDatabaseDefinition, true);
         });
 
         test(": returns true.", () async {
@@ -41,7 +42,7 @@ void testDatabaseAccessor() => group(": $_scenarioName", () {
                 // ignore: deprecated_member_use_from_same_package
                 .nativeFactory
                 .deleteDatabase(await DatabaseFactory.buildDatabasePath(
-                    testDatabaseDefinition.name));
+                    testDatabaseDefinition.name, true));
           });
 
           test(": returns false.", () async {
