@@ -87,7 +87,7 @@ void testDatabaseAccessor() => group(": $_scenarioName", () {
               0) as int;
         });
 
-        test(": insert", () async {
+        test(": insert.", () async {
           final insertedId = await databaseAccessor.insert(sampleDefTable, {
             sampleDefColInteger.name: 1,
             sampleDefColText.name: "$_scenarioName: operations: insert",
@@ -96,7 +96,7 @@ void testDatabaseAccessor() => group(": $_scenarioName", () {
           expect(insertedId, maxPkInsertedId + 1);
         });
 
-        test(": select", () async {
+        test(": select.", () async {
           final selected = await databaseAccessor.select(
             sampleDefTable,
             orderBy: "${sampleDefPk.name} ASC",
@@ -104,6 +104,20 @@ void testDatabaseAccessor() => group(": $_scenarioName", () {
           );
 
           expect(selected, [inserted]);
+        });
+
+        test(": update.", () async {
+          final updatedCount = await databaseAccessor.update(
+            sampleDefTable,
+            {
+              sampleDefColInteger.name: 999,
+              sampleDefColText.name: "$_scenarioName: operations: update",
+            },
+            where: "${sampleDefPk.name} = ?",
+            whereArgs: [inserted[sampleDefPk.name]],
+          );
+
+          expect(updatedCount, 1);
         });
       });
     });
