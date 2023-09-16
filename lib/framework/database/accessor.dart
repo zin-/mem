@@ -1,8 +1,11 @@
+import 'package:mem/framework/database/definition/table_definition_v2.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:sqflite/sqlite_api.dart';
 
 // ISSUE #209
-//  implement insert, select, update, delete
+//  TODO implement select
+//  TODO implement update
+//  TODO implement delete
 class DatabaseAccessor {
   final Database _nativeDatabase;
 
@@ -30,6 +33,15 @@ class DatabaseAccessor {
                 return false;
               },
             ),
+      );
+
+  Future<int> insert(
+    TableDefinitionV2 tableDefinition,
+    Map<String, Object?> value,
+  ) =>
+      v(
+        () => _nativeDatabase.insert(tableDefinition.name, value),
+        [tableDefinition, value],
       );
 
   DatabaseAccessor(this._nativeDatabase);
