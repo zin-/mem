@@ -3,7 +3,6 @@ import 'package:mem/logger/log_service.dart';
 import 'package:sqflite/sqlite_api.dart';
 
 // ISSUE #209
-//  TODO implement select
 //  TODO implement update
 //  TODO implement delete
 class DatabaseAccessor {
@@ -42,6 +41,30 @@ class DatabaseAccessor {
       v(
         () => _nativeDatabase.insert(tableDefinition.name, value),
         [tableDefinition, value],
+      );
+
+  Future<List<Map<String, Object?>>> select(
+    TableDefinitionV2 tableDefinition, {
+    String? where,
+    List<Object?>? whereArgs,
+    String? orderBy,
+    int? limit,
+  }) =>
+      v(
+        () => _nativeDatabase.query(
+          tableDefinition.name,
+          where: where,
+          whereArgs: whereArgs,
+          orderBy: orderBy,
+          limit: limit,
+        ),
+        [
+          tableDefinition,
+          where,
+          whereArgs,
+          orderBy,
+          limit,
+        ],
       );
 
   DatabaseAccessor(this._nativeDatabase);

@@ -52,14 +52,29 @@ void testDatabaseAccessor() => group(": $_scenarioName", () {
       });
 
       group(": operations", () {
+        final inserted = {
+          sampleDefPk.name: 0,
+          sampleDefColInteger.name: 0,
+          sampleDefColText.name: "$_scenarioName: operations: inserted",
+        };
+
         late final DatabaseAccessor databaseAccessor;
+        late final int maxPkInsertedId;
         setUpAll(() async {
+          await DatabaseFactory
+              // ignore: deprecated_member_use_from_same_package
+              .nativeFactory
+              .deleteDatabase(await DatabaseFactory.buildDatabasePath(
+                  sampleDefDb.name, true));
+
           databaseAccessor =
               await DatabaseFactory.open(sampleDefDBAddedColumn, true);
-        });
 
-        late int maxPkInsertedId;
-        setUp(() async {
+          await databaseAccessor
+              // ignore: deprecated_member_use_from_same_package
+              .nativeDatabase
+              .insert(sampleDefTable.name, inserted);
+
           maxPkInsertedId = ((await databaseAccessor
                       // ignore: deprecated_member_use_from_same_package
                       .nativeDatabase
@@ -75,10 +90,20 @@ void testDatabaseAccessor() => group(": $_scenarioName", () {
         test(": insert", () async {
           final insertedId = await databaseAccessor.insert(sampleDefTable, {
             sampleDefColInteger.name: 1,
-            sampleDefColText.name: "$_scenarioName: insert",
+            sampleDefColText.name: "$_scenarioName: operations: insert",
           });
 
           expect(insertedId, maxPkInsertedId + 1);
+        });
+
+        test(": select", () async {
+          final selected = await databaseAccessor.select(
+            sampleDefTable,
+            orderBy: "${sampleDefPk.name} ASC",
+            limit: 1,
+          );
+
+          expect(selected, [inserted]);
         });
       });
     });
