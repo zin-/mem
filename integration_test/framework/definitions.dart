@@ -20,7 +20,6 @@ final sampleDefTable = TableDefinitionV2(
   ],
   singularName: 'sample_table_singular_name',
 );
-
 final sampleDefFk = ForeignKeyDefinition(sampleDefTable);
 final sampleDefColTimeStamp = TimestampColumnDefinition('sample_timestamp');
 final sampleDefTableChild = TableDefinitionV2(
@@ -56,20 +55,21 @@ final sampleDefDBAddedTable = DatabaseDefinitionV2(
 
 final sampleDefTableChildAddedColumn = TableDefinitionV2(
   sampleDefTableChild.name,
-  sampleDefTableChild.columnDefinitions.toList(growable: true)
-    ..add(IntegerColumnDefinition(
+  [
+    ...sampleDefTableChild.columnDefinitions,
+    IntegerColumnDefinition(
       'test_integer',
       // FIXME Nullableで定義しないとデータ移行が行なえない
       // ISSUE #230
       notNull: false,
-    )),
+    )
+  ],
 );
 final sampleDefDBAddedColumn = DatabaseDefinitionV2(
   sampleDefDBAddedTable.name,
   sampleDefDBAddedTable.version + 1,
-  [
-    sampleDefTable,
-    sampleDefTableChildAddedColumn,
-    sampleDefTableAdded,
-  ],
+  sampleDefDBAddedTable.tableDefinitions.toList(growable: true)
+    ..removeWhere(
+        (element) => element.name == sampleDefTableChildAddedColumn.name)
+    ..add(sampleDefTableChildAddedColumn),
 );
