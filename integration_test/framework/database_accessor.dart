@@ -16,7 +16,7 @@ void testDatabaseAccessor() => group(": $_scenarioName", () {
         late DatabaseAccessor databaseAccessor;
 
         setUp(() async {
-          databaseAccessor = await DatabaseFactory.open(sampleDefDb, true);
+          databaseAccessor = await DatabaseFactory.open(sampleDefDb);
         });
 
         test(": returns true.", () async {
@@ -41,8 +41,8 @@ void testDatabaseAccessor() => group(": $_scenarioName", () {
             await DatabaseFactory
                 // ignore: deprecated_member_use_from_same_package
                 .nativeFactory
-                .deleteDatabase(await DatabaseFactory.buildDatabasePath(
-                    sampleDefDb.name, true));
+                .deleteDatabase(
+                    await DatabaseFactory.buildDatabasePath(sampleDefDb.name));
           });
 
           test(": returns false.", () async {
@@ -66,11 +66,10 @@ void testDatabaseAccessor() => group(": $_scenarioName", () {
           await DatabaseFactory
               // ignore: deprecated_member_use_from_same_package
               .nativeFactory
-              .deleteDatabase(await DatabaseFactory.buildDatabasePath(
-                  sampleDefDb.name, true));
+              .deleteDatabase(
+                  await DatabaseFactory.buildDatabasePath(sampleDefDb.name));
 
-          databaseAccessor =
-              await DatabaseFactory.open(sampleDefDBAddedColumn, true);
+          databaseAccessor = await DatabaseFactory.open(sampleDefDBAddedColumn);
 
           await databaseAccessor
               // ignore: deprecated_member_use_from_same_package

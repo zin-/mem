@@ -11,6 +11,7 @@ import 'definition/database_definition_v2.dart';
 const _testDatabasePrefix = "test_";
 
 class DatabaseFactory {
+  static var onTest = false;
   static final _nativeFactory = defaultTargetPlatform == TargetPlatform.windows
       ? () {
           sqflite.sqfliteFfiInit();
@@ -23,12 +24,11 @@ class DatabaseFactory {
 
   static Future<DatabaseAccessor> open(
     DatabaseDefinitionV2 databaseDefinition,
-    bool onTest,
   ) =>
       i(
         () async => DatabaseAccessor(
           await _nativeFactory.openDatabase(
-            await buildDatabasePath(databaseDefinition.name, onTest),
+            await buildDatabasePath(databaseDefinition.name),
             options: sqflite.OpenDatabaseOptions(
               version: databaseDefinition.version,
               onConfigure: _onConfigure(databaseDefinition),
@@ -42,7 +42,6 @@ class DatabaseFactory {
 
   static Future<String> buildDatabasePath(
     String databaseName,
-    bool onTest,
   ) async =>
       path.join(
         await _nativeFactory.getDatabasesPath(),
