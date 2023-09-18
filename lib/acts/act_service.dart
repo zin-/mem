@@ -37,16 +37,13 @@ class ActService {
         [memId, when],
       );
 
-  Future finish(int actId, DateAndTime when) => i(
+  Future<Act> finish(int actId, DateAndTime when) => i(
         () async {
           final finishingAct = await _actRepository.shipById(actId);
 
           final replaced = await _actRepository.replace(
             finishingAct.copiedWith(
-              DateAndTimePeriod(
-                start: finishingAct.period.start,
-                end: when,
-              ),
+              finishingAct.period.copiedWith(when),
             ),
           );
 
