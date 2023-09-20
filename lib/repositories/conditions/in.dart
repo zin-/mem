@@ -7,11 +7,11 @@ class In extends Condition {
   In(this._key, this._values);
 
   @override
-  String whereString() => '$_key IN ( ${_values.join(', ')} )';
+  String where() => '$_key IN ( ${_values.join(', ')} )';
 
   @override
-  Iterable? whereArgs() => null;
+  List<Object?>? whereArgs() => null;
 
   @override
-  String toString() => whereString();
+  String toString() => where();
 }

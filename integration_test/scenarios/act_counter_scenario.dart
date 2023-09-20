@@ -8,9 +8,10 @@ import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
-import 'package:mem/framework/database/database.dart';
-import 'package:mem/framework/database/database_manager.dart';
+import 'package:mem/framework/database/accessor.dart';
+import 'package:mem/framework/database/factory.dart';
 import 'package:mem/main.dart';
+import 'package:mem/repositories/database_repository.dart';
 
 import 'helpers.dart';
 
@@ -31,36 +32,50 @@ void testActCounterConfigure() => group(
         late int insertedMemId2;
         late DateTime actPeriod;
 
-        late final Database db;
+        late final DatabaseAccessor dbA;
 
         setUpAll(() async {
-          db = await DatabaseManager(onTest: true).open(databaseDefinition);
+          DatabaseFactory.onTest = true;
+          dbA = await DatabaseRepository().receive(databaseDefinition);
         });
         setUp(() async {
-          await resetDatabase(db);
+          for (var tableDefinition
+              in databaseDefinition.tableDefinitions.reversed) {
+            await dbA.delete(tableDefinition);
+          }
 
-          final memsTable = db.getTable(defTableMems.name);
-          insertedMemId = await memsTable.insert({
-            defColMemsName.name: insertedMemName,
-            defColCreatedAt.name: zeroDate,
-          });
-          insertedMemId2 = await memsTable.insert({
-            defColMemsName.name: insertedMemName2,
-            defColCreatedAt.name: zeroDate,
-          });
-          final actsTable = db.getTable(defTableActs.name);
-          await actsTable.insert({
-            defFkActsMemId.name: insertedMemId,
-            defColActsStart.name: zeroDate,
-            defColActsStartIsAllDay.name: 0,
-            defColCreatedAt.name: zeroDate,
-          });
-          await actsTable.insert({
-            defFkActsMemId.name: insertedMemId,
-            defColActsStart.name: actPeriod = DateTime.now(),
-            defColActsStartIsAllDay.name: 0,
-            defColCreatedAt.name: zeroDate,
-          });
+          insertedMemId = await dbA.insert(
+            defTableMems,
+            {
+              defColMemsName.name: insertedMemName,
+              defColCreatedAt.name: zeroDate,
+            },
+          );
+          insertedMemId2 = await dbA.insert(
+            defTableMems,
+            {
+              defColMemsName.name: insertedMemName2,
+              defColCreatedAt.name: zeroDate,
+            },
+          );
+          await dbA.insert(
+            defTableActs,
+            {
+              defFkActsMemId.name: insertedMemId,
+              defColActsStart.name: zeroDate,
+              defColActsStartIsAllDay.name: 0,
+              defColCreatedAt.name: zeroDate,
+            },
+          );
+          await dbA.insert(
+            defTableActs,
+            {
+              defFkActsMemId.name: insertedMemId,
+              defColActsStart.name: actPeriod = DateTime.now(),
+              defColActsStartIsAllDay.name: 0,
+              defColCreatedAt.name: zeroDate,
+            },
+          );
         });
 
         testWidgets(

@@ -2,7 +2,6 @@ import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_items.dart';
-import 'package:mem/framework/database/database.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/database_tuple_repository.dart';
 import 'package:mem/repositories/conditions/conditions.dart';
@@ -72,12 +71,11 @@ class MemItemRepository
   @override
   noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 
-  MemItemRepository._(super.table);
+  MemItemRepository._() : super(defTableMemItems);
 
   static MemItemRepository? _instance;
 
-  factory MemItemRepository([Table? table]) =>
-      _instance ??= MemItemRepository._(table!);
+  factory MemItemRepository() => _instance ??= MemItemRepository._();
 
   static resetWith(MemItemRepository? instance) => _instance = instance;
 }

@@ -2,11 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/databases/table_definitions/acts.dart';
-import 'package:mem/databases/table_definitions/mem_items.dart';
-import 'package:mem/databases/table_definitions/mem_notifications.dart';
-import 'package:mem/databases/table_definitions/mems.dart';
-import 'package:mem/framework/database/database.dart';
 import 'package:mem/main.dart';
 
 Future<void> runApplication() => main(languageCode: 'en');
@@ -29,13 +24,6 @@ String timeText(DateTime dateTime) {
 
 String dateTimeText(DateTime dateTime) {
   return '${dateText(dateTime)} ${timeText(dateTime)}';
-}
-
-Future<void> resetDatabase(Database database) async {
-  await database.getTable(defTableActs.name).delete();
-  await database.getTable(defTableMemItems.name).delete();
-  await database.getTable(defTableMemNotifications.name).delete();
-  await database.getTable(defTableMems.name).delete();
 }
 
 final newMemFabFinder = find.byIcon(Icons.add);

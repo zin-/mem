@@ -1,5 +1,6 @@
 import 'package:mem/databases/table_definitions/base.dart';
-import 'package:mem/framework/database/database.dart';
+import 'package:mem/framework/database/accessor.dart';
+import 'package:mem/framework/database/definition/table_definition.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/repository.dart';
 
@@ -8,9 +9,14 @@ import 'conditions/conditions.dart';
 
 abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
     implements RepositoryV2<E, P> {
-  final Table _table;
+  static DatabaseAccessor? _databaseAccessor;
 
-  DatabaseTupleRepository(this._table);
+  static set databaseAccessor(DatabaseAccessor databaseAccessor) =>
+      _databaseAccessor ??= databaseAccessor;
+
+  final TableDefinition _tableDefinition;
+
+  DatabaseTupleRepository(this._tableDefinition);
 
   Map<String, dynamic> unpack(P payload);
 
@@ -23,7 +29,10 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
 
           entityMap[defColCreatedAt.name] = DateTime.now();
 
-          final id = await _table.insert(entityMap);
+          final id = await _databaseAccessor!.insert(
+            _tableDefinition,
+            entityMap,
+          );
 
           entityMap[defPkId.name] = id;
 
@@ -34,8 +43,9 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
 
   @override
   Future<List<P>> ship([Condition? condition]) => v(
-        () async => (await _table.select(
-          whereString: condition?.whereString(),
+        () async => (await _databaseAccessor!.select(
+          _tableDefinition,
+          where: condition?.where(),
           whereArgs: condition?.whereArgs(),
         ))
             .map((e) => pack(e))
@@ -45,7 +55,17 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
 
   @override
   Future<P> shipById(id) => v(
-        () async => pack(await _table.selectByPk(id)),
+        () async {
+          final condition = Equals(defPkId.name, id);
+          return pack(
+            (await _databaseAccessor!.select(
+              _tableDefinition,
+              where: condition.where(),
+              whereArgs: condition.whereArgs(),
+            ))
+                .single,
+          );
+        },
         {'id': id},
       );
 
@@ -54,14 +74,14 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
         () async {
           final entityMap = unpack(payload);
 
-          if (entityMap[defColCreatedAt.name] == null) {
-            entityMap[defColCreatedAt.name] = DateTime.now();
-          }
           entityMap[defColUpdatedAt.name] = DateTime.now();
 
-          await _table.updateByPk(
-            entityMap[defPkId.name],
+          final condition = Equals(defPkId.name, entityMap[defPkId.name]);
+          await _databaseAccessor!.update(
+            _tableDefinition,
             entityMap,
+            where: condition.where(),
+            whereArgs: condition.whereArgs(),
           );
 
           return pack(entityMap);
@@ -76,9 +96,12 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
 
           entityMap[defColArchivedAt.name] = DateTime.now();
 
-          await _table.updateByPk(
-            entityMap[defPkId.name],
+          final condition = Equals(defPkId.name, entityMap[defPkId.name]);
+          await _databaseAccessor!.update(
+            _tableDefinition,
             entityMap,
+            where: condition.where(),
+            whereArgs: condition.whereArgs(),
           );
 
           return pack(entityMap);
@@ -94,9 +117,12 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
           entityMap[defColUpdatedAt.name] = DateTime.now();
           entityMap[defColArchivedAt.name] = null;
 
-          await _table.updateByPk(
-            entityMap[defPkId.name],
+          final condition = Equals(defPkId.name, entityMap[defPkId.name]);
+          await _databaseAccessor!.update(
+            _tableDefinition,
             entityMap,
+            where: condition.where(),
+            whereArgs: condition.whereArgs(),
           );
 
           return pack(entityMap);
@@ -107,15 +133,17 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
   @override
   Future<List<P>> waste([Condition? condition]) => v(
         () async {
-          final payloads = (await _table.select(
-            whereString: condition?.whereString(),
+          final payloads = (await _databaseAccessor!.select(
+            _tableDefinition,
+            where: condition?.where(),
             whereArgs: condition?.whereArgs(),
           ))
               .map((e) => pack(e))
               .toList();
 
-          final count = await _table.delete(
-            whereString: condition?.whereString(),
+          final count = await _databaseAccessor!.delete(
+            _tableDefinition,
+            where: condition?.where(),
             whereArgs: condition?.whereArgs(),
           );
 
@@ -129,8 +157,18 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
   @override
   Future<P> wasteById(id) => v(
         () async {
-          final payload = await _table.selectByPk(id);
-          await _table.deleteByPk(id);
+          final condition = Equals(defPkId.name, id);
+          final payload = (await _databaseAccessor!.select(
+            _tableDefinition,
+            where: condition.where(),
+            whereArgs: condition.whereArgs(),
+          ))
+              .single;
+          await _databaseAccessor!.delete(
+            _tableDefinition,
+            where: condition.where(),
+            whereArgs: condition.whereArgs(),
+          );
           return pack(payload);
         },
         {'id': id},

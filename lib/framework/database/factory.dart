@@ -23,7 +23,7 @@ class DatabaseFactory {
   static sqflite.DatabaseFactory get nativeFactory => _nativeFactory;
 
   static Future<DatabaseAccessor> open(
-    DatabaseDefinitionV2 databaseDefinition,
+    DatabaseDefinition databaseDefinition,
   ) =>
       i(
         () async => DatabaseAccessor(
@@ -48,7 +48,7 @@ class DatabaseFactory {
         "${onTest ? _testDatabasePrefix : ""}$databaseName",
       );
 
-  static _onConfigure(DatabaseDefinitionV2 databaseDefinition) =>
+  static _onConfigure(DatabaseDefinition databaseDefinition) =>
       (sqflite_api.Database db) => i(
             () async {
               var foreignKeyIsEnabled = false;
@@ -68,7 +68,7 @@ class DatabaseFactory {
             db,
           );
 
-  static _onCreate(DatabaseDefinitionV2 databaseDefinition) =>
+  static _onCreate(DatabaseDefinition databaseDefinition) =>
       (sqflite_api.Database db, int version) => i(
             () async {
               for (final tableDefinition
@@ -79,7 +79,7 @@ class DatabaseFactory {
             [db, version],
           );
 
-  static _onUpgrade(DatabaseDefinitionV2 databaseDefinition) =>
+  static _onUpgrade(DatabaseDefinition databaseDefinition) =>
       (sqflite_api.Database db, int oldVersion, int newVersion) => i(
             () async {
               final oldTables = await _getCurrentTables(db);
@@ -150,7 +150,7 @@ class DatabaseFactory {
 
   static Future<void> _executeCreateTableSql(
     sqflite.Database db,
-    TableDefinitionV2 tableDefinition,
+    TableDefinition tableDefinition,
   ) async {
     final createTableSql = tableDefinition.buildCreateTableSql();
     info("Create table: \"$createTableSql\".");

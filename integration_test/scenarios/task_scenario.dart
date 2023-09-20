@@ -3,9 +3,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
-import 'package:mem/framework/database/database.dart';
-import 'package:mem/framework/database/database_manager.dart';
+import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/databases/definition.dart';
+import 'package:mem/framework/database/factory.dart';
+import 'package:mem/repositories/database_repository.dart';
 
 import 'helpers.dart';
 
@@ -18,27 +19,30 @@ void main() {
 const scenarioName = 'Task scenario';
 
 void testTaskScenario() => group(': $scenarioName', () {
-      late final Database db;
+      late final DatabaseAccessor dbA;
 
       setUpAll(() async {
-        db = await DatabaseManager(onTest: true).open(databaseDefinition);
+        DatabaseFactory.onTest = true;
+        dbA = await DatabaseRepository().receive(databaseDefinition);
       });
       setUp(() async {
-        await resetDatabase(db);
+        for (var tableDefinition
+            in databaseDefinition.tableDefinitions.reversed) {
+          await dbA.delete(tableDefinition);
+        }
 
-        final memTable = db.getTable(defTableMems.name);
-        await memTable.insert({
+        await dbA.insert(defTableMems, {
           defColMemsName.name: '$scenarioName - mem name - has period',
           defColMemsStartOn.name: DateTime.now(),
-          defColCreatedAt.name: DateTime.now(),
+          defColCreatedAt.name: zeroDate,
         });
-        await memTable.insert({
+        await dbA.insert(defTableMems, {
           defColMemsName.name: '$scenarioName - mem name - no period',
           defColMemsStartOn.name: null,
           defColMemsStartAt.name: null,
           defColMemsEndOn.name: null,
           defColMemsEndAt.name: null,
-          defColCreatedAt.name: DateTime.now(),
+          defColCreatedAt.name: zeroDate,
         });
       });
 
@@ -126,10 +130,12 @@ void testTaskScenario() => group(': $scenarioName', () {
           await widgetTester.pumpAndSettle();
 
           expect(find.text(enteringMemName), findsOneWidget);
-          final savedMemStartAt =
-              (await db.getTable(defTableMems.name).select()).singleWhere(
-            (element) => element[defColMemsName.name] == enteringMemName,
-          )[defColMemsStartAt.name];
+          final savedMemStartAt = (await dbA.select(
+            defTableMems,
+            where: "${defColMemsName.name} = ?",
+            whereArgs: [enteringMemName],
+          ))
+              .single[defColMemsStartAt.name] as DateTime;
 
           expect(find.text(dateText(savedMemStartAt)), findsOneWidget);
           expect(find.text(timeText(savedMemStartAt)), findsOneWidget);

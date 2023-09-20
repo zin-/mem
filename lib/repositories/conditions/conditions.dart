@@ -1,9 +1,9 @@
 import 'package:mem/framework/database/definition/column/column_definition.dart';
 
 abstract class Condition {
-  String whereString();
+  String? where();
 
-  Iterable<dynamic>? whereArgs();
+  List<Object?>? whereArgs();
 }
 
 typedef Conditions = Iterable<Condition>;
@@ -15,10 +15,10 @@ class Equals extends Condition {
   Equals(this._key, this._value);
 
   @override
-  String whereString() => '$_key = ?';
+  String where() => '$_key = ?';
 
   @override
-  Iterable<dynamic> whereArgs() => [_value];
+  List<Object?>? whereArgs() => [_value];
 
   @override
   String toString() => '$_key = $_value';
@@ -31,10 +31,10 @@ class IsNull extends Condition {
   IsNull(this._key);
 
   @override
-  String whereString() => '$_key $_operator';
+  String where() => '$_key $_operator';
 
   @override
-  Iterable<dynamic>? whereArgs() => null;
+  List<Object?>? whereArgs() => null;
 
   @override
   String toString() {
@@ -49,12 +49,12 @@ class IsNotNull extends Condition {
   IsNotNull(this._key);
 
   @override
-  String whereString() {
+  String where() {
     return '$_key $_operator';
   }
 
   @override
-  Iterable<dynamic>? whereArgs() => null;
+  List<Object?>? whereArgs() => null;
 
   @override
   String toString() {
@@ -70,12 +70,17 @@ class And extends Condition {
   And(this._conditions) : super();
 
   @override
-  String whereString() =>
-      _conditions.map((e) => '( ${e.whereString()} )').join(_operator);
+  String? where() => _conditions.isEmpty
+      ? null
+      : _conditions.map((e) => '( ${e.where()} )').join(_operator);
 
   @override
-  Iterable<dynamic> whereArgs() =>
-      _conditions.map((e) => e.whereArgs()).expand((element) => element ?? []);
+  List<Object?>? whereArgs() => _conditions.isEmpty
+      ? null
+      : _conditions
+          .map((e) => e.whereArgs())
+          .expand((element) => element ?? [])
+          .toList();
 
   @override
   String toString() => _conditions.map((e) => e.toString()).join(_operator);
@@ -83,15 +88,15 @@ class And extends Condition {
 
 class GraterThanOrEqual extends Condition {
   final ColumnDefinition _columnDefinition;
-  final dynamic _value;
+  final Object? _value;
 
   GraterThanOrEqual(this._columnDefinition, this._value);
 
   @override
-  Iterable? whereArgs() => [_columnDefinition.toTuple(_value)];
+  String where() => '? <= ${_columnDefinition.name}';
 
   @override
-  String whereString() => '? <= ${_columnDefinition.name}';
+  List<Object?>? whereArgs() => [_value];
 
   @override
   String toString() => '$_value <= ${_columnDefinition.name}';
@@ -104,10 +109,10 @@ class LessThan extends Condition {
   LessThan(this._columnDefinition, this._value);
 
   @override
-  Iterable? whereArgs() => [_columnDefinition.toTuple(_value)];
+  String where() => '${_columnDefinition.name} < ?';
 
   @override
-  String whereString() => '${_columnDefinition.name} < ?';
+  List<Object?>? whereArgs() => [_value];
 
   @override
   String toString() => '${_columnDefinition.name} < $_value';

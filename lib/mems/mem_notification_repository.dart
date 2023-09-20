@@ -1,6 +1,5 @@
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
-import 'package:mem/framework/database/database.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/database_tuple_repository.dart';
 import 'package:mem/repositories/conditions/conditions.dart';
@@ -27,7 +26,8 @@ class MemNotificationRepository
       );
 
   Future<Iterable<MemNotification>> wasteByMemId(int memId) => v(
-        () async => await super.waste(Equals(defFkMemNotificationsMemId.name, memId)),
+        () async =>
+            await super.waste(Equals(defFkMemNotificationsMemId.name, memId)),
         memId,
       );
 
@@ -63,12 +63,12 @@ class MemNotificationRepository
     return entity.toMap();
   }
 
-  MemNotificationRepository._(super.table);
+  MemNotificationRepository._() : super(defTableMemNotifications);
 
   static MemNotificationRepository? _instance;
 
-  factory MemNotificationRepository([Table? table]) =>
-      _instance ??= MemNotificationRepository._(table!);
+  factory MemNotificationRepository() =>
+      _instance ??= MemNotificationRepository._();
 
   static resetWith(MemNotificationRepository? instance) => _instance = instance;
 }

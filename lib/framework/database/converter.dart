@@ -5,35 +5,20 @@ import 'definition/column/timestamp_column_definition.dart';
 import 'definition/table_definition.dart';
 
 class DatabaseConverter {
-  Map<String, Object?> to(
-    Map<String, Object?> values,
-    TableDefinitionV2 tableDefinition,
-  ) =>
-      v(
-        () => values.map((key, value) {
-          switch (tableDefinition.columnDefinitions
-              .singleWhere((element) => element.name == key)
-              .runtimeType) {
-            case TimestampColumnDefinition:
-              return MapEntry(key, (value as DateTime?)?.toIso8601String());
-            case BooleanColumnDefinition:
-              return MapEntry(
-                  key,
-                  value == null
-                      ? null
-                      : value == true
-                          ? 1
-                          : 0);
-            default:
-              return MapEntry(key, value);
-          }
-        }),
-        [values, tableDefinition],
+  Object? to(Object? value) => v(
+        () => value is DateTime
+            ? value.toIso8601String()
+            : value is bool
+                ? value
+                    ? 1
+                    : 0
+                : value,
+        value,
       );
 
   Map<String, Object?> from(
     Map<String, Object?> values,
-    TableDefinitionV2 tableDefinition,
+    TableDefinition tableDefinition,
   ) =>
       v(
         () => values.map((key, value) {

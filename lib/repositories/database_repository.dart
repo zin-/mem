@@ -7,7 +7,7 @@ import 'package:mem/logger/log_service.dart';
 class DatabaseRepository {
   final _cache = <String, DatabaseAccessor>{};
 
-  Future<DatabaseAccessor> receive(DatabaseDefinitionV2 entity) => v(
+  Future<DatabaseAccessor> receive(DatabaseDefinition entity) => v(
         () async {
           return _cache[entity.name] ??
               await () async {

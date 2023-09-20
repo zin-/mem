@@ -1,12 +1,11 @@
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
-import 'package:mem/framework/database/definition/column/column_definition.dart';
-import 'package:mem/framework/database/definition/column/column_type.dart';
 import 'package:mem/framework/database/definition/column/foreign_key_definition.dart';
+import 'package:mem/framework/database/definition/column/text_column_definition.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
 
-final defColMemItemsType = ColumnDefinition('type', ColumnType.text);
-final defColMemItemsValue = ColumnDefinition('value', ColumnType.text);
+final defColMemItemsType = TextColumnDefinition('type');
+final defColMemItemsValue = TextColumnDefinition('value');
 final defFkMemItemsMemId = ForeignKeyDefinition(defTableMems);
 
 final defTableMemItems = TableDefinition(
@@ -14,7 +13,7 @@ final defTableMemItems = TableDefinition(
   [
     defColMemItemsType,
     defColMemItemsValue,
+    defFkMemItemsMemId,
     ...defColsBase,
-    ForeignKeyDefinition(defTableMems),
   ],
 );

@@ -14,7 +14,7 @@ class ActCounterService {
   final ActRepository _actRepository;
   final ActCounterRepository _actCounterRepository;
 
-  Future<void> createNew(MemId memId) => i(
+  Future<void> createNew(MemId memId) => v(
         () async => await _actCounterRepository.receive(
           ActCounter(
             await _memRepository.shipById(memId),

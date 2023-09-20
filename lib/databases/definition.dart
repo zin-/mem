@@ -4,9 +4,12 @@ import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/definition/database_definition.dart';
 
+const _dbName = 'mem.db';
+const _dbVersion = 7;
+
 final databaseDefinition = DatabaseDefinition(
-  'mem.db',
-  7,
+  _dbName,
+  _dbVersion,
   [
     defTableMems,
     defTableMemItems,

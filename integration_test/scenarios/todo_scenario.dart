@@ -3,9 +3,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
-import 'package:mem/framework/database/database.dart';
-import 'package:mem/framework/database/database_manager.dart';
+import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/databases/definition.dart';
+import 'package:mem/framework/database/factory.dart';
+import 'package:mem/repositories/database_repository.dart';
 import 'package:mem/values/durations.dart';
 
 import '../_helpers.dart';
@@ -25,25 +26,28 @@ void testTodoScenario() => group(': $_scenarioName', () {
       const undoneMemName = '$_scenarioName - mem name - inserted - undone';
       const doneMemName = '$_scenarioName - mem name - inserted - done';
 
-      late final Database db;
+      late final DatabaseAccessor dbA;
 
       setUpAll(() async {
-        db = await DatabaseManager(onTest: true).open(databaseDefinition);
+        DatabaseFactory.onTest = true;
+        dbA = await DatabaseRepository().receive(databaseDefinition);
       });
       setUp(() async {
-        await resetDatabase(db);
+        for (var tableDefinition
+            in databaseDefinition.tableDefinitions.reversed) {
+          await dbA.delete(tableDefinition);
+        }
 
-        final memTable = db.getTable(defTableMems.name);
-        await memTable.insert({
+        await dbA.insert(defTableMems, {
           defColMemsName.name: insertedMemName,
           defColCreatedAt.name: zeroDate,
         });
-        await memTable.insert({
+        await dbA.insert(defTableMems, {
           defColMemsName.name: undoneMemName,
           defColMemsDoneAt.name: null,
           defColCreatedAt.name: zeroDate,
         });
-        await memTable.insert({
+        await dbA.insert(defTableMems, {
           defColMemsName.name: doneMemName,
           defColMemsDoneAt.name: zeroDate,
           defColCreatedAt.name: zeroDate,

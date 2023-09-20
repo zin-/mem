@@ -1,6 +1,6 @@
 import 'column_definition.dart';
 
-class BooleanColumnDefinition extends ColumnDefinitionV2 {
+class BooleanColumnDefinition extends ColumnDefinition {
   BooleanColumnDefinition(
     String name, {
     super.notNull,

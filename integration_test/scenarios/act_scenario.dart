@@ -8,9 +8,10 @@ import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
-import 'package:mem/framework/database/database.dart';
-import 'package:mem/framework/database/database_manager.dart';
+import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/databases/definition.dart';
+import 'package:mem/framework/database/factory.dart';
+import 'package:mem/repositories/database_repository.dart';
 import 'package:mem/values/durations.dart';
 
 import 'helpers.dart';
@@ -30,44 +31,59 @@ void testActScenario() => group(': $_scenarioName', () {
 
       const insertedMemName = '$_scenarioName: inserted mem - name';
 
-      late final Database db;
+      late final DatabaseAccessor dbA;
       late final int insertedMemId;
 
       setUpAll(() async {
-        db = (await DatabaseManager(onTest: true).open(databaseDefinition));
+        DatabaseFactory.onTest = true;
+        dbA = await DatabaseRepository().receive(databaseDefinition);
 
-        await resetDatabase(db);
+        for (var tableDefinition
+            in databaseDefinition.tableDefinitions.reversed) {
+          await dbA.delete(tableDefinition);
+        }
 
-        insertedMemId = await db.getTable(defTableMems.name).insert({
-          defColMemsName.name: insertedMemName,
-          defColCreatedAt.name: DateTime.now(),
-        });
-        await db.getTable(defTableMems.name).insert({
-          defColMemsName.name: "$insertedMemName - 2",
-          defColCreatedAt.name: DateTime.now(),
-        });
-        await db.getTable(defTableMemNotifications.name).insert({
-          defFkMemNotificationsMemId.name: insertedMemId,
-          defColMemNotificationsTime.name: 1,
-          defColMemNotificationsType.name:
-              MemNotificationType.afterActStarted.name,
-          defColMemNotificationsMessage.name:
-              '$_scenarioName: mem notification message',
-          defColCreatedAt.name: DateTime.now(),
-        });
+        insertedMemId = await dbA.insert(
+          defTableMems,
+          {
+            defColMemsName.name: insertedMemName,
+            defColCreatedAt.name: zeroDate,
+          },
+        );
+        await dbA.insert(
+          defTableMems,
+          {
+            defColMemsName.name: "$insertedMemName - 2",
+            defColCreatedAt.name: zeroDate,
+          },
+        );
+        await dbA.insert(
+          defTableMemNotifications,
+          {
+            defFkMemNotificationsMemId.name: insertedMemId,
+            defColMemNotificationsTime.name: 1,
+            defColMemNotificationsType.name:
+                MemNotificationType.afterActStarted.name,
+            defColMemNotificationsMessage.name:
+                '$_scenarioName: mem notification message',
+            defColCreatedAt.name: zeroDate,
+          },
+        );
       });
       setUp(() async {
-        final actsTable = db.getTable(defTableActs.name);
+        await dbA.delete(defTableActs);
 
-        await actsTable.delete();
-        await actsTable.insert({
-          defFkActsMemId.name: insertedMemId,
-          defColActsStart.name: zeroDate,
-          defColActsStartIsAllDay.name: 0,
-          defColActsEnd.name: zeroDate,
-          defColActsEndIsAllDay.name: 0,
-          defColCreatedAt.name: zeroDate,
-        });
+        await dbA.insert(
+          defTableActs,
+          {
+            defFkActsMemId.name: insertedMemId,
+            defColActsStart.name: zeroDate,
+            defColActsStartIsAllDay.name: 0,
+            defColActsEnd.name: zeroDate,
+            defColActsEndIsAllDay.name: 0,
+            defColCreatedAt.name: zeroDate,
+          },
+        );
       });
 
       Future<void> showMemListPage(WidgetTester widgetTester) async {
@@ -121,12 +137,15 @@ void testActScenario() => group(': $_scenarioName', () {
         group(": by Mem", () {
           group(": show inserted acts", () {
             setUp(() async {
-              await db.getTable(defTableActs.name).insert({
-                defFkActsMemId.name: insertedMemId,
-                defColActsStart.name: zeroDate,
-                defColActsStartIsAllDay.name: 0,
-                defColCreatedAt.name: zeroDate,
-              });
+              await dbA.insert(
+                defTableActs,
+                {
+                  defFkActsMemId.name: insertedMemId,
+                  defColActsStart.name: zeroDate,
+                  defColActsStartIsAllDay.name: 0,
+                  defColCreatedAt.name: zeroDate,
+                },
+              );
             });
 
             testWidgets(
@@ -276,12 +295,15 @@ void testActScenario() => group(': $_scenarioName', () {
 
           group(': Edit act', () {
             setUp(() async {
-              await db.getTable(defTableActs.name).insert({
-                defFkActsMemId.name: insertedMemId,
-                defColActsStart.name: zeroDate,
-                defColActsStartIsAllDay.name: 0,
-                defColCreatedAt.name: zeroDate,
-              });
+              await dbA.insert(
+                defTableActs,
+                {
+                  defFkActsMemId.name: insertedMemId,
+                  defColActsStart.name: zeroDate,
+                  defColActsStartIsAllDay.name: 0,
+                  defColCreatedAt.name: zeroDate,
+                },
+              );
             });
 
             testWidgets(': save.', (widgetTester) async {
@@ -396,32 +418,35 @@ void testActScenario() => group(': $_scenarioName', () {
 
       group(": ActLineChartPage", () {
         setUp(() async {
-          final actsTable = db.getTable(defTableActs.name);
-
-          await actsTable.delete();
-
           final now = DateTime.now();
 
-          await actsTable.insert({
-            defFkActsMemId.name: insertedMemId,
-            defColActsStart.name: DateTime(now.year, now.month - 1, 28),
-            defColActsStartIsAllDay.name: 0,
-            defColActsEnd.name: now,
-            defColActsEndIsAllDay.name: 0,
-            defColCreatedAt.name: zeroDate,
-          });
+          await dbA.delete(defTableActs);
 
+          await dbA.insert(
+            defTableActs,
+            {
+              defFkActsMemId.name: insertedMemId,
+              defColActsStart.name: DateTime(now.year, now.month - 1, 28),
+              defColActsStartIsAllDay.name: 0,
+              defColActsEnd.name: now,
+              defColActsEndIsAllDay.name: 0,
+              defColCreatedAt.name: zeroDate,
+            },
+          );
           for (int i = 0; i < 6; i++) {
             final start = now.subtract(Duration(days: i));
             for (int j = 0; j < randomInt(5); j++) {
-              await actsTable.insert({
-                defFkActsMemId.name: insertedMemId,
-                defColActsStart.name: start,
-                defColActsStartIsAllDay.name: 0,
-                defColActsEnd.name: now,
-                defColActsEndIsAllDay.name: 0,
-                defColCreatedAt.name: zeroDate,
-              });
+              await dbA.insert(
+                defTableActs,
+                {
+                  defFkActsMemId.name: insertedMemId,
+                  defColActsStart.name: start,
+                  defColActsStartIsAllDay.name: 0,
+                  defColActsEnd.name: now,
+                  defColActsEndIsAllDay.name: 0,
+                  defColCreatedAt.name: zeroDate,
+                },
+              );
             }
           }
         });

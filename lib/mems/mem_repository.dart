@@ -3,7 +3,6 @@ import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
-import 'package:mem/framework/database/database.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/database_tuple_repository.dart';
 import 'package:mem/repositories/conditions/conditions.dart';
@@ -78,12 +77,11 @@ class MemRepository extends DatabaseTupleRepository<MemEntity, Mem> {
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 
-  MemRepository._(super.table);
+  MemRepository._() : super(defTableMems);
 
   static MemRepository? _instance;
 
-  factory MemRepository([Table? table]) =>
-      _instance ??= MemRepository._(table!);
+  factory MemRepository() => _instance ??= MemRepository._();
 
   static resetWith(MemRepository? memRepository) => _instance = memRepository;
 }

@@ -1,6 +1,6 @@
 import 'column_definition.dart';
 
-class TextColumnDefinition extends ColumnDefinitionV2 {
+class TextColumnDefinition extends ColumnDefinition {
   TextColumnDefinition(
     String name, {
     super.notNull,

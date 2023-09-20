@@ -35,19 +35,22 @@ class DatabaseAccessor {
       );
 
   Future<int> insert(
-    TableDefinitionV2 tableDefinition,
+    TableDefinition tableDefinition,
     Map<String, Object?> values,
   ) =>
       v(
         () => _nativeDatabase.insert(
           tableDefinition.name,
-          _converter.to(values, tableDefinition),
+          values.map((key, value) => MapEntry(key, _converter.to(value))),
         ),
-        [tableDefinition, values],
+        [
+          tableDefinition.name,
+          values,
+        ],
       );
 
   Future<List<Map<String, Object?>>> select(
-    TableDefinitionV2 tableDefinition, {
+    TableDefinition tableDefinition, {
     String? where,
     List<Object?>? whereArgs,
     String? orderBy,
@@ -58,14 +61,14 @@ class DatabaseAccessor {
             .query(
               tableDefinition.name,
               where: where,
-              whereArgs: whereArgs,
+              whereArgs: whereArgs?.map((e) => _converter.to(e)).toList(),
               orderBy: orderBy,
               limit: limit,
             )
             .then((value) =>
                 value.map((e) => _converter.from(e, tableDefinition)).toList()),
         [
-          tableDefinition,
+          tableDefinition.name,
           where,
           whereArgs,
           orderBy,
@@ -74,28 +77,28 @@ class DatabaseAccessor {
       );
 
   Future<int> update(
-    TableDefinitionV2 tableDefinition,
-    Map<String, Object?> value, {
+    TableDefinition tableDefinition,
+    Map<String, Object?> values, {
     String? where,
     List<Object?>? whereArgs,
   }) =>
       v(
         () => _nativeDatabase.update(
           tableDefinition.name,
-          _converter.to(value, tableDefinition),
+          values.map((key, value) => MapEntry(key, _converter.to(value))),
           where: where,
-          whereArgs: whereArgs,
+          whereArgs: whereArgs?.map((e) => _converter.to(e)).toList(),
         ),
         [
-          tableDefinition,
-          value,
+          tableDefinition.name,
+          values,
           where,
           whereArgs,
         ],
       );
 
   Future<int> delete(
-    TableDefinitionV2 tableDefinition, {
+    TableDefinition tableDefinition, {
     String? where,
     List<Object?>? whereArgs,
   }) =>
@@ -103,10 +106,10 @@ class DatabaseAccessor {
         () => _nativeDatabase.delete(
           tableDefinition.name,
           where: where,
-          whereArgs: whereArgs,
+          whereArgs: whereArgs?.map((e) => _converter.to(e)).toList(),
         ),
         [
-          tableDefinition,
+          tableDefinition.name,
           where,
           whereArgs,
         ],

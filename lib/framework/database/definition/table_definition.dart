@@ -1,16 +1,15 @@
 import 'package:collection/collection.dart';
 import 'package:mem/framework/database/definition/column/column_definition.dart';
 import 'package:mem/framework/database/definition/exceptions.dart';
-import 'package:mem/framework/database/definition/column/primary_key_definition.dart';
 
 import 'column/foreign_key_definition.dart';
 
-class TableDefinitionV2 {
+class TableDefinition {
   final String name;
-  final Iterable<ColumnDefinitionV2> columnDefinitions;
+  final Iterable<ColumnDefinition> columnDefinitions;
   final String? singularName;
 
-  TableDefinitionV2(this.name, this.columnDefinitions, {this.singularName}) {
+  TableDefinition(this.name, this.columnDefinitions, {this.singularName}) {
     if (name.isEmpty) {
       throw TableDefinitionException('Table name is empty.');
     } else if (name.contains(' ')) {
@@ -47,11 +46,11 @@ class TableDefinitionV2 {
         ')',
       ].join(' ');
 
-  Iterable<ColumnDefinitionV2> get primaryKeyDefinitions =>
+  Iterable<ColumnDefinition> get primaryKeyDefinitions =>
       columnDefinitions.where((element) => element.isPrimaryKey);
 
-  Iterable<ForeignKeyDefinitionV2> get foreignKeyDefinitions =>
-      columnDefinitions.whereType<ForeignKeyDefinitionV2>();
+  Iterable<ForeignKeyDefinition> get foreignKeyDefinitions =>
+      columnDefinitions.whereType<ForeignKeyDefinition>();
 
   @override
   String toString() => [
@@ -62,42 +61,4 @@ class TableDefinitionV2 {
           'singularName': singularName,
         },
       ].join(': ');
-}
-
-class TableDefinition {
-  final String name;
-  final List<ColumnDefinition> columns;
-
-  TableDefinition(this.name, this.columns) {
-    if (name.isEmpty) {
-      throw TableDefinitionException('Table name is required.');
-    } else if (name.contains(' ')) {
-      throw TableDefinitionException('Table name contains " ".');
-    } else if (columns.isEmpty) {
-      throw TableDefinitionException('Table columns are required.');
-    } else if (columns.whereType<PrimaryKeyDefinition>().isEmpty) {
-      throw TableDefinitionException('Primary key is required.');
-    } else if (columns.whereType<PrimaryKeyDefinition>().length > 1) {
-      throw TableDefinitionException('Only one primary key is allowed.');
-    } else if (columns.groupListsBy((c) => c.name).length != columns.length) {
-      throw TableDefinitionException(
-          'Duplicated column names are not allowed.');
-    }
-  }
-
-  String buildCreateTableSql() => 'CREATE TABLE'
-      ' $name'
-      ' ('
-      ' ${columns.map((column) => column.buildCreateTableSql()).join(', ')}'
-      ' )';
-
-  PrimaryKeyDefinition get primaryKey =>
-      columns.whereType<PrimaryKeyDefinition>().first;
-
-  @override
-  String toString() => 'Table definition'
-      ' :: {'
-      ' name: $name'
-      ', columns: $columns'
-      ' }';
 }

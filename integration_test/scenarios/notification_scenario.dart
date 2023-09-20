@@ -8,12 +8,13 @@ import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
-import 'package:mem/framework/database/database.dart';
-import 'package:mem/framework/database/database_manager.dart';
+import 'package:mem/framework/database/accessor.dart';
+import 'package:mem/framework/database/factory.dart';
 import 'package:mem/notifications/client.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification_ids.dart';
 import 'package:mem/notifications/wrapper.dart';
+import 'package:mem/repositories/database_repository.dart';
 import 'package:mem/values/durations.dart';
 
 import 'helpers.dart';
@@ -29,19 +30,23 @@ const _scenarioName = "Notification scenario";
 void testNotificationScenario() => group(": $_scenarioName", () {
       const insertedMemName = "$_scenarioName - mem name - inserted";
 
-      late final Database db;
+      late final DatabaseAccessor dbA;
       int? insertedMemId;
 
       setUpAll(() async {
-        db = await DatabaseManager(onTest: true).open(databaseDefinition);
+        DatabaseFactory.onTest = true;
+        dbA = await DatabaseRepository().receive(databaseDefinition);
       });
       setUp(() async {
-        await resetDatabase(db);
+        for (var tableDefinition
+            in databaseDefinition.tableDefinitions.reversed) {
+          await dbA.delete(tableDefinition);
+        }
 
-        insertedMemId = await db.getTable(defTableMems.name).insert({
+        insertedMemId = await dbA.insert(defTableMems, {
           defColMemsName.name: insertedMemName,
           defColMemsDoneAt.name: null,
-          defColCreatedAt.name: DateTime(0),
+          defColCreatedAt.name: zeroDate,
         });
       });
 
@@ -90,8 +95,8 @@ void testNotificationScenario() => group(": $_scenarioName", () {
             await Future.delayed(
               waitSideEffectDuration,
               () async {
-                final mems =
-                    await db.getTable(defTableMems.name).select();
+                final mems = await dbA.select(defTableMems);
+                // final mems = await db.getTable(defTableMems.name).select();
 
                 expect(mems.length, 1);
                 expect(
@@ -141,8 +146,7 @@ void testNotificationScenario() => group(": $_scenarioName", () {
             await Future.delayed(
               waitSideEffectDuration,
               () async {
-                final acts =
-                    await db.getTable(defTableActs.name).select();
+                final acts = await dbA.select(defTableActs);
 
                 expect(acts.length, 1);
                 expect(
@@ -159,9 +163,9 @@ void testNotificationScenario() => group(": $_scenarioName", () {
                   ],
                   [
                     isNotNull,
-                    0,
+                    isFalse,
                     isNull,
-                    0,
+                    isFalse,
                     isNotNull,
                     isNotNull,
                     isNull,
@@ -191,8 +195,8 @@ void testNotificationScenario() => group(": $_scenarioName", () {
               await Future.delayed(
                 waitSideEffectDuration,
                 () async {
-                  final acts =
-                      await db.getTable(defTableActs.name).select();
+                  final acts = await dbA.select(defTableActs);
+                  // final acts = await db.getTable(defTableActs.name).select();
 
                   expect(acts.length, 1);
                   expect(
@@ -209,9 +213,9 @@ void testNotificationScenario() => group(": $_scenarioName", () {
                     ],
                     [
                       isNotNull,
-                      0,
+                      isFalse,
                       isNotNull,
-                      0,
+                      isFalse,
                       isNotNull,
                       isNotNull,
                       isNotNull,
@@ -229,15 +233,13 @@ void testNotificationScenario() => group(": $_scenarioName", () {
             late final int insertedActId2;
 
             setUp(() async {
-              final actsTable = db.getTable(defTableActs.name);
-
-              insertedActId = await actsTable.insert({
+              insertedActId = await dbA.insert(defTableActs, {
                 defFkActsMemId.name: insertedMemId,
                 defColActsStart.name: zeroDate.add(const Duration(minutes: 1)),
                 defColActsStartIsAllDay.name: 0,
                 defColCreatedAt.name: zeroDate,
               });
-              insertedActId2 = await actsTable.insert({
+              insertedActId2 = await dbA.insert(defTableActs, {
                 defFkActsMemId.name: insertedMemId,
                 defColActsStart.name: zeroDate,
                 defColActsStartIsAllDay.name: 0,
@@ -261,8 +263,7 @@ void testNotificationScenario() => group(": $_scenarioName", () {
                 await Future.delayed(
                   waitSideEffectDuration,
                   () async {
-                    final acts =
-                        await db.getTable(defTableActs.name).select();
+                    final acts = await dbA.select(defTableActs);
 
                     expect(acts.length, 2);
                     expect(
@@ -279,7 +280,7 @@ void testNotificationScenario() => group(": $_scenarioName", () {
                       ],
                       [
                         isNotNull,
-                        0,
+                        isFalse,
                         isNull,
                         isNull,
                         insertedActId,
@@ -303,9 +304,9 @@ void testNotificationScenario() => group(": $_scenarioName", () {
                       ],
                       [
                         isNotNull,
-                        0,
+                        isFalse,
                         isNotNull,
-                        0,
+                        isFalse,
                         insertedActId2,
                         isNotNull,
                         isNotNull,

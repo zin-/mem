@@ -5,9 +5,10 @@ import 'package:mem/core/mem_item.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
-import 'package:mem/framework/database/database.dart';
-import 'package:mem/framework/database/database_manager.dart';
+import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/databases/definition.dart';
+import 'package:mem/framework/database/factory.dart';
+import 'package:mem/repositories/database_repository.dart';
 import 'package:mem/values/durations.dart';
 
 import '../_helpers.dart';
@@ -26,27 +27,34 @@ void testMemoScenario() => group(
       () {
         const insertedMemName = '$scenarioName - mem name - inserted';
         const insertedMemMemo = '$scenarioName - mem memo - inserted';
-        late final Database db;
+        late final DatabaseAccessor dbA;
 
         setUpAll(() async {
-          db = await DatabaseManager(onTest: true).open(databaseDefinition);
+          DatabaseFactory.onTest = true;
+          dbA = await DatabaseRepository().receive(databaseDefinition);
         });
         setUp(() async {
-          await resetDatabase(db);
+          for (var tableDefinition
+              in databaseDefinition.tableDefinitions.reversed) {
+            await dbA.delete(tableDefinition);
+          }
 
-          final memTable = db.getTable(defTableMems.name);
-          final insertedMemId = await memTable.insert({
-            defColMemsName.name: insertedMemName,
-            defColCreatedAt.name: DateTime.now(),
-          });
-
-          final memItemTable = db.getTable(defTableMemItems.name);
-          await memItemTable.insert({
-            defFkMemItemsMemId.name: insertedMemId,
-            defColMemItemsType.name: MemItemType.memo.name,
-            defColMemItemsValue.name: insertedMemMemo,
-            defColCreatedAt.name: DateTime.now(),
-          });
+          final insertedMemId = await dbA.insert(
+            defTableMems,
+            {
+              defColMemsName.name: insertedMemName,
+              defColCreatedAt.name: zeroDate,
+            },
+          );
+          await dbA.insert(
+            defTableMemItems,
+            {
+              defFkMemItemsMemId.name: insertedMemId,
+              defColMemItemsType.name: MemItemType.memo.name,
+              defColMemItemsValue.name: insertedMemMemo,
+              defColCreatedAt.name: zeroDate,
+            },
+          );
         });
 
         testWidgets(
@@ -181,17 +189,21 @@ void testMemoScenario() => group(
             const archivedMemName = 'Memo scenario: V2: Archive: archived';
 
             setUp(() async {
-              final memTable = db.getTable(defTableMems.name);
-
-              await memTable.insert({
-                defColMemsName.name: unarchivedMemName,
-                defColCreatedAt.name: DateTime.now(),
-              });
-              await memTable.insert({
-                defColMemsName.name: archivedMemName,
-                defColCreatedAt.name: DateTime.now(),
-                defColArchivedAt.name: DateTime.now(),
-              });
+              await dbA.insert(
+                defTableMems,
+                {
+                  defColMemsName.name: unarchivedMemName,
+                  defColCreatedAt.name: DateTime.now(),
+                },
+              );
+              await dbA.insert(
+                defTableMems,
+                {
+                  defColMemsName.name: archivedMemName,
+                  defColCreatedAt.name: DateTime.now(),
+                  defColArchivedAt.name: DateTime.now(),
+                },
+              );
             });
 
             testWidgets(
@@ -321,7 +333,7 @@ void testMemoScenario() => group(
 
         group(': MemItemsView', () {
           setUp(() async {
-            await db.getTable(defTableMemItems.name).delete();
+            await dbA.delete(defTableMemItems);
           });
 
           testWidgets(': save twice on create.', (widgetTester) async {
@@ -371,14 +383,15 @@ void testMemoScenario() => group(
             expect(find.text(enteringMemMemoText1), findsNothing);
             expect(find.text(enteringMemMemoText2), findsOneWidget);
 
-            final mem = (await db.getTable(defTableMems.name).select(
-              whereString: '${defColMemsName.name} = ?',
+            final mem = (await dbA.select(
+              defTableMems,
+              where: '${defColMemsName.name} = ?',
               whereArgs: [enteringMemNameText],
             ))
                 .single;
-            final memItems =
-                await db.getTable(defTableMemItems.name).select(
-              whereString: '${defFkMemItemsMemId.name} = ?',
+            final memItems = await dbA.select(
+              defTableMemItems,
+              where: '${defFkMemItemsMemId.name} = ?',
               whereArgs: [mem['id']],
             );
             expect(memItems.length, 1);

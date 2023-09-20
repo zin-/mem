@@ -6,7 +6,7 @@ void main() {
   test(
     'Database name is empty.',
     () => expect(
-      () => DatabaseDefinitionV2('', 0, []),
+      () => DatabaseDefinition('', 0, []),
       throwsA(
         (e) {
           expect(e, isA<DatabaseDefinitionException>());
@@ -19,7 +19,7 @@ void main() {
   test(
     'Database name contains " ".',
     () => expect(
-      () => DatabaseDefinitionV2('has space', 0, []),
+      () => DatabaseDefinition('has space', 0, []),
       throwsA(
         (e) {
           expect(e, isA<DatabaseDefinitionException>());
@@ -32,7 +32,7 @@ void main() {
   test(
     'Database name contains "-".',
     () => expect(
-      () => DatabaseDefinitionV2('has-hyphen', 0, []),
+      () => DatabaseDefinition('has-hyphen', 0, []),
       throwsA(
         (e) {
           expect(e, isA<DatabaseDefinitionException>());
@@ -46,7 +46,7 @@ void main() {
   test(
     'Version is less than 1.',
     () => expect(
-      () => DatabaseDefinitionV2('test_database', 0, []),
+      () => DatabaseDefinition('test_database', 0, []),
       throwsA(
         (e) {
           expect(e, isA<DatabaseDefinitionException>());

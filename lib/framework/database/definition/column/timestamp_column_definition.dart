@@ -1,6 +1,6 @@
 import 'column_definition.dart';
 
-class TimestampColumnDefinition extends ColumnDefinitionV2 {
+class TimestampColumnDefinition extends ColumnDefinition {
   TimestampColumnDefinition(
     String name, {
     super.notNull,

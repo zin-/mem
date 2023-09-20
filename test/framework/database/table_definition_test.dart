@@ -8,7 +8,7 @@ void main() {
   test(
     'Table name is empty.',
     () => expect(
-      () => TableDefinitionV2('', []),
+      () => TableDefinition('', []),
       throwsA(
         (e) {
           expect(e, isA<TableDefinitionException>());
@@ -21,7 +21,7 @@ void main() {
   test(
     'Table name contains " ".',
     () => expect(
-      () => TableDefinitionV2('has space', []),
+      () => TableDefinition('has space', []),
       throwsA(
         (e) {
           expect(e, isA<TableDefinitionException>());
@@ -34,7 +34,7 @@ void main() {
   test(
     'Table name contains "-".',
     () => expect(
-      () => TableDefinitionV2('has-hyphen', []),
+      () => TableDefinition('has-hyphen', []),
       throwsA(
         (e) {
           expect(e, isA<TableDefinitionException>());
@@ -48,7 +48,7 @@ void main() {
   test(
     'ColumnDefinitions are empty.',
     () => expect(
-      () => TableDefinitionV2('test_table', []),
+      () => TableDefinition('test_table', []),
       throwsA(
         (e) {
           expect(e, isA<TableDefinitionException>());
@@ -61,7 +61,7 @@ void main() {
   test(
     'Duplicate column name.',
     () => expect(
-      () => TableDefinitionV2('test_table', [
+      () => TableDefinition('test_table', [
         IntegerColumnDefinition('same_name'),
         TextColumnDefinition('same_name'),
       ]),

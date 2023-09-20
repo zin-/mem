@@ -4,7 +4,7 @@ import 'package:mem/framework/database/definition/column/integer_column_definiti
 import 'package:mem/framework/database/definition/column/text_column_definition.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
 
-final compositePkTable = TableDefinitionV2(
+final compositePkTable = TableDefinition(
   'test_table',
   [
     IntegerColumnDefinition('pk_1', isPrimaryKey: true),
@@ -17,7 +17,7 @@ void main() {
   test(
     'Parent table has multiple primary keys.',
     () => expect(
-      () => ForeignKeyDefinitionV2(compositePkTable),
+      () => ForeignKeyDefinition(compositePkTable),
       throwsA((e) {
         expect(e, isA<UnimplementedError>());
         expect(

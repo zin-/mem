@@ -6,12 +6,12 @@ import 'package:sqflite/sqflite.dart' as sqflite;
 import 'database_definitions.dart';
 
 void main() {
-  testDatabaseFactoryV2();
+  testDatabaseFactory();
 }
 
-const _scenarioName = "Database factory test V2";
+const _scenarioName = "Database factory test";
 
-void testDatabaseFactoryV2() => group(": $_scenarioName", () {
+void testDatabaseFactory() => group(": $_scenarioName", () {
       setUpAll(() {
         DatabaseFactory.onTest = true;
       });
