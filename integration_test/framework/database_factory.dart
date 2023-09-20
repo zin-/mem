@@ -3,7 +3,7 @@ import 'package:mem/framework/database/factory.dart';
 import 'package:path/path.dart' as path;
 import 'package:sqflite/sqflite.dart' as sqflite;
 
-import 'definitions.dart';
+import 'database_definitions.dart';
 
 void main() {
   testDatabaseFactoryV2();

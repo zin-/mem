@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/factory.dart';
 
-import 'definitions.dart';
+import 'database_definitions.dart';
 
 void main() {
   testDatabaseAccessor();
