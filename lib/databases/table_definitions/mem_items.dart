@@ -5,16 +5,16 @@ import 'package:mem/framework/database/definition/column_type.dart';
 import 'package:mem/framework/database/definition/foreign_key_definition.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
 
-final memItemTypeColDef = ColumnDefinition('type', ColumnType.text);
-final memItemValueColDef = ColumnDefinition('value', ColumnType.text);
-final memIdFkDef = ForeignKeyDefinition(memTableDefinition);
+final defColMemItemsType = ColumnDefinition('type', ColumnType.text);
+final defColMemItemsValue = ColumnDefinition('value', ColumnType.text);
+final defFkMemItemsMemId = ForeignKeyDefinition(defTableMems);
 
-final memItemTableDefinition = TableDefinition(
+final defTableMemItems = TableDefinition(
   'mem_items',
   [
-    memItemTypeColDef,
-    memItemValueColDef,
-    ...defaultColumnDefinitions,
-    ForeignKeyDefinition(memTableDefinition),
+    defColMemItemsType,
+    defColMemItemsValue,
+    ...defColsBase,
+    ForeignKeyDefinition(defTableMems),
   ],
 );

@@ -34,18 +34,18 @@ void testMemoScenario() => group(
         setUp(() async {
           await resetDatabase(db);
 
-          final memTable = db.getTable(memTableDefinition.name);
+          final memTable = db.getTable(defTableMems.name);
           final insertedMemId = await memTable.insert({
-            defMemName.name: insertedMemName,
-            createdAtColDef.name: DateTime.now(),
+            defColMemsName.name: insertedMemName,
+            defColCreatedAt.name: DateTime.now(),
           });
 
-          final memItemTable = db.getTable(memItemTableDefinition.name);
+          final memItemTable = db.getTable(defTableMemItems.name);
           await memItemTable.insert({
-            memIdFkDef.name: insertedMemId,
-            memItemTypeColDef.name: MemItemType.memo.name,
-            memItemValueColDef.name: insertedMemMemo,
-            createdAtColDef.name: DateTime.now(),
+            defFkMemItemsMemId.name: insertedMemId,
+            defColMemItemsType.name: MemItemType.memo.name,
+            defColMemItemsValue.name: insertedMemMemo,
+            defColCreatedAt.name: DateTime.now(),
           });
         });
 
@@ -181,16 +181,16 @@ void testMemoScenario() => group(
             const archivedMemName = 'Memo scenario: V2: Archive: archived';
 
             setUp(() async {
-              final memTable = db.getTable(memTableDefinition.name);
+              final memTable = db.getTable(defTableMems.name);
 
               await memTable.insert({
-                defMemName.name: unarchivedMemName,
-                createdAtColDef.name: DateTime.now(),
+                defColMemsName.name: unarchivedMemName,
+                defColCreatedAt.name: DateTime.now(),
               });
               await memTable.insert({
-                defMemName.name: archivedMemName,
-                createdAtColDef.name: DateTime.now(),
-                archivedAtColDef.name: DateTime.now(),
+                defColMemsName.name: archivedMemName,
+                defColCreatedAt.name: DateTime.now(),
+                defColArchivedAt.name: DateTime.now(),
               });
             });
 
@@ -321,7 +321,7 @@ void testMemoScenario() => group(
 
         group(': MemItemsView', () {
           setUp(() async {
-            await db.getTable(memItemTableDefinition.name).delete();
+            await db.getTable(defTableMemItems.name).delete();
           });
 
           testWidgets(': save twice on create.', (widgetTester) async {
@@ -371,19 +371,19 @@ void testMemoScenario() => group(
             expect(find.text(enteringMemMemoText1), findsNothing);
             expect(find.text(enteringMemMemoText2), findsOneWidget);
 
-            final mem = (await db.getTable(memTableDefinition.name).select(
-              whereString: '${defMemName.name} = ?',
+            final mem = (await db.getTable(defTableMems.name).select(
+              whereString: '${defColMemsName.name} = ?',
               whereArgs: [enteringMemNameText],
             ))
                 .single;
             final memItems =
-                await db.getTable(memItemTableDefinition.name).select(
-              whereString: '${memIdFkDef.name} = ?',
+                await db.getTable(defTableMemItems.name).select(
+              whereString: '${defFkMemItemsMemId.name} = ?',
               whereArgs: [mem['id']],
             );
             expect(memItems.length, 1);
             expect(
-              memItems.single[memItemValueColDef.name],
+              memItems.single[defColMemItemsValue.name],
               enteringMemMemoText2,
             );
           });

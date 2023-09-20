@@ -17,16 +17,16 @@ abstract class DatabaseTupleEntity implements EntityV2 {
   });
 
   DatabaseTupleEntity.fromMap(Map<String, dynamic> valueMap)
-      : id = valueMap[idPKDef.name],
-        createdAt = valueMap[createdAtColDef.name],
-        updatedAt = valueMap[updatedAtColDef.name],
-        archivedAt = valueMap[archivedAtColDef.name];
+      : id = valueMap[defPkId.name],
+        createdAt = valueMap[defColCreatedAt.name],
+        updatedAt = valueMap[defColUpdatedAt.name],
+        archivedAt = valueMap[defColArchivedAt.name];
 
   @override
   Map<AttributeName, dynamic> toMap() => {
-        idPKDef.name: id,
-        createdAtColDef.name: createdAt,
-        updatedAtColDef.name: updatedAt,
-        archivedAtColDef.name: archivedAt,
+        defPkId.name: id,
+        defColCreatedAt.name: createdAt,
+        defColUpdatedAt.name: updatedAt,
+        defColArchivedAt.name: archivedAt,
       };
 }

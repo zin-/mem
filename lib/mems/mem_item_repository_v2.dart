@@ -12,7 +12,7 @@ import 'mem_item_entity_v2.dart';
 class MemItemRepository
     extends DatabaseTupleRepository<MemItemEntity, MemItem> {
   Future<Iterable<MemItem>> shipByMemId(MemId memId) => v(
-        () => super.ship(Equals(memIdFkDef.name, memId)),
+        () => super.ship(Equals(defFkMemItemsMemId.name, memId)),
         {'memId': memId},
       );
 
@@ -29,33 +29,33 @@ class MemItemRepository
       );
 
   Future<Iterable<MemItem>> wasteByMemId(MemId memId) => v(
-        () async => await super.waste(Equals(memIdFkDef.name, memId)),
+        () async => await super.waste(Equals(defFkMemItemsMemId.name, memId)),
         {'memId': memId},
       );
 
   @override
   UnpackedPayload unpack(MemItem payload) => {
-        memIdFkDef.name: payload.memId,
-        memItemTypeColDef.name: payload.type.name,
-        memItemValueColDef.name: payload.value,
-        idPKDef.name: payload.id,
-        createdAtColDef.name: payload.createdAt,
-        updatedAtColDef.name: payload.updatedAt,
-        archivedAtColDef.name: payload.archivedAt,
+        defFkMemItemsMemId.name: payload.memId,
+        defColMemItemsType.name: payload.type.name,
+        defColMemItemsValue.name: payload.value,
+        defPkId.name: payload.id,
+        defColCreatedAt.name: payload.createdAt,
+        defColUpdatedAt.name: payload.updatedAt,
+        defColArchivedAt.name: payload.archivedAt,
       };
 
   @override
   MemItem pack(UnpackedPayload unpackedPayload) {
     final memItemEntity = MemItemEntity(
-      memId: unpackedPayload[memIdFkDef.name],
+      memId: unpackedPayload[defFkMemItemsMemId.name],
       type: MemItemType.values.firstWhere((v) {
-        return v.name == unpackedPayload[memItemTypeColDef.name];
+        return v.name == unpackedPayload[defColMemItemsType.name];
       }),
-      value: unpackedPayload[memItemValueColDef.name],
-      id: unpackedPayload[idPKDef.name],
-      createdAt: unpackedPayload[createdAtColDef.name],
-      updatedAt: unpackedPayload[updatedAtColDef.name],
-      archivedAt: unpackedPayload[archivedAtColDef.name],
+      value: unpackedPayload[defColMemItemsValue.name],
+      id: unpackedPayload[defPkId.name],
+      createdAt: unpackedPayload[defColCreatedAt.name],
+      updatedAt: unpackedPayload[defColUpdatedAt.name],
+      archivedAt: unpackedPayload[defColArchivedAt.name],
     );
 
     return MemItem(

@@ -8,9 +8,9 @@ final databaseDefinition = DatabaseDefinition(
   'mem.db',
   7,
   [
-    memTableDefinition,
-    memItemTableDefinition,
-    actTableDefinition,
-    memNotificationTableDefinition,
+    defTableMems,
+    defTableMemItems,
+    defTableActs,
+    defTableMemNotifications,
   ],
 );

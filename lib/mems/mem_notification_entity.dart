@@ -24,17 +24,17 @@ class MemNotificationEntity extends DatabaseTupleEntity {
         );
 
   MemNotificationEntity.fromMap(Map<String, dynamic> valueMap)
-      : memId = valueMap[memIdFkDef.name],
-        type = valueMap[memNotificationTypeColDef.name],
-        time = valueMap[timeColDef.name],
-        message = valueMap[memNotificationMessageColDef.name],
+      : memId = valueMap[defFkMemNotificationsMemId.name],
+        type = valueMap[defColMemNotificationsType.name],
+        time = valueMap[defColMemNotificationsTime.name],
+        message = valueMap[defColMemNotificationsMessage.name],
         super.fromMap(valueMap);
 
   @override
   Map<String, dynamic> toMap() => {
-        memIdFkDef.name: memId,
-        memNotificationTypeColDef.name: type,
-        timeColDef.name: time,
-        memNotificationMessageColDef.name: message,
+        defFkMemNotificationsMemId.name: memId,
+        defColMemNotificationsType.name: type,
+        defColMemNotificationsTime.name: time,
+        defColMemNotificationsMessage.name: message,
       }..addAll(super.toMap());
 }

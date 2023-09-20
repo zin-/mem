@@ -17,12 +17,12 @@ class ActRepository extends DatabaseTupleRepository<ActEntity, Act> {
       v(
         () async {
           if (period == null) {
-            return await ship(Equals(fkDefMemId.name, memId));
+            return await ship(Equals(defFkActsMemId.name, memId));
           } else {
             return await ship(And([
-              Equals(fkDefMemId.name, memId),
-              GraterThanOrEqual(defActStart, period.start),
-              LessThan(defActStart, period.end),
+              Equals(defFkActsMemId.name, memId),
+              GraterThanOrEqual(defColActsStart, period.start),
+              LessThan(defColActsStart, period.end),
             ]));
           }
         },
@@ -30,7 +30,7 @@ class ActRepository extends DatabaseTupleRepository<ActEntity, Act> {
       );
 
   Future<List<Act>> shipActive() => v(
-        () async => await ship(IsNull(defActEnd.name)),
+        () async => await ship(IsNull(defColActsEnd.name)),
       );
 
   @override

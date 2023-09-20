@@ -65,16 +65,16 @@ Future<void> openDatabase() async {
   final database = await DatabaseManager().open(databaseDefinition);
 
   MemRepository(
-    database.getTable(memTableDefinition.name),
+    database.getTable(defTableMems.name),
   );
   MemItemRepository(
-    database.getTable(memItemTableDefinition.name),
+    database.getTable(defTableMemItems.name),
   );
   ActRepository(
-    database.getTable(actTableDefinition.name),
+    database.getTable(defTableActs.name),
   );
   MemNotificationRepository(
-    database.getTable(memNotificationTableDefinition.name),
+    database.getTable(defTableMemNotifications.name),
   );
 }
 

@@ -24,11 +24,11 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
         () async {
           final entityMap = unpack(payload);
 
-          entityMap[createdAtColDef.name] = DateTime.now();
+          entityMap[defColCreatedAt.name] = DateTime.now();
 
           final id = await _table.insert(entityMap);
 
-          entityMap[idPKDef.name] = id;
+          entityMap[defPkId.name] = id;
 
           return pack(entityMap);
         },
@@ -57,13 +57,13 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
         () async {
           final entityMap = unpack(payload);
 
-          if (entityMap[createdAtColDef.name] == null) {
-            entityMap[createdAtColDef.name] = DateTime.now();
+          if (entityMap[defColCreatedAt.name] == null) {
+            entityMap[defColCreatedAt.name] = DateTime.now();
           }
-          entityMap[updatedAtColDef.name] = DateTime.now();
+          entityMap[defColUpdatedAt.name] = DateTime.now();
 
           await _table.updateByPk(
-            entityMap[idPKDef.name],
+            entityMap[defPkId.name],
             entityMap,
           );
 
@@ -77,10 +77,10 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
         () async {
           final entityMap = unpack(payload);
 
-          entityMap[archivedAtColDef.name] = DateTime.now();
+          entityMap[defColArchivedAt.name] = DateTime.now();
 
           await _table.updateByPk(
-            entityMap[idPKDef.name],
+            entityMap[defPkId.name],
             entityMap,
           );
 
@@ -94,11 +94,11 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
         () async {
           final entityMap = unpack(payload);
 
-          entityMap[updatedAtColDef.name] = DateTime.now();
-          entityMap[archivedAtColDef.name] = null;
+          entityMap[defColUpdatedAt.name] = DateTime.now();
+          entityMap[defColArchivedAt.name] = null;
 
           await _table.updateByPk(
-            entityMap[idPKDef.name],
+            entityMap[defPkId.name],
             entityMap,
           );
 

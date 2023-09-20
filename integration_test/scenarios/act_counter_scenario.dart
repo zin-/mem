@@ -39,27 +39,27 @@ void testActCounterConfigure() => group(
         setUp(() async {
           await resetDatabase(db);
 
-          final memsTable = db.getTable(memTableDefinition.name);
+          final memsTable = db.getTable(defTableMems.name);
           insertedMemId = await memsTable.insert({
-            defMemName.name: insertedMemName,
-            createdAtColDef.name: zeroDate,
+            defColMemsName.name: insertedMemName,
+            defColCreatedAt.name: zeroDate,
           });
           insertedMemId2 = await memsTable.insert({
-            defMemName.name: insertedMemName2,
-            createdAtColDef.name: zeroDate,
+            defColMemsName.name: insertedMemName2,
+            defColCreatedAt.name: zeroDate,
           });
-          final actsTable = db.getTable(actTableDefinition.name);
+          final actsTable = db.getTable(defTableActs.name);
           await actsTable.insert({
-            fkDefMemId.name: insertedMemId,
-            defActStart.name: zeroDate,
-            defActStartIsAllDay.name: 0,
-            createdAtColDef.name: zeroDate,
+            defFkActsMemId.name: insertedMemId,
+            defColActsStart.name: zeroDate,
+            defColActsStartIsAllDay.name: 0,
+            defColCreatedAt.name: zeroDate,
           });
           await actsTable.insert({
-            fkDefMemId.name: insertedMemId,
-            defActStart.name: actPeriod = DateTime.now(),
-            defActStartIsAllDay.name: 0,
-            createdAtColDef.name: zeroDate,
+            defFkActsMemId.name: insertedMemId,
+            defColActsStart.name: actPeriod = DateTime.now(),
+            defColActsStartIsAllDay.name: 0,
+            defColCreatedAt.name: zeroDate,
           });
         });
 

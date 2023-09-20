@@ -5,22 +5,22 @@ import 'package:mem/framework/database/definition/column_type.dart';
 import 'package:mem/framework/database/definition/foreign_key_definition.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
 
-final defActStart = ColumnDefinition('start', ColumnType.datetime);
-final defActStartIsAllDay =
+final defColActsStart = ColumnDefinition('start', ColumnType.datetime);
+final defColActsStartIsAllDay =
     ColumnDefinition('start_is_all_day', ColumnType.integer);
-final defActEnd = ColumnDefinition('end', ColumnType.datetime, notNull: false);
-final defActEndIsAllDay =
+final defColActsEnd = ColumnDefinition('end', ColumnType.datetime, notNull: false);
+final defColActsEndIsAllDay =
     ColumnDefinition('end_is_all_day', ColumnType.integer, notNull: false);
-final fkDefMemId = ForeignKeyDefinition(memTableDefinition);
+final defFkActsMemId = ForeignKeyDefinition(defTableMems);
 
-final actTableDefinition = TableDefinition(
+final defTableActs = TableDefinition(
   'acts',
   [
-    defActStart,
-    defActStartIsAllDay,
-    defActEnd,
-    defActEndIsAllDay,
-    ...defaultColumnDefinitions,
-    fkDefMemId,
+    defColActsStart,
+    defColActsStartIsAllDay,
+    defColActsEnd,
+    defColActsEndIsAllDay,
+    ...defColsBase,
+    defFkActsMemId,
   ],
 );

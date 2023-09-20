@@ -32,10 +32,10 @@ String dateTimeText(DateTime dateTime) {
 }
 
 Future<void> resetDatabase(Database database) async {
-  await database.getTable(actTableDefinition.name).delete();
-  await database.getTable(memItemTableDefinition.name).delete();
-  await database.getTable(memNotificationTableDefinition.name).delete();
-  await database.getTable(memTableDefinition.name).delete();
+  await database.getTable(defTableActs.name).delete();
+  await database.getTable(defTableMemItems.name).delete();
+  await database.getTable(defTableMemNotifications.name).delete();
+  await database.getTable(defTableMems.name).delete();
 }
 
 final newMemFabFinder = find.byIcon(Icons.add);

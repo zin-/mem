@@ -26,19 +26,19 @@ void testTaskScenario() => group(': $scenarioName', () {
       setUp(() async {
         await resetDatabase(db);
 
-        final memTable = db.getTable(memTableDefinition.name);
+        final memTable = db.getTable(defTableMems.name);
         await memTable.insert({
-          defMemName.name: '$scenarioName - mem name - has period',
-          defMemStartOn.name: DateTime.now(),
-          createdAtColDef.name: DateTime.now(),
+          defColMemsName.name: '$scenarioName - mem name - has period',
+          defColMemsStartOn.name: DateTime.now(),
+          defColCreatedAt.name: DateTime.now(),
         });
         await memTable.insert({
-          defMemName.name: '$scenarioName - mem name - no period',
-          defMemStartOn.name: null,
-          defMemStartAt.name: null,
-          defMemEndOn.name: null,
-          defMemEndAt.name: null,
-          createdAtColDef.name: DateTime.now(),
+          defColMemsName.name: '$scenarioName - mem name - no period',
+          defColMemsStartOn.name: null,
+          defColMemsStartAt.name: null,
+          defColMemsEndOn.name: null,
+          defColMemsEndAt.name: null,
+          defColCreatedAt.name: DateTime.now(),
         });
       });
 
@@ -127,9 +127,9 @@ void testTaskScenario() => group(': $scenarioName', () {
 
           expect(find.text(enteringMemName), findsOneWidget);
           final savedMemStartAt =
-              (await db.getTable(memTableDefinition.name).select()).singleWhere(
-            (element) => element[defMemName.name] == enteringMemName,
-          )[defMemStartAt.name];
+              (await db.getTable(defTableMems.name).select()).singleWhere(
+            (element) => element[defColMemsName.name] == enteringMemName,
+          )[defColMemsStartAt.name];
 
           expect(find.text(dateText(savedMemStartAt)), findsOneWidget);
           expect(find.text(timeText(savedMemStartAt)), findsOneWidget);

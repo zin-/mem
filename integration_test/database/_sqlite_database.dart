@@ -64,7 +64,7 @@ void testSqliteDatabase() => group(
                   final addingTableDefinition = TableDefinition(
                     'added_table',
                     [
-                      idPKDef,
+                      defPkId,
                       ColumnDefinition('test', ColumnType.text),
                     ],
                   );

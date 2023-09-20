@@ -10,16 +10,16 @@ import 'mem_notification_entity.dart';
 class MemNotificationRepository
     extends DatabaseTupleRepository<MemNotificationEntity, MemNotification> {
   Future<Iterable<MemNotification>> shipByMemId(int memId) => v(
-        () => super.ship(Equals(memIdFkDef.name, memId)),
+        () => super.ship(Equals(defFkMemNotificationsMemId.name, memId)),
         memId,
       );
 
   Future<Iterable<MemNotification>> shipByMemIdAndAfterActStarted(int memId) =>
       v(
         () => super.ship(And([
-          Equals(memIdFkDef.name, memId),
+          Equals(defFkMemNotificationsMemId.name, memId),
           Equals(
-            memNotificationTypeColDef.name,
+            defColMemNotificationsType.name,
             MemNotificationType.afterActStarted.name,
           ),
         ])),
@@ -27,7 +27,7 @@ class MemNotificationRepository
       );
 
   Future<Iterable<MemNotification>> wasteByMemId(int memId) => v(
-        () async => await super.waste(Equals(memIdFkDef.name, memId)),
+        () async => await super.waste(Equals(defFkMemNotificationsMemId.name, memId)),
         memId,
       );
 

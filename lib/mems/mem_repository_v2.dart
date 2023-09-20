@@ -16,13 +16,13 @@ class MemRepository extends DatabaseTupleRepository<MemEntity, Mem> {
             archived == null
                 ? null
                 : archived
-                    ? IsNotNull(archivedAtColDef.name)
-                    : IsNull(archivedAtColDef.name),
+                    ? IsNotNull(defColArchivedAt.name)
+                    : IsNull(defColArchivedAt.name),
             done == null
                 ? null
                 : done
-                    ? IsNotNull(defMemDoneAt.name)
-                    : IsNull(defMemDoneAt.name),
+                    ? IsNotNull(defColMemsDoneAt.name)
+                    : IsNull(defColMemsDoneAt.name),
           ].whereType<Condition>()),
         ),
         {
@@ -33,19 +33,19 @@ class MemRepository extends DatabaseTupleRepository<MemEntity, Mem> {
 
   @override
   UnpackedPayload unpack(Mem payload) => {
-        defMemName.name: payload.name,
-        defMemDoneAt.name: payload.doneAt,
-        defMemStartOn.name: payload.period?.start,
-        defMemStartAt.name: payload.period?.start?.isAllDay == false
+        defColMemsName.name: payload.name,
+        defColMemsDoneAt.name: payload.doneAt,
+        defColMemsStartOn.name: payload.period?.start,
+        defColMemsStartAt.name: payload.period?.start?.isAllDay == false
             ? payload.period?.start
             : null,
-        defMemEndOn.name: payload.period?.end,
-        defMemEndAt.name:
+        defColMemsEndOn.name: payload.period?.end,
+        defColMemsEndAt.name:
             payload.period?.end?.isAllDay == false ? payload.period?.end : null,
-        idPKDef.name: payload.id,
-        createdAtColDef.name: payload.createdAt,
-        updatedAtColDef.name: payload.updatedAt,
-        archivedAtColDef.name: payload.archivedAt,
+        defPkId.name: payload.id,
+        defColCreatedAt.name: payload.createdAt,
+        defColUpdatedAt.name: payload.updatedAt,
+        defColArchivedAt.name: payload.archivedAt,
       };
 
   @override

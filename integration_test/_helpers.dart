@@ -31,20 +31,20 @@ Future<void> prepareSavedData(
   bool isArchived = false,
 }) async {
   final database = await DatabaseManager(onTest: true).open(databaseDefinition);
-  final memTable = database.getTable(memTableDefinition.name);
+  final memTable = database.getTable(defTableMems.name);
   final savedMemId = await memTable.insert({
-    defMemName.name: memName,
-    createdAtColDef.name: DateTime.now(),
-    archivedAtColDef.name: isArchived ? DateTime.now() : null,
+    defColMemsName.name: memName,
+    defColCreatedAt.name: DateTime.now(),
+    defColArchivedAt.name: isArchived ? DateTime.now() : null,
   });
   assert(savedMemId == 1);
-  final memItemTable = database.getTable(memItemTableDefinition.name);
+  final memItemTable = database.getTable(defTableMemItems.name);
   await memItemTable.insert({
-    memIdFkDef.name: savedMemId,
-    memItemTypeColDef.name: MemItemType.memo.name,
-    memItemValueColDef.name: memMemo,
-    createdAtColDef.name: DateTime.now(),
-    archivedAtColDef.name: isArchived ? DateTime.now() : null,
+    defFkMemItemsMemId.name: savedMemId,
+    defColMemItemsType.name: MemItemType.memo.name,
+    defColMemItemsValue.name: memMemo,
+    defColCreatedAt.name: DateTime.now(),
+    defColArchivedAt.name: isArchived ? DateTime.now() : null,
   });
   await DatabaseManager(onTest: true).close(databaseDefinition.name);
 }
@@ -89,7 +89,7 @@ Future<void> prepareSavedMem(
 ) async {
   final memTable =
       (await DatabaseManager(onTest: true).open(databaseDefinition))
-          .getTable(memTableDefinition.name);
+          .getTable(defTableMems.name);
 
   await MemRepository(memTable).receive(Mem(
       name: memName,

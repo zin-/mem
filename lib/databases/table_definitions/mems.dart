@@ -3,27 +3,27 @@ import 'package:mem/framework/database/definition/column_definition.dart';
 import 'package:mem/framework/database/definition/column_type.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
 
-final defMemName = ColumnDefinition('name', ColumnType.text);
-final defMemDoneAt =
+final defColMemsName = ColumnDefinition('name', ColumnType.text);
+final defColMemsDoneAt =
     ColumnDefinition('doneAt', ColumnType.datetime, notNull: false);
-final defMemStartOn =
+final defColMemsStartOn =
     ColumnDefinition('notifyOn', ColumnType.datetime, notNull: false);
-final defMemStartAt =
+final defColMemsStartAt =
     ColumnDefinition('notifyAt', ColumnType.datetime, notNull: false);
-final defMemEndOn =
+final defColMemsEndOn =
     ColumnDefinition('endOn', ColumnType.datetime, notNull: false);
-final defMemEndAt =
+final defColMemsEndAt =
     ColumnDefinition('endAt', ColumnType.datetime, notNull: false);
 
-final memTableDefinition = TableDefinition(
+final defTableMems = TableDefinition(
   'mems',
   [
-    defMemName,
-    defMemDoneAt,
-    defMemStartOn,
-    defMemStartAt,
-    defMemEndOn,
-    defMemEndAt,
-    ...defaultColumnDefinitions
+    defColMemsName,
+    defColMemsDoneAt,
+    defColMemsStartOn,
+    defColMemsStartAt,
+    defColMemsEndOn,
+    defColMemsEndAt,
+    ...defColsBase
   ],
 );

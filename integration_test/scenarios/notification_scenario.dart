@@ -38,10 +38,10 @@ void testNotificationScenario() => group(": $_scenarioName", () {
       setUp(() async {
         await resetDatabase(db);
 
-        insertedMemId = await db.getTable(memTableDefinition.name).insert({
-          defMemName.name: insertedMemName,
-          defMemDoneAt.name: null,
-          createdAtColDef.name: DateTime(0),
+        insertedMemId = await db.getTable(defTableMems.name).insert({
+          defColMemsName.name: insertedMemName,
+          defColMemsDoneAt.name: null,
+          defColCreatedAt.name: DateTime(0),
         });
       });
 
@@ -91,21 +91,21 @@ void testNotificationScenario() => group(": $_scenarioName", () {
               waitSideEffectDuration,
               () async {
                 final mems =
-                    await db.getTable(memTableDefinition.name).select();
+                    await db.getTable(defTableMems.name).select();
 
                 expect(mems.length, 1);
                 expect(
                   [
-                    mems[0][defMemName.name],
-                    mems[0][defMemDoneAt.name],
-                    mems[0][defMemStartOn.name],
-                    mems[0][defMemStartAt.name],
-                    mems[0][defMemEndOn.name],
-                    mems[0][defMemEndAt.name],
-                    mems[0][idPKDef.name],
-                    mems[0][createdAtColDef.name],
-                    mems[0][updatedAtColDef.name],
-                    mems[0][archivedAtColDef.name],
+                    mems[0][defColMemsName.name],
+                    mems[0][defColMemsDoneAt.name],
+                    mems[0][defColMemsStartOn.name],
+                    mems[0][defColMemsStartAt.name],
+                    mems[0][defColMemsEndOn.name],
+                    mems[0][defColMemsEndAt.name],
+                    mems[0][defPkId.name],
+                    mems[0][defColCreatedAt.name],
+                    mems[0][defColUpdatedAt.name],
+                    mems[0][defColArchivedAt.name],
                   ],
                   [
                     insertedMemName,
@@ -142,20 +142,20 @@ void testNotificationScenario() => group(": $_scenarioName", () {
               waitSideEffectDuration,
               () async {
                 final acts =
-                    await db.getTable(actTableDefinition.name).select();
+                    await db.getTable(defTableActs.name).select();
 
                 expect(acts.length, 1);
                 expect(
                   [
-                    acts[0][defActStart.name],
-                    acts[0][defActStartIsAllDay.name],
-                    acts[0][defActEnd.name],
-                    acts[0][defActEndIsAllDay.name],
-                    acts[0][idPKDef.name],
-                    acts[0][createdAtColDef.name],
-                    acts[0][updatedAtColDef.name],
-                    acts[0][archivedAtColDef.name],
-                    acts[0][fkDefMemId.name],
+                    acts[0][defColActsStart.name],
+                    acts[0][defColActsStartIsAllDay.name],
+                    acts[0][defColActsEnd.name],
+                    acts[0][defColActsEndIsAllDay.name],
+                    acts[0][defPkId.name],
+                    acts[0][defColCreatedAt.name],
+                    acts[0][defColUpdatedAt.name],
+                    acts[0][defColArchivedAt.name],
+                    acts[0][defFkActsMemId.name],
                   ],
                   [
                     isNotNull,
@@ -192,20 +192,20 @@ void testNotificationScenario() => group(": $_scenarioName", () {
                 waitSideEffectDuration,
                 () async {
                   final acts =
-                      await db.getTable(actTableDefinition.name).select();
+                      await db.getTable(defTableActs.name).select();
 
                   expect(acts.length, 1);
                   expect(
                     [
-                      acts[0][defActStart.name],
-                      acts[0][defActStartIsAllDay.name],
-                      acts[0][defActEnd.name],
-                      acts[0][defActEndIsAllDay.name],
-                      acts[0][idPKDef.name],
-                      acts[0][createdAtColDef.name],
-                      acts[0][updatedAtColDef.name],
-                      acts[0][archivedAtColDef.name],
-                      acts[0][fkDefMemId.name],
+                      acts[0][defColActsStart.name],
+                      acts[0][defColActsStartIsAllDay.name],
+                      acts[0][defColActsEnd.name],
+                      acts[0][defColActsEndIsAllDay.name],
+                      acts[0][defPkId.name],
+                      acts[0][defColCreatedAt.name],
+                      acts[0][defColUpdatedAt.name],
+                      acts[0][defColArchivedAt.name],
+                      acts[0][defFkActsMemId.name],
                     ],
                     [
                       isNotNull,
@@ -229,19 +229,19 @@ void testNotificationScenario() => group(": $_scenarioName", () {
             late final int insertedActId2;
 
             setUp(() async {
-              final actsTable = db.getTable(actTableDefinition.name);
+              final actsTable = db.getTable(defTableActs.name);
 
               insertedActId = await actsTable.insert({
-                fkDefMemId.name: insertedMemId,
-                defActStart.name: zeroDate.add(const Duration(minutes: 1)),
-                defActStartIsAllDay.name: 0,
-                createdAtColDef.name: zeroDate,
+                defFkActsMemId.name: insertedMemId,
+                defColActsStart.name: zeroDate.add(const Duration(minutes: 1)),
+                defColActsStartIsAllDay.name: 0,
+                defColCreatedAt.name: zeroDate,
               });
               insertedActId2 = await actsTable.insert({
-                fkDefMemId.name: insertedMemId,
-                defActStart.name: zeroDate,
-                defActStartIsAllDay.name: 0,
-                createdAtColDef.name: zeroDate,
+                defFkActsMemId.name: insertedMemId,
+                defColActsStart.name: zeroDate,
+                defColActsStartIsAllDay.name: 0,
+                defColCreatedAt.name: zeroDate,
               });
             });
 
@@ -262,20 +262,20 @@ void testNotificationScenario() => group(": $_scenarioName", () {
                   waitSideEffectDuration,
                   () async {
                     final acts =
-                        await db.getTable(actTableDefinition.name).select();
+                        await db.getTable(defTableActs.name).select();
 
                     expect(acts.length, 2);
                     expect(
                       [
-                        acts[0][defActStart.name],
-                        acts[0][defActStartIsAllDay.name],
-                        acts[0][defActEnd.name],
-                        acts[0][defActEndIsAllDay.name],
-                        acts[0][idPKDef.name],
-                        acts[0][createdAtColDef.name],
-                        acts[0][updatedAtColDef.name],
-                        acts[0][archivedAtColDef.name],
-                        acts[0][fkDefMemId.name],
+                        acts[0][defColActsStart.name],
+                        acts[0][defColActsStartIsAllDay.name],
+                        acts[0][defColActsEnd.name],
+                        acts[0][defColActsEndIsAllDay.name],
+                        acts[0][defPkId.name],
+                        acts[0][defColCreatedAt.name],
+                        acts[0][defColUpdatedAt.name],
+                        acts[0][defColArchivedAt.name],
+                        acts[0][defFkActsMemId.name],
                       ],
                       [
                         isNotNull,
@@ -291,15 +291,15 @@ void testNotificationScenario() => group(": $_scenarioName", () {
                     );
                     expect(
                       [
-                        acts[1][defActStart.name],
-                        acts[1][defActStartIsAllDay.name],
-                        acts[1][defActEnd.name],
-                        acts[1][defActEndIsAllDay.name],
-                        acts[1][idPKDef.name],
-                        acts[1][createdAtColDef.name],
-                        acts[1][updatedAtColDef.name],
-                        acts[1][archivedAtColDef.name],
-                        acts[1][fkDefMemId.name],
+                        acts[1][defColActsStart.name],
+                        acts[1][defColActsStartIsAllDay.name],
+                        acts[1][defColActsEnd.name],
+                        acts[1][defColActsEndIsAllDay.name],
+                        acts[1][defPkId.name],
+                        acts[1][defColCreatedAt.name],
+                        acts[1][defColUpdatedAt.name],
+                        acts[1][defColArchivedAt.name],
+                        acts[1][defFkActsMemId.name],
                       ],
                       [
                         isNotNull,

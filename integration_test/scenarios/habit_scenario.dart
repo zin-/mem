@@ -30,24 +30,24 @@ void testHabitScenario() => group(': $_scenarioName', () {
 
         await resetDatabase(db);
 
-        final memTable = db.getTable(memTableDefinition.name);
+        final memTable = db.getTable(defTableMems.name);
         insertedMemId = await memTable.insert({
-          defMemName.name: insertedMemName,
-          createdAtColDef.name: DateTime.now(),
+          defColMemsName.name: insertedMemName,
+          defColCreatedAt.name: DateTime.now(),
         });
         withRepeatedMemId = await memTable.insert({
-          defMemName.name: withRepeatedMemName,
-          createdAtColDef.name: DateTime.now(),
+          defColMemsName.name: withRepeatedMemName,
+          defColCreatedAt.name: DateTime.now(),
         });
-        await db.getTable(memNotificationTableDefinition.name).insert({
-          timeColDef.name: timeOfDaySeconds,
-          memIdFkDef.name: withRepeatedMemId,
-          createdAtColDef.name: DateTime.now(),
+        await db.getTable(defTableMemNotifications.name).insert({
+          defColMemNotificationsTime.name: timeOfDaySeconds,
+          defFkMemNotificationsMemId.name: withRepeatedMemId,
+          defColCreatedAt.name: DateTime.now(),
         });
       });
       setUp(() async {
-        await db.getTable(memNotificationTableDefinition.name).delete(
-          whereString: '${memIdFkDef.name} = ?',
+        await db.getTable(defTableMemNotifications.name).delete(
+          whereString: '${defFkMemNotificationsMemId.name} = ?',
           whereArgs: [
             insertedMemId,
           ],
@@ -94,9 +94,9 @@ void testHabitScenario() => group(': $_scenarioName', () {
 
               await expectLater(
                 inserted = (await db
-                        .getTable(memNotificationTableDefinition.name)
+                        .getTable(defTableMemNotifications.name)
                         .select(
-                  whereString: '${memIdFkDef.name} = ?',
+                  whereString: '${defFkMemNotificationsMemId.name} = ?',
                   whereArgs: [insertedMemId],
                 ))
                     .single,
@@ -105,11 +105,11 @@ void testHabitScenario() => group(': $_scenarioName', () {
               final timeOfDay = TimeOfDay.fromDateTime(pickTime);
               await expectLater(
                 [
-                  inserted[timeColDef.name],
-                  inserted[createdAtColDef.name],
-                  inserted[updatedAtColDef.name],
-                  inserted[archivedAtColDef.name],
-                  inserted[memIdFkDef.name],
+                  inserted[defColMemNotificationsTime.name],
+                  inserted[defColCreatedAt.name],
+                  inserted[defColUpdatedAt.name],
+                  inserted[defColArchivedAt.name],
+                  inserted[defFkMemNotificationsMemId.name],
                 ],
                 [
                   ((timeOfDay.hour * 60) + timeOfDay.minute) * 60,
@@ -152,9 +152,9 @@ void testHabitScenario() => group(': $_scenarioName', () {
             waitSideEffectDuration,
             () async {
               final memNotifications = (await db
-                  .getTable(memNotificationTableDefinition.name)
+                  .getTable(defTableMemNotifications.name)
                   .select(
-                whereString: '${memIdFkDef.name} = ?',
+                whereString: '${defFkMemNotificationsMemId.name} = ?',
                 whereArgs: [withRepeatedMemId],
               ));
               await expectLater(memNotifications.length, 0);
@@ -203,9 +203,9 @@ void testHabitScenario() => group(': $_scenarioName', () {
 
               await expectLater(
                 inserted = (await db
-                        .getTable(memNotificationTableDefinition.name)
+                        .getTable(defTableMemNotifications.name)
                         .select(
-                  whereString: '${memIdFkDef.name} = ?',
+                  whereString: '${defFkMemNotificationsMemId.name} = ?',
                   whereArgs: [insertedMemId],
                 ))
                     .single,
@@ -213,13 +213,13 @@ void testHabitScenario() => group(': $_scenarioName', () {
               );
               await expectLater(
                 [
-                  inserted[memIdFkDef.name],
-                  inserted[timeColDef.name],
-                  inserted[memNotificationTypeColDef.name],
-                  inserted[memNotificationMessageColDef.name],
-                  inserted[createdAtColDef.name],
-                  inserted[updatedAtColDef.name],
-                  inserted[archivedAtColDef.name],
+                  inserted[defFkMemNotificationsMemId.name],
+                  inserted[defColMemNotificationsTime.name],
+                  inserted[defColMemNotificationsType.name],
+                  inserted[defColMemNotificationsMessage.name],
+                  inserted[defColCreatedAt.name],
+                  inserted[defColUpdatedAt.name],
+                  inserted[defColArchivedAt.name],
                 ],
                 [
                   insertedMemId,
@@ -265,8 +265,8 @@ void testHabitScenario() => group(': $_scenarioName', () {
             waitSideEffectDuration,
             () async {
               await expectLater(
-                (await db.getTable(memNotificationTableDefinition.name).select(
-                  whereString: '${memIdFkDef.name} = ?',
+                (await db.getTable(defTableMemNotifications.name).select(
+                  whereString: '${defFkMemNotificationsMemId.name} = ?',
                   whereArgs: [insertedMemId],
                 )),
                 isEmpty,
