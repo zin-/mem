@@ -48,7 +48,7 @@ class MemNotificationRepository
   }
 
   @override
-  UnpackedPayload unpack(MemNotification payload) {
+  Map<String, dynamic> unpack(MemNotification payload) {
     final entity = MemNotificationEntity(
       payload.memId!,
       payload.type.name,

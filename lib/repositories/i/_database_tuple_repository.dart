@@ -6,17 +6,15 @@ import 'package:mem/repositories/_repository.dart';
 import '_database_tuple_entity.dart';
 import 'conditions.dart';
 
-typedef UnpackedPayload = Map<String, dynamic>;
-
 abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
     implements RepositoryV2<E, P> {
   final Table _table;
 
   DatabaseTupleRepository(this._table);
 
-  UnpackedPayload unpack(P payload);
+  Map<String, dynamic> unpack(P payload);
 
-  P pack(UnpackedPayload unpackedPayload);
+  P pack(Map<String, dynamic> unpackedPayload);
 
   @override
   Future<P> receive(P payload) => v(

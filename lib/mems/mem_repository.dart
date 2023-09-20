@@ -32,7 +32,7 @@ class MemRepository extends DatabaseTupleRepository<MemEntity, Mem> {
       );
 
   @override
-  UnpackedPayload unpack(Mem payload) => {
+  Map<String, dynamic> unpack(Mem payload) => {
         defColMemsName.name: payload.name,
         defColMemsDoneAt.name: payload.doneAt,
         defColMemsStartOn.name: payload.period?.start,
@@ -49,7 +49,7 @@ class MemRepository extends DatabaseTupleRepository<MemEntity, Mem> {
       };
 
   @override
-  Mem pack(UnpackedPayload unpackedPayload) {
+  Mem pack(Map<String, dynamic> unpackedPayload) {
     final memEntity = MemEntity.fromMap(unpackedPayload);
 
     final notifyOn = memEntity.notifyOn;

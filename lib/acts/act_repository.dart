@@ -34,7 +34,7 @@ class ActRepository extends DatabaseTupleRepository<ActEntity, Act> {
       );
 
   @override
-  Act pack(UnpackedPayload unpackedPayload) {
+  Act pack(Map<String, dynamic> unpackedPayload) {
     final actEntity = ActEntity.fromMap(unpackedPayload);
 
     return Act(
@@ -59,7 +59,7 @@ class ActRepository extends DatabaseTupleRepository<ActEntity, Act> {
   }
 
   @override
-  UnpackedPayload unpack(Act payload) {
+  Map<String, dynamic> unpack(Act payload) {
     final actEntity = ActEntity(
       payload.memId,
       payload.period.start!.dateTime,

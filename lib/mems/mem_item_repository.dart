@@ -34,7 +34,7 @@ class MemItemRepository
       );
 
   @override
-  UnpackedPayload unpack(MemItem payload) => {
+  Map<String, dynamic> unpack(MemItem payload) => {
         defFkMemItemsMemId.name: payload.memId,
         defColMemItemsType.name: payload.type.name,
         defColMemItemsValue.name: payload.value,
@@ -45,7 +45,7 @@ class MemItemRepository
       };
 
   @override
-  MemItem pack(UnpackedPayload unpackedPayload) {
+  MemItem pack(Map<String, dynamic> unpackedPayload) {
     final memItemEntity = MemItemEntity(
       memId: unpackedPayload[defFkMemItemsMemId.name],
       type: MemItemType.values.firstWhere((v) {
