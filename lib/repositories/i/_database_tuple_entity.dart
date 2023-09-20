@@ -1,7 +1,6 @@
 import 'package:mem/databases/table_definitions/base.dart';
 
 import '_entity.dart';
-import 'types.dart';
 
 abstract class DatabaseTupleEntity implements EntityV2 {
   dynamic id;
@@ -23,7 +22,7 @@ abstract class DatabaseTupleEntity implements EntityV2 {
         archivedAt = valueMap[defColArchivedAt.name];
 
   @override
-  Map<AttributeName, dynamic> toMap() => {
+  Map<String, dynamic> toMap() => {
         defPkId.name: id,
         defColCreatedAt.name: createdAt,
         defColUpdatedAt.name: updatedAt,

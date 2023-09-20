@@ -2,12 +2,11 @@ import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/_repository.dart';
-import 'package:mem/repositories/i/types.dart';
 
 import '_database_tuple_entity.dart';
 import 'conditions.dart';
 
-typedef UnpackedPayload = Map<AttributeName, dynamic>;
+typedef UnpackedPayload = Map<String, dynamic>;
 
 abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
     implements RepositoryV2<E, P> {

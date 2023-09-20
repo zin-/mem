@@ -1,7 +1,5 @@
 import 'package:mem/framework/database/definition/column/column_definition.dart';
 
-import 'types.dart';
-
 abstract class Condition {
   String whereString();
 
@@ -11,7 +9,7 @@ abstract class Condition {
 typedef Conditions = Iterable<Condition>;
 
 class Equals extends Condition {
-  final AttributeName _key;
+  final String _key;
   final dynamic _value;
 
   Equals(this._key, this._value);
@@ -28,7 +26,7 @@ class Equals extends Condition {
 
 class IsNull extends Condition {
   static const _operator = 'IS NULL';
-  final AttributeName _key;
+  final String _key;
 
   IsNull(this._key);
 
@@ -46,7 +44,7 @@ class IsNull extends Condition {
 
 class IsNotNull extends Condition {
   static const _operator = 'IS NOT NULL';
-  final AttributeName _key;
+  final String _key;
 
   IsNotNull(this._key);
 

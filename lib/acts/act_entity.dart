@@ -1,7 +1,6 @@
 import 'package:mem/core/mem.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/repositories/i/_database_tuple_entity.dart';
-import 'package:mem/repositories/i/types.dart';
 
 class ActEntity extends DatabaseTupleEntity {
   final MemId memId;
@@ -38,7 +37,7 @@ class ActEntity extends DatabaseTupleEntity {
         super.fromMap(valueMap);
 
   @override
-  Map<AttributeName, dynamic> toMap() => {
+  Map<String, dynamic> toMap() => {
         defFkActsMemId.name: memId,
         defColActsStart.name: start,
         defColActsStartIsAllDay.name: startIsAllDay ? 1 : 0,
