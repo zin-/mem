@@ -1,6 +1,6 @@
 import 'package:mem/databases/table_definitions/base.dart';
 
-import '_entity_v2.dart';
+import '_entity.dart';
 import 'types.dart';
 
 abstract class DatabaseTupleEntity implements EntityV2 {

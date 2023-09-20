@@ -1,6 +1,6 @@
 import 'column_definition.dart';
 
-class IntegerColumnDefinition extends ColumnDefinition {
+class IntegerColumnDefinition extends ColumnDefinitionV2 {
   IntegerColumnDefinition(
     String name, {
     super.notNull,

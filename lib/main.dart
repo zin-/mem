@@ -12,9 +12,9 @@ import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/page.dart';
-import 'package:mem/mems/mem_item_repository_v2.dart';
+import 'package:mem/mems/mem_item_repository.dart';
 import 'package:mem/mems/mem_notification_repository.dart';
-import 'package:mem/mems/mem_repository_v2.dart';
+import 'package:mem/mems/mem_repository.dart';
 import 'package:mem/notifications/client.dart';
 import 'package:mem/notifications/notification_repository.dart';
 

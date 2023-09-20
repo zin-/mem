@@ -1,6 +1,6 @@
 import 'package:mem/databases/table_definitions/mems.dart';
 
-import 'i/_database_tuple_entity_v2.dart';
+import 'i/_database_tuple_entity.dart';
 
 class MemEntity extends DatabaseTupleEntity {
   final String name;

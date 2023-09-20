@@ -7,9 +7,9 @@ import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification_repository.dart';
 import 'package:mem/notifications/notification_service.dart';
 
-import 'mem_item_repository_v2.dart';
+import 'mem_item_repository.dart';
 import 'mem_notification_repository.dart';
-import 'mem_repository_v2.dart';
+import 'mem_repository.dart';
 
 class MemService {
   final MemRepository _memRepository;

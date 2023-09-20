@@ -9,9 +9,9 @@ import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_entity.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/mem_item_repository_v2.dart';
+import 'package:mem/mems/mem_item_repository.dart';
 import 'package:mem/mems/mem_notification_repository.dart';
-import 'package:mem/mems/mem_repository_v2.dart';
+import 'package:mem/mems/mem_repository.dart';
 import 'package:mem/notifications/wrapper.dart';
 import 'package:mockito/mockito.dart';
 

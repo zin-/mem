@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/framework/database/definition/database_definition_v2.dart';
+import 'package:mem/framework/database/definition/database_definition.dart';
 import 'package:mem/framework/database/definition/exceptions.dart';
 
 void main() {

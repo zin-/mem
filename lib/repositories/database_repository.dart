@@ -1,5 +1,5 @@
 import 'package:mem/framework/database/accessor.dart';
-import 'package:mem/framework/database/definition/database_definition_v2.dart';
+import 'package:mem/framework/database/definition/database_definition.dart';
 import 'package:mem/framework/database/factory.dart';
 import 'package:mem/logger/log_service.dart';
 

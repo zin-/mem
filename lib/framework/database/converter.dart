@@ -2,7 +2,7 @@ import 'package:mem/logger/log_service.dart';
 
 import 'definition/column/boolean_column_definition.dart';
 import 'definition/column/timestamp_column_definition.dart';
-import 'definition/table_definition_v2.dart';
+import 'definition/table_definition.dart';
 
 class DatabaseConverter {
   Map<String, Object?> to(

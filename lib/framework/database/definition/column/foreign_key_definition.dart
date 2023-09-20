@@ -1,9 +1,9 @@
 import 'package:mem/framework/database/definition/exceptions.dart';
-import 'package:mem/framework/database/definition/table_definition_v2.dart';
+import 'package:mem/framework/database/definition/table_definition.dart';
 
 import 'column_definition.dart';
 
-class ForeignKeyDefinition extends ColumnDefinition {
+class ForeignKeyDefinition extends ColumnDefinitionV2 {
   final TableDefinitionV2 parentTableDefinition;
 
   ForeignKeyDefinition(

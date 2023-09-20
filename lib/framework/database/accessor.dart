@@ -2,7 +2,7 @@ import 'package:mem/logger/log_service.dart';
 import 'package:sqflite/sqlite_api.dart';
 
 import 'converter.dart';
-import 'definition/table_definition_v2.dart';
+import 'definition/table_definition.dart';
 
 class DatabaseAccessor {
   final Database _nativeDatabase;

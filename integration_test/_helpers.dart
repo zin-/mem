@@ -11,7 +11,7 @@ import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/database_manager.dart';
-import 'package:mem/mems/mem_repository_v2.dart';
+import 'package:mem/mems/mem_repository.dart';
 
 import 'scenarios/helpers.dart';
 

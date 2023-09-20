@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/framework/database/definition/column/foreign_key_definition.dart';
 import 'package:mem/framework/database/definition/column/integer_column_definition.dart';
 import 'package:mem/framework/database/definition/column/text_column_definition.dart';
-import 'package:mem/framework/database/definition/table_definition_v2.dart';
+import 'package:mem/framework/database/definition/table_definition.dart';
 
 final compositePkTable = TableDefinitionV2(
   'test_table',

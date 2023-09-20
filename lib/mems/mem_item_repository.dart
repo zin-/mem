@@ -4,10 +4,10 @@ import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/repositories/i/_database_tuple_repository_v2.dart';
+import 'package:mem/repositories/i/_database_tuple_repository.dart';
 import 'package:mem/repositories/i/conditions.dart';
 
-import 'mem_item_entity_v2.dart';
+import 'mem_item_entity.dart';
 
 class MemItemRepository
     extends DatabaseTupleRepository<MemItemEntity, MemItem> {

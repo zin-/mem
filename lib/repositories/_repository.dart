@@ -1,4 +1,4 @@
-import 'i/_entity_v2.dart';
+import 'i/_entity.dart';
 import 'i/conditions.dart';
 
 abstract class RepositoryV2<E extends EntityV2, Payload> {

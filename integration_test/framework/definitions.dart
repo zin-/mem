@@ -3,8 +3,8 @@ import 'package:mem/framework/database/definition/column/foreign_key_definition.
 import 'package:mem/framework/database/definition/column/integer_column_definition.dart';
 import 'package:mem/framework/database/definition/column/text_column_definition.dart';
 import 'package:mem/framework/database/definition/column/timestamp_column_definition.dart';
-import 'package:mem/framework/database/definition/database_definition_v2.dart';
-import 'package:mem/framework/database/definition/table_definition_v2.dart';
+import 'package:mem/framework/database/definition/database_definition.dart';
+import 'package:mem/framework/database/definition/table_definition.dart';
 
 final sampleDefPk = IntegerColumnDefinition(
   'sample_pk_integer',

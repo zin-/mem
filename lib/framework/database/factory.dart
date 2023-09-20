@@ -1,12 +1,12 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
-import 'package:mem/framework/database/definition/table_definition_v2.dart';
+import 'package:mem/framework/database/definition/table_definition.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:path/path.dart' as path;
 import 'package:sqflite/sqlite_api.dart' as sqflite_api;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite;
 import 'accessor.dart';
-import 'definition/database_definition_v2.dart';
+import 'definition/database_definition.dart';
 
 const _testDatabasePrefix = "test_";
 
