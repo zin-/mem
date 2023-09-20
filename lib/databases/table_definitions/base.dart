@@ -1,6 +1,6 @@
 import 'package:mem/framework/database/definition/column/column_definition.dart';
 import 'package:mem/framework/database/definition/column/column_type.dart';
-import 'package:mem/framework/database/definition/primary_key_definition.dart';
+import 'package:mem/framework/database/definition/column/primary_key_definition.dart';
 
 final defPkId =
     PrimaryKeyDefinition('id', ColumnType.integer, autoincrement: true);

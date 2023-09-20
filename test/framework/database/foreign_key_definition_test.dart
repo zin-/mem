@@ -17,7 +17,7 @@ void main() {
   test(
     'Parent table has multiple primary keys.',
     () => expect(
-      () => ForeignKeyDefinition(compositePkTable),
+      () => ForeignKeyDefinitionV2(compositePkTable),
       throwsA((e) {
         expect(e, isA<UnimplementedError>());
         expect(

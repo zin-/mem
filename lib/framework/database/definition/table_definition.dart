@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:mem/framework/database/definition/column/column_definition.dart';
 import 'package:mem/framework/database/definition/exceptions.dart';
-import 'package:mem/framework/database/definition/primary_key_definition.dart';
+import 'package:mem/framework/database/definition/column/primary_key_definition.dart';
 
 import 'column/foreign_key_definition.dart';
 
@@ -50,8 +50,8 @@ class TableDefinitionV2 {
   Iterable<ColumnDefinitionV2> get primaryKeyDefinitions =>
       columnDefinitions.where((element) => element.isPrimaryKey);
 
-  Iterable<ForeignKeyDefinition> get foreignKeyDefinitions =>
-      columnDefinitions.whereType<ForeignKeyDefinition>();
+  Iterable<ForeignKeyDefinitionV2> get foreignKeyDefinitions =>
+      columnDefinitions.whereType<ForeignKeyDefinitionV2>();
 
   @override
   String toString() => [

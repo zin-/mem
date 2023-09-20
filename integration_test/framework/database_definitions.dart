@@ -29,7 +29,7 @@ final sampleDefPkChild = IntegerColumnDefinition(
   'sample_pk_child',
   isPrimaryKey: true,
 );
-final sampleDefFkChild = ForeignKeyDefinition(sampleDefTable);
+final sampleDefFkChild = ForeignKeyDefinitionV2(sampleDefTable);
 
 final sampleDefTableChild = TableDefinitionV2(
   'sample_child_table',
