@@ -6,7 +6,7 @@ import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_notification_repository.dart';
 import 'package:mem/mems/states.dart';
-import 'package:mem/repositories/i/conditions/in.dart';
+import 'package:mem/repositories/conditions/in.dart';
 
 final fetchMemNotifications = Provider.autoDispose
     .family<Future<Iterable<MemNotification>>, Iterable<int>>(

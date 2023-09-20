@@ -1,6 +1,6 @@
 import 'package:mem/databases/table_definitions/base.dart';
 
-import '_entity.dart';
+import 'entity.dart';
 
 abstract class DatabaseTupleEntity implements EntityV2 {
   dynamic id;

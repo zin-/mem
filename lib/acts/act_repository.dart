@@ -6,8 +6,8 @@ import 'package:mem/core/mem.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/framework/database/database.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/repositories/i/_database_tuple_repository.dart';
-import 'package:mem/repositories/i/conditions.dart';
+import 'package:mem/repositories/database_tuple_repository.dart';
+import 'package:mem/repositories/conditions/conditions.dart';
 
 class ActRepository extends DatabaseTupleRepository<ActEntity, Act> {
   Future<List<Act>> shipByMemId(
