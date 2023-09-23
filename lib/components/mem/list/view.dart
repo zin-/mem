@@ -46,20 +46,18 @@ class _MemListViewComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => v(
-        () {
-          return CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              _appBar,
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) => _itemBuilder(_memList[index].id),
-                  childCount: _memList.length,
-                ),
+        () => CustomScrollView(
+          controller: _scrollController,
+          slivers: [
+            _appBar,
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) => _itemBuilder(_memList[index].id),
+                childCount: _memList.length,
               ),
-            ],
-          );
-        },
+            ),
+          ],
+        ),
         {
           '_memList': _memList,
           '_appBar': _appBar,

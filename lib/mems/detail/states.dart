@@ -7,7 +7,7 @@ import 'package:mem/core/mem_notification.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/components/value_state_notifier.dart';
-import 'package:mem/mems/mem_repository_v2.dart';
+import 'package:mem/mems/mem_repository.dart';
 import 'package:mem/mems/states.dart';
 
 final memDetailProvider = StateNotifierProvider.autoDispose

@@ -32,7 +32,7 @@ class _LogPrinter extends PrettyPrinter {
   _LogPrinter()
       : super(
           methodCount: 1,
-          errorMethodCount: 10,
+          errorMethodCount: 100,
           printTime: true,
         );
 

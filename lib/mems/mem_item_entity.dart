@@ -1,5 +1,5 @@
 import 'package:mem/core/mem_item.dart';
-import 'package:mem/repositories/i/_database_tuple_entity_v2.dart';
+import 'package:mem/repositories/database_tuple_entity.dart';
 
 class MemItemEntity extends DatabaseTupleEntity {
   int? memId;

@@ -30,6 +30,9 @@ abstract class DateAndTimePeriod implements Comparable<DateAndTimePeriod> {
 
   @override
   String toString() => {'start': start, 'end': end}.toString();
+
+  DateAndTimePeriod copiedWith(DateAndTime? end) =>
+      DateAndTimePeriod(start: start, end: end);
 }
 
 class _WithStartOnly extends DateAndTimePeriod

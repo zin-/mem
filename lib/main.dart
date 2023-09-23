@@ -2,21 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:mem/act_counter/act_counter_configure.dart';
 import 'package:mem/act_counter/act_counter_repository.dart';
 import 'package:mem/act_counter/act_counter_service.dart';
-import 'package:mem/acts/act_repository.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
-import 'package:mem/database/table_definitions/acts.dart';
-import 'package:mem/database/table_definitions/mem_items.dart';
-import 'package:mem/database/table_definitions/mem_notifications.dart';
-import 'package:mem/database/table_definitions/mems.dart';
-import 'package:mem/framework/database/database_manager.dart';
-import 'package:mem/database/definition.dart';
+import 'package:mem/databases/definition.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/page.dart';
-import 'package:mem/mems/mem_item_repository_v2.dart';
-import 'package:mem/mems/mem_notification_repository.dart';
-import 'package:mem/mems/mem_repository_v2.dart';
 import 'package:mem/notifications/client.dart';
 import 'package:mem/notifications/notification_repository.dart';
+import 'package:mem/repositories/database_repository.dart';
+import 'package:mem/repositories/database_tuple_repository.dart';
 
 import 'application.dart';
 
@@ -60,23 +53,8 @@ Future<void> _runApplication({Widget? home, String? languageCode}) => i(
       [home, languageCode],
     );
 
-// FIXME Databaseに関わるRepositoryの初期化処理で勝手に読み込まれるべき
-Future<void> openDatabase() async {
-  final database = await DatabaseManager().open(databaseDefinition);
-
-  MemRepository(
-    database.getTable(memTableDefinition.name),
-  );
-  MemItemRepository(
-    database.getTable(memItemTableDefinition.name),
-  );
-  ActRepository(
-    database.getTable(actTableDefinition.name),
-  );
-  MemNotificationRepository(
-    database.getTable(memNotificationTableDefinition.name),
-  );
-}
+Future<void> openDatabase() async => DatabaseTupleRepository.databaseAccessor =
+    await DatabaseRepository().receive(databaseDefinition);
 
 // FIXME HomeWidget関連の処理、場所が適切ではない
 const uriSchema = 'mem';

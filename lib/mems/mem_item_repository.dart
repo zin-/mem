@@ -1,18 +1,17 @@
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_item.dart';
-import 'package:mem/database/table_definitions/base.dart';
-import 'package:mem/database/table_definitions/mem_items.dart';
-import 'package:mem/framework/database/database.dart';
+import 'package:mem/databases/table_definitions/base.dart';
+import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/repositories/i/_database_tuple_repository_v2.dart';
-import 'package:mem/repositories/i/conditions.dart';
+import 'package:mem/repositories/database_tuple_repository.dart';
+import 'package:mem/repositories/conditions/conditions.dart';
 
-import 'mem_item_entity_v2.dart';
+import 'mem_item_entity.dart';
 
 class MemItemRepository
     extends DatabaseTupleRepository<MemItemEntity, MemItem> {
   Future<Iterable<MemItem>> shipByMemId(MemId memId) => v(
-        () => super.ship(Equals(memIdFkDef.name, memId)),
+        () => super.ship(Equals(defFkMemItemsMemId.name, memId)),
         {'memId': memId},
       );
 
@@ -29,33 +28,33 @@ class MemItemRepository
       );
 
   Future<Iterable<MemItem>> wasteByMemId(MemId memId) => v(
-        () async => await super.waste(Equals(memIdFkDef.name, memId)),
+        () async => await super.waste(Equals(defFkMemItemsMemId.name, memId)),
         {'memId': memId},
       );
 
   @override
-  UnpackedPayload unpack(MemItem payload) => {
-        memIdFkDef.name: payload.memId,
-        memItemTypeColDef.name: payload.type.name,
-        memItemValueColDef.name: payload.value,
-        idPKDef.name: payload.id,
-        createdAtColDef.name: payload.createdAt,
-        updatedAtColDef.name: payload.updatedAt,
-        archivedAtColDef.name: payload.archivedAt,
+  Map<String, dynamic> unpack(MemItem payload) => {
+        defFkMemItemsMemId.name: payload.memId,
+        defColMemItemsType.name: payload.type.name,
+        defColMemItemsValue.name: payload.value,
+        defPkId.name: payload.id,
+        defColCreatedAt.name: payload.createdAt,
+        defColUpdatedAt.name: payload.updatedAt,
+        defColArchivedAt.name: payload.archivedAt,
       };
 
   @override
-  MemItem pack(UnpackedPayload unpackedPayload) {
+  MemItem pack(Map<String, dynamic> unpackedPayload) {
     final memItemEntity = MemItemEntity(
-      memId: unpackedPayload[memIdFkDef.name],
+      memId: unpackedPayload[defFkMemItemsMemId.name],
       type: MemItemType.values.firstWhere((v) {
-        return v.name == unpackedPayload[memItemTypeColDef.name];
+        return v.name == unpackedPayload[defColMemItemsType.name];
       }),
-      value: unpackedPayload[memItemValueColDef.name],
-      id: unpackedPayload[idPKDef.name],
-      createdAt: unpackedPayload[createdAtColDef.name],
-      updatedAt: unpackedPayload[updatedAtColDef.name],
-      archivedAt: unpackedPayload[archivedAtColDef.name],
+      value: unpackedPayload[defColMemItemsValue.name],
+      id: unpackedPayload[defPkId.name],
+      createdAt: unpackedPayload[defColCreatedAt.name],
+      updatedAt: unpackedPayload[defColUpdatedAt.name],
+      archivedAt: unpackedPayload[defColArchivedAt.name],
     );
 
     return MemItem(
@@ -72,12 +71,11 @@ class MemItemRepository
   @override
   noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 
-  MemItemRepository._(super.table);
+  MemItemRepository._() : super(defTableMemItems);
 
   static MemItemRepository? _instance;
 
-  factory MemItemRepository([Table? table]) =>
-      _instance ??= MemItemRepository._(table!);
+  factory MemItemRepository() => _instance ??= MemItemRepository._();
 
   static resetWith(MemItemRepository? instance) => _instance = instance;
 }

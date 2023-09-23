@@ -4,13 +4,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/act_counter/act_counter_repository.dart';
-import 'package:mem/database/definition.dart';
-import 'package:mem/database/table_definitions/acts.dart';
-import 'package:mem/database/table_definitions/base.dart';
-import 'package:mem/database/table_definitions/mems.dart';
-import 'package:mem/framework/database/database.dart';
-import 'package:mem/framework/database/database_manager.dart';
+import 'package:mem/databases/definition.dart';
+import 'package:mem/databases/table_definitions/acts.dart';
+import 'package:mem/databases/table_definitions/base.dart';
+import 'package:mem/databases/table_definitions/mems.dart';
+import 'package:mem/framework/database/accessor.dart';
+import 'package:mem/framework/database/factory.dart';
 import 'package:mem/main.dart';
+import 'package:mem/repositories/database_repository.dart';
 
 import 'helpers.dart';
 
@@ -31,36 +32,50 @@ void testActCounterConfigure() => group(
         late int insertedMemId2;
         late DateTime actPeriod;
 
-        late final Database db;
+        late final DatabaseAccessor dbA;
 
         setUpAll(() async {
-          db = await DatabaseManager(onTest: true).open(databaseDefinition);
+          DatabaseFactory.onTest = true;
+          dbA = await DatabaseRepository().receive(databaseDefinition);
         });
         setUp(() async {
-          await resetDatabase(db);
+          for (var tableDefinition
+              in databaseDefinition.tableDefinitions.reversed) {
+            await dbA.delete(tableDefinition);
+          }
 
-          final memsTable = db.getTable(memTableDefinition.name);
-          insertedMemId = await memsTable.insert({
-            defMemName.name: insertedMemName,
-            createdAtColDef.name: zeroDate,
-          });
-          insertedMemId2 = await memsTable.insert({
-            defMemName.name: insertedMemName2,
-            createdAtColDef.name: zeroDate,
-          });
-          final actsTable = db.getTable(actTableDefinition.name);
-          await actsTable.insert({
-            fkDefMemId.name: insertedMemId,
-            defActStart.name: zeroDate,
-            defActStartIsAllDay.name: 0,
-            createdAtColDef.name: zeroDate,
-          });
-          await actsTable.insert({
-            fkDefMemId.name: insertedMemId,
-            defActStart.name: actPeriod = DateTime.now(),
-            defActStartIsAllDay.name: 0,
-            createdAtColDef.name: zeroDate,
-          });
+          insertedMemId = await dbA.insert(
+            defTableMems,
+            {
+              defColMemsName.name: insertedMemName,
+              defColCreatedAt.name: zeroDate,
+            },
+          );
+          insertedMemId2 = await dbA.insert(
+            defTableMems,
+            {
+              defColMemsName.name: insertedMemName2,
+              defColCreatedAt.name: zeroDate,
+            },
+          );
+          await dbA.insert(
+            defTableActs,
+            {
+              defFkActsMemId.name: insertedMemId,
+              defColActsStart.name: zeroDate,
+              defColActsStartIsAllDay.name: 0,
+              defColCreatedAt.name: zeroDate,
+            },
+          );
+          await dbA.insert(
+            defTableActs,
+            {
+              defFkActsMemId.name: insertedMemId,
+              defColActsStart.name: actPeriod = DateTime.now(),
+              defColActsStartIsAllDay.name: 0,
+              defColCreatedAt.name: zeroDate,
+            },
+          );
         });
 
         testWidgets(

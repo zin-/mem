@@ -3,11 +3,10 @@ import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
-import 'package:mem/database/table_definitions/acts.dart';
-import 'package:mem/framework/database/database.dart';
+import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/repositories/i/_database_tuple_repository_v2.dart';
-import 'package:mem/repositories/i/conditions.dart';
+import 'package:mem/repositories/database_tuple_repository.dart';
+import 'package:mem/repositories/conditions/conditions.dart';
 
 class ActRepository extends DatabaseTupleRepository<ActEntity, Act> {
   Future<List<Act>> shipByMemId(
@@ -17,12 +16,12 @@ class ActRepository extends DatabaseTupleRepository<ActEntity, Act> {
       v(
         () async {
           if (period == null) {
-            return await ship(Equals(fkDefMemId.name, memId));
+            return await ship(Equals(defFkActsMemId.name, memId));
           } else {
             return await ship(And([
-              Equals(fkDefMemId.name, memId),
-              GraterThanOrEqual(defActStart, period.start),
-              LessThan(defActStart, period.end),
+              Equals(defFkActsMemId.name, memId),
+              GraterThanOrEqual(defColActsStart, period.start),
+              LessThan(defColActsStart, period.end),
             ]));
           }
         },
@@ -30,11 +29,11 @@ class ActRepository extends DatabaseTupleRepository<ActEntity, Act> {
       );
 
   Future<List<Act>> shipActive() => v(
-        () async => await ship(IsNull(defActEnd.name)),
+        () async => await ship(IsNull(defColActsEnd.name)),
       );
 
   @override
-  Act pack(UnpackedPayload unpackedPayload) {
+  Act pack(Map<String, dynamic> unpackedPayload) {
     final actEntity = ActEntity.fromMap(unpackedPayload);
 
     return Act(
@@ -59,7 +58,7 @@ class ActRepository extends DatabaseTupleRepository<ActEntity, Act> {
   }
 
   @override
-  UnpackedPayload unpack(Act payload) {
+  Map<String, dynamic> unpack(Act payload) {
     final actEntity = ActEntity(
       payload.memId,
       payload.period.start!.dateTime,
@@ -78,12 +77,11 @@ class ActRepository extends DatabaseTupleRepository<ActEntity, Act> {
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 
-  ActRepository._(super.table);
+  ActRepository._() : super(defTableActs);
 
   static ActRepository? _instance;
 
-  factory ActRepository([Table? table]) =>
-      _instance ??= ActRepository._(table!);
+  factory ActRepository() => _instance ??= ActRepository._();
 
   static resetWith(ActRepository? instance) => _instance = instance;
 }

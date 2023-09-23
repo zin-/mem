@@ -1,13 +1,119 @@
+import 'package:mem/logger/log_service.dart';
 import 'package:sqflite/sqlite_api.dart';
 
-// ISSUE #209
+import 'converter.dart';
+import 'definition/table_definition.dart';
+
 class DatabaseAccessor {
-  final Database nativeDatabase;
+  final Database _nativeDatabase;
+  final DatabaseConverter _converter = DatabaseConverter();
 
-  DatabaseAccessor(this.nativeDatabase);
+  @Deprecated("Use only for developing or test.")
+  Database get nativeDatabase => _nativeDatabase;
 
-  @override
-  String toString() => {
-        "nativeDatabase": nativeDatabase,
-      }.toString();
+  Future<bool> isOpened() => v(
+        () async =>
+            _nativeDatabase.isOpen &&
+            await _nativeDatabase.getVersion().then((value) => true).catchError(
+              (e, stackTrace) async {
+                final exceptionMessage = e.toString();
+                // nativeDatabaseがcloseされずにdeleteされた場合に以下のエラーになる
+                if (exceptionMessage.startsWith(
+                      "DatabaseException(database_closed ",
+                    ) ||
+                    exceptionMessage.startsWith(
+                      "SqfliteFfiException(error, Bad state: This database has already been closed})",
+                    )) {
+                  warn(e);
+                  await _nativeDatabase.close();
+                } else {
+                  throw e;
+                }
+                return false;
+              },
+            ),
+      );
+
+  Future<int> insert(
+    TableDefinition tableDefinition,
+    Map<String, Object?> values,
+  ) =>
+      v(
+        () => _nativeDatabase.insert(
+          tableDefinition.name,
+          values.map((key, value) => MapEntry(key, _converter.to(value))),
+        ),
+        [
+          tableDefinition.name,
+          values,
+        ],
+      );
+
+  Future<List<Map<String, Object?>>> select(
+    TableDefinition tableDefinition, {
+    String? where,
+    List<Object?>? whereArgs,
+    String? orderBy,
+    int? limit,
+  }) =>
+      v(
+        () => _nativeDatabase
+            .query(
+              tableDefinition.name,
+              where: where,
+              whereArgs: whereArgs?.map((e) => _converter.to(e)).toList(),
+              orderBy: orderBy,
+              limit: limit,
+            )
+            .then((value) =>
+                value.map((e) => _converter.from(e, tableDefinition)).toList()),
+        [
+          tableDefinition.name,
+          where,
+          whereArgs,
+          orderBy,
+          limit,
+        ],
+      );
+
+  Future<int> update(
+    TableDefinition tableDefinition,
+    Map<String, Object?> values, {
+    String? where,
+    List<Object?>? whereArgs,
+  }) =>
+      v(
+        () => _nativeDatabase.update(
+          tableDefinition.name,
+          values.map((key, value) => MapEntry(key, _converter.to(value))),
+          where: where,
+          whereArgs: whereArgs?.map((e) => _converter.to(e)).toList(),
+        ),
+        [
+          tableDefinition.name,
+          values,
+          where,
+          whereArgs,
+        ],
+      );
+
+  Future<int> delete(
+    TableDefinition tableDefinition, {
+    String? where,
+    List<Object?>? whereArgs,
+  }) =>
+      v(
+        () => _nativeDatabase.delete(
+          tableDefinition.name,
+          where: where,
+          whereArgs: whereArgs?.map((e) => _converter.to(e)).toList(),
+        ),
+        [
+          tableDefinition.name,
+          where,
+          whereArgs,
+        ],
+      );
+
+  DatabaseAccessor(this._nativeDatabase);
 }

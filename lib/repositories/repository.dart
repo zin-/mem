@@ -1,5 +1,5 @@
-import 'i/_entity_v2.dart';
-import 'i/conditions.dart';
+import 'entity.dart';
+import 'conditions/conditions.dart';
 
 abstract class RepositoryV2<E extends EntityV2, Payload> {
   Future<Payload> receive(Payload payload);

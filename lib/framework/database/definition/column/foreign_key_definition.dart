@@ -1,15 +1,16 @@
-import 'package:mem/framework/database/definition/exceptions.dart';
-import 'package:mem/framework/database/definition/table_definition_v2.dart';
-
-import 'column_definition.dart';
+import 'package:mem/framework/database/definition/table_definition.dart';
+import 'package:mem/framework/database/definition/column/column_definition.dart';
 
 class ForeignKeyDefinition extends ColumnDefinition {
-  final TableDefinitionV2 parentTableDefinition;
+  final TableDefinition parentTableDefinition;
 
   ForeignKeyDefinition(
     this.parentTableDefinition,
   ) : super(
-          'fk_${parentTableDefinition.singularName ?? (throw ColumnDefinitionException('Parent table: "${parentTableDefinition.name}" does not have singular name.'))}_id',
+          // FIXME fk_hoge_idにしたいが、既にhoges_idで定義されていてmigrationができない
+          // ISSUE #230 modify column name
+          // 'fk_${parentTableDefinition.singularName ?? (throw ColumnDefinitionException('Parent table: "${parentTableDefinition.name}" does not have singular name.'))}_id',
+          "${parentTableDefinition.name}_id",
           parentTableDefinition.primaryKeyDefinitions.length == 1
               ? parentTableDefinition.primaryKeyDefinitions.single.type
               : throw UnimplementedError(

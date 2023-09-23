@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/core/mem_notification.dart';
-import 'package:mem/database/definition.dart';
-import 'package:mem/database/table_definitions/base.dart';
-import 'package:mem/database/table_definitions/mem_notifications.dart';
-import 'package:mem/database/table_definitions/mems.dart';
-import 'package:mem/framework/database/database.dart';
-import 'package:mem/framework/database/database_manager.dart';
+import 'package:mem/databases/definition.dart';
+import 'package:mem/databases/table_definitions/base.dart';
+import 'package:mem/databases/table_definitions/mem_notifications.dart';
+import 'package:mem/databases/table_definitions/mems.dart';
+import 'package:mem/framework/database/accessor.dart';
+import 'package:mem/framework/database/factory.dart';
+import 'package:mem/repositories/database_repository.dart';
 
 import 'helpers.dart';
 
@@ -21,37 +22,59 @@ void testHabitScenario() => group(': $_scenarioName', () {
       const withRepeatedMemName = '$insertedMemName - with repeated';
       const timeOfDaySeconds = 1000;
 
-      late final Database db;
+      late final DatabaseAccessor dbA;
       late final int insertedMemId;
       late final int withRepeatedMemId;
 
       setUpAll(() async {
-        db = await DatabaseManager(onTest: true).open(databaseDefinition);
+        DatabaseFactory.onTest = true;
+        dbA = await DatabaseRepository().receive(databaseDefinition);
 
-        await resetDatabase(db);
+        for (var tableDefinition
+            in databaseDefinition.tableDefinitions.reversed) {
+          await dbA.delete(tableDefinition);
+        }
 
-        final memTable = db.getTable(memTableDefinition.name);
-        insertedMemId = await memTable.insert({
-          defMemName.name: insertedMemName,
-          createdAtColDef.name: DateTime.now(),
-        });
-        withRepeatedMemId = await memTable.insert({
-          defMemName.name: withRepeatedMemName,
-          createdAtColDef.name: DateTime.now(),
-        });
-        await db.getTable(memNotificationTableDefinition.name).insert({
-          timeColDef.name: timeOfDaySeconds,
-          memIdFkDef.name: withRepeatedMemId,
-          createdAtColDef.name: DateTime.now(),
-        });
+        insertedMemId = await dbA.insert(
+          defTableMems,
+          {
+            defColMemsName.name: insertedMemName,
+            defColCreatedAt.name: zeroDate,
+          },
+        );
+        withRepeatedMemId = await dbA.insert(
+          defTableMems,
+          {
+            defColMemsName.name: withRepeatedMemName,
+            defColCreatedAt.name: zeroDate,
+          },
+        );
+        await dbA.insert(
+          defTableMemNotifications,
+          {
+            defFkMemNotificationsMemId.name: withRepeatedMemId,
+            defColMemNotificationsTime.name: timeOfDaySeconds,
+            defColMemNotificationsType.name: "repeat",
+            defColMemNotificationsMessage.name: "Repeat",
+            defColCreatedAt.name: zeroDate,
+          },
+        );
+
+        // await resetDatabase(db);
       });
       setUp(() async {
-        await db.getTable(memNotificationTableDefinition.name).delete(
-          whereString: '${memIdFkDef.name} = ?',
-          whereArgs: [
-            insertedMemId,
-          ],
+        await dbA.delete(
+          defTableMemNotifications,
+          where: '${defFkMemNotificationsMemId.name} = ?',
+          whereArgs: [insertedMemId],
         );
+
+        // await db.getTable(defTableMemNotifications.name).delete(
+        //   whereString: '${defFkMemNotificationsMemId.name} = ?',
+        //   whereArgs: [
+        //     insertedMemId,
+        //   ],
+        // );
       });
 
       group(': Repeated notification', () {
@@ -93,10 +116,9 @@ void testHabitScenario() => group(': $_scenarioName', () {
               late final Map<String, dynamic> inserted;
 
               await expectLater(
-                inserted = (await db
-                        .getTable(memNotificationTableDefinition.name)
-                        .select(
-                  whereString: '${memIdFkDef.name} = ?',
+                inserted = (await dbA.select(
+                  defTableMemNotifications,
+                  where: '${defFkMemNotificationsMemId.name} = ?',
                   whereArgs: [insertedMemId],
                 ))
                     .single,
@@ -105,11 +127,11 @@ void testHabitScenario() => group(': $_scenarioName', () {
               final timeOfDay = TimeOfDay.fromDateTime(pickTime);
               await expectLater(
                 [
-                  inserted[timeColDef.name],
-                  inserted[createdAtColDef.name],
-                  inserted[updatedAtColDef.name],
-                  inserted[archivedAtColDef.name],
-                  inserted[memIdFkDef.name],
+                  inserted[defColMemNotificationsTime.name],
+                  inserted[defColCreatedAt.name],
+                  inserted[defColUpdatedAt.name],
+                  inserted[defColArchivedAt.name],
+                  inserted[defFkMemNotificationsMemId.name],
                 ],
                 [
                   ((timeOfDay.hour * 60) + timeOfDay.minute) * 60,
@@ -151,10 +173,9 @@ void testHabitScenario() => group(': $_scenarioName', () {
           await Future.delayed(
             waitSideEffectDuration,
             () async {
-              final memNotifications = (await db
-                  .getTable(memNotificationTableDefinition.name)
-                  .select(
-                whereString: '${memIdFkDef.name} = ?',
+              final memNotifications = (await dbA.select(
+                defTableMemNotifications,
+                where: '${defFkMemNotificationsMemId.name} = ?',
                 whereArgs: [withRepeatedMemId],
               ));
               await expectLater(memNotifications.length, 0);
@@ -202,10 +223,9 @@ void testHabitScenario() => group(': $_scenarioName', () {
               late final Map<String, dynamic> inserted;
 
               await expectLater(
-                inserted = (await db
-                        .getTable(memNotificationTableDefinition.name)
-                        .select(
-                  whereString: '${memIdFkDef.name} = ?',
+                inserted = (await dbA.select(
+                  defTableMemNotifications,
+                  where: '${defFkMemNotificationsMemId.name} = ?',
                   whereArgs: [insertedMemId],
                 ))
                     .single,
@@ -213,13 +233,13 @@ void testHabitScenario() => group(': $_scenarioName', () {
               );
               await expectLater(
                 [
-                  inserted[memIdFkDef.name],
-                  inserted[timeColDef.name],
-                  inserted[memNotificationTypeColDef.name],
-                  inserted[memNotificationMessageColDef.name],
-                  inserted[createdAtColDef.name],
-                  inserted[updatedAtColDef.name],
-                  inserted[archivedAtColDef.name],
+                  inserted[defFkMemNotificationsMemId.name],
+                  inserted[defColMemNotificationsTime.name],
+                  inserted[defColMemNotificationsType.name],
+                  inserted[defColMemNotificationsMessage.name],
+                  inserted[defColCreatedAt.name],
+                  inserted[defColUpdatedAt.name],
+                  inserted[defColArchivedAt.name],
                 ],
                 [
                   insertedMemId,
@@ -265,8 +285,9 @@ void testHabitScenario() => group(': $_scenarioName', () {
             waitSideEffectDuration,
             () async {
               await expectLater(
-                (await db.getTable(memNotificationTableDefinition.name).select(
-                  whereString: '${memIdFkDef.name} = ?',
+                (await dbA.select(
+                  defTableMemNotifications,
+                  where: '${defFkMemNotificationsMemId.name} = ?',
                   whereArgs: [insertedMemId],
                 )),
                 isEmpty,

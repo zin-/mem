@@ -2,16 +2,11 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/database/table_definitions/acts.dart';
-import 'package:mem/database/table_definitions/mem_items.dart';
-import 'package:mem/database/table_definitions/mem_notifications.dart';
-import 'package:mem/database/table_definitions/mems.dart';
-import 'package:mem/framework/database/database.dart';
 import 'package:mem/main.dart';
 
 Future<void> runApplication() => main(languageCode: 'en');
 
-const waitSideEffectDuration = Duration(milliseconds: 2800);
+const waitSideEffectDuration = Duration(milliseconds: 2000);
 final zeroDate = DateTime(0);
 
 int randomInt([int max = 42949671]) => Random().nextInt(max);
@@ -29,13 +24,6 @@ String timeText(DateTime dateTime) {
 
 String dateTimeText(DateTime dateTime) {
   return '${dateText(dateTime)} ${timeText(dateTime)}';
-}
-
-Future<void> resetDatabase(Database database) async {
-  await database.getTable(actTableDefinition.name).delete();
-  await database.getTable(memItemTableDefinition.name).delete();
-  await database.getTable(memNotificationTableDefinition.name).delete();
-  await database.getTable(memTableDefinition.name).delete();
 }
 
 final newMemFabFinder = find.byIcon(Icons.add);

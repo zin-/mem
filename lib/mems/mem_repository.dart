@@ -1,12 +1,11 @@
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
-import 'package:mem/database/table_definitions/base.dart';
-import 'package:mem/database/table_definitions/mems.dart';
-import 'package:mem/framework/database/database.dart';
+import 'package:mem/databases/table_definitions/base.dart';
+import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/repositories/i/_database_tuple_repository_v2.dart';
-import 'package:mem/repositories/i/conditions.dart';
+import 'package:mem/repositories/database_tuple_repository.dart';
+import 'package:mem/repositories/conditions/conditions.dart';
 import 'package:mem/repositories/mem_entity.dart';
 
 class MemRepository extends DatabaseTupleRepository<MemEntity, Mem> {
@@ -16,13 +15,13 @@ class MemRepository extends DatabaseTupleRepository<MemEntity, Mem> {
             archived == null
                 ? null
                 : archived
-                    ? IsNotNull(archivedAtColDef.name)
-                    : IsNull(archivedAtColDef.name),
+                    ? IsNotNull(defColArchivedAt.name)
+                    : IsNull(defColArchivedAt.name),
             done == null
                 ? null
                 : done
-                    ? IsNotNull(defMemDoneAt.name)
-                    : IsNull(defMemDoneAt.name),
+                    ? IsNotNull(defColMemsDoneAt.name)
+                    : IsNull(defColMemsDoneAt.name),
           ].whereType<Condition>()),
         ),
         {
@@ -32,24 +31,24 @@ class MemRepository extends DatabaseTupleRepository<MemEntity, Mem> {
       );
 
   @override
-  UnpackedPayload unpack(Mem payload) => {
-        defMemName.name: payload.name,
-        defMemDoneAt.name: payload.doneAt,
-        defMemStartOn.name: payload.period?.start,
-        defMemStartAt.name: payload.period?.start?.isAllDay == false
+  Map<String, dynamic> unpack(Mem payload) => {
+        defColMemsName.name: payload.name,
+        defColMemsDoneAt.name: payload.doneAt,
+        defColMemsStartOn.name: payload.period?.start,
+        defColMemsStartAt.name: payload.period?.start?.isAllDay == false
             ? payload.period?.start
             : null,
-        defMemEndOn.name: payload.period?.end,
-        defMemEndAt.name:
+        defColMemsEndOn.name: payload.period?.end,
+        defColMemsEndAt.name:
             payload.period?.end?.isAllDay == false ? payload.period?.end : null,
-        idPKDef.name: payload.id,
-        createdAtColDef.name: payload.createdAt,
-        updatedAtColDef.name: payload.updatedAt,
-        archivedAtColDef.name: payload.archivedAt,
+        defPkId.name: payload.id,
+        defColCreatedAt.name: payload.createdAt,
+        defColUpdatedAt.name: payload.updatedAt,
+        defColArchivedAt.name: payload.archivedAt,
       };
 
   @override
-  Mem pack(UnpackedPayload unpackedPayload) {
+  Mem pack(Map<String, dynamic> unpackedPayload) {
     final memEntity = MemEntity.fromMap(unpackedPayload);
 
     final notifyOn = memEntity.notifyOn;
@@ -78,12 +77,11 @@ class MemRepository extends DatabaseTupleRepository<MemEntity, Mem> {
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 
-  MemRepository._(super.table);
+  MemRepository._() : super(defTableMems);
 
   static MemRepository? _instance;
 
-  factory MemRepository([Table? table]) =>
-      _instance ??= MemRepository._(table!);
+  factory MemRepository() => _instance ??= MemRepository._();
 
   static resetWith(MemRepository? memRepository) => _instance = memRepository;
 }

@@ -1,4 +1,11 @@
-import 'package:mem/framework/database/database.dart';
+class DatabaseException implements Exception {
+  final String message;
+
+  DatabaseException(this.message);
+
+  @override
+  String toString() => message;
+}
 
 class DatabaseDefinitionException extends DatabaseException {
   DatabaseDefinitionException(super.message);

@@ -27,5 +27,10 @@ import 'package:mem/framework/entity_v3.dart';
 ///
 /// 加えて、ライブラリを正しく使えているかのテストは利用者側で行う必要がある
 abstract class RepositoryV3<Payload extends EntityV3, Result> {
+  // FIXME rename payload
+  //  Repositoryが扱うものとしてはPayloadもいい名前だけど
+  //  受け取るのも払い出すのもPayloadなのでもっと詳細な名前にしたい
+  //  -> entity?
+  //    DatabaseRepositoryにおいてはentityでもなさそう
   Result receive(Payload payload);
 }

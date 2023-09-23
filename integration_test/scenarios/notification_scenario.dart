@@ -4,16 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:mem/database/definition.dart';
-import 'package:mem/database/table_definitions/acts.dart';
-import 'package:mem/database/table_definitions/base.dart';
-import 'package:mem/database/table_definitions/mems.dart';
-import 'package:mem/framework/database/database.dart';
-import 'package:mem/framework/database/database_manager.dart';
+import 'package:mem/databases/definition.dart';
+import 'package:mem/databases/table_definitions/acts.dart';
+import 'package:mem/databases/table_definitions/base.dart';
+import 'package:mem/databases/table_definitions/mems.dart';
+import 'package:mem/framework/database/accessor.dart';
+import 'package:mem/framework/database/factory.dart';
 import 'package:mem/notifications/client.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification_ids.dart';
 import 'package:mem/notifications/wrapper.dart';
+import 'package:mem/repositories/database_repository.dart';
 import 'package:mem/values/durations.dart';
 
 import 'helpers.dart';
@@ -29,19 +30,23 @@ const _scenarioName = "Notification scenario";
 void testNotificationScenario() => group(": $_scenarioName", () {
       const insertedMemName = "$_scenarioName - mem name - inserted";
 
-      late final Database db;
+      late final DatabaseAccessor dbA;
       int? insertedMemId;
 
       setUpAll(() async {
-        db = await DatabaseManager(onTest: true).open(databaseDefinition);
+        DatabaseFactory.onTest = true;
+        dbA = await DatabaseRepository().receive(databaseDefinition);
       });
       setUp(() async {
-        await resetDatabase(db);
+        for (var tableDefinition
+            in databaseDefinition.tableDefinitions.reversed) {
+          await dbA.delete(tableDefinition);
+        }
 
-        insertedMemId = await db.getTable(memTableDefinition.name).insert({
-          defMemName.name: insertedMemName,
-          defMemDoneAt.name: null,
-          createdAtColDef.name: DateTime(0),
+        insertedMemId = await dbA.insert(defTableMems, {
+          defColMemsName.name: insertedMemName,
+          defColMemsDoneAt.name: null,
+          defColCreatedAt.name: zeroDate,
         });
       });
 
@@ -90,22 +95,22 @@ void testNotificationScenario() => group(": $_scenarioName", () {
             await Future.delayed(
               waitSideEffectDuration,
               () async {
-                final mems =
-                    await db.getTable(memTableDefinition.name).select();
+                final mems = await dbA.select(defTableMems);
+                // final mems = await db.getTable(defTableMems.name).select();
 
                 expect(mems.length, 1);
                 expect(
                   [
-                    mems[0][defMemName.name],
-                    mems[0][defMemDoneAt.name],
-                    mems[0][defMemStartOn.name],
-                    mems[0][defMemStartAt.name],
-                    mems[0][defMemEndOn.name],
-                    mems[0][defMemEndAt.name],
-                    mems[0][idPKDef.name],
-                    mems[0][createdAtColDef.name],
-                    mems[0][updatedAtColDef.name],
-                    mems[0][archivedAtColDef.name],
+                    mems[0][defColMemsName.name],
+                    mems[0][defColMemsDoneAt.name],
+                    mems[0][defColMemsStartOn.name],
+                    mems[0][defColMemsStartAt.name],
+                    mems[0][defColMemsEndOn.name],
+                    mems[0][defColMemsEndAt.name],
+                    mems[0][defPkId.name],
+                    mems[0][defColCreatedAt.name],
+                    mems[0][defColUpdatedAt.name],
+                    mems[0][defColArchivedAt.name],
                   ],
                   [
                     insertedMemName,
@@ -141,27 +146,26 @@ void testNotificationScenario() => group(": $_scenarioName", () {
             await Future.delayed(
               waitSideEffectDuration,
               () async {
-                final acts =
-                    await db.getTable(actTableDefinition.name).select();
+                final acts = await dbA.select(defTableActs);
 
                 expect(acts.length, 1);
                 expect(
                   [
-                    acts[0][defActStart.name],
-                    acts[0][defActStartIsAllDay.name],
-                    acts[0][defActEnd.name],
-                    acts[0][defActEndIsAllDay.name],
-                    acts[0][idPKDef.name],
-                    acts[0][createdAtColDef.name],
-                    acts[0][updatedAtColDef.name],
-                    acts[0][archivedAtColDef.name],
-                    acts[0][fkDefMemId.name],
+                    acts[0][defColActsStart.name],
+                    acts[0][defColActsStartIsAllDay.name],
+                    acts[0][defColActsEnd.name],
+                    acts[0][defColActsEndIsAllDay.name],
+                    acts[0][defPkId.name],
+                    acts[0][defColCreatedAt.name],
+                    acts[0][defColUpdatedAt.name],
+                    acts[0][defColArchivedAt.name],
+                    acts[0][defFkActsMemId.name],
                   ],
                   [
                     isNotNull,
-                    0,
+                    isFalse,
                     isNull,
-                    0,
+                    isFalse,
                     isNotNull,
                     isNotNull,
                     isNull,
@@ -191,27 +195,27 @@ void testNotificationScenario() => group(": $_scenarioName", () {
               await Future.delayed(
                 waitSideEffectDuration,
                 () async {
-                  final acts =
-                      await db.getTable(actTableDefinition.name).select();
+                  final acts = await dbA.select(defTableActs);
+                  // final acts = await db.getTable(defTableActs.name).select();
 
                   expect(acts.length, 1);
                   expect(
                     [
-                      acts[0][defActStart.name],
-                      acts[0][defActStartIsAllDay.name],
-                      acts[0][defActEnd.name],
-                      acts[0][defActEndIsAllDay.name],
-                      acts[0][idPKDef.name],
-                      acts[0][createdAtColDef.name],
-                      acts[0][updatedAtColDef.name],
-                      acts[0][archivedAtColDef.name],
-                      acts[0][fkDefMemId.name],
+                      acts[0][defColActsStart.name],
+                      acts[0][defColActsStartIsAllDay.name],
+                      acts[0][defColActsEnd.name],
+                      acts[0][defColActsEndIsAllDay.name],
+                      acts[0][defPkId.name],
+                      acts[0][defColCreatedAt.name],
+                      acts[0][defColUpdatedAt.name],
+                      acts[0][defColArchivedAt.name],
+                      acts[0][defFkActsMemId.name],
                     ],
                     [
                       isNotNull,
-                      0,
+                      isFalse,
                       isNotNull,
-                      0,
+                      isFalse,
                       isNotNull,
                       isNotNull,
                       isNotNull,
@@ -229,19 +233,17 @@ void testNotificationScenario() => group(": $_scenarioName", () {
             late final int insertedActId2;
 
             setUp(() async {
-              final actsTable = db.getTable(actTableDefinition.name);
-
-              insertedActId = await actsTable.insert({
-                fkDefMemId.name: insertedMemId,
-                defActStart.name: zeroDate.add(const Duration(minutes: 1)),
-                defActStartIsAllDay.name: 0,
-                createdAtColDef.name: zeroDate,
+              insertedActId = await dbA.insert(defTableActs, {
+                defFkActsMemId.name: insertedMemId,
+                defColActsStart.name: zeroDate.add(const Duration(minutes: 1)),
+                defColActsStartIsAllDay.name: 0,
+                defColCreatedAt.name: zeroDate,
               });
-              insertedActId2 = await actsTable.insert({
-                fkDefMemId.name: insertedMemId,
-                defActStart.name: zeroDate,
-                defActStartIsAllDay.name: 0,
-                createdAtColDef.name: zeroDate,
+              insertedActId2 = await dbA.insert(defTableActs, {
+                defFkActsMemId.name: insertedMemId,
+                defColActsStart.name: zeroDate,
+                defColActsStartIsAllDay.name: 0,
+                defColCreatedAt.name: zeroDate,
               });
             });
 
@@ -261,25 +263,24 @@ void testNotificationScenario() => group(": $_scenarioName", () {
                 await Future.delayed(
                   waitSideEffectDuration,
                   () async {
-                    final acts =
-                        await db.getTable(actTableDefinition.name).select();
+                    final acts = await dbA.select(defTableActs);
 
                     expect(acts.length, 2);
                     expect(
                       [
-                        acts[0][defActStart.name],
-                        acts[0][defActStartIsAllDay.name],
-                        acts[0][defActEnd.name],
-                        acts[0][defActEndIsAllDay.name],
-                        acts[0][idPKDef.name],
-                        acts[0][createdAtColDef.name],
-                        acts[0][updatedAtColDef.name],
-                        acts[0][archivedAtColDef.name],
-                        acts[0][fkDefMemId.name],
+                        acts[0][defColActsStart.name],
+                        acts[0][defColActsStartIsAllDay.name],
+                        acts[0][defColActsEnd.name],
+                        acts[0][defColActsEndIsAllDay.name],
+                        acts[0][defPkId.name],
+                        acts[0][defColCreatedAt.name],
+                        acts[0][defColUpdatedAt.name],
+                        acts[0][defColArchivedAt.name],
+                        acts[0][defFkActsMemId.name],
                       ],
                       [
                         isNotNull,
-                        0,
+                        isFalse,
                         isNull,
                         isNull,
                         insertedActId,
@@ -291,21 +292,21 @@ void testNotificationScenario() => group(": $_scenarioName", () {
                     );
                     expect(
                       [
-                        acts[1][defActStart.name],
-                        acts[1][defActStartIsAllDay.name],
-                        acts[1][defActEnd.name],
-                        acts[1][defActEndIsAllDay.name],
-                        acts[1][idPKDef.name],
-                        acts[1][createdAtColDef.name],
-                        acts[1][updatedAtColDef.name],
-                        acts[1][archivedAtColDef.name],
-                        acts[1][fkDefMemId.name],
+                        acts[1][defColActsStart.name],
+                        acts[1][defColActsStartIsAllDay.name],
+                        acts[1][defColActsEnd.name],
+                        acts[1][defColActsEndIsAllDay.name],
+                        acts[1][defPkId.name],
+                        acts[1][defColCreatedAt.name],
+                        acts[1][defColUpdatedAt.name],
+                        acts[1][defColArchivedAt.name],
+                        acts[1][defFkActsMemId.name],
                       ],
                       [
                         isNotNull,
-                        0,
+                        isFalse,
                         isNotNull,
-                        0,
+                        isFalse,
                         insertedActId2,
                         isNotNull,
                         isNotNull,

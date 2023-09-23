@@ -1,42 +1,64 @@
 import 'package:collection/collection.dart';
-import 'package:mem/framework/database/definition/column_definition.dart';
+import 'package:mem/framework/database/definition/column/column_definition.dart';
 import 'package:mem/framework/database/definition/exceptions.dart';
-import 'package:mem/framework/database/definition/primary_key_definition.dart';
+
+import 'column/foreign_key_definition.dart';
 
 class TableDefinition {
   final String name;
-  final List<ColumnDefinition> columns;
+  final Iterable<ColumnDefinition> columnDefinitions;
+  final String? singularName;
 
-  TableDefinition(this.name, this.columns) {
+  TableDefinition(this.name, this.columnDefinitions, {this.singularName}) {
     if (name.isEmpty) {
-      throw TableDefinitionException('Table name is required.');
+      throw TableDefinitionException('Table name is empty.');
     } else if (name.contains(' ')) {
       throw TableDefinitionException('Table name contains " ".');
-    } else if (columns.isEmpty) {
-      throw TableDefinitionException('Table columns are required.');
-    } else if (columns.whereType<PrimaryKeyDefinition>().isEmpty) {
-      throw TableDefinitionException('Primary key is required.');
-    } else if (columns.whereType<PrimaryKeyDefinition>().length > 1) {
-      throw TableDefinitionException('Only one primary key is allowed.');
-    } else if (columns.groupListsBy((c) => c.name).length != columns.length) {
-      throw TableDefinitionException(
-          'Duplicated column names are not allowed.');
+    } else if (name.contains('-')) {
+      throw TableDefinitionException('Table name contains "-".');
+    }
+
+    if (columnDefinitions.isEmpty) {
+      throw TableDefinitionException('ColumnDefinitions are empty.');
+    } else if (columnDefinitions.groupListsBy((c) => c.name).length !=
+        columnDefinitions.length) {
+      throw TableDefinitionException('Duplicate column name.');
     }
   }
 
-  String buildCreateTableSql() => 'CREATE TABLE'
-      ' $name'
-      ' ('
-      ' ${columns.map((column) => column.buildCreateTableSql()).join(', ')}'
-      ' )';
+  String buildCreateTableSql() => [
+        'CREATE TABLE',
+        name,
+        '(',
+        [
+          columnDefinitions
+              .map((columnDefinition) => columnDefinition.buildCreateTableSql())
+              .join(', '),
+          primaryKeyDefinitions.isEmpty
+              ? null
+              : 'PRIMARY KEY ( ${primaryKeyDefinitions.map((e) => e.name).join(', ')} )',
+          foreignKeyDefinitions.isEmpty
+              ? null
+              : foreignKeyDefinitions
+                  .map((e) => e.buildForeignKeySql())
+                  .join(', '),
+        ].where((element) => element != null).join(', '),
+        ')',
+      ].join(' ');
 
-  PrimaryKeyDefinition get primaryKey =>
-      columns.whereType<PrimaryKeyDefinition>().first;
+  Iterable<ColumnDefinition> get primaryKeyDefinitions =>
+      columnDefinitions.where((element) => element.isPrimaryKey);
+
+  Iterable<ForeignKeyDefinition> get foreignKeyDefinitions =>
+      columnDefinitions.whereType<ForeignKeyDefinition>();
 
   @override
-  String toString() => 'Table definition'
-      ' :: {'
-      ' name: $name'
-      ', columns: $columns'
-      ' }';
+  String toString() => [
+        'TableDefinition',
+        {
+          'name': name,
+          'columnDefinitions': columnDefinitions.map((e) => e.toString()),
+          'singularName': singularName,
+        },
+      ].join(': ');
 }

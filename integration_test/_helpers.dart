@@ -2,16 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/components/l10n.dart';
-import 'package:mem/core/date_and_time/date_and_time.dart';
-import 'package:mem/core/date_and_time/date_and_time_period.dart';
-import 'package:mem/core/mem.dart';
-import 'package:mem/core/mem_item.dart';
-import 'package:mem/database/definition.dart';
-import 'package:mem/database/table_definitions/base.dart';
-import 'package:mem/database/table_definitions/mem_items.dart';
-import 'package:mem/database/table_definitions/mems.dart';
-import 'package:mem/framework/database/database_manager.dart';
-import 'package:mem/mems/mem_repository_v2.dart';
 
 import 'scenarios/helpers.dart';
 
@@ -24,30 +14,6 @@ Future closeMemListFilter(WidgetTester widgetTester) async =>
 
 TextFormField memNameTextFormField(WidgetTester widgetTester) =>
     (widgetTester.widget(memNameOnDetailPageFinder) as TextFormField);
-
-Future<void> prepareSavedData(
-  String memName,
-  String memMemo, {
-  bool isArchived = false,
-}) async {
-  final database = await DatabaseManager(onTest: true).open(databaseDefinition);
-  final memTable = database.getTable(memTableDefinition.name);
-  final savedMemId = await memTable.insert({
-    defMemName.name: memName,
-    createdAtColDef.name: DateTime.now(),
-    archivedAtColDef.name: isArchived ? DateTime.now() : null,
-  });
-  assert(savedMemId == 1);
-  final memItemTable = database.getTable(memItemTableDefinition.name);
-  await memItemTable.insert({
-    memIdFkDef.name: savedMemId,
-    memItemTypeColDef.name: MemItemType.memo.name,
-    memItemValueColDef.name: memMemo,
-    createdAtColDef.name: DateTime.now(),
-    archivedAtColDef.name: isArchived ? DateTime.now() : null,
-  });
-  await DatabaseManager(onTest: true).close(databaseDefinition.name);
-}
 
 // V2
 /// enum型では文字列を返却することができないためclassで定義する
@@ -80,33 +46,6 @@ abstract class TestSize {
   static const large = 'Large';
 
   TestSize._();
-}
-
-Future<void> prepareSavedMem(
-  String memName,
-  DateTime memNotifyOn,
-  TimeOfDay memNotifyAt,
-) async {
-  final memTable =
-      (await DatabaseManager(onTest: true).open(databaseDefinition))
-          .getTable(memTableDefinition.name);
-
-  await MemRepository(memTable).receive(Mem(
-      name: memName,
-      id: null,
-      period: DateAndTimePeriod(
-        start: DateAndTime(
-          memNotifyOn.year,
-          memNotifyOn.month,
-          memNotifyOn.day,
-          memNotifyAt.hour,
-          memNotifyAt.minute,
-        ),
-      )));
-
-  await DatabaseManager(onTest: true).close(databaseDefinition.name);
-
-  MemRepository.resetWith(null);
 }
 
 Future<void> runTestWidget(WidgetTester widgetTester, Widget widget) =>

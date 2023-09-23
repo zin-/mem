@@ -1,6 +1,6 @@
-import 'package:mem/database/table_definitions/mems.dart';
+import 'package:mem/databases/table_definitions/mems.dart';
 
-import 'i/_database_tuple_entity_v2.dart';
+import 'database_tuple_entity.dart';
 
 class MemEntity extends DatabaseTupleEntity {
   final String name;
@@ -11,11 +11,11 @@ class MemEntity extends DatabaseTupleEntity {
   final DateTime? endAt;
 
   MemEntity.fromMap(Map<String, dynamic> valueMap)
-      : name = valueMap[defMemName.name],
-        doneAt = valueMap[defMemDoneAt.name],
-        notifyOn = valueMap[defMemStartOn.name],
-        notifyAt = valueMap[defMemStartAt.name],
-        endOn = valueMap[defMemEndOn.name],
-        endAt = valueMap[defMemEndAt.name],
+      : name = valueMap[defColMemsName.name],
+        doneAt = valueMap[defColMemsDoneAt.name],
+        notifyOn = valueMap[defColMemsStartOn.name],
+        notifyAt = valueMap[defColMemsStartAt.name],
+        endOn = valueMap[defColMemsEndOn.name],
+        endAt = valueMap[defColMemsEndAt.name],
         super.fromMap(valueMap);
 }

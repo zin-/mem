@@ -6,7 +6,6 @@ import 'package:mem/components/l10n.dart';
 import 'package:mem/components/mem/list/actions.dart';
 import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/core/mem.dart';
-import 'package:mem/framework/database/database_manager.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/mems/list/actions.dart';
 import 'package:mem/mems/list/body.dart';
@@ -14,10 +13,6 @@ import 'package:mem/mems/list/show_new_mem_fab.dart';
 import 'package:mem/mems/states.dart';
 
 void main() {
-  setUpAll(() {
-    DatabaseManager(onTest: true);
-  });
-
   testWidgets('Hide & show ShowNewMemFab.', (widgetTester) async {
     final scrollController = ScrollController();
     final samples = List.generate(
