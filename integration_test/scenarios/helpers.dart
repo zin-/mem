@@ -11,7 +11,7 @@ import 'package:mem/main.dart';
 
 Future<void> runApplication() => main(languageCode: 'en');
 
-const waitSideEffectDuration = Duration(milliseconds: 2500);
+const waitSideEffectDuration = Duration(milliseconds: 2000);
 final zeroDate = DateTime(0);
 
 int randomInt([int max = 42949671]) => Random().nextInt(max);

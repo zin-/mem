@@ -171,7 +171,7 @@ void testActScenario() => group(': $_scenarioName', () {
               final startTime = DateTime.now();
               await widgetTester.tap(startIconFinder);
               await Future.delayed(defaultTransitionDuration);
-              await widgetTester.pumpAndSettle();
+              await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
               expect(startIconFinder, findsNothing);
               [
