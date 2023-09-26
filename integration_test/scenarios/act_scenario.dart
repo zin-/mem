@@ -312,15 +312,15 @@ void testActScenario() => group(': $_scenarioName', () {
               await widgetTester.longPress(find.text(dateText(zeroDate)).at(1));
               await widgetTester.pumpAndSettle();
 
-              await widgetTester.tap(find.byType(Switch).at(1));
-              await widgetTester.pumpAndSettle();
-
               final pickedDate = DateTime.now();
+              await widgetTester.tap(find.byType(Switch).at(1));
+              await widgetTester.pump();
+
               await widgetTester.tap(find.text('OK'));
-              await widgetTester.pumpAndSettle();
+              await widgetTester.pump();
 
               await widgetTester.tap(find.byIcon(Icons.save_alt));
-              await widgetTester.pumpAndSettle();
+              await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
               [
                 insertedMemName,
@@ -356,7 +356,7 @@ void testActScenario() => group(': $_scenarioName', () {
               await widgetTester.pumpAndSettle();
 
               await widgetTester.tap(find.byIcon(Icons.save_alt));
-              await widgetTester.pumpAndSettle();
+              await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
               [
                 insertedMemName,
