@@ -23,34 +23,27 @@ class ActListView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () {
-          List<Mem> mems;
-          if (_memId == null) {
-            mems = ref.watch(memListProvider);
-          } else {
-            mems = [
-              ref.watch(memListProvider).singleWhereOrNull(
-                    (element) => element.id == _memId,
-                  )!
-            ];
-          }
-          final actList = ref.watch(actListProvider(_memId)) ?? [];
-          return AsyncValueView(
-            loadActList(_memId),
-            (data) => _ActListViewComponent(
-              actList.groupListsBy((element) {
-                final dateAndTime = element.period.start!.dateTime;
+        () => AsyncValueView(
+          loadActList(_memId),
+          (data) => _ActListViewComponent(
+            (ref.watch(actListProvider(_memId)) ?? []).groupListsBy((element) {
+              final dateAndTime = element.period.start!.dateTime;
 
-                return DateTime(
-                  dateAndTime.year,
-                  dateAndTime.month,
-                  dateAndTime.day,
-                );
-              }),
-              mems,
-            ),
-          );
-        },
+              return DateTime(
+                dateAndTime.year,
+                dateAndTime.month,
+                dateAndTime.day,
+              );
+            }),
+            _memId == null
+                ? ref.watch(memListProvider)
+                : [
+                    ref.watch(memListProvider).singleWhereOrNull(
+                          (element) => element.id == _memId,
+                        )!
+                  ],
+          ),
+        ),
         _memId,
       );
 }
@@ -68,54 +61,52 @@ class _ActListViewComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => v(
-        () {
-          return CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                title: Text(_mems.length == 1 ? _mems.single.name : "Acts"),
-                floating: true,
-              ),
-              ..._groupedActList.entries.map(
-                (e) => SliverStickyHeader(
-                  header: Container(
-                    padding: pagePadding,
-                    color: Colors.white,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        DateAndTimeText(
-                          DateAndTime.from(e.key),
-                          style: subHeaderTextStyle,
-                        ),
-                        Text(
-                          e.value.length.toString(),
-                          style: subHeaderTextStyle,
-                        )
-                      ],
-                    ),
+        () => CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              title: Text(_mems.length == 1 ? _mems.single.name : "Acts"),
+              floating: true,
+            ),
+            ..._groupedActList.entries.map(
+              (e) => SliverStickyHeader(
+                header: Container(
+                  padding: pagePadding,
+                  color: Colors.white,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      DateAndTimeText(
+                        DateAndTime.from(e.key),
+                        style: subHeaderTextStyle,
+                      ),
+                      Text(
+                        e.value.length.toString(),
+                        style: subHeaderTextStyle,
+                      )
+                    ],
                   ),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      childCount: e.value.length,
-                      (context, index) {
-                        final act = e.value.toList()[index];
-                        return ActListItemView(
-                          context,
-                          act,
-                          mem: _mems.length > 1
-                              ? _mems.singleWhereOrNull(
-                                  (element) => element.id == act.memId,
-                                )
-                              : null,
-                        );
-                      },
-                    ),
+                ),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    childCount: e.value.length,
+                    (context, index) {
+                      final act = e.value.toList()[index];
+                      return ActListItemView(
+                        context,
+                        act,
+                        mem: _mems.length > 1
+                            ? _mems.singleWhereOrNull(
+                                (element) => element.id == act.memId,
+                              )
+                            : null,
+                      );
+                    },
                   ),
                 ),
               ),
-            ],
-          );
-        },
+            ),
+          ],
+        ),
         [_groupedActList, _mems],
       );
 }
