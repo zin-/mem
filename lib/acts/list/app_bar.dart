@@ -26,6 +26,9 @@ class ActListAppBar extends ConsumerWidget {
       );
 }
 
+// TODO add toggle
+//  最初は日毎の合計時間で件数に変更できる
+//  state自体はActListの下に定義する
 class _ActListAppBar extends StatelessWidget {
   final String? _memName;
 
