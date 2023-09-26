@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:mem/acts/actions.dart';
+import 'package:mem/acts/list/app_bar.dart';
 import 'package:mem/acts/states.dart';
 import 'package:mem/components/async_value_view.dart';
 import 'package:mem/components/date_and_time/date_and_time_view.dart';
@@ -26,6 +27,7 @@ class ActListView extends ConsumerWidget {
         () => AsyncValueView(
           loadActList(_memId),
           (data) => _ActListViewComponent(
+            _memId,
             (ref.watch(actListProvider(_memId)) ?? []).groupListsBy((element) {
               final dateAndTime = element.period.start!.dateTime;
 
@@ -51,10 +53,12 @@ class ActListView extends ConsumerWidget {
 class _ActListViewComponent extends StatelessWidget {
   final subHeaderTextStyle = const TextStyle(color: secondaryGreyColor);
 
+  final int? _memId;
   final Map<DateTime, List<Act>> _groupedActList;
   final List<Mem> _mems;
 
   const _ActListViewComponent(
+    this._memId,
     this._groupedActList,
     this._mems,
   );
@@ -63,10 +67,7 @@ class _ActListViewComponent extends StatelessWidget {
   Widget build(BuildContext context) => v(
         () => CustomScrollView(
           slivers: [
-            SliverAppBar(
-              title: Text(_mems.length == 1 ? _mems.single.name : "Acts"),
-              floating: true,
-            ),
+            ActListAppBar(_memId),
             ..._groupedActList.entries.map(
               (e) => SliverStickyHeader(
                 header: Container(

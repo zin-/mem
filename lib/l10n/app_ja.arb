@@ -5,6 +5,7 @@
   "memListPageTitle": "List",
   "memDetailPageTitle": "Detail",
   "actCounterConfigureTitle":"Select target",
+  "actListPageTitle":"Acts",
 
   "memNameLabel": "Name",
   "memMemoLabel": "Memo",
