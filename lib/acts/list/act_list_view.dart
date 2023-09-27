@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:mem/acts/actions.dart';
 import 'package:mem/acts/list/app_bar.dart';
+import 'package:mem/acts/list/states.dart';
 import 'package:mem/acts/states.dart';
 import 'package:mem/components/async_value_view.dart';
 import 'package:mem/components/date_and_time/date_and_time_view.dart';
@@ -44,6 +45,7 @@ class ActListView extends ConsumerWidget {
                           (element) => element.id == _memId,
                         )!
                   ],
+            ref.watch(timeViewProvider),
           ),
         ),
         _memId,
@@ -56,11 +58,13 @@ class _ActListViewComponent extends StatelessWidget {
   final int? _memId;
   final Map<DateTime, List<Act>> _groupedActList;
   final List<Mem> _mems;
+  final bool _timeView;
 
   const _ActListViewComponent(
     this._memId,
     this._groupedActList,
     this._mems,
+    this._timeView,
   );
 
   @override
@@ -108,6 +112,6 @@ class _ActListViewComponent extends StatelessWidget {
             ),
           ],
         ),
-        [_groupedActList, _mems],
+        [_memId, _groupedActList, _mems, _timeView],
       );
 }

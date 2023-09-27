@@ -92,22 +92,15 @@ void testActScenario() => group(': $_scenarioName', () {
       }
 
       group(': ActListPage', () {
-        Future<void> showActListPage(WidgetTester widgetTester) async {
-          await showMemListPage(widgetTester);
-
-          await widgetTester.tap(find.text(insertedMemName));
-          await widgetTester.pumpAndSettle();
-
-          await widgetTester.tap(showActPageIconFinder);
-          await widgetTester.pumpAndSettle();
-        }
-
         group(": All", () {
           testWidgets(': show inserted acts.', (widgetTester) async {
             await runApplication();
             await widgetTester.pumpAndSettle();
 
             await widgetTester.tap(find.byIcon(Icons.playlist_play));
+            await widgetTester.pumpAndSettle();
+
+            await widgetTester.tap(find.byIcon(Icons.numbers));
             await widgetTester.pumpAndSettle();
 
             [
@@ -135,6 +128,19 @@ void testActScenario() => group(': $_scenarioName', () {
         });
 
         group(": by Mem", () {
+          Future<void> showActListPage(WidgetTester widgetTester) async {
+            await showMemListPage(widgetTester);
+
+            await widgetTester.tap(find.text(insertedMemName));
+            await widgetTester.pumpAndSettle();
+
+            await widgetTester.tap(showActPageIconFinder);
+            await widgetTester.pumpAndSettle();
+
+            await widgetTester.tap(find.byIcon(Icons.numbers));
+            await widgetTester.pumpAndSettle();
+          }
+
           group(": show inserted acts", () {
             setUp(() async {
               await dbA.insert(
