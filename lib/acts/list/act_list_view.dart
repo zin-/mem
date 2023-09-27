@@ -5,6 +5,7 @@ import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:mem/acts/actions.dart';
 import 'package:mem/acts/list/app_bar.dart';
 import 'package:mem/acts/list/states.dart';
+import 'package:mem/acts/list/total_act_time_item.dart';
 import 'package:mem/acts/states.dart';
 import 'package:mem/components/async_value_view.dart';
 import 'package:mem/components/date_and_time/date_and_time_view.dart';
@@ -100,21 +101,41 @@ class _ActListViewComponent extends StatelessWidget {
                   ),
                 ),
                 sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    childCount: e.value.length,
-                    (context, index) {
-                      final act = e.value.toList()[index];
-                      return ActListItemView(
-                        context,
-                        act,
-                        mem: _mems.length > 1
-                            ? _mems.singleWhereOrNull(
-                                (element) => element.id == act.memId,
-                              )
-                            : null,
-                      );
-                    },
-                  ),
+                  delegate: _timeView
+                      ? SliverChildBuilderDelegate(
+                          childCount: e.value
+                              .groupListsBy((element) => element.memId)
+                              .length,
+                          (context, index) {
+                            final entry = e.value
+                                .groupListsBy((element) => element.memId)
+                                .entries
+                                .toList()[index];
+
+                            return TotalActTimeListItem(
+                              entry.value,
+                              _mems.length > 1
+                                  ? _mems.singleWhereOrNull(
+                                      (element) => element.id == entry.key)
+                                  : null,
+                            );
+                          },
+                        )
+                      : SliverChildBuilderDelegate(
+                          childCount: e.value.length,
+                          (context, index) {
+                            final act = e.value.toList()[index];
+                            return ActListItemView(
+                              context,
+                              act,
+                              mem: _mems.length > 1
+                                  ? _mems.singleWhereOrNull(
+                                      (element) => element.id == act.memId,
+                                    )
+                                  : null,
+                            );
+                          },
+                        ),
                 ),
               ),
             ),
