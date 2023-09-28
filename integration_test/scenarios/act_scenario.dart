@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/components/timer.dart';
+import 'package:mem/core/date_and_time/duration.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/base.dart';
@@ -25,11 +26,13 @@ void main() {
 const _scenarioName = 'Act scenario';
 
 void testActScenario() => group(': $_scenarioName', () {
+      const oneMin = Duration(minutes: 1);
+      const insertedMemName = '$_scenarioName: inserted mem - name';
+
       final showActPageIconFinder = find.byIcon(Icons.play_arrow);
       final startIconFinder = find.byIcon(Icons.play_arrow);
       final stopIconFinder = find.byIcon(Icons.stop);
-
-      const insertedMemName = '$_scenarioName: inserted mem - name';
+      final oneMinDate = zeroDate.add(oneMin);
 
       late final DatabaseAccessor dbA;
       late final int insertedMemId;
@@ -79,7 +82,7 @@ void testActScenario() => group(': $_scenarioName', () {
             defFkActsMemId.name: insertedMemId,
             defColActsStart.name: zeroDate,
             defColActsStartIsAllDay.name: 0,
-            defColActsEnd.name: zeroDate,
+            defColActsEnd.name: oneMinDate,
             defColActsEndIsAllDay.name: 0,
             defColCreatedAt.name: zeroDate,
           },
@@ -93,38 +96,71 @@ void testActScenario() => group(': $_scenarioName', () {
 
       group(': ActListPage', () {
         group(": All", () {
-          testWidgets(': show inserted acts.', (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+          group(
+            ": show inserted acts",
+            () {
+              testWidgets(': time.', (widgetTester) async {
+                await runApplication();
+                await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.byIcon(Icons.playlist_play));
-            await widgetTester.pumpAndSettle();
+                await widgetTester.tap(find.byIcon(Icons.playlist_play));
+                await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.byIcon(Icons.numbers));
-            await widgetTester.pumpAndSettle();
+                expect(startIconFinder, findsNothing);
+                expect(stopIconFinder, findsNothing);
+                [
+                  "Acts",
+                  dateText(zeroDate),
+                  oneMin.format(),
+                  oneMin.format(),
+                  "1",
+                  insertedMemName,
+                ].forEachIndexed((index, t) {
+                  expect(
+                    (widgetTester.widget(find.byType(Text).at(index)) as Text)
+                        .data,
+                    t,
+                    reason: "Index is \"$index\".",
+                  );
+                });
+              });
 
-            [
-              "Acts",
-              dateText(zeroDate),
-              "1",
-              dateText(zeroDate),
-              " ",
-              timeText(zeroDate),
-              "~",
-              dateText(zeroDate),
-              " ",
-              timeText(zeroDate),
-              insertedMemName,
-            ].forEachIndexed((index, t) {
-              expect(
-                (widgetTester.widget(find.byType(Text).at(index)) as Text).data,
-                t,
-                reason: "Index is \"$index\".",
-              );
-            });
-            expect(startIconFinder, findsNothing);
-            expect(stopIconFinder, findsNothing);
-          });
+              testWidgets(': count.', (widgetTester) async {
+                await runApplication();
+                await widgetTester.pumpAndSettle();
+
+                await widgetTester.tap(find.byIcon(Icons.playlist_play));
+                await widgetTester.pumpAndSettle();
+
+                await widgetTester.tap(find.byIcon(Icons.numbers));
+                await widgetTester.pumpAndSettle();
+
+                expect(startIconFinder, findsNothing);
+                expect(stopIconFinder, findsNothing);
+                expect(find.byIcon(Icons.access_time), findsOneWidget);
+                [
+                  "Acts",
+                  dateText(zeroDate),
+                  "1",
+                  dateText(zeroDate),
+                  " ",
+                  timeText(zeroDate),
+                  "~",
+                  dateText(oneMinDate),
+                  " ",
+                  timeText(oneMinDate),
+                  insertedMemName,
+                ].forEachIndexed((index, t) {
+                  expect(
+                    (widgetTester.widget(find.byType(Text).at(index)) as Text)
+                        .data,
+                    t,
+                    reason: "Index is \"$index\".",
+                  );
+                });
+              });
+            },
+          );
         });
 
         group(": by Mem", () {
@@ -171,9 +207,9 @@ void testActScenario() => group(': $_scenarioName', () {
                   " ",
                   timeText(zeroDate),
                   "~",
-                  dateText(zeroDate),
+                  dateText(oneMinDate),
                   " ",
-                  timeText(zeroDate),
+                  timeText(oneMinDate),
                 ].forEachIndexed((index, t) {
                   expect(
                     (widgetTester.widget(find.byType(Text).at(index)) as Text)
@@ -213,9 +249,9 @@ void testActScenario() => group(': $_scenarioName', () {
                 " ",
                 timeText(zeroDate),
                 "~",
-                dateText(zeroDate),
+                dateText(oneMinDate),
                 " ",
-                timeText(zeroDate),
+                timeText(oneMinDate),
               ].forEachIndexed((index, t) {
                 expect(
                   (widgetTester.widget(find.byType(Text).at(index)) as Text)
@@ -246,9 +282,9 @@ void testActScenario() => group(': $_scenarioName', () {
                 " ",
                 timeText(zeroDate),
                 "~",
-                dateText(zeroDate),
+                dateText(oneMinDate),
                 " ",
-                timeText(zeroDate),
+                timeText(oneMinDate),
               ].forEachIndexed((index, t) {
                 expect(
                   (widgetTester.widget(find.byType(Text).at(index)) as Text)
@@ -285,9 +321,9 @@ void testActScenario() => group(': $_scenarioName', () {
                 " ",
                 timeText(zeroDate),
                 "~",
-                dateText(zeroDate),
+                dateText(oneMinDate),
                 " ",
-                timeText(zeroDate),
+                timeText(oneMinDate),
               ].forEachIndexed((index, t) {
                 expect(
                   (widgetTester.widget(find.byType(Text).at(index)) as Text)
@@ -343,9 +379,9 @@ void testActScenario() => group(': $_scenarioName', () {
                 " ",
                 timeText(zeroDate),
                 "~",
-                dateText(zeroDate),
+                dateText(oneMinDate),
                 " ",
-                timeText(zeroDate),
+                timeText(oneMinDate),
               ].forEachIndexed((index, t) {
                 expect(
                   (widgetTester.widget(find.byType(Text).at(index)) as Text)
@@ -406,9 +442,9 @@ void testActScenario() => group(': $_scenarioName', () {
                 " ",
                 timeText(zeroDate),
                 "~",
-                dateText(zeroDate),
+                dateText(oneMinDate),
                 " ",
-                timeText(zeroDate),
+                timeText(oneMinDate),
               ].forEachIndexed((index, t) {
                 expect(
                   (widgetTester.widget(find.byType(Text).at(index)) as Text)
