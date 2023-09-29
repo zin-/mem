@@ -5,6 +5,8 @@ abstract class DateAndTimePeriod implements Comparable<DateAndTimePeriod> {
 
   DateAndTime? get end;
 
+  Duration get duration => Duration.zero;
+
   DateAndTimePeriod._();
 
   factory DateAndTimePeriod({DateAndTime? start, DateAndTime? end}) {
@@ -88,6 +90,9 @@ class _WithStartAndEnd extends DateAndTimePeriod
 
   @override
   final DateAndTime end;
+
+  @override
+  Duration get duration => end.difference(start);
 
   _WithStartAndEnd(this.start, this.end) : super._() {
     if (start.compareTo(end) > 0) {
