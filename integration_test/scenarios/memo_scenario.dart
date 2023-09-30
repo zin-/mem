@@ -11,7 +11,7 @@ import 'package:mem/framework/database/factory.dart';
 import 'package:mem/repositories/database_repository.dart';
 import 'package:mem/values/durations.dart';
 
-import '../_helpers.dart';
+import '../helpers.dart';
 import 'helpers.dart';
 
 void main() {
