@@ -2,8 +2,30 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/framework/database/accessor.dart';
+import 'package:mem/framework/database/definition/database_definition.dart';
+import 'package:mem/framework/database/factory.dart';
 import 'package:mem/main.dart';
+import 'package:mem/repositories/database_repository.dart';
 
+// Database(DB) operations
+Future<DatabaseAccessor> openTestDatabase(
+  DatabaseDefinition databaseDefinition,
+) async {
+  DatabaseFactory.onTest = true;
+  return await DatabaseRepository().receive(databaseDefinition);
+}
+
+Future<void> clearAllTestDatabaseRows(
+  DatabaseDefinition databaseDefinition,
+) async {
+  final databaseAccessor = await openTestDatabase(databaseDefinition);
+  for (var tableDefinition in databaseDefinition.tableDefinitions.reversed) {
+    await databaseAccessor.delete(tableDefinition);
+  }
+}
+
+// Application operations
 Future<void> runApplication() => main(languageCode: 'en');
 
 const waitSideEffectDuration = Duration(milliseconds: 1500);

@@ -7,12 +7,6 @@ void main() {
   testEdgeScenario();
 }
 
-void testEdgeScenario() => group(
-      'Edge scenario',
-      () {
-        group(
-          'Edge scenario',
-          () {},
-        );
-      },
-    );
+const _scenarioName = "Edge scenario";
+
+void testEdgeScenario() => group(": $_scenarioName", () {});
