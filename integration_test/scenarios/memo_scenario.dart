@@ -9,7 +9,6 @@ import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/values/durations.dart';
 
-import '../helpers.dart';
 import 'helpers.dart';
 
 void main() {
@@ -222,10 +221,10 @@ void testMemoScenario() => group(
                   find.text(insertedMemName),
                   findsNothing,
                 );
-                await widgetTester.tap(memListFilterButton);
+                await widgetTester.tap(memListFilterButtonFinder);
                 await widgetTester.pumpAndSettle();
 
-                await widgetTester.tap(findShowArchiveSwitch);
+                await widgetTester.tap(showArchiveSwitchFinder);
                 await widgetTester.pumpAndSettle();
 
                 await closeMemListFilter(widgetTester);
@@ -244,10 +243,10 @@ void testMemoScenario() => group(
 
                 expect(find.text(unarchivedMemName), findsOneWidget);
                 expect(find.text(archivedMemName), findsOneWidget);
-                await widgetTester.tap(memListFilterButton);
+                await widgetTester.tap(memListFilterButtonFinder);
                 await widgetTester.pumpAndSettle();
 
-                await widgetTester.tap(findShowNotArchiveSwitch);
+                await widgetTester.tap(showNotArchiveSwitchFinder);
                 await widgetTester.pumpAndSettle();
 
                 await closeMemListFilter(widgetTester);

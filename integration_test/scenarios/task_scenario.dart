@@ -53,7 +53,7 @@ void testTaskScenario() => group(': $scenarioName', () {
 
           expect(find.text('M/d/y'), findsNWidgets(2));
           expect(calendarIconFinder, findsNWidgets(2));
-          expect(switchFinder, findsNWidgets(2));
+          expect(find.byType(Switch), findsNWidgets(2));
           expect(timeIconFinder, findsOneWidget);
           await widgetTester.tap(calendarIconFinder.at(0));
           await widgetTester.pumpAndSettle();
@@ -75,7 +75,7 @@ void testTaskScenario() => group(': $scenarioName', () {
           );
           expect(timeIconFinder, findsOneWidget);
 
-          await widgetTester.tap(switchFinder.at(0));
+          await widgetTester.tap(find.byType(Switch).at(0));
           await widgetTester.pumpAndSettle();
 
           await widgetTester.tap(find.text('OK'));
