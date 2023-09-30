@@ -40,6 +40,21 @@ void testTaskScenario() => group(': $scenarioName', () {
         });
       });
 
+      group(": show Period", () {
+        testWidgets(": new Mem has no period.", (widgetTester) async {
+          await runApplication();
+          await widgetTester.pumpAndSettle();
+
+          await widgetTester.tap(newMemFabFinder);
+          await widgetTester.pumpAndSettle();
+
+          expect(find.text(datePlaceHolder), findsNWidgets(2));
+          expect(calendarIconFinder, findsNWidgets(2));
+          expect(find.byType(Switch), findsNWidgets(2));
+          expect(timeIconFinder, findsOneWidget);
+        });
+      });
+
       testWidgets(
         ': Set Period.',
         (widgetTester) async {
@@ -51,10 +66,6 @@ void testTaskScenario() => group(': $scenarioName', () {
           await widgetTester.tap(newMemFabFinder);
           await widgetTester.pumpAndSettle();
 
-          expect(find.text('M/d/y'), findsNWidgets(2));
-          expect(calendarIconFinder, findsNWidgets(2));
-          expect(find.byType(Switch), findsNWidgets(2));
-          expect(timeIconFinder, findsOneWidget);
           await widgetTester.tap(calendarIconFinder.at(0));
           await widgetTester.pumpAndSettle();
 

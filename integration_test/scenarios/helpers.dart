@@ -56,6 +56,7 @@ final memMemoOnDetailPageFinder = find.byType(TextFormField).at(6);
 // Constants
 const waitSideEffectDuration = Duration(milliseconds: 1500);
 final zeroDate = DateTime(0);
+const datePlaceHolder = "M/d/y";
 
 // Value builder
 int randomInt([int max = 42949671]) => Random().nextInt(max);
