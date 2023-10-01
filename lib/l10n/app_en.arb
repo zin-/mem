@@ -54,6 +54,7 @@
 
   "done_label": "Done",
   "finish_label": "Finish",
+  "pause_act_label": "Pause",
   "start_label": "Start",
 
   "reminder_name": "Reminder",

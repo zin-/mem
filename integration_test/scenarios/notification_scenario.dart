@@ -314,5 +314,17 @@ void testNotificationScenario() => group(": $_scenarioName", () {
             );
           });
         });
+
+        testWidgets(": pause act.", (widgetTester) async {
+          final details = NotificationResponse(
+            notificationResponseType:
+                NotificationResponseType.selectedNotificationAction,
+            id: memRepeatedNotificationId(insertedMemId!),
+            payload: json.encode({memIdKey: insertedMemId}),
+            actionId: NotificationClient().pauseAct.id,
+          );
+
+          await onDidReceiveNotificationResponse(details);
+        });
       });
     });

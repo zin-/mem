@@ -54,6 +54,7 @@
 
   "done_label": "Done",
   "finish_label": "終了",
+  "pause_act_label": "一時停止",
   "start_label": "開始",
 
   "reminder_name": "Reminder",

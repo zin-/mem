@@ -6,6 +6,7 @@ import 'package:mem/notifications/notification/action.dart';
 import 'package:mem/notifications/notification/channel.dart';
 import 'package:mem/notifications/notification/done_mem_notification_action.dart';
 import 'package:mem/notifications/notification/finish_active_act_notification_action.dart';
+import 'package:mem/notifications/notification/pause_act_notification_action.dart';
 import 'package:mem/notifications/notification/start_act_notification_action.dart';
 
 class NotificationClient {
@@ -17,6 +18,7 @@ class NotificationClient {
   late final NotificationAction doneMemAction;
   late final NotificationAction startActAction;
   late final NotificationAction finishActiveActAction;
+  late final NotificationAction pauseAct;
 
   final notificationActions = <NotificationAction>[];
 
@@ -52,7 +54,10 @@ class NotificationClient {
       startActAction =
           StartActNotificationAction('start-act', l10n.start_label),
       finishActiveActAction = FinishActiveActNotificationAction(
-          'finish-active_act', l10n.finish_label),
+        'finish-active_act',
+        l10n.finish_label,
+      ),
+      pauseAct = PauseActNotificationAction('pause-act', l10n.pause_act_label),
     ]);
   }
 
