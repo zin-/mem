@@ -475,7 +475,7 @@ void testActScenario() => group(': $_scenarioName', () {
               defColCreatedAt.name: zeroDate,
             },
           );
-          for (int i = 0; i < 6; i++) {
+          for (int i = 0; i < 32; i++) {
             final start = now.subtract(Duration(days: i));
             for (int j = 0; j < randomInt(5); j++) {
               await dbA.insert(
@@ -493,20 +493,17 @@ void testActScenario() => group(': $_scenarioName', () {
           }
         });
 
-        testWidgets(
-          ": show chart",
-          (widgetTester) async {
-            await showMemListPage(widgetTester);
+        testWidgets(": show chart", (widgetTester) async {
+          await showMemListPage(widgetTester);
 
-            await widgetTester.tap(find.text(insertedMemName));
-            await widgetTester.pumpAndSettle();
+          await widgetTester.tap(find.text(insertedMemName));
+          await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.byIcon(Icons.show_chart));
-            await widgetTester.pumpAndSettle();
+          await widgetTester.tap(find.byIcon(Icons.show_chart));
+          await widgetTester.pumpAndSettle();
 
-            expect(true, isTrue);
-          },
-        );
+          expect(true, isTrue);
+        });
       });
 
       group(': MemListPage', () {

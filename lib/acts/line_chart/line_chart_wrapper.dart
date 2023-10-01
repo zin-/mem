@@ -39,27 +39,23 @@ class LineChartWrapper extends StatelessWidget {
             final dateTime = DateTime.fromMillisecondsSinceEpoch(
               value.toInt(),
             );
-            if (value == meta.min || value == meta.max || dateTime.month == 1) {
-              return Text(
-                DateFormat.yMd().format(
-                  dateTime,
-                ),
-              );
-            } else if (dateTime.day == 1) {
-              return Text(DateFormat.Md().format(
-                dateTime,
-              ));
-            } else if (dateTime.day == 5 ||
-                dateTime.day == 10 ||
-                dateTime.day == 15 ||
-                dateTime.day == 20 ||
-                dateTime.day == 25) {
-              return Text(DateFormat.d().format(
-                dateTime,
-              ));
-            } else {
-              return const Text('');
-            }
+
+            return Text(
+              (value == meta.min || value == meta.max || dateTime.month == 1
+                          ? DateFormat.yMd()
+                          : dateTime.day == 1
+                              ? DateFormat.Md()
+                              : dateTime.day == 5 ||
+                                      dateTime.day == 10 ||
+                                      dateTime.day == 15 ||
+                                      dateTime.day == 20 ||
+                                      dateTime.day == 25 ||
+                                      dateTime.day == 30
+                                  ? DateFormat.d()
+                                  : null)
+                      ?.format(dateTime) ??
+                  "",
+            );
           },
         ),
       ),
