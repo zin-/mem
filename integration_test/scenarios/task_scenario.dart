@@ -77,28 +77,27 @@ void testTaskScenario() => group(': $scenarioName', () {
           await widgetTester.tap(find.text('OK'));
           await widgetTester.pumpAndSettle();
 
-          final startDate = '${now.month + 1}/$pickingStartDate/${now.year}';
+          final startDate = DateTime(now.year, now.month + 1, pickingStartDate);
           expect(
             (widgetTester.widget(find.byType(TextFormField).at(1))
                     as TextFormField)
                 .initialValue,
-            startDate,
+            dateText(startDate),
           );
           expect(timeIconFinder, findsOneWidget);
 
           await widgetTester.tap(find.byType(Switch).at(0));
           await widgetTester.pumpAndSettle();
 
+          final pickingStartTime = DateTime.now();
           await widgetTester.tap(find.text('OK'));
           await widgetTester.pumpAndSettle();
 
-          final start = DateTime.now();
-          final startTime = timeText(start);
           expect(
             (widgetTester.widget(find.byType(TextFormField).at(2))
                     as TextFormField)
                 .initialValue,
-            startTime,
+            timeText(pickingStartTime),
           );
           expect(timeIconFinder, findsNWidgets(2));
 
@@ -113,13 +112,12 @@ void testTaskScenario() => group(': $scenarioName', () {
           await widgetTester.tap(find.text('OK'));
           await widgetTester.pumpAndSettle();
 
-          final endDate =
-              dateText(DateTime(now.year, now.month + 2, pickingEndDate));
+          final endDate = DateTime(now.year, now.month + 2, pickingEndDate);
           expect(
             (widgetTester.widget(find.byType(TextFormField).at(3))
                     as TextFormField)
                 .initialValue,
-            endDate,
+            dateText(endDate),
           );
 
           const enteringMemName =
@@ -144,7 +142,7 @@ void testTaskScenario() => group(': $scenarioName', () {
 
           expect(find.text(dateText(savedMemStartAt)), findsOneWidget);
           expect(find.text(timeText(savedMemStartAt)), findsOneWidget);
-          expect(find.text(endDate), findsOneWidget);
+          expect(find.text(dateText(endDate)), findsOneWidget);
         },
       );
     });
