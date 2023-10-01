@@ -63,6 +63,8 @@
   "repeated_reminder_description": "1日の指定された時間に通知します。",
   "active_act_notification": "実施中のAct",
   "active_act_notification_description": "開始済みのActを表示します。",
+  "paused_act_notification": "一時停止中のAct",
+  "paused_act_notification_description": "素早く再開するために一時停止中のActを表示します。",
   "after_act_started_notification": "Act開始後の通知",
   "after_act_started_notification_description": "Act開始の指定時間後に通知します。",
 

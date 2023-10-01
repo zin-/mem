@@ -13,6 +13,7 @@ class NotificationClient {
   late final NotificationChannel reminderChannel;
   late final NotificationChannel repeatedReminderChannel;
   late final NotificationChannel activeActNotificationChannel;
+  late final NotificationChannel pausedAct;
   late final NotificationChannel afterActStartedNotificationChannel;
 
   late final NotificationAction doneMemAction;
@@ -37,6 +38,14 @@ class NotificationClient {
       'active_act-notification',
       l10n.active_act_notification,
       l10n.active_act_notification_description,
+      usesChronometer: true,
+      ongoing: true,
+      autoCancel: false,
+    );
+    pausedAct = NotificationChannel(
+      "paused_act",
+      l10n.paused_act_notification,
+      l10n.paused_act_notification_description,
       usesChronometer: true,
       ongoing: true,
       autoCancel: false,

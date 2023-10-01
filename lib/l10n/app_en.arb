@@ -63,6 +63,8 @@
   "repeated_reminder_description": "To remind at specific time per day.",
   "active_act_notification": "Active act",
   "active_act_notification_description": "To show active act.",
+  "paused_act_notification": "Paused act",
+  "paused_act_notification_description": "To start again act.",
   "after_act_started_notification": "After act started",
   "after_act_started_notification_description": "To remind specific amount of time after act started.",
 

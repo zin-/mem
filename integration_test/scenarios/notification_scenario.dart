@@ -315,16 +315,47 @@ void testNotificationScenario() => group(": $_scenarioName", () {
           });
         });
 
-        testWidgets(": pause act.", (widgetTester) async {
-          final details = NotificationResponse(
-            notificationResponseType:
-                NotificationResponseType.selectedNotificationAction,
-            id: memRepeatedNotificationId(insertedMemId!),
-            payload: json.encode({memIdKey: insertedMemId}),
-            actionId: NotificationClient().pauseAct.id,
-          );
+        group(": pause act", () {
+          testWidgets(": no active act.", (widgetTester) async {
+            final details = NotificationResponse(
+              notificationResponseType:
+                  NotificationResponseType.selectedNotificationAction,
+              id: memRepeatedNotificationId(insertedMemId!),
+              payload: json.encode({memIdKey: insertedMemId}),
+              actionId: NotificationClient().pauseAct.id,
+            );
 
-          await onDidReceiveNotificationResponse(details);
+            await onDidReceiveNotificationResponse(details);
+          });
+
+          group(": 2 active acts", () {
+            setUp(() async {
+              dbA.insert(defTableActs, {
+                defFkActsMemId.name: insertedMemId,
+                defColActsStart.name: zeroDate,
+                defColActsStartIsAllDay.name: false,
+                defColCreatedAt.name: zeroDate,
+              });
+              dbA.insert(defTableActs, {
+                defFkActsMemId.name: insertedMemId,
+                defColActsStart.name: zeroDate,
+                defColActsStartIsAllDay.name: false,
+                defColCreatedAt.name: zeroDate,
+              });
+            });
+
+            testWidgets(": no thrown.", (widgetTester) async {
+              final details = NotificationResponse(
+                notificationResponseType:
+                    NotificationResponseType.selectedNotificationAction,
+                id: memRepeatedNotificationId(insertedMemId!),
+                payload: json.encode({memIdKey: insertedMemId}),
+                actionId: NotificationClient().pauseAct.id,
+              );
+
+              await onDidReceiveNotificationResponse(details);
+            });
+          });
         });
       });
     });
