@@ -35,6 +35,16 @@ abstract class DateAndTimePeriod implements Comparable<DateAndTimePeriod> {
 
   DateAndTimePeriod copiedWith(DateAndTime? end) =>
       DateAndTimePeriod(start: start, end: end);
+
+  static int compare(DateAndTimePeriod? a, DateAndTimePeriod? b) {
+    if (a != null && b != null) {
+      return a.compareTo(b);
+    } else if (a == null && b == null) {
+      return 0;
+    } else {
+      return a == null ? 1 : -1;
+    }
+  }
 }
 
 class _WithStartOnly extends DateAndTimePeriod

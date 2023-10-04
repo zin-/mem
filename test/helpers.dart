@@ -55,6 +55,14 @@ Widget buildTestAppWithProvider(
       child: buildTestApp(widget),
     );
 
+class TestCaseV2<I> {
+  final I input;
+  final dynamic expected;
+  final String? name;
+
+  TestCaseV2(this.input, this.expected, {this.name});
+}
+
 class TestCase<T> {
   final String name;
   final T input;

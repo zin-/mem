@@ -2,6 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 
+import '../helpers.dart';
+
 void main() {
   group('Create instance', () {
     group(': Constructor', () {
@@ -260,5 +262,42 @@ void main() {
     });
     //e   -|
     //   |-|
+  });
+
+  group(": compare", () {
+    for (var testCase in [
+      TestCaseV2(
+        name: "both are not null",
+        [
+          DateAndTimePeriod.startNow(),
+          DateAndTimePeriod(end: DateAndTime.now()),
+        ],
+        DateAndTimePeriod.startNow()
+            .compareTo(DateAndTimePeriod(end: DateAndTime.now())),
+      ),
+      TestCaseV2(
+        name: "both are null",
+        [null, null],
+        0,
+      ),
+      TestCaseV2(
+        name: "a is null, b is not null",
+        [null, DateAndTimePeriod.startNow()],
+        1,
+      ),
+      TestCaseV2(
+        name: "a is not null, b is null",
+        [DateAndTimePeriod.startNow(), null],
+        -1,
+      ),
+    ]) {
+      test(
+        ": ${testCase.name}.",
+        () => expect(
+          DateAndTimePeriod.compare(testCase.input[0], testCase.input[1]),
+          testCase.expected,
+        ),
+      );
+    }
   });
 }
