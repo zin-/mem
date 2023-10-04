@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/states.dart';
 import 'package:mem/core/act.dart';
+import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/components/value_state_notifier.dart';
@@ -82,12 +83,9 @@ final memListProvider =
           return a.isDone() ? 1 : -1;
         }
 
-        final aPeriod = a.period;
-        final bPeriod = b.period;
-        if (aPeriod != null && bPeriod != null) {
-          return aPeriod.compareTo(bPeriod);
-        } else if (aPeriod != null || bPeriod != null) {
-          return aPeriod == null ? 1 : -1;
+        final comparedPeriod = DateAndTimePeriod.compare(a.period, b.period);
+        if (comparedPeriod != 0) {
+          return comparedPeriod;
         }
 
         return (a.id as int).compareTo(b.id);
