@@ -6,17 +6,20 @@ import 'package:mem/notifications/notification/action.dart';
 import 'package:mem/notifications/notification/channel.dart';
 import 'package:mem/notifications/notification/done_mem_notification_action.dart';
 import 'package:mem/notifications/notification/finish_active_act_notification_action.dart';
+import 'package:mem/notifications/notification/pause_act_notification_action.dart';
 import 'package:mem/notifications/notification/start_act_notification_action.dart';
 
 class NotificationClient {
   late final NotificationChannel reminderChannel;
   late final NotificationChannel repeatedReminderChannel;
   late final NotificationChannel activeActNotificationChannel;
+  late final NotificationChannel pausedAct;
   late final NotificationChannel afterActStartedNotificationChannel;
 
   late final NotificationAction doneMemAction;
   late final NotificationAction startActAction;
   late final NotificationAction finishActiveActAction;
+  late final NotificationAction pauseAct;
 
   final notificationActions = <NotificationAction>[];
 
@@ -39,6 +42,13 @@ class NotificationClient {
       ongoing: true,
       autoCancel: false,
     );
+    pausedAct = NotificationChannel(
+      "paused_act",
+      l10n.paused_act_notification,
+      l10n.paused_act_notification_description,
+      usesChronometer: true,
+      autoCancel: false,
+    );
     afterActStartedNotificationChannel = NotificationChannel(
       'after_act_started-notification',
       l10n.after_act_started_notification,
@@ -52,7 +62,10 @@ class NotificationClient {
       startActAction =
           StartActNotificationAction('start-act', l10n.start_label),
       finishActiveActAction = FinishActiveActNotificationAction(
-          'finish-active_act', l10n.finish_label),
+        'finish-active_act',
+        l10n.finish_label,
+      ),
+      pauseAct = PauseActNotificationAction('pause-act', l10n.pause_act_label),
     ]);
   }
 

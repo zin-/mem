@@ -5,11 +5,8 @@ import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/databases/definition.dart';
-import 'package:mem/framework/database/factory.dart';
-import 'package:mem/repositories/database_repository.dart';
 import 'package:mem/values/durations.dart';
 
-import '../_helpers.dart';
 import 'helpers.dart';
 
 void main() {
@@ -29,14 +26,10 @@ void testTodoScenario() => group(': $_scenarioName', () {
       late final DatabaseAccessor dbA;
 
       setUpAll(() async {
-        DatabaseFactory.onTest = true;
-        dbA = await DatabaseRepository().receive(databaseDefinition);
+        dbA = await openTestDatabase(databaseDefinition);
       });
       setUp(() async {
-        for (var tableDefinition
-            in databaseDefinition.tableDefinitions.reversed) {
-          await dbA.delete(tableDefinition);
-        }
+        await clearAllTestDatabaseRows(databaseDefinition);
 
         await dbA.insert(defTableMems, {
           defColMemsName.name: insertedMemName,
@@ -75,7 +68,7 @@ void testTodoScenario() => group(': $_scenarioName', () {
             expect(find.text(insertedMemName), findsNothing);
             expect(find.text(undoneMemName), findsOneWidget);
             expect(find.text(doneMemName), findsNothing);
-            await widgetTester.tap(memListFilterButton);
+            await widgetTester.tap(memListFilterButtonFinder);
             await widgetTester.pumpAndSettle();
             await widgetTester.tap(find.byType(Switch).at(3));
             await closeMemListFilter(widgetTester);
@@ -93,7 +86,7 @@ void testTodoScenario() => group(': $_scenarioName', () {
             await widgetTester.pageBack();
             await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(memListFilterButton);
+            await widgetTester.tap(memListFilterButtonFinder);
             await widgetTester.pumpAndSettle();
             await widgetTester.tap(find.byType(Switch).at(2));
             await closeMemListFilter(widgetTester);
@@ -120,7 +113,7 @@ void testTodoScenario() => group(': $_scenarioName', () {
             expect(find.text(insertedMemName), findsNothing);
             expect(find.text(undoneMemName), findsOneWidget);
             expect(find.text(doneMemName), findsNothing);
-            await widgetTester.tap(memListFilterButton);
+            await widgetTester.tap(memListFilterButtonFinder);
             await widgetTester.pumpAndSettle();
             await widgetTester.tap(find.byType(Switch).at(2));
             await closeMemListFilter(widgetTester);
@@ -135,7 +128,7 @@ void testTodoScenario() => group(': $_scenarioName', () {
             expect(find.text(insertedMemName), findsOneWidget);
             expect(find.text(undoneMemName), findsOneWidget);
             expect(find.text(doneMemName), findsOneWidget);
-            await widgetTester.tap(memListFilterButton);
+            await widgetTester.tap(memListFilterButtonFinder);
             await widgetTester.pumpAndSettle();
             await widgetTester.tap(find.byType(Switch).at(3));
             await closeMemListFilter(widgetTester);

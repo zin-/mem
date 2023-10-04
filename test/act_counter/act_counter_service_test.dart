@@ -16,7 +16,6 @@ import 'package:mem/notifications/wrapper.dart';
 import 'package:mockito/mockito.dart';
 
 import '../helpers.dart';
-import '../helpers.mocks.dart';
 
 void main() {
   LogService.initialize(Level.verbose);

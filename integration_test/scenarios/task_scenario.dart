@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:mem/core/date_and_time/date_and_time.dart';
+import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/databases/definition.dart';
-import 'package:mem/framework/database/factory.dart';
-import 'package:mem/repositories/database_repository.dart';
 
 import 'helpers.dart';
 
@@ -19,30 +19,203 @@ void main() {
 const scenarioName = 'Task scenario';
 
 void testTaskScenario() => group(': $scenarioName', () {
+      final about1MonthAgo = DateTime.now().subtract(const Duration(days: 32));
+
+      const insertedMemHasNoPeriod = '$scenarioName - mem name - no period';
+      const insertedMemHasPeriodStart =
+          '$scenarioName - mem name - has period start';
+      final insertedMemPeriodStart =
+          about1MonthAgo.add(const Duration(days: 2));
+      const insertedMemHasPeriodEnd =
+          '$scenarioName - mem name - has period end';
+      final insertedMemPeriodEnd =
+          about1MonthAgo.add(const Duration(days: 3, minutes: 10));
+      const insertedMemHasPeriod = '$scenarioName - mem name - has period';
+      final insertedMemPeriod = WithStartAndEnd(
+        DateAndTime.from(
+            about1MonthAgo.add(const Duration(days: 4, minutes: 20)),
+            timeOfDay:
+                about1MonthAgo.add(const Duration(days: 4, minutes: 20))),
+        DateAndTime.from(
+          about1MonthAgo.add(const Duration(days: 5, minutes: 30)),
+          timeOfDay: about1MonthAgo.add(const Duration(days: 5, minutes: 30)),
+        ),
+      );
+
       late final DatabaseAccessor dbA;
 
       setUpAll(() async {
-        DatabaseFactory.onTest = true;
-        dbA = await DatabaseRepository().receive(databaseDefinition);
+        dbA = await openTestDatabase(databaseDefinition);
       });
       setUp(() async {
-        for (var tableDefinition
-            in databaseDefinition.tableDefinitions.reversed) {
-          await dbA.delete(tableDefinition);
-        }
+        await clearAllTestDatabaseRows(databaseDefinition);
 
         await dbA.insert(defTableMems, {
-          defColMemsName.name: '$scenarioName - mem name - has period',
-          defColMemsStartOn.name: DateTime.now(),
-          defColCreatedAt.name: zeroDate,
-        });
-        await dbA.insert(defTableMems, {
-          defColMemsName.name: '$scenarioName - mem name - no period',
+          defColMemsName.name: insertedMemHasNoPeriod,
           defColMemsStartOn.name: null,
           defColMemsStartAt.name: null,
           defColMemsEndOn.name: null,
           defColMemsEndAt.name: null,
           defColCreatedAt.name: zeroDate,
+        });
+        await dbA.insert(defTableMems, {
+          defColMemsName.name: insertedMemHasPeriodStart,
+          defColMemsStartOn.name: insertedMemPeriodStart,
+          defColCreatedAt.name: zeroDate,
+        });
+        await dbA.insert(defTableMems, {
+          defColMemsName.name: insertedMemHasPeriodEnd,
+          defColMemsEndOn.name: insertedMemPeriodEnd,
+          defColMemsEndAt.name: insertedMemPeriodEnd,
+          defColCreatedAt.name: zeroDate,
+        });
+        await dbA.insert(defTableMems, {
+          defColMemsName.name: insertedMemHasPeriod,
+          defColMemsStartOn.name: insertedMemPeriod.start.dateTime,
+          defColMemsStartAt.name: insertedMemPeriod.start.dateTime,
+          defColMemsEndOn.name: insertedMemPeriod.end.dateTime,
+          defColMemsEndAt.name: insertedMemPeriod.end.dateTime,
+          defColCreatedAt.name: zeroDate,
+        });
+      });
+
+      group(": show Period", () {
+        testWidgets(": new Mem has no period.", (widgetTester) async {
+          await runApplication();
+          await widgetTester.pumpAndSettle();
+
+          await widgetTester.tap(newMemFabFinder);
+          await widgetTester.pumpAndSettle();
+
+          expect(find.text(datePlaceHolder), findsNWidgets(2));
+          expect(calendarIconFinder, findsNWidgets(2));
+          expect(find.byType(Switch), findsNWidgets(2));
+          expect(
+            widgetTester.widget<Switch>(find.byType(Switch).at(0)).value,
+            true,
+          );
+          expect(
+            widgetTester.widget<Switch>(find.byType(Switch).at(1)).value,
+            true,
+          );
+          expect(timeIconFinder, findsOneWidget);
+        });
+
+        group(": inserted Mem", () {
+          testWidgets(": on MemList", (widgetTester) async {
+            await runApplication();
+            await widgetTester.pumpAndSettle();
+
+            final texts =
+                widgetTester.widgetList<Text>(find.byType(Text)).toList();
+
+            expect(texts[2].data, dateText(insertedMemPeriodStart));
+            expect(texts[3].data, "~");
+            expect(texts[5].data, "~");
+            expect(texts[6].data, dateText(insertedMemPeriodEnd));
+            expect(texts[7].data, " ");
+            expect(texts[8].data, timeText(insertedMemPeriodEnd));
+            expect(texts[10].data, dateText(insertedMemPeriod.start));
+            expect(texts[11].data, " ");
+            expect(texts[12].data, timeText(insertedMemPeriod.start));
+            expect(texts[13].data, "~");
+            expect(texts[14].data, dateText(insertedMemPeriod.end));
+            expect(texts[15].data, " ");
+            expect(texts[16].data, timeText(insertedMemPeriod.end));
+          });
+
+          testWidgets(": has period start.", (widgetTester) async {
+            await runApplication();
+            await widgetTester.pumpAndSettle();
+
+            await widgetTester.tap(find.text(insertedMemHasPeriodStart));
+            await widgetTester.pumpAndSettle();
+
+            expect(
+              widgetTester
+                  .widget<TextFormField>(find.byType(TextFormField).at(1))
+                  .initialValue,
+              dateText(insertedMemPeriodStart),
+            );
+            expect(
+              widgetTester
+                  .widget<TextFormField>(find.byType(TextFormField).at(2))
+                  .initialValue,
+              "",
+            );
+          });
+          testWidgets(": has period end.", (widgetTester) async {
+            await runApplication();
+            await widgetTester.pumpAndSettle();
+
+            await widgetTester.tap(find.text(insertedMemHasPeriodEnd));
+            await widgetTester.pumpAndSettle();
+
+            expect(
+              widgetTester
+                  .widget<TextFormField>(find.byType(TextFormField).at(1))
+                  .initialValue,
+              "",
+            );
+            expect(
+              widgetTester
+                  .widget<TextFormField>(find.byType(TextFormField).at(2))
+                  .initialValue,
+              dateText(insertedMemPeriodEnd),
+            );
+            expect(
+              widgetTester
+                  .widget<TextFormField>(find.byType(TextFormField).at(3))
+                  .initialValue,
+              timeText(insertedMemPeriodEnd),
+            );
+            expect(
+              widgetTester.widget<Switch>(find.byType(Switch).at(1)).value,
+              false,
+            );
+            expect(timeIconFinder, findsNWidgets(2));
+          });
+          testWidgets(": has period.", (widgetTester) async {
+            await runApplication();
+            await widgetTester.pumpAndSettle();
+
+            await widgetTester.tap(find.text(insertedMemHasPeriod));
+            await widgetTester.pumpAndSettle();
+
+            expect(
+              widgetTester
+                  .widget<TextFormField>(find.byType(TextFormField).at(1))
+                  .initialValue,
+              dateText(insertedMemPeriod.start),
+            );
+            expect(
+              widgetTester
+                  .widget<TextFormField>(find.byType(TextFormField).at(2))
+                  .initialValue,
+              timeText(insertedMemPeriod.start),
+            );
+            expect(
+              widgetTester.widget<Switch>(find.byType(Switch).at(0)).value,
+              false,
+            );
+            expect(
+              widgetTester
+                  .widget<TextFormField>(find.byType(TextFormField).at(3))
+                  .initialValue,
+              dateText(insertedMemPeriod.end),
+            );
+            expect(
+              widgetTester
+                  .widget<TextFormField>(find.byType(TextFormField).at(4))
+                  .initialValue,
+              timeText(insertedMemPeriod.end),
+            );
+            expect(
+              widgetTester.widget<Switch>(find.byType(Switch).at(1)).value,
+              false,
+            );
+            expect(timeIconFinder, findsNWidgets(3));
+          });
         });
       });
 
@@ -57,10 +230,6 @@ void testTaskScenario() => group(': $scenarioName', () {
           await widgetTester.tap(newMemFabFinder);
           await widgetTester.pumpAndSettle();
 
-          expect(find.text('M/d/y'), findsNWidgets(2));
-          expect(calendarIconFinder, findsNWidgets(2));
-          expect(switchFinder, findsNWidgets(2));
-          expect(timeIconFinder, findsOneWidget);
           await widgetTester.tap(calendarIconFinder.at(0));
           await widgetTester.pumpAndSettle();
 
@@ -72,28 +241,27 @@ void testTaskScenario() => group(': $scenarioName', () {
           await widgetTester.tap(find.text('OK'));
           await widgetTester.pumpAndSettle();
 
-          final startDate = '${now.month + 1}/$pickingStartDate/${now.year}';
+          final startDate = DateTime(now.year, now.month + 1, pickingStartDate);
           expect(
             (widgetTester.widget(find.byType(TextFormField).at(1))
                     as TextFormField)
                 .initialValue,
-            startDate,
+            dateText(startDate),
           );
           expect(timeIconFinder, findsOneWidget);
 
-          await widgetTester.tap(switchFinder.at(0));
+          await widgetTester.tap(find.byType(Switch).at(0));
           await widgetTester.pumpAndSettle();
 
+          final pickingStartTime = DateTime.now();
           await widgetTester.tap(find.text('OK'));
           await widgetTester.pumpAndSettle();
 
-          final start = DateTime.now();
-          final startTime = timeText(start);
           expect(
             (widgetTester.widget(find.byType(TextFormField).at(2))
                     as TextFormField)
                 .initialValue,
-            startTime,
+            timeText(pickingStartTime),
           );
           expect(timeIconFinder, findsNWidgets(2));
 
@@ -108,13 +276,12 @@ void testTaskScenario() => group(': $scenarioName', () {
           await widgetTester.tap(find.text('OK'));
           await widgetTester.pumpAndSettle();
 
-          final endDate =
-              dateText(DateTime(now.year, now.month + 2, pickingEndDate));
+          final endDate = DateTime(now.year, now.month + 2, pickingEndDate);
           expect(
             (widgetTester.widget(find.byType(TextFormField).at(3))
                     as TextFormField)
                 .initialValue,
-            endDate,
+            dateText(endDate),
           );
 
           const enteringMemName =
@@ -139,7 +306,7 @@ void testTaskScenario() => group(': $scenarioName', () {
 
           expect(find.text(dateText(savedMemStartAt)), findsOneWidget);
           expect(find.text(timeText(savedMemStartAt)), findsOneWidget);
-          expect(find.text(endDate), findsOneWidget);
+          expect(find.text(dateText(endDate)), findsOneWidget);
         },
       );
     });

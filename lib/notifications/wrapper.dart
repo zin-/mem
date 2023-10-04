@@ -71,7 +71,9 @@ class NotificationsWrapper {
               UILocalNotificationDateInterpretation.absoluteTime,
           androidScheduleMode: AndroidScheduleMode.exact,
           payload: payload,
-          matchDateTimeComponents: interval?.convert(),
+          matchDateTimeComponents:
+              // TODO NotificationInterval.perDay以外も指定できるようにする
+              interval == null ? null : DateTimeComponents.time,
         ),
         {
           'id': id,
@@ -155,20 +157,20 @@ class NotificationsWrapper {
   static resetWith(NotificationsWrapper? instance) => _instance = instance;
 }
 
-extension on NotificationInterval {
-  DateTimeComponents convert() {
-    switch (this) {
-      case NotificationInterval.perDay:
-        return DateTimeComponents.time;
-      case NotificationInterval.perWeek:
-        return DateTimeComponents.dayOfWeekAndTime;
-      case NotificationInterval.perMonth:
-        return DateTimeComponents.dayOfMonthAndTime;
-      case NotificationInterval.perYear:
-        return DateTimeComponents.dateAndTime;
-    }
-  }
-}
+// extension on NotificationInterval {
+//   DateTimeComponents convert() {
+//     switch (this) {
+//       case NotificationInterval.perDay:
+//         return DateTimeComponents.time;
+//       case NotificationInterval.perWeek:
+//         return DateTimeComponents.dayOfWeekAndTime;
+//       case NotificationInterval.perMonth:
+//         return DateTimeComponents.dayOfMonthAndTime;
+//       case NotificationInterval.perYear:
+//         return DateTimeComponents.dateAndTime;
+//     }
+//   }
+// }
 
 // 分かりやすさのために、entry-pointはすべてmain.dartに定義したいが、
 // NotificationResponseがライブラリの型なので、ここで定義する
@@ -209,12 +211,10 @@ Future<void> onDidReceiveNotificationResponse(NotificationResponse details) =>
 
             if (payload.containsKey(memIdKey)) {
               final memId = payload[memIdKey];
-              if (memId is int) {
-                await NotificationClient()
-                    .notificationActions
-                    .singleWhere((element) => element.id == actionId)
-                    .onTapped(memId);
-              }
+              await NotificationClient()
+                  .notificationActions
+                  .singleWhere((element) => element.id == actionId)
+                  .onTapped(memId as int);
             }
             break;
         }

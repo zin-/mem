@@ -9,12 +9,10 @@ import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
-import 'package:mem/framework/database/factory.dart';
 import 'package:mem/notifications/client.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification_ids.dart';
 import 'package:mem/notifications/wrapper.dart';
-import 'package:mem/repositories/database_repository.dart';
 import 'package:mem/values/durations.dart';
 
 import 'helpers.dart';
@@ -34,14 +32,10 @@ void testNotificationScenario() => group(": $_scenarioName", () {
       int? insertedMemId;
 
       setUpAll(() async {
-        DatabaseFactory.onTest = true;
-        dbA = await DatabaseRepository().receive(databaseDefinition);
+        dbA = await openTestDatabase(databaseDefinition);
       });
       setUp(() async {
-        for (var tableDefinition
-            in databaseDefinition.tableDefinitions.reversed) {
-          await dbA.delete(tableDefinition);
-        }
+        await clearAllTestDatabaseRows(databaseDefinition);
 
         insertedMemId = await dbA.insert(defTableMems, {
           defColMemsName.name: insertedMemName,
@@ -318,6 +312,49 @@ void testNotificationScenario() => group(": $_scenarioName", () {
                 );
               },
             );
+          });
+        });
+
+        group(": pause act", () {
+          testWidgets(": no active act.", (widgetTester) async {
+            final details = NotificationResponse(
+              notificationResponseType:
+                  NotificationResponseType.selectedNotificationAction,
+              id: memRepeatedNotificationId(insertedMemId!),
+              payload: json.encode({memIdKey: insertedMemId}),
+              actionId: NotificationClient().pauseAct.id,
+            );
+
+            await onDidReceiveNotificationResponse(details);
+          });
+
+          group(": 2 active acts", () {
+            setUp(() async {
+              dbA.insert(defTableActs, {
+                defFkActsMemId.name: insertedMemId,
+                defColActsStart.name: zeroDate,
+                defColActsStartIsAllDay.name: false,
+                defColCreatedAt.name: zeroDate,
+              });
+              dbA.insert(defTableActs, {
+                defFkActsMemId.name: insertedMemId,
+                defColActsStart.name: zeroDate,
+                defColActsStartIsAllDay.name: false,
+                defColCreatedAt.name: zeroDate,
+              });
+            });
+
+            testWidgets(": no thrown.", (widgetTester) async {
+              final details = NotificationResponse(
+                notificationResponseType:
+                    NotificationResponseType.selectedNotificationAction,
+                id: memRepeatedNotificationId(insertedMemId!),
+                payload: json.encode({memIdKey: insertedMemId}),
+                actionId: NotificationClient().pauseAct.id,
+              );
+
+              await onDidReceiveNotificationResponse(details);
+            });
           });
         });
       });

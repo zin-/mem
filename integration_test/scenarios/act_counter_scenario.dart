@@ -9,9 +9,7 @@ import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
-import 'package:mem/framework/database/factory.dart';
 import 'package:mem/main.dart';
-import 'package:mem/repositories/database_repository.dart';
 
 import 'helpers.dart';
 
@@ -35,14 +33,10 @@ void testActCounterConfigure() => group(
         late final DatabaseAccessor dbA;
 
         setUpAll(() async {
-          DatabaseFactory.onTest = true;
-          dbA = await DatabaseRepository().receive(databaseDefinition);
+          dbA = await openTestDatabase(databaseDefinition);
         });
         setUp(() async {
-          for (var tableDefinition
-              in databaseDefinition.tableDefinitions.reversed) {
-            await dbA.delete(tableDefinition);
-          }
+          await clearAllTestDatabaseRows(databaseDefinition);
 
           insertedMemId = await dbA.insert(
             defTableMems,

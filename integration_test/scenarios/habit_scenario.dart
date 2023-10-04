@@ -7,7 +7,6 @@ import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/factory.dart';
-import 'package:mem/repositories/database_repository.dart';
 
 import 'helpers.dart';
 
@@ -28,12 +27,9 @@ void testHabitScenario() => group(': $_scenarioName', () {
 
       setUpAll(() async {
         DatabaseFactory.onTest = true;
-        dbA = await DatabaseRepository().receive(databaseDefinition);
+        dbA = await openTestDatabase(databaseDefinition);
 
-        for (var tableDefinition
-            in databaseDefinition.tableDefinitions.reversed) {
-          await dbA.delete(tableDefinition);
-        }
+        await clearAllTestDatabaseRows(databaseDefinition);
 
         insertedMemId = await dbA.insert(
           defTableMems,
@@ -59,8 +55,6 @@ void testHabitScenario() => group(': $_scenarioName', () {
             defColCreatedAt.name: zeroDate,
           },
         );
-
-        // await resetDatabase(db);
       });
       setUp(() async {
         await dbA.delete(
@@ -68,13 +62,6 @@ void testHabitScenario() => group(': $_scenarioName', () {
           where: '${defFkMemNotificationsMemId.name} = ?',
           whereArgs: [insertedMemId],
         );
-
-        // await db.getTable(defTableMemNotifications.name).delete(
-        //   whereString: '${defFkMemNotificationsMemId.name} = ?',
-        //   whereArgs: [
-        //     insertedMemId,
-        //   ],
-        // );
       });
 
       group(': Repeated notification', () {

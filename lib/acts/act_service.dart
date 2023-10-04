@@ -94,6 +94,7 @@ class ActService {
               json.encode({memIdKey: memId}),
               [
                 _notificationClient.finishActiveActAction,
+                _notificationClient.pauseAct,
               ],
               _notificationClient.activeActNotificationChannel,
             ),

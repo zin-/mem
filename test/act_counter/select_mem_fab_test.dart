@@ -6,18 +6,17 @@ import 'package:mem/act_counter/states.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mockito/mockito.dart';
 
-import '../_helpers.dart';
 import '../helpers.dart';
-import '../helpers.mocks.dart';
 
 void main() {
   group('Appearance', () {
     testWidgets(
       'selectedMemIds is empty',
       (widgetTester) async {
-        await runTestWidgetWithProvider(
-          widgetTester,
-          const SelectMemFab(),
+        await widgetTester.pumpWidget(
+          buildTestAppWithProvider(
+            const SelectMemFab(),
+          ),
         );
 
         expect(find.byIcon(Icons.check), findsOneWidget);
@@ -34,13 +33,14 @@ void main() {
     testWidgets(
       'selectedMemIds is not empty',
       (widgetTester) async {
-        await runTestWidgetWithProvider(
-          widgetTester,
-          const SelectMemFab(),
-          overrides: [
-            selectedMemIdsProvider
-                .overrideWith((ref) => ListValueStateNotifier([1])),
-          ],
+        await widgetTester.pumpWidget(
+          buildTestAppWithProvider(
+            const SelectMemFab(),
+            overrides: [
+              selectedMemIdsProvider
+                  .overrideWith((ref) => ListValueStateNotifier([1])),
+            ],
+          ),
         );
 
         expect(find.byIcon(Icons.check), findsOneWidget);
@@ -67,13 +67,14 @@ void main() {
         when(mockedActCounterService.createNew(selectedMemId))
             .thenAnswer((realInvocation) => Future.value(null));
 
-        await runTestWidgetWithProvider(
-          widgetTester,
-          const SelectMemFab(),
-          overrides: [
-            selectedMemIdsProvider
-                .overrideWith((ref) => ListValueStateNotifier([selectedMemId])),
-          ],
+        await widgetTester.pumpWidget(
+          buildTestAppWithProvider(
+            const SelectMemFab(),
+            overrides: [
+              selectedMemIdsProvider.overrideWith(
+                  (ref) => ListValueStateNotifier([selectedMemId])),
+            ],
+          ),
         );
 
         await widgetTester.tap(find.byType(SelectMemFab));

@@ -15,7 +15,7 @@ abstract class DateAndTimePeriod implements Comparable<DateAndTimePeriod> {
     } else if (start == null && end != null) {
       return _WithEndOnly(end);
     } else if (start != null && end != null) {
-      return _WithStartAndEnd(start, end);
+      return WithStartAndEnd(start, end);
     }
 
     throw ArgumentError(
@@ -35,6 +35,16 @@ abstract class DateAndTimePeriod implements Comparable<DateAndTimePeriod> {
 
   DateAndTimePeriod copiedWith(DateAndTime? end) =>
       DateAndTimePeriod(start: start, end: end);
+
+  static int compare(DateAndTimePeriod? a, DateAndTimePeriod? b) {
+    if (a != null && b != null) {
+      return a.compareTo(b);
+    } else if (a == null && b == null) {
+      return 0;
+    } else {
+      return a == null ? 1 : -1;
+    }
+  }
 }
 
 class _WithStartOnly extends DateAndTimePeriod
@@ -54,7 +64,7 @@ class _WithStartOnly extends DateAndTimePeriod
     } else if (other is _WithEndOnly) {
       return start.isBefore(other.end) ? -1 : 1;
     } else {
-      other as _WithStartAndEnd;
+      other as WithStartAndEnd;
       return -other.compareTo(this);
     }
   }
@@ -77,13 +87,13 @@ class _WithEndOnly extends DateAndTimePeriod
     } else if (other is _WithEndOnly) {
       return end.compareTo(other.end);
     } else {
-      other as _WithStartAndEnd;
+      other as WithStartAndEnd;
       return -other.compareTo(this);
     }
   }
 }
 
-class _WithStartAndEnd extends DateAndTimePeriod
+class WithStartAndEnd extends DateAndTimePeriod
     implements Comparable<DateAndTimePeriod> {
   @override
   final DateAndTime start;
@@ -94,7 +104,7 @@ class _WithStartAndEnd extends DateAndTimePeriod
   @override
   Duration get duration => end.difference(start);
 
-  _WithStartAndEnd(this.start, this.end) : super._() {
+  WithStartAndEnd(this.start, this.end) : super._() {
     if (start.compareTo(end) > 0) {
       throw ArgumentError(
         {
@@ -112,7 +122,7 @@ class _WithStartAndEnd extends DateAndTimePeriod
     } else if (other is _WithEndOnly) {
       return end.isAfter(other.end) ? 1 : -1;
     } else {
-      other as _WithStartAndEnd;
+      other as WithStartAndEnd;
       final c = start.compareTo(other.start);
       if (c != 0) {
         return c;

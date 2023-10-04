@@ -1,21 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/components/l10n.dart';
-
-import 'scenarios/helpers.dart';
-
-final memListFilterButton = find.byIcon(Icons.filter_list);
-final findShowNotArchiveSwitch = find.byType(Switch).at(0);
-final findShowArchiveSwitch = find.byType(Switch).at(1);
-
-Future closeMemListFilter(WidgetTester widgetTester) async =>
-    await widgetTester.tapAt(const Offset(0, 0));
-
-TextFormField memNameTextFormField(WidgetTester widgetTester) =>
-    (widgetTester.widget(memNameOnDetailPageFinder) as TextFormField);
-
-// V2
 /// enum型では文字列を返却することができないためclassで定義する
 /// ref.
 /// - https://testing.googleblog.com/2010/12/test-sizes.html
@@ -47,13 +29,3 @@ abstract class TestSize {
 
   TestSize._();
 }
-
-Future<void> runTestWidget(WidgetTester widgetTester, Widget widget) =>
-    widgetTester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        onGenerateTitle: (context) => buildL10n(context).test,
-        home: widget,
-      ),
-    );

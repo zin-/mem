@@ -16,6 +16,8 @@ import 'package:mem/notifications/notification_repository.dart';
 import 'package:mem/notifications/wrapper.dart';
 import 'package:mockito/annotations.dart';
 
+export 'helpers.mocks.dart';
+
 bool randomBool() => Random().nextBool();
 
 int randomInt([int max = 42949671]) => Random().nextInt(max);
@@ -52,6 +54,14 @@ Widget buildTestAppWithProvider(
       overrides: overrides ?? [],
       child: buildTestApp(widget),
     );
+
+class TestCaseV2<I> {
+  final I input;
+  final dynamic expected;
+  final String? name;
+
+  TestCaseV2(this.input, this.expected, {this.name});
+}
 
 class TestCase<T> {
   final String name;

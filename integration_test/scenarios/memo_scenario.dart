@@ -7,11 +7,8 @@ import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/databases/definition.dart';
-import 'package:mem/framework/database/factory.dart';
-import 'package:mem/repositories/database_repository.dart';
 import 'package:mem/values/durations.dart';
 
-import '../_helpers.dart';
 import 'helpers.dart';
 
 void main() {
@@ -30,14 +27,10 @@ void testMemoScenario() => group(
         late final DatabaseAccessor dbA;
 
         setUpAll(() async {
-          DatabaseFactory.onTest = true;
-          dbA = await DatabaseRepository().receive(databaseDefinition);
+          dbA = await openTestDatabase(databaseDefinition);
         });
         setUp(() async {
-          for (var tableDefinition
-              in databaseDefinition.tableDefinitions.reversed) {
-            await dbA.delete(tableDefinition);
-          }
+          await clearAllTestDatabaseRows(databaseDefinition);
 
           final insertedMemId = await dbA.insert(
             defTableMems,
@@ -144,6 +137,9 @@ void testMemoScenario() => group(
               await widgetTester.pumpAndSettle();
 
               expect(find.text(enteringMemNameText), findsOneWidget);
+              // FIXME 画面に表示されておらずtapできない場合がある
+              //  - 画面サイズが著しく小さい場合
+              //  - 要素が増えてMemoの領域が画面外まで追いやられた場合
               await widgetTester.tap(memMemoOnDetailPageFinder);
               await widgetTester.pumpAndSettle();
 
@@ -225,10 +221,10 @@ void testMemoScenario() => group(
                   find.text(insertedMemName),
                   findsNothing,
                 );
-                await widgetTester.tap(memListFilterButton);
+                await widgetTester.tap(memListFilterButtonFinder);
                 await widgetTester.pumpAndSettle();
 
-                await widgetTester.tap(findShowArchiveSwitch);
+                await widgetTester.tap(showArchiveSwitchFinder);
                 await widgetTester.pumpAndSettle();
 
                 await closeMemListFilter(widgetTester);
@@ -247,10 +243,10 @@ void testMemoScenario() => group(
 
                 expect(find.text(unarchivedMemName), findsOneWidget);
                 expect(find.text(archivedMemName), findsOneWidget);
-                await widgetTester.tap(memListFilterButton);
+                await widgetTester.tap(memListFilterButtonFinder);
                 await widgetTester.pumpAndSettle();
 
-                await widgetTester.tap(findShowNotArchiveSwitch);
+                await widgetTester.tap(showNotArchiveSwitchFinder);
                 await widgetTester.pumpAndSettle();
 
                 await closeMemListFilter(widgetTester);
