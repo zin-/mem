@@ -31,12 +31,12 @@ void testTaskScenario() => group(': $scenarioName', () {
       final insertedMemPeriodEnd =
           about1MonthAgo.add(const Duration(days: 3, minutes: 10));
       const insertedMemHasPeriod = '$scenarioName - mem name - has period';
-      final insertedMemPeriod = DateAndTimePeriod(
-        start: DateAndTime.from(
+      final insertedMemPeriod = WithStartAndEnd(
+        DateAndTime.from(
             about1MonthAgo.add(const Duration(days: 4, minutes: 20)),
             timeOfDay:
                 about1MonthAgo.add(const Duration(days: 4, minutes: 20))),
-        end: DateAndTime.from(
+        DateAndTime.from(
           about1MonthAgo.add(const Duration(days: 5, minutes: 30)),
           timeOfDay: about1MonthAgo.add(const Duration(days: 5, minutes: 30)),
         ),
@@ -71,10 +71,10 @@ void testTaskScenario() => group(': $scenarioName', () {
         });
         await dbA.insert(defTableMems, {
           defColMemsName.name: insertedMemHasPeriod,
-          defColMemsStartOn.name: insertedMemPeriod.start?.dateTime,
-          defColMemsStartAt.name: insertedMemPeriod.start?.dateTime,
-          defColMemsEndOn.name: insertedMemPeriod.end?.dateTime,
-          defColMemsEndAt.name: insertedMemPeriod.end?.dateTime,
+          defColMemsStartOn.name: insertedMemPeriod.start.dateTime,
+          defColMemsStartAt.name: insertedMemPeriod.start.dateTime,
+          defColMemsEndOn.name: insertedMemPeriod.end.dateTime,
+          defColMemsEndAt.name: insertedMemPeriod.end.dateTime,
           defColCreatedAt.name: zeroDate,
         });
       });
@@ -115,13 +115,13 @@ void testTaskScenario() => group(': $scenarioName', () {
             expect(texts[6].data, dateText(insertedMemPeriodEnd));
             expect(texts[7].data, " ");
             expect(texts[8].data, timeText(insertedMemPeriodEnd));
-            expect(texts[10].data, dateText(insertedMemPeriod.start!));
+            expect(texts[10].data, dateText(insertedMemPeriod.start));
             expect(texts[11].data, " ");
-            expect(texts[12].data, timeText(insertedMemPeriod.start!));
+            expect(texts[12].data, timeText(insertedMemPeriod.start));
             expect(texts[13].data, "~");
-            expect(texts[14].data, dateText(insertedMemPeriod.end!));
+            expect(texts[14].data, dateText(insertedMemPeriod.end));
             expect(texts[15].data, " ");
-            expect(texts[16].data, timeText(insertedMemPeriod.end!));
+            expect(texts[16].data, timeText(insertedMemPeriod.end));
           });
 
           testWidgets(": has period start.", (widgetTester) async {
@@ -186,13 +186,13 @@ void testTaskScenario() => group(': $scenarioName', () {
               widgetTester
                   .widget<TextFormField>(find.byType(TextFormField).at(1))
                   .initialValue,
-              dateText(insertedMemPeriod.start!),
+              dateText(insertedMemPeriod.start),
             );
             expect(
               widgetTester
                   .widget<TextFormField>(find.byType(TextFormField).at(2))
                   .initialValue,
-              timeText(insertedMemPeriod.start!),
+              timeText(insertedMemPeriod.start),
             );
             expect(
               widgetTester.widget<Switch>(find.byType(Switch).at(0)).value,
@@ -202,13 +202,13 @@ void testTaskScenario() => group(': $scenarioName', () {
               widgetTester
                   .widget<TextFormField>(find.byType(TextFormField).at(3))
                   .initialValue,
-              dateText(insertedMemPeriod.end!),
+              dateText(insertedMemPeriod.end),
             );
             expect(
               widgetTester
                   .widget<TextFormField>(find.byType(TextFormField).at(4))
                   .initialValue,
-              timeText(insertedMemPeriod.end!),
+              timeText(insertedMemPeriod.end),
             );
             expect(
               widgetTester.widget<Switch>(find.byType(Switch).at(1)).value,
