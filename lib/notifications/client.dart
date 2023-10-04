@@ -47,7 +47,6 @@ class NotificationClient {
       l10n.paused_act_notification,
       l10n.paused_act_notification_description,
       usesChronometer: true,
-      ongoing: true,
       autoCancel: false,
     );
     afterActStartedNotificationChannel = NotificationChannel(

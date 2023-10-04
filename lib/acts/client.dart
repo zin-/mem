@@ -31,7 +31,6 @@ class ActsClient {
               "Paused",
               json.encode({memIdKey: mem.id}),
               [
-                // FIXME ここからstartしたあともう一度pauseすると通知されない？
                 _notificationClient.startActAction,
               ],
               _notificationClient.pausedAct,

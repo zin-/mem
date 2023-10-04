@@ -1,5 +1,6 @@
 const seed = 10;
 
+// FIXME https://github.com/zin-/mem/issues/213
 int memStartNotificationId(int memId) => memId * seed + 1;
 
 int memEndNotificationId(int memId) => memId * seed + 2;
