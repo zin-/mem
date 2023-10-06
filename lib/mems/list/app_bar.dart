@@ -19,6 +19,12 @@ class MemListAppBar extends StatelessWidget {
           child: Row(
             children: [
               IconButton(
+                icon: const Icon(Icons.search),
+                onPressed: () {
+                  // TODO
+                },
+              ),
+              IconButton(
                 icon: const Icon(Icons.filter_list),
                 onPressed: () => showModalBottomSheet(
                   context: context,

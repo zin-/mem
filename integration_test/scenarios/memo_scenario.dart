@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -50,15 +51,54 @@ void testMemoScenario() => group(
           );
         });
 
-        testWidgets(
-          ': List.',
-          (widgetTester) async {
+        group(": List", () {
+          testWidgets(
+            ': Show elements.',
+            (widgetTester) async {
+              await runApplication();
+              await widgetTester.pumpAndSettle();
+
+              [
+                "List",
+                insertedMemName,
+              ].forEachIndexed((index, element) {
+                expect(
+                  widgetTester.widget<Text>(find.byType(Text).at(index)).data,
+                  element,
+                  reason: "Index is $index.",
+                );
+              });
+              expect(
+                (widgetTester
+                        .widget<FloatingActionButton>(
+                            find.byType(FloatingActionButton))
+                        .child as Icon)
+                    .icon,
+                Icons.add,
+              );
+              [
+                Icons.search,
+                Icons.filter_list,
+              ].forEachIndexed((index, element) {
+                expect(
+                  (widgetTester
+                          .widget<IconButton>(find.byType(IconButton).at(index))
+                          .icon as Icon)
+                      .icon,
+                  element,
+                  reason: "Index is $index.",
+                );
+              });
+            },
+          );
+
+          testWidgets(": Search", (widgetTester) async {
             await runApplication();
             await widgetTester.pumpAndSettle();
 
-            expect(find.text(insertedMemName), findsOneWidget);
-          },
-        );
+            await widgetTester.tap(find.byIcon(Icons.search));
+          });
+        });
 
         group(': Save', () {
           testWidgets(
