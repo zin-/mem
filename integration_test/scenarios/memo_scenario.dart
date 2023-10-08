@@ -100,7 +100,7 @@ void testMemoScenario() => group(
               await widgetTester.tap(searchIconFinder);
               await widgetTester.pump();
 
-              expect(searchIconFinder, findsNothing);
+              expect(searchIconFinder, findsOneWidget);
               expect(filterListIconFinder, findsNothing);
               expect(closeIconFinder, findsOneWidget);
               expect(
@@ -116,6 +116,20 @@ void testMemoScenario() => group(
               expect(searchIconFinder, findsOneWidget);
               expect(filterListIconFinder, findsOneWidget);
               expect(closeIconFinder, findsNothing);
+            });
+
+            testWidgets(": enter search text.", (widgetTester) async {
+              await runApplication();
+              await widgetTester.pumpAndSettle();
+
+              await widgetTester.tap(searchIconFinder);
+              await widgetTester.pump();
+
+              await widgetTester.enterText(
+                find.byType(TextFormField),
+                "entering search text",
+              );
+              await widgetTester.pump();
             });
           });
         });

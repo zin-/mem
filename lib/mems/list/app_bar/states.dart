@@ -6,7 +6,7 @@ final onSearchProvider =
   (ref) => ValueStateNotifier(false),
 );
 
-// final searchTextProvider =
-//     StateNotifierProvider.autoDispose<ValueStateNotifier<String?>, String?>(
-//   (ref) => ValueStateNotifier(null),
-// );
+final searchTextProvider =
+    StateNotifierProvider.autoDispose<ValueStateNotifier<String?>, String?>(
+  (ref) => ValueStateNotifier(null),
+);

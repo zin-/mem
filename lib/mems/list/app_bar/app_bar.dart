@@ -13,7 +13,7 @@ class MemListAppBar extends ConsumerWidget {
     return _MemListAppBar(
       ref.watch(onSearchProvider),
       ref.read(onSearchProvider.notifier).updatedBy,
-      // ref.read(searchTextProvider.notifier).updatedBy,
+      ref.watch(searchTextProvider.notifier).updatedBy,
     );
   }
 }
@@ -22,12 +22,12 @@ class _MemListAppBar extends StatelessWidget {
   final bool _onSearch;
   final void Function(bool value) _changeOnSearch;
 
-  // final void Function(String value) _onSearchTextChanged;
+  final void Function(String value) _onSearchTextChanged;
 
   const _MemListAppBar(
     this._onSearch,
     this._changeOnSearch,
-    // this._onSearchTextChanged,
+    this._onSearchTextChanged,
   );
 
   @override
@@ -38,13 +38,26 @@ class _MemListAppBar extends StatelessWidget {
       title: _onSearch
           ? TextFormField(
               autofocus: true,
-              // onChanged: _onSearchTextChanged,
+              style: const TextStyle(
+                color: colorOnPrimary,
+              ),
+              decoration: const InputDecoration(
+                icon: Icon(Icons.search),
+                iconColor: colorOnPrimary,
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(
+                    color: colorOnPrimary,
+                  ),
+                ),
+              ),
+              cursorColor: colorOnPrimary,
+              onChanged: _onSearchTextChanged,
             )
           : Text(l10n.memListPageTitle),
       floating: true,
       actions: [
         IconTheme(
-          data: const IconThemeData(color: iconOnPrimaryColor),
+          data: const IconThemeData(color: colorOnPrimary),
           child: Row(
             children: [
               _onSearch
