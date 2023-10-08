@@ -92,11 +92,31 @@ void testMemoScenario() => group(
             },
           );
 
-          testWidgets(": Search", (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+          group(": Search", () {
+            testWidgets(": toggle search mode.", (widgetTester) async {
+              await runApplication();
+              await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.byIcon(Icons.search));
+              await widgetTester.tap(searchIconFinder);
+              await widgetTester.pump();
+
+              expect(searchIconFinder, findsNothing);
+              expect(filterListIconFinder, findsNothing);
+              expect(closeIconFinder, findsOneWidget);
+              expect(
+                widgetTester
+                    .widget<TextFormField>(find.byType(TextFormField))
+                    .initialValue,
+                isEmpty,
+              );
+
+              await widgetTester.tap(closeIconFinder);
+              await widgetTester.pump();
+
+              expect(searchIconFinder, findsOneWidget);
+              expect(filterListIconFinder, findsOneWidget);
+              expect(closeIconFinder, findsNothing);
+            });
           });
         });
 
@@ -261,7 +281,7 @@ void testMemoScenario() => group(
                   find.text(insertedMemName),
                   findsNothing,
                 );
-                await widgetTester.tap(memListFilterButtonFinder);
+                await widgetTester.tap(filterListIconFinder);
                 await widgetTester.pumpAndSettle();
 
                 await widgetTester.tap(showArchiveSwitchFinder);
@@ -283,7 +303,7 @@ void testMemoScenario() => group(
 
                 expect(find.text(unarchivedMemName), findsOneWidget);
                 expect(find.text(archivedMemName), findsOneWidget);
-                await widgetTester.tap(memListFilterButtonFinder);
+                await widgetTester.tap(filterListIconFinder);
                 await widgetTester.pumpAndSettle();
 
                 await widgetTester.tap(showNotArchiveSwitchFinder);

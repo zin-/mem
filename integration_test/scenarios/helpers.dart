@@ -37,7 +37,9 @@ final saveMemFabFinder = find.byIcon(Icons.save_alt);
 final calendarIconFinder = find.byIcon(Icons.calendar_month);
 final timeIconFinder = find.byIcon(Icons.access_time_outlined);
 final clearIconFinder = find.byIcon(Icons.clear);
-final memListFilterButtonFinder = find.byIcon(Icons.filter_list);
+final searchIconFinder = find.byIcon(Icons.search);
+final closeIconFinder = find.byIcon(Icons.close);
+final filterListIconFinder = find.byIcon(Icons.filter_list);
 final okFinder = find.text('OK');
 
 //  On MemList filter
