@@ -93,6 +93,16 @@ void testMemoScenario() => group(
           );
 
           group(": Search", () {
+            const insertedSearchTargetMemName =
+                "$scenarioName - mem name - search target";
+
+            setUp(() async {
+              dbA.insert(defTableMems, {
+                defColMemsName.name: insertedSearchTargetMemName,
+                defColCreatedAt.name: zeroDate,
+              });
+            });
+
             testWidgets(": toggle search mode.", (widgetTester) async {
               await runApplication();
               await widgetTester.pumpAndSettle();
@@ -125,11 +135,31 @@ void testMemoScenario() => group(
               await widgetTester.tap(searchIconFinder);
               await widgetTester.pump();
 
+              [
+                insertedMemName,
+                insertedSearchTargetMemName,
+              ].forEachIndexed((index, element) {
+                expect(
+                  widgetTester.widget<Text>(find.byType(Text).at(index)).data,
+                  element,
+                  reason: "Index is $index.",
+                );
+              });
+
               await widgetTester.enterText(
                 find.byType(TextFormField),
-                "entering search text",
+                "search",
               );
               await widgetTester.pump();
+
+              expect(find.text(insertedMemName), findsNothing);
+              expect(find.text(insertedSearchTargetMemName), findsOneWidget);
+
+              await widgetTester.tap(closeIconFinder);
+              await widgetTester.pump();
+
+              expect(find.text(insertedMemName), findsOneWidget);
+              expect(find.text(insertedSearchTargetMemName), findsOneWidget);
             });
           });
         });

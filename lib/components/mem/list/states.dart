@@ -7,6 +7,7 @@ import 'package:mem/core/mem.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/components/value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/mems/list/app_bar/states.dart';
 import 'package:mem/mems/states.dart';
 
 final showNotArchivedProvider =
@@ -42,8 +43,15 @@ final memListProvider =
   final showArchived = ref.watch(showArchivedProvider);
   final showNotDone = ref.watch(showNotDoneProvider);
   final showDone = ref.watch(showDoneProvider);
+  final searchText = ref.watch(searchTextProvider);
   final filtered = v(
     () => rawMemList.where((mem) {
+      if (searchText == null || searchText.isEmpty) {
+        return true;
+      } else {
+        return mem.name.contains(searchText);
+      }
+    }).where((mem) {
       if (showNotArchived == showArchived) {
         return true;
       } else {
@@ -56,7 +64,14 @@ final memListProvider =
         return showDone ? mem.isDone() : !mem.isDone();
       }
     }).toList(),
-    {rawMemList, showNotArchived, showArchived, showNotDone, showDone},
+    {
+      rawMemList,
+      showNotArchived,
+      showArchived,
+      showNotDone,
+      showDone,
+      searchText,
+    },
   );
 
   final activeActs = ref.watch(activeActsProvider);

@@ -63,7 +63,10 @@ class _MemListAppBar extends StatelessWidget {
               _onSearch
                   ? IconButton(
                       icon: const Icon(Icons.close),
-                      onPressed: () => _changeOnSearch(false),
+                      onPressed: () {
+                        _onSearchTextChanged("");
+                        _changeOnSearch(false);
+                      },
                     )
                   : IconButton(
                       icon: const Icon(Icons.search),
