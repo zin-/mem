@@ -68,7 +68,7 @@ void testTodoScenario() => group(': $_scenarioName', () {
             expect(find.text(insertedMemName), findsNothing);
             expect(find.text(undoneMemName), findsOneWidget);
             expect(find.text(doneMemName), findsNothing);
-            await widgetTester.tap(memListFilterButtonFinder);
+            await widgetTester.tap(filterListIconFinder);
             await widgetTester.pumpAndSettle();
             await widgetTester.tap(find.byType(Switch).at(3));
             await closeMemListFilter(widgetTester);
@@ -86,7 +86,7 @@ void testTodoScenario() => group(': $_scenarioName', () {
             await widgetTester.pageBack();
             await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(memListFilterButtonFinder);
+            await widgetTester.tap(filterListIconFinder);
             await widgetTester.pumpAndSettle();
             await widgetTester.tap(find.byType(Switch).at(2));
             await closeMemListFilter(widgetTester);
@@ -113,7 +113,7 @@ void testTodoScenario() => group(': $_scenarioName', () {
             expect(find.text(insertedMemName), findsNothing);
             expect(find.text(undoneMemName), findsOneWidget);
             expect(find.text(doneMemName), findsNothing);
-            await widgetTester.tap(memListFilterButtonFinder);
+            await widgetTester.tap(filterListIconFinder);
             await widgetTester.pumpAndSettle();
             await widgetTester.tap(find.byType(Switch).at(2));
             await closeMemListFilter(widgetTester);
@@ -128,7 +128,7 @@ void testTodoScenario() => group(': $_scenarioName', () {
             expect(find.text(insertedMemName), findsOneWidget);
             expect(find.text(undoneMemName), findsOneWidget);
             expect(find.text(doneMemName), findsOneWidget);
-            await widgetTester.tap(memListFilterButtonFinder);
+            await widgetTester.tap(filterListIconFinder);
             await widgetTester.pumpAndSettle();
             await widgetTester.tap(find.byType(Switch).at(3));
             await closeMemListFilter(widgetTester);

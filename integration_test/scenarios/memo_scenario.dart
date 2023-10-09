@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -50,15 +51,118 @@ void testMemoScenario() => group(
           );
         });
 
-        testWidgets(
-          ': List.',
-          (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+        group(": List", () {
+          testWidgets(
+            ': Show elements.',
+            (widgetTester) async {
+              await runApplication();
+              await widgetTester.pumpAndSettle();
 
-            expect(find.text(insertedMemName), findsOneWidget);
-          },
-        );
+              [
+                "List",
+                insertedMemName,
+              ].forEachIndexed((index, element) {
+                expect(
+                  widgetTester.widget<Text>(find.byType(Text).at(index)).data,
+                  element,
+                  reason: "Index is $index.",
+                );
+              });
+              expect(
+                (widgetTester
+                        .widget<FloatingActionButton>(
+                            find.byType(FloatingActionButton))
+                        .child as Icon)
+                    .icon,
+                Icons.add,
+              );
+              [
+                Icons.search,
+                Icons.filter_list,
+              ].forEachIndexed((index, element) {
+                expect(
+                  (widgetTester
+                          .widget<IconButton>(find.byType(IconButton).at(index))
+                          .icon as Icon)
+                      .icon,
+                  element,
+                  reason: "Index is $index.",
+                );
+              });
+            },
+          );
+
+          group(": Search", () {
+            const insertedSearchTargetMemName =
+                "$scenarioName - mem name - search target";
+
+            setUp(() async {
+              dbA.insert(defTableMems, {
+                defColMemsName.name: insertedSearchTargetMemName,
+                defColCreatedAt.name: zeroDate,
+              });
+            });
+
+            testWidgets(": toggle search mode.", (widgetTester) async {
+              await runApplication();
+              await widgetTester.pumpAndSettle();
+
+              await widgetTester.tap(searchIconFinder);
+              await widgetTester.pump();
+
+              expect(searchIconFinder, findsOneWidget);
+              expect(filterListIconFinder, findsNothing);
+              expect(closeIconFinder, findsOneWidget);
+              expect(
+                widgetTester
+                    .widget<TextFormField>(find.byType(TextFormField))
+                    .initialValue,
+                isEmpty,
+              );
+
+              await widgetTester.tap(closeIconFinder);
+              await widgetTester.pump();
+
+              expect(searchIconFinder, findsOneWidget);
+              expect(filterListIconFinder, findsOneWidget);
+              expect(closeIconFinder, findsNothing);
+            });
+
+            testWidgets(": enter search text.", (widgetTester) async {
+              await runApplication();
+              await widgetTester.pumpAndSettle();
+
+              await widgetTester.tap(searchIconFinder);
+              await widgetTester.pump();
+
+              [
+                insertedMemName,
+                insertedSearchTargetMemName,
+              ].forEachIndexed((index, element) {
+                expect(
+                  widgetTester.widget<Text>(find.byType(Text).at(index)).data,
+                  element,
+                  reason: "Index is $index.",
+                );
+              });
+
+              await widgetTester.enterText(
+                find.byType(TextFormField),
+                "search",
+              );
+              await widgetTester.pump();
+
+              expect(find.text(insertedMemName), findsNothing);
+              expect(find.text(insertedSearchTargetMemName), findsOneWidget);
+
+              await widgetTester.tap(closeIconFinder);
+              await widgetTester.pump();
+
+              expect(find.text(insertedMemName), findsOneWidget);
+              expect(find.text(insertedSearchTargetMemName), findsOneWidget);
+            });
+          });
+        });
 
         group(': Save', () {
           testWidgets(
@@ -221,7 +325,7 @@ void testMemoScenario() => group(
                   find.text(insertedMemName),
                   findsNothing,
                 );
-                await widgetTester.tap(memListFilterButtonFinder);
+                await widgetTester.tap(filterListIconFinder);
                 await widgetTester.pumpAndSettle();
 
                 await widgetTester.tap(showArchiveSwitchFinder);
@@ -243,7 +347,7 @@ void testMemoScenario() => group(
 
                 expect(find.text(unarchivedMemName), findsOneWidget);
                 expect(find.text(archivedMemName), findsOneWidget);
-                await widgetTester.tap(memListFilterButtonFinder);
+                await widgetTester.tap(filterListIconFinder);
                 await widgetTester.pumpAndSettle();
 
                 await widgetTester.tap(showNotArchiveSwitchFinder);

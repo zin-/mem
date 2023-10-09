@@ -507,35 +507,41 @@ void testActScenario() => group(': $_scenarioName', () {
       });
 
       group(': MemListPage', () {
-        testWidgets(': start & finish act.', (widgetTester) async {
+        setUp(() async {
+          dbA.insert(defTableActs, {
+            defFkActsMemId.name: insertedMemId,
+            defColActsStart.name: zeroDate,
+            defColActsStartIsAllDay.name: false,
+            defColCreatedAt.name: zeroDate,
+          });
+        });
+
+        testWidgets(": start act.", (widgetTester) async {
           await showMemListPage(widgetTester);
 
-          expect(startIconFinder, findsNWidgets(2));
-          expect(stopIconFinder, findsNothing);
-
-          await widgetTester.tap(startIconFinder.at(1));
+          await widgetTester.tap(startIconFinder);
           await widgetTester.pump();
 
           expect(
-            (widgetTester.widget(find.byType(Text).at(2)) as Text).data,
+            widgetTester.widget<Text>(find.byType(Text).at(4)).data,
             '00:00:00',
           );
-          expect(startIconFinder, findsOneWidget);
-          expect(stopIconFinder, findsOneWidget);
-          await widgetTester.pumpAndSettle(elapsePeriod);
-
-          expect(find.text('00:00:00'), findsNothing);
-          await widgetTester.tap(startIconFinder);
-          await widgetTester.pumpAndSettle();
 
           expect(startIconFinder, findsNothing);
           expect(stopIconFinder, findsNWidgets(2));
+          await widgetTester.pumpAndSettle(elapsePeriod);
 
-          await widgetTester.tap(stopIconFinder.at(0));
-          await widgetTester.pumpAndSettle();
+          expect(find.text('00:00:00'), findsNothing);
+        });
 
-          expect(stopIconFinder, findsOneWidget);
-          expect(startIconFinder, findsOneWidget);
+        testWidgets(": finish act.", (widgetTester) async {
+          await showMemListPage(widgetTester);
+
+          await widgetTester.tap(stopIconFinder);
+          await widgetTester.pump();
+
+          expect(startIconFinder, findsNWidgets(2));
+          expect(stopIconFinder, findsNothing);
         });
       });
     });

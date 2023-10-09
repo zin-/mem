@@ -4,7 +4,7 @@ import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/components/mem/list/view.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/list/actions.dart';
-import 'package:mem/mems/list/app_bar.dart';
+import 'package:mem/mems/list/app_bar/app_bar.dart';
 import 'package:mem/mems/transitions.dart';
 
 import 'item/view.dart';
