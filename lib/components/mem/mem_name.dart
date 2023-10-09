@@ -52,6 +52,7 @@ class MemNameTextFormField extends StatelessWidget {
               decoration: InputDecoration(
                 labelText: l10n.memNameLabel,
               ),
+              autofocus: _memName?.isEmpty ?? false,
               validator: (value) =>
                   (value?.isEmpty ?? false) ? l10n.requiredError : null,
               onChanged: _onChanged,
