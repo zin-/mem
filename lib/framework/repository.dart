@@ -1,7 +1,5 @@
 import 'package:mem/framework/entity.dart';
-import 'package:mem/framework/entity_v3.dart';
 import 'package:mem/repositories/conditions/conditions.dart';
-import 'package:mem/repositories/entity.dart';
 
 /// # Repositoryとは
 /// 外部データとの連携を行なう
