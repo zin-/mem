@@ -1,4 +1,14 @@
+import 'package:mem/framework/entity.dart';
 import 'package:mem/framework/entity_v3.dart';
+import 'package:mem/repositories/conditions/conditions.dart';
+import 'package:mem/repositories/entity.dart';
+
+/// # Repositoryとは
+/// 外部データとの連携を行なう
+///
+/// ## 外部データとは
+/// ## 連携とは
+abstract class Repository<E extends Entity> {}
 
 /// # Repositoryの役割とは
 /// データを扱う
@@ -33,4 +43,22 @@ abstract class RepositoryV3<Payload extends EntityV3, Result> {
   //  -> entity?
   //    DatabaseRepositoryにおいてはentityでもなさそう
   Result receive(Payload payload);
+}
+
+abstract class RepositoryV2<E extends EntityV2, Payload> {
+  Future<Payload> receive(Payload payload);
+
+  Future<List<Payload>> ship(Condition condition);
+
+  Future<Payload> shipById(dynamic id);
+
+  Future<Payload> replace(Payload payload);
+
+  Future<Payload> archive(Payload payload);
+
+  Future<Payload> unarchive(Payload payload);
+
+  Future<List<Payload>> waste(Condition condition);
+
+  Future<Payload> wasteById(dynamic id);
 }

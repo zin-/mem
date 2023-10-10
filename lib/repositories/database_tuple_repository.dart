@@ -1,8 +1,8 @@
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
+import 'package:mem/framework/repository.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/repositories/repository.dart';
 
 import 'database_tuple_entity.dart';
 import 'conditions/conditions.dart';

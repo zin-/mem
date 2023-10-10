@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:mem/framework/repository.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/repositories/repository.dart';
 
 import 'act_counter.dart';
 import 'home_widget_accessor.dart';
