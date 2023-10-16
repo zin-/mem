@@ -1,12 +1,9 @@
 import 'package:mem/framework/entity.dart';
 import 'package:mem/repositories/conditions/conditions.dart';
 
-/// # Repositoryとは
-/// 外部データとの連携を行なう
-///
-/// ## 外部データとは
-/// ## 連携とは
-abstract class Repository<E extends Entity> {}
+abstract class Repository<E extends Entity> {
+  receive(E entity);
+}
 
 /// # Repositoryの役割とは
 /// データを扱う
