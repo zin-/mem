@@ -1,43 +1,27 @@
 import 'package:mem/framework/entity.dart';
 import 'package:mem/repositories/conditions/conditions.dart';
 
+/// # Repositoryとは
+///
+/// システムから外部データを扱う
+// ## 語源
+//
+// 「倉庫」、「貯蔵庫」、「資源のありか」
+//
+// IT分野においては、データ・コード・ドキュメントなどの情報を保管・格納する場所として用いる
+//
+// ## 関数名について
+//
+// 一般的には`getById(id)`, `update(entity)`などとされる場合が多いが、ここでは採用しない
+//
+// ### 理由
+// オブジェクト指向プログラミングにおける原理的な解釈において誤りである
+//  「倉庫」が`get`（得る）ことはあるだろうか？
+//  抽象的には得ると捉える事もできるだろうが、では`update`（更新する）ことはあるだろうか？
+//  更新することはないように感じる
+//  よって、ここでは`receive`（受け取る）、`replace`（置き換える）などの荷物や事物を扱う際の単語を採用する
 abstract class Repository<E extends Entity> {
   receive(E entity);
-}
-
-/// # Repositoryの役割とは
-/// データを扱う
-///
-/// ここでの"扱う"とは、受け取ったデータを他システムへ連携したり、条件からデータを取得したりすること
-///
-/// # 検討
-/// ## データの変換をどこで行うか
-/// 自システムで扱うデータと他システムに渡すデータは形式が異なることが多いためどこかで変換が必要
-/// ~~repositoryに渡す時点で変換されているべき？~~
-/// repositoryで変換する
-///
-/// # ライブラリをどう扱うか
-/// 殆どの場合、他システムへのアクセスはライブラリを通じて行うことになる
-///
-/// ライブラリのラッパーを定義する場合、repositoryの役割は何になるか？
-/// データの変換してラッパーを呼び出すこと
-///
-/// ライブラリの形式に合わせるのはラッパーの役割なのでデータの変換をどこまでやるかという話はあるかも
-///
-/// # テストをどうするか
-/// 他システムと連携するため、基本的にはSmall testではカバーできない
-///
-/// 例外的にコアなフレームワーク・ライブラリ（dartやflutter）でモックが用意されていて、
-/// Small testに収まる場合もある（MethodChannelなど
-///
-/// 加えて、ライブラリを正しく使えているかのテストは利用者側で行う必要がある
-abstract class RepositoryV3<Payload extends EntityV3, Result> {
-  // FIXME rename payload
-  //  Repositoryが扱うものとしてはPayloadもいい名前だけど
-  //  受け取るのも払い出すのもPayloadなのでもっと詳細な名前にしたい
-  //  -> entity?
-  //    DatabaseRepositoryにおいてはentityでもなさそう
-  Result receive(Payload payload);
 }
 
 abstract class RepositoryV2<E extends EntityV2, Payload> {

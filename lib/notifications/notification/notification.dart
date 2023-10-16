@@ -1,6 +1,6 @@
 import 'package:mem/framework/entity.dart';
 
-abstract class Notification extends EntityV3 {
+abstract class Notification extends Entity {
   final int id;
 
   Notification(this.id);
