@@ -6,7 +6,7 @@ import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/framework/entity.dart';
 
-class ActCounter extends EntityV2 {
+class ActCounter extends Entity {
   final Mem _mem;
   final Iterable<Act> _acts;
   final MemId memId;
@@ -69,12 +69,6 @@ class ActCounter extends EntityV2 {
       end: start.add(Duration(days: datePeriod)),
     );
   }
-
-  @override
-  Map<String, dynamic> toMap() => {
-        '_mem': _mem,
-        '_acts': _acts,
-      };
 }
 
 class InitializedActCounter extends ActCounter {
