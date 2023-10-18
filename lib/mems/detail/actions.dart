@@ -4,6 +4,7 @@ import 'package:mem/core/mem_detail.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
+import 'package:mem/mems/mem_item_repository.dart';
 import 'package:mem/mems/mem_notification_repository.dart';
 import 'package:mem/mems/mem_service.dart';
 import 'package:mem/mems/states.dart';
@@ -12,7 +13,9 @@ final loadMemItems = FutureProvider.autoDispose.family<List<MemItem>, int?>(
   (ref, memId) => v(
     () async {
       if (memId != null) {
-        final memItems = await MemService().fetchMemItemsByMemId(memId);
+        final memItems = await MemItemRepository()
+            .shipByMemId(memId)
+            .then((value) => value.map((e) => e.toV1()).toList());
 
         if (memItems.isNotEmpty) {
           ref.watch(memItemsProvider(memId).notifier).updatedBy(memItems);

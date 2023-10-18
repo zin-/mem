@@ -18,21 +18,8 @@ class MemService {
   final NotificationService _notificationService;
   final NotificationRepository _notificationRepository;
 
-  MemService._(
-    this._memRepository,
-    this._memItemRepository,
-    this._memNotificationRepository,
-    this._notificationService,
-    this._notificationRepository,
-  );
-
   Future<Mem> fetchMemById(int memId) => i(
         () => _memRepository.shipById(memId),
-        {'memId': memId},
-      );
-
-  Future<List<MemItem>> fetchMemItemsByMemId(int memId) => i(
-        () async => (await _memItemRepository.shipByMemId(memId)).toList(),
         {'memId': memId},
       );
 
@@ -45,9 +32,11 @@ class MemService {
 
           final savedMemItems = (await Future.wait(memDetail.memItems.map((e) =>
                   (e.isSaved() && !undo
-                          ? _memItemRepository.replace
-                          : _memItemRepository.receive)
-                      .call(e..memId = savedMem.id))))
+                      ? _memItemRepository.replace(
+                          SavedMemItemV2.fromV1(e..memId = savedMem.id))
+                      : _memItemRepository
+                          .receive(MemItemV2.fromV1(e..memId = savedMem.id))))))
+              .map((e) => e.toV1())
               .toList();
 
           final savedMemNotifications = memDetail.notifications == null
@@ -105,6 +94,7 @@ class MemService {
           final archivedMem = await _memRepository.archive(mem);
           final archivedMemItems =
               (await _memItemRepository.archiveByMemId(archivedMem.id))
+                  .map((e) => e.toV1())
                   .toList();
 
           _notificationService.memReminder(archivedMem);
@@ -122,6 +112,7 @@ class MemService {
           final unarchivedMem = await _memRepository.unarchive(mem);
           final unarchivedMemItems =
               (await _memItemRepository.unarchiveByMemId(unarchivedMem.id))
+                  .map((e) => e.toV1())
                   .toList();
 
           _notificationService.memReminder(unarchivedMem);
@@ -149,6 +140,14 @@ class MemService {
         },
         {'memId': memId},
       );
+
+  MemService._(
+    this._memRepository,
+    this._memItemRepository,
+    this._memNotificationRepository,
+    this._notificationService,
+    this._notificationRepository,
+  );
 
   static MemService? _instance;
 
