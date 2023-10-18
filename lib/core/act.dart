@@ -1,5 +1,4 @@
 import 'package:mem/core/entity_value.dart';
-import 'package:mem/core/mem.dart';
 import 'package:mem/framework/entity.dart';
 import 'package:mem/repositories/database_tuple_entity.dart';
 
@@ -41,7 +40,7 @@ class SavedActV2<I> extends ActV2 with SavedDatabaseTuple<I> {
 }
 
 class Act extends EntityValue {
-  final MemId memId;
+  final int memId;
   final DateAndTimePeriod period;
 
   @override

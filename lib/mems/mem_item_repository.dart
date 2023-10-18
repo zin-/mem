@@ -1,4 +1,3 @@
-import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/logger/log_service.dart';
@@ -7,24 +6,24 @@ import 'package:mem/repositories/conditions/conditions.dart';
 
 class MemItemRepository
     extends DatabaseTupleRepository<MemItemV2, SavedMemItemV2<int>, int> {
-  Future<Iterable<SavedMemItemV2<int>>> shipByMemId(MemId memId) => v(
+  Future<Iterable<SavedMemItemV2<int>>> shipByMemId(int memId) => v(
         () => super.ship(Equals(defFkMemItemsMemId.name, memId)),
         {'memId': memId},
       );
 
-  Future<Iterable<SavedMemItemV2<int>>> archiveByMemId(MemId memId) => v(
+  Future<Iterable<SavedMemItemV2<int>>> archiveByMemId(int memId) => v(
         () async => Future.wait(
             (await shipByMemId(memId)).map((e) => super.archive(e))),
         {'memId': memId},
       );
 
-  Future<Iterable<SavedMemItemV2<int>>> unarchiveByMemId(MemId memId) => v(
+  Future<Iterable<SavedMemItemV2<int>>> unarchiveByMemId(int memId) => v(
         () async => Future.wait(
             (await shipByMemId(memId)).map((e) => super.unarchive(e))),
         {'memId': memId},
       );
 
-  Future<Iterable<SavedMemItemV2<int>>> wasteByMemId(MemId memId) => v(
+  Future<Iterable<SavedMemItemV2<int>>> wasteByMemId(int memId) => v(
         () async => await super.waste(Equals(defFkMemItemsMemId.name, memId)),
         {'memId': memId},
       );

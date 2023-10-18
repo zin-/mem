@@ -2,8 +2,6 @@ import 'package:mem/core/date_and_time/date_and_time_period.dart';
 
 import 'entity_value.dart';
 
-typedef MemId = int;
-
 class Mem extends EntityValue {
   String name;
   DateTime? doneAt;
