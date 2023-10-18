@@ -8,7 +8,7 @@ import 'package:mem/repositories/database_tuple_repository.dart';
 import 'package:mem/repositories/conditions/conditions.dart';
 import 'package:mem/repositories/mem_entity.dart';
 
-class MemRepository extends DatabaseTupleRepository<MemEntity, Mem> {
+class MemRepository extends DatabaseTupleRepositoryV2<MemEntity, Mem> {
   Future<List<Mem>> shipByCondition(bool? archived, bool? done) => v(
         () => super.ship(
           And([

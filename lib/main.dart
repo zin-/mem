@@ -53,7 +53,7 @@ Future<void> _runApplication({Widget? home, String? languageCode}) => i(
       [home, languageCode],
     );
 
-Future<void> openDatabase() async => DatabaseTupleRepository.databaseAccessor =
+Future<void> openDatabase() async => DatabaseTupleRepositoryV2.databaseAccessor =
     await DatabaseRepository().receive(databaseDefinition);
 
 // FIXME HomeWidget関連の処理、場所が適切ではない

@@ -8,7 +8,7 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/database_tuple_repository.dart';
 import 'package:mem/repositories/conditions/conditions.dart';
 
-class ActRepository extends DatabaseTupleRepository<ActEntity, Act> {
+class ActRepository extends DatabaseTupleRepositoryV2<ActEntity, Act> {
   Future<List<Act>> shipByMemId(
     MemId memId, {
     DateAndTimePeriod? period,

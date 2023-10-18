@@ -7,7 +7,7 @@ import 'package:mem/repositories/conditions/conditions.dart';
 import 'mem_notification_entity.dart';
 
 class MemNotificationRepository
-    extends DatabaseTupleRepository<MemNotificationEntity, MemNotification> {
+    extends DatabaseTupleRepositoryV2<MemNotificationEntity, MemNotification> {
   Future<Iterable<MemNotification>> shipByMemId(int memId) => v(
         () => super.ship(Equals(defFkMemNotificationsMemId.name, memId)),
         memId,

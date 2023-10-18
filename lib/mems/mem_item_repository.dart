@@ -9,7 +9,7 @@ import 'package:mem/repositories/conditions/conditions.dart';
 import 'mem_item_entity.dart';
 
 class MemItemRepository
-    extends DatabaseTupleRepository<MemItemEntity, MemItem> {
+    extends DatabaseTupleRepositoryV2<MemItemEntity, MemItem> {
   Future<Iterable<MemItem>> shipByMemId(MemId memId) => v(
         () => super.ship(Equals(defFkMemItemsMemId.name, memId)),
         {'memId': memId},
