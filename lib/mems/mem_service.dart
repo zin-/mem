@@ -51,10 +51,13 @@ class MemService {
                         () => MemNotification(e.type, e.time, e.message));
                   } else {
                     return (e.isSaved() && !undo
-                        ? _memNotificationRepository
-                            .replace(e..memId = savedMem.id)
-                        : _memNotificationRepository
-                            .receive(e..memId = savedMem.id))
+                            ? _memNotificationRepository.replace(
+                                SavedMemNotificationV2.fromV1(
+                                    e..memId = savedMem.id))
+                            : _memNotificationRepository.receive(
+                                MemNotificationV2.fromV1(
+                                    e..memId = savedMem.id)))
+                        .then((value) => value.toV1())
                       ..then(
                         (value) => _notificationService.memRepeatedReminder(
                           savedMem,

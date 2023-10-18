@@ -4,16 +4,15 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/database_tuple_repository.dart';
 import 'package:mem/repositories/conditions/conditions.dart';
 
-import 'mem_notification_entity.dart';
-
-class MemNotificationRepository
-    extends DatabaseTupleRepositoryV2<MemNotificationEntity, MemNotification> {
-  Future<Iterable<MemNotification>> shipByMemId(int memId) => v(
+class MemNotificationRepository extends DatabaseTupleRepository<
+    MemNotificationV2, SavedMemNotificationV2<int>, int> {
+  Future<Iterable<SavedMemNotificationV2<int>>> shipByMemId(int memId) => v(
         () => super.ship(Equals(defFkMemNotificationsMemId.name, memId)),
         memId,
       );
 
-  Future<Iterable<MemNotification>> shipByMemIdAndAfterActStarted(int memId) =>
+  Future<Iterable<SavedMemNotificationV2<int>>> shipByMemIdAndAfterActStarted(
+          int memId) =>
       v(
         () => super.ship(And([
           Equals(defFkMemNotificationsMemId.name, memId),
@@ -25,42 +24,34 @@ class MemNotificationRepository
         memId,
       );
 
-  Future<Iterable<MemNotification>> wasteByMemId(int memId) => v(
-        () async =>
-            await super.waste(Equals(defFkMemNotificationsMemId.name, memId)),
+  Future<Iterable<SavedMemNotificationV2<int>>> wasteByMemId(int memId) => v(
+        () => super.waste(Equals(defFkMemNotificationsMemId.name, memId)),
         memId,
       );
 
   @override
-  MemNotification pack(Map<String, dynamic> unpackedPayload) {
-    final entity = MemNotificationEntity.fromMap(unpackedPayload);
-
-    return MemNotification(
-      MemNotificationType.fromName(entity.type),
-      entity.time,
-      entity.message,
-      memId: entity.memId,
-      id: entity.id,
-      createdAt: entity.createdAt,
-      updatedAt: entity.updatedAt,
-      archivedAt: entity.archivedAt,
-    );
-  }
+  SavedMemNotificationV2<int> pack(Map<String, dynamic> tuple) =>
+      SavedMemNotificationV2<int>(
+        tuple[defFkMemNotificationsMemId.name],
+        MemNotificationType.fromName(tuple[defColMemNotificationsType.name]),
+        tuple[defColMemNotificationsTime.name],
+        tuple[defColMemNotificationsMessage.name],
+      )..pack(tuple);
 
   @override
-  Map<String, dynamic> unpack(MemNotification payload) {
-    final entity = MemNotificationEntity(
-      payload.memId!,
-      payload.type.name,
-      payload.time!,
-      payload.message,
-      payload.id,
-      payload.createdAt,
-      payload.updatedAt,
-      payload.archivedAt,
-    );
+  Map<String, dynamic> unpack(MemNotificationV2 entity) {
+    final map = {
+      defFkMemNotificationsMemId.name: entity.memId,
+      defColMemNotificationsType.name: entity.type.name,
+      defColMemNotificationsTime.name: entity.time,
+      defColMemNotificationsMessage.name: entity.message,
+    };
 
-    return entity.toMap();
+    if (entity is SavedMemNotificationV2) {
+      map.addAll(entity.unpack());
+    }
+
+    return map;
   }
 
   MemNotificationRepository._() : super(defTableMemNotifications);
@@ -69,6 +60,4 @@ class MemNotificationRepository
 
   factory MemNotificationRepository() =>
       _instance ??= MemNotificationRepository._();
-
-  static resetWith(MemNotificationRepository? instance) => _instance = instance;
 }
