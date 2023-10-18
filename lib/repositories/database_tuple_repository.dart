@@ -82,67 +82,67 @@ abstract class DatabaseTupleRepository<E extends Entity, SavedEntity extends E,
         payload,
       );
 
-  Future<SavedEntity> archive(SavedEntity payload) => v(
-        () async {
-          final entityMap = unpack(payload);
-
-          entityMap[defColArchivedAt.name] = DateTime.now();
-
-          final condition = Equals(defPkId.name, entityMap[defPkId.name]);
-          await _databaseAccessor!.update(
-            _tableDefinition,
-            entityMap,
-            where: condition.where(),
-            whereArgs: condition.whereArgs(),
-          );
-
-          return pack(entityMap);
-        },
-        payload,
-      );
-
-  Future<SavedEntity> unarchive(SavedEntity payload) => v(
-        () async {
-          final entityMap = unpack(payload);
-
-          entityMap[defColUpdatedAt.name] = DateTime.now();
-          entityMap[defColArchivedAt.name] = null;
-
-          final condition = Equals(defPkId.name, entityMap[defPkId.name]);
-          await _databaseAccessor!.update(
-            _tableDefinition,
-            entityMap,
-            where: condition.where(),
-            whereArgs: condition.whereArgs(),
-          );
-
-          return pack(entityMap);
-        },
-        payload,
-      );
-
-  Future<List<SavedEntity>> waste([Condition? condition]) => v(
-        () async {
-          final payloads = (await _databaseAccessor!.select(
-            _tableDefinition,
-            where: condition?.where(),
-            whereArgs: condition?.whereArgs(),
-          ))
-              .map((e) => pack(e))
-              .toList();
-
-          final count = await _databaseAccessor!.delete(
-            _tableDefinition,
-            where: condition?.where(),
-            whereArgs: condition?.whereArgs(),
-          );
-
-          assert(count == payloads.length);
-
-          return payloads;
-        },
-        condition,
-      );
+  // Future<SavedEntity> archive(SavedEntity payload) => v(
+  //       () async {
+  //         final entityMap = unpack(payload);
+  //
+  //         entityMap[defColArchivedAt.name] = DateTime.now();
+  //
+  //         final condition = Equals(defPkId.name, entityMap[defPkId.name]);
+  //         await _databaseAccessor!.update(
+  //           _tableDefinition,
+  //           entityMap,
+  //           where: condition.where(),
+  //           whereArgs: condition.whereArgs(),
+  //         );
+  //
+  //         return pack(entityMap);
+  //       },
+  //       payload,
+  //     );
+  //
+  // Future<SavedEntity> unarchive(SavedEntity payload) => v(
+  //       () async {
+  //         final entityMap = unpack(payload);
+  //
+  //         entityMap[defColUpdatedAt.name] = DateTime.now();
+  //         entityMap[defColArchivedAt.name] = null;
+  //
+  //         final condition = Equals(defPkId.name, entityMap[defPkId.name]);
+  //         await _databaseAccessor!.update(
+  //           _tableDefinition,
+  //           entityMap,
+  //           where: condition.where(),
+  //           whereArgs: condition.whereArgs(),
+  //         );
+  //
+  //         return pack(entityMap);
+  //       },
+  //       payload,
+  //     );
+  //
+  // Future<List<SavedEntity>> waste([Condition? condition]) => v(
+  //       () async {
+  //         final payloads = (await _databaseAccessor!.select(
+  //           _tableDefinition,
+  //           where: condition?.where(),
+  //           whereArgs: condition?.whereArgs(),
+  //         ))
+  //             .map((e) => pack(e))
+  //             .toList();
+  //
+  //         final count = await _databaseAccessor!.delete(
+  //           _tableDefinition,
+  //           where: condition?.where(),
+  //           whereArgs: condition?.whereArgs(),
+  //         );
+  //
+  //         assert(count == payloads.length);
+  //
+  //         return payloads;
+  //       },
+  //       condition,
+  //     );
 
   Future<SavedEntity> wasteById(Id id) => v(
         () async {

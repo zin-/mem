@@ -6,7 +6,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mem/act_counter/act_counter_repository.dart';
 import 'package:mem/act_counter/act_counter_service.dart';
 import 'package:mem/act_counter/home_widget_accessor.dart';
-import 'package:mem/acts/act_repository.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/logger_wrapper.dart';
 import 'package:mem/mems/mem_item_repository.dart';
@@ -31,7 +30,6 @@ int randomInt([int max = 42949671]) => Random().nextInt(max);
   MemRepository,
   MemItemRepository,
   NotificationRepository,
-  ActRepository,
   ActCounterRepository,
   ActCounterService,
   MemNotificationRepository,
