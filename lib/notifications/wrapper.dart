@@ -153,8 +153,6 @@ class NotificationsWrapper {
 
   factory NotificationsWrapper(String androidDefaultIconPath) =>
       _instance ??= NotificationsWrapper._(androidDefaultIconPath);
-
-  static resetWith(NotificationsWrapper? instance) => _instance = instance;
 }
 
 // extension on NotificationInterval {

@@ -77,8 +77,4 @@ class NotificationRepository extends Repository<Notification> {
           : null,
     );
   }
-
-  static void reset(NotificationRepository? notificationRepository) {
-    _instance = notificationRepository;
-  }
 }

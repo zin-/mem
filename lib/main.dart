@@ -53,13 +53,8 @@ Future<void> _runApplication({Widget? home, String? languageCode}) => i(
       [home, languageCode],
     );
 
-Future<void> openDatabase() async {
-  final databaseAccessor =
-      await DatabaseRepository().receive(databaseDefinition);
-
-  DatabaseTupleRepository.databaseAccessor = databaseAccessor;
-  DatabaseTupleRepositoryV2.databaseAccessor = databaseAccessor;
-}
+Future<void> openDatabase() async => DatabaseTupleRepository.databaseAccessor =
+    await DatabaseRepository().receive(databaseDefinition);
 
 // FIXME HomeWidget関連の処理、場所が適切ではない
 const uriSchema = 'mem';

@@ -19,15 +19,17 @@ class MemService {
   final NotificationRepository _notificationRepository;
 
   Future<Mem> fetchMemById(int memId) => i(
-        () => _memRepository.shipById(memId),
+        () => _memRepository.shipById(memId).then((value) => value.toV1()),
         {'memId': memId},
       );
 
   Future<MemDetail> save(MemDetail memDetail, {bool undo = false}) => i(
         () async {
-          final savedMem = memDetail.mem.isSaved() && !undo
-              ? await _memRepository.replace(memDetail.mem)
-              : await _memRepository.receive(memDetail.mem);
+          final savedMem = (memDetail.mem.isSaved() && !undo
+                  ? await _memRepository
+                      .replace(SavedMemV2.fromV1(memDetail.mem))
+                  : await _memRepository.receive(MemV2.fromV1(memDetail.mem)))
+              .toV1();
           _notificationService.memReminder(savedMem);
 
           final savedMemItems = (await Future.wait(memDetail.memItems.map((e) =>
@@ -94,7 +96,9 @@ class MemService {
 
   Future<MemDetail> archive(Mem mem) => i(
         () async {
-          final archivedMem = await _memRepository.archive(mem);
+          final archivedMem = await _memRepository
+              .archive(SavedMemV2.fromV1(mem))
+              .then((value) => value.toV1());
           final archivedMemItems =
               (await _memItemRepository.archiveByMemId(archivedMem.id))
                   .map((e) => e.toV1())
@@ -112,7 +116,9 @@ class MemService {
 
   Future<MemDetail> unarchive(Mem mem) => i(
         () async {
-          final unarchivedMem = await _memRepository.unarchive(mem);
+          final unarchivedMem = await _memRepository
+              .unarchive(SavedMemV2.fromV1(mem))
+              .then((value) => value.toV1());
           final unarchivedMemItems =
               (await _memItemRepository.unarchiveByMemId(unarchivedMem.id))
                   .map((e) => e.toV1())
@@ -161,8 +167,4 @@ class MemService {
         NotificationService(),
         NotificationRepository(),
       );
-
-  static void reset(MemService? memService) {
-    _instance = memService;
-  }
 }

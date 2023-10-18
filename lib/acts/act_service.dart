@@ -91,7 +91,9 @@ class ActService {
 
   Future _registerStartNotifications(int memId) => v(
         () async {
-          final mem = await _memRepository.shipById(memId);
+          final mem = await _memRepository
+              .shipById(memId)
+              .then((value) => value.toV1());
 
           _notificationRepository.receive(
             ShowNotification(

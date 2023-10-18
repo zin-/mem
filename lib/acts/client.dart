@@ -22,7 +22,9 @@ class ActsClient {
         () async {
           final finished = await _actService.finish(actId, when);
 
-          final mem = await _memRepository.shipById(finished.memId);
+          final mem = await _memRepository
+              .shipById(finished.memId)
+              .then((value) => value.toV1());
 
           await _notificationRepository.receive(
             ShowNotification(

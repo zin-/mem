@@ -33,7 +33,10 @@ final editingMemProvider = StateNotifierProvider.autoDispose
           rawMemList?.singleWhereOrNull((element) => element.id == memId);
 
       if (memId != null && rawMemList == null) {
-        MemRepository().shipById(memId).then((value) {
+        MemRepository()
+            .shipById(memId)
+            .then((value) => value.toV1())
+            .then((value) {
           ref
               .read(memsProvider.notifier)
               .upsertAll([value], (tmp, item) => tmp.id == item.id);
