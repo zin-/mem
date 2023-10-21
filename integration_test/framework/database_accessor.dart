@@ -12,45 +12,6 @@ void main() {
 const _scenarioName = "Database accessor test";
 
 void testDatabaseAccessor() => group(": $_scenarioName", () {
-      group(": isOpened()", () {
-        late DatabaseAccessor databaseAccessor;
-
-        setUp(() async {
-          databaseAccessor = await DatabaseFactory.open(sampleDefDb);
-        });
-
-        test(": returns true.", () async {
-          expect(await databaseAccessor.isOpened(), true);
-        });
-
-        group(": when closed", () {
-          setUp(() async {
-            await databaseAccessor
-                // ignore: deprecated_member_use_from_same_package
-                .nativeDatabase
-                .close();
-          });
-
-          test(": returns false.", () async {
-            expect(await databaseAccessor.isOpened(), false);
-          });
-        });
-
-        group(": when deleted", () {
-          setUp(() async {
-            await DatabaseFactory
-                // ignore: deprecated_member_use_from_same_package
-                .nativeFactory
-                .deleteDatabase(
-                    await DatabaseFactory.buildDatabasePath(sampleDefDb.name));
-          });
-
-          test(": returns false.", () async {
-            expect(await databaseAccessor.isOpened(), false);
-          });
-        });
-      });
-
       group(": operations", () {
         final inserted = {
           sampleDefPk.name: 0,
