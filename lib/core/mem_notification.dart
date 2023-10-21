@@ -19,7 +19,7 @@ class MemNotificationV2 extends Entity {
 }
 
 class SavedMemNotificationV2<I> extends MemNotificationV2
-    with SavedDatabaseTuple<I> {
+    with SavedDatabaseTupleMixin<I> {
   SavedMemNotificationV2(super.memId, super.type, super.time, super.message);
 
   MemNotification toV1() => MemNotification(

@@ -20,7 +20,7 @@ class MemV2 extends Entity {
         );
 }
 
-class SavedMemV2<I> extends MemV2 with SavedDatabaseTuple<I> {
+class SavedMemV2<I> extends MemV2 with SavedDatabaseTupleMixin<I> {
   SavedMemV2(super.name, super.doneAt, super.period);
 
   Mem toV1() => Mem(

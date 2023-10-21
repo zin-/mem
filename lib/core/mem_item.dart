@@ -21,7 +21,7 @@ class MemItemV2 extends Entity {
       );
 }
 
-class SavedMemItemV2<I> extends MemItemV2 with SavedDatabaseTuple<I> {
+class SavedMemItemV2<I> extends MemItemV2 with SavedDatabaseTupleMixin<I> {
   SavedMemItemV2(super.memId, super.type, super.value);
 
   MemItem toV1() => MemItem(

@@ -1,7 +1,7 @@
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/framework/repository/entity.dart';
 
-mixin SavedDatabaseTuple<T> on Entity {
+mixin SavedDatabaseTupleMixin<T> on Entity {
   late T id;
   late DateTime createdAt;
   DateTime? updatedAt;

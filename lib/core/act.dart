@@ -11,7 +11,7 @@ class ActV2 extends Entity {
   ActV2(this.memId, this.period);
 }
 
-class SavedActV2<I> extends ActV2 with SavedDatabaseTuple<I> {
+class SavedActV2<I> extends ActV2 with SavedDatabaseTupleMixin<I> {
   SavedActV2(super.memId, super.period);
 
   SavedActV2<I> copiedWith(DateAndTimePeriod period) => SavedActV2(
