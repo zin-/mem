@@ -4,7 +4,7 @@ import 'package:mem/core/mem.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/repositories/database_tuple_repository.dart';
+import 'package:mem/framework/database_tuple_repository.dart';
 import 'package:mem/repositories/conditions/conditions.dart';
 
 class MemRepository

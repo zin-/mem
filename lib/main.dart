@@ -9,7 +9,7 @@ import 'package:mem/mems/detail/page.dart';
 import 'package:mem/notifications/client.dart';
 import 'package:mem/notifications/notification_repository.dart';
 import 'package:mem/framework/database_repository.dart';
-import 'package:mem/repositories/database_tuple_repository.dart';
+import 'package:mem/framework/database_tuple_repository.dart';
 
 import 'application.dart';
 

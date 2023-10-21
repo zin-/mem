@@ -1,5 +1,5 @@
 import 'package:mem/framework/entity.dart';
-import 'package:mem/repositories/database_tuple_entity.dart';
+import 'package:mem/framework/database_tuple_entity.dart';
 
 import 'entity_value.dart';
 
