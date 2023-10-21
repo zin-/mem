@@ -14,9 +14,11 @@ final loadActList = FutureProvider.autoDispose.family<List<Act>, int?>(
     () async {
       // TODO 全件取得する場合、件数的な不安がある
       //  1週間分とかにしとくか？
-      final acts = memId == null
-          ? await ActRepository().ship()
-          : await ActRepository().shipByMemId(memId);
+      final acts = (memId == null
+              ? await ActRepository().ship()
+              : await ActRepository().shipByMemId(memId))
+          .map((e) => e.toV1())
+          .toList();
 
       ref.watch(actsProvider.notifier).upsertAll(
             acts,

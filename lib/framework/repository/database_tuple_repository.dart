@@ -1,31 +1,26 @@
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
+import 'package:mem/framework/repository/entity.dart';
+import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/repositories/repository.dart';
+import 'package:mem/framework/repository/condition/conditions.dart';
 
-import 'database_tuple_entity.dart';
-import 'conditions/conditions.dart';
+// FIXME byIdの引数の型のためにSavedEntityの型以外にIが必要になっている
+//  Rにidの型情報が含まれているのに改めて渡す必要があるのはおかしい
+//  DatabaseTupleに型情報を付与することでズレは発生しなくなった
+//  ただ、これだと未保存のDatabaseTupleが
+// FIXME SavedEntityはSavedDatabaseTupleをmixinしている必要があるが型制約を定義できていない
+abstract class DatabaseTupleRepository<E extends Entity, SavedEntity extends E,
+    Id> implements Repository<E> {
+  Map<String, dynamic> unpack(E entity);
 
-abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
-    implements RepositoryV2<E, P> {
-  static DatabaseAccessor? _databaseAccessor;
-
-  static set databaseAccessor(DatabaseAccessor databaseAccessor) =>
-      _databaseAccessor ??= databaseAccessor;
-
-  final TableDefinition _tableDefinition;
-
-  DatabaseTupleRepository(this._tableDefinition);
-
-  Map<String, dynamic> unpack(P payload);
-
-  P pack(Map<String, dynamic> unpackedPayload);
+  SavedEntity pack(Map<String, dynamic> tuple);
 
   @override
-  Future<P> receive(P payload) => v(
+  Future<SavedEntity> receive(E entity) => v(
         () async {
-          final entityMap = unpack(payload);
+          final entityMap = unpack(entity);
 
           entityMap[defColCreatedAt.name] = DateTime.now();
 
@@ -38,11 +33,10 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
 
           return pack(entityMap);
         },
-        {'payload': payload},
+        entity,
       );
 
-  @override
-  Future<List<P>> ship([Condition? condition]) => v(
+  Future<List<SavedEntity>> ship([Condition? condition]) => v(
         () async => (await _databaseAccessor!.select(
           _tableDefinition,
           where: condition?.where(),
@@ -50,11 +44,10 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
         ))
             .map((e) => pack(e))
             .toList(),
-        {'condition': condition},
+        condition,
       );
 
-  @override
-  Future<P> shipById(id) => v(
+  Future<SavedEntity> shipById(Id id) => v(
         () async {
           final condition = Equals(defPkId.name, id);
           return pack(
@@ -66,11 +59,10 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
                 .single,
           );
         },
-        {'id': id},
+        id,
       );
 
-  @override
-  Future<P> replace(P payload) => v(
+  Future<SavedEntity> replace(SavedEntity payload) => v(
         () async {
           final entityMap = unpack(payload);
 
@@ -86,11 +78,10 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
 
           return pack(entityMap);
         },
-        {'payload': payload},
+        payload,
       );
 
-  @override
-  Future<P> archive(P payload) => v(
+  Future<SavedEntity> archive(SavedEntity payload) => v(
         () async {
           final entityMap = unpack(payload);
 
@@ -106,11 +97,10 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
 
           return pack(entityMap);
         },
-        {'payload': payload},
+        payload,
       );
 
-  @override
-  Future<P> unarchive(P payload) => v(
+  Future<SavedEntity> unarchive(SavedEntity payload) => v(
         () async {
           final entityMap = unpack(payload);
 
@@ -127,11 +117,10 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
 
           return pack(entityMap);
         },
-        {'payload': payload},
+        payload,
       );
 
-  @override
-  Future<List<P>> waste([Condition? condition]) => v(
+  Future<List<SavedEntity>> waste([Condition? condition]) => v(
         () async {
           final payloads = (await _databaseAccessor!.select(
             _tableDefinition,
@@ -151,11 +140,10 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
 
           return payloads;
         },
-        {'condition': condition},
+        condition,
       );
 
-  @override
-  Future<P> wasteById(id) => v(
+  Future<SavedEntity> wasteById(Id id) => v(
         () async {
           final condition = Equals(defPkId.name, id);
           final payload = (await _databaseAccessor!.select(
@@ -171,6 +159,15 @@ abstract class DatabaseTupleRepository<E extends DatabaseTupleEntity, P>
           );
           return pack(payload);
         },
-        {'id': id},
+        id,
       );
+
+  static DatabaseAccessor? _databaseAccessor;
+
+  static set databaseAccessor(DatabaseAccessor databaseAccessor) =>
+      _databaseAccessor ??= databaseAccessor;
+
+  final TableDefinition _tableDefinition;
+
+  DatabaseTupleRepository(this._tableDefinition);
 }

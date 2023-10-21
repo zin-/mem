@@ -1,4 +1,4 @@
-import 'package:mem/repositories/conditions/conditions.dart';
+import 'package:mem/framework/repository/condition/conditions.dart';
 
 class In extends Condition {
   final String _key;

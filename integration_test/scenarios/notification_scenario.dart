@@ -159,7 +159,7 @@ void testNotificationScenario() => group(": $_scenarioName", () {
                     isNotNull,
                     isFalse,
                     isNull,
-                    isFalse,
+                    isNull,
                     isNotNull,
                     isNotNull,
                     isNull,

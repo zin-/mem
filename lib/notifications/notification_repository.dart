@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:mem/framework/repository_v3.dart';
+import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:timezone/data/latest_all.dart';
 import 'package:timezone/timezone.dart';
@@ -12,7 +12,7 @@ import 'notification/repeated_notification.dart';
 import 'notification/show_notification.dart';
 import 'wrapper.dart';
 
-class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
+class NotificationRepository extends Repository<Notification> {
   final NotificationsWrapper? _flutterLocalNotificationsWrapper;
 
   Future<bool?> checkNotification() => v(
@@ -20,46 +20,43 @@ class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
       );
 
   @override
-  Future<void> receive(
-    Notification payload,
-  ) =>
-      v(
+  Future<void> receive(Notification entity) => v(
         () async {
-          if (payload is RepeatedNotification) {
+          if (entity is RepeatedNotification) {
             await _flutterLocalNotificationsWrapper?.zonedSchedule(
-              payload.id,
-              payload.title,
-              payload.body,
-              TZDateTime.from(payload.notifyFirstAt, local),
-              payload.payloadJson,
-              payload.actions,
-              payload.channel,
-              payload.interval,
+              entity.id,
+              entity.title,
+              entity.body,
+              TZDateTime.from(entity.notifyFirstAt, local),
+              entity.payloadJson,
+              entity.actions,
+              entity.channel,
+              entity.interval,
             );
-          } else if (payload is OneTimeNotification) {
+          } else if (entity is OneTimeNotification) {
             await _flutterLocalNotificationsWrapper?.zonedSchedule(
-              payload.id,
-              payload.title,
-              payload.body,
-              TZDateTime.from(payload.notifyAt, local),
-              payload.payloadJson,
-              payload.actions,
-              payload.channel,
+              entity.id,
+              entity.title,
+              entity.body,
+              TZDateTime.from(entity.notifyAt, local),
+              entity.payloadJson,
+              entity.actions,
+              entity.channel,
             );
-          } else if (payload is ShowNotification) {
+          } else if (entity is ShowNotification) {
             await _flutterLocalNotificationsWrapper?.show(
-              payload.id,
-              payload.title,
-              payload.body,
-              payload.actions,
-              payload.channel,
-              payload.payloadJson,
+              entity.id,
+              entity.title,
+              entity.body,
+              entity.actions,
+              entity.channel,
+              entity.payloadJson,
             );
-          } else if (payload is CancelNotification) {
-            await discard(payload.id);
+          } else if (entity is CancelNotification) {
+            await discard(entity.id);
           }
         },
-        payload,
+        entity,
       );
 
   Future<void> discard(int notificationId) => v(
@@ -79,9 +76,5 @@ class NotificationRepository extends RepositoryV3<Notification, Future<void>> {
           ? NotificationsWrapper(androidDefaultIconPath)
           : null,
     );
-  }
-
-  static void reset(NotificationRepository? notificationRepository) {
-    _instance = notificationRepository;
   }
 }

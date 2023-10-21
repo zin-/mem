@@ -1,20 +1,21 @@
 import 'package:flutter/foundation.dart';
+import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/repositories/repository.dart';
 
 import 'act_counter.dart';
 import 'home_widget_accessor.dart';
 
+// TODO constantsとして別で定義する
 // see android\app\src\main\kotlin\zin\playground\mem\ActCounterConfigure.kt
 const methodChannelName = 'zin.playground.mem/act_counter';
 const initializeMethodName = 'initialize';
 const widgetProviderName = 'ActCounterProvider';
 
-class ActCounterRepository extends RepositoryV2<ActCounter, ActCounter> {
+class ActCounterRepository extends Repository<ActCounter> {
   final HomeWidgetAccessor? _homeWidgetAccessor;
 
   @override
-  Future<ActCounter> receive(ActCounter payload) => v(
+  Future<ActCounter> receive(ActCounter entity) => v(
         () async {
           final homeWidgetId = await _homeWidgetAccessor?.initialize(
             methodChannelName,
@@ -22,7 +23,7 @@ class ActCounterRepository extends RepositoryV2<ActCounter, ActCounter> {
           );
 
           if (homeWidgetId != null) {
-            InitializedActCounter(homeWidgetId, payload)
+            InitializedActCounter(homeWidgetId, entity)
                 .widgetData()
                 .forEach((key, value) async {
               await _homeWidgetAccessor?.saveWidgetData(key, value);
@@ -31,27 +32,23 @@ class ActCounterRepository extends RepositoryV2<ActCounter, ActCounter> {
             await _homeWidgetAccessor?.updateWidget(widgetProviderName);
           }
 
-          return payload;
+          return entity;
         },
-        {'payload': payload},
+        entity,
       );
 
-  @override
-  Future<ActCounter> replace(ActCounter payload) => v(
+  Future<ActCounter> replace(ActCounter entity) => v(
         () async {
-          payload.widgetData().forEach((key, value) async {
+          entity.widgetData().forEach((key, value) async {
             await _homeWidgetAccessor?.saveWidgetData(key, value);
           });
 
           await _homeWidgetAccessor?.updateWidget(widgetProviderName);
 
-          return payload;
+          return entity;
         },
-        {'payload': payload},
+        entity,
       );
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 
   ActCounterRepository._(this._homeWidgetAccessor);
 

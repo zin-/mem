@@ -1,6 +1,6 @@
-import 'package:mem/framework/entity_v3.dart';
+import 'package:mem/framework/repository/entity.dart';
 
-class NotificationAction extends EntityV3 {
+class NotificationAction extends Entity {
   final String id;
   final String title;
   final Future<void> Function(int memId) onTapped;

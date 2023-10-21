@@ -1,4 +1,4 @@
-import 'package:mem/framework/entity_v3.dart';
+import 'package:mem/framework/repository/entity.dart';
 
 /// # Logとは
 ///
@@ -36,7 +36,7 @@ import 'package:mem/framework/entity_v3.dart';
 // 言葉の意味としては「丸太を投げ込め！」という号令で、「航海開始」を表す
 //
 // 航海日誌においては、最初の記録ということになる
-class Log extends EntityV3 {
+class Log extends Entity {
   final Level level;
   final String message;
   final dynamic error;

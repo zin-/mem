@@ -4,8 +4,8 @@ import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/mem_notification_repository.dart';
-import 'package:mem/mems/mem_repository.dart';
+import 'package:mem/repositories/mem_notification_repository.dart';
+import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/notifications/client.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/one_time_notification.dart';
@@ -26,9 +26,11 @@ class ActService {
 
   Future<Act> start(int memId, DateAndTime when) => i(
         () async {
-          final receivedAct = await _actRepository.receive(
-            Act(memId, DateAndTimePeriod(start: when)),
-          );
+          final receivedAct = await _actRepository
+              .receive(
+                ActV2(memId, DateAndTimePeriod(start: when)),
+              )
+              .then((value) => value.toV1());
 
           _registerStartNotifications(receivedAct.memId);
 
@@ -41,11 +43,13 @@ class ActService {
         () async {
           final finishingAct = await _actRepository.shipById(actId);
 
-          final replaced = await _actRepository.replace(
-            finishingAct.copiedWith(
-              finishingAct.period.copiedWith(when),
-            ),
-          );
+          final replaced = await _actRepository
+              .replace(
+                finishingAct.copiedWith(
+                  finishingAct.period.copiedWith(when),
+                ),
+              )
+              .then((value) => value.toV1());
 
           _cancelNotifications(replaced.memId);
 
@@ -58,7 +62,9 @@ class ActService {
 
   Future<Act> edit(Act editingAct) => i(
         () async {
-          final replaced = await _actRepository.replace(editingAct);
+          final replaced = await _actRepository
+              .replace(SavedActV2.fromV1(editingAct))
+              .then((value) => value.toV1());
 
           if (replaced.period.end == null) {
             _registerStartNotifications(replaced.memId);
@@ -73,7 +79,8 @@ class ActService {
 
   Future<Act> delete(int id) => i(
         () async {
-          final wasted = await ActRepository().wasteById(id);
+          final wasted =
+              await _actRepository.wasteById(id).then((value) => value.toV1());
 
           _cancelNotifications(wasted.memId);
 
@@ -84,7 +91,9 @@ class ActService {
 
   Future _registerStartNotifications(int memId) => v(
         () async {
-          final mem = await _memRepository.shipById(memId);
+          final mem = await _memRepository
+              .shipById(memId)
+              .then((value) => value.toV1());
 
           _notificationRepository.receive(
             ShowNotification(

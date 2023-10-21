@@ -1,17 +1,18 @@
-import 'package:mem/framework/repository_v3.dart';
+
+import 'package:mem/framework/repository/repository.dart';
 
 import 'log_entity.dart';
 import 'logger_wrapper.dart';
 
-class LogRepository extends RepositoryV3<Log, void> {
+class LogRepository extends Repository<Log> {
   LoggerWrapper _loggerWrapper;
 
   @override
-  void receive(Log payload) => _loggerWrapper.log(
-        payload.level,
-        payload.message,
-        payload.error,
-        payload.stackTrace,
+  void receive(Log entity) => _loggerWrapper.log(
+        entity.level,
+        entity.message,
+        entity.error,
+        entity.stackTrace,
       );
 
   LogRepository._(this._loggerWrapper);

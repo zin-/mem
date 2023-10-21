@@ -11,7 +11,8 @@ class FinishActiveActNotificationAction extends NotificationAction {
           title,
           (memId) async {
             final activeActs = (await ActRepository().shipActive())
-                .where((element) => element.memId == memId);
+                .where((element) => element.memId == memId)
+                .map((e) => e.toV1());
 
             final now = DateAndTime.now();
             ActService().finish(
