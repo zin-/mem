@@ -4,7 +4,7 @@ import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/framework/database_tuple_repository.dart';
-import 'package:mem/repositories/conditions/conditions.dart';
+import 'package:mem/framework/conditions/conditions.dart';
 
 class ActRepository
     extends DatabaseTupleRepository<ActV2, SavedActV2<int>, int> {

@@ -4,7 +4,7 @@ import 'package:mem/framework/database/definition/table_definition.dart';
 import 'package:mem/framework/entity.dart';
 import 'package:mem/framework/repository.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/repositories/conditions/conditions.dart';
+import 'package:mem/framework/conditions/conditions.dart';
 
 // FIXME byIdの引数の型のためにSavedEntityの型以外にIが必要になっている
 //  Rにidの型情報が含まれているのに改めて渡す必要があるのはおかしい

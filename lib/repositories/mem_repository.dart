@@ -5,7 +5,7 @@ import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/framework/database_tuple_repository.dart';
-import 'package:mem/repositories/conditions/conditions.dart';
+import 'package:mem/framework/conditions/conditions.dart';
 
 class MemRepository
     extends DatabaseTupleRepository<MemV2, SavedMemV2<int>, int> {
