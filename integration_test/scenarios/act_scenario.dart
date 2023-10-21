@@ -11,8 +11,6 @@ import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/databases/definition.dart';
-import 'package:mem/framework/database/factory.dart';
-import 'package:mem/repositories/database_repository.dart';
 import 'package:mem/values/durations.dart';
 
 import 'helpers.dart';
@@ -38,13 +36,8 @@ void testActScenario() => group(': $_scenarioName', () {
       late final int insertedMemId;
 
       setUpAll(() async {
-        DatabaseFactory.onTest = true;
-        dbA = await DatabaseRepository().receive(databaseDefinition);
-
-        for (var tableDefinition
-            in databaseDefinition.tableDefinitions.reversed) {
-          await dbA.delete(tableDefinition);
-        }
+        dbA = await openTestDatabase(databaseDefinition);
+        await clearAllTestDatabaseRows(databaseDefinition);
 
         insertedMemId = await dbA.insert(
           defTableMems,

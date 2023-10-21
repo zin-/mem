@@ -6,7 +6,7 @@ import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/definition/database_definition.dart';
 import 'package:mem/framework/database/factory.dart';
 import 'package:mem/main.dart';
-import 'package:mem/repositories/database_repository.dart';
+import 'package:mem/framework/database_repository.dart';
 
 // Database(DB) operations
 Future<DatabaseAccessor> openTestDatabase(
