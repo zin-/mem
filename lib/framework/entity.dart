@@ -15,7 +15,3 @@ abstract class Entity {}
 //  domain領域では、nullの場合はそもそも実行する必要がないはずなのでnot nullになっている
 //  data領域ではさらに厳しく、データとして存在しているはずのものしかなくなるのでidなどの情報が付与されているはず
 //  など
-
-abstract class EntityV2 {
-  Map<String, dynamic> toMap();
-}
