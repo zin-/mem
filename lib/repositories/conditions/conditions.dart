@@ -6,8 +6,6 @@ abstract class Condition {
   List<Object?>? whereArgs();
 }
 
-typedef Conditions = Iterable<Condition>;
-
 class Equals extends Condition {
   final String _key;
   final dynamic _value;
@@ -65,7 +63,7 @@ class IsNotNull extends Condition {
 class And extends Condition {
   static const _operator = ' AND ';
 
-  final Conditions _conditions;
+  final Iterable<Condition> _conditions;
 
   And(this._conditions) : super();
 
