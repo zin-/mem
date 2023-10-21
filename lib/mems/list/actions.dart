@@ -3,7 +3,7 @@ import 'package:mem/acts/act_repository.dart';
 import 'package:mem/acts/states.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
-import 'package:mem/framework/conditions/in.dart';
+import 'package:mem/framework/repository/condition/in.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
 import 'package:mem/mems/states.dart';

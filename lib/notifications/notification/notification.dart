@@ -1,4 +1,4 @@
-import 'package:mem/framework/entity.dart';
+import 'package:mem/framework/repository/entity.dart';
 
 abstract class Notification extends Entity {
   final int id;

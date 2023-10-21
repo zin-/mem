@@ -1,4 +1,4 @@
-import 'package:mem/framework/entity.dart';
+import 'package:mem/framework/repository/entity.dart';
 
 class NotificationAction extends Entity {
   final String id;

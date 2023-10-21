@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:mem/framework/repository.dart';
+import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/logger/log_service.dart';
 
 import 'act_counter.dart';

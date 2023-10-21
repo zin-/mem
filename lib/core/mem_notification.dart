@@ -1,6 +1,6 @@
 import 'package:mem/core/entity_value.dart';
-import 'package:mem/framework/entity.dart';
-import 'package:mem/framework/database_tuple_entity.dart';
+import 'package:mem/framework/repository/entity.dart';
+import 'package:mem/framework/repository/database_tuple_entity.dart';
 
 class MemNotificationV2 extends Entity {
   final int memId;

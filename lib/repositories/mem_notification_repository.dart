@@ -1,8 +1,8 @@
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/framework/database_tuple_repository.dart';
-import 'package:mem/framework/conditions/conditions.dart';
+import 'package:mem/framework/repository/database_tuple_repository.dart';
+import 'package:mem/framework/repository/condition/conditions.dart';
 
 class MemNotificationRepository extends DatabaseTupleRepository<
     MemNotificationV2, SavedMemNotificationV2<int>, int> {

@@ -1,7 +1,7 @@
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/definition/database_definition.dart';
 import 'package:mem/framework/database/factory.dart';
-import 'package:mem/framework/repository.dart';
+import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/logger/log_service.dart';
 
 class DatabaseRepository extends Repository<DatabaseDefinition> {

@@ -1,5 +1,5 @@
 
-import 'package:mem/framework/repository.dart';
+import 'package:mem/framework/repository/repository.dart';
 
 import 'log_entity.dart';
 import 'logger_wrapper.dart';

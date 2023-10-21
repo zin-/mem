@@ -1,6 +1,6 @@
 import 'package:mem/framework/database/definition/exceptions.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
-import 'package:mem/framework/entity.dart';
+import 'package:mem/framework/repository/entity.dart';
 
 class DatabaseDefinition extends Entity {
   final String name;
