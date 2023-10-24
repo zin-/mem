@@ -23,6 +23,15 @@ class MemV2 extends Entity {
 class SavedMemV2<I> extends MemV2 with SavedDatabaseTupleMixin<I> {
   SavedMemV2(super.name, super.doneAt, super.period);
 
+  SavedMemV2 copiedWith({
+    DateTime? Function()? doneAt,
+  }) =>
+      SavedMemV2<I>(
+        name,
+        doneAt == null ? this.doneAt : doneAt(),
+        period,
+      )..copiedFrom(this);
+
   Mem toV1() => Mem(
         name: name,
         doneAt: doneAt,
@@ -38,7 +47,7 @@ class SavedMemV2<I> extends MemV2 with SavedDatabaseTupleMixin<I> {
         v1.doneAt,
         v1.period,
       )
-        ..id = v1.id
+        ..id = v1.id as I
         ..createdAt = v1.createdAt as DateTime
         ..updatedAt = v1.updatedAt
         ..archivedAt = v1.archivedAt;

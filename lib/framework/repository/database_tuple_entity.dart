@@ -22,4 +22,10 @@ mixin SavedDatabaseTupleMixin<T> on Entity {
       defColArchivedAt.name: archivedAt,
     };
   }
+
+  SavedDatabaseTupleMixin copiedFrom(SavedDatabaseTupleMixin origin) => this
+    ..id = origin.id
+    ..createdAt = origin.createdAt
+    ..updatedAt = origin.updatedAt
+    ..archivedAt = origin.archivedAt;
 }

@@ -33,6 +33,7 @@ void testTodoScenario() => group(': $_scenarioName', () {
 
         await dbA.insert(defTableMems, {
           defColMemsName.name: insertedMemName,
+          defColMemsDoneAt.name: null,
           defColCreatedAt.name: zeroDate,
         });
         await dbA.insert(defTableMems, {

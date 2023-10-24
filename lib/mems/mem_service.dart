@@ -17,11 +17,6 @@ class MemService {
   final NotificationService _notificationService;
   final NotificationRepository _notificationRepository;
 
-  Future<Mem> fetchMemById(int memId) => i(
-        () => _memRepository.shipById(memId).then((value) => value.toV1()),
-        {'memId': memId},
-      );
-
   Future<MemDetail> save(MemDetail memDetail, {bool undo = false}) => i(
         () async {
           final savedMem = (memDetail.mem.isSaved() && !undo
@@ -79,7 +74,9 @@ class MemService {
 
   Future<MemDetail> doneByMemId(int memId) => i(
         () async => save(MemDetail(
-          (await fetchMemById(memId))..doneAt = DateTime.now(),
+          (await _memRepository.shipById(memId))
+              .copiedWith(doneAt: () => DateTime.now())
+              .toV1(),
           [],
         )),
         {'memId': memId},
@@ -87,7 +84,9 @@ class MemService {
 
   Future<MemDetail> undoneByMemId(int memId) => i(
         () async => save(MemDetail(
-          (await fetchMemById(memId))..doneAt = null,
+          (await _memRepository.shipById(memId))
+              .copiedWith(doneAt: () => null)
+              .toV1(),
           [],
         )),
         {'memId': memId},
