@@ -78,7 +78,7 @@ class _MemListItemViewComponent extends ListTile {
           leading: memRepeatedNotifications == null
               ? activeAct == null
                   ? MemDoneCheckbox(
-                      memV1,
+                      MemV2.fromV1(memV1),
                       (value) => onMemDoneCheckboxTapped(value, memV1.id),
                     )
                   : null

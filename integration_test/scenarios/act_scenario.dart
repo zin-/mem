@@ -468,7 +468,7 @@ void testActScenario() => group(': $_scenarioName', () {
               defColCreatedAt.name: zeroDate,
             },
           );
-          for (int i = 0; i < 32; i++) {
+          for (int i = 0; i < 34; i++) {
             final start = now.subtract(Duration(days: i));
             for (int j = 0; j < randomInt(5); j++) {
               await dbA.insert(
