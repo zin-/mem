@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_detail.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/logger/log_service.dart';
@@ -80,7 +81,7 @@ final archiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
     () async {
       final mem = ref.read(memDetailProvider(memId)).mem;
 
-      final archived = await MemService().archive(mem);
+      final archived = await MemService().archive(SavedMemV2.fromV1(mem));
 
       ref.read(editingMemProvider(memId).notifier).updatedBy(archived.mem);
       ref
@@ -98,7 +99,7 @@ final unarchiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
     () async {
       final mem = ref.read(memDetailProvider(memId)).mem;
 
-      final unarchived = await MemService().unarchive(mem);
+      final unarchived = await MemService().unarchive(SavedMemV2.fromV1(mem));
 
       ref.read(editingMemProvider(memId).notifier).updatedBy(unarchived.mem);
       ref

@@ -92,11 +92,10 @@ class MemService {
         {'memId': memId},
       );
 
-  Future<MemDetail> archive(Mem mem) => i(
+  Future<MemDetail> archive(SavedMemV2<int> mem) => i(
         () async {
-          final archivedMem = await _memRepository
-              .archive(SavedMemV2.fromV1(mem))
-              .then((value) => value.toV1());
+          final archivedMem =
+              await _memRepository.archive(mem).then((value) => value.toV1());
           final archivedMemItems =
               (await _memItemRepository.archiveByMemId(archivedMem.id))
                   .map((e) => e.toV1())
@@ -109,14 +108,13 @@ class MemService {
             archivedMemItems,
           );
         },
-        {'mem': mem},
+        mem,
       );
 
-  Future<MemDetail> unarchive(Mem mem) => i(
+  Future<MemDetail> unarchive(SavedMemV2<int> mem) => i(
         () async {
-          final unarchivedMem = await _memRepository
-              .unarchive(SavedMemV2.fromV1(mem))
-              .then((value) => value.toV1());
+          final unarchivedMem =
+              await _memRepository.unarchive(mem).then((value) => value.toV1());
           final unarchivedMemItems =
               (await _memItemRepository.unarchiveByMemId(unarchivedMem.id))
                   .map((e) => e.toV1())
@@ -129,7 +127,7 @@ class MemService {
             unarchivedMemItems,
           );
         },
-        {'mem': mem},
+        mem,
       );
 
   Future<bool> remove(int memId) => i(
