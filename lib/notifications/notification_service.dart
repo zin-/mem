@@ -34,7 +34,7 @@ class NotificationService {
       );
 
   Future<void> memRepeatedReminder(
-    Mem mem,
+    SavedMemV2 mem,
     MemNotification? memNotification,
   ) =>
       i(

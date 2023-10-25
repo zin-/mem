@@ -42,7 +42,10 @@ class MemService {
                     if (e.isSaved()) {
                       _memNotificationRepository.wasteById(e.id);
                     }
-                    _notificationService.memRepeatedReminder(savedMem, null);
+                    _notificationService.memRepeatedReminder(
+                      SavedMemV2.fromV1(savedMem),
+                      null,
+                    );
                     return Future(
                         () => MemNotification(e.type, e.time, e.message));
                   } else {
@@ -56,7 +59,7 @@ class MemService {
                         .then((value) => value.toV1())
                       ..then(
                         (value) => _notificationService.memRepeatedReminder(
-                          savedMem,
+                          SavedMemV2.fromV1(savedMem),
                           value,
                         ),
                       );
