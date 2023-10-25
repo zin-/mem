@@ -31,21 +31,21 @@ class SingleSelectableMemListItem extends ConsumerWidget {
 
 class _SingleSelectableMemListItemComponent extends ListTile {
   _SingleSelectableMemListItemComponent(
-    Mem mem,
+    Mem memV1,
     bool isSelected,
     void Function(int? memId) onSelected,
   ) : super(
-          title: MemNameText(mem),
-          subtitle: mem.period == null ? null : MemPeriodTexts(mem.id),
+          title: MemNameText(SavedMemV2.fromV1(memV1)),
+          subtitle: memV1.period == null ? null : MemPeriodTexts(memV1.id),
           trailing: Radio<int>(
-            value: mem.id,
-            groupValue: isSelected ? mem.id : null,
+            value: memV1.id,
+            groupValue: isSelected ? memV1.id : null,
             onChanged: onSelected,
           ),
-          onTap: () => onSelected(mem.id),
+          onTap: () => onSelected(memV1.id),
         ) {
     verbose({
-      'mem': mem,
+      'mem': memV1,
       'isSelected': isSelected,
     });
   }

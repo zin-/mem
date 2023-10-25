@@ -12,6 +12,8 @@ import 'package:mem/mems/list/body.dart';
 import 'package:mem/mems/list/show_new_mem_fab.dart';
 import 'package:mem/mems/states.dart';
 
+import '../../integration_test/scenarios/helpers.dart';
+
 void main() {
   testWidgets('Hide & show ShowNewMemFab.', (widgetTester) async {
     final scrollController = ScrollController();
@@ -20,6 +22,7 @@ void main() {
       (index) => Mem(
         name: 'Hide & show ShowNewMemFab: mem name - $index',
         id: index,
+        createdAt: zeroDate,
       ),
     );
 

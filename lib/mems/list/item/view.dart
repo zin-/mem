@@ -68,7 +68,7 @@ class MemListItemView extends ConsumerWidget {
 
 class _MemListItemViewComponent extends ListTile {
   _MemListItemViewComponent(
-    Mem mem,
+    Mem memV1,
     Act? activeAct,
     MemNotification? memRepeatedNotifications,
     void Function(int memId) onTap,
@@ -78,12 +78,12 @@ class _MemListItemViewComponent extends ListTile {
           leading: memRepeatedNotifications == null
               ? activeAct == null
                   ? MemDoneCheckbox(
-                      mem,
-                      (value) => onMemDoneCheckboxTapped(value, mem.id),
+                      memV1,
+                      (value) => onMemDoneCheckboxTapped(value, memV1.id),
                     )
                   : null
               : null,
-          trailing: mem.isDone()
+          trailing: memV1.isDone()
               ? null
               : IconButton(
                   onPressed: () => onActButtonTapped(activeAct),
@@ -92,20 +92,20 @@ class _MemListItemViewComponent extends ListTile {
                       : const Icon(Icons.stop),
                 ),
           title: activeAct == null
-              ? MemNameText(mem)
+              ? MemNameText(SavedMemV2.fromV1(memV1))
               : Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(child: MemNameText(mem)),
+                    Expanded(child: MemNameText(SavedMemV2.fromV1(memV1))),
                     ElapsedTimeView(activeAct.period.start!),
                   ],
                 ),
-          subtitle: mem.period == null ? null : MemPeriodTexts(mem.id),
-          tileColor: mem.isArchived() ? archivedColor : null,
-          onTap: () => onTap(mem.id),
+          subtitle: memV1.period == null ? null : MemPeriodTexts(memV1.id),
+          tileColor: memV1.isArchived() ? archivedColor : null,
+          onTap: () => onTap(memV1.id),
         ) {
     verbose({
-      'mem': mem,
+      'mem': memV1,
       'activeAct': activeAct,
       'memRepeatedNotifications': memRepeatedNotifications,
     });
