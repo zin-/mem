@@ -16,7 +16,7 @@ class ActCounterService {
   Future<void> createNew(int memId) => v(
         () async => await _actCounterRepository.receive(
           ActCounter(
-            await _memRepository.shipById(memId).then((value) => value.toV1()),
+            await _memRepository.shipById(memId),
             await _actRepository
                 .shipByMemId(
                   memId,
@@ -37,9 +37,7 @@ class ActCounterService {
 
           await _actCounterRepository.replace(
             ActCounter(
-              await _memRepository
-                  .shipById(memId)
-                  .then((value) => value.toV1()),
+              await _memRepository.shipById(memId),
               await _actRepository
                   .shipByMemId(
                     memId,
