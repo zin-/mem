@@ -23,7 +23,7 @@ class MemListView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => AsyncValueView(
         loadMemList,
         (data) => _MemListViewComponent(
-          ref.watch(memListProvider),
+          ref.watch(memListProvider).map((e) => SavedMemV2.fromV1(e)).toList(),
           _appBar,
           _itemBuilder,
           _scrollController,
@@ -32,7 +32,7 @@ class MemListView extends ConsumerWidget {
 }
 
 class _MemListViewComponent extends StatelessWidget {
-  final List<Mem> _memList;
+  final List<SavedMemV2> _memList;
   final Widget _appBar;
   final Widget Function(int memId) _itemBuilder;
   final ScrollController? _scrollController;
