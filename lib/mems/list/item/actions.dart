@@ -15,7 +15,7 @@ final doneMem = Provider.autoDispose.family<Mem, int>(
 
       MemService().doneByMemId(memId).then(
             (doneMemDetail) => ref.read(memsProvider.notifier).upsertAll(
-              [doneMemDetail.mem],
+              [doneMemDetail.mem.toV1()],
               (tmp, item) => tmp.id == item.id,
             ),
           );
@@ -37,7 +37,7 @@ final undoneMem = Provider.autoDispose.family<Mem, int>(
 
       MemService().undoneByMemId(memId).then(
             (undoneMemDetail) => ref.read(memsProvider.notifier).upsertAll(
-              [undoneMemDetail.mem],
+              [undoneMemDetail.mem.toV1()],
               (tmp, item) => tmp.id == item.id,
             ),
           );

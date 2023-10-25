@@ -23,7 +23,8 @@ final removedMemDetailProvider = StateNotifierProvider.autoDispose
 
       MemDetail? removedMemDetail;
       if (removedMem != null && removedMemItems != null) {
-        removedMemDetail = MemDetail(removedMem, removedMemItems);
+        removedMemDetail =
+            MemDetail(SavedMemV2.fromV1(removedMem), removedMemItems);
       } else {
         removedMemDetail = null;
       }

@@ -13,6 +13,16 @@ class MemV2 extends Entity {
 
   bool get isDone => doneAt != null;
 
+  MemV2 copiedWith({
+    DateTime? Function()? doneAt,
+    DateAndTimePeriod? Function()? period,
+  }) =>
+      MemV2(
+        name,
+        doneAt == null ? this.doneAt : doneAt(),
+        period == null ? this.period : period(),
+      );
+
   Mem toV1() => Mem(
         name: name,
         doneAt: doneAt,
@@ -31,13 +41,15 @@ class MemV2 extends Entity {
 class SavedMemV2<I> extends MemV2 with SavedDatabaseTupleMixin<I> {
   SavedMemV2(super.name, super.doneAt, super.period);
 
+  @override
   SavedMemV2 copiedWith({
     DateTime? Function()? doneAt,
+    DateAndTimePeriod? Function()? period,
   }) =>
       SavedMemV2<I>(
         name,
         doneAt == null ? this.doneAt : doneAt(),
-        period,
+        period == null ? this.period : period(),
       )..copiedFrom(this);
 
   @override

@@ -15,7 +15,7 @@ final memDetailProvider = StateNotifierProvider.autoDispose
   (ref, memId) => v(
     () => ValueStateNotifier(
       MemDetail(
-        ref.watch(editingMemProvider(memId)),
+        MemV2.fromV1(ref.watch(editingMemProvider(memId))),
         ref.watch(memItemsProvider(memId))!,
         ref.watch(memNotificationsByMemIdProvider(memId)),
       ),
@@ -54,8 +54,10 @@ final editingMemProvider = StateNotifierProvider.autoDispose
 final memIsArchivedProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<bool>, bool, int?>(
   (ref, memId) => v(
-    () => ValueStateNotifier(
-        ref.watch(memDetailProvider(memId)).mem.isArchived()),
+    () {
+      final mem = ref.watch(memDetailProvider(memId)).mem;
+      return ValueStateNotifier((mem is SavedMemV2) ? mem.isArchived : false);
+    },
     memId,
   ),
 );

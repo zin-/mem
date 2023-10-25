@@ -14,12 +14,12 @@ class MemDetailFab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mem = ref.watch(memDetailProvider(_memId)).mem;
+    final memName = ref.watch(memDetailProvider(_memId)).mem.name;
 
     return _MemDetailFabComponent(
       _formKey,
       () => ref.read(saveMem(_memId)),
-      mem.name,
+      memName,
     );
   }
 }

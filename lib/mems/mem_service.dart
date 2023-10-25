@@ -19,10 +19,11 @@ class MemService {
 
   Future<MemDetail> save(MemDetail memDetail, {bool undo = false}) => i(
         () async {
-          final savedMem = (memDetail.mem.isSaved() && !undo
+          final savedMem = (memDetail.mem.toV1().isSaved() && !undo
                   ? await _memRepository
-                      .replace(SavedMemV2.fromV1(memDetail.mem))
-                  : await _memRepository.receive(MemV2.fromV1(memDetail.mem)))
+                      .replace(SavedMemV2.fromV1(memDetail.mem.toV1()))
+                  : await _memRepository
+                      .receive(MemV2.fromV1(memDetail.mem.toV1())))
               .toV1();
           _notificationService.memReminder(SavedMemV2.fromV1(savedMem));
 
@@ -67,7 +68,7 @@ class MemService {
                 }));
 
           return MemDetail(
-            savedMem,
+            SavedMemV2.fromV1(savedMem),
             savedMemItems,
             savedMemNotifications,
           );
@@ -76,22 +77,28 @@ class MemService {
       );
 
   Future<MemDetail> doneByMemId(int memId) => i(
-        () async => save(MemDetail(
-          (await _memRepository.shipById(memId))
+        () async {
+          final done = (await _memRepository.shipById(memId))
               .copiedWith(doneAt: () => DateTime.now())
-              .toV1(),
-          [],
-        )),
+              .toV1();
+          return save(MemDetail(
+            SavedMemV2.fromV1(done),
+            [],
+          ));
+        },
         {'memId': memId},
       );
 
   Future<MemDetail> undoneByMemId(int memId) => i(
-        () async => save(MemDetail(
-          (await _memRepository.shipById(memId))
+        () async {
+          final undone = (await _memRepository.shipById(memId))
               .copiedWith(doneAt: () => null)
-              .toV1(),
-          [],
-        )),
+              .toV1();
+          return save(MemDetail(
+            SavedMemV2.fromV1(undone),
+            [],
+          ));
+        },
         {'memId': memId},
       );
 
@@ -107,7 +114,7 @@ class MemService {
           _notificationService.memReminder(SavedMemV2.fromV1(archivedMem));
 
           return MemDetail(
-            archivedMem,
+            SavedMemV2.fromV1(archivedMem),
             archivedMemItems,
           );
         },
@@ -126,7 +133,7 @@ class MemService {
           _notificationService.memReminder(SavedMemV2.fromV1(unarchivedMem));
 
           return MemDetail(
-            unarchivedMem,
+            SavedMemV2.fromV1(unarchivedMem),
             unarchivedMemItems,
           );
         },

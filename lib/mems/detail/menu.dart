@@ -21,7 +21,7 @@ class MemDetailMenu extends ConsumerWidget {
     final mem = ref.watch(memDetailProvider(_memId)).mem;
 
     return _MemDetailMenuComponent(
-      MemV2.fromV1(mem),
+      mem,
       () => ref.read(unarchiveMem(_memId!)),
       () => ref.read(archiveMem(_memId!)),
       () => ref.read(removeMem(_memId!)),

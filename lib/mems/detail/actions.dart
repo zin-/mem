@@ -58,11 +58,14 @@ final saveMem =
               ref.watch(memDetailProvider(memId)),
             );
 
-            ref
-                .read(memsProvider.notifier)
-                .upsertAll([saved.mem], (tmp, item) => tmp.id == item.id);
+            ref.read(memsProvider.notifier).upsertAll(
+              [saved.mem.toV1()],
+              (tmp, item) => tmp.id == item.id,
+            );
 
-            ref.read(editingMemProvider(memId).notifier).updatedBy(saved.mem);
+            ref
+                .read(editingMemProvider(memId).notifier)
+                .updatedBy(saved.mem.toV1());
             ref
                 .read(memItemsProvider(memId).notifier)
                 .updatedBy(saved.memItems);
@@ -79,14 +82,16 @@ final saveMem =
 final archiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
   (ref, memId) => v(
     () async {
-      final mem = ref.read(memDetailProvider(memId)).mem;
+      final mem = ref.read(memDetailProvider(memId)).mem.toV1();
 
       final archived = await MemService().archive(SavedMemV2.fromV1(mem));
 
-      ref.read(editingMemProvider(memId).notifier).updatedBy(archived.mem);
+      ref
+          .read(editingMemProvider(memId).notifier)
+          .updatedBy(archived.mem.toV1());
       ref
           .read(memsProvider.notifier)
-          .upsertAll([archived.mem], (tmp, item) => tmp.id == item.id);
+          .upsertAll([archived.mem.toV1()], (tmp, item) => tmp.id == item.id);
 
       return archived;
     },
@@ -97,14 +102,16 @@ final archiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
 final unarchiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
   (ref, memId) => v(
     () async {
-      final mem = ref.read(memDetailProvider(memId)).mem;
+      final mem = ref.read(memDetailProvider(memId)).mem.toV1();
 
       final unarchived = await MemService().unarchive(SavedMemV2.fromV1(mem));
 
-      ref.read(editingMemProvider(memId).notifier).updatedBy(unarchived.mem);
+      ref
+          .read(editingMemProvider(memId).notifier)
+          .updatedBy(unarchived.mem.toV1());
       ref
           .read(memsProvider.notifier)
-          .upsertAll([unarchived.mem], (tmp, item) => tmp.id == item.id);
+          .upsertAll([unarchived.mem.toV1()], (tmp, item) => tmp.id == item.id);
 
       return unarchived;
     },
