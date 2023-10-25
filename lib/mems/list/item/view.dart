@@ -26,7 +26,9 @@ class MemListItemView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemListItemViewComponent(
-          ref.watch(memListProvider).firstWhere((_) => _.id == _memId),
+          SavedMemV2.fromV1(
+            ref.watch(memListProvider).firstWhere((_) => _.id == _memId),
+          ),
           ref.watch(activeActsProvider)?.singleWhereOrNull(
                 (act) => act.memId == _memId,
               ),
@@ -68,7 +70,7 @@ class MemListItemView extends ConsumerWidget {
 
 class _MemListItemViewComponent extends ListTile {
   _MemListItemViewComponent(
-    Mem memV1,
+    SavedMemV2 mem,
     Act? activeAct,
     MemNotification? memRepeatedNotifications,
     void Function(int memId) onTap,
@@ -78,12 +80,12 @@ class _MemListItemViewComponent extends ListTile {
           leading: memRepeatedNotifications == null
               ? activeAct == null
                   ? MemDoneCheckbox(
-                      MemV2.fromV1(memV1),
-                      (value) => onMemDoneCheckboxTapped(value, memV1.id),
+                      mem,
+                      (value) => onMemDoneCheckboxTapped(value, mem.id),
                     )
                   : null
               : null,
-          trailing: memV1.isDone()
+          trailing: mem.isDone
               ? null
               : IconButton(
                   onPressed: () => onActButtonTapped(activeAct),
@@ -92,20 +94,20 @@ class _MemListItemViewComponent extends ListTile {
                       : const Icon(Icons.stop),
                 ),
           title: activeAct == null
-              ? MemNameText(SavedMemV2.fromV1(memV1))
+              ? MemNameText(mem)
               : Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(child: MemNameText(SavedMemV2.fromV1(memV1))),
+                    Expanded(child: MemNameText(mem)),
                     ElapsedTimeView(activeAct.period.start!),
                   ],
                 ),
-          subtitle: memV1.period == null ? null : MemPeriodTexts(memV1.id),
-          tileColor: memV1.isArchived() ? archivedColor : null,
-          onTap: () => onTap(memV1.id),
+          subtitle: mem.period == null ? null : MemPeriodTexts(mem.id),
+          tileColor: mem.isArchived ? archivedColor : null,
+          onTap: () => onTap(mem.id),
         ) {
     verbose({
-      'mem': memV1,
+      'mem': mem,
       'activeAct': activeAct,
       'memRepeatedNotifications': memRepeatedNotifications,
     });
