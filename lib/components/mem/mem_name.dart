@@ -19,7 +19,7 @@ class MemNameText extends StatelessWidget {
             _mem.name,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: _mem.isDone()
+            style: _mem.isDone
                 ? const TextStyle(decoration: TextDecoration.lineThrough)
                 : null,
           ),

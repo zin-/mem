@@ -21,7 +21,7 @@ class MemDoneCheckbox extends StatelessWidget {
             _mem is SavedMemV2 ? (_mem as SavedMemV2).id : null,
           ),
           Checkbox(
-            value: _mem.isDone(),
+            value: _mem.isDone,
             onChanged:
                 (_mem is SavedMemV2 ? (_mem as SavedMemV2).isArchived : false)
                     ? null

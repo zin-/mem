@@ -11,7 +11,7 @@ class MemV2 extends Entity {
 
   MemV2(this.name, this.doneAt, this.period);
 
-  bool isDone() => doneAt != null;
+  bool get isDone => doneAt != null;
 
   factory MemV2.fromV1(Mem v1) => v1.isSaved()
       ? SavedMemV2.fromV1(v1)
