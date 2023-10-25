@@ -117,10 +117,8 @@ class _ActListViewComponent extends StatelessWidget {
                             return TotalActTimeListItem(
                               entry.value,
                               _mems.length >= 2
-                                  ? _mems
-                                      .singleWhereOrNull(
-                                          (element) => element.id == entry.key)
-                                      ?.toV1()
+                                  ? _mems.singleWhereOrNull(
+                                      (element) => element.id == entry.key)
                                   : null,
                             );
                           },
