@@ -16,7 +16,8 @@ class SingleSelectableMemListItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _SingleSelectableMemListItemComponent(
-          ref.watch(memListProvider).firstWhere((_) => _.id == _memId),
+          SavedMemV2.fromV1(
+              ref.watch(memListProvider).firstWhere((_) => _.id == _memId)),
           ref.watch(selectedMemIdsProvider)?.contains(_memId) ?? false,
           (memId) => v(
             () => ref
@@ -31,21 +32,21 @@ class SingleSelectableMemListItem extends ConsumerWidget {
 
 class _SingleSelectableMemListItemComponent extends ListTile {
   _SingleSelectableMemListItemComponent(
-    Mem memV1,
+    SavedMemV2 mem,
     bool isSelected,
     void Function(int? memId) onSelected,
   ) : super(
-          title: MemNameText(SavedMemV2.fromV1(memV1)),
-          subtitle: memV1.period == null ? null : MemPeriodTexts(memV1.id),
+          title: MemNameText(mem),
+          subtitle: mem.period == null ? null : MemPeriodTexts(mem.id),
           trailing: Radio<int>(
-            value: memV1.id,
-            groupValue: isSelected ? memV1.id : null,
+            value: mem.id,
+            groupValue: isSelected ? mem.id : null,
             onChanged: onSelected,
           ),
-          onTap: () => onSelected(memV1.id),
+          onTap: () => onSelected(mem.id),
         ) {
     verbose({
-      'mem': memV1,
+      'mem': mem,
       'isSelected': isSelected,
     });
   }
