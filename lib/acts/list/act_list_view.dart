@@ -40,13 +40,15 @@ class ActListView extends ConsumerWidget {
                 dateAndTime.day,
               );
             }),
-            _memId == null
-                ? ref.watch(memListProvider)
-                : [
-                    ref.watch(memListProvider).singleWhereOrNull(
-                          (element) => element.id == _memId,
-                        )!
-                  ],
+            (_memId == null
+                    ? ref.watch(memListProvider)
+                    : [
+                        ref.watch(memListProvider).singleWhereOrNull(
+                              (element) => element.id == _memId,
+                            )!
+                      ])
+                .map((e) => SavedMemV2.fromV1((e)))
+                .toList(),
             ref.watch(timeViewProvider),
           ),
         ),
@@ -59,7 +61,7 @@ class _ActListViewComponent extends StatelessWidget {
 
   final int? _memId;
   final Map<DateTime, List<Act>> _groupedActList;
-  final List<Mem> _mems;
+  final List<SavedMemV2> _mems;
   final bool _timeView;
 
   const _ActListViewComponent(
@@ -115,8 +117,10 @@ class _ActListViewComponent extends StatelessWidget {
                             return TotalActTimeListItem(
                               entry.value,
                               _mems.length > 1
-                                  ? _mems.singleWhereOrNull(
-                                      (element) => element.id == entry.key)
+                                  ? _mems
+                                      .singleWhereOrNull(
+                                          (element) => element.id == entry.key)
+                                      ?.toV1()
                                   : null,
                             );
                           },
@@ -129,9 +133,11 @@ class _ActListViewComponent extends StatelessWidget {
                               context,
                               act,
                               mem: _mems.length > 1
-                                  ? _mems.singleWhereOrNull(
-                                      (element) => element.id == act.memId,
-                                    )
+                                  ? _mems
+                                      .singleWhereOrNull(
+                                        (element) => element.id == act.memId,
+                                      )
+                                      ?.toV1()
                                   : null,
                             );
                           },
