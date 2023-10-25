@@ -347,10 +347,10 @@ void testActScenario() => group(': $_scenarioName', () {
               await widgetTester.longPress(find.text(dateText(zeroDate)).at(1));
               await widgetTester.pumpAndSettle();
 
-              final pickedDate = DateTime.now();
               await widgetTester.tap(find.byType(Switch).at(1));
               await widgetTester.pump();
 
+              final pickedDate = DateTime.now();
               await widgetTester.tap(find.text('OK'));
               await widgetTester.pump();
 
