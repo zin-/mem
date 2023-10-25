@@ -21,7 +21,7 @@ class MemDetailMenu extends ConsumerWidget {
     final mem = ref.watch(memDetailProvider(_memId)).mem;
 
     return _MemDetailMenuComponent(
-      mem,
+      MemV2.fromV1(mem),
       () => ref.read(unarchiveMem(_memId!)),
       () => ref.read(archiveMem(_memId!)),
       () => ref.read(removeMem(_memId!)),
@@ -30,7 +30,7 @@ class MemDetailMenu extends ConsumerWidget {
 }
 
 class _MemDetailMenuComponent extends StatelessWidget {
-  final Mem _mem;
+  final MemV2 _mem;
   final Future<MemDetail?> Function() _unarchiveMem;
   final Future<MemDetail?> Function() _archiveMem;
   final Future<bool> Function() _removeMem;
@@ -46,11 +46,12 @@ class _MemDetailMenuComponent extends StatelessWidget {
   Widget build(BuildContext context) {
     final menu = <Widget>[];
 
-    if (_mem.isSaved()) {
-      menu.add(_showActChartIconButton(Navigator.of(context), _mem.id));
-      menu.add(_showActIconButton(context, _mem.id));
+    if (_mem is SavedMemV2) {
+      menu.add(_showActChartIconButton(
+          Navigator.of(context), (_mem as SavedMemV2).id));
+      menu.add(_showActIconButton(context, (_mem as SavedMemV2).id));
 
-      if (_mem.isArchived()) {
+      if ((_mem as SavedMemV2).isArchived) {
         menu.add(_unarchiveIconButton(context));
       } else {
         menu.add(_archiveIconButton(context));
