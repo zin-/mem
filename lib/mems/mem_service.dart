@@ -24,7 +24,7 @@ class MemService {
                       .replace(SavedMemV2.fromV1(memDetail.mem))
                   : await _memRepository.receive(MemV2.fromV1(memDetail.mem)))
               .toV1();
-          _notificationService.memReminder(savedMem);
+          _notificationService.memReminder(SavedMemV2.fromV1(savedMem));
 
           final savedMemItems = (await Future.wait(memDetail.memItems.map((e) =>
                   (e.isSaved() && !undo
@@ -102,7 +102,7 @@ class MemService {
                   .map((e) => e.toV1())
                   .toList();
 
-          _notificationService.memReminder(archivedMem);
+          _notificationService.memReminder(SavedMemV2.fromV1(archivedMem));
 
           return MemDetail(
             archivedMem,
@@ -122,7 +122,7 @@ class MemService {
                   .map((e) => e.toV1())
                   .toList();
 
-          _notificationService.memReminder(unarchivedMem);
+          _notificationService.memReminder(SavedMemV2.fromV1(unarchivedMem));
 
           return MemDetail(
             unarchivedMem,

@@ -18,7 +18,7 @@ class NotificationService {
   // FIXME ここにあるのはおかしい
   final NotificationClient _notificationClient;
 
-  Future<void> memReminder(Mem mem) => i(
+  Future<void> memReminder(SavedMemV2 mem) => i(
         () async {
           final memNotifications = MemNotifications.of(
             mem,
