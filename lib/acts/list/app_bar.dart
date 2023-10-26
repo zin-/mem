@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/list/states.dart';
 import 'package:mem/components/l10n.dart';
+import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/states.dart';
 
@@ -18,7 +19,9 @@ class ActListAppBar extends ConsumerWidget {
               ? null
               : ref
                   .watch(memsProvider)
-                  ?.singleWhereOrNull((element) => element.id == _memId)
+                  ?.singleWhereOrNull(
+                    (element) => element is SavedMemV2 && element.id == _memId,
+                  )
                   ?.name,
           IconButton(
             icon: Icon(

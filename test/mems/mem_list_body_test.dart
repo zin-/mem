@@ -19,11 +19,13 @@ void main() {
     final scrollController = ScrollController();
     final samples = List.generate(
       20,
-      (index) => Mem(
-        name: 'Hide & show ShowNewMemFab: mem name - $index',
-        id: index,
-        createdAt: zeroDate,
-      ),
+      (index) => SavedMemV2(
+        'Hide & show ShowNewMemFab: mem name - $index',
+        null,
+        null,
+      )
+        ..id = index
+        ..createdAt = zeroDate,
     );
 
     await widgetTester.pumpWidget(ProviderScope(

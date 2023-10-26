@@ -9,18 +9,19 @@ final doneMem = Provider.autoDispose.family<Mem, int>(
     () {
       final mem = ref
           .read(memsProvider)!
-          .singleWhere((mem) => mem.id == memId)
-          .copied()
-        ..doneAt = DateTime.now();
+          .singleWhere((mem) => mem is SavedMemV2 ? mem.id == memId : false)
+          .copiedWith(doneAt: () => DateTime.now());
 
       MemService().doneByMemId(memId).then(
             (doneMemDetail) => ref.read(memsProvider.notifier).upsertAll(
-              [doneMemDetail.mem.toV1()],
-              (tmp, item) => tmp.id == item.id,
+              [doneMemDetail.mem],
+              (tmp, item) => tmp is SavedMemV2 && item is SavedMemV2
+                  ? tmp.id == item.id
+                  : false,
             ),
           );
 
-      return mem;
+      return mem.toV1();
     },
     memId,
   ),
@@ -31,18 +32,19 @@ final undoneMem = Provider.autoDispose.family<Mem, int>(
     () {
       final mem = ref
           .read(memsProvider)!
-          .singleWhere((mem) => mem.id == memId)
-          .copied()
-        ..doneAt = null;
+          .singleWhere((mem) => mem is SavedMemV2 ? mem.id == memId : false)
+          .copiedWith(doneAt: () => null);
 
       MemService().undoneByMemId(memId).then(
             (undoneMemDetail) => ref.read(memsProvider.notifier).upsertAll(
-              [undoneMemDetail.mem.toV1()],
-              (tmp, item) => tmp.id == item.id,
+              [undoneMemDetail.mem],
+              (tmp, item) => tmp is SavedMemV2 && item is SavedMemV2
+                  ? tmp.id == item.id
+                  : false,
             ),
           );
 
-      return mem;
+      return mem.toV1();
     },
     memId,
   ),

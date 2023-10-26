@@ -37,7 +37,7 @@ final showDoneProvider = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
 final memListProvider =
     StateNotifierProvider.autoDispose<ValueStateNotifier<List<Mem>>, List<Mem>>(
         (ref) {
-  final rawMemList = ref.watch(memsProvider) ?? <Mem>[];
+  final rawMemList = ref.watch(memsProvider) ?? <MemV2>[];
 
   final showNotArchived = ref.watch(showNotArchivedProvider);
   final showArchived = ref.watch(showArchivedProvider);
@@ -55,13 +55,15 @@ final memListProvider =
       if (showNotArchived == showArchived) {
         return true;
       } else {
-        return showArchived ? mem.isArchived() : !mem.isArchived();
+        return showArchived
+            ? mem is SavedMemV2 && mem.isArchived
+            : !(mem is SavedMemV2 ? mem.isArchived : false);
       }
     }).where((mem) {
       if (showNotDone == showDone) {
         return true;
       } else {
-        return showDone ? mem.isDone() : !mem.isDone();
+        return showDone ? mem.isDone : !mem.isDone;
       }
     }).toList(),
     {
@@ -77,10 +79,10 @@ final memListProvider =
   final activeActs = ref.watch(activeActsProvider);
   final sorted = v(
     () => filtered.sorted((a, b) {
-      final activeActOfA =
-          activeActs?.singleWhereOrNull((act) => act.memId == a.id);
-      final activeActOfB =
-          activeActs?.singleWhereOrNull((act) => act.memId == b.id);
+      final activeActOfA = activeActs
+          ?.singleWhereOrNull((act) => a is SavedMemV2 && act.memId == a.id);
+      final activeActOfB = activeActs
+          ?.singleWhereOrNull((act) => b is SavedMemV2 && act.memId == b.id);
       if ((activeActOfA == null) ^ (activeActOfB == null)) {
         return activeActOfA == null ? 1 : -1;
       } else if (activeActOfA != null && activeActOfB != null) {
@@ -91,11 +93,12 @@ final memListProvider =
         }
       }
 
-      if (a.isArchived() != b.isArchived()) {
-        return a.isArchived() ? 1 : -1;
+      if ((a is SavedMemV2 && a.isArchived) !=
+          (b is SavedMemV2 && b.isArchived)) {
+        return a is SavedMemV2 && a.isArchived ? 1 : -1;
       }
-      if (a.isDone() != b.isDone()) {
-        return a.isDone() ? 1 : -1;
+      if (a.isDone != b.isDone) {
+        return a.isDone ? 1 : -1;
       }
 
       final comparedPeriod = DateAndTimePeriod.compare(a.period, b.period);
@@ -103,12 +106,14 @@ final memListProvider =
         return comparedPeriod;
       }
 
-      return (a.id as int).compareTo(b.id);
+      return a is SavedMemV2 && b is SavedMemV2
+          ? (a.id as int).compareTo(b.id)
+          : 0;
     }).toList(),
     {filtered, activeActs},
   );
 
-  return ValueStateNotifier(sorted);
+  return ValueStateNotifier(sorted.map((e) => e.toV1()).toList());
 });
 
 final activeActsProvider =

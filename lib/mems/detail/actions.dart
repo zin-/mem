@@ -59,8 +59,10 @@ final saveMem =
             );
 
             ref.read(memsProvider.notifier).upsertAll(
-              [saved.mem.toV1()],
-              (tmp, item) => tmp.id == item.id,
+              [saved.mem],
+              (tmp, item) => tmp is SavedMemV2 && item is SavedMemV2
+                  ? tmp.id == item.id
+                  : false,
             );
 
             ref
@@ -89,9 +91,11 @@ final archiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
       ref
           .read(editingMemProvider(memId).notifier)
           .updatedBy(archived.mem.toV1());
-      ref
-          .read(memsProvider.notifier)
-          .upsertAll([archived.mem.toV1()], (tmp, item) => tmp.id == item.id);
+      ref.read(memsProvider.notifier).upsertAll(
+          [archived.mem],
+          (tmp, item) => tmp is SavedMemV2 && item is SavedMemV2
+              ? tmp.id == item.id
+              : false);
 
       return archived;
     },
@@ -109,9 +113,11 @@ final unarchiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
       ref
           .read(editingMemProvider(memId).notifier)
           .updatedBy(unarchived.mem.toV1());
-      ref
-          .read(memsProvider.notifier)
-          .upsertAll([unarchived.mem.toV1()], (tmp, item) => tmp.id == item.id);
+      ref.read(memsProvider.notifier).upsertAll(
+          [unarchived.mem],
+          (tmp, item) => tmp is SavedMemV2 && item is SavedMemV2
+              ? tmp.id == item.id
+              : false);
 
       return unarchived;
     },
@@ -128,15 +134,16 @@ final removeMem = Provider.autoDispose.family<Future<bool>, int?>(
         ref.read(removedMemProvider(memId).notifier).updatedBy(
               ref
                   .read(memsProvider)
-                  ?.singleWhereOrNull((element) => element.id == memId),
+                  ?.singleWhereOrNull(
+                      (element) => element is SavedMemV2 && element.id == memId)
+                  ?.toV1(),
             );
         ref.read(removedMemItemsProvider(memId).notifier).updatedBy(
               ref.read(memItemsProvider(memId)),
             );
 
-        ref
-            .read(memsProvider.notifier)
-            .removeWhere((element) => element.id == memId);
+        ref.read(memsProvider.notifier).removeWhere(
+            (element) => element is SavedMemV2 && element.id == memId);
 
         return removeSuccess;
       }

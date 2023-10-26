@@ -41,11 +41,13 @@ class MemListItemView extends ConsumerWidget {
           (bool? value, int memId) async {
             ref.read(memsProvider.notifier).upsertAll(
               [
-                value == true
+                SavedMemV2.fromV1(value == true
                     ? ref.read(doneMem(_memId))
-                    : ref.read(undoneMem(_memId))
+                    : ref.read(undoneMem(_memId)))
               ],
-              (tmp, item) => tmp.id == item.id,
+              (tmp, item) => tmp is SavedMemV2 && item is SavedMemV2
+                  ? tmp.id == item.id
+                  : false,
             );
           },
           (activeAct) => v(

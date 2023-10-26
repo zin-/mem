@@ -29,22 +29,21 @@ final editingMemProvider = StateNotifierProvider.autoDispose
   (ref, memId) => v(
     () {
       final rawMemList = ref.watch(memsProvider);
-      final memFromRawMemList =
-          rawMemList?.singleWhereOrNull((element) => element.id == memId);
+      final memFromRawMemList = rawMemList?.singleWhereOrNull(
+          (element) => element is SavedMemV2 ? element.id == memId : false);
 
       if (memId != null && rawMemList == null) {
-        MemRepository()
-            .shipById(memId)
-            .then((value) => value.toV1())
-            .then((value) {
-          ref
-              .read(memsProvider.notifier)
-              .upsertAll([value], (tmp, item) => tmp.id == item.id);
+        MemRepository().shipById(memId).then((value) {
+          ref.read(memsProvider.notifier).upsertAll(
+              [value],
+              (tmp, item) => tmp is SavedMemV2 && item is SavedMemV2
+                  ? tmp.id == item.id
+                  : false);
         });
       }
 
       return ValueStateNotifier(
-        memFromRawMemList ?? Mem(name: ''),
+        memFromRawMemList?.toV1() ?? Mem(name: ''),
       );
     },
     memId,

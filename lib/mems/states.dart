@@ -8,8 +8,8 @@ import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 
 final memsProvider =
-    StateNotifierProvider<ListValueStateNotifier<Mem>, List<Mem>?>(
-        (ref) => v(() => ListValueStateNotifier<Mem>(null)));
+    StateNotifierProvider<ListValueStateNotifier<MemV2>, List<MemV2>?>(
+        (ref) => v(() => ListValueStateNotifier<MemV2>(null)));
 final memNotificationsProvider = StateNotifierProvider<
         ListValueStateNotifier<MemNotification>, List<MemNotification>?>(
     (ref) => v(() => ListValueStateNotifier<MemNotification>(null)));

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/mem/list/states.dart';
+import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/mems/states.dart';
@@ -28,8 +29,10 @@ final loadMemList = FutureProvider(
       );
 
       ref.read(memsProvider.notifier).upsertAll(
-            mems,
-            (tmp, item) => tmp.id == item.id,
+            mems.map((e) => MemV2.fromV1(e)),
+            (tmp, item) => tmp is SavedMemV2 && item is SavedMemV2
+                ? tmp.id == item.id
+                : false,
           );
     },
   ),
