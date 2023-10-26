@@ -4,13 +4,13 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_service.dart';
 import 'package:mem/mems/states.dart';
 
-final doneMem = Provider.autoDispose.family<Mem, int>(
+final doneMem = Provider.autoDispose.family<SavedMemV2, int>(
   (ref, memId) => v(
     () {
       final mem = ref
           .read(memsProvider)!
           .singleWhere((mem) => mem is SavedMemV2 ? mem.id == memId : false)
-          .copiedWith(doneAt: () => DateTime.now());
+          .copiedWith(doneAt: () => DateTime.now()) as SavedMemV2;
 
       MemService().doneByMemId(memId).then(
             (doneMemDetail) => ref.read(memsProvider.notifier).upsertAll(
@@ -21,7 +21,7 @@ final doneMem = Provider.autoDispose.family<Mem, int>(
             ),
           );
 
-      return mem.toV1();
+      return mem;
     },
     memId,
   ),
