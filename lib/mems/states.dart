@@ -23,8 +23,7 @@ final removedMemDetailProvider = StateNotifierProvider.autoDispose
 
       MemDetail? removedMemDetail;
       if (removedMem != null && removedMemItems != null) {
-        removedMemDetail =
-            MemDetail(SavedMemV2.fromV1(removedMem), removedMemItems);
+        removedMemDetail = MemDetail(removedMem, removedMemItems);
       } else {
         removedMemDetail = null;
       }
@@ -34,9 +33,9 @@ final removedMemDetailProvider = StateNotifierProvider.autoDispose
   ),
 );
 final removedMemProvider =
-    StateNotifierProvider.family<ValueStateNotifier<Mem?>, Mem?, int>(
+    StateNotifierProvider.family<ValueStateNotifier<MemV2?>, MemV2?, int>(
   (ref, memId) => v(
-    () => ValueStateNotifier<Mem?>(null),
+    () => ValueStateNotifier<MemV2?>(null),
     memId,
   ),
 );
