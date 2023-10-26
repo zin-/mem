@@ -82,9 +82,9 @@ final saveMem =
 final archiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
   (ref, memId) => v(
     () async {
-      final mem = ref.read(memDetailProvider(memId)).mem.toV1();
+      final mem = ref.read(memDetailProvider(memId)).mem as SavedMemV2<int>;
 
-      final archived = await MemService().archive(SavedMemV2.fromV1(mem));
+      final archived = await MemService().archive(mem);
 
       ref.read(editingMemProvider(memId).notifier).updatedBy(archived.mem);
       ref.read(memsProvider.notifier).upsertAll(
@@ -102,9 +102,9 @@ final archiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
 final unarchiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
   (ref, memId) => v(
     () async {
-      final mem = ref.read(memDetailProvider(memId)).mem.toV1();
+      final mem = ref.read(memDetailProvider(memId)).mem as SavedMemV2<int>;
 
-      final unarchived = await MemService().unarchive(SavedMemV2.fromV1(mem));
+      final unarchived = await MemService().unarchive(mem);
 
       ref.read(editingMemProvider(memId).notifier).updatedBy(unarchived.mem);
       ref.read(memsProvider.notifier).upsertAll(

@@ -80,7 +80,7 @@ class _MemDetailBodyComponent extends StatelessWidget {
             ),
             Padding(
               padding: pageBottomPadding,
-              child: CreatedAndUpdatedAtTexts(_mem.toV1()),
+              child: CreatedAndUpdatedAtTexts(_mem),
             ),
           ],
         ),

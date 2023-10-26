@@ -91,14 +91,12 @@ class ActService {
 
   Future _registerStartNotifications(int memId) => v(
         () async {
-          final mem = await _memRepository
-              .shipById(memId)
-              .then((value) => value.toV1());
+          final memName = (await _memRepository.shipById(memId)).name;
 
           _notificationRepository.receive(
             ShowNotification(
               activeActNotificationId(memId),
-              mem.name,
+              memName,
               'Running',
               json.encode({memIdKey: memId}),
               [
@@ -117,7 +115,7 @@ class ActService {
               _notificationRepository.receive(
                 OneTimeNotification(
                   afterActStartedNotificationId(memId),
-                  mem.name,
+                  memName,
                   notification.message,
                   json.encode({memIdKey: memId}),
                   [
