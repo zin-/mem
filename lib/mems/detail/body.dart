@@ -20,17 +20,17 @@ class MemDetailBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
-          final editingMem = ref.watch(memDetailProvider(_memId)).mem.toV1();
+          final editingMem = ref.watch(memDetailProvider(_memId)).mem;
 
           return _MemDetailBodyComponent(
             _memId,
-            MemV2.fromV1(editingMem),
+            editingMem,
             (value) => ref.read(editingMemProvider(_memId).notifier).updatedBy(
-                  editingMem.copied()..name = value,
+                  editingMem.copiedWith(name: () => value),
                 ),
             (value) => ref.read(editingMemProvider(_memId).notifier).updatedBy(
-                  editingMem.copied()
-                    ..doneAt = value == true ? DateTime.now() : null,
+                  editingMem.copiedWith(
+                      doneAt: () => value == true ? DateTime.now() : null),
                 ),
           );
         },

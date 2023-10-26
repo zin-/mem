@@ -14,11 +14,12 @@ class MemV2 extends Entity {
   bool get isDone => doneAt != null;
 
   MemV2 copiedWith({
+    String Function()? name,
     DateTime? Function()? doneAt,
     DateAndTimePeriod? Function()? period,
   }) =>
       MemV2(
-        name,
+        name == null ? this.name : name(),
         doneAt == null ? this.doneAt : doneAt(),
         period == null ? this.period : period(),
       );
@@ -43,11 +44,12 @@ class SavedMemV2<I> extends MemV2 with SavedDatabaseTupleMixin<I> {
 
   @override
   SavedMemV2 copiedWith({
+    String Function()? name,
     DateTime? Function()? doneAt,
     DateAndTimePeriod? Function()? period,
   }) =>
       SavedMemV2<I>(
-        name,
+        name == null ? this.name : name(),
         doneAt == null ? this.doneAt : doneAt(),
         period == null ? this.period : period(),
       )..copiedFrom(this);
