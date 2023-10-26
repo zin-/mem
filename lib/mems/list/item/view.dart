@@ -26,9 +26,7 @@ class MemListItemView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemListItemViewComponent(
-          SavedMemV2.fromV1(
-            ref.watch(memListProvider).firstWhere((_) => _.id == _memId),
-          ),
+          ref.watch(memListProvider).firstWhere((_) => _.id == _memId),
           ref.watch(activeActsProvider)?.singleWhereOrNull(
                 (act) => act.memId == _memId,
               ),

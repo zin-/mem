@@ -41,14 +41,12 @@ class ActListView extends ConsumerWidget {
               );
             }),
             (_memId == null
-                    ? ref.watch(memListProvider)
-                    : [
-                        ref.watch(memListProvider).singleWhereOrNull(
-                              (element) => element.id == _memId,
-                            )!
-                      ])
-                .map((e) => SavedMemV2.fromV1((e)))
-                .toList(),
+                ? ref.watch(memListProvider)
+                : [
+                    ref.watch(memListProvider).singleWhereOrNull(
+                          (element) => element.id == _memId,
+                        )!
+                  ]),
             ref.watch(timeViewProvider),
           ),
         ),

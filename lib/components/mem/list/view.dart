@@ -23,7 +23,7 @@ class MemListView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => AsyncValueView(
         loadMemList,
         (data) => _MemListViewComponent(
-          ref.watch(memListProvider).map((e) => SavedMemV2.fromV1(e)).toList(),
+          ref.watch(memListProvider),
           _appBar,
           _itemBuilder,
           _scrollController,
