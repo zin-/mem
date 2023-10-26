@@ -43,7 +43,7 @@ class MemListItemView extends ConsumerWidget {
               [
                 value == true
                     ? ref.read(doneMem(_memId))
-                    : SavedMemV2.fromV1(ref.read(undoneMem(_memId)))
+                    : ref.read(undoneMem(_memId))
               ],
               (tmp, item) => tmp is SavedMemV2 && item is SavedMemV2
                   ? tmp.id == item.id

@@ -27,13 +27,13 @@ final doneMem = Provider.autoDispose.family<SavedMemV2, int>(
   ),
 );
 
-final undoneMem = Provider.autoDispose.family<Mem, int>(
+final undoneMem = Provider.autoDispose.family<SavedMemV2, int>(
   (ref, memId) => v(
     () {
       final mem = ref
           .read(memsProvider)!
           .singleWhere((mem) => mem is SavedMemV2 ? mem.id == memId : false)
-          .copiedWith(doneAt: () => null);
+          .copiedWith(doneAt: () => null) as SavedMemV2;
 
       MemService().undoneByMemId(memId).then(
             (undoneMemDetail) => ref.read(memsProvider.notifier).upsertAll(
@@ -44,7 +44,7 @@ final undoneMem = Provider.autoDispose.family<Mem, int>(
             ),
           );
 
-      return mem.toV1();
+      return mem;
     },
     memId,
   ),
