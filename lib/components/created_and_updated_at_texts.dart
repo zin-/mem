@@ -6,14 +6,14 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/values/colors.dart';
 
 class CreatedAndUpdatedAtTexts extends StatelessWidget {
-  final MemV2 _entity;
+  final Mem _entity;
 
   const CreatedAndUpdatedAtTexts(this._entity, {super.key});
 
   @override
   Widget build(BuildContext context) => v(
         () {
-          if (_entity is SavedMemV2) {
+          if (_entity is SavedMem) {
             return Wrap(
               direction: Axis.horizontal,
               children: [
@@ -25,8 +25,8 @@ class CreatedAndUpdatedAtTexts extends StatelessWidget {
                     ),
                     DateAndTimeText(
                       DateAndTime.from(
-                        (_entity as SavedMemV2).createdAt,
-                        timeOfDay: (_entity as SavedMemV2).createdAt,
+                        (_entity as SavedMem).createdAt,
+                        timeOfDay: (_entity as SavedMem).createdAt,
                       ),
                       style: const TextStyle(
                         color: secondaryGreyColor,
@@ -34,7 +34,7 @@ class CreatedAndUpdatedAtTexts extends StatelessWidget {
                     ),
                   ],
                 ),
-                (_entity as SavedMemV2).updatedAt == null
+                (_entity as SavedMem).updatedAt == null
                     ? const SizedBox.shrink()
                     : Row(
                         children: [
@@ -44,8 +44,8 @@ class CreatedAndUpdatedAtTexts extends StatelessWidget {
                           ),
                           DateAndTimeText(
                             DateAndTime.from(
-                              (_entity as SavedMemV2).updatedAt!,
-                              timeOfDay: (_entity as SavedMemV2).updatedAt,
+                              (_entity as SavedMem).updatedAt!,
+                              timeOfDay: (_entity as SavedMem).updatedAt,
                             ),
                             style: const TextStyle(
                               color: secondaryGreyColor,

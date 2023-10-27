@@ -25,25 +25,25 @@ final memDetailProvider = StateNotifierProvider.autoDispose
 );
 
 final editingMemProvider = StateNotifierProvider.autoDispose
-    .family<ValueStateNotifier<MemV2>, MemV2, int?>(
+    .family<ValueStateNotifier<Mem>, Mem, int?>(
   (ref, memId) => v(
     () {
       final rawMemList = ref.watch(memsProvider);
       final memFromRawMemList = rawMemList?.singleWhereOrNull(
-          (element) => element is SavedMemV2 ? element.id == memId : false);
+          (element) => element is SavedMem ? element.id == memId : false);
 
       if (memId != null && rawMemList == null) {
         MemRepository().shipById(memId).then((value) {
           ref.read(memsProvider.notifier).upsertAll(
               [value],
-              (tmp, item) => tmp is SavedMemV2 && item is SavedMemV2
+              (tmp, item) => tmp is SavedMem && item is SavedMem
                   ? tmp.id == item.id
                   : false);
         });
       }
 
       return ValueStateNotifier(
-        memFromRawMemList ?? MemV2('', null, null),
+        memFromRawMemList ?? Mem('', null, null),
       );
     },
     memId,
@@ -55,7 +55,7 @@ final memIsArchivedProvider = StateNotifierProvider.autoDispose
   (ref, memId) => v(
     () {
       final mem = ref.watch(memDetailProvider(memId)).mem;
-      return ValueStateNotifier((mem is SavedMemV2) ? mem.isArchived : false);
+      return ValueStateNotifier((mem is SavedMem) ? mem.isArchived : false);
     },
     memId,
   ),

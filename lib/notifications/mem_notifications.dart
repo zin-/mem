@@ -17,7 +17,7 @@ const _endNotificationBody = 'end';
 
 class MemNotifications {
   static List<Notification> of(
-    SavedMemV2 mem,
+    SavedMem mem,
     TimeOfDay startOfDay,
   ) {
     if (mem.isDone || mem.isArchived) {

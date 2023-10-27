@@ -28,7 +28,7 @@ final loadMemList = FutureProvider(
 
       ref.read(memsProvider.notifier).upsertAll(
             mems,
-            (tmp, item) => tmp is SavedMemV2 && item is SavedMemV2
+            (tmp, item) => tmp is SavedMem && item is SavedMem
                 ? tmp.id == item.id
                 : false,
           );

@@ -35,9 +35,9 @@ final showDoneProvider = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
 );
 
 final memListProvider = StateNotifierProvider.autoDispose<
-    ValueStateNotifier<List<SavedMemV2>>, List<SavedMemV2>>((ref) {
+    ValueStateNotifier<List<SavedMem>>, List<SavedMem>>((ref) {
   final rawMemList =
-      ref.watch(memsProvider)?.map((e) => e as SavedMemV2) ?? <SavedMemV2>[];
+      ref.watch(memsProvider)?.map((e) => e as SavedMem) ?? <SavedMem>[];
 
   final showNotArchived = ref.watch(showNotArchivedProvider);
   final showArchived = ref.watch(showArchivedProvider);

@@ -8,8 +8,8 @@ import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 
 class MemRepository
-    extends DatabaseTupleRepository<MemV2, SavedMemV2<int>, int> {
-  Future<List<SavedMemV2<int>>> shipByCondition(bool? archived, bool? done) =>
+    extends DatabaseTupleRepository<Mem, SavedMem<int>, int> {
+  Future<List<SavedMem<int>>> shipByCondition(bool? archived, bool? done) =>
       v(
         () => super.ship(
           And([
@@ -32,11 +32,11 @@ class MemRepository
       );
 
   @override
-  SavedMemV2<int> pack(Map<String, dynamic> tuple) {
+  SavedMem<int> pack(Map<String, dynamic> tuple) {
     final startOn = tuple[defColMemsStartOn.name];
     final endOn = tuple[defColMemsEndOn.name];
 
-    return SavedMemV2<int>(
+    return SavedMem<int>(
       tuple[defColMemsName.name],
       tuple[defColMemsDoneAt.name],
       startOn == null && endOn == null
@@ -55,7 +55,7 @@ class MemRepository
   }
 
   @override
-  Map<String, dynamic> unpack(MemV2 entity) {
+  Map<String, dynamic> unpack(Mem entity) {
     final map = {
       defColMemsName.name: entity.name,
       defColMemsDoneAt.name: entity.doneAt,
@@ -67,7 +67,7 @@ class MemRepository
           entity.period?.end?.isAllDay == true ? null : entity.period?.end,
     };
 
-    if (entity is SavedMemV2) {
+    if (entity is SavedMem) {
       map.addAll(entity.unpack());
     }
 

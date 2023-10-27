@@ -10,7 +10,7 @@ class ActListItemView extends ListTile {
     BuildContext context,
     Act act, {
     // Act一覧の要素に対してMemがあったら名前を表示するという実装は合っているだろうか？
-    SavedMemV2? mem,
+    SavedMem? mem,
     super.key,
   }) : super(
           title: DateAndTimePeriodTexts(act.period),

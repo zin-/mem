@@ -20,7 +20,7 @@ class ActListAppBar extends ConsumerWidget {
               : ref
                   .watch(memsProvider)
                   ?.singleWhereOrNull(
-                    (element) => element is SavedMemV2 && element.id == _memId,
+                    (element) => element is SavedMem && element.id == _memId,
                   )
                   ?.name,
           IconButton(

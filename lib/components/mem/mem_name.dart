@@ -7,7 +7,7 @@ import 'package:mem/logger/log_service.dart';
 String _memNameTag(int? memId) => heroTag('mem-name', memId);
 
 class MemNameText extends StatelessWidget {
-  final SavedMemV2 _mem;
+  final SavedMem _mem;
 
   const MemNameText(this._mem, {Key? key}) : super(key: key);
 

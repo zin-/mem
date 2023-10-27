@@ -59,7 +59,7 @@ class _ActListViewComponent extends StatelessWidget {
 
   final int? _memId;
   final Map<DateTime, List<Act>> _groupedActList;
-  final List<SavedMemV2> _mems;
+  final List<SavedMem> _mems;
   final bool _timeView;
 
   const _ActListViewComponent(
