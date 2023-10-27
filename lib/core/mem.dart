@@ -24,12 +24,6 @@ class MemV2 extends Entity {
         period == null ? this.period : period(),
       );
 
-  Mem toV1() => Mem(
-        name: name,
-        doneAt: doneAt,
-        period: period,
-      );
-
   factory MemV2.fromV1(Mem v1) => v1.isSaved()
       ? SavedMemV2.fromV1(v1)
       : MemV2(
@@ -53,17 +47,6 @@ class SavedMemV2<I> extends MemV2 with SavedDatabaseTupleMixin<I> {
         doneAt == null ? this.doneAt : doneAt(),
         period == null ? this.period : period(),
       )..copiedFrom(this);
-
-  @override
-  Mem toV1() => Mem(
-        name: name,
-        doneAt: doneAt,
-        period: period,
-        id: id as int,
-        createdAt: createdAt,
-        updatedAt: updatedAt,
-        archivedAt: archivedAt,
-      );
 
   factory SavedMemV2.fromV1(Mem v1) => SavedMemV2(
         v1.name,

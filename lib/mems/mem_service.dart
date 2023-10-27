@@ -19,13 +19,12 @@ class MemService {
 
   Future<MemDetail> save(MemDetail memDetail, {bool undo = false}) => i(
         () async {
-          final savedMem = (memDetail.mem.toV1().isSaved() && !undo
-                  ? await _memRepository
-                      .replace(SavedMemV2.fromV1(memDetail.mem.toV1()))
-                  : await _memRepository
-                      .receive(MemV2.fromV1(memDetail.mem.toV1())))
-              .toV1();
-          _notificationService.memReminder(SavedMemV2.fromV1(savedMem));
+          final mem = memDetail.mem;
+
+          final savedMem = (mem is SavedMemV2<int> && !undo
+              ? await _memRepository.replace(mem)
+              : await _memRepository.receive(mem));
+          _notificationService.memReminder(savedMem);
 
           final savedMemItems = (await Future.wait(memDetail.memItems.map((e) =>
                   (e.isSaved() && !undo
@@ -44,7 +43,7 @@ class MemService {
                       _memNotificationRepository.wasteById(e.id);
                     }
                     _notificationService.memRepeatedReminder(
-                      SavedMemV2.fromV1(savedMem),
+                      savedMem,
                       null,
                     );
                     return Future(
@@ -60,7 +59,7 @@ class MemService {
                         .then((value) => value.toV1())
                       ..then(
                         (value) => _notificationService.memRepeatedReminder(
-                          SavedMemV2.fromV1(savedMem),
+                          savedMem,
                           value,
                         ),
                       );
@@ -68,7 +67,7 @@ class MemService {
                 }));
 
           return MemDetail(
-            SavedMemV2.fromV1(savedMem),
+            savedMem,
             savedMemItems,
             savedMemNotifications,
           );
@@ -79,12 +78,8 @@ class MemService {
   Future<MemDetail> doneByMemId(int memId) => i(
         () async {
           final done = (await _memRepository.shipById(memId))
-              .copiedWith(doneAt: () => DateTime.now())
-              .toV1();
-          return save(MemDetail(
-            SavedMemV2.fromV1(done),
-            [],
-          ));
+              .copiedWith(doneAt: () => DateTime.now());
+          return save(MemDetail(done, []));
         },
         {'memId': memId},
       );
@@ -92,48 +87,39 @@ class MemService {
   Future<MemDetail> undoneByMemId(int memId) => i(
         () async {
           final undone = (await _memRepository.shipById(memId))
-              .copiedWith(doneAt: () => null)
-              .toV1();
-          return save(MemDetail(
-            SavedMemV2.fromV1(undone),
-            [],
-          ));
+              .copiedWith(doneAt: () => null);
+          return save(MemDetail(undone, []));
         },
         {'memId': memId},
       );
 
   Future<MemDetail> archive(SavedMemV2<int> mem) => i(
         () async {
-          final archivedMem =
-              await _memRepository.archive(mem).then((value) => value.toV1());
+          final archivedMem = await _memRepository.archive(mem);
           final archivedMemItems =
               (await _memItemRepository.archiveByMemId(archivedMem.id))
                   .map((e) => e.toV1())
                   .toList();
 
-          _notificationService.memReminder(SavedMemV2.fromV1(archivedMem));
+          _notificationService.memReminder(archivedMem);
 
-          return MemDetail(
-            SavedMemV2.fromV1(archivedMem),
-            archivedMemItems,
-          );
+          return MemDetail(archivedMem, archivedMemItems);
         },
         mem,
       );
 
   Future<MemDetail> unarchive(SavedMemV2<int> mem) => i(
         () async {
-          final unarchivedMem =
-              await _memRepository.unarchive(mem).then((value) => value.toV1());
+          final unarchivedMem = await _memRepository.unarchive(mem);
           final unarchivedMemItems =
               (await _memItemRepository.unarchiveByMemId(unarchivedMem.id))
                   .map((e) => e.toV1())
                   .toList();
 
-          _notificationService.memReminder(SavedMemV2.fromV1(unarchivedMem));
+          _notificationService.memReminder(unarchivedMem);
 
           return MemDetail(
-            SavedMemV2.fromV1(unarchivedMem),
+            unarchivedMem,
             unarchivedMemItems,
           );
         },
