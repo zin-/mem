@@ -12,7 +12,8 @@ final editAct = Provider.autoDispose.family<Act, int>(
       final editingAct = ref.watch(editingActProvider(actId));
 
       ActService()
-          .edit(editingAct)
+          .edit(SavedActV2.fromV1(editingAct))
+          .then((value) => value.toV1())
           .then((editedAct) => ref.read(actsProvider.notifier).upsertAll(
                 [editedAct],
                 (tmp, item) => tmp.id == item.id,

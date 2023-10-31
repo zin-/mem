@@ -37,7 +37,7 @@ final startActBy = Provider.autoDispose.family<Act, int>(
 
       ActService().start(memId, now).then((startedAct) => v(
             () => ref.read(actsProvider.notifier).upsertAll(
-              [startedAct],
+              [startedAct.toV1()],
               (tmp, item) => tmp.id == item.id,
             ),
             startedAct,
@@ -59,7 +59,7 @@ final finishActBy = Provider.autoDispose.family<Act, int>(
 
       ActService().finish(finishingAct.id!, now).then((finishedAct) => v(
             () => ref.read(actsProvider.notifier).upsertAll(
-              [finishedAct],
+              [finishedAct.toV1()],
               (tmp, item) => tmp.id == item.id,
             ),
             finishedAct,

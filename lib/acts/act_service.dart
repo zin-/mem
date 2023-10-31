@@ -24,13 +24,11 @@ class ActService {
   // FIXME ここに定義されるのはおかしい
   final NotificationClient _notificationClient;
 
-  Future<Act> start(int memId, DateAndTime when) => i(
+  Future<SavedActV2> start(int memId, DateAndTime when) => i(
         () async {
-          final receivedAct = await _actRepository
-              .receive(
-                ActV2(memId, DateAndTimePeriod(start: when)),
-              )
-              .then((value) => value.toV1());
+          final receivedAct = await _actRepository.receive(
+            ActV2(memId, DateAndTimePeriod(start: when)),
+          );
 
           _registerStartNotifications(receivedAct.memId);
 
@@ -39,17 +37,15 @@ class ActService {
         [memId, when],
       );
 
-  Future<Act> finish(int actId, DateAndTime when) => i(
+  Future<SavedActV2> finish(int actId, DateAndTime when) => i(
         () async {
           final finishingAct = await _actRepository.shipById(actId);
 
-          final replaced = await _actRepository
-              .replace(
-                finishingAct.copiedWith(
-                  finishingAct.period.copiedWith(when),
-                ),
-              )
-              .then((value) => value.toV1());
+          final replaced = await _actRepository.replace(
+            finishingAct.copiedWith(
+              finishingAct.period.copiedWith(when),
+            ),
+          );
 
           _cancelNotifications(replaced.memId);
 
@@ -60,11 +56,9 @@ class ActService {
         [actId, when],
       );
 
-  Future<Act> edit(Act editingAct) => i(
+  Future<SavedActV2> edit(SavedActV2<int> editingAct) => i(
         () async {
-          final replaced = await _actRepository
-              .replace(SavedActV2.fromV1(editingAct))
-              .then((value) => value.toV1());
+          final replaced = await _actRepository.replace(editingAct);
 
           if (replaced.period.end == null) {
             _registerStartNotifications(replaced.memId);
@@ -77,10 +71,9 @@ class ActService {
         editingAct,
       );
 
-  Future<Act> delete(int id) => i(
+  Future<SavedActV2> delete(int id) => i(
         () async {
-          final wasted =
-              await _actRepository.wasteById(id).then((value) => value.toV1());
+          final wasted = await _actRepository.wasteById(id);
 
           _cancelNotifications(wasted.memId);
 

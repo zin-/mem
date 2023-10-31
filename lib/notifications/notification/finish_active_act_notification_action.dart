@@ -17,7 +17,9 @@ class FinishActiveActNotificationAction extends NotificationAction {
             final now = DateAndTime.now();
             ActService().finish(
               (activeActs.isEmpty
-                      ? await ActService().start(memId, now)
+                      ? await ActService()
+                          .start(memId, now)
+                          .then((value) => value.toV1())
                       : activeActs
                           .sorted((a, b) => a.period.compareTo(b.period))
                           .first)
