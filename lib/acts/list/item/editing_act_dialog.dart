@@ -39,7 +39,7 @@ class EditingActDialog extends ConsumerWidget {
             );
       }),
       () => v(() => ref.read(actListProvider(_act.memId).notifier).upsertAll(
-            [ref.read(editAct(_act.id!))],
+            [ref.read(editAct(_act.id!)).toV1()],
             (tmp, item) => tmp.id == item.id,
           )),
     );

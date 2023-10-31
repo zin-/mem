@@ -11,6 +11,8 @@ class ActV2 extends Entity {
   ActV2(this.memId, this.period);
 
   Act toV1() => Act(memId, period);
+
+  factory ActV2.fromV1(Act v1) => ActV2(v1.memId, v1.period);
 }
 
 class SavedActV2<I> extends ActV2 with SavedDatabaseTupleMixin<I> {
