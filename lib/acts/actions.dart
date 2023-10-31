@@ -9,7 +9,7 @@ import 'act_repository.dart';
 import 'act_service.dart';
 import 'states.dart';
 
-final loadActList = FutureProvider.autoDispose.family<List<Act>, int?>(
+final loadActList = FutureProvider.autoDispose.family<List<SavedActV2>, int?>(
   (ref, memId) => v(
     () async {
       // TODO 全件取得する場合、件数的な不安がある
@@ -17,11 +17,10 @@ final loadActList = FutureProvider.autoDispose.family<List<Act>, int?>(
       final acts = (memId == null
               ? await ActRepository().ship()
               : await ActRepository().shipByMemId(memId))
-          .map((e) => e.toV1())
           .toList();
 
       ref.watch(actsProvider.notifier).upsertAll(
-            acts,
+            acts.map((e) => e.toV1()),
             (tmp, item) => tmp.id == item.id,
           );
 
@@ -30,7 +29,7 @@ final loadActList = FutureProvider.autoDispose.family<List<Act>, int?>(
   ),
 );
 
-final startActBy = Provider.autoDispose.family<Act, int>(
+final startActBy = Provider.autoDispose.family<ActV2, int>(
   (ref, memId) => v(
     () {
       final now = DateAndTime.now();
@@ -43,13 +42,13 @@ final startActBy = Provider.autoDispose.family<Act, int>(
             startedAct,
           ));
 
-      return Act(memId, DateAndTimePeriod(start: now));
+      return ActV2(memId, DateAndTimePeriod(start: now));
     },
     memId,
   ),
 );
 
-final finishActBy = Provider.autoDispose.family<Act, int>(
+final finishActBy = Provider.autoDispose.family<SavedActV2, int>(
   (ref, memId) => v(
     () {
       final now = DateAndTime.now();
@@ -65,7 +64,7 @@ final finishActBy = Provider.autoDispose.family<Act, int>(
             finishedAct,
           ));
 
-      return finishingAct;
+      return SavedActV2.fromV1(finishingAct);
     },
     memId,
   ),

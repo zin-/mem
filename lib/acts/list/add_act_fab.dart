@@ -16,7 +16,7 @@ class ActFab extends ConsumerWidget {
     if (activeActList.isEmpty) {
       return _StartActFab(
         () => ref.read(actListProvider(_memId).notifier).upsertAll(
-          [ref.read(startActBy(_memId))],
+          [ref.read(startActBy(_memId)).toV1()],
           (tmp, item) => tmp.id == item.id,
         ),
       );

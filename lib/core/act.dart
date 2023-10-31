@@ -9,6 +9,8 @@ class ActV2 extends Entity {
   final DateAndTimePeriod period;
 
   ActV2(this.memId, this.period);
+
+  Act toV1() => Act(memId, period);
 }
 
 class SavedActV2<I> extends ActV2 with SavedDatabaseTupleMixin<I> {
@@ -23,6 +25,7 @@ class SavedActV2<I> extends ActV2 with SavedDatabaseTupleMixin<I> {
         ..updatedAt = updatedAt
         ..archivedAt = archivedAt;
 
+  @override
   Act toV1() => Act(
         memId,
         period,
