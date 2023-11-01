@@ -28,9 +28,7 @@ final fetchMemNotifications = Provider.autoDispose
 final fetchActiveActs = Provider(
   (ref) => v(
     () => ActRepository().shipActive().then(
-          (activeActs) => ref
-              .read(actsProvider.notifier)
-              .updatedBy(activeActs.map((e) => e.toV1()).toList()),
+          (activeActs) => ref.read(actsProvider.notifier).updatedBy(activeActs),
         ),
   ),
 );

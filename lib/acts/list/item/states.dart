@@ -8,8 +8,7 @@ final editingActProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<SavedActV2<int>>, SavedActV2<int>, int>(
   (ref, actId) => v(
     () => ValueStateNotifier(
-      SavedActV2.fromV1(
-          ref.read(actsProvider)!.singleWhere((act) => act.id == actId)),
+      ref.read(actsProvider)!.singleWhere((act) => act.id == actId),
     ),
     actId,
   ),

@@ -24,7 +24,7 @@ class ActService {
   // FIXME ここに定義されるのはおかしい
   final NotificationClient _notificationClient;
 
-  Future<SavedActV2> start(int memId, DateAndTime when) => i(
+  Future<SavedActV2<int>> start(int memId, DateAndTime when) => i(
         () async {
           final receivedAct = await _actRepository.receive(
             ActV2(memId, DateAndTimePeriod(start: when)),
@@ -37,7 +37,7 @@ class ActService {
         [memId, when],
       );
 
-  Future<SavedActV2> finish(int actId, DateAndTime when) => i(
+  Future<SavedActV2<int>> finish(int actId, DateAndTime when) => i(
         () async {
           final finishingAct = await _actRepository.shipById(actId);
 
@@ -56,7 +56,7 @@ class ActService {
         [actId, when],
       );
 
-  Future<SavedActV2> edit(SavedActV2<int> editingAct) => i(
+  Future<SavedActV2<int>> edit(SavedActV2<int> editingAct) => i(
         () async {
           final replaced = await _actRepository.replace(editingAct);
 

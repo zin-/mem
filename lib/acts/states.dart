@@ -4,8 +4,8 @@ import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/logger/log_service.dart';
 
-final actsProvider =
-    StateNotifierProvider<ListValueStateNotifier<Act>, List<Act>?>(
+final actsProvider = StateNotifierProvider<
+    ListValueStateNotifier<SavedActV2<int>>, List<SavedActV2<int>>?>(
   (ref) => v(() => ListValueStateNotifier(null)),
 );
 
@@ -19,7 +19,9 @@ final actListProvider = StateNotifierProvider.autoDispose
         (memId == null
                 ? acts
                 : acts?.where((act) => act.memId == memId).toList())
-            ?.sorted((a, b) => b.period.compareTo(a.period)),
+            ?.sorted((a, b) => b.period.compareTo(a.period))
+            .map((e) => e.toV1())
+            .toList(),
       );
     },
     memId,

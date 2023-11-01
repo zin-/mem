@@ -20,7 +20,7 @@ final loadActList = FutureProvider.autoDispose.family<List<SavedActV2>, int?>(
           .toList();
 
       ref.watch(actsProvider.notifier).upsertAll(
-            acts.map((e) => e.toV1()),
+            acts,
             (tmp, item) => tmp.id == item.id,
           );
 
@@ -36,7 +36,7 @@ final startActBy = Provider.autoDispose.family<ActV2, int>(
 
       ActService().start(memId, now).then((startedAct) => v(
             () => ref.read(actsProvider.notifier).upsertAll(
-              [startedAct.toV1()],
+              [startedAct],
               (tmp, item) => tmp.id == item.id,
             ),
             startedAct,
@@ -58,7 +58,7 @@ final finishActBy = Provider.autoDispose.family<SavedActV2, int>(
 
       ActService().finish(finishingAct.id!, now).then((finishedAct) => v(
             () => ref.read(actsProvider.notifier).upsertAll(
-              [finishedAct.toV1()],
+              [finishedAct],
               (tmp, item) => tmp.id == item.id,
             ),
             finishedAct,

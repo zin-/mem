@@ -117,6 +117,7 @@ final activeActsProvider =
         ref
             .watch(actsProvider)
             ?.where((act) => act.period.end == null)
+            .map((e) => e.toV1())
             .toList(),
       )),
 );
