@@ -16,19 +16,19 @@ class EditingActDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final editingAct = ref.watch(editingActProvider(_act.id!));
+    final editingAct = ref.watch(editingActProvider(_act.id!)).toV1();
 
     return _EditingActDialogComponent(
       editingAct,
       (pickedPeriod) => v(
         () => ref.read(editingActProvider(_act.id!).notifier).updatedBy(
-              _act.copiedWith(
+              SavedActV2.fromV1(_act.copiedWith(
                 // FIXME avoid '!'
                 //  nullになった場合のエラーを表示するべき
                 //  エラー表示は責務としては、対象のコンポーネントのはず
                 //  そうすると型の解決ができない？
                 pickedPeriod!,
-              ),
+              )),
             ),
         pickedPeriod,
       ),
