@@ -31,7 +31,9 @@ class ActListView extends ConsumerWidget {
           loadActList(_memId),
           (data) => _ActListViewComponent(
             _memId,
-            (ref.watch(actListProvider(_memId)) ?? []).groupListsBy((element) {
+            (ref.watch(actListProvider(_memId)) ?? [])
+                .map((e) => e.toV1())
+                .groupListsBy((element) {
               final dateAndTime = element.period.start!.dateTime;
 
               return DateTime(

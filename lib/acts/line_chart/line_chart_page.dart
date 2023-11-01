@@ -29,7 +29,8 @@ class ActLineChartPage extends ConsumerWidget {
                   ActsSummary(
                     ref
                         .watch(actListProvider(_memId))!
-                        .where((element) => element.memId == _memId),
+                        .where((element) => element.memId == _memId)
+                        .map((e) => e.toV1()),
                   ),
                 ),
               ),
