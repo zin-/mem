@@ -31,9 +31,7 @@ class ActListView extends ConsumerWidget {
           loadActList(_memId),
           (data) => _ActListViewComponent(
             _memId,
-            (ref.watch(actListProvider(_memId)) ?? [])
-                .map((e) => e.toV1())
-                .groupListsBy((element) {
+            (ref.watch(actListProvider(_memId)) ?? []).groupListsBy((element) {
               final dateAndTime = element.period.start!.dateTime;
 
               return DateTime(
@@ -60,7 +58,7 @@ class _ActListViewComponent extends StatelessWidget {
   final subHeaderTextStyle = const TextStyle(color: secondaryGreyColor);
 
   final int? _memId;
-  final Map<DateTime, List<Act>> _groupedActList;
+  final Map<DateTime, List<ActV2>> _groupedActList;
   final List<SavedMem> _mems;
   final bool _timeView;
 
@@ -115,7 +113,7 @@ class _ActListViewComponent extends StatelessWidget {
                                 .toList()[index];
 
                             return TotalActTimeListItem(
-                              entry.value,
+                              entry.value.map((e) => e.toV1()).toList(),
                               _mems.length >= 2
                                   ? _mems.singleWhereOrNull(
                                       (element) => element.id == entry.key)
@@ -129,7 +127,7 @@ class _ActListViewComponent extends StatelessWidget {
                             final act = e.value.toList()[index];
                             return ActListItemView(
                               context,
-                              act,
+                              act.toV1(),
                               mem: _mems.length >= 2
                                   ? _mems.singleWhereOrNull(
                                       (element) => element.id == act.memId,
