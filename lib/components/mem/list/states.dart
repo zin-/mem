@@ -111,13 +111,12 @@ final memListProvider = StateNotifierProvider.autoDispose<
   return ValueStateNotifier(sorted);
 });
 
-final activeActsProvider =
-    StateNotifierProvider.autoDispose<ListValueStateNotifier<Act>, List<Act>?>(
-  (ref) => v(() => ListValueStateNotifier<Act>(
+final activeActsProvider = StateNotifierProvider.autoDispose<
+    ListValueStateNotifier<SavedActV2>, List<SavedActV2>?>(
+  (ref) => v(() => ListValueStateNotifier(
         ref
             .watch(actsProvider)
             ?.where((act) => act.period.end == null)
-            .map((e) => e.toV1())
             .toList(),
       )),
 );

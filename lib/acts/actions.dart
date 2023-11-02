@@ -64,7 +64,7 @@ final finishActBy = Provider.autoDispose.family<SavedActV2, int>(
             finishedAct,
           ));
 
-      return SavedActV2.fromV1(finishingAct);
+      return finishingAct;
     },
     memId,
   ),

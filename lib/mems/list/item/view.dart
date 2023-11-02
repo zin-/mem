@@ -27,9 +27,12 @@ class MemListItemView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemListItemViewComponent(
           ref.watch(memListProvider).firstWhere((_) => _.id == _memId),
-          ref.watch(activeActsProvider)?.singleWhereOrNull(
+          ref
+              .watch(activeActsProvider)
+              ?.singleWhereOrNull(
                 (act) => act.memId == _memId,
-              ),
+              )
+              ?.toV1(),
           ref.watch(memNotificationsByMemIdProvider(_memId))?.singleWhereOrNull(
                 (element) =>
                     element.isSaved() &&
@@ -51,9 +54,7 @@ class MemListItemView extends ConsumerWidget {
           (activeAct) => v(
             () async {
               if (activeAct == null) {
-                ref
-                    .read(activeActsProvider.notifier)
-                    .add(ref.read(startActBy(_memId)).toV1());
+                ref.read(startActBy(_memId));
               } else {
                 ref.read(activeActsProvider.notifier).removeWhere(
                       (act) =>
