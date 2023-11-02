@@ -18,7 +18,7 @@ class ActListItemView extends ListTile {
           onLongPress: () {
             showDialog(
               context: context,
-              builder: (context) => EditingActDialog(act),
+              builder: (context) => EditingActDialog(act.id!),
             );
           },
         );

@@ -10,36 +10,33 @@ import 'actions.dart';
 import 'states.dart';
 
 class EditingActDialog extends ConsumerWidget {
-  final Act _act;
+  final int _actId;
 
-  const EditingActDialog(this._act, {super.key});
+  const EditingActDialog(this._actId, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final editingAct = ref.watch(editingActProvider(_act.id!)).toV1();
+    final editingAct = ref.watch(editingActProvider(_actId));
 
     return _EditingActDialogComponent(
       editingAct,
       (pickedPeriod) => v(
-        () => ref.read(editingActProvider(_act.id!).notifier).updatedBy(
-              SavedActV2.fromV1(_act.copiedWith(
-                // FIXME avoid '!'
-                //  nullになった場合のエラーを表示するべき
-                //  エラー表示は責務としては、対象のコンポーネントのはず
-                //  そうすると型の解決ができない？
-                pickedPeriod!,
-              )),
+        () => ref.read(editingActProvider(_actId).notifier).updatedBy(
+              editingAct.copiedWith(
+                pickedPeriod == null ? null : () => pickedPeriod,
+              ),
             ),
         pickedPeriod,
       ),
       () => v(() {
-        ref.read(deleteAct(_act.id!));
-        ref.read(actListProvider(_act.memId).notifier).removeWhere(
-              (act) => act is SavedActV2 && act.id == _act.memId,
+        ref.read(deleteAct(_actId));
+        ref.read(actListProvider(editingAct.memId).notifier).removeWhere(
+              (act) => act is SavedActV2 && act.id == editingAct.memId,
             );
       }),
-      () => v(() => ref.read(actListProvider(_act.memId).notifier).upsertAll(
-            [ref.read(editAct(_act.id!))],
+      () => v(() =>
+          ref.read(actListProvider(editingAct.memId).notifier).upsertAll(
+            [ref.read(editAct(_actId))],
             (tmp, item) =>
                 tmp is SavedActV2 && item is SavedActV2 && tmp.id == item.id,
           )),
@@ -48,7 +45,7 @@ class EditingActDialog extends ConsumerWidget {
 }
 
 class _EditingActDialogComponent extends StatelessWidget {
-  final Act _editingAct;
+  final SavedActV2 _editingAct;
   final Function(DateAndTimePeriod? picked) _onPeriodChanged;
   final Function() _onDeleteTapped;
   final Function() _onSaveTapped;

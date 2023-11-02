@@ -43,7 +43,7 @@ class ActService {
 
           final replaced = await _actRepository.replace(
             finishingAct.copiedWith(
-              finishingAct.period.copiedWith(when),
+              () => finishingAct.period.copiedWith(when),
             ),
           );
 

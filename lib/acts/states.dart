@@ -9,7 +9,6 @@ final actsProvider = StateNotifierProvider<
   (ref) => v(() => ListValueStateNotifier(null)),
 );
 
-// FIXME loadActList と同じIFな気がする、統一できるのではないか？
 final actListProvider = StateNotifierProvider.autoDispose
     .family<ListValueStateNotifier<ActV2>, List<ActV2>?, int?>(
   (ref, memId) => v(

@@ -18,9 +18,9 @@ class ActV2 extends Entity {
 class SavedActV2<I> extends ActV2 with SavedDatabaseTupleMixin<I> {
   SavedActV2(super.memId, super.period);
 
-  SavedActV2<I> copiedWith(DateAndTimePeriod period) => SavedActV2(
+  SavedActV2<I> copiedWith(DateAndTimePeriod Function()? period) => SavedActV2(
         memId,
-        period,
+        period == null ? this.period : period(),
       )
         ..id = id
         ..createdAt = createdAt
