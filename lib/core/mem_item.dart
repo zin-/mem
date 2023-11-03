@@ -15,8 +15,12 @@ class MemItemV2 extends Entity {
 
   MemItemV2(this.memId, this.type, this.value);
 
-  MemItemV2 copiedWith(dynamic Function()? value) => MemItemV2(
-        memId,
+  MemItemV2 copiedWith({
+    int Function()? memId,
+    dynamic Function()? value,
+  }) =>
+      MemItemV2(
+        memId == null ? this.memId : memId(),
         type,
         value == null ? this.value : value(),
       );
@@ -43,8 +47,12 @@ class SavedMemItemV2<I> extends MemItemV2 with SavedDatabaseTupleMixin<I> {
   SavedMemItemV2(super.memId, super.type, super.value);
 
   @override
-  SavedMemItemV2 copiedWith(dynamic Function()? value) => SavedMemItemV2(
-        memId,
+  SavedMemItemV2<I> copiedWith({
+    int Function()? memId,
+    dynamic Function()? value,
+  }) =>
+      SavedMemItemV2(
+        memId == null ? this.memId : memId(),
         type,
         value == null ? this.value : value(),
       )..copiedFrom(this);

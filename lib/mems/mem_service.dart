@@ -26,14 +26,14 @@ class MemService {
               : await _memRepository.receive(mem));
           _notificationService.memReminder(savedMem);
 
-          final savedMemItems = (await Future.wait(memDetail.memItems.map((e) =>
-                  (e.isSaved() && !undo
-                      ? _memItemRepository.replace(
-                          SavedMemItemV2.fromV1(e..memId = savedMem.id))
-                      : _memItemRepository
-                          .receive(MemItemV2.fromV1(e..memId = savedMem.id))))))
-              .map((e) => e.toV1())
-              .toList();
+          final savedMemItems = (await Future.wait(
+              memDetail.memItems.map((e) => (e is SavedMemItemV2<int> && !undo
+                  ? _memItemRepository.replace(
+                      e.copiedWith(memId: () => savedMem.id),
+                    )
+                  : _memItemRepository.receive(
+                      e.copiedWith(memId: () => savedMem.id),
+                    )))));
 
           final savedMemNotifications = memDetail.notifications == null
               ? null
@@ -97,13 +97,11 @@ class MemService {
         () async {
           final archivedMem = await _memRepository.archive(mem);
           final archivedMemItems =
-              (await _memItemRepository.archiveByMemId(archivedMem.id))
-                  .map((e) => e.toV1())
-                  .toList();
+              await _memItemRepository.archiveByMemId(archivedMem.id);
 
           _notificationService.memReminder(archivedMem);
 
-          return MemDetail(archivedMem, archivedMemItems);
+          return MemDetail(archivedMem, archivedMemItems.toList());
         },
         mem,
       );
@@ -112,15 +110,13 @@ class MemService {
         () async {
           final unarchivedMem = await _memRepository.unarchive(mem);
           final unarchivedMemItems =
-              (await _memItemRepository.unarchiveByMemId(unarchivedMem.id))
-                  .map((e) => e.toV1())
-                  .toList();
+              await _memItemRepository.unarchiveByMemId(unarchivedMem.id);
 
           _notificationService.memReminder(unarchivedMem);
 
           return MemDetail(
             unarchivedMem,
-            unarchivedMemItems,
+            unarchivedMemItems.toList(),
           );
         },
         mem,

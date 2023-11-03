@@ -509,23 +509,26 @@ void testActScenario() => group(': $_scenarioName', () {
           });
         });
 
-        testWidgets(": start act.", (widgetTester) async {
-          await showMemListPage(widgetTester);
+        testWidgets(
+          ": start act.",
+          (widgetTester) async {
+            await showMemListPage(widgetTester);
 
-          await widgetTester.tap(startIconFinder);
-          await widgetTester.pump();
+            await widgetTester.tap(startIconFinder);
+            await widgetTester.pump();
 
-          expect(
-            widgetTester.widget<Text>(find.byType(Text).at(4)).data,
-            '00:00:00',
-          );
+            expect(
+              widgetTester.widget<Text>(find.byType(Text).at(4)).data,
+              '00:00:00',
+            );
 
-          expect(startIconFinder, findsNothing);
-          expect(stopIconFinder, findsNWidgets(2));
-          await widgetTester.pumpAndSettle(elapsePeriod);
+            expect(startIconFinder, findsNothing);
+            expect(stopIconFinder, findsNWidgets(2));
+            await widgetTester.pumpAndSettle(elapsePeriod);
 
-          expect(find.text('00:00:00'), findsNothing);
-        });
+            expect(find.text('00:00:00'), findsNothing);
+          },
+        );
 
         testWidgets(": finish act.", (widgetTester) async {
           await showMemListPage(widgetTester);
