@@ -18,16 +18,21 @@ class MemNotificationV2 extends Entity {
         memId: memId,
       );
 
-  factory MemNotificationV2.fromV1(MemNotification v1) => MemNotificationV2(
-        v1.memId as int,
-        v1.type,
-        v1.time,
-        v1.message,
-      );
+  factory MemNotificationV2.fromV1(MemNotification v1) => v1.isSaved()
+      ? SavedMemNotificationV2.fromV1(v1)
+      : MemNotificationV2(
+          v1.memId,
+          v1.type,
+          v1.time,
+          v1.message,
+        );
 }
 
 class SavedMemNotificationV2<I> extends MemNotificationV2
     with SavedDatabaseTupleMixin<I> {
+  @override
+  int get memId => super.memId as int;
+
   SavedMemNotificationV2(super.memId, super.type, super.time, super.message);
 
   @override

@@ -30,11 +30,14 @@ class MemListItemView extends ConsumerWidget {
           ref.watch(activeActsProvider)?.singleWhereOrNull(
                 (act) => act.memId == _memId,
               ),
-          ref.watch(memNotificationsByMemIdProvider(_memId))?.singleWhereOrNull(
+          ref
+              .watch(memNotificationsByMemIdProvider(_memId))
+              ?.singleWhereOrNull(
                 (element) =>
-                    element.isSaved() &&
+                    element is SavedMemNotificationV2 &&
                     element.type == MemNotificationType.repeat,
-              ),
+              )
+              ?.toV1(),
           _onTapped,
           (bool? value, int memId) async {
             ref.read(memsProvider.notifier).upsertAll(

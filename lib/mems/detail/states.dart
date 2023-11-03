@@ -17,7 +17,10 @@ final memDetailProvider = StateNotifierProvider.autoDispose
       MemDetail(
         ref.watch(editingMemProvider(memId)),
         ref.watch(memItemsProvider(memId))!,
-        ref.watch(memNotificationsByMemIdProvider(memId)),
+        ref
+            .watch(memNotificationsByMemIdProvider(memId))
+            ?.map((e) => e.toV1())
+            .toList(),
       ),
     ),
     memId,
@@ -88,7 +91,7 @@ MemNotificationV2 _initialAfterActStartedMemNotification(int? memId) =>
     );
 
 final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
-    .family<ListValueStateNotifier<MemNotification>, List<MemNotification>?,
+    .family<ListValueStateNotifier<MemNotificationV2>, List<MemNotificationV2>?,
         int?>(
   (ref, memId) => v(
     () {
@@ -104,10 +107,12 @@ final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
 
       return ListValueStateNotifier(
         [
-          memRepeatedNotification ??
-              _initialRepeatMemNotification(memId).toV1(),
-          memAfterActStartedNotification ??
-              _initialAfterActStartedMemNotification(memId).toV1(),
+          memRepeatedNotification == null
+              ? _initialRepeatMemNotification(memId)
+              : MemNotificationV2.fromV1(memRepeatedNotification),
+          memAfterActStartedNotification == null
+              ? _initialAfterActStartedMemNotification(memId)
+              : MemNotificationV2.fromV1(memAfterActStartedNotification),
         ],
       );
     },

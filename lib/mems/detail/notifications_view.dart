@@ -20,12 +20,18 @@ class NotificationsWidget extends ConsumerWidget {
           loadMemNotificationsByMemId(_memId),
           (loaded) => _NotificationsWidgetComponent(
             ref.watch(memDetailProvider(_memId)).notifications!,
-            (current) => (time, message) =>
-                ref.read(memNotificationsByMemIdProvider(_memId).notifier).upsertAll(
+            (current) => (time, message) => ref
+                    .read(memNotificationsByMemIdProvider(_memId).notifier)
+                    .upsertAll(
                   [
-                    current.copyWith(time, message),
+                    MemNotificationV2.fromV1(current.copyWith(time, message)),
                   ],
-                  (tmp, item) => tmp.id == item.id && tmp.type == item.type,
+                  (tmp, item) =>
+                      tmp.type == item.type &&
+                      (tmp is SavedMemNotificationV2 &&
+                              item is SavedMemNotificationV2
+                          ? tmp.id == item.id
+                          : true),
                 ),
           ),
         ),
