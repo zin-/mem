@@ -7,8 +7,8 @@ import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 
 class ActRepository
-    extends DatabaseTupleRepository<ActV2, SavedActV2<int>, int> {
-  Future<List<SavedActV2<int>>> shipByMemId(
+    extends DatabaseTupleRepository<Act, SavedAct<int>, int> {
+  Future<List<SavedAct<int>>> shipByMemId(
     int memId, {
     DateAndTimePeriod? period,
   }) =>
@@ -27,12 +27,12 @@ class ActRepository
         {'memId': memId, 'period': period},
       );
 
-  Future<List<SavedActV2<int>>> shipActive() => v(
+  Future<List<SavedAct<int>>> shipActive() => v(
         () async => await ship(IsNull(defColActsEnd.name)),
       );
 
   @override
-  SavedActV2<int> pack(Map<String, dynamic> tuple) => SavedActV2<int>(
+  SavedAct<int> pack(Map<String, dynamic> tuple) => SavedAct<int>(
         tuple[defFkActsMemId.name],
         DateAndTimePeriod(
           start: DateAndTime.from(
@@ -53,7 +53,7 @@ class ActRepository
       )..pack(tuple);
 
   @override
-  Map<String, dynamic> unpack(ActV2 entity) {
+  Map<String, dynamic> unpack(Act entity) {
     final map = {
       defFkActsMemId.name: entity.memId,
       defColActsStart.name: entity.period.start,
@@ -62,7 +62,7 @@ class ActRepository
       defColActsEndIsAllDay.name: entity.period.end?.isAllDay,
     };
 
-    if (entity is SavedActV2) {
+    if (entity is SavedAct) {
       map.addAll(entity.unpack());
     }
 

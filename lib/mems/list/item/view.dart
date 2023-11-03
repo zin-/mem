@@ -69,11 +69,11 @@ class MemListItemView extends ConsumerWidget {
 class _MemListItemViewComponent extends ListTile {
   _MemListItemViewComponent(
     SavedMem mem,
-    SavedActV2? activeAct,
+    SavedAct? activeAct,
     MemNotification? memRepeatedNotifications,
     void Function(int memId) onTap,
     void Function(bool? value, int memId) onMemDoneCheckboxTapped,
-    void Function(SavedActV2? act) onActButtonTapped,
+    void Function(SavedAct? act) onActButtonTapped,
   ) : super(
           leading: memRepeatedNotifications == null
               ? activeAct == null

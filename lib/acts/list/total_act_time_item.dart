@@ -4,7 +4,7 @@ import 'package:mem/core/date_and_time/duration.dart';
 import 'package:mem/core/mem.dart';
 
 class TotalActTimeListItem extends ListTile {
-  TotalActTimeListItem(List<ActV2> acts, SavedMem? mem, {super.key})
+  TotalActTimeListItem(List<Act> acts, SavedMem? mem, {super.key})
       : super(
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

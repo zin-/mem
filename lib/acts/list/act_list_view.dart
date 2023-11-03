@@ -58,7 +58,7 @@ class _ActListViewComponent extends StatelessWidget {
   final subHeaderTextStyle = const TextStyle(color: secondaryGreyColor);
 
   final int? _memId;
-  final Map<DateTime, List<ActV2>> _groupedActList;
+  final Map<DateTime, List<Act>> _groupedActList;
   final List<SavedMem> _mems;
   final bool _timeView;
 
@@ -125,7 +125,7 @@ class _ActListViewComponent extends StatelessWidget {
                           childCount: e.value.length,
                           (context, index) {
                             final act = e.value.toList()[index];
-                            if (act is SavedActV2) {
+                            if (act is SavedAct) {
                               return ActListItemView(
                                 context,
                                 act,

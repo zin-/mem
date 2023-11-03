@@ -8,7 +8,7 @@ import 'editing_act_dialog.dart';
 class ActListItemView extends ListTile {
   ActListItemView(
     BuildContext context,
-    SavedActV2 act, {
+    SavedAct act, {
     // Act一覧の要素に対してMemがあったら名前を表示するという実装は合っているだろうか？
     SavedMem? mem,
     super.key,

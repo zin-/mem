@@ -6,7 +6,7 @@ import 'package:mem/logger/log_service.dart';
 
 import 'states.dart';
 
-final editAct = Provider.autoDispose.family<ActV2, int>(
+final editAct = Provider.autoDispose.family<Act, int>(
   (ref, actId) => v(
     () {
       final editingAct = ref.watch(editingActProvider(actId));

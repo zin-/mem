@@ -5,7 +5,7 @@ import 'package:mem/core/act.dart';
 import 'package:mem/logger/log_service.dart';
 
 final editingActProvider = StateNotifierProvider.autoDispose
-    .family<ValueStateNotifier<SavedActV2<int>>, SavedActV2<int>, int>(
+    .family<ValueStateNotifier<SavedAct<int>>, SavedAct<int>, int>(
   (ref, actId) => v(
     () => ValueStateNotifier(
       ref.read(actsProvider)!.singleWhere((act) => act.id == actId),

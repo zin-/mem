@@ -5,12 +5,12 @@ import 'package:mem/core/act.dart';
 import 'package:mem/logger/log_service.dart';
 
 final actsProvider = StateNotifierProvider<
-    ListValueStateNotifier<SavedActV2<int>>, List<SavedActV2<int>>?>(
+    ListValueStateNotifier<SavedAct<int>>, List<SavedAct<int>>?>(
   (ref) => v(() => ListValueStateNotifier(null)),
 );
 
 final actListProvider = StateNotifierProvider.autoDispose
-    .family<ListValueStateNotifier<ActV2>, List<ActV2>?, int?>(
+    .family<ListValueStateNotifier<Act>, List<Act>?, int?>(
   (ref, memId) => v(
     () => ListValueStateNotifier(
       ref

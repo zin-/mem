@@ -4,7 +4,7 @@ import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/logger/log_service.dart';
 
 class ActsSummary {
-  final Iterable<ActV2> _acts;
+  final Iterable<Act> _acts;
 
   ActsSummary(this._acts);
 
@@ -22,13 +22,13 @@ class ActsSummary {
         : previousValue,
   );
 
-  Map<DateAndTime, List<ActV2>> _groupListByDate() => v(
+  Map<DateAndTime, List<Act>> _groupListByDate() => v(
         () {
           final groupedListByDate = _acts.groupListsBy(
             (element) => DateAndTime.from(element.period.start!),
           );
 
-          final fillElements = <MapEntry<DateAndTime, List<ActV2>>>[];
+          final fillElements = <MapEntry<DateAndTime, List<Act>>>[];
           groupedListByDate.entries.forEachIndexed((index, element) {
             if (index != 0) {
               final diffInDays = groupedListByDate.entries

@@ -19,14 +19,14 @@ class ActFab extends ConsumerWidget {
         () => ref.read(actListProvider(_memId).notifier).upsertAll(
           [ref.read(startActBy(_memId))],
           (tmp, item) =>
-              tmp is SavedActV2 && item is SavedActV2 && tmp.id == item.id,
+              tmp is SavedAct && item is SavedAct && tmp.id == item.id,
         ),
       );
     } else {
       return _FinishActFab(
         () => ref.read(actListProvider(_memId).notifier).removeWhere(
               (element) =>
-                  element is SavedActV2 &&
+                  element is SavedAct &&
                   element.id ==
                       ref.read(finishActBy(activeActList.last.memId)).id,
             ),

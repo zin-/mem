@@ -31,21 +31,21 @@ class EditingActDialog extends ConsumerWidget {
       () => v(() {
         ref.read(deleteAct(_actId));
         ref.read(actListProvider(editingAct.memId).notifier).removeWhere(
-              (act) => act is SavedActV2 && act.id == editingAct.memId,
+              (act) => act is SavedAct && act.id == editingAct.memId,
             );
       }),
       () => v(() =>
           ref.read(actListProvider(editingAct.memId).notifier).upsertAll(
             [ref.read(editAct(_actId))],
             (tmp, item) =>
-                tmp is SavedActV2 && item is SavedActV2 && tmp.id == item.id,
+                tmp is SavedAct && item is SavedAct && tmp.id == item.id,
           )),
     );
   }
 }
 
 class _EditingActDialogComponent extends StatelessWidget {
-  final SavedActV2 _editingAct;
+  final SavedAct _editingAct;
   final Function(DateAndTimePeriod? picked) _onPeriodChanged;
   final Function() _onDeleteTapped;
   final Function() _onSaveTapped;

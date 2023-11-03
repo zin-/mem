@@ -3,17 +3,17 @@ import 'package:mem/framework/repository/database_tuple_entity.dart';
 
 import 'date_and_time/date_and_time_period.dart';
 
-class ActV2 extends Entity {
+class Act extends Entity {
   final int memId;
   final DateAndTimePeriod period;
 
-  ActV2(this.memId, this.period);
+  Act(this.memId, this.period);
 }
 
-class SavedActV2<I> extends ActV2 with SavedDatabaseTupleMixin<I> {
-  SavedActV2(super.memId, super.period);
+class SavedAct<I> extends Act with SavedDatabaseTupleMixin<I> {
+  SavedAct(super.memId, super.period);
 
-  SavedActV2<I> copiedWith(DateAndTimePeriod Function()? period) => SavedActV2(
+  SavedAct<I> copiedWith(DateAndTimePeriod Function()? period) => SavedAct(
         memId,
         period == null ? this.period : period(),
       )
