@@ -8,22 +8,35 @@ enum MemItemType {
 }
 
 class MemItemV2 extends Entity {
-  final int memId;
+  // 未保存のMemに紐づくMemItemはmemIdをintで持つことができないため暫定的にnullableにしている
+  final int? memId;
   final MemItemType type;
   final dynamic value;
 
   MemItemV2(this.memId, this.type, this.value);
 
-  factory MemItemV2.fromV1(MemItem v1) => MemItemV2(
-        v1.memId as int,
-        v1.type,
-        v1.value,
+  MemItem toV1() => MemItem(
+        type: type,
+        memId: memId,
+        value: value,
       );
+
+  factory MemItemV2.fromV1(MemItem v1) => v1.isSaved()
+      ? SavedMemItemV2.fromV1(v1)
+      : MemItemV2(
+          v1.memId,
+          v1.type,
+          v1.value,
+        );
 }
 
 class SavedMemItemV2<I> extends MemItemV2 with SavedDatabaseTupleMixin<I> {
+  @override
+  int get memId => super.memId as int;
+
   SavedMemItemV2(super.memId, super.type, super.value);
 
+  @override
   MemItem toV1() => MemItem(
         type: type,
         memId: memId,

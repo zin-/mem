@@ -20,7 +20,7 @@ final loadMemItems =
         if (memItems.isNotEmpty) {
           ref
               .watch(memItemsProvider(memId).notifier)
-              .updatedBy(memItems.map((e) => e.toV1()).toList());
+              .updatedBy(memItems.toList());
         }
 
         return memItems.toList();
@@ -67,9 +67,8 @@ final saveMem =
             );
 
             ref.read(editingMemProvider(memId).notifier).updatedBy(saved.mem);
-            ref
-                .read(memItemsProvider(memId).notifier)
-                .updatedBy(saved.memItems);
+            ref.read(memItemsProvider(memId).notifier).updatedBy(
+                saved.memItems.map((e) => SavedMemItemV2.fromV1(e)).toList());
             ref.read(memNotificationsProvider.notifier).upsertAll(
                   saved.notifications ?? [],
                   (tmp, item) => tmp.id == item.id,
@@ -129,7 +128,7 @@ final removeMem = Provider.autoDispose.family<Future<bool>, int?>(
                   (element) => element is SavedMem && element.id == memId),
             );
         ref.read(removedMemItemsProvider(memId).notifier).updatedBy(
-              ref.read(memItemsProvider(memId)),
+              ref.read(memItemsProvider(memId))?.map((e) => e.toV1()).toList(),
             );
 
         ref.read(memsProvider.notifier).removeWhere(

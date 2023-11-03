@@ -20,9 +20,12 @@ class MemItemsFormFields extends ConsumerWidget {
           (value, memItem) => v(
             () {
               ref.watch(memItemsProvider(_memId).notifier).upsertAll(
-                [memItem..value = value],
-                (tmp, item) => tmp.id == item.id && tmp.type == item.type,
-              );
+                    [memItem..value = value].map((e) => MemItemV2.fromV1(e)),
+                    (tmp, item) => tmp.type == item.type &&
+                            (tmp is SavedMemItemV2 && item is SavedMemItemV2)
+                        ? tmp.id == item.id
+                        : true,
+                  );
             },
             {value, memItem},
           ),
