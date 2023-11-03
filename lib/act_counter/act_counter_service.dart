@@ -17,12 +17,10 @@ class ActCounterService {
         () async => await _actCounterRepository.receive(
           ActCounter(
             await _memRepository.shipById(memId),
-            await _actRepository
-                .shipByMemId(
-                  memId,
-                  period: ActCounter.period(DateAndTime.now()),
-                )
-                .then((value) => value.map((e) => e.toV1())),
+            await _actRepository.shipByMemId(
+              memId,
+              period: ActCounter.period(DateAndTime.now()),
+            ),
           ),
         ),
         {'memId': memId},
@@ -38,12 +36,10 @@ class ActCounterService {
           await _actCounterRepository.replace(
             ActCounter(
               await _memRepository.shipById(memId),
-              await _actRepository
-                  .shipByMemId(
-                    memId,
-                    period: ActCounter.period(now),
-                  )
-                  .then((value) => value.map((e) => e.toV1())),
+              await _actRepository.shipByMemId(
+                memId,
+                period: ActCounter.period(now),
+              ),
             ),
           );
         },
