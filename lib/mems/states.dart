@@ -19,11 +19,17 @@ final removedMemDetailProvider = StateNotifierProvider.autoDispose
   (ref, memId) => v(
     () {
       final removedMem = ref.watch(removedMemProvider(memId));
-      final removedMemItems = ref.watch(removedMemItemsProvider(memId));
+      final removedMemItems = ref
+          .watch(removedMemItemsProvider(memId))
+          ?.map((e) => e.toV1())
+          .toList();
 
       MemDetail? removedMemDetail;
       if (removedMem != null && removedMemItems != null) {
-        removedMemDetail = MemDetail(removedMem, removedMemItems);
+        removedMemDetail = MemDetail(
+          removedMem,
+          removedMemItems,
+        );
       } else {
         removedMemDetail = null;
       }
@@ -40,9 +46,9 @@ final removedMemProvider =
   ),
 );
 final removedMemItemsProvider = StateNotifierProvider.family<
-    ValueStateNotifier<List<MemItem>?>, List<MemItem>?, int>(
+    ValueStateNotifier<List<MemItemV2>?>, List<MemItemV2>?, int>(
   (ref, memId) => v(
-    () => ValueStateNotifier<List<MemItem>?>(null),
+    () => ValueStateNotifier(null),
     memId,
   ),
 );
