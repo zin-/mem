@@ -27,12 +27,9 @@ class MemListItemView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemListItemViewComponent(
           ref.watch(memListProvider).firstWhere((_) => _.id == _memId),
-          ref
-              .watch(activeActsProvider)
-              ?.singleWhereOrNull(
+          ref.watch(activeActsProvider)?.singleWhereOrNull(
                 (act) => act.memId == _memId,
-              )
-              ?.toV1(),
+              ),
           ref.watch(memNotificationsByMemIdProvider(_memId))?.singleWhereOrNull(
                 (element) =>
                     element.isSaved() &&
@@ -72,11 +69,11 @@ class MemListItemView extends ConsumerWidget {
 class _MemListItemViewComponent extends ListTile {
   _MemListItemViewComponent(
     SavedMem mem,
-    Act? activeAct,
+    SavedActV2? activeAct,
     MemNotification? memRepeatedNotifications,
     void Function(int memId) onTap,
     void Function(bool? value, int memId) onMemDoneCheckboxTapped,
-    void Function(Act? act) onActButtonTapped,
+    void Function(SavedActV2? act) onActButtonTapped,
   ) : super(
           leading: memRepeatedNotifications == null
               ? activeAct == null
