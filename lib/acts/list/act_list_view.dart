@@ -125,15 +125,19 @@ class _ActListViewComponent extends StatelessWidget {
                           childCount: e.value.length,
                           (context, index) {
                             final act = e.value.toList()[index];
-                            return ActListItemView(
-                              context,
-                              act.toV1(),
-                              mem: _mems.length >= 2
-                                  ? _mems.singleWhereOrNull(
-                                      (element) => element.id == act.memId,
-                                    )
-                                  : null,
-                            );
+                            if (act is SavedActV2) {
+                              return ActListItemView(
+                                context,
+                                act,
+                                mem: _mems.length >= 2
+                                    ? _mems.singleWhereOrNull(
+                                        (element) => element.id == act.memId,
+                                      )
+                                    : null,
+                              );
+                            } else {
+                              return null;
+                            }
                           },
                         ),
                 ),
