@@ -22,7 +22,7 @@ class MemItemsFormFields extends ConsumerWidget {
               ref.watch(memItemsProvider(_memId).notifier).upsertAll(
                 [memItem.copiedWith(value: () => value)],
                 (tmp, item) => tmp.type == item.type &&
-                        (tmp is SavedMemItemV2 && item is SavedMemItemV2)
+                        (tmp is SavedMemItem && item is SavedMemItem)
                     ? tmp.id == item.id
                     : true,
               );
@@ -34,8 +34,8 @@ class MemItemsFormFields extends ConsumerWidget {
 }
 
 class _MemItemsFormFieldsComponent extends StatelessWidget {
-  final List<MemItemV2> _memItems;
-  final Function(dynamic value, MemItemV2 memItem) _onChanged;
+  final List<MemItem> _memItems;
+  final Function(dynamic value, MemItem memItem) _onChanged;
 
   const _MemItemsFormFieldsComponent(this._memItems, this._onChanged);
 

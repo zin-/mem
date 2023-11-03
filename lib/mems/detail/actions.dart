@@ -11,7 +11,7 @@ import 'package:mem/mems/mem_service.dart';
 import 'package:mem/mems/states.dart';
 
 final loadMemItems =
-    FutureProvider.autoDispose.family<List<SavedMemItemV2<int>>, int?>(
+    FutureProvider.autoDispose.family<List<SavedMemItem<int>>, int?>(
   (ref, memId) => v(
     () async {
       if (memId != null) {

@@ -4,7 +4,7 @@ import 'package:mem/core/mem_notification.dart';
 
 class MemDetail {
   final Mem mem;
-  final List<MemItemV2> memItems;
+  final List<MemItem> memItems;
   final List<MemNotification>? notifications;
 
   MemDetail(this.mem, this.memItems, [this.notifications]);

@@ -27,7 +27,7 @@ class MemService {
           _notificationService.memReminder(savedMem);
 
           final savedMemItems = (await Future.wait(
-              memDetail.memItems.map((e) => (e is SavedMemItemV2<int> && !undo
+              memDetail.memItems.map((e) => (e is SavedMemItem<int> && !undo
                   ? _memItemRepository.replace(
                       e.copiedWith(memId: () => savedMem.id),
                     )

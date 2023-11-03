@@ -43,7 +43,7 @@ final removedMemProvider =
   ),
 );
 final removedMemItemsProvider = StateNotifierProvider.family<
-    ValueStateNotifier<List<MemItemV2>?>, List<MemItemV2>?, int>(
+    ValueStateNotifier<List<MemItem>?>, List<MemItem>?, int>(
   (ref, memId) => v(
     () => ValueStateNotifier(null),
     memId,

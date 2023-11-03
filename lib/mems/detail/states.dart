@@ -62,10 +62,10 @@ final memIsArchivedProvider = StateNotifierProvider.autoDispose
 );
 
 final memItemsProvider = StateNotifierProvider.autoDispose
-    .family<ListValueStateNotifier<MemItemV2>, List<MemItemV2>?, int?>(
+    .family<ListValueStateNotifier<MemItem>, List<MemItem>?, int?>(
   (ref, memId) => v(
     () => ListValueStateNotifier([
-      MemItemV2(memId, MemItemType.memo, ''),
+      MemItem(memId, MemItemType.memo, ''),
     ]),
     memId,
   ),
