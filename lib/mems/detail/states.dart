@@ -71,19 +71,20 @@ final memItemsProvider = StateNotifierProvider.autoDispose
   ),
 );
 
-MemNotification _initialRepeatMemNotification(int? memId) => MemNotification(
+MemNotificationV2 _initialRepeatMemNotification(int? memId) =>
+    MemNotificationV2(
+      memId,
       MemNotificationType.repeat,
       null,
       'Repeat',
-      memId: memId,
     );
 
-MemNotification _initialAfterActStartedMemNotification(int? memId) =>
-    MemNotification(
+MemNotificationV2 _initialAfterActStartedMemNotification(int? memId) =>
+    MemNotificationV2(
+      memId,
       MemNotificationType.afterActStarted,
       null,
       'Finish?',
-      memId: memId,
     );
 
 final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
@@ -103,9 +104,10 @@ final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
 
       return ListValueStateNotifier(
         [
-          memRepeatedNotification ?? _initialRepeatMemNotification(memId),
+          memRepeatedNotification ??
+              _initialRepeatMemNotification(memId).toV1(),
           memAfterActStartedNotification ??
-              _initialAfterActStartedMemNotification(memId),
+              _initialAfterActStartedMemNotification(memId).toV1(),
         ],
       );
     },

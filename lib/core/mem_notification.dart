@@ -3,12 +3,20 @@ import 'package:mem/framework/repository/entity.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 
 class MemNotificationV2 extends Entity {
-  final int memId;
+  // 未保存のMemに紐づくMemNotificationはmemIdをintで持つことができないため暫定的にnullableにしている
+  final int? memId;
   final MemNotificationType type;
   final int? time;
   final String message;
 
   MemNotificationV2(this.memId, this.type, this.time, this.message);
+
+  MemNotification toV1() => MemNotification(
+        type,
+        time,
+        message,
+        memId: memId,
+      );
 
   factory MemNotificationV2.fromV1(MemNotification v1) => MemNotificationV2(
         v1.memId as int,
@@ -22,6 +30,7 @@ class SavedMemNotificationV2<I> extends MemNotificationV2
     with SavedDatabaseTupleMixin<I> {
   SavedMemNotificationV2(super.memId, super.type, super.time, super.message);
 
+  @override
   MemNotification toV1() => MemNotification(
         type,
         time,
