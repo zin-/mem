@@ -11,19 +11,16 @@ class FinishActiveActNotificationAction extends NotificationAction {
           title,
           (memId) async {
             final activeActs = (await ActRepository().shipActive())
-                .where((element) => element.memId == memId)
-                .map((e) => e.toV1());
+                .where((element) => element.memId == memId);
 
             final now = DateAndTime.now();
             ActService().finish(
               (activeActs.isEmpty
-                      ? await ActService()
-                          .start(memId, now)
-                          .then((value) => value.toV1())
+                      ? await ActService().start(memId, now)
                       : activeActs
                           .sorted((a, b) => a.period.compareTo(b.period))
                           .first)
-                  .id!,
+                  .id,
               now,
             );
           },
