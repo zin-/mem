@@ -16,16 +16,20 @@ class MemItemsFormFields extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => AsyncValueView(
         loadMemItems(_memId),
         (data) => _MemItemsFormFieldsComponent(
-          ref.watch(memDetailProvider(_memId)).memItems,
+          ref
+              .watch(memDetailProvider(_memId))
+              .memItems
+              .map((e) => MemItemV2.fromV1(e))
+              .toList(),
           (value, memItem) => v(
             () {
               ref.watch(memItemsProvider(_memId).notifier).upsertAll(
-                    [memItem..value = value].map((e) => MemItemV2.fromV1(e)),
-                    (tmp, item) => tmp.type == item.type &&
-                            (tmp is SavedMemItemV2 && item is SavedMemItemV2)
-                        ? tmp.id == item.id
-                        : true,
-                  );
+                [memItem.copiedWith(() => value)],
+                (tmp, item) => tmp.type == item.type &&
+                        (tmp is SavedMemItemV2 && item is SavedMemItemV2)
+                    ? tmp.id == item.id
+                    : true,
+              );
             },
             {value, memItem},
           ),
@@ -34,8 +38,8 @@ class MemItemsFormFields extends ConsumerWidget {
 }
 
 class _MemItemsFormFieldsComponent extends StatelessWidget {
-  final List<MemItem> _memItems;
-  final Function(dynamic value, MemItem memItem) _onChanged;
+  final List<MemItemV2> _memItems;
+  final Function(dynamic value, MemItemV2 memItem) _onChanged;
 
   const _MemItemsFormFieldsComponent(this._memItems, this._onChanged);
 
