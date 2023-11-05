@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_detail.dart';
 import 'package:mem/core/mem_item.dart';
+import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/mem_item_repository.dart';
@@ -42,8 +43,11 @@ final loadMemNotificationsByMemId =
 
         if (memNotifications.isNotEmpty) {
           ref.watch(memNotificationsProvider.notifier).upsertAll(
-                memNotifications.toList(),
-                (tmp, item) => tmp.id == item.id,
+                memNotifications.map((e) => SavedMemNotificationV2.fromV1(e)),
+                (tmp, item) =>
+                    tmp is SavedMemNotificationV2 &&
+                    item is SavedMemNotificationV2 &&
+                    tmp.id == item.id,
               );
         }
       }
@@ -71,8 +75,13 @@ final saveMem =
                 .read(memItemsProvider(memId).notifier)
                 .updatedBy(saved.memItems);
             ref.read(memNotificationsProvider.notifier).upsertAll(
-                  saved.notifications ?? [],
-                  (tmp, item) => tmp.id == item.id,
+                  saved.notifications
+                          ?.map((e) => SavedMemNotificationV2.fromV1(e)) ??
+                      [],
+                  (tmp, item) =>
+                      tmp is SavedMemNotificationV2 &&
+                      item is SavedMemNotificationV2 &&
+                      tmp.id == item.id,
                 );
 
             return saved;

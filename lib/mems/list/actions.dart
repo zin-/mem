@@ -17,8 +17,11 @@ final fetchMemNotifications = Provider.autoDispose
             .ship(In(defFkMemNotificationsMemId.name, memIds))
       ..then(
         (value) => ref.read(memNotificationsProvider.notifier).upsertAll(
-              value.map((e) => e.toV1()),
-              (tmp, item) => tmp.id == item.id,
+              value,
+              (tmp, item) =>
+                  tmp is SavedMemNotificationV2 &&
+                  item is SavedMemNotificationV2 &&
+                  tmp.id == item.id,
             ),
       ),
     memIds,

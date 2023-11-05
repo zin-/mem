@@ -9,10 +9,12 @@ import 'package:mem/logger/log_service.dart';
 
 final memsProvider =
     StateNotifierProvider<ListValueStateNotifier<Mem>, List<Mem>?>(
-        (ref) => v(() => ListValueStateNotifier<Mem>(null)));
+  (ref) => v(() => ListValueStateNotifier<Mem>(null)),
+);
 final memNotificationsProvider = StateNotifierProvider<
-        ListValueStateNotifier<MemNotification>, List<MemNotification>?>(
-    (ref) => v(() => ListValueStateNotifier<MemNotification>(null)));
+    ListValueStateNotifier<MemNotificationV2>, List<MemNotificationV2>?>(
+  (ref) => v(() => ListValueStateNotifier(null)),
+);
 
 final removedMemDetailProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<MemDetail?>, MemDetail?, int>(

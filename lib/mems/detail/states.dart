@@ -107,12 +107,9 @@ final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
 
       return ListValueStateNotifier(
         [
-          memRepeatedNotification == null
-              ? _initialRepeatMemNotification(memId)
-              : MemNotificationV2.fromV1(memRepeatedNotification),
-          memAfterActStartedNotification == null
-              ? _initialAfterActStartedMemNotification(memId)
-              : MemNotificationV2.fromV1(memAfterActStartedNotification),
+          memRepeatedNotification ?? _initialRepeatMemNotification(memId),
+          memAfterActStartedNotification ??
+              _initialAfterActStartedMemNotification(memId),
         ],
       );
     },
