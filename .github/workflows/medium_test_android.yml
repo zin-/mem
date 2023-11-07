@@ -25,10 +25,7 @@ jobs:
           flutter pub get
 
       - name: "Run Tests and Collect Coverage"
-        run: |
-          flutter test --coverage
-#          lcov --remove coverage/lcov.info 'lib/generated_plugin_registrant.dart' -o coverage/lcov.info
-          genhtml coverage/lcov.info -o coverage
+        run: flutter test --coverage --dart-define=CICD=true
 
       - name: 'Upload coverage'
         uses: codecov/codecov-action@v3
