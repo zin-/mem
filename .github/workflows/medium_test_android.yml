@@ -30,8 +30,9 @@ jobs:
           lcov --remove coverage/lcov.info 'lib/generated_plugin_registrant.dart' -o coverage/lcov.info # カバレッジ情報から生成されたプラグインを削除する（任意のプラグインを削除する場合）
           genhtml coverage/lcov.info -o coverage
 
-#      - name: Upload Coverage
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: coverage
-#          path: coverage
+      - name: 'Upload coverage'
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          flags: medium_test-android-ex
