@@ -27,7 +27,7 @@ jobs:
       - name: "Run Tests and Collect Coverage"
         run: |
           flutter test --coverage
-          lcov --remove coverage/lcov.info 'lib/generated_plugin_registrant.dart' -o coverage/lcov.info
+#          lcov --remove coverage/lcov.info 'lib/generated_plugin_registrant.dart' -o coverage/lcov.info
           genhtml coverage/lcov.info -o coverage
 
       - name: 'Upload coverage'
