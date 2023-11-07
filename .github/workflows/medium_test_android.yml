@@ -24,6 +24,9 @@ jobs:
           flutter doctor -v
           flutter pub get
 
+      - name: 'Flutter Doctor'
+        run: flutter doctor -v
+
       - name: "Run Tests and Collect Coverage"
         run: flutter test --coverage --dart-define=CICD=true
 
