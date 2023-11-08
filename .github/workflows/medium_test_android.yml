@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: "Set up Flutter"
-        uses: subosito/flutter-action@v6
+        uses: subosito/flutter-action@v2
         with:
           flutter-version: stable  # Flutterのバージョンを指定
           cache: true
