@@ -9,13 +9,16 @@ on:
 jobs:
   analyze-code:
     name: Analyze ${{ matrix.analyze-target }} code on ${{ matrix.os }}, ${{ matrix.flutter-channel }}
+
     strategy:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
         flutter-channel: [ stable, beta, master]
         analyze-target: [ application, test ]
+
     runs-on: ${{ matrix.os }}
+
     steps:
       - uses: actions/checkout@v4
 
