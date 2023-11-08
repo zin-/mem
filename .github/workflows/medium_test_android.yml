@@ -58,6 +58,9 @@ jobs:
           disable-linux-hw-accel: true # disableなのでfalseで無効にしないと思ったがdisablingが動いている？
           script: echo "Generated AVD snapshot for caching."
 
+      - name: Flutter doctor
+        run: flutter doctor -v
+
 #      - name: Run Flutter Tests
 #        uses: reactivecircus/android-emulator-runner@v2
 #        with:
