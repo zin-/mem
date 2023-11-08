@@ -8,7 +8,7 @@ on:
 
 jobs:
   analyze-code:
-    name: Analyze code on ${{ matrix.os }}, ${{ matrix.flutter-channel }}
+    name: Analyze ${{ matrix.analyze-target }} code on ${{ matrix.os }}, ${{ matrix.flutter-channel }}
     strategy:
       fail-fast: false
       matrix:
@@ -18,21 +18,23 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+
       - name: "Set up Flutter"
         uses: subosito/flutter-action@v2
         with:
           channel: ${{ matrix.flutter-channel }}
           cache: true
-#      - name: "Generate Localization code"
-#        uses: ./.github/actions/generate-localization_code
+
       - run: flutter doctor -v
-      - name: Analyze Application code
+
+      - name: "Analyze Application code"
         if: ${{ matrix.analyze-target == 'application' }}
         run: flutter analyze lib
-      - name: Build Mocks
+
+      - name: "Generate Mocks"
         if: ${{ matrix.analyze-target == 'test' }}
         uses: ./.github/actions/build-mocks
-      - name: Analyze Test code
+      - name: "Analyze Test code"
         if: ${{ matrix.analyze-target == 'test' }}
         run: flutter analyze test integration_test
 
