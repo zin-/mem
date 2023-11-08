@@ -5,12 +5,12 @@ on:
 
 jobs:
   build:
-    name: Build on ${{ matrix.os }}
+    name: Build on ${{ matrix.os }} with ${{ matrix.flutter-channel }}
     strategy:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
-        flutter-channel: [ stable, beta, main, master]
+        flutter-channel: [ stable, beta, master]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
