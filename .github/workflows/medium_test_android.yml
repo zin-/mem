@@ -61,23 +61,23 @@ jobs:
       - name: Flutter doctor
         run: flutter doctor -v
 
-#      - name: Run Flutter Tests
-#        uses: reactivecircus/android-emulator-runner@v2
-#        with:
-#          api-level: 29
-#          target: default
-#          arch: x86_64
-#          profile: Nexus 6
-#          force-avd-creation: false
-#          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-#          disable-animations: false
-#          emulator-boot-timeout: 1800 # キャッシュが効いていない初回起動のみ必要かもしれない
-#          disable-linux-hw-accel: true # disableなのでfalseで無効にしないと思ったがdisablingが動いている？
-#          script: flutter test integration_test/app_test.dart -d android --coverage --dart-define=CICD=true
-#
-#      - name: Upload coverage
-#        uses: codecov/codecov-action@v3
-#        with:
-#          token: ${{ secrets.CODECOV_TOKEN }}
-#          files: ./coverage/lcov.info
-#          flags: medium_test-android-ex
+      - name: Run Flutter Tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          target: default
+          arch: x86_64
+          profile: Nexus 6
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          emulator-boot-timeout: 1800 # キャッシュが効いていない初回起動のみ必要かもしれない
+          disable-linux-hw-accel: true # disableなのでfalseで無効にしないと思ったがdisablingが動いている？
+          script: flutter test integration_test/app_test.dart --machine  -d android --coverage --dart-define=CICD=true
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          flags: medium_test-android-ex

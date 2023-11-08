@@ -55,10 +55,11 @@ Continuous Integration and Continuous Delivery(/Deployment)
 ### 環境
 
 コードチェックもテストも同じ環境でそれぞれ行い、環境は複数用意したい
+それぞれにバージョンなどを定義することは避けなければならない
 
 具体的には以下
 
-- プラットフォーム
+- 実行環境
   - Windows
   - MacOS
   - Ubuntu
@@ -66,15 +67,23 @@ Continuous Integration and Continuous Delivery(/Deployment)
   - stable
   - canary
 - Device
-  - Android
-    - OS version
-    - 何があるか知らない
-  - Windows
-    - latest
-  - MacOS
-  - iPhone
-  - iPad
-  - Ubuntu
+  - OS
+    - Android
+      - OS version
+        - 何があるか知らない
+      - 実行環境はどこでも動くはず
+        - KVM権限の絡みや利用するツールの関係でMacOSでないと難易度が高いかもしれない
+    - Windows
+      - latest
+      - 実行環境がWindowsでないと動かないはず
+    - MacOS
+    - iPhone
+    - iPad
+    - Ubuntu
+  - Monitor size
+    - OSによって下限となるサイズはありそう
+      - Macとか画面小さいイメージない
+      - Android, Windowsあたりはそれっぽい画面サイズがあれば良いのかも
 
 ## CD
 
