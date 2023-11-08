@@ -32,10 +32,6 @@ jobs:
       - name: Setup Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 30  # 使用するAndroid APIレベルを指定
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: false
           script: echo "Generated AVD snapshot for caching."
 
       - name: Start Emulator
