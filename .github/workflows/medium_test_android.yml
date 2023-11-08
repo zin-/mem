@@ -14,7 +14,7 @@ jobs:
       - name: "Set up Flutter"
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: stable  # Flutterのバージョンを指定
+          channel: stable  # Flutterのバージョンを指定
           cache: true
 
       - name: "Install dependencies"
