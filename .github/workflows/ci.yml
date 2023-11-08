@@ -14,6 +14,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
         flutter-channel: [ stable, beta, master]
+        analyze-target: [ application, test ]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -25,11 +26,14 @@ jobs:
 #      - name: "Generate Localization code"
 #        uses: ./.github/actions/generate-localization_code
       - run: flutter doctor -v
-#      - name: Analyze Application code
-#        run: flutter analyze lib
+      - name: Analyze Application code
+        if: ${{ matrix.analyze-target == 'application' }}
+        run: flutter analyze lib
       - name: Build Mocks
+        if: ${{ matrix.analyze-target == 'test' }}
         uses: ./.github/actions/build-mocks
       - name: Analyze Test code
+        if: ${{ matrix.analyze-target == 'test' }}
         run: flutter analyze test integration_test
 
   tmp:
