@@ -31,6 +31,7 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
           emulator-boot-timeout: 1800 # キャッシュが効いていない初回起動のみ必要かもしれない
+          disable-linux-hw-accel: false
           script: echo "Generated AVD snapshot for caching."
 
       - name: "Set up Flutter"
