@@ -23,9 +23,9 @@ Continuous Integration and Continuous Delivery(/Deployment)
 
 問題を検知した際の報告も必要
 
-### 必要な処理
+## 必要な処理
 
-#### コードチェック
+### コードチェック
 
 - コードの依存解決
   - 依存ライブラリの解決
@@ -38,19 +38,43 @@ Continuous Integration and Continuous Delivery(/Deployment)
   - アプリケーションコード
   - テストコード
 
-#### テスト
+### テスト
 
 - 端末に閉じたテスト
   - Medium test
   - 対象プラットフォーム
     - Android, Windows, Web, MacOSなど（Flutterが動作するすべての環境で実行したい）
-    - 
+      - 現時点ではAndroidとWindowsのみ
 - ドメインに閉じたテスト
   - Small test
 - すべてに開いたテスト
   - Large test
   - 現時点では、プラットフォームに閉じたDBやAPIへのアクセスしか行っていないため実装しない
     - 端末外のシステムにアクセスするように拡張したら検討する
+
+### 環境
+
+コードチェックもテストも同じ環境でそれぞれ行い、環境は複数用意したい
+
+具体的には以下
+
+- プラットフォーム
+  - Windows
+  - MacOS
+  - Ubuntu
+- Flutter version
+  - stable
+  - canary
+- Device
+  - Android
+    - OS version
+    - 何があるか知らない
+  - Windows
+    - latest
+  - MacOS
+  - iPhone
+  - iPad
+  - Ubuntu
 
 ## CD
 
