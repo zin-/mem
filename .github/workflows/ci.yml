@@ -1,12 +1,21 @@
-name: "[EX] Medium test(android)"
+name: "[EX]Continuous Integration"
 
 on:
   push:
 
 jobs:
   build:
-    runs-on: macos-latest
+    name: Build on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
 
+  tmp:
+    runs-on: macos-latest
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
