@@ -33,8 +33,10 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 30  # 使用するAndroid APIレベルを指定
-          target: default  # 使用するエミュレータの名前を指定
-          script: flutter doctor -v
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
 
       - name: Start Emulator
         run: |
