@@ -3,8 +3,8 @@ name: "[EX]Continuous Integration"
 on:
   push:
 
-#env:
-#  flutter-channel: stable
+env:
+  flutter-channel: stable
 
 jobs:
   analyze-code:
@@ -98,6 +98,8 @@ jobs:
         run: flutter doctor -v
 
       - name: Run Flutter Tests
+        id: test-execution
+        continue-on-error: true
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
@@ -117,3 +119,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
           flags: medium_test-android-ex
+
+      - name: Error handling
+        if: ${{ steps.test-execution.outcome == 'failure' }}
+        run: exit 1
