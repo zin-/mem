@@ -23,10 +23,10 @@ jobs:
       - name: 'Generate Localization code'
         uses: ./.github/actions/generate-localization_code
 
-      - name: 'Build Mocks'
+      - name: "Build Mocks"
         uses: ./.github/actions/build-mocks
 
-      - name: Build APK
+      - name: "Build APK"
         run: flutter build apk
 
       - name: Setup Emulator
@@ -38,13 +38,5 @@ jobs:
           profile: Nexus 6
           script: echo "Generated AVD snapshot for caching."
 
-      - name: Start Emulator
-        run: |
-          emulator -avd default -no-audio -no-window &
-          sleep 30  # エミュレータが起動するのを待つために適切な時間を設定
-
-      - name: Wait for Emulator to Start
-        run: adb wait-for-device
-
       - name: Run Flutter Tests
-        run: flutter test
+        run: flutter test integration_test/app_test.dart -d ${{ matrix.platform }} --coverage --dart-define=CICD=true
