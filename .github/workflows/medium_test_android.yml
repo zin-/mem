@@ -37,8 +37,9 @@ jobs:
           emulator-options: -accel on  # エミュレータのオプションを指定
 
       - name: Start Emulator
-        run: emulator -avd default -no-audio -no-window
-        background: true
+        run: |
+          emulator -avd default -no-audio -no-window &
+          sleep 30  # エミュレータが起動するのを待つために適切な時間を設定
 
       - name: Wait for Emulator to Start
         run: adb wait-for-device
