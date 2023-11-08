@@ -3,9 +3,12 @@ name: "[EX]Continuous Integration"
 on:
   push:
 
+#env:
+#  flutter-channel: stable
+
 jobs:
   build:
-    name: Build on ${{ matrix.os }} with ${{ matrix.flutter-channel }}
+    name: Build on ${{ matrix.os }} with Flutter ${{ matrix.flutter-channel }} channel
     strategy:
       fail-fast: false
       matrix:
@@ -19,7 +22,9 @@ jobs:
         with:
           channel: ${{ matrix.flutter-channel }}
           cache: true
-      - run: flutter --version
+      - name: Generate Localization code
+        uses: ./.github/actions/generate-localization_code
+      - run: flutter doctor -v
 
   tmp:
     runs-on: macos-latest
