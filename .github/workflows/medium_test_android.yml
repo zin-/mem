@@ -34,7 +34,6 @@ jobs:
         with:
           api-level: 30  # 使用するAndroid APIレベルを指定
           target: default  # 使用するエミュレータの名前を指定
-          emulator-options: -accel on  # エミュレータのオプションを指定
 
       - name: Start Emulator
         run: |
