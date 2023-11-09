@@ -11,6 +11,8 @@ inputs:
     required: true
   java-version:
     required: true
+  flutter-channel:
+    required: true
 
 runs:
   using: composite
@@ -21,3 +23,10 @@ runs:
         distribution: ${{ inputs.java-distribution }}
         java-version: ${{ inputs.java-version }}
         cache: gradle
+    - name: Set up Gradle
+      uses: gradle/gradle-build-action@v2
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: ${{ env.flutter-channel }}
+        cache: true
