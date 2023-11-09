@@ -96,7 +96,6 @@ jobs:
 
       - name: "Run Flutter Tests"
         id: test-execution
-        continue-on-error: true
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
@@ -106,15 +105,22 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: flutter test integration_test/app_test.dart --machine  -d android --coverage --dart-define=CICD=true
+          script: flutter test integration_test/app_test.dart --machine  -d android --coverage --dart-define=CICD=true | tee >(grep "^{" | grep "}$" >temp_report.log)
 
       - name: "Upload coverage"
+        if: success() || failure()
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
           flags: medium_test-android-ex
 
-      - name: "Error handling"
-        if: ${{ steps.test-execution.outcome == 'failure' }}
-        run: exit 1
+      - name: Report
+        if: success() || failure()
+        uses: dorny/test-reporter@v1
+        with:
+#          name: '${{ matrix.api-level }}-${{ matrix.target }}-${{ matrix.arch }}'
+          name: 'test report'
+          path: 'temp_report.log'
+          reporter: 'flutter-json'
+          fail-on-error: 'false'
