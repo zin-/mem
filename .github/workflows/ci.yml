@@ -14,8 +14,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
-        flutter-channel: [ stable, beta, master]
-        analyze-target: [ application, test ]
+#        flutter-channel: [ stable, beta, master]
+#        analyze-target: [ application, test ]
 
     runs-on: ${{ matrix.os }}
 
@@ -25,20 +25,21 @@ jobs:
       - name: "Set up Flutter"
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ matrix.flutter-channel }}
+          channel: ${{ env.flutter-channel }}
+#          channel: ${{ matrix.flutter-channel }}
           cache: true
 
       - run: flutter doctor -v
 
       - name: "Analyze Application code"
-        if: ${{ matrix.analyze-target == 'application' }}
+#        if: ${{ matrix.analyze-target == 'application' }}
         run: flutter analyze lib
 
       - name: "Generate Mocks"
-        if: ${{ matrix.analyze-target == 'test' }}
+#        if: ${{ matrix.analyze-target == 'test' }}
         uses: ./.github/actions/build-mocks
       - name: "Analyze Test code"
-        if: ${{ matrix.analyze-target == 'test' }}
+#        if: ${{ matrix.analyze-target == 'test' }}
         run: flutter analyze test integration_test
 
   medium_test-android:
