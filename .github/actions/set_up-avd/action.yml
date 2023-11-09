@@ -28,5 +28,5 @@ runs:
     - name: Set up Flutter
       uses: subosito/flutter-action@v2
       with:
-        channel: ${{ env.flutter-channel }}
+        channel: ${{ inputs.flutter-channel }}
         cache: true
