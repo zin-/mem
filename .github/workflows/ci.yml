@@ -41,8 +41,15 @@ jobs:
         if: ${{ matrix.analyze-target == 'test' }}
         run: flutter analyze test integration_test
 
-  tmp:
+  medium_test-android:
+    name: "Medium test(Android)"
+
     runs-on: macos-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
@@ -59,19 +66,13 @@ jobs:
       - name: "Set up Flutter"
         uses: subosito/flutter-action@v2
         with:
-          channel: stable  # Flutterのバージョンを指定
+          channel: ${{ env.flutter-channel }}
           cache: true
-
-      - name: "Install dependencies"
-        run: flutter pub get
 
       - name: 'Generate Localization code'
         uses: ./.github/actions/generate-localization_code
 
-      - name: "Build Mocks"
-        uses: ./.github/actions/build-mocks
-
-      - name: AVD cache
+      - name: "AVD cache"
         uses: actions/cache@v3
         id: avd-cache
         with:
@@ -79,7 +80,7 @@ jobs:
             ~/.android/avd/*
             ~/.android/adb*
           key: avd-29-default-x86_64
-      - name: Create AVD and generate snapshot for chaching
+      - name: "Create AVD and generate snapshot for chaching"
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -90,14 +91,9 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
-          emulator-boot-timeout: 1800 # キャッシュが効いていない初回起動のみ必要かもしれない
-          disable-linux-hw-accel: true # disableなのでfalseで無効にしないと思ったがdisablingが動いている？
           script: echo "Generated AVD snapshot for caching."
 
-      - name: Flutter doctor
-        run: flutter doctor -v
-
-      - name: Run Flutter Tests
+      - name: "Run Flutter Tests"
         id: test-execution
         continue-on-error: true
         uses: reactivecircus/android-emulator-runner@v2
@@ -107,19 +103,17 @@ jobs:
           arch: x86_64
           profile: Nexus 6
           force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: false
-          emulator-boot-timeout: 1800 # キャッシュが効いていない初回起動のみ必要かもしれない
-          disable-linux-hw-accel: true # disableなのでfalseで無効にしないと思ったがdisablingが動いている？
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
           script: flutter test integration_test/app_test.dart --machine  -d android --coverage --dart-define=CICD=true
 
-      - name: Upload coverage
+      - name: "Upload coverage"
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
           flags: medium_test-android-ex
 
-      - name: Error handling
+      - name: "Error handling"
         if: ${{ steps.test-execution.outcome == 'failure' }}
         run: exit 1
