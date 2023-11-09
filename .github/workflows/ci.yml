@@ -47,15 +47,15 @@ jobs:
 
     runs-on: macos-latest
 
-#    strategy:
-#      fail-fast: false
-#      matrix:
+    strategy:
+      fail-fast: false
+      matrix:
 # TODO 複数のAndroid Emulator Runnerを使う
 #   - malinskiy/action-android
 #   - reactivecircus/android-emulator-runner
 #   パフォーマンスチェックのため
 #   Github actionsの実行時間制限とかが出始めたらやめる
-#        android-emulator-runner: [ malinskiy, reactivecircus ]
+        android-emulator-runner: [ malinskiy, reactivecircus ]
 
 # TODO 画面サイズ
 # TODO OSバージョン
@@ -66,12 +66,19 @@ jobs:
       - name: "Checkout code"
         uses: actions/checkout@v4
 
-      - name: Set up Java
-        uses: actions/setup-java@v3
+      - name: Set up AVD
+        uses: ./.github/actions/set_up-android
         with:
-          distribution: 'zulu'
-          java-version: '11'
-          cache: 'gradle'
+          method: ${{ matrix.android-emulator-runner }}
+          java-distribution: zulu
+          java-version: 11
+
+#      - name: Set up Java
+#        uses: actions/setup-java@v3
+#        with:
+#          distribution: 'zulu'
+#          java-version: '11'
+#          cache: 'gradle'
       - name: Set up Gradle
         uses: gradle/gradle-build-action@v2
 

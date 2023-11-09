@@ -1,0 +1,23 @@
+name: Set up AVD
+inputs:
+  method:
+    type: choice
+    description: Which to run
+    required: true
+    options:
+      - malinskiy
+      - reactivecircus
+  java-distribution:
+    required: true
+  java-version:
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: ${{ inputs.java-distribution }}
+        java-version: ${{ inputs.java-version }}
+        cache: gradle
