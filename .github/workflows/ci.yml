@@ -50,6 +50,17 @@ jobs:
 #    strategy:
 #      fail-fast: false
 #      matrix:
+# TODO 複数のAndroid Emulator Runnerを使う
+#   - malinskiy/action-android
+#   - reactivecircus/android-emulator-runner
+#   パフォーマンスチェックのため
+#   Github actionsの実行時間制限とかが出始めたらやめる
+#        android-emulator-runner: [ malinskiy, reactivecircus ]
+
+# TODO 画面サイズ
+# TODO OSバージョン
+# TODO Java distribution
+# TODO Java version
 
     steps:
       - name: "Checkout code"
@@ -58,7 +69,7 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
-          distribution: 'zulu' # See 'Supported distributions' for available options
+          distribution: 'zulu'
           java-version: '11'
           cache: 'gradle'
       - name: Set up Gradle
@@ -105,7 +116,9 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: flutter test integration_test/app_test.dart --machine  -d android --coverage --dart-define=CICD=true | tee >(grep "^{" | grep "}$" >temp_report.log)
+          script: |
+            bash ./scripts/integration_test.sh "emulator-5554"
+#          script: flutter test integration_test/app_test.dart --machine  -d android --coverage --dart-define=CICD=true | tee >(grep "^{" | grep "}$" > temp_report.log)
 
       - name: "Upload coverage"
         if: success() || failure()
