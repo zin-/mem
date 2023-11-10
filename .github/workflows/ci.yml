@@ -73,14 +73,6 @@ jobs:
           android-api-level: 29
           android-target: default
           android-arch: x86_64
-#      - name: Set up Java
-#        uses: actions/setup-java@v3
-#        with:
-#          distribution: 'zulu'
-#          java-version: '11'
-#          cache: 'gradle'
-#      - name: Set up Gradle
-#        uses: gradle/gradle-build-action@v2
 
       - name: "Set up Flutter"
         uses: subosito/flutter-action@v2
@@ -90,27 +82,6 @@ jobs:
 
       - name: 'Generate Localization code'
         uses: ./.github/actions/generate-localization_code
-
-#      - name: "AVD cache"
-#        uses: actions/cache@v3
-#        id: avd-cache
-#        with:
-#          path: |
-#            ~/.android/avd/*
-#            ~/.android/adb*
-#          key: avd-29-default-x86_64
-#      - name: "Create AVD and generate snapshot for chaching"
-#        if: steps.avd-cache.outputs.cache-hit != 'true'
-#        uses: reactivecircus/android-emulator-runner@v2
-#        with:
-#          api-level: 29
-#          target: default
-#          arch: x86_64
-#          profile: Nexus 6
-#          force-avd-creation: false
-#          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-#          disable-animations: false
-#          script: echo "Generated AVD snapshot for caching."
 
       - name: "Run Flutter Tests"
         id: test-execution
@@ -133,14 +104,14 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
-          flags: medium_test-android-ex
+          flags: medium_test-android-ex-${{ matrix.android-emulator-runner }}
 
       - name: Report
         if: success() || failure()
         uses: dorny/test-reporter@v1
         with:
 #          name: '${{ matrix.api-level }}-${{ matrix.target }}-${{ matrix.arch }}'
-          name: 'test report'
+          name: 'Medium test(Android)'
           path: 'temp_report.log'
           reporter: 'flutter-json'
-          fail-on-error: 'false'
+          fail-on-error: true
