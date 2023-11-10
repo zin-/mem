@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -ne 1 ] && [ "$CI" = "true" ]; then
-  echo "引数にデバイス名を指定してください。"
+  echo "Invalid arguments. Argument 1 must be device name."
   exit 1
 fi
 
