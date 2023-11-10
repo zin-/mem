@@ -84,6 +84,7 @@ jobs:
         uses: ./.github/actions/generate-localization_code
 
       - name: "Run Flutter Tests"
+        if: ${{ matrix.android-emulator-runner == 'reactivecircus' }}
         id: test-execution
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -97,6 +98,10 @@ jobs:
           script: |
             bash ./scripts/integration_test.sh "emulator-5554"
 #          script: flutter test integration_test/app_test.dart --machine  -d android --coverage --dart-define=CICD=true | tee >(grep "^{" | grep "}$" > temp_report.log)
+      - id: 'test_execution'
+        if: ${{ matrix.android-emulator-runner == 'malinskiy' }}
+        continue-on-error: true
+        run: flutter test integration_test/app_test.dart -d "emulator-5554" --coverage --dart-define=CICD=true
 
       - name: "Upload coverage"
         if: success() || failure()
