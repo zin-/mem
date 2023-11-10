@@ -73,6 +73,9 @@ jobs:
           java-distribution: zulu
           java-version: 11
           flutter-channel: ${{ env.flutter-channel }}
+          android-api-level: 29
+          android-target: default
+          android-arch: x86_64
 #      - name: Set up Java
 #        uses: actions/setup-java@v3
 #        with:
@@ -91,26 +94,26 @@ jobs:
       - name: 'Generate Localization code'
         uses: ./.github/actions/generate-localization_code
 
-      - name: "AVD cache"
-        uses: actions/cache@v3
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-29-default-x86_64
-      - name: "Create AVD and generate snapshot for chaching"
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 29
-          target: default
-          arch: x86_64
-          profile: Nexus 6
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: false
-          script: echo "Generated AVD snapshot for caching."
+#      - name: "AVD cache"
+#        uses: actions/cache@v3
+#        id: avd-cache
+#        with:
+#          path: |
+#            ~/.android/avd/*
+#            ~/.android/adb*
+#          key: avd-29-default-x86_64
+#      - name: "Create AVD and generate snapshot for chaching"
+#        if: steps.avd-cache.outputs.cache-hit != 'true'
+#        uses: reactivecircus/android-emulator-runner@v2
+#        with:
+#          api-level: 29
+#          target: default
+#          arch: x86_64
+#          profile: Nexus 6
+#          force-avd-creation: false
+#          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+#          disable-animations: false
+#          script: echo "Generated AVD snapshot for caching."
 
       - name: "Run Flutter Tests"
         id: test-execution
