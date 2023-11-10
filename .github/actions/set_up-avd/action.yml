@@ -38,7 +38,7 @@ runs:
           ~/.android/adb*
         key: avd-${{ inputs.android-api-level }}-${{ inputs.android-target }}-${{ inputs.android-arch }}
     - name: "Create AVD and generate snapshot for chaching"
-      if: steps.avd-cache.outputs.cache-hit != 'true'
+      if: steps.avd-cache.outputs.cache-hit != 'true' && ${{ inputs.method == 'reactivecircus'}}
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: ${{ inputs.android-api-level }}
@@ -49,3 +49,7 @@ runs:
         emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
         disable-animations: false
         script: echo "Generated AVD snapshot for caching."
+
+    - name: 'Install Android SDK'
+      if: steps.avd-cache.outputs.cache-hit != 'true' && ${{ inputs.method == 'malinskiy'}}
+      uses: malinskiy/action-android/install-sdk@release/0.1.3
