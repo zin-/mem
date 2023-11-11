@@ -128,7 +128,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ windows]
+        platform: [ windows ]
 #        platform: [android, windows]
         include:
           - platform: android
