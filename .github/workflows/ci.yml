@@ -8,7 +8,7 @@ env:
 
 jobs:
   analyze-code:
-    name: "Analyze ${{ matrix.analyze-target }} code"
+    name: Analyze ${{ matrix.analyze-target }} code
 
     strategy:
       fail-fast: false
