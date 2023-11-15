@@ -56,7 +56,10 @@ jobs:
 #        uses: ./.github/actions/generate-localization_code
 
       - name: Run Flutter test
-        run: flutter test --coverage
+        run: |
+          flutter test
+          --coverage | tee >(grep "^{" | grep "}$" >temp_report.log)
+
       - name: Upload coverage
         if: success() || failure()
         uses: codecov/codecov-action@v3
@@ -64,6 +67,14 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
           flags: small_test-ex
+      - name: Report
+        if: success() || failure()
+        uses: dorny/test-reporter@v1
+        with:
+          name: "Medium test(Android)(${{ matrix.android-emulator-runner }})"
+          path: 'temp_report.log'
+          reporter: 'flutter-json'
+          fail-on-error: true
 
   medium_test-android:
     name: "Medium test(Android)"
@@ -115,12 +126,10 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
           flags: ex-medium_test-android-${{ matrix.android-emulator-runner }}
-
       - name: Report
         if: success() || failure()
         uses: dorny/test-reporter@v1
         with:
-#          name: '${{ matrix.api-level }}-${{ matrix.target }}-${{ matrix.arch }}'
           name: "Medium test(Android)(${{ matrix.android-emulator-runner }})"
           path: 'temp_report.log'
           reporter: 'flutter-json'
