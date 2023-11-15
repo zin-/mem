@@ -55,7 +55,7 @@ jobs:
         uses: ./.github/actions/build-mocks
 
       - name: "Run Flutter test"
-        run: flutter test --coverage --machine 2>&1 | tee temp_report.log
+        run: flutter test --coverage --machine | tee temp_report.log
 
       - name: Upload coverage
         if: success() || failure()
