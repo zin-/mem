@@ -129,15 +129,7 @@ jobs:
       fail-fast: false
       matrix:
         platform: [ windows ]
-#        platform: [android, windows]
         include:
-#          - platform: android
-#            os: macos-latest
-#            android-api-level: 30
-#            android-tag: 'default'
-#            android-abi: 'x86_64'
-#            java-distribution: 'temurin'
-#            java-version: 17
           - platform: windows
             os: windows-latest
     runs-on: ${{ matrix.os }}

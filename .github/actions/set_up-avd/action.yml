@@ -36,7 +36,8 @@ runs:
         path: |
           ~/.android/avd/*
           ~/.android/adb*
-        key: avd-${{ inputs.android-api-level }}-${{ inputs.android-target }}-${{ inputs.android-arch }}
+        key: avd-${{ inputs.android-api-level }}-${{ inputs.android-target }}-${{ inputs.android-arch }}-${{ inputs.method }}
+
     - name: "Create AVD and generate snapshot for chaching"
       if: steps.avd-cache.outputs.cache-hit != 'true' && ${{ inputs.method == 'reactivecircus'}}
       uses: reactivecircus/android-emulator-runner@v2
