@@ -55,7 +55,7 @@ jobs:
         uses: ./.github/actions/build-mocks
 
       - name: "Run Flutter test"
-        run: flutter test --coverage --machine | tee >(grep "^{" | grep "}$" >test_report.log)
+        run: flutter test --coverage | tee >(grep "^{" | grep "}$" >test_report.log)
 
       - name: Upload coverage
         if: always()
