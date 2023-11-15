@@ -73,3 +73,4 @@ runs:
       if: ${{ inputs.method == 'malinskiy'}}
       continue-on-error: true
       run: flutter test integration_test/app_test.dart -d "emulator-5554" --coverage --dart-define=CICD=true
+      shell: bash
