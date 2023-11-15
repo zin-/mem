@@ -64,16 +64,6 @@ jobs:
       - name: "Checkout code"
         uses: actions/checkout@v4
 
-      - name: Set up AVD
-        uses: ./.github/actions/set_up-avd
-        with:
-          method: ${{ matrix.android-emulator-runner }}
-          java-distribution: zulu
-          java-version: 11
-          android-api-level: 29
-          android-target: default
-          android-arch: x86_64
-
       - name: "Set up Flutter"
         uses: subosito/flutter-action@v2
         with:
@@ -83,25 +73,15 @@ jobs:
       - name: 'Generate Localization code'
         uses: ./.github/actions/generate-localization_code
 
-      - name: "Run Flutter Tests"
-        if: ${{ matrix.android-emulator-runner == 'reactivecircus' }}
-        id: test-execution
-        uses: reactivecircus/android-emulator-runner@v2
+      - name: Run Android Integration Test
+        uses: ./.github/actions/set_up-avd
         with:
-          api-level: 29
-          target: default
-          arch: x86_64
-          profile: Nexus 6
-          force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          script: |
-            bash ./scripts/integration_test.sh "emulator-5554"
-#          script: flutter test integration_test/app_test.dart --machine  -d android --coverage --dart-define=CICD=true | tee >(grep "^{" | grep "}$" > temp_report.log)
-      - id: 'test_execution'
-        if: ${{ matrix.android-emulator-runner == 'malinskiy' }}
-        continue-on-error: true
-        run: flutter test integration_test/app_test.dart -d "emulator-5554" --coverage --dart-define=CICD=true
+          method: ${{ matrix.android-emulator-runner }}
+          java-distribution: zulu
+          java-version: 11
+          android-api-level: 29
+          android-target: default
+          android-arch: x86_64
 
       - name: "Upload coverage"
         if: success() || failure()
