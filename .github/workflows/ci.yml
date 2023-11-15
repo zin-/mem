@@ -55,7 +55,9 @@ jobs:
         uses: ./.github/actions/build-mocks
 
       - name: "Run Flutter test"
-        run: flutter test --coverage | tee test_report.log
+        run: flutter test --coverage | tee >(grep "^{" | grep "}$" >test_report.log)
+#      表示はいい感じ、reportで失敗する
+#        run: flutter test --coverage | tee test_report.log
 
       - name: Upload coverage
         if: always()
