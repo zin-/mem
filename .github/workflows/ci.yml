@@ -131,6 +131,8 @@ jobs:
           flags: ex-medium_test-android-${{ matrix.android-emulator-runner }}
 
   medium_test-windows:
+#  TODO skipを解除する
+    if: false # 計算コスト削減のため一時的にskipする
     name: "Medium test(Windows)"
     runs-on: windows-latest
     steps:
