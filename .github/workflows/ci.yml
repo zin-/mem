@@ -68,6 +68,7 @@ jobs:
           path: "reports/test_report.log"
           reporter: "flutter-json"
           fail-on-error: false
+          fail-on-empty: false
       - name: "Upload coverage"
         if: always()
         uses: codecov/codecov-action@v3
@@ -166,6 +167,7 @@ jobs:
           path: "reports/test_report.log"
           reporter: "flutter-json"
           fail-on-error: false
+          fail-on-empty: false
       - name: "Upload coverage"
         if: always()
         uses: codecov/codecov-action@v3
