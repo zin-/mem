@@ -152,7 +152,7 @@ jobs:
         uses: ./.github/actions/generate-localization_code
 
       - name: "Run Windows Medium Test"
-        run: flutter test integration_test/app_test.dart -d windows | tee > (grep"^{" | grep "}$" > temp_report.log)
+        run: flutter test integration_test/app_test.dart -d windows | tee >(grep"^{" | grep "}$" > temp_report.log)
 
       - name: "Upload coverage"
         if: success() || failure()
