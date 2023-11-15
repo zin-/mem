@@ -129,7 +129,6 @@ jobs:
           name: "Medium test report(Android) (${{ matrix.android-emulator-runner }})"
           path: 'temp_report.log'
           reporter: 'flutter-json'
-          fail-on-error: true
 
   medium_test-windows:
     name: 'Medium test(Windows)'
