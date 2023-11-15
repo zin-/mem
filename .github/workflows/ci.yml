@@ -55,7 +55,9 @@ jobs:
         uses: ./.github/actions/build-mocks
 
       - name: "Run Flutter test"
-        run: flutter test --coverage --machine | tee >(grep "^{" | grep "}$" >test_report.log)
+        run: flutter test --coverage --reporter json
+#      表示がやな感じ、reportはOK
+#        run: flutter test --coverage --machine | tee >(grep "^{" | grep "}$" >test_report.log)
 #      表示はいい感じ、report成功するけど、表示されない
 #        run: flutter test --coverage | tee >(grep "^{" | grep "}$" >test_report.log)
 #      表示はいい感じ、reportで失敗する
