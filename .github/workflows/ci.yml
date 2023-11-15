@@ -84,11 +84,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-# TODO 複数のAndroid Emulator Runnerを使う
-#   - malinskiy/action-android
-#   - reactivecircus/android-emulator-runner
-#   パフォーマンスチェックのため
-#   Github actionsの実行時間制限とかが出始めたらやめる
+        # 複数のAndroid Emulator Runnerを使う
+        #   パフォーマンスチェックのため
+        #   Github actionsの実行時間制限とかが出始めたらやめる
         android-emulator-runner: [ malinskiy, reactivecircus ]
 
 # TODO 画面サイズ
