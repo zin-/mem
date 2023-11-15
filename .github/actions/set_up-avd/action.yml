@@ -85,7 +85,7 @@ runs:
         path: ${{ inputs.android-sdk-root }}/system-images/android-${{ inputs.android-api-level }}/${{ inputs.android-tag }}/${{ inputs.android-abi }}
         key: system_images-${{ env.android-system-images-key }}
     - name: 'Install System images'
-      if: steps.system_images-cache.outputs.cache-hit != 'true'
+      if: steps.system_images-cache.outputs.cache-hit != 'true' && ${{ inputs.method == 'malinskiy'}}
       run: sdkmanager "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-tag }};${{ inputs.android-abi }}"
       shell: bash
 # TODO キャッシュしたい。4~6mかかっている
@@ -98,6 +98,7 @@ runs:
         tag: ${{ inputs.android-tag }}
         abi: ${{ inputs.android-abi }}
     - name: 'Run Android emulator'
+      if: ${{ inputs.method == 'malinskiy'}}
       run: $ANDROID_SDK_ROOT/emulator/emulator @emulator -no-snapshot-save -noaudio -no-boot-anim &
       shell: bash
     - id: test_execution
