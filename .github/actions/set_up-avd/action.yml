@@ -86,7 +86,7 @@ runs:
         key: system_images-${{ env.android-system-images-key }}
     - name: 'Install System images'
       if: inputs.method == 'malinskiy' && steps.system_images-cache.outputs.cache-hit != 'true'
-      run: sdkmanager "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-tag }};${{ inputs.android-abi }}"
+      run: sdkmanager "system-images;android-${{ inputs.android-api-level }};default;x86_64"
       shell: bash
 # TODO キャッシュしたい。4~6mかかっている
     - name: 'Create Android emulator'
