@@ -126,7 +126,7 @@ jobs:
         if: success() || failure()
         uses: dorny/test-reporter@v1
         with:
-          name: "Medium test(Android) (${{ matrix.android-emulator-runner }})"
+          name: "Medium test report(Android) (${{ matrix.android-emulator-runner }})"
           path: 'temp_report.log'
           reporter: 'flutter-json'
           fail-on-error: true
