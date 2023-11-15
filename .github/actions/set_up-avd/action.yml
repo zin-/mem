@@ -63,7 +63,12 @@ runs:
         emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
         disable-animations: true
         script: |
-          bash ./scripts/integration_test.sh "emulator-5554"
+          flutter test integration_test/app_test.dart
+          --coverage
+          --dart-define=CICD=true
+          -d "emulator-5554"
+          --file-reporter json:reports/test_report.log
+#          bash ./scripts/integration_test.sh "emulator-5554"
 #          script: flutter test integration_test/app_test.dart --machine  -d android --coverage --dart-define=CICD=true | tee >(grep "^{" | grep "}$" > temp_report.log)
 
     - name: Install Android SDK
@@ -103,10 +108,10 @@ runs:
       shell: bash
     - id: test_execution
       if: ${{ inputs.method == 'malinskiy'}}
-      continue-on-error: true
       run: |
         flutter test integration_test/app_test.dart
-        -d "emulator-5554"
         --coverage
-        --dart-define=CICD=true | tee >(grep "^{" | grep "}$" >temp_report.log)
+        --dart-define=CICD=true
+        -d "emulator-5554"
+        --file-reporter json:reports/test_report.log
       shell: bash
