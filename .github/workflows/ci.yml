@@ -55,9 +55,7 @@ jobs:
         uses: ./.github/actions/build-mocks
 
       - name: "Run Flutter test"
-        run: |
-          flutter test
-          --coverage | tee >(grep "^{" | grep "}$" >temp_report.log)
+        run: flutter test --coverage --machine 2>&1 | tee temp_report.log
 
       - name: Upload coverage
         if: success() || failure()
@@ -70,7 +68,7 @@ jobs:
         if: success() || failure()
         uses: dorny/test-reporter@v1
         with:
-          name: "Medium test(Android)(${{ matrix.android-emulator-runner }})"
+          name: "Small test report"
           path: 'temp_report.log'
           reporter: 'flutter-json'
           fail-on-error: true
@@ -159,7 +157,7 @@ jobs:
         if: success() || failure()
         uses: dorny/test-reporter@v1
         with:
-          name: "Medium test(Windows)"
+          name: "Medium test report(Windows)"
           path: 'temp_report.log'
           reporter: 'flutter-json'
           fail-on-error: true
