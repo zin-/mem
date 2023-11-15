@@ -147,8 +147,7 @@ jobs:
         uses: ./.github/actions/generate-localization_code
 
       - name: "Run Windows Medium Test"
-        # TODO reportファイルの生成が必要
-        run: flutter test integration_test/app_test.dart -d windows --coverage --dart-define=CICD=true --machine > temp_report.log
+        run: flutter test integration_test/app_test.dart --dart-define=CICD=true --coverage -d windows --machine 2>&1 | tee temp_report.log
 
       - name: "Upload coverage"
         if: success() || failure()
