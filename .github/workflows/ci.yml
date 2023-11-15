@@ -55,8 +55,8 @@ jobs:
 
 #      - name: 'Install dependencies'
 #        uses: ./.github/actions/install-dependencies
-#      - name: 'Build Mocks'
-#        uses: ./.github/actions/build-mocks
+      - name: "Generate Mocks"
+        uses: ./.github/actions/build-mocks
 #      - name: 'Generate Localization code'
 #        uses: ./.github/actions/generate-localization_code
 
