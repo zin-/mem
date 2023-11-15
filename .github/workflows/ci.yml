@@ -148,7 +148,7 @@ jobs:
 
       - name: "Run Windows Medium Test"
         # TODO reportファイルの生成が必要
-        run: flutter test integration_test/app_test.dart -d windows  --coverage --dart-define=CICD=true --machine > temp_report.log
+        run: flutter test integration_test/app_test.dart -d windows --coverage --dart-define=CICD=true --machine > temp_report.log
 
       - name: "Upload coverage"
         if: success() || failure()
@@ -161,7 +161,7 @@ jobs:
         if: success() || failure()
         uses: dorny/test-reporter@v1
         with:
-          name: "Medium test(Windows)(${{ matrix.android-emulator-runner }})"
+          name: "Medium test(Windows)"
           path: 'temp_report.log'
           reporter: 'flutter-json'
           fail-on-error: true
