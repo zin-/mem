@@ -56,30 +56,21 @@ jobs:
 
       - name: "Run Flutter test"
         run: flutter test --coverage --file-reporter json:reports/test_report.log
-#      表示がやな感じ、report失敗たぶんファイルがない
-#        run: flutter test --coverage --reporter json:test_report.log
-#      表示がやな感じ、reportはOK
-#        run: flutter test --coverage --machine | tee >(grep "^{" | grep "}$" >test_report.log)
-#      表示はいい感じ、report成功するけど、表示されない
-#        run: flutter test --coverage | tee >(grep "^{" | grep "}$" >test_report.log)
-#      表示はいい感じ、reportで失敗する
-#        run: flutter test --coverage | tee test_report.log
 
-      - name: Upload coverage
-        if: always()
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage/lcov.info
-          flags: small_test-ex
-      - name: Report
+      - name: "Report"
         if: always()
         uses: dorny/test-reporter@v1
         with:
           name: "Small test report"
           path: "reports/test_report.log"
           reporter: "flutter-json"
-          fail-on-error: true
+      - name: "Upload coverage"
+        if: always()
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          flags: small_test
 
   medium_test-android:
     name: "Medium test(Android)"
