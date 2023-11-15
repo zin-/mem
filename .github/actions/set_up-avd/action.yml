@@ -76,7 +76,7 @@ runs:
       uses: malinskiy/action-android/install-sdk@release/0.1.3
     - name: 'Add env: android-system-images-key'
       if: inputs.method == 'malinskiy'
-      run: echo "android-system-images-key=${{ inputs.android-api-level }}-${{ inputs.android-tag }}-${{ inputs.android-abi }}" >> $GITHUB_ENV
+      run: echo "android-system-images-key=${{ inputs.android-api-level }}-default-x86_64" >> $GITHUB_ENV
       shell: bash
     - name: 'Install Android platform tools'
       if: inputs.method == 'malinskiy'
@@ -87,7 +87,7 @@ runs:
       name: 'Cache System images'
       uses: actions/cache@v3
       with:
-        path: ${{ inputs.android-sdk-root }}/system-images/android-${{ inputs.android-api-level }}/${{ inputs.android-tag }}/${{ inputs.android-abi }}
+        path: ${{ inputs.android-sdk-root }}/system-images/android-${{ inputs.android-api-level }}/default/x86_64
         key: system_images-${{ env.android-system-images-key }}
     - name: 'Install System images'
       if: inputs.method == 'malinskiy' && steps.system_images-cache.outputs.cache-hit != 'true'
@@ -100,8 +100,8 @@ runs:
       with:
         cmd: flutter doctor -v
         api: ${{ inputs.android-api-level }}
-        tag: ${{ inputs.android-tag }}
-        abi: ${{ inputs.android-abi }}
+        tag: default
+        abi: x86_64
     - name: 'Run Android emulator'
       if: inputs.method == 'malinskiy'
       run: $ANDROID_SDK_ROOT/emulator/emulator @emulator -no-snapshot-save -noaudio -no-boot-anim &
