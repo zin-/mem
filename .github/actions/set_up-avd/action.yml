@@ -63,11 +63,11 @@ runs:
         emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
         disable-animations: true
         script: |
-          flutter test integration_test/app_test.dart
-          --coverage
-          --dart-define=CICD=true
-          -d "emulator-5554"
-          --file-reporter json:reports/test_report.log
+          flutter test integration_test/app_test.dart \
+            --coverage \
+            --dart-define=CICD=true \
+            --device-id "emulator-5554" \
+            --file-reporter json:reports/test_report.log
 #          bash ./scripts/integration_test.sh "emulator-5554"
 #          script: flutter test integration_test/app_test.dart --machine  -d android --coverage --dart-define=CICD=true | tee >(grep "^{" | grep "}$" > temp_report.log)
 
@@ -109,9 +109,9 @@ runs:
     - id: test_execution
       if: ${{ inputs.method == 'malinskiy'}}
       run: |
-        flutter test integration_test/app_test.dart
-        --coverage
-        --dart-define=CICD=true
-        -d "emulator-5554"
-        --file-reporter json:reports/test_report.log
+        flutter test integration_test/app_test.dart \
+          --coverage \
+          --dart-define=CICD=true \
+          --device-id "emulator-5554" \
+          --file-reporter json:reports/test_report.log
       shell: bash
