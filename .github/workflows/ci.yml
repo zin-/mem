@@ -67,6 +67,7 @@ jobs:
           name: "Small test report"
           path: "reports/test_report.log"
           reporter: "flutter-json"
+          fail-on-error: false
       - name: "Upload coverage"
         if: always()
         uses: codecov/codecov-action@v3
@@ -122,6 +123,7 @@ jobs:
           name: "Medium test report(Android) (${{ matrix.android-emulator-runner }})"
           path: "reports/test_report.log"
           reporter: "flutter-json"
+          fail-on-error: false
       - name: "Upload coverage"
         if: always()
         uses: codecov/codecov-action@v3
@@ -162,6 +164,7 @@ jobs:
           name: "Medium test report(Windows)"
           path: "reports/test_report.log"
           reporter: "flutter-json"
+          fail-on-error: false
       - name: "Upload coverage"
         if: always()
         uses: codecov/codecov-action@v3
