@@ -8,6 +8,8 @@ env:
 
 jobs:
   analyze-code:
+#  TODO skipを解除する
+    if: false # 計算コスト削減のため一時的にskipする
     strategy:
       fail-fast: false
       matrix:
