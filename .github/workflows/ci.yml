@@ -99,8 +99,7 @@ jobs:
 # TODO Java version
 
     steps:
-      - name: "Checkout code"
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: "Set up Flutter"
         uses: subosito/flutter-action@v2
@@ -108,10 +107,10 @@ jobs:
           channel: ${{ env.flutter-channel }}
           cache: true
 
-      - name: 'Generate Localization code'
+      - name: "Generate Localization code"
         uses: ./.github/actions/generate-localization_code
 
-      - name: Run Android Integration Test
+      - name: "Run Android Medium Test"
         uses: ./.github/actions/set_up-avd
         with:
           method: ${{ matrix.android-emulator-runner }}
@@ -133,6 +132,42 @@ jobs:
         uses: dorny/test-reporter@v1
         with:
           name: "Medium test(Android)(${{ matrix.android-emulator-runner }})"
+          path: 'temp_report.log'
+          reporter: 'flutter-json'
+          fail-on-error: true
+
+  medium_test-windows:
+    name: 'Medium test(Windows)'
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Set up Flutter"
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.flutter-channel }}
+          cache: true
+
+      - name: "Generate Localization code"
+        uses: ./.github/actions/generate-localization_code
+
+      - name: "Run Windows Medium Test"
+        run: |
+          flutter test integration_test/app_test.dart
+          -d windows | tee >(grep "^{" | grep "}$" >temp_report.log)
+
+      - name: "Upload coverage"
+        if: success() || failure()
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          flags: ex-medium_test-windows-${{ matrix.android-emulator-runner }}
+      - name: Report
+        if: success() || failure()
+        uses: dorny/test-reporter@v1
+        with:
+          name: "Medium test(Windows)(${{ matrix.android-emulator-runner }})"
           path: 'temp_report.log'
           reporter: 'flutter-json'
           fail-on-error: true
