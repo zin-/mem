@@ -144,10 +144,10 @@ jobs:
 
       - name: "Run Windows Medium Test"
         run: |
-          flutter test integration_test/app_test.dart
-          --dart-define=CICD=true
-          --coverage
-          -d windows
+          flutter test integration_test/app_test.dart ^
+          --dart-define=CICD=true ^
+          --coverage ^
+          -d windows ^
           --file-reporter json:reports/test_report.log
 
       - name: "Report"
