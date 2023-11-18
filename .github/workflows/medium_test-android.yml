@@ -1,4 +1,4 @@
-name: "[EX]Medium test android"
+name: "[EX]Medium test(Android)"
 
 on:
   workflow_call:
