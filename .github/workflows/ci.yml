@@ -81,7 +81,9 @@ jobs:
     name: "Medium test(Android)"
     uses: ./.github/workflows/medium_test-android.yml
     with:
-      flutter-channel: "${{ env.flutter-channel }}"
+#     TODO ci配下のすべての環境を揃えるためenvを使うための回避策を考える
+#      flutter-channel: "${{ env.flutter-channel }}"
+      flutter-channel: stable
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
