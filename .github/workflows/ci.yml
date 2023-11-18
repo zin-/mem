@@ -81,7 +81,7 @@ jobs:
     name: "Medium test(Android)"
     uses: ./.github/workflows/medium_test-android.yml
     with:
-      flutter-channel: ${{ env.flutter-channel }}
+      flutter-channel: "${{ env.flutter-channel }}"
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
