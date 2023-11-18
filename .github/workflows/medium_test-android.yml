@@ -1,0 +1,70 @@
+name: "[EX]Medium test android"
+
+on:
+  workflow_call:
+    inputs:
+      flutter-channel:
+        required: true
+        type: string
+    secrets:
+      CODECOV_TOKEN:
+        required: true
+
+jobs:
+  medium_test-android:
+    name: "Medium test(Android)"
+
+    runs-on: macos-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # 複数のAndroid Emulator Runnerを使う
+        #   パフォーマンスチェックのため
+        #   Github actionsの実行時間制限とかが出始めたらやめる
+        android-emulator-runner: [ malinskiy, reactivecircus ]
+
+# TODO 画面サイズ
+# TODO OSバージョン
+# TODO Java distribution
+# TODO Java version
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Set up Flutter"
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ inputs.flutter-channel }}
+          cache: true
+
+      - name: "Generate Localization code"
+        uses: ./.github/actions/generate-localization_code
+
+      - name: "Run Android Medium Test"
+        uses: ./.github/actions/set_up-avd
+        with:
+          method: ${{ matrix.android-emulator-runner }}
+          java-distribution: zulu
+          java-version: 11
+          android-api-level: 29
+          android-target: default
+          android-arch: x86_64
+
+      - name: "Report"
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: "Medium test report(Android) (${{ matrix.android-emulator-runner }})"
+          path: "reports/test_report.log"
+          reporter: "flutter-json"
+          fail-on-error: false
+          fail-on-empty: false
+      - name: "Upload coverage"
+        if: always()
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          flags: ex-medium_test-android-${{ matrix.android-emulator-runner }}
+
