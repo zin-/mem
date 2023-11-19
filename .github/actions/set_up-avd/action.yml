@@ -1,16 +1,5 @@
 name: Set up AVD
 inputs:
-  method:
-    type: choice
-    description: Which to run
-    required: true
-    options:
-      - malinskiy
-      - reactivecircus
-  java-distribution:
-    required: true
-  java-version:
-    required: true
   android-api-level:
     required: true
   android-target:
@@ -31,7 +20,7 @@ runs:
         key: avd-${{ inputs.android-api-level }}-${{ inputs.android-target }}-${{ inputs.android-arch }}-${{ inputs.method }}
 
     - name: "Create AVD and generate snapshot for chaching"
-      if: inputs.method == 'reactivecircus' && steps.avd-cache.outputs.cache-hit != 'true'
+      if: steps.avd-cache.outputs.cache-hit != 'true'
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: ${{ inputs.android-api-level }}
@@ -43,7 +32,6 @@ runs:
         disable-animations: false
         script: echo "Generated AVD snapshot for caching."
     - name: Run Flutter Tests
-      if: inputs.method == 'reactivecircus'
       id: test-execution
       uses: reactivecircus/android-emulator-runner@v2
       with:
@@ -62,48 +50,3 @@ runs:
           --file-reporter json:reports/test_report.log
 #          bash ./scripts/integration_test.sh "emulator-5554"
 #          script: flutter test integration_test/app_test.dart --machine  -d android --coverage --dart-define=CICD=true | tee >(grep "^{" | grep "}$" > temp_report.log)
-
-    - name: Install Android SDK
-      if: inputs.method == 'malinskiy' && steps.avd-cache.outputs.cache-hit != 'true'
-      uses: malinskiy/action-android/install-sdk@release/0.1.3
-    - name: 'Add env: android-system-images-key'
-      if: inputs.method == 'malinskiy'
-      run: echo "android-system-images-key=${{ inputs.android-api-level }}-default-x86_64" >> $GITHUB_ENV
-      shell: bash
-    - name: 'Install Android platform tools'
-      if: inputs.method == 'malinskiy'
-      run: sdkmanager platform-tools
-      shell: bash
-    - id: system_images-cache
-      if: inputs.method == 'malinskiy'
-      name: 'Cache System images'
-      uses: actions/cache@v3
-      with:
-        path: ${{ inputs.android-sdk-root }}/system-images/android-${{ inputs.android-api-level }}/default/x86_64
-        key: system_images-${{ env.android-system-images-key }}
-    - name: 'Install System images'
-      if: inputs.method == 'malinskiy' && steps.system_images-cache.outputs.cache-hit != 'true'
-      run: sdkmanager "system-images;android-${{ inputs.android-api-level }};default;x86_64"
-      shell: bash
-# TODO キャッシュしたい。4~6mかかっている
-    - name: 'Create Android emulator'
-      if: inputs.method == 'malinskiy'
-      uses: malinskiy/action-android/emulator-run-cmd@release/0.1.3
-      with:
-        cmd: flutter doctor -v
-        api: ${{ inputs.android-api-level }}
-        tag: default
-        abi: x86_64
-    - name: 'Run Android emulator'
-      if: inputs.method == 'malinskiy'
-      run: $ANDROID_SDK_ROOT/emulator/emulator @emulator -no-snapshot-save -noaudio -no-boot-anim &
-      shell: bash
-    - id: test_execution
-      if: ${{ inputs.method == 'malinskiy'}}
-      run: >
-        flutter test integration_test/app_test.dart
-        --coverage
-        --dart-define=CICD=true
-        --device-id "emulator-5554"
-        --file-reporter json:reports/test_report.log
-      shell: bash
