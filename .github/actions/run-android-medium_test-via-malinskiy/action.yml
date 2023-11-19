@@ -32,13 +32,13 @@ runs:
       shell: bash
 
 # TODO キャッシュしたい。4~6mかかっている
-    - name: "Create Android virtual device"
-      uses: malinskiy/action-android/emulator-run-cmd@release/0.1.3
-      with:
-        cmd: echo "Generated AVD snapshot for caching."
-        api: ${{ inputs.android-api-level }}
-        tag: ${{ inputs.android-target }}
-        abi: ${{ inputs.android-arch }}
+#    - name: "Create Android virtual device"
+#      uses: malinskiy/action-android/emulator-run-cmd@release/0.1.3
+#      with:
+#        cmd: echo "Generated AVD snapshot for caching."
+#        api: ${{ inputs.android-api-level }}
+#        tag: ${{ inputs.android-target }}
+#        abi: ${{ inputs.android-arch }}
 
     - uses: malinskiy/action-android/emulator-run-cmd@release/0.1.3
       with:
