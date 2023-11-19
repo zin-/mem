@@ -62,6 +62,7 @@ jobs:
           android-api-level: 29
           android-target: default
           android-arch: x86_64
+          android-device-profile: Pixel 6 Pro
 
       - name: "Report"
         if: always()

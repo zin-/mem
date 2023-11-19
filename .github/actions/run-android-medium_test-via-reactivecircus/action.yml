@@ -6,6 +6,8 @@ inputs:
     required: true
   android-arch:
     required: true
+  android-device-profile:
+    required: true
 
 runs:
   using: composite
@@ -26,7 +28,7 @@ runs:
         api-level: ${{ inputs.android-api-level }}
         target: ${{ inputs.android-target }}
         arch: ${{ inputs.android-arch }}
-        profile: Pixel 7 Pro
+        profile: ${{ inputs.android-device-profile }}
         force-avd-creation: false
         emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
         disable-animations: false
@@ -34,10 +36,10 @@ runs:
 
     - uses: reactivecircus/android-emulator-runner@v2
       with:
-        api-level: 29
-        target: default
-        arch: x86_64
-        profile: Pixel 7 Pro
+        api-level: ${{ inputs.android-api-level }}
+        target: ${{ inputs.android-target }}
+        arch: ${{ inputs.android-arch }}
+        profile: ${{ inputs.android-device-profile }}
         force-avd-creation: false
         emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
         disable-animations: true
