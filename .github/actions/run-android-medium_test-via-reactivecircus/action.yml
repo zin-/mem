@@ -32,9 +32,7 @@ runs:
         disable-animations: false
         script: echo "Generated AVD snapshot for caching."
 
-    - name: "Run Flutter Tests"
-      id: test-execution
-      uses: reactivecircus/android-emulator-runner@v2
+    - uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 29
         target: default
