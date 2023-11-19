@@ -26,7 +26,7 @@ runs:
         api-level: ${{ inputs.android-api-level }}
         target: ${{ inputs.android-target }}
         arch: ${{ inputs.android-arch }}
-        profile: Nexus 6
+        profile: Pixel 7 Pro
         force-avd-creation: false
         emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
         disable-animations: false
