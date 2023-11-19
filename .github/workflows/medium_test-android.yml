@@ -49,7 +49,7 @@ jobs:
 
       - name: "Run Android Medium Test via malinskiy"
         if: matrix.android-emulator-runner == 'malinskiy'
-        uses: ./.github/actions/run-android-medium_test-via-${{ matrix.android-emulator-runner }}
+        uses: ./.github/actions/run-android-medium_test-via-malinskiy
         with:
           android-api-level: 29
           android-target: default
