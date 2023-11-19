@@ -43,6 +43,9 @@ jobs:
 
       - name: "Set up Java and Gradle"
         uses: ./.github/actions/set_up-java-and-gradle
+        with:
+          java-distribution: zulu
+          java-version: 11
 
       - name: "Run Android Medium Test"
         uses: ./.github/actions/set_up-avd
