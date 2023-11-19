@@ -19,7 +19,7 @@ runs:
           ~/.android/adb*
         key: avd-${{ inputs.android-api-level }}-${{ inputs.android-target }}-${{ inputs.android-arch }}-${{ inputs.method }}
 
-    - name: "Create AVD and generate snapshot for chaching"
+    - name: "Create Android virtual device"
       if: steps.avd-cache.outputs.cache-hit != 'true'
       uses: reactivecircus/android-emulator-runner@v2
       with:
