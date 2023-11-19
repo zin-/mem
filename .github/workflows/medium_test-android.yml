@@ -41,6 +41,9 @@ jobs:
       - name: "Generate Localization code"
         uses: ./.github/actions/generate-localization_code
 
+      - name: "Set up Java and Gradle"
+        uses: ./.github/actions/set_up-java-and-gradle
+
       - name: "Run Android Medium Test"
         uses: ./.github/actions/set_up-avd
         with:

@@ -21,14 +21,6 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: "Set up Java"
-      uses: actions/setup-java@v3
-      with:
-        distribution: ${{ inputs.java-distribution }}
-        java-version: ${{ inputs.java-version }}
-        cache: gradle
-    - name: "Set up Gradle"
-      uses: gradle/gradle-build-action@v2
     - name: "AVD cache"
       uses: actions/cache@v3
       id: avd-cache
