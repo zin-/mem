@@ -31,7 +31,8 @@ runs:
         emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
         disable-animations: false
         script: echo "Generated AVD snapshot for caching."
-    - name: Run Flutter Tests
+
+    - name: "Run Flutter Tests"
       id: test-execution
       uses: reactivecircus/android-emulator-runner@v2
       with:

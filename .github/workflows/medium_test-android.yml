@@ -57,7 +57,7 @@ jobs:
 
       - name: "Run Android Medium Test"
         if: matrix.android-emulator-runner == 'reactivecircus'
-        uses: ./.github/actions/set_up-avd
+        uses: ./.github/actions/run-android-medium_test-via-reactivecircus
         with:
           android-api-level: 29
           android-target: default
