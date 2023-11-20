@@ -6,8 +6,10 @@ inputs:
     required: true
   android-arch:
     required: true
-  android-device-profile:
-    required: true
+# TODO 有効はProfileを見つける
+#   画面サイズなどのバラエティを増やす際に検討する
+#  android-device-profile:
+#    required: true
 
 runs:
   using: composite
@@ -49,5 +51,3 @@ runs:
           --dart-define=CICD=true
           --device-id "emulator-5554"
           --file-reporter json:reports/test_report.log
-#          bash ./scripts/integration_test.sh "emulator-5554"
-#          script: flutter test integration_test/app_test.dart --machine  -d android --coverage --dart-define=CICD=true | tee >(grep "^{" | grep "}$" > temp_report.log)

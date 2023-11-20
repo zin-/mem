@@ -31,15 +31,7 @@ runs:
       run: sdkmanager "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-target }};${{ inputs.android-arch }}"
       shell: bash
 
-# TODO キャッシュしたい。4~6mかかっている
-#    - name: "Create Android virtual device"
-#      uses: malinskiy/action-android/emulator-run-cmd@release/0.1.3
-#      with:
-#        cmd: echo "Generated AVD snapshot for caching."
-#        api: ${{ inputs.android-api-level }}
-#        tag: ${{ inputs.android-target }}
-#        abi: ${{ inputs.android-arch }}
-
+    # TODO キャッシュしたい。起動だけで4~6mかかっている
     - uses: malinskiy/action-android/emulator-run-cmd@release/0.1.3
       with:
         cmd: >
