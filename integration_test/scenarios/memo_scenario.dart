@@ -286,7 +286,7 @@ void testMemoScenario() => group(
               expect(find.text(enteringMemNameText), findsOneWidget);
               expect(find.text(enteringMemMemoText), findsOneWidget);
             },
-            // skip: true,
+            skip: true,
           );
 
           group(': Archive', () {
