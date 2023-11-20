@@ -94,7 +94,6 @@ jobs:
       - id: set-result
         name: "Set Result"
         if: always()
-
         run: echo "${{ matrix.android-emulator-runner }}-status=${{ job.status }}" >> $GITHUB_OUTPUT
 
   check-overall-results:
