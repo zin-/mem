@@ -86,6 +86,7 @@ jobs:
 
   result:
     needs: [ medium_test-android ]
+    if: always()
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
