@@ -241,17 +241,11 @@ void testMemoScenario() => group(
               await widgetTester.pumpAndSettle();
 
               expect(find.text(enteringMemNameText), findsOneWidget);
-              // FIXME 画面に表示されておらずtapできない場合がある
-              //  - 画面サイズが著しく小さい場合
-              //  - 要素が増えてMemoの領域が画面外まで追いやられた場合
-              await widgetTester.scrollUntilVisible(
-                memMemoOnDetailPageFinder,
-                // FIXME この数値に根拠がない
-                1,
-              );
-              await widgetTester.tap(memMemoOnDetailPageFinder);
-              await widgetTester.pumpAndSettle();
-
+              // // FIXME 画面に表示されておらずtapできない場合がある
+              // //  - 画面サイズが著しく小さい場合
+              // //  - 要素が増えてMemoの領域が画面外まで追いやられた場合
+              // await widgetTester.tap(memMemoOnDetailPageFinder);
+              // await widgetTester.pumpAndSettle();
               const enteringMemMemoText =
                   '$scenarioName: Save: Update - mem memo - entering';
               await widgetTester.enterText(
@@ -260,6 +254,11 @@ void testMemoScenario() => group(
               );
               await widgetTester.pumpAndSettle();
 
+              await widgetTester.scrollUntilVisible(
+                find.text(enteringMemMemoText),
+                // FIXME この数値に根拠がない
+                1,
+              );
               expect(find.text(enteringMemMemoText), findsOneWidget);
               await widgetTester.tap(saveMemFabFinder);
               await widgetTester.pumpAndSettle();
