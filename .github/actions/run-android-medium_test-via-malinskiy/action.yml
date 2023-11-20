@@ -15,7 +15,7 @@ runs:
     - name: "Install Android SDK"
       uses: malinskiy/action-android/install-sdk@release/0.1.3
     - name: "Add env: android-system-images-key"
-      run: echo "android-system-images-key=${{ inputs.android-api-level }}-${{ inputs.android-target }}-${{ inputs.android-arch }}" >> $GITHUB_ENV
+      run: echo "android-system-images-key=${{ inputs.android-api-level }}-${{ inputs.android-target }}-${{ inputs.android-arch }}-malinskiy" >> $GITHUB_ENV
       shell: bash
     - name: "Install Android platform tools"
       run: sdkmanager platform-tools
