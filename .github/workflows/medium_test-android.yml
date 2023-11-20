@@ -88,10 +88,6 @@ jobs:
     needs: [ medium_test-android ]
     if: always()
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        result-run: [1]
     steps:
       - name: Set Overall Status
         run: echo "Overall status is ${{ job.status }}"
