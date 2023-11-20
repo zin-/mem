@@ -255,7 +255,7 @@ void testMemoScenario() => group(
               await widgetTester.pumpAndSettle();
 
               await widgetTester.scrollUntilVisible(
-                find.text(enteringMemMemoText),
+                find.text(enteringMemMemoText).first,
                 // FIXME この数値に根拠がない
                 1,
               );
