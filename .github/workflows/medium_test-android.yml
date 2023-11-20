@@ -101,4 +101,4 @@ jobs:
     steps:
       - name: Set Overall Status
         run: echo "Overall status is ${{ job.status }}"
-      - run: echo "Overall status is ${{ needs.medium_test-android.outputs.result }}"
+      - run: echo "Overall status is ${{ needs.medium_test-android.outputs.status }}"
