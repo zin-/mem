@@ -25,7 +25,8 @@ jobs:
         android-emulator-runner: [ malinskiy, reactivecircus ]
 
     outputs:
-      status: ${{ steps.set-result.outputs.status }}
+      malinskiy-status: ${{ steps.set-result.outputs.malinskiy-status }}
+      reactivecircus-status: ${{ steps.set-result.outputs.reactivecircus-status }}
 
 # TODO 画面サイズ
 # TODO OSバージョン
@@ -92,7 +93,7 @@ jobs:
       - id: set-result
         name: "Set Result"
         if: always()
-        run: echo "status=${{ job.status }}" >> $GITHUB_OUTPUT
+        run: echo "${{ matrix.android-emulator-runner }}-status=${{ job.status }}" >> $GITHUB_OUTPUT
 
   result:
     needs: [ medium_test-android ]
@@ -101,4 +102,5 @@ jobs:
     steps:
       - name: Set Overall Status
         run: echo "Overall status is ${{ job.status }}"
-      - run: echo "Overall status is ${{ needs.medium_test-android.outputs.status }}"
+      - run: echo "Overall status is ${{ needs.medium_test-android.outputs.malinskiy-status }}"
+      - run: echo "Overall status is ${{ needs.medium_test-android.outputs.reactivecircus-status }}"
