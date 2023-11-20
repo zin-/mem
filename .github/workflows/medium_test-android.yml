@@ -95,14 +95,13 @@ jobs:
         if: always()
         run: echo "${{ matrix.android-emulator-runner }}-status=${{ job.status }}" >> $GITHUB_OUTPUT
 
-  result:
-    needs: [ medium_test-android ]
+  check-overall-results:
+    needs: medium_test-android
     if: always()
     runs-on: ubuntu-latest
     steps:
-      - name: Set Overall Status
-        run: echo "Overall status is ${{ job.status }}"
-      - run: echo "Overall status is ${{ needs.medium_test-android.outputs.malinskiy-status }}"
-      - run: echo "Overall status is ${{ needs.medium_test-android.outputs.reactivecircus-status }}"
-      - if: needs.medium_test-android.outputs.malinskiy-status == 'failure' && needs.medium_test-android.outputs.reactivecircus-status == 'failure'
+      - name: "Check overall results"
+        if: >
+          needs.medium_test-android.outputs.malinskiy-status == 'failure'
+          && needs.medium_test-android.outputs.reactivecircus-status == 'failure'
         run: exit 1
