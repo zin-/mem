@@ -94,8 +94,9 @@ jobs:
           name: "Medium test report(Android) (${{ matrix.android-emulator-runner }})"
           path: "reports/test_report.log"
           reporter: "flutter-json"
-          fail-on-error: false
-          fail-on-empty: false
+          fail-on-error: true
+          fail-on-empty: true
+        continue-on-error: true
       - name: "Upload coverage"
         if: always()
         uses: codecov/codecov-action@v3
