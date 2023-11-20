@@ -98,10 +98,12 @@ jobs:
   check-overall-results:
     needs: medium_test-android
     if: always()
+    name: "Check overall results"
     runs-on: ubuntu-latest
     steps:
-      - name: "Check overall results"
+      - name: "All results are failure"
         if: >
           needs.medium_test-android.outputs.malinskiy-status == 'failure'
           && needs.medium_test-android.outputs.reactivecircus-status == 'failure'
         run: exit 1
+      - run: exit 0
