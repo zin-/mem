@@ -244,11 +244,11 @@ void testMemoScenario() => group(
               // FIXME 画面に表示されておらずtapできない場合がある
               //  - 画面サイズが著しく小さい場合
               //  - 要素が増えてMemoの領域が画面外まで追いやられた場合
-              await widgetTester.scrollUntilVisible(
-                memMemoOnDetailPageFinder,
-                // FIXME この数値に根拠がない
-                100,
-              );
+              // await widgetTester.scrollUntilVisible(
+              //   memMemoOnDetailPageFinder,
+              //   // FIXME この数値に根拠がない
+              //   100,
+              // );
               await widgetTester.tap(memMemoOnDetailPageFinder);
               await widgetTester.pumpAndSettle();
 
