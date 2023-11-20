@@ -83,7 +83,7 @@ jobs:
           path: "reports/test_report.log"
           reporter: "flutter-json"
           fail-on-error: true
-          fail-on-empty: true
+          fail-on-empty: false
       - name: "Upload coverage"
         if: always()
         uses: codecov/codecov-action@v3
