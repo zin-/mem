@@ -24,6 +24,9 @@ jobs:
         #   Github actionsの実行時間制限とかが出始めたらやめる
         android-emulator-runner: [ malinskiy, reactivecircus ]
 
+    outputs:
+      status: ${{ steps.set-result.outputs.result }}
+
 # TODO 画面サイズ
 # TODO OSバージョン
 # TODO Java distribution
@@ -83,6 +86,10 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
           flags: ex-medium_test-android-${{ matrix.android-emulator-runner }}
+      - id: set-result
+        name: "Set Result"
+        if: always()
+        run: echo "result=${{ job.status }}" >> $GITHUB_OUTPUT
 
   result:
     needs: [ medium_test-android ]
@@ -91,3 +98,4 @@ jobs:
     steps:
       - name: Set Overall Status
         run: echo "Overall status is ${{ job.status }}"
+      - run: echo "Overall status is ${{ needs.medium_test-android.outputs.result }}"
