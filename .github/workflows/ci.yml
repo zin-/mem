@@ -1,4 +1,4 @@
-name: "[EX]Continuous Integration"
+name: "Continuous Integration"
 
 on:
   push:
@@ -63,7 +63,7 @@ jobs:
         if: always()
         uses: dorny/test-reporter@v1
         with:
-          name: "Small test report"
+          name: "Report (Small test)"
           path: "reports/test_report.log"
           reporter: "flutter-json"
           fail-on-error: false
@@ -113,7 +113,7 @@ jobs:
         if: always()
         uses: dorny/test-reporter@v1
         with:
-          name: "Medium test report(Windows)"
+          name: "Report (Medium test (Windows))"
           path: "reports/test_report.log"
           reporter: "flutter-json"
           fail-on-error: false
