@@ -92,7 +92,7 @@ jobs:
       - id: set-result
         name: "Set Result"
         if: always()
-        run: echo "result=${{ job.status }}" >> $GITHUB_OUTPUT
+        run: echo "status=${{ job.status }}" >> $GITHUB_OUTPUT
 
   result:
     needs: [ medium_test-android ]
