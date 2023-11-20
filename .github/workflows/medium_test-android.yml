@@ -68,7 +68,6 @@ jobs:
       - id: set-result-malinskiy
         if: matrix.android-emulator-runner == 'malinskiy'
         name: "Set Result"
-        if: always()
         run: echo "status=${{ steps.run-android-medium_test-via-malinskiy.outcome }}" >> $GITHUB_OUTPUT
 
       - id: run-android-medium_test-via-reactivecircus
@@ -84,11 +83,9 @@ jobs:
       - id: set-result-reactivecircus
         if: matrix.android-emulator-runner == 'reactivecircus'
         name: "Set Result"
-        if: always()
         run: echo "status=${{ steps.run-android-medium_test-via-reactivecircus.outcome }}" >> $GITHUB_OUTPUT
 
       - name: "Report"
-        if: always()
         uses: dorny/test-reporter@v1
         with:
           name: "Medium test report(Android) (${{ matrix.android-emulator-runner }})"
@@ -98,7 +95,6 @@ jobs:
           fail-on-empty: true
         continue-on-error: true
       - name: "Upload coverage"
-        if: always()
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
