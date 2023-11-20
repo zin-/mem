@@ -42,6 +42,8 @@ jobs:
           channel: ${{ inputs.flutter-channel }}
           cache: true
 
+      - name: "Install Dependencies"
+        uses: ./.github/actions/install-dependencies
       - name: "Generate Localization code"
         uses: ./.github/actions/generate-localization_code
 
@@ -90,6 +92,7 @@ jobs:
       - id: set-result
         name: "Set Result"
         if: always()
+
         run: echo "${{ matrix.android-emulator-runner }}-status=${{ job.status }}" >> $GITHUB_OUTPUT
 
   check-overall-results:
