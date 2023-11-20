@@ -25,7 +25,7 @@ jobs:
         android-emulator-runner: [ malinskiy, reactivecircus ]
 
     outputs:
-      status: ${{ steps.set-result.outputs.result }}
+      status: ${{ steps.set-result.outputs.status }}
 
 # TODO 画面サイズ
 # TODO OSバージョン
