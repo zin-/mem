@@ -47,6 +47,9 @@ jobs:
           java-distribution: zulu
           java-version: 11
 
+      - name: "Build APK"
+        run: flutter build apk --debug
+
       - name: "Run Android Medium Test via malinskiy"
         if: matrix.android-emulator-runner == 'malinskiy'
         uses: ./.github/actions/run-android-medium_test-via-malinskiy
