@@ -104,8 +104,8 @@ jobs:
         run: echo "Overall status is ${{ job.status }}"
       - run: echo "Overall status is ${{ needs.medium_test-android.outputs.malinskiy-status }}"
       - run: echo "Overall status is ${{ needs.medium_test-android.outputs.reactivecircus-status }}"
-      - if: needs.medium_test-android.outputs.malinskiy-status == 'success '
+      - if: needs.medium_test-android.outputs.malinskiy-status == 'success'
         run: exit 0
-      - if: needs.medium_test-android.outputs.reactivecircus-status == 'success '
+      - if: needs.medium_test-android.outputs.reactivecircus-status == 'success'
         run: exit 0
       - run: exit 1
