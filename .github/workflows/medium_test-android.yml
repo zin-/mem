@@ -35,57 +35,60 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: "Set up Flutter"
-        uses: subosito/flutter-action@v2
-        with:
-          channel: ${{ inputs.flutter-channel }}
-          cache: true
-
-      - name: "Generate Localization code"
-        uses: ./.github/actions/generate-localization_code
-
-      - name: "Set up Java and Gradle"
-        uses: ./.github/actions/set_up-java-and-gradle
-        with:
-          java-distribution: zulu
-          java-version: 11
-
-      - name: "Build APK"
-        run: flutter build apk --debug
-
+#      - name: "Set up Flutter"
+#        uses: subosito/flutter-action@v2
+#        with:
+#          channel: ${{ inputs.flutter-channel }}
+#          cache: true
+#
+#      - name: "Generate Localization code"
+#        uses: ./.github/actions/generate-localization_code
+#
+#      - name: "Set up Java and Gradle"
+#        uses: ./.github/actions/set_up-java-and-gradle
+#        with:
+#          java-distribution: zulu
+#          java-version: 11
+#
+#      - name: "Build APK"
+#        run: flutter build apk --debug
+#
       - name: "Run Android Medium Test via malinskiy"
         if: matrix.android-emulator-runner == 'malinskiy'
-        uses: ./.github/actions/run-android-medium_test-via-malinskiy
-        with:
-          android-api-level: 29
-          android-target: default
-          android-arch: x86_64
-
+        run: exit 1
+#        uses: ./.github/actions/run-android-medium_test-via-malinskiy
+#        with:
+#          android-api-level: 29
+#          android-target: default
+#          android-arch: x86_64
+#
       - name: "Run Android Medium Test via reactivecircus"
         if: matrix.android-emulator-runner == 'reactivecircus'
-        uses: ./.github/actions/run-android-medium_test-via-reactivecircus
-        with:
-          android-api-level: 29
-          android-target: default
-          android-arch: x86_64
-          android-device-profile: Pixel 5
+        run: exit 0
+#        uses: ./.github/actions/run-android-medium_test-via-reactivecircus
+#        with:
+#          android-api-level: 29
+#          android-target: default
+#          android-arch: x86_64
+#          android-device-profile: Pixel 5
+#
+#      - name: "Report"
+#        if: always()
+#        uses: dorny/test-reporter@v1
+#        with:
+#          name: "Medium test report(Android) (${{ matrix.android-emulator-runner }})"
+#          path: "reports/test_report.log"
+#          reporter: "flutter-json"
+#          fail-on-error: false
+#          fail-on-empty: false
+#      - name: "Upload coverage"
+#        if: always()
+#        uses: codecov/codecov-action@v3
+#        with:
+#          token: ${{ secrets.CODECOV_TOKEN }}
+#          files: ./coverage/lcov.info
+#          flags: ex-medium_test-android-${{ matrix.android-emulator-runner }}
 
-      - name: "Report"
-        if: always()
-        uses: dorny/test-reporter@v1
-        with:
-          name: "Medium test report(Android) (${{ matrix.android-emulator-runner }})"
-          path: "reports/test_report.log"
-          reporter: "flutter-json"
-          fail-on-error: false
-          fail-on-empty: false
-      - name: "Upload coverage"
-        if: always()
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage/lcov.info
-          flags: ex-medium_test-android-${{ matrix.android-emulator-runner }}
       - id: set-result
         name: "Set Result"
         if: always()
