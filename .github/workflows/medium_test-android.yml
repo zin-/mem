@@ -56,7 +56,8 @@ jobs:
       - name: "Build APK"
         run: flutter build apk --debug
 
-      - name: "Run Android Medium Test via malinskiy"
+      - id: run-android-medium_test
+        name: "Run Android Medium Test via malinskiy"
         if: matrix.android-emulator-runner == 'malinskiy'
         uses: ./.github/actions/run-android-medium_test-via-malinskiy
         with:
@@ -65,7 +66,8 @@ jobs:
           android-arch: x86_64
         continue-on-error: true
 
-      - name: "Run Android Medium Test via reactivecircus"
+      - id: run-android-medium_test
+        name: "Run Android Medium Test via reactivecircus"
         if: matrix.android-emulator-runner == 'reactivecircus'
         uses: ./.github/actions/run-android-medium_test-via-reactivecircus
         with:
@@ -94,7 +96,7 @@ jobs:
       - id: set-result
         name: "Set Result"
         if: always()
-        run: echo "${{ matrix.android-emulator-runner }}-status=${{ job.status }}" >> $GITHUB_OUTPUT
+        run: echo "${{ matrix.android-emulator-runner }}-status=${{ steps.run-android-medium_test.outcome }}" >> $GITHUB_OUTPUT
 
   check-overall-results:
     needs: medium_test-android
