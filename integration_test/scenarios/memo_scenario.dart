@@ -231,8 +231,7 @@ void testMemoScenario() => group(
                 await widgetTester.pumpAndSettle();
 
                 await widgetTester.tap(memNameOnDetailPageFinder);
-                await widgetTester.pump(const Duration(milliseconds: 400));
-                // await widgetTester.pump();
+                await widgetTester.pump(waitShowSoftwareKeyboardDuration);
 
                 const enteringMemNameText =
                     '$scenarioName: Save: Update - mem name - entering';
@@ -279,7 +278,7 @@ void testMemoScenario() => group(
                 await widgetTester.pumpAndSettle();
 
                 await widgetTester.tap(memMemoOnDetailPageFinder);
-                await widgetTester.pump();
+                await widgetTester.pump(waitShowSoftwareKeyboardDuration);
 
                 const enteringMemMemoText =
                     '$scenarioName: Save: Update - mem memo - entering';
