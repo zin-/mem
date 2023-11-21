@@ -231,7 +231,8 @@ void testMemoScenario() => group(
                 await widgetTester.pumpAndSettle();
 
                 await widgetTester.tap(memNameOnDetailPageFinder);
-                await widgetTester.pump();
+                await widgetTester.pump(const Duration(milliseconds: 400));
+                // await widgetTester.pump();
 
                 const enteringMemNameText =
                     '$scenarioName: Save: Update - mem name - entering';
