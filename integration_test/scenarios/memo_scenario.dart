@@ -255,6 +255,7 @@ void testMemoScenario() => group(
                   find.text(saveSuccessText),
                   findsNothing,
                 );
+
                 await widgetTester.pageBack();
                 await widgetTester.pumpAndSettle();
                 expect(find.text(insertedMemName), findsNothing);
@@ -276,55 +277,33 @@ void testMemoScenario() => group(
                 await widgetTester.tap(find.text(insertedMemName));
                 await widgetTester.pumpAndSettle();
 
-                // const enteringMemNameText =
-                //     '$scenarioName: Save: Update - mem name - entering';
-                // await widgetTester.enterText(
-                //   memNameOnDetailPageFinder,
-                //   enteringMemNameText,
-                // );
-                // await widgetTester.pumpAndSettle();
+                await widgetTester.tap(memMemoOnDetailPageFinder);
+                await widgetTester.pump();
 
-                // expect(find.text(enteringMemNameText), findsOneWidget);
-                // // FIXME 画面に表示されておらずtapできない場合がある
-                // //  - 画面サイズが著しく小さい場合
-                // //  - 要素が増えてMemoの領域が画面外まで追いやられた場合
-                // await widgetTester.tap(memMemoOnDetailPageFinder);
-                // await widgetTester.pumpAndSettle();
-                //
-                // const enteringMemMemoText =
-                //     '$scenarioName: Save: Update - mem memo - entering';
-                // await widgetTester.enterText(
-                //   memMemoOnDetailPageFinder,
-                //   enteringMemMemoText,
-                // );
-                // await widgetTester.pumpAndSettle();
-                //
-                // expect(find.text(enteringMemMemoText), findsOneWidget);
-                // await widgetTester.tap(saveMemFabFinder);
-                // await widgetTester.pumpAndSettle();
-                //
-                // const saveSuccessText = 'Save success. $enteringMemNameText';
-                // expect(
-                //   find.text(saveSuccessText),
-                //   findsOneWidget,
-                // );
-                // await widgetTester.pumpAndSettle(defaultDismissDuration);
-                //
-                // expect(
-                //   find.text(saveSuccessText),
-                //   findsNothing,
-                // );
-                // await widgetTester.pageBack();
-                // await widgetTester.pumpAndSettle();
-                //
-                // expect(find.text(insertedMemName), findsNothing);
-                // expect(find.text(enteringMemNameText), findsOneWidget);
-                // await widgetTester.tap(find.text(enteringMemNameText));
-                // await widgetTester.pumpAndSettle();
-                //
-                // expect(find.text(insertedMemName), findsNothing);
-                // expect(find.text(enteringMemNameText), findsOneWidget);
-                // expect(find.text(enteringMemMemoText), findsOneWidget);
+                const enteringMemMemoText =
+                    '$scenarioName: Save: Update - mem memo - entering';
+                await widgetTester.enterText(
+                  memMemoOnDetailPageFinder,
+                  enteringMemMemoText,
+                );
+                await widgetTester.pump();
+                expect(find.text(enteringMemMemoText), findsOneWidget);
+
+                await widgetTester.tap(saveMemFabFinder);
+                await widgetTester.pumpAndSettle();
+                const saveSuccessText = 'Save success. $insertedMemName';
+                expect(
+                  find.text(saveSuccessText),
+                  findsOneWidget,
+                );
+
+                await widgetTester.pageBack();
+                await widgetTester.pumpAndSettle();
+
+                await widgetTester.tap(find.text(insertedMemName));
+                await widgetTester.pumpAndSettle();
+                expect(find.text(insertedMemName), findsOneWidget);
+                expect(find.text(enteringMemMemoText), findsOneWidget);
               },
             );
           });
