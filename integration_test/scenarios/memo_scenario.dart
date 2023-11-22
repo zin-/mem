@@ -286,7 +286,7 @@ void testMemoScenario() => group(
                   memMemoOnDetailPageFinder,
                   enteringMemMemoText,
                 );
-                await widgetTester.pump();
+                await widgetTester.pumpAndSettle();
                 expect(find.text(enteringMemMemoText), findsOneWidget);
 
                 await widgetTester.tap(saveMemFabFinder);
