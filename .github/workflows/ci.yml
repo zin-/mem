@@ -10,7 +10,7 @@ jobs:
   set_up-env:
     outputs:
       flutter-channel: ${{ steps.env-variables.outputs.flutter-channel }}
-    runs-on: ubunts-latest
+    runs-on: ubuntu-latest
     steps:
       - id: env-variables
         run: |
