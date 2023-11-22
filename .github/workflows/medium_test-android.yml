@@ -15,7 +15,9 @@ jobs:
   medium_test-android:
     name: "Medium test (Android)"
 
-    runs-on: macos-latest
+    outputs:
+      malinskiy-status: ${{ steps.set-result-malinskiy.outputs.status }}
+      reactivecircus-status: ${{ steps.set-result-reactivecircus.outputs.status }}
 
     strategy:
       fail-fast: false
@@ -24,10 +26,10 @@ jobs:
         #   パフォーマンスチェックのため
         #   Github actionsの実行時間制限とかが出始めたらやめる
         android-emulator-runner: [ malinskiy, reactivecircus ]
+        include:
+          - os: macos-latest
 
-    outputs:
-      malinskiy-status: ${{ steps.set-result-malinskiy.outputs.status }}
-      reactivecircus-status: ${{ steps.set-result-reactivecircus.outputs.status }}
+    runs-on: ${{ matrix.os }}
 
 # TODO 画面サイズ
 # TODO OSバージョン
