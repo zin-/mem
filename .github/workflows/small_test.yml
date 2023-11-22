@@ -6,6 +6,7 @@ on:
       flutter-channel:
         required: true
         type: string
+
     secrets:
       CODECOV_TOKEN:
         required: true
