@@ -12,7 +12,7 @@ on:
 
 jobs:
   medium_test-android:
-    name: "Medium test(Android)"
+    name: "Medium test (Android)"
 
     runs-on: macos-latest
 
