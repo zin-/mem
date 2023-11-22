@@ -1,0 +1,52 @@
+name: "Small test"
+
+on:
+  workflow_call:
+    inputs:
+      flutter-channel:
+        required: true
+        type: string
+    secrets:
+      CODECOV_TOKEN:
+        required: true
+
+jobs:
+  small_test:
+    name: "Small test"
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Set up Flutter"
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ inputs.flutter-channel }}
+          cache: true
+
+      - name: "Generate Mocks"
+        uses: ./.github/actions/build-mocks
+
+      - name: "Run Flutter test"
+        run: >
+          flutter test
+          --coverage
+          --file-reporter json:reports/test_report.log
+
+      - name: "Report"
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: "Report (Small test)"
+          path: "reports/test_report.log"
+          reporter: "flutter-json"
+          fail-on-error: false
+          fail-on-empty: false
+      - name: "Upload coverage"
+        if: always()
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          flags: small_test
