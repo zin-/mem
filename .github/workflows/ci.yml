@@ -8,29 +8,11 @@ env:
 
 jobs:
   analyze-code:
-    name: "Analyze code"
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: "Set up Flutter"
-        uses: subosito/flutter-action@v2
-        with:
-          channel: ${{ env.flutter-channel }}
-          cache: true
-
-      - name: "Install Dependencies"
-        uses: ./.github/actions/install-dependencies
-
-      - name: "Analyze Application code"
-        run: flutter analyze lib
-
-      - name: "Generate Mocks"
-        uses: ./.github/actions/build-mocks
-      - name: "Analyze Test code"
-        run: flutter analyze test integration_test
+    uses: ./.github/workflows/analyze-code.yml
+    with:
+      # TODO ci配下のすべての環境を揃えたい。envを使うための回避策を考える
+#      flutter-channel: "${{ env.flutter-channel }}"
+      flutter-channel: stable
 
   small_test:
     name: "Small test"
