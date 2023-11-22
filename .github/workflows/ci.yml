@@ -8,17 +8,9 @@ env:
 
 jobs:
   analyze-code:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
-        # TODO 必要か検討する
-        #   今のところ不要に見える
-#        flutter-channel: [ stable, beta, master]
+    name: "Analyze code"
 
-    name: "Analyze code on ${{ matrix.os }}"
-
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -28,6 +20,9 @@ jobs:
         with:
           channel: ${{ env.flutter-channel }}
           cache: true
+
+      - name: "Install Dependencies"
+        uses: ./.github/actions/install-dependencies
 
       - name: "Analyze Application code"
         run: flutter analyze lib
