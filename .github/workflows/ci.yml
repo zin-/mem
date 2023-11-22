@@ -32,10 +32,9 @@ jobs:
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-  medium_test-android:
+  medium_test:
     needs: set_up-env
-    name: "Medium test(Android)"
-    uses: ./.github/workflows/medium_test-android.yml
+    uses: ./.github/workflows/medium_test.yml
     with:
       flutter-channel: ${{ needs.set_up-env.outputs.flutter-channel }}
     secrets:

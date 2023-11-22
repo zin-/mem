@@ -1,0 +1,20 @@
+name: "Medium test"
+
+on:
+  workflow_call:
+    inputs:
+      flutter-channel:
+        required: true
+        type: string
+    secrets:
+      CODECOV_TOKEN:
+        required: true
+
+jobs:
+  medium_test-android:
+    needs: set_up-env
+    uses: ./.github/workflows/medium_test-android.yml
+    with:
+      flutter-channel: ${{ inputs.flutter-channel }}
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
