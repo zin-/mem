@@ -12,7 +12,6 @@ on:
 
 jobs:
   medium_test-android:
-    needs: set_up-env
     uses: ./.github/workflows/medium_test-android.yml
     with:
       flutter-channel: ${{ inputs.flutter-channel }}
