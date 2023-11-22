@@ -1,0 +1,54 @@
+name: "Medium test (Windows)"
+
+on:
+  workflow_call:
+    inputs:
+      flutter-channel:
+        required: true
+        type: string
+    secrets:
+      CODECOV_TOKEN:
+        required: true
+
+jobs:
+  medium_test-windows:
+    name: "Medium test (Windows)"
+
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Set up Flutter"
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ inputs.flutter-channel }}
+          cache: true
+
+      - name: "Generate Localization code"
+        uses: ./.github/actions/generate-localization_code
+
+      - name: "Run Windows Medium Test"
+        run: >
+          flutter test integration_test/app_test.dart
+          --dart-define=CICD=true
+          --coverage
+          --device-id windows
+          --file-reporter json:reports/test_report.log
+
+      - name: "Report"
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: "Report (Medium test (Windows))"
+          path: "reports/test_report.log"
+          reporter: "flutter-json"
+          fail-on-error: false
+          fail-on-empty: false
+      - name: "Upload coverage"
+        if: always()
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          flags: medium_test-windows
