@@ -8,6 +8,7 @@ env:
 
 jobs:
   set_up-env:
+    name: "Set up Environment variables"
     outputs:
       flutter-channel: ${{ steps.env-variables.outputs.flutter-channel }}
     runs-on: ubuntu-latest
@@ -20,12 +21,10 @@ jobs:
     needs: set_up-env
     uses: ./.github/workflows/analyze-code.yml
     with:
-      # TODO ci配下のすべての環境を揃えたい。envを使うための回避策を考える
-#      flutter-channel: "${{ env.flutter-channel }}"
-#      flutter-channel: stable
       flutter-channel: ${{ needs.set_up-env.outputs.flutter-channel }}
 
   small_test:
+    needs: set_up-env
     name: "Small test"
     runs-on: ubuntu-latest
     # TODO medium_test-androidと同様にReusable Workflowにしてもいいかもしれない
@@ -35,7 +34,7 @@ jobs:
       - name: "Set up Flutter"
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ env.flutter-channel }}
+          channel: ${{ needs.set_up-env.outputs.flutter-channel }}
           cache: true
 
       - name: "Generate Mocks"
@@ -65,16 +64,16 @@ jobs:
           flags: small_test
 
   medium_test-android:
+    needs: set_up-env
     name: "Medium test(Android)"
     uses: ./.github/workflows/medium_test-android.yml
     with:
-      # TODO ci配下のすべての環境を揃えたい。envを使うための回避策を考える
-#      flutter-channel: "${{ env.flutter-channel }}"
-      flutter-channel: stable
+      flutter-channel: ${{ needs.set_up-env.outputs.flutter-channel }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   medium_test-windows:
+    needs: set_up-env
     name: "Medium test(Windows)"
     runs-on: windows-latest
     steps:
@@ -83,7 +82,7 @@ jobs:
       - name: "Set up Flutter"
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ env.flutter-channel }}
+          channel: ${{ needs.set_up-env.outputs.flutter-channel }}
           cache: true
 
       - name: "Generate Localization code"
