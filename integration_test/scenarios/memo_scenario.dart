@@ -239,7 +239,7 @@ void testMemoScenario() => group(
                   memNameOnDetailPageFinder,
                   enteringMemNameText,
                 );
-                await widgetTester.pump();
+                await widgetTester.pumpAndSettle();
                 expect(find.text(enteringMemNameText), findsOneWidget);
 
                 await widgetTester.tap(saveMemFabFinder);
