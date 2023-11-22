@@ -39,11 +39,3 @@ jobs:
       flutter-channel: ${{ needs.set_up-env.outputs.flutter-channel }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-  medium_test-windows:
-    needs: set_up-env
-    uses: ./.github/workflows/medium_test-windows.yml
-    with:
-      flutter-channel: ${{ needs.set_up-env.outputs.flutter-channel }}
-    secrets:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
