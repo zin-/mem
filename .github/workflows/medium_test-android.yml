@@ -16,8 +16,8 @@ jobs:
     name: "Medium test (Android)"
 
     outputs:
-      malinskiy-status: ${{ steps.set-result-malinskiy.outputs.status }}
-      reactivecircus-status: ${{ steps.set-result-reactivecircus.outputs.status }}
+      malinskiy-status: ${{ steps.set-result.outputs.malinskiy-status }}
+      reactivecircus-status: ${{ steps.set-result.outputs.reactivecircus-status }}
 
     strategy:
       fail-fast: false
@@ -59,34 +59,47 @@ jobs:
       - name: "Build APK"
         run: flutter build apk --debug
 
-      - id: run-android-medium_test-via-malinskiy
-        name: "Run Android Medium Test via malinskiy"
-        if: matrix.android-emulator-runner == 'malinskiy'
-        uses: ./.github/actions/run-android-medium_test-via-malinskiy
+      - id: run-android-medium_test
+        name: "Run Android Medium test"
+        uses: ./.github/actions/run-android-medium_test
         with:
+          android-emulator-runner: ${{ matrix.android-emulator-runner }}
           android-api-level: 29
           android-target: default
           android-arch: x86_64
-        continue-on-error: true
-      - id: set-result-malinskiy
-        if: matrix.android-emulator-runner == 'malinskiy'
-        name: "Set Result"
-        run: echo "status=${{ steps.run-android-medium_test-via-malinskiy.outcome }}" >> $GITHUB_OUTPUT
 
-      - id: run-android-medium_test-via-reactivecircus
-        name: "Run Android Medium Test via reactivecircus"
-        if: matrix.android-emulator-runner == 'reactivecircus'
-        uses: ./.github/actions/run-android-medium_test-via-reactivecircus
-        with:
-          android-api-level: 29
-          android-target: default
-          android-arch: x86_64
-#          android-device-profile: Pixel 5
-        continue-on-error: true
-      - id: set-result-reactivecircus
-        if: matrix.android-emulator-runner == 'reactivecircus'
+      - id: set-result
         name: "Set Result"
-        run: echo "status=${{ steps.run-android-medium_test-via-reactivecircus.outcome }}" >> $GITHUB_OUTPUT
+        run: echo "${{ matrix.android-emulator-runner }}-status=${{ steps.run-android-medium_test.outputs.status }}" >> $GITHUB_OUTPUT
+
+#      - id: run-android-medium_test-via-malinskiy
+#        name: "Run Android Medium Test via malinskiy"
+#        if: matrix.android-emulator-runner == 'malinskiy'
+#        uses: ./.github/actions/run-android-medium_test-via-malinskiy
+#        with:
+#          android-api-level: 29
+#          android-target: default
+#          android-arch: x86_64
+#        continue-on-error: true
+#      - id: set-result-malinskiy
+#        if: matrix.android-emulator-runner == 'malinskiy'
+#        name: "Set Result"
+#        run: echo "status=${{ steps.run-android-medium_test-via-malinskiy.outcome }}" >> $GITHUB_OUTPUT
+#
+#      - id: run-android-medium_test-via-reactivecircus
+#        name: "Run Android Medium Test via reactivecircus"
+#        if: matrix.android-emulator-runner == 'reactivecircus'
+#        uses: ./.github/actions/run-android-medium_test-via-reactivecircus
+#        with:
+#          android-api-level: 29
+#          android-target: default
+#          android-arch: x86_64
+##          android-device-profile: Pixel 5
+#        continue-on-error: true
+#      - id: set-result-reactivecircus
+#        if: matrix.android-emulator-runner == 'reactivecircus'
+#        name: "Set Result"
+#        run: echo "status=${{ steps.run-android-medium_test-via-reactivecircus.outcome }}" >> $GITHUB_OUTPUT
 
       - name: "Report"
         uses: dorny/test-reporter@v1
