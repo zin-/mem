@@ -15,7 +15,8 @@ inputs:
     type: string
 
 outputs:
-  status: ${{ steps.set-result.outputs.status }}
+  status:
+    value: ${{ steps.set-result.outputs.status }}
 
 runs:
   using: composite
@@ -45,10 +46,13 @@ runs:
     - if: matrix.android-emulator-runner == 'malinskiy'
       name: "Set Result (malinskiy)"
       run: echo "STATUS=${{ steps.run-android-medium_test-via-malinskiy.outcome }}" >> $GITHUB_ENV
+      shell: bash
     - if: matrix.android-emulator-runner == 'reactivecircus'
       name: "Set Result (reactivecircus)"
       run: echo "STATUS=${{ steps.run-android-medium_test-via-reactivecircus.outcome }}" >> $GITHUB_Env
+      shell: bash
 
     - id: set-result
       name: "Set Result"
       run: echo "status=STATUS" >> $GITHUB_OUTPUT
+      shell: bash
