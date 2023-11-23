@@ -9,6 +9,7 @@ runs:
       name: "Cache"
       uses: actions/cache@v3
       with:
+        # TODO 整理する
         path: |
           **/build
           **/.dart_tool
@@ -18,6 +19,8 @@ runs:
           **/.flutter-plugins
           **${{ env.PUB_CACHE }}
           **/.packages
+          ${{ env.FLUTTER_HOME }}/.pub-cache
+          **/.dart_tool/package_config.json
         key: dependencies-${{ hashFiles('pubspec.lock') }}
     - name: "Get Packages"
       if: steps.cache.outputs.cache-hit != 'true'
