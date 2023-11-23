@@ -72,35 +72,6 @@ jobs:
         name: "Set Result"
         run: echo "${{ matrix.android-emulator-runner }}-status=${{ steps.run-android-medium_test.outputs.status }}" >> $GITHUB_OUTPUT
 
-#      - id: run-android-medium_test-via-malinskiy
-#        name: "Run Android Medium Test via malinskiy"
-#        if: matrix.android-emulator-runner == 'malinskiy'
-#        uses: ./.github/actions/run-android-medium_test-via-malinskiy
-#        with:
-#          android-api-level: 29
-#          android-target: default
-#          android-arch: x86_64
-#        continue-on-error: true
-#      - id: set-result-malinskiy
-#        if: matrix.android-emulator-runner == 'malinskiy'
-#        name: "Set Result"
-#        run: echo "status=${{ steps.run-android-medium_test-via-malinskiy.outcome }}" >> $GITHUB_OUTPUT
-#
-#      - id: run-android-medium_test-via-reactivecircus
-#        name: "Run Android Medium Test via reactivecircus"
-#        if: matrix.android-emulator-runner == 'reactivecircus'
-#        uses: ./.github/actions/run-android-medium_test-via-reactivecircus
-#        with:
-#          android-api-level: 29
-#          android-target: default
-#          android-arch: x86_64
-##          android-device-profile: Pixel 5
-#        continue-on-error: true
-#      - id: set-result-reactivecircus
-#        if: matrix.android-emulator-runner == 'reactivecircus'
-#        name: "Set Result"
-#        run: echo "status=${{ steps.run-android-medium_test-via-reactivecircus.outcome }}" >> $GITHUB_OUTPUT
-
       - name: "Report"
         uses: dorny/test-reporter@v1
         with:
@@ -123,9 +94,9 @@ jobs:
     name: "Check overall results"
     runs-on: ubuntu-latest
     steps:
-      - name: "All results are failure"
-        if: >
+      - if: >
           needs.medium_test-android.outputs.malinskiy-status == 'failure'
           && needs.medium_test-android.outputs.reactivecircus-status == 'failure'
+        name: "All results are failure"
         run: exit 1
       - run: exit 0
