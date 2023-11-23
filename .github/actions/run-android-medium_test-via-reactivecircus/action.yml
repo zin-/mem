@@ -1,12 +1,15 @@
 name: "Run Android Medium test via reactivecircus"
 inputs:
+  script:
+    required: true
+    type: string
   android-api-level:
     required: true
   android-target:
     required: true
   android-arch:
     required: true
-# TODO 有効はProfileを見つける
+# TODO 有効なProfileを見つける
 #   画面サイズなどのバラエティを増やす際に検討する
 #  android-device-profile:
 #    required: true
@@ -45,9 +48,4 @@ runs:
         force-avd-creation: false
         emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
         disable-animations: true
-        script: >
-          flutter test integration_test/app_test.dart
-          --coverage
-          --dart-define=CICD=true
-          --device-id "emulator-5554"
-          --file-reporter json:reports/test_report.log
+        script: ${{ inputs.script }}

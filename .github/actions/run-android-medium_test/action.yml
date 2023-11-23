@@ -4,6 +4,9 @@ inputs:
   android-emulator-runner:
     required: true
     type: string
+  script:
+    required: true
+    type: string
   android-api-level:
     required: true
     type: string
@@ -27,6 +30,7 @@ runs:
       name: "Run Android Medium Test via malinskiy"
       uses: ./.github/actions/run-android-medium_test-via-malinskiy
       with:
+        script: ${{ inputs.script }}
         android-api-level: ${{ inputs.android-api-level }}
         android-target: ${{ inputs.android-target }}
         android-arch: ${{ inputs.android-arch }}
@@ -37,6 +41,7 @@ runs:
       name: "Run Android Medium Test via reactivecircus"
       uses: ./.github/actions/run-android-medium_test-via-reactivecircus
       with:
+        script: ${{ inputs.script }}
         android-api-level: ${{ inputs.android-api-level }}
         android-target: ${{ inputs.android-target }}
         android-arch: ${{ inputs.android-arch }}
@@ -48,6 +53,7 @@ runs:
       name: "Run Android Medium Test via native"
       uses: ./.github/actions/run-android-medium_test-via-native
       with:
+        script: ${{ inputs.script }}
         android-api-level: ${{ inputs.android-api-level }}
         android-target: ${{ inputs.android-target }}
         android-arch: ${{ inputs.android-arch }}

@@ -1,6 +1,9 @@
 name: "Run Android Medium test via malinskiy"
 
 inputs:
+  script:
+    required: true
+    type: string
   android-api-level:
     required: true
   android-target:
@@ -34,12 +37,7 @@ runs:
     # TODO キャッシュしたい。起動だけで4~6mかかっている
     - uses: malinskiy/action-android/emulator-run-cmd@release/0.1.3
       with:
-        cmd: >
-          flutter test integration_test/app_test.dart
-          --coverage
-          --dart-define=CICD=true
-          --device-id "emulator-5554"
-          --file-reporter json:reports/test_report.log
+        cmd: ${{ inputs.script }}
         api: ${{ inputs.android-api-level }}
         tag: ${{ inputs.android-target }}
         abi: ${{ inputs.android-arch }}
