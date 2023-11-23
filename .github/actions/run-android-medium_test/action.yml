@@ -22,7 +22,7 @@ outputs:
     value: ${{ steps.set-result.outputs.status }}
 
 runs:
-  using: composite
+  using: "composite"
 
   steps:
     - if: inputs.android-emulator-runner == 'malinskiy'
