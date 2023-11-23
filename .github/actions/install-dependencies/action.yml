@@ -14,7 +14,7 @@ runs:
           **/flutter_export_environment.sh
           **/.flutter-plugin-dependencies
           **/.flutter-plugins
-          **/${{ env.PUB_CACHE }}
+          **${{ env.PUB_CACHE }}
           **/.packages
         key: dependencies-${{ hashFiles('pubspec.lock') }}
     - name: 'Get Packages'
