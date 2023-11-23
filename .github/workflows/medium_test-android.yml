@@ -95,8 +95,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - if: >
-          needs.medium_test-android.outputs.malinskiy-status == 'failure'
-          && needs.medium_test-android.outputs.reactivecircus-status == 'failure'
-        name: "All results are failure"
+          needs.medium_test-android.outputs.malinskiy-status != 'success' ||
+          needs.medium_test-android.outputs.reactivecircus-status != 'success'
+        name: "No success results"
         run: exit 1
       - run: exit 0
