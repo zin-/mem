@@ -1,4 +1,4 @@
-name: Set up AVD
+name: "Run Android Medium test via reactivecircus"
 inputs:
   android-api-level:
     required: true
