@@ -14,35 +14,5 @@ runs:
   using: "composite"
 
   steps:
-    - name: "AVD cache"
-      uses: actions/cache@v3
-      id: avd-cache
-      with:
-        path: |
-          ~/.android/avd/*
-          ~/.android/adb*
-        key: avd-${{ inputs.android-api-level }}-${{ inputs.android-target }}-${{ inputs.android-arch }}-reactivecircus
-
-    - name: "Create Android virtual device"
-      if: steps.avd-cache.outputs.cache-hit != 'true'
-      uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: ${{ inputs.android-api-level }}
-        target: ${{ inputs.android-target }}
-        arch: ${{ inputs.android-arch }}
-#        profile: ${{ inputs.android-device-profile }}
-        force-avd-creation: false
-        emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-        disable-animations: false
-        script: echo "Generated AVD snapshot for caching."
-
-    - uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: ${{ inputs.android-api-level }}
-        target: ${{ inputs.android-target }}
-        arch: ${{ inputs.android-arch }}
-#        profile: ${{ inputs.android-device-profile }}
-        force-avd-creation: false
-        emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-        disable-animations: true
-        script: ${{ inputs.script }}
+    - run: echo "dev"
+      shell: bash
