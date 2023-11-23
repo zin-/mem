@@ -8,12 +8,12 @@ runs:
       uses: actions/cache@v3
       with:
         path: |
-          **/.flutter-plugins
+          **/build
+          **/.dart_tool
+          **/Generated.xcconfig
+          **/flutter_export_environment.sh
           **/.flutter-plugin-dependencies
-          **/.dart_tool/package_config.json
-          **/.dart_tool/flutter_gen/pubspec.yaml
-          ${{ env.PUB_CACHE }}
-          **/.packages
+          **/.flutter-plugins
         key: dependencies-${{ hashFiles('pubspec.lock') }}
     - name: 'Get Packages'
       if: steps.cache.outputs.cache-hit != 'true'
