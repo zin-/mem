@@ -17,5 +17,5 @@ runs:
         key: dependencies-${{ hashFiles('pubspec.lock') }}
     - name: 'Get Packages'
       if: steps.cache.outputs.cache-hit != 'true'
-      run: flutter packages pub get
+      run: flutter pub get
       shell: bash
