@@ -43,6 +43,16 @@ runs:
   #          android-device-profile: Pixel 5
       continue-on-error: true
 
+    - if: inputs.android-emulator-runner == 'native'
+      id: run-android-medium_test-via-native
+      name: "Run Android Medium Test via native"
+      uses: ./.github/actions/run-android-medium_test-via-native
+      with:
+        android-api-level: ${{ inputs.android-api-level }}
+        android-target: ${{ inputs.android-target }}
+        android-arch: ${{ inputs.android-arch }}
+      continue-on-error: true
+
     - if: matrix.android-emulator-runner == 'malinskiy'
       name: "Set Result (malinskiy)"
       run: echo "STATUS=${{ steps.run-android-medium_test-via-malinskiy.outcome }}" >> $GITHUB_ENV
@@ -50,6 +60,10 @@ runs:
     - if: matrix.android-emulator-runner == 'reactivecircus'
       name: "Set Result (reactivecircus)"
       run: echo "STATUS=${{ steps.run-android-medium_test-via-reactivecircus.outcome }}" >> $GITHUB_ENV
+      shell: bash
+    - if: matrix.android-emulator-runner == 'native'
+      name: "Set Result (native)"
+      run: echo "STATUS=${{ steps.run-android-medium_test-via-native.outcome }}" >> $GITHUB_ENV
       shell: bash
 
     - id: set-result
