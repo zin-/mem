@@ -17,10 +17,8 @@ runs:
           **/flutter_export_environment.sh
           **/.flutter-plugin-dependencies
           **/.flutter-plugins
-          **${{ env.PUB_CACHE }}
+          ${{ env.PUB_CACHE }}
           **/.packages
-          ${{ env.FLUTTER_ROOT }}/.pub-cache
-          **/.dart_tool/package_config.json
         key: dependencies-${{ hashFiles('pubspec.lock') }}
     - name: "Get Packages"
       if: steps.cache.outputs.cache-hit != 'true'
