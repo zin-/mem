@@ -2,12 +2,17 @@ name: "Run Android Medium test"
 
 inputs:
   android-emulator-runner:
+    required: true
+    type: string
   android-api-level:
     required: true
+    type: string
   android-target:
     required: true
+    type: string
   android-arch:
     required: true
+    type: string
 
 outputs:
   status: ${{ steps.set-result.outputs.status }}
@@ -16,19 +21,19 @@ runs:
   using: composite
 
   steps:
-    - id: run-android-medium_test-via-malinskiy
+    - if: inputs.android-emulator-runner == 'malinskiy'
+      id: run-android-medium_test-via-malinskiy
       name: "Run Android Medium Test via malinskiy"
-      if: inputs.android-emulator-runner == 'malinskiy'
       uses: ./.github/actions/run-android-medium_test-via-malinskiy
       with:
-        android-api-level: 29
-        android-target: default
-        android-arch: x86_64
+        android-api-level: ${{ inputs.android-api-level }}
+        android-target: ${{ inputs.android-target }}
+        android-arch: ${{ inputs.android-arch }}
       continue-on-error: true
 
-    - id: run-android-medium_test-via-reactivecircus
+    - if: inputs.android-emulator-runner == 'reactivecircus'
+      id: run-android-medium_test-via-reactivecircus
       name: "Run Android Medium Test via reactivecircus"
-      if: inputs.android-emulator-runner == 'reactivecircus'
       uses: ./.github/actions/run-android-medium_test-via-reactivecircus
       with:
         android-api-level: 29
@@ -37,12 +42,10 @@ runs:
   #          android-device-profile: Pixel 5
       continue-on-error: true
 
-    - id: set-result-malinskiy
-      if: matrix.android-emulator-runner == 'malinskiy'
+    - if: matrix.android-emulator-runner == 'malinskiy'
       name: "Set Result (malinskiy)"
       run: echo "STATUS=${{ steps.run-android-medium_test-via-malinskiy.outcome }}" >> $GITHUB_ENV
-    - id: set-result-reactivecircus
-      if: matrix.android-emulator-runner == 'reactivecircus'
+    - if: matrix.android-emulator-runner == 'reactivecircus'
       name: "Set Result (reactivecircus)"
       run: echo "STATUS=${{ steps.run-android-medium_test-via-reactivecircus.outcome }}" >> $GITHUB_Env
 
