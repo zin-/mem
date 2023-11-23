@@ -19,7 +19,7 @@ runs:
           **/.flutter-plugins
           **${{ env.PUB_CACHE }}
           **/.packages
-          ${{ env.FLUTTER_HOME }}/.pub-cache
+          ${{ env.FLUTTER_ROOT }}/.pub-cache
           **/.dart_tool/package_config.json
         key: dependencies-${{ hashFiles('pubspec.lock') }}
     - name: "Get Packages"
