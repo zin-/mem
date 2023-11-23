@@ -91,7 +91,7 @@ jobs:
   check-overall-results:
     needs: medium_test-android
     if: always()
-    name: "Check overall results"
+    name: "Check overall Android Medium test results"
     runs-on: ubuntu-latest
     steps:
       - name: "Results"
