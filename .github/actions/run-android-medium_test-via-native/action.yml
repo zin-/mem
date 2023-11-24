@@ -14,8 +14,10 @@ runs:
   using: "composite"
 
   steps:
+    - run: sudo apt update
+      shell: bash
     - name: "Install Android SDK"
-      run: sudo apt update && sudo apt install android-sdk
+      run:  sudo apt install android-sdk
       shell: bash
     - run: echo "dev"
       shell: bash
