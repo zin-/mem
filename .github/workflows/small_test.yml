@@ -35,8 +35,8 @@ jobs:
       - name: "Run Flutter test"
         run: >
           flutter test
-          --coverage
           --file-reporter json:reports/test_report.log
+          --coverage
 
       - if: always()
         name: "Report"
