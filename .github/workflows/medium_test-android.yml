@@ -21,6 +21,7 @@ jobs:
     outputs:
       malinskiy-status: ${{ steps.set-result.outputs.malinskiy-status }}
       reactivecircus-status: ${{ steps.set-result.outputs.reactivecircus-status }}
+      native-status: ${{ steps.set-result.outputs.native-status }}
 
     strategy:
       fail-fast: false
@@ -105,10 +106,12 @@ jobs:
       - name: "Results"
         run: |
           echo "malinskiy-status: ${{ needs.medium_test-android.outputs.malinskiy-status }}"
-          echo "malinskiy-status: ${{ needs.medium_test-android.outputs.reactivecircus-status }}"
+          echo "reactivecircus-status: ${{ needs.medium_test-android.outputs.reactivecircus-status }}"
+          echo "native-status: ${{ needs.medium_test-android.outputs.native-status }}"
 
       - if: >
           needs.medium_test-android.outputs.malinskiy-status != 'success' &&
-          needs.medium_test-android.outputs.reactivecircus-status != 'success'
+          needs.medium_test-android.outputs.reactivecircus-status != 'success' &&
+          needs.medium_test-android.outputs.native-status != 'success'
         name: "No success results"
         run: exit 1
