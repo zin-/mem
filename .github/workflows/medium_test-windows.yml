@@ -35,7 +35,7 @@ jobs:
         uses: ./.github/actions/generate-localization_code
 
       - name: "Run Windows Medium Test"
-        run: ${{ inputs.script }} --device-id windows
+        run: "${{ inputs.script }} --device-id windows"
 
       - name: "Report"
         uses: dorny/test-reporter@v1
