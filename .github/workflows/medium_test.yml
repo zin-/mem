@@ -11,19 +11,16 @@ on:
       CODECOV_TOKEN:
         required: true
 
-env:
-  run-medium_test-script: >
-    flutter test integration_test/app_test.dart
-    --dart-define=CICD=true
-    --coverage
-    --file-reporter json:reports/test_report.log
-
 jobs:
   medium_test-android:
     uses: ./.github/workflows/medium_test-android.yml
     with:
       flutter-channel: ${{ inputs.flutter-channel }}
-      script: ${{ env.run-medium_test-script }}
+      script: >
+        flutter test integration_test/app_test.dart
+        --coverage
+        --dart-define=CICD=true
+        --file-reporter json:reports/test_report.log
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
@@ -31,6 +28,10 @@ jobs:
     uses: ./.github/workflows/medium_test-windows.yml
     with:
       flutter-channel: ${{ inputs.flutter-channel }}
-      script: ${{ env.run-medium_test-script }}
+      script: >
+        flutter test integration_test/app_test.dart
+        --coverage
+        --dart-define=CICD=true
+        --file-reporter json:reports/test_report.log
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
