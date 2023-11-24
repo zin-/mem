@@ -23,6 +23,7 @@ jobs:
     uses: ./.github/workflows/medium_test-android.yml
     with:
       flutter-channel: ${{ inputs.flutter-channel }}
+      script: ${{ env.run-medium_test-script }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
@@ -30,5 +31,6 @@ jobs:
     uses: ./.github/workflows/medium_test-windows.yml
     with:
       flutter-channel: ${{ inputs.flutter-channel }}
+      script: ${{ env.run-medium_test-script }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
