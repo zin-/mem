@@ -6,9 +6,6 @@ on:
       flutter-channel:
         required: true
         type: string
-      script:
-        required: true
-        type: string
 
     secrets:
       CODECOV_TOKEN:
@@ -35,7 +32,12 @@ jobs:
         uses: ./.github/actions/generate-localization_code
 
       - name: "Run Windows Medium Test"
-        run: "${{ inputs.script }} --device-id windows"
+        run: >
+          flutter test integration_test/app_test.dart
+          --dart-define=CICD=true
+          --file-reporter json:reports/test_report.log
+          --coverage
+          --device-id windows
 
       - name: "Report"
         uses: dorny/test-reporter@v1

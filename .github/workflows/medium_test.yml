@@ -16,11 +16,6 @@ jobs:
     uses: ./.github/workflows/medium_test-android.yml
     with:
       flutter-channel: ${{ inputs.flutter-channel }}
-      script: >
-        flutter test integration_test/app_test.dart
-        --coverage
-        --dart-define=CICD=true
-        --file-reporter json:reports/test_report.log
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
@@ -28,10 +23,5 @@ jobs:
     uses: ./.github/workflows/medium_test-windows.yml
     with:
       flutter-channel: ${{ inputs.flutter-channel }}
-      script: >
-        flutter test integration_test/app_test.dart
-        --coverage
-        --dart-define=CICD=true
-        --file-reporter json:reports/test_report.log
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
