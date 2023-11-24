@@ -26,6 +26,8 @@ jobs:
           channel: ${{ inputs.flutter-channel }}
           cache: true
 
+      - name: "Install Dependencies"
+        uses: ./.github/actions/install-dependencies
       - name: "Generate Localization code"
         uses: ./.github/actions/generate-localization_code
 
