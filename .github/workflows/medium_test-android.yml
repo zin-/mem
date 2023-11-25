@@ -27,7 +27,7 @@ jobs:
         #   パフォーマンスチェックのため
         #   Github actionsの実行時間制限とかが出始めたらやめる
 #        android-emulator-runner: [ malinskiy, reactivecircus, native ]
-# TODO drop
+        # FIXME tmp
         android-emulator-runner: [ native ]
         include:
           - os: macos-latest
@@ -44,25 +44,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: "Set up Flutter"
-        uses: subosito/flutter-action@v2
-        with:
-          channel: ${{ inputs.flutter-channel }}
-          cache: true
-
-      - name: "Install Dependencies"
-        uses: ./.github/actions/install-dependencies
-      - name: "Generate Localization code"
-        uses: ./.github/actions/generate-localization_code
-
-      - name: "Set up Java and Gradle"
-        uses: ./.github/actions/set_up-java-and-gradle
-        with:
-          java-distribution: zulu
-          java-version: 11
-
-      - name: "Build APK"
-        run: flutter build apk --debug
+# FIXME tmp
+#      - name: "Set up Flutter"
+#        uses: subosito/flutter-action@v2
+#        with:
+#          channel: ${{ inputs.flutter-channel }}
+#          cache: true
+#
+#      - name: "Install Dependencies"
+#        uses: ./.github/actions/install-dependencies
+#      - name: "Generate Localization code"
+#        uses: ./.github/actions/generate-localization_code
+#
+#      - name: "Set up Java and Gradle"
+#        uses: ./.github/actions/set_up-java-and-gradle
+#        with:
+#          java-distribution: zulu
+#          java-version: 11
+#
+#      - name: "Build APK"
+#        run: flutter build apk --debug
 
       - id: run-android-medium_test
         name: "Run Android Medium test"

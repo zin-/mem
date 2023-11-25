@@ -20,7 +20,7 @@ jobs:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   medium_test-windows:
-    # TODO drop
+    # FIXME tmp
     if: false
     uses: ./.github/workflows/medium_test-windows.yml
     with:
