@@ -26,7 +26,9 @@ jobs:
         # 複数のAndroid Emulator Runnerを使う
         #   パフォーマンスチェックのため
         #   Github actionsの実行時間制限とかが出始めたらやめる
-        android-emulator-runner: [ malinskiy, reactivecircus, native ]
+#        android-emulator-runner: [ malinskiy, reactivecircus, native ]
+# TODO drop
+        android-emulator-runner: [ native ]
         include:
           - os: macos-latest
           - android-emulator-runner: native

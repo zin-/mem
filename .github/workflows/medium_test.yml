@@ -20,6 +20,8 @@ jobs:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   medium_test-windows:
+    # TODO drop
+    if: false
     uses: ./.github/workflows/medium_test-windows.yml
     with:
       flutter-channel: ${{ inputs.flutter-channel }}

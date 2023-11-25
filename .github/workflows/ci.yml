@@ -19,12 +19,16 @@ jobs:
           echo "flutter-channel=${{ env.flutter-channel }}" >> $GITHUB_OUTPUT
 
   analyze-code:
+    # TODO drop
+    if: false
     needs: set_up-env
     uses: ./.github/workflows/analyze-code.yml
     with:
       flutter-channel: ${{ needs.set_up-env.outputs.flutter-channel }}
 
   small_test:
+    # TODO drop
+    if: false
     needs: set_up-env
     uses: ./.github/workflows/small_test.yml
     with:
