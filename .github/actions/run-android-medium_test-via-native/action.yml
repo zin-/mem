@@ -27,5 +27,7 @@ runs:
       shell: bash
     - run: ls -a /
       shell: bash
+    - run: ls -a /opt
+      shell: bash
     - run: echo "dev"
       shell: bash
