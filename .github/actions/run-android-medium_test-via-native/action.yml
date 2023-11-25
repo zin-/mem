@@ -19,9 +19,9 @@ runs:
     - name: "Install Android SDK"
       run:  sudo apt install android-sdk
       shell: bash
-    - run: ls -a
+    - run: ls -a ~
       shell: bash
-    - run: ls -a lib
+    - run: ls -a ~/lib
       shell: bash
     - run: echo "dev"
       shell: bash
