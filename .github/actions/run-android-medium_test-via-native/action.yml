@@ -37,5 +37,8 @@ runs:
     - run: ls -a /hoome
       shell: bash
 
+    - run: android-sdk -h
+      shell: bash
+
     - run: echo "dev"
       shell: bash
