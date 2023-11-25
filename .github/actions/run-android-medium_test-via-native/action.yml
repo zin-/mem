@@ -20,6 +20,9 @@ runs:
       run:  sudo apt install android-sdk
       shell: bash
 
+    - run: pwd
+      shell: bash
+
     - run: ls -a ~
       shell: bash
 
