@@ -19,21 +19,23 @@ runs:
     - name: "Install Android SDK"
       run:  sudo apt install android-sdk
       shell: bash
-    - run: ls -a ~
-      shell: bash
-    - run: ls -a ~/runners
-      shell: bash
-    - run: ls -a ~/work
-      shell: bash
+
     - run: ls -a /
       shell: bash
+
     - run: ls -a /opt
       shell: bash
     - run: ls -a /opt/runner
       shell: bash
+
     - run: ls -a /usr
       shell: bash
+
     - run: ls -a /tmp
       shell: bash
+
+    - run: ls -a /hoome
+      shell: bash
+
     - run: echo "dev"
       shell: bash
