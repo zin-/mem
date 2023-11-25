@@ -39,6 +39,8 @@ runs:
 
     - run: ls -a /home
       shell: bash
+    - run: ls -a /home/runner
+      shell: bash
 
     - run: android-sdk -h
       shell: bash
