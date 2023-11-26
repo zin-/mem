@@ -35,14 +35,19 @@ runs:
     - run: ls -a
       shell: bash
 
-    - run: wget https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip
+    - run: >
+        wget
+        -P ~/android-sdk/cmdline-tools/latest
+        https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip
       shell: bash
 
-    - run: unzip commandlinetools-linux-10406996_latest.zip
+    - run: unzip ~/android-sdk/cmdline-tools/latest/commandlinetools-linux-10406996_latest.zip
       shell: bash
     - run: pwd
       shell: bash
     - run: ls -a
+      shell: bash
+    - run: ls -a ~/android-sdk/cmdline-tools/latest
       shell: bash
 
     - run: |
