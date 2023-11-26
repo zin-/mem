@@ -21,18 +21,15 @@ runs:
     - name: "Install Android SDK"
       run:  sudo apt install android-sdk
       shell: bash
+    - run: ls -a /usr/lib/android-sdk
+      shell: bash
+
     - run: sudo cp -rf /usr/lib/android-sdk ~/android-sdk
       shell: bash
     - run: sudo chown -R $(id -u):$(id -g) ~/android-sdk
       shell: bash
 
     - run: mkdir -p ~/android-sdk/cmdline-tools/latest
-      shell: bash
-    - run: cd ~/android-sdk/cmdline-tools/latest
-      shell: bash
-    - run: pwd
-      shell: bash
-    - run: ls -a
       shell: bash
 
     - run: >
@@ -46,11 +43,12 @@ runs:
         -d ~/android-sdk/cmdline-tools/latest
         ~/android-sdk/cmdline-tools/latest/commandlinetools-linux-10406996_latest.zip
       shell: bash
-    - run: pwd
-      shell: bash
-    - run: ls -a
-      shell: bash
     - run: ls -a ~/android-sdk/cmdline-tools/latest
+      shell: bash
+    - run: ls -a ~/android-sdk/cmdline-tools/latest/cmdline-tools
+      shell: bash
+
+    - run: ls -a
       shell: bash
 
     - run: |
