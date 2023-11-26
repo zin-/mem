@@ -24,9 +24,11 @@ runs:
 
     - run: sudo cp -rf /usr/lib/android-sdk ~/android-sdk
       shell: bash
+    - run: ls -a
+      shell: bash
     - run: sudo chown -R $(id -u):$(id -g) ~/android-sdk
       shell: bash
-    - run: mv ~/android-sdk
+    - run: cd ~/android-sdk
       shell: bash
     - run: ls -a
       shell: bash
@@ -37,7 +39,7 @@ runs:
       shell: bash
     - run: ls -a /cmdline-tools
       shell: bash
-    - run: mv ~/android-sdk/cmdline-tools/latest
+    - run: cd ~/android-sdk/cmdline-tools/latest
       shell: bash
 
     - run: wget https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip
