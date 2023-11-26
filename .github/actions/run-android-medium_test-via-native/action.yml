@@ -29,6 +29,12 @@ runs:
     - run: sudo chown -R $(id -u):$(id -g) ~/android-sdk
       shell: bash
 
+    - run: |
+        echo "export ANDROID_HOME=~/android-sdk"
+        echo "export PATH=$PATH:$ANDROID_HOME/platform-tools/bin"
+        echo "export PATH=$PATH:$ANDROID_HOME/tools/bin"
+      shell: bash
+
     - run: mkdir ~/tmp
       shell: bash
 
@@ -40,25 +46,15 @@ runs:
 
     - run: >
         unzip
-        ~/android-sdk/cmdline-tools/latest/commandlinetools-linux-10406996_latest.zip
+        ~/tmp/commandlinetools-linux-10406996_latest.zip
         -d ~/tmp
-      shell: bash
-    - run: ls -a ~/tmp
       shell: bash
 
     - run: mkdir ~/android-sdk/cmdline-tools/latest -p
       shell: bash
     - run: cp ~/tmp/cmdline-tools/* ~/android-sdk/cmdline-tools/latest
       shell: bash
-
-    - run: ls -a
-      shell: bash
-
-    - run: |
-        echo "export ANDROID_HOME=~/android-sdk"
-        echo "export PATH=$PATH:$ANDROID_HOME/platform-tools/bin"
-        echo "export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin"
-        echo "export PATH=$PATH:$ANDROID_HOME/tools/bin"
+    - run: echo "export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin"
       shell: bash
 
     - run: sdkmanager -h
