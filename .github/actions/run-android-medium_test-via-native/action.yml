@@ -41,7 +41,10 @@ runs:
         https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip
       shell: bash
 
-    - run: unzip ~/android-sdk/cmdline-tools/latest/commandlinetools-linux-10406996_latest.zip
+    - run: >
+        unzip
+        -d ~/android-sdk/cmdline-tools/latest
+        ~/android-sdk/cmdline-tools/latest/commandlinetools-linux-10406996_latest.zip
       shell: bash
     - run: pwd
       shell: bash
