@@ -36,6 +36,8 @@ runs:
 
     - run: unzip commandlinetools-linux-10406996_latest.zip
       shell: bash
+    - run: ls -a
+      shell: bash
 
     - run: |
         echo "export ANDROID_HOME=~/android-sdk"
