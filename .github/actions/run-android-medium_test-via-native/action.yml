@@ -45,7 +45,9 @@ runs:
     - run: ls -a /home/runner
       shell: bash
 
-    - run: android-sdk -h
+    - run: sdkmanager -h
+      shell: bash
+    - run: where sdkmanager
       shell: bash
 
     - run: echo "dev"
