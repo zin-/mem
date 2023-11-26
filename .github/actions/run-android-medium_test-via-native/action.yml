@@ -36,6 +36,8 @@ runs:
 
     - run: ls -a /usr
       shell: bash
+    - run: ls -a /usr/lib
+      shell: bash
 
     - run: ls -a /tmp
       shell: bash
