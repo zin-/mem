@@ -31,9 +31,9 @@ runs:
 
     - run: echo "ANDROID_HOME=~/android-sdk" >> $GITHUB_ENV
       shell: bash
-    - run: echo "$ANDROID_HOME/platform-tools/bin" >> $GITHUB_PATH
+    - run: echo "${{ env.ANDROID_HOME }}/platform-tools/bin" >> $GITHUB_PATH
       shell: bash
-    - run: echo "$ANDROID_HOME/tools/bin" >> $GITHUB_PATH
+    - run: echo "${{ env.ANDROID_HOME }}/tools/bin" >> $GITHUB_PATH
       shell: bash
 
     - run: mkdir ~/tmp
@@ -55,7 +55,11 @@ runs:
       shell: bash
     - run: cp -r ~/tmp/cmdline-tools/* ~/android-sdk/cmdline-tools/latest
       shell: bash
-    - run: echo "export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin"
+    - run: ls ~/android-sdk/cmdline-tools/latest -a
+      shell: bash
+    - run: ls ~/android-sdk/cmdline-tools/latest/bin -a
+      shell: bash
+    - run: echo "${{ env.ANDROID_HOME }}/cmdline-tools/latest/bin" >> $GITHUB_PATH
       shell: bash
 
     - run: sdkmanager -h
