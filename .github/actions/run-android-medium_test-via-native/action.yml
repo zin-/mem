@@ -16,35 +16,11 @@ runs:
   steps:
     - run: sudo apt update
       shell: bash
+
     - name: "Install Android SDK"
       run:  sudo apt install android-sdk
       shell: bash
-
-    - run: pwd
-      shell: bash
-
-    - run: ls -a ~
-      shell: bash
-
-    - run: ls -a /
-      shell: bash
-
-    - run: ls -a /opt
-      shell: bash
-    - run: ls -a /opt/runner
-      shell: bash
-
-    - run: ls -a /usr
-      shell: bash
-    - run: ls -a /usr/lib
-      shell: bash
-
-    - run: ls -a /tmp
-      shell: bash
-
-    - run: ls -a /home
-      shell: bash
-    - run: ls -a /home/runner
+    - run: ls -a /usr/lib/android-sdk
       shell: bash
 
     - run: sdkmanager -h
