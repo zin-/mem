@@ -52,7 +52,7 @@ runs:
 
     - run: mkdir ~/android-sdk/cmdline-tools/latest -p
       shell: bash
-    - run: cp ~/tmp/cmdline-tools/* ~/android-sdk/cmdline-tools/latest
+    - run: cp -r ~/tmp/cmdline-tools/* ~/android-sdk/cmdline-tools/latest
       shell: bash
     - run: echo "export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin"
       shell: bash
