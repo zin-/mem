@@ -29,10 +29,11 @@ runs:
     - run: sudo chown -R $(id -u):$(id -g) ~/android-sdk
       shell: bash
 
-    - run: |
-        echo "export ANDROID_HOME=~/android-sdk"
-        echo "export PATH=$PATH:$ANDROID_HOME/platform-tools/bin"
-        echo "export PATH=$PATH:$ANDROID_HOME/tools/bin"
+    - run: echo "ANDROID_HOME=~/android-sdk" >> $GITHUB_ENV
+      shell: bash
+    - run: echo "$ANDROID_HOME/platform-tools/bin" >> $GITHUB_PATH
+      shell: bash
+    - run: echo "$ANDROID_HOME/tools/bin" >> $GITHUB_PATH
       shell: bash
 
     - run: mkdir ~/tmp
