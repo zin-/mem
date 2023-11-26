@@ -29,23 +29,26 @@ runs:
     - run: sudo chown -R $(id -u):$(id -g) ~/android-sdk
       shell: bash
 
-    - run: mkdir -p ~/android-sdk/cmdline-tools/latest
+    - run: mkdir ~/tmp
       shell: bash
 
     - run: >
         wget
-        -P ~/android-sdk/cmdline-tools/latest
         https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip
+        -P ~/tmp
       shell: bash
 
     - run: >
         unzip
-        -d ~/android-sdk/cmdline-tools/latest
         ~/android-sdk/cmdline-tools/latest/commandlinetools-linux-10406996_latest.zip
+        -d ~/tmp
       shell: bash
-    - run: ls -a ~/android-sdk/cmdline-tools/latest
+    - run: ls -a ~/tmp
       shell: bash
-    - run: ls -a ~/android-sdk/cmdline-tools/latest/cmdline-tools
+
+    - run: mkdir ~/android-sdk/cmdline-tools/latest -p
+      shell: bash
+    - run: cp ~/tmp/cmdline-tools/* ~/android-sdk/cmdline-tools/latest
       shell: bash
 
     - run: ls -a
