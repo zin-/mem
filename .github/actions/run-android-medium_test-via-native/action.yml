@@ -18,21 +18,30 @@ runs:
       shell: bash
 
 # TODO cache
+    - run: mkdir
     - name: "Install Android SDK"
       run:  sudo apt install android-sdk
       shell: bash
-    - run: ls -a /usr/lib/android-sdk
+
+    - run: sudo cp -rf /usr/lib/android-sdk ~/
       shell: bash
-    - run: ls -a /usr/lib/android-sdk/platform-tools
+    - run: sudo chown -R $(id -u):$(id -g) ~/android-sdk
       shell: bash
-    - run: ls -a /usr/lib/android-sdk/tools
+
+    - run: wget https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip
       shell: bash
-    - run: ls -a /usr/lib/android-sdk/tools/bin
+
+    - run: unzip commandlinetools-linux-10406996_latest.zip
       shell: bash
+    - run: mkdir -p ~/android-sdk/cmdline-tools/latest
+      shell: bash
+    - run: mv ~/cmdline-tools/* ~/android-sdk/cmdline-tools/latest/
+      shell: bash
+
     - run: |
-        echo "export ANDROID_HOME=/usr/lib/android-sdk"
-        echo "export PATH=$PATH:$ANDROID_HOME/platform-tools"
-        echo "export PATH=$PATH:$ANDROID_HOME/tools"
+        echo "export ANDROID_HOME=~/android-sdk"
+        echo "export PATH=$PATH:$ANDROID_HOME/platform-tools/bin"
+        echo "export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin"
         echo "export PATH=$PATH:$ANDROID_HOME/tools/bin"
       shell: bash
 
