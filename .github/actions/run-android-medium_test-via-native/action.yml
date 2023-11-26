@@ -36,7 +36,7 @@ runs:
       shell: bash
     - run: ls -a
       shell: bash
-    - run: mv ~/cmdline-tools/* ~/android-sdk/cmdline-tools/latest/
+    - run: mv ~/commandlinetools-linux-10406996_latest/* ~/android-sdk/cmdline-tools/latest/
       shell: bash
 
     - run: |
