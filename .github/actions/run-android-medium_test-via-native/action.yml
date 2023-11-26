@@ -26,7 +26,7 @@ runs:
     - run: sudo chown -R $(id -u):$(id -g) ~/android-sdk
       shell: bash
 
-    - run: mkdir ~/android-sdk/cmdline-tools/latest
+    - run: mkdir -p ~/android-sdk/cmdline-tools/latest
       shell: bash
     - run: cd ~/android-sdk/cmdline-tools/latest
       shell: bash
