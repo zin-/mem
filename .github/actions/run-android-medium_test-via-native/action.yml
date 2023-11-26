@@ -17,10 +17,23 @@ runs:
     - run: sudo apt update
       shell: bash
 
+# TODO cache
     - name: "Install Android SDK"
       run:  sudo apt install android-sdk
       shell: bash
     - run: ls -a /usr/lib/android-sdk
+      shell: bash
+    - run: ls -a /usr/lib/android-sdk/platform-tools
+      shell: bash
+    - run: ls -a /usr/lib/android-sdk/tools
+      shell: bash
+    - run: ls -a /usr/lib/android-sdk/tools/bin
+      shell: bash
+    - run: |
+        echo "ANDROID_SDK_HOME="/usr/lib/android-sdk"
+        echo "PATH=$PATH:$ANDROID_SDK_HOME/platform-tools"
+        echo "PATH=$PATH:$ANDROID_SDK_HOME/tools"
+        echo "PATH=$PATH:$ANDROID_SDK_HOME/tools/bin"
       shell: bash
 
     - run: sdkmanager -h
