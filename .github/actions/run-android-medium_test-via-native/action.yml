@@ -26,8 +26,8 @@ runs:
 
     - run: sudo cp -rf /usr/lib/android-sdk ~/android-sdk
       shell: bash
-#    - run: sudo chown -R $(id -u):$(id -g) ~/android-sdk
-#      shell: bash
+    - run: sudo chown -R $(id -u):$(id -g) ~/android-sdk
+      shell: bash
 
     - run: echo "ANDROID_HOME=~/android-sdk" >> $GITHUB_ENV
       shell: bash
