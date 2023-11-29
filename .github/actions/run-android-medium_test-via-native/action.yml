@@ -71,7 +71,9 @@ runs:
     - name: "Create Android Virtual Device"
       shell: bash
       run: >
-        avdmanager create avd
+        # 対話形式のようなのでnoで進める
+        # Do you wish to create a custom hardware profile? [no]
+        no | avdmanager create avd
         --name emulator-5554
         --package "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-target }};${{ inputs.android-arch}}"
 
