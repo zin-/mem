@@ -33,39 +33,29 @@ runs:
     - shell: bash
       run: echo "${{ env.ANDROID_HOME }}/tools/bin" >> $GITHUB_PATH
 
-    - run: mkdir ~/tmp
+    - name: "Install Android SDK Command line tools"
       shell: bash
-
-    - run: >
+      run: mkdir ~/tmp
+    - shell: bash
+      run: >
         wget
         https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip
         -P ~/tmp
-      shell: bash
-
-    - run: >
+    - shell: bash
+      run: >
         unzip
         ~/tmp/commandlinetools-linux-10406996_latest.zip
         -d ~/tmp
-      shell: bash
-
-    - run: mkdir ~/android-sdk/cmdline-tools/latest -p
-      shell: bash
-    - run: cp -r ~/tmp/cmdline-tools/* ~/android-sdk/cmdline-tools/latest
-      shell: bash
-    - run: ls ~/android-sdk/cmdline-tools/latest -a
-      shell: bash
-    - run: ls ~/android-sdk/cmdline-tools/latest/bin -a
-      shell: bash
-    - run: echo "${{ env.ANDROID_HOME }}/cmdline-tools/latest/bin" >> $GITHUB_PATH
-      shell: bash
-
-    - run: ls /home/runner/android-sdk/build-tools -a
-      shell: bash
+    - shell: bash
+      run: mkdir ~/android-sdk/cmdline-tools/latest -p
+    - shell: bash
+      run: cp -r ~/tmp/cmdline-tools/* ~/android-sdk/cmdline-tools/latest
+    - shell: bash
+      run: echo "${{ env.ANDROID_HOME }}/cmdline-tools/latest/bin" >> $GITHUB_PATH
 
     - name: "Accept Android SDK licenses"
       shell: bash
       run: yes | sdkmanager --licenses
-
 
     - run: sdkmanager --list
       shell: bash
