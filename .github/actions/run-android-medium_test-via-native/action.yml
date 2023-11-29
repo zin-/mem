@@ -70,7 +70,7 @@ runs:
 
     - name: "Create Android Virtual Device"
       shell: bash
-      run: avdmanager create avd --name emulator-5554
+      run: avdmanager create avd --name emulator-5554 -package "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-target }};${{ inputs.android-arch}}"
 
     - run: avdmanager --help
       shell: bash
