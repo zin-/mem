@@ -66,7 +66,7 @@ runs:
       run: sdkmanager --install "cmdline-tools;latest"
 
     - shell: bash
-      run: sdkmanager --install "system-images;android-34;google_apis;x86_64"
+      run: sdkmanager --install "system-images;android-34;default;x86_64"
 
     - run: sdkmanager --list
       shell: bash
