@@ -58,7 +58,7 @@ runs:
 
     - name: "Accept Android SDK licenses"
       shell: bash
-      run: y | sdkmanager --licenses
+      run: yes | sdkmanager --licenses || true
 
     - run: sdkmanager --list
       shell: bash
