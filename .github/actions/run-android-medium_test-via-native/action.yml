@@ -62,8 +62,10 @@ runs:
     - run: ls /home/runner/android-sdk/build-tools -a
       shell: bash
 
-    - run: sdkmanager --licenses y
+    - name: "Accept Android SDK licenses"
       shell: bash
+      run: yes | sdkmanager --licenses y
+
 
     - run: sdkmanager --list
       shell: bash
