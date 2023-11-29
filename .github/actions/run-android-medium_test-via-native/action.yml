@@ -62,9 +62,9 @@ runs:
     - run: echo "${{ env.ANDROID_HOME }}/cmdline-tools/latest/bin" >> $GITHUB_PATH
       shell: bash
 
-    - run: sdkmanager --help
+    - run: sdkmanager --list
       shell: bash
-    - run: sdkmanager list
+    - run: sdkmanager --help
       shell: bash
 
     - run: echo "dev"
