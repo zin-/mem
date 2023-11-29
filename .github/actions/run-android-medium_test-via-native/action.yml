@@ -68,7 +68,11 @@ runs:
       shell: bash
       run: sdkmanager --install "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-target }};${{ inputs.android-arch}}"
 
-    - run: sdkmanager --help
+    - name: "Create Android Virtual Device"
+      shell: bash
+      run: avdmanager create avd
+
+    - run: avdmanager --help
       shell: bash
 
     - run: echo "dev"
