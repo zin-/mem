@@ -21,14 +21,12 @@ runs:
     - name: "Install Android SDK"
       run:  sudo apt install android-sdk
       shell: bash
-    - run: ls -a /usr/lib/android-sdk
-      shell: bash
 
+    # `/usr/lib`以下に配置されたままだと、`android-sdk`の利用に`sudo`が必要なので、移動する
     - run: sudo cp -rf /usr/lib/android-sdk ~/android-sdk
       shell: bash
     - run: sudo chown -R $(id -u):$(id -g) ~/android-sdk
       shell: bash
-
     - run: echo "ANDROID_HOME=~/android-sdk" >> $GITHUB_ENV
       shell: bash
     - run: echo "${{ env.ANDROID_HOME }}/platform-tools/bin" >> $GITHUB_PATH
