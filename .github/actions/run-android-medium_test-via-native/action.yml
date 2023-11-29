@@ -52,7 +52,8 @@ runs:
       run: cp -r ~/tmp/cmdline-tools/* ~/android-sdk/cmdline-tools/latest
     - shell: bash
       run: echo "${{ env.ANDROID_HOME }}/cmdline-tools/latest/bin" >> $GITHUB_PATH
-
+    # `apt install android-sdk`に`debian`と`29.0.3`が含まれており警告が出力されるため
+    # 不要そうな`debian`を削除する
     - shell: bash
       run: rm -rf /home/runner/android-sdk/build-tools/debian
 
