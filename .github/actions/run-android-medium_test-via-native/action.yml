@@ -61,11 +61,12 @@ runs:
       shell: bash
       run: yes | sdkmanager --licenses || true
 
-    - shell: bash
-      run: sdkmanager --install "system-images;android-34;default;x86_64"
-
     - run: sdkmanager --list
       shell: bash
+
+    - name: "Install system images"
+      shell: bash
+      run: sdkmanager --install "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-target }};${{ inputs.android-arch}}"
 
     - run: sdkmanager --help
       shell: bash
