@@ -64,6 +64,10 @@ runs:
 
     - run: sdkmanager --list
       shell: bash
+
+    - run: sdkmanager --install "cmdline-tools;latest"
+      shell: bash
+
     - run: sdkmanager --help
       shell: bash
 
