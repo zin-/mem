@@ -61,10 +61,11 @@ runs:
       shell: bash
       run: yes | sdkmanager --licenses || true
 
-    - run: sdkmanager --list
+    - name: "Update Command line tools"
       shell: bash
+      run: sdkmanager --install "cmdline-tools;latest"
 
-    - run: sdkmanager --install "cmdline-tools;latest"
+    - run: sdkmanager --list
       shell: bash
 
     - run: sdkmanager --help
