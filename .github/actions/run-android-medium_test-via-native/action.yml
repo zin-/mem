@@ -53,6 +53,9 @@ runs:
     - shell: bash
       run: echo "${{ env.ANDROID_HOME }}/cmdline-tools/latest/bin" >> $GITHUB_PATH
 
+    - shell: bash
+      run: rm -rf /home/runner/android-sdk/build-tools/debian
+
     - name: "Accept Android SDK licenses"
       shell: bash
       run: y | sdkmanager --licenses
