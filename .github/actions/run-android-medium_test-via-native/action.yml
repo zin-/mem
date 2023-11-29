@@ -61,10 +61,6 @@ runs:
       shell: bash
       run: yes | sdkmanager --licenses || true
 
-    - name: "Update Command line tools"
-      shell: bash
-      run: sdkmanager --install "cmdline-tools;latest"
-
     - shell: bash
       run: sdkmanager --install "system-images;android-34;default;x86_64"
 
