@@ -78,6 +78,9 @@ runs:
         --package "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-target }};${{ inputs.android-arch}}"
         --force
 
+    - run: avdmanager list
+      shell: bash
+
     - run: avdmanager --help
       shell: bash
 
