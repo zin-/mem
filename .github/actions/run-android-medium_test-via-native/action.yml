@@ -19,20 +19,20 @@ runs:
 
 # TODO cache
     - name: "Install Android SDK"
-      run:  sudo apt install android-sdk
       shell: bash
+      run:  sudo apt install android-sdk
 
     # `/usr/lib`以下に配置されたままだと、`android-sdk`の利用に`sudo`が必要なので、移動する
-    - run: sudo cp -rf /usr/lib/android-sdk ~/android-sdk
-      shell: bash
-    - run: sudo chown -R $(id -u):$(id -g) ~/android-sdk
-      shell: bash
-    - run: echo "ANDROID_HOME=~/android-sdk" >> $GITHUB_ENV
-      shell: bash
-    - run: echo "${{ env.ANDROID_HOME }}/platform-tools/bin" >> $GITHUB_PATH
-      shell: bash
-    - run: echo "${{ env.ANDROID_HOME }}/tools/bin" >> $GITHUB_PATH
-      shell: bash
+    - shell: bash
+      run: sudo cp -rf /usr/lib/android-sdk ~/android-sdk
+    - shell: bash
+      run: sudo chown -R $(id -u):$(id -g) ~/android-sdk
+    - shell: bash
+      run: echo "ANDROID_HOME=~/android-sdk" >> $GITHUB_ENV
+    - shell: bash
+      run: echo "${{ env.ANDROID_HOME }}/platform-tools/bin" >> $GITHUB_PATH
+    - shell: bash
+      run: echo "${{ env.ANDROID_HOME }}/tools/bin" >> $GITHUB_PATH
 
     - run: mkdir ~/tmp
       shell: bash
@@ -63,7 +63,7 @@ runs:
     - run: ls /home/runner/android-sdk/build-tools -a
       shell: bash
 
-    - run: sdkmanager --licenses
+    - run: sdkmanager --licenses y
       shell: bash
 
     - run: sdkmanager --list
