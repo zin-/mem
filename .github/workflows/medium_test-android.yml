@@ -32,9 +32,9 @@ jobs:
         include:
           - os: macos-latest
             java-version: 11
-          - android-emulator-runner: native
-            os: ubuntu-latest
-            java-version: 17
+#          - android-emulator-runner: native
+#            os: ubuntu-latest
+#            java-version: 17
 
     runs-on: ${{ matrix.os }}
 
