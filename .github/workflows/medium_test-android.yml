@@ -26,9 +26,9 @@ jobs:
         # 複数のAndroid Emulator Runnerを使う
         #   パフォーマンスチェックのため
         #   Github actionsの実行時間制限とかが出始めたらやめる
+#        TODO 途中だが次のタスクに進みたいので中断する
 #        android-emulator-runner: [ malinskiy, reactivecircus, native ]
-        # FIXME tmp
-        android-emulator-runner: [ native ]
+        android-emulator-runner: [ malinskiy, reactivecircus ]
         include:
           - os: macos-latest
             java-version: 11
@@ -46,25 +46,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-# FIXME tmp
       - name: "Set up Java and Gradle"
         uses: ./.github/actions/set_up-java-and-gradle
         with:
           java-distribution: zulu
           java-version: ${{ matrix.java-version }}
-#      - name: "Set up Flutter"
-#        uses: subosito/flutter-action@v2
-#        with:
-#          channel: ${{ inputs.flutter-channel }}
-#          cache: true
-#
-#      - name: "Install Dependencies"
-#        uses: ./.github/actions/install-dependencies
-#      - name: "Generate Localization code"
-#        uses: ./.github/actions/generate-localization_code
-#
-#      - name: "Build APK"
-#        run: flutter build apk --debug
+      - name: "Set up Flutter"
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ inputs.flutter-channel }}
+          cache: true
+
+      - name: "Install Dependencies"
+        uses: ./.github/actions/install-dependencies
+      - name: "Generate Localization code"
+        uses: ./.github/actions/generate-localization_code
+      - name: "Build APK"
+        run: flutter build apk --debug
 
       - id: run-android-medium_test
         name: "Run Android Medium test"
