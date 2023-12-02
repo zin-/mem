@@ -1,0 +1,43 @@
+name: "Run Android Medium test via malinskiy"
+
+inputs:
+  script:
+    required: true
+    type: string
+  android-api-level:
+    required: true
+  android-target:
+    required: true
+  android-arch:
+    required: true
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: "Install Android SDK"
+      uses: malinskiy/action-android/install-sdk@release/0.1.3
+    - name: "Add env: android-system-images-key"
+      run: echo "android-system-images-key=${{ inputs.android-api-level }}-${{ inputs.android-target }}-${{ inputs.android-arch }}-malinskiy" >> $GITHUB_ENV
+      shell: bash
+    - name: "Install Android platform tools"
+      run: sdkmanager platform-tools
+      shell: bash
+    - id: system_images-cache
+      name: "Cache System images"
+      uses: actions/cache@v3
+      with:
+        path: ${{ inputs.android-sdk-root }}/system-images/android-${{ inputs.android-api-level }}/${{ inputs.android-target }}/${{ inputs.android-arch }}
+        key: system_images-${{ env.android-system-images-key }}
+    - name: "Install System images"
+      if: steps.system_images-cache.outputs.cache-hit != 'true'
+      run: sdkmanager "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-target }};${{ inputs.android-arch }}"
+      shell: bash
+
+    # TODO キャッシュしたい。起動だけで4~6mかかっている
+    - uses: malinskiy/action-android/emulator-run-cmd@release/0.1.3
+      with:
+        cmd: ${{ inputs.script }}
+        api: ${{ inputs.android-api-level }}
+        tag: ${{ inputs.android-target }}
+        abi: ${{ inputs.android-arch }}

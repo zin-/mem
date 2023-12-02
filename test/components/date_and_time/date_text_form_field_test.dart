@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:mem/components/date_and_time/date_view.dart';
 import 'package:mem/components/l10n.dart';
 
+import '../../helpers.dart';
+
 void main() {
   Future pumpDateTextFormField(
     WidgetTester widgetTester,
@@ -77,7 +79,7 @@ void main() {
         await widgetTester.tap(find.byIcon(Icons.calendar_month));
         await widgetTester.pump();
 
-        await widgetTester.tap(find.text('CANCEL'));
+        await widgetTester.tap(cancelTextFinder);
       },
     );
 

@@ -1,0 +1,91 @@
+name: "Run Android Medium test via native"
+inputs:
+  script:
+    required: true
+    type: string
+  android-api-level:
+    required: true
+  android-target:
+    required: true
+  android-arch:
+    required: true
+
+runs:
+  using: "composite"
+
+  steps:
+    - run: sudo apt update
+      shell: bash
+
+# TODO cache
+    - name: "Install Android SDK"
+      shell: bash
+      run:  sudo apt install android-sdk
+    # `/usr/lib`以下に配置されたままだと、`android-sdk`の利用に`sudo`が必要なので、移動する
+    - shell: bash
+      run: sudo cp -rf /usr/lib/android-sdk ~/android-sdk
+    - shell: bash
+      run: sudo chown -R $(id -u):$(id -g) ~/android-sdk
+    - shell: bash
+      run: echo "ANDROID_HOME=~/android-sdk" >> $GITHUB_ENV
+    - shell: bash
+      run: echo "${{ env.ANDROID_HOME }}/platform-tools/bin" >> $GITHUB_PATH
+    - shell: bash
+      run: echo "${{ env.ANDROID_HOME }}/tools/bin" >> $GITHUB_PATH
+
+    - name: "Install Android SDK Command line tools"
+      shell: bash
+      run: mkdir ~/tmp
+    - shell: bash
+      run: >
+        wget
+        https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip
+        -P ~/tmp
+    - shell: bash
+      run: >
+        unzip
+        ~/tmp/commandlinetools-linux-10406996_latest.zip
+        -d ~/tmp
+    - shell: bash
+      run: mkdir ~/android-sdk/cmdline-tools/latest -p
+    - shell: bash
+      run: cp -r ~/tmp/cmdline-tools/* ~/android-sdk/cmdline-tools/latest
+    - shell: bash
+      run: echo "${{ env.ANDROID_HOME }}/cmdline-tools/latest/bin" >> $GITHUB_PATH
+    # `apt install android-sdk`に`debian`と`29.0.3`が含まれており警告が出力されるため
+    # 不要そうな`debian`を削除する
+    - shell: bash
+      run: rm -rf /home/runner/android-sdk/build-tools/debian
+
+    - name: "Accept Android SDK licenses"
+      shell: bash
+      run: yes | sdkmanager --licenses || true
+
+    - run: sdkmanager --list
+      shell: bash
+
+    - name: "Install system images"
+      shell: bash
+      run: sdkmanager --install "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-target }};${{ inputs.android-arch}}"
+
+    - name: "Create Android Virtual Device"
+      shell: bash
+      # 対話形式のようなのでnoで進める
+      # Do you wish to create a custom hardware profile? [no]
+      run: >
+        echo "no" | avdmanager create avd
+        --name emulator-5554
+        --package "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-target }};${{ inputs.android-arch}}"
+        --force
+
+    - run: avdmanager list avd
+      shell: bash
+
+    - run: nohup $ANDROID_HOME/emulator/emulator -avd emulator-5554 -no-snapshot > /dev/null 2>&1
+      shell: bash
+
+    - run: avdmanager --help
+      shell: bash
+
+    - run: echo "dev"
+      shell: bash

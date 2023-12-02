@@ -1,0 +1,41 @@
+name: "Continuous Integration"
+
+on:
+  push:
+
+env:
+  flutter-channel: stable
+
+jobs:
+  set_up-env:
+    name: "Set up Environment variables"
+    outputs:
+      flutter-channel: ${{ steps.env-variables.outputs.flutter-channel }}
+    runs-on: ubuntu-latest
+    steps:
+      - id: env-variables
+        name: "Set up Environment variables"
+        run: |
+          echo "flutter-channel=${{ env.flutter-channel }}" >> $GITHUB_OUTPUT
+
+  analyze-code:
+    needs: set_up-env
+    uses: ./.github/workflows/analyze-code.yml
+    with:
+      flutter-channel: ${{ needs.set_up-env.outputs.flutter-channel }}
+
+  small_test:
+    needs: set_up-env
+    uses: ./.github/workflows/small_test.yml
+    with:
+      flutter-channel: ${{ needs.set_up-env.outputs.flutter-channel }}
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  medium_test:
+    needs: set_up-env
+    uses: ./.github/workflows/medium_test.yml
+    with:
+      flutter-channel: ${{ needs.set_up-env.outputs.flutter-channel }}
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

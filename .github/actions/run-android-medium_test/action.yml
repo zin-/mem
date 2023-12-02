@@ -1,0 +1,78 @@
+name: "Run Android Medium test"
+
+inputs:
+  android-emulator-runner:
+    required: true
+    type: string
+  script:
+    required: true
+    type: string
+  android-api-level:
+    required: true
+    type: string
+  android-target:
+    required: true
+    type: string
+  android-arch:
+    required: true
+    type: string
+
+outputs:
+  status:
+    value: ${{ steps.set-result.outputs.status }}
+
+runs:
+  using: "composite"
+
+  steps:
+    - if: inputs.android-emulator-runner == 'malinskiy'
+      id: run-android-medium_test-via-malinskiy
+      name: "Run Android Medium Test via malinskiy"
+      uses: ./.github/actions/run-android-medium_test-via-malinskiy
+      with:
+        script: ${{ inputs.script }}
+        android-api-level: ${{ inputs.android-api-level }}
+        android-target: ${{ inputs.android-target }}
+        android-arch: ${{ inputs.android-arch }}
+      continue-on-error: true
+
+    - if: inputs.android-emulator-runner == 'reactivecircus'
+      id: run-android-medium_test-via-reactivecircus
+      name: "Run Android Medium Test via reactivecircus"
+      uses: ./.github/actions/run-android-medium_test-via-reactivecircus
+      with:
+        script: ${{ inputs.script }}
+        android-api-level: ${{ inputs.android-api-level }}
+        android-target: ${{ inputs.android-target }}
+        android-arch: ${{ inputs.android-arch }}
+  #          android-device-profile: Pixel 5
+      continue-on-error: true
+
+    - if: inputs.android-emulator-runner == 'native'
+      id: run-android-medium_test-via-native
+      name: "Run Android Medium Test via native"
+      uses: ./.github/actions/run-android-medium_test-via-native
+      with:
+        script: ${{ inputs.script }}
+        android-api-level: ${{ inputs.android-api-level }}
+        android-target: ${{ inputs.android-target }}
+        android-arch: ${{ inputs.android-arch }}
+      continue-on-error: true
+
+    - if: matrix.android-emulator-runner == 'malinskiy'
+      name: "Set Result (malinskiy)"
+      run: echo "STATUS=${{ steps.run-android-medium_test-via-malinskiy.outcome }}" >> $GITHUB_ENV
+      shell: bash
+    - if: matrix.android-emulator-runner == 'reactivecircus'
+      name: "Set Result (reactivecircus)"
+      run: echo "STATUS=${{ steps.run-android-medium_test-via-reactivecircus.outcome }}" >> $GITHUB_ENV
+      shell: bash
+    - if: matrix.android-emulator-runner == 'native'
+      name: "Set Result (native)"
+      run: echo "STATUS=${{ steps.run-android-medium_test-via-native.outcome }}" >> $GITHUB_ENV
+      shell: bash
+
+    - id: set-result
+      name: "Set Result"
+      run: echo "status=$STATUS" >> $GITHUB_OUTPUT
+      shell: bash
