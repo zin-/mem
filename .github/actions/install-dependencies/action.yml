@@ -1,21 +1,26 @@
-name: 'Install dependencies'
+name: "Install dependencies"
+
 runs:
-  using: 'composite'
+  using: "composite"
+
   steps:
 # FIXME cacheされていない気がする
     - id: cache
-      name: 'Cache'
+      name: "Cache"
       uses: actions/cache@v3
       with:
+        # TODO 整理する
         path: |
-          **/.flutter-plugins
+          **/build
+          **/.dart_tool
+          **/Generated.xcconfig
+          **/flutter_export_environment.sh
           **/.flutter-plugin-dependencies
-          **/.dart_tool/package_config.json
-          **/.dart_tool/flutter_gen/pubspec.yaml
+          **/.flutter-plugins
           ${{ env.PUB_CACHE }}
           **/.packages
-        key: -dependencies-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
-    - name: 'Get Packages'
+        key: dependencies-${{ hashFiles('pubspec.lock') }}
+    - name: "Get Packages"
       if: steps.cache.outputs.cache-hit != 'true'
-      run: flutter packages pub get
+      run: flutter pub get
       shell: bash

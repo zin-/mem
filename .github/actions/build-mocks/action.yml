@@ -1,14 +1,16 @@
-name: 'Build Mocks'
+name: "Build Mocks"
+
 runs:
-  using: 'composite'
+  using: "composite"
+
   steps:
     - id: cache
-      name: 'Cache'
+      name: "Cache"
       uses: actions/cache@v3
       with:
         path: test/**.mocks.dart
         key: mocks-${{ runner.os }}-${{ hashFiles('test/**', 'lib/**') }}
-    - name: 'Build Mocks'
+    - name: "Build Mocks"
       if: steps.cache.outputs.cache-hit != 'true'
       run: ./scripts/generate_mocks.sh
       shell: bash

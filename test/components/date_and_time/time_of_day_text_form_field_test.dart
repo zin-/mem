@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/components/date_and_time/time_of_day_view.dart';
 import 'package:mem/components/l10n.dart';
 
+import '../../helpers.dart';
+
 void main() {
   Future pumpTimeOfDayTextFormField(
     WidgetTester widgetTester,
@@ -75,7 +77,7 @@ void main() {
           },
         );
 
-        await pickNowTimeOfDay(widgetTester, cancelButton);
+        await pickNowTimeOfDay(widgetTester, cancelTextFinder);
       },
     );
 
@@ -97,7 +99,6 @@ void main() {
 }
 
 Finder okButton = find.text('OK');
-Finder cancelButton = find.text('CANCEL');
 
 Future<void> showTimeOfDayPicker(WidgetTester widgetTester) async {
   await widgetTester.tap(find.descendant(

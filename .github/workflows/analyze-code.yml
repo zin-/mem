@@ -1,0 +1,34 @@
+name: "Analyze code"
+
+on:
+  workflow_call:
+    inputs:
+      flutter-channel:
+        required: true
+        type: string
+
+jobs:
+  analyze-code:
+    name: "Analyze code"
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Set up Flutter"
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ inputs.flutter-channel }}
+          cache: true
+
+      - name: "Install Dependencies"
+        uses: ./.github/actions/install-dependencies
+
+      - name: "Analyze Application code"
+        run: flutter analyze lib
+
+      - name: "Generate Mocks"
+        uses: ./.github/actions/build-mocks
+      - name: "Analyze Test code"
+        run: flutter analyze test integration_test

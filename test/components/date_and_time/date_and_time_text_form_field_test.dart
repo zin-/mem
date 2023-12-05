@@ -6,6 +6,8 @@ import 'package:mem/components/date_and_time/time_of_day_view.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 
+import '../../helpers.dart';
+
 void main() {
   Future<void> showTarget(
     WidgetTester widgetTester,
@@ -139,7 +141,7 @@ void main() {
 
           await widgetTester.tap(find.byIcon(Icons.calendar_month));
           await widgetTester.pump();
-          await widgetTester.tap(find.text('CANCEL'));
+          await widgetTester.tap(cancelTextFinder);
 
           expect(count, 0);
         },
@@ -359,7 +361,7 @@ void main() {
           await widgetTester.tap(allDaySwitchFinder);
           await widgetTester.pump();
 
-          await widgetTester.tap(find.text('CANCEL'));
+          await widgetTester.tap(cancelTextFinder);
           await widgetTester.pump();
 
           expect(count, 0);
@@ -452,7 +454,7 @@ void main() {
           await widgetTester.tap(find.byIcon(Icons.access_time_outlined));
           await widgetTester.pump();
 
-          await widgetTester.tap(find.text('CANCEL'));
+          await widgetTester.tap(cancelTextFinder);
           await widgetTester.pump();
 
           expect(count, 0);

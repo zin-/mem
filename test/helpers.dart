@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/act_counter/act_counter_repository.dart';
 import 'package:mem/act_counter/act_counter_service.dart';
 import 'package:mem/act_counter/home_widget_accessor.dart';
@@ -62,3 +63,6 @@ class TestCase<T> {
 
   TestCase(this.name, this.input, this.verify);
 }
+
+// Finders
+final cancelTextFinder = find.text("Cancel");

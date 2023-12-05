@@ -9,7 +9,7 @@
 
   "memNameLabel": "Name",
   "memMemoLabel": "Memo",
-  "saveMemSuccessMessage": "Save success. {memName}",
+  "saveMemSuccessMessage": "\"{memName}\"の保存に成功しました。",
   "@saveMemSuccessMessage": {
     "placeholders": {
       "memName": {}
