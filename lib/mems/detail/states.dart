@@ -17,10 +17,7 @@ final memDetailProvider = StateNotifierProvider.autoDispose
       MemDetail(
         ref.watch(editingMemProvider(memId)),
         ref.watch(memItemsProvider(memId))!,
-        ref
-            .watch(memNotificationsByMemIdProvider(memId))
-            ?.map((e) => e.toV1())
-            .toList(),
+        ref.watch(memNotificationsByMemIdProvider(memId)),
       ),
     ),
     memId,

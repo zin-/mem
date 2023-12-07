@@ -75,9 +75,7 @@ final saveMem =
                 .read(memItemsProvider(memId).notifier)
                 .updatedBy(saved.memItems);
             ref.read(memNotificationsProvider.notifier).upsertAll(
-                  saved.notifications
-                          ?.map((e) => SavedMemNotificationV2.fromV1(e)) ??
-                      [],
+                  saved.notifications ?? [],
                   (tmp, item) =>
                       tmp is SavedMemNotificationV2 &&
                       item is SavedMemNotificationV2 &&

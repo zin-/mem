@@ -39,28 +39,22 @@ class MemService {
               ? null
               : await Future.wait(memDetail.notifications!.map((e) {
                   if (e.time == null) {
-                    if (e.isSaved()) {
+                    if (e is SavedMemNotificationV2) {
                       _memNotificationRepository.wasteById(e.id);
                     }
                     _notificationService.memRepeatedReminder(
                       savedMem,
                       null,
                     );
-                    return Future(
-                        () => MemNotification(e.type, e.time, e.message));
+                    return Future.value(e);
                   } else {
-                    return (e.isSaved() && !undo
-                            ? _memNotificationRepository.replace(
-                                SavedMemNotificationV2.fromV1(
-                                    e..memId = savedMem.id))
-                            : _memNotificationRepository.receive(
-                                MemNotificationV2.fromV1(
-                                    e..memId = savedMem.id)))
-                        .then((value) => value.toV1())
+                    return (e is SavedMemNotificationV2<int> && !undo
+                        ? _memNotificationRepository.replace(e)
+                        : _memNotificationRepository.receive(e))
                       ..then(
                         (value) => _notificationService.memRepeatedReminder(
                           savedMem,
-                          value,
+                          value.toV1(),
                         ),
                       );
                   }

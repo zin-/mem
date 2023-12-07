@@ -19,7 +19,7 @@ class MemNotificationV2 extends Entity {
       );
 
   factory MemNotificationV2.fromV1(MemNotification v1) => v1.isSaved()
-      ? SavedMemNotificationV2.fromV1(v1)
+      ? SavedMemNotificationV2<int>.fromV1(v1)
       : MemNotificationV2(
           v1.memId,
           v1.type,
