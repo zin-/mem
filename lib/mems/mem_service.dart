@@ -54,7 +54,7 @@ class MemService {
                       ..then(
                         (value) => _notificationService.memRepeatedReminder(
                           savedMem,
-                          value.toV1(),
+                          value,
                         ),
                       );
                   }

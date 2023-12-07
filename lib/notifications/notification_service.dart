@@ -35,7 +35,7 @@ class NotificationService {
 
   Future<void> memRepeatedReminder(
     SavedMem mem,
-    MemNotification? memNotification,
+    MemNotificationV2? memNotification,
   ) =>
       i(
         () async {
