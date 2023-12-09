@@ -37,13 +37,12 @@ final loadMemNotificationsByMemId =
   (ref, memId) => v(
     () async {
       if (memId != null) {
-        final memNotifications = await MemNotificationRepository()
-            .shipByMemId(memId)
-            .then((value) => value.map((e) => e.toV1()));
+        final memNotifications =
+            await MemNotificationRepository().shipByMemId(memId);
 
         if (memNotifications.isNotEmpty) {
           ref.watch(memNotificationsProvider.notifier).upsertAll(
-                memNotifications.map((e) => SavedMemNotificationV2.fromV1(e)),
+                memNotifications,
                 (tmp, item) =>
                     tmp is SavedMemNotificationV2 &&
                     item is SavedMemNotificationV2 &&
