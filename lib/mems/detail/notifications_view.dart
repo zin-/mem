@@ -19,17 +19,12 @@ class NotificationsWidget extends ConsumerWidget {
         () => AsyncValueView(
           loadMemNotificationsByMemId(_memId),
           (loaded) => _NotificationsWidgetComponent(
-            ref
-                    .watch(memDetailProvider(_memId))
-                    .notifications
-                    ?.map((e) => e.toV1())
-                    .toList() ??
-                [],
+            ref.watch(memDetailProvider(_memId)).notifications ?? [],
             (current) => (time, message) => ref
                     .read(memNotificationsByMemIdProvider(_memId).notifier)
                     .upsertAll(
                   [
-                    MemNotificationV2.fromV1(current.copyWith(time, message)),
+                    current.copiedWith(() => time, () => message),
                   ],
                   (tmp, item) =>
                       tmp.type == item.type &&
@@ -45,9 +40,9 @@ class NotificationsWidget extends ConsumerWidget {
 }
 
 class _NotificationsWidgetComponent extends StatelessWidget {
-  final List<MemNotification> _notifications;
+  final List<MemNotificationV2> _notifications;
   final Function(int? pickedTimeOfDay, String message) Function(
-      MemNotification current) _onChanged;
+      MemNotificationV2 current) _onChanged;
 
   const _NotificationsWidgetComponent(this._notifications, this._onChanged);
 

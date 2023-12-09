@@ -11,6 +11,17 @@ class MemNotificationV2 extends Entity {
 
   MemNotificationV2(this.memId, this.type, this.time, this.message);
 
+  MemNotificationV2 copiedWith(
+    int? Function()? time,
+    String Function()? message,
+  ) =>
+      MemNotificationV2(
+        memId,
+        type,
+        time == null ? this.time : time(),
+        message == null ? this.message : message(),
+      );
+
   MemNotification toV1() => MemNotification(
         type,
         time,
@@ -34,6 +45,18 @@ class SavedMemNotificationV2<I> extends MemNotificationV2
   int get memId => super.memId as int;
 
   SavedMemNotificationV2(super.memId, super.type, super.time, super.message);
+
+  @override
+  SavedMemNotificationV2<I> copiedWith(
+    int? Function()? time,
+    String Function()? message,
+  ) =>
+      SavedMemNotificationV2(
+        memId,
+        type,
+        time == null ? this.time : time(),
+        message == null ? this.message : message(),
+      )..copiedFrom(this);
 
   @override
   MemNotification toV1() => MemNotification(
