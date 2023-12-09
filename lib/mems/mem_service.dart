@@ -39,7 +39,7 @@ class MemService {
               ? null
               : await Future.wait(memDetail.notifications!.map((e) {
                   if (e.time == null) {
-                    if (e is SavedMemNotificationV2) {
+                    if (e is SavedMemNotification) {
                       _memNotificationRepository.wasteById(e.id);
                     }
                     _notificationService.memRepeatedReminder(
@@ -48,7 +48,7 @@ class MemService {
                     );
                     return Future.value(e);
                   } else {
-                    return (e is SavedMemNotificationV2<int> && !undo
+                    return (e is SavedMemNotification<int> && !undo
                         ? _memNotificationRepository.replace(e)
                         : _memNotificationRepository.receive(e))
                       ..then(

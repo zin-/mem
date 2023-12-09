@@ -9,7 +9,7 @@ import 'package:mem/repositories/mem_notification_repository.dart';
 import 'package:mem/mems/states.dart';
 
 final fetchMemNotifications = Provider.autoDispose
-    .family<Future<Iterable<SavedMemNotificationV2>>, Iterable<int>>(
+    .family<Future<Iterable<SavedMemNotification>>, Iterable<int>>(
   (ref, memIds) => v(
     () => memIds.isEmpty
         ? Future.value([])
@@ -19,8 +19,8 @@ final fetchMemNotifications = Provider.autoDispose
         (value) => ref.read(memNotificationsProvider.notifier).upsertAll(
               value,
               (tmp, item) =>
-                  tmp is SavedMemNotificationV2 &&
-                  item is SavedMemNotificationV2 &&
+                  tmp is SavedMemNotification &&
+                  item is SavedMemNotification &&
                   tmp.id == item.id,
             ),
       ),

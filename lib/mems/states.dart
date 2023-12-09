@@ -12,7 +12,7 @@ final memsProvider =
   (ref) => v(() => ListValueStateNotifier<Mem>(null)),
 );
 final memNotificationsProvider = StateNotifierProvider<
-    ListValueStateNotifier<MemNotificationV2>, List<MemNotificationV2>?>(
+    ListValueStateNotifier<MemNotification>, List<MemNotification>?>(
   (ref) => v(() => ListValueStateNotifier(null)),
 );
 

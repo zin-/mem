@@ -28,8 +28,8 @@ class NotificationsWidget extends ConsumerWidget {
                   ],
                   (tmp, item) =>
                       tmp.type == item.type &&
-                      (tmp is SavedMemNotificationV2 &&
-                              item is SavedMemNotificationV2
+                      (tmp is SavedMemNotification &&
+                              item is SavedMemNotification
                           ? tmp.id == item.id
                           : true),
                 ),
@@ -40,9 +40,9 @@ class NotificationsWidget extends ConsumerWidget {
 }
 
 class _NotificationsWidgetComponent extends StatelessWidget {
-  final List<MemNotificationV2> _notifications;
+  final List<MemNotification> _notifications;
   final Function(int? pickedTimeOfDay, String message) Function(
-      MemNotificationV2 current) _onChanged;
+      MemNotification current) _onChanged;
 
   const _NotificationsWidgetComponent(this._notifications, this._onChanged);
 

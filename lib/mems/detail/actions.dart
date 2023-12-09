@@ -44,8 +44,8 @@ final loadMemNotificationsByMemId =
           ref.watch(memNotificationsProvider.notifier).upsertAll(
                 memNotifications,
                 (tmp, item) =>
-                    tmp is SavedMemNotificationV2 &&
-                    item is SavedMemNotificationV2 &&
+                    tmp is SavedMemNotification &&
+                    item is SavedMemNotification &&
                     tmp.id == item.id,
               );
         }
@@ -76,8 +76,8 @@ final saveMem =
             ref.read(memNotificationsProvider.notifier).upsertAll(
                   saved.notifications ?? [],
                   (tmp, item) =>
-                      tmp is SavedMemNotificationV2 &&
-                      item is SavedMemNotificationV2 &&
+                      tmp is SavedMemNotification &&
+                      item is SavedMemNotification &&
                       tmp.id == item.id,
                 );
 
