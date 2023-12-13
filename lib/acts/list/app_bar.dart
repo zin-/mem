@@ -15,7 +15,7 @@ class ActListAppBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _ActListAppBar(
           _memId == null
-              ? buildL10n(context).actListPageTitle
+              ? buildL10n(context).defaultActListPageTitle
               : ref.watch(memProvider(_memId!))?.name ?? somethingWrong,
           IconButton(
             icon: Icon(
