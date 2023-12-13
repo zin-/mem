@@ -63,7 +63,7 @@ class _HomePageState extends State<_HomePage> {
   @override
   Widget build(BuildContext context) => v(
         () => Scaffold(
-          body: widget._pages[_selectedIndex],
+          body: SafeArea(child: widget._pages[_selectedIndex]),
           floatingActionButton: widget.floatingActionButtons[_selectedIndex],
           bottomNavigationBar: NavigationBar(
             selectedIndex: _selectedIndex,
