@@ -11,6 +11,19 @@ final memsProvider =
     StateNotifierProvider<ListValueStateNotifier<Mem>, List<Mem>?>(
   (ref) => v(() => ListValueStateNotifier<Mem>(null)),
 );
+final memProvider = StateNotifierProvider.autoDispose
+    .family<ValueStateNotifier<SavedMem?>, SavedMem?, int>(
+  (ref, memId) => v(
+    () => ValueStateNotifier(
+      ref
+              .read(memsProvider)
+              ?.singleWhere((mem) => mem is SavedMem<int> && mem.id == memId)
+          as SavedMem<int>?,
+    ),
+    {"memId": memId},
+  ),
+);
+
 final memNotificationsProvider = StateNotifierProvider<
     ListValueStateNotifier<MemNotification>, List<MemNotification>?>(
   (ref) => v(() => ListValueStateNotifier(null)),

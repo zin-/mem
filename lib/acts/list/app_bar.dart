@@ -1,11 +1,10 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/list/states.dart';
 import 'package:mem/components/l10n.dart';
-import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/states.dart';
+import 'package:mem/values/constants.dart';
 
 class ActListAppBar extends ConsumerWidget {
   final int? _memId;
@@ -16,13 +15,8 @@ class ActListAppBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _ActListAppBar(
           _memId == null
-              ? null
-              : ref
-                  .watch(memsProvider)
-                  ?.singleWhereOrNull(
-                    (element) => element is SavedMem && element.id == _memId,
-                  )
-                  ?.name,
+              ? buildL10n(context).actListPageTitle
+              : ref.watch(memProvider(_memId!))?.name ?? somethingWrong,
           IconButton(
             icon: Icon(
               ref.watch(timeViewProvider) ? Icons.numbers : Icons.access_time,
@@ -37,20 +31,20 @@ class ActListAppBar extends ConsumerWidget {
 }
 
 class _ActListAppBar extends StatelessWidget {
-  final String? _memName;
+  final String _title;
   final IconButton _viewModeToggle;
 
-  const _ActListAppBar(this._memName, this._viewModeToggle);
+  const _ActListAppBar(this._title, this._viewModeToggle);
 
   @override
   Widget build(BuildContext context) => v(
         () => SliverAppBar(
-          title: Text(_memName ?? buildL10n(context).actListPageTitle),
+          title: Text(_title),
           actions: [
             _viewModeToggle,
           ],
           floating: true,
         ),
-        {_memName, _viewModeToggle},
+        {_title, _viewModeToggle},
       );
 }

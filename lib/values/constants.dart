@@ -1,0 +1,1 @@
+const somethingWrong = "Something wrong";
