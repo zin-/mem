@@ -17,10 +17,10 @@ class ActLineChartPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
-          final mem = ref.read(memDetailProvider(_memId)).mem;
+          final memName = ref.read(memDetailProvider(_memId)).mem.name;
 
           return Scaffold(
-            appBar: AppBar(title: Text(mem.name)),
+            appBar: AppBar(title: Text(memName)),
             body: Padding(
               padding: pagePadding,
               child: AsyncValueView(

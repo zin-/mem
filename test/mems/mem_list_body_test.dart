@@ -12,15 +12,20 @@ import 'package:mem/mems/list/body.dart';
 import 'package:mem/mems/list/show_new_mem_fab.dart';
 import 'package:mem/mems/states.dart';
 
+import '../../integration_test/scenarios/helpers.dart';
+
 void main() {
   testWidgets('Hide & show ShowNewMemFab.', (widgetTester) async {
     final scrollController = ScrollController();
     final samples = List.generate(
       20,
-      (index) => Mem(
-        name: 'Hide & show ShowNewMemFab: mem name - $index',
-        id: index,
-      ),
+      (index) => SavedMem(
+        'Hide & show ShowNewMemFab: mem name - $index',
+        null,
+        null,
+      )
+        ..id = index
+        ..createdAt = zeroDate,
     );
 
     await widgetTester.pumpWidget(ProviderScope(

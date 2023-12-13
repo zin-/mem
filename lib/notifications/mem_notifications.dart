@@ -17,10 +17,10 @@ const _endNotificationBody = 'end';
 
 class MemNotifications {
   static List<Notification> of(
-    Mem mem,
+    SavedMem mem,
     TimeOfDay startOfDay,
   ) {
-    if (mem.isDone() || mem.isArchived()) {
+    if (mem.isDone || mem.isArchived) {
       return CancelAllMemNotifications.of(mem.id);
     } else {
       final notifications = <Notification>[];

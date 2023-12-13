@@ -7,7 +7,7 @@ import 'package:mem/logger/log_service.dart';
 String _memNameTag(int? memId) => heroTag('mem-name', memId);
 
 class MemNameText extends StatelessWidget {
-  final Mem _mem;
+  final SavedMem _mem;
 
   const MemNameText(this._mem, {Key? key}) : super(key: key);
 
@@ -19,7 +19,7 @@ class MemNameText extends StatelessWidget {
             _mem.name,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: _mem.isDone()
+            style: _mem.isDone
                 ? const TextStyle(decoration: TextDecoration.lineThrough)
                 : null,
           ),

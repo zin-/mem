@@ -16,10 +16,16 @@ class MemDoneCheckbox extends StatelessWidget {
   @override
   Widget build(BuildContext context) => v(
         () => HeroView(
-          heroTag('mem-done', _mem.id),
+          heroTag(
+            'mem-done',
+            _mem is SavedMem ? (_mem as SavedMem).id : null,
+          ),
           Checkbox(
-            value: _mem.isDone(),
-            onChanged: _mem.isArchived() ? null : _onChanged,
+            value: _mem.isDone,
+            onChanged:
+                (_mem is SavedMem ? (_mem as SavedMem).isArchived : false)
+                    ? null
+                    : _onChanged,
           ),
         ),
         {

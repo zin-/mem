@@ -8,9 +8,9 @@ import 'editing_act_dialog.dart';
 class ActListItemView extends ListTile {
   ActListItemView(
     BuildContext context,
-    Act act, {
+    SavedAct act, {
     // Act一覧の要素に対してMemがあったら名前を表示するという実装は合っているだろうか？
-    Mem? mem,
+    SavedMem? mem,
     super.key,
   }) : super(
           title: DateAndTimePeriodTexts(act.period),
@@ -18,7 +18,7 @@ class ActListItemView extends ListTile {
           onLongPress: () {
             showDialog(
               context: context,
-              builder: (context) => EditingActDialog(act),
+              builder: (context) => EditingActDialog(act.id!),
             );
           },
         );

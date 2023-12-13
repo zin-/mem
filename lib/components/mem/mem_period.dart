@@ -47,9 +47,9 @@ class MemPeriodTextFormFields extends ConsumerWidget {
           return _MemPeriodTextFormFieldsComponent(
             mem.period,
             (pickedPeriod) => v(
-              () => ref
-                  .read(editingMemProvider(_memId).notifier)
-                  .updatedBy(mem.copied()..period = pickedPeriod),
+              () => ref.read(editingMemProvider(_memId).notifier).updatedBy(
+                    mem.copiedWith(period: () => pickedPeriod),
+                  ),
               pickedPeriod,
             ),
           );

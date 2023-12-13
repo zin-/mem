@@ -1,1 +1,0 @@
-class InitializationError extends Error {}

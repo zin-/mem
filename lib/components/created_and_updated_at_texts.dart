@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:mem/components/date_and_time/date_and_time_view.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
-import 'package:mem/core/entity_value.dart';
+import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/values/colors.dart';
 
 class CreatedAndUpdatedAtTexts extends StatelessWidget {
-  final EntityValue _entity;
+  final Mem _entity;
 
   const CreatedAndUpdatedAtTexts(this._entity, {super.key});
 
   @override
   Widget build(BuildContext context) => v(
         () {
-          if (_entity.isSaved()) {
+          if (_entity is SavedMem) {
             return Wrap(
               direction: Axis.horizontal,
               children: [
@@ -25,8 +25,8 @@ class CreatedAndUpdatedAtTexts extends StatelessWidget {
                     ),
                     DateAndTimeText(
                       DateAndTime.from(
-                        _entity.createdAt!,
-                        timeOfDay: _entity.createdAt!,
+                        (_entity as SavedMem).createdAt,
+                        timeOfDay: (_entity as SavedMem).createdAt,
                       ),
                       style: const TextStyle(
                         color: secondaryGreyColor,
@@ -34,7 +34,7 @@ class CreatedAndUpdatedAtTexts extends StatelessWidget {
                     ),
                   ],
                 ),
-                _entity.updatedAt == null
+                (_entity as SavedMem).updatedAt == null
                     ? const SizedBox.shrink()
                     : Row(
                         children: [
@@ -44,8 +44,8 @@ class CreatedAndUpdatedAtTexts extends StatelessWidget {
                           ),
                           DateAndTimeText(
                             DateAndTime.from(
-                              _entity.updatedAt!,
-                              timeOfDay: _entity.updatedAt,
+                              (_entity as SavedMem).updatedAt!,
+                              timeOfDay: (_entity as SavedMem).updatedAt,
                             ),
                             style: const TextStyle(
                               color: secondaryGreyColor,

@@ -5,13 +5,13 @@ import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 
 class MemNotificationRepository extends DatabaseTupleRepository<
-    MemNotificationV2, SavedMemNotificationV2<int>, int> {
-  Future<Iterable<SavedMemNotificationV2<int>>> shipByMemId(int memId) => v(
+    MemNotification, SavedMemNotification<int>, int> {
+  Future<Iterable<SavedMemNotification<int>>> shipByMemId(int memId) => v(
         () => super.ship(Equals(defFkMemNotificationsMemId.name, memId)),
         memId,
       );
 
-  Future<Iterable<SavedMemNotificationV2<int>>> shipByMemIdAndAfterActStarted(
+  Future<Iterable<SavedMemNotification<int>>> shipByMemIdAndAfterActStarted(
           int memId) =>
       v(
         () => super.ship(And([
@@ -24,14 +24,14 @@ class MemNotificationRepository extends DatabaseTupleRepository<
         memId,
       );
 
-  Future<Iterable<SavedMemNotificationV2<int>>> wasteByMemId(int memId) => v(
+  Future<Iterable<SavedMemNotification<int>>> wasteByMemId(int memId) => v(
         () => super.waste(Equals(defFkMemNotificationsMemId.name, memId)),
         memId,
       );
 
   @override
-  SavedMemNotificationV2<int> pack(Map<String, dynamic> tuple) =>
-      SavedMemNotificationV2<int>(
+  SavedMemNotification<int> pack(Map<String, dynamic> tuple) =>
+      SavedMemNotification<int>(
         tuple[defFkMemNotificationsMemId.name],
         MemNotificationType.fromName(tuple[defColMemNotificationsType.name]),
         tuple[defColMemNotificationsTime.name],
@@ -39,7 +39,7 @@ class MemNotificationRepository extends DatabaseTupleRepository<
       )..pack(tuple);
 
   @override
-  Map<String, dynamic> unpack(MemNotificationV2 entity) {
+  Map<String, dynamic> unpack(MemNotification entity) {
     final map = {
       defFkMemNotificationsMemId.name: entity.memId,
       defColMemNotificationsType.name: entity.type.name,
@@ -47,7 +47,7 @@ class MemNotificationRepository extends DatabaseTupleRepository<
       defColMemNotificationsMessage.name: entity.message,
     };
 
-    if (entity is SavedMemNotificationV2) {
+    if (entity is SavedMemNotification) {
       map.addAll(entity.unpack());
     }
 

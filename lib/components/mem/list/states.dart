@@ -34,10 +34,10 @@ final showDoneProvider = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
   ),
 );
 
-final memListProvider =
-    StateNotifierProvider.autoDispose<ValueStateNotifier<List<Mem>>, List<Mem>>(
-        (ref) {
-  final rawMemList = ref.watch(memsProvider) ?? <Mem>[];
+final memListProvider = StateNotifierProvider.autoDispose<
+    ValueStateNotifier<List<SavedMem>>, List<SavedMem>>((ref) {
+  final rawMemList =
+      ref.watch(memsProvider)?.map((e) => e as SavedMem) ?? <SavedMem>[];
 
   final showNotArchived = ref.watch(showNotArchivedProvider);
   final showArchived = ref.watch(showArchivedProvider);
@@ -55,13 +55,13 @@ final memListProvider =
       if (showNotArchived == showArchived) {
         return true;
       } else {
-        return showArchived ? mem.isArchived() : !mem.isArchived();
+        return showArchived ? mem.isArchived : !mem.isArchived;
       }
     }).where((mem) {
       if (showNotDone == showDone) {
         return true;
       } else {
-        return showDone ? mem.isDone() : !mem.isDone();
+        return showDone ? mem.isDone : !mem.isDone;
       }
     }).toList(),
     {
@@ -91,11 +91,11 @@ final memListProvider =
         }
       }
 
-      if (a.isArchived() != b.isArchived()) {
-        return a.isArchived() ? 1 : -1;
+      if ((a.isArchived) != (b.isArchived)) {
+        return a.isArchived ? 1 : -1;
       }
-      if (a.isDone() != b.isDone()) {
-        return a.isDone() ? 1 : -1;
+      if (a.isDone != b.isDone) {
+        return a.isDone ? 1 : -1;
       }
 
       final comparedPeriod = DateAndTimePeriod.compare(a.period, b.period);
@@ -111,9 +111,9 @@ final memListProvider =
   return ValueStateNotifier(sorted);
 });
 
-final activeActsProvider =
-    StateNotifierProvider.autoDispose<ListValueStateNotifier<Act>, List<Act>?>(
-  (ref) => v(() => ListValueStateNotifier<Act>(
+final activeActsProvider = StateNotifierProvider.autoDispose<
+    ListValueStateNotifier<SavedAct>, List<SavedAct>?>(
+  (ref) => v(() => ListValueStateNotifier(
         ref
             .watch(actsProvider)
             ?.where((act) => act.period.end == null)

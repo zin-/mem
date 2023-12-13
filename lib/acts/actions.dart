@@ -9,7 +9,7 @@ import 'act_repository.dart';
 import 'act_service.dart';
 import 'states.dart';
 
-final loadActList = FutureProvider.autoDispose.family<List<Act>, int?>(
+final loadActList = FutureProvider.autoDispose.family<List<SavedAct>, int?>(
   (ref, memId) => v(
     () async {
       // TODO 全件取得する場合、件数的な不安がある
@@ -17,7 +17,6 @@ final loadActList = FutureProvider.autoDispose.family<List<Act>, int?>(
       final acts = (memId == null
               ? await ActRepository().ship()
               : await ActRepository().shipByMemId(memId))
-          .map((e) => e.toV1())
           .toList();
 
       ref.watch(actsProvider.notifier).upsertAll(
@@ -49,7 +48,7 @@ final startActBy = Provider.autoDispose.family<Act, int>(
   ),
 );
 
-final finishActBy = Provider.autoDispose.family<Act, int>(
+final finishActBy = Provider.autoDispose.family<SavedAct, int>(
   (ref, memId) => v(
     () {
       final now = DateAndTime.now();

@@ -4,24 +4,21 @@ import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/logger/log_service.dart';
 
-final actsProvider =
-    StateNotifierProvider<ListValueStateNotifier<Act>, List<Act>?>(
+final actsProvider = StateNotifierProvider<
+    ListValueStateNotifier<SavedAct<int>>, List<SavedAct<int>>?>(
   (ref) => v(() => ListValueStateNotifier(null)),
 );
 
-// FIXME loadActListと同じIFな気がする、統一できるのではないか？
 final actListProvider = StateNotifierProvider.autoDispose
     .family<ListValueStateNotifier<Act>, List<Act>?, int?>(
   (ref, memId) => v(
-    () {
-      final acts = ref.watch(actsProvider);
-      return ListValueStateNotifier(
-        (memId == null
-                ? acts
-                : acts?.where((act) => act.memId == memId).toList())
-            ?.sorted((a, b) => b.period.compareTo(a.period)),
-      );
-    },
+    () => ListValueStateNotifier(
+      ref
+          .watch(actsProvider)
+          ?.where((act) => memId == null || act.memId == memId)
+          .toList()
+          .sorted((a, b) => b.period.compareTo(a.period)),
+    ),
     memId,
   ),
 );

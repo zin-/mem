@@ -7,6 +7,8 @@ mixin SavedDatabaseTupleMixin<T> on Entity {
   DateTime? updatedAt;
   DateTime? archivedAt;
 
+  bool get isArchived => archivedAt != null;
+
   void pack(Map<String, dynamic> tuple) {
     id = tuple[defPkId.name];
     createdAt = tuple[defColCreatedAt.name];
@@ -22,4 +24,10 @@ mixin SavedDatabaseTupleMixin<T> on Entity {
       defColArchivedAt.name: archivedAt,
     };
   }
+
+  SavedDatabaseTupleMixin copiedFrom(SavedDatabaseTupleMixin origin) => this
+    ..id = origin.id
+    ..createdAt = origin.createdAt
+    ..updatedAt = origin.updatedAt
+    ..archivedAt = origin.archivedAt;
 }

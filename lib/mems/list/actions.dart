@@ -9,17 +9,19 @@ import 'package:mem/repositories/mem_notification_repository.dart';
 import 'package:mem/mems/states.dart';
 
 final fetchMemNotifications = Provider.autoDispose
-    .family<Future<Iterable<MemNotification>>, Iterable<int>>(
+    .family<Future<Iterable<SavedMemNotification>>, Iterable<int>>(
   (ref, memIds) => v(
     () => memIds.isEmpty
         ? Future.value([])
         : MemNotificationRepository()
             .ship(In(defFkMemNotificationsMemId.name, memIds))
-            .then((value) => value.map((e) => e.toV1()))
       ..then(
         (value) => ref.read(memNotificationsProvider.notifier).upsertAll(
               value,
-              (tmp, item) => tmp.id == item.id,
+              (tmp, item) =>
+                  tmp is SavedMemNotification &&
+                  item is SavedMemNotification &&
+                  tmp.id == item.id,
             ),
       ),
     memIds,
@@ -28,9 +30,7 @@ final fetchMemNotifications = Provider.autoDispose
 final fetchActiveActs = Provider(
   (ref) => v(
     () => ActRepository().shipActive().then(
-          (activeActs) => ref
-              .read(actsProvider.notifier)
-              .updatedBy(activeActs.map((e) => e.toV1()).toList()),
+          (activeActs) => ref.read(actsProvider.notifier).updatedBy(activeActs),
         ),
   ),
 );

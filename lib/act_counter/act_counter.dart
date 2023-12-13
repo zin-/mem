@@ -7,8 +7,8 @@ import 'package:mem/core/mem.dart';
 import 'package:mem/framework/repository/entity.dart';
 
 class ActCounter extends Entity {
-  final Mem _mem;
-  final Iterable<Act> _acts;
+  final SavedMem _mem;
+  final Iterable<SavedAct> _acts;
   final int memId;
   final int? actCount;
   final DateTime? lastUpdatedAt;
@@ -20,8 +20,8 @@ class ActCounter extends Entity {
         actCount = _acts.length,
         lastUpdatedAt = (_acts
                 .sorted(
-                  (a, b) => (a.updatedAt ?? a.createdAt!)
-                      .compareTo(b.updatedAt ?? b.createdAt!),
+                  (a, b) => (a.updatedAt ?? a.createdAt)
+                      .compareTo(b.updatedAt ?? b.createdAt),
                 )
                 .lastOrNull)
             ?.period
@@ -30,8 +30,8 @@ class ActCounter extends Entity {
   Map<String, dynamic> widgetData() {
     final lastAct = _acts
         .sorted(
-          (a, b) => (a.updatedAt ?? a.createdAt!)
-              .compareTo(b.updatedAt ?? b.createdAt!),
+          (a, b) => (a.updatedAt ?? a.createdAt)
+              .compareTo(b.updatedAt ?? b.createdAt),
         )
         .lastOrNull;
 

@@ -11,8 +11,7 @@ class FinishActiveActNotificationAction extends NotificationAction {
           title,
           (memId) async {
             final activeActs = (await ActRepository().shipActive())
-                .where((element) => element.memId == memId)
-                .map((e) => e.toV1());
+                .where((element) => element.memId == memId);
 
             final now = DateAndTime.now();
             ActService().finish(
@@ -21,7 +20,7 @@ class FinishActiveActNotificationAction extends NotificationAction {
                       : activeActs
                           .sorted((a, b) => a.period.compareTo(b.period))
                           .first)
-                  .id!,
+                  .id,
               now,
             );
           },

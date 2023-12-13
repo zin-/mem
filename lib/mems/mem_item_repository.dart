@@ -5,31 +5,31 @@ import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 
 class MemItemRepository
-    extends DatabaseTupleRepository<MemItemV2, SavedMemItemV2<int>, int> {
-  Future<Iterable<SavedMemItemV2<int>>> shipByMemId(int memId) => v(
+    extends DatabaseTupleRepository<MemItem, SavedMemItem<int>, int> {
+  Future<Iterable<SavedMemItem<int>>> shipByMemId(int memId) => v(
         () => super.ship(Equals(defFkMemItemsMemId.name, memId)),
         {'memId': memId},
       );
 
-  Future<Iterable<SavedMemItemV2<int>>> archiveByMemId(int memId) => v(
+  Future<Iterable<SavedMemItem<int>>> archiveByMemId(int memId) => v(
         () async => Future.wait(
             (await shipByMemId(memId)).map((e) => super.archive(e))),
         {'memId': memId},
       );
 
-  Future<Iterable<SavedMemItemV2<int>>> unarchiveByMemId(int memId) => v(
+  Future<Iterable<SavedMemItem<int>>> unarchiveByMemId(int memId) => v(
         () async => Future.wait(
             (await shipByMemId(memId)).map((e) => super.unarchive(e))),
         {'memId': memId},
       );
 
-  Future<Iterable<SavedMemItemV2<int>>> wasteByMemId(int memId) => v(
+  Future<Iterable<SavedMemItem<int>>> wasteByMemId(int memId) => v(
         () async => await super.waste(Equals(defFkMemItemsMemId.name, memId)),
         {'memId': memId},
       );
 
   @override
-  SavedMemItemV2<int> pack(Map<String, dynamic> tuple) => SavedMemItemV2(
+  SavedMemItem<int> pack(Map<String, dynamic> tuple) => SavedMemItem(
         tuple[defFkMemItemsMemId.name],
         MemItemType.values.firstWhere(
           (v) => v.name == tuple[defColMemItemsType.name],
@@ -38,14 +38,14 @@ class MemItemRepository
       )..pack(tuple);
 
   @override
-  Map<String, dynamic> unpack(MemItemV2 entity) {
+  Map<String, dynamic> unpack(MemItem entity) {
     final map = {
       defFkMemItemsMemId.name: entity.memId,
       defColMemItemsType.name: entity.type.name,
       defColMemItemsValue.name: entity.value,
     };
 
-    if (entity is SavedMemItemV2) {
+    if (entity is SavedMemItem) {
       map.addAll(entity.unpack());
     }
 

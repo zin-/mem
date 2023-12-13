@@ -46,11 +46,12 @@ class _MemDetailMenuComponent extends StatelessWidget {
   Widget build(BuildContext context) {
     final menu = <Widget>[];
 
-    if (_mem.isSaved()) {
-      menu.add(_showActChartIconButton(Navigator.of(context), _mem.id));
-      menu.add(_showActIconButton(context, _mem.id));
+    if (_mem is SavedMem) {
+      menu.add(_showActChartIconButton(
+          Navigator.of(context), (_mem as SavedMem).id));
+      menu.add(_showActIconButton(context, (_mem as SavedMem).id));
 
-      if (_mem.isArchived()) {
+      if ((_mem as SavedMem).isArchived) {
         menu.add(_unarchiveIconButton(context));
       } else {
         menu.add(_archiveIconButton(context));

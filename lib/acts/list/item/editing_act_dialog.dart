@@ -10,44 +10,42 @@ import 'actions.dart';
 import 'states.dart';
 
 class EditingActDialog extends ConsumerWidget {
-  final Act _act;
+  final int _actId;
 
-  const EditingActDialog(this._act, {super.key});
+  const EditingActDialog(this._actId, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final editingAct = ref.watch(editingActProvider(_act.id!));
+    final editingAct = ref.watch(editingActProvider(_actId));
 
     return _EditingActDialogComponent(
       editingAct,
       (pickedPeriod) => v(
-        () => ref.read(editingActProvider(_act.id!).notifier).updatedBy(
-              _act.copiedWith(
-                // FIXME avoid '!'
-                //  nullになった場合のエラーを表示するべき
-                //  エラー表示は責務としては、対象のコンポーネントのはず
-                //  そうすると型の解決ができない？
-                pickedPeriod!,
+        () => ref.read(editingActProvider(_actId).notifier).updatedBy(
+              editingAct.copiedWith(
+                pickedPeriod == null ? null : () => pickedPeriod,
               ),
             ),
         pickedPeriod,
       ),
       () => v(() {
-        ref.read(deleteAct(_act.id!));
-        ref.read(actListProvider(_act.memId).notifier).removeWhere(
-              (act) => act.id == _act.memId,
+        ref.read(deleteAct(_actId));
+        ref.read(actListProvider(editingAct.memId).notifier).removeWhere(
+              (act) => act is SavedAct && act.id == editingAct.memId,
             );
       }),
-      () => v(() => ref.read(actListProvider(_act.memId).notifier).upsertAll(
-            [ref.read(editAct(_act.id!))],
-            (tmp, item) => tmp.id == item.id,
+      () => v(() =>
+          ref.read(actListProvider(editingAct.memId).notifier).upsertAll(
+            [ref.read(editAct(_actId))],
+            (tmp, item) =>
+                tmp is SavedAct && item is SavedAct && tmp.id == item.id,
           )),
     );
   }
 }
 
 class _EditingActDialogComponent extends StatelessWidget {
-  final Act _editingAct;
+  final SavedAct _editingAct;
   final Function(DateAndTimePeriod? picked) _onPeriodChanged;
   final Function() _onDeleteTapped;
   final Function() _onSaveTapped;

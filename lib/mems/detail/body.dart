@@ -26,11 +26,11 @@ class MemDetailBody extends ConsumerWidget {
             _memId,
             editingMem,
             (value) => ref.read(editingMemProvider(_memId).notifier).updatedBy(
-                  editingMem.copied()..name = value,
+                  editingMem.copiedWith(name: () => value),
                 ),
             (value) => ref.read(editingMemProvider(_memId).notifier).updatedBy(
-                  editingMem.copied()
-                    ..doneAt = value == true ? DateTime.now() : null,
+                  editingMem.copiedWith(
+                      doneAt: () => value == true ? DateTime.now() : null),
                 ),
           );
         },
@@ -84,6 +84,6 @@ class _MemDetailBodyComponent extends StatelessWidget {
             ),
           ],
         ),
-        {_memId.toString(), _mem},
+        {"memId": _memId.toString(), "_mem": _mem},
       );
 }

@@ -32,7 +32,7 @@ class MemListItemView extends ConsumerWidget {
               ),
           ref.watch(memNotificationsByMemIdProvider(_memId))?.singleWhereOrNull(
                 (element) =>
-                    element.isSaved() &&
+                    element is SavedMemNotification &&
                     element.type == MemNotificationType.repeat,
               ),
           _onTapped,
@@ -43,15 +43,15 @@ class MemListItemView extends ConsumerWidget {
                     ? ref.read(doneMem(_memId))
                     : ref.read(undoneMem(_memId))
               ],
-              (tmp, item) => tmp.id == item.id,
+              (tmp, item) => tmp is SavedMem && item is SavedMem
+                  ? tmp.id == item.id
+                  : false,
             );
           },
           (activeAct) => v(
             () async {
               if (activeAct == null) {
-                ref
-                    .read(activeActsProvider.notifier)
-                    .add(ref.read(startActBy(_memId)));
+                ref.read(startActBy(_memId));
               } else {
                 ref.read(activeActsProvider.notifier).removeWhere(
                       (act) =>
@@ -68,12 +68,12 @@ class MemListItemView extends ConsumerWidget {
 
 class _MemListItemViewComponent extends ListTile {
   _MemListItemViewComponent(
-    Mem mem,
-    Act? activeAct,
+    SavedMem mem,
+    SavedAct? activeAct,
     MemNotification? memRepeatedNotifications,
     void Function(int memId) onTap,
     void Function(bool? value, int memId) onMemDoneCheckboxTapped,
-    void Function(Act? act) onActButtonTapped,
+    void Function(SavedAct? act) onActButtonTapped,
   ) : super(
           leading: memRepeatedNotifications == null
               ? activeAct == null
@@ -83,7 +83,7 @@ class _MemListItemViewComponent extends ListTile {
                     )
                   : null
               : null,
-          trailing: mem.isDone()
+          trailing: mem.isDone
               ? null
               : IconButton(
                   onPressed: () => onActButtonTapped(activeAct),
@@ -101,7 +101,7 @@ class _MemListItemViewComponent extends ListTile {
                   ],
                 ),
           subtitle: mem.period == null ? null : MemPeriodTexts(mem.id),
-          tileColor: mem.isArchived() ? archivedColor : null,
+          tileColor: mem.isArchived ? archivedColor : null,
           onTap: () => onTap(mem.id),
         ) {
     verbose({

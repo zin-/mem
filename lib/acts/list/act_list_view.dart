@@ -40,13 +40,13 @@ class ActListView extends ConsumerWidget {
                 dateAndTime.day,
               );
             }),
-            _memId == null
+            (_memId == null
                 ? ref.watch(memListProvider)
                 : [
                     ref.watch(memListProvider).singleWhereOrNull(
                           (element) => element.id == _memId,
                         )!
-                  ],
+                  ]),
             ref.watch(timeViewProvider),
           ),
         ),
@@ -59,7 +59,7 @@ class _ActListViewComponent extends StatelessWidget {
 
   final int? _memId;
   final Map<DateTime, List<Act>> _groupedActList;
-  final List<Mem> _mems;
+  final List<SavedMem> _mems;
   final bool _timeView;
 
   const _ActListViewComponent(
@@ -114,7 +114,7 @@ class _ActListViewComponent extends StatelessWidget {
 
                             return TotalActTimeListItem(
                               entry.value,
-                              _mems.length > 1
+                              _mems.length >= 2
                                   ? _mems.singleWhereOrNull(
                                       (element) => element.id == entry.key)
                                   : null,
@@ -125,15 +125,19 @@ class _ActListViewComponent extends StatelessWidget {
                           childCount: e.value.length,
                           (context, index) {
                             final act = e.value.toList()[index];
-                            return ActListItemView(
-                              context,
-                              act,
-                              mem: _mems.length > 1
-                                  ? _mems.singleWhereOrNull(
-                                      (element) => element.id == act.memId,
-                                    )
-                                  : null,
-                            );
+                            if (act is SavedAct) {
+                              return ActListItemView(
+                                context,
+                                act,
+                                mem: _mems.length >= 2
+                                    ? _mems.singleWhereOrNull(
+                                        (element) => element.id == act.memId,
+                                      )
+                                    : null,
+                              );
+                            } else {
+                              return null;
+                            }
                           },
                         ),
                 ),

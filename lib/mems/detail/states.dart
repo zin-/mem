@@ -29,22 +29,21 @@ final editingMemProvider = StateNotifierProvider.autoDispose
   (ref, memId) => v(
     () {
       final rawMemList = ref.watch(memsProvider);
-      final memFromRawMemList =
-          rawMemList?.singleWhereOrNull((element) => element.id == memId);
+      final memFromRawMemList = rawMemList?.singleWhereOrNull(
+          (element) => element is SavedMem ? element.id == memId : false);
 
       if (memId != null && rawMemList == null) {
-        MemRepository()
-            .shipById(memId)
-            .then((value) => value.toV1())
-            .then((value) {
-          ref
-              .read(memsProvider.notifier)
-              .upsertAll([value], (tmp, item) => tmp.id == item.id);
+        MemRepository().shipById(memId).then((value) {
+          ref.read(memsProvider.notifier).upsertAll(
+              [value],
+              (tmp, item) => tmp is SavedMem && item is SavedMem
+                  ? tmp.id == item.id
+                  : false);
         });
       }
 
       return ValueStateNotifier(
-        memFromRawMemList ?? Mem(name: ''),
+        memFromRawMemList ?? Mem('', null, null),
       );
     },
     memId,
@@ -54,8 +53,10 @@ final editingMemProvider = StateNotifierProvider.autoDispose
 final memIsArchivedProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<bool>, bool, int?>(
   (ref, memId) => v(
-    () => ValueStateNotifier(
-        ref.watch(memDetailProvider(memId)).mem.isArchived()),
+    () {
+      final mem = ref.watch(memDetailProvider(memId)).mem;
+      return ValueStateNotifier((mem is SavedMem) ? mem.isArchived : false);
+    },
     memId,
   ),
 );
@@ -64,25 +65,26 @@ final memItemsProvider = StateNotifierProvider.autoDispose
     .family<ListValueStateNotifier<MemItem>, List<MemItem>?, int?>(
   (ref, memId) => v(
     () => ListValueStateNotifier([
-      MemItem(memId: memId, type: MemItemType.memo, value: ''),
+      MemItem(memId, MemItemType.memo, ''),
     ]),
     memId,
   ),
 );
 
-MemNotification _initialRepeatMemNotification(int? memId) => MemNotification(
+MemNotification _initialRepeatMemNotification(int? memId) =>
+    MemNotification(
+      memId,
       MemNotificationType.repeat,
       null,
       'Repeat',
-      memId: memId,
     );
 
 MemNotification _initialAfterActStartedMemNotification(int? memId) =>
     MemNotification(
+      memId,
       MemNotificationType.afterActStarted,
       null,
       'Finish?',
-      memId: memId,
     );
 
 final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
