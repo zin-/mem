@@ -5,14 +5,12 @@ import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:mem/acts/actions.dart';
 import 'package:mem/acts/list/app_bar.dart';
 import 'package:mem/acts/list/states.dart';
+import 'package:mem/acts/list/sub_header.dart';
 import 'package:mem/acts/list/total_act_time_item.dart';
 import 'package:mem/acts/states.dart';
 import 'package:mem/components/async_value_view.dart';
-import 'package:mem/components/date_and_time/date_and_time_view.dart';
 import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/core/act.dart';
-import 'package:mem/core/date_and_time/date_and_time.dart';
-import 'package:mem/core/date_and_time/duration.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/values/colors.dart';
@@ -79,26 +77,7 @@ class _ActListViewComponent extends StatelessWidget {
                 header: Container(
                   padding: pagePadding,
                   color: Colors.white,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      DateAndTimeText(
-                        DateAndTime.from(e.key),
-                        style: subHeaderTextStyle,
-                      ),
-                      Text(
-                        _timeView
-                            ? e.value
-                                .fold<Duration>(
-                                    Duration.zero,
-                                    (previousValue, element) =>
-                                        previousValue + element.period.duration)
-                                .format()
-                            : e.value.length.toString(),
-                        style: subHeaderTextStyle,
-                      )
-                    ],
-                  ),
+                  child: ActListSubHeader(e),
                 ),
                 sliver: SliverList(
                   delegate: _timeView
