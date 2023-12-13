@@ -39,11 +39,11 @@ class _ActListAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) => v(
         () => SliverAppBar(
+          floating: true,
           title: Text(_title),
           actions: [
             _viewModeToggle,
           ],
-          floating: true,
         ),
         {_title, _viewModeToggle},
       );
