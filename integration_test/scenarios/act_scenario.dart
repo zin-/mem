@@ -102,7 +102,7 @@ void testActScenario() => group(': $_scenarioName', () {
                 expect(startIconFinder, findsNothing);
                 expect(stopIconFinder, findsNothing);
                 [
-                  "Acts",
+                  "All",
                   dateText(zeroDate),
                   oneMin.format(),
                   oneMin.format(),
@@ -132,7 +132,7 @@ void testActScenario() => group(': $_scenarioName', () {
                 expect(stopIconFinder, findsNothing);
                 expect(find.byIcon(Icons.access_time), findsOneWidget);
                 [
-                  "Acts",
+                  "All",
                   dateText(zeroDate),
                   "1",
                   dateText(zeroDate),
