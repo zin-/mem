@@ -44,7 +44,7 @@ class _HomePage extends StatefulWidget {
   static final _scrollController = ScrollController();
   final _pages = [
     MemListBody(_scrollController),
-    const ActListView(),
+    const ActListView(null),
   ];
   final floatingActionButtons = [
     ShowNewMemFab(_scrollController),

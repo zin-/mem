@@ -21,7 +21,7 @@ import 'item/view.dart';
 class ActListView extends ConsumerWidget {
   final int? _memId;
 
-  const ActListView({int? memId, super.key}) : _memId = memId;
+  const ActListView(this._memId, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
