@@ -10,10 +10,10 @@ class Act extends Entity {
   Act(this.memId, this.period);
 }
 
-class SavedAct<I> extends Act with SavedDatabaseTupleMixin<I> {
+class SavedAct extends Act with SavedDatabaseTupleMixin<int> {
   SavedAct(super.memId, super.period);
 
-  SavedAct<I> copiedWith(DateAndTimePeriod Function()? period) => SavedAct(
+  SavedAct copiedWith(DateAndTimePeriod Function()? period) => SavedAct(
         memId,
         period == null ? this.period : period(),
       )

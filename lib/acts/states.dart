@@ -5,7 +5,7 @@ import 'package:mem/core/act.dart';
 import 'package:mem/logger/log_service.dart';
 
 final actsProvider = StateNotifierProvider<
-    ListValueStateNotifier<SavedAct<int>>, List<SavedAct<int>>?>(
+    ListValueStateNotifier<SavedAct>, List<SavedAct>?>(
   (ref) => v(() => ListValueStateNotifier(null)),
 );
 

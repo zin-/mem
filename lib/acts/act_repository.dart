@@ -7,8 +7,8 @@ import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 
 class ActRepository
-    extends DatabaseTupleRepository<Act, SavedAct<int>, int> {
-  Future<List<SavedAct<int>>> shipByMemId(
+    extends DatabaseTupleRepository<Act, SavedAct, int> {
+  Future<List<SavedAct>> shipByMemId(
     int memId, {
     DateAndTimePeriod? period,
   }) =>
@@ -27,12 +27,12 @@ class ActRepository
         {'memId': memId, 'period': period},
       );
 
-  Future<List<SavedAct<int>>> shipActive() => v(
+  Future<List<SavedAct>> shipActive() => v(
         () async => await ship(IsNull(defColActsEnd.name)),
       );
 
   @override
-  SavedAct<int> pack(Map<String, dynamic> tuple) => SavedAct<int>(
+  SavedAct pack(Map<String, dynamic> tuple) => SavedAct(
         tuple[defFkActsMemId.name],
         DateAndTimePeriod(
           start: DateAndTime.from(
