@@ -56,7 +56,7 @@ final finishActBy = Provider.autoDispose.family<SavedAct, int>(
             (act) => act.memId == memId,
           );
 
-      ActService().finish(finishingAct.id!, now).then((finishedAct) => v(
+      ActService().finish(finishingAct.id, now).then((finishedAct) => v(
             () => ref.read(actsProvider.notifier).upsertAll(
               [finishedAct],
               (tmp, item) => tmp.id == item.id,
