@@ -13,7 +13,6 @@ import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/values/colors.dart';
 import 'package:mem/values/dimens.dart';
 
 import 'item/view.dart';
@@ -53,8 +52,6 @@ class ActListView extends ConsumerWidget {
 }
 
 class _ActListViewComponent extends StatelessWidget {
-  final subHeaderTextStyle = const TextStyle(color: secondaryGreyColor);
-
   final int? _memId;
   final Map<DateTime, List<Act>> _groupedActList;
   final List<SavedMem> _mems;
