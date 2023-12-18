@@ -22,15 +22,15 @@ class MemNotification extends Entity {
       );
 }
 
-class SavedMemNotification<I> extends MemNotification
-    with SavedDatabaseTupleMixin<I> {
+class SavedMemNotification extends MemNotification
+    with SavedDatabaseTupleMixin<int> {
   @override
   int get memId => super.memId as int;
 
   SavedMemNotification(super.memId, super.type, super.time, super.message);
 
   @override
-  SavedMemNotification<I> copiedWith(
+  SavedMemNotification copiedWith(
     int? Function()? time,
     String Function()? message,
   ) =>

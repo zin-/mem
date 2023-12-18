@@ -23,7 +23,7 @@ class Mem extends Entity {
       );
 }
 
-class SavedMem<I> extends Mem with SavedDatabaseTupleMixin<I> {
+class SavedMem extends Mem with SavedDatabaseTupleMixin<int> {
   SavedMem(super.name, super.doneAt, super.period);
 
   @override
@@ -32,7 +32,7 @@ class SavedMem<I> extends Mem with SavedDatabaseTupleMixin<I> {
     DateTime? Function()? doneAt,
     DateAndTimePeriod? Function()? period,
   }) =>
-      SavedMem<I>(
+      SavedMem(
         name == null ? this.name : name(),
         doneAt == null ? this.doneAt : doneAt(),
         period == null ? this.period : period(),

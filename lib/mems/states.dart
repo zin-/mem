@@ -17,8 +17,8 @@ final memProvider = StateNotifierProvider.autoDispose
     () => ValueStateNotifier(
       ref
               .read(memsProvider)
-              ?.singleWhere((mem) => mem is SavedMem<int> && mem.id == memId)
-          as SavedMem<int>?,
+              ?.singleWhere((mem) => mem is SavedMem && mem.id == memId)
+          as SavedMem?,
     ),
     {"memId": memId},
   ),
