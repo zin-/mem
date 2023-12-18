@@ -103,7 +103,7 @@ final memListProvider = StateNotifierProvider.autoDispose<
         return comparedPeriod;
       }
 
-      return (a.id as int).compareTo(b.id);
+      return a.id.compareTo(b.id);
     }).toList(),
     {filtered, activeActs},
   );
