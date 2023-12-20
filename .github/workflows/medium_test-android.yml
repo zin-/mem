@@ -16,7 +16,6 @@ jobs:
     name: "Medium test (Android)"
 
     strategy:
-      fail-fast: false
       matrix:
         # 複数のAndroid Emulator Runnerを使う
         #   パフォーマンスチェックのため
@@ -32,6 +31,7 @@ jobs:
             os: ubuntu-latest
             experimental: true
             java-version: 17
+      fail-fast: false
 
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.continue-on-error }}
