@@ -52,13 +52,13 @@ class ActListView extends ConsumerWidget {
 
 class _ActListViewComponent extends StatelessWidget {
   final int? _memId;
-  final Map<DateTime, List<Act>> _groupedActList;
+  final Map<DateTime, List<Act>> _groupedActListByDate;
   final List<SavedMem> _mems;
   final bool _timeView;
 
   const _ActListViewComponent(
     this._memId,
-    this._groupedActList,
+    this._groupedActListByDate,
     this._mems,
     this._timeView,
   );
@@ -68,7 +68,7 @@ class _ActListViewComponent extends StatelessWidget {
         () => CustomScrollView(
           slivers: [
             ActListAppBar(_memId),
-            ..._groupedActList.entries.map(
+            ..._groupedActListByDate.entries.map(
               (e) => SliverStickyHeader(
                 header: ActListSubHeader(e),
                 sliver: SliverList(
@@ -85,7 +85,7 @@ class _ActListViewComponent extends StatelessWidget {
         ),
         {
           "_memId": _memId,
-          "_groupedActList": _groupedActList,
+          "_groupedActList": _groupedActListByDate,
           "_mems": _mems,
           "_timeView": _timeView,
         },
