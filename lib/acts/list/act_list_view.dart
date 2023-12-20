@@ -27,15 +27,7 @@ class ActListView extends ConsumerWidget {
           loadActList(_memId),
           (data) => _ActListViewComponent(
             _memId,
-            (ref.watch(actListProvider(_memId)) ?? []).groupListsBy((element) {
-              final dateAndTime = element.period.start!.dateTime;
-
-              return DateTime(
-                dateAndTime.year,
-                dateAndTime.month,
-                dateAndTime.day,
-              );
-            }),
+            ref.watch(actListProvider(_memId)) ?? [],
             (_memId == null
                 ? ref.watch(memListProvider)
                 : [
@@ -52,13 +44,13 @@ class ActListView extends ConsumerWidget {
 
 class _ActListViewComponent extends StatelessWidget {
   final int? _memId;
-  final Map<DateTime, List<Act>> _groupedActListByDate;
+  final List<Act> _actList;
   final List<SavedMem> _memList;
   final bool _timeView;
 
   const _ActListViewComponent(
     this._memId,
-    this._groupedActListByDate,
+    this._actList,
     this._memList,
     this._timeView,
   );
@@ -68,24 +60,35 @@ class _ActListViewComponent extends StatelessWidget {
         () => CustomScrollView(
           slivers: [
             ActListAppBar(_memId),
-            ..._groupedActListByDate.entries.map(
-              (e) => SliverStickyHeader(
-                header: ActListSubHeader(e),
-                sliver: SliverList(
-                  delegate: _timeView
-                      ? _SummaryActListItem(
-                          e.value.groupListsBy((act) => act.memId),
-                          _memList,
-                        )
-                      : _SimpleActListItem(e.value, _memList),
+            ..._actList
+                .groupListsBy((element) {
+                  final dateAndTime = element.period.start!.dateTime;
+
+                  return DateTime(
+                    dateAndTime.year,
+                    dateAndTime.month,
+                    dateAndTime.day,
+                  );
+                })
+                .entries
+                .map(
+                  (e) => SliverStickyHeader(
+                    header: ActListSubHeader(e),
+                    sliver: SliverList(
+                      delegate: _timeView
+                          ? _SummaryActListItem(
+                              e.value.groupListsBy((act) => act.memId),
+                              _memList,
+                            )
+                          : _SimpleActListItem(e.value, _memList),
+                    ),
+                  ),
                 ),
-              ),
-            ),
           ],
         ),
         {
           "_memId": _memId,
-          "_groupedActList": _groupedActListByDate,
+          "_actList": _actList,
           "_memList": _memList,
           "_timeView": _timeView,
         },
