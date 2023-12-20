@@ -53,13 +53,13 @@ class ActListView extends ConsumerWidget {
 class _ActListViewComponent extends StatelessWidget {
   final int? _memId;
   final Map<DateTime, List<Act>> _groupedActListByDate;
-  final List<SavedMem> _mems;
+  final List<SavedMem> _memList;
   final bool _timeView;
 
   const _ActListViewComponent(
     this._memId,
     this._groupedActListByDate,
-    this._mems,
+    this._memList,
     this._timeView,
   );
 
@@ -75,9 +75,9 @@ class _ActListViewComponent extends StatelessWidget {
                   delegate: _timeView
                       ? _SummaryActListItem(
                           e.value.groupListsBy((act) => act.memId),
-                          _mems,
+                          _memList,
                         )
-                      : _SimpleActListItem(e.value, _mems),
+                      : _SimpleActListItem(e.value, _memList),
                 ),
               ),
             ),
@@ -86,7 +86,7 @@ class _ActListViewComponent extends StatelessWidget {
         {
           "_memId": _memId,
           "_groupedActList": _groupedActListByDate,
-          "_mems": _mems,
+          "_mems": _memList,
           "_timeView": _timeView,
         },
       );
