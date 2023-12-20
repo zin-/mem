@@ -352,8 +352,6 @@ void testActScenario() => group(': $_scenarioName', () {
 
             testWidgets(
               ': save.',
-              // FIXME 今の仕組みではzeroDateから続くActを完了させたときの総時間を導出する現実的な方法がない
-              skip: true,
               (widgetTester) async {
                 await showActListPage(widgetTester);
 
