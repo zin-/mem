@@ -86,7 +86,7 @@ class _ActListViewComponent extends StatelessWidget {
         {
           "_memId": _memId,
           "_groupedActList": _groupedActListByDate,
-          "_mems": _memList,
+          "_memList": _memList,
           "_timeView": _timeView,
         },
       );
