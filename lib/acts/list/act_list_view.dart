@@ -78,44 +78,11 @@ class _ActListViewComponent extends StatelessWidget {
                 ),
                 sliver: SliverList(
                   delegate: _timeView
-                      ? SliverChildBuilderDelegate(
-                          childCount: e.value
-                              .groupListsBy((element) => element.memId)
-                              .length,
-                          (context, index) {
-                            final entry = e.value
-                                .groupListsBy((element) => element.memId)
-                                .entries
-                                .toList()[index];
-
-                            return TotalActTimeListItem(
-                              entry.value,
-                              _mems.length >= 2
-                                  ? _mems.singleWhereOrNull(
-                                      (element) => element.id == entry.key)
-                                  : null,
-                            );
-                          },
+                      ? _SummaryActListItem(
+                          e.value.groupListsBy((act) => act.memId),
+                          _mems,
                         )
-                      : SliverChildBuilderDelegate(
-                          childCount: e.value.length,
-                          (context, index) {
-                            final act = e.value.toList()[index];
-                            if (act is SavedAct) {
-                              return ActListItemView(
-                                context,
-                                act,
-                                mem: _mems.length >= 2
-                                    ? _mems.singleWhereOrNull(
-                                        (element) => element.id == act.memId,
-                                      )
-                                    : null,
-                              );
-                            } else {
-                              return null;
-                            }
-                          },
-                        ),
+                      : _SimpleActListItem(e.value, _mems),
                 ),
               ),
             ),
@@ -123,4 +90,49 @@ class _ActListViewComponent extends StatelessWidget {
         ),
         [_memId, _groupedActList, _mems, _timeView],
       );
+}
+
+class _SummaryActListItem extends SliverChildBuilderDelegate {
+  _SummaryActListItem(
+    Map<int, List<Act>> groupedActListByMemId,
+    List<SavedMem> memList,
+  ) : super(
+          childCount: groupedActListByMemId.length,
+          (context, index) {
+            final entry = groupedActListByMemId.entries.toList()[index];
+
+            return TotalActTimeListItem(
+              entry.value,
+              memList.length >= 2
+                  ? memList
+                      .singleWhereOrNull((element) => element.id == entry.key)
+                  : null,
+            );
+          },
+        );
+}
+
+class _SimpleActListItem extends SliverChildBuilderDelegate {
+  _SimpleActListItem(
+    List<Act> actList,
+    List<SavedMem> memList,
+  ) : super(
+          childCount: actList.length,
+          (context, index) {
+            final act = actList[index];
+            if (act is SavedAct) {
+              return ActListItemView(
+                context,
+                act,
+                mem: memList.length >= 2
+                    ? memList.singleWhereOrNull(
+                        (element) => element.id == act.memId,
+                      )
+                    : null,
+              );
+            } else {
+              return null;
+            }
+          },
+        );
 }
