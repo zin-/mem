@@ -22,7 +22,7 @@ class ActLineChartPage extends ConsumerWidget {
           return Scaffold(
             appBar: AppBar(title: Text(memName)),
             body: Padding(
-              padding: pagePadding,
+              padding: defaultPadding,
               child: AsyncValueView(
                 loadActList(_memId),
                 (loaded) => LineChartWrapper(

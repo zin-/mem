@@ -2,7 +2,7 @@ import 'package:flutter/rendering.dart';
 
 const _pagePaddingValue = 16.0;
 const bottomSheetPadding = EdgeInsets.all(10.0);
-const pagePadding = EdgeInsets.all(_pagePaddingValue);
+const defaultPadding = EdgeInsets.all(_pagePaddingValue);
 const pageTopPadding = EdgeInsets.fromLTRB(
   _pagePaddingValue,
   _pagePaddingValue,

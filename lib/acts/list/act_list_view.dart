@@ -13,7 +13,6 @@ import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/values/dimens.dart';
 
 import 'item/view.dart';
 
@@ -47,7 +46,7 @@ class ActListView extends ConsumerWidget {
             ref.watch(timeViewProvider),
           ),
         ),
-        _memId,
+        {"_memId": _memId},
       );
 }
 
@@ -71,11 +70,7 @@ class _ActListViewComponent extends StatelessWidget {
             ActListAppBar(_memId),
             ..._groupedActList.entries.map(
               (e) => SliverStickyHeader(
-                header: Container(
-                  padding: pagePadding,
-                  color: Colors.white,
-                  child: ActListSubHeader(e),
-                ),
+                header: ActListSubHeader(e),
                 sliver: SliverList(
                   delegate: _timeView
                       ? _SummaryActListItem(
@@ -88,7 +83,12 @@ class _ActListViewComponent extends StatelessWidget {
             ),
           ],
         ),
-        [_memId, _groupedActList, _mems, _timeView],
+        {
+          "_memId": _memId,
+          "_groupedActList": _groupedActList,
+          "_mems": _mems,
+          "_timeView": _timeView,
+        },
       );
 }
 
