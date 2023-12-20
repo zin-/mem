@@ -35,8 +35,8 @@ jobs:
             experimental: true
           - android-emulator-runner: native
             os: ubuntu-latest
-            java-version: 17
             experimental: true
+            java-version: 17
 
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.continue-on-error }}
