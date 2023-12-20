@@ -26,17 +26,20 @@ jobs:
         # 複数のAndroid Emulator Runnerを使う
         #   パフォーマンスチェックのため
         #   Github actionsの実行時間制限とかが出始めたらやめる
-#        TODO 途中だが次のタスクに進みたいので中断する
-#        android-emulator-runner: [ malinskiy, reactivecircus, native ]
-        android-emulator-runner: [ malinskiy, reactivecircus ]
+        android-emulator-runner: [ malinskiy, reactivecircus, native ]
         include:
           - os: macos-latest
             java-version: 11
-#          - android-emulator-runner: native
-#            os: ubuntu-latest
-#            java-version: 17
+            experimental: false
+          - android-emulator-runner: malinskiy
+            experimental: true
+          - android-emulator-runner: native
+            os: ubuntu-latest
+            java-version: 17
+            experimental: true
 
     runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.continue-on-error }}
 
 # TODO 画面サイズ
 # TODO OSバージョン
@@ -91,7 +94,6 @@ jobs:
           reporter: "flutter-json"
           fail-on-error: true
           fail-on-empty: true
-        continue-on-error: true
       - name: "Upload coverage"
         uses: codecov/codecov-action@v3
         with:
