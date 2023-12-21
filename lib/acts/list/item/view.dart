@@ -5,7 +5,6 @@ import 'package:mem/logger/log_service.dart';
 
 import 'editing_act_dialog.dart';
 
-// TODO 年月日は不要なので表示しない
 class ActListItemView extends StatelessWidget {
   final SavedAct _act;
 
