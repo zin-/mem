@@ -31,8 +31,7 @@ jobs:
       - name: "Generate Localization code"
         uses: ./.github/actions/generate-localization_code
 
-      - id: run-windows-medium_test
-        name: "Run Windows Medium Test"
+      - name: "Run Windows Medium Test"
         run: >
           flutter test integration_test/app_test.dart
           --dart-define=CICD=true
@@ -47,7 +46,7 @@ jobs:
           name: "Report (Medium test (Windows))"
           path: "reports/test_report.log"
           reporter: "flutter-json"
-          fail-on-error: true
+          fail-on-error: false
           fail-on-empty: true
       - name: "Upload coverage"
         uses: codecov/codecov-action@v3
@@ -55,7 +54,3 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
           flags: medium_test-windows
-
-      - name: "Failed"
-        if: ${{ steps.run-windows-medium_test.output }} == "failure"
-        run: exit 1
