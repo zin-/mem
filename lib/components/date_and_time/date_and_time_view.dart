@@ -5,16 +5,22 @@ import 'package:mem/core/date_and_time/date_and_time.dart';
 
 class DateAndTimeText extends StatelessWidget {
   final DateAndTime _dateAndTime;
+  final bool _showDate;
   final TextStyle? _style;
 
-  const DateAndTimeText(this._dateAndTime, {super.key, TextStyle? style})
-      : _style = style;
+  const DateAndTimeText(
+    this._dateAndTime, {
+    super.key,
+    showDate = true,
+    TextStyle? style,
+  })  : _showDate = showDate,
+        _style = style;
 
   @override
   Widget build(BuildContext context) {
     if (_dateAndTime.isAllDay) {
       return DateText(_dateAndTime);
-    } else {
+    } else if (_showDate) {
       return Flex(
         direction: Axis.horizontal,
         mainAxisSize: MainAxisSize.min,
@@ -24,6 +30,8 @@ class DateAndTimeText extends StatelessWidget {
           TimeOfDayText(TimeOfDay.fromDateTime(_dateAndTime), style: _style),
         ],
       );
+    } else {
+      return TimeOfDayText(TimeOfDay.fromDateTime(_dateAndTime), style: _style);
     }
   }
 }

@@ -18,7 +18,10 @@ class ActListItemView extends StatelessWidget {
   Widget build(BuildContext context) => v(
         () {
           return ListTile(
-            title: DateAndTimePeriodTexts(_act.period),
+            title: DateAndTimePeriodTexts(
+              _act.period,
+              showDate: false,
+            ),
             subtitle: _memName == null ? null : Text(_memName!),
             onLongPress: () {
               showDialog(
