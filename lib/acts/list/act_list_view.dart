@@ -125,13 +125,13 @@ class _SimpleActListItem extends SliverChildBuilderDelegate {
             final act = actList[index];
             if (act is SavedAct) {
               return ActListItemView(
-                context,
                 act,
-                mem: memList.length >= 2
-                    ? memList.singleWhereOrNull(
-                        (element) => element.id == act.memId,
-                      )
-                    : null,
+                (memList.length >= 2
+                        ? memList.singleWhereOrNull(
+                            (element) => element.id == act.memId,
+                          )
+                        : null)
+                    ?.name,
               );
             } else {
               return null;
