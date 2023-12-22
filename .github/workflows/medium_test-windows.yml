@@ -46,7 +46,7 @@ jobs:
           name: "Report (Medium test (Windows))"
           path: "reports/test_report.log"
           reporter: "flutter-json"
-          fail-on-error: false
+          fail-on-error: true
           fail-on-empty: true
       - name: "Upload coverage"
         uses: codecov/codecov-action@v3
