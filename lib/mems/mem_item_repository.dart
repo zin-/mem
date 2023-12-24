@@ -5,31 +5,31 @@ import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 
 class MemItemRepository
-    extends DatabaseTupleRepository<MemItem, SavedMemItem<int>, int> {
-  Future<Iterable<SavedMemItem<int>>> shipByMemId(int memId) => v(
+    extends DatabaseTupleRepository<MemItem, SavedMemItem, int> {
+  Future<Iterable<SavedMemItem>> shipByMemId(int memId) => v(
         () => super.ship(Equals(defFkMemItemsMemId.name, memId)),
         {'memId': memId},
       );
 
-  Future<Iterable<SavedMemItem<int>>> archiveByMemId(int memId) => v(
+  Future<Iterable<SavedMemItem>> archiveByMemId(int memId) => v(
         () async => Future.wait(
             (await shipByMemId(memId)).map((e) => super.archive(e))),
         {'memId': memId},
       );
 
-  Future<Iterable<SavedMemItem<int>>> unarchiveByMemId(int memId) => v(
+  Future<Iterable<SavedMemItem>> unarchiveByMemId(int memId) => v(
         () async => Future.wait(
             (await shipByMemId(memId)).map((e) => super.unarchive(e))),
         {'memId': memId},
       );
 
-  Future<Iterable<SavedMemItem<int>>> wasteByMemId(int memId) => v(
+  Future<Iterable<SavedMemItem>> wasteByMemId(int memId) => v(
         () async => await super.waste(Equals(defFkMemItemsMemId.name, memId)),
         {'memId': memId},
       );
 
   @override
-  SavedMemItem<int> pack(Map<String, dynamic> tuple) => SavedMemItem(
+  SavedMemItem pack(Map<String, dynamic> tuple) => SavedMemItem(
         tuple[defFkMemItemsMemId.name],
         MemItemType.values.firstWhere(
           (v) => v.name == tuple[defColMemItemsType.name],

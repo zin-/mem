@@ -102,8 +102,9 @@ void testActScenario() => group(': $_scenarioName', () {
                 expect(startIconFinder, findsNothing);
                 expect(stopIconFinder, findsNothing);
                 [
-                  "Acts",
+                  "All",
                   dateText(zeroDate),
+                  "1",
                   oneMin.format(),
                   oneMin.format(),
                   "1",
@@ -132,15 +133,12 @@ void testActScenario() => group(': $_scenarioName', () {
                 expect(stopIconFinder, findsNothing);
                 expect(find.byIcon(Icons.access_time), findsOneWidget);
                 [
-                  "Acts",
+                  "All",
                   dateText(zeroDate),
                   "1",
-                  dateText(zeroDate),
-                  " ",
+                  oneMin.format(),
                   timeText(zeroDate),
                   "~",
-                  dateText(oneMinDate),
-                  " ",
                   timeText(oneMinDate),
                   insertedMemName,
                 ].forEachIndexed((index, t) {
@@ -192,16 +190,11 @@ void testActScenario() => group(': $_scenarioName', () {
                   insertedMemName,
                   dateText(zeroDate),
                   "2",
-                  dateText(zeroDate),
-                  " ",
+                  oneMin.format(),
                   timeText(zeroDate),
                   "~",
-                  dateText(zeroDate),
-                  " ",
                   timeText(zeroDate),
                   "~",
-                  dateText(oneMinDate),
-                  " ",
                   timeText(oneMinDate),
                 ].forEachIndexed((index, t) {
                   expect(
@@ -232,18 +225,14 @@ void testActScenario() => group(': $_scenarioName', () {
                 insertedMemName,
                 dateText(startTime),
                 "1",
-                dateText(startTime),
-                " ",
+                Duration.zero.format(),
                 timeText(startTime),
                 "~",
                 dateText(zeroDate),
                 "1",
-                dateText(zeroDate),
-                " ",
+                oneMin.format(),
                 timeText(zeroDate),
                 "~",
-                dateText(oneMinDate),
-                " ",
                 timeText(oneMinDate),
               ].forEachIndexed((index, t) {
                 expect(
@@ -262,21 +251,15 @@ void testActScenario() => group(': $_scenarioName', () {
                 insertedMemName,
                 dateText(startTime),
                 "1",
-                dateText(startTime),
-                " ",
+                const Duration(seconds: 2).format(),
                 timeText(startTime),
                 "~",
-                dateText(stopTime),
-                " ",
                 timeText(stopTime),
                 dateText(zeroDate),
                 "1",
-                dateText(zeroDate),
-                " ",
+                oneMin.format(),
                 timeText(zeroDate),
                 "~",
-                dateText(oneMinDate),
-                " ",
                 timeText(oneMinDate),
               ].forEachIndexed((index, t) {
                 expect(
@@ -297,25 +280,17 @@ void testActScenario() => group(': $_scenarioName', () {
                 insertedMemName,
                 dateText(startTime2),
                 "2",
-                dateText(startTime2),
-                " ",
+                const Duration(seconds: 2).format(),
                 timeText(startTime2),
                 "~",
-                dateText(startTime),
-                " ",
                 timeText(startTime),
                 "~",
-                dateText(stopTime),
-                " ",
                 timeText(stopTime),
                 dateText(zeroDate),
                 "1",
-                dateText(zeroDate),
-                " ",
+                oneMin.format(),
                 timeText(zeroDate),
                 "~",
-                dateText(oneMinDate),
-                " ",
                 timeText(oneMinDate),
               ].forEachIndexed((index, t) {
                 expect(
@@ -341,87 +316,82 @@ void testActScenario() => group(': $_scenarioName', () {
               );
             });
 
-            testWidgets(': save.', (widgetTester) async {
-              await showActListPage(widgetTester);
+            testWidgets(
+              ': save.',
+              (widgetTester) async {
+                await showActListPage(widgetTester);
 
-              await widgetTester.longPress(find.text(dateText(zeroDate)).at(1));
-              await widgetTester.pumpAndSettle();
+                await widgetTester
+                    .longPress(find.text(timeText(zeroDate)).at(0));
+                await widgetTester.pumpAndSettle();
 
-              await widgetTester.tap(find.byType(Switch).at(1));
-              await widgetTester.pump();
+                await widgetTester.tap(find.byType(Switch).at(1));
+                await widgetTester.pump();
 
-              final pickedDate = DateTime.now();
-              await widgetTester.tap(find.text('OK'));
-              await widgetTester.pump();
+                final pickedDate = DateTime.now();
+                await widgetTester.tap(find.text('OK'));
+                await widgetTester.pump();
 
-              await widgetTester.tap(find.byIcon(Icons.save_alt));
-              await widgetTester.pumpAndSettle(waitSideEffectDuration);
+                await widgetTester.tap(find.byIcon(Icons.save_alt));
+                await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
-              [
-                insertedMemName,
-                dateText(zeroDate),
-                "2",
-                dateText(zeroDate),
-                " ",
-                timeText(zeroDate),
-                "~",
-                dateText(pickedDate),
-                " ",
-                timeText(pickedDate),
-                dateText(zeroDate),
-                " ",
-                timeText(zeroDate),
-                "~",
-                dateText(oneMinDate),
-                " ",
-                timeText(oneMinDate),
-              ].forEachIndexed((index, t) {
-                expect(
-                  (widgetTester.widget(find.byType(Text).at(index)) as Text)
-                      .data,
-                  t,
-                  reason: "Index is \"$index\".",
-                );
-              });
+                [
+                  insertedMemName,
+                  dateText(zeroDate),
+                  "2",
+                  "skip",
+                  timeText(zeroDate),
+                  "~",
+                  timeText(pickedDate),
+                  timeText(zeroDate),
+                  "~",
+                  timeText(oneMinDate),
+                ].forEachIndexed((index, expected) {
+                  expect(
+                    (widgetTester.widget(find.byType(Text).at(index)) as Text)
+                        .data,
+                    expected,
+                    reason: "Index is \"$index\".",
+                    skip: expected == "skip",
+                  );
+                });
 
-              await widgetTester.longPress(find.text(dateText(zeroDate)).at(2));
-              await widgetTester.pumpAndSettle();
+                await widgetTester
+                    .longPress(find.text(timeText(zeroDate)).at(1));
+                await widgetTester.pumpAndSettle();
 
-              await widgetTester.tap(find.byIcon(Icons.clear).at(1));
-              await widgetTester.pumpAndSettle();
+                await widgetTester.tap(find.byIcon(Icons.clear).at(1));
+                await widgetTester.pumpAndSettle();
 
-              await widgetTester.tap(find.byIcon(Icons.save_alt));
-              await widgetTester.pumpAndSettle(waitSideEffectDuration);
+                await widgetTester.tap(find.byIcon(Icons.save_alt));
+                await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
-              [
-                insertedMemName,
-                dateText(zeroDate),
-                "2",
-                dateText(zeroDate),
-                " ",
-                timeText(zeroDate),
-                "~",
-                dateText(zeroDate),
-                " ",
-                timeText(zeroDate),
-                "~",
-                dateText(pickedDate),
-                " ",
-                timeText(pickedDate),
-              ].forEachIndexed((index, t) {
-                expect(
-                  (widgetTester.widget(find.byType(Text).at(index)) as Text)
-                      .data,
-                  t,
-                  reason: "Index is \"$index\".",
-                );
-              });
-            });
+                [
+                  insertedMemName,
+                  dateText(zeroDate),
+                  "2",
+                  "skip",
+                  timeText(zeroDate),
+                  "~",
+                  timeText(zeroDate),
+                  "~",
+                  timeText(pickedDate),
+                ].forEachIndexed((index, expected) {
+                  expect(
+                    (widgetTester.widget(find.byType(Text).at(index)) as Text)
+                        .data,
+                    expected,
+                    reason: "Index is \"$index\".",
+                    skip: expected == "skip",
+                  );
+                });
+              },
+            );
 
             testWidgets(': delete.', (widgetTester) async {
               await showActListPage(widgetTester);
 
-              await widgetTester.longPress(find.text(dateText(zeroDate)).at(1));
+              await widgetTester.longPress(find.text(timeText(zeroDate)).at(0));
               await widgetTester.pumpAndSettle();
 
               await widgetTester.tap(find.byIcon(Icons.delete));
@@ -431,19 +401,17 @@ void testActScenario() => group(': $_scenarioName', () {
                 insertedMemName,
                 dateText(zeroDate),
                 "1",
-                dateText(zeroDate),
-                " ",
+                oneMin.format(),
                 timeText(zeroDate),
                 "~",
-                dateText(oneMinDate),
-                " ",
                 timeText(oneMinDate),
-              ].forEachIndexed((index, t) {
+              ].forEachIndexed((index, expected) {
                 expect(
                   (widgetTester.widget(find.byType(Text).at(index)) as Text)
                       .data,
-                  t,
+                  expected,
                   reason: "Index is \"$index\".",
+                  skip: expected == "skip",
                 );
               });
             });
@@ -515,7 +483,7 @@ void testActScenario() => group(': $_scenarioName', () {
             await showMemListPage(widgetTester);
 
             await widgetTester.tap(startIconFinder);
-            await widgetTester.pump();
+            await widgetTester.pumpAndSettle();
 
             expect(
               widgetTester.widget<Text>(find.byType(Text).at(4)).data,

@@ -1,56 +1,67 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/acts/list/states.dart';
-import 'package:mem/components/l10n.dart';
-import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/states.dart';
 
-class ActListAppBar extends ConsumerWidget {
-  final int? _memId;
+class ActListAppBarIF {
+  final String _title;
+  final void Function(bool changed) _changeDateViewMode;
+  final void Function(bool changed) _changeTimeViewMode;
 
-  const ActListAppBar(this._memId, {super.key});
+  ActListAppBarIF(
+    this._title,
+    this._changeDateViewMode,
+    this._changeTimeViewMode,
+  );
+
+  Map<String, dynamic> _toMap() => {
+        "_title": _title,
+      };
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => v(
-        () => _ActListAppBar(
-          _memId == null
-              ? null
-              : ref
-                  .watch(memsProvider)
-                  ?.singleWhereOrNull(
-                    (element) => element is SavedMem && element.id == _memId,
-                  )
-                  ?.name,
-          IconButton(
-            icon: Icon(
-              ref.watch(timeViewProvider) ? Icons.numbers : Icons.access_time,
-            ),
-            onPressed: () => ref
-                .read(timeViewProvider.notifier)
-                .updatedBy(!ref.read(timeViewProvider)),
-          ),
-        ),
-        _memId,
-      );
+  String toString() => _toMap().toString();
 }
 
-class _ActListAppBar extends StatelessWidget {
-  final String? _memName;
-  final IconButton _viewModeToggle;
+class ActListAppBar extends StatelessWidget {
+  final ActListAppBarIF _actListAppBarIF;
+  final bool _isDateView;
+  final bool _isTimeView;
 
-  const _ActListAppBar(this._memName, this._viewModeToggle);
+  const ActListAppBar(
+    this._actListAppBarIF,
+    this._isDateView,
+    this._isTimeView, {
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) => v(
         () => SliverAppBar(
-          title: Text(_memName ?? buildL10n(context).actListPageTitle),
+          title: Text(_actListAppBarIF._title),
           actions: [
-            _viewModeToggle,
+            IconButton(
+                onPressed: () => v(
+                      () => _actListAppBarIF._changeDateViewMode(!_isDateView),
+                      {"_isDateView": _isDateView},
+                    ),
+                icon: Icon(
+                  _isDateView
+                      ? Icons.calendar_view_month
+                      : Icons.calendar_view_day,
+                )),
+            IconButton(
+              onPressed: () => v(
+                () => _actListAppBarIF._changeTimeViewMode(!_isTimeView),
+                {"_isTimeView": _isTimeView},
+              ),
+              icon: Icon(
+                _isTimeView ? Icons.numbers : Icons.access_time,
+              ),
+            )
           ],
-          floating: true,
         ),
-        {_memName, _viewModeToggle},
+        {
+          "_actListAppBarIF": _actListAppBarIF,
+          "_isDateView": _isDateView,
+          "_isTimeView": _isTimeView,
+        },
       );
 }

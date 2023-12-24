@@ -24,14 +24,14 @@ class MemItem extends Entity {
       );
 }
 
-class SavedMemItem<I> extends MemItem with SavedDatabaseTupleMixin<I> {
+class SavedMemItem extends MemItem with SavedDatabaseTupleMixin<int> {
   @override
   int get memId => super.memId as int;
 
   SavedMemItem(super.memId, super.type, super.value);
 
   @override
-  SavedMemItem<I> copiedWith({
+  SavedMemItem copiedWith({
     int Function()? memId,
     dynamic Function()? value,
   }) =>

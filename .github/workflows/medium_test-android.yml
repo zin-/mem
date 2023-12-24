@@ -15,28 +15,26 @@ jobs:
   medium_test-android:
     name: "Medium test (Android)"
 
-    outputs:
-      malinskiy-status: ${{ steps.set-result.outputs.malinskiy-status }}
-      reactivecircus-status: ${{ steps.set-result.outputs.reactivecircus-status }}
-      native-status: ${{ steps.set-result.outputs.native-status }}
-
     strategy:
-      fail-fast: false
       matrix:
         # 複数のAndroid Emulator Runnerを使う
         #   パフォーマンスチェックのため
         #   Github actionsの実行時間制限とかが出始めたらやめる
-#        TODO 途中だが次のタスクに進みたいので中断する
-#        android-emulator-runner: [ malinskiy, reactivecircus, native ]
-        android-emulator-runner: [ malinskiy, reactivecircus ]
+        android-emulator-runner: [ malinskiy, reactivecircus, native ]
         include:
           - os: macos-latest
             java-version: 11
-#          - android-emulator-runner: native
-#            os: ubuntu-latest
-#            java-version: 17
+            experimental: false
+          - android-emulator-runner: malinskiy
+            experimental: true
+          - android-emulator-runner: native
+            os: ubuntu-latest
+            experimental: true
+            java-version: 17
+      fail-fast: false
 
     runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.continue-on-error }}
 
 # TODO 画面サイズ
 # TODO OSバージョン
@@ -79,10 +77,6 @@ jobs:
           android-target: default
           android-arch: x86_64 # FIXME これandroidのarchじゃなくて動かす側のcpu archだ
 
-      - id: set-result
-        name: "Set Result"
-        run: echo "${{ matrix.android-emulator-runner }}-status=${{ steps.run-android-medium_test.outputs.status }}" >> $GITHUB_OUTPUT
-
       - name: "Report"
         uses: dorny/test-reporter@v1
         with:
@@ -91,29 +85,9 @@ jobs:
           reporter: "flutter-json"
           fail-on-error: true
           fail-on-empty: true
-        continue-on-error: true
       - name: "Upload coverage"
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
           flags: medium_test-android-${{ matrix.android-emulator-runner }}
-
-  check-overall-results:
-    needs: medium_test-android
-    if: always()
-    name: "Check overall Android Medium test results"
-    runs-on: ubuntu-latest
-    steps:
-      - name: "Results"
-        run: |
-          echo "malinskiy-status: ${{ needs.medium_test-android.outputs.malinskiy-status }}"
-          echo "reactivecircus-status: ${{ needs.medium_test-android.outputs.reactivecircus-status }}"
-          echo "native-status: ${{ needs.medium_test-android.outputs.native-status }}"
-
-      - if: >
-          needs.medium_test-android.outputs.malinskiy-status != 'success' &&
-          needs.medium_test-android.outputs.reactivecircus-status != 'success' &&
-          needs.medium_test-android.outputs.native-status != 'success'
-        name: "No success results"
-        run: exit 1

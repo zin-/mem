@@ -38,6 +38,7 @@ jobs:
           --file-reporter json:reports/test_report.log
           --coverage
           --device-id windows
+        continue-on-error: true
 
       - name: "Report"
         uses: dorny/test-reporter@v1

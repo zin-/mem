@@ -6,8 +6,13 @@ import 'package:mem/logger/log_service.dart';
 
 class DateAndTimePeriodTexts extends StatelessWidget {
   final DateAndTimePeriod _dateAndTimePeriod;
+  final bool _showDate;
 
-  const DateAndTimePeriodTexts(this._dateAndTimePeriod, {super.key});
+  const DateAndTimePeriodTexts(
+    this._dateAndTimePeriod, {
+    super.key,
+    showDate = true,
+  }) : _showDate = showDate;
 
   @override
   Widget build(BuildContext context) => v(() {
@@ -15,11 +20,17 @@ class DateAndTimePeriodTexts extends StatelessWidget {
           children: [
             _dateAndTimePeriod.start == null
                 ? const SizedBox.shrink()
-                : DateAndTimeText(_dateAndTimePeriod.start!),
+                : DateAndTimeText(
+                    _dateAndTimePeriod.start!,
+                    showTime: _showDate,
+                  ),
             const Text('~'),
             _dateAndTimePeriod.end == null
                 ? const SizedBox.shrink()
-                : DateAndTimeText(_dateAndTimePeriod.end!),
+                : DateAndTimeText(
+                    _dateAndTimePeriod.end!,
+                    showTime: _showDate,
+                  ),
           ],
         );
       });

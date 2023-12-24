@@ -4,14 +4,14 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 
-class MemNotificationRepository extends DatabaseTupleRepository<
-    MemNotification, SavedMemNotification<int>, int> {
-  Future<Iterable<SavedMemNotification<int>>> shipByMemId(int memId) => v(
+class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
+    SavedMemNotification, int> {
+  Future<Iterable<SavedMemNotification>> shipByMemId(int memId) => v(
         () => super.ship(Equals(defFkMemNotificationsMemId.name, memId)),
         memId,
       );
 
-  Future<Iterable<SavedMemNotification<int>>> shipByMemIdAndAfterActStarted(
+  Future<Iterable<SavedMemNotification>> shipByMemIdAndAfterActStarted(
           int memId) =>
       v(
         () => super.ship(And([
@@ -24,14 +24,13 @@ class MemNotificationRepository extends DatabaseTupleRepository<
         memId,
       );
 
-  Future<Iterable<SavedMemNotification<int>>> wasteByMemId(int memId) => v(
+  Future<Iterable<SavedMemNotification>> wasteByMemId(int memId) => v(
         () => super.waste(Equals(defFkMemNotificationsMemId.name, memId)),
         memId,
       );
 
   @override
-  SavedMemNotification<int> pack(Map<String, dynamic> tuple) =>
-      SavedMemNotification<int>(
+  SavedMemNotification pack(Map<String, dynamic> tuple) => SavedMemNotification(
         tuple[defFkMemNotificationsMemId.name],
         MemNotificationType.fromName(tuple[defColMemNotificationsType.name]),
         tuple[defColMemNotificationsTime.name],

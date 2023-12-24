@@ -21,13 +21,13 @@ class MemService {
         () async {
           final mem = memDetail.mem;
 
-          final savedMem = (mem is SavedMem<int> && !undo
+          final savedMem = (mem is SavedMem && !undo
               ? await _memRepository.replace(mem)
               : await _memRepository.receive(mem));
           _notificationService.memReminder(savedMem);
 
           final savedMemItems = (await Future.wait(
-              memDetail.memItems.map((e) => (e is SavedMemItem<int> && !undo
+              memDetail.memItems.map((e) => (e is SavedMemItem && !undo
                   ? _memItemRepository.replace(
                       e.copiedWith(memId: () => savedMem.id),
                     )
@@ -48,7 +48,7 @@ class MemService {
                     );
                     return Future.value(e);
                   } else {
-                    return (e is SavedMemNotification<int> && !undo
+                    return (e is SavedMemNotification && !undo
                         ? _memNotificationRepository.replace(e)
                         : _memNotificationRepository.receive(e))
                       ..then(
@@ -87,7 +87,7 @@ class MemService {
         {'memId': memId},
       );
 
-  Future<MemDetail> archive(SavedMem<int> mem) => i(
+  Future<MemDetail> archive(SavedMem mem) => i(
         () async {
           final archivedMem = await _memRepository.archive(mem);
           final archivedMemItems =
@@ -100,7 +100,7 @@ class MemService {
         mem,
       );
 
-  Future<MemDetail> unarchive(SavedMem<int> mem) => i(
+  Future<MemDetail> unarchive(SavedMem mem) => i(
         () async {
           final unarchivedMem = await _memRepository.unarchive(mem);
           final unarchivedMemItems =

@@ -8,12 +8,20 @@ class Act extends Entity {
   final DateAndTimePeriod period;
 
   Act(this.memId, this.period);
+
+  Map<String, Object?> _toMap() => {
+        "memId": memId,
+        "period": period,
+      };
+
+  @override
+  String toString() => _toMap().toString();
 }
 
-class SavedAct<I> extends Act with SavedDatabaseTupleMixin<I> {
+class SavedAct extends Act with SavedDatabaseTupleMixin<int> {
   SavedAct(super.memId, super.period);
 
-  SavedAct<I> copiedWith(DateAndTimePeriod Function()? period) => SavedAct(
+  SavedAct copiedWith(DateAndTimePeriod Function()? period) => SavedAct(
         memId,
         period == null ? this.period : period(),
       )
@@ -21,4 +29,7 @@ class SavedAct<I> extends Act with SavedDatabaseTupleMixin<I> {
         ..createdAt = createdAt
         ..updatedAt = updatedAt
         ..archivedAt = archivedAt;
+
+  @override
+  Map<String, Object?> _toMap() => super._toMap()..addAll(unpack());
 }

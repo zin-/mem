@@ -12,7 +12,7 @@ import 'package:mem/mems/mem_service.dart';
 import 'package:mem/mems/states.dart';
 
 final loadMemItems =
-    FutureProvider.autoDispose.family<List<SavedMemItem<int>>, int?>(
+    FutureProvider.autoDispose.family<List<SavedMemItem>, int?>(
   (ref, memId) => v(
     () async {
       if (memId != null) {
@@ -89,7 +89,7 @@ final saveMem =
 final archiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
   (ref, memId) => v(
     () async {
-      final mem = ref.read(memDetailProvider(memId)).mem as SavedMem<int>;
+      final mem = ref.read(memDetailProvider(memId)).mem as SavedMem;
 
       final archived = await MemService().archive(mem);
 
@@ -108,7 +108,7 @@ final archiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
 final unarchiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
   (ref, memId) => v(
     () async {
-      final mem = ref.read(memDetailProvider(memId)).mem as SavedMem<int>;
+      final mem = ref.read(memDetailProvider(memId)).mem as SavedMem;
 
       final unarchived = await MemService().unarchive(mem);
 

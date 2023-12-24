@@ -7,10 +7,8 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 
-class MemRepository
-    extends DatabaseTupleRepository<Mem, SavedMem<int>, int> {
-  Future<List<SavedMem<int>>> shipByCondition(bool? archived, bool? done) =>
-      v(
+class MemRepository extends DatabaseTupleRepository<Mem, SavedMem, int> {
+  Future<List<SavedMem>> shipByCondition(bool? archived, bool? done) => v(
         () => super.ship(
           And([
             archived == null
@@ -32,11 +30,11 @@ class MemRepository
       );
 
   @override
-  SavedMem<int> pack(Map<String, dynamic> tuple) {
+  SavedMem pack(Map<String, dynamic> tuple) {
     final startOn = tuple[defColMemsStartOn.name];
     final endOn = tuple[defColMemsEndOn.name];
 
-    return SavedMem<int>(
+    return SavedMem(
       tuple[defColMemsName.name],
       tuple[defColMemsDoneAt.name],
       startOn == null && endOn == null

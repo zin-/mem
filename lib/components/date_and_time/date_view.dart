@@ -4,25 +4,31 @@ import 'package:mem/logger/log_service.dart';
 
 final DateFormat _dateFormat = DateFormat.yMd();
 
-String Function(DateTime dateTime) _buildFormatFunction(BuildContext context) {
+String Function(DateTime dateTime) _buildFormatFunction(
+  BuildContext context,
+  bool showDate,
+) {
   assert(debugCheckHasMediaQuery(context));
   assert(debugCheckHasMaterialLocalizations(context));
   final MaterialLocalizations localizations = MaterialLocalizations.of(context);
 
-  return localizations.formatCompactDate;
+  return showDate
+      ? localizations.formatCompactDate
+      : localizations.formatMonthYear;
 }
 
 class DateText extends StatelessWidget {
   final DateTime _dateTime;
+  final bool _showDate;
   final TextStyle? _style;
 
-  const DateText(this._dateTime, {super.key, TextStyle? style})
+  const DateText(this._dateTime, this._showDate, {super.key, TextStyle? style})
       : _style = style;
 
   @override
   Widget build(BuildContext context) => v(
         () => Text(
-          _buildFormatFunction(context)(_dateTime),
+          _buildFormatFunction(context, _showDate)(_dateTime),
           style: _style,
         ),
         _dateTime,
@@ -52,7 +58,9 @@ class DateTextFormField extends StatelessWidget {
         () {
           return TextFormField(
             controller: TextEditingController(
-              text: date == null ? '' : _buildFormatFunction(context)(date!),
+              text: date == null
+                  ? ''
+                  : _buildFormatFunction(context, true)(date!),
             ),
             decoration: InputDecoration(
               hintText: _dateFormat.pattern,
