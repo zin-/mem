@@ -7,21 +7,26 @@ import 'package:mem/mems/detail/page.dart';
 import 'package:mem/mems/states.dart';
 import 'package:mem/values/durations.dart';
 
-void showMemDetailPage(BuildContext context, WidgetRef ref, int? memId) => v(
+// FIXME 使い勝手が悪いので改修する
+void showMemDetailPage(BuildContext context, WidgetRef? ref, int? memId) => v(
       () {
         Navigator.of(context)
             .push<bool?>(
-              PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    MemDetailPage(memId),
-                transitionsBuilder: _showMemDetailTransitionBuilder,
-                transitionDuration: defaultTransitionDuration,
-                reverseTransitionDuration: defaultTransitionDuration,
-              ),
-            )
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                MemDetailPage(memId),
+            transitionsBuilder: _showMemDetailTransitionBuilder,
+            transitionDuration: defaultTransitionDuration,
+            reverseTransitionDuration: defaultTransitionDuration,
+          ),
+        )
             .then(
-              (result) => handleRemoved(context, ref, memId, result),
-            );
+          (result) {
+            if (ref != null) {
+              handleRemoved(context, ref, memId, result);
+            }
+          },
+        );
       },
       [context, ref, memId],
     );
