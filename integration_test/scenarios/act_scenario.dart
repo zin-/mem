@@ -322,7 +322,7 @@ void testActScenario() => group(': $_scenarioName', () {
                 await showActListPage(widgetTester);
 
                 await widgetTester
-                    .longPress(find.text(dateText(zeroDate)).at(1));
+                    .longPress(find.text(timeText(zeroDate)).at(0));
                 await widgetTester.pumpAndSettle();
 
                 await widgetTester.tap(find.byType(Switch).at(1));
@@ -339,31 +339,25 @@ void testActScenario() => group(': $_scenarioName', () {
                   insertedMemName,
                   dateText(zeroDate),
                   "2",
-                  dateText(zeroDate),
-                  " ",
+                  "skip",
                   timeText(zeroDate),
                   "~",
-                  dateText(pickedDate),
-                  " ",
                   timeText(pickedDate),
-                  dateText(zeroDate),
-                  " ",
                   timeText(zeroDate),
                   "~",
-                  dateText(oneMinDate),
-                  " ",
                   timeText(oneMinDate),
-                ].forEachIndexed((index, t) {
+                ].forEachIndexed((index, expected) {
                   expect(
                     (widgetTester.widget(find.byType(Text).at(index)) as Text)
                         .data,
-                    t,
+                    expected,
                     reason: "Index is \"$index\".",
+                    skip: expected == "skip",
                   );
                 });
 
                 await widgetTester
-                    .longPress(find.text(dateText(zeroDate)).at(2));
+                    .longPress(find.text(timeText(zeroDate)).at(1));
                 await widgetTester.pumpAndSettle();
 
                 await widgetTester.tap(find.byIcon(Icons.clear).at(1));
@@ -376,23 +370,19 @@ void testActScenario() => group(': $_scenarioName', () {
                   insertedMemName,
                   dateText(zeroDate),
                   "2",
-                  dateText(zeroDate),
-                  " ",
+                  "skip",
                   timeText(zeroDate),
                   "~",
-                  dateText(zeroDate),
-                  " ",
                   timeText(zeroDate),
                   "~",
-                  dateText(pickedDate),
-                  " ",
                   timeText(pickedDate),
-                ].forEachIndexed((index, t) {
+                ].forEachIndexed((index, expected) {
                   expect(
                     (widgetTester.widget(find.byType(Text).at(index)) as Text)
                         .data,
-                    t,
+                    expected,
                     reason: "Index is \"$index\".",
+                    skip: expected == "skip",
                   );
                 });
               },
@@ -401,7 +391,7 @@ void testActScenario() => group(': $_scenarioName', () {
             testWidgets(': delete.', (widgetTester) async {
               await showActListPage(widgetTester);
 
-              await widgetTester.longPress(find.text(dateText(zeroDate)).at(1));
+              await widgetTester.longPress(find.text(timeText(zeroDate)).at(0));
               await widgetTester.pumpAndSettle();
 
               await widgetTester.tap(find.byIcon(Icons.delete));
@@ -412,19 +402,16 @@ void testActScenario() => group(': $_scenarioName', () {
                 dateText(zeroDate),
                 "1",
                 oneMin.format(),
-                dateText(zeroDate),
-                " ",
                 timeText(zeroDate),
                 "~",
-                dateText(oneMinDate),
-                " ",
                 timeText(oneMinDate),
-              ].forEachIndexed((index, t) {
+              ].forEachIndexed((index, expected) {
                 expect(
                   (widgetTester.widget(find.byType(Text).at(index)) as Text)
                       .data,
-                  t,
+                  expected,
                   reason: "Index is \"$index\".",
+                  skip: expected == "skip",
                 );
               });
             });
