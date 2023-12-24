@@ -11,6 +11,7 @@ class AsyncValueView<D> extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) =>
       ref.watch(_asyncValueProvider).when(
+            // TODO ロードしたデータではなく、watchedを渡す
             data: (D loaded) => v(() => _builder(loaded), loaded),
             error: (error, stackTrace) => v(
               () => Text(error.toString()),
