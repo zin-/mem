@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/acts/list/act_list_view.dart';
+import 'package:mem/acts/list/act_list.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/list/body.dart';
@@ -44,7 +44,7 @@ class _HomePage extends StatefulWidget {
   static final _scrollController = ScrollController();
   final _pages = [
     MemListBody(_scrollController),
-    const ActListView(null),
+    const ActList(null),
   ];
   final floatingActionButtons = [
     ShowNewMemFab(_scrollController),

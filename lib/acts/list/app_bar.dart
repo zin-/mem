@@ -1,50 +1,49 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/acts/list/states.dart';
-import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/states.dart';
-import 'package:mem/values/constants.dart';
 
-class ActListAppBar extends ConsumerWidget {
-  final int? _memId;
+class ActListAppBarIF {
+  final String _title;
+  final void Function(bool changed) _changeViewMode;
 
-  const ActListAppBar(this._memId, {super.key});
+  ActListAppBarIF(this._title, this._changeViewMode);
+
+  Map<String, dynamic> _toMap() => {
+        "_title": _title,
+      };
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => v(
-        () => _ActListAppBar(
-          _memId == null
-              ? buildL10n(context).defaultActListPageTitle
-              : ref.watch(memProvider(_memId!))?.name ?? somethingWrong,
-          IconButton(
-            icon: Icon(
-              ref.watch(timeViewProvider) ? Icons.numbers : Icons.access_time,
-            ),
-            onPressed: () => ref
-                .read(timeViewProvider.notifier)
-                .updatedBy(!ref.read(timeViewProvider)),
-          ),
-        ),
-        _memId,
-      );
+  String toString() => _toMap().toString();
 }
 
-class _ActListAppBar extends StatelessWidget {
-  final String _title;
-  final IconButton _viewModeToggle;
+class ActListAppBar extends StatelessWidget {
+  final ActListAppBarIF _actListAppBarIF;
+  final bool _isTimeView;
 
-  const _ActListAppBar(this._title, this._viewModeToggle);
+  const ActListAppBar(
+    this._actListAppBarIF,
+    this._isTimeView, {
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) => v(
         () => SliverAppBar(
-          floating: true,
-          title: Text(_title),
+          title: Text(_actListAppBarIF._title),
           actions: [
-            _viewModeToggle,
+            IconButton(
+              onPressed: () => v(
+                () => _actListAppBarIF._changeViewMode(!_isTimeView),
+                {"_isTimeView": _isTimeView},
+              ),
+              icon: Icon(
+                _isTimeView ? Icons.numbers : Icons.access_time,
+              ),
+            )
           ],
         ),
-        {_title, _viewModeToggle},
+        {
+          "_actListAppBarIF": _actListAppBarIF,
+          "_isTimeView": _isTimeView,
+        },
       );
 }

@@ -9,89 +9,111 @@ import 'package:mem/acts/list/sub_header.dart';
 import 'package:mem/acts/list/total_act_time_item.dart';
 import 'package:mem/acts/states.dart';
 import 'package:mem/components/async_value_view.dart';
+import 'package:mem/components/l10n.dart';
 import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/mems/states.dart';
+import 'package:mem/values/constants.dart';
 
 import 'item/view.dart';
 
-class ActListView extends ConsumerWidget {
+class ActList extends ConsumerWidget {
   final int? _memId;
 
-  const ActListView(this._memId, {super.key});
+  const ActList(this._memId, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => AsyncValueView(
           loadActList(_memId),
-          (data) => _ActListViewComponent(
-            _memId,
-            ref.watch(actListProvider(_memId)) ?? [],
-            (_memId == null
-                ? ref.watch(memListProvider)
-                : [
-                    ref.watch(memListProvider).singleWhereOrNull(
-                          (element) => element.id == _memId,
-                        )!
-                  ]),
-            ref.watch(timeViewProvider),
+          (loaded) => _ActList(
+            _ActListIF(
+              ActListAppBarIF(
+                _memId == null
+                    ? buildL10n(context).defaultActListPageTitle
+                    : ref.read(memProvider(_memId!))?.name ?? somethingWrong,
+                (bool changed) =>
+                    ref.read(timeViewProvider.notifier).updatedBy(changed),
+              ),
+              ref.watch(timeViewProvider),
+              ref.watch(actListProvider(_memId)) ?? [],
+              (_memId == null
+                  ? ref.watch(memListProvider)
+                  : [
+                      ref.watch(memListProvider).singleWhereOrNull(
+                            (element) => element.id == _memId,
+                          )!
+                    ]),
+            ),
           ),
         ),
         {"_memId": _memId},
       );
 }
 
-class _ActListViewComponent extends StatelessWidget {
-  final int? _memId;
+class _ActListIF {
+  final ActListAppBarIF _actListAppBarIF;
+  final bool _isTimeView;
   final List<Act> _actList;
   final List<SavedMem> _memList;
-  final bool _timeView;
 
-  const _ActListViewComponent(
-    this._memId,
+  _ActListIF(
+    this._actListAppBarIF,
+    this._isTimeView,
     this._actList,
     this._memList,
-    this._timeView,
   );
+
+  Map<String, dynamic> _toMap() => {
+        "_actListAppBarIF": _actListAppBarIF,
+        "_isTimeView": _isTimeView,
+        "_actList": _actList,
+        "_memList": _memList,
+      };
+
+  @override
+  String toString() => _toMap().toString();
+}
+
+class _ActList extends StatelessWidget {
+  final _ActListIF _actListIF;
+
+  const _ActList(this._actListIF);
 
   @override
   Widget build(BuildContext context) => v(
         () => CustomScrollView(
           slivers: [
-            ActListAppBar(_memId),
-            ..._actList
-                .groupListsBy((element) {
-                  final dateAndTime = element.period.start!.dateTime;
-
-                  return DateTime(
-                    dateAndTime.year,
-                    dateAndTime.month,
-                    dateAndTime.day,
-                  );
-                })
+            ActListAppBar(
+              _actListIF._actListAppBarIF,
+              _actListIF._isTimeView,
+            ),
+            ..._actListIF._actList
+                .groupListsBy(
+                  (element) => DateTime(
+                    element.period.start!.year,
+                    element.period.start!.month,
+                  ),
+                )
                 .entries
                 .map(
                   (e) => SliverStickyHeader(
                     header: ActListSubHeader(e),
                     sliver: SliverList(
-                      delegate: _timeView
+                      delegate: _actListIF._isTimeView
                           ? _SummaryActListItem(
-                              e.value.groupListsBy((act) => act.memId),
-                              _memList,
+                              e.value.groupListsBy((element) => element.memId),
+                              _actListIF._memList,
                             )
-                          : _SimpleActListItem(e.value, _memList),
+                          : _SimpleActListItem(e.value, _actListIF._memList),
                     ),
                   ),
-                ),
+                )
           ],
         ),
-        {
-          "_memId": _memId,
-          "_actList": _actList,
-          "_memList": _memList,
-          "_timeView": _timeView,
-        },
+        _actListIF,
       );
 }
 
