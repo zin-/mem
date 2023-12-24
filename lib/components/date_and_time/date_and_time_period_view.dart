@@ -22,14 +22,14 @@ class DateAndTimePeriodTexts extends StatelessWidget {
                 ? const SizedBox.shrink()
                 : DateAndTimeText(
                     _dateAndTimePeriod.start!,
-                    showDate: _showDate,
+                    showTime: _showDate,
                   ),
             const Text('~'),
             _dateAndTimePeriod.end == null
                 ? const SizedBox.shrink()
                 : DateAndTimeText(
                     _dateAndTimePeriod.end!,
-                    showDate: _showDate,
+                    showTime: _showDate,
                   ),
           ],
         );
