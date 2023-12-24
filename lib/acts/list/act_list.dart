@@ -35,8 +35,11 @@ class ActList extends ConsumerWidget {
                     ? buildL10n(context).defaultActListPageTitle
                     : ref.read(memProvider(_memId!))?.name ?? somethingWrong,
                 (bool changed) =>
+                    ref.read(dateViewProvider.notifier).updatedBy(changed),
+                (bool changed) =>
                     ref.read(timeViewProvider.notifier).updatedBy(changed),
               ),
+              ref.watch(dateViewProvider),
               ref.watch(timeViewProvider),
               ref.watch(actListProvider(_memId)) ?? [],
               (_memId == null
@@ -55,12 +58,14 @@ class ActList extends ConsumerWidget {
 
 class _ActListIF {
   final ActListAppBarIF _actListAppBarIF;
+  final bool _isDateView;
   final bool _isTimeView;
   final List<Act> _actList;
   final List<SavedMem> _memList;
 
   _ActListIF(
     this._actListAppBarIF,
+    this._isDateView,
     this._isTimeView,
     this._actList,
     this._memList,
@@ -68,6 +73,7 @@ class _ActListIF {
 
   Map<String, dynamic> _toMap() => {
         "_actListAppBarIF": _actListAppBarIF,
+        "_isDateView": _isDateView,
         "_isTimeView": _isTimeView,
         "_actList": _actList,
         "_memList": _memList,
@@ -88,6 +94,7 @@ class _ActList extends StatelessWidget {
           slivers: [
             ActListAppBar(
               _actListIF._actListAppBarIF,
+              _actListIF._isDateView,
               _actListIF._isTimeView,
             ),
             ..._actListIF._actList
@@ -95,12 +102,13 @@ class _ActList extends StatelessWidget {
                   (element) => DateTime(
                     element.period.start!.year,
                     element.period.start!.month,
+                    _actListIF._isDateView ? element.period.start!.day : 1,
                   ),
                 )
                 .entries
                 .map(
                   (e) => SliverStickyHeader(
-                    header: ActListSubHeader(e),
+                    header: ActListSubHeader(e, _actListIF._isDateView),
                     sliver: SliverList(
                       delegate: _actListIF._isTimeView
                           ? _SummaryActListItem(

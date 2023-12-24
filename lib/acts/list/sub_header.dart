@@ -11,9 +11,11 @@ class ActListSubHeader extends StatelessWidget {
   final _subHeaderTextStyle = const TextStyle(color: secondaryGreyColor);
 
   final MapEntry<DateTime, List<Act>> _groupedAct;
+  final bool _showDate;
 
   const ActListSubHeader(
-    this._groupedAct, {
+    this._groupedAct,
+    this._showDate, {
     super.key,
   });
 
@@ -28,6 +30,7 @@ class ActListSubHeader extends StatelessWidget {
               DateAndTimeText(
                 DateAndTime.from(_groupedAct.key),
                 style: _subHeaderTextStyle,
+                showDate: _showDate,
               ),
               Text(
                 _groupedAct.value.length.toString(),
