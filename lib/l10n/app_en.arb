@@ -2,6 +2,9 @@
   "@@locale": "en",
   "appTitle": "Mem",
 
+  "memListDestinationLabel": "List",
+  "actListDestinationLabel": "Acts",
+
   "memListPageTitle": "List",
   "memDetailPageTitle": "Detail",
   "actCounterConfigureTitle":"Select target",

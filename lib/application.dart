@@ -50,10 +50,6 @@ class _HomePage extends StatefulWidget {
     ShowNewMemFab(_scrollController),
     null,
   ];
-  final _destinations = [
-    const NavigationDestination(icon: Icon(Icons.list), label: "list"),
-    const NavigationDestination(icon: Icon(Icons.playlist_play), label: "acts"),
-  ];
 
   @override
   State<StatefulWidget> createState() => _HomePageState();
@@ -64,20 +60,33 @@ class _HomePageState extends State<_HomePage> {
 
   @override
   Widget build(BuildContext context) => v(
-        () => Scaffold(
-          body: SafeArea(child: widget._pages[_showIndex]),
-          floatingActionButton: widget._floatingActionButtons[_showIndex],
-          bottomNavigationBar: NavigationBar(
-            selectedIndex: _showIndex,
-            onDestinationSelected: (selectedIndex) => v(
-              () => setState(
-                () => _showIndex = selectedIndex,
+        () {
+          final l10n = buildL10n(context);
+
+          return Scaffold(
+            body: SafeArea(child: widget._pages[_showIndex]),
+            floatingActionButton: widget._floatingActionButtons[_showIndex],
+            bottomNavigationBar: NavigationBar(
+              selectedIndex: _showIndex,
+              onDestinationSelected: (selectedIndex) => v(
+                () => setState(
+                  () => _showIndex = selectedIndex,
+                ),
+                {"selectedIndex": selectedIndex},
               ),
-              {"selectedIndex": selectedIndex},
+              destinations: [
+                NavigationDestination(
+                  icon: const Icon(Icons.list),
+                  label: l10n.memListDestinationLabel,
+                ),
+                NavigationDestination(
+                  icon: const Icon(Icons.playlist_play),
+                  label: l10n.actListDestinationLabel,
+                ),
+              ],
             ),
-            destinations: widget._destinations,
-          ),
-        ),
+          );
+        },
         {"_showIndex": _showIndex},
       );
 }
