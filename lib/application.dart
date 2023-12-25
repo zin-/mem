@@ -46,11 +46,13 @@ class _HomePage extends StatefulWidget {
     MemListBody(_scrollController),
     const ActList(null),
   ];
-  final floatingActionButtons = [
+  final _floatingActionButtons = [
     ShowNewMemFab(_scrollController),
-    // TODO 不要か？
-    //  このときにやれるPrimary actionがないか検討する
     null,
+  ];
+  final _destinations = [
+    const NavigationDestination(icon: Icon(Icons.list), label: "list"),
+    const NavigationDestination(icon: Icon(Icons.playlist_play), label: "acts"),
   ];
 
   @override
@@ -58,25 +60,24 @@ class _HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<_HomePage> {
-  int _selectedIndex = 0;
+  int _showIndex = 0;
 
   @override
   Widget build(BuildContext context) => v(
         () => Scaffold(
-          body: SafeArea(child: widget._pages[_selectedIndex]),
-          floatingActionButton: widget.floatingActionButtons[_selectedIndex],
+          body: SafeArea(child: widget._pages[_showIndex]),
+          floatingActionButton: widget._floatingActionButtons[_showIndex],
           bottomNavigationBar: NavigationBar(
-            selectedIndex: _selectedIndex,
-            onDestinationSelected: (value) => setState(() {
-              _selectedIndex = value;
-            }),
-            destinations: const [
-              NavigationDestination(icon: Icon(Icons.list), label: "list"),
-              NavigationDestination(
-                  icon: Icon(Icons.playlist_play), label: "acts"),
-            ],
+            selectedIndex: _showIndex,
+            onDestinationSelected: (selectedIndex) => v(
+              () => setState(
+                () => _showIndex = selectedIndex,
+              ),
+              {"selectedIndex": selectedIndex},
+            ),
+            destinations: widget._destinations,
           ),
         ),
-        [_selectedIndex],
+        {"_showIndex": _showIndex},
       );
 }
