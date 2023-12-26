@@ -18,27 +18,26 @@ class _ShowNewMemFabState extends State<ShowNewMemFab>
     with SingleTickerProviderStateMixin {
   bool _show = true;
 
+  void _toggleShowOnScroll() => v(
+        () {
+          switch (widget._scrollController.position.userScrollDirection) {
+            case ScrollDirection.idle:
+              break;
+            case ScrollDirection.forward:
+              setState(() => _show = true);
+              break;
+            case ScrollDirection.reverse:
+              setState(() => _show = false);
+              break;
+          }
+        },
+        {'_show': _show},
+      );
+
   @override
   void initState() {
     super.initState();
-    widget._scrollController.addListener(() => v(
-          () {
-            if (widget._scrollController.position.userScrollDirection ==
-                    ScrollDirection.forward &&
-                !_show) {
-              setState(() {
-                _show = true;
-              });
-            } else if (widget._scrollController.position.userScrollDirection ==
-                    ScrollDirection.reverse &&
-                _show) {
-              setState(() {
-                _show = false;
-              });
-            }
-          },
-          {'_show': _show},
-        ));
+    widget._scrollController.addListener(_toggleShowOnScroll);
   }
 
   @override
@@ -60,5 +59,13 @@ class _ShowNewMemFabState extends State<ShowNewMemFab>
           ),
         ),
         {'_show': _show},
+      );
+
+  @override
+  void dispose() => v(
+        () {
+          widget._scrollController.removeListener(_toggleShowOnScroll);
+          super.dispose();
+        },
       );
 }
