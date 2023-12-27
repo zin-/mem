@@ -101,7 +101,7 @@ class _MemListItemViewComponent extends ListTile {
                   ],
                 ),
           subtitle: mem.period == null ? null : MemPeriodTexts(mem.id),
-          tileColor: mem.isArchived ? archivedColor : null,
+          tileColor: mem.isArchived ? secondaryGreyColor : null,
           onTap: () => onTap(mem.id),
         ) {
     verbose({

@@ -7,7 +7,6 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/list/body.dart';
 import 'package:mem/mems/list/show_new_mem_fab.dart';
 import 'package:mem/notifications/client.dart';
-import 'package:mem/values/colors.dart';
 
 class MemApplication extends StatelessWidget {
   final Widget? home;
@@ -27,12 +26,7 @@ class MemApplication extends StatelessWidget {
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               locale: languageCode == null ? null : Locale(languageCode!),
-              theme: ThemeData(
-                primarySwatch: primaryColor,
-                bottomAppBarTheme: const BottomAppBarTheme(
-                  color: primaryColor,
-                ),
-              ),
+              theme: ThemeData.light(useMaterial3: true),
               home: home ?? _HomePage(),
             ),
           );
