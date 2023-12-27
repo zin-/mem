@@ -80,7 +80,6 @@ class _MemDetailMenuComponent extends StatelessWidget {
         },
         icon: const Icon(
           Icons.show_chart,
-          color: Colors.white,
         ),
       );
 
@@ -95,13 +94,11 @@ class _MemDetailMenuComponent extends StatelessWidget {
         },
         icon: const Icon(
           Icons.play_arrow,
-          color: Colors.white,
         ),
       );
 
   IconButton _unarchiveIconButton(BuildContext context) => IconButton(
         icon: const Icon(Icons.unarchive),
-        color: Colors.white,
         onPressed: () {
           final l10n = buildL10n(context);
 
@@ -121,7 +118,6 @@ class _MemDetailMenuComponent extends StatelessWidget {
 
   IconButton _archiveIconButton(BuildContext context) => IconButton(
         icon: const Icon(Icons.archive),
-        color: Colors.white,
         onPressed: () {
           final l10n = buildL10n(context);
 
@@ -150,8 +146,8 @@ class _MemDetailMenuComponent extends StatelessWidget {
           value: MenuOption.remove,
           child: Row(
             children: [
-              const Icon(Icons.delete, color: Colors.black),
-              Text(l10n.removeAction)
+              const Icon(Icons.delete),
+              Text(l10n.removeAction),
             ],
           ),
         ),
@@ -196,10 +192,6 @@ class _RemoveMemAlertDialog extends StatelessWidget {
               child: Text(l10n.okAction),
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
-              ),
               onPressed: () => Navigator.of(context).pop(),
               child: Text(l10n.cancelAction),
             ),

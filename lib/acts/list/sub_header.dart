@@ -23,7 +23,6 @@ class ActListSubHeader extends StatelessWidget {
   Widget build(BuildContext context) => v(
         () => Container(
           padding: defaultPadding,
-          color: Colors.white,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
