@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/components/mem/list/filter.dart';
-import 'package:mem/mems/list/app_bar/states.dart';
+import 'package:mem/mems/list/states.dart';
 import 'package:mem/values/colors.dart';
 
 class MemListAppBar extends ConsumerWidget {
