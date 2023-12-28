@@ -47,7 +47,10 @@ class _HomePageState extends State<_HomePage> {
 
   final _bodies = [
     MemListBody(_scrollController),
-    const ActList(null),
+    ActList(
+      null,
+      _scrollController,
+    ),
   ];
   final _floatingActionButtons = [
     ShowNewMemFab(_scrollController),
@@ -82,7 +85,9 @@ class _HomePageState extends State<_HomePage> {
             body: SafeArea(child: _bodies[_showIndex]),
             floatingActionButton: _floatingActionButtons[_showIndex],
             bottomNavigationBar: AnimatedContainer(
-              height: _bottomAppBarIsHidden ? zeroHeight : defaultNavigationBarHeight,
+              height: _bottomAppBarIsHidden
+                  ? zeroHeight
+                  : defaultNavigationBarHeight,
               duration: defaultTransitionDuration,
               child: AnimatedOpacity(
                 opacity: _bottomAppBarIsHidden ? 0.0 : 1.0,
