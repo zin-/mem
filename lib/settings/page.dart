@@ -2,14 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:settings_ui/settings_ui.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
   @override
-  Widget build(BuildContext context) => d(
+  State<StatefulWidget> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  final String _startOfDayKey = "start_od_day";
+  TimeOfDay? _startOfDay;
+
+  @override
+  void initState() => v(
         () {
-          // TODO: implement build
+          super.initState();
+          _loadPreferences();
+        },
+      );
+
+  @override
+  Widget build(BuildContext context) => v(
+        () {
           final l10n = buildL10n(context);
 
           return Scaffold(
@@ -24,20 +40,29 @@ class SettingsPage extends StatelessWidget {
                       SettingsTile.navigation(
                         leading: const Icon(Icons.start),
                         title: Text(l10n.start_of_day_label),
-                        onPressed: (context) => d(
+                        onPressed: (context) => v(
                           () async {
                             final picked = await showTimePicker(
                               context: context,
                               initialTime: TimeOfDay.now(),
                             );
-                            // TODO save to preference
-                            debug(picked);
+                            final prefs = await SharedPreferences.getInstance();
+
+                            setState(() {
+                              _startOfDay = picked;
+                            });
+
+                            return picked == null
+                                ? await prefs.remove(_startOfDayKey)
+                                : await prefs.setString(
+                                    _startOfDayKey,
+                                    picked.serialize(),
+                                  );
                           },
                         ),
-                        value: Text(
-                          // TODO load from preference
-                          TimeOfDay.now().format(context),
-                        ),
+                        value: _startOfDay == null
+                            ? null
+                            : Text(_startOfDay!.format(context)),
                       )
                     ],
                   )
@@ -46,5 +71,38 @@ class SettingsPage extends StatelessWidget {
             ),
           );
         },
+      );
+
+  _loadPreferences() => v(
+        () async {
+          final prefs = await SharedPreferences.getInstance();
+
+          final startOfDay = prefs.getString(_startOfDayKey);
+
+          if (startOfDay != null) {
+            setState(
+              () => _startOfDay = TimeOfDayExtension.deserialize(startOfDay),
+            );
+          }
+        },
+      );
+}
+
+extension TimeOfDayExtension on TimeOfDay {
+  static deserialize(String text) => v(
+        () {
+          final hourAndMinute =
+              text.split(":").map((e) => int.parse(e)).toList();
+          return TimeOfDay(
+            hour: hourAndMinute[0],
+            minute: hourAndMinute[1],
+          );
+        },
+        {"text": text},
+      );
+
+  String serialize() => v(
+        () => "$hour:$minute",
+        toString(),
       );
 }

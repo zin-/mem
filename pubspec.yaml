@@ -39,6 +39,9 @@ dependencies:
   ## for Logger
   logger:
 
+  ## for Preferences
+  shared_preferences: ^2.2.2
+
   # for basic operations
   collection:
 
