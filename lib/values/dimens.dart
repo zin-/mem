@@ -15,3 +15,6 @@ const pageBottomPadding = EdgeInsets.fromLTRB(
   _pagePaddingValue,
   _pagePaddingValue,
 );
+
+const zeroHeight = 0.0;
+const defaultNavigationBarHeight = 80.0;
