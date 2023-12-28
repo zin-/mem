@@ -9,6 +9,7 @@
   "memDetailPageTitle": "Detail",
   "actCounterConfigureTitle":"Select target",
   "defaultActListPageTitle":"All",
+  "settingsPageTitle": "設定",
 
   "memNameLabel": "Name",
   "memMemoLabel": "Memo",

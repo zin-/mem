@@ -4,6 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/list/act_list.dart';
 import 'package:mem/components/l10n.dart';
+import 'package:mem/drawer.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/list/body.dart';
 import 'package:mem/mems/list/show_new_mem_fab.dart';
@@ -82,6 +83,7 @@ class _HomePageState extends State<_HomePage> {
           final l10n = buildL10n(context);
 
           return Scaffold(
+            drawer: ApplicationDrawer(l10n),
             body: SafeArea(child: _bodies[_showIndex]),
             floatingActionButton: _floatingActionButtons[_showIndex],
             bottomNavigationBar: AnimatedContainer(
