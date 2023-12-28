@@ -18,6 +18,9 @@ dependencies:
   intl:
   flutter_picker: ^2.1.0
 
+  ## for SettingsPage
+  settings_ui: ^2.0.2
+
   ## for View state management
   flutter_riverpod:
 

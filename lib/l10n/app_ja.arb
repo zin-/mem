@@ -61,6 +61,8 @@
   "pause_act_label": "一時停止",
   "start_label": "開始",
 
+  "start_of_day_label": "1日の開始時間",
+
   "reminder_name": "Reminder",
   "reminder_description": "To remind at specific time.",
   "repeated_reminder_name": "繰り返し通知",
