@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/components/l10n.dart';
 import 'package:mem/components/mem/list/filter.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/list/states.dart';
 
 class MemListAppBar extends ConsumerWidget {
@@ -30,46 +30,45 @@ class _MemListAppBar extends StatelessWidget {
   );
 
   @override
-  Widget build(BuildContext context) {
-    final l10n = buildL10n(context);
-
-    return SliverAppBar(
-      title: _onSearch
-          ? TextFormField(
-              autofocus: true,
-              decoration: const InputDecoration(
-                icon: Icon(Icons.search),
-              ),
-              onChanged: _onSearchTextChanged,
-            )
-          : Text(l10n.memListPageTitle),
-      floating: true,
-      actions: [
-        Row(
-          children: [
-            _onSearch
-                ? IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () {
-                      _onSearchTextChanged("");
-                      _changeOnSearch(false);
-                    },
-                  )
-                : IconButton(
-                    icon: const Icon(Icons.search),
-                    onPressed: () => _changeOnSearch(true),
+  Widget build(BuildContext context) => v(
+        () => SliverAppBar(
+          title: _onSearch
+              ? TextFormField(
+                  autofocus: true,
+                  decoration: const InputDecoration(
+                    icon: Icon(Icons.search),
                   ),
-            if (!_onSearch)
-              IconButton(
-                icon: const Icon(Icons.filter_list),
-                onPressed: () => showModalBottomSheet(
-                  context: context,
-                  builder: (context) => const MemListFilter(),
-                ),
-              ),
+                  onChanged: _onSearchTextChanged,
+                )
+              : null,
+          floating: true,
+          actions: [
+            Row(
+              children: [
+                _onSearch
+                    ? IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () {
+                          _onSearchTextChanged("");
+                          _changeOnSearch(false);
+                        },
+                      )
+                    : IconButton(
+                        icon: const Icon(Icons.search),
+                        onPressed: () => _changeOnSearch(true),
+                      ),
+                if (!_onSearch)
+                  IconButton(
+                    icon: const Icon(Icons.filter_list),
+                    onPressed: () => showModalBottomSheet(
+                      context: context,
+                      builder: (context) => const MemListFilter(),
+                    ),
+                  ),
+              ],
+            ),
           ],
         ),
-      ],
-    );
-  }
+        {"_onSearch": _onSearch},
+      );
 }
