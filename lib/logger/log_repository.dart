@@ -1,14 +1,13 @@
-
 import 'package:mem/framework/repository/repository.dart';
 
 import 'log_entity.dart';
 import 'logger_wrapper.dart';
 
-class LogRepository extends Repository<Log> {
+class LogRepository extends Repository<Log, void> {
   LoggerWrapper _loggerWrapper;
 
   @override
-  void receive(Log entity) => _loggerWrapper.log(
+  Future<void> receive(Log entity) async => _loggerWrapper.log(
         entity.level,
         entity.message,
         entity.error,

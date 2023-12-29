@@ -11,11 +11,11 @@ const methodChannelName = 'zin.playground.mem/act_counter';
 const initializeMethodName = 'initialize';
 const widgetProviderName = 'ActCounterProvider';
 
-class ActCounterRepository extends Repository<ActCounter> {
+class ActCounterRepository extends Repository<ActCounter, void> {
   final HomeWidgetAccessor? _homeWidgetAccessor;
 
   @override
-  Future<ActCounter> receive(ActCounter entity) => v(
+  Future<void> receive(ActCounter entity) => v(
         () async {
           final homeWidgetId = await _homeWidgetAccessor?.initialize(
             methodChannelName,
@@ -31,8 +31,6 @@ class ActCounterRepository extends Repository<ActCounter> {
 
             await _homeWidgetAccessor?.updateWidget(widgetProviderName);
           }
-
-          return entity;
         },
         entity,
       );

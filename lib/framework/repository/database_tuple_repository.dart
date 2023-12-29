@@ -12,7 +12,7 @@ import 'package:mem/framework/repository/condition/conditions.dart';
 //  ただ、これだと未保存のDatabaseTupleが
 // FIXME SavedEntityはSavedDatabaseTupleをmixinしている必要があるが型制約を定義できていない
 abstract class DatabaseTupleRepository<E extends Entity, SavedEntity extends E,
-    Id> implements Repository<E> {
+    Id> implements Repository<E, SavedEntity> {
   Map<String, dynamic> unpack(E entity);
 
   SavedEntity pack(Map<String, dynamic> tuple);
