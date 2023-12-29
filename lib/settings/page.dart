@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/settings/actions.dart';
 import 'package:settings_ui/settings_ui.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -46,15 +46,14 @@ class _SettingsPageState extends State<SettingsPage> {
                               context: context,
                               initialTime: TimeOfDay.now(),
                             );
-                            final prefs = await SharedPreferences.getInstance();
 
                             setState(() {
                               _startOfDay = picked;
                             });
 
                             return picked == null
-                                ? await prefs.remove(_startOfDayKey)
-                                : await prefs.setString(
+                                ? await remove(_startOfDayKey)
+                                : await save(
                                     _startOfDayKey,
                                     picked.serialize(),
                                   );
@@ -75,11 +74,9 @@ class _SettingsPageState extends State<SettingsPage> {
 
   _loadPreferences() => v(
         () async {
-          final prefs = await SharedPreferences.getInstance();
+          final startOfDay = await loadByKey(_startOfDayKey);
 
-          final startOfDay = prefs.getString(_startOfDayKey);
-
-          if (startOfDay != null) {
+          if (startOfDay is String) {
             setState(
               () => _startOfDay = TimeOfDayExtension.deserialize(startOfDay),
             );
