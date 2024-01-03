@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:settings_ui/settings_ui.dart';
 
 import 'helpers.dart';
 
@@ -33,6 +34,40 @@ void testSettingsScenario() => group(
             expect(find.text(l10n.start_of_day_label), findsOneWidget);
           },
         );
+
+        testWidgets(
+          ": pick & remove start of day.",
+          (widgetTester) async {
+            await _showPage(widgetTester);
+
+            await widgetTester.tap(find.text(l10n.start_of_day_label));
+            await widgetTester.pumpAndSettle();
+
+            final now = DateTime.now();
+
+            await widgetTester.tap(okFinder);
+            await widgetTester.pumpAndSettle();
+
+            expect(
+              widgetTester
+                  .widget<Text>(find
+                      .descendant(
+                        of: find.byType(SettingsTile),
+                        matching: find.byType(Text),
+                      )
+                      .at(1))
+                  .data,
+              timeText(now),
+            );
+
+            await widgetTester.tap(find.text(l10n.start_of_day_label));
+            await widgetTester.pumpAndSettle();
+            await widgetTester.tap(cancelFinder);
+            await widgetTester.pumpAndSettle();
+
+            expect(find.text(timeText(now)), findsNothing);
+          },
+        );
       },
     );
 
@@ -46,5 +81,15 @@ Future<void> _openDrawer(WidgetTester widgetTester) async {
       matching: find.byType(DrawerButtonIcon),
     ),
   );
+  await widgetTester.pumpAndSettle();
+}
+
+Future<void> _showPage(WidgetTester widgetTester) async {
+  await runApplication();
+  await widgetTester.pumpAndSettle();
+
+  await _openDrawer(widgetTester);
+
+  await widgetTester.tap(find.text(l10n.settingsPageTitle));
   await widgetTester.pumpAndSettle();
 }

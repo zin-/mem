@@ -44,7 +44,9 @@ final clearIconFinder = find.byIcon(Icons.clear);
 final searchIconFinder = find.byIcon(Icons.search);
 final closeIconFinder = find.byIcon(Icons.close);
 final filterListIconFinder = find.byIcon(Icons.filter_list);
+
 final okFinder = find.text('OK');
+final cancelFinder = find.text('Cancel');
 
 //  On MemList filter
 final showNotArchiveSwitchFinder = find.byType(Switch).at(0);
