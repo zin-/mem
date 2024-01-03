@@ -72,7 +72,7 @@ class _SettingsPageState extends State<SettingsPage> {
         },
       );
 
-  _loadPreferences() => v(
+  Future<void> _loadPreferences() => v(
         () async {
           final startOfDay = await loadByKey(_startOfDayKey);
 
