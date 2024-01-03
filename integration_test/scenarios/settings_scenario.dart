@@ -40,10 +40,9 @@ void testSettingsScenario() => group(
           (widgetTester) async {
             await _showPage(widgetTester);
 
+            final now = DateTime.now();
             await widgetTester.tap(find.text(l10n.start_of_day_label));
             await widgetTester.pumpAndSettle();
-
-            final now = DateTime.now();
 
             await widgetTester.tap(okFinder);
             await widgetTester.pumpAndSettle();
