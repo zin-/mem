@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/components/l10n.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/definition/database_definition.dart';
 import 'package:mem/framework/database/factory.dart';
@@ -30,6 +31,9 @@ Future<void> runApplication() => main(languageCode: 'en');
 
 Future closeMemListFilter(WidgetTester widgetTester) async =>
     await widgetTester.tapAt(const Offset(0, 0));
+
+// Localization(l10n) texts
+final l10n = buildL10n();
 
 // Finders
 final newMemFabFinder = find.byIcon(Icons.add);
