@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/settings/actions.dart';
+import 'package:mem/settings/keys.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -12,7 +13,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  final String _startOfDayKey = "start_od_day";
   TimeOfDay? _startOfDay;
 
   @override
@@ -52,11 +52,8 @@ class _SettingsPageState extends State<SettingsPage> {
                             });
 
                             return picked == null
-                                ? await remove(_startOfDayKey)
-                                : await save(
-                                    _startOfDayKey,
-                                    picked.serialize(),
-                                  );
+                                ? await remove(startOfDayKey)
+                                : await save(startOfDayKey, picked);
                           },
                         ),
                         value: _startOfDay == null
@@ -74,32 +71,11 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _loadPreferences() => v(
         () async {
-          final startOfDay = await loadByKey(_startOfDayKey);
+          final startOfDay = await loadByKey(startOfDayKey);
 
-          if (startOfDay is String) {
-            setState(
-              () => _startOfDay = TimeOfDayExtension.deserialize(startOfDay),
-            );
-          }
-        },
-      );
-}
-
-extension TimeOfDayExtension on TimeOfDay {
-  static deserialize(String text) => v(
-        () {
-          final hourAndMinute =
-              text.split(":").map((e) => int.parse(e)).toList();
-          return TimeOfDay(
-            hour: hourAndMinute[0],
-            minute: hourAndMinute[1],
+          setState(
+            () => _startOfDay = startOfDay as TimeOfDay?,
           );
         },
-        {"text": text},
-      );
-
-  String serialize() => v(
-        () => "$hour:$minute",
-        toString(),
       );
 }

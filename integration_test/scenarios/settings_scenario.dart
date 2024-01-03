@@ -38,6 +38,10 @@ void testSettingsScenario() => group(
         testWidgets(
           ": pick & remove start of day.",
           (widgetTester) async {
+            await runApplication();
+            await widgetTester.pumpAndSettle();
+
+            await _openDrawer(widgetTester);
             await _showPage(widgetTester);
 
             final now = DateTime.now();
@@ -67,6 +71,41 @@ void testSettingsScenario() => group(
             expect(find.text(timeText(now)), findsNothing);
           },
         );
+
+        testWidgets(
+          ": show saved.",
+          (widgetTester) async {
+            await runApplication();
+            await widgetTester.pumpAndSettle();
+
+            await _openDrawer(widgetTester);
+            await _showPage(widgetTester);
+
+            final now = DateTime.now();
+            await widgetTester.tap(find.text(l10n.start_of_day_label));
+            await widgetTester.pumpAndSettle();
+
+            await widgetTester.tap(okFinder);
+            await widgetTester.pumpAndSettle();
+
+            await widgetTester.pageBack();
+            await widgetTester.pumpAndSettle();
+
+            await _showPage(widgetTester);
+
+            expect(
+              widgetTester
+                  .widget<Text>(find
+                      .descendant(
+                        of: find.byType(SettingsTile),
+                        matching: find.byType(Text),
+                      )
+                      .at(1))
+                  .data,
+              timeText(now),
+            );
+          },
+        );
       },
     );
 
@@ -84,11 +123,6 @@ Future<void> _openDrawer(WidgetTester widgetTester) async {
 }
 
 Future<void> _showPage(WidgetTester widgetTester) async {
-  await runApplication();
-  await widgetTester.pumpAndSettle();
-
-  await _openDrawer(widgetTester);
-
   await widgetTester.tap(find.text(l10n.settingsPageTitle));
   await widgetTester.pumpAndSettle();
 }

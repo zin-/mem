@@ -48,8 +48,15 @@ class PreferenceRepository extends _KeyWithValueRepository<Preference, String> {
   factory PreferenceRepository() => _instance ??= PreferenceRepository._();
 }
 
+class PreferenceKey {
+  final String value;
+  final Type type;
+
+  PreferenceKey(this.value, this.type);
+}
+
 class Preference extends _KeyWithValue<String, Object?> {
-  Preference(super.value, super.key);
+  Preference(super.key, super.value);
 }
 
 abstract class _ExRepository<E extends _ExEntity> {}
