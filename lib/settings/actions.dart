@@ -1,35 +1,19 @@
 import 'package:mem/logger/log_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mem/settings/repository.dart';
+
+final _repository = PreferenceRepository();
 
 Future<bool> save(String key, Object? value) => v(
-      () async {
-        final sharedPreferences = await SharedPreferences.getInstance();
-
-        switch (value.runtimeType) {
-          case String:
-            return await sharedPreferences.setString(key, value as String);
-
-          default:
-            throw UnimplementedError();
-        }
-      },
+      () => _repository.receive(Preference(key, value)),
       {"key": key, "value": value},
     );
 
 Future<Object?> loadByKey(String key) => v(
-      () async {
-        final sharedPreferences = await SharedPreferences.getInstance();
-
-        return sharedPreferences.get(key);
-      },
+      () async => (await _repository.findByKey(key))?.value,
       {"key": key},
     );
 
 Future<bool> remove(String key) => v(
-      () async {
-        final sharedPreferences = await SharedPreferences.getInstance();
-
-        return sharedPreferences.remove(key);
-      },
+      () => _repository.discard(key),
       {"key": key},
     );
