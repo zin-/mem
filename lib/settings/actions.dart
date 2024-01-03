@@ -1,5 +1,4 @@
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/settings/preference.dart';
 import 'package:mem/settings/repository.dart';
 
 final _repository = PreferenceRepository();
