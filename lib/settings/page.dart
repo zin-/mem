@@ -1,27 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/components/async_value_view.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/settings/actions.dart';
 import 'package:mem/settings/keys.dart';
+import 'package:mem/settings/states.dart';
 import 'package:settings_ui/settings_ui.dart';
 
-class SettingsPage extends StatefulWidget {
+class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _SettingsPageState();
+  Widget build(BuildContext context, WidgetRef ref) => i(
+        () => AsyncValueView(
+          FutureProvider((ref) => loadByKey(startOfDayKey)),
+          (loaded) => _SettingsPage(
+            startOfDay: ref.watch(startOfDayProvider),
+            onStartOfDayChanged: (TimeOfDay? picked) => v(
+              () async {
+                picked == null
+                    ? await remove(startOfDayKey)
+                    : await save(startOfDayKey, picked);
+
+                ref.read(startOfDayProvider.notifier).updatedBy(picked);
+              },
+              picked,
+            ),
+          ),
+        ),
+      );
 }
 
-class _SettingsPageState extends State<SettingsPage> {
-  TimeOfDay? _startOfDay;
+class _SettingsPage extends StatelessWidget {
+  final TimeOfDay? _startOfDay;
+  final void Function(TimeOfDay? picked) _onStartOfDayChanged;
 
-  @override
-  void initState() => v(
-        () {
-          super.initState();
-          _loadPreferences();
-        },
-      );
+  const _SettingsPage({
+    required TimeOfDay? startOfDay,
+    required onStartOfDayChanged,
+  })  : _startOfDay = startOfDay,
+        _onStartOfDayChanged = onStartOfDayChanged;
 
   @override
   Widget build(BuildContext context) => v(
@@ -41,20 +60,12 @@ class _SettingsPageState extends State<SettingsPage> {
                         leading: const Icon(Icons.start),
                         title: Text(l10n.start_of_day_label),
                         onPressed: (context) => v(
-                          () async {
-                            final picked = await showTimePicker(
+                          () async => _onStartOfDayChanged(
+                            await showTimePicker(
                               context: context,
                               initialTime: TimeOfDay.now(),
-                            );
-
-                            setState(() {
-                              _startOfDay = picked;
-                            });
-
-                            return picked == null
-                                ? await remove(startOfDayKey)
-                                : await save(startOfDayKey, picked);
-                          },
+                            ),
+                          ),
                         ),
                         value: _startOfDay == null
                             ? null
@@ -65,16 +76,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 ],
               ),
             ),
-          );
-        },
-      );
-
-  Future<void> _loadPreferences() => v(
-        () async {
-          final startOfDay = await loadByKey(startOfDayKey);
-
-          setState(
-            () => _startOfDay = startOfDay as TimeOfDay?,
           );
         },
       );
