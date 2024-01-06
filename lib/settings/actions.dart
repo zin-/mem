@@ -35,6 +35,7 @@ Future<bool> remove(PreferenceKey key) => v(
       {"key": key},
     );
 
+// TODO どこに定義するのが適切か検討する
 extension TimeOfDayExtension on TimeOfDay {
   static deserialize(String text) => v(
         () {
