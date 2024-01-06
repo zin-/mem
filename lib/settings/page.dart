@@ -13,12 +13,11 @@ class SettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => i(
-        () => AsyncValueView(
-          FutureProvider((ref) => loadByKey(startOfDayKey).then((value) => ref
-              .read(startOfDayProvider.notifier)
-              .updatedBy(value as TimeOfDay?))),
-          (loaded) => _SettingsPage(
-            startOfDay: ref.watch(startOfDayProvider),
+        () => AsyncValueViewV2(
+          loadByKey(startOfDayKey),
+          startOfDayProvider,
+          (data, watched) => _SettingsPage(
+            startOfDay: watched,
             onStartOfDayChanged: (TimeOfDay? picked) => v(
               () async {
                 picked == null
@@ -80,5 +79,6 @@ class _SettingsPage extends StatelessWidget {
             ),
           );
         },
+        {"_startOfDay": _startOfDay},
       );
 }
