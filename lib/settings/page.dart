@@ -14,7 +14,9 @@ class SettingsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => i(
         () => AsyncValueView(
-          FutureProvider((ref) => loadByKey(startOfDayKey)),
+          FutureProvider((ref) => loadByKey(startOfDayKey).then((value) => ref
+              .read(startOfDayProvider.notifier)
+              .updatedBy(value as TimeOfDay?))),
           (loaded) => _SettingsPage(
             startOfDay: ref.watch(startOfDayProvider),
             onStartOfDayChanged: (TimeOfDay? picked) => v(
