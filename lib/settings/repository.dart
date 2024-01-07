@@ -1,4 +1,5 @@
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/settings/entity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PreferenceRepository extends _KeyWithValueRepository<Preference, String> {
@@ -48,51 +49,23 @@ class PreferenceRepository extends _KeyWithValueRepository<Preference, String> {
   factory PreferenceRepository() => _instance ??= PreferenceRepository._();
 }
 
-class PreferenceKey {
-  final String value;
-  final Type type;
+abstract class _ExRepository<E extends ExEntity> {}
 
-  PreferenceKey(this.value, this.type);
-}
-
-class Preference extends _KeyWithValue<String, Object?> {
-  Preference(super.key, super.value);
-}
-
-abstract class _ExRepository<E extends _ExEntity> {}
-
-abstract class _KeyWithValueRepository<E extends _KeyWithValue<Key, Object?>,
+abstract class _KeyWithValueRepository<E extends KeyWithValue<Key, Object?>,
         Key> extends _ExRepository<E>
     with
         _Receiver<E, bool>,
         _FinderByKey<E, Key>,
         _DiscarderByKey<E, Key, bool> {}
 
-abstract class _ExEntity {}
-
-abstract class _KeyWithValue<Key, Value> extends _ExEntity {
-  final Key key;
-  final Value value;
-
-  _KeyWithValue(this.key, this.value);
-
-  Map<String, Object?> _toMap() => {
-        "key": key,
-        "value": value,
-      };
-
-  @override
-  String toString() => _toMap().toString();
-}
-
-mixin _Receiver<E extends _ExEntity, Result> on _ExRepository<E> {
+mixin _Receiver<E extends ExEntity, Result> on _ExRepository<E> {
   Future<Result> receive(E entity);
 }
-mixin _FinderByKey<E extends _KeyWithValue<Key, dynamic>, Key>
+mixin _FinderByKey<E extends KeyWithValue<Key, dynamic>, Key>
     on _ExRepository<E> {
   Future<E?> findByKey(Key key);
 }
-mixin _DiscarderByKey<E extends _KeyWithValue<Key, dynamic>, Key, Result>
+mixin _DiscarderByKey<E extends KeyWithValue<Key, dynamic>, Key, Result>
     on _ExRepository<E> {
   Future<Result> discard(Key key);
 }

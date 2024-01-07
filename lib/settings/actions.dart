@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/settings/entity.dart';
 import 'package:mem/settings/repository.dart';
 
 final _repository = PreferenceRepository();
@@ -14,6 +15,7 @@ Future<bool> save(PreferenceKey key, Object? value) => v(
       {"key": key, "value": value},
     );
 
+// TODO PreferenceKeyに返却型の情報を持たせて、repositoryもその型を返却するようにする
 Future<Object?> loadByKey(PreferenceKey key) => v(
       () async {
         final preference = await _repository.findByKey(key.value);
