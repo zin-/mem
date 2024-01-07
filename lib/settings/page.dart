@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/components/async_value_view.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/settings/actions.dart';
@@ -13,21 +12,17 @@ class SettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => i(
-        () => AsyncValueViewV2(
-          loadByKey(startOfDayKey),
-          startOfDayProvider,
-          (data, watched) => _SettingsPage(
-            startOfDay: watched,
-            onStartOfDayChanged: (TimeOfDay? picked) => v(
-              () async {
-                picked == null
-                    ? await remove(startOfDayKey)
-                    : await save(startOfDayKey, picked);
+        () => _SettingsPage(
+          startOfDay: ref.watch(startOfDayProvider),
+          onStartOfDayChanged: (TimeOfDay? picked) => v(
+            () async {
+              picked == null
+                  ? await remove(startOfDayKey)
+                  : await save(startOfDayKey, picked);
 
-                ref.read(startOfDayProvider.notifier).updatedBy(picked);
-              },
-              picked,
-            ),
+              ref.read(startOfDayProvider.notifier).updatedBy(picked);
+            },
+            picked,
           ),
         ),
       );
@@ -64,7 +59,7 @@ class _SettingsPage extends StatelessWidget {
                           () async => _onStartOfDayChanged(
                             await showTimePicker(
                               context: context,
-                              initialTime: TimeOfDay.now(),
+                              initialTime: _startOfDay ?? TimeOfDay.now(),
                             ),
                           ),
                         ),
