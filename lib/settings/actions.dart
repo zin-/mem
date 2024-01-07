@@ -5,24 +5,14 @@ import 'package:mem/settings/repository.dart';
 
 final _repository = PreferenceRepository();
 
-Future<bool> save(PreferenceKey key, Object? value) => v(
-      () async => await _repository.receive(
-        Preference(
-          key.value,
-          value is TimeOfDay ? value.serialize() : value,
-        ),
-      ),
-      {"key": key, "value": value},
-    );
-
 // TODO PreferenceKeyに返却型の情報を持たせて、repositoryもその型を返却するようにする
 Future<Object?> loadByKey(PreferenceKey key) => v(
       () async {
-        final preference = await _repository.findByKey(key.value);
+        final preference = await _repository.findByKey(key);
         final value = preference?.value;
         if (key.type == TimeOfDay && value != null) {
           return Preference(
-            key.value,
+            key,
             TimeOfDayExtension.deserialize(value as String),
           ).value;
         } else {
@@ -32,8 +22,18 @@ Future<Object?> loadByKey(PreferenceKey key) => v(
       {"key": key},
     );
 
+Future<bool> save(PreferenceKey key, Object? value) => v(
+      () async => await _repository.receive(
+        Preference(
+          key,
+          value is TimeOfDay ? value.serialize() : value,
+        ),
+      ),
+      {"key": key, "value": value},
+    );
+
 Future<bool> remove(PreferenceKey key) => v(
-      () async => await _repository.discard(key.value),
+      () async => await _repository.discard(key),
       {"key": key},
     );
 

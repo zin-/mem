@@ -1,11 +1,14 @@
-class PreferenceKey {
+class PreferenceKey<T> {
   final String value;
   final Type type;
 
   PreferenceKey(this.value, this.type);
+
+  @override
+  String toString() => value;
 }
 
-class Preference extends KeyWithValue<String, Object?> {
+class Preference<T> extends KeyWithValue<PreferenceKey<T>, Object?> {
   Preference(super.key, super.value);
 }
 

@@ -2,16 +2,15 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/settings/entity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class PreferenceRepository extends _KeyWithValueRepository<Preference, String> {
+class PreferenceRepository
+    extends _KeyWithValueRepository<Preference, PreferenceKey> {
   @override
   Future<bool> receive(Preference entity) => v(
         () async {
-          final sharedPreferences = await SharedPreferences.getInstance();
-
           switch (entity.value.runtimeType) {
             case String:
-              return await sharedPreferences.setString(
-                entity.key,
+              return await (await SharedPreferences.getInstance()).setString(
+                entity.key.value,
                 entity.value as String,
               );
 
@@ -23,22 +22,17 @@ class PreferenceRepository extends _KeyWithValueRepository<Preference, String> {
       );
 
   @override
-  Future<Preference?> findByKey(String key) => v(
-        () async {
-          final sharedPreferences = await SharedPreferences.getInstance();
-
-          return Preference(key, sharedPreferences.get(key));
-        },
+  Future<Preference?> findByKey(PreferenceKey key) => v(
+        () async => Preference(
+          key,
+          (await SharedPreferences.getInstance()).get(key.value),
+        ),
         key,
       );
 
   @override
-  Future<bool> discard(String key) => v(
-        () async {
-          final sharedPreferences = await SharedPreferences.getInstance();
-
-          return sharedPreferences.remove(key);
-        },
+  Future<bool> discard(PreferenceKey key) => v(
+        () async => (await SharedPreferences.getInstance()).remove(key.value),
         key,
       );
 
