@@ -1,5 +1,6 @@
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/settings/entity.dart';
+import 'package:mem/settings/key.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PreferenceClient extends _KeyWithValueRepository<Preference<dynamic>,
@@ -22,11 +23,18 @@ class PreferenceClient extends _KeyWithValueRepository<Preference<dynamic>,
       );
 
   @override
-  Future<Preference<dynamic>?> findByKey(PreferenceKey<dynamic> key) => v(
-        () async => Preference<dynamic>(
-          key,
-          (await SharedPreferences.getInstance()).get(key.value),
-        ),
+  Future<Preference<dynamic>?> findByKey(PreferenceKey<dynamic> key) => d(
+        () async {
+          final sharedPreferences = await SharedPreferences.getInstance();
+
+          final value = sharedPreferences.get(key.value);
+          debug(value);
+
+          return Preference<dynamic>(
+            key,
+            value,
+          );
+        },
         key,
       );
 

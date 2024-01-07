@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/settings/entity.dart';
 import 'package:mem/settings/client.dart';
+import 'package:mem/settings/key.dart';
 
 final _client = PreferenceClient();
 
