@@ -8,18 +8,7 @@ final _client = PreferenceClient();
 
 // TODO PreferenceKeyに返却型の情報を持たせて、repositoryもその型を返却するようにする
 Future<Object?> loadByKey(PreferenceKey key) => v(
-      () async {
-        final preference = await _client.findByKey(key);
-        final value = preference?.value;
-        if (key.type == TimeOfDay && value != null) {
-          return Preference(
-            key,
-            TimeOfDayExtension.deserialize(value as String),
-          ).value;
-        } else {
-          return preference?.value;
-        }
-      },
+      () async => (await _client.findByKey(key))?.value,
       {"key": key},
     );
 
@@ -38,22 +27,3 @@ Future<bool> remove(PreferenceKey key) => v(
       {"key": key},
     );
 
-// TODO どこに定義するのが適切か検討する
-extension TimeOfDayExtension on TimeOfDay {
-  static deserialize(String text) => v(
-        () {
-          final hourAndMinute =
-              text.split(":").map((e) => int.parse(e)).toList();
-          return TimeOfDay(
-            hour: hourAndMinute[0],
-            minute: hourAndMinute[1],
-          );
-        },
-        {"text": text},
-      );
-
-  String serialize() => v(
-        () => "$hour:$minute",
-        toString(),
-      );
-}

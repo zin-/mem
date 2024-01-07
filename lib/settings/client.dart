@@ -23,16 +23,15 @@ class PreferenceClient extends _KeyWithValueRepository<Preference<dynamic>,
       );
 
   @override
-  Future<Preference<dynamic>?> findByKey(PreferenceKey<dynamic> key) => d(
+  Future<Preference<dynamic>?> findByKey(PreferenceKey<dynamic> key) => v(
         () async {
           final sharedPreferences = await SharedPreferences.getInstance();
 
           final value = sharedPreferences.get(key.value);
-          debug(value);
 
           return Preference<dynamic>(
             key,
-            value,
+            value == null ? null : key.deserialize(value),
           );
         },
         key,

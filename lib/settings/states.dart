@@ -5,9 +5,9 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/settings/actions.dart';
 import 'package:mem/settings/keys.dart';
 
-final startOfDayProvider = StateNotifierProvider.autoDispose<
-    ValueStateNotifier<TimeOfDay?>, TimeOfDay?>(
-  (ref) => d(
+final startOfDayProvider =
+    StateNotifierProvider<ValueStateNotifier<TimeOfDay?>, TimeOfDay?>(
+  (ref) => v(
     () => ValueStateNotifier(
       null,
       future: loadByKey(startOfDayKey),
