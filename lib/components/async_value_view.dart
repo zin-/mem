@@ -3,19 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
 
-final _asyncValue = FutureProvider.family(
-  (ref, future) => v(
-    () => future,
-    future,
-  ),
-);
-
 class AsyncValueViewV2 extends ConsumerWidget {
+  final _asyncValue = FutureProvider.family(
+    (ref, future) => v(
+      () => future,
+      future,
+    ),
+  );
+
   final Future<dynamic> _future;
   final StateNotifierProvider<ValueStateNotifier, dynamic> _watch;
   final Widget Function(dynamic data, dynamic watched) _builder;
 
-  const AsyncValueViewV2(
+  AsyncValueViewV2(
     this._future,
     this._watch,
     this._builder, {
