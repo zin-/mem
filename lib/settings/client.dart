@@ -2,7 +2,7 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/settings/entity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class PreferenceRepository
+class PreferenceClient
     extends _KeyWithValueRepository<Preference, PreferenceKey> {
   @override
   Future<bool> receive(Preference entity) => v(
@@ -36,11 +36,11 @@ class PreferenceRepository
         key,
       );
 
-  PreferenceRepository._();
+  PreferenceClient._();
 
-  static PreferenceRepository? _instance;
+  static PreferenceClient? _instance;
 
-  factory PreferenceRepository() => _instance ??= PreferenceRepository._();
+  factory PreferenceClient() => _instance ??= PreferenceClient._();
 }
 
 abstract class _ExRepository<E extends ExEntity> {}
