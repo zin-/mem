@@ -8,7 +8,7 @@ class PreferenceKey<T> {
   String toString() => value;
 }
 
-class Preference<T> extends KeyWithValue<PreferenceKey<T>, Object?> {
+class Preference<T> extends KeyWithValue<PreferenceKey<T>, T?> {
   Preference(super.key, super.value);
 }
 
@@ -20,7 +20,7 @@ abstract class KeyWithValue<Key, Value> extends ExEntity {
 
   KeyWithValue(this.key, this.value);
 
-  Map<String, Object?> _toMap() => {
+  Map<String, dynamic> _toMap() => {
         "key": key,
         "value": value,
       };

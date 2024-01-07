@@ -2,10 +2,10 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/settings/entity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class PreferenceClient
-    extends _KeyWithValueRepository<Preference, PreferenceKey> {
+class PreferenceClient extends _KeyWithValueRepository<Preference<dynamic>,
+    PreferenceKey<dynamic>> {
   @override
-  Future<bool> receive(Preference entity) => v(
+  Future<bool> receive(Preference<dynamic> entity) => v(
         () async {
           switch (entity.value.runtimeType) {
             case String:
@@ -22,8 +22,8 @@ class PreferenceClient
       );
 
   @override
-  Future<Preference?> findByKey(PreferenceKey key) => v(
-        () async => Preference(
+  Future<Preference<dynamic>?> findByKey(PreferenceKey<dynamic> key) => v(
+        () async => Preference<dynamic>(
           key,
           (await SharedPreferences.getInstance()).get(key.value),
         ),
@@ -31,7 +31,7 @@ class PreferenceClient
       );
 
   @override
-  Future<bool> discard(PreferenceKey key) => v(
+  Future<bool> discard(PreferenceKey<dynamic> key) => v(
         () async => (await SharedPreferences.getInstance()).remove(key.value),
         key,
       );
@@ -45,7 +45,7 @@ class PreferenceClient
 
 abstract class _ExRepository<E extends ExEntity> {}
 
-abstract class _KeyWithValueRepository<E extends KeyWithValue<Key, Object?>,
+abstract class _KeyWithValueRepository<E extends KeyWithValue<Key, dynamic>,
         Key> extends _ExRepository<E>
     with
         _Receiver<E, bool>,
