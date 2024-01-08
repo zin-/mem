@@ -3,8 +3,20 @@ import 'package:mem/settings/entity.dart';
 import 'package:mem/settings/key.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class PreferenceClient extends _KeyWithValueRepository<Preference<dynamic>,
-    PreferenceKey<dynamic>> {
+class PreferenceClient
+    extends _KeyWithValueRepository<Preference, PreferenceKey> {
+  Future<Preference<T>> shipByKey<T>(PreferenceKey<T> key) => v(
+        () async {
+          final saved = (await SharedPreferences.getInstance()).get(key.value);
+
+          return Preference(
+            key,
+            key.deserialize(saved),
+          );
+        },
+        key,
+      );
+
   @override
   Future<bool> receive(Preference entity) => v(
         () async {
@@ -24,20 +36,8 @@ class PreferenceClient extends _KeyWithValueRepository<Preference<dynamic>,
         entity,
       );
 
-  Future<Preference<T>> shipByKey<T>(PreferenceKey<T> key) => v(
-        () async {
-          final value = (await SharedPreferences.getInstance()).get(key.value);
-
-          return Preference(
-            key,
-            value == null ? null : key.deserialize(value),
-          );
-        },
-        key,
-      );
-
   @override
-  Future<bool> discard(PreferenceKey<dynamic> key) => v(
+  Future<bool> discard(PreferenceKey key) => v(
         () async => (await SharedPreferences.getInstance()).remove(key.value),
         key,
       );

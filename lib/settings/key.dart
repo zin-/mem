@@ -6,8 +6,7 @@ abstract class PreferenceKey<T> {
 
   PreferenceKey(this.value);
 
-  // TODO serializedの型は不要か？
-  T deserialize(serialized);
+  T? deserialize(serialized);
 
   serialize(T? deserialized);
 
@@ -19,14 +18,18 @@ class TimeOfDayPreferenceKey extends PreferenceKey<TimeOfDay> {
   TimeOfDayPreferenceKey(super.value);
 
   @override
-  TimeOfDay deserialize(serialized) => v(
+  TimeOfDay? deserialize(serialized) => v(
         () {
-          final hourAndMinute =
-              serialized.split(":").map((e) => int.parse(e)).toList();
-          return TimeOfDay(
-            hour: hourAndMinute[0],
-            minute: hourAndMinute[1],
-          );
+          if (serialized == null) {
+            return null;
+          } else {
+            final hourAndMinute =
+                serialized.split(":").map((e) => int.parse(e)).toList();
+            return TimeOfDay(
+              hour: hourAndMinute[0],
+              minute: hourAndMinute[1],
+            );
+          }
         },
         {"serialized": serialized},
       );
