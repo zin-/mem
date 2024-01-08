@@ -8,11 +8,11 @@ import 'package:mem/components/mem/mem_name.dart';
 import 'package:mem/components/mem/mem_period.dart';
 import 'package:mem/components/timer.dart';
 import 'package:mem/core/act.dart';
-import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/states.dart';
+import 'package:mem/repositories/mem.dart';
 import 'package:mem/values/colors.dart';
 
 import 'actions.dart';

@@ -6,6 +6,7 @@ import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
+import 'package:mem/repositories/mem.dart';
 
 class MemRepository extends DatabaseTupleRepository<Mem, SavedMem, int> {
   Future<List<SavedMem>> shipByCondition(bool? archived, bool? done) => v(

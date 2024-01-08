@@ -7,6 +7,7 @@ import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_detail.dart';
 import 'package:mem/mems/detail/actions.dart';
 import 'package:mem/mems/detail/states.dart';
+import 'package:mem/repositories/mem.dart';
 import 'package:mem/values/durations.dart';
 
 enum MenuOption { remove }
