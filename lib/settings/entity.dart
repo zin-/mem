@@ -12,11 +12,9 @@ abstract class KeyWithValue<Key, Value> extends ExEntity {
 
   KeyWithValue(this.key, this.value);
 
-  Map<String, dynamic> _toMap() => {
+  @override
+  String toString() => {
         "key": key,
         "value": value,
-      };
-
-  @override
-  String toString() => _toMap().toString();
+      }.toString();
 }
