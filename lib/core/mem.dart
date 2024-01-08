@@ -1,6 +1,5 @@
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/repository/entity.dart';
-import 'package:mem/framework/repository/database_tuple_entity.dart';
 
 class Mem extends Entity {
   final String name;
