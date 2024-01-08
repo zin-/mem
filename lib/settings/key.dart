@@ -6,7 +6,10 @@ abstract class PreferenceKey<T> {
 
   PreferenceKey(this.value);
 
+  // TODO serializedの型は不要か？
   T deserialize(serialized);
+
+  serialize(T? deserialized);
 
   @override
   String toString() => value;
@@ -27,12 +30,12 @@ class TimeOfDayPreferenceKey extends PreferenceKey<TimeOfDay> {
         },
         {"serialized": serialized},
       );
-}
 
-// TODO どこに定義するのが適切か検討する
-extension TimeOfDayExtension on TimeOfDay {
-  String serialize() => d(
-        () => "$hour:$minute",
-        toString(),
+  @override
+  String? serialize(deserialized) => v(
+        () => deserialized == null
+            ? null
+            : "${deserialized.hour}:${deserialized.minute}",
+        {"deserialized": deserialized},
       );
 }

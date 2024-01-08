@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/settings/entity.dart';
 import 'package:mem/settings/client.dart';
@@ -12,13 +11,8 @@ Future<T?> loadByKey<T>(PreferenceKey<T> key) => v(
     );
 
 // TODO PreferenceKeyに返却型の情報を持たせて、repositoryもその型を受け取るようにする
-Future<bool> save(PreferenceKey key, Object? value) => v(
-      () async => await _client.receive(
-        Preference(
-          key,
-          value is TimeOfDay ? value.serialize() : value,
-        ),
-      ),
+Future<bool> save<T>(PreferenceKey<T> key, T? value) => v(
+      () async => await _client.receive(Preference(key, value)),
       {"key": key, "value": value},
     );
 
