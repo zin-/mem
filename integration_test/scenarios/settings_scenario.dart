@@ -52,11 +52,15 @@ void testSettingsScenario() => group(
             await widgetTester.pumpAndSettle();
 
             expect(
-              find.descendant(
-                of: find.byType(SettingsTile),
-                matching: find.text(timeText(now)),
-              ),
-              findsOneWidget,
+              widgetTester
+                  .widget<Text>(find
+                      .descendant(
+                        of: find.byType(SettingsTile),
+                        matching: find.byType(Text),
+                      )
+                      .at(1))
+                  .data,
+              timeText(now),
             );
 
             await widgetTester.tap(find.text(l10n.start_of_day_label));
@@ -90,11 +94,15 @@ void testSettingsScenario() => group(
             await _showPage(widgetTester);
 
             expect(
-              find.descendant(
-                of: find.byType(SettingsTile),
-                matching: find.text(timeText(now)),
-              ),
-              findsOneWidget,
+              widgetTester
+                  .widget<Text>(find
+                      .descendant(
+                        of: find.byType(SettingsTile),
+                        matching: find.byType(Text),
+                      )
+                      .at(1))
+                  .data,
+              timeText(now),
             );
           },
         );

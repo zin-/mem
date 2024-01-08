@@ -22,14 +22,11 @@ class PreferenceClient extends _KeyWithValueRepository<Preference<dynamic>,
         entity,
       );
 
-  @override
-  Future<Preference<dynamic>?> findByKey(PreferenceKey<dynamic> key) => v(
+  Future<Preference<T>?> findByKey<T>(PreferenceKey<T> key) => v(
         () async {
-          final sharedPreferences = await SharedPreferences.getInstance();
+          final value = (await SharedPreferences.getInstance()).get(key.value);
 
-          final value = sharedPreferences.get(key.value);
-
-          return Preference<dynamic>(
+          return Preference(
             key,
             value == null ? null : key.deserialize(value),
           );
@@ -54,17 +51,10 @@ abstract class _ExRepository<E extends ExEntity> {}
 
 abstract class _KeyWithValueRepository<E extends KeyWithValue<Key, dynamic>,
         Key> extends _ExRepository<E>
-    with
-        _Receiver<E, bool>,
-        _FinderByKey<E, Key>,
-        _DiscarderByKey<E, Key, bool> {}
+    with _Receiver<E, bool>, _DiscarderByKey<E, Key, bool> {}
 
 mixin _Receiver<E extends ExEntity, Result> on _ExRepository<E> {
   Future<Result> receive(E entity);
-}
-mixin _FinderByKey<E extends KeyWithValue<Key, dynamic>, Key>
-    on _ExRepository<E> {
-  Future<E?> findByKey(Key key);
 }
 mixin _DiscarderByKey<E extends KeyWithValue<Key, dynamic>, Key, Result>
     on _ExRepository<E> {

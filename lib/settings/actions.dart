@@ -6,12 +6,12 @@ import 'package:mem/settings/key.dart';
 
 final _client = PreferenceClient();
 
-// TODO PreferenceKeyに返却型の情報を持たせて、repositoryもその型を返却するようにする
-Future<Object?> loadByKey(PreferenceKey key) => v(
+Future<T?> loadByKey<T>(PreferenceKey<T> key) => v(
       () async => (await _client.findByKey(key))?.value,
       {"key": key},
     );
 
+// TODO PreferenceKeyに返却型の情報を持たせて、repositoryもその型を受け取るようにする
 Future<bool> save(PreferenceKey key, Object? value) => v(
       () async => await _client.receive(
         Preference(
@@ -26,4 +26,3 @@ Future<bool> remove(PreferenceKey key) => v(
       () async => await _client.discard(key),
       {"key": key},
     );
-
