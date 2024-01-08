@@ -1,4 +1,5 @@
 import 'package:mem/framework/repository/entity.dart';
+import 'package:mem/framework/repository/key_with_value.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/settings/entity.dart';
 import 'package:mem/settings/key.dart';
