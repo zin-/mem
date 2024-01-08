@@ -6,6 +6,7 @@
 // 「存在するもの」、「実体」
 abstract class Entity {}
 
+abstract class ExEntity {}
 // memo
 // - view, domain, dataのそれぞれの領域で似た内容でも型が変わることになるはず
 // これをしっかりと定義したい

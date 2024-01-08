@@ -1,3 +1,4 @@
+import 'package:mem/framework/repository/entity.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/settings/entity.dart';
 import 'package:mem/settings/key.dart';
@@ -49,7 +50,7 @@ class PreferenceClient
   factory PreferenceClient() => _instance ??= PreferenceClient._();
 }
 
-abstract class _ExRepository<E extends ExEntity> {}
+abstract class _ExRepository<Entity extends ExEntity> {}
 
 abstract class _KeyWithValueRepository<
         Entity extends KeyWithValue<Key, dynamic>,
