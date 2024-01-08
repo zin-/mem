@@ -51,14 +51,15 @@ class PreferenceClient
 
 abstract class _ExRepository<E extends ExEntity> {}
 
-abstract class _KeyWithValueRepository<E extends KeyWithValue<Key, dynamic>,
-        Key> extends _ExRepository<E>
-    with _Receiver<E, bool>, _DiscarderByKey<E, Key, bool> {}
+abstract class _KeyWithValueRepository<
+        Entity extends KeyWithValue<Key, dynamic>,
+        Key> extends _ExRepository<Entity>
+    with _Receiver<Entity, bool>, _DiscarderByKey<Entity, Key, bool> {}
 
-mixin _Receiver<E extends ExEntity, Result> on _ExRepository<E> {
-  Future<Result> receive(E entity);
+mixin _Receiver<Entity extends ExEntity, Result> on _ExRepository<Entity> {
+  Future<Result> receive(Entity entity);
 }
-mixin _DiscarderByKey<E extends KeyWithValue<Key, dynamic>, Key, Result>
-    on _ExRepository<E> {
+mixin _DiscarderByKey<Entity extends KeyWithValue<Key, dynamic>, Key, Result>
+    on _ExRepository<Entity> {
   Future<Result> discard(Key key);
 }
