@@ -109,7 +109,7 @@ void testSettingsScenario() => group(
           );
 
           testWidgets(
-            ": remove",
+            ": remove.",
             (widgetTester) async {
               await runApplication();
               await widgetTester.pumpAndSettle();
