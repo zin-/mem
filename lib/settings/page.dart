@@ -16,10 +16,7 @@ class SettingsPage extends ConsumerWidget {
           startOfDay: ref.watch(startOfDayProvider),
           onStartOfDayChanged: (TimeOfDay? picked) => v(
             () async {
-              picked == null
-                  ? await remove(startOfDayKey)
-                  : await save(startOfDayKey, picked);
-
+              await update(startOfDayKey, picked);
               ref.read(startOfDayProvider.notifier).updatedBy(picked);
             },
             picked,

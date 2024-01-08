@@ -10,16 +10,13 @@ Future<T?> loadByKey<T>(PreferenceKey<T> key) => v(
       {"key": key},
     );
 
-Future<bool> save<Key extends PreferenceKey<Value>, Value>(
+Future<bool> update<Key extends PreferenceKey<Value>, Value>(
   Key key,
-  Value value,
+  Value? value,
 ) =>
     v(
-      () async => await _client.receive(Preference(key, value)),
+      () async => await (value == null
+          ? _client.discard(key)
+          : _client.receive(Preference(key, value))),
       {"key": key, "value": value},
-    );
-
-Future<bool> remove(PreferenceKey key) => v(
-      () async => await _client.discard(key),
-      {"key": key},
     );
