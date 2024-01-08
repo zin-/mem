@@ -5,7 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class PreferenceClient extends _KeyWithValueRepository<Preference<dynamic>,
     PreferenceKey<dynamic>> {
-  Future<bool> receive<T>(Preference<T> entity) => v(
+  @override
+  Future<bool> receive(Preference entity) => v(
         () async {
           final serialized = entity.key.serialize(entity.value);
 
@@ -52,9 +53,7 @@ abstract class _ExRepository<E extends ExEntity> {}
 
 abstract class _KeyWithValueRepository<E extends KeyWithValue<Key, dynamic>,
         Key> extends _ExRepository<E>
-    with
-        // _Receiver<E, bool>,
-        _DiscarderByKey<E, Key, bool> {}
+    with _Receiver<E, bool>, _DiscarderByKey<E, Key, bool> {}
 
 mixin _Receiver<E extends ExEntity, Result> on _ExRepository<E> {
   Future<Result> receive(E entity);
