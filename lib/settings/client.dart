@@ -1,12 +1,11 @@
-import 'package:mem/framework/repository/entity.dart';
-import 'package:mem/framework/repository/key_with_value.dart';
+import 'package:mem/framework/repository/key_with_value_repository.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/settings/preference.dart';
 import 'package:mem/settings/preference_key.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PreferenceClient
-    extends _KeyWithValueRepository<Preference, PreferenceKey> {
+    extends KeyWithValueRepository<Preference, PreferenceKey> {
   Future<Preference<T>> shipByKey<T>(PreferenceKey<T> key) => v(
         () async {
           final saved = (await SharedPreferences.getInstance()).get(key.value);
@@ -49,19 +48,4 @@ class PreferenceClient
   static PreferenceClient? _instance;
 
   factory PreferenceClient() => _instance ??= PreferenceClient._();
-}
-
-abstract class _ExRepository<Entity extends ExEntity> {}
-
-abstract class _KeyWithValueRepository<
-        Entity extends KeyWithValue<Key, dynamic>,
-        Key> extends _ExRepository<Entity>
-    with _Receiver<Entity, bool>, _DiscarderByKey<Entity, Key, bool> {}
-
-mixin _Receiver<Entity extends ExEntity, Result> on _ExRepository<Entity> {
-  Future<Result> receive(Entity entity);
-}
-mixin _DiscarderByKey<Entity extends KeyWithValue<Key, dynamic>, Key, Result>
-    on _ExRepository<Entity> {
-  Future<Result> discard(Key key);
 }

@@ -22,3 +22,9 @@ import 'package:mem/framework/repository/entity.dart';
 abstract class Repository<E extends Entity, Result> {
   Future<Result> receive(E entity);
 }
+
+abstract class ExRepository<Entity extends ExEntity> {}
+
+mixin Receiver<Entity extends ExEntity, Result> on ExRepository<Entity> {
+  Future<Result> receive(Entity entity);
+}
