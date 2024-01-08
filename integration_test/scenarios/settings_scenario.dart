@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/settings/client.dart';
-import 'package:mem/settings/entity.dart';
+import 'package:mem/settings/preference.dart';
 import 'package:mem/settings/keys.dart';
 import 'package:settings_ui/settings_ui.dart';
 
