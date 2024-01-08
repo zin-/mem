@@ -6,7 +6,7 @@ import 'package:mem/settings/key.dart';
 final _client = PreferenceClient();
 
 Future<T?> loadByKey<T>(PreferenceKey<T> key) => v(
-      () async => (await _client.findByKey(key))?.value,
+      () async => (await _client.shipByKey(key)).value,
       {"key": key},
     );
 

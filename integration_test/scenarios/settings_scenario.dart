@@ -70,7 +70,7 @@ void testSettingsScenario() => group(
               timeText(now),
             );
             expect(
-              (await PreferenceClient().findByKey(startOfDayKey))?.value,
+              (await PreferenceClient().shipByKey(startOfDayKey)).value,
               TimeOfDay.fromDateTime(now),
             );
           },
@@ -125,7 +125,7 @@ void testSettingsScenario() => group(
 
               expect(find.text(timeText(now)), findsNothing);
               expect(
-                (await PreferenceClient().findByKey(startOfDayKey))?.value,
+                (await PreferenceClient().shipByKey(startOfDayKey)).value,
                 null,
               );
             },
