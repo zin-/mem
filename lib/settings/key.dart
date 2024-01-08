@@ -32,7 +32,7 @@ class TimeOfDayPreferenceKey extends PreferenceKey<TimeOfDay> {
       );
 
   @override
-  String? serialize(deserialized) => v(
+  serialize(TimeOfDay? deserialized) => v(
         () => deserialized == null
             ? null
             : "${deserialized.hour}:${deserialized.minute}",

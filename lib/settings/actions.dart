@@ -10,8 +10,11 @@ Future<T?> loadByKey<T>(PreferenceKey<T> key) => v(
       {"key": key},
     );
 
-// TODO PreferenceKeyに返却型の情報を持たせて、repositoryもその型を受け取るようにする
-Future<bool> save<T>(PreferenceKey<T> key, T? value) => v(
+Future<bool> save<Key extends PreferenceKey<Value>, Value>(
+  Key key,
+  Value value,
+) =>
+    v(
       () async => await _client.receive(Preference(key, value)),
       {"key": key, "value": value},
     );
