@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/framework/database/accessor.dart';
@@ -82,3 +83,23 @@ String timeText(DateTime dateTime) {
 
 String dateTimeText(DateTime dateTime) =>
     '${dateText(dateTime)} ${timeText(dateTime)}';
+
+// MockMethodChannel
+//  for local_notifications
+void setMockLocalNotifications(WidgetTester widgetTester) =>
+    widgetTester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      const MethodChannel("dexterous.com/flutter/local_notifications"),
+      (message) {
+        switch (message.method) {
+          case "initialize":
+            return Future.value(true);
+
+          case "getNotificationAppLaunchDetails":
+            return Future.value();
+
+          default:
+            // TODO 呼び出されたことを確認したい場合、チェック関数を受け取ってここで呼び出しても良い
+            return Future.value();
+        }
+      },
+    );

@@ -234,6 +234,8 @@ void testTaskScenario() => group(': $scenarioName', () {
       testWidgets(
         ': Set Period.',
         (widgetTester) async {
+          setMockLocalNotifications(widgetTester);
+
           final now = DateTime.now();
 
           await runApplication();
