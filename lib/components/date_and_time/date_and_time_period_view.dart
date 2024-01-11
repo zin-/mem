@@ -8,11 +8,15 @@ class DateAndTimePeriodTexts extends StatelessWidget {
   final DateAndTimePeriod _dateAndTimePeriod;
   final bool _showDate;
 
+  final TextStyle? _style;
+
   const DateAndTimePeriodTexts(
     this._dateAndTimePeriod, {
     super.key,
     showDate = true,
-  }) : _showDate = showDate;
+    TextStyle? style,
+  })  : _showDate = showDate,
+        _style = style;
 
   @override
   Widget build(BuildContext context) => v(() {
@@ -23,6 +27,7 @@ class DateAndTimePeriodTexts extends StatelessWidget {
                 : DateAndTimeText(
                     _dateAndTimePeriod.start!,
                     showTime: _showDate,
+                    style: _style,
                   ),
             const Text('~'),
             _dateAndTimePeriod.end == null
@@ -30,6 +35,7 @@ class DateAndTimePeriodTexts extends StatelessWidget {
                 : DateAndTimeText(
                     _dateAndTimePeriod.end!,
                     showTime: _showDate,
+                    style: _style,
                   ),
           ],
         );
