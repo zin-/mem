@@ -45,6 +45,8 @@ abstract class DateAndTimePeriod implements Comparable<DateAndTimePeriod> {
       return a == null ? 1 : -1;
     }
   }
+
+  int compareWithDateAndTime(DateAndTime? dateAndTime);
 }
 
 class _WithStartOnly extends DateAndTimePeriod
@@ -68,6 +70,10 @@ class _WithStartOnly extends DateAndTimePeriod
       return -other.compareTo(this);
     }
   }
+
+  @override
+  int compareWithDateAndTime(DateAndTime? dateAndTime) =>
+      dateAndTime == null ? 0 : start.compareTo(dateAndTime);
 }
 
 class _WithEndOnly extends DateAndTimePeriod
@@ -91,6 +97,10 @@ class _WithEndOnly extends DateAndTimePeriod
       return -other.compareTo(this);
     }
   }
+
+  @override
+  int compareWithDateAndTime(DateAndTime? dateAndTime) =>
+      dateAndTime == null ? 0 : end.compareTo(dateAndTime);
 }
 
 class WithStartAndEnd extends DateAndTimePeriod
@@ -131,4 +141,8 @@ class WithStartAndEnd extends DateAndTimePeriod
       }
     }
   }
+
+  @override
+  int compareWithDateAndTime(DateAndTime? dateAndTime) =>
+      dateAndTime == null ? 0 : end.compareTo(dateAndTime);
 }
