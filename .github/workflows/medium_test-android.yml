@@ -34,7 +34,7 @@ jobs:
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.continue-on-error }}
+    continue-on-error: ${{ matrix.experimental }}
 
 # TODO 画面サイズ
 # TODO OSバージョン
