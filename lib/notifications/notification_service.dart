@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:mem/core/date_and_time/time_of_day.dart';
-import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/repositories/mem.dart';
 
 import 'client.dart';
 import 'mem_notifications.dart';

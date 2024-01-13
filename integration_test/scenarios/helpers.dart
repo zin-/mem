@@ -1,7 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/components/l10n.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/definition/database_definition.dart';
 import 'package:mem/framework/database/factory.dart';
@@ -31,6 +33,9 @@ Future<void> runApplication() => main(languageCode: 'en');
 Future closeMemListFilter(WidgetTester widgetTester) async =>
     await widgetTester.tapAt(const Offset(0, 0));
 
+// Localization(l10n) texts
+final l10n = buildL10n();
+
 // Finders
 final newMemFabFinder = find.byIcon(Icons.add);
 final saveMemFabFinder = find.byIcon(Icons.save_alt);
@@ -40,7 +45,9 @@ final clearIconFinder = find.byIcon(Icons.clear);
 final searchIconFinder = find.byIcon(Icons.search);
 final closeIconFinder = find.byIcon(Icons.close);
 final filterListIconFinder = find.byIcon(Icons.filter_list);
+
 final okFinder = find.text('OK');
+final cancelFinder = find.text('Cancel');
 
 //  On MemList filter
 final showNotArchiveSwitchFinder = find.byType(Switch).at(0);
@@ -76,3 +83,23 @@ String timeText(DateTime dateTime) {
 
 String dateTimeText(DateTime dateTime) =>
     '${dateText(dateTime)} ${timeText(dateTime)}';
+
+// MockMethodChannel
+//  for local_notifications
+void setMockLocalNotifications(WidgetTester widgetTester) =>
+    widgetTester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      const MethodChannel("dexterous.com/flutter/local_notifications"),
+      (message) {
+        switch (message.method) {
+          case "initialize":
+            return Future.value(true);
+
+          case "getNotificationAppLaunchDetails":
+            return Future.value();
+
+          default:
+            // TODO 呼び出されたことを確認したい場合、チェック関数を受け取ってここで呼び出しても良い
+            return Future.value();
+        }
+      },
+    );

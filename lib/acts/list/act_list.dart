@@ -12,17 +12,22 @@ import 'package:mem/components/async_value_view.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/core/act.dart';
-import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/states.dart';
+import 'package:mem/repositories/mem.dart';
 import 'package:mem/values/constants.dart';
 
 import 'item/view.dart';
 
 class ActList extends ConsumerWidget {
   final int? _memId;
+  final ScrollController? _scrollController;
 
-  const ActList(this._memId, {super.key});
+  const ActList(
+    this._memId,
+    this._scrollController, {
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
@@ -49,6 +54,7 @@ class ActList extends ConsumerWidget {
                             (element) => element.id == _memId,
                           )!
                     ]),
+              _scrollController,
             ),
           ),
         ),
@@ -62,6 +68,7 @@ class _ActListIF {
   final bool _isTimeView;
   final List<Act> _actList;
   final List<SavedMem> _memList;
+  final ScrollController? _scrollController;
 
   _ActListIF(
     this._actListAppBarIF,
@@ -69,6 +76,7 @@ class _ActListIF {
     this._isTimeView,
     this._actList,
     this._memList,
+    this._scrollController,
   );
 
   Map<String, dynamic> _toMap() => {
@@ -91,6 +99,7 @@ class _ActList extends StatelessWidget {
   @override
   Widget build(BuildContext context) => v(
         () => CustomScrollView(
+          controller: _actListIF._scrollController,
           slivers: [
             ActListAppBar(
               _actListIF._actListAppBarIF,

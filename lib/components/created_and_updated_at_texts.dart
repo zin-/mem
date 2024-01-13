@@ -3,6 +3,7 @@ import 'package:mem/components/date_and_time/date_and_time_view.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/repositories/mem.dart';
 import 'package:mem/values/colors.dart';
 
 class CreatedAndUpdatedAtTexts extends StatelessWidget {

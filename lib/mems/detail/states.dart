@@ -7,6 +7,7 @@ import 'package:mem/core/mem_notification.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/components/value_state_notifier.dart';
+import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/mems/states.dart';
 
@@ -71,8 +72,7 @@ final memItemsProvider = StateNotifierProvider.autoDispose
   ),
 );
 
-MemNotification _initialRepeatMemNotification(int? memId) =>
-    MemNotification(
+MemNotification _initialRepeatMemNotification(int? memId) => MemNotification(
       memId,
       MemNotificationType.repeat,
       null,

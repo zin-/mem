@@ -59,7 +59,6 @@ void testMemoScenario() => group(
               await widgetTester.pumpAndSettle();
 
               [
-                "List",
                 insertedMemName,
               ].forEachIndexed((index, element) {
                 expect(
@@ -76,18 +75,27 @@ void testMemoScenario() => group(
                     .icon,
                 Icons.add,
               );
+              final iconButtons =
+                  widgetTester.widgetList<IconButton>(find.byType(IconButton));
               [
+                DrawerButtonIcon,
                 Icons.search,
                 Icons.filter_list,
-              ].forEachIndexed((index, element) {
-                expect(
-                  (widgetTester
-                          .widget<IconButton>(find.byType(IconButton).at(index))
-                          .icon as Icon)
-                      .icon,
-                  element,
-                  reason: "Index is $index.",
-                );
+              ].forEachIndexed((index, expected) {
+                final icon = iconButtons.elementAt(index).icon;
+                if (icon is Icon) {
+                  expect(
+                    icon.icon,
+                    expected,
+                    reason: "Index is $index.",
+                  );
+                } else {
+                  expect(
+                    icon.runtimeType,
+                    expected,
+                    reason: "Index is $index.",
+                  );
+                }
               });
             },
           );

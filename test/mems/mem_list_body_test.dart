@@ -5,12 +5,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/components/mem/list/actions.dart';
 import 'package:mem/components/mem/list/states.dart';
-import 'package:mem/core/mem.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/mems/list/actions.dart';
 import 'package:mem/mems/list/body.dart';
 import 'package:mem/mems/list/show_new_mem_fab.dart';
 import 'package:mem/mems/states.dart';
+import 'package:mem/repositories/mem.dart';
 
 import '../../integration_test/scenarios/helpers.dart';
 

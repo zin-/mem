@@ -73,7 +73,7 @@ class _MemDetailPageComponentState extends State<_MemDetailPageComponent> {
               actions: [
                 MemDetailMenu(_memId),
               ],
-              backgroundColor: _memIsArchived ? archivedColor : primaryColor,
+              backgroundColor: _memIsArchived ? secondaryGreyColor : null,
             ),
             body: Form(
               key: _formKey,

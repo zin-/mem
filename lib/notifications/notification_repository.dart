@@ -12,7 +12,7 @@ import 'notification/repeated_notification.dart';
 import 'notification/show_notification.dart';
 import 'wrapper.dart';
 
-class NotificationRepository extends Repository<Notification> {
+class NotificationRepository extends Repository<Notification, void> {
   final NotificationsWrapper? _flutterLocalNotificationsWrapper;
 
   Future<bool?> checkNotification() => v(

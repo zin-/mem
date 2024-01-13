@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/duration.dart';
-import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/transitions.dart';
+import 'package:mem/repositories/mem.dart';
 
 class TotalActTimeListItem extends StatelessWidget {
   final List<Act> _actList;

@@ -486,7 +486,7 @@ void testActScenario() => group(': $_scenarioName', () {
             await widgetTester.pumpAndSettle();
 
             expect(
-              widgetTester.widget<Text>(find.byType(Text).at(4)).data,
+              widgetTester.widget<Text>(find.byType(Text).at(3)).data,
               '00:00:00',
             );
 

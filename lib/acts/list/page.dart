@@ -6,14 +6,22 @@ import 'package:mem/logger/log_service.dart';
 import 'act_list.dart';
 
 class ActListPage extends ConsumerWidget {
+  final _scrollController = ScrollController();
+
   final int _memId;
 
-  const ActListPage(this._memId, {super.key});
+  ActListPage(
+    this._memId, {
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => i(
         () => Scaffold(
-          body: ActList(_memId),
+          body: ActList(
+            _memId,
+            _scrollController,
+          ),
           floatingActionButton: ActFab(_memId),
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerFloat,

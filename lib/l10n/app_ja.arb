@@ -2,10 +2,14 @@
   "@@locale": "ja",
   "appTitle": "Mem",
 
+  "memListDestinationLabel": "List",
+  "actListDestinationLabel": "Acts",
+
   "memListPageTitle": "List",
   "memDetailPageTitle": "Detail",
   "actCounterConfigureTitle":"Select target",
   "defaultActListPageTitle":"All",
+  "settingsPageTitle": "設定",
 
   "memNameLabel": "Name",
   "memMemoLabel": "Memo",
@@ -56,6 +60,8 @@
   "finish_label": "終了",
   "pause_act_label": "一時停止",
   "start_label": "開始",
+
+  "start_of_day_label": "1日の開始時間",
 
   "reminder_name": "Reminder",
   "reminder_description": "To remind at specific time.",

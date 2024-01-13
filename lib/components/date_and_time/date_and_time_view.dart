@@ -24,7 +24,7 @@ class DateAndTimeText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (_dateAndTime.isAllDay) {
-      return DateText(_dateAndTime, _showDate);
+      return DateText(_dateAndTime, _showDate, style: _style);
     } else if (_showTime) {
       return Flex(
         direction: Axis.horizontal,

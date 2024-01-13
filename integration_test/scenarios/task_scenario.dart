@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -106,22 +107,33 @@ void testTaskScenario() => group(': $scenarioName', () {
             await runApplication();
             await widgetTester.pumpAndSettle();
 
+            final expectedList = [
+              insertedMemHasPeriodStart,
+              dateText(insertedMemPeriodStart),
+              "~",
+              insertedMemHasPeriodEnd,
+              "~",
+              dateText(insertedMemPeriodEnd),
+              " ",
+              timeText(insertedMemPeriodEnd),
+              insertedMemHasPeriod,
+              dateText(insertedMemPeriod.start),
+              " ",
+              timeText(insertedMemPeriod.start),
+              "~",
+              dateText(insertedMemPeriod.end),
+              " ",
+              timeText(insertedMemPeriod.end),
+            ];
             final texts =
                 widgetTester.widgetList<Text>(find.byType(Text)).toList();
-
-            expect(texts[2].data, dateText(insertedMemPeriodStart));
-            expect(texts[3].data, "~");
-            expect(texts[5].data, "~");
-            expect(texts[6].data, dateText(insertedMemPeriodEnd));
-            expect(texts[7].data, " ");
-            expect(texts[8].data, timeText(insertedMemPeriodEnd));
-            expect(texts[10].data, dateText(insertedMemPeriod.start));
-            expect(texts[11].data, " ");
-            expect(texts[12].data, timeText(insertedMemPeriod.start));
-            expect(texts[13].data, "~");
-            expect(texts[14].data, dateText(insertedMemPeriod.end));
-            expect(texts[15].data, " ");
-            expect(texts[16].data, timeText(insertedMemPeriod.end));
+            expectedList.forEachIndexed((index, expected) {
+              expect(
+                texts[index].data,
+                expected,
+                reason: "Index is $index.",
+              );
+            });
           });
 
           testWidgets(": has period start.", (widgetTester) async {
@@ -222,6 +234,8 @@ void testTaskScenario() => group(': $scenarioName', () {
       testWidgets(
         ': Set Period.',
         (widgetTester) async {
+          setMockLocalNotifications(widgetTester);
+
           final now = DateTime.now();
 
           await runApplication();

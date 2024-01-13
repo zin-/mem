@@ -19,6 +19,12 @@ import 'package:mem/framework/repository/entity.dart';
 //  抽象的には得ると捉える事もできるだろうが、では`update`（更新する）ことはあるだろうか？
 //  更新することはないように感じる
 //  よって、ここでは`receive`（受け取る）、`replace`（置き換える）などの荷物や事物を扱う際の単語を採用する
-abstract class Repository<E extends Entity> {
-  receive(E entity);
+abstract class Repository<E extends Entity, Result> {
+  Future<Result> receive(E entity);
+}
+
+abstract class ExRepository<Entity extends ExEntity> {}
+
+mixin Receiver<Entity extends ExEntity, Result> on ExRepository<Entity> {
+  Future<Result> receive(Entity entity);
 }

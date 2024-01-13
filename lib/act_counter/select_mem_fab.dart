@@ -28,7 +28,7 @@ class _SelectMemComponent extends StatelessWidget {
   @override
   Widget build(BuildContext context) => i(
         () => FloatingActionButton(
-          backgroundColor: _selected ? null : archivedColor,
+          backgroundColor: _selected ? null : secondaryGreyColor,
           onPressed: _selected ? _onPressed : null,
           child: const Icon(
             Icons.check,

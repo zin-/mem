@@ -4,7 +4,8 @@ import 'package:mem/framework/database/factory.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/logger/log_service.dart';
 
-class DatabaseRepository extends Repository<DatabaseDefinition> {
+class DatabaseRepository
+    extends Repository<DatabaseDefinition, DatabaseAccessor> {
   final _cache = <String, DatabaseAccessor>{};
 
   @override

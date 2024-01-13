@@ -3,8 +3,8 @@ import 'package:collection/collection.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
-import 'package:mem/core/mem.dart';
 import 'package:mem/framework/repository/entity.dart';
+import 'package:mem/repositories/mem.dart';
 
 class ActCounter extends Entity {
   final SavedMem _mem;

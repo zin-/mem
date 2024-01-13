@@ -12,6 +12,7 @@ import 'scenarios/edge_scenario.dart';
 import 'scenarios/habit_scenario.dart';
 import 'scenarios/memo_scenario.dart';
 import 'scenarios/notification_scenario.dart';
+import 'scenarios/settings_scenario.dart';
 import 'scenarios/task_scenario.dart';
 import 'scenarios/todo_scenario.dart';
 
@@ -35,6 +36,8 @@ void main() {
     testHabitScenario();
 
     testActScenario();
+
+    testSettingsScenario();
 
     testNotificationScenario();
     testActCounterConfigure();

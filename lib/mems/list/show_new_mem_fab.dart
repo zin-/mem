@@ -16,38 +16,32 @@ class ShowNewMemFab extends StatefulWidget {
 
 class _ShowNewMemFabState extends State<ShowNewMemFab>
     with SingleTickerProviderStateMixin {
-  bool _show = true;
+  bool _isHidden = false;
 
   @override
-  void initState() {
-    super.initState();
-    widget._scrollController.addListener(() => v(
-          () {
-            if (widget._scrollController.position.userScrollDirection ==
-                    ScrollDirection.forward &&
-                !_show) {
-              setState(() {
-                _show = true;
-              });
-            } else if (widget._scrollController.position.userScrollDirection ==
-                    ScrollDirection.reverse &&
-                _show) {
-              setState(() {
-                _show = false;
-              });
-            }
-          },
-          {'_show': _show},
-        ));
-  }
+  void initState() => v(
+        () {
+          super.initState();
+          widget._scrollController.addListener(_toggleShowOnScroll);
+        },
+        {"_isHidden": _isHidden},
+      );
+
+  @override
+  void dispose() => v(
+        () {
+          widget._scrollController.removeListener(_toggleShowOnScroll);
+          super.dispose();
+        },
+      );
 
   @override
   Widget build(BuildContext context) => v(
         () => AnimatedSlide(
-          offset: _show ? Offset.zero : const Offset(0, 1),
+          offset: _isHidden ? const Offset(0, 1) : Offset.zero,
           duration: defaultTransitionDuration,
           child: AnimatedOpacity(
-            opacity: _show ? 1 : 0,
+            opacity: _isHidden ? 0 : 1,
             duration: defaultTransitionDuration,
             child: Consumer(
               builder: (context, ref, child) {
@@ -59,6 +53,26 @@ class _ShowNewMemFabState extends State<ShowNewMemFab>
             ),
           ),
         ),
-        {'_show': _show},
+        {"_isHidden": _isHidden},
+      );
+
+  void _toggleShowOnScroll() => v(
+        () {
+          switch (widget._scrollController.position.userScrollDirection) {
+            case ScrollDirection.idle:
+              break;
+            case ScrollDirection.forward:
+              _isHidden ? setState(() => _isHidden = false) : null;
+              break;
+            case ScrollDirection.reverse:
+              _isHidden ? null : setState(() => _isHidden = true);
+              break;
+          }
+        },
+        {
+          "_isHidden": _isHidden,
+          "userScrollDirection":
+              widget._scrollController.position.userScrollDirection,
+        },
       );
 }
