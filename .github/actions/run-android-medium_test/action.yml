@@ -16,6 +16,10 @@ inputs:
   android-arch:
     required: true
     type: string
+  experimental:
+    type: boolean
+    requried: false
+    default: false
 
 outputs:
   status:
@@ -34,7 +38,7 @@ runs:
         android-api-level: ${{ inputs.android-api-level }}
         android-target: ${{ inputs.android-target }}
         android-arch: ${{ inputs.android-arch }}
-      continue-on-error: true
+      continue-on-error: ${{ inputs.experimental }}
 
     - if: inputs.android-emulator-runner == 'reactivecircus'
       id: run-android-medium_test-via-reactivecircus
@@ -46,7 +50,7 @@ runs:
         android-target: ${{ inputs.android-target }}
         android-arch: ${{ inputs.android-arch }}
   #          android-device-profile: Pixel 5
-      continue-on-error: true
+      continue-on-error: ${{ inputs.experimental }}
 
     - if: inputs.android-emulator-runner == 'native'
       id: run-android-medium_test-via-native
@@ -57,7 +61,7 @@ runs:
         android-api-level: ${{ inputs.android-api-level }}
         android-target: ${{ inputs.android-target }}
         android-arch: ${{ inputs.android-arch }}
-      continue-on-error: true
+      continue-on-error: ${{ inputs.experimental }}
 
     - if: matrix.android-emulator-runner == 'malinskiy'
       name: "Set Result (malinskiy)"

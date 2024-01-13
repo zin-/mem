@@ -76,6 +76,7 @@ jobs:
           android-api-level: 29
           android-target: default
           android-arch: x86_64 # FIXME これandroidのarchじゃなくて動かす側のcpu archだ
+          experimental: ${{ matrix.experimental }}
 
       - name: "Report"
         uses: dorny/test-reporter@v1
