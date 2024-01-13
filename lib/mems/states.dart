@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/core/mem.dart';
@@ -22,6 +23,18 @@ final memProvider = StateNotifierProvider.autoDispose
           as SavedMem?,
     ),
     {"memId": memId},
+  ),
+);
+
+final memByMemIdProvider = StateNotifierProvider.autoDispose
+    .family<ValueStateNotifier<SavedMem?>, SavedMem?, int?>(
+  (ref, memId) => v(
+    () => ValueStateNotifier(
+      ref.read(memsProvider)?.singleWhereOrNull(
+            (element) => element is SavedMem ? element.id == memId : false,
+          ) as SavedMem?,
+    ),
+    memId,
   ),
 );
 
