@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/body.dart';
@@ -15,51 +14,22 @@ class MemDetailPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () {
-          final memIsArchived = ref.watch(memIsArchivedProvider(_memId));
-
-          return _MemDetailPageComponent(
-            _memId,
-            memIsArchived,
-          );
+        () => _MemDetailPage(
+          _memId,
+          ref.watch(memIsArchivedProvider(_memId)),
+        ),
+        {
+          "_memId": _memId,
         },
-        _memId.toString(),
       );
 }
 
-class _MemDetailPageComponent extends StatefulWidget {
+class _MemDetailPage extends StatelessWidget {
+  final _formKey = GlobalKey<FormState>();
   final int? _memId;
   final bool _memIsArchived;
 
-  const _MemDetailPageComponent(this._memId, this._memIsArchived);
-
-  @override
-  State<StatefulWidget> createState() => _MemDetailPageComponentState();
-}
-
-class _MemDetailPageComponentState extends State<_MemDetailPageComponent> {
-  final _formKey = GlobalKey<FormState>();
-  final _keyboardVisibilityController = KeyboardVisibilityController();
-
-  late int? _memId;
-  late bool _memIsArchived;
-
-  bool _isKeyboardShown = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _memId = widget._memId;
-    _memIsArchived = widget._memIsArchived;
-
-    _isKeyboardShown = _keyboardVisibilityController.isVisible;
-    _keyboardVisibilityController.onChange.listen(
-      (bool isVisible) => v(
-        () => setState(() => _isKeyboardShown = isVisible),
-        isVisible,
-      ),
-    );
-  }
+  _MemDetailPage(this._memId, this._memIsArchived);
 
   @override
   Widget build(BuildContext context) => v(
@@ -75,14 +45,10 @@ class _MemDetailPageComponentState extends State<_MemDetailPageComponent> {
             child: MemDetailBody(_memId),
           ),
           floatingActionButton: MemDetailFab(_formKey, _memId),
-          floatingActionButtonLocation: _isKeyboardShown
-              ? FloatingActionButtonLocation.endFloat
-              : FloatingActionButtonLocation.centerFloat,
         ),
         {
           "_memId": _memId,
           "_memIsArchived": _memIsArchived,
-          "_isKeyboardShown": _isKeyboardShown,
         },
       );
 }
