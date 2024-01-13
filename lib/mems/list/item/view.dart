@@ -77,9 +77,7 @@ class _MemListItemViewComponent extends ListTile {
   ) : super(
           leading: memRepeatedNotifications == null
               ? activeAct == null
-                  ?
-                  // TODO archivedでの背景色がおかしい
-                  MemDoneCheckbox(
+                  ? MemDoneCheckbox(
                       mem,
                       (value) => onMemDoneCheckboxTapped(value, mem.id),
                     )
@@ -94,9 +92,7 @@ class _MemListItemViewComponent extends ListTile {
                       : const Icon(Icons.stop),
                 ),
           title: activeAct == null
-              ?
-              // TODO archivedでの背景色がおかしい
-              MemNameText(mem)
+              ? MemNameText(mem)
               : Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
