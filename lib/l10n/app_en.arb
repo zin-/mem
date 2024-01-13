@@ -5,8 +5,6 @@
   "memListDestinationLabel": "List",
   "actListDestinationLabel": "Acts",
 
-  "memListPageTitle": "List",
-  "memDetailPageTitle": "Detail",
   "actCounterConfigureTitle":"Select target",
   "defaultActListPageTitle":"All",
   "settingsPageTitle": "Settings",
