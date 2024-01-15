@@ -3,7 +3,7 @@ import 'package:mem/framework/repository/database_tuple_entity.dart';
 
 import 'date_and_time/date_and_time_period.dart';
 
-class Act extends Entity {
+class Act extends EntityV1 {
   final int memId;
   final DateAndTimePeriod period;
 

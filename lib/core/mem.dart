@@ -1,7 +1,7 @@
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/repository/entity.dart';
 
-class Mem extends Entity {
+class Mem extends EntityV1 {
   final String name;
   final DateTime? doneAt;
   final DateAndTimePeriod? period;

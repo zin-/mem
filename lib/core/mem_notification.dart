@@ -1,7 +1,7 @@
 import 'package:mem/framework/repository/entity.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 
-class MemNotification extends Entity {
+class MemNotification extends EntityV1 {
   // 未保存のMemに紐づくMemNotificationはmemIdをintで持つことができないため暫定的にnullableにしている
   final int? memId;
   final MemNotificationType type;

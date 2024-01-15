@@ -5,7 +5,7 @@ enum MemItemType {
   memo,
 }
 
-class MemItem extends Entity {
+class MemItem extends EntityV1 {
   // 未保存のMemに紐づくMemItemはmemIdをintで持つことができないため暫定的にnullableにしている
   final int? memId;
   final MemItemType type;
