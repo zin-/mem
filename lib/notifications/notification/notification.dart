@@ -1,9 +1,9 @@
 import 'package:mem/framework/repository/entity.dart';
 
-abstract class Notification extends Entity {
+abstract class NotificationV1 extends Entity {
   final int id;
 
-  Notification(this.id);
+  NotificationV1(this.id);
 
   @override
   String toString() => {

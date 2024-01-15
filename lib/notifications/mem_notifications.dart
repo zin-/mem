@@ -16,14 +16,14 @@ const _startNotificationBody = 'start';
 const _endNotificationBody = 'end';
 
 class MemNotifications {
-  static List<Notification> of(
+  static List<NotificationV1> of(
     SavedMem mem,
     TimeOfDay startOfDay,
   ) {
     if (mem.isDone || mem.isArchived) {
       return CancelAllMemNotifications.of(mem.id);
     } else {
-      final notifications = <Notification>[];
+      final notifications = <NotificationV1>[];
       final now = DateTime.now();
 
       final periodStart = mem.period?.start;
@@ -54,7 +54,7 @@ class MemNotifications {
     }
   }
 
-  static Notification _createNotificationAt(
+  static NotificationV1 _createNotificationAt(
     id,
     title,
     body,
@@ -87,7 +87,7 @@ class MemNotifications {
 }
 
 class CancelAllMemNotifications {
-  static List<Notification> of(int memId) => [
+  static List<NotificationV1> of(int memId) => [
         CancelNotification(memStartNotificationId(memId)),
         CancelNotification(memEndNotificationId(memId)),
         CancelNotification(memRepeatedNotificationId(memId)),
