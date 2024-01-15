@@ -20,6 +20,14 @@ class MemNotification extends Entity {
         time == null ? this.time : time(),
         message == null ? this.message : message(),
       );
+
+  @override
+  String toString() => "${super.toString()}: ${{
+        "memId": memId,
+        "type": type,
+        "time": time,
+        "message": message,
+      }}";
 }
 
 class SavedMemNotification extends MemNotification
