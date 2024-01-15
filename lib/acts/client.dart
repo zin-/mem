@@ -11,7 +11,7 @@ import 'package:mem/notifications/notification_ids.dart';
 import 'package:mem/notifications/notification_repository.dart';
 
 class ActsClient {
-  final NotificationClient _notificationClient;
+  final NotificationClientV2 _notificationClient;
 
   final ActService _actService;
 
@@ -50,7 +50,7 @@ class ActsClient {
   static ActsClient? _instance;
 
   factory ActsClient() => _instance ??= ActsClient._(
-        NotificationClient(),
+        NotificationClientV2(),
         ActService(),
         MemRepository(),
         NotificationRepository(),

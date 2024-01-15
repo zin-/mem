@@ -21,7 +21,7 @@ class MemApplication extends StatelessWidget {
   @override
   Widget build(BuildContext context) => i(
         () {
-          NotificationClient(context);
+          NotificationClientV2(context);
           final l10n = buildL10n(context);
 
           return ProviderScope(

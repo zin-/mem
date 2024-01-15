@@ -81,7 +81,7 @@ void testNotificationScenario() => group(": $_scenarioName", () {
                   NotificationResponseType.selectedNotificationAction,
               id: memStartNotificationId(insertedMemId!),
               payload: json.encode({memIdKey: insertedMemId}),
-              actionId: NotificationClient().doneMemAction.id,
+              actionId: NotificationClientV2().doneMemAction.id,
             );
 
             await onDidReceiveNotificationResponse(details);
@@ -132,7 +132,7 @@ void testNotificationScenario() => group(": $_scenarioName", () {
                   NotificationResponseType.selectedNotificationAction,
               id: memRepeatedNotificationId(insertedMemId!),
               payload: json.encode({memIdKey: insertedMemId}),
-              actionId: NotificationClient().startActAction.id,
+              actionId: NotificationClientV2().startActAction.id,
             );
 
             await onDidReceiveNotificationResponse(details);
@@ -181,7 +181,7 @@ void testNotificationScenario() => group(": $_scenarioName", () {
                     NotificationResponseType.selectedNotificationAction,
                 id: memRepeatedNotificationId(insertedMemId!),
                 payload: json.encode({memIdKey: insertedMemId}),
-                actionId: NotificationClient().finishActiveActAction.id,
+                actionId: NotificationClientV2().finishActiveActAction.id,
               );
 
               await onDidReceiveNotificationResponse(details);
@@ -249,7 +249,7 @@ void testNotificationScenario() => group(": $_scenarioName", () {
                       NotificationResponseType.selectedNotificationAction,
                   id: memRepeatedNotificationId(insertedMemId!),
                   payload: json.encode({memIdKey: insertedMemId}),
-                  actionId: NotificationClient().finishActiveActAction.id,
+                  actionId: NotificationClientV2().finishActiveActAction.id,
                 );
 
                 await onDidReceiveNotificationResponse(details);
@@ -322,7 +322,7 @@ void testNotificationScenario() => group(": $_scenarioName", () {
                   NotificationResponseType.selectedNotificationAction,
               id: memRepeatedNotificationId(insertedMemId!),
               payload: json.encode({memIdKey: insertedMemId}),
-              actionId: NotificationClient().pauseAct.id,
+              actionId: NotificationClientV2().pauseAct.id,
             );
 
             await onDidReceiveNotificationResponse(details);
@@ -350,7 +350,7 @@ void testNotificationScenario() => group(": $_scenarioName", () {
                     NotificationResponseType.selectedNotificationAction,
                 id: memRepeatedNotificationId(insertedMemId!),
                 payload: json.encode({memIdKey: insertedMemId}),
-                actionId: NotificationClient().pauseAct.id,
+                actionId: NotificationClientV2().pauseAct.id,
               );
 
               await onDidReceiveNotificationResponse(details);

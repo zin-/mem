@@ -16,7 +16,7 @@ class NotificationService {
   final NotificationRepository _notificationRepository;
 
   // FIXME ここにあるのはおかしい
-  final NotificationClient _notificationClient;
+  final NotificationClientV2 _notificationClient;
 
   Future<void> memReminder(SavedMem mem) => i(
         () async {
@@ -83,5 +83,5 @@ class NotificationService {
   static NotificationService? _instance;
 
   factory NotificationService() => _instance ??=
-      NotificationService._(NotificationRepository(), NotificationClient());
+      NotificationService._(NotificationRepository(), NotificationClientV2());
 }

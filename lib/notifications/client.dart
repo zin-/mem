@@ -9,7 +9,8 @@ import 'package:mem/notifications/notification/finish_active_act_notification_ac
 import 'package:mem/notifications/notification/pause_act_notification_action.dart';
 import 'package:mem/notifications/notification/start_act_notification_action.dart';
 
-class NotificationClient {
+// TODO refactor
+class NotificationClientV2 {
   late final NotificationChannel reminderChannel;
   late final NotificationChannel repeatedReminderChannel;
   late final NotificationChannel activeActNotificationChannel;
@@ -23,7 +24,7 @@ class NotificationClient {
 
   final notificationActions = <NotificationAction>[];
 
-  NotificationClient._(AppLocalizations l10n) {
+  NotificationClientV2._(AppLocalizations l10n) {
     reminderChannel = NotificationChannel(
       'reminder',
       l10n.reminder_name,
@@ -69,10 +70,10 @@ class NotificationClient {
     ]);
   }
 
-  static NotificationClient? _instance;
+  static NotificationClientV2? _instance;
 
-  factory NotificationClient([BuildContext? context]) => i(
-        () => _instance ??= NotificationClient._(buildL10n(context)),
+  factory NotificationClientV2([BuildContext? context]) => i(
+        () => _instance ??= NotificationClientV2._(buildL10n(context)),
         context,
       );
 }

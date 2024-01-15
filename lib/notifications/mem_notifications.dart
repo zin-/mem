@@ -62,7 +62,7 @@ class MemNotifications {
     int memId,
     TimeOfDay startOfDay,
   ) {
-    final notificationClient = NotificationClient();
+    final notificationClient = NotificationClientV2();
 
     return OneTimeNotification(
       id,

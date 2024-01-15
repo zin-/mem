@@ -22,7 +22,7 @@ class ActService {
   final NotificationRepository _notificationRepository;
 
   // FIXME ここに定義されるのはおかしい
-  final NotificationClient _notificationClient;
+  final NotificationClientV2 _notificationClient;
 
   Future<SavedAct> start(int memId, DateAndTime when) => i(
         () async {
@@ -148,6 +148,6 @@ class ActService {
         MemRepository(),
         MemNotificationRepository(),
         NotificationRepository(),
-        NotificationClient(),
+        NotificationClientV2(),
       );
 }
