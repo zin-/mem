@@ -69,7 +69,7 @@ final saveMem =
                   : false,
             );
 
-            ref.read(editingMemProvider(memId).notifier).updatedBy(saved.mem);
+            ref.read(editingMemByMemIdProvider(memId).notifier).updatedBy(saved.mem);
             ref
                 .read(memItemsProvider(memId).notifier)
                 .updatedBy(saved.memItems);
@@ -93,7 +93,7 @@ final archiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
 
       final archived = await MemService().archive(mem);
 
-      ref.read(editingMemProvider(memId).notifier).updatedBy(archived.mem);
+      ref.read(editingMemByMemIdProvider(memId).notifier).updatedBy(archived.mem);
       ref.read(memsProvider.notifier).upsertAll(
           [archived.mem],
           (tmp, item) =>
@@ -112,7 +112,7 @@ final unarchiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
 
       final unarchived = await MemService().unarchive(mem);
 
-      ref.read(editingMemProvider(memId).notifier).updatedBy(unarchived.mem);
+      ref.read(editingMemByMemIdProvider(memId).notifier).updatedBy(unarchived.mem);
       ref.read(memsProvider.notifier).upsertAll(
           [unarchived.mem],
           (tmp, item) =>

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/hero_view.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/mems/detail/states.dart';
 import 'package:mem/repositories/mem.dart';
 
 String _memNameTag(int? memId) => heroTag('mem-name', memId);
@@ -28,17 +30,34 @@ class MemNameText extends StatelessWidget {
       );
 }
 
-class MemNameTextFormField extends StatelessWidget {
-  final String? _memName;
+class MemNameTextFormField extends ConsumerWidget {
   final int? _memId;
+
+  const MemNameTextFormField(this._memId, {super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => v(
+        () {
+          final editingMem = ref.read(editingMemByMemIdProvider(_memId));
+
+          return _MemNameTextFormField(
+            _memId,
+            editingMem.name,
+            (value) => ref
+                .read(editingMemByMemIdProvider(_memId).notifier)
+                .updatedBy(editingMem.copiedWith(name: () => value)),
+          );
+        },
+        {"_memId": _memId},
+      );
+}
+
+class _MemNameTextFormField extends StatelessWidget {
+  final int? _memId;
+  final String _memName;
   final void Function(String value) _onChanged;
 
-  const MemNameTextFormField(
-    this._memName,
-    this._memId,
-    this._onChanged, {
-    Key? key,
-  }) : super(key: key);
+  const _MemNameTextFormField(this._memId, this._memName, this._onChanged);
 
   @override
   Widget build(BuildContext context) => v(
@@ -52,16 +71,13 @@ class MemNameTextFormField extends StatelessWidget {
               decoration: InputDecoration(
                 labelText: l10n.memNameLabel,
               ),
-              autofocus: _memName?.isEmpty ?? false,
+              autofocus: _memName.isEmpty,
               validator: (value) =>
                   (value?.isEmpty ?? false) ? l10n.requiredError : null,
               onChanged: _onChanged,
             ),
           );
         },
-        {
-          '_memName': _memName,
-          '_memId': _memId,
-        },
+        {"_memId": _memId, "_memName": _memName},
       );
 }

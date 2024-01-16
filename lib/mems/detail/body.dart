@@ -25,13 +25,11 @@ class MemDetailBody extends ConsumerWidget {
           return _MemDetailBodyComponent(
             _memId,
             editingMem,
-            (value) => ref.read(editingMemProvider(_memId).notifier).updatedBy(
-                  editingMem.copiedWith(name: () => value),
-                ),
-            (value) => ref.read(editingMemProvider(_memId).notifier).updatedBy(
-                  editingMem.copiedWith(
-                      doneAt: () => value == true ? DateTime.now() : null),
-                ),
+            (value) =>
+                ref.read(editingMemByMemIdProvider(_memId).notifier).updatedBy(
+                      editingMem.copiedWith(
+                          doneAt: () => value == true ? DateTime.now() : null),
+                    ),
           );
         },
         _memId.toString(),
@@ -41,13 +39,11 @@ class MemDetailBody extends ConsumerWidget {
 class _MemDetailBodyComponent extends StatelessWidget {
   final int? _memId;
   final Mem _mem;
-  final Function(String memName) _onMemNameChanged;
   final Function(bool? memDone) _onMemDoneChanged;
 
   const _MemDetailBodyComponent(
     this._memId,
     this._mem,
-    this._onMemNameChanged,
     this._onMemDoneChanged,
   );
 
@@ -61,11 +57,7 @@ class _MemDetailBodyComponent extends StatelessWidget {
                   padding: pageTopPadding,
                   child: Column(
                     children: [
-                      MemNameTextFormField(
-                        _mem.name,
-                        _memId,
-                        _onMemNameChanged,
-                      ),
+                      MemNameTextFormField(_memId),
                       MemDoneCheckbox(
                         _mem,
                         _onMemDoneChanged,
