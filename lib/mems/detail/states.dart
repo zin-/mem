@@ -7,8 +7,6 @@ import 'package:mem/core/mem_notification.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/components/value_state_notifier.dart';
-import 'package:mem/repositories/mem.dart';
-import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/mems/states.dart';
 
 final memDetailProvider = StateNotifierProvider.autoDispose
@@ -28,27 +26,9 @@ final memDetailProvider = StateNotifierProvider.autoDispose
 final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<Mem>, Mem, int?>(
   (ref, memId) => v(
-    () {
-      // TODO memByMemIdProviderに切り替える
-      //  と、通知から表示した際に取得処理が走らないのでnameが表示されない
-      final rawMemList = ref.watch(memsProvider);
-      final memFromRawMemList = rawMemList?.singleWhereOrNull(
-          (element) => element is SavedMem ? element.id == memId : false);
-
-      if (memId != null && rawMemList == null) {
-        MemRepository().shipById(memId).then((value) {
-          ref.read(memsProvider.notifier).upsertAll(
-              [value],
-              (tmp, item) => tmp is SavedMem && item is SavedMem
-                  ? tmp.id == item.id
-                  : false);
-        });
-      }
-
-      return ValueStateNotifier(
-        memFromRawMemList ?? Mem.defaultNew(),
-      );
-    },
+    () => ValueStateNotifier(
+      ref.watch(memByMemIdProvider(memId)) ?? Mem.defaultNew(),
+    ),
     memId,
   ),
 );

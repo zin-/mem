@@ -8,6 +8,7 @@ import 'package:mem/components/value_state_notifier.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/mem.dart';
+import 'package:mem/repositories/mem_repository.dart';
 
 final memsProvider =
     StateNotifierProvider<ListValueStateNotifier<Mem>, List<Mem>?>(
@@ -21,6 +22,7 @@ final memByMemIdProvider = StateNotifierProvider.autoDispose
       ref.read(memsProvider)?.singleWhereOrNull(
             (element) => element is SavedMem ? element.id == memId : false,
           ) as SavedMem?,
+      initialFuture: memId == null ? null : MemRepository().shipById(memId),
     ),
     memId,
   ),
