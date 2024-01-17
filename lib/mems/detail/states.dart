@@ -44,7 +44,7 @@ final memIsArchivedProvider = StateNotifierProvider.autoDispose
 );
 
 final memItemsProvider = StateNotifierProvider.autoDispose
-    .family<ListValueStateNotifier<MemItem>, List<MemItem>?, int?>(
+    .family<ListValueStateNotifier<MemItem>, List<MemItem>, int?>(
   (ref, memId) => v(
     () => ListValueStateNotifier([
       MemItem(memId, MemItemType.memo, ''),
@@ -69,18 +69,17 @@ MemNotification _initialAfterActStartedMemNotification(int? memId) =>
     );
 
 final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
-    .family<ListValueStateNotifier<MemNotification>, List<MemNotification>?,
+    .family<ListValueStateNotifier<MemNotification>, List<MemNotification>,
         int?>(
   (ref, memId) => v(
     () {
       final memNotificationsByMemId = ref
           .watch(memNotificationsProvider)
-          ?.where((element) => element.memId == memId);
-      final memRepeatedNotification =
-          memNotificationsByMemId?.singleWhereOrNull(
-              (element) => element.type == MemNotificationType.repeat);
+          .where((element) => element.memId == memId);
+      final memRepeatedNotification = memNotificationsByMemId.singleWhereOrNull(
+          (element) => element.type == MemNotificationType.repeat);
       final memAfterActStartedNotification =
-          memNotificationsByMemId?.singleWhereOrNull(
+          memNotificationsByMemId.singleWhereOrNull(
               (element) => element.type == MemNotificationType.afterActStarted);
 
       return ListValueStateNotifier(

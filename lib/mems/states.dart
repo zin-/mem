@@ -11,15 +11,15 @@ import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_repository.dart';
 
 final memsProvider =
-    StateNotifierProvider<ListValueStateNotifier<Mem>, List<Mem>?>(
-  (ref) => v(() => ListValueStateNotifier<Mem>(null)),
+    StateNotifierProvider<ListValueStateNotifier<Mem>, List<Mem>>(
+  (ref) => v(() => ListValueStateNotifier<Mem>([])),
 );
 
 final memByMemIdProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<SavedMem?>, SavedMem?, int?>(
   (ref, memId) => v(
     () => ValueStateNotifier(
-      ref.read(memsProvider)?.singleWhereOrNull(
+      ref.read(memsProvider).singleWhereOrNull(
             (element) => element is SavedMem ? element.id == memId : false,
           ) as SavedMem?,
       initialFuture: memId == null ? null : MemRepository().shipById(memId),
@@ -29,8 +29,8 @@ final memByMemIdProvider = StateNotifierProvider.autoDispose
 );
 
 final memNotificationsProvider = StateNotifierProvider<
-    ListValueStateNotifier<MemNotification>, List<MemNotification>?>(
-  (ref) => v(() => ListValueStateNotifier(null)),
+    ListValueStateNotifier<MemNotification>, List<MemNotification>>(
+  (ref) => v(() => ListValueStateNotifier([])),
 );
 
 final removedMemDetailProvider = StateNotifierProvider.autoDispose

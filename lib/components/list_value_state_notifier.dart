@@ -1,12 +1,17 @@
 import 'package:mem/components/value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
 
-class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>?> {
-  ListValueStateNotifier(super.state);
+class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
+  ListValueStateNotifier(
+    super.state, {
+    Future<List<T>>? initialFuture,
+  }) {
+    initialFuture?.then((value) => v(() => updatedBy(value), value));
+  }
 
   void add(T item, {int? index}) => v(
         () {
-          final tmp = List.of(state ?? <T>[]);
+          final tmp = List.of(state);
 
           tmp.insert(index ?? tmp.length, item);
 
@@ -17,7 +22,7 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>?> {
 
   void upsertAll(Iterable<T> items, bool Function(T tmp, T item) where) => v(
         () {
-          final tmp = List.of(state ?? <T>[]);
+          final tmp = List.of(state);
 
           for (var item in items) {
             final index = tmp.indexWhere(
@@ -37,9 +42,9 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>?> {
 
   void removeWhere(bool Function(T element) test) => v(
         () {
-          final tmp = List.of(state ?? <T>[]);
+          final tmp = List.of(state);
 
-          final index = state?.indexWhere(test) ?? -1;
+          final index = state.indexWhere(test);
           if (index != -1) {
             tmp.removeAt(index);
           }
