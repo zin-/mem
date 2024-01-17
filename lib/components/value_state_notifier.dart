@@ -5,12 +5,15 @@ import 'package:mem/logger/log_service.dart';
 
 const _jsonEncoderIndent = '  ';
 
-class ValueStateNotifier<T> extends StateNotifier<T> {
-  ValueStateNotifier(super.state, {Future<T>? future}) {
-    future?.then((value) => v(() => updatedBy(value), value));
+class ValueStateNotifier<StateT> extends StateNotifier<StateT> {
+  ValueStateNotifier(
+    super.state, {
+    Future<StateT>? initialFuture,
+  }) {
+    initialFuture?.then((value) => v(() => updatedBy(value), value));
   }
 
-  T updatedBy(T value) => v(
+  StateT updatedBy(StateT value) => v(
         () => state = value,
         {'current': state, 'updating': value},
       );
