@@ -29,6 +29,8 @@ final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<Mem>, Mem, int?>(
   (ref, memId) => v(
     () {
+      // TODO memByMemIdProviderに切り替える
+      //  と、通知から表示した際に取得処理が走らないのでnameが表示されない
       final rawMemList = ref.watch(memsProvider);
       final memFromRawMemList = rawMemList?.singleWhereOrNull(
           (element) => element is SavedMem ? element.id == memId : false);
@@ -44,7 +46,7 @@ final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
       }
 
       return ValueStateNotifier(
-        mem ?? Mem.defaultNew(),
+        memFromRawMemList ?? Mem.defaultNew(),
       );
     },
     memId,
