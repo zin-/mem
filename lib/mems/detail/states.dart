@@ -44,7 +44,7 @@ final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
       }
 
       return ValueStateNotifier(
-        memFromRawMemList ?? Mem('', null, null),
+        mem ?? Mem.defaultNew(),
       );
     },
     memId,

@@ -20,4 +20,6 @@ class Mem extends EntityV1 {
         doneAt == null ? this.doneAt : doneAt(),
         period == null ? this.period : period(),
       );
+
+  factory Mem.defaultNew() => Mem("", null, null);
 }
