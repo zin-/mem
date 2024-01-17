@@ -17,7 +17,7 @@ class SingleSelectableMemListItem extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _SingleSelectableMemListItemComponent(
           ref.watch(memListProvider).firstWhere((_) => _.id == _memId),
-          ref.watch(selectedMemIdsProvider)?.contains(_memId) ?? false,
+          ref.watch(selectedMemIdsProvider).contains(_memId),
           (memId) => v(
             () => ref
                 .read(selectedMemIdsProvider.notifier)

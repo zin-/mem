@@ -27,10 +27,10 @@ class MemListItemView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemListItemViewComponent(
           ref.watch(memListProvider).firstWhere((_) => _.id == _memId),
-          ref.watch(activeActsProvider)?.singleWhereOrNull(
+          ref.watch(activeActsProvider).singleWhereOrNull(
                 (act) => act.memId == _memId,
               ),
-          ref.watch(memNotificationsByMemIdProvider(_memId))?.singleWhereOrNull(
+          ref.watch(memNotificationsByMemIdProvider(_memId)).singleWhereOrNull(
                 (element) =>
                     element is SavedMemNotification &&
                     element.type == MemNotificationType.repeat,

@@ -28,7 +28,7 @@ class ActLineChartPage extends ConsumerWidget {
                 (loaded) => LineChartWrapper(
                   ActsSummary(
                     ref
-                        .watch(actListProvider(_memId))!
+                        .watch(actListProvider(_memId))
                         .where((element) => element.memId == _memId),
                   ),
                 ),
