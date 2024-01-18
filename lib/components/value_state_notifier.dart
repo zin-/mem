@@ -10,7 +10,12 @@ class ValueStateNotifier<StateT> extends StateNotifier<StateT> {
     super.state, {
     Future<StateT>? initialFuture,
   }) {
-    initialFuture?.then((value) => v(() => updatedBy(value), value));
+    initialFuture?.then(
+      (value) => v(
+        () => updatedBy(value),
+        value,
+      ),
+    );
   }
 
   StateT updatedBy(StateT value) => v(
