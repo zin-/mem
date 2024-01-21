@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/l10n.dart';
+import 'package:mem/components/nullable_widget_builder.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/actions.dart';
+import 'package:mem/mems/states.dart';
+import 'package:mem/repositories/mem.dart';
 
 class RemoveMemIconButton extends ConsumerWidget {
   final int? _memId;
@@ -11,9 +14,15 @@ class RemoveMemIconButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () => _RemoveMemIconButton(
-          () => ref.read(removeMem(_memId!)),
-        ),
+        () {
+          final mem = ref.watch(memByMemIdProvider((_memId)));
+
+          return mem is SavedMem
+              ? _RemoveMemIconButton(
+                  () => ref.read(removeMem(_memId!)),
+                )
+              : nullableWidget;
+        },
         {"_memId": _memId},
       );
 }
