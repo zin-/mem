@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/app_bar_actions_builder.dart';
 import 'package:mem/components/l10n.dart';
-import 'package:mem/components/nullable_widget_builder.dart';
-import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/actions.dart';
 import 'package:mem/mems/states.dart';
 import 'package:mem/repositories/mem.dart';
@@ -55,45 +53,6 @@ class RemoveMemAction extends AppBarAction {
       ),
     );
   }
-}
-
-class RemoveMemIconButton extends ConsumerWidget {
-  final int? _memId;
-
-  const RemoveMemIconButton(this._memId, {super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) => v(
-        () {
-          final mem = ref.watch(memByMemIdProvider((_memId)));
-
-          return mem is SavedMem
-              ? _RemoveMemIconButton(
-                  () => ref.read(removeMem(_memId!)),
-                )
-              : nullableWidget;
-        },
-        {"_memId": _memId},
-      );
-}
-
-class _RemoveMemIconButton extends StatelessWidget {
-  final Future<bool> Function() _removeMem;
-
-  const _RemoveMemIconButton(this._removeMem);
-
-  @override
-  Widget build(BuildContext context) => v(
-        () => IconButton(
-          icon: const Icon(Icons.delete),
-          onPressed: () => v(
-            () => showDialog(
-              context: context,
-              builder: (context) => _RemoveMemAlertDialog(_removeMem),
-            ),
-          ),
-        ),
-      );
 }
 
 class _RemoveMemAlertDialog extends StatelessWidget {
