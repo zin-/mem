@@ -18,74 +18,68 @@ class ArchiveMemAction extends AppBarAction {
         );
 
   @override
-  PopupMenuItem buildPopupMenuItem({
+  Widget buildPopupMenuItemChild(
+    BuildContext context, {
     Icon Function()? icon,
     String Function()? name,
     VoidCallback Function()? onPressed,
   }) {
-    // TODO: refactor
-    return PopupMenuItem(
-      onTap: onPressed == null ? this.onPressed : onPressed(),
-      enabled: onPressed == null ? this.onPressed != null : true,
-      child: Consumer(
-        builder: (context, ref, child) {
-          final mem = ref.watch(memByMemIdProvider(_memId));
-          if (mem is SavedMem) {
-            if (mem.isArchived) {
-              return ListTile(
-                leading: const Icon(Icons.unarchive),
-                title: Text(buildL10n(context).unarchive_action),
-                onTap: () {
-                  ref.read(unarchiveMem(_memId!));
+    // TODO: implement buildPopupMenuItemChild
+    return Consumer(
+      builder: (context, ref, child) {
+        final mem = ref.watch(memByMemIdProvider(_memId));
+        if (mem is SavedMem) {
+          if (mem.isArchived) {
+            return super.buildPopupMenuItemChild(
+              context,
+              icon: () => const Icon(Icons.unarchive),
+              name: () => buildL10n(context).unarchive_action,
+              onPressed: () => () {
+                ref.read(unarchiveMem(_memId!));
 
-                  Navigator.of(context).pop(null);
+                Navigator.of(context).pop(null);
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content:
-                          Text(buildL10n(context).unarchiveMemSuccessMessage(
-                        mem.name,
-                      )),
-                      duration: defaultDismissDuration,
-                      dismissDirection: DismissDirection.horizontal,
-                    ),
-                  );
-                },
-              );
-            } else {
-              return ListTile(
-                leading: const Icon(Icons.archive),
-                title: Text(buildL10n(context).archiveFilterTitle),
-                onTap: () {
-                  ref.read(archiveMem(_memId!));
-
-                  Navigator.of(context)
-                    ..pop(null)
-                    ..pop(null);
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        buildL10n(context).archiveMemSuccessMessage(
-                          mem.name,
-                        ),
-                      ),
-                      duration: defaultDismissDuration,
-                      dismissDirection: DismissDirection.horizontal,
-                    ),
-                  );
-                },
-              );
-            }
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(buildL10n(context).unarchiveMemSuccessMessage(
+                      mem.name,
+                    )),
+                    duration: defaultDismissDuration,
+                    dismissDirection: DismissDirection.horizontal,
+                  ),
+                );
+              },
+            );
           } else {
-            return ListTile(
-              leading: icon == null ? this.icon : icon(),
-              title: Text(name == null ? this.name : name()),
-              enabled: onPressed == null ? this.onPressed != null : true,
+            return super.buildPopupMenuItemChild(
+              context,
+              icon: () => const Icon(Icons.archive),
+              name: () => buildL10n(context).archiveFilterTitle,
+              onPressed: () => () {
+                ref.read(archiveMem(_memId!));
+
+                Navigator.of(context)
+                  ..pop(null)
+                  ..pop(null);
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      buildL10n(context).archiveMemSuccessMessage(
+                        mem.name,
+                      ),
+                    ),
+                    duration: defaultDismissDuration,
+                    dismissDirection: DismissDirection.horizontal,
+                  ),
+                );
+              },
             );
           }
-        },
-      ),
+        } else {
+          return super.buildPopupMenuItemChild(context);
+        }
+      },
     );
   }
 }

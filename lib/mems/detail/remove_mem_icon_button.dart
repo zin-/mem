@@ -17,40 +17,34 @@ class RemoveMemAction extends AppBarAction {
         );
 
   @override
-  PopupMenuItem buildPopupMenuItem({
+  Widget buildPopupMenuItemChild(
+    BuildContext context, {
     Icon Function()? icon,
     String Function()? name,
     VoidCallback Function()? onPressed,
   }) {
-    // TODO: refactor
-    return PopupMenuItem(
-      onTap: onPressed == null ? this.onPressed : onPressed(),
-      enabled: onPressed == null ? this.onPressed != null : true,
-      child: Consumer(
-        builder: (context, ref, child) {
-          final mem = ref.watch(memByMemIdProvider(_memId));
-          if (mem is SavedMem) {
-            return ListTile(
-              leading: this.icon,
-              title: Text(this.name),
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => _RemoveMemAlertDialog(
-                    () => ref.read(removeMem(_memId!)),
-                  ),
-                );
-              },
-            );
-          } else {
-            return ListTile(
-              leading: icon == null ? this.icon : icon(),
-              title: Text(name == null ? this.name : name()),
-              enabled: onPressed == null ? this.onPressed != null : true,
-            );
-          }
-        },
-      ),
+    // TODO: implement buildPopupMenuItemChild
+    return Consumer(
+      builder: (context, ref, child) {
+        final mem = ref.watch(memByMemIdProvider(_memId));
+        if (mem is SavedMem) {
+          return super.buildPopupMenuItemChild(
+            context,
+            onPressed: () => () {
+              showDialog(
+                context: context,
+                builder: (context) => _RemoveMemAlertDialog(
+                  () => ref.read(removeMem(_memId!)),
+                ),
+              );
+            },
+          );
+        } else {
+          return super.buildPopupMenuItemChild(
+            context,
+          );
+        }
+      },
     );
   }
 }
