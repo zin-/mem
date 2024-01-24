@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mem/logger/log_service.dart';
 
@@ -7,28 +6,101 @@ import 'nullable_widget_builder.dart';
 /// [https://m3.material.io/components/top-app-bar/guidelines#b1b64842-7d88-4c3f-8ffb-4183fe648c9e]
 const maxShowCount = 3;
 
-class AppBarActionsBuilder {
-  final List<Widget Function()> _widgetBuilders;
+class AppBarActionsBuilderV2 {
+  final List<AppBarAction> actions;
 
-  AppBarActionsBuilder(this._widgetBuilders);
+  AppBarActionsBuilderV2(this.actions);
 
-  List<Widget>? build() => d(
+  List<Widget>? build() => v(
         () {
-          final widgetList = _widgetBuilders
-              .map((e) => NullableWidgetBuilder(e).build())
-              .whereType<Widget>()
-              .toList(growable: false);
+          // TODO refactor
+          if (actions.length > maxShowCount) {
+            return actions
+                .sublist(0, maxShowCount - 1)
+                .map((e) => e.buildIconButton())
+                .toList()
+              ..add(
+                PopupMenuButton(
+                  itemBuilder: (context) => actions
+                      .sublist(maxShowCount - 1)
+                      .map((e) => e.buildPopupMenuItem())
+                      .toList(),
+                ),
+              )
+              ..toList(growable: false);
+          } else {
+            return actions
+                .map((e) => e.buildIconButton())
+                .toList(growable: false);
+          }
+        },
+      );
+}
 
-          // TODO 最終的なactionsの数によって、適切な数に省略する
-          //  actionsには上限となる数がある、これは画面サイズの制約と認知・操作負荷によるものがある
-          //  TODO 4超の場合、先頭から2つを残して残りをPopupMenuに押し込む
-          //    この際、IconButtonではなく、PopupMenuItemに変換する必要がある
-          //    TODO 元のwidgetを新しいクラスにして、以下の機能を実装する
-          //    - IconButtonとPopupMenuItemに切り替えられるように実装する
-          //    - buildする前に表示するかの判定をしたい
-          //
+abstract class AppBarAction {
+  final Icon icon;
+  final String name;
+  final VoidCallback? onPressed;
 
-          return widgetList;
+  AppBarAction(
+    this.icon,
+    this.name, {
+    this.onPressed,
+  });
+
+  // TODO rename
+  //  この段階では表示されることが確定していないため、buildとは呼べない
+  Widget buildIconButton({
+    Icon Function()? icon,
+    String Function()? name,
+    VoidCallback Function()? onPressed,
+  }) =>
+      v(
+        () => IconButton(
+          onPressed: onPressed == null ? this.onPressed : onPressed(),
+          tooltip: name == null ? this.name : name(),
+          icon: icon == null ? this.icon : icon(),
+        ),
+        {
+          "icon": icon,
+          "name": name,
+          "onPressed": onPressed,
+        },
+      );
+
+  // TODO rename
+  //  この段階では表示されることが確定していないため、buildとは呼べない
+  PopupMenuItem buildPopupMenuItem({
+    Icon Function()? icon,
+    String Function()? name,
+    VoidCallback Function()? onPressed,
+  }) =>
+      v(
+        () =>
+            // FIXME なんかおかしい気がする
+            //  他のrefactoringで拾えそう？
+            PopupMenuItem(
+          onTap: onPressed == null ? this.onPressed : onPressed(),
+          enabled: onPressed == null ? this.onPressed != null : true,
+          child: ListTile(
+            leading: icon == null ? this.icon : icon(),
+            title: Text(name == null ? this.name : name()),
+            onTap: () => d(
+              () {
+                if (onPressed == null) {
+                  this.onPressed?.call();
+                } else {
+                  onPressed()();
+                }
+              },
+            ),
+            enabled: onPressed == null ? this.onPressed != null : true,
+          ),
+        ),
+        {
+          "icon": icon,
+          "name": name,
+          "onPressed": onPressed,
         },
       );
 }

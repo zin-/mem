@@ -2,6 +2,8 @@
   "@@locale": "ja",
   "appTitle": "Mem",
 
+  "actChartPageTitle": "Chart",
+
   "memListDestinationLabel": "List",
   "actListDestinationLabel": "Acts",
 
@@ -55,6 +57,7 @@
   "showDoneLabel": "Show done",
 
   "done_label": "Done",
+  "unarchive_action": "Unarchive",
   "finish_label": "終了",
   "pause_act_label": "一時停止",
   "start_label": "開始",

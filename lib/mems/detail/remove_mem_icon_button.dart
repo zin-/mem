@@ -1,11 +1,61 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/components/app_bar_actions_builder.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/components/nullable_widget_builder.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/actions.dart';
 import 'package:mem/mems/states.dart';
 import 'package:mem/repositories/mem.dart';
+
+class RemoveMemAction extends AppBarAction {
+  final int? _memId;
+
+  RemoveMemAction(BuildContext context, this._memId)
+      : super(
+          const Icon(Icons.delete),
+          buildL10n(context).removeAction,
+          onPressed: _memId == null ? null : () {},
+        );
+
+  @override
+  PopupMenuItem buildPopupMenuItem({
+    Icon Function()? icon,
+    String Function()? name,
+    VoidCallback Function()? onPressed,
+  }) {
+    // TODO: refactor
+    return PopupMenuItem(
+      onTap: onPressed == null ? this.onPressed : onPressed(),
+      enabled: onPressed == null ? this.onPressed != null : true,
+      child: Consumer(
+        builder: (context, ref, child) {
+          final mem = ref.watch(memByMemIdProvider(_memId));
+          if (mem is SavedMem) {
+            return ListTile(
+              leading: this.icon,
+              title: Text(this.name),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => _RemoveMemAlertDialog(
+                    () => ref.read(removeMem(_memId!)),
+                  ),
+                );
+              },
+            );
+          } else {
+            return ListTile(
+              leading: icon == null ? this.icon : icon(),
+              title: Text(name == null ? this.name : name()),
+              enabled: onPressed == null ? this.onPressed != null : true,
+            );
+          }
+        },
+      ),
+    );
+  }
+}
 
 class RemoveMemIconButton extends ConsumerWidget {
   final int? _memId;

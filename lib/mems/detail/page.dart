@@ -39,14 +39,12 @@ class _MemDetailPage extends StatelessWidget {
   Widget build(BuildContext context) => v(
         () => Scaffold(
           appBar: AppBar(
-            actions: AppBarActionsBuilder(
-              [
-                () => TransitChartIconButton(_memId),
-                () => TransitActListIconButton(_memId),
-                () => ArchiveMemIconButton(_memId),
-                () => RemoveMemIconButton(_memId),
-              ],
-            ).build(),
+            actions: AppBarActionsBuilderV2([
+              TransitChartAction(context, _memId),
+              TransitActListAction(context, _memId),
+              ArchiveMemAction(context, _memId),
+              RemoveMemAction(context, _memId),
+            ]).build(),
             backgroundColor: _memIsArchived ? secondaryGreyColor : null,
           ),
           body: Form(
