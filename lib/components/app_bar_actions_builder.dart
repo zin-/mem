@@ -4,10 +4,10 @@ import 'package:mem/logger/log_service.dart';
 /// [https://m3.material.io/components/top-app-bar/guidelines#b1b64842-7d88-4c3f-8ffb-4183fe648c9e]
 const maxShowCount = 3;
 
-class AppBarActionsBuilderV2 {
+class AppBarActionsBuilder {
   final List<AppBarAction> actions;
 
-  AppBarActionsBuilderV2(this.actions);
+  AppBarActionsBuilder(this.actions);
 
   List<Widget>? build() => v(
         () {

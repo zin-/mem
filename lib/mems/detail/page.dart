@@ -39,7 +39,7 @@ class _MemDetailPage extends StatelessWidget {
   Widget build(BuildContext context) => v(
         () => Scaffold(
           appBar: AppBar(
-            actions: AppBarActionsBuilderV2([
+            actions: AppBarActionsBuilder([
               TransitChartAction(context, _memId),
               TransitActListAction(context, _memId),
               ArchiveMemAction(context, _memId),
