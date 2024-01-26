@@ -77,7 +77,9 @@ class ArchiveMemAction extends AppBarAction {
             );
           }
         } else {
-          return super.buildPopupMenuItemChild(context);
+          return super.buildPopupMenuItemChild(
+            context,
+          );
         }
       },
     );

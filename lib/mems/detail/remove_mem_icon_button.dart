@@ -22,6 +22,7 @@ class RemoveMemAction extends AppBarAction {
     Icon Function()? icon,
     String Function()? name,
     VoidCallback Function()? onPressed,
+    ListTileThemeData? listTileThemeData,
   }) {
     // TODO: implement buildPopupMenuItemChild
     return Consumer(

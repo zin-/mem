@@ -10,20 +10,24 @@ class AppBarActions {
   AppBarActions(this.actions);
 
   List<Widget> build(BuildContext context) => v(
-        () => (actions.length > maxShowCount
-                ? [
-                    ...actions
-                        .sublist(0, maxShowCount - 1)
-                        .map((e) => e.buildIconButton()),
-                    PopupMenuButton(
-                      itemBuilder: (context) => actions
-                          .sublist(maxShowCount - 1)
-                          .map((e) => e.buildPopupMenuItem(context))
-                          .toList(),
-                    ),
-                  ]
-                : actions.map((e) => e.buildIconButton()))
-            .toList(growable: false),
+        () {
+          return (actions.length > maxShowCount
+                  ? [
+                      ...actions
+                          .sublist(0, maxShowCount - 1)
+                          .map((e) => e.buildIconButton()),
+                      PopupMenuButton(
+                        itemBuilder: (context) {
+                          return actions
+                              .sublist(maxShowCount - 1)
+                              .map((e) => e._buildPopupMenuItem(context))
+                              .toList();
+                        },
+                      ),
+                    ]
+                  : actions.map((e) => e.buildIconButton()))
+              .toList(growable: false);
+        },
       );
 }
 
@@ -59,29 +63,21 @@ abstract class AppBarAction {
       );
 
   Widget buildPopupMenuItemChild(
+    // FIXME BuildContextを削除する
+    //  できればここでは使いたくない
     BuildContext context, {
     Icon Function()? icon,
     String Function()? name,
     VoidCallback Function()? onPressed,
   }) =>
-      d(
+      v(
         () {
           return ListTileTheme(
-            data: ListTileTheme.of(context).copyWith(
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: Theme.of(context).useMaterial3 ? 12.0 : 16.0,
-              ),
-              minLeadingWidth: 24,
-              horizontalTitleGap: Theme.of(context).useMaterial3 ? 12 : 20,
-              visualDensity: Theme.of(context)
-                  .listTileTheme
-                  .visualDensity
-                  ?.copyWith(horizontal: 0.0),
-            ),
+            data: _createListTileThemeData(context),
             child: ListTile(
               leading: icon == null ? this.icon : icon(),
               title: Text(name == null ? this.name : name()),
-              onTap: () => d(
+              onTap: () => v(
                 () {
                   if (onPressed == null) {
                     this.onPressed?.call();
@@ -98,7 +94,7 @@ abstract class AppBarAction {
 
   // TODO rename
   //  この段階では表示されることが確定していないため、buildとは呼べない
-  PopupMenuItem buildPopupMenuItem(
+  PopupMenuItem _buildPopupMenuItem(
     BuildContext context, {
     Icon Function()? icon,
     String Function()? name,
@@ -122,5 +118,19 @@ abstract class AppBarAction {
           "name": name,
           "onPressed": onPressed,
         },
+      );
+
+  ListTileThemeData _createListTileThemeData(BuildContext context) => v(
+        () => ListTileTheme.of(context).copyWith(
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: Theme.of(context).useMaterial3 ? 12.0 : 16.0,
+          ),
+          minLeadingWidth: 24,
+          horizontalTitleGap: Theme.of(context).useMaterial3 ? 12 : 20,
+          visualDensity: Theme.of(context)
+              .listTileTheme
+              .visualDensity
+              ?.copyWith(horizontal: 0.0),
+        ),
       );
 }
