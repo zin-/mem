@@ -10,6 +10,7 @@ import 'scenarios/act_counter_scenario.dart';
 import 'scenarios/act_scenario.dart';
 import 'scenarios/edge_scenario.dart';
 import 'scenarios/habit_scenario.dart';
+import 'scenarios/memo/memo_detail_scenario.dart';
 import 'scenarios/memo_scenario.dart';
 import 'scenarios/notification_scenario.dart';
 import 'scenarios/settings_scenario.dart';
@@ -30,6 +31,8 @@ void main() {
   });
 
   group('Scenario test', () {
+    testMemoDetailScenario();
+
     testMemoScenario();
     testTodoScenario();
     testTaskScenario();

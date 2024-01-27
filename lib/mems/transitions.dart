@@ -45,6 +45,8 @@ Widget _showMemDetailTransitionBuilder(
       child: child,
     );
 
+const keyUndo = Key("undo");
+
 void handleRemoved(
   BuildContext context,
   WidgetRef ref,
@@ -67,6 +69,7 @@ void handleRemoved(
                 duration: infiniteDismissDuration,
                 dismissDirection: DismissDirection.horizontal,
                 action: SnackBarAction(
+                  key: keyUndo,
                   label: l10n.undoAction,
                   onPressed: () {
                     ref.read(undoRemoveMem(memId));

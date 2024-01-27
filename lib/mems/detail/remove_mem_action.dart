@@ -6,11 +6,14 @@ import 'package:mem/mems/detail/actions.dart';
 import 'package:mem/mems/states.dart';
 import 'package:mem/repositories/mem.dart';
 
+const keyRemoveMem = Key("remove-mem");
+
 class RemoveMemAction extends AppBarAction {
   final int? _memId;
 
   RemoveMemAction(BuildContext context, this._memId)
       : super(
+          key: keyRemoveMem,
           const Icon(Icons.delete),
           buildL10n(context).removeAction,
           onPressed: _memId == null ? null : () {},
@@ -24,7 +27,6 @@ class RemoveMemAction extends AppBarAction {
     VoidCallback Function()? onPressed,
     ListTileThemeData? listTileThemeData,
   }) {
-    // TODO: implement buildPopupMenuItemChild
     return Consumer(
       builder: (context, ref, child) {
         final mem = ref.watch(memByMemIdProvider(_memId));
@@ -50,6 +52,9 @@ class RemoveMemAction extends AppBarAction {
   }
 }
 
+const keyOk = Key("ok");
+const keyCancel = Key("cancel");
+
 class _RemoveMemAlertDialog extends StatelessWidget {
   final Future<bool> Function() _removeMem;
 
@@ -66,6 +71,7 @@ class _RemoveMemAlertDialog extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             ElevatedButton(
+              key: keyOk,
               onPressed: () async {
                 if (await _removeMem()) {
                   if (context.mounted) {
@@ -79,6 +85,7 @@ class _RemoveMemAlertDialog extends StatelessWidget {
               child: Text(l10n.okAction),
             ),
             ElevatedButton(
+              key: keyCancel,
               onPressed: () => Navigator.of(context)
                 ..pop()
                 ..pop(),

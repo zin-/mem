@@ -35,11 +35,13 @@ abstract class AppBarAction {
   final Icon icon;
   final String name;
   final VoidCallback? onPressed;
+  final Key? key;
 
   AppBarAction(
     this.icon,
     this.name, {
     this.onPressed,
+    this.key,
   });
 
   // TODO rename
@@ -75,6 +77,7 @@ abstract class AppBarAction {
           return ListTileTheme(
             data: _createListTileThemeData(context),
             child: ListTile(
+              key: key,
               leading: icon == null ? this.icon : icon(),
               title: Text(name == null ? this.name : name()),
               onTap: () => v(
