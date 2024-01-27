@@ -350,6 +350,9 @@ void testMemoScenario() => group(
                 await widgetTester.tap(find.text(insertedMemName));
                 await widgetTester.pumpAndSettle();
 
+                await widgetTester.tap(find.byIcon(Icons.more_vert));
+                await widgetTester.pumpAndSettle();
+
                 await widgetTester.tap(find.byIcon(Icons.archive));
                 await widgetTester.pumpAndSettle();
 
@@ -369,6 +372,9 @@ void testMemoScenario() => group(
                 expect(find.text(unarchivedMemName), findsOneWidget);
                 expect(find.text(archivedMemName), findsOneWidget);
                 await widgetTester.tap(find.text(insertedMemName));
+                await widgetTester.pumpAndSettle();
+
+                await widgetTester.tap(find.byIcon(Icons.more_vert));
                 await widgetTester.pumpAndSettle();
 
                 await widgetTester.tap(find.byIcon(Icons.unarchive));
