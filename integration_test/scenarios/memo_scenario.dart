@@ -409,7 +409,7 @@ void testMemoScenario() => group(
             await widgetTester.pumpAndSettle();
 
             await widgetTester.tap(find.byIcon(Icons.delete));
-            await widgetTester.pump();
+            await widgetTester.pumpAndSettle();
 
             await widgetTester.tap(find.text('Cancel'));
             await widgetTester.pumpAndSettle();

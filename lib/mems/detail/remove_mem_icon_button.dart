@@ -71,6 +71,7 @@ class _RemoveMemAlertDialog extends StatelessWidget {
                   if (context.mounted) {
                     Navigator.of(context)
                       ..pop()
+                      ..pop()
                       ..pop(true);
                   }
                 }
@@ -78,7 +79,9 @@ class _RemoveMemAlertDialog extends StatelessWidget {
               child: Text(l10n.okAction),
             ),
             ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Navigator.of(context)
+                ..pop()
+                ..pop(),
               child: Text(l10n.cancelAction),
             ),
           ],
