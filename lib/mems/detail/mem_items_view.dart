@@ -7,6 +7,8 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/actions.dart';
 import 'package:mem/mems/detail/states.dart';
 
+const keyMemMemo = Key("mem-memo");
+
 class MemItemsFormFields extends ConsumerWidget {
   final int? _memId;
 
@@ -48,6 +50,7 @@ class _MemItemsFormFieldsComponent extends StatelessWidget {
             children: [
               ..._memItems.map(
                 (memItem) => TextFormField(
+                  key: keyMemMemo,
                   decoration: InputDecoration(
                     icon: const Icon(Icons.subject),
                     labelText: l10n.memMemoLabel,

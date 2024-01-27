@@ -6,6 +6,8 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/repositories/mem.dart';
 
+Key keyMemName = const Key("mem-name");
+
 String _memNameTag(int? memId) => heroTag('mem-name', memId);
 
 class MemNameText extends StatelessWidget {
@@ -18,6 +20,7 @@ class MemNameText extends StatelessWidget {
         () => HeroView(
           _memNameTag(_mem.id),
           Text(
+            key: keyMemName,
             _mem.name,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -67,6 +70,7 @@ class _MemNameTextFormField extends StatelessWidget {
           return HeroView(
             _memNameTag(_memId),
             TextFormField(
+              key: keyMemName,
               initialValue: _memName,
               decoration: InputDecoration(
                 labelText: l10n.memNameLabel,
