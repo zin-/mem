@@ -30,4 +30,7 @@ mixin SavedDatabaseTupleMixin<T> on EntityV1 {
     ..createdAt = origin.createdAt
     ..updatedAt = origin.updatedAt
     ..archivedAt = origin.archivedAt;
+
+  @override
+  String toString() => "Saved${super.toString()}${unpack()}";
 }

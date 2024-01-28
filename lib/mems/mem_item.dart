@@ -17,7 +17,4 @@ class SavedMemItem extends MemItem with SavedDatabaseTupleMixin<int> {
         type,
         value == null ? this.value : value(),
       )..copiedFrom(this);
-
-  @override
-  String toString() => "Saved${super.toString()}${unpack()}";
 }

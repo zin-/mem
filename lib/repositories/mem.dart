@@ -16,7 +16,4 @@ class SavedMem extends Mem with SavedDatabaseTupleMixin<int> {
         doneAt == null ? this.doneAt : doneAt(),
         period == null ? this.period : period(),
       )..copiedFrom(this);
-
-  @override
-  String toString() => "Saved${super.toString()}${unpack()}";
 }
