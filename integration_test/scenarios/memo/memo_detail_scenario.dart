@@ -9,6 +9,8 @@ import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
+import 'package:mem/mems/detail/archive_mem_action.dart';
+import 'package:mem/mems/detail/fab.dart';
 import 'package:mem/mems/detail/mem_items_view.dart';
 import 'package:mem/mems/detail/remove_mem_action.dart';
 import 'package:mem/mems/transitions.dart';
@@ -100,6 +102,68 @@ void testMemoDetailScenario() => group(
         );
 
         group(
+          ": Save",
+          () {
+            testWidgets(
+              ": create.",
+              (widgetTester) async {
+                await runApplication();
+                await widgetTester.pumpAndSettle();
+
+                await widgetTester.tap(newMemFabFinder);
+                await widgetTester.pumpAndSettle();
+
+                // enter text
+                const enteringMemName =
+                    "$_scenarioName: Save: create - entering - mem - name";
+                const enteringMemMemo =
+                    "$_scenarioName: Save: create - entering - mem - memo";
+                await widgetTester.enterText(
+                  find.byKey(keyMemName),
+                  enteringMemName,
+                );
+                await widgetTester.enterText(
+                  find.byKey(keyMemMemo),
+                  enteringMemMemo,
+                );
+
+                // save
+                await widgetTester.tap(find.byKey(keySaveMemFab));
+                await widgetTester.pump();
+
+                // validate save message
+                expect(
+                  find.text(l10n.saveMemSuccessMessage(enteringMemName)),
+                  findsOneWidget,
+                );
+
+                // validate actions states
+                await widgetTester.tap(menuButtonIconFinder);
+                await widgetTester.pumpAndSettle();
+
+                expect(
+                  widgetTester
+                      .widget<ListTile>(find.byKey(keyArchiveMem))
+                      .enabled,
+                  true,
+                );
+                expect(
+                  widgetTester
+                      .widget<ListTile>(find.byKey(keyRemoveMem))
+                      .enabled,
+                  true,
+                );
+
+                // TODO validate db states
+                // TODO back & validate list states
+
+                expect(1, 0);
+              },
+            );
+          },
+        );
+
+        group(
           ": Remove",
           () {
             Future<List<Map<String, Object?>>> selectFromMemsWhereIdIs(
@@ -127,10 +191,12 @@ void testMemoDetailScenario() => group(
                 await widgetTester.tap(menuButtonIconFinder);
                 await widgetTester.pumpAndSettle();
 
-                final removeMem =
-                    widgetTester.widget<ListTile>(find.byKey(keyRemoveMem));
-
-                expect(removeMem.enabled, false);
+                expect(
+                  widgetTester
+                      .widget<ListTile>(find.byKey(keyRemoveMem))
+                      .enabled,
+                  false,
+                );
               },
             );
 
