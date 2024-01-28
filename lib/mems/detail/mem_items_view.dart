@@ -6,6 +6,7 @@ import 'package:mem/core/mem_item.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/actions.dart';
 import 'package:mem/mems/detail/states.dart';
+import 'package:mem/mems/mem_item.dart';
 
 const keyMemMemo = Key("mem-memo");
 

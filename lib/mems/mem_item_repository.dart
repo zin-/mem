@@ -3,6 +3,7 @@ import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
+import 'package:mem/mems/mem_item.dart';
 
 class MemItemRepository
     extends DatabaseTupleRepository<MemItem, SavedMemItem, int> {
