@@ -10,6 +10,8 @@ class Mem extends EntityV1 {
 
   bool get isDone => doneAt != null;
 
+  factory Mem.defaultNew() => Mem("", null, null);
+
   Mem copiedWith({
     String Function()? name,
     DateTime? Function()? doneAt,
@@ -21,5 +23,10 @@ class Mem extends EntityV1 {
         period == null ? this.period : period(),
       );
 
-  factory Mem.defaultNew() => Mem("", null, null);
+  @override
+  String toString() => "Mem: ${{
+        "name": name,
+        "doneAt": doneAt,
+        "period": period,
+      }}";
 }

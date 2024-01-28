@@ -18,9 +18,5 @@ class SavedMem extends Mem with SavedDatabaseTupleMixin<int> {
       )..copiedFrom(this);
 
   @override
-  String toString() => "SavedMem: ${{
-        "name": name,
-        "doneAt": doneAt,
-        "period": period,
-      }}${unpack()}";
+  String toString() => "Saved${super.toString()}${unpack()}";
 }
