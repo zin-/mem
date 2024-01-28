@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/app_bar_actions_builder.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/detail/archive_mem_icon_button.dart';
+import 'package:mem/mems/detail/archive_mem_action.dart';
 import 'package:mem/mems/detail/body.dart';
 import 'package:mem/mems/detail/fab.dart';
 import 'package:mem/mems/detail/remove_mem_action.dart';
-import 'package:mem/mems/detail/transit_act_list_icon_button.dart';
-import 'package:mem/mems/detail/transit_chart_icon_button.dart';
+import 'package:mem/mems/detail/transit_act_list_action.dart';
+import 'package:mem/mems/detail/transit_chart_action.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/values/colors.dart';
 
