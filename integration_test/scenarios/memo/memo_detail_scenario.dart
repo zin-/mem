@@ -102,6 +102,17 @@ void testMemoDetailScenario() => group(
         group(
           ": Remove",
           () {
+            Future<List<Map<String, Object?>>> selectFromMemsWhereIdIs(
+              int memId,
+            ) async {
+              final whereIdIs = Equals(defPkId.name, memId);
+              return await dbA.select(
+                defTableMems,
+                where: whereIdIs.where(),
+                whereArgs: whereIdIs.whereArgs(),
+              );
+            }
+
             testWidgets(
               ": disable on new.",
               (widgetTester) async {
@@ -141,14 +152,8 @@ void testMemoDetailScenario() => group(
                 await widgetTester.tap(find.byKey(keyCancel));
                 await widgetTester.pumpAndSettle();
 
-                final whereIdIs = Equals(defPkId.name, insertedMemId);
                 expect(
-                  (await dbA.select(
-                    defTableMems,
-                    where: whereIdIs.where(),
-                    whereArgs: whereIdIs.whereArgs(),
-                  ))
-                      .length,
+                  (await selectFromMemsWhereIdIs(insertedMemId)).length,
                   1,
                 );
               },
@@ -208,14 +213,8 @@ void testMemoDetailScenario() => group(
                 await widgetTester.pumpAndSettle();
 
                 expect(find.text(insertedMemName), findsOneWidget);
-                final whereIdIs = Equals(defPkId.name, insertedMemId);
                 expect(
-                  (await dbA.select(
-                    defTableMems,
-                    where: whereIdIs.where(),
-                    whereArgs: whereIdIs.whereArgs(),
-                  ))
-                      .length,
+                  (await selectFromMemsWhereIdIs(insertedMemId)).length,
                   1,
                 );
               },
