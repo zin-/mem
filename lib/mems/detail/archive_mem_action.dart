@@ -18,7 +18,7 @@ class ArchiveMemAction extends AppBarAction {
         );
 
   @override
-  Widget buildPopupMenuItemChild(
+  Widget popupMenuItemChildBuilder(
     BuildContext context, {
     Icon Function()? icon,
     String Function()? name,
@@ -30,7 +30,7 @@ class ArchiveMemAction extends AppBarAction {
         final mem = ref.watch(memByMemIdProvider(_memId));
         if (mem is SavedMem) {
           if (mem.isArchived) {
-            return super.buildPopupMenuItemChild(
+            return super.popupMenuItemChildBuilder(
               context,
               icon: () => const Icon(Icons.unarchive),
               name: () => buildL10n(context).unarchive_action,
@@ -51,7 +51,7 @@ class ArchiveMemAction extends AppBarAction {
               },
             );
           } else {
-            return super.buildPopupMenuItemChild(
+            return super.popupMenuItemChildBuilder(
               context,
               icon: () => const Icon(Icons.archive),
               name: () => buildL10n(context).archiveFilterTitle,
@@ -77,7 +77,7 @@ class ArchiveMemAction extends AppBarAction {
             );
           }
         } else {
-          return super.buildPopupMenuItemChild(
+          return super.popupMenuItemChildBuilder(
             context,
           );
         }

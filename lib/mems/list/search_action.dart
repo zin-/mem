@@ -15,19 +15,19 @@ class SearchAction extends AppBarAction {
         );
 
   @override
-  Widget buildIconButton({
+  Widget iconButtonBuilder({
     Icon Function()? icon,
     String Function()? name,
     VoidCallback Function()? onPressed,
   }) =>
       Consumer(
         builder: (context, ref, child) => ref.watch(searchTextProvider) == null
-            ? super.buildIconButton(
+            ? super.iconButtonBuilder(
                 onPressed: () => () {
                   ref.read(searchTextProvider.notifier).updatedBy("");
                 },
               )
-            : super.buildIconButton(
+            : super.iconButtonBuilder(
                 icon: () => const Icon(Icons.close),
                 name: () => buildL10n(context).close_search_action,
                 onPressed: () => () {

@@ -15,17 +15,17 @@ class AppBarActions {
                   ? [
                       ...actions
                           .sublist(0, maxShowCount - 1)
-                          .map((e) => e.buildIconButton()),
+                          .map((e) => e.iconButtonBuilder()),
                       PopupMenuButton(
                         itemBuilder: (context) {
                           return actions
                               .sublist(maxShowCount - 1)
-                              .map((e) => e._buildPopupMenuItem(context))
+                              .map((e) => e._popupMenuItemBuilder(context))
                               .toList();
                         },
                       ),
                     ]
-                  : actions.map((e) => e.buildIconButton()))
+                  : actions.map((e) => e.iconButtonBuilder()))
               .toList(growable: false);
         },
       );
@@ -44,9 +44,7 @@ abstract class AppBarAction {
     this.key,
   });
 
-  // TODO rename
-  //  この段階では表示されることが確定していないため、buildとは呼べない
-  Widget buildIconButton({
+  Widget iconButtonBuilder({
     Icon Function()? icon,
     String Function()? name,
     VoidCallback Function()? onPressed,
@@ -64,7 +62,7 @@ abstract class AppBarAction {
         },
       );
 
-  Widget buildPopupMenuItemChild(
+  Widget popupMenuItemChildBuilder(
     // FIXME BuildContextを削除する
     //  できればここでは使いたくない
     BuildContext context, {
@@ -97,25 +95,23 @@ abstract class AppBarAction {
 
   // TODO rename
   //  この段階では表示されることが確定していないため、buildとは呼べない
-  PopupMenuItem _buildPopupMenuItem(
+  PopupMenuItem _popupMenuItemBuilder(
     BuildContext context, {
     Icon Function()? icon,
     String Function()? name,
     VoidCallback Function()? onPressed,
   }) =>
       v(
-        () {
-          return PopupMenuItem(
-            padding: EdgeInsets.zero,
-            enabled: onPressed == null ? this.onPressed != null : true,
-            child: buildPopupMenuItemChild(
-              context,
-              icon: icon,
-              name: name,
-              onPressed: onPressed,
-            ),
-          );
-        },
+        () => PopupMenuItem(
+          padding: EdgeInsets.zero,
+          enabled: onPressed == null ? this.onPressed != null : true,
+          child: popupMenuItemChildBuilder(
+            context,
+            icon: icon,
+            name: name,
+            onPressed: onPressed,
+          ),
+        ),
         {
           "icon": icon,
           "name": name,
