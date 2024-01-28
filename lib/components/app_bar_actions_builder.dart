@@ -93,8 +93,6 @@ abstract class AppBarAction {
         },
       );
 
-  // TODO rename
-  //  この段階では表示されることが確定していないため、buildとは呼べない
   PopupMenuItem _popupMenuItemBuilder(
     BuildContext context, {
     Icon Function()? icon,
