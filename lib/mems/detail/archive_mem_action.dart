@@ -7,11 +7,14 @@ import 'package:mem/mems/states.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/values/durations.dart';
 
+const keyArchiveMem = Key("archive-mem");
+
 class ArchiveMemAction extends AppBarAction {
   final int? _memId;
 
   ArchiveMemAction(BuildContext context, this._memId)
       : super(
+          key: keyArchiveMem,
           const Icon(Icons.archive),
           buildL10n(context).archiveFilterTitle,
           onPressed: _memId == null ? null : () {},
