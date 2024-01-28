@@ -51,6 +51,7 @@ abstract class AppBarAction {
   }) =>
       v(
         () => IconButton(
+          key: key,
           onPressed: onPressed == null ? this.onPressed : onPressed(),
           tooltip: name == null ? this.name : name(),
           icon: icon == null ? this.icon : icon(),
