@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/app_bar_actions_builder.dart';
-import 'package:mem/components/mem/list/filter.dart';
 import 'package:mem/components/nullable_widget.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/mems/list/filter_action.dart';
 import 'package:mem/mems/list/search_action.dart';
 import 'package:mem/mems/list/states.dart';
 
@@ -19,10 +19,10 @@ class MemListAppBar extends ConsumerWidget {
 }
 
 class _MemListAppBar extends StatelessWidget {
-  final bool _onSearch;
+  final bool _searching;
 
   const _MemListAppBar(
-    this._onSearch,
+    this._searching,
   );
 
   @override
@@ -32,24 +32,11 @@ class _MemListAppBar extends StatelessWidget {
             () => const SearchTextFormField(),
           ).build(),
           floating: true,
-          actions: [
-            ...AppBarActions([
-              SearchAction(context),
-            ]).build(context),
-            Row(
-              children: [
-                if (!_onSearch)
-                  IconButton(
-                    icon: const Icon(Icons.filter_list),
-                    onPressed: () => showModalBottomSheet(
-                      context: context,
-                      builder: (context) => const MemListFilter(),
-                    ),
-                  ),
-              ],
-            ),
-          ],
+          actions: AppBarActions([
+            SearchAction(context),
+            if (!_searching) FilterAction(context),
+          ]).build(context),
         ),
-        {"_onSearch": _onSearch},
+        {"_onSearch": _searching},
       );
 }

@@ -51,6 +51,7 @@
   "cancelAction": "Cancel",
   "search_action": "検索",
   "close_search_action": "やめる",
+  "filter_action": "絞り込む",
   "archiveFilterTitle": "Archive",
   "showNotArchivedLabel": "Show not archived",
   "showArchivedLabel": "Show archived",
