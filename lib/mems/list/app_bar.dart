@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/components/app_bar_actions_builder.dart';
 import 'package:mem/components/mem/list/filter.dart';
+import 'package:mem/components/nullable_widget.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/mems/list/search_action.dart';
 import 'package:mem/mems/list/states.dart';
 
 class MemListAppBar extends ConsumerWidget {
@@ -10,53 +13,31 @@ class MemListAppBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return _MemListAppBar(
-      ref.watch(onSearchProvider),
-      ref.read(onSearchProvider.notifier).updatedBy,
-      ref.watch(searchTextProvider.notifier).updatedBy,
+      ref.watch(searchTextProvider) != null,
     );
   }
 }
 
 class _MemListAppBar extends StatelessWidget {
   final bool _onSearch;
-  final void Function(bool value) _changeOnSearch;
-
-  final void Function(String value) _onSearchTextChanged;
 
   const _MemListAppBar(
     this._onSearch,
-    this._changeOnSearch,
-    this._onSearchTextChanged,
   );
 
   @override
   Widget build(BuildContext context) => v(
         () => SliverAppBar(
-          title: _onSearch
-              ? TextFormField(
-                  autofocus: true,
-                  decoration: const InputDecoration(
-                    icon: Icon(Icons.search),
-                  ),
-                  onChanged: _onSearchTextChanged,
-                )
-              : null,
+          title: NullableWidgetBuilder(
+            () => const SearchTextFormField(),
+          ).build(),
           floating: true,
           actions: [
+            ...AppBarActions([
+              SearchAction(context),
+            ]).build(context),
             Row(
               children: [
-                _onSearch
-                    ? IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () {
-                          _onSearchTextChanged("");
-                          _changeOnSearch(false);
-                        },
-                      )
-                    : IconButton(
-                        icon: const Icon(Icons.search),
-                        onPressed: () => _changeOnSearch(true),
-                      ),
                 if (!_onSearch)
                   IconButton(
                     icon: const Icon(Icons.filter_list),

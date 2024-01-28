@@ -49,6 +49,8 @@
   },
   "okAction": "OK",
   "cancelAction": "Cancel",
+  "search_action": "Search",
+  "close_search_action": "Close",
   "archiveFilterTitle": "Archive",
   "showNotArchivedLabel": "Show not archived",
   "showArchivedLabel": "Show archived",

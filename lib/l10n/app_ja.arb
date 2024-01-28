@@ -49,6 +49,8 @@
   },
   "okAction": "OK",
   "cancelAction": "Cancel",
+  "search_action": "検索",
+  "close_search_action": "やめる",
   "archiveFilterTitle": "Archive",
   "showNotArchivedLabel": "Show not archived",
   "showArchivedLabel": "Show archived",
