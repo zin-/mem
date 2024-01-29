@@ -33,16 +33,6 @@ final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
   ),
 );
 
-final memIsArchivedProvider = StateNotifierProvider.autoDispose
-    .family<ValueStateNotifier<bool>, bool, int?>(
-  (ref, memId) => v(
-    () => ValueStateNotifier(
-      ref.watch(memByMemIdProvider(memId))?.isArchived ?? false,
-    ),
-    memId,
-  ),
-);
-
 final memItemsProvider = StateNotifierProvider.autoDispose
     .family<ListValueStateNotifier<MemItem>, List<MemItem>, int?>(
   (ref, memId) => v(

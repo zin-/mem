@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/app_bar_actions_builder.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/mems/detail/actions.dart';
-import 'package:mem/mems/states.dart';
+import 'package:mem/mems/detail/states.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/values/durations.dart';
 
@@ -12,12 +12,19 @@ const keyArchiveMem = Key("archive-mem");
 class ArchiveMemAction extends AppBarAction {
   final int? _memId;
 
-  ArchiveMemAction(BuildContext context, this._memId)
-      : super(
+  ArchiveMemAction(
+    BuildContext context,
+    this._memId,
+    bool memIsSaved,
+  ) : super(
           key: keyArchiveMem,
           const Icon(Icons.archive),
           buildL10n(context).archiveFilterTitle,
-          onPressed: _memId == null ? null : () {},
+          onPressed: memIsSaved
+              ? () {}
+              : _memId == null
+                  ? null
+                  : () {},
         );
 
   @override
@@ -27,10 +34,9 @@ class ArchiveMemAction extends AppBarAction {
     String Function()? name,
     VoidCallback Function()? onPressed,
   }) {
-    // TODO: implement buildPopupMenuItemChild
     return Consumer(
       builder: (context, ref, child) {
-        final mem = ref.watch(memByMemIdProvider(_memId));
+        final mem = ref.watch(editingMemByMemIdProvider(_memId));
         if (mem is SavedMem) {
           if (mem.isArchived) {
             return super.popupMenuItemChildBuilder(
@@ -38,7 +44,7 @@ class ArchiveMemAction extends AppBarAction {
               icon: () => const Icon(Icons.unarchive),
               name: () => buildL10n(context).unarchive_action,
               onPressed: () => () {
-                ref.read(unarchiveMem(_memId!));
+                ref.read(unarchiveMem(mem.id));
 
                 Navigator.of(context).pop(null);
 
@@ -59,7 +65,7 @@ class ArchiveMemAction extends AppBarAction {
               icon: () => const Icon(Icons.archive),
               name: () => buildL10n(context).archiveFilterTitle,
               onPressed: () => () {
-                ref.read(archiveMem(_memId!));
+                ref.read(archiveMem(mem.id));
 
                 Navigator.of(context)
                   ..pop(null)

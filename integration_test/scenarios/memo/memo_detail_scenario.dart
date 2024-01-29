@@ -129,7 +129,7 @@ void testMemoDetailScenario() => group(
 
                 // save
                 await widgetTester.tap(find.byKey(keySaveMemFab));
-                await widgetTester.pump();
+                await widgetTester.pumpAndSettle();
 
                 // validate save message
                 expect(
