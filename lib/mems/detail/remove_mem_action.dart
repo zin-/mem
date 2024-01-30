@@ -11,12 +11,19 @@ const keyRemoveMem = Key("remove-mem");
 class RemoveMemAction extends AppBarAction {
   final int? _memId;
 
-  RemoveMemAction(BuildContext context, this._memId)
-      : super(
+  RemoveMemAction(
+    BuildContext context,
+    this._memId,
+    bool memIsSaved,
+  ) : super(
           key: keyRemoveMem,
           const Icon(Icons.delete),
           buildL10n(context).removeAction,
-          onPressed: _memId == null ? null : () {},
+          onPressed: memIsSaved
+              ? () {}
+              : _memId == null
+                  ? null
+                  : () {},
         );
 
   @override

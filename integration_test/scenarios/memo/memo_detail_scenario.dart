@@ -14,6 +14,7 @@ import 'package:mem/mems/detail/fab.dart';
 import 'package:mem/mems/detail/mem_items_view.dart';
 import 'package:mem/mems/detail/remove_mem_action.dart';
 import 'package:mem/mems/transitions.dart';
+import 'package:mem/values/durations.dart';
 
 import '../helpers.dart';
 
@@ -153,11 +154,37 @@ void testMemoDetailScenario() => group(
                       .enabled,
                   true,
                 );
+                // TODO close popup menu
 
-                // TODO validate db states
+                // validate db states
+                final getCreatedMem =
+                    Equals(defColMemsName.name, enteringMemName);
+                final mems = await dbA.select(
+                  defTableMems,
+                  where: getCreatedMem.where(),
+                  whereArgs: getCreatedMem.whereArgs(),
+                );
+                expect(mems.length, 1);
+                final getCreatedMemItem = And([
+                  Equals(defFkMemItemsMemId.name, mems[0][defPkId.name]),
+                  Equals(defColMemItemsType.name, MemItemType.memo.name),
+                  Equals(defColMemItemsValue.name, enteringMemMemo),
+                ]);
+                final memItems = await dbA.select(
+                  defTableMemItems,
+                  where: getCreatedMemItem.where(),
+                  whereArgs: getCreatedMemItem.whereArgs(),
+                );
+                expect(memItems.length, 1);
+
                 // TODO back & validate list states
+                await widgetTester.pageBack();
+                await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-                expect(1, 0);
+                expect(
+                  find.text(enteringMemName),
+                  findsOneWidget,
+                );
               },
             );
           },

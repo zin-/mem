@@ -50,7 +50,7 @@ class _MemDetailPage extends StatelessWidget {
               TransitChartAction(context, _memId),
               TransitActListAction(context, _memId),
               ArchiveMemAction(context, _memId, _memIsSaved),
-              RemoveMemAction(context, _memId),
+              RemoveMemAction(context, _memId, _memIsSaved),
             ]).build(context),
             backgroundColor: _memIsArchived ? secondaryGreyColor : null,
           ),
