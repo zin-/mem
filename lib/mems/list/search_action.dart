@@ -16,6 +16,7 @@ class SearchAction extends AppBarAction {
 
   @override
   Widget iconButtonBuilder({
+    Key Function()? key,
     Icon Function()? icon,
     String Function()? name,
     VoidCallback Function()? onPressed,

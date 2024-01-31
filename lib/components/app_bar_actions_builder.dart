@@ -21,8 +21,8 @@ class AppBarActionsBuilder {
                           return actions.sublist(_maxShowCount - 1).map(
                             (e) {
                               return PopupMenuItem(
-                                // childには基本ListTileを用いるため、zeroを指定し、ListTile側でUIを調整する
                                 padding: EdgeInsets.zero,
+                                enabled: e.onPressed != null,
                                 child: SizedBox(
                                   height: 48.0,
                                   child: ListTileTheme(
@@ -37,7 +37,7 @@ class AppBarActionsBuilder {
                                           .visualDensity
                                           ?.copyWith(horizontal: 0.0),
                                     ),
-                                    child: e.popupMenuItemChildBuilder(context),
+                                    child: e.popupMenuItemChildBuilder(),
                                   ),
                                 ),
                               );
@@ -66,13 +66,14 @@ abstract class AppBarAction {
   });
 
   Widget iconButtonBuilder({
+    Key Function()? key,
     Icon Function()? icon,
     String Function()? name,
     VoidCallback Function()? onPressed,
   }) =>
       v(
         () => IconButton(
-          key: key,
+          key: key == null ? this.key : key(),
           onPressed: onPressed == null ? this.onPressed : onPressed(),
           tooltip: name == null ? this.name : name(),
           icon: icon == null ? this.icon : icon(),
@@ -85,10 +86,8 @@ abstract class AppBarAction {
       );
 
   // MenuItemChildは基本的にはListTileだが、Consumerの利用が必要な場合があるためWidgetとしている
-  Widget popupMenuItemChildBuilder(
-    // FIXME BuildContextを削除する
-    //  できればここでは使いたくない
-    BuildContext context, {
+  Widget popupMenuItemChildBuilder({
+    Key Function()? key,
     Icon Function()? icon,
     String Function()? name,
     VoidCallback Function()? onPressed,
@@ -96,7 +95,7 @@ abstract class AppBarAction {
       v(
         () {
           return ListTile(
-            key: key,
+            key: key == null ? this.key : key(),
             leading: icon == null ? this.icon : icon(),
             title: Text(name == null ? this.name : name()),
             onTap: () => v(

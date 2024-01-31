@@ -27,19 +27,17 @@ class RemoveMemAction extends AppBarAction {
         );
 
   @override
-  Widget popupMenuItemChildBuilder(
-    BuildContext context, {
+  Widget popupMenuItemChildBuilder({
+    Key Function()? key,
     Icon Function()? icon,
     String Function()? name,
     VoidCallback Function()? onPressed,
-    ListTileThemeData? listTileThemeData,
   }) {
     return Consumer(
       builder: (context, ref, child) {
         final mem = ref.watch(memByMemIdProvider(_memId));
         if (mem is SavedMem) {
           return super.popupMenuItemChildBuilder(
-            context,
             onPressed: () => () {
               showDialog(
                 context: context,
@@ -50,9 +48,7 @@ class RemoveMemAction extends AppBarAction {
             },
           );
         } else {
-          return super.popupMenuItemChildBuilder(
-            context,
-          );
+          return super.popupMenuItemChildBuilder();
         }
       },
     );
