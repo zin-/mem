@@ -8,7 +8,7 @@ import 'package:mem/repositories/mem.dart';
 import 'package:mem/values/durations.dart';
 
 class ArchiveMemAction extends AppBarActionBuilder {
-  final int? _memId;
+  final int _memId;
 
   ArchiveMemAction(this._memId) : super();
 

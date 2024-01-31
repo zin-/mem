@@ -9,7 +9,7 @@ import 'package:mem/repositories/mem.dart';
 const keyRemoveMem = Key("remove-mem");
 
 class RemoveMemAction extends AppBarActionBuilder {
-  final int? _memId;
+  final int _memId;
 
   RemoveMemAction(this._memId)
       : super(
@@ -34,7 +34,7 @@ class RemoveMemAction extends AppBarActionBuilder {
                 showDialog(
                   context: context,
                   builder: (context) => _RemoveMemAlertDialog(
-                    () => ref.read(removeMem(_memId!)),
+                    () => ref.read(removeMem(mem.id)),
                   ),
                 );
               },

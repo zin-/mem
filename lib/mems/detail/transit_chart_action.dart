@@ -5,19 +5,17 @@ import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
 
 class TransitChartAction extends AppBarActionBuilder {
-  TransitChartAction(BuildContext context, int? memId)
+  TransitChartAction(BuildContext context, int memId)
       : super(
           icon: const Icon(Icons.show_chart),
           name: buildL10n(context).actChartPageTitle,
-          onPressed: memId == null
-              ? null
-              : () => v(
-                    () => Navigator.of(context).push(
-                      PageRouteBuilder(
-                        pageBuilder: (context, animation, secondaryAnimation) =>
-                            ActLineChartPage(memId),
-                      ),
-                    ),
-                  ),
+          onPressed: () => v(
+            () => Navigator.of(context).push(
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    ActLineChartPage(memId),
+              ),
+            ),
+          ),
         );
 }

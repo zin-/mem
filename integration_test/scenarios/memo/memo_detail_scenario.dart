@@ -165,7 +165,7 @@ void testMemoDetailScenario() => group(
             }
 
             testWidgets(
-              ": disable on new.",
+              ": nothing on new.",
               (widgetTester) async {
                 await runApplication();
                 await widgetTester.pumpAndSettle();
@@ -174,16 +174,17 @@ void testMemoDetailScenario() => group(
                 await widgetTester.pumpAndSettle();
 
                 expect(find.byKey(keyRemoveMem), findsNothing);
+                expect(menuButtonIconFinder, findsNothing);
 
-                await widgetTester.tap(menuButtonIconFinder);
-                await widgetTester.pumpAndSettle();
-
-                expect(
-                  widgetTester
-                      .widget<ListTile>(find.byKey(keyRemoveMem))
-                      .enabled,
-                  false,
-                );
+                // await widgetTester.tap(menuButtonIconFinder);
+                // await widgetTester.pumpAndSettle();
+                //
+                // expect(
+                //   widgetTester
+                //       .widget<ListTile>(find.byKey(keyRemoveMem))
+                //       .enabled,
+                //   false,
+                // );
               },
             );
 

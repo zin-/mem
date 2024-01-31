@@ -21,7 +21,6 @@ class AppBarActionsBuilder {
                           (e) {
                             return PopupMenuItem(
                               padding: EdgeInsets.zero,
-                              enabled: e._onPressed != null,
                               child: SizedBox(
                                 height: 48.0,
                                 child: ListTileTheme(
