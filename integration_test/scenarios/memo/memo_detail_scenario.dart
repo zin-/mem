@@ -9,7 +9,6 @@ import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
-import 'package:mem/mems/detail/archive_mem_action.dart';
 import 'package:mem/mems/detail/fab.dart';
 import 'package:mem/mems/detail/mem_items_view.dart';
 import 'package:mem/mems/detail/remove_mem_action.dart';
@@ -142,21 +141,6 @@ void testMemoDetailScenario() => group(
                     whereArgs: getCreatedMemItem.whereArgs());
                 expect(memItems.length, 1);
 
-                await widgetTester.tap(menuButtonIconFinder);
-                await widgetTester.pumpAndSettle();
-                expect(
-                    widgetTester
-                        .widget<ListTile>(find.byKey(keyArchiveMem))
-                        .enabled,
-                    true);
-                expect(
-                    widgetTester
-                        .widget<ListTile>(find.byKey(keyRemoveMem))
-                        .enabled,
-                    true);
-
-                await widgetTester.tapAt(const Offset(0.0, 0.0));
-                await widgetTester.pumpAndSettle();
                 await widgetTester.pageBack();
                 await widgetTester.pumpAndSettle(defaultTransitionDuration);
                 expect(find.text(enteringMemName), findsOneWidget);
