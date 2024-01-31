@@ -1,69 +1,69 @@
 import 'package:flutter/material.dart';
 import 'package:mem/logger/log_service.dart';
 
-/// [https://m3.material.io/components/top-app-bar/guidelines#b1b64842-7d88-4c3f-8ffb-4183fe648c9e]
-const _maxShowCount = 3;
-
 class AppBarActionsBuilder {
-  final List<AppBarActionBuilder> actions;
+  /// [https://m3.material.io/components/top-app-bar/guidelines#b1b64842-7d88-4c3f-8ffb-4183fe648c9e]
+  final _maxShowCount = 3;
 
-  AppBarActionsBuilder(this.actions);
+  final List<AppBarActionBuilder> _actions;
+
+  AppBarActionsBuilder(this._actions);
 
   List<Widget> build(BuildContext context) => v(
-        () {
-          return (actions.length > _maxShowCount
-                  ? [
-                      ...actions
-                          .sublist(0, _maxShowCount - 1)
-                          .map((e) => e.iconButtonBuilder()),
-                      PopupMenuButton(
-                        itemBuilder: (context) {
-                          return actions.sublist(_maxShowCount - 1).map(
-                            (e) {
-                              return PopupMenuItem(
-                                padding: EdgeInsets.zero,
-                                enabled: e.onPressed != null,
-                                child: SizedBox(
-                                  height: 48.0,
-                                  child: ListTileTheme(
-                                    data: ListTileTheme.of(context).copyWith(
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                        horizontal: 12.0,
-                                      ),
-                                      minLeadingWidth: 24,
-                                      horizontalTitleGap: 12,
-                                      visualDensity: ListTileTheme.of(context)
-                                          .visualDensity
-                                          ?.copyWith(horizontal: 0.0),
+        () => (_actions.length > _maxShowCount
+                ? [
+                    ..._actions
+                        .sublist(0, _maxShowCount - 1)
+                        .map((e) => e.iconButtonBuilder()),
+                    PopupMenuButton(
+                      itemBuilder: (context) {
+                        return _actions.sublist(_maxShowCount - 1).map(
+                          (e) {
+                            return PopupMenuItem(
+                              padding: EdgeInsets.zero,
+                              enabled: e._onPressed != null,
+                              child: SizedBox(
+                                height: 48.0,
+                                child: ListTileTheme(
+                                  data: ListTileTheme.of(context).copyWith(
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 12.0,
                                     ),
-                                    child: e.popupMenuItemChildBuilder(),
+                                    minLeadingWidth: 24,
+                                    horizontalTitleGap: 12,
+                                    visualDensity: ListTileTheme.of(context)
+                                        .visualDensity
+                                        ?.copyWith(horizontal: 0.0),
                                   ),
+                                  child: e.popupMenuItemChildBuilder(),
                                 ),
-                              );
-                            },
-                          ).toList();
-                        },
-                      ),
-                    ]
-                  : actions.map((e) => e.iconButtonBuilder()))
-              .toList(growable: false);
-        },
+                              ),
+                            );
+                          },
+                        ).toList();
+                      },
+                    ),
+                  ]
+                : _actions.map((e) => e.iconButtonBuilder()))
+            .toList(growable: false),
       );
 }
 
 abstract class AppBarActionBuilder {
-  final Key? key;
-  final Icon? icon;
-  final String? name;
-  final VoidCallback? onPressed;
+  final Key? _key;
+  final Icon? _icon;
+  final String? _name;
+  final VoidCallback? _onPressed;
 
   AppBarActionBuilder({
-    this.key,
-    this.icon,
-    this.name,
-    this.onPressed,
-  });
+    Key? key,
+    Icon? icon,
+    String? name,
+    VoidCallback? onPressed,
+  })  : _onPressed = onPressed,
+        _name = name,
+        _icon = icon,
+        _key = key;
 
   Widget iconButtonBuilder({
     Key Function()? key,
@@ -73,10 +73,10 @@ abstract class AppBarActionBuilder {
   }) =>
       v(
         () => IconButton(
-          key: key == null ? this.key : key(),
-          onPressed: onPressed == null ? this.onPressed : onPressed(),
-          tooltip: name == null ? this.name : name(),
-          icon: icon == null ? this.icon! : icon(),
+          key: key == null ? _key : key(),
+          onPressed: onPressed == null ? _onPressed : onPressed(),
+          tooltip: name == null ? _name : name(),
+          icon: icon == null ? _icon! : icon(),
         ),
         {
           "key": key?.call(),
@@ -86,7 +86,6 @@ abstract class AppBarActionBuilder {
         },
       );
 
-  // MenuItemChildは基本的にはListTileだが、Consumerの利用が必要な場合があるためWidgetとしている
   Widget popupMenuItemChildBuilder({
     Key Function()? key,
     Icon Function()? icon,
@@ -95,22 +94,14 @@ abstract class AppBarActionBuilder {
   }) =>
       v(
         () {
-          final resolvedName = name == null ? this.name : name();
+          final resolvedName = name == null ? _name : name();
 
           return ListTile(
-            key: key == null ? this.key : key(),
-            leading: icon == null ? this.icon : icon(),
+            key: key == null ? _key : key(),
+            leading: icon == null ? _icon : icon(),
             title: resolvedName == null ? null : Text(resolvedName),
-            onTap: () => v(
-              () {
-                if (onPressed == null) {
-                  this.onPressed?.call();
-                } else {
-                  onPressed()();
-                }
-              },
-            ),
-            enabled: onPressed == null ? this.onPressed != null : true,
+            onTap: onPressed == null ? _onPressed : onPressed(),
+            enabled: onPressed == null ? _onPressed != null : true,
           );
         },
         {
