@@ -4,6 +4,8 @@ import 'package:mem/logger/log_service.dart';
 class AppBarActionsBuilder {
   /// [https://m3.material.io/components/top-app-bar/guidelines#b1b64842-7d88-4c3f-8ffb-4183fe648c9e]
   final _maxShowCount = 3;
+  final _popupMenuItemPadding = EdgeInsets.zero;
+  final _popupMenuItemHeight = 48.0;
 
   final List<AppBarActionBuilder> _actions;
 
@@ -20,20 +22,11 @@ class AppBarActionsBuilder {
                         return _actions.sublist(_maxShowCount - 1).map(
                           (e) {
                             return PopupMenuItem(
-                              padding: EdgeInsets.zero,
+                              padding: _popupMenuItemPadding,
                               child: SizedBox(
-                                height: 48.0,
+                                height: _popupMenuItemHeight,
                                 child: ListTileTheme(
-                                  data: ListTileTheme.of(context).copyWith(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 12.0,
-                                    ),
-                                    minLeadingWidth: 24,
-                                    horizontalTitleGap: 12,
-                                    visualDensity: ListTileTheme.of(context)
-                                        .visualDensity
-                                        ?.copyWith(horizontal: 0.0),
-                                  ),
+                                  data: _createListTileTheme(context),
                                   child: e.popupMenuItemChildBuilder(),
                                 ),
                               ),
@@ -45,6 +38,15 @@ class AppBarActionsBuilder {
                   ]
                 : _actions.map((e) => e.iconButtonBuilder()))
             .toList(growable: false),
+      );
+
+  ListTileThemeData _createListTileTheme(BuildContext context) =>
+      ListTileTheme.of(context).copyWith(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12.0),
+        minLeadingWidth: 24,
+        horizontalTitleGap: 12,
+        visualDensity:
+            ListTileTheme.of(context).visualDensity?.copyWith(horizontal: 0.0),
       );
 }
 
