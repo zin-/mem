@@ -11,18 +11,10 @@ const keyRemoveMem = Key("remove-mem");
 class RemoveMemAction extends AppBarActionBuilder {
   final int? _memId;
 
-  RemoveMemAction(
-    BuildContext context,
-    this._memId,
-    bool memIsSaved,
-  ) : super(
+  RemoveMemAction(this._memId)
+      : super(
           key: keyRemoveMem,
           icon: const Icon(Icons.delete),
-          onPressed: memIsSaved
-              ? () {}
-              : _memId == null
-                  ? null
-                  : () {},
         );
 
   @override
@@ -31,28 +23,27 @@ class RemoveMemAction extends AppBarActionBuilder {
     Icon Function()? icon,
     String Function()? name,
     VoidCallback Function()? onPressed,
-  }) {
-    return Consumer(
-      builder: (context, ref, child) {
-        final mem = ref.watch(memByMemIdProvider(_memId));
-        if (mem is SavedMem) {
-          return super.popupMenuItemChildBuilder(
-            name: () => buildL10n(context).removeAction,
-            onPressed: () => () {
-              showDialog(
-                context: context,
-                builder: (context) => _RemoveMemAlertDialog(
-                  () => ref.read(removeMem(_memId!)),
-                ),
-              );
-            },
-          );
-        } else {
-          return super.popupMenuItemChildBuilder();
-        }
-      },
-    );
-  }
+  }) =>
+      Consumer(
+        builder: (context, ref, child) {
+          final mem = ref.watch(memByMemIdProvider(_memId));
+          if (mem is SavedMem) {
+            return super.popupMenuItemChildBuilder(
+              name: () => buildL10n(context).removeAction,
+              onPressed: () => () {
+                showDialog(
+                  context: context,
+                  builder: (context) => _RemoveMemAlertDialog(
+                    () => ref.read(removeMem(_memId!)),
+                  ),
+                );
+              },
+            );
+          } else {
+            return super.popupMenuItemChildBuilder();
+          }
+        },
+      );
 }
 
 const keyOk = Key("ok");

@@ -24,9 +24,6 @@ class MemDetailPage extends ConsumerWidget {
             (value) => value is SavedMem ? value.id : null,
           )),
           ref.watch(editingMemByMemIdProvider(_memId).select(
-            (value) => value is SavedMem,
-          )),
-          ref.watch(editingMemByMemIdProvider(_memId).select(
             (value) => value is SavedMem ? value.isArchived : false,
           )),
         ),
@@ -39,10 +36,9 @@ class MemDetailPage extends ConsumerWidget {
 class _MemDetailPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   final int? _memId;
-  final bool _memIsSaved;
   final bool _memIsArchived;
 
-  _MemDetailPage(this._memId, this._memIsSaved, this._memIsArchived);
+  _MemDetailPage(this._memId, this._memIsArchived);
 
   @override
   Widget build(BuildContext context) => v(
@@ -51,8 +47,8 @@ class _MemDetailPage extends StatelessWidget {
             actions: AppBarActionsBuilder([
               TransitChartAction(context, _memId),
               TransitActListAction(context, _memId),
-              ArchiveMemAction(context, _memId, _memIsSaved),
-              RemoveMemAction(context, _memId, _memIsSaved),
+              ArchiveMemAction(_memId),
+              RemoveMemAction(_memId),
             ]).build(context),
             backgroundColor: _memIsArchived ? secondaryGreyColor : null,
           ),
