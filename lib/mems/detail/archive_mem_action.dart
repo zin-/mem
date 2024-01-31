@@ -9,7 +9,7 @@ import 'package:mem/values/durations.dart';
 
 const keyArchiveMem = Key("archive-mem");
 
-class ArchiveMemAction extends AppBarAction {
+class ArchiveMemAction extends AppBarActionBuilder {
   final int? _memId;
 
   ArchiveMemAction(
@@ -19,7 +19,6 @@ class ArchiveMemAction extends AppBarAction {
   ) : super(
           key: keyArchiveMem,
           const Icon(Icons.archive),
-          buildL10n(context).archiveFilterTitle,
           onPressed: memIsSaved
               ? () {}
               : _memId == null

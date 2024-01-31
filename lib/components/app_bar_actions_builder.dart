@@ -5,7 +5,7 @@ import 'package:mem/logger/log_service.dart';
 const _maxShowCount = 3;
 
 class AppBarActionsBuilder {
-  final List<AppBarAction> actions;
+  final List<AppBarActionBuilder> actions;
 
   AppBarActionsBuilder(this.actions);
 
@@ -52,15 +52,15 @@ class AppBarActionsBuilder {
       );
 }
 
-abstract class AppBarAction {
+abstract class AppBarActionBuilder {
   final Icon icon;
-  final String name;
+  final String? name;
   final VoidCallback? onPressed;
   final Key? key;
 
-  AppBarAction(
-    this.icon,
-    this.name, {
+  AppBarActionBuilder(
+    this.icon, {
+    this.name,
     this.onPressed,
     this.key,
   });
@@ -94,10 +94,12 @@ abstract class AppBarAction {
   }) =>
       v(
         () {
+          final resolvedName = name == null ? this.name : name();
+
           return ListTile(
             key: key == null ? this.key : key(),
             leading: icon == null ? this.icon : icon(),
-            title: Text(name == null ? this.name : name()),
+            title: resolvedName == null ? null : Text(resolvedName),
             onTap: () => v(
               () {
                 if (onPressed == null) {

@@ -8,7 +8,7 @@ import 'package:mem/repositories/mem.dart';
 
 const keyRemoveMem = Key("remove-mem");
 
-class RemoveMemAction extends AppBarAction {
+class RemoveMemAction extends AppBarActionBuilder {
   final int? _memId;
 
   RemoveMemAction(
@@ -18,7 +18,6 @@ class RemoveMemAction extends AppBarAction {
   ) : super(
           key: keyRemoveMem,
           const Icon(Icons.delete),
-          buildL10n(context).removeAction,
           onPressed: memIsSaved
               ? () {}
               : _memId == null
@@ -38,6 +37,7 @@ class RemoveMemAction extends AppBarAction {
         final mem = ref.watch(memByMemIdProvider(_memId));
         if (mem is SavedMem) {
           return super.popupMenuItemChildBuilder(
+            name: () => buildL10n(context).removeAction,
             onPressed: () => () {
               showDialog(
                 context: context,

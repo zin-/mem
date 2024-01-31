@@ -7,12 +7,8 @@ import 'package:mem/mems/list/states.dart';
 
 const _searchIcon = Icon(Icons.search);
 
-class SearchAction extends AppBarAction {
-  SearchAction(BuildContext context)
-      : super(
-          _searchIcon,
-          buildL10n(context).search_action,
-        );
+class SearchAction extends AppBarActionBuilder {
+  SearchAction(BuildContext context) : super(_searchIcon);
 
   @override
   Widget iconButtonBuilder({
@@ -24,6 +20,7 @@ class SearchAction extends AppBarAction {
       Consumer(
         builder: (context, ref, child) => ref.watch(searchTextProvider) == null
             ? super.iconButtonBuilder(
+                name: () => buildL10n(context).search_action,
                 onPressed: () => () {
                   ref.read(searchTextProvider.notifier).updatedBy("");
                 },
