@@ -175,16 +175,6 @@ void testMemoDetailScenario() => group(
 
                 expect(find.byKey(keyRemoveMem), findsNothing);
                 expect(menuButtonIconFinder, findsNothing);
-
-                // await widgetTester.tap(menuButtonIconFinder);
-                // await widgetTester.pumpAndSettle();
-                //
-                // expect(
-                //   widgetTester
-                //       .widget<ListTile>(find.byKey(keyRemoveMem))
-                //       .enabled,
-                //   false,
-                // );
               },
             );
 
