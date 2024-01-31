@@ -217,16 +217,13 @@ void testMemoDetailScenario() => group(
               (widgetTester) async {
                 await runApplication();
                 await widgetTester.pumpAndSettle();
-
                 await widgetTester.tap(find.text(insertedMemName));
                 await widgetTester.pumpAndSettle();
 
                 await widgetTester.tap(menuButtonIconFinder);
                 await widgetTester.pumpAndSettle();
-
                 await widgetTester.tap(find.byKey(keyRemoveMem));
                 await widgetTester.pumpAndSettle();
-
                 await widgetTester.tap(find.byKey(keyOk));
                 await widgetTester.pumpAndSettle();
 
@@ -278,16 +275,12 @@ void testMemoDetailScenario() => group(
               (widgetTester) async {
                 await runApplication();
                 await widgetTester.pumpAndSettle();
-
                 await widgetTester.tap(find.text(insertedMemName));
                 await widgetTester.pumpAndSettle();
-
                 await widgetTester.tap(menuButtonIconFinder);
                 await widgetTester.pumpAndSettle();
-
                 await widgetTester.tap(find.byKey(keyRemoveMem));
                 await widgetTester.pumpAndSettle();
-
                 await widgetTester.tap(find.byKey(keyOk));
                 await widgetTester.pumpAndSettle();
 
@@ -297,6 +290,12 @@ void testMemoDetailScenario() => group(
                 expect(find.text(insertedMemName), findsOneWidget);
                 expect(
                     (await selectFromMemsWhereName(insertedMemName)).length, 1);
+
+                await widgetTester.tap(find.text(insertedMemName));
+                await widgetTester.pumpAndSettle();
+
+                expect(find.text(insertedMemName), findsOneWidget);
+                expect(find.text(insertedMemMemo), findsOneWidget);
               },
             );
           },
