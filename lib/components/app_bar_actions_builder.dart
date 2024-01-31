@@ -4,10 +4,10 @@ import 'package:mem/logger/log_service.dart';
 /// [https://m3.material.io/components/top-app-bar/guidelines#b1b64842-7d88-4c3f-8ffb-4183fe648c9e]
 const _maxShowCount = 3;
 
-class AppBarActions {
+class AppBarActionsBuilder {
   final List<AppBarAction> actions;
 
-  AppBarActions(this.actions);
+  AppBarActionsBuilder(this.actions);
 
   List<Widget> build(BuildContext context) => v(
         () {
@@ -18,10 +18,31 @@ class AppBarActions {
                           .map((e) => e.iconButtonBuilder()),
                       PopupMenuButton(
                         itemBuilder: (context) {
-                          return actions
-                              .sublist(_maxShowCount - 1)
-                              .map((e) => e._popupMenuItemBuilder(context))
-                              .toList();
+                          return actions.sublist(_maxShowCount - 1).map(
+                            (e) {
+                              return PopupMenuItem(
+                                // childには基本ListTileを用いるため、zeroを指定し、ListTile側でUIを調整する
+                                padding: EdgeInsets.zero,
+                                child: SizedBox(
+                                  height: 48.0,
+                                  child: ListTileTheme(
+                                    data: ListTileTheme.of(context).copyWith(
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                        horizontal: 12.0,
+                                      ),
+                                      minLeadingWidth: 24,
+                                      horizontalTitleGap: 12,
+                                      visualDensity: ListTileTheme.of(context)
+                                          .visualDensity
+                                          ?.copyWith(horizontal: 0.0),
+                                    ),
+                                    child: e.popupMenuItemChildBuilder(context),
+                                  ),
+                                ),
+                              );
+                            },
+                          ).toList();
                         },
                       ),
                     ]
@@ -63,6 +84,7 @@ abstract class AppBarAction {
         },
       );
 
+  // MenuItemChildは基本的にはListTileだが、Consumerの利用が必要な場合があるためWidgetとしている
   Widget popupMenuItemChildBuilder(
     // FIXME BuildContextを削除する
     //  できればここでは使いたくない
@@ -73,46 +95,21 @@ abstract class AppBarAction {
   }) =>
       v(
         () {
-          return ListTileTheme(
-            data: _createListTileThemeData(context),
-            child: ListTile(
-              key: key,
-              leading: icon == null ? this.icon : icon(),
-              title: Text(name == null ? this.name : name()),
-              onTap: () => v(
-                () {
-                  if (onPressed == null) {
-                    this.onPressed?.call();
-                  } else {
-                    onPressed()();
-                  }
-                },
-              ),
-              enabled: onPressed == null ? this.onPressed != null : true,
+          return ListTile(
+            key: key,
+            leading: icon == null ? this.icon : icon(),
+            title: Text(name == null ? this.name : name()),
+            onTap: () => v(
+              () {
+                if (onPressed == null) {
+                  this.onPressed?.call();
+                } else {
+                  onPressed()();
+                }
+              },
             ),
+            enabled: onPressed == null ? this.onPressed != null : true,
           );
         },
-      );
-
-  PopupMenuItem _popupMenuItemBuilder(BuildContext context) => v(
-        () => PopupMenuItem(
-          padding: EdgeInsets.zero,
-          enabled: onPressed != null,
-          child: popupMenuItemChildBuilder(context),
-        ),
-      );
-
-  ListTileThemeData _createListTileThemeData(BuildContext context) => v(
-        () => ListTileTheme.of(context).copyWith(
-          contentPadding: EdgeInsets.symmetric(
-            horizontal: Theme.of(context).useMaterial3 ? 12.0 : 16.0,
-          ),
-          minLeadingWidth: 24,
-          horizontalTitleGap: Theme.of(context).useMaterial3 ? 12 : 20,
-          visualDensity: Theme.of(context)
-              .listTileTheme
-              .visualDensity
-              ?.copyWith(horizontal: 0.0),
-        ),
       );
 }

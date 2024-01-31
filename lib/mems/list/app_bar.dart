@@ -32,7 +32,7 @@ class _MemListAppBar extends StatelessWidget {
             () => const SearchTextFormField(),
           ).build(),
           floating: true,
-          actions: AppBarActions([
+          actions: AppBarActionsBuilder([
             SearchAction(context),
             if (!_searching) FilterAction(context),
           ]).build(context),
