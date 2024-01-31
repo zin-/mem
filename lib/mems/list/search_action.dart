@@ -8,7 +8,7 @@ import 'package:mem/mems/list/states.dart';
 const _searchIcon = Icon(Icons.search);
 
 class SearchAction extends AppBarActionBuilder {
-  SearchAction(BuildContext context) : super(_searchIcon);
+  SearchAction(BuildContext context) : super(icon: _searchIcon);
 
   @override
   Widget iconButtonBuilder({

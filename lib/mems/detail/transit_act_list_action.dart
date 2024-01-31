@@ -7,7 +7,7 @@ import 'package:mem/logger/log_service.dart';
 class TransitActListAction extends AppBarActionBuilder {
   TransitActListAction(BuildContext context, int? memId)
       : super(
-          const Icon(Icons.play_arrow),
+          icon: const Icon(Icons.play_arrow),
           name: buildL10n(context).actListDestinationLabel,
           onPressed: memId == null
               ? null

@@ -6,7 +6,7 @@ import 'package:mem/components/mem/list/filter.dart';
 class FilterAction extends AppBarActionBuilder {
   FilterAction(BuildContext context)
       : super(
-          const Icon(Icons.filter_list),
+          icon: const Icon(Icons.filter_list),
           name: buildL10n(context).filter_action,
           onPressed: () => showModalBottomSheet(
             context: context,

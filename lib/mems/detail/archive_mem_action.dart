@@ -7,8 +7,6 @@ import 'package:mem/mems/detail/states.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/values/durations.dart';
 
-const keyArchiveMem = Key("archive-mem");
-
 class ArchiveMemAction extends AppBarActionBuilder {
   final int? _memId;
 
@@ -17,8 +15,7 @@ class ArchiveMemAction extends AppBarActionBuilder {
     this._memId,
     bool memIsSaved,
   ) : super(
-          key: keyArchiveMem,
-          const Icon(Icons.archive),
+          icon: const Icon(Icons.archive),
           onPressed: memIsSaved
               ? () {}
               : _memId == null

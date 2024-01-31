@@ -17,7 +17,7 @@ class RemoveMemAction extends AppBarActionBuilder {
     bool memIsSaved,
   ) : super(
           key: keyRemoveMem,
-          const Icon(Icons.delete),
+          icon: const Icon(Icons.delete),
           onPressed: memIsSaved
               ? () {}
               : _memId == null

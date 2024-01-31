@@ -53,16 +53,16 @@ class AppBarActionsBuilder {
 }
 
 abstract class AppBarActionBuilder {
-  final Icon icon;
+  final Key? key;
+  final Icon? icon;
   final String? name;
   final VoidCallback? onPressed;
-  final Key? key;
 
-  AppBarActionBuilder(
-    this.icon, {
+  AppBarActionBuilder({
+    this.key,
+    this.icon,
     this.name,
     this.onPressed,
-    this.key,
   });
 
   Widget iconButtonBuilder({
@@ -76,12 +76,13 @@ abstract class AppBarActionBuilder {
           key: key == null ? this.key : key(),
           onPressed: onPressed == null ? this.onPressed : onPressed(),
           tooltip: name == null ? this.name : name(),
-          icon: icon == null ? this.icon : icon(),
+          icon: icon == null ? this.icon! : icon(),
         ),
         {
-          "icon": icon,
-          "name": name,
-          "onPressed": onPressed,
+          "key": key?.call(),
+          "icon": icon?.call(),
+          "name": name?.call(),
+          "onPressed": onPressed?.call(),
         },
       );
 
@@ -111,6 +112,12 @@ abstract class AppBarActionBuilder {
             ),
             enabled: onPressed == null ? this.onPressed != null : true,
           );
+        },
+        {
+          "key": key?.call(),
+          "icon": icon?.call(),
+          "name": name?.call(),
+          "onPressed": onPressed?.call(),
         },
       );
 }
