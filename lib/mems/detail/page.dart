@@ -20,7 +20,9 @@ class MemDetailPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemDetailPage(
-          _memId,
+          ref.watch(editingMemByMemIdProvider(_memId).select(
+            (value) => value is SavedMem ? value.id : null,
+          )),
           ref.watch(editingMemByMemIdProvider(_memId).select(
             (value) => value is SavedMem,
           )),

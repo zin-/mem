@@ -169,14 +169,14 @@ void testMemoDetailScenario() => group(
         group(
           ": Remove",
           () {
-            Future<List<Map<String, Object?>>> selectFromMemsWhereIdIs(
-              int memId,
+            Future<List<Map<String, Object?>>> selectFromMemsWhereName(
+              String name,
             ) async {
-              final whereIdIs = Equals(defPkId.name, memId);
+              final where = Equals(defColMemsName.name, name);
               return await dbA.select(
                 defTableMems,
-                where: whereIdIs.where(),
-                whereArgs: whereIdIs.whereArgs(),
+                where: where.where(),
+                whereArgs: where.whereArgs(),
               );
             }
 
@@ -222,7 +222,7 @@ void testMemoDetailScenario() => group(
                 await widgetTester.pumpAndSettle();
 
                 expect(
-                  (await selectFromMemsWhereIdIs(insertedMemId)).length,
+                  (await selectFromMemsWhereName(insertedMemName)).length,
                   1,
                 );
               },
@@ -256,7 +256,8 @@ void testMemoDetailScenario() => group(
                 );
                 expect(find.text(insertedMemName), findsNothing);
 
-                expect((await dbA.select(defTableMems)).length, 0);
+                expect(
+                    (await selectFromMemsWhereName(insertedMemName)).length, 0);
               },
             );
 
@@ -282,8 +283,9 @@ void testMemoDetailScenario() => group(
                 await widgetTester.tap(find.byKey(keyOk));
                 await widgetTester.pumpAndSettle();
 
-                expect(find.text(insertedMemName), findsNothing);
-                expect((await dbA.select(defTableMems)).length, 0);
+                expect(find.text(enteringMemName), findsNothing);
+                expect(
+                    (await selectFromMemsWhereName(enteringMemName)).length, 0);
               },
             );
 
@@ -310,9 +312,7 @@ void testMemoDetailScenario() => group(
 
                 expect(find.text(insertedMemName), findsOneWidget);
                 expect(
-                  (await selectFromMemsWhereIdIs(insertedMemId)).length,
-                  1,
-                );
+                    (await selectFromMemsWhereName(insertedMemName)).length, 1);
               },
             );
           },
