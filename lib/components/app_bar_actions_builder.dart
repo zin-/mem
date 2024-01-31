@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mem/logger/log_service.dart';
 
 /// [https://m3.material.io/components/top-app-bar/guidelines#b1b64842-7d88-4c3f-8ffb-4183fe648c9e]
-const maxShowCount = 3;
+const _maxShowCount = 3;
 
 class AppBarActions {
   final List<AppBarAction> actions;
@@ -11,15 +11,15 @@ class AppBarActions {
 
   List<Widget> build(BuildContext context) => v(
         () {
-          return (actions.length > maxShowCount
+          return (actions.length > _maxShowCount
                   ? [
                       ...actions
-                          .sublist(0, maxShowCount - 1)
+                          .sublist(0, _maxShowCount - 1)
                           .map((e) => e.iconButtonBuilder()),
                       PopupMenuButton(
                         itemBuilder: (context) {
                           return actions
-                              .sublist(maxShowCount - 1)
+                              .sublist(_maxShowCount - 1)
                               .map((e) => e._popupMenuItemBuilder(context))
                               .toList();
                         },
@@ -94,28 +94,12 @@ abstract class AppBarAction {
         },
       );
 
-  PopupMenuItem _popupMenuItemBuilder(
-    BuildContext context, {
-    Icon Function()? icon,
-    String Function()? name,
-    VoidCallback Function()? onPressed,
-  }) =>
-      v(
+  PopupMenuItem _popupMenuItemBuilder(BuildContext context) => v(
         () => PopupMenuItem(
           padding: EdgeInsets.zero,
-          enabled: onPressed == null ? this.onPressed != null : true,
-          child: popupMenuItemChildBuilder(
-            context,
-            icon: icon,
-            name: name,
-            onPressed: onPressed,
-          ),
+          enabled: onPressed != null,
+          child: popupMenuItemChildBuilder(context),
         ),
-        {
-          "icon": icon,
-          "name": name,
-          "onPressed": onPressed,
-        },
       );
 
   ListTileThemeData _createListTileThemeData(BuildContext context) => v(
