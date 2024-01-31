@@ -261,6 +261,33 @@ void testMemoDetailScenario() => group(
             );
 
             testWidgets(
+              ": exec on created.",
+              (widgetTester) async {
+                await runApplication();
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(newMemFabFinder);
+                await widgetTester.pumpAndSettle();
+
+                const enteringMemName =
+                    "$_scenarioName: Remove: exec on created - entering - mem - name";
+                await widgetTester.enterText(
+                    find.byKey(keyMemName), enteringMemName);
+                await widgetTester.tap(find.byKey(keySaveMemFab));
+                await widgetTester.pumpAndSettle();
+
+                await widgetTester.tap(menuButtonIconFinder);
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(find.byKey(keyRemoveMem));
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(find.byKey(keyOk));
+                await widgetTester.pumpAndSettle();
+
+                expect(find.text(insertedMemName), findsNothing);
+                expect((await dbA.select(defTableMems)).length, 0);
+              },
+            );
+
+            testWidgets(
               ": undo.",
               (widgetTester) async {
                 await runApplication();
