@@ -27,17 +27,21 @@ class ValueStateNotifier<StateT> extends StateNotifier<StateT> {
   @override
   String toString() {
     String content;
-    if (state is Map || state is Iterable) {
-      final encoder = JsonEncoder.withIndent(
-        _jsonEncoderIndent,
-        (object) => object.toString(),
-      );
-      content = encoder.convert(state);
-    } else {
-      content = state.toString();
-    }
+    if (mounted) {
+      if (state is Map || state is Iterable) {
+        final encoder = JsonEncoder.withIndent(
+          _jsonEncoderIndent,
+          (object) => object.toString(),
+        );
+        content = encoder.convert(state);
+      } else {
+        content = state.toString();
+      }
 
-    return 'ValueStateNotifier: $content';
+      return "${super.toString()}: $content";
+    } else {
+      return "${super.toString()} is disposed";
+    }
   }
 // coverage:ignore-end
 }
