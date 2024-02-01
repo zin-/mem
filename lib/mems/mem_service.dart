@@ -1,5 +1,4 @@
 import 'package:mem/core/mem_detail.dart';
-import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_item.dart';
 import 'package:mem/mems/mem_item_repository.dart';
@@ -7,6 +6,7 @@ import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification_repository.dart';
 import 'package:mem/notifications/notification_service.dart';
 import 'package:mem/repositories/mem.dart';
+import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 

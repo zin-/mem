@@ -1,5 +1,4 @@
 import 'package:mem/framework/repository/entity.dart';
-import 'package:mem/framework/repository/database_tuple_entity.dart';
 
 class MemNotification extends EntityV1 {
   // 未保存のMemに紐づくMemNotificationはmemIdをintで持つことができないため暫定的にnullableにしている
@@ -28,26 +27,6 @@ class MemNotification extends EntityV1 {
         "time": time,
         "message": message,
       }}";
-}
-
-class SavedMemNotification extends MemNotification
-    with SavedDatabaseTupleMixin<int> {
-  @override
-  int get memId => super.memId as int;
-
-  SavedMemNotification(super.memId, super.type, super.time, super.message);
-
-  @override
-  SavedMemNotification copiedWith(
-    int? Function()? time,
-    String Function()? message,
-  ) =>
-      SavedMemNotification(
-        memId,
-        type,
-        time == null ? this.time : time(),
-        message == null ? this.message : message(),
-      )..copiedFrom(this);
 }
 
 enum MemNotificationType {

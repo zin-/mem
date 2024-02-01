@@ -8,6 +8,7 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/actions.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/core/date_and_time/time_of_day.dart' as core;
+import 'package:mem/repositories/mem_notification.dart';
 
 class NotificationsWidget extends ConsumerWidget {
   final int? _memId;
