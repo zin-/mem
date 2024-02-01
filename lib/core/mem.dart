@@ -24,7 +24,7 @@ class Mem extends EntityV1 {
       );
 
   @override
-  String toString() => "Mem: ${{
+  String toString() => "${super.toString()}: ${{
         "name": name,
         "doneAt": doneAt,
         "period": period,

@@ -23,7 +23,7 @@ class MemItem extends EntityV1 {
       );
 
   @override
-  String toString() => "MemItem: ${{
+  String toString() => "${super.toString()}: ${{
         "memId": memId,
         "type": type,
         "value": value,

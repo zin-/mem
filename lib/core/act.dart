@@ -9,13 +9,11 @@ class Act extends EntityV1 {
 
   Act(this.memId, this.period);
 
-  Map<String, Object?> _toMap() => {
+  @override
+  String toString() => "${super.toString()}: ${{
         "memId": memId,
         "period": period,
-      };
-
-  @override
-  String toString() => _toMap().toString();
+      }}";
 }
 
 class SavedAct extends Act with SavedDatabaseTupleMixin<int> {
@@ -29,7 +27,4 @@ class SavedAct extends Act with SavedDatabaseTupleMixin<int> {
         ..createdAt = createdAt
         ..updatedAt = updatedAt
         ..archivedAt = archivedAt;
-
-  @override
-  Map<String, Object?> _toMap() => super._toMap()..addAll(unpack());
 }

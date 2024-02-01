@@ -72,7 +72,7 @@ class NotificationClientV2 {
 
   static NotificationClientV2? _instance;
 
-  factory NotificationClientV2([BuildContext? context]) => i(
+  factory NotificationClientV2([BuildContext? context]) => v(
         () => _instance ??= NotificationClientV2._(buildL10n(context)),
         context,
       );
