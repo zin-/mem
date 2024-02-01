@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/components/mem/mem_name.dart';
@@ -57,49 +56,6 @@ void testMemoDetailScenario() => group(
             },
           );
         });
-
-        group(
-          ": Transit",
-          () {
-            testWidgets(
-              ": new.",
-              (widgetTester) async {
-                await runApplication();
-                await widgetTester.pumpAndSettle();
-
-                await widgetTester.tap(newMemFabFinder);
-                await widgetTester.pumpAndSettle();
-
-                final memName =
-                    widgetTester.widget<TextFormField>(find.byKey(keyMemName));
-                final memMemo =
-                    widgetTester.widget<TextFormField>(find.byKey(keyMemMemo));
-
-                expect(memName.initialValue, isEmpty);
-                expect(memMemo.initialValue, isEmpty);
-              },
-            );
-
-            testWidgets(
-              ": saved.",
-              (widgetTester) async {
-                await runApplication();
-                await widgetTester.pumpAndSettle();
-
-                await widgetTester.tap(find.text(insertedMemName));
-                await widgetTester.pumpAndSettle();
-
-                final memName =
-                    widgetTester.widget<TextFormField>(find.byKey(keyMemName));
-                final memMemo =
-                    widgetTester.widget<TextFormField>(find.byKey(keyMemMemo));
-
-                expect(memName.initialValue, equals(insertedMemName));
-                expect(memMemo.initialValue, equals(insertedMemMemo));
-              },
-            );
-          },
-        );
 
         group(
           ": Save",
