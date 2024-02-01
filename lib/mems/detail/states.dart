@@ -8,6 +8,7 @@ import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/components/value_state_notifier.dart';
 import 'package:mem/mems/states.dart';
+import 'package:mem/repositories/mem_notification_repository.dart';
 
 final memDetailProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<MemDetail>, MemDetail, int?>(
@@ -48,21 +49,38 @@ final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
         int?>(
   (ref, memId) => v(
     () {
-      final memNotificationsByMemId = ref
-          .watch(memNotificationsProvider)
-          .where((element) => element.memId == memId);
+      final memNotificationsByMemId =
+          ref.watch(memNotificationsProvider.select((value) => value.where(
+                (e) => e.memId == memId,
+              )));
+
       final memRepeatedNotification = memNotificationsByMemId.singleWhereOrNull(
-          (element) => element.type == MemNotificationType.repeat);
+        (e) => e.type == MemNotificationType.repeat,
+      );
       final memAfterActStartedNotification =
           memNotificationsByMemId.singleWhereOrNull(
-              (element) => element.type == MemNotificationType.afterActStarted);
+        (e) => e.type == MemNotificationType.afterActStarted,
+      );
 
       return ListValueStateNotifier(
         [
-          memRepeatedNotification ?? MemNotification.repeated(memId),
-          memAfterActStartedNotification ??
-              MemNotification.afterActStarted(memId),
+          if (memRepeatedNotification != null) memRepeatedNotification,
+          if (memAfterActStartedNotification != null)
+            memAfterActStartedNotification,
         ],
+        initialFuture: memId == null
+            ? Future.value([
+                MemNotification.repeated(memId),
+                MemNotification.afterActStarted(memId),
+              ])
+            : MemNotificationRepository()
+                .shipByMemId(memId)
+                .then((value) => value.isEmpty
+                    ? [
+                        MemNotification.repeated(memId),
+                        MemNotification.afterActStarted(memId),
+                      ]
+                    : value),
       );
     },
     {"memId": memId},

@@ -6,7 +6,14 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
     super.state, {
     Future<List<T>>? initialFuture,
   }) {
-    initialFuture?.then((value) => v(() => updatedBy(value), value));
+    initialFuture?.then(
+      (value) => v(
+        () => mounted
+            ? updatedBy(value)
+            : warn("${super.toString()}. No update."),
+        value,
+      ),
+    );
   }
 
   void add(T item, {int? index}) => v(

@@ -26,16 +26,17 @@ class MemListItemView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () => _MemListItemViewComponent(
+        () => _MemListItemView(
           ref.watch(memListProvider).firstWhere((_) => _.id == _memId),
           ref.watch(activeActsProvider).singleWhereOrNull(
                 (act) => act.memId == _memId,
               ),
-          ref.watch(memNotificationsByMemIdProvider(_memId)).singleWhereOrNull(
-                (element) =>
-                    element is SavedMemNotification &&
-                    element.type == MemNotificationType.repeat,
-              ),
+          ref.watch(memNotificationsByMemIdProvider(_memId)
+              .select((value) => value.singleWhereOrNull(
+                    (element) =>
+                        element is SavedMemNotification &&
+                        element.type == MemNotificationType.repeat,
+                  ))),
           _onTapped,
           (bool? value, int memId) async {
             ref.read(memsProvider.notifier).upsertAll(
@@ -67,22 +68,20 @@ class MemListItemView extends ConsumerWidget {
       );
 }
 
-class _MemListItemViewComponent extends ListTile {
-  _MemListItemViewComponent(
+class _MemListItemView extends ListTile {
+  _MemListItemView(
     SavedMem mem,
     SavedAct? activeAct,
-    MemNotification? memRepeatedNotifications,
+    MemNotification? memRepeatedNotification,
     void Function(int memId) onTap,
     void Function(bool? value, int memId) onMemDoneCheckboxTapped,
     void Function(SavedAct? act) onActButtonTapped,
   ) : super(
-          leading: memRepeatedNotifications == null
-              ? activeAct == null
-                  ? MemDoneCheckbox(
-                      mem,
-                      (value) => onMemDoneCheckboxTapped(value, mem.id),
-                    )
-                  : null
+          leading: memRepeatedNotification == null && activeAct == null
+              ? MemDoneCheckbox(
+                  mem,
+                  (value) => onMemDoneCheckboxTapped(value, mem.id),
+                )
               : null,
           trailing: mem.isDone
               ? null
@@ -108,7 +107,7 @@ class _MemListItemViewComponent extends ListTile {
     verbose({
       'mem': mem,
       'activeAct': activeAct,
-      'memRepeatedNotifications': memRepeatedNotifications,
+      'memRepeatedNotification': memRepeatedNotification,
     });
   }
 }

@@ -20,7 +20,7 @@ class NotificationsWidget extends ConsumerWidget {
         () => AsyncValueView(
           loadMemNotificationsByMemId(_memId),
           (loaded) => _NotificationsWidgetComponent(
-            ref.watch(memDetailProvider(_memId)).notifications ?? [],
+            ref.watch(memNotificationsByMemIdProvider(_memId)),
             (current) => (time, message) => ref
                     .read(memNotificationsByMemIdProvider(_memId).notifier)
                     .upsertAll(

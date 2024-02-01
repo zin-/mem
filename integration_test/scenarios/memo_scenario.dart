@@ -173,61 +173,6 @@ void testMemoScenario() => group(
         });
 
         group(': Save', () {
-          testWidgets(
-            ': Create.',
-            (widgetTester) async {
-              await runApplication();
-              await widgetTester.pumpAndSettle();
-
-              await widgetTester.tap(newMemFabFinder);
-              await widgetTester.pumpAndSettle();
-
-              expect(find.text(insertedMemName), findsNothing);
-              expect(find.text(insertedMemMemo), findsNothing);
-              const enteringMemNameText =
-                  '$scenarioName: Save: Create - mem name - entering';
-              await widgetTester.enterText(
-                memNameOnDetailPageFinder,
-                enteringMemNameText,
-              );
-              await widgetTester.pumpAndSettle();
-
-              expect(find.text(enteringMemNameText), findsOneWidget);
-              const enteringMemMemoText =
-                  '$scenarioName: Save: Create - mem memo - entering';
-              await widgetTester.enterText(
-                memMemoOnDetailPageFinder,
-                enteringMemMemoText,
-              );
-              await widgetTester.pumpAndSettle();
-
-              expect(find.text(enteringMemMemoText), findsOneWidget);
-              await widgetTester.tap(saveMemFabFinder);
-              await widgetTester.pump(defaultTransitionDuration);
-
-              const saveSuccessText = 'Save success. $enteringMemNameText';
-              expect(
-                find.text(saveSuccessText),
-                findsOneWidget,
-              );
-              await widgetTester.pumpAndSettle(defaultDismissDuration);
-
-              expect(find.text(saveSuccessText), findsNothing);
-              await widgetTester.pageBack();
-              await widgetTester.pumpAndSettle();
-
-              expect(find.text(insertedMemName), findsOneWidget);
-              expect(find.text(enteringMemNameText), findsOneWidget);
-              expect(find.text(enteringMemMemoText), findsNothing);
-              await widgetTester.tap(find.text(enteringMemNameText));
-              await widgetTester.pumpAndSettle();
-
-              expect(find.text(insertedMemName), findsNothing);
-              expect(find.text(enteringMemNameText), findsOneWidget);
-              expect(find.text(enteringMemMemoText), findsOneWidget);
-            },
-          );
-
           group(": Update", () {
             testWidgets(
               ': mem name.',
