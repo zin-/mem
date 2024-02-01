@@ -29,7 +29,7 @@ T w<T>(
 ]) =>
     LogService().functionLog(Level.warning, target, args);
 
-@Deprecated('For development only')
+@Deprecated('Use for development only')
 T d<T>(
   T Function() target, [
   dynamic args,
