@@ -1,51 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/components/async_value_view.dart';
 import 'package:mem/components/date_and_time/time_of_day_view.dart';
 import 'package:mem/components/time_text_form_field.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/detail/actions.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/core/date_and_time/time_of_day.dart' as core;
 import 'package:mem/repositories/mem_notification.dart';
 
-class NotificationsWidget extends ConsumerWidget {
+class NotificationsView extends ConsumerWidget {
   final int? _memId;
 
-  const NotificationsWidget(this._memId, {super.key});
+  const NotificationsView(this._memId, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () => AsyncValueView(
-          loadMemNotificationsByMemId(_memId),
-          (loaded) => _NotificationsWidgetComponent(
-            ref.watch(memNotificationsByMemIdProvider(_memId)),
-            (current) => (time, message) => ref
-                    .read(memNotificationsByMemIdProvider(_memId).notifier)
-                    .upsertAll(
-                  [
-                    current.copiedWith(() => time, () => message),
-                  ],
-                  (tmp, item) =>
-                      tmp.type == item.type &&
-                      (tmp is SavedMemNotification &&
-                              item is SavedMemNotification
-                          ? tmp.id == item.id
-                          : true),
-                ),
-          ),
+        () => _NotificationsView(
+          ref.watch(memNotificationsByMemIdProvider(_memId)),
+          (current) => (time, message) => ref
+                  .read(memNotificationsByMemIdProvider(_memId).notifier)
+                  .upsertAll(
+                [
+                  current.copiedWith(() => time, () => message),
+                ],
+                (tmp, item) =>
+                    tmp.type == item.type &&
+                    (tmp is SavedMemNotification && item is SavedMemNotification
+                        ? tmp.id == item.id
+                        : true),
+              ),
         ),
-        _memId,
+        {"_memId": _memId},
       );
 }
 
-class _NotificationsWidgetComponent extends StatelessWidget {
+class _NotificationsView extends StatelessWidget {
   final List<MemNotification> _notifications;
   final Function(int? pickedTimeOfDay, String message) Function(
       MemNotification current) _onChanged;
 
-  const _NotificationsWidgetComponent(this._notifications, this._onChanged);
+  const _NotificationsView(this._notifications, this._onChanged);
 
   @override
   Widget build(BuildContext context) => v(
@@ -53,7 +47,7 @@ class _NotificationsWidgetComponent extends StatelessWidget {
           children: _notifications.map((e) {
             switch (e.type) {
               case MemNotificationType.repeat:
-                return _RepeatedNotificationWidgetComponent(
+                return _RepeatedNotificationView(
                   e.time == null
                       ? null
                       : core.TimeOfDay.fromSeconds(e.time!).convert(),
@@ -63,7 +57,7 @@ class _NotificationsWidgetComponent extends StatelessWidget {
                   ),
                 );
               case MemNotificationType.afterActStarted:
-                return _AfterActStartedNotificationWidgetComponent(
+                return _AfterActStartedNotificationView(
                   e.time,
                   e.message,
                   _onChanged(e),
@@ -71,15 +65,15 @@ class _NotificationsWidgetComponent extends StatelessWidget {
             }
           }).toList(),
         ),
-        _notifications,
+        {"_notifications": _notifications},
       );
 }
 
-class _RepeatedNotificationWidgetComponent extends StatelessWidget {
+class _RepeatedNotificationView extends StatelessWidget {
   final TimeOfDay? _notifyAt;
   final Function(TimeOfDay? pickedTimeOfDay) _onChanged;
 
-  const _RepeatedNotificationWidgetComponent(this._notifyAt, this._onChanged);
+  const _RepeatedNotificationView(this._notifyAt, this._onChanged);
 
   @override
   Widget build(BuildContext context) => v(
@@ -106,12 +100,12 @@ class _RepeatedNotificationWidgetComponent extends StatelessWidget {
       );
 }
 
-class _AfterActStartedNotificationWidgetComponent extends StatelessWidget {
+class _AfterActStartedNotificationView extends StatelessWidget {
   final int? _time;
   final String _message;
   final Function(int? time, String message) _onChanged;
 
-  const _AfterActStartedNotificationWidgetComponent(
+  const _AfterActStartedNotificationView(
     this._time,
     this._message,
     this._onChanged,

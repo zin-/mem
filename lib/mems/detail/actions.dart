@@ -6,7 +6,6 @@ import 'package:mem/mems/mem_item.dart';
 import 'package:mem/mems/mem_item_repository.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
-import 'package:mem/repositories/mem_notification_repository.dart';
 import 'package:mem/mems/mem_service.dart';
 import 'package:mem/mems/states.dart';
 
@@ -27,28 +26,6 @@ final loadMemItems =
       }
 
       return [];
-    },
-    memId,
-  ),
-);
-final loadMemNotificationsByMemId =
-    FutureProvider.autoDispose.family<void, int?>(
-  (ref, memId) => v(
-    () async {
-      if (memId != null) {
-        final memNotifications =
-            await MemNotificationRepository().shipByMemId(memId);
-
-        if (memNotifications.isNotEmpty) {
-          ref.watch(memNotificationsProvider.notifier).upsertAll(
-                memNotifications,
-                (tmp, item) =>
-                    tmp is SavedMemNotification &&
-                    item is SavedMemNotification &&
-                    tmp.id == item.id,
-              );
-        }
-      }
     },
     memId,
   ),
