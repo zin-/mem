@@ -69,6 +69,8 @@ class _NotificationsView extends StatelessWidget {
       );
 }
 
+const keyMemRepeatedNotification = Key("mem-repeated-notification");
+
 class _RepeatedNotificationView extends StatelessWidget {
   final TimeOfDay? _notifyAt;
   final Function(TimeOfDay? pickedTimeOfDay) _onChanged;
@@ -78,6 +80,7 @@ class _RepeatedNotificationView extends StatelessWidget {
   @override
   Widget build(BuildContext context) => v(
         () => Flex(
+          key: keyMemRepeatedNotification,
           direction: Axis.horizontal,
           mainAxisSize: MainAxisSize.min,
           children: [
