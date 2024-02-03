@@ -14,12 +14,13 @@ class MemItemsFormFields extends ConsumerWidget {
   const MemItemsFormFields(this._memId, {super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) =>
-      _MemItemsFormFields(
+  Widget build(BuildContext context, WidgetRef ref) => _MemItemsFormFields(
         ref.watch(memItemsByMemIdProvider(_memId)),
         (entered, previous) => v(
           () {
-            return ref.watch(memItemsByMemIdProvider(_memId).notifier).upsertAll(
+            return ref
+                .watch(memItemsByMemIdProvider(_memId).notifier)
+                .upsertAll(
               [previous.copiedWith(value: () => entered)],
               (current, updating) {
                 return current.type == updating.type &&

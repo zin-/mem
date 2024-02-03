@@ -275,9 +275,24 @@ void testMemoDetailScenario() => group(
                 await widgetTester.tap(find.byKey(keyUndo));
                 await widgetTester.pumpAndSettle();
 
+                expect(
+                  find.text(l10n.undoMemSuccessMessage(insertedMemName)),
+                  findsOneWidget,
+                );
+
                 expect(find.text(insertedMemName), findsOneWidget);
                 expect(
                     (await selectFromMemsWhereName(insertedMemName)).length, 1);
+                final where = Equals(defColMemItemsValue.name, insertedMemMemo);
+                expect(
+                  (await dbA.select(
+                    defTableMemItems,
+                    where: where.where(),
+                    whereArgs: where.whereArgs(),
+                  ))
+                      .length,
+                  1,
+                );
 
                 await widgetTester.tap(find.text(insertedMemName));
                 await widgetTester.pumpAndSettle();

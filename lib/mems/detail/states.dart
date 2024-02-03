@@ -40,7 +40,14 @@ final memItemsByMemIdProvider = StateNotifierProvider.autoDispose
   (ref, memId) => v(
     () => ListValueStateNotifier(
       [
-        MemItem.memo(memId),
+        ref.watch(
+              memItemsProvider.select(
+                (value) => value.singleWhereOrNull(
+                  (element) => element.memId == memId,
+                ),
+              ),
+            ) ??
+            MemItem.memo(memId),
       ],
       initialFuture: memId == null
           ? null
