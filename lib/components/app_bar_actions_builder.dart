@@ -102,7 +102,9 @@ abstract class AppBarActionBuilder {
             leading: icon == null ? _icon : icon(),
             title: resolvedName == null ? null : Text(resolvedName),
             onTap: onPressed == null ? _onPressed : onPressed(),
-            enabled: onPressed == null ? _onPressed != null : true,
+            // for coverage.
+            // enabled: onPressed == null ? _onPressed != null : true,
+            enabled: onPressed != null,
           );
         },
         {

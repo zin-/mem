@@ -6,6 +6,8 @@ import 'package:mem/components/nullable_widget.dart';
 import 'package:mem/mems/list/states.dart';
 
 const _searchIcon = Icon(Icons.search);
+const keySearch = Key("search");
+const keyCloseSearch = Key("close-search");
 
 class SearchAction extends AppBarActionBuilder {
   SearchAction(BuildContext context) : super(icon: _searchIcon);
@@ -20,12 +22,14 @@ class SearchAction extends AppBarActionBuilder {
       Consumer(
         builder: (context, ref, child) => ref.watch(searchTextProvider) == null
             ? super.iconButtonBuilder(
+                key: () => keySearch,
                 name: () => buildL10n(context).search_action,
                 onPressed: () => () {
                   ref.read(searchTextProvider.notifier).updatedBy("");
                 },
               )
             : super.iconButtonBuilder(
+                key: () => keyCloseSearch,
                 icon: () => const Icon(Icons.close),
                 name: () => buildL10n(context).close_search_action,
                 onPressed: () => () {

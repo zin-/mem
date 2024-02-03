@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/app_bar_actions_builder.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/mems/detail/actions.dart';
-import 'package:mem/mems/detail/states.dart';
-import 'package:mem/repositories/mem.dart';
+import 'package:mem/mems/states.dart';
 import 'package:mem/values/durations.dart';
+
+const keyArchiveMem = Key("archive-mem");
+const keyUnarchiveMem = Key("unarchive-mem");
 
 class ArchiveMemAction extends AppBarActionBuilder {
   final int _memId;
@@ -21,56 +23,53 @@ class ArchiveMemAction extends AppBarActionBuilder {
   }) =>
       Consumer(
         builder: (context, ref, child) {
-          final mem = ref.watch(editingMemByMemIdProvider(_memId));
-          if (mem is SavedMem) {
-            if (mem.isArchived) {
-              return super.popupMenuItemChildBuilder(
-                icon: () => const Icon(Icons.unarchive),
-                name: () => buildL10n(context).unarchive_action,
-                onPressed: () => () {
-                  ref.read(unarchiveMem(mem.id));
+          final mem = ref.watch(memByMemIdProvider(_memId))!;
+          if (mem.isArchived) {
+            return super.popupMenuItemChildBuilder(
+              key: () => keyUnarchiveMem,
+              icon: () => const Icon(Icons.unarchive),
+              name: () => buildL10n(context).unarchive_action,
+              onPressed: () => () {
+                ref.read(unarchiveMem(mem.id));
 
-                  Navigator.of(context).pop(null);
+                Navigator.of(context).pop(null);
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content:
-                          Text(buildL10n(context).unarchiveMemSuccessMessage(
-                        mem.name,
-                      )),
-                      duration: defaultDismissDuration,
-                      dismissDirection: DismissDirection.horizontal,
-                    ),
-                  );
-                },
-              );
-            } else {
-              return super.popupMenuItemChildBuilder(
-                icon: () => const Icon(Icons.archive),
-                name: () => buildL10n(context).archiveFilterTitle,
-                onPressed: () => () {
-                  ref.read(archiveMem(mem.id));
-
-                  Navigator.of(context)
-                    ..pop(null)
-                    ..pop(null);
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        buildL10n(context).archiveMemSuccessMessage(
-                          mem.name,
-                        ),
-                      ),
-                      duration: defaultDismissDuration,
-                      dismissDirection: DismissDirection.horizontal,
-                    ),
-                  );
-                },
-              );
-            }
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(buildL10n(context).unarchiveMemSuccessMessage(
+                      mem.name,
+                    )),
+                    duration: defaultDismissDuration,
+                    dismissDirection: DismissDirection.horizontal,
+                  ),
+                );
+              },
+            );
           } else {
-            return super.popupMenuItemChildBuilder();
+            return super.popupMenuItemChildBuilder(
+              key: () => keyArchiveMem,
+              icon: () => const Icon(Icons.archive),
+              name: () => buildL10n(context).archiveFilterTitle,
+              onPressed: () => () {
+                ref.read(archiveMem(mem.id));
+
+                Navigator.of(context)
+                  ..pop(null)
+                  ..pop(null);
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      buildL10n(context).archiveMemSuccessMessage(
+                        mem.name,
+                      ),
+                    ),
+                    duration: defaultDismissDuration,
+                    dismissDirection: DismissDirection.horizontal,
+                  ),
+                );
+              },
+            );
           }
         },
       );
