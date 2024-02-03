@@ -25,7 +25,7 @@ final saveMem =
                 .read(editingMemByMemIdProvider(memId).notifier)
                 .updatedBy(saved.mem);
             ref
-                .read(memItemsProvider(memId).notifier)
+                .read(memItemsByMemIdProvider(memId).notifier)
                 .updatedBy(saved.memItems);
             ref.read(memNotificationsProvider.notifier).upsertAll(
                   saved.notifications ?? [],
@@ -92,7 +92,7 @@ final removeMem = Provider.autoDispose.family<Future<bool>, int?>(
             .read(removedMemProvider(memId).notifier)
             .updatedBy(ref.read(memByMemIdProvider(memId)));
         ref.read(removedMemItemsProvider(memId).notifier).updatedBy(
-              ref.read(memItemsProvider(memId)),
+              ref.read(memItemsByMemIdProvider(memId)),
             );
         // TODO mem notificationsにも同様の処理が必要では？
 

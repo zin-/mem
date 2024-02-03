@@ -17,7 +17,7 @@ final memDetailProvider = StateNotifierProvider.autoDispose
     () => ValueStateNotifier(
       MemDetail(
         ref.watch(editingMemByMemIdProvider(memId)),
-        ref.watch(memItemsProvider(memId)),
+        ref.watch(memItemsByMemIdProvider(memId)),
         ref.watch(memNotificationsByMemIdProvider(memId)),
       ),
     ),
@@ -35,7 +35,7 @@ final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
   ),
 );
 
-final memItemsProvider = StateNotifierProvider.autoDispose
+final memItemsByMemIdProvider = StateNotifierProvider.autoDispose
     .family<ListValueStateNotifier<MemItem>, List<MemItem>, int?>(
   (ref, memId) => v(
     () => ListValueStateNotifier(
