@@ -7,6 +7,7 @@ import 'package:mem/core/mem_notification.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/components/value_state_notifier.dart';
+import 'package:mem/mems/mem_item_repository.dart';
 import 'package:mem/mems/states.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
 
@@ -16,7 +17,7 @@ final memDetailProvider = StateNotifierProvider.autoDispose
     () => ValueStateNotifier(
       MemDetail(
         ref.watch(editingMemByMemIdProvider(memId)),
-        ref.watch(memItemsProvider(memId))!,
+        ref.watch(memItemsProvider(memId)),
         ref.watch(memNotificationsByMemIdProvider(memId)),
       ),
     ),
@@ -37,9 +38,16 @@ final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
 final memItemsProvider = StateNotifierProvider.autoDispose
     .family<ListValueStateNotifier<MemItem>, List<MemItem>, int?>(
   (ref, memId) => v(
-    () => ListValueStateNotifier([
-      MemItem(memId, MemItemType.memo, ''),
-    ]),
+    () => ListValueStateNotifier(
+      [
+        MemItem.memo(memId),
+      ],
+      initialFuture: memId == null
+          ? null
+          : MemItemRepository().shipByMemId(memId).then(
+                (value) => value.isEmpty ? [MemItem.memo(memId)] : value,
+              ),
+    ),
     memId,
   ),
 );
@@ -49,18 +57,16 @@ final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
         int?>(
   (ref, memId) => v(
     () {
-      final memNotificationsByMemId =
-          ref.watch(memNotificationsProvider.select((value) => value.where(
-                (e) => e.memId == memId,
+      final memRepeatedNotification = ref.watch(
+          memNotificationsProvider.select((value) => value.singleWhereOrNull(
+                (e) => e.memId == memId && e.type == MemNotificationType.repeat,
               )));
-
-      final memRepeatedNotification = memNotificationsByMemId.singleWhereOrNull(
-        (e) => e.type == MemNotificationType.repeat,
-      );
-      final memAfterActStartedNotification =
-          memNotificationsByMemId.singleWhereOrNull(
-        (e) => e.type == MemNotificationType.afterActStarted,
-      );
+      final memAfterActStartedNotification = ref.watch(
+          memNotificationsProvider.select((value) => value.singleWhereOrNull(
+                (e) =>
+                    e.memId == memId &&
+                    e.type == MemNotificationType.afterActStarted,
+              )));
 
       return ListValueStateNotifier(
         [
@@ -73,14 +79,24 @@ final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
                 MemNotification.repeated(memId),
                 MemNotification.afterActStarted(memId),
               ])
-            : MemNotificationRepository()
-                .shipByMemId(memId)
-                .then((value) => value.isEmpty
-                    ? [
+            : MemNotificationRepository().shipByMemId(memId).then(
+                (value) {
+                  return [
+                    value.singleWhereOrNull(
+                          (e) =>
+                              e.memId == memId &&
+                              e.type == MemNotificationType.repeat,
+                        ) ??
                         MemNotification.repeated(memId),
+                    value.singleWhereOrNull(
+                          (e) =>
+                              e.memId == memId &&
+                              e.type == MemNotificationType.afterActStarted,
+                        ) ??
                         MemNotification.afterActStarted(memId),
-                      ]
-                    : value),
+                  ];
+                },
+              ),
       );
     },
     {"memId": memId},

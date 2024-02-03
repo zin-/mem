@@ -2,34 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/core/mem_detail.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
-import 'package:mem/mems/mem_item.dart';
-import 'package:mem/mems/mem_item_repository.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/mems/mem_service.dart';
 import 'package:mem/mems/states.dart';
-
-final loadMemItems =
-    FutureProvider.autoDispose.family<List<SavedMemItem>, int?>(
-  (ref, memId) => v(
-    () async {
-      if (memId != null) {
-        final memItems = await MemItemRepository().shipByMemId(memId);
-
-        if (memItems.isNotEmpty) {
-          ref
-              .watch(memItemsProvider(memId).notifier)
-              .updatedBy(memItems.toList());
-        }
-
-        return memItems.toList();
-      }
-
-      return [];
-    },
-    memId,
-  ),
-);
 
 final saveMem =
     Provider.autoDispose.family<Future<MemDetail>, int?>((ref, memId) => v(
