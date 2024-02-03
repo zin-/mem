@@ -52,6 +52,7 @@ final removedMemDetailProvider = StateNotifierProvider.autoDispose
 
       return ValueStateNotifier(removedMemDetail);
     },
+    memId,
   ),
 );
 final removedMemProvider =
