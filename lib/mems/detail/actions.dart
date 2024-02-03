@@ -94,6 +94,7 @@ final removeMem = Provider.autoDispose.family<Future<bool>, int?>(
         ref.read(removedMemItemsProvider(memId).notifier).updatedBy(
               ref.read(memItemsProvider(memId)),
             );
+        // TODO mem notificationsにも同様の処理が必要では？
 
         ref.read(memsProvider.notifier).removeWhere(
             (element) => element is SavedMem && element.id == memId);
