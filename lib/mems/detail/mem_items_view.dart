@@ -15,7 +15,7 @@ class MemItemsFormFields extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) =>
-      _MemItemsFormFieldsComponent(
+      _MemItemsFormFields(
         ref.watch(memItemsByMemIdProvider(_memId)),
         (entered, previous) => v(
           () {
@@ -34,11 +34,11 @@ class MemItemsFormFields extends ConsumerWidget {
       );
 }
 
-class _MemItemsFormFieldsComponent extends StatelessWidget {
+class _MemItemsFormFields extends StatelessWidget {
   final List<MemItem> _memItems;
   final Function(dynamic entered, MemItem previous) _onChanged;
 
-  const _MemItemsFormFieldsComponent(this._memItems, this._onChanged);
+  const _MemItemsFormFields(this._memItems, this._onChanged);
 
   @override
   Widget build(BuildContext context) => v(
