@@ -134,7 +134,7 @@ class NotificationsWrapper {
   NotificationsWrapper._(
     String androidDefaultIconPath,
   ) {
-    i(
+    v(
       () {
         _pluginIsInitialized = _flutterLocalNotificationsPlugin.initialize(
           InitializationSettings(
