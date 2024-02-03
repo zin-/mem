@@ -7,7 +7,7 @@ import 'package:mem/mems/mem_item.dart';
 
 class MemItemRepository
     extends DatabaseTupleRepository<MemItem, SavedMemItem, int> {
-  Future<Iterable<SavedMemItem>> shipByMemId(int memId) => v(
+  Future<List<SavedMemItem>> shipByMemId(int memId) => v(
         () => super.ship(Equals(defFkMemItemsMemId.name, memId)),
         {'memId': memId},
       );

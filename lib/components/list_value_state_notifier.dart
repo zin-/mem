@@ -27,11 +27,15 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
         {'item': item},
       );
 
-  void upsertAll(Iterable<T> items, bool Function(T tmp, T item) where) => v(
+  List<T> upsertAll(
+    Iterable<T> updatingItems,
+    bool Function(T current, T updating) where,
+  ) =>
+      v(
         () {
           final tmp = List.of(state);
 
-          for (var item in items) {
+          for (var item in updatingItems) {
             final index = tmp.indexWhere(
               (tmpElement) => where(tmpElement, item),
             );
@@ -42,9 +46,9 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
             }
           }
 
-          updatedBy(tmp);
+          return updatedBy(tmp);
         },
-        {'items': items},
+        {"updatingItems": updatingItems},
       );
 
   void removeWhere(bool Function(T element) test) => v(

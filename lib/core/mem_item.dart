@@ -12,6 +12,8 @@ class MemItem extends EntityV1 {
 
   MemItem(this.memId, this.type, this.value);
 
+  factory MemItem.memo(int? memId) => MemItem(memId, MemItemType.memo, "");
+
   MemItem copiedWith({
     int Function()? memId,
     dynamic Function()? value,

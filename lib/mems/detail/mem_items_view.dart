@@ -64,6 +64,6 @@ class _MemItemsFormFieldsComponent extends StatelessWidget {
             ],
           );
         },
-        _memItems,
+        {"_memItems": _memItems},
       );
 }
