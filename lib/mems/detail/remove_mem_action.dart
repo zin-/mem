@@ -4,7 +4,6 @@ import 'package:mem/components/app_bar_actions_builder.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/mems/detail/actions.dart';
 import 'package:mem/mems/states.dart';
-import 'package:mem/repositories/mem.dart';
 
 const keyRemoveMem = Key("remove-mem");
 
@@ -25,24 +24,18 @@ class RemoveMemAction extends AppBarActionBuilder {
     VoidCallback Function()? onPressed,
   }) =>
       Consumer(
-        builder: (context, ref, child) {
-          final mem = ref.watch(memByMemIdProvider(_memId));
-          if (mem is SavedMem) {
-            return super.popupMenuItemChildBuilder(
-              name: () => buildL10n(context).removeAction,
-              onPressed: () => () {
-                showDialog(
-                  context: context,
-                  builder: (context) => _RemoveMemAlertDialog(
-                    () => ref.read(removeMem(mem.id)),
-                  ),
-                );
-              },
+        builder: (context, ref, child) => super.popupMenuItemChildBuilder(
+          name: () => buildL10n(context).removeAction,
+          onPressed: () => () {
+            showDialog(
+              context: context,
+              builder: (context) => _RemoveMemAlertDialog(
+                () => ref
+                    .read(removeMem(ref.watch(memByMemIdProvider(_memId))!.id)),
+              ),
             );
-          } else {
-            return super.popupMenuItemChildBuilder();
-          }
-        },
+          },
+        ),
       );
 }
 
