@@ -18,9 +18,7 @@ class MemItemsFormFields extends ConsumerWidget {
         ref.watch(memItemsByMemIdProvider(_memId)),
         (entered, previous) => v(
           () {
-            return ref
-                .watch(memItemsByMemIdProvider(_memId).notifier)
-                .upsertAll(
+            return ref.read(memItemsByMemIdProvider(_memId).notifier).upsertAll(
               [previous.copiedWith(value: () => entered)],
               (current, updating) {
                 return current.type == updating.type &&

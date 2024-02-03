@@ -16,10 +16,9 @@ final undoRemoveMem = FutureProvider.autoDispose.family<void, int>(
 
         if (removeUndoneMem is SavedMem) {
           ref.read(memsProvider.notifier).add(removeUndoneMem);
-          ref.read(memItemsProvider.notifier).upsertAll(
-                removeUndone.memItems,
-                (current, updating) => true,
-              );
+          for (var element in removeUndone.memItems) {
+            ref.read(memItemsProvider.notifier).add(element);
+          }
         }
       }
     },
