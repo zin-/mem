@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/components/mem/list/actions.dart';
 import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
+import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/list/actions.dart';
 import 'package:mem/mems/list/body.dart';
 import 'package:mem/mems/list/show_new_mem_fab.dart';
@@ -34,6 +35,8 @@ void main() {
         fetchMemNotifications.overrideWith((ref, arg) => Future(() => [])),
         activeActsProvider.overrideWith((ref) => ListValueStateNotifier([])),
         memsProvider.overrideWith((ref) => ListValueStateNotifier(samples)),
+        memNotificationsByMemIdProvider
+            .overrideWith((ref, arg) => ListValueStateNotifier([])),
       ],
       child: MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
