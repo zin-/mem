@@ -5,7 +5,6 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/after_act_started_notification_view.dart';
 import 'package:mem/mems/detail/mem_repeated_notification_view.dart';
 import 'package:mem/mems/detail/states.dart';
-import 'package:mem/core/date_and_time/time_of_day.dart' as core;
 import 'package:mem/repositories/mem_notification.dart';
 
 class NotificationsView extends ConsumerWidget {
@@ -50,9 +49,19 @@ class _NotificationsView extends StatelessWidget {
                 return MemRepeatedNotificationView(
                   e.time == null
                       ? null
-                      : core.TimeOfDay.fromSeconds(e.time!).convert(),
+                      : () {
+                          final hours = (e.time! / 60 / 60).floor();
+                          final minutes =
+                              ((e.time! - hours * 60 * 60) / 60).floor();
+                          return TimeOfDay(hour: hours, minute: minutes);
+                        }(),
                   (pickedTimeOfDay) => _onChanged(e)(
-                    pickedTimeOfDay?.convert().toSeconds(),
+                    pickedTimeOfDay == null
+                        ? null
+                        : ((pickedTimeOfDay.hour * 60 +
+                                pickedTimeOfDay.minute) *
+                            60),
+                    // pickedTimeOfDay?.convert().toSeconds(),
                     e.message,
                   ),
                 );
@@ -67,12 +76,4 @@ class _NotificationsView extends StatelessWidget {
         ),
         {"_notifications": _notifications},
       );
-}
-
-extension on core.TimeOfDay {
-  TimeOfDay convert() => TimeOfDay(hour: hour, minute: minute);
-}
-
-extension on TimeOfDay {
-  core.TimeOfDay convert() => core.TimeOfDay(hour, minute);
 }

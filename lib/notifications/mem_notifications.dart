@@ -1,9 +1,6 @@
 import 'dart:convert';
-
 import 'package:mem/core/date_and_time/date_and_time.dart';
-import 'package:mem/core/date_and_time/time_of_day.dart';
 import 'package:mem/repositories/mem.dart';
-
 import 'client.dart';
 import 'notification/cancel_notification.dart';
 import 'notification/notification.dart';
@@ -18,7 +15,8 @@ const _endNotificationBody = 'end';
 class MemNotifications {
   static List<NotificationV1> of(
     SavedMem mem,
-    TimeOfDay startOfDay,
+    int hour,
+    int minute,
   ) {
     if (mem.isDone || mem.isArchived) {
       return CancelAllMemNotifications.of(mem.id);
@@ -34,7 +32,8 @@ class MemNotifications {
           _startNotificationBody,
           periodStart,
           mem.id,
-          startOfDay,
+          hour,
+          minute,
         ));
       }
 
@@ -46,7 +45,8 @@ class MemNotifications {
           _endNotificationBody,
           periodEnd,
           mem.id,
-          startOfDay,
+          hour,
+          minute,
         ));
       }
 
@@ -60,7 +60,8 @@ class MemNotifications {
     body,
     DateAndTime notifyAt,
     int memId,
-    TimeOfDay startOfDay,
+    int hour,
+    int minute,
   ) {
     final notificationClient = NotificationClientV2();
 
@@ -78,8 +79,8 @@ class MemNotifications {
               notifyAt.year,
               notifyAt.month,
               notifyAt.day,
-              startOfDay.hour,
-              startOfDay.minute,
+              hour,
+              minute,
             )
           : notifyAt,
     );
