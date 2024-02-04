@@ -12,6 +12,12 @@ class MemNotification extends EntityV1 {
 
   MemNotification(this.memId, this.type, this.time, this.message);
 
+  bool isEnabled() => time != null;
+
+  bool isRepeated() => type == MemNotificationType.repeat;
+
+  bool afterActStarted() => type == MemNotificationType.afterActStarted;
+
   factory MemNotification.repeated(int? memId) => MemNotification(
       memId, MemNotificationType.repeat, null, _repeatedMessage);
 
