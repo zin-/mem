@@ -16,7 +16,7 @@ class MemNotification extends EntityV1 {
 
   bool isRepeated() => type == MemNotificationType.repeat;
 
-  bool afterActStarted() => type == MemNotificationType.afterActStarted;
+  bool isAfterActStarted() => type == MemNotificationType.afterActStarted;
 
   factory MemNotification.repeated(int? memId) => MemNotification(
       memId, MemNotificationType.repeat, null, _repeatedMessage);

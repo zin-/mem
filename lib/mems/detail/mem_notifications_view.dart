@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
@@ -12,17 +13,11 @@ class MemNotificationsView extends ConsumerWidget {
   const MemNotificationsView(this._memId, {super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => d(
-        () {
-          // TODO: implement build
-          final memNotifications =
-              ref.read(memNotificationsByMemIdProvider(_memId));
-
-          return _MemNotificationsView(memNotifications);
-        },
-        {
-          "_memId": _memId,
-        },
+  Widget build(BuildContext context, WidgetRef ref) => v(
+        () => _MemNotificationsView(
+          ref.read(memNotificationsByMemIdProvider(_memId)),
+        ),
+        {"_memId": _memId},
       );
 }
 
@@ -41,14 +36,19 @@ class _MemNotificationsView extends StatelessWidget {
               )
               .isNotEmpty;
 
-          final notifyTimes =
-              _memNotifications.where((element) => element.isRepeated()).map(
-                    (e) => TimeOfDay.fromDateTime(
-                      DateAndTime(0, 0, 0, 0, 0, e.time),
-                    ).format(context),
-                  );
-          // TODO
-          const span = "毎日";
+          final df = DateFormat(DateFormat.HOUR24_MINUTE);
+          final a = _memNotifications
+              .where((element) => element.isEnabled())
+              .map((e) {
+            switch (e.type) {
+              case MemNotificationType.repeat:
+                return "毎日${TimeOfDay.fromDateTime(
+                  DateAndTime(0, 0, 0, 0, 0, e.time),
+                ).format(context)}";
+              case MemNotificationType.afterActStarted:
+                return "開始${df.format(DateAndTime(0, 0, 0, 0, 0, e.time))}後";
+            }
+          });
 
           return ListTile(
             contentPadding: EdgeInsets.zero,
@@ -57,19 +57,20 @@ class _MemNotificationsView extends StatelessWidget {
               color: hasEnabledNotifications ? null : secondaryGreyColor,
             ),
             title: Text(
-              hasEnabledNotifications ? span + notifyTimes.join(", ") : "通知しない",
+              hasEnabledNotifications ? a.join(", ") : "通知しない",
               style: TextStyle(
                 color: hasEnabledNotifications ? null : secondaryGreyColor,
               ),
             ),
-            trailing: hasEnabledNotifications
-                ? // TODO edit
-                null
-                : IconButton(
-                    onPressed: () => d(() {}),
-                    icon: const Icon(Icons.notification_add),
-                    tooltip: "通知を追加する",
-                  ),
+            trailing: IconButton(
+              onPressed: () => d(() {
+                // TODO transit notification page
+              }),
+              icon: Icon(
+                hasEnabledNotifications ? Icons.edit : Icons.notification_add,
+              ),
+              tooltip: hasEnabledNotifications ? "通知を変更する" : "通知を追加する",
+            ),
           );
         },
         {"_memNotifications": _memNotifications},
