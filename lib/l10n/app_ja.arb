@@ -78,6 +78,9 @@
   "after_act_started_notification": "Act開始後の通知",
   "after_act_started_notification_description": "Act開始の指定時間後に通知します。",
 
+  "repeat_notification": "毎日{notifyAt}",
+  "repeat_act_started": "開始{notifyAt}後",
+
   "dev": "Under development",
   "test": "Under test"
 }

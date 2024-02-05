@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:mem/components/l10n.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
@@ -36,17 +37,19 @@ class _MemNotificationsView extends StatelessWidget {
               )
               .isNotEmpty;
 
+          final l10n = buildL10n(context);
           final df = DateFormat(DateFormat.HOUR24_MINUTE);
           final a = _memNotifications
               .where((element) => element.isEnabled())
               .map((e) {
             switch (e.type) {
               case MemNotificationType.repeat:
-                return "毎日${TimeOfDay.fromDateTime(
+                return l10n.repeat_notification(TimeOfDay.fromDateTime(
                   DateAndTime(0, 0, 0, 0, 0, e.time),
-                ).format(context)}";
+                ).format(context));
               case MemNotificationType.afterActStarted:
-                return "開始${df.format(DateAndTime(0, 0, 0, 0, 0, e.time))}後";
+                return l10n.after_act_started_notification_t(
+                    df.format(DateAndTime(0, 0, 0, 0, 0, e.time)));
             }
           });
 
