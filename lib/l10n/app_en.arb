@@ -78,8 +78,11 @@
   "after_act_started_notification": "After act started",
   "after_act_started_notification_description": "To remind specific amount of time after act started.",
 
+  "no_notifications": "No notifications",
   "repeat_notification": "{notifyAt} every day",
-  "after_act_started_notification_t": "{notifyAt} after started",
+  "after_act_started_notification_text": "{notifyAt} after started",
+  "edit_notification": "Edit notification",
+  "add_notification": "Add notification",
 
   "dev": "Under development",
   "test": "Under test"

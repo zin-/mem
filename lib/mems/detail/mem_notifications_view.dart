@@ -28,9 +28,8 @@ class _MemNotificationsView extends StatelessWidget {
   const _MemNotificationsView(this._memNotifications);
 
   @override
-  Widget build(BuildContext context) => d(
+  Widget build(BuildContext context) => v(
         () {
-          // TODO: implement build
           final hasEnabledNotifications = _memNotifications
               .where(
                 (element) => element.isEnabled(),
@@ -48,7 +47,7 @@ class _MemNotificationsView extends StatelessWidget {
                   DateAndTime(0, 0, 0, 0, 0, e.time),
                 ).format(context));
               case MemNotificationType.afterActStarted:
-                return l10n.after_act_started_notification_t(
+                return l10n.after_act_started_notification_text(
                     df.format(DateAndTime(0, 0, 0, 0, 0, e.time)));
             }
           });
@@ -60,19 +59,21 @@ class _MemNotificationsView extends StatelessWidget {
               color: hasEnabledNotifications ? null : secondaryGreyColor,
             ),
             title: Text(
-              hasEnabledNotifications ? a.join(", ") : "通知しない",
+              hasEnabledNotifications ? a.join(", ") : l10n.no_notifications,
               style: TextStyle(
                 color: hasEnabledNotifications ? null : secondaryGreyColor,
               ),
             ),
             trailing: IconButton(
-              onPressed: () => d(() {
+              onPressed: () => v(() {
                 // TODO transit notification page
               }),
               icon: Icon(
                 hasEnabledNotifications ? Icons.edit : Icons.notification_add,
               ),
-              tooltip: hasEnabledNotifications ? "通知を変更する" : "通知を追加する",
+              tooltip: hasEnabledNotifications
+                  ? l10n.edit_notification
+                  : l10n.add_notification,
             ),
           );
         },
