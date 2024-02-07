@@ -5,8 +5,11 @@ import 'package:mem/components/l10n.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/mems/detail/mem_notifications_page.dart';
 import 'package:mem/mems/detail/states.dart';
+import 'package:mem/mems/transitions.dart';
 import 'package:mem/values/colors.dart';
+import 'package:mem/values/durations.dart';
 
 class MemNotificationsView extends ConsumerWidget {
   final int? _memId;
@@ -16,6 +19,7 @@ class MemNotificationsView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemNotificationsView(
+          _memId,
           ref.read(memNotificationsByMemIdProvider(_memId)),
         ),
         {"_memId": _memId},
@@ -23,9 +27,10 @@ class MemNotificationsView extends ConsumerWidget {
 }
 
 class _MemNotificationsView extends StatelessWidget {
+  final int? _memId;
   final List<MemNotification> _memNotifications;
 
-  const _MemNotificationsView(this._memNotifications);
+  const _MemNotificationsView(this._memId, this._memNotifications);
 
   @override
   Widget build(BuildContext context) => v(
@@ -65,9 +70,14 @@ class _MemNotificationsView extends StatelessWidget {
               ),
             ),
             trailing: IconButton(
-              onPressed: () => v(() {
-                // TODO transit notification page
-              }),
+              onPressed: () =>
+                  v(() => Navigator.of(context).push(PageRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            MemNotificationsPage(_memId),
+                        transitionsBuilder: detailTransitionsBuilder,
+                        transitionDuration: defaultTransitionDuration,
+                        reverseTransitionDuration: defaultTransitionDuration,
+                      ))),
               icon: Icon(
                 hasEnabledNotifications ? Icons.edit : Icons.notification_add,
               ),
@@ -77,6 +87,6 @@ class _MemNotificationsView extends StatelessWidget {
             ),
           );
         },
-        {"_memNotifications": _memNotifications},
+        {"_memId": _memId, "_memNotifications": _memNotifications},
       );
 }
