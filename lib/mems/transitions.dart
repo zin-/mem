@@ -15,7 +15,7 @@ void showMemDetailPage(BuildContext context, WidgetRef? ref, int? memId) => v(
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
                 MemDetailPage(memId),
-            transitionsBuilder: _showMemDetailTransitionBuilder,
+            transitionsBuilder: detailTransitionsBuilder,
             transitionDuration: defaultTransitionDuration,
             reverseTransitionDuration: defaultTransitionDuration,
           ),
@@ -31,7 +31,7 @@ void showMemDetailPage(BuildContext context, WidgetRef? ref, int? memId) => v(
       [context, ref, memId],
     );
 
-Widget _showMemDetailTransitionBuilder(
+Widget detailTransitionsBuilder(
   BuildContext context,
   Animation<double> animation,
   Animation<double> secondaryAnimation,
