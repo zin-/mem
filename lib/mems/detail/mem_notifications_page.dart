@@ -11,46 +11,47 @@ class MemNotificationsPage extends ConsumerWidget {
   const MemNotificationsPage(this._memId, {super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => d(
-        () {
-          // TODO: implement build
-          final memName = ref.watch(
-              editingMemByMemIdProvider(_memId).select((value) => value.name));
-
-          return _MemNotificationsPage(
-            memName,
-          );
-        },
+  Widget build(BuildContext context, WidgetRef ref) => v(
+        () => _MemNotificationsPage(
+          _memId,
+          ref.watch(
+            editingMemByMemIdProvider(_memId).select(
+              (value) => value.name,
+            ),
+          ),
+        ),
         {"_memId": _memId},
       );
 }
 
 class _MemNotificationsPage extends StatelessWidget {
+  final int? _memId;
   final String _memName;
 
-  const _MemNotificationsPage(this._memName);
+  const _MemNotificationsPage(this._memId, this._memName);
 
   @override
-  Widget build(BuildContext context) => d(
-        () {
-          // TODO: implement build
-          return Scaffold(
-            appBar: AppBar(
-              title: Text(_memName),
-            ),
-            body: Flex(
-              direction: Axis.vertical,
-              children: [
-                MemRepeatedNotificationView(null, (updating) => null),
-                AfterActStartedNotificationView(
-                  null,
-                  "_message",
-                  (time, message) => null,
-                ),
-              ],
-            ),
-          );
+  Widget build(BuildContext context) => v(
+        () => Scaffold(
+          appBar: AppBar(
+            title: Text(_memName),
+          ),
+          body: Flex(
+            direction: Axis.vertical,
+            children: [
+              MemRepeatedNotificationView(_memId),
+              // TODO
+              AfterActStartedNotificationView(
+                null,
+                "_message",
+                (time, message) => null,
+              ),
+            ],
+          ),
+        ),
+        {
+          "_memId": _memId,
+          "_memName": _memName,
         },
-        {"_memName": _memName},
       );
 }

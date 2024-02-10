@@ -9,12 +9,13 @@ class SavedMemNotification extends MemNotification
   SavedMemNotification(super.memId, super.type, super.time, super.message);
 
   @override
-  SavedMemNotification copiedWith(
+  SavedMemNotification copiedWith({
+    int Function()? memId,
     int? Function()? time,
     String Function()? message,
-  ) =>
+  }) =>
       SavedMemNotification(
-        memId,
+        memId == null ? this.memId : memId(),
         type,
         time == null ? this.time : time(),
         message == null ? this.message : message(),

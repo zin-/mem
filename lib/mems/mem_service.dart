@@ -49,8 +49,12 @@ class MemService {
                     return Future.value(e);
                   } else {
                     return (e is SavedMemNotification && !undo
-                        ? _memNotificationRepository.replace(e)
-                        : _memNotificationRepository.receive(e))
+                        ? _memNotificationRepository.replace(e.copiedWith(
+                            memId: () => savedMem.id,
+                          ))
+                        : _memNotificationRepository.receive(e.copiedWith(
+                            memId: () => savedMem.id,
+                          )))
                       ..then(
                         (value) => _notificationService.memRepeatedReminder(
                           savedMem,

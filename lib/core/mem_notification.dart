@@ -24,13 +24,13 @@ class MemNotification extends EntityV1 {
   factory MemNotification.afterActStarted(int? memId) => MemNotification(memId,
       MemNotificationType.afterActStarted, null, _afterActStartedMessage);
 
-  // TODO optional
-  MemNotification copiedWith(
+  MemNotification copiedWith({
+    int Function()? memId,
     int? Function()? time,
     String Function()? message,
-  ) =>
+  }) =>
       MemNotification(
-        memId,
+        memId == null ? this.memId : memId(),
         type,
         time == null ? this.time : time(),
         message == null ? this.message : message(),
