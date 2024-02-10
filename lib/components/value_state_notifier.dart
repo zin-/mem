@@ -12,7 +12,9 @@ class ValueStateNotifier<StateT> extends StateNotifier<StateT> {
   }) {
     initialFuture?.then(
       (value) => v(
-        () => updatedBy(value),
+        () => mounted
+            ? updatedBy(value)
+            : warn("${super.toString()}. No update."),
         value,
       ),
     );
