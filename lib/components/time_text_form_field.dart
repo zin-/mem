@@ -5,12 +5,10 @@ import 'package:mem/logger/log_service.dart';
 class TimeTextFormField extends StatelessWidget {
   final int? _secondsOfTime;
   final void Function(int? pickedSecondsOfTime) _onChanged;
-  final Widget? _icon;
 
   const TimeTextFormField(
     this._secondsOfTime,
-    this._onChanged,
-    this._icon, {
+    this._onChanged, {
     super.key,
   });
 
@@ -29,7 +27,6 @@ class TimeTextFormField extends StatelessWidget {
                   hours != null && minutes != null ? '$hours h $minutes m' : '',
             ),
             decoration: InputDecoration(
-              icon: _icon,
               hintText: 'h:m',
               suffixIcon: IconButton(
                 icon: const Icon(Icons.add),

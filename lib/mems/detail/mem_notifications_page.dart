@@ -39,13 +39,9 @@ class _MemNotificationsPage extends StatelessWidget {
           body: Flex(
             direction: Axis.vertical,
             children: [
+              // TODO add clear button
               MemRepeatedNotificationView(_memId),
-              // TODO
-              AfterActStartedNotificationView(
-                null,
-                "_message",
-                (time, message) => null,
-              ),
+              AfterActStartedNotificationView(_memId),
             ],
           ),
         ),

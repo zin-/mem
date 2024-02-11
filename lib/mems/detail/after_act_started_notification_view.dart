@@ -1,54 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/time_text_form_field.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/mems/detail/states.dart';
 
-class AfterActStartedNotificationView extends StatelessWidget {
-  final int? _time;
-  final String _message;
-  final Function(int? time, String message) _onChanged;
+class AfterActStartedNotificationView extends ConsumerWidget {
+  final int? _memId;
 
-  const AfterActStartedNotificationView(
-    this._time,
-    this._message,
-    this._onChanged, {
-    super.key,
-  });
+  const AfterActStartedNotificationView(this._memId, {super.key});
 
   @override
-  Widget build(BuildContext context) => v(
-        () => Card(
-          child: Flex(
+  Widget build(BuildContext context, WidgetRef ref) => v(
+        () {
+          final notification =
+              ref.watch(memAfterActStartedNotificationByMemIdProvider(_memId));
+
+          return Flex(
             direction: Axis.vertical,
             children: [
-              Flex(
-                direction: Axis.horizontal,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Expanded(
-                    child: TimeTextFormField(
-                      _time,
-                      (pickedSecondsOfTime) => _onChanged(
-                        pickedSecondsOfTime,
-                        _message,
-                      ),
-                      const Icon(Icons.exposure_plus_1),
-                    ),
-                  ),
-                  _time == null
-                      ? const SizedBox.shrink()
-                      : IconButton(
-                          onPressed: () => _onChanged(null, _message),
-                          icon: const Icon(Icons.clear),
-                        ),
-                ],
+              ListTile(
+                leading: const Icon(Icons.exposure_plus_1),
+                title: TimeTextFormField(
+                  notification.time,
+                  (pickedSecondsOfTime) {
+                    ref
+                        .read(memAfterActStartedNotificationByMemIdProvider(
+                                _memId)
+                            .notifier)
+                        .updatedBy(notification.copiedWith(
+                            time: () => pickedSecondsOfTime));
+                  },
+                ),
               ),
-              TextFormField(
-                initialValue: _message,
-                onChanged: (value) => _onChanged(_time, value),
+              // TODO disable on no time
+              ListTile(
+                leading: const SizedBox(width: 24.0),
+                title: TextFormField(
+                  initialValue: notification.message,
+                  onChanged: (value) {
+                    ref
+                        .read(memAfterActStartedNotificationByMemIdProvider(
+                                _memId)
+                            .notifier)
+                        .updatedBy(
+                            notification.copiedWith(message: () => value));
+                  },
+                ),
               ),
             ],
-          ),
-        ),
-        [_time, _message],
+          );
+        },
+        {"_memId": _memId},
       );
 }
