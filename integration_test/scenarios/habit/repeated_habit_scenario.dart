@@ -6,7 +6,7 @@ import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
-import 'package:mem/mems/detail/mem_repeated_notification_view.dart';
+import 'package:mem/mems/detail/mem_notifications_view.dart';
 
 import '../helpers.dart';
 
@@ -61,13 +61,20 @@ void testRepeatedHabitScenario() => group(
 
               expect(
                 widgetTester
-                    .widget<TextFormField>(
+                    .widget<Text>(
                       find.descendant(
-                          of: find.byKey(keyMemRepeatedNotification),
-                          matching: find.byType(TextFormField)),
+                        of: find.byKey(keyMemNotificationsView),
+                        matching: find.byType(Text),
+                      ),
                     )
-                    .initialValue,
-                isEmpty,
+                    .data,
+                l10n.no_notifications,
+              );
+              expect(
+                find.descendant(
+                    of: find.byKey(keyMemNotificationsView),
+                    matching: find.byIcon(Icons.notification_add)),
+                findsOneWidget,
               );
             },
           );
@@ -82,13 +89,19 @@ void testRepeatedHabitScenario() => group(
 
               expect(
                 widgetTester
-                    .widget<TextFormField>(
+                    .widget<Text>(
                       find.descendant(
-                          of: find.byKey(keyMemRepeatedNotification),
-                          matching: find.byType(TextFormField)),
+                          of: find.byKey(keyMemNotificationsView),
+                          matching: find.byType(Text)),
                     )
-                    .initialValue,
-                "12:00 AM",
+                    .data,
+                "12:00 AM every day",
+              );
+              expect(
+                find.descendant(
+                    of: find.byKey(keyMemNotificationsView),
+                    matching: find.byIcon(Icons.edit)),
+                findsOneWidget,
               );
             },
           );

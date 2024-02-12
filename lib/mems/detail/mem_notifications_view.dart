@@ -11,6 +11,8 @@ import 'package:mem/mems/transitions.dart';
 import 'package:mem/values/colors.dart';
 import 'package:mem/values/durations.dart';
 
+const keyMemNotificationsView = Key("mem-notifications");
+
 class MemNotificationsView extends ConsumerWidget {
   final int? _memId;
 
@@ -20,6 +22,9 @@ class MemNotificationsView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemNotificationsView(
           _memId,
+          ref.read(memNotificationsByMemIdProvider(_memId).select(
+            (value) => value.where((element) => element.isEnabled()).isNotEmpty,
+          )),
           ref.read(memNotificationsByMemIdProvider(_memId)),
         ),
         {"_memId": _memId},
@@ -28,45 +33,46 @@ class MemNotificationsView extends ConsumerWidget {
 
 class _MemNotificationsView extends StatelessWidget {
   final int? _memId;
+  final bool _hasEnabledNotifications;
   final List<MemNotification> _memNotifications;
 
-  const _MemNotificationsView(this._memId, this._memNotifications);
+  const _MemNotificationsView(
+    this._memId,
+    this._hasEnabledNotifications,
+    this._memNotifications,
+  ) : super(key: keyMemNotificationsView);
 
   @override
   Widget build(BuildContext context) => v(
         () {
-          final hasEnabledNotifications = _memNotifications
-              .where(
-                (element) => element.isEnabled(),
-              )
-              .isNotEmpty;
-
           final l10n = buildL10n(context);
-          final df = DateFormat(DateFormat.HOUR24_MINUTE);
-          final a = _memNotifications
-              .where((element) => element.isEnabled())
-              .map((e) {
-            switch (e.type) {
-              case MemNotificationType.repeat:
-                return l10n.repeat_notification(TimeOfDay.fromDateTime(
-                  DateAndTime(0, 0, 0, 0, 0, e.time),
-                ).format(context));
-              case MemNotificationType.afterActStarted:
-                return l10n.after_act_started_notification_text(
-                    df.format(DateAndTime(0, 0, 0, 0, 0, e.time)));
-            }
-          });
 
           return ListTile(
             contentPadding: EdgeInsets.zero,
             leading: Icon(
               Icons.notifications,
-              color: hasEnabledNotifications ? null : secondaryGreyColor,
+              color: _hasEnabledNotifications ? null : secondaryGreyColor,
             ),
             title: Text(
-              hasEnabledNotifications ? a.join(", ") : l10n.no_notifications,
+              _hasEnabledNotifications
+                  ? _memNotifications
+                      .where((element) => element.isEnabled())
+                      .map((e) {
+                      switch (e.type) {
+                        case MemNotificationType.repeat:
+                          return l10n
+                              .repeat_notification(TimeOfDay.fromDateTime(
+                            DateAndTime(0, 0, 0, 0, 0, e.time),
+                          ).format(context));
+                        case MemNotificationType.afterActStarted:
+                          return l10n.after_act_started_notification_text(
+                              DateFormat(DateFormat.HOUR24_MINUTE)
+                                  .format(DateAndTime(0, 0, 0, 0, 0, e.time)));
+                      }
+                    }).join(", ")
+                  : l10n.no_notifications,
               style: TextStyle(
-                color: hasEnabledNotifications ? null : secondaryGreyColor,
+                color: _hasEnabledNotifications ? null : secondaryGreyColor,
               ),
             ),
             trailing: IconButton(
@@ -79,14 +85,18 @@ class _MemNotificationsView extends StatelessWidget {
                         reverseTransitionDuration: defaultTransitionDuration,
                       ))),
               icon: Icon(
-                hasEnabledNotifications ? Icons.edit : Icons.notification_add,
+                _hasEnabledNotifications ? Icons.edit : Icons.notification_add,
               ),
-              tooltip: hasEnabledNotifications
+              tooltip: _hasEnabledNotifications
                   ? l10n.edit_notification
                   : l10n.add_notification,
             ),
           );
         },
-        {"_memId": _memId, "_memNotifications": _memNotifications},
+        {
+          "_memId": _memId,
+          "_hasEnabledNotifications": _hasEnabledNotifications,
+          "_memNotifications": _memNotifications,
+        },
       );
 }
