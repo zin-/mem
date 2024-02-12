@@ -13,39 +13,55 @@ class MemRepeatedNotificationView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () {
-          final notification =
-              ref.watch(memRepeatedNotificationByMemIdProvider(_memId));
-
-          return ListTile(
-            title: TimeOfDayTextFormField(
-              timeOfDay: notification.time == null
-                  ? null
-                  : () {
-                      final hours = (notification.time! / 60 / 60).floor();
-                      final minutes =
-                          ((notification.time! - hours * 60 * 60) / 60).floor();
-                      return TimeOfDay(hour: hours, minute: minutes);
-                    }(),
-              onChanged: (pickedTimeOfDay) => v(
-                () {
-                  ref
-                      .watch(memRepeatedNotificationByMemIdProvider(_memId)
-                          .notifier)
-                      .updatedBy(notification.copiedWith(
-                        time: () => pickedTimeOfDay == null
-                            ? null
-                            : ((pickedTimeOfDay.hour * 60 +
-                                    pickedTimeOfDay.minute) *
-                                60),
-                        message: () => notification.message,
-                      ));
-                },
-                pickedTimeOfDay,
+        () => _MemRepeatedNotificationView(
+          ref.watch(memRepeatedNotificationByMemIdProvider(_memId).select(
+            (value) => value.time,
+          )),
+          onTimeChanged: (picked) => ref
+              .read(memRepeatedNotificationByMemIdProvider(_memId).notifier)
+              .updatedBy(
+                ref
+                    .read(memRepeatedNotificationByMemIdProvider(_memId))
+                    .copiedWith(
+                      time: () => picked,
+                    ),
               ),
-            ),
-          );
+        ),
+        {
+          "_memId": _memId,
         },
-        {"_memId": _memId},
+      );
+}
+
+class _MemRepeatedNotificationView extends StatelessWidget {
+  final int? _time;
+  final void Function(int? picked) _onTimeChanged;
+
+  const _MemRepeatedNotificationView(
+    this._time, {
+    required void Function(int? picked) onTimeChanged,
+  }) : _onTimeChanged = onTimeChanged;
+
+  @override
+  Widget build(BuildContext context) => v(
+        () => ListTile(
+          title: TimeOfDayTextFormField(
+            timeOfDay: _time == null
+                ? null
+                : () {
+                    final hours = (_time! / 60 / 60).floor();
+                    final minutes = ((_time! - hours * 60 * 60) / 60).floor();
+                    return TimeOfDay(hour: hours, minute: minutes);
+                  }(),
+            onChanged: (pickedTimeOfDay) => _onTimeChanged(
+              pickedTimeOfDay == null
+                  ? null
+                  : ((pickedTimeOfDay.hour * 60 + pickedTimeOfDay.minute) * 60),
+            ),
+          ),
+        ),
+        {
+          "_time": _time,
+        },
       );
 }

@@ -12,44 +12,74 @@ class AfterActStartedNotificationView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
-          final notification =
-              ref.watch(memAfterActStartedNotificationByMemIdProvider(_memId));
+          final time = ref.watch(
+              memAfterActStartedNotificationByMemIdProvider(_memId)
+                  .select((value) => value.time));
+          final message = ref.watch(
+              memAfterActStartedNotificationByMemIdProvider(_memId)
+                  .select((value) => value.message));
 
-          return Flex(
-            direction: Axis.vertical,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.start),
-                title: TimeTextFormField(
-                  notification.time,
-                  (pickedSecondsOfTime) {
-                    ref
-                        .read(memAfterActStartedNotificationByMemIdProvider(
-                                _memId)
-                            .notifier)
-                        .updatedBy(notification.copiedWith(
-                            time: () => pickedSecondsOfTime));
-                  },
-                ),
-              ),
-              // TODO disable on no time
-              ListTile(
-                leading: const SizedBox(width: 24.0),
-                title: TextFormField(
-                  initialValue: notification.message,
-                  onChanged: (value) {
-                    ref
-                        .read(memAfterActStartedNotificationByMemIdProvider(
-                                _memId)
-                            .notifier)
-                        .updatedBy(
-                            notification.copiedWith(message: () => value));
-                  },
-                ),
-              ),
-            ],
+          final notification =
+              ref.read(memAfterActStartedNotificationByMemIdProvider(_memId));
+
+          return _AfterActStartedNotificationView(
+            time,
+            message,
+            onTimeChanged: (picked) => ref
+                .read(memAfterActStartedNotificationByMemIdProvider(_memId)
+                    .notifier)
+                .updatedBy(notification.copiedWith(time: () => picked)),
+            onMessageChanged: (value) => ref
+                .read(memAfterActStartedNotificationByMemIdProvider(_memId)
+                    .notifier)
+                .updatedBy(notification.copiedWith(message: () => value)),
           );
         },
-        {"_memId": _memId},
+        {
+          "_memId": _memId,
+        },
+      );
+}
+
+class _AfterActStartedNotificationView extends StatelessWidget {
+  final int? _time;
+  final String _message;
+  final void Function(int? picked) _onTimeChanged;
+  final void Function(String value) _onMessageChanged;
+
+  const _AfterActStartedNotificationView(
+    this._time,
+    this._message, {
+    required void Function(int? picked) onTimeChanged,
+    required void Function(String value) onMessageChanged,
+  })  : _onTimeChanged = onTimeChanged,
+        _onMessageChanged = onMessageChanged;
+
+  @override
+  Widget build(BuildContext context) => v(
+        () => Flex(
+          direction: Axis.vertical,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.start),
+              title: TimeTextFormField(
+                _time,
+                _onTimeChanged,
+              ),
+            ),
+            // TODO disable on no time
+            ListTile(
+              leading: const SizedBox(width: 24.0),
+              title: TextFormField(
+                initialValue: _message,
+                onChanged: _onMessageChanged,
+              ),
+            )
+          ],
+        ),
+        {
+          "_time": _time,
+          "_message": _message,
+        },
       );
 }
