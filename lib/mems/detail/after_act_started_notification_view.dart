@@ -73,12 +73,12 @@ class _AfterActStartedNotificationView extends StatelessWidget {
                       icon: const Icon(Icons.clear),
                     ),
             ),
-            // TODO disable on no time
             ListTile(
               leading: const SizedBox(width: 24.0),
               title: TextFormField(
                 initialValue: _message,
                 onChanged: _onMessageChanged,
+                enabled: _time != null,
               ),
             )
           ],
