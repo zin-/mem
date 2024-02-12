@@ -59,6 +59,12 @@ class _MemRepeatedNotificationView extends StatelessWidget {
                   : ((pickedTimeOfDay.hour * 60 + pickedTimeOfDay.minute) * 60),
             ),
           ),
+          trailing: _time == null
+              ? null
+              : IconButton(
+                  onPressed: () => _onTimeChanged(null),
+                  icon: const Icon(Icons.clear),
+                ),
         ),
         {
           "_time": _time,

@@ -20,7 +20,9 @@ class MemNotificationsPage extends ConsumerWidget {
             ),
           ),
         ),
-        {"_memId": _memId},
+        {
+          "_memId": _memId,
+        },
       );
 }
 
@@ -39,7 +41,6 @@ class _MemNotificationsPage extends StatelessWidget {
           body: Flex(
             direction: Axis.vertical,
             children: [
-              // TODO add clear button
               MemRepeatedNotificationView(_memId),
               AfterActStartedNotificationView(_memId),
             ],

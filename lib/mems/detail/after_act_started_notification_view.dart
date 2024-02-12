@@ -66,6 +66,12 @@ class _AfterActStartedNotificationView extends StatelessWidget {
                 _time,
                 _onTimeChanged,
               ),
+              trailing: _time == null
+                  ? null
+                  : IconButton(
+                      onPressed: () => _onTimeChanged(null),
+                      icon: const Icon(Icons.clear),
+                    ),
             ),
             // TODO disable on no time
             ListTile(
