@@ -19,7 +19,7 @@ class AfterActStartedNotificationView extends ConsumerWidget {
             direction: Axis.vertical,
             children: [
               ListTile(
-                leading: const Icon(Icons.exposure_plus_1),
+                leading: const Icon(Icons.start),
                 title: TimeTextFormField(
                   notification.time,
                   (pickedSecondsOfTime) {
