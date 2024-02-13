@@ -79,7 +79,7 @@
   "after_act_started_notification_description": "Act開始の指定時間後に通知します。",
 
   "no_notifications": "通知しない",
-  "repeat_notification": "毎日{notifyAt}",
+  "repeated_notification_text": "毎日{notifyAt}",
   "after_act_started_notification_text": "開始{notifyAt}後",
   "edit_notification": "通知を変更する",
   "add_notification": "通知を追加する",
