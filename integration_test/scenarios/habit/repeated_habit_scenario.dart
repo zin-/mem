@@ -84,6 +84,9 @@ void testRepeatedHabitScenario() => group(
             (widgetTester) async {
               await runApplication();
               await widgetTester.pumpAndSettle();
+
+              expect(find.byType(Checkbox), findsNothing);
+
               await widgetTester.tap(find.text(insertedMemName));
               await widgetTester.pumpAndSettle();
 
