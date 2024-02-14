@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/components/date_and_time/time_of_day_view.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/base.dart';
@@ -7,14 +8,13 @@ import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/mems/detail/mem_notifications_view.dart';
+import 'package:mem/mems/detail/mem_repeated_notification_view.dart';
 
 import '../helpers.dart';
 
 void main() {
   testRepeatedHabitScenario();
 }
-
-const _scenarioName = 'Repeated habit scenario';
 
 void testRepeatedHabitScenario() => group(
       ": $_scenarioName",
@@ -70,11 +70,30 @@ void testRepeatedHabitScenario() => group(
                     .data,
                 l10n.no_notifications,
               );
+
+              await widgetTester.tap(
+                find.descendant(
+                  of: find.byKey(keyMemNotificationsView),
+                  matching: find.byIcon(Icons.notification_add),
+                ),
+              );
+              await widgetTester.pumpAndSettle();
+
+              expect(
+                widgetTester
+                    .widget<TimeOfDayTextFormField>(
+                      find.descendant(
+                          of: find.byKey(keyMemRepeatedNotification),
+                          matching: find.byType(TimeOfDayTextFormField)),
+                    )
+                    .timeOfDay,
+                null,
+              );
               expect(
                 find.descendant(
-                    of: find.byKey(keyMemNotificationsView),
-                    matching: find.byIcon(Icons.notification_add)),
-                findsOneWidget,
+                    of: find.byKey(keyMemRepeatedNotification),
+                    matching: find.byIcon(Icons.clear)),
+                findsNothing,
               );
             },
           );
@@ -100,14 +119,55 @@ void testRepeatedHabitScenario() => group(
                     .data,
                 "12:00 AM every day",
               );
+
+              await widgetTester.tap(
+                find.descendant(
+                  of: find.byKey(keyMemNotificationsView),
+                  matching: find.byIcon(Icons.edit),
+                ),
+              );
+              await widgetTester.pumpAndSettle();
+
+              expect(
+                widgetTester
+                    .widget<TimeOfDayTextFormField>(
+                      find.descendant(
+                          of: find.byKey(keyMemRepeatedNotification),
+                          matching: find.byType(TimeOfDayTextFormField)),
+                    )
+                    .timeOfDay,
+                const TimeOfDay(hour: 0, minute: 0),
+              );
               expect(
                 find.descendant(
-                    of: find.byKey(keyMemNotificationsView),
-                    matching: find.byIcon(Icons.edit)),
+                    of: find.byKey(keyMemRepeatedNotification),
+                    matching: find.byIcon(Icons.clear)),
                 findsOneWidget,
               );
             },
           );
         });
+
+        testWidgets(
+          ": Save",
+          (widgetTester) async {
+            await runApplication();
+            await widgetTester.pumpAndSettle();
+            await widgetTester.tap(newMemFabFinder);
+            await widgetTester.pumpAndSettle();
+
+            await widgetTester.tap(
+              find.descendant(
+                of: find.byKey(keyMemNotificationsView),
+                matching: find.byIcon(Icons.notification_add),
+              ),
+            );
+            await widgetTester.pumpAndSettle();
+
+            // expect(1, 2);
+          },
+        );
       },
     );
+
+const _scenarioName = 'Repeated habit scenario';

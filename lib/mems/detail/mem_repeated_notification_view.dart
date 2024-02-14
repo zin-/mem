@@ -45,6 +45,7 @@ class _MemRepeatedNotificationView extends StatelessWidget {
   @override
   Widget build(BuildContext context) => v(
         () => ListTile(
+          key: keyMemRepeatedNotification,
           title: TimeOfDayTextFormField(
             timeOfDay: _time == null
                 ? null

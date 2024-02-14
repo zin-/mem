@@ -75,14 +75,17 @@ class _MemNotificationsView extends StatelessWidget {
               ),
             ),
             trailing: IconButton(
-              onPressed: () =>
-                  v(() => Navigator.of(context).push(PageRouteBuilder(
-                        pageBuilder: (context, animation, secondaryAnimation) =>
-                            MemNotificationsPage(_memId),
-                        transitionsBuilder: detailTransitionsBuilder,
-                        transitionDuration: defaultTransitionDuration,
-                        reverseTransitionDuration: defaultTransitionDuration,
-                      ))),
+              onPressed: () => v(
+                () => Navigator.of(context).push(
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        MemNotificationsPage(_memId),
+                    transitionsBuilder: detailTransitionsBuilder,
+                    transitionDuration: defaultTransitionDuration,
+                    reverseTransitionDuration: defaultTransitionDuration,
+                  ),
+                ),
+              ),
               icon: Icon(
                 hasEnabledNotifications ? Icons.edit : Icons.notification_add,
               ),
