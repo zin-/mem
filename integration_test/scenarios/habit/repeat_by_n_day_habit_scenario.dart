@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/components/mem/mem_name.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
+import 'package:mem/mems/detail/fab.dart';
 import 'package:mem/mems/detail/mem_notifications_view.dart';
 import 'package:mem/mems/detail/mem_repeat_by_n_day_notification_view.dart';
 
@@ -30,6 +32,8 @@ void testRepeatByNDayHabitScenario() => group(
 
         group(": Show", () {
           const insertedMemName = "$_scenarioName - mem name - inserted";
+          const insertedMemRepeatByNDay = 2;
+
           late int insertedMemId;
 
           setUp(() async {
@@ -47,6 +51,17 @@ void testRepeatByNDayHabitScenario() => group(
                 defColMemNotificationsType.name:
                     MemNotificationType.repeat.name,
                 defColMemNotificationsTime.name: 1,
+                defColMemNotificationsMessage.name: "never",
+                defColCreatedAt.name: zeroDate,
+              },
+            );
+            await dbA.insert(
+              defTableMemNotifications,
+              {
+                defFkMemNotificationsMemId.name: insertedMemId,
+                defColMemNotificationsType.name:
+                    MemNotificationType.repeatByNDay.name,
+                defColMemNotificationsTime.name: insertedMemRepeatByNDay,
                 defColMemNotificationsMessage.name: "never",
                 defColCreatedAt.name: zeroDate,
               },
@@ -93,6 +108,106 @@ void testRepeatByNDayHabitScenario() => group(
               );
             },
           );
+
+          testWidgets(
+            ": on saved.",
+            (widgetTester) async {
+              await runApplication();
+              await widgetTester.pumpAndSettle();
+
+              await widgetTester.tap(find.text(insertedMemName));
+              await widgetTester.pumpAndSettle();
+
+              expect(
+                widgetTester
+                    .widget<Text>(
+                      find.descendant(
+                          of: find.byKey(keyMemNotificationsView),
+                          matching: find.byType(Text)),
+                    )
+                    .data,
+                "12:00 AM every $insertedMemRepeatByNDay days",
+              );
+
+              await widgetTester.tap(
+                find.descendant(
+                  of: find.byKey(keyMemNotificationsView),
+                  matching: find.byIcon(Icons.edit),
+                ),
+              );
+              await widgetTester.pumpAndSettle();
+
+              expect(
+                widgetTester
+                    .widget<TextFormField>(
+                      find.descendant(
+                        of: find.byKey(keyMemRepeatByNDayNotification),
+                        matching: find.byType(TextFormField),
+                      ),
+                    )
+                    .initialValue,
+                insertedMemRepeatByNDay.toString(),
+              );
+            },
+          );
         });
+
+        testWidgets(
+          ": Save",
+          (widgetTester) async {
+            await runApplication();
+            await widgetTester.pumpAndSettle();
+            await widgetTester.tap(newMemFabFinder);
+            await widgetTester.pumpAndSettle();
+
+            await widgetTester.tap(
+              find.descendant(
+                of: find.byKey(keyMemNotificationsView),
+                matching: find.byIcon(Icons.notification_add),
+              ),
+            );
+            await widgetTester.pumpAndSettle();
+
+            const enteringNDay = 3;
+            await widgetTester.enterText(
+              find.descendant(
+                  of: find.byKey(keyMemRepeatByNDayNotification),
+                  matching: find.byType(TextFormField)),
+              enteringNDay.toString(),
+            );
+
+            await widgetTester.pageBack();
+            await widgetTester.pumpAndSettle();
+            const enteringMemName =
+                "$_scenarioName: Save - entering - mem name";
+            await widgetTester.enterText(
+              find.byKey(keyMemName),
+              enteringMemName,
+            );
+            await widgetTester.tap(find.byKey(keySaveMemFab));
+            await widgetTester.pump(waitSideEffectDuration);
+
+            final savedMem = (await dbA.select(
+              defTableMems,
+              where: "${defColMemsName.name} = ?",
+              whereArgs: [enteringMemName],
+            ))
+                .single;
+            final savedMemNotification = (await dbA.select(
+              defTableMemNotifications,
+              where: "${defFkMemNotificationsMemId.name} = ?"
+                  " AND ${defColMemNotificationsType.name} = ?",
+              whereArgs: [
+                savedMem[defPkId.name],
+                MemNotificationType.repeatByNDay.name,
+              ],
+            ))
+                .single;
+            expect(
+              savedMemNotification[defColMemNotificationsTime.name],
+              enteringNDay,
+            );
+          },
+        );
       },
     );

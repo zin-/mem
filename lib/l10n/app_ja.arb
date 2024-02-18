@@ -80,6 +80,7 @@
 
   "no_notifications": "通知しない",
   "repeated_notification_text": "毎日{notifyAt}",
+  "repeat_every_n_day_notification_text": "{nDay}日ごとの{notifyAt}",
   "repeat_by_n_day_prefix": "",
   "repeat_by_n_day_suffix": "日ごと",
   "after_act_started_notification_text": "開始{notifyAt}後",

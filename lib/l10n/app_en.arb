@@ -80,6 +80,7 @@
 
   "no_notifications": "No notifications",
   "repeated_notification_text": "{notifyAt} every day",
+  "repeat_every_n_day_notification_text": "{notifyAt} every {nDay} days",
   "repeat_by_n_day_prefix": "by",
   "repeat_by_n_day_suffix": "day",
   "after_act_started_notification_text": "{notifyAt} after started",

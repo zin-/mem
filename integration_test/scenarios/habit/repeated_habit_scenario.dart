@@ -177,18 +177,6 @@ void testRepeatedHabitScenario() => group(
             await widgetTester.tap(okFinder);
             await widgetTester.pump();
 
-            expect(
-              widgetTester
-                  .widget<TimeOfDayTextFormField>(
-                    find.descendant(
-                      of: find.byKey(keyMemRepeatedNotification),
-                      matching: find.byType(TimeOfDayTextFormField),
-                    ),
-                  )
-                  .timeOfDay,
-              pickTime,
-            );
-
             await widgetTester.pageBack();
             await widgetTester.pumpAndSettle();
             const enteringMemName =

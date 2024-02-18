@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -44,23 +45,35 @@ class _MemNotificationsView extends StatelessWidget {
         () {
           final l10n = buildL10n(context);
 
-          final hasEnabledNotifications = _memNotifications
-              .where((element) => element.isEnabled())
-              .isNotEmpty;
-          final text = _memNotifications
-              .where((element) => element.isEnabled())
-              .map((e) {
-            switch (e.type) {
-              case MemNotificationType.repeat:
-                return l10n.repeated_notification_text(TimeOfDay.fromDateTime(
-                  DateAndTime(0, 0, 0, 0, 0, e.time),
-                ).format(context));
-              case MemNotificationType.afterActStarted:
-                return l10n.after_act_started_notification_text(
-                    DateFormat(DateFormat.HOUR24_MINUTE)
-                        .format(DateAndTime(0, 0, 0, 0, 0, e.time)));
-            }
-          }).join(", ");
+          final enables =
+              _memNotifications.where((element) => element.isEnabled());
+
+          final hasEnabledNotifications = enables.isNotEmpty;
+          final repeat = enables.singleWhereOrNull(
+              (element) => element.type == MemNotificationType.repeat);
+          final repeatByNDay = enables.singleWhereOrNull(
+              (element) => element.type == MemNotificationType.repeatByNDay);
+          final afterActStarted = enables.singleWhereOrNull(
+              (element) => element.type == MemNotificationType.afterActStarted);
+
+          final text = [
+            if (repeat != null)
+              if (repeatByNDay != null && (repeatByNDay.time ?? 0) > 1)
+                l10n.repeat_every_n_day_notification_text(
+                  repeatByNDay.time.toString(),
+                  TimeOfDay.fromDateTime(
+                    DateAndTime(0, 0, 0, 0, 0, repeat.time),
+                  ).format(context),
+                )
+              else
+                l10n.repeated_notification_text(TimeOfDay.fromDateTime(
+                  DateAndTime(0, 0, 0, 0, 0, repeat.time),
+                ).format(context)),
+            if (afterActStarted != null)
+              l10n.after_act_started_notification_text(
+                  DateFormat(DateFormat.HOUR24_MINUTE).format(
+                      DateAndTime(0, 0, 0, 0, 0, afterActStarted.time))),
+          ].join(", ");
 
           return ListTile(
             contentPadding: EdgeInsets.zero,

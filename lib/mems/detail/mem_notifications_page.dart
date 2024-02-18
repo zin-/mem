@@ -43,7 +43,7 @@ class _MemNotificationsPage extends StatelessWidget {
             direction: Axis.vertical,
             children: [
               MemRepeatedNotificationView(_memId),
-              const MemRepeatByNDayNotificationView(),
+              MemRepeatByNDayNotificationView(_memId),
               AfterActStartedNotificationView(_memId),
             ],
           ),

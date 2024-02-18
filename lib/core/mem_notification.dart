@@ -21,6 +21,9 @@ class MemNotification extends EntityV1 {
   factory MemNotification.repeated(int? memId) => MemNotification(
       memId, MemNotificationType.repeat, null, _repeatedMessage);
 
+  factory MemNotification.repeatByNDay(int? memId) => MemNotification(
+      memId, MemNotificationType.repeatByNDay, null, _repeatedMessage);
+
   factory MemNotification.afterActStarted(int? memId) => MemNotification(memId,
       MemNotificationType.afterActStarted, null, _afterActStartedMessage);
 
@@ -47,15 +50,11 @@ class MemNotification extends EntityV1 {
 
 enum MemNotificationType {
   repeat,
+  repeatByNDay,
   afterActStarted;
 
-  factory MemNotificationType.fromName(String name) {
-    if (name == MemNotificationType.repeat.name) {
-      return MemNotificationType.repeat;
-    } else if (name == MemNotificationType.afterActStarted.name) {
-      return MemNotificationType.afterActStarted;
-    }
-
-    throw Exception('Unexpected name: "$name".');
-  }
+  factory MemNotificationType.fromName(String name) =>
+      MemNotificationType.values.singleWhere(
+        (element) => element.name == name,
+      );
 }
