@@ -11,6 +11,7 @@ import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/mems/detail/fab.dart';
 import 'package:mem/mems/detail/mem_notifications_view.dart';
 import 'package:mem/mems/detail/mem_repeated_notification_view.dart';
+import 'package:mem/values/durations.dart';
 
 import '../helpers.dart';
 
@@ -82,7 +83,7 @@ void testRepeatedHabitScenario() => group(
                   matching: find.byIcon(Icons.notification_add),
                 ),
               );
-              await widgetTester.pumpAndSettle();
+              await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
               expect(
                 widgetTester
