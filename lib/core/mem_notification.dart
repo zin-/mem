@@ -56,5 +56,6 @@ enum MemNotificationType {
   factory MemNotificationType.fromName(String name) =>
       MemNotificationType.values.singleWhere(
         (element) => element.name == name,
+        orElse: () => throw Exception('Unexpected name: "$name".'),
       );
 }
