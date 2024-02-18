@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/core/mem_detail.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
+import 'package:mem/mems/mem_client.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/mems/mem_service.dart';
@@ -10,8 +11,11 @@ import 'package:mem/mems/states.dart';
 final saveMem =
     Provider.autoDispose.family<Future<MemDetail>, int?>((ref, memId) => v(
           () async {
-            final saved = await MemService().save(
-              ref.watch(memDetailProvider(memId)),
+            final memDetail = ref.watch(memDetailProvider(memId));
+            final saved = await MemClient().save(
+              memDetail.mem,
+              memDetail.memItems,
+              memDetail.notifications ?? [],
             );
 
             ref.read(memsProvider.notifier).upsertAll(
