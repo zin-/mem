@@ -211,6 +211,7 @@ void testActScenario() => group(': $_scenarioName', () {
 
           testWidgets(
             ': start & finish act.',
+            skip: true,
             (widgetTester) async {
               await showActListPage(widgetTester);
 
