@@ -5,6 +5,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/main.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/action.dart';
 import 'package:mem/notifications/notification/channel.dart';
@@ -12,12 +13,53 @@ import 'package:mem/notifications/notification/done_mem_notification_action.dart
 import 'package:mem/notifications/notification/finish_active_act_notification_action.dart';
 import 'package:mem/notifications/notification/pause_act_notification_action.dart';
 import 'package:mem/notifications/notification/repeated_notification.dart';
+import 'package:mem/notifications/notification/show_notification.dart';
 import 'package:mem/notifications/notification/start_act_notification_action.dart';
 import 'package:mem/notifications/notification_channels.dart';
 import 'package:mem/notifications/notification_ids.dart';
+import 'package:mem/repositories/mem_notification_repository.dart';
+import 'package:mem/repositories/mem_repository.dart';
 
 import 'notification_actions.dart';
 import 'notification_repository.dart';
+
+@pragma('vm:entry-point')
+void showNotification(
+  int id,
+  Map<String, dynamic> params,
+) =>
+    d(
+      () async {
+        await openDatabase();
+
+        final memId = params[memIdKey];
+        final mem = await MemRepository().shipById(memId);
+        final memNotification =
+            (await MemNotificationRepository().shipByMemId(mem.id)).singleWhere(
+          (element) => element.type == MemNotificationType.repeat,
+        );
+
+        await NotificationRepository().receive(
+          ShowNotification(
+            memRepeatedNotificationId(mem.id),
+            mem.name,
+            memNotification.message,
+            json.encode(params),
+            [
+              NotificationClientV3()._notificationActions.startActAction,
+              NotificationClientV3()._notificationActions.finishActiveActAction,
+            ],
+            NotificationClientV3()
+                ._notificationChannels
+                .repeatedReminderChannel,
+          ),
+        );
+      },
+      {
+        "id": id,
+        "params": params,
+      },
+    );
 
 // TODO refactor
 class NotificationClientV3 {
@@ -53,20 +95,26 @@ class NotificationClientV3 {
             notifyFirstAt = notifyFirstAt.add(const Duration(days: 1));
           }
 
-          final memRepeatNotification = RepeatedNotification(
-            memRepeatedNotificationId(repeatMemNotification.memId!),
-            memName,
-            repeatMemNotification.message,
-            json.encode({memIdKey: repeatMemNotification.memId}),
-            [
-              _notificationActions.startActAction,
-              _notificationActions.finishActiveActAction,
-            ],
-            _notificationChannels.repeatedReminderChannel,
-            notifyFirstAt,
-            NotificationInterval.perDay,
+          await _notificationRepository.receiveV2(
+            RepeatedNotification(
+              memRepeatedNotificationId(repeatMemNotification.memId!),
+              memName,
+              repeatMemNotification.message,
+              json.encode({memIdKey: repeatMemNotification.memId}),
+              [
+                _notificationActions.startActAction,
+                _notificationActions.finishActiveActAction,
+              ],
+              _notificationChannels.repeatedReminderChannel,
+              notifyFirstAt,
+              NotificationInterval.perDay,
+              intervalSeconds: repeatEveryNDay?.time == null
+                  ? null
+// : repeatEveryNDay!.time! * 60 * 60 * 24,
+                  : repeatEveryNDay!.time!,
+            ),
+            showNotification,
           );
-          await _notificationRepository.receive(memRepeatNotification);
         },
         {
           "memName": memName,

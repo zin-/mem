@@ -50,6 +50,7 @@ dependencies:
   workmanager: ^0.5.1
   fl_chart: ^0.63.0
   flutter_sticky_header: ^0.6.5
+  android_alarm_manager_plus: ^3.0.4
 
 dev_dependencies:
   # for Test mock

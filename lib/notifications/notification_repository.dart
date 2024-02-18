@@ -1,6 +1,10 @@
+import 'dart:convert';
+
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/notifications/mem_notifications.dart';
 import 'package:timezone/data/latest_all.dart';
 import 'package:timezone/timezone.dart';
 
@@ -17,6 +21,23 @@ class NotificationRepository extends RepositoryV1<Notification, void> {
 
   Future<bool?> checkNotification() => v(
         () async => _flutterLocalNotificationsWrapper?.handleAppLaunchDetails(),
+      );
+
+  Future receiveV2(RepeatedNotification entity, Function callback) => d(
+        () async {
+          final intervalSeconds = entity.intervalSeconds;
+          if (intervalSeconds != null) {
+            await AndroidAlarmManager.periodic(
+              Duration(seconds: intervalSeconds),
+              entity.id,
+              callback,
+              params: json.decode(entity.payloadJson!),
+            );
+          }
+        },
+        {
+          "entity": entity,
+        },
       );
 
   @override
@@ -69,6 +90,7 @@ class NotificationRepository extends RepositoryV1<Notification, void> {
   static NotificationRepository? _instance;
 
   factory NotificationRepository() {
+    AndroidAlarmManager.initialize();
     initializeTimeZones();
 
     return _instance ??= NotificationRepository._(
