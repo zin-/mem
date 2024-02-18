@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/components/date_and_time/time_of_day_view.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
-import 'package:mem/mems/detail/mem_notifications_page.dart';
 import 'package:mem/mems/detail/mem_notifications_view.dart';
+import 'package:mem/mems/detail/mem_repeat_by_n_day_notification_view.dart';
 
 import '../helpers.dart';
 
@@ -84,19 +83,13 @@ void testRepeatByNDayHabitScenario() => group(
 
               expect(
                 widgetTester
-                    .widget<TimeOfDayTextFormField>(
+                    .widget<TextFormField>(
                       find.descendant(
                           of: find.byKey(keyMemRepeatByNDayNotification),
-                          matching: find.byType(TimeOfDayTextFormField)),
+                          matching: find.byType(TextFormField)),
                     )
-                    .timeOfDay,
-                null,
-              );
-              expect(
-                find.descendant(
-                    of: find.byKey(keyMemRepeatByNDayNotification),
-                    matching: find.byIcon(Icons.clear)),
-                findsNothing,
+                    .initialValue,
+                1.toString(),
               );
             },
           );

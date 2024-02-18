@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/after_act_started_notification_view.dart';
+import 'package:mem/mems/detail/mem_repeat_by_n_day_notification_view.dart';
 import 'package:mem/mems/detail/mem_repeated_notification_view.dart';
 import 'package:mem/mems/detail/states.dart';
 
@@ -42,6 +43,7 @@ class _MemNotificationsPage extends StatelessWidget {
             direction: Axis.vertical,
             children: [
               MemRepeatedNotificationView(_memId),
+              const MemRepeatByNDayNotificationView(),
               AfterActStartedNotificationView(_memId),
             ],
           ),
@@ -52,5 +54,3 @@ class _MemNotificationsPage extends StatelessWidget {
         },
       );
 }
-
-const keyMemRepeatByNDayNotification = Key("mem-repeat-by-n-day-notification");
