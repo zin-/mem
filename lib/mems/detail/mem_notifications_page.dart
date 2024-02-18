@@ -52,3 +52,5 @@ class _MemNotificationsPage extends StatelessWidget {
         },
       );
 }
+
+const keyMemRepeatByNDayNotification = Key("mem-repeat-by-n-day-notification");
