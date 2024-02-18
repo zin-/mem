@@ -2,7 +2,7 @@ import 'action.dart';
 import 'channel.dart';
 import 'notification.dart';
 
-class ShowNotification extends NotificationV1 {
+class ShowNotification extends Notification {
   final String title;
   final String body;
   final String? payloadJson;

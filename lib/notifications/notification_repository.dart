@@ -12,7 +12,7 @@ import 'notification/repeated_notification.dart';
 import 'notification/show_notification.dart';
 import 'wrapper.dart';
 
-class NotificationRepository extends RepositoryV1<NotificationV1, void> {
+class NotificationRepository extends RepositoryV1<Notification, void> {
   final NotificationsWrapper? _flutterLocalNotificationsWrapper;
 
   Future<bool?> checkNotification() => v(
@@ -22,7 +22,7 @@ class NotificationRepository extends RepositoryV1<NotificationV1, void> {
   receiveV2() => d(() {});
 
   @override
-  Future<void> receive(NotificationV1 entity) => v(
+  Future<void> receive(Notification entity) => v(
         () async {
           if (entity is RepeatedNotification) {
             await _flutterLocalNotificationsWrapper?.zonedSchedule(

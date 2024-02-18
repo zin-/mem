@@ -1,5 +1,5 @@
 import 'notification.dart';
 
-class CancelNotification extends NotificationV1 {
+class CancelNotification extends Notification {
   CancelNotification(super.id);
 }
