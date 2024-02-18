@@ -4,7 +4,6 @@ import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/notifications/mem_notifications.dart';
 import 'package:timezone/data/latest_all.dart';
 import 'package:timezone/timezone.dart';
 
