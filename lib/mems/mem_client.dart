@@ -5,6 +5,7 @@ import 'package:mem/core/mem_item.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/client.dart';
+import 'package:mem/repositories/mem_notification.dart';
 
 import 'mem_service.dart';
 
@@ -29,7 +30,9 @@ class MemClient {
 
           // TODO ここでnotificationClientを使って通知を登録する
           final repeatMemNotification = saved.notifications?.singleWhereOrNull(
-            (element) => element.type == MemNotificationType.repeat,
+            (element) =>
+                element is SavedMemNotification &&
+                element.type == MemNotificationType.repeat,
           );
           if (repeatMemNotification != null) {
             await _notificationClient.registerMemRepeatNotification(
