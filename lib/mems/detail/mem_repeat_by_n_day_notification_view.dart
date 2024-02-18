@@ -51,7 +51,6 @@ class _MemRepeatByNDayNotificationView extends StatelessWidget {
   @override
   Widget build(BuildContext context) => v(
         () {
-          // TODO: implement build
           final l10n = buildL10n(context);
           final prefix = l10n.repeat_by_n_day_prefix;
 
