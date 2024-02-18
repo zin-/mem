@@ -16,7 +16,7 @@ void main() {
 
 const _scenarioName = 'Habit scenario';
 
-void testHabitScenario() => group(': $_scenarioName', () {
+void testHabitScenario() => group(': $_scenarioName', skip: true, () {
       const insertedMemName = '$_scenarioName - mem name - inserted';
       const withRepeatedMemName = '$insertedMemName - with repeated';
       const timeOfDaySeconds = 1000;

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/components/date_and_time/time_of_day_view.dart';
+import 'package:mem/components/mem/mem_name.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
+import 'package:mem/mems/detail/fab.dart';
 import 'package:mem/mems/detail/mem_notifications_view.dart';
 import 'package:mem/mems/detail/mem_repeated_notification_view.dart';
 
@@ -16,21 +18,24 @@ void main() {
   testRepeatedHabitScenario();
 }
 
+const _scenarioName = 'Repeated habit scenario';
+
 void testRepeatedHabitScenario() => group(
       ": $_scenarioName",
       () {
-        group(": Show", () {
-          late final DatabaseAccessor dbA;
-          setUpAll(() async {
-            dbA = await openTestDatabase(databaseDefinition);
-          });
+        late final DatabaseAccessor dbA;
+        setUpAll(() async {
+          dbA = await openTestDatabase(databaseDefinition);
+        });
+        setUp(() async {
+          await clearAllTestDatabaseRows(databaseDefinition);
+        });
 
+        group(": Show", () {
           const insertedMemName = "$_scenarioName - inserted - mem - name";
           late int insertedMemId;
 
           setUp(() async {
-            await clearAllTestDatabaseRows(databaseDefinition);
-
             insertedMemId = await dbA.insert(
               defTableMems,
               {
@@ -132,8 +137,9 @@ void testRepeatedHabitScenario() => group(
                 widgetTester
                     .widget<TimeOfDayTextFormField>(
                       find.descendant(
-                          of: find.byKey(keyMemRepeatedNotification),
-                          matching: find.byType(TimeOfDayTextFormField)),
+                        of: find.byKey(keyMemRepeatedNotification),
+                        matching: find.byType(TimeOfDayTextFormField),
+                      ),
                     )
                     .timeOfDay,
                 const TimeOfDay(hour: 0, minute: 0),
@@ -164,10 +170,53 @@ void testRepeatedHabitScenario() => group(
             );
             await widgetTester.pumpAndSettle();
 
-            // expect(1, 2);
+            final pickTime = TimeOfDay.now();
+            await widgetTester.tap(timeIconFinder);
+            await widgetTester.pump();
+
+            await widgetTester.tap(okFinder);
+            await widgetTester.pump();
+
+            expect(
+              widgetTester
+                  .widget<TimeOfDayTextFormField>(
+                    find.descendant(
+                      of: find.byKey(keyMemRepeatedNotification),
+                      matching: find.byType(TimeOfDayTextFormField),
+                    ),
+                  )
+                  .timeOfDay,
+              pickTime,
+            );
+
+            await widgetTester.pageBack();
+            await widgetTester.pumpAndSettle();
+            const enteringMemName =
+                "$_scenarioName: Save - entering - mem name";
+            await widgetTester.enterText(
+              find.byKey(keyMemName),
+              enteringMemName,
+            );
+            await widgetTester.tap(find.byKey(keySaveMemFab));
+            await widgetTester.pump(waitSideEffectDuration);
+
+            final savedMem = (await dbA.select(
+              defTableMems,
+              where: "${defColMemsName.name} = ?",
+              whereArgs: [enteringMemName],
+            ))
+                .single;
+            final savedMemNotification = (await dbA.select(
+              defTableMemNotifications,
+              where: "${defFkMemNotificationsMemId.name} = ?",
+              whereArgs: [savedMem[defPkId.name]],
+            ))
+                .single;
+            expect(
+              savedMemNotification[defColMemNotificationsTime.name],
+              (pickTime.hour * 60 + pickTime.minute) * 60,
+            );
           },
         );
       },
     );
-
-const _scenarioName = 'Repeated habit scenario';
