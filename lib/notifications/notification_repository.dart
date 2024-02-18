@@ -19,8 +19,6 @@ class NotificationRepository extends RepositoryV1<Notification, void> {
         () async => _flutterLocalNotificationsWrapper?.handleAppLaunchDetails(),
       );
 
-  receiveV2() => d(() {});
-
   @override
   Future<void> receive(Notification entity) => v(
         () async {
