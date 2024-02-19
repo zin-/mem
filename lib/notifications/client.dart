@@ -28,7 +28,7 @@ void showNotification(
   int id,
   Map<String, dynamic> params,
 ) =>
-    d(
+    v(
       () async {
         await openDatabase();
 
@@ -73,7 +73,7 @@ class NotificationClientV3 {
     MemNotification repeatMemNotification,
     MemNotification? repeatEveryNDay,
   ) =>
-      d(
+      v(
         () async {
           final now = DateTime.now();
           final hours = (repeatMemNotification.time! / 60 / 60).floor();

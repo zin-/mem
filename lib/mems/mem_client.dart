@@ -18,7 +18,7 @@ class MemClient {
     List<MemItem> memItemList,
     List<MemNotification> memNotificationList,
   ) =>
-      d(
+      v(
         () async {
           final saved = await _memService.save(
             MemDetail(

@@ -22,7 +22,7 @@ class NotificationRepository extends RepositoryV1<Notification, void> {
         () async => _flutterLocalNotificationsWrapper?.handleAppLaunchDetails(),
       );
 
-  Future receiveV2(RepeatedNotification entity, Function callback) => d(
+  Future receiveV2(RepeatedNotification entity, Function callback) => v(
         () async {
           final intervalSeconds = entity.intervalSeconds;
           if (intervalSeconds != null) {
