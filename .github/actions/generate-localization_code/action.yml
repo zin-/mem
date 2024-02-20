@@ -14,3 +14,5 @@ runs:
       if: steps.cache.outputs.cache-hit != 'true'
       run: ./scripts/generate_l10n.sh
       shell: bash
+    - run: ls -aux
+      shell: bash
