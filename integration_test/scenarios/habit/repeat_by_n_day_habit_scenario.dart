@@ -95,7 +95,7 @@ void testRepeatByNDayHabitScenario() => group(
                   matching: find.byIcon(Icons.notification_add),
                 ),
               );
-              await widgetTester.pumpAndSettle();
+              await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
               expect(
                 widgetTester
@@ -136,7 +136,7 @@ void testRepeatByNDayHabitScenario() => group(
                   matching: find.byIcon(Icons.edit),
                 ),
               );
-              await widgetTester.pumpAndSettle();
+              await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
               expect(
                 widgetTester
