@@ -4,15 +4,18 @@ runs:
   using: "composite"
 
   steps:
-    - id: cache
-      name: "Cache"
-      uses: actions/cache@v3
-      with:
-        path: .dart_tool/flutter_gen/gen_l10n/*
-        key: l10n-${{ runner.os }}-${{ hashFiles('lib/l10n/*') }}
-    - name: "Generate Localization code"
-      if: steps.cache.outputs.cache-hit != 'true'
-      run: ./scripts/generate_l10n.sh
+# TODO キャッシュする https://github.com/zin-/mem/issues/287
+#   元々キャッシュしていたが、いつの間にかimportが失敗するようになっていた
+#   一時的にキャッシュを無効化する
+#    - id: cache
+#      name: "Cache"
+#      uses: actions/cache@v3
+#      with:
+#        path: .dart_tool/flutter_gen/gen_l10n/*
+#        key: l10n-${{ runner.os }}-${{ hashFiles('lib/l10n/*') }}
+#    - name: "Generate Localization code"
+#      if: steps.cache.outputs.cache-hit != 'true'
+    - run: ./scripts/generate_l10n.sh
       shell: bash
     - run: ls -aux
       shell: bash
