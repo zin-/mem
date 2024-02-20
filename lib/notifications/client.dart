@@ -110,8 +110,7 @@ class NotificationClientV3 {
               NotificationInterval.perDay,
               intervalSeconds: repeatEveryNDay?.time == null
                   ? null
-// : repeatEveryNDay!.time! * 60 * 60 * 24,
-                  : repeatEveryNDay!.time!,
+                  : repeatEveryNDay!.time! * 60 * 60 * 24,
             ),
             showNotification,
           );
