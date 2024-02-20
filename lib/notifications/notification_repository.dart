@@ -89,8 +89,10 @@ class NotificationRepository extends RepositoryV1<Notification, void> {
   static NotificationRepository? _instance;
 
   factory NotificationRepository() {
-    AndroidAlarmManager.initialize();
-    initializeTimeZones();
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      AndroidAlarmManager.initialize();
+      initializeTimeZones();
+    }
 
     return _instance ??= NotificationRepository._(
       defaultTargetPlatform == TargetPlatform.android
