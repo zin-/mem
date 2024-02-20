@@ -10,6 +10,7 @@ import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/mems/detail/fab.dart';
 import 'package:mem/mems/detail/mem_notifications_view.dart';
 import 'package:mem/mems/detail/mem_repeat_by_n_day_notification_view.dart';
+import 'package:mem/values/durations.dart';
 
 import '../helpers.dart';
 
@@ -74,7 +75,7 @@ void testRepeatByNDayHabitScenario() => group(
               await runApplication();
               await widgetTester.pumpAndSettle();
               await widgetTester.tap(newMemFabFinder);
-              await widgetTester.pumpAndSettle();
+              await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
               expect(
                 widgetTester
@@ -116,7 +117,7 @@ void testRepeatByNDayHabitScenario() => group(
               await widgetTester.pumpAndSettle();
 
               await widgetTester.tap(find.text(insertedMemName));
-              await widgetTester.pumpAndSettle();
+              await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
               expect(
                 widgetTester

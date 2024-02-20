@@ -63,7 +63,7 @@ void testRepeatedHabitScenario() => group(
               await runApplication();
               await widgetTester.pumpAndSettle();
               await widgetTester.tap(newMemFabFinder);
-              await widgetTester.pumpAndSettle();
+              await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
               expect(
                 widgetTester
@@ -113,7 +113,7 @@ void testRepeatedHabitScenario() => group(
               expect(find.byType(Checkbox), findsNothing);
 
               await widgetTester.tap(find.text(insertedMemName));
-              await widgetTester.pumpAndSettle();
+              await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
               expect(
                 widgetTester
