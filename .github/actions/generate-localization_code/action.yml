@@ -17,11 +17,11 @@ runs:
 #      if: steps.cache.outputs.cache-hit != 'true'
     - run: ./scripts/generate_l10n.sh
       shell: bash
-    - run: ls -aux
-      shell: bash
-    - run: ls .dart_tool
-      shell: bash
-    - run: ls .dart_tool/flutter_gen
-      shell: bash
-    - run: ls .dart_tool/flutter_gen/gen_l10n
-      shell: bash
+#    - run: ls -aux
+#      shell: bash
+#    - run: ls .dart_tool
+#      shell: bash
+#    - run: ls .dart_tool/flutter_gen
+#      shell: bash
+#    - run: ls .dart_tool/flutter_gen/gen_l10n
+#      shell: bash
