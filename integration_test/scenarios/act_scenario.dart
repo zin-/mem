@@ -359,7 +359,7 @@ void testActScenario() => group(': $_scenarioName', () {
 
                 await widgetTester
                     .longPress(find.text(timeText(zeroDate)).at(1));
-                await widgetTester.pumpAndSettle();
+                await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
                 await widgetTester.tap(find.byIcon(Icons.clear).at(1));
                 await widgetTester.pumpAndSettle();
