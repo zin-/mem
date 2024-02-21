@@ -1,4 +1,4 @@
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:mem/l10n/app_localizations.dart';
 
 import 'notification/action.dart';
 import 'notification/done_mem_notification_action.dart';
