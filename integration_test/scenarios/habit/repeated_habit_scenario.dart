@@ -86,7 +86,11 @@ void testRepeatedHabitScenario() => group(
               );
 
               FocusManager.instance.primaryFocus?.unfocus();
-
+              await widgetTester.dragUntilVisible(
+                notificationAddFinder,
+                find.byType(SingleChildScrollView),
+                const Offset(0, 50),
+              );
               await widgetTester.tap(
                 notificationAddFinder,
               );
