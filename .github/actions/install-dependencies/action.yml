@@ -4,6 +4,8 @@ runs:
   using: "composite"
 
   steps:
+    - run: ls
+      shell: bash
     # FIXME cacheされていない気がする
     - id: cache
       name: "Cache"
