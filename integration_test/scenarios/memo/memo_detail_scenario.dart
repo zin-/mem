@@ -10,7 +10,7 @@ import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/mems/detail/fab.dart';
 import 'package:mem/mems/detail/mem_items_view.dart';
-import 'package:mem/mems/detail/remove_mem_action.dart';
+import 'package:mem/mems/detail/app_bar/remove_mem_action.dart';
 import 'package:mem/mems/transitions.dart';
 import 'package:mem/values/durations.dart';
 

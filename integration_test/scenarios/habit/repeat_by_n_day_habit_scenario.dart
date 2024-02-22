@@ -8,8 +8,8 @@ import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/mems/detail/fab.dart';
-import 'package:mem/mems/detail/mem_notifications_view.dart';
-import 'package:mem/mems/detail/mem_repeat_by_n_day_notification_view.dart';
+import 'package:mem/mems/detail/notifications/mem_notifications_view.dart';
+import 'package:mem/mems/detail/notifications/mem_repeat_by_n_day_notification_view.dart';
 import 'package:mem/values/durations.dart';
 
 import '../helpers.dart';

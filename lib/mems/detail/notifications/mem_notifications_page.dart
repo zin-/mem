@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/detail/after_act_started_notification_view.dart';
-import 'package:mem/mems/detail/mem_repeat_by_n_day_notification_view.dart';
-import 'package:mem/mems/detail/mem_repeated_notification_view.dart';
 import 'package:mem/mems/detail/states.dart';
+
+import 'after_act_started_notification_view.dart';
+import 'mem_repeat_by_n_day_notification_view.dart';
+import 'mem_repeated_notification_view.dart';
 
 class MemNotificationsPage extends ConsumerWidget {
   final int? _memId;
