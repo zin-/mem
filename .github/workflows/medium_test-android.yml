@@ -36,10 +36,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
 
-# TODO 画面サイズ
-# TODO OSバージョン
-# TODO Java distribution
-# TODO Java version
+    # TODO 画面サイズ
+    # TODO OSバージョン
+    # TODO Java distribution
+    # TODO Java version
 
     steps:
       - uses: actions/checkout@v4
@@ -54,11 +54,12 @@ jobs:
         with:
           channel: ${{ inputs.flutter-channel }}
           cache: true
+      - name: "Flutter doctor"
+        uses: ./.github/actions/flutter-doctor
 
       - name: "Install Dependencies"
         uses: ./.github/actions/install-dependencies
-      - name: "Generate Localization code"
-        uses: ./.github/actions/generate-localization_code
+
       - name: "Build APK"
         run: flutter build apk --debug
 
