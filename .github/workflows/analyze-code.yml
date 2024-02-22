@@ -21,12 +21,12 @@ jobs:
         with:
           channel: ${{ inputs.flutter-channel }}
           cache: true
+      - name: "Flutter doctor"
+        uses: ./.github/actions/flutter-doctor
 
       - name: "Install Dependencies"
         uses: ./.github/actions/install-dependencies
 
-      - name: "Flutter doctor"
-        uses: ./.github/actions/flutter-doctor
       - name: "Analyze Application code"
         run: flutter analyze lib
 
