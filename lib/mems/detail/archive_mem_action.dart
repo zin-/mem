@@ -28,7 +28,7 @@ class ArchiveMemAction extends AppBarActionBuilder {
             return super.popupMenuItemChildBuilder(
               key: () => keyUnarchiveMem,
               icon: () => const Icon(Icons.unarchive),
-              name: () => buildL10n(context).unarchive_action,
+              name: () => buildL10n(context).unarchiveAction,
               onPressed: () => () {
                 ref.read(unarchiveMem(mem.id));
 

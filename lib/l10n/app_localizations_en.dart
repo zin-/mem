@@ -75,13 +75,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cancelAction => 'Cancel';
 
   @override
-  String get search_action => 'Search';
+  String get searchAction => 'Search';
 
   @override
-  String get close_search_action => 'Close';
+  String get closeSearchAction => 'Close';
 
   @override
-  String get filter_action => 'Filter';
+  String get filterAction => 'Filter';
 
   @override
   String get archiveFilterTitle => 'Archive';
@@ -102,82 +102,82 @@ class AppLocalizationsEn extends AppLocalizations {
   String get showDoneLabel => 'Show done';
 
   @override
-  String get done_label => 'Done';
+  String get doneLabel => 'Done';
 
   @override
-  String get unarchive_action => 'Unarchive';
+  String get unarchiveAction => 'Unarchive';
 
   @override
-  String get finish_label => 'Finish';
+  String get finishLabel => 'Finish';
 
   @override
-  String get pause_act_label => 'Pause';
+  String get pauseActLabel => 'Pause';
 
   @override
-  String get start_label => 'Start';
+  String get startLabel => 'Start';
 
   @override
-  String get start_of_day_label => 'Start of day';
+  String get startOfDayLabel => 'Start of day';
 
   @override
-  String get reminder_name => 'Reminder';
+  String get reminderName => 'Reminder';
 
   @override
-  String get reminder_description => 'To remind at specific time.';
+  String get reminderDescription => 'To remind at specific time.';
 
   @override
-  String get repeated_reminder_name => 'Repeated Reminder';
+  String get repeatedReminderName => 'Repeated Reminder';
 
   @override
-  String get repeated_reminder_description => 'To remind at specific time per day.';
+  String get repeatedReminderDescription => 'To remind at specific time per day.';
 
   @override
-  String get active_act_notification => 'Active act';
+  String get activeActNotification => 'Active act';
 
   @override
-  String get active_act_notification_description => 'To show active act.';
+  String get activeActNotificationDescription => 'To show active act.';
 
   @override
-  String get paused_act_notification => 'Paused act';
+  String get pausedActNotification => 'Paused act';
 
   @override
-  String get paused_act_notification_description => 'To start again act.';
+  String get pausedActNotificationDescription => 'To start again act.';
 
   @override
-  String get after_act_started_notification => 'After act started';
+  String get afterActStartedNotification => 'After act started';
 
   @override
-  String get after_act_started_notification_description => 'To remind specific amount of time after act started.';
+  String get afterActStartedNotificationDescription => 'To remind specific amount of time after act started.';
 
   @override
-  String get no_notifications => 'No notifications';
+  String get noNotifications => 'No notifications';
 
   @override
-  String repeated_notification_text(Object notifyAt) {
+  String repeatedNotificationText(Object notifyAt) {
     return '$notifyAt every day';
   }
 
   @override
-  String repeat_every_n_day_notification_text(Object nDay, Object notifyAt) {
+  String repeatEveryNDayNotificationText(Object nDay, Object notifyAt) {
     return '$notifyAt every $nDay days';
   }
 
   @override
-  String get repeat_by_n_day_prefix => 'by';
+  String get repeatByNDayPrefix => 'by';
 
   @override
-  String get repeat_by_n_day_suffix => 'day';
+  String get repeatByNDaySuffix => 'day';
 
   @override
-  String after_act_started_notification_text(Object notifyAt) {
+  String afterActStartedNotificationText(Object notifyAt) {
     return '$notifyAt after started';
   }
 
   @override
-  String get edit_notification => 'Edit notification';
+  String get editNotification => 'Edit notification';
 
   @override
-  String get add_notification => 'Add notification';
+  String get addNotification => 'Add notification';
 
   @override
   String get dev => 'Under development';

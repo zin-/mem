@@ -23,7 +23,7 @@ class SearchAction extends AppBarActionBuilder {
         builder: (context, ref, child) => ref.watch(searchTextProvider) == null
             ? super.iconButtonBuilder(
                 key: () => keySearch,
-                name: () => buildL10n(context).search_action,
+                name: () => buildL10n(context).searchAction,
                 onPressed: () => () {
                   ref.read(searchTextProvider.notifier).updatedBy("");
                 },
@@ -31,7 +31,7 @@ class SearchAction extends AppBarActionBuilder {
             : super.iconButtonBuilder(
                 key: () => keyCloseSearch,
                 icon: () => const Icon(Icons.close),
-                name: () => buildL10n(context).close_search_action,
+                name: () => buildL10n(context).closeSearchAction,
                 onPressed: () => () {
                   ref.read(searchTextProvider.notifier).updatedBy(null);
                 },

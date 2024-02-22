@@ -86,7 +86,7 @@ void testRepeatByNDayHabitScenario() => group(
                       ),
                     )
                     .data,
-                l10n.no_notifications,
+                l10n.noNotifications,
               );
 
               await widgetTester.tap(

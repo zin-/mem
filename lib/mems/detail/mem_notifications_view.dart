@@ -59,18 +59,18 @@ class _MemNotificationsView extends StatelessWidget {
           final text = [
             if (repeat != null)
               if (repeatByNDay != null && (repeatByNDay.time ?? 0) > 1)
-                l10n.repeat_every_n_day_notification_text(
+                l10n.repeatEveryNDayNotificationText(
                   repeatByNDay.time.toString(),
                   TimeOfDay.fromDateTime(
                     DateAndTime(0, 0, 0, 0, 0, repeat.time),
                   ).format(context),
                 )
               else
-                l10n.repeated_notification_text(TimeOfDay.fromDateTime(
+                l10n.repeatedNotificationText(TimeOfDay.fromDateTime(
                   DateAndTime(0, 0, 0, 0, 0, repeat.time),
                 ).format(context)),
             if (afterActStarted != null)
-              l10n.after_act_started_notification_text(
+              l10n.afterActStartedNotificationText(
                   DateFormat(DateFormat.HOUR24_MINUTE).format(
                       DateAndTime(0, 0, 0, 0, 0, afterActStarted.time))),
           ].join(", ");
@@ -82,7 +82,7 @@ class _MemNotificationsView extends StatelessWidget {
               color: hasEnabledNotifications ? null : secondaryGreyColor,
             ),
             title: Text(
-              hasEnabledNotifications ? text : l10n.no_notifications,
+              hasEnabledNotifications ? text : l10n.noNotifications,
               style: TextStyle(
                 color: hasEnabledNotifications ? null : secondaryGreyColor,
               ),
@@ -103,8 +103,8 @@ class _MemNotificationsView extends StatelessWidget {
                 hasEnabledNotifications ? Icons.edit : Icons.notification_add,
               ),
               tooltip: hasEnabledNotifications
-                  ? l10n.edit_notification
-                  : l10n.add_notification,
+                  ? l10n.editNotification
+                  : l10n.addNotification,
             ),
           );
         },

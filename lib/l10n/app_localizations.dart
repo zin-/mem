@@ -213,23 +213,23 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get cancelAction;
 
-  /// No description provided for @search_action.
+  /// No description provided for @searchAction.
   ///
   /// In en, this message translates to:
   /// **'Search'**
-  String get search_action;
+  String get searchAction;
 
-  /// No description provided for @close_search_action.
+  /// No description provided for @closeSearchAction.
   ///
   /// In en, this message translates to:
   /// **'Close'**
-  String get close_search_action;
+  String get closeSearchAction;
 
-  /// No description provided for @filter_action.
+  /// No description provided for @filterAction.
   ///
   /// In en, this message translates to:
   /// **'Filter'**
-  String get filter_action;
+  String get filterAction;
 
   /// No description provided for @archiveFilterTitle.
   ///
@@ -267,149 +267,149 @@ abstract class AppLocalizations {
   /// **'Show done'**
   String get showDoneLabel;
 
-  /// No description provided for @done_label.
+  /// No description provided for @doneLabel.
   ///
   /// In en, this message translates to:
   /// **'Done'**
-  String get done_label;
+  String get doneLabel;
 
-  /// No description provided for @unarchive_action.
+  /// No description provided for @unarchiveAction.
   ///
   /// In en, this message translates to:
   /// **'Unarchive'**
-  String get unarchive_action;
+  String get unarchiveAction;
 
-  /// No description provided for @finish_label.
+  /// No description provided for @finishLabel.
   ///
   /// In en, this message translates to:
   /// **'Finish'**
-  String get finish_label;
+  String get finishLabel;
 
-  /// No description provided for @pause_act_label.
+  /// No description provided for @pauseActLabel.
   ///
   /// In en, this message translates to:
   /// **'Pause'**
-  String get pause_act_label;
+  String get pauseActLabel;
 
-  /// No description provided for @start_label.
+  /// No description provided for @startLabel.
   ///
   /// In en, this message translates to:
   /// **'Start'**
-  String get start_label;
+  String get startLabel;
 
-  /// No description provided for @start_of_day_label.
+  /// No description provided for @startOfDayLabel.
   ///
   /// In en, this message translates to:
   /// **'Start of day'**
-  String get start_of_day_label;
+  String get startOfDayLabel;
 
-  /// No description provided for @reminder_name.
+  /// No description provided for @reminderName.
   ///
   /// In en, this message translates to:
   /// **'Reminder'**
-  String get reminder_name;
+  String get reminderName;
 
-  /// No description provided for @reminder_description.
+  /// No description provided for @reminderDescription.
   ///
   /// In en, this message translates to:
   /// **'To remind at specific time.'**
-  String get reminder_description;
+  String get reminderDescription;
 
-  /// No description provided for @repeated_reminder_name.
+  /// No description provided for @repeatedReminderName.
   ///
   /// In en, this message translates to:
   /// **'Repeated Reminder'**
-  String get repeated_reminder_name;
+  String get repeatedReminderName;
 
-  /// No description provided for @repeated_reminder_description.
+  /// No description provided for @repeatedReminderDescription.
   ///
   /// In en, this message translates to:
   /// **'To remind at specific time per day.'**
-  String get repeated_reminder_description;
+  String get repeatedReminderDescription;
 
-  /// No description provided for @active_act_notification.
+  /// No description provided for @activeActNotification.
   ///
   /// In en, this message translates to:
   /// **'Active act'**
-  String get active_act_notification;
+  String get activeActNotification;
 
-  /// No description provided for @active_act_notification_description.
+  /// No description provided for @activeActNotificationDescription.
   ///
   /// In en, this message translates to:
   /// **'To show active act.'**
-  String get active_act_notification_description;
+  String get activeActNotificationDescription;
 
-  /// No description provided for @paused_act_notification.
+  /// No description provided for @pausedActNotification.
   ///
   /// In en, this message translates to:
   /// **'Paused act'**
-  String get paused_act_notification;
+  String get pausedActNotification;
 
-  /// No description provided for @paused_act_notification_description.
+  /// No description provided for @pausedActNotificationDescription.
   ///
   /// In en, this message translates to:
   /// **'To start again act.'**
-  String get paused_act_notification_description;
+  String get pausedActNotificationDescription;
 
-  /// No description provided for @after_act_started_notification.
+  /// No description provided for @afterActStartedNotification.
   ///
   /// In en, this message translates to:
   /// **'After act started'**
-  String get after_act_started_notification;
+  String get afterActStartedNotification;
 
-  /// No description provided for @after_act_started_notification_description.
+  /// No description provided for @afterActStartedNotificationDescription.
   ///
   /// In en, this message translates to:
   /// **'To remind specific amount of time after act started.'**
-  String get after_act_started_notification_description;
+  String get afterActStartedNotificationDescription;
 
-  /// No description provided for @no_notifications.
+  /// No description provided for @noNotifications.
   ///
   /// In en, this message translates to:
   /// **'No notifications'**
-  String get no_notifications;
+  String get noNotifications;
 
-  /// No description provided for @repeated_notification_text.
+  /// No description provided for @repeatedNotificationText.
   ///
   /// In en, this message translates to:
   /// **'{notifyAt} every day'**
-  String repeated_notification_text(Object notifyAt);
+  String repeatedNotificationText(Object notifyAt);
 
-  /// No description provided for @repeat_every_n_day_notification_text.
+  /// No description provided for @repeatEveryNDayNotificationText.
   ///
   /// In en, this message translates to:
   /// **'{notifyAt} every {nDay} days'**
-  String repeat_every_n_day_notification_text(Object nDay, Object notifyAt);
+  String repeatEveryNDayNotificationText(Object nDay, Object notifyAt);
 
-  /// No description provided for @repeat_by_n_day_prefix.
+  /// No description provided for @repeatByNDayPrefix.
   ///
   /// In en, this message translates to:
   /// **'by'**
-  String get repeat_by_n_day_prefix;
+  String get repeatByNDayPrefix;
 
-  /// No description provided for @repeat_by_n_day_suffix.
+  /// No description provided for @repeatByNDaySuffix.
   ///
   /// In en, this message translates to:
   /// **'day'**
-  String get repeat_by_n_day_suffix;
+  String get repeatByNDaySuffix;
 
-  /// No description provided for @after_act_started_notification_text.
+  /// No description provided for @afterActStartedNotificationText.
   ///
   /// In en, this message translates to:
   /// **'{notifyAt} after started'**
-  String after_act_started_notification_text(Object notifyAt);
+  String afterActStartedNotificationText(Object notifyAt);
 
-  /// No description provided for @edit_notification.
+  /// No description provided for @editNotification.
   ///
   /// In en, this message translates to:
   /// **'Edit notification'**
-  String get edit_notification;
+  String get editNotification;
 
-  /// No description provided for @add_notification.
+  /// No description provided for @addNotification.
   ///
   /// In en, this message translates to:
   /// **'Add notification'**
-  String get add_notification;
+  String get addNotification;
 
   /// No description provided for @dev.
   ///

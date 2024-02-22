@@ -51,7 +51,7 @@ class _SettingsPage extends StatelessWidget {
                     tiles: [
                       SettingsTile.navigation(
                         leading: const Icon(Icons.start),
-                        title: Text(l10n.start_of_day_label),
+                        title: Text(l10n.startOfDayLabel),
                         onPressed: (context) => v(
                           () async => _onStartOfDayChanged(
                             await showTimePicker(

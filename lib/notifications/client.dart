@@ -156,46 +156,46 @@ class NotificationClientV2 {
   NotificationClientV2._(AppLocalizations l10n) {
     reminderChannel = NotificationChannel(
       'reminder',
-      l10n.reminder_name,
-      l10n.reminder_description,
+      l10n.reminderName,
+      l10n.reminderDescription,
     );
     repeatedReminderChannel = NotificationChannel(
       'repeated-reminder',
-      l10n.repeated_reminder_name,
-      l10n.repeated_reminder_description,
+      l10n.repeatedReminderName,
+      l10n.repeatedReminderDescription,
     );
     activeActNotificationChannel = NotificationChannel(
       'active_act-notification',
-      l10n.active_act_notification,
-      l10n.active_act_notification_description,
+      l10n.activeActNotification,
+      l10n.activeActNotificationDescription,
       usesChronometer: true,
       ongoing: true,
       autoCancel: false,
     );
     pausedAct = NotificationChannel(
       "paused_act",
-      l10n.paused_act_notification,
-      l10n.paused_act_notification_description,
+      l10n.pausedActNotification,
+      l10n.pausedActNotificationDescription,
       usesChronometer: true,
       autoCancel: false,
     );
     afterActStartedNotificationChannel = NotificationChannel(
       'after_act_started-notification',
-      l10n.after_act_started_notification,
-      l10n.after_act_started_notification_description,
+      l10n.afterActStartedNotification,
+      l10n.afterActStartedNotificationDescription,
       usesChronometer: true,
       autoCancel: false,
     );
 
     notificationActions.addAll([
-      doneMemAction = DoneMemNotificationAction('done-mem', l10n.done_label),
+      doneMemAction = DoneMemNotificationAction('done-mem', l10n.doneLabel),
       startActAction =
-          StartActNotificationAction('start-act', l10n.start_label),
+          StartActNotificationAction('start-act', l10n.startLabel),
       finishActiveActAction = FinishActiveActNotificationAction(
         'finish-active_act',
-        l10n.finish_label,
+        l10n.finishLabel,
       ),
-      pauseAct = PauseActNotificationAction('pause-act', l10n.pause_act_label),
+      pauseAct = PauseActNotificationAction('pause-act', l10n.pauseActLabel),
     ]);
   }
 

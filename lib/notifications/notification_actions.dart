@@ -13,13 +13,13 @@ class NotificationActions {
   late final NotificationAction pauseAct;
 
   NotificationActions(AppLocalizations l10n)
-      : doneMemAction = DoneMemNotificationAction('done-mem', l10n.done_label),
+      : doneMemAction = DoneMemNotificationAction('done-mem', l10n.doneLabel),
         startActAction =
-            StartActNotificationAction('start-act', l10n.start_label),
+            StartActNotificationAction('start-act', l10n.startLabel),
         finishActiveActAction = FinishActiveActNotificationAction(
           'finish-active_act',
-          l10n.finish_label,
+          l10n.finishLabel,
         ),
         pauseAct =
-            PauseActNotificationAction('pause-act', l10n.pause_act_label);
+            PauseActNotificationAction('pause-act', l10n.pauseActLabel);
 }

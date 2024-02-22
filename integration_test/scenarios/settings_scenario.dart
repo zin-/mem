@@ -38,7 +38,7 @@ void testSettingsScenario() => group(
             await widgetTester.pumpAndSettle();
 
             expect(find.text(l10n.settingsPageTitle), findsOneWidget);
-            expect(find.text(l10n.start_of_day_label), findsOneWidget);
+            expect(find.text(l10n.startOfDayLabel), findsOneWidget);
           },
         );
 
@@ -52,7 +52,7 @@ void testSettingsScenario() => group(
             await _showPage(widgetTester);
 
             final now = DateTime.now();
-            await widgetTester.tap(find.text(l10n.start_of_day_label));
+            await widgetTester.tap(find.text(l10n.startOfDayLabel));
             await widgetTester.pumpAndSettle();
 
             await widgetTester.tap(okFinder);
@@ -117,7 +117,7 @@ void testSettingsScenario() => group(
               await _openDrawer(widgetTester);
               await _showPage(widgetTester);
 
-              await widgetTester.tap(find.text(l10n.start_of_day_label));
+              await widgetTester.tap(find.text(l10n.startOfDayLabel));
               await widgetTester.pumpAndSettle();
 
               await widgetTester.tap(cancelFinder);

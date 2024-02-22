@@ -7,7 +7,7 @@ class FilterAction extends AppBarActionBuilder {
   FilterAction(BuildContext context)
       : super(
           icon: const Icon(Icons.filter_list),
-          name: buildL10n(context).filter_action,
+          name: buildL10n(context).filterAction,
           onPressed: () => showModalBottomSheet(
             context: context,
             builder: (context) => const MemListFilter(),

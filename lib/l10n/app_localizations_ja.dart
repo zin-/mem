@@ -75,13 +75,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get cancelAction => 'Cancel';
 
   @override
-  String get search_action => '検索';
+  String get searchAction => '検索';
 
   @override
-  String get close_search_action => 'やめる';
+  String get closeSearchAction => 'やめる';
 
   @override
-  String get filter_action => '絞り込む';
+  String get filterAction => '絞り込む';
 
   @override
   String get archiveFilterTitle => 'Archive';
@@ -102,82 +102,82 @@ class AppLocalizationsJa extends AppLocalizations {
   String get showDoneLabel => 'Show done';
 
   @override
-  String get done_label => 'Done';
+  String get doneLabel => 'Done';
 
   @override
-  String get unarchive_action => 'Unarchive';
+  String get unarchiveAction => 'Unarchive';
 
   @override
-  String get finish_label => '終了';
+  String get finishLabel => '終了';
 
   @override
-  String get pause_act_label => '一時停止';
+  String get pauseActLabel => '一時停止';
 
   @override
-  String get start_label => '開始';
+  String get startLabel => '開始';
 
   @override
-  String get start_of_day_label => '1日の開始時間';
+  String get startOfDayLabel => '1日の開始時間';
 
   @override
-  String get reminder_name => 'Reminder';
+  String get reminderName => 'Reminder';
 
   @override
-  String get reminder_description => 'To remind at specific time.';
+  String get reminderDescription => 'To remind at specific time.';
 
   @override
-  String get repeated_reminder_name => '繰り返し通知';
+  String get repeatedReminderName => '繰り返し通知';
 
   @override
-  String get repeated_reminder_description => '1日の指定された時間に通知します。';
+  String get repeatedReminderDescription => '1日の指定された時間に通知します。';
 
   @override
-  String get active_act_notification => '実施中のAct';
+  String get activeActNotification => '実施中のAct';
 
   @override
-  String get active_act_notification_description => '開始済みのActを表示します。';
+  String get activeActNotificationDescription => '開始済みのActを表示します。';
 
   @override
-  String get paused_act_notification => '一時停止中のAct';
+  String get pausedActNotification => '一時停止中のAct';
 
   @override
-  String get paused_act_notification_description => '素早く再開するために一時停止中のActを表示します。';
+  String get pausedActNotificationDescription => '素早く再開するために一時停止中のActを表示します。';
 
   @override
-  String get after_act_started_notification => 'Act開始後の通知';
+  String get afterActStartedNotification => 'Act開始後の通知';
 
   @override
-  String get after_act_started_notification_description => 'Act開始の指定時間後に通知します。';
+  String get afterActStartedNotificationDescription => 'Act開始の指定時間後に通知します。';
 
   @override
-  String get no_notifications => '通知しない';
+  String get noNotifications => '通知しない';
 
   @override
-  String repeated_notification_text(Object notifyAt) {
+  String repeatedNotificationText(Object notifyAt) {
     return '毎日$notifyAt';
   }
 
   @override
-  String repeat_every_n_day_notification_text(Object nDay, Object notifyAt) {
+  String repeatEveryNDayNotificationText(Object nDay, Object notifyAt) {
     return '$nDay日ごとの$notifyAt';
   }
 
   @override
-  String get repeat_by_n_day_prefix => '';
+  String get repeatByNDayPrefix => '';
 
   @override
-  String get repeat_by_n_day_suffix => '日ごと';
+  String get repeatByNDaySuffix => '日ごと';
 
   @override
-  String after_act_started_notification_text(Object notifyAt) {
+  String afterActStartedNotificationText(Object notifyAt) {
     return '開始$notifyAt後';
   }
 
   @override
-  String get edit_notification => '通知を変更する';
+  String get editNotification => '通知を変更する';
 
   @override
-  String get add_notification => '通知を追加する';
+  String get addNotification => '通知を追加する';
 
   @override
   String get dev => 'Under development';

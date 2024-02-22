@@ -52,7 +52,7 @@ class _MemRepeatByNDayNotificationView extends StatelessWidget {
   Widget build(BuildContext context) => v(
         () {
           final l10n = buildL10n(context);
-          final prefix = l10n.repeat_by_n_day_prefix;
+          final prefix = l10n.repeatByNDayPrefix;
 
           return ListTile(
             key: keyMemRepeatByNDayNotification,
@@ -68,7 +68,7 @@ class _MemRepeatByNDayNotificationView extends StatelessWidget {
                     value.isEmpty ? 1 : int.parse(value),
                   ),
                 ),
-                Text(l10n.repeat_by_n_day_suffix),
+                Text(l10n.repeatByNDaySuffix),
               ]
                   .map(
                     (e) => Flexible(
