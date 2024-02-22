@@ -61,7 +61,7 @@ void testRepeatedHabitScenario() => group(
             ": on new.",
             (widgetTester) async {
               await runApplication();
-              await widgetTester.pumpAndSettle();
+              await widgetTester.pumpAndSettle(waitSideEffectDuration);
               await widgetTester.tap(newMemFabFinder);
               await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
