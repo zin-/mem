@@ -4,14 +4,10 @@ runs:
   using: "composite"
 
   steps:
-    - run: ls
-      shell: bash
-    # FIXME cacheされていない気がする
     - id: cache
       name: "Cache"
       uses: actions/cache@v3
       with:
-        # TODO 整理する
         path: |
           # flutter
           .dart_tool
