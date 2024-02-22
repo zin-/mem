@@ -6,6 +6,8 @@ runs:
   steps:
     - run: ls ${{ env.PUB_CACHE }}
       shell: bash
+    - run: ls .packages
+      shell: bash
     # FIXME cacheされていない気がする
     - id: cache
       name: "Cache"
