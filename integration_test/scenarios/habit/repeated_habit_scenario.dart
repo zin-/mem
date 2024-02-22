@@ -76,6 +76,17 @@ void testRepeatedHabitScenario() => group(
                     .data,
                 l10n.noNotifications,
               );
+              expect(
+                widgetTester
+                    .widget<Text>(
+                      find.descendant(
+                        of: find.byKey(keyMemNotificationsView),
+                        matching: find.byIcon(Icons.notification_add),
+                      ),
+                    )
+                    .data,
+                findsOneWidget,
+              );
 
               await widgetTester.tap(
                 find.descendant(
