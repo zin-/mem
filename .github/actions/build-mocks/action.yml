@@ -1,4 +1,5 @@
 name: "Build Mocks"
+description: "Build mocks for Small tests."
 
 runs:
   using: "composite"
