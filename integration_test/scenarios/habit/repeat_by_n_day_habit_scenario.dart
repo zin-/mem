@@ -89,11 +89,17 @@ void testRepeatByNDayHabitScenario() => group(
                 l10n.noNotifications,
               );
 
+              final notificationAddFinder = find.descendant(
+                of: find.byKey(keyMemNotificationsView),
+                matching: find.byIcon(Icons.notification_add),
+              );
+              await widgetTester.dragUntilVisible(
+                notificationAddFinder,
+                find.byType(SingleChildScrollView),
+                const Offset(0, 50),
+              );
               await widgetTester.tap(
-                find.descendant(
-                  of: find.byKey(keyMemNotificationsView),
-                  matching: find.byIcon(Icons.notification_add),
-                ),
+                notificationAddFinder,
               );
               await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
@@ -161,13 +167,19 @@ void testRepeatByNDayHabitScenario() => group(
             await widgetTester.tap(newMemFabFinder);
             await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(
-              find.descendant(
-                of: find.byKey(keyMemNotificationsView),
-                matching: find.byIcon(Icons.notification_add),
-              ),
+            final notificationAddFinder = find.descendant(
+              of: find.byKey(keyMemNotificationsView),
+              matching: find.byIcon(Icons.notification_add),
             );
-            await widgetTester.pumpAndSettle();
+            await widgetTester.dragUntilVisible(
+              notificationAddFinder,
+              find.byType(SingleChildScrollView),
+              const Offset(0, 50),
+            );
+            await widgetTester.tap(
+              notificationAddFinder,
+            );
+            await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
             const enteringNDay = 3;
             await widgetTester.enterText(

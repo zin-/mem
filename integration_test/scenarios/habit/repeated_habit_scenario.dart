@@ -85,7 +85,6 @@ void testRepeatedHabitScenario() => group(
                 findsOneWidget,
               );
 
-              FocusManager.instance.primaryFocus?.unfocus();
               await widgetTester.dragUntilVisible(
                 notificationAddFinder,
                 find.byType(SingleChildScrollView),
@@ -174,11 +173,17 @@ void testRepeatedHabitScenario() => group(
             await widgetTester.tap(newMemFabFinder);
             await widgetTester.pumpAndSettle();
 
+            final notificationAddFinder = find.descendant(
+              of: find.byKey(keyMemNotificationsView),
+              matching: find.byIcon(Icons.notification_add),
+            );
+            await widgetTester.dragUntilVisible(
+              notificationAddFinder,
+              find.byType(SingleChildScrollView),
+              const Offset(0, 50),
+            );
             await widgetTester.tap(
-              find.descendant(
-                of: find.byKey(keyMemNotificationsView),
-                matching: find.byIcon(Icons.notification_add),
-              ),
+              notificationAddFinder,
             );
             await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
