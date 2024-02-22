@@ -4,21 +4,24 @@ runs:
   using: "composite"
 
   steps:
-# FIXME cacheされていない気がする
+    # FIXME cacheされていない気がする
     - id: cache
       name: "Cache"
       uses: actions/cache@v3
       with:
         # TODO 整理する
         path: |
-          **/build
-          **/.dart_tool
-          **/Generated.xcconfig
+          # flutter
+          .dart_tool/dartpad
+          .dart_tool/package_config.json
+          .dart_tool/package_config_subset
+          .dart_tool/version
+          .flutter-plugin-dependencies
+          .flutter-plugins
+          # ios & macos
           **/flutter_export_environment.sh
-          **/.flutter-plugin-dependencies
-          **/.flutter-plugins
-          ${{ env.PUB_CACHE }}
-          **/.packages
+          **/Generated.xcconfig
+          **/Flutter-Generated.xcconfig
         key: dependencies-${{ hashFiles('pubspec.lock') }}
     - name: "Get Packages"
       if: steps.cache.outputs.cache-hit != 'true'
