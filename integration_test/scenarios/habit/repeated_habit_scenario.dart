@@ -61,9 +61,9 @@ void testRepeatedHabitScenario() => group(
             ": on new.",
             (widgetTester) async {
               await runApplication();
-              await widgetTester.pumpAndSettle(waitSideEffectDuration);
+              await widgetTester.pumpAndSettle();
               await widgetTester.tap(newMemFabFinder);
-              await widgetTester.pumpAndSettle(waitSideEffectDuration);
+              await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
               expect(
                 widgetTester
@@ -76,19 +76,19 @@ void testRepeatedHabitScenario() => group(
                     .data,
                 l10n.noNotifications,
               );
+              final notificationAddFinder = find.descendant(
+                of: find.byKey(keyMemNotificationsView),
+                matching: find.byIcon(Icons.notification_add),
+              );
               expect(
-                find.descendant(
-                  of: find.byKey(keyMemNotificationsView),
-                  matching: find.byIcon(Icons.notification_add),
-                ),
+                notificationAddFinder,
                 findsOneWidget,
               );
 
+              FocusManager.instance.primaryFocus?.unfocus();
+
               await widgetTester.tap(
-                find.descendant(
-                  of: find.byKey(keyMemNotificationsView),
-                  matching: find.byIcon(Icons.notification_add),
-                ),
+                notificationAddFinder,
               );
               await widgetTester.pumpAndSettle(defaultTransitionDuration);
 

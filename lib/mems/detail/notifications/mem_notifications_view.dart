@@ -39,7 +39,9 @@ class _MemNotificationsView extends StatelessWidget {
   const _MemNotificationsView(
     this._memId,
     this._memNotifications,
-  ) : super(key: keyMemNotificationsView);
+  ) : super(
+          key: keyMemNotificationsView,
+        );
 
   @override
   Widget build(BuildContext context) => v(
