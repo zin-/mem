@@ -4,6 +4,8 @@ runs:
   using: "composite"
 
   steps:
+    - run: ls ${{ env.PUB_CACHE }}
+      shell: bash
     # FIXME cacheされていない気がする
     - id: cache
       name: "Cache"
@@ -19,6 +21,8 @@ runs:
           **/flutter_export_environment.sh
           **/Generated.xcconfig
           **/Flutter-Generated.xcconfig
+          # packages
+          ${{ env.PUB_CACHE }}
         key: dependencies-${{ hashFiles('pubspec.lock') }}
     - name: "Get Packages"
       if: steps.cache.outputs.cache-hit != 'true'
