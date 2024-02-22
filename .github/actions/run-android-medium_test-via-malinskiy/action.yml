@@ -1,14 +1,18 @@
 name: "Run Android Medium test via malinskiy"
+description: "Run Android Medium test via malinskiy."
 
 inputs:
   script:
+    description: "script"
     required: true
-    type: string
   android-api-level:
+    description: "android-api-level"
     required: true
   android-target:
+    description: "android-target"
     required: true
   android-arch:
+    description: "android-arch"
     required: true
 
 runs:

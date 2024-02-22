@@ -1,13 +1,18 @@
 name: "Run Android Medium test via native"
+description: "Run Android Medium test via native."
+
 inputs:
   script:
+    description: "script"
     required: true
-    type: string
   android-api-level:
+    description: "android-api-level"
     required: true
   android-target:
+    description: "android-target"
     required: true
   android-arch:
+    description: "android-arch"
     required: true
 
 runs:
@@ -17,10 +22,10 @@ runs:
     - run: sudo apt update
       shell: bash
 
-# TODO cache
+    # TODO cache
     - name: "Install Android SDK"
       shell: bash
-      run:  sudo apt install android-sdk
+      run: sudo apt install android-sdk
     # `/usr/lib`以下に配置されたままだと、`android-sdk`の利用に`sudo`が必要なので、移動する
     - shell: bash
       run: sudo cp -rf /usr/lib/android-sdk ~/android-sdk
