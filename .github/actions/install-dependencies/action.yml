@@ -12,10 +12,7 @@ runs:
         # TODO 整理する
         path: |
           # flutter
-          .dart_tool/dartpad
-          .dart_tool/package_config.json
-          .dart_tool/package_config_subset
-          .dart_tool/version
+          .dart_tool
           .flutter-plugin-dependencies
           .flutter-plugins
           # ios & macos
