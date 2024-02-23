@@ -211,8 +211,9 @@ void testActScenario() => group(': $_scenarioName', () {
 
           testWidgets(
             ': start & finish act.',
-            skip: true,
             (widgetTester) async {
+              setMockLocalNotifications(widgetTester);
+
               await showActListPage(widgetTester);
 
               expect(stopIconFinder, findsNothing);
