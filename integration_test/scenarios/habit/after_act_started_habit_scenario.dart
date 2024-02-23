@@ -141,6 +141,19 @@ void testAfterActStartedHabitScenario() => group(
             await widgetTester.pumpAndSettle();
 
             await widgetTester.tap(okFinder);
+            await widgetTester.pumpAndSettle();
+
+            const enteringMemNotificationMessage =
+                "$_scenarioName - entering - mem notification message";
+            await widgetTester.enterText(
+              find
+                  .descendant(
+                    of: find.byKey(keyMemAfterActStartedNotification),
+                    matching: find.byType(TextFormField),
+                  )
+                  .at(1),
+              enteringMemNotificationMessage,
+            );
             await widgetTester.pump();
 
             await widgetTester.pageBack();
@@ -184,6 +197,10 @@ void testAfterActStartedHabitScenario() => group(
             expect(
               savedMemNotification[defColMemNotificationsTime.name],
               (1 * 60) * 60,
+            );
+            expect(
+              savedMemNotification[defColMemNotificationsMessage.name],
+              enteringMemNotificationMessage,
             );
           },
         );
