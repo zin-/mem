@@ -24,7 +24,7 @@ import 'notification_actions.dart';
 import 'notification_repository.dart';
 
 @pragma('vm:entry-point')
-void showNotification(
+Future<void> showRepeatEveryNDayNotification(
   int id,
   Map<String, dynamic> params,
 ) =>
@@ -112,7 +112,7 @@ class NotificationClientV3 {
                   ? null
                   : repeatEveryNDay!.time! * 60 * 60 * 24,
             ),
-            showNotification,
+            showRepeatEveryNDayNotification,
           );
         },
         {
@@ -189,8 +189,7 @@ class NotificationClientV2 {
 
     notificationActions.addAll([
       doneMemAction = DoneMemNotificationAction('done-mem', l10n.doneLabel),
-      startActAction =
-          StartActNotificationAction('start-act', l10n.startLabel),
+      startActAction = StartActNotificationAction('start-act', l10n.startLabel),
       finishActiveActAction = FinishActiveActNotificationAction(
         'finish-active_act',
         l10n.finishLabel,
