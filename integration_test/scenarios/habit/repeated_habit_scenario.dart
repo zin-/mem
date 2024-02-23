@@ -163,106 +163,131 @@ void testRepeatedHabitScenario() => group(
           );
         });
 
-        testWidgets(
-          ": Save",
-          (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
-            await widgetTester.tap(newMemFabFinder);
-            await widgetTester.pumpAndSettle();
+        group(": Save", () {
+          testWidgets(
+            ": create.",
+            (widgetTester) async {
+              await runApplication();
+              await widgetTester.pumpAndSettle();
+              await widgetTester.tap(newMemFabFinder);
+              await widgetTester.pumpAndSettle();
 
-            final notificationAddFinder = find.descendant(
-              of: find.byKey(keyMemNotificationsView),
-              matching: find.byIcon(Icons.notification_add),
-            );
-            await widgetTester.dragUntilVisible(
-              notificationAddFinder,
-              find.byType(SingleChildScrollView),
-              const Offset(0, 50),
-            );
-            await widgetTester.tap(
-              notificationAddFinder,
-            );
-            await widgetTester.pumpAndSettle(defaultTransitionDuration);
+              final notificationAddFinder = find.descendant(
+                of: find.byKey(keyMemNotificationsView),
+                matching: find.byIcon(Icons.notification_add),
+              );
+              await widgetTester.dragUntilVisible(
+                notificationAddFinder,
+                find.byType(SingleChildScrollView),
+                const Offset(0, 50),
+              );
+              await widgetTester.tap(
+                notificationAddFinder,
+              );
+              await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-            final pickTime = TimeOfDay.now();
-            await widgetTester.tap(timeIconFinder);
-            await widgetTester.pump();
+              final pickTime = TimeOfDay.now();
+              await widgetTester.tap(timeIconFinder);
+              await widgetTester.pump();
 
-            await widgetTester.tap(okFinder);
-            await widgetTester.pump();
+              await widgetTester.tap(okFinder);
+              await widgetTester.pump();
 
-            await widgetTester.pageBack();
-            await widgetTester.pumpAndSettle();
-            const enteringMemName =
-                "$_scenarioName: Save - entering - mem name";
-            await widgetTester.enterText(
-              find.byKey(keyMemName),
-              enteringMemName,
-            );
-            await widgetTester.tap(find.byKey(keySaveMemFab));
-            await widgetTester.pump(waitSideEffectDuration);
+              await widgetTester.pageBack();
+              await widgetTester.pumpAndSettle();
+              const enteringMemName =
+                  "$_scenarioName: Save: create - entering - mem name";
+              await widgetTester.enterText(
+                find.byKey(keyMemName),
+                enteringMemName,
+              );
+              await widgetTester.tap(find.byKey(keySaveMemFab));
+              await widgetTester.pump(waitSideEffectDuration);
 
-            final savedMem = (await dbA.select(
-              defTableMems,
-              where: "${defColMemsName.name} = ?",
-              whereArgs: [enteringMemName],
-            ))
-                .single;
-            final savedMemNotification = (await dbA.select(
-              defTableMemNotifications,
-              where: "${defFkMemNotificationsMemId.name} = ?",
-              whereArgs: [savedMem[defPkId.name]],
-            ))
-                .single;
-            expect(
-              savedMemNotification[defColMemNotificationsTime.name],
-              (pickTime.hour * 60 + pickTime.minute) * 60,
-            );
-          },
-        );
+              final savedMem = (await dbA.select(
+                defTableMems,
+                where: "${defColMemsName.name} = ?",
+                whereArgs: [enteringMemName],
+              ))
+                  .single;
+              final savedMemNotification = (await dbA.select(
+                defTableMemNotifications,
+                where: "${defFkMemNotificationsMemId.name} = ?",
+                whereArgs: [savedMem[defPkId.name]],
+              ))
+                  .single;
+              expect(
+                savedMemNotification[defColMemNotificationsTime.name],
+                (pickTime.hour * 60 + pickTime.minute) * 60,
+              );
+            },
+          );
 
-        testWidgets(
-          ": clear.",
-          (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
-            await widgetTester.tap(find.text(insertedMemName));
-            await widgetTester.pumpAndSettle(defaultTransitionDuration);
-            await widgetTester.tap(
-              find.descendant(
+          testWidgets(
+            ": update.",
+            (widgetTester) async {
+              await runApplication();
+              await widgetTester.pumpAndSettle();
+              await widgetTester.tap(find.text(insertedMemName));
+              await widgetTester.pumpAndSettle();
+
+              final notificationAddFinder = find.descendant(
                 of: find.byKey(keyMemNotificationsView),
                 matching: find.byIcon(Icons.edit),
-              ),
-            );
-            await widgetTester.pumpAndSettle(defaultTransitionDuration);
+              );
+              await widgetTester.dragUntilVisible(
+                notificationAddFinder,
+                find.byType(SingleChildScrollView),
+                const Offset(0, 50),
+              );
+              await widgetTester.tap(
+                notificationAddFinder,
+              );
+              await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-            await widgetTester.tap(
-              find.descendant(
-                of: find.byKey(keyMemRepeatedNotification),
-                matching: find.byIcon(Icons.clear),
-              ),
-            );
-            await widgetTester.pump();
-
-            expect(
-              widgetTester
-                  .widget<TimeOfDayTextFormField>(
-                    find.descendant(
-                      of: find.byKey(keyMemRepeatedNotification),
-                      matching: find.byType(TimeOfDayTextFormField),
-                    ),
-                  )
-                  .timeOfDay,
-              isNull,
-            );
-            expect(
-              find.descendant(
+              await widgetTester.tap(
+                find.descendant(
                   of: find.byKey(keyMemRepeatedNotification),
-                  matching: find.byIcon(Icons.clear)),
-              findsNothing,
-            );
-          },
-        );
+                  matching: find.byIcon(Icons.clear),
+                ),
+              );
+              await widgetTester.pump();
+
+              final pickTime = TimeOfDay.now();
+              await widgetTester.tap(timeIconFinder);
+              await widgetTester.pump();
+              await widgetTester.tap(okFinder);
+              await widgetTester.pump();
+
+              await widgetTester.pageBack();
+              await widgetTester.pumpAndSettle();
+              const enteringMemName =
+                  "$_scenarioName: Save: update - entering - mem name";
+              await widgetTester.enterText(
+                find.byKey(keyMemName),
+                enteringMemName,
+              );
+              await widgetTester.tap(find.byKey(keySaveMemFab));
+              await widgetTester.pump(waitSideEffectDuration);
+
+              final savedMem = (await dbA.select(
+                defTableMems,
+                where: "${defColMemsName.name} = ?",
+                whereArgs: [enteringMemName],
+              ))
+                  .single;
+              final savedMemNotification = (await dbA.select(
+                defTableMemNotifications,
+                where: "${defFkMemNotificationsMemId.name} = ?",
+                whereArgs: [savedMem[defPkId.name]],
+              ))
+                  .single;
+              expect(
+                savedMemNotification[defColMemNotificationsTime.name],
+                (pickTime.hour * 60 + pickTime.minute) * 60,
+              );
+            },
+          );
+        });
       },
     );
