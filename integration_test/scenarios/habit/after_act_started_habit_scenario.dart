@@ -28,39 +28,38 @@ void testAfterActStartedHabitScenario() => group(
         setUpAll(() async {
           dbA = await openTestDatabase(databaseDefinition);
         });
+
+        const insertedMemName = "$_scenarioName - inserted - mem - name";
+        const secondsOfTime = 1 * 60;
+
+        late int insertedMemId;
+
         setUp(() async {
           await clearAllTestDatabaseRows(databaseDefinition);
+
+          insertedMemId = await dbA.insert(
+            defTableMems,
+            {
+              defColMemsName.name: insertedMemName,
+              defColCreatedAt.name: zeroDate,
+            },
+          );
+          await dbA.insert(
+            defTableMemNotifications,
+            {
+              defFkMemNotificationsMemId.name: insertedMemId,
+              defColMemNotificationsType.name:
+                  MemNotificationType.afterActStarted.name,
+              defColMemNotificationsTime.name: secondsOfTime,
+              defColMemNotificationsMessage.name: "never",
+              defColCreatedAt.name: zeroDate,
+            },
+          );
         });
 
         group(
           ": Show",
           () {
-            const insertedMemName = "$_scenarioName - inserted - mem - name";
-            const secondsOfTime = 1 * 60;
-
-            late int insertedMemId;
-
-            setUp(() async {
-              insertedMemId = await dbA.insert(
-                defTableMems,
-                {
-                  defColMemsName.name: insertedMemName,
-                  defColCreatedAt.name: zeroDate,
-                },
-              );
-              await dbA.insert(
-                defTableMemNotifications,
-                {
-                  defFkMemNotificationsMemId.name: insertedMemId,
-                  defColMemNotificationsType.name:
-                      MemNotificationType.afterActStarted.name,
-                  defColMemNotificationsTime.name: secondsOfTime,
-                  defColMemNotificationsMessage.name: "never",
-                  defColCreatedAt.name: zeroDate,
-                },
-              );
-            });
-
             testWidgets(
               ": on saved.",
               (widgetTester) async {
@@ -201,6 +200,49 @@ void testAfterActStartedHabitScenario() => group(
             expect(
               savedMemNotification[defColMemNotificationsMessage.name],
               enteringMemNotificationMessage,
+            );
+          },
+        );
+
+        testWidgets(
+          ": clear.",
+          (widgetTester) async {
+            await runApplication();
+            await widgetTester.pumpAndSettle();
+            await widgetTester.tap(find.text(insertedMemName));
+            await widgetTester.pumpAndSettle(defaultTransitionDuration);
+            await widgetTester.tap(
+              find.descendant(
+                of: find.byKey(keyMemNotificationsView),
+                matching: find.byIcon(Icons.edit),
+              ),
+            );
+            await widgetTester.pumpAndSettle();
+
+            await widgetTester.tap(
+              find.descendant(
+                of: find.byKey(keyMemAfterActStartedNotification),
+                matching: find.byIcon(Icons.clear),
+              ),
+            );
+            await widgetTester.pump();
+
+            expect(
+              widgetTester
+                  .widget<TimeTextFormField>(
+                    find.descendant(
+                      of: find.byKey(keyMemAfterActStartedNotification),
+                      matching: find.byType(TimeTextFormField),
+                    ),
+                  )
+                  .secondsOfTime,
+              null,
+            );
+            expect(
+              find.descendant(
+                  of: find.byKey(keyMemAfterActStartedNotification),
+                  matching: find.byIcon(Icons.clear)),
+              findsNothing,
             );
           },
         );
