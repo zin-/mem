@@ -9,9 +9,9 @@ import 'framework/database_factory.dart';
 import 'scenarios/act_counter_scenario.dart';
 import 'scenarios/act_scenario.dart';
 import 'scenarios/edge_scenario.dart';
+import 'scenarios/habit/after_act_started_habit_scenario.dart';
 import 'scenarios/habit/repeat_by_n_day_habit_scenario.dart';
 import 'scenarios/habit/repeated_habit_scenario.dart';
-import 'scenarios/habit_scenario.dart';
 import 'scenarios/memo/mem_list_scenario.dart';
 import 'scenarios/memo/memo_detail_scenario.dart';
 import 'scenarios/memo_scenario.dart';
@@ -37,14 +37,16 @@ void main() {
   group('Scenario test', () {
     testMemoListScenario();
     testMemoDetailScenario();
+
     testRepeatedHabitScenario();
     testRepeatByNDayHabitScenario();
+    testAfterActStartedHabitScenario();
+
     testNotificationsScenario();
 
     testMemoScenario();
     testTodoScenario();
     testTaskScenario();
-    testHabitScenario();
 
     testActScenario();
 

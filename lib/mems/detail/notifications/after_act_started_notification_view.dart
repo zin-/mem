@@ -4,6 +4,9 @@ import 'package:mem/components/time_text_form_field.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
 
+const keyMemAfterActStartedNotification =
+    Key("mem-after-act-started-notification");
+
 class AfterActStartedNotificationView extends ConsumerWidget {
   final int? _memId;
 
@@ -53,7 +56,10 @@ class _AfterActStartedNotificationView extends StatelessWidget {
     required void Function(int? picked) onTimeChanged,
     required void Function(String value) onMessageChanged,
   })  : _onTimeChanged = onTimeChanged,
-        _onMessageChanged = onMessageChanged;
+        _onMessageChanged = onMessageChanged,
+        super(
+          key: keyMemAfterActStartedNotification,
+        );
 
   @override
   Widget build(BuildContext context) => v(

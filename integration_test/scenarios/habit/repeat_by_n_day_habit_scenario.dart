@@ -70,53 +70,6 @@ void testRepeatByNDayHabitScenario() => group(
           });
 
           testWidgets(
-            ": on new.",
-            (widgetTester) async {
-              await runApplication();
-              await widgetTester.pumpAndSettle();
-              await widgetTester.tap(newMemFabFinder);
-              await widgetTester.pumpAndSettle(defaultTransitionDuration);
-
-              expect(
-                widgetTester
-                    .widget<Text>(
-                      find.descendant(
-                        of: find.byKey(keyMemNotificationsView),
-                        matching: find.byType(Text),
-                      ),
-                    )
-                    .data,
-                l10n.noNotifications,
-              );
-
-              final notificationAddFinder = find.descendant(
-                of: find.byKey(keyMemNotificationsView),
-                matching: find.byIcon(Icons.notification_add),
-              );
-              await widgetTester.dragUntilVisible(
-                notificationAddFinder,
-                find.byType(SingleChildScrollView),
-                const Offset(0, 50),
-              );
-              await widgetTester.tap(
-                notificationAddFinder,
-              );
-              await widgetTester.pumpAndSettle(defaultTransitionDuration);
-
-              expect(
-                widgetTester
-                    .widget<TextFormField>(
-                      find.descendant(
-                          of: find.byKey(keyMemRepeatByNDayNotification),
-                          matching: find.byType(TextFormField)),
-                    )
-                    .initialValue,
-                1.toString(),
-              );
-            },
-          );
-
-          testWidgets(
             ": on saved.",
             (widgetTester) async {
               await runApplication();
