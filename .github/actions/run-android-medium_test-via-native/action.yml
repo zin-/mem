@@ -88,6 +88,7 @@ runs:
 
     - run: nohup $ANDROID_HOME/emulator/emulator -avd emulator-5554 -no-snapshot > /dev/null 2>&1
       shell: bash
+      continue-on-error: true
 
     - run: avdmanager --help
       shell: bash

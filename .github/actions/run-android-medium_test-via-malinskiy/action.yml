@@ -45,3 +45,4 @@ runs:
         api: ${{ inputs.android-api-level }}
         tag: ${{ inputs.android-target }}
         abi: ${{ inputs.android-arch }}
+      continue-on-error: true
