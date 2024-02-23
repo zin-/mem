@@ -36,7 +36,7 @@ Future<void> showRepeatEveryNDayNotification(
         final mem = await MemRepository().shipById(memId);
         final memNotification =
             (await MemNotificationRepository().shipByMemId(mem.id)).singleWhere(
-          (element) => element.type == MemNotificationType.repeat,
+          (element) => element.isRepeated(),
         );
 
         await NotificationRepository().receive(

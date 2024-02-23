@@ -31,15 +31,14 @@ class MemClient {
           // TODO ここでnotificationClientを使って通知を登録する
           final repeatMemNotification = saved.notifications?.singleWhereOrNull(
             (element) =>
-                element is SavedMemNotification &&
-                element.type == MemNotificationType.repeat,
+                element is SavedMemNotification && element.isRepeated(),
           );
           if (repeatMemNotification != null) {
             await _notificationClient.registerMemRepeatNotification(
               saved.mem.name,
               repeatMemNotification,
               saved.notifications?.singleWhereOrNull(
-                (element) => element.type == MemNotificationType.repeatByNDay,
+                (element) => element.isRepeatByNDay(),
               ),
             );
           }

@@ -66,9 +66,9 @@ final memRepeatedNotificationByMemIdProvider = StateNotifierProvider.autoDispose
       final notification = ref.watch(
         memNotificationsProvider.select(
           (value) => value
-              .where((element) =>
-                  element.memId == memId &&
-                  element.type == MemNotificationType.repeat)
+              .where(
+                (element) => element.memId == memId && element.isRepeated(),
+              )
               .singleOrNull,
         ),
       );
@@ -84,7 +84,7 @@ final memRepeatedNotificationByMemIdProvider = StateNotifierProvider.autoDispose
                       value.singleWhereOrNull(
                         (e) =>
                             e.memId == memId &&
-                            e.type == MemNotificationType.repeat,
+                            e.isRepeated(),
                       ) ??
                       MemNotification.repeated(memId),
                 ),
@@ -104,7 +104,7 @@ final memRepeatByNDayNotificationByMemIdProvider = StateNotifierProvider
           (value) => value
               .where((element) =>
                   element.memId == memId &&
-                  element.type == MemNotificationType.repeatByNDay)
+                  element.isRepeatByNDay())
               .singleOrNull,
         ),
       );
@@ -120,7 +120,7 @@ final memRepeatByNDayNotificationByMemIdProvider = StateNotifierProvider
                       value.singleWhereOrNull(
                         (e) =>
                             e.memId == memId &&
-                            e.type == MemNotificationType.repeatByNDay,
+                            e.isRepeatByNDay(),
                       ) ??
                       MemNotification.repeatByNDay(memId),
                 ),
@@ -140,7 +140,7 @@ final memAfterActStartedNotificationByMemIdProvider = StateNotifierProvider
           (value) => value
               .where((element) =>
                   element.memId == memId &&
-                  element.type == MemNotificationType.afterActStarted)
+                  element.isAfterActStarted())
               .singleOrNull,
         ),
       );
@@ -156,7 +156,7 @@ final memAfterActStartedNotificationByMemIdProvider = StateNotifierProvider
                       value.singleWhereOrNull(
                         (e) =>
                             e.memId == memId &&
-                            e.type == MemNotificationType.afterActStarted,
+                            e.isAfterActStarted(),
                       ) ??
                       MemNotification.afterActStarted(memId),
                 ),

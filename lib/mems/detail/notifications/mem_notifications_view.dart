@@ -53,11 +53,11 @@ class _MemNotificationsView extends StatelessWidget {
 
           final hasEnabledNotifications = enables.isNotEmpty;
           final repeat = enables.singleWhereOrNull(
-              (element) => element.type == MemNotificationType.repeat);
+              (element) => element.isRepeated());
           final repeatByNDay = enables.singleWhereOrNull(
-              (element) => element.type == MemNotificationType.repeatByNDay);
+              (element) => element.isRepeatByNDay());
           final afterActStarted = enables.singleWhereOrNull(
-              (element) => element.type == MemNotificationType.afterActStarted);
+              (element) => element.isAfterActStarted());
 
           final text = [
             if (repeat != null)

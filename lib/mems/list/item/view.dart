@@ -35,7 +35,7 @@ class MemListItemView extends ConsumerWidget {
               .select((value) => value.singleWhereOrNull(
                     (element) =>
                         element is SavedMemNotification &&
-                        element.type == MemNotificationType.repeat,
+                        element.isRepeated(),
                   ))),
           _onTapped,
           (bool? value, int memId) async {
