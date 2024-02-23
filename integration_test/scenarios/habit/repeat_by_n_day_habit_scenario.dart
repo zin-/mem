@@ -134,6 +134,11 @@ void testRepeatByNDayHabitScenario() => group(
             );
             await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
+            await widgetTester.tap(timeIconFinder);
+            await widgetTester.pump();
+            await widgetTester.tap(okFinder);
+            await widgetTester.pump();
+
             const enteringNDay = 3;
             await widgetTester.enterText(
               find.descendant(
@@ -162,10 +167,12 @@ void testRepeatByNDayHabitScenario() => group(
             final savedMemNotification = (await dbA.select(
               defTableMemNotifications,
               where: "${defFkMemNotificationsMemId.name} = ?"
-                  " AND ${defColMemNotificationsType.name} = ?",
+                  " AND ${defColMemNotificationsType.name} = ?"
+                  " AND ${defColMemNotificationsTime.name} = ?",
               whereArgs: [
                 savedMem[defPkId.name],
                 MemNotificationType.repeatByNDay.name,
+                enteringNDay,
               ],
             ))
                 .single;
