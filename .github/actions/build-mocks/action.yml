@@ -5,13 +5,13 @@ runs:
   using: "composite"
 
   steps:
-    - id: cache
-      name: "Cache"
-      uses: actions/cache@v3
-      with:
-        path: test/**.mocks.dart
-        key: mocks-${{ hashFiles('test/**', 'lib/**') }}
+    #    - id: cache
+    #      name: "Cache"
+    #      uses: actions/cache@v3
+    #      with:
+    #        path: test/**.mocks.dart
+    #        key: mocks-${{ hashFiles('test/**', 'lib/**') }}
     - name: "Build Mocks"
-      if: steps.cache.outputs.cache-hit != 'true'
+      #      if: steps.cache.outputs.cache-hit != 'true'
       run: ./scripts/generate_mocks.sh
       shell: bash
