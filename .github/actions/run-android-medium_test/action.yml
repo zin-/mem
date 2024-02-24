@@ -1,25 +1,30 @@
 name: "Run Android Medium test"
+description: "Run Android Medium test"
 
 inputs:
   android-emulator-runner:
+    description: "android-emulator-runner"
     required: true
-    type: string
   script:
     required: true
-    type: string
+    description: "script"
   android-api-level:
     required: true
-    type: string
+    description: "android-api-level"
   android-target:
+    description: "android-target"
     required: true
-    type: string
   android-arch:
+    description: "android-arch"
     required: true
-    type: string
+  experimental:
+    description: "experimental"
+    default: "false"
 
 outputs:
   status:
     value: ${{ steps.set-result.outputs.status }}
+    description: "status"
 
 runs:
   using: "composite"
@@ -34,7 +39,7 @@ runs:
         android-api-level: ${{ inputs.android-api-level }}
         android-target: ${{ inputs.android-target }}
         android-arch: ${{ inputs.android-arch }}
-      continue-on-error: true
+      continue-on-error: ${{ inputs.experimental }}
 
     - if: inputs.android-emulator-runner == 'reactivecircus'
       id: run-android-medium_test-via-reactivecircus
@@ -45,8 +50,8 @@ runs:
         android-api-level: ${{ inputs.android-api-level }}
         android-target: ${{ inputs.android-target }}
         android-arch: ${{ inputs.android-arch }}
-  #          android-device-profile: Pixel 5
-      continue-on-error: true
+      #          android-device-profile: Pixel 5
+      continue-on-error: ${{ inputs.experimental }}
 
     - if: inputs.android-emulator-runner == 'native'
       id: run-android-medium_test-via-native

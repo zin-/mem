@@ -15,7 +15,7 @@ class MemListBody extends ConsumerWidget {
   const MemListBody(this._scrollController, {super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => i(
+  Widget build(BuildContext context, WidgetRef ref) => v(
         () {
           ref.read(fetchMemNotifications(
             ref.watch(memListProvider).map((e) => e.id),

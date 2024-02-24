@@ -10,7 +10,7 @@ final startOfDayProvider =
   (ref) => v(
     () => ValueStateNotifier(
       null,
-      future: loadByKey(startOfDayKey),
+      initialFuture: loadByKey(startOfDayKey),
     ),
   ),
 );

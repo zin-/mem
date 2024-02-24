@@ -1,12 +1,12 @@
 import 'package:mem/core/mem_detail.dart';
-import 'package:mem/core/mem_item.dart';
-import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/mems/mem_item.dart';
 import 'package:mem/mems/mem_item_repository.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification_repository.dart';
 import 'package:mem/notifications/notification_service.dart';
 import 'package:mem/repositories/mem.dart';
+import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 
@@ -49,8 +49,12 @@ class MemService {
                     return Future.value(e);
                   } else {
                     return (e is SavedMemNotification && !undo
-                        ? _memNotificationRepository.replace(e)
-                        : _memNotificationRepository.receive(e))
+                        ? _memNotificationRepository.replace(e.copiedWith(
+                            memId: () => savedMem.id,
+                          ))
+                        : _memNotificationRepository.receive(e.copiedWith(
+                            memId: () => savedMem.id,
+                          )))
                       ..then(
                         (value) => _notificationService.memRepeatedReminder(
                           savedMem,
@@ -116,8 +120,9 @@ class MemService {
         mem,
       );
 
-  Future<bool> remove(int memId) => i(
+  Future<bool> remove(int memId) => v(
         () async {
+          // TODO https://github.com/zin-/mem/issues/284
           await _memNotificationRepository.wasteByMemId(memId);
           await _memItemRepository.wasteByMemId(memId);
           await _memRepository.wasteById(memId);

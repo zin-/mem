@@ -1,9 +1,12 @@
 name: "Set up Java and Gradle"
+description: "Set up Java and Gradle."
 
 inputs:
   java-distribution:
+    description: "java-distribution"
     required: true
   java-version:
+    description: "java-version"
     required: true
 
 runs:

@@ -3,6 +3,7 @@ import 'show_notification.dart';
 class RepeatedNotification extends ShowNotification {
   final DateTime notifyFirstAt;
   final NotificationInterval interval;
+  final int? intervalSeconds;
 
   RepeatedNotification(
     super.id,
@@ -12,8 +13,9 @@ class RepeatedNotification extends ShowNotification {
     super.actions,
     super.channel,
     this.notifyFirstAt,
-    this.interval,
-  );
+    this.interval, {
+    this.intervalSeconds,
+  });
 
   @override
   String toString() =>

@@ -36,10 +36,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
 
-# TODO 画面サイズ
-# TODO OSバージョン
-# TODO Java distribution
-# TODO Java version
+    # TODO 画面サイズ
+    # TODO OSバージョン
+    # TODO Java distribution
+    # TODO Java version
 
     steps:
       - uses: actions/checkout@v4
@@ -54,11 +54,12 @@ jobs:
         with:
           channel: ${{ inputs.flutter-channel }}
           cache: true
+      - name: "Flutter doctor"
+        uses: ./.github/actions/flutter-doctor
 
       - name: "Install Dependencies"
         uses: ./.github/actions/install-dependencies
-      - name: "Generate Localization code"
-        uses: ./.github/actions/generate-localization_code
+
       - name: "Build APK"
         run: flutter build apk --debug
 
@@ -76,6 +77,7 @@ jobs:
           android-api-level: 29
           android-target: default
           android-arch: x86_64 # FIXME これandroidのarchじゃなくて動かす側のcpu archだ
+          experimental: ${{ matrix.experimental }}
 
       - name: "Report"
         uses: dorny/test-reporter@v1
@@ -85,9 +87,11 @@ jobs:
           reporter: "flutter-json"
           fail-on-error: true
           fail-on-empty: true
+        continue-on-error: ${{ matrix.experimental }}
       - name: "Upload coverage"
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
           flags: medium_test-android-${{ matrix.android-emulator-runner }}
+        continue-on-error: ${{ matrix.experimental }}

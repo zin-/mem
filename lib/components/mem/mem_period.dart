@@ -65,12 +65,14 @@ class MemPeriodTextFormFields extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
-          final mem = ref.watch(memDetailProvider(_memId)).mem;
+          final mem = ref.watch(editingMemByMemIdProvider(_memId));
 
           return _MemPeriodTextFormFieldsComponent(
             mem.period,
             (pickedPeriod) => v(
-              () => ref.read(editingMemProvider(_memId).notifier).updatedBy(
+              () => ref
+                  .read(editingMemByMemIdProvider(_memId).notifier)
+                  .updatedBy(
                     mem.copiedWith(period: () => pickedPeriod),
                   ),
               pickedPeriod,

@@ -3,14 +3,12 @@ import 'package:flutter_picker/picker.dart';
 import 'package:mem/logger/log_service.dart';
 
 class TimeTextFormField extends StatelessWidget {
-  final int? _secondsOfTime;
+  final int? secondsOfTime;
   final void Function(int? pickedSecondsOfTime) _onChanged;
-  final Widget? _icon;
 
   const TimeTextFormField(
-    this._secondsOfTime,
-    this._onChanged,
-    this._icon, {
+    this.secondsOfTime,
+    this._onChanged, {
     super.key,
   });
 
@@ -19,9 +17,9 @@ class TimeTextFormField extends StatelessWidget {
         () {
           int? hours;
           int? minutes;
-          if (_secondsOfTime != null) {
-            hours = (_secondsOfTime! ~/ 60 ~/ 60);
-            minutes = (_secondsOfTime! ~/ 60 % 60);
+          if (secondsOfTime != null) {
+            hours = (secondsOfTime! ~/ 60 ~/ 60);
+            minutes = (secondsOfTime! ~/ 60 % 60);
           }
           return TextFormField(
             controller: TextEditingController(
@@ -29,7 +27,6 @@ class TimeTextFormField extends StatelessWidget {
                   hours != null && minutes != null ? '$hours h $minutes m' : '',
             ),
             decoration: InputDecoration(
-              icon: _icon,
               hintText: 'h:m',
               suffixIcon: IconButton(
                 icon: const Icon(Icons.add),
@@ -60,6 +57,6 @@ class TimeTextFormField extends StatelessWidget {
             ),
           );
         },
-        _secondsOfTime,
+        secondsOfTime,
       );
 }

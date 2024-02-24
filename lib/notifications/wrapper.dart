@@ -134,7 +134,7 @@ class NotificationsWrapper {
   NotificationsWrapper._(
     String androidDefaultIconPath,
   ) {
-    i(
+    v(
       () {
         _pluginIsInitialized = _flutterLocalNotificationsPlugin.initialize(
           InitializationSettings(
@@ -180,7 +180,7 @@ Future<void> onDidReceiveNotificationResponse(NotificationResponse details) =>
         WidgetsFlutterBinding.ensureInitialized();
 
         await openDatabase();
-        NotificationClient();
+        NotificationClientV2();
 
         final id = details.id;
         if (id == null) {
@@ -209,7 +209,7 @@ Future<void> onDidReceiveNotificationResponse(NotificationResponse details) =>
 
             if (payload.containsKey(memIdKey)) {
               final memId = payload[memIdKey];
-              await NotificationClient()
+              await NotificationClientV2()
                   .notificationActions
                   .singleWhere((element) => element.id == actionId)
                   .onTapped(memId as int);

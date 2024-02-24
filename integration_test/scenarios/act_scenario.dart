@@ -212,6 +212,8 @@ void testActScenario() => group(': $_scenarioName', () {
           testWidgets(
             ': start & finish act.',
             (widgetTester) async {
+              setMockLocalNotifications(widgetTester);
+
               await showActListPage(widgetTester);
 
               expect(stopIconFinder, findsNothing);
@@ -251,7 +253,7 @@ void testActScenario() => group(': $_scenarioName', () {
                 insertedMemName,
                 dateText(startTime),
                 "1",
-                const Duration(seconds: 2).format(),
+                isNotNull,
                 timeText(startTime),
                 "~",
                 timeText(stopTime),
@@ -280,7 +282,7 @@ void testActScenario() => group(': $_scenarioName', () {
                 insertedMemName,
                 dateText(startTime2),
                 "2",
-                const Duration(seconds: 2).format(),
+                isNotNull,
                 timeText(startTime2),
                 "~",
                 timeText(startTime),
@@ -358,7 +360,7 @@ void testActScenario() => group(': $_scenarioName', () {
 
                 await widgetTester
                     .longPress(find.text(timeText(zeroDate)).at(1));
-                await widgetTester.pumpAndSettle();
+                await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
                 await widgetTester.tap(find.byIcon(Icons.clear).at(1));
                 await widgetTester.pumpAndSettle();

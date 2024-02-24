@@ -15,7 +15,7 @@ void showMemDetailPage(BuildContext context, WidgetRef? ref, int? memId) => v(
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
                 MemDetailPage(memId),
-            transitionsBuilder: _showMemDetailTransitionBuilder,
+            transitionsBuilder: detailTransitionsBuilder,
             transitionDuration: defaultTransitionDuration,
             reverseTransitionDuration: defaultTransitionDuration,
           ),
@@ -31,7 +31,7 @@ void showMemDetailPage(BuildContext context, WidgetRef? ref, int? memId) => v(
       [context, ref, memId],
     );
 
-Widget _showMemDetailTransitionBuilder(
+Widget detailTransitionsBuilder(
   BuildContext context,
   Animation<double> animation,
   Animation<double> secondaryAnimation,
@@ -44,6 +44,8 @@ Widget _showMemDetailTransitionBuilder(
       ).animate(animation),
       child: child,
     );
+
+const keyUndo = Key("undo");
 
 void handleRemoved(
   BuildContext context,
@@ -67,6 +69,7 @@ void handleRemoved(
                 duration: infiniteDismissDuration,
                 dismissDirection: DismissDirection.horizontal,
                 action: SnackBarAction(
+                  key: keyUndo,
                   label: l10n.undoAction,
                   onPressed: () {
                     ref.read(undoRemoveMem(memId));

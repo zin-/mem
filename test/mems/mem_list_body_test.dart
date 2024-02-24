@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/components/l10n.dart';
 import 'package:mem/components/mem/list/actions.dart';
 import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
+import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/list/actions.dart';
 import 'package:mem/mems/list/body.dart';
 import 'package:mem/mems/list/show_new_mem_fab.dart';
@@ -31,13 +31,14 @@ void main() {
     await widgetTester.pumpWidget(ProviderScope(
       overrides: [
         loadMemList.overrideWith((ref) => null),
-        fetchActiveActs.overrideWith((ref) => Future.value(null)),
+        fetchActiveActs.overrideWith((ref) => Future.value([])),
         fetchMemNotifications.overrideWith((ref, arg) => Future(() => [])),
         activeActsProvider.overrideWith((ref) => ListValueStateNotifier([])),
         memsProvider.overrideWith((ref) => ListValueStateNotifier(samples)),
+        memNotificationsByMemIdProvider
+            .overrideWith((ref, arg) => ListValueStateNotifier([])),
       ],
       child: MaterialApp(
-        onGenerateTitle: (context) => buildL10n(context).memDetailPageTitle,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(

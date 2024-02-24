@@ -99,7 +99,7 @@ void testTaskScenario() => group(': $scenarioName', () {
             widgetTester.widget<Switch>(find.byType(Switch).at(1)).value,
             true,
           );
-          expect(timeIconFinder, findsOneWidget);
+          expect(timeIconFinder, findsNothing);
         });
 
         group(": inserted Mem", () {
@@ -185,7 +185,7 @@ void testTaskScenario() => group(': $scenarioName', () {
               widgetTester.widget<Switch>(find.byType(Switch).at(1)).value,
               false,
             );
-            expect(timeIconFinder, findsNWidgets(2));
+            expect(timeIconFinder, findsOneWidget);
           });
           testWidgets(": has period.", (widgetTester) async {
             await runApplication();
@@ -226,7 +226,7 @@ void testTaskScenario() => group(': $scenarioName', () {
               widgetTester.widget<Switch>(find.byType(Switch).at(1)).value,
               false,
             );
-            expect(timeIconFinder, findsNWidgets(3));
+            expect(timeIconFinder, findsNWidgets(2));
           });
         });
       });
@@ -262,7 +262,7 @@ void testTaskScenario() => group(': $scenarioName', () {
                 .initialValue,
             dateText(startDate),
           );
-          expect(timeIconFinder, findsOneWidget);
+          expect(timeIconFinder, findsNothing);
 
           await widgetTester.tap(find.byType(Switch).at(0));
           await widgetTester.pumpAndSettle();
@@ -277,7 +277,7 @@ void testTaskScenario() => group(': $scenarioName', () {
                 .initialValue,
             timeText(pickingStartTime),
           );
-          expect(timeIconFinder, findsNWidgets(2));
+          expect(timeIconFinder, findsOneWidget);
 
           await widgetTester.tap(calendarIconFinder.at(1));
           await widgetTester.pumpAndSettle();

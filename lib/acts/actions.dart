@@ -52,7 +52,7 @@ final finishActBy = Provider.autoDispose.family<SavedAct, int>(
   (ref, memId) => v(
     () {
       final now = DateAndTime.now();
-      final finishingAct = ref.read(activeActsProvider)!.singleWhere(
+      final finishingAct = ref.read(activeActsProvider).singleWhere(
             (act) => act.memId == memId,
           );
 

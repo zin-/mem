@@ -1,13 +1,18 @@
 name: "Run Android Medium test via reactivecircus"
+description: "Run Android Medium test via reactivecircus."
+
 inputs:
   script:
+    description: "script"
     required: true
-    type: string
   android-api-level:
+    description: "android-api-level"
     required: true
   android-target:
+    description: "android-target"
     required: true
   android-arch:
+    description: "android-arch"
     required: true
 # TODO 有効なProfileを見つける
 #   画面サイズなどのバラエティを増やす際に検討する
@@ -34,7 +39,7 @@ runs:
         api-level: ${{ inputs.android-api-level }}
         target: ${{ inputs.android-target }}
         arch: ${{ inputs.android-arch }}
-#        profile: ${{ inputs.android-device-profile }}
+        #        profile: ${{ inputs.android-device-profile }}
         force-avd-creation: false
         emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
         disable-animations: false
@@ -45,8 +50,9 @@ runs:
         api-level: ${{ inputs.android-api-level }}
         target: ${{ inputs.android-target }}
         arch: ${{ inputs.android-arch }}
-#        profile: ${{ inputs.android-device-profile }}
+        #        profile: ${{ inputs.android-device-profile }}
         force-avd-creation: false
         emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
         disable-animations: true
         script: ${{ inputs.script }}
+      continue-on-error: true

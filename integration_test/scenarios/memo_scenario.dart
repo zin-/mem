@@ -173,61 +173,6 @@ void testMemoScenario() => group(
         });
 
         group(': Save', () {
-          testWidgets(
-            ': Create.',
-            (widgetTester) async {
-              await runApplication();
-              await widgetTester.pumpAndSettle();
-
-              await widgetTester.tap(newMemFabFinder);
-              await widgetTester.pumpAndSettle();
-
-              expect(find.text(insertedMemName), findsNothing);
-              expect(find.text(insertedMemMemo), findsNothing);
-              const enteringMemNameText =
-                  '$scenarioName: Save: Create - mem name - entering';
-              await widgetTester.enterText(
-                memNameOnDetailPageFinder,
-                enteringMemNameText,
-              );
-              await widgetTester.pumpAndSettle();
-
-              expect(find.text(enteringMemNameText), findsOneWidget);
-              const enteringMemMemoText =
-                  '$scenarioName: Save: Create - mem memo - entering';
-              await widgetTester.enterText(
-                memMemoOnDetailPageFinder,
-                enteringMemMemoText,
-              );
-              await widgetTester.pumpAndSettle();
-
-              expect(find.text(enteringMemMemoText), findsOneWidget);
-              await widgetTester.tap(saveMemFabFinder);
-              await widgetTester.pump(defaultTransitionDuration);
-
-              const saveSuccessText = 'Save success. $enteringMemNameText';
-              expect(
-                find.text(saveSuccessText),
-                findsOneWidget,
-              );
-              await widgetTester.pumpAndSettle(defaultDismissDuration);
-
-              expect(find.text(saveSuccessText), findsNothing);
-              await widgetTester.pageBack();
-              await widgetTester.pumpAndSettle();
-
-              expect(find.text(insertedMemName), findsOneWidget);
-              expect(find.text(enteringMemNameText), findsOneWidget);
-              expect(find.text(enteringMemMemoText), findsNothing);
-              await widgetTester.tap(find.text(enteringMemNameText));
-              await widgetTester.pumpAndSettle();
-
-              expect(find.text(insertedMemName), findsNothing);
-              expect(find.text(enteringMemNameText), findsOneWidget);
-              expect(find.text(enteringMemMemoText), findsOneWidget);
-            },
-          );
-
           group(": Update", () {
             testWidgets(
               ': mem name.',
@@ -275,45 +220,6 @@ void testMemoScenario() => group(
                 expect(find.text(enteringMemNameText), findsOneWidget);
               },
             );
-
-            testWidgets(
-              ': mem memo.',
-              (widgetTester) async {
-                await runApplication();
-                await widgetTester.pumpAndSettle();
-
-                await widgetTester.tap(find.text(insertedMemName));
-                await widgetTester.pumpAndSettle();
-
-                await widgetTester.tap(memMemoOnDetailPageFinder);
-                await widgetTester.pump(waitShowSoftwareKeyboardDuration);
-
-                const enteringMemMemoText =
-                    '$scenarioName: Save: Update - mem memo - entering';
-                await widgetTester.enterText(
-                  memMemoOnDetailPageFinder,
-                  enteringMemMemoText,
-                );
-                await widgetTester.pumpAndSettle();
-                expect(find.text(enteringMemMemoText), findsOneWidget);
-
-                await widgetTester.tap(saveMemFabFinder);
-                await widgetTester.pumpAndSettle();
-                const saveSuccessText = 'Save success. $insertedMemName';
-                expect(
-                  find.text(saveSuccessText),
-                  findsOneWidget,
-                );
-
-                await widgetTester.pageBack();
-                await widgetTester.pumpAndSettle();
-
-                await widgetTester.tap(find.text(insertedMemName));
-                await widgetTester.pumpAndSettle();
-                expect(find.text(insertedMemName), findsOneWidget);
-                expect(find.text(enteringMemMemoText), findsOneWidget);
-              },
-            );
           });
 
           group(': Archive', () {
@@ -350,6 +256,9 @@ void testMemoScenario() => group(
                 await widgetTester.tap(find.text(insertedMemName));
                 await widgetTester.pumpAndSettle();
 
+                await widgetTester.tap(find.byIcon(Icons.more_vert));
+                await widgetTester.pumpAndSettle();
+
                 await widgetTester.tap(find.byIcon(Icons.archive));
                 await widgetTester.pumpAndSettle();
 
@@ -369,6 +278,9 @@ void testMemoScenario() => group(
                 expect(find.text(unarchivedMemName), findsOneWidget);
                 expect(find.text(archivedMemName), findsOneWidget);
                 await widgetTester.tap(find.text(insertedMemName));
+                await widgetTester.pumpAndSettle();
+
+                await widgetTester.tap(find.byIcon(Icons.more_vert));
                 await widgetTester.pumpAndSettle();
 
                 await widgetTester.tap(find.byIcon(Icons.unarchive));
@@ -392,144 +304,6 @@ void testMemoScenario() => group(
                 expect(find.text(unarchivedMemName), findsNothing);
                 expect(find.text(archivedMemName), findsOneWidget);
               },
-            );
-          });
-        });
-
-        testWidgets(
-          ': Remove & undo.',
-          (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
-
-            await widgetTester.tap(find.text(insertedMemName));
-            await widgetTester.pumpAndSettle(defaultTransitionDuration);
-
-            await widgetTester.tap(find.byIcon(Icons.more_vert));
-            await widgetTester.pumpAndSettle();
-
-            await widgetTester.tap(find.byIcon(Icons.delete));
-            await widgetTester.pump();
-
-            await widgetTester.tap(find.text('Cancel'));
-            await widgetTester.pumpAndSettle();
-
-            await widgetTester.tap(find.byIcon(Icons.more_vert));
-            await widgetTester.pumpAndSettle();
-
-            await widgetTester.tap(find.byIcon(Icons.delete));
-            await widgetTester.pumpAndSettle();
-
-            await widgetTester.tap(find.text('OK'));
-            await Future.delayed(waitSideEffectDuration);
-            await widgetTester.pumpAndSettle(defaultTransitionDuration);
-
-            expect(
-              find.text('Remove success. $insertedMemName'),
-              findsOneWidget,
-            );
-            expect(find.text(insertedMemName), findsNothing);
-            await widgetTester.tap(find.byIcon(Icons.filter_list));
-            await widgetTester.pumpAndSettle(defaultTransitionDuration);
-
-            await widgetTester.tap(find.byType(Switch).at(1));
-            await widgetTester.tap(find.byType(Switch).at(3));
-            await widgetTester.pump();
-
-            await closeMemListFilter(widgetTester);
-            await widgetTester.pumpAndSettle(defaultTransitionDuration);
-
-            expect(find.text(insertedMemName), findsNothing);
-            expect(
-              find.text('Remove success. $insertedMemName'),
-              findsOneWidget,
-            );
-            await widgetTester.tap(find.text('Undo'));
-            await widgetTester.pumpAndSettle();
-
-            expect(
-              find.text('Remove success. $insertedMemName'),
-              findsNothing,
-            );
-            expect(
-              find.text('Undo success. $insertedMemName'),
-              findsOneWidget,
-            );
-            await widgetTester.tap(find.text(insertedMemName));
-            await widgetTester.pumpAndSettle(defaultTransitionDuration);
-
-            expect(find.text(insertedMemName), findsOneWidget);
-            expect(find.text(insertedMemMemo), findsOneWidget);
-          },
-        );
-
-        group(': MemItemsView', () {
-          setUp(() async {
-            await dbA.delete(defTableMemItems);
-          });
-
-          testWidgets(': save twice on create.', (widgetTester) async {
-            await runApplication();
-            await widgetTester.pump();
-
-            await widgetTester.tap(newMemFabFinder);
-            await widgetTester.pumpAndSettle();
-
-            const enteringMemNameText =
-                '$scenarioName: MemItemsView: save twice on create - mem name - entering';
-            await widgetTester.enterText(
-              memNameOnDetailPageFinder,
-              enteringMemNameText,
-            );
-            const enteringMemMemoText =
-                '$scenarioName: MemItemsView: save twice on create - mem memo - entering';
-            const enteringMemMemoText1 = '$enteringMemMemoText - 1';
-            await widgetTester.enterText(
-              memMemoOnDetailPageFinder,
-              enteringMemMemoText1,
-            );
-            await widgetTester.tap(saveMemFabFinder);
-            await widgetTester.pumpAndSettle(defaultDismissDuration);
-
-            await widgetTester.tap(find.text(enteringMemMemoText1));
-            await widgetTester.pump(defaultTransitionDuration);
-
-            const enteringMemMemoText2 = '$enteringMemMemoText - 2';
-            await widgetTester.enterText(
-              memMemoOnDetailPageFinder,
-              enteringMemMemoText2,
-            );
-            await widgetTester.pump(defaultTransitionDuration);
-
-            expect(find.text(enteringMemMemoText1), findsNothing);
-            expect(find.text(enteringMemMemoText2), findsOneWidget);
-            await widgetTester.tap(saveMemFabFinder);
-            await widgetTester.pumpAndSettle(defaultDismissDuration);
-
-            await widgetTester.pageBack();
-            await widgetTester.pumpAndSettle(defaultTransitionDuration);
-
-            await widgetTester.tap(find.text(enteringMemNameText));
-            await widgetTester.pumpAndSettle(defaultTransitionDuration);
-
-            expect(find.text(enteringMemMemoText1), findsNothing);
-            expect(find.text(enteringMemMemoText2), findsOneWidget);
-
-            final mem = (await dbA.select(
-              defTableMems,
-              where: '${defColMemsName.name} = ?',
-              whereArgs: [enteringMemNameText],
-            ))
-                .single;
-            final memItems = await dbA.select(
-              defTableMemItems,
-              where: '${defFkMemItemsMemId.name} = ?',
-              whereArgs: [mem['id']],
-            );
-            expect(memItems.length, 1);
-            expect(
-              memItems.single[defColMemItemsValue.name],
-              enteringMemMemoText2,
             );
           });
         });

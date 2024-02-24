@@ -1,7 +1,9 @@
 import 'package:mem/framework/repository/entity.dart';
-import 'package:mem/framework/repository/database_tuple_entity.dart';
 
-class MemNotification extends Entity {
+const _repeatedMessage = "Repeat";
+const _afterActStartedMessage = "Finish?";
+
+class MemNotification extends EntityV1 {
   // 未保存のMemに紐づくMemNotificationはmemIdをintで持つことができないため暫定的にnullableにしている
   final int? memId;
   final MemNotificationType type;
@@ -10,49 +12,52 @@ class MemNotification extends Entity {
 
   MemNotification(this.memId, this.type, this.time, this.message);
 
-  MemNotification copiedWith(
+  bool isEnabled() => time != null;
+
+  bool isRepeated() => type == MemNotificationType.repeat;
+
+  bool isRepeatByNDay() => type == MemNotificationType.repeatByNDay;
+
+  bool isAfterActStarted() => type == MemNotificationType.afterActStarted;
+
+  factory MemNotification.repeated(int? memId) => MemNotification(
+      memId, MemNotificationType.repeat, null, _repeatedMessage);
+
+  factory MemNotification.repeatByNDay(int? memId) => MemNotification(
+      memId, MemNotificationType.repeatByNDay, null, _repeatedMessage);
+
+  factory MemNotification.afterActStarted(int? memId) => MemNotification(memId,
+      MemNotificationType.afterActStarted, null, _afterActStartedMessage);
+
+  MemNotification copiedWith({
+    int Function()? memId,
     int? Function()? time,
     String Function()? message,
-  ) =>
+  }) =>
       MemNotification(
-        memId,
+        memId == null ? this.memId : memId(),
         type,
         time == null ? this.time : time(),
         message == null ? this.message : message(),
       );
-}
-
-class SavedMemNotification extends MemNotification
-    with SavedDatabaseTupleMixin<int> {
-  @override
-  int get memId => super.memId as int;
-
-  SavedMemNotification(super.memId, super.type, super.time, super.message);
 
   @override
-  SavedMemNotification copiedWith(
-    int? Function()? time,
-    String Function()? message,
-  ) =>
-      SavedMemNotification(
-        memId,
-        type,
-        time == null ? this.time : time(),
-        message == null ? this.message : message(),
-      )..copiedFrom(this);
+  String toString() => "${super.toString()}: ${{
+        "memId": memId,
+        "type": type,
+        "time": time,
+        "message": message,
+      }}";
 }
 
 enum MemNotificationType {
   repeat,
+  repeatByNDay,
   afterActStarted;
 
-  factory MemNotificationType.fromName(String name) {
-    if (name == MemNotificationType.repeat.name) {
-      return MemNotificationType.repeat;
-    } else if (name == MemNotificationType.afterActStarted.name) {
-      return MemNotificationType.afterActStarted;
-    }
-
-    throw Exception('Unexpected name: "$name".');
-  }
+  factory MemNotificationType.fromName(String name) =>
+      MemNotificationType.values.singleWhere(
+        (element) => element.name == name,
+        orElse: () => throw Exception('Unexpected name: "$name".'),
+      );
 }

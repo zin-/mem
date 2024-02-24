@@ -1,10 +1,7 @@
 import 'dart:convert';
-
-import 'package:mem/core/date_and_time/time_of_day.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/mem.dart';
-
 import 'client.dart';
 import 'mem_notifications.dart';
 import 'notification/cancel_notification.dart';
@@ -16,14 +13,14 @@ class NotificationService {
   final NotificationRepository _notificationRepository;
 
   // FIXME ここにあるのはおかしい
-  final NotificationClient _notificationClient;
+  final NotificationClientV2 _notificationClient;
 
-  Future<void> memReminder(SavedMem mem) => i(
+  Future<void> memReminder(SavedMem mem) => v(
         () async {
           final memNotifications = MemNotifications.of(
             mem,
             // TODO 時間がないときのデフォルト値を設定から取得する
-            TimeOfDay(5, 0),
+            5, 0,
           );
 
           for (var element in memNotifications) {
@@ -37,7 +34,7 @@ class NotificationService {
     SavedMem mem,
     MemNotification? memNotification,
   ) =>
-      i(
+      v(
         () async {
           if (memNotification == null) {
             await _notificationRepository.receive(
@@ -45,14 +42,19 @@ class NotificationService {
             );
           } else {
             final now = DateTime.now();
-            final timeOfDay = TimeOfDay.fromSeconds(memNotification.time!);
+            final hours = (memNotification.time! / 60 / 60).floor();
+            final minutes =
+                ((memNotification.time! - hours * 60 * 60) / 60).floor();
+            final seconds =
+                ((memNotification.time! - ((hours * 60) + minutes) * 60) / 60)
+                    .floor();
             var notifyFirstAt = DateTime(
               now.year,
               now.month,
               now.day,
-              timeOfDay.hour,
-              timeOfDay.minute,
-              timeOfDay.second,
+              hours,
+              minutes,
+              seconds,
             );
             if (notifyFirstAt.isBefore(now)) {
               notifyFirstAt = notifyFirstAt.add(const Duration(days: 1));
@@ -83,5 +85,5 @@ class NotificationService {
   static NotificationService? _instance;
 
   factory NotificationService() => _instance ??=
-      NotificationService._(NotificationRepository(), NotificationClient());
+      NotificationService._(NotificationRepository(), NotificationClientV2());
 }

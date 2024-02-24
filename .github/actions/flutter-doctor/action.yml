@@ -1,0 +1,9 @@
+name: "Flutter doctor"
+description: "Check flutter status."
+
+runs:
+  using: "composite"
+
+  steps:
+    - run: flutter doctor -v
+      shell: bash

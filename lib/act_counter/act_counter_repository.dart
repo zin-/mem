@@ -11,7 +11,7 @@ const methodChannelName = 'zin.playground.mem/act_counter';
 const initializeMethodName = 'initialize';
 const widgetProviderName = 'ActCounterProvider';
 
-class ActCounterRepository extends Repository<ActCounter, void> {
+class ActCounterRepository extends RepositoryV1<ActCounter, void> {
   final HomeWidgetAccessor? _homeWidgetAccessor;
 
   @override

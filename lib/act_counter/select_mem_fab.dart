@@ -13,8 +13,8 @@ class SelectMemFab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedMemIds = ref.watch(selectedMemIdsProvider);
     return _SelectMemComponent(
-      selectedMemIds?.isNotEmpty ?? false,
-      () => ref.read(selectMem((selectedMemIds?.single)!)),
+      selectedMemIds.isNotEmpty,
+      () => ref.read(selectMem((selectedMemIds.single))),
     );
   }
 }

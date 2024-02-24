@@ -6,6 +6,8 @@ import 'package:mem/mems/detail/actions.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/values/durations.dart';
 
+const Key keySaveMemFab = Key("save-mem");
+
 class MemDetailFab extends ConsumerWidget {
   final GlobalKey<FormState> _formKey;
   final int? _memId;
@@ -37,6 +39,7 @@ class _MemDetailFabComponent extends StatelessWidget {
           final l10n = buildL10n(context);
 
           return FloatingActionButton(
+            key: keySaveMemFab,
             child: const Icon(Icons.save_alt),
             onPressed: () => v(() {
               if (_formKey.currentState?.validate() ?? false) {

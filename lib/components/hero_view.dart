@@ -12,6 +12,7 @@ class HeroView extends StatelessWidget {
         () => Hero(
           tag: _tag,
           child: Material(
+            color: Colors.transparent,
             child: _child,
           ),
         ),

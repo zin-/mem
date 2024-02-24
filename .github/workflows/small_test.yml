@@ -25,6 +25,8 @@ jobs:
         with:
           channel: ${{ inputs.flutter-channel }}
           cache: true
+      - name: "Flutter doctor"
+        uses: ./.github/actions/flutter-doctor
 
       - name: "Install Dependencies"
         uses: ./.github/actions/install-dependencies
@@ -37,18 +39,17 @@ jobs:
           flutter test
           --file-reporter json:reports/test_report.log
           --coverage
+        continue-on-error: true
 
-      - if: always()
-        name: "Report"
+      - name: "Report"
         uses: dorny/test-reporter@v1
         with:
           name: "Report (Small test)"
           path: "reports/test_report.log"
           reporter: "flutter-json"
-          fail-on-error: false
-          fail-on-empty: false
-      - if: always()
-        name: "Upload coverage"
+          fail-on-error: true
+          fail-on-empty: true
+      - name: "Upload coverage"
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

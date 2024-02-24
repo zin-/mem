@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/components/async_value_view.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/detail/actions.dart';
 import 'package:mem/mems/detail/states.dart';
+import 'package:mem/mems/mem_item.dart';
+
+const keyMemMemo = Key("mem-memo");
 
 class MemItemsFormFields extends ConsumerWidget {
   final int? _memId;
@@ -13,31 +14,30 @@ class MemItemsFormFields extends ConsumerWidget {
   const MemItemsFormFields(this._memId, {super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => AsyncValueView(
-        loadMemItems(_memId),
-        (data) => _MemItemsFormFieldsComponent(
-          ref.watch(memDetailProvider(_memId)).memItems,
-          (value, memItem) => v(
-            () {
-              ref.watch(memItemsProvider(_memId).notifier).upsertAll(
-                [memItem.copiedWith(value: () => value)],
-                (tmp, item) => tmp.type == item.type &&
-                        (tmp is SavedMemItem && item is SavedMemItem)
-                    ? tmp.id == item.id
-                    : true,
-              );
-            },
-            {value, memItem},
-          ),
+  Widget build(BuildContext context, WidgetRef ref) => _MemItemsFormFields(
+        ref.watch(memItemsByMemIdProvider(_memId)),
+        (entered, previous) => v(
+          () {
+            return ref.read(memItemsByMemIdProvider(_memId).notifier).upsertAll(
+              [previous.copiedWith(value: () => entered)],
+              (current, updating) {
+                return current.type == updating.type &&
+                        (current is SavedMemItem && updating is SavedMemItem)
+                    ? current.id == updating.id
+                    : true;
+              },
+            );
+          },
+          {"entered": entered, "previous": previous},
         ),
       );
 }
 
-class _MemItemsFormFieldsComponent extends StatelessWidget {
+class _MemItemsFormFields extends StatelessWidget {
   final List<MemItem> _memItems;
-  final Function(dynamic value, MemItem memItem) _onChanged;
+  final Function(dynamic entered, MemItem previous) _onChanged;
 
-  const _MemItemsFormFieldsComponent(this._memItems, this._onChanged);
+  const _MemItemsFormFields(this._memItems, this._onChanged);
 
   @override
   Widget build(BuildContext context) => v(
@@ -48,6 +48,7 @@ class _MemItemsFormFieldsComponent extends StatelessWidget {
             children: [
               ..._memItems.map(
                 (memItem) => TextFormField(
+                  key: keyMemMemo,
                   decoration: InputDecoration(
                     icon: const Icon(Icons.subject),
                     labelText: l10n.memMemoLabel,
@@ -60,6 +61,6 @@ class _MemItemsFormFieldsComponent extends StatelessWidget {
             ],
           );
         },
-        _memItems,
+        {"_memItems": _memItems},
       );
 }

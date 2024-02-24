@@ -1,7 +1,7 @@
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/framework/repository/entity.dart';
 
-mixin SavedDatabaseTupleMixin<T> on Entity {
+mixin SavedDatabaseTupleMixin<T> on EntityV1 {
   late T id;
   late DateTime createdAt;
   DateTime? updatedAt;
@@ -30,4 +30,7 @@ mixin SavedDatabaseTupleMixin<T> on Entity {
     ..createdAt = origin.createdAt
     ..updatedAt = origin.updatedAt
     ..archivedAt = origin.archivedAt;
+
+  @override
+  String toString() => "${super.toString()}${unpack()}";
 }

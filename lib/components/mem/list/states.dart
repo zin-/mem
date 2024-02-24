@@ -36,8 +36,7 @@ final showDoneProvider = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
 
 final memListProvider = StateNotifierProvider.autoDispose<
     ValueStateNotifier<List<SavedMem>>, List<SavedMem>>((ref) {
-  final rawMemList =
-      ref.watch(memsProvider)?.map((e) => e as SavedMem) ?? <SavedMem>[];
+  final rawMemList = ref.watch(memsProvider).map((e) => e as SavedMem);
 
   final showNotArchived = ref.watch(showNotArchivedProvider);
   final showArchived = ref.watch(showArchivedProvider);
@@ -78,9 +77,9 @@ final memListProvider = StateNotifierProvider.autoDispose<
   final sorted = v(
     () => filtered.sorted((a, b) {
       final activeActOfA =
-          activeActs?.singleWhereOrNull((act) => act.memId == a.id);
+          activeActs.singleWhereOrNull((act) => act.memId == a.id);
       final activeActOfB =
-          activeActs?.singleWhereOrNull((act) => act.memId == b.id);
+          activeActs.singleWhereOrNull((act) => act.memId == b.id);
       if ((activeActOfA == null) ^ (activeActOfB == null)) {
         return activeActOfA == null ? 1 : -1;
       } else if (activeActOfA != null && activeActOfB != null) {
@@ -112,11 +111,8 @@ final memListProvider = StateNotifierProvider.autoDispose<
 });
 
 final activeActsProvider = StateNotifierProvider.autoDispose<
-    ListValueStateNotifier<SavedAct>, List<SavedAct>?>(
+    ListValueStateNotifier<SavedAct>, List<SavedAct>>(
   (ref) => v(() => ListValueStateNotifier(
-        ref
-            .watch(actsProvider)
-            ?.where((act) => act.period.end == null)
-            .toList(),
+        ref.watch(actsProvider).where((act) => act.period.end == null).toList(),
       )),
 );

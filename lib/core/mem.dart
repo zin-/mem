@@ -1,7 +1,7 @@
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/repository/entity.dart';
 
-class Mem extends Entity {
+class Mem extends EntityV1 {
   final String name;
   final DateTime? doneAt;
   final DateAndTimePeriod? period;
@@ -9,6 +9,8 @@ class Mem extends Entity {
   Mem(this.name, this.doneAt, this.period);
 
   bool get isDone => doneAt != null;
+
+  factory Mem.defaultNew() => Mem("", null, null);
 
   Mem copiedWith({
     String Function()? name,
@@ -20,4 +22,11 @@ class Mem extends Entity {
         doneAt == null ? this.doneAt : doneAt(),
         period == null ? this.period : period(),
       );
+
+  @override
+  String toString() => "${super.toString()}: ${{
+        "name": name,
+        "doneAt": doneAt,
+        "period": period,
+      }}";
 }

@@ -3,7 +3,7 @@ import 'package:mem/framework/repository/repository.dart';
 import 'log_entity.dart';
 import 'logger_wrapper.dart';
 
-class LogRepository extends Repository<Log, void> {
+class LogRepository extends RepositoryV1<Log, void> {
   LoggerWrapper _loggerWrapper;
 
   @override

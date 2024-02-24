@@ -5,17 +5,17 @@ import 'package:mem/core/act.dart';
 import 'package:mem/logger/log_service.dart';
 
 final actsProvider =
-    StateNotifierProvider<ListValueStateNotifier<SavedAct>, List<SavedAct>?>(
-  (ref) => v(() => ListValueStateNotifier(null)),
+    StateNotifierProvider<ListValueStateNotifier<SavedAct>, List<SavedAct>>(
+  (ref) => v(() => ListValueStateNotifier([])),
 );
 
 final actListProvider = StateNotifierProvider.autoDispose
-    .family<ListValueStateNotifier<Act>, List<Act>?, int?>(
+    .family<ListValueStateNotifier<Act>, List<Act>, int?>(
   (ref, memId) => v(
     () => ListValueStateNotifier(
       ref
           .watch(actsProvider)
-          ?.where((act) => memId == null || act.memId == memId)
+          .where((act) => memId == null || act.memId == memId)
           .toList()
           .sorted((a, b) => b.period.compareTo(a.period)),
     ),

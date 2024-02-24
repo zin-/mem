@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/core/mem.dart';
@@ -7,27 +8,34 @@ import 'package:mem/components/value_state_notifier.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/mem.dart';
+import 'package:mem/repositories/mem_repository.dart';
 
 final memsProvider =
-    StateNotifierProvider<ListValueStateNotifier<Mem>, List<Mem>?>(
-  (ref) => v(() => ListValueStateNotifier<Mem>(null)),
+    StateNotifierProvider<ListValueStateNotifier<Mem>, List<Mem>>(
+  (ref) => v(() => ListValueStateNotifier<Mem>([])),
 );
-final memProvider = StateNotifierProvider.autoDispose
-    .family<ValueStateNotifier<SavedMem?>, SavedMem?, int>(
-  (ref, memId) => v(
-    () => ValueStateNotifier(
-      ref
-              .read(memsProvider)
-              ?.singleWhere((mem) => mem is SavedMem && mem.id == memId)
-          as SavedMem?,
-    ),
-    {"memId": memId},
+final memItemsProvider =
+    StateNotifierProvider<ListValueStateNotifier<MemItem>, List<MemItem>>(
+  (ref) => v(
+    () => ListValueStateNotifier([]),
   ),
 );
-
 final memNotificationsProvider = StateNotifierProvider<
-    ListValueStateNotifier<MemNotification>, List<MemNotification>?>(
-  (ref) => v(() => ListValueStateNotifier(null)),
+    ListValueStateNotifier<MemNotification>, List<MemNotification>>(
+  (ref) => v(() => ListValueStateNotifier([])),
+);
+
+final memByMemIdProvider = StateNotifierProvider.autoDispose
+    .family<ValueStateNotifier<SavedMem?>, SavedMem?, int?>(
+  (ref, memId) => v(
+    () => ValueStateNotifier(
+      ref.read(memsProvider).singleWhereOrNull(
+            (element) => element is SavedMem ? element.id == memId : false,
+          ) as SavedMem?,
+      initialFuture: memId == null ? null : MemRepository().shipById(memId),
+    ),
+    memId,
+  ),
 );
 
 final removedMemDetailProvider = StateNotifierProvider.autoDispose
@@ -49,6 +57,7 @@ final removedMemDetailProvider = StateNotifierProvider.autoDispose
 
       return ValueStateNotifier(removedMemDetail);
     },
+    memId,
   ),
 );
 final removedMemProvider =

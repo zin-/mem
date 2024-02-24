@@ -64,7 +64,7 @@ const memIdParamName = 'mem_id';
 
 Future<void> backgroundCallback(Uri? uri) => i(
       () async {
-        NotificationClient();
+        NotificationClientV2();
 
         if (uri != null && uri.scheme == uriSchema && uri.host == appId) {
           await openDatabase();

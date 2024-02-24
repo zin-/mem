@@ -1,12 +1,24 @@
 import 'package:mem/components/value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
 
-class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>?> {
-  ListValueStateNotifier(super.state);
+class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
+  ListValueStateNotifier(
+    super.state, {
+    Future<List<T>>? initialFuture,
+  }) {
+    initialFuture?.then(
+      (value) => v(
+        () => mounted
+            ? updatedBy(value)
+            : warn("${super.toString()}. No update."),
+        value,
+      ),
+    );
+  }
 
   void add(T item, {int? index}) => v(
         () {
-          final tmp = List.of(state ?? <T>[]);
+          final tmp = List.of(state);
 
           tmp.insert(index ?? tmp.length, item);
 
@@ -15,11 +27,15 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>?> {
         {'item': item},
       );
 
-  void upsertAll(Iterable<T> items, bool Function(T tmp, T item) where) => v(
+  List<T> upsertAll(
+    Iterable<T> updatingItems,
+    bool Function(T current, T updating) where,
+  ) =>
+      v(
         () {
-          final tmp = List.of(state ?? <T>[]);
+          final tmp = List.of(state);
 
-          for (var item in items) {
+          for (var item in updatingItems) {
             final index = tmp.indexWhere(
               (tmpElement) => where(tmpElement, item),
             );
@@ -30,16 +46,16 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>?> {
             }
           }
 
-          updatedBy(tmp);
+          return updatedBy(tmp);
         },
-        {'items': items},
+        {"updatingItems": updatingItems},
       );
 
   void removeWhere(bool Function(T element) test) => v(
         () {
-          final tmp = List.of(state ?? <T>[]);
+          final tmp = List.of(state);
 
-          final index = state?.indexWhere(test) ?? -1;
+          final index = state.indexWhere(test);
           if (index != -1) {
             tmp.removeAt(index);
           }

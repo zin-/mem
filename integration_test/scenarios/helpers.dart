@@ -45,6 +45,7 @@ final clearIconFinder = find.byIcon(Icons.clear);
 final searchIconFinder = find.byIcon(Icons.search);
 final closeIconFinder = find.byIcon(Icons.close);
 final filterListIconFinder = find.byIcon(Icons.filter_list);
+final menuButtonIconFinder = find.byIcon(Icons.more_vert);
 
 final okFinder = find.text('OK');
 final cancelFinder = find.text('Cancel');
@@ -64,7 +65,7 @@ final memMemoOnDetailPageFinder = find.byType(TextFormField).at(6);
 
 // Constants
 const waitShowSoftwareKeyboardDuration = Duration(milliseconds: 400);
-const waitSideEffectDuration = Duration(milliseconds: 1500);
+const waitSideEffectDuration = Duration(milliseconds: 1400);
 final zeroDate = DateTime(0);
 const datePlaceHolder = "M/d/y";
 
