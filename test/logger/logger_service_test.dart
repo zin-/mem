@@ -8,7 +8,7 @@ import '../helpers.dart';
 
 void main() {
   final mockedLoggerWrapper = MockLoggerWrapper();
-  LogRepositoryV1(mockedLoggerWrapper);
+  LogRepository(mockedLoggerWrapper);
 
   LogService.initialize(Level.info);
 

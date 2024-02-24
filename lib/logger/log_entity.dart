@@ -36,13 +36,13 @@ import 'package:mem/framework/repository/entity.dart';
 // 言葉の意味としては「丸太を投げ込め！」という号令で、「航海開始」を表す
 //
 // 航海日誌においては、最初の記録ということになる
-class LogV1 extends EntityV1 {
+class Log extends Entity {
   final Level level;
   final String message;
   final dynamic error;
   final StackTrace? stackTrace;
 
-  LogV1(
+  Log(
     this.level,
     dynamic message,
     this.error,
