@@ -79,6 +79,44 @@ void main() {
         },
       );
 
+      test(
+        ": is Set",
+        () {
+          const level = Level.info;
+          const target = {1, 2, 3};
+
+          final result = LogService().valueLog(level, target);
+
+          expect(result, target);
+
+          verify(mockedLoggerWrapper.log(
+            level,
+            "{\n  1\n  , 2\n  , 3\n}",
+            null,
+            null,
+          )).called(1);
+        },
+      );
+
+      test(
+        ": is Map",
+        () {
+          const level = Level.info;
+          const target = {"a": 1, "b": 2, "c": 3};
+
+          final result = LogService().valueLog(level, target);
+
+          expect(result, target);
+
+          verify(mockedLoggerWrapper.log(
+            level,
+            "{\n  a: 1\n  , b: 2\n  , c: 3\n}",
+            null,
+            null,
+          )).called(1);
+        },
+      );
+
       group(": is Future", () {
         test(": no await.", () {
           const level = Level.info;

@@ -68,7 +68,13 @@ class LogService {
                     .replaceAll("[", "[\n  ")
                     .replaceAll(", ", "\n  , ")
                     .replaceAll("]", "\n]")
-                : target;
+                : target is Set || target is Map
+                    ? target
+                        .toString()
+                        .replaceAll("{", "{\n  ")
+                        .replaceAll(", ", "\n  , ")
+                        .replaceAll("}", "\n}")
+                    : target;
 
         _repository.receive(Log(
           tmpLevel,
