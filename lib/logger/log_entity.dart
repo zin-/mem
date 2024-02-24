@@ -44,10 +44,10 @@ class Log extends Entity {
 
   Log(
     this.level,
-    dynamic message,
+    this.message,
     this.error,
     this.stackTrace,
-  ) : message = message?.toString() ?? "no message";
+  );
 }
 
 enum Level {

@@ -43,8 +43,8 @@ void main() {
       }
     });
 
-    group(": focus target", () {
-      test(": target is null.", () {
+    group(": target", () {
+      test(": is null.", () {
         const level = Level.info;
         const target = null;
 
@@ -54,14 +54,14 @@ void main() {
 
         verify(mockedLoggerWrapper.log(
           level,
-          "no message.",
+          "null",
           null,
           null,
         )).called(1);
       });
 
-      group(": target is Future", () {
-        test(": sync.", () {
+      group(": is Future", () {
+        test(": no await.", () {
           const level = Level.info;
           const value = "test message future";
           final target = Future.value(value);
@@ -73,7 +73,7 @@ void main() {
           verifyNever(mockedLoggerWrapper.log(any, any, any, any));
         });
 
-        test(": async.", () async {
+        test(": await.", () async {
           const level = Level.info;
           const value = "test message future";
           final target = Future.value(value);
@@ -96,7 +96,7 @@ void main() {
         });
 
         test(
-          ": error.",
+          ": on error.",
           () async {
             const level = Level.info;
             const errorMessage = "test message future";

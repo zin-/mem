@@ -64,7 +64,7 @@ class LogService {
           tmpLevel,
           [
             tmpPrefixes.join(),
-            target ?? "no message.",
+            target ?? "null",
           ].join(),
           null,
           stackTrace,
