@@ -261,19 +261,13 @@ void testRepeatedHabitScenario() => group(
 
               await widgetTester.pageBack();
               await widgetTester.pumpAndSettle();
-              const enteringMemName =
-                  "$_scenarioName: Save: update - entering - mem name";
-              await widgetTester.enterText(
-                find.byKey(keyMemName),
-                enteringMemName,
-              );
               await widgetTester.tap(find.byKey(keySaveMemFab));
               await widgetTester.pump(waitSideEffectDuration);
 
               final savedMem = (await dbA.select(
                 defTableMems,
                 where: "${defColMemsName.name} = ?",
-                whereArgs: [enteringMemName],
+                whereArgs: [insertedMemName],
               ))
                   .single;
               final savedMemNotification = (await dbA.select(
