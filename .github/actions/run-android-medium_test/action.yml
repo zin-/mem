@@ -53,6 +53,9 @@ runs:
       #          android-device-profile: Pixel 5
       continue-on-error: ${{ inputs.experimental }}
 
+    - run: echo ${{ inputs.experimental }}
+      shell: bash
+
     - if: inputs.android-emulator-runner == 'native'
       id: run-android-medium_test-via-native
       name: "Run Android Medium Test via native"
