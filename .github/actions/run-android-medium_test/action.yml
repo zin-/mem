@@ -62,7 +62,7 @@ runs:
         android-api-level: ${{ inputs.android-api-level }}
         android-target: ${{ inputs.android-target }}
         android-arch: ${{ inputs.android-arch }}
-      continue-on-error: ${{ inputs.experimental == "true" }}
+      continue-on-error: ${{ inputs.experimental == 'true' }}
 
     - if: matrix.android-emulator-runner == 'malinskiy'
       name: "Set Result (malinskiy)"
