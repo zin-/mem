@@ -16,23 +16,23 @@ void main() {
     reset(mockedLoggerWrapper);
   });
 
-  group('valueLog', () {
+  group("valueLog", () {
     setUpAll(() {
       when(mockedLoggerWrapper.log(any, any, any, any)).thenReturn(null);
     });
 
-    group(': on service level is info', () {
+    group(": on service level is info", () {
       for (final testCase in [
-        TestCase('verbose', Level.verbose, (Level input) {
+        TestCase("verbose", Level.verbose, (Level input) {
           verifyNever(mockedLoggerWrapper.log(any, any, any, any));
         }),
-        TestCase('info', Level.info, (Level input) {
+        TestCase("info", Level.info, (Level input) {
           verify(mockedLoggerWrapper.log(input, any, null, null)).called(1);
         }),
       ]) {
-        test(': log level is ${testCase.name}.', () {
+        test(": log level is ${testCase.name}.", () {
           final level = testCase.input;
-          const target = 'log: test message';
+          const target = "log: test message";
 
           final result = LogService().valueLog(level, target);
 
@@ -43,8 +43,8 @@ void main() {
       }
     });
 
-    group(': focus target', () {
-      test(': target is null.', () {
+    group(": focus target", () {
+      test(": target is null.", () {
         const level = Level.info;
         const target = null;
 
@@ -54,16 +54,16 @@ void main() {
 
         verify(mockedLoggerWrapper.log(
           level,
-          'no message.',
+          "no message.",
           null,
           null,
         )).called(1);
       });
 
-      group(': target is Future', () {
-        test(': sync.', () {
+      group(": target is Future", () {
+        test(": sync.", () {
           const level = Level.info;
-          const value = 'test message future';
+          const value = "test message future";
           final target = Future.value(value);
 
           final result = LogService().valueLog(level, target);
@@ -73,9 +73,9 @@ void main() {
           verifyNever(mockedLoggerWrapper.log(any, any, any, any));
         });
 
-        test(': async.', () async {
+        test(": async.", () async {
           const level = Level.info;
-          const value = 'test message future';
+          const value = "test message future";
           final target = Future.value(value);
 
           final result = await LogService().valueLog(level, target);
@@ -85,7 +85,7 @@ void main() {
           expect(
             verify(mockedLoggerWrapper.log(
               level,
-              '[future] >> $value',
+              "[future] >> $value",
               captureAny,
               any,
             )).captured,
@@ -96,10 +96,10 @@ void main() {
         });
 
         test(
-          ': error.',
+          ": error.",
           () async {
             const level = Level.info;
-            const errorMessage = 'test message future';
+            const errorMessage = "test message future";
             final e = Exception(errorMessage);
 
             expect(
@@ -114,7 +114,7 @@ void main() {
             await Future(() async {
               verify(mockedLoggerWrapper.log(
                 Level.error,
-                '[error] !!',
+                "[error] !!",
                 e,
                 any,
               )).called(1);
@@ -124,30 +124,30 @@ void main() {
       });
     });
 
-    group(': alias', () {
+    group(": alias", () {
       for (final testCase in [
-        TestCase('verbose', verbose, (input) {
+        TestCase("verbose", verbose, (input) {
           verifyNever(mockedLoggerWrapper.log(any, any, any, any));
         }),
-        TestCase('info', info, (input) {
-          verify(mockedLoggerWrapper.log(Level.info, 'info', null, null))
+        TestCase("info", info, (input) {
+          verify(mockedLoggerWrapper.log(Level.info, "info", null, null))
               .called(1);
         }),
-        TestCase('warn', warn, (input) {
-          verify(mockedLoggerWrapper.log(Level.warning, 'warn', null, null))
+        TestCase("warn", warn, (input) {
+          verify(mockedLoggerWrapper.log(Level.warning, "warn", null, null))
               .called(1);
         }),
         TestCase(
-          'debug',
+          "debug",
           // ignore: deprecated_member_use_from_same_package
           debug,
           (input) {
-            verify(mockedLoggerWrapper.log(Level.debug, 'debug', null, null))
+            verify(mockedLoggerWrapper.log(Level.debug, "debug", null, null))
                 .called(1);
           },
         ),
       ]) {
-        test(': ${testCase.name}', () {
+        test(": ${testCase.name}", () {
           final testMessage = testCase.name;
 
           final result = testCase.input(testMessage);
@@ -160,9 +160,9 @@ void main() {
     });
   });
 
-  group('functionLog', () {
-    group(': sync', () {
-      test(': returns.', () {
+  group("functionLog", () {
+    group(": sync", () {
+      test(": returns.", () {
         const level = Level.info;
         const arg1 = 1;
         const arg2 = 2;
@@ -181,23 +181,23 @@ void main() {
 
         verify(mockedLoggerWrapper.log(
           level,
-          '[start] :: $args',
+          "[start] :: $args",
           null,
           null,
         )).called(1);
         verify(mockedLoggerWrapper.log(
           level,
-          '[end] => ${sampleFunc(arg1, arg2)}',
+          "[end] => ${sampleFunc(arg1, arg2)}",
           null,
           null,
         )).called(1);
       });
-      test(': throws.', () {
+      test(": throws.", () {
         const level = Level.info;
         const arg1 = 1;
         const arg2 = 2;
         const args = [arg1, arg2];
-        final e = Exception('test exception :: functionLog: sync: throws');
+        final e = Exception("test exception :: functionLog: sync: throws");
         int sampleFunc(int a, int b) {
           throw e;
         }
@@ -213,31 +213,31 @@ void main() {
 
         verify(mockedLoggerWrapper.log(
           level,
-          '[start] :: $args',
+          "[start] :: $args",
           null,
           null,
         )).called(1);
         verify(mockedLoggerWrapper.log(
           Level.error,
-          '[error] !!',
+          "[error] !!",
           e,
           any,
         )).called(1);
       });
 
-      group(': auto debug', () {
-        group(': cascading val', () {
-          test(': that is sync.', () {
+      group(": auto debug", () {
+        group(": cascading val", () {
+          test(": that is sync.", () {
             const level = Level.debug;
             const arg1 = 1;
             const arg2 = 2;
             const args = [arg1, arg2];
             int sampleFunc(int a, int b) {
-              LogService().valueLog(Level.verbose, 'verbose log');
+              LogService().valueLog(Level.verbose, "verbose log");
               return a + b;
             }
 
-            LogService().valueLog(Level.verbose, 'verbose log');
+            LogService().valueLog(Level.verbose, "verbose log");
 
             final result = LogService().functionLog(
               level,
@@ -256,26 +256,26 @@ void main() {
               )).captured,
               [
                 Level.debug,
-                '[start] :: $args',
+                "[start] :: $args",
                 Level.debug,
-                '** [AUTO DEBUG] ** verbose log',
+                "** [AUTO DEBUG] ** verbose log",
                 Level.debug,
-                '[end] => ${sampleFunc(arg1, arg2)}',
+                "[end] => ${sampleFunc(arg1, arg2)}",
               ],
             );
           });
-          test(': that is future.', () async {
+          test(": that is future.", () async {
             const level = Level.debug;
             const arg1 = 1;
             const arg2 = 2;
             const args = [arg1, arg2];
             int sampleFunc(int a, int b) {
               LogService()
-                  .valueLog(Level.verbose, Future.value('future verbose log'));
+                  .valueLog(Level.verbose, Future.value("future verbose log"));
               return a + b;
             }
 
-            LogService().valueLog(Level.verbose, 'verbose log - do not log');
+            LogService().valueLog(Level.verbose, "verbose log - do not log");
 
             final result = LogService().functionLog(
               level,
@@ -295,19 +295,19 @@ void main() {
                 )).captured,
                 [
                   Level.debug,
-                  '[start] :: $args',
+                  "[start] :: $args",
                   Level.debug,
-                  '[end] => ${sampleFunc(arg1, arg2)}',
+                  "[end] => ${sampleFunc(arg1, arg2)}",
                   Level.debug,
-                  '** [AUTO DEBUG] ** [future] >> future verbose log',
+                  "** [AUTO DEBUG] ** [future] >> future verbose log",
                 ],
               );
             });
           });
         });
 
-        group(': cascading function', () {
-          test(': that returns sync.', () {
+        group(": cascading function", () {
+          test(": that returns sync.", () {
             const level = Level.debug;
             const arg1 = 2;
             const arg2 = 3;
@@ -318,7 +318,7 @@ void main() {
                   () {
                     return c * d;
                   },
-                  {'c': c, 'd': d},
+                  {"c": c, "d": d},
                 );
 
             int sampleFunc(int a, int b) {
@@ -345,17 +345,17 @@ void main() {
               )).captured,
               [
                 Level.debug,
-                '[start] :: [2, 3]',
+                "[start] :: [2, 3]",
                 Level.debug,
-                '** [AUTO DEBUG] ** [start] :: {c: 2, d: 3}',
+                "** [AUTO DEBUG] ** [start] :: {c: 2, d: 3}",
                 Level.debug,
-                '** [AUTO DEBUG] ** [end] => 6',
+                "** [AUTO DEBUG] ** [end] => 6",
                 Level.debug,
-                '[end] => 8',
+                "[end] => 8",
               ],
             );
           });
-          test(': that returns future.', () async {
+          test(": that returns future.", () async {
             const level = Level.debug;
             const arg1 = 2;
             const arg2 = 3;
@@ -366,7 +366,7 @@ void main() {
                   () async {
                     return c * d;
                   },
-                  {'c': c, 'd': d},
+                  {"c": c, "d": d},
                 );
 
             int sampleFunc(int a, int b) {
@@ -394,11 +394,11 @@ void main() {
                 )).captured,
                 [
                   Level.debug,
-                  '[start] :: [2, 3]',
+                  "[start] :: [2, 3]",
                   Level.debug,
-                  '** [AUTO DEBUG] ** [start] :: {c: 2, d: 3}',
+                  "** [AUTO DEBUG] ** [start] :: {c: 2, d: 3}",
                   Level.debug,
-                  '[end] => 5',
+                  "[end] => 5",
                 ],
               );
             });
@@ -409,8 +409,8 @@ void main() {
       });
     });
 
-    group(': async', () {
-      test(': returns.', () async {
+    group(": async", () {
+      test(": returns.", () async {
         const level = Level.info;
         const arg1 = 1;
         const arg2 = 2;
@@ -429,24 +429,24 @@ void main() {
 
         verify(mockedLoggerWrapper.log(
           level,
-          '[start] :: $args',
+          "[start] :: $args",
           null,
           null,
         )).called(1);
         verify(mockedLoggerWrapper.log(
           level,
-          '[end] => [future] >> ${await sampleFunc(arg1, arg2)}',
+          "[end] => [future] >> ${await sampleFunc(arg1, arg2)}",
           any,
           any,
         )).called(1);
       });
-      test(': throws.', () async {
+      test(": throws.", () async {
         const level = Level.info;
         const arg1 = 1;
         const arg2 = 2;
         const args = [arg1, arg2];
         const errorMessage =
-            'test exception :: functionLog: return type is future: throws';
+            "test exception :: functionLog: return type is future: throws";
         final e = Exception(errorMessage);
         Future<int> sampleFunc(int a, int b) async {
           throw e;
@@ -475,30 +475,30 @@ void main() {
             )).captured,
             [
               Level.info,
-              '[start] :: [1, 2]',
+              "[start] :: [1, 2]",
               null,
               Level.error,
-              '[error] !!',
+              "[error] !!",
               e,
             ],
           );
         });
       });
 
-      group(': auto debug', () {
-        group(': cascading val', () {
-          test(': that is future.', () async {
+      group(": auto debug", () {
+        group(": cascading val", () {
+          test(": that is future.", () async {
             const level = Level.debug;
             const arg1 = 1;
             const arg2 = 2;
             const args = [arg1, arg2];
             Future<int> sampleFunc(int a, int b) async {
               LogService()
-                  .valueLog(Level.verbose, Future.value('future verbose log'));
+                  .valueLog(Level.verbose, Future.value("future verbose log"));
               return a + b;
             }
 
-            LogService().valueLog(Level.verbose, 'verbose log - do not log');
+            LogService().valueLog(Level.verbose, "verbose log - do not log");
 
             final result = await LogService().functionLog(
               level,
@@ -518,19 +518,19 @@ void main() {
                 )).captured,
                 [
                   Level.debug,
-                  '[start] :: [1, 2]',
+                  "[start] :: [1, 2]",
                   Level.debug,
-                  '** [AUTO DEBUG] ** [future] >> future verbose log',
+                  "** [AUTO DEBUG] ** [future] >> future verbose log",
                   Level.debug,
-                  '[end] => [future] >> 3',
+                  "[end] => [future] >> 3",
                 ],
               );
             });
           });
         });
 
-        group(': cascading function', () {
-          test(': that returns future.', () async {
+        group(": cascading function", () {
+          test(": that returns future.", () async {
             const level = Level.debug;
             const arg1 = 2;
             const arg2 = 3;
@@ -541,7 +541,7 @@ void main() {
                   () async {
                     return c * d;
                   },
-                  {'c': c, 'd': d},
+                  {"c": c, "d": d},
                 );
 
             Future<int> sampleFunc(int a, int b) async {
@@ -568,13 +568,13 @@ void main() {
                 )).captured,
                 [
                   Level.debug,
-                  '[start] :: [2, 3]',
+                  "[start] :: [2, 3]",
                   Level.debug,
-                  '** [AUTO DEBUG] ** [start] :: {c: 2, d: 3}',
+                  "** [AUTO DEBUG] ** [start] :: {c: 2, d: 3}",
                   Level.debug,
-                  '** [AUTO DEBUG] ** [end] => [future] >> 6',
+                  "** [AUTO DEBUG] ** [end] => [future] >> 6",
                   Level.debug,
-                  '[end] => [future] >> 8',
+                  "[end] => [future] >> 8",
                 ],
               );
             });
@@ -585,41 +585,41 @@ void main() {
       });
     });
 
-    group(': alias', () {
+    group(": alias", () {
       for (final testCase in [
-        TestCase('v', v, (input) {
+        TestCase("v", v, (input) {
           verifyNever(mockedLoggerWrapper.log(any, any, any, any));
         }),
-        TestCase('i', i, (input) {
+        TestCase("i", i, (input) {
           verify(mockedLoggerWrapper.log(
-                  Level.info, '[start] :: null', null, null))
+                  Level.info, "[start] :: null", null, null))
               .called(1);
-          verify(mockedLoggerWrapper.log(Level.info, '[end] => i', null, null))
+          verify(mockedLoggerWrapper.log(Level.info, "[end] => i", null, null))
               .called(1);
         }),
-        TestCase('w', w, (input) {
+        TestCase("w", w, (input) {
           verify(mockedLoggerWrapper.log(
-                  Level.warning, '[start] :: null', null, null))
+                  Level.warning, "[start] :: null", null, null))
               .called(1);
           verify(mockedLoggerWrapper.log(
-                  Level.warning, '[end] => w', null, null))
+                  Level.warning, "[end] => w", null, null))
               .called(1);
         }),
         TestCase(
-          'd',
+          "d",
           // ignore: deprecated_member_use_from_same_package
           d,
           (input) {
             verify(mockedLoggerWrapper.log(
-                    Level.debug, '[start] :: null', null, null))
+                    Level.debug, "[start] :: null", null, null))
                 .called(1);
             verify(mockedLoggerWrapper.log(
-                    Level.debug, '[end] => d', null, null))
+                    Level.debug, "[end] => d", null, null))
                 .called(1);
           },
         ),
       ]) {
-        test(': ${testCase.name}', () {
+        test(": ${testCase.name}", () {
           final testMessage = testCase.name;
 
           final result = testCase.input(() {

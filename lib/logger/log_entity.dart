@@ -47,7 +47,7 @@ class Log extends Entity {
     dynamic message,
     this.error,
     this.stackTrace,
-  ) : message = message?.toString() ?? 'no message';
+  ) : message = message?.toString() ?? "no message";
 }
 
 enum Level {
