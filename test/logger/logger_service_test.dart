@@ -60,6 +60,25 @@ void main() {
         )).called(1);
       });
 
+      test(
+        ": is List",
+        () {
+          const level = Level.info;
+          const target = [1, 2, 3];
+
+          final result = LogService().valueLog(level, target);
+
+          expect(result, target);
+
+          verify(mockedLoggerWrapper.log(
+            level,
+            "[\n  1\n  , 2\n  , 3\n]",
+            null,
+            null,
+          )).called(1);
+        },
+      );
+
       group(": is Future", () {
         test(": no await.", () {
           const level = Level.info;

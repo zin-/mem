@@ -60,11 +60,21 @@ class LogService {
           tmpLevel = Level.debug;
         }
 
+        final message = target == null
+            ? "null"
+            : target is List
+                ? target
+                    .toString()
+                    .replaceAll("[", "[\n  ")
+                    .replaceAll(", ", "\n  , ")
+                    .replaceAll("]", "\n]")
+                : target;
+
         _repository.receive(Log(
           tmpLevel,
           [
             tmpPrefixes.join(),
-            target ?? "null",
+            message,
           ].join(),
           null,
           stackTrace,
