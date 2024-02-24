@@ -37,7 +37,7 @@ T d<T>(
     LogService().functionLog(Level.debug, target, args);
 
 class LogService {
-  final LogRepository _repository;
+  final LogRepositoryV1 _repository;
   final Level _level;
 
   T valueLog<T>(
@@ -60,7 +60,7 @@ class LogService {
           tmpLevel = Level.debug;
         }
 
-        _repository.receive(Log(
+        _repository.receive(LogV1(
           tmpLevel,
           [
             tmpPrefixes.join(),
@@ -118,7 +118,7 @@ class LogService {
   }
 
   _errorLog(dynamic e, [StackTrace? stackTrace]) => _repository.receive(
-        Log(
+        LogV1(
           Level.error,
           '[error] !!',
           e,
@@ -138,7 +138,7 @@ class LogService {
     bool enableSimpleLog = false,
   ]) =>
       _instance = LogService._(
-        LogRepository(LoggerWrapper(enableSimpleLog)),
+        LogRepositoryV1(LoggerWrapper(enableSimpleLog)),
         level,
       );
 

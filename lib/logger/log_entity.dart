@@ -36,13 +36,13 @@ import 'package:mem/framework/repository/entity.dart';
 // 言葉の意味としては「丸太を投げ込め！」という号令で、「航海開始」を表す
 //
 // 航海日誌においては、最初の記録ということになる
-class Log extends EntityV1 {
+class LogV1 extends EntityV1 {
   final Level level;
   final String message;
   final dynamic error;
   final StackTrace? stackTrace;
 
-  Log(
+  LogV1(
     this.level,
     dynamic message,
     this.error,
@@ -52,6 +52,12 @@ class Log extends EntityV1 {
 
 enum Level {
   /// 処理のすべてを出力する際に利用する
+  // # 意味
+  // 多弁、冗長
+  // ほとんどの場合、否定的な意味で用いられる
+  //
+  // # 語源
+  // verbum（言葉、ラテン語）に由来し、verbosus（言葉であふれた、ラテン語）
   verbose,
 
   /// 特に記録したい処理に利用する

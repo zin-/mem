@@ -3,23 +3,23 @@ import 'package:mem/framework/repository/repository.dart';
 import 'log_entity.dart';
 import 'logger_wrapper.dart';
 
-class LogRepository extends RepositoryV1<Log, void> {
+class LogRepositoryV1 extends RepositoryV1<LogV1, void> {
   LoggerWrapper _loggerWrapper;
 
   @override
-  Future<void> receive(Log entity) async => _loggerWrapper.log(
+  Future<void> receive(LogV1 entity) async => _loggerWrapper.log(
         entity.level,
         entity.message,
         entity.error,
         entity.stackTrace,
       );
 
-  LogRepository._(this._loggerWrapper);
+  LogRepositoryV1._(this._loggerWrapper);
 
-  static LogRepository? _instance;
+  static LogRepositoryV1? _instance;
 
-  factory LogRepository(LoggerWrapper loggerWrapper) =>
-      _instance ??= LogRepository._(
+  factory LogRepositoryV1(LoggerWrapper loggerWrapper) =>
+      _instance ??= LogRepositoryV1._(
         loggerWrapper,
       );
 }
