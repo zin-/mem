@@ -48,6 +48,40 @@ void testTodoScenario() => group(': $_scenarioName', () {
         });
       });
 
+      group(
+        ": show",
+        () {
+          testWidgets(
+            ": list: initial.",
+            (widgetTester) async {
+              await runApplication();
+              await widgetTester.pumpAndSettle();
+
+              expect(find.text(insertedMemName), findsOneWidget);
+              expect(find.text(undoneMemName), findsOneWidget);
+              expect(find.text(doneMemName), findsNothing);
+
+              await widgetTester.tap(filterListIconFinder);
+              await widgetTester.pumpAndSettle();
+
+              expect(
+                widgetTester.widget<Switch>(find.byType(Switch).at(2)).value,
+                true,
+              );
+              expect(
+                widgetTester.widget<Switch>(find.byType(Switch).at(3)).value,
+                false,
+              );
+            },
+          );
+        },
+      );
+
+      group(
+        ": on detail",
+        () {},
+      );
+
       group(': done & undone', () {
         testWidgets(
           ': MemDetailPage.',
