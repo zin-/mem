@@ -160,6 +160,83 @@ void main() {
           );
 
           group(
+            ": empty",
+            () {
+              test(
+                ": List.",
+                () {
+                  const level = Level.info;
+                  const target = [];
+
+                  final result = LogService().valueLog(level, target);
+
+                  expect(result, target);
+
+                  expect(
+                    verify(mockedLoggerWrapper.log(
+                      level,
+                      captureAny,
+                      null,
+                      null,
+                    )).captured,
+                    [
+                      "[]",
+                    ],
+                  );
+                },
+              );
+
+              test(
+                ": Set.",
+                () {
+                  const level = Level.info;
+                  const target = <dynamic>{};
+
+                  final result = LogService().valueLog(level, target);
+
+                  expect(result, target);
+
+                  expect(
+                    verify(mockedLoggerWrapper.log(
+                      level,
+                      captureAny,
+                      null,
+                      null,
+                    )).captured,
+                    [
+                      "{}",
+                    ],
+                  );
+                },
+              );
+
+              test(
+                ": Map.",
+                () {
+                  const level = Level.info;
+                  const target = {};
+
+                  final result = LogService().valueLog(level, target);
+
+                  expect(result, target);
+
+                  expect(
+                    verify(mockedLoggerWrapper.log(
+                      level,
+                      captureAny,
+                      null,
+                      null,
+                    )).captured,
+                    [
+                      "{}",
+                    ],
+                  );
+                },
+              );
+            },
+          );
+
+          group(
             ": complicated",
             () {
               test(

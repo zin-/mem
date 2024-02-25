@@ -72,21 +72,30 @@ class Log extends Entity {
       final openingBracket = target is Set ? "{" : "[";
       final closingBracket = target is Set ? "}" : "]";
 
-      elements.add(openingBracket);
-      for (var value in target) {
-        writelnIndented("${_format(value, baseIndentation: indentation)},");
+      if (target.isEmpty) {
+        elements.add("$openingBracket$closingBracket");
+      } else {
+        elements.add(openingBracket);
+        for (var value in target) {
+          writelnIndented("${_format(value, baseIndentation: indentation)},");
+        }
+        elements.add("$baseIndentation$closingBracket");
       }
-      elements.add("$baseIndentation$closingBracket");
     } else if (target is Map) {
-      elements.add("{");
+      const openingBracket = "{";
+      const closingBracket = "}";
 
-      for (var entry in target.entries) {
-        writelnIndented(
-          "${entry.key}: ${_format(entry.value, baseIndentation: indentation)},",
-        );
+      if (target.isEmpty) {
+        elements.add("$openingBracket$closingBracket");
+      } else {
+        elements.add(openingBracket);
+        for (var entry in target.entries) {
+          writelnIndented(
+            "${entry.key}: ${_format(entry.value, baseIndentation: indentation)},",
+          );
+        }
+        elements.add("$baseIndentation$closingBracket");
       }
-
-      elements.add("$baseIndentation}");
     } else {
       elements.add(target.toString());
     }
