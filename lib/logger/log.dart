@@ -65,14 +65,12 @@ class Log extends Entity {
 
     if (target is Iterable) {
       stringBuffer.writeln(target is Set ? "{" : "[");
-
       for (var value in target) {
         stringBuffer.writeln("$defaultIndent${_format(value)},");
       }
       stringBuffer.write(target is Set ? "}" : "]");
     } else if (target is Map) {
       stringBuffer.writeln("{");
-
       for (var entry in target.entries) {
         stringBuffer.writeln("$defaultIndent${entry.key}: ${entry.value},");
       }
