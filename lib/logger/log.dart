@@ -39,7 +39,7 @@ import 'package:mem/framework/repository/entity.dart';
 class Log extends Entity {
   final Level level;
   final List<String> prefixes;
-  final String target;
+  final dynamic target;
   final dynamic error;
   final StackTrace? stackTrace;
 
@@ -54,8 +54,34 @@ class Log extends Entity {
   String buildMessage() {
     return [
       prefixes.join(),
-      target,
+      _format(target),
     ].join();
+  }
+
+  static const defaultIndent = "  ";
+
+  String _format(dynamic target) {
+    final stringBuffer = StringBuffer();
+
+    if (target is Iterable) {
+      stringBuffer.writeln(target is Set ? "{" : "[");
+
+      for (var value in target) {
+        stringBuffer.writeln("$defaultIndent${_format(value)},");
+      }
+      stringBuffer.write(target is Set ? "}" : "]");
+    } else if (target is Map) {
+      stringBuffer.writeln("{");
+
+      for (var entry in target.entries) {
+        stringBuffer.writeln("$defaultIndent${entry.key}: ${entry.value},");
+      }
+      stringBuffer.write("}");
+    } else {
+      stringBuffer.write(target);
+    }
+
+    return stringBuffer.toString();
   }
 }
 

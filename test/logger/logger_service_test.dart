@@ -44,27 +44,11 @@ void main() {
     });
 
     group(": target", () {
-      test(": is null.", () {
-        const level = Level.info;
-        const target = null;
-
-        final result = LogService().valueLog(level, target);
-
-        expect(result, target);
-
-        verify(mockedLoggerWrapper.log(
-          level,
-          "null",
-          null,
-          null,
-        )).called(1);
-      });
-
       test(
-        ": is List",
+        ": is null.",
         () {
           const level = Level.info;
-          const target = [1, 2, 3];
+          const target = null;
 
           final result = LogService().valueLog(level, target);
 
@@ -72,113 +56,176 @@ void main() {
 
           verify(mockedLoggerWrapper.log(
             level,
-            "[\n  1\n  , 2\n  , 3\n]",
+            "null",
             null,
             null,
           )).called(1);
         },
       );
 
-      test(
-        ": is Set",
+      group(
+        ": format",
         () {
-          const level = Level.info;
-          const target = {1, 2, 3};
+          group(
+            ": simple",
+            () {
+              test(
+                ": List.",
+                () {
+                  const level = Level.info;
+                  const target = [0, 1, 1];
 
-          final result = LogService().valueLog(level, target);
+                  final result = LogService().valueLog(level, target);
 
-          expect(result, target);
+                  expect(result, target);
 
-          verify(mockedLoggerWrapper.log(
-            level,
-            "{\n  1\n  , 2\n  , 3\n}",
-            null,
-            null,
-          )).called(1);
-        },
-      );
+                  expect(
+                    verify(mockedLoggerWrapper.log(
+                      level,
+                      captureAny,
+                      null,
+                      null,
+                    )).captured,
+                    [
+                      "[\n"
+                          "  0,\n"
+                          "  1,\n"
+                          "  1,\n"
+                          "]",
+                    ],
+                  );
+                },
+              );
 
-      test(
-        ": is Map",
-        () {
-          const level = Level.info;
-          const target = {"a": 1, "b": 2, "c": 3};
+              test(
+                ": Set.",
+                () {
+                  const level = Level.info;
+                  const target = {0, 1, 2};
 
-          final result = LogService().valueLog(level, target);
+                  final result = LogService().valueLog(level, target);
 
-          expect(result, target);
+                  expect(result, target);
 
-          verify(mockedLoggerWrapper.log(
-            level,
-            "{\n  a: 1\n  , b: 2\n  , c: 3\n}",
-            null,
-            null,
-          )).called(1);
-        },
-      );
+                  expect(
+                    verify(mockedLoggerWrapper.log(
+                      level,
+                      captureAny,
+                      null,
+                      null,
+                    )).captured,
+                    [
+                      "{\n"
+                          "  0,\n"
+                          "  1,\n"
+                          "  2,\n"
+                          "}",
+                    ],
+                  );
+                },
+              );
 
-      group(": is Future", () {
-        test(": no await.", () {
-          const level = Level.info;
-          const value = "test message future";
-          final target = Future.value(value);
+              test(
+                ": Map.",
+                () {
+                  const level = Level.info;
+                  const target = {
+                    "a": 0,
+                    "b": 1,
+                    "c": 1,
+                  };
 
-          final result = LogService().valueLog(level, target);
+                  final result = LogService().valueLog(level, target);
 
-          expect(result, target);
+                  expect(result, target);
 
-          verifyNever(mockedLoggerWrapper.log(any, any, any, any));
-        });
-
-        test(": await.", () async {
-          const level = Level.info;
-          const value = "test message future";
-          final target = Future.value(value);
-
-          final result = await LogService().valueLog(level, target);
-
-          expect(result, value);
-
-          expect(
-            verify(mockedLoggerWrapper.log(
-              level,
-              "[future] >> $value",
-              captureAny,
-              any,
-            )).captured,
-            [
-              null,
-            ],
+                  expect(
+                    verify(mockedLoggerWrapper.log(
+                      level,
+                      captureAny,
+                      null,
+                      null,
+                    )).captured,
+                    [
+                      "{\n"
+                          "  a: 0,\n"
+                          "  b: 1,\n"
+                          "  c: 1,\n"
+                          "}",
+                    ],
+                  );
+                },
+              );
+            },
           );
-        });
+        },
+      );
 
-        test(
-          ": on error.",
-          () async {
+      group(
+        ": is Future",
+        () {
+          test(": no await.", () {
             const level = Level.info;
-            const errorMessage = "test message future";
-            final e = Exception(errorMessage);
+            const value = "test message future";
+            final target = Future.value(value);
+
+            final result = LogService().valueLog(level, target);
+
+            expect(result, target);
+
+            verifyNever(mockedLoggerWrapper.log(any, any, any, any));
+          });
+
+          test(": await.", () async {
+            const level = Level.info;
+            const value = "test message future";
+            final target = Future.value(value);
+
+            final result = await LogService().valueLog(level, target);
+
+            expect(result, value);
 
             expect(
-              () => LogService().valueLog(level, Future.error(e)),
-              throwsA((thrown) {
-                expect(thrown, isA<Exception>());
-                expect(thrown.message, errorMessage);
-                return true;
-              }),
-            );
-
-            await Future(() async {
               verify(mockedLoggerWrapper.log(
-                Level.error,
-                "[error] !!",
-                e,
+                level,
+                "[future] >> $value",
+                captureAny,
                 any,
-              )).called(1);
-            });
-          },
-        );
-      });
+              )).captured,
+              [
+                null,
+              ],
+            );
+          });
+
+          test(
+            ": on error.",
+            () async {
+              const level = Level.info;
+              const errorMessage = "test message future";
+              final e = Exception(errorMessage);
+
+              expect(
+                () => LogService().valueLog(level, Future.error(e)),
+                throwsA((thrown) {
+                  expect(thrown, isA<Exception>());
+                  expect(thrown.message, errorMessage);
+                  return true;
+                }),
+              );
+
+              await Future(() async {
+                verify(mockedLoggerWrapper.log(
+                  Level.error,
+                  "[error] !!",
+                  e,
+                  any,
+                )).called(1);
+              });
+            },
+          );
+        },
+      );
     });
 
     group(": alias", () {
