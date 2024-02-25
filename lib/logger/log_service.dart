@@ -1,4 +1,4 @@
-import 'log_entity.dart';
+import 'log.dart';
 import 'log_repository.dart';
 import 'logger_wrapper.dart';
 
@@ -76,15 +76,15 @@ class LogService {
                         .replaceAll("}", "\n}")
                     : target;
 
-        _repository.receive(Log(
-          tmpLevel,
-          [
-            tmpPrefixes.join(),
-            message,
-          ].join(),
-          null,
-          stackTrace,
-        ));
+        _repository.receive(
+          Log(
+            tmpLevel,
+            tmpPrefixes,
+            message.toString(),
+            null,
+            stackTrace,
+          ),
+        );
       }
     }
 
@@ -136,7 +136,10 @@ class LogService {
   _errorLog(dynamic e, [StackTrace? stackTrace]) => _repository.receive(
         Log(
           Level.error,
-          "[error] !!",
+          [
+            "[error] !!",
+          ],
+          "",
           e,
           stackTrace,
         ),

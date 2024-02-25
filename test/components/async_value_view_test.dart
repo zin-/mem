@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/components/async_value_view.dart';
-import 'package:mem/logger/log_entity.dart';
+import 'package:mem/logger/log.dart';
 import 'package:mem/logger/log_service.dart';
 
 import '../helpers.dart';

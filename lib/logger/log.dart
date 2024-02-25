@@ -38,16 +38,25 @@ import 'package:mem/framework/repository/entity.dart';
 // 航海日誌においては、最初の記録ということになる
 class Log extends Entity {
   final Level level;
-  final String message;
+  final List<String> prefixes;
+  final String target;
   final dynamic error;
   final StackTrace? stackTrace;
 
   Log(
     this.level,
-    this.message,
+    this.prefixes,
+    this.target,
     this.error,
     this.stackTrace,
   );
+
+  String buildMessage() {
+    return [
+      prefixes.join(),
+      target,
+    ].join();
+  }
 }
 
 enum Level {

@@ -1,6 +1,6 @@
 import 'package:mem/framework/repository/repository.dart';
 
-import 'log_entity.dart';
+import 'log.dart';
 import 'logger_wrapper.dart';
 
 class LogRepository extends Repository<Log> with Receiver<Log, void> {
@@ -9,7 +9,7 @@ class LogRepository extends Repository<Log> with Receiver<Log, void> {
   @override
   Future<void> receive(Log entity) async => _loggerWrapper.log(
         entity.level,
-        entity.message,
+        entity.buildMessage(),
         entity.error,
         entity.stackTrace,
       );
