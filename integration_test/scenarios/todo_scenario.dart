@@ -77,11 +77,6 @@ void testTodoScenario() => group(': $_scenarioName', () {
         },
       );
 
-      group(
-        ": on detail",
-        () {},
-      );
-
       group(': done & undone', () {
         testWidgets(
           ': MemDetailPage.',
