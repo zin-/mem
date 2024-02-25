@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
-import 'package:mem/logger/log_entity.dart';
+import 'package:mem/logger/log.dart';
 import 'package:mem/logger/log_service.dart';
 
 import 'framework/database_accessor.dart';

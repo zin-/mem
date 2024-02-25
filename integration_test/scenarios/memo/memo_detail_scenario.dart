@@ -116,22 +116,31 @@ void testMemoDetailScenario() => group(
                 const enteringMemMemo =
                     "$_scenarioName: Save: twice on create - entering - mem - memo";
                 await widgetTester.enterText(
-                    find.byKey(keyMemName), enteringMemName);
+                  find.byKey(keyMemName),
+                  enteringMemName,
+                );
                 await widgetTester.enterText(
-                    find.byKey(keyMemMemo), enteringMemMemo);
+                  find.byKey(keyMemMemo),
+                  enteringMemMemo,
+                );
                 await widgetTester.tap(find.byKey(keySaveMemFab));
-                await widgetTester.pumpAndSettle();
+                await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
                 const enteringMemMemo2 = "$enteringMemMemo - 2";
                 await widgetTester.enterText(
-                    find.byKey(keyMemMemo), enteringMemMemo2);
+                  find.byKey(keyMemMemo),
+                  enteringMemMemo2,
+                );
                 await widgetTester.tap(find.byKey(keySaveMemFab));
+                await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
                 final getCreatedMem =
                     Equals(defColMemsName.name, enteringMemName);
-                final mems = await dbA.select(defTableMems,
-                    where: getCreatedMem.where(),
-                    whereArgs: getCreatedMem.whereArgs());
+                final mems = await dbA.select(
+                  defTableMems,
+                  where: getCreatedMem.where(),
+                  whereArgs: getCreatedMem.whereArgs(),
+                );
                 expect(mems.length, 1);
                 final getCreatedMemItem = And([
                   Equals(defFkMemItemsMemId.name, mems[0][defPkId.name]),
@@ -140,8 +149,10 @@ void testMemoDetailScenario() => group(
                 final memItems = await dbA.select(defTableMemItems,
                     where: getCreatedMemItem.where(),
                     whereArgs: getCreatedMemItem.whereArgs());
-                expect(memItems.single[defColMemItemsValue.name],
-                    enteringMemMemo2);
+                expect(
+                  memItems.single[defColMemItemsValue.name],
+                  enteringMemMemo2,
+                );
               },
             );
           },

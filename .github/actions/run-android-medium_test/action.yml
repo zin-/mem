@@ -39,7 +39,7 @@ runs:
         android-api-level: ${{ inputs.android-api-level }}
         android-target: ${{ inputs.android-target }}
         android-arch: ${{ inputs.android-arch }}
-      continue-on-error: ${{ inputs.experimental }}
+      continue-on-error: true
 
     - if: inputs.android-emulator-runner == 'reactivecircus'
       id: run-android-medium_test-via-reactivecircus

@@ -36,22 +36,82 @@ import 'package:mem/framework/repository/entity.dart';
 // 言葉の意味としては「丸太を投げ込め！」という号令で、「航海開始」を表す
 //
 // 航海日誌においては、最初の記録ということになる
-class Log extends EntityV1 {
+class Log extends Entity {
   final Level level;
-  final String message;
+  final List<String> prefixes;
+  final dynamic target;
   final dynamic error;
   final StackTrace? stackTrace;
 
   Log(
     this.level,
-    dynamic message,
+    this.prefixes,
+    this.target,
     this.error,
     this.stackTrace,
-  ) : message = message?.toString() ?? 'no message';
+  );
+
+  String buildMessage() {
+    return [
+      prefixes.join(),
+      _format(target),
+    ].join();
+  }
+
+  final _defaultIndentation = "  ";
+
+  String _format(dynamic target, {String baseIndentation = ""}) {
+    final indentation = "$baseIndentation$_defaultIndentation";
+    final elements = <String>[];
+
+    void writelnIndented(String content) {
+      elements.add("$indentation$content");
+    }
+
+    if (target is Iterable) {
+      final openingBracket = target is Set ? "{" : "[";
+      final closingBracket = target is Set ? "}" : "]";
+
+      if (target.isEmpty) {
+        elements.add("$openingBracket$closingBracket");
+      } else {
+        elements.add(openingBracket);
+        for (var value in target) {
+          writelnIndented("${_format(value, baseIndentation: indentation)},");
+        }
+        elements.add("$baseIndentation$closingBracket");
+      }
+    } else if (target is Map) {
+      const openingBracket = "{";
+      const closingBracket = "}";
+
+      if (target.isEmpty) {
+        elements.add("$openingBracket$closingBracket");
+      } else {
+        elements.add(openingBracket);
+        for (var entry in target.entries) {
+          writelnIndented(
+            "${entry.key}: ${_format(entry.value, baseIndentation: indentation)},",
+          );
+        }
+        elements.add("$baseIndentation$closingBracket");
+      }
+    } else {
+      elements.add(target.toString());
+    }
+
+    return elements.join('\n');
+  }
 }
 
 enum Level {
   /// 処理のすべてを出力する際に利用する
+  // # 意味
+  // 多弁、冗長
+  // ほとんどの場合、否定的な意味で用いられる
+  //
+  // # 語源
+  // verbum（言葉、ラテン語）に由来し、verbosus（言葉であふれた、ラテン語）
   verbose,
 
   /// 特に記録したい処理に利用する

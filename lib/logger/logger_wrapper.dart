@@ -1,6 +1,6 @@
 import 'package:logger/logger.dart';
 
-import 'log_entity.dart' as log_entity;
+import 'log.dart' as log_entity;
 
 class LoggerWrapper {
   final Logger _logger;

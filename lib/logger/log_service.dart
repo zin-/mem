@@ -1,4 +1,4 @@
-import 'log_entity.dart';
+import 'log.dart';
 import 'log_repository.dart';
 import 'logger_wrapper.dart';
 
@@ -8,7 +8,7 @@ T info<T>(T target) => LogService().valueLog(Level.info, target);
 
 T warn<T>(T target) => LogService().valueLog(Level.warning, target);
 
-@Deprecated('For development only')
+@Deprecated("For development only")
 T debug<T>(T target) => LogService().valueLog(Level.debug, target);
 
 T v<T>(
@@ -29,7 +29,7 @@ T w<T>(
 ]) =>
     LogService().functionLog(Level.warning, target, args);
 
-@Deprecated('Use for development only')
+@Deprecated("Use for development only")
 T d<T>(
   T Function() target, [
   dynamic args,
@@ -56,19 +56,19 @@ class LogService {
         Level tmpLevel = level;
 
         if (autoDebug || _DebugLoggableFunction._debug) {
-          tmpPrefixes.insert(0, '** [AUTO DEBUG] ** ');
+          tmpPrefixes.insert(0, "** [AUTO DEBUG] ** ");
           tmpLevel = Level.debug;
         }
 
-        _repository.receive(Log(
-          tmpLevel,
-          [
-            tmpPrefixes.join(),
-            target ?? 'no message.',
-          ].join(),
-          null,
-          stackTrace,
-        ));
+        _repository.receive(
+          Log(
+            tmpLevel,
+            tmpPrefixes,
+            target,
+            null,
+            stackTrace,
+          ),
+        );
       }
     }
 
@@ -76,12 +76,12 @@ class LogService {
   }
 
   T functionLog<T>(Level level, T Function() function, [dynamic args]) {
-    valueLog(level, args.toString(), prefixes: ['[start] :: ']);
+    valueLog(level, args.toString(), prefixes: ["[start] :: "]);
 
     try {
       final result = function._callWithDebug(level == Level.debug);
 
-      valueLog(level, result, prefixes: ['[end] => ']);
+      valueLog(level, result, prefixes: ["[end] => "]);
 
       return result;
     } catch (e, stackTrace) {
@@ -103,7 +103,7 @@ class LogService {
         (value) => valueLog(
           level,
           value,
-          prefixes: (prefixes ?? [])..add('[future] >> '),
+          prefixes: (prefixes ?? [])..add("[future] >> "),
           stackTrace: currentStackTrace,
           autoDebug: autoDebug,
         ),
@@ -120,7 +120,10 @@ class LogService {
   _errorLog(dynamic e, [StackTrace? stackTrace]) => _repository.receive(
         Log(
           Level.error,
-          '[error] !!',
+          [
+            "[error] !!",
+          ],
+          "",
           e,
           stackTrace,
         ),
