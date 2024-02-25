@@ -58,28 +58,40 @@ class Log extends Entity {
     ].join();
   }
 
-  static const defaultIndent = "  ";
+  final _defaultIndentation = "  ";
 
-  String _format(dynamic target) {
-    final stringBuffer = StringBuffer();
+  String _format(dynamic target, {String baseIndentation = ""}) {
+    final indentation = "$baseIndentation$_defaultIndentation";
+    final elements = <String>[];
 
-    if (target is Iterable) {
-      stringBuffer.writeln(target is Set ? "{" : "[");
-      for (var value in target) {
-        stringBuffer.writeln("$defaultIndent${_format(value)},");
-      }
-      stringBuffer.write(target is Set ? "}" : "]");
-    } else if (target is Map) {
-      stringBuffer.writeln("{");
-      for (var entry in target.entries) {
-        stringBuffer.writeln("$defaultIndent${entry.key}: ${entry.value},");
-      }
-      stringBuffer.write("}");
-    } else {
-      stringBuffer.write(target);
+    void writelnIndented(String content) {
+      elements.add("$indentation$content");
     }
 
-    return stringBuffer.toString();
+    if (target is Iterable) {
+      final openingBracket = target is Set ? "{" : "[";
+      final closingBracket = target is Set ? "}" : "]";
+
+      elements.add(openingBracket);
+      for (var value in target) {
+        writelnIndented("${_format(value, baseIndentation: indentation)},");
+      }
+      elements.add("$baseIndentation$closingBracket");
+    } else if (target is Map) {
+      elements.add("{");
+
+      for (var entry in target.entries) {
+        writelnIndented(
+          "${entry.key}: ${_format(entry.value, baseIndentation: indentation)},",
+        );
+      }
+
+      elements.add("$baseIndentation}");
+    } else {
+      elements.add(target.toString());
+    }
+
+    return elements.join('\n');
   }
 }
 

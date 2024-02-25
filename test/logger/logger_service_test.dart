@@ -158,6 +158,61 @@ void main() {
               );
             },
           );
+
+          group(
+            ": complicated",
+            () {
+              test(
+                ": Map has List has Set has Map",
+                () {
+                  const level = Level.info;
+                  const target = {
+                    "a": 0,
+                    "b": [
+                      1,
+                      {
+                        1,
+                        2,
+                        {
+                          "c": 3,
+                          "d": 5,
+                        },
+                      },
+                    ],
+                  };
+
+                  final result = LogService().valueLog(level, target);
+
+                  expect(result, target);
+
+                  expect(
+                    verify(mockedLoggerWrapper.log(
+                      level,
+                      captureAny,
+                      null,
+                      null,
+                    )).captured,
+                    [
+                      "{\n"
+                          "  a: 0,\n"
+                          "  b: [\n"
+                          "    1,\n"
+                          "    {\n"
+                          "      1,\n"
+                          "      2,\n"
+                          "      {\n"
+                          "        c: 3,\n"
+                          "        d: 5,\n"
+                          "      },\n"
+                          "    },\n"
+                          "  ],\n"
+                          "}"
+                    ],
+                  );
+                },
+              );
+            },
+          );
         },
       );
 
