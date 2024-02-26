@@ -129,14 +129,19 @@ class NotificationClientV3 {
 
   static NotificationClientV3? _instance;
 
-  factory NotificationClientV3([BuildContext? context]) {
-    final l10n = buildL10n(context);
-    return _instance ??= NotificationClientV3._(
-      NotificationChannels(l10n),
-      NotificationActions(l10n),
-      NotificationRepository(),
-    );
-  }
+  factory NotificationClientV3([BuildContext? context]) => v(
+        () {
+          final l10n = buildL10n(context);
+          return _instance ??= NotificationClientV3._(
+            NotificationChannels(l10n),
+            NotificationActions(l10n),
+            NotificationRepository(),
+          );
+        },
+        {
+          "context": context,
+        },
+      );
 }
 
 class NotificationClientV2 {
