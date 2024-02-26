@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:mem/core/date_and_time/date_and_time.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/mem.dart';
 import 'client.dart';
 import 'notification/cancel_notification.dart';
@@ -14,45 +15,53 @@ const _endNotificationBody = 'end';
 
 class MemNotifications {
   static List<Notification> of(
-    SavedMem mem,
+    SavedMem savedMem,
     int hour,
     int minute,
-  ) {
-    if (mem.isDone || mem.isArchived) {
-      return CancelAllMemNotifications.of(mem.id);
-    } else {
-      final notifications = <Notification>[];
-      final now = DateTime.now();
+  ) =>
+      v(
+        () {
+          if (savedMem.isDone || savedMem.isArchived) {
+            return CancelAllMemNotifications.of(savedMem.id);
+          } else {
+            final notifications = <Notification>[];
+            final now = DateTime.now();
 
-      final periodStart = mem.period?.start;
-      if (periodStart != null && periodStart.isAfter(now)) {
-        notifications.add(_createNotificationAt(
-          memStartNotificationId(mem.id),
-          mem.name,
-          _startNotificationBody,
-          periodStart,
-          mem.id,
-          hour,
-          minute,
-        ));
-      }
+            final periodStart = savedMem.period?.start;
+            if (periodStart != null && periodStart.isAfter(now)) {
+              notifications.add(_createNotificationAt(
+                memStartNotificationId(savedMem.id),
+                savedMem.name,
+                _startNotificationBody,
+                periodStart,
+                savedMem.id,
+                hour,
+                minute,
+              ));
+            }
 
-      final periodEnd = mem.period?.end;
-      if (periodEnd != null && periodEnd.isAfter(now)) {
-        notifications.add(_createNotificationAt(
-          memEndNotificationId(mem.id),
-          mem.name,
-          _endNotificationBody,
-          periodEnd,
-          mem.id,
-          hour,
-          minute,
-        ));
-      }
+            final periodEnd = savedMem.period?.end;
+            if (periodEnd != null && periodEnd.isAfter(now)) {
+              notifications.add(_createNotificationAt(
+                memEndNotificationId(savedMem.id),
+                savedMem.name,
+                _endNotificationBody,
+                periodEnd,
+                savedMem.id,
+                hour,
+                minute,
+              ));
+            }
 
-      return notifications;
-    }
-  }
+            return notifications;
+          }
+        },
+        {
+          "savedMem": savedMem,
+          "hour": hour,
+          "minute": minute,
+        },
+      );
 
   static Notification _createNotificationAt(
     id,

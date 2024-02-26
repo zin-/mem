@@ -15,10 +15,10 @@ class NotificationService {
   // FIXME ここにあるのはおかしい
   final NotificationClientV2 _notificationClient;
 
-  Future<void> memReminder(SavedMem mem) => v(
+  Future<void> memReminder(SavedMem savedMem) => v(
         () async {
           final memNotifications = MemNotifications.of(
-            mem,
+            savedMem,
             // TODO 時間がないときのデフォルト値を設定から取得する
             5, 0,
           );
@@ -27,18 +27,20 @@ class NotificationService {
             await _notificationRepository.receive(element);
           }
         },
-        mem,
+        {
+          "savedMem": savedMem,
+        },
       );
 
   Future<void> memRepeatedReminder(
-    SavedMem mem,
+    SavedMem savedMem,
     MemNotification? memNotification,
   ) =>
       v(
         () async {
           if (memNotification == null) {
             await _notificationRepository.receive(
-              CancelNotification(memRepeatedNotificationId(mem.id)),
+              CancelNotification(memRepeatedNotificationId(savedMem.id)),
             );
           } else {
             final now = DateTime.now();
@@ -61,8 +63,8 @@ class NotificationService {
             }
 
             final repeatedNotification = RepeatedNotification(
-              memRepeatedNotificationId(mem.id),
-              mem.name,
+              memRepeatedNotificationId(savedMem.id),
+              savedMem.name,
               memNotification.message,
               json.encode({memIdKey: memNotification.memId}),
               [
@@ -77,7 +79,10 @@ class NotificationService {
             await _notificationRepository.receive(repeatedNotification);
           }
         },
-        {mem, memNotification},
+        {
+          "savedMem": savedMem,
+          "memNotification": memNotification,
+        },
       );
 
   NotificationService._(this._notificationRepository, this._notificationClient);

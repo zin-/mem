@@ -76,12 +76,16 @@ class NotificationRepository extends RepositoryV1<Notification, void> {
             await discard(entity.id);
           }
         },
-        entity,
+        {
+          "entity": entity,
+        },
       );
 
   Future<void> discard(int notificationId) => v(
         () async => _flutterLocalNotificationsWrapper?.cancel(notificationId),
-        notificationId,
+        {
+          "notificationId": notificationId,
+        },
       );
 
   NotificationRepository._(this._flutterLocalNotificationsWrapper);
