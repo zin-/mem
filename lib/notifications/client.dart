@@ -68,7 +68,7 @@ class NotificationClientV3 {
 
   final NotificationRepository _notificationRepository;
 
-  Future<void> registerMemRepeatNotification(
+  Future<void> registerRepeatMemNotification(
     String memName,
     MemNotification repeatMemNotification,
     MemNotification? repeatEveryNDay,
