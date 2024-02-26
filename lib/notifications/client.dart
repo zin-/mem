@@ -202,6 +202,8 @@ class NotificationClientV2 {
 
   factory NotificationClientV2([BuildContext? context]) => v(
         () => _instance ??= NotificationClientV2._(buildL10n(context)),
-        context,
+        {
+          "context": context,
+        },
       );
 }

@@ -143,11 +143,13 @@ class ActService {
 
   static ActService? _instance;
 
-  factory ActService() => _instance ??= ActService._(
-        ActRepository(),
-        MemRepository(),
-        MemNotificationRepository(),
-        NotificationRepository(),
-        NotificationClientV2(),
+  factory ActService() => i(
+        () => _instance ??= ActService._(
+          ActRepository(),
+          MemRepository(),
+          MemNotificationRepository(),
+          NotificationRepository(),
+          NotificationClientV2(),
+        ),
       );
 }
