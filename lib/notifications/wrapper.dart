@@ -109,26 +109,31 @@ class NotificationsWrapper {
       );
 
   Future<bool> handleAppLaunchDetails() => v(
-        () async => _pluginIsInitialized.then((value) async {
-          final appLaunchDetails = await _flutterLocalNotificationsPlugin
-              .getNotificationAppLaunchDetails();
+        () async => _pluginIsInitialized.then(
+          (value) => v(
+            () async {
+              final appLaunchDetails = await _flutterLocalNotificationsPlugin
+                  .getNotificationAppLaunchDetails();
 
-          if (appLaunchDetails?.didNotificationLaunchApp == false) {
-            return false;
-          }
+              if (appLaunchDetails?.didNotificationLaunchApp == false) {
+                return false;
+              }
 // アプリが停止状態で、通知から起動される必要があるため現状テストする方法がない
 // coverage:ignore-start
-          final details = appLaunchDetails?.notificationResponse;
+              final details = appLaunchDetails?.notificationResponse;
 
-          if (details == null) {
-            return false;
-          }
+              if (details == null) {
+                return false;
+              }
 
-          onDidReceiveNotificationResponse(details);
+              onDidReceiveNotificationResponse(details);
 
-          return true;
+              return true;
 // coverage:ignore-end
-        }),
+            },
+            {"_pluginIsInitialized": value},
+          ),
+        ),
       );
 
   NotificationsWrapper._(
@@ -145,14 +150,20 @@ class NotificationsWrapper {
               onDidReceiveNotificationResponse,
         );
       },
-      androidDefaultIconPath,
+      {
+        "androidDefaultIconPath": androidDefaultIconPath,
+      },
     );
   }
 
   static NotificationsWrapper? _instance;
 
-  factory NotificationsWrapper(String androidDefaultIconPath) =>
-      _instance ??= NotificationsWrapper._(androidDefaultIconPath);
+  factory NotificationsWrapper(String androidDefaultIconPath) => v(
+        () => _instance ??= NotificationsWrapper._(androidDefaultIconPath),
+        {
+          "androidDefaultIconPath": androidDefaultIconPath,
+        },
+      );
 }
 
 // extension on NotificationInterval {

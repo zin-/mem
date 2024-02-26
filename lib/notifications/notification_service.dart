@@ -84,6 +84,10 @@ class NotificationService {
 
   static NotificationService? _instance;
 
-  factory NotificationService() => _instance ??=
-      NotificationService._(NotificationRepository(), NotificationClientV2());
+  factory NotificationService() => i(
+        () => _instance ??= NotificationService._(
+          NotificationRepository(),
+          NotificationClientV2(),
+        ),
+      );
 }

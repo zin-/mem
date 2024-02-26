@@ -56,8 +56,10 @@ class MemClient {
 
   static MemClient? _instance;
 
-  factory MemClient() => _instance ??= MemClient._(
-        MemService(),
-        NotificationClientV3(),
+  factory MemClient() => v(
+        () => _instance ??= MemClient._(
+          MemService(),
+          NotificationClientV3(),
+        ),
       );
 }

@@ -58,6 +58,7 @@ class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
 
   static MemNotificationRepository? _instance;
 
-  factory MemNotificationRepository() =>
-      _instance ??= MemNotificationRepository._();
+  factory MemNotificationRepository() => v(
+        () => _instance ??= MemNotificationRepository._(),
+      );
 }
