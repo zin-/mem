@@ -154,13 +154,7 @@ extension _DebugLoggableFunction<T> on T Function() {
   T _callWithDebug(bool debug) {
     _debug = _debug || debug;
     final result = call();
-    if (result is Future) {
-      result.whenComplete(() {
-        if (debug) _debug = false;
-      });
-    } else {
-      if (debug) _debug = false;
-    }
+    if (debug) _debug = false;
     return result;
   }
 }
