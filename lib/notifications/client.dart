@@ -17,6 +17,7 @@ import 'package:mem/notifications/notification/show_notification.dart';
 import 'package:mem/notifications/notification/start_act_notification_action.dart';
 import 'package:mem/notifications/notification_channels.dart';
 import 'package:mem/notifications/notification_ids.dart';
+import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 
@@ -70,7 +71,7 @@ class NotificationClientV3 {
 
   Future<void> registerMemRepeatNotification(
     String memName,
-    MemNotification repeatMemNotification,
+    SavedMemNotification repeatMemNotification,
     MemNotification? repeatEveryNDay,
   ) =>
       v(
@@ -97,7 +98,7 @@ class NotificationClientV3 {
 
           await _notificationRepository.receiveV2(
             RepeatedNotification(
-              memRepeatedNotificationId(repeatMemNotification.memId!),
+              memRepeatedNotificationId(repeatMemNotification.memId),
               memName,
               repeatMemNotification.message,
               json.encode({memIdKey: repeatMemNotification.memId}),
