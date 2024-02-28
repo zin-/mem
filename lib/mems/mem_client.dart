@@ -69,11 +69,17 @@ class MemClient {
         },
       );
 
-  Future<MemDetail> archive(Mem mem) => d(
+  Future<MemDetail> archive(Mem mem) => v(
         () async {
           // FIXME MemServiceの責務
           if (mem is SavedMem) {
             final archived = await _memService.archive(mem);
+
+            final archivedMem = archived.mem;
+            // FIXME archive後のMemDetailなので、必ずSavedMemのはず
+            if (archivedMem is SavedMem) {
+              _notificationService.memReminder(archivedMem);
+            }
 
             return archived;
             // } else {

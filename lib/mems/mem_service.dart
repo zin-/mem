@@ -88,8 +88,6 @@ class MemService {
           final archivedMemNotifications =
               await _memNotificationRepository.archiveByMemId(archivedMem.id);
 
-          _notificationService.memReminder(archivedMem);
-
           return MemDetail(
             archivedMem,
             archivedMemItems.toList(),
