@@ -90,6 +90,7 @@ class MemClient {
             //   _memService.save();
           }
 
+          // coverage:ignore-line
           throw Error();
         },
         {
@@ -115,6 +116,7 @@ class MemClient {
             //   _memService.save();
           }
 
+          // coverage:ignore-line
           throw Error();
         },
         {
