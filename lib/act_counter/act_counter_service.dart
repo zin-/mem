@@ -7,7 +7,7 @@ import 'package:mem/repositories/mem_repository.dart';
 import 'act_counter.dart';
 import 'act_counter_repository.dart';
 
-class ActCounterService {
+class ActCounterClient {
   final ActService _actService;
   final MemRepository _memRepository;
   final ActRepository _actRepository;
@@ -46,21 +46,21 @@ class ActCounterService {
         {'memId': memId},
       );
 
-  ActCounterService._(
+  ActCounterClient._(
     this._actService,
     this._memRepository,
     this._actRepository,
     this._actCounterRepository,
   );
 
-  static ActCounterService? _instance;
+  static ActCounterClient? _instance;
 
-  factory ActCounterService() => _instance ??= ActCounterService._(
+  factory ActCounterClient() => _instance ??= ActCounterClient._(
         ActService(),
         MemRepository(),
         ActRepository(),
         ActCounterRepository(),
       );
 
-  static resetWith(ActCounterService? instance) => _instance = instance;
+  static resetWith(ActCounterClient? instance) => _instance = instance;
 }

@@ -57,7 +57,7 @@ void main() {
 
   group('Actions', () {
     final mockedActCounterService = MockActCounterService();
-    ActCounterService.resetWith(mockedActCounterService);
+    ActCounterClient.resetWith(mockedActCounterService);
 
     testWidgets(
       ': tap',

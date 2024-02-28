@@ -73,7 +73,7 @@ Future<void> backgroundCallback(Uri? uri) => i(
             final memId = uri.queryParameters[memIdParamName];
 
             if (memId != null) {
-              await ActCounterService().increment(
+              await ActCounterClient().increment(
                 int.parse(memId),
                 DateAndTime.now(),
               );
