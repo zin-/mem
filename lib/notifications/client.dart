@@ -9,6 +9,7 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/action.dart';
+import 'package:mem/notifications/notification/cancel_notification.dart';
 import 'package:mem/notifications/notification/channel.dart';
 import 'package:mem/notifications/notification/done_mem_notification_action.dart';
 import 'package:mem/notifications/notification/finish_active_act_notification_action.dart';
@@ -18,7 +19,6 @@ import 'package:mem/notifications/notification/show_notification.dart';
 import 'package:mem/notifications/notification/start_act_notification_action.dart';
 import 'package:mem/notifications/notification_channels.dart';
 import 'package:mem/notifications/notification_ids.dart';
-import 'package:mem/notifications/notification_service.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
@@ -70,8 +70,6 @@ class NotificationClientV3 {
   final NotificationChannels _notificationChannels;
   final NotificationActions _notificationActions;
 
-  @Deprecated("use NotificationRepository")
-  final NotificationService _notificationService;
   final NotificationRepository _notificationRepository;
 
   void registerMemNotifications(
@@ -84,9 +82,9 @@ class NotificationClientV3 {
 
           memNotifications?.forEach((e) {
             if (e.isEnabled()) {
-              _notificationService.memRepeatedReminder(savedMem, e);
+              _memRepeatedReminder(savedMem, e);
             } else {
-              _notificationService.memRepeatedReminder(savedMem, null);
+              _memRepeatedReminder(savedMem, null);
             }
           });
 
@@ -137,6 +135,60 @@ class NotificationClientV3 {
         },
         {
           "savedMem": savedMem,
+        },
+      );
+
+  // TODO _registerMemRepeatNotificationと統合する
+  _memRepeatedReminder(
+    SavedMem savedMem,
+    MemNotification? memNotification,
+  ) =>
+      v(
+        () async {
+          if (memNotification == null) {
+            await _notificationRepository.receive(
+              CancelNotification(memRepeatedNotificationId(savedMem.id)),
+            );
+          } else {
+            final now = DateTime.now();
+            final hours = (memNotification.time! / 60 / 60).floor();
+            final minutes =
+                ((memNotification.time! - hours * 60 * 60) / 60).floor();
+            final seconds =
+                ((memNotification.time! - ((hours * 60) + minutes) * 60) / 60)
+                    .floor();
+            var notifyFirstAt = DateTime(
+              now.year,
+              now.month,
+              now.day,
+              hours,
+              minutes,
+              seconds,
+            );
+            if (notifyFirstAt.isBefore(now)) {
+              notifyFirstAt = notifyFirstAt.add(const Duration(days: 1));
+            }
+
+            final repeatedNotification = RepeatedNotification(
+              memRepeatedNotificationId(savedMem.id),
+              savedMem.name,
+              memNotification.message,
+              json.encode({memIdKey: memNotification.memId}),
+              [
+                _notificationActions.startActAction,
+                _notificationActions.finishActiveActAction,
+              ],
+              _notificationChannels.repeatedReminderChannel,
+              notifyFirstAt,
+              NotificationInterval.perDay,
+            );
+
+            await _notificationRepository.receive(repeatedNotification);
+          }
+        },
+        {
+          "savedMem": savedMem,
+          "memNotification": memNotification,
         },
       );
 
@@ -196,7 +248,6 @@ class NotificationClientV3 {
   NotificationClientV3._(
     this._notificationChannels,
     this._notificationActions,
-    this._notificationService,
     this._notificationRepository,
   );
 
@@ -208,7 +259,6 @@ class NotificationClientV3 {
           return _instance ??= NotificationClientV3._(
             NotificationChannels(l10n),
             NotificationActions(l10n),
-            NotificationService(),
             NotificationRepository(),
           );
         },
