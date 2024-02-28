@@ -12,7 +12,6 @@ class MemClient {
   final MemService _memService;
   final NotificationClientV3 _notificationClient;
 
-  @Deprecated("use NotificationClientV3")
   Future<MemDetail> save(
     Mem mem,
     List<MemItem> memItemList,

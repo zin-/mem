@@ -26,6 +26,7 @@ class NotificationRepository extends RepositoryV1<Notification, void> {
         () async {
           final intervalSeconds = entity.intervalSeconds;
           if (intervalSeconds != null) {
+            // FIXME ここにあるのはおかしいのでは？
             await AndroidAlarmManager.periodic(
               Duration(seconds: intervalSeconds),
               entity.id,
