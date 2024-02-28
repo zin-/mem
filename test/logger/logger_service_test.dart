@@ -417,7 +417,7 @@ void main() {
 
         verify(mockedLoggerWrapper.log(
           level,
-          "[start] :: $args",
+          "[start] :: [\n  $arg1,\n  $arg2,\n]",
           null,
           null,
         )).called(1);
@@ -449,7 +449,7 @@ void main() {
 
         verify(mockedLoggerWrapper.log(
           level,
-          "[start] :: $args",
+          "[start] :: [\n  $arg1,\n  $arg2,\n]",
           null,
           null,
         )).called(1);
@@ -492,7 +492,7 @@ void main() {
               )).captured,
               [
                 Level.debug,
-                "[start] :: $args",
+                "[start] :: [\n  $arg1,\n  $arg2,\n]",
                 Level.debug,
                 "** [AUTO DEBUG] ** verbose log",
                 Level.debug,
@@ -531,7 +531,7 @@ void main() {
                 )).captured,
                 [
                   Level.debug,
-                  "[start] :: $args",
+                  "[start] :: [\n  $arg1,\n  $arg2,\n]",
                   Level.debug,
                   "[end] => ${sampleFunc(arg1, arg2)}",
                   Level.debug,
@@ -581,9 +581,9 @@ void main() {
               )).captured,
               [
                 Level.debug,
-                "[start] :: [2, 3]",
+                "[start] :: [\n  $arg1,\n  $arg2,\n]",
                 Level.debug,
-                "** [AUTO DEBUG] ** [start] :: {c: 2, d: 3}",
+                "** [AUTO DEBUG] ** [start] :: {\n  c: 2,\n  d: 3,\n}",
                 Level.debug,
                 "** [AUTO DEBUG] ** [end] => 6",
                 Level.debug,
@@ -630,9 +630,9 @@ void main() {
                 )).captured,
                 [
                   Level.debug,
-                  "[start] :: [2, 3]",
+                  "[start] :: [\n  $arg1,\n  $arg2,\n]",
                   Level.debug,
-                  "** [AUTO DEBUG] ** [start] :: {c: 2, d: 3}",
+                  "** [AUTO DEBUG] ** [start] :: {\n  c: 2,\n  d: 3,\n}",
                   Level.debug,
                   "[end] => 5",
                 ],
@@ -665,7 +665,7 @@ void main() {
 
         verify(mockedLoggerWrapper.log(
           level,
-          "[start] :: $args",
+          "[start] :: [\n  $arg1,\n  $arg2,\n]",
           null,
           null,
         )).called(1);
@@ -711,7 +711,7 @@ void main() {
             )).captured,
             [
               Level.info,
-              "[start] :: [1, 2]",
+              "[start] :: [\n  $arg1,\n  $arg2,\n]",
               null,
               Level.error,
               "[error] !!",
@@ -754,11 +754,11 @@ void main() {
                 )).captured,
                 [
                   Level.debug,
-                  "[start] :: [1, 2]",
+                  "[start] :: [\n  $arg1,\n  $arg2,\n]",
                   Level.debug,
                   "** [AUTO DEBUG] ** [future] >> future verbose log",
                   Level.debug,
-                  "[end] => [future] >> 3",
+                  "[end] => [future] >> ${await sampleFunc(arg1, arg2)}",
                 ],
               );
             });
@@ -804,20 +804,18 @@ void main() {
                 )).captured,
                 [
                   Level.debug,
-                  "[start] :: [2, 3]",
+                  "[start] :: [\n  $arg1,\n  $arg2,\n]",
                   Level.debug,
-                  "** [AUTO DEBUG] ** [start] :: {c: 2, d: 3}",
+                  "** [AUTO DEBUG] ** [start] :: {\n  c: 2,\n  d: 3,\n}",
                   Level.debug,
-                  "** [AUTO DEBUG] ** [end] => [future] >> 6",
+                  "** [AUTO DEBUG] ** [end] => [future] >> ${await cascadedFunc(arg1, arg2)}",
                   Level.debug,
-                  "[end] => [future] >> 8",
+                  "[end] => [future] >> ${await sampleFunc(arg1, arg2)}",
                 ],
               );
             });
           });
         });
-
-        // TODO after error
       });
     });
 
