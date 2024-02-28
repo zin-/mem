@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/act_service.dart';
+import 'package:mem/acts/client.dart';
 import 'package:mem/acts/states.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/logger/log_service.dart';
@@ -11,7 +12,7 @@ final editAct = Provider.autoDispose.family<Act, int>(
     () {
       final editingAct = ref.watch(editingActProvider(actId));
 
-      ActService()
+      ActsClient()
           .edit(editingAct)
           .then((editedAct) => ref.read(actsProvider.notifier).upsertAll(
                 [editedAct],

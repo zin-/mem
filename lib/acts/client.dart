@@ -40,6 +40,26 @@ class ActsClient {
         },
       );
 
+  Future<SavedAct> edit(
+    SavedAct savedAct,
+  ) =>
+      i(
+        () async {
+          final replaced = await _actService.edit(savedAct);
+
+          if (replaced.period.end == null) {
+            _registerStartNotifications(replaced.memId);
+          } else {
+            // _cancelNotifications(replaced.memId);
+          }
+
+          return replaced;
+        },
+        {
+          "savedAct": savedAct,
+        },
+      );
+
   Future pause(int actId, DateAndTime when) => i(
         () async {
           final finished = await _actService.finish(actId, when);
