@@ -82,6 +82,39 @@ class ActsClient {
         {actId, when},
       );
 
+  Future<SavedAct> finish(
+    int actId,
+    DateAndTime when,
+  ) =>
+      v(
+        () async {
+          final finished = await _actService.finish(actId, when);
+
+          _cancelNotifications(finished.memId);
+
+          // ISSUE #226
+
+          return finished;
+        },
+        {
+          "actId": actId,
+          "when": when,
+        },
+      );
+
+  Future<SavedAct> delete(int actId) => i(
+        () async {
+          final deleted = await _actService.delete(actId);
+
+          _cancelNotifications(deleted.memId);
+
+          return deleted;
+        },
+        {
+          "actId": actId,
+        },
+      );
+
   void _registerStartNotifications(int memId) => v(
         () async {
           final memName = (await _memRepository.shipById(memId)).name;

@@ -2,14 +2,11 @@ import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/notifications/notification_ids.dart';
-import 'package:mem/notifications/notification_repository.dart';
 
 import 'act_repository.dart';
 
 class ActService {
   final ActRepository _actRepository;
-  final NotificationRepository _notificationRepository;
 
   Future<SavedAct> start(
     int memId,
@@ -29,49 +26,34 @@ class ActService {
         () async {
           final finishingAct = await _actRepository.shipById(actId);
 
-          final replaced = await _actRepository.replace(
+          return await _actRepository.replace(
             finishingAct.copiedWith(
               () => finishingAct.period.copiedWith(when),
             ),
           );
-
-          _cancelNotifications(replaced.memId);
-
-          // ISSUE #226
-
-          return replaced;
         },
-        [actId, when],
+        {
+          "actId": actId,
+          "when": when,
+        },
       );
 
-  Future<SavedAct> edit(SavedAct editingAct) => i(
-        () async => await _actRepository.replace(editingAct),
-        editingAct,
+  Future<SavedAct> edit(SavedAct savedAct) => i(
+        () async => await _actRepository.replace(savedAct),
+        {
+          "savedAct": savedAct,
+        },
       );
 
-  Future<SavedAct> delete(int id) => i(
-        () async {
-          final wasted = await _actRepository.wasteById(id);
-
-          _cancelNotifications(wasted.memId);
-
-          return wasted;
+  Future<SavedAct> delete(int actId) => i(
+        () async => await _actRepository.wasteById(actId),
+        {
+          "actId": actId,
         },
-        id,
-      );
-
-  Future _cancelNotifications(int memId) => v(
-        () async {
-          await _notificationRepository.discard(activeActNotificationId(memId));
-          await _notificationRepository
-              .discard(afterActStartedNotificationId(memId));
-        },
-        memId,
       );
 
   ActService._(
     this._actRepository,
-    this._notificationRepository,
   );
 
   static ActService? _instance;
@@ -79,7 +61,6 @@ class ActService {
   factory ActService() => i(
         () => _instance ??= ActService._(
           ActRepository(),
-          NotificationRepository(),
         ),
       );
 }
