@@ -1,5 +1,5 @@
 import 'package:mem/acts/act_repository.dart';
-import 'package:mem/acts/act_service.dart';
+import 'package:mem/acts/client.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/mem_repository.dart';
@@ -8,7 +8,7 @@ import 'act_counter.dart';
 import 'act_counter_repository.dart';
 
 class ActCounterClient {
-  final ActService _actService;
+  final ActsClient _actsClient;
   final MemRepository _memRepository;
   final ActRepository _actRepository;
   final ActCounterRepository _actCounterRepository;
@@ -28,8 +28,8 @@ class ActCounterClient {
 
   Future<void> increment(int memId, DateAndTime now) => i(
         () async {
-          await _actService.finish(
-            (await _actService.start(memId, now)).id,
+          await _actsClient.finish(
+            (await _actsClient.start(memId, now)).id,
             now,
           );
 
@@ -47,7 +47,7 @@ class ActCounterClient {
       );
 
   ActCounterClient._(
-    this._actService,
+    this._actsClient,
     this._memRepository,
     this._actRepository,
     this._actCounterRepository,
@@ -56,7 +56,7 @@ class ActCounterClient {
   static ActCounterClient? _instance;
 
   factory ActCounterClient() => _instance ??= ActCounterClient._(
-        ActService(),
+        ActsClient(),
         MemRepository(),
         ActRepository(),
         ActCounterRepository(),
