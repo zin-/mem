@@ -110,6 +110,15 @@ class NotificationClientV3 {
         },
       );
 
+  void cancelMemNotifications(SavedMem savedMem) => v(
+        () {
+          _notificationService.memReminder(savedMem);
+        },
+        {
+          "savedMem": savedMem,
+        },
+      );
+
   Future<void> _registerMemRepeatNotification(
     String memName,
     SavedMemNotification repeatMemNotification,

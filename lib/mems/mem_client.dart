@@ -6,7 +6,6 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/client.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification_repository.dart';
-import 'package:mem/notifications/notification_service.dart';
 import 'package:mem/repositories/mem.dart';
 
 import 'mem_service.dart';
@@ -14,8 +13,6 @@ import 'mem_service.dart';
 class MemClient {
   final MemService _memService;
   final NotificationClientV3 _notificationClient;
-  @Deprecated("use NotificationClientV3")
-  final NotificationService _notificationService;
   final NotificationRepository _notificationRepository;
 
   Future<MemDetail> save(
@@ -59,7 +56,7 @@ class MemClient {
             final archivedMem = archived.mem;
             // FIXME archive後のMemDetailなので、必ずSavedMemのはず
             if (archivedMem is SavedMem) {
-              _notificationService.memReminder(archivedMem);
+              _notificationClient.cancelMemNotifications(archivedMem);
             }
 
             return archived;
@@ -85,7 +82,10 @@ class MemClient {
             final unarchivedMem = unarchived.mem;
             // FIXME unarchive後のMemDetailなので、必ずSavedMemのはず
             if (unarchivedMem is SavedMem) {
-              _notificationService.memReminder(unarchivedMem);
+              _notificationClient.registerMemNotifications(
+                unarchivedMem,
+                unarchived.notifications,
+              );
             }
 
             return unarchived;
@@ -123,7 +123,6 @@ class MemClient {
   MemClient._(
     this._memService,
     this._notificationClient,
-    this._notificationService,
     this._notificationRepository,
   );
 
@@ -133,7 +132,6 @@ class MemClient {
         () => _instance ??= MemClient._(
           MemService(),
           NotificationClientV3(),
-          NotificationService(),
           NotificationRepository(),
         ),
       );
