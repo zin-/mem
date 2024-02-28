@@ -5,6 +5,8 @@ import 'package:mem/core/mem_item.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/client.dart';
+import 'package:mem/notifications/mem_notifications.dart';
+import 'package:mem/notifications/notification_repository.dart';
 import 'package:mem/notifications/notification_service.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
@@ -15,6 +17,7 @@ class MemClient {
   final MemService _memService;
   final NotificationClientV3 _notificationClient;
   final NotificationService _notificationService;
+  final NotificationRepository _notificationRepository;
 
   Future<MemDetail> save(
     Mem mem,
@@ -119,10 +122,29 @@ class MemClient {
         },
       );
 
+  Future<bool> remove(int memId) => v(
+        () async {
+          final removeSuccess = await _memService.remove(memId);
+
+          if (removeSuccess) {
+            CancelAllMemNotifications.of(memId).forEach(
+              (cancelNotification) =>
+                  _notificationRepository.receive(cancelNotification),
+            );
+          }
+
+          return removeSuccess;
+        },
+        {
+          "memId": memId,
+        },
+      );
+
   MemClient._(
     this._memService,
     this._notificationClient,
     this._notificationService,
+    this._notificationRepository,
   );
 
   static MemClient? _instance;
@@ -132,6 +154,7 @@ class MemClient {
           MemService(),
           NotificationClientV3(),
           NotificationService(),
+          NotificationRepository(),
         ),
       );
 }

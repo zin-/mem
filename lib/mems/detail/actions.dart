@@ -5,7 +5,6 @@ import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/mem_client.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
-import 'package:mem/mems/mem_service.dart';
 import 'package:mem/mems/states.dart';
 
 final _memClient = MemClient();
@@ -92,7 +91,7 @@ final removeMem = Provider.autoDispose.family<Future<bool>, int?>(
   (ref, memId) => v(
     () async {
       if (memId != null) {
-        final removeSuccess = await MemService().remove(memId);
+        final removeSuccess = await _memClient.remove(memId);
 
         ref
             .read(removedMemProvider(memId).notifier)
