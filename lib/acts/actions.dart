@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/acts/client.dart';
 import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
@@ -34,13 +35,15 @@ final startActBy = Provider.autoDispose.family<Act, int>(
     () {
       final now = DateAndTime.now();
 
-      ActService().start(memId, now).then((startedAct) => v(
-            () => ref.read(actsProvider.notifier).upsertAll(
-              [startedAct],
-              (tmp, item) => tmp.id == item.id,
+      ActsClient().start(memId, now).then(
+            (startedAct) => v(
+              () => ref.read(actsProvider.notifier).upsertAll(
+                [startedAct],
+                (tmp, item) => tmp.id == item.id,
+              ),
+              startedAct,
             ),
-            startedAct,
-          ));
+          );
 
       return Act(memId, DateAndTimePeriod(start: now));
     },

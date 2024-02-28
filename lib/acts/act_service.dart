@@ -24,17 +24,18 @@ class ActService {
   // FIXME ここに定義されるのはおかしい
   final NotificationClientV2 _notificationClient;
 
-  Future<SavedAct> start(int memId, DateAndTime when) => i(
-        () async {
-          final receivedAct = await _actRepository.receive(
-            Act(memId, DateAndTimePeriod(start: when)),
-          );
-
-          _registerStartNotifications(receivedAct.memId);
-
-          return receivedAct;
+  Future<SavedAct> start(
+    int memId,
+    DateAndTime when,
+  ) =>
+      i(
+        () async => await _actRepository.receive(
+          Act(memId, DateAndTimePeriod(start: when)),
+        ),
+        {
+          "memId": memId,
+          "when": when,
         },
-        [memId, when],
       );
 
   Future<SavedAct> finish(int actId, DateAndTime when) => i(
