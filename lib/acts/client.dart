@@ -50,7 +50,7 @@ class ActsClient {
           if (replaced.period.end == null) {
             _registerStartNotifications(replaced.memId);
           } else {
-            // _cancelNotifications(replaced.memId);
+            _cancelNotifications(replaced.memId);
           }
 
           return replaced;
@@ -124,6 +124,15 @@ class ActsClient {
         {
           "memId": memId,
         },
+      );
+
+  Future _cancelNotifications(int memId) => v(
+        () async {
+          await _notificationRepository.discard(activeActNotificationId(memId));
+          await _notificationRepository
+              .discard(afterActStartedNotificationId(memId));
+        },
+        memId,
       );
 
   ActsClient._(

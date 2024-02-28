@@ -45,17 +45,7 @@ class ActService {
       );
 
   Future<SavedAct> edit(SavedAct editingAct) => i(
-        () async {
-          final replaced = await _actRepository.replace(editingAct);
-
-          if (replaced.period.end == null) {
-            // _registerStartNotifications(replaced.memId);
-          } else {
-            _cancelNotifications(replaced.memId);
-          }
-
-          return replaced;
-        },
+        () async => await _actRepository.replace(editingAct),
         editingAct,
       );
 
