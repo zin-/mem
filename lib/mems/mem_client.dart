@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_detail.dart';
 import 'package:mem/core/mem_item.dart';
@@ -9,13 +8,13 @@ import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification_repository.dart';
 import 'package:mem/notifications/notification_service.dart';
 import 'package:mem/repositories/mem.dart';
-import 'package:mem/repositories/mem_notification.dart';
 
 import 'mem_service.dart';
 
 class MemClient {
   final MemService _memService;
   final NotificationClientV3 _notificationClient;
+  @Deprecated("use NotificationClientV3")
   final NotificationService _notificationService;
   final NotificationRepository _notificationRepository;
 
@@ -34,32 +33,11 @@ class MemClient {
             ),
           );
 
-          // TODO ここでnotificationClientを使って通知を登録する
           final savedMem = saved.mem;
           if (savedMem is SavedMem) {
-            _notificationService.memReminder(savedMem);
-
-            saved.notifications?.forEach((e) {
-              if (e.isEnabled()) {
-                _notificationService.memRepeatedReminder(savedMem, e);
-              } else {
-                _notificationService.memRepeatedReminder(savedMem, null);
-              }
-            });
-          }
-
-          final repeatMemNotification = saved.notifications
-              ?.whereType<SavedMemNotification>()
-              .singleWhereOrNull(
-                (element) => element.isRepeated(),
-              );
-          if (repeatMemNotification != null) {
-            await _notificationClient.registerMemRepeatNotification(
-              saved.mem.name,
-              repeatMemNotification,
-              saved.notifications?.singleWhereOrNull(
-                (element) => element.isRepeatByNDay(),
-              ),
+            _notificationClient.registerMemNotifications(
+              savedMem,
+              saved.notifications,
             );
           }
 

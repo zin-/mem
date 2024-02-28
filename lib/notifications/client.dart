@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mem/components/l10n.dart';
@@ -17,6 +18,8 @@ import 'package:mem/notifications/notification/show_notification.dart';
 import 'package:mem/notifications/notification/start_act_notification_action.dart';
 import 'package:mem/notifications/notification_channels.dart';
 import 'package:mem/notifications/notification_ids.dart';
+import 'package:mem/notifications/notification_service.dart';
+import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
@@ -67,9 +70,47 @@ class NotificationClientV3 {
   final NotificationChannels _notificationChannels;
   final NotificationActions _notificationActions;
 
+  final NotificationService _notificationService;
   final NotificationRepository _notificationRepository;
 
-  Future<void> registerMemRepeatNotification(
+  void registerMemNotifications(
+    SavedMem savedMem,
+    Iterable<MemNotification>? memNotifications,
+  ) =>
+      v(
+        () {
+          _notificationService.memReminder(savedMem);
+
+          memNotifications?.forEach((e) {
+            if (e.isEnabled()) {
+              _notificationService.memRepeatedReminder(savedMem, e);
+            } else {
+              _notificationService.memRepeatedReminder(savedMem, null);
+            }
+          });
+
+          final repeatMemNotification = memNotifications
+              ?.whereType<SavedMemNotification>()
+              .singleWhereOrNull(
+                (element) => element.isRepeated(),
+              );
+          if (repeatMemNotification != null) {
+            _registerMemRepeatNotification(
+              savedMem.name,
+              repeatMemNotification,
+              memNotifications?.singleWhereOrNull(
+                (element) => element.isRepeatByNDay(),
+              ),
+            );
+          }
+        },
+        {
+          "savedMem": savedMem,
+          "memNotifications": memNotifications,
+        },
+      );
+
+  Future<void> _registerMemRepeatNotification(
     String memName,
     SavedMemNotification repeatMemNotification,
     MemNotification? repeatEveryNDay,
@@ -125,6 +166,7 @@ class NotificationClientV3 {
   NotificationClientV3._(
     this._notificationChannels,
     this._notificationActions,
+    this._notificationService,
     this._notificationRepository,
   );
 
@@ -136,6 +178,7 @@ class NotificationClientV3 {
           return _instance ??= NotificationClientV3._(
             NotificationChannels(l10n),
             NotificationActions(l10n),
+            NotificationService(),
             NotificationRepository(),
           );
         },
