@@ -70,6 +70,7 @@ class NotificationClientV3 {
   final NotificationChannels _notificationChannels;
   final NotificationActions _notificationActions;
 
+  @Deprecated("use NotificationRepository")
   final NotificationService _notificationService;
   final NotificationRepository _notificationRepository;
 
@@ -79,7 +80,7 @@ class NotificationClientV3 {
   ) =>
       v(
         () {
-          _notificationService.memReminder(savedMem);
+          _memReminder(savedMem);
 
           memNotifications?.forEach((e) {
             if (e.isEnabled()) {
@@ -119,6 +120,23 @@ class NotificationClientV3 {
         },
         {
           "memId": memId,
+        },
+      );
+
+  Future<void> _memReminder(SavedMem savedMem) => v(
+        () async {
+          final memNotifications = MemNotifications.of(
+            savedMem,
+            // TODO 時間がないときのデフォルト値を設定から取得する
+            5, 0,
+          );
+
+          for (var element in memNotifications) {
+            await _notificationRepository.receive(element);
+          }
+        },
+        {
+          "savedMem": savedMem,
         },
       );
 

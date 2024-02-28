@@ -15,23 +15,6 @@ class NotificationService {
   // FIXME ここにあるのはおかしい
   final NotificationClientV2 _notificationClient;
 
-  Future<void> memReminder(SavedMem savedMem) => v(
-        () async {
-          final memNotifications = MemNotifications.of(
-            savedMem,
-            // TODO 時間がないときのデフォルト値を設定から取得する
-            5, 0,
-          );
-
-          for (var element in memNotifications) {
-            await _notificationRepository.receive(element);
-          }
-        },
-        {
-          "savedMem": savedMem,
-        },
-      );
-
   Future<void> memRepeatedReminder(
     SavedMem savedMem,
     MemNotification? memNotification,
