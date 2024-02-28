@@ -94,6 +94,31 @@ class MemClient {
         },
       );
 
+  Future<MemDetail> unarchive(Mem mem) => v(
+        () async {
+          // FIXME MemServiceの責務
+          if (mem is SavedMem) {
+            final unarchived = await _memService.unarchive(mem);
+
+            final unarchivedMem = unarchived.mem;
+            // FIXME unarchive後のMemDetailなので、必ずSavedMemのはず
+            if (unarchivedMem is SavedMem) {
+              _notificationService.memReminder(unarchivedMem);
+            }
+
+            return unarchived;
+            // } else {
+            //   // FIXME Memしかないので、子の状態が分からない
+            //   _memService.save();
+          }
+
+          throw Error();
+        },
+        {
+          "mem": mem,
+        },
+      );
+
   MemClient._(
     this._memService,
     this._notificationClient,

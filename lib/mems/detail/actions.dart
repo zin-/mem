@@ -72,7 +72,7 @@ final unarchiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
     () async {
       final mem = ref.read(memDetailProvider(memId)).mem as SavedMem;
 
-      final unarchived = await MemService().unarchive(mem);
+      final unarchived = await _memClient.unarchive(mem);
 
       ref
           .read(editingMemByMemIdProvider(memId).notifier)

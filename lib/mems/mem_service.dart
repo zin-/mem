@@ -4,7 +4,6 @@ import 'package:mem/mems/mem_item.dart';
 import 'package:mem/mems/mem_item_repository.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification_repository.dart';
-import 'package:mem/notifications/notification_service.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
@@ -14,7 +13,6 @@ class MemService {
   final MemRepository _memRepository;
   final MemItemRepository _memItemRepository;
   final MemNotificationRepository _memNotificationRepository;
-  final NotificationService _notificationService;
   final NotificationRepository _notificationRepository;
 
   Future<MemDetail> save(MemDetail memDetail, {bool undo = false}) => i(
@@ -104,12 +102,13 @@ class MemService {
           final unarchivedMem = await _memRepository.unarchive(mem);
           final unarchivedMemItems =
               await _memItemRepository.unarchiveByMemId(unarchivedMem.id);
-
-          _notificationService.memReminder(unarchivedMem);
+          final unarchivedMemNotifications = await _memNotificationRepository
+              .unarchiveByMemId(unarchivedMem.id);
 
           return MemDetail(
             unarchivedMem,
-            unarchivedMemItems.toList(),
+            unarchivedMemItems.toList(growable: false),
+            unarchivedMemNotifications.toList(growable: false),
           );
         },
         mem,
@@ -136,7 +135,6 @@ class MemService {
     this._memRepository,
     this._memItemRepository,
     this._memNotificationRepository,
-    this._notificationService,
     this._notificationRepository,
   );
 
@@ -147,7 +145,6 @@ class MemService {
           MemRepository(),
           MemItemRepository(),
           MemNotificationRepository(),
-          NotificationService(),
           NotificationRepository(),
         ),
       );
