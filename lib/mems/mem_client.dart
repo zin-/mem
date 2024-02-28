@@ -4,8 +4,6 @@ import 'package:mem/core/mem_item.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/client.dart';
-import 'package:mem/notifications/mem_notifications.dart';
-import 'package:mem/notifications/notification_repository.dart';
 import 'package:mem/repositories/mem.dart';
 
 import 'mem_service.dart';
@@ -13,8 +11,8 @@ import 'mem_service.dart';
 class MemClient {
   final MemService _memService;
   final NotificationClientV3 _notificationClient;
-  final NotificationRepository _notificationRepository;
 
+  @Deprecated("use NotificationClientV3")
   Future<MemDetail> save(
     Mem mem,
     List<MemItem> memItemList,
@@ -56,7 +54,7 @@ class MemClient {
             final archivedMem = archived.mem;
             // FIXME archive後のMemDetailなので、必ずSavedMemのはず
             if (archivedMem is SavedMem) {
-              _notificationClient.cancelMemNotifications(archivedMem);
+              _notificationClient.cancelMemNotifications(archivedMem.id);
             }
 
             return archived;
@@ -107,10 +105,7 @@ class MemClient {
           final removeSuccess = await _memService.remove(memId);
 
           if (removeSuccess) {
-            CancelAllMemNotifications.of(memId).forEach(
-              (cancelNotification) =>
-                  _notificationRepository.receive(cancelNotification),
-            );
+            _notificationClient.cancelMemNotifications(memId);
           }
 
           return removeSuccess;
@@ -123,7 +118,6 @@ class MemClient {
   MemClient._(
     this._memService,
     this._notificationClient,
-    this._notificationRepository,
   );
 
   static MemClient? _instance;
@@ -132,7 +126,6 @@ class MemClient {
         () => _instance ??= MemClient._(
           MemService(),
           NotificationClientV3(),
-          NotificationRepository(),
         ),
       );
 }

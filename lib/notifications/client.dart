@@ -110,12 +110,15 @@ class NotificationClientV3 {
         },
       );
 
-  void cancelMemNotifications(SavedMem savedMem) => v(
+  void cancelMemNotifications(int memId) => v(
         () {
-          _notificationService.memReminder(savedMem);
+          CancelAllMemNotifications.of(memId).forEach(
+            (cancelNotification) =>
+                _notificationRepository.receive(cancelNotification),
+          );
         },
         {
-          "savedMem": savedMem,
+          "memId": memId,
         },
       );
 
