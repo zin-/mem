@@ -12,6 +12,14 @@ class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
         memId,
       );
 
+  Future<Iterable<SavedMemNotification>> archiveByMemId(int memId) => v(
+        () async => Future.wait(
+            (await shipByMemId(memId)).map((e) => super.archive(e))),
+        {
+          "memId": memId,
+        },
+      );
+
   Future<Iterable<SavedMemNotification>> shipByMemIdAndAfterActStarted(
           int memId) =>
       v(

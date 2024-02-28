@@ -85,12 +85,20 @@ class MemService {
           final archivedMem = await _memRepository.archive(mem);
           final archivedMemItems =
               await _memItemRepository.archiveByMemId(archivedMem.id);
+          final archivedMemNotifications =
+              await _memNotificationRepository.archiveByMemId(archivedMem.id);
 
           _notificationService.memReminder(archivedMem);
 
-          return MemDetail(archivedMem, archivedMemItems.toList());
+          return MemDetail(
+            archivedMem,
+            archivedMemItems.toList(),
+            archivedMemNotifications.toList(),
+          );
         },
-        mem,
+        {
+          "mem": mem,
+        },
       );
 
   Future<MemDetail> unarchive(SavedMem mem) => i(
