@@ -76,7 +76,7 @@ class LogService {
   }
 
   T functionLog<T>(Level level, T Function() function, [dynamic args]) {
-    valueLog(level, args.toString(), prefixes: ["[start] :: "]);
+    valueLog(level, args, prefixes: ["[start] :: "]);
 
     try {
       final result = function._callWithDebug(level == Level.debug);
