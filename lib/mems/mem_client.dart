@@ -5,6 +5,8 @@ import 'package:mem/core/mem_item.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/client.dart';
+import 'package:mem/notifications/notification_service.dart';
+import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
 
 import 'mem_service.dart';
@@ -12,6 +14,7 @@ import 'mem_service.dart';
 class MemClient {
   final MemService _memService;
   final NotificationClientV3 _notificationClient;
+  final NotificationService _notificationService;
 
   Future<MemDetail> save(
     Mem mem,
@@ -29,6 +32,19 @@ class MemClient {
           );
 
           // TODO ここでnotificationClientを使って通知を登録する
+          final savedMem = saved.mem;
+          if (savedMem is SavedMem) {
+            _notificationService.memReminder(savedMem);
+
+            saved.notifications?.forEach((e) {
+              if (e.isEnabled()) {
+                _notificationService.memRepeatedReminder(savedMem, e);
+              } else {
+                _notificationService.memRepeatedReminder(savedMem, null);
+              }
+            });
+          }
+
           final repeatMemNotification = saved.notifications
               ?.whereType<SavedMemNotification>()
               .singleWhereOrNull(
@@ -53,7 +69,11 @@ class MemClient {
         },
       );
 
-  MemClient._(this._memService, this._notificationClient);
+  MemClient._(
+    this._memService,
+    this._notificationClient,
+    this._notificationService,
+  );
 
   static MemClient? _instance;
 
@@ -61,6 +81,7 @@ class MemClient {
         () => _instance ??= MemClient._(
           MemService(),
           NotificationClientV3(),
+          NotificationService(),
         ),
       );
 }

@@ -24,7 +24,6 @@ class MemService {
           final savedMem = (mem is SavedMem && !undo
               ? await _memRepository.replace(mem)
               : await _memRepository.receive(mem));
-          _notificationService.memReminder(savedMem);
 
           final savedMemItems = (await Future.wait(
               memDetail.memItems.map((e) => (e is SavedMemItem && !undo
@@ -42,10 +41,6 @@ class MemService {
                     if (e is SavedMemNotification) {
                       _memNotificationRepository.wasteById(e.id);
                     }
-                    _notificationService.memRepeatedReminder(
-                      savedMem,
-                      null,
-                    );
                     return Future.value(e);
                   } else {
                     return (e is SavedMemNotification && !undo
@@ -54,13 +49,7 @@ class MemService {
                           ))
                         : _memNotificationRepository.receive(e.copiedWith(
                             memId: () => savedMem.id,
-                          )))
-                      ..then(
-                        (value) => _notificationService.memRepeatedReminder(
-                          savedMem,
-                          value,
-                        ),
-                      );
+                          )));
                   }
                 }));
 
