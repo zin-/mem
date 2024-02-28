@@ -23,16 +23,38 @@ const _scenarioName = "Memo list scenario";
 void testMemoListScenario() => group(
       " $_scenarioName",
       () {
+        late final DatabaseAccessor dbA;
+        setUpAll(() async {
+          dbA = await openTestDatabase(databaseDefinition);
+        });
+
+        const insertedMemName = "$_scenarioName: inserted - mem name";
+        const unarchivedMemName = "$insertedMemName - unarchived";
+        const archivedMemName = "$insertedMemName - archived";
+        setUp(() async {
+          await clearAllTestDatabaseRows(databaseDefinition);
+
+          await dbA.insert(
+            defTableMems,
+            {
+              defColMemsName.name: unarchivedMemName,
+              defColCreatedAt.name: DateTime.now(),
+            },
+          );
+          await dbA.insert(
+            defTableMems,
+            {
+              defColMemsName.name: archivedMemName,
+              defColCreatedAt.name: DateTime.now(),
+              defColArchivedAt.name: DateTime.now(),
+            },
+          );
+        });
+
         group(
           ": Transit",
           () {
-            late final DatabaseAccessor dbA;
-            setUpAll(() async {
-              dbA = await openTestDatabase(databaseDefinition);
-            });
-
-            const insertedMemName = "$_scenarioName - inserted - mem - name";
-            const insertedMemMemo = "$_scenarioName - inserted - mem - memo";
+            const insertedMemMemo = "$_scenarioName: inserted - mem memo";
             late int insertedMemId;
 
             setUp(() async {
@@ -93,6 +115,44 @@ void testMemoListScenario() => group(
                 expect(memMemo.initialValue, equals(insertedMemMemo));
               },
             );
+          },
+        );
+
+        testWidgets(
+          ": Filter: Archive",
+          (widgetTester) async {
+            await runApplication();
+            await widgetTester.pumpAndSettle();
+
+            expect(find.text(unarchivedMemName), findsOneWidget);
+            expect(find.text(archivedMemName), findsNothing);
+
+            await widgetTester.tap(filterListIconFinder);
+            await widgetTester.pumpAndSettle();
+
+            await widgetTester.tap(showArchiveSwitchFinder);
+            await widgetTester.pumpAndSettle();
+
+            expect(find.text(unarchivedMemName), findsOneWidget);
+            expect(find.text(archivedMemName), findsOneWidget);
+
+            await widgetTester.tap(showNotArchiveSwitchFinder);
+            await widgetTester.pumpAndSettle();
+
+            expect(find.text(unarchivedMemName), findsNothing);
+            expect(find.text(archivedMemName), findsOneWidget);
+
+            await widgetTester.tap(showArchiveSwitchFinder);
+            await widgetTester.pumpAndSettle();
+
+            expect(find.text(unarchivedMemName), findsOneWidget);
+            expect(find.text(archivedMemName), findsOneWidget);
+
+            await closeMemListFilter(widgetTester);
+            await widgetTester.pumpAndSettle();
+
+            expect(find.text(unarchivedMemName), findsOneWidget);
+            expect(find.text(archivedMemName), findsOneWidget);
           },
         );
       },
