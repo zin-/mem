@@ -8,11 +8,13 @@ import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/mems/mem_service.dart';
 import 'package:mem/mems/states.dart';
 
+final _memClient = MemClient();
+
 final saveMem =
     Provider.autoDispose.family<Future<MemDetail>, int?>((ref, memId) => v(
           () async {
             final memDetail = ref.watch(memDetailProvider(memId));
-            final saved = await MemClient().save(
+            final saved = await _memClient.save(
               memDetail.mem,
               memDetail.memItems,
               memDetail.notifications ?? [],
@@ -49,7 +51,7 @@ final archiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
     () async {
       final mem = ref.read(memDetailProvider(memId)).mem as SavedMem;
 
-      final archived = await MemService().archive(mem);
+      final archived = await _memClient.archive(mem);
 
       ref
           .read(editingMemByMemIdProvider(memId).notifier)
