@@ -10,7 +10,6 @@ import 'client.dart';
 import 'mem_notifications.dart';
 import 'notification/action.dart';
 import 'notification/channel.dart';
-import 'notification/repeated_notification.dart';
 
 class NotificationsWrapper {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
@@ -54,9 +53,8 @@ class NotificationsWrapper {
     TZDateTime tzDateTime,
     String? payload,
     List<NotificationAction> actions,
-    NotificationChannel channel, [
-    NotificationInterval? interval,
-  ]) =>
+    NotificationChannel channel,
+  ) =>
       v(
         () => _flutterLocalNotificationsPlugin.zonedSchedule(
           id,
@@ -71,9 +69,6 @@ class NotificationsWrapper {
               UILocalNotificationDateInterpretation.absoluteTime,
           androidScheduleMode: AndroidScheduleMode.exact,
           payload: payload,
-          matchDateTimeComponents:
-              // TODO NotificationInterval.perDay以外も指定できるようにする
-              interval == null ? null : DateTimeComponents.time,
         ),
         {
           'id': id,

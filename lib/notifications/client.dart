@@ -10,7 +10,6 @@ import 'package:mem/main.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/cancel_notification.dart';
 import 'package:mem/notifications/notification/one_time_notification.dart';
-import 'package:mem/notifications/notification/repeated_notification.dart';
 import 'package:mem/notifications/notification/show_notification.dart';
 import 'package:mem/notifications/notification_channels.dart';
 import 'package:mem/notifications/notification_ids.dart';
@@ -288,7 +287,7 @@ class NotificationClient {
               notifyFirstAt = notifyFirstAt.add(const Duration(days: 1));
             }
 
-            final repeatedNotification = RepeatedNotification(
+            final repeatedNotification = ShowNotification(
               memRepeatedNotificationId(savedMem.id),
               savedMem.name,
               memNotification.message,
@@ -298,8 +297,6 @@ class NotificationClient {
                 notificationActions.finishActiveActAction,
               ],
               notificationChannels.repeatedReminderChannel,
-              notifyFirstAt,
-              NotificationInterval.perDay,
             );
 
             await _notificationRepository.receive(repeatedNotification);
