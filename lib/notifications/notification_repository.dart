@@ -2,12 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:timezone/data/latest_all.dart';
-import 'package:timezone/timezone.dart';
 
 import 'icons.dart';
 import 'notification/cancel_notification.dart';
 import 'notification/notification.dart';
-import 'notification/one_time_notification.dart';
 import 'notification/show_notification.dart';
 import 'wrapper.dart';
 
@@ -21,17 +19,7 @@ class NotificationRepository extends RepositoryV1<Notification, void> {
   @override
   Future<void> receive(Notification entity) => v(
         () async {
-          if (entity is OneTimeNotification) {
-            await _flutterLocalNotificationsWrapper?.zonedSchedule(
-              entity.id,
-              entity.title,
-              entity.body,
-              TZDateTime.from(entity.notifyAt, local),
-              entity.payloadJson,
-              entity.actions,
-              entity.channel,
-            );
-          } else if (entity is ShowNotification) {
+          if (entity is ShowNotification) {
             await _flutterLocalNotificationsWrapper?.show(
               entity.id,
               entity.title,

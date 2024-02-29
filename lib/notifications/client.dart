@@ -9,7 +9,6 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/cancel_notification.dart';
-import 'package:mem/notifications/notification/one_time_notification.dart';
 import 'package:mem/notifications/notification/show_notification.dart';
 import 'package:mem/notifications/notification_channels.dart';
 import 'package:mem/notifications/notification_ids.dart';
@@ -169,7 +168,7 @@ class NotificationClient {
           if (afterActStartedNotifications.isNotEmpty) {
             for (var notification in afterActStartedNotifications) {
               _notificationRepository.receive(
-                OneTimeNotification(
+                ShowNotification(
                   afterActStartedNotificationId(memId),
                   memName,
                   notification.message,
@@ -178,7 +177,6 @@ class NotificationClient {
                     notificationActions.finishActiveActAction,
                   ],
                   notificationChannels.afterActStartedNotificationChannel,
-                  DateTime.now().add(Duration(seconds: notification.time!)),
                 ),
               );
             }

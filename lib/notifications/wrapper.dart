@@ -46,6 +46,7 @@ class NotificationsWrapper {
         },
       );
 
+  @Deprecated("use ScheduleClient.")
   Future<void> zonedSchedule(
     int id,
     String title,

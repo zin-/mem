@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/notifications/notification/show_notification.dart';
 import 'package:mem/repositories/mem.dart';
 import 'client.dart';
 import 'notification/cancel_notification.dart';
 import 'notification/notification.dart';
-import 'notification/one_time_notification.dart';
 import 'notification_ids.dart';
 
 const memIdKey = 'memId';
@@ -70,7 +70,7 @@ class MemNotifications {
   ) {
     final notificationClient = NotificationClient();
 
-    return OneTimeNotification(
+    return ShowNotification(
       id,
       title,
       body,
@@ -79,15 +79,6 @@ class MemNotifications {
         notificationClient.notificationActions.doneMemAction,
       ],
       notificationClient.notificationChannels.reminderChannel,
-      notifyAt.isAllDay == true
-          ? DateTime(
-              notifyAt.year,
-              notifyAt.month,
-              notifyAt.day,
-              hour,
-              minute,
-            )
-          : notifyAt,
     );
   }
 }
