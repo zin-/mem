@@ -199,6 +199,17 @@ class NotificationClientV3 {
         },
       );
 
+  Future<void> cancelActNotification(int memId) => v(
+        () async {
+          await _notificationRepository.discard(activeActNotificationId(memId));
+          await _notificationRepository
+              .discard(afterActStartedNotificationId(memId));
+        },
+        {
+          "memId": memId,
+        },
+      );
+
   Future<void> _memReminder(SavedMem savedMem) => v(
         () async {
           final memNotifications = MemNotifications.of(

@@ -5,8 +5,6 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/notifications/client.dart';
-import 'package:mem/notifications/notification_ids.dart';
-import 'package:mem/notifications/notification_repository.dart';
 
 class ActsClient {
   final ActService _actService;
@@ -15,7 +13,6 @@ class ActsClient {
   final MemNotificationRepository _memNotificationRepository;
 
   final NotificationClientV3 _notificationClient;
-  final NotificationRepository _notificationRepository;
 
   Future<SavedAct> start(
     int memId,
@@ -45,7 +42,7 @@ class ActsClient {
           if (replaced.period.end == null) {
             _registerStartNotifications(replaced.memId);
           } else {
-            _cancelNotifications(replaced.memId);
+            _notificationClient.cancelActNotification(replaced.memId);
           }
 
           return replaced;
@@ -81,7 +78,7 @@ class ActsClient {
         () async {
           final finished = await _actService.finish(actId, when);
 
-          _cancelNotifications(finished.memId);
+          _notificationClient.cancelActNotification(finished.memId);
 
           // ISSUE #226
 
@@ -97,7 +94,7 @@ class ActsClient {
         () async {
           final deleted = await _actService.delete(actId);
 
-          _cancelNotifications(deleted.memId);
+          _notificationClient.cancelActNotification(deleted.memId);
 
           return deleted;
         },
@@ -123,21 +120,11 @@ class ActsClient {
         },
       );
 
-  Future _cancelNotifications(int memId) => v(
-        () async {
-          await _notificationRepository.discard(activeActNotificationId(memId));
-          await _notificationRepository
-              .discard(afterActStartedNotificationId(memId));
-        },
-        memId,
-      );
-
   ActsClient._(
     this._actService,
     this._memRepository,
     this._memNotificationRepository,
     this._notificationClient,
-    this._notificationRepository,
   );
 
   static ActsClient? _instance;
@@ -147,6 +134,5 @@ class ActsClient {
         MemRepository(),
         MemNotificationRepository(),
         NotificationClientV3(),
-        NotificationRepository(),
       );
 }
