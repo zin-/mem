@@ -98,6 +98,7 @@ class CancelAllMemNotifications {
         CancelNotification(memEndNotificationId(memId)),
         CancelNotification(memRepeatedNotificationId(memId)),
         CancelNotification(activeActNotificationId(memId)),
+        CancelNotification(pausedActNotificationId(memId)),
         CancelNotification(afterActStartedNotificationId(memId)),
       ];
 }
