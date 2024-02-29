@@ -72,7 +72,7 @@ class MemNotifications {
     int hour,
     int minute,
   ) {
-    final notificationClient = NotificationClientV3();
+    final notificationClient = NotificationClient();
 
     return OneTimeNotification(
       id,

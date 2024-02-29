@@ -47,10 +47,10 @@ Future<void> showRepeatEveryNDayNotification(
             memNotification.message,
             json.encode(params),
             [
-              NotificationClientV3().notificationActions.startActAction,
-              NotificationClientV3().notificationActions.finishActiveActAction,
+              NotificationClient().notificationActions.startActAction,
+              NotificationClient().notificationActions.finishActiveActAction,
             ],
-            NotificationClientV3().notificationChannels.repeatedReminderChannel,
+            NotificationClient().notificationChannels.repeatedReminderChannel,
           ),
         );
       },
@@ -61,7 +61,7 @@ Future<void> showRepeatEveryNDayNotification(
     );
 
 // TODO refactor
-class NotificationClientV3 {
+class NotificationClient {
   final NotificationChannels notificationChannels;
   final NotificationActions notificationActions;
 
@@ -322,19 +322,19 @@ class NotificationClientV3 {
         },
       );
 
-  NotificationClientV3._(
+  NotificationClient._(
     this.notificationChannels,
     this.notificationActions,
     this._scheduleClient,
     this._notificationRepository,
   );
 
-  static NotificationClientV3? _instance;
+  static NotificationClient? _instance;
 
-  factory NotificationClientV3([BuildContext? context]) => v(
+  factory NotificationClient([BuildContext? context]) => v(
         () {
           final l10n = buildL10n(context);
-          return _instance ??= NotificationClientV3._(
+          return _instance ??= NotificationClient._(
             NotificationChannels(l10n),
             NotificationActions(l10n),
             ScheduleClient(),

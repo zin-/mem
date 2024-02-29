@@ -219,7 +219,7 @@ Future<void> onDidReceiveNotificationResponse(NotificationResponse details) =>
 
             if (payload.containsKey(memIdKey)) {
               final memId = payload[memIdKey];
-              await NotificationClientV3()
+              await NotificationClient()
                   .notificationActions
                   .list
                   .singleWhere((element) => element.id == actionId)

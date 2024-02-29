@@ -10,7 +10,7 @@ import 'mem_service.dart';
 
 class MemClient {
   final MemService _memService;
-  final NotificationClientV3 _notificationClient;
+  final NotificationClient _notificationClient;
 
   Future<MemDetail> save(
     Mem mem,
@@ -122,7 +122,7 @@ class MemClient {
   factory MemClient() => v(
         () => _instance ??= MemClient._(
           MemService(),
-          NotificationClientV3(),
+          NotificationClient(),
         ),
       );
 }

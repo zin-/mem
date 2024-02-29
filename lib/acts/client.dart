@@ -12,7 +12,7 @@ class ActsClient {
   final MemRepository _memRepository;
   final MemNotificationRepository _memNotificationRepository;
 
-  final NotificationClientV3 _notificationClient;
+  final NotificationClient _notificationClient;
 
   Future<SavedAct> start(
     int memId,
@@ -133,6 +133,6 @@ class ActsClient {
         ActService(),
         MemRepository(),
         MemNotificationRepository(),
-        NotificationClientV3(),
+        NotificationClient(),
       );
 }
