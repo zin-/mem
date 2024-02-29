@@ -20,6 +20,8 @@ import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
+import 'package:mem/settings/client.dart';
+import 'package:mem/settings/keys.dart';
 
 import 'notification_actions.dart';
 import 'notification_repository.dart';
@@ -67,6 +69,33 @@ class NotificationClient {
 
   final ScheduleClient _scheduleClient;
   final NotificationRepository _notificationRepository;
+  final PreferenceClient _preferenceClient;
+
+  NotificationClient._(
+    this.notificationChannels,
+    this.notificationActions,
+    this._scheduleClient,
+    this._notificationRepository,
+    this._preferenceClient,
+  );
+
+  static NotificationClient? _instance;
+
+  factory NotificationClient([BuildContext? context]) => v(
+        () {
+          final l10n = buildL10n(context);
+          return _instance ??= NotificationClient._(
+            NotificationChannels(l10n),
+            NotificationActions(l10n),
+            ScheduleClient(),
+            NotificationRepository(),
+            PreferenceClient(),
+          );
+        },
+        {
+          "context": context,
+        },
+      );
 
   void registerMemNotifications(
     SavedMem savedMem,
@@ -203,10 +232,12 @@ class NotificationClient {
 
   Future<void> _memReminder(SavedMem savedMem) => v(
         () async {
+          final startOfDay =
+              (await _preferenceClient.shipByKey(startOfDayKey)).value;
           final memNotifications = MemNotifications.of(
             savedMem,
-            // TODO 時間がないときのデフォルト値を設定から取得する
-            5, 0,
+            startOfDay?.hour ?? 0,
+            startOfDay?.minute ?? 0,
           );
 
           for (var element in memNotifications) {
@@ -319,30 +350,6 @@ class NotificationClient {
         {
           "memName": memName,
           "repeatMemNotification": repeatMemNotification,
-        },
-      );
-
-  NotificationClient._(
-    this.notificationChannels,
-    this.notificationActions,
-    this._scheduleClient,
-    this._notificationRepository,
-  );
-
-  static NotificationClient? _instance;
-
-  factory NotificationClient([BuildContext? context]) => v(
-        () {
-          final l10n = buildL10n(context);
-          return _instance ??= NotificationClient._(
-            NotificationChannels(l10n),
-            NotificationActions(l10n),
-            ScheduleClient(),
-            NotificationRepository(),
-          );
-        },
-        {
-          "context": context,
         },
       );
 }
