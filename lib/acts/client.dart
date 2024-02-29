@@ -19,7 +19,8 @@ class ActsClient {
   final MemRepository _memRepository;
   final MemNotificationRepository _memNotificationRepository;
 
-  final NotificationClientV2 _notificationClient;
+  final NotificationClientV3 _notificationClient;
+  final NotificationClientV2 _notificationClientV2;
   final NotificationRepository _notificationRepository;
 
   Future<SavedAct> start(
@@ -60,26 +61,21 @@ class ActsClient {
         },
       );
 
-  Future pause(int actId, DateAndTime when) => i(
+  Future pause(
+    int actId,
+    DateAndTime when,
+  ) =>
+      i(
         () async {
           final finished = await _actService.finish(actId, when);
 
           final mem = await _memRepository.shipById(finished.memId);
-
-          await _notificationRepository.receive(
-            ShowNotification(
-              pausedActNotificationId(finished.memId),
-              mem.name,
-              "Paused",
-              json.encode({memIdKey: mem.id}),
-              [
-                _notificationClient.startActAction,
-              ],
-              _notificationClient.pausedAct,
-            ),
-          );
+          await _notificationClient.pauseAct(mem.id, mem.name, when);
         },
-        {actId, when},
+        {
+          "actId": actId,
+          "when": when,
+        },
       );
 
   Future<SavedAct> finish(
@@ -126,10 +122,10 @@ class ActsClient {
               'Running',
               json.encode({memIdKey: memId}),
               [
-                _notificationClient.finishActiveActAction,
-                _notificationClient.pauseAct,
+                _notificationClientV2.finishActiveActAction,
+                _notificationClientV2.pauseAct,
               ],
-              _notificationClient.activeActNotificationChannel,
+              _notificationClientV2.activeActNotificationChannel,
             ),
           );
 
@@ -145,9 +141,9 @@ class ActsClient {
                   notification.message,
                   json.encode({memIdKey: memId}),
                   [
-                    _notificationClient.finishActiveActAction,
+                    _notificationClientV2.finishActiveActAction,
                   ],
-                  _notificationClient.afterActStartedNotificationChannel,
+                  _notificationClientV2.afterActStartedNotificationChannel,
                   DateTime.now().add(Duration(seconds: notification.time!)),
                 ),
               );
@@ -173,6 +169,7 @@ class ActsClient {
     this._memRepository,
     this._memNotificationRepository,
     this._notificationClient,
+    this._notificationClientV2,
     this._notificationRepository,
   );
 
@@ -182,6 +179,7 @@ class ActsClient {
         ActService(),
         MemRepository(),
         MemNotificationRepository(),
+        NotificationClientV3(),
         NotificationClientV2(),
         NotificationRepository(),
       );

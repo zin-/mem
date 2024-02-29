@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mem/components/l10n.dart';
+import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
@@ -121,6 +122,33 @@ class NotificationClientV3 {
         },
         {
           "memId": memId,
+        },
+      );
+
+  Future pauseAct(
+    int memId,
+    String memName,
+    DateAndTime when,
+  ) =>
+      i(
+        () async {
+          await _notificationRepository.receive(
+            ShowNotification(
+              pausedActNotificationId(memId),
+              memName,
+              "Paused",
+              json.encode({memIdKey: memId}),
+              [
+                _notificationActions.startActAction,
+              ],
+              _notificationChannels.pausedAct,
+            ),
+          );
+        },
+        {
+          "memId": memId,
+          "memName": memName,
+          "when": when,
         },
       );
 
