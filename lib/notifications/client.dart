@@ -232,16 +232,24 @@ class NotificationClient {
 
   Future<void> _memReminder(SavedMem savedMem) => v(
         () async {
-          final startOfDay =
-              (await _preferenceClient.shipByKey(startOfDayKey)).value;
-          final memNotifications = MemNotifications.of(
-            savedMem,
-            startOfDay?.hour ?? 0,
-            startOfDay?.minute ?? 0,
-          );
+          if (savedMem.isDone || savedMem.isArchived) {
+            CancelAllMemNotifications.of(savedMem.id).forEach((element) {
+              _notificationRepository.discard(element.id);
+              _scheduleClient.discard(element.id);
+            });
+          } else {
+            final startOfDay =
+                (await _preferenceClient.shipByKey(startOfDayKey)).value;
 
-          for (var element in memNotifications) {
-            await _notificationRepository.receive(element);
+            final memNotifications = MemNotifications.of(
+              savedMem,
+              startOfDay?.hour ?? 0,
+              startOfDay?.minute ?? 0,
+            );
+
+            for (var element in memNotifications) {
+              await _notificationRepository.receive(element);
+            }
           }
         },
         {

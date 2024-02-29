@@ -21,40 +21,36 @@ class MemNotifications {
   ) =>
       v(
         () {
-          if (savedMem.isDone || savedMem.isArchived) {
-            return CancelAllMemNotifications.of(savedMem.id);
-          } else {
-            final notifications = <Notification>[];
-            final now = DateTime.now();
+          final notifications = <Notification>[];
+          final now = DateTime.now();
 
-            final periodStart = savedMem.period?.start;
-            if (periodStart != null && periodStart.isAfter(now)) {
-              notifications.add(_createNotificationAt(
-                memStartNotificationId(savedMem.id),
-                savedMem.name,
-                _startNotificationBody,
-                periodStart,
-                savedMem.id,
-                hour,
-                minute,
-              ));
-            }
-
-            final periodEnd = savedMem.period?.end;
-            if (periodEnd != null && periodEnd.isAfter(now)) {
-              notifications.add(_createNotificationAt(
-                memEndNotificationId(savedMem.id),
-                savedMem.name,
-                _endNotificationBody,
-                periodEnd,
-                savedMem.id,
-                hour,
-                minute,
-              ));
-            }
-
-            return notifications;
+          final periodStart = savedMem.period?.start;
+          if (periodStart != null && periodStart.isAfter(now)) {
+            notifications.add(_createNotificationAt(
+              memStartNotificationId(savedMem.id),
+              savedMem.name,
+              _startNotificationBody,
+              periodStart,
+              savedMem.id,
+              hour,
+              minute,
+            ));
           }
+
+          final periodEnd = savedMem.period?.end;
+          if (periodEnd != null && periodEnd.isAfter(now)) {
+            notifications.add(_createNotificationAt(
+              memEndNotificationId(savedMem.id),
+              savedMem.name,
+              _endNotificationBody,
+              periodEnd,
+              savedMem.id,
+              hour,
+              minute,
+            ));
+          }
+
+          return notifications;
         },
         {
           "savedMem": savedMem,

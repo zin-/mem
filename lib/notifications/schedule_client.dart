@@ -20,6 +20,13 @@ class ScheduleClient extends Repository<Schedule>
         },
       );
 
+  Future<void> discard(int id) => v(
+        () async => await AndroidAlarmManager.cancel(id),
+        {
+          "id": id,
+        },
+      );
+
   ScheduleClient._();
 
   static ScheduleClient? _instance;
