@@ -1,15 +1,10 @@
-import 'dart:convert';
-
 import 'package:mem/acts/act_service.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/notifications/notification/one_time_notification.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/notifications/client.dart';
-import 'package:mem/notifications/mem_notifications.dart';
-import 'package:mem/notifications/notification/show_notification.dart';
 import 'package:mem/notifications/notification_ids.dart';
 import 'package:mem/notifications/notification_repository.dart';
 
@@ -20,7 +15,6 @@ class ActsClient {
   final MemNotificationRepository _memNotificationRepository;
 
   final NotificationClientV3 _notificationClient;
-  final NotificationClientV2 _notificationClientV2;
   final NotificationRepository _notificationRepository;
 
   Future<SavedAct> start(
@@ -70,7 +64,8 @@ class ActsClient {
           final finished = await _actService.finish(actId, when);
 
           final mem = await _memRepository.shipById(finished.memId);
-          await _notificationClient.pauseAct(mem.id, mem.name, when);
+          await _notificationClient.pauseActNotification(
+              mem.id, mem.name, when);
         },
         {
           "actId": actId,
@@ -114,41 +109,14 @@ class ActsClient {
   void _registerStartNotifications(int memId) => v(
         () async {
           final memName = (await _memRepository.shipById(memId)).name;
-
-          _notificationRepository.receive(
-            ShowNotification(
-              activeActNotificationId(memId),
-              memName,
-              'Running',
-              json.encode({memIdKey: memId}),
-              [
-                _notificationClientV2.finishActiveActAction,
-                _notificationClientV2.pauseAct,
-              ],
-              _notificationClientV2.activeActNotificationChannel,
-            ),
-          );
-
           final afterActStartedNotifications = await _memNotificationRepository
               .shipByMemIdAndAfterActStarted(memId);
 
-          if (afterActStartedNotifications.isNotEmpty) {
-            for (var notification in afterActStartedNotifications) {
-              _notificationRepository.receive(
-                OneTimeNotification(
-                  afterActStartedNotificationId(memId),
-                  memName,
-                  notification.message,
-                  json.encode({memIdKey: memId}),
-                  [
-                    _notificationClientV2.finishActiveActAction,
-                  ],
-                  _notificationClientV2.afterActStartedNotificationChannel,
-                  DateTime.now().add(Duration(seconds: notification.time!)),
-                ),
-              );
-            }
-          }
+          _notificationClient.startActNotifications(
+            memId,
+            memName,
+            afterActStartedNotifications,
+          );
         },
         {
           "memId": memId,
@@ -169,7 +137,6 @@ class ActsClient {
     this._memRepository,
     this._memNotificationRepository,
     this._notificationClient,
-    this._notificationClientV2,
     this._notificationRepository,
   );
 
@@ -180,7 +147,6 @@ class ActsClient {
         MemRepository(),
         MemNotificationRepository(),
         NotificationClientV3(),
-        NotificationClientV2(),
         NotificationRepository(),
       );
 }

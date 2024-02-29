@@ -14,6 +14,7 @@ import 'package:mem/notifications/notification/cancel_notification.dart';
 import 'package:mem/notifications/notification/channel.dart';
 import 'package:mem/notifications/notification/done_mem_notification_action.dart';
 import 'package:mem/notifications/notification/finish_active_act_notification_action.dart';
+import 'package:mem/notifications/notification/one_time_notification.dart';
 import 'package:mem/notifications/notification/pause_act_notification_action.dart';
 import 'package:mem/notifications/notification/repeated_notification.dart';
 import 'package:mem/notifications/notification/show_notification.dart';
@@ -125,12 +126,58 @@ class NotificationClientV3 {
         },
       );
 
-  Future pauseAct(
+  Future<void> startActNotifications(
+    int memId,
+    String memName,
+    Iterable<SavedMemNotification> afterActStartedNotifications,
+  ) =>
+      v(
+        () async {
+          _notificationRepository.receive(
+            ShowNotification(
+              activeActNotificationId(memId),
+              memName,
+              'Running',
+              json.encode({memIdKey: memId}),
+              [
+                _notificationActions.finishActiveActAction,
+                _notificationActions.pauseAct,
+              ],
+              _notificationChannels.activeActNotificationChannel,
+            ),
+          );
+
+          if (afterActStartedNotifications.isNotEmpty) {
+            for (var notification in afterActStartedNotifications) {
+              _notificationRepository.receive(
+                OneTimeNotification(
+                  afterActStartedNotificationId(memId),
+                  memName,
+                  notification.message,
+                  json.encode({memIdKey: memId}),
+                  [
+                    _notificationActions.finishActiveActAction,
+                  ],
+                  _notificationChannels.afterActStartedNotificationChannel,
+                  DateTime.now().add(Duration(seconds: notification.time!)),
+                ),
+              );
+            }
+          }
+        },
+        {
+          "memId": memId,
+          "memName": memName,
+          "afterActStartedNotifications": afterActStartedNotifications,
+        },
+      );
+
+  Future<void> pauseActNotification(
     int memId,
     String memName,
     DateAndTime when,
   ) =>
-      i(
+      v(
         () async {
           await _notificationRepository.receive(
             ShowNotification(
