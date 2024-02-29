@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
-import 'package:timezone/timezone.dart';
 
 import 'client.dart';
 import 'mem_notifications.dart';
@@ -43,41 +42,6 @@ class NotificationsWrapper {
           actions,
           channel,
           payload,
-        },
-      );
-
-  @Deprecated("use ScheduleClient.")
-  Future<void> zonedSchedule(
-    int id,
-    String title,
-    String? body,
-    TZDateTime tzDateTime,
-    String? payload,
-    List<NotificationAction> actions,
-    NotificationChannel channel,
-  ) =>
-      v(
-        () => _flutterLocalNotificationsPlugin.zonedSchedule(
-          id,
-          title,
-          body,
-          tzDateTime,
-          _buildNotificationDetails(
-            channel,
-            actions,
-          ),
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
-          androidScheduleMode: AndroidScheduleMode.exact,
-          payload: payload,
-        ),
-        {
-          'id': id,
-          'title': title,
-          'body': body,
-          'tzDateTime': tzDateTime,
-          'payload': payload,
-          'channel': channel,
         },
       );
 
@@ -161,21 +125,6 @@ class NotificationsWrapper {
         },
       );
 }
-
-// extension on NotificationInterval {
-//   DateTimeComponents convert() {
-//     switch (this) {
-//       case NotificationInterval.perDay:
-//         return DateTimeComponents.time;
-//       case NotificationInterval.perWeek:
-//         return DateTimeComponents.dayOfWeekAndTime;
-//       case NotificationInterval.perMonth:
-//         return DateTimeComponents.dayOfMonthAndTime;
-//       case NotificationInterval.perYear:
-//         return DateTimeComponents.dateAndTime;
-//     }
-//   }
-// }
 
 // 分かりやすさのために、entry-pointはすべてmain.dartに定義したいが、
 // NotificationResponseがライブラリの型なので、ここで定義する
