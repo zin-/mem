@@ -56,7 +56,7 @@ void main() {
   });
 
   group('Actions', () {
-    final mockedActCounterService = MockActCounterService();
+    final mockedActCounterService = MockActCounterClient();
     ActCounterClient.resetWith(mockedActCounterService);
 
     testWidgets(
