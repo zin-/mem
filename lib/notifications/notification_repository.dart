@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/logger/log_service.dart';
@@ -20,24 +17,6 @@ class NotificationRepository extends RepositoryV1<Notification, void> {
 
   Future<bool?> checkNotification() => v(
         () async => _flutterLocalNotificationsWrapper?.handleAppLaunchDetails(),
-      );
-
-  Future receiveV2(RepeatedNotification entity, Function callback) => v(
-        () async {
-          final intervalSeconds = entity.intervalSeconds;
-          if (intervalSeconds != null) {
-            // FIXME ここにあるのはおかしいのでは？
-            await AndroidAlarmManager.periodic(
-              Duration(seconds: intervalSeconds),
-              entity.id,
-              callback,
-              params: json.decode(entity.payloadJson!),
-            );
-          }
-        },
-        {
-          "entity": entity,
-        },
       );
 
   @override
@@ -96,7 +75,6 @@ class NotificationRepository extends RepositoryV1<Notification, void> {
   factory NotificationRepository() => v(
         () {
           if (defaultTargetPlatform == TargetPlatform.android) {
-            AndroidAlarmManager.initialize();
             initializeTimeZones();
           }
 

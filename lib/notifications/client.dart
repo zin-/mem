@@ -19,6 +19,8 @@ import 'package:mem/notifications/notification/show_notification.dart';
 import 'package:mem/notifications/notification/start_act_notification_action.dart';
 import 'package:mem/notifications/notification_channels.dart';
 import 'package:mem/notifications/notification_ids.dart';
+import 'package:mem/notifications/schedule.dart';
+import 'package:mem/notifications/schedule_client.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
@@ -70,6 +72,7 @@ class NotificationClientV3 {
   final NotificationChannels _notificationChannels;
   final NotificationActions _notificationActions;
 
+  final ScheduleClient _scheduleClient;
   final NotificationRepository _notificationRepository;
 
   void registerMemNotifications(
@@ -219,25 +222,22 @@ class NotificationClientV3 {
             notifyFirstAt = notifyFirstAt.add(const Duration(days: 1));
           }
 
-          await _notificationRepository.receiveV2(
-            RepeatedNotification(
-              memRepeatedNotificationId(repeatMemNotification.memId),
-              memName,
-              repeatMemNotification.message,
-              json.encode({memIdKey: repeatMemNotification.memId}),
-              [
-                _notificationActions.startActAction,
-                _notificationActions.finishActiveActAction,
-              ],
-              _notificationChannels.repeatedReminderChannel,
-              notifyFirstAt,
-              NotificationInterval.perDay,
-              intervalSeconds: repeatEveryNDay?.time == null
-                  ? null
-                  : repeatEveryNDay!.time! * 60 * 60 * 24,
-            ),
-            showRepeatEveryNDayNotification,
-          );
+          final intervalDays = repeatEveryNDay?.time;
+          if (intervalDays != null) {
+            await _scheduleClient.receive(
+              Schedule(
+                memRepeatedNotificationId(repeatMemNotification.memId),
+                notifyFirstAt,
+                Duration(
+                  days: intervalDays,
+                ),
+                showRepeatEveryNDayNotification,
+                {
+                  memIdKey: repeatMemNotification.memId,
+                },
+              ),
+            );
+          }
         },
         {
           "memName": memName,
@@ -248,6 +248,7 @@ class NotificationClientV3 {
   NotificationClientV3._(
     this._notificationChannels,
     this._notificationActions,
+    this._scheduleClient,
     this._notificationRepository,
   );
 
@@ -259,6 +260,7 @@ class NotificationClientV3 {
           return _instance ??= NotificationClientV3._(
             NotificationChannels(l10n),
             NotificationActions(l10n),
+            ScheduleClient(),
             NotificationRepository(),
           );
         },
