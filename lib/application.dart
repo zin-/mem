@@ -8,7 +8,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/list/body.dart';
 import 'package:mem/mems/list/show_new_mem_fab.dart';
-import 'package:mem/notifications/client.dart';
 import 'package:mem/values/dimens.dart';
 import 'package:mem/values/durations.dart';
 
@@ -21,7 +20,6 @@ class MemApplication extends StatelessWidget {
   @override
   Widget build(BuildContext context) => i(
         () {
-          NotificationClientV2(context);
           final l10n = buildL10n(context);
 
           return ProviderScope(

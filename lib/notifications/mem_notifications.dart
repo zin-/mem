@@ -72,7 +72,7 @@ class MemNotifications {
     int hour,
     int minute,
   ) {
-    final notificationClient = NotificationClientV2();
+    final notificationClient = NotificationClientV3();
 
     return OneTimeNotification(
       id,
@@ -80,9 +80,9 @@ class MemNotifications {
       body,
       json.encode({memIdKey: memId}),
       [
-        notificationClient.doneMemAction,
+        notificationClient.notificationActions.doneMemAction,
       ],
-      notificationClient.reminderChannel,
+      notificationClient.notificationChannels.reminderChannel,
       notifyAt.isAllDay == true
           ? DateTime(
               notifyAt.year,

@@ -2,23 +2,16 @@ import 'dart:convert';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
 import 'package:mem/notifications/mem_notifications.dart';
-import 'package:mem/notifications/notification/action.dart';
 import 'package:mem/notifications/notification/cancel_notification.dart';
-import 'package:mem/notifications/notification/channel.dart';
-import 'package:mem/notifications/notification/done_mem_notification_action.dart';
-import 'package:mem/notifications/notification/finish_active_act_notification_action.dart';
 import 'package:mem/notifications/notification/one_time_notification.dart';
-import 'package:mem/notifications/notification/pause_act_notification_action.dart';
 import 'package:mem/notifications/notification/repeated_notification.dart';
 import 'package:mem/notifications/notification/show_notification.dart';
-import 'package:mem/notifications/notification/start_act_notification_action.dart';
 import 'package:mem/notifications/notification_channels.dart';
 import 'package:mem/notifications/notification_ids.dart';
 import 'package:mem/notifications/schedule.dart';
@@ -54,12 +47,10 @@ Future<void> showRepeatEveryNDayNotification(
             memNotification.message,
             json.encode(params),
             [
-              NotificationClientV3()._notificationActions.startActAction,
-              NotificationClientV3()._notificationActions.finishActiveActAction,
+              NotificationClientV3().notificationActions.startActAction,
+              NotificationClientV3().notificationActions.finishActiveActAction,
             ],
-            NotificationClientV3()
-                ._notificationChannels
-                .repeatedReminderChannel,
+            NotificationClientV3().notificationChannels.repeatedReminderChannel,
           ),
         );
       },
@@ -71,8 +62,8 @@ Future<void> showRepeatEveryNDayNotification(
 
 // TODO refactor
 class NotificationClientV3 {
-  final NotificationChannels _notificationChannels;
-  final NotificationActions _notificationActions;
+  final NotificationChannels notificationChannels;
+  final NotificationActions notificationActions;
 
   final ScheduleClient _scheduleClient;
   final NotificationRepository _notificationRepository;
@@ -140,10 +131,10 @@ class NotificationClientV3 {
               'Running',
               json.encode({memIdKey: memId}),
               [
-                _notificationActions.finishActiveActAction,
-                _notificationActions.pauseAct,
+                notificationActions.finishActiveActAction,
+                notificationActions.pauseAct,
               ],
-              _notificationChannels.activeActNotificationChannel,
+              notificationChannels.activeActNotificationChannel,
             ),
           );
 
@@ -156,9 +147,9 @@ class NotificationClientV3 {
                   notification.message,
                   json.encode({memIdKey: memId}),
                   [
-                    _notificationActions.finishActiveActAction,
+                    notificationActions.finishActiveActAction,
                   ],
-                  _notificationChannels.afterActStartedNotificationChannel,
+                  notificationChannels.afterActStartedNotificationChannel,
                   DateTime.now().add(Duration(seconds: notification.time!)),
                 ),
               );
@@ -186,9 +177,9 @@ class NotificationClientV3 {
               "Paused",
               json.encode({memIdKey: memId}),
               [
-                _notificationActions.startActAction,
+                notificationActions.startActAction,
               ],
-              _notificationChannels.pausedAct,
+              notificationChannels.pausedAct,
             ),
           );
         },
@@ -264,10 +255,10 @@ class NotificationClientV3 {
               memNotification.message,
               json.encode({memIdKey: memNotification.memId}),
               [
-                _notificationActions.startActAction,
-                _notificationActions.finishActiveActAction,
+                notificationActions.startActAction,
+                notificationActions.finishActiveActAction,
               ],
-              _notificationChannels.repeatedReminderChannel,
+              notificationChannels.repeatedReminderChannel,
               notifyFirstAt,
               NotificationInterval.perDay,
             );
@@ -332,8 +323,8 @@ class NotificationClientV3 {
       );
 
   NotificationClientV3._(
-    this._notificationChannels,
-    this._notificationActions,
+    this.notificationChannels,
+    this.notificationActions,
     this._scheduleClient,
     this._notificationRepository,
   );
@@ -350,75 +341,6 @@ class NotificationClientV3 {
             NotificationRepository(),
           );
         },
-        {
-          "context": context,
-        },
-      );
-}
-
-class NotificationClientV2 {
-  late final NotificationChannel reminderChannel;
-  late final NotificationChannel repeatedReminderChannel;
-  late final NotificationChannel activeActNotificationChannel;
-  late final NotificationChannel pausedAct;
-  late final NotificationChannel afterActStartedNotificationChannel;
-
-  late final NotificationAction doneMemAction;
-  late final NotificationAction startActAction;
-  late final NotificationAction finishActiveActAction;
-  late final NotificationAction pauseAct;
-
-  final notificationActions = <NotificationAction>[];
-
-  NotificationClientV2._(AppLocalizations l10n) {
-    reminderChannel = NotificationChannel(
-      'reminder',
-      l10n.reminderName,
-      l10n.reminderDescription,
-    );
-    repeatedReminderChannel = NotificationChannel(
-      'repeated-reminder',
-      l10n.repeatedReminderName,
-      l10n.repeatedReminderDescription,
-    );
-    activeActNotificationChannel = NotificationChannel(
-      'active_act-notification',
-      l10n.activeActNotification,
-      l10n.activeActNotificationDescription,
-      usesChronometer: true,
-      ongoing: true,
-      autoCancel: false,
-    );
-    pausedAct = NotificationChannel(
-      "paused_act",
-      l10n.pausedActNotification,
-      l10n.pausedActNotificationDescription,
-      usesChronometer: true,
-      autoCancel: false,
-    );
-    afterActStartedNotificationChannel = NotificationChannel(
-      'after_act_started-notification',
-      l10n.afterActStartedNotification,
-      l10n.afterActStartedNotificationDescription,
-      usesChronometer: true,
-      autoCancel: false,
-    );
-
-    notificationActions.addAll([
-      doneMemAction = DoneMemNotificationAction('done-mem', l10n.doneLabel),
-      startActAction = StartActNotificationAction('start-act', l10n.startLabel),
-      finishActiveActAction = FinishActiveActNotificationAction(
-        'finish-active_act',
-        l10n.finishLabel,
-      ),
-      pauseAct = PauseActNotificationAction('pause-act', l10n.pauseActLabel),
-    ]);
-  }
-
-  static NotificationClientV2? _instance;
-
-  factory NotificationClientV2([BuildContext? context]) => v(
-        () => _instance ??= NotificationClientV2._(buildL10n(context)),
         {
           "context": context,
         },
