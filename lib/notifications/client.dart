@@ -10,6 +10,7 @@ import 'package:mem/main.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/cancel_notification.dart';
 import 'package:mem/notifications/notification/show_notification.dart';
+import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/notifications/notification_channels.dart';
 import 'package:mem/notifications/notification_ids.dart';
 import 'package:mem/notifications/schedule.dart';
@@ -92,6 +93,47 @@ class NotificationClient {
         },
         {
           "context": context,
+        },
+      );
+
+  Future<void> show(
+    int id,
+    String title,
+    NotificationType notificationType,
+    Map<String, dynamic> params,
+  ) =>
+      v(
+        () async {
+          String body;
+          switch (notificationType) {
+            case NotificationType.startMem:
+              body = _startMemNotificationBody;
+              break;
+            case NotificationType.endMem:
+              body = _endMemNotificationBody;
+              break;
+          }
+
+          await _notificationRepository.receive(
+            ShowNotification(
+              id,
+              title,
+              body,
+              jsonEncode(params),
+              [
+                notificationActions.doneMemAction,
+                notificationActions.startActAction,
+                notificationActions.finishActiveActAction,
+              ],
+              notificationChannels.reminderChannel,
+            ),
+          );
+        },
+        {
+          "id": id,
+          "title": title,
+          "notificationType": notificationType,
+          "params": params,
         },
       );
 
@@ -227,7 +269,10 @@ class NotificationClient {
         },
       );
 
-  Future<void> _memReminder(SavedMem savedMem) => v(
+  Future<void> _memReminder(
+    SavedMem savedMem,
+  ) =>
+      v(
         () async {
           if (savedMem.isDone || savedMem.isArchived) {
             CancelAllMemNotifications.of(savedMem.id).forEach((element) {
@@ -235,17 +280,67 @@ class NotificationClient {
               _scheduleClient.discard(element.id);
             });
           } else {
-            final startOfDay =
-                (await _preferenceClient.shipByKey(startOfDayKey)).value;
+            final startId = memStartNotificationId(savedMem.id);
+            final endId = memEndNotificationId(savedMem.id);
 
-            final memNotifications = MemNotifications.of(
-              savedMem,
-              startOfDay?.hour ?? 0,
-              startOfDay?.minute ?? 0,
-            );
+            await _notificationRepository.discard(startId);
+            await _scheduleClient.discard(startId);
+            await _notificationRepository.discard(endId);
+            await _scheduleClient.discard(endId);
 
-            for (var element in memNotifications) {
-              await _notificationRepository.receive(element);
+            final period = savedMem.period;
+            if (period != null) {
+              final startOfDay =
+                  (await _preferenceClient.shipByKey(startOfDayKey)).value ??
+                      // FIXME どっかで持っておくべきか？
+                      const TimeOfDay(hour: 0, minute: 0);
+
+              final start = period.start;
+              if (start != null) {
+                await _scheduleClient.receive(Schedule(
+                  memStartNotificationId(savedMem.id),
+                  start.isAllDay
+                      ? DateTime(
+                          start.year,
+                          start.month,
+                          start.day,
+                          startOfDay.hour,
+                          startOfDay.minute,
+                        )
+                      : start,
+                  scheduleCallback,
+                  {
+                    memIdKey: savedMem.id,
+                    notificationTypeKey: NotificationType.startMem.name,
+                  },
+                ));
+              }
+
+              final end = period.end;
+              if (end != null) {
+                final endOfDay = startOfDay.subtractMinutes(1);
+
+                await _scheduleClient.receive(Schedule(
+                  memEndNotificationId(savedMem.id),
+                  end.isAllDay
+                      ? DateTime(
+                          end.year,
+                          end.month,
+                          startOfDay.compareTo(endOfDay) < 0 &&
+                                  start?.day == end.day
+                              ? end.day
+                              : end.day + 1,
+                          endOfDay.hour,
+                          endOfDay.minute,
+                        )
+                      : end,
+                  scheduleCallback,
+                  {
+                    memIdKey: savedMem.id,
+                    notificationTypeKey: NotificationType.endMem.name,
+                  },
+                ));
+              }
             }
           }
         },
@@ -355,4 +450,46 @@ class NotificationClient {
           "repeatMemNotification": repeatMemNotification,
         },
       );
+}
+
+const notificationTypeKey = "notificationType";
+const _startMemNotificationBody = "start";
+const _endMemNotificationBody = "end";
+
+Future<void> scheduleCallback(
+  int id,
+  Map<String, dynamic> params,
+) =>
+    v(
+      () async {
+        await openDatabase();
+
+        final memId = params[memIdKey] as int;
+        final mem = await MemRepository().shipById(memId);
+
+        final notificationType = NotificationType.values.singleWhere(
+            (element) => element.name == params[notificationTypeKey]);
+
+        await NotificationClient().show(
+          id,
+          mem.name,
+          notificationType,
+          params,
+        );
+      },
+      {
+        "id": id,
+        "params": params,
+      },
+    );
+
+extension on TimeOfDay {
+  TimeOfDay subtractMinutes(int minutes) {
+    int totalMinutes = hour * 60 + minute;
+    int subtracted = (totalMinutes - minutes + 24 * 60) % (24 * 60);
+    return TimeOfDay(hour: subtracted ~/ 60, minute: subtracted % 60);
+  }
+
+  int compareTo(TimeOfDay other) =>
+      (hour * 60 + minute).compareTo(other.hour * 60 + other.minute);
 }
