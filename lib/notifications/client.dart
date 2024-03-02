@@ -336,11 +336,12 @@ class NotificationClient {
           final intervalDays = repeatEveryNDay?.time;
           if (intervalDays != null) {
             await _scheduleClient.receive(
-              Schedule(
+              PeriodicSchedule(
                 memRepeatedNotificationId(repeatMemNotification.memId),
                 notifyFirstAt,
                 Duration(
-                  days: intervalDays,
+                  seconds: intervalDays,
+                  // days: intervalDays,
                 ),
                 showRepeatEveryNDayNotification,
                 {

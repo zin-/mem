@@ -8,13 +8,24 @@ class ScheduleClient extends Repository<Schedule>
     with Receiver<Schedule, void> {
   @override
   Future<void> receive(Schedule entity) => v(
-        () async => await AndroidAlarmManager.periodic(
-          entity.duration,
-          entity.id,
-          entity.callback,
-          startAt: entity.startAt,
-          params: entity.params,
-        ),
+        () async {
+          if (entity is PeriodicSchedule) {
+            await AndroidAlarmManager.periodic(
+              entity.duration,
+              entity.id,
+              entity.callback,
+              startAt: entity.startAt,
+              params: entity.params,
+            );
+          } else {
+            await AndroidAlarmManager.oneShotAt(
+              entity.startAt,
+              entity.id,
+              entity.callback,
+              params: entity.params,
+            );
+          }
+        },
         {
           "entity": entity,
         },
