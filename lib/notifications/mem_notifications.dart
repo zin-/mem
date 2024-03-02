@@ -14,14 +14,14 @@ const _startNotificationBody = 'start';
 const _endNotificationBody = 'end';
 
 class MemNotifications {
-  static List<Notification> of(
+  static List<ShowNotification> of(
     SavedMem savedMem,
     int hour,
     int minute,
   ) =>
       v(
         () {
-          final notifications = <Notification>[];
+          final notifications = <ShowNotification>[];
           final now = DateTime.now();
 
           final periodStart = savedMem.period?.start;
