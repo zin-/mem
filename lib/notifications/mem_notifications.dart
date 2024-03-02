@@ -59,7 +59,7 @@ class MemNotifications {
         },
       );
 
-  static Notification _createNotificationAt(
+  static ShowNotification _createNotificationAt(
     id,
     title,
     body,
