@@ -74,6 +74,12 @@
         android:exported="true"
         android:permission="android.permission.BIND_JOB_SERVICE"/>
 
+    <!--  for flutter_local_notifications  -->
+    <receiver
+        android:exported="false"
+        android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver"
+    />
+
     <!--  for android_alarm_manager_plus  -->
     <service
         android:name="dev.fluttercommunity.plus.androidalarmmanager.AlarmService"
