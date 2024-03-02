@@ -23,7 +23,6 @@ Future<void> main({String? languageCode}) => i(
       {'languageCode': languageCode},
     );
 
-@pragma('vm:entry-point')
 Future<void> launchMemDetailPage(int memId) => i(
       () {
         WidgetsFlutterBinding.ensureInitialized();
