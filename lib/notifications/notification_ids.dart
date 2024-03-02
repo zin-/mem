@@ -1,3 +1,4 @@
+// FIXME privateに
 const seed = 10;
 
 // FIXME https://github.com/zin-/mem/issues/213
