@@ -340,8 +340,7 @@ class NotificationClient {
                 memRepeatedNotificationId(repeatMemNotification.memId),
                 notifyFirstAt,
                 Duration(
-                  seconds: intervalDays,
-                  // days: intervalDays,
+                  days: intervalDays,
                 ),
                 showRepeatEveryNDayNotification,
                 {
