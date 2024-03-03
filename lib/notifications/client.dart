@@ -326,7 +326,8 @@ class NotificationClient {
                       ? DateTime(
                           end.year,
                           end.month,
-                          startOfDay.compareTo(endOfDay) < 0 &&
+                          // FIXME ここなんか違う気がする
+                          startOfDay.compareTo(endOfDay) > 0 &&
                                   start?.day == end.day
                               ? end.day
                               : end.day + 1,
