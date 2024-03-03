@@ -327,7 +327,6 @@ class NotificationClient {
                       ? DateTime(
                           end.year,
                           end.month,
-                          // FIXME ここなんか違う気がする
                           TimeOfDay(
                                               hour: start?.hour ??
                                                   startOfDay.hour,
