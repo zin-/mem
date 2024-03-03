@@ -469,7 +469,8 @@ Future<void> scheduleCallback(
         final mem = await MemRepository().shipById(memId);
 
         final notificationType = NotificationType.values.singleWhere(
-            (element) => element.name == params[notificationTypeKey]);
+          (element) => element.name == params[notificationTypeKey],
+        );
 
         await NotificationClient().show(
           id,
