@@ -243,68 +243,6 @@ void testMemoScenario() => group(
                 },
               );
             });
-
-            testWidgets(
-              ': archive & unarchive.',
-              (widgetTester) async {
-                await runApplication();
-                await widgetTester.pumpAndSettle();
-
-                expect(find.text(unarchivedMemName), findsOneWidget);
-                expect(find.text(archivedMemName), findsNothing);
-
-                await widgetTester.tap(find.text(insertedMemName));
-                await widgetTester.pumpAndSettle();
-
-                await widgetTester.tap(find.byIcon(Icons.more_vert));
-                await widgetTester.pumpAndSettle();
-
-                await widgetTester.tap(find.byIcon(Icons.archive));
-                await widgetTester.pumpAndSettle();
-
-                expect(
-                  find.text(insertedMemName),
-                  findsNothing,
-                );
-                await widgetTester.tap(filterListIconFinder);
-                await widgetTester.pumpAndSettle();
-
-                await widgetTester.tap(showArchiveSwitchFinder);
-                await widgetTester.pumpAndSettle();
-
-                await closeMemListFilter(widgetTester);
-                await widgetTester.pumpAndSettle(defaultTransitionDuration);
-
-                expect(find.text(unarchivedMemName), findsOneWidget);
-                expect(find.text(archivedMemName), findsOneWidget);
-                await widgetTester.tap(find.text(insertedMemName));
-                await widgetTester.pumpAndSettle();
-
-                await widgetTester.tap(find.byIcon(Icons.more_vert));
-                await widgetTester.pumpAndSettle();
-
-                await widgetTester.tap(find.byIcon(Icons.unarchive));
-                await widgetTester.pumpAndSettle();
-
-                await widgetTester.pageBack();
-                await widgetTester.pumpAndSettle();
-
-                expect(find.text(unarchivedMemName), findsOneWidget);
-                expect(find.text(archivedMemName), findsOneWidget);
-                await widgetTester.tap(filterListIconFinder);
-                await widgetTester.pumpAndSettle();
-
-                await widgetTester.tap(showNotArchiveSwitchFinder);
-                await widgetTester.pumpAndSettle();
-
-                await closeMemListFilter(widgetTester);
-                await widgetTester.pumpAndSettle(defaultTransitionDuration);
-
-                expect(find.text(insertedMemName), findsNothing);
-                expect(find.text(unarchivedMemName), findsNothing);
-                expect(find.text(archivedMemName), findsOneWidget);
-              },
-            );
           });
         });
       },

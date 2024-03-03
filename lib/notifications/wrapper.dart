@@ -4,13 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
-import 'package:timezone/timezone.dart';
 
 import 'client.dart';
 import 'mem_notifications.dart';
 import 'notification/action.dart';
 import 'notification/channel.dart';
-import 'notification/repeated_notification.dart';
 
 class NotificationsWrapper {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
@@ -47,44 +45,6 @@ class NotificationsWrapper {
         },
       );
 
-  Future<void> zonedSchedule(
-    int id,
-    String title,
-    String? body,
-    TZDateTime tzDateTime,
-    String? payload,
-    List<NotificationAction> actions,
-    NotificationChannel channel, [
-    NotificationInterval? interval,
-  ]) =>
-      v(
-        () => _flutterLocalNotificationsPlugin.zonedSchedule(
-          id,
-          title,
-          body,
-          tzDateTime,
-          _buildNotificationDetails(
-            channel,
-            actions,
-          ),
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
-          androidScheduleMode: AndroidScheduleMode.exact,
-          payload: payload,
-          matchDateTimeComponents:
-              // TODO NotificationInterval.perDay以外も指定できるようにする
-              interval == null ? null : DateTimeComponents.time,
-        ),
-        {
-          'id': id,
-          'title': title,
-          'body': body,
-          'tzDateTime': tzDateTime,
-          'payload': payload,
-          'channel': channel,
-        },
-      );
-
   Future<void> cancel(int notificationId) => v(
         () => _flutterLocalNotificationsPlugin.cancel(notificationId),
         {'notificationId': notificationId},
@@ -109,26 +69,31 @@ class NotificationsWrapper {
       );
 
   Future<bool> handleAppLaunchDetails() => v(
-        () async => _pluginIsInitialized.then((value) async {
-          final appLaunchDetails = await _flutterLocalNotificationsPlugin
-              .getNotificationAppLaunchDetails();
+        () async => _pluginIsInitialized.then(
+          (value) => v(
+            () async {
+              final appLaunchDetails = await _flutterLocalNotificationsPlugin
+                  .getNotificationAppLaunchDetails();
 
-          if (appLaunchDetails?.didNotificationLaunchApp == false) {
-            return false;
-          }
+              if (appLaunchDetails?.didNotificationLaunchApp == false) {
+                return false;
+              }
 // アプリが停止状態で、通知から起動される必要があるため現状テストする方法がない
 // coverage:ignore-start
-          final details = appLaunchDetails?.notificationResponse;
+              final details = appLaunchDetails?.notificationResponse;
 
-          if (details == null) {
-            return false;
-          }
+              if (details == null) {
+                return false;
+              }
 
-          onDidReceiveNotificationResponse(details);
+              onDidReceiveNotificationResponse(details);
 
-          return true;
+              return true;
 // coverage:ignore-end
-        }),
+            },
+            {"_pluginIsInitialized": value},
+          ),
+        ),
       );
 
   NotificationsWrapper._(
@@ -145,30 +110,21 @@ class NotificationsWrapper {
               onDidReceiveNotificationResponse,
         );
       },
-      androidDefaultIconPath,
+      {
+        "androidDefaultIconPath": androidDefaultIconPath,
+      },
     );
   }
 
   static NotificationsWrapper? _instance;
 
-  factory NotificationsWrapper(String androidDefaultIconPath) =>
-      _instance ??= NotificationsWrapper._(androidDefaultIconPath);
+  factory NotificationsWrapper(String androidDefaultIconPath) => v(
+        () => _instance ??= NotificationsWrapper._(androidDefaultIconPath),
+        {
+          "androidDefaultIconPath": androidDefaultIconPath,
+        },
+      );
 }
-
-// extension on NotificationInterval {
-//   DateTimeComponents convert() {
-//     switch (this) {
-//       case NotificationInterval.perDay:
-//         return DateTimeComponents.time;
-//       case NotificationInterval.perWeek:
-//         return DateTimeComponents.dayOfWeekAndTime;
-//       case NotificationInterval.perMonth:
-//         return DateTimeComponents.dayOfMonthAndTime;
-//       case NotificationInterval.perYear:
-//         return DateTimeComponents.dateAndTime;
-//     }
-//   }
-// }
 
 // 分かりやすさのために、entry-pointはすべてmain.dartに定義したいが、
 // NotificationResponseがライブラリの型なので、ここで定義する
@@ -180,7 +136,6 @@ Future<void> onDidReceiveNotificationResponse(NotificationResponse details) =>
         WidgetsFlutterBinding.ensureInitialized();
 
         await openDatabase();
-        NotificationClientV2();
 
         final id = details.id;
         if (id == null) {
@@ -209,8 +164,9 @@ Future<void> onDidReceiveNotificationResponse(NotificationResponse details) =>
 
             if (payload.containsKey(memIdKey)) {
               final memId = payload[memIdKey];
-              await NotificationClientV2()
+              await NotificationClient()
                   .notificationActions
+                  .list
                   .singleWhere((element) => element.id == actionId)
                   .onTapped(memId as int);
             }

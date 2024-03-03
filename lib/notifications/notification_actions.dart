@@ -20,6 +20,12 @@ class NotificationActions {
           'finish-active_act',
           l10n.finishLabel,
         ),
-        pauseAct =
-            PauseActNotificationAction('pause-act', l10n.pauseActLabel);
+        pauseAct = PauseActNotificationAction('pause-act', l10n.pauseActLabel);
+
+  List<NotificationAction> get list => [
+        doneMemAction,
+        startActAction,
+        finishActiveActAction,
+        pauseAct,
+      ];
 }

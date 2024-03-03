@@ -76,7 +76,7 @@ class LogService {
   }
 
   T functionLog<T>(Level level, T Function() function, [dynamic args]) {
-    valueLog(level, args.toString(), prefixes: ["[start] :: "]);
+    valueLog(level, args, prefixes: ["[start] :: "]);
 
     try {
       final result = function._callWithDebug(level == Level.debug);
@@ -148,10 +148,10 @@ class LogService {
   factory LogService() => _instance ??= LogService.initialize();
 }
 
-extension _DebugLoggableFunction on Function {
+extension _DebugLoggableFunction<T> on T Function() {
   static bool _debug = false;
 
-  _callWithDebug(bool debug) {
+  T _callWithDebug(bool debug) {
     _debug = _debug || debug;
     final result = call();
     if (debug) _debug = false;

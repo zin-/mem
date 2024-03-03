@@ -6,7 +6,6 @@ import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/page.dart';
-import 'package:mem/notifications/client.dart';
 import 'package:mem/notifications/notification_repository.dart';
 import 'package:mem/framework/repository/database_repository.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
@@ -24,7 +23,6 @@ Future<void> main({String? languageCode}) => i(
       {'languageCode': languageCode},
     );
 
-@pragma('vm:entry-point')
 Future<void> launchMemDetailPage(int memId) => i(
       () {
         WidgetsFlutterBinding.ensureInitialized();
@@ -64,8 +62,6 @@ const memIdParamName = 'mem_id';
 
 Future<void> backgroundCallback(Uri? uri) => i(
       () async {
-        NotificationClientV2();
-
         if (uri != null && uri.scheme == uriSchema && uri.host == appId) {
           await openDatabase();
 
@@ -73,7 +69,7 @@ Future<void> backgroundCallback(Uri? uri) => i(
             final memId = uri.queryParameters[memIdParamName];
 
             if (memId != null) {
-              await ActCounterService().increment(
+              await ActCounterClient().increment(
                 int.parse(memId),
                 DateAndTime.now(),
               );

@@ -77,5 +77,7 @@ class MemRepository extends DatabaseTupleRepository<Mem, SavedMem, int> {
 
   static MemRepository? _instance;
 
-  factory MemRepository() => _instance ??= MemRepository._();
+  factory MemRepository() => v(
+        () => _instance ??= MemRepository._(),
+      );
 }

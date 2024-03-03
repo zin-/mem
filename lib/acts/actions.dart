@@ -6,8 +6,10 @@ import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
 
 import 'act_repository.dart';
-import 'act_service.dart';
+import 'client.dart';
 import 'states.dart';
+
+final _actsClient = ActsClient();
 
 final loadActList = FutureProvider.autoDispose.family<List<SavedAct>, int?>(
   (ref, memId) => v(
@@ -34,13 +36,15 @@ final startActBy = Provider.autoDispose.family<Act, int>(
     () {
       final now = DateAndTime.now();
 
-      ActService().start(memId, now).then((startedAct) => v(
-            () => ref.read(actsProvider.notifier).upsertAll(
-              [startedAct],
-              (tmp, item) => tmp.id == item.id,
+      _actsClient.start(memId, now).then(
+            (startedAct) => v(
+              () => ref.read(actsProvider.notifier).upsertAll(
+                [startedAct],
+                (tmp, item) => tmp.id == item.id,
+              ),
+              startedAct,
             ),
-            startedAct,
-          ));
+          );
 
       return Act(memId, DateAndTimePeriod(start: now));
     },
@@ -56,7 +60,7 @@ final finishActBy = Provider.autoDispose.family<SavedAct, int>(
             (act) => act.memId == memId,
           );
 
-      ActService().finish(finishingAct.id, now).then((finishedAct) => v(
+      _actsClient.finish(finishingAct.id, now).then((finishedAct) => v(
             () => ref.read(actsProvider.notifier).upsertAll(
               [finishedAct],
               (tmp, item) => tmp.id == item.id,

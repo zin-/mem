@@ -27,7 +27,7 @@ int randomInt([int max = 42949671]) => Random().nextInt(max);
   //  Repositoryはシステム固有の処理であるのに対して、Tableは永続仮想をラップする役割を持つため
   NotificationRepository,
   ActCounterRepository,
-  ActCounterService,
+  ActCounterClient,
 ])
 void main() {}
 

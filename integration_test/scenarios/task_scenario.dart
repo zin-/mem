@@ -8,6 +8,9 @@ import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/databases/definition.dart';
+import 'package:mem/settings/client.dart';
+import 'package:mem/settings/keys.dart';
+import 'package:mem/settings/preference.dart';
 
 import 'helpers.dart';
 
@@ -17,21 +20,21 @@ void main() {
   testTaskScenario();
 }
 
-const scenarioName = 'Task scenario';
+const _scenarioName = "Task scenario";
 
-void testTaskScenario() => group(': $scenarioName', () {
+void testTaskScenario() => group(': $_scenarioName', () {
       final about1MonthAgo = DateTime.now().subtract(const Duration(days: 32));
 
-      const insertedMemHasNoPeriod = '$scenarioName - mem name - no period';
+      const insertedMemHasNoPeriod = '$_scenarioName - mem name - no period';
       const insertedMemHasPeriodStart =
-          '$scenarioName - mem name - has period start';
+          '$_scenarioName - mem name - has period start';
       final insertedMemPeriodStart =
           about1MonthAgo.add(const Duration(days: 2));
       const insertedMemHasPeriodEnd =
-          '$scenarioName - mem name - has period end';
+          '$_scenarioName - mem name - has period end';
       final insertedMemPeriodEnd =
           about1MonthAgo.add(const Duration(days: 3, minutes: 10));
-      const insertedMemHasPeriod = '$scenarioName - mem name - has period';
+      const insertedMemHasPeriod = '$_scenarioName - mem name - has period';
       final insertedMemPeriod = WithStartAndEnd(
         DateAndTime.from(
             about1MonthAgo.add(const Duration(days: 4, minutes: 20)),
@@ -231,96 +234,157 @@ void testTaskScenario() => group(': $scenarioName', () {
         });
       });
 
-      testWidgets(
-        ': Set Period.',
-        (widgetTester) async {
-          setMockLocalNotifications(widgetTester);
+      group(
+        ": Save period",
+        () {
+          testWidgets(
+            ": start is all day.",
+            (widgetTester) async {
+              await runApplication();
+              await widgetTester.pumpAndSettle();
+              await widgetTester.tap(newMemFabFinder);
+              await widgetTester.pumpAndSettle();
 
-          final now = DateTime.now();
+              await widgetTester.tap(calendarIconFinder.at(0));
+              await widgetTester.pumpAndSettle();
 
-          await runApplication();
-          await widgetTester.pumpAndSettle();
+              await widgetTester.tap(find.byIcon(Icons.chevron_right).at(0));
+              await widgetTester.pumpAndSettle();
 
-          await widgetTester.tap(newMemFabFinder);
-          await widgetTester.pumpAndSettle();
+              const pickingStartDate = 1;
+              await widgetTester.tap(find.text('$pickingStartDate'));
+              await widgetTester.tap(okFinder);
+              await widgetTester.pumpAndSettle();
 
-          await widgetTester.tap(calendarIconFinder.at(0));
-          await widgetTester.pumpAndSettle();
+              final now = DateTime.now();
+              final start = DateTime(
+                now.year,
+                now.month + 1,
+                pickingStartDate,
+              );
+              expect(
+                (widgetTester.widget(find.byType(TextFormField).at(1))
+                        as TextFormField)
+                    .initialValue,
+                dateText(start),
+              );
+              expect(timeIconFinder, findsNothing);
 
-          await widgetTester.tap(find.byIcon(Icons.chevron_right).at(0));
-          await widgetTester.pumpAndSettle();
+              const enteringMemName =
+                  "$_scenarioName: Save period: start is all day - mem name - entering";
+              await widgetTester.enterText(
+                memNameOnDetailPageFinder,
+                enteringMemName,
+              );
+              await widgetTester.tap(saveMemFabFinder);
+              await widgetTester.pumpAndSettle();
 
-          const pickingStartDate = 1;
-          await widgetTester.tap(find.text('$pickingStartDate'));
-          await widgetTester.tap(find.text('OK'));
-          await widgetTester.pumpAndSettle();
-
-          final startDate = DateTime(now.year, now.month + 1, pickingStartDate);
-          expect(
-            (widgetTester.widget(find.byType(TextFormField).at(1))
-                    as TextFormField)
-                .initialValue,
-            dateText(startDate),
-          );
-          expect(timeIconFinder, findsNothing);
-
-          await widgetTester.tap(find.byType(Switch).at(0));
-          await widgetTester.pumpAndSettle();
-
-          final pickingStartTime = DateTime.now();
-          await widgetTester.tap(find.text('OK'));
-          await widgetTester.pumpAndSettle();
-
-          expect(
-            (widgetTester.widget(find.byType(TextFormField).at(2))
-                    as TextFormField)
-                .initialValue,
-            timeText(pickingStartTime),
-          );
-          expect(timeIconFinder, findsOneWidget);
-
-          await widgetTester.tap(calendarIconFinder.at(1));
-          await widgetTester.pumpAndSettle();
-
-          await widgetTester.tap(find.byIcon(Icons.chevron_right).at(0));
-          await widgetTester.pumpAndSettle();
-
-          const pickingEndDate = 28;
-          await widgetTester.tap(find.text('$pickingEndDate'));
-          await widgetTester.tap(find.text('OK'));
-          await widgetTester.pumpAndSettle();
-
-          final endDate = DateTime(now.year, now.month + 2, pickingEndDate);
-          expect(
-            (widgetTester.widget(find.byType(TextFormField).at(3))
-                    as TextFormField)
-                .initialValue,
-            dateText(endDate),
+              final savedMems = await dbA.select(
+                defTableMems,
+                where: "${defColMemsName.name} = ?",
+                whereArgs: [enteringMemName],
+              );
+              expect(savedMems, hasLength(1));
+              expect(savedMems.single[defColMemsStartOn.name], equals(start));
+            },
           );
 
-          const enteringMemName =
-              '$scenarioName: Set Period - mem name - entering';
-          await widgetTester.enterText(
-            memNameOnDetailPageFinder,
-            enteringMemName,
+          testWidgets(
+            ": end is all day.",
+            (widgetTester) async {
+              await runApplication();
+              await widgetTester.pumpAndSettle();
+              await widgetTester.tap(newMemFabFinder);
+              await widgetTester.pumpAndSettle();
+
+              await widgetTester.tap(calendarIconFinder.at(1));
+              await widgetTester.pumpAndSettle();
+
+              await widgetTester.tap(okFinder);
+              await widgetTester.pumpAndSettle();
+
+              const enteringMemName =
+                  "$_scenarioName: Save period: end is all day - mem name - entering";
+              await widgetTester.enterText(
+                memNameOnDetailPageFinder,
+                enteringMemName,
+              );
+              await widgetTester.tap(saveMemFabFinder);
+              await widgetTester.pumpAndSettle();
+
+              final savedMems = await dbA.select(
+                defTableMems,
+                where: "${defColMemsName.name} = ?",
+                whereArgs: [enteringMemName],
+              );
+              expect(savedMems, hasLength(1));
+            },
           );
-          await widgetTester.tap(saveMemFabFinder);
-          await widgetTester.pumpAndSettle();
 
-          await widgetTester.pageBack();
-          await widgetTester.pumpAndSettle();
+          testWidgets(
+            ": start is not all day, end is all day.",
+            (widgetTester) async {
+              await PreferenceClient().receive(Preference(
+                startOfDayKey,
+                const TimeOfDay(hour: 1, minute: 0),
+              ));
 
-          expect(find.text(enteringMemName), findsOneWidget);
-          final savedMemStartAt = (await dbA.select(
-            defTableMems,
-            where: "${defColMemsName.name} = ?",
-            whereArgs: [enteringMemName],
-          ))
-              .single[defColMemsStartAt.name] as DateTime;
+              await runApplication();
+              await widgetTester.pumpAndSettle();
+              await widgetTester.tap(newMemFabFinder);
+              await widgetTester.pumpAndSettle();
+              await widgetTester.tap(calendarIconFinder.at(0));
+              await widgetTester.pumpAndSettle();
+              await widgetTester.tap(find.byIcon(Icons.chevron_right).at(0));
+              await widgetTester.pumpAndSettle();
+              const pickingDate = 1;
+              await widgetTester.tap(find.text("$pickingDate"));
+              await widgetTester.tap(okFinder);
+              await widgetTester.pumpAndSettle();
 
-          expect(find.text(dateText(savedMemStartAt)), findsOneWidget);
-          expect(find.text(timeText(savedMemStartAt)), findsOneWidget);
-          expect(find.text(dateText(endDate)), findsOneWidget);
+              await widgetTester.tap(find.byType(Switch).at(0));
+              await widgetTester.pumpAndSettle();
+
+              await widgetTester.tap(okFinder);
+              await widgetTester.pumpAndSettle();
+
+              await widgetTester.tap(calendarIconFinder.at(1));
+              await widgetTester.pumpAndSettle();
+
+              await widgetTester.tap(find.text("$pickingDate"));
+              await widgetTester.tap(okFinder);
+              await widgetTester.pumpAndSettle();
+
+              final now = DateTime.now();
+              final endDate = DateTime(now.year, now.month + 1, pickingDate);
+              expect(
+                (widgetTester.widget(find.byType(TextFormField).at(3))
+                        as TextFormField)
+                    .initialValue,
+                dateText(endDate),
+              );
+
+              const enteringMemName =
+                  "$_scenarioName: Save Period: start is not all day, end is all day - mem name - entering";
+              await widgetTester.enterText(
+                memNameOnDetailPageFinder,
+                enteringMemName,
+              );
+              await widgetTester.tap(saveMemFabFinder);
+              await widgetTester.pumpAndSettle();
+
+              final savedMems = (await dbA.select(
+                defTableMems,
+                where: "${defColMemsName.name} = ?",
+                whereArgs: [enteringMemName],
+              ));
+              expect(savedMems, hasLength(1));
+              expect(
+                savedMems.single[defColMemsEndOn.name],
+                equals(endDate),
+              );
+            },
+          );
         },
       );
     });

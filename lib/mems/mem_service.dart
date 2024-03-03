@@ -2,9 +2,6 @@ import 'package:mem/core/mem_detail.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_item.dart';
 import 'package:mem/mems/mem_item_repository.dart';
-import 'package:mem/notifications/mem_notifications.dart';
-import 'package:mem/notifications/notification_repository.dart';
-import 'package:mem/notifications/notification_service.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
@@ -14,8 +11,6 @@ class MemService {
   final MemRepository _memRepository;
   final MemItemRepository _memItemRepository;
   final MemNotificationRepository _memNotificationRepository;
-  final NotificationService _notificationService;
-  final NotificationRepository _notificationRepository;
 
   Future<MemDetail> save(MemDetail memDetail, {bool undo = false}) => i(
         () async {
@@ -24,7 +19,6 @@ class MemService {
           final savedMem = (mem is SavedMem && !undo
               ? await _memRepository.replace(mem)
               : await _memRepository.receive(mem));
-          _notificationService.memReminder(savedMem);
 
           final savedMemItems = (await Future.wait(
               memDetail.memItems.map((e) => (e is SavedMemItem && !undo
@@ -42,10 +36,6 @@ class MemService {
                     if (e is SavedMemNotification) {
                       _memNotificationRepository.wasteById(e.id);
                     }
-                    _notificationService.memRepeatedReminder(
-                      savedMem,
-                      null,
-                    );
                     return Future.value(e);
                   } else {
                     return (e is SavedMemNotification && !undo
@@ -54,13 +44,7 @@ class MemService {
                           ))
                         : _memNotificationRepository.receive(e.copiedWith(
                             memId: () => savedMem.id,
-                          )))
-                      ..then(
-                        (value) => _notificationService.memRepeatedReminder(
-                          savedMem,
-                          value,
-                        ),
-                      );
+                          )));
                   }
                 }));
 
@@ -96,12 +80,18 @@ class MemService {
           final archivedMem = await _memRepository.archive(mem);
           final archivedMemItems =
               await _memItemRepository.archiveByMemId(archivedMem.id);
+          final archivedMemNotifications =
+              await _memNotificationRepository.archiveByMemId(archivedMem.id);
 
-          _notificationService.memReminder(archivedMem);
-
-          return MemDetail(archivedMem, archivedMemItems.toList());
+          return MemDetail(
+            archivedMem,
+            archivedMemItems.toList(),
+            archivedMemNotifications.toList(),
+          );
         },
-        mem,
+        {
+          "mem": mem,
+        },
       );
 
   Future<MemDetail> unarchive(SavedMem mem) => i(
@@ -109,12 +99,13 @@ class MemService {
           final unarchivedMem = await _memRepository.unarchive(mem);
           final unarchivedMemItems =
               await _memItemRepository.unarchiveByMemId(unarchivedMem.id);
-
-          _notificationService.memReminder(unarchivedMem);
+          final unarchivedMemNotifications = await _memNotificationRepository
+              .unarchiveByMemId(unarchivedMem.id);
 
           return MemDetail(
             unarchivedMem,
-            unarchivedMemItems.toList(),
+            unarchivedMemItems.toList(growable: false),
+            unarchivedMemNotifications.toList(growable: false),
           );
         },
         mem,
@@ -127,11 +118,6 @@ class MemService {
           await _memItemRepository.wasteByMemId(memId);
           await _memRepository.wasteById(memId);
 
-          CancelAllMemNotifications.of(memId).forEach(
-            (cancelNotification) =>
-                _notificationRepository.receive(cancelNotification),
-          );
-
           return true;
         },
         {'memId': memId},
@@ -141,17 +127,15 @@ class MemService {
     this._memRepository,
     this._memItemRepository,
     this._memNotificationRepository,
-    this._notificationService,
-    this._notificationRepository,
   );
 
   static MemService? _instance;
 
-  factory MemService() => _instance ??= MemService._(
-        MemRepository(),
-        MemItemRepository(),
-        MemNotificationRepository(),
-        NotificationService(),
-        NotificationRepository(),
+  factory MemService() => i(
+        () => _instance ??= MemService._(
+          MemRepository(),
+          MemItemRepository(),
+          MemNotificationRepository(),
+        ),
       );
 }

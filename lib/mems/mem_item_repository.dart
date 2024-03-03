@@ -57,5 +57,7 @@ class MemItemRepository
 
   static MemItemRepository? _instance;
 
-  factory MemItemRepository() => _instance ??= MemItemRepository._();
+  factory MemItemRepository() => v(
+        () => _instance ??= MemItemRepository._(),
+      );
 }

@@ -1,17 +1,16 @@
-import 'package:collection/collection.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_detail.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/client.dart';
-import 'package:mem/repositories/mem_notification.dart';
+import 'package:mem/repositories/mem.dart';
 
 import 'mem_service.dart';
 
 class MemClient {
   final MemService _memService;
-  final NotificationClientV3 _notificationClient;
+  final NotificationClient _notificationClient;
 
   Future<MemDetail> save(
     Mem mem,
@@ -28,18 +27,11 @@ class MemClient {
             ),
           );
 
-          // TODO ここでnotificationClientを使って通知を登録する
-          final repeatMemNotification = saved.notifications?.singleWhereOrNull(
-            (element) =>
-                element is SavedMemNotification && element.isRepeated(),
-          );
-          if (repeatMemNotification != null) {
-            await _notificationClient.registerMemRepeatNotification(
-              saved.mem.name,
-              repeatMemNotification,
-              saved.notifications?.singleWhereOrNull(
-                (element) => element.isRepeatByNDay(),
-              ),
+          final savedMem = saved.mem;
+          if (savedMem is SavedMem) {
+            _notificationClient.registerMemNotifications(
+              savedMem,
+              saved.notifications,
             );
           }
 
@@ -52,12 +44,85 @@ class MemClient {
         },
       );
 
-  MemClient._(this._memService, this._notificationClient);
+  Future<MemDetail> archive(Mem mem) => v(
+        () async {
+          // FIXME MemServiceの責務
+          if (mem is SavedMem) {
+            final archived = await _memService.archive(mem);
+
+            final archivedMem = archived.mem;
+            // FIXME archive後のMemDetailなので、必ずSavedMemのはず
+            if (archivedMem is SavedMem) {
+              _notificationClient.cancelMemNotifications(archivedMem.id);
+            }
+
+            return archived;
+            // } else {
+            //   // FIXME Memしかないので、子の状態が分からない
+            //   _memService.save();
+          }
+
+          throw Error(); // coverage:ignore-line
+        },
+        {
+          "mem": mem,
+        },
+      );
+
+  Future<MemDetail> unarchive(Mem mem) => v(
+        () async {
+          // FIXME MemServiceの責務
+          if (mem is SavedMem) {
+            final unarchived = await _memService.unarchive(mem);
+
+            final unarchivedMem = unarchived.mem;
+            // FIXME unarchive後のMemDetailなので、必ずSavedMemのはず
+            if (unarchivedMem is SavedMem) {
+              _notificationClient.registerMemNotifications(
+                unarchivedMem,
+                unarchived.notifications,
+              );
+            }
+
+            return unarchived;
+            // } else {
+            //   // FIXME Memしかないので、子の状態が分からない
+            //   _memService.save();
+          }
+
+          throw Error(); // coverage:ignore-line
+        },
+        {
+          "mem": mem,
+        },
+      );
+
+  Future<bool> remove(int memId) => v(
+        () async {
+          final removeSuccess = await _memService.remove(memId);
+
+          if (removeSuccess) {
+            _notificationClient.cancelMemNotifications(memId);
+          }
+
+          return removeSuccess;
+        },
+        {
+          "memId": memId,
+        },
+      );
+
+  MemClient._(
+    this._memService,
+    this._notificationClient,
+  );
 
   static MemClient? _instance;
 
-  factory MemClient() => _instance ??= MemClient._(
-        MemService(),
-        NotificationClientV3(),
+  factory MemClient() => v(
+        () => _instance ??= MemClient._(
+          MemService(),
+          NotificationClient(),
+        ),
       );
 }
