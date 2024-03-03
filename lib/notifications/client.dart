@@ -295,19 +295,20 @@ class NotificationClient {
                       // FIXME どっかで持っておくべきか？
                       const TimeOfDay(hour: 0, minute: 0);
 
-              final start = period.start;
+              DateAndTime? start = period.start;
               if (start != null) {
+                start = start.isAllDay
+                    ? DateAndTime(
+                        start.year,
+                        start.month,
+                        start.day,
+                        startOfDay.hour,
+                        startOfDay.minute,
+                      )
+                    : start;
                 await _scheduleClient.receive(Schedule(
                   memStartNotificationId(savedMem.id),
-                  start.isAllDay
-                      ? DateTime(
-                          start.year,
-                          start.month,
-                          start.day,
-                          startOfDay.hour,
-                          startOfDay.minute,
-                        )
-                      : start,
+                  start,
                   scheduleCallback,
                   {
                     memIdKey: savedMem.id,
@@ -327,10 +328,16 @@ class NotificationClient {
                           end.year,
                           end.month,
                           // FIXME ここなんか違う気がする
-                          startOfDay.compareTo(endOfDay) > 0 &&
+                          TimeOfDay(
+                                              hour: start?.hour ??
+                                                  startOfDay.hour,
+                                              minute: start?.minute ??
+                                                  startOfDay.minute)
+                                          .compareTo(endOfDay) >
+                                      0 &&
                                   start?.day == end.day
-                              ? end.day
-                              : end.day + 1,
+                              ? end.day + 1
+                              : end.day,
                           endOfDay.hour,
                           endOfDay.minute,
                         )

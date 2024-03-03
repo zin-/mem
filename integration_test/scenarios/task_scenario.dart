@@ -271,7 +271,7 @@ void testTaskScenario() => group(': $_scenarioName', () {
               expect(timeIconFinder, findsNothing);
 
               const enteringMemName =
-                  "$_scenarioName: Save period: is all day - mem name - entering";
+                  "$_scenarioName: Save period: start is all day - mem name - entering";
               await widgetTester.enterText(
                 memNameOnDetailPageFinder,
                 enteringMemName,
@@ -286,6 +286,38 @@ void testTaskScenario() => group(': $_scenarioName', () {
               );
               expect(savedMems, hasLength(1));
               expect(savedMems.single[defColMemsStartOn.name], equals(start));
+            },
+          );
+
+          testWidgets(
+            ": end is all day.",
+            (widgetTester) async {
+              await runApplication();
+              await widgetTester.pumpAndSettle();
+              await widgetTester.tap(newMemFabFinder);
+              await widgetTester.pumpAndSettle();
+
+              await widgetTester.tap(calendarIconFinder.at(1));
+              await widgetTester.pumpAndSettle();
+
+              await widgetTester.tap(okFinder);
+              await widgetTester.pumpAndSettle();
+
+              const enteringMemName =
+                  "$_scenarioName: Save period: end is all day - mem name - entering";
+              await widgetTester.enterText(
+                memNameOnDetailPageFinder,
+                enteringMemName,
+              );
+              await widgetTester.tap(saveMemFabFinder);
+              await widgetTester.pumpAndSettle();
+
+              final savedMems = await dbA.select(
+                defTableMems,
+                where: "${defColMemsName.name} = ?",
+                whereArgs: [enteringMemName],
+              );
+              expect(savedMems, hasLength(1));
             },
           );
 
