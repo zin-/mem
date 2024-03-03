@@ -485,11 +485,12 @@ Future<void> scheduleCallback(
 
 extension on TimeOfDay {
   TimeOfDay subtractMinutes(int minutes) {
-    int totalMinutes = hour * 60 + minute;
-    int subtracted = (totalMinutes - minutes + 24 * 60) % (24 * 60);
+    int subtracted = (_totalMinutes - minutes + 24 * 60) % (24 * 60);
     return TimeOfDay(hour: subtracted ~/ 60, minute: subtracted % 60);
   }
 
   int compareTo(TimeOfDay other) =>
-      (hour * 60 + minute).compareTo(other.hour * 60 + other.minute);
+      _totalMinutes.compareTo(other._totalMinutes);
+
+  int get _totalMinutes => hour * 60 + minute;
 }
