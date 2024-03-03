@@ -7,14 +7,6 @@ import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
-import 'package:mem/notifications/mem_notifications.dart';
-import 'package:mem/notifications/notification/cancel_notification.dart';
-import 'package:mem/notifications/notification/show_notification.dart';
-import 'package:mem/notifications/notification/type.dart';
-import 'package:mem/notifications/notification_channels.dart';
-import 'package:mem/notifications/notification_ids.dart';
-import 'package:mem/notifications/schedule.dart';
-import 'package:mem/notifications/schedule_client.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
@@ -22,8 +14,16 @@ import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/settings/client.dart';
 import 'package:mem/settings/keys.dart';
 
+import 'mem_notifications.dart';
+import 'notification/cancel_notification.dart';
+import 'notification/show_notification.dart';
+import 'notification/type.dart';
 import 'notification_actions.dart';
+import 'notification_channels.dart';
+import 'notification_ids.dart';
 import 'notification_repository.dart';
+import 'schedule.dart';
+import 'schedule_client.dart';
 
 @pragma('vm:entry-point')
 Future<void> showRepeatEveryNDayNotification(
