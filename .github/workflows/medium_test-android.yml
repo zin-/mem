@@ -79,7 +79,8 @@ jobs:
           android-arch: x86_64 # FIXME これandroidのarchじゃなくて動かす側のcpu archだ
           experimental: ${{ matrix.experimental }}
 
-      - name: "Report"
+      - if: always()
+        name: "Report"
         uses: dorny/test-reporter@v1
         with:
           name: "Report (Medium test (Android)) (${{ matrix.android-emulator-runner }})"
@@ -87,11 +88,10 @@ jobs:
           reporter: "flutter-json"
           fail-on-error: true
           fail-on-empty: true
-        continue-on-error: ${{ matrix.experimental }}
-      - name: "Upload coverage"
+      - if: always()
+        name: "Upload coverage"
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
           flags: medium_test-android-${{ matrix.android-emulator-runner }}
-        continue-on-error: ${{ matrix.experimental }}

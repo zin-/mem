@@ -51,7 +51,6 @@ runs:
         android-target: ${{ inputs.android-target }}
         android-arch: ${{ inputs.android-arch }}
       #          android-device-profile: Pixel 5
-      continue-on-error: ${{ inputs.experimental }}
 
     - if: inputs.android-emulator-runner == 'native'
       id: run-android-medium_test-via-native
