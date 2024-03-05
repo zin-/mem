@@ -78,7 +78,7 @@ jobs:
           android-target: default
           android-arch: x86_64 # FIXME これandroidのarchじゃなくて動かす側のcpu archだ
           experimental: ${{ matrix.experimental }}
-        continue-on-error: ${{ matrix.experimental == 'true' }}
+        continue-on-error: ${{ matrix.experimental == true }}
 
       - if: always()
         name: "Report"
@@ -89,7 +89,7 @@ jobs:
           reporter: "flutter-json"
           fail-on-error: true
           fail-on-empty: true
-        continue-on-error: ${{ matrix.experimental == 'true' }}
+        continue-on-error: ${{ matrix.experimental == true }}
       - if: always()
         name: "Upload coverage"
         uses: codecov/codecov-action@v4
@@ -97,4 +97,4 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
           flags: medium_test-android-${{ matrix.android-emulator-runner }}
-        continue-on-error: ${{ matrix.experimental == 'true' }}
+        continue-on-error: ${{ matrix.experimental == true }}
