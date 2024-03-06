@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
@@ -21,7 +20,6 @@ import 'notification_actions.dart';
 import 'notification_channels.dart';
 import 'notification_ids.dart';
 import 'notification_repository.dart';
-import 'schedule.dart';
 import 'schedule_client.dart';
 
 @pragma('vm:entry-point')
@@ -98,21 +96,12 @@ class NotificationClient {
   Future<void> show(
     int id,
     String title,
+    String body,
     NotificationType notificationType,
     Map<String, dynamic> params,
   ) =>
       v(
         () async {
-          String body;
-          switch (notificationType) {
-            case NotificationType.startMem:
-              body = _startMemNotificationBody;
-              break;
-            case NotificationType.endMem:
-              body = _endMemNotificationBody;
-              break;
-          }
-
           await _notificationRepository.receive(
             ShowNotification(
               id,
@@ -131,6 +120,7 @@ class NotificationClient {
         {
           "id": id,
           "title": title,
+          "body": body,
           "notificationType": notificationType,
           "params": params,
         },
@@ -162,29 +152,6 @@ class NotificationClient {
               scheduleCallback,
             )) {
               await _scheduleClient.receive(schedule);
-            }
-
-            memNotifications?.forEach((e) {
-              if (e.isEnabled()) {
-                _memRepeatedReminder(savedMem, e);
-              } else {
-                _memRepeatedReminder(savedMem, null);
-              }
-            });
-
-            final repeatMemNotification = memNotifications
-                ?.whereType<SavedMemNotification>()
-                .singleWhereOrNull(
-                  (element) => element.isRepeated(),
-                );
-            if (repeatMemNotification != null) {
-              _registerMemRepeatNotification(
-                savedMem.name,
-                repeatMemNotification,
-                memNotifications?.singleWhereOrNull(
-                  (element) => element.isRepeatByNDay(),
-                ),
-              );
             }
           }
         },
@@ -288,108 +255,6 @@ class NotificationClient {
           "memId": memId,
         },
       );
-
-  // TODO _registerMemRepeatNotificationと統合する
-  _memRepeatedReminder(
-    SavedMem savedMem,
-    MemNotification? memNotification,
-  ) =>
-      v(
-        () async {
-          if (memNotification == null) {
-            await _notificationRepository.discard(
-              memRepeatedNotificationId(savedMem.id),
-            );
-          } else {
-            final now = DateTime.now();
-            final hours = (memNotification.time! / 60 / 60).floor();
-            final minutes =
-                ((memNotification.time! - hours * 60 * 60) / 60).floor();
-            final seconds =
-                ((memNotification.time! - ((hours * 60) + minutes) * 60) / 60)
-                    .floor();
-            var notifyFirstAt = DateTime(
-              now.year,
-              now.month,
-              now.day,
-              hours,
-              minutes,
-              seconds,
-            );
-            if (notifyFirstAt.isBefore(now)) {
-              notifyFirstAt = notifyFirstAt.add(const Duration(days: 1));
-            }
-
-            final repeatedNotification = ShowNotification(
-              memRepeatedNotificationId(savedMem.id),
-              savedMem.name,
-              memNotification.message,
-              json.encode({memIdKey: memNotification.memId}),
-              [
-                notificationActions.startActAction,
-                notificationActions.finishActiveActAction,
-              ],
-              notificationChannels.repeatedReminderChannel,
-            );
-
-            await _notificationRepository.receive(repeatedNotification);
-          }
-        },
-        {
-          "savedMem": savedMem,
-          "memNotification": memNotification,
-        },
-      );
-
-  Future<void> _registerMemRepeatNotification(
-    String memName,
-    SavedMemNotification repeatMemNotification,
-    MemNotification? repeatEveryNDay,
-  ) =>
-      v(
-        () async {
-          final now = DateTime.now();
-          final hours = (repeatMemNotification.time! / 60 / 60).floor();
-          final minutes =
-              ((repeatMemNotification.time! - hours * 60 * 60) / 60).floor();
-          final seconds =
-              ((repeatMemNotification.time! - ((hours * 60) + minutes) * 60) /
-                      60)
-                  .floor();
-          var notifyFirstAt = DateTime(
-            now.year,
-            now.month,
-            now.day,
-            hours,
-            minutes,
-            seconds,
-          );
-          if (notifyFirstAt.isBefore(now)) {
-            notifyFirstAt = notifyFirstAt.add(const Duration(days: 1));
-          }
-
-          final intervalDays = repeatEveryNDay?.time;
-          if (intervalDays != null) {
-            await _scheduleClient.receive(
-              PeriodicSchedule(
-                memRepeatedNotificationId(repeatMemNotification.memId),
-                notifyFirstAt,
-                Duration(
-                  days: intervalDays,
-                ),
-                showRepeatEveryNDayNotification,
-                {
-                  memIdKey: repeatMemNotification.memId,
-                },
-              ),
-            );
-          }
-        },
-        {
-          "memName": memName,
-          "repeatMemNotification": repeatMemNotification,
-        },
-      );
 }
 
 const notificationTypeKey = "notificationType";
@@ -400,7 +265,7 @@ Future<void> scheduleCallback(
   int id,
   Map<String, dynamic> params,
 ) =>
-    v(
+    i(
       () async {
         await openDatabase();
 
@@ -411,9 +276,27 @@ Future<void> scheduleCallback(
           (element) => element.name == params[notificationTypeKey],
         );
 
+        String body;
+        switch (notificationType) {
+          case NotificationType.startMem:
+            body = _startMemNotificationBody;
+            break;
+          case NotificationType.endMem:
+            body = _endMemNotificationBody;
+            break;
+          case NotificationType.repeat:
+            final memRepeatNotification =
+                ((await MemNotificationRepository().shipByMemId(memId)))
+                    .where((element) => element.isRepeated());
+            // FIXME lastじゃなくてsingleのはず
+            //  保存側のバグなので一旦このままコミットする
+            body = memRepeatNotification.last.message;
+        }
+
         await NotificationClient().show(
           id,
           mem.name,
+          body,
           notificationType,
           params,
         );

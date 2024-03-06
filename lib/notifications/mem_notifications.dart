@@ -5,6 +5,7 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/client.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/repositories/mem.dart';
+import 'package:mem/repositories/mem_notification.dart';
 
 import 'notification_ids.dart';
 import 'schedule.dart';
@@ -22,14 +23,22 @@ class MemNotifications {
   ) =>
       v(
         () {
-          final memPeriodSchedules = _memPeriodSchedules(
-            savedMem,
-            startOfDay,
-            callback,
-          );
+          Iterable<Schedule>? memPeriodicSchedule;
+          if (memNotifications != null) {
+            memPeriodicSchedule = _memPeriodicSchedule(
+              savedMem.id,
+              memNotifications.whereType<SavedMemNotification>(),
+              callback,
+            );
+          }
 
           return [
-            memPeriodSchedules,
+            _memPeriodSchedules(
+              savedMem,
+              startOfDay,
+              callback,
+            ),
+            if (memPeriodicSchedule != null) memPeriodicSchedule,
           ].flattened;
         },
         {
@@ -104,6 +113,55 @@ class MemNotifications {
         {
           "savedMem": savedMem,
           "startOfDay": startOfDay,
+        },
+      );
+
+  static Iterable<Schedule> _memPeriodicSchedule(
+    int memId,
+    Iterable<SavedMemNotification> savedMemNotifications,
+    Function callback,
+  ) =>
+      v(
+        () {
+          final enables =
+              savedMemNotifications.where((element) => element.isEnabled());
+
+          if (enables.where((element) => element.isRepeated()).isEmpty) {
+            return [
+              CancelSchedule(memRepeatedNotificationId(1)),
+            ];
+          } else {
+            final repeat =
+                enables.singleWhere((element) => element.isRepeated());
+            final repeatNDay = enables
+                .singleWhereOrNull((element) => element.isRepeatByNDay());
+
+            final now = DateTime.now();
+            final today = DateTime(now.year, now.month, now.day);
+
+            final notifyFirstAt = DateTime.fromMicrosecondsSinceEpoch(
+              today.microsecondsSinceEpoch + (repeat.time ?? 0) * 1000 * 1000,
+            );
+
+            return [
+              PeriodicSchedule(
+                memRepeatedNotificationId(memId),
+                notifyFirstAt,
+                Duration(
+                  days: repeatNDay?.time ?? 1,
+                ),
+                callback,
+                {
+                  memIdKey: memId,
+                  notificationTypeKey: NotificationType.repeat.name,
+                },
+              )
+            ];
+          }
+        },
+        {
+          "memId": memId,
+          "savedMemNotifications": savedMemNotifications,
         },
       );
 }
