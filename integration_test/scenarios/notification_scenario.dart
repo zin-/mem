@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:mem/core/mem_notification.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/base.dart';
+import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/notifications/client.dart';
@@ -30,6 +32,8 @@ void testNotificationScenario() => group(
       ": $_scenarioName",
       () {
         const insertedMemName = "$_scenarioName - mem name - inserted";
+        const insertedMemNotificationMessage =
+            "$_scenarioName - inserted - mem notification message";
 
         late final DatabaseAccessor dbA;
         int? insertedMemId;
@@ -43,6 +47,13 @@ void testNotificationScenario() => group(
           insertedMemId = await dbA.insert(defTableMems, {
             defColMemsName.name: insertedMemName,
             defColMemsDoneAt.name: null,
+            defColCreatedAt.name: zeroDate,
+          });
+          await dbA.insert(defTableMemNotifications, {
+            defFkMemNotificationsMemId.name: insertedMemId,
+            defColMemNotificationsTime.name: 0,
+            defColMemNotificationsType.name: MemNotificationType.repeat.name,
+            defColMemNotificationsMessage.name: insertedMemNotificationMessage,
             defColCreatedAt.name: zeroDate,
           });
         });
