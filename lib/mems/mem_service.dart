@@ -32,12 +32,7 @@ class MemService {
           final savedMemNotifications = memDetail.notifications == null
               ? null
               : await Future.wait(memDetail.notifications!.map((e) {
-                  if (e.time == null) {
-                    if (e is SavedMemNotification) {
-                      _memNotificationRepository.wasteById(e.id);
-                    }
-                    return Future.value(e);
-                  } else {
+                  if (e.isEnabled()) {
                     return (e is SavedMemNotification && !undo
                         ? _memNotificationRepository.replace(e.copiedWith(
                             memId: () => savedMem.id,
@@ -45,6 +40,16 @@ class MemService {
                         : _memNotificationRepository.receive(e.copiedWith(
                             memId: () => savedMem.id,
                           )));
+                  } else {
+                    if (e is SavedMemNotification) {
+                      _memNotificationRepository.wasteById(e.id);
+                    } else {
+                      _memNotificationRepository.wasteByMemIdAndType(
+                        savedMem.id,
+                        e.type,
+                      );
+                    }
+                    return Future.value(e);
                   }
                 }));
 

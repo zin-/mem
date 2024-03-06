@@ -46,6 +46,23 @@ class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
         memId,
       );
 
+  Future<Iterable<SavedMemNotification>> wasteByMemIdAndType(
+    int memId,
+    MemNotificationType type,
+  ) =>
+      v(
+        () => super.waste(
+          And([
+            Equals(defFkMemNotificationsMemId.name, memId),
+            Equals(defColMemNotificationsType.name, type.name),
+          ]),
+        ),
+        {
+          "memId": memId,
+          "type": type,
+        },
+      );
+
   @override
   SavedMemNotification pack(Map<String, dynamic> tuple) => SavedMemNotification(
         tuple[defFkMemNotificationsMemId.name],

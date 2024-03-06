@@ -285,12 +285,10 @@ Future<void> scheduleCallback(
             body = _endMemNotificationBody;
             break;
           case NotificationType.repeat:
-            final memRepeatNotification =
-                ((await MemNotificationRepository().shipByMemId(memId)))
-                    .where((element) => element.isRepeated());
-            // FIXME lastじゃなくてsingleのはず
-            //  保存側のバグなので一旦このままコミットする
-            body = memRepeatNotification.last.message;
+            body = ((await MemNotificationRepository().shipByMemId(memId)))
+                .singleWhere((element) => element.isRepeated())
+                .message;
+            break;
         }
 
         await NotificationClient().show(
