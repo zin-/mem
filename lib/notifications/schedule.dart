@@ -4,6 +4,15 @@ abstract class Schedule extends Entity {
   final int id;
 
   Schedule(this.id);
+
+  @override
+  String toString() => "${super.toString()}: ${{
+        "id": id,
+      }}";
+}
+
+class CancelSchedule extends Schedule {
+  CancelSchedule(super.id);
 }
 
 class TimedSchedule extends Schedule {
@@ -19,8 +28,7 @@ class TimedSchedule extends Schedule {
   );
 
   @override
-  String toString() => "${super.toString()}: ${{
-        "id": id,
+  String toString() => "${super.toString()}${{
         "startAt": startAt,
         "callback": callback,
         "params": params,

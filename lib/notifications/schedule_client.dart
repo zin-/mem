@@ -24,6 +24,8 @@ class ScheduleClient extends Repository<Schedule>
               entity.callback,
               params: entity.params,
             );
+          } else if (entity is CancelSchedule) {
+            await discard(entity.id);
           }
         },
         {
