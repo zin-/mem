@@ -42,7 +42,7 @@ class MemNotifications {
       v(
         () {
           final periodStart = savedMem.period?.start;
-          Schedule? periodStartSchedule;
+          TimedSchedule? periodStartSchedule;
           if (periodStart == null) {
             // TODO 値の指定がない場合キャンセルする
             //  キャンセルの判断はここでやるべきか？
@@ -50,7 +50,7 @@ class MemNotifications {
             //    CancelEntityをRepositoryに渡すのはどうなんだ？
             //  endの方も同様
           } else {
-            periodStartSchedule = Schedule(
+            periodStartSchedule = TimedSchedule(
               memStartNotificationId(savedMem.id),
               periodStart.isAllDay
                   ? DateTime(
@@ -70,12 +70,12 @@ class MemNotifications {
           }
 
           final periodEnd = savedMem.period?.end;
-          Schedule? periodEndSchedule;
+          TimedSchedule? periodEndSchedule;
           if (periodEnd == null) {
             // TODO
           } else {
             final endOfDay = startOfDay.subtractMinutes(1);
-            periodEndSchedule = Schedule(
+            periodEndSchedule = TimedSchedule(
               memEndNotificationId(savedMem.id),
               periodEnd.isAllDay
                   ? DateTime(

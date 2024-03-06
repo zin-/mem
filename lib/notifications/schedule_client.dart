@@ -17,7 +17,7 @@ class ScheduleClient extends Repository<Schedule>
               startAt: entity.startAt,
               params: entity.params,
             );
-          } else {
+          } else if (entity is TimedSchedule) {
             await AndroidAlarmManager.oneShotAt(
               entity.startAt,
               entity.id,

@@ -1,13 +1,18 @@
 import 'package:mem/framework/repository/entity.dart';
 
-class Schedule extends Entity {
+abstract class Schedule extends Entity {
   final int id;
+
+  Schedule(this.id);
+}
+
+class TimedSchedule extends Schedule {
   final DateTime startAt;
   final Function callback;
   final Map<String, dynamic> params;
 
-  Schedule(
-    this.id,
+  TimedSchedule(
+    super.id,
     this.startAt,
     this.callback,
     this.params,
@@ -22,7 +27,7 @@ class Schedule extends Entity {
       }}";
 }
 
-class PeriodicSchedule extends Schedule {
+class PeriodicSchedule extends TimedSchedule {
   final Duration duration;
 
   PeriodicSchedule(
