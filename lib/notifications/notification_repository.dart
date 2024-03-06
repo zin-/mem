@@ -4,7 +4,6 @@ import 'package:mem/logger/log_service.dart';
 import 'package:timezone/data/latest_all.dart';
 
 import 'icons.dart';
-import 'notification/cancel_notification.dart';
 import 'notification/notification.dart';
 import 'notification/show_notification.dart';
 import 'wrapper.dart';
@@ -28,8 +27,6 @@ class NotificationRepository extends RepositoryV1<Notification, void> {
               entity.channel,
               entity.payloadJson,
             );
-          } else if (entity is CancelNotification) {
-            await discard(entity.id);
           }
         },
         {

@@ -15,7 +15,6 @@ import 'package:mem/settings/client.dart';
 import 'package:mem/settings/keys.dart';
 
 import 'mem_notifications.dart';
-import 'notification/cancel_notification.dart';
 import 'notification/show_notification.dart';
 import 'notification/type.dart';
 import 'notification_actions.dart';
@@ -143,12 +142,14 @@ class NotificationClient {
   ) =>
       v(
         () async {
+          // TODO 混乱し始めたので整理する
+          //  SavedMemから通知を登録する
+          //    SavedMemNotificationsからも登録する
+          //      これはSavedMemの状態によって登録するのか削除するのか変わるため
+          //    SavedMemが完了もしくはアーカイブされている場合、すべてキャンセルする
+          //      削除した場合も同様にキャンセルするため、関数に切り出す
           if (savedMem.isDone || savedMem.isArchived) {
-            for (var cancelNotification
-                in CancelAllMemNotifications.of(savedMem.id)) {
-              await _notificationRepository.discard(cancelNotification.id);
-              await _scheduleClient.discard(cancelNotification.id);
-            }
+            cancelMemNotifications(savedMem.id);
           } else {
             _memReminder(savedMem);
 
@@ -182,12 +183,12 @@ class NotificationClient {
         },
       );
 
-  void cancelMemNotifications(int memId) => v(
-        () {
-          CancelAllMemNotifications.of(memId).forEach(
-            (cancelNotification) =>
-                _notificationRepository.receive(cancelNotification),
-          );
+  Future<void> cancelMemNotifications(int memId) => v(
+        () async {
+          for (var id in AllMemNotificationsId.of(memId)) {
+            await _notificationRepository.discard(id);
+            await _scheduleClient.discard(id);
+          }
         },
         {
           "memId": memId,
@@ -365,8 +366,8 @@ class NotificationClient {
       v(
         () async {
           if (memNotification == null) {
-            await _notificationRepository.receive(
-              CancelNotification(memRepeatedNotificationId(savedMem.id)),
+            await _notificationRepository.discard(
+              memRepeatedNotificationId(savedMem.id),
             );
           } else {
             final now = DateTime.now();
