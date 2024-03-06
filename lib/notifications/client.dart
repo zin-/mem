@@ -138,7 +138,9 @@ class NotificationClient {
 
   Future<void> registerMemNotifications(
     SavedMem savedMem,
-    Iterable<MemNotification>? memNotifications,
+    // FIXME Iterable<SavedMemNotification>が正しい
+    //  影響箇所が大きいため保留
+    List<MemNotification>? memNotifications,
   ) =>
       v(
         () async {
@@ -156,6 +158,7 @@ class NotificationClient {
               (await _preferenceClient.shipByKey(startOfDayKey)).value ??
                   // FIXME どっかで持っておくべきか？
                   const TimeOfDay(hour: 0, minute: 0),
+              memNotifications,
               scheduleCallback,
             )) {
               await _scheduleClient.receive(schedule);
