@@ -41,14 +41,10 @@ class MemService {
                             memId: () => savedMem.id,
                           )));
                   } else {
-                    if (e is SavedMemNotification) {
-                      _memNotificationRepository.wasteById(e.id);
-                    } else {
-                      _memNotificationRepository.wasteByMemIdAndType(
-                        savedMem.id,
-                        e.type,
-                      );
-                    }
+                    _memNotificationRepository.wasteByMemIdAndType(
+                      savedMem.id,
+                      e.type,
+                    );
                     return Future.value(e);
                   }
                 }));

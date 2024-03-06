@@ -60,6 +60,11 @@ Future<void> showRepeatEveryNDayNotification(
 
 // TODO refactor
 class NotificationClient {
+  // TODO ChannelにActionを持たせる
+  //  ChannelごとにActionは決まる
+  // TODO NotificationTypeとも統一できるはず
+  //  startとendが同じChannelか
+  // TODO idの生成も最後のタイミングでやるならChannelに持たせることができるようになるかも？
   final NotificationChannels notificationChannels;
   final NotificationActions notificationActions;
 
@@ -134,12 +139,6 @@ class NotificationClient {
   ) =>
       v(
         () async {
-          // TODO 混乱し始めたので整理する
-          //  SavedMemから通知を登録する
-          //    SavedMemNotificationsからも登録する
-          //      これはSavedMemの状態によって登録するのか削除するのか変わるため
-          //    SavedMemが完了もしくはアーカイブされている場合、すべてキャンセルする
-          //      削除した場合も同様にキャンセルするため、関数に切り出す
           if (savedMem.isDone || savedMem.isArchived) {
             cancelMemNotifications(savedMem.id);
           } else {
