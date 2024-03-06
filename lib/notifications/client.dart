@@ -151,7 +151,17 @@ class NotificationClient {
           if (savedMem.isDone || savedMem.isArchived) {
             cancelMemNotifications(savedMem.id);
           } else {
-            _memReminder(savedMem);
+            for (var schedule in MemNotifications.scheduleOf(
+              savedMem,
+              (await _preferenceClient.shipByKey(startOfDayKey)).value ??
+                  // FIXME どっかで持っておくべきか？
+                  const TimeOfDay(hour: 0, minute: 0),
+              scheduleCallback,
+            )) {
+              await _scheduleClient.receive(schedule);
+            }
+
+            // _memReminder(savedMem);
 
             memNotifications?.forEach((e) {
               if (e.isEnabled()) {
@@ -278,85 +288,85 @@ class NotificationClient {
         },
       );
 
-  Future<void> _memReminder(
-    SavedMem savedMem,
-  ) =>
-      v(
-        () async {
-          final startId = memStartNotificationId(savedMem.id);
-          final endId = memEndNotificationId(savedMem.id);
-
-          await _notificationRepository.discard(startId);
-          await _scheduleClient.discard(startId);
-          await _notificationRepository.discard(endId);
-          await _scheduleClient.discard(endId);
-
-          final period = savedMem.period;
-          if (period != null) {
-            final startOfDay =
-                (await _preferenceClient.shipByKey(startOfDayKey)).value ??
-                    // FIXME どっかで持っておくべきか？
-                    const TimeOfDay(hour: 0, minute: 0);
-
-            DateAndTime? start = period.start;
-            if (start != null) {
-              start = start.isAllDay
-                  ? DateAndTime(
-                      start.year,
-                      start.month,
-                      start.day,
-                      startOfDay.hour,
-                      startOfDay.minute,
-                    )
-                  : start;
-              await _scheduleClient.receive(Schedule(
-                memStartNotificationId(savedMem.id),
-                start,
-                scheduleCallback,
-                {
-                  memIdKey: savedMem.id,
-                  notificationTypeKey: NotificationType.startMem.name,
-                },
-              ));
-            }
-
-            final end = period.end;
-            if (end != null) {
-              final endOfDay = startOfDay.subtractMinutes(1);
-
-              await _scheduleClient.receive(Schedule(
-                memEndNotificationId(savedMem.id),
-                end.isAllDay
-                    ? DateTime(
-                        end.year,
-                        end.month,
-                        TimeOfDay(
-                                            hour:
-                                                start?.hour ?? startOfDay.hour,
-                                            minute: start?.minute ??
-                                                startOfDay.minute)
-                                        .compareTo(endOfDay) >
-                                    0 &&
-                                start?.day == end.day
-                            ? end.day + 1
-                            : end.day,
-                        endOfDay.hour,
-                        endOfDay.minute,
-                      )
-                    : end,
-                scheduleCallback,
-                {
-                  memIdKey: savedMem.id,
-                  notificationTypeKey: NotificationType.endMem.name,
-                },
-              ));
-            }
-          }
-        },
-        {
-          "savedMem": savedMem,
-        },
-      );
+  // Future<void> _memReminder(
+  //   SavedMem savedMem,
+  // ) =>
+  //     v(
+  //       () async {
+  //         final startId = memStartNotificationId(savedMem.id);
+  //         final endId = memEndNotificationId(savedMem.id);
+  //
+  //         await _notificationRepository.discard(startId);
+  //         await _scheduleClient.discard(startId);
+  //         await _notificationRepository.discard(endId);
+  //         await _scheduleClient.discard(endId);
+  //
+  //         final period = savedMem.period;
+  //         if (period != null) {
+  //           final startOfDay =
+  //               (await _preferenceClient.shipByKey(startOfDayKey)).value ??
+  //                   // FIXME どっかで持っておくべきか？
+  //                   const TimeOfDay(hour: 0, minute: 0);
+  //
+  //           DateAndTime? start = period.start;
+  //           if (start != null) {
+  //             start = start.isAllDay
+  //                 ? DateAndTime(
+  //                     start.year,
+  //                     start.month,
+  //                     start.day,
+  //                     startOfDay.hour,
+  //                     startOfDay.minute,
+  //                   )
+  //                 : start;
+  //             await _scheduleClient.receive(Schedule(
+  //               memStartNotificationId(savedMem.id),
+  //               start,
+  //               scheduleCallback,
+  //               {
+  //                 memIdKey: savedMem.id,
+  //                 notificationTypeKey: NotificationType.startMem.name,
+  //               },
+  //             ));
+  //           }
+  //
+  //           final end = period.end;
+  //           if (end != null) {
+  //             final endOfDay = startOfDay.subtractMinutes(1);
+  //
+  //             await _scheduleClient.receive(Schedule(
+  //               memEndNotificationId(savedMem.id),
+  //               end.isAllDay
+  //                   ? DateTime(
+  //                       end.year,
+  //                       end.month,
+  //                       TimeOfDay(
+  //                                           hour:
+  //                                               start?.hour ?? startOfDay.hour,
+  //                                           minute: start?.minute ??
+  //                                               startOfDay.minute)
+  //                                       .compareTo(endOfDay) >
+  //                                   0 &&
+  //                               start?.day == end.day
+  //                           ? end.day + 1
+  //                           : end.day,
+  //                       endOfDay.hour,
+  //                       endOfDay.minute,
+  //                     )
+  //                   : end,
+  //               scheduleCallback,
+  //               {
+  //                 memIdKey: savedMem.id,
+  //                 notificationTypeKey: NotificationType.endMem.name,
+  //               },
+  //             ));
+  //           }
+  //         }
+  //       },
+  //       {
+  //         "savedMem": savedMem,
+  //       },
+  //     );
 
   // TODO _registerMemRepeatNotificationと統合する
   _memRepeatedReminder(
@@ -492,15 +502,3 @@ Future<void> scheduleCallback(
         "params": params,
       },
     );
-
-extension on TimeOfDay {
-  TimeOfDay subtractMinutes(int minutes) {
-    int subtracted = (_totalMinutes - minutes + 24 * 60) % (24 * 60);
-    return TimeOfDay(hour: subtracted ~/ 60, minute: subtracted % 60);
-  }
-
-  int compareTo(TimeOfDay other) =>
-      _totalMinutes.compareTo(other._totalMinutes);
-
-  int get _totalMinutes => hour * 60 + minute;
-}
