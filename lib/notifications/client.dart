@@ -6,6 +6,8 @@ import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
+import 'package:mem/notifications/notification/action.dart';
+import 'package:mem/notifications/notification/channel.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
@@ -21,42 +23,6 @@ import 'notification_channels.dart';
 import 'notification_ids.dart';
 import 'notification_repository.dart';
 import 'schedule_client.dart';
-
-@pragma('vm:entry-point')
-Future<void> showRepeatEveryNDayNotification(
-  int id,
-  Map<String, dynamic> params,
-) =>
-    v(
-      () async {
-        await openDatabase();
-
-        final memId = params[memIdKey];
-        final mem = await MemRepository().shipById(memId);
-        final memNotification =
-            (await MemNotificationRepository().shipByMemId(mem.id)).singleWhere(
-          (element) => element.isRepeated(),
-        );
-
-        await NotificationRepository().receive(
-          ShowNotification(
-            memRepeatedNotificationId(mem.id),
-            mem.name,
-            memNotification.message,
-            json.encode(params),
-            [
-              NotificationClient().notificationActions.startActAction,
-              NotificationClient().notificationActions.finishActiveActAction,
-            ],
-            NotificationClient().notificationChannels.repeatedReminderChannel,
-          ),
-        );
-      },
-      {
-        "id": id,
-        "params": params,
-      },
-    );
 
 // TODO refactor
 class NotificationClient {
@@ -107,18 +73,35 @@ class NotificationClient {
   ) =>
       v(
         () async {
+          late final NotificationChannel channel;
+          late final List<NotificationAction> actions;
+          switch (notificationType) {
+            case NotificationType.startMem:
+            case NotificationType.endMem:
+              channel = notificationChannels.reminderChannel;
+              actions = [
+                notificationActions.doneMemAction,
+                notificationActions.startActAction,
+                notificationActions.finishActiveActAction,
+              ];
+              break;
+            case NotificationType.repeat:
+              channel = notificationChannels.repeatedReminderChannel;
+              actions = [
+                notificationActions.startActAction,
+                notificationActions.finishActiveActAction,
+              ];
+              break;
+          }
+
           await _notificationRepository.receive(
             ShowNotification(
               id,
               title,
               body,
               jsonEncode(params),
-              [
-                notificationActions.doneMemAction,
-                notificationActions.startActAction,
-                notificationActions.finishActiveActAction,
-              ],
-              notificationChannels.reminderChannel,
+              actions,
+              channel,
             ),
           );
         },

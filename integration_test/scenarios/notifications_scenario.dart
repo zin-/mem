@@ -6,9 +6,6 @@ import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
-import 'package:mem/notifications/client.dart';
-import 'package:mem/notifications/mem_notifications.dart';
-import 'package:mem/notifications/notification_ids.dart';
 
 import 'helpers.dart';
 
@@ -48,19 +45,5 @@ void testNotificationsScenario() => group(
             defColCreatedAt.name: zeroDate,
           });
         });
-
-        testWidgets(
-          ": show repeat every n day notification.",
-          (widgetTester) async {
-            await showRepeatEveryNDayNotification(
-              memRepeatedNotificationId(insertedMemId!),
-              {
-                memIdKey: insertedMemId,
-              },
-            );
-
-            // TODO 通知が表示されたのかを確認したい
-          },
-        );
       },
     );
