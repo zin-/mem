@@ -6,7 +6,7 @@ abstract class Notification extends EntityV1 {
   Notification(this.id);
 
   @override
-  String toString() => {
-        'id': id,
-      }.toString();
+  String toString() => "${super.toString()}: ${{
+        "id": id,
+      }}";
 }
