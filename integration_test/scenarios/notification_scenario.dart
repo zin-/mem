@@ -13,6 +13,10 @@ import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/notifications/client.dart';
 import 'package:mem/notifications/mem_notifications.dart';
+import 'package:mem/notifications/notification/done_mem_notification_action.dart';
+import 'package:mem/notifications/notification/finish_active_act_notification_action.dart';
+import 'package:mem/notifications/notification/pause_act_notification_action.dart';
+import 'package:mem/notifications/notification/start_act_notification_action.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/notifications/notification_ids.dart';
 import 'package:mem/notifications/wrapper.dart';
@@ -127,7 +131,7 @@ void testNotificationScenario() => group(
                 payload: json.encode({memIdKey: insertedMemId}),
                 actionId: NotificationClient()
                     .notificationChannels
-                    .actionMap["done-mem"]
+                    .actionMap[doneMemNotificationActionId]
                     ?.id,
               );
 
@@ -181,7 +185,7 @@ void testNotificationScenario() => group(
                 payload: json.encode({memIdKey: insertedMemId}),
                 actionId: NotificationClient()
                     .notificationChannels
-                    .actionMap["start-act"]
+                    .actionMap[startActNotificationActionId]
                     ?.id,
               );
 
@@ -233,7 +237,7 @@ void testNotificationScenario() => group(
                   payload: json.encode({memIdKey: insertedMemId}),
                   actionId: NotificationClient()
                       .notificationChannels
-                      .actionMap["finish-active_act"]
+                      .actionMap[finishActiveActNotificationActionId]
                       ?.id,
                 );
 
@@ -305,7 +309,7 @@ void testNotificationScenario() => group(
                     payload: json.encode({memIdKey: insertedMemId}),
                     actionId: NotificationClient()
                         .notificationChannels
-                        .actionMap["finish-active_act"]
+                        .actionMap[finishActiveActNotificationActionId]
                         ?.id,
                   );
 
@@ -381,7 +385,7 @@ void testNotificationScenario() => group(
                 payload: json.encode({memIdKey: insertedMemId}),
                 actionId: NotificationClient()
                     .notificationChannels
-                    .actionMap["pause-act"]
+                    .actionMap[pauseActNotificationActionId]
                     ?.id,
               );
 
@@ -412,7 +416,7 @@ void testNotificationScenario() => group(
                   payload: json.encode({memIdKey: insertedMemId}),
                   actionId: NotificationClient()
                       .notificationChannels
-                      .actionMap["pause-act"]
+                      .actionMap[pauseActNotificationActionId]
                       ?.id,
                 );
 

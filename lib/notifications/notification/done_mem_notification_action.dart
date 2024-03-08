@@ -1,10 +1,12 @@
 import 'package:mem/mems/mem_service.dart';
 import 'package:mem/notifications/notification/action.dart';
 
+const doneMemNotificationActionId = "done-mem";
+
 class DoneMemNotificationAction extends NotificationAction {
-  DoneMemNotificationAction(String id, String title)
+  DoneMemNotificationAction(String title)
       : super(
-          id,
+          doneMemNotificationActionId,
           title,
           (memId) => MemService().doneByMemId(memId),
         );

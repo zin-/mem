@@ -17,14 +17,11 @@ class NotificationChannels {
   late final Map<String, NotificationAction> actionMap;
 
   NotificationChannels(AppLocalizations l10n) {
-    final doneMemAction = DoneMemNotificationAction('done-mem', l10n.doneLabel),
-        startActAction =
-            StartActNotificationAction('start-act', l10n.startLabel),
-        finishActiveActAction = FinishActiveActNotificationAction(
-          'finish-active_act',
-          l10n.finishLabel,
-        ),
-        pauseAct = PauseActNotificationAction('pause-act', l10n.pauseActLabel);
+    final doneMemAction = DoneMemNotificationAction(l10n.doneLabel),
+        startActAction = StartActNotificationAction(l10n.startLabel),
+        finishActiveActAction =
+            FinishActiveActNotificationAction(l10n.finishLabel),
+        pauseAct = PauseActNotificationAction(l10n.pauseActLabel);
 
     actionMap = Map.fromIterable(
       [

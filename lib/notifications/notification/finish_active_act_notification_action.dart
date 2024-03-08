@@ -4,10 +4,12 @@ import 'package:mem/acts/client.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/notifications/notification/action.dart';
 
+const finishActiveActNotificationActionId = "finish-active_act";
+
 class FinishActiveActNotificationAction extends NotificationAction {
-  FinishActiveActNotificationAction(String id, String title)
+  FinishActiveActNotificationAction(String title)
       : super(
-          id,
+          finishActiveActNotificationActionId,
           title,
           (memId) async {
             final activeActs = (await ActRepository().shipActive())
