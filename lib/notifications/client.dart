@@ -8,6 +8,7 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
 import 'package:mem/notifications/notification/action.dart';
 import 'package:mem/notifications/notification/channel.dart';
+import 'package:mem/notifications/schedule.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
@@ -92,6 +93,13 @@ class NotificationClient {
                 notificationActions.finishActiveActAction,
               ];
               break;
+            case NotificationType.afterActStarted:
+              channel = notificationChannels.afterActStartedNotificationChannel;
+              actions = [
+                notificationActions.finishActiveActAction,
+                notificationActions.pauseAct,
+              ];
+              break;
           }
 
           await _notificationRepository.receive(
@@ -158,10 +166,11 @@ class NotificationClient {
   Future<void> startActNotifications(
     int memId,
     String memName,
-    Iterable<SavedMemNotification> afterActStartedNotifications,
+    Iterable<SavedMemNotification> savedMemNotifications,
   ) =>
       v(
         () async {
+          await cancelActNotification(memId);
           _notificationRepository.receive(
             ShowNotification(
               activeActNotificationId(memId),
@@ -176,27 +185,24 @@ class NotificationClient {
             ),
           );
 
-          if (afterActStartedNotifications.isNotEmpty) {
-            for (var notification in afterActStartedNotifications) {
-              _notificationRepository.receive(
-                ShowNotification(
-                  afterActStartedNotificationId(memId),
-                  memName,
-                  notification.message,
-                  json.encode({memIdKey: memId}),
-                  [
-                    notificationActions.finishActiveActAction,
-                  ],
-                  notificationChannels.afterActStartedNotificationChannel,
-                ),
-              );
-            }
+          final now = DateTime.now();
+          for (var notification in savedMemNotifications.where((element) =>
+              element.isEnabled() && element.isAfterActStarted())) {
+            await _scheduleClient.receive(TimedSchedule(
+              afterActStartedNotificationId(memId),
+              now.add(Duration(seconds: notification.time!)),
+              scheduleCallback,
+              {
+                memIdKey: notification.memId,
+                notificationTypeKey: NotificationType.afterActStarted.name,
+              },
+            ));
           }
         },
         {
           "memId": memId,
           "memName": memName,
-          "afterActStartedNotifications": afterActStartedNotifications,
+          "savedMemNotifications": savedMemNotifications,
         },
       );
 
@@ -207,6 +213,7 @@ class NotificationClient {
   ) =>
       v(
         () async {
+          await cancelActNotification(memId);
           await _notificationRepository.receive(
             ShowNotification(
               pausedActNotificationId(memId),
@@ -269,6 +276,11 @@ Future<void> scheduleCallback(
           case NotificationType.repeat:
             body = ((await MemNotificationRepository().shipByMemId(memId)))
                 .singleWhere((element) => element.isRepeated())
+                .message;
+            break;
+          case NotificationType.afterActStarted:
+            body = ((await MemNotificationRepository().shipByMemId(memId)))
+                .singleWhere((element) => element.isAfterActStarted())
                 .message;
             break;
         }

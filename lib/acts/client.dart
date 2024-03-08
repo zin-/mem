@@ -106,13 +106,13 @@ class ActsClient {
   void _registerStartNotifications(int memId) => v(
         () async {
           final memName = (await _memRepository.shipById(memId)).name;
-          final afterActStartedNotifications = await _memNotificationRepository
-              .shipByMemIdAndAfterActStarted(memId);
+          final savedMemNotifications =
+              await _memNotificationRepository.shipByMemId(memId);
 
           _notificationClient.startActNotifications(
             memId,
             memName,
-            afterActStartedNotifications,
+            savedMemNotifications,
           );
         },
         {
