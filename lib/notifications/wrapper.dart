@@ -7,7 +7,6 @@ import 'package:mem/main.dart';
 
 import 'client.dart';
 import 'mem_notifications.dart';
-import 'notification/action.dart';
 import 'notification/channel.dart';
 
 // TODO Windows, Web, Linuxでの通知を実装する
@@ -22,7 +21,6 @@ class NotificationsWrapper {
     int id,
     String title,
     String? body,
-    List<NotificationAction> actions,
     NotificationChannel channel,
     String? payload,
   ) =>
@@ -33,17 +31,15 @@ class NotificationsWrapper {
           body,
           _buildNotificationDetails(
             channel,
-            actions,
           ),
           payload: payload,
         ),
         {
-          id,
-          title,
-          body.toString(),
-          actions,
-          channel,
-          payload,
+          "id": id,
+          "title": title,
+          "body": body,
+          "channel": channel,
+          "payload": payload,
         },
       );
 
@@ -54,16 +50,15 @@ class NotificationsWrapper {
 
   NotificationDetails _buildNotificationDetails(
     NotificationChannel channel,
-    List<NotificationAction> actions,
   ) =>
       NotificationDetails(
         android: AndroidNotificationDetails(
           channel.id,
           channel.name,
           channelDescription: channel.description,
-          actions: actions
+          actions: channel.actionList
               .map((e) => AndroidNotificationAction(e.id, e.title))
-              .toList(),
+              .toList(growable: false),
           usesChronometer: channel.usesChronometer,
           ongoing: channel.ongoing,
           autoCancel: channel.autoCancel,
@@ -166,6 +161,8 @@ Future<void> onDidReceiveNotificationResponse(NotificationResponse details) =>
 
             if (payload.containsKey(memIdKey)) {
               final memId = payload[memIdKey];
+              // FIXME drop
+              //  どうしたらいいんだろ？
               await NotificationClient()
                   .notificationActions
                   .list

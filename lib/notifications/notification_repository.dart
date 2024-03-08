@@ -23,7 +23,6 @@ class NotificationRepository extends RepositoryV1<Notification, void> {
               entity.id,
               entity.title,
               entity.body,
-              entity.actions,
               entity.channel,
               entity.payloadJson,
             );

@@ -1,4 +1,3 @@
-import 'action.dart';
 import 'channel.dart';
 import 'notification.dart';
 
@@ -6,7 +5,6 @@ class ShowNotification extends Notification {
   final String title;
   final String body;
   final String? payloadJson;
-  final List<NotificationAction> actions;
   final NotificationChannel channel;
 
   ShowNotification(
@@ -14,18 +12,16 @@ class ShowNotification extends Notification {
     this.title,
     this.body,
     this.payloadJson,
-    this.actions,
     this.channel,
   );
 
   @override
   String toString() =>
+      super.toString() +
       {
-        'title': title,
-        'body': body,
-        'payloadJson': payloadJson,
-        'actions': actions,
-        'channel': channel,
-      }.toString() +
-      super.toString();
+        "title": title,
+        "body": body,
+        "payloadJson": payloadJson,
+        "channel": channel,
+      }.toString();
 }

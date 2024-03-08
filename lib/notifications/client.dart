@@ -6,9 +6,6 @@ import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
-import 'package:mem/notifications/notification/action.dart';
-import 'package:mem/notifications/notification/channel.dart';
-import 'package:mem/notifications/schedule.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
@@ -17,22 +14,26 @@ import 'package:mem/settings/client.dart';
 import 'package:mem/settings/keys.dart';
 
 import 'mem_notifications.dart';
+import 'notification/channel.dart';
 import 'notification/show_notification.dart';
 import 'notification/type.dart';
 import 'notification_actions.dart';
 import 'notification_channels.dart';
 import 'notification_ids.dart';
 import 'notification_repository.dart';
+import 'schedule.dart';
 import 'schedule_client.dart';
 
 // TODO refactor
 class NotificationClient {
-  // TODO ChannelにActionを持たせる
-  //  ChannelごとにActionは決まる
   // TODO NotificationTypeとも統一できるはず
   //  startとendが同じChannelか
   // TODO idの生成も最後のタイミングでやるならChannelに持たせることができるようになるかも？
   final NotificationChannels notificationChannels;
+
+  // TODO drop
+  //  ChannelにActionを持たせる
+  //  ChannelごとにActionは決まる
   final NotificationActions notificationActions;
 
   final ScheduleClient _scheduleClient;
@@ -75,30 +76,16 @@ class NotificationClient {
       v(
         () async {
           late final NotificationChannel channel;
-          late final List<NotificationAction> actions;
           switch (notificationType) {
             case NotificationType.startMem:
             case NotificationType.endMem:
               channel = notificationChannels.reminderChannel;
-              actions = [
-                notificationActions.doneMemAction,
-                notificationActions.startActAction,
-                notificationActions.finishActiveActAction,
-              ];
               break;
             case NotificationType.repeat:
               channel = notificationChannels.repeatedReminderChannel;
-              actions = [
-                notificationActions.startActAction,
-                notificationActions.finishActiveActAction,
-              ];
               break;
             case NotificationType.afterActStarted:
               channel = notificationChannels.afterActStartedNotificationChannel;
-              actions = [
-                notificationActions.finishActiveActAction,
-                notificationActions.pauseAct,
-              ];
               break;
           }
 
@@ -108,7 +95,6 @@ class NotificationClient {
               title,
               body,
               jsonEncode(params),
-              actions,
               channel,
             ),
           );
@@ -177,10 +163,6 @@ class NotificationClient {
               memName,
               'Running',
               json.encode({memIdKey: memId}),
-              [
-                notificationActions.finishActiveActAction,
-                notificationActions.pauseAct,
-              ],
               notificationChannels.activeActNotificationChannel,
             ),
           );
@@ -220,9 +202,6 @@ class NotificationClient {
               memName,
               "Paused",
               json.encode({memIdKey: memId}),
-              [
-                notificationActions.startActAction,
-              ],
               notificationChannels.pausedAct,
             ),
           );
