@@ -1,4 +1,5 @@
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:mem/notifications/notification/action.dart';
 import 'package:mem/notifications/notification/done_mem_notification_action.dart';
 import 'package:mem/notifications/notification/finish_active_act_notification_action.dart';
 import 'package:mem/notifications/notification/pause_act_notification_action.dart';
@@ -13,6 +14,8 @@ class NotificationChannels {
   late final NotificationChannel pausedAct;
   late final NotificationChannel afterActStartedNotificationChannel;
 
+  late final Map<String, NotificationAction> actionMap;
+
   NotificationChannels(AppLocalizations l10n) {
     final doneMemAction = DoneMemNotificationAction('done-mem', l10n.doneLabel),
         startActAction =
@@ -22,6 +25,16 @@ class NotificationChannels {
           l10n.finishLabel,
         ),
         pauseAct = PauseActNotificationAction('pause-act', l10n.pauseActLabel);
+
+    actionMap = Map.fromIterable(
+      [
+        doneMemAction,
+        startActAction,
+        finishActiveActAction,
+        pauseAct,
+      ],
+      key: (element) => element.id,
+    );
 
     reminderChannel = NotificationChannel(
       'reminder',

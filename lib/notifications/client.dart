@@ -17,7 +17,6 @@ import 'mem_notifications.dart';
 import 'notification/channel.dart';
 import 'notification/show_notification.dart';
 import 'notification/type.dart';
-import 'notification_actions.dart';
 import 'notification_channels.dart';
 import 'notification_ids.dart';
 import 'notification_repository.dart';
@@ -30,19 +29,12 @@ class NotificationClient {
   //  startとendが同じChannelか
   // TODO idの生成も最後のタイミングでやるならChannelに持たせることができるようになるかも？
   final NotificationChannels notificationChannels;
-
-  // TODO drop
-  //  ChannelにActionを持たせる
-  //  ChannelごとにActionは決まる
-  final NotificationActions notificationActions;
-
   final ScheduleClient _scheduleClient;
   final NotificationRepository _notificationRepository;
   final PreferenceClient _preferenceClient;
 
   NotificationClient._(
     this.notificationChannels,
-    this.notificationActions,
     this._scheduleClient,
     this._notificationRepository,
     this._preferenceClient,
@@ -55,7 +47,6 @@ class NotificationClient {
           final l10n = buildL10n(context);
           return _instance ??= NotificationClient._(
             NotificationChannels(l10n),
-            NotificationActions(l10n),
             ScheduleClient(),
             NotificationRepository(),
             PreferenceClient(),

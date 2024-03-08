@@ -161,13 +161,10 @@ Future<void> onDidReceiveNotificationResponse(NotificationResponse details) =>
 
             if (payload.containsKey(memIdKey)) {
               final memId = payload[memIdKey];
-              // FIXME drop
-              //  どうしたらいいんだろ？
               await NotificationClient()
-                  .notificationActions
-                  .list
-                  .singleWhere((element) => element.id == actionId)
-                  .onTapped(memId as int);
+                  .notificationChannels
+                  .actionMap[actionId]
+                  ?.onTapped(memId as int);
             }
             break;
         }
