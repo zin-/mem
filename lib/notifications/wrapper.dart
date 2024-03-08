@@ -10,6 +10,8 @@ import 'mem_notifications.dart';
 import 'notification/action.dart';
 import 'notification/channel.dart';
 
+// TODO Windows, Web, Linuxでの通知を実装する
+//  https://github.com/zin-/mem/issues/303
 class NotificationsWrapper {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
