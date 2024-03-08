@@ -32,8 +32,6 @@ void testNotificationScenario() => group(
       ": $_scenarioName",
       () {
         const insertedMemName = "$_scenarioName - mem name - inserted";
-        const insertedMemNotificationMessage =
-            "$_scenarioName - inserted - mem notification message";
 
         late final DatabaseAccessor dbA;
         int? insertedMemId;
@@ -53,7 +51,17 @@ void testNotificationScenario() => group(
             defFkMemNotificationsMemId.name: insertedMemId,
             defColMemNotificationsTime.name: 0,
             defColMemNotificationsType.name: MemNotificationType.repeat.name,
-            defColMemNotificationsMessage.name: insertedMemNotificationMessage,
+            defColMemNotificationsMessage.name:
+                "$_scenarioName - inserted - mem notification message - repeat",
+            defColCreatedAt.name: zeroDate,
+          });
+          await dbA.insert(defTableMemNotifications, {
+            defFkMemNotificationsMemId.name: insertedMemId,
+            defColMemNotificationsTime.name: 1,
+            defColMemNotificationsType.name:
+                MemNotificationType.afterActStarted.name,
+            defColMemNotificationsMessage.name:
+                "$_scenarioName - inserted - mem notification message - after act started",
             defColCreatedAt.name: zeroDate,
           });
         });
