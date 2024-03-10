@@ -4,16 +4,15 @@ import 'package:mem/notifications/notification/done_mem_notification_action.dart
 import 'package:mem/notifications/notification/finish_active_act_notification_action.dart';
 import 'package:mem/notifications/notification/pause_act_notification_action.dart';
 import 'package:mem/notifications/notification/start_act_notification_action.dart';
+import 'package:mem/notifications/notification/type.dart';
 
 import 'notification/channel.dart';
 
 class NotificationChannels {
-  late final NotificationChannel reminderChannel;
-  late final NotificationChannel repeatedReminderChannel;
   late final NotificationChannel activeActNotificationChannel;
   late final NotificationChannel pausedAct;
-  late final NotificationChannel afterActStartedNotificationChannel;
 
+  late final Map<NotificationType, NotificationChannel> notificationChannels;
   late final Map<String, NotificationAction> actionMap;
 
   NotificationChannels(AppLocalizations l10n) {
@@ -33,8 +32,8 @@ class NotificationChannels {
       key: (element) => element.id,
     );
 
-    reminderChannel = NotificationChannel(
-      'reminder',
+    final reminderChannel = NotificationChannel(
+      "reminder",
       l10n.reminderName,
       l10n.reminderDescription,
       [
@@ -43,15 +42,7 @@ class NotificationChannels {
         finishActiveActAction,
       ],
     );
-    repeatedReminderChannel = NotificationChannel(
-      'repeated-reminder',
-      l10n.repeatedReminderName,
-      l10n.repeatedReminderDescription,
-      [
-        startActAction,
-        finishActiveActAction,
-      ],
-    );
+
     activeActNotificationChannel = NotificationChannel(
       'active_act-notification',
       l10n.activeActNotification,
@@ -74,16 +65,30 @@ class NotificationChannels {
       usesChronometer: true,
       autoCancel: false,
     );
-    afterActStartedNotificationChannel = NotificationChannel(
-      'after_act_started-notification',
-      l10n.afterActStartedNotification,
-      l10n.afterActStartedNotificationDescription,
-      [
-        finishActiveActAction,
-        pauseAct,
-      ],
-      usesChronometer: true,
-      autoCancel: false,
-    );
+
+    notificationChannels = {
+      NotificationType.startMem: reminderChannel,
+      NotificationType.endMem: reminderChannel,
+      NotificationType.repeat: NotificationChannel(
+        "repeated-reminder",
+        l10n.repeatedReminderName,
+        l10n.repeatedReminderDescription,
+        [
+          startActAction,
+          finishActiveActAction,
+        ],
+      ),
+      NotificationType.afterActStarted: NotificationChannel(
+        'after_act_started-notification',
+        l10n.afterActStartedNotification,
+        l10n.afterActStartedNotificationDescription,
+        [
+          finishActiveActAction,
+          pauseAct,
+        ],
+        usesChronometer: true,
+        autoCancel: false,
+      ),
+    };
   }
 }

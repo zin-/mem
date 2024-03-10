@@ -14,7 +14,6 @@ import 'package:mem/settings/client.dart';
 import 'package:mem/settings/keys.dart';
 
 import 'mem_notifications.dart';
-import 'notification/channel.dart';
 import 'notification/show_notification.dart';
 import 'notification/type.dart';
 import 'notification_channels.dart';
@@ -66,19 +65,8 @@ class NotificationClient {
   ) =>
       v(
         () async {
-          late final NotificationChannel channel;
-          switch (notificationType) {
-            case NotificationType.startMem:
-            case NotificationType.endMem:
-              channel = notificationChannels.reminderChannel;
-              break;
-            case NotificationType.repeat:
-              channel = notificationChannels.repeatedReminderChannel;
-              break;
-            case NotificationType.afterActStarted:
-              channel = notificationChannels.afterActStartedNotificationChannel;
-              break;
-          }
+          final channel =
+              notificationChannels.notificationChannels[notificationType]!;
 
           await _notificationRepository.receive(
             ShowNotification(
@@ -220,11 +208,7 @@ const notificationTypeKey = "notificationType";
 const _startMemNotificationBody = "start";
 const _endMemNotificationBody = "end";
 
-Future<void> scheduleCallback(
-  int id,
-  Map<String, dynamic> params,
-) =>
-    i(
+Future<void> scheduleCallback(int id, Map<String, dynamic> params) => i(
       () async {
         await openDatabase();
 
@@ -263,8 +247,5 @@ Future<void> scheduleCallback(
           params,
         );
       },
-      {
-        "id": id,
-        "params": params,
-      },
+      {"id": id, "params": params},
     );
