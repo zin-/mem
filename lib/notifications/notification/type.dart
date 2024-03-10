@@ -3,5 +3,7 @@ enum NotificationType {
   startMem,
   endMem,
   repeat,
+  activeAct,
+  pausedAct,
   afterActStarted,
 }

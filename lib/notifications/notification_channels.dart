@@ -9,9 +9,6 @@ import 'package:mem/notifications/notification/type.dart';
 import 'notification/channel.dart';
 
 class NotificationChannels {
-  late final NotificationChannel activeActNotificationChannel;
-  late final NotificationChannel pausedAct;
-
   late final Map<NotificationType, NotificationChannel> notificationChannels;
   late final Map<String, NotificationAction> actionMap;
 
@@ -43,29 +40,6 @@ class NotificationChannels {
       ],
     );
 
-    activeActNotificationChannel = NotificationChannel(
-      'active_act-notification',
-      l10n.activeActNotification,
-      l10n.activeActNotificationDescription,
-      [
-        finishActiveActAction,
-        pauseAct,
-      ],
-      usesChronometer: true,
-      ongoing: true,
-      autoCancel: false,
-    );
-    pausedAct = NotificationChannel(
-      "paused_act",
-      l10n.pausedActNotification,
-      l10n.pausedActNotificationDescription,
-      [
-        startActAction,
-      ],
-      usesChronometer: true,
-      autoCancel: false,
-    );
-
     notificationChannels = {
       NotificationType.startMem: reminderChannel,
       NotificationType.endMem: reminderChannel,
@@ -77,6 +51,28 @@ class NotificationChannels {
           startActAction,
           finishActiveActAction,
         ],
+      ),
+      NotificationType.activeAct: NotificationChannel(
+        'active_act-notification',
+        l10n.activeActNotification,
+        l10n.activeActNotificationDescription,
+        [
+          finishActiveActAction,
+          pauseAct,
+        ],
+        usesChronometer: true,
+        ongoing: true,
+        autoCancel: false,
+      ),
+      NotificationType.pausedAct: NotificationChannel(
+        "paused_act",
+        l10n.pausedActNotification,
+        l10n.pausedActNotificationDescription,
+        [
+          startActAction,
+        ],
+        usesChronometer: true,
+        autoCancel: false,
       ),
       NotificationType.afterActStarted: NotificationChannel(
         'after_act_started-notification',

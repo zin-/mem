@@ -136,14 +136,15 @@ class NotificationClient {
       v(
         () async {
           await cancelActNotification(memId);
-          _notificationRepository.receive(
-            ShowNotification(
-              activeActNotificationId(memId),
-              memName,
-              'Running',
-              json.encode({memIdKey: memId}),
-              notificationChannels.activeActNotificationChannel,
-            ),
+
+          await show(
+            activeActNotificationId(memId),
+            memName,
+            "Running",
+            NotificationType.activeAct,
+            {
+              memIdKey: memId,
+            },
           );
 
           final now = DateTime.now();
@@ -175,14 +176,15 @@ class NotificationClient {
       v(
         () async {
           await cancelActNotification(memId);
-          await _notificationRepository.receive(
-            ShowNotification(
-              pausedActNotificationId(memId),
-              memName,
-              "Paused",
-              json.encode({memIdKey: memId}),
-              notificationChannels.pausedAct,
-            ),
+
+          await show(
+            pausedActNotificationId(memId),
+            memName,
+            "Paused",
+            NotificationType.pausedAct,
+            {
+              memIdKey: memId,
+            },
           );
         },
         {
@@ -237,6 +239,11 @@ Future<void> scheduleCallback(int id, Map<String, dynamic> params) => i(
                 .singleWhere((element) => element.isAfterActStarted())
                 .message;
             break;
+
+          case NotificationType.activeAct:
+          case NotificationType.pausedAct:
+            body = "Error";
+          // throw Error();
         }
 
         await NotificationClient().show(
