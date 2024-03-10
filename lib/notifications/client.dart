@@ -67,7 +67,13 @@ class NotificationClient {
         () async {
           final channel =
               notificationChannels.notificationChannels[notificationType]!;
-          // FIXME notificationType => bodyの変換をして、引数から消す
+          // FIXME 引数を減らせそう
+          //  memId => savedMem.name => title
+          //  notificationType => body
+          //    memId => savedMemNotification => body
+          //  notificationType & memId => notificationId
+          //  typeで持つよりはChannelで持つか？
+          //  ここまでやるならNotificationを作ってしまった方が良いか？
 
           await _notificationRepository.receive(
             ShowNotification(
