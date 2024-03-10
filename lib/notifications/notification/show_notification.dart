@@ -4,14 +4,14 @@ import 'notification.dart';
 class ShowNotification extends Notification {
   final String title;
   final String body;
-  final String? payloadJson;
+  final Map<String, dynamic> payload;
   final NotificationChannel channel;
 
   ShowNotification(
     super.id,
     this.title,
     this.body,
-    this.payloadJson,
+    this.payload,
     this.channel,
   );
 
@@ -21,7 +21,7 @@ class ShowNotification extends Notification {
       {
         "title": title,
         "body": body,
-        "payloadJson": payloadJson,
+        "payload": payload,
         "channel": channel,
       }.toString();
 }

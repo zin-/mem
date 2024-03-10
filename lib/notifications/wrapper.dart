@@ -22,7 +22,7 @@ class NotificationsWrapper {
     String title,
     String? body,
     NotificationChannel channel,
-    String? payload,
+    Map<String, dynamic> payload,
   ) =>
       v(
         () => _flutterLocalNotificationsPlugin.show(
@@ -32,7 +32,7 @@ class NotificationsWrapper {
           _buildNotificationDetails(
             channel,
           ),
-          payload: payload,
+          payload: jsonEncode(payload),
         ),
         {
           "id": id,
