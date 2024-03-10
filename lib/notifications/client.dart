@@ -59,7 +59,6 @@ class NotificationClient {
   Future<void> show(
     int id,
     String title,
-    String body,
     NotificationType notificationType,
     int memId,
   ) =>
@@ -69,11 +68,35 @@ class NotificationClient {
               notificationChannels.notificationChannels[notificationType]!;
           // FIXME 引数を減らせそう
           //  memId => savedMem.name => title
-          //  notificationType => body
-          //    memId => savedMemNotification => body
           //  notificationType & memId => notificationId
           //  typeで持つよりはChannelで持つか？
           //  ここまでやるならNotificationを作ってしまった方が良いか？
+
+          String body;
+          switch (notificationType) {
+            case NotificationType.startMem:
+              body = _startMemNotificationBody;
+              break;
+            case NotificationType.endMem:
+              body = _endMemNotificationBody;
+              break;
+            case NotificationType.repeat:
+              body = ((await MemNotificationRepository().shipByMemId(memId)))
+                  .singleWhere((element) => element.isRepeated())
+                  .message;
+              break;
+            case NotificationType.afterActStarted:
+              body = ((await MemNotificationRepository().shipByMemId(memId)))
+                  .singleWhere((element) => element.isAfterActStarted())
+                  .message;
+              break;
+            case NotificationType.activeAct:
+              body = "Running";
+              break;
+            case NotificationType.pausedAct:
+              body = "Paused";
+              break;
+          }
 
           await _notificationRepository.receive(
             ShowNotification(
@@ -88,7 +111,6 @@ class NotificationClient {
         {
           "id": id,
           "title": title,
-          "body": body,
           "notificationType": notificationType,
           "memId": memId,
         },
@@ -147,7 +169,6 @@ class NotificationClient {
           await show(
             activeActNotificationId(memId),
             memName,
-            "Running",
             NotificationType.activeAct,
             memId,
           );
@@ -185,7 +206,6 @@ class NotificationClient {
           await show(
             pausedActNotificationId(memId),
             memName,
-            "Paused",
             NotificationType.pausedAct,
             memId,
           );
@@ -224,35 +244,9 @@ Future<void> scheduleCallback(int id, Map<String, dynamic> params) => i(
           (element) => element.name == params[notificationTypeKey],
         );
 
-        String body;
-        switch (notificationType) {
-          case NotificationType.startMem:
-            body = _startMemNotificationBody;
-            break;
-          case NotificationType.endMem:
-            body = _endMemNotificationBody;
-            break;
-          case NotificationType.repeat:
-            body = ((await MemNotificationRepository().shipByMemId(memId)))
-                .singleWhere((element) => element.isRepeated())
-                .message;
-            break;
-          case NotificationType.afterActStarted:
-            body = ((await MemNotificationRepository().shipByMemId(memId)))
-                .singleWhere((element) => element.isAfterActStarted())
-                .message;
-            break;
-
-          case NotificationType.activeAct:
-          case NotificationType.pausedAct:
-            body = "Error";
-          // throw Error();
-        }
-
         await NotificationClient().show(
           id,
           mem.name,
-          body,
           notificationType,
           memId,
         );
