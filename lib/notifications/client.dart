@@ -26,8 +26,10 @@ import 'schedule_client.dart';
 class NotificationClient {
   // TODO NotificationTypeとも統一できるはず
   //  startとendが同じChannelか
+  //    NotificationType => NotificationChannelの変換ができる
   // TODO idの生成も最後のタイミングでやるならChannelに持たせることができるようになるかも？
   final NotificationChannels notificationChannels;
+
   final ScheduleClient _scheduleClient;
   final NotificationRepository _notificationRepository;
   final PreferenceClient _preferenceClient;
@@ -61,19 +63,20 @@ class NotificationClient {
     String title,
     String body,
     NotificationType notificationType,
-    Map<String, dynamic> params,
+    int memId,
   ) =>
       v(
         () async {
           final channel =
               notificationChannels.notificationChannels[notificationType]!;
+          // FIXME notificationType => bodyの変換をして、引数から消す
 
           await _notificationRepository.receive(
             ShowNotification(
               id,
               title,
               body,
-              jsonEncode(params),
+              jsonEncode({memIdKey: memId}),
               channel,
             ),
           );
@@ -83,7 +86,7 @@ class NotificationClient {
           "title": title,
           "body": body,
           "notificationType": notificationType,
-          "params": params,
+          "memId": memId,
         },
       );
 
@@ -142,9 +145,7 @@ class NotificationClient {
             memName,
             "Running",
             NotificationType.activeAct,
-            {
-              memIdKey: memId,
-            },
+            memId,
           );
 
           final now = DateTime.now();
@@ -182,9 +183,7 @@ class NotificationClient {
             memName,
             "Paused",
             NotificationType.pausedAct,
-            {
-              memIdKey: memId,
-            },
+            memId,
           );
         },
         {
@@ -251,7 +250,7 @@ Future<void> scheduleCallback(int id, Map<String, dynamic> params) => i(
           mem.name,
           body,
           notificationType,
-          params,
+          memId,
         );
       },
       {"id": id, "params": params},
