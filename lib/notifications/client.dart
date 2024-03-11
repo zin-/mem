@@ -12,7 +12,7 @@ import 'package:mem/settings/client.dart';
 import 'package:mem/settings/keys.dart';
 
 import 'mem_notifications.dart';
-import 'notification/show_notification.dart';
+import 'notification/notification.dart' as entity;
 import 'notification/type.dart';
 import 'notification_channels.dart';
 import 'notification_ids.dart';
@@ -99,12 +99,12 @@ class NotificationClient {
           }
 
           await _notificationRepository.receive(
-            ShowNotification(
+            entity.Notification(
               id,
               title,
               body,
-              {memIdKey: memId},
               channel,
+              {memIdKey: memId},
             ),
           );
         },
