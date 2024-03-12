@@ -118,6 +118,7 @@ class NotificationsWrapper {
   factory NotificationsWrapper(String androidDefaultIconPath) => v(
         () => _instance ??= NotificationsWrapper._(androidDefaultIconPath),
         {
+          "_instance": _instance,
           "androidDefaultIconPath": androidDefaultIconPath,
         },
       );

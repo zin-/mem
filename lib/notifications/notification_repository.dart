@@ -7,19 +7,21 @@ import 'notification/notification.dart';
 import 'wrapper.dart';
 
 class NotificationRepository extends KeyWithValueRepository<Notification, int> {
-  NotificationRepository._(this._flutterLocalNotificationsWrapper);
+  late final NotificationsWrapper? _flutterLocalNotificationsWrapper =
+      defaultTargetPlatform == TargetPlatform.android
+          ? NotificationsWrapper(androidDefaultIconPath)
+          : null;
+
+  NotificationRepository._();
 
   static NotificationRepository? _instance;
 
   factory NotificationRepository() => v(
-        () => _instance ??= NotificationRepository._(
-          defaultTargetPlatform == TargetPlatform.android
-              ? NotificationsWrapper(androidDefaultIconPath)
-              : null,
-        ),
+        () => _instance ??= NotificationRepository._(),
+        {
+          "_instance": _instance,
+        },
       );
-
-  final NotificationsWrapper? _flutterLocalNotificationsWrapper;
 
   Future<bool?> checkNotification() => v(
         () async => _flutterLocalNotificationsWrapper?.handleAppLaunchDetails(),
