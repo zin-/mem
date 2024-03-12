@@ -220,8 +220,10 @@ class NotificationClient {
   Future<void> cancelActNotification(int memId) => v(
         () async {
           await _notificationRepository.discard(activeActNotificationId(memId));
+
           await _notificationRepository
               .discard(afterActStartedNotificationId(memId));
+          await _scheduleClient.discard(afterActStartedNotificationId(memId));
         },
         {
           "memId": memId,
