@@ -55,28 +55,17 @@ class NotificationClient {
       );
 
   Future<void> show(
-    int id,
     NotificationType notificationType,
     int memId,
   ) =>
       v(
-        () async {
-          // FIXME 引数を減らせそう
-          //  memId => savedMem.name => title
-          //  notificationType & memId => notificationId
-          //  typeで持つよりはChannelで持つか？
-          //  ここまでやるならNotificationを作ってしまった方が良いか？
-
-          await _notificationRepository.receive(
-            await notificationChannels.buildNotification(
-              id,
-              notificationType,
-              memId,
-            ),
-          );
-        },
+        () async => await _notificationRepository.receive(
+          await notificationChannels.buildNotification(
+            notificationType,
+            memId,
+          ),
+        ),
         {
-          "id": id,
           "notificationType": notificationType,
           "memId": memId,
         },
@@ -131,7 +120,6 @@ class NotificationClient {
           await cancelActNotification(memId);
 
           await show(
-            activeActNotificationId(memId),
             NotificationType.activeAct,
             memId,
           );
@@ -165,7 +153,6 @@ class NotificationClient {
           await cancelActNotification(memId);
 
           await show(
-            pausedActNotificationId(memId),
             NotificationType.pausedAct,
             memId,
           );
@@ -203,7 +190,6 @@ Future<void> scheduleCallback(int id, Map<String, dynamic> params) => i(
         );
 
         await NotificationClient().show(
-          id,
           notificationType,
           memId,
         );
