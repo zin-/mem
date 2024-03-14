@@ -18,12 +18,7 @@ import 'notification_repository.dart';
 import 'schedule.dart';
 import 'schedule_client.dart';
 
-// TODO refactor
 class NotificationClient {
-  // TODO NotificationTypeとも統一できるはず
-  //  startとendが同じChannelか
-  //    NotificationType => NotificationChannelの変換ができる
-  // TODO idの生成も最後のタイミングでやるならChannelに持たせることができるようになるかも？
   final NotificationChannels notificationChannels;
 
   final ScheduleClient _scheduleClient;
