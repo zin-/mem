@@ -114,10 +114,14 @@ class _AndroidAlarmManagerWrapper {
 
   Future<bool> _initialize() => v(
         () async {
-          if (_initialized && defaultTargetPlatform == TargetPlatform.android) {
-            return _initialized = await AndroidAlarmManager.initialize();
+          if (_initialized) {
+            return true;
           } else {
-            return false;
+            if (defaultTargetPlatform == TargetPlatform.android) {
+              return _initialized = await AndroidAlarmManager.initialize();
+            } else {
+              return false;
+            }
           }
         },
         {
