@@ -1,28 +1,41 @@
 import 'package:mem/framework/repository/entity.dart';
 
-class Schedule extends Entity {
+abstract class Schedule extends Entity {
   final int id;
+
+  Schedule(this.id);
+
+  @override
+  String toString() => "${super.toString()}: ${{
+        "id": id,
+      }}";
+}
+
+class CancelSchedule extends Schedule {
+  CancelSchedule(super.id);
+}
+
+class TimedSchedule extends Schedule {
   final DateTime startAt;
   final Function callback;
   final Map<String, dynamic> params;
 
-  Schedule(
-    this.id,
+  TimedSchedule(
+    super.id,
     this.startAt,
     this.callback,
     this.params,
   );
 
   @override
-  String toString() => "${super.toString()}: ${{
-        "id": id,
+  String toString() => "${super.toString()}${{
         "startAt": startAt,
         "callback": callback,
         "params": params,
       }}";
 }
 
-class PeriodicSchedule extends Schedule {
+class PeriodicSchedule extends TimedSchedule {
   final Duration duration;
 
   PeriodicSchedule(

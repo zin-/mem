@@ -38,9 +38,9 @@ jobs:
           --file-reporter json:reports/test_report.log
           --coverage
           --device-id windows
-        continue-on-error: true
 
-      - name: "Report"
+      - if: always()
+        name: "Report"
         uses: dorny/test-reporter@v1
         with:
           name: "Report (Medium test (Windows))"
@@ -48,8 +48,8 @@ jobs:
           reporter: "flutter-json"
           fail-on-error: true
           fail-on-empty: true
-        continue-on-error: true
-      - name: "Upload coverage"
+      - if: always()
+        name: "Upload coverage"
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

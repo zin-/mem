@@ -51,6 +51,7 @@ Future<void> _runApplication({Widget? home, String? languageCode}) => i(
       [home, languageCode],
     );
 
+// FIXME 先に初期化が必要なのではなく、Repositoryを利用する際に勝手に初期化されるようにする
 Future<void> openDatabase() async => DatabaseTupleRepository.databaseAccessor =
     await DatabaseRepository().receive(databaseDefinition);
 

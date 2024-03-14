@@ -7,9 +7,14 @@ import 'package:mem/repositories/mem_notification.dart';
 
 class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
     SavedMemNotification, int> {
-  Future<List<SavedMemNotification>> shipByMemId(int memId) => v(
+  Future<List<SavedMemNotification>> shipByMemId(
+    int memId,
+  ) =>
+      v(
         () => super.ship(Equals(defFkMemNotificationsMemId.name, memId)),
-        memId,
+        {
+          "memId": memId,
+        },
       );
 
   Future<Iterable<SavedMemNotification>> archiveByMemId(int memId) => v(
@@ -28,22 +33,26 @@ class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
         },
       );
 
-  Future<Iterable<SavedMemNotification>> shipByMemIdAndAfterActStarted(
-          int memId) =>
-      v(
-        () => super.ship(And([
-          Equals(defFkMemNotificationsMemId.name, memId),
-          Equals(
-            defColMemNotificationsType.name,
-            MemNotificationType.afterActStarted.name,
-          ),
-        ])),
-        memId,
-      );
-
   Future<Iterable<SavedMemNotification>> wasteByMemId(int memId) => v(
         () => super.waste(Equals(defFkMemNotificationsMemId.name, memId)),
         memId,
+      );
+
+  Future<Iterable<SavedMemNotification>> wasteByMemIdAndType(
+    int memId,
+    MemNotificationType type,
+  ) =>
+      v(
+        () => super.waste(
+          And([
+            Equals(defFkMemNotificationsMemId.name, memId),
+            Equals(defColMemNotificationsType.name, type.name),
+          ]),
+        ),
+        {
+          "memId": memId,
+          "type": type,
+        },
       );
 
   @override

@@ -7,9 +7,10 @@ import 'package:mem/main.dart';
 
 import 'client.dart';
 import 'mem_notifications.dart';
-import 'notification/action.dart';
 import 'notification/channel.dart';
 
+// TODO Windows, Web, Linuxでの通知を実装する
+//  https://github.com/zin-/mem/issues/303
 class NotificationsWrapper {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -20,9 +21,8 @@ class NotificationsWrapper {
     int id,
     String title,
     String? body,
-    List<NotificationAction> actions,
     NotificationChannel channel,
-    String? payload,
+    Map<String, dynamic> payload,
   ) =>
       v(
         () => _flutterLocalNotificationsPlugin.show(
@@ -31,17 +31,15 @@ class NotificationsWrapper {
           body,
           _buildNotificationDetails(
             channel,
-            actions,
           ),
-          payload: payload,
+          payload: jsonEncode(payload),
         ),
         {
-          id,
-          title,
-          body.toString(),
-          actions,
-          channel,
-          payload,
+          "id": id,
+          "title": title,
+          "body": body,
+          "channel": channel,
+          "payload": payload,
         },
       );
 
@@ -52,16 +50,15 @@ class NotificationsWrapper {
 
   NotificationDetails _buildNotificationDetails(
     NotificationChannel channel,
-    List<NotificationAction> actions,
   ) =>
       NotificationDetails(
         android: AndroidNotificationDetails(
           channel.id,
           channel.name,
           channelDescription: channel.description,
-          actions: actions
+          actions: channel.actionList
               .map((e) => AndroidNotificationAction(e.id, e.title))
-              .toList(),
+              .toList(growable: false),
           usesChronometer: channel.usesChronometer,
           ongoing: channel.ongoing,
           autoCancel: channel.autoCancel,
@@ -121,6 +118,7 @@ class NotificationsWrapper {
   factory NotificationsWrapper(String androidDefaultIconPath) => v(
         () => _instance ??= NotificationsWrapper._(androidDefaultIconPath),
         {
+          "_instance": _instance,
           "androidDefaultIconPath": androidDefaultIconPath,
         },
       );
@@ -165,10 +163,9 @@ Future<void> onDidReceiveNotificationResponse(NotificationResponse details) =>
             if (payload.containsKey(memIdKey)) {
               final memId = payload[memIdKey];
               await NotificationClient()
-                  .notificationActions
-                  .list
-                  .singleWhere((element) => element.id == actionId)
-                  .onTapped(memId as int);
+                  .notificationChannels
+                  .actionMap[actionId]
+                  ?.onTapped(memId as int);
             }
             break;
         }

@@ -4,14 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:mem/core/mem_notification.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/base.dart';
+import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/notifications/client.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/type.dart';
+import 'package:mem/notifications/notification_channels.dart';
 import 'package:mem/notifications/notification_ids.dart';
 import 'package:mem/notifications/wrapper.dart';
 import 'package:mem/values/durations.dart';
@@ -43,6 +46,23 @@ void testNotificationScenario() => group(
           insertedMemId = await dbA.insert(defTableMems, {
             defColMemsName.name: insertedMemName,
             defColMemsDoneAt.name: null,
+            defColCreatedAt.name: zeroDate,
+          });
+          await dbA.insert(defTableMemNotifications, {
+            defFkMemNotificationsMemId.name: insertedMemId,
+            defColMemNotificationsTime.name: 0,
+            defColMemNotificationsType.name: MemNotificationType.repeat.name,
+            defColMemNotificationsMessage.name:
+                "$_scenarioName - inserted - mem notification message - repeat",
+            defColCreatedAt.name: zeroDate,
+          });
+          await dbA.insert(defTableMemNotifications, {
+            defFkMemNotificationsMemId.name: insertedMemId,
+            defColMemNotificationsTime.name: 1,
+            defColMemNotificationsType.name:
+                MemNotificationType.afterActStarted.name,
+            defColMemNotificationsMessage.name:
+                "$_scenarioName - inserted - mem notification message - after act started",
             defColCreatedAt.name: zeroDate,
           });
         });
@@ -106,8 +126,10 @@ void testNotificationScenario() => group(
                     NotificationResponseType.selectedNotificationAction,
                 id: memStartNotificationId(insertedMemId!),
                 payload: json.encode({memIdKey: insertedMemId}),
-                actionId:
-                    NotificationClient().notificationActions.doneMemAction.id,
+                actionId: NotificationClient()
+                    .notificationChannels
+                    .actionMap[doneMemNotificationActionId]
+                    ?.id,
               );
 
               await onDidReceiveNotificationResponse(details);
@@ -158,8 +180,10 @@ void testNotificationScenario() => group(
                     NotificationResponseType.selectedNotificationAction,
                 id: memRepeatedNotificationId(insertedMemId!),
                 payload: json.encode({memIdKey: insertedMemId}),
-                actionId:
-                    NotificationClient().notificationActions.startActAction.id,
+                actionId: NotificationClient()
+                    .notificationChannels
+                    .actionMap[startActNotificationActionId]
+                    ?.id,
               );
 
               await onDidReceiveNotificationResponse(details);
@@ -209,9 +233,9 @@ void testNotificationScenario() => group(
                   id: memRepeatedNotificationId(insertedMemId!),
                   payload: json.encode({memIdKey: insertedMemId}),
                   actionId: NotificationClient()
-                      .notificationActions
-                      .finishActiveActAction
-                      .id,
+                      .notificationChannels
+                      .actionMap[finishActiveActNotificationActionId]
+                      ?.id,
                 );
 
                 await onDidReceiveNotificationResponse(details);
@@ -281,9 +305,9 @@ void testNotificationScenario() => group(
                     id: memRepeatedNotificationId(insertedMemId!),
                     payload: json.encode({memIdKey: insertedMemId}),
                     actionId: NotificationClient()
-                        .notificationActions
-                        .finishActiveActAction
-                        .id,
+                        .notificationChannels
+                        .actionMap[finishActiveActNotificationActionId]
+                        ?.id,
                   );
 
                   await onDidReceiveNotificationResponse(details);
@@ -356,7 +380,10 @@ void testNotificationScenario() => group(
                     NotificationResponseType.selectedNotificationAction,
                 id: memRepeatedNotificationId(insertedMemId!),
                 payload: json.encode({memIdKey: insertedMemId}),
-                actionId: NotificationClient().notificationActions.pauseAct.id,
+                actionId: NotificationClient()
+                    .notificationChannels
+                    .actionMap[pauseActNotificationActionId]
+                    ?.id,
               );
 
               await onDidReceiveNotificationResponse(details);
@@ -384,8 +411,10 @@ void testNotificationScenario() => group(
                       NotificationResponseType.selectedNotificationAction,
                   id: memRepeatedNotificationId(insertedMemId!),
                   payload: json.encode({memIdKey: insertedMemId}),
-                  actionId:
-                      NotificationClient().notificationActions.pauseAct.id,
+                  actionId: NotificationClient()
+                      .notificationChannels
+                      .actionMap[pauseActNotificationActionId]
+                      ?.id,
                 );
 
                 await onDidReceiveNotificationResponse(details);
