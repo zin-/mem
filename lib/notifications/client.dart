@@ -10,6 +10,7 @@ import 'package:mem/repositories/mem_notification_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/settings/client.dart';
 import 'package:mem/settings/keys.dart';
+import 'package:mem/values/constants.dart';
 
 import 'mem_notifications.dart';
 import 'notification/notification.dart' as entity;
@@ -130,8 +131,7 @@ class NotificationClient {
             for (var schedule in MemNotifications.scheduleOf(
               savedMem,
               (await _preferenceClient.shipByKey(startOfDayKey)).value ??
-                  // FIXME どっかで持っておくべきか？
-                  const TimeOfDay(hour: 0, minute: 0),
+                  defaultStartOfDay,
               memNotifications,
               scheduleCallback,
             )) {
