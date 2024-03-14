@@ -6,14 +6,12 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
-import 'package:mem/repositories/mem_notification_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/settings/client.dart';
 import 'package:mem/settings/keys.dart';
 import 'package:mem/values/constants.dart';
 
 import 'mem_notifications.dart';
-import 'notification/notification.dart' as entity;
 import 'notification/type.dart';
 import 'notification_channels.dart';
 import 'notification_ids.dart';
@@ -65,47 +63,17 @@ class NotificationClient {
   ) =>
       v(
         () async {
-          final channel =
-              notificationChannels.notificationChannels[notificationType]!;
           // FIXME 引数を減らせそう
           //  memId => savedMem.name => title
           //  notificationType & memId => notificationId
           //  typeで持つよりはChannelで持つか？
           //  ここまでやるならNotificationを作ってしまった方が良いか？
 
-          String body;
-          switch (notificationType) {
-            case NotificationType.startMem:
-              body = _startMemNotificationBody;
-              break;
-            case NotificationType.endMem:
-              body = _endMemNotificationBody;
-              break;
-            case NotificationType.repeat:
-              body = ((await MemNotificationRepository().shipByMemId(memId)))
-                  .singleWhere((element) => element.isRepeated())
-                  .message;
-              break;
-            case NotificationType.afterActStarted:
-              body = ((await MemNotificationRepository().shipByMemId(memId)))
-                  .singleWhere((element) => element.isAfterActStarted())
-                  .message;
-              break;
-            case NotificationType.activeAct:
-              body = "Running";
-              break;
-            case NotificationType.pausedAct:
-              body = "Paused";
-              break;
-          }
-
           await _notificationRepository.receive(
-            entity.Notification(
+            await notificationChannels.buildNotification(
               id,
-              title,
-              body,
-              channel,
-              {memIdKey: memId},
+              notificationType,
+              memId,
             ),
           );
         },
@@ -232,8 +200,6 @@ class NotificationClient {
 }
 
 const notificationTypeKey = "notificationType";
-const _startMemNotificationBody = "start";
-const _endMemNotificationBody = "end";
 
 Future<void> scheduleCallback(int id, Map<String, dynamic> params) => i(
       () async {
