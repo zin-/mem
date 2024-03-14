@@ -30,7 +30,6 @@ class NotificationChannels {
   ) =>
       v(
         () async {
-          final channel = notificationChannels[notificationType]!;
           final title = (await MemRepository().shipById(memId)).name;
           String body;
           switch (notificationType) {
@@ -57,6 +56,7 @@ class NotificationChannels {
               body = "Paused";
               break;
           }
+          final channel = notificationChannels[notificationType]!;
 
           return Notification(
             id,

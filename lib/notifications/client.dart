@@ -6,7 +6,6 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
-import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/settings/client.dart';
 import 'package:mem/settings/keys.dart';
 import 'package:mem/values/constants.dart';
@@ -57,7 +56,6 @@ class NotificationClient {
 
   Future<void> show(
     int id,
-    String title,
     NotificationType notificationType,
     int memId,
   ) =>
@@ -79,7 +77,6 @@ class NotificationClient {
         },
         {
           "id": id,
-          "title": title,
           "notificationType": notificationType,
           "memId": memId,
         },
@@ -127,7 +124,6 @@ class NotificationClient {
 
   Future<void> startActNotifications(
     int memId,
-    String memName,
     Iterable<SavedMemNotification> savedMemNotifications,
   ) =>
       v(
@@ -136,7 +132,6 @@ class NotificationClient {
 
           await show(
             activeActNotificationId(memId),
-            memName,
             NotificationType.activeAct,
             memId,
           );
@@ -157,14 +152,12 @@ class NotificationClient {
         },
         {
           "memId": memId,
-          "memName": memName,
           "savedMemNotifications": savedMemNotifications,
         },
       );
 
   Future<void> pauseActNotification(
     int memId,
-    String memName,
     DateAndTime when,
   ) =>
       v(
@@ -173,14 +166,12 @@ class NotificationClient {
 
           await show(
             pausedActNotificationId(memId),
-            memName,
             NotificationType.pausedAct,
             memId,
           );
         },
         {
           "memId": memId,
-          "memName": memName,
           "when": when,
         },
       );
@@ -206,7 +197,6 @@ Future<void> scheduleCallback(int id, Map<String, dynamic> params) => i(
         await openDatabase();
 
         final memId = params[memIdKey] as int;
-        final mem = await MemRepository().shipById(memId);
 
         final notificationType = NotificationType.values.singleWhere(
           (element) => element.name == params[notificationTypeKey],
@@ -214,7 +204,6 @@ Future<void> scheduleCallback(int id, Map<String, dynamic> params) => i(
 
         await NotificationClient().show(
           id,
-          mem.name,
           notificationType,
           memId,
         );
