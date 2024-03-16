@@ -33,8 +33,11 @@ void testMemoDetailScenario() => group(
           dbA = await openTestDatabase(databaseDefinition);
         });
 
-        const insertedMemName = "$_scenarioName - inserted - mem - name";
-        const insertedMemMemo = "$_scenarioName - inserted - mem - memo";
+        const baseMemName = "$_scenarioName - mem name";
+        const baseMemMemo = "$_scenarioName - mem memo";
+
+        const insertedMemName = "$baseMemName - inserted";
+        const insertedMemMemo = "$baseMemMemo - inserted";
         late int insertedMemId;
 
         setUp(() async {
@@ -58,9 +61,37 @@ void testMemoDetailScenario() => group(
           );
         });
 
+        testWidgets(
+          ": Show saved.",
+          (widgetTester) async {
+            await runApplication();
+            await widgetTester.pumpAndSettle();
+            await widgetTester.tap(find.text(insertedMemName));
+            await widgetTester.pumpAndSettle();
+
+            expect(
+              widgetTester
+                  .widget<TextFormField>(find.byKey(keyMemName))
+                  .initialValue,
+              insertedMemName,
+            );
+            expect(find.text(insertedMemName), findsOneWidget);
+            expect(
+              widgetTester
+                  .widget<TextFormField>(find.byKey(keyMemMemo))
+                  .initialValue,
+              insertedMemMemo,
+            );
+            expect(find.text(insertedMemMemo), findsOneWidget);
+          },
+        );
+
         group(
           ": Save",
           () {
+            const saveMemName = "$baseMemName: Save";
+            const saveMemMemo = "$baseMemMemo: Save";
+
             testWidgets(
               ": create.",
               (widgetTester) async {
@@ -69,10 +100,8 @@ void testMemoDetailScenario() => group(
                 await widgetTester.tap(newMemFabFinder);
                 await widgetTester.pumpAndSettle();
 
-                const enteringMemName =
-                    "$_scenarioName: Save: create - entering - mem - name";
-                const enteringMemMemo =
-                    "$_scenarioName: Save: create - entering - mem - memo";
+                const enteringMemName = "$saveMemName: create - entering";
+                const enteringMemMemo = "$saveMemMemo: create - entering";
                 await widgetTester.enterText(
                     find.byKey(keyMemName), enteringMemName);
                 await widgetTester.enterText(
@@ -113,9 +142,9 @@ void testMemoDetailScenario() => group(
                 await widgetTester.tap(newMemFabFinder);
                 await widgetTester.pumpAndSettle();
                 const enteringMemName =
-                    "$_scenarioName: Save: twice on create - entering - mem - name";
+                    "$saveMemName: twice on create - entering";
                 const enteringMemMemo =
-                    "$_scenarioName: Save: twice on create - entering - mem - memo";
+                    "$saveMemMemo: twice on create - entering";
                 await widgetTester.enterText(
                   find.byKey(keyMemName),
                   enteringMemName,
@@ -158,8 +187,7 @@ void testMemoDetailScenario() => group(
             );
 
             group(': Archive', () {
-              const insertedMemName =
-                  "$_scenarioName: Save: Archive: inserted - mem name";
+              const insertedMemName = "$saveMemName: Archive: inserted";
               const unarchivedMemName = "$insertedMemName - unarchived";
               const archivedMemName = "$insertedMemName - archived";
 
@@ -348,7 +376,7 @@ void testMemoDetailScenario() => group(
                 await widgetTester.pumpAndSettle();
 
                 const enteringMemName =
-                    "$_scenarioName: Remove: exec on created - entering - mem - name";
+                    "$baseMemName: Remove: exec on created - entering";
                 await widgetTester.enterText(
                     find.byKey(keyMemName), enteringMemName);
                 await widgetTester.tap(find.byKey(keySaveMemFab));
