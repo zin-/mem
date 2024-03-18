@@ -26,7 +26,11 @@ class ActCounterClient {
         {'memId': memId},
       );
 
-  Future<void> increment(int memId, DateAndTime now) => i(
+  Future<void> increment(
+    int memId,
+    DateAndTime now,
+  ) =>
+      i(
         () async {
           await _actsClient.finish(
             (await _actsClient.start(memId, now)).id,
@@ -43,7 +47,10 @@ class ActCounterClient {
             ),
           );
         },
-        {'memId': memId},
+        {
+          "memId": memId,
+          "now": now,
+        },
       );
 
   ActCounterClient._(
