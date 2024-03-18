@@ -28,13 +28,13 @@ class ActCounterClient {
 
   Future<void> increment(
     int memId,
-    DateAndTime now,
+    DateAndTime when,
   ) =>
       i(
         () async {
           await _actsClient.finish(
-            (await _actsClient.start(memId, now)).id,
-            now,
+            (await _actsClient.start(memId, when)).id,
+            when,
           );
 
           await _actCounterRepository.replace(
@@ -42,14 +42,14 @@ class ActCounterClient {
               await _memRepository.shipById(memId),
               await _actRepository.shipByMemId(
                 memId,
-                period: ActCounter.period(now),
+                period: ActCounter.period(when),
               ),
             ),
           );
         },
         {
           "memId": memId,
-          "now": now,
+          "when": when,
         },
       );
 
