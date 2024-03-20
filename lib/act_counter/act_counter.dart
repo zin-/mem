@@ -10,41 +10,30 @@ class ActCounter extends EntityV1 {
   final SavedMem _mem;
   final Iterable<SavedAct> _acts;
   final int memId;
-  final int? actCount;
-  final DateTime? lastUpdatedAt;
   final String? name;
+  final int? actCount;
+  final SavedAct? lastAct;
 
   ActCounter(this._mem, this._acts)
       : memId = _mem.id,
         name = _mem.name,
         actCount = _acts.length,
-        lastUpdatedAt = (_acts
-                .sorted(
-                  (a, b) => (a.updatedAt ?? a.createdAt)
-                      .compareTo(b.updatedAt ?? b.createdAt),
-                )
-                .lastOrNull)
-            ?.period
-            .end;
+        lastAct = _acts
+            .sorted(
+              (a, b) => (a.updatedAt ?? a.createdAt)
+                  .compareTo(b.updatedAt ?? b.createdAt),
+            )
+            .lastOrNull;
 
-  Map<String, dynamic> widgetData() {
-    final lastAct = _acts
-        .sorted(
-          (a, b) => (a.updatedAt ?? a.createdAt)
-              .compareTo(b.updatedAt ?? b.createdAt),
-        )
-        .lastOrNull;
-
-    return {
-      'memName-${_mem.id}': _mem.name,
-      'actCount-${_mem.id}': _acts.length,
-      'lastUpdatedAtSeconds-${_mem.id}': lastAct == null
-          ? null
-          : (lastAct.period.end ?? lastAct.period.start!)
-              .millisecondsSinceEpoch
-              .toDouble(),
-    };
-  }
+  Map<String, dynamic> widgetData() => {
+        "memName-$memId": name,
+        "actCount-$memId": actCount,
+        "lastUpdatedAtSeconds-$memId": lastAct == null
+            ? null
+            : (lastAct?.period.end ?? lastAct?.period.start!)
+                ?.millisecondsSinceEpoch
+                .toDouble(),
+      };
 
   static DateAndTimePeriod period(DateAndTime startDate) {
     int startHour = 5;
@@ -80,7 +69,7 @@ class InitializedActCounter extends ActCounter {
   @override
   Map<String, dynamic> widgetData() => super.widgetData()
     ..putIfAbsent(
-      'memId-$homeWidgetId',
-      () => _mem.id,
+      "memId-$homeWidgetId",
+      () => memId,
     );
 }
