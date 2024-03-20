@@ -150,6 +150,37 @@ void testActScenario() => group(': $_scenarioName', () {
                   );
                 });
               });
+
+              testWidgets(
+                ': month view.',
+                (widgetTester) async {
+                  await runApplication();
+                  await widgetTester.pumpAndSettle();
+                  await widgetTester.tap(find.byIcon(Icons.playlist_play));
+                  await widgetTester.pumpAndSettle();
+
+                  await widgetTester
+                      .tap(find.byIcon(Icons.calendar_view_month));
+                  await widgetTester.pumpAndSettle();
+
+                  [
+                    equals("All"),
+                    equals("January 0"),
+                    equals("1"),
+                    equals(oneMin.format()),
+                    equals(oneMin.format()),
+                    equals("1"),
+                    insertedMemName,
+                  ].forEachIndexed((index, t) {
+                    expect(
+                      (widgetTester.widget(find.byType(Text).at(index)) as Text)
+                          .data,
+                      t,
+                      reason: "Index is \"$index\".",
+                    );
+                  });
+                },
+              );
             },
           );
         });
