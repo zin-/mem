@@ -1,6 +1,4 @@
-import 'package:collection/collection.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:mem/acts/act_repository.dart';
 import 'package:mem/acts/client.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/logger/log_service.dart';
@@ -100,23 +98,10 @@ class NotificationChannels {
           finishActiveActNotificationActionId,
           l10n.finishLabel,
           (memId) => v(
-            () async {
-              final activeActs = (await ActRepository().shipActive())
-                  .where((element) => element.memId == memId);
-
-              final now = DateAndTime.now();
-              final actsClient = ActsClient();
-
-              await actsClient.finish(
-                (activeActs.isEmpty
-                        ? await actsClient.start(memId, now)
-                        : activeActs
-                            .sorted((a, b) => a.period.compareTo(b.period))
-                            .first)
-                    .id,
-                now,
-              );
-            },
+            () async => await ActsClient().finish(
+              memId,
+              DateAndTime.now(),
+            ),
             {"memId": memId},
           ),
         ),
@@ -124,23 +109,10 @@ class NotificationChannels {
           pauseActNotificationActionId,
           l10n.pauseActLabel,
           (memId) => v(
-            () async {
-              final activeActs = (await ActRepository().shipActive())
-                  .where((element) => element.memId == memId);
-
-              final now = DateAndTime.now();
-              final actsClient = ActsClient();
-
-              await actsClient.pause(
-                (activeActs.isEmpty
-                        ? await actsClient.start(memId, now)
-                        : activeActs
-                            .sorted((a, b) => a.period.compareTo(b.period))
-                            .first)
-                    .id,
-                now,
-              );
-            },
+            () async => await ActsClient().pause(
+              memId,
+              DateAndTime.now(),
+            ),
             {"memId": memId},
           ),
         );

@@ -51,28 +51,28 @@ class ActsClient {
       );
 
   Future pause(
-    int actId,
+    int memId,
     DateAndTime when,
   ) =>
       i(
         () async {
-          final finished = await _actService.finish(actId, when);
+          final finished = await _actService.finish(memId, when);
 
           await _notificationClient.pauseActNotification(finished.memId, when);
         },
         {
-          "actId": actId,
+          "memId": memId,
           "when": when,
         },
       );
 
   Future<SavedAct> finish(
-    int actId,
+    int memId,
     DateAndTime when,
   ) =>
       v(
         () async {
-          final finished = await _actService.finish(actId, when);
+          final finished = await _actService.finish(memId, when);
 
           _notificationClient.cancelActNotification(finished.memId);
 
@@ -81,7 +81,7 @@ class ActsClient {
           return finished;
         },
         {
-          "actId": actId,
+          "memId": memId,
           "when": when,
         },
       );

@@ -33,7 +33,7 @@ class ActCounterClient {
       i(
         () async {
           await _actsClient.finish(
-            (await _actsClient.start(memId, when)).id,
+            memId,
             when,
           );
 

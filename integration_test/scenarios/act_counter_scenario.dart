@@ -217,26 +217,26 @@ void testActCounterConfigure() => group(
 
             final saveWidgetDataArgs = {
               0: {
-                'id': "memName-$insertedMemId",
-                'data': insertedMemName,
+                "id": "memName-$insertedMemId",
+                "data": insertedMemName,
               },
               1: {
-                'id': "actCount-$insertedMemId",
+                "id": "actCount-$insertedMemId",
                 // length of inserted acts
-                'data': 2,
+                "data": 1,
               },
               2: {
-                'id': "lastUpdatedAtSeconds-$insertedMemId",
-                'data': isNotNull,
+                "id": "lastUpdatedAtSeconds-$insertedMemId",
+                "data": isNotNull,
               },
             };
             widgetTester.binding.defaultBinaryMessenger
                 .setMockMethodCallHandler(
-              const MethodChannel('home_widget'),
+              const MethodChannel("home_widget"),
               (message) {
-                if (message.method == 'registerBackgroundCallback') {
+                if (message.method == "registerBackgroundCallback") {
                   return Future.value(true);
-                } else if (message.method == 'saveWidgetData') {
+                } else if (message.method == "saveWidgetData") {
                   expect(
                     message.arguments,
                     saveWidgetDataArgs[saveWidgetDataCount],
@@ -248,10 +248,10 @@ void testActCounterConfigure() => group(
                   expect(
                     message.arguments,
                     {
-                      'name': "ActCounterProvider",
-                      'android': null,
-                      'ios': null,
-                      'qualifiedAndroidName': null,
+                      "name": "ActCounterProvider",
+                      "android": null,
+                      "ios": null,
+                      "qualifiedAndroidName": null,
                     },
                   );
 

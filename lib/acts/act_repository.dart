@@ -30,6 +30,21 @@ class ActRepository extends DatabaseTupleRepository<Act, SavedAct, int> {
         () async => await ship(IsNull(defColActsEnd.name)),
       );
 
+  Future<List<SavedAct>> shipActiveByMemId(
+    int memId,
+  ) =>
+      v(
+        () async => await ship(
+          And([
+            Equals(defFkActsMemId.name, memId),
+            IsNull(defColActsEnd.name),
+          ]),
+        ),
+        {
+          "memId": memId,
+        },
+      );
+
   @override
   SavedAct pack(Map<String, dynamic> tuple) => SavedAct(
         tuple[defFkActsMemId.name],
