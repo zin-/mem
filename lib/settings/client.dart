@@ -31,7 +31,7 @@ class PreferenceClient
               );
 
             default:
-              throw UnimplementedError();
+              throw UnimplementedError(); // coverage:ignore-line
           }
         },
         entity,

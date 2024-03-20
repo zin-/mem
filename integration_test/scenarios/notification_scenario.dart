@@ -225,7 +225,7 @@ void testNotificationScenario() => group(
 
           group(": finish active Act", () {
             testWidgets(
-              ': no active Act.',
+              ": no active Act.",
               (widgetTester) async {
                 final details = NotificationResponse(
                   notificationResponseType:
@@ -240,48 +240,42 @@ void testNotificationScenario() => group(
 
                 await onDidReceiveNotificationResponse(details);
 
-                await Future.delayed(
-                  waitSideEffectDuration,
-                  () async {
-                    final acts = await dbA.select(defTableActs);
-                    // final acts = await db.getTable(defTableActs.name).select();
+                final acts = await dbA.select(defTableActs);
 
-                    expect(acts.length, 1);
-                    expect(
-                      [
-                        acts[0][defColActsStart.name],
-                        acts[0][defColActsStartIsAllDay.name],
-                        acts[0][defColActsEnd.name],
-                        acts[0][defColActsEndIsAllDay.name],
-                        acts[0][defPkId.name],
-                        acts[0][defColCreatedAt.name],
-                        acts[0][defColUpdatedAt.name],
-                        acts[0][defColArchivedAt.name],
-                        acts[0][defFkActsMemId.name],
-                      ],
-                      [
-                        isNotNull,
-                        isFalse,
-                        isNotNull,
-                        isFalse,
-                        isNotNull,
-                        isNotNull,
-                        isNotNull,
-                        isNull,
-                        insertedMemId,
-                      ],
-                    );
-                  },
+                expect(acts, hasLength(1));
+                expect(
+                  [
+                    acts[0][defColActsStart.name],
+                    acts[0][defColActsStartIsAllDay.name],
+                    acts[0][defColActsEnd.name],
+                    acts[0][defColActsEndIsAllDay.name],
+                    acts[0][defPkId.name],
+                    acts[0][defColCreatedAt.name],
+                    acts[0][defColUpdatedAt.name],
+                    acts[0][defColArchivedAt.name],
+                    acts[0][defFkActsMemId.name],
+                  ],
+                  [
+                    isNotNull,
+                    isFalse,
+                    isNotNull,
+                    isFalse,
+                    isNotNull,
+                    isNotNull,
+                    isNull,
+                    isNull,
+                    insertedMemId,
+                  ],
                 );
               },
             );
 
             group("2 active Acts.", () {
-              late final int insertedActId;
+              late final int insertedActId1;
               late final int insertedActId2;
 
               setUp(() async {
-                insertedActId = await dbA.insert(defTableActs, {
+                insertedActId1 = await dbA.insert(defTableActs, {
                   defFkActsMemId.name: insertedMemId,
                   defColActsStart.name:
                       zeroDate.add(const Duration(minutes: 1)),
@@ -297,7 +291,7 @@ void testNotificationScenario() => group(
               });
 
               testWidgets(
-                ': 2 active Acts.',
+                ": test.",
                 (widgetTester) async {
                   final details = NotificationResponse(
                     notificationResponseType:
@@ -312,61 +306,56 @@ void testNotificationScenario() => group(
 
                   await onDidReceiveNotificationResponse(details);
 
-                  await Future.delayed(
-                    waitSideEffectDuration,
-                    () async {
-                      final acts = await dbA.select(defTableActs);
+                  final acts = await dbA.select(defTableActs);
 
-                      expect(acts.length, 2);
-                      expect(
-                        [
-                          acts[0][defColActsStart.name],
-                          acts[0][defColActsStartIsAllDay.name],
-                          acts[0][defColActsEnd.name],
-                          acts[0][defColActsEndIsAllDay.name],
-                          acts[0][defPkId.name],
-                          acts[0][defColCreatedAt.name],
-                          acts[0][defColUpdatedAt.name],
-                          acts[0][defColArchivedAt.name],
-                          acts[0][defFkActsMemId.name],
-                        ],
-                        [
-                          isNotNull,
-                          isFalse,
-                          isNull,
-                          isNull,
-                          insertedActId,
-                          isNotNull,
-                          isNull,
-                          isNull,
-                          insertedMemId,
-                        ],
-                      );
-                      expect(
-                        [
-                          acts[1][defColActsStart.name],
-                          acts[1][defColActsStartIsAllDay.name],
-                          acts[1][defColActsEnd.name],
-                          acts[1][defColActsEndIsAllDay.name],
-                          acts[1][defPkId.name],
-                          acts[1][defColCreatedAt.name],
-                          acts[1][defColUpdatedAt.name],
-                          acts[1][defColArchivedAt.name],
-                          acts[1][defFkActsMemId.name],
-                        ],
-                        [
-                          isNotNull,
-                          isFalse,
-                          isNotNull,
-                          isFalse,
-                          insertedActId2,
-                          isNotNull,
-                          isNotNull,
-                          isNull,
-                          insertedMemId,
-                        ],
-                      );
-                    },
+                  expect(acts, hasLength(2));
+                  expect(
+                    [
+                      acts[0][defColActsStart.name],
+                      acts[0][defColActsStartIsAllDay.name],
+                      acts[0][defColActsEnd.name],
+                      acts[0][defColActsEndIsAllDay.name],
+                      acts[0][defPkId.name],
+                      acts[0][defColCreatedAt.name],
+                      acts[0][defColUpdatedAt.name],
+                      acts[0][defColArchivedAt.name],
+                      acts[0][defFkActsMemId.name],
+                    ],
+                    [
+                      isNotNull,
+                      isFalse,
+                      isNotNull,
+                      isFalse,
+                      insertedActId1,
+                      isNotNull,
+                      isNotNull,
+                      isNull,
+                      insertedMemId,
+                    ],
+                  );
+                  expect(
+                    [
+                      acts[1][defColActsStart.name],
+                      acts[1][defColActsStartIsAllDay.name],
+                      acts[1][defColActsEnd.name],
+                      acts[1][defColActsEndIsAllDay.name],
+                      acts[1][defPkId.name],
+                      acts[1][defColCreatedAt.name],
+                      acts[1][defColUpdatedAt.name],
+                      acts[1][defColArchivedAt.name],
+                      acts[1][defFkActsMemId.name],
+                    ],
+                    [
+                      isNotNull,
+                      isFalse,
+                      isNull,
+                      isNull,
+                      insertedActId2,
+                      isNotNull,
+                      isNull,
+                      isNull,
+                      insertedMemId,
+                    ],
                   );
                 },
               );

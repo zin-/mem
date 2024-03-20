@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
@@ -22,18 +23,36 @@ class ActService {
         },
       );
 
-  Future<SavedAct> finish(int actId, DateAndTime when) => i(
+  Future<SavedAct> finish(
+    int memId,
+    DateAndTime when,
+  ) =>
+      i(
         () async {
-          final finishingAct = await _actRepository.shipById(actId);
+          final active = (await _actRepository.shipActiveByMemId(memId))
+              .sorted((a, b) => a.createdAt.compareTo(b.createdAt))
+              .firstOrNull;
 
-          return await _actRepository.replace(
-            finishingAct.copiedWith(
-              () => finishingAct.period.copiedWith(when),
-            ),
-          );
+          if (active == null) {
+            return await _actRepository.receive(
+              Act(
+                memId,
+                DateAndTimePeriod(
+                  start: when,
+                  end: when,
+                ),
+              ),
+            );
+          } else {
+            return await _actRepository.replace(
+              active.copiedWith(
+                () => active.period.copiedWith(when),
+              ),
+            );
+          }
         },
         {
-          "actId": actId,
+          "memId": memId,
           "when": when,
         },
       );
