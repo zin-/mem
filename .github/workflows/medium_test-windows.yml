@@ -33,7 +33,7 @@ jobs:
 
       - name: "Run Windows Medium Test"
         run: >
-          flutter test integration_test/app_test.dart
+          flutter test integration_test
           --dart-define=CICD=true
           --file-reporter json:reports/test_report.log
           --coverage
