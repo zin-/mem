@@ -22,7 +22,7 @@ jobs:
     needs: set_up-env
     uses: ./.github/workflows/analyze-code.yml
     with:
-      flutter-channel: ${{ needs.set_up-env.outputs.flutter-channel }}
+      flutter-channel: ${{ env.flutter-channel }}
 
   small_test:
     needs: set_up-env
