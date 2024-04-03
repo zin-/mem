@@ -14,8 +14,7 @@ class ShowNewMemFab extends StatefulWidget {
   State<ShowNewMemFab> createState() => _ShowNewMemFabState();
 }
 
-class _ShowNewMemFabState extends State<ShowNewMemFab>
-    with SingleTickerProviderStateMixin {
+class _ShowNewMemFabState extends State<ShowNewMemFab> {
   bool _isHidden = false;
 
   @override
