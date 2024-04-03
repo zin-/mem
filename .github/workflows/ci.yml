@@ -15,6 +15,7 @@ jobs:
     steps:
       - id: env-variables
         name: "Set up Environment variables"
+        # description: "reusing-workflowsの呼び出しではwithにenvを指定できないためoutputsに変換する"
         run: |
           echo "flutter-channel=${{ env.flutter-channel }}" >> $GITHUB_OUTPUT
 
@@ -22,7 +23,7 @@ jobs:
     needs: set_up-env
     uses: ./.github/workflows/analyze-code.yml
     with:
-      flutter-channel: ${{ env.flutter-channel }}
+      flutter-channel: ${{ needs.set_up-env.outputs.flutter-channel }}
 
   small_test:
     needs: set_up-env
