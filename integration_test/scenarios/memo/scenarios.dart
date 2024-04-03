@@ -5,12 +5,10 @@ import 'detail_scenarios.dart' as detail_scenarios;
 
 const _scenarioName = "Memo scenario";
 
-void main() {
-  group(
-    _scenarioName,
-    () {
-      list_scenarios.main();
-      detail_scenarios.main();
-    },
-  );
-}
+void main() => group(
+      _scenarioName,
+      () {
+        list_scenarios.main();
+        detail_scenarios.main();
+      },
+    );
