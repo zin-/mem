@@ -4,8 +4,7 @@ import 'package:integration_test/integration_test.dart';
 import 'package:mem/logger/log.dart';
 import 'package:mem/logger/log_service.dart';
 
-import 'framework/database_accessor.dart';
-import 'framework/database_factory.dart';
+import 'framework/framework_tests.dart' as framework_tests;
 import 'scenarios/act_counter_scenario.dart';
 import 'scenarios/act_scenario.dart';
 import 'scenarios/edge_scenario.dart';
@@ -28,10 +27,7 @@ void main() {
   info({'onCICD': onCICD});
 
   // app_testではないので、分けた方が良いかも？
-  group('Framework test', () {
-    testDatabaseFactory();
-    testDatabaseAccessor();
-  });
+  framework_tests.main();
 
   group('Scenario test', () {
     memo_scenarios.main();
