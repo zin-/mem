@@ -12,7 +12,7 @@ import 'scenarios/edge_scenario.dart';
 import 'scenarios/habit/after_act_started_habit_scenario.dart';
 import 'scenarios/habit/repeat_by_n_day_habit_scenario.dart';
 import 'scenarios/habit/repeated_habit_scenario.dart';
-import 'scenarios/memo/memo_detail_scenario.dart';
+import 'scenarios/memo/scenarios.dart' as memo_scenarios;
 import 'scenarios/memo_scenario.dart';
 import 'scenarios/notification_scenario.dart';
 import 'scenarios/notifications_scenario.dart';
@@ -34,7 +34,7 @@ void main() {
   });
 
   group('Scenario test', () {
-    testMemoDetailScenario();
+    memo_scenarios.main();
 
     testRepeatedHabitScenario();
     testRepeatByNDayHabitScenario();
