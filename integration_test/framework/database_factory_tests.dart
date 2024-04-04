@@ -5,35 +5,32 @@ import 'package:sqflite/sqflite.dart' as sqflite;
 
 import 'database_definitions.dart';
 
-void main() {
-  testDatabaseFactory();
-}
+const _name = "Database factory test";
 
-const _scenarioName = "Database factory test";
+void main() => group(
+      "$_name: open",
+      () {
+        setUpAll(() {
+          DatabaseFactory.onTest = true;
+        });
+        setUp(() async {
+          for (final testDefDatabase in [
+            sampleDefDb,
+            sampleDefDBAddedTable,
+            sampleDefDBAddedColumn,
+          ]) {
+            await DatabaseFactory
+                // ignore: deprecated_member_use_from_same_package
+                .nativeFactory
+                .deleteDatabase(
+              await DatabaseFactory.buildDatabasePath(testDefDatabase.name),
+            );
+          }
+        });
+        tearDownAll(() {
+          DatabaseFactory.onTest = false;
+        });
 
-void testDatabaseFactory() => group(": $_scenarioName", () {
-      setUpAll(() {
-        DatabaseFactory.onTest = true;
-      });
-      setUp(() async {
-        for (final testDefDatabase in [
-          sampleDefDb,
-          sampleDefDBAddedTable,
-          sampleDefDBAddedColumn,
-        ]) {
-          await DatabaseFactory
-              // ignore: deprecated_member_use_from_same_package
-              .nativeFactory
-              .deleteDatabase(
-            await DatabaseFactory.buildDatabasePath(testDefDatabase.name),
-          );
-        }
-      });
-      tearDownAll(() {
-        DatabaseFactory.onTest = false;
-      });
-
-      group(": open", () {
         test(
           ": once.",
           () async {
@@ -216,5 +213,5 @@ void testDatabaseFactory() => group(": $_scenarioName", () {
             },
           );
         });
-      });
-    });
+      },
+    );

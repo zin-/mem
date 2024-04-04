@@ -5,18 +5,15 @@ import 'package:mem/framework/database/factory.dart';
 
 import 'database_definitions.dart';
 
-void main() {
-  testDatabaseAccessor();
-}
+const _name = "Database accessor test";
 
-const _scenarioName = "Database accessor test";
-
-void testDatabaseAccessor() => group(": $_scenarioName", () {
-      group(": operations", () {
+void main() => group(
+      "$_name: operations",
+      () {
         final inserted = {
           sampleDefPk.name: 0,
           sampleDefColInteger.name: 0,
-          sampleDefColText.name: "$_scenarioName: operations: inserted",
+          sampleDefColText.name: "$_name: operations: inserted",
           sampleDefColTimeStamp.name: DateTime(0),
           sampleDefColBoolean.name: false,
         };
@@ -59,7 +56,7 @@ void testDatabaseAccessor() => group(": $_scenarioName", () {
         test(": insert.", () async {
           final insertedId = await databaseAccessor.insert(sampleDefTable, {
             sampleDefColInteger.name: 1,
-            sampleDefColText.name: "$_scenarioName: operations: insert",
+            sampleDefColText.name: "$_name: operations: insert",
             sampleDefColTimeStamp.name: DateTime.now(),
             sampleDefColBoolean.name: true,
           });
@@ -82,7 +79,7 @@ void testDatabaseAccessor() => group(": $_scenarioName", () {
             sampleDefTable,
             {
               sampleDefColInteger.name: 999,
-              sampleDefColText.name: "$_scenarioName: operations: update",
+              sampleDefColText.name: "$_name: operations: update",
               sampleDefColBoolean.name: false,
             },
             where: "${sampleDefPk.name} = ?",
@@ -101,5 +98,5 @@ void testDatabaseAccessor() => group(": $_scenarioName", () {
 
           expect(updatedCount, 1);
         });
-      });
-    });
+      },
+    );

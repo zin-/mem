@@ -10,7 +10,9 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
       (value) => v(
         () => mounted
             ? updatedBy(value)
+// coverage:ignore-start
             : warn("${super.toString()}. No update."),
+// coverage:ignore-end
         value,
       ),
     );

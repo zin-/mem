@@ -1,9 +1,20 @@
 name: "Flutter doctor"
-description: "Check flutter status."
+description: "Flutterを実行可能状態にし、doctorを使って状態を確認する"
+
+inputs:
+  flutter-channel:
+    description: "Flutter channel"
+    required: true
 
 runs:
   using: "composite"
 
   steps:
+    - name: "Install Flutter"
+      uses: subosito/flutter-action@main
+      with:
+        channel: ${{ inputs.flutter-channel }}
+        cache: true
+
     - run: flutter doctor -v
       shell: bash

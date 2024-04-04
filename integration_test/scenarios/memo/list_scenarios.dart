@@ -12,17 +12,13 @@ import 'package:mem/mems/detail/mem_items_view.dart';
 
 import '../helpers.dart';
 
-void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
-  testMemoListScenario();
-}
-
 const _scenarioName = "Memo list scenario";
 
-void testMemoListScenario() => group(
-      " $_scenarioName",
+void main() => group(
+      _scenarioName,
       () {
+        IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
         late final DatabaseAccessor dbA;
         setUpAll(() async {
           dbA = await openTestDatabase(databaseDefinition);
@@ -31,6 +27,7 @@ void testMemoListScenario() => group(
         const insertedMemName = "$_scenarioName: inserted - mem name";
         const unarchivedMemName = "$insertedMemName - unarchived";
         const archivedMemName = "$insertedMemName - archived";
+
         setUp(() async {
           await clearAllTestDatabaseRows(databaseDefinition);
 

@@ -20,20 +20,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: "Set up Flutter"
-        uses: subosito/flutter-action@main
-        with:
-          channel: ${{ inputs.flutter-channel }}
-          cache: true
       - name: "Flutter doctor"
         uses: ./.github/actions/flutter-doctor
+        with:
+          flutter-channel: ${{ inputs.flutter-channel }}
 
       - name: "Install Dependencies"
         uses: ./.github/actions/install-dependencies
 
       - name: "Run Windows Medium Test"
         run: >
-          flutter test integration_test/app_test.dart
+          flutter test integration_test
           --dart-define=CICD=true
           --file-reporter json:reports/test_report.log
           --coverage

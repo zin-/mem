@@ -49,13 +49,11 @@ jobs:
         with:
           java-distribution: zulu
           java-version: ${{ matrix.java-version }}
-      - name: "Set up Flutter"
-        uses: subosito/flutter-action@main
-        with:
-          channel: ${{ inputs.flutter-channel }}
-          cache: true
+
       - name: "Flutter doctor"
         uses: ./.github/actions/flutter-doctor
+        with:
+          flutter-channel: ${{ inputs.flutter-channel }}
 
       - name: "Install Dependencies"
         uses: ./.github/actions/install-dependencies

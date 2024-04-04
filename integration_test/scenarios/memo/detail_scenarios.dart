@@ -17,17 +17,13 @@ import 'package:mem/values/durations.dart';
 
 import '../helpers.dart';
 
-void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
-  testMemoDetailScenario();
-}
-
 const _scenarioName = "Memo detail scenario";
 
-void testMemoDetailScenario() => group(
-      " $_scenarioName",
+void main() => group(
+      _scenarioName,
       () {
+        IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
         late final DatabaseAccessor dbA;
         setUpAll(() async {
           dbA = await openTestDatabase(databaseDefinition);
