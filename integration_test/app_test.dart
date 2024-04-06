@@ -5,8 +5,8 @@ import 'package:mem/logger/log.dart';
 import 'package:mem/logger/log_service.dart';
 
 import 'framework/framework_tests.dart' as framework_tests;
-import 'scenarios/act_counter_scenario.dart';
-import 'scenarios/act_scenario.dart';
+import 'scenarios/habit/act_counter_scenario.dart';
+import 'scenarios/habit/act_scenario.dart';
 import 'scenarios/edge_scenario.dart';
 import 'scenarios/habit/after_act_started_habit_scenario.dart';
 import 'scenarios/habit/repeat_by_n_day_habit_scenario.dart';

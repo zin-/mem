@@ -13,7 +13,7 @@ import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/values/durations.dart';
 
-import 'helpers.dart';
+import '../helpers.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
