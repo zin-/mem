@@ -16,21 +16,17 @@ import 'package:mem/values/durations.dart';
 
 import '../helpers.dart';
 
-void main() {
-  testRepeatedHabitScenario();
-}
+const _name = 'Repeated habit scenario';
 
-const _scenarioName = 'Repeated habit scenario';
-
-void testRepeatedHabitScenario() => group(
-      ": $_scenarioName",
+void main() => group(
+      _name,
       () {
         late final DatabaseAccessor dbA;
         setUpAll(() async {
           dbA = await openTestDatabase(databaseDefinition);
         });
 
-        const insertedMemName = "$_scenarioName - inserted - mem - name";
+        const insertedMemName = "$_name - inserted - mem - name";
         late int insertedMemId;
 
         setUp(() async {
@@ -197,7 +193,7 @@ void testRepeatedHabitScenario() => group(
               await widgetTester.pageBack();
               await widgetTester.pumpAndSettle();
               const enteringMemName =
-                  "$_scenarioName: Save: create - entering - mem name";
+                  "$_name: Save: create - entering - mem name";
               await widgetTester.enterText(
                 find.byKey(keyMemName),
                 enteringMemName,

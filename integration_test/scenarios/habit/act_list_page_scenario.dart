@@ -1,93 +1,79 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test/integration_test.dart';
-import 'package:mem/components/timer.dart';
+
 import 'package:mem/core/date_and_time/duration.dart';
 import 'package:mem/core/mem_notification.dart';
+import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
-import 'package:mem/databases/definition.dart';
 import 'package:mem/values/durations.dart';
 
 import '../helpers.dart';
 
-void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+const _name = "ActListPage scenario";
 
-  testActScenario();
-}
+void main() => group(
+      _name,
+      () {
+        const oneMin = Duration(minutes: 1);
+        const insertedMemName = '$_name: inserted mem - name';
 
-const _scenarioName = 'Act scenario';
+        final oneMinDate = zeroDate.add(oneMin);
 
-void testActScenario() => group(': $_scenarioName', () {
-      const oneMin = Duration(minutes: 1);
-      const insertedMemName = '$_scenarioName: inserted mem - name';
+        late final DatabaseAccessor dbA;
+        late final int insertedMemId;
 
-      final showActPageIconFinder = find.byIcon(Icons.play_arrow);
-      final startIconFinder = find.byIcon(Icons.play_arrow);
-      final stopIconFinder = find.byIcon(Icons.stop);
-      final oneMinDate = zeroDate.add(oneMin);
+        setUpAll(() async {
+          dbA = await openTestDatabase(databaseDefinition);
+          await clearAllTestDatabaseRows(databaseDefinition);
 
-      late final DatabaseAccessor dbA;
-      late final int insertedMemId;
+          insertedMemId = await dbA.insert(
+            defTableMems,
+            {
+              defColMemsName.name: insertedMemName,
+              defColCreatedAt.name: zeroDate,
+            },
+          );
+          await dbA.insert(
+            defTableMems,
+            {
+              defColMemsName.name: "$insertedMemName - 2",
+              defColCreatedAt.name: zeroDate,
+            },
+          );
+          await dbA.insert(
+            defTableMemNotifications,
+            {
+              defFkMemNotificationsMemId.name: insertedMemId,
+              defColMemNotificationsTime.name: 1,
+              defColMemNotificationsType.name:
+                  MemNotificationType.afterActStarted.name,
+              defColMemNotificationsMessage.name:
+                  '$_name: mem notification message',
+              defColCreatedAt.name: zeroDate,
+            },
+          );
+        });
+        setUp(() async {
+          await dbA.delete(defTableActs);
 
-      setUpAll(() async {
-        dbA = await openTestDatabase(databaseDefinition);
-        await clearAllTestDatabaseRows(databaseDefinition);
+          await dbA.insert(
+            defTableActs,
+            {
+              defFkActsMemId.name: insertedMemId,
+              defColActsStart.name: zeroDate,
+              defColActsStartIsAllDay.name: 0,
+              defColActsEnd.name: oneMinDate,
+              defColActsEndIsAllDay.name: 0,
+              defColCreatedAt.name: zeroDate,
+            },
+          );
+        });
 
-        insertedMemId = await dbA.insert(
-          defTableMems,
-          {
-            defColMemsName.name: insertedMemName,
-            defColCreatedAt.name: zeroDate,
-          },
-        );
-        await dbA.insert(
-          defTableMems,
-          {
-            defColMemsName.name: "$insertedMemName - 2",
-            defColCreatedAt.name: zeroDate,
-          },
-        );
-        await dbA.insert(
-          defTableMemNotifications,
-          {
-            defFkMemNotificationsMemId.name: insertedMemId,
-            defColMemNotificationsTime.name: 1,
-            defColMemNotificationsType.name:
-                MemNotificationType.afterActStarted.name,
-            defColMemNotificationsMessage.name:
-                '$_scenarioName: mem notification message',
-            defColCreatedAt.name: zeroDate,
-          },
-        );
-      });
-      setUp(() async {
-        await dbA.delete(defTableActs);
-
-        await dbA.insert(
-          defTableActs,
-          {
-            defFkActsMemId.name: insertedMemId,
-            defColActsStart.name: zeroDate,
-            defColActsStartIsAllDay.name: 0,
-            defColActsEnd.name: oneMinDate,
-            defColActsEndIsAllDay.name: 0,
-            defColCreatedAt.name: zeroDate,
-          },
-        );
-      });
-
-      Future<void> showMemListPage(WidgetTester widgetTester) async {
-        await runApplication();
-        await widgetTester.pumpAndSettle();
-      }
-
-      group(': ActListPage', () {
         group(": All", () {
           group(
             ": show inserted acts",
@@ -186,13 +172,18 @@ void testActScenario() => group(': $_scenarioName', () {
         });
 
         group(": by Mem", () {
+          Future<void> showMemListPage(WidgetTester widgetTester) async {
+            await runApplication();
+            await widgetTester.pumpAndSettle();
+          }
+
           Future<void> showActListPage(WidgetTester widgetTester) async {
             await showMemListPage(widgetTester);
 
             await widgetTester.tap(find.text(insertedMemName));
             await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(showActPageIconFinder);
+            await widgetTester.tap(startIconFinder);
             await widgetTester.pumpAndSettle();
 
             await widgetTester.tap(find.byIcon(Icons.numbers));
@@ -450,95 +441,5 @@ void testActScenario() => group(': $_scenarioName', () {
             });
           });
         });
-      });
-
-      group(": ActLineChartPage", () {
-        setUp(() async {
-          final now = DateTime.now();
-
-          await dbA.delete(defTableActs);
-
-          await dbA.insert(
-            defTableActs,
-            {
-              defFkActsMemId.name: insertedMemId,
-              defColActsStart.name: DateTime(now.year, now.month - 1, 28),
-              defColActsStartIsAllDay.name: 0,
-              defColActsEnd.name: now,
-              defColActsEndIsAllDay.name: 0,
-              defColCreatedAt.name: zeroDate,
-            },
-          );
-          for (int i = 0; i < 34; i++) {
-            final start = now.subtract(Duration(days: i));
-            for (int j = 0; j < randomInt(5); j++) {
-              await dbA.insert(
-                defTableActs,
-                {
-                  defFkActsMemId.name: insertedMemId,
-                  defColActsStart.name: start,
-                  defColActsStartIsAllDay.name: 0,
-                  defColActsEnd.name: now,
-                  defColActsEndIsAllDay.name: 0,
-                  defColCreatedAt.name: zeroDate,
-                },
-              );
-            }
-          }
-        });
-
-        testWidgets(": show chart", (widgetTester) async {
-          await showMemListPage(widgetTester);
-
-          await widgetTester.tap(find.text(insertedMemName));
-          await widgetTester.pumpAndSettle();
-
-          await widgetTester.tap(find.byIcon(Icons.show_chart));
-          await widgetTester.pumpAndSettle();
-
-          expect(true, isTrue);
-        });
-      });
-
-      group(': MemListPage', () {
-        setUp(() async {
-          dbA.insert(defTableActs, {
-            defFkActsMemId.name: insertedMemId,
-            defColActsStart.name: zeroDate,
-            defColActsStartIsAllDay.name: false,
-            defColCreatedAt.name: zeroDate,
-          });
-        });
-
-        testWidgets(
-          ": start act.",
-          (widgetTester) async {
-            await showMemListPage(widgetTester);
-
-            await widgetTester.tap(startIconFinder);
-            await widgetTester.pumpAndSettle();
-
-            expect(
-              widgetTester.widget<Text>(find.byType(Text).at(3)).data,
-              '00:00:00',
-            );
-
-            expect(startIconFinder, findsNothing);
-            expect(stopIconFinder, findsNWidgets(2));
-            await widgetTester.pumpAndSettle(elapsePeriod);
-
-            expect(find.text('00:00:00'), findsNothing);
-          },
-        );
-
-        testWidgets(": finish act.", (widgetTester) async {
-          await showMemListPage(widgetTester);
-
-          await widgetTester.tap(stopIconFinder);
-          await widgetTester.pump();
-
-          expect(startIconFinder, findsNWidgets(2));
-          expect(stopIconFinder, findsNothing);
-        });
-      });
-    });
+      },
+    );

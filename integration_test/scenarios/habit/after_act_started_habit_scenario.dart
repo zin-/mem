@@ -15,21 +15,17 @@ import 'package:mem/values/durations.dart';
 
 import '../helpers.dart';
 
-void main() {
-  testAfterActStartedHabitScenario();
-}
+const _name = 'After act started habit scenario';
 
-const _scenarioName = 'After act started habit scenario';
-
-void testAfterActStartedHabitScenario() => group(
-      ": $_scenarioName",
+void main() => group(
+      _name,
       () {
         late final DatabaseAccessor dbA;
         setUpAll(() async {
           dbA = await openTestDatabase(databaseDefinition);
         });
 
-        const insertedMemName = "$_scenarioName - inserted - mem - name";
+        const insertedMemName = "$_name - inserted - mem - name";
         const secondsOfTime = 1 * 60;
 
         late int insertedMemId;
@@ -143,7 +139,7 @@ void testAfterActStartedHabitScenario() => group(
             await widgetTester.pumpAndSettle();
 
             const enteringMemNotificationMessage =
-                "$_scenarioName - entering - mem notification message";
+                "$_name - entering - mem notification message";
             await widgetTester.enterText(
               find
                   .descendant(
@@ -169,8 +165,7 @@ void testAfterActStartedHabitScenario() => group(
               "01:00 after started",
             );
 
-            const enteringMemName =
-                "$_scenarioName: Save - entering - mem name";
+            const enteringMemName = "$_name: Save - entering - mem name";
             await widgetTester.enterText(
               find.byKey(keyMemName),
               enteringMemName,

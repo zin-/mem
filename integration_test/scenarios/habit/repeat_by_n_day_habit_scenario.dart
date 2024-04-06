@@ -14,14 +14,10 @@ import 'package:mem/values/durations.dart';
 
 import '../helpers.dart';
 
-void main() {
-  testRepeatByNDayHabitScenario();
-}
+const _name = 'Repeat by n day habit scenario';
 
-const _scenarioName = 'Repeat by n day habit scenario';
-
-void testRepeatByNDayHabitScenario() => group(
-      ": $_scenarioName",
+void main() => group(
+      _name,
       () {
         late final DatabaseAccessor dbA;
         setUpAll(() async {
@@ -32,7 +28,7 @@ void testRepeatByNDayHabitScenario() => group(
         });
 
         group(": Show", () {
-          const insertedMemName = "$_scenarioName - mem name - inserted";
+          const insertedMemName = "$_name - mem name - inserted";
           const insertedMemRepeatByNDay = 2;
 
           late int insertedMemId;
@@ -149,8 +145,7 @@ void testRepeatByNDayHabitScenario() => group(
 
             await widgetTester.pageBack();
             await widgetTester.pumpAndSettle();
-            const enteringMemName =
-                "$_scenarioName: Save - entering - mem name";
+            const enteringMemName = "$_name: Save - entering - mem name";
             await widgetTester.enterText(
               find.byKey(keyMemName),
               enteringMemName,
