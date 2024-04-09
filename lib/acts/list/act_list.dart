@@ -6,7 +6,7 @@ import 'package:mem/acts/actions.dart';
 import 'package:mem/acts/list/app_bar.dart';
 import 'package:mem/acts/list/states.dart';
 import 'package:mem/acts/list/sub_header.dart';
-import 'package:mem/acts/list/total_act_time_item.dart';
+import 'package:mem/acts/list/item/total_act_time_item.dart';
 import 'package:mem/acts/states.dart';
 import 'package:mem/components/async_value_view.dart';
 import 'package:mem/components/l10n.dart';
