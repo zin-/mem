@@ -5,13 +5,10 @@ import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:mem/acts/actions.dart';
 import 'package:mem/acts/states.dart';
 import 'package:mem/components/async_value_view.dart';
-import 'package:mem/components/l10n.dart';
 import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/states.dart';
 import 'package:mem/repositories/mem.dart';
-import 'package:mem/values/constants.dart';
 
 import 'app_bar.dart';
 import 'item/total_act_time_item.dart';
@@ -34,40 +31,32 @@ class ActList extends ConsumerWidget {
         () => AsyncValueView(
           loadActList(_memId),
           (loaded) => _ActList(
-            _memId == null
-                ? buildL10n(context).defaultActListPageTitle
-                : ref.read(memByMemIdProvider(_memId))?.name ?? somethingWrong,
+            _memId,
             ref.watch(dateViewProvider),
-            (bool changed) =>
-                ref.read(dateViewProvider.notifier).updatedBy(changed),
             ref.watch(timeViewProvider),
-            (bool changed) =>
-                ref.read(timeViewProvider.notifier).updatedBy(changed),
             ref.watch(actListProvider(_memId)) ?? [],
             (_memId == null ? ref.watch(memListProvider) : []),
             _scrollController,
           ),
         ),
-        {"_memId": _memId},
+        {
+          "_memId": _memId,
+        },
       );
 }
 
 class _ActList extends StatelessWidget {
-  final String _title;
+  final int? _memId;
   final bool _isDateView;
-  final void Function(bool changed) _changeDateViewMode;
   final bool _isTimeView;
-  final void Function(bool changed) _changeTimeViewMode;
   final List<Act> _actList;
   final List<SavedMem> _memList;
   final ScrollController? _scrollController;
 
   const _ActList(
-    this._title,
+    this._memId,
     this._isDateView,
-    this._changeDateViewMode,
     this._isTimeView,
-    this._changeTimeViewMode,
     this._actList,
     this._memList,
     this._scrollController,
@@ -79,11 +68,7 @@ class _ActList extends StatelessWidget {
           controller: _scrollController,
           slivers: [
             ActListAppBar(
-              _title,
-              _isDateView,
-              _changeDateViewMode,
-              _isTimeView,
-              _changeTimeViewMode,
+              _memId,
             ),
             ..._actList
                 .groupListsBy(
@@ -110,7 +95,7 @@ class _ActList extends StatelessWidget {
           ],
         ),
         {
-          "_title": _title,
+          "_memId": _memId,
           "_isDateView": _isDateView,
           "_isTimeView": _isTimeView,
           "_actList": _actList,
