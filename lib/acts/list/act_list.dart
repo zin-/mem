@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:mem/acts/actions.dart';
+import 'package:mem/acts/list/item/builder.dart';
 import 'package:mem/acts/states.dart';
 import 'package:mem/components/async_value_view.dart';
 import 'package:mem/components/mem/list/states.dart';
@@ -11,8 +12,6 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/mem.dart';
 
 import 'app_bar.dart';
-import 'item/total_act_time_item.dart';
-import 'item/view.dart';
 import 'states.dart';
 import 'sub_header.dart';
 
@@ -83,41 +82,15 @@ class _ActList extends StatelessWidget {
                   (e) => SliverStickyHeader(
                     header: ActListSubHeader(e, _isDateView),
                     sliver: SliverList(
-                      delegate: _isTimeView
-                          ? SliverChildBuilderDelegate(
-                              (context, index) {
-                                final entry = e.value
-                                    .groupListsBy((element) => element.memId)
-                                    .entries
-                                    .toList()[index];
+                      delegate: () {
+                        final builder =
+                            ActListItemBuilder(e, _memList, _isTimeView);
 
-                                return TotalActTimeListItem(
-                                  entry.value,
-                                  _memList.singleWhereOrNull(
-                                      (element) => element.id == entry.key),
-                                );
-                              },
-                              childCount: e.value
-                                  .groupListsBy((element) => element.memId)
-                                  .length,
-                            )
-                          : SliverChildBuilderDelegate(
-                              (context, index) {
-                                final act = e.value[index];
-                                if (act is SavedAct) {
-                                  return ActListItemView(
-                                    act,
-                                    _memList
-                                        .singleWhereOrNull((element) =>
-                                            element.id == act.memId)
-                                        ?.name,
-                                  );
-                                } else {
-                                  return null;
-                                }
-                              },
-                              childCount: e.value.length,
-                            ),
+                        return SliverChildBuilderDelegate(
+                          builder.build,
+                          childCount: builder.childCount,
+                        );
+                      }(),
                     ),
                   ),
                 )
