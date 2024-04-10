@@ -88,7 +88,23 @@ class _ActList extends StatelessWidget {
                               e.value.groupListsBy((element) => element.memId),
                               _memList,
                             )
-                          : _SimpleActListItem(e.value, _memList),
+                          : SliverChildBuilderDelegate(
+                              (context, index) {
+                                final act = e.value[index];
+                                if (act is SavedAct) {
+                                  return ActListItemView(
+                                    act,
+                                    _memList
+                                        .singleWhereOrNull((element) =>
+                                            element.id == act.memId)
+                                        ?.name,
+                                  );
+                                } else {
+                                  return null;
+                                }
+                              },
+                              childCount: e.value.length,
+                            ),
                     ),
                   ),
                 )
@@ -117,28 +133,6 @@ class _SummaryActListItem extends SliverChildBuilderDelegate {
               entry.value,
               memList.singleWhereOrNull((element) => element.id == entry.key),
             );
-          },
-        );
-}
-
-class _SimpleActListItem extends SliverChildBuilderDelegate {
-  _SimpleActListItem(
-    List<Act> actList,
-    List<SavedMem> memList,
-  ) : super(
-          childCount: actList.length,
-          (context, index) {
-            final act = actList[index];
-            if (act is SavedAct) {
-              return ActListItemView(
-                act,
-                memList
-                    .singleWhereOrNull((element) => element.id == act.memId)
-                    ?.name,
-              );
-            } else {
-              return null;
-            }
           },
         );
 }
