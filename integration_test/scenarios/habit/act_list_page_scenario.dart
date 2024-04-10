@@ -1,13 +1,10 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mem/core/date_and_time/duration.dart';
-import 'package:mem/core/mem_notification.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/base.dart';
-import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/values/durations.dart';
@@ -38,25 +35,6 @@ void main() => group(
               defColCreatedAt.name: zeroDate,
             },
           );
-          await dbA.insert(
-            defTableMems,
-            {
-              defColMemsName.name: "$insertedMemName - 2",
-              defColCreatedAt.name: zeroDate,
-            },
-          );
-          await dbA.insert(
-            defTableMemNotifications,
-            {
-              defFkMemNotificationsMemId.name: insertedMemId,
-              defColMemNotificationsTime.name: 1,
-              defColMemNotificationsType.name:
-                  MemNotificationType.afterActStarted.name,
-              defColMemNotificationsMessage.name:
-                  '$_name: mem notification message',
-              defColCreatedAt.name: zeroDate,
-            },
-          );
         });
         setUp(() async {
           await dbA.delete(defTableActs);
@@ -78,64 +56,56 @@ void main() => group(
           group(
             ": show inserted acts",
             () {
-              testWidgets(': time.', (widgetTester) async {
-                await runApplication();
-                await widgetTester.pumpAndSettle();
+              testWidgets(
+                ': time.',
+                (widgetTester) async {
+                  await runApplication();
+                  await widgetTester.pumpAndSettle();
 
-                await widgetTester.tap(find.byIcon(Icons.playlist_play));
-                await widgetTester.pumpAndSettle();
+                  await widgetTester.tap(find.byIcon(Icons.playlist_play));
+                  await widgetTester.pumpAndSettle();
 
-                expect(startIconFinder, findsNothing);
-                expect(stopIconFinder, findsNothing);
-                [
-                  "All",
-                  dateText(zeroDate),
-                  "1",
-                  oneMin.format(),
-                  oneMin.format(),
-                  "1",
-                  insertedMemName,
-                ].forEachIndexed((index, t) {
+                  expect(startIconFinder, findsNothing);
+                  expect(stopIconFinder, findsNothing);
+                  expect(widgetTester.textAt(0).data, equals("All"));
                   expect(
-                    (widgetTester.widget(find.byType(Text).at(index)) as Text)
-                        .data,
-                    t,
-                    reason: "Index is \"$index\".",
-                  );
-                });
-              });
+                      widgetTester.textAt(1).data, equals(dateText(zeroDate)));
+                  expect(widgetTester.textAt(2).data, equals("1"));
+                  expect(widgetTester.textAt(3).data, equals(oneMin.format()));
+                  expect(widgetTester.textAt(4).data, equals(oneMin.format()));
+                  expect(widgetTester.textAt(5).data, equals("1"));
+                  expect(widgetTester.textAt(6).data, equals(insertedMemName));
+                },
+              );
 
-              testWidgets(': count.', (widgetTester) async {
-                await runApplication();
-                await widgetTester.pumpAndSettle();
+              testWidgets(
+                ': count.',
+                (widgetTester) async {
+                  await runApplication();
+                  await widgetTester.pumpAndSettle();
 
-                await widgetTester.tap(find.byIcon(Icons.playlist_play));
-                await widgetTester.pumpAndSettle();
+                  await widgetTester.tap(find.byIcon(Icons.playlist_play));
+                  await widgetTester.pumpAndSettle();
 
-                await widgetTester.tap(find.byIcon(Icons.numbers));
-                await widgetTester.pumpAndSettle();
+                  await widgetTester.tap(find.byIcon(Icons.numbers));
+                  await widgetTester.pumpAndSettle();
 
-                expect(startIconFinder, findsNothing);
-                expect(stopIconFinder, findsNothing);
-                expect(find.byIcon(Icons.access_time), findsOneWidget);
-                [
-                  "All",
-                  dateText(zeroDate),
-                  "1",
-                  oneMin.format(),
-                  timeText(zeroDate),
-                  "~",
-                  timeText(oneMinDate),
-                  insertedMemName,
-                ].forEachIndexed((index, t) {
+                  expect(startIconFinder, findsNothing);
+                  expect(stopIconFinder, findsNothing);
+                  expect(find.byIcon(Icons.access_time), findsOneWidget);
+                  expect(widgetTester.textAt(0).data, equals("All"));
                   expect(
-                    (widgetTester.widget(find.byType(Text).at(index)) as Text)
-                        .data,
-                    t,
-                    reason: "Index is \"$index\".",
-                  );
-                });
-              });
+                      widgetTester.textAt(1).data, equals(dateText(zeroDate)));
+                  expect(widgetTester.textAt(2).data, equals("1"));
+                  expect(widgetTester.textAt(3).data, equals(oneMin.format()));
+                  expect(
+                      widgetTester.textAt(4).data, equals(timeText(zeroDate)));
+                  expect(widgetTester.textAt(5).data, equals("~"));
+                  expect(widgetTester.textAt(6).data,
+                      equals(timeText(oneMinDate)));
+                  expect(widgetTester.textAt(7).data, equals(insertedMemName));
+                },
+              );
 
               testWidgets(
                 ': month view.',
@@ -149,22 +119,13 @@ void main() => group(
                       .tap(find.byIcon(Icons.calendar_view_month));
                   await widgetTester.pumpAndSettle();
 
-                  [
-                    equals("All"),
-                    equals("January 0"),
-                    equals("1"),
-                    equals(oneMin.format()),
-                    equals(oneMin.format()),
-                    equals("1"),
-                    insertedMemName,
-                  ].forEachIndexed((index, t) {
-                    expect(
-                      (widgetTester.widget(find.byType(Text).at(index)) as Text)
-                          .data,
-                      t,
-                      reason: "Index is \"$index\".",
-                    );
-                  });
+                  expect(widgetTester.textAt(0).data, equals("All"));
+                  expect(widgetTester.textAt(1).data, equals("January 0"));
+                  expect(widgetTester.textAt(2).data, equals("1"));
+                  expect(widgetTester.textAt(3).data, equals(oneMin.format()));
+                  expect(widgetTester.textAt(4).data, equals(oneMin.format()));
+                  expect(widgetTester.textAt(5).data, equals("1"));
+                  expect(widgetTester.textAt(6).data, equals(insertedMemName));
                 },
               );
             },
@@ -208,24 +169,16 @@ void main() => group(
               (widgetTester) async {
                 await showActListPage(widgetTester);
 
-                [
-                  insertedMemName,
-                  dateText(zeroDate),
-                  "2",
-                  oneMin.format(),
-                  timeText(zeroDate),
-                  "~",
-                  timeText(zeroDate),
-                  "~",
-                  timeText(oneMinDate),
-                ].forEachIndexed((index, t) {
-                  expect(
-                    (widgetTester.widget(find.byType(Text).at(index)) as Text)
-                        .data,
-                    t,
-                    reason: "Index is \"$index\".",
-                  );
-                });
+                expect(widgetTester.textAt(0).data, equals(insertedMemName));
+                expect(widgetTester.textAt(1).data, equals(dateText(zeroDate)));
+                expect(widgetTester.textAt(2).data, equals("2"));
+                expect(widgetTester.textAt(3).data, equals(oneMin.format()));
+                expect(widgetTester.textAt(4).data, equals(timeText(zeroDate)));
+                expect(widgetTester.textAt(5).data, equals("~"));
+                expect(widgetTester.textAt(6).data, equals(timeText(zeroDate)));
+                expect(widgetTester.textAt(7).data, equals("~"));
+                expect(
+                    widgetTester.textAt(8).data, equals(timeText(oneMinDate)));
                 expect(stopIconFinder, findsOneWidget);
               },
             );
@@ -245,85 +198,63 @@ void main() => group(
               await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
               expect(startIconFinder, findsNothing);
-              [
-                insertedMemName,
-                dateText(startTime),
-                "1",
-                Duration.zero.format(),
-                timeText(startTime),
-                "~",
-                dateText(zeroDate),
-                "1",
-                oneMin.format(),
-                timeText(zeroDate),
-                "~",
-                timeText(oneMinDate),
-              ].forEachIndexed((index, t) {
-                expect(
-                  (widgetTester.widget(find.byType(Text).at(index)) as Text)
-                      .data,
-                  t,
-                  reason: "Index is \"$index\".",
-                );
-              });
+              expect(widgetTester.textAt(0).data, equals(insertedMemName));
+              expect(widgetTester.textAt(1).data, equals(dateText(startTime)));
+              expect(widgetTester.textAt(2).data, equals("1"));
+              expect(
+                  widgetTester.textAt(3).data, equals(Duration.zero.format()));
+              expect(widgetTester.textAt(4).data, equals(timeText(startTime)));
+              expect(widgetTester.textAt(5).data, equals("~"));
+              expect(widgetTester.textAt(6).data, equals(dateText(zeroDate)));
+              expect(widgetTester.textAt(7).data, equals("1"));
+              expect(widgetTester.textAt(8).data, equals(oneMin.format()));
+              expect(widgetTester.textAt(9).data, equals(timeText(zeroDate)));
+              expect(widgetTester.textAt(10).data, equals("~"));
+              expect(
+                  widgetTester.textAt(11).data, equals(timeText(oneMinDate)));
+
               final stopTime = DateTime.now();
               await widgetTester.tap(stopIconFinder);
               await Future.delayed(defaultTransitionDuration);
               await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
-              [
-                insertedMemName,
-                dateText(startTime),
-                "1",
-                isNotNull,
-                timeText(startTime),
-                "~",
-                timeText(stopTime),
-                dateText(zeroDate),
-                "1",
-                oneMin.format(),
-                timeText(zeroDate),
-                "~",
-                timeText(oneMinDate),
-              ].forEachIndexed((index, t) {
-                expect(
-                  (widgetTester.widget(find.byType(Text).at(index)) as Text)
-                      .data,
-                  t,
-                  reason: "Index is \"$index\".",
-                );
-              });
-
+              expect(widgetTester.textAt(0).data, equals(insertedMemName));
+              expect(widgetTester.textAt(1).data, equals(dateText(startTime)));
+              expect(widgetTester.textAt(2).data, equals("1"));
+              expect(widgetTester.textAt(3).data, isNotNull);
+              expect(widgetTester.textAt(4).data, equals(timeText(startTime)));
+              expect(widgetTester.textAt(5).data, equals("~"));
+              expect(widgetTester.textAt(6).data, equals(timeText(stopTime)));
+              expect(widgetTester.textAt(7).data, equals(dateText(zeroDate)));
+              expect(widgetTester.textAt(8).data, equals("1"));
+              expect(widgetTester.textAt(9).data, equals(oneMin.format()));
+              expect(widgetTester.textAt(10).data, equals(timeText(zeroDate)));
+              expect(widgetTester.textAt(11).data, equals("~"));
+              expect(
+                  widgetTester.textAt(12).data, equals(timeText(oneMinDate)));
               expect(stopIconFinder, findsNothing);
+
               final startTime2 = DateTime.now();
               await widgetTester.tap(startIconFinder);
               await Future.delayed(defaultTransitionDuration);
               await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
-              [
-                insertedMemName,
-                dateText(startTime2),
-                "2",
-                isNotNull,
-                timeText(startTime2),
-                "~",
-                timeText(startTime),
-                "~",
-                timeText(stopTime),
-                dateText(zeroDate),
-                "1",
-                oneMin.format(),
-                timeText(zeroDate),
-                "~",
-                timeText(oneMinDate),
-              ].forEachIndexed((index, t) {
-                expect(
-                  (widgetTester.widget(find.byType(Text).at(index)) as Text)
-                      .data,
-                  t,
-                  reason: "Index is \"$index\".",
-                );
-              });
+              expect(widgetTester.textAt(0).data, equals(insertedMemName));
+              expect(widgetTester.textAt(1).data, equals(dateText(startTime2)));
+              expect(widgetTester.textAt(2).data, equals("2"));
+              expect(widgetTester.textAt(3).data, isNotNull);
+              expect(widgetTester.textAt(4).data, equals(timeText(startTime2)));
+              expect(widgetTester.textAt(5).data, equals("~"));
+              expect(widgetTester.textAt(6).data, equals(timeText(startTime)));
+              expect(widgetTester.textAt(7).data, equals("~"));
+              expect(widgetTester.textAt(8).data, equals(timeText(stopTime)));
+              expect(widgetTester.textAt(9).data, equals(dateText(zeroDate)));
+              expect(widgetTester.textAt(10).data, equals("1"));
+              expect(widgetTester.textAt(11).data, equals(oneMin.format()));
+              expect(widgetTester.textAt(12).data, equals(timeText(zeroDate)));
+              expect(widgetTester.textAt(13).data, equals("~"));
+              expect(
+                  widgetTester.textAt(14).data, equals(timeText(oneMinDate)));
             },
           );
 
@@ -359,26 +290,18 @@ void main() => group(
                 await widgetTester.tap(find.byIcon(Icons.save_alt));
                 await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
-                [
-                  insertedMemName,
-                  dateText(zeroDate),
-                  "2",
-                  "skip",
-                  timeText(zeroDate),
-                  "~",
-                  timeText(pickedDate),
-                  timeText(zeroDate),
-                  "~",
-                  timeText(oneMinDate),
-                ].forEachIndexed((index, expected) {
-                  expect(
-                    (widgetTester.widget(find.byType(Text).at(index)) as Text)
-                        .data,
-                    expected,
-                    reason: "Index is \"$index\".",
-                    skip: expected == "skip",
-                  );
-                });
+                expect(widgetTester.textAt(0).data, equals(insertedMemName));
+                expect(widgetTester.textAt(1).data, equals(dateText(zeroDate)));
+                expect(widgetTester.textAt(2).data, equals("2"));
+                expect(widgetTester.textAt(3).data, isNotNull);
+                expect(widgetTester.textAt(4).data, equals(timeText(zeroDate)));
+                expect(widgetTester.textAt(5).data, equals("~"));
+                expect(
+                    widgetTester.textAt(6).data, equals(timeText(pickedDate)));
+                expect(widgetTester.textAt(7).data, equals(timeText(zeroDate)));
+                expect(widgetTester.textAt(8).data, equals("~"));
+                expect(
+                    widgetTester.textAt(9).data, equals(timeText(oneMinDate)));
 
                 await widgetTester
                     .longPress(find.text(timeText(zeroDate)).at(1));
@@ -390,25 +313,16 @@ void main() => group(
                 await widgetTester.tap(find.byIcon(Icons.save_alt));
                 await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
-                [
-                  insertedMemName,
-                  dateText(zeroDate),
-                  "2",
-                  "skip",
-                  timeText(zeroDate),
-                  "~",
-                  timeText(zeroDate),
-                  "~",
-                  timeText(pickedDate),
-                ].forEachIndexed((index, expected) {
-                  expect(
-                    (widgetTester.widget(find.byType(Text).at(index)) as Text)
-                        .data,
-                    expected,
-                    reason: "Index is \"$index\".",
-                    skip: expected == "skip",
-                  );
-                });
+                expect(widgetTester.textAt(0).data, equals(insertedMemName));
+                expect(widgetTester.textAt(1).data, equals(dateText(zeroDate)));
+                expect(widgetTester.textAt(2).data, equals("2"));
+                expect(widgetTester.textAt(3).data, isNotNull);
+                expect(widgetTester.textAt(4).data, equals(timeText(zeroDate)));
+                expect(widgetTester.textAt(5).data, equals("~"));
+                expect(widgetTester.textAt(6).data, equals(timeText(zeroDate)));
+                expect(widgetTester.textAt(7).data, equals("~"));
+                expect(
+                    widgetTester.textAt(8).data, equals(timeText(pickedDate)));
               },
             );
 
@@ -421,23 +335,13 @@ void main() => group(
               await widgetTester.tap(find.byIcon(Icons.delete));
               await widgetTester.pumpAndSettle();
 
-              [
-                insertedMemName,
-                dateText(zeroDate),
-                "1",
-                oneMin.format(),
-                timeText(zeroDate),
-                "~",
-                timeText(oneMinDate),
-              ].forEachIndexed((index, expected) {
-                expect(
-                  (widgetTester.widget(find.byType(Text).at(index)) as Text)
-                      .data,
-                  expected,
-                  reason: "Index is \"$index\".",
-                  skip: expected == "skip",
-                );
-              });
+              expect(widgetTester.textAt(0).data, equals(insertedMemName));
+              expect(widgetTester.textAt(1).data, equals(dateText(zeroDate)));
+              expect(widgetTester.textAt(2).data, equals("1"));
+              expect(widgetTester.textAt(3).data, equals(oneMin.format()));
+              expect(widgetTester.textAt(4).data, equals(timeText(zeroDate)));
+              expect(widgetTester.textAt(5).data, equals("~"));
+              expect(widgetTester.textAt(6).data, equals(timeText(oneMinDate)));
             });
           });
         });

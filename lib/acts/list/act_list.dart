@@ -48,13 +48,7 @@ class ActList extends ConsumerWidget {
               ref.watch(dateViewProvider),
               ref.watch(timeViewProvider),
               ref.watch(actListProvider(_memId)) ?? [],
-              (_memId == null
-                  ? ref.watch(memListProvider)
-                  : [
-                      ref.watch(memListProvider).singleWhereOrNull(
-                            (element) => element.id == _memId,
-                          )!
-                    ]),
+              (_memId == null ? ref.watch(memListProvider) : []),
               _scrollController,
             ),
           ),
@@ -146,10 +140,7 @@ class _SummaryActListItem extends SliverChildBuilderDelegate {
 
             return TotalActTimeListItem(
               entry.value,
-              memList.length >= 2
-                  ? memList
-                      .singleWhereOrNull((element) => element.id == entry.key)
-                  : null,
+              memList.singleWhereOrNull((element) => element.id == entry.key),
             );
           },
         );
@@ -166,11 +157,8 @@ class _SimpleActListItem extends SliverChildBuilderDelegate {
             if (act is SavedAct) {
               return ActListItemView(
                 act,
-                (memList.length >= 2
-                        ? memList.singleWhereOrNull(
-                            (element) => element.id == act.memId,
-                          )
-                        : null)
+                memList
+                    .singleWhereOrNull((element) => element.id == act.memId)
                     ?.name,
               );
             } else {

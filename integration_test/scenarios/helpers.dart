@@ -105,3 +105,7 @@ void setMockLocalNotifications(WidgetTester widgetTester) =>
         }
       },
     );
+
+extension WidgetTesterExtension on WidgetTester {
+  Text textAt(int index) => widget<Text>(find.byType(Text).at(index));
+}
