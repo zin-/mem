@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/components/mem/mem_name.dart';
 
 import 'package:mem/core/date_and_time/duration.dart';
 import 'package:mem/databases/definition.dart';
@@ -114,7 +115,6 @@ void main() => group(
                   (widgetTester) async {
                     await runApplication();
                     await widgetTester.pumpAndSettle();
-
                     await widgetTester.tap(find.byIcon(Icons.playlist_play));
                     await widgetTester.pumpAndSettle();
 
@@ -349,5 +349,25 @@ void main() => group(
             });
           });
         });
+
+        testWidgets(
+          ": show MemDetailPage.",
+          (widgetTester) async {
+            await runApplication();
+            await widgetTester.pumpAndSettle();
+            await widgetTester.tap(find.byIcon(Icons.playlist_play));
+            await widgetTester.pumpAndSettle();
+
+            await widgetTester.tap(find.byIcon(Icons.arrow_forward));
+            await widgetTester.pumpAndSettle();
+
+            expect(
+              widgetTester
+                  .widget<TextFormField>(find.byKey(keyMemName))
+                  .initialValue,
+              insertedMemName,
+            );
+          },
+        );
       },
     );
