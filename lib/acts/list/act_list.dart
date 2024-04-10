@@ -84,9 +84,22 @@ class _ActList extends StatelessWidget {
                     header: ActListSubHeader(e, _isDateView),
                     sliver: SliverList(
                       delegate: _isTimeView
-                          ? _SummaryActListItem(
-                              e.value.groupListsBy((element) => element.memId),
-                              _memList,
+                          ? SliverChildBuilderDelegate(
+                              (context, index) {
+                                final entry = e.value
+                                    .groupListsBy((element) => element.memId)
+                                    .entries
+                                    .toList()[index];
+
+                                return TotalActTimeListItem(
+                                  entry.value,
+                                  _memList.singleWhereOrNull(
+                                      (element) => element.id == entry.key),
+                                );
+                              },
+                              childCount: e.value
+                                  .groupListsBy((element) => element.memId)
+                                  .length,
                             )
                           : SliverChildBuilderDelegate(
                               (context, index) {
@@ -118,21 +131,4 @@ class _ActList extends StatelessWidget {
           "_memList": _memList,
         },
       );
-}
-
-class _SummaryActListItem extends SliverChildBuilderDelegate {
-  _SummaryActListItem(
-    Map<int, List<Act>> groupedActListByMemId,
-    List<SavedMem> memList,
-  ) : super(
-          childCount: groupedActListByMemId.length,
-          (context, index) {
-            final entry = groupedActListByMemId.entries.toList()[index];
-
-            return TotalActTimeListItem(
-              entry.value,
-              memList.singleWhereOrNull((element) => element.id == entry.key),
-            );
-          },
-        );
 }
