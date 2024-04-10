@@ -1,45 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:mem/logger/log_service.dart';
 
-class ActListAppBarIF {
+class ActListAppBar extends StatelessWidget {
   final String _title;
+  final bool _isDateView;
   final void Function(bool changed) _changeDateViewMode;
+  final bool _isTimeView;
   final void Function(bool changed) _changeTimeViewMode;
 
-  ActListAppBarIF(
-    this._title,
-    this._changeDateViewMode,
-    this._changeTimeViewMode,
-  );
-
-  Map<String, dynamic> _toMap() => {
-        "_title": _title,
-      };
-
-  @override
-  String toString() => _toMap().toString();
-}
-
-class ActListAppBar extends StatelessWidget {
-  final ActListAppBarIF _actListAppBarIF;
-  final bool _isDateView;
-  final bool _isTimeView;
-
   const ActListAppBar(
-    this._actListAppBarIF,
+    this._title,
     this._isDateView,
-    this._isTimeView, {
+    this._changeDateViewMode,
+    this._isTimeView,
+    this._changeTimeViewMode, {
     super.key,
   });
 
   @override
   Widget build(BuildContext context) => v(
         () => SliverAppBar(
-          title: Text(_actListAppBarIF._title),
+          title: Text(_title),
           actions: [
             IconButton(
                 onPressed: () => v(
-                      () => _actListAppBarIF._changeDateViewMode(!_isDateView),
+                      () => _changeDateViewMode(!_isDateView),
                       {"_isDateView": _isDateView},
                     ),
                 icon: Icon(
@@ -49,7 +34,7 @@ class ActListAppBar extends StatelessWidget {
                 )),
             IconButton(
               onPressed: () => v(
-                () => _actListAppBarIF._changeTimeViewMode(!_isTimeView),
+                () => _changeTimeViewMode(!_isTimeView),
                 {"_isTimeView": _isTimeView},
               ),
               icon: Icon(
@@ -59,7 +44,7 @@ class ActListAppBar extends StatelessWidget {
           ],
         ),
         {
-          "_actListAppBarIF": _actListAppBarIF,
+          "_title": _title,
           "_isDateView": _isDateView,
           "_isTimeView": _isTimeView,
         },

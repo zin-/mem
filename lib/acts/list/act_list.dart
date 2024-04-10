@@ -35,18 +35,16 @@ class ActList extends ConsumerWidget {
           loadActList(_memId),
           (loaded) => _ActList(
             _ActListIF(
-              ActListAppBarIF(
-                _memId == null
-                    ? buildL10n(context).defaultActListPageTitle
-                    : ref.read(memByMemIdProvider(_memId))?.name ??
-                        somethingWrong,
-                (bool changed) =>
-                    ref.read(dateViewProvider.notifier).updatedBy(changed),
-                (bool changed) =>
-                    ref.read(timeViewProvider.notifier).updatedBy(changed),
-              ),
+              _memId == null
+                  ? buildL10n(context).defaultActListPageTitle
+                  : ref.read(memByMemIdProvider(_memId))?.name ??
+                      somethingWrong,
               ref.watch(dateViewProvider),
+              (bool changed) =>
+                  ref.read(dateViewProvider.notifier).updatedBy(changed),
               ref.watch(timeViewProvider),
+              (bool changed) =>
+                  ref.read(timeViewProvider.notifier).updatedBy(changed),
               ref.watch(actListProvider(_memId)) ?? [],
               (_memId == null ? ref.watch(memListProvider) : []),
               _scrollController,
@@ -58,24 +56,28 @@ class ActList extends ConsumerWidget {
 }
 
 class _ActListIF {
-  final ActListAppBarIF _actListAppBarIF;
+  final String _title;
   final bool _isDateView;
+  final void Function(bool changed) _changeDateViewMode;
   final bool _isTimeView;
+  final void Function(bool changed) _changeTimeViewMode;
   final List<Act> _actList;
   final List<SavedMem> _memList;
   final ScrollController? _scrollController;
 
   _ActListIF(
-    this._actListAppBarIF,
+    this._title,
     this._isDateView,
+    this._changeDateViewMode,
     this._isTimeView,
+    this._changeTimeViewMode,
     this._actList,
     this._memList,
     this._scrollController,
   );
 
   Map<String, dynamic> _toMap() => {
-        "_actListAppBarIF": _actListAppBarIF,
+        "_title": _title,
         "_isDateView": _isDateView,
         "_isTimeView": _isTimeView,
         "_actList": _actList,
@@ -97,9 +99,11 @@ class _ActList extends StatelessWidget {
           controller: _actListIF._scrollController,
           slivers: [
             ActListAppBar(
-              _actListIF._actListAppBarIF,
+              _actListIF._title,
               _actListIF._isDateView,
+              _actListIF._changeDateViewMode,
               _actListIF._isTimeView,
+              _actListIF._changeTimeViewMode,
             ),
             ..._actListIF._actList
                 .groupListsBy(
