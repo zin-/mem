@@ -12,9 +12,10 @@ import 'package:mem/framework/repository/database_repository.dart';
 
 // Database(DB) operations
 Future<DatabaseAccessor> openTestDatabase(
-  DatabaseDefinition databaseDefinition,
-) async {
-  DatabaseFactory.onTest = true;
+  DatabaseDefinition databaseDefinition, {
+  bool onTest = true,
+}) async {
+  DatabaseFactory.onTest = onTest;
   return await DatabaseRepository().receive(databaseDefinition);
 }
 
