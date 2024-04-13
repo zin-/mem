@@ -10,16 +10,25 @@ const _name = "Database accessor test";
 void main() => group(
       "$_name: operations",
       () {
+        const insertedName = "$_name: operations: inserted";
+
         final inserted = {
-          sampleDefPk.name: 0,
+          sampleDefPk.name: 1,
           sampleDefColInteger.name: 0,
-          sampleDefColText.name: "$_name: operations: inserted",
+          sampleDefColText.name: insertedName,
           sampleDefColTimeStamp.name: DateTime(0),
           sampleDefColBoolean.name: false,
         };
+        final inserted2 = {
+          sampleDefPk.name: 2,
+          sampleDefColInteger.name: 1,
+          sampleDefColText.name: "$insertedName - 2",
+          sampleDefColTimeStamp.name: DateTime(1),
+          sampleDefColBoolean.name: true,
+        };
 
         late final DatabaseAccessor databaseAccessor;
-        late final int maxPkInsertedId;
+
         setUpAll(() async {
           await DatabaseFactory
               // ignore: deprecated_member_use_from_same_package
@@ -28,20 +37,46 @@ void main() => group(
                   await DatabaseFactory.buildDatabasePath(sampleDefDb.name));
 
           databaseAccessor = await DatabaseFactory.open(sampleDefDBAddedColumn);
+        });
+
+        setUp(() async {
+          await databaseAccessor
+              // ignore: deprecated_member_use_from_same_package
+              .nativeDatabase
+              .delete(sampleDefTable.name);
 
           await databaseAccessor
               // ignore: deprecated_member_use_from_same_package
               .nativeDatabase
-              .insert(sampleDefTable.name, {
-            ...inserted,
-            sampleDefColTimeStamp.name:
-                (inserted[sampleDefColTimeStamp.name] as DateTime)
-                    .toIso8601String(),
-            sampleDefColBoolean.name:
-                (inserted[sampleDefColBoolean.name] as bool) ? 1 : 0,
-          });
+              .insert(
+            sampleDefTable.name,
+            {
+              ...inserted,
+              sampleDefColTimeStamp.name:
+                  (inserted[sampleDefColTimeStamp.name] as DateTime)
+                      .toIso8601String(),
+              sampleDefColBoolean.name:
+                  (inserted[sampleDefColBoolean.name] as bool) ? 1 : 0,
+            },
+          );
+          await databaseAccessor
+              // ignore: deprecated_member_use_from_same_package
+              .nativeDatabase
+              .insert(
+            sampleDefTable.name,
+            {
+              ...inserted2,
+              sampleDefColTimeStamp.name:
+                  (inserted2[sampleDefColTimeStamp.name] as DateTime)
+                      .toIso8601String(),
+              sampleDefColBoolean.name:
+                  (inserted2[sampleDefColBoolean.name] as bool) ? 1 : 0,
+            },
+          );
+        });
 
-          maxPkInsertedId = ((await databaseAccessor
+        test(": insert.", () async {
+          final maxPkInsertedId = ((await databaseAccessor
                       // ignore: deprecated_member_use_from_same_package
                       .nativeDatabase
                       .query(
@@ -51,9 +86,7 @@ void main() => group(
               ))
                   .singleWhereOrNull((element) => true)?[sampleDefPk.name] ??
               0) as int;
-        });
 
-        test(": insert.", () async {
           final insertedId = await databaseAccessor.insert(sampleDefTable, {
             sampleDefColInteger.name: 1,
             sampleDefColText.name: "$_name: operations: insert",
@@ -64,15 +97,68 @@ void main() => group(
           expect(insertedId, maxPkInsertedId + 1);
         });
 
-        test(": select.", () async {
-          final selected = await databaseAccessor.select(
-            sampleDefTable,
-            orderBy: "${sampleDefPk.name} ASC",
-            limit: 1,
-          );
+        group(
+          ": select",
+          () {
+            test(
+              ": simple.",
+              () async {
+                final selected = await databaseAccessor.select(sampleDefTable);
 
-          expect(selected, [inserted]);
-        });
+                expect(selected, [inserted, inserted2]);
+              },
+            );
+
+            test(
+              ": where.",
+              () async {
+                final selected = await databaseAccessor.select(
+                  sampleDefTable,
+                  where: "${sampleDefPk.name} = ?",
+                  whereArgs: [inserted2[sampleDefPk.name]],
+                );
+
+                expect(selected, [inserted2]);
+              },
+            );
+
+            test(
+              ": orderBy.",
+              () async {
+                final selected = await databaseAccessor.select(
+                  sampleDefTable,
+                  orderBy: "${sampleDefPk.name} DESC",
+                );
+
+                expect(selected, [inserted2, inserted]);
+              },
+            );
+
+            test(
+              ": offset.",
+              () async {
+                final selected = await databaseAccessor.select(
+                  sampleDefTable,
+                  offset: 1,
+                );
+
+                expect(selected, [inserted2]);
+              },
+            );
+
+            test(
+              ": limit.",
+              () async {
+                final selected = await databaseAccessor.select(
+                  sampleDefTable,
+                  limit: 1,
+                );
+
+                expect(selected, [inserted]);
+              },
+            );
+          },
+        );
 
         test(": update.", () async {
           final updatedCount = await databaseAccessor.update(

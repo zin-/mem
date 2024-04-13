@@ -31,6 +31,7 @@ class DatabaseAccessor {
     String? where,
     List<Object?>? whereArgs,
     String? orderBy,
+    int? offset,
     int? limit,
   }) =>
       v(
@@ -40,6 +41,7 @@ class DatabaseAccessor {
               where: where,
               whereArgs: whereArgs?.map((e) => _converter.to(e)).toList(),
               orderBy: orderBy,
+              offset: offset,
               limit: limit,
             )
             .then((value) =>
