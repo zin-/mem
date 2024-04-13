@@ -166,6 +166,52 @@ void main() => group(
                 );
               },
             );
+
+            group(
+              ": many acts",
+              // TODO 仕様が決まってきたらCI上でも実行する
+              // FIXME 実行時間の増加し過ぎるかも、テスト分割を検討したほうが良いかもしれない
+              // skip: true,
+              () {
+                const days = 300;
+                const numberOfActsByDate = 100;
+
+                setUp(() async {
+                  await dbA.delete(defTableActs);
+
+                  for (var j = 0; j < days; j++) {
+                    for (var i = 0; i < numberOfActsByDate; i++) {
+                      final start = zeroDate
+                          .add(Duration(days: j))
+                          .add(Duration(minutes: i));
+                      final end = start.add(oneMin);
+
+                      await dbA.insert(
+                        defTableActs,
+                        {
+                          defFkActsMemId.name: insertedMemId,
+                          defColActsStart.name: start,
+                          defColActsStartIsAllDay.name: 0,
+                          defColActsEnd.name: end,
+                          defColActsEndIsAllDay.name: 0,
+                          defColCreatedAt.name: zeroDate,
+                        },
+                      );
+                    }
+                  }
+                });
+
+                testWidgets(
+                  ': time.',
+                  (widgetTester) async {
+                    await runApplication();
+                    await widgetTester.pumpAndSettle();
+                    await widgetTester.tap(find.byIcon(Icons.playlist_play));
+                    await widgetTester.pumpAndSettle();
+                  },
+                );
+              },
+            );
           },
         );
 
