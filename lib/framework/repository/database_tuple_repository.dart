@@ -2,6 +2,7 @@ import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
 import 'package:mem/framework/repository/entity.dart';
+import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
@@ -38,12 +39,18 @@ abstract class DatabaseTupleRepository<E extends EntityV1,
 
   Future<List<SavedEntity>> ship({
     Condition? condition,
+    List<OrderBy>? orderBy,
+    int? offset,
+    int? limit,
   }) =>
       v(
         () async => (await _databaseAccessor!.select(
           _tableDefinition,
           where: condition?.where(),
           whereArgs: condition?.whereArgs(),
+          orderBy: orderBy?.map((e) => e.toQuery()).join(", "),
+          offset: offset,
+          limit: limit,
         ))
             .map((e) => pack(e))
             .toList(),
@@ -167,8 +174,8 @@ abstract class DatabaseTupleRepository<E extends EntityV1,
 
   static DatabaseAccessor? _databaseAccessor;
 
-  static set databaseAccessor(DatabaseAccessor databaseAccessor) =>
-      _databaseAccessor ??= databaseAccessor;
+  static set databaseAccessor(DatabaseAccessor? databaseAccessor) =>
+      _databaseAccessor = databaseAccessor;
 
   final TableDefinition _tableDefinition;
 

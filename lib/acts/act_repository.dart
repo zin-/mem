@@ -2,6 +2,7 @@ import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
+import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
@@ -10,6 +11,9 @@ class ActRepository extends DatabaseTupleRepository<Act, SavedAct, int> {
   Future<List<SavedAct>> shipByMemId(
     int memId, {
     DateAndTimePeriod? period,
+    List<OrderBy>? orderBy,
+    int? offset,
+    int? limit,
   }) =>
       v(
         () async {
@@ -24,6 +28,9 @@ class ActRepository extends DatabaseTupleRepository<Act, SavedAct, int> {
                 GraterThanOrEqual(defColActsStart, period.start),
                 LessThan(defColActsStart, period.end),
               ]),
+              orderBy: orderBy,
+              offset: offset,
+              limit: limit,
             );
           }
         },
