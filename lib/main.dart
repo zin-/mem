@@ -46,7 +46,12 @@ Future<void> _runApplication({Widget? home, String? languageCode}) => i(
         await openDatabase();
         ActCounterRepository();
 
-        runApp(MemApplication(languageCode, home: home));
+        runApp(
+          MemApplication(
+            languageCode,
+            home: home,
+          ),
+        );
       },
       [home, languageCode],
     );
