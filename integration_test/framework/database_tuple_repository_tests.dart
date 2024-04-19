@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/framework/database/factory.dart';
+import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/database_repository.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
@@ -36,6 +37,18 @@ void main() => group(
       () {
         setUpAll(() async {
           DatabaseFactory.onTest = true;
+          for (final testDefDatabase in [
+            sampleDefDb,
+            sampleDefDBAddedTable,
+            sampleDefDBAddedColumn,
+          ]) {
+            await DatabaseFactory
+                // ignore: deprecated_member_use_from_same_package
+                .nativeFactory
+                .deleteDatabase(
+              await DatabaseFactory.buildDatabasePath(testDefDatabase.name),
+            );
+          }
 
           DatabaseTupleRepository.databaseAccessor =
               await DatabaseRepository().receive(sampleDefDBAddedColumn);
@@ -44,6 +57,19 @@ void main() => group(
           DatabaseFactory.onTest = false;
           DatabaseTupleRepository.databaseAccessor = null;
         });
+
+        test(
+          ": count.",
+          () async {
+            final repository = TestRepository(sampleDefTable);
+
+            final count = await repository.count(
+              condition: Equals(sampleDefPk.name, 1),
+            );
+
+            expect(count, equals(0));
+          },
+        );
 
         test(
           ": ship",

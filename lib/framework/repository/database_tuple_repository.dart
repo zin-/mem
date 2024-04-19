@@ -37,6 +37,20 @@ abstract class DatabaseTupleRepository<E extends EntityV1,
         entity,
       );
 
+  Future<int> count({
+    Condition? condition,
+  }) =>
+      v(
+        () async => await _databaseAccessor!.count(
+          _tableDefinition,
+          where: condition?.where(),
+          whereArgs: condition?.whereArgs(),
+        ),
+        {
+          "condition": condition,
+        },
+      );
+
   Future<List<SavedEntity>> ship({
     Condition? condition,
     List<OrderBy>? orderBy,
