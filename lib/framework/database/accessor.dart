@@ -26,6 +26,25 @@ class DatabaseAccessor {
         ],
       );
 
+  Future<int> count(
+    TableDefinition tableDefinition, {
+    String? where,
+    List<Object?>? whereArgs,
+  }) =>
+      v(
+        () async => (await _nativeDatabase.query(
+          tableDefinition.name,
+          columns: ["COUNT(*)"],
+        ))[0]
+            .values
+            .elementAt(0) as int,
+        {
+          "tableDefinition": tableDefinition,
+          "where": where,
+          "whereArgs": whereArgs,
+        },
+      );
+
   Future<List<Map<String, Object?>>> select(
     TableDefinition tableDefinition, {
     String? where,

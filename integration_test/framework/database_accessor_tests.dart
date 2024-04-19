@@ -97,6 +97,15 @@ void main() => group(
           expect(insertedId, maxPkInsertedId + 1);
         });
 
+        test(
+          ": count.",
+          () async {
+            final count = await databaseAccessor.count(sampleDefTable);
+
+            expect(count, equals(2));
+          },
+        );
+
         group(
           ": select",
           () {
