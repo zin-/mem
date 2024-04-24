@@ -1,12 +1,12 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/acts/act_service.dart';
+import 'package:mem/acts/client.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/components/value_state_notifier.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/logger/log_service.dart';
 
-final _actsService = ActService();
+final _actsClient = ActsClient();
 
 final actsProvider =
     StateNotifierProvider<ListValueStateNotifier<SavedAct>, List<SavedAct>>(
@@ -33,12 +33,12 @@ final actListProvider = StateNotifierProvider.autoDispose
         Future.microtask(() async {
           ref.read(isLoading.notifier).updatedBy(true);
 
-          final latest = await _actsService.fetch(memId, 1);
+          final latest = await _actsClient.fetch(memId, 1);
           final c = ref.read(currentPage);
 
           ListWithTotalPage<SavedAct>? byPage;
           if (c != 1) {
-            byPage = await _actsService.fetch(memId, c);
+            byPage = await _actsClient.fetch(memId, c);
           }
 
           ref.read(isLoading.notifier).updatedBy(false);

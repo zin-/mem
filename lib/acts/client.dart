@@ -5,12 +5,46 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
 import 'package:mem/notifications/client.dart';
 
+class ListWithTotalPage<T> {
+  final List<T> list;
+  final int totalPage;
+
+  ListWithTotalPage(this.list, this.totalPage);
+}
+
 class ActsClient {
   final ActService _actService;
 
   final MemNotificationRepository _memNotificationRepository;
 
   final NotificationClient _notificationClient;
+
+  Future<ListWithTotalPage<SavedAct>> fetch(
+    int? memId,
+    int page,
+  ) =>
+      v(
+        () async {
+          // TODO settingsから持ってきたい https://github.com/zin-/mem/issues/318
+          const limit = 50;
+          final offset = (page - 1) * limit;
+
+          final actListWithTotalCount = await _actService.fetch(
+            memId,
+            offset,
+            limit,
+          );
+
+          return ListWithTotalPage(
+            actListWithTotalCount.list,
+            (actListWithTotalCount.totalCount / limit).ceil(),
+          );
+        },
+        {
+          "memId": memId,
+          "page": page,
+        },
+      );
 
   Future<SavedAct> start(
     int memId,

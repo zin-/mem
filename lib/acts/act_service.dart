@@ -6,26 +6,23 @@ import 'package:mem/logger/log_service.dart';
 
 import 'act_repository.dart';
 
-class ListWithTotalPage<T> {
+class ListWithTotalCount<T> {
   final List<T> list;
-  final int totalPage;
+  final int totalCount;
 
-  ListWithTotalPage(this.list, this.totalPage);
+  ListWithTotalCount(this.list, this.totalCount);
 }
 
 class ActService {
   final ActRepository _actRepository;
 
-  Future<ListWithTotalPage<SavedAct>> fetch(
+  Future<ListWithTotalCount<SavedAct>> fetch(
     int? memId,
-    // FIXME pageはFEの概念なのでServiceに定義されているのはおかしい
-    int page,
+    int offset,
+    int limit,
   ) =>
       v(
         () async {
-          const limit = 50;
-          final offset = (page - 1) * limit;
-
           final acts = await _actRepository.ship(
             memId: memId,
             actOrderBy: ActOrderBy.descStart,
@@ -34,11 +31,12 @@ class ActService {
           );
           final count = await _actRepository.count(memId: memId);
 
-          return ListWithTotalPage(acts, (count / limit).ceil());
+          return ListWithTotalCount(acts, count);
         },
         {
           "memId": memId,
-          "page": page,
+          "offset": offset,
+          "limit": limit,
         },
       );
 
