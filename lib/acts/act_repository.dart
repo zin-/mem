@@ -2,39 +2,65 @@ import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
+import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 
 class ActRepository extends DatabaseTupleRepository<Act, SavedAct, int> {
-  Future<List<SavedAct>> shipByMemId(
-    int memId, {
+  @override
+  Future<int> count({
+    int? memId,
+    Condition? condition,
+  }) =>
+      v(
+        () => super.count(
+          condition: And(
+            [
+              if (memId != null) Equals(defPkId.name, memId),
+              if (condition != null) condition,
+            ],
+          ),
+        ),
+        {
+          "memId": memId,
+          "condition": condition,
+        },
+      );
+
+  @override
+  Future<List<SavedAct>> ship({
+    int? memId,
     DateAndTimePeriod? period,
+    Condition? condition,
     List<OrderBy>? orderBy,
     int? offset,
     int? limit,
   }) =>
       v(
-        () async {
-          if (period == null) {
-            return await ship(
-              condition: Equals(defFkActsMemId.name, memId),
-            );
-          } else {
-            return await ship(
-              condition: And([
-                Equals(defFkActsMemId.name, memId),
+        () => super.ship(
+          condition: And(
+            [
+              if (memId != null) Equals(defFkActsMemId.name, memId),
+              if (period != null)
                 GraterThanOrEqual(defColActsStart, period.start),
-                LessThan(defColActsStart, period.end),
-              ]),
-              orderBy: orderBy,
-              offset: offset,
-              limit: limit,
-            );
-          }
+              if (period != null) LessThan(defColActsStart, period.end),
+              if (condition != null) condition,
+            ],
+          ),
+          orderBy: orderBy,
+          offset: offset,
+          limit: limit,
+        ),
+        {
+          "memId": memId,
+          "period": period,
+          "condition": condition,
+          "orderBy": orderBy,
+          "offset": offset,
+          "limit": limit,
         },
-        {'memId': memId, 'period': period},
       );
 
   Future<List<SavedAct>> shipActive() => v(

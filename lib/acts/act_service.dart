@@ -2,12 +2,49 @@ import 'package:collection/collection.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
+import 'package:mem/databases/table_definitions/acts.dart';
+import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/logger/log_service.dart';
 
 import 'act_repository.dart';
 
+class ListWithTotalPage<T> {
+  final List<T> list;
+  final int totalPage;
+
+  ListWithTotalPage(this.list, this.totalPage);
+}
+
 class ActService {
   final ActRepository _actRepository;
+
+  Future<ListWithTotalPage<SavedAct>> fetch(
+    int? memId,
+    // FIXME pageはFEの概念なのでServiceに定義されているのはおかしい
+    int page,
+  ) =>
+      v(
+        () async {
+          // TODO Serviceにカラム定義が出てくるのはおかしくない？
+          final orderBy = [Descending(defColActsStart)];
+          const limit = 50;
+          final offset = (page - 1) * limit;
+
+          final acts = await _actRepository.ship(
+            memId: memId,
+            orderBy: orderBy,
+            offset: offset,
+            limit: limit,
+          );
+          final count = await _actRepository.count(memId: memId);
+
+          return ListWithTotalPage(acts, (count / limit).ceil());
+        },
+        {
+          "memId": memId,
+          "page": page,
+        },
+      );
 
   Future<SavedAct> start(
     int memId,

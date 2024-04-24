@@ -17,8 +17,8 @@ class ActCounterClient {
         () async => await _actCounterRepository.receive(
           ActCounter(
             await _memRepository.shipById(memId),
-            await _actRepository.shipByMemId(
-              memId,
+            await _actRepository.ship(
+              memId: memId,
               period: ActCounter.period(DateAndTime.now()),
             ),
           ),
@@ -40,8 +40,8 @@ class ActCounterClient {
           await _actCounterRepository.replace(
             ActCounter(
               await _memRepository.shipById(memId),
-              await _actRepository.shipByMemId(
-                memId,
+              await _actRepository.ship(
+                memId: memId,
                 period: ActCounter.period(when),
               ),
             ),

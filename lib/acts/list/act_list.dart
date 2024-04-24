@@ -2,16 +2,14 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
-import 'package:mem/acts/actions.dart';
-import 'package:mem/acts/list/item/builder.dart';
 import 'package:mem/acts/states.dart';
-import 'package:mem/components/async_value_view.dart';
 import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/mem.dart';
 
 import 'app_bar.dart';
+import 'item/builder.dart';
 import 'states.dart';
 import 'sub_header.dart';
 
@@ -27,17 +25,37 @@ class ActList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () => AsyncValueView(
-          loadActList(_memId),
-          (loaded) => _ActList(
+        () {
+          final scrollController = _scrollController;
+          if (scrollController != null && scrollController.hasClients) {
+            if (scrollController.position.maxScrollExtent == 0.0 ||
+                scrollController.position.pixels >
+                    scrollController.position.maxScrollExtent * 0.6) {
+              final c = ref.read(currentPage);
+
+              if (c < ref.read(maxPage)) {
+                Future.microtask(() {
+                  final l = ref.read(isLoading);
+                  if (l) {
+                    ref.watch(isLoading); // coverage:ignore-line
+                  } else {
+                    ref.read(currentPage.notifier).updatedBy(c + 1);
+                    ref.read(isUpdating.notifier).updatedBy(false);
+                  }
+                });
+              }
+            }
+          }
+
+          return _ActList(
             _memId,
             ref.watch(dateViewProvider),
             ref.watch(timeViewProvider),
             ref.watch(actListProvider(_memId)) ?? [],
             (_memId == null ? ref.watch(memListProvider) : []),
             _scrollController,
-          ),
-        ),
+          );
+        },
         {
           "_memId": _memId,
         },
