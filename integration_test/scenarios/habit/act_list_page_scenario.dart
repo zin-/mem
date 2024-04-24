@@ -169,12 +169,9 @@ void main() => group(
 
             group(
               ": many acts",
-              // TODO 仕様が決まってきたらCI上でも実行する
-              // FIXME 実行時間の増加し過ぎるかも、テスト分割を検討したほうが良いかもしれない
-              // skip: true,
               () {
-                const days = 300;
-                const numberOfActsByDate = 100;
+                const days = 30;
+                const numberOfActsByDate = 3;
 
                 setUp(() async {
                   await dbA.delete(defTableActs);
@@ -202,12 +199,38 @@ void main() => group(
                 });
 
                 testWidgets(
-                  ': time.',
+                  ': infinite scroll.',
                   (widgetTester) async {
                     await runApplication();
                     await widgetTester.pumpAndSettle();
                     await widgetTester.tap(find.byIcon(Icons.playlist_play));
                     await widgetTester.pumpAndSettle();
+
+                    final noOnInitialItemFinder = find.text("1/15/0");
+                    final earliestItemFinder = find.text("1/1/0");
+
+                    expect(noOnInitialItemFinder, findsNothing);
+                    expect(earliestItemFinder, findsNothing);
+
+                    final listFinder = find.byType(Scrollable);
+
+                    await widgetTester.scrollUntilVisible(
+                      noOnInitialItemFinder,
+                      500.0,
+                      scrollable: listFinder,
+                    );
+
+                    expect(noOnInitialItemFinder, findsOneWidget);
+                    expect(earliestItemFinder, findsNothing);
+
+                    await widgetTester.scrollUntilVisible(
+                      earliestItemFinder,
+                      500.0,
+                      scrollable: listFinder,
+                    );
+
+                    expect(noOnInitialItemFinder, findsNothing);
+                    expect(earliestItemFinder, findsOneWidget);
                   },
                 );
               },
