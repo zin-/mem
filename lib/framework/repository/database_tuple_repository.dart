@@ -62,7 +62,9 @@ abstract class DatabaseTupleRepository<E extends EntityV1,
           _tableDefinition,
           where: condition?.where(),
           whereArgs: condition?.whereArgs(),
-          orderBy: orderBy?.map((e) => e.toQuery()).join(", "),
+          orderBy: orderBy?.isEmpty != false
+              ? null
+              : orderBy?.map((e) => e.toQuery()).join(", "),
           offset: offset,
           limit: limit,
         ))

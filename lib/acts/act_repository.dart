@@ -8,6 +8,20 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 
+enum ActOrderBy { descStart }
+
+extension _ActOrderByExt on ActOrderBy {
+  OrderBy get toQuery {
+    switch (index) {
+      case 0:
+        return Descending(defColActsStart);
+
+      default:
+        throw Exception(); // coverage:ignore-line
+    }
+  }
+}
+
 class ActRepository extends DatabaseTupleRepository<Act, SavedAct, int> {
   @override
   Future<int> count({
@@ -19,7 +33,7 @@ class ActRepository extends DatabaseTupleRepository<Act, SavedAct, int> {
           condition: And(
             [
               if (memId != null) Equals(defPkId.name, memId),
-              if (condition != null) condition,
+              if (condition != null) condition, // coverage:ignore-line
             ],
           ),
         ),
@@ -33,6 +47,7 @@ class ActRepository extends DatabaseTupleRepository<Act, SavedAct, int> {
   Future<List<SavedAct>> ship({
     int? memId,
     DateAndTimePeriod? period,
+    ActOrderBy? actOrderBy,
     Condition? condition,
     List<OrderBy>? orderBy,
     int? offset,
@@ -49,7 +64,10 @@ class ActRepository extends DatabaseTupleRepository<Act, SavedAct, int> {
               if (condition != null) condition,
             ],
           ),
-          orderBy: orderBy,
+          orderBy: [
+            if (actOrderBy != null) actOrderBy.toQuery,
+            if (orderBy != null) ...orderBy, // coverage:ignore-line
+          ],
           offset: offset,
           limit: limit,
         ),
