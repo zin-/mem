@@ -22,15 +22,19 @@ jobs:
         #   Github actionsの実行時間制限とかが出始めたらやめる
         android-emulator-runner: [ malinskiy, reactivecircus, native ]
         include:
-          - os: macos-latest
-            java-version: 11
+          # - os: macos-latest
+          # FIXME macos-14とreactivecircusでエラーになるため、バージョンを指定している
+          # https://github.com/ReactiveCircus/android-emulator-runner/issues/350
+          - os: macos-12
+            java-version: 17
             experimental: false
+            android-api-level: 33
+            android-arch: x86_64
           - android-emulator-runner: malinskiy
             experimental: true
           - android-emulator-runner: native
             os: ubuntu-latest
             experimental: true
-            java-version: 17
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
@@ -72,9 +76,9 @@ jobs:
             --file-reporter json:reports/test_report.log
             --coverage
             --device-id "emulator-5554"
-          android-api-level: 29
+          android-api-level: ${{ matrix.android-api-level }}
           android-target: default
-          android-arch: x86_64 # FIXME これandroidのarchじゃなくて動かす側のcpu archだ
+          android-arch: ${{ matrix.android-arch }} # FIXME これandroidのarchじゃなくて動かす側のcpu archだ
           experimental: ${{ matrix.experimental }}
         continue-on-error: ${{ matrix.experimental == true }}
 
