@@ -11,7 +11,8 @@ class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
     int memId,
   ) =>
       v(
-        () => super.ship(Equals(defFkMemNotificationsMemId.name, memId)),
+        () => super
+            .ship(condition: Equals(defFkMemNotificationsMemId.name, memId)),
         {
           "memId": memId,
         },

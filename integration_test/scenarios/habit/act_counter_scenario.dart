@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test/integration_test.dart';
+
 import 'package:mem/act_counter/act_counter_repository.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
@@ -11,21 +11,15 @@ import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/main.dart';
 
-import 'helpers.dart';
+import '../helpers.dart';
 
-void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+const _name = "ActCounter test";
 
-  testActCounterConfigure();
-}
-
-const _scenarioName = "ActCounter test";
-
-void testActCounterConfigure() => group(
-      ': $_scenarioName',
+void main() => group(
+      _name,
       () {
-        const insertedMemName = '$_scenarioName: inserted - mem name';
-        const insertedMemName2 = '$_scenarioName: inserted - mem name - 2';
+        const insertedMemName = '$_name: inserted - mem name';
+        const insertedMemName2 = '$_name: inserted - mem name - 2';
         late int insertedMemId;
         late int insertedMemId2;
         late DateTime actPeriod;

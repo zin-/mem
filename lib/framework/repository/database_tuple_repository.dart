@@ -2,6 +2,7 @@ import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
 import 'package:mem/framework/repository/entity.dart';
+import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
@@ -11,8 +12,8 @@ import 'package:mem/framework/repository/condition/conditions.dart';
 //  DatabaseTupleに型情報を付与することでズレは発生しなくなった
 //  ただ、これだと未保存のDatabaseTupleが
 // FIXME SavedEntityはSavedDatabaseTupleをmixinしている必要があるが型制約を定義できていない
-abstract class DatabaseTupleRepository<E extends EntityV1, SavedEntity extends E,
-    Id> implements RepositoryV1<E, SavedEntity> {
+abstract class DatabaseTupleRepository<E extends EntityV1,
+    SavedEntity extends E, Id> implements RepositoryV1<E, SavedEntity> {
   Map<String, dynamic> unpack(E entity);
 
   SavedEntity pack(Map<String, dynamic> tuple);
@@ -36,11 +37,36 @@ abstract class DatabaseTupleRepository<E extends EntityV1, SavedEntity extends E
         entity,
       );
 
-  Future<List<SavedEntity>> ship([Condition? condition]) => v(
+  Future<int> count({
+    Condition? condition,
+  }) =>
+      v(
+        () async => await _databaseAccessor!.count(
+          _tableDefinition,
+          where: condition?.where(),
+          whereArgs: condition?.whereArgs(),
+        ),
+        {
+          "condition": condition,
+        },
+      );
+
+  Future<List<SavedEntity>> ship({
+    Condition? condition,
+    List<OrderBy>? orderBy,
+    int? offset,
+    int? limit,
+  }) =>
+      v(
         () async => (await _databaseAccessor!.select(
           _tableDefinition,
           where: condition?.where(),
           whereArgs: condition?.whereArgs(),
+          orderBy: orderBy?.isEmpty != false
+              ? null
+              : orderBy?.map((e) => e.toQuery()).join(", "),
+          offset: offset,
+          limit: limit,
         ))
             .map((e) => pack(e))
             .toList(),
@@ -164,8 +190,8 @@ abstract class DatabaseTupleRepository<E extends EntityV1, SavedEntity extends E
 
   static DatabaseAccessor? _databaseAccessor;
 
-  static set databaseAccessor(DatabaseAccessor databaseAccessor) =>
-      _databaseAccessor ??= databaseAccessor;
+  static set databaseAccessor(DatabaseAccessor? databaseAccessor) =>
+      _databaseAccessor = databaseAccessor;
 
   final TableDefinition _tableDefinition;
 

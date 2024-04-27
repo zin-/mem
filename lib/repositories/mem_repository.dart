@@ -11,7 +11,7 @@ import 'package:mem/repositories/mem.dart';
 class MemRepository extends DatabaseTupleRepository<Mem, SavedMem, int> {
   Future<List<SavedMem>> shipByCondition(bool? archived, bool? done) => v(
         () => super.ship(
-          And([
+          condition: And([
             archived == null
                 ? null
                 : archived

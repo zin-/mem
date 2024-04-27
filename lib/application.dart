@@ -13,13 +13,19 @@ import 'package:mem/values/dimens.dart';
 import 'package:mem/values/durations.dart';
 
 class MemApplication extends StatelessWidget {
+  final ScrollController scrollController = ScrollController();
+
   final Widget? home;
   final String? languageCode;
 
-  const MemApplication(this.languageCode, {this.home, super.key});
+  MemApplication(
+    this.languageCode, {
+    this.home,
+    super.key,
+  });
 
   @override
-  Widget build(BuildContext context) => i(
+  Widget build(BuildContext context) => v(
         () {
           final l10n = buildL10n(context);
 
@@ -30,7 +36,7 @@ class MemApplication extends StatelessWidget {
               supportedLocales: AppLocalizations.supportedLocales,
               locale: languageCode == null ? null : Locale(languageCode!),
               theme: ThemeData.light(useMaterial3: true),
-              home: home ?? _HomePage(),
+              home: home ?? _HomePage(scrollController),
             ),
           );
         },
@@ -38,7 +44,7 @@ class MemApplication extends StatelessWidget {
 }
 
 class _HomePage extends ScrollControllableWidget {
-  _HomePage() : super(ScrollController());
+  const _HomePage(super.scrollController) : super();
 
   @override
   State<StatefulWidget> createState() => _HomePageState();

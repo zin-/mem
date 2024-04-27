@@ -2,32 +2,87 @@ import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
+import 'package:mem/databases/table_definitions/base.dart';
+import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 
+enum ActOrderBy { descStart }
+
+extension _ActOrderByExt on ActOrderBy {
+  OrderBy get toQuery {
+    switch (index) {
+      case 0:
+        return Descending(defColActsStart);
+
+      default:
+        throw Exception(); // coverage:ignore-line
+    }
+  }
+}
+
 class ActRepository extends DatabaseTupleRepository<Act, SavedAct, int> {
-  Future<List<SavedAct>> shipByMemId(
-    int memId, {
-    DateAndTimePeriod? period,
+  @override
+  Future<int> count({
+    int? memId,
+    Condition? condition,
   }) =>
       v(
-        () async {
-          if (period == null) {
-            return await ship(Equals(defFkActsMemId.name, memId));
-          } else {
-            return await ship(And([
-              Equals(defFkActsMemId.name, memId),
-              GraterThanOrEqual(defColActsStart, period.start),
-              LessThan(defColActsStart, period.end),
-            ]));
-          }
+        () => super.count(
+          condition: And(
+            [
+              if (memId != null) Equals(defPkId.name, memId),
+              if (condition != null) condition, // coverage:ignore-line
+            ],
+          ),
+        ),
+        {
+          "memId": memId,
+          "condition": condition,
         },
-        {'memId': memId, 'period': period},
+      );
+
+  @override
+  Future<List<SavedAct>> ship({
+    int? memId,
+    DateAndTimePeriod? period,
+    ActOrderBy? actOrderBy,
+    Condition? condition,
+    List<OrderBy>? orderBy,
+    int? offset,
+    int? limit,
+  }) =>
+      v(
+        () => super.ship(
+          condition: And(
+            [
+              if (memId != null) Equals(defFkActsMemId.name, memId),
+              if (period != null)
+                GraterThanOrEqual(defColActsStart, period.start),
+              if (period != null) LessThan(defColActsStart, period.end),
+              if (condition != null) condition,
+            ],
+          ),
+          orderBy: [
+            if (actOrderBy != null) actOrderBy.toQuery,
+            if (orderBy != null) ...orderBy, // coverage:ignore-line
+          ],
+          offset: offset,
+          limit: limit,
+        ),
+        {
+          "memId": memId,
+          "period": period,
+          "condition": condition,
+          "orderBy": orderBy,
+          "offset": offset,
+          "limit": limit,
+        },
       );
 
   Future<List<SavedAct>> shipActive() => v(
-        () async => await ship(IsNull(defColActsEnd.name)),
+        () async => await ship(condition: IsNull(defColActsEnd.name)),
       );
 
   Future<List<SavedAct>> shipActiveByMemId(
@@ -35,7 +90,7 @@ class ActRepository extends DatabaseTupleRepository<Act, SavedAct, int> {
   ) =>
       v(
         () async => await ship(
-          And([
+          condition: And([
             Equals(defFkActsMemId.name, memId),
             IsNull(defColActsEnd.name),
           ]),

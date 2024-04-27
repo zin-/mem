@@ -14,7 +14,7 @@ final fetchMemNotifications = Provider.autoDispose
     () => memIds.isEmpty
         ? Future.value([])
         : MemNotificationRepository()
-            .ship(In(defFkMemNotificationsMemId.name, memIds))
+            .ship(condition: In(defFkMemNotificationsMemId.name, memIds))
       ..then(
         (value) => ref.read(memNotificationsProvider.notifier).upsertAll(
               value,

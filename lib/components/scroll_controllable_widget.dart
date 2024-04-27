@@ -4,9 +4,11 @@ import 'package:mem/logger/log_service.dart';
 
 abstract class ScrollControllableWidget extends StatefulWidget {
   final ScrollController scrollController;
+  final double shouldNotifyScrollRatio;
 
   const ScrollControllableWidget(
     this.scrollController, {
+    this.shouldNotifyScrollRatio = 0.8,
     super.key,
   });
 }
@@ -14,6 +16,8 @@ abstract class ScrollControllableWidget extends StatefulWidget {
 mixin ScrollControllableStateMixin<T extends ScrollControllableWidget>
     on State<T> {
   ScrollDirection scrollDirection = ScrollDirection.idle;
+  double pixels = 0.0;
+  double maxScrollExtent = 0.0;
 
   @override
   void initState() => v(
@@ -38,6 +42,16 @@ mixin ScrollControllableStateMixin<T extends ScrollControllableWidget>
             setState(() {
               scrollDirection =
                   widget.scrollController.position.userScrollDirection;
+            });
+          }
+
+          if (widget.scrollController.position.pixels >
+              widget.scrollController.position.maxScrollExtent *
+                  widget.shouldNotifyScrollRatio) {
+            setState(() {
+              pixels = widget.scrollController.position.pixels;
+              maxScrollExtent =
+                  widget.scrollController.position.maxScrollExtent;
             });
           }
         },

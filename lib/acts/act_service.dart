@@ -6,8 +6,39 @@ import 'package:mem/logger/log_service.dart';
 
 import 'act_repository.dart';
 
+class ListWithTotalCount<T> {
+  final List<T> list;
+  final int totalCount;
+
+  ListWithTotalCount(this.list, this.totalCount);
+}
+
 class ActService {
   final ActRepository _actRepository;
+
+  Future<ListWithTotalCount<SavedAct>> fetch(
+    int? memId,
+    int offset,
+    int limit,
+  ) =>
+      v(
+        () async {
+          final acts = await _actRepository.ship(
+            memId: memId,
+            actOrderBy: ActOrderBy.descStart,
+            offset: offset,
+            limit: limit,
+          );
+          final count = await _actRepository.count(memId: memId);
+
+          return ListWithTotalCount(acts, count);
+        },
+        {
+          "memId": memId,
+          "offset": offset,
+          "limit": limit,
+        },
+      );
 
   Future<SavedAct> start(
     int memId,

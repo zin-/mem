@@ -12,9 +12,10 @@ import 'package:mem/framework/repository/database_repository.dart';
 
 // Database(DB) operations
 Future<DatabaseAccessor> openTestDatabase(
-  DatabaseDefinition databaseDefinition,
-) async {
-  DatabaseFactory.onTest = true;
+  DatabaseDefinition databaseDefinition, {
+  bool onTest = true,
+}) async {
+  DatabaseFactory.onTest = onTest;
   return await DatabaseRepository().receive(databaseDefinition);
 }
 
@@ -46,7 +47,8 @@ final searchIconFinder = find.byIcon(Icons.search);
 final closeIconFinder = find.byIcon(Icons.close);
 final filterListIconFinder = find.byIcon(Icons.filter_list);
 final menuButtonIconFinder = find.byIcon(Icons.more_vert);
-
+final startIconFinder = find.byIcon(Icons.play_arrow);
+final stopIconFinder = find.byIcon(Icons.stop);
 final okFinder = find.text('OK');
 final cancelFinder = find.text('Cancel');
 
@@ -104,3 +106,7 @@ void setMockLocalNotifications(WidgetTester widgetTester) =>
         }
       },
     );
+
+extension WidgetTesterExtension on WidgetTester {
+  Text textAt(int index) => widget<Text>(find.byType(Text).at(index));
+}

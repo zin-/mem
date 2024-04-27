@@ -5,12 +5,8 @@ import 'package:mem/logger/log.dart';
 import 'package:mem/logger/log_service.dart';
 
 import 'framework/framework_tests.dart' as framework_tests;
-import 'scenarios/act_counter_scenario.dart';
-import 'scenarios/act_scenario.dart';
 import 'scenarios/edge_scenario.dart';
-import 'scenarios/habit/after_act_started_habit_scenario.dart';
-import 'scenarios/habit/repeat_by_n_day_habit_scenario.dart';
-import 'scenarios/habit/repeated_habit_scenario.dart';
+import 'scenarios/habit/scenarios.dart' as habit_scenarios;
 import 'scenarios/memo/scenarios.dart' as memo_scenarios;
 import 'scenarios/memo_scenario.dart';
 import 'scenarios/notification_scenario.dart';
@@ -31,10 +27,7 @@ void main() {
 
   group('Scenario test', () {
     memo_scenarios.main();
-
-    testRepeatedHabitScenario();
-    testRepeatByNDayHabitScenario();
-    testAfterActStartedHabitScenario();
+    habit_scenarios.main();
 
     testNotificationsScenario();
 
@@ -42,13 +35,9 @@ void main() {
     testTodoScenario();
     testTaskScenario();
 
-    testActScenario();
-
     testSettingsScenario();
 
     testNotificationScenario();
-    testActCounterConfigure();
-
     testEdgeScenario();
   });
 }

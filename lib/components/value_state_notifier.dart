@@ -21,7 +21,18 @@ class ValueStateNotifier<StateT> extends StateNotifier<StateT> {
   }
 
   StateT updatedBy(StateT value) => v(
-        () => state = value,
+        () {
+          state.toString() == value.toString()
+              ? verbose(
+                  "No update. Same value: ${{
+                    "state": state,
+                    "value": value,
+                  }}",
+                )
+              : state = value;
+
+          return state;
+        },
         {'current': state, 'updating': value},
       );
 

@@ -19,59 +19,88 @@ runs:
   using: "composite"
 
   steps:
-    - run: sudo apt update
+    - name: "apt update"
+      run: sudo apt-get update 1> /dev/null
       shell: bash
 
     # TODO cache
     - name: "Install Android SDK"
       shell: bash
-      run: sudo apt install android-sdk
-    # `/usr/lib`以下に配置されたままだと、`android-sdk`の利用に`sudo`が必要なので、移動する
-    - shell: bash
-      run: sudo cp -rf /usr/lib/android-sdk ~/android-sdk
-    - shell: bash
-      run: sudo chown -R $(id -u):$(id -g) ~/android-sdk
-    - shell: bash
-      run: echo "ANDROID_HOME=~/android-sdk" >> $GITHUB_ENV
-    - shell: bash
-      run: echo "${{ env.ANDROID_HOME }}/platform-tools/bin" >> $GITHUB_PATH
-    - shell: bash
-      run: echo "${{ env.ANDROID_HOME }}/tools/bin" >> $GITHUB_PATH
+      run: sudo apt-get install android-sdk 1> /dev/null
 
-    - name: "Install Android SDK Command line tools"
-      shell: bash
-      run: mkdir ~/tmp
     - shell: bash
+      run: echo $HOME
+      continue-on-error: true
+    - shell: bash
+      run: echo ${{ env.HOME }}
+      continue-on-error: true
+    - shell: bash
+      run: echo $ANDROID_SDK_ROOT
+      continue-on-error: true
+
+    #    - shell: bash
+    #      run: ls /usr/lib/android-sdk
+    #      continue-on-error: true
+
+    - shell: bash
+      run: echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> $GITHUB_ENV
+    - name: "Move for executing without `sudo`"
+      shell: bash
+      run: sudo cp -rf /usr/lib/android-sdk ${{ env.ANDROID_SDK_ROOT }}
+    - shell: bash
+      run: sudo chown -R $(id -u):$(id -g) ${{ env.ANDROID_SDK_ROOT }}
+
+    - name: "Make directory for download"
+      shell: bash
+      run: mkdir $HOME/download
+    - name: "Download Android SDK Command line tools"
+      shell: bash
       run: >
         wget
         https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip
-        -P ~/tmp
-    - shell: bash
+        -P $HOME/download
+        -q
+    - name: "Make directory for unzip"
+      shell: bash
+      run: mkdir $HOME/unzip
+    - name: "Unzip Android SDK Command line tools"
+      shell: bash
       run: >
         unzip
-        ~/tmp/commandlinetools-linux-10406996_latest.zip
-        -d ~/tmp
-    - shell: bash
-      run: mkdir ~/android-sdk/cmdline-tools/latest -p
-    - shell: bash
-      run: cp -r ~/tmp/cmdline-tools/* ~/android-sdk/cmdline-tools/latest
-    - shell: bash
-      run: echo "${{ env.ANDROID_HOME }}/cmdline-tools/latest/bin" >> $GITHUB_PATH
-    # `apt install android-sdk`に`debian`と`29.0.3`が含まれており警告が出力されるため
-    # 不要そうな`debian`を削除する
-    - shell: bash
-      run: rm -rf /home/runner/android-sdk/build-tools/debian
+        ~/download/commandlinetools-linux-10406996_latest.zip
+        -d $HOME/unzip
+        1> /dev/null
+    - name: "Make directory for android-sdk"
+      shell: bash
+      run: mkdir $HOME/.android/cmdline-tools/latest -p
+    - name: "Move android-sdk"
+      shell: bash
+      run: cp -r $HOME/unzip/cmdline-tools/* $HOME/.android/cmdline-tools/latest
+    - name: "Add PATH for android-sdk"
+      shell: bash
+      run: echo $HOME/.android/cmdline-tools/latest/bin >> $GITHUB_PATH
+
+    #    # `apt install android-sdk`に`debian`と`29.0.3`が含まれており警告が出力されるため
+    #    # 不要そうな`debian`を削除する
+    #    - shell: bash
+    #      run: rm -rf /home/runner/android-sdk/build-tools/debian
+
+    - name: "set Env REPO_OS_OVERRIDE"
+      shell: bash
+      run: echo "REPO_OS_OVERRIDE=linux" >> $GITHUB_ENV
 
     - name: "Accept Android SDK licenses"
       shell: bash
-      run: yes | sdkmanager --licenses || true
-
-    - run: sdkmanager --list
-      shell: bash
+      # FIXME `1> /dev/null`が動いていない
+      run: yes | sdkmanager --licenses || true 1> /dev/null
 
     - name: "Install system images"
       shell: bash
-      run: sdkmanager --install "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-target }};${{ inputs.android-arch}}"
+      run: >
+        sdkmanager
+        --install
+        "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-target }};${{ inputs.android-arch}}"
+        1> /dev/null
 
     - name: "Create Android Virtual Device"
       shell: bash
@@ -83,23 +112,16 @@ runs:
         --package "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-target }};${{ inputs.android-arch}}"
         --force
 
-    - run: avdmanager list avd
+    - name: "set Env ANDROID_AVD_HOME"
       shell: bash
+      run: echo "ANDROID_AVD_HOME=/home/runner/.config/.android/avd" >> $GITHUB_ENV
 
-    - run: ls $ANDROID_HOME
-      shell: bash
-      continue-on-error: true
-    - run: ls $ANDROID_HOME/emulator
-      shell: bash
-      continue-on-error: true
-
-    - run: $ANDROID_HOME/emulator/emulator -avd emulator-5554 -no-snapshot
+    # TODO
+    - name: "exec avd"
+      run: $HOME/.android/emulator/emulator -avd emulator-5554 -no-snapshot
       #    - run: nohup $ANDROID_HOME/emulator/emulator -avd emulator-5554 -no-snapshot > /dev/null 2>&1
       shell: bash
       continue-on-error: true
-
-    - run: avdmanager --help
-      shell: bash
 
     - run: echo "dev"
       shell: bash
