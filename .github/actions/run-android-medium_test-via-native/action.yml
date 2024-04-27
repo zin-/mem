@@ -19,48 +19,75 @@ runs:
   using: "composite"
 
   steps:
-    - run: sudo apt update
+    - run: sudo apt-get update
       shell: bash
 
     # TODO cache
     - name: "Install Android SDK"
       shell: bash
-      run: sudo apt install android-sdk
-    # `/usr/lib`以下に配置されたままだと、`android-sdk`の利用に`sudo`が必要なので、移動する
+      run: sudo apt-get install android-sdk
     - shell: bash
-      run: sudo cp -rf /usr/lib/android-sdk ~/android-sdk
+      run: ls /usr
     - shell: bash
-      run: sudo chown -R $(id -u):$(id -g) ~/android-sdk
+      run: ls /usr/lib
     - shell: bash
-      run: echo "ANDROID_HOME=~/android-sdk" >> $GITHUB_ENV
-    - shell: bash
-      run: echo "${{ env.ANDROID_HOME }}/platform-tools/bin" >> $GITHUB_PATH
-    - shell: bash
-      run: echo "${{ env.ANDROID_HOME }}/tools/bin" >> $GITHUB_PATH
+      run: ls /usr/lib/android-sdk
 
-    - name: "Install Android SDK Command line tools"
+    #    - name: "Move for executing without `sudo`"
+    #      shell: bash
+    #      run: sudo cp -rf /usr/lib/android-sdk ~/android-sdk
+    #    - shell: bash
+    #      run: sudo chown -R $(id -u):$(id -g) ~/android-sdk
+    #    - shell: bash
+    #      run: echo "ANDROID_HOME=~/android-sdk" >> $GITHUB_ENV
+    #    - shell: bash
+    #      run: echo "${{ env.ANDROID_HOME }}/platform-tools/bin" >> $GITHUB_PATH
+    #    - shell: bash
+    #      run: echo "${{ env.ANDROID_HOME }}/tools/bin" >> $GITHUB_PATH
+
+    - name: "Make directory for download"
       shell: bash
-      run: mkdir ~/tmp
-    - shell: bash
+      run: mkdir ~/download
+    - name: "Download Android SDK Command line tools"
+      shell: bash
       run: >
         wget
         https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip
-        -P ~/tmp
-    - shell: bash
+        -P ~/download
+    - name: "Make directory for unzip"
+      shell: bash
+      run: mkdir ~/unzip
+    - name: "Unzip Android SDK Command line tools"
+      shell: bash
       run: >
         unzip
-        ~/tmp/commandlinetools-linux-10406996_latest.zip
-        -d ~/tmp
-    - shell: bash
+        ~/download/commandlinetools-linux-10406996_latest.zip
+        -d ~/unzip
+    - name: "Make directory for android-sdk"
+      shell: bash
       run: mkdir ~/android-sdk/cmdline-tools/latest -p
+    - name: "Move android-sdk"
+      shell: bash
+      run: cp -r ~/unzip/cmdline-tools/* ~/android-sdk/cmdline-tools/latest
     - shell: bash
-      run: cp -r ~/tmp/cmdline-tools/* ~/android-sdk/cmdline-tools/latest
+      run: ls ~/android-sdk/
     - shell: bash
-      run: echo "${{ env.ANDROID_HOME }}/cmdline-tools/latest/bin" >> $GITHUB_PATH
-    # `apt install android-sdk`に`debian`と`29.0.3`が含まれており警告が出力されるため
-    # 不要そうな`debian`を削除する
+      run: ls ~/android-sdk/cmdline-tools
     - shell: bash
-      run: rm -rf /home/runner/android-sdk/build-tools/debian
+      run: ls ~/android-sdk/cmdline-tools/latest
+    - shell: bash
+      run: ls ~/android-sdk/cmdline-tools/latest/bin
+    - name: "Add PATH for android-sdk"
+      shell: bash
+      run: echo ~/android-sdk/cmdline-tools/latest/bin >> $GITHUB_PATH
+
+    #    # `apt install android-sdk`に`debian`と`29.0.3`が含まれており警告が出力されるため
+    #    # 不要そうな`debian`を削除する
+    #    - shell: bash
+    #      run: rm -rf /home/runner/android-sdk/build-tools/debian
+
+    - shell: bash
+      run: sdkmanager --help
 
     - name: "Accept Android SDK licenses"
       shell: bash
@@ -72,6 +99,9 @@ runs:
     - name: "Install system images"
       shell: bash
       run: sdkmanager --install "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-target }};${{ inputs.android-arch}}"
+
+    - run: avdmanager --help
+      shell: bash
 
     - name: "Create Android Virtual Device"
       shell: bash
@@ -93,13 +123,13 @@ runs:
       shell: bash
       continue-on-error: true
 
+    - run: $ANDROID_HOME/emulator/emulator --help
+      shell: bash
+
     - run: $ANDROID_HOME/emulator/emulator -avd emulator-5554 -no-snapshot
       #    - run: nohup $ANDROID_HOME/emulator/emulator -avd emulator-5554 -no-snapshot > /dev/null 2>&1
       shell: bash
       continue-on-error: true
-
-    - run: avdmanager --help
-      shell: bash
 
     - run: echo "dev"
       shell: bash
