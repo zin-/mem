@@ -19,10 +19,6 @@ const _scenarioName = "Settings test";
 void testSettingsScenario() => group(
       ": $_scenarioName",
       () {
-        setUp(() async {
-          await PreferenceClient().discard(startOfDayKey);
-        });
-
         testWidgets(
           ": show page.",
           (widgetTester) async {
@@ -45,95 +41,107 @@ void testSettingsScenario() => group(
           },
         );
 
-        testWidgets(
-          ": pick start of day.",
-          (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+        group(
+          "Start of day",
+          () {
+            setUp(() async {
+              await PreferenceClient().discard(startOfDayKey);
+            });
 
-            await _openDrawer(widgetTester);
-            await _showPage(widgetTester);
+            testWidgets(
+              "pick start of day.",
+              (widgetTester) async {
+                await runApplication();
+                await widgetTester.pumpAndSettle();
 
-            final now = DateTime.now();
-            await widgetTester.tap(find.text(l10n.startOfDayLabel));
-            await widgetTester.pumpAndSettle();
+                await _openDrawer(widgetTester);
+                await _showPage(widgetTester);
 
-            await widgetTester.tap(okFinder);
-            await widgetTester.pumpAndSettle();
+                final now = DateTime.now();
+                await widgetTester.tap(find.text(l10n.startOfDayLabel));
+                await widgetTester.pumpAndSettle();
 
-            expect(
-              widgetTester
-                  .widget<Text>(find
-                      .descendant(
-                        of: find.byType(SettingsTile),
-                        matching: find.byType(Text),
-                      )
-                      .at(1))
-                  .data,
-              timeText(now),
+                await widgetTester.tap(okFinder);
+                await widgetTester.pumpAndSettle();
+
+                expect(
+                  widgetTester
+                      .widget<Text>(find
+                          .descendant(
+                            of: find.byType(SettingsTile),
+                            matching: find.byType(Text),
+                          )
+                          .at(1))
+                      .data,
+                  timeText(now),
+                );
+                expect(
+                  (await PreferenceClient().shipByKey(startOfDayKey)).value,
+                  TimeOfDay.fromDateTime(now),
+                );
+              },
             );
-            expect(
-              (await PreferenceClient().shipByKey(startOfDayKey)).value,
-              TimeOfDay.fromDateTime(now),
+
+            group(
+              "with saved",
+              () {
+                final now = DateTime.now();
+                setUp(() async {
+                  await PreferenceClient().receive(Preference(
+                    startOfDayKey,
+                    TimeOfDay.fromDateTime(now),
+                  ));
+                });
+
+                testWidgets(
+                  "show saved.",
+                  (widgetTester) async {
+                    await runApplication();
+                    await widgetTester.pumpAndSettle();
+
+                    await _openDrawer(widgetTester);
+                    await _showPage(widgetTester);
+
+                    expect(
+                      widgetTester
+                          .widget<Text>(find
+                              .descendant(
+                                of: find.byType(SettingsTile),
+                                matching: find.byType(Text),
+                              )
+                              .at(1))
+                          .data,
+                      timeText(now),
+                    );
+                  },
+                );
+
+                testWidgets(
+                  "remove.",
+                  (widgetTester) async {
+                    await runApplication();
+                    await widgetTester.pumpAndSettle();
+
+                    await _openDrawer(widgetTester);
+                    await _showPage(widgetTester);
+
+                    await widgetTester.tap(find.text(l10n.startOfDayLabel));
+                    await widgetTester.pumpAndSettle();
+
+                    await widgetTester.tap(cancelFinder);
+                    await widgetTester.pumpAndSettle();
+
+                    expect(find.text(timeText(now)), findsNothing);
+                    expect(
+                      (await PreferenceClient().shipByKey(startOfDayKey)).value,
+                      null,
+                    );
+                  },
+                );
+              },
             );
           },
         );
-
-        group(": with saved", () {
-          final now = DateTime.now();
-          setUp(() async {
-            await PreferenceClient().receive(Preference(
-              startOfDayKey,
-              TimeOfDay.fromDateTime(now),
-            ));
-          });
-
-          testWidgets(
-            ": show saved.",
-            (widgetTester) async {
-              await runApplication();
-              await widgetTester.pumpAndSettle();
-
-              await _openDrawer(widgetTester);
-              await _showPage(widgetTester);
-
-              expect(
-                widgetTester
-                    .widget<Text>(find
-                        .descendant(
-                          of: find.byType(SettingsTile),
-                          matching: find.byType(Text),
-                        )
-                        .at(1))
-                    .data,
-                timeText(now),
-              );
-            },
-          );
-
-          testWidgets(
-            ": remove.",
-            (widgetTester) async {
-              await runApplication();
-              await widgetTester.pumpAndSettle();
-
-              await _openDrawer(widgetTester);
-              await _showPage(widgetTester);
-
-              await widgetTester.tap(find.text(l10n.startOfDayLabel));
-              await widgetTester.pumpAndSettle();
-
-              await widgetTester.tap(cancelFinder);
-              await widgetTester.pumpAndSettle();
-
-              expect(find.text(timeText(now)), findsNothing);
-              expect(
-                (await PreferenceClient().shipByKey(startOfDayKey)).value,
-                null,
-              );
-            },
-          );
-        });
       },
     );
 
