@@ -63,7 +63,11 @@ class _SettingsPage extends StatelessWidget {
                         value: _startOfDay == null
                             ? null
                             : Text(_startOfDay!.format(context)),
-                      )
+                      ),
+                      SettingsTile.navigation(
+                        leading: const Icon(Icons.backup),
+                        title: Text(l10n.backupLabel),
+                      ),
                     ],
                   )
                 ],

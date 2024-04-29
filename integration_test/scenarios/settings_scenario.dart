@@ -38,7 +38,10 @@ void testSettingsScenario() => group(
             await widgetTester.pumpAndSettle();
 
             expect(find.text(l10n.settingsPageTitle), findsOneWidget);
+            expect(find.byIcon(Icons.start), findsOneWidget);
             expect(find.text(l10n.startOfDayLabel), findsOneWidget);
+            expect(find.byIcon(Icons.backup), findsOneWidget);
+            expect(find.text(l10n.backupLabel), findsOneWidget);
           },
         );
 

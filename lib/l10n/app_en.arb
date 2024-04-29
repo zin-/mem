@@ -66,6 +66,7 @@
   "startLabel": "Start",
 
   "startOfDayLabel": "Start of day",
+  "backupLabel": "Backup",
 
   "reminderName": "Reminder",
   "reminderDescription": "To remind at specific time.",
