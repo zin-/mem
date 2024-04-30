@@ -110,9 +110,8 @@ class LogService {
         onError: (error, stackTrace) => _errorLog(error, stackTrace),
       );
     } else {
-      target.then(
-        (value) {},
-        onError: (error, stackTrace) => _errorLog(error, stackTrace),
+      target.onError(
+        (error, stackTrace) => _errorLog(error, stackTrace),
       );
     }
   }
