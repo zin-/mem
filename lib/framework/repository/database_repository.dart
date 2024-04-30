@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/definition/database_definition.dart';
 import 'package:mem/framework/database/factory.dart';
@@ -24,6 +26,19 @@ class DatabaseRepository extends Repository<DatabaseDefinition>
             }(),
         {
           "entity": entity,
+        },
+      );
+
+  Future<File?> shipFileByNameIs(String name) => v(
+        () async {
+          final databaseFile = File(
+            await DatabaseFactory.buildDatabasePath(name),
+          );
+
+          return await databaseFile.exists() ? databaseFile : null;
+        },
+        {
+          "name": name,
         },
       );
 }
