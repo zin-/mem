@@ -2,7 +2,7 @@ import 'package:mem/framework/database/definition/exceptions.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
 import 'package:mem/framework/repository/entity.dart';
 
-class DatabaseDefinition extends EntityV1 {
+class DatabaseDefinition extends Entity {
   final String name;
   final int version;
   final List<TableDefinition> tableDefinitions;
@@ -22,10 +22,9 @@ class DatabaseDefinition extends EntityV1 {
   }
 
   @override
-  String toString() => 'DatabaseDefinition'
-      ' : {'
-      ' name: $name,'
-      ' version: $version,'
-      ' tableDefinitions: ${tableDefinitions.map((e) => e.toString())}'
-      ' }';
+  String toString() => "${super.toString()}: ${{
+        "name": name,
+        "version": version,
+        "tableDefinitions": tableDefinitions.map((e) => e.toString())
+      }}";
 }
