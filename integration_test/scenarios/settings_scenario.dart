@@ -142,6 +142,34 @@ void testSettingsScenario() => group(
             );
           },
         );
+
+        group(
+          "Backup",
+          () {
+            testWidgets(
+              "create.",
+              (widgetTester) async {
+                await runApplication();
+                await widgetTester.pumpAndSettle();
+
+                await _openDrawer(widgetTester);
+                await _showPage(widgetTester);
+
+                await widgetTester.tap(find.text(l10n.backupLabel));
+                await widgetTester.pump();
+
+                expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+                await widgetTester
+                    .pumpAndSettle(const Duration(milliseconds: 1500));
+
+                expect(find.byType(CircularProgressIndicator), findsNothing);
+
+                // fail("dev");
+              },
+            );
+          },
+        );
       },
     );
 

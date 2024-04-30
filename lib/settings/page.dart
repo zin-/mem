@@ -67,6 +67,27 @@ class _SettingsPage extends StatelessWidget {
                       SettingsTile.navigation(
                         leading: const Icon(Icons.backup),
                         title: Text(l10n.backupLabel),
+                        onPressed: (context) => v(
+                          () {
+                            Future.delayed(
+                              const Duration(milliseconds: 1000),
+                            ).whenComplete(
+                              () => v(
+                                () => Navigator.of(context).pop(),
+                              ),
+                            );
+
+                            showGeneralDialog(
+                              context: context,
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) {
+                                return const Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              },
+                            );
+                          },
+                        ),
                       ),
                     ],
                   )
