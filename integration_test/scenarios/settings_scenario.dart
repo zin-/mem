@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test/integration_test.dart';
+import 'package:mem/databases/definition.dart';
 import 'package:mem/settings/client.dart';
 import 'package:mem/settings/preference.dart';
 import 'package:mem/settings/keys.dart';
@@ -8,17 +8,15 @@ import 'package:settings_ui/settings_ui.dart';
 
 import 'helpers.dart';
 
-void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
-  testSettingsScenario();
-}
-
 const _scenarioName = "Settings test";
 
-void testSettingsScenario() => group(
+void main() => group(
       ": $_scenarioName",
       () {
+        setUpAll(() async {
+          await openTestDatabase(databaseDefinition);
+        });
+
         testWidgets(
           ": show page.",
           (widgetTester) async {
