@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/settings/actions.dart';
+import 'package:mem/settings/backup_client.dart';
 import 'package:mem/settings/keys.dart';
 import 'package:mem/settings/states.dart';
 import 'package:settings_ui/settings_ui.dart';
@@ -69,22 +70,34 @@ class _SettingsPage extends StatelessWidget {
                         title: Text(l10n.backupLabel),
                         onPressed: (context) => v(
                           () {
-                            Future.delayed(
-                              const Duration(milliseconds: 1000),
-                            ).whenComplete(
-                              () => v(
-                                () => Navigator.of(context).pop(),
-                              ),
-                            );
+                            BackupClient()
+                                .createBackup()
+                                .whenComplete(
+                                  () => v(
+                                    () => Navigator.of(context).pop(),
+                                  ),
+                                )
+                                .then(
+                                  (result) => v(
+                                    () => ScaffoldMessenger.of(context)
+                                        .showSnackBar(
+                                      SnackBar(
+                                        content: Text(result.toString()),
+                                      ),
+                                    ),
+                                    {
+                                      "result": result,
+                                    },
+                                  ),
+                                );
 
                             showGeneralDialog(
                               context: context,
                               pageBuilder:
-                                  (context, animation, secondaryAnimation) {
-                                return const Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              },
+                                  (context, animation, secondaryAnimation) =>
+                                      const Center(
+                                child: CircularProgressIndicator(),
+                              ),
                             );
                           },
                         ),

@@ -1,9 +1,13 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/settings/client.dart';
 import 'package:mem/settings/preference.dart';
 import 'package:mem/settings/keys.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 import 'helpers.dart';
@@ -147,6 +151,29 @@ void main() => group(
             testWidgets(
               "create.",
               (widgetTester) async {
+                String? result;
+                switch (defaultTargetPlatform) {
+                  case TargetPlatform.android:
+                    widgetTester.binding.defaultBinaryMessenger
+                        .setMockMethodCallHandler(
+                      const MethodChannel("dev.fluttercommunity.plus/share"),
+                      (message) async {
+                        await Future.delayed(const Duration(milliseconds: 500));
+                        expect(message.method, equals("shareFilesWithResult"));
+                        return result = "Success.";
+                      },
+                    );
+                    break;
+
+                  case TargetPlatform.windows:
+                    final downloadsDirectory = await getDownloadsDirectory();
+                    result = path.join(downloadsDirectory!.path, "test_mem.db");
+                    break;
+
+                  default:
+                    throw UnimplementedError();
+                }
+
                 await runApplication();
                 await widgetTester.pumpAndSettle();
 
@@ -156,14 +183,13 @@ void main() => group(
                 await widgetTester.tap(find.text(l10n.backupLabel));
                 await widgetTester.pump();
 
-                expect(find.byType(CircularProgressIndicator), findsOneWidget);
+                // expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
                 await widgetTester
                     .pumpAndSettle(const Duration(milliseconds: 1500));
 
                 expect(find.byType(CircularProgressIndicator), findsNothing);
-
-                // fail("dev");
+                expect(find.text(result!), findsOneWidget);
               },
             );
           },
