@@ -66,6 +66,7 @@
   "startLabel": "開始",
 
   "startOfDayLabel": "1日の開始時間",
+  "backupLabel": "Backup",
 
   "reminderName": "Reminder",
   "reminderDescription": "To remind at specific time.",

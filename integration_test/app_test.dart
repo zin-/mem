@@ -11,7 +11,7 @@ import 'scenarios/memo/scenarios.dart' as memo_scenarios;
 import 'scenarios/memo_scenario.dart';
 import 'scenarios/notification_scenario.dart';
 import 'scenarios/notifications_scenario.dart';
-import 'scenarios/settings_scenario.dart';
+import 'scenarios/settings_scenario.dart' as settings_scenario;
 import 'scenarios/task_scenario.dart';
 import 'scenarios/todo_scenario.dart';
 
@@ -35,7 +35,7 @@ void main() {
     testTodoScenario();
     testTaskScenario();
 
-    testSettingsScenario();
+    settings_scenario.main();
 
     testNotificationScenario();
     testEdgeScenario();

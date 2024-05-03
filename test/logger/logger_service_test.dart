@@ -330,32 +330,41 @@ void main() {
             );
           });
 
-          test(
-            ": on error.",
-            () async {
-              const level = Level.info;
-              const errorMessage = "test message future";
-              final e = Exception(errorMessage);
+          for (final testCase in [
+            TestCase("verbose", Level.verbose, (input) {
+              verifyNever(mockedLoggerWrapper.log(any, any, any, any));
+            }),
+            TestCase("info", Level.info, (input) {
+              verifyNever(mockedLoggerWrapper.log(any, any, any, any));
+            }),
+          ]) {
+            test(
+              ": on error: ${testCase.name}.",
+              () async {
+                final level = testCase.input;
+                const errorMessage = "test message future";
+                final e = Exception(errorMessage);
 
-              expect(
-                () => LogService().valueLog(level, Future.error(e)),
-                throwsA((thrown) {
-                  expect(thrown, isA<Exception>());
-                  expect(thrown.message, errorMessage);
-                  return true;
-                }),
-              );
+                expect(
+                  () => LogService().valueLog(level, Future.error(e)),
+                  throwsA((thrown) {
+                    expect(thrown, isA<Exception>());
+                    expect(thrown.message, errorMessage);
+                    return true;
+                  }),
+                );
 
-              await Future(() async {
-                verify(mockedLoggerWrapper.log(
-                  Level.error,
-                  "[error] !!",
-                  e,
-                  any,
-                )).called(1);
-              });
-            },
-          );
+                await Future(() async {
+                  verify(mockedLoggerWrapper.log(
+                    Level.error,
+                    "[error] !!",
+                    e,
+                    any,
+                  )).called(1);
+                });
+              },
+            );
+          }
         },
       );
     });

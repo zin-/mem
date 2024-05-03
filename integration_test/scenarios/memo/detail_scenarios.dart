@@ -99,14 +99,21 @@ void main() => group(
                 const enteringMemName = "$saveMemName: create - entering";
                 const enteringMemMemo = "$saveMemMemo: create - entering";
                 await widgetTester.enterText(
-                    find.byKey(keyMemName), enteringMemName);
+                  find.byKey(keyMemName),
+                  enteringMemName,
+                );
                 await widgetTester.enterText(
-                    find.byKey(keyMemMemo), enteringMemMemo);
+                  find.byKey(keyMemMemo),
+                  enteringMemMemo,
+                );
                 await widgetTester.tap(find.byKey(keySaveMemFab));
-                await widgetTester.pumpAndSettle();
+                await widgetTester.pump();
 
-                expect(find.text(l10n.saveMemSuccessMessage(enteringMemName)),
-                    findsOneWidget);
+                expect(
+                  find.text(l10n.saveMemSuccessMessage(enteringMemName)),
+                  findsOneWidget,
+                );
+
                 final getCreatedMem =
                     Equals(defColMemsName.name, enteringMemName);
                 final mems = await dbA.select(defTableMems,

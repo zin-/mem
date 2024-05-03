@@ -7,7 +7,7 @@ import 'package:mem/logger/log_service.dart';
 const height = 250.0;
 
 class MemListFilter extends StatelessWidget {
-  const MemListFilter({Key? key}) : super(key: key);
+  const MemListFilter({super.key});
 
   @override
   Widget build(BuildContext context) => i(

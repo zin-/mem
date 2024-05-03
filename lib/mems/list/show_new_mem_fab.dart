@@ -8,9 +8,9 @@ import 'package:mem/values/durations.dart';
 
 class ShowNewMemFab extends ScrollControllableWidget {
   const ShowNewMemFab(
-    ScrollController scrollController, {
-    Key? key,
-  }) : super(scrollController, key: key);
+    super.scrollController, {
+    super.key,
+  });
 
   @override
   State<ShowNewMemFab> createState() => _ShowNewMemFabState();
