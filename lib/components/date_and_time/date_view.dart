@@ -48,10 +48,9 @@ class DateTextFormField extends StatelessWidget {
     this.onChanged, {
     DateTime? firstDate,
     DateTime? lastDate,
-    Key? key,
+    super.key,
   })  : _firstDate = firstDate,
-        _lastDate = lastDate,
-        super(key: key);
+        _lastDate = lastDate;
 
   @override
   Widget build(BuildContext context) => v(

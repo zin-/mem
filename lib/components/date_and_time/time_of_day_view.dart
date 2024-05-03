@@ -26,9 +26,9 @@ class TimeOfDayTextFormField extends StatelessWidget {
   const TimeOfDayTextFormField({
     required this.timeOfDay,
     required this.onChanged,
-    Key? key,
     this.icon,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) => v(

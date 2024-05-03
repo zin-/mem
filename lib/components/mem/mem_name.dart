@@ -13,7 +13,7 @@ String _memNameTag(int? memId) => heroTag('mem-name', memId);
 class MemNameText extends StatelessWidget {
   final SavedMem _mem;
 
-  const MemNameText(this._mem, {Key? key}) : super(key: key);
+  const MemNameText(this._mem, {super.key});
 
   @override
   Widget build(BuildContext context) => v(

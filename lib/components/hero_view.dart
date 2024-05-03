@@ -5,7 +5,11 @@ class HeroView extends StatelessWidget {
   final String _tag;
   final Widget _child;
 
-  const HeroView(this._tag, this._child, {Key? key}) : super(key: key);
+  const HeroView(
+    this._tag,
+    this._child, {
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) => v(
