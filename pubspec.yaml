@@ -17,6 +17,7 @@ dependencies:
   # for View
   intl: any
   flutter_picker: ^2.1.0
+  flutter_sticky_header: ^0.6.5
 
   ## for SettingsPage
   settings_ui: ^2.0.2
@@ -24,9 +25,13 @@ dependencies:
   ## for View state management
   flutter_riverpod:
 
+  ## for Chart
+  fl_chart: ^0.67.0
+
   # for Notification
   flutter_local_notifications:
   timezone:
+  android_alarm_manager_plus: ^3.0.4
 
   # for Persistence
   ## for Database
@@ -51,9 +56,6 @@ dependencies:
   # for Home widgets
   home_widget: ^0.2.0+1
   workmanager: ^0.5.1
-  fl_chart: ^0.63.0
-  flutter_sticky_header: ^0.6.5
-  android_alarm_manager_plus: ^3.0.4
 
 dev_dependencies:
   # for Test mock
