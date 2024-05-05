@@ -57,6 +57,7 @@ class _SettingsPage extends StatelessWidget {
                         _onStartOfDayChanged,
                       ),
                       _buildBackup(l10n.backupLabel),
+                      _buildResetNotification(l10n.resetNotificationLabel),
                     ],
                   )
                 ],
@@ -125,4 +126,12 @@ SettingsTile _buildBackup(
           );
         },
       ),
+    );
+
+SettingsTile _buildResetNotification(
+  String title,
+) =>
+    SettingsTile.navigation(
+      leading: const Icon(Icons.notifications),
+      title: Text(title),
     );

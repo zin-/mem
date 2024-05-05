@@ -40,6 +40,8 @@ void main() => group(
             expect(find.text(l10n.startOfDayLabel), findsOneWidget);
             expect(find.byIcon(Icons.backup), findsOneWidget);
             expect(find.text(l10n.backupLabel), findsOneWidget);
+            expect(find.byIcon(Icons.backup), findsOneWidget);
+            expect(find.text(l10n.resetNotificationLabel), findsOneWidget);
           },
         );
 
