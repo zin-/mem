@@ -50,58 +50,13 @@ class _SettingsPage extends StatelessWidget {
                 sections: [
                   SettingsSection(
                     tiles: [
-                      SettingsTile.navigation(
-                        leading: const Icon(Icons.start),
-                        title: Text(l10n.startOfDayLabel),
-                        onPressed: (context) => v(
-                          () async => _onStartOfDayChanged(
-                            await showTimePicker(
-                              context: context,
-                              initialTime: _startOfDay ?? TimeOfDay.now(),
-                            ),
-                          ),
-                        ),
-                        value: _startOfDay == null
-                            ? null
-                            : Text(_startOfDay!.format(context)),
+                      _buildStartOfDay(
+                        context,
+                        l10n.startOfDayLabel,
+                        _startOfDay,
+                        _onStartOfDayChanged,
                       ),
-                      SettingsTile.navigation(
-                        leading: const Icon(Icons.backup),
-                        title: Text(l10n.backupLabel),
-                        onPressed: (context) => v(
-                          () {
-                            BackupClient()
-                                .createBackup()
-                                .whenComplete(
-                                  () => v(
-                                    () => Navigator.of(context).pop(),
-                                  ),
-                                )
-                                .then(
-                                  (result) => v(
-                                    () => ScaffoldMessenger.of(context)
-                                        .showSnackBar(
-                                      SnackBar(
-                                        content: Text(result.toString()),
-                                      ),
-                                    ),
-                                    {
-                                      "result": result,
-                                    },
-                                  ),
-                                );
-
-                            showGeneralDialog(
-                              context: context,
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) =>
-                                      const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
+                      _buildBackup(l10n.backupLabel),
                     ],
                   )
                 ],
@@ -112,3 +67,62 @@ class _SettingsPage extends StatelessWidget {
         {"_startOfDay": _startOfDay},
       );
 }
+
+SettingsTile _buildStartOfDay(
+  BuildContext context,
+  String title,
+  TimeOfDay? startOfDay,
+  void Function(TimeOfDay? changed) onChanged,
+) =>
+    SettingsTile.navigation(
+      leading: const Icon(Icons.start),
+      title: Text(title),
+      onPressed: (context) => v(
+        () async => onChanged(
+          await showTimePicker(
+            context: context,
+            initialTime: startOfDay ?? TimeOfDay.now(),
+          ),
+        ),
+      ),
+      value: startOfDay == null ? null : Text(startOfDay.format(context)),
+    );
+
+SettingsTile _buildBackup(
+  String title,
+) =>
+    SettingsTile.navigation(
+      leading: const Icon(Icons.backup),
+      title: Text(title),
+      onPressed: (context) => v(
+        () {
+          BackupClient()
+              .createBackup()
+              .whenComplete(
+                () => v(
+                  () => Navigator.of(context).pop(),
+                ),
+              )
+              .then(
+                (result) => v(
+                  () => ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(result.toString()),
+                    ),
+                  ),
+                  {
+                    "result": result,
+                  },
+                ),
+              );
+
+          showGeneralDialog(
+            context: context,
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                const Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        },
+      ),
+    );
