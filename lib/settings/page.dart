@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/notifications/client.dart';
 import 'package:mem/settings/actions.dart';
 import 'package:mem/settings/backup_client.dart';
 import 'package:mem/settings/keys.dart';
@@ -134,4 +135,30 @@ SettingsTile _buildResetNotification(
     SettingsTile.navigation(
       leading: const Icon(Icons.notifications),
       title: Text(title),
+      onPressed: (context) => v(
+        () {
+          NotificationClient(context).resetAll().whenComplete(
+                () => v(
+                  () {
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          buildL10n(context).completeResetNotification,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+
+          showGeneralDialog(
+            context: context,
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                const Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        },
+      ),
     );

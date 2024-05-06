@@ -1,12 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:mem/framework/repository/key_with_value_repository.dart';
+import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/logger/log_service.dart';
 
 import 'icons.dart';
 import 'notification/notification.dart';
 import 'wrapper.dart';
 
-class NotificationRepository extends KeyWithValueRepository<Notification, int> {
+class NotificationRepository extends KeyWithValueRepository<Notification, int>
+    with Discarder {
   late final NotificationsWrapper? _flutterLocalNotificationsWrapper =
       defaultTargetPlatform == TargetPlatform.android
           ? NotificationsWrapper(androidDefaultIconPath)
@@ -55,5 +57,10 @@ class NotificationRepository extends KeyWithValueRepository<Notification, int> {
         {
           "key": key,
         },
+      );
+
+  @override
+  Future<void> discardAll() => v(
+        () async => _flutterLocalNotificationsWrapper?.cancelAll(),
       );
 }

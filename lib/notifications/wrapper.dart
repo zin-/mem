@@ -48,6 +48,10 @@ class NotificationsWrapper {
         {'notificationId': notificationId},
       );
 
+  Future<void> cancelAll() => v(
+        () async => await _flutterLocalNotificationsPlugin.cancelAll(),
+      );
+
   NotificationDetails _buildNotificationDetails(
     NotificationChannel channel,
   ) =>
