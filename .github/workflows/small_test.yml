@@ -28,6 +28,9 @@ jobs:
       - name: "Install Dependencies"
         uses: ./.github/actions/install-dependencies
 
+      - name: "Generate l10n"
+        uses: ./.github/actions/generate-l10n
+
       - name: "Generate Mocks"
         uses: ./.github/actions/build-mocks
 
