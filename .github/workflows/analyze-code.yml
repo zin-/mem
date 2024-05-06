@@ -27,7 +27,8 @@ jobs:
       - name: "Analyze Application code"
         run: flutter analyze lib
 
-      - name: "Generate Mocks"
+      - name: "Build Mocks"
         uses: ./.github/actions/build-mocks
+
       - name: "Analyze Test code"
         run: flutter analyze test integration_test
