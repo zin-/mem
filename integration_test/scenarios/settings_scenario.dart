@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/databases/definition.dart';
+import 'package:mem/databases/table_definitions/base.dart';
+import 'package:mem/databases/table_definitions/mems.dart';
+import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/settings/client.dart';
 import 'package:mem/settings/preference.dart';
 import 'package:mem/settings/keys.dart';
@@ -17,8 +20,27 @@ const _scenarioName = "Settings test";
 void main() => group(
       ": $_scenarioName",
       () {
+        const numberOfMem = 1000;
+        const insertedMemName = '$_scenarioName: inserted - mem name';
+
+        late final DatabaseAccessor dbA;
+
         setUpAll(() async {
-          await openTestDatabase(databaseDefinition);
+          dbA = await openTestDatabase(databaseDefinition);
+        });
+
+        setUp(() async {
+          await clearAllTestDatabaseRows(databaseDefinition);
+
+          for (var i = 0; i < numberOfMem; i++) {
+            await dbA.insert(
+              defTableMems,
+              {
+                defColMemsName.name: "$insertedMemName: $i",
+                defColCreatedAt.name: zeroDate,
+              },
+            );
+          }
         });
 
         testWidgets(
@@ -40,6 +62,8 @@ void main() => group(
             expect(find.text(l10n.startOfDayLabel), findsOneWidget);
             expect(find.byIcon(Icons.backup), findsOneWidget);
             expect(find.text(l10n.backupLabel), findsOneWidget);
+            expect(find.byIcon(Icons.backup), findsOneWidget);
+            expect(find.text(l10n.resetNotificationLabel), findsOneWidget);
           },
         );
 
@@ -183,7 +207,7 @@ void main() => group(
                 await widgetTester.tap(find.text(l10n.backupLabel));
                 await widgetTester.pump();
 
-                // expect(find.byType(CircularProgressIndicator), findsOneWidget);
+                expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
                 await widgetTester
                     .pumpAndSettle(const Duration(milliseconds: 1500));
@@ -192,6 +216,28 @@ void main() => group(
                 expect(find.text(result!), findsOneWidget);
               },
             );
+          },
+        );
+
+        testWidgets(
+          "Reset Notification",
+          (widgetTester) async {
+            await runApplication();
+            await widgetTester.pumpAndSettle();
+
+            await _openDrawer(widgetTester);
+            await _showPage(widgetTester);
+
+            await widgetTester.tap(find.text(l10n.resetNotificationLabel));
+            await widgetTester.pump();
+
+            expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+            await widgetTester
+                .pumpAndSettle(const Duration(milliseconds: 1000));
+
+            expect(find.byType(CircularProgressIndicator), findsNothing);
+            expect(find.text(l10n.completeResetNotification), findsOneWidget);
           },
         );
       },

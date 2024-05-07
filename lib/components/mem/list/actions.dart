@@ -18,9 +18,9 @@ final loadMemList = FutureProvider(
       final showDone = ref.watch(showDoneProvider);
 
       final mems = await v(
-        () => MemRepository().shipByCondition(
-          showNotArchived == showArchived ? null : showArchived,
-          showNotDone == showDone ? null : showDone,
+        () => MemRepository().ship(
+          archived: showNotArchived == showArchived ? null : showArchived,
+          done: showNotDone == showDone ? null : showDone,
         ),
         {
           'showNotArchived': showNotArchived,

@@ -3,30 +3,46 @@ import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
+import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/repositories/mem.dart';
 
 class MemRepository extends DatabaseTupleRepository<Mem, SavedMem, int> {
-  Future<List<SavedMem>> shipByCondition(bool? archived, bool? done) => v(
+  @override
+  Future<List<SavedMem>> ship({
+    bool? archived,
+    bool? done,
+    Condition? condition,
+    List<OrderBy>? orderBy,
+    int? offset,
+    int? limit,
+  }) =>
+      v(
         () => super.ship(
           condition: And([
-            archived == null
-                ? null
-                : archived
-                    ? IsNotNull(defColArchivedAt.name)
-                    : IsNull(defColArchivedAt.name),
-            done == null
-                ? null
-                : done
-                    ? IsNotNull(defColMemsDoneAt.name)
-                    : IsNull(defColMemsDoneAt.name),
-          ].whereType<Condition>()),
+            if (archived != null)
+              archived
+                  ? IsNotNull(defColArchivedAt.name)
+                  : IsNull(defColArchivedAt.name),
+            if (done != null)
+              done
+                  ? IsNotNull(defColMemsDoneAt.name)
+                  : IsNull(defColMemsDoneAt.name),
+            if (condition != null) condition, // coverage:ignore-line
+          ]),
+          orderBy: orderBy,
+          offset: offset,
+          limit: limit,
         ),
         {
-          'archived': archived,
-          'done': done,
+          "archived": archived,
+          "done": done,
+          "condition": condition,
+          "orderBy": orderBy,
+          "offset": offset,
+          "limit": limit,
         },
       );
 

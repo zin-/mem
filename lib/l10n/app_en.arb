@@ -67,6 +67,8 @@
 
   "startOfDayLabel": "Start of day",
   "backupLabel": "Backup",
+  "resetNotificationLabel": "Reset Notification",
+  "completeResetNotification": "Complete Reset Notification",
 
   "reminderName": "Reminder",
   "reminderDescription": "To remind at specific time.",

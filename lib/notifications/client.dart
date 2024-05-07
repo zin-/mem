@@ -6,6 +6,8 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
+import 'package:mem/repositories/mem_notification_repository.dart';
+import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/settings/client.dart';
 import 'package:mem/settings/keys.dart';
 import 'package:mem/values/constants.dart';
@@ -24,12 +26,16 @@ class NotificationClient {
   final ScheduleClient _scheduleClient;
   final NotificationRepository _notificationRepository;
   final PreferenceClient _preferenceClient;
+  final MemRepository _memRepository;
+  final MemNotificationRepository _memNotificationRepository;
 
   NotificationClient._(
     this.notificationChannels,
     this._scheduleClient,
     this._notificationRepository,
     this._preferenceClient,
+    this._memRepository,
+    this._memNotificationRepository,
   );
 
   static NotificationClient? _instance;
@@ -42,6 +48,8 @@ class NotificationClient {
             ScheduleClient(),
             NotificationRepository(),
             PreferenceClient(),
+            MemRepository(),
+            MemNotificationRepository(),
           );
         },
         {
@@ -168,6 +176,24 @@ class NotificationClient {
         },
         {
           "memId": memId,
+        },
+      );
+
+  Future<void> resetAll() => v(
+        () async {
+          await _notificationRepository.discardAll();
+
+          final allMems = await _memRepository.ship(
+            archived: false,
+            done: false,
+          );
+
+          for (final mem in allMems) {
+            final memNotifications =
+                await _memNotificationRepository.shipByMemId(mem.id);
+
+            await registerMemNotifications(mem, memNotifications);
+          }
         },
       );
 }

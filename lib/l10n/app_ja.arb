@@ -67,6 +67,8 @@
 
   "startOfDayLabel": "1日の開始時間",
   "backupLabel": "Backup",
+  "resetNotificationLabel": "Reset Notification",
+  "completeResetNotification": "Complete Reset Notification",
 
   "reminderName": "Reminder",
   "reminderDescription": "To remind at specific time.",

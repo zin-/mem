@@ -25,6 +25,12 @@ mixin Receiver<E extends Entity, Result> on Repository<E> {
   Future<Result> receive(E entity);
 }
 
+// FIXME 型指定は不要なはずなので、おかしい？（間違っている気がする
+//  というか、mixinの利用自体がなんか変なので辞めたほうが良いかも
+mixin Discarder<E extends Entity> on Repository<E> {
+  Future<void> discardAll();
+}
+
 abstract class RepositoryV1<E extends EntityV1, Result> {
   Future<Result> receive(E entity);
 }

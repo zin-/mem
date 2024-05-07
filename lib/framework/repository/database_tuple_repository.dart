@@ -70,7 +70,12 @@ abstract class DatabaseTupleRepository<E extends EntityV1,
         ))
             .map((e) => pack(e))
             .toList(),
-        condition,
+        {
+          "condition": condition,
+          "orderBy": orderBy,
+          "offset": offset,
+          "limit": limit,
+        },
       );
 
   Future<SavedEntity> shipById(Id id) => v(
