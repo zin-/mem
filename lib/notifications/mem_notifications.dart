@@ -125,7 +125,7 @@ class MemNotifications {
 
           if (enables.where((element) => element.isRepeated()).isEmpty) {
             return [
-              CancelSchedule(memRepeatedNotificationId(1)),
+              CancelSchedule(memRepeatedNotificationId(memId)),
             ];
           } else {
             final repeat =
