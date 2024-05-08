@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/client.dart';
 import 'package:mem/notifications/notification/type.dart';
@@ -16,9 +15,7 @@ class MemNotifications {
   static Iterable<Schedule> scheduleOf(
     SavedMem savedMem,
     TimeOfDay startOfDay,
-    // FIXME Iterable<SavedMemNotification>が正しい
-    //  影響箇所が大きいため保留
-    List<MemNotification>? memNotifications,
+    Iterable<SavedMemNotification>? memNotifications,
     Function callback,
   ) =>
       v(

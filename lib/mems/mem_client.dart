@@ -5,6 +5,7 @@ import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/client.dart';
 import 'package:mem/repositories/mem.dart';
+import 'package:mem/repositories/mem_notification.dart';
 
 import 'mem_service.dart';
 
@@ -27,13 +28,10 @@ class MemClient {
             ),
           );
 
-          final savedMem = saved.mem;
-          if (savedMem is SavedMem) {
-            _notificationClient.registerMemNotifications(
-              savedMem,
-              saved.notifications,
-            );
-          }
+          _notificationClient.registerMemNotifications(
+            saved.mem as SavedMem,
+            saved.notifications?.whereType<SavedMemNotification>(),
+          );
 
           return saved;
         },
@@ -75,14 +73,10 @@ class MemClient {
           if (mem is SavedMem) {
             final unarchived = await _memService.unarchive(mem);
 
-            final unarchivedMem = unarchived.mem;
-            // FIXME unarchive後のMemDetailなので、必ずSavedMemのはず
-            if (unarchivedMem is SavedMem) {
-              _notificationClient.registerMemNotifications(
-                unarchivedMem,
-                unarchived.notifications,
-              );
-            }
+            _notificationClient.registerMemNotifications(
+              unarchived.mem as SavedMem,
+              unarchived.notifications?.whereType<SavedMemNotification>(),
+            );
 
             return unarchived;
             // } else {

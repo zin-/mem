@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
-import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
 import 'package:mem/repositories/mem.dart';
@@ -76,9 +75,7 @@ class NotificationClient {
 
   Future<void> registerMemNotifications(
     SavedMem savedMem,
-    // FIXME Iterable<SavedMemNotification>が正しい
-    //  影響箇所が大きいため保留
-    List<MemNotification>? memNotifications,
+    Iterable<SavedMemNotification>? memNotifications,
   ) =>
       v(
         () async {
