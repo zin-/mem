@@ -28,11 +28,11 @@ jobs:
       - name: "Install Dependencies"
         uses: ./.github/actions/install-dependencies
 
-      - name: "Generate l10n"
-        uses: ./.github/actions/generate-l10n
-
       - name: "Build Mocks"
         uses: ./.github/actions/build-mocks
+
+      - name: "Generate l10n"
+        uses: ./.github/actions/generate-l10n
 
       - name: "Run Flutter test"
         run: >
