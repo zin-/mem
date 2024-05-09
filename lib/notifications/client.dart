@@ -78,20 +78,23 @@ class NotificationClient {
       );
 
   Future<void> registerMemNotifications(
-    SavedMem savedMem,
-    Iterable<SavedMemNotification>? memNotifications,
-  ) =>
+    int memId, {
+    SavedMem? savedMem,
+    Iterable<SavedMemNotification>? savedMemNotifications,
+  }) =>
       v(
         () async {
-          if (savedMem.isDone || savedMem.isArchived) {
-            cancelMemNotifications(savedMem.id);
+          final mem = savedMem ?? await _memRepository.shipById(memId);
+          if (mem.isDone || mem.isArchived) {
+            cancelMemNotifications(memId);
           } else {
             for (var schedule in MemNotifications.scheduleOf(
-              savedMem,
+              mem,
               (await _preferenceClient.shipByKey(startOfDayKey)).value ??
                   defaultStartOfDay,
-              memNotifications,
-              await _actRepository.findOneOrNothingBy(savedMem.id, true),
+              savedMemNotifications ??
+                  await _memNotificationRepository.shipByMemId(memId),
+              await _actRepository.findOneOrNothingBy(memId, true),
               scheduleCallback,
             )) {
               await _scheduleClient.receive(schedule);
@@ -99,8 +102,9 @@ class NotificationClient {
           }
         },
         {
+          "memId": memId,
           "savedMem": savedMem,
-          "memNotifications": memNotifications,
+          "savedMemNotifications": savedMemNotifications,
         },
       );
 
@@ -144,8 +148,8 @@ class NotificationClient {
           }
 
           await registerMemNotifications(
-            await _memRepository.shipById(memId),
-            savedMemNotifications,
+            memId,
+            savedMemNotifications: savedMemNotifications,
           );
         },
         {
@@ -168,8 +172,7 @@ class NotificationClient {
           );
 
           await registerMemNotifications(
-            await _memRepository.shipById(memId),
-            await _memNotificationRepository.shipByMemId(memId),
+            memId,
           );
         },
         {
@@ -195,16 +198,15 @@ class NotificationClient {
         () async {
           await _notificationRepository.discardAll();
 
-          final allMems = await _memRepository.ship(
+          final allSavedMems = await _memRepository.ship(
             archived: false,
             done: false,
           );
 
-          for (final mem in allMems) {
-            final memNotifications =
-                await _memNotificationRepository.shipByMemId(mem.id);
-
-            await registerMemNotifications(mem, memNotifications);
+          for (final mem in allSavedMems) {
+            await registerMemNotifications(
+              mem.id,
+            );
           }
         },
       );

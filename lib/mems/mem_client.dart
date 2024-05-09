@@ -29,8 +29,10 @@ class MemClient {
           );
 
           _notificationClient.registerMemNotifications(
-            saved.mem as SavedMem,
-            saved.notifications?.whereType<SavedMemNotification>(),
+            (saved.mem as SavedMem).id,
+            savedMem: saved.mem as SavedMem,
+            savedMemNotifications:
+                saved.notifications?.whereType<SavedMemNotification>(),
           );
 
           return saved;
@@ -74,8 +76,10 @@ class MemClient {
             final unarchived = await _memService.unarchive(mem);
 
             _notificationClient.registerMemNotifications(
-              unarchived.mem as SavedMem,
-              unarchived.notifications?.whereType<SavedMemNotification>(),
+              (unarchived.mem as SavedMem).id,
+              savedMem: unarchived.mem as SavedMem,
+              savedMemNotifications:
+                  unarchived.notifications?.whereType<SavedMemNotification>(),
             );
 
             return unarchived;
