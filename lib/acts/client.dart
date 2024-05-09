@@ -2,7 +2,6 @@ import 'package:mem/acts/act_service.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/repositories/mem_notification_repository.dart';
 import 'package:mem/notifications/client.dart';
 
 class ListWithTotalPage<T> {
@@ -14,8 +13,6 @@ class ListWithTotalPage<T> {
 
 class ActsClient {
   final ActService _actService;
-
-  final MemNotificationRepository _memNotificationRepository;
 
   final NotificationClient _notificationClient;
 
@@ -54,7 +51,7 @@ class ActsClient {
         () async {
           final startedAct = await _actService.start(memId, when);
 
-          _registerStartNotifications(memId);
+          _notificationClient.startActNotifications(memId);
 
           return startedAct;
         },
@@ -72,7 +69,7 @@ class ActsClient {
           final replaced = await _actService.edit(savedAct);
 
           if (replaced.period.end == null) {
-            _registerStartNotifications(replaced.memId);
+            _notificationClient.startActNotifications(replaced.memId);
           } else {
             _notificationClient.cancelActNotification(replaced.memId);
           }
@@ -133,24 +130,8 @@ class ActsClient {
         },
       );
 
-  void _registerStartNotifications(int memId) => v(
-        () async {
-          final savedMemNotifications =
-              await _memNotificationRepository.shipByMemId(memId);
-
-          _notificationClient.startActNotifications(
-            memId,
-            savedMemNotifications,
-          );
-        },
-        {
-          "memId": memId,
-        },
-      );
-
   ActsClient._(
     this._actService,
-    this._memNotificationRepository,
     this._notificationClient,
   );
 
@@ -158,7 +139,6 @@ class ActsClient {
 
   factory ActsClient() => _instance ??= ActsClient._(
         ActService(),
-        MemNotificationRepository(),
         NotificationClient(),
       );
 }

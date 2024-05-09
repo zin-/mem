@@ -122,7 +122,6 @@ class NotificationClient {
 
   Future<void> startActNotifications(
     int memId,
-    Iterable<SavedMemNotification> savedMemNotifications,
   ) =>
       v(
         () async {
@@ -134,7 +133,9 @@ class NotificationClient {
           );
 
           final now = DateTime.now();
-          for (var notification in savedMemNotifications.where((element) =>
+          final memNotifications =
+              await _memNotificationRepository.shipByMemId(memId);
+          for (var notification in memNotifications.where((element) =>
               element.isEnabled() && element.isAfterActStarted())) {
             await _scheduleClient.receive(TimedSchedule(
               afterActStartedNotificationId(memId),
@@ -149,12 +150,11 @@ class NotificationClient {
 
           await registerMemNotifications(
             memId,
-            savedMemNotifications: savedMemNotifications,
+            savedMemNotifications: memNotifications,
           );
         },
         {
           "memId": memId,
-          "savedMemNotifications": savedMemNotifications,
         },
       );
 
