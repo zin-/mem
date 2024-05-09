@@ -142,6 +142,11 @@ class NotificationClient {
               },
             ));
           }
+
+          await registerMemNotifications(
+            await _memRepository.shipById(memId),
+            savedMemNotifications,
+          );
         },
         {
           "memId": memId,
@@ -160,6 +165,11 @@ class NotificationClient {
           await show(
             NotificationType.pausedAct,
             memId,
+          );
+
+          await registerMemNotifications(
+            await _memRepository.shipById(memId),
+            await _memNotificationRepository.shipByMemId(memId),
           );
         },
         {
