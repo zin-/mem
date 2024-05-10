@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mem/acts/act_repository.dart';
 import 'package:mem/components/l10n.dart';
-import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
 import 'package:mem/repositories/mem.dart';
@@ -160,7 +159,6 @@ class NotificationClient {
 
   Future<void> pauseActNotification(
     int memId,
-    DateAndTime when,
   ) =>
       v(
         () async {
@@ -177,7 +175,6 @@ class NotificationClient {
         },
         {
           "memId": memId,
-          "when": when,
         },
       );
 

@@ -89,7 +89,7 @@ class ActsClient {
         () async {
           final finished = await _actService.finish(memId, when);
 
-          await _notificationClient.pauseActNotification(finished.memId, when);
+          await _notificationClient.pauseActNotification(finished.memId);
         },
         {
           "memId": memId,
