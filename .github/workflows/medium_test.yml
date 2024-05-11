@@ -36,7 +36,7 @@ jobs:
   ex-medium_test-windows:
     strategy:
       matrix:
-        target: [ framework, scenarios ]
+        target: [ scenarios/memo, framework ]
       fail-fast: true
       max-parallel: 1
 
