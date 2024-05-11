@@ -6,7 +6,7 @@ import 'package:mem/logger/log_service.dart';
 
 import 'framework/framework_test.dart' as framework_tests;
 import 'scenarios/edge_scenario.dart';
-import 'scenarios/habit/scenarios.dart' as habit_scenarios;
+import 'scenarios/habit/habit_test.dart' as habit_scenarios;
 import 'scenarios/memo/memo_test.dart' as memo_scenarios;
 import 'scenarios/memo_scenario.dart';
 import 'scenarios/notification_scenario.dart';
