@@ -48,7 +48,6 @@ jobs:
           scenarios/edge_scenario.dart
         ]
       fail-fast: true
-      max-parallel: 5
 
     uses: ./.github/workflows/medium_test-windows.yml
     with:
