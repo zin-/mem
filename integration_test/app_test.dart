@@ -4,10 +4,10 @@ import 'package:integration_test/integration_test.dart';
 import 'package:mem/logger/log.dart';
 import 'package:mem/logger/log_service.dart';
 
-import 'framework/framework_tests.dart' as framework_tests;
+import 'framework/framework_test.dart' as framework_tests;
 import 'scenarios/edge_scenario.dart';
 import 'scenarios/habit/scenarios.dart' as habit_scenarios;
-import 'scenarios/memo/scenarios.dart' as memo_scenarios;
+import 'scenarios/memo/memo_test.dart' as memo_scenarios;
 import 'scenarios/memo_scenario.dart';
 import 'scenarios/notification_scenario.dart';
 import 'scenarios/notifications_scenario.dart';

@@ -9,6 +9,9 @@ on:
       test-script:
         required: true
         type: string
+      target:
+        required: true
+        type: string
 
     secrets:
       CODECOV_TOKEN:
@@ -49,4 +52,4 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
-          flags: medium_test-windows
+          flags: medium_test-windows-${{ inputs.target }}

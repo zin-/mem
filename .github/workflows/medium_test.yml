@@ -29,13 +29,14 @@ jobs:
         --file-reporter json:reports/test_report.log
         --coverage
         --device-id windows
+      target: all
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   ex-medium_test-windows:
     strategy:
       matrix:
-        target: [ a, b ]
+        target: [ framework, scenarios ]
       fail-fast: true
       max-parallel: 1
 
@@ -43,10 +44,11 @@ jobs:
     with:
       flutter-channel: ${{ inputs.flutter-channel }}
       test-script: >
-        flutter test integration_test/app_test.dart
+        flutter test integration_test/${{ matrix.target }}
         --dart-define=CICD=true
         --file-reporter json:reports/test_report.log
         --coverage
         --device-id windows
+      target: ${{ matrix.target }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
