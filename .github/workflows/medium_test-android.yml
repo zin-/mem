@@ -39,6 +39,7 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
+    timeout-minutes: 3
 
     # TODO 画面サイズ
     # TODO OSバージョン

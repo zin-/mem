@@ -10,6 +10,7 @@ env:
 jobs:
   set_up-env:
     name: "Set up Environment variables"
+    timeout-minutes: 3
     outputs:
       flutter-channel: ${{ steps.env-variables.outputs.flutter-channel }}
     runs-on: ubuntu-latest

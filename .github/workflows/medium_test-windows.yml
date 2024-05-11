@@ -14,8 +14,8 @@ on:
 jobs:
   medium_test-windows:
     name: "Medium test (Windows)"
-
     runs-on: windows-latest
+    timeout-minutes: 3
 
     steps:
       - uses: actions/checkout@v4

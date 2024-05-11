@@ -14,8 +14,8 @@ on:
 jobs:
   small_test:
     name: "Small test"
-
     runs-on: ubuntu-latest
+    timeout-minutes: 3
 
     steps:
       - uses: actions/checkout@v4
