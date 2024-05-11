@@ -6,6 +6,12 @@ on:
       flutter-channel:
         required: true
         type: string
+      test-script:
+        required: true
+        type: string
+      target:
+        required: true
+        type: string
 
     secrets:
       CODECOV_TOKEN:
@@ -13,7 +19,7 @@ on:
 
 jobs:
   medium_test-android:
-    name: "Medium test (Android)"
+    name: "Medium test (Android) (${{ inputs.target }})"
 
     strategy:
       matrix:
@@ -39,7 +45,7 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
-    timeout-minutes: 1
+    timeout-minutes: 10
 
     # TODO 画面サイズ
     # TODO OSバージョン
@@ -71,12 +77,7 @@ jobs:
         uses: ./.github/actions/run-android-medium_test
         with:
           android-emulator-runner: ${{ matrix.android-emulator-runner }}
-          script: >
-            flutter test integration_test/app_test.dart
-            --dart-define=CICD=true
-            --file-reporter json:reports/test_report.log
-            --coverage
-            --device-id "emulator-5554"
+          script: ${{ inputs.test-script }}
           android-api-level: ${{ matrix.android-api-level }}
           android-target: default
           android-arch: ${{ matrix.android-arch }} # FIXME これandroidのarchじゃなくて動かす側のcpu archだ
@@ -87,7 +88,7 @@ jobs:
         name: "Report"
         uses: dorny/test-reporter@v1
         with:
-          name: "Report (Medium test (Android)) (${{ matrix.android-emulator-runner }})"
+          name: "Report (Medium test (Android) (${{ inputs.target }})) (${{ matrix.android-emulator-runner }})"
           path: "reports/test_report.log"
           reporter: "flutter-json"
           fail-on-error: true
@@ -99,5 +100,5 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
-          flags: medium_test-android-${{ matrix.android-emulator-runner }}
+          flags: medium_test-android-${{ inputs.target }}-${{ matrix.android-emulator-runner }}
         continue-on-error: ${{ matrix.experimental == true }}

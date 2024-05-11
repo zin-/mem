@@ -22,6 +22,8 @@ jobs:
     uses: ./.github/workflows/medium_test-android.yml
     with:
       flutter-channel: ${{ inputs.flutter-channel }}
+      test-script: ${{ inputs.test-script }} --device-id "emulator-5554"
+      target: ${{ inputs.target }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 

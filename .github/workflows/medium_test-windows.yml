@@ -19,7 +19,7 @@ on:
 
 jobs:
   medium_test-windows:
-    name: "Medium test (Windows) (${{ inputs.target }}))"
+    name: "Medium test (Windows) (${{ inputs.target }})"
     runs-on: windows-latest
     timeout-minutes: 10
 
@@ -41,7 +41,7 @@ jobs:
         name: "Report"
         uses: dorny/test-reporter@v1
         with:
-          name: "Report (Medium test (Windows)(${{ inputs.target }}))"
+          name: "Report (Medium test (Windows) (${{ inputs.target }}))"
           path: "reports/test_report.log"
           reporter: "flutter-json"
           fail-on-error: true
