@@ -5,23 +5,23 @@ runs:
   using: "composite"
 
   steps:
-    - id: cache
-      name: "Cache"
-      uses: actions/cache@v4
-      with:
-        path: |
-          # flutter
-          .dart_tool
-          .flutter-plugin-dependencies
-          .flutter-plugins
-          # ios & macos
-          **/flutter_export_environment.sh
-          **/Generated.xcconfig
-          **/Flutter-Generated.xcconfig
-          # packages
-          ${{ env.PUB_CACHE }}
-        key: dependencies-${{ hashFiles('pubspec.lock') }}
+    #    - id: cache
+    #      name: "Cache"
+    #      uses: actions/cache@v4
+    #      with:
+    #        path: |
+    #          # flutter
+    #          .dart_tool
+    #          .flutter-plugin-dependencies
+    #          .flutter-plugins
+    #          # ios & macos
+    #          **/flutter_export_environment.sh
+    #          **/Generated.xcconfig
+    #          **/Flutter-Generated.xcconfig
+    #          # packages
+    #          ${{ env.PUB_CACHE }}
+    #        key: dependencies-${{ hashFiles('pubspec.lock') }}
     - name: "Get Packages"
-      if: steps.cache.outputs.cache-hit != 'true'
+      #      if: steps.cache.outputs.cache-hit != 'true'
       run: flutter pub get
       shell: bash

@@ -8,13 +8,15 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 
-enum ActOrderBy { descStart }
+enum ActOrderBy { descStart, descEnd }
 
 extension _ActOrderByExt on ActOrderBy {
   OrderBy get toQuery {
     switch (index) {
       case 0:
         return Descending(defColActsStart);
+      case 1:
+        return Descending(defColActsEnd);
 
       default:
         throw Exception(); // coverage:ignore-line
@@ -23,6 +25,29 @@ extension _ActOrderByExt on ActOrderBy {
 }
 
 class ActRepository extends DatabaseTupleRepository<Act, SavedAct, int> {
+  Future<SavedAct?> findOneBy(
+    int memId,
+    bool latest,
+  ) =>
+      v(
+        () async {
+          final oneOrNothing = await super.ship(
+            condition: Equals(defFkActsMemId.name, memId),
+            orderBy: [
+              if (latest) ActOrderBy.descEnd.toQuery,
+              if (latest) ActOrderBy.descStart.toQuery,
+            ],
+            limit: 1,
+          );
+
+          return oneOrNothing.length == 1 ? oneOrNothing.single : null;
+        },
+        {
+          "memId": memId,
+          "latest": latest,
+        },
+      );
+
   @override
   Future<int> count({
     int? memId,

@@ -1,12 +1,12 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:mem/core/mem_notification.dart';
+import 'package:mem/core/act.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/notifications/client.dart';
-import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
 
+import 'client.dart';
+import 'notification/type.dart';
 import 'notification_ids.dart';
 import 'schedule.dart';
 
@@ -16,9 +16,8 @@ class MemNotifications {
   static Iterable<Schedule> scheduleOf(
     SavedMem savedMem,
     TimeOfDay startOfDay,
-    // FIXME Iterable<SavedMemNotification>が正しい
-    //  影響箇所が大きいため保留
-    List<MemNotification>? memNotifications,
+    Iterable<SavedMemNotification>? memNotifications,
+    SavedAct? lastAct,
     Function callback,
   ) =>
       v(
@@ -28,6 +27,7 @@ class MemNotifications {
             memPeriodicSchedule = _memPeriodicSchedule(
               savedMem.id,
               memNotifications.whereType<SavedMemNotification>(),
+              lastAct,
               callback,
             );
           }
@@ -45,6 +45,7 @@ class MemNotifications {
           "savedMem": savedMem,
           "startOfDay": startOfDay,
           "memNotifications": memNotifications,
+          "lastAct": lastAct,
         },
       );
 
@@ -119,6 +120,7 @@ class MemNotifications {
   static Iterable<Schedule> _memPeriodicSchedule(
     int memId,
     Iterable<SavedMemNotification> savedMemNotifications,
+    SavedAct? lastAct,
     Function callback,
   ) =>
       v(
@@ -128,7 +130,7 @@ class MemNotifications {
 
           if (enables.where((element) => element.isRepeated()).isEmpty) {
             return [
-              CancelSchedule(memRepeatedNotificationId(1)),
+              CancelSchedule(memRepeatedNotificationId(memId)),
             ];
           } else {
             final repeat =
@@ -136,17 +138,21 @@ class MemNotifications {
             final repeatNDay = enables
                 .singleWhereOrNull((element) => element.isRepeatByNDay());
 
-            final now = DateTime.now();
-            final today = DateTime(now.year, now.month, now.day);
-
-            final notifyFirstAt = DateTime.fromMicrosecondsSinceEpoch(
-              today.microsecondsSinceEpoch + (repeat.time ?? 0) * 1000 * 1000,
-            );
+            var notifyFirstOn = lastAct == null
+                ? DateTime.now()
+                : lastAct.period.end ?? lastAct.period.start!;
 
             return [
               PeriodicSchedule(
                 memRepeatedNotificationId(memId),
-                notifyFirstAt,
+                DateTime.fromMicrosecondsSinceEpoch(
+                  DateTime(
+                        notifyFirstOn.year,
+                        notifyFirstOn.month,
+                        notifyFirstOn.day,
+                      ).microsecondsSinceEpoch +
+                      (repeat.time ?? 0) * 1000 * 1000,
+                ),
                 Duration(
                   days: repeatNDay?.time ?? 1,
                 ),
@@ -162,6 +168,7 @@ class MemNotifications {
         {
           "memId": memId,
           "savedMemNotifications": savedMemNotifications,
+          "lastAct": lastAct,
         },
       );
 }
