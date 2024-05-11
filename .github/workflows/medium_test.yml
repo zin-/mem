@@ -36,9 +36,12 @@ jobs:
   ex-medium_test-windows:
     strategy:
       matrix:
-        target: [ scenarios/memo, framework ]
+        target: [
+          framework,
+          scenarios/memo
+        ]
       fail-fast: true
-      max-parallel: 1
+      max-parallel: 2
 
     uses: ./.github/workflows/medium_test-windows.yml
     with:
