@@ -41,7 +41,7 @@ jobs:
         name: "Report"
         uses: dorny/test-reporter@v1
         with:
-          name: "Report (Medium test (Windows))"
+          name: "Report (Medium test (Windows)(${{ inputs.target }}))"
           path: "reports/test_report.log"
           reporter: "flutter-json"
           fail-on-error: true
