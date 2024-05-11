@@ -1,4 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/logger/log.dart';
+import 'package:mem/logger/log_service.dart';
 
 import 'act_counter_scenario.dart' as act_counter_scenario;
 import 'after_act_started_habit_scenario.dart'
@@ -14,6 +16,11 @@ const _name = "Habit scenario";
 void main() => group(
       _name,
       () {
+        LogService.initialize(
+          Level.verbose,
+          const bool.fromEnvironment('CICD', defaultValue: false),
+        );
+
         act_list_page_scenario.main();
         act_line_chart_page_scenario.main();
         mem_list_page_scenario.main();

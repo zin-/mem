@@ -8,6 +8,8 @@ import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/databases/definition.dart';
+import 'package:mem/logger/log.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/values/durations.dart';
 
 import 'helpers.dart';
@@ -23,6 +25,11 @@ const scenarioName = 'Memo scenario';
 void testMemoScenario() => group(
       ': $scenarioName',
       () {
+        LogService.initialize(
+          Level.verbose,
+          const bool.fromEnvironment('CICD', defaultValue: false),
+        );
+
         const insertedMemName = '$scenarioName - mem name - inserted';
         const insertedMemMemo = '$scenarioName - mem memo - inserted';
         late final DatabaseAccessor dbA;
