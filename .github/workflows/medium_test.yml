@@ -6,6 +6,12 @@ on:
       flutter-channel:
         required: true
         type: string
+      test-script:
+        required: true
+        type: string
+      target:
+        required: true
+        type: string
 
     secrets:
       CODECOV_TOKEN:
@@ -24,40 +30,8 @@ jobs:
     with:
       flutter-channel: ${{ inputs.flutter-channel }}
       test-script: >
-        flutter test integration_test/app_test.dart
-        --dart-define=CICD=true
-        --file-reporter json:reports/test_report.log
-        --coverage
+        ${{ inputs.test-script }}
         --device-id windows
-      target: all
-    secrets:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-  ex-medium_test-windows:
-    strategy:
-      matrix:
-        target: [
-          framework,
-          scenarios/memo,
-          scenarios/habit,
-          scenarios/memo_scenario.dart,
-          scenarios/todo_scenario.dart,
-          scenarios/task_scenario.dart,
-          scenarios/notification_scenario.dart,
-          scenarios/settings_scenario.dart,
-          scenarios/edge_scenario.dart
-        ]
-      fail-fast: true
-
-    uses: ./.github/workflows/medium_test-windows.yml
-    with:
-      flutter-channel: ${{ inputs.flutter-channel }}
-      test-script: >
-        flutter test integration_test/${{ matrix.target }}
-        --dart-define=CICD=true
-        --file-reporter json:reports/test_report.log
-        --coverage
-        --device-id windows
-      target: ${{ matrix.target }}
+      target: ${{ inputs.target }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
