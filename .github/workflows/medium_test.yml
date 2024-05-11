@@ -33,7 +33,7 @@ jobs:
     uses: ./.github/workflows/medium_test-windows.yml
     with:
       flutter-channel: ${{ inputs.flutter-channel }}
-      test-script: |
+      test-script: >
         ${{ inputs.test-script }}
         --device-id windows
       target: ${{ inputs.target }}
