@@ -29,9 +29,7 @@ jobs:
     uses: ./.github/workflows/medium_test-windows.yml
     with:
       flutter-channel: ${{ inputs.flutter-channel }}
-      test-script: >
-        ${{ inputs.test-script }}
-        --device-id windows
+      test-script: ${{ inputs.test-script }} --device-id windows
       target: ${{ inputs.target }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
