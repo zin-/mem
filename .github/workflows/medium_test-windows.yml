@@ -6,6 +6,9 @@ on:
       flutter-channel:
         required: true
         type: string
+      test-script:
+        required: true
+        type: string
 
     secrets:
       CODECOV_TOKEN:
@@ -29,12 +32,7 @@ jobs:
         uses: ./.github/actions/install-dependencies
 
       - name: "Run Windows Medium Test"
-        run: >
-          flutter test integration_test
-          --dart-define=CICD=true
-          --file-reporter json:reports/test_report.log
-          --coverage
-          --device-id windows
+        run: ${{ inputs.test-script }}
 
       - if: always()
         name: "Report"

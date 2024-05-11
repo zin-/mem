@@ -23,5 +23,30 @@ jobs:
     uses: ./.github/workflows/medium_test-windows.yml
     with:
       flutter-channel: ${{ inputs.flutter-channel }}
+      test-script: >
+        flutter test integration_test/app_test.dart
+        --dart-define=CICD=true
+        --file-reporter json:reports/test_report.log
+        --coverage
+        --device-id windows
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  ex-medium_test-windows:
+    strategy:
+      matrix:
+        target: [ a, b ]
+      fail-fast: true
+      max-parallel: 1
+
+    uses: ./.github/workflows/medium_test-windows.yml
+    with:
+      flutter-channel: ${{ inputs.flutter-channel }}
+      test-script: >
+        flutter test integration_test/app_test.dart
+        --dart-define=CICD=true
+        --file-reporter json:reports/test_report.log
+        --coverage
+        --device-id windows
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
