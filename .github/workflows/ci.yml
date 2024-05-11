@@ -55,11 +55,7 @@ jobs:
     uses: ./.github/workflows/medium_test.yml
     with:
       flutter-channel: ${{ needs.set_up-env.outputs.flutter-channel }}
-      test-script: |
-        flutter test integration_test/${{ matrix.target }}
-        --dart-define=CICD=true
-        --file-reporter json:reports/test_report.log
-        --coverage
+      test-script: flutter test integration_test/${{ matrix.target }} --dart-define=CICD=true --file-reporter json:reports/test_report.log --coverage
       target: ${{ matrix.target }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
