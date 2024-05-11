@@ -25,7 +25,7 @@ extension _ActOrderByExt on ActOrderBy {
 }
 
 class ActRepository extends DatabaseTupleRepository<Act, SavedAct, int> {
-  Future<SavedAct?> findOneOrNothingBy(
+  Future<SavedAct?> findOneBy(
     int memId,
     bool latest,
   ) =>
