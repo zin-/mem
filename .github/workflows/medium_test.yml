@@ -40,7 +40,12 @@ jobs:
           framework,
           scenarios/memo,
           scenarios/habit,
-          scenarios/memo_scenario.dart
+          scenarios/memo_scenario.dart,
+          scenarios/todo_scenario.dart,
+          scenarios/task_scenario.dart,
+          scenarios/notification_scenario.dart,
+          scenarios/settings_scenario.dart,
+          scenarios/edge_scenario.dart
         ]
       fail-fast: true
       max-parallel: 5

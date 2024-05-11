@@ -10,7 +10,6 @@ import 'scenarios/habit/habit_test.dart' as habit_scenarios;
 import 'scenarios/memo/memo_test.dart' as memo_scenarios;
 import 'scenarios/memo_scenario.dart';
 import 'scenarios/notification_scenario.dart';
-import 'scenarios/notifications_scenario.dart';
 import 'scenarios/settings_scenario.dart' as settings_scenario;
 import 'scenarios/task_scenario.dart';
 import 'scenarios/todo_scenario.dart';
@@ -28,8 +27,6 @@ void main() {
   group('Scenario test', () {
     memo_scenarios.main();
     habit_scenarios.main();
-
-    testNotificationsScenario();
 
     testMemoScenario();
     testTodoScenario();
