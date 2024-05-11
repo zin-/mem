@@ -38,7 +38,8 @@ jobs:
       matrix:
         target: [
           framework,
-          scenarios/memo
+          scenarios/memo,
+          scenarios/memo_scenario.dart
         ]
       fail-fast: true
       max-parallel: 2
