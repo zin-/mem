@@ -31,16 +31,15 @@ class ActList extends ConsumerWidget {
             if (scrollController.position.maxScrollExtent == 0.0 ||
                 scrollController.position.pixels >
                     scrollController.position.maxScrollExtent * 0.6) {
-              final c = ref.read(currentPage);
+              final c = ref.read(currentPage(_memId));
 
-              if (c < ref.read(maxPage)) {
+              if (c < ref.read(maxPage(_memId))) {
                 Future.microtask(() {
-                  final l = ref.read(isLoading);
-                  if (l) {
-                    ref.watch(isLoading); // coverage:ignore-line
+                  if (ref.read(isLoading(_memId))) {
+                    ref.watch(isLoading(_memId)); // coverage:ignore-line
                   } else {
-                    ref.read(currentPage.notifier).updatedBy(c + 1);
-                    ref.read(isUpdating.notifier).updatedBy(false);
+                    ref.read(currentPage(_memId).notifier).updatedBy(c + 1);
+                    ref.read(isUpdating(_memId).notifier).updatedBy(false);
                   }
                 });
               }

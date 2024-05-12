@@ -35,6 +35,8 @@ class DatabaseAccessor {
         () async => (await _nativeDatabase.query(
           tableDefinition.name,
           columns: ["COUNT(*)"],
+          where: where,
+          whereArgs: whereArgs,
         ))[0]
             .values
             .elementAt(0) as int,
