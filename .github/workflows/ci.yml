@@ -40,18 +40,13 @@ jobs:
       matrix:
         target: [
           framework,
-          scenarios/memo,
-          scenarios/habit,
-          scenarios/todo_scenario.dart,
-          scenarios/task_scenario.dart,
-          scenarios/notification_scenario.dart,
+          app_test.dart,
           scenarios/settings_scenario.dart
-          # scenarios/edge_scenario.dart
         ]
         include:
           - timeout-minutes-android: 20
           - target: scenarios/settings_scenario.dart
-            timeout-minutes-android: 50
+            timeout-minutes-android: 40
       fail-fast: true
 
     needs: set_up-env
