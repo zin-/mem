@@ -138,6 +138,53 @@ void main() => group(
             );
 
             testWidgets(
+              ': update.',
+              (widgetTester) async {
+                await runApplication();
+                await widgetTester.pumpAndSettle();
+
+                await widgetTester.tap(find.text(insertedMemName));
+                await widgetTester.pumpAndSettle();
+
+                await widgetTester.tap(memNameOnDetailPageFinder);
+                await widgetTester.pump(waitShowSoftwareKeyboardDuration);
+
+                const enteringMemNameText =
+                    '$_scenarioName: Save: Update - mem name - entering';
+                await widgetTester.enterText(
+                  memNameOnDetailPageFinder,
+                  enteringMemNameText,
+                );
+                await widgetTester.pumpAndSettle();
+                expect(find.text(enteringMemNameText), findsOneWidget);
+
+                await widgetTester.tap(saveMemFabFinder);
+                await widgetTester.pumpAndSettle();
+                const saveSuccessText = 'Save success. $enteringMemNameText';
+                expect(
+                  find.text(saveSuccessText),
+                  findsOneWidget,
+                );
+
+                await widgetTester.pumpAndSettle(defaultDismissDuration);
+                expect(
+                  find.text(saveSuccessText),
+                  findsNothing,
+                );
+
+                await widgetTester.pageBack();
+                await widgetTester.pumpAndSettle();
+                expect(find.text(insertedMemName), findsNothing);
+                expect(find.text(enteringMemNameText), findsOneWidget);
+
+                await widgetTester.tap(find.text(enteringMemNameText));
+                await widgetTester.pumpAndSettle();
+                expect(find.text(insertedMemName), findsNothing);
+                expect(find.text(enteringMemNameText), findsOneWidget);
+              },
+            );
+
+            testWidgets(
               ": twice on create.",
               (widgetTester) async {
                 await runApplication();

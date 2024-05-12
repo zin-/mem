@@ -42,7 +42,6 @@ jobs:
           framework,
           scenarios/memo,
           scenarios/habit,
-          scenarios/memo_scenario.dart,
           scenarios/todo_scenario.dart,
           scenarios/task_scenario.dart,
           scenarios/notification_scenario.dart,
