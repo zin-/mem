@@ -140,7 +140,8 @@ class MemNotifications {
 
             var notifyFirstOn = lastAct == null
                 ? DateTime.now()
-                : lastAct.period.end ?? lastAct.period.start!;
+                : (lastAct.period.end ?? lastAct.period.start!)
+                    .add(Duration(days: repeatNDay?.time ?? 1));
 
             return [
               PeriodicSchedule(

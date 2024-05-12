@@ -5,6 +5,8 @@ import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/databases/definition.dart';
+import 'package:mem/logger/log.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/values/durations.dart';
 
 import 'helpers.dart';
@@ -18,6 +20,11 @@ void main() {
 const _scenarioName = 'Todo scenario';
 
 void testTodoScenario() => group(': $_scenarioName', () {
+      LogService.initialize(
+        Level.verbose,
+        const bool.fromEnvironment('CICD', defaultValue: false),
+      );
+
       const insertedMemName = '$_scenarioName - mem name - inserted';
 
       const undoneMemName = '$_scenarioName - mem name - inserted - undone';

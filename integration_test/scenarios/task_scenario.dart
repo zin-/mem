@@ -8,6 +8,8 @@ import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/databases/definition.dart';
+import 'package:mem/logger/log.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/settings/client.dart';
 import 'package:mem/settings/keys.dart';
 import 'package:mem/settings/preference.dart';
@@ -23,6 +25,11 @@ void main() {
 const _scenarioName = "Task scenario";
 
 void testTaskScenario() => group(': $_scenarioName', () {
+      LogService.initialize(
+        Level.verbose,
+        const bool.fromEnvironment('CICD', defaultValue: false),
+      );
+
       final about1MonthAgo = DateTime.now().subtract(const Duration(days: 32));
 
       const insertedMemHasNoPeriod = '$_scenarioName - mem name - no period';

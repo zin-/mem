@@ -13,37 +13,56 @@ final actsProvider =
   (ref) => v(() => ListValueStateNotifier([])),
 );
 
-final isLoading = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
-    (ref) => ValueStateNotifier(false));
-final isUpdating = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
-    (ref) => ValueStateNotifier(false));
-final currentPage = StateNotifierProvider<ValueStateNotifier<int>, int>(
-    (ref) => ValueStateNotifier(1));
-final maxPage = StateNotifierProvider<ValueStateNotifier<int>, int>(
-    (ref) => ValueStateNotifier(0));
+final isLoading = StateNotifierProvider.autoDispose
+    .family<ValueStateNotifier<bool>, bool, int?>(
+  (ref, memId) => v(
+    () => ValueStateNotifier(false),
+    {"memId": memId},
+  ),
+);
+final isUpdating = StateNotifierProvider.autoDispose
+    .family<ValueStateNotifier<bool>, bool, int?>(
+  (ref, memId) => v(
+    () => ValueStateNotifier(false),
+    {"memId": memId},
+  ),
+);
+final currentPage =
+    StateNotifierProvider.family<ValueStateNotifier<int>, int, int?>(
+  (ref, memId) => v(
+    () => ValueStateNotifier(1),
+    {"memId": memId},
+  ),
+);
+final maxPage =
+    StateNotifierProvider.family<ValueStateNotifier<int>, int, int?>(
+  (ref, memId) => v(
+    () => ValueStateNotifier(0),
+    {"memId": memId},
+  ),
+);
 
 final actListProvider = StateNotifierProvider.autoDispose
     .family<ListValueStateNotifier<Act>, List<Act>, int?>(
   (ref, memId) => v(
     () {
-      final u = ref.read(isUpdating);
-      if (u) {
-        ref.watch(isUpdating);
+      if (ref.read(isUpdating(memId))) {
+        ref.watch(isUpdating(memId));
       } else {
         Future.microtask(() async {
-          ref.read(isLoading.notifier).updatedBy(true);
+          ref.read(isLoading(memId).notifier).updatedBy(true);
 
           final latest = await _actsClient.fetch(memId, 1);
-          final c = ref.read(currentPage);
+          final c = ref.read(currentPage(memId));
 
           ListWithTotalPage<SavedAct>? byPage;
           if (c != 1) {
             byPage = await _actsClient.fetch(memId, c);
           }
 
-          ref.read(isLoading.notifier).updatedBy(false);
-          ref.read(isUpdating.notifier).updatedBy(true);
-          ref.read(maxPage.notifier).updatedBy(latest.totalPage);
+          ref.read(isLoading(memId).notifier).updatedBy(false);
+          ref.read(isUpdating(memId).notifier).updatedBy(true);
+          ref.read(maxPage(memId).notifier).updatedBy(latest.totalPage);
           ref.read(actsProvider.notifier).upsertAll(
             [...latest.list, if (byPage != null) ...byPage.list],
             (current, updating) => current.id == updating.id,

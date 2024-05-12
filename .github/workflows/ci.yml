@@ -10,6 +10,7 @@ env:
 jobs:
   set_up-env:
     name: "Set up Environment variables"
+    timeout-minutes: 3
     outputs:
       flutter-channel: ${{ steps.env-variables.outputs.flutter-channel }}
     runs-on: ubuntu-latest
@@ -35,9 +36,25 @@ jobs:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   medium_test:
+    strategy:
+      matrix:
+        target: [
+          framework,
+          scenarios/app_test.dart,
+          scenarios/settings_scenario.dart
+        ]
+        include:
+          - timeout-minutes-android: 20
+          - target: scenarios/settings_scenario.dart
+            timeout-minutes-android: 40
+      fail-fast: true
+
     needs: set_up-env
     uses: ./.github/workflows/medium_test.yml
     with:
       flutter-channel: ${{ needs.set_up-env.outputs.flutter-channel }}
+      test-script: flutter test integration_test/${{ matrix.target }} --dart-define=CICD=true --file-reporter json:reports/test_report.log --coverage
+      target: ${{ matrix.target }}
+      timeout-minutes-android: ${{ matrix.timeout-minutes-android }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

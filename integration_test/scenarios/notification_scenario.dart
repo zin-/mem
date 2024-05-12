@@ -11,6 +11,8 @@ import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
+import 'package:mem/logger/log.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/client.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/type.dart';
@@ -32,6 +34,11 @@ const _scenarioName = "Notification scenario";
 void testNotificationScenario() => group(
       ": $_scenarioName",
       () {
+        LogService.initialize(
+          Level.verbose,
+          const bool.fromEnvironment('CICD', defaultValue: false),
+        );
+
         const insertedMemName = "$_scenarioName - mem name - inserted";
 
         late final DatabaseAccessor dbA;

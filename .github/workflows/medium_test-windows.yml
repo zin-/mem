@@ -6,6 +6,12 @@ on:
       flutter-channel:
         required: true
         type: string
+      test-script:
+        required: true
+        type: string
+      target:
+        required: true
+        type: string
 
     secrets:
       CODECOV_TOKEN:
@@ -13,9 +19,9 @@ on:
 
 jobs:
   medium_test-windows:
-    name: "Medium test (Windows)"
-
+    name: "Medium test (Windows) (${{ inputs.target }})"
     runs-on: windows-latest
+    timeout-minutes: 10
 
     steps:
       - uses: actions/checkout@v4
@@ -29,18 +35,13 @@ jobs:
         uses: ./.github/actions/install-dependencies
 
       - name: "Run Windows Medium Test"
-        run: >
-          flutter test integration_test
-          --dart-define=CICD=true
-          --file-reporter json:reports/test_report.log
-          --coverage
-          --device-id windows
+        run: ${{ inputs.test-script }}
 
       - if: always()
         name: "Report"
         uses: dorny/test-reporter@v1
         with:
-          name: "Report (Medium test (Windows))"
+          name: "Report (Medium test (Windows) (${{ inputs.target }}))"
           path: "reports/test_report.log"
           reporter: "flutter-json"
           fail-on-error: true
@@ -51,4 +52,4 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
-          flags: medium_test-windows
+          flags: medium_test-windows-${{ inputs.target }}

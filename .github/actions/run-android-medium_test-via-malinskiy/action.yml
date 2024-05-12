@@ -1,3 +1,5 @@
+# 利用されていないが、いつか使うかもしれないので残す
+# テストを分割したことによってMacOSの並列実行数の影響が出るようになったのでCIから外している
 name: "Run Android Medium test via malinskiy"
 description: "Run Android Medium test via malinskiy."
 

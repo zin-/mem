@@ -29,9 +29,12 @@ final saveMem =
             ref
                 .read(editingMemByMemIdProvider(memId).notifier)
                 .updatedBy(saved.mem);
-            ref
-                .read(memItemsByMemIdProvider(memId).notifier)
-                .updatedBy(saved.memItems);
+            ref.read(memItemsProvider.notifier).upsertAll(
+                  saved.memItems,
+                  (current, updating) =>
+                      current.memId == updating.memId &&
+                      current.type == updating.type,
+                );
             ref.read(memNotificationsProvider.notifier).upsertAll(
                   saved.notifications ?? [],
                   (tmp, item) =>

@@ -10,8 +10,8 @@ on:
 jobs:
   analyze-code:
     name: "Analyze code"
-
     runs-on: ubuntu-latest
+    timeout-minutes: 3
 
     steps:
       - uses: actions/checkout@v4

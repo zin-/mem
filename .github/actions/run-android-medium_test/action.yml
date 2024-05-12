@@ -25,17 +25,6 @@ runs:
   using: "composite"
 
   steps:
-    - if: inputs.android-emulator-runner == 'malinskiy'
-      id: run-android-medium_test-via-malinskiy
-      name: "Run Android Medium Test via malinskiy"
-      uses: ./.github/actions/run-android-medium_test-via-malinskiy
-      with:
-        script: ${{ inputs.script }}
-        android-api-level: ${{ inputs.android-api-level }}
-        android-target: ${{ inputs.android-target }}
-        android-arch: ${{ inputs.android-arch }}
-      continue-on-error: true
-
     - if: inputs.android-emulator-runner == 'reactivecircus'
       id: run-android-medium_test-via-reactivecircus
       name: "Run Android Medium Test via reactivecircus"
