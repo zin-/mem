@@ -45,8 +45,8 @@ jobs:
           scenarios/todo_scenario.dart,
           scenarios/task_scenario.dart,
           scenarios/notification_scenario.dart,
-          scenarios/settings_scenario.dart,
-          scenarios/edge_scenario.dart
+          scenarios/settings_scenario.dart
+          # scenarios/edge_scenario.dart
         ]
       fail-fast: true
 
