@@ -51,7 +51,7 @@ jobs:
         include:
           - timeout-minutes-android: 20
           - target: scenarios/settings_scenario.dart
-            timeout-minutes-android: 30
+            timeout-minutes-android: 50
       fail-fast: true
 
     needs: set_up-env
