@@ -12,6 +12,9 @@ on:
       target:
         required: true
         type: string
+      timeout-minutes:
+        required: true
+        type: number
 
     secrets:
       CODECOV_TOKEN:
@@ -43,7 +46,7 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
-    timeout-minutes: 20
+    timeout-minutes: ${{ inputs.timeout-minutes }}
 
     # TODO 画面サイズ
     # TODO OSバージョン

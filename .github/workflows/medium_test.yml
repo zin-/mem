@@ -12,6 +12,9 @@ on:
       target:
         required: true
         type: string
+      timeout-minutes-android:
+        required: true
+        type: number
 
     secrets:
       CODECOV_TOKEN:
@@ -25,6 +28,7 @@ jobs:
       test-script: >
         ${{ inputs.test-script }} --device-id "emulator-5554"
       target: ${{ inputs.target }}
+      timeout-minutes: ${{ inputs.timeout-minutes-android }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
