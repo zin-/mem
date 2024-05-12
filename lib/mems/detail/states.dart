@@ -35,8 +35,8 @@ final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
   ),
 );
 
-final memItemsByMemIdProvider = StateNotifierProvider.autoDispose
-    .family<ListValueStateNotifier<MemItem>, List<MemItem>, int?>(
+final memItemsByMemIdProvider = StateNotifierProvider.family<
+    ListValueStateNotifier<MemItem>, List<MemItem>, int?>(
   (ref, memId) => v(
     () => ListValueStateNotifier(
       [
@@ -55,7 +55,7 @@ final memItemsByMemIdProvider = StateNotifierProvider.autoDispose
                 (value) => value.isEmpty ? [MemItem.memo(memId)] : value,
               ),
     ),
-    memId,
+    {"memId": memId},
   ),
 );
 
@@ -82,9 +82,7 @@ final memRepeatedNotificationByMemIdProvider = StateNotifierProvider.autoDispose
             : MemNotificationRepository().shipByMemId(memId).then(
                   (value) =>
                       value.singleWhereOrNull(
-                        (e) =>
-                            e.memId == memId &&
-                            e.isRepeated(),
+                        (e) => e.memId == memId && e.isRepeated(),
                       ) ??
                       MemNotification.repeated(memId),
                 ),
@@ -103,8 +101,7 @@ final memRepeatByNDayNotificationByMemIdProvider = StateNotifierProvider
         memNotificationsProvider.select(
           (value) => value
               .where((element) =>
-                  element.memId == memId &&
-                  element.isRepeatByNDay())
+                  element.memId == memId && element.isRepeatByNDay())
               .singleOrNull,
         ),
       );
@@ -118,9 +115,7 @@ final memRepeatByNDayNotificationByMemIdProvider = StateNotifierProvider
             : MemNotificationRepository().shipByMemId(memId).then(
                   (value) =>
                       value.singleWhereOrNull(
-                        (e) =>
-                            e.memId == memId &&
-                            e.isRepeatByNDay(),
+                        (e) => e.memId == memId && e.isRepeatByNDay(),
                       ) ??
                       MemNotification.repeatByNDay(memId),
                 ),
@@ -139,8 +134,7 @@ final memAfterActStartedNotificationByMemIdProvider = StateNotifierProvider
         memNotificationsProvider.select(
           (value) => value
               .where((element) =>
-                  element.memId == memId &&
-                  element.isAfterActStarted())
+                  element.memId == memId && element.isAfterActStarted())
               .singleOrNull,
         ),
       );
@@ -154,9 +148,7 @@ final memAfterActStartedNotificationByMemIdProvider = StateNotifierProvider
             : MemNotificationRepository().shipByMemId(memId).then(
                   (value) =>
                       value.singleWhereOrNull(
-                        (e) =>
-                            e.memId == memId &&
-                            e.isAfterActStarted(),
+                        (e) => e.memId == memId && e.isAfterActStarted(),
                       ) ??
                       MemNotification.afterActStarted(memId),
                 ),
