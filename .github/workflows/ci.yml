@@ -40,7 +40,7 @@ jobs:
       matrix:
         target: [
           framework,
-          app_test.dart,
+          scenarios/app_test.dart,
           scenarios/settings_scenario.dart
         ]
         include:
