@@ -26,7 +26,7 @@ jobs:
         # 複数のAndroid Emulator Runnerを使う
         #   パフォーマンスチェックのため
         #   Github actionsの実行時間制限とかが出始めたらやめる
-        android-emulator-runner: [ malinskiy, reactivecircus, native ]
+        android-emulator-runner: [ reactivecircus, native ]
         include:
           # - os: macos-latest
           # FIXME macos-14とreactivecircusでエラーになるため、バージョンを指定している
@@ -36,8 +36,6 @@ jobs:
             experimental: false
             android-api-level: 33
             android-arch: x86_64
-          - android-emulator-runner: malinskiy
-            experimental: true
           - android-emulator-runner: native
             os: ubuntu-latest
             experimental: true
