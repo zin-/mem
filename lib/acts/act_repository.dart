@@ -24,26 +24,30 @@ extension _ActOrderByExt on ActOrderBy {
 }
 
 class ActRepository extends DatabaseTupleRepository<Act, SavedAct, int> {
-  Future<SavedAct?> findOneBy(
-    int memId,
-    bool latest,
-  ) =>
+  @override
+  Future<SavedAct?> findOneBy({
+    int? memId,
+    bool? latest,
+    Condition? condition,
+    List<OrderBy>? orderBy,
+  }) =>
       v(
-        () async {
-          final oneOrNothing = await super.ship(
-            condition: Equals(defFkActsMemId.name, memId),
-            orderBy: [
-              if (latest) ActOrderBy.descEnd.toQuery,
-              if (latest) ActOrderBy.descStart.toQuery,
-            ],
-            limit: 1,
-          );
-
-          return oneOrNothing.length == 1 ? oneOrNothing.single : null;
-        },
+        () async => await super.findOneBy(
+          condition: And([
+            if (memId != null) Equals(defFkActsMemId.name, memId),
+            if (condition != null) condition,
+          ]),
+          orderBy: [
+            if (latest == true) ActOrderBy.descEnd.toQuery,
+            if (latest == true) ActOrderBy.descStart.toQuery,
+            if (orderBy != null) ...orderBy
+          ],
+        ),
         {
           "memId": memId,
           "latest": latest,
+          "condition": condition,
+          "orderBy": orderBy,
         },
       );
 
