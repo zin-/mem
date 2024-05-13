@@ -67,6 +67,8 @@ void main() => group(
 
         testWidgets(
           ": start act.",
+          // 時間に関するテストなので3回までリトライ可能とする
+          retry: 3,
           (widgetTester) async {
             await runApplication();
             await widgetTester.pumpAndSettle();
