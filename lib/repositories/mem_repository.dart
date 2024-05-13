@@ -47,6 +47,27 @@ class MemRepository extends DatabaseTupleRepository<Mem, SavedMem, int> {
       );
 
   @override
+  Future<SavedMem?> findOneBy({
+    int? id,
+    Condition? condition,
+    List<OrderBy>? orderBy,
+  }) =>
+      v(
+        () => super.findOneBy(
+          condition: And([
+            if (id != null) Equals(defPkId.name, id),
+            if (condition != null) condition, // coverage:ignore-line
+          ]),
+          orderBy: orderBy,
+        ),
+        {
+          "id": id,
+          "condition": condition,
+          "orderBy": orderBy,
+        },
+      );
+
+  @override
   SavedMem pack(Map<String, dynamic> tuple) {
     final startOn = tuple[defColMemsStartOn.name];
     final endOn = tuple[defColMemsEndOn.name];

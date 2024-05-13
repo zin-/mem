@@ -93,7 +93,7 @@ class NotificationClient {
                   defaultStartOfDay,
               savedMemNotifications ??
                   await _memNotificationRepository.shipByMemId(memId),
-              await _actRepository.findOneBy(memId, true),
+              await _actRepository.findOneBy(memId: memId, latest: true),
               scheduleCallback,
             )) {
               await _scheduleClient.receive(schedule);

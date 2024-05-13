@@ -23,7 +23,7 @@ class ArchiveMemAction extends AppBarActionBuilder {
   }) =>
       Consumer(
         builder: (context, ref, child) {
-          final mem = ref.watch(memByMemIdProvider(_memId))!;
+          final mem = ref.read(memByMemIdProvider(_memId))!;
           if (mem.isArchived) {
             return super.popupMenuItemChildBuilder(
               key: () => keyUnarchiveMem,

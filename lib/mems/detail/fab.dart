@@ -12,18 +12,24 @@ class MemDetailFab extends ConsumerWidget {
   final GlobalKey<FormState> _formKey;
   final int? _memId;
 
-  const MemDetailFab(this._formKey, this._memId, {super.key});
+  const MemDetailFab(
+    this._formKey,
+    this._memId, {
+    super.key,
+  });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final memName = ref.watch(memDetailProvider(_memId)).mem.name;
-
-    return _MemDetailFabComponent(
-      _formKey,
-      () => ref.read(saveMem(_memId)),
-      memName,
-    );
-  }
+  Widget build(BuildContext context, WidgetRef ref) => v(
+        () => _MemDetailFabComponent(
+          _formKey,
+          () => ref.read(saveMem(_memId)),
+          ref.watch(
+              editingMemByMemIdProvider(_memId).select((value) => value.name)),
+        ),
+        {
+          "_memId": _memId,
+        },
+      );
 }
 
 class _MemDetailFabComponent extends StatelessWidget {
@@ -35,29 +41,29 @@ class _MemDetailFabComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => v(
-        () {
-          final l10n = buildL10n(context);
+        () => FloatingActionButton(
+          key: keySaveMemFab,
+          child: const Icon(Icons.save_alt),
+          onPressed: () => v(() {
+            if (_formKey.currentState?.validate() ?? false) {
+              _saveMem();
 
-          return FloatingActionButton(
-            key: keySaveMemFab,
-            child: const Icon(Icons.save_alt),
-            onPressed: () => v(() {
-              if (_formKey.currentState?.validate() ?? false) {
-                _saveMem();
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(l10n.saveMemSuccessMessage(
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    buildL10n(context).saveMemSuccessMessage(
                       _memName,
-                    )),
-                    duration: defaultDismissDuration,
-                    dismissDirection: DismissDirection.horizontal,
+                    ),
                   ),
-                );
-              }
-            }),
-          );
+                  duration: defaultDismissDuration,
+                  dismissDirection: DismissDirection.horizontal,
+                ),
+              );
+            }
+          }),
+        ),
+        {
+          "_memName": _memName,
         },
-        _memName,
       );
 }

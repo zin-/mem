@@ -93,6 +93,22 @@ abstract class DatabaseTupleRepository<E extends EntityV1,
         id,
       );
 
+  Future<SavedEntity?> findOneBy({
+    Condition? condition,
+    List<OrderBy>? orderBy,
+  }) =>
+      v(
+        () async => await ship(
+          condition: condition,
+          orderBy: orderBy,
+          limit: 1,
+        ).then((value) => value.length == 1 ? value.single : null),
+        {
+          "condition": condition,
+          "orderBy": orderBy,
+        },
+      );
+
   Future<SavedEntity> replace(SavedEntity payload) => v(
         () async {
           final entityMap = unpack(payload);

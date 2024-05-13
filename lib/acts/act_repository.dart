@@ -7,15 +7,13 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 
-enum ActOrderBy { descStart, descEnd }
+enum ActOrderBy { descStart }
 
 extension _ActOrderByExt on ActOrderBy {
   OrderBy get toQuery {
     switch (index) {
       case 0:
         return Descending(defColActsStart);
-      case 1:
-        return Descending(defColActsEnd);
 
       default:
         throw Exception(); // coverage:ignore-line
@@ -24,26 +22,29 @@ extension _ActOrderByExt on ActOrderBy {
 }
 
 class ActRepository extends DatabaseTupleRepository<Act, SavedAct, int> {
-  Future<SavedAct?> findOneBy(
-    int memId,
-    bool latest,
-  ) =>
+  @override
+  Future<SavedAct?> findOneBy({
+    int? memId,
+    bool? latest,
+    Condition? condition,
+    List<OrderBy>? orderBy,
+  }) =>
       v(
-        () async {
-          final oneOrNothing = await super.ship(
-            condition: Equals(defFkActsMemId.name, memId),
-            orderBy: [
-              if (latest) ActOrderBy.descEnd.toQuery,
-              if (latest) ActOrderBy.descStart.toQuery,
-            ],
-            limit: 1,
-          );
-
-          return oneOrNothing.length == 1 ? oneOrNothing.single : null;
-        },
+        () async => await super.findOneBy(
+          condition: And([
+            if (memId != null) Equals(defFkActsMemId.name, memId),
+            if (condition != null) condition, // coverage:ignore-line
+          ]),
+          orderBy: [
+            if (latest == true) ActOrderBy.descStart.toQuery,
+            if (orderBy != null) ...orderBy, // coverage:ignore-line
+          ],
+        ),
         {
           "memId": memId,
           "latest": latest,
+          "condition": condition,
+          "orderBy": orderBy,
         },
       );
 

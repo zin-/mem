@@ -12,11 +12,10 @@ final _memClient = MemClient();
 final saveMem =
     Provider.autoDispose.family<Future<MemDetail>, int?>((ref, memId) => v(
           () async {
-            final memDetail = ref.watch(memDetailProvider(memId));
             final saved = await _memClient.save(
-              memDetail.mem,
-              memDetail.memItems,
-              memDetail.notifications ?? [],
+              ref.read(editingMemByMemIdProvider(memId)),
+              ref.read(memItemsByMemIdProvider(memId)),
+              ref.read(memNotificationsByMemIdProvider(memId)),
             );
 
             ref.read(memsProvider.notifier).upsertAll(
@@ -51,10 +50,9 @@ final saveMem =
 final archiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
   (ref, memId) => v(
     () async {
-      final mem = ref.read(memDetailProvider(memId)).mem as SavedMem;
+      final mem = ref.read(memByMemIdProvider(memId));
 
-      final archived = await _memClient.archive(mem);
-
+      final archived = await _memClient.archive(mem as SavedMem);
       ref
           .read(editingMemByMemIdProvider(memId).notifier)
           .updatedBy(archived.mem);
@@ -72,9 +70,9 @@ final archiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
 final unarchiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
   (ref, memId) => v(
     () async {
-      final mem = ref.read(memDetailProvider(memId)).mem as SavedMem;
+      final mem = ref.read(memByMemIdProvider(memId));
 
-      final unarchived = await _memClient.unarchive(mem);
+      final unarchived = await _memClient.unarchive(mem as SavedMem);
 
       ref
           .read(editingMemByMemIdProvider(memId).notifier)

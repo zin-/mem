@@ -29,12 +29,13 @@ final memByMemIdProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<SavedMem?>, SavedMem?, int?>(
   (ref, memId) => v(
     () => ValueStateNotifier(
-      ref.read(memsProvider).singleWhereOrNull(
+      ref.watch(memsProvider).singleWhereOrNull(
             (element) => element is SavedMem ? element.id == memId : false,
           ) as SavedMem?,
-      initialFuture: memId == null ? null : MemRepository().shipById(memId),
+      initialFuture:
+          memId == null ? null : MemRepository().findOneBy(id: memId),
     ),
-    memId,
+    {"memId": memId},
   ),
 );
 

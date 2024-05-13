@@ -24,7 +24,7 @@ class MemNotificationsView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemNotificationsView(
           _memId,
-          ref.read(memNotificationsByMemIdProvider(_memId)),
+          ref.watch(memNotificationsByMemIdProvider(_memId)),
         ),
         {
           "_memId": _memId,
@@ -52,12 +52,12 @@ class _MemNotificationsView extends StatelessWidget {
               _memNotifications.where((element) => element.isEnabled());
 
           final hasEnabledNotifications = enables.isNotEmpty;
-          final repeat = enables.singleWhereOrNull(
-              (element) => element.isRepeated());
-          final repeatByNDay = enables.singleWhereOrNull(
-              (element) => element.isRepeatByNDay());
-          final afterActStarted = enables.singleWhereOrNull(
-              (element) => element.isAfterActStarted());
+          final repeat =
+              enables.singleWhereOrNull((element) => element.isRepeated());
+          final repeatByNDay =
+              enables.singleWhereOrNull((element) => element.isRepeatByNDay());
+          final afterActStarted = enables
+              .singleWhereOrNull((element) => element.isAfterActStarted());
 
           final text = [
             if (repeat != null)

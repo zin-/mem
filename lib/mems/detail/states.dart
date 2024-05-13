@@ -1,7 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/core/mem.dart';
-import 'package:mem/core/mem_detail.dart';
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
@@ -11,27 +10,13 @@ import 'package:mem/mems/mem_item_repository.dart';
 import 'package:mem/mems/states.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
 
-final memDetailProvider = StateNotifierProvider.autoDispose
-    .family<ValueStateNotifier<MemDetail>, MemDetail, int?>(
-  (ref, memId) => v(
-    () => ValueStateNotifier(
-      MemDetail(
-        ref.watch(editingMemByMemIdProvider(memId)),
-        ref.watch(memItemsByMemIdProvider(memId)),
-        ref.watch(memNotificationsByMemIdProvider(memId)),
-      ),
-    ),
-    memId,
-  ),
-);
-
 final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<Mem>, Mem, int?>(
   (ref, memId) => v(
     () => ValueStateNotifier(
       ref.watch(memByMemIdProvider(memId)) ?? Mem.defaultNew(),
     ),
-    memId,
+    {"memId": memId},
   ),
 );
 
