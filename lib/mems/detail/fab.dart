@@ -16,7 +16,8 @@ class MemDetailFab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final memName = ref.watch(memDetailProvider(_memId)).mem.name;
+    // TODO select(name)
+    final memName = ref.watch(editingMemByMemIdProvider(_memId)).name;
 
     return _MemDetailFabComponent(
       _formKey,

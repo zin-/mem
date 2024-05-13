@@ -14,7 +14,7 @@ final saveMem =
           () async {
             final memDetail = ref.watch(memDetailProvider(memId));
             final saved = await _memClient.save(
-              memDetail.mem,
+              ref.read(editingMemByMemIdProvider(memId)),
               memDetail.memItems,
               memDetail.notifications ?? [],
             );
