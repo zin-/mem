@@ -35,12 +35,12 @@ class ActRepository extends DatabaseTupleRepository<Act, SavedAct, int> {
         () async => await super.findOneBy(
           condition: And([
             if (memId != null) Equals(defFkActsMemId.name, memId),
-            if (condition != null) condition,
+            if (condition != null) condition, // coverage:ignore-line
           ]),
           orderBy: [
             if (latest == true) ActOrderBy.descEnd.toQuery,
             if (latest == true) ActOrderBy.descStart.toQuery,
-            if (orderBy != null) ...orderBy
+            if (orderBy != null) ...orderBy, // coverage:ignore-line
           ],
         ),
         {

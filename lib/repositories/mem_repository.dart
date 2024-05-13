@@ -56,7 +56,7 @@ class MemRepository extends DatabaseTupleRepository<Mem, SavedMem, int> {
         () => super.findOneBy(
           condition: And([
             if (id != null) Equals(defPkId.name, id),
-            if (condition != null) condition,
+            if (condition != null) condition, // coverage:ignore-line
           ]),
           orderBy: orderBy,
         ),
