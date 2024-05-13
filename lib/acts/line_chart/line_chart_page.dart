@@ -16,26 +16,30 @@ class ActLineChartPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () {
-          final memName = ref.read(memDetailProvider(_memId)).mem.name;
-
-          return Scaffold(
-            appBar: AppBar(title: Text(memName)),
-            body: Padding(
-              padding: defaultPadding,
-              child: AsyncValueView(
-                loadActList(_memId),
-                (loaded) => LineChartWrapper(
-                  ActsSummary(
-                    ref
-                        .watch(actListProvider(_memId))
-                        .where((element) => element.memId == _memId),
-                  ),
+        () => Scaffold(
+          appBar: AppBar(
+            title: Text(
+              ref.read(
+                editingMemByMemIdProvider(_memId).select((value) => value.name),
+              ),
+            ),
+          ),
+          body: Padding(
+            padding: defaultPadding,
+            child: AsyncValueView(
+              loadActList(_memId),
+              (loaded) => LineChartWrapper(
+                ActsSummary(
+                  ref
+                      .watch(actListProvider(_memId))
+                      .where((element) => element.memId == _memId),
                 ),
               ),
             ),
-          );
+          ),
+        ),
+        {
+          "_memId": _memId,
         },
-        _memId,
       );
 }
