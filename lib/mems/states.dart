@@ -34,7 +34,7 @@ final memByMemIdProvider = StateNotifierProvider.autoDispose
           ) as SavedMem?,
       initialFuture: memId == null ? null : MemRepository().shipById(memId),
     ),
-    memId,
+    {"memId": memId},
   ),
 );
 

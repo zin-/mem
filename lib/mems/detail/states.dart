@@ -31,7 +31,7 @@ final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
     () => ValueStateNotifier(
       ref.watch(memByMemIdProvider(memId)) ?? Mem.defaultNew(),
     ),
-    memId,
+    {"memId": memId},
   ),
 );
 

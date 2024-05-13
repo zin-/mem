@@ -12,11 +12,10 @@ final _memClient = MemClient();
 final saveMem =
     Provider.autoDispose.family<Future<MemDetail>, int?>((ref, memId) => v(
           () async {
-            final memDetail = ref.watch(memDetailProvider(memId));
             final saved = await _memClient.save(
               ref.read(editingMemByMemIdProvider(memId)),
-              memDetail.memItems,
-              memDetail.notifications ?? [],
+              ref.read(memItemsByMemIdProvider(memId)),
+              ref.read(memNotificationsByMemIdProvider(memId)),
             );
 
             ref.read(memsProvider.notifier).upsertAll(
