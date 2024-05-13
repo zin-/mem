@@ -20,7 +20,7 @@ class MemDetailBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
-          final editingMem = ref.watch(memDetailProvider(_memId)).mem;
+          final editingMem = ref.watch(editingMemByMemIdProvider(_memId));
 
           return _MemDetailBodyComponent(
             _memId,
@@ -76,6 +76,9 @@ class _MemDetailBodyComponent extends StatelessWidget {
             ),
           ],
         ),
-        {"memId": _memId.toString(), "_mem": _mem},
+        {
+          "_memId": _memId,
+          "_mem": _mem,
+        },
       );
 }
