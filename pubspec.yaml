@@ -16,6 +16,8 @@ dependencies:
 
   # for View
   intl: any
+  # FIXME upgrade flutter_picker version
+  #  for https://github.com/zin-/mem/issues/339
   flutter_picker: ^2.1.0
   flutter_sticky_header: ^0.6.5
 

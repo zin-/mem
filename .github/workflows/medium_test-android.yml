@@ -4,17 +4,20 @@ on:
   workflow_call:
     inputs:
       flutter-channel:
-        required: true
         type: string
+        required: true
+      flutter-version:
+        type: string
+        required: true
       test-script:
-        required: true
         type: string
+        required: true
       target:
-        required: true
         type: string
-      timeout-minutes:
         required: true
+      timeout-minutes:
         type: number
+        required: true
 
     secrets:
       CODECOV_TOKEN:
@@ -66,6 +69,7 @@ jobs:
         uses: ./.github/actions/flutter-doctor
         with:
           flutter-channel: ${{ inputs.flutter-channel }}
+          flutter-version: ${{ inputs.flutter-version }}
 
       - name: "Install Dependencies"
         uses: ./.github/actions/install-dependencies

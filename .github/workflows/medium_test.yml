@@ -4,17 +4,20 @@ on:
   workflow_call:
     inputs:
       flutter-channel:
-        required: true
         type: string
+        required: true
+      flutter-version:
+        type: string
+        required: true
       test-script:
-        required: true
         type: string
+        required: true
       target:
-        required: true
         type: string
-      timeout-minutes-android:
         required: true
+      timeout-minutes-android:
         type: number
+        required: true
 
     secrets:
       CODECOV_TOKEN:
@@ -25,6 +28,7 @@ jobs:
     uses: ./.github/workflows/medium_test-android.yml
     with:
       flutter-channel: ${{ inputs.flutter-channel }}
+      flutter-version: ${{ inputs.flutter-version }}
       test-script: >
         ${{ inputs.test-script }} --device-id "emulator-5554"
       target: ${{ inputs.target }}
@@ -36,6 +40,7 @@ jobs:
     uses: ./.github/workflows/medium_test-windows.yml
     with:
       flutter-channel: ${{ inputs.flutter-channel }}
+      flutter-version: ${{ inputs.flutter-version }}
       test-script: ${{ inputs.test-script }} --device-id windows
       target: ${{ inputs.target }}
     secrets:
