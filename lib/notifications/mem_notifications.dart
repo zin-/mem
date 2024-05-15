@@ -18,7 +18,7 @@ class MemNotifications {
     TimeOfDay startOfDay,
     Iterable<SavedMemNotification>? memNotifications,
     SavedAct? lastAct,
-    Function callback,
+    Future<void> Function(int, Map<String, dynamic>) callback,
   ) =>
       v(
         () {
@@ -52,7 +52,7 @@ class MemNotifications {
   static Iterable<Schedule> _memPeriodSchedules(
     SavedMem savedMem,
     TimeOfDay startOfDay,
-    Function callback,
+    Future<void> Function(int, Map<String, dynamic>) callback,
   ) =>
       v(
         () {
@@ -121,7 +121,7 @@ class MemNotifications {
     int memId,
     Iterable<SavedMemNotification> savedMemNotifications,
     SavedAct? lastAct,
-    Function callback,
+    Future<void> Function(int, Map<String, dynamic>) callback,
   ) =>
       v(
         () {

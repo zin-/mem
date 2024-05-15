@@ -83,7 +83,7 @@ class _AndroidAlarmManagerWrapper {
   Future<bool> periodic(
     Duration duration,
     int id,
-    Function callback,
+    Future<void> Function(int, Map<String, dynamic>) callback,
     DateTime? startAt,
     Map<String, dynamic> params,
   ) =>
