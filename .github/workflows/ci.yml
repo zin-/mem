@@ -45,14 +45,15 @@ jobs:
     strategy:
       matrix:
         target: [
-          framework,
+          scenarios/settings_scenario.dart,
           scenarios/app_test.dart,
-          scenarios/settings_scenario.dart
+          framework
         ]
         include:
-          - timeout-minutes-android: 20
+          - timeout-minutes-android: 30
+            timeout-minutes-windows: 15
           - target: scenarios/settings_scenario.dart
-            timeout-minutes-android: 40
+            timeout-minutes-android: 50
       fail-fast: true
 
     needs: set_up-env
@@ -63,5 +64,6 @@ jobs:
       test-script: flutter test integration_test/${{ matrix.target }} --dart-define=CICD=true --file-reporter json:reports/test_report.log --coverage
       target: ${{ matrix.target }}
       timeout-minutes-android: ${{ matrix.timeout-minutes-android }}
+      timeout-minutes-windows: ${{ matrix.timeout-minutes-windows }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

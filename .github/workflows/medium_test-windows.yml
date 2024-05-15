@@ -15,6 +15,9 @@ on:
       target:
         type: string
         required: true
+      timeout-minutes:
+        type: number
+        required: true
 
     secrets:
       CODECOV_TOKEN:
@@ -24,7 +27,7 @@ jobs:
   medium_test-windows:
     name: "Medium test (Windows) (${{ inputs.target }})"
     runs-on: windows-latest
-    timeout-minutes: 10
+    timeout-minutes: ${{ inputs.timeout-minutes }}
 
     steps:
       - uses: actions/checkout@v4

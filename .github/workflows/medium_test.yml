@@ -18,6 +18,9 @@ on:
       timeout-minutes-android:
         type: number
         required: true
+      timeout-minutes-windows:
+        type: number
+        required: true
 
     secrets:
       CODECOV_TOKEN:
@@ -43,5 +46,6 @@ jobs:
       flutter-version: ${{ inputs.flutter-version }}
       test-script: ${{ inputs.test-script }} --device-id windows
       target: ${{ inputs.target }}
+      timeout-minutes: ${{ inputs.timeout-minutes-windows }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
