@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mem/acts/act_repository.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
@@ -27,7 +26,6 @@ class NotificationClient {
   final PreferenceClient _preferenceClient;
   final MemRepository _memRepository;
   final MemNotificationRepository _memNotificationRepository;
-  final ActRepository _actRepository;
 
   NotificationClient._(
     this.notificationChannels,
@@ -36,7 +34,6 @@ class NotificationClient {
     this._preferenceClient,
     this._memRepository,
     this._memNotificationRepository,
-    this._actRepository,
   );
 
   static NotificationClient? _instance;
@@ -51,7 +48,6 @@ class NotificationClient {
             PreferenceClient(),
             MemRepository(),
             MemNotificationRepository(),
-            ActRepository(),
           );
         },
         {
@@ -93,7 +89,6 @@ class NotificationClient {
                   defaultStartOfDay,
               savedMemNotifications ??
                   await _memNotificationRepository.shipByMemId(memId),
-              await _actRepository.findOneBy(memId: memId, latest: true),
               scheduleCallback,
             )) {
               await _scheduleClient.receive(schedule);

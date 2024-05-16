@@ -12,12 +12,15 @@ class ScheduleClient extends Repository<Schedule>
   ScheduleClient._(this._androidAlarmManagerWrapper);
 
   factory ScheduleClient() => v(
-        () {
-          return _instance ??= ScheduleClient._(
-            _AndroidAlarmManagerWrapper(),
-          );
-        },
+        () => _instance ??= ScheduleClient._(
+          _AndroidAlarmManagerWrapper(),
+        ),
       );
+
+  static void resetSingleton() {
+    _AndroidAlarmManagerWrapper.resetSingleton();
+    _instance = null;
+  }
 
   @override
   Future<void> receive(Schedule entity) => v(
@@ -62,6 +65,11 @@ class _AndroidAlarmManagerWrapper {
         () => _instance ??= _AndroidAlarmManagerWrapper._(),
         {"_instance": _instance},
       );
+
+  static void resetSingleton() {
+    _instance?._initialized = false;
+    _instance = null;
+  }
 
   Future<bool> oneShotAt(
     DateTime time,

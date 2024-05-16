@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -89,6 +90,7 @@ String dateTimeText(DateTime dateTime) =>
 
 // MockMethodChannel
 //  for local_notifications
+// FIXME SetMockMethodChannelに移行する
 void setMockLocalNotifications(WidgetTester widgetTester) =>
     widgetTester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
       const MethodChannel("dexterous.com/flutter/local_notifications"),
@@ -107,6 +109,34 @@ void setMockLocalNotifications(WidgetTester widgetTester) =>
       },
     );
 
-extension WidgetTesterExtension on WidgetTester {
+extension TextAt on WidgetTester {
   Text textAt(int index) => widget<Text>(find.byType(Text).at(index));
+}
+
+extension HandleMockMethodChannel on WidgetTester {
+  static const androidAlarmManagerChannel = AndroidAlarmManager.channel;
+
+  void setMockAndroidAlarmManager(
+    List<Future<Object?>? Function(MethodCall message)?> expectedMethodCallList,
+  ) {
+    int callCount = 0;
+    binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      androidAlarmManagerChannel,
+      (message) async {
+        if (callCount > expectedMethodCallList.length) {
+          fail("lack of expectedMethodCallList: ${{
+            'callCount': callCount,
+            'method': message.method,
+            'arguments': message.arguments,
+          }}.");
+        }
+        final result = await expectedMethodCallList[callCount]?.call(message);
+        callCount++;
+        return result;
+      },
+    );
+  }
+
+  void clearMockAndroidAlarmManager() => binding.defaultBinaryMessenger
+      .setMockMethodCallHandler(androidAlarmManagerChannel, null);
 }
