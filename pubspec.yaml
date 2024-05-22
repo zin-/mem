@@ -34,7 +34,7 @@ dependencies:
   # for Notification
   flutter_local_notifications:
   timezone:
-  android_alarm_manager_plus: ^3.0.4
+  android_alarm_manager_plus: ^4.0.3
 
   # for Persistence
   ## for Database
