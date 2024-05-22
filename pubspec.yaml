@@ -29,7 +29,7 @@ dependencies:
   flutter_riverpod:
 
   ## for Chart
-  fl_chart: ^0.67.0
+  fl_chart: ^0.68.0
 
   # for Notification
   flutter_local_notifications:
