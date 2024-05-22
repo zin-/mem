@@ -12,10 +12,33 @@ import 'notification/channel.dart';
 // TODO Windows, Web, Linuxでの通知を実装する
 //  https://github.com/zin-/mem/issues/303
 class NotificationsWrapper {
-  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  final String androidDefaultIconPath;
+  bool _pluginIsInitialized = false;
 
-  late final Future<bool?> _pluginIsInitialized;
+  Future<FlutterLocalNotificationsPlugin>
+      get _flutterLocalNotificationsPlugin => v(
+            () async {
+              final flutterLocalNotificationsPlugin =
+                  FlutterLocalNotificationsPlugin();
+              if (!_pluginIsInitialized) {
+                await flutterLocalNotificationsPlugin.initialize(
+                  InitializationSettings(
+                    android:
+                        AndroidInitializationSettings(androidDefaultIconPath),
+                  ),
+                  onDidReceiveNotificationResponse:
+                      onDidReceiveNotificationResponse,
+                  onDidReceiveBackgroundNotificationResponse:
+                      onDidReceiveNotificationResponse,
+                );
+                _pluginIsInitialized = true;
+              }
+              return flutterLocalNotificationsPlugin;
+            },
+            {
+              '_pluginIsInitialized': _pluginIsInitialized,
+            },
+          );
 
   Future<void> show(
     int id,
@@ -25,7 +48,7 @@ class NotificationsWrapper {
     Map<String, dynamic> payload,
   ) =>
       v(
-        () => _flutterLocalNotificationsPlugin.show(
+        () async => await (await _flutterLocalNotificationsPlugin).show(
           id,
           title,
           body,
@@ -44,12 +67,13 @@ class NotificationsWrapper {
       );
 
   Future<void> cancel(int notificationId) => v(
-        () => _flutterLocalNotificationsPlugin.cancel(notificationId),
+        () async => await (await _flutterLocalNotificationsPlugin)
+            .cancel(notificationId),
         {'notificationId': notificationId},
       );
 
   Future<void> cancelAll() => v(
-        () async => await _flutterLocalNotificationsPlugin.cancelAll(),
+        () async => await (await _flutterLocalNotificationsPlugin).cancelAll(),
       );
 
   NotificationDetails _buildNotificationDetails(
@@ -70,62 +94,52 @@ class NotificationsWrapper {
       );
 
   Future<bool> handleAppLaunchDetails() => v(
-        () async => _pluginIsInitialized.then(
-          (value) => v(
-            () async {
-              final appLaunchDetails = await _flutterLocalNotificationsPlugin
+        () async {
+          final appLaunchDetails =
+              await (await _flutterLocalNotificationsPlugin)
                   .getNotificationAppLaunchDetails();
 
-              if (appLaunchDetails?.didNotificationLaunchApp == false) {
-                return false;
-              }
+          if (appLaunchDetails?.didNotificationLaunchApp == false) {
+            return false;
+          }
 // アプリが停止状態で、通知から起動される必要があるため現状テストする方法がない
 // coverage:ignore-start
-              final details = appLaunchDetails?.notificationResponse;
+          final details = appLaunchDetails?.notificationResponse;
 
-              if (details == null) {
-                return false;
-              }
+          if (details == null) {
+            return false;
+          }
 
-              onDidReceiveNotificationResponse(details);
+          onDidReceiveNotificationResponse(details);
 
-              return true;
+          return true;
 // coverage:ignore-end
-            },
-            {"_pluginIsInitialized": value},
-          ),
-        ),
+        },
       );
 
   NotificationsWrapper._(
-    String androidDefaultIconPath,
-  ) {
-    v(
-      () {
-        _pluginIsInitialized = _flutterLocalNotificationsPlugin.initialize(
-          InitializationSettings(
-            android: AndroidInitializationSettings(androidDefaultIconPath),
-          ),
-          onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
-          onDidReceiveBackgroundNotificationResponse:
-              onDidReceiveNotificationResponse,
-        );
-      },
-      {
-        "androidDefaultIconPath": androidDefaultIconPath,
-      },
-    );
-  }
+    this.androidDefaultIconPath,
+  );
 
   static NotificationsWrapper? _instance;
 
-  factory NotificationsWrapper(String androidDefaultIconPath) => v(
-        () => _instance ??= NotificationsWrapper._(androidDefaultIconPath),
+  factory NotificationsWrapper(
+    String androidDefaultIconPath,
+  ) =>
+      v(
+        () => _instance ??= NotificationsWrapper._(
+          androidDefaultIconPath,
+        ),
         {
           "_instance": _instance,
           "androidDefaultIconPath": androidDefaultIconPath,
         },
       );
+
+  static void resetSingleton() {
+    _instance?._pluginIsInitialized = false;
+    _instance = null;
+  }
 }
 
 // 分かりやすさのために、entry-pointはすべてmain.dartに定義したいが、

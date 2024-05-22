@@ -113,30 +113,44 @@ extension TextAt on WidgetTester {
   Text textAt(int index) => widget<Text>(find.byType(Text).at(index));
 }
 
-extension HandleMockMethodChannel on WidgetTester {
+extension HandleMockMethodCallHandler on WidgetTester {
   static const androidAlarmManagerChannel = AndroidAlarmManager.channel;
+  static const flutterLocalNotificationsChannel =
+      MethodChannel('dexterous.com/flutter/local_notifications');
 
   void setMockAndroidAlarmManager(
     List<Future<Object?>? Function(MethodCall message)?> expectedMethodCallList,
+  ) =>
+      _setMockMethodCallHandler(
+          androidAlarmManagerChannel, expectedMethodCallList);
+
+  void clearMockAndroidAlarmManager() => binding.defaultBinaryMessenger
+      .setMockMethodCallHandler(androidAlarmManagerChannel, null);
+
+  void setMockFlutterLocalNotifications(
+    List<Future<Object?>? Function(MethodCall message)?> expectedMethodCallList,
+  ) =>
+      _setMockMethodCallHandler(
+          flutterLocalNotificationsChannel, expectedMethodCallList);
+
+  void clearMockFlutterLocalNotifications() => binding.defaultBinaryMessenger
+      .setMockMethodCallHandler(flutterLocalNotificationsChannel, null);
+
+  void _setMockMethodCallHandler(
+    MethodChannel methodChannel,
+    List<Future<Object?>? Function(MethodCall message)?> expectedMethodCallList,
   ) {
-    int callCount = 0;
     binding.defaultBinaryMessenger.setMockMethodCallHandler(
-      androidAlarmManagerChannel,
+      methodChannel,
       (message) async {
-        if (callCount > expectedMethodCallList.length) {
+        if (expectedMethodCallList.isEmpty) {
           fail("lack of expectedMethodCallList: ${{
-            'callCount': callCount,
             'method': message.method,
             'arguments': message.arguments,
           }}.");
         }
-        final result = await expectedMethodCallList[callCount]?.call(message);
-        callCount++;
-        return result;
+        return await expectedMethodCallList.removeAt(0)?.call(message);
       },
     );
   }
-
-  void clearMockAndroidAlarmManager() => binding.defaultBinaryMessenger
-      .setMockMethodCallHandler(androidAlarmManagerChannel, null);
 }

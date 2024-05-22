@@ -9,7 +9,7 @@ import 'wrapper.dart';
 
 class NotificationRepository extends KeyWithValueRepository<Notification, int>
     with Discarder {
-  late final NotificationsWrapper? _flutterLocalNotificationsWrapper =
+  NotificationsWrapper? _flutterLocalNotificationsWrapper =
       defaultTargetPlatform == TargetPlatform.android
           ? NotificationsWrapper(androidDefaultIconPath)
           : null;
@@ -22,6 +22,17 @@ class NotificationRepository extends KeyWithValueRepository<Notification, int>
         () => _instance ??= NotificationRepository._(),
         {
           "_instance": _instance,
+        },
+      );
+
+  static void resetSingleton() => v(
+        () {
+          NotificationsWrapper.resetSingleton();
+          _instance?._flutterLocalNotificationsWrapper = null;
+          _instance = null;
+        },
+        {
+          '_instance': _instance,
         },
       );
 
