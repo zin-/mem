@@ -17,6 +17,7 @@ const doneMemNotificationActionId = "done-mem";
 const startActNotificationActionId = "start-act";
 const finishActiveActNotificationActionId = "finish-active_act";
 const pauseActNotificationActionId = "pause-act";
+const pauseActNotificationBody = "Paused";
 
 class NotificationChannels {
   late final Map<NotificationType, NotificationChannel> notificationChannels;
@@ -58,7 +59,7 @@ class NotificationChannels {
               break;
             case NotificationType.pausedAct:
               id = pausedActNotificationId(memId);
-              body = "Paused";
+              body = pauseActNotificationBody;
               break;
           }
           final channel = notificationChannels[notificationType]!;
