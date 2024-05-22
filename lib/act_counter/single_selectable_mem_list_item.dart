@@ -16,7 +16,7 @@ class SingleSelectableMemListItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _SingleSelectableMemListItemComponent(
-          ref.watch(memListProvider).firstWhere((_) => _.id == _memId),
+          ref.watch(memListProvider).firstWhere((mem) => mem.id == _memId),
           ref.watch(selectedMemIdsProvider).contains(_memId),
           (memId) => v(
             () => ref

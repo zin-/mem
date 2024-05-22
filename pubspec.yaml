@@ -70,7 +70,7 @@ dev_dependencies:
   mockito:
   build_runner:
 
-  flutter_lints: ^3.0.2
+  flutter_lints: ^4.0.0
 
   # for Icon
   flutter_launcher_icons:
