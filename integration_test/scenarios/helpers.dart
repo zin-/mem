@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -89,6 +90,7 @@ String dateTimeText(DateTime dateTime) =>
 
 // MockMethodChannel
 //  for local_notifications
+// FIXME SetMockMethodChannelに移行する
 void setMockLocalNotifications(WidgetTester widgetTester) =>
     widgetTester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
       const MethodChannel("dexterous.com/flutter/local_notifications"),
@@ -107,6 +109,48 @@ void setMockLocalNotifications(WidgetTester widgetTester) =>
       },
     );
 
-extension WidgetTesterExtension on WidgetTester {
+extension TextAt on WidgetTester {
   Text textAt(int index) => widget<Text>(find.byType(Text).at(index));
+}
+
+extension HandleMockMethodCallHandler on WidgetTester {
+  static const androidAlarmManagerChannel = AndroidAlarmManager.channel;
+  static const flutterLocalNotificationsChannel =
+      MethodChannel('dexterous.com/flutter/local_notifications');
+
+  void setMockAndroidAlarmManager(
+    List<Future<Object?>? Function(MethodCall message)?> expectedMethodCallList,
+  ) =>
+      _setMockMethodCallHandler(
+          androidAlarmManagerChannel, expectedMethodCallList);
+
+  void clearMockAndroidAlarmManager() => binding.defaultBinaryMessenger
+      .setMockMethodCallHandler(androidAlarmManagerChannel, null);
+
+  void setMockFlutterLocalNotifications(
+    List<Future<Object?>? Function(MethodCall message)?> expectedMethodCallList,
+  ) =>
+      _setMockMethodCallHandler(
+          flutterLocalNotificationsChannel, expectedMethodCallList);
+
+  void clearMockFlutterLocalNotifications() => binding.defaultBinaryMessenger
+      .setMockMethodCallHandler(flutterLocalNotificationsChannel, null);
+
+  void _setMockMethodCallHandler(
+    MethodChannel methodChannel,
+    List<Future<Object?>? Function(MethodCall message)?> expectedMethodCallList,
+  ) {
+    binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      methodChannel,
+      (message) async {
+        if (expectedMethodCallList.isEmpty) {
+          fail("lack of expectedMethodCallList: ${{
+            'method': message.method,
+            'arguments': message.arguments,
+          }}.");
+        }
+        return await expectedMethodCallList.removeAt(0)?.call(message);
+      },
+    );
+  }
 }

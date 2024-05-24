@@ -6,6 +6,8 @@ on:
 
 env:
   flutter-channel: stable
+  # FIXME https://github.com/zin-/mem/issues/339
+  flutter-version: 3.19.6
 
 jobs:
   set_up-env:
@@ -13,6 +15,7 @@ jobs:
     timeout-minutes: 3
     outputs:
       flutter-channel: ${{ steps.env-variables.outputs.flutter-channel }}
+      flutter-version: ${{ steps.env-variables.outputs.flutter-version }}
     runs-on: ubuntu-latest
     steps:
       - id: env-variables
@@ -20,18 +23,21 @@ jobs:
         # description: "reusing-workflowsの呼び出しではwithにenvを指定できないためoutputsに変換する"
         run: |
           echo "flutter-channel=${{ env.flutter-channel }}" >> $GITHUB_OUTPUT
+          echo "flutter-version=${{ env.flutter-version }}" >> $GITHUB_OUTPUT
 
   analyze-code:
     needs: set_up-env
     uses: ./.github/workflows/analyze-code.yml
     with:
       flutter-channel: ${{ needs.set_up-env.outputs.flutter-channel }}
+      flutter-version: ${{ needs.set_up-env.outputs.flutter-version }}
 
   small_test:
     needs: set_up-env
     uses: ./.github/workflows/small_test.yml
     with:
       flutter-channel: ${{ needs.set_up-env.outputs.flutter-channel }}
+      flutter-version: ${{ needs.set_up-env.outputs.flutter-version }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
@@ -39,22 +45,25 @@ jobs:
     strategy:
       matrix:
         target: [
-          framework,
+          scenarios/settings_scenario.dart,
           scenarios/app_test.dart,
-          scenarios/settings_scenario.dart
+          framework
         ]
         include:
-          - timeout-minutes-android: 20
+          - timeout-minutes-android: 30
+            timeout-minutes-windows: 15
           - target: scenarios/settings_scenario.dart
-            timeout-minutes-android: 40
+            timeout-minutes-android: 50
       fail-fast: true
 
     needs: set_up-env
     uses: ./.github/workflows/medium_test.yml
     with:
       flutter-channel: ${{ needs.set_up-env.outputs.flutter-channel }}
+      flutter-version: ${{ needs.set_up-env.outputs.flutter-version }}
       test-script: flutter test integration_test/${{ matrix.target }} --dart-define=CICD=true --file-reporter json:reports/test_report.log --coverage
       target: ${{ matrix.target }}
       timeout-minutes-android: ${{ matrix.timeout-minutes-android }}
+      timeout-minutes-windows: ${{ matrix.timeout-minutes-windows }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

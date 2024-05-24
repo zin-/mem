@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mem/acts/act_repository.dart';
 import 'package:mem/components/l10n.dart';
@@ -27,7 +30,6 @@ class NotificationClient {
   final PreferenceClient _preferenceClient;
   final MemRepository _memRepository;
   final MemNotificationRepository _memNotificationRepository;
-  final ActRepository _actRepository;
 
   NotificationClient._(
     this.notificationChannels,
@@ -36,26 +38,33 @@ class NotificationClient {
     this._preferenceClient,
     this._memRepository,
     this._memNotificationRepository,
-    this._actRepository,
   );
 
   static NotificationClient? _instance;
 
   factory NotificationClient([BuildContext? context]) => v(
+        () => _instance ??= NotificationClient._(
+          NotificationChannels(buildL10n(context)),
+          ScheduleClient(),
+          NotificationRepository(),
+          PreferenceClient(),
+          MemRepository(),
+          MemNotificationRepository(),
+        ),
+        {
+          'context': context,
+          '_instance': _instance,
+        },
+      );
+
+  static void resetSingleton() => v(
         () {
-          final l10n = buildL10n(context);
-          return _instance ??= NotificationClient._(
-            NotificationChannels(l10n),
-            ScheduleClient(),
-            NotificationRepository(),
-            PreferenceClient(),
-            MemRepository(),
-            MemNotificationRepository(),
-            ActRepository(),
-          );
+          ScheduleClient.resetSingleton();
+          NotificationRepository.resetSingleton();
+          _instance = null;
         },
         {
-          "context": context,
+          '_instance': _instance,
         },
       );
 
@@ -93,7 +102,6 @@ class NotificationClient {
                   defaultStartOfDay,
               savedMemNotifications ??
                   await _memNotificationRepository.shipByMemId(memId),
-              await _actRepository.findOneBy(memId: memId, latest: true),
               scheduleCallback,
             )) {
               await _scheduleClient.receive(schedule);
@@ -221,10 +229,55 @@ Future<void> scheduleCallback(int id, Map<String, dynamic> params) => i(
           (element) => element.name == params[notificationTypeKey],
         );
 
-        await NotificationClient().show(
-          notificationType,
-          memId,
-        );
+        switch (notificationType) {
+          case NotificationType.repeat:
+            if (await _shouldNotify(memId)) {
+              await NotificationClient().show(
+                notificationType,
+                memId,
+              );
+            }
+
+            break;
+
+          default:
+            await NotificationClient().show(
+              notificationType,
+              memId,
+            );
+            break;
+        }
       },
       {"id": id, "params": params},
+    );
+
+Future<bool> _shouldNotify(int memId) => v(
+      () async {
+        final repeatByNDayMemNotification =
+            (await MemNotificationRepository().shipByMemId(memId))
+                .singleWhereOrNull(
+          (element) => element.isEnabled() && element.isRepeatByNDay(),
+        );
+
+        if (repeatByNDayMemNotification != null) {
+          final lastActTime = await ActRepository()
+              .findOneBy(memId: memId, latest: true)
+              .then((value) =>
+                  value?.period.end ??
+                  // FIXME 永続化されている時点でstartは必ずあるので型で表現する
+                  value?.period.start!);
+
+          if (lastActTime != null) {
+            if (Duration(
+                    days:
+                        // FIXME 永続化されている時点でtimeは必ずあるので型で表現する
+                        repeatByNDayMemNotification.time!) <
+                DateTime.now().difference(lastActTime)) {
+              return false;
+            }
+          }
+        }
+
+        return true;
+      },
     );

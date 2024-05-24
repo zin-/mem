@@ -57,14 +57,14 @@ class DateAndTimeTextFormFieldV2 extends StatelessWidget {
                         ),
                         onChanged: (timeOfDay) {
                           if (timeOfDay != null) {
-                            final _ = _dateAndTime ?? DateTime.now();
+                            final dateTime = _dateAndTime ?? DateTime.now();
                             _onChanged(DateAndTime(
-                              _.year,
-                              _.month,
-                              _.day,
+                              dateTime.year,
+                              dateTime.month,
+                              dateTime.day,
                               timeOfDay.hour,
                               timeOfDay.minute,
-                              _.second,
+                              dateTime.second,
                             ));
                           }
                         },

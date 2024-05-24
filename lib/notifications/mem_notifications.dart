@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:mem/core/act.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
@@ -17,8 +16,7 @@ class MemNotifications {
     SavedMem savedMem,
     TimeOfDay startOfDay,
     Iterable<SavedMemNotification>? memNotifications,
-    SavedAct? lastAct,
-    Function callback,
+    Future<void> Function(int, Map<String, dynamic>) callback,
   ) =>
       v(
         () {
@@ -27,7 +25,6 @@ class MemNotifications {
             memPeriodicSchedule = _memPeriodicSchedule(
               savedMem.id,
               memNotifications.whereType<SavedMemNotification>(),
-              lastAct,
               callback,
             );
           }
@@ -45,14 +42,13 @@ class MemNotifications {
           "savedMem": savedMem,
           "startOfDay": startOfDay,
           "memNotifications": memNotifications,
-          "lastAct": lastAct,
         },
       );
 
   static Iterable<Schedule> _memPeriodSchedules(
     SavedMem savedMem,
     TimeOfDay startOfDay,
-    Function callback,
+    Future<void> Function(int, Map<String, dynamic>) callback,
   ) =>
       v(
         () {
@@ -120,8 +116,7 @@ class MemNotifications {
   static Iterable<Schedule> _memPeriodicSchedule(
     int memId,
     Iterable<SavedMemNotification> savedMemNotifications,
-    SavedAct? lastAct,
-    Function callback,
+    Future<void> Function(int, Map<String, dynamic>) callback,
   ) =>
       v(
         () {
@@ -133,30 +128,23 @@ class MemNotifications {
               CancelSchedule(memRepeatedNotificationId(memId)),
             ];
           } else {
-            final repeat =
-                enables.singleWhere((element) => element.isRepeated());
-            final repeatNDay = enables
-                .singleWhereOrNull((element) => element.isRepeatByNDay());
-
-            var notifyFirstOn = lastAct == null
-                ? DateTime.now()
-                : (lastAct.period.end ?? lastAct.period.start!)
-                    .add(Duration(days: repeatNDay?.time ?? 1));
+            final repeatTimeAt = Duration(
+                seconds: enables
+                    .singleWhere((element) => element.isRepeated())
+                    // FIXME 永続化されている時点でtimeは必ずあるので型で表現する
+                    .time!);
 
             return [
               PeriodicSchedule(
                 memRepeatedNotificationId(memId),
-                DateTime.fromMicrosecondsSinceEpoch(
-                  DateTime(
-                        notifyFirstOn.year,
-                        notifyFirstOn.month,
-                        notifyFirstOn.day,
-                      ).microsecondsSinceEpoch +
-                      (repeat.time ?? 0) * 1000 * 1000,
+                DateTime.now().copyWith(
+                  hour: repeatTimeAt.inHours,
+                  minute: repeatTimeAt.inMinutes,
+                  second: 0,
+                  millisecond: 0,
+                  microsecond: 0,
                 ),
-                Duration(
-                  days: repeatNDay?.time ?? 1,
-                ),
+                const Duration(days: 1),
                 callback,
                 {
                   memIdKey: memId,
@@ -169,7 +157,6 @@ class MemNotifications {
         {
           "memId": memId,
           "savedMemNotifications": savedMemNotifications,
-          "lastAct": lastAct,
         },
       );
 }

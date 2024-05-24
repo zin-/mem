@@ -5,6 +5,9 @@ inputs:
   flutter-channel:
     description: "Flutter channel"
     required: true
+  flutter-version:
+    description: "Flutter version"
+    required: true
 
 runs:
   using: "composite"
@@ -14,6 +17,7 @@ runs:
       uses: subosito/flutter-action@main
       with:
         channel: ${{ inputs.flutter-channel }}
+        flutter-version: ${{ inputs.flutter-version }}
         cache: true
 
     - run: flutter doctor -v

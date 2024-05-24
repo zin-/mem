@@ -27,7 +27,8 @@ void main() => group(
           dbA = await openTestDatabase(databaseDefinition);
         });
 
-        const insertedMemName = "$_name - inserted - mem - name";
+        const baseMemName = "$_name - mem - name";
+        const insertedMemName = "$baseMemName - inserted";
         late int insertedMemId;
 
         setUp(() async {
@@ -45,7 +46,7 @@ void main() => group(
             {
               defFkMemNotificationsMemId.name: insertedMemId,
               defColMemNotificationsType.name: MemNotificationType.repeat.name,
-              defColMemNotificationsTime.name: 1,
+              defColMemNotificationsTime.name: 2,
               defColMemNotificationsMessage.name: "never",
               defColCreatedAt.name: zeroDate,
             },
@@ -181,15 +182,13 @@ void main() => group(
               await widgetTester.pumpAndSettle();
               await widgetTester.tap(newMemFabFinder);
               await widgetTester.pumpAndSettle();
+              const enteringMemName = "$baseMemName - entering";
+              await widgetTester.enterText(
+                  find.byKey(keyMemName), enteringMemName);
 
               final notificationAddFinder = find.descendant(
                 of: find.byKey(keyMemNotificationsView),
                 matching: find.byIcon(Icons.notification_add),
-              );
-              await widgetTester.dragUntilVisible(
-                notificationAddFinder,
-                find.byType(SingleChildScrollView),
-                const Offset(0, 50),
               );
               await widgetTester.tap(
                 notificationAddFinder,
@@ -205,14 +204,8 @@ void main() => group(
 
               await widgetTester.pageBack();
               await widgetTester.pumpAndSettle();
-              const enteringMemName =
-                  "$_name: Save: create - entering - mem name";
-              await widgetTester.enterText(
-                find.byKey(keyMemName),
-                enteringMemName,
-              );
               await widgetTester.tap(find.byKey(keySaveMemFab));
-              await widgetTester.pump(waitSideEffectDuration);
+              await widgetTester.pumpAndSettle();
 
               final savedMem = (await dbA.select(
                 defTableMems,

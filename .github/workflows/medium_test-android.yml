@@ -4,17 +4,20 @@ on:
   workflow_call:
     inputs:
       flutter-channel:
-        required: true
         type: string
+        required: true
+      flutter-version:
+        type: string
+        required: true
       test-script:
-        required: true
         type: string
+        required: true
       target:
-        required: true
         type: string
-      timeout-minutes:
         required: true
+      timeout-minutes:
         type: number
+        required: true
 
     secrets:
       CODECOV_TOKEN:
@@ -22,8 +25,6 @@ on:
 
 jobs:
   medium_test-android:
-    name: "Medium test (Android) (${{ inputs.target }})"
-
     strategy:
       matrix:
         # 複数のAndroid Emulator Runnerを使う
@@ -44,6 +45,7 @@ jobs:
             experimental: true
       fail-fast: false
 
+    name: "Medium test (${{ matrix.android-emulator-runner }}) (Android) (${{ inputs.target }})"
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
     timeout-minutes: ${{ inputs.timeout-minutes }}
@@ -66,6 +68,7 @@ jobs:
         uses: ./.github/actions/flutter-doctor
         with:
           flutter-channel: ${{ inputs.flutter-channel }}
+          flutter-version: ${{ inputs.flutter-version }}
 
       - name: "Install Dependencies"
         uses: ./.github/actions/install-dependencies

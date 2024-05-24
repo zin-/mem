@@ -18,7 +18,7 @@ class MemPeriodTexts extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemPeriodTexts(
-          (ref.watch(memListProvider).firstWhere((_) => _.id == _memId))
+          (ref.watch(memListProvider).firstWhere((mem) => mem.id == _memId))
               .period!,
           ref.watch(startOfDayProvider) ?? defaultStartOfDay,
         ),

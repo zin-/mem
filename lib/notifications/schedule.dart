@@ -17,7 +17,7 @@ class CancelSchedule extends Schedule {
 
 class TimedSchedule extends Schedule {
   final DateTime startAt;
-  final Function callback;
+  final Future<void> Function(int, Map<String, dynamic>) callback;
   final Map<String, dynamic> params;
 
   TimedSchedule(

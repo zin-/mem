@@ -27,15 +27,14 @@ class MemListItemView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemListItemView(
-          ref.watch(memListProvider).firstWhere((_) => _.id == _memId),
+          ref.watch(memListProvider).firstWhere((mem) => mem.id == _memId),
           ref.watch(activeActsProvider).singleWhereOrNull(
                 (act) => act.memId == _memId,
               ),
           ref.watch(memNotificationsByMemIdProvider(_memId)
               .select((value) => value.singleWhereOrNull(
                     (element) =>
-                        element is SavedMemNotification &&
-                        element.isRepeated(),
+                        element is SavedMemNotification && element.isRepeated(),
                   ))),
           _onTapped,
           (bool? value, int memId) async {
