@@ -8,6 +8,11 @@ const _jsonEncoderIndent = '  ';
 class ValueStateNotifier<StateT> extends StateNotifier<StateT> {
   ValueStateNotifier(
     super.state, {
+    Future<void> Function(
+      StateT current,
+      ValueStateNotifier<StateT> notifier,
+    )? initializer,
+    // FIXME initializeに移行する
     Future<StateT>? initialFuture,
   }) {
     initialFuture?.then(
@@ -18,6 +23,7 @@ class ValueStateNotifier<StateT> extends StateNotifier<StateT> {
         value,
       ),
     );
+    initializer?.call(state, this);
   }
 
   StateT updatedBy(StateT value) => v(

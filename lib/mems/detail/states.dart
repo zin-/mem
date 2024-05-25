@@ -8,6 +8,7 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/components/value_state_notifier.dart';
 import 'package:mem/mems/mem_item_repository.dart';
 import 'package:mem/mems/states.dart';
+import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
 
 final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
@@ -47,33 +48,32 @@ final memItemsByMemIdProvider = StateNotifierProvider.family<
 final memRepeatedNotificationByMemIdProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<MemNotification>, MemNotification, int?>(
   (ref, memId) => v(
-    () {
-      final notification = ref.watch(
-        memNotificationsProvider.select(
-          (value) => value
-              .where(
-                (element) => element.memId == memId && element.isRepeated(),
-              )
-              .singleOrNull,
-        ),
-      );
-
-      return ValueStateNotifier(
-        notification ?? MemNotification.repeated(memId),
-        initialFuture: memId == null
-            ? Future.value(
-                MemNotification.repeated(memId),
-              )
-            : MemNotificationRepository().shipByMemId(memId).then(
-                  (value) =>
-                      value.singleWhereOrNull(
-                        (e) => e.memId == memId && e.isRepeated(),
-                      ) ??
-                      MemNotification.repeated(memId),
-                ),
-      );
-    },
-    memId,
+    () => ValueStateNotifier<MemNotification>(
+      ref.watch(
+            memNotificationsProvider.select(
+              (value) => value
+                  .where(
+                    (element) => element.memId == memId && element.isRepeated(),
+                  )
+                  .singleOrNull,
+            ),
+          ) ??
+          MemNotification.repeated(memId),
+      initializer: (current, notifier) => v(
+        () async {
+          if (memId != null && current is! SavedMemNotification) {
+            ref.read(memNotificationsProvider.notifier).upsertAll(
+                  await MemNotificationRepository().shipByMemId(memId),
+                  (current, updating) =>
+                      current.memId == updating.memId &&
+                      current.type == updating.type,
+                );
+          }
+        },
+        {'current': current, 'notifier': notifier},
+      ),
+    ),
+    {'memId': memId},
   ),
 );
 
