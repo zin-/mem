@@ -368,9 +368,10 @@ void testNotificationScenario() => group(
               );
             });
           });
-
           group(": pause act", () {
             testWidgets(": no active act.", (widgetTester) async {
+              widgetTester.clearMockAndroidAlarmManager();
+
               final details = NotificationResponse(
                 notificationResponseType:
                     NotificationResponseType.selectedNotificationAction,
@@ -402,6 +403,8 @@ void testNotificationScenario() => group(
               });
 
               testWidgets(": no thrown.", (widgetTester) async {
+                widgetTester.clearMockAndroidAlarmManager();
+
                 final details = NotificationResponse(
                   notificationResponseType:
                       NotificationResponseType.selectedNotificationAction,

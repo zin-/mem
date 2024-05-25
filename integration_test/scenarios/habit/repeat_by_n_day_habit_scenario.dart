@@ -16,6 +16,7 @@ import 'package:mem/notifications/client.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/notifications/notification_ids.dart';
+import 'package:mem/values/constants.dart';
 import 'package:mem/values/durations.dart';
 
 import '../helpers.dart';
@@ -156,8 +157,16 @@ void main() => group(
                 expect(message.arguments[1], isFalse);
                 expect(message.arguments[2], isFalse);
                 expect(message.arguments[3], isFalse);
-                expect(message.arguments[4],
-                    greaterThan(testStart.millisecondsSinceEpoch));
+                expect(
+                    message.arguments[4],
+                    equals(testStart
+                        .copyWith(
+                            hour: defaultStartOfDay.hour,
+                            minute: defaultStartOfDay.minute,
+                            second: 0,
+                            millisecond: 0,
+                            microsecond: 0)
+                        .millisecondsSinceEpoch));
                 expect(message.arguments[5],
                     const Duration(days: 1).inMilliseconds);
                 expect(message.arguments[6], isFalse);
