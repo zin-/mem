@@ -12,17 +12,7 @@ class ValueStateNotifier<StateT> extends StateNotifier<StateT> {
       StateT current,
       ValueStateNotifier<StateT> notifier,
     )? initializer,
-    // FIXME initializeに移行する
-    Future<StateT>? initialFuture,
   }) {
-    initialFuture?.then(
-      (value) => v(
-        () => mounted
-            ? updatedBy(value)
-            : warn("${super.toString()}. No update."),
-        value,
-      ),
-    );
     initializer?.call(state, this);
   }
 

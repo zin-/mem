@@ -81,32 +81,31 @@ final memRepeatByNDayNotificationByMemIdProvider = StateNotifierProvider
     .autoDispose
     .family<ValueStateNotifier<MemNotification>, MemNotification, int?>(
   (ref, memId) => v(
-    () {
-      final notification = ref.watch(
-        memNotificationsProvider.select(
-          (value) => value
-              .where((element) =>
-                  element.memId == memId && element.isRepeatByNDay())
-              .singleOrNull,
-        ),
-      );
-
-      return ValueStateNotifier(
-        notification ?? MemNotification.repeatByNDay(memId),
-        initialFuture: memId == null
-            ? Future.value(
-                MemNotification.repeatByNDay(memId),
-              )
-            : MemNotificationRepository().shipByMemId(memId).then(
-                  (value) =>
-                      value.singleWhereOrNull(
-                        (e) => e.memId == memId && e.isRepeatByNDay(),
-                      ) ??
-                      MemNotification.repeatByNDay(memId),
-                ),
-      );
-    },
-    memId,
+    () => ValueStateNotifier(
+      ref.watch(
+            memNotificationsProvider.select(
+              (value) => value
+                  .where((element) =>
+                      element.memId == memId && element.isRepeatByNDay())
+                  .singleOrNull,
+            ),
+          ) ??
+          MemNotification.repeatByNDay(memId),
+      initializer: (current, notifier) => v(
+        () async {
+          if (memId != null && current is! SavedMemNotification) {
+            ref.read(memNotificationsProvider.notifier).upsertAll(
+                  await MemNotificationRepository().shipByMemId(memId),
+                  (current, updating) =>
+                      current.memId == updating.memId &&
+                      current.type == updating.type,
+                );
+          }
+        },
+        {'current': current, 'notifier': notifier},
+      ),
+    ),
+    {'memId': memId},
   ),
 );
 
@@ -114,32 +113,31 @@ final memAfterActStartedNotificationByMemIdProvider = StateNotifierProvider
     .autoDispose
     .family<ValueStateNotifier<MemNotification>, MemNotification, int?>(
   (ref, memId) => v(
-    () {
-      final notification = ref.watch(
-        memNotificationsProvider.select(
-          (value) => value
-              .where((element) =>
-                  element.memId == memId && element.isAfterActStarted())
-              .singleOrNull,
-        ),
-      );
-
-      return ValueStateNotifier(
-        notification ?? MemNotification.afterActStarted(memId),
-        initialFuture: memId == null
-            ? Future.value(
-                MemNotification.afterActStarted(memId),
-              )
-            : MemNotificationRepository().shipByMemId(memId).then(
-                  (value) =>
-                      value.singleWhereOrNull(
-                        (e) => e.memId == memId && e.isAfterActStarted(),
-                      ) ??
-                      MemNotification.afterActStarted(memId),
-                ),
-      );
-    },
-    memId,
+    () => ValueStateNotifier(
+      ref.watch(
+            memNotificationsProvider.select(
+              (value) => value
+                  .where((element) =>
+                      element.memId == memId && element.isAfterActStarted())
+                  .singleOrNull,
+            ),
+          ) ??
+          MemNotification.afterActStarted(memId),
+      initializer: (current, notifier) => v(
+        () async {
+          if (memId != null && current is! SavedMemNotification) {
+            ref.read(memNotificationsProvider.notifier).upsertAll(
+                  await MemNotificationRepository().shipByMemId(memId),
+                  (current, updating) =>
+                      current.memId == updating.memId &&
+                      current.type == updating.type,
+                );
+          }
+        },
+        {'current': current, 'notifier': notifier},
+      ),
+    ),
+    {'memId': memId},
   ),
 );
 
