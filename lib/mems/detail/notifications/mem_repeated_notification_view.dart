@@ -20,7 +20,7 @@ class MemRepeatedNotificationView extends ConsumerWidget {
             (value) => value.time,
           )),
           ref.read(startOfDayProvider) ?? defaultStartOfDay,
-          onTimeChanged: (picked) => ref
+          (picked) => ref
               .read(memRepeatedNotificationByMemIdProvider(_memId).notifier)
               .updatedBy(
                 ref
@@ -43,9 +43,9 @@ class _MemRepeatedNotificationView extends StatelessWidget {
 
   const _MemRepeatedNotificationView(
     this._time,
-    this._defaultTime, {
-    required void Function(int? picked) onTimeChanged,
-  }) : _onTimeChanged = onTimeChanged;
+    this._defaultTime,
+    this._onTimeChanged,
+  );
 
   @override
   Widget build(BuildContext context) => v(
