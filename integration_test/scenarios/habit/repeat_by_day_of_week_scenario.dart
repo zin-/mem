@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:day_picker/day_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,6 +8,7 @@ import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
+import 'package:mem/mems/detail/fab.dart';
 import 'package:mem/mems/detail/notifications/mem_notifications_view.dart';
 import 'package:mem/values/durations.dart';
 
@@ -25,11 +27,12 @@ void main() => group(
         });
 
         const insertedMemName = "$baseMemName - inserted";
+        int? insertedMemId;
 
         setUp(() async {
           await clearAllTestDatabaseRows(databaseDefinition);
 
-          final insertedMemId = await dbA.insert(defTableMems, {
+          insertedMemId = await dbA.insert(defTableMems, {
             defColMemsName.name: insertedMemName,
             defColMemsDoneAt.name: null,
             defColCreatedAt.name: zeroDate
@@ -171,6 +174,55 @@ void main() => group(
                     everyElement(false));
               },
             );
+          },
+        );
+
+        testWidgets(
+          "save.",
+          (widgetTester) async {
+            await runApplication();
+            await widgetTester.pumpAndSettle();
+            await widgetTester.tap(find.text(insertedMemName));
+            await widgetTester.pumpAndSettle(defaultTransitionDuration);
+            await widgetTester.tap(find.descendant(
+                of: find.byKey(keyMemNotificationsView),
+                matching: find.byIcon(Icons.edit)));
+            await widgetTester.pumpAndSettle();
+            await widgetTester.tap(find.text('Mon'));
+            await widgetTester.tap(find.text('Sun'));
+
+            await widgetTester.pageBack();
+            await widgetTester.pumpAndSettle();
+
+            await widgetTester.tap(find.byKey(keySaveMemFab));
+            await widgetTester.pumpAndSettle(waitSideEffectDuration);
+
+            await widgetTester.tap(find.descendant(
+                of: find.byKey(keyMemNotificationsView),
+                matching: find.byIcon(Icons.edit)));
+            await widgetTester.pumpAndSettle();
+
+            final savedMemNotification = await dbA.select(
+                defTableMemNotifications,
+                where: "${defFkMemNotificationsMemId.name} = ?",
+                whereArgs: [insertedMemId],
+                orderBy: "id ASC");
+            expect(savedMemNotification, hasLength(1));
+            expect(savedMemNotification[0][defColMemNotificationsTime.name],
+                equals(6));
+            expect(
+                widgetTester
+                    .widget<SelectWeekDays>(find.byType(SelectWeekDays))
+                    .days[6]
+                    .isSelected,
+                isTrue);
+            expect(
+                widgetTester
+                    .widget<SelectWeekDays>(find.byType(SelectWeekDays))
+                    .days
+                    .whereIndexed((index, element) => index != 6)
+                    .map((e) => e.isSelected),
+                everyElement(isFalse));
           },
         );
       },

@@ -35,12 +35,19 @@ final saveMem =
                       current.type == updating.type,
                 );
             ref.read(memNotificationsProvider.notifier).upsertAll(
-                  saved.notifications ?? [],
-                  (tmp, item) =>
-                      tmp is SavedMemNotification &&
-                      item is SavedMemNotification &&
-                      tmp.id == item.id,
-                );
+              saved.notifications ?? [],
+              (tmp, item) =>
+                  tmp is SavedMemNotification &&
+                  item is SavedMemNotification &&
+                  tmp.id == item.id,
+              removeWhere: (current) {
+                return !(saved.notifications
+                        ?.where((element) => element.isRepeatByDayOfWeek())
+                        .map((e) => e.time)
+                        .contains(current.time) ??
+                    false);
+              },
+            );
 
             return saved;
           },

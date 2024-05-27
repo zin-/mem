@@ -1,5 +1,6 @@
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
+import 'package:mem/framework/repository/condition/in.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
@@ -53,6 +54,26 @@ class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
         {
           "memId": memId,
           "type": type,
+        },
+      );
+
+  Future<Iterable<SavedMemNotification>> wasteBy(
+    int memId,
+    MemNotificationType type,
+    Iterable<int> times,
+  ) =>
+      v(
+        () => super.waste(
+          And([
+            Equals(defFkMemNotificationsMemId.name, memId),
+            Equals(defColMemNotificationsType.name, type.name),
+            In(defColMemNotificationsTime.name, times),
+          ]),
+        ),
+        {
+          'memId': memId,
+          'type': type,
+          'times': times,
         },
       );
 
