@@ -109,6 +109,43 @@ final memRepeatByNDayNotificationByMemIdProvider = StateNotifierProvider
   ),
 );
 
+final memRepeatByDayOfWeekNotificationListByMemIdProvider =
+    StateNotifierProvider.autoDispose.family<
+        ValueStateNotifier<Iterable<MemNotification>>,
+        Iterable<MemNotification>,
+        int?>(
+  (ref, memId) => v(
+    () {
+      final memRepeatByDayOfWeekNotificationList = ref.watch(
+        memNotificationsProvider.select(
+          (value) => value.where((element) =>
+              element.memId == memId &&
+              element.isEnabled() &&
+              element.isRepeatByDayOfWeek()),
+        ),
+      );
+
+      return ValueStateNotifier(
+        memRepeatByDayOfWeekNotificationList,
+        initializer: (current, notifier) => v(
+          () async {
+            if (memId != null && current is! SavedMemNotification) {
+              ref.read(memNotificationsProvider.notifier).upsertAll(
+                    await MemNotificationRepository().shipByMemId(memId),
+                    (current, updating) =>
+                        current.memId == updating.memId &&
+                        current.type == updating.type,
+                  );
+            }
+          },
+          {'current': current, 'notifier': notifier},
+        ),
+      );
+    },
+    {'memId': memId},
+  ),
+);
+
 final memAfterActStartedNotificationByMemIdProvider = StateNotifierProvider
     .autoDispose
     .family<ValueStateNotifier<MemNotification>, MemNotification, int?>(
@@ -149,6 +186,8 @@ final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
       [
         ref.watch(memRepeatedNotificationByMemIdProvider(memId)),
         ref.watch(memRepeatByNDayNotificationByMemIdProvider(memId)),
+        ...ref
+            .watch(memRepeatByDayOfWeekNotificationListByMemIdProvider(memId)),
         ref.watch(memAfterActStartedNotificationByMemIdProvider(memId)),
       ],
     ),
