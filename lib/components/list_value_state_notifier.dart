@@ -31,13 +31,18 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
 
   List<T> upsertAll(
     Iterable<T> updatingItems,
-    bool Function(T current, T updating) where,
-  ) =>
+    bool Function(T current, T updating) where, {
+    bool Function(T current)? removeWhere,
+  }) =>
       v(
         () {
           final tmp = List.of(state);
 
-          for (var item in updatingItems) {
+          if (removeWhere != null) {
+            tmp.removeWhere((element) => removeWhere(element));
+          }
+
+          for (final item in updatingItems) {
             final index = tmp.indexWhere(
               (tmpElement) => where(tmpElement, item),
             );

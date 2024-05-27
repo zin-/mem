@@ -4,6 +4,7 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
 
 import 'after_act_started_notification_view.dart';
+import 'mem_repeat_by_day_of_week_notification_view.dart';
 import 'mem_repeat_by_n_day_notification_view.dart';
 import 'mem_repeated_notification_view.dart';
 
@@ -45,6 +46,7 @@ class _MemNotificationsPage extends StatelessWidget {
             children: [
               MemRepeatedNotificationView(_memId),
               MemRepeatByNDayNotificationView(_memId),
+              MemRepeatByDaysOfWeekNotificationView(_memId),
               AfterActStartedNotificationView(_memId),
             ],
           ),
