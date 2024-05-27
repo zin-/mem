@@ -1,4 +1,8 @@
+import 'package:collection/collection.dart';
+import 'package:intl/intl.dart';
+import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/framework/repository/entity.dart';
+import 'package:mem/logger/log_service.dart';
 
 const _repeatedMessage = "Repeat";
 const _repeatByDayOfWeekMessage = "Repeat by day of week";
@@ -55,6 +59,97 @@ class MemNotification extends EntityV1 {
         "time": time,
         "message": message,
       }}";
+
+  static String? toOneLine(
+    Iterable<MemNotification> memNotifications,
+    String Function(String at) buildRepeatedNotificationText,
+    String Function(String nDay, String at)
+        buildRepeatEveryNDayNotificationText,
+    String Function(String at) buildAfterActStartedNotificationText,
+    String Function(DateAndTime dateAndTime) formatToTimeOfDay,
+  ) =>
+      v(
+        () {
+          final enables =
+              memNotifications.where((element) => element.isEnabled());
+
+          if (enables.isEmpty) {
+            return null;
+          } else {
+            final repeat =
+                enables.singleWhereOrNull((element) => element.isRepeated());
+            final repeatByNDay = enables
+                .singleWhereOrNull((element) => element.isRepeatByNDay());
+            final repeatByDayOfWeeks =
+                enables.where((element) => element.isRepeatByDayOfWeek());
+            final afterActStarted = enables
+                .singleWhereOrNull((element) => element.isAfterActStarted());
+
+            final text = [
+              if (repeat != null)
+                _oneLineRepeat(
+                  repeat,
+                  repeatByNDay,
+                  buildRepeatedNotificationText,
+                  buildRepeatEveryNDayNotificationText,
+                  formatToTimeOfDay,
+                ),
+              if (repeatByDayOfWeeks.isNotEmpty)
+                _oneLineRepeatByDaysOfWeek(repeatByDayOfWeeks),
+              if (afterActStarted != null)
+                _oneLineAfterAct(
+                  afterActStarted,
+                  buildAfterActStartedNotificationText,
+                ),
+            ].join(", ");
+
+            return text;
+          }
+        },
+        {'memNotifications': memNotifications},
+      );
+
+  static String _oneLineRepeat(
+    MemNotification repeat,
+    MemNotification? repeatByNDay,
+    String Function(String at) buildRepeatedNotificationText,
+    String Function(String nDay, String at)
+        buildRepeatEveryNDayNotificationText,
+    String Function(DateAndTime dateAndTime) formatToTimeOfDay,
+  ) {
+    if (repeatByNDay != null && (repeatByNDay.time ?? 0) > 1) {
+      return buildRepeatEveryNDayNotificationText(
+        repeatByNDay.time.toString(),
+        formatToTimeOfDay(
+          DateAndTime(0, 0, 0, 0, 0, repeat.time),
+        ),
+      );
+    } else {
+      return buildRepeatedNotificationText(formatToTimeOfDay(
+        DateAndTime(0, 0, 0, 0, 0, repeat.time),
+      ));
+    }
+  }
+
+  static String _oneLineRepeatByDaysOfWeek(
+    Iterable<MemNotification> repeatByDayOfWeeks,
+  ) {
+    final dateFormat = DateFormat.E();
+    final firstMonday = DateTime(0, 1, 3);
+
+    return repeatByDayOfWeeks
+        .map((e) => firstMonday.add(Duration(days: e.time!)))
+        .sorted((a, b) => a.compareTo(b))
+        .map((e) => dateFormat.format(e))
+        .join(", ");
+  }
+
+  static String _oneLineAfterAct(
+    afterActStarted,
+    String Function(String at) buildAfterActStartedNotificationText,
+  ) =>
+      buildAfterActStartedNotificationText(DateFormat(DateFormat.HOUR24_MINUTE)
+          .format(DateAndTime(0, 0, 0, 0, 0, afterActStarted.time)));
 }
 
 enum MemNotificationType {
