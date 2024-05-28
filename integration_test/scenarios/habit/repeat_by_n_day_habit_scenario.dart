@@ -9,8 +9,6 @@ import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
-import 'package:mem/logger/log.dart';
-import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/fab.dart';
 import 'package:mem/mems/detail/notifications/mem_notifications_view.dart';
 import 'package:mem/mems/detail/notifications/mem_repeat_by_n_day_notification_view.dart';
@@ -300,7 +298,6 @@ void main() => group(
           testWidgets(
             'withoutAct.',
             (widgetTester) async {
-              LogService.initialize(Level.verbose);
               int initializeCount = 0;
               int showCount = 0;
               widgetTester.setMockFlutterLocalNotifications(
