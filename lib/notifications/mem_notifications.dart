@@ -137,13 +137,15 @@ class MemNotifications {
             return [
               PeriodicSchedule(
                 memRepeatedNotificationId(memId),
-                DateTime.now().copyWith(
-                  hour: repeatTimeAt.inHours,
-                  minute: repeatTimeAt.inMinutes,
-                  second: 0,
-                  millisecond: 0,
-                  microsecond: 0,
-                ),
+                DateTime.now()
+                    .copyWith(
+                      hour: 0,
+                      minute: 0,
+                      second: 0,
+                      millisecond: 0,
+                      microsecond: 0,
+                    )
+                    .add(repeatTimeAt),
                 const Duration(days: 1),
                 callback,
                 {
