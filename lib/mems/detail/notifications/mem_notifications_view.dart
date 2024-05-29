@@ -1,9 +1,6 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:mem/components/l10n.dart';
-import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
@@ -52,31 +49,15 @@ class _MemNotificationsView extends StatelessWidget {
               _memNotifications.where((element) => element.isEnabled());
 
           final hasEnabledNotifications = enables.isNotEmpty;
-          final repeat =
-              enables.singleWhereOrNull((element) => element.isRepeated());
-          final repeatByNDay =
-              enables.singleWhereOrNull((element) => element.isRepeatByNDay());
-          final afterActStarted = enables
-              .singleWhereOrNull((element) => element.isAfterActStarted());
 
-          final text = [
-            if (repeat != null)
-              if (repeatByNDay != null && (repeatByNDay.time ?? 0) > 1)
-                l10n.repeatEveryNDayNotificationText(
-                  repeatByNDay.time.toString(),
-                  TimeOfDay.fromDateTime(
-                    DateAndTime(0, 0, 0, 0, 0, repeat.time),
-                  ).format(context),
-                )
-              else
-                l10n.repeatedNotificationText(TimeOfDay.fromDateTime(
-                  DateAndTime(0, 0, 0, 0, 0, repeat.time),
-                ).format(context)),
-            if (afterActStarted != null)
-              l10n.afterActStartedNotificationText(
-                  DateFormat(DateFormat.HOUR24_MINUTE).format(
-                      DateAndTime(0, 0, 0, 0, 0, afterActStarted.time))),
-          ].join(", ");
+          final oneLine = MemNotification.toOneLine(
+            _memNotifications,
+            l10n.repeatedNotificationText,
+            l10n.repeatEveryNDayNotificationText,
+            l10n.afterActStartedNotificationText,
+            (dataAndTime) =>
+                TimeOfDay.fromDateTime(dataAndTime).format(context),
+          );
 
           return ListTile(
             contentPadding: EdgeInsets.zero,
@@ -85,7 +66,7 @@ class _MemNotificationsView extends StatelessWidget {
               color: hasEnabledNotifications ? null : secondaryGreyColor,
             ),
             title: Text(
-              hasEnabledNotifications ? text : l10n.noNotifications,
+              oneLine ?? l10n.noNotifications,
               style: TextStyle(
                 color: hasEnabledNotifications ? null : secondaryGreyColor,
               ),

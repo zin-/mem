@@ -59,6 +59,7 @@ dependencies:
   # for Home widgets
   home_widget: ^0.2.0+1
   workmanager: ^0.5.1
+  day_picker: ^2.2.0
 
 dev_dependencies:
   # for Test mock

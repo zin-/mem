@@ -15,29 +15,26 @@ class MemNotifications {
   static Iterable<Schedule> scheduleOf(
     SavedMem savedMem,
     TimeOfDay startOfDay,
-    Iterable<SavedMemNotification>? memNotifications,
+    Iterable<SavedMemNotification> memNotifications,
     Future<void> Function(int, Map<String, dynamic>) callback,
   ) =>
       v(
-        () {
-          Iterable<Schedule>? memPeriodicSchedule;
-          if (memNotifications != null) {
-            memPeriodicSchedule = _memPeriodicSchedule(
-              savedMem.id,
-              memNotifications.whereType<SavedMemNotification>(),
-              callback,
-            );
-          }
-
-          return [
-            _memPeriodSchedules(
-              savedMem,
-              startOfDay,
-              callback,
-            ),
-            if (memPeriodicSchedule != null) memPeriodicSchedule,
-          ].flattened;
-        },
+        () => [
+          ..._memPeriodSchedules(
+            savedMem,
+            startOfDay,
+            callback,
+          ),
+          _memPeriodicSchedule(
+            savedMem.id,
+            memNotifications
+                .whereType<SavedMemNotification>()
+                .singleWhereOrNull(
+                  (element) => element.isEnabled() && element.isRepeated(),
+                ),
+            callback,
+          ),
+        ],
         {
           "savedMem": savedMem,
           "startOfDay": startOfDay,
@@ -113,50 +110,38 @@ class MemNotifications {
         },
       );
 
-  static Iterable<Schedule> _memPeriodicSchedule(
+  static Schedule _memPeriodicSchedule(
     int memId,
-    Iterable<SavedMemNotification> savedMemNotifications,
+    SavedMemNotification? savedRepeatedMemNotifications,
     Future<void> Function(int, Map<String, dynamic>) callback,
   ) =>
       v(
-        () {
-          final enables =
-              savedMemNotifications.where((element) => element.isEnabled());
-
-          if (enables.where((element) => element.isRepeated()).isEmpty) {
-            return [
-              CancelSchedule(memRepeatedNotificationId(memId)),
-            ];
-          } else {
-            final repeatTimeAt = Duration(
-                seconds: enables
-                    .singleWhere((element) => element.isRepeated())
-                    // FIXME 永続化されている時点でtimeは必ずあるので型で表現する
-                    .time!);
-
-            return [
-              PeriodicSchedule(
+        () => savedRepeatedMemNotifications == null
+            ? CancelSchedule(memRepeatedNotificationId(memId))
+            : PeriodicSchedule(
                 memRepeatedNotificationId(memId),
-                DateTime.now().copyWith(
-                  hour: repeatTimeAt.inHours,
-                  minute: repeatTimeAt.inMinutes,
-                  second: 0,
-                  millisecond: 0,
-                  microsecond: 0,
-                ),
+                DateTime.now()
+                    .copyWith(
+                      hour: 0,
+                      minute: 0,
+                      second: 0,
+                      millisecond: 0,
+                      microsecond: 0,
+                    )
+                    .add(Duration(
+                        seconds: savedRepeatedMemNotifications
+                            // FIXME 永続化されている時点でtimeは必ずあるので型で表現する
+                            .time!)),
                 const Duration(days: 1),
                 callback,
                 {
                   memIdKey: memId,
                   notificationTypeKey: NotificationType.repeat.name,
                 },
-              )
-            ];
-          }
-        },
+              ),
         {
           "memId": memId,
-          "savedMemNotifications": savedMemNotifications,
+          "savedMemNotifications": savedRepeatedMemNotifications,
         },
       );
 }

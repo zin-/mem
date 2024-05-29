@@ -8,16 +8,12 @@ const _jsonEncoderIndent = '  ';
 class ValueStateNotifier<StateT> extends StateNotifier<StateT> {
   ValueStateNotifier(
     super.state, {
-    Future<StateT>? initialFuture,
+    Future<void> Function(
+      StateT current,
+      ValueStateNotifier<StateT> notifier,
+    )? initializer,
   }) {
-    initialFuture?.then(
-      (value) => v(
-        () => mounted
-            ? updatedBy(value)
-            : warn("${super.toString()}. No update."),
-        value,
-      ),
-    );
+    initializer?.call(state, this);
   }
 
   StateT updatedBy(StateT value) => v(

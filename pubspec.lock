@@ -209,6 +209,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.6"
+  day_picker:
+    dependency: "direct main"
+    description:
+      name: day_picker
+      sha256: a0f73716d688b3643769db39e7626cae54026bec24c33a8ebf5a6f8c618a05f2
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.0"
   dbus:
     dependency: transitive
     description:
@@ -1138,5 +1146,5 @@ packages:
     source: hosted
     version: "3.1.2"
 sdks:
-  dart: ">=3.2.0 <=3.3.4"
+  dart: ">=3.3.0 <=3.3.4"
   flutter: ">=3.16.0"

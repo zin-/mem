@@ -1,4 +1,5 @@
 import 'package:mem/core/mem_detail.dart';
+import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_item.dart';
 import 'package:mem/mems/mem_item_repository.dart';
@@ -48,6 +49,16 @@ class MemService {
                     return Future.value(e);
                   }
                 }));
+
+          _memNotificationRepository.wasteBy(
+              savedMem.id,
+              MemNotificationType.repeatByDayOfWeek,
+              List.generate(7, (index) => index).where((element) =>
+                  !(savedMemNotifications?.where(
+                              (element) => element.isRepeatByDayOfWeek()) ??
+                          [])
+                      .map((e) => e.time)
+                      .contains(element)));
 
           return MemDetail(
             savedMem,

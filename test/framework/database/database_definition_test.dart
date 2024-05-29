@@ -10,7 +10,8 @@ void main() {
       throwsA(
         (e) {
           expect(e, isA<DatabaseDefinitionException>());
-          expect(e.message, 'Database name is empty.');
+          expect(e.toString(),
+              'Instance of \'DatabaseDefinitionException\': {message: Database name is empty.}');
           return true;
         },
       ),
@@ -23,7 +24,8 @@ void main() {
       throwsA(
         (e) {
           expect(e, isA<DatabaseDefinitionException>());
-          expect(e.message, 'Database name contains " ".');
+          expect(e.toString(),
+              'Instance of \'DatabaseDefinitionException\': {message: Database name contains " ".}');
           return true;
         },
       ),
@@ -36,7 +38,8 @@ void main() {
       throwsA(
         (e) {
           expect(e, isA<DatabaseDefinitionException>());
-          expect(e.message, 'Database name contains "-".');
+          expect(e.toString(),
+              'Instance of \'DatabaseDefinitionException\': {message: Database name contains "-".}');
           return true;
         },
       ),
@@ -50,7 +53,8 @@ void main() {
       throwsA(
         (e) {
           expect(e, isA<DatabaseDefinitionException>());
-          expect(e.message, 'Version is less than 1.');
+          expect(e.toString(),
+              'Instance of \'DatabaseDefinitionException\': {message: Version is less than 1.}');
           return true;
         },
       ),

@@ -4,8 +4,6 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_item.dart';
 import 'package:mem/mems/mem_item_repository.dart';
 import 'package:mem/repositories/mem.dart';
-import 'package:mem/repositories/mem_notification.dart';
-import 'package:mem/repositories/mem_notification_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/mems/states.dart';
 
@@ -41,13 +39,6 @@ final loadMemList = FutureProvider(
               (current, updating) =>
                   current is SavedMemItem &&
                   updating is SavedMemItem &&
-                  current.id == updating.id,
-            );
-        ref.read(memNotificationsProvider.notifier).upsertAll(
-              await MemNotificationRepository().shipByMemId(mem.id),
-              (current, updating) =>
-                  current is SavedMemNotification &&
-                  updating is SavedMemNotification &&
                   current.id == updating.id,
             );
       }

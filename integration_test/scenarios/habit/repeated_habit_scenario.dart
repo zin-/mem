@@ -100,7 +100,7 @@ void main() => group(
                           matching: find.byType(TimeOfDayTextFormField)),
                     )
                     .timeOfDay,
-                null,
+                defaultStartOfDay,
               );
               expect(
                 find.descendant(
@@ -195,7 +195,6 @@ void main() => group(
               );
               await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-              final pickTime = TimeOfDay.now();
               await widgetTester.tap(timeIconFinder);
               await widgetTester.pump();
 
@@ -221,7 +220,7 @@ void main() => group(
                   .single;
               expect(
                 savedMemNotification[defColMemNotificationsTime.name],
-                (pickTime.hour * 60 + pickTime.minute) * 60,
+                0,
               );
             },
           );
@@ -256,7 +255,6 @@ void main() => group(
               );
               await widgetTester.pump();
 
-              final pickTime = TimeOfDay.now();
               await widgetTester.tap(timeIconFinder);
               await widgetTester.pump();
               await widgetTester.tap(okFinder);
@@ -281,7 +279,7 @@ void main() => group(
                   .single;
               expect(
                 savedMemNotification[defColMemNotificationsTime.name],
-                (pickTime.hour * 60 + pickTime.minute) * 60,
+                0,
               );
             },
           );

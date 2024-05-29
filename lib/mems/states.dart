@@ -32,8 +32,21 @@ final memByMemIdProvider = StateNotifierProvider.autoDispose
       ref.watch(memsProvider).singleWhereOrNull(
             (element) => element is SavedMem ? element.id == memId : false,
           ) as SavedMem?,
-      initialFuture:
-          memId == null ? null : MemRepository().findOneBy(id: memId),
+      initializer: (current, notifier) => v(
+        () async {
+          if (memId != null) {
+            final savedMem = await MemRepository().findOneBy(id: memId);
+            ref.read(memsProvider.notifier).upsertAll(
+              [if (savedMem != null) savedMem],
+              (current, updating) =>
+                  (current is SavedMem && updating is SavedMem)
+                      ? current.id == updating.id
+                      : true,
+            );
+          }
+        },
+        {'current': current, 'notifier': notifier},
+      ),
     ),
     {"memId": memId},
   ),
