@@ -284,7 +284,7 @@ Future<bool> _shouldNotify(int memId) => v(
             if (Duration(
                     days:
                         // FIXME 永続化されている時点でtimeは必ずあるので型で表現する
-                        repeatByNDayMemNotification.time!) <
+                        repeatByNDayMemNotification.time!) >
                 DateTime.now().difference(lastActTime)) {
               return false;
             }

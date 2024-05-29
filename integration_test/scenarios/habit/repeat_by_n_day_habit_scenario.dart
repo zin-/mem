@@ -257,11 +257,13 @@ void main() => group(
 
         group('notify repeatByNDay', () {
           const withoutActMemName = "$insertedMemName - without act";
-          const withActMemName = "$insertedMemName - with act";
+          const withOldActMemName = "$insertedMemName - with old act";
+          const withCurrentActMemName = "$insertedMemName - with current act";
           const insertedRepeatNotificationMessage =
               "$_name - inserted - mem notification message - repeat";
           int? withoutActMemId;
-          int? withActMemId;
+          int? withOldActMemId;
+          int? withCurrentActMemId;
 
           setUp(() async {
             withoutActMemId = await dbA.insert(defTableMems, {
@@ -269,13 +271,22 @@ void main() => group(
               defColMemsDoneAt.name: null,
               defColCreatedAt.name: zeroDate,
             });
-            withActMemId = await dbA.insert(defTableMems, {
-              defColMemsName.name: withActMemName,
+            withOldActMemId = await dbA.insert(defTableMems, {
+              defColMemsName.name: withOldActMemName,
+              defColMemsDoneAt.name: null,
+              defColCreatedAt.name: zeroDate,
+            });
+            withCurrentActMemId = await dbA.insert(defTableMems, {
+              defColMemsName.name: withCurrentActMemName,
               defColMemsDoneAt.name: null,
               defColCreatedAt.name: zeroDate,
             });
 
-            for (final insertedMemId in [withoutActMemId, withActMemId]) {
+            for (final insertedMemId in [
+              withoutActMemId,
+              withOldActMemId,
+              withCurrentActMemId
+            ]) {
               await dbA.insert(defTableMemNotifications, {
                 defFkMemNotificationsMemId.name: insertedMemId,
                 defColMemNotificationsTime.name: 0,
@@ -297,8 +308,14 @@ void main() => group(
             }
 
             await dbA.insert(defTableActs, {
-              defFkActsMemId.name: withActMemId,
+              defFkActsMemId.name: withOldActMemId,
               defColActsStart.name: zeroDate.toIso8601String(),
+              defColActsStartIsAllDay.name: 0,
+              defColCreatedAt.name: zeroDate,
+            });
+            await dbA.insert(defTableActs, {
+              defFkActsMemId.name: withCurrentActMemId,
+              defColActsStart.name: DateTime.now().toIso8601String(),
               defColActsStartIsAllDay.name: 0,
               defColCreatedAt.name: zeroDate,
             });
@@ -352,20 +369,93 @@ void main() => group(
           );
 
           testWidgets(
-            'withAct',
+            'withOldAct',
             (widgetTester) async {
+              int initializeCount = 0;
+              int showCount = 0;
               widgetTester.setMockFlutterLocalNotifications(
-                [],
+                [
+                  (message) async {
+                    expect(message.method, equals('initialize'));
+                    initializeCount++;
+                    return true;
+                  },
+                  (message) async {
+                    expect(message.method, equals('show'));
+                    expect(message.arguments['id'],
+                        equals(memRepeatedNotificationId(withOldActMemId!)));
+                    expect(
+                        message.arguments['title'], equals(withOldActMemName));
+                    expect(message.arguments['body'],
+                        equals(insertedRepeatNotificationMessage));
+                    expect(message.arguments['payload'],
+                        equals("{\"$memIdKey\":$withOldActMemId}"));
+                    showCount++;
+                    return false;
+                  },
+                ],
               );
 
-              final id = withActMemId!;
               final params = {
-                memIdKey: id,
+                memIdKey: withOldActMemId,
                 notificationTypeKey: NotificationType.repeat.name,
               };
 
-              await scheduleCallback(id, params);
+              await scheduleCallback(0, params);
 
+              if (defaultTargetPlatform == TargetPlatform.android) {
+                expect(initializeCount, equals(1));
+                expect(showCount, equals(1));
+              } else {
+                expect(initializeCount, equals(0));
+                expect(showCount, equals(0));
+              }
+              widgetTester.clearMockFlutterLocalNotifications();
+            },
+          );
+
+          testWidgets(
+            'withCurrentAct',
+            (widgetTester) async {
+              // int initializeCount = 0;
+              // int showCount = 0;
+              widgetTester.setMockFlutterLocalNotifications(
+                [
+                  // (message) async {
+                  //   expect(message.method, equals('initialize'));
+                  //   initializeCount++;
+                  //   return true;
+                  // },
+                  // (message) async {
+                  //   expect(message.method, equals('show'));
+                  //   expect(message.arguments['id'],
+                  //       equals(memRepeatedNotificationId(withOldActMemId!)));
+                  //   expect(
+                  //       message.arguments['title'], equals(withOldActMemName));
+                  //   expect(message.arguments['body'],
+                  //       equals(insertedRepeatNotificationMessage));
+                  //   expect(message.arguments['payload'],
+                  //       equals("{\"$memIdKey\":$withOldActMemId}"));
+                  //   showCount++;
+                  //   return false;
+                  // },
+                ],
+              );
+
+              final params = {
+                memIdKey: withCurrentActMemId,
+                notificationTypeKey: NotificationType.repeat.name,
+              };
+
+              await scheduleCallback(0, params);
+
+              // if (defaultTargetPlatform == TargetPlatform.android) {
+              //   expect(initializeCount, equals(1));
+              //   expect(showCount, equals(1));
+              // } else {
+              //   expect(initializeCount, equals(0));
+              //   expect(showCount, equals(0));
+              // }
               widgetTester.clearMockFlutterLocalNotifications();
             },
           );
