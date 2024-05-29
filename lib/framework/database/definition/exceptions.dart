@@ -4,7 +4,9 @@ class DatabaseException implements Exception {
   DatabaseException(this.message);
 
   @override
-  String toString() => message;
+  String toString() => "${super.toString()}: ${{
+        'message': message,
+      }}";
 }
 
 class DatabaseDefinitionException extends DatabaseException {
