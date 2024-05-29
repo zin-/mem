@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mem/acts/client.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
@@ -44,8 +45,9 @@ class NotificationChannels {
             case NotificationType.repeat:
               id = memRepeatedNotificationId(memId);
               body = ((await MemNotificationRepository().shipByMemId(memId)))
-                  .singleWhere((element) => element.isRepeated())
-                  .message;
+                      .singleWhereOrNull((element) => element.isRepeated())
+                      ?.message ??
+                  "Repeat";
               break;
             case NotificationType.afterActStarted:
               id = afterActStartedNotificationId(memId);

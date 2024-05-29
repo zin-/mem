@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:day_picker/day_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/core/mem_notification.dart';
@@ -10,6 +11,10 @@ import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/mems/detail/fab.dart';
 import 'package:mem/mems/detail/notifications/mem_notifications_view.dart';
+import 'package:mem/notifications/client.dart';
+import 'package:mem/notifications/mem_notifications.dart';
+import 'package:mem/notifications/notification/type.dart';
+import 'package:mem/notifications/notification_ids.dart';
 import 'package:mem/values/durations.dart';
 
 import '../helpers.dart';
@@ -20,16 +25,15 @@ void main() => group(
       _scenarioName,
       () {
         const baseMemName = "$_scenarioName - mem - name";
+        const insertedMemName = "$baseMemName - inserted";
 
         late final DatabaseAccessor dbA;
+
+        int? insertedMemId;
+        int? notifyTodayMemId;
+        int? notifyTomorrowMemId;
         setUpAll(() async {
           dbA = await openTestDatabase(databaseDefinition);
-        });
-
-        const insertedMemName = "$baseMemName - inserted";
-        int? insertedMemId;
-
-        setUp(() async {
           await clearAllTestDatabaseRows(databaseDefinition);
 
           insertedMemId = await dbA.insert(defTableMems, {
@@ -46,6 +50,38 @@ void main() => group(
                 "$_scenarioName - mem notification - repeatByDayOfWeek - message - inserted",
             defColCreatedAt.name: zeroDate,
           });
+          notifyTodayMemId = await dbA.insert(defTableMems, {
+            defColMemsName.name: baseMemName,
+            defColMemsDoneAt.name: null,
+            defColCreatedAt.name: zeroDate
+          });
+          await dbA.insert(defTableMemNotifications, {
+            defFkMemNotificationsMemId.name: notifyTodayMemId,
+            defColMemNotificationsTime.name: DateTime.now().weekday,
+            defColMemNotificationsType.name:
+                MemNotificationType.repeatByDayOfWeek.name,
+            defColMemNotificationsMessage.name:
+                "$_scenarioName - mem notification - repeatByDayOfWeek - message - inserted",
+            defColCreatedAt.name: zeroDate,
+          });
+          notifyTomorrowMemId = await dbA.insert(defTableMems, {
+            defColMemsName.name: baseMemName,
+            defColMemsDoneAt.name: null,
+            defColCreatedAt.name: zeroDate
+          });
+          await dbA.insert(defTableMemNotifications, {
+            defFkMemNotificationsMemId.name: notifyTomorrowMemId,
+            defColMemNotificationsTime.name: DateTime.now().weekday + 1,
+            defColMemNotificationsType.name:
+                MemNotificationType.repeatByDayOfWeek.name,
+            defColMemNotificationsMessage.name:
+                "$_scenarioName - mem notification - repeatByDayOfWeek - message - inserted",
+            defColCreatedAt.name: zeroDate,
+          });
+        });
+
+        setUp(() async {
+          NotificationClient.resetSingleton();
         });
 
         group(
@@ -223,6 +259,76 @@ void main() => group(
                     .whereIndexed((index, element) => index != 6)
                     .map((e) => e.isSelected),
                 everyElement(isFalse));
+          },
+        );
+
+        group(
+          'scheduleCallback',
+          () {
+            testWidgets(
+              'notify',
+              (widgetTester) async {
+                int initializeCount = 0;
+                int showCount = 0;
+                widgetTester.setMockFlutterLocalNotifications(
+                  [
+                    (message) async {
+                      expect(message.method, equals('initialize'));
+                      initializeCount++;
+                      return true;
+                    },
+                    (message) async {
+                      expect(message.method, equals('show'));
+                      expect(message.arguments['id'],
+                          equals(memRepeatedNotificationId(notifyTodayMemId!)));
+                      expect(message.arguments['title'], equals(baseMemName));
+                      expect(message.arguments['body'], equals("Repeat"));
+                      expect(message.arguments['payload'],
+                          equals("{\"$memIdKey\":$notifyTodayMemId}"));
+                      showCount++;
+                      return false;
+                    },
+                  ],
+                );
+
+                await scheduleCallback(
+                  1,
+                  {
+                    memIdKey: notifyTodayMemId,
+                    notificationTypeKey: NotificationType.repeat.name,
+                  },
+                );
+
+                if (defaultTargetPlatform == TargetPlatform.android) {
+                  expect(initializeCount, equals(1));
+                  expect(showCount, equals(1));
+                } else {
+                  expect(initializeCount, equals(0));
+                  expect(showCount, equals(0));
+                }
+
+                widgetTester.clearMockFlutterLocalNotifications();
+              },
+            );
+
+            testWidgets(
+              'not notify',
+              (widgetTester) async {
+                widgetTester.setMockFlutterLocalNotifications(
+                  [],
+                );
+
+                await scheduleCallback(
+                  1,
+                  {
+                    memIdKey: notifyTomorrowMemId,
+                    notificationTypeKey: NotificationType.repeat.name,
+                  },
+                );
+
+                widgetTester.clearMockFlutterLocalNotifications();
+              },
+            );
           },
         );
       },

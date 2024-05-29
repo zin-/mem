@@ -253,11 +253,24 @@ Future<void> scheduleCallback(int id, Map<String, dynamic> params) => i(
 
 Future<bool> _shouldNotify(int memId) => v(
       () async {
+        final savedMemNotifications =
+            await MemNotificationRepository().shipByMemId(memId);
         final repeatByNDayMemNotification =
-            (await MemNotificationRepository().shipByMemId(memId))
-                .singleWhereOrNull(
+            savedMemNotifications.singleWhereOrNull(
           (element) => element.isEnabled() && element.isRepeatByNDay(),
         );
+        final repeatByDayOfWeekMemNotifications = savedMemNotifications.where(
+          (element) => element.isEnabled() && element.isRepeatByDayOfWeek(),
+        );
+
+        if (repeatByDayOfWeekMemNotifications.isNotEmpty) {
+          final now = DateTime.now();
+          if (!repeatByDayOfWeekMemNotifications
+              .map((e) => e.time)
+              .contains(now.weekday)) {
+            return false;
+          }
+        }
 
         if (repeatByNDayMemNotification != null) {
           final lastActTime = await ActRepository()
