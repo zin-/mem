@@ -417,29 +417,8 @@ void main() => group(
           testWidgets(
             'withCurrentAct',
             (widgetTester) async {
-              // int initializeCount = 0;
-              // int showCount = 0;
               widgetTester.setMockFlutterLocalNotifications(
-                [
-                  // (message) async {
-                  //   expect(message.method, equals('initialize'));
-                  //   initializeCount++;
-                  //   return true;
-                  // },
-                  // (message) async {
-                  //   expect(message.method, equals('show'));
-                  //   expect(message.arguments['id'],
-                  //       equals(memRepeatedNotificationId(withOldActMemId!)));
-                  //   expect(
-                  //       message.arguments['title'], equals(withOldActMemName));
-                  //   expect(message.arguments['body'],
-                  //       equals(insertedRepeatNotificationMessage));
-                  //   expect(message.arguments['payload'],
-                  //       equals("{\"$memIdKey\":$withOldActMemId}"));
-                  //   showCount++;
-                  //   return false;
-                  // },
-                ],
+                [],
               );
 
               final params = {
@@ -449,13 +428,6 @@ void main() => group(
 
               await scheduleCallback(0, params);
 
-              // if (defaultTargetPlatform == TargetPlatform.android) {
-              //   expect(initializeCount, equals(1));
-              //   expect(showCount, equals(1));
-              // } else {
-              //   expect(initializeCount, equals(0));
-              //   expect(showCount, equals(0));
-              // }
               widgetTester.clearMockFlutterLocalNotifications();
             },
           );
