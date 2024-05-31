@@ -26,17 +26,23 @@ const _name = 'Repeat by n day habit scenario';
 void main() => group(
       _name,
       () {
-        late final DatabaseAccessor dbA;
-        setUpAll(() async {
-          dbA = await openTestDatabase(databaseDefinition);
-        });
-
-        int insertedMemId = 0;
         const insertedMemName = "$_name - mem name - inserted";
         const insertedMemRepeatByNDay = 2;
+        const withoutActMemName = "$insertedMemName - without act";
+        const withOldActMemName = "$insertedMemName - with old act";
+        const withCurrentActMemName = "$insertedMemName - with current act";
+        const insertedRepeatNotificationMessage =
+            "$_name - inserted - mem notification message - repeat";
 
-        setUp(() async {
-          NotificationClient.resetSingleton();
+        late final DatabaseAccessor dbA;
+
+        int insertedMemId = 0;
+        int withoutActMemId = 0;
+        int withOldActMemId = 0;
+        int withCurrentActMemId = 0;
+
+        setUpAll(() async {
+          dbA = await openTestDatabase(databaseDefinition);
 
           await clearAllTestDatabaseRows(databaseDefinition);
 
@@ -68,6 +74,63 @@ void main() => group(
               defColCreatedAt.name: zeroDate,
             },
           );
+
+          withoutActMemId = await dbA.insert(defTableMems, {
+            defColMemsName.name: withoutActMemName,
+            defColMemsDoneAt.name: null,
+            defColCreatedAt.name: zeroDate,
+          });
+          withOldActMemId = await dbA.insert(defTableMems, {
+            defColMemsName.name: withOldActMemName,
+            defColMemsDoneAt.name: null,
+            defColCreatedAt.name: zeroDate,
+          });
+          withCurrentActMemId = await dbA.insert(defTableMems, {
+            defColMemsName.name: withCurrentActMemName,
+            defColMemsDoneAt.name: null,
+            defColCreatedAt.name: zeroDate,
+          });
+
+          for (final insertedMemId in [
+            withoutActMemId,
+            withOldActMemId,
+            withCurrentActMemId
+          ]) {
+            await dbA.insert(defTableMemNotifications, {
+              defFkMemNotificationsMemId.name: insertedMemId,
+              defColMemNotificationsTime.name: 0,
+              defColMemNotificationsType.name: MemNotificationType.repeat.name,
+              defColMemNotificationsMessage.name:
+                  insertedRepeatNotificationMessage,
+              defColCreatedAt.name: zeroDate,
+            });
+            await dbA.insert(defTableMemNotifications, {
+              defFkMemNotificationsMemId.name: insertedMemId,
+              defColMemNotificationsTime.name: 2,
+              defColMemNotificationsType.name:
+                  MemNotificationType.repeatByNDay.name,
+              defColMemNotificationsMessage.name:
+                  "$_name - inserted - mem notification message - after act started",
+              defColCreatedAt.name: zeroDate,
+            });
+          }
+
+          await dbA.insert(defTableActs, {
+            defFkActsMemId.name: withOldActMemId,
+            defColActsStart.name: zeroDate.toIso8601String(),
+            defColActsStartIsAllDay.name: 0,
+            defColCreatedAt.name: zeroDate,
+          });
+          await dbA.insert(defTableActs, {
+            defFkActsMemId.name: withCurrentActMemId,
+            defColActsStart.name: DateTime.now().toIso8601String(),
+            defColActsStartIsAllDay.name: 0,
+            defColCreatedAt.name: zeroDate,
+          });
+        });
+
+        setUp(() async {
+          NotificationClient.resetSingleton();
         });
 
         testWidgets(
@@ -116,7 +179,13 @@ void main() => group(
           'save.',
           (widgetTester) async {
             final testStart = DateTime.now();
-            var expectedSavedMemId = insertedMemId + 1;
+            var expectedSavedMemId = ((await dbA.select(
+                  defTableMems,
+                  orderBy: "id DESC",
+                  limit: 1,
+                ))
+                    .single[defPkId.name] as int) +
+                1;
 
             int alarmServiceStartCount = 0;
             int alarmCancelCount = 0;
@@ -256,54 +325,6 @@ void main() => group(
         );
 
         group('notify repeatByNDay', () {
-          const withoutActMemName = "$insertedMemName - without act";
-          const withActMemName = "$insertedMemName - with act";
-          const insertedRepeatNotificationMessage =
-              "$_name - inserted - mem notification message - repeat";
-          int? withoutActMemId;
-          int? withActMemId;
-
-          setUp(() async {
-            withoutActMemId = await dbA.insert(defTableMems, {
-              defColMemsName.name: withoutActMemName,
-              defColMemsDoneAt.name: null,
-              defColCreatedAt.name: zeroDate,
-            });
-            withActMemId = await dbA.insert(defTableMems, {
-              defColMemsName.name: withActMemName,
-              defColMemsDoneAt.name: null,
-              defColCreatedAt.name: zeroDate,
-            });
-
-            for (final insertedMemId in [withoutActMemId, withActMemId]) {
-              await dbA.insert(defTableMemNotifications, {
-                defFkMemNotificationsMemId.name: insertedMemId,
-                defColMemNotificationsTime.name: 0,
-                defColMemNotificationsType.name:
-                    MemNotificationType.repeat.name,
-                defColMemNotificationsMessage.name:
-                    insertedRepeatNotificationMessage,
-                defColCreatedAt.name: zeroDate,
-              });
-              await dbA.insert(defTableMemNotifications, {
-                defFkMemNotificationsMemId.name: insertedMemId,
-                defColMemNotificationsTime.name: 2,
-                defColMemNotificationsType.name:
-                    MemNotificationType.repeatByNDay.name,
-                defColMemNotificationsMessage.name:
-                    "$_name - inserted - mem notification message - after act started",
-                defColCreatedAt.name: zeroDate,
-              });
-            }
-
-            await dbA.insert(defTableActs, {
-              defFkActsMemId.name: withActMemId,
-              defColActsStart.name: zeroDate.toIso8601String(),
-              defColActsStartIsAllDay.name: 0,
-              defColCreatedAt.name: zeroDate,
-            });
-          });
-
           testWidgets(
             'withoutAct.',
             (widgetTester) async {
@@ -319,7 +340,7 @@ void main() => group(
                   (message) async {
                     expect(message.method, equals('show'));
                     expect(message.arguments['id'],
-                        equals(memRepeatedNotificationId(withoutActMemId!)));
+                        equals(memRepeatedNotificationId(withoutActMemId)));
                     expect(
                         message.arguments['title'], equals(withoutActMemName));
                     expect(message.arguments['body'],
@@ -332,13 +353,12 @@ void main() => group(
                 ],
               );
 
-              final id = withoutActMemId!;
               final params = {
-                memIdKey: id,
+                memIdKey: withoutActMemId,
                 notificationTypeKey: NotificationType.repeat.name,
               };
 
-              await scheduleCallback(id, params);
+              await scheduleCallback(0, params);
 
               if (defaultTargetPlatform == TargetPlatform.android) {
                 expect(initializeCount, equals(1));
@@ -352,19 +372,64 @@ void main() => group(
           );
 
           testWidgets(
-            'withAct',
+            'withOldAct',
+            (widgetTester) async {
+              int initializeCount = 0;
+              int showCount = 0;
+              widgetTester.setMockFlutterLocalNotifications(
+                [
+                  (message) async {
+                    expect(message.method, equals('initialize'));
+                    initializeCount++;
+                    return true;
+                  },
+                  (message) async {
+                    expect(message.method, equals('show'));
+                    expect(message.arguments['id'],
+                        equals(memRepeatedNotificationId(withOldActMemId)));
+                    expect(
+                        message.arguments['title'], equals(withOldActMemName));
+                    expect(message.arguments['body'],
+                        equals(insertedRepeatNotificationMessage));
+                    expect(message.arguments['payload'],
+                        equals("{\"$memIdKey\":$withOldActMemId}"));
+                    showCount++;
+                    return false;
+                  },
+                ],
+              );
+
+              final params = {
+                memIdKey: withOldActMemId,
+                notificationTypeKey: NotificationType.repeat.name,
+              };
+
+              await scheduleCallback(0, params);
+
+              if (defaultTargetPlatform == TargetPlatform.android) {
+                expect(initializeCount, equals(1));
+                expect(showCount, equals(1));
+              } else {
+                expect(initializeCount, equals(0));
+                expect(showCount, equals(0));
+              }
+              widgetTester.clearMockFlutterLocalNotifications();
+            },
+          );
+
+          testWidgets(
+            'withCurrentAct',
             (widgetTester) async {
               widgetTester.setMockFlutterLocalNotifications(
                 [],
               );
 
-              final id = withActMemId!;
               final params = {
-                memIdKey: id,
+                memIdKey: withCurrentActMemId,
                 notificationTypeKey: NotificationType.repeat.name,
               };
 
-              await scheduleCallback(id, params);
+              await scheduleCallback(0, params);
 
               widgetTester.clearMockFlutterLocalNotifications();
             },
