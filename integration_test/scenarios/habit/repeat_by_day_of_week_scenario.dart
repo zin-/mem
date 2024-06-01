@@ -3,6 +3,7 @@ import 'package:day_picker/day_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/base.dart';
@@ -27,6 +28,9 @@ void main() => group(
         const baseMemName = "$_scenarioName - mem - name";
         const insertedMemName = "$baseMemName - inserted";
 
+        final insertedMemNotificationTime =
+            DateTime.now().subtract(const Duration(days: 1));
+
         late final DatabaseAccessor dbA;
 
         int? insertedMemId;
@@ -43,7 +47,8 @@ void main() => group(
           });
           await dbA.insert(defTableMemNotifications, {
             defFkMemNotificationsMemId.name: insertedMemId,
-            defColMemNotificationsTime.name: 0,
+            defColMemNotificationsTime.name:
+                insertedMemNotificationTime.weekday,
             defColMemNotificationsType.name:
                 MemNotificationType.repeatByDayOfWeek.name,
             defColMemNotificationsMessage.name:
@@ -71,17 +76,14 @@ void main() => group(
           });
           await dbA.insert(defTableMemNotifications, {
             defFkMemNotificationsMemId.name: notifyTomorrowMemId,
-            defColMemNotificationsTime.name: DateTime.now().weekday + 1,
+            defColMemNotificationsTime.name:
+                DateTime.now().add(const Duration(days: 1)).weekday,
             defColMemNotificationsType.name:
                 MemNotificationType.repeatByDayOfWeek.name,
             defColMemNotificationsMessage.name:
                 "$_scenarioName - mem notification - repeatByDayOfWeek - message - inserted",
             defColCreatedAt.name: zeroDate,
           });
-        });
-
-        setUp(() async {
-          NotificationClient.resetSingleton();
         });
 
         group(
@@ -122,8 +124,12 @@ void main() => group(
             testWidgets(
               'saved.',
               (widgetTester) async {
+                final repeatText =
+                    DateFormat.E().format(insertedMemNotificationTime);
+
                 await runApplication();
                 await widgetTester.pumpAndSettle();
+
                 await widgetTester.tap(find.text(insertedMemName));
                 await widgetTester.pumpAndSettle();
 
@@ -135,7 +141,7 @@ void main() => group(
                               matching: find.byType(Text)),
                         )
                         .data,
-                    equals("Mon"));
+                    equals(repeatText));
 
                 await widgetTester.tap(find.descendant(
                     of: find.byKey(keyMemNotificationsView),
@@ -145,9 +151,17 @@ void main() => group(
                 expect(
                     widgetTester
                         .widget<SelectWeekDays>(find.byType(SelectWeekDays))
-                        .days[0]
+                        .days[insertedMemNotificationTime.weekday - 1]
                         .isSelected,
                     isTrue);
+                expect(
+                    widgetTester
+                        .widget<SelectWeekDays>(find.byType(SelectWeekDays))
+                        .days
+                        .whereIndexed((index, element) =>
+                            index != insertedMemNotificationTime.weekday - 1)
+                        .map((e) => e.isSelected),
+                    everyElement(isFalse));
               },
             );
           },
@@ -185,11 +199,19 @@ void main() => group(
                         .days[4]
                         .isSelected,
                     isTrue);
+                expect(
+                    widgetTester
+                        .widget<SelectWeekDays>(find.byType(SelectWeekDays))
+                        .days
+                        .whereIndexed(
+                            (index, element) => index != 0 && index != 4)
+                        .map((e) => e.isSelected),
+                    everyElement(isFalse));
               },
             );
 
             testWidgets(
-              'unselect Mon.',
+              'unselect selected.',
               (widgetTester) async {
                 await runApplication();
                 await widgetTester.pumpAndSettle();
@@ -200,7 +222,8 @@ void main() => group(
                     matching: find.byIcon(Icons.edit)));
                 await widgetTester.pumpAndSettle();
 
-                await widgetTester.tap(find.text('Mon'));
+                await widgetTester.tap(find
+                    .text(DateFormat.E().format(insertedMemNotificationTime)));
 
                 expect(
                     widgetTester
@@ -224,7 +247,8 @@ void main() => group(
                 of: find.byKey(keyMemNotificationsView),
                 matching: find.byIcon(Icons.edit)));
             await widgetTester.pumpAndSettle();
-            await widgetTester.tap(find.text('Mon'));
+            await widgetTester.tap(
+                find.text(DateFormat.E().format(insertedMemNotificationTime)));
             await widgetTester.tap(find.text('Sun'));
 
             await widgetTester.pageBack();
@@ -245,7 +269,7 @@ void main() => group(
                 orderBy: "id ASC");
             expect(savedMemNotification, hasLength(1));
             expect(savedMemNotification[0][defColMemNotificationsTime.name],
-                equals(6));
+                equals(7));
             expect(
                 widgetTester
                     .widget<SelectWeekDays>(find.byType(SelectWeekDays))
@@ -265,6 +289,10 @@ void main() => group(
         group(
           'scheduleCallback',
           () {
+            setUp(() async {
+              NotificationClient.resetSingleton();
+            });
+
             testWidgets(
               'notify',
               (widgetTester) async {
