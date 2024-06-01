@@ -130,16 +130,15 @@ void main() => group(
                 await runApplication();
                 await widgetTester.pumpAndSettle();
 
+                expect(find.text(repeatText), findsOneWidget);
                 await widgetTester.tap(find.text(insertedMemName));
                 await widgetTester.pumpAndSettle();
 
                 expect(
                     widgetTester
-                        .widget<Text>(
-                          find.descendant(
-                              of: find.byKey(keyMemNotificationsView),
-                              matching: find.byType(Text)),
-                        )
+                        .widget<Text>(find.descendant(
+                            of: find.byKey(keyMemNotificationsView),
+                            matching: find.byType(Text)))
                         .data,
                     equals(repeatText));
 

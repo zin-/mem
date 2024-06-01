@@ -112,26 +112,26 @@ void main() => group(
           );
 
           testWidgets(
-            ": on saved.",
+            'saved.',
             (widgetTester) async {
+              const repeatText = "12:00 AM every day";
+
               await runApplication();
               await widgetTester.pumpAndSettle();
 
               expect(find.byType(Checkbox), findsNothing);
+              expect(find.text(repeatText), findsOneWidget);
 
               await widgetTester.tap(find.text(insertedMemName));
               await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
               expect(
-                widgetTester
-                    .widget<Text>(
-                      find.descendant(
+                  widgetTester
+                      .widget<Text>(find.descendant(
                           of: find.byKey(keyMemNotificationsView),
-                          matching: find.byType(Text)),
-                    )
-                    .data,
-                "12:00 AM every day",
-              );
+                          matching: find.byType(Text)))
+                      .data,
+                  repeatText);
 
               await widgetTester.tap(
                 find.descendant(
