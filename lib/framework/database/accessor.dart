@@ -49,6 +49,8 @@ class DatabaseAccessor {
 
   Future<List<Map<String, Object?>>> select(
     TableDefinition tableDefinition, {
+    String? groupBy,
+    List<String>? extraColumns,
     String? where,
     List<Object?>? whereArgs,
     String? orderBy,
@@ -59,8 +61,10 @@ class DatabaseAccessor {
         () => _nativeDatabase
             .query(
               tableDefinition.name,
+              columns: extraColumns == null ? null : ['*', ...extraColumns],
               where: where,
               whereArgs: whereArgs?.map((e) => _converter.to(e)).toList(),
+              groupBy: groupBy,
               orderBy: orderBy,
               offset: offset,
               limit: limit,
