@@ -68,7 +68,7 @@ class ActsClient {
         () async {
           final replaced = await _actService.edit(savedAct);
 
-          if (replaced.period.end == null) {
+          if (replaced.isActive) {
             _notificationClient.startActNotifications(replaced.memId);
           } else {
             _notificationClient.cancelActNotification(replaced.memId);

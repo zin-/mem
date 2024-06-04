@@ -9,6 +9,8 @@ class Act extends EntityV1 {
 
   Act(this.memId, this.period);
 
+  bool get isActive => period.start != null && period.end == null;
+
   @override
   String toString() => "${super.toString()}: ${{
         "memId": memId,
