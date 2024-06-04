@@ -3,6 +3,7 @@ import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
+import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
@@ -15,6 +16,7 @@ class MemRepository extends DatabaseTupleRepository<Mem, SavedMem, int> {
     bool? archived,
     bool? done,
     Condition? condition,
+    GroupBy? groupBy,
     List<OrderBy>? orderBy,
     int? offset,
     int? limit,
@@ -37,12 +39,13 @@ class MemRepository extends DatabaseTupleRepository<Mem, SavedMem, int> {
           limit: limit,
         ),
         {
-          "archived": archived,
-          "done": done,
-          "condition": condition,
-          "orderBy": orderBy,
-          "offset": offset,
-          "limit": limit,
+          'archived': archived,
+          'done': done,
+          'condition': condition,
+          'groupBy': groupBy,
+          'orderBy': orderBy,
+          'offset': offset,
+          'limit': limit,
         },
       );
 

@@ -2,6 +2,7 @@ import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
+import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
@@ -74,6 +75,7 @@ class ActRepository extends DatabaseTupleRepository<Act, SavedAct, int> {
     DateAndTimePeriod? period,
     ActOrderBy? actOrderBy,
     Condition? condition,
+    GroupBy? groupBy,
     List<OrderBy>? orderBy,
     int? offset,
     int? limit,
@@ -97,12 +99,14 @@ class ActRepository extends DatabaseTupleRepository<Act, SavedAct, int> {
           limit: limit,
         ),
         {
-          "memId": memId,
-          "period": period,
-          "condition": condition,
-          "orderBy": orderBy,
-          "offset": offset,
-          "limit": limit,
+          'memId': memId,
+          'period': period,
+          'actOrderBy': actOrderBy,
+          'condition': condition,
+          'groupBy': groupBy,
+          'orderBy': orderBy,
+          'offset': offset,
+          'limit': limit,
         },
       );
 
