@@ -33,45 +33,55 @@ final showDoneProvider = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
     () => ValueStateNotifier(false),
   ),
 );
+final _filteredMemsProvider = StateNotifierProvider.autoDispose<
+    ListValueStateNotifier<SavedMem>, List<SavedMem>>(
+  (ref) {
+    final savedMems = ref.watch(memsProvider).map((e) => e as SavedMem);
+
+    final showNotArchived = ref.watch(showNotArchivedProvider);
+    final showArchived = ref.watch(showArchivedProvider);
+    final showNotDone = ref.watch(showNotDoneProvider);
+    final showDone = ref.watch(showDoneProvider);
+    final searchText = ref.watch(searchTextProvider);
+
+    return ListValueStateNotifier(
+      v(
+        () => savedMems.where((mem) {
+          if (showNotArchived == showArchived) {
+            return true;
+          } else {
+            return showArchived ? mem.isArchived : !mem.isArchived;
+          }
+        }).where((mem) {
+          if (showNotDone == showDone) {
+            return true;
+          } else {
+            return showDone ? mem.isDone : !mem.isDone;
+          }
+        }).where((mem) {
+          // FIXME searchTextがある場合、Memの状態に関わらずsearchTextだけでフィルターした方が良いかも
+          if (searchText == null || searchText.isEmpty) {
+            return true;
+          } else {
+            return mem.name.contains(searchText);
+          }
+        }).toList(),
+        {
+          'savedMems': savedMems,
+          'showNotArchived': showNotArchived,
+          'showArchived': showArchived,
+          'showNotDone': showNotDone,
+          'showDone': showDone,
+          'searchText': searchText,
+        },
+      ),
+    );
+  },
+);
 
 final memListProvider = StateNotifierProvider.autoDispose<
     ValueStateNotifier<List<SavedMem>>, List<SavedMem>>((ref) {
-  final rawMemList = ref.watch(memsProvider).map((e) => e as SavedMem);
-
-  final showNotArchived = ref.watch(showNotArchivedProvider);
-  final showArchived = ref.watch(showArchivedProvider);
-  final showNotDone = ref.watch(showNotDoneProvider);
-  final showDone = ref.watch(showDoneProvider);
-  final searchText = ref.watch(searchTextProvider);
-  final filtered = v(
-    () => rawMemList.where((mem) {
-      if (searchText == null || searchText.isEmpty) {
-        return true;
-      } else {
-        return mem.name.contains(searchText);
-      }
-    }).where((mem) {
-      if (showNotArchived == showArchived) {
-        return true;
-      } else {
-        return showArchived ? mem.isArchived : !mem.isArchived;
-      }
-    }).where((mem) {
-      if (showNotDone == showDone) {
-        return true;
-      } else {
-        return showDone ? mem.isDone : !mem.isDone;
-      }
-    }).toList(),
-    {
-      rawMemList,
-      showNotArchived,
-      showArchived,
-      showNotDone,
-      showDone,
-      searchText,
-    },
-  );
+  final filtered = ref.watch(_filteredMemsProvider);
 
   final activeActs = ref.watch(activeActsProvider);
   final sorted = v(
