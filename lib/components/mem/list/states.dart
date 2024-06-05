@@ -86,18 +86,12 @@ final memListProvider = StateNotifierProvider.autoDispose<
   final activeActs = ref.watch(activeActsProvider);
   final sorted = v(
     () => filtered.sorted((a, b) {
-      final activeActOfA =
-          activeActs.singleWhereOrNull((act) => act.memId == a.id);
-      final activeActOfB =
-          activeActs.singleWhereOrNull((act) => act.memId == b.id);
-      if ((activeActOfA == null) ^ (activeActOfB == null)) {
-        return activeActOfA == null ? 1 : -1;
-      } else if (activeActOfA != null && activeActOfB != null) {
-        final c =
-            activeActOfA.period.start!.compareTo(activeActOfB.period.start!);
-        if (c != 0) {
-          return c;
-        }
+      final comparedByActiveAct = _compareActiveAct(
+        activeActs.singleWhereOrNull((act) => act.memId == a.id),
+        activeActs.singleWhereOrNull((act) => act.memId == b.id),
+      );
+      if (comparedByActiveAct != 0) {
+        return comparedByActiveAct;
       }
 
       if ((a.isArchived) != (b.isArchived)) {
@@ -119,6 +113,20 @@ final memListProvider = StateNotifierProvider.autoDispose<
 
   return ValueStateNotifier(sorted);
 });
+
+int _compareActiveAct(Act? activeActOfA, Act? activeActOfB) => v(
+      () {
+        if (activeActOfA == null && activeActOfB == null) {
+          return 0;
+        } else if (activeActOfA != null && activeActOfB != null) {
+          return activeActOfA.period.start!
+              .compareTo(activeActOfB.period.start!);
+        } else {
+          return activeActOfA == null ? 1 : -1;
+        }
+      },
+      {'activeActOfA': activeActOfA, 'activeActOfB': activeActOfB},
+    );
 
 final activeActsProvider = StateNotifierProvider.autoDispose<
     ListValueStateNotifier<SavedAct>, List<SavedAct>>(
