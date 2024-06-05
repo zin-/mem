@@ -82,36 +82,39 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
 final memListProvider = StateNotifierProvider.autoDispose<
     ValueStateNotifier<List<SavedMem>>, List<SavedMem>>((ref) {
   final filtered = ref.watch(_filteredMemsProvider);
-
   final activeActs = ref.watch(activeActsProvider);
-  final sorted = v(
-    () => filtered.sorted((a, b) {
-      final comparedByActiveAct = _compareActiveAct(
-        activeActs.singleWhereOrNull((act) => act.memId == a.id),
-        activeActs.singleWhereOrNull((act) => act.memId == b.id),
-      );
-      if (comparedByActiveAct != 0) {
-        return comparedByActiveAct;
-      }
 
-      if ((a.isArchived) != (b.isArchived)) {
-        return a.isArchived ? 1 : -1;
-      }
-      if (a.isDone != b.isDone) {
-        return a.isDone ? 1 : -1;
-      }
+  return ValueStateNotifier(
+    v(
+      () => filtered.sorted((a, b) {
+        final comparedByActiveAct = _compareActiveAct(
+          activeActs.singleWhereOrNull((act) => act.memId == a.id),
+          activeActs.singleWhereOrNull((act) => act.memId == b.id),
+        );
+        if (comparedByActiveAct != 0) {
+          return comparedByActiveAct;
+        }
 
-      final comparedPeriod = DateAndTimePeriod.compare(a.period, b.period);
-      if (comparedPeriod != 0) {
-        return comparedPeriod;
-      }
+        if ((a.isArchived) != (b.isArchived)) {
+          return a.isArchived ? 1 : -1;
+        }
+        if (a.isDone != b.isDone) {
+          return a.isDone ? 1 : -1;
+        }
 
-      return a.id.compareTo(b.id);
-    }).toList(),
-    {filtered, activeActs},
+        final comparedTime = _compareTime(a.period, b.period);
+        if (comparedTime != 0) {
+          return comparedTime;
+        }
+
+        return a.id.compareTo(b.id);
+      }).toList(),
+      {
+        'filtered': filtered,
+        'activeActs': activeActs,
+      },
+    ),
   );
-
-  return ValueStateNotifier(sorted);
 });
 
 int _compareActiveAct(Act? activeActOfA, Act? activeActOfB) => v(
@@ -126,6 +129,20 @@ int _compareActiveAct(Act? activeActOfA, Act? activeActOfB) => v(
         }
       },
       {'activeActOfA': activeActOfA, 'activeActOfB': activeActOfB},
+    );
+
+int _compareTime(
+  DateAndTimePeriod? periodOfA,
+  DateAndTimePeriod? periodOfB,
+) =>
+    v(
+      () {
+        return DateAndTimePeriod.compare(periodOfA, periodOfB);
+      },
+      {
+        'periodOfA': periodOfA,
+        'periodOfB': periodOfB,
+      },
     );
 
 final activeActsProvider = StateNotifierProvider.autoDispose<
