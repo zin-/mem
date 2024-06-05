@@ -6,6 +6,7 @@ import 'package:mem/core/mem_notification.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/components/value_state_notifier.dart';
+import 'package:mem/mems/mem_item.dart';
 import 'package:mem/mems/mem_item_repository.dart';
 import 'package:mem/mems/states.dart';
 import 'package:mem/repositories/mem_notification.dart';
@@ -35,11 +36,17 @@ final memItemsByMemIdProvider = StateNotifierProvider.family<
             ) ??
             MemItem.memo(memId),
       ],
-      initialFuture: memId == null
-          ? null
-          : MemItemRepository().shipByMemId(memId).then(
-                (value) => value.isEmpty ? [MemItem.memo(memId)] : value,
-              ),
+      initializer: (current, notifier) async {
+        if (memId != null) {
+          ref.read(memItemsProvider.notifier).upsertAll(
+                await MemItemRepository().shipByMemId(memId),
+                (current, updating) =>
+                    current is SavedMemItem &&
+                    updating is SavedMemItem &&
+                    current.id == updating.id,
+              );
+        }
+      },
     ),
     {"memId": memId},
   ),
