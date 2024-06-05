@@ -29,13 +29,17 @@ class AfterActStartedNotificationView extends ConsumerWidget {
             time,
             message,
             onTimeChanged: (picked) => ref
-                .read(memAfterActStartedNotificationByMemIdProvider(_memId)
-                    .notifier)
-                .updatedBy(notification.copiedWith(time: () => picked)),
+                .read(memNotificationsByMemIdProvider(_memId).notifier)
+                .upsertAll(
+              [notification.copiedWith(time: () => picked)],
+              (current, updating) => current.type == updating.type,
+            ),
             onMessageChanged: (value) => ref
-                .read(memAfterActStartedNotificationByMemIdProvider(_memId)
-                    .notifier)
-                .updatedBy(notification.copiedWith(message: () => value)),
+                .read(memNotificationsByMemIdProvider(_memId).notifier)
+                .upsertAll(
+              [notification.copiedWith(message: () => value)],
+              (current, updating) => current.type == updating.type,
+            ),
           );
         },
         {

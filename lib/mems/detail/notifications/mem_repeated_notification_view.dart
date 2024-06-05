@@ -21,14 +21,17 @@ class MemRepeatedNotificationView extends ConsumerWidget {
           )),
           ref.read(startOfDayProvider) ?? defaultStartOfDay,
           (picked) => ref
-              .read(memRepeatedNotificationByMemIdProvider(_memId).notifier)
-              .updatedBy(
-                ref
-                    .read(memRepeatedNotificationByMemIdProvider(_memId))
-                    .copiedWith(
-                      time: () => picked,
-                    ),
-              ),
+              .read(memNotificationsByMemIdProvider(_memId).notifier)
+              .upsertAll(
+            [
+              ref
+                  .read(memRepeatedNotificationByMemIdProvider(_memId))
+                  .copiedWith(
+                    time: () => picked,
+                  )
+            ],
+            (current, updating) => current.type == updating.type,
+          ),
         ),
         {
           "_memId": _memId,
