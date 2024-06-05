@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/l10n.dart';
@@ -9,6 +8,7 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/notifications/mem_notifications_text.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/states.dart';
+import 'package:mem/repositories/mem_notification.dart';
 
 class MemListItemSubtitle extends ConsumerWidget {
   final int _memId;
@@ -17,13 +17,15 @@ class MemListItemSubtitle extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () {
-          return _MemListItemSubtitle(
-            _memId,
-            ref.watch(memByMemIdProvider(_memId))?.period,
-            ref.watch(memNotificationsByMemIdProvider(_memId)),
-          );
-        },
+        () => _MemListItemSubtitle(
+          _memId,
+          ref.watch(memByMemIdProvider(_memId))?.period,
+          ref.watch(
+            memNotificationsByMemIdProvider(_memId).select(
+              (v) => v.whereType<SavedMemNotification>(),
+            ),
+          ),
+        ),
         {
           '_memId': _memId,
         },
@@ -33,12 +35,12 @@ class MemListItemSubtitle extends ConsumerWidget {
 class _MemListItemSubtitle extends StatelessWidget {
   final int _memId;
   final DateAndTimePeriod? _memPeriod;
-  final Iterable<MemNotification> _memNotifications;
+  final Iterable<SavedMemNotification> _savedMemNotifications;
 
   const _MemListItemSubtitle(
     this._memId,
     this._memPeriod,
-    this._memNotifications,
+    this._savedMemNotifications,
   );
 
   @override
@@ -47,7 +49,7 @@ class _MemListItemSubtitle extends StatelessWidget {
           final l10n = buildL10n(context);
 
           final memNotificationOneLine = MemNotification.toOneLine(
-            _memNotifications,
+            _savedMemNotifications,
             l10n.repeatedNotificationText,
             l10n.repeatEveryNDayNotificationText,
             l10n.afterActStartedNotificationText,
@@ -64,7 +66,7 @@ class _MemListItemSubtitle extends StatelessWidget {
         },
         {
           '_memPeriod': _memPeriod,
-          '_memNotifications': _memNotifications,
+          '_savedMemNotifications': _savedMemNotifications,
         },
       );
 }
