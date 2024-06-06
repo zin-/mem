@@ -29,6 +29,10 @@ void main() => group(
 
         const baseMemName = "$_name - mem - name";
         const insertedMemName = "$baseMemName - inserted";
+        const insertedMemName2 = "$insertedMemName - 2";
+
+        final now = DateTime.now();
+
         late int insertedMemId;
 
         setUp(() async {
@@ -48,6 +52,24 @@ void main() => group(
               defColMemNotificationsType.name: MemNotificationType.repeat.name,
               defColMemNotificationsTime.name: 2,
               defColMemNotificationsMessage.name: "never",
+              defColCreatedAt.name: zeroDate,
+            },
+          );
+          await dbA.insert(
+            defTableActs,
+            {
+              defFkActsMemId.name: insertedMemId,
+              defColActsStart.name: now.toIso8601String(),
+              defColActsStartIsAllDay.name: 0,
+              defColActsEnd.name: now.toIso8601String(),
+              defColActsEndIsAllDay.name: 0,
+              defColCreatedAt.name: zeroDate,
+            },
+          );
+          await dbA.insert(
+            defTableMems,
+            {
+              defColMemsName.name: insertedMemName2,
               defColCreatedAt.name: zeroDate,
             },
           );
@@ -119,7 +141,6 @@ void main() => group(
               await runApplication();
               await widgetTester.pumpAndSettle();
 
-              expect(find.byType(Checkbox), findsNothing);
               expect(find.text(repeatText), findsOneWidget);
 
               await widgetTester.tap(find.text(insertedMemName));
