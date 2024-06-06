@@ -2,6 +2,8 @@ import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
+import 'package:mem/framework/repository/condition/in.dart';
+import 'package:mem/framework/repository/extra_column.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/logger/log_service.dart';
@@ -72,7 +74,9 @@ class ActRepository extends DatabaseTupleRepository<Act, SavedAct, int> {
   @override
   Future<List<SavedAct>> ship({
     int? memId,
+    Iterable<int>? memIdsIn,
     DateAndTimePeriod? period,
+    bool? latestByMemIds,
     ActOrderBy? actOrderBy,
     Condition? condition,
     GroupBy? groupBy,
@@ -85,12 +89,19 @@ class ActRepository extends DatabaseTupleRepository<Act, SavedAct, int> {
           condition: And(
             [
               if (memId != null) Equals(defFkActsMemId.name, memId),
+              if (memIdsIn != null) In(defFkActsMemId.name, memIdsIn),
               if (period != null)
                 GraterThanOrEqual(defColActsStart, period.start),
               if (period != null) LessThan(defColActsStart, period.end),
               if (condition != null) condition,
             ],
           ),
+          groupBy: latestByMemIds == true
+              ? GroupBy(
+                  [defFkActsMemId],
+                  extraColumns: [Max(defColActsStart)],
+                )
+              : null,
           orderBy: [
             if (actOrderBy != null) actOrderBy.toQuery,
             if (orderBy != null) ...orderBy, // coverage:ignore-line
@@ -100,6 +111,7 @@ class ActRepository extends DatabaseTupleRepository<Act, SavedAct, int> {
         ),
         {
           'memId': memId,
+          'memIds': memIdsIn,
           'period': period,
           'actOrderBy': actOrderBy,
           'condition': condition,
