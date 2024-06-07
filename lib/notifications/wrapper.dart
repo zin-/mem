@@ -35,7 +35,9 @@ class NotificationsWrapper {
               }
               return flutterLocalNotificationsPlugin;
             },
+// coverage:ignore-start
             {
+// coverage:ignore-end
               '_pluginIsInitialized': _pluginIsInitialized,
             },
           );
@@ -57,7 +59,9 @@ class NotificationsWrapper {
           ),
           payload: jsonEncode(payload),
         ),
+// coverage:ignore-start
         {
+// coverage:ignore-end
           "id": id,
           "title": title,
           "body": body,
@@ -130,9 +134,11 @@ class NotificationsWrapper {
         () => _instance ??= NotificationsWrapper._(
           androidDefaultIconPath,
         ),
+// coverage:ignore-start
         {
+// coverage:ignore-end
           "_instance": _instance,
-          "androidDefaultIconPath": androidDefaultIconPath,
+          "androidDefaultIconPath": androidDefaultIconPath
         },
       );
 
