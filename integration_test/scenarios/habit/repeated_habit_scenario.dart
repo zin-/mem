@@ -56,6 +56,17 @@ void main() => group(
             },
           );
           await dbA.insert(
+            defTableMemNotifications,
+            {
+              defFkMemNotificationsMemId.name: insertedMemId,
+              defColMemNotificationsType.name:
+                  MemNotificationType.repeatByNDay.name,
+              defColMemNotificationsTime.name: 1,
+              defColMemNotificationsMessage.name: "never",
+              defColCreatedAt.name: zeroDate,
+            },
+          );
+          await dbA.insert(
             defTableActs,
             {
               defFkActsMemId.name: insertedMemId,
@@ -297,11 +308,14 @@ void main() => group(
                 defTableMemNotifications,
                 where: "${defFkMemNotificationsMemId.name} = ?",
                 whereArgs: [savedMem[defPkId.name]],
-              ))
-                  .single;
+              ));
               expect(
-                savedMemNotification[defColMemNotificationsTime.name],
+                savedMemNotification[0][defColMemNotificationsTime.name],
                 0,
+              );
+              expect(
+                savedMemNotification[1][defColMemNotificationsTime.name],
+                1,
               );
             },
           );
