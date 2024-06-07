@@ -269,11 +269,10 @@ final savedMemNotificationsProvider = StateNotifierProvider.autoDispose<
 
             ref.read(memNotificationsProvider.notifier).upsertAll(
                   actsByMemIds,
-                  (current, updating) => (current is SavedMemNotification &&
-                          updating is SavedMemNotification)
-                      ? current.id == updating.id
-                      : current.memId == updating.memId &&
-                          current.type == updating.type,
+                  (current, updating) =>
+                      current is SavedMemNotification &&
+                      updating is SavedMemNotification &&
+                      current.id == updating.id,
                 );
           }
         },
