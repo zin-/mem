@@ -1,6 +1,8 @@
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/framework/repository/condition/in.dart';
+import 'package:mem/framework/repository/group_by.dart';
+import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
@@ -8,6 +10,39 @@ import 'package:mem/repositories/mem_notification.dart';
 
 class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
     SavedMemNotification, int> {
+  @override
+  Future<List<SavedMemNotification>> ship({
+    Iterable<int>? memIdsIn,
+    Condition? condition,
+    GroupBy? groupBy,
+    List<OrderBy>? orderBy,
+    int? offset,
+    int? limit,
+  }) =>
+      v(
+        () => super.ship(
+          condition: And(
+            [
+              if (memIdsIn != null)
+                In(defFkMemNotificationsMemId.name, memIdsIn),
+              if (condition != null) condition, // coverage:ignore-line
+            ],
+          ),
+          groupBy: groupBy,
+          orderBy: orderBy,
+          offset: offset,
+          limit: limit,
+        ),
+        {
+          'memIds': memIdsIn,
+          'condition': condition,
+          'groupBy': groupBy,
+          'orderBy': orderBy,
+          'offset': offset,
+          'limit': limit,
+        },
+      );
+
   Future<List<SavedMemNotification>> shipByMemId(
     int memId,
   ) =>

@@ -54,7 +54,7 @@ class MemRepeatByDaysOfWeekNotificationView extends ConsumerWidget {
 }
 
 class _MemRepeatByDaysOfWeekNotificationView extends StatelessWidget {
-  final List<int> _daysOfWeek = [0, 1, 2, 3, 4, 5, 6];
+  final List<int> _daysOfWeek = [1, 2, 3, 4, 5, 6, 7];
 
   final List<int> _repeatByDaysOfWeek;
   final void Function(Iterable<int> selected) _onChanged;
@@ -80,10 +80,9 @@ class _MemRepeatByDaysOfWeekNotificationView extends StatelessWidget {
               days: _daysOfWeek
                   .map((e) => now.add(Duration(days: e)))
                   .sorted((a, b) => a.weekday.compareTo(b.weekday))
-                  .map((e) => dateFormat.format(e))
-                  .mapIndexed((index, e) => DayInWeek(e,
-                      dayKey: index.toString(),
-                      isSelected: _repeatByDaysOfWeek.contains(index)))
+                  .mapIndexed((index, e) => DayInWeek(dateFormat.format(e),
+                      dayKey: (index + 1).toString(),
+                      isSelected: _repeatByDaysOfWeek.contains(index + 1)))
                   .toList(growable: false),
               backgroundColor: theme.canvasColor,
               daysFillColor: theme.primaryColor,

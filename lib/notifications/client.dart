@@ -237,7 +237,6 @@ Future<void> scheduleCallback(int id, Map<String, dynamic> params) => i(
                 memId,
               );
             }
-
             break;
 
           default:
@@ -255,10 +254,6 @@ Future<bool> _shouldNotify(int memId) => v(
       () async {
         final savedMemNotifications =
             await MemNotificationRepository().shipByMemId(memId);
-        final repeatByNDayMemNotification =
-            savedMemNotifications.singleWhereOrNull(
-          (element) => element.isEnabled() && element.isRepeatByNDay(),
-        );
         final repeatByDayOfWeekMemNotifications = savedMemNotifications.where(
           (element) => element.isEnabled() && element.isRepeatByDayOfWeek(),
         );
@@ -272,22 +267,25 @@ Future<bool> _shouldNotify(int memId) => v(
           }
         }
 
-        if (repeatByNDayMemNotification != null) {
-          final lastActTime = await ActRepository()
-              .findOneBy(memId: memId, latest: true)
-              .then((value) =>
-                  value?.period.end ??
-                  // FIXME 永続化されている時点でstartは必ずあるので型で表現する
-                  value?.period.start!);
+        final repeatByNDayMemNotification =
+            savedMemNotifications.singleWhereOrNull(
+          (element) => element.isEnabled() && element.isRepeatByNDay(),
+        );
+        final lastActTime = await ActRepository()
+            .findOneBy(memId: memId, latest: true)
+            .then((value) =>
+                value?.period.end ??
+                // FIXME 永続化されている時点でstartは必ずあるので型で表現する
+                value?.period.start!);
 
-          if (lastActTime != null) {
-            if (Duration(
-                    days:
-                        // FIXME 永続化されている時点でtimeは必ずあるので型で表現する
-                        repeatByNDayMemNotification.time!) >
-                DateTime.now().difference(lastActTime)) {
-              return false;
-            }
+        if (lastActTime != null) {
+          if (Duration(
+                  days:
+                      // FIXME 永続化されている時点でtimeは必ずあるので型で表現する
+                      //  repeatByNDayMemNotification自体がないのは別の話
+                      repeatByNDayMemNotification?.time! ?? 1) >
+              DateTime.now().difference(lastActTime)) {
+            return false;
           }
         }
 

@@ -4,18 +4,20 @@ import 'package:mem/logger/log_service.dart';
 class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
   ListValueStateNotifier(
     super.state, {
-    Future<List<T>>? initialFuture,
+    void Function(
+      List<T> current,
+      ListValueStateNotifier<T> notifier,
+    )? initializer,
   }) {
-    initialFuture?.then(
-      (value) => v(
-        () => mounted
-            ? updatedBy(value)
+    if (initializer != null) {
+      if (mounted) {
+        initializer.call(state, this);
+      } else {
 // coverage:ignore-start
-            : warn("${super.toString()}. No update."),
+        warn("${super.toString()}. No update.");
 // coverage:ignore-end
-        value,
-      ),
-    );
+      }
+    }
   }
 
   void add(T item, {int? index}) => v(
@@ -27,6 +29,17 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
           updatedBy(tmp);
         },
         {'item': item},
+      );
+
+  List<T> addAll(Iterable<T> items) => v(
+        () {
+          final tmp = List.of(state);
+
+          tmp.addAll(items);
+
+          return updatedBy(tmp);
+        },
+        {'items': items},
       );
 
   List<T> upsertAll(

@@ -133,16 +133,20 @@ class MemNotification extends EntityV1 {
 
   static String _oneLineRepeatByDaysOfWeek(
     Iterable<MemNotification> repeatByDayOfWeeks,
-  ) {
-    final dateFormat = DateFormat.E();
-    final firstMonday = DateTime(0, 1, 3);
+  ) =>
+      v(
+        () {
+          final dateFormat = DateFormat.E();
+          final firstSunday = DateTime(0, 1, 2);
 
-    return repeatByDayOfWeeks
-        .map((e) => firstMonday.add(Duration(days: e.time!)))
-        .sorted((a, b) => a.compareTo(b))
-        .map((e) => dateFormat.format(e))
-        .join(", ");
-  }
+          return repeatByDayOfWeeks
+              .map((e) => firstSunday.add(Duration(days: e.time!)))
+              .sorted((a, b) => a.compareTo(b))
+              .map((e) => dateFormat.format(e))
+              .join(", ");
+        },
+        {'repeatByDayOfWeeks': repeatByDayOfWeeks},
+      );
 
   static String _oneLineAfterAct(
     afterActStarted,

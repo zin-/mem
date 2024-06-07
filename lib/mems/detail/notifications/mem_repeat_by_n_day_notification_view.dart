@@ -23,13 +23,16 @@ class MemRepeatByNDayNotificationView extends ConsumerWidget {
             (value) {
               ref
                   .read(
-                    memRepeatByNDayNotificationByMemIdProvider(_memId).notifier,
+                memNotificationsByMemIdProvider(_memId).notifier,
+              )
+                  .upsertAll(
+                [
+                  notification.copiedWith(
+                    time: () => value,
                   )
-                  .updatedBy(
-                    notification.copiedWith(
-                      time: () => value,
-                    ),
-                  );
+                ],
+                (current, updating) => current.type == updating.type,
+              );
             },
           );
         },

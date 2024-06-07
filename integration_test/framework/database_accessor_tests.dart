@@ -26,6 +26,13 @@ void main() => group(
           sampleDefColTimeStamp.name: DateTime(1),
           sampleDefColBoolean.name: true,
         };
+        final inserted3 = {
+          sampleDefPk.name: 3,
+          sampleDefColInteger.name: 3,
+          sampleDefColText.name: "$insertedName - 3",
+          sampleDefColTimeStamp.name: DateTime(3),
+          sampleDefColBoolean.name: false,
+        };
 
         late final DatabaseAccessor databaseAccessor;
 
@@ -73,6 +80,20 @@ void main() => group(
                   (inserted2[sampleDefColBoolean.name] as bool) ? 1 : 0,
             },
           );
+          await databaseAccessor
+              // ignore: deprecated_member_use_from_same_package
+              .nativeDatabase
+              .insert(
+            sampleDefTable.name,
+            {
+              ...inserted3,
+              sampleDefColTimeStamp.name:
+                  (inserted3[sampleDefColTimeStamp.name] as DateTime)
+                      .toIso8601String(),
+              sampleDefColBoolean.name:
+                  (inserted3[sampleDefColBoolean.name] as bool) ? 1 : 0,
+            },
+          );
         });
 
         test(": insert.", () async {
@@ -102,7 +123,7 @@ void main() => group(
           () async {
             final count = await databaseAccessor.count(sampleDefTable);
 
-            expect(count, equals(2));
+            expect(count, equals(3));
           },
         );
 
@@ -114,7 +135,24 @@ void main() => group(
               () async {
                 final selected = await databaseAccessor.select(sampleDefTable);
 
-                expect(selected, [inserted, inserted2]);
+                expect(selected, [inserted, inserted2, inserted3]);
+              },
+            );
+
+            test(
+              'group by.',
+              () async {
+                final extraColumn = 'MAX( ${sampleDefPk.name} )';
+                final selected = await databaseAccessor.select(
+                  sampleDefTable,
+                  groupBy: sampleDefColBoolean.name,
+                  extraColumns: [extraColumn],
+                );
+
+                expect(selected, [
+                  {...inserted3, extraColumn: inserted3[sampleDefPk.name]},
+                  {...inserted2, extraColumn: inserted2[sampleDefPk.name]},
+                ]);
               },
             );
 
@@ -139,7 +177,7 @@ void main() => group(
                   orderBy: "${sampleDefPk.name} DESC",
                 );
 
-                expect(selected, [inserted2, inserted]);
+                expect(selected, [inserted3, inserted2, inserted]);
               },
             );
 
@@ -151,7 +189,7 @@ void main() => group(
                   offset: 1,
                 );
 
-                expect(selected, [inserted2]);
+                expect(selected, [inserted2, inserted3]);
               },
             );
 

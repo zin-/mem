@@ -1,3 +1,5 @@
+import 'package:collection/collection.dart';
+
 import 'definition/column/boolean_column_definition.dart';
 import 'definition/column/timestamp_column_definition.dart';
 import 'definition/table_definition.dart';
@@ -17,7 +19,7 @@ class DatabaseConverter {
   ) =>
       values.map((key, value) {
         switch (tableDefinition.columnDefinitions
-            .singleWhere((element) => element.name == key)
+            .singleWhereOrNull((element) => element.name == key)
             .runtimeType) {
           case TimestampColumnDefinition:
             return MapEntry(

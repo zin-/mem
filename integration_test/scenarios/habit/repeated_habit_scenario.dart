@@ -29,6 +29,10 @@ void main() => group(
 
         const baseMemName = "$_name - mem - name";
         const insertedMemName = "$baseMemName - inserted";
+        const insertedMemName2 = "$insertedMemName - 2";
+
+        final now = DateTime.now();
+
         late int insertedMemId;
 
         setUp(() async {
@@ -48,6 +52,36 @@ void main() => group(
               defColMemNotificationsType.name: MemNotificationType.repeat.name,
               defColMemNotificationsTime.name: 2,
               defColMemNotificationsMessage.name: "never",
+              defColCreatedAt.name: zeroDate,
+            },
+          );
+          await dbA.insert(
+            defTableMemNotifications,
+            {
+              defFkMemNotificationsMemId.name: insertedMemId,
+              defColMemNotificationsType.name:
+                  MemNotificationType.repeatByNDay.name,
+              defColMemNotificationsTime.name: 1,
+              defColMemNotificationsMessage.name: "never",
+              defColCreatedAt.name: zeroDate,
+            },
+          );
+          await dbA.insert(
+            defTableActs,
+            {
+              defFkActsMemId.name: insertedMemId,
+              defColActsStart.name: now.toIso8601String(),
+              defColActsStartIsAllDay.name: 0,
+              defColActsEnd.name: now.toIso8601String(),
+              defColActsEndIsAllDay.name: 0,
+              defColCreatedAt.name: zeroDate,
+            },
+          );
+          await dbA.insert(
+            defTableMems,
+            {
+              defColMemsName.name: insertedMemName2,
+              defColMemsStartOn.name: now.toIso8601String(),
               defColCreatedAt.name: zeroDate,
             },
           );
@@ -112,26 +146,25 @@ void main() => group(
           );
 
           testWidgets(
-            ": on saved.",
+            'saved.',
             (widgetTester) async {
+              const repeatText = "12:00 AM every day";
+
               await runApplication();
               await widgetTester.pumpAndSettle();
 
-              expect(find.byType(Checkbox), findsNothing);
+              expect(find.text(repeatText), findsOneWidget);
 
               await widgetTester.tap(find.text(insertedMemName));
               await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
               expect(
-                widgetTester
-                    .widget<Text>(
-                      find.descendant(
+                  widgetTester
+                      .widget<Text>(find.descendant(
                           of: find.byKey(keyMemNotificationsView),
-                          matching: find.byType(Text)),
-                    )
-                    .data,
-                "12:00 AM every day",
-              );
+                          matching: find.byType(Text)))
+                      .data,
+                  repeatText);
 
               await widgetTester.tap(
                 find.descendant(
@@ -275,11 +308,14 @@ void main() => group(
                 defTableMemNotifications,
                 where: "${defFkMemNotificationsMemId.name} = ?",
                 whereArgs: [savedMem[defPkId.name]],
-              ))
-                  .single;
+              ));
               expect(
-                savedMemNotification[defColMemNotificationsTime.name],
+                savedMemNotification[0][defColMemNotificationsTime.name],
                 0,
+              );
+              expect(
+                savedMemNotification[1][defColMemNotificationsTime.name],
+                1,
               );
             },
           );

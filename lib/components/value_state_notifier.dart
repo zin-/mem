@@ -8,12 +8,20 @@ const _jsonEncoderIndent = '  ';
 class ValueStateNotifier<StateT> extends StateNotifier<StateT> {
   ValueStateNotifier(
     super.state, {
-    Future<void> Function(
+    void Function(
       StateT current,
       ValueStateNotifier<StateT> notifier,
     )? initializer,
   }) {
-    initializer?.call(state, this);
+    if (initializer != null) {
+      if (mounted) {
+        initializer.call(state, this);
+      } else {
+// coverage:ignore-start
+        warn("${super.toString()}. No update.");
+// coverage:ignore-end
+      }
+    }
   }
 
   StateT updatedBy(StateT value) => v(

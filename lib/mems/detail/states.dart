@@ -6,9 +6,9 @@ import 'package:mem/core/mem_notification.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/components/value_state_notifier.dart';
+import 'package:mem/mems/mem_item.dart';
 import 'package:mem/mems/mem_item_repository.dart';
 import 'package:mem/mems/states.dart';
-import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
 
 final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
@@ -35,11 +35,17 @@ final memItemsByMemIdProvider = StateNotifierProvider.family<
             ) ??
             MemItem.memo(memId),
       ],
-      initialFuture: memId == null
-          ? null
-          : MemItemRepository().shipByMemId(memId).then(
-                (value) => value.isEmpty ? [MemItem.memo(memId)] : value,
-              ),
+      initializer: (current, notifier) async {
+        if (memId != null) {
+          ref.read(memItemsProvider.notifier).upsertAll(
+                await MemItemRepository().shipByMemId(memId),
+                (current, updating) =>
+                    current is SavedMemItem &&
+                    updating is SavedMemItem &&
+                    current.id == updating.id,
+              );
+        }
+      },
     ),
     {"memId": memId},
   ),
@@ -50,27 +56,13 @@ final memRepeatedNotificationByMemIdProvider = StateNotifierProvider.autoDispose
   (ref, memId) => v(
     () => ValueStateNotifier<MemNotification>(
       ref.watch(
-            memNotificationsProvider.select(
-              (value) => value
-                  .where(
-                    (element) => element.memId == memId && element.isRepeated(),
-                  )
-                  .singleOrNull,
-            ),
-          ) ??
-          MemNotification.repeated(memId),
-      initializer: (current, notifier) => v(
-        () async {
-          if (memId != null && current is! SavedMemNotification) {
-            ref.read(memNotificationsProvider.notifier).upsertAll(
-                  await MemNotificationRepository().shipByMemId(memId),
-                  (current, updating) =>
-                      current.memId == updating.memId &&
-                      current.type == updating.type,
-                );
-          }
-        },
-        {'current': current, 'notifier': notifier},
+        memNotificationsByMemIdProvider(memId).select(
+          (value) => value
+              .where(
+                (element) => element.isRepeated(),
+              )
+              .single,
+        ),
       ),
     ),
     {'memId': memId},
@@ -83,65 +75,15 @@ final memRepeatByNDayNotificationByMemIdProvider = StateNotifierProvider
   (ref, memId) => v(
     () => ValueStateNotifier(
       ref.watch(
-            memNotificationsProvider.select(
-              (value) => value
-                  .where((element) =>
-                      element.memId == memId && element.isRepeatByNDay())
-                  .singleOrNull,
-            ),
-          ) ??
-          MemNotification.repeatByNDay(memId),
-      initializer: (current, notifier) => v(
-        () async {
-          if (memId != null && current is! SavedMemNotification) {
-            ref.read(memNotificationsProvider.notifier).upsertAll(
-                  await MemNotificationRepository().shipByMemId(memId),
-                  (current, updating) =>
-                      current.memId == updating.memId &&
-                      current.type == updating.type,
-                );
-          }
-        },
-        {'current': current, 'notifier': notifier},
+        memNotificationsByMemIdProvider(memId).select(
+          (value) => value
+              .where(
+                (element) => element.isRepeatByNDay(),
+              )
+              .single,
+        ),
       ),
     ),
-    {'memId': memId},
-  ),
-);
-
-final memRepeatByDayOfWeekNotificationListByMemIdProvider =
-    StateNotifierProvider.autoDispose.family<
-        ValueStateNotifier<Iterable<MemNotification>>,
-        Iterable<MemNotification>,
-        int?>(
-  (ref, memId) => v(
-    () {
-      final memRepeatByDayOfWeekNotificationList = ref.watch(
-        memNotificationsProvider.select(
-          (value) => value.where((element) =>
-              element.memId == memId &&
-              element.isEnabled() &&
-              element.isRepeatByDayOfWeek()),
-        ),
-      );
-
-      return ValueStateNotifier(
-        memRepeatByDayOfWeekNotificationList,
-        initializer: (current, notifier) => v(
-          () async {
-            if (memId != null && current is! SavedMemNotification) {
-              ref.read(memNotificationsProvider.notifier).upsertAll(
-                    await MemNotificationRepository().shipByMemId(memId),
-                    (current, updating) =>
-                        current.memId == updating.memId &&
-                        current.type == updating.type,
-                  );
-            }
-          },
-          {'current': current, 'notifier': notifier},
-        ),
-      );
-    },
     {'memId': memId},
   ),
 );
@@ -152,26 +94,13 @@ final memAfterActStartedNotificationByMemIdProvider = StateNotifierProvider
   (ref, memId) => v(
     () => ValueStateNotifier(
       ref.watch(
-            memNotificationsProvider.select(
-              (value) => value
-                  .where((element) =>
-                      element.memId == memId && element.isAfterActStarted())
-                  .singleOrNull,
-            ),
-          ) ??
-          MemNotification.afterActStarted(memId),
-      initializer: (current, notifier) => v(
-        () async {
-          if (memId != null && current is! SavedMemNotification) {
-            ref.read(memNotificationsProvider.notifier).upsertAll(
-                  await MemNotificationRepository().shipByMemId(memId),
-                  (current, updating) =>
-                      current.memId == updating.memId &&
-                      current.type == updating.type,
-                );
-          }
-        },
-        {'current': current, 'notifier': notifier},
+        memNotificationsByMemIdProvider(memId).select(
+          (value) => value
+              .where(
+                (element) => element.isAfterActStarted(),
+              )
+              .single,
+        ),
       ),
     ),
     {'memId': memId},
@@ -182,15 +111,38 @@ final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
     .family<ListValueStateNotifier<MemNotification>, List<MemNotification>,
         int?>(
   (ref, memId) => v(
-    () => ListValueStateNotifier(
-      [
-        ref.watch(memRepeatedNotificationByMemIdProvider(memId)),
-        ref.watch(memRepeatByNDayNotificationByMemIdProvider(memId)),
-        ...ref
-            .watch(memRepeatByDayOfWeekNotificationListByMemIdProvider(memId)),
-        ref.watch(memAfterActStartedNotificationByMemIdProvider(memId)),
-      ],
-    ),
+    () {
+      final memNotificationsByMemId = ref.watch(memNotificationsProvider.select(
+          (memNotifications) => memNotifications
+              .where((memNotification) => memNotification.memId == memId)));
+
+      return ListValueStateNotifier(
+        [
+          ...memNotificationsByMemId,
+          if (memNotificationsByMemId.every((element) => !element.isRepeated()))
+            MemNotification.repeated(memId),
+          if (memNotificationsByMemId
+              .every((element) => !element.isRepeatByNDay()))
+            MemNotification.repeatByNDay(memId),
+          if (memNotificationsByMemId
+              .every((element) => !element.isAfterActStarted()))
+            MemNotification.afterActStarted(memId),
+        ],
+        initializer: (current, notifier) => v(
+          () async {
+            if (memId != null) {
+              ref.read(memNotificationsProvider.notifier).upsertAll(
+                    await MemNotificationRepository().shipByMemId(memId),
+                    (current, updating) =>
+                        current.memId == updating.memId &&
+                        current.type == updating.type,
+                  );
+            }
+          },
+          {'current': current},
+        ),
+      );
+    },
     {"memId": memId},
   ),
 );

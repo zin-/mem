@@ -5,6 +5,8 @@ import 'package:mem/framework/repository/database_repository.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/entity.dart';
+import 'package:mem/framework/repository/extra_column.dart';
+import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 
 import 'database_definitions.dart';
@@ -71,21 +73,42 @@ void main() => group(
           },
         );
 
-        test(
-          ": ship",
-          () async {
-            final repository = TestRepository(sampleDefTable);
+        group(
+          'ship',
+          () {
+            test(
+              'group by',
+              () async {
+                final repository = TestRepository(sampleDefTable);
 
-            final shipped = await repository.ship(
-              orderBy: [
-                Ascending(sampleDefPk),
-                Descending(sampleDefColInteger),
-              ],
-              offset: 1,
-              limit: 1,
+                final shipped = await repository.ship(
+                  groupBy: GroupBy(
+                    [sampleDefColBoolean],
+                    extraColumns: [Max(sampleDefPk)],
+                  ),
+                );
+
+                expect(shipped, hasLength(0));
+              },
             );
 
-            expect(shipped, hasLength(0));
+            test(
+              'order by',
+              () async {
+                final repository = TestRepository(sampleDefTable);
+
+                final shipped = await repository.ship(
+                  orderBy: [
+                    Ascending(sampleDefPk),
+                    Descending(sampleDefColInteger),
+                  ],
+                  offset: 1,
+                  limit: 1,
+                );
+
+                expect(shipped, hasLength(0));
+              },
+            );
           },
         );
       },

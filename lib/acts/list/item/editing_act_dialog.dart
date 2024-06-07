@@ -28,18 +28,13 @@ class EditingActDialog extends ConsumerWidget {
             ),
         pickedPeriod,
       ),
-      () => v(() {
-        ref.read(deleteAct(_actId));
-        ref.read(actListProvider(editingAct.memId).notifier).removeWhere(
-              (act) => act is SavedAct && act.id == editingAct.memId,
-            );
-      }),
-      () => v(() =>
-          ref.read(actListProvider(editingAct.memId).notifier).upsertAll(
-            [ref.read(editAct(_actId))],
-            (tmp, item) =>
-                tmp is SavedAct && item is SavedAct && tmp.id == item.id,
-          )),
+      () => v(() => ref.read(deleteAct(_actId))),
+      () => v(
+          () => ref.read(actListProvider(editingAct.memId).notifier).upsertAll(
+                [ref.read(editAct(_actId))],
+                (tmp, item) =>
+                    tmp is SavedAct && item is SavedAct && tmp.id == item.id,
+              )),
     );
   }
 }

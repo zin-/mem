@@ -125,7 +125,7 @@ void main() {
                     MemNotification.repeatByNDay(memId).copiedWith(
                       time: () => repeatByNDay,
                     ),
-                    MemNotification.repeatByDayOfWeek(memId, 0),
+                    MemNotification.repeatByDayOfWeek(memId, 1),
                   ],
                   (at) => fail("no call"),
                   buildRepeatEveryNDayNotificationText,
@@ -154,7 +154,7 @@ void main() {
             const memId = 1;
 
             final oneLine = MemNotification.toOneLine(
-              [MemNotification.repeatByDayOfWeek(memId, 1)],
+              [MemNotification.repeatByDayOfWeek(memId, 2)],
               buildRepeatedNotificationText,
               (a, b) => "$a, $b",
               (a) => a,

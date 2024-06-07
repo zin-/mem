@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -91,11 +92,8 @@ void main() => group(
             defColCreatedAt.name: zeroDate,
           });
 
-          for (final insertedMemId in [
-            withoutActMemId,
-            withOldActMemId,
-            withCurrentActMemId
-          ]) {
+          [withoutActMemId, withOldActMemId, withCurrentActMemId]
+              .forEachIndexed((index, insertedMemId) async {
             await dbA.insert(defTableMemNotifications, {
               defFkMemNotificationsMemId.name: insertedMemId,
               defColMemNotificationsTime.name: 0,
@@ -106,14 +104,15 @@ void main() => group(
             });
             await dbA.insert(defTableMemNotifications, {
               defFkMemNotificationsMemId.name: insertedMemId,
-              defColMemNotificationsTime.name: 2,
+              defColMemNotificationsTime.name:
+                  index + insertedMemRepeatByNDay + 1,
               defColMemNotificationsType.name:
                   MemNotificationType.repeatByNDay.name,
               defColMemNotificationsMessage.name:
                   "$_name - inserted - mem notification message - after act started",
               defColCreatedAt.name: zeroDate,
             });
-          }
+          });
 
           await dbA.insert(defTableActs, {
             defFkActsMemId.name: withOldActMemId,
@@ -136,22 +135,22 @@ void main() => group(
         testWidgets(
           'show saved.',
           (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+            const repeatText = "12:00 AM every $insertedMemRepeatByNDay days";
 
+            await runApplication();
+            await widgetTester.pumpAndSettle(defaultTransitionDuration);
+
+            expect(find.text(repeatText), findsOneWidget);
             await widgetTester.tap(find.text(insertedMemName));
             await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
             expect(
-              widgetTester
-                  .widget<Text>(
-                    find.descendant(
+                widgetTester
+                    .widget<Text>(find.descendant(
                         of: find.byKey(keyMemNotificationsView),
-                        matching: find.byType(Text)),
-                  )
-                  .data,
-              "12:00 AM every $insertedMemRepeatByNDay days",
-            );
+                        matching: find.byType(Text)))
+                    .data,
+                repeatText);
 
             await widgetTester.tap(
               find.descendant(
