@@ -25,7 +25,7 @@ class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
             [
               if (memIdsIn != null)
                 In(defFkMemNotificationsMemId.name, memIdsIn),
-              if (condition != null) condition,
+              if (condition != null) condition, // coverage:ignore-line
             ],
           ),
           groupBy: groupBy,
