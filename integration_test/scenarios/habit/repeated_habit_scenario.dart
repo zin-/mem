@@ -70,6 +70,7 @@ void main() => group(
             defTableMems,
             {
               defColMemsName.name: insertedMemName2,
+              defColMemsStartOn.name: now.toIso8601String(),
               defColCreatedAt.name: zeroDate,
             },
           );
