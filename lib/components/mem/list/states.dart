@@ -238,10 +238,7 @@ final latestActsByMemProvider = StateNotifierProvider.autoDispose<
               latestByMemIds: true,
             );
 
-            ref.read(actsProvider.notifier).upsertAll(
-                  actsByMemIds,
-                  (current, updating) => current.id == updating.id,
-                );
+            ref.read(actsProvider.notifier).addAll(actsByMemIds);
           }
         },
         {'current': current},

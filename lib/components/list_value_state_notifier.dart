@@ -31,6 +31,17 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
         {'item': item},
       );
 
+  List<T> addAll(Iterable<T> items) => v(
+        () {
+          final tmp = List.of(state);
+
+          tmp.addAll(items);
+
+          return updatedBy(tmp);
+        },
+        {'items': items},
+      );
+
   List<T> upsertAll(
     Iterable<T> updatingItems,
     bool Function(T current, T updating) where, {
