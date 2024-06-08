@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:mem/core/mem_detail.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
@@ -30,40 +31,51 @@ class MemService {
                       e.copiedWith(memId: () => savedMem.id),
                     )))));
 
-          final savedMemNotifications = memDetail.notifications == null
-              ? null
-              : await Future.wait(memDetail.notifications!.map((e) {
-                  if (e.isEnabled()) {
-                    return (e is SavedMemNotification && !undo
-                        ? _memNotificationRepository.replace(e.copiedWith(
-                            memId: () => savedMem.id,
-                          ))
-                        : _memNotificationRepository.receive(e.copiedWith(
-                            memId: () => savedMem.id,
-                          )));
-                  } else {
-                    _memNotificationRepository.wasteByMemIdAndType(
-                      savedMem.id,
-                      e.type,
-                    );
-                    return Future.value(e);
-                  }
-                }));
+          final memNotifications = memDetail.notifications;
+          final returnMemNotifications =
+              List<SavedMemNotification?>.empty(growable: true);
+          if (memNotifications == null) {
+            await _memNotificationRepository.wasteByMemId(savedMem.id);
+          } else {
+            returnMemNotifications.addAll(await Future.wait(memNotifications
+                .where((e) => !e.isRepeatByDayOfWeek())
+                .map((e) {
+              if (e.isEnabled()) {
+                return (e is SavedMemNotification && !undo
+                    ? _memNotificationRepository.replace(e.copiedWith(
+                        memId: () => savedMem.id,
+                      ))
+                    : _memNotificationRepository.receive(e.copiedWith(
+                        memId: () => savedMem.id,
+                      )));
+              } else {
+                _memNotificationRepository.wasteByMemIdAndType(
+                  savedMem.id,
+                  e.type,
+                );
+                return Future.value(null);
+              }
+            })));
 
-          _memNotificationRepository.wasteBy(
+            await _memNotificationRepository.wasteByMemIdAndType(
               savedMem.id,
               MemNotificationType.repeatByDayOfWeek,
-              List.generate(7, (index) => index).where((element) =>
-                  !(savedMemNotifications?.where(
-                              (element) => element.isRepeatByDayOfWeek()) ??
-                          [])
-                      .map((e) => e.time)
-                      .contains(element)));
+            );
+            for (var entry in memNotifications
+                .where((e) => e.isRepeatByDayOfWeek())
+                .groupListsBy((e) => e.time)
+                .entries) {
+              returnMemNotifications.add(await _memNotificationRepository
+                  .receive(entry.value.first.copiedWith(
+                memId: () => savedMem.id,
+              )));
+            }
+          }
 
           return MemDetail(
             savedMem,
             savedMemItems,
-            savedMemNotifications,
+            returnMemNotifications.whereType<SavedMemNotification>().toList(),
           );
         },
         {'memDetail': memDetail},
