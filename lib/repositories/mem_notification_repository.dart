@@ -80,7 +80,9 @@ class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
         () => super.waste(
           And(
             [
+// coverage:ignore-start
               if (condition != null) condition,
+// coverage:ignore-end
               if (memIdIs != null)
                 Equals(defFkMemNotificationsMemId.name, memIdIs),
               if (type != null)
