@@ -418,20 +418,18 @@ void main() => group(
             );
 
             testWidgets(
-              ": exec on created.",
-              retry: 3,
+              'on created.',
               (widgetTester) async {
                 await runApplication();
                 await widgetTester.pumpAndSettle();
                 await widgetTester.tap(newMemFabFinder);
                 await widgetTester.pumpAndSettle();
-
                 const enteringMemName =
                     "$baseMemName: Remove: exec on created - entering";
                 await widgetTester.enterText(
                     find.byKey(keyMemName), enteringMemName);
                 await widgetTester.tap(find.byKey(keySaveMemFab));
-                await widgetTester.pumpAndSettle();
+                await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
                 await widgetTester.tap(menuButtonIconFinder);
                 await widgetTester.pumpAndSettle();
