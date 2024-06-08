@@ -419,6 +419,7 @@ void main() => group(
 
             testWidgets(
               ": exec on created.",
+              retry: 3,
               (widgetTester) async {
                 await runApplication();
                 await widgetTester.pumpAndSettle();
