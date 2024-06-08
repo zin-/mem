@@ -70,45 +70,28 @@ class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
         },
       );
 
-  Future<Iterable<SavedMemNotification>> wasteByMemId(int memId) => v(
-        () => super.waste(Equals(defFkMemNotificationsMemId.name, memId)),
-        memId,
-      );
-
-  Future<Iterable<SavedMemNotification>> wasteByMemIdAndType(
-    int memId,
-    MemNotificationType type,
-  ) =>
+  @override
+  Future<List<SavedMemNotification>> waste([
+    Condition? condition,
+    int? memIdIs,
+    MemNotificationType? type,
+  ]) =>
       v(
         () => super.waste(
-          And([
-            Equals(defFkMemNotificationsMemId.name, memId),
-            Equals(defColMemNotificationsType.name, type.name),
-          ]),
+          And(
+            [
+              if (condition != null) condition,
+              if (memIdIs != null)
+                Equals(defFkMemNotificationsMemId.name, memIdIs),
+              if (type != null)
+                Equals(defColMemNotificationsType.name, type.name),
+            ],
+          ),
         ),
         {
-          "memId": memId,
-          "type": type,
-        },
-      );
-
-  Future<Iterable<SavedMemNotification>> wasteBy(
-    int memId,
-    MemNotificationType type,
-    Iterable<int> times,
-  ) =>
-      v(
-        () => super.waste(
-          And([
-            Equals(defFkMemNotificationsMemId.name, memId),
-            Equals(defColMemNotificationsType.name, type.name),
-            In(defColMemNotificationsTime.name, times),
-          ]),
-        ),
-        {
-          'memId': memId,
+          'condition': condition,
+          'memId': memIdIs,
           'type': type,
-          'times': times,
         },
       );
 

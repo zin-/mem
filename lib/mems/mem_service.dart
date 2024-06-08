@@ -35,7 +35,7 @@ class MemService {
           final returnMemNotifications =
               List<SavedMemNotification?>.empty(growable: true);
           if (memNotifications == null) {
-            await _memNotificationRepository.wasteByMemId(savedMem.id);
+            await _memNotificationRepository.waste(null, savedMem.id);
           } else {
             returnMemNotifications.addAll(await Future.wait(memNotifications
                 .where((e) => !e.isRepeatByDayOfWeek())
@@ -49,7 +49,8 @@ class MemService {
                         memId: () => savedMem.id,
                       )));
               } else {
-                _memNotificationRepository.wasteByMemIdAndType(
+                _memNotificationRepository.waste(
+                  null,
                   savedMem.id,
                   e.type,
                 );
@@ -57,7 +58,8 @@ class MemService {
               }
             })));
 
-            await _memNotificationRepository.wasteByMemIdAndType(
+            await _memNotificationRepository.waste(
+              null,
               savedMem.id,
               MemNotificationType.repeatByDayOfWeek,
             );
@@ -138,7 +140,7 @@ class MemService {
   Future<bool> remove(int memId) => v(
         () async {
           // TODO https://github.com/zin-/mem/issues/284
-          await _memNotificationRepository.wasteByMemId(memId);
+          await _memNotificationRepository.waste(null, memId);
           await _memItemRepository.wasteByMemId(memId);
           await _memRepository.wasteById(memId);
 
