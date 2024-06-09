@@ -76,12 +76,12 @@ void main() => group(
             await widgetTester.tap(startIconFinder);
             await widgetTester.pumpAndSettle();
 
-            expect(widgetTester.widget<Text>(find.byType(Text).at(4)).data,
+            expect(widgetTester.widget<Text>(find.byType(Text).at(1)).data,
                 "00:00:00");
 
             expect(startIconFinder, findsNothing);
             expect(stopIconFinder, findsNWidgets(2));
-            await widgetTester.pumpAndSettle(elapsePeriod);
+            await widgetTester.pumpAndSettle(elapsePeriod * 2);
 
             expect(find.text("00:00:00"), findsNothing);
           },

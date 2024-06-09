@@ -1,5 +1,4 @@
 import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/act_repository.dart';
 import 'package:mem/acts/states.dart';
@@ -7,7 +6,6 @@ import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/components/value_state_notifier.dart';
-import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/list/states.dart';
 import 'package:mem/mems/states.dart';
@@ -100,10 +98,8 @@ final memListProvider = StateNotifierProvider.autoDispose<
             latestActsByMem.singleWhereOrNull((act) => act.memId == a.id);
         final latestActOfB =
             latestActsByMem.singleWhereOrNull((act) => act.memId == b.id);
-        final comparedByActiveAct = _compareActiveAct(
-          latestActOfA,
-          latestActOfB,
-        );
+        final comparedByActiveAct =
+            Act.activeCompare(latestActOfA, latestActOfB);
         if (comparedByActiveAct != 0) {
           return comparedByActiveAct;
         }
@@ -121,16 +117,22 @@ final memListProvider = StateNotifierProvider.autoDispose<
             savedMemNotifications.where((e) => e.memId == b.id);
 
         final startOfDay = ref.read(startOfDayProvider) ?? defaultStartOfDay;
-
+        final now = DateTime.now();
         final comparedTime = _compareTime(
           a.period,
-          latestActOfA,
-          memNotificationsOfA,
+          MemNotifications.nexRepeatNotifyAt(
+            memNotificationsOfA,
+            startOfDay,
+            latestActOfA,
+            now,
+          ),
           b.period,
-          latestActOfB,
-          memNotificationsOfB,
-          startOfDay,
-          DateTime.now(),
+          MemNotifications.nexRepeatNotifyAt(
+            memNotificationsOfB,
+            startOfDay,
+            latestActOfB,
+            now,
+          ),
         );
         if (comparedTime != 0) {
           return comparedTime;
@@ -146,70 +148,35 @@ final memListProvider = StateNotifierProvider.autoDispose<
   );
 });
 
-int _compareActiveAct(Act? actOfA, Act? actOfB) => v(
-      () {
-        final actOfAIsActive = actOfA?.isActive;
-        final actOfBIsActive = actOfB?.isActive;
-
-        if (actOfAIsActive == true || actOfBIsActive == true) {
-          if (actOfAIsActive == true && actOfBIsActive == true) {
-            return actOfA!.period.start!.compareTo(actOfB!.period.start!);
-          } else {
-            return actOfAIsActive == true ? -1 : 1;
-          }
-        } else {
-          return 0;
-        }
-      },
-      {'actOfA': actOfA, 'actOfB': actOfB},
-    );
-
 int _compareTime(
   DateAndTimePeriod? periodOfA,
-  Act? latestActOfA,
-  Iterable<MemNotification> memNotificationsOfA,
+  DateTime? nextNotifyAtOfA,
   DateAndTimePeriod? periodOfB,
-  Act? latestActOfB,
-  Iterable<MemNotification> memNotificationsOfB,
-  TimeOfDay startOfDay,
-  DateTime now,
+  DateTime? nextNotifyAtOfB,
 ) =>
     v(
       () {
-        final nextNotifyAtOfA = MemNotifications.nexNotifyAt(
-          periodOfA,
-          memNotificationsOfA,
-          startOfDay,
-          latestActOfA,
-          now,
-        );
-        final nextNotifyAtOfB = MemNotifications.nexNotifyAt(
-          periodOfB,
-          memNotificationsOfB,
-          startOfDay,
-          latestActOfB,
-          now,
-        );
-
-        if (nextNotifyAtOfA == null && nextNotifyAtOfB == null) {
-          return DateAndTimePeriod.compare(periodOfA, periodOfB);
-        } else if (periodOfA != null && nextNotifyAtOfB != null) {
-          return periodOfA.compareWithDateAndTime(nextNotifyAtOfB);
-        } else if (periodOfB != null && nextNotifyAtOfA != null) {
-          return -periodOfB.compareWithDateAndTime(nextNotifyAtOfA);
+        if ((periodOfA == null && nextNotifyAtOfA == null) &&
+            (periodOfB == null && nextNotifyAtOfB == null)) {
+          return 0;
         } else if (nextNotifyAtOfA != null && nextNotifyAtOfB != null) {
           return nextNotifyAtOfA.compareTo(nextNotifyAtOfB);
+        } else if (periodOfA != null && nextNotifyAtOfB != null) {
+          return periodOfA.compareWithDateAndTime(nextNotifyAtOfB);
+        } else if (nextNotifyAtOfA != null && periodOfB != null) {
+          return -periodOfB.compareWithDateAndTime(nextNotifyAtOfA);
+        } else if ((periodOfA == null && nextNotifyAtOfA == null) ||
+            (periodOfB == null && nextNotifyAtOfB == null)) {
+          return (periodOfA == null && nextNotifyAtOfA == null) ? 1 : -1;
+        } else {
+          return DateAndTimePeriod.compare(periodOfA, periodOfB);
         }
-
-        return DateAndTimePeriod.compare(periodOfA, periodOfB);
       },
       {
         'periodOfA': periodOfA,
-        'latestActOfA': latestActOfA,
-        'memNotificationsOfA': memNotificationsOfA,
+        'nextNotifyAtOfA': nextNotifyAtOfA,
         'periodOfB': periodOfB,
-        'latestActOfB': latestActOfB,
-        'memNotificationsOfB': memNotificationsOfB,
+        'nextNotifyAtOfB': nextNotifyAtOfB,
       },
     );
 

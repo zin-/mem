@@ -6,7 +6,6 @@ import 'package:mem/components/mem/list/actions.dart';
 import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/mems/detail/states.dart';
-import 'package:mem/mems/list/actions.dart';
 import 'package:mem/mems/list/body.dart';
 import 'package:mem/mems/list/show_new_mem_fab.dart';
 import 'package:mem/mems/states.dart';
@@ -31,8 +30,10 @@ void main() {
     await widgetTester.pumpWidget(ProviderScope(
       overrides: [
         loadMemList.overrideWith((ref) => null),
-        fetchActiveActs.overrideWith((ref) => Future.value([])),
-        activeActsProvider.overrideWith((ref) => ListValueStateNotifier([])),
+        latestActsByMemProvider
+            .overrideWith((ref) => ListValueStateNotifier([])),
+        savedMemNotificationsProvider
+            .overrideWith((ref) => ListValueStateNotifier([])),
         memsProvider.overrideWith((ref) => ListValueStateNotifier(samples)),
         memNotificationsByMemIdProvider
             .overrideWith((ref, arg) => ListValueStateNotifier([])),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/mem/list/view.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/list/actions.dart';
 import 'package:mem/mems/list/app_bar.dart';
 import 'package:mem/mems/transitions.dart';
 
@@ -16,8 +15,6 @@ class MemListBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
-          ref.read(fetchActiveActs);
-
           return _MemListBodyComponent(
             _scrollController,
             (memId) => showMemDetailPage(context, ref, memId),
