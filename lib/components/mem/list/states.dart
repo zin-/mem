@@ -156,17 +156,21 @@ int _compareTime(
 ) =>
     v(
       () {
-        if (nextNotifyAtOfA == null && nextNotifyAtOfB == null) {
-          return DateAndTimePeriod.compare(periodOfA, periodOfB);
-        } else if (periodOfA != null && nextNotifyAtOfB != null) {
-          return periodOfA.compareWithDateAndTime(nextNotifyAtOfB);
-        } else if (periodOfB != null && nextNotifyAtOfA != null) {
-          return -periodOfB.compareWithDateAndTime(nextNotifyAtOfA);
+        if ((periodOfA == null && nextNotifyAtOfA == null) &&
+            (periodOfB == null && nextNotifyAtOfB == null)) {
+          return 0;
         } else if (nextNotifyAtOfA != null && nextNotifyAtOfB != null) {
           return nextNotifyAtOfA.compareTo(nextNotifyAtOfB);
+        } else if (periodOfA != null && nextNotifyAtOfB != null) {
+          return periodOfA.compareWithDateAndTime(nextNotifyAtOfB);
+        } else if (nextNotifyAtOfA != null && periodOfB != null) {
+          return -periodOfB.compareWithDateAndTime(nextNotifyAtOfA);
+        } else if ((periodOfA == null && nextNotifyAtOfA == null) ||
+            (periodOfB == null && nextNotifyAtOfB == null)) {
+          return (periodOfA == null && nextNotifyAtOfA == null) ? 1 : -1;
+        } else {
+          return DateAndTimePeriod.compare(periodOfA, periodOfB);
         }
-
-        return DateAndTimePeriod.compare(periodOfA, periodOfB);
       },
       {
         'periodOfA': periodOfA,

@@ -122,10 +122,6 @@ class ActRepository extends DatabaseTupleRepository<Act, SavedAct, int> {
         },
       );
 
-  Future<List<SavedAct>> shipActive() => v(
-        () async => await ship(condition: IsNull(defColActsEnd.name)),
-      );
-
   Future<List<SavedAct>> shipActiveByMemId(
     int memId,
   ) =>
