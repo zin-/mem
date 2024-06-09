@@ -9,6 +9,7 @@ import 'package:mem/components/value_state_notifier.dart';
 import 'package:mem/mems/mem_item.dart';
 import 'package:mem/mems/mem_item_repository.dart';
 import 'package:mem/mems/states.dart';
+import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
 
 final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
@@ -130,12 +131,16 @@ final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
         ],
         initializer: (current, notifier) => v(
           () async {
-            if (memId != null) {
+            if (memId != null &&
+                current.whereType<SavedMemNotification>().isEmpty) {
               ref.read(memNotificationsProvider.notifier).upsertAll(
                     await MemNotificationRepository().shipByMemId(memId),
-                    (current, updating) =>
-                        current.memId == updating.memId &&
-                        current.type == updating.type,
+                    (current, updating) => updating.isRepeatByDayOfWeek()
+                        ? current.memId == updating.memId &&
+                            current.type == updating.type &&
+                            current.time == updating.time
+                        : current.memId == updating.memId &&
+                            current.type == updating.type,
                   );
             }
           },

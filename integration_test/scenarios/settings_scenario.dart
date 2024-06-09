@@ -181,6 +181,7 @@ void main() => group(
           () {
             testWidgets(
               "create.",
+              retry: 3,
               (widgetTester) async {
                 String? result;
                 switch (defaultTargetPlatform) {

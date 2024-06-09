@@ -68,7 +68,7 @@ final memMemoOnDetailPageFinder = find.byType(TextFormField).at(6);
 
 // Constants
 const waitShowSoftwareKeyboardDuration = Duration(milliseconds: 400);
-const waitSideEffectDuration = Duration(milliseconds: 1400);
+const waitSideEffectDuration = Duration(milliseconds: 700);
 final zeroDate = DateTime(0);
 const datePlaceHolder = "M/d/y";
 
