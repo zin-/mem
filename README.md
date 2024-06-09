@@ -4,4 +4,4 @@
 
 Manage all.
 
-## [開発ロードマップ](./docs/load_map.md)
+## [開発ロードマップ](documents/load_map.md)
