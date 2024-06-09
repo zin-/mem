@@ -25,7 +25,9 @@ class HomeWidgetAccessor {
       v(
         () async => (await MethodChannel(methodChannelName)
             .invokeMethod<int>(initializeMethodName))!,
+// coverage:ignore-start
         {
+// coverage:ignore-end
           'methodChannelName': methodChannelName,
           'initializeMethodName': initializeMethodName,
         },
