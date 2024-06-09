@@ -100,10 +100,8 @@ final memListProvider = StateNotifierProvider.autoDispose<
             latestActsByMem.singleWhereOrNull((act) => act.memId == a.id);
         final latestActOfB =
             latestActsByMem.singleWhereOrNull((act) => act.memId == b.id);
-        final comparedByActiveAct = _compareActiveAct(
-          latestActOfA,
-          latestActOfB,
-        );
+        final comparedByActiveAct =
+            Act.activeCompare(latestActOfA, latestActOfB);
         if (comparedByActiveAct != 0) {
           return comparedByActiveAct;
         }
@@ -145,24 +143,6 @@ final memListProvider = StateNotifierProvider.autoDispose<
     ),
   );
 });
-
-int _compareActiveAct(Act? actOfA, Act? actOfB) => v(
-      () {
-        final actOfAIsActive = actOfA?.isActive;
-        final actOfBIsActive = actOfB?.isActive;
-
-        if (actOfAIsActive == true || actOfBIsActive == true) {
-          if (actOfAIsActive == true && actOfBIsActive == true) {
-            return actOfA!.period.start!.compareTo(actOfB!.period.start!);
-          } else {
-            return actOfAIsActive == true ? -1 : 1;
-          }
-        } else {
-          return 0;
-        }
-      },
-      {'actOfA': actOfA, 'actOfB': actOfB},
-    );
 
 int _compareTime(
   DateAndTimePeriod? periodOfA,
