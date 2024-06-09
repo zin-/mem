@@ -1,7 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mem/core/act.dart';
-import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/mem.dart';
@@ -148,8 +147,7 @@ class MemNotifications {
         },
       );
 
-  static DateTime? nexNotifyAt(
-    DateAndTimePeriod? memPeriod,
+  static DateTime? nexRepeatNotifyAt(
     Iterable<MemNotification> memNotifications,
     TimeOfDay startOfDay,
     Act? latestAct,
@@ -208,7 +206,6 @@ class MemNotifications {
           return notifyAt;
         },
         {
-          'memPeriod': memPeriod,
           'memNotifications': memNotifications,
           'startOfDay': startOfDay,
           'latestAct': latestAct,
