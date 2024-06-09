@@ -167,9 +167,7 @@ class MemNotifications {
                 ?.time;
             final timeOfDay = repeatAt == null
                 ? startOfDay
-                : TimeOfDay(
-                    hour: (repeatAt / 60 / 60).floor(),
-                    minute: (repeatAt / 60).floor());
+                : TimeOfDay(hour: 0, minute: (repeatAt / 60).floor());
 
             if (latestAct == null) {
               notifyAt = now.copyWith(
