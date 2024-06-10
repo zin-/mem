@@ -21,7 +21,7 @@ class ActListItemView extends StatelessWidget {
               _act.period,
               showDate: false,
             ),
-            subtitle: _memName == null ? null : Text(_memName!),
+            subtitle: _memName == null ? null : Text(_memName),
             onLongPress: () {
               showDialog(
                 context: context,

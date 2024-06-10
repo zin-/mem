@@ -20,8 +20,7 @@ class DateAndTimeTextFormFieldV2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) => v(
         () {
-          final isAllDay =
-              _dateAndTime == null ? true : _dateAndTime?.isAllDay ?? true;
+          final isAllDay = _dateAndTime == null ? true : _dateAndTime.isAllDay;
 
           return Flex(
             direction: Axis.horizontal,
@@ -53,11 +52,11 @@ class DateAndTimeTextFormFieldV2 extends StatelessWidget {
                   : Expanded(
                       child: TimeOfDayTextFormField(
                         timeOfDay: TimeOfDay.fromDateTime(
-                          _dateAndTime ?? DateAndTime.now(),
+                          _dateAndTime,
                         ),
                         onChanged: (timeOfDay) {
                           if (timeOfDay != null) {
-                            final dateTime = _dateAndTime ?? DateTime.now();
+                            final dateTime = _dateAndTime;
                             _onChanged(DateAndTime(
                               dateTime.year,
                               dateTime.month,
@@ -96,7 +95,7 @@ class DateAndTimeTextFormFieldV2 extends StatelessWidget {
                       }
                     } else {
                       _onChanged(DateAndTime.from(
-                        _dateAndTime!,
+                        _dateAndTime,
                         timeOfDay: null,
                       ));
                     }

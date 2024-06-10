@@ -21,10 +21,10 @@ class DatabaseConverter {
         switch (tableDefinition.columnDefinitions
             .singleWhereOrNull((element) => element.name == key)
             .runtimeType) {
-          case TimestampColumnDefinition:
+          case const (TimestampColumnDefinition):
             return MapEntry(
                 key, value == null ? null : DateTime.parse(value as String));
-          case BooleanColumnDefinition:
+          case const (BooleanColumnDefinition):
             return MapEntry(key, value == null ? null : value == 1);
           default:
             return MapEntry(key, value);

@@ -26,8 +26,8 @@ class CreatedAndUpdatedAtTexts extends StatelessWidget {
                     ),
                     DateAndTimeText(
                       DateAndTime.from(
-                        (_entity as SavedMem).createdAt,
-                        timeOfDay: (_entity as SavedMem).createdAt,
+                        _entity.createdAt,
+                        timeOfDay: _entity.createdAt,
                       ),
                       style: const TextStyle(
                         color: secondaryGreyColor,
@@ -35,7 +35,7 @@ class CreatedAndUpdatedAtTexts extends StatelessWidget {
                     ),
                   ],
                 ),
-                (_entity as SavedMem).updatedAt == null
+                _entity.updatedAt == null
                     ? const SizedBox.shrink()
                     : Row(
                         children: [
@@ -45,8 +45,8 @@ class CreatedAndUpdatedAtTexts extends StatelessWidget {
                           ),
                           DateAndTimeText(
                             DateAndTime.from(
-                              (_entity as SavedMem).updatedAt!,
-                              timeOfDay: (_entity as SavedMem).updatedAt,
+                              (_entity).updatedAt!,
+                              timeOfDay: (_entity).updatedAt,
                             ),
                             style: const TextStyle(
                               color: secondaryGreyColor,
