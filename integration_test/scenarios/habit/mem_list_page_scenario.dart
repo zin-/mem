@@ -92,7 +92,7 @@ void main() => group(
           await widgetTester.pumpAndSettle();
 
           await widgetTester.tap(stopIconFinder);
-          await widgetTester.pump();
+          await widgetTester.pump(waitSideEffectDuration);
 
           expect(startIconFinder, findsNWidgets(2));
           expect(stopIconFinder, findsNothing);
