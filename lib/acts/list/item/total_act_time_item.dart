@@ -28,11 +28,11 @@ class TotalActTimeListItem extends StatelessWidget {
                 Text(_actList.length.toString()),
               ],
             ),
-            subtitle: _mem == null ? null : Text(_mem!.name),
+            subtitle: _mem == null ? null : Text(_mem.name),
             trailing: _mem == null
                 ? null
                 : IconButton(
-                    onPressed: () => showMemDetailPage(context, null, _mem!.id),
+                    onPressed: () => showMemDetailPage(context, null, _mem.id),
                     icon: const Icon(Icons.arrow_forward),
                   ),
           );

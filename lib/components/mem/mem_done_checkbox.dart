@@ -19,14 +19,13 @@ class MemDoneCheckbox extends StatelessWidget {
         () => HeroView(
           heroTag(
             'mem-done',
-            _mem is SavedMem ? (_mem as SavedMem).id : null,
+            _mem is SavedMem ? _mem.id : null,
           ),
           Checkbox(
             value: _mem.isDone,
-            onChanged:
-                (_mem is SavedMem ? (_mem as SavedMem).isArchived : false)
-                    ? null
-                    : _onChanged,
+            onChanged: (_mem is SavedMem ? _mem.isArchived : false)
+                ? null
+                : _onChanged,
           ),
         ),
         {

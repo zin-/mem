@@ -7,7 +7,6 @@ inputs:
     required: true
   flutter-version:
     description: "Flutter version"
-    required: true
 
 runs:
   using: "composite"

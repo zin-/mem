@@ -58,8 +58,8 @@ class _MemRepeatedNotificationView extends StatelessWidget {
             timeOfDay: _time == null
                 ? _defaultTime
                 : () {
-                    final hours = (_time! / 60 / 60).floor();
-                    final minutes = ((_time! - hours * 60 * 60) / 60).floor();
+                    final hours = (_time / 60 / 60).floor();
+                    final minutes = ((_time - hours * 60 * 60) / 60).floor();
                     return TimeOfDay(hour: hours, minute: minutes);
                   }(),
             onChanged: (pickedTimeOfDay) => _onTimeChanged(

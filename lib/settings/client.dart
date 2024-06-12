@@ -24,7 +24,7 @@ class PreferenceClient
           final serialized = entity.key.serialize(entity.value);
 
           switch (serialized.runtimeType) {
-            case String:
+            case const (String):
               return await (await SharedPreferences.getInstance()).setString(
                 entity.key.value,
                 serialized,

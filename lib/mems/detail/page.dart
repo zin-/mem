@@ -51,9 +51,9 @@ class _MemDetailPage extends StatelessWidget {
             actions: _memIsSaved
                 ? AppBarActionsBuilder([
                     TransitChartAction(context, _memId!),
-                    TransitActListAction(context, _memId!),
-                    ArchiveMemAction(_memId!),
-                    RemoveMemAction(_memId!),
+                    TransitActListAction(context, _memId),
+                    ArchiveMemAction(_memId),
+                    RemoveMemAction(_memId),
                   ]).build(context)
                 : null,
             backgroundColor: _memIsArchived ? secondaryGreyColor : null,

@@ -8,7 +8,6 @@ on:
         required: true
       flutter-version:
         type: string
-        required: true
 
     secrets:
       CODECOV_TOKEN:
