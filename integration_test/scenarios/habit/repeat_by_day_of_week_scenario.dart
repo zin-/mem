@@ -16,6 +16,7 @@ import 'package:mem/notifications/client.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/notifications/notification_ids.dart';
+import 'package:mem/notifications/schedule_client.dart';
 import 'package:mem/values/durations.dart';
 
 import '../helpers.dart';

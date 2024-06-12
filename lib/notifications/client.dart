@@ -1,11 +1,8 @@
 import 'dart:async';
 
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:mem/acts/act_repository.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/main.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
@@ -218,77 +215,3 @@ class NotificationClient {
 }
 
 const notificationTypeKey = "notificationType";
-
-Future<void> scheduleCallback(int id, Map<String, dynamic> params) => i(
-      () async {
-        await openDatabase();
-
-        final memId = params[memIdKey] as int;
-
-        final notificationType = NotificationType.values.singleWhere(
-          (element) => element.name == params[notificationTypeKey],
-        );
-
-        switch (notificationType) {
-          case NotificationType.repeat:
-            if (await _shouldNotify(memId)) {
-              await NotificationClient().show(
-                notificationType,
-                memId,
-              );
-            }
-            break;
-
-          default:
-            await NotificationClient().show(
-              notificationType,
-              memId,
-            );
-            break;
-        }
-      },
-      {"id": id, "params": params},
-    );
-
-Future<bool> _shouldNotify(int memId) => v(
-      () async {
-        final savedMemNotifications =
-            await MemNotificationRepository().shipByMemId(memId);
-        final repeatByDayOfWeekMemNotifications = savedMemNotifications.where(
-          (element) => element.isEnabled() && element.isRepeatByDayOfWeek(),
-        );
-
-        if (repeatByDayOfWeekMemNotifications.isNotEmpty) {
-          final now = DateTime.now();
-          if (!repeatByDayOfWeekMemNotifications
-              .map((e) => e.time)
-              .contains(now.weekday)) {
-            return false;
-          }
-        }
-
-        final repeatByNDayMemNotification =
-            savedMemNotifications.singleWhereOrNull(
-          (element) => element.isEnabled() && element.isRepeatByNDay(),
-        );
-        final lastActTime = await ActRepository()
-            .findOneBy(memId: memId, latest: true)
-            .then((value) =>
-                value?.period.end ??
-                // FIXME 永続化されている時点でstartは必ずあるので型で表現する
-                value?.period.start!);
-
-        if (lastActTime != null) {
-          if (Duration(
-                  days:
-                      // FIXME 永続化されている時点でtimeは必ずあるので型で表現する
-                      //  repeatByNDayMemNotification自体がないのは別の話
-                      repeatByNDayMemNotification?.time! ?? 1) >
-              DateTime.now().difference(lastActTime)) {
-            return false;
-          }
-        }
-
-        return true;
-      },
-    );
