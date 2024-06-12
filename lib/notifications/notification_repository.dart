@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:mem/framework/repository/key_with_value_repository.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/values/paths.dart';
 
-import 'icons.dart';
 import 'notification/notification.dart';
 import 'wrapper.dart';
 
