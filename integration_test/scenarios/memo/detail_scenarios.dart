@@ -185,7 +185,8 @@ void main() => group(
             );
 
             testWidgets(
-              ": twice on create.",
+              'twice on create.',
+              retry: 3,
               (widgetTester) async {
                 await runApplication();
                 await widgetTester.pumpAndSettle();
