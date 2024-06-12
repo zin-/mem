@@ -18,14 +18,12 @@ class MemNotifications {
     SavedMem savedMem,
     TimeOfDay startOfDay,
     Iterable<SavedMemNotification> memNotifications,
-    Future<void> Function(int, Map<String, dynamic>) callback,
   ) =>
       v(
         () => [
           ..._memPeriodSchedules(
             savedMem,
             startOfDay,
-            callback,
           ),
           _memPeriodicSchedule(
             savedMem.id,
@@ -34,7 +32,6 @@ class MemNotifications {
                 .singleWhereOrNull(
                   (element) => element.isEnabled() && element.isRepeated(),
                 ),
-            callback,
           ),
         ],
         {
@@ -47,7 +44,6 @@ class MemNotifications {
   static Iterable<Schedule> _memPeriodSchedules(
     SavedMem savedMem,
     TimeOfDay startOfDay,
-    Future<void> Function(int, Map<String, dynamic>) callback,
   ) =>
       v(
         () {
@@ -65,7 +61,6 @@ class MemNotifications {
                           startOfDay.minute,
                         )
                       : periodStart,
-                  callback,
                   {
                     memIdKey: savedMem.id,
                     notificationTypeKey: NotificationType.startMem.name,
@@ -93,7 +88,6 @@ class MemNotifications {
                             endOfDay.minute,
                           )
                         : periodEnd,
-                    callback,
                     {
                       memIdKey: savedMem.id,
                       notificationTypeKey: NotificationType.endMem.name,
@@ -115,7 +109,6 @@ class MemNotifications {
   static Schedule _memPeriodicSchedule(
     int memId,
     SavedMemNotification? savedRepeatedMemNotifications,
-    Future<void> Function(int, Map<String, dynamic>) callback,
   ) =>
       v(
         () => savedRepeatedMemNotifications == null
@@ -135,7 +128,6 @@ class MemNotifications {
                             // FIXME 永続化されている時点でtimeは必ずあるので型で表現する
                             .time!)),
                 const Duration(days: 1),
-                callback,
                 {
                   memIdKey: memId,
                   notificationTypeKey: NotificationType.repeat.name,

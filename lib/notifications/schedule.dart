@@ -17,20 +17,17 @@ class CancelSchedule extends Schedule {
 
 class TimedSchedule extends Schedule {
   final DateTime startAt;
-  final Future<void> Function(int, Map<String, dynamic>) callback;
   final Map<String, dynamic> params;
 
   TimedSchedule(
     super.id,
     this.startAt,
-    this.callback,
     this.params,
   );
 
   @override
   String toString() => "${super.toString()}${{
         "startAt": startAt,
-        "callback": callback,
         "params": params,
       }}";
 }
@@ -42,7 +39,6 @@ class PeriodicSchedule extends TimedSchedule {
     super.id,
     super.startAt,
     this.duration,
-    super.callback,
     super.params,
   );
 

@@ -99,7 +99,6 @@ class NotificationClient {
                   defaultStartOfDay,
               savedMemNotifications ??
                   await _memNotificationRepository.shipByMemId(memId),
-              scheduleCallback,
             )) {
               await _scheduleClient.receive(schedule);
             }
@@ -144,7 +143,6 @@ class NotificationClient {
             await _scheduleClient.receive(TimedSchedule(
               afterActStartedNotificationId(memId),
               now.add(Duration(seconds: notification.time!)),
-              scheduleCallback,
               {
                 memIdKey: notification.memId,
                 notificationTypeKey: NotificationType.afterActStarted.name,
