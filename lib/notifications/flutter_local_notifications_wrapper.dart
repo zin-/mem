@@ -11,7 +11,7 @@ import 'notification/channel.dart';
 
 // TODO Windows, Web, Linuxでの通知を実装する
 //  https://github.com/zin-/mem/issues/303
-class NotificationsWrapper {
+class FlutterLocalNotificationsWrapper {
   final String androidDefaultIconPath;
   bool _pluginIsInitialized = false;
 
@@ -121,17 +121,17 @@ class NotificationsWrapper {
         },
       );
 
-  NotificationsWrapper._(
+  FlutterLocalNotificationsWrapper._(
     this.androidDefaultIconPath,
   );
 
-  static NotificationsWrapper? _instance;
+  static FlutterLocalNotificationsWrapper? _instance;
 
-  factory NotificationsWrapper(
+  factory FlutterLocalNotificationsWrapper(
     String androidDefaultIconPath,
   ) =>
       v(
-        () => _instance ??= NotificationsWrapper._(
+        () => _instance ??= FlutterLocalNotificationsWrapper._(
           androidDefaultIconPath,
         ),
 // coverage:ignore-start

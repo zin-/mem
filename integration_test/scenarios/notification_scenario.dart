@@ -18,7 +18,7 @@ import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/notifications/notification_channels.dart';
 import 'package:mem/notifications/notification_ids.dart';
-import 'package:mem/notifications/wrapper.dart';
+import 'package:mem/notifications/flutter_local_notifications_wrapper.dart';
 import 'package:mem/values/durations.dart';
 
 import 'helpers.dart';

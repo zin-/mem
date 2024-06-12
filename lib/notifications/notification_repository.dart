@@ -5,13 +5,13 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/values/paths.dart';
 
 import 'notification/notification.dart';
-import 'wrapper.dart';
+import 'flutter_local_notifications_wrapper.dart';
 
 class NotificationRepository extends KeyWithValueRepository<Notification, int>
     with Discarder {
-  NotificationsWrapper? _flutterLocalNotificationsWrapper =
+  FlutterLocalNotificationsWrapper? _flutterLocalNotificationsWrapper =
       defaultTargetPlatform == TargetPlatform.android
-          ? NotificationsWrapper(androidDefaultIconPath)
+          ? FlutterLocalNotificationsWrapper(androidDefaultIconPath)
           : null;
 
   NotificationRepository._();
@@ -27,7 +27,7 @@ class NotificationRepository extends KeyWithValueRepository<Notification, int>
 
   static void resetSingleton() => v(
         () {
-          NotificationsWrapper.resetSingleton();
+          FlutterLocalNotificationsWrapper.resetSingleton();
           _instance?._flutterLocalNotificationsWrapper = null;
           _instance = null;
         },
