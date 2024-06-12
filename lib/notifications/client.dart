@@ -140,14 +140,13 @@ class NotificationClient {
               await _memNotificationRepository.shipByMemId(memId);
           for (var notification in memNotifications.where((element) =>
               element.isEnabled() && element.isAfterActStarted())) {
-            await _scheduleClient.receive(TimedSchedule(
-              afterActStartedNotificationId(memId),
-              now.add(Duration(seconds: notification.time!)),
-              {
-                memIdKey: notification.memId,
-                notificationTypeKey: NotificationType.afterActStarted.name,
-              },
-            ));
+            await _scheduleClient.receive(
+              Schedule.of(
+                memId,
+                now.add(Duration(seconds: notification.time!)),
+                NotificationType.afterActStarted,
+              ),
+            );
           }
 
           await registerMemNotifications(
