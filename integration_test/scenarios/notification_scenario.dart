@@ -13,12 +13,12 @@ import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/logger/log.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/main.dart';
 import 'package:mem/notifications/client.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/notifications/notification_channels.dart';
 import 'package:mem/notifications/notification_ids.dart';
-import 'package:mem/notifications/flutter_local_notifications_wrapper.dart';
 import 'package:mem/values/durations.dart';
 
 import 'helpers.dart';
@@ -106,7 +106,7 @@ void testNotificationScenario() => group(
               payload: json.encode({memIdKey: insertedMemId}),
             );
 
-            await onDidReceiveNotificationResponse(details);
+            await onNotificationResponseReceived(details);
 
             await Future.delayed(
               defaultTransitionDuration,
@@ -139,7 +139,7 @@ void testNotificationScenario() => group(
                     ?.id,
               );
 
-              await onDidReceiveNotificationResponse(details);
+              await onNotificationResponseReceived(details);
 
               await Future.delayed(
                 waitSideEffectDuration,
@@ -193,7 +193,7 @@ void testNotificationScenario() => group(
                     ?.id,
               );
 
-              await onDidReceiveNotificationResponse(details);
+              await onNotificationResponseReceived(details);
 
               await Future.delayed(
                 waitSideEffectDuration,
@@ -245,7 +245,7 @@ void testNotificationScenario() => group(
                       ?.id,
                 );
 
-                await onDidReceiveNotificationResponse(details);
+                await onNotificationResponseReceived(details);
 
                 final acts = await dbA.select(defTableActs);
 
@@ -311,7 +311,7 @@ void testNotificationScenario() => group(
                         ?.id,
                   );
 
-                  await onDidReceiveNotificationResponse(details);
+                  await onNotificationResponseReceived(details);
 
                   final acts = await dbA.select(defTableActs);
 
@@ -383,7 +383,7 @@ void testNotificationScenario() => group(
                     ?.id,
               );
 
-              await onDidReceiveNotificationResponse(details);
+              await onNotificationResponseReceived(details);
             });
 
             group(": 2 active acts", () {
@@ -416,7 +416,7 @@ void testNotificationScenario() => group(
                       ?.id,
                 );
 
-                await onDidReceiveNotificationResponse(details);
+                await onNotificationResponseReceived(details);
               });
             });
           });

@@ -6,6 +6,8 @@ import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/page.dart';
+import 'package:mem/notifications/client.dart';
+import 'package:mem/notifications/flutter_local_notifications_wrapper.dart';
 import 'package:mem/notifications/notification_repository.dart';
 import 'package:mem/framework/repository/database_repository.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
@@ -39,6 +41,43 @@ Future<void> launchActCounterConfigure() => i(
 
         return _runApplication(home: const ActCounterConfigure());
       },
+    );
+
+@pragma('vm:entry-point')
+Future<void> onNotificationResponseReceived(dynamic details) => i(
+      () async {
+        WidgetsFlutterBinding.ensureInitialized();
+        await openDatabase();
+
+        await onDidReceiveNotificationResponse(
+          details,
+          (memId) => v(
+            () async {
+              if (memId is int) {
+                await launchMemDetailPage(memId);
+              }
+            },
+            {
+              'memId': memId,
+            },
+          ),
+          (actionId, memId) => v(
+            () async {
+              if (actionId is String && memId is int) {
+                await NotificationClient()
+                    .notificationChannels
+                    .actionMap[actionId]
+                    ?.onTapped(memId);
+              }
+            },
+            {
+              'actionId': actionId,
+              'memId': memId,
+            },
+          ),
+        );
+      },
+      {'details': details},
     );
 
 Future<void> _runApplication({Widget? home, String? languageCode}) => i(
