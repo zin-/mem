@@ -10,15 +10,17 @@ import 'notification/channel.dart';
 // TODO Windows, Web, Linuxでの通知を実装する
 //  https://github.com/zin-/mem/issues/303
 class FlutterLocalNotificationsWrapper {
+  bool _pluginIsInitializing = false;
+
   final String androidDefaultIconPath;
-  bool _pluginIsInitialized = false;
 
   Future<FlutterLocalNotificationsPlugin>
       get _flutterLocalNotificationsPlugin => v(
             () async {
               final flutterLocalNotificationsPlugin =
                   FlutterLocalNotificationsPlugin();
-              if (!_pluginIsInitialized) {
+              if (!_pluginIsInitializing) {
+                _pluginIsInitializing = true;
                 await flutterLocalNotificationsPlugin.initialize(
                   InitializationSettings(
                     android:
@@ -29,16 +31,41 @@ class FlutterLocalNotificationsWrapper {
                   onDidReceiveBackgroundNotificationResponse:
                       onNotificationResponseReceived,
                 );
-                _pluginIsInitialized = true;
               }
               return flutterLocalNotificationsPlugin;
             },
 // coverage:ignore-start
             {
 // coverage:ignore-end
-              '_pluginIsInitialized': _pluginIsInitialized,
+              '_pluginIsInitializing': _pluginIsInitializing,
             },
           );
+
+  FlutterLocalNotificationsWrapper._(
+    this.androidDefaultIconPath,
+  );
+
+  static FlutterLocalNotificationsWrapper? _instance;
+
+  factory FlutterLocalNotificationsWrapper(
+    String androidDefaultIconPath,
+  ) =>
+      v(
+        () => _instance ??= FlutterLocalNotificationsWrapper._(
+          androidDefaultIconPath,
+        ),
+// coverage:ignore-start
+        {
+// coverage:ignore-end
+          "_instance": _instance,
+          "androidDefaultIconPath": androidDefaultIconPath
+        },
+      );
+
+  static void resetSingleton() {
+    _instance?._pluginIsInitializing = false;
+    _instance = null;
+  }
 
   Future<void> show(
     int id,
@@ -118,32 +145,6 @@ class FlutterLocalNotificationsWrapper {
 // coverage:ignore-end
         },
       );
-
-  FlutterLocalNotificationsWrapper._(
-    this.androidDefaultIconPath,
-  );
-
-  static FlutterLocalNotificationsWrapper? _instance;
-
-  factory FlutterLocalNotificationsWrapper(
-    String androidDefaultIconPath,
-  ) =>
-      v(
-        () => _instance ??= FlutterLocalNotificationsWrapper._(
-          androidDefaultIconPath,
-        ),
-// coverage:ignore-start
-        {
-// coverage:ignore-end
-          "_instance": _instance,
-          "androidDefaultIconPath": androidDefaultIconPath
-        },
-      );
-
-  static void resetSingleton() {
-    _instance?._pluginIsInitialized = false;
-    _instance = null;
-  }
 }
 
 Future<void> onDidReceiveNotificationResponse(

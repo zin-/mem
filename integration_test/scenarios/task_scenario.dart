@@ -4,12 +4,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
+import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/databases/definition.dart';
+import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/logger/log.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/notifications/client.dart';
+import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/settings/client.dart';
 import 'package:mem/settings/keys.dart';
 import 'package:mem/settings/preference.dart';
@@ -54,10 +58,11 @@ void testTaskScenario() => group(': $_scenarioName', () {
       );
 
       late final DatabaseAccessor dbA;
-
       setUpAll(() async {
         dbA = await openTestDatabase(databaseDefinition);
       });
+
+      int? insertedMemHasPeriodId;
       setUp(() async {
         await clearAllTestDatabaseRows(databaseDefinition);
 
@@ -80,7 +85,7 @@ void testTaskScenario() => group(': $_scenarioName', () {
           defColMemsEndAt.name: insertedMemPeriodEnd,
           defColCreatedAt.name: zeroDate,
         });
-        await dbA.insert(defTableMems, {
+        insertedMemHasPeriodId = await dbA.insert(defTableMems, {
           defColMemsName.name: insertedMemHasPeriod,
           defColMemsStartOn.name: insertedMemPeriod.start.dateTime,
           defColMemsStartAt.name: insertedMemPeriod.start.dateTime,
@@ -390,6 +395,40 @@ void testTaskScenario() => group(': $_scenarioName', () {
                 savedMems.single[defColMemsEndOn.name],
                 equals(endDate),
               );
+            },
+          );
+        },
+      );
+
+      group(
+        'notification',
+        () {
+          setUp(
+            () async {
+              await dbA.insert(defTableActs, {
+                defFkActsMemId.name: insertedMemHasPeriodId,
+                defColActsStart.name: zeroDate.toIso8601String(),
+                defColActsStartIsAllDay.name: 0,
+                defColCreatedAt.name: zeroDate,
+              });
+            },
+          );
+
+          testWidgets(
+            'not notify on active act.',
+            (widgetTester) async {
+              DatabaseTupleRepository.databaseAccessor = dbA;
+
+              widgetTester.setMockFlutterLocalNotifications(
+                [],
+              );
+
+              await NotificationClient().show(
+                NotificationType.startMem,
+                insertedMemHasPeriodId!,
+              );
+
+              widgetTester.clearMockFlutterLocalNotifications();
             },
           );
         },

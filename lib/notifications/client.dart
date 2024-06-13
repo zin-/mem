@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:mem/acts/act_repository.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/mem.dart';
@@ -70,15 +71,48 @@ class NotificationClient {
     int memId,
   ) =>
       v(
-        () async => await _notificationRepository.receive(
-          await notificationChannels.buildNotification(
-            notificationType,
-            memId,
-          ),
-        ),
+        () async {
+          final savedMem = await _memRepository.findOneBy(id: memId);
+
+          if (savedMem == null || savedMem.isDone || savedMem.isArchived) {
+            await cancelMemNotifications(memId);
+            return;
+          }
+
+          if (notificationType == NotificationType.startMem) {
+            final latestAct =
+                (await ActRepository().ship(memId: memId, latestByMemIds: true))
+                    .singleOrNull;
+            if (latestAct != null && latestAct.isActive) {
+              return;
+            }
+          }
+
+          await Future.wait(NotificationType.values
+              .where(
+                (e) => e != NotificationType.activeAct && e != notificationType,
+              )
+              .map(
+                (e) => _notificationRepository
+                    .discard(e.buildNotificationId(memId)),
+              ));
+          if (notificationType == NotificationType.activeAct ||
+              notificationType == NotificationType.pausedAct ||
+              notificationType == NotificationType.afterActStarted) {
+            await _notificationRepository
+                .discard(NotificationType.activeAct.buildNotificationId(memId));
+          }
+
+          await _notificationRepository.receive(
+            await notificationChannels.buildNotification(
+              notificationType,
+              memId,
+            ),
+          );
+        },
         {
-          "notificationType": notificationType,
-          "memId": memId,
+          'notificationType': notificationType,
+          'memId': memId,
         },
       );
 
