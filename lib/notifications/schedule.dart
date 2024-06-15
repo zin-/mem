@@ -15,38 +15,22 @@ abstract class Schedule extends Entity {
     NotificationType notificationType,
   ) =>
       v(
-        () {
-          final scheduleId = _buildScheduleId(notificationType, memId);
-
-          return at == null
-              ? CancelSchedule(
-                  scheduleId,
-                )
-              : TimedSchedule(
-                  scheduleId,
-                  at,
-                  {
-                    memIdKey: memId,
-                    notificationTypeKey: notificationType.name,
-                  },
-                );
-        },
+        () => at == null
+            ? CancelSchedule(
+                notificationType.buildNotificationId(memId),
+              )
+            : TimedSchedule(
+                notificationType.buildNotificationId(memId),
+                at,
+                {
+                  memIdKey: memId,
+                  notificationTypeKey: notificationType.name,
+                },
+              ),
         {
           'id': memId,
           'at': at,
           'notificationType': notificationType,
-        },
-      );
-
-  static int _buildScheduleId(
-    NotificationType notificationType,
-    int memId,
-  ) =>
-      v(
-        () => notificationType.buildNotificationId(memId),
-        {
-          'notificationType': notificationType,
-          'memId': memId,
         },
       );
 
