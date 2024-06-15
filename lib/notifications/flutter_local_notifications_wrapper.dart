@@ -119,6 +119,7 @@ class FlutterLocalNotificationsWrapper {
           usesChronometer: channel.usesChronometer,
           ongoing: channel.ongoing,
           autoCancel: channel.autoCancel,
+          playSound: channel.playSound,
         ),
       );
 

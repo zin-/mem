@@ -87,6 +87,8 @@ extension NotificationChannelBuilder on NotificationType {
                 usesChronometer: true,
                 ongoing: true,
                 autoCancel: false,
+                playSound: false,
+                enableVibration: false,
               );
             case NotificationType.pausedAct:
               return NotificationChannel(
@@ -98,6 +100,8 @@ extension NotificationChannelBuilder on NotificationType {
                 ],
                 usesChronometer: true,
                 autoCancel: false,
+                playSound: false,
+                enableVibration: false,
               );
             case NotificationType.afterActStarted:
               return NotificationChannel(

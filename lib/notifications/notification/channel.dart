@@ -8,6 +8,8 @@ class NotificationChannel {
   final bool usesChronometer;
   final bool ongoing;
   final bool autoCancel;
+  final bool playSound;
+  final bool enableVibration;
 
   NotificationChannel(
     this.id,
@@ -17,6 +19,8 @@ class NotificationChannel {
     this.usesChronometer = false,
     this.ongoing = false,
     this.autoCancel = true,
+    this.playSound = true,
+    this.enableVibration = true,
   });
 
   @override
