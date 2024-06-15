@@ -1,46 +1,71 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
 
-import 'client.dart';
 import 'mem_notifications.dart';
 import 'notification/channel.dart';
 
 // TODO Windows, Web, Linuxでの通知を実装する
 //  https://github.com/zin-/mem/issues/303
-class NotificationsWrapper {
+class FlutterLocalNotificationsWrapper {
+  bool _pluginIsInitializing = false;
+
   final String androidDefaultIconPath;
-  bool _pluginIsInitialized = false;
 
   Future<FlutterLocalNotificationsPlugin>
       get _flutterLocalNotificationsPlugin => v(
             () async {
               final flutterLocalNotificationsPlugin =
                   FlutterLocalNotificationsPlugin();
-              if (!_pluginIsInitialized) {
+              if (!_pluginIsInitializing) {
+                _pluginIsInitializing = true;
                 await flutterLocalNotificationsPlugin.initialize(
                   InitializationSettings(
                     android:
                         AndroidInitializationSettings(androidDefaultIconPath),
                   ),
                   onDidReceiveNotificationResponse:
-                      onDidReceiveNotificationResponse,
+                      onNotificationResponseReceived,
                   onDidReceiveBackgroundNotificationResponse:
-                      onDidReceiveNotificationResponse,
+                      onNotificationResponseReceived,
                 );
-                _pluginIsInitialized = true;
               }
               return flutterLocalNotificationsPlugin;
             },
 // coverage:ignore-start
             {
 // coverage:ignore-end
-              '_pluginIsInitialized': _pluginIsInitialized,
+              '_pluginIsInitializing': _pluginIsInitializing,
             },
           );
+
+  FlutterLocalNotificationsWrapper._(
+    this.androidDefaultIconPath,
+  );
+
+  static FlutterLocalNotificationsWrapper? _instance;
+
+  factory FlutterLocalNotificationsWrapper(
+    String androidDefaultIconPath,
+  ) =>
+      v(
+        () => _instance ??= FlutterLocalNotificationsWrapper._(
+          androidDefaultIconPath,
+        ),
+// coverage:ignore-start
+        {
+// coverage:ignore-end
+          "_instance": _instance,
+          "androidDefaultIconPath": androidDefaultIconPath
+        },
+      );
+
+  static void resetSingleton() {
+    _instance?._pluginIsInitializing = false;
+    _instance = null;
+  }
 
   Future<void> show(
     int id,
@@ -114,56 +139,24 @@ class NotificationsWrapper {
             return false;
           }
 
-          onDidReceiveNotificationResponse(details);
+          onNotificationResponseReceived(details);
 
           return true;
 // coverage:ignore-end
         },
       );
-
-  NotificationsWrapper._(
-    this.androidDefaultIconPath,
-  );
-
-  static NotificationsWrapper? _instance;
-
-  factory NotificationsWrapper(
-    String androidDefaultIconPath,
-  ) =>
-      v(
-        () => _instance ??= NotificationsWrapper._(
-          androidDefaultIconPath,
-        ),
-// coverage:ignore-start
-        {
-// coverage:ignore-end
-          "_instance": _instance,
-          "androidDefaultIconPath": androidDefaultIconPath
-        },
-      );
-
-  static void resetSingleton() {
-    _instance?._pluginIsInitialized = false;
-    _instance = null;
-  }
 }
 
-// 分かりやすさのために、entry-pointはすべてmain.dartに定義したいが、
-// NotificationResponseがライブラリの型なので、ここで定義する
-// ライブラリから呼び出されるentry-pointなのでprivateにすることもできない
-@pragma('vm:entry-point')
-Future<void> onDidReceiveNotificationResponse(NotificationResponse details) =>
-    i(
+Future<void> onDidReceiveNotificationResponse(
+  NotificationResponse details,
+  Future<void> Function(dynamic memId) onSelected,
+  Future<void> Function(
+    String? actionId,
+    dynamic memId,
+  ) onActionSelected,
+) =>
+    v(
       () async {
-        WidgetsFlutterBinding.ensureInitialized();
-
-        await openDatabase();
-
-        final id = details.id;
-        if (id == null) {
-          return;
-        }
-
         final notificationPayload = details.payload;
         final payload =
             notificationPayload == null ? {} : json.decode(notificationPayload);
@@ -171,26 +164,15 @@ Future<void> onDidReceiveNotificationResponse(NotificationResponse details) =>
         switch (details.notificationResponseType) {
           case NotificationResponseType.selectedNotification:
             if (payload.containsKey(memIdKey)) {
-              final memId = payload[memIdKey];
-              if (memId is int) {
-                await launchMemDetailPage(memId);
-              }
+              await onSelected(payload[memIdKey]);
             }
             break;
 
           case NotificationResponseType.selectedNotificationAction:
-            final actionId = details.actionId;
-            if (actionId == null) {
-              return;
-            }
-
-            if (payload.containsKey(memIdKey)) {
-              final memId = payload[memIdKey];
-              await NotificationClient()
-                  .notificationChannels
-                  .actionMap[actionId]
-                  ?.onTapped(memId as int);
-            }
+            await onActionSelected(
+              details.actionId,
+              payload[memIdKey],
+            );
             break;
         }
       },

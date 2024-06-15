@@ -1,9 +1,38 @@
 import 'package:mem/framework/repository/entity.dart';
+import 'package:mem/logger/log_service.dart';
+import 'package:mem/notifications/client.dart';
+import 'package:mem/notifications/mem_notifications.dart';
+import 'package:mem/notifications/notification/type.dart';
 
 abstract class Schedule extends Entity {
   final int id;
 
   Schedule(this.id);
+
+  factory Schedule.of(
+    int memId,
+    DateTime? at,
+    NotificationType notificationType,
+  ) =>
+      v(
+        () => at == null
+            ? CancelSchedule(
+                notificationType.buildNotificationId(memId),
+              )
+            : TimedSchedule(
+                notificationType.buildNotificationId(memId),
+                at,
+                {
+                  memIdKey: memId,
+                  notificationTypeKey: notificationType.name,
+                },
+              ),
+        {
+          'id': memId,
+          'at': at,
+          'notificationType': notificationType,
+        },
+      );
 
   @override
   String toString() => "${super.toString()}: ${{
@@ -17,20 +46,17 @@ class CancelSchedule extends Schedule {
 
 class TimedSchedule extends Schedule {
   final DateTime startAt;
-  final Future<void> Function(int, Map<String, dynamic>) callback;
   final Map<String, dynamic> params;
 
   TimedSchedule(
     super.id,
     this.startAt,
-    this.callback,
     this.params,
   );
 
   @override
   String toString() => "${super.toString()}${{
         "startAt": startAt,
-        "callback": callback,
         "params": params,
       }}";
 }
@@ -42,7 +68,6 @@ class PeriodicSchedule extends TimedSchedule {
     super.id,
     super.startAt,
     this.duration,
-    super.callback,
     super.params,
   );
 

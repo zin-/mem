@@ -16,6 +16,7 @@ import 'package:mem/notifications/client.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/notifications/notification_ids.dart';
+import 'package:mem/notifications/schedule_client.dart';
 import 'package:mem/values/durations.dart';
 
 import '../helpers.dart';
@@ -296,6 +297,7 @@ void main() => group(
               'notify',
               (widgetTester) async {
                 int initializeCount = 0;
+                int cancelCount = 0;
                 int showCount = 0;
                 widgetTester.setMockFlutterLocalNotifications(
                   [
@@ -304,6 +306,19 @@ void main() => group(
                       initializeCount++;
                       return true;
                     },
+                    ...[
+                      memStartNotificationId(notifyTodayMemId!),
+                      memEndNotificationId(notifyTodayMemId!),
+                      pausedActNotificationId(notifyTodayMemId!),
+                      afterActStartedNotificationId(notifyTodayMemId!),
+                    ].map(
+                      (e) => (message) async {
+                        expect(message.method, equals('cancel'));
+                        expect(message.arguments['id'], equals(e));
+                        cancelCount++;
+                        return false;
+                      },
+                    ),
                     (message) async {
                       expect(message.method, equals('show'));
                       expect(message.arguments['id'],
@@ -328,9 +343,11 @@ void main() => group(
 
                 if (defaultTargetPlatform == TargetPlatform.android) {
                   expect(initializeCount, equals(1));
+                  expect(cancelCount, equals(4));
                   expect(showCount, equals(1));
                 } else {
                   expect(initializeCount, equals(0));
+                  expect(cancelCount, equals(0));
                   expect(showCount, equals(0));
                 }
 

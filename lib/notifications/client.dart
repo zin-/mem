@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:mem/acts/act_repository.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/main.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
@@ -73,15 +72,54 @@ class NotificationClient {
     int memId,
   ) =>
       v(
-        () async => await _notificationRepository.receive(
-          await notificationChannels.buildNotification(
-            notificationType,
-            memId,
-          ),
-        ),
+        () async {
+          final savedMem = await _memRepository.findOneBy(id: memId);
+
+          if (savedMem == null || savedMem.isDone || savedMem.isArchived) {
+            await cancelMemNotifications(memId);
+            return;
+          }
+
+          if (notificationType == NotificationType.repeat) {
+            if (!await _shouldNotify(memId)) {
+              return;
+            }
+          }
+
+          if (notificationType == NotificationType.startMem) {
+            final latestAct =
+                (await ActRepository().ship(memId: memId, latestByMemIds: true))
+                    .singleOrNull;
+            if (latestAct != null && latestAct.isActive) {
+              return;
+            }
+          }
+
+          await Future.wait(NotificationType.values
+              .where(
+                (e) => e != NotificationType.activeAct && e != notificationType,
+              )
+              .map(
+                (e) => _notificationRepository
+                    .discard(e.buildNotificationId(memId)),
+              ));
+          if (notificationType == NotificationType.activeAct ||
+              notificationType == NotificationType.pausedAct ||
+              notificationType == NotificationType.afterActStarted) {
+            await _notificationRepository
+                .discard(NotificationType.activeAct.buildNotificationId(memId));
+          }
+
+          await _notificationRepository.receive(
+            await notificationChannels.buildNotification(
+              notificationType,
+              memId,
+            ),
+          );
+        },
         {
-          "notificationType": notificationType,
-          "memId": memId,
+          'notificationType': notificationType,
+          'memId': memId,
         },
       );
 
@@ -102,7 +140,6 @@ class NotificationClient {
                   defaultStartOfDay,
               savedMemNotifications ??
                   await _memNotificationRepository.shipByMemId(memId),
-              scheduleCallback,
             )) {
               await _scheduleClient.receive(schedule);
             }
@@ -144,15 +181,13 @@ class NotificationClient {
               await _memNotificationRepository.shipByMemId(memId);
           for (var notification in memNotifications.where((element) =>
               element.isEnabled() && element.isAfterActStarted())) {
-            await _scheduleClient.receive(TimedSchedule(
-              afterActStartedNotificationId(memId),
-              now.add(Duration(seconds: notification.time!)),
-              scheduleCallback,
-              {
-                memIdKey: notification.memId,
-                notificationTypeKey: NotificationType.afterActStarted.name,
-              },
-            ));
+            await _scheduleClient.receive(
+              Schedule.of(
+                memId,
+                now.add(Duration(seconds: notification.time!)),
+                NotificationType.afterActStarted,
+              ),
+            );
           }
 
           await registerMemNotifications(
@@ -199,6 +234,49 @@ class NotificationClient {
         },
       );
 
+  Future<bool> _shouldNotify(int memId) => v(
+        () async {
+          final savedMemNotifications =
+              await MemNotificationRepository().shipByMemId(memId);
+          final repeatByDayOfWeekMemNotifications = savedMemNotifications.where(
+            (element) => element.isEnabled() && element.isRepeatByDayOfWeek(),
+          );
+
+          if (repeatByDayOfWeekMemNotifications.isNotEmpty) {
+            final now = DateTime.now();
+            if (!repeatByDayOfWeekMemNotifications
+                .map((e) => e.time)
+                .contains(now.weekday)) {
+              return false;
+            }
+          }
+
+          final repeatByNDayMemNotification =
+              savedMemNotifications.singleWhereOrNull(
+            (element) => element.isEnabled() && element.isRepeatByNDay(),
+          );
+          final lastActTime = await ActRepository()
+              .findOneBy(memId: memId, latest: true)
+              .then((value) =>
+                  value?.period.end ??
+                  // FIXME 永続化されている時点でstartは必ずあるので型で表現する
+                  value?.period.start!);
+
+          if (lastActTime != null) {
+            if (Duration(
+                    days:
+                        // FIXME 永続化されている時点でtimeは必ずあるので型で表現する
+                        //  repeatByNDayMemNotification自体がないのは別の話
+                        repeatByNDayMemNotification?.time! ?? 1) >
+                DateTime.now().difference(lastActTime)) {
+              return false;
+            }
+          }
+
+          return true;
+        },
+      );
+
   Future<void> resetAll() => v(
         () async {
           await _notificationRepository.discardAll();
@@ -218,77 +296,3 @@ class NotificationClient {
 }
 
 const notificationTypeKey = "notificationType";
-
-Future<void> scheduleCallback(int id, Map<String, dynamic> params) => i(
-      () async {
-        await openDatabase();
-
-        final memId = params[memIdKey] as int;
-
-        final notificationType = NotificationType.values.singleWhere(
-          (element) => element.name == params[notificationTypeKey],
-        );
-
-        switch (notificationType) {
-          case NotificationType.repeat:
-            if (await _shouldNotify(memId)) {
-              await NotificationClient().show(
-                notificationType,
-                memId,
-              );
-            }
-            break;
-
-          default:
-            await NotificationClient().show(
-              notificationType,
-              memId,
-            );
-            break;
-        }
-      },
-      {"id": id, "params": params},
-    );
-
-Future<bool> _shouldNotify(int memId) => v(
-      () async {
-        final savedMemNotifications =
-            await MemNotificationRepository().shipByMemId(memId);
-        final repeatByDayOfWeekMemNotifications = savedMemNotifications.where(
-          (element) => element.isEnabled() && element.isRepeatByDayOfWeek(),
-        );
-
-        if (repeatByDayOfWeekMemNotifications.isNotEmpty) {
-          final now = DateTime.now();
-          if (!repeatByDayOfWeekMemNotifications
-              .map((e) => e.time)
-              .contains(now.weekday)) {
-            return false;
-          }
-        }
-
-        final repeatByNDayMemNotification =
-            savedMemNotifications.singleWhereOrNull(
-          (element) => element.isEnabled() && element.isRepeatByNDay(),
-        );
-        final lastActTime = await ActRepository()
-            .findOneBy(memId: memId, latest: true)
-            .then((value) =>
-                value?.period.end ??
-                // FIXME 永続化されている時点でstartは必ずあるので型で表現する
-                value?.period.start!);
-
-        if (lastActTime != null) {
-          if (Duration(
-                  days:
-                      // FIXME 永続化されている時点でtimeは必ずあるので型で表現する
-                      //  repeatByNDayMemNotification自体がないのは別の話
-                      repeatByNDayMemNotification?.time! ?? 1) >
-              DateTime.now().difference(lastActTime)) {
-            return false;
-          }
-        }
-
-        return true;
-      },
-    );
