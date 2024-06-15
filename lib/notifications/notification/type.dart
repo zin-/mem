@@ -32,6 +32,9 @@ extension NotificationChannelBuilder on NotificationType {
               return afterActStartedNotificationId(memId);
           }
         },
-        {'this': this},
+        {
+          'this': this,
+          'memId': memId,
+        },
       );
 }
