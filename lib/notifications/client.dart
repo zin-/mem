@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mem/acts/act_repository.dart';
 import 'package:mem/components/l10n.dart';
@@ -77,6 +78,12 @@ class NotificationClient {
           if (savedMem == null || savedMem.isDone || savedMem.isArchived) {
             await cancelMemNotifications(memId);
             return;
+          }
+
+          if (notificationType == NotificationType.repeat) {
+            if (!await _shouldNotify(memId)) {
+              return;
+            }
           }
 
           if (notificationType == NotificationType.startMem) {
@@ -224,6 +231,49 @@ class NotificationClient {
         },
         {
           "memId": memId,
+        },
+      );
+
+  Future<bool> _shouldNotify(int memId) => v(
+        () async {
+          final savedMemNotifications =
+              await MemNotificationRepository().shipByMemId(memId);
+          final repeatByDayOfWeekMemNotifications = savedMemNotifications.where(
+            (element) => element.isEnabled() && element.isRepeatByDayOfWeek(),
+          );
+
+          if (repeatByDayOfWeekMemNotifications.isNotEmpty) {
+            final now = DateTime.now();
+            if (!repeatByDayOfWeekMemNotifications
+                .map((e) => e.time)
+                .contains(now.weekday)) {
+              return false;
+            }
+          }
+
+          final repeatByNDayMemNotification =
+              savedMemNotifications.singleWhereOrNull(
+            (element) => element.isEnabled() && element.isRepeatByNDay(),
+          );
+          final lastActTime = await ActRepository()
+              .findOneBy(memId: memId, latest: true)
+              .then((value) =>
+                  value?.period.end ??
+                  // FIXME 永続化されている時点でstartは必ずあるので型で表現する
+                  value?.period.start!);
+
+          if (lastActTime != null) {
+            if (Duration(
+                    days:
+                        // FIXME 永続化されている時点でtimeは必ずあるので型で表現する
+                        //  repeatByNDayMemNotification自体がないのは別の話
+                        repeatByNDayMemNotification?.time! ?? 1) >
+                DateTime.now().difference(lastActTime)) {
+              return false;
+            }
+          }
+
+          return true;
         },
       );
 
