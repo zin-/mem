@@ -20,6 +20,8 @@ const pauseActNotificationActionId = "pause-act";
 const pauseActNotificationBody = "Paused";
 
 class NotificationChannels {
+  final AppLocalizations _l10n;
+
   late final Map<NotificationType, NotificationChannel> notificationChannels;
   late final Map<String, NotificationAction> actionMap;
 
@@ -72,10 +74,10 @@ class NotificationChannels {
         },
       );
 
-  NotificationChannels(AppLocalizations l10n) {
+  NotificationChannels(this._l10n) {
     final doneMemAction = NotificationAction(
           doneMemNotificationActionId,
-          l10n.doneLabel,
+          _l10n.doneLabel,
           (memId) => v(
             () => MemService().doneByMemId(memId),
             {"memId": memId},
@@ -83,7 +85,7 @@ class NotificationChannels {
         ),
         startActAction = NotificationAction(
           startActNotificationActionId,
-          l10n.startLabel,
+          _l10n.startLabel,
           (memId) => v(
             () => ActsClient().start(memId, DateAndTime.now()),
             {"memId": memId},
@@ -91,7 +93,7 @@ class NotificationChannels {
         ),
         finishActiveActAction = NotificationAction(
           finishActiveActNotificationActionId,
-          l10n.finishLabel,
+          _l10n.finishLabel,
           (memId) => v(
             () async => await ActsClient().finish(
               memId,
@@ -102,7 +104,7 @@ class NotificationChannels {
         ),
         pauseAct = NotificationAction(
           pauseActNotificationActionId,
-          l10n.pauseActLabel,
+          _l10n.pauseActLabel,
           (memId) => v(
             () async => await ActsClient().pause(
               memId,
@@ -124,8 +126,8 @@ class NotificationChannels {
 
     final reminderChannel = NotificationChannel(
       "reminder",
-      l10n.reminderName,
-      l10n.reminderDescription,
+      _l10n.reminderName,
+      _l10n.reminderDescription,
       [
         doneMemAction,
         startActAction,
@@ -138,8 +140,8 @@ class NotificationChannels {
       NotificationType.endMem: reminderChannel,
       NotificationType.repeat: NotificationChannel(
         "repeated-reminder",
-        l10n.repeatedReminderName,
-        l10n.repeatedReminderDescription,
+        _l10n.repeatedReminderName,
+        _l10n.repeatedReminderDescription,
         [
           startActAction,
           finishActiveActAction,
@@ -147,8 +149,8 @@ class NotificationChannels {
       ),
       NotificationType.activeAct: NotificationChannel(
         'active_act-notification',
-        l10n.activeActNotification,
-        l10n.activeActNotificationDescription,
+        _l10n.activeActNotification,
+        _l10n.activeActNotificationDescription,
         [
           finishActiveActAction,
           pauseAct,
@@ -159,8 +161,8 @@ class NotificationChannels {
       ),
       NotificationType.pausedAct: NotificationChannel(
         "paused_act",
-        l10n.pausedActNotification,
-        l10n.pausedActNotificationDescription,
+        _l10n.pausedActNotification,
+        _l10n.pausedActNotificationDescription,
         [
           startActAction,
         ],
@@ -169,8 +171,8 @@ class NotificationChannels {
       ),
       NotificationType.afterActStarted: NotificationChannel(
         'after_act_started-notification',
-        l10n.afterActStartedNotification,
-        l10n.afterActStartedNotificationDescription,
+        _l10n.afterActStartedNotification,
+        _l10n.afterActStartedNotificationDescription,
         [
           finishActiveActAction,
           pauseAct,
