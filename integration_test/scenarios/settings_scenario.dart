@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +9,9 @@ import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/logger/log.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/notifications/client.dart';
+import 'package:mem/notifications/notification/type.dart';
+import 'package:mem/notifications/notification_ids.dart';
 import 'package:mem/settings/client.dart';
 import 'package:mem/settings/preference.dart';
 import 'package:mem/settings/keys.dart';
@@ -30,6 +34,8 @@ void main() => group(
         const numberOfMem = 100;
         const insertedMemName = '$_scenarioName: inserted - mem name';
 
+        final insertedMemIds = List<int>.empty(growable: true);
+
         late final DatabaseAccessor dbA;
 
         setUpAll(() async {
@@ -37,22 +43,28 @@ void main() => group(
         });
 
         setUp(() async {
+          NotificationClient.resetSingleton();
+
           await clearAllTestDatabaseRows(databaseDefinition);
 
           for (var i = 0; i < numberOfMem; i++) {
-            await dbA.insert(
-              defTableMems,
-              {
-                defColMemsName.name: "$insertedMemName: $i",
-                defColCreatedAt.name: zeroDate,
-              },
+            insertedMemIds.add(
+              await dbA.insert(
+                defTableMems,
+                {
+                  defColMemsName.name: "$insertedMemName: $i",
+                  defColCreatedAt.name: zeroDate,
+                },
+              ),
             );
           }
         });
 
         testWidgets(
-          ": show page.",
+          'show page.',
           (widgetTester) async {
+            widgetTester.clearMockFlutterLocalNotifications();
+
             await runApplication();
             await widgetTester.pumpAndSettle();
 
@@ -228,8 +240,61 @@ void main() => group(
         );
 
         testWidgets(
-          "Reset Notification",
+          'Reset Notification',
           (widgetTester) async {
+            int alarmServiceStartCount = 0;
+            int alarmCancelCount = 0;
+            final cancelIds = insertedMemIds
+                .map(
+                  (e) => [
+                    memStartNotificationId(e),
+                    memEndNotificationId(e),
+                    memRepeatedNotificationId(e),
+                  ],
+                )
+                .flattened;
+            widgetTester.setMockAndroidAlarmManager([
+              (m) async {
+                expect(m.method, equals('AlarmService.start'));
+                alarmServiceStartCount++;
+                return true;
+              },
+              ...cancelIds.map((e) => (m) async {
+                    expect(m.method, equals('Alarm.cancel'));
+                    alarmCancelCount++;
+                    return false;
+                  }),
+            ]);
+
+            int initializeCount = 0;
+            int getNotificationAppLaunchDetailsCount = 0;
+            int cancelAllCount = 0;
+            int deleteNotificationChannelCount = 0;
+            widgetTester.setMockFlutterLocalNotifications([
+              (m) async {
+                expect(m.method, equals('initialize'));
+                initializeCount++;
+                return true;
+              },
+              (m) async {
+                expect(m.method, equals('getNotificationAppLaunchDetails'));
+                getNotificationAppLaunchDetailsCount++;
+                return null;
+              },
+              (m) async {
+                expect(m.method, equals('cancelAll'));
+                cancelAllCount++;
+                return null;
+              },
+              ...NotificationType.values.map(
+                (e) => (m) async {
+                  expect(m.method, equals('deleteNotificationChannel'));
+                  deleteNotificationChannelCount++;
+                  return null;
+                },
+              ),
+            ]);
+
             await runApplication();
             await widgetTester.pumpAndSettle();
 
@@ -246,6 +311,26 @@ void main() => group(
 
             expect(find.byType(CircularProgressIndicator), findsNothing);
             expect(find.text(l10n.completeResetNotification), findsOneWidget);
+
+            if (defaultTargetPlatform == TargetPlatform.android) {
+              expect(alarmServiceStartCount, equals(1));
+              expect(alarmCancelCount, equals(300));
+              expect(initializeCount, equals(1));
+              expect(getNotificationAppLaunchDetailsCount, equals(1));
+              expect(cancelAllCount, equals(1));
+              expect(deleteNotificationChannelCount,
+                  equals(NotificationType.values.length));
+            } else {
+              expect(alarmServiceStartCount, equals(0));
+              expect(alarmCancelCount, equals(0));
+              expect(initializeCount, equals(0));
+              expect(getNotificationAppLaunchDetailsCount, equals(0));
+              expect(cancelAllCount, equals(0));
+              expect(deleteNotificationChannelCount, equals(0));
+            }
+
+            widgetTester.clearMockAndroidAlarmManager();
+            widgetTester.clearMockFlutterLocalNotifications();
           },
         );
       },
