@@ -14,60 +14,45 @@ import 'schedule.dart';
 const memIdKey = 'memId';
 
 class MemNotifications {
-  static Iterable<Schedule> scheduleOf(
+  static Schedule periodicScheduleOf(
     SavedMem savedMem,
     TimeOfDay startOfDay,
     Iterable<SavedMemNotification> memNotifications,
   ) =>
       v(
-        () => [
-          ...savedMem.periodSchedules(startOfDay),
-          _memPeriodicSchedule(
-            savedMem.id,
-            memNotifications
-                .whereType<SavedMemNotification>()
-                .singleWhereOrNull(
-                  (element) => element.isEnabled() && element.isRepeated(),
-                ),
-          ),
-        ],
+        () {
+          final savedRepeatMemNotification = memNotifications
+              .whereType<SavedMemNotification>()
+              .singleWhereOrNull(
+                (element) => element.isEnabled() && element.isRepeated(),
+              );
+          return savedRepeatMemNotification == null
+              ? CancelSchedule(memRepeatedNotificationId(savedMem.id))
+              : PeriodicSchedule(
+                  memRepeatedNotificationId(savedMem.id),
+                  DateTime.now()
+                      .copyWith(
+                        hour: 0,
+                        minute: 0,
+                        second: 0,
+                        millisecond: 0,
+                        microsecond: 0,
+                      )
+                      .add(Duration(
+                          seconds: savedRepeatMemNotification
+                              // FIXME 永続化されている時点でtimeは必ずあるので型で表現する
+                              .time!)),
+                  const Duration(days: 1),
+                  {
+                    memIdKey: savedMem.id,
+                    notificationTypeKey: NotificationType.repeat.name,
+                  },
+                );
+        },
         {
           "savedMem": savedMem,
           "startOfDay": startOfDay,
           "memNotifications": memNotifications,
-        },
-      );
-
-  static Schedule _memPeriodicSchedule(
-    int memId,
-    SavedMemNotification? savedRepeatedMemNotifications,
-  ) =>
-      v(
-        () => savedRepeatedMemNotifications == null
-            ? CancelSchedule(memRepeatedNotificationId(memId))
-            : PeriodicSchedule(
-                memRepeatedNotificationId(memId),
-                DateTime.now()
-                    .copyWith(
-                      hour: 0,
-                      minute: 0,
-                      second: 0,
-                      millisecond: 0,
-                      microsecond: 0,
-                    )
-                    .add(Duration(
-                        seconds: savedRepeatedMemNotifications
-                            // FIXME 永続化されている時点でtimeは必ずあるので型で表現する
-                            .time!)),
-                const Duration(days: 1),
-                {
-                  memIdKey: memId,
-                  notificationTypeKey: NotificationType.repeat.name,
-                },
-              ),
-        {
-          "memId": memId,
-          "savedMemNotifications": savedRepeatedMemNotifications,
         },
       );
 

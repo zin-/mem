@@ -134,13 +134,18 @@ class NotificationClient {
           if (mem.isDone || mem.isArchived) {
             cancelMemNotifications(memId);
           } else {
-            for (var schedule in MemNotifications.scheduleOf(
-              mem,
-              (await _preferenceClient.shipByKey(startOfDayKey)).value ??
-                  defaultStartOfDay,
-              savedMemNotifications ??
-                  await _memNotificationRepository.shipByMemId(memId),
-            )) {
+            final startOfDay =
+                (await _preferenceClient.shipByKey(startOfDayKey)).value ??
+                    defaultStartOfDay;
+            for (var schedule in [
+              ...mem.periodSchedules(startOfDay),
+              MemNotifications.periodicScheduleOf(
+                mem,
+                startOfDay,
+                savedMemNotifications ??
+                    await _memNotificationRepository.shipByMemId(memId),
+              )
+            ]) {
               await _scheduleClient.receive(schedule);
             }
           }
