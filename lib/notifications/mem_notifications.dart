@@ -56,7 +56,7 @@ class MemNotifications {
         },
       );
 
-  static DateTime? nexRepeatNotifyAt(
+  static DateTime? nextRepeatNotifyAt(
     Iterable<MemNotification> memNotifications,
     TimeOfDay startOfDay,
     Act? latestAct,
