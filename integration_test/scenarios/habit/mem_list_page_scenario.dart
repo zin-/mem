@@ -16,7 +16,7 @@ const _name = "MemListPage scenario";
 void main() => group(
       _name,
       () {
-        const insertedMemName = '$_name: inserted mem - name';
+        const insertedMemNameBase = '$_name: inserted mem - name';
 
         late final DatabaseAccessor dbA;
         late final int insertedMemId;
@@ -28,7 +28,7 @@ void main() => group(
           insertedMemId = await dbA.insert(
             defTableMems,
             {
-              defColMemsName.name: insertedMemName,
+              defColMemsName.name: "$insertedMemNameBase - active",
               defColCreatedAt.name: zeroDate,
             },
           );
@@ -48,7 +48,7 @@ void main() => group(
           await dbA.insert(
             defTableMems,
             {
-              defColMemsName.name: "$insertedMemName - 2",
+              defColMemsName.name: "$insertedMemNameBase - plain",
               defColCreatedAt.name: zeroDate,
             },
           );
@@ -65,37 +65,45 @@ void main() => group(
           });
         });
 
-        testWidgets(
-          ": start act.",
-          // 時間に関するテストなので3回までリトライ可能とする
-          retry: 3,
-          (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+        group(
+          'act',
+          () {
+            testWidgets(
+              'start.',
+              // 時間に関するテストなので3回までリトライ可能とする
+              retry: 3,
+              (widgetTester) async {
+                await runApplication();
+                await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(startIconFinder);
-            await widgetTester.pumpAndSettle();
+                await widgetTester.tap(startIconFinder);
+                await widgetTester.pumpAndSettle();
 
-            expect(widgetTester.widget<Text>(find.byType(Text).at(1)).data,
-                "00:00:00");
+                expect(widgetTester.widget<Text>(find.byType(Text).at(1)).data,
+                    "00:00:00");
 
-            expect(startIconFinder, findsNothing);
-            expect(stopIconFinder, findsNWidgets(2));
-            await widgetTester.pumpAndSettle(elapsePeriod * 2);
+                expect(startIconFinder, findsNothing);
+                expect(stopIconFinder, findsNWidgets(2));
+                await widgetTester.pumpAndSettle(elapsePeriod * 2);
 
-            expect(find.text("00:00:00"), findsNothing);
+                expect(find.text("00:00:00"), findsNothing);
+              },
+            );
+
+            testWidgets(
+              'finish.',
+              (widgetTester) async {
+                await runApplication();
+                await widgetTester.pumpAndSettle();
+
+                await widgetTester.tap(stopIconFinder);
+                await widgetTester.pump(waitSideEffectDuration);
+
+                expect(startIconFinder, findsNWidgets(2));
+                expect(stopIconFinder, findsNothing);
+              },
+            );
           },
         );
-
-        testWidgets(": finish act.", (widgetTester) async {
-          await runApplication();
-          await widgetTester.pumpAndSettle();
-
-          await widgetTester.tap(stopIconFinder);
-          await widgetTester.pump(waitSideEffectDuration);
-
-          expect(startIconFinder, findsNWidgets(2));
-          expect(stopIconFinder, findsNothing);
-        });
       },
     );
