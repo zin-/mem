@@ -18,41 +18,42 @@ class MemNotifications {
     SavedMem savedMem,
     TimeOfDay startOfDay,
     Iterable<SavedMemNotification> memNotifications,
+    Act? latestAct,
+    DateTime now,
   ) =>
       v(
-        () {
-          final savedRepeatMemNotification = memNotifications
-              .whereType<SavedMemNotification>()
-              .singleWhereOrNull(
-                (element) => element.isEnabled() && element.isRepeated(),
-              );
-          return savedRepeatMemNotification == null
-              ? CancelSchedule(memRepeatedNotificationId(savedMem.id))
-              : PeriodicSchedule(
-                  memRepeatedNotificationId(savedMem.id),
-                  DateTime.now()
-                      .copyWith(
-                        hour: 0,
-                        minute: 0,
-                        second: 0,
-                        millisecond: 0,
-                        microsecond: 0,
-                      )
-                      .add(Duration(
-                          seconds: savedRepeatMemNotification
-                              // FIXME 永続化されている時点でtimeは必ずあるので型で表現する
-                              .time!)),
-                  const Duration(days: 1),
-                  {
-                    memIdKey: savedMem.id,
-                    notificationTypeKey: NotificationType.repeat.name,
-                  },
-                );
-        },
+        () => memNotifications
+                .whereType<SavedMemNotification>()
+                .where(
+                  (e) =>
+                      e.isEnabled() &&
+                      (e.isRepeated() ||
+                          e.isRepeatByNDay() ||
+                          e.isRepeatByDayOfWeek()),
+                )
+                .isEmpty
+            ? CancelSchedule(memRepeatedNotificationId(savedMem.id))
+            : PeriodicSchedule(
+                memRepeatedNotificationId(savedMem.id),
+                nextRepeatNotifyAt(
+                      memNotifications,
+                      startOfDay,
+                      latestAct,
+                      now,
+                    ) ??
+                    now,
+                const Duration(days: 1),
+                {
+                  memIdKey: savedMem.id,
+                  notificationTypeKey: NotificationType.repeat.name,
+                },
+              ),
         {
-          "savedMem": savedMem,
-          "startOfDay": startOfDay,
-          "memNotifications": memNotifications,
+          'savedMem': savedMem,
+          'startOfDay': startOfDay,
+          'memNotifications': memNotifications,
+          'latestAct': latestAct,
+          'now': now,
         },
       );
 

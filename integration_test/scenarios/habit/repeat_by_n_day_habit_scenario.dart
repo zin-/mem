@@ -179,13 +179,10 @@ void main() => group(
           'save.',
           (widgetTester) async {
             final testStart = DateTime.now();
-            var expectedSavedMemId = ((await dbA.select(
-                  defTableMems,
-                  orderBy: "id DESC",
-                  limit: 1,
-                ))
-                    .single[defPkId.name] as int) +
-                1;
+            var expectedSavedMemId =
+                ((await dbA.select(defTableMems, orderBy: "id DESC", limit: 1))
+                        .single[defPkId.name] as int) +
+                    1;
 
             int alarmServiceStartCount = 0;
             int alarmCancelCount = 0;
@@ -235,6 +232,7 @@ void main() => group(
                             second: 0,
                             millisecond: 0,
                             microsecond: 0)
+                        .add(const Duration(days: 1))
                         .millisecondsSinceEpoch));
                 expect(message.arguments[5],
                     const Duration(days: 1).inMilliseconds);
@@ -257,17 +255,12 @@ void main() => group(
             await widgetTester.pumpAndSettle();
             const enteringMemName = "$_name: Save - entering - mem name";
             await widgetTester.enterText(
-              find.byKey(keyMemName),
-              enteringMemName,
-            );
+                find.byKey(keyMemName), enteringMemName);
 
             final notificationAddFinder = find.descendant(
-              of: find.byKey(keyMemNotificationsView),
-              matching: find.byIcon(Icons.notification_add),
-            );
-            await widgetTester.tap(
-              notificationAddFinder,
-            );
+                of: find.byKey(keyMemNotificationsView),
+                matching: find.byIcon(Icons.notification_add));
+            await widgetTester.tap(notificationAddFinder);
             await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
             await widgetTester.tap(timeIconFinder);
@@ -306,166 +299,173 @@ void main() => group(
               ],
             ))
                 .single;
-            expect(
-              savedMemNotification[defColMemNotificationsTime.name],
-              enteringNDay,
-            );
+            expect(savedMemNotification[defColMemNotificationsTime.name],
+                equals(enteringNDay),
+                reason: 'enteringNDay');
 
             if (defaultTargetPlatform == TargetPlatform.android) {
-              expect(alarmServiceStartCount, equals(1));
-              expect(alarmCancelCount, equals(2));
-              expect(alarmPeriodicCount, equals(1));
-              widgetTester.clearMockAndroidAlarmManager();
+              expect(alarmServiceStartCount, equals(1),
+                  reason: 'alarmServiceStartCount');
+              expect(alarmCancelCount, equals(2), reason: 'alarmCancelCount');
+              expect(alarmPeriodicCount, equals(1),
+                  reason: 'alarmPeriodicCount');
             } else {
-              expect(alarmServiceStartCount, equals(0));
-              expect(alarmCancelCount, equals(0));
-              expect(alarmPeriodicCount, equals(0));
+              expect(alarmServiceStartCount, equals(0),
+                  reason: 'alarmServiceStartCount');
+              expect(alarmCancelCount, equals(0), reason: 'alarmCancelCount');
+              expect(alarmPeriodicCount, equals(0),
+                  reason: 'alarmPeriodicCount');
             }
+
+            widgetTester.clearMockAndroidAlarmManager();
           },
         );
 
-        group('notify repeatByNDay', () {
-          testWidgets(
-            'withoutAct.',
-            (widgetTester) async {
-              int initializeCount = 0;
-              int cancelCount = 0;
-              int showCount = 0;
-              widgetTester.setMockFlutterLocalNotifications(
-                [
-                  (message) async {
-                    expect(message.method, equals('initialize'));
-                    initializeCount++;
-                    return true;
-                  },
-                  ...[
-                    memStartNotificationId(withoutActMemId),
-                    memEndNotificationId(withoutActMemId),
-                    pausedActNotificationId(withoutActMemId),
-                    afterActStartedNotificationId(withoutActMemId),
-                  ].map(
-                    (e) => (message) async {
-                      expect(message.method, equals('cancel'));
-                      expect(message.arguments['id'], equals(e));
-                      cancelCount++;
+        group(
+          'notify repeatByNDay',
+          () {
+            testWidgets(
+              'withoutAct.',
+              (widgetTester) async {
+                int initializeCount = 0;
+                int cancelCount = 0;
+                int showCount = 0;
+                widgetTester.setMockFlutterLocalNotifications(
+                  [
+                    (message) async {
+                      expect(message.method, equals('initialize'));
+                      initializeCount++;
+                      return true;
+                    },
+                    ...[
+                      memStartNotificationId(withoutActMemId),
+                      memEndNotificationId(withoutActMemId),
+                      pausedActNotificationId(withoutActMemId),
+                      afterActStartedNotificationId(withoutActMemId),
+                    ].map(
+                      (e) => (message) async {
+                        expect(message.method, equals('cancel'));
+                        expect(message.arguments['id'], equals(e));
+                        cancelCount++;
+                        return false;
+                      },
+                    ),
+                    (message) async {
+                      expect(message.method, equals('show'));
+                      expect(message.arguments['id'],
+                          equals(memRepeatedNotificationId(withoutActMemId)));
+                      expect(message.arguments['title'],
+                          equals(withoutActMemName));
+                      expect(message.arguments['body'],
+                          equals(insertedRepeatNotificationMessage));
+                      expect(message.arguments['payload'],
+                          equals("{\"$memIdKey\":$withoutActMemId}"));
+                      showCount++;
                       return false;
                     },
-                  ),
-                  (message) async {
-                    expect(message.method, equals('show'));
-                    expect(message.arguments['id'],
-                        equals(memRepeatedNotificationId(withoutActMemId)));
-                    expect(
-                        message.arguments['title'], equals(withoutActMemName));
-                    expect(message.arguments['body'],
-                        equals(insertedRepeatNotificationMessage));
-                    expect(message.arguments['payload'],
-                        equals("{\"$memIdKey\":$withoutActMemId}"));
-                    showCount++;
-                    return false;
-                  },
-                ],
-              );
+                  ],
+                );
 
-              final params = {
-                memIdKey: withoutActMemId,
-                notificationTypeKey: NotificationType.repeat.name,
-              };
+                final params = {
+                  memIdKey: withoutActMemId,
+                  notificationTypeKey: NotificationType.repeat.name,
+                };
 
-              await scheduleCallback(0, params);
+                await scheduleCallback(0, params);
 
-              if (defaultTargetPlatform == TargetPlatform.android) {
-                expect(initializeCount, equals(1));
-                expect(cancelCount, equals(4));
-                expect(showCount, equals(1));
-              } else {
-                expect(initializeCount, equals(0));
-                expect(cancelCount, equals(0));
-                expect(showCount, equals(0));
-              }
-              widgetTester.clearMockFlutterLocalNotifications();
-            },
-          );
+                if (defaultTargetPlatform == TargetPlatform.android) {
+                  expect(initializeCount, equals(1));
+                  expect(cancelCount, equals(4));
+                  expect(showCount, equals(1));
+                } else {
+                  expect(initializeCount, equals(0));
+                  expect(cancelCount, equals(0));
+                  expect(showCount, equals(0));
+                }
+                widgetTester.clearMockFlutterLocalNotifications();
+              },
+            );
 
-          testWidgets(
-            'withOldAct',
-            (widgetTester) async {
-              int initializeCount = 0;
-              int cancelCount = 0;
-              int showCount = 0;
-              widgetTester.setMockFlutterLocalNotifications(
-                [
-                  (message) async {
-                    expect(message.method, equals('initialize'));
-                    initializeCount++;
-                    return true;
-                  },
-                  ...[
-                    memStartNotificationId(withOldActMemId),
-                    memEndNotificationId(withOldActMemId),
-                    pausedActNotificationId(withOldActMemId),
-                    afterActStartedNotificationId(withOldActMemId),
-                  ].map(
-                    (e) => (message) async {
-                      expect(message.method, equals('cancel'));
-                      expect(message.arguments['id'], equals(e));
-                      cancelCount++;
+            testWidgets(
+              'withOldAct',
+              (widgetTester) async {
+                int initializeCount = 0;
+                int cancelCount = 0;
+                int showCount = 0;
+                widgetTester.setMockFlutterLocalNotifications(
+                  [
+                    (message) async {
+                      expect(message.method, equals('initialize'));
+                      initializeCount++;
+                      return true;
+                    },
+                    ...[
+                      memStartNotificationId(withOldActMemId),
+                      memEndNotificationId(withOldActMemId),
+                      pausedActNotificationId(withOldActMemId),
+                      afterActStartedNotificationId(withOldActMemId),
+                    ].map(
+                      (e) => (message) async {
+                        expect(message.method, equals('cancel'));
+                        expect(message.arguments['id'], equals(e));
+                        cancelCount++;
+                        return false;
+                      },
+                    ),
+                    (message) async {
+                      expect(message.method, equals('show'));
+                      expect(message.arguments['id'],
+                          equals(memRepeatedNotificationId(withOldActMemId)));
+                      expect(message.arguments['title'],
+                          equals(withOldActMemName));
+                      expect(message.arguments['body'],
+                          equals(insertedRepeatNotificationMessage));
+                      expect(message.arguments['payload'],
+                          equals("{\"$memIdKey\":$withOldActMemId}"));
+                      showCount++;
                       return false;
                     },
-                  ),
-                  (message) async {
-                    expect(message.method, equals('show'));
-                    expect(message.arguments['id'],
-                        equals(memRepeatedNotificationId(withOldActMemId)));
-                    expect(
-                        message.arguments['title'], equals(withOldActMemName));
-                    expect(message.arguments['body'],
-                        equals(insertedRepeatNotificationMessage));
-                    expect(message.arguments['payload'],
-                        equals("{\"$memIdKey\":$withOldActMemId}"));
-                    showCount++;
-                    return false;
-                  },
-                ],
-              );
+                  ],
+                );
 
-              final params = {
-                memIdKey: withOldActMemId,
-                notificationTypeKey: NotificationType.repeat.name,
-              };
+                final params = {
+                  memIdKey: withOldActMemId,
+                  notificationTypeKey: NotificationType.repeat.name,
+                };
 
-              await scheduleCallback(0, params);
+                await scheduleCallback(0, params);
 
-              if (defaultTargetPlatform == TargetPlatform.android) {
-                expect(initializeCount, equals(1));
-                expect(cancelCount, equals(4));
-                expect(showCount, equals(1));
-              } else {
-                expect(initializeCount, equals(0));
-                expect(cancelCount, equals(0));
-                expect(showCount, equals(0));
-              }
-              widgetTester.clearMockFlutterLocalNotifications();
-            },
-          );
+                if (defaultTargetPlatform == TargetPlatform.android) {
+                  expect(initializeCount, equals(1));
+                  expect(cancelCount, equals(4));
+                  expect(showCount, equals(1));
+                } else {
+                  expect(initializeCount, equals(0));
+                  expect(cancelCount, equals(0));
+                  expect(showCount, equals(0));
+                }
+                widgetTester.clearMockFlutterLocalNotifications();
+              },
+            );
 
-          testWidgets(
-            'withCurrentAct',
-            (widgetTester) async {
-              widgetTester.setMockFlutterLocalNotifications(
-                [],
-              );
+            testWidgets(
+              'withCurrentAct',
+              (widgetTester) async {
+                widgetTester.setMockFlutterLocalNotifications(
+                  [],
+                );
 
-              final params = {
-                memIdKey: withCurrentActMemId,
-                notificationTypeKey: NotificationType.repeat.name,
-              };
+                final params = {
+                  memIdKey: withCurrentActMemId,
+                  notificationTypeKey: NotificationType.repeat.name,
+                };
 
-              await scheduleCallback(0, params);
+                await scheduleCallback(0, params);
 
-              widgetTester.clearMockFlutterLocalNotifications();
-            },
-          );
-        });
+                widgetTester.clearMockFlutterLocalNotifications();
+              },
+            );
+          },
+        );
       },
     );

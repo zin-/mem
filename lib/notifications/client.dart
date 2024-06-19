@@ -134,6 +134,10 @@ class NotificationClient {
           if (mem.isDone || mem.isArchived) {
             cancelMemNotifications(memId);
           } else {
+            final latestAct = await ActRepository().findOneBy(
+              memId: memId,
+              latest: true,
+            );
             final startOfDay =
                 (await _preferenceClient.shipByKey(startOfDayKey)).value ??
                     defaultStartOfDay;
@@ -144,6 +148,8 @@ class NotificationClient {
                 startOfDay,
                 savedMemNotifications ??
                     await _memNotificationRepository.shipByMemId(memId),
+                latestAct,
+                DateTime.now(),
               )
             ]) {
               await _scheduleClient.receive(schedule);
