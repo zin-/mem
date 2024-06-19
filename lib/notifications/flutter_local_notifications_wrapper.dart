@@ -105,6 +105,26 @@ class FlutterLocalNotificationsWrapper {
         () async => await (await _flutterLocalNotificationsPlugin).cancelAll(),
       );
 
+  Future<void> deleteNotificationChannels(
+    Iterable<String> channelIds,
+  ) =>
+      v(
+        () async {
+          final p = (await _flutterLocalNotificationsPlugin)
+              .resolvePlatformSpecificImplementation<
+                  AndroidFlutterLocalNotificationsPlugin>();
+
+          for (var e in channelIds) {
+            await p?.deleteNotificationChannel(e);
+          }
+        },
+// coverage:ignore-start
+        {
+// coverage:ignore-end
+          'channelIds': channelIds,
+        },
+      );
+
   NotificationDetails _buildNotificationDetails(
     NotificationChannel channel,
   ) =>
@@ -119,6 +139,7 @@ class FlutterLocalNotificationsWrapper {
           usesChronometer: channel.usesChronometer,
           ongoing: channel.ongoing,
           autoCancel: channel.autoCancel,
+          playSound: channel.playSound,
         ),
       );
 

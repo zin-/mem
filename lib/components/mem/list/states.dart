@@ -120,14 +120,14 @@ final memListProvider = StateNotifierProvider.autoDispose<
         final now = DateTime.now();
         final comparedTime = _compareTime(
           a.period,
-          MemNotifications.nexRepeatNotifyAt(
+          MemNotifications.nextRepeatNotifyAt(
             memNotificationsOfA,
             startOfDay,
             latestActOfA,
             now,
           ),
           b.period,
-          MemNotifications.nexRepeatNotifyAt(
+          MemNotifications.nextRepeatNotifyAt(
             memNotificationsOfB,
             startOfDay,
             latestActOfB,

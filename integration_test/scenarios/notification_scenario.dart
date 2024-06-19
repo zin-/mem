@@ -17,7 +17,7 @@ import 'package:mem/main.dart';
 import 'package:mem/notifications/client.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/type.dart';
-import 'package:mem/notifications/notification_channels.dart';
+import 'package:mem/notifications/notification_actions.dart';
 import 'package:mem/notifications/notification_ids.dart';
 import 'package:mem/notifications/schedule_client.dart';
 import 'package:mem/values/durations.dart';
@@ -134,10 +134,9 @@ void testNotificationScenario() => group(
                     NotificationResponseType.selectedNotificationAction,
                 id: memStartNotificationId(insertedMemId!),
                 payload: json.encode({memIdKey: insertedMemId}),
-                actionId: NotificationClient()
-                    .notificationChannels
-                    .actionMap[doneMemNotificationActionId]
-                    ?.id,
+                actionId: buildNotificationActions()
+                    .singleWhere((e) => e.id == doneMemNotificationActionId)
+                    .id,
               );
 
               await onNotificationResponseReceived(details);
@@ -188,10 +187,9 @@ void testNotificationScenario() => group(
                     NotificationResponseType.selectedNotificationAction,
                 id: memRepeatedNotificationId(insertedMemId!),
                 payload: json.encode({memIdKey: insertedMemId}),
-                actionId: NotificationClient()
-                    .notificationChannels
-                    .actionMap[startActNotificationActionId]
-                    ?.id,
+                actionId: buildNotificationActions()
+                    .singleWhere((e) => e.id == startActNotificationActionId)
+                    .id,
               );
 
               await onNotificationResponseReceived(details);
@@ -240,10 +238,10 @@ void testNotificationScenario() => group(
                       NotificationResponseType.selectedNotificationAction,
                   id: memRepeatedNotificationId(insertedMemId!),
                   payload: json.encode({memIdKey: insertedMemId}),
-                  actionId: NotificationClient()
-                      .notificationChannels
-                      .actionMap[finishActiveActNotificationActionId]
-                      ?.id,
+                  actionId: buildNotificationActions()
+                      .singleWhere(
+                          (e) => e.id == finishActiveActNotificationActionId)
+                      .id,
                 );
 
                 await onNotificationResponseReceived(details);
@@ -306,10 +304,10 @@ void testNotificationScenario() => group(
                         NotificationResponseType.selectedNotificationAction,
                     id: memRepeatedNotificationId(insertedMemId!),
                     payload: json.encode({memIdKey: insertedMemId}),
-                    actionId: NotificationClient()
-                        .notificationChannels
-                        .actionMap[finishActiveActNotificationActionId]
-                        ?.id,
+                    actionId: buildNotificationActions()
+                        .singleWhere(
+                            (e) => e.id == finishActiveActNotificationActionId)
+                        .id,
                   );
 
                   await onNotificationResponseReceived(details);
@@ -378,10 +376,9 @@ void testNotificationScenario() => group(
                     NotificationResponseType.selectedNotificationAction,
                 id: memRepeatedNotificationId(insertedMemId!),
                 payload: json.encode({memIdKey: insertedMemId}),
-                actionId: NotificationClient()
-                    .notificationChannels
-                    .actionMap[pauseActNotificationActionId]
-                    ?.id,
+                actionId: buildNotificationActions()
+                    .singleWhere((e) => e.id == pauseActNotificationActionId)
+                    .id,
               );
 
               await onNotificationResponseReceived(details);
@@ -411,10 +408,9 @@ void testNotificationScenario() => group(
                       NotificationResponseType.selectedNotificationAction,
                   id: memRepeatedNotificationId(insertedMemId!),
                   payload: json.encode({memIdKey: insertedMemId}),
-                  actionId: NotificationClient()
-                      .notificationChannels
-                      .actionMap[pauseActNotificationActionId]
-                      ?.id,
+                  actionId: buildNotificationActions()
+                      .singleWhere((e) => e.id == pauseActNotificationActionId)
+                      .id,
                 );
 
                 await onNotificationResponseReceived(details);

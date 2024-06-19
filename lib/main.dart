@@ -6,8 +6,8 @@ import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/page.dart';
-import 'package:mem/notifications/client.dart';
 import 'package:mem/notifications/flutter_local_notifications_wrapper.dart';
+import 'package:mem/notifications/notification_actions.dart';
 import 'package:mem/notifications/notification_repository.dart';
 import 'package:mem/framework/repository/database_repository.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
@@ -64,10 +64,11 @@ Future<void> onNotificationResponseReceived(dynamic details) => i(
           (actionId, memId) => v(
             () async {
               if (actionId is String && memId is int) {
-                await NotificationClient()
-                    .notificationChannels
-                    .actionMap[actionId]
-                    ?.onTapped(memId);
+                await buildNotificationActions()
+                    .singleWhere(
+                      (e) => e.id == actionId,
+                    )
+                    .onTapped(memId);
               }
             },
             {

@@ -14,64 +14,50 @@ import 'schedule.dart';
 const memIdKey = 'memId';
 
 class MemNotifications {
-  static Iterable<Schedule> scheduleOf(
+  static Schedule periodicScheduleOf(
     SavedMem savedMem,
     TimeOfDay startOfDay,
     Iterable<SavedMemNotification> memNotifications,
+    Act? latestAct,
+    DateTime now,
   ) =>
       v(
-        () => [
-          ...savedMem.periodSchedules(startOfDay),
-          _memPeriodicSchedule(
-            savedMem.id,
-            memNotifications
+        () => memNotifications
                 .whereType<SavedMemNotification>()
-                .singleWhereOrNull(
-                  (element) => element.isEnabled() && element.isRepeated(),
-                ),
-          ),
-        ],
-        {
-          "savedMem": savedMem,
-          "startOfDay": startOfDay,
-          "memNotifications": memNotifications,
-        },
-      );
-
-  static Schedule _memPeriodicSchedule(
-    int memId,
-    SavedMemNotification? savedRepeatedMemNotifications,
-  ) =>
-      v(
-        () => savedRepeatedMemNotifications == null
-            ? CancelSchedule(memRepeatedNotificationId(memId))
+                .where(
+                  (e) =>
+                      e.isEnabled() &&
+                      (e.isRepeated() ||
+                          e.isRepeatByNDay() ||
+                          e.isRepeatByDayOfWeek()),
+                )
+                .isEmpty
+            ? CancelSchedule(memRepeatedNotificationId(savedMem.id))
             : PeriodicSchedule(
-                memRepeatedNotificationId(memId),
-                DateTime.now()
-                    .copyWith(
-                      hour: 0,
-                      minute: 0,
-                      second: 0,
-                      millisecond: 0,
-                      microsecond: 0,
-                    )
-                    .add(Duration(
-                        seconds: savedRepeatedMemNotifications
-                            // FIXME 永続化されている時点でtimeは必ずあるので型で表現する
-                            .time!)),
+                memRepeatedNotificationId(savedMem.id),
+                nextRepeatNotifyAt(
+                      memNotifications,
+                      startOfDay,
+                      latestAct,
+                      now,
+                    ) ??
+                    now,
                 const Duration(days: 1),
                 {
-                  memIdKey: memId,
+                  memIdKey: savedMem.id,
                   notificationTypeKey: NotificationType.repeat.name,
                 },
               ),
         {
-          "memId": memId,
-          "savedMemNotifications": savedRepeatedMemNotifications,
+          'savedMem': savedMem,
+          'startOfDay': startOfDay,
+          'memNotifications': memNotifications,
+          'latestAct': latestAct,
+          'now': now,
         },
       );
 
-  static DateTime? nexRepeatNotifyAt(
+  static DateTime? nextRepeatNotifyAt(
     Iterable<MemNotification> memNotifications,
     TimeOfDay startOfDay,
     Act? latestAct,
@@ -85,6 +71,7 @@ class MemNotifications {
             return null;
           } else if (memNotifications
               .whereType<SavedMemNotification>()
+              .where((e) => !e.isAfterActStarted())
               .isNotEmpty) {
             final repeatAt = memNotifications
                 .singleWhereOrNull((e) => e.isRepeated() && e.isEnabled())
@@ -114,6 +101,10 @@ class MemNotifications {
                             ?.time ??
                         1,
                   ));
+            }
+
+            while (notifyAt != null && now.compareTo(notifyAt) > 0) {
+              notifyAt = notifyAt.add(const Duration(days: 1));
             }
 
             final daysOfWeek = memNotifications
