@@ -51,13 +51,10 @@ void main() => group(
             },
           );
 
-          await dbA.insert(
-            defTableMems,
-            {
-              defColMemsName.name: plainMemName,
-              defColCreatedAt.name: zeroDate,
-            },
-          );
+          await dbA.insert(defTableMems, {
+            defColMemsName.name: plainMemName,
+            defColCreatedAt.name: zeroDate,
+          });
 
           dbA.insert(defTableActs, {
             defFkActsMemId.name: insertedMemId,
@@ -75,6 +72,8 @@ void main() => group(
             const memWithEveryDayName = "$insertedMemNameBase - every day";
             const memWithTomorrowDayOfWeekName =
                 "$insertedMemNameBase - tomorrow day of week";
+            const memWithTodayFinishedActName =
+                "$insertedMemNameBase - today finished act";
 
             final now = DateTime.now();
 
@@ -122,6 +121,26 @@ void main() => group(
                 defColMemNotificationsMessage.name: "",
                 defColCreatedAt.name: zeroDate,
               });
+              final memWithTodayFinishedActId = await dbA.insert(defTableMems, {
+                defColMemsName.name: memWithTodayFinishedActName,
+                defColCreatedAt.name: zeroDate,
+              });
+              await dbA.insert(defTableMemNotifications, {
+                defFkMemNotificationsMemId.name: memWithTodayFinishedActId,
+                defColMemNotificationsTime.name: 1,
+                defColMemNotificationsType.name:
+                    MemNotificationType.repeatByNDay.name,
+                defColMemNotificationsMessage.name: "",
+                defColCreatedAt.name: zeroDate,
+              });
+              dbA.insert(defTableActs, {
+                defFkActsMemId.name: memWithTodayFinishedActId,
+                defColActsStart.name: now,
+                defColActsStartIsAllDay.name: false,
+                defColActsEnd.name: now,
+                defColActsEndIsAllDay.name: false,
+                defColCreatedAt.name: zeroDate,
+              });
             });
 
             testWidgets(
@@ -136,7 +155,9 @@ void main() => group(
                     widgetTester.textAt(6).data, equals(memWithEveryDayName));
                 expect(widgetTester.textAt(8).data,
                     equals(memWithTomorrowDayOfWeekName));
-                expect(widgetTester.textAt(10).data, equals(plainMemName));
+                expect(widgetTester.textAt(10).data,
+                    equals(memWithTodayFinishedActName));
+                expect(widgetTester.textAt(12).data, equals(plainMemName));
               },
             );
           },
