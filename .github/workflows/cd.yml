@@ -1,0 +1,31 @@
+name: "Continuous Delivery"
+
+on:
+  workflow_run:
+    workflows:
+      - "CI"
+      - "ci"
+      - CI
+    types:
+      - completed
+    branches:
+      - main
+      # FIXME 動作確認のため、マージ前にはmainだけを対象とする
+      - feature/272-delivery
+
+env:
+  flutter-channel: stable
+  #  flutter-version: 3.19.6
+
+jobs:
+  upload_for_android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Flutter doctor"
+        uses: ./.github/actions/flutter-doctor
+        with:
+          flutter-channel: ${{ env.flutter-channel }}
+          flutter-version: ${{ env.flutter-version }}
