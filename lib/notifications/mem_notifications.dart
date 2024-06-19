@@ -70,6 +70,7 @@ class MemNotifications {
             return null;
           } else if (memNotifications
               .whereType<SavedMemNotification>()
+              .where((e) => !e.isAfterActStarted())
               .isNotEmpty) {
             final repeatAt = memNotifications
                 .singleWhereOrNull((e) => e.isRepeated() && e.isEnabled())

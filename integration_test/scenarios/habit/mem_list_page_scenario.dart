@@ -17,18 +17,24 @@ void main() => group(
       _name,
       () {
         const insertedMemNameBase = '$_name: inserted mem - name';
+        const memWithActiveName = "$insertedMemNameBase - active";
+        const plainMemName = "$insertedMemNameBase - plain";
 
         late final DatabaseAccessor dbA;
-        late final int insertedMemId;
 
         setUpAll(() async {
           dbA = await openTestDatabase(databaseDefinition);
+        });
+
+        int? insertedMemId;
+
+        setUp(() async {
           await clearAllTestDatabaseRows(databaseDefinition);
 
           insertedMemId = await dbA.insert(
             defTableMems,
             {
-              defColMemsName.name: "$insertedMemNameBase - active",
+              defColMemsName.name: memWithActiveName,
               defColCreatedAt.name: zeroDate,
             },
           );
@@ -48,14 +54,10 @@ void main() => group(
           await dbA.insert(
             defTableMems,
             {
-              defColMemsName.name: "$insertedMemNameBase - plain",
+              defColMemsName.name: plainMemName,
               defColCreatedAt.name: zeroDate,
             },
           );
-        });
-
-        setUp(() async {
-          await dbA.delete(defTableActs);
 
           dbA.insert(defTableActs, {
             defFkActsMemId.name: insertedMemId,
@@ -64,6 +66,81 @@ void main() => group(
             defColCreatedAt.name: zeroDate,
           });
         });
+
+        group(
+          'show',
+          () {
+            const memWithStartName = "$insertedMemNameBase - start";
+            const memWithAfterStartName = "$insertedMemNameBase - after start";
+            const memWithEveryDayName = "$insertedMemNameBase - every day";
+            const memWithTomorrowDayOfWeekName =
+                "$insertedMemNameBase - tomorrow day of week";
+
+            final now = DateTime.now();
+
+            setUp(() async {
+              await dbA.insert(defTableMems, {
+                defColMemsName.name: memWithStartName,
+                defColMemsStartOn.name: now,
+                defColCreatedAt.name: zeroDate,
+              });
+              final memWithAfterStartId = await dbA.insert(defTableMems, {
+                defColMemsName.name: memWithAfterStartName,
+                defColCreatedAt.name: zeroDate,
+              });
+              await dbA.insert(defTableMemNotifications, {
+                defFkMemNotificationsMemId.name: memWithAfterStartId,
+                defColMemNotificationsTime.name: 3600,
+                defColMemNotificationsType.name:
+                    MemNotificationType.afterActStarted.name,
+                defColMemNotificationsMessage.name: "",
+                defColCreatedAt.name: zeroDate,
+              });
+              final memWithEveryDayId = await dbA.insert(defTableMems, {
+                defColMemsName.name: memWithEveryDayName,
+                defColCreatedAt.name: zeroDate,
+              });
+              await dbA.insert(defTableMemNotifications, {
+                defFkMemNotificationsMemId.name: memWithEveryDayId,
+                defColMemNotificationsTime.name: 1,
+                defColMemNotificationsType.name:
+                    MemNotificationType.repeatByNDay.name,
+                defColMemNotificationsMessage.name: "",
+                defColCreatedAt.name: zeroDate,
+              });
+              final memWithTomorrowDayOfWeekId =
+                  await dbA.insert(defTableMems, {
+                defColMemsName.name: memWithTomorrowDayOfWeekName,
+                defColCreatedAt.name: zeroDate,
+              });
+              await dbA.insert(defTableMemNotifications, {
+                defFkMemNotificationsMemId.name: memWithTomorrowDayOfWeekId,
+                defColMemNotificationsTime.name:
+                    now.add(const Duration(days: 1)).weekday,
+                defColMemNotificationsType.name:
+                    MemNotificationType.repeatByDayOfWeek.name,
+                defColMemNotificationsMessage.name: "",
+                defColCreatedAt.name: zeroDate,
+              });
+            });
+
+            testWidgets(
+              'sorted.',
+              (widgetTester) async {
+                await runApplication();
+                await widgetTester.pumpAndSettle(waitSideEffectDuration);
+
+                expect(widgetTester.textAt(0).data, equals(memWithActiveName));
+                expect(widgetTester.textAt(3).data, equals(memWithStartName));
+                expect(
+                    widgetTester.textAt(6).data, equals(memWithEveryDayName));
+                expect(widgetTester.textAt(8).data,
+                    equals(memWithTomorrowDayOfWeekName));
+                expect(widgetTester.textAt(10).data, equals(plainMemName));
+              },
+            );
+          },
+        );
 
         group(
           'act',
