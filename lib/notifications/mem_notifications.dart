@@ -102,6 +102,10 @@ class MemNotifications {
                   ));
             }
 
+            while (notifyAt != null && now.compareTo(notifyAt) > 0) {
+              notifyAt = notifyAt.add(const Duration(days: 1));
+            }
+
             final daysOfWeek = memNotifications
                 .where((e) => e.isRepeatByDayOfWeek() && e.isEnabled());
 
