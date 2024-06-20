@@ -1,17 +1,18 @@
 name: "Continuous Delivery"
 
 on:
-  workflow_run:
-    workflows:
-      - "CI"
-      - "ci"
-      - CI
-    types:
-      - completed
-    branches:
-      - main
-      # FIXME 動作確認のため、マージ前にはmainだけを対象とする
-      - feature/272-delivery
+  push:
+#  workflow_run:
+#    workflows:
+#      - "CI"
+#      - "ci"
+#      - CI
+#    types:
+#      - completed
+#    branches:
+#      - main
+#      # FIXME 動作確認のため、マージ前にはmainだけを対象とする
+#      - feature/272-delivery
 
 env:
   flutter-channel: stable
@@ -29,3 +30,24 @@ jobs:
         with:
           flutter-channel: ${{ env.flutter-channel }}
           flutter-version: ${{ env.flutter-version }}
+
+      - name: "Set up Java and Gradle"
+        uses: ./.github/actions/set_up-java-and-gradle
+        with:
+          java-distribution: zulu
+          java-version: 17
+
+      - name: "Create jks"
+        run: echo -n ${{ secrets.ANDROID_KEY_JKS }} | base64 -d > android/mem.jks
+
+      - name: "Create key.properties"
+        run: |
+          echo 'storeFile=../mem.jks' > android/key.properties
+          echo 'storePassword=${{ secrets.ANDROID_STORE_PASSWORD }}' >> android/key.properties
+          echo 'keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}' >> android/key.properties
+          echo 'keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}' >> android/key.properties
+
+      - name: "Build Android AppBundle"
+        run: flutter build appbundle --build-number ${GITHUB_RUN_NUMBER}
+
+      - run: ls ./build/app/outputs/bundle/release
