@@ -50,4 +50,14 @@ jobs:
       - name: "Build Android AppBundle"
         run: flutter build appbundle --build-number ${GITHUB_RUN_NUMBER}
 
-      - run: ls ./build/app/outputs/bundle/release
+      - name: "Create Service account key"
+        run: echo -n ${{ secrets.SERVICE_ACCOUNT_KEY_JSON }} | base64 -d > service-account-key.json
+
+      - name: "Upload to Google play"
+        uses: r0adkll/upload-google-play@v1.1.3
+        with:
+          releaseFiles: build/app/outputs/bundle/release/app-release.aab
+          serviceAccountJson: service-account-key.json
+          packageName: zin.playground.mem
+          track: internal
+          status: draft
