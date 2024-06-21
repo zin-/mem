@@ -10,6 +10,7 @@ AbstractSettingsSection buildBackupSection(BuildContext context) => v(
         title: Text(buildL10n(context).backupLabel),
         tiles: [
           _buildGenerateBackupTile(context),
+          _buildRestoreBackupTile(context),
         ],
       ),
       {'context': context},
@@ -23,30 +24,30 @@ AbstractSettingsTile _buildGenerateBackupTile(BuildContext context) => v(
           () {
             BackupClient()
                 .createBackup()
-                .whenComplete(
-                  () => v(
-                    () => Navigator.of(context).pop(),
-                  ),
-                )
-                .then(
-                  (result) => v(
+                .whenComplete(() => v(() => Navigator.of(context).pop()))
+                .then((result) => v(
                     () => ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(result.toString()),
-                      ),
-                    ),
-                    {
-                      "result": result,
-                    },
-                  ),
-                );
+                        SnackBar(content: Text(result.toString()))),
+                    {"result": result}));
 
             showGeneralDialog(
-              context: context,
-              pageBuilder: (context, animation, secondaryAnimation) =>
-                  const Center(child: CircularProgressIndicator()),
-            );
+                context: context,
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const Center(child: CircularProgressIndicator()));
           },
+          {'context': context},
+        ),
+      ),
+      {'context': context},
+    );
+
+AbstractSettingsTile _buildRestoreBackupTile(BuildContext context) => v(
+      () => SettingsTile.navigation(
+        leading: const Icon(Icons.settings_backup_restore),
+        title: Text(buildL10n(context).restoreBackupLabel),
+        onPressed: (context) => v(
+          () {},
+          {'context': context},
         ),
       ),
       {'context': context},

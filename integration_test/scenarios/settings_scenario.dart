@@ -236,6 +236,20 @@ void main() => group(
                 expect(find.text(result!), findsOneWidget);
               },
             );
+
+            testWidgets(
+              'restore.',
+              (widgetTester) async {
+                await runApplication();
+                await widgetTester.pumpAndSettle();
+
+                await _openDrawer(widgetTester);
+                await _showPage(widgetTester);
+
+                await widgetTester.tap(find.text(l10n.restoreBackupLabel));
+                await widgetTester.pump();
+              },
+            );
           },
         );
 
