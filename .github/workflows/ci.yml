@@ -6,8 +6,7 @@ on:
 
 env:
   flutter-channel: stable
-  # FIXME https://github.com/zin-/mem/issues/339
-#  flutter-version: 3.19.6
+  #  flutter-version: 3.19.6
 
 jobs:
   set_up-env:
