@@ -1,18 +1,13 @@
 name: "Continuous Delivery"
 
 on:
-  push:
-#  workflow_run:
-#    workflows:
-#      - "CI"
-#      - "ci"
-#      - CI
-#    types:
-#      - completed
-#    branches:
-#      - main
-#      # FIXME 動作確認のため、マージ前にはmainだけを対象とする
-#      - feature/272-delivery
+  workflow_run:
+    workflows:
+      - CI
+    types:
+      - completed
+    branches:
+      - main
 
 env:
   flutter-channel: stable
