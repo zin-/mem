@@ -224,7 +224,7 @@ void main() => group(
                 await _openDrawer(widgetTester);
                 await _showPage(widgetTester);
 
-                await widgetTester.tap(find.text(l10n.backupLabel));
+                await widgetTester.tap(find.text(l10n.createBackupLabel));
                 await widgetTester.pump();
 
                 expect(find.byType(CircularProgressIndicator), findsOneWidget);

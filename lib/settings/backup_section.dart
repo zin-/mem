@@ -5,43 +5,49 @@ import 'package:settings_ui/settings_ui.dart';
 
 import 'backup_client.dart';
 
-AbstractSettingsTile buildGenerateBackupTile(BuildContext context) => v(
-      () {
-        final l10n = buildL10n(context);
+AbstractSettingsSection buildBackupSection(BuildContext context) => v(
+      () => SettingsSection(
+        title: Text(buildL10n(context).backupLabel),
+        tiles: [
+          _buildGenerateBackupTile(context),
+        ],
+      ),
+      {'context': context},
+    );
 
-        return SettingsTile.navigation(
-          leading: const Icon(Icons.backup),
-          title: Text(l10n.backupLabel),
-          onPressed: (context) => v(
-            () {
-              BackupClient()
-                  .createBackup()
-                  .whenComplete(
-                    () => v(
-                      () => Navigator.of(context).pop(),
-                    ),
-                  )
-                  .then(
-                    (result) => v(
-                      () => ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(result.toString()),
-                        ),
+AbstractSettingsTile _buildGenerateBackupTile(BuildContext context) => v(
+      () => SettingsTile.navigation(
+        leading: const Icon(Icons.backup),
+        title: Text(buildL10n(context).createBackupLabel),
+        onPressed: (context) => v(
+          () {
+            BackupClient()
+                .createBackup()
+                .whenComplete(
+                  () => v(
+                    () => Navigator.of(context).pop(),
+                  ),
+                )
+                .then(
+                  (result) => v(
+                    () => ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(result.toString()),
                       ),
-                      {
-                        "result": result,
-                      },
                     ),
-                  );
+                    {
+                      "result": result,
+                    },
+                  ),
+                );
 
-              showGeneralDialog(
-                context: context,
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    const Center(child: CircularProgressIndicator()),
-              );
-            },
-          ),
-        );
-      },
+            showGeneralDialog(
+              context: context,
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  const Center(child: CircularProgressIndicator()),
+            );
+          },
+        ),
+      ),
       {'context': context},
     );

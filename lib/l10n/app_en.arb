@@ -67,6 +67,7 @@
 
   "startOfDayLabel": "Start of day",
   "backupLabel": "Backup",
+  "createBackupLabel": "Create",
   "resetNotificationLabel": "Reset Notification",
   "completeResetNotification": "Complete Reset Notification",
 
