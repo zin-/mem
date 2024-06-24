@@ -52,6 +52,10 @@ final startIconFinder = find.byIcon(Icons.play_arrow);
 final stopIconFinder = find.byIcon(Icons.stop);
 final okFinder = find.text('OK');
 final cancelFinder = find.text('Cancel');
+final drawerIconFinder = find.descendant(
+    of: find.descendant(
+        of: find.byType(AppBar), matching: find.byType(IconButton)),
+    matching: find.byType(DrawerButtonIcon));
 
 //  On MemList filter
 final showNotArchiveSwitchFinder = find.byType(Switch).at(0);
