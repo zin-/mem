@@ -23,4 +23,24 @@ class BackupClient {
         () async => await _filesClient.saveOrShare((await _databaseRepository
             .shipFileByNameIs(databaseDefinition.name))!),
       );
+
+  Future<Object?> restore() => v(
+        () async {
+          final pickedFiles = await _filesClient.pick();
+
+          // if (pickedFiles != null &&
+          //     pickedFiles.isNotEmpty &&
+          //     pickedFiles.length == 1) {
+          //   final picked = pickedFiles.single;
+          //   // TODO check file name
+          //   //  DBの形式なのかとかも見たほうがよいかも？
+          //   //  名前より、配置して読み込んでみてアクセスできそうかを見たほうが良いかも
+          //   // TODO 元のファイルを日時付きで名前変更して置いておく？
+          //   //  で、新しいファイルを通常の名前にして置き換えるか
+          //   return picked.name;
+          // }
+
+          return pickedFiles;
+        },
+      );
 }

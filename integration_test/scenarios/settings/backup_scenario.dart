@@ -94,19 +94,36 @@ void main() => group(
           },
         );
 
-        testWidgets(
-          'restore.',
-          (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+        group(
+          'restore',
+          () {
+            testWidgets(
+              'pick nothing.',
+              (widgetTester) async {
+                // widgetTester.setMockMethodCallHandler(
+                //   MethodChannelMock.filePicker,
+                //   [
+                //     (m) async {
+                //       expect(m.method, 'any');
+                //       return null;
+                //     }
+                //   ],
+                // );
 
-            await widgetTester.tap(drawerIconFinder);
-            await widgetTester.pumpAndSettle();
-            await widgetTester.tap(find.text(l10n.settingsPageTitle));
-            await widgetTester.pumpAndSettle();
+                await runApplication();
+                await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.text(l10n.restoreBackupLabel));
-            await widgetTester.pump();
+                await widgetTester.tap(drawerIconFinder);
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(find.text(l10n.settingsPageTitle));
+                await widgetTester.pumpAndSettle();
+
+                await widgetTester.tap(find.text(l10n.restoreBackupLabel));
+                await widgetTester.pump();
+
+                expect(find.text(l10n.canceledRestoreBackup), findsOneWidget);
+              },
+            );
           },
         );
       },

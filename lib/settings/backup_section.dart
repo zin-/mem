@@ -46,7 +46,28 @@ AbstractSettingsTile _buildRestoreBackupTile(BuildContext context) => v(
         leading: const Icon(Icons.settings_backup_restore),
         title: Text(buildL10n(context).restoreBackupLabel),
         onPressed: (context) => v(
-          () {},
+          () async {
+            showGeneralDialog(
+              context: context,
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  const Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+
+            await BackupClient().restore();
+
+            if (context.mounted) {
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    buildL10n(context).canceledRestoreBackup,
+                  ),
+                ),
+              );
+            }
+          },
           {'context': context},
         ),
       ),

@@ -69,6 +69,7 @@
   "backupLabel": "Backup",
   "createBackupLabel": "Create",
   "restoreBackupLabel": "Restore",
+  "canceledRestoreBackup": "Canceled restore backup.",
   "resetNotificationLabel": "Reset Notification",
   "completeResetNotification": "Complete Reset Notification",
 

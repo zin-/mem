@@ -13,6 +13,11 @@ class FilesClient {
 
   factory FilesClient() => _instance ??= FilesClient._();
 
+  // Future<List<XFile>?> pick() => v(
+  //       () async => (await FilePicker.platform.pickFiles())?.xFiles,
+  //     );
+  Future<List<XFile>?> pick() => v(() async => null);
+
   Future<String> saveOrShare(File file) => v(
         () async {
           switch (defaultTargetPlatform) {
