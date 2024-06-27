@@ -100,15 +100,15 @@ void main() => group(
             testWidgets(
               'pick nothing.',
               (widgetTester) async {
-                // widgetTester.setMockMethodCallHandler(
-                //   MethodChannelMock.filePicker,
-                //   [
-                //     (m) async {
-                //       expect(m.method, 'any');
-                //       return null;
-                //     }
-                //   ],
-                // );
+                widgetTester.setMockMethodCallHandler(
+                  MethodChannelMock.filePicker,
+                  [
+                    (m) async {
+                      expect(m.method, 'any');
+                      return null;
+                    }
+                  ],
+                );
 
                 await runApplication();
                 await widgetTester.pumpAndSettle();

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:path/path.dart';
@@ -13,10 +14,9 @@ class FilesClient {
 
   factory FilesClient() => _instance ??= FilesClient._();
 
-  // Future<List<XFile>?> pick() => v(
-  //       () async => (await FilePicker.platform.pickFiles())?.xFiles,
-  //     );
-  Future<List<XFile>?> pick() => v(() async => null);
+  Future<List<XFile>?> pick() => v(
+        () async => (await FilePicker.platform.pickFiles())?.xFiles,
+      );
 
   Future<String> saveOrShare(File file) => v(
         () async {
