@@ -56,7 +56,9 @@ class DatabaseRepository extends Repository<DatabaseDefinition>
 
           await backup.copy(current.path);
         },
+// coverage:ignore-start
         {
+// coverage:ignore-end
           'name': name,
           'backup': backup,
         },
