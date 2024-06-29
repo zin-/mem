@@ -93,7 +93,6 @@ void main() => group(
             expect(find.byType(CircularProgressIndicator), findsNothing);
             expect(find.text(result!), findsOneWidget);
           },
-          skip: true,
         );
 
         if (defaultTargetPlatform != TargetPlatform.windows) {
