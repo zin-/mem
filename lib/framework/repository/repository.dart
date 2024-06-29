@@ -24,9 +24,6 @@ abstract class Repository<E extends Entity> {}
 mixin Receiver<E extends Entity, Result> on Repository<E> {
   Future<Result> receive(E entity);
 }
-mixin Replacer<E extends Entity> on Repository<E> {
-  Future<E> replace(E entity);
-}
 
 // FIXME 型指定は不要なはずなので、おかしい？（間違っている気がする
 //  というか、mixinの利用自体がなんか変なので辞めたほうが良いかも
