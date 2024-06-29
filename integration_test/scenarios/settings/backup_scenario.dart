@@ -163,9 +163,10 @@ void main() => group(
                   await widgetTester.pumpAndSettle();
 
                   await widgetTester.tap(find.text(l10n.restoreBackupLabel));
-                  await widgetTester.pump();
+                  await widgetTester.pumpAndSettle();
 
-                  expect(find.text(l10n.canceledRestoreBackup), findsOneWidget);
+                  expect(find.text(l10n.completedRestoreBackup(backupFileName)),
+                      findsOneWidget);
                 },
               );
             },

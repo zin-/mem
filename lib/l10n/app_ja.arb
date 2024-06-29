@@ -70,6 +70,7 @@
   "createBackupLabel": "作成",
   "restoreBackupLabel": "復元",
   "canceledRestoreBackup": "バックアップからの復元をキャンセルしました",
+  "completedRestoreBackup": "'{backupFileName}'から復元しました",
   "resetNotificationLabel": "Reset Notification",
   "completeResetNotification": "Complete Reset Notification",
 

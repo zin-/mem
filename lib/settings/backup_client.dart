@@ -26,7 +26,7 @@ class BackupClient {
             .shipFileByNameIs(databaseDefinition.name))!),
       );
 
-  Future<Object?> restore() => v(
+  Future<String?> restore() => v(
         () async {
           final pickedFiles = await _filesClient.pick();
 
@@ -41,7 +41,7 @@ class BackupClient {
             return pickedFile.name;
           }
 
-          return pickedFiles;
+          return null;
         },
       );
 }

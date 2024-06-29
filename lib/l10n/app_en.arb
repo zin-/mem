@@ -70,6 +70,7 @@
   "createBackupLabel": "Create",
   "restoreBackupLabel": "Restore",
   "canceledRestoreBackup": "Canceled restore backup.",
+  "completedRestoreBackup": "Completed restore backup by '{backupFileName}'.",
   "resetNotificationLabel": "Reset Notification",
   "completeResetNotification": "Complete Reset Notification",
 

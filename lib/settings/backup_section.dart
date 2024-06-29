@@ -55,14 +55,17 @@ AbstractSettingsTile _buildRestoreBackupTile(BuildContext context) => v(
               ),
             );
 
-            await BackupClient().restore();
+            final backupFileName = await BackupClient().restore();
 
             if (context.mounted) {
               Navigator.of(context).pop();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    buildL10n(context).canceledRestoreBackup,
+                    backupFileName == null
+                        ? buildL10n(context).canceledRestoreBackup
+                        : buildL10n(context)
+                            .completedRestoreBackup(backupFileName),
                   ),
                 ),
               );
