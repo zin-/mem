@@ -4,7 +4,7 @@ description: Manage any.
 publish_to: 'none'
 
 # FIXME https://github.com/zin-/mem/issues/321
-version: 0.3.2
+version: 0.4.0
 
 environment:
   sdk: ">=3.4.0 <4.0.0"
