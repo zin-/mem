@@ -1,7 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/base.dart';
@@ -15,11 +14,9 @@ import 'package:mem/notifications/notification_ids.dart';
 import 'package:mem/settings/client.dart';
 import 'package:mem/settings/preference.dart';
 import 'package:mem/settings/keys.dart';
-import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart';
 import 'package:settings_ui/settings_ui.dart';
 
-import 'helpers.dart';
+import '../helpers.dart';
 
 const _scenarioName = "Settings test";
 
@@ -70,7 +67,8 @@ void main() => group(
 
             expect(find.byType(AppBar), findsOneWidget);
 
-            await _openDrawer(widgetTester);
+            await widgetTester.tap(drawerIconFinder);
+            await widgetTester.pumpAndSettle();
 
             expect(find.byIcon(Icons.settings), findsOneWidget);
             await widgetTester.tap(find.text(l10n.settingsPageTitle));
@@ -99,8 +97,10 @@ void main() => group(
                 await runApplication();
                 await widgetTester.pumpAndSettle();
 
-                await _openDrawer(widgetTester);
-                await _showPage(widgetTester);
+                await widgetTester.tap(drawerIconFinder);
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(find.text(l10n.settingsPageTitle));
+                await widgetTester.pumpAndSettle();
 
                 final now = DateTime.now();
                 await widgetTester.tap(find.text(l10n.startOfDayLabel));
@@ -144,8 +144,10 @@ void main() => group(
                     await runApplication();
                     await widgetTester.pumpAndSettle();
 
-                    await _openDrawer(widgetTester);
-                    await _showPage(widgetTester);
+                    await widgetTester.tap(drawerIconFinder);
+                    await widgetTester.pumpAndSettle();
+                    await widgetTester.tap(find.text(l10n.settingsPageTitle));
+                    await widgetTester.pumpAndSettle();
 
                     expect(
                       widgetTester
@@ -167,8 +169,10 @@ void main() => group(
                     await runApplication();
                     await widgetTester.pumpAndSettle();
 
-                    await _openDrawer(widgetTester);
-                    await _showPage(widgetTester);
+                    await widgetTester.tap(drawerIconFinder);
+                    await widgetTester.pumpAndSettle();
+                    await widgetTester.tap(find.text(l10n.settingsPageTitle));
+                    await widgetTester.pumpAndSettle();
 
                     await widgetTester.tap(find.text(l10n.startOfDayLabel));
                     await widgetTester.pumpAndSettle();
@@ -183,57 +187,6 @@ void main() => group(
                     );
                   },
                 );
-              },
-            );
-          },
-        );
-
-        group(
-          "Backup",
-          () {
-            testWidgets(
-              "create.",
-              retry: 3,
-              (widgetTester) async {
-                String? result;
-                switch (defaultTargetPlatform) {
-                  case TargetPlatform.android:
-                    widgetTester.binding.defaultBinaryMessenger
-                        .setMockMethodCallHandler(
-                      const MethodChannel("dev.fluttercommunity.plus/share"),
-                      (message) async {
-                        await Future.delayed(const Duration(milliseconds: 500));
-                        expect(message.method, equals("shareFilesWithResult"));
-                        return result = "Success.";
-                      },
-                    );
-                    break;
-
-                  case TargetPlatform.windows:
-                    final downloadsDirectory = await getDownloadsDirectory();
-                    result = path.join(downloadsDirectory!.path, "test_mem.db");
-                    break;
-
-                  default:
-                    throw UnimplementedError();
-                }
-
-                await runApplication();
-                await widgetTester.pumpAndSettle();
-
-                await _openDrawer(widgetTester);
-                await _showPage(widgetTester);
-
-                await widgetTester.tap(find.text(l10n.backupLabel));
-                await widgetTester.pump();
-
-                expect(find.byType(CircularProgressIndicator), findsOneWidget);
-
-                await widgetTester
-                    .pumpAndSettle(const Duration(milliseconds: 1500));
-
-                expect(find.byType(CircularProgressIndicator), findsNothing);
-                expect(find.text(result!), findsOneWidget);
               },
             );
           },
@@ -298,8 +251,10 @@ void main() => group(
             await runApplication();
             await widgetTester.pumpAndSettle();
 
-            await _openDrawer(widgetTester);
-            await _showPage(widgetTester);
+            await widgetTester.tap(drawerIconFinder);
+            await widgetTester.pumpAndSettle();
+            await widgetTester.tap(find.text(l10n.settingsPageTitle));
+            await widgetTester.pumpAndSettle();
 
             await widgetTester.tap(find.text(l10n.resetNotificationLabel));
             await widgetTester.pump();
@@ -335,21 +290,3 @@ void main() => group(
         );
       },
     );
-
-Future<void> _openDrawer(WidgetTester widgetTester) async {
-  await widgetTester.tap(
-    find.descendant(
-      of: find.descendant(
-        of: find.byType(AppBar),
-        matching: find.byType(IconButton),
-      ),
-      matching: find.byType(DrawerButtonIcon),
-    ),
-  );
-  await widgetTester.pumpAndSettle();
-}
-
-Future<void> _showPage(WidgetTester widgetTester) async {
-  await widgetTester.tap(find.text(l10n.settingsPageTitle));
-  await widgetTester.pumpAndSettle();
-}

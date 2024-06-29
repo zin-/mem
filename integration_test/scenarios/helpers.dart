@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -52,6 +53,10 @@ final startIconFinder = find.byIcon(Icons.play_arrow);
 final stopIconFinder = find.byIcon(Icons.stop);
 final okFinder = find.text('OK');
 final cancelFinder = find.text('Cancel');
+final drawerIconFinder = find.descendant(
+    of: find.descendant(
+        of: find.byType(AppBar), matching: find.byType(IconButton)),
+    matching: find.byType(DrawerButtonIcon));
 
 //  On MemList filter
 final showNotArchiveSwitchFinder = find.byType(Switch).at(0);
@@ -113,6 +118,26 @@ extension TextAt on WidgetTester {
   Text textAt(int index) => widget<Text>(find.byType(Text).at(index));
 }
 
+enum MethodChannelMock {
+  filePicker,
+}
+
+extension Method on MethodChannelMock {
+  MethodChannel channel() {
+    switch (this) {
+      case MethodChannelMock.filePicker:
+        return MethodChannel(
+          'miguelruivo.flutter.plugins.filepicker',
+          defaultTargetPlatform == TargetPlatform.linux ||
+                  defaultTargetPlatform == TargetPlatform.windows ||
+                  defaultTargetPlatform == TargetPlatform.macOS
+              ? const JSONMethodCodec()
+              : const StandardMethodCodec(),
+        );
+    }
+  }
+}
+
 extension HandleMockMethodCallHandler on WidgetTester {
   static const androidAlarmManagerChannel = AndroidAlarmManager.channel;
   static const flutterLocalNotificationsChannel =
@@ -135,6 +160,13 @@ extension HandleMockMethodCallHandler on WidgetTester {
 
   void clearMockFlutterLocalNotifications() => binding.defaultBinaryMessenger
       .setMockMethodCallHandler(flutterLocalNotificationsChannel, null);
+
+  void setMockMethodCallHandler(
+    MethodChannelMock methodChannelMock,
+    List<Future<Object?>? Function(MethodCall message)?> expectedMethodCallList,
+  ) =>
+      _setMockMethodCallHandler(
+          methodChannelMock.channel(), expectedMethodCallList);
 
   void _setMockMethodCallHandler(
     MethodChannel methodChannel,

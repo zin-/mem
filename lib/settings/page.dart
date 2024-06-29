@@ -4,7 +4,7 @@ import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/client.dart';
 import 'package:mem/settings/actions.dart';
-import 'package:mem/settings/backup_client.dart';
+import 'package:mem/settings/backup_section.dart';
 import 'package:mem/settings/keys.dart';
 import 'package:mem/settings/states.dart';
 import 'package:settings_ui/settings_ui.dart';
@@ -57,10 +57,10 @@ class _SettingsPage extends StatelessWidget {
                         _startOfDay,
                         _onStartOfDayChanged,
                       ),
-                      _buildBackup(l10n.backupLabel),
                       _buildResetNotification(l10n.resetNotificationLabel),
                     ],
-                  )
+                  ),
+                  buildBackupSection(context),
                 ],
               ),
             ),
@@ -88,45 +88,6 @@ SettingsTile _buildStartOfDay(
         ),
       ),
       value: startOfDay == null ? null : Text(startOfDay.format(context)),
-    );
-
-SettingsTile _buildBackup(
-  String title,
-) =>
-    SettingsTile.navigation(
-      leading: const Icon(Icons.backup),
-      title: Text(title),
-      onPressed: (context) => v(
-        () {
-          BackupClient()
-              .createBackup()
-              .whenComplete(
-                () => v(
-                  () => Navigator.of(context).pop(),
-                ),
-              )
-              .then(
-                (result) => v(
-                  () => ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(result.toString()),
-                    ),
-                  ),
-                  {
-                    "result": result,
-                  },
-                ),
-              );
-
-          showGeneralDialog(
-            context: context,
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                const Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        },
-      ),
     );
 
 SettingsTile _buildResetNotification(

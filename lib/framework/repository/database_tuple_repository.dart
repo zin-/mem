@@ -214,6 +214,13 @@ abstract class DatabaseTupleRepository<E extends EntityV1,
         id,
       );
 
+  static Future<void> close() => v(
+        () async {
+          await _databaseAccessor?.close();
+          _databaseAccessor = null;
+        },
+      );
+
   static DatabaseAccessor? _databaseAccessor;
 
   static set databaseAccessor(DatabaseAccessor? databaseAccessor) =>
