@@ -119,5 +119,9 @@ class DatabaseAccessor {
         ],
       );
 
+  Future<void> close() => v(
+        () async => await _nativeDatabase.close(),
+      );
+
   DatabaseAccessor(this._nativeDatabase);
 }

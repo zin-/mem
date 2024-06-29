@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:mem/settings/files_client.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/framework/repository/database_repository.dart';
@@ -28,17 +30,16 @@ class BackupClient {
         () async {
           final pickedFiles = await _filesClient.pick();
 
-          // if (pickedFiles != null &&
-          //     pickedFiles.isNotEmpty &&
-          //     pickedFiles.length == 1) {
-          //   final picked = pickedFiles.single;
-          //   // TODO check file name
-          //   //  DBの形式なのかとかも見たほうがよいかも？
-          //   //  名前より、配置して読み込んでみてアクセスできそうかを見たほうが良いかも
-          //   // TODO 元のファイルを日時付きで名前変更して置いておく？
-          //   //  で、新しいファイルを通常の名前にして置き換えるか
-          //   return picked.name;
-          // }
+          if (pickedFiles != null && pickedFiles.length == 1) {
+            final pickedFile = pickedFiles.single;
+            // FIXME とりあえず.dbファイルを置き換えているだけ
+            //  対象ファイルが不正だった場合などを考慮していない
+            //  置き換え後、repositoryなどの再読み込みが必要かもしれないが考慮していない
+            await _databaseRepository.replace(
+                databaseDefinition.name, File(pickedFile.path));
+
+            return pickedFile.name;
+          }
 
           return pickedFiles;
         },

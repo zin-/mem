@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:mem/framework/repository/database_tuple_repository.dart';
+import 'package:path/path.dart';
 
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/definition/database_definition.dart';
@@ -39,6 +41,24 @@ class DatabaseRepository extends Repository<DatabaseDefinition>
         },
         {
           "name": name,
+        },
+      );
+
+  Future<void> replace(String name, File backup) => v(
+        () async {
+          await DatabaseTupleRepository.close();
+
+          final current = (await shipFileByNameIs(name))!;
+
+          final currentName = basename(current.path);
+          await current.rename(
+              current.path.replaceFirst(currentName, "past-$currentName"));
+
+          await backup.copy(current.path);
+        },
+        {
+          'name': name,
+          'backup': backup,
         },
       );
 }
