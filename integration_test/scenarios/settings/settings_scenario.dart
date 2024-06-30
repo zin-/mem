@@ -8,7 +8,7 @@ import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/logger/log.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/notifications/client.dart';
+import 'package:mem/notifications/notification_client.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/notifications/notification_ids.dart';
 import 'package:mem/settings/client.dart';

@@ -13,7 +13,7 @@ import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/mems/detail/fab.dart';
 import 'package:mem/mems/detail/notifications/mem_notifications_view.dart';
 import 'package:mem/mems/detail/notifications/mem_repeat_by_n_day_notification_view.dart';
-import 'package:mem/notifications/client.dart';
+import 'package:mem/notifications/notification_client.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/notifications/notification_ids.dart';

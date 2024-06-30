@@ -6,7 +6,7 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
 
-import 'client.dart';
+import 'notification_client.dart';
 import 'notification/type.dart';
 import 'notification_ids.dart';
 import 'schedule.dart';

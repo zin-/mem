@@ -2,7 +2,7 @@ import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
 import 'package:mem/notifications/android_alarm_manager_wrapper.dart';
-import 'package:mem/notifications/client.dart';
+import 'package:mem/notifications/notification_client.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/notifications/schedule.dart';
