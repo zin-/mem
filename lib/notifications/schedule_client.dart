@@ -72,6 +72,7 @@ class ScheduleClient extends Repository<Schedule>
       );
 }
 
+@pragma('vm:entry-point')
 Future<void> scheduleCallback(int id, Map<String, dynamic> params) => i(
       () async {
         await openDatabase();
