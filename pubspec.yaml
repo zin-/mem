@@ -60,6 +60,9 @@ dependencies:
   day_picker: ^2.2.0
   file_picker: ^8.0.5
 
+  # for Permissions
+  permission_handler: ^11.3.1
+
 dev_dependencies:
   # for Test mock
   test:
