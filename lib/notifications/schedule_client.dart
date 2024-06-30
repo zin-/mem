@@ -6,6 +6,8 @@ import 'package:mem/notifications/notification_client.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/notifications/schedule.dart';
+import 'package:mem/permissions/permission.dart';
+import 'package:mem/permissions/permission_handler_wrapper.dart';
 
 class ScheduleClient extends Repository<Schedule>
     with Receiver<Schedule, void> {
@@ -42,23 +44,25 @@ class ScheduleClient extends Repository<Schedule>
   @override
   Future<void> receive(Schedule entity) => v(
         () async {
-          if (entity is PeriodicSchedule) {
-            await _androidAlarmManagerWrapper.periodic(
-              entity.duration,
-              entity.id,
-              _scheduleCallback,
-              entity.startAt,
-              entity.params,
-            );
-          } else if (entity is TimedSchedule) {
-            await _androidAlarmManagerWrapper.oneShotAt(
-              entity.startAt,
-              entity.id,
-              _scheduleCallback,
-              entity.params,
-            );
-          } else if (entity is CancelSchedule) {
-            await discard(entity.id);
+          if (await PermissionHandlerWrapper().grant(Permission.notification)) {
+            if (entity is PeriodicSchedule) {
+              await _androidAlarmManagerWrapper.periodic(
+                entity.duration,
+                entity.id,
+                _scheduleCallback,
+                entity.startAt,
+                entity.params,
+              );
+            } else if (entity is TimedSchedule) {
+              await _androidAlarmManagerWrapper.oneShotAt(
+                entity.startAt,
+                entity.id,
+                _scheduleCallback,
+                entity.params,
+              );
+            } else if (entity is CancelSchedule) {
+              await discard(entity.id);
+            }
           }
         },
         {
