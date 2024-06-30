@@ -120,6 +120,7 @@ extension TextAt on WidgetTester {
 
 enum MethodChannelMock {
   filePicker,
+  permissionHandler,
 }
 
 extension Method on MethodChannelMock {
@@ -134,6 +135,8 @@ extension Method on MethodChannelMock {
               ? const JSONMethodCodec()
               : const StandardMethodCodec(),
         );
+      case MethodChannelMock.permissionHandler:
+        return const MethodChannel('flutter.baseflow.com/permissions/methods');
     }
   }
 }
@@ -167,6 +170,13 @@ extension HandleMockMethodCallHandler on WidgetTester {
   ) =>
       _setMockMethodCallHandler(
           methodChannelMock.channel(), expectedMethodCallList);
+
+  void clearAllMockMethodCallHandler() {
+    for (var e in MethodChannelMock.values) {
+      binding.defaultBinaryMessenger
+          .setMockMethodCallHandler(e.channel(), null);
+    }
+  }
 
   void _setMockMethodCallHandler(
     MethodChannel methodChannel,

@@ -82,6 +82,15 @@ void testNotificationScenario() => group(
               testWidgets(
                 ": ${element.name}.",
                 (widgetTester) async {
+                  int checkPermissionStatusCount = 0;
+                  widgetTester.setMockMethodCallHandler(
+                      MethodChannelMock.permissionHandler, [
+                    (m) async {
+                      expect(m.method, 'checkPermissionStatus');
+                      checkPermissionStatusCount++;
+                      return 1;
+                    }
+                  ]);
                   setMockLocalNotifications(widgetTester);
 
                   final id = insertedMemId!;
@@ -91,6 +100,8 @@ void testNotificationScenario() => group(
                   };
 
                   await scheduleCallback(id, params);
+
+                  expect(checkPermissionStatusCount, 1);
                 },
               );
             }
@@ -371,6 +382,18 @@ void testNotificationScenario() => group(
             testWidgets(": no active act.", (widgetTester) async {
               widgetTester.clearMockAndroidAlarmManager();
 
+              int checkPermissionStatusCount = 0;
+              widgetTester.setMockMethodCallHandler(
+                  MethodChannelMock.permissionHandler,
+                  List.generate(
+                    4,
+                    (i) => (m) async {
+                      expect(m.method, 'checkPermissionStatus');
+                      checkPermissionStatusCount++;
+                      return 1;
+                    },
+                  ));
+
               final details = NotificationResponse(
                 notificationResponseType:
                     NotificationResponseType.selectedNotificationAction,
@@ -382,6 +405,8 @@ void testNotificationScenario() => group(
               );
 
               await onNotificationResponseReceived(details);
+
+              expect(checkPermissionStatusCount, 4);
             });
 
             group(": 2 active acts", () {
@@ -403,6 +428,18 @@ void testNotificationScenario() => group(
               testWidgets(": no thrown.", (widgetTester) async {
                 widgetTester.clearMockAndroidAlarmManager();
 
+                int checkPermissionStatusCount = 0;
+                widgetTester.setMockMethodCallHandler(
+                    MethodChannelMock.permissionHandler,
+                    List.generate(
+                      4,
+                      (i) => (m) async {
+                        expect(m.method, 'checkPermissionStatus');
+                        checkPermissionStatusCount++;
+                        return 1;
+                      },
+                    ));
+
                 final details = NotificationResponse(
                   notificationResponseType:
                       NotificationResponseType.selectedNotificationAction,
@@ -414,6 +451,8 @@ void testNotificationScenario() => group(
                 );
 
                 await onNotificationResponseReceived(details);
+
+                expect(checkPermissionStatusCount, 4);
               });
             });
           });

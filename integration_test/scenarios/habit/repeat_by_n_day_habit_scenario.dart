@@ -184,6 +184,16 @@ void main() => group(
                         .single[defPkId.name] as int) +
                     1;
 
+            int checkPermissionStatusCount = 0;
+            widgetTester.setMockMethodCallHandler(
+                MethodChannelMock.permissionHandler,
+                List.generate(
+                    3,
+                    (i) => (m) async {
+                          expect(m.method, 'checkPermissionStatus');
+                          checkPermissionStatusCount++;
+                          return 1;
+                        }));
             int alarmServiceStartCount = 0;
             int alarmCancelCount = 0;
             int alarmPeriodicCount = 0;
@@ -304,12 +314,16 @@ void main() => group(
                 reason: 'enteringNDay');
 
             if (defaultTargetPlatform == TargetPlatform.android) {
+              expect(checkPermissionStatusCount, equals(3),
+                  reason: 'checkPermissionStatusCount');
               expect(alarmServiceStartCount, equals(1),
                   reason: 'alarmServiceStartCount');
               expect(alarmCancelCount, equals(2), reason: 'alarmCancelCount');
               expect(alarmPeriodicCount, equals(1),
                   reason: 'alarmPeriodicCount');
             } else {
+              expect(checkPermissionStatusCount, equals(3),
+                  reason: 'checkPermissionStatusCount');
               expect(alarmServiceStartCount, equals(0),
                   reason: 'alarmServiceStartCount');
               expect(alarmCancelCount, equals(0), reason: 'alarmCancelCount');
@@ -327,6 +341,15 @@ void main() => group(
             testWidgets(
               'withoutAct.',
               (widgetTester) async {
+                int checkPermissionStatusCount = 0;
+                widgetTester.setMockMethodCallHandler(
+                    MethodChannelMock.permissionHandler, [
+                      (m) async {
+                    expect(m.method, 'checkPermissionStatus');
+                    checkPermissionStatusCount++;
+                    return 1;
+                  }
+                ]);
                 int initializeCount = 0;
                 int cancelCount = 0;
                 int showCount = 0;
@@ -374,13 +397,17 @@ void main() => group(
                 await scheduleCallback(0, params);
 
                 if (defaultTargetPlatform == TargetPlatform.android) {
-                  expect(initializeCount, equals(1));
-                  expect(cancelCount, equals(4));
-                  expect(showCount, equals(1));
+                  expect(checkPermissionStatusCount, equals(1),
+                      reason: 'checkPermissionStatusCount');
+                  expect(initializeCount, equals(1), reason: 'initializeCount');
+                  expect(cancelCount, equals(4), reason: 'cancelCount');
+                  expect(showCount, equals(1), reason: 'showCount');
                 } else {
-                  expect(initializeCount, equals(0));
-                  expect(cancelCount, equals(0));
-                  expect(showCount, equals(0));
+                  expect(checkPermissionStatusCount, equals(1),
+                      reason: 'checkPermissionStatusCount');
+                  expect(initializeCount, equals(0), reason: 'initializeCount');
+                  expect(cancelCount, equals(0), reason: 'cancelCount');
+                  expect(showCount, equals(0), reason: 'showCount');
                 }
                 widgetTester.clearMockFlutterLocalNotifications();
               },
@@ -389,6 +416,15 @@ void main() => group(
             testWidgets(
               'withOldAct',
               (widgetTester) async {
+                int checkPermissionStatusCount = 0;
+                widgetTester.setMockMethodCallHandler(
+                    MethodChannelMock.permissionHandler, [
+                      (m) async {
+                    expect(m.method, 'checkPermissionStatus');
+                    checkPermissionStatusCount++;
+                    return 1;
+                  }
+                ]);
                 int initializeCount = 0;
                 int cancelCount = 0;
                 int showCount = 0;
@@ -436,13 +472,17 @@ void main() => group(
                 await scheduleCallback(0, params);
 
                 if (defaultTargetPlatform == TargetPlatform.android) {
-                  expect(initializeCount, equals(1));
-                  expect(cancelCount, equals(4));
-                  expect(showCount, equals(1));
+                  expect(checkPermissionStatusCount, equals(1),
+                      reason: 'checkPermissionStatusCount');
+                  expect(initializeCount, equals(1), reason: 'initializeCount');
+                  expect(cancelCount, equals(4), reason: 'cancelCount');
+                  expect(showCount, equals(1), reason: 'showCount');
                 } else {
-                  expect(initializeCount, equals(0));
-                  expect(cancelCount, equals(0));
-                  expect(showCount, equals(0));
+                  expect(checkPermissionStatusCount, equals(1),
+                      reason: 'checkPermissionStatusCount');
+                  expect(initializeCount, equals(0), reason: 'initializeCount');
+                  expect(cancelCount, equals(0), reason: 'cancelCount');
+                  expect(showCount, equals(0), reason: 'showCount');
                 }
                 widgetTester.clearMockFlutterLocalNotifications();
               },

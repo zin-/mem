@@ -296,6 +296,15 @@ void main() => group(
             testWidgets(
               'notify',
               (widgetTester) async {
+                int checkPermissionStatusCount = 0;
+                widgetTester.setMockMethodCallHandler(
+                    MethodChannelMock.permissionHandler, [
+                  (m) async {
+                    expect(m.method, 'checkPermissionStatus');
+                    checkPermissionStatusCount++;
+                    return 1;
+                  }
+                ]);
                 int initializeCount = 0;
                 int cancelCount = 0;
                 int showCount = 0;
@@ -342,16 +351,19 @@ void main() => group(
                 );
 
                 if (defaultTargetPlatform == TargetPlatform.android) {
+                  expect(checkPermissionStatusCount, equals(1));
                   expect(initializeCount, equals(1));
                   expect(cancelCount, equals(4));
                   expect(showCount, equals(1));
                 } else {
+                  expect(checkPermissionStatusCount, equals(0));
                   expect(initializeCount, equals(0));
                   expect(cancelCount, equals(0));
                   expect(showCount, equals(0));
                 }
 
                 widgetTester.clearMockFlutterLocalNotifications();
+                widgetTester.clearAllMockMethodCallHandler();
               },
             );
 
