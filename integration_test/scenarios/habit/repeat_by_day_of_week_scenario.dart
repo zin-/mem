@@ -308,7 +308,8 @@ void main() => group(
                 int initializeCount = 0;
                 int cancelCount = 0;
                 int showCount = 0;
-                widgetTester.setMockFlutterLocalNotifications(
+                widgetTester.setMockMethodCallHandler(
+                  MethodChannelMock.flutterLocalNotifications,
                   [
                     (message) async {
                       expect(message.method, equals('initialize'));
@@ -362,7 +363,6 @@ void main() => group(
                   expect(showCount, equals(0));
                 }
 
-                widgetTester.clearMockFlutterLocalNotifications();
                 widgetTester.clearAllMockMethodCallHandler();
               },
             );
@@ -370,7 +370,8 @@ void main() => group(
             testWidgets(
               'not notify',
               (widgetTester) async {
-                widgetTester.setMockFlutterLocalNotifications(
+                widgetTester.setMockMethodCallHandler(
+                  MethodChannelMock.flutterLocalNotifications,
                   [],
                 );
 
@@ -382,7 +383,7 @@ void main() => group(
                   },
                 );
 
-                widgetTester.clearMockFlutterLocalNotifications();
+                widgetTester.clearAllMockMethodCallHandler();
               },
             );
           },

@@ -197,7 +197,8 @@ void main() => group(
             int alarmServiceStartCount = 0;
             int alarmCancelCount = 0;
             int alarmPeriodicCount = 0;
-            widgetTester.setMockAndroidAlarmManager([
+            widgetTester.setMockMethodCallHandler(
+                MethodChannelMock.androidAlarmManager, [
               (message) async {
                 expect(message.method, equals('AlarmService.start'));
                 expect(
@@ -331,7 +332,7 @@ void main() => group(
                   reason: 'alarmPeriodicCount');
             }
 
-            widgetTester.clearMockAndroidAlarmManager();
+            widgetTester.clearAllMockMethodCallHandler();
           },
         );
 
@@ -344,7 +345,7 @@ void main() => group(
                 int checkPermissionStatusCount = 0;
                 widgetTester.setMockMethodCallHandler(
                     MethodChannelMock.permissionHandler, [
-                      (m) async {
+                  (m) async {
                     expect(m.method, 'checkPermissionStatus');
                     checkPermissionStatusCount++;
                     return 1;
@@ -353,7 +354,8 @@ void main() => group(
                 int initializeCount = 0;
                 int cancelCount = 0;
                 int showCount = 0;
-                widgetTester.setMockFlutterLocalNotifications(
+                widgetTester.setMockMethodCallHandler(
+                  MethodChannelMock.flutterLocalNotifications,
                   [
                     (message) async {
                       expect(message.method, equals('initialize'));
@@ -409,7 +411,8 @@ void main() => group(
                   expect(cancelCount, equals(0), reason: 'cancelCount');
                   expect(showCount, equals(0), reason: 'showCount');
                 }
-                widgetTester.clearMockFlutterLocalNotifications();
+
+                widgetTester.clearAllMockMethodCallHandler();
               },
             );
 
@@ -419,7 +422,7 @@ void main() => group(
                 int checkPermissionStatusCount = 0;
                 widgetTester.setMockMethodCallHandler(
                     MethodChannelMock.permissionHandler, [
-                      (m) async {
+                  (m) async {
                     expect(m.method, 'checkPermissionStatus');
                     checkPermissionStatusCount++;
                     return 1;
@@ -428,7 +431,8 @@ void main() => group(
                 int initializeCount = 0;
                 int cancelCount = 0;
                 int showCount = 0;
-                widgetTester.setMockFlutterLocalNotifications(
+                widgetTester.setMockMethodCallHandler(
+                  MethodChannelMock.flutterLocalNotifications,
                   [
                     (message) async {
                       expect(message.method, equals('initialize'));
@@ -484,16 +488,16 @@ void main() => group(
                   expect(cancelCount, equals(0), reason: 'cancelCount');
                   expect(showCount, equals(0), reason: 'showCount');
                 }
-                widgetTester.clearMockFlutterLocalNotifications();
+
+                widgetTester.clearAllMockMethodCallHandler();
               },
             );
 
             testWidgets(
               'withCurrentAct',
               (widgetTester) async {
-                widgetTester.setMockFlutterLocalNotifications(
-                  [],
-                );
+                widgetTester.setMockMethodCallHandler(
+                    MethodChannelMock.flutterLocalNotifications, []);
 
                 final params = {
                   memIdKey: withCurrentActMemId,
@@ -502,7 +506,7 @@ void main() => group(
 
                 await scheduleCallback(0, params);
 
-                widgetTester.clearMockFlutterLocalNotifications();
+                widgetTester.clearAllMockMethodCallHandler();
               },
             );
           },

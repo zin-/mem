@@ -380,7 +380,7 @@ void testNotificationScenario() => group(
           });
           group(": pause act", () {
             testWidgets(": no active act.", (widgetTester) async {
-              widgetTester.clearMockAndroidAlarmManager();
+              widgetTester.clearAllMockMethodCallHandler();
 
               int checkPermissionStatusCount = 0;
               widgetTester.setMockMethodCallHandler(
@@ -426,7 +426,7 @@ void testNotificationScenario() => group(
               });
 
               testWidgets(": no thrown.", (widgetTester) async {
-                widgetTester.clearMockAndroidAlarmManager();
+                widgetTester.clearAllMockMethodCallHandler();
 
                 int checkPermissionStatusCount = 0;
                 widgetTester.setMockMethodCallHandler(

@@ -119,13 +119,19 @@ extension TextAt on WidgetTester {
 }
 
 enum MethodChannelMock {
+  androidAlarmManager,
+  flutterLocalNotifications,
   filePicker,
   permissionHandler,
 }
 
 extension Method on MethodChannelMock {
-  MethodChannel channel() {
+  MethodChannel get channel {
     switch (this) {
+      case MethodChannelMock.androidAlarmManager:
+        return AndroidAlarmManager.channel;
+      case MethodChannelMock.flutterLocalNotifications:
+        return const MethodChannel('dexterous.com/flutter/local_notifications');
       case MethodChannelMock.filePicker:
         return MethodChannel(
           'miguelruivo.flutter.plugins.filepicker',
@@ -142,57 +148,27 @@ extension Method on MethodChannelMock {
 }
 
 extension HandleMockMethodCallHandler on WidgetTester {
-  static const androidAlarmManagerChannel = AndroidAlarmManager.channel;
-  static const flutterLocalNotificationsChannel =
-      MethodChannel('dexterous.com/flutter/local_notifications');
-
-  void setMockAndroidAlarmManager(
-    List<Future<Object?>? Function(MethodCall message)?> expectedMethodCallList,
-  ) =>
-      _setMockMethodCallHandler(
-          androidAlarmManagerChannel, expectedMethodCallList);
-
-  void clearMockAndroidAlarmManager() => binding.defaultBinaryMessenger
-      .setMockMethodCallHandler(androidAlarmManagerChannel, null);
-
-  void setMockFlutterLocalNotifications(
-    List<Future<Object?>? Function(MethodCall message)?> expectedMethodCallList,
-  ) =>
-      _setMockMethodCallHandler(
-          flutterLocalNotificationsChannel, expectedMethodCallList);
-
-  void clearMockFlutterLocalNotifications() => binding.defaultBinaryMessenger
-      .setMockMethodCallHandler(flutterLocalNotificationsChannel, null);
-
   void setMockMethodCallHandler(
     MethodChannelMock methodChannelMock,
     List<Future<Object?>? Function(MethodCall message)?> expectedMethodCallList,
   ) =>
-      _setMockMethodCallHandler(
-          methodChannelMock.channel(), expectedMethodCallList);
+      binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        methodChannelMock.channel,
+        (message) async {
+          if (expectedMethodCallList.isEmpty) {
+            fail("lack of expectedMethodCallList: ${{
+              'channel': methodChannelMock,
+              'method': message.method,
+              'arguments': message.arguments,
+            }}.");
+          }
+          return await expectedMethodCallList.removeAt(0)?.call(message);
+        },
+      );
 
   void clearAllMockMethodCallHandler() {
     for (var e in MethodChannelMock.values) {
-      binding.defaultBinaryMessenger
-          .setMockMethodCallHandler(e.channel(), null);
+      binding.defaultBinaryMessenger.setMockMethodCallHandler(e.channel, null);
     }
-  }
-
-  void _setMockMethodCallHandler(
-    MethodChannel methodChannel,
-    List<Future<Object?>? Function(MethodCall message)?> expectedMethodCallList,
-  ) {
-    binding.defaultBinaryMessenger.setMockMethodCallHandler(
-      methodChannel,
-      (message) async {
-        if (expectedMethodCallList.isEmpty) {
-          fail("lack of expectedMethodCallList: ${{
-            'method': message.method,
-            'arguments': message.arguments,
-          }}.");
-        }
-        return await expectedMethodCallList.removeAt(0)?.call(message);
-      },
-    );
   }
 }

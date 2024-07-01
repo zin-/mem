@@ -419,7 +419,8 @@ void testTaskScenario() => group(': $_scenarioName', () {
             (widgetTester) async {
               DatabaseTupleRepository.databaseAccessor = dbA;
 
-              widgetTester.setMockFlutterLocalNotifications(
+              widgetTester.setMockMethodCallHandler(
+                MethodChannelMock.flutterLocalNotifications,
                 [],
               );
 
@@ -428,7 +429,7 @@ void testTaskScenario() => group(': $_scenarioName', () {
                 insertedMemHasPeriodId!,
               );
 
-              widgetTester.clearMockFlutterLocalNotifications();
+              widgetTester.clearAllMockMethodCallHandler();
             },
           );
         },

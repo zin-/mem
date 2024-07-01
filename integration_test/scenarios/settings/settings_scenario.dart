@@ -60,7 +60,7 @@ void main() => group(
         testWidgets(
           'show page.',
           (widgetTester) async {
-            widgetTester.clearMockFlutterLocalNotifications();
+            widgetTester.clearAllMockMethodCallHandler();
 
             await runApplication();
             await widgetTester.pumpAndSettle();
@@ -206,7 +206,8 @@ void main() => group(
                   ],
                 )
                 .flattened;
-            widgetTester.setMockAndroidAlarmManager([
+            widgetTester.setMockMethodCallHandler(
+                MethodChannelMock.androidAlarmManager, [
               (m) async {
                 expect(m.method, equals('AlarmService.start'));
                 alarmServiceStartCount++;
@@ -223,7 +224,8 @@ void main() => group(
             int getNotificationAppLaunchDetailsCount = 0;
             int cancelAllCount = 0;
             int deleteNotificationChannelCount = 0;
-            widgetTester.setMockFlutterLocalNotifications([
+            widgetTester.setMockMethodCallHandler(
+                MethodChannelMock.flutterLocalNotifications, [
               (m) async {
                 expect(m.method, equals('initialize'));
                 initializeCount++;
@@ -284,8 +286,7 @@ void main() => group(
               expect(deleteNotificationChannelCount, equals(0));
             }
 
-            widgetTester.clearMockAndroidAlarmManager();
-            widgetTester.clearMockFlutterLocalNotifications();
+            widgetTester.clearAllMockMethodCallHandler();
           },
         );
       },
