@@ -18,8 +18,11 @@ extension on Permission {
     switch (this) {
       case Permission.notification:
         return permission_handler.Permission.notification;
+
+// coverage:ignore-start
       default:
         throw UnimplementedError(toString());
+// coverage:ignore-end
     }
   }
 }
