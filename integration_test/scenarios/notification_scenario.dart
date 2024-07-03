@@ -82,6 +82,8 @@ void testNotificationScenario() => group(
               testWidgets(
                 ": ${element.name}.",
                 (widgetTester) async {
+                  widgetTester.ignoreMockMethodCallHandler(
+                      MethodChannelMock.flutterLocalNotifications);
                   int checkPermissionStatusCount = 0;
                   widgetTester.setMockMethodCallHandler(
                       MethodChannelMock.permissionHandler, [

@@ -59,6 +59,9 @@ void main() => group(
             testWidgets(
               ": on saved.",
               (widgetTester) async {
+                widgetTester.ignoreMockMethodCallHandler(
+                    MethodChannelMock.flutterLocalNotifications);
+
                 await runApplication();
                 await widgetTester.pumpAndSettle();
                 await widgetTester.tap(find.text(insertedMemName));
@@ -108,6 +111,9 @@ void main() => group(
         testWidgets(
           ": Save",
           (widgetTester) async {
+            widgetTester.ignoreMockMethodCallHandler(
+                MethodChannelMock.flutterLocalNotifications);
+
             await runApplication();
             await widgetTester.pumpAndSettle();
             await widgetTester.tap(newMemFabFinder);
@@ -171,21 +177,8 @@ void main() => group(
               enteringMemName,
             );
 
-            widgetTester.setMockMethodCallHandler(
-                MethodChannelMock.flutterLocalNotifications, [
-              (message) {
-                switch (message.method) {
-                  case "initialize":
-                    return Future.value(true);
-
-                  case "getNotificationAppLaunchDetails":
-                    return Future.value();
-
-                  default:
-                    return Future.value();
-                }
-              },
-            ]);
+            widgetTester.ignoreMockMethodCallHandler(
+                MethodChannelMock.flutterLocalNotifications);
 
             await widgetTester.tap(find.byKey(keySaveMemFab));
             await widgetTester.pump(waitSideEffectDuration);
@@ -216,6 +209,9 @@ void main() => group(
         testWidgets(
           ": clear.",
           (widgetTester) async {
+            widgetTester.ignoreMockMethodCallHandler(
+                MethodChannelMock.flutterLocalNotifications);
+
             await runApplication();
             await widgetTester.pumpAndSettle();
             await widgetTester.tap(find.text(insertedMemName));

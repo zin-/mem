@@ -260,21 +260,8 @@ void main() => group(
           testWidgets(
             ': start & finish act.',
             (widgetTester) async {
-              widgetTester.setMockMethodCallHandler(
-                  MethodChannelMock.flutterLocalNotifications, [
-                (message) {
-                  switch (message.method) {
-                    case "initialize":
-                      return Future.value(true);
-
-                    case "getNotificationAppLaunchDetails":
-                      return Future.value();
-
-                    default:
-                      return Future.value();
-                  }
-                },
-              ]);
+              widgetTester.ignoreMockMethodCallHandler(
+                  MethodChannelMock.flutterLocalNotifications);
 
               await showActListPage(widgetTester);
 
@@ -361,6 +348,9 @@ void main() => group(
             testWidgets(
               ': save.',
               (widgetTester) async {
+                widgetTester.ignoreMockMethodCallHandler(
+                    MethodChannelMock.flutterLocalNotifications);
+
                 await showActListPage(widgetTester);
 
                 await widgetTester
@@ -414,6 +404,9 @@ void main() => group(
             );
 
             testWidgets(': delete.', (widgetTester) async {
+              widgetTester.ignoreMockMethodCallHandler(
+                  MethodChannelMock.flutterLocalNotifications);
+
               await showActListPage(widgetTester);
 
               await widgetTester.longPress(find.text(timeText(zeroDate)).at(0));
@@ -436,6 +429,9 @@ void main() => group(
         testWidgets(
           ": show MemDetailPage.",
           (widgetTester) async {
+            widgetTester.ignoreMockMethodCallHandler(
+                MethodChannelMock.flutterLocalNotifications);
+
             await runApplication();
             await widgetTester.pumpAndSettle();
             await widgetTester.tap(find.byIcon(Icons.playlist_play));

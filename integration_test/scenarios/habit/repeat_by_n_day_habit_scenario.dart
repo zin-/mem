@@ -136,6 +136,9 @@ void main() => group(
         testWidgets(
           'show saved.',
           (widgetTester) async {
+            widgetTester.ignoreMockMethodCallHandler(
+                MethodChannelMock.flutterLocalNotifications);
+
             const repeatText = "12:00 AM every $insertedMemRepeatByNDay days";
 
             await runApplication();
@@ -178,6 +181,9 @@ void main() => group(
         testWidgets(
           'save.',
           (widgetTester) async {
+            widgetTester.ignoreMockMethodCallHandler(
+                MethodChannelMock.flutterLocalNotifications);
+
             final testStart = DateTime.now();
             var expectedSavedMemId =
                 ((await dbA.select(defTableMems, orderBy: "id DESC", limit: 1))

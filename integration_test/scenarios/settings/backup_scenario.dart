@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/base.dart';
@@ -54,15 +53,16 @@ void main() => group(
             String? result;
             switch (defaultTargetPlatform) {
               case TargetPlatform.android:
-                widgetTester.binding.defaultBinaryMessenger
-                    .setMockMethodCallHandler(
-                  const MethodChannel("dev.fluttercommunity.plus/share"),
+                widgetTester.ignoreMockMethodCallHandler(
+                    MethodChannelMock.flutterLocalNotifications);
+                widgetTester
+                    .setMockMethodCallHandler(MethodChannelMock.sharePlus, [
                   (message) async {
                     await Future.delayed(const Duration(milliseconds: 500));
                     expect(message.method, equals("shareFilesWithResult"));
                     return result = "Success.";
-                  },
-                );
+                  }
+                ]);
                 break;
 
               case TargetPlatform.windows:
@@ -102,6 +102,8 @@ void main() => group(
               testWidgets(
                 'pick nothing.',
                 (widgetTester) async {
+                  widgetTester.ignoreMockMethodCallHandler(
+                      MethodChannelMock.flutterLocalNotifications);
                   widgetTester.setMockMethodCallHandler(
                     MethodChannelMock.filePicker,
                     [
@@ -137,6 +139,8 @@ void main() => group(
                       path.basename(current.path), backupFileName);
                   current.copy(backupFilePath);
 
+                  widgetTester.ignoreMockMethodCallHandler(
+                      MethodChannelMock.flutterLocalNotifications);
                   widgetTester.setMockMethodCallHandler(
                     MethodChannelMock.filePicker,
                     [

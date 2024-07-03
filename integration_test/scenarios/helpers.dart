@@ -100,6 +100,7 @@ extension TextAt on WidgetTester {
 enum MethodChannelMock {
   androidAlarmManager,
   flutterLocalNotifications,
+  sharePlus,
   filePicker,
   permissionHandler,
 }
@@ -111,6 +112,8 @@ extension Method on MethodChannelMock {
         return AndroidAlarmManager.channel;
       case MethodChannelMock.flutterLocalNotifications:
         return const MethodChannel('dexterous.com/flutter/local_notifications');
+      case MethodChannelMock.sharePlus:
+        return const MethodChannel("dev.fluttercommunity.plus/share");
       case MethodChannelMock.filePicker:
         return MethodChannel(
           'miguelruivo.flutter.plugins.filepicker',
@@ -149,5 +152,37 @@ extension HandleMockMethodCallHandler on WidgetTester {
     for (var e in MethodChannelMock.values) {
       binding.defaultBinaryMessenger.setMockMethodCallHandler(e.channel, null);
     }
+  }
+
+  void ignoreMockMethodCallHandler(MethodChannelMock methodChannelMock) {
+    setMockMethodCallHandler(
+        methodChannelMock,
+        List.generate(
+            100,
+            (index) => (m) async {
+                  switch (methodChannelMock) {
+                    case MethodChannelMock.androidAlarmManager:
+                    // TODO: Handle this case.
+                    case MethodChannelMock.flutterLocalNotifications:
+                      switch (m.method) {
+                        case 'initialize':
+                          return true;
+
+                        case 'getNotificationAppLaunchDetails':
+                          return null;
+
+                        case 'show':
+                          return null;
+                      }
+                    case MethodChannelMock.sharePlus:
+                    // TODO: Handle this case.
+                    case MethodChannelMock.filePicker:
+                    // TODO: Handle this case.
+                    case MethodChannelMock.permissionHandler:
+                    // TODO: Handle this case.
+                  }
+
+                  return false;
+                }));
   }
 }
