@@ -93,21 +93,6 @@ void testNotificationScenario() => group(
                       return 1;
                     }
                   ]);
-                  widgetTester.setMockMethodCallHandler(
-                      MethodChannelMock.flutterLocalNotifications, [
-                    (message) {
-                      switch (message.method) {
-                        case "initialize":
-                          return Future.value(true);
-
-                        case "getNotificationAppLaunchDetails":
-                          return Future.value();
-
-                        default:
-                          return Future.value();
-                      }
-                    },
-                  ]);
 
                   final id = insertedMemId!;
                   final params = {
@@ -396,8 +381,8 @@ void testNotificationScenario() => group(
           });
           group(": pause act", () {
             testWidgets(": no active act.", (widgetTester) async {
-              widgetTester.clearAllMockMethodCallHandler();
-
+              widgetTester.ignoreMockMethodCallHandler(
+                  MethodChannelMock.flutterLocalNotifications);
               int checkPermissionStatusCount = 0;
               widgetTester.setMockMethodCallHandler(
                   MethodChannelMock.permissionHandler,
@@ -442,8 +427,8 @@ void testNotificationScenario() => group(
               });
 
               testWidgets(": no thrown.", (widgetTester) async {
-                widgetTester.clearAllMockMethodCallHandler();
-
+                widgetTester.ignoreMockMethodCallHandler(
+                    MethodChannelMock.flutterLocalNotifications);
                 int checkPermissionStatusCount = 0;
                 widgetTester.setMockMethodCallHandler(
                     MethodChannelMock.permissionHandler,

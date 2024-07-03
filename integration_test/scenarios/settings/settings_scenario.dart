@@ -263,8 +263,7 @@ void main() => group(
 
             expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-            await widgetTester
-                .pumpAndSettle(const Duration(milliseconds: 1000));
+            await widgetTester.pumpAndSettle(const Duration(seconds: 20));
 
             expect(find.byType(CircularProgressIndicator), findsNothing);
             expect(find.text(l10n.completeResetNotification), findsOneWidget);
