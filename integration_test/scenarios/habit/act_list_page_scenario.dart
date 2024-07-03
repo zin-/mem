@@ -260,7 +260,21 @@ void main() => group(
           testWidgets(
             ': start & finish act.',
             (widgetTester) async {
-              setMockLocalNotifications(widgetTester);
+              widgetTester.setMockMethodCallHandler(
+                  MethodChannelMock.flutterLocalNotifications, [
+                (message) {
+                  switch (message.method) {
+                    case "initialize":
+                      return Future.value(true);
+
+                    case "getNotificationAppLaunchDetails":
+                      return Future.value();
+
+                    default:
+                      return Future.value();
+                  }
+                },
+              ]);
 
               await showActListPage(widgetTester);
 

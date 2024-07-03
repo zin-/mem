@@ -171,7 +171,21 @@ void main() => group(
               enteringMemName,
             );
 
-            setMockLocalNotifications(widgetTester);
+            widgetTester.setMockMethodCallHandler(
+                MethodChannelMock.flutterLocalNotifications, [
+              (message) {
+                switch (message.method) {
+                  case "initialize":
+                    return Future.value(true);
+
+                  case "getNotificationAppLaunchDetails":
+                    return Future.value();
+
+                  default:
+                    return Future.value();
+                }
+              },
+            ]);
 
             await widgetTester.tap(find.byKey(keySaveMemFab));
             await widgetTester.pump(waitSideEffectDuration);

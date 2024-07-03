@@ -91,7 +91,21 @@ void testNotificationScenario() => group(
                       return 1;
                     }
                   ]);
-                  setMockLocalNotifications(widgetTester);
+                  widgetTester.setMockMethodCallHandler(
+                      MethodChannelMock.flutterLocalNotifications, [
+                    (message) {
+                      switch (message.method) {
+                        case "initialize":
+                          return Future.value(true);
+
+                        case "getNotificationAppLaunchDetails":
+                          return Future.value();
+
+                        default:
+                          return Future.value();
+                      }
+                    },
+                  ]);
 
                   final id = insertedMemId!;
                   final params = {
