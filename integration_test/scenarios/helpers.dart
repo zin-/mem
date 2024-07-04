@@ -158,7 +158,7 @@ extension HandleMockMethodCallHandler on WidgetTester {
     setMockMethodCallHandler(
         methodChannelMock,
         List.generate(
-            100,
+            300,
             (index) => (m) async {
                   switch (methodChannelMock) {
                     case MethodChannelMock.androidAlarmManager:
@@ -179,7 +179,10 @@ extension HandleMockMethodCallHandler on WidgetTester {
                     case MethodChannelMock.filePicker:
                     // TODO: Handle this case.
                     case MethodChannelMock.permissionHandler:
-                    // TODO: Handle this case.
+                      switch (m.method) {
+                        case 'checkPermissionStatus':
+                          return 1;
+                      }
                   }
 
                   return false;
