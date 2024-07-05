@@ -106,6 +106,7 @@ const appId = 'zin.playground.mem';
 const actCounter = 'act_counters';
 const memIdParamName = 'mem_id';
 
+@pragma('vm:entry-point')
 Future<void> backgroundCallback(Uri? uri) => i(
       () async {
         if (uri != null && uri.scheme == uriSchema && uri.host == appId) {
