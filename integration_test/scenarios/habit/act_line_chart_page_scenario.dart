@@ -68,6 +68,9 @@ void main() => group(
         testWidgets(
           ": show chart",
           (widgetTester) async {
+            widgetTester.ignoreMockMethodCallHandler(
+                MethodChannelMock.flutterLocalNotifications);
+
             await runApplication();
             await widgetTester.pumpAndSettle();
 

@@ -2,7 +2,7 @@ import 'package:mem/acts/act_service.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/notifications/client.dart';
+import 'package:mem/notifications/notification_client.dart';
 
 class ListWithTotalPage<T> {
   final List<T> list;

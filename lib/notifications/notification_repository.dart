@@ -3,6 +3,8 @@ import 'package:mem/framework/repository/key_with_value_repository.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/notification/type.dart';
+import 'package:mem/permissions/permission.dart';
+import 'package:mem/permissions/permission_handler_wrapper.dart';
 import 'package:mem/values/paths.dart';
 
 import 'notification/notification.dart';
@@ -44,15 +46,18 @@ class NotificationRepository extends KeyWithValueRepository<Notification, int>
   @override
   Future<bool> receive(Notification entity) => v(
         () async {
-          await _flutterLocalNotificationsWrapper?.show(
-            entity.key,
-            entity.title,
-            entity.body,
-            entity.channel,
-            entity.payload,
-          );
-
-          return true;
+          if (await PermissionHandlerWrapper().grant(Permission.notification)) {
+            await _flutterLocalNotificationsWrapper?.show(
+              entity.key,
+              entity.title,
+              entity.body,
+              entity.channel,
+              entity.payload,
+            );
+            return true;
+          } else {
+            return false;
+          }
         },
         {
           "entity": entity,

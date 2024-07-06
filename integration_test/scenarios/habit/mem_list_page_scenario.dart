@@ -146,6 +146,9 @@ void main() => group(
             testWidgets(
               'sorted.',
               (widgetTester) async {
+                widgetTester.ignoreMockMethodCallHandler(
+                    MethodChannelMock.flutterLocalNotifications);
+
                 await runApplication();
                 await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
@@ -171,6 +174,9 @@ void main() => group(
               // 時間に関するテストなので3回までリトライ可能とする
               retry: 3,
               (widgetTester) async {
+                widgetTester.ignoreMockMethodCallHandler(
+                    MethodChannelMock.flutterLocalNotifications);
+
                 await runApplication();
                 await widgetTester.pumpAndSettle();
 
@@ -191,6 +197,9 @@ void main() => group(
             testWidgets(
               'finish.',
               (widgetTester) async {
+                widgetTester.ignoreMockMethodCallHandler(
+                    MethodChannelMock.flutterLocalNotifications);
+
                 await runApplication();
                 await widgetTester.pumpAndSettle();
 

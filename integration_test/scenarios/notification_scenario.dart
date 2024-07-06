@@ -14,7 +14,7 @@ import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/logger/log.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
-import 'package:mem/notifications/client.dart';
+import 'package:mem/notifications/notification_client.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/notifications/notification_actions.dart';
@@ -82,7 +82,17 @@ void testNotificationScenario() => group(
               testWidgets(
                 ": ${element.name}.",
                 (widgetTester) async {
-                  setMockLocalNotifications(widgetTester);
+                  widgetTester.ignoreMockMethodCallHandler(
+                      MethodChannelMock.flutterLocalNotifications);
+                  int checkPermissionStatusCount = 0;
+                  widgetTester.setMockMethodCallHandler(
+                      MethodChannelMock.permissionHandler, [
+                    (m) async {
+                      expect(m.method, 'checkPermissionStatus');
+                      checkPermissionStatusCount++;
+                      return 1;
+                    }
+                  ]);
 
                   final id = insertedMemId!;
                   final params = {
@@ -91,6 +101,8 @@ void testNotificationScenario() => group(
                   };
 
                   await scheduleCallback(id, params);
+
+                  expect(checkPermissionStatusCount, 1);
                 },
               );
             }
@@ -369,7 +381,19 @@ void testNotificationScenario() => group(
           });
           group(": pause act", () {
             testWidgets(": no active act.", (widgetTester) async {
-              widgetTester.clearMockAndroidAlarmManager();
+              widgetTester.ignoreMockMethodCallHandler(
+                  MethodChannelMock.flutterLocalNotifications);
+              int checkPermissionStatusCount = 0;
+              widgetTester.setMockMethodCallHandler(
+                  MethodChannelMock.permissionHandler,
+                  List.generate(
+                    4,
+                    (i) => (m) async {
+                      expect(m.method, 'checkPermissionStatus');
+                      checkPermissionStatusCount++;
+                      return 1;
+                    },
+                  ));
 
               final details = NotificationResponse(
                 notificationResponseType:
@@ -382,6 +406,8 @@ void testNotificationScenario() => group(
               );
 
               await onNotificationResponseReceived(details);
+
+              expect(checkPermissionStatusCount, 4);
             });
 
             group(": 2 active acts", () {
@@ -401,7 +427,19 @@ void testNotificationScenario() => group(
               });
 
               testWidgets(": no thrown.", (widgetTester) async {
-                widgetTester.clearMockAndroidAlarmManager();
+                widgetTester.ignoreMockMethodCallHandler(
+                    MethodChannelMock.flutterLocalNotifications);
+                int checkPermissionStatusCount = 0;
+                widgetTester.setMockMethodCallHandler(
+                    MethodChannelMock.permissionHandler,
+                    List.generate(
+                      4,
+                      (i) => (m) async {
+                        expect(m.method, 'checkPermissionStatus');
+                        checkPermissionStatusCount++;
+                        return 1;
+                      },
+                    ));
 
                 final details = NotificationResponse(
                   notificationResponseType:
@@ -414,6 +452,8 @@ void testNotificationScenario() => group(
                 );
 
                 await onNotificationResponseReceived(details);
+
+                expect(checkPermissionStatusCount, 4);
               });
             });
           });

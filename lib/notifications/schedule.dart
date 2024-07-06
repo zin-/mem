@@ -1,6 +1,6 @@
 import 'package:mem/framework/repository/entity.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/notifications/client.dart';
+import 'package:mem/notifications/notification_client.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/type.dart';
 

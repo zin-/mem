@@ -12,7 +12,7 @@ import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/mems/detail/fab.dart';
 import 'package:mem/mems/detail/notifications/mem_notifications_view.dart';
-import 'package:mem/notifications/client.dart';
+import 'package:mem/notifications/notification_client.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/notifications/notification_ids.dart';
@@ -296,10 +296,20 @@ void main() => group(
             testWidgets(
               'notify',
               (widgetTester) async {
+                int checkPermissionStatusCount = 0;
+                widgetTester.setMockMethodCallHandler(
+                    MethodChannelMock.permissionHandler, [
+                  (m) async {
+                    expect(m.method, 'checkPermissionStatus');
+                    checkPermissionStatusCount++;
+                    return 1;
+                  }
+                ]);
                 int initializeCount = 0;
                 int cancelCount = 0;
                 int showCount = 0;
-                widgetTester.setMockFlutterLocalNotifications(
+                widgetTester.setMockMethodCallHandler(
+                  MethodChannelMock.flutterLocalNotifications,
                   [
                     (message) async {
                       expect(message.method, equals('initialize'));
@@ -342,23 +352,26 @@ void main() => group(
                 );
 
                 if (defaultTargetPlatform == TargetPlatform.android) {
+                  expect(checkPermissionStatusCount, equals(1));
                   expect(initializeCount, equals(1));
                   expect(cancelCount, equals(4));
                   expect(showCount, equals(1));
                 } else {
+                  expect(checkPermissionStatusCount, equals(0));
                   expect(initializeCount, equals(0));
                   expect(cancelCount, equals(0));
                   expect(showCount, equals(0));
                 }
 
-                widgetTester.clearMockFlutterLocalNotifications();
+                widgetTester.clearAllMockMethodCallHandler();
               },
             );
 
             testWidgets(
               'not notify',
               (widgetTester) async {
-                widgetTester.setMockFlutterLocalNotifications(
+                widgetTester.setMockMethodCallHandler(
+                  MethodChannelMock.flutterLocalNotifications,
                   [],
                 );
 
@@ -370,7 +383,7 @@ void main() => group(
                   },
                 );
 
-                widgetTester.clearMockFlutterLocalNotifications();
+                widgetTester.clearAllMockMethodCallHandler();
               },
             );
           },

@@ -93,38 +93,27 @@ String timeText(DateTime dateTime) {
 String dateTimeText(DateTime dateTime) =>
     '${dateText(dateTime)} ${timeText(dateTime)}';
 
-// MockMethodChannel
-//  for local_notifications
-// FIXME SetMockMethodChannelに移行する
-void setMockLocalNotifications(WidgetTester widgetTester) =>
-    widgetTester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-      const MethodChannel("dexterous.com/flutter/local_notifications"),
-      (message) {
-        switch (message.method) {
-          case "initialize":
-            return Future.value(true);
-
-          case "getNotificationAppLaunchDetails":
-            return Future.value();
-
-          default:
-            // TODO 呼び出されたことを確認したい場合、チェック関数を受け取ってここで呼び出しても良い
-            return Future.value();
-        }
-      },
-    );
-
 extension TextAt on WidgetTester {
   Text textAt(int index) => widget<Text>(find.byType(Text).at(index));
 }
 
 enum MethodChannelMock {
+  androidAlarmManager,
+  flutterLocalNotifications,
+  sharePlus,
   filePicker,
+  permissionHandler,
 }
 
 extension Method on MethodChannelMock {
-  MethodChannel channel() {
+  MethodChannel get channel {
     switch (this) {
+      case MethodChannelMock.androidAlarmManager:
+        return AndroidAlarmManager.channel;
+      case MethodChannelMock.flutterLocalNotifications:
+        return const MethodChannel('dexterous.com/flutter/local_notifications');
+      case MethodChannelMock.sharePlus:
+        return const MethodChannel("dev.fluttercommunity.plus/share");
       case MethodChannelMock.filePicker:
         return MethodChannel(
           'miguelruivo.flutter.plugins.filepicker',
@@ -134,55 +123,69 @@ extension Method on MethodChannelMock {
               ? const JSONMethodCodec()
               : const StandardMethodCodec(),
         );
+      case MethodChannelMock.permissionHandler:
+        return const MethodChannel('flutter.baseflow.com/permissions/methods');
     }
   }
 }
 
 extension HandleMockMethodCallHandler on WidgetTester {
-  static const androidAlarmManagerChannel = AndroidAlarmManager.channel;
-  static const flutterLocalNotificationsChannel =
-      MethodChannel('dexterous.com/flutter/local_notifications');
-
-  void setMockAndroidAlarmManager(
-    List<Future<Object?>? Function(MethodCall message)?> expectedMethodCallList,
-  ) =>
-      _setMockMethodCallHandler(
-          androidAlarmManagerChannel, expectedMethodCallList);
-
-  void clearMockAndroidAlarmManager() => binding.defaultBinaryMessenger
-      .setMockMethodCallHandler(androidAlarmManagerChannel, null);
-
-  void setMockFlutterLocalNotifications(
-    List<Future<Object?>? Function(MethodCall message)?> expectedMethodCallList,
-  ) =>
-      _setMockMethodCallHandler(
-          flutterLocalNotificationsChannel, expectedMethodCallList);
-
-  void clearMockFlutterLocalNotifications() => binding.defaultBinaryMessenger
-      .setMockMethodCallHandler(flutterLocalNotificationsChannel, null);
-
   void setMockMethodCallHandler(
     MethodChannelMock methodChannelMock,
     List<Future<Object?>? Function(MethodCall message)?> expectedMethodCallList,
   ) =>
-      _setMockMethodCallHandler(
-          methodChannelMock.channel(), expectedMethodCallList);
+      binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        methodChannelMock.channel,
+        (message) async {
+          if (expectedMethodCallList.isEmpty) {
+            fail("lack of expectedMethodCallList: ${{
+              'channel': methodChannelMock,
+              'method': message.method,
+              'arguments': message.arguments,
+            }}.");
+          }
+          return await expectedMethodCallList.removeAt(0)?.call(message);
+        },
+      );
 
-  void _setMockMethodCallHandler(
-    MethodChannel methodChannel,
-    List<Future<Object?>? Function(MethodCall message)?> expectedMethodCallList,
-  ) {
-    binding.defaultBinaryMessenger.setMockMethodCallHandler(
-      methodChannel,
-      (message) async {
-        if (expectedMethodCallList.isEmpty) {
-          fail("lack of expectedMethodCallList: ${{
-            'method': message.method,
-            'arguments': message.arguments,
-          }}.");
-        }
-        return await expectedMethodCallList.removeAt(0)?.call(message);
-      },
-    );
+  void clearAllMockMethodCallHandler() {
+    for (var e in MethodChannelMock.values) {
+      binding.defaultBinaryMessenger.setMockMethodCallHandler(e.channel, null);
+    }
+  }
+
+  void ignoreMockMethodCallHandler(MethodChannelMock methodChannelMock) {
+    setMockMethodCallHandler(
+        methodChannelMock,
+        List.generate(
+            300,
+            (index) => (m) async {
+                  switch (methodChannelMock) {
+                    case MethodChannelMock.androidAlarmManager:
+                    // TODO: Handle this case.
+                    case MethodChannelMock.flutterLocalNotifications:
+                      switch (m.method) {
+                        case 'initialize':
+                          return true;
+
+                        case 'getNotificationAppLaunchDetails':
+                          return null;
+
+                        case 'show':
+                          return null;
+                      }
+                    case MethodChannelMock.sharePlus:
+                    // TODO: Handle this case.
+                    case MethodChannelMock.filePicker:
+                    // TODO: Handle this case.
+                    case MethodChannelMock.permissionHandler:
+                      switch (m.method) {
+                        case 'checkPermissionStatus':
+                          return 1;
+                      }
+                  }
+
+                  return false;
+                }));
   }
 }

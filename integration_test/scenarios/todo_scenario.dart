@@ -9,7 +9,7 @@ import 'package:mem/databases/definition.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/logger/log.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/notifications/client.dart';
+import 'package:mem/notifications/notification_client.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/values/durations.dart';
@@ -193,7 +193,8 @@ void testTodoScenario() => group(': $_scenarioName', () {
 
           int initializeCount = 0;
           int cancelCount = 0;
-          widgetTester.setMockFlutterLocalNotifications(
+          widgetTester.setMockMethodCallHandler(
+            MethodChannelMock.flutterLocalNotifications,
             [
               (message) async {
                 expect(message.method, equals('initialize'));
@@ -213,7 +214,8 @@ void testTodoScenario() => group(': $_scenarioName', () {
 
           int alarmServiceStartCount = 0;
           int alarmCancelCount = 0;
-          widgetTester.setMockAndroidAlarmManager([
+          widgetTester
+              .setMockMethodCallHandler(MethodChannelMock.androidAlarmManager, [
             (message) async {
               expect(message.method, equals('AlarmService.start'));
               expect(
@@ -251,7 +253,7 @@ void testTodoScenario() => group(': $_scenarioName', () {
             expect(alarmCancelCount, equals(0));
           }
 
-          widgetTester.clearMockFlutterLocalNotifications();
+          widgetTester.clearAllMockMethodCallHandler();
         },
       );
     });

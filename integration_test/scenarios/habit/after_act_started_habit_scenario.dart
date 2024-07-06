@@ -53,54 +53,52 @@ void main() => group(
           );
         });
 
-        group(
-          ": Show",
-          () {
-            testWidgets(
-              ": on saved.",
-              (widgetTester) async {
-                await runApplication();
-                await widgetTester.pumpAndSettle();
-                await widgetTester.tap(find.text(insertedMemName));
-                await widgetTester.pumpAndSettle(defaultTransitionDuration);
+        testWidgets(
+          'Show on saved.',
+          (widgetTester) async {
+            widgetTester.ignoreMockMethodCallHandler(
+                MethodChannelMock.flutterLocalNotifications);
 
-                expect(
-                  widgetTester
-                      .widget<Text>(
-                        find.descendant(
-                            of: find.byKey(keyMemNotificationsView),
-                            matching: find.byType(Text)),
-                      )
-                      .data,
-                  "00:01 after started",
-                );
+            await runApplication();
+            await widgetTester.pumpAndSettle();
+            await widgetTester.tap(find.text(insertedMemName));
+            await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-                await widgetTester.tap(
-                  find.descendant(
-                    of: find.byKey(keyMemNotificationsView),
-                    matching: find.byIcon(Icons.edit),
-                  ),
-                );
-                await widgetTester.pumpAndSettle(defaultTransitionDuration);
+            expect(
+              widgetTester
+                  .widget<Text>(
+                    find.descendant(
+                        of: find.byKey(keyMemNotificationsView),
+                        matching: find.byType(Text)),
+                  )
+                  .data,
+              "00:01 after started",
+            );
 
-                expect(
-                  widgetTester
-                      .widget<TimeTextFormField>(
-                        find.descendant(
-                          of: find.byKey(keyMemAfterActStartedNotification),
-                          matching: find.byType(TimeTextFormField),
-                        ),
-                      )
-                      .secondsOfTime,
-                  secondsOfTime,
-                );
-                expect(
-                  find.descendant(
+            await widgetTester.tap(
+              find.descendant(
+                of: find.byKey(keyMemNotificationsView),
+                matching: find.byIcon(Icons.edit),
+              ),
+            );
+            await widgetTester.pumpAndSettle(defaultTransitionDuration);
+
+            expect(
+              widgetTester
+                  .widget<TimeTextFormField>(
+                    find.descendant(
                       of: find.byKey(keyMemAfterActStartedNotification),
-                      matching: find.byIcon(Icons.clear)),
-                  findsOneWidget,
-                );
-              },
+                      matching: find.byType(TimeTextFormField),
+                    ),
+                  )
+                  .secondsOfTime,
+              secondsOfTime,
+            );
+            expect(
+              find.descendant(
+                  of: find.byKey(keyMemAfterActStartedNotification),
+                  matching: find.byIcon(Icons.clear)),
+              findsOneWidget,
             );
           },
         );
@@ -108,6 +106,9 @@ void main() => group(
         testWidgets(
           ": Save",
           (widgetTester) async {
+            widgetTester.ignoreMockMethodCallHandler(
+                MethodChannelMock.flutterLocalNotifications);
+
             await runApplication();
             await widgetTester.pumpAndSettle();
             await widgetTester.tap(newMemFabFinder);
@@ -171,7 +172,8 @@ void main() => group(
               enteringMemName,
             );
 
-            setMockLocalNotifications(widgetTester);
+            widgetTester.ignoreMockMethodCallHandler(
+                MethodChannelMock.flutterLocalNotifications);
 
             await widgetTester.tap(find.byKey(keySaveMemFab));
             await widgetTester.pump(waitSideEffectDuration);
@@ -202,6 +204,9 @@ void main() => group(
         testWidgets(
           ": clear.",
           (widgetTester) async {
+            widgetTester.ignoreMockMethodCallHandler(
+                MethodChannelMock.flutterLocalNotifications);
+
             await runApplication();
             await widgetTester.pumpAndSettle();
             await widgetTester.tap(find.text(insertedMemName));
@@ -239,6 +244,20 @@ void main() => group(
                   matching: find.byIcon(Icons.clear)),
               findsNothing,
             );
+          },
+        );
+
+        testWidgets(
+          'start act.',
+          (widgetTester) async {
+            await runApplication();
+            await widgetTester.pumpAndSettle();
+            await widgetTester.tap(startIconFinder);
+
+            await widgetTester.pump();
+            await widgetTester.pumpAndSettle();
+
+            expect(startIconFinder, findsNothing);
           },
         );
       },
