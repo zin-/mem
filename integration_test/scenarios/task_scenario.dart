@@ -247,7 +247,6 @@ void testTaskScenario() => group(': $_scenarioName', () {
             });
           });
         },
-        skip: true,
       );
 
       group(
@@ -312,7 +311,6 @@ void testTaskScenario() => group(': $_scenarioName', () {
 
           testWidgets(
             ": end is all day.",
-            skip: true,
             (widgetTester) async {
               await runApplication();
               await widgetTester.pumpAndSettle();
@@ -345,7 +343,6 @@ void testTaskScenario() => group(': $_scenarioName', () {
 
           testWidgets(
             ": start is not all day, end is all day.",
-            skip: true,
             (widgetTester) async {
               await PreferenceClient().receive(Preference(
                 startOfDayKey,
@@ -413,7 +410,6 @@ void testTaskScenario() => group(': $_scenarioName', () {
 
       group(
         'notification',
-        skip: true,
         () {
           setUp(
             () async {
