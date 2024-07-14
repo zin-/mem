@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:mem/act_counter/act_counter_configure.dart';
 import 'package:mem/act_counter/act_counter_repository.dart';
 import 'package:mem/act_counter/act_counter_client.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/detail/page.dart';
 import 'package:mem/notifications/flutter_local_notifications_wrapper.dart';
 import 'package:mem/notifications/notification_actions.dart';
 import 'package:mem/notifications/notification_repository.dart';
 import 'package:mem/framework/repository/database_repository.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
+import 'package:mem/router.dart';
 
 import 'application.dart';
 
@@ -29,7 +28,9 @@ Future<void> launchMemDetailPage(int memId) => i(
       () {
         WidgetsFlutterBinding.ensureInitialized();
 
-        return _runApplication(home: MemDetailPage(memId));
+        return _runApplication(
+          initialPath: buildMemDetailPath(memId),
+        );
       },
       {'memId': memId},
     );
@@ -39,7 +40,9 @@ Future<void> launchActCounterConfigure() => i(
       () {
         WidgetsFlutterBinding.ensureInitialized();
 
-        return _runApplication(home: const ActCounterConfigure());
+        return _runApplication(
+          initialPath: newActCountersPath,
+        );
       },
     );
 
@@ -81,19 +84,25 @@ Future<void> onNotificationResponseReceived(dynamic details) => i(
       {'details': details},
     );
 
-Future<void> _runApplication({Widget? home, String? languageCode}) => i(
+Future<void> _runApplication({
+  String? languageCode,
+  String? initialPath,
+}) =>
+    i(
       () async {
         await openDatabase();
         ActCounterRepository();
 
         runApp(
           MemApplication(
-            languageCode,
-            home: home,
+            initialPath: initialPath,
           ),
         );
       },
-      [home, languageCode],
+      {
+        'languageCode': languageCode,
+        'initialPath': initialPath,
+      },
     );
 
 // FIXME 先に初期化が必要なのではなく、Repositoryを利用する際に勝手に初期化されるようにする
