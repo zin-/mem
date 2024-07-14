@@ -16,7 +16,7 @@ class MemApplication extends StatelessWidget {
           onGenerateTitle: (context) => buildL10n(context).appTitle,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          // TODO 必要？
+          // FIXME 必要ないかもしれない
           // locale: languageCode == null ? null : Locale(languageCode!),
           theme: ThemeData.light(useMaterial3: true),
         ),
