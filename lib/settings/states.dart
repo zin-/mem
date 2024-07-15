@@ -11,7 +11,9 @@ final startOfDayProvider =
     () => ValueStateNotifier(
       null,
       initializer: (current, notifier) => v(
-        () async => notifier.updatedBy(await loadByKey(startOfDayKey)),
+        () async =>
+            // TODO ここで初期値を設定して良い気がする defaultStartOfDay
+            notifier.updatedBy(await loadByKey(startOfDayKey)),
         {'current': current, 'notifier': notifier},
       ),
     ),
