@@ -7,6 +7,7 @@ import 'package:mem/settings/actions.dart';
 import 'package:mem/settings/backup_section.dart';
 import 'package:mem/settings/keys.dart';
 import 'package:mem/settings/states.dart';
+import 'package:mem/values/constants.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 class SettingsPage extends ConsumerWidget {
@@ -19,20 +20,24 @@ class SettingsPage extends ConsumerWidget {
           onStartOfDayChanged: (TimeOfDay? picked) => v(
             () async {
               await update(startOfDayKey, picked);
-              ref.read(startOfDayProvider.notifier).updatedBy(picked);
+              ref
+                  .read(startOfDayProvider.notifier)
+                  .updatedBy(picked ?? defaultStartOfDay);
             },
-            picked,
+            {
+              'picked': picked,
+            },
           ),
         ),
       );
 }
 
 class _SettingsPage extends StatelessWidget {
-  final TimeOfDay? _startOfDay;
+  final TimeOfDay _startOfDay;
   final void Function(TimeOfDay? picked) _onStartOfDayChanged;
 
   const _SettingsPage({
-    required TimeOfDay? startOfDay,
+    required TimeOfDay startOfDay,
     required onStartOfDayChanged,
   })  : _startOfDay = startOfDay,
         _onStartOfDayChanged = onStartOfDayChanged;
@@ -73,7 +78,7 @@ class _SettingsPage extends StatelessWidget {
 SettingsTile _buildStartOfDay(
   BuildContext context,
   String title,
-  TimeOfDay? startOfDay,
+  TimeOfDay startOfDay,
   void Function(TimeOfDay? changed) onChanged,
 ) =>
     SettingsTile.navigation(
@@ -81,13 +86,13 @@ SettingsTile _buildStartOfDay(
       title: Text(title),
       onPressed: (context) => v(
         () async => onChanged(
-          await showTimePicker(
+          (await showTimePicker(
             context: context,
-            initialTime: startOfDay ?? TimeOfDay.now(),
-          ),
+            initialTime: startOfDay,
+          )),
         ),
       ),
-      value: startOfDay == null ? null : Text(startOfDay.format(context)),
+      value: Text(startOfDay.format(context)),
     );
 
 SettingsTile _buildResetNotification(

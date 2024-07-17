@@ -16,7 +16,9 @@ Future<bool> update<Key extends PreferenceKey<Value>, Value>(
 ) =>
     v(
       () async => await (value == null
+// coverage:ignore-start
           ? _client.discard(key)
+// coverage:ignore-end
           : _client.receive(Preference(key, value))),
       {"key": key, "value": value},
     );
