@@ -16,7 +16,7 @@ class SettingsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => i(
         () => _SettingsPage(
           startOfDay: ref.watch(startOfDayProvider),
-          onStartOfDayChanged: (TimeOfDay? picked) => v(
+          onStartOfDayChanged: (TimeOfDay picked) => v(
             () async {
               await update(startOfDayKey, picked);
               ref.read(startOfDayProvider.notifier).updatedBy(picked);
@@ -28,11 +28,11 @@ class SettingsPage extends ConsumerWidget {
 }
 
 class _SettingsPage extends StatelessWidget {
-  final TimeOfDay? _startOfDay;
-  final void Function(TimeOfDay? picked) _onStartOfDayChanged;
+  final TimeOfDay _startOfDay;
+  final void Function(TimeOfDay picked) _onStartOfDayChanged;
 
   const _SettingsPage({
-    required TimeOfDay? startOfDay,
+    required TimeOfDay startOfDay,
     required onStartOfDayChanged,
   })  : _startOfDay = startOfDay,
         _onStartOfDayChanged = onStartOfDayChanged;
@@ -73,21 +73,22 @@ class _SettingsPage extends StatelessWidget {
 SettingsTile _buildStartOfDay(
   BuildContext context,
   String title,
-  TimeOfDay? startOfDay,
-  void Function(TimeOfDay? changed) onChanged,
+  TimeOfDay startOfDay,
+  void Function(TimeOfDay changed) onChanged,
 ) =>
     SettingsTile.navigation(
       leading: const Icon(Icons.start),
       title: Text(title),
       onPressed: (context) => v(
         () async => onChanged(
-          await showTimePicker(
-            context: context,
-            initialTime: startOfDay ?? TimeOfDay.now(),
-          ),
+          (await showTimePicker(
+                context: context,
+                initialTime: startOfDay,
+              )) ??
+              startOfDay,
         ),
       ),
-      value: startOfDay == null ? null : Text(startOfDay.format(context)),
+      value: Text(startOfDay.format(context)),
     );
 
 SettingsTile _buildResetNotification(
