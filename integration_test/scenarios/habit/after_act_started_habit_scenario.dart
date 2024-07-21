@@ -107,11 +107,21 @@ void main() => group(
           ": Save",
           (widgetTester) async {
             widgetTester.ignoreMockMethodCallHandler(
+                MethodChannelMock.permissionHandler);
+            widgetTester.ignoreMockMethodCallHandler(
                 MethodChannelMock.flutterLocalNotifications);
 
             await runApplication();
             await widgetTester.pumpAndSettle();
             await widgetTester.tap(newMemFabFinder);
+            await widgetTester.pumpAndSettle();
+            const enteringMemName = "$_name: Save - entering - mem name";
+            await widgetTester.enterText(
+              find.byKey(keyMemName),
+              enteringMemName,
+            );
+            FocusScope.of(widgetTester.element(find.byKey(keyMemName)))
+                .unfocus();
             await widgetTester.pumpAndSettle();
 
             final notificationAddFinder = find.descendant(
@@ -166,15 +176,6 @@ void main() => group(
               "01:00 after started",
             );
 
-            const enteringMemName = "$_name: Save - entering - mem name";
-            await widgetTester.enterText(
-              find.byKey(keyMemName),
-              enteringMemName,
-            );
-
-            widgetTester.ignoreMockMethodCallHandler(
-                MethodChannelMock.flutterLocalNotifications);
-
             await widgetTester.tap(find.byKey(keySaveMemFab));
             await widgetTester.pump(waitSideEffectDuration);
 
@@ -189,7 +190,11 @@ void main() => group(
               where: "${defFkMemNotificationsMemId.name} = ?",
               whereArgs: [savedMem[defPkId.name]],
             ))
-                .single;
+                .singleWhere(
+              (element) =>
+                  element[defColMemNotificationsType.name] ==
+                  MemNotificationType.afterActStarted.name,
+            );
             expect(
               savedMemNotification[defColMemNotificationsTime.name],
               (1 * 60) * 60,

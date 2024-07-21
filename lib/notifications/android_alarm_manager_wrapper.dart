@@ -49,6 +49,10 @@ class AndroidAlarmManagerWrapper {
                 id,
                 callback,
                 startAt: startAt,
+                allowWhileIdle: true,
+                exact: true,
+                wakeup: true,
+                rescheduleOnReboot: true,
                 params: params,
               )
             : false,

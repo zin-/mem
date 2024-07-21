@@ -80,30 +80,16 @@ class MemNotifications {
                 ? startOfDay
                 : TimeOfDay(hour: 0, minute: (repeatAt / 60).floor());
 
-            if (latestAct == null) {
-              notifyAt = now.copyWith(
-                  hour: timeOfDay.hour,
-                  minute: timeOfDay.minute,
-                  second: 0,
-                  millisecond: 0,
-                  microsecond: 0);
-            } else {
-              notifyAt = latestAct.period.end!
-                  .copyWith(
-                      hour: timeOfDay.hour,
-                      minute: timeOfDay.minute,
-                      second: 0,
-                      millisecond: 0,
-                      microsecond: 0)
-                  .add(Duration(
-                    days: memNotifications
-                            .singleWhereOrNull((e) => e.isRepeatByNDay())
-                            ?.time ??
-                        1,
-                  ));
-            }
+            notifyAt =
+                (latestAct == null ? now : latestAct.period.end!).copyWith(
+              hour: timeOfDay.hour,
+              minute: timeOfDay.minute,
+              second: 0,
+              millisecond: 0,
+              microsecond: 0,
+            );
 
-            while (notifyAt != null && now.compareTo(notifyAt) > 0) {
+            while (notifyAt != null && now.compareTo(notifyAt) < 0) {
               notifyAt = notifyAt.add(const Duration(days: 1));
             }
 

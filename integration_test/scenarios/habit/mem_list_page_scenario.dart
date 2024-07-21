@@ -147,6 +147,8 @@ void main() => group(
               'sorted.',
               (widgetTester) async {
                 widgetTester.ignoreMockMethodCallHandler(
+                    MethodChannelMock.permissionHandler);
+                widgetTester.ignoreMockMethodCallHandler(
                     MethodChannelMock.flutterLocalNotifications);
 
                 await runApplication();
@@ -157,9 +159,9 @@ void main() => group(
                 expect(
                     widgetTester.textAt(6).data, equals(memWithEveryDayName));
                 expect(widgetTester.textAt(8).data,
-                    equals(memWithTomorrowDayOfWeekName));
-                expect(widgetTester.textAt(10).data,
                     equals(memWithTodayFinishedActName));
+                expect(widgetTester.textAt(10).data,
+                    equals(memWithTomorrowDayOfWeekName));
                 expect(widgetTester.textAt(12).data, equals(plainMemName));
               },
             );
@@ -174,6 +176,8 @@ void main() => group(
               // 時間に関するテストなので3回までリトライ可能とする
               retry: 3,
               (widgetTester) async {
+                widgetTester.ignoreMockMethodCallHandler(
+                    MethodChannelMock.permissionHandler);
                 widgetTester.ignoreMockMethodCallHandler(
                     MethodChannelMock.flutterLocalNotifications);
 

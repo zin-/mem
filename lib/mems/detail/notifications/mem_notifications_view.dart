@@ -45,17 +45,20 @@ class _MemNotificationsView extends StatelessWidget {
   Widget build(BuildContext context) => v(
         () {
           final l10n = buildL10n(context);
-
-          final enables =
-              _memNotifications.where((element) => element.isEnabled());
-
-          final hasEnabledNotifications = enables.isNotEmpty;
+          final oneLine = MemNotification.toOneLine(
+            _memNotifications,
+            l10n.repeatedNotificationText,
+            l10n.repeatEveryNDayNotificationText,
+            l10n.afterActStartedNotificationText,
+            (dataAndTime) =>
+                TimeOfDay.fromDateTime(dataAndTime).format(context),
+          );
 
           return ListTile(
             contentPadding: EdgeInsets.zero,
             leading: Icon(
               Icons.notifications,
-              color: hasEnabledNotifications ? null : secondaryGreyColor,
+              color: oneLine?.isEmpty == false ? null : secondaryGreyColor,
             ),
             title: MemNotificationText(_memId),
             trailing: IconButton(
@@ -71,9 +74,9 @@ class _MemNotificationsView extends StatelessWidget {
                 ),
               ),
               icon: Icon(
-                hasEnabledNotifications ? Icons.edit : Icons.notification_add,
+                oneLine?.isEmpty == false ? Icons.edit : Icons.notification_add,
               ),
-              tooltip: hasEnabledNotifications
+              tooltip: oneLine?.isEmpty == false
                   ? l10n.editNotification
                   : l10n.addNotification,
             ),
