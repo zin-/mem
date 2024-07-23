@@ -237,9 +237,9 @@ void main() => group(
                 expect(message.method, equals('Alarm.periodic'));
                 expect(message.arguments[0],
                     equals(memRepeatedNotificationId(expectedSavedMemId)));
-                expect(message.arguments[1], isFalse);
-                expect(message.arguments[2], isFalse);
-                expect(message.arguments[3], isFalse);
+                expect(message.arguments[1], isTrue);
+                expect(message.arguments[2], isTrue);
+                expect(message.arguments[3], isTrue);
                 expect(
                     message.arguments[4],
                     equals(testStart
@@ -249,11 +249,10 @@ void main() => group(
                             second: 0,
                             millisecond: 0,
                             microsecond: 0)
-                        .add(const Duration(days: 1))
                         .millisecondsSinceEpoch));
                 expect(message.arguments[5],
                     const Duration(days: 1).inMilliseconds);
-                expect(message.arguments[6], isFalse);
+                expect(message.arguments[6], isTrue);
                 expect(message.arguments[7], isNotNull);
                 expect(
                     message.arguments[8],
