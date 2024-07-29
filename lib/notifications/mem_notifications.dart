@@ -89,7 +89,7 @@ class MemNotifications {
               microsecond: 0,
             );
 
-            while (notifyAt != null && now.compareTo(notifyAt) < 0) {
+            while (notifyAt != null && now.compareTo(notifyAt) >= 0) {
               notifyAt = notifyAt.add(const Duration(days: 1));
             }
 
