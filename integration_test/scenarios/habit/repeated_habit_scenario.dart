@@ -195,130 +195,137 @@ void main() => group(
           );
         });
 
-        group(": Save", () {
-          setUp(() async {
-            await dbA.insert(
-              defTableActs,
-              {
-                defFkActsMemId.name: insertedMemId,
-                defColActsStart.name: zeroDate,
-                defColActsStartIsAllDay.name: 0,
-                defColCreatedAt.name: zeroDate,
+        group(
+          ": Save",
+          () {
+            setUp(() async {
+              await dbA.insert(
+                defTableActs,
+                {
+                  defFkActsMemId.name: insertedMemId,
+                  defColActsStart.name: zeroDate,
+                  defColActsStartIsAllDay.name: 0,
+                  defColCreatedAt.name: zeroDate,
+                },
+              );
+            });
+
+            testWidgets(
+              ": create.",
+              (widgetTester) async {
+                await runApplication();
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(newMemFabFinder);
+                await widgetTester.pumpAndSettle();
+                const enteringMemName = "$baseMemName - entering";
+                await widgetTester.enterText(
+                    find.byKey(keyMemName), enteringMemName);
+
+                final notificationAddFinder = find.descendant(
+                  of: find.byKey(keyMemNotificationsView),
+                  matching: find.byIcon(Icons.notification_add),
+                );
+                await widgetTester.tap(
+                  notificationAddFinder,
+                );
+                await widgetTester.pumpAndSettle(defaultTransitionDuration);
+
+                await widgetTester.tap(timeIconFinder);
+                await widgetTester.pump();
+
+                await widgetTester.tap(okFinder);
+                await widgetTester.pump();
+
+                await widgetTester.pageBack();
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(find.byKey(keySaveMemFab));
+                await widgetTester.pumpAndSettle();
+
+                final savedMem = (await dbA.select(
+                  defTableMems,
+                  where: "${defColMemsName.name} = ?",
+                  whereArgs: [enteringMemName],
+                ))
+                    .single;
+                final savedMemNotification = (await dbA.select(
+                  defTableMemNotifications,
+                  where: "${defFkMemNotificationsMemId.name} = ?",
+                  whereArgs: [savedMem[defPkId.name]],
+                ))
+                    .singleWhere(
+                  (e) =>
+                      e[defColMemNotificationsType.name] ==
+                      MemNotificationType.repeat.name,
+                );
+                expect(
+                  savedMemNotification[defColMemNotificationsTime.name],
+                  0,
+                );
               },
             );
-          });
 
-          testWidgets(
-            ": create.",
-            (widgetTester) async {
-              await runApplication();
-              await widgetTester.pumpAndSettle();
-              await widgetTester.tap(newMemFabFinder);
-              await widgetTester.pumpAndSettle();
-              const enteringMemName = "$baseMemName - entering";
-              await widgetTester.enterText(
-                  find.byKey(keyMemName), enteringMemName);
+            testWidgets(
+              ": update.",
+              (widgetTester) async {
+                await runApplication();
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(find.text(insertedMemName));
+                await widgetTester.pumpAndSettle();
 
-              final notificationAddFinder = find.descendant(
-                of: find.byKey(keyMemNotificationsView),
-                matching: find.byIcon(Icons.notification_add),
-              );
-              await widgetTester.tap(
-                notificationAddFinder,
-              );
-              await widgetTester.pumpAndSettle(defaultTransitionDuration);
+                final notificationAddFinder = find.descendant(
+                  of: find.byKey(keyMemNotificationsView),
+                  matching: find.byIcon(Icons.edit),
+                );
+                await widgetTester.dragUntilVisible(
+                  notificationAddFinder,
+                  find.byType(SingleChildScrollView),
+                  const Offset(0, 50),
+                );
+                await widgetTester.tap(
+                  notificationAddFinder,
+                );
+                await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-              await widgetTester.tap(timeIconFinder);
-              await widgetTester.pump();
+                await widgetTester.tap(
+                  find.descendant(
+                    of: find.byKey(keyMemRepeatedNotification),
+                    matching: find.byIcon(Icons.clear),
+                  ),
+                );
+                await widgetTester.pump();
 
-              await widgetTester.tap(okFinder);
-              await widgetTester.pump();
+                await widgetTester.tap(timeIconFinder);
+                await widgetTester.pump();
+                await widgetTester.tap(okFinder);
+                await widgetTester.pump();
 
-              await widgetTester.pageBack();
-              await widgetTester.pumpAndSettle();
-              await widgetTester.tap(find.byKey(keySaveMemFab));
-              await widgetTester.pumpAndSettle();
+                await widgetTester.pageBack();
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(find.byKey(keySaveMemFab));
+                await widgetTester.pump(waitSideEffectDuration);
 
-              final savedMem = (await dbA.select(
-                defTableMems,
-                where: "${defColMemsName.name} = ?",
-                whereArgs: [enteringMemName],
-              ))
-                  .single;
-              final savedMemNotification = (await dbA.select(
-                defTableMemNotifications,
-                where: "${defFkMemNotificationsMemId.name} = ?",
-                whereArgs: [savedMem[defPkId.name]],
-              ))
-                  .single;
-              expect(
-                savedMemNotification[defColMemNotificationsTime.name],
-                0,
-              );
-            },
-          );
-
-          testWidgets(
-            ": update.",
-            (widgetTester) async {
-              await runApplication();
-              await widgetTester.pumpAndSettle();
-              await widgetTester.tap(find.text(insertedMemName));
-              await widgetTester.pumpAndSettle();
-
-              final notificationAddFinder = find.descendant(
-                of: find.byKey(keyMemNotificationsView),
-                matching: find.byIcon(Icons.edit),
-              );
-              await widgetTester.dragUntilVisible(
-                notificationAddFinder,
-                find.byType(SingleChildScrollView),
-                const Offset(0, 50),
-              );
-              await widgetTester.tap(
-                notificationAddFinder,
-              );
-              await widgetTester.pumpAndSettle(defaultTransitionDuration);
-
-              await widgetTester.tap(
-                find.descendant(
-                  of: find.byKey(keyMemRepeatedNotification),
-                  matching: find.byIcon(Icons.clear),
-                ),
-              );
-              await widgetTester.pump();
-
-              await widgetTester.tap(timeIconFinder);
-              await widgetTester.pump();
-              await widgetTester.tap(okFinder);
-              await widgetTester.pump();
-
-              await widgetTester.pageBack();
-              await widgetTester.pumpAndSettle();
-              await widgetTester.tap(find.byKey(keySaveMemFab));
-              await widgetTester.pump(waitSideEffectDuration);
-
-              final savedMem = (await dbA.select(
-                defTableMems,
-                where: "${defColMemsName.name} = ?",
-                whereArgs: [insertedMemName],
-              ))
-                  .single;
-              final savedMemNotification = (await dbA.select(
-                defTableMemNotifications,
-                where: "${defFkMemNotificationsMemId.name} = ?",
-                whereArgs: [savedMem[defPkId.name]],
-              ));
-              expect(
-                savedMemNotification[0][defColMemNotificationsTime.name],
-                0,
-              );
-              expect(
-                savedMemNotification[1][defColMemNotificationsTime.name],
-                1,
-              );
-            },
-          );
-        });
+                final savedMem = (await dbA.select(
+                  defTableMems,
+                  where: "${defColMemsName.name} = ?",
+                  whereArgs: [insertedMemName],
+                ))
+                    .single;
+                final savedMemNotification = (await dbA.select(
+                  defTableMemNotifications,
+                  where: "${defFkMemNotificationsMemId.name} = ?",
+                  whereArgs: [savedMem[defPkId.name]],
+                ));
+                expect(
+                  savedMemNotification[0][defColMemNotificationsTime.name],
+                  0,
+                );
+                expect(
+                  savedMemNotification[1][defColMemNotificationsTime.name],
+                  1,
+                );
+              },
+            );
+          },
+        );
       },
     );
