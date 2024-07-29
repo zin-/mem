@@ -241,7 +241,7 @@ void main() => group(
                 expect(message.arguments[2], isTrue);
                 expect(message.arguments[3], isTrue);
                 expect(
-                    message.arguments[4],
+                    DateTime.fromMillisecondsSinceEpoch(message.arguments[4]),
                     equals(testStart
                         .copyWith(
                             hour: defaultStartOfDay.hour,
@@ -249,9 +249,9 @@ void main() => group(
                             second: 0,
                             millisecond: 0,
                             microsecond: 0)
-                        .millisecondsSinceEpoch));
-                expect(message.arguments[5],
-                    const Duration(days: 1).inMilliseconds);
+                        .add(const Duration(days: 1))));
+                expect(Duration(milliseconds: message.arguments[5]),
+                    const Duration(days: 1));
                 expect(message.arguments[6], isTrue);
                 expect(message.arguments[7], isNotNull);
                 expect(
