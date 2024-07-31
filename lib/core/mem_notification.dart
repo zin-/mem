@@ -31,7 +31,7 @@ class MemNotification extends EntityV1 {
       memId, MemNotificationType.repeat, null, _repeatedMessage);
 
   factory MemNotification.repeatByNDay(int? memId) => MemNotification(
-      memId, MemNotificationType.repeatByNDay, null, _repeatedMessage);
+      memId, MemNotificationType.repeatByNDay, 1, _repeatedMessage);
 
   factory MemNotification.repeatByDayOfWeek(int? memId, int time) =>
       MemNotification(memId, MemNotificationType.repeatByDayOfWeek, time,

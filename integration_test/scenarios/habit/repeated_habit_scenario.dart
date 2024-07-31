@@ -87,130 +87,110 @@ void main() => group(
           );
         });
 
-        group(": Show", () {
-          testWidgets(
-            ": on new.",
-            (widgetTester) async {
-              await runApplication();
-              await widgetTester.pumpAndSettle();
-              await widgetTester.tap(newMemFabFinder);
-              await widgetTester.pumpAndSettle(defaultTransitionDuration);
+        group(
+          'show',
+          () {
+            testWidgets(
+              'on new.',
+              (widgetTester) async {
+                await runApplication();
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(newMemFabFinder);
+                await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-              expect(
-                widgetTester
-                    .widget<Text>(
-                      find.descendant(
-                        of: find.byKey(keyMemNotificationsView),
-                        matching: find.byType(Text),
-                      ),
-                    )
-                    .data,
-                l10n.noNotifications,
-              );
-              final notificationAddFinder = find.descendant(
-                of: find.byKey(keyMemNotificationsView),
-                matching: find.byIcon(Icons.notification_add),
-              );
-              expect(
-                notificationAddFinder,
-                findsOneWidget,
-              );
+                expect(
+                    widgetTester
+                        .widget<Text>(find.descendant(
+                            of: find.byKey(keyMemNotificationsView),
+                            matching: find.byType(Text)))
+                        .data,
+                    l10n.noNotifications);
+                final notificationAddFinder = find.descendant(
+                    of: find.byKey(keyMemNotificationsView),
+                    matching: find.byIcon(Icons.notification_add));
+                expect(notificationAddFinder, findsOneWidget);
 
-              await widgetTester.dragUntilVisible(
-                notificationAddFinder,
-                find.byType(SingleChildScrollView),
-                const Offset(0, 50),
-              );
-              await widgetTester.tap(
-                notificationAddFinder,
-              );
-              await widgetTester.pumpAndSettle(defaultTransitionDuration);
+                await widgetTester.dragUntilVisible(notificationAddFinder,
+                    find.byType(SingleChildScrollView), const Offset(0, 50));
+                await widgetTester.tap(notificationAddFinder);
+                await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-              expect(
-                widgetTester
-                    .widget<TimeOfDayTextFormField>(
-                      find.descendant(
-                          of: find.byKey(keyMemRepeatedNotification),
-                          matching: find.byType(TimeOfDayTextFormField)),
-                    )
-                    .timeOfDay,
-                defaultStartOfDay,
-              );
-              expect(
-                find.descendant(
-                    of: find.byKey(keyMemRepeatedNotification),
-                    matching: find.byIcon(Icons.clear)),
-                findsNothing,
-              );
-            },
-          );
-
-          testWidgets(
-            'saved.',
-            (widgetTester) async {
-              const repeatText = "12:00 AM every day";
-
-              await runApplication();
-              await widgetTester.pumpAndSettle();
-
-              expect(find.text(repeatText), findsOneWidget);
-
-              await widgetTester.tap(find.text(insertedMemName));
-              await widgetTester.pumpAndSettle(defaultTransitionDuration);
-
-              expect(
-                  widgetTester
-                      .widget<Text>(find.descendant(
-                          of: find.byKey(keyMemNotificationsView),
-                          matching: find.byType(Text)))
-                      .data,
-                  repeatText);
-
-              await widgetTester.tap(
-                find.descendant(
-                  of: find.byKey(keyMemNotificationsView),
-                  matching: find.byIcon(Icons.edit),
-                ),
-              );
-              await widgetTester.pumpAndSettle(defaultTransitionDuration);
-
-              expect(
-                widgetTester
-                    .widget<TimeOfDayTextFormField>(
-                      find.descendant(
+                expect(
+                    widgetTester
+                        .widget<TimeOfDayTextFormField>(find.descendant(
+                            of: find.byKey(keyMemRepeatedNotification),
+                            matching: find.byType(TimeOfDayTextFormField)))
+                        .timeOfDay,
+                    defaultStartOfDay);
+                expect(
+                    find.descendant(
                         of: find.byKey(keyMemRepeatedNotification),
-                        matching: find.byType(TimeOfDayTextFormField),
-                      ),
-                    )
-                    .timeOfDay,
-                defaultStartOfDay,
-              );
-              expect(
-                find.descendant(
-                    of: find.byKey(keyMemRepeatedNotification),
-                    matching: find.byIcon(Icons.clear)),
-                findsOneWidget,
-              );
-            },
-          );
-        });
-
-        group(": Save", () {
-          setUp(() async {
-            await dbA.insert(
-              defTableActs,
-              {
-                defFkActsMemId.name: insertedMemId,
-                defColActsStart.name: zeroDate,
-                defColActsStartIsAllDay.name: 0,
-                defColCreatedAt.name: zeroDate,
+                        matching: find.byIcon(Icons.clear)),
+                    findsNothing);
               },
             );
+
+            testWidgets(
+              'saved.',
+              (widgetTester) async {
+                const repeatText = "12:00 AM every day";
+
+                await runApplication();
+                await widgetTester.pumpAndSettle();
+
+                expect(find.text(repeatText), findsOneWidget);
+
+                await widgetTester.tap(find.text(insertedMemName));
+                await widgetTester.pumpAndSettle(defaultTransitionDuration);
+
+                expect(
+                    widgetTester
+                        .widget<Text>(find.descendant(
+                            of: find.byKey(keyMemNotificationsView),
+                            matching: find.byType(Text)))
+                        .data,
+                    repeatText);
+
+                await widgetTester.tap(find.descendant(
+                    of: find.byKey(keyMemNotificationsView),
+                    matching: find.byIcon(Icons.edit)));
+                await widgetTester.pumpAndSettle(defaultTransitionDuration);
+
+                expect(
+                    widgetTester
+                        .widget<TimeOfDayTextFormField>(
+                          find.descendant(
+                              of: find.byKey(keyMemRepeatedNotification),
+                              matching: find.byType(TimeOfDayTextFormField)),
+                        )
+                        .timeOfDay,
+                    defaultStartOfDay);
+                expect(
+                    find.descendant(
+                        of: find.byKey(keyMemRepeatedNotification),
+                        matching: find.byIcon(Icons.clear)),
+                    findsOneWidget);
+              },
+            );
+          },
+        );
+
+        group('save', () {
+          setUp(() async {
+            await dbA.insert(defTableActs, {
+              defFkActsMemId.name: insertedMemId,
+              defColActsStart.name: zeroDate,
+              defColActsStartIsAllDay.name: 0,
+              defColCreatedAt.name: zeroDate
+            });
           });
 
           testWidgets(
-            ": create.",
+            'create.',
             (widgetTester) async {
+              widgetTester.ignoreMockMethodCallHandler(
+                  MethodChannelMock.permissionHandler);
+
               await runApplication();
               await widgetTester.pumpAndSettle();
               await widgetTester.tap(newMemFabFinder);
@@ -220,12 +200,9 @@ void main() => group(
                   find.byKey(keyMemName), enteringMemName);
 
               final notificationAddFinder = find.descendant(
-                of: find.byKey(keyMemNotificationsView),
-                matching: find.byIcon(Icons.notification_add),
-              );
-              await widgetTester.tap(
-                notificationAddFinder,
-              );
+                  of: find.byKey(keyMemNotificationsView),
+                  matching: find.byIcon(Icons.notification_add));
+              await widgetTester.tap(notificationAddFinder);
               await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
               await widgetTester.tap(timeIconFinder);
@@ -239,22 +216,18 @@ void main() => group(
               await widgetTester.tap(find.byKey(keySaveMemFab));
               await widgetTester.pumpAndSettle();
 
-              final savedMem = (await dbA.select(
-                defTableMems,
-                where: "${defColMemsName.name} = ?",
-                whereArgs: [enteringMemName],
-              ))
+              final savedMem = (await dbA.select(defTableMems,
+                      where: "${defColMemsName.name} = ?",
+                      whereArgs: [enteringMemName]))
                   .single;
-              final savedMemNotification = (await dbA.select(
-                defTableMemNotifications,
-                where: "${defFkMemNotificationsMemId.name} = ?",
-                whereArgs: [savedMem[defPkId.name]],
-              ))
-                  .single;
-              expect(
-                savedMemNotification[defColMemNotificationsTime.name],
-                0,
-              );
+              final savedMemNotifications = (await dbA.select(
+                  defTableMemNotifications,
+                  where: "${defFkMemNotificationsMemId.name} = ?",
+                  whereArgs: [savedMem[defPkId.name]]));
+              final repeat = savedMemNotifications.singleWhere((e) =>
+                  e[defColMemNotificationsType.name] ==
+                  MemNotificationType.repeat.name);
+              expect(repeat[defColMemNotificationsTime.name], 0);
             },
           );
 
