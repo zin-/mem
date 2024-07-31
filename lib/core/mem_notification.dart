@@ -103,10 +103,12 @@ class MemNotification extends EntityV1 {
                 ),
             ].join(", ");
 
-            return text;
+            return text.isEmpty ? null : text;
           }
         },
-        {'memNotifications': memNotifications},
+        {
+          'memNotifications': memNotifications,
+        },
       );
 
   static String _oneLineRepeat(

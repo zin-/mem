@@ -147,6 +147,8 @@ void main() => group(
               'sorted.',
               (widgetTester) async {
                 widgetTester.ignoreMockMethodCallHandler(
+                    MethodChannelMock.permissionHandler);
+                widgetTester.ignoreMockMethodCallHandler(
                     MethodChannelMock.flutterLocalNotifications);
 
                 await runApplication();
@@ -156,11 +158,13 @@ void main() => group(
                 expect(widgetTester.textAt(3).data, equals(memWithStartName));
                 expect(
                     widgetTester.textAt(6).data, equals(memWithEveryDayName));
-                expect(widgetTester.textAt(8).data,
+                expect(widgetTester.textAt(7).data,
                     equals(memWithTomorrowDayOfWeekName));
-                expect(widgetTester.textAt(10).data,
+                expect(widgetTester.textAt(9).data,
                     equals(memWithTodayFinishedActName));
-                expect(widgetTester.textAt(12).data, equals(plainMemName));
+                expect(widgetTester.textAt(10).data, equals(plainMemName));
+                expect(widgetTester.textAt(11).data,
+                    equals(memWithAfterStartName));
               },
             );
           },
