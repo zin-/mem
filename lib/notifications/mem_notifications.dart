@@ -23,7 +23,6 @@ class MemNotifications {
   ) =>
       v(
         () => memNotifications
-                .whereType<SavedMemNotification>()
                 .where(
                   (e) =>
                       e.isEnabled() &&
