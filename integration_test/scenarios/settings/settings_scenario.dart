@@ -102,7 +102,6 @@ void main() => group(
                 await widgetTester.tap(find.text(l10n.settingsPageTitle));
                 await widgetTester.pumpAndSettle();
 
-                final now = DateTime.now();
                 await widgetTester.tap(find.text(l10n.startOfDayLabel));
                 await widgetTester.pumpAndSettle();
 
@@ -118,11 +117,11 @@ void main() => group(
                           )
                           .at(1))
                       .data,
-                  timeText(now),
+                  timeText(zeroDate),
                 );
                 expect(
                   (await PreferenceClient().shipByKey(startOfDayKey)).value,
-                  TimeOfDay.fromDateTime(now),
+                  TimeOfDay.fromDateTime(zeroDate),
                 );
               },
             );
@@ -159,31 +158,6 @@ void main() => group(
                               .at(1))
                           .data,
                       timeText(now),
-                    );
-                  },
-                );
-
-                testWidgets(
-                  "remove.",
-                  (widgetTester) async {
-                    await runApplication();
-                    await widgetTester.pumpAndSettle();
-
-                    await widgetTester.tap(drawerIconFinder);
-                    await widgetTester.pumpAndSettle();
-                    await widgetTester.tap(find.text(l10n.settingsPageTitle));
-                    await widgetTester.pumpAndSettle();
-
-                    await widgetTester.tap(find.text(l10n.startOfDayLabel));
-                    await widgetTester.pumpAndSettle();
-
-                    await widgetTester.tap(cancelFinder);
-                    await widgetTester.pumpAndSettle();
-
-                    expect(find.text(timeText(now)), findsNothing);
-                    expect(
-                      (await PreferenceClient().shipByKey(startOfDayKey)).value,
-                      null,
                     );
                   },
                 );

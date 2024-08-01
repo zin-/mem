@@ -23,7 +23,6 @@ class MemNotifications {
   ) =>
       v(
         () => memNotifications
-                .whereType<SavedMemNotification>()
                 .where(
                   (e) =>
                       e.isEnabled() &&
@@ -107,11 +106,11 @@ class MemNotifications {
               notifyAt = notifyAt.add(const Duration(days: 1));
             }
 
-            final daysOfWeek = memNotifications
+            final daysOfWeeks = memNotifications
                 .where((e) => e.isRepeatByDayOfWeek() && e.isEnabled());
 
-            while (daysOfWeek.isNotEmpty &&
-                !daysOfWeek.map((e) => e.time).contains(notifyAt?.weekday)) {
+            while (daysOfWeeks.isNotEmpty &&
+                !daysOfWeeks.map((e) => e.time).contains(notifyAt?.weekday)) {
               notifyAt = notifyAt?.add(const Duration(days: 1));
             }
           }

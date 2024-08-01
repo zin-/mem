@@ -11,6 +11,7 @@ import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/mems/detail/fab.dart';
 import 'package:mem/mems/detail/notifications/after_act_started_notification_view.dart';
 import 'package:mem/mems/detail/notifications/mem_notifications_view.dart';
+import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/values/durations.dart';
 
 import '../helpers.dart';
@@ -104,10 +105,12 @@ void main() => group(
         );
 
         testWidgets(
-          ": Save",
+          'save.',
           (widgetTester) async {
             widgetTester.ignoreMockMethodCallHandler(
                 MethodChannelMock.flutterLocalNotifications);
+            widgetTester.ignoreMockMethodCallHandler(
+                MethodChannelMock.permissionHandler);
 
             await runApplication();
             await widgetTester.pumpAndSettle();
@@ -115,25 +118,16 @@ void main() => group(
             await widgetTester.pumpAndSettle();
 
             final notificationAddFinder = find.descendant(
-              of: find.byKey(keyMemNotificationsView),
-              matching: find.byIcon(Icons.notification_add),
-            );
-            await widgetTester.dragUntilVisible(
-              notificationAddFinder,
-              find.byType(SingleChildScrollView),
-              const Offset(0, 50),
-            );
-            await widgetTester.tap(
-              notificationAddFinder,
-            );
+                of: find.byKey(keyMemNotificationsView),
+                matching: find.byIcon(Icons.notification_add));
+            await widgetTester.dragUntilVisible(notificationAddFinder,
+                find.byType(SingleChildScrollView), const Offset(0, 50));
+            await widgetTester.tap(notificationAddFinder);
             await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-            await widgetTester.tap(
-              find.descendant(
+            await widgetTester.tap(find.descendant(
                 of: find.byKey(keyMemAfterActStartedNotification),
-                matching: find.byIcon(Icons.add),
-              ),
-            );
+                matching: find.byIcon(Icons.add)));
             await widgetTester.pumpAndSettle();
 
             await widgetTester.tap(okFinder);
@@ -142,35 +136,28 @@ void main() => group(
             const enteringMemNotificationMessage =
                 "$_name - entering - mem notification message";
             await widgetTester.enterText(
-              find
-                  .descendant(
-                    of: find.byKey(keyMemAfterActStartedNotification),
-                    matching: find.byType(TextFormField),
-                  )
-                  .at(1),
-              enteringMemNotificationMessage,
-            );
+                find
+                    .descendant(
+                        of: find.byKey(keyMemAfterActStartedNotification),
+                        matching: find.byType(TextFormField))
+                    .at(1),
+                enteringMemNotificationMessage);
             await widgetTester.pump();
 
             await widgetTester.pageBack();
             await widgetTester.pumpAndSettle();
 
             expect(
-              widgetTester
-                  .widget<Text>(
-                    find.descendant(
+                widgetTester
+                    .widget<Text>(find.descendant(
                         of: find.byKey(keyMemNotificationsView),
-                        matching: find.byType(Text)),
-                  )
-                  .data,
-              "01:00 after started",
-            );
+                        matching: find.byType(Text)))
+                    .data,
+                "01:00 after started");
 
             const enteringMemName = "$_name: Save - entering - mem name";
             await widgetTester.enterText(
-              find.byKey(keyMemName),
-              enteringMemName,
-            );
+                find.byKey(keyMemName), enteringMemName);
 
             widgetTester.ignoreMockMethodCallHandler(
                 MethodChannelMock.flutterLocalNotifications);
@@ -178,26 +165,21 @@ void main() => group(
             await widgetTester.tap(find.byKey(keySaveMemFab));
             await widgetTester.pump(waitSideEffectDuration);
 
-            final savedMem = (await dbA.select(
-              defTableMems,
-              where: "${defColMemsName.name} = ?",
-              whereArgs: [enteringMemName],
-            ))
+            final savedMem = (await dbA.select(defTableMems,
+                    where: "${defColMemsName.name} = ?",
+                    whereArgs: [enteringMemName]))
                 .single;
-            final savedMemNotification = (await dbA.select(
-              defTableMemNotifications,
-              where: "${defFkMemNotificationsMemId.name} = ?",
-              whereArgs: [savedMem[defPkId.name]],
-            ))
-                .single;
-            expect(
-              savedMemNotification[defColMemNotificationsTime.name],
-              (1 * 60) * 60,
-            );
-            expect(
-              savedMemNotification[defColMemNotificationsMessage.name],
-              enteringMemNotificationMessage,
-            );
+            final savedMemNotifications = (await dbA.select(
+                defTableMemNotifications,
+                where: "${defFkMemNotificationsMemId.name} = ?",
+                whereArgs: [savedMem[defPkId.name]]));
+            final afterActStarted = savedMemNotifications.singleWhere((e) =>
+                e[defColMemNotificationsType.name] ==
+                NotificationType.afterActStarted.name);
+            expect(afterActStarted[defColMemNotificationsTime.name],
+                (1 * 60) * 60);
+            expect(afterActStarted[defColMemNotificationsMessage.name],
+                enteringMemNotificationMessage);
           },
         );
 

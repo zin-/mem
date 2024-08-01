@@ -13,6 +13,7 @@ import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/list/item/subtitle.dart';
 import 'package:mem/mems/states.dart';
 import 'package:mem/repositories/mem.dart';
+import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/values/colors.dart';
 
 import 'actions.dart';
@@ -72,7 +73,7 @@ class _MemListItemView extends ListTile {
     void Function(SavedAct? act) onActButtonTapped,
   ) : super(
           leading: memNotifications
-                      .where((element) => element.isEnabled())
+                      .where((e) => e is SavedMemNotification && e.isEnabled())
                       .isEmpty &&
                   activeAct == null
               ? MemDoneCheckbox(
@@ -99,12 +100,14 @@ class _MemListItemView extends ListTile {
                 ),
           subtitle: mem.period == null &&
                   memNotifications
-                      .where((element) => element.isEnabled())
+                      .where((e) => e is SavedMemNotification && e.isEnabled())
                       .isEmpty
               ? null
               : MemListItemSubtitle(mem.id),
-          isThreeLine: !(mem.period == null &&
-              memNotifications.where((element) => element.isEnabled()).isEmpty),
+          isThreeLine: mem.period != null &&
+              memNotifications
+                  .where((e) => e is SavedMemNotification && e.isEnabled())
+                  .isNotEmpty,
           tileColor: mem.isArchived ? secondaryGreyColor : null,
           onTap: () => onTap(mem.id),
         ) {

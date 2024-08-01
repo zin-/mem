@@ -6,7 +6,7 @@ import 'package:mem/mems/detail/states.dart';
 import 'package:mem/settings/states.dart';
 import 'package:mem/values/constants.dart';
 
-const keyMemRepeatedNotification = Key("mem-repeated-notification");
+const keyMemRepeatedNotification = Key('mem-repeated-notification');
 
 class MemRepeatedNotificationView extends ConsumerWidget {
   final int? _memId;
@@ -15,26 +15,31 @@ class MemRepeatedNotificationView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () => _MemRepeatedNotificationView(
-          ref.watch(memRepeatedNotificationByMemIdProvider(_memId).select(
-            (value) => value.time,
-          )),
-          ref.read(startOfDayProvider) ?? defaultStartOfDay,
-          (picked) => ref
-              .read(memNotificationsByMemIdProvider(_memId).notifier)
-              .upsertAll(
-            [
-              ref
-                  .read(memRepeatedNotificationByMemIdProvider(_memId))
-                  .copiedWith(
-                    time: () => picked,
-                  )
-            ],
-            (current, updating) => current.type == updating.type,
-          ),
-        ),
+        () {
+          final memRepeatNotification =
+              ref.watch(memNotificationsByMemIdProvider(_memId).select(
+            (v) => v.singleWhere(
+              (element) => element.isRepeated(),
+            ),
+          ));
+
+          return _MemRepeatedNotificationView(
+            memRepeatNotification.time,
+            ref.read(startOfDayProvider) ?? defaultStartOfDay,
+            (picked) => ref
+                .read(memNotificationsByMemIdProvider(_memId).notifier)
+                .upsertAll(
+              [
+                memRepeatNotification.copiedWith(
+                  time: () => picked,
+                )
+              ],
+              (current, updating) => current.type == updating.type,
+            ),
+          );
+        },
         {
-          "_memId": _memId,
+          '_memId': _memId,
         },
       );
 }
@@ -76,7 +81,7 @@ class _MemRepeatedNotificationView extends StatelessWidget {
                 ),
         ),
         {
-          "_time": _time,
+          '_time': _time,
         },
       );
 }

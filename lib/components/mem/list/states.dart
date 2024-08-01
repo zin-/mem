@@ -14,7 +14,6 @@ import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
 import 'package:mem/settings/states.dart';
-import 'package:mem/values/constants.dart';
 
 final showNotArchivedProvider =
     StateNotifierProvider<ValueStateNotifier<bool>, bool>(
@@ -116,7 +115,7 @@ final memListProvider = StateNotifierProvider.autoDispose<
         final memNotificationsOfB =
             savedMemNotifications.where((e) => e.memId == b.id);
 
-        final startOfDay = ref.read(startOfDayProvider) ?? defaultStartOfDay;
+        final startOfDay = ref.read(startOfDayProvider);
         final now = DateTime.now();
         final comparedTime = _compareTime(
           a.period,

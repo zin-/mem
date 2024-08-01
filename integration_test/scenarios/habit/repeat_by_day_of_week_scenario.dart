@@ -237,8 +237,11 @@ void main() => group(
         );
 
         testWidgets(
-          "save.",
+          'save.',
           (widgetTester) async {
+            widgetTester.ignoreMockMethodCallHandler(
+                MethodChannelMock.permissionHandler);
+
             await runApplication();
             await widgetTester.pumpAndSettle();
             await widgetTester.tap(find.text(insertedMemName));
@@ -262,14 +265,6 @@ void main() => group(
                 matching: find.byIcon(Icons.edit)));
             await widgetTester.pumpAndSettle();
 
-            final savedMemNotification = await dbA.select(
-                defTableMemNotifications,
-                where: "${defFkMemNotificationsMemId.name} = ?",
-                whereArgs: [insertedMemId],
-                orderBy: "id ASC");
-            expect(savedMemNotification, hasLength(1));
-            expect(savedMemNotification[0][defColMemNotificationsTime.name],
-                equals(7));
             expect(
                 widgetTester
                     .widget<SelectWeekDays>(find.byType(SelectWeekDays))
@@ -280,9 +275,23 @@ void main() => group(
                 widgetTester
                     .widget<SelectWeekDays>(find.byType(SelectWeekDays))
                     .days
-                    .whereIndexed((index, element) => index != 6)
+                    .whereIndexed((i, e) => i != 6)
                     .map((e) => e.isSelected),
                 everyElement(isFalse));
+
+            final savedMemNotifications = await dbA.select(
+                defTableMemNotifications,
+                where: "${defFkMemNotificationsMemId.name} = ?",
+                whereArgs: [insertedMemId],
+                orderBy: "id ASC");
+            expect(savedMemNotifications, hasLength(2));
+            expect(
+                savedMemNotifications.singleWhere(
+                  (e) =>
+                      e[defColMemNotificationsType.name] ==
+                      MemNotificationType.repeatByDayOfWeek.name,
+                )[defColMemNotificationsTime.name],
+                equals(7));
           },
         );
 
