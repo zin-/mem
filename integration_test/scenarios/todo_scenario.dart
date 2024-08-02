@@ -6,7 +6,7 @@ import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/databases/definition.dart';
-import 'package:mem/framework/repository/database_tuple_repository.dart';
+import 'package:mem/framework/repository/database_tuple_repository_v1.dart';
 import 'package:mem/logger/log.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/notification_client.dart';
@@ -189,7 +189,7 @@ void testTodoScenario() => group(': $_scenarioName', () {
       testWidgets(
         'not notify on done mem.',
         (widgetTester) async {
-          DatabaseTupleRepository.databaseAccessor = dbA;
+          DatabaseTupleRepositoryV1.databaseAccessor = dbA;
 
           int initializeCount = 0;
           int cancelCount = 0;

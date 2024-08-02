@@ -11,8 +11,8 @@ import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_repository.dart';
 
 final memsProvider =
-    StateNotifierProvider<ListValueStateNotifier<Mem>, List<Mem>>(
-  (ref) => v(() => ListValueStateNotifier<Mem>([])),
+    StateNotifierProvider<ListValueStateNotifier<MemV1>, List<MemV1>>(
+  (ref) => v(() => ListValueStateNotifier<MemV1>([])),
 );
 final memItemsProvider =
     StateNotifierProvider<ListValueStateNotifier<MemItem>, List<MemItem>>(
@@ -26,20 +26,20 @@ final memNotificationsProvider = StateNotifierProvider<
 );
 
 final memByMemIdProvider = StateNotifierProvider.autoDispose
-    .family<ValueStateNotifier<SavedMem?>, SavedMem?, int?>(
+    .family<ValueStateNotifier<SavedMemV1?>, SavedMemV1?, int?>(
   (ref, memId) => v(
     () => ValueStateNotifier(
       ref.watch(memsProvider).singleWhereOrNull(
-            (element) => element is SavedMem ? element.id == memId : false,
-          ) as SavedMem?,
+            (element) => element is SavedMemV1 ? element.id == memId : false,
+          ) as SavedMemV1?,
       initializer: (current, notifier) => v(
         () async {
           if (memId != null) {
-            final savedMem = await MemRepository().findOneBy(id: memId);
+            final savedMem = await MemRepositoryV1().findOneBy(id: memId);
             ref.read(memsProvider.notifier).upsertAll(
               [if (savedMem != null) savedMem],
               (current, updating) =>
-                  (current is SavedMem && updating is SavedMem)
+                  (current is SavedMemV1 && updating is SavedMemV1)
                       ? current.id == updating.id
                       : true,
             );
@@ -75,9 +75,9 @@ final removedMemDetailProvider = StateNotifierProvider.autoDispose
   ),
 );
 final removedMemProvider =
-    StateNotifierProvider.family<ValueStateNotifier<Mem?>, Mem?, int>(
+    StateNotifierProvider.family<ValueStateNotifier<MemV1?>, MemV1?, int>(
   (ref, memId) => v(
-    () => ValueStateNotifier<Mem?>(null),
+    () => ValueStateNotifier<MemV1?>(null),
     memId,
   ),
 );

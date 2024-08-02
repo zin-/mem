@@ -4,9 +4,9 @@
 // # 語源
 //
 // 「存在するもの」、「実体」
-abstract class EntityV1 {}
+abstract class EntityV2 {}
 
-abstract class Entity {}
+abstract class EntityV1 {}
 // memo
 // - view, domain, dataのそれぞれの領域で似た内容でも型が変わることになるはず
 // これをしっかりと定義したい

@@ -15,7 +15,7 @@ const memIdKey = 'memId';
 
 class MemNotifications {
   static Schedule periodicScheduleOf(
-    SavedMem savedMem,
+    SavedMemV1 savedMem,
     TimeOfDay startOfDay,
     Iterable<SavedMemNotification> memNotifications,
     Act? latestAct,

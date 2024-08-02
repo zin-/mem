@@ -27,7 +27,7 @@ class NotificationClient {
   final ScheduleClient _scheduleClient;
   final NotificationRepository _notificationRepository;
   final PreferenceClient _preferenceClient;
-  final MemRepository _memRepository;
+  final MemRepositoryV1 _memRepository;
   final MemNotificationRepository _memNotificationRepository;
 
   NotificationClient._(
@@ -47,7 +47,7 @@ class NotificationClient {
           ScheduleClient(),
           NotificationRepository(),
           PreferenceClient(),
-          MemRepository(),
+          MemRepositoryV1(),
           MemNotificationRepository(),
         ),
         {
@@ -125,7 +125,7 @@ class NotificationClient {
 
   Future<void> registerMemNotifications(
     int memId, {
-    SavedMem? savedMem,
+    SavedMemV1? savedMem,
     Iterable<SavedMemNotification>? savedMemNotifications,
   }) =>
       v(

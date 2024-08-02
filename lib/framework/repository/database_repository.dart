@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:mem/framework/repository/database_tuple_repository.dart';
+import 'package:mem/framework/repository/database_tuple_repository_v1.dart';
 import 'package:path/path.dart';
 
 import 'package:mem/framework/database/accessor.dart';
@@ -8,7 +8,7 @@ import 'package:mem/framework/database/factory.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/logger/log_service.dart';
 
-class DatabaseRepository extends Repository<DatabaseDefinition>
+class DatabaseRepository extends RepositoryV2<DatabaseDefinition>
     with Receiver<DatabaseDefinition, DatabaseAccessor> {
   static DatabaseRepository? _instance;
 
@@ -46,7 +46,7 @@ class DatabaseRepository extends Repository<DatabaseDefinition>
 
   Future<void> replace(String name, File backup) => v(
         () async {
-          await DatabaseTupleRepository.close();
+          await DatabaseTupleRepositoryV1.close();
 
           final current = (await shipFileByNameIs(name))!;
 

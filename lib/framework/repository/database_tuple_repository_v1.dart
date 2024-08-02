@@ -13,7 +13,7 @@ import 'package:mem/framework/repository/condition/conditions.dart';
 //  DatabaseTupleに型情報を付与することでズレは発生しなくなった
 //  ただ、これだと未保存のDatabaseTupleが
 // FIXME SavedEntityはSavedDatabaseTupleをmixinしている必要があるが型制約を定義できていない
-abstract class DatabaseTupleRepository<E extends EntityV1,
+abstract class DatabaseTupleRepositoryV1<E extends EntityV1,
     SavedEntity extends E, Id> implements RepositoryV1<E, SavedEntity> {
   Map<String, dynamic> unpack(E entity);
 
@@ -85,7 +85,7 @@ abstract class DatabaseTupleRepository<E extends EntityV1,
 
   Future<SavedEntity> shipById(Id id) => v(
         () async {
-          final condition = Equals(defPkId.name, id);
+          final condition = EqualsV1(defPkId.name, id);
           return pack(
             (await _databaseAccessor!.select(
               _tableDefinition,
@@ -120,7 +120,7 @@ abstract class DatabaseTupleRepository<E extends EntityV1,
 
           entityMap[defColUpdatedAt.name] = DateTime.now();
 
-          final condition = Equals(defPkId.name, entityMap[defPkId.name]);
+          final condition = EqualsV1(defPkId.name, entityMap[defPkId.name]);
           await _databaseAccessor!.update(
             _tableDefinition,
             entityMap,
@@ -139,7 +139,7 @@ abstract class DatabaseTupleRepository<E extends EntityV1,
 
           entityMap[defColArchivedAt.name] = DateTime.now();
 
-          final condition = Equals(defPkId.name, entityMap[defPkId.name]);
+          final condition = EqualsV1(defPkId.name, entityMap[defPkId.name]);
           await _databaseAccessor!.update(
             _tableDefinition,
             entityMap,
@@ -159,7 +159,7 @@ abstract class DatabaseTupleRepository<E extends EntityV1,
           entityMap[defColUpdatedAt.name] = DateTime.now();
           entityMap[defColArchivedAt.name] = null;
 
-          final condition = Equals(defPkId.name, entityMap[defPkId.name]);
+          final condition = EqualsV1(defPkId.name, entityMap[defPkId.name]);
           await _databaseAccessor!.update(
             _tableDefinition,
             entityMap,
@@ -197,7 +197,7 @@ abstract class DatabaseTupleRepository<E extends EntityV1,
 
   Future<SavedEntity> wasteById(Id id) => v(
         () async {
-          final condition = Equals(defPkId.name, id);
+          final condition = EqualsV1(defPkId.name, id);
           final payload = (await _databaseAccessor!.select(
             _tableDefinition,
             where: condition.where(),
@@ -228,5 +228,5 @@ abstract class DatabaseTupleRepository<E extends EntityV1,
 
   final TableDefinition _tableDefinition;
 
-  DatabaseTupleRepository(this._tableDefinition);
+  DatabaseTupleRepositoryV1(this._tableDefinition);
 }

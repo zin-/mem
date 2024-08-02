@@ -4,11 +4,11 @@ import 'package:mem/framework/repository/condition/in.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/framework/repository/database_tuple_repository.dart';
+import 'package:mem/framework/repository/database_tuple_repository_v1.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/repositories/mem_notification.dart';
 
-class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
+class MemNotificationRepository extends DatabaseTupleRepositoryV1<MemNotification,
     SavedMemNotification, int> {
   @override
   Future<List<SavedMemNotification>> ship({
@@ -48,7 +48,7 @@ class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
   ) =>
       v(
         () => super
-            .ship(condition: Equals(defFkMemNotificationsMemId.name, memId)),
+            .ship(condition: EqualsV1(defFkMemNotificationsMemId.name, memId)),
         {
           "memId": memId,
         },
@@ -84,9 +84,9 @@ class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
               if (condition != null) condition,
 // coverage:ignore-end
               if (memIdIs != null)
-                Equals(defFkMemNotificationsMemId.name, memIdIs),
+                EqualsV1(defFkMemNotificationsMemId.name, memIdIs),
               if (type != null)
-                Equals(defColMemNotificationsType.name, type.name),
+                EqualsV1(defColMemNotificationsType.name, type.name),
             ],
           ),
         ),

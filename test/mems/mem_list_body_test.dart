@@ -18,7 +18,7 @@ void main() {
     final scrollController = ScrollController();
     final samples = List.generate(
       20,
-      (index) => SavedMem(
+      (index) => SavedMemV1(
         'Hide & show ShowNewMemFab: mem name - $index',
         null,
         null,

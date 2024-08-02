@@ -7,23 +7,23 @@ import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/notifications/schedule.dart';
 import 'package:mem/repositories/mem.dart';
 
-class Mem extends EntityV1 {
+class MemV1 extends EntityV1 {
   final String name;
   final DateTime? doneAt;
   final DateAndTimePeriod? period;
 
-  Mem(this.name, this.doneAt, this.period);
+  MemV1(this.name, this.doneAt, this.period);
 
   bool get isDone => doneAt != null;
 
-  factory Mem.defaultNew() => Mem("", null, null);
+  factory MemV1.defaultNew() => MemV1("", null, null);
 
   Iterable<Schedule> periodSchedules(
     TimeOfDay startOfDay,
   ) =>
       v(
         () {
-          final id = this is SavedMem ? (this as SavedMem).id : null;
+          final id = this is SavedMemV1 ? (this as SavedMemV1).id : null;
 
           return id == null
               ? throw Exception() // coverage:ignore-line
@@ -64,12 +64,12 @@ class Mem extends EntityV1 {
         },
       );
 
-  Mem copiedWith({
+  MemV1 copiedWith({
     String Function()? name,
     DateTime? Function()? doneAt,
     DateAndTimePeriod? Function()? period,
   }) =>
-      Mem(
+      MemV1(
         name == null ? this.name : name(),
         doneAt == null ? this.doneAt : doneAt(),
         period == null ? this.period : period(),

@@ -7,7 +7,7 @@ import 'package:mem/framework/repository/entity.dart';
 import 'package:mem/repositories/mem.dart';
 
 class ActCounter extends EntityV1 {
-  final SavedMem _mem;
+  final SavedMemV1 _mem;
   final Iterable<SavedAct> _acts;
   final int memId;
   final String? name;

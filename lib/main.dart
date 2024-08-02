@@ -8,7 +8,7 @@ import 'package:mem/notifications/flutter_local_notifications_wrapper.dart';
 import 'package:mem/notifications/notification_actions.dart';
 import 'package:mem/notifications/notification_repository.dart';
 import 'package:mem/framework/repository/database_repository.dart';
-import 'package:mem/framework/repository/database_tuple_repository.dart';
+import 'package:mem/framework/repository/database_tuple_repository_v1.dart';
 import 'package:mem/router.dart';
 
 import 'application.dart';
@@ -106,7 +106,7 @@ Future<void> _runApplication({
     );
 
 // FIXME 先に初期化が必要なのではなく、Repositoryを利用する際に勝手に初期化されるようにする
-Future<void> openDatabase() async => DatabaseTupleRepository.databaseAccessor =
+Future<void> openDatabase() async => DatabaseTupleRepositoryV1.databaseAccessor =
     await DatabaseRepository().receive(databaseDefinition);
 
 // FIXME HomeWidget関連の処理、場所が適切ではない

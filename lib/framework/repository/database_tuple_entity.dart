@@ -1,7 +1,7 @@
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/framework/repository/entity.dart';
 
-mixin SavedDatabaseTupleMixin<T> on EntityV1 {
+mixin SavedDatabaseTupleMixinV1<T> on EntityV1 {
   late T id;
   late DateTime createdAt;
   DateTime? updatedAt;
@@ -25,7 +25,7 @@ mixin SavedDatabaseTupleMixin<T> on EntityV1 {
     };
   }
 
-  SavedDatabaseTupleMixin copiedFrom(SavedDatabaseTupleMixin origin) => this
+  SavedDatabaseTupleMixinV1 copiedFrom(SavedDatabaseTupleMixinV1 origin) => this
     ..id = origin.id
     ..createdAt = origin.createdAt
     ..updatedAt = origin.updatedAt

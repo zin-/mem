@@ -39,9 +39,9 @@ final showDoneProvider = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
   ),
 );
 final _filteredMemsProvider = StateNotifierProvider.autoDispose<
-    ListValueStateNotifier<SavedMem>, List<SavedMem>>(
+    ListValueStateNotifier<SavedMemV1>, List<SavedMemV1>>(
   (ref) {
-    final savedMems = ref.watch(memsProvider).map((e) => e as SavedMem);
+    final savedMems = ref.watch(memsProvider).map((e) => e as SavedMemV1);
 
     final showNotArchived = ref.watch(showNotArchivedProvider);
     final showArchived = ref.watch(showArchivedProvider);
@@ -85,7 +85,7 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
 );
 
 final memListProvider = StateNotifierProvider.autoDispose<
-    ValueStateNotifier<List<SavedMem>>, List<SavedMem>>((ref) {
+    ValueStateNotifier<List<SavedMemV1>>, List<SavedMemV1>>((ref) {
   final filtered = ref.watch(_filteredMemsProvider);
   final latestActsByMem = ref.watch(latestActsByMemProvider);
   final savedMemNotifications = ref.watch(savedMemNotificationsProvider);
@@ -197,7 +197,7 @@ final latestActsByMemProvider = StateNotifierProvider.autoDispose<
         () async {
           if (current.isEmpty) {
             final memIds =
-                ref.read(memsProvider).whereType<SavedMem>().map((e) => e.id);
+                ref.read(memsProvider).whereType<SavedMemV1>().map((e) => e.id);
 
             final actsByMemIds = await ActRepository().ship(
               memIdsIn: memIds,
@@ -224,7 +224,7 @@ final savedMemNotificationsProvider = StateNotifierProvider.autoDispose<
         () async {
           if (current.isEmpty) {
             final memIds =
-                ref.read(memsProvider).whereType<SavedMem>().map((e) => e.id);
+                ref.read(memsProvider).whereType<SavedMemV1>().map((e) => e.id);
 
             final actsByMemIds = await MemNotificationRepository().ship(
               memIdsIn: memIds,

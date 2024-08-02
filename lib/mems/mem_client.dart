@@ -14,7 +14,7 @@ class MemClient {
   final NotificationClient _notificationClient;
 
   Future<MemDetail> save(
-    Mem mem,
+    MemV1 mem,
     List<MemItem> memItemList,
     List<MemNotification> memNotificationList,
   ) =>
@@ -29,8 +29,8 @@ class MemClient {
           );
 
           _notificationClient.registerMemNotifications(
-            (saved.mem as SavedMem).id,
-            savedMem: saved.mem as SavedMem,
+            (saved.mem as SavedMemV1).id,
+            savedMem: saved.mem as SavedMemV1,
             savedMemNotifications:
                 saved.notifications?.whereType<SavedMemNotification>(),
           );
@@ -44,15 +44,15 @@ class MemClient {
         },
       );
 
-  Future<MemDetail> archive(Mem mem) => v(
+  Future<MemDetail> archive(MemV1 mem) => v(
         () async {
           // FIXME MemServiceの責務
-          if (mem is SavedMem) {
+          if (mem is SavedMemV1) {
             final archived = await _memService.archive(mem);
 
             final archivedMem = archived.mem;
             // FIXME archive後のMemDetailなので、必ずSavedMemのはず
-            if (archivedMem is SavedMem) {
+            if (archivedMem is SavedMemV1) {
               _notificationClient.cancelMemNotifications(archivedMem.id);
             }
 
@@ -69,15 +69,15 @@ class MemClient {
         },
       );
 
-  Future<MemDetail> unarchive(Mem mem) => v(
+  Future<MemDetail> unarchive(MemV1 mem) => v(
         () async {
           // FIXME MemServiceの責務
-          if (mem is SavedMem) {
+          if (mem is SavedMemV1) {
             final unarchived = await _memService.unarchive(mem);
 
             _notificationClient.registerMemNotifications(
-              (unarchived.mem as SavedMem).id,
-              savedMem: unarchived.mem as SavedMem,
+              (unarchived.mem as SavedMemV1).id,
+              savedMem: unarchived.mem as SavedMemV1,
               savedMemNotifications:
                   unarchived.notifications?.whereType<SavedMemNotification>(),
             );

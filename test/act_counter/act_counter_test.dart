@@ -13,7 +13,7 @@ void main() {
       final zeroDate = DateTime(0);
       final oneDate = DateTime(1);
 
-      final savedMem = SavedMem("constructor", null, null)..id = memId;
+      final savedMem = SavedMemV1("constructor", null, null)..id = memId;
       final acts = [
         SavedAct(memId, DateAndTimePeriod(end: DateAndTime.now()))
           ..createdAt = zeroDate

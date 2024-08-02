@@ -6,11 +6,11 @@ abstract class Condition {
   List<Object?>? whereArgs();
 }
 
-class Equals extends Condition {
+class EqualsV1 extends Condition {
   final String _key;
   final dynamic _value;
 
-  Equals(this._key, this._value);
+  EqualsV1(this._key, this._value);
 
   @override
   String where() => '$_key = ?';

@@ -1,7 +1,7 @@
 import 'package:mem/core/mem_item.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 
-class SavedMemItem extends MemItem with SavedDatabaseTupleMixin<int> {
+class SavedMemItem extends MemItem with SavedDatabaseTupleMixinV1<int> {
   @override
   int get memId => super.memId as int;
 

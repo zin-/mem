@@ -40,7 +40,7 @@ class Act extends EntityV1 {
       }}";
 }
 
-class SavedAct extends Act with SavedDatabaseTupleMixin<int> {
+class SavedAct extends Act with SavedDatabaseTupleMixinV1<int> {
   SavedAct(super.memId, super.period);
 
   SavedAct copiedWith(DateAndTimePeriod Function()? period) => SavedAct(

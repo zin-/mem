@@ -6,13 +6,13 @@ import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/framework/repository/database_tuple_repository.dart';
+import 'package:mem/framework/repository/database_tuple_repository_v1.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/repositories/mem.dart';
 
-class MemRepository extends DatabaseTupleRepository<Mem, SavedMem, int> {
+class MemRepositoryV1 extends DatabaseTupleRepositoryV1<MemV1, SavedMemV1, int> {
   @override
-  Future<List<SavedMem>> ship({
+  Future<List<SavedMemV1>> ship({
     bool? archived,
     bool? done,
     Condition? condition,
@@ -50,7 +50,7 @@ class MemRepository extends DatabaseTupleRepository<Mem, SavedMem, int> {
       );
 
   @override
-  Future<SavedMem?> findOneBy({
+  Future<SavedMemV1?> findOneBy({
     int? id,
     Condition? condition,
     List<OrderBy>? orderBy,
@@ -58,7 +58,7 @@ class MemRepository extends DatabaseTupleRepository<Mem, SavedMem, int> {
       v(
         () => super.findOneBy(
           condition: And([
-            if (id != null) Equals(defPkId.name, id),
+            if (id != null) EqualsV1(defPkId.name, id),
             if (condition != null) condition, // coverage:ignore-line
           ]),
           orderBy: orderBy,
@@ -71,11 +71,11 @@ class MemRepository extends DatabaseTupleRepository<Mem, SavedMem, int> {
       );
 
   @override
-  SavedMem pack(Map<String, dynamic> tuple) {
+  SavedMemV1 pack(Map<String, dynamic> tuple) {
     final startOn = tuple[defColMemsStartOn.name];
     final endOn = tuple[defColMemsEndOn.name];
 
-    return SavedMem(
+    return SavedMemV1(
       tuple[defColMemsName.name],
       tuple[defColMemsDoneAt.name],
       startOn == null && endOn == null
@@ -94,7 +94,7 @@ class MemRepository extends DatabaseTupleRepository<Mem, SavedMem, int> {
   }
 
   @override
-  Map<String, dynamic> unpack(Mem entity) {
+  Map<String, dynamic> unpack(MemV1 entity) {
     final map = {
       defColMemsName.name: entity.name,
       defColMemsDoneAt.name: entity.doneAt,
@@ -106,18 +106,18 @@ class MemRepository extends DatabaseTupleRepository<Mem, SavedMem, int> {
           entity.period?.end?.isAllDay == true ? null : entity.period?.end,
     };
 
-    if (entity is SavedMem) {
+    if (entity is SavedMemV1) {
       map.addAll(entity.unpack());
     }
 
     return map;
   }
 
-  MemRepository._() : super(defTableMems);
+  MemRepositoryV1._() : super(defTableMems);
 
-  static MemRepository? _instance;
+  static MemRepositoryV1? _instance;
 
-  factory MemRepository() => v(
-        () => _instance ??= MemRepository._(),
+  factory MemRepositoryV1() => v(
+        () => _instance ??= MemRepositoryV1._(),
       );
 }
