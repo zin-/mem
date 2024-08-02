@@ -1,6 +1,6 @@
 import 'package:mem/framework/repository/entity.dart';
 
-abstract class KeyWithValue<Key, Value> extends Entity {
+abstract class KeyWithValue<Key, Value> extends EntityV2 {
   final Key key;
   final Value value;
 

@@ -189,7 +189,7 @@ void testTodoScenario() => group(': $_scenarioName', () {
       testWidgets(
         'not notify on done mem.',
         (widgetTester) async {
-          DatabaseTupleRepository.databaseAccessor = dbA;
+          DatabaseTupleRepositoryV1.databaseAccessor = dbA;
 
           int initializeCount = 0;
           int cancelCount = 0;

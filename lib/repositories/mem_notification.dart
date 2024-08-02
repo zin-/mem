@@ -2,7 +2,7 @@ import 'package:mem/core/mem_notification.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 
 class SavedMemNotification extends MemNotification
-    with SavedDatabaseTupleMixin<int> {
+    with SavedDatabaseTupleMixinV1<int> {
   @override
   int get memId => super.memId as int;
 

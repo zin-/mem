@@ -6,7 +6,7 @@ import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/mems/mem_item.dart';
 
 class MemItemRepository
-    extends DatabaseTupleRepository<MemItem, SavedMemItem, int> {
+    extends DatabaseTupleRepositoryV1<MemItem, SavedMemItem, int> {
   Future<List<SavedMemItem>> shipByMemId(int memId) => v(
         () => super.ship(condition: Equals(defFkMemItemsMemId.name, memId)),
         {'memId': memId},

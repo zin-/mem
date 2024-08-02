@@ -8,7 +8,7 @@ import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/repositories/mem_notification.dart';
 
-class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
+class MemNotificationRepository extends DatabaseTupleRepositoryV1<MemNotification,
     SavedMemNotification, int> {
   @override
   Future<List<SavedMemNotification>> ship({

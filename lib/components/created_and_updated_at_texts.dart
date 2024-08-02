@@ -7,14 +7,14 @@ import 'package:mem/repositories/mem.dart';
 import 'package:mem/values/colors.dart';
 
 class CreatedAndUpdatedAtTexts extends StatelessWidget {
-  final Mem _entity;
+  final MemV1 _entity;
 
   const CreatedAndUpdatedAtTexts(this._entity, {super.key});
 
   @override
   Widget build(BuildContext context) => v(
         () {
-          if (_entity is SavedMem) {
+          if (_entity is SavedMemV1) {
             return Wrap(
               direction: Axis.horizontal,
               children: [

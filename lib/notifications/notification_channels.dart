@@ -22,7 +22,7 @@ class NotificationChannels {
   ) =>
       v(
         () async {
-          final title = (await MemRepository().shipById(memId)).name;
+          final title = (await MemRepositoryV1().shipById(memId)).name;
           String body;
           switch (notificationType) {
             case NotificationType.startMem:

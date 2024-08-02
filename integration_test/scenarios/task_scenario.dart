@@ -425,7 +425,7 @@ void testTaskScenario() => group(': $_scenarioName', () {
           testWidgets(
             'not notify on active act.',
             (widgetTester) async {
-              DatabaseTupleRepository.databaseAccessor = dbA;
+              DatabaseTupleRepositoryV1.databaseAccessor = dbA;
 
               widgetTester.setMockMethodCallHandler(
                 MethodChannelMock.flutterLocalNotifications,

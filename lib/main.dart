@@ -106,7 +106,7 @@ Future<void> _runApplication({
     );
 
 // FIXME 先に初期化が必要なのではなく、Repositoryを利用する際に勝手に初期化されるようにする
-Future<void> openDatabase() async => DatabaseTupleRepository.databaseAccessor =
+Future<void> openDatabase() async => DatabaseTupleRepositoryV1.databaseAccessor =
     await DatabaseRepository().receive(databaseDefinition);
 
 // FIXME HomeWidget関連の処理、場所が適切ではない

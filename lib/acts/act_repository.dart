@@ -24,7 +24,7 @@ extension _ActOrderByExt on ActOrderBy {
   }
 }
 
-class ActRepository extends DatabaseTupleRepository<Act, SavedAct, int> {
+class ActRepository extends DatabaseTupleRepositoryV1<Act, SavedAct, int> {
   @override
   Future<SavedAct?> findOneBy({
     int? memId,

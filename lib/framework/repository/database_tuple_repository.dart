@@ -13,7 +13,7 @@ import 'package:mem/framework/repository/condition/conditions.dart';
 //  DatabaseTupleに型情報を付与することでズレは発生しなくなった
 //  ただ、これだと未保存のDatabaseTupleが
 // FIXME SavedEntityはSavedDatabaseTupleをmixinしている必要があるが型制約を定義できていない
-abstract class DatabaseTupleRepository<E extends EntityV1,
+abstract class DatabaseTupleRepositoryV1<E extends EntityV1,
     SavedEntity extends E, Id> implements RepositoryV1<E, SavedEntity> {
   Map<String, dynamic> unpack(E entity);
 
@@ -228,5 +228,5 @@ abstract class DatabaseTupleRepository<E extends EntityV1,
 
   final TableDefinition _tableDefinition;
 
-  DatabaseTupleRepository(this._tableDefinition);
+  DatabaseTupleRepositoryV1(this._tableDefinition);
 }

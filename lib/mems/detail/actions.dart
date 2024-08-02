@@ -20,7 +20,7 @@ final saveMem =
 
             ref.read(memsProvider.notifier).upsertAll(
               [saved.mem],
-              (tmp, item) => tmp is SavedMem && item is SavedMem
+              (tmp, item) => tmp is SavedMemV1 && item is SavedMemV1
                   ? tmp.id == item.id
                   : false,
             );
@@ -53,14 +53,14 @@ final archiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
     () async {
       final mem = ref.read(memByMemIdProvider(memId));
 
-      final archived = await _memClient.archive(mem as SavedMem);
+      final archived = await _memClient.archive(mem as SavedMemV1);
       ref
           .read(editingMemByMemIdProvider(memId).notifier)
           .updatedBy(archived.mem);
       ref.read(memsProvider.notifier).upsertAll(
           [archived.mem],
           (tmp, item) =>
-              tmp is SavedMem && item is SavedMem ? tmp.id == item.id : false);
+              tmp is SavedMemV1 && item is SavedMemV1 ? tmp.id == item.id : false);
 
       return archived;
     },
@@ -73,7 +73,7 @@ final unarchiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
     () async {
       final mem = ref.read(memByMemIdProvider(memId));
 
-      final unarchived = await _memClient.unarchive(mem as SavedMem);
+      final unarchived = await _memClient.unarchive(mem as SavedMemV1);
 
       ref
           .read(editingMemByMemIdProvider(memId).notifier)
@@ -81,7 +81,7 @@ final unarchiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
       ref.read(memsProvider.notifier).upsertAll(
           [unarchived.mem],
           (tmp, item) =>
-              tmp is SavedMem && item is SavedMem ? tmp.id == item.id : false);
+              tmp is SavedMemV1 && item is SavedMemV1 ? tmp.id == item.id : false);
 
       return unarchived;
     },
@@ -104,7 +104,7 @@ final removeMem = Provider.autoDispose.family<Future<bool>, int?>(
         // TODO mem notificationsにも同様の処理が必要では？
 
         ref.read(memsProvider.notifier).removeWhere(
-            (element) => element is SavedMem && element.id == memId);
+            (element) => element is SavedMemV1 && element.id == memId);
 
         return removeSuccess;
       }

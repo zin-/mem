@@ -15,10 +15,10 @@ const _name = "DatabaseTupleRepository tests";
 
 class TestEntity extends EntityV1 {}
 
-class SavedTestEntity extends TestEntity with SavedDatabaseTupleMixin<int> {}
+class SavedTestEntity extends TestEntity with SavedDatabaseTupleMixinV1<int> {}
 
 class TestRepository
-    extends DatabaseTupleRepository<TestEntity, SavedTestEntity, int> {
+    extends DatabaseTupleRepositoryV1<TestEntity, SavedTestEntity, int> {
   TestRepository(super.tableDefinition);
 
   @override
@@ -52,12 +52,12 @@ void main() => group(
             );
           }
 
-          DatabaseTupleRepository.databaseAccessor =
+          DatabaseTupleRepositoryV1.databaseAccessor =
               await DatabaseRepository().receive(sampleDefDBAddedColumn);
         });
         tearDownAll(() {
           DatabaseFactory.onTest = false;
-          DatabaseTupleRepository.databaseAccessor = null;
+          DatabaseTupleRepositoryV1.databaseAccessor = null;
         });
 
         test(
