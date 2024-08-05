@@ -34,3 +34,27 @@ mixin SavedDatabaseTupleMixinV1<T> on EntityV1 {
   @override
   String toString() => "${super.toString()}${unpack()}";
 }
+
+mixin DatabaseTupleEntity<PrimaryKey> on Entity {
+  late PrimaryKey id;
+  late DateTime createdAt;
+  late DateTime? updatedAt;
+  late DateTime? archivedAt;
+
+  DatabaseTupleEntity<PrimaryKey> withMap(Map<String, dynamic> map) {
+    id = map[defPkId.name];
+    createdAt = map[defColCreatedAt.name];
+    updatedAt = map[defColUpdatedAt.name];
+    archivedAt = map[defColArchivedAt.name];
+    return this;
+  }
+
+  @override
+  Map<String, dynamic> get toMap => super.toMap
+    ..addAll({
+      defPkId.name: id,
+      defColCreatedAt.name: createdAt,
+      defColUpdatedAt.name: updatedAt,
+      defColArchivedAt.name: archivedAt,
+    });
+}

@@ -7,6 +7,10 @@
 abstract class EntityV2 {}
 
 abstract class EntityV1 {}
+
+mixin Entity {
+  Map<String, dynamic> get toMap;
+}
 // memo
 // - view, domain, dataのそれぞれの領域で似た内容でも型が変わることになるはず
 // これをしっかりと定義したい
