@@ -8,7 +8,7 @@ import 'package:mem/notifications/flutter_local_notifications_wrapper.dart';
 import 'package:mem/notifications/notification_actions.dart';
 import 'package:mem/notifications/notification_repository.dart';
 import 'package:mem/framework/repository/database_repository.dart';
-import 'package:mem/framework/repository/database_tuple_repository.dart';
+import 'package:mem/framework/repository/database_tuple_repository_v1.dart';
 import 'package:mem/router.dart';
 
 import 'application.dart';

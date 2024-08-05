@@ -3,7 +3,7 @@ import 'package:mem/framework/database/factory.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/database_repository.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
-import 'package:mem/framework/repository/database_tuple_repository.dart';
+import 'package:mem/framework/repository/database_tuple_repository_v1.dart';
 import 'package:mem/framework/repository/entity.dart';
 import 'package:mem/framework/repository/extra_column.dart';
 import 'package:mem/framework/repository/group_by.dart';
