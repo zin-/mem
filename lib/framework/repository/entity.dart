@@ -10,6 +10,9 @@ abstract class EntityV1 {}
 
 mixin Entity {
   Map<String, dynamic> get toMap;
+
+  @override
+  String toString() => "${super.toString()}: $toMap";
 }
 // memo
 // - view, domain, dataのそれぞれの領域で似た内容でも型が変わることになるはず
