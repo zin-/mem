@@ -6,11 +6,11 @@ import 'entity_test.dart';
 
 const _name = 'DatabaseTupleEntity test';
 
-class _TestObjectDatabaseTupleEntity extends TestObjectEntity
+class TestObjectDatabaseTupleEntity extends TestObjectEntity
     with DatabaseTupleEntity<int> {
-  _TestObjectDatabaseTupleEntity(super.a);
+  TestObjectDatabaseTupleEntity(super.a);
 
-  _TestObjectDatabaseTupleEntity.fromMap(Map<String, dynamic> map)
+  TestObjectDatabaseTupleEntity.fromMap(Map<String, dynamic> map)
       : super.fromMap(map) {
     withMap(map);
   }
@@ -24,7 +24,7 @@ void main() => group(
           () {
             const a = false;
 
-            final testObject = _TestObjectDatabaseTupleEntity(a);
+            final testObject = TestObjectDatabaseTupleEntity(a);
 
             expect(testObject.a, equals(a));
           },
@@ -41,7 +41,7 @@ void main() => group(
               defColArchivedAt.name: null
             };
 
-            final testObject = _TestObjectDatabaseTupleEntity.fromMap(map);
+            final testObject = TestObjectDatabaseTupleEntity.fromMap(map);
 
             expect(testObject.a, map[TestObjectEntity.fieldNames[0]]);
           },
@@ -58,7 +58,7 @@ void main() => group(
               defColArchivedAt.name: null
             };
 
-            final testObject = _TestObjectDatabaseTupleEntity.fromMap(map);
+            final testObject = TestObjectDatabaseTupleEntity.fromMap(map);
 
             expect(testObject.toMap, map);
           },
