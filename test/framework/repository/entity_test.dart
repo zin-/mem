@@ -57,5 +57,18 @@ void main() => group(
                 testObject.toMap, equals({TestObjectEntity.fieldNames[0]: a}));
           },
         );
+
+        test(
+          '#==',
+          () {
+            const a = false;
+            const b = false;
+
+            final testObjectA = TestObjectEntity(a);
+            final testObjectB = TestObjectEntity(b);
+
+            expect(testObjectA, equals(testObjectB));
+          },
+        );
       },
     );

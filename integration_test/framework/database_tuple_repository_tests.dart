@@ -78,11 +78,9 @@ void main() => group(
                     await repository.receive(entity, createdAt: now);
 
                 expect(
-                    received.toString(),
-                    equals(TestObjectDatabaseTupleEntity(entity.a).withMap({
-                      defPkId.name: 1,
-                      defColCreatedAt.name: now
-                    }).toString()));
+                    received,
+                    equals(TestObjectDatabaseTupleEntity(entity.a).withMap(
+                        {defPkId.name: 1, defColCreatedAt.name: now})));
               },
             );
           },

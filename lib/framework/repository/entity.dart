@@ -13,6 +13,18 @@ mixin Entity {
 
   @override
   String toString() => "${super.toString()}: $toMap";
+
+  @override
+  int get hashCode => toMap.entries.fold(
+        0,
+        (value, element) =>
+            value ^ element.key.hashCode ^ element.value.hashCode,
+      );
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (runtimeType == other.runtimeType && hashCode == other.hashCode);
 }
 // memo
 // - view, domain, dataのそれぞれの領域で似た内容でも型が変わることになるはず
