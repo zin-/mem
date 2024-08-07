@@ -71,12 +71,18 @@ void main() => group(
             test(
               '#receive',
               () async {
+                final now = DateTime.now();
                 final entity = TestObjectEntity(false);
 
-                final received = await repository.receive(entity);
+                final received =
+                    await repository.receive(entity, createdAt: now);
 
                 expect(
-                    received, equals(TestObjectDatabaseTupleEntity(entity.a)));
+                    received.toString(),
+                    equals(TestObjectDatabaseTupleEntity(entity.a).withMap({
+                      defPkId.name: 1,
+                      defColCreatedAt.name: now
+                    }).toString()));
               },
             );
           },

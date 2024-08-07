@@ -40,11 +40,11 @@ abstract class DatabaseTupleRepository<E extends Entity> extends Repository<E> {
 
   E pack(Map<String, dynamic> map);
 
-  Future<E> receive(E entity) => d(
+  Future<E> receive(E entity, {DateTime? createdAt}) => v(
         () async {
           final entityMap = entity.toMap;
 
-          entityMap[defColCreatedAt.name] = DateTime.now();
+          entityMap[defColCreatedAt.name] = createdAt ?? DateTime.now();
 
           final id = await _databaseAccessor!.insert(
             _tableDefinition,
@@ -57,6 +57,7 @@ abstract class DatabaseTupleRepository<E extends Entity> extends Repository<E> {
         },
         {
           'entity': entity,
+          'createdAt': createdAt,
         },
       );
 }
