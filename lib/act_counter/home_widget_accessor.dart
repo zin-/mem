@@ -44,7 +44,7 @@ class HomeWidgetAccessor {
       );
 
   HomeWidgetAccessor._() {
-    HomeWidget.registerInteractivityCallback(backgroundCallback);
+    HomeWidget.registerBackgroundCallback(backgroundCallback);
   }
 
   static HomeWidgetAccessor? _instance;
