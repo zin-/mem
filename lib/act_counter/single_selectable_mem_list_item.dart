@@ -31,7 +31,7 @@ class SingleSelectableMemListItem extends ConsumerWidget {
 
 class _SingleSelectableMemListItemComponent extends ListTile {
   _SingleSelectableMemListItemComponent(
-    SavedMem mem,
+    SavedMemV1 mem,
     bool isSelected,
     void Function(int? memId) onSelected,
   ) : super(

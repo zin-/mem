@@ -7,7 +7,7 @@ import 'package:mem/repositories/mem.dart';
 
 class TotalActTimeListItem extends StatelessWidget {
   final List<Act> _actList;
-  final SavedMem? _mem;
+  final SavedMemV1? _mem;
 
   const TotalActTimeListItem(this._actList, this._mem, {super.key});
 

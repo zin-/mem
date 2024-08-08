@@ -4,7 +4,7 @@ import 'package:mem/mems/mem_service.dart';
 import 'package:mem/mems/states.dart';
 import 'package:mem/repositories/mem.dart';
 
-final doneMem = Provider.autoDispose.family<SavedMem, int>(
+final doneMem = Provider.autoDispose.family<SavedMemV1, int>(
   (ref, memId) => v(
     () {
       final mem = ref
@@ -14,7 +14,7 @@ final doneMem = Provider.autoDispose.family<SavedMem, int>(
       MemService().doneByMemId(memId).then(
             (doneMemDetail) => ref.read(memsProvider.notifier).upsertAll(
               [doneMemDetail.mem],
-              (tmp, item) => tmp is SavedMem && item is SavedMem
+              (tmp, item) => tmp is SavedMemV1 && item is SavedMemV1
                   ? tmp.id == item.id
                   : false,
             ),
@@ -26,7 +26,7 @@ final doneMem = Provider.autoDispose.family<SavedMem, int>(
   ),
 );
 
-final undoneMem = Provider.autoDispose.family<SavedMem, int>(
+final undoneMem = Provider.autoDispose.family<SavedMemV1, int>(
   (ref, memId) => v(
     () {
       final mem =
@@ -35,7 +35,7 @@ final undoneMem = Provider.autoDispose.family<SavedMem, int>(
       MemService().undoneByMemId(memId).then(
             (undoneMemDetail) => ref.read(memsProvider.notifier).upsertAll(
               [undoneMemDetail.mem],
-              (tmp, item) => tmp is SavedMem && item is SavedMem
+              (tmp, item) => tmp is SavedMemV1 && item is SavedMemV1
                   ? tmp.id == item.id
                   : false,
             ),

@@ -40,7 +40,7 @@ class MemListItemView extends ConsumerWidget {
                     ? ref.read(doneMem(_memId))
                     : ref.read(undoneMem(_memId))
               ],
-              (tmp, item) => tmp is SavedMem && item is SavedMem
+              (tmp, item) => tmp is SavedMemV1 && item is SavedMemV1
                   ? tmp.id == item.id
                   : false,
             );
@@ -65,7 +65,7 @@ class MemListItemView extends ConsumerWidget {
 
 class _MemListItemView extends ListTile {
   _MemListItemView(
-    SavedMem mem,
+    SavedMemV1 mem,
     SavedAct? activeAct,
     Iterable<MemNotification> memNotifications,
     void Function(int memId) onTap,

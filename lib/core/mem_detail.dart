@@ -3,7 +3,7 @@ import 'package:mem/core/mem_item.dart';
 import 'package:mem/core/mem_notification.dart';
 
 class MemDetail {
-  final Mem mem;
+  final MemV1 mem;
   final List<MemItem> memItems;
   final List<MemNotification>? notifications;
 

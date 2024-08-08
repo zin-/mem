@@ -4,6 +4,8 @@ import 'package:mem/logger/log_service.dart';
 import 'database_accessor_tests.dart' as database_accessor_tests;
 import 'database_factory_tests.dart' as database_factory_tests;
 import 'database_repository_tests.dart' as database_repository_tests;
+import 'database_tuple_repository_tests_v1.dart'
+    as database_tuple_repository_tests_v1;
 import 'database_tuple_repository_tests.dart'
     as database_tuple_repository_tests;
 
@@ -22,6 +24,7 @@ void main() => group(
 
         database_repository_tests.main();
 
+        database_tuple_repository_tests_v1.main();
         database_tuple_repository_tests.main();
       },
     );

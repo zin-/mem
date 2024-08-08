@@ -1,112 +1,86 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/databases/table_definitions/base.dart';
+import 'package:mem/framework/database/definition/column/boolean_column_definition.dart';
+import 'package:mem/framework/database/definition/database_definition.dart';
+import 'package:mem/framework/database/definition/table_definition.dart';
 import 'package:mem/framework/database/factory.dart';
-import 'package:mem/framework/repository/condition/conditions.dart';
-import 'package:mem/framework/repository/database_repository.dart';
-import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
-import 'package:mem/framework/repository/entity.dart';
-import 'package:mem/framework/repository/extra_column.dart';
-import 'package:mem/framework/repository/group_by.dart';
-import 'package:mem/framework/repository/order_by.dart';
 
-import 'database_definitions.dart';
+import '../../test/framework/repository/database_tuple_entity_test.dart';
+import '../../test/framework/repository/entity_test.dart';
 
 const _name = "DatabaseTupleRepository tests";
 
-class TestEntity extends EntityV1 {}
+final _defColA = BooleanColumnDefinition(TestObjectEntity.fieldNames[0]);
+final _defTableTestObject =
+    TableDefinition('test_object', [_defColA, ...defColsBase]);
+final _defDbTest = DatabaseDefinition('test_db', 1, [_defTableTestObject]);
 
-class SavedTestEntity extends TestEntity with SavedDatabaseTupleMixin<int> {}
-
-class TestRepository
-    extends DatabaseTupleRepository<TestEntity, SavedTestEntity, int> {
-  TestRepository(super.tableDefinition);
-
-  @override
-  SavedTestEntity pack(Map<String, dynamic> tuple) {
-    // TODO: implement pack
-    throw UnimplementedError();
-  }
+class _TestObjectRepository extends DatabaseTupleRepository<TestObjectEntity> {
+  _TestObjectRepository() : super(_defDbTest, _defTableTestObject);
 
   @override
-  Map<String, dynamic> unpack(TestEntity entity) {
-    // TODO: implement unpack
-    throw UnimplementedError();
-  }
+  TestObjectEntity pack(Map<String, dynamic> map) =>
+      TestObjectDatabaseTupleEntity.fromMap(map);
 }
 
 void main() => group(
       _name,
       () {
-        setUpAll(() async {
-          DatabaseFactory.onTest = true;
-          for (final testDefDatabase in [
-            sampleDefDb,
-            sampleDefDBAddedTable,
-            sampleDefDBAddedColumn,
-          ]) {
+        late String databasePath;
+        setUpAll(
+          () async {
+            databasePath =
+                await DatabaseFactory.buildDatabasePath(_defDbTest.name);
+
             await DatabaseFactory
                 // ignore: deprecated_member_use_from_same_package
                 .nativeFactory
-                .deleteDatabase(
-              await DatabaseFactory.buildDatabasePath(testDefDatabase.name),
-            );
-          }
-
-          DatabaseTupleRepository.databaseAccessor =
-              await DatabaseRepository().receive(sampleDefDBAddedColumn);
-        });
-        tearDownAll(() {
-          DatabaseFactory.onTest = false;
-          DatabaseTupleRepository.databaseAccessor = null;
-        });
+                .deleteDatabase(databasePath);
+          },
+        );
 
         test(
-          ": count.",
+          '#new',
           () async {
-            final repository = TestRepository(sampleDefTable);
+            _TestObjectRepository();
 
-            final count = await repository.count(
-              condition: Equals(sampleDefPk.name, 1),
-            );
-
-            expect(count, equals(0));
+            expect(
+                await DatabaseFactory
+                    // ignore: deprecated_member_use_from_same_package
+                    .nativeFactory
+                    .databaseExists(databasePath),
+                false);
           },
         );
 
         group(
-          'ship',
+          'operations',
           () {
+            final repository = _TestObjectRepository();
+
             test(
-              'group by',
+              '#count',
               () async {
-                final repository = TestRepository(sampleDefTable);
+                final count = await repository.count();
 
-                final shipped = await repository.ship(
-                  groupBy: GroupBy(
-                    [sampleDefColBoolean],
-                    extraColumns: [Max(sampleDefPk)],
-                  ),
-                );
-
-                expect(shipped, hasLength(0));
+                expect(count, 0);
               },
             );
 
             test(
-              'order by',
+              '#receive',
               () async {
-                final repository = TestRepository(sampleDefTable);
+                final now = DateTime.now();
+                final entity = TestObjectEntity(false);
 
-                final shipped = await repository.ship(
-                  orderBy: [
-                    Ascending(sampleDefPk),
-                    Descending(sampleDefColInteger),
-                  ],
-                  offset: 1,
-                  limit: 1,
-                );
+                final received =
+                    await repository.receive(entity, createdAt: now);
 
-                expect(shipped, hasLength(0));
+                expect(
+                    received,
+                    equals(TestObjectDatabaseTupleEntity(entity.a).withMap(
+                        {defPkId.name: 1, defColCreatedAt.name: now})));
               },
             );
           },

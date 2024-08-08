@@ -10,7 +10,7 @@ import 'package:mem/repositories/mem_notification_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 
 class MemService {
-  final MemRepository _memRepository;
+  final MemRepositoryV1 _memRepository;
   final MemItemRepository _memItemRepository;
   final MemNotificationRepository _memNotificationRepository;
 
@@ -18,7 +18,7 @@ class MemService {
         () async {
           final mem = memDetail.mem;
 
-          final savedMem = (mem is SavedMem && !undo
+          final savedMem = (mem is SavedMemV1 && !undo
               ? await _memRepository.replace(mem)
               : await _memRepository.receive(mem));
 
@@ -101,7 +101,7 @@ class MemService {
         {'memId': memId},
       );
 
-  Future<MemDetail> archive(SavedMem mem) => i(
+  Future<MemDetail> archive(SavedMemV1 mem) => i(
         () async {
           final archivedMem = await _memRepository.archive(mem);
           final archivedMemItems =
@@ -120,7 +120,7 @@ class MemService {
         },
       );
 
-  Future<MemDetail> unarchive(SavedMem mem) => i(
+  Future<MemDetail> unarchive(SavedMemV1 mem) => i(
         () async {
           final unarchivedMem = await _memRepository.unarchive(mem);
           final unarchivedMemItems =
@@ -159,7 +159,7 @@ class MemService {
 
   factory MemService() => i(
         () => _instance ??= MemService._(
-          MemRepository(),
+          MemRepositoryV1(),
           MemItemRepository(),
           MemNotificationRepository(),
         ),

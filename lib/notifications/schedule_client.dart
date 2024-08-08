@@ -9,7 +9,7 @@ import 'package:mem/notifications/schedule.dart';
 import 'package:mem/permissions/permission.dart';
 import 'package:mem/permissions/permission_handler_wrapper.dart';
 
-class ScheduleClient extends Repository<Schedule>
+class ScheduleClient extends RepositoryV2<Schedule>
     with Receiver<Schedule, void> {
   static ScheduleClient? _instance;
   final AndroidAlarmManagerWrapper _androidAlarmManagerWrapper;

@@ -1,7 +1,7 @@
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/framework/repository/entity.dart';
 
-mixin SavedDatabaseTupleMixin<T> on EntityV1 {
+mixin SavedDatabaseTupleMixinV1<T> on EntityV1 {
   late T id;
   late DateTime createdAt;
   DateTime? updatedAt;
@@ -25,7 +25,7 @@ mixin SavedDatabaseTupleMixin<T> on EntityV1 {
     };
   }
 
-  SavedDatabaseTupleMixin copiedFrom(SavedDatabaseTupleMixin origin) => this
+  SavedDatabaseTupleMixinV1 copiedFrom(SavedDatabaseTupleMixinV1 origin) => this
     ..id = origin.id
     ..createdAt = origin.createdAt
     ..updatedAt = origin.updatedAt
@@ -33,4 +33,28 @@ mixin SavedDatabaseTupleMixin<T> on EntityV1 {
 
   @override
   String toString() => "${super.toString()}${unpack()}";
+}
+
+mixin DatabaseTupleEntity<PrimaryKey> on Entity {
+  late PrimaryKey id;
+  late DateTime createdAt;
+  late DateTime? updatedAt;
+  late DateTime? archivedAt;
+
+  DatabaseTupleEntity<PrimaryKey> withMap(Map<String, dynamic> map) {
+    id = map[defPkId.name];
+    createdAt = map[defColCreatedAt.name];
+    updatedAt = map[defColUpdatedAt.name];
+    archivedAt = map[defColArchivedAt.name];
+    return this;
+  }
+
+  @override
+  Map<String, dynamic> get toMap => super.toMap
+    ..addAll({
+      defPkId.name: id,
+      defColCreatedAt.name: createdAt,
+      defColUpdatedAt.name: updatedAt,
+      defColArchivedAt.name: archivedAt,
+    });
 }

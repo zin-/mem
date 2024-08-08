@@ -4,11 +4,11 @@ import 'package:mem/framework/repository/condition/in.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/framework/repository/database_tuple_repository.dart';
+import 'package:mem/framework/repository/database_tuple_repository_v1.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/repositories/mem_notification.dart';
 
-class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
+class MemNotificationRepository extends DatabaseTupleRepositoryV1<MemNotification,
     SavedMemNotification, int> {
   @override
   Future<List<SavedMemNotification>> ship({

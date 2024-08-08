@@ -9,7 +9,7 @@ import 'view.dart';
 
 class ActListItemBuilder {
   final MapEntry<DateTime, List<Act>> _actListWithDatetime;
-  final List<SavedMem> _memList;
+  final List<SavedMemV1> _memList;
   final bool _isTimeView;
 
   late final Map _actListGroupedByMemId;
