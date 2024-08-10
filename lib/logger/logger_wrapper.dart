@@ -33,7 +33,7 @@ class _LogPrinter extends PrettyPrinter {
       : super(
           methodCount: 1,
           errorMethodCount: 100,
-          printTime: true,
+          dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
         );
 
   @override
