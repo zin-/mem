@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
@@ -10,6 +11,9 @@ import 'package:mem/values/durations.dart';
 // FIXME 使い勝手が悪いので改修する
 void showMemDetailPage(BuildContext context, WidgetRef? ref, int? memId) => v(
       () {
+        final l10n = buildL10n(context);
+        final scaffoldMessenger = ScaffoldMessenger.of(context);
+
         Navigator.of(context)
             .push<bool?>(
           PageRouteBuilder(
@@ -23,7 +27,7 @@ void showMemDetailPage(BuildContext context, WidgetRef? ref, int? memId) => v(
             .then(
           (result) {
             if (ref != null) {
-              handleRemoved(context, ref, memId, result);
+              handleRemoved(l10n, scaffoldMessenger, ref, memId, result);
             }
           },
         );
@@ -48,7 +52,8 @@ Widget detailTransitionsBuilder(
 const keyUndo = Key("undo");
 
 void handleRemoved(
-  BuildContext context,
+  AppLocalizations l10n,
+  ScaffoldMessengerState scaffoldMessengerState,
   WidgetRef ref,
   int? memId,
   bool? result,
@@ -59,9 +64,7 @@ void handleRemoved(
           final removed = ref.read(removedMemProvider(memId));
 
           if (removed != null) {
-            final l10n = buildL10n(context);
-
-            ScaffoldMessenger.of(context).showSnackBar(
+            scaffoldMessengerState.showSnackBar(
               SnackBar(
                 content: Text(
                   l10n.removeMemSuccessMessage(removed.name),
@@ -74,7 +77,7 @@ void handleRemoved(
                   onPressed: () {
                     ref.read(undoRemoveMem(memId));
 
-                    ScaffoldMessenger.of(context).showSnackBar(
+                    scaffoldMessengerState.showSnackBar(
                       SnackBar(
                         content: Text(
                           l10n.undoMemSuccessMessage(removed.name),
@@ -90,5 +93,11 @@ void handleRemoved(
           }
         }
       },
-      [context, ref, memId, result],
+      {
+        'l10n': l10n,
+        'scaffoldMessengerState': scaffoldMessengerState,
+        'ref': ref,
+        'memId': memId,
+        'result': result,
+      },
     );
