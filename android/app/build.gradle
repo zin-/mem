@@ -1,6 +1,7 @@
 plugins {
   id "com.android.application"
   id "kotlin-android"
+  // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
   id "dev.flutter.flutter-gradle-plugin"
 }
 
@@ -22,8 +23,6 @@ if (flutterVersionName == null) {
   flutterVersionName = '1.0'
 }
 
-apply plugin: 'kotlin-android'
-
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
 if (keystorePropertiesFile.exists()) {
@@ -31,22 +30,37 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
+  namespace 'zin.playground.mem'
   // FIXME 直接書き換えるといつか問題が起こりそう。プロジェクトごとに設定できるようにしたい
-  compileSdkVersion 34 // 直接書き換えた
-  // compileSdkVersion flutter.compileSdkVersion
-  ndkVersion flutter.ndkVersion
+//  compileSdkVersion 34 // 直接書き換えた
+//  compileSdk = 34
+  compileSdk = flutter.compileSdkVersion
+  ndkVersion = flutter.ndkVersion
 
   compileOptions {
-    sourceCompatibility JavaVersion.VERSION_1_8
-    targetCompatibility JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
   }
 
   kotlinOptions {
-    jvmTarget = '1.8'
+    jvmTarget = JavaVersion.VERSION_1_8
   }
 
-  sourceSets {
-    main.java.srcDirs += 'src/main/kotlin'
+//  sourceSets {
+//    main.java.srcDirs += 'src/main/kotlin'
+//  }
+
+  defaultConfig {
+    // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+    applicationId "zin.playground.mem"
+    // You can update the following values to match your application needs.
+    // For more information, see: https://flutter.dev/to/review-gradle-config.
+    // FIXME 直接書き換えるといつか問題が起こりそう。プロジェクトごとに設定できるようにしたい
+//    minSdkVersion 26 // 直接書き換えた
+    minSdk = flutter.minSdkVersion
+    targetSdk = flutter.targetSdkVersion
+    versionCode = flutter.versionCode
+    versionName = flutter.versionName
   }
 
   signingConfigs {
@@ -58,28 +72,13 @@ android {
     }
   }
 
-  defaultConfig {
-    applicationId "zin.playground.mem"
-    // You can update the following values to match your application needs.
-    // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-build-configuration.
-    minSdkVersion 26 // 直接書き換えた
-    // minSdkVersion flutter.minSdkVersion
-    targetSdkVersion flutter.targetSdkVersion
-    versionCode flutterVersionCode.toInteger()
-    versionName flutterVersionName
-  }
-
   buildTypes {
     release {
       signingConfig signingConfigs.release
     }
   }
-  namespace 'zin.playground.mem'
 }
 
 flutter {
   source '../..'
-}
-
-dependencies {
 }
