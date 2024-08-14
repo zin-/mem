@@ -174,7 +174,7 @@ abstract class DatabaseTupleRepository<E extends EntityV1,
 
   Future<List<SavedEntity>> waste([Condition? condition]) => v(
         () async {
-          final payloads = (await _databaseAccessor!.select(
+          final targets = (await _databaseAccessor!.select(
             _tableDefinition,
             where: condition?.where(),
             whereArgs: condition?.whereArgs(),
@@ -188,9 +188,9 @@ abstract class DatabaseTupleRepository<E extends EntityV1,
             whereArgs: condition?.whereArgs(),
           );
 
-          assert(count == payloads.length);
+          assert(count == targets.length);
 
-          return payloads;
+          return targets;
         },
         condition,
       );

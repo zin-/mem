@@ -350,6 +350,49 @@ void main() => group(
             }
 
             testWidgets(
+              ": undo.",
+              (widgetTester) async {
+                await runApplication();
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(find.text(insertedMemName));
+                await widgetTester.pumpAndSettle();
+
+                await widgetTester.tap(menuButtonIconFinder);
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(find.byKey(keyRemoveMem));
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(find.byKey(keyOk));
+                await widgetTester.pumpAndSettle(waitSideEffectDuration);
+
+                expect(
+                  find.text(l10n.removeMemSuccessMessage(insertedMemName)),
+                  findsOneWidget,
+                );
+                expect(find.text(insertedMemName), findsNothing);
+                expect(
+                    (await selectFromMemsWhereName(insertedMemName)).length, 0);
+
+                await widgetTester.tap(find.byKey(keyUndo));
+                await widgetTester.pumpAndSettle();
+
+                expect(
+                  find.text(l10n.undoMemSuccessMessage(insertedMemName)),
+                  findsOneWidget,
+                );
+                expect(find.text(insertedMemName), findsOneWidget);
+
+                expect(
+                    (await selectFromMemsWhereName(insertedMemName)).length, 1);
+
+                await widgetTester.tap(find.text(insertedMemName));
+                await widgetTester.pumpAndSettle();
+
+                expect(find.text(insertedMemName), findsOneWidget);
+                expect(find.text(insertedMemMemo), findsOneWidget);
+              },
+            );
+
+            testWidgets(
               ": nothing on new.",
               (widgetTester) async {
                 await runApplication();
@@ -389,36 +432,6 @@ void main() => group(
             );
 
             testWidgets(
-              ": exec.",
-              (widgetTester) async {
-                await runApplication();
-                await widgetTester.pumpAndSettle();
-                await widgetTester.tap(find.text(insertedMemName));
-                await widgetTester.pumpAndSettle();
-
-                await widgetTester.tap(menuButtonIconFinder);
-                await widgetTester.pumpAndSettle();
-                await widgetTester.tap(find.byKey(keyRemoveMem));
-                await widgetTester.pumpAndSettle();
-                await widgetTester.tap(find.byKey(keyOk));
-                await widgetTester.pumpAndSettle();
-
-                expect(
-                  find.text(l10n.removeMemSuccessMessage(insertedMemName)),
-                  findsOneWidget,
-                );
-                expect(
-                  find.byKey(keyUndo),
-                  findsOneWidget,
-                );
-                expect(find.text(insertedMemName), findsNothing);
-
-                expect(
-                    (await selectFromMemsWhereName(insertedMemName)).length, 0);
-              },
-            );
-
-            testWidgets(
               'on created.',
               skip: true,
               (widgetTester) async {
@@ -443,50 +456,6 @@ void main() => group(
                 expect(find.text(enteringMemName), findsNothing);
                 expect(
                     (await selectFromMemsWhereName(enteringMemName)).length, 0);
-              },
-            );
-
-            testWidgets(
-              ": undo.",
-              (widgetTester) async {
-                await runApplication();
-                await widgetTester.pumpAndSettle();
-                await widgetTester.tap(find.text(insertedMemName));
-                await widgetTester.pumpAndSettle();
-                await widgetTester.tap(menuButtonIconFinder);
-                await widgetTester.pumpAndSettle();
-                await widgetTester.tap(find.byKey(keyRemoveMem));
-                await widgetTester.pumpAndSettle();
-                await widgetTester.tap(find.byKey(keyOk));
-                await widgetTester.pumpAndSettle();
-
-                await widgetTester.tap(find.byKey(keyUndo));
-                await widgetTester.pumpAndSettle();
-
-                expect(
-                  find.text(l10n.undoMemSuccessMessage(insertedMemName)),
-                  findsOneWidget,
-                );
-
-                expect(find.text(insertedMemName), findsOneWidget);
-                expect(
-                    (await selectFromMemsWhereName(insertedMemName)).length, 1);
-                final where = Equals(defColMemItemsValue.name, insertedMemMemo);
-                expect(
-                  (await dbA.select(
-                    defTableMemItems,
-                    where: where.where(),
-                    whereArgs: where.whereArgs(),
-                  ))
-                      .length,
-                  1,
-                );
-
-                await widgetTester.tap(find.text(insertedMemName));
-                await widgetTester.pumpAndSettle();
-
-                expect(find.text(insertedMemName), findsOneWidget);
-                expect(find.text(insertedMemMemo), findsOneWidget);
               },
             );
           },

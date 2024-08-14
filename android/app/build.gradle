@@ -1,72 +1,70 @@
 plugins {
   id "com.android.application"
   id "kotlin-android"
+  // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
   id "dev.flutter.flutter-gradle-plugin"
 }
 
+def flutterCompileSdkVersion = flutter.compileSdkVersion
+def flutterNdkVersion = '26.1.10909125'
+//println("flutter.ndkVersion: $flutter.ndkVersion") // => 23.1.7779620
+//def flutterNdkVersion = flutter.ndkVersion
+def flutterMinSdkVersion = flutter.minSdkVersion
+def flutterTargetSdkVersion = flutter.targetSdkVersion
+def javaVersion = JavaVersion.VERSION_1_8
+
 def localProperties = new Properties()
-def localPropertiesFile = rootProject.file('local.properties')
+def localPropertiesFile = rootProject.file('local.properties') as File
 if (localPropertiesFile.exists()) {
   localPropertiesFile.withReader('UTF-8') { reader ->
     localProperties.load(reader)
   }
 }
-
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
-if (flutterVersionCode == null) {
-  flutterVersionCode = '1'
-}
-
-def flutterVersionName = localProperties.getProperty('flutter.versionName')
-if (flutterVersionName == null) {
-  flutterVersionName = '1.0'
-}
-
-apply plugin: 'kotlin-android'
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode') ?: '1'
+def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '1.0'
 
 def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file('key.properties')
+def keystorePropertiesFile = rootProject.file('key.properties') as File
 if (keystorePropertiesFile.exists()) {
   keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
+
 android {
-  // FIXME 直接書き換えるといつか問題が起こりそう。プロジェクトごとに設定できるようにしたい
-  compileSdkVersion 34 // 直接書き換えた
-  // compileSdkVersion flutter.compileSdkVersion
-  ndkVersion flutter.ndkVersion
+  namespace 'zin.playground.mem'
+
+  compileSdk = flutterCompileSdkVersion
+  ndkVersion = flutterNdkVersion
 
   compileOptions {
-    sourceCompatibility JavaVersion.VERSION_1_8
-    targetCompatibility JavaVersion.VERSION_1_8
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+
+    coreLibraryDesugaringEnabled true
   }
 
   kotlinOptions {
-    jvmTarget = '1.8'
+    jvmTarget = javaVersion
   }
 
-  sourceSets {
-    main.java.srcDirs += 'src/main/kotlin'
+  defaultConfig {
+    applicationId 'zin.playground.mem'
+
+    // You can update the following values to match your application needs.
+    // For more information, see: https://flutter.dev/to/review-gradle-config.
+    minSdk = flutterMinSdkVersion
+    targetSdk = flutterTargetSdkVersion
+    versionCode = flutterVersionCode
+    versionName = flutterVersionName
   }
 
   signingConfigs {
     release {
-      keyAlias keystoreProperties['keyAlias']
-      keyPassword keystoreProperties['keyPassword']
-      storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
-      storePassword keystoreProperties['storePassword']
+      keyAlias keystoreProperties.getProperty('keyAlias')
+      keyPassword keystoreProperties.getProperty('keyPassword')
+      storeFile keystoreProperties.getProperty('storeFile') ? file(keystoreProperties.getProperty('storeFile')) : null
+      storePassword keystoreProperties.getProperty('storePassword')
     }
-  }
-
-  defaultConfig {
-    applicationId "zin.playground.mem"
-    // You can update the following values to match your application needs.
-    // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-build-configuration.
-    minSdkVersion 26 // 直接書き換えた
-    // minSdkVersion flutter.minSdkVersion
-    targetSdkVersion flutter.targetSdkVersion
-    versionCode flutterVersionCode.toInteger()
-    versionName flutterVersionName
   }
 
   buildTypes {
@@ -74,7 +72,6 @@ android {
       signingConfig signingConfigs.release
     }
   }
-  namespace 'zin.playground.mem'
 }
 
 flutter {
@@ -82,4 +79,11 @@ flutter {
 }
 
 dependencies {
+  coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
+
+  // conflict:
+  // - work-runtime-2.8.1-runtime (from workmanager: 0.5.2)
+  // and
+  // - work-runtime-ktx-2.7.1-runtime ( from home_widget: 0.6.0)
+  implementation 'androidx.work:work-runtime:2.9.1'
 }

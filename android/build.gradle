@@ -3,14 +3,21 @@ allprojects {
     google()
     mavenCentral()
   }
+//
+//  gradle.projectsEvaluated {
+//    tasks.withType(JavaCompile) { c ->
+//      println("dev: root: build.gradle: allprojects: projectsEvaluated: tasks.withType: $c")
+//      options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+//    }
+//  }
 }
 
-rootProject.buildDir = '../build'
+rootProject.buildDir = "../build"
 subprojects {
   project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
 subprojects {
-  project.evaluationDependsOn(':app')
+  project.evaluationDependsOn(":app")
 }
 
 tasks.register("clean", Delete) {
