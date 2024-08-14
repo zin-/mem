@@ -1,7 +1,7 @@
 name: "Continuous Delivery"
 
 on:
-  #  debugのために必要
+  # debugのために必要
   workflow_dispatch:
   workflow_run:
     workflows:
