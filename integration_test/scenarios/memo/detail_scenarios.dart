@@ -362,7 +362,7 @@ void main() => group(
                 await widgetTester.tap(find.byKey(keyRemoveMem));
                 await widgetTester.pumpAndSettle();
                 await widgetTester.tap(find.byKey(keyOk));
-                await widgetTester.pumpAndSettle();
+                await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
                 expect(
                   find.text(l10n.removeMemSuccessMessage(insertedMemName)),
