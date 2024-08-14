@@ -188,10 +188,7 @@ abstract class DatabaseTupleRepository<E extends EntityV1,
             whereArgs: condition?.whereArgs(),
           );
 
-          assert(
-            count == targets.length,
-            {'count': count, 'targets': targets},
-          );
+          assert(count == targets.length);
 
           return targets;
         },
