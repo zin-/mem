@@ -8,7 +8,7 @@ import 'package:mem/mems/mem_item.dart';
 class MemItemRepository
     extends DatabaseTupleRepositoryV1<MemItem, SavedMemItem, int> {
   Future<List<SavedMemItem>> shipByMemId(int memId) => v(
-        () => super.ship(condition: EqualsV1(defFkMemItemsMemId.name, memId)),
+        () => super.ship(condition: Equals(defFkMemItemsMemId, memId)),
         {'memId': memId},
       );
 
@@ -25,7 +25,7 @@ class MemItemRepository
       );
 
   Future<Iterable<SavedMemItem>> wasteByMemId(int memId) => v(
-        () async => await super.waste(EqualsV1(defFkMemItemsMemId.name, memId)),
+        () async => await super.waste(Equals(defFkMemItemsMemId, memId)),
         {'memId': memId},
       );
 

@@ -35,7 +35,7 @@ class ActRepository extends DatabaseTupleRepositoryV1<Act, SavedAct, int> {
       v(
         () async => await super.findOneBy(
           condition: And([
-            if (memId != null) EqualsV1(defFkActsMemId.name, memId),
+            if (memId != null) Equals(defFkActsMemId, memId),
             if (condition != null) condition, // coverage:ignore-line
           ]),
           orderBy: [
@@ -60,7 +60,7 @@ class ActRepository extends DatabaseTupleRepositoryV1<Act, SavedAct, int> {
         () => super.count(
           condition: And(
             [
-              if (memId != null) EqualsV1(defFkActsMemId.name, memId),
+              if (memId != null) Equals(defFkActsMemId, memId),
               if (condition != null) condition, // coverage:ignore-line
             ],
           ),
@@ -88,7 +88,7 @@ class ActRepository extends DatabaseTupleRepositoryV1<Act, SavedAct, int> {
         () => super.ship(
           condition: And(
             [
-              if (memId != null) EqualsV1(defFkActsMemId.name, memId),
+              if (memId != null) Equals(defFkActsMemId, memId),
               if (memIdsIn != null) In(defFkActsMemId.name, memIdsIn),
               if (period != null)
                 GraterThanOrEqual(defColActsStart, period.start),
@@ -128,7 +128,7 @@ class ActRepository extends DatabaseTupleRepositoryV1<Act, SavedAct, int> {
       v(
         () async => await ship(
           condition: And([
-            EqualsV1(defFkActsMemId.name, memId),
+            Equals(defFkActsMemId, memId),
             IsNull(defColActsEnd.name),
           ]),
         ),

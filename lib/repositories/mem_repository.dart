@@ -10,7 +10,8 @@ import 'package:mem/framework/repository/database_tuple_repository_v1.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/repositories/mem.dart';
 
-class MemRepositoryV1 extends DatabaseTupleRepositoryV1<MemV1, SavedMemV1, int> {
+class MemRepositoryV1
+    extends DatabaseTupleRepositoryV1<MemV1, SavedMemV1, int> {
   @override
   Future<List<SavedMemV1>> ship({
     bool? archived,
@@ -58,7 +59,7 @@ class MemRepositoryV1 extends DatabaseTupleRepositoryV1<MemV1, SavedMemV1, int> 
       v(
         () => super.findOneBy(
           condition: And([
-            if (id != null) EqualsV1(defPkId.name, id),
+            if (id != null) Equals(defPkId, id),
             if (condition != null) condition, // coverage:ignore-line
           ]),
           orderBy: orderBy,

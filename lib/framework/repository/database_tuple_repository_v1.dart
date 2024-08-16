@@ -85,7 +85,7 @@ abstract class DatabaseTupleRepositoryV1<E extends EntityV1,
 
   Future<SavedEntity> shipById(Id id) => v(
         () async {
-          final condition = EqualsV1(defPkId.name, id);
+          final condition = Equals(defPkId, id);
           return pack(
             (await _databaseAccessor!.select(
               _tableDefinition,
@@ -120,7 +120,7 @@ abstract class DatabaseTupleRepositoryV1<E extends EntityV1,
 
           entityMap[defColUpdatedAt.name] = DateTime.now();
 
-          final condition = EqualsV1(defPkId.name, entityMap[defPkId.name]);
+          final condition = Equals(defPkId, entityMap[defPkId.name]);
           await _databaseAccessor!.update(
             _tableDefinition,
             entityMap,
@@ -139,7 +139,7 @@ abstract class DatabaseTupleRepositoryV1<E extends EntityV1,
 
           entityMap[defColArchivedAt.name] = DateTime.now();
 
-          final condition = EqualsV1(defPkId.name, entityMap[defPkId.name]);
+          final condition = Equals(defPkId, entityMap[defPkId.name]);
           await _databaseAccessor!.update(
             _tableDefinition,
             entityMap,
@@ -159,7 +159,7 @@ abstract class DatabaseTupleRepositoryV1<E extends EntityV1,
           entityMap[defColUpdatedAt.name] = DateTime.now();
           entityMap[defColArchivedAt.name] = null;
 
-          final condition = EqualsV1(defPkId.name, entityMap[defPkId.name]);
+          final condition = Equals(defPkId, entityMap[defPkId.name]);
           await _databaseAccessor!.update(
             _tableDefinition,
             entityMap,
@@ -197,7 +197,7 @@ abstract class DatabaseTupleRepositoryV1<E extends EntityV1,
 
   Future<SavedEntity> wasteById(Id id) => v(
         () async {
-          final condition = EqualsV1(defPkId.name, id);
+          final condition = Equals(defPkId, id);
           final payload = (await _databaseAccessor!.select(
             _tableDefinition,
             where: condition.where(),

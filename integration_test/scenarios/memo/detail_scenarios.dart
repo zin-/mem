@@ -114,16 +114,15 @@ void main() => group(
                   findsOneWidget,
                 );
 
-                final getCreatedMem =
-                    EqualsV1(defColMemsName.name, enteringMemName);
+                final getCreatedMem = Equals(defColMemsName, enteringMemName);
                 final mems = await dbA.select(defTableMems,
                     where: getCreatedMem.where(),
                     whereArgs: getCreatedMem.whereArgs());
                 expect(mems.length, 1);
                 final getCreatedMemItem = And([
-                  EqualsV1(defFkMemItemsMemId.name, mems[0][defPkId.name]),
-                  EqualsV1(defColMemItemsType.name, MemItemType.memo.name),
-                  EqualsV1(defColMemItemsValue.name, enteringMemMemo)
+                  Equals(defFkMemItemsMemId, mems[0][defPkId.name]),
+                  Equals(defColMemItemsType, MemItemType.memo.name),
+                  Equals(defColMemItemsValue, enteringMemMemo)
                 ]);
                 final memItems = await dbA.select(defTableMemItems,
                     where: getCreatedMemItem.where(),
@@ -215,8 +214,7 @@ void main() => group(
                 await widgetTester.tap(find.byKey(keySaveMemFab));
                 await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
-                final getCreatedMem =
-                    EqualsV1(defColMemsName.name, enteringMemName);
+                final getCreatedMem = Equals(defColMemsName, enteringMemName);
                 final mems = await dbA.select(
                   defTableMems,
                   where: getCreatedMem.where(),
@@ -224,8 +222,8 @@ void main() => group(
                 );
                 expect(mems.length, 1);
                 final getCreatedMemItem = And([
-                  EqualsV1(defFkMemItemsMemId.name, mems[0][defPkId.name]),
-                  EqualsV1(defColMemItemsType.name, MemItemType.memo.name),
+                  Equals(defFkMemItemsMemId, mems[0][defPkId.name]),
+                  Equals(defColMemItemsType, MemItemType.memo.name),
                 ]);
                 final memItems = await dbA.select(defTableMemItems,
                     where: getCreatedMemItem.where(),
@@ -284,7 +282,7 @@ void main() => group(
                   );
 
                   final findUnarchivedMem =
-                      EqualsV1(defColMemsName.name, unarchivedMemName);
+                      Equals(defColMemsName, unarchivedMemName);
                   final mems = await dbA.select(
                     defTableMems,
                     where: findUnarchivedMem.where(),
@@ -321,7 +319,7 @@ void main() => group(
                   );
 
                   final findArchivedMem =
-                      EqualsV1(defColMemsName.name, archivedMemName);
+                      Equals(defColMemsName, archivedMemName);
                   final mems = await dbA.select(
                     defTableMems,
                     where: findArchivedMem.where(),
@@ -341,7 +339,7 @@ void main() => group(
             Future<List<Map<String, Object?>>> selectFromMemsWhereName(
               String name,
             ) async {
-              final where = EqualsV1(defColMemsName.name, name);
+              final where = Equals(defColMemsName, name);
               return await dbA.select(
                 defTableMems,
                 where: where.where(),

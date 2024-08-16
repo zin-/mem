@@ -66,7 +66,7 @@ void main() => group(
             final repository = TestRepository(sampleDefTable);
 
             final count = await repository.count(
-              condition: EqualsV1(sampleDefPk.name, 1),
+              condition: Equals(sampleDefPk, 1),
             );
 
             expect(count, equals(0));
