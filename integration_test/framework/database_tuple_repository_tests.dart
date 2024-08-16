@@ -6,6 +6,9 @@ import 'package:mem/framework/database/definition/table_definition.dart';
 import 'package:mem/framework/database/factory.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
+import 'package:mem/framework/repository/extra_column.dart';
+import 'package:mem/framework/repository/group_by.dart';
+import 'package:mem/framework/repository/order_by.dart';
 
 import '../../test/framework/repository/database_tuple_entity_test.dart';
 import '../../test/framework/repository/entity_test.dart';
@@ -17,11 +20,12 @@ final _defTableTestObject =
     TableDefinition('test_object', [_defColA, ...defColsBase]);
 final _defDbTest = DatabaseDefinition('test_db', 1, [_defTableTestObject]);
 
-class _TestObjectRepository extends DatabaseTupleRepository<TestObjectEntity> {
+class _TestObjectRepository extends DatabaseTupleRepository<TestObjectEntity,
+    TestObjectDatabaseTupleEntity> {
   _TestObjectRepository() : super(_defDbTest, _defTableTestObject);
 
   @override
-  TestObjectEntity pack(Map<String, dynamic> map) =>
+  TestObjectDatabaseTupleEntity pack(Map<String, dynamic> map) =>
       TestObjectDatabaseTupleEntity.fromMap(map);
 }
 
@@ -125,6 +129,96 @@ void main() => group(
                         received,
                         equals(TestObjectDatabaseTupleEntity(entity.a).withMap(
                             {defPkId.name: 1, defColCreatedAt.name: now})));
+                  },
+                );
+              },
+            );
+
+            group(
+              '#ship',
+              () {
+                final falseSample = TestObjectEntity(false);
+                final trueSample = TestObjectEntity(true);
+                final now = DateTime.now();
+                final later = now.add(const Duration(seconds: 1));
+
+                late int sampleId1;
+                late int sampleId2;
+                late int sampleId3;
+                setUpAll(
+                  () async {
+                    final dbA = await DatabaseFactory.open(_defDbTest);
+
+                    await dbA.delete(_defTableTestObject);
+                    sampleId1 = await dbA.insert(_defTableTestObject,
+                        falseSample.toMap..addAll({defColCreatedAt.name: now}));
+                    sampleId2 = await dbA.insert(_defTableTestObject,
+                        trueSample.toMap..addAll({defColCreatedAt.name: now}));
+                    sampleId3 = await dbA.insert(
+                        _defTableTestObject,
+                        falseSample.toMap
+                          ..addAll({defColCreatedAt.name: later}));
+                  },
+                );
+
+                test(
+                  ': all.',
+                  () async {
+                    final shipped = await repository.ship();
+
+                    expect(shipped, hasLength(3));
+                    expect(shipped[0].id, equals(sampleId1));
+                    expect(shipped[0].createdAt, equals(now));
+                  },
+                );
+                test(
+                  ': condition.',
+                  () async {
+                    final shipped = await repository.ship(
+                      condition: Equals(_defColA, false),
+                    );
+
+                    expect(shipped, hasLength(2));
+                  },
+                );
+                test(
+                  ': groupBy.',
+                  () async {
+                    final shipped = await repository.ship(
+                        groupBy: GroupBy([_defColA],
+                            extraColumns: [Max(defColCreatedAt)]));
+
+                    expect(shipped, hasLength(2));
+                    expect(shipped[0].id, equals(sampleId3));
+                    expect(shipped[0].createdAt, equals(later));
+                  },
+                );
+                test(
+                  ': orderBy.',
+                  () async {
+                    final shipped =
+                        await repository.ship(orderBy: [Descending(defPkId)]);
+
+                    expect(shipped, hasLength(3));
+                    expect(shipped[0].id, sampleId3);
+                  },
+                );
+                test(
+                  ': offset.',
+                  () async {
+                    final shipped = await repository.ship(offset: 1);
+
+                    expect(shipped, hasLength(2));
+                    expect(shipped[0].id, sampleId2);
+                  },
+                );
+                test(
+                  ': limit.',
+                  () async {
+                    final shipped = await repository.ship(limit: 2);
+
+                    expect(shipped, hasLength(2));
+                    expect(shipped[1].id, sampleId2);
                   },
                 );
               },

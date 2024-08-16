@@ -4,19 +4,19 @@ import 'package:mem/framework/database/definition/database_definition.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/database_repository.dart';
+import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
+import 'package:mem/framework/repository/group_by.dart';
+import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/logger/log_service.dart';
 
-// FIXME byIdの引数の型のためにSavedEntityの型以外にIが必要になっている
-//  Rにidの型情報が含まれているのに改めて渡す必要があるのはおかしい
-//  DatabaseTupleに型情報を付与することでズレは発生しなくなった
-//  ただ、これだと未保存のDatabaseTupleが
-// FIXME SavedEntityはSavedDatabaseTupleをmixinしている必要があるが型制約を定義できていない
-abstract class DatabaseTupleRepository<E extends Entity> extends Repository<E> {
+abstract class DatabaseTupleRepository<E extends Entity,
+    Saved extends DatabaseTupleEntity> extends Repository<E> {
   final DatabaseDefinition _databaseDefinition;
   final TableDefinition _tableDefinition;
 
+  // FIXME DatabaseDefinitionの中にTableDefinitionがあるのでEから取得できるのでは？
   DatabaseTupleRepository(this._databaseDefinition, this._tableDefinition);
 
   DatabaseAccessor? _databaseAccessor;
@@ -38,15 +38,15 @@ abstract class DatabaseTupleRepository<E extends Entity> extends Repository<E> {
         },
       );
 
-  E pack(Map<String, dynamic> map);
+  Saved pack(Map<String, dynamic> map);
 
-  Future<E> receive(E entity, {DateTime? createdAt}) => v(
+  Future<Saved> receive(E entity, {DateTime? createdAt}) => v(
         () async {
           final entityMap = entity.toMap;
 
           entityMap[defColCreatedAt.name] = createdAt ?? DateTime.now();
 
-          final id = await _databaseAccessor!.insert(
+          final id = await (await _dbA).insert(
             _tableDefinition,
             entityMap,
           );
@@ -58,6 +58,37 @@ abstract class DatabaseTupleRepository<E extends Entity> extends Repository<E> {
         {
           'entity': entity,
           'createdAt': createdAt,
+        },
+      );
+
+  Future<List<Saved>> ship({
+    Condition? condition,
+    GroupBy? groupBy,
+    List<OrderBy>? orderBy,
+    int? offset,
+    int? limit,
+  }) =>
+      v(
+        () async => (await (await _dbA).select(
+          _tableDefinition,
+          groupBy: groupBy?.toQuery,
+          extraColumns: groupBy?.toExtraColumns,
+          where: condition?.where(),
+          whereArgs: condition?.whereArgs(),
+          orderBy: orderBy?.isEmpty != false
+              ? null
+              : orderBy?.map((e) => e.toQuery()).join(", "),
+          offset: offset,
+          limit: limit,
+        ))
+            .map((e) => pack(e))
+            .toList(),
+        {
+          'condition': condition,
+          'groupBy': groupBy,
+          'orderBy': orderBy,
+          'offset': offset,
+          'limit': limit,
         },
       );
 }
