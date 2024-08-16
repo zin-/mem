@@ -11,6 +11,8 @@ abstract class EntityV1 {}
 mixin Entity {
   Map<String, dynamic> get toMap;
 
+  Entity copiedWith();
+
   @override
   String toString() => "${super.toString()}: $toMap";
 

@@ -91,4 +91,26 @@ abstract class DatabaseTupleRepository<E extends Entity,
           'limit': limit,
         },
       );
+
+  Future<Saved> replace(Saved savedEntity, {DateTime? updatedAt}) => v(
+        () async {
+          final entityMap = savedEntity.toMap;
+
+          entityMap[defColUpdatedAt.name] = updatedAt ?? DateTime.now();
+
+          final byId = Equals(defPkId, entityMap[defPkId.name]);
+          await (await _dbA).update(
+            _tableDefinition,
+            entityMap,
+            where: byId.where(),
+            whereArgs: byId.whereArgs(),
+          );
+
+          return pack(entityMap);
+        },
+        {
+          'savedEntity': savedEntity,
+          'updatedAt': updatedAt,
+        },
+      );
 }

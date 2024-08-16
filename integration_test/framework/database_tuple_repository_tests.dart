@@ -223,6 +223,48 @@ void main() => group(
                 );
               },
             );
+
+            group(
+              '#replace',
+              () {
+                late TestObjectDatabaseTupleEntity savedFalseSample;
+                setUpAll(
+                  () async {
+                    final falseSample = TestObjectEntity(false);
+                    final now = DateTime.now();
+
+                    final dbA = await DatabaseFactory.open(_defDbTest);
+
+                    await dbA.delete(_defTableTestObject);
+                    savedFalseSample =
+                        TestObjectDatabaseTupleEntity.fromMap(falseSample.toMap
+                          ..addAll({
+                            defPkId.name: await dbA.insert(
+                                _defTableTestObject,
+                                falseSample.toMap
+                                  ..addAll({defColCreatedAt.name: now})),
+                            defColCreatedAt.name: now
+                          }));
+                  },
+                );
+
+                test(
+                  ': updated.',
+                  () async {
+                    final updatedAt = DateTime.now();
+                    final updating = savedFalseSample.copiedWith(
+                      a: () => true,
+                    );
+
+                    final updated = await repository.replace(updating,
+                        updatedAt: updatedAt);
+
+                    expect(updated.a, equals(updating.a));
+                    expect(updated.updatedAt, equals(updatedAt));
+                  },
+                );
+              },
+            );
           },
         );
       },

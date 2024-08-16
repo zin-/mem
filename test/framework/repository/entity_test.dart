@@ -19,6 +19,10 @@ class TestObjectEntity extends _TestObject with Entity {
 
   @override
   Map<String, dynamic> get toMap => {fieldNames[0]: a};
+
+  @override
+  TestObjectEntity copiedWith({bool Function()? a}) =>
+      TestObjectEntity(a == null ? this.a : a());
 }
 
 void main() => group(
@@ -68,6 +72,17 @@ void main() => group(
             final testObjectB = TestObjectEntity(b);
 
             expect(testObjectA, equals(testObjectB));
+          },
+        );
+
+        test(
+          '#copiedWith',
+          () {
+            final from = TestObjectEntity(false);
+
+            final copied = from.copiedWith(a: () => true);
+
+            expect(copied.a, equals(true));
           },
         );
       },
