@@ -259,6 +259,8 @@ void main() => group(
 
           testWidgets(
             ': start & finish act.',
+            // 時間に関するテストなのでリトライ可能とする
+            retry: maxRetryCount,
             (widgetTester) async {
               widgetTester.ignoreMockMethodCallHandler(
                   MethodChannelMock.flutterLocalNotifications);

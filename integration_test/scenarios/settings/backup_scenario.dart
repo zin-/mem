@@ -48,7 +48,7 @@ void main() => group(
 
         testWidgets(
           "create.",
-          retry: 3,
+          retry: maxRetryCount,
           (widgetTester) async {
             String? result;
             switch (defaultTargetPlatform) {

@@ -185,7 +185,7 @@ void main() => group(
 
             testWidgets(
               'twice on create.',
-              retry: 3,
+              retry: maxRetryCount,
               (widgetTester) async {
                 await runApplication();
                 await widgetTester.pumpAndSettle();
