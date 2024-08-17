@@ -10,7 +10,7 @@ import 'act_counter_repository.dart';
 class ActCounterClient {
   final ActsClient _actsClient;
   final MemRepositoryV1 _memRepository;
-  final ActRepositoryV2 _actRepository;
+  final ActRepository _actRepository;
   final ActCounterRepository _actCounterRepository;
 
   Future<void> createNew(int memId) => v(
@@ -71,7 +71,7 @@ class ActCounterClient {
   factory ActCounterClient() => _instance ??= ActCounterClient._(
         ActsClient(),
         MemRepositoryV1(),
-        ActRepositoryV2(),
+        ActRepository(),
         ActCounterRepository(),
       );
 

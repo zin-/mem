@@ -10,7 +10,7 @@ import 'client.dart';
 import 'states.dart';
 
 final _actsClient = ActsClient();
-final _actRepository = ActRepositoryV2();
+final _actRepository = ActRepository();
 
 final loadActList = FutureProvider.autoDispose.family<List<SavedAct>, int?>(
   (ref, memId) => v(

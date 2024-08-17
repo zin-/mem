@@ -87,7 +87,7 @@ class NotificationClient {
           }
 
           if (notificationType == NotificationType.startMem) {
-            final latestAct = (await ActRepositoryV2()
+            final latestAct = (await ActRepository()
                     .ship(memId: memId, latestByMemIds: true))
                 .singleOrNull;
             if (latestAct != null && latestAct.isActive) {
@@ -134,7 +134,7 @@ class NotificationClient {
           if (mem.isDone || mem.isArchived) {
             cancelMemNotifications(memId);
           } else {
-            final latestAct = await ActRepositoryV2()
+            final latestAct = await ActRepository()
                 .ship(
                   memId: memId,
                   latestByMemIds: true,
@@ -268,7 +268,7 @@ class NotificationClient {
               savedMemNotifications.singleWhereOrNull(
             (element) => element.isEnabled() && element.isRepeatByNDay(),
           );
-          final lastActTime = await ActRepositoryV2()
+          final lastActTime = await ActRepository()
               .ship(memId: memId, latestByMemIds: true)
               .then((value) =>
                   value.singleOrNull?.period.end ??

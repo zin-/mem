@@ -14,7 +14,7 @@ class ListWithTotalCount<T> {
 }
 
 class ActService {
-  final ActRepositoryV2 _actRepository;
+  final ActRepository _actRepository;
 
   Future<ListWithTotalCount<SavedAct>> fetch(
     int? memId,
@@ -118,7 +118,7 @@ class ActService {
 
   factory ActService() => i(
         () => _instance ??= ActService._(
-          ActRepositoryV2(),
+          ActRepository(),
         ),
       );
 }

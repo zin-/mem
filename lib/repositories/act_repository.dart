@@ -25,9 +25,8 @@ extension _ActOrderByExt on ActOrderBy {
   }
 }
 
-class ActRepositoryV2
-    extends DatabaseTupleRepository<ActEntity, SavedActEntity> {
-  ActRepositoryV2() : super(databaseDefinition, defTableActs);
+class ActRepository extends DatabaseTupleRepository<ActEntity, SavedActEntity> {
+  ActRepository() : super(databaseDefinition, defTableActs);
 
   @override
   SavedActEntity pack(Map<String, dynamic> map) => SavedActEntity.fromMap(map);
