@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:mem/acts/act_repository.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/repositories/act_repository.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
@@ -87,9 +87,9 @@ class NotificationClient {
           }
 
           if (notificationType == NotificationType.startMem) {
-            final latestAct =
-                (await ActRepository().ship(memId: memId, latestByMemIds: true))
-                    .singleOrNull;
+            final latestAct = (await ActRepositoryV2()
+                    .ship(memId: memId, latestByMemIds: true))
+                .singleOrNull;
             if (latestAct != null && latestAct.isActive) {
               return;
             }
@@ -134,10 +134,12 @@ class NotificationClient {
           if (mem.isDone || mem.isArchived) {
             cancelMemNotifications(memId);
           } else {
-            final latestAct = await ActRepository().findOneBy(
-              memId: memId,
-              latest: true,
-            );
+            final latestAct = await ActRepositoryV2()
+                .ship(
+                  memId: memId,
+                  latestByMemIds: true,
+                )
+                .then((value) => value.singleOrNull?.toV1());
             final startOfDay =
                 (await _preferenceClient.shipByKey(startOfDayKey)).value ??
                     defaultStartOfDay;
@@ -266,12 +268,12 @@ class NotificationClient {
               savedMemNotifications.singleWhereOrNull(
             (element) => element.isEnabled() && element.isRepeatByNDay(),
           );
-          final lastActTime = await ActRepository()
-              .findOneBy(memId: memId, latest: true)
+          final lastActTime = await ActRepositoryV2()
+              .ship(memId: memId, latestByMemIds: true)
               .then((value) =>
-                  value?.period.end ??
+                  value.singleOrNull?.period.end ??
                   // FIXME 永続化されている時点でstartは必ずあるので型で表現する
-                  value?.period.start!);
+                  value.singleOrNull?.period.start!);
 
           if (lastActTime != null) {
             if (Duration(

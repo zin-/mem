@@ -1,4 +1,3 @@
-import 'package:mem/acts/act_repository.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
@@ -11,6 +10,8 @@ import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/act_entity.dart';
+
+enum ActOrderBy { descStart }
 
 extension _ActOrderByExt on ActOrderBy {
   OrderBy get toQuery {

@@ -1,7 +1,7 @@
-import 'package:mem/acts/act_repository.dart';
 import 'package:mem/acts/client.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/repositories/act_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 
 import 'act_counter.dart';
@@ -10,20 +10,24 @@ import 'act_counter_repository.dart';
 class ActCounterClient {
   final ActsClient _actsClient;
   final MemRepositoryV1 _memRepository;
-  final ActRepository _actRepository;
+  final ActRepositoryV2 _actRepository;
   final ActCounterRepository _actCounterRepository;
 
   Future<void> createNew(int memId) => v(
         () async => await _actCounterRepository.receive(
           ActCounter(
             await _memRepository.shipById(memId),
-            await _actRepository.ship(
-              memId: memId,
-              period: ActCounter.period(DateAndTime.now()),
-            ),
+            await _actRepository
+                .ship(
+                  memId: memId,
+                  period: ActCounter.period(DateAndTime.now()),
+                )
+                .then((v) => v.map((e) => e.toV1())),
           ),
         ),
-        {'memId': memId},
+        {
+          'memId': memId,
+        },
       );
 
   Future<void> increment(
@@ -40,10 +44,12 @@ class ActCounterClient {
           await _actCounterRepository.replace(
             ActCounter(
               await _memRepository.shipById(memId),
-              await _actRepository.ship(
-                memId: memId,
-                period: ActCounter.period(when),
-              ),
+              await _actRepository
+                  .ship(
+                    memId: memId,
+                    period: ActCounter.period(when),
+                  )
+                  .then((v) => v.map((e) => e.toV1())),
             ),
           );
         },
@@ -65,7 +71,7 @@ class ActCounterClient {
   factory ActCounterClient() => _instance ??= ActCounterClient._(
         ActsClient(),
         MemRepositoryV1(),
-        ActRepository(),
+        ActRepositoryV2(),
         ActCounterRepository(),
       );
 

@@ -6,8 +6,6 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/act_entity.dart';
 import 'package:mem/repositories/act_repository.dart';
 
-import 'act_repository.dart';
-
 class ListWithTotalCount<T> {
   final List<T> list;
   final int totalCount;

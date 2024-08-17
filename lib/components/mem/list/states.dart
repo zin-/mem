@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/acts/act_repository.dart';
 import 'package:mem/acts/states.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
@@ -10,6 +9,7 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/list/states.dart';
 import 'package:mem/mems/states.dart';
 import 'package:mem/notifications/mem_notifications.dart';
+import 'package:mem/repositories/act_repository.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
@@ -199,10 +199,12 @@ final latestActsByMemProvider = StateNotifierProvider.autoDispose<
             final memIds =
                 ref.read(memsProvider).whereType<SavedMemV1>().map((e) => e.id);
 
-            final actsByMemIds = await ActRepository().ship(
-              memIdsIn: memIds,
-              latestByMemIds: true,
-            );
+            final actsByMemIds = await ActRepositoryV2()
+                .ship(
+                  memIdsIn: memIds,
+                  latestByMemIds: true,
+                )
+                .then((value) => value.map((e) => e.toV1()));
 
             ref.read(actsProvider.notifier).addAll(actsByMemIds);
           }
