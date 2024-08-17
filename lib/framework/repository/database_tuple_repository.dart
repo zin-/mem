@@ -19,10 +19,17 @@ abstract class DatabaseTupleRepository<E extends Entity,
   // FIXME DatabaseDefinitionの中にTableDefinitionがあるのでEから取得できるのでは？
   DatabaseTupleRepository(this._databaseDefinition, this._tableDefinition);
 
-  DatabaseAccessor? _databaseAccessor;
+  static DatabaseAccessor? _databaseAccessor;
 
   late final Future<DatabaseAccessor> _dbA = (() async => _databaseAccessor ??=
       await DatabaseRepository().receive(_databaseDefinition))();
+
+  static Future close() => v(
+        () async {
+          await _databaseAccessor?.close();
+          _databaseAccessor = null;
+        },
+      );
 
   Future<int> count({
     Condition? condition,
