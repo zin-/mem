@@ -113,4 +113,49 @@ abstract class DatabaseTupleRepository<E extends Entity,
           'updatedAt': updatedAt,
         },
       );
+
+  Future<Saved> archive(Saved savedEntity, {DateTime? archivedAt}) => v(
+        () async {
+          final entityMap = savedEntity.toMap;
+
+          entityMap[defColArchivedAt.name] = archivedAt ?? DateTime.now();
+
+          final byId = Equals(defPkId, entityMap[defPkId.name]);
+          await (await _dbA).update(
+            _tableDefinition,
+            entityMap,
+            where: byId.where(),
+            whereArgs: byId.whereArgs(),
+          );
+
+          return pack(entityMap);
+        },
+        {
+          'savedEntity': savedEntity,
+          'archivedAt': archivedAt,
+        },
+      );
+
+  Future<Saved> unarchive(Saved savedEntity, {DateTime? updatedAt}) => v(
+        () async {
+          final entityMap = savedEntity.toMap;
+
+          entityMap[defColUpdatedAt.name] = updatedAt ?? DateTime.now();
+          entityMap[defColArchivedAt.name] = null;
+
+          final byId = Equals(defPkId, entityMap[defPkId.name]);
+          await (await _dbA).update(
+            _tableDefinition,
+            entityMap,
+            where: byId.where(),
+            whereArgs: byId.whereArgs(),
+          );
+
+          return pack(entityMap);
+        },
+        {
+          'savedEntity': savedEntity,
+          'updatedAt': updatedAt,
+        },
+      );
 }

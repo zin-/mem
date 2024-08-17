@@ -265,6 +265,87 @@ void main() => group(
                 );
               },
             );
+
+            group(
+              '#archive',
+              () {
+                late TestObjectDatabaseTupleEntity savedFalseSample;
+                setUpAll(
+                  () async {
+                    final falseSample = TestObjectEntity(false);
+                    final now = DateTime.now();
+
+                    final dbA = await DatabaseFactory.open(_defDbTest);
+
+                    await dbA.delete(_defTableTestObject);
+                    savedFalseSample =
+                        TestObjectDatabaseTupleEntity.fromMap(falseSample.toMap
+                          ..addAll({
+                            defPkId.name: await dbA.insert(
+                                _defTableTestObject,
+                                falseSample.toMap
+                                  ..addAll({defColCreatedAt.name: now})),
+                            defColCreatedAt.name: now
+                          }));
+                  },
+                );
+
+                test(
+                  ': archived.',
+                  () async {
+                    final archivedAt = DateTime.now();
+
+                    final archived = await repository.archive(savedFalseSample,
+                        archivedAt: archivedAt);
+
+                    expect(archived.archivedAt, equals(archivedAt));
+                  },
+                );
+              },
+            );
+
+            group(
+              '#unarchive',
+              () {
+                late TestObjectDatabaseTupleEntity savedArchivedSample;
+                setUpAll(
+                  () async {
+                    final falseSample = TestObjectEntity(false);
+                    final now = DateTime.now();
+
+                    final dbA = await DatabaseFactory.open(_defDbTest);
+
+                    await dbA.delete(_defTableTestObject);
+                    savedArchivedSample =
+                        TestObjectDatabaseTupleEntity.fromMap(falseSample.toMap
+                          ..addAll({
+                            defPkId.name: await dbA.insert(
+                                _defTableTestObject,
+                                falseSample.toMap
+                                  ..addAll({
+                                    defColCreatedAt.name: now,
+                                    defColArchivedAt.name: now
+                                  })),
+                            defColCreatedAt.name: now,
+                            defColArchivedAt.name: now
+                          }));
+                  },
+                );
+
+                test(
+                  ': unarchived.',
+                  () async {
+                    final updatedAt = DateTime.now();
+
+                    final archived = await repository
+                        .unarchive(savedArchivedSample, updatedAt: updatedAt);
+
+                    expect(archived.updatedAt, equals(updatedAt));
+                    expect(archived.archivedAt, isNull);
+                  },
+                );
+              },
+            );
           },
         );
       },
