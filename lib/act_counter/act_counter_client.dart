@@ -9,14 +9,14 @@ import 'act_counter_repository.dart';
 
 class ActCounterClient {
   final ActsClient _actsClient;
-  final MemRepositoryV1 _memRepository;
+  final MemRepository _memRepository;
   final ActRepository _actRepository;
   final ActCounterRepository _actCounterRepository;
 
   Future<void> createNew(int memId) => v(
         () async => await _actCounterRepository.receive(
           ActCounter(
-            await _memRepository.shipById(memId),
+            await _memRepository.ship(id: memId).then((v) => v.single.toV1()),
             await _actRepository
                 .ship(
                   memId: memId,
@@ -43,7 +43,7 @@ class ActCounterClient {
 
           await _actCounterRepository.replace(
             ActCounter(
-              await _memRepository.shipById(memId),
+              await _memRepository.ship(id: memId).then((v) => v.single.toV1()),
               await _actRepository
                   .ship(
                     memId: memId,
@@ -70,7 +70,7 @@ class ActCounterClient {
 
   factory ActCounterClient() => _instance ??= ActCounterClient._(
         ActsClient(),
-        MemRepositoryV1(),
+        MemRepository(),
         ActRepository(),
         ActCounterRepository(),
       );

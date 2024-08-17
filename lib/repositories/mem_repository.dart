@@ -1,14 +1,56 @@
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/core/mem.dart';
+import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
+import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/framework/repository/database_tuple_repository_v1.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/repositories/mem.dart';
+import 'package:mem/repositories/mem_entity.dart';
+
+class MemRepository extends DatabaseTupleRepository<MemEntity, SavedMemEntity> {
+  MemRepository() : super(databaseDefinition, defTableMems);
+
+  @override
+  SavedMemEntity pack(Map<String, dynamic> map) => SavedMemEntity.fromMap(map);
+
+  @override
+  Future<List<SavedMemEntity>> ship({
+    int? id,
+    Condition? condition,
+    GroupBy? groupBy,
+    List<OrderBy>? orderBy,
+    int? offset,
+    int? limit,
+  }) =>
+      v(
+        () => super.ship(
+          condition: And(
+            [
+              if (id != null) Equals(defPkId, id),
+              if (condition != null) condition,
+            ],
+          ),
+          groupBy: groupBy,
+          orderBy: orderBy,
+          offset: offset,
+          limit: limit,
+        ),
+        {
+          'id': id,
+          'condition': condition,
+          'groupBy': groupBy,
+          'orderBy': orderBy,
+          'offset': offset,
+          'limit': limit,
+        },
+      );
+}
 
 class MemRepositoryV1
     extends DatabaseTupleRepositoryV1<MemV1, SavedMemV1, int> {
