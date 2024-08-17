@@ -40,7 +40,11 @@ abstract class DatabaseTupleRepository<E extends Entity,
 
   Saved pack(Map<String, dynamic> map);
 
-  Future<Saved> receive(E entity, {DateTime? createdAt}) => v(
+  Future<Saved> receive(
+    E entity, {
+    DateTime? createdAt,
+  }) =>
+      v(
         () async {
           final entityMap = entity.toMap;
 
@@ -92,7 +96,11 @@ abstract class DatabaseTupleRepository<E extends Entity,
         },
       );
 
-  Future<Saved> replace(Saved savedEntity, {DateTime? updatedAt}) => v(
+  Future<Saved> replace(
+    Saved savedEntity, {
+    DateTime? updatedAt,
+  }) =>
+      v(
         () async {
           final entityMap = savedEntity.toMap;
 
@@ -114,7 +122,11 @@ abstract class DatabaseTupleRepository<E extends Entity,
         },
       );
 
-  Future<Saved> archive(Saved savedEntity, {DateTime? archivedAt}) => v(
+  Future<Saved> archive(
+    Saved savedEntity, {
+    DateTime? archivedAt,
+  }) =>
+      v(
         () async {
           final entityMap = savedEntity.toMap;
 
@@ -136,7 +148,11 @@ abstract class DatabaseTupleRepository<E extends Entity,
         },
       );
 
-  Future<Saved> unarchive(Saved savedEntity, {DateTime? updatedAt}) => v(
+  Future<Saved> unarchive(
+    Saved savedEntity, {
+    DateTime? updatedAt,
+  }) =>
+      v(
         () async {
           final entityMap = savedEntity.toMap;
 
@@ -156,6 +172,28 @@ abstract class DatabaseTupleRepository<E extends Entity,
         {
           'savedEntity': savedEntity,
           'updatedAt': updatedAt,
+        },
+      );
+
+  Future<List<Saved>> waste({
+    Condition? condition,
+  }) =>
+      v(
+        () async {
+          final targets = await ship(
+            condition: condition,
+          );
+
+          await _databaseAccessor!.delete(
+            _tableDefinition,
+            where: condition?.where(),
+            whereArgs: condition?.whereArgs(),
+          );
+
+          return targets;
+        },
+        {
+          'condition': condition,
         },
       );
 }

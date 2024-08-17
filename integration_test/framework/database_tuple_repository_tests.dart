@@ -346,6 +346,43 @@ void main() => group(
                 );
               },
             );
+
+            group(
+              '#waste',
+              () {
+                late TestObjectDatabaseTupleEntity savedFalseSample;
+                setUpAll(
+                  () async {
+                    final falseSample = TestObjectEntity(false);
+                    final now = DateTime.now();
+
+                    final dbA = await DatabaseFactory.open(_defDbTest);
+
+                    await dbA.delete(_defTableTestObject);
+                    savedFalseSample =
+                        TestObjectDatabaseTupleEntity.fromMap(falseSample.toMap
+                          ..addAll({
+                            defPkId.name: await dbA.insert(
+                                _defTableTestObject,
+                                falseSample.toMap
+                                  ..addAll({defColCreatedAt.name: now})),
+                            defColCreatedAt.name: now
+                          }));
+                  },
+                );
+
+                test(
+                  ': wasted.',
+                  () async {
+                    final wastedList = await repository.waste(
+                        condition: Equals(defPkId, savedFalseSample.id));
+
+                    expect(wastedList, hasLength(equals(1)));
+                    expect(wastedList[0], equals(savedFalseSample));
+                  },
+                );
+              },
+            );
           },
         );
       },
