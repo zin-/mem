@@ -2,6 +2,7 @@ import 'package:mem/acts/act_repository.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
+import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/condition/in.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
@@ -56,9 +57,10 @@ class ActRepositoryV2
     Iterable<int>? memIdsIn,
     DateAndTimePeriod? period,
     bool? latestByMemIds,
-    ActOrderBy? actOrderBy,
+    bool? isActive,
     Condition? condition,
     GroupBy? groupBy,
+    ActOrderBy? actOrderBy,
     List<OrderBy>? orderBy,
     int? offset,
     int? limit,
@@ -72,6 +74,7 @@ class ActRepositoryV2
               if (period != null)
                 GraterThanOrEqual(defColActsStart, period.start),
               if (period != null) LessThan(defColActsStart, period.end),
+              if (isActive != null) IsNull(defColActsEnd.name),
               if (condition != null) condition,
             ],
           ),
@@ -93,12 +96,29 @@ class ActRepositoryV2
           'memIds': memIdsIn,
           'period': period,
           'latestByMemIds': latestByMemIds,
-          'actOrderBy': actOrderBy,
+          'isActive': isActive,
           'condition': condition,
           'groupBy': groupBy,
+          'actOrderBy': actOrderBy,
           'orderBy': orderBy,
           'offset': offset,
           'limit': limit,
+        },
+      );
+
+  @override
+  Future<List<SavedActEntity>> waste({int? id, Condition? condition}) => v(
+        () => super.waste(
+          condition: And(
+            [
+              if (id != null) Equals(defPkId, id),
+              if (condition != null) condition,
+            ],
+          ),
+        ),
+        {
+          'id': id,
+          'condition': condition,
         },
       );
 }
