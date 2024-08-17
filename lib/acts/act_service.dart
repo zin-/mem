@@ -3,6 +3,7 @@ import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/repositories/act_repository.dart';
 
 import 'act_repository.dart';
 
@@ -14,7 +15,8 @@ class ListWithTotalCount<T> {
 }
 
 class ActService {
-  final ActRepository _actRepository;
+  final ActRepositoryV2 _actRepository;
+  final ActRepository _actRepositoryV1;
 
   Future<ListWithTotalCount<SavedAct>> fetch(
     int? memId,
@@ -22,21 +24,21 @@ class ActService {
     int limit,
   ) =>
       v(
-        () async {
-          final acts = await _actRepository.ship(
+        () async => ListWithTotalCount(
+          (await _actRepository.ship(
             memId: memId,
             actOrderBy: ActOrderBy.descStart,
             offset: offset,
             limit: limit,
-          );
-          final count = await _actRepository.count(memId: memId);
-
-          return ListWithTotalCount(acts, count);
-        },
+          ))
+              .map((e) => e.toV1())
+              .toList(),
+          await _actRepository.count(memId: memId),
+        ),
         {
-          "memId": memId,
-          "offset": offset,
-          "limit": limit,
+          'memId': memId,
+          'offset': offset,
+          'limit': limit,
         },
       );
 
@@ -45,7 +47,7 @@ class ActService {
     DateAndTime when,
   ) =>
       i(
-        () async => await _actRepository.receive(
+        () async => await _actRepositoryV1.receive(
           Act(memId, DateAndTimePeriod(start: when)),
         ),
         {
@@ -60,12 +62,12 @@ class ActService {
   ) =>
       i(
         () async {
-          final active = (await _actRepository.shipActiveByMemId(memId))
+          final active = (await _actRepositoryV1.shipActiveByMemId(memId))
               .sorted((a, b) => a.createdAt.compareTo(b.createdAt))
               .firstOrNull;
 
           if (active == null) {
-            return await _actRepository.receive(
+            return await _actRepositoryV1.receive(
               Act(
                 memId,
                 DateAndTimePeriod(
@@ -75,7 +77,7 @@ class ActService {
               ),
             );
           } else {
-            return await _actRepository.replace(
+            return await _actRepositoryV1.replace(
               active.copiedWith(
                 () => active.period.copiedWith(when),
               ),
@@ -89,14 +91,14 @@ class ActService {
       );
 
   Future<SavedAct> edit(SavedAct savedAct) => i(
-        () async => await _actRepository.replace(savedAct),
+        () async => await _actRepositoryV1.replace(savedAct),
         {
           "savedAct": savedAct,
         },
       );
 
   Future<SavedAct> delete(int actId) => i(
-        () async => await _actRepository.wasteById(actId),
+        () async => await _actRepositoryV1.wasteById(actId),
         {
           "actId": actId,
         },
@@ -104,12 +106,14 @@ class ActService {
 
   ActService._(
     this._actRepository,
+    this._actRepositoryV1,
   );
 
   static ActService? _instance;
 
   factory ActService() => i(
         () => _instance ??= ActService._(
+          ActRepositoryV2(),
           ActRepository(),
         ),
       );
