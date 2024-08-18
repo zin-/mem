@@ -29,6 +29,16 @@ class MemEntity extends Mem with Entity {
                 ),
         );
 
+  MemEntity.fromV1(MemV1 savedMem)
+      : this.fromMap(
+          MemEntity(
+            savedMem.name,
+            savedMem.doneAt,
+            savedMem.period,
+          ).toMap,
+        );
+
+// coverage:ignore-start
   @override
   Entity copiedWith({
     String Function()? name,
@@ -39,6 +49,7 @@ class MemEntity extends Mem with Entity {
         name == null ? this.name : name(),
         doneAt == null ? this.doneAt : doneAt(),
         period == null ? this.period : period(),
+// coverage:ignore-end
       );
 
   @override
@@ -55,21 +66,26 @@ class MemEntity extends Mem with Entity {
 }
 
 class SavedMemEntity extends MemEntity with DatabaseTupleEntity<int> {
-  SavedMemEntity(super.name, super.doneAt, super.period);
+  // SavedMemEntity(super.name, super.doneAt, super.period);
 
-  SavedMemEntity.fromMap(Map<String, dynamic> map) : super.fromMap(map) {
+  SavedMemEntity.fromMap(
+    Map<String, dynamic> map,
+  ) : super.fromMap(map) {
     withMap(map);
   }
 
   SavedMemEntity.fromV1(SavedMemV1 savedMem)
       : this.fromMap(
-            MemEntity(savedMem.name, savedMem.doneAt, savedMem.period).toMap
-              ..addAll({
+          MemEntity.fromV1(savedMem).toMap
+            ..addAll(
+              {
                 defPkId.name: savedMem.id,
                 defColCreatedAt.name: savedMem.createdAt,
                 defColUpdatedAt.name: savedMem.updatedAt,
-                defColArchivedAt.name: savedMem.archivedAt
-              }));
+                defColArchivedAt.name: savedMem.archivedAt,
+              },
+            ),
+        );
 
   SavedMemV1 toV1() => SavedMemV1(name, doneAt, period)
     ..id = id

@@ -27,7 +27,7 @@ class NotificationClient {
   final ScheduleClient _scheduleClient;
   final NotificationRepository _notificationRepository;
   final PreferenceClient _preferenceClient;
-  final MemRepositoryV1 _memRepository;
+  final MemRepository _memRepository;
   final MemNotificationRepository _memNotificationRepository;
 
   NotificationClient._(
@@ -47,7 +47,7 @@ class NotificationClient {
           ScheduleClient(),
           NotificationRepository(),
           PreferenceClient(),
-          MemRepositoryV1(),
+          MemRepository(),
           MemNotificationRepository(),
         ),
         {
@@ -73,7 +73,9 @@ class NotificationClient {
   ) =>
       v(
         () async {
-          final savedMem = await _memRepository.findOneBy(id: memId);
+          final savedMem = await _memRepository
+              .ship(id: memId)
+              .then((v) => v.singleOrNull?.toV1());
 
           if (savedMem == null || savedMem.isDone || savedMem.isArchived) {
             await cancelMemNotifications(memId);
@@ -87,9 +89,9 @@ class NotificationClient {
           }
 
           if (notificationType == NotificationType.startMem) {
-            final latestAct = (await ActRepository()
-                    .ship(memId: memId, latestByMemIds: true))
-                .singleOrNull;
+            final latestAct =
+                (await ActRepository().ship(memId: memId, latestByMemIds: true))
+                    .singleOrNull;
             if (latestAct != null && latestAct.isActive) {
               return;
             }
@@ -130,8 +132,9 @@ class NotificationClient {
   }) =>
       v(
         () async {
-          final mem = savedMem ?? await _memRepository.shipById(memId);
-          if (mem.isDone || mem.isArchived) {
+          final mem = savedMem ??
+              await _memRepository.ship(id: memId).then((v) => v.single.toV1());
+          if (mem!.isDone || mem.isArchived) {
             cancelMemNotifications(memId);
           } else {
             final latestAct = await ActRepository()

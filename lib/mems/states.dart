@@ -35,7 +35,9 @@ final memByMemIdProvider = StateNotifierProvider.autoDispose
       initializer: (current, notifier) => v(
         () async {
           if (memId != null) {
-            final savedMem = await MemRepositoryV1().findOneBy(id: memId);
+            final savedMem = await MemRepository()
+                .ship(id: memId)
+                .then((value) => value.singleOrNull?.toV1());
             ref.read(memsProvider.notifier).upsertAll(
               [if (savedMem != null) savedMem],
               (current, updating) =>
