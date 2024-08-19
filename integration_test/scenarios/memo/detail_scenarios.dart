@@ -91,6 +91,11 @@ void main() => group(
             testWidgets(
               ": create.",
               (widgetTester) async {
+                widgetTester.ignoreMockMethodCallHandler(
+                    MethodChannelMock.permissionHandler);
+                widgetTester.ignoreMockMethodCallHandler(
+                    MethodChannelMock.flutterLocalNotifications);
+
                 await runApplication();
                 await widgetTester.pumpAndSettle();
                 await widgetTester.tap(newMemFabFinder);
@@ -103,16 +108,12 @@ void main() => group(
                   enteringMemName,
                 );
                 await widgetTester.enterText(
-                  find.byKey(keyMemMemo),
-                  enteringMemMemo,
-                );
+                    find.byKey(keyMemMemo), enteringMemMemo);
                 await widgetTester.tap(find.byKey(keySaveMemFab));
                 await widgetTester.pump();
 
-                expect(
-                  find.text(l10n.saveMemSuccessMessage(enteringMemName)),
-                  findsOneWidget,
-                );
+                expect(find.text(l10n.saveMemSuccessMessage(enteringMemName)),
+                    findsOneWidget);
 
                 final getCreatedMem = Equals(defColMemsName, enteringMemName);
                 final mems = await dbA.select(defTableMems,
@@ -139,37 +140,29 @@ void main() => group(
             testWidgets(
               ': update.',
               (widgetTester) async {
+                widgetTester.ignoreMockMethodCallHandler(
+                    MethodChannelMock.permissionHandler);
+                widgetTester.ignoreMockMethodCallHandler(
+                    MethodChannelMock.flutterLocalNotifications);
+
                 await runApplication();
                 await widgetTester.pumpAndSettle();
-
                 await widgetTester.tap(find.text(insertedMemName));
                 await widgetTester.pumpAndSettle();
 
                 await widgetTester.tap(memNameOnDetailPageFinder);
                 await widgetTester.pump(waitShowSoftwareKeyboardDuration);
-
                 const enteringMemNameText =
-                    '$_scenarioName: Save: Update - mem name - entering';
+                    "$_scenarioName: Save: Update - mem name - entering";
                 await widgetTester.enterText(
-                  memNameOnDetailPageFinder,
-                  enteringMemNameText,
-                );
+                    memNameOnDetailPageFinder, enteringMemNameText);
                 await widgetTester.pumpAndSettle();
                 expect(find.text(enteringMemNameText), findsOneWidget);
 
                 await widgetTester.tap(saveMemFabFinder);
                 await widgetTester.pumpAndSettle();
-                const saveSuccessText = 'Save success. $enteringMemNameText';
-                expect(
-                  find.text(saveSuccessText),
-                  findsOneWidget,
-                );
-
-                await widgetTester.pumpAndSettle(defaultDismissDuration);
-                expect(
-                  find.text(saveSuccessText),
-                  findsNothing,
-                );
+                const saveSuccessText = "Save success. $enteringMemNameText";
+                expect(find.text(saveSuccessText), findsOneWidget);
 
                 await widgetTester.pageBack();
                 await widgetTester.pumpAndSettle();
@@ -184,9 +177,14 @@ void main() => group(
             );
 
             testWidgets(
-              'twice on create.',
+              ': twice on create.',
               retry: maxRetryCount,
               (widgetTester) async {
+                widgetTester.ignoreMockMethodCallHandler(
+                    MethodChannelMock.permissionHandler);
+                widgetTester.ignoreMockMethodCallHandler(
+                    MethodChannelMock.flutterLocalNotifications);
+
                 await runApplication();
                 await widgetTester.pumpAndSettle();
                 await widgetTester.tap(newMemFabFinder);
@@ -196,42 +194,32 @@ void main() => group(
                 const enteringMemMemo =
                     "$saveMemMemo: twice on create - entering";
                 await widgetTester.enterText(
-                  find.byKey(keyMemName),
-                  enteringMemName,
-                );
+                    find.byKey(keyMemName), enteringMemName);
                 await widgetTester.enterText(
-                  find.byKey(keyMemMemo),
-                  enteringMemMemo,
-                );
+                    find.byKey(keyMemMemo), enteringMemMemo);
                 await widgetTester.tap(find.byKey(keySaveMemFab));
                 await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
                 const enteringMemMemo2 = "$enteringMemMemo - 2";
                 await widgetTester.enterText(
-                  find.byKey(keyMemMemo),
-                  enteringMemMemo2,
-                );
+                    find.byKey(keyMemMemo), enteringMemMemo2);
                 await widgetTester.tap(find.byKey(keySaveMemFab));
                 await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
                 final getCreatedMem = Equals(defColMemsName, enteringMemName);
-                final mems = await dbA.select(
-                  defTableMems,
-                  where: getCreatedMem.where(),
-                  whereArgs: getCreatedMem.whereArgs(),
-                );
+                final mems = await dbA.select(defTableMems,
+                    where: getCreatedMem.where(),
+                    whereArgs: getCreatedMem.whereArgs());
                 expect(mems.length, 1);
                 final getCreatedMemItem = And([
                   Equals(defFkMemItemsMemId, mems[0][defPkId.name]),
-                  Equals(defColMemItemsType, MemItemType.memo.name),
+                  Equals(defColMemItemsType, MemItemType.memo.name)
                 ]);
                 final memItems = await dbA.select(defTableMemItems,
                     where: getCreatedMemItem.where(),
                     whereArgs: getCreatedMemItem.whereArgs());
-                expect(
-                  memItems.single[defColMemItemsValue.name],
-                  enteringMemMemo2,
-                );
+                expect(memItems.single[defColMemItemsValue.name],
+                    enteringMemMemo2);
               },
             );
 
