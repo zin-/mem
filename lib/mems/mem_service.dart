@@ -32,15 +32,15 @@ class MemService {
 
           final savedMemItems = (await Future.wait(
               memDetail.memItems.map((e) => (e is SavedMemItem && !undo
-                  ? _memItemRepository
-                      .replace(
-                        SavedMemItemEntity.fromV1(
-                            e.copiedWith(memId: () => savedMem.id)),
-                      )
-                      .then((value) => value.toV1())
-                  : _memItemRepositoryV1.receive(
-                      e.copiedWith(memId: () => savedMem.id),
-                    )))));
+                      ? _memItemRepository.replace(
+                          SavedMemItemEntity.fromV1(
+                              e.copiedWith(memId: () => savedMem.id)),
+                        )
+                      : _memItemRepository.receive(
+                          MemItemEntity.fromV1(
+                              e.copiedWith(memId: () => savedMem.id)),
+                        ))
+                  .then((value) => value.toV1()))));
 
           final memNotifications = memDetail.notifications;
           final returnMemNotifications =
@@ -124,8 +124,9 @@ class MemService {
           final archivedMem = await _memRepository
               .archive(SavedMemEntity.fromV1(mem))
               .then((v) => v.toV1());
-          final archivedMemItems =
-              await _memItemRepositoryV1.archiveByMemId(archivedMem.id);
+          final archivedMemItems = await _memItemRepository
+              .archiveBy(memId: archivedMem.id)
+              .then((v) => v.map((e) => e.toV1()));
           final archivedMemNotifications =
               await _memNotificationRepository.archiveByMemId(archivedMem.id);
 

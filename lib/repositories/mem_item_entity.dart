@@ -17,6 +17,10 @@ class MemItemEntity extends MemItemV2 with Entity {
           map[defColMemItemsValue.name],
         );
 
+  MemItemEntity.fromV1(MemItem memItem)
+      : this.fromMap(
+            MemItemEntity(memItem.memId, memItem.type, memItem.value).toMap);
+
   @override
   Entity copiedWith({
     int Function()? memId,
@@ -44,9 +48,7 @@ class SavedMemItemEntity extends MemItemEntity with DatabaseTupleEntity<int> {
 
   SavedMemItemEntity.fromV1(SavedMemItem savedMemItem)
       : this.fromMap(
-          MemItemEntity(
-                  savedMemItem.memId, savedMemItem.type, savedMemItem.value)
-              .toMap
+          MemItemEntity.fromV1(savedMemItem).toMap
             ..addAll(
               {
                 defPkId.name: savedMemItem.id,

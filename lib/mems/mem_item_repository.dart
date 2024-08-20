@@ -49,6 +49,30 @@ class MemItemRepositoryV2
           'limit': limit,
         },
       );
+
+  Future<Iterable<SavedMemItemEntity>> archiveBy({
+    int? memId,
+    DateTime? archivedAt,
+  }) =>
+      v(
+        () async => Future.wait(
+          await ship(
+            condition: And(
+              [
+                if (memId != null) Equals(defFkMemItemsMemId, memId),
+              ],
+            ),
+          ).then(
+            (v) => v.map(
+              (e) => archive(e, archivedAt: archivedAt),
+            ),
+          ),
+        ),
+        {
+          'memId': memId,
+          'archivedAt': archivedAt,
+        },
+      );
 }
 
 class MemItemRepository
