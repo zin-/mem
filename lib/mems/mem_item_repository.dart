@@ -73,6 +73,30 @@ class MemItemRepositoryV2
           'archivedAt': archivedAt,
         },
       );
+
+  Future<Iterable<SavedMemItemEntity>> unarchiveBy({
+    int? memId,
+    DateTime? updatedAt,
+  }) =>
+      v(
+        () async => Future.wait(
+          await ship(
+            condition: And(
+              [
+                if (memId != null) Equals(defFkMemItemsMemId, memId),
+              ],
+            ),
+          ).then(
+            (v) => v.map(
+              (e) => unarchive(e, updatedAt: updatedAt),
+            ),
+          ),
+        ),
+        {
+          'memId': memId,
+          'updatedAt': updatedAt,
+        },
+      );
 }
 
 class MemItemRepository

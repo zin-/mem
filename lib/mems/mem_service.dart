@@ -146,8 +146,9 @@ class MemService {
           final unarchivedMem = await _memRepository
               .unarchive(SavedMemEntity.fromV1(mem))
               .then((value) => value.toV1());
-          final unarchivedMemItems =
-              await _memItemRepositoryV1.unarchiveByMemId(unarchivedMem.id);
+          final unarchivedMemItems = await _memItemRepository
+              .unarchiveBy(memId: unarchivedMem.id)
+              .then((v) => v.map((e) => e.toV1()));
           final unarchivedMemNotifications = await _memNotificationRepository
               .unarchiveByMemId(unarchivedMem.id);
 
