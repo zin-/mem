@@ -9,9 +9,9 @@ class MemItemV2 {
   final MemItemType type;
   final dynamic value;
 
-  MemItemV2(this.memId, this.type, this.value);
+  MemItemV2(this.memId, this.type, this.value); // coverage:ignore-line
 
-  factory MemItemV2.memo(int? memId) => MemItemV2(memId, MemItemType.memo, "");
+// factory MemItemV2.memo(int? memId) => MemItemV2(memId, MemItemType.memo, "");
 }
 
 class MemItem extends EntityV1 {

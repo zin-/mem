@@ -83,37 +83,6 @@ abstract class DatabaseTupleRepositoryV1<E extends EntityV1,
         },
       );
 
-  Future<SavedEntity> shipById(Id id) => v(
-        () async {
-          final condition = Equals(defPkId, id);
-          return pack(
-            (await _databaseAccessor!.select(
-              _tableDefinition,
-              where: condition.where(),
-              whereArgs: condition.whereArgs(),
-            ))
-                .single,
-          );
-        },
-        id,
-      );
-
-  Future<SavedEntity?> findOneBy({
-    Condition? condition,
-    List<OrderBy>? orderBy,
-  }) =>
-      v(
-        () async => await ship(
-          condition: condition,
-          orderBy: orderBy,
-          limit: 1,
-        ).then((value) => value.length == 1 ? value.single : null),
-        {
-          "condition": condition,
-          "orderBy": orderBy,
-        },
-      );
-
   Future<SavedEntity> replace(SavedEntity payload) => v(
         () async {
           final entityMap = unpack(payload);
@@ -193,25 +162,6 @@ abstract class DatabaseTupleRepositoryV1<E extends EntityV1,
           return targets;
         },
         condition,
-      );
-
-  Future<SavedEntity> wasteById(Id id) => v(
-        () async {
-          final condition = Equals(defPkId, id);
-          final payload = (await _databaseAccessor!.select(
-            _tableDefinition,
-            where: condition.where(),
-            whereArgs: condition.whereArgs(),
-          ))
-              .single;
-          await _databaseAccessor!.delete(
-            _tableDefinition,
-            where: condition.where(),
-            whereArgs: condition.whereArgs(),
-          );
-          return pack(payload);
-        },
-        id,
       );
 
   static Future<void> close() => v(

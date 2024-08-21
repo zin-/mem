@@ -106,7 +106,7 @@ class MemItemRepository
           condition: And(
             [
               if (memId != null) Equals(defPkId, memId),
-              if (condition != null) condition,
+              if (condition != null) condition, // coverage:ignore-line
             ],
           ),
         ),

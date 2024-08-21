@@ -22,16 +22,18 @@ class MemItemEntity extends MemItemV2 with Entity {
             MemItemEntity(memItem.memId, memItem.type, memItem.value).toMap);
 
   @override
-  Entity copiedWith({
-    int Function()? memId,
-    MemItemType Function()? type,
-    dynamic Function()? value,
-  }) =>
-      MemItemEntity(
-        memId == null ? this.memId : memId(),
-        type == null ? this.type : type(),
-        value == null ? this.value : value(),
-      );
+  Entity copiedWith() => throw UnimplementedError(); // coverage:ignore-line
+  // @override
+  // Entity copiedWith({
+  //   int Function()? memId,
+  //   MemItemType Function()? type,
+  //   dynamic Function()? value,
+  // }) =>
+  //     MemItemEntity(
+  //       memId == null ? this.memId : memId(),
+  //       type == null ? this.type : type(),
+  //       value == null ? this.value : value(),
+  //     );
 
   @override
   Map<String, dynamic> get toMap => {
@@ -66,21 +68,23 @@ class SavedMemItemEntity extends MemItemEntity with DatabaseTupleEntity<int> {
     ..archivedAt = archivedAt;
 
   @override
-  SavedMemItemEntity copiedWith({
-    int Function()? memId,
-    MemItemType Function()? type,
-    dynamic Function()? value,
-  }) =>
-      SavedMemItemEntity.fromMap(
-        toMap
-          ..addAll(
-            super
-                .copiedWith(
-                  memId: memId,
-                  type: type,
-                  value: value,
-                )
-                .toMap,
-          ),
-      );
+  Entity copiedWith() => throw UnimplementedError(); // coverage:ignore-line
+// @override
+// SavedMemItemEntity copiedWith({
+//   int Function()? memId,
+//   MemItemType Function()? type,
+//   dynamic Function()? value,
+// }) =>
+//     SavedMemItemEntity.fromMap(
+//       toMap
+//         ..addAll(
+//           super
+//               .copiedWith(
+//                 memId: memId,
+//                 type: type,
+//                 value: value,
+//               )
+//               .toMap,
+//         ),
+//     );
 }

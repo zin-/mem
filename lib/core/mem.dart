@@ -14,55 +14,55 @@ class Mem {
 
   Mem(this.name, this.doneAt, this.period);
 
-  factory Mem.defaultNew() => Mem("", null, null);
-
-  bool get isDone => doneAt != null;
-
-  Iterable<Schedule> periodSchedules(
-    TimeOfDay startOfDay,
-  ) =>
-      v(
-        () {
-          final id = this is SavedMemV1 ? (this as SavedMemV1).id : null;
-
-          return id == null
-              ? throw Exception() // coverage:ignore-line
-              : [
-                  Schedule.of(
-                    id,
-                    period?.start?.isAllDay == true
-                        ? DateTime(
-                            period!.start!.year,
-                            period!.start!.month,
-                            period!.start!.day,
-                            startOfDay.hour,
-                            startOfDay.minute,
-                          )
-                        : period?.start,
-                    NotificationType.startMem,
-                  ),
-                  Schedule.of(
-                    id,
-                    period?.end?.isAllDay == true
-                        ? DateTime(
-                            period!.end!.year,
-                            period!.end!.month,
-                            period!.end!.day,
-                            startOfDay.hour,
-                            startOfDay.minute,
-                          )
-                            .add(const Duration(days: 1))
-                            .subtract(const Duration(minutes: 1))
-                        : period?.end,
-                    NotificationType.endMem,
-                  ),
-                ];
-        },
-        {
-          'this': this,
-          'startOfDay': startOfDay,
-        },
-      );
+// factory Mem.defaultNew() => Mem("", null, null);
+//
+// bool get isDone => doneAt != null;
+//
+// Iterable<Schedule> periodSchedules(
+//   TimeOfDay startOfDay,
+// ) =>
+//     v(
+//       () {
+//         final id = this is SavedMemV1 ? (this as SavedMemV1).id : null;
+//
+//         return id == null
+//             ? throw Exception() // coverage:ignore-line
+//             : [
+//                 Schedule.of(
+//                   id,
+//                   period?.start?.isAllDay == true
+//                       ? DateTime(
+//                           period!.start!.year,
+//                           period!.start!.month,
+//                           period!.start!.day,
+//                           startOfDay.hour,
+//                           startOfDay.minute,
+//                         )
+//                       : period?.start,
+//                   NotificationType.startMem,
+//                 ),
+//                 Schedule.of(
+//                   id,
+//                   period?.end?.isAllDay == true
+//                       ? DateTime(
+//                           period!.end!.year,
+//                           period!.end!.month,
+//                           period!.end!.day,
+//                           startOfDay.hour,
+//                           startOfDay.minute,
+//                         )
+//                           .add(const Duration(days: 1))
+//                           .subtract(const Duration(minutes: 1))
+//                       : period?.end,
+//                   NotificationType.endMem,
+//                 ),
+//               ];
+//       },
+//       {
+//         'this': this,
+//         'startOfDay': startOfDay,
+//       },
+//     );
 }
 
 class MemV1 extends EntityV1 {

@@ -14,24 +14,24 @@ class ActV2 {
 
   bool get isActive => period.start != null && period.end == null;
 
-  static int activeCompare(ActV2? a, ActV2? b) => v(
-        () {
-          final aIsActive = a?.isActive;
-          final bIsActive = b?.isActive;
-
-          if ((aIsActive == null && bIsActive == null) ||
-              (aIsActive == false && bIsActive == false) ||
-              (aIsActive == null && bIsActive == false) ||
-              (aIsActive == false && bIsActive == null)) {
-            return 0;
-          } else if (aIsActive == true && bIsActive == true) {
-            return b!.period.start!.compareTo(a!.period.start as DateTime);
-          } else {
-            return (aIsActive == null || aIsActive == false) ? 1 : -1;
-          }
-        },
-        {'a': a, 'b': b},
-      );
+  // static int activeCompare(ActV2? a, ActV2? b) => v(
+  //       () {
+  //         final aIsActive = a?.isActive;
+  //         final bIsActive = b?.isActive;
+  //
+  //         if ((aIsActive == null && bIsActive == null) ||
+  //             (aIsActive == false && bIsActive == false) ||
+  //             (aIsActive == null && bIsActive == false) ||
+  //             (aIsActive == false && bIsActive == null)) {
+  //           return 0;
+  //         } else if (aIsActive == true && bIsActive == true) {
+  //           return b!.period.start!.compareTo(a!.period.start as DateTime);
+  //         } else {
+  //           return (aIsActive == null || aIsActive == false) ? 1 : -1;
+  //         }
+  //       },
+  //       {'a': a, 'b': b},
+  //     );
 }
 
 class Act extends EntityV1 {
