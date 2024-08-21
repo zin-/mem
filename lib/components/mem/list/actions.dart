@@ -38,7 +38,7 @@ final loadMemList = FutureProvider(
           );
       for (var mem in mems) {
         ref.read(memItemsProvider.notifier).upsertAll(
-              await MemItemRepositoryV2()
+              await MemItemRepository()
                   .ship(memId: mem.id)
                   .then((v) => v.map((e) => e.toV1())),
               (current, updating) =>

@@ -13,8 +13,7 @@ import 'package:mem/repositories/mem_repository.dart';
 
 class MemService {
   final MemRepository _memRepository;
-  final MemItemRepositoryV2 _memItemRepository;
-  final MemItemRepository _memItemRepositoryV1;
+  final MemItemRepository _memItemRepository;
   final MemNotificationRepository _memNotificationRepository;
 
   Future<MemDetail> save(
@@ -165,7 +164,7 @@ class MemService {
         () async {
           // TODO https://github.com/zin-/mem/issues/284
           await _memNotificationRepository.waste(null, memId);
-          await _memItemRepositoryV1.wasteByMemId(memId);
+          await _memItemRepository.waste(memId: memId);
           await _memRepository.waste(id: memId);
 
           return true;
@@ -176,7 +175,6 @@ class MemService {
   MemService._(
     this._memRepository,
     this._memItemRepository,
-    this._memItemRepositoryV1,
     this._memNotificationRepository,
   );
 
@@ -185,7 +183,6 @@ class MemService {
   factory MemService() => i(
         () => _instance ??= MemService._(
           MemRepository(),
-          MemItemRepositoryV2(),
           MemItemRepository(),
           MemNotificationRepository(),
         ),
