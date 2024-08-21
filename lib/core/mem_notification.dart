@@ -170,3 +170,13 @@ enum MemNotificationType {
         orElse: () => throw Exception('Unexpected name: "$name".'),
       );
 }
+
+class MemNotificationV2 {
+  // 未保存のMemに紐づくMemNotificationはmemIdをintで持つことができないため暫定的にnullableにしている
+  final int? memId;
+  final MemNotificationType type;
+  final int? time;
+  final String message;
+
+  MemNotificationV2(this.memId, this.type, this.time, this.message);
+}

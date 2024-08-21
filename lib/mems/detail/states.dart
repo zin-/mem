@@ -118,7 +118,9 @@ final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
             if (memId != null &&
                 current.whereType<SavedMemNotification>().isEmpty) {
               ref.read(memNotificationsProvider.notifier).upsertAll(
-                    await MemNotificationRepository().shipByMemId(memId),
+                    await MemNotificationRepositoryV2()
+                        .ship(memId: memId)
+                        .then((value) => value.map((e) => e.toV1())),
                     (current, updating) => updating.isRepeatByDayOfWeek()
                         ? current.memId == updating.memId &&
                             current.type == updating.type &&

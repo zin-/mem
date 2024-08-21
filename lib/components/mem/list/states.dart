@@ -228,9 +228,11 @@ final savedMemNotificationsProvider = StateNotifierProvider.autoDispose<
             final memIds =
                 ref.read(memsProvider).whereType<SavedMemV1>().map((e) => e.id);
 
-            final actsByMemIds = await MemNotificationRepository().ship(
-              memIdsIn: memIds,
-            );
+            final actsByMemIds = await MemNotificationRepositoryV2()
+                .ship(
+                  memIdsIn: memIds,
+                )
+                .then((value) => value.map((e) => e.toV1()));
 
             ref.read(memNotificationsProvider.notifier).upsertAll(
                   actsByMemIds,
