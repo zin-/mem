@@ -152,7 +152,9 @@ class NotificationClient {
                 mem,
                 startOfDay,
                 savedMemNotifications ??
-                    await _memNotificationRepository.shipByMemId(memId),
+                    await _memNotificationRepository
+                        .ship(memId: memId)
+                        .then((value) => value.map((e) => e.toV1())),
                 latestAct,
                 DateTime.now(),
               )
@@ -193,8 +195,9 @@ class NotificationClient {
           );
 
           final now = DateTime.now();
-          final memNotifications =
-              await _memNotificationRepository.shipByMemId(memId);
+          final memNotifications = await _memNotificationRepository
+              .ship(memId: memId)
+              .then((value) => value.map((e) => e.toV1()));
           for (var notification in memNotifications.where((element) =>
               element.isEnabled() && element.isAfterActStarted())) {
             await _scheduleClient.receive(
@@ -252,8 +255,9 @@ class NotificationClient {
 
   Future<bool> _shouldNotify(int memId) => v(
         () async {
-          final savedMemNotifications =
-              await MemNotificationRepository().shipByMemId(memId);
+          final savedMemNotifications = await _memNotificationRepository
+              .ship(memId: memId)
+              .then((value) => value.map((e) => e.toV1()));
           final repeatByDayOfWeekMemNotifications = savedMemNotifications.where(
             (element) => element.isEnabled() && element.isRepeatByDayOfWeek(),
           );
