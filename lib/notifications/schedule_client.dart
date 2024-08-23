@@ -1,6 +1,5 @@
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/main.dart';
 import 'package:mem/notifications/android_alarm_manager_wrapper.dart';
 import 'package:mem/notifications/notification_client.dart';
 import 'package:mem/notifications/mem_notifications.dart';
@@ -79,8 +78,6 @@ class ScheduleClient extends RepositoryV2<Schedule>
 @pragma('vm:entry-point')
 Future<void> scheduleCallback(int id, Map<String, dynamic> params) => i(
       () async {
-        await openDatabase();
-
         await NotificationClient().show(
           NotificationType.values.singleWhere(
             (element) => element.name == params[notificationTypeKey],
