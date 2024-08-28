@@ -31,8 +31,4 @@ mixin Discarder<E extends EntityV2> on RepositoryV2<E> {
   Future<void> discardAll();
 }
 
-abstract class RepositoryV1<E extends EntityV1, Result> {
-  Future<Result> receive(E entity);
-}
-
 abstract class Repository<E extends Entity> {}
