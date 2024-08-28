@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  FIXME updatePeriodMillisを有効にしたい
+  Attribute updatePeriodMillis is only used in API level 3 and higher (current min is 1)
+-->
 <appwidget-provider
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:minWidth="40dp"
