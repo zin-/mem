@@ -1,3 +1,4 @@
+import 'package:mem/act_counter/act_counter_entity.dart';
 import 'package:mem/acts/client.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/logger/log_service.dart';
@@ -14,17 +15,19 @@ class ActCounterClient {
   final ActCounterRepository _actCounterRepository;
 
   Future<void> createNew(int memId) => v(
-        () async => await _actCounterRepository.receive(
-          ActCounter(
-            await _memRepository.ship(id: memId).then((v) => v.single.toV1()),
-            await _actRepository
-                .ship(
-                  memId: memId,
-                  period: ActCounter.period(DateAndTime.now()),
-                )
-                .then((v) => v.map((e) => e.toV1())),
-          ),
-        ),
+        () async {
+          await _actCounterRepository.receive(
+            ActCounterEntity.from(
+              await _memRepository.ship(id: memId).then((v) => v.single.toV1()),
+              await _actRepository
+                  .ship(
+                    memId: memId,
+                    period: ActCounter.period(DateAndTime.now()),
+                  )
+                  .then((v) => v.map((e) => e.toV1())),
+            ),
+          );
+        },
         {
           'memId': memId,
         },
@@ -42,7 +45,7 @@ class ActCounterClient {
           );
 
           await _actCounterRepository.replace(
-            ActCounter(
+            ActCounterEntity.from(
               await _memRepository.ship(id: memId).then((v) => v.single.toV1()),
               await _actRepository
                   .ship(

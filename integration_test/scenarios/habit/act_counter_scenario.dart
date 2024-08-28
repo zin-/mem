@@ -2,8 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:mem/act_counter/act_counter_repository.dart';
+import 'package:mem/act_counter/act_counter_entity.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/base.dart';
@@ -22,7 +21,7 @@ void main() => group(
         const insertedMemName2 = '$_name: inserted - mem name - 2';
         late int insertedMemId;
         late int insertedMemId2;
-        late DateTime actPeriod;
+        late DateTime actStart;
 
         late final DatabaseAccessor dbA;
 
@@ -59,7 +58,7 @@ void main() => group(
             defTableActs,
             {
               defFkActsMemId.name: insertedMemId,
-              defColActsStart.name: actPeriod = DateTime.now(),
+              defColActsStart.name: actStart = DateTime.now(),
               defColActsStartIsAllDay.name: 0,
               defColCreatedAt.name: zeroDate,
             },
@@ -73,11 +72,14 @@ void main() => group(
             var saveWidgetDataCount = 0;
             var updateWidgetCount = 0;
             final homeWidgetId = randomInt();
+            final actCounter =
+                ActCounterEntity(insertedMemId, insertedMemName, 1, actStart);
+
             widgetTester.binding.defaultBinaryMessenger
                 .setMockMethodCallHandler(
-              const MethodChannel(methodChannelName),
+              MethodChannel(actCounter.methodChannelName),
               (message) {
-                expect(message.method, initializeMethodName);
+                expect(message.method, actCounter.initializeMethodName);
                 expect(message.arguments, null);
 
                 initializeCount++;
@@ -96,7 +98,7 @@ void main() => group(
               },
               2: {
                 'id': "lastUpdatedAtSeconds-$insertedMemId",
-                'data': actPeriod.millisecondsSinceEpoch.toDouble(),
+                'data': actStart.millisecondsSinceEpoch.toDouble(),
               },
               3: {
                 'id': "memId-$homeWidgetId",

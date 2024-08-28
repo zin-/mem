@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/act_counter/act_counter_repository.dart';
 import 'package:mem/act_counter/act_counter_client.dart';
 import 'package:mem/act_counter/home_widget_accessor.dart';
 import 'package:mem/components/l10n.dart';
@@ -26,7 +25,6 @@ int randomInt([int max = 42949671]) => Random().nextInt(max);
   // FIXME RepositoryではなくTableをmockする
   //  Repositoryはシステム固有の処理であるのに対して、Tableは永続仮想をラップする役割を持つため
   NotificationRepository,
-  ActCounterRepository,
   ActCounterClient,
 ])
 void main() {}

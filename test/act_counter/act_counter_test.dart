@@ -21,9 +21,9 @@ void main() {
         SavedAct(memId, DateAndTimePeriod.startNow())..createdAt = zeroDate,
       ];
 
-      final actCounter = ActCounter(savedMem, acts);
+      final actCounter = ActCounter.from(savedMem, acts);
 
-      expect(actCounter.lastAct, equals(acts[0]));
+      expect(actCounter.updatedAt, equals(acts[0].period.end));
     },
   );
 
