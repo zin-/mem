@@ -21,8 +21,10 @@ class MemItemEntity extends MemItemV2 with Entity {
       : this.fromMap(
             MemItemEntity(memItem.memId, memItem.type, memItem.value).toMap);
 
+// coverage:ignore-start
   @override
-  Entity copiedWith() => throw UnimplementedError(); // coverage:ignore-line
+  Entity copiedWith() => throw UnimplementedError();
+
   // @override
   // Entity copiedWith({
   //   int Function()? memId,
@@ -34,6 +36,7 @@ class MemItemEntity extends MemItemV2 with Entity {
   //       type == null ? this.type : type(),
   //       value == null ? this.value : value(),
   //     );
+// coverage:ignore-end
 
   @override
   Map<String, dynamic> get toMap => {
@@ -67,8 +70,6 @@ class SavedMemItemEntity extends MemItemEntity with DatabaseTupleEntity<int> {
     ..updatedAt = updatedAt
     ..archivedAt = archivedAt;
 
-  @override
-  Entity copiedWith() => throw UnimplementedError(); // coverage:ignore-line
 // @override
 // SavedMemItemEntity copiedWith({
 //   int Function()? memId,

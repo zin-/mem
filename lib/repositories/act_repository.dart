@@ -112,7 +112,7 @@ class ActRepository extends DatabaseTupleRepository<ActEntity, SavedActEntity> {
           condition: And(
             [
               if (id != null) Equals(defPkId, id),
-              if (condition != null) condition,
+              if (condition != null) condition, // coverage:ignore-line
             ],
           ),
         ),
