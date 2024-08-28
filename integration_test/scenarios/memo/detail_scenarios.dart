@@ -229,94 +229,84 @@ void main() => group(
               const archivedMemName = "$insertedMemName - archived";
 
               setUp(() async {
-                await dbA.insert(
-                  defTableMems,
-                  {
-                    defColMemsName.name: unarchivedMemName,
-                    defColCreatedAt.name: DateTime.now(),
-                  },
-                );
-                await dbA.insert(
-                  defTableMems,
-                  {
-                    defColMemsName.name: archivedMemName,
-                    defColCreatedAt.name: DateTime.now(),
-                    defColArchivedAt.name: DateTime.now(),
-                  },
-                );
+                final unarchivedMemId = await dbA.insert(defTableMems, {
+                  defColMemsName.name: unarchivedMemName,
+                  defColCreatedAt.name: DateTime.now(),
+                });
+                await dbA.insert(defTableMemItems, {
+                  defFkMemItemsMemId.name: unarchivedMemId,
+                  defColMemItemsType.name: MemItemType.memo.name,
+                  defColMemItemsValue.name: insertedMemMemo,
+                  defColCreatedAt.name: zeroDate,
+                });
+                final archivedMemId = await dbA.insert(defTableMems, {
+                  defColMemsName.name: archivedMemName,
+                  defColCreatedAt.name: DateTime.now(),
+                  defColArchivedAt.name: DateTime.now(),
+                });
+                await dbA.insert(defTableMemItems, {
+                  defFkMemItemsMemId.name: archivedMemId,
+                  defColMemItemsType.name: MemItemType.memo.name,
+                  defColMemItemsValue.name: insertedMemMemo,
+                  defColCreatedAt.name: zeroDate,
+                });
               });
 
-              testWidgets(
-                ": archive.",
-                (widgetTester) async {
-                  await runApplication();
-                  await widgetTester.pumpAndSettle();
-                  await widgetTester.tap(find.text(unarchivedMemName));
-                  await widgetTester.pumpAndSettle();
+              testWidgets(": archive.", (widgetTester) async {
+                await runApplication();
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(find.text(unarchivedMemName));
+                await widgetTester.pumpAndSettle();
 
-                  await widgetTester.tap(find.byIcon(Icons.more_vert));
-                  await widgetTester.pumpAndSettle();
+                await widgetTester.tap(find.byIcon(Icons.more_vert));
+                await widgetTester.pumpAndSettle();
 
-                  await widgetTester.tap(find.byIcon(Icons.archive));
-                  await widgetTester.pumpAndSettle();
+                await widgetTester.tap(find.byIcon(Icons.archive));
+                await widgetTester.pumpAndSettle();
 
-                  expect(
-                    find.text(unarchivedMemName),
-                    findsNothing,
-                  );
-                  expect(
+                expect(find.text(unarchivedMemName), findsNothing);
+                expect(
                     find.text(l10n.archiveMemSuccessMessage(unarchivedMemName)),
-                    findsOneWidget,
-                  );
+                    findsOneWidget);
 
-                  final findUnarchivedMem =
-                      Equals(defColMemsName, unarchivedMemName);
-                  final mems = await dbA.select(
-                    defTableMems,
+                final findUnarchivedMem =
+                    Equals(defColMemsName, unarchivedMemName);
+                final mems = await dbA.select(defTableMems,
                     where: findUnarchivedMem.where(),
-                    whereArgs: findUnarchivedMem.whereArgs(),
-                  );
-                  expect(mems.length, 1);
-                  expect(mems.single[defColArchivedAt.name], isNotNull);
-                },
-              );
+                    whereArgs: findUnarchivedMem.whereArgs());
+                expect(mems.length, 1);
+                expect(mems.single[defColArchivedAt.name], isNotNull);
+              });
 
-              testWidgets(
-                ": unarchive.",
-                (widgetTester) async {
-                  await runApplication();
-                  await widgetTester.pumpAndSettle();
-                  await widgetTester.tap(filterListIconFinder);
-                  await widgetTester.pumpAndSettle();
-                  await widgetTester.tap(showArchiveSwitchFinder);
-                  await widgetTester.pumpAndSettle();
-                  await closeMemListFilter(widgetTester);
-                  await widgetTester.pumpAndSettle();
-                  await widgetTester.tap(find.text(archivedMemName));
-                  await widgetTester.pumpAndSettle();
+              testWidgets(": unarchive.", (widgetTester) async {
+                await runApplication();
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(filterListIconFinder);
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(showArchiveSwitchFinder);
+                await widgetTester.pumpAndSettle();
+                await closeMemListFilter(widgetTester);
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(find.text(archivedMemName));
+                await widgetTester.pumpAndSettle();
 
-                  await widgetTester.tap(find.byIcon(Icons.more_vert));
-                  await widgetTester.pumpAndSettle();
+                await widgetTester.tap(find.byIcon(Icons.more_vert));
+                await widgetTester.pumpAndSettle();
 
-                  await widgetTester.tap(find.byIcon(Icons.unarchive));
-                  await widgetTester.pumpAndSettle();
+                await widgetTester.tap(find.byIcon(Icons.unarchive));
+                await widgetTester.pumpAndSettle();
 
-                  expect(
+                expect(
                     find.text(l10n.unarchiveMemSuccessMessage(archivedMemName)),
-                    findsOneWidget,
-                  );
+                    findsOneWidget);
 
-                  final findArchivedMem =
-                      Equals(defColMemsName, archivedMemName);
-                  final mems = await dbA.select(
-                    defTableMems,
+                final findArchivedMem = Equals(defColMemsName, archivedMemName);
+                final mems = await dbA.select(defTableMems,
                     where: findArchivedMem.where(),
-                    whereArgs: findArchivedMem.whereArgs(),
-                  );
-                  expect(mems.length, 1);
-                  expect(mems.single[defColArchivedAt.name], isNull);
-                },
-              );
+                    whereArgs: findArchivedMem.whereArgs());
+                expect(mems.length, 1);
+                expect(mems.single[defColArchivedAt.name], isNull);
+              });
             });
           },
         );

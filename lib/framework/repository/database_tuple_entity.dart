@@ -9,13 +9,6 @@ mixin SavedDatabaseTupleMixinV1<T> on EntityV1 {
 
   bool get isArchived => archivedAt != null;
 
-  void pack(Map<String, dynamic> tuple) {
-    id = tuple[defPkId.name];
-    createdAt = tuple[defColCreatedAt.name];
-    updatedAt = tuple[defColUpdatedAt.name];
-    archivedAt = tuple[defColArchivedAt.name];
-  }
-
   Map<String, dynamic> unpack() {
     return {
       defPkId.name: id,
