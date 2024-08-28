@@ -11,6 +11,7 @@ abstract class EntityV1 {}
 mixin Entity {
   Map<String, dynamic> get toMap;
 
+  // FIXME EntityではなくCopyableみたいなmixinで切り出すべきかもしれない
   Entity copiedWith();
 
   @override
