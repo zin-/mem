@@ -120,4 +120,15 @@ class NotificationRepositoryV2
           'key': key,
         },
       );
+
+  @override
+  Future<void> discardAll() => v(
+        () async {
+          await _flutterLocalNotificationsWrapper?.cancelAll();
+          await _flutterLocalNotificationsWrapper
+              ?.deleteNotificationChannels(NotificationType.values.map(
+            (e) => e.buildNotificationChannel().id,
+          ));
+        },
+      );
 }

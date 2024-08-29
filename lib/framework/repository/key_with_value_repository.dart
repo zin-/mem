@@ -11,9 +11,11 @@ mixin DiscarderByKey<E extends KeyWithValue<Key, dynamic>, Key, Result>
 }
 
 abstract class KeyWithValueRepositoryV2<
-    ENTITY extends KeyWithValueV2<Key, dynamic>,
-    Key> extends Repository<ENTITY> {
+    ENTITY extends KeyWithValueV2<KEY, dynamic>,
+    KEY> extends Repository<ENTITY> {
   Future<void> receive(ENTITY entity);
 
   Future<void> discard(int key);
+
+  Future<void> discardAll();
 }
