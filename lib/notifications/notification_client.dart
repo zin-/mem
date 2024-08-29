@@ -25,7 +25,8 @@ class NotificationClient {
   final NotificationChannels notificationChannels;
 
   final ScheduleClient _scheduleClient;
-  final NotificationRepository _notificationRepository;
+  final NotificationRepository _notificationRepositoryV1;
+  final NotificationRepositoryV2 _notificationRepository;
   final PreferenceClient _preferenceClient;
   final MemRepository _memRepository;
   final MemNotificationRepository _memNotificationRepository;
@@ -33,6 +34,7 @@ class NotificationClient {
   NotificationClient._(
     this.notificationChannels,
     this._scheduleClient,
+    this._notificationRepositoryV1,
     this._notificationRepository,
     this._preferenceClient,
     this._memRepository,
@@ -46,6 +48,7 @@ class NotificationClient {
           NotificationChannels(buildL10n(context)),
           ScheduleClient(),
           NotificationRepository(),
+          NotificationRepositoryV2(),
           PreferenceClient(),
           MemRepository(),
           MemNotificationRepository(),
@@ -112,7 +115,7 @@ class NotificationClient {
                 .discard(NotificationType.activeAct.buildNotificationId(memId));
           }
 
-          await _notificationRepository.receive(
+          await _notificationRepositoryV1.receive(
             await notificationChannels.buildNotification(
               notificationType,
               memId,
@@ -173,7 +176,7 @@ class NotificationClient {
   Future<void> cancelMemNotifications(int memId) => v(
         () async {
           for (var id in AllMemNotificationsId.of(memId)) {
-            await _notificationRepository.discard(id);
+            await _notificationRepositoryV1.discard(id);
             await _scheduleClient.discard(id);
           }
         },
@@ -242,9 +245,10 @@ class NotificationClient {
 
   Future<void> cancelActNotification(int memId) => v(
         () async {
-          await _notificationRepository.discard(activeActNotificationId(memId));
+          await _notificationRepositoryV1
+              .discard(activeActNotificationId(memId));
 
-          await _notificationRepository
+          await _notificationRepositoryV1
               .discard(afterActStartedNotificationId(memId));
           await _scheduleClient.discard(afterActStartedNotificationId(memId));
         },
@@ -299,7 +303,7 @@ class NotificationClient {
 
   Future<void> resetAll() => v(
         () async {
-          await _notificationRepository.discardAll();
+          await _notificationRepositoryV1.discardAll();
 
           final allSavedMems = await _memRepository.ship(
             archived: false,

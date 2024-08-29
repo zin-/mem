@@ -87,3 +87,37 @@ class NotificationRepository extends KeyWithValueRepository<Notification, int>
         },
       );
 }
+
+class NotificationRepositoryV2
+    extends KeyWithValueRepositoryV2<NotificationV2, int> {
+  final FlutterLocalNotificationsWrapper? _flutterLocalNotificationsWrapper =
+      defaultTargetPlatform == TargetPlatform.android
+          ? FlutterLocalNotificationsWrapper(androidDefaultIconPath)
+          : null;
+
+  @override
+  Future<void> receive(NotificationV2 entity) => v(
+        () async {
+          if (await PermissionHandlerWrapper().grant(Permission.notification)) {
+            await _flutterLocalNotificationsWrapper?.show(
+              entity.key,
+              entity.title,
+              entity.body,
+              entity.channel,
+              entity.payload,
+            );
+          }
+        },
+        {
+          'entity': entity,
+        },
+      );
+
+  @override
+  Future<void> discard(int key) => v(
+        () async => await _flutterLocalNotificationsWrapper?.cancel(key),
+        {
+          'key': key,
+        },
+      );
+}
