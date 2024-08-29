@@ -13,7 +13,7 @@ Future<void> main({String? languageCode}) => i(
       () async {
         WidgetsFlutterBinding.ensureInitialized();
 
-        await NotificationRepository().checkNotification();
+        await NotificationRepository().ship();
 
         return _runApplication(languageCode: languageCode);
       },

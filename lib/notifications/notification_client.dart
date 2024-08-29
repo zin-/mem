@@ -25,7 +25,7 @@ class NotificationClient {
   final NotificationChannels notificationChannels;
 
   final ScheduleClient _scheduleClient;
-  final NotificationRepositoryV2 _notificationRepository;
+  final NotificationRepository _notificationRepository;
   final PreferenceClient _preferenceClient;
   final MemRepository _memRepository;
   final MemNotificationRepository _memNotificationRepository;
@@ -45,7 +45,7 @@ class NotificationClient {
         () => _instance ??= NotificationClient._(
           NotificationChannels(buildL10n(context)),
           ScheduleClient(),
-          NotificationRepositoryV2(),
+          NotificationRepository(),
           PreferenceClient(),
           MemRepository(),
           MemNotificationRepository(),
@@ -59,7 +59,7 @@ class NotificationClient {
   static void resetSingleton() => v(
         () {
           ScheduleClient.resetSingleton();
-          NotificationRepository.resetSingleton();
+          NotificationRepository.reset();
           _instance = null;
         },
         {

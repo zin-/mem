@@ -8,7 +8,6 @@ import 'package:mem/act_counter/act_counter_client.dart';
 import 'package:mem/act_counter/home_widget_accessor.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/logger_wrapper.dart';
-import 'package:mem/notifications/notification_repository.dart';
 import 'package:mem/notifications/flutter_local_notifications_wrapper.dart';
 import 'package:mockito/annotations.dart';
 
@@ -24,7 +23,6 @@ int randomInt([int max = 42949671]) => Random().nextInt(max);
   FlutterLocalNotificationsWrapper,
   // FIXME RepositoryではなくTableをmockする
   //  Repositoryはシステム固有の処理であるのに対して、Tableは永続仮想をラップする役割を持つため
-  NotificationRepository,
   ActCounterClient,
 ])
 void main() {}
