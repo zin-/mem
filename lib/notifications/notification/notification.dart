@@ -2,7 +2,7 @@ import 'package:mem/framework/repository/entity.dart';
 import 'package:mem/framework/repository/key_with_value.dart';
 import 'package:mem/notifications/notification/channel.dart';
 
-class NotificationV2 with Entity, KeyWithValueV2<int, Map<String, dynamic>> {
+class NotificationV2 with Entity, KeyWithValue<int, Map<String, dynamic>> {
   final String title;
   final String body;
   final NotificationChannel channel;
@@ -29,10 +29,4 @@ class NotificationV2 with Entity, KeyWithValueV2<int, Map<String, dynamic>> {
   Entity copiedWith() => throw UnimplementedError();
 
 // coverage:ignore-end
-
-  @override
-  Map<String, dynamic> get toMap => {
-        'key': key,
-        'value': value,
-      };
 }

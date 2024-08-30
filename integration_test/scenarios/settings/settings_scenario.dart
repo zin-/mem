@@ -88,7 +88,7 @@ void main() => group(
           "Start of day",
           () {
             setUp(() async {
-              await PreferenceClient().discard(startOfDayKey);
+              await PreferenceClientRepository().discard(startOfDayKey);
             });
 
             testWidgets(
@@ -120,7 +120,8 @@ void main() => group(
                   timeText(zeroDate),
                 );
                 expect(
-                  (await PreferenceClient().shipByKey(startOfDayKey)).value,
+                  (await PreferenceClientRepository().shipByKey(startOfDayKey))
+                      .value,
                   TimeOfDay.fromDateTime(zeroDate),
                 );
               },
@@ -131,7 +132,7 @@ void main() => group(
               () {
                 final now = DateTime.now();
                 setUp(() async {
-                  await PreferenceClient().receive(Preference(
+                  await PreferenceClientRepository().receive(PreferenceEntity(
                     startOfDayKey,
                     TimeOfDay.fromDateTime(now),
                   ));

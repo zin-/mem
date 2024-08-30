@@ -26,7 +26,7 @@ class NotificationClient {
 
   final ScheduleClient _scheduleClient;
   final NotificationRepository _notificationRepository;
-  final PreferenceClient _preferenceClient;
+  final PreferenceClientRepository _preferenceClientRepository;
   final MemRepository _memRepository;
   final MemNotificationRepository _memNotificationRepository;
 
@@ -34,7 +34,7 @@ class NotificationClient {
     this.notificationChannels,
     this._scheduleClient,
     this._notificationRepository,
-    this._preferenceClient,
+    this._preferenceClientRepository,
     this._memRepository,
     this._memNotificationRepository,
   );
@@ -46,7 +46,7 @@ class NotificationClient {
           NotificationChannels(buildL10n(context)),
           ScheduleClient(),
           NotificationRepository(),
-          PreferenceClient(),
+          PreferenceClientRepository(),
           MemRepository(),
           MemNotificationRepository(),
         ),
@@ -144,7 +144,8 @@ class NotificationClient {
                 )
                 .then((value) => value.singleOrNull?.toV1());
             final startOfDay =
-                (await _preferenceClient.shipByKey(startOfDayKey)).value ??
+                (await _preferenceClientRepository.shipByKey(startOfDayKey))
+                        .value ??
                     defaultStartOfDay;
             for (var schedule in [
               ...mem.periodSchedules(startOfDay),

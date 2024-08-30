@@ -343,7 +343,7 @@ void testTaskScenario() => group(': $_scenarioName', () {
           testWidgets(
             ": start is not all day, end is all day.",
             (widgetTester) async {
-              await PreferenceClient().receive(Preference(
+              await PreferenceClientRepository().receive(PreferenceEntity(
                 startOfDayKey,
                 const TimeOfDay(hour: 1, minute: 0),
               ));

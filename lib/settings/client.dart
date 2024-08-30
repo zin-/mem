@@ -4,22 +4,22 @@ import 'package:mem/settings/preference.dart';
 import 'package:mem/settings/preference_key.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class PreferenceClient
-    extends KeyWithValueRepository<Preference, PreferenceKey> {
-  Future<Preference<T>> shipByKey<T>(PreferenceKey<T> key) => v(
+class PreferenceClientRepository
+    extends KeyWithValueRepositoryV2<PreferenceEntity, PreferenceKey> {
+  Future<PreferenceEntity<T>> shipByKey<T>(PreferenceKey<T> key) => v(
         () async {
           final saved = (await SharedPreferences.getInstance()).get(key.value);
 
-          return Preference(
+          return PreferenceEntity(
             key,
             key.deserialize(saved),
           );
         },
-        key,
+        {'key': key},
       );
 
   @override
-  Future<bool> receive(Preference entity) => v(
+  Future<bool> receive(PreferenceEntity entity) => v(
         () async {
           final serialized = entity.key.serialize(entity.value);
 
@@ -34,18 +34,15 @@ class PreferenceClient
               throw UnimplementedError(); // coverage:ignore-line
           }
         },
-        entity,
+        {'entity': entity},
       );
 
   @override
-  Future<bool> discard(PreferenceKey key) => v(
+  Future<void> discard(PreferenceKey key) => v(
         () async => (await SharedPreferences.getInstance()).remove(key.value),
-        key,
+        {'key': key},
       );
 
-  PreferenceClient._();
-
-  static PreferenceClient? _instance;
-
-  factory PreferenceClient() => _instance ??= PreferenceClient._();
+  @override
+  Future<void> discardAll() => throw UnimplementedError();
 }
