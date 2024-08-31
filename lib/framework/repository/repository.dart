@@ -19,16 +19,4 @@ import 'package:mem/framework/repository/entity.dart';
 //  抽象的には得ると捉える事もできるだろうが、では`update`（更新する）ことはあるだろうか？
 //  更新することはないように感じる
 //  よって、ここでは`receive`（受け取る）、`replace`（置き換える）などの荷物や事物を扱う際の単語を採用する
-abstract class RepositoryV2<E extends EntityV2> {}
-
-mixin Receiver<E extends EntityV2, Result> on RepositoryV2<E> {
-  Future<Result> receive(E entity);
-}
-
-// FIXME 型指定は不要なはずなので、おかしい？（間違っている気がする
-//  というか、mixinの利用自体がなんか変なので辞めたほうが良いかも
-mixin Discarder<E extends EntityV2> on RepositoryV2<E> {
-  Future<void> discardAll();
-}
-
 abstract class Repository<E extends Entity> {}

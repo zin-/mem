@@ -8,8 +8,7 @@ import 'package:mem/notifications/schedule.dart';
 import 'package:mem/permissions/permission.dart';
 import 'package:mem/permissions/permission_handler_wrapper.dart';
 
-class ScheduleClient extends RepositoryV2<Schedule>
-    with Receiver<Schedule, void> {
+class ScheduleClient extends Repository<Schedule> {
   static ScheduleClient? _instance;
   final AndroidAlarmManagerWrapper _androidAlarmManagerWrapper;
   final Future<void> Function(int id, Map<String, dynamic> params)
@@ -40,7 +39,6 @@ class ScheduleClient extends RepositoryV2<Schedule>
         },
       );
 
-  @override
   Future<void> receive(Schedule entity) => v(
         () async {
           if (await PermissionHandlerWrapper().grant(Permission.notification)) {

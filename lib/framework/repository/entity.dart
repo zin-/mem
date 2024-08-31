@@ -4,8 +4,6 @@
 // # 語源
 //
 // 「存在するもの」、「実体」
-abstract class EntityV2 {}
-
 abstract class EntityV1 {}
 
 mixin Entity {

@@ -103,6 +103,7 @@ class Log with Entity {
     return elements.join('\n');
   }
 
+// coverage:ignore-start
   @override
   // TODO: implement copiedWith
   Entity copiedWith() => throw UnimplementedError();
@@ -110,6 +111,7 @@ class Log with Entity {
   @override
   // TODO: implement toMap
   Map<String, dynamic> get toMap => throw UnimplementedError();
+// coverage:ignore-end
 }
 
 enum Level {
