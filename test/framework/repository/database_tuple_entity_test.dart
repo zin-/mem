@@ -14,11 +14,6 @@ class TestObjectDatabaseTupleEntity extends TestObjectEntity
       : super.fromMap(map) {
     withMap(map);
   }
-
-  @override
-  TestObjectDatabaseTupleEntity copiedWith({bool Function()? a}) =>
-      TestObjectDatabaseTupleEntity.fromMap(
-          toMap..addAll(super.copiedWith(a: a).toMap));
 }
 
 void main() => group(
@@ -66,27 +61,6 @@ void main() => group(
             final testObject = TestObjectDatabaseTupleEntity.fromMap(map);
 
             expect(testObject.toMap, map);
-          },
-        );
-
-        test(
-          '#copiedWith',
-          () {
-            final from = TestObjectDatabaseTupleEntity.fromMap({
-              TestObjectEntity.fieldNames[0]: false,
-              defPkId.name: 1,
-              defColCreatedAt.name: DateTime.now(),
-              defColUpdatedAt.name: DateTime.now(),
-              defColArchivedAt.name: DateTime.now()
-            });
-
-            final copied = from.copiedWith(a: () => true);
-
-            expect(copied.a, equals(true));
-            expect(copied.id, equals(from.id));
-            expect(copied.createdAt, equals(from.createdAt));
-            expect(copied.updatedAt, equals(from.updatedAt));
-            expect(copied.archivedAt, equals(from.archivedAt));
           },
         );
       },

@@ -248,21 +248,19 @@ void main() => group(
                   },
                 );
 
-                test(
-                  ': updated.',
-                  () async {
-                    final updatedAt = DateTime.now();
-                    final updating = savedFalseSample.copiedWith(
-                      a: () => true,
-                    );
+                test(': updated.', () async {
+                  final updatedAt = DateTime.now();
+                  final updating = TestObjectDatabaseTupleEntity.fromMap(
+                      savedFalseSample.toMap
+                        ..update(
+                            TestObjectEntity.fieldNames[0], (value) => false));
 
-                    final updated = await repository.replace(updating,
-                        updatedAt: updatedAt);
+                  final updated =
+                      await repository.replace(updating, updatedAt: updatedAt);
 
-                    expect(updated.a, equals(updating.a));
-                    expect(updated.updatedAt, equals(updatedAt));
-                  },
-                );
+                  expect(updated.a, equals(updating.a));
+                  expect(updated.updatedAt, equals(updatedAt));
+                });
               },
             );
 

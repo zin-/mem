@@ -3,9 +3,12 @@ import 'package:mem/framework/repository/repository.dart';
 
 abstract class KeyWithValueRepository<ENTITY extends KeyWithValue<KEY, dynamic>,
     KEY> extends Repository<ENTITY> {
-  Future<void> receive(ENTITY entity) => throw UnimplementedError();
+  Future<void> receive(ENTITY entity);
 
-  Future<void> discard(KEY key) => throw UnimplementedError();
+  Future<void> discard(KEY key);
+}
 
-  Future<void> discardAll() => throw UnimplementedError();
+mixin DiscardAll<ENTITY extends KeyWithValue<KEY, dynamic>, KEY>
+    on KeyWithValueRepository<ENTITY, KEY> {
+  Future<void> discardAll();
 }

@@ -9,8 +9,8 @@ import 'package:mem/values/paths.dart';
 import 'notification/notification.dart';
 import 'flutter_local_notifications_wrapper.dart';
 
-class NotificationRepository
-    extends KeyWithValueRepository<NotificationV2, int> {
+class NotificationRepository extends KeyWithValueRepository<NotificationV2, int>
+    with DiscardAll {
   final FlutterLocalNotificationsWrapper? _flutterLocalNotificationsWrapper =
       defaultTargetPlatform == TargetPlatform.android
           ? FlutterLocalNotificationsWrapper(androidDefaultIconPath)
