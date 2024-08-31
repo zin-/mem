@@ -4,17 +4,17 @@ import 'package:mem/framework/repository/home_widget_entity.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/logger/log_service.dart';
 
-abstract class HomeWidgetRepository<E extends HomeWidgetEntity,
-    Saved extends SavedHomeWidgetEntity> extends Repository<E> {
+abstract class HomeWidgetRepository<ENTITY extends HomeWidgetEntity,
+    SAVED extends SavedHomeWidgetEntity> extends Repository<ENTITY> {
   static final _homeWidgetAccessor =
       defaultTargetPlatform == TargetPlatform.android
           ? HomeWidgetAccessor()
           : null;
 
-  Saved pack(Map<String, dynamic> map);
+  SAVED pack(Map<String, dynamic> map);
 
   Future<void> receive(
-    E entity,
+    ENTITY entity,
   ) =>
       v(
         () async {
@@ -42,7 +42,7 @@ abstract class HomeWidgetRepository<E extends HomeWidgetEntity,
       );
 
   Future<void> replace(
-    E entity,
+    ENTITY entity,
   ) =>
       v(
         () async {

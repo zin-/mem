@@ -11,8 +11,8 @@ import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/logger/log_service.dart';
 
-abstract class DatabaseTupleRepository<E extends Entity,
-    Saved extends DatabaseTupleEntity> extends Repository<E> {
+abstract class DatabaseTupleRepository<ENTITY extends Entity,
+    SAVED extends DatabaseTupleEntity> extends Repository<ENTITY> {
   final DatabaseDefinition _databaseDefinition;
   final TableDefinition _tableDefinition;
 
@@ -45,10 +45,10 @@ abstract class DatabaseTupleRepository<E extends Entity,
         },
       );
 
-  Saved pack(Map<String, dynamic> map);
+  SAVED pack(Map<String, dynamic> map);
 
-  Future<Saved> receive(
-    E entity, {
+  Future<SAVED> receive(
+    ENTITY entity, {
     DateTime? createdAt,
   }) =>
       v(
@@ -72,7 +72,7 @@ abstract class DatabaseTupleRepository<E extends Entity,
         },
       );
 
-  Future<List<Saved>> ship({
+  Future<List<SAVED>> ship({
     Condition? condition,
     GroupBy? groupBy,
     List<OrderBy>? orderBy,
@@ -103,8 +103,8 @@ abstract class DatabaseTupleRepository<E extends Entity,
         },
       );
 
-  Future<Saved> replace(
-    Saved savedEntity, {
+  Future<SAVED> replace(
+    SAVED savedEntity, {
     DateTime? updatedAt,
   }) =>
       v(
@@ -129,8 +129,8 @@ abstract class DatabaseTupleRepository<E extends Entity,
         },
       );
 
-  Future<Saved> archive(
-    Saved savedEntity, {
+  Future<SAVED> archive(
+    SAVED savedEntity, {
     DateTime? archivedAt,
   }) =>
       v(
@@ -155,8 +155,8 @@ abstract class DatabaseTupleRepository<E extends Entity,
         },
       );
 
-  Future<Saved> unarchive(
-    Saved savedEntity, {
+  Future<SAVED> unarchive(
+    SAVED savedEntity, {
     DateTime? updatedAt,
   }) =>
       v(
@@ -182,7 +182,7 @@ abstract class DatabaseTupleRepository<E extends Entity,
         },
       );
 
-  Future<List<Saved>> waste({
+  Future<List<SAVED>> waste({
     Condition? condition,
   }) =>
       v(
