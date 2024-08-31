@@ -34,13 +34,6 @@ abstract class Schedule with Entity {
         },
       );
 
-// coverage:ignore-start
-  @override
-  // TODO: implement copiedWith
-  Entity copiedWith() => throw UnimplementedError();
-
-// coverage:ignore-end
-
   @override
   Map<String, dynamic> get toMap => {
         'id': id,

@@ -6,12 +6,6 @@ class ActCounterEntity extends ActCounter with Entity, HomeWidgetEntity {
   ActCounterEntity(super.memId, super.name, super.actCount, super.updatedAt)
       : super();
 
-// coverage:ignore-start
-  @override
-  Entity copiedWith() => throw UnimplementedError();
-
-// coverage:ignore-end
-
   @override
   Map<String, dynamic> get toMap => {
         'initializeMethodName': initializeMethodName,

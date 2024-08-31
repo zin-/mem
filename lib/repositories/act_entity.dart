@@ -6,7 +6,7 @@ import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
 
-class ActEntity extends ActV2 with Entity {
+class ActEntity extends ActV2 with Entity, Copyable {
   ActEntity(super.memId, super.period);
 
   ActEntity.fromMap(Map<String, dynamic> map)

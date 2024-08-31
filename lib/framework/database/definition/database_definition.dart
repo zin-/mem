@@ -21,12 +21,6 @@ class DatabaseDefinition with Entity {
     }
   }
 
-// coverage:ignore-start
-  @override
-  Entity copiedWith() => throw UnimplementedError();
-
-// coverage:ignore-end
-
   @override
   Map<String, dynamic> get toMap => {
         'name': name,

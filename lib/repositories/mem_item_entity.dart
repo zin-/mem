@@ -21,23 +21,6 @@ class MemItemEntity extends MemItemV2 with Entity {
       : this.fromMap(
             MemItemEntity(memItem.memId, memItem.type, memItem.value).toMap);
 
-// coverage:ignore-start
-  @override
-  Entity copiedWith() => throw UnimplementedError();
-
-  // @override
-  // Entity copiedWith({
-  //   int Function()? memId,
-  //   MemItemType Function()? type,
-  //   dynamic Function()? value,
-  // }) =>
-  //     MemItemEntity(
-  //       memId == null ? this.memId : memId(),
-  //       type == null ? this.type : type(),
-  //       value == null ? this.value : value(),
-  //     );
-// coverage:ignore-end
-
   @override
   Map<String, dynamic> get toMap => {
         defFkMemItemsMemId.name: memId,

@@ -8,10 +8,4 @@ class PreferenceEntity<VALUE>
     this.key = key;
     this.value = value;
   }
-
-// coverage:ignore-start
-  @override
-  Entity copiedWith() => throw UnimplementedError();
-
-// coverage:ignore-end
 }

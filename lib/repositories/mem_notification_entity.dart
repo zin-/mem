@@ -17,12 +17,6 @@ class MemNotificationEntity extends MemNotificationV2 with Entity {
   MemNotificationEntity.fromV1(MemNotification v1)
       : super(v1.memId, v1.type, v1.time, v1.message);
 
-// coverage:ignore-start
-  @override
-  Entity copiedWith() => throw UnimplementedError();
-
-// coverage:ignore-end
-
   @override
   Map<String, dynamic> get toMap => {
         defFkMemNotificationsMemId.name: memId,

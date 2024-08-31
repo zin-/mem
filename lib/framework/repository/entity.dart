@@ -9,9 +9,6 @@ abstract class EntityV1 {}
 mixin Entity {
   Map<String, dynamic> get toMap;
 
-  // FIXME EntityではなくCopyableみたいなmixinで切り出すべきかもしれない
-  Entity copiedWith();
-
   @override
   String toString() => "${super.toString()}: $toMap";
 
@@ -26,6 +23,10 @@ mixin Entity {
   bool operator ==(Object other) =>
       identical(this, other) ||
       (runtimeType == other.runtimeType && hashCode == other.hashCode);
+}
+
+mixin Copyable on Entity {
+  Entity copiedWith();
 }
 // memo
 // - view, domain, dataのそれぞれの領域で似た内容でも型が変わることになるはず

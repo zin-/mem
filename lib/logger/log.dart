@@ -105,10 +105,6 @@ class Log with Entity {
 
 // coverage:ignore-start
   @override
-  // TODO: implement copiedWith
-  Entity copiedWith() => throw UnimplementedError();
-
-  @override
   // TODO: implement toMap
   Map<String, dynamic> get toMap => throw UnimplementedError();
 // coverage:ignore-end

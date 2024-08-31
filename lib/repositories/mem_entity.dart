@@ -38,20 +38,6 @@ class MemEntity extends Mem with Entity {
           ).toMap,
         );
 
-// coverage:ignore-start
-  @override
-  Entity copiedWith({
-    String Function()? name,
-    DateTime? Function()? doneAt,
-    DateAndTimePeriod? Function()? period,
-  }) =>
-      MemEntity(
-        name == null ? this.name : name(),
-        doneAt == null ? this.doneAt : doneAt(),
-        period == null ? this.period : period(),
-// coverage:ignore-end
-      );
-
   @override
   Map<String, dynamic> get toMap => {
         defColMemsName.name: name,

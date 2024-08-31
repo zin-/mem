@@ -23,10 +23,4 @@ class NotificationV2 with Entity, KeyWithValue<int, Map<String, dynamic>> {
       'payload': payload,
     };
   }
-
-// coverage:ignore-start
-  @override
-  Entity copiedWith() => throw UnimplementedError();
-
-// coverage:ignore-end
 }
