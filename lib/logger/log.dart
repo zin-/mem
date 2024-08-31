@@ -36,7 +36,7 @@ import 'package:mem/framework/repository/entity.dart';
 // 言葉の意味としては「丸太を投げ込め！」という号令で、「航海開始」を表す
 //
 // 航海日誌においては、最初の記録ということになる
-class Log extends EntityV2 {
+class Log with Entity {
   final Level level;
   final List<String> prefixes;
   final dynamic target;
@@ -102,6 +102,14 @@ class Log extends EntityV2 {
 
     return elements.join('\n');
   }
+
+  @override
+  // TODO: implement copiedWith
+  Entity copiedWith() => throw UnimplementedError();
+
+  @override
+  // TODO: implement toMap
+  Map<String, dynamic> get toMap => throw UnimplementedError();
 }
 
 enum Level {
