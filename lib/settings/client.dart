@@ -5,7 +5,7 @@ import 'package:mem/settings/preference_key.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PreferenceClientRepository
-    extends KeyWithValueRepositoryV2<PreferenceEntity, PreferenceKey> {
+    extends KeyWithValueRepository<PreferenceEntity, PreferenceKey> {
   Future<PreferenceEntity<T>> shipByKey<T>(PreferenceKey<T> key) => v(
         () async {
           final saved = (await SharedPreferences.getInstance()).get(key.value);
@@ -42,7 +42,4 @@ class PreferenceClientRepository
         () async => (await SharedPreferences.getInstance()).remove(key.value),
         {'key': key},
       );
-
-  @override
-  Future<void> discardAll() => throw UnimplementedError();
 }
