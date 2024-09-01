@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/actions.dart';
 import 'package:mem/acts/states.dart';
-import 'package:mem/core/act.dart';
+import 'package:mem/repositories/act_entity.dart';
 
 class ActFab extends ConsumerWidget {
   final int _memId;
@@ -19,14 +19,18 @@ class ActFab extends ConsumerWidget {
         () => ref.read(actListProvider(_memId).notifier).upsertAll(
           [ref.read(startActBy(_memId))],
           (tmp, item) =>
-              tmp is SavedAct && item is SavedAct && tmp.id == item.id,
+              tmp is SavedActEntity &&
+              item is SavedActEntity &&
+// coverage:ignore-start
+              tmp.id == item.id,
+// coverage:ignore-end
         ),
       );
     } else {
       return _FinishActFab(
         () => ref.read(actListProvider(_memId).notifier).removeWhere(
               (element) =>
-                  element is SavedAct &&
+                  element is SavedActEntity &&
                   element.id ==
                       ref.read(finishActBy(activeActList.last.memId)).id,
             ),

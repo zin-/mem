@@ -9,6 +9,7 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/list/states.dart';
 import 'package:mem/mems/states.dart';
 import 'package:mem/notifications/mem_notifications.dart';
+import 'package:mem/repositories/act_entity.dart';
 import 'package:mem/repositories/act_repository.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_notification.dart';
@@ -97,8 +98,10 @@ final memListProvider = StateNotifierProvider.autoDispose<
             latestActsByMem.singleWhereOrNull((act) => act.memId == a.id);
         final latestActOfB =
             latestActsByMem.singleWhereOrNull((act) => act.memId == b.id);
-        final comparedByActiveAct =
-            Act.activeCompare(latestActOfA, latestActOfB);
+        final comparedByActiveAct = Act.activeCompare(
+          latestActOfA,
+          latestActOfB,
+        );
         if (comparedByActiveAct != 0) {
           return comparedByActiveAct;
         }
@@ -180,7 +183,7 @@ int _compareTime(
     );
 
 final latestActsByMemProvider = StateNotifierProvider.autoDispose<
-    ListValueStateNotifier<SavedAct>, List<SavedAct>>(
+    ListValueStateNotifier<SavedActEntity>, List<SavedActEntity>>(
   (ref) => v(
     () => ListValueStateNotifier(
       ref.watch(
@@ -199,12 +202,10 @@ final latestActsByMemProvider = StateNotifierProvider.autoDispose<
             final memIds =
                 ref.read(memsProvider).whereType<SavedMemV1>().map((e) => e.id);
 
-            final actsByMemIds = await ActRepository()
-                .ship(
-                  memIdsIn: memIds,
-                  latestByMemIds: true,
-                )
-                .then((value) => value.map((e) => e.toV1()));
+            final actsByMemIds = await ActRepository().ship(
+              memIdsIn: memIds,
+              latestByMemIds: true,
+            );
 
             ref.read(actsProvider.notifier).addAll(actsByMemIds);
           }
@@ -250,8 +251,12 @@ final savedMemNotificationsProvider = StateNotifierProvider.autoDispose<
 );
 
 final activeActsProvider = StateNotifierProvider.autoDispose<
-    ListValueStateNotifier<SavedAct>, List<SavedAct>>(
+    ListValueStateNotifier<SavedActEntity>, List<SavedActEntity>>(
   (ref) => v(() => ListValueStateNotifier(
-        ref.watch(actsProvider).where((act) => act.period.end == null).toList(),
+        ref
+            .watch(actsProvider)
+            // .map((e) => e.toV1())
+            .where((act) => act.isActive)
+            .toList(),
       )),
 );

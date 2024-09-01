@@ -1,8 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/act_counter/act_counter.dart';
-import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
+import 'package:mem/databases/table_definitions/base.dart';
+import 'package:mem/repositories/act_entity.dart';
 import 'package:mem/repositories/mem.dart';
 
 void main() {
@@ -14,10 +15,13 @@ void main() {
 
       final savedMem = SavedMemV1("constructor", null, null)..id = memId;
       final acts = [
-        SavedAct(memId, DateAndTimePeriod.startNow())
-          ..createdAt = zeroDate
-          ..updatedAt = oneDate,
-        SavedAct(memId, DateAndTimePeriod.startNow())..createdAt = zeroDate
+        SavedActEntity(memId, DateAndTimePeriod.startNow(), {
+          defPkId.name: 1,
+          defColCreatedAt.name: zeroDate,
+          defColUpdatedAt.name: oneDate
+        }),
+        SavedActEntity(memId, DateAndTimePeriod.startNow(),
+            {defPkId.name: 2, defColCreatedAt.name: zeroDate})
       ];
 
       final actCounter = ActCounter.from(savedMem, acts);
@@ -31,10 +35,13 @@ void main() {
 
       final savedMem = SavedMemV1("constructor", null, null)..id = memId;
       final acts = [
-        SavedAct(memId, DateAndTimePeriod(end: DateAndTime.now()))
-          ..createdAt = zeroDate
-          ..updatedAt = oneDate,
-        SavedAct(memId, DateAndTimePeriod.startNow())..createdAt = zeroDate
+        SavedActEntity(memId, DateAndTimePeriod(end: DateAndTime.now()), {
+          defPkId.name: 3,
+          defColCreatedAt.name: zeroDate,
+          defColUpdatedAt.name: oneDate
+        }),
+        SavedActEntity(memId, DateAndTimePeriod.startNow(),
+            {defPkId.name: 4, defColCreatedAt.name: zeroDate})
       ];
 
       final actCounter = ActCounter.from(savedMem, acts);

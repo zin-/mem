@@ -50,7 +50,7 @@ class ActList extends ConsumerWidget {
             _memId,
             ref.watch(dateViewProvider),
             ref.watch(timeViewProvider),
-            ref.watch(actListProvider(_memId)) ?? [],
+            ref.watch(actListProvider(_memId)),
             (_memId == null ? ref.watch(memListProvider) : []),
             _scrollController,
           );

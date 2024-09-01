@@ -142,7 +142,7 @@ class NotificationClient {
                   memId: memId,
                   latestByMemIds: true,
                 )
-                .then((value) => value.singleOrNull?.toV1());
+                .then((value) => value.singleOrNull);
             final startOfDay =
                 (await _preferenceClientRepository.shipByKey(startOfDayKey))
                         .value ??

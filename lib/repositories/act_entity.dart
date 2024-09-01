@@ -2,11 +2,10 @@ import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
-import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
 
-class ActEntity extends ActV2 with Entity, Copyable {
+class ActEntity extends Act with Entity, Copyable {
   ActEntity(super.memId, super.period);
 
   ActEntity.fromMap(Map<String, dynamic> map)
@@ -51,24 +50,14 @@ class ActEntity extends ActV2 with Entity, Copyable {
 }
 
 class SavedActEntity extends ActEntity with DatabaseTupleEntity<int> {
-  SavedActEntity.fromMap(Map<String, dynamic> map) : super.fromMap(map) {
+  SavedActEntity(super.memId, super.period, Map<String, dynamic> map)
+      : super() {
     withMap(map);
   }
 
-  SavedActEntity.fromV1(SavedAct savedAct)
-      : this.fromMap(ActEntity(savedAct.memId, savedAct.period).toMap
-          ..addAll({
-            defPkId.name: savedAct.id,
-            defColCreatedAt.name: savedAct.createdAt,
-            defColUpdatedAt.name: savedAct.updatedAt,
-            defColArchivedAt.name: savedAct.archivedAt
-          }));
-
-  SavedAct toV1() => SavedAct(memId, period)
-    ..id = id
-    ..createdAt = createdAt
-    ..updatedAt = updatedAt
-    ..archivedAt = archivedAt;
+  SavedActEntity.fromMap(Map<String, dynamic> map) : super.fromMap(map) {
+    withMap(map);
+  }
 
   @override
   SavedActEntity copiedWith({

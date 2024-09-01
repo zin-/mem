@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/repositories/act_entity.dart';
 import 'package:mem/repositories/mem.dart';
 
 import 'total_act_time_item.dart';
@@ -36,7 +37,7 @@ class ActListItemBuilder {
             );
           } else {
             final act = _actListWithDatetime.value[index];
-            if (act is SavedAct) {
+            if (act is SavedActEntity) {
               return ActListItemView(
                 act,
                 _memList

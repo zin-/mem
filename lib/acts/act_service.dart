@@ -1,5 +1,4 @@
 import 'package:collection/collection.dart';
-import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
@@ -16,7 +15,7 @@ class ListWithTotalCount<T> {
 class ActService {
   final ActRepository _actRepository;
 
-  Future<ListWithTotalCount<SavedAct>> fetch(
+  Future<ListWithTotalCount<SavedActEntity>> fetch(
     int? memId,
     int offset,
     int limit,
@@ -29,7 +28,7 @@ class ActService {
             offset: offset,
             limit: limit,
           ))
-              .map((e) => e.toV1())
+              // .map((e) => e.toV1())
               .toList(),
           await _actRepository.count(memId: memId),
         ),
@@ -40,22 +39,21 @@ class ActService {
         },
       );
 
-  Future<SavedAct> start(
+  Future<SavedActEntity> start(
     int memId,
     DateAndTime when,
   ) =>
       i(
-        () async => (await _actRepository.receive(
+        () async => await _actRepository.receive(
           ActEntity(memId, DateAndTimePeriod(start: when)),
-        ))
-            .toV1(),
+        ),
         {
           'memId': memId,
           'when': when,
         },
       );
 
-  Future<SavedAct> finish(
+  Future<SavedActEntity> finish(
     int memId,
     DateAndTime when,
   ) =>
@@ -69,7 +67,7 @@ class ActService {
               .firstOrNull;
 
           if (active == null) {
-            return (await _actRepository.receive(
+            return await _actRepository.receive(
               ActEntity(
                 memId,
                 DateAndTimePeriod(
@@ -77,15 +75,13 @@ class ActService {
                   end: when,
                 ),
               ),
-            ))
-                .toV1();
+            );
           } else {
-            return (await _actRepository.replace(
+            return await _actRepository.replace(
               active.copiedWith(
                 period: () => active.period.copiedWith(when),
               ),
-            ))
-                .toV1();
+            );
           }
         },
         {
@@ -94,17 +90,15 @@ class ActService {
         },
       );
 
-  Future<SavedAct> edit(SavedAct savedAct) => i(
-        () async =>
-            (await _actRepository.replace(SavedActEntity.fromV1(savedAct)))
-                .toV1(),
+  Future<SavedActEntity> edit(SavedActEntity savedAct) => i(
+        () async => await _actRepository.replace(savedAct),
         {
           'savedAct': savedAct,
         },
       );
 
-  Future<SavedAct> delete(int actId) => i(
-        () async => (await _actRepository.waste(id: actId)).single.toV1(),
+  Future<SavedActEntity> delete(int actId) => i(
+        () async => (await _actRepository.waste(id: actId)).single,
         {
           'actId': actId,
         },
