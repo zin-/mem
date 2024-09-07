@@ -4,8 +4,8 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/mem_client.dart';
 import 'package:mem/repositories/mem.dart';
-import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/mems/states.dart';
+import 'package:mem/repositories/mem_notification_entity.dart';
 
 final _memClient = MemClient();
 
@@ -37,8 +37,8 @@ final saveMem =
             ref.read(memNotificationsProvider.notifier).upsertAll(
                   saved.notifications ?? [],
                   (tmp, item) =>
-                      tmp is SavedMemNotification &&
-                      item is SavedMemNotification &&
+                      tmp is SavedMemNotificationEntity &&
+                      item is SavedMemNotificationEntity &&
                       tmp.id == item.id,
                   removeWhere: (current) => current.isRepeatByDayOfWeek(),
                 );
@@ -59,8 +59,9 @@ final archiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
           .updatedBy(archived.mem);
       ref.read(memsProvider.notifier).upsertAll(
           [archived.mem],
-          (tmp, item) =>
-              tmp is SavedMemV1 && item is SavedMemV1 ? tmp.id == item.id : false);
+          (tmp, item) => tmp is SavedMemV1 && item is SavedMemV1
+              ? tmp.id == item.id
+              : false);
 
       return archived;
     },
@@ -80,8 +81,9 @@ final unarchiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
           .updatedBy(unarchived.mem);
       ref.read(memsProvider.notifier).upsertAll(
           [unarchived.mem],
-          (tmp, item) =>
-              tmp is SavedMemV1 && item is SavedMemV1 ? tmp.id == item.id : false);
+          (tmp, item) => tmp is SavedMemV1 && item is SavedMemV1
+              ? tmp.id == item.id
+              : false);
 
       return unarchived;
     },

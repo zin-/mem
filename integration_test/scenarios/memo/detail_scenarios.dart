@@ -176,52 +176,49 @@ void main() => group(
               },
             );
 
-            testWidgets(
-              ': twice on create.',
-              retry: maxRetryCount,
-              (widgetTester) async {
-                widgetTester.ignoreMockMethodCallHandler(
-                    MethodChannelMock.permissionHandler);
-                widgetTester.ignoreMockMethodCallHandler(
-                    MethodChannelMock.flutterLocalNotifications);
+            testWidgets(': twice on create.', retry: maxRetryCount,
+                (widgetTester) async {
+              widgetTester.ignoreMockMethodCallHandler(
+                  MethodChannelMock.permissionHandler);
+              widgetTester.ignoreMockMethodCallHandler(
+                  MethodChannelMock.flutterLocalNotifications);
 
-                await runApplication();
-                await widgetTester.pumpAndSettle();
-                await widgetTester.tap(newMemFabFinder);
-                await widgetTester.pumpAndSettle();
-                const enteringMemName =
-                    "$saveMemName: twice on create - entering";
-                const enteringMemMemo =
-                    "$saveMemMemo: twice on create - entering";
-                await widgetTester.enterText(
-                    find.byKey(keyMemName), enteringMemName);
-                await widgetTester.enterText(
-                    find.byKey(keyMemMemo), enteringMemMemo);
-                await widgetTester.tap(find.byKey(keySaveMemFab));
-                await widgetTester.pumpAndSettle(waitSideEffectDuration);
+              await runApplication();
+              await widgetTester.pumpAndSettle();
+              await widgetTester.tap(newMemFabFinder);
+              await widgetTester.pumpAndSettle();
+              const enteringMemName =
+                  "$saveMemName: twice on create - entering";
+              const enteringMemMemo =
+                  "$saveMemMemo: twice on create - entering";
+              await widgetTester.enterText(
+                  find.byKey(keyMemName), enteringMemName);
+              await widgetTester.enterText(
+                  find.byKey(keyMemMemo), enteringMemMemo);
+              await widgetTester.tap(find.byKey(keySaveMemFab));
+              await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
-                const enteringMemMemo2 = "$enteringMemMemo - 2";
-                await widgetTester.enterText(
-                    find.byKey(keyMemMemo), enteringMemMemo2);
-                await widgetTester.tap(find.byKey(keySaveMemFab));
-                await widgetTester.pumpAndSettle(waitSideEffectDuration);
+              const enteringMemMemo2 = "$enteringMemMemo - 2";
+              await widgetTester.enterText(
+                  find.byKey(keyMemMemo), enteringMemMemo2);
+              await widgetTester.tap(find.byKey(keySaveMemFab));
+              await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
-                final getCreatedMem = Equals(defColMemsName, enteringMemName);
-                final mems = await dbA.select(defTableMems,
-                    where: getCreatedMem.where(),
-                    whereArgs: getCreatedMem.whereArgs());
-                expect(mems.length, 1);
-                final getCreatedMemItem = And([
-                  Equals(defFkMemItemsMemId, mems[0][defPkId.name]),
-                  Equals(defColMemItemsType, MemItemType.memo.name)
-                ]);
-                final memItems = await dbA.select(defTableMemItems,
-                    where: getCreatedMemItem.where(),
-                    whereArgs: getCreatedMemItem.whereArgs());
-                expect(memItems.single[defColMemItemsValue.name],
-                    enteringMemMemo2);
-              },
-            );
+              final getCreatedMem = Equals(defColMemsName, enteringMemName);
+              final mems = await dbA.select(defTableMems,
+                  where: getCreatedMem.where(),
+                  whereArgs: getCreatedMem.whereArgs());
+              expect(mems.length, 1);
+              final getCreatedMemItem = And([
+                Equals(defFkMemItemsMemId, mems[0][defPkId.name]),
+                Equals(defColMemItemsType, MemItemType.memo.name)
+              ]);
+              final memItems = await dbA.select(defTableMemItems,
+                  where: getCreatedMemItem.where(),
+                  whereArgs: getCreatedMemItem.whereArgs());
+              expect(
+                  memItems.single[defColMemItemsValue.name], enteringMemMemo2);
+            });
 
             group(': Archive', () {
               const insertedMemName = "$saveMemName: Archive: inserted";

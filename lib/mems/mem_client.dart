@@ -1,11 +1,11 @@
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_detail.dart';
-import 'package:mem/core/mem_item.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/notification_client.dart';
 import 'package:mem/repositories/mem.dart';
-import 'package:mem/repositories/mem_notification.dart';
+import 'package:mem/repositories/mem_item_entity.dart';
+import 'package:mem/repositories/mem_notification_entity.dart';
 
 import 'mem_service.dart';
 
@@ -15,7 +15,7 @@ class MemClient {
 
   Future<MemDetail> save(
     MemV1 mem,
-    List<MemItem> memItemList,
+    List<MemItemEntity> memItemList,
     List<MemNotification> memNotificationList,
   ) =>
       v(
@@ -32,7 +32,7 @@ class MemClient {
             (saved.mem as SavedMemV1).id,
             savedMem: saved.mem as SavedMemV1,
             savedMemNotifications:
-                saved.notifications?.whereType<SavedMemNotification>(),
+                saved.notifications?.whereType<SavedMemNotificationEntity>(),
           );
 
           return saved;
@@ -78,8 +78,8 @@ class MemClient {
             _notificationClient.registerMemNotifications(
               (unarchived.mem as SavedMemV1).id,
               savedMem: unarchived.mem as SavedMemV1,
-              savedMemNotifications:
-                  unarchived.notifications?.whereType<SavedMemNotification>(),
+              savedMemNotifications: unarchived.notifications
+                  ?.whereType<SavedMemNotificationEntity>(),
             );
 
             return unarchived;

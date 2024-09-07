@@ -6,7 +6,7 @@ import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/act_repository.dart';
 import 'package:mem/repositories/mem.dart';
-import 'package:mem/repositories/mem_notification.dart';
+import 'package:mem/repositories/mem_notification_entity.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/settings/client.dart';
@@ -128,7 +128,7 @@ class NotificationClient {
   Future<void> registerMemNotifications(
     int memId, {
     SavedMemV1? savedMem,
-    Iterable<SavedMemNotification>? savedMemNotifications,
+    Iterable<SavedMemNotificationEntity>? savedMemNotifications,
   }) =>
       v(
         () async {
@@ -153,9 +153,7 @@ class NotificationClient {
                 mem,
                 startOfDay,
                 savedMemNotifications ??
-                    await _memNotificationRepository
-                        .ship(memId: memId)
-                        .then((value) => value.map((e) => e.toV1())),
+                    await _memNotificationRepository.ship(memId: memId),
                 latestAct,
                 DateTime.now(),
               )
@@ -196,9 +194,8 @@ class NotificationClient {
           );
 
           final now = DateTime.now();
-          final memNotifications = await _memNotificationRepository
-              .ship(memId: memId)
-              .then((value) => value.map((e) => e.toV1()));
+          final memNotifications =
+              await _memNotificationRepository.ship(memId: memId);
           for (var notification in memNotifications.where((element) =>
               element.isEnabled() && element.isAfterActStarted())) {
             await _scheduleClient.receive(
@@ -256,9 +253,8 @@ class NotificationClient {
 
   Future<bool> _shouldNotify(int memId) => v(
         () async {
-          final savedMemNotifications = await _memNotificationRepository
-              .ship(memId: memId)
-              .then((value) => value.map((e) => e.toV1()));
+          final savedMemNotifications =
+              await _memNotificationRepository.ship(memId: memId);
           final repeatByDayOfWeekMemNotifications = savedMemNotifications.where(
             (element) => element.isEnabled() && element.isRepeatByDayOfWeek(),
           );

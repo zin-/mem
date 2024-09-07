@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/date_and_time/time_of_day_view.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
+import 'package:mem/repositories/mem_notification_entity.dart';
 import 'package:mem/settings/states.dart';
 import 'package:mem/values/constants.dart';
 
@@ -16,12 +17,13 @@ class MemRepeatedNotificationView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
-          final memRepeatNotification =
-              ref.watch(memNotificationsByMemIdProvider(_memId).select(
-            (v) => v.singleWhere(
-              (element) => element.isRepeated(),
+          final memRepeatNotification = ref.watch(
+            memNotificationsByMemIdProvider(_memId).select(
+              (v) => v.singleWhere(
+                (element) => element.isRepeated(),
+              ),
             ),
-          ));
+          );
 
           return _MemRepeatedNotificationView(
             memRepeatNotification.time,
@@ -30,7 +32,7 @@ class MemRepeatedNotificationView extends ConsumerWidget {
                 .read(memNotificationsByMemIdProvider(_memId).notifier)
                 .upsertAll(
               [
-                memRepeatNotification.copiedWith(
+                (memRepeatNotification as MemNotificationEntity).copiedWith(
                   time: () => picked,
                 )
               ],

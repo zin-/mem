@@ -6,10 +6,10 @@ import 'package:mem/core/mem_notification.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/components/value_state_notifier.dart';
-import 'package:mem/mems/mem_item.dart';
 import 'package:mem/mems/mem_item_repository.dart';
 import 'package:mem/mems/states.dart';
-import 'package:mem/repositories/mem_notification.dart';
+import 'package:mem/repositories/mem_item_entity.dart';
+import 'package:mem/repositories/mem_notification_entity.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
 
 final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
@@ -23,7 +23,7 @@ final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
 );
 
 final memItemsByMemIdProvider = StateNotifierProvider.family<
-    ListValueStateNotifier<MemItem>, List<MemItem>, int?>(
+    ListValueStateNotifier<MemItemEntity>, List<MemItemEntity>, int?>(
   (ref, memId) => v(
     () => ListValueStateNotifier(
       [
@@ -34,23 +34,21 @@ final memItemsByMemIdProvider = StateNotifierProvider.family<
                 ),
               ),
             ) ??
-            MemItem.memo(memId),
+            MemItemEntity(memId, MemItemType.memo, "")
       ],
       initializer: (current, notifier) async {
         if (memId != null) {
           ref.read(memItemsProvider.notifier).upsertAll(
-                await MemItemRepository()
-                    .ship(memId: memId)
-                    .then((v) => v.map((e) => e.toV1())),
+                await MemItemRepository().ship(memId: memId),
                 (current, updating) =>
-                    current is SavedMemItem &&
-                    updating is SavedMemItem &&
+                    current is SavedMemItemEntity &&
+                    updating is SavedMemItemEntity &&
                     current.id == updating.id,
               );
         }
       },
     ),
-    {"memId": memId},
+    {'memId': memId},
   ),
 );
 
@@ -105,22 +103,23 @@ final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
         [
           ...memNotificationsByMemId,
           if (memNotificationsByMemId.every((element) => !element.isRepeated()))
-            MemNotification.repeated(memId),
+            MemNotificationEntity.initialByType(
+                memId, MemNotificationType.repeat),
           if (memNotificationsByMemId
               .every((element) => !element.isRepeatByNDay()))
-            MemNotification.repeatByNDay(memId),
+            MemNotificationEntity.initialByType(
+                memId, MemNotificationType.repeatByNDay),
           if (memNotificationsByMemId
               .every((element) => !element.isAfterActStarted()))
-            MemNotification.afterActStarted(memId),
+            MemNotificationEntity.initialByType(
+                memId, MemNotificationType.afterActStarted),
         ],
         initializer: (current, notifier) => v(
           () async {
             if (memId != null &&
-                current.whereType<SavedMemNotification>().isEmpty) {
+                current.whereType<SavedMemNotificationEntity>().isEmpty) {
               ref.read(memNotificationsProvider.notifier).upsertAll(
-                    await MemNotificationRepository()
-                        .ship(memId: memId)
-                        .then((value) => value.map((e) => e.toV1())),
+                    await MemNotificationRepository().ship(memId: memId),
                     (current, updating) => updating.isRepeatByDayOfWeek()
                         ? current.memId == updating.memId &&
                             current.type == updating.type &&

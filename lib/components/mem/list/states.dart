@@ -12,7 +12,7 @@ import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/repositories/act_entity.dart';
 import 'package:mem/repositories/act_repository.dart';
 import 'package:mem/repositories/mem.dart';
-import 'package:mem/repositories/mem_notification.dart';
+import 'package:mem/repositories/mem_notification_entity.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
 import 'package:mem/settings/states.dart';
 
@@ -216,12 +216,13 @@ final latestActsByMemProvider = StateNotifierProvider.autoDispose<
   ),
 );
 final savedMemNotificationsProvider = StateNotifierProvider.autoDispose<
-    ListValueStateNotifier<SavedMemNotification>, List<SavedMemNotification>>(
+    ListValueStateNotifier<SavedMemNotificationEntity>,
+    List<SavedMemNotificationEntity>>(
   (ref) => v(
     () => ListValueStateNotifier(
       ref.watch(
         memNotificationsProvider.select(
-            (value) => value.whereType<SavedMemNotification>().toList()),
+            (value) => value.whereType<SavedMemNotificationEntity>().toList()),
       ),
       initializer: (current, notifier) => v(
         () async {
@@ -229,17 +230,15 @@ final savedMemNotificationsProvider = StateNotifierProvider.autoDispose<
             final memIds =
                 ref.read(memsProvider).whereType<SavedMemV1>().map((e) => e.id);
 
-            final actsByMemIds = await MemNotificationRepository()
-                .ship(
-                  memIdsIn: memIds,
-                )
-                .then((value) => value.map((e) => e.toV1()));
+            final actsByMemIds = await MemNotificationRepository().ship(
+              memIdsIn: memIds,
+            );
 
             ref.read(memNotificationsProvider.notifier).upsertAll(
                   actsByMemIds,
                   (current, updating) =>
-                      current is SavedMemNotification &&
-                      updating is SavedMemNotification &&
+                      current is SavedMemNotificationEntity &&
+                      updating is SavedMemNotificationEntity &&
                       current.id == updating.id,
                 );
           }

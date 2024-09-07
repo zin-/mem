@@ -25,8 +25,8 @@ mixin Entity {
       (runtimeType == other.runtimeType && hashCode == other.hashCode);
 }
 
-mixin Copyable on Entity {
-  Entity copiedWith();
+mixin Copyable<T> on Entity {
+  T copiedWith();
 }
 // memo
 // - view, domain, dataのそれぞれの領域で似た内容でも型が変わることになるはず

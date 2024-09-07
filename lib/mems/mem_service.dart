@@ -2,12 +2,10 @@ import 'package:collection/collection.dart';
 import 'package:mem/core/mem_detail.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/mem_item.dart';
 import 'package:mem/mems/mem_item_repository.dart';
 import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_entity.dart';
 import 'package:mem/repositories/mem_item_entity.dart';
-import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/repositories/mem_notification_entity.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
@@ -30,21 +28,20 @@ class MemService {
                   : await _memRepository.receive(MemEntity.fromV1(mem)))
               .toV1();
 
-          final savedMemItems = (await Future.wait(
-              memDetail.memItems.map((e) => (e is SavedMemItem && !undo
-                      ? _memItemRepository.replace(
-                          SavedMemItemEntity.fromV1(
-                              e.copiedWith(memId: () => savedMem.id)),
-                        )
-                      : _memItemRepository.receive(
-                          MemItemEntity.fromV1(
-                              e.copiedWith(memId: () => savedMem.id)),
-                        ))
-                  .then((value) => value.toV1()))));
+          final savedMemItems = await Future.wait(
+            memDetail.memItems.map((e) => (e is SavedMemItemEntity && !undo
+                ? _memItemRepository.replace(
+                    e.copiedWith(memId: () => savedMem.id)
+                        as SavedMemItemEntity,
+                  )
+                : _memItemRepository.receive(
+                    e.copiedWith(memId: () => savedMem.id),
+                  ))),
+          );
 
           final memNotifications = memDetail.notifications;
           final returnMemNotifications =
-              List<SavedMemNotification?>.empty(growable: true);
+              List<SavedMemNotificationEntity?>.empty(growable: true);
           if (memNotifications == null) {
             await _memNotificationRepository.waste(memId: savedMem.id);
           } else {
@@ -52,17 +49,15 @@ class MemService {
                 .where((e) => !e.isRepeatByDayOfWeek())
                 .map((e) {
               if (e.isEnabled()) {
-                return (e is SavedMemNotification && !undo
-                        ? _memNotificationRepository.replace(
-                            SavedMemNotificationEntity.fromV1(e.copiedWith(
-                            memId: () => savedMem.id,
-                          )))
-                        : _memNotificationRepository.receive(
-                            MemNotificationEntity.fromV1(e.copiedWith(
-                              memId: () => savedMem.id,
-                            )),
-                          ))
-                    .then((v) => v.toV1());
+                return (e is SavedMemNotificationEntity && !undo
+                    ? _memNotificationRepository.replace((e).copiedWith(
+                        memId: () => savedMem.id,
+                      ))
+                    : _memNotificationRepository.receive(
+                        (e as MemNotificationEntity).copiedWith(
+                          memId: () => savedMem.id,
+                        ),
+                      ));
               } else {
                 return _memNotificationRepository
                     .waste(
@@ -82,15 +77,11 @@ class MemService {
                 .groupListsBy((e) => e.time)
                 .entries) {
               returnMemNotifications.add(
-                await _memNotificationRepository
-                    .receive(
-                      MemNotificationEntity.fromV1(
-                        entry.value.first.copiedWith(
-                          memId: () => savedMem.id,
-                        ),
-                      ),
-                    )
-                    .then((value) => value.toV1()),
+                await _memNotificationRepository.receive(
+                  (entry.value.first as MemNotificationEntity).copiedWith(
+                    memId: () => savedMem.id,
+                  ),
+                ),
               );
             }
           }
@@ -98,7 +89,9 @@ class MemService {
           return MemDetail(
             savedMem,
             savedMemItems,
-            returnMemNotifications.whereType<SavedMemNotification>().toList(),
+            returnMemNotifications
+                .whereType<SavedMemNotificationEntity>()
+                .toList(),
           );
         },
         {
@@ -134,12 +127,10 @@ class MemService {
           final archivedMem = await _memRepository
               .archive(SavedMemEntity.fromV1(mem))
               .then((v) => v.toV1());
-          final archivedMemItems = await _memItemRepository
-              .archiveBy(memId: archivedMem.id)
-              .then((v) => v.map((e) => e.toV1()));
-          final archivedMemNotifications = await _memNotificationRepository
-              .archiveBy(memId: archivedMem.id)
-              .then((v) => v.map((e) => e.toV1()));
+          final archivedMemItems =
+              await _memItemRepository.archiveBy(memId: archivedMem.id);
+          final archivedMemNotifications =
+              await _memNotificationRepository.archiveBy(memId: archivedMem.id);
 
           return MemDetail(
             archivedMem,
@@ -157,12 +148,10 @@ class MemService {
           final unarchivedMem = await _memRepository
               .unarchive(SavedMemEntity.fromV1(mem))
               .then((value) => value.toV1());
-          final unarchivedMemItems = await _memItemRepository
-              .unarchiveBy(memId: unarchivedMem.id)
-              .then((v) => v.map((e) => e.toV1()));
+          final unarchivedMemItems =
+              await _memItemRepository.unarchiveBy(memId: unarchivedMem.id);
           final unarchivedMemNotifications = await _memNotificationRepository
-              .unarchiveBy(memId: unarchivedMem.id)
-              .then((v) => v.map((e) => e.toV1()));
+              .unarchiveBy(memId: unarchivedMem.id);
 
           return MemDetail(
             unarchivedMem,

@@ -5,7 +5,7 @@ import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
 
-class ActEntity extends Act with Entity, Copyable {
+class ActEntity extends Act with Entity, Copyable<ActEntity> {
   ActEntity(super.memId, super.period);
 
   ActEntity.fromMap(Map<String, dynamic> map)
@@ -30,7 +30,7 @@ class ActEntity extends Act with Entity, Copyable {
         );
 
   @override
-  Entity copiedWith({
+  ActEntity copiedWith({
     int Function()? memId,
     DateAndTimePeriod Function()? period,
   }) =>

@@ -203,6 +203,9 @@ void main() => group(_name, () {
         });
 
         testWidgets(": update.", (widgetTester) async {
+          widgetTester
+              .ignoreMockMethodCallHandler(MethodChannelMock.permissionHandler);
+
           await runApplication();
           await widgetTester.pumpAndSettle();
           await widgetTester.tap(find.text(insertedMemName));
@@ -231,16 +234,22 @@ void main() => group(_name, () {
           await widgetTester.tap(find.byKey(keySaveMemFab));
           await widgetTester.pump(waitSideEffectDuration);
 
-          final savedMem = (await dbA.select(defTableMems,
+          final savedMemId = (await dbA.select(defTableMems,
                   where: "${defColMemsName.name} = ?",
                   whereArgs: [insertedMemName]))
-              .single;
-          final savedMemNotification = (await dbA.select(
+              .single[defPkId.name];
+          final savedMemNotifications = (await dbA.select(
               defTableMemNotifications,
               where: "${defFkMemNotificationsMemId.name} = ?",
-              whereArgs: [savedMem[defPkId.name]]));
-          expect(savedMemNotification[0][defColMemNotificationsTime.name], 0);
-          expect(savedMemNotification[1][defColMemNotificationsTime.name], 1);
+              whereArgs: [savedMemId],
+              orderBy: "id ASC"));
+          expect(savedMemNotifications, hasLength(2));
+          expect(savedMemNotifications[0][defColMemNotificationsType.name],
+              MemNotificationType.repeat.name);
+          expect(savedMemNotifications[0][defColMemNotificationsTime.name], 0);
+          expect(savedMemNotifications[1][defColMemNotificationsType.name],
+              MemNotificationType.repeatByNDay.name);
+          expect(savedMemNotifications[1][defColMemNotificationsTime.name], 1);
         });
       });
     });

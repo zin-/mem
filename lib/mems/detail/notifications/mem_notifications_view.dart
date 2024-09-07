@@ -11,7 +11,7 @@ import 'package:mem/values/durations.dart';
 
 import 'mem_notifications_page.dart';
 
-const keyMemNotificationsView = Key("mem-notifications");
+const keyMemNotificationsView = Key('mem-notifications');
 
 class MemNotificationsView extends ConsumerWidget {
   final int? _memId;
@@ -25,14 +25,14 @@ class MemNotificationsView extends ConsumerWidget {
           ref.watch(memNotificationsByMemIdProvider(_memId)),
         ),
         {
-          "_memId": _memId,
+          '_memId': _memId,
         },
       );
 }
 
 class _MemNotificationsView extends StatelessWidget {
   final int? _memId;
-  final List<MemNotification> _memNotifications;
+  final Iterable<MemNotification> _memNotifications;
 
   const _MemNotificationsView(
     this._memId,
@@ -83,8 +83,8 @@ class _MemNotificationsView extends StatelessWidget {
           );
         },
         {
-          "_memId": _memId,
-          "_memNotifications": _memNotifications,
+          '_memId': _memId,
+          '_memNotifications': _memNotifications,
         },
       );
 }

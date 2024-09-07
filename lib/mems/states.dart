@@ -3,19 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_detail.dart';
-import 'package:mem/core/mem_item.dart';
 import 'package:mem/components/value_state_notifier.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/mem.dart';
+import 'package:mem/repositories/mem_item_entity.dart';
 import 'package:mem/repositories/mem_repository.dart';
 
 final memsProvider =
     StateNotifierProvider<ListValueStateNotifier<MemV1>, List<MemV1>>(
   (ref) => v(() => ListValueStateNotifier<MemV1>([])),
 );
-final memItemsProvider =
-    StateNotifierProvider<ListValueStateNotifier<MemItem>, List<MemItem>>(
+final memItemsProvider = StateNotifierProvider<
+    ListValueStateNotifier<MemItemEntity>, List<MemItemEntity>>(
   (ref) => v(
     () => ListValueStateNotifier([]),
   ),
@@ -84,7 +84,7 @@ final removedMemProvider =
   ),
 );
 final removedMemItemsProvider = StateNotifierProvider.family<
-    ValueStateNotifier<List<MemItem>?>, List<MemItem>?, int>(
+    ValueStateNotifier<List<MemItemEntity>?>, List<MemItemEntity>?, int>(
   (ref, memId) => v(
     () => ValueStateNotifier(null),
     memId,
