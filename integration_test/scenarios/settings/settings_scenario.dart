@@ -127,43 +127,33 @@ void main() => group(
               },
             );
 
-            group(
-              "with saved",
-              () {
-                final now = DateTime.now();
-                setUp(() async {
-                  await PreferenceClientRepository().receive(PreferenceEntity(
-                    startOfDayKey,
-                    TimeOfDay.fromDateTime(now),
-                  ));
-                });
+            group('with saved', () {
+              final now = DateTime.now();
+              setUp(() async {
+                await PreferenceClientRepository().receive(PreferenceEntity(
+                    startOfDayKey, TimeOfDay.fromDateTime(now)));
+              });
 
-                testWidgets(
-                  "show saved.",
-                  (widgetTester) async {
-                    await runApplication();
-                    await widgetTester.pumpAndSettle();
+              testWidgets('show saved.', (widgetTester) async {
+                await runApplication();
+                await widgetTester.pumpAndSettle();
 
-                    await widgetTester.tap(drawerIconFinder);
-                    await widgetTester.pumpAndSettle();
-                    await widgetTester.tap(find.text(l10n.settingsPageTitle));
-                    await widgetTester.pumpAndSettle();
+                await widgetTester.tap(drawerIconFinder);
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(find.text(l10n.settingsPageTitle));
+                await widgetTester.pumpAndSettle();
 
-                    expect(
-                      widgetTester
-                          .widget<Text>(find
-                              .descendant(
+                expect(
+                    widgetTester
+                        .widget<Text>(find
+                            .descendant(
                                 of: find.byType(SettingsTile),
-                                matching: find.byType(Text),
-                              )
-                              .at(1))
-                          .data,
-                      timeText(now),
-                    );
-                  },
-                );
-              },
-            );
+                                matching: find.byType(Text))
+                            .at(1))
+                        .data,
+                    timeText(now));
+              });
+            });
           },
         );
 
