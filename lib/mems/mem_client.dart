@@ -3,7 +3,7 @@ import 'package:mem/core/mem_detail.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/notification_client.dart';
-import 'package:mem/repositories/mem.dart';
+import 'package:mem/repositories/mem_entity.dart';
 import 'package:mem/repositories/mem_item_entity.dart';
 import 'package:mem/repositories/mem_notification_entity.dart';
 
@@ -14,7 +14,7 @@ class MemClient {
   final NotificationClient _notificationClient;
 
   Future<MemDetail> save(
-    MemV1 mem,
+    MemEntity mem,
     List<MemItemEntity> memItemList,
     List<MemNotification> memNotificationList,
   ) =>
@@ -29,8 +29,8 @@ class MemClient {
           );
 
           _notificationClient.registerMemNotifications(
-            (saved.mem as SavedMemV1).id,
-            savedMem: saved.mem as SavedMemV1,
+            (saved.mem as SavedMemEntity).id,
+            savedMem: saved.mem as SavedMemEntity,
             savedMemNotifications:
                 saved.notifications?.whereType<SavedMemNotificationEntity>(),
           );
@@ -44,15 +44,15 @@ class MemClient {
         },
       );
 
-  Future<MemDetail> archive(MemV1 mem) => v(
+  Future<MemDetail> archive(MemEntity mem) => v(
         () async {
           // FIXME MemServiceの責務
-          if (mem is SavedMemV1) {
+          if (mem is SavedMemEntity) {
             final archived = await _memService.archive(mem);
 
             final archivedMem = archived.mem;
             // FIXME archive後のMemDetailなので、必ずSavedMemのはず
-            if (archivedMem is SavedMemV1) {
+            if (archivedMem is SavedMemEntity) {
               _notificationClient.cancelMemNotifications(archivedMem.id);
             }
 
@@ -69,15 +69,16 @@ class MemClient {
         },
       );
 
-  Future<MemDetail> unarchive(MemV1 mem) => v(
+  Future<MemDetail> unarchive(Mem mem) => v(
         () async {
-          // FIXME MemServiceの責務
-          if (mem is SavedMemV1) {
+          // FIXME 保存済みかどうかを判定するのはMemServiceの責務？
+          //  Client sideで判定できるものではない気がする
+          if (mem is SavedMemEntity) {
             final unarchived = await _memService.unarchive(mem);
 
             _notificationClient.registerMemNotifications(
-              (unarchived.mem as SavedMemV1).id,
-              savedMem: unarchived.mem as SavedMemV1,
+              (unarchived.mem as SavedMemEntity).id,
+              savedMem: unarchived.mem as SavedMemEntity,
               savedMemNotifications: unarchived.notifications
                   ?.whereType<SavedMemNotificationEntity>(),
             );

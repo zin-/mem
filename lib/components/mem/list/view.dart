@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/async_value_view.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/repositories/mem.dart';
+import 'package:mem/repositories/mem_entity.dart';
 
 import 'actions.dart';
 import 'states.dart';
@@ -32,7 +32,7 @@ class MemListView extends ConsumerWidget {
 }
 
 class _MemListViewComponent extends StatelessWidget {
-  final List<SavedMemV1> _memList;
+  final List<SavedMemEntity> _memList;
   final Widget _appBar;
   final Widget Function(int memId) _itemBuilder;
   final ScrollController? _scrollController;

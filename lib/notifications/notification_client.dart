@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/act_repository.dart';
-import 'package:mem/repositories/mem.dart';
+import 'package:mem/repositories/mem_entity.dart';
 import 'package:mem/repositories/mem_notification_entity.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
 import 'package:mem/repositories/mem_repository.dart';
@@ -73,9 +73,8 @@ class NotificationClient {
   ) =>
       v(
         () async {
-          final savedMem = await _memRepository
-              .ship(id: memId)
-              .then((v) => v.singleOrNull?.toV1());
+          final savedMem =
+              await _memRepository.ship(id: memId).then((v) => v.singleOrNull);
 
           if (savedMem == null || savedMem.isDone || savedMem.isArchived) {
             await cancelMemNotifications(memId);
@@ -127,13 +126,19 @@ class NotificationClient {
 
   Future<void> registerMemNotifications(
     int memId, {
-    SavedMemV1? savedMem,
+    SavedMemEntity? savedMem,
     Iterable<SavedMemNotificationEntity>? savedMemNotifications,
   }) =>
       v(
         () async {
           final mem = savedMem ??
-              await _memRepository.ship(id: memId).then((v) => v.single.toV1());
+              await _memRepository
+                  .ship(
+                    id: memId,
+                  )
+                  .then(
+                    (v) => v.single,
+                  );
           if (mem!.isDone || mem.isArchived) {
             cancelMemNotifications(memId);
           } else {

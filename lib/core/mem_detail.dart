@@ -1,5 +1,5 @@
-import 'package:mem/core/mem.dart';
 import 'package:mem/core/mem_notification.dart';
+import 'package:mem/repositories/mem_entity.dart';
 import 'package:mem/repositories/mem_item_entity.dart';
 
 // FIXME 定義するべきではない気がする
@@ -8,7 +8,7 @@ import 'package:mem/repositories/mem_item_entity.dart';
 //      - DBのFK制約が絡むしEntityかも
 //      - Repositoryも絡んでいくはず
 class MemDetail {
-  final MemV1 mem;
+  final MemEntity mem;
   final List<MemItemEntity> memItems;
   final List<MemNotification>? notifications;
 

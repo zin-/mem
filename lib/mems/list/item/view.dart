@@ -12,7 +12,7 @@ import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/list/item/subtitle.dart';
 import 'package:mem/mems/states.dart';
 import 'package:mem/repositories/act_entity.dart';
-import 'package:mem/repositories/mem.dart';
+import 'package:mem/repositories/mem_entity.dart';
 import 'package:mem/repositories/mem_notification_entity.dart';
 import 'package:mem/values/colors.dart';
 
@@ -40,7 +40,7 @@ class MemListItemView extends ConsumerWidget {
                     ? ref.read(doneMem(_memId))
                     : ref.read(undoneMem(_memId))
               ],
-              (tmp, item) => tmp is SavedMemV1 && item is SavedMemV1
+              (tmp, item) => tmp is SavedMemEntity && item is SavedMemEntity
                   ? tmp.id == item.id
                   : false,
             );
@@ -65,7 +65,7 @@ class MemListItemView extends ConsumerWidget {
 
 class _MemListItemView extends ListTile {
   _MemListItemView(
-    SavedMemV1 mem,
+    SavedMemEntity mem,
     SavedActEntity? activeAct,
     Iterable<MemNotification> memNotifications,
     void Function(int memId) onTap,

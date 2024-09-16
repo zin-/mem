@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/repositories/act_entity.dart';
-import 'package:mem/repositories/mem.dart';
+import 'package:mem/repositories/mem_entity.dart';
 
 import 'total_act_time_item.dart';
 import 'view.dart';
 
 class ActListItemBuilder {
   final MapEntry<DateTime, List<Act>> _actListWithDatetime;
-  final List<SavedMemV1> _memList;
+  final List<SavedMemEntity> _memList;
   final bool _isTimeView;
 
   late final Map _actListGroupedByMemId;

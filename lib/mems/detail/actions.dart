@@ -3,8 +3,8 @@ import 'package:mem/core/mem_detail.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/mem_client.dart';
-import 'package:mem/repositories/mem.dart';
 import 'package:mem/mems/states.dart';
+import 'package:mem/repositories/mem_entity.dart';
 import 'package:mem/repositories/mem_notification_entity.dart';
 
 final _memClient = MemClient();
@@ -19,8 +19,10 @@ final saveMem =
             );
 
             ref.read(memsProvider.notifier).upsertAll(
-              [saved.mem],
-              (tmp, item) => tmp is SavedMemV1 && item is SavedMemV1
+              [
+                saved.mem,
+              ],
+              (tmp, item) => tmp is SavedMemEntity && item is SavedMemEntity
                   ? tmp.id == item.id
                   : false,
             );
@@ -53,13 +55,15 @@ final archiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
     () async {
       final mem = ref.read(memByMemIdProvider(memId));
 
-      final archived = await _memClient.archive(mem as SavedMemV1);
+      final archived = await _memClient.archive(mem!);
       ref
           .read(editingMemByMemIdProvider(memId).notifier)
           .updatedBy(archived.mem);
       ref.read(memsProvider.notifier).upsertAll(
-          [archived.mem],
-          (tmp, item) => tmp is SavedMemV1 && item is SavedMemV1
+          [
+            archived.mem,
+          ],
+          (tmp, item) => tmp is SavedMemEntity && item is SavedMemEntity
               ? tmp.id == item.id
               : false);
 
@@ -72,16 +76,20 @@ final archiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
 final unarchiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
   (ref, memId) => v(
     () async {
-      final mem = ref.read(memByMemIdProvider(memId));
-
-      final unarchived = await _memClient.unarchive(mem as SavedMemV1);
+      final unarchived = await _memClient.unarchive(
+        ref.read(
+          memByMemIdProvider(memId),
+        )!,
+      );
 
       ref
           .read(editingMemByMemIdProvider(memId).notifier)
           .updatedBy(unarchived.mem);
       ref.read(memsProvider.notifier).upsertAll(
-          [unarchived.mem],
-          (tmp, item) => tmp is SavedMemV1 && item is SavedMemV1
+          [
+            unarchived.mem,
+          ],
+          (tmp, item) => tmp is SavedMemEntity && item is SavedMemEntity
               ? tmp.id == item.id
               : false);
 
@@ -97,16 +105,17 @@ final removeMem = Provider.autoDispose.family<Future<bool>, int?>(
       if (memId != null) {
         final removeSuccess = await _memClient.remove(memId);
 
-        ref
-            .read(removedMemProvider(memId).notifier)
-            .updatedBy(ref.read(memByMemIdProvider(memId)));
+        final mem = ref.read(memByMemIdProvider(memId));
+        ref.read(removedMemProvider(memId).notifier).updatedBy(
+              mem,
+            );
         ref.read(removedMemItemsProvider(memId).notifier).updatedBy(
               ref.read(memItemsByMemIdProvider(memId)),
             );
         // TODO mem notificationsにも同様の処理が必要では？
 
         ref.read(memsProvider.notifier).removeWhere(
-            (element) => element is SavedMemV1 && element.id == memId);
+            (element) => element is SavedMemEntity && element.id == memId);
 
         return removeSuccess;
       }

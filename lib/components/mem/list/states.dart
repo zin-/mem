@@ -11,7 +11,7 @@ import 'package:mem/mems/states.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/repositories/act_entity.dart';
 import 'package:mem/repositories/act_repository.dart';
-import 'package:mem/repositories/mem.dart';
+import 'package:mem/repositories/mem_entity.dart';
 import 'package:mem/repositories/mem_notification_entity.dart';
 import 'package:mem/repositories/mem_notification_repository.dart';
 import 'package:mem/settings/states.dart';
@@ -40,9 +40,9 @@ final showDoneProvider = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
   ),
 );
 final _filteredMemsProvider = StateNotifierProvider.autoDispose<
-    ListValueStateNotifier<SavedMemV1>, List<SavedMemV1>>(
+    ListValueStateNotifier<SavedMemEntity>, List<SavedMemEntity>>(
   (ref) {
-    final savedMems = ref.watch(memsProvider).map((e) => e as SavedMemV1);
+    final savedMems = ref.watch(memsProvider).whereType<SavedMemEntity>();
 
     final showNotArchived = ref.watch(showNotArchivedProvider);
     final showArchived = ref.watch(showArchivedProvider);
@@ -86,7 +86,7 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
 );
 
 final memListProvider = StateNotifierProvider.autoDispose<
-    ValueStateNotifier<List<SavedMemV1>>, List<SavedMemV1>>((ref) {
+    ValueStateNotifier<List<SavedMemEntity>>, List<SavedMemEntity>>((ref) {
   final filtered = ref.watch(_filteredMemsProvider);
   final latestActsByMem = ref.watch(latestActsByMemProvider);
   final savedMemNotifications = ref.watch(savedMemNotificationsProvider);
@@ -199,15 +199,15 @@ final latestActsByMemProvider = StateNotifierProvider.autoDispose<
       initializer: (current, notifier) => v(
         () async {
           if (current.isEmpty) {
-            final memIds =
-                ref.read(memsProvider).whereType<SavedMemV1>().map((e) => e.id);
-
-            final actsByMemIds = await ActRepository().ship(
-              memIdsIn: memIds,
-              latestByMemIds: true,
-            );
-
-            ref.read(actsProvider.notifier).addAll(actsByMemIds);
+            ref.read(actsProvider.notifier).addAll(
+                  await ActRepository().ship(
+                    memIdsIn: ref
+                        .read(memsProvider)
+                        .whereType<SavedMemEntity>()
+                        .map((e) => e.id),
+                    latestByMemIds: true,
+                  ),
+                );
           }
         },
         {'current': current},
@@ -227,8 +227,10 @@ final savedMemNotificationsProvider = StateNotifierProvider.autoDispose<
       initializer: (current, notifier) => v(
         () async {
           if (current.isEmpty) {
-            final memIds =
-                ref.read(memsProvider).whereType<SavedMemV1>().map((e) => e.id);
+            final memIds = ref
+                .read(memsProvider)
+                .whereType<SavedMemEntity>()
+                .map((e) => e.id);
 
             final actsByMemIds = await MemNotificationRepository().ship(
               memIdsIn: memIds,

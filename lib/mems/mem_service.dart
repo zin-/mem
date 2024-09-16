@@ -3,7 +3,6 @@ import 'package:mem/core/mem_detail.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_item_repository.dart';
-import 'package:mem/repositories/mem.dart';
 import 'package:mem/repositories/mem_entity.dart';
 import 'package:mem/repositories/mem_item_entity.dart';
 import 'package:mem/repositories/mem_notification_entity.dart';
@@ -23,10 +22,9 @@ class MemService {
         () async {
           final mem = memDetail.mem;
 
-          final savedMem = (mem is SavedMemV1 && !undo
-                  ? await _memRepository.replace(SavedMemEntity.fromV1(mem))
-                  : await _memRepository.receive(MemEntity.fromV1(mem)))
-              .toV1();
+          final savedMem = (mem is SavedMemEntity && !undo
+              ? await _memRepository.replace(mem)
+              : await _memRepository.receive(mem));
 
           final savedMemItems = await Future.wait(
             memDetail.memItems.map((e) => (e is SavedMemItemEntity && !undo
@@ -102,10 +100,9 @@ class MemService {
 
   Future<MemDetail> doneByMemId(int memId) => i(
         () async {
-          final done = (await _memRepository
-                  .ship(id: memId)
-                  .then((v) => v.single.toV1()))
-              .copiedWith(doneAt: () => DateTime.now());
+          final done =
+              (await _memRepository.ship(id: memId).then((v) => v.single))
+                  .copiedWith(doneAt: () => DateTime.now());
           return save(MemDetail(done, []));
         },
         {'memId': memId},
@@ -113,20 +110,17 @@ class MemService {
 
   Future<MemDetail> undoneByMemId(int memId) => i(
         () async {
-          final undone = (await _memRepository
-                  .ship(id: memId)
-                  .then((v) => v.single.toV1()))
-              .copiedWith(doneAt: () => null);
+          final undone =
+              (await _memRepository.ship(id: memId).then((v) => v.single))
+                  .copiedWith(doneAt: () => null);
           return save(MemDetail(undone, []));
         },
         {'memId': memId},
       );
 
-  Future<MemDetail> archive(SavedMemV1 mem) => i(
+  Future<MemDetail> archive(SavedMemEntity mem) => i(
         () async {
-          final archivedMem = await _memRepository
-              .archive(SavedMemEntity.fromV1(mem))
-              .then((v) => v.toV1());
+          final archivedMem = await _memRepository.archive(mem);
           final archivedMemItems =
               await _memItemRepository.archiveBy(memId: archivedMem.id);
           final archivedMemNotifications =
@@ -143,11 +137,9 @@ class MemService {
         },
       );
 
-  Future<MemDetail> unarchive(SavedMemV1 mem) => i(
+  Future<MemDetail> unarchive(SavedMemEntity mem) => i(
         () async {
-          final unarchivedMem = await _memRepository
-              .unarchive(SavedMemEntity.fromV1(mem))
-              .then((value) => value.toV1());
+          final unarchivedMem = await _memRepository.unarchive(mem);
           final unarchivedMemItems =
               await _memItemRepository.unarchiveBy(memId: unarchivedMem.id);
           final unarchivedMemNotifications = await _memNotificationRepository

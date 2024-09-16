@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mem/core/act.dart';
 import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/repositories/mem.dart';
+import 'package:mem/repositories/mem_entity.dart';
 import 'package:mem/repositories/mem_notification_entity.dart';
 
 import 'notification_client.dart';
@@ -15,7 +15,7 @@ const memIdKey = 'memId';
 
 class MemNotifications {
   static Schedule periodicScheduleOf(
-    SavedMemV1 savedMem,
+    SavedMemEntity savedMem,
     TimeOfDay startOfDay,
     Iterable<SavedMemNotificationEntity> memNotifications,
     Act? latestAct,

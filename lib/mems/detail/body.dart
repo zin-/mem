@@ -38,7 +38,7 @@ class MemDetailBody extends ConsumerWidget {
 
 class _MemDetailBodyComponent extends StatelessWidget {
   final int? _memId;
-  final MemV1 _mem;
+  final Mem _mem;
   final Function(bool? memDone) _onMemDoneChanged;
 
   const _MemDetailBodyComponent(
@@ -72,7 +72,9 @@ class _MemDetailBodyComponent extends StatelessWidget {
             ),
             Padding(
               padding: pageBottomPadding,
-              child: CreatedAndUpdatedAtTexts(_mem),
+              child: CreatedAndUpdatedAtTexts(
+                _mem,
+              ),
             ),
           ],
         ),
