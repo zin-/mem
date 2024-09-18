@@ -1,16 +1,16 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/core/mem_item.dart';
-import 'package:mem/core/mem_notification.dart';
+import 'package:mem/mems/mem_item.dart';
+import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/components/value_state_notifier.dart';
 import 'package:mem/mems/mem_item_repository.dart';
 import 'package:mem/mems/states.dart';
-import 'package:mem/repositories/mem_entity.dart';
-import 'package:mem/repositories/mem_item_entity.dart';
-import 'package:mem/repositories/mem_notification_entity.dart';
-import 'package:mem/repositories/mem_notification_repository.dart';
+import 'package:mem/mems/mem_entity.dart';
+import 'package:mem/mems/mem_item_entity.dart';
+import 'package:mem/mems/mem_notification_entity.dart';
+import 'package:mem/mems/mem_notification_repository.dart';
 
 final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<MemEntity>, MemEntity, int?>(

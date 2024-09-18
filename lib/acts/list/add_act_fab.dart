@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/actions.dart';
 import 'package:mem/acts/states.dart';
-import 'package:mem/repositories/act_entity.dart';
+import 'package:mem/acts/act_entity.dart';
 
 class ActFab extends ConsumerWidget {
   final int _memId;

@@ -2,8 +2,8 @@ import 'package:mem/act_counter/act_counter_entity.dart';
 import 'package:mem/acts/client.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/repositories/act_repository.dart';
-import 'package:mem/repositories/mem_repository.dart';
+import 'package:mem/acts/act_repository.dart';
+import 'package:mem/mems/mem_repository.dart';
 
 import 'act_counter.dart';
 import 'act_counter_repository.dart';

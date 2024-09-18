@@ -9,7 +9,7 @@ import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/list/body.dart';
 import 'package:mem/mems/list/show_new_mem_fab.dart';
 import 'package:mem/mems/states.dart';
-import 'package:mem/repositories/mem_entity.dart';
+import 'package:mem/mems/mem_entity.dart';
 
 import '../../integration_test/scenarios/helpers.dart';
 

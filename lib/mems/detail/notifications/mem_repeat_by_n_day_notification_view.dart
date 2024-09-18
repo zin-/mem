@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
-import 'package:mem/repositories/mem_notification_entity.dart';
+import 'package:mem/mems/mem_notification_entity.dart';
 import 'package:mem/values/dimens.dart';
 
 const keyMemRepeatByNDayNotification = Key("mem-repeat-by-n-day-notification");

@@ -1,4 +1,4 @@
-import 'package:mem/core/mem_notification.dart';
+import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/framework/repository/condition/in.dart';
@@ -7,7 +7,7 @@ import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
-import 'package:mem/repositories/mem_notification_entity.dart';
+import 'package:mem/mems/mem_notification_entity.dart';
 
 class MemNotificationRepository extends DatabaseTupleRepository<
     MemNotificationEntity, SavedMemNotificationEntity> {

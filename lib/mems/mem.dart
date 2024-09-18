@@ -4,7 +4,7 @@ import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/notifications/schedule.dart';
-import 'package:mem/repositories/mem_entity.dart';
+import 'package:mem/mems/mem_entity.dart';
 
 class Mem {
   final String name;

@@ -2,8 +2,8 @@ import 'package:collection/collection.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/repositories/act_entity.dart';
-import 'package:mem/repositories/act_repository.dart';
+import 'package:mem/acts/act_entity.dart';
+import 'package:mem/acts/act_repository.dart';
 
 class ListWithTotalCount<T> {
   final List<T> list;

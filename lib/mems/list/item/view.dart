@@ -6,14 +6,14 @@ import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/components/mem/mem_done_checkbox.dart';
 import 'package:mem/components/mem/mem_name.dart';
 import 'package:mem/components/timer.dart';
-import 'package:mem/core/mem_notification.dart';
+import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/list/item/subtitle.dart';
 import 'package:mem/mems/states.dart';
-import 'package:mem/repositories/act_entity.dart';
-import 'package:mem/repositories/mem_entity.dart';
-import 'package:mem/repositories/mem_notification_entity.dart';
+import 'package:mem/acts/act_entity.dart';
+import 'package:mem/mems/mem_entity.dart';
+import 'package:mem/mems/mem_notification_entity.dart';
 import 'package:mem/values/colors.dart';
 
 import 'actions.dart';

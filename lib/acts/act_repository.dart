@@ -9,7 +9,7 @@ import 'package:mem/framework/repository/extra_column.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/repositories/act_entity.dart';
+import 'package:mem/acts/act_entity.dart';
 
 enum ActOrderBy { descStart }
 

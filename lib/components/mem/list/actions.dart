@@ -2,9 +2,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_item_repository.dart';
-import 'package:mem/repositories/mem_entity.dart';
-import 'package:mem/repositories/mem_item_entity.dart';
-import 'package:mem/repositories/mem_repository.dart';
+import 'package:mem/mems/mem_entity.dart';
+import 'package:mem/mems/mem_item_entity.dart';
+import 'package:mem/mems/mem_repository.dart';
 import 'package:mem/mems/states.dart';
 
 final loadMemList = FutureProvider(

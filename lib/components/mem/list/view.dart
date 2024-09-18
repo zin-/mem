@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/async_value_view.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/repositories/mem_entity.dart';
+import 'package:mem/mems/mem_entity.dart';
 
 import 'actions.dart';
 import 'states.dart';

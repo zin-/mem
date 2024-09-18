@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
-import 'package:mem/repositories/mem_item_entity.dart';
+import 'package:mem/mems/mem_item_entity.dart';
 
 const keyMemMemo = Key("mem-memo");
 

@@ -6,7 +6,7 @@ import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
-import 'package:mem/repositories/mem_entity.dart';
+import 'package:mem/mems/mem_entity.dart';
 
 class MemRepository extends DatabaseTupleRepository<MemEntity, SavedMemEntity> {
   MemRepository() : super(databaseDefinition, defTableMems);

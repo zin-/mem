@@ -1,11 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/core/mem_detail.dart';
+import 'package:mem/mems/mem_detail.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/mem_client.dart';
 import 'package:mem/mems/states.dart';
-import 'package:mem/repositories/mem_entity.dart';
-import 'package:mem/repositories/mem_notification_entity.dart';
+import 'package:mem/mems/mem_entity.dart';
+import 'package:mem/mems/mem_notification_entity.dart';
 
 final _memClient = MemClient();
 

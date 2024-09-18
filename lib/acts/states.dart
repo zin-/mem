@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/client.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/components/value_state_notifier.dart';
-import 'package:mem/core/act.dart';
+import 'package:mem/acts/act.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/repositories/act_entity.dart';
+import 'package:mem/acts/act_entity.dart';
 
 final _actsClient = ActsClient();
 

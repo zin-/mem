@@ -1,4 +1,4 @@
-import 'package:mem/core/mem_notification.dart';
+import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';

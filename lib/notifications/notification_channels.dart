@@ -2,8 +2,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/mem_notifications.dart';
-import 'package:mem/repositories/mem_notification_repository.dart';
-import 'package:mem/repositories/mem_repository.dart';
+import 'package:mem/mems/mem_notification_repository.dart';
+import 'package:mem/mems/mem_repository.dart';
 
 import 'notification/action.dart';
 import 'notification/notification.dart';

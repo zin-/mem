@@ -1,6 +1,6 @@
-import 'package:mem/core/mem_notification.dart';
-import 'package:mem/repositories/mem_entity.dart';
-import 'package:mem/repositories/mem_item_entity.dart';
+import 'package:mem/mems/mem_notification.dart';
+import 'package:mem/mems/mem_entity.dart';
+import 'package:mem/mems/mem_item_entity.dart';
 
 // FIXME 定義するべきではない気がする
 //  - Mem, MemItems, MemNotificationsの関係はどのレイヤーのもの？

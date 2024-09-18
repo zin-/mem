@@ -3,8 +3,8 @@ import 'package:mem/act_counter/home_widget.dart';
 
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
-import 'package:mem/repositories/act_entity.dart';
-import 'package:mem/repositories/mem_entity.dart';
+import 'package:mem/acts/act_entity.dart';
+import 'package:mem/mems/mem_entity.dart';
 
 class ActCounter implements HomeWidget {
   @override

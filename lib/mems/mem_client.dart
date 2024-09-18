@@ -1,11 +1,11 @@
-import 'package:mem/core/mem.dart';
-import 'package:mem/core/mem_detail.dart';
-import 'package:mem/core/mem_notification.dart';
+import 'package:mem/mems/mem.dart';
+import 'package:mem/mems/mem_detail.dart';
+import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/notification_client.dart';
-import 'package:mem/repositories/mem_entity.dart';
-import 'package:mem/repositories/mem_item_entity.dart';
-import 'package:mem/repositories/mem_notification_entity.dart';
+import 'package:mem/mems/mem_entity.dart';
+import 'package:mem/mems/mem_item_entity.dart';
+import 'package:mem/mems/mem_notification_entity.dart';
 
 import 'mem_service.dart';
 

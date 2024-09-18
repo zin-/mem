@@ -9,7 +9,7 @@ import 'package:mem/mems/detail/app_bar/remove_mem_action.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/detail/app_bar/transit_act_list_action.dart';
 import 'package:mem/mems/detail/app_bar/transit_chart_action.dart';
-import 'package:mem/repositories/mem_entity.dart';
+import 'package:mem/mems/mem_entity.dart';
 import 'package:mem/values/colors.dart';
 
 class MemDetailPage extends ConsumerWidget {
