@@ -9,7 +9,7 @@ import 'package:mem/values/paths.dart';
 import 'notification/notification.dart';
 import 'flutter_local_notifications_wrapper.dart';
 
-class NotificationRepository extends KeyWithValueRepository<NotificationV2, int>
+class NotificationRepository extends KeyWithValueRepository<Notification, int>
     with DiscardAll {
   final FlutterLocalNotificationsWrapper? _flutterLocalNotificationsWrapper =
       defaultTargetPlatform == TargetPlatform.android
@@ -17,7 +17,7 @@ class NotificationRepository extends KeyWithValueRepository<NotificationV2, int>
           : null;
 
   @override
-  Future<void> receive(NotificationV2 entity) => v(
+  Future<void> receive(Notification entity) => v(
         () async {
           if (await PermissionHandlerWrapper().grant(Permission.notification)) {
             await _flutterLocalNotificationsWrapper?.show(

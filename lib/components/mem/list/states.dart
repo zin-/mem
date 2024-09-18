@@ -253,11 +253,9 @@ final savedMemNotificationsProvider = StateNotifierProvider.autoDispose<
 
 final activeActsProvider = StateNotifierProvider.autoDispose<
     ListValueStateNotifier<SavedActEntity>, List<SavedActEntity>>(
-  (ref) => v(() => ListValueStateNotifier(
-        ref
-            .watch(actsProvider)
-            // .map((e) => e.toV1())
-            .where((act) => act.isActive)
-            .toList(),
-      )),
+  (ref) => v(
+    () => ListValueStateNotifier(
+      ref.watch(actsProvider).where((act) => act.isActive).toList(),
+    ),
+  ),
 );

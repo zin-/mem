@@ -44,20 +44,12 @@ Widget buildTestAppWithProvider(
       child: buildTestApp(widget),
     );
 
-class TestCaseV2<I> {
-  final I input;
-  final dynamic expected;
+class TestCase<INPUT, EXPECTED> {
+  final INPUT input;
+  final EXPECTED expected;
   final String? name;
 
-  TestCaseV2(this.input, this.expected, {this.name});
-}
-
-class TestCase<T> {
-  final String name;
-  final T input;
-  final Function(T input) verify;
-
-  TestCase(this.name, this.input, this.verify);
+  TestCase(this.input, this.expected, {this.name});
 }
 
 // Finders

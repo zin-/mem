@@ -3,7 +3,7 @@ import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
 
-class MemItemEntity extends MemItemV2 with Entity, Copyable<MemItemEntity> {
+class MemItemEntity extends MemItem with Entity, Copyable<MemItemEntity> {
   MemItemEntity(super.memId, super.type, super.value);
 
   MemItemEntity.fromMap(Map<String, dynamic> map)

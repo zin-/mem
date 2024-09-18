@@ -16,7 +16,7 @@ class NotificationChannels {
 
   late final Map<String, NotificationAction> actionMap;
 
-  Future<NotificationV2> buildNotification(
+  Future<Notification> buildNotification(
     NotificationType notificationType,
     int memId,
   ) =>
@@ -52,7 +52,7 @@ class NotificationChannels {
               break;
           }
 
-          return NotificationV2(
+          return Notification(
             notificationType.buildNotificationId(memId),
             title,
             body,

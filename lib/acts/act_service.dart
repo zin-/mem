@@ -27,9 +27,7 @@ class ActService {
             actOrderBy: ActOrderBy.descStart,
             offset: offset,
             limit: limit,
-          ))
-              // .map((e) => e.toV1())
-              .toList(),
+          )),
           await _actRepository.count(memId: memId),
         ),
         {

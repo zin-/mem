@@ -2,10 +2,10 @@ enum MemItemType {
   memo,
 }
 
-class MemItemV2 {
+class MemItem {
   final int? memId;
   final MemItemType type;
   final dynamic value;
 
-  MemItemV2(this.memId, this.type, this.value);
+  MemItem(this.memId, this.type, this.value);
 }
