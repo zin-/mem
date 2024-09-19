@@ -4,9 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:mem/acts/states.dart';
 import 'package:mem/components/mem/list/states.dart';
-import 'package:mem/core/act.dart';
+import 'package:mem/acts/act.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/repositories/mem.dart';
+import 'package:mem/mems/mem_entity.dart';
 
 import 'app_bar.dart';
 import 'item/builder.dart';
@@ -50,7 +50,7 @@ class ActList extends ConsumerWidget {
             _memId,
             ref.watch(dateViewProvider),
             ref.watch(timeViewProvider),
-            ref.watch(actListProvider(_memId)) ?? [],
+            ref.watch(actListProvider(_memId)),
             (_memId == null ? ref.watch(memListProvider) : []),
             _scrollController,
           );
@@ -66,7 +66,7 @@ class _ActList extends StatelessWidget {
   final bool _isDateView;
   final bool _isTimeView;
   final List<Act> _actList;
-  final List<SavedMem> _memList;
+  final List<SavedMemEntity> _memList;
   final ScrollController? _scrollController;
 
   const _ActList(
@@ -100,8 +100,11 @@ class _ActList extends StatelessWidget {
                     header: ActListSubHeader(e, _isDateView),
                     sliver: SliverList(
                       delegate: () {
-                        final builder =
-                            ActListItemBuilder(e, _memList, _isTimeView);
+                        final builder = ActListItemBuilder(
+                          e,
+                          _memList,
+                          _isTimeView,
+                        );
 
                         return SliverChildBuilderDelegate(
                           builder.build,

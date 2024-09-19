@@ -1,31 +1,54 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/act_counter/act_counter.dart';
-import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
-import 'package:mem/repositories/mem.dart';
+import 'package:mem/databases/table_definitions/base.dart';
+import 'package:mem/acts/act_entity.dart';
+import 'package:mem/mems/mem_entity.dart';
 
 void main() {
-  test(
-    ": constructor.",
-    () {
+  group('ActCounter.from', () {
+    test(": updatedAt is last act start.", () {
       const memId = 1;
       final zeroDate = DateTime(0);
       final oneDate = DateTime(1);
 
-      final savedMem = SavedMem("constructor", null, null)..id = memId;
+      final savedMem = SavedMemEntity("constructor", null, null)..id = memId;
       final acts = [
-        SavedAct(memId, DateAndTimePeriod(end: DateAndTime.now()))
-          ..createdAt = zeroDate
-          ..updatedAt = oneDate,
-        SavedAct(memId, DateAndTimePeriod.startNow())..createdAt = zeroDate,
+        SavedActEntity(memId, DateAndTimePeriod.startNow(), {
+          defPkId.name: 1,
+          defColCreatedAt.name: zeroDate,
+          defColUpdatedAt.name: oneDate
+        }),
+        SavedActEntity(memId, DateAndTimePeriod.startNow(),
+            {defPkId.name: 2, defColCreatedAt.name: zeroDate})
       ];
 
-      final actCounter = ActCounter(savedMem, acts);
+      final actCounter = ActCounter.from(savedMem, acts);
 
-      expect(actCounter.lastAct, equals(acts[0]));
-    },
-  );
+      expect(actCounter.updatedAt, equals(acts[0].period.start));
+    });
+    test(": updatedAt is last act end.", () {
+      const memId = 1;
+      final zeroDate = DateTime(0);
+      final oneDate = DateTime(1);
+
+      final savedMem = SavedMemEntity("constructor", null, null)..id = memId;
+      final acts = [
+        SavedActEntity(memId, DateAndTimePeriod(end: DateAndTime.now()), {
+          defPkId.name: 3,
+          defColCreatedAt.name: zeroDate,
+          defColUpdatedAt.name: oneDate
+        }),
+        SavedActEntity(memId, DateAndTimePeriod.startNow(),
+            {defPkId.name: 4, defColCreatedAt.name: zeroDate})
+      ];
+
+      final actCounter = ActCounter.from(savedMem, acts);
+
+      expect(actCounter.updatedAt, equals(acts[0].period.end));
+    });
+  });
 
   group('period', () {
     test(': startDate time is 5:00', () {

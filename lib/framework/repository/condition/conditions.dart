@@ -1,3 +1,4 @@
+import 'package:mem/framework/database/converter.dart';
 import 'package:mem/framework/database/definition/column/column_definition.dart';
 
 abstract class Condition {
@@ -7,19 +8,19 @@ abstract class Condition {
 }
 
 class Equals extends Condition {
-  final String _key;
+  final ColumnDefinition _columnDefinition;
   final dynamic _value;
 
-  Equals(this._key, this._value);
+  Equals(this._columnDefinition, this._value);
 
   @override
-  String where() => '$_key = ?';
+  String? where() => "${_columnDefinition.name} = ?";
 
   @override
-  List<Object?>? whereArgs() => [_value];
+  List<Object?>? whereArgs() => [DatabaseConverter().to(_value)];
 
   @override
-  String toString() => '$_key = $_value';
+  String toString() => "${_columnDefinition.name} = $_value";
 }
 
 class IsNull extends Condition {

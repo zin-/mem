@@ -9,7 +9,7 @@ import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/list/body.dart';
 import 'package:mem/mems/list/show_new_mem_fab.dart';
 import 'package:mem/mems/states.dart';
-import 'package:mem/repositories/mem.dart';
+import 'package:mem/mems/mem_entity.dart';
 
 import '../../integration_test/scenarios/helpers.dart';
 
@@ -18,13 +18,15 @@ void main() {
     final scrollController = ScrollController();
     final samples = List.generate(
       20,
-      (index) => SavedMem(
+      (index) => SavedMemEntity(
         'Hide & show ShowNewMemFab: mem name - $index',
         null,
         null,
       )
         ..id = index
-        ..createdAt = zeroDate,
+        ..createdAt = zeroDate
+        ..updatedAt = null
+        ..archivedAt = null,
     );
 
     await widgetTester.pumpWidget(ProviderScope(

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:mem/components/date_and_time/date_and_time_period_view.dart';
-import 'package:mem/core/act.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/acts/act_entity.dart';
 
 import 'editing_act_dialog.dart';
 
 class ActListItemView extends StatelessWidget {
-  final SavedAct _act;
+  final SavedActEntity _act;
 
   // Act一覧の要素に対してMemがあったら名前を表示するという実装は合っているだろうか？
   final String? _memName;

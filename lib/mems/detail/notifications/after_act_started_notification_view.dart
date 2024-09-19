@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/time_text_form_field.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
+import 'package:mem/mems/mem_notification_entity.dart';
 
 const keyMemAfterActStartedNotification =
     Key("mem-after-act-started-notification");
@@ -31,13 +32,19 @@ class AfterActStartedNotificationView extends ConsumerWidget {
             onTimeChanged: (picked) => ref
                 .read(memNotificationsByMemIdProvider(_memId).notifier)
                 .upsertAll(
-              [notification.copiedWith(time: () => picked)],
+              [
+                (notification as MemNotificationEntity)
+                    .copiedWith(time: () => picked)
+              ],
               (current, updating) => current.type == updating.type,
             ),
             onMessageChanged: (value) => ref
                 .read(memNotificationsByMemIdProvider(_memId).notifier)
                 .upsertAll(
-              [notification.copiedWith(message: () => value)],
+              [
+                (notification as MemNotificationEntity)
+                    .copiedWith(message: () => value)
+              ],
               (current, updating) => current.type == updating.type,
             ),
           );
