@@ -1,7 +1,8 @@
+import 'package:mem/framework/repository/entity.dart';
 import 'package:mem/framework/repository/key_with_value.dart';
 import 'package:mem/notifications/notification/channel.dart';
 
-class Notification extends KeyWithValue<int, Map<String, dynamic>> {
+class Notification with Entity, KeyWithValue<int, Map<String, dynamic>> {
   final String title;
   final String body;
   final NotificationChannel channel;
@@ -13,19 +14,13 @@ class Notification extends KeyWithValue<int, Map<String, dynamic>> {
     this.body,
     this.channel,
     this.payload,
-  ) : super(
-          id,
-          {
-            "title": title,
-            "body": body,
-            "channel": channel,
-            "payload": payload,
-          },
-        );
-
-  @override
-  String toString() => "${super.toString()}: ${{
-        "key": key,
-        "value": value,
-      }}";
+  ) {
+    key = id;
+    value = {
+      'title': title,
+      'body': body,
+      'channel': channel,
+      'payload': payload,
+    };
+  }
 }

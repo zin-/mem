@@ -3,12 +3,13 @@ import 'package:day_picker/day_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:mem/core/mem_notification.dart';
+import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
+import 'package:mem/mems/mem_notification_entity.dart';
 
 const keyMemRepeatByDaysOfWeekNotification =
-    Key("mem-repeat-by-days-of-week-notification");
+    Key('mem-repeat-by-days-of-week-notification');
 
 class MemRepeatByDaysOfWeekNotificationView extends ConsumerWidget {
   final int? _memId;
@@ -33,7 +34,11 @@ class MemRepeatByDaysOfWeekNotificationView extends ConsumerWidget {
                       (e) =>
                           daysOfWeek.singleWhereOrNull(
                               (element) => element.time == e) ??
-                          MemNotification.repeatByDayOfWeek(_memId, e),
+                          MemNotificationEntity.initialByType(
+                            _memId,
+                            MemNotificationType.repeatByDayOfWeek,
+                            time: () => e,
+                          ),
                     ),
                     (current, updating) =>
                         current.type == updating.type &&
@@ -43,12 +48,17 @@ class MemRepeatByDaysOfWeekNotificationView extends ConsumerWidget {
                         current.memId == _memId &&
                         !selected.contains(current.time),
                   ),
-              {'selected': selected, 'daysOfWeek': daysOfWeek},
+// coverage:ignore-start
+              {
+// coverage:ignore-end
+                'selected': selected,
+                'daysOfWeek': daysOfWeek,
+              },
             ),
           );
         },
         {
-          "_memId": _memId,
+          '_memId': _memId,
         },
       );
 }

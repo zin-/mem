@@ -4,14 +4,14 @@ import 'package:mem/components/hero_view.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
-import 'package:mem/repositories/mem.dart';
+import 'package:mem/mems/mem_entity.dart';
 
 Key keyMemName = const Key("mem-name");
 
 String _memNameTag(int? memId) => heroTag('mem-name', memId);
 
 class MemNameText extends StatelessWidget {
-  final SavedMem _mem;
+  final SavedMemEntity _mem;
 
   const MemNameText(this._mem, {super.key});
 

@@ -5,12 +5,12 @@ import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
 
-class DateAndTimeTextFormFieldV2 extends StatelessWidget {
+class DateAndTimeTextFormField extends StatelessWidget {
   final DateAndTime? _dateAndTime;
   final void Function(DateAndTime? pickedDateAndTime) _onChanged;
   final DateAndTimePeriod? _selectableRange;
 
-  const DateAndTimeTextFormFieldV2(
+  const DateAndTimeTextFormField(
     this._dateAndTime,
     this._onChanged, {
     super.key,

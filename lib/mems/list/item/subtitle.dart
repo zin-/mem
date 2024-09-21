@@ -3,12 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/components/mem/mem_period.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
-import 'package:mem/core/mem_notification.dart';
+import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/notifications/mem_notifications_text.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/states.dart';
-import 'package:mem/repositories/mem_notification.dart';
+import 'package:mem/mems/mem_notification_entity.dart';
 
 class MemListItemSubtitle extends ConsumerWidget {
   final int _memId;
@@ -22,7 +22,7 @@ class MemListItemSubtitle extends ConsumerWidget {
           ref.watch(memByMemIdProvider(_memId))?.period,
           ref.watch(
             memNotificationsByMemIdProvider(_memId).select(
-              (v) => v.whereType<SavedMemNotification>(),
+              (v) => v.whereType<SavedMemNotificationEntity>(),
             ),
           ),
         ),
@@ -35,7 +35,7 @@ class MemListItemSubtitle extends ConsumerWidget {
 class _MemListItemSubtitle extends StatelessWidget {
   final int _memId;
   final DateAndTimePeriod? _memPeriod;
-  final Iterable<SavedMemNotification> _savedMemNotifications;
+  final Iterable<MemNotification> _savedMemNotifications;
 
   const _MemListItemSubtitle(
     this._memId,

@@ -1,36 +1,28 @@
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/framework/repository/entity.dart';
 
-mixin SavedDatabaseTupleMixin<T> on EntityV1 {
-  late T id;
+mixin DatabaseTupleEntity<PrimaryKey> on Entity {
+  late PrimaryKey id;
   late DateTime createdAt;
-  DateTime? updatedAt;
-  DateTime? archivedAt;
+  late DateTime? updatedAt;
+  late DateTime? archivedAt;
 
   bool get isArchived => archivedAt != null;
 
-  void pack(Map<String, dynamic> tuple) {
-    id = tuple[defPkId.name];
-    createdAt = tuple[defColCreatedAt.name];
-    updatedAt = tuple[defColUpdatedAt.name];
-    archivedAt = tuple[defColArchivedAt.name];
+  DatabaseTupleEntity<PrimaryKey> withMap(Map<String, dynamic> map) {
+    id = map[defPkId.name];
+    createdAt = map[defColCreatedAt.name];
+    updatedAt = map[defColUpdatedAt.name];
+    archivedAt = map[defColArchivedAt.name];
+    return this;
   }
 
-  Map<String, dynamic> unpack() {
-    return {
+  @override
+  Map<String, dynamic> get toMap => super.toMap
+    ..addAll({
       defPkId.name: id,
       defColCreatedAt.name: createdAt,
       defColUpdatedAt.name: updatedAt,
       defColArchivedAt.name: archivedAt,
-    };
-  }
-
-  SavedDatabaseTupleMixin copiedFrom(SavedDatabaseTupleMixin origin) => this
-    ..id = origin.id
-    ..createdAt = origin.createdAt
-    ..updatedAt = origin.updatedAt
-    ..archivedAt = origin.archivedAt;
-
-  @override
-  String toString() => "${super.toString()}${unpack()}";
+    });
 }

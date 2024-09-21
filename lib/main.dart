@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:mem/act_counter/act_counter_repository.dart';
 import 'package:mem/act_counter/act_counter_client.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
-import 'package:mem/databases/definition.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/flutter_local_notifications_wrapper.dart';
 import 'package:mem/notifications/notification_actions.dart';
 import 'package:mem/notifications/notification_repository.dart';
-import 'package:mem/framework/repository/database_repository.dart';
-import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/router.dart';
 
 import 'application.dart';
@@ -17,7 +13,7 @@ Future<void> main({String? languageCode}) => i(
       () async {
         WidgetsFlutterBinding.ensureInitialized();
 
-        await NotificationRepository().checkNotification();
+        await NotificationRepository().ship();
 
         return _runApplication(languageCode: languageCode);
       },
@@ -50,7 +46,6 @@ Future<void> launchActCounterConfigure() => i(
 Future<void> onNotificationResponseReceived(dynamic details) => i(
       () async {
         WidgetsFlutterBinding.ensureInitialized();
-        await openDatabase();
 
         await onDidReceiveNotificationResponse(
           details,
@@ -90,9 +85,6 @@ Future<void> _runApplication({
 }) =>
     i(
       () async {
-        await openDatabase();
-        ActCounterRepository();
-
         runApp(
           MemApplication(
             initialPath: initialPath,
@@ -105,10 +97,6 @@ Future<void> _runApplication({
       },
     );
 
-// FIXME 先に初期化が必要なのではなく、Repositoryを利用する際に勝手に初期化されるようにする
-Future<void> openDatabase() async => DatabaseTupleRepository.databaseAccessor =
-    await DatabaseRepository().receive(databaseDefinition);
-
 // FIXME HomeWidget関連の処理、場所が適切ではない
 const uriSchema = 'mem';
 const appId = 'zin.playground.mem';
@@ -119,8 +107,6 @@ const memIdParamName = 'mem_id';
 Future<void> backgroundCallback(Uri? uri) => i(
       () async {
         if (uri != null && uri.scheme == uriSchema && uri.host == appId) {
-          await openDatabase();
-
           if (uri.pathSegments.contains(actCounter)) {
             final memId = uri.queryParameters[memIdParamName];
 

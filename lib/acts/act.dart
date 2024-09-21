@@ -1,12 +1,10 @@
 import 'dart:core';
 
-import 'package:mem/framework/repository/entity.dart';
-import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/logger/log_service.dart';
 
-import 'date_and_time/date_and_time_period.dart';
+import '../core/date_and_time/date_and_time_period.dart';
 
-class Act extends EntityV1 {
+class Act {
   final int memId;
   final DateAndTimePeriod period;
 
@@ -32,23 +30,4 @@ class Act extends EntityV1 {
         },
         {'a': a, 'b': b},
       );
-
-  @override
-  String toString() => "${super.toString()}: ${{
-        "memId": memId,
-        "period": period,
-      }}";
-}
-
-class SavedAct extends Act with SavedDatabaseTupleMixin<int> {
-  SavedAct(super.memId, super.period);
-
-  SavedAct copiedWith(DateAndTimePeriod Function()? period) => SavedAct(
-        memId,
-        period == null ? this.period : period(),
-      )
-        ..id = id
-        ..createdAt = createdAt
-        ..updatedAt = updatedAt
-        ..archivedAt = archivedAt;
 }
