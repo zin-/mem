@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/states.dart';
 import 'package:mem/components/date_and_time/date_and_time_period_view.dart';
+import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/acts/act_entity.dart';
 
 import 'actions.dart';
 import 'states.dart';
@@ -23,7 +23,7 @@ class EditingActDialog extends ConsumerWidget {
       (pickedPeriod) => v(
         () => ref.read(editingActProvider(_actId).notifier).updatedBy(
               editingAct.copiedWith(
-                period: pickedPeriod == null ? null : () => pickedPeriod,
+                pickedPeriod == null ? null : () => pickedPeriod,
               ),
             ),
         pickedPeriod,
@@ -33,16 +33,14 @@ class EditingActDialog extends ConsumerWidget {
           () => ref.read(actListProvider(editingAct.memId).notifier).upsertAll(
                 [ref.read(editAct(_actId))],
                 (tmp, item) =>
-                    tmp is SavedActEntity &&
-                    item is SavedActEntity &&
-                    tmp.id == item.id,
+                    tmp is SavedAct && item is SavedAct && tmp.id == item.id,
               )),
     );
   }
 }
 
 class _EditingActDialogComponent extends StatelessWidget {
-  final SavedActEntity _editingAct;
+  final SavedAct _editingAct;
   final Function(DateAndTimePeriod? picked) _onPeriodChanged;
   final Function() _onDeleteTapped;
   final Function() _onSaveTapped;

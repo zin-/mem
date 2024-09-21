@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mem/components/mem/mem_name.dart';
-import 'package:mem/mems/mem_item.dart';
+import 'package:mem/core/mem_item.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_items.dart';
@@ -91,11 +91,6 @@ void main() => group(
             testWidgets(
               ": create.",
               (widgetTester) async {
-                widgetTester.ignoreMockMethodCallHandler(
-                    MethodChannelMock.permissionHandler);
-                widgetTester.ignoreMockMethodCallHandler(
-                    MethodChannelMock.flutterLocalNotifications);
-
                 await runApplication();
                 await widgetTester.pumpAndSettle();
                 await widgetTester.tap(newMemFabFinder);
@@ -108,22 +103,27 @@ void main() => group(
                   enteringMemName,
                 );
                 await widgetTester.enterText(
-                    find.byKey(keyMemMemo), enteringMemMemo);
+                  find.byKey(keyMemMemo),
+                  enteringMemMemo,
+                );
                 await widgetTester.tap(find.byKey(keySaveMemFab));
                 await widgetTester.pump();
 
-                expect(find.text(l10n.saveMemSuccessMessage(enteringMemName)),
-                    findsOneWidget);
+                expect(
+                  find.text(l10n.saveMemSuccessMessage(enteringMemName)),
+                  findsOneWidget,
+                );
 
-                final getCreatedMem = Equals(defColMemsName, enteringMemName);
+                final getCreatedMem =
+                    Equals(defColMemsName.name, enteringMemName);
                 final mems = await dbA.select(defTableMems,
                     where: getCreatedMem.where(),
                     whereArgs: getCreatedMem.whereArgs());
                 expect(mems.length, 1);
                 final getCreatedMemItem = And([
-                  Equals(defFkMemItemsMemId, mems[0][defPkId.name]),
-                  Equals(defColMemItemsType, MemItemType.memo.name),
-                  Equals(defColMemItemsValue, enteringMemMemo)
+                  Equals(defFkMemItemsMemId.name, mems[0][defPkId.name]),
+                  Equals(defColMemItemsType.name, MemItemType.memo.name),
+                  Equals(defColMemItemsValue.name, enteringMemMemo)
                 ]);
                 final memItems = await dbA.select(defTableMemItems,
                     where: getCreatedMemItem.where(),
@@ -140,29 +140,37 @@ void main() => group(
             testWidgets(
               ': update.',
               (widgetTester) async {
-                widgetTester.ignoreMockMethodCallHandler(
-                    MethodChannelMock.permissionHandler);
-                widgetTester.ignoreMockMethodCallHandler(
-                    MethodChannelMock.flutterLocalNotifications);
-
                 await runApplication();
                 await widgetTester.pumpAndSettle();
+
                 await widgetTester.tap(find.text(insertedMemName));
                 await widgetTester.pumpAndSettle();
 
                 await widgetTester.tap(memNameOnDetailPageFinder);
                 await widgetTester.pump(waitShowSoftwareKeyboardDuration);
+
                 const enteringMemNameText =
-                    "$_scenarioName: Save: Update - mem name - entering";
+                    '$_scenarioName: Save: Update - mem name - entering';
                 await widgetTester.enterText(
-                    memNameOnDetailPageFinder, enteringMemNameText);
+                  memNameOnDetailPageFinder,
+                  enteringMemNameText,
+                );
                 await widgetTester.pumpAndSettle();
                 expect(find.text(enteringMemNameText), findsOneWidget);
 
                 await widgetTester.tap(saveMemFabFinder);
                 await widgetTester.pumpAndSettle();
-                const saveSuccessText = "Save success. $enteringMemNameText";
-                expect(find.text(saveSuccessText), findsOneWidget);
+                const saveSuccessText = 'Save success. $enteringMemNameText';
+                expect(
+                  find.text(saveSuccessText),
+                  findsOneWidget,
+                );
+
+                await widgetTester.pumpAndSettle(defaultDismissDuration);
+                expect(
+                  find.text(saveSuccessText),
+                  findsNothing,
+                );
 
                 await widgetTester.pageBack();
                 await widgetTester.pumpAndSettle();
@@ -176,49 +184,58 @@ void main() => group(
               },
             );
 
-            testWidgets(': twice on create.', retry: maxRetryCount,
-                (widgetTester) async {
-              widgetTester.ignoreMockMethodCallHandler(
-                  MethodChannelMock.permissionHandler);
-              widgetTester.ignoreMockMethodCallHandler(
-                  MethodChannelMock.flutterLocalNotifications);
+            testWidgets(
+              'twice on create.',
+              retry: 3,
+              (widgetTester) async {
+                await runApplication();
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(newMemFabFinder);
+                await widgetTester.pumpAndSettle();
+                const enteringMemName =
+                    "$saveMemName: twice on create - entering";
+                const enteringMemMemo =
+                    "$saveMemMemo: twice on create - entering";
+                await widgetTester.enterText(
+                  find.byKey(keyMemName),
+                  enteringMemName,
+                );
+                await widgetTester.enterText(
+                  find.byKey(keyMemMemo),
+                  enteringMemMemo,
+                );
+                await widgetTester.tap(find.byKey(keySaveMemFab));
+                await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
-              await runApplication();
-              await widgetTester.pumpAndSettle();
-              await widgetTester.tap(newMemFabFinder);
-              await widgetTester.pumpAndSettle();
-              const enteringMemName =
-                  "$saveMemName: twice on create - entering";
-              const enteringMemMemo =
-                  "$saveMemMemo: twice on create - entering";
-              await widgetTester.enterText(
-                  find.byKey(keyMemName), enteringMemName);
-              await widgetTester.enterText(
-                  find.byKey(keyMemMemo), enteringMemMemo);
-              await widgetTester.tap(find.byKey(keySaveMemFab));
-              await widgetTester.pumpAndSettle(waitSideEffectDuration);
+                const enteringMemMemo2 = "$enteringMemMemo - 2";
+                await widgetTester.enterText(
+                  find.byKey(keyMemMemo),
+                  enteringMemMemo2,
+                );
+                await widgetTester.tap(find.byKey(keySaveMemFab));
+                await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
-              const enteringMemMemo2 = "$enteringMemMemo - 2";
-              await widgetTester.enterText(
-                  find.byKey(keyMemMemo), enteringMemMemo2);
-              await widgetTester.tap(find.byKey(keySaveMemFab));
-              await widgetTester.pumpAndSettle(waitSideEffectDuration);
-
-              final getCreatedMem = Equals(defColMemsName, enteringMemName);
-              final mems = await dbA.select(defTableMems,
+                final getCreatedMem =
+                    Equals(defColMemsName.name, enteringMemName);
+                final mems = await dbA.select(
+                  defTableMems,
                   where: getCreatedMem.where(),
-                  whereArgs: getCreatedMem.whereArgs());
-              expect(mems.length, 1);
-              final getCreatedMemItem = And([
-                Equals(defFkMemItemsMemId, mems[0][defPkId.name]),
-                Equals(defColMemItemsType, MemItemType.memo.name)
-              ]);
-              final memItems = await dbA.select(defTableMemItems,
-                  where: getCreatedMemItem.where(),
-                  whereArgs: getCreatedMemItem.whereArgs());
-              expect(
-                  memItems.single[defColMemItemsValue.name], enteringMemMemo2);
-            });
+                  whereArgs: getCreatedMem.whereArgs(),
+                );
+                expect(mems.length, 1);
+                final getCreatedMemItem = And([
+                  Equals(defFkMemItemsMemId.name, mems[0][defPkId.name]),
+                  Equals(defColMemItemsType.name, MemItemType.memo.name),
+                ]);
+                final memItems = await dbA.select(defTableMemItems,
+                    where: getCreatedMemItem.where(),
+                    whereArgs: getCreatedMemItem.whereArgs());
+                expect(
+                  memItems.single[defColMemItemsValue.name],
+                  enteringMemMemo2,
+                );
+              },
+            );
 
             group(': Archive', () {
               const insertedMemName = "$saveMemName: Archive: inserted";
@@ -226,84 +243,94 @@ void main() => group(
               const archivedMemName = "$insertedMemName - archived";
 
               setUp(() async {
-                final unarchivedMemId = await dbA.insert(defTableMems, {
-                  defColMemsName.name: unarchivedMemName,
-                  defColCreatedAt.name: DateTime.now(),
-                });
-                await dbA.insert(defTableMemItems, {
-                  defFkMemItemsMemId.name: unarchivedMemId,
-                  defColMemItemsType.name: MemItemType.memo.name,
-                  defColMemItemsValue.name: insertedMemMemo,
-                  defColCreatedAt.name: zeroDate,
-                });
-                final archivedMemId = await dbA.insert(defTableMems, {
-                  defColMemsName.name: archivedMemName,
-                  defColCreatedAt.name: DateTime.now(),
-                  defColArchivedAt.name: DateTime.now(),
-                });
-                await dbA.insert(defTableMemItems, {
-                  defFkMemItemsMemId.name: archivedMemId,
-                  defColMemItemsType.name: MemItemType.memo.name,
-                  defColMemItemsValue.name: insertedMemMemo,
-                  defColCreatedAt.name: zeroDate,
-                });
+                await dbA.insert(
+                  defTableMems,
+                  {
+                    defColMemsName.name: unarchivedMemName,
+                    defColCreatedAt.name: DateTime.now(),
+                  },
+                );
+                await dbA.insert(
+                  defTableMems,
+                  {
+                    defColMemsName.name: archivedMemName,
+                    defColCreatedAt.name: DateTime.now(),
+                    defColArchivedAt.name: DateTime.now(),
+                  },
+                );
               });
 
-              testWidgets(": archive.", (widgetTester) async {
-                await runApplication();
-                await widgetTester.pumpAndSettle();
-                await widgetTester.tap(find.text(unarchivedMemName));
-                await widgetTester.pumpAndSettle();
+              testWidgets(
+                ": archive.",
+                (widgetTester) async {
+                  await runApplication();
+                  await widgetTester.pumpAndSettle();
+                  await widgetTester.tap(find.text(unarchivedMemName));
+                  await widgetTester.pumpAndSettle();
 
-                await widgetTester.tap(find.byIcon(Icons.more_vert));
-                await widgetTester.pumpAndSettle();
+                  await widgetTester.tap(find.byIcon(Icons.more_vert));
+                  await widgetTester.pumpAndSettle();
 
-                await widgetTester.tap(find.byIcon(Icons.archive));
-                await widgetTester.pumpAndSettle();
+                  await widgetTester.tap(find.byIcon(Icons.archive));
+                  await widgetTester.pumpAndSettle();
 
-                expect(find.text(unarchivedMemName), findsNothing);
-                expect(
+                  expect(
+                    find.text(unarchivedMemName),
+                    findsNothing,
+                  );
+                  expect(
                     find.text(l10n.archiveMemSuccessMessage(unarchivedMemName)),
-                    findsOneWidget);
+                    findsOneWidget,
+                  );
 
-                final findUnarchivedMem =
-                    Equals(defColMemsName, unarchivedMemName);
-                final mems = await dbA.select(defTableMems,
+                  final findUnarchivedMem =
+                      Equals(defColMemsName.name, unarchivedMemName);
+                  final mems = await dbA.select(
+                    defTableMems,
                     where: findUnarchivedMem.where(),
-                    whereArgs: findUnarchivedMem.whereArgs());
-                expect(mems.length, 1);
-                expect(mems.single[defColArchivedAt.name], isNotNull);
-              });
+                    whereArgs: findUnarchivedMem.whereArgs(),
+                  );
+                  expect(mems.length, 1);
+                  expect(mems.single[defColArchivedAt.name], isNotNull);
+                },
+              );
 
-              testWidgets(": unarchive.", (widgetTester) async {
-                await runApplication();
-                await widgetTester.pumpAndSettle();
-                await widgetTester.tap(filterListIconFinder);
-                await widgetTester.pumpAndSettle();
-                await widgetTester.tap(showArchiveSwitchFinder);
-                await widgetTester.pumpAndSettle();
-                await closeMemListFilter(widgetTester);
-                await widgetTester.pumpAndSettle();
-                await widgetTester.tap(find.text(archivedMemName));
-                await widgetTester.pumpAndSettle();
+              testWidgets(
+                ": unarchive.",
+                (widgetTester) async {
+                  await runApplication();
+                  await widgetTester.pumpAndSettle();
+                  await widgetTester.tap(filterListIconFinder);
+                  await widgetTester.pumpAndSettle();
+                  await widgetTester.tap(showArchiveSwitchFinder);
+                  await widgetTester.pumpAndSettle();
+                  await closeMemListFilter(widgetTester);
+                  await widgetTester.pumpAndSettle();
+                  await widgetTester.tap(find.text(archivedMemName));
+                  await widgetTester.pumpAndSettle();
 
-                await widgetTester.tap(find.byIcon(Icons.more_vert));
-                await widgetTester.pumpAndSettle();
+                  await widgetTester.tap(find.byIcon(Icons.more_vert));
+                  await widgetTester.pumpAndSettle();
 
-                await widgetTester.tap(find.byIcon(Icons.unarchive));
-                await widgetTester.pumpAndSettle();
+                  await widgetTester.tap(find.byIcon(Icons.unarchive));
+                  await widgetTester.pumpAndSettle();
 
-                expect(
+                  expect(
                     find.text(l10n.unarchiveMemSuccessMessage(archivedMemName)),
-                    findsOneWidget);
+                    findsOneWidget,
+                  );
 
-                final findArchivedMem = Equals(defColMemsName, archivedMemName);
-                final mems = await dbA.select(defTableMems,
+                  final findArchivedMem =
+                      Equals(defColMemsName.name, archivedMemName);
+                  final mems = await dbA.select(
+                    defTableMems,
                     where: findArchivedMem.where(),
-                    whereArgs: findArchivedMem.whereArgs());
-                expect(mems.length, 1);
-                expect(mems.single[defColArchivedAt.name], isNull);
-              });
+                    whereArgs: findArchivedMem.whereArgs(),
+                  );
+                  expect(mems.length, 1);
+                  expect(mems.single[defColArchivedAt.name], isNull);
+                },
+              );
             });
           },
         );
@@ -314,7 +341,7 @@ void main() => group(
             Future<List<Map<String, Object?>>> selectFromMemsWhereName(
               String name,
             ) async {
-              final where = Equals(defColMemsName, name);
+              final where = Equals(defColMemsName.name, name);
               return await dbA.select(
                 defTableMems,
                 where: where.where(),

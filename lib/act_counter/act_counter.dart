@@ -1,50 +1,39 @@
 import 'package:collection/collection.dart';
-import 'package:mem/act_counter/home_widget.dart';
 
+import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
-import 'package:mem/acts/act_entity.dart';
-import 'package:mem/mems/mem_entity.dart';
+import 'package:mem/framework/repository/entity.dart';
+import 'package:mem/repositories/mem.dart';
 
-class ActCounter implements HomeWidget {
-  @override
-  String get methodChannelName => 'zin.playground.mem/act_counter';
-
-  @override
-  String get initializeMethodName => 'initialize';
-
-  @override
-  String get widgetProviderName => 'ActCounterProvider';
-
+class ActCounter extends EntityV1 {
+  final SavedMem _mem;
+  final Iterable<SavedAct> _acts;
   final int memId;
   final String? name;
   final int? actCount;
-  final DateTime? updatedAt;
+  final SavedAct? lastAct;
 
-  ActCounter(this.memId, this.name, this.actCount, this.updatedAt);
+  ActCounter(this._mem, this._acts)
+      : memId = _mem.id,
+        name = _mem.name,
+        actCount = _acts.length,
+        lastAct = _acts
+            .sorted(
+              (a, b) => (a.updatedAt ?? a.createdAt)
+                  .compareTo(b.updatedAt ?? b.createdAt),
+            )
+            .lastOrNull;
 
-  ActCounter.from(
-    SavedMemEntity savedMem,
-    Iterable<SavedActEntity> savedActs,
-  )   : memId = savedMem.id,
-        name = savedMem.name,
-        actCount = savedActs.length,
-        updatedAt = savedActs
-                .sorted(
-                  (a, b) => (a.updatedAt ?? a.createdAt)
-                      .compareTo(b.updatedAt ?? b.createdAt),
-                )
-                .lastOrNull
-                ?.period
-                .end ??
-            savedActs
-                .sorted(
-                  (a, b) => (a.updatedAt ?? a.createdAt)
-                      .compareTo(b.updatedAt ?? b.createdAt),
-                )
-                .lastOrNull
-                ?.period
-                .start;
+  Map<String, dynamic> widgetData() => {
+        "memName-$memId": name,
+        "actCount-$memId": actCount,
+        "lastUpdatedAtSeconds-$memId": lastAct == null
+            ? null
+            : (lastAct?.period.end ?? lastAct?.period.start!)
+                ?.millisecondsSinceEpoch
+                .toDouble(),
+      };
 
   static DateAndTimePeriod period(DateAndTime startDate) {
     int startHour = 5;
@@ -69,4 +58,18 @@ class ActCounter implements HomeWidget {
       end: start.add(Duration(days: datePeriod)),
     );
   }
+}
+
+class InitializedActCounter extends ActCounter {
+  final int homeWidgetId;
+
+  InitializedActCounter(this.homeWidgetId, ActCounter actCounter)
+      : super(actCounter._mem, actCounter._acts);
+
+  @override
+  Map<String, dynamic> widgetData() => super.widgetData()
+    ..putIfAbsent(
+      "memId-$homeWidgetId",
+      () => memId,
+    );
 }

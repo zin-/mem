@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/created_and_updated_at_texts.dart';
-import 'package:mem/mems/mem.dart';
+import 'package:mem/core/mem.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/notifications/mem_notifications_view.dart';
 import 'package:mem/components/mem/mem_done_checkbox.dart';
@@ -72,9 +72,7 @@ class _MemDetailBodyComponent extends StatelessWidget {
             ),
             Padding(
               padding: pageBottomPadding,
-              child: CreatedAndUpdatedAtTexts(
-                _mem,
-              ),
+              child: CreatedAndUpdatedAtTexts(_mem),
             ),
           ],
         ),

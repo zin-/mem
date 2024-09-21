@@ -76,7 +76,6 @@ const waitShowSoftwareKeyboardDuration = Duration(milliseconds: 400);
 const waitSideEffectDuration = Duration(milliseconds: 700);
 final zeroDate = DateTime(0);
 const datePlaceHolder = "M/d/y";
-const maxRetryCount = 5;
 
 // Value builder
 int randomInt([int max = 42949671]) => Random().nextInt(max);

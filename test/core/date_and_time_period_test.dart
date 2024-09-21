@@ -266,7 +266,7 @@ void main() {
 
   group(": compare", () {
     for (var testCase in [
-      TestCase(
+      TestCaseV2(
         name: "both are not null",
         [
           DateAndTimePeriod.startNow(),
@@ -275,17 +275,17 @@ void main() {
         DateAndTimePeriod.startNow()
             .compareTo(DateAndTimePeriod(end: DateAndTime.now())),
       ),
-      TestCase(
+      TestCaseV2(
         name: "both are null",
         [null, null],
         0,
       ),
-      TestCase(
+      TestCaseV2(
         name: "a is null, b is not null",
         [null, DateAndTimePeriod.startNow()],
         1,
       ),
-      TestCase(
+      TestCaseV2(
         name: "a is not null, b is null",
         [DateAndTimePeriod.startNow(), null],
         -1,

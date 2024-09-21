@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:mem/acts/act_repository.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/acts/act_repository.dart';
-import 'package:mem/mems/mem_entity.dart';
-import 'package:mem/mems/mem_notification_entity.dart';
-import 'package:mem/mems/mem_notification_repository.dart';
-import 'package:mem/mems/mem_repository.dart';
+import 'package:mem/repositories/mem.dart';
+import 'package:mem/repositories/mem_notification.dart';
+import 'package:mem/repositories/mem_notification_repository.dart';
+import 'package:mem/repositories/mem_repository.dart';
 import 'package:mem/settings/client.dart';
 import 'package:mem/settings/keys.dart';
 import 'package:mem/values/constants.dart';
@@ -26,7 +26,7 @@ class NotificationClient {
 
   final ScheduleClient _scheduleClient;
   final NotificationRepository _notificationRepository;
-  final PreferenceClientRepository _preferenceClientRepository;
+  final PreferenceClient _preferenceClient;
   final MemRepository _memRepository;
   final MemNotificationRepository _memNotificationRepository;
 
@@ -34,7 +34,7 @@ class NotificationClient {
     this.notificationChannels,
     this._scheduleClient,
     this._notificationRepository,
-    this._preferenceClientRepository,
+    this._preferenceClient,
     this._memRepository,
     this._memNotificationRepository,
   );
@@ -46,7 +46,7 @@ class NotificationClient {
           NotificationChannels(buildL10n(context)),
           ScheduleClient(),
           NotificationRepository(),
-          PreferenceClientRepository(),
+          PreferenceClient(),
           MemRepository(),
           MemNotificationRepository(),
         ),
@@ -59,7 +59,7 @@ class NotificationClient {
   static void resetSingleton() => v(
         () {
           ScheduleClient.resetSingleton();
-          NotificationRepository.reset();
+          NotificationRepository.resetSingleton();
           _instance = null;
         },
         {
@@ -73,8 +73,7 @@ class NotificationClient {
   ) =>
       v(
         () async {
-          final savedMem =
-              await _memRepository.ship(id: memId).then((v) => v.singleOrNull);
+          final savedMem = await _memRepository.findOneBy(id: memId);
 
           if (savedMem == null || savedMem.isDone || savedMem.isArchived) {
             await cancelMemNotifications(memId);
@@ -126,31 +125,21 @@ class NotificationClient {
 
   Future<void> registerMemNotifications(
     int memId, {
-    SavedMemEntity? savedMem,
-    Iterable<SavedMemNotificationEntity>? savedMemNotifications,
+    SavedMem? savedMem,
+    Iterable<SavedMemNotification>? savedMemNotifications,
   }) =>
       v(
         () async {
-          final mem = savedMem ??
-              await _memRepository
-                  .ship(
-                    id: memId,
-                  )
-                  .then(
-                    (v) => v.single,
-                  );
-          if (mem!.isDone || mem.isArchived) {
+          final mem = savedMem ?? await _memRepository.shipById(memId);
+          if (mem.isDone || mem.isArchived) {
             cancelMemNotifications(memId);
           } else {
-            final latestAct = await ActRepository()
-                .ship(
-                  memId: memId,
-                  latestByMemIds: true,
-                )
-                .then((value) => value.singleOrNull);
+            final latestAct = await ActRepository().findOneBy(
+              memId: memId,
+              latest: true,
+            );
             final startOfDay =
-                (await _preferenceClientRepository.shipByKey(startOfDayKey))
-                        .value ??
+                (await _preferenceClient.shipByKey(startOfDayKey)).value ??
                     defaultStartOfDay;
             for (var schedule in [
               ...mem.periodSchedules(startOfDay),
@@ -158,7 +147,7 @@ class NotificationClient {
                 mem,
                 startOfDay,
                 savedMemNotifications ??
-                    await _memNotificationRepository.ship(memId: memId),
+                    await _memNotificationRepository.shipByMemId(memId),
                 latestAct,
                 DateTime.now(),
               )
@@ -200,7 +189,7 @@ class NotificationClient {
 
           final now = DateTime.now();
           final memNotifications =
-              await _memNotificationRepository.ship(memId: memId);
+              await _memNotificationRepository.shipByMemId(memId);
           for (var notification in memNotifications.where((element) =>
               element.isEnabled() && element.isAfterActStarted())) {
             await _scheduleClient.receive(
@@ -259,7 +248,7 @@ class NotificationClient {
   Future<bool> _shouldNotify(int memId) => v(
         () async {
           final savedMemNotifications =
-              await _memNotificationRepository.ship(memId: memId);
+              await MemNotificationRepository().shipByMemId(memId);
           final repeatByDayOfWeekMemNotifications = savedMemNotifications.where(
             (element) => element.isEnabled() && element.isRepeatByDayOfWeek(),
           );
@@ -278,11 +267,11 @@ class NotificationClient {
             (element) => element.isEnabled() && element.isRepeatByNDay(),
           );
           final lastActTime = await ActRepository()
-              .ship(memId: memId, latestByMemIds: true)
+              .findOneBy(memId: memId, latest: true)
               .then((value) =>
-                  value.singleOrNull?.period.end ??
+                  value?.period.end ??
                   // FIXME 永続化されている時点でstartは必ずあるので型で表現する
-                  value.singleOrNull?.period.start!);
+                  value?.period.start!);
 
           if (lastActTime != null) {
             if (Duration(

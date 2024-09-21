@@ -4,22 +4,22 @@ import 'package:mem/settings/preference.dart';
 import 'package:mem/settings/preference_key.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class PreferenceClientRepository
-    extends KeyWithValueRepository<PreferenceEntity, PreferenceKey> {
-  Future<PreferenceEntity<T>> shipByKey<T>(PreferenceKey<T> key) => v(
+class PreferenceClient
+    extends KeyWithValueRepository<Preference, PreferenceKey> {
+  Future<Preference<T>> shipByKey<T>(PreferenceKey<T> key) => v(
         () async {
           final saved = (await SharedPreferences.getInstance()).get(key.value);
 
-          return PreferenceEntity(
+          return Preference(
             key,
             key.deserialize(saved),
           );
         },
-        {'key': key},
+        key,
       );
 
   @override
-  Future<bool> receive(PreferenceEntity entity) => v(
+  Future<bool> receive(Preference entity) => v(
         () async {
           final serialized = entity.key.serialize(entity.value);
 
@@ -34,12 +34,18 @@ class PreferenceClientRepository
               throw UnimplementedError(); // coverage:ignore-line
           }
         },
-        {'entity': entity},
+        entity,
       );
 
   @override
-  Future<void> discard(PreferenceKey key) => v(
+  Future<bool> discard(PreferenceKey key) => v(
         () async => (await SharedPreferences.getInstance()).remove(key.value),
-        {'key': key},
+        key,
       );
+
+  PreferenceClient._();
+
+  static PreferenceClient? _instance;
+
+  factory PreferenceClient() => _instance ??= PreferenceClient._();
 }

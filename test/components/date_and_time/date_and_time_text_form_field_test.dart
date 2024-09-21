@@ -17,7 +17,7 @@ void main() {
   }) async {
     await widgetTester.pumpWidget(MaterialApp(
       home: Scaffold(
-        body: DateAndTimeTextFormField(
+        body: DateAndTimeTextFormFieldV2(
           dateAndTime,
           onChanged,
           selectableRange: selectableRange,

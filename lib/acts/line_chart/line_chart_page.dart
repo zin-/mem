@@ -29,9 +29,11 @@ class ActLineChartPage extends ConsumerWidget {
             child: AsyncValueView(
               loadActList(_memId),
               (loaded) => LineChartWrapper(
-                ActsSummary(ref
-                    .watch(actListProvider(_memId))
-                    .where((element) => element.memId == _memId)),
+                ActsSummary(
+                  ref
+                      .watch(actListProvider(_memId))
+                      .where((element) => element.memId == _memId),
+                ),
               ),
             ),
           ),

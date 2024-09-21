@@ -1,10 +1,10 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:mem/acts/act.dart';
-import 'package:mem/mems/mem_notification.dart';
+import 'package:mem/core/act.dart';
+import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/mem_entity.dart';
-import 'package:mem/mems/mem_notification_entity.dart';
+import 'package:mem/repositories/mem.dart';
+import 'package:mem/repositories/mem_notification.dart';
 
 import 'notification_client.dart';
 import 'notification/type.dart';
@@ -15,9 +15,9 @@ const memIdKey = 'memId';
 
 class MemNotifications {
   static Schedule periodicScheduleOf(
-    SavedMemEntity savedMem,
+    SavedMem savedMem,
     TimeOfDay startOfDay,
-    Iterable<SavedMemNotificationEntity> memNotifications,
+    Iterable<SavedMemNotification> memNotifications,
     Act? latestAct,
     DateTime now,
   ) =>
@@ -69,7 +69,7 @@ class MemNotifications {
           if (latestAct?.isActive == true) {
             return null;
           } else if (memNotifications
-              .whereType<SavedMemNotificationEntity>()
+              .whereType<SavedMemNotification>()
               .where((e) => !e.isAfterActStarted())
               .isNotEmpty) {
             final repeatAt = memNotifications

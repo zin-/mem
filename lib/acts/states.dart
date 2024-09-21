@@ -3,14 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/client.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/components/value_state_notifier.dart';
-import 'package:mem/acts/act.dart';
+import 'package:mem/core/act.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/acts/act_entity.dart';
 
 final _actsClient = ActsClient();
 
-final actsProvider = StateNotifierProvider<
-    ListValueStateNotifier<SavedActEntity>, List<SavedActEntity>>(
+final actsProvider =
+    StateNotifierProvider<ListValueStateNotifier<SavedAct>, List<SavedAct>>(
   (ref) => v(() => ListValueStateNotifier([])),
 );
 
@@ -56,7 +55,7 @@ final actListProvider = StateNotifierProvider.autoDispose
           final latest = await _actsClient.fetch(memId, 1);
           final c = ref.read(currentPage(memId));
 
-          ListWithTotalPage<SavedActEntity>? byPage;
+          ListWithTotalPage<SavedAct>? byPage;
           if (c != 1) {
             byPage = await _actsClient.fetch(memId, c);
           }
@@ -75,6 +74,7 @@ final actListProvider = StateNotifierProvider.autoDispose
         ref
             .watch(actsProvider)
             .where((act) => memId == null || act.memId == memId)
+            .toList()
             .sorted((a, b) => b.period.compareTo(a.period)),
       );
     },

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/components/timer.dart';
-import 'package:mem/mems/mem_notification.dart';
+import 'package:mem/core/mem_notification.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/base.dart';
@@ -175,8 +175,8 @@ void main() => group(
           () {
             testWidgets(
               'start.',
-              // 時間に関するテストなのでリトライ可能とする
-              retry: maxRetryCount,
+              // 時間に関するテストなので3回までリトライ可能とする
+              retry: 3,
               (widgetTester) async {
                 widgetTester.ignoreMockMethodCallHandler(
                     MethodChannelMock.flutterLocalNotifications);

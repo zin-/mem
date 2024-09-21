@@ -2,8 +2,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/mem_notifications.dart';
-import 'package:mem/mems/mem_notification_repository.dart';
-import 'package:mem/mems/mem_repository.dart';
+import 'package:mem/repositories/mem_notification_repository.dart';
+import 'package:mem/repositories/mem_repository.dart';
 
 import 'notification/action.dart';
 import 'notification/notification.dart';
@@ -22,9 +22,7 @@ class NotificationChannels {
   ) =>
       v(
         () async {
-          final title = await MemRepository()
-              .ship(id: memId)
-              .then((value) => value.single.name);
+          final title = (await MemRepository().shipById(memId)).name;
           String body;
           switch (notificationType) {
             case NotificationType.startMem:
@@ -34,13 +32,13 @@ class NotificationChannels {
               body = "end";
               break;
             case NotificationType.repeat:
-              body = ((await MemNotificationRepository().ship(memId: memId)))
+              body = ((await MemNotificationRepository().shipByMemId(memId)))
                       .singleWhereOrNull((element) => element.isRepeated())
                       ?.message ??
                   "Repeat";
               break;
             case NotificationType.afterActStarted:
-              body = ((await MemNotificationRepository().ship(memId: memId)))
+              body = ((await MemNotificationRepository().shipByMemId(memId)))
                   .singleWhere((element) => element.isAfterActStarted())
                   .message;
               break;

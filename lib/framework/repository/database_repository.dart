@@ -8,7 +8,8 @@ import 'package:mem/framework/database/factory.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/logger/log_service.dart';
 
-class DatabaseRepository extends Repository<DatabaseDefinition> {
+class DatabaseRepository extends Repository<DatabaseDefinition>
+    with Receiver<DatabaseDefinition, DatabaseAccessor> {
   static DatabaseRepository? _instance;
 
   final _cache = <String, DatabaseAccessor>{};
@@ -17,6 +18,7 @@ class DatabaseRepository extends Repository<DatabaseDefinition> {
 
   factory DatabaseRepository() => _instance ??= DatabaseRepository._();
 
+  @override
   Future<DatabaseAccessor> receive(DatabaseDefinition entity) => v(
         () async =>
             _cache[entity.name] ??
