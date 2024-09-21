@@ -1,26 +1,14 @@
 import 'package:collection/collection.dart';
 import 'package:intl/intl.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
+import 'package:mem/framework/repository/entity.dart';
 import 'package:mem/logger/log_service.dart';
 
 const _repeatedMessage = "Repeat";
 const _repeatByDayOfWeekMessage = "Repeat by day of week";
 const _afterActStartedMessage = "Finish?";
 
-enum MemNotificationType {
-  repeat,
-  repeatByNDay,
-  repeatByDayOfWeek,
-  afterActStarted;
-
-  factory MemNotificationType.fromName(String name) =>
-      MemNotificationType.values.singleWhere(
-        (element) => element.name == name,
-        orElse: () => throw Exception('Unexpected name: "$name".'),
-      );
-}
-
-class MemNotification {
+class MemNotification extends EntityV1 {
   // 未保存のMemに紐づくMemNotificationはmemIdをintで持つことができないため暫定的にnullableにしている
   final int? memId;
   final MemNotificationType type;
@@ -28,29 +16,6 @@ class MemNotification {
   final String message;
 
   MemNotification(this.memId, this.type, this.time, this.message);
-
-  static MemNotification initialByType(
-    int? memId,
-    MemNotificationType type, {
-    int? Function()? time,
-  }) {
-    switch (type) {
-// coverage:ignore-start
-      case MemNotificationType.repeat:
-        return MemNotification(
-            memId, type, time == null ? null : time(), _repeatedMessage);
-      case MemNotificationType.repeatByNDay:
-        return MemNotification(
-            memId, type, time == null ? 1 : time(), _repeatedMessage);
-      case MemNotificationType.repeatByDayOfWeek:
-        return MemNotification(memId, type, time == null ? null : time(),
-            _repeatByDayOfWeekMessage);
-      case MemNotificationType.afterActStarted:
-        return MemNotification(
-            memId, type, time == null ? null : time(), _afterActStartedMessage);
-// coverage:ignore-end
-    }
-  }
 
   bool isEnabled() => time != null;
 
@@ -61,6 +26,39 @@ class MemNotification {
   bool isRepeatByDayOfWeek() => type == MemNotificationType.repeatByDayOfWeek;
 
   bool isAfterActStarted() => type == MemNotificationType.afterActStarted;
+
+  factory MemNotification.repeated(int? memId) => MemNotification(
+      memId, MemNotificationType.repeat, null, _repeatedMessage);
+
+  factory MemNotification.repeatByNDay(int? memId) => MemNotification(
+      memId, MemNotificationType.repeatByNDay, 1, _repeatedMessage);
+
+  factory MemNotification.repeatByDayOfWeek(int? memId, int time) =>
+      MemNotification(memId, MemNotificationType.repeatByDayOfWeek, time,
+          _repeatByDayOfWeekMessage);
+
+  factory MemNotification.afterActStarted(int? memId) => MemNotification(memId,
+      MemNotificationType.afterActStarted, null, _afterActStartedMessage);
+
+  MemNotification copiedWith({
+    int Function()? memId,
+    int? Function()? time,
+    String Function()? message,
+  }) =>
+      MemNotification(
+        memId == null ? this.memId : memId(),
+        type,
+        time == null ? this.time : time(),
+        message == null ? this.message : message(),
+      );
+
+  @override
+  String toString() => "${super.toString()}: ${{
+        "memId": memId,
+        "type": type,
+        "time": time,
+        "message": message,
+      }}";
 
   static String? toOneLine(
     Iterable<MemNotification> memNotifications,
@@ -120,27 +118,20 @@ class MemNotification {
     String Function(String nDay, String at)
         buildRepeatEveryNDayNotificationText,
     String Function(DateAndTime dateAndTime) formatToTimeOfDay,
-  ) =>
-      v(
-        () {
-          if (repeatByNDay != null && (repeatByNDay.time ?? 0) > 1) {
-            return buildRepeatEveryNDayNotificationText(
-              repeatByNDay.time.toString(),
-              formatToTimeOfDay(
-                DateAndTime(0, 0, 0, 0, 0, repeat.time),
-              ),
-            );
-          } else {
-            return buildRepeatedNotificationText(formatToTimeOfDay(
-              DateAndTime(0, 0, 0, 0, 0, repeat.time),
-            ));
-          }
-        },
-        {
-          'repeat': repeat,
-          'repeatByNDay': repeatByNDay,
-        },
+  ) {
+    if (repeatByNDay != null && (repeatByNDay.time ?? 0) > 1) {
+      return buildRepeatEveryNDayNotificationText(
+        repeatByNDay.time.toString(),
+        formatToTimeOfDay(
+          DateAndTime(0, 0, 0, 0, 0, repeat.time),
+        ),
       );
+    } else {
+      return buildRepeatedNotificationText(formatToTimeOfDay(
+        DateAndTime(0, 0, 0, 0, 0, repeat.time),
+      ));
+    }
+  }
 
   static String _oneLineRepeatByDaysOfWeek(
     Iterable<MemNotification> repeatByDayOfWeeks,
@@ -156,9 +147,7 @@ class MemNotification {
               .map((e) => dateFormat.format(e))
               .join(", ");
         },
-        {
-          'repeatByDayOfWeeks': repeatByDayOfWeeks,
-        },
+        {'repeatByDayOfWeeks': repeatByDayOfWeeks},
       );
 
   static String _oneLineAfterAct(
@@ -167,4 +156,17 @@ class MemNotification {
   ) =>
       buildAfterActStartedNotificationText(DateFormat(DateFormat.HOUR24_MINUTE)
           .format(DateAndTime(0, 0, 0, 0, 0, afterActStarted.time)));
+}
+
+enum MemNotificationType {
+  repeat,
+  repeatByNDay,
+  repeatByDayOfWeek,
+  afterActStarted;
+
+  factory MemNotificationType.fromName(String name) =>
+      MemNotificationType.values.singleWhere(
+        (element) => element.name == name,
+        orElse: () => throw Exception('Unexpected name: "$name".'),
+      );
 }

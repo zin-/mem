@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/components/l10n.dart';
+import 'package:mem/core/mem_item.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
-import 'package:mem/mems/mem_item_entity.dart';
+import 'package:mem/mems/mem_item.dart';
 
 const keyMemMemo = Key("mem-memo");
 
@@ -20,8 +21,7 @@ class MemItemsFormFields extends ConsumerWidget {
             () => ref.read(memItemsByMemIdProvider(_memId).notifier).upsertAll(
               [previous.copiedWith(value: () => entered)],
               (current, updating) => current.type == updating.type &&
-                      (current is SavedMemItemEntity &&
-                          updating is SavedMemItemEntity)
+                      (current is SavedMemItem && updating is SavedMemItem)
                   ? current.id == updating.id
                   : true,
             ),
@@ -35,8 +35,8 @@ class MemItemsFormFields extends ConsumerWidget {
 }
 
 class _MemItemsFormFields extends StatelessWidget {
-  final List<MemItemEntity> _memItems;
-  final void Function(dynamic entered, MemItemEntity previous) _onChanged;
+  final List<MemItem> _memItems;
+  final void Function(dynamic entered, MemItem previous) _onChanged;
 
   const _MemItemsFormFields(this._memItems, this._onChanged);
 

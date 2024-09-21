@@ -6,14 +6,14 @@ import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/components/mem/mem_done_checkbox.dart';
 import 'package:mem/components/mem/mem_name.dart';
 import 'package:mem/components/timer.dart';
-import 'package:mem/mems/mem_notification.dart';
+import 'package:mem/core/act.dart';
+import 'package:mem/core/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/list/item/subtitle.dart';
 import 'package:mem/mems/states.dart';
-import 'package:mem/acts/act_entity.dart';
-import 'package:mem/mems/mem_entity.dart';
-import 'package:mem/mems/mem_notification_entity.dart';
+import 'package:mem/repositories/mem.dart';
+import 'package:mem/repositories/mem_notification.dart';
 import 'package:mem/values/colors.dart';
 
 import 'actions.dart';
@@ -40,7 +40,7 @@ class MemListItemView extends ConsumerWidget {
                     ? ref.read(doneMem(_memId))
                     : ref.read(undoneMem(_memId))
               ],
-              (tmp, item) => tmp is SavedMemEntity && item is SavedMemEntity
+              (tmp, item) => tmp is SavedMem && item is SavedMem
                   ? tmp.id == item.id
                   : false,
             );
@@ -65,16 +65,15 @@ class MemListItemView extends ConsumerWidget {
 
 class _MemListItemView extends ListTile {
   _MemListItemView(
-    SavedMemEntity mem,
-    SavedActEntity? activeAct,
+    SavedMem mem,
+    SavedAct? activeAct,
     Iterable<MemNotification> memNotifications,
     void Function(int memId) onTap,
     void Function(bool? value, int memId) onMemDoneCheckboxTapped,
-    void Function(SavedActEntity? act) onActButtonTapped,
+    void Function(SavedAct? act) onActButtonTapped,
   ) : super(
           leading: memNotifications
-                      .where((e) =>
-                          e is SavedMemNotificationEntity && e.isEnabled())
+                      .where((e) => e is SavedMemNotification && e.isEnabled())
                       .isEmpty &&
                   activeAct == null
               ? MemDoneCheckbox(
@@ -101,15 +100,13 @@ class _MemListItemView extends ListTile {
                 ),
           subtitle: mem.period == null &&
                   memNotifications
-                      .where((e) =>
-                          e is SavedMemNotificationEntity && e.isEnabled())
+                      .where((e) => e is SavedMemNotification && e.isEnabled())
                       .isEmpty
               ? null
               : MemListItemSubtitle(mem.id),
           isThreeLine: mem.period != null &&
               memNotifications
-                  .where(
-                      (e) => e is SavedMemNotificationEntity && e.isEnabled())
+                  .where((e) => e is SavedMemNotification && e.isEnabled())
                   .isNotEmpty,
           tileColor: mem.isArchived ? secondaryGreyColor : null,
           onTap: () => onTap(mem.id),

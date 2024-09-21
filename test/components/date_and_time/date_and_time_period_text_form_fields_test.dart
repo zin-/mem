@@ -12,14 +12,14 @@ void main() {
 
   for (final testCase in [
     TestCase(
-      name: 'pick start',
+      'pick start',
       DateAndTimePeriod(start: DateAndTime.from(now)),
-      null,
+      (input) => null,
     ),
     TestCase(
-      name: 'pick end',
+      'pick end',
       DateAndTimePeriod(end: DateAndTime.from(now)),
-      null,
+      (input) => null,
     ),
   ]) {
     testWidgets(

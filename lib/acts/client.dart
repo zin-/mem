@@ -1,8 +1,8 @@
 import 'package:mem/acts/act_service.dart';
+import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/notification_client.dart';
-import 'package:mem/acts/act_entity.dart';
 
 class ListWithTotalPage<T> {
   final List<T> list;
@@ -16,7 +16,7 @@ class ActsClient {
 
   final NotificationClient _notificationClient;
 
-  Future<ListWithTotalPage<SavedActEntity>> fetch(
+  Future<ListWithTotalPage<SavedAct>> fetch(
     int? memId,
     int page,
   ) =>
@@ -43,7 +43,7 @@ class ActsClient {
         },
       );
 
-  Future<SavedActEntity> start(
+  Future<SavedAct> start(
     int memId,
     DateAndTime when,
   ) =>
@@ -61,8 +61,8 @@ class ActsClient {
         },
       );
 
-  Future<SavedActEntity> edit(
-    SavedActEntity savedAct,
+  Future<SavedAct> edit(
+    SavedAct savedAct,
   ) =>
       i(
         () async {
@@ -81,7 +81,7 @@ class ActsClient {
         },
       );
 
-  Future<void> pause(
+  Future pause(
     int memId,
     DateAndTime when,
   ) =>
@@ -97,7 +97,7 @@ class ActsClient {
         },
       );
 
-  Future<SavedActEntity> finish(
+  Future<SavedAct> finish(
     int memId,
     DateAndTime when,
   ) =>
@@ -117,7 +117,7 @@ class ActsClient {
         },
       );
 
-  Future<SavedActEntity> delete(int actId) => i(
+  Future<SavedAct> delete(int actId) => i(
         () async {
           final deleted = await _actService.delete(actId);
 

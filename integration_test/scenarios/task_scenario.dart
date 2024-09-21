@@ -9,6 +9,7 @@ import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/databases/definition.dart';
+import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/logger/log.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/notification_client.dart';
@@ -340,63 +341,70 @@ void testTaskScenario() => group(': $_scenarioName', () {
             },
           );
 
-          testWidgets(': start is not all day, end is all day.',
-              (widgetTester) async {
-            widgetTester.ignoreMockMethodCallHandler(
-                MethodChannelMock.permissionHandler);
+          testWidgets(
+            ": start is not all day, end is all day.",
+            (widgetTester) async {
+              await PreferenceClient().receive(Preference(
+                startOfDayKey,
+                const TimeOfDay(hour: 1, minute: 0),
+              ));
 
-            await PreferenceClientRepository().receive(PreferenceEntity(
-                startOfDayKey, const TimeOfDay(hour: 1, minute: 0)));
+              await runApplication();
+              await widgetTester.pumpAndSettle();
+              await widgetTester.tap(newMemFabFinder);
+              await widgetTester.pumpAndSettle();
+              await widgetTester.tap(calendarIconFinder.at(0));
+              await widgetTester.pumpAndSettle();
+              await widgetTester.tap(find.byIcon(Icons.chevron_right).at(0));
+              await widgetTester.pumpAndSettle();
+              const pickingDate = 1;
+              await widgetTester.tap(find.text("$pickingDate"));
+              await widgetTester.tap(okFinder);
+              await widgetTester.pumpAndSettle();
 
-            await runApplication();
-            await widgetTester.pumpAndSettle();
-            await widgetTester.tap(newMemFabFinder);
-            await widgetTester.pumpAndSettle();
-            await widgetTester.tap(calendarIconFinder.at(0));
-            await widgetTester.pumpAndSettle();
-            await widgetTester.tap(find.byIcon(Icons.chevron_right).at(0));
-            await widgetTester.pumpAndSettle();
-            const pickingDate = 1;
-            await widgetTester.tap(find.text("$pickingDate"));
-            await widgetTester.tap(okFinder);
-            await widgetTester.pumpAndSettle();
+              await widgetTester.tap(find.byType(Switch).at(0));
+              await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.byType(Switch).at(0));
-            await widgetTester.pumpAndSettle();
+              await widgetTester.tap(okFinder);
+              await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(okFinder);
-            await widgetTester.pumpAndSettle();
+              await widgetTester.tap(calendarIconFinder.at(1));
+              await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(calendarIconFinder.at(1));
-            await widgetTester.pumpAndSettle();
+              await widgetTester.tap(find.text("$pickingDate"));
+              await widgetTester.tap(okFinder);
+              await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.text("$pickingDate"));
-            await widgetTester.tap(okFinder);
-            await widgetTester.pumpAndSettle();
-
-            final now = DateTime.now();
-            final endDate = DateTime(now.year, now.month + 1, pickingDate);
-            expect(
+              final now = DateTime.now();
+              final endDate = DateTime(now.year, now.month + 1, pickingDate);
+              expect(
                 (widgetTester.widget(find.byType(TextFormField).at(3))
                         as TextFormField)
                     .initialValue,
-                dateText(endDate));
+                dateText(endDate),
+              );
 
-            const enteringMemName =
-                "$_scenarioName: Save Period: start is not all day, end is all day - mem name - entering";
-            await widgetTester.enterText(
-                memNameOnDetailPageFinder, enteringMemName);
-            await widgetTester.tap(saveMemFabFinder);
-            await widgetTester.pumpAndSettle();
+              const enteringMemName =
+                  "$_scenarioName: Save Period: start is not all day, end is all day - mem name - entering";
+              await widgetTester.enterText(
+                memNameOnDetailPageFinder,
+                enteringMemName,
+              );
+              await widgetTester.tap(saveMemFabFinder);
+              await widgetTester.pumpAndSettle();
 
-            await PreferenceClientRepository().discard(startOfDayKey);
-
-            final savedMems = (await dbA.select(defTableMems,
+              final savedMems = (await dbA.select(
+                defTableMems,
                 where: "${defColMemsName.name} = ?",
-                whereArgs: [enteringMemName]));
-            expect(savedMems, hasLength(1));
-            expect(savedMems.single[defColMemsEndOn.name], equals(endDate));
-          });
+                whereArgs: [enteringMemName],
+              ));
+              expect(savedMems, hasLength(1));
+              expect(
+                savedMems.single[defColMemsEndOn.name],
+                equals(endDate),
+              );
+            },
+          );
         },
       );
 
@@ -417,6 +425,8 @@ void testTaskScenario() => group(': $_scenarioName', () {
           testWidgets(
             'not notify on active act.',
             (widgetTester) async {
+              DatabaseTupleRepository.databaseAccessor = dbA;
+
               widgetTester.setMockMethodCallHandler(
                 MethodChannelMock.flutterLocalNotifications,
                 [],

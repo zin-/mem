@@ -3,19 +3,14 @@ import 'package:mem/settings/preference.dart';
 import 'package:mem/settings/client.dart';
 import 'package:mem/settings/preference_key.dart';
 
-final _client = PreferenceClientRepository();
+final _client = PreferenceClient();
 
-Future<T?> loadByKey<T>(
-  PreferenceKey<T> key,
-) =>
-    v(
+Future<T?> loadByKey<T>(PreferenceKey<T> key) => v(
       () async => (await _client.shipByKey(key)).value,
-      {
-        'key': key,
-      },
+      {"key": key},
     );
 
-Future<void> update<Key extends PreferenceKey<Value>, Value>(
+Future<bool> update<Key extends PreferenceKey<Value>, Value>(
   Key key,
   Value? value,
 ) =>
@@ -24,9 +19,6 @@ Future<void> update<Key extends PreferenceKey<Value>, Value>(
 // coverage:ignore-start
           ? _client.discard(key)
 // coverage:ignore-end
-          : _client.receive(PreferenceEntity(key, value))),
-      {
-        'key': key,
-        'value': value,
-      },
+          : _client.receive(Preference(key, value))),
+      {"key": key, "value": value},
     );

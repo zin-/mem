@@ -1,11 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/acts/act_repository.dart';
 import 'package:mem/components/mem/list/states.dart';
-import 'package:mem/acts/act.dart';
+import 'package:mem/core/act.dart';
 import 'package:mem/core/date_and_time/date_and_time.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/acts/act_entity.dart';
-import 'package:mem/acts/act_repository.dart';
 
 import 'client.dart';
 import 'states.dart';
@@ -13,8 +12,7 @@ import 'states.dart';
 final _actsClient = ActsClient();
 final _actRepository = ActRepository();
 
-final loadActList =
-    FutureProvider.autoDispose.family<List<SavedActEntity>, int?>(
+final loadActList = FutureProvider.autoDispose.family<List<SavedAct>, int?>(
   (ref, memId) => v(
     () async {
       // TODO 全件取得する場合、件数的な不安がある
@@ -29,7 +27,7 @@ final loadActList =
       return acts;
     },
     {
-      'memId': memId,
+      "memId": memId,
     },
   ),
 );
@@ -55,7 +53,7 @@ final startActBy = Provider.autoDispose.family<Act, int>(
   ),
 );
 
-final finishActBy = Provider.autoDispose.family<SavedActEntity, int>(
+final finishActBy = Provider.autoDispose.family<SavedAct, int>(
   (ref, memId) => v(
     () {
       final now = DateAndTime.now();

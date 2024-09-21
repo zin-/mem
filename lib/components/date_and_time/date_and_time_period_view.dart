@@ -58,7 +58,7 @@ class DateAndTimePeriodTextFormFields extends StatelessWidget {
           direction: Axis.vertical,
           mainAxisSize: MainAxisSize.min,
           children: [
-            DateAndTimeTextFormField(
+            DateAndTimeTextFormFieldV2(
               _dateAndTimePeriod?.start,
               (pickedDateAndTime) => v(
                 () =>
@@ -76,7 +76,7 @@ class DateAndTimePeriodTextFormFields extends StatelessWidget {
                       end: _dateAndTimePeriod?.end,
                     ),
             ),
-            DateAndTimeTextFormField(
+            DateAndTimeTextFormFieldV2(
               _dateAndTimePeriod?.end,
               (pickedDateAndTime) => v(
                 () => _dateAndTimePeriod?.start == null &&

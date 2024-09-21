@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mem/mems/mem.dart';
+import 'package:mem/core/mem.dart';
 import 'package:mem/components/hero_view.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/mem_entity.dart';
+import 'package:mem/repositories/mem.dart';
 
 class MemDoneCheckbox extends StatelessWidget {
   final Mem _mem;
@@ -19,11 +19,11 @@ class MemDoneCheckbox extends StatelessWidget {
         () => HeroView(
           heroTag(
             'mem-done',
-            _mem is SavedMemEntity ? _mem.id : null,
+            _mem is SavedMem ? _mem.id : null,
           ),
           Checkbox(
             value: _mem.isDone,
-            onChanged: (_mem is SavedMemEntity ? _mem.isArchived : false)
+            onChanged: (_mem is SavedMem ? _mem.isArchived : false)
                 ? null
                 : _onChanged,
           ),

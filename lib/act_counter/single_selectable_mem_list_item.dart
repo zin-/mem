@@ -4,7 +4,7 @@ import 'package:mem/components/mem/list/states.dart';
 import 'package:mem/components/mem/mem_name.dart';
 import 'package:mem/components/mem/mem_period.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/mem_entity.dart';
+import 'package:mem/repositories/mem.dart';
 
 import 'states.dart';
 
@@ -31,7 +31,7 @@ class SingleSelectableMemListItem extends ConsumerWidget {
 
 class _SingleSelectableMemListItemComponent extends ListTile {
   _SingleSelectableMemListItemComponent(
-    SavedMemEntity mem,
+    SavedMem mem,
     bool isSelected,
     void Function(int? memId) onSelected,
   ) : super(

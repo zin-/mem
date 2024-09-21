@@ -1,32 +1,29 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/mems/mem_item.dart';
-import 'package:mem/mems/mem_notification.dart';
+import 'package:mem/core/mem.dart';
+import 'package:mem/core/mem_item.dart';
+import 'package:mem/core/mem_notification.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/components/value_state_notifier.dart';
+import 'package:mem/mems/mem_item.dart';
 import 'package:mem/mems/mem_item_repository.dart';
 import 'package:mem/mems/states.dart';
-import 'package:mem/mems/mem_entity.dart';
-import 'package:mem/mems/mem_item_entity.dart';
-import 'package:mem/mems/mem_notification_entity.dart';
-import 'package:mem/mems/mem_notification_repository.dart';
+import 'package:mem/repositories/mem_notification.dart';
+import 'package:mem/repositories/mem_notification_repository.dart';
 
 final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
-    .family<ValueStateNotifier<MemEntity>, MemEntity, int?>(
+    .family<ValueStateNotifier<Mem>, Mem, int?>(
   (ref, memId) => v(
-    () {
-      final mem = ref.watch(memByMemIdProvider(memId));
-      return ValueStateNotifier(
-        mem ?? MemEntity("", null, null),
-      );
-    },
+    () => ValueStateNotifier(
+      ref.watch(memByMemIdProvider(memId)) ?? Mem.defaultNew(),
+    ),
     {"memId": memId},
   ),
 );
 
 final memItemsByMemIdProvider = StateNotifierProvider.family<
-    ListValueStateNotifier<MemItemEntity>, List<MemItemEntity>, int?>(
+    ListValueStateNotifier<MemItem>, List<MemItem>, int?>(
   (ref, memId) => v(
     () => ListValueStateNotifier(
       [
@@ -37,21 +34,21 @@ final memItemsByMemIdProvider = StateNotifierProvider.family<
                 ),
               ),
             ) ??
-            MemItemEntity(memId, MemItemType.memo, "")
+            MemItem.memo(memId),
       ],
       initializer: (current, notifier) async {
         if (memId != null) {
           ref.read(memItemsProvider.notifier).upsertAll(
-                await MemItemRepository().ship(memId: memId),
+                await MemItemRepository().shipByMemId(memId),
                 (current, updating) =>
-                    current is SavedMemItemEntity &&
-                    updating is SavedMemItemEntity &&
+                    current is SavedMemItem &&
+                    updating is SavedMemItem &&
                     current.id == updating.id,
               );
         }
       },
     ),
-    {'memId': memId},
+    {"memId": memId},
   ),
 );
 
@@ -106,23 +103,20 @@ final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
         [
           ...memNotificationsByMemId,
           if (memNotificationsByMemId.every((element) => !element.isRepeated()))
-            MemNotificationEntity.initialByType(
-                memId, MemNotificationType.repeat),
+            MemNotification.repeated(memId),
           if (memNotificationsByMemId
               .every((element) => !element.isRepeatByNDay()))
-            MemNotificationEntity.initialByType(
-                memId, MemNotificationType.repeatByNDay),
+            MemNotification.repeatByNDay(memId),
           if (memNotificationsByMemId
               .every((element) => !element.isAfterActStarted()))
-            MemNotificationEntity.initialByType(
-                memId, MemNotificationType.afterActStarted),
+            MemNotification.afterActStarted(memId),
         ],
         initializer: (current, notifier) => v(
           () async {
             if (memId != null &&
-                current.whereType<SavedMemNotificationEntity>().isEmpty) {
+                current.whereType<SavedMemNotification>().isEmpty) {
               ref.read(memNotificationsProvider.notifier).upsertAll(
-                    await MemNotificationRepository().ship(memId: memId),
+                    await MemNotificationRepository().shipByMemId(memId),
                     (current, updating) => updating.isRepeatByDayOfWeek()
                         ? current.memId == updating.memId &&
                             current.type == updating.type &&

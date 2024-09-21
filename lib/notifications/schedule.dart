@@ -4,7 +4,7 @@ import 'package:mem/notifications/notification_client.dart';
 import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/type.dart';
 
-abstract class Schedule with Entity {
+abstract class Schedule extends Entity {
   final int id;
 
   Schedule(this.id);
@@ -35,9 +35,9 @@ abstract class Schedule with Entity {
       );
 
   @override
-  Map<String, dynamic> get toMap => {
-        'id': id,
-      };
+  String toString() => "${super.toString()}: ${{
+        "id": id,
+      }}";
 }
 
 class CancelSchedule extends Schedule {
@@ -55,11 +55,10 @@ class TimedSchedule extends Schedule {
   );
 
   @override
-  Map<String, dynamic> get toMap => super.toMap
-    ..addAll({
-      'startAt': startAt,
-      'params': params,
-    });
+  String toString() => "${super.toString()}${{
+        "startAt": startAt,
+        "params": params,
+      }}";
 }
 
 class PeriodicSchedule extends TimedSchedule {
@@ -73,8 +72,5 @@ class PeriodicSchedule extends TimedSchedule {
   );
 
   @override
-  Map<String, dynamic> get toMap => super.toMap
-    ..addAll({
-      'duration': duration,
-    });
+  String toString() => "${super.toString()}${{"duration": duration}}";
 }
