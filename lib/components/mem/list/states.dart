@@ -1,8 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/acts/act_repository.dart';
 import 'package:mem/acts/states.dart';
-import 'package:mem/core/act.dart';
+import 'package:mem/acts/act.dart';
 import 'package:mem/core/date_and_time/date_and_time_period.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/components/value_state_notifier.dart';
@@ -10,9 +9,11 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/list/states.dart';
 import 'package:mem/mems/states.dart';
 import 'package:mem/notifications/mem_notifications.dart';
-import 'package:mem/repositories/mem.dart';
-import 'package:mem/repositories/mem_notification.dart';
-import 'package:mem/repositories/mem_notification_repository.dart';
+import 'package:mem/acts/act_entity.dart';
+import 'package:mem/acts/act_repository.dart';
+import 'package:mem/mems/mem_entity.dart';
+import 'package:mem/mems/mem_notification_entity.dart';
+import 'package:mem/mems/mem_notification_repository.dart';
 import 'package:mem/settings/states.dart';
 
 final showNotArchivedProvider =
@@ -39,9 +40,9 @@ final showDoneProvider = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
   ),
 );
 final _filteredMemsProvider = StateNotifierProvider.autoDispose<
-    ListValueStateNotifier<SavedMem>, List<SavedMem>>(
+    ListValueStateNotifier<SavedMemEntity>, List<SavedMemEntity>>(
   (ref) {
-    final savedMems = ref.watch(memsProvider).map((e) => e as SavedMem);
+    final savedMems = ref.watch(memsProvider).whereType<SavedMemEntity>();
 
     final showNotArchived = ref.watch(showNotArchivedProvider);
     final showArchived = ref.watch(showArchivedProvider);
@@ -85,7 +86,7 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
 );
 
 final memListProvider = StateNotifierProvider.autoDispose<
-    ValueStateNotifier<List<SavedMem>>, List<SavedMem>>((ref) {
+    ValueStateNotifier<List<SavedMemEntity>>, List<SavedMemEntity>>((ref) {
   final filtered = ref.watch(_filteredMemsProvider);
   final latestActsByMem = ref.watch(latestActsByMemProvider);
   final savedMemNotifications = ref.watch(savedMemNotificationsProvider);
@@ -97,8 +98,10 @@ final memListProvider = StateNotifierProvider.autoDispose<
             latestActsByMem.singleWhereOrNull((act) => act.memId == a.id);
         final latestActOfB =
             latestActsByMem.singleWhereOrNull((act) => act.memId == b.id);
-        final comparedByActiveAct =
-            Act.activeCompare(latestActOfA, latestActOfB);
+        final comparedByActiveAct = Act.activeCompare(
+          latestActOfA,
+          latestActOfB,
+        );
         if (comparedByActiveAct != 0) {
           return comparedByActiveAct;
         }
@@ -180,7 +183,7 @@ int _compareTime(
     );
 
 final latestActsByMemProvider = StateNotifierProvider.autoDispose<
-    ListValueStateNotifier<SavedAct>, List<SavedAct>>(
+    ListValueStateNotifier<SavedActEntity>, List<SavedActEntity>>(
   (ref) => v(
     () => ListValueStateNotifier(
       ref.watch(
@@ -196,15 +199,15 @@ final latestActsByMemProvider = StateNotifierProvider.autoDispose<
       initializer: (current, notifier) => v(
         () async {
           if (current.isEmpty) {
-            final memIds =
-                ref.read(memsProvider).whereType<SavedMem>().map((e) => e.id);
-
-            final actsByMemIds = await ActRepository().ship(
-              memIdsIn: memIds,
-              latestByMemIds: true,
-            );
-
-            ref.read(actsProvider.notifier).addAll(actsByMemIds);
+            ref.read(actsProvider.notifier).addAll(
+                  await ActRepository().ship(
+                    memIdsIn: ref
+                        .read(memsProvider)
+                        .whereType<SavedMemEntity>()
+                        .map((e) => e.id),
+                    latestByMemIds: true,
+                  ),
+                );
           }
         },
         {'current': current},
@@ -213,18 +216,21 @@ final latestActsByMemProvider = StateNotifierProvider.autoDispose<
   ),
 );
 final savedMemNotificationsProvider = StateNotifierProvider.autoDispose<
-    ListValueStateNotifier<SavedMemNotification>, List<SavedMemNotification>>(
+    ListValueStateNotifier<SavedMemNotificationEntity>,
+    List<SavedMemNotificationEntity>>(
   (ref) => v(
     () => ListValueStateNotifier(
       ref.watch(
         memNotificationsProvider.select(
-            (value) => value.whereType<SavedMemNotification>().toList()),
+            (value) => value.whereType<SavedMemNotificationEntity>().toList()),
       ),
       initializer: (current, notifier) => v(
         () async {
           if (current.isEmpty) {
-            final memIds =
-                ref.read(memsProvider).whereType<SavedMem>().map((e) => e.id);
+            final memIds = ref
+                .read(memsProvider)
+                .whereType<SavedMemEntity>()
+                .map((e) => e.id);
 
             final actsByMemIds = await MemNotificationRepository().ship(
               memIdsIn: memIds,
@@ -233,8 +239,8 @@ final savedMemNotificationsProvider = StateNotifierProvider.autoDispose<
             ref.read(memNotificationsProvider.notifier).upsertAll(
                   actsByMemIds,
                   (current, updating) =>
-                      current is SavedMemNotification &&
-                      updating is SavedMemNotification &&
+                      current is SavedMemNotificationEntity &&
+                      updating is SavedMemNotificationEntity &&
                       current.id == updating.id,
                 );
           }
@@ -246,8 +252,10 @@ final savedMemNotificationsProvider = StateNotifierProvider.autoDispose<
 );
 
 final activeActsProvider = StateNotifierProvider.autoDispose<
-    ListValueStateNotifier<SavedAct>, List<SavedAct>>(
-  (ref) => v(() => ListValueStateNotifier(
-        ref.watch(actsProvider).where((act) => act.period.end == null).toList(),
-      )),
+    ListValueStateNotifier<SavedActEntity>, List<SavedActEntity>>(
+  (ref) => v(
+    () => ListValueStateNotifier(
+      ref.watch(actsProvider).where((act) => act.isActive).toList(),
+    ),
+  ),
 );

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:mem/core/act.dart';
+import 'package:mem/acts/act.dart';
 import 'package:mem/core/date_and_time/duration.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/transitions.dart';
-import 'package:mem/repositories/mem.dart';
+import 'package:mem/mems/mem_entity.dart';
 
 class TotalActTimeListItem extends StatelessWidget {
   final List<Act> _actList;
-  final SavedMem? _mem;
+  final SavedMemEntity? _mem;
 
   const TotalActTimeListItem(this._actList, this._mem, {super.key});
 

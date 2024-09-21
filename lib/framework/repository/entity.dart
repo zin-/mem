@@ -4,9 +4,28 @@
 // # 語源
 //
 // 「存在するもの」、「実体」
-abstract class EntityV1 {}
+mixin Entity {
+  Map<String, dynamic> get toMap;
 
-abstract class Entity {}
+  @override
+  String toString() => "${super.toString()}: $toMap";
+
+  @override
+  int get hashCode => toMap.entries.fold(
+        0,
+        (value, element) =>
+            value ^ element.key.hashCode ^ element.value.hashCode,
+      );
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (runtimeType == other.runtimeType && hashCode == other.hashCode);
+}
+
+mixin Copyable<T> on Entity {
+  T copiedWith();
+}
 // memo
 // - view, domain, dataのそれぞれの領域で似た内容でも型が変わることになるはず
 // これをしっかりと定義したい

@@ -4,12 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/act_counter/act_counter_repository.dart';
 import 'package:mem/act_counter/act_counter_client.dart';
 import 'package:mem/act_counter/home_widget_accessor.dart';
 import 'package:mem/components/l10n.dart';
 import 'package:mem/logger/logger_wrapper.dart';
-import 'package:mem/notifications/notification_repository.dart';
 import 'package:mem/notifications/flutter_local_notifications_wrapper.dart';
 import 'package:mockito/annotations.dart';
 
@@ -25,8 +23,6 @@ int randomInt([int max = 42949671]) => Random().nextInt(max);
   FlutterLocalNotificationsWrapper,
   // FIXME RepositoryではなくTableをmockする
   //  Repositoryはシステム固有の処理であるのに対して、Tableは永続仮想をラップする役割を持つため
-  NotificationRepository,
-  ActCounterRepository,
   ActCounterClient,
 ])
 void main() {}
@@ -48,20 +44,12 @@ Widget buildTestAppWithProvider(
       child: buildTestApp(widget),
     );
 
-class TestCaseV2<I> {
-  final I input;
-  final dynamic expected;
+class TestCase<INPUT, EXPECTED> {
+  final INPUT input;
+  final EXPECTED expected;
   final String? name;
 
-  TestCaseV2(this.input, this.expected, {this.name});
-}
-
-class TestCase<T> {
-  final String name;
-  final T input;
-  final Function(T input) verify;
-
-  TestCase(this.name, this.input, this.verify);
+  TestCase(this.input, this.expected, {this.name});
 }
 
 // Finders

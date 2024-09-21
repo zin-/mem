@@ -1,32 +1,63 @@
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/framework/database/accessor.dart';
+import 'package:mem/framework/database/definition/database_definition.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
+import 'package:mem/framework/repository/condition/conditions.dart';
+import 'package:mem/framework/repository/database_repository.dart';
+import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/framework/repository/condition/conditions.dart';
 
-// FIXME byIdの引数の型のためにSavedEntityの型以外にIが必要になっている
-//  Rにidの型情報が含まれているのに改めて渡す必要があるのはおかしい
-//  DatabaseTupleに型情報を付与することでズレは発生しなくなった
-//  ただ、これだと未保存のDatabaseTupleが
-// FIXME SavedEntityはSavedDatabaseTupleをmixinしている必要があるが型制約を定義できていない
-abstract class DatabaseTupleRepository<E extends EntityV1,
-    SavedEntity extends E, Id> implements RepositoryV1<E, SavedEntity> {
-  Map<String, dynamic> unpack(E entity);
+abstract class DatabaseTupleRepository<ENTITY extends Entity,
+    SAVED extends DatabaseTupleEntity> extends Repository<ENTITY> {
+  final DatabaseDefinition _databaseDefinition;
+  final TableDefinition _tableDefinition;
 
-  SavedEntity pack(Map<String, dynamic> tuple);
+  // FIXME DatabaseDefinitionの中にTableDefinitionがあるのでEから取得できるのでは？
+  DatabaseTupleRepository(this._databaseDefinition, this._tableDefinition);
 
-  @override
-  Future<SavedEntity> receive(E entity) => v(
+  static DatabaseAccessor? _databaseAccessor;
+
+  late final Future<DatabaseAccessor> _dbA = (() async => _databaseAccessor ??=
+      await DatabaseRepository().receive(_databaseDefinition))();
+
+  static Future close() => v(
         () async {
-          final entityMap = unpack(entity);
+          await _databaseAccessor?.close();
+          _databaseAccessor = null;
+        },
+      );
 
-          entityMap[defColCreatedAt.name] = DateTime.now();
+  Future<int> count({
+    Condition? condition,
+  }) =>
+      v(
+        () async => (await _dbA).count(
+          _tableDefinition,
+          where: condition?.where(),
+          whereArgs: condition?.whereArgs(),
+        ),
+        {
+          'condition': condition,
+        },
+      );
 
-          final id = await _databaseAccessor!.insert(
+  SAVED pack(Map<String, dynamic> map);
+
+  Future<SAVED> receive(
+    ENTITY entity, {
+    DateTime? createdAt,
+  }) =>
+      v(
+        () async {
+          final entityMap = entity.toMap;
+
+          entityMap[defColCreatedAt.name] = createdAt ?? DateTime.now();
+
+          final id = await (await _dbA).insert(
             _tableDefinition,
             entityMap,
           );
@@ -35,24 +66,13 @@ abstract class DatabaseTupleRepository<E extends EntityV1,
 
           return pack(entityMap);
         },
-        entity,
-      );
-
-  Future<int> count({
-    Condition? condition,
-  }) =>
-      v(
-        () async => await _databaseAccessor!.count(
-          _tableDefinition,
-          where: condition?.where(),
-          whereArgs: condition?.whereArgs(),
-        ),
         {
-          "condition": condition,
+          'entity': entity,
+          'createdAt': createdAt,
         },
       );
 
-  Future<List<SavedEntity>> ship({
+  Future<List<SAVED>> ship({
     Condition? condition,
     GroupBy? groupBy,
     List<OrderBy>? orderBy,
@@ -60,7 +80,7 @@ abstract class DatabaseTupleRepository<E extends EntityV1,
     int? limit,
   }) =>
       v(
-        () async => (await _databaseAccessor!.select(
+        () async => (await (await _dbA).select(
           _tableDefinition,
           groupBy: groupBy?.toQuery,
           extraColumns: groupBy?.toExtraColumns,
@@ -83,150 +103,104 @@ abstract class DatabaseTupleRepository<E extends EntityV1,
         },
       );
 
-  Future<SavedEntity> shipById(Id id) => v(
-        () async {
-          final condition = Equals(defPkId.name, id);
-          return pack(
-            (await _databaseAccessor!.select(
-              _tableDefinition,
-              where: condition.where(),
-              whereArgs: condition.whereArgs(),
-            ))
-                .single,
-          );
-        },
-        id,
-      );
-
-  Future<SavedEntity?> findOneBy({
-    Condition? condition,
-    List<OrderBy>? orderBy,
+  Future<SAVED> replace(
+    SAVED savedEntity, {
+    DateTime? updatedAt,
   }) =>
       v(
-        () async => await ship(
-          condition: condition,
-          orderBy: orderBy,
-          limit: 1,
-        ).then((value) => value.length == 1 ? value.single : null),
+        () async {
+          final entityMap = savedEntity.toMap;
+
+          entityMap[defColUpdatedAt.name] = updatedAt ?? DateTime.now();
+
+          final byId = Equals(defPkId, entityMap[defPkId.name]);
+          await (await _dbA).update(
+            _tableDefinition,
+            entityMap,
+            where: byId.where(),
+            whereArgs: byId.whereArgs(),
+          );
+
+          return pack(entityMap);
+        },
         {
-          "condition": condition,
-          "orderBy": orderBy,
+          'savedEntity': savedEntity,
+          'updatedAt': updatedAt,
         },
       );
 
-  Future<SavedEntity> replace(SavedEntity payload) => v(
+  Future<SAVED> archive(
+    SAVED savedEntity, {
+    DateTime? archivedAt,
+  }) =>
+      v(
         () async {
-          final entityMap = unpack(payload);
+          final entityMap = savedEntity.toMap;
 
-          entityMap[defColUpdatedAt.name] = DateTime.now();
+          entityMap[defColArchivedAt.name] = archivedAt ?? DateTime.now();
 
-          final condition = Equals(defPkId.name, entityMap[defPkId.name]);
-          await _databaseAccessor!.update(
+          final byId = Equals(defPkId, entityMap[defPkId.name]);
+          await (await _dbA).update(
             _tableDefinition,
             entityMap,
-            where: condition.where(),
-            whereArgs: condition.whereArgs(),
+            where: byId.where(),
+            whereArgs: byId.whereArgs(),
           );
 
           return pack(entityMap);
         },
-        payload,
-      );
-
-  Future<SavedEntity> archive(SavedEntity payload) => v(
-        () async {
-          final entityMap = unpack(payload);
-
-          entityMap[defColArchivedAt.name] = DateTime.now();
-
-          final condition = Equals(defPkId.name, entityMap[defPkId.name]);
-          await _databaseAccessor!.update(
-            _tableDefinition,
-            entityMap,
-            where: condition.where(),
-            whereArgs: condition.whereArgs(),
-          );
-
-          return pack(entityMap);
+        {
+          'savedEntity': savedEntity,
+          'archivedAt': archivedAt,
         },
-        payload,
       );
 
-  Future<SavedEntity> unarchive(SavedEntity payload) => v(
+  Future<SAVED> unarchive(
+    SAVED savedEntity, {
+    DateTime? updatedAt,
+  }) =>
+      v(
         () async {
-          final entityMap = unpack(payload);
+          final entityMap = savedEntity.toMap;
 
-          entityMap[defColUpdatedAt.name] = DateTime.now();
+          entityMap[defColUpdatedAt.name] = updatedAt ?? DateTime.now();
           entityMap[defColArchivedAt.name] = null;
 
-          final condition = Equals(defPkId.name, entityMap[defPkId.name]);
-          await _databaseAccessor!.update(
+          final byId = Equals(defPkId, entityMap[defPkId.name]);
+          await (await _dbA).update(
             _tableDefinition,
             entityMap,
-            where: condition.where(),
-            whereArgs: condition.whereArgs(),
+            where: byId.where(),
+            whereArgs: byId.whereArgs(),
           );
 
           return pack(entityMap);
         },
-        payload,
+        {
+          'savedEntity': savedEntity,
+          'updatedAt': updatedAt,
+        },
       );
 
-  Future<List<SavedEntity>> waste([Condition? condition]) => v(
+  Future<List<SAVED>> waste({
+    Condition? condition,
+  }) =>
+      v(
         () async {
-          final targets = (await _databaseAccessor!.select(
-            _tableDefinition,
-            where: condition?.where(),
-            whereArgs: condition?.whereArgs(),
-          ))
-              .map((e) => pack(e))
-              .toList();
+          final targets = await ship(
+            condition: condition,
+          );
 
-          final count = await _databaseAccessor!.delete(
+          await _databaseAccessor!.delete(
             _tableDefinition,
             where: condition?.where(),
             whereArgs: condition?.whereArgs(),
           );
-
-          assert(count == targets.length);
 
           return targets;
         },
-        condition,
-      );
-
-  Future<SavedEntity> wasteById(Id id) => v(
-        () async {
-          final condition = Equals(defPkId.name, id);
-          final payload = (await _databaseAccessor!.select(
-            _tableDefinition,
-            where: condition.where(),
-            whereArgs: condition.whereArgs(),
-          ))
-              .single;
-          await _databaseAccessor!.delete(
-            _tableDefinition,
-            where: condition.where(),
-            whereArgs: condition.whereArgs(),
-          );
-          return pack(payload);
-        },
-        id,
-      );
-
-  static Future<void> close() => v(
-        () async {
-          await _databaseAccessor?.close();
-          _databaseAccessor = null;
+        {
+          'condition': condition,
         },
       );
-
-  static DatabaseAccessor? _databaseAccessor;
-
-  static set databaseAccessor(DatabaseAccessor? databaseAccessor) =>
-      _databaseAccessor = databaseAccessor;
-
-  final TableDefinition _tableDefinition;
-
-  DatabaseTupleRepository(this._tableDefinition);
 }

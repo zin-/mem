@@ -1,11 +1,14 @@
 import 'package:mem/framework/repository/key_with_value.dart';
 import 'package:mem/framework/repository/repository.dart';
 
-abstract class KeyWithValueRepository<E extends KeyWithValue<Key, dynamic>, Key>
-    extends Repository<E>
-    with Receiver<E, bool>, DiscarderByKey<E, Key, bool> {}
+abstract class KeyWithValueRepository<ENTITY extends KeyWithValue<KEY, dynamic>,
+    KEY> extends Repository<ENTITY> {
+  Future<void> receive(ENTITY entity);
 
-mixin DiscarderByKey<E extends KeyWithValue<Key, dynamic>, Key, Result>
-    on Repository<E> {
-  Future<Result> discard(Key key);
+  Future<void> discard(KEY key);
+}
+
+mixin DiscardAll<ENTITY extends KeyWithValue<KEY, dynamic>, KEY>
+    on KeyWithValueRepository<ENTITY, KEY> {
+  Future<void> discardAll();
 }

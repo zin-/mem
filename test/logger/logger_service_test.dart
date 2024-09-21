@@ -23,12 +23,18 @@ void main() {
 
     group(": on service level is info", () {
       for (final testCase in [
-        TestCase("verbose", Level.verbose, (Level input) {
-          verifyNever(mockedLoggerWrapper.log(any, any, any, any));
-        }),
-        TestCase("info", Level.info, (Level input) {
-          verify(mockedLoggerWrapper.log(input, any, null, null)).called(1);
-        }),
+        TestCase(
+          name: "verbose",
+          Level.verbose,
+          (Level input) =>
+              verifyNever(mockedLoggerWrapper.log(any, any, any, any)),
+        ),
+        TestCase(
+          name: "info",
+          Level.info,
+          (Level input) =>
+              verify(mockedLoggerWrapper.log(input, any, null, null)).called(1),
+        ),
       ]) {
         test(": log level is ${testCase.name}.", () {
           final level = testCase.input;
@@ -38,7 +44,7 @@ void main() {
 
           expect(result, target);
 
-          testCase.verify(level);
+          testCase.expected(level);
         });
       }
     });
@@ -331,12 +337,17 @@ void main() {
           });
 
           for (final testCase in [
-            TestCase("verbose", Level.verbose, (input) {
-              verifyNever(mockedLoggerWrapper.log(any, any, any, any));
-            }),
-            TestCase("info", Level.info, (input) {
-              verifyNever(mockedLoggerWrapper.log(any, any, any, any));
-            }),
+            TestCase(
+                name: "verbose",
+                Level.verbose,
+                (input) =>
+                    verifyNever(mockedLoggerWrapper.log(any, any, any, any))),
+            TestCase(
+              name: "info",
+              Level.info,
+              (input) =>
+                  verifyNever(mockedLoggerWrapper.log(any, any, any, any)),
+            ),
           ]) {
             test(
               ": on error: ${testCase.name}.",
@@ -345,6 +356,7 @@ void main() {
                 const errorMessage = "test message future";
                 final e = Exception(errorMessage);
 
+                verifyNever(mockedLoggerWrapper.log(any, any, any, any));
                 expect(
                   () => LogService().valueLog(level, Future.error(e)),
                   throwsA((thrown) {
@@ -371,25 +383,32 @@ void main() {
 
     group(": alias", () {
       for (final testCase in [
-        TestCase("verbose", verbose, (input) {
-          verifyNever(mockedLoggerWrapper.log(any, any, any, any));
-        }),
-        TestCase("info", info, (input) {
-          verify(mockedLoggerWrapper.log(Level.info, "info", null, null))
-              .called(1);
-        }),
-        TestCase("warn", warn, (input) {
-          verify(mockedLoggerWrapper.log(Level.warning, "warn", null, null))
-              .called(1);
-        }),
         TestCase(
-          "debug",
+          name: "verbose",
+          verbose,
+          (input) => verifyNever(mockedLoggerWrapper.log(any, any, any, any)),
+        ),
+        TestCase(
+          name: "info",
+          info,
+          (input) =>
+              verify(mockedLoggerWrapper.log(Level.info, "info", null, null))
+                  .called(1),
+        ),
+        TestCase(
+          name: "warn",
+          warn,
+          (input) =>
+              verify(mockedLoggerWrapper.log(Level.warning, "warn", null, null))
+                  .called(1),
+        ),
+        TestCase(
+          name: "debug",
           // ignore: deprecated_member_use_from_same_package
           debug,
-          (input) {
-            verify(mockedLoggerWrapper.log(Level.debug, "debug", null, null))
-                .called(1);
-          },
+          (input) =>
+              verify(mockedLoggerWrapper.log(Level.debug, "debug", null, null))
+                  .called(1),
         ),
       ]) {
         test(": ${testCase.name}", () {
@@ -399,7 +418,7 @@ void main() {
 
           expect(result, testMessage);
 
-          testCase.verify(testCase.input);
+          testCase.expected(testCase.input);
         });
       }
     });
@@ -830,26 +849,37 @@ void main() {
 
     group(": alias", () {
       for (final testCase in [
-        TestCase("v", v, (input) {
-          verifyNever(mockedLoggerWrapper.log(any, any, any, any));
-        }),
-        TestCase("i", i, (input) {
-          verify(mockedLoggerWrapper.log(
-                  Level.info, "[start] :: null", null, null))
-              .called(1);
-          verify(mockedLoggerWrapper.log(Level.info, "[end] => i", null, null))
-              .called(1);
-        }),
-        TestCase("w", w, (input) {
-          verify(mockedLoggerWrapper.log(
-                  Level.warning, "[start] :: null", null, null))
-              .called(1);
-          verify(mockedLoggerWrapper.log(
-                  Level.warning, "[end] => w", null, null))
-              .called(1);
-        }),
         TestCase(
-          "d",
+          name: "v",
+          v,
+          (input) => verifyNever(mockedLoggerWrapper.log(any, any, any, any)),
+        ),
+        TestCase(
+          name: "i",
+          i,
+          (input) {
+            verify(mockedLoggerWrapper.log(
+                    Level.info, "[start] :: null", null, null))
+                .called(1);
+            verify(mockedLoggerWrapper.log(
+                    Level.info, "[end] => i", null, null))
+                .called(1);
+          },
+        ),
+        TestCase(
+          name: "w",
+          w,
+          (input) {
+            verify(mockedLoggerWrapper.log(
+                    Level.warning, "[start] :: null", null, null))
+                .called(1);
+            verify(mockedLoggerWrapper.log(
+                    Level.warning, "[end] => w", null, null))
+                .called(1);
+          },
+        ),
+        TestCase(
+          name: "d",
           // ignore: deprecated_member_use_from_same_package
           d,
           (input) {
@@ -871,7 +901,7 @@ void main() {
 
           expect(result, testMessage);
 
-          testCase.verify(testCase.input);
+          testCase.expected(testCase.input);
         });
       }
     });

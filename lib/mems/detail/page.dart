@@ -9,7 +9,7 @@ import 'package:mem/mems/detail/app_bar/remove_mem_action.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/detail/app_bar/transit_act_list_action.dart';
 import 'package:mem/mems/detail/app_bar/transit_chart_action.dart';
-import 'package:mem/repositories/mem.dart';
+import 'package:mem/mems/mem_entity.dart';
 import 'package:mem/values/colors.dart';
 
 class MemDetailPage extends ConsumerWidget {
@@ -21,13 +21,13 @@ class MemDetailPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemDetailPage(
           ref.watch(editingMemByMemIdProvider(_memId).select(
-            (value) => value is SavedMem ? value.id : null,
+            (value) => value is SavedMemEntity ? value.id : null,
           )),
           ref.watch(editingMemByMemIdProvider(_memId).select(
-            (value) => value is SavedMem,
+            (value) => value is SavedMemEntity,
           )),
           ref.watch(editingMemByMemIdProvider(_memId).select(
-            (value) => value is SavedMem ? value.isArchived : false,
+            (value) => value is SavedMemEntity ? value.isArchived : false,
           )),
         ),
         {

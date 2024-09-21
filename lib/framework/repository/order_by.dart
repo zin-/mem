@@ -8,12 +8,12 @@ abstract class OrderBy {
   String toQuery();
 }
 
-class Ascending extends OrderBy {
-  Ascending(super.columnDefinition);
-
-  @override
-  String toQuery() => "${columnDefinition.name} ASC";
-}
+// class Ascending extends OrderBy {
+//   Ascending(super.columnDefinition);
+//
+//   @override
+//   String toQuery() => "${columnDefinition.name} ASC";
+// }
 
 class Descending extends OrderBy {
   Descending(super.columnDefinition);

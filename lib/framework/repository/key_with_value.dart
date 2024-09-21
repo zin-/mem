@@ -1,14 +1,10 @@
 import 'package:mem/framework/repository/entity.dart';
 
-abstract class KeyWithValue<Key, Value> extends Entity {
-  final Key key;
-  final Value value;
-
-  KeyWithValue(this.key, this.value);
+// FIXME IdWithValueの方が命名として適切なのでは？
+mixin KeyWithValue<KEY, VALUE> on Entity {
+  late final KEY key;
+  late final VALUE value;
 
   @override
-  String toString() => {
-        "key": key,
-        "value": value,
-      }.toString();
+  Map<String, dynamic> get toMap => {'key': key, 'value': value};
 }
