@@ -268,9 +268,9 @@ void main() => group(': $_name', () {
         await widgetTester.pageBack();
         await widgetTester.pumpAndSettle();
         await widgetTester.tap(find.byKey(keySaveMemFab));
-        final lastAction = widgetTester.pumpAndSettle();
+        await widgetTester.pumpAndSettle();
 
-        lastAction.whenComplete(() async {
+        await widgetTester.runAsync(() async {
           final savedMem = (await dbA.select(
             defTableMems,
             where: "${defColMemsName.name} = ?",
