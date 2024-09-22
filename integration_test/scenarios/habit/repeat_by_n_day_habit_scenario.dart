@@ -268,45 +268,48 @@ void main() => group(': $_name', () {
         await widgetTester.pageBack();
         await widgetTester.pumpAndSettle();
         await widgetTester.tap(find.byKey(keySaveMemFab));
-        await widgetTester.pumpAndSettle();
+        final lastAction = widgetTester.pumpAndSettle();
 
-        final savedMem = (await dbA.select(
-          defTableMems,
-          where: "${defColMemsName.name} = ?",
-          whereArgs: [enteringMemName],
-        ))
-            .single;
-        final savedMemNotification = (await dbA.select(defTableMemNotifications,
-                where: "${defFkMemNotificationsMemId.name} = ?"
-                    " AND ${defColMemNotificationsType.name} = ?"
-                    " AND ${defColMemNotificationsTime.name} = ?",
-                whereArgs: [
-              savedMem[defPkId.name],
-              MemNotificationType.repeatByNDay.name,
-              enteringNDay
-            ]))
-            .single;
-        expect(savedMemNotification[defColMemNotificationsTime.name],
-            equals(enteringNDay),
-            reason: 'enteringNDay');
+        lastAction.whenComplete(() async {
+          final savedMem = (await dbA.select(
+            defTableMems,
+            where: "${defColMemsName.name} = ?",
+            whereArgs: [enteringMemName],
+          ))
+              .single;
+          final savedMemNotification = (await dbA.select(
+                  defTableMemNotifications,
+                  where: "${defFkMemNotificationsMemId.name} = ?"
+                      " AND ${defColMemNotificationsType.name} = ?"
+                      " AND ${defColMemNotificationsTime.name} = ?",
+                  whereArgs: [
+                savedMem[defPkId.name],
+                MemNotificationType.repeatByNDay.name,
+                enteringNDay
+              ]))
+              .single;
+          expect(savedMemNotification[defColMemNotificationsTime.name],
+              equals(enteringNDay),
+              reason: 'enteringNDay');
 
-        if (defaultTargetPlatform == TargetPlatform.android) {
-          await expectLater(alarmServiceStartCount, equals(1),
-              reason: 'alarmServiceStartCount');
-          await expectLater(alarmCancelCount, equals(2),
-              reason: 'alarmCancelCount');
-          await expectLater(alarmPeriodicCount, equals(1),
-              reason: 'alarmPeriodicCount');
-        } else {
-          await expectLater(alarmServiceStartCount, equals(0),
-              reason: 'alarmServiceStartCount');
-          await expectLater(alarmCancelCount, equals(0),
-              reason: 'alarmCancelCount');
-          await expectLater(alarmPeriodicCount, equals(0),
-              reason: 'alarmPeriodicCount');
-        }
+          if (defaultTargetPlatform == TargetPlatform.android) {
+            await expectLater(alarmServiceStartCount, equals(1),
+                reason: 'alarmServiceStartCount');
+            await expectLater(alarmCancelCount, equals(2),
+                reason: 'alarmCancelCount');
+            await expectLater(alarmPeriodicCount, equals(1),
+                reason: 'alarmPeriodicCount');
+          } else {
+            await expectLater(alarmServiceStartCount, equals(0),
+                reason: 'alarmServiceStartCount');
+            await expectLater(alarmCancelCount, equals(0),
+                reason: 'alarmCancelCount');
+            await expectLater(alarmPeriodicCount, equals(0),
+                reason: 'alarmPeriodicCount');
+          }
 
-        widgetTester.clearAllMockMethodCallHandler();
+          widgetTester.clearAllMockMethodCallHandler();
+        });
       });
 
       group('notify repeatByNDay', () {
