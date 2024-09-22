@@ -291,15 +291,19 @@ void main() => group(': $_name', () {
             reason: 'enteringNDay');
 
         if (defaultTargetPlatform == TargetPlatform.android) {
-          expect(alarmServiceStartCount, equals(1),
+          await expectLater(alarmServiceStartCount, equals(1),
               reason: 'alarmServiceStartCount');
-          expect(alarmCancelCount, equals(2), reason: 'alarmCancelCount');
-          expect(alarmPeriodicCount, equals(1), reason: 'alarmPeriodicCount');
+          await expectLater(alarmCancelCount, equals(2),
+              reason: 'alarmCancelCount');
+          await expectLater(alarmPeriodicCount, equals(1),
+              reason: 'alarmPeriodicCount');
         } else {
-          expect(alarmServiceStartCount, equals(0),
+          await expectLater(alarmServiceStartCount, equals(0),
               reason: 'alarmServiceStartCount');
-          expect(alarmCancelCount, equals(0), reason: 'alarmCancelCount');
-          expect(alarmPeriodicCount, equals(0), reason: 'alarmPeriodicCount');
+          await expectLater(alarmCancelCount, equals(0),
+              reason: 'alarmCancelCount');
+          await expectLater(alarmPeriodicCount, equals(0),
+              reason: 'alarmPeriodicCount');
         }
 
         widgetTester.clearAllMockMethodCallHandler();
