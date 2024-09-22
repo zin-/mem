@@ -379,6 +379,7 @@ void testNotificationScenario() => group(
               );
             });
           });
+
           group(": pause act", () {
             testWidgets(": no active act.", (widgetTester) async {
               widgetTester.ignoreMockMethodCallHandler(
@@ -407,7 +408,7 @@ void testNotificationScenario() => group(
 
               await onNotificationResponseReceived(details);
 
-              expect(checkPermissionStatusCount, 4);
+              expect(checkPermissionStatusCount, 1);
             });
 
             group(": 2 active acts", () {
@@ -453,7 +454,7 @@ void testNotificationScenario() => group(
 
                 await onNotificationResponseReceived(details);
 
-                expect(checkPermissionStatusCount, 4);
+                expect(checkPermissionStatusCount, 1);
               });
             });
           });

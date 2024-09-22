@@ -179,16 +179,6 @@ void main() => group(': $_name', () {
                     .single[defPkId.name] as int) +
                 1;
 
-        int checkPermissionStatusCount = 0;
-        widgetTester.setMockMethodCallHandler(
-            MethodChannelMock.permissionHandler,
-            List.generate(
-                3,
-                (i) => (m) async {
-                      expect(m.method, 'checkPermissionStatus');
-                      checkPermissionStatusCount++;
-                      return 1;
-                    }));
         int alarmServiceStartCount = 0;
         int alarmCancelCount = 0;
         int alarmPeriodicCount = 0;
@@ -301,15 +291,11 @@ void main() => group(': $_name', () {
             reason: 'enteringNDay');
 
         if (defaultTargetPlatform == TargetPlatform.android) {
-          expect(checkPermissionStatusCount, equals(3),
-              reason: 'checkPermissionStatusCount');
           expect(alarmServiceStartCount, equals(1),
               reason: 'alarmServiceStartCount');
           expect(alarmCancelCount, equals(2), reason: 'alarmCancelCount');
           expect(alarmPeriodicCount, equals(1), reason: 'alarmPeriodicCount');
         } else {
-          expect(checkPermissionStatusCount, equals(3),
-              reason: 'checkPermissionStatusCount');
           expect(alarmServiceStartCount, equals(0),
               reason: 'alarmServiceStartCount');
           expect(alarmCancelCount, equals(0), reason: 'alarmCancelCount');
