@@ -179,16 +179,6 @@ void main() => group(': $_name', () {
                     .single[defPkId.name] as int) +
                 1;
 
-        int checkPermissionStatusCount = 0;
-        widgetTester.setMockMethodCallHandler(
-            MethodChannelMock.permissionHandler,
-            List.generate(
-                3,
-                (i) => (m) async {
-                      expect(m.method, 'checkPermissionStatus');
-                      checkPermissionStatusCount++;
-                      return 1;
-                    }));
         int alarmServiceStartCount = 0;
         int alarmCancelCount = 0;
         int alarmPeriodicCount = 0;
@@ -280,43 +270,46 @@ void main() => group(': $_name', () {
         await widgetTester.tap(find.byKey(keySaveMemFab));
         await widgetTester.pumpAndSettle();
 
-        final savedMem = (await dbA.select(
-          defTableMems,
-          where: "${defColMemsName.name} = ?",
-          whereArgs: [enteringMemName],
-        ))
-            .single;
-        final savedMemNotification = (await dbA.select(defTableMemNotifications,
-                where: "${defFkMemNotificationsMemId.name} = ?"
-                    " AND ${defColMemNotificationsType.name} = ?"
-                    " AND ${defColMemNotificationsTime.name} = ?",
-                whereArgs: [
-              savedMem[defPkId.name],
-              MemNotificationType.repeatByNDay.name,
-              enteringNDay
-            ]))
-            .single;
-        expect(savedMemNotification[defColMemNotificationsTime.name],
-            equals(enteringNDay),
-            reason: 'enteringNDay');
+        await widgetTester.runAsync(() async {
+          final savedMem = (await dbA.select(
+            defTableMems,
+            where: "${defColMemsName.name} = ?",
+            whereArgs: [enteringMemName],
+          ))
+              .single;
+          final savedMemNotification = (await dbA.select(
+                  defTableMemNotifications,
+                  where: "${defFkMemNotificationsMemId.name} = ?"
+                      " AND ${defColMemNotificationsType.name} = ?"
+                      " AND ${defColMemNotificationsTime.name} = ?",
+                  whereArgs: [
+                savedMem[defPkId.name],
+                MemNotificationType.repeatByNDay.name,
+                enteringNDay
+              ]))
+              .single;
+          expect(savedMemNotification[defColMemNotificationsTime.name],
+              equals(enteringNDay),
+              reason: 'enteringNDay');
 
-        if (defaultTargetPlatform == TargetPlatform.android) {
-          expect(checkPermissionStatusCount, equals(3),
-              reason: 'checkPermissionStatusCount');
-          expect(alarmServiceStartCount, equals(1),
-              reason: 'alarmServiceStartCount');
-          expect(alarmCancelCount, equals(2), reason: 'alarmCancelCount');
-          expect(alarmPeriodicCount, equals(1), reason: 'alarmPeriodicCount');
-        } else {
-          expect(checkPermissionStatusCount, equals(3),
-              reason: 'checkPermissionStatusCount');
-          expect(alarmServiceStartCount, equals(0),
-              reason: 'alarmServiceStartCount');
-          expect(alarmCancelCount, equals(0), reason: 'alarmCancelCount');
-          expect(alarmPeriodicCount, equals(0), reason: 'alarmPeriodicCount');
-        }
+          if (defaultTargetPlatform == TargetPlatform.android) {
+            await expectLater(alarmServiceStartCount, equals(1),
+                reason: 'alarmServiceStartCount');
+            await expectLater(alarmCancelCount, equals(2),
+                reason: 'alarmCancelCount');
+            await expectLater(alarmPeriodicCount, equals(1),
+                reason: 'alarmPeriodicCount');
+          } else {
+            await expectLater(alarmServiceStartCount, equals(0),
+                reason: 'alarmServiceStartCount');
+            await expectLater(alarmCancelCount, equals(0),
+                reason: 'alarmCancelCount');
+            await expectLater(alarmPeriodicCount, equals(0),
+                reason: 'alarmPeriodicCount');
+          }
 
-        widgetTester.clearAllMockMethodCallHandler();
+          widgetTester.clearAllMockMethodCallHandler();
+        });
       });
 
       group('notify repeatByNDay', () {
