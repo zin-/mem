@@ -80,20 +80,21 @@ Future<void> onNotificationResponseReceived(dynamic details) => i(
     );
 
 Future<void> _runApplication({
-  String? languageCode,
   String? initialPath,
+  String? languageCode,
 }) =>
     i(
       () async {
         runApp(
           MemApplication(
             initialPath: initialPath,
+            languageCode: languageCode,
           ),
         );
       },
       {
-        'languageCode': languageCode,
         'initialPath': initialPath,
+        'languageCode': languageCode,
       },
     );
 
