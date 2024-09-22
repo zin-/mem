@@ -14,12 +14,10 @@ class MemListBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () {
-          return _MemListBodyComponent(
-            _scrollController,
-            (memId) => showMemDetailPage(context, ref, memId),
-          );
-        },
+        () => _MemListBodyComponent(
+          _scrollController,
+          (memId) => showMemDetailPage(context, ref, memId),
+        ),
       );
 }
 
