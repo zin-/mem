@@ -5,7 +5,7 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_entity.dart';
 
 import 'actions.dart';
-import 'states.dart';
+import '../../components/mem/list/states.dart';
 
 class MemListView extends ConsumerWidget {
   final Widget _appBar;
