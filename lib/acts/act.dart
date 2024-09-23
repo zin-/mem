@@ -2,7 +2,7 @@ import 'dart:core';
 
 import 'package:mem/logger/log_service.dart';
 
-import '../core/date_and_time/date_and_time_period.dart';
+import '../date_and_time/date_and_time_period.dart';
 
 class Act {
   final int memId;

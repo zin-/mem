@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/states.dart';
 import 'package:mem/acts/act.dart';
-import 'package:mem/core/date_and_time/date_and_time_period.dart';
+import 'package:mem/date_and_time/date_and_time_period.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/components/value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
