@@ -3,8 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/components/date_and_time/date_and_time_text_form_field.dart';
 import 'package:mem/components/date_and_time/date_view.dart';
 import 'package:mem/components/date_and_time/time_of_day_view.dart';
-import 'package:mem/core/date_and_time/date_and_time.dart';
-import 'package:mem/core/date_and_time/date_and_time_period.dart';
+import 'package:mem/date_and_time/date_and_time.dart';
+import 'package:mem/date_and_time/date_and_time_period.dart';
 
 import '../../helpers.dart';
 

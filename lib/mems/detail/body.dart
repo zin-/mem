@@ -4,10 +4,10 @@ import 'package:mem/components/created_and_updated_at_texts.dart';
 import 'package:mem/mems/mem.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/notifications/mem_notifications_view.dart';
-import 'package:mem/components/mem/mem_done_checkbox.dart';
+import 'package:mem/mems/mem_done_checkbox.dart';
 import 'package:mem/mems/detail/states.dart';
-import 'package:mem/components/mem/mem_name.dart';
-import 'package:mem/components/mem/mem_period.dart';
+import 'package:mem/mems/mem_name.dart';
+import 'package:mem/mems/mem_period.dart';
 import 'package:mem/values/dimens.dart';
 
 import 'mem_items_view.dart';

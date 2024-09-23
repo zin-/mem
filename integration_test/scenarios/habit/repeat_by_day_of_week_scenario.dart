@@ -339,6 +339,12 @@ void main() => group(
                       },
                     ),
                     (message) async {
+                      expect(message.method,
+                          equals('requestNotificationsPermission'));
+                      expect(message.arguments, isNull);
+                      return true;
+                    },
+                    (message) async {
                       expect(message.method, equals('show'));
                       expect(message.arguments['id'],
                           equals(memRepeatedNotificationId(notifyTodayMemId!)));

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/act_counter/act_counter_client.dart';
-import 'package:mem/act_counter/select_mem_fab.dart';
-import 'package:mem/act_counter/states.dart';
+import 'package:mem/acts/counter/act_counter_client.dart';
+import 'package:mem/acts/counter/select_mem_fab.dart';
+import 'package:mem/acts/counter/states.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mockito/mockito.dart';
 

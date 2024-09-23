@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/components/mem/mem_name.dart';
+import 'package:mem/mems/mem_name.dart';
 import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
@@ -345,6 +345,11 @@ void main() => group(': $_name', () {
                   return false;
                 }),
             (message) async {
+              expect(message.method, equals('requestNotificationsPermission'));
+              expect(message.arguments, isNull);
+              return true;
+            },
+            (message) async {
               expect(message.method, equals('show'));
               expect(message.arguments['id'],
                   equals(memRepeatedNotificationId(withoutActMemId)));
@@ -413,6 +418,11 @@ void main() => group(': $_name', () {
                   cancelCount++;
                   return false;
                 }),
+            (message) async {
+              expect(message.method, equals('requestNotificationsPermission'));
+              expect(message.arguments, isNull);
+              return true;
+            },
             (message) async {
               expect(message.method, equals('show'));
               expect(message.arguments['id'],

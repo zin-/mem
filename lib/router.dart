@@ -1,5 +1,5 @@
 import 'package:go_router/go_router.dart';
-import 'package:mem/act_counter/act_counter_configure.dart';
+import 'package:mem/acts/counter/act_counter_configure.dart';
 import 'package:mem/home_screen.dart';
 import 'package:mem/mems/detail/page.dart';
 

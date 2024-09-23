@@ -16,9 +16,7 @@ class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return HomePage(scrollController);
-  }
+  Widget build(BuildContext context) => HomePage(scrollController);
 }
 
 class HomePage extends ScrollControllableWidget {
