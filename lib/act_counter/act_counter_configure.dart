@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/act_counter/select_mem_fab.dart';
 import 'package:mem/components/l10n.dart';
-import 'package:mem/components/mem/list/view.dart';
+import 'package:mem/mems/list/view.dart';
 import 'package:mem/logger/log_service.dart';
 
 import 'single_selectable_mem_list_item.dart';
