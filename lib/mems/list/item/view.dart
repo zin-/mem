@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/actions.dart';
-import 'package:mem/components/mem/list/states.dart';
+import 'package:mem/mems/list/states.dart';
 import 'package:mem/mems/mem_done_checkbox.dart';
 import 'package:mem/mems/mem_name.dart';
 import 'package:mem/components/timer.dart';

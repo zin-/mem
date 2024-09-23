@@ -3,7 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/mems/list/actions.dart';
-import 'package:mem/components/mem/list/states.dart';
+import 'package:mem/mems/list/states.dart';
 import 'package:mem/components/list_value_state_notifier.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/list/body.dart';
