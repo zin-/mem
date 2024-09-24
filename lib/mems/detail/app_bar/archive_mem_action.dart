@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/components/app_bar_actions_builder.dart';
+import 'package:mem/framework/view/app_bar_actions_builder.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/mems/detail/actions.dart';
 import 'package:mem/mems/states.dart';
