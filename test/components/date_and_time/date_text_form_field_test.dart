@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
-import 'package:mem/components/date_and_time/date_view.dart';
+import 'package:mem/date_and_time/date_view.dart';
 import 'package:mem/components/l10n.dart';
 
 import '../../helpers.dart';
