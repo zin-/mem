@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:mem/components/l10n.dart';
+import 'package:mem/l10n/l10n.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/acts/act_repository.dart';
 import 'package:mem/mems/mem_entity.dart';

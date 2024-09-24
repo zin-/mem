@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/acts/counter/act_counter_client.dart';
 import 'package:mem/acts/counter/home_widget_accessor.dart';
-import 'package:mem/components/l10n.dart';
+import 'package:mem/l10n/l10n.dart';
 import 'package:mem/logger/logger_wrapper.dart';
 import 'package:mem/notifications/flutter_local_notifications_wrapper.dart';
 import 'package:mockito/annotations.dart';
