@@ -5,7 +5,7 @@ import 'package:mem/acts/actions.dart';
 import 'package:mem/mems/list/states.dart';
 import 'package:mem/mems/mem_done_checkbox.dart';
 import 'package:mem/mems/mem_name.dart';
-import 'package:mem/components/timer.dart';
+import 'package:mem/framework/view/timer.dart';
 import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';

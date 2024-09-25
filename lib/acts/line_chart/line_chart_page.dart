@@ -4,7 +4,7 @@ import 'package:mem/acts/actions.dart';
 import 'package:mem/acts/acts_summary.dart';
 import 'package:mem/acts/line_chart/line_chart_wrapper.dart';
 import 'package:mem/acts/states.dart';
-import 'package:mem/components/async_value_view.dart';
+import 'package:mem/framework/view/async_value_view.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/values/dimens.dart';

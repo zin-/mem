@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:mem/acts/list/act_list.dart';
-import 'package:mem/components/l10n.dart';
-import 'package:mem/components/scroll_controllable_widget.dart';
-import 'package:mem/drawer.dart';
+import 'package:mem/l10n/l10n.dart';
+import 'package:mem/framework/view/scroll_controllable_widget.dart';
+import 'package:mem/framework/view/drawer.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/list/body.dart';
 import 'package:mem/mems/list/show_new_mem_fab.dart';

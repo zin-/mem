@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/components/created_and_updated_at_texts.dart';
+import 'package:mem/framework/date_and_time/created_and_updated_at_texts.dart';
 import 'package:mem/mems/mem.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/notifications/mem_notifications_view.dart';

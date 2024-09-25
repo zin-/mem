@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/mems/list/actions.dart';
 import 'package:mem/mems/list/states.dart';
-import 'package:mem/components/list_value_state_notifier.dart';
+import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/list/body.dart';
 import 'package:mem/mems/list/show_new_mem_fab.dart';
