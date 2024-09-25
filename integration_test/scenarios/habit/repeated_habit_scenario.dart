@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/date_and_time/time_of_day_view.dart';
+import 'package:mem/framework/date_and_time/time_of_day_view.dart';
 import 'package:mem/mems/mem_name.dart';
 import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/databases/definition.dart';
