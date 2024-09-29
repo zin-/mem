@@ -49,7 +49,7 @@ class _HomePageState extends State<HomePage> with ScrollControllableStateMixin {
           final l10n = buildL10n(context);
 
           return Scaffold(
-            drawer: ApplicationDrawer(l10n),
+            drawer: ApplicationDrawer(),
             body: SafeArea(child: bodies[_showIndex]),
             floatingActionButton: floatingActionButtons[_showIndex],
             bottomNavigationBar: AnimatedContainer(
