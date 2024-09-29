@@ -66,3 +66,18 @@ jobs:
       timeout-minutes-windows: ${{ matrix.timeout-minutes-windows }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  build-android-app_bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Build Android AppBundle"
+        uses: ./.github/actions/build-android-app_bundle
+        with:
+          flutter-channel: ${{ env.flutter-channel }}
+          flutter-version: ${{ env.flutter-version }}
+          ANDROID_KEY_JKS: ${{ secrets.ANDROID_KEY_JKS }}
+          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}

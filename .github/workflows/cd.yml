@@ -22,30 +22,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: "Set up Java and Gradle"
-        uses: ./.github/actions/set_up-java-and-gradle
-        with:
-          java-distribution: zulu
-          java-version: 17
-
-      - name: "Flutter doctor"
-        uses: ./.github/actions/flutter-doctor
+      - name: "Build Android AppBundle"
+        uses: ./.github/actions/build-android-app_bundle
         with:
           flutter-channel: ${{ env.flutter-channel }}
           flutter-version: ${{ env.flutter-version }}
-
-      - name: "Create jks"
-        run: echo -n ${{ secrets.ANDROID_KEY_JKS }} | base64 -d > android/mem.jks
-
-      - name: "Create key.properties"
-        run: |
-          echo 'storeFile=../mem.jks' > android/key.properties
-          echo 'storePassword=${{ secrets.ANDROID_STORE_PASSWORD }}' >> android/key.properties
-          echo 'keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}' >> android/key.properties
-          echo 'keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}' >> android/key.properties
-
-      - name: "Build Android AppBundle"
-        run: flutter build appbundle --build-number ${GITHUB_RUN_NUMBER}
+          ANDROID_KEY_JKS: ${{ secrets.ANDROID_KEY_JKS }}
+          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
 
       - name: "Create Service account key"
         run: echo -n ${{ secrets.SERVICE_ACCOUNT_KEY_JSON }} | base64 -d > service-account-key.json
