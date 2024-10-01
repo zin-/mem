@@ -29,6 +29,7 @@ jobs:
           flutter-version: ${{ env.flutter-version }}
           ANDROID_KEY_JKS: ${{ secrets.ANDROID_KEY_JKS }}
           ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
 
       - name: "Create Service account key"
