@@ -169,7 +169,7 @@ void main() => group(': $_name', () {
         },
       );
 
-      testWidgets('save.', (widgetTester) async {
+      testWidgets(': save.', (widgetTester) async {
         widgetTester.ignoreMockMethodCallHandler(
             MethodChannelMock.flutterLocalNotifications);
 
@@ -268,7 +268,7 @@ void main() => group(': $_name', () {
         await widgetTester.pageBack();
         await widgetTester.pumpAndSettle();
         await widgetTester.tap(find.byKey(keySaveMemFab));
-        await widgetTester.pumpAndSettle();
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
         await widgetTester.runAsync(() async {
           final savedMem = (await dbA.select(

@@ -1,0 +1,49 @@
+name: "Build Android AppBundle"
+description: "Android AppBundleを作成する"
+
+inputs:
+  flutter-channel:
+    description: "Flutter channel"
+    required: true
+  flutter-version:
+    description: "Flutter version"
+  ANDROID_KEY_JKS:
+    description: "secrets"
+  ANDROID_STORE_PASSWORD:
+    description: "secrets"
+  ANDROID_KEY_PASSWORD:
+    description: "secrets"
+  ANDROID_KEY_ALIAS:
+    description: "secrets"
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: "Set up Java and Gradle"
+      uses: ./.github/actions/set_up-java-and-gradle
+      with:
+        java-distribution: zulu
+        java-version: 17
+
+    - name: "Flutter doctor"
+      uses: ./.github/actions/flutter-doctor
+      with:
+        flutter-channel: ${{ inputs.flutter-channel }}
+        flutter-version: ${{ inputs.flutter-version }}
+
+    - name: "Create jks"
+      run: echo -n ${{ inputs.ANDROID_KEY_JKS }} | base64 -d > android/mem.jks
+      shell: bash
+
+    - name: "Create key.properties"
+      run: |
+        echo 'storeFile=../mem.jks' > android/key.properties
+        echo 'storePassword=${{ inputs.ANDROID_STORE_PASSWORD }}' >> android/key.properties
+        echo 'keyPassword=${{ inputs.ANDROID_KEY_PASSWORD }}' >> android/key.properties
+        echo 'keyAlias=${{ inputs.ANDROID_KEY_ALIAS }}' >> android/key.properties
+      shell: bash
+
+    - name: "Build Android AppBundle"
+      run: flutter build appbundle --build-number ${GITHUB_RUN_NUMBER}
+      shell: bash
