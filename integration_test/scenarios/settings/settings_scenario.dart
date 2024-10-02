@@ -11,9 +11,9 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/notification_client.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/notifications/notification_ids.dart';
-import 'package:mem/settings/client.dart';
-import 'package:mem/settings/preference.dart';
-import 'package:mem/settings/keys.dart';
+import 'package:mem/settings/preference/client.dart';
+import 'package:mem/settings/preference/preference.dart';
+import 'package:mem/settings/preference/keys.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 import '../helpers.dart';
