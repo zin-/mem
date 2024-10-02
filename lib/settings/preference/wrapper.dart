@@ -35,6 +35,17 @@ class SharedPreferencesWrapper {
         },
       );
 
+  Future<bool> remove(String key) => v(
+        () async => await _sharedPreferencesFuture.then(
+          (sharedPreferences) async => await sharedPreferences.remove(
+            key,
+          ),
+        ),
+        {
+          'key': key,
+        },
+      );
+
   Future<SharedPreferences> _initialize() => v(
         () async => await SharedPreferences.getInstance(),
       );
