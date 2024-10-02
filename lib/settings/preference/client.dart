@@ -10,34 +10,30 @@ class PreferenceClientRepository
   final _sharedPreferencesWrapper = SharedPreferencesWrapper();
 
   Future<PreferenceEntity<T>> shipByKey<T>(PreferenceKey<T> key) => v(
-        () async {
-          final saved = await _sharedPreferencesWrapper.get(key.value);
-
-          return PreferenceEntity(
-            key,
-            key.deserialize(saved),
-          );
+        () async => PreferenceEntity(
+          key,
+          key.deserialize(
+            await _sharedPreferencesWrapper.get(
+              key.value,
+            ),
+          ),
+        ),
+        {
+          'key': key,
         },
-        {'key': key},
       );
 
   @override
   Future<bool> receive(PreferenceEntity entity) => v(
-        () async {
-          final serialized = entity.key.serialize(entity.value);
-
-          switch (serialized.runtimeType) {
-            case const (String):
-              return await (await SharedPreferences.getInstance()).setString(
-                entity.key.value,
-                serialized,
-              );
-
-            default:
-              throw UnimplementedError(); // coverage:ignore-line
-          }
+        () async => await _sharedPreferencesWrapper.set(
+          entity.key.value,
+          entity.key.serialize(
+            entity.value,
+          ),
+        ),
+        {
+          'entity': entity,
         },
-        {'entity': entity},
       );
 
   @override

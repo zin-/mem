@@ -7,12 +7,31 @@ class SharedPreferencesWrapper {
 
   Future<Object?> get(String key) => v(
         () async => await _sharedPreferencesFuture.then(
-          (value) {
-            return value.get(key);
+          (sharedPreferences) => sharedPreferences.get(key),
+        ),
+        {
+          'key': key,
+        },
+      );
+
+  Future<bool> set(String key, Object? value) => v(
+        () async => await _sharedPreferencesFuture.then(
+          (sharedPreferences) async {
+            switch (value.runtimeType) {
+              case const (String):
+                return await sharedPreferences.setString(
+                  key,
+                  value as String,
+                );
+
+              default:
+                throw UnimplementedError(); // coverage:ignore-line
+            }
           },
         ),
         {
           'key': key,
+          'value': value,
         },
       );
 
