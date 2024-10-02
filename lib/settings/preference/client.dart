@@ -1,8 +1,9 @@
 import 'package:mem/framework/repository/key_with_value_repository.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/settings/preference/wrapper.dart';
-import 'package:mem/settings/preference/preference.dart';
-import 'package:mem/settings/preference/preference_key.dart';
+
+import 'preference.dart';
+import 'preference_key.dart';
+import 'wrapper.dart';
 
 class PreferenceClientRepository
     extends KeyWithValueRepository<PreferenceEntity, PreferenceKey> {
