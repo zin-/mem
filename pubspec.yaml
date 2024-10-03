@@ -88,6 +88,9 @@ dependencies:
   # for Permissions
   permission_handler: ^11.3.1
 
+  # for Error report
+  sentry_flutter: ^8.9.0
+
 dev_dependencies:
   # for Test mock
   flutter_test:
