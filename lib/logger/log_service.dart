@@ -1,3 +1,5 @@
+import 'package:sentry_flutter/sentry_flutter.dart';
+
 import 'log.dart';
 import 'log_repository.dart';
 import 'logger_wrapper.dart';
@@ -86,7 +88,6 @@ class LogService {
       return result;
     } catch (e, stackTrace) {
       _errorLog(e, stackTrace);
-      rethrow;
     }
   }
 
@@ -116,17 +117,28 @@ class LogService {
     }
   }
 
-  _errorLog(dynamic e, [StackTrace? stackTrace]) => _repository.receive(
-        Log(
-          Level.error,
-          [
-            "[error] !!",
-          ],
-          "",
-          e,
-          stackTrace,
-        ),
-      );
+  Never _errorLog(
+    dynamic e, [
+    StackTrace? stackTrace,
+  ]) {
+    _repository.receive(
+      Log(
+        Level.error,
+        [
+          "[error] !!",
+        ],
+        "",
+        e,
+        stackTrace,
+      ),
+    );
+    Sentry.captureException(
+      e,
+      stackTrace: stackTrace,
+    );
+
+    throw e;
+  }
 
   bool _shouldLog(Level level) =>
       _DebugLoggableFunction._debug || level.index >= _level.index;
