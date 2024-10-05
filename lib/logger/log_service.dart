@@ -88,6 +88,7 @@ class LogService {
       return result;
     } catch (e, stackTrace) {
       _errorLog(e, stackTrace);
+      rethrow;
     }
   }
 
@@ -117,7 +118,7 @@ class LogService {
     }
   }
 
-  Never _errorLog(
+  _errorLog(
     dynamic e, [
     StackTrace? stackTrace,
   ]) {
@@ -136,8 +137,6 @@ class LogService {
       e,
       stackTrace: stackTrace,
     );
-
-    throw e;
   }
 
   bool _shouldLog(Level level) =>
