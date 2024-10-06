@@ -36,8 +36,9 @@ void testNotificationScenario() => group(
       ": $_scenarioName",
       () {
         LogService.initialize(
-          Level.verbose,
-          const bool.fromEnvironment('CICD', defaultValue: false),
+          level: Level.verbose,
+          enableSimpleLog:
+              const bool.fromEnvironment('CICD', defaultValue: false),
         );
 
         const insertedMemName = "$_scenarioName - mem name - inserted";

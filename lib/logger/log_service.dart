@@ -141,10 +141,10 @@ class LogService {
 
   static LogService? _instance;
 
-  factory LogService.initialize([
+  factory LogService.initialize({
     Level level = Level.info,
     bool enableSimpleLog = false,
-  ]) =>
+  }) =>
       _instance = LogService._(
         LogRepository(
           LoggerWrapper(enableSimpleLog),

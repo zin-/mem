@@ -9,8 +9,9 @@ const _scenarioName = 'Memo scenario';
 
 void main() => group(': $_scenarioName', () {
       LogService.initialize(
-        Level.verbose,
-        const bool.fromEnvironment('CICD', defaultValue: false),
+        level: Level.verbose,
+        enableSimpleLog:
+            const bool.fromEnvironment('CICD', defaultValue: false),
       );
 
       list_scenarios.main();

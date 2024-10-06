@@ -19,8 +19,9 @@ void main() => group(
       _name,
       () {
         LogService.initialize(
-          Level.verbose,
-          const bool.fromEnvironment('CICD', defaultValue: false),
+          level: Level.verbose,
+          enableSimpleLog:
+              const bool.fromEnvironment('CICD', defaultValue: false),
         );
 
         act_list_page_scenario.main();

@@ -24,8 +24,9 @@ void main() => group(
       ": $_scenarioName",
       () {
         LogService.initialize(
-          Level.warning,
-          const bool.fromEnvironment('CICD', defaultValue: false),
+          level: Level.verbose,
+          enableSimpleLog:
+              const bool.fromEnvironment('CICD', defaultValue: false),
         );
 
         const numberOfMem = 100;

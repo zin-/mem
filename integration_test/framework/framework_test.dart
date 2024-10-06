@@ -13,8 +13,9 @@ void main() => group(
       _name,
       () {
         LogService.initialize(
-          Level.verbose,
-          const bool.fromEnvironment('CICD', defaultValue: false),
+          level: Level.verbose,
+          enableSimpleLog:
+              const bool.fromEnvironment('CICD', defaultValue: false),
         );
 
         database_factory_tests.main();

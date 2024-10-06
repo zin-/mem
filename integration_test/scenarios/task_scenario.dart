@@ -29,8 +29,9 @@ const _scenarioName = "Task scenario";
 
 void testTaskScenario() => group(': $_scenarioName', () {
       LogService.initialize(
-        Level.verbose,
-        const bool.fromEnvironment('CICD', defaultValue: false),
+        level: Level.verbose,
+        enableSimpleLog:
+            const bool.fromEnvironment('CICD', defaultValue: false),
       );
 
       final about1MonthAgo = DateTime.now().subtract(const Duration(days: 32));

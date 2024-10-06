@@ -15,7 +15,9 @@ void main() {
     mockedSentryWrapper,
   );
 
-  LogService.initialize(Level.info);
+  LogService.initialize(
+    level: Level.info,
+  );
 
   setUp(() {
     reset(mockedLoggerWrapper);
