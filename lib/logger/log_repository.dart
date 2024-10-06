@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/logger/sentry_wrapper.dart';
 
@@ -5,8 +7,13 @@ import 'log.dart';
 import 'logger_wrapper.dart';
 
 class LogRepository extends Repository<Log> {
-  LoggerWrapper _loggerWrapper;
-  SentryWrapper _sentryWrapper;
+  final LoggerWrapper _loggerWrapper;
+  final SentryWrapper? _sentryWrapper;
+
+  Future<void> init(
+    FutureOr<void> Function() appRunner,
+  ) async =>
+      await _sentryWrapper?.init(appRunner);
 
   Future<void> receive(Log entity) async {
     _loggerWrapper.log(
@@ -16,7 +23,8 @@ class LogRepository extends Repository<Log> {
       entity.stackTrace,
     );
 
-    if (Level.warning.index <= entity.level.index &&
+    if (_sentryWrapper != null &&
+        Level.warning.index <= entity.level.index &&
         entity.level.index < Level.debug.index) {
       await _sentryWrapper.captureException(entity.error, entity.stackTrace);
     }
@@ -31,7 +39,7 @@ class LogRepository extends Repository<Log> {
 
   factory LogRepository(
     LoggerWrapper loggerWrapper,
-    SentryWrapper sentryWrapper,
+    SentryWrapper? sentryWrapper,
   ) =>
       _instance ??= LogRepository._(
         loggerWrapper,

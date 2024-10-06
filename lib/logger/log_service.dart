@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:mem/logger/sentry_wrapper.dart';
 
 import 'log.dart';
@@ -41,6 +43,11 @@ T d<T>(
 class LogService {
   final LogRepository _repository;
   final Level _level;
+
+  Future<void> init(
+    FutureOr<void> Function() appRunner,
+  ) async =>
+      await _repository.init(appRunner);
 
   T valueLog<T>(
     Level level,
