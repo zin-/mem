@@ -15,7 +15,7 @@ void main() {
     mockedSentryWrapper,
   );
 
-  LogService.initialize(
+  final logService = LogService.initialize(
     level: Level.info,
   );
 
@@ -51,7 +51,7 @@ void main() {
           final level = testCase.input;
           const target = "log: test message";
 
-          final result = LogService().valueLog(level, target);
+          final result = logService.valueLog(level, target);
 
           expect(result, target);
 
@@ -67,7 +67,7 @@ void main() {
           const level = Level.info;
           const target = null;
 
-          final result = LogService().valueLog(level, target);
+          final result = logService.valueLog(level, target);
 
           expect(result, target);
 
@@ -92,7 +92,7 @@ void main() {
                   const level = Level.info;
                   const target = [0, 1, 1];
 
-                  final result = LogService().valueLog(level, target);
+                  final result = logService.valueLog(level, target);
 
                   expect(result, target);
 
@@ -120,7 +120,7 @@ void main() {
                   const level = Level.info;
                   const target = {0, 1, 2};
 
-                  final result = LogService().valueLog(level, target);
+                  final result = logService.valueLog(level, target);
 
                   expect(result, target);
 
@@ -152,7 +152,7 @@ void main() {
                     "c": 1,
                   };
 
-                  final result = LogService().valueLog(level, target);
+                  final result = logService.valueLog(level, target);
 
                   expect(result, target);
 
@@ -185,7 +185,7 @@ void main() {
                   const level = Level.info;
                   const target = [];
 
-                  final result = LogService().valueLog(level, target);
+                  final result = logService.valueLog(level, target);
 
                   expect(result, target);
 
@@ -209,7 +209,7 @@ void main() {
                   const level = Level.info;
                   const target = <dynamic>{};
 
-                  final result = LogService().valueLog(level, target);
+                  final result = logService.valueLog(level, target);
 
                   expect(result, target);
 
@@ -233,7 +233,7 @@ void main() {
                   const level = Level.info;
                   const target = {};
 
-                  final result = LogService().valueLog(level, target);
+                  final result = logService.valueLog(level, target);
 
                   expect(result, target);
 
@@ -275,7 +275,7 @@ void main() {
                     ],
                   };
 
-                  final result = LogService().valueLog(level, target);
+                  final result = logService.valueLog(level, target);
 
                   expect(result, target);
 
@@ -318,7 +318,7 @@ void main() {
             const value = "test message future";
             final target = Future.value(value);
 
-            final result = LogService().valueLog(level, target);
+            final result = logService.valueLog(level, target);
 
             expect(result, target);
 
@@ -330,7 +330,7 @@ void main() {
             const value = "test message future";
             final target = Future.value(value);
 
-            final result = await LogService().valueLog(level, target);
+            final result = await logService.valueLog(level, target);
 
             expect(result, value);
 
@@ -369,7 +369,7 @@ void main() {
 
                 verifyNever(mockedLoggerWrapper.log(any, any, any, any));
                 expect(
-                  () => LogService().valueLog(level, Future.error(e)),
+                  () => logService.valueLog(level, Future.error(e)),
                   throwsA((thrown) {
                     expect(thrown, isA<Exception>());
                     expect(thrown.message, errorMessage);
@@ -446,7 +446,7 @@ void main() {
           return a + b;
         }
 
-        final result = LogService().functionLog(
+        final result = logService.functionLog(
           level,
           () => sampleFunc(arg1, arg2),
           args,
@@ -478,7 +478,7 @@ void main() {
         }
 
         expect(
-          () => LogService().functionLog(
+          () => logService.functionLog(
             level,
             () => sampleFunc(arg1, arg2),
             args,
@@ -508,13 +508,13 @@ void main() {
             const arg2 = 2;
             const args = [arg1, arg2];
             int sampleFunc(int a, int b) {
-              LogService().valueLog(Level.verbose, "verbose log");
+              logService.valueLog(Level.verbose, "verbose log");
               return a + b;
             }
 
-            LogService().valueLog(Level.verbose, "verbose log");
+            logService.valueLog(Level.verbose, "verbose log");
 
-            final result = LogService().functionLog(
+            final result = logService.functionLog(
               level,
               () => sampleFunc(arg1, arg2),
               args,
@@ -545,14 +545,14 @@ void main() {
             const arg2 = 2;
             const args = [arg1, arg2];
             int sampleFunc(int a, int b) {
-              LogService()
-                  .valueLog(Level.verbose, Future.value("future verbose log"));
+              logService.valueLog(
+                  Level.verbose, Future.value("future verbose log"));
               return a + b;
             }
 
-            LogService().valueLog(Level.verbose, "verbose log - do not log");
+            logService.valueLog(Level.verbose, "verbose log - do not log");
 
-            final result = LogService().functionLog(
+            final result = logService.functionLog(
               level,
               () => sampleFunc(arg1, arg2),
               args,
@@ -588,7 +588,7 @@ void main() {
             const arg2 = 3;
             const args = [arg1, arg2];
 
-            int cascadedFunc(int c, int d) => LogService().functionLog(
+            int cascadedFunc(int c, int d) => logService.functionLog(
                   Level.verbose,
                   () {
                     return c * d;
@@ -603,7 +603,7 @@ void main() {
             final cascadedFuncResult = cascadedFunc(arg1, arg2);
             expect(cascadedFuncResult, 6);
 
-            final result = LogService().functionLog(
+            final result = logService.functionLog(
               level,
               () => sampleFunc(arg1, arg2),
               args,
@@ -636,7 +636,7 @@ void main() {
             const arg2 = 3;
             const args = [arg1, arg2];
 
-            Future<int> cascadedFunc(int c, int d) => LogService().functionLog(
+            Future<int> cascadedFunc(int c, int d) => logService.functionLog(
                   Level.verbose,
                   () async {
                     return c * d;
@@ -651,7 +651,7 @@ void main() {
 
             cascadedFunc(arg1, arg2);
 
-            final result = LogService().functionLog(
+            final result = logService.functionLog(
               level,
               () => sampleFunc(arg1, arg2),
               args,
@@ -694,7 +694,7 @@ void main() {
           return a + b;
         }
 
-        final result = await LogService().functionLog(
+        final result = await logService.functionLog(
           level,
           () => sampleFunc(arg1, arg2),
           args,
@@ -728,7 +728,7 @@ void main() {
         }
 
         expect(
-          () => LogService().functionLog(
+          () => logService.functionLog(
             level,
             () => sampleFunc(arg1, arg2),
             args,
@@ -768,14 +768,14 @@ void main() {
             const arg2 = 2;
             const args = [arg1, arg2];
             Future<int> sampleFunc(int a, int b) async {
-              LogService()
-                  .valueLog(Level.verbose, Future.value("future verbose log"));
+              logService.valueLog(
+                  Level.verbose, Future.value("future verbose log"));
               return a + b;
             }
 
-            LogService().valueLog(Level.verbose, "verbose log - do not log");
+            logService.valueLog(Level.verbose, "verbose log - do not log");
 
-            final result = await LogService().functionLog(
+            final result = await logService.functionLog(
               level,
               () => sampleFunc(arg1, arg2),
               args,
@@ -811,7 +811,7 @@ void main() {
             const arg2 = 3;
             const args = [arg1, arg2];
 
-            Future<int> cascadedFunc(int c, int d) => LogService().functionLog(
+            Future<int> cascadedFunc(int c, int d) => logService.functionLog(
                   Level.verbose,
                   () async {
                     return c * d;
@@ -825,7 +825,7 @@ void main() {
 
             cascadedFunc(arg1, arg2);
 
-            final result = await LogService().functionLog(
+            final result = await logService.functionLog(
               level,
               () => sampleFunc(arg1, arg2),
               args,
