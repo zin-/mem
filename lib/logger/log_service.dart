@@ -1,4 +1,4 @@
-import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:mem/logger/sentry_wrapper.dart';
 
 import 'log.dart';
 import 'log_repository.dart';
@@ -121,23 +121,18 @@ class LogService {
   _errorLog(
     dynamic e, [
     StackTrace? stackTrace,
-  ]) {
-    _repository.receive(
-      Log(
-        Level.error,
-        [
-          "[error] !!",
-        ],
-        "",
-        e,
-        stackTrace,
-      ),
-    );
-    Sentry.captureException(
-      e,
-      stackTrace: stackTrace,
-    );
-  }
+  ]) =>
+      _repository.receive(
+        Log(
+          Level.error,
+          [
+            "[error] !!",
+          ],
+          "",
+          e,
+          stackTrace,
+        ),
+      );
 
   bool _shouldLog(Level level) =>
       _DebugLoggableFunction._debug || level.index >= _level.index;
@@ -151,7 +146,10 @@ class LogService {
     bool enableSimpleLog = false,
   ]) =>
       _instance = LogService._(
-        LogRepository(LoggerWrapper(enableSimpleLog)),
+        LogRepository(
+          LoggerWrapper(enableSimpleLog),
+          SentryWrapper(),
+        ),
         level,
       );
 

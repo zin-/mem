@@ -8,12 +8,21 @@ import '../helpers.dart';
 
 void main() {
   final mockedLoggerWrapper = MockLoggerWrapper();
-  LogRepository(mockedLoggerWrapper);
+  final mockedSentryWrapper = MockSentryWrapper();
+
+  LogRepository(
+    mockedLoggerWrapper,
+    mockedSentryWrapper,
+  );
 
   LogService.initialize(Level.info);
 
   setUp(() {
     reset(mockedLoggerWrapper);
+    reset(mockedSentryWrapper);
+
+    when(mockedSentryWrapper.captureException(any, any))
+        .thenAnswer((realInvocation) => Future.value("test"));
   });
 
   group("valueLog", () {
