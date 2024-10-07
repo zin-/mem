@@ -11,7 +11,11 @@ void main() {
   testWidgets(
     'throw',
     (widgetTester) async {
-      LogService.initialize(Level.verbose);
+      LogService.initialize(
+        level: Level.verbose,
+        enableSimpleLog:
+            const bool.fromEnvironment('CICD', defaultValue: false),
+      );
       const thrown = 'test value - AsyncValue is not future: throw';
 
       await widgetTester.pumpWidget(

@@ -8,6 +8,7 @@ import 'package:mem/acts/counter/act_counter_client.dart';
 import 'package:mem/acts/counter/home_widget_accessor.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/logger/logger_wrapper.dart';
+import 'package:mem/logger/sentry_wrapper.dart';
 import 'package:mem/notifications/flutter_local_notifications_wrapper.dart';
 import 'package:mockito/annotations.dart';
 
@@ -24,6 +25,7 @@ int randomInt([int max = 42949671]) => Random().nextInt(max);
   // FIXME RepositoryではなくTableをmockする
   //  Repositoryはシステム固有の処理であるのに対して、Tableは永続仮想をラップする役割を持つため
   ActCounterClient,
+  SentryWrapper,
 ])
 void main() {}
 

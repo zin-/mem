@@ -85,10 +85,12 @@ Future<void> _runApplication({
 }) =>
     i(
       () async {
-        runApp(
-          MemApplication(
-            initialPath: initialPath,
-            languageCode: languageCode,
+        await LogService().init(
+          () => runApp(
+            MemApplication(
+              initialPath: initialPath,
+              languageCode: languageCode,
+            ),
           ),
         );
       },

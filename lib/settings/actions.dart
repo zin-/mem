@@ -1,7 +1,7 @@
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/settings/preference.dart';
-import 'package:mem/settings/client.dart';
-import 'package:mem/settings/preference_key.dart';
+import 'package:mem/settings/preference/preference.dart';
+import 'package:mem/settings/preference/client.dart';
+import 'package:mem/settings/preference/preference_key.dart';
 
 final _client = PreferenceClientRepository();
 

@@ -16,8 +16,8 @@ void main() {
 
   const onCICD = bool.fromEnvironment('CICD', defaultValue: false);
   LogService.initialize(
-    Level.verbose,
-    const bool.fromEnvironment('CICD', defaultValue: false),
+    level: Level.verbose,
+    enableSimpleLog: onCICD,
   );
   info({'onCICD': onCICD});
 

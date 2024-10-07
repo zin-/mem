@@ -22,8 +22,9 @@ void main() => group(
         const baseInsertedMemName = '$_scenarioName - mem name - inserted';
 
         LogService.initialize(
-          Level.warning,
-          const bool.fromEnvironment('CICD', defaultValue: false),
+          level: Level.verbose,
+          enableSimpleLog:
+              const bool.fromEnvironment('CICD', defaultValue: false),
         );
 
         late final DatabaseAccessor dbA;

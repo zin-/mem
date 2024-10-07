@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:mem/logger/sentry_wrapper.dart';
+
 import 'log.dart';
 import 'log_repository.dart';
 import 'logger_wrapper.dart';
@@ -39,6 +43,11 @@ T d<T>(
 class LogService {
   final LogRepository _repository;
   final Level _level;
+
+  Future<void> init(
+    FutureOr<void> Function() appRunner,
+  ) async =>
+      await _repository.init(appRunner);
 
   T valueLog<T>(
     Level level,
@@ -116,7 +125,11 @@ class LogService {
     }
   }
 
-  _errorLog(dynamic e, [StackTrace? stackTrace]) => _repository.receive(
+  _errorLog(
+    dynamic e, [
+    StackTrace? stackTrace,
+  ]) =>
+      _repository.receive(
         Log(
           Level.error,
           [
@@ -135,12 +148,15 @@ class LogService {
 
   static LogService? _instance;
 
-  factory LogService.initialize([
+  factory LogService.initialize({
     Level level = Level.info,
     bool enableSimpleLog = false,
-  ]) =>
+  }) =>
       _instance = LogService._(
-        LogRepository(LoggerWrapper(enableSimpleLog)),
+        LogRepository(
+          LoggerWrapper(enableSimpleLog),
+          SentryWrapper(),
+        ),
         level,
       );
 
