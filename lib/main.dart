@@ -109,6 +109,8 @@ const memIdParamName = 'mem_id';
 @pragma('vm:entry-point')
 Future<void> backgroundCallback(Uri? uri) => i(
       () async {
+        WidgetsFlutterBinding.ensureInitialized();
+
         if (uri != null && uri.scheme == uriSchema && uri.host == appId) {
           if (uri.pathSegments.contains(actCounter)) {
             final memId = uri.queryParameters[memIdParamName];
