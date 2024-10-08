@@ -1,5 +1,6 @@
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
@@ -54,6 +55,27 @@ class MemEntity extends Mem with Entity, Copyable<MemEntity> {
 
 class SavedMemEntity extends MemEntity with DatabaseTupleEntity<int> {
   SavedMemEntity(super.name, super.doneAt, super.period);
+
+  @override
+  int compareTo(
+    Mem other, {
+    thisLatestAct,
+    otherLatestAct,
+  }) =>
+      v(
+        () {
+          final compared = super.compareTo(other);
+
+          if (compared == 0 && other is SavedMemEntity) {
+            return id.compareTo(other.id);
+          } else {
+            return compared;
+          }
+        },
+        {
+          'other': other,
+        },
+      );
 
   SavedMemEntity.fromMap(
     Map<String, dynamic> map,

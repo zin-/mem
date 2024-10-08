@@ -144,6 +144,7 @@ final memListProvider = StateNotifierProvider.autoDispose<
       {
         'filtered': filtered,
         'latestActsByMem': latestActsByMem,
+        'savedMemNotifications': savedMemNotifications,
       },
     ),
   );

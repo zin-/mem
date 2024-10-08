@@ -1,5 +1,6 @@
-// FIXME coreからflutterへの依存は排除したい
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; // FIXME coreからflutterへの依存は排除したい
+
+import 'package:mem/acts/act.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/notification/type.dart';
@@ -14,6 +15,37 @@ class Mem {
   Mem(this.name, this.doneAt, this.period);
 
   bool get isDone => doneAt != null;
+
+  int compareTo(
+    Mem other, {
+    Act? thisLatestAct,
+    Act? otherLatestAct,
+  }) =>
+      d(
+        () {
+          final comparedByActiveAct = Act.activeCompare(
+            thisLatestAct,
+            otherLatestAct,
+          );
+          if (comparedByActiveAct != 0) {
+            return comparedByActiveAct;
+          }
+
+          // if ((a.isArchived) != (b.isArchived)) {
+          //   return a.isArchived ? 1 : -1;
+          // }
+          // if (isDone != other.isDone) {
+          //   return isDone ? 1 : -1;
+          // }
+
+          return 0;
+        },
+        {
+          'other': other,
+          'thisLatestAct': thisLatestAct,
+          'otherLatestAct': otherLatestAct,
+        },
+      );
 
   Iterable<Schedule> periodSchedules(
     TimeOfDay startOfDay,
