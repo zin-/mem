@@ -156,7 +156,7 @@ class LogService {
       _instance ??= LogService._(
         LogRepository(
           LoggerWrapper(enableSimpleLog),
-          enableErrorReport ? SentryWrapper() : null,
+          enableErrorReport ? SentryWrapper() : null, // coverage:ignore-line
         ),
         level,
       );

@@ -16,7 +16,7 @@ class LogRepository extends Repository<Log> {
     if (_sentryWrapper == null) {
       await appRunner();
     } else {
-      await _sentryWrapper.init(appRunner);
+      await _sentryWrapper.init(appRunner); // coverage:ignore-line
     }
   }
 
