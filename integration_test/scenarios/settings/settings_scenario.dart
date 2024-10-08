@@ -23,7 +23,7 @@ const _scenarioName = "Settings test";
 void main() => group(
       ": $_scenarioName",
       () {
-        LogService.initialize(
+        LogService(
           level: Level.verbose,
           enableSimpleLog:
               const bool.fromEnvironment('CICD', defaultValue: false),

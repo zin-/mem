@@ -148,19 +148,18 @@ class LogService {
 
   static LogService? _instance;
 
-  factory LogService.initialize({
+  factory LogService({
     Level level = Level.info,
     bool enableSimpleLog = false,
+    bool enableErrorReport = false,
   }) =>
-      _instance = LogService._(
+      _instance ??= LogService._(
         LogRepository(
           LoggerWrapper(enableSimpleLog),
-          SentryWrapper(),
+          enableErrorReport ? SentryWrapper() : null,
         ),
         level,
       );
-
-  factory LogService() => _instance ??= LogService.initialize();
 }
 
 extension _DebugLoggableFunction<T> on T Function() {

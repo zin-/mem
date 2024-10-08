@@ -85,7 +85,9 @@ Future<void> _runApplication({
 }) =>
     i(
       () async {
-        await LogService().init(
+        await LogService(
+          enableErrorReport: true,
+        ).init(
           () => runApp(
             MemApplication(
               initialPath: initialPath,

@@ -15,7 +15,7 @@ void main() {
     mockedSentryWrapper,
   );
 
-  final logService = LogService.initialize(
+  final logService = LogService(
     level: Level.info,
   );
 

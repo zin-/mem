@@ -18,7 +18,7 @@ const _name = "Habit scenario";
 void main() => group(
       _name,
       () {
-        LogService.initialize(
+        LogService(
           level: Level.verbose,
           enableSimpleLog:
               const bool.fromEnvironment('CICD', defaultValue: false),

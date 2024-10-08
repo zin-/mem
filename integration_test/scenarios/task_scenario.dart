@@ -28,7 +28,7 @@ void main() {
 const _scenarioName = "Task scenario";
 
 void testTaskScenario() => group(': $_scenarioName', () {
-      LogService.initialize(
+      LogService(
         level: Level.verbose,
         enableSimpleLog:
             const bool.fromEnvironment('CICD', defaultValue: false),

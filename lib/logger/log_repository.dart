@@ -12,8 +12,13 @@ class LogRepository extends Repository<Log> {
 
   Future<void> init(
     FutureOr<void> Function() appRunner,
-  ) async =>
-      await _sentryWrapper?.init(appRunner);
+  ) async {
+    if (_sentryWrapper == null) {
+      await appRunner();
+    } else {
+      await _sentryWrapper.init(appRunner);
+    }
+  }
 
   Future<void> receive(Log entity) async {
     _loggerWrapper.log(
