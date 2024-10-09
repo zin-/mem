@@ -27,6 +27,15 @@ void main() => group(_name, () {
 
           expect(result, equals(1));
         });
+
+        test(': is done.', () {
+          final memA = Mem("$_name - a", null, null);
+          final memB = Mem("$_name - b", DateAndTime.now(), null);
+
+          final result = memA.compareTo(memB);
+
+          expect(result, equals(-1));
+        });
       });
 
       group(": SavedMemEntity", () {

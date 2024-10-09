@@ -34,9 +34,9 @@ class Mem {
           // if ((a.isArchived) != (b.isArchived)) {
           //   return a.isArchived ? 1 : -1;
           // }
-          // if (isDone != other.isDone) {
-          //   return isDone ? 1 : -1;
-          // }
+          if (isDone != other.isDone) {
+            return isDone ? 1 : -1;
+          }
 
           return 0;
         },
