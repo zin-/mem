@@ -8,7 +8,7 @@ import 'detail_scenarios.dart' as detail_scenarios;
 const _scenarioName = 'Memo scenario';
 
 void main() => group(': $_scenarioName', () {
-      LogService.initialize(
+      LogService(
         level: Level.verbose,
         enableSimpleLog:
             const bool.fromEnvironment('CICD', defaultValue: false),

@@ -1,5 +1,5 @@
 // coverage:ignore-file
-import 'package:awesome_notifications/awesome_notifications.dart' as an;
+// import 'package:awesome_notifications/awesome_notifications.dart' as an;
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -7,68 +7,67 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/notification/channel.dart';
 
 class AwesomeNotificationsWrapper {
-  late final Future<an.AwesomeNotifications> _awesomeNotificationsFuture =
-      _initialize(
-    _androidDefaultIconPath,
-    _l10n,
-    _notificationChannels,
-  );
+  // late final Future<an.AwesomeNotifications> _awesomeNotificationsFuture =
+  //     _initialize(
+  //   _androidDefaultIconPath,
+  //   _l10n,
+  //   _notificationChannels,
+  // );
 
-  Future<an.AwesomeNotifications> _initialize(
-    String androidDefaultIconPath,
-    AppLocalizations l10n,
-    Set<NotificationChannel> notificationChannels,
-  ) =>
-      v(
-        () async {
-          final awesomeNotifications = an.AwesomeNotifications();
+  // Future<an.AwesomeNotifications> _initialize(
+  //   String androidDefaultIconPath,
+  //   AppLocalizations l10n,
+  //   Set<NotificationChannel> notificationChannels,
+  // ) =>
+  //     v(
+  //       () async {
+  //         final awesomeNotifications = an.AwesomeNotifications();
+  //
+  //         await awesomeNotifications.initialize(
+  //           'resource://drawable/$androidDefaultIconPath',
+  //           notificationChannels
+  //               .map(
+  //                 (e) => an.NotificationChannel(
+  //                   channelKey: e.id,
+  //                   channelName: e.name,
+  //                   channelDescription: e.description,
+  //                 ),
+  //               )
+  //               .toList(growable: false),
+  //           // TODO build variantで変える
+  //           debug: true,
+  //         );
+  //
+  //         an.AwesomeNotifications().setListeners(
+  //           onActionReceivedMethod: (an.ReceivedAction receivedAction) async {
+  //             verbose('onActionReceivedMethod');
+  //           },
+  //           onNotificationCreatedMethod:
+  //               (an.ReceivedNotification receivedNotification) async {
+  //             verbose('onNotificationCreatedMethod');
+  //           },
+  //           onNotificationDisplayedMethod:
+  //               (an.ReceivedNotification receivedNotification) async {
+  //             verbose('onNotificationDisplayedMethod');
+  //           },
+  //           onDismissActionReceivedMethod:
+  //               (an.ReceivedAction receivedAction) async {
+  //             verbose('onDismissActionReceivedMethod');
+  //           },
+  //         );
+  //
+  //         return awesomeNotifications;
+  //       },
+  //     );
 
-          await awesomeNotifications.initialize(
-            'resource://drawable/$androidDefaultIconPath',
-            notificationChannels
-                .map(
-                  (e) => an.NotificationChannel(
-                    channelKey: e.id,
-                    channelName: e.name,
-                    channelDescription: e.description,
-                  ),
-                )
-                .toList(growable: false),
-            // TODO build variantで変える
-            debug: true,
-          );
+  // final String _androidDefaultIconPath;
+  // final AppLocalizations _l10n;
+  // final Set<NotificationChannel> _notificationChannels;
 
-          an.AwesomeNotifications().setListeners(
-            onActionReceivedMethod: (an.ReceivedAction receivedAction) async {
-              verbose('onActionReceivedMethod');
-            },
-            onNotificationCreatedMethod:
-                (an.ReceivedNotification receivedNotification) async {
-              verbose('onNotificationCreatedMethod');
-            },
-            onNotificationDisplayedMethod:
-                (an.ReceivedNotification receivedNotification) async {
-              verbose('onNotificationDisplayedMethod');
-            },
-            onDismissActionReceivedMethod:
-                (an.ReceivedAction receivedAction) async {
-              verbose('onDismissActionReceivedMethod');
-            },
-          );
-
-          return awesomeNotifications;
-        },
+  AwesomeNotificationsWrapper._(// this._androidDefaultIconPath,
+      // this._l10n,
+      // this._notificationChannels,
       );
-
-  final String _androidDefaultIconPath;
-  final AppLocalizations _l10n;
-  final Set<NotificationChannel> _notificationChannels;
-
-  AwesomeNotificationsWrapper._(
-    this._androidDefaultIconPath,
-    this._l10n,
-    this._notificationChannels,
-  );
 
   Future<bool> show(
     int id,
@@ -77,13 +76,14 @@ class AwesomeNotificationsWrapper {
   ) =>
       v(
         () async {
-          return await (await _awesomeNotificationsFuture).createNotification(
-            content: an.NotificationContent(
-              id: id,
-              channelKey: channelId,
-              title: title,
-            ),
-          );
+          // return await (await _awesomeNotificationsFuture).createNotification(
+          //   content: an.NotificationContent(
+          //     id: id,
+          //     channelKey: channelId,
+          //     title: title,
+          //   ),
+          // );
+          return false;
         },
         {
           'id': id,
@@ -101,10 +101,10 @@ class AwesomeNotificationsWrapper {
   ) =>
       v(
         () => _instance ??= AwesomeNotificationsWrapper._(
-          androidDefaultIconPath,
-          l10n,
-          notificationChannels,
-        ),
+            // androidDefaultIconPath,
+            // l10n,
+            // notificationChannels,
+            ),
         {
           '_instance': _instance,
           'androidDefaultIconPath': androidDefaultIconPath,

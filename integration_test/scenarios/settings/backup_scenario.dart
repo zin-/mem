@@ -21,7 +21,7 @@ void main() => group(
         const numberOfMem = 100;
         const baseInsertedMemName = '$_scenarioName - mem name - inserted';
 
-        LogService.initialize(
+        LogService(
           level: Level.verbose,
           enableSimpleLog:
               const bool.fromEnvironment('CICD', defaultValue: false),

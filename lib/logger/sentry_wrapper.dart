@@ -1,3 +1,4 @@
+// coverage:ignore-file // テストにおいて実行しないため
 import 'dart:async';
 
 import 'package:mem/logger/log_service.dart';

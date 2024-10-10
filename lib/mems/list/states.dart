@@ -1,13 +1,10 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/states.dart';
-import 'package:mem/acts/act.dart';
-import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/states.dart';
-import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/acts/act_entity.dart';
 import 'package:mem/acts/act_repository.dart';
 import 'package:mem/mems/mem_entity.dart';
@@ -97,20 +94,6 @@ final memListProvider = StateNotifierProvider.autoDispose<
             latestActsByMem.singleWhereOrNull((act) => act.memId == a.id);
         final latestActOfB =
             latestActsByMem.singleWhereOrNull((act) => act.memId == b.id);
-        final comparedByActiveAct = Act.activeCompare(
-          latestActOfA,
-          latestActOfB,
-        );
-        if (comparedByActiveAct != 0) {
-          return comparedByActiveAct;
-        }
-
-        if ((a.isArchived) != (b.isArchived)) {
-          return a.isArchived ? 1 : -1;
-        }
-        if (a.isDone != b.isDone) {
-          return a.isDone ? 1 : -1;
-        }
 
         final memNotificationsOfA =
             savedMemNotifications.where((e) => e.memId == a.id);
@@ -119,24 +102,18 @@ final memListProvider = StateNotifierProvider.autoDispose<
 
         final startOfDay = ref.read(startOfDayProvider);
         final now = DateTime.now();
-        final comparedTime = _compareTime(
-          a.period,
-          MemNotifications.nextRepeatNotifyAt(
-            memNotificationsOfA,
-            startOfDay,
-            latestActOfA,
-            now,
-          ),
-          b.period,
-          MemNotifications.nextRepeatNotifyAt(
-            memNotificationsOfB,
-            startOfDay,
-            latestActOfB,
-            now,
-          ),
+
+        final compared = a.compareTo(
+          b,
+          latestActOfThis: latestActOfA,
+          latestActOfOther: latestActOfB,
+          memNotificationsOfThis: memNotificationsOfA,
+          memNotificationsOfOther: memNotificationsOfB,
+          startOfDay: startOfDay,
+          now: now,
         );
-        if (comparedTime != 0) {
-          return comparedTime;
+        if (compared != 0) {
+          return compared;
         }
 
         return a.id.compareTo(b.id);
@@ -144,42 +121,11 @@ final memListProvider = StateNotifierProvider.autoDispose<
       {
         'filtered': filtered,
         'latestActsByMem': latestActsByMem,
+        'savedMemNotifications': savedMemNotifications,
       },
     ),
   );
 });
-
-int _compareTime(
-  DateAndTimePeriod? periodOfA,
-  DateTime? nextNotifyAtOfA,
-  DateAndTimePeriod? periodOfB,
-  DateTime? nextNotifyAtOfB,
-) =>
-    v(
-      () {
-        if ((periodOfA == null && nextNotifyAtOfA == null) &&
-            (periodOfB == null && nextNotifyAtOfB == null)) {
-          return 0;
-        } else if (nextNotifyAtOfA != null && nextNotifyAtOfB != null) {
-          return nextNotifyAtOfA.compareTo(nextNotifyAtOfB);
-        } else if (periodOfA != null && nextNotifyAtOfB != null) {
-          return periodOfA.compareWithDateAndTime(nextNotifyAtOfB);
-        } else if (nextNotifyAtOfA != null && periodOfB != null) {
-          return -periodOfB.compareWithDateAndTime(nextNotifyAtOfA);
-        } else if ((periodOfA == null && nextNotifyAtOfA == null) ||
-            (periodOfB == null && nextNotifyAtOfB == null)) {
-          return (periodOfA == null && nextNotifyAtOfA == null) ? 1 : -1;
-        } else {
-          return DateAndTimePeriod.compare(periodOfA, periodOfB);
-        }
-      },
-      {
-        'periodOfA': periodOfA,
-        'nextNotifyAtOfA': nextNotifyAtOfA,
-        'periodOfB': periodOfB,
-        'nextNotifyAtOfB': nextNotifyAtOfB,
-      },
-    );
 
 final latestActsByMemProvider = StateNotifierProvider.autoDispose<
     ListValueStateNotifier<SavedActEntity>, List<SavedActEntity>>(

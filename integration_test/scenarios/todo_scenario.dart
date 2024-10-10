@@ -24,7 +24,7 @@ void main() {
 const _scenarioName = 'Todo scenario';
 
 void testTodoScenario() => group(': $_scenarioName', () {
-      LogService.initialize(
+      LogService(
         level: Level.verbose,
         enableSimpleLog:
             const bool.fromEnvironment('CICD', defaultValue: false),
