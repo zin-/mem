@@ -16,6 +16,25 @@ void main() => group(_name, () {
       const startOfDay = TimeOfDay(hour: 0, minute: 0);
       final now = DateTime.now();
 
+      // TODO 仕様を整理する
+      // ざっくりした要望として重要な順に並んでいてほしい
+      // その日中にやることにしていること、習慣として時間を決めてやることにしていること
+      //  - 最も上位に来るのは、実行中のもの
+      //    - 実行中のものの中だと、直近に始めた順
+      //      - そうか？先に始めた順にしたほうが良い気がする
+      //        - 何かをやっていて途中で更に始めた場合、もとのやつは中断しているか並行しているか
+      //  - まず、時分の指定がないもの
+      //    - 1日を通して気にする必要があるので最上位かも
+      //    - 時分を決めてしまうタスクとしてとらえるとしても上位にあってほしい
+      //    - これは、期間指定の開始と終了に当てはまる
+      //  - 次は、時分の指定があるもの
+      //  - その日にやったかどうかも気にしたい
+      //    - 最新のActが、その日中かどうか？
+      //    - 3日に1回とかもある、この場合最新のActから何日たっているか？
+      //  - いつやるかは指定なしだけど、AfterActStartedがで繰り返しやることが想定されるもの
+      //  - 完了しているものやアーカイブしたものは下位
+      //    - 同時に見ることはほとんどないはずではあるけど
+      // TODO 期間と繰り返しの両方を持つ場合は？
       final mems = [
         {
           mem: Mem("plain", null, null),
@@ -48,18 +67,26 @@ void main() => group(_name, () {
             MemNotification(0, MemNotificationType.repeat, 0, "message")
           ]
         },
+        {
+          mem: Mem("has period start", null,
+              DateAndTimePeriod(start: DateAndTime(0))),
+          latestAct: null,
+          memNotifications: null
+        },
       ];
       final results = [
         // plain
-        0, 1, -1, -1, 0,
+        0, 1, -1, -1, 0, 0,
         // has active act
-        -1, 0, -1, -1, -1,
+        -1, 0, -1, -1, -1, -1,
         // is archived
-        1, 1, 0, 1, 1,
+        1, 1, 0, 1, 1, 1,
         // is done
-        1, 1, -1, 0, 1,
+        1, 1, -1, 0, 1, 1,
         // has mem notifications
-        0, 1, -1, -1, 0,
+        0, 1, -1, -1, 0, 0,
+        // has period start
+        0, 1, -1, -1, 0, 0,
       ];
 
       for (final a in mems) {
@@ -70,6 +97,10 @@ void main() => group(_name, () {
               final result = (a[mem] as Mem).compareTo((b[mem] as Mem),
                   latestActOfThis: (a[latestAct] as Act?),
                   latestActOfOther: (b[latestAct] as Act?),
+                  memNotificationsOfThis:
+                      (a[memNotifications] as Iterable<MemNotification>?),
+                  memNotificationsOfOther:
+                      (b[memNotifications] as Iterable<MemNotification>?),
                   startOfDay: startOfDay,
                   now: now);
 
@@ -78,13 +109,4 @@ void main() => group(_name, () {
           );
         }
       }
-
-      test(': mem notifications.', () {
-        final memA = Mem("$_name - a", null, null);
-        final memB = Mem("$_name - b", DateAndTime.now(), null);
-
-        final result = memA.compareTo(memB);
-
-        expect(result, equals(-1));
-      });
     });
