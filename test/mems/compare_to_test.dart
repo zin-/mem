@@ -55,5 +55,22 @@ void main() => group(_name, () {
 
           expect(result, equals(1));
         });
+
+        test(': isArchived', () {
+          final a = SavedMemEntity("$_name - a", null, null)
+            ..id = 0
+            ..createdAt = DateTime.now()
+            ..updatedAt = null
+            ..archivedAt = DateTime.now();
+          final b = SavedMemEntity("$_name - b", null, null)
+            ..id = 0
+            ..createdAt = DateTime.now()
+            ..updatedAt = null
+            ..archivedAt = null;
+
+          final result = a.compareTo(b);
+
+          expect(result, equals(1));
+        });
       });
     });

@@ -14,6 +14,8 @@ class Mem {
 
   Mem(this.name, this.doneAt, this.period);
 
+  bool get isArchived => false;
+
   bool get isDone => doneAt != null;
 
   int compareTo(
@@ -31,9 +33,9 @@ class Mem {
             return comparedByActiveAct;
           }
 
-          // if ((a.isArchived) != (b.isArchived)) {
-          //   return a.isArchived ? 1 : -1;
-          // }
+          if ((isArchived) != (other.isArchived)) {
+            return isArchived ? 1 : -1;
+          }
           if (isDone != other.isDone) {
             return isDone ? 1 : -1;
           }
