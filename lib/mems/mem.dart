@@ -46,24 +46,29 @@ class Mem {
             return isDone ? 1 : -1;
           }
 
-          final comparedTime = _compareTime(
-            period,
-            MemNotifications.nextRepeatNotifyAt(
-              memNotificationsOfThis!,
-              startOfDay!,
-              latestActOfThis,
-              now!,
-            ),
-            other.period,
-            MemNotifications.nextRepeatNotifyAt(
-              memNotificationsOfOther!,
-              startOfDay,
-              latestActOfOther,
-              now,
-            ),
-          );
-          if (comparedTime != 0) {
-            return comparedTime;
+          if (memNotificationsOfThis != null &&
+              memNotificationsOfOther != null &&
+              startOfDay != null &&
+              now != null) {
+            final comparedTime = _compareTime(
+              period,
+              MemNotifications.nextRepeatNotifyAt(
+                memNotificationsOfThis,
+                startOfDay,
+                latestActOfThis,
+                now,
+              ),
+              other.period,
+              MemNotifications.nextRepeatNotifyAt(
+                memNotificationsOfOther,
+                startOfDay,
+                latestActOfOther,
+                now,
+              ),
+            );
+            if (comparedTime != 0) {
+              return comparedTime;
+            }
           }
 
           return 0;
