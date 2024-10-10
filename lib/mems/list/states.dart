@@ -92,17 +92,6 @@ final memListProvider = StateNotifierProvider.autoDispose<
   return ValueStateNotifier(
     v(
       () => filtered.sorted((a, b) {
-        final compared = a.compareTo(
-          b,
-          thisLatestAct:
-              latestActsByMem.singleWhereOrNull((act) => act.memId == a.id),
-          otherLatestAct:
-              latestActsByMem.singleWhereOrNull((act) => act.memId == b.id),
-        );
-        if (compared != 0) {
-          return compared;
-        }
-
         final latestActOfA =
             latestActsByMem.singleWhereOrNull((act) => act.memId == a.id);
         final latestActOfB =
@@ -112,6 +101,17 @@ final memListProvider = StateNotifierProvider.autoDispose<
             savedMemNotifications.where((e) => e.memId == a.id);
         final memNotificationsOfB =
             savedMemNotifications.where((e) => e.memId == b.id);
+
+        final compared = a.compareTo(
+          b,
+          latestActOfThis: latestActOfA,
+          latestActOfOther: latestActOfB,
+          memNotificationsOfThis: memNotificationsOfA,
+          memNotificationsOfOther: memNotificationsOfB,
+        );
+        if (compared != 0) {
+          return compared;
+        }
 
         final startOfDay = ref.read(startOfDayProvider);
         final now = DateTime.now();

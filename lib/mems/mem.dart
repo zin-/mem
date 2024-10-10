@@ -3,6 +3,7 @@ import 'package:flutter/material.dart'; // FIXME coreからflutterへの依存�
 import 'package:mem/acts/act.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/notifications/schedule.dart';
 import 'package:mem/mems/mem_entity.dart';
@@ -20,14 +21,16 @@ class Mem {
 
   int compareTo(
     Mem other, {
-    Act? thisLatestAct,
-    Act? otherLatestAct,
+    Act? latestActOfThis,
+    Act? latestActOfOther,
+    Iterable<MemNotification>? memNotificationsOfThis,
+    Iterable<MemNotification>? memNotificationsOfOther,
   }) =>
       v(
         () {
           final comparedByActiveAct = Act.activeCompare(
-            thisLatestAct,
-            otherLatestAct,
+            latestActOfThis,
+            latestActOfOther,
           );
           if (comparedByActiveAct != 0) {
             return comparedByActiveAct;
@@ -44,8 +47,8 @@ class Mem {
         },
         {
           'other': other,
-          'thisLatestAct': thisLatestAct,
-          'otherLatestAct': otherLatestAct,
+          'thisLatestAct': latestActOfThis,
+          'otherLatestAct': latestActOfOther,
         },
       );
 

@@ -23,7 +23,7 @@ void main() => group(_name, () {
           final memB = Mem("$_name - b", null, null);
           final actB = Act(0, DateAndTimePeriod(start: DateAndTime.now()));
 
-          final result = memA.compareTo(memB, otherLatestAct: actB);
+          final result = memA.compareTo(memB, latestActOfOther: actB);
 
           expect(result, equals(1));
         });
