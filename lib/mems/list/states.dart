@@ -1,7 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/states.dart';
-import 'package:mem/acts/act.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
@@ -93,24 +92,21 @@ final memListProvider = StateNotifierProvider.autoDispose<
   return ValueStateNotifier(
     v(
       () => filtered.sorted((a, b) {
+        final compared = a.compareTo(
+          b,
+          thisLatestAct:
+              latestActsByMem.singleWhereOrNull((act) => act.memId == a.id),
+          otherLatestAct:
+              latestActsByMem.singleWhereOrNull((act) => act.memId == b.id),
+        );
+        if (compared != 0) {
+          return compared;
+        }
+
         final latestActOfA =
             latestActsByMem.singleWhereOrNull((act) => act.memId == a.id);
         final latestActOfB =
             latestActsByMem.singleWhereOrNull((act) => act.memId == b.id);
-        final comparedByActiveAct = Act.activeCompare(
-          latestActOfA,
-          latestActOfB,
-        );
-        if (comparedByActiveAct != 0) {
-          return comparedByActiveAct;
-        }
-
-        if ((a.isArchived) != (b.isArchived)) {
-          return a.isArchived ? 1 : -1;
-        }
-        if (a.isDone != b.isDone) {
-          return a.isDone ? 1 : -1;
-        }
 
         final memNotificationsOfA =
             savedMemNotifications.where((e) => e.memId == a.id);
