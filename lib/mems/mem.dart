@@ -31,7 +31,7 @@ class Mem {
   }) =>
       v(
         () {
-          if ((isArchived) != (other.isArchived)) {
+          if (isArchived != other.isArchived) {
             return isArchived ? 1 : -1;
           }
           if (isDone != other.isDone) {
