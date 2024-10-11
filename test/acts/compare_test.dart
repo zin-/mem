@@ -66,20 +66,44 @@ void main() => group(
               // finished 2
               1, 1, 1, 1, 1, 1, 0,
             ];
+            final onlyActiveExpectedList = [
+              // null
+              0, 1, 1, 1, 0, 0, 0,
+              // active 0
+              -1, 0, 1, 1, -1, -1, -1,
+              // active 1
+              -1, -1, 0, 1, -1, -1, -1,
+              // active 2
+              -1, -1, -1, 0, -1, -1, -1,
+              // finished 0
+              0, 1, 1, 1, 0, 0, 0,
+              // finished 1
+              0, 1, 1, 1, 0, 0, 0,
+              // finished 2
+              0, 1, 1, 1, 0, 0, 0,
+            ];
 
-            for (final a in acts) {
-              for (final b in acts) {
-                test(
-                  '${a[name]}, ${b[name]}.',
-                  () {
-                    final result = Act.compare(
-                      (a[act] as Act?),
-                      (b[act] as Act?),
-                    );
+            for (final onlyActive in [false, true]) {
+              for (final a in acts) {
+                for (final b in acts) {
+                  test(
+                    'onlyActive: $onlyActive, ${a[name]}, ${b[name]}.',
+                    () {
+                      final result = Act.compare(
+                        (a[act] as Act?),
+                        (b[act] as Act?),
+                        onlyActive: onlyActive,
+                      );
 
-                    expect(result, expectedList.removeAt(0));
-                  },
-                );
+                      expect(
+                        result,
+                        onlyActive
+                            ? onlyActiveExpectedList.removeAt(0)
+                            : expectedList.removeAt(0),
+                      );
+                    },
+                  );
+                }
               }
             }
           },
