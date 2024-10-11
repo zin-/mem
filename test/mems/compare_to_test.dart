@@ -20,12 +20,6 @@ void main() => group(_name, () {
       // ざっくりした要望としては「重要な順」に並んでいてほしい
       //  重要じゃなくて「実施する順」では？
       // その日中にやることにしていること、習慣として時間を決めてやることにしていること
-      //  - Active act
-      //    - 最も上位に来るのは、実行中のもの
-      //    - 実行中のものの中だと、直近に始めた順
-      //      - そうか？先に始めた順にしたほうが良い気がする
-      //        - 何かをやっていて途中で更に始めた場合、もとのやつは中断しているか並行しているか
-      //    - Memの並び替えとしては必要だけどMemの仕様ではない
       //  - Time
       //    - On
       //      - まず、時分の指定がないもの
@@ -50,11 +44,6 @@ void main() => group(_name, () {
         {
           mem: Mem("plain", null, null),
           latestAct: null,
-          memNotifications: null
-        },
-        {
-          mem: Mem("has active act", null, null),
-          latestAct: Act(0, DateAndTimePeriod(start: DateAndTime(0))),
           memNotifications: null
         },
         {
@@ -87,20 +76,18 @@ void main() => group(_name, () {
       ];
       final results = [
         // plain
-        0, 1, -1, -1, 0,
+        0, -1, -1, 0,
         // FIXME 期間なしとありで差がないのはおかしい
         //  期間の比較がMemNotificationsがないと実施されないようになっていておかしい
         0,
-        // has active act
-        -1, 0, -1, -1, -1, -1,
         // is archived
-        1, 1, 0, 1, 1, 1,
+        1, 0, 1, 1, 1,
         // is done
-        1, 1, -1, 0, 1, 1,
+        1, -1, 0, 1, 1,
         // has mem notifications
-        0, 1, -1, -1, 0, 0,
+        0, -1, -1, 0, 0,
         // has period start
-        0, 1, -1, -1, 0, 0,
+        0, -1, -1, 0, 0,
       ];
 
       for (final a in mems) {

@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/acts/act.dart';
 import 'package:mem/acts/states.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
@@ -94,6 +95,14 @@ final memListProvider = StateNotifierProvider.autoDispose<
             latestActsByMem.singleWhereOrNull((act) => act.memId == a.id);
         final latestActOfB =
             latestActsByMem.singleWhereOrNull((act) => act.memId == b.id);
+
+        final comparedByActiveAct = Act.compare(
+          latestActOfA,
+          latestActOfB,
+        );
+        if (comparedByActiveAct != 0) {
+          return comparedByActiveAct;
+        }
 
         final memNotificationsOfA =
             savedMemNotifications.where((e) => e.memId == a.id);

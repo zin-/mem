@@ -31,14 +31,6 @@ class Mem {
   }) =>
       v(
         () {
-          final comparedByActiveAct = Act.compare(
-            latestActOfThis,
-            latestActOfOther,
-          );
-          if (comparedByActiveAct != 0) {
-            return comparedByActiveAct;
-          }
-
           if ((isArchived) != (other.isArchived)) {
             return isArchived ? 1 : -1;
           }
