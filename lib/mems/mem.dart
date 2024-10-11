@@ -31,7 +31,7 @@ class Mem {
   }) =>
       v(
         () {
-          final comparedByActiveAct = Act.activeCompare(
+          final comparedByActiveAct = Act.compare(
             latestActOfThis,
             latestActOfOther,
           );

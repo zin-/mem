@@ -9,7 +9,7 @@ void main() => group(
       _name,
       () {
         group(
-          ': activeCompare',
+          ': compare',
           () {
             const name = 'name';
             const act = 'act';
@@ -35,18 +35,36 @@ void main() => group(
                     DateAndTimePeriod(
                         start: DateAndTime(0), end: DateAndTime(0)))
               },
+              {
+                name: 'finished 1',
+                act: Act(
+                    4,
+                    DateAndTimePeriod(
+                        start: DateAndTime(1), end: DateAndTime(1)))
+              },
+              {
+                name: 'finished 2',
+                act: Act(
+                    5,
+                    DateAndTimePeriod(
+                        start: DateAndTime(2), end: DateAndTime(2)))
+              },
             ];
             final expectedList = [
               // null
-              0, 1, 1, 1, 0,
+              0, 1, 1, 1, -1, -1, -1,
               // active 0
-              -1, 0, 1, 1, -1,
+              -1, 0, 1, 1, -1, -1, -1,
               // active 1
-              -1, -1, 0, 1, -1,
+              -1, -1, 0, 1, -1, -1, -1,
               // active 2
-              -1, -1, -1, 0, -1,
+              -1, -1, -1, 0, -1, -1, -1,
               // finished 0
-              0, 1, 1, 1, 0,
+              1, 1, 1, 1, 0, -1, -1,
+              // finished 1
+              1, 1, 1, 1, 1, 0, -1,
+              // finished 2
+              1, 1, 1, 1, 1, 1, 0,
             ];
 
             for (final a in acts) {
@@ -54,7 +72,7 @@ void main() => group(
                 test(
                   '${a[name]}, ${b[name]}.',
                   () {
-                    final result = Act.activeCompare(
+                    final result = Act.compare(
                       (a[act] as Act?),
                       (b[act] as Act?),
                     );
