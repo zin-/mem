@@ -25,16 +25,16 @@ void main() => group(_name, () {
       //    - At
       //      - 次は、時分の指定があるもの
       //    - Repeat
-      //      - repeatやAfterActがあるもの
+      //      - repeatやrepeatByDayなどがあるもの
       //      - 最新のActから考える
       //        - repeatByDayやrepeatByWeekOfDayなど
-      //      - AfterActだけのものは下位
+      //  - ↑で決まらずAfterActStartedがあるもの
       //  - Plain
       //  - Done, Archived
       //    - 完了しているものやアーカイブしたものは下位
       //    - 同時に見ることはほとんどないはずではあるけど
       // TODO 期間と繰り返しの両方を持つ場合は？
-      //  期間内は繰り返しという認識でいるべき
+      //  期間内は繰り返しという認識で良いはず
       final mems = [
         {
           mem: Mem("plain", null, null),

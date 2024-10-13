@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:intl/intl.dart';
+import 'package:mem/acts/act.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/logger/log_service.dart';
 
@@ -24,6 +25,8 @@ class MemNotification {
   // 未保存のMemに紐づくMemNotificationはmemIdをintで持つことができないため暫定的にnullableにしている
   final int? memId;
   final MemNotificationType type;
+
+  // repeat: seconds(at day, hours * 60 * 60 + minutes * 60)
   final int? time;
   final String message;
 
@@ -61,6 +64,82 @@ class MemNotification {
   bool isRepeatByDayOfWeek() => type == MemNotificationType.repeatByDayOfWeek;
 
   bool isAfterActStarted() => type == MemNotificationType.afterActStarted;
+
+  static nextNotifyAt(
+    Iterable<MemNotification> memNotifications,
+    DateTime startOfToday,
+    Act? latestAct,
+  ) =>
+      v(
+        () {
+          if (memNotifications.isEmpty) {
+            return null;
+          } else {
+            var notifyAt = startOfToday;
+
+            // repeat
+            final repeat = memNotifications.singleWhereOrNull(
+              (e) => e.isRepeated(),
+            );
+            if (repeat != null) {
+              final hours = (repeat.time! / 60 / 60).floor();
+              final minutes = ((repeat.time! - hours * 60 * 60) / 60).floor();
+              notifyAt = DateTime(
+                notifyAt.year,
+                notifyAt.month,
+                notifyAt.day,
+                hours,
+                minutes,
+              );
+            }
+
+            // repeatByNDay
+            final repeatByNDay = memNotifications.singleWhereOrNull(
+              (e) => e.isRepeatByNDay(),
+            );
+            if (latestAct != null) {
+              final latestActStartIsLessThanToday = latestAct
+                  .period.start!.dateTime
+                  .add(Duration(days: repeatByNDay?.time ?? 1))
+                  .compareTo(startOfToday);
+              if (latestActStartIsLessThanToday > -1) {
+                notifyAt = DateTime(
+                  latestAct.period.start!.dateTime.year,
+                  latestAct.period.start!.dateTime.month,
+                  latestAct.period.start!.dateTime.day +
+                      (repeatByNDay?.time ?? 1),
+                  notifyAt.hour,
+                  notifyAt.minute,
+                );
+              }
+            }
+
+            // repeatByDayOfWeek
+            final repeatByDayOfWeekList = memNotifications
+                .where(
+                  (element) => element.isRepeatByDayOfWeek(),
+                )
+                .map(
+                  (e) => e.time,
+                )
+                .sorted(
+                  (a, b) => a!.compareTo(b!),
+                );
+            if (repeatByDayOfWeekList.isNotEmpty) {
+              while (!repeatByDayOfWeekList.contains(notifyAt.weekday)) {
+                notifyAt = notifyAt.add(const Duration(days: 1));
+              }
+            }
+
+            return notifyAt;
+          }
+        },
+        {
+          'memNotifications': memNotifications,
+          'startOfToday': startOfToday,
+          'latestAct': latestAct,
+        },
+      );
 
   static String? toOneLine(
     Iterable<MemNotification> memNotifications,
