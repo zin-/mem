@@ -44,7 +44,7 @@ class MemNotification {
             memId, type, time == null ? null : time(), _repeatedMessage);
       case MemNotificationType.repeatByNDay:
         return MemNotification(
-            memId, type, time == null ? 1 : time(), _repeatedMessage);
+            memId, type, time == null ? null : time(), _repeatedMessage);
       case MemNotificationType.repeatByDayOfWeek:
         return MemNotification(memId, type, time == null ? null : time(),
             _repeatByDayOfWeekMessage);

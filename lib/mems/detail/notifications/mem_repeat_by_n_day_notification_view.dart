@@ -29,7 +29,7 @@ class MemRepeatByNDayNotificationView extends ConsumerWidget {
                   .upsertAll(
                 [
                   (notification as MemNotificationEntity).copiedWith(
-                    time: () => value,
+                    time: () => value == 0 ? null : value,
                   ),
                 ],
                 (current, updating) => current.type == updating.type,
@@ -66,7 +66,7 @@ class _MemRepeatByNDayNotificationView extends StatelessWidget {
               children: [
                 if (prefix.isNotEmpty) Text(prefix),
                 TextFormField(
-                  initialValue: (nDay ?? 1).toString(),
+                  initialValue: (nDay ?? 0).toString(),
                   keyboardType: TextInputType.number,
                   onChanged: (value) => _onNDayChanged(
                     value.isEmpty ? 1 : int.parse(value),
