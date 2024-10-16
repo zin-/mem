@@ -1,7 +1,9 @@
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/act.dart';
 import 'package:mem/acts/states.dart';
+import 'package:mem/framework/date_and_time/time_of_day.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
@@ -88,6 +90,7 @@ final memListProvider = StateNotifierProvider.autoDispose<
   final latestActsByMem = ref.watch(latestActsByMemProvider);
   final savedMemNotifications = ref.watch(savedMemNotificationsProvider);
 
+  final now = DateTime.now();
   return ValueStateNotifier(
     v(
       () => filtered.sorted((a, b) {
@@ -99,6 +102,7 @@ final memListProvider = StateNotifierProvider.autoDispose<
         final comparedByActiveAct = Act.compare(
           latestActOfA,
           latestActOfB,
+          onlyActive: true,
         );
         if (comparedByActiveAct != 0) {
           return comparedByActiveAct;
@@ -110,16 +114,22 @@ final memListProvider = StateNotifierProvider.autoDispose<
             savedMemNotifications.where((e) => e.memId == b.id);
 
         final startOfDay = ref.read(startOfDayProvider);
-        final now = DateTime.now();
+        final nowTime = TimeOfDay.fromDateTime(now);
+        final startOfToday = DateTime(
+          now.year,
+          now.month,
+          now.day + (startOfDay.lessThan(nowTime) ? 0 : 1),
+          startOfDay.hour,
+          startOfDay.minute,
+        );
 
         final compared = a.compareTo(
           b,
+          startOfToday,
           latestActOfThis: latestActOfA,
           latestActOfOther: latestActOfB,
           memNotificationsOfThis: memNotificationsOfA,
           memNotificationsOfOther: memNotificationsOfB,
-          startOfDay: startOfDay,
-          now: now,
         );
         if (compared != 0) {
           return compared;

@@ -4,7 +4,6 @@ import 'package:mem/acts/act.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_notification.dart';
-import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/notifications/schedule.dart';
 import 'package:mem/mems/mem_entity.dart';
@@ -21,13 +20,12 @@ class Mem {
   bool get isDone => doneAt != null;
 
   int compareTo(
-    Mem other, {
+    Mem other,
+    DateTime startOfToday, {
     Act? latestActOfThis,
     Act? latestActOfOther,
     Iterable<MemNotification>? memNotificationsOfThis,
     Iterable<MemNotification>? memNotificationsOfOther,
-    TimeOfDay? startOfDay,
-    DateTime? now,
   }) =>
       v(
         () {
@@ -38,69 +36,73 @@ class Mem {
             return isDone ? 1 : -1;
           }
 
-          if (memNotificationsOfThis != null &&
-              memNotificationsOfOther != null &&
-              startOfDay != null &&
-              now != null) {
-            final comparedTime = _compareTime(
-              period,
-              MemNotifications.nextRepeatNotifyAt(
-                memNotificationsOfThis,
-                startOfDay,
-                latestActOfThis,
-                now,
-              ),
-              other.period,
-              MemNotifications.nextRepeatNotifyAt(
-                memNotificationsOfOther,
-                startOfDay,
-                latestActOfOther,
-                now,
-              ),
-            );
-            if (comparedTime != 0) {
-              return comparedTime;
+          // FIXME endしかない場合
+          final timeOfThis = _selectNonNullOrGreater(
+            period?.start,
+            memNotificationsOfThis?.isEmpty ?? false
+                ? null
+                : MemNotification.nextNotifyAt(
+                    memNotificationsOfThis!,
+                    startOfToday,
+                    latestActOfThis,
+                  ),
+          );
+          final timeOfOther = _selectNonNullOrGreater(
+            other.period?.start,
+            memNotificationsOfOther?.isEmpty ?? false
+                ? null
+                : MemNotification.nextNotifyAt(
+                    memNotificationsOfOther!,
+                    startOfToday,
+                    latestActOfOther,
+                  ),
+          );
+
+          if (timeOfThis != null || timeOfOther != null) {
+            if (timeOfThis == null) {
+              return 1;
+            } else if (timeOfOther == null) {
+              return -1;
+            } else {
+              return timeOfThis.compareTo(timeOfOther);
             }
           }
 
           return 0;
         },
         {
+          'this': this,
           'other': other,
           'thisLatestAct': latestActOfThis,
           'otherLatestAct': latestActOfOther,
+          'memNotificationsOfThis': memNotificationsOfThis,
+          'memNotificationsOfOther': memNotificationsOfOther,
+          'startOfToday': startOfToday,
         },
       );
 
-  int _compareTime(
-    DateAndTimePeriod? periodOfA,
-    DateTime? nextNotifyAtOfA,
-    DateAndTimePeriod? periodOfB,
-    DateTime? nextNotifyAtOfB,
+  DateTime? _selectNonNullOrGreater(
+    DateTime? a,
+    DateTime? b,
   ) =>
       v(
         () {
-          if ((periodOfA == null && nextNotifyAtOfA == null) &&
-              (periodOfB == null && nextNotifyAtOfB == null)) {
-            return 0;
-          } else if (nextNotifyAtOfA != null && nextNotifyAtOfB != null) {
-            return nextNotifyAtOfA.compareTo(nextNotifyAtOfB);
-          } else if (periodOfA != null && nextNotifyAtOfB != null) {
-            return periodOfA.compareWithDateAndTime(nextNotifyAtOfB);
-          } else if (nextNotifyAtOfA != null && periodOfB != null) {
-            return -periodOfB.compareWithDateAndTime(nextNotifyAtOfA);
-          } else if ((periodOfA == null && nextNotifyAtOfA == null) ||
-              (periodOfB == null && nextNotifyAtOfB == null)) {
-            return (periodOfA == null && nextNotifyAtOfA == null) ? 1 : -1;
-          } else {
-            return DateAndTimePeriod.compare(periodOfA, periodOfB);
+          if (a != null || b != null) {
+            if (a == null) {
+              return b;
+            } else if (b == null) {
+              return a;
+            } else if (a.compareTo(b) > 0) {
+              return a;
+            } else {
+              return b;
+            }
           }
+          return null;
         },
         {
-          'periodOfA': periodOfA,
-          'nextNotifyAtOfA': nextNotifyAtOfA,
-          'periodOfB': periodOfB,
-          'nextNotifyAtOfB': nextNotifyAtOfB,
+          'a': a,
+          'b': b,
         },
       );
 
