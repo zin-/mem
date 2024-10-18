@@ -284,7 +284,7 @@ void main() => group(
                 where: "${defFkMemNotificationsMemId.name} = ?",
                 whereArgs: [insertedMemId],
                 orderBy: "id ASC");
-            expect(savedMemNotifications, hasLength(2));
+            expect(savedMemNotifications, hasLength(1));
             expect(
                 savedMemNotifications.singleWhere(
                   (e) =>
