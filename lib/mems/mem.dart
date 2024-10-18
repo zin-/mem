@@ -89,7 +89,6 @@ class Mem {
             }
           }
 
-          // TODO AfterActStartedがあれば上位に
           final thisHasAfterActStarted = memNotificationsOfThis
                   ?.where(
                     (e) => e.isAfterActStarted(),
