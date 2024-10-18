@@ -135,7 +135,6 @@ final memListProvider = StateNotifierProvider.autoDispose<
           return compared;
         }
 
-        // TODO AfterActStartedがあれば上位に
         return a.id.compareTo(b.id);
       }).toList(),
       {

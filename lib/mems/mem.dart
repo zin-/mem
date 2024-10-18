@@ -36,7 +36,6 @@ class Mem {
             return isDone ? 1 : -1;
           }
 
-          // FIXME endしかない場合
           final timeOfThis = _selectNonNullOrGreater(
             period?.start != null || period?.end != null
                 ? period?.start != null && period?.end != null
@@ -45,7 +44,12 @@ class Mem {
                         : period?.start
                     : period?.start ?? period?.end
                 : null,
-            memNotificationsOfThis?.isEmpty ?? true
+            memNotificationsOfThis
+                        ?.where(
+                          (e) => !e.isAfterActStarted(),
+                        )
+                        .isEmpty ??
+                    true
                 ? null
                 : MemNotification.nextNotifyAt(
                     memNotificationsOfThis!,
@@ -61,7 +65,12 @@ class Mem {
                         : other.period?.start
                     : other.period?.start ?? other.period?.end
                 : null,
-            memNotificationsOfOther?.isEmpty ?? true
+            memNotificationsOfOther
+                        ?.where(
+                          (e) => !e.isAfterActStarted(),
+                        )
+                        .isEmpty ??
+                    true
                 ? null
                 : MemNotification.nextNotifyAt(
                     memNotificationsOfOther!,
@@ -78,6 +87,23 @@ class Mem {
             } else {
               return timeOfThis.compareTo(timeOfOther);
             }
+          }
+
+          // TODO AfterActStartedがあれば上位に
+          final thisHasAfterActStarted = memNotificationsOfThis
+                  ?.where(
+                    (e) => e.isAfterActStarted(),
+                  )
+                  .isNotEmpty ??
+              false;
+          final otherHasAfterActStarted = memNotificationsOfOther
+                  ?.where(
+                    (e) => e.isAfterActStarted(),
+                  )
+                  .isNotEmpty ??
+              false;
+          if (thisHasAfterActStarted != otherHasAfterActStarted) {
+            return thisHasAfterActStarted ? -1 : 1;
           }
 
           return 0;

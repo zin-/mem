@@ -14,30 +14,6 @@ void main() => group(_name, () {
       const memNotifications = 'memNotifications';
       final now = DateTime.now();
 
-      // TODO 仕様を整理する
-      // 要望としては「実施する順」に並んでいてほしい
-      //  - Time
-      //    - Period
-      //      - 両方あるなら
-      //        - 処理日時が開始日時を超えていたら、終了の方を使う
-      //      - 片方しかないならそれを使う
-      //    - On
-      //      - 時分指定がないものは1日の開始時間が指定されているものとして扱う
-      //        - 期間の終了の場合は翌日の開始時間の1分前として扱う
-      //    - At
-      //      - 次は、時分の指定があるもの
-      //    - Repeat
-      //      - repeatやrepeatByDayなどがあるもの
-      //      - 最新のActから考える
-      //        - repeatByDayやrepeatByWeekOfDayなど
-      //  - ↑で決まらずAfterActStartedがあるもの
-      //    - 時間指定はないけど繰り返しやるもの
-      //  - Plain
-      //  - Done, Archived
-      //    - 完了しているものやアーカイブしたものは下位
-      //    - 同時に見ることはほとんどないはずではあるけど
-      // TODO 期間と繰り返しの両方を持つ場合は？
-      //  期間内は繰り返しという認識で良いはず
       final mems = [
         {
           mem: Mem("plain", null, null),
