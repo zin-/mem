@@ -38,8 +38,14 @@ class Mem {
 
           // FIXME endしかない場合
           final timeOfThis = _selectNonNullOrGreater(
-            period?.start,
-            memNotificationsOfThis?.isEmpty ?? false
+            period?.start != null || period?.end != null
+                ? period?.start != null && period?.end != null
+                    ? period!.start!.compareTo(startOfToday) < 0
+                        ? period?.end
+                        : period?.start
+                    : period?.start ?? period?.end
+                : null,
+            memNotificationsOfThis?.isEmpty ?? true
                 ? null
                 : MemNotification.nextNotifyAt(
                     memNotificationsOfThis!,
@@ -48,8 +54,14 @@ class Mem {
                   ),
           );
           final timeOfOther = _selectNonNullOrGreater(
-            other.period?.start,
-            memNotificationsOfOther?.isEmpty ?? false
+            other.period?.start != null || other.period?.end != null
+                ? other.period?.start != null && other.period?.end != null
+                    ? other.period!.start!.compareTo(startOfToday) < 0
+                        ? other.period?.end
+                        : other.period?.start
+                    : other.period?.start ?? other.period?.end
+                : null,
+            memNotificationsOfOther?.isEmpty ?? true
                 ? null
                 : MemNotification.nextNotifyAt(
                     memNotificationsOfOther!,

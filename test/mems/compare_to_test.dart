@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/acts/act.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
@@ -13,12 +12,15 @@ void main() => group(_name, () {
       const mem = 'mem';
       const latestAct = 'latestAct';
       const memNotifications = 'memNotifications';
-      const startOfDay = TimeOfDay(hour: 0, minute: 0);
       final now = DateTime.now();
 
       // TODO 仕様を整理する
       // 要望としては「実施する順」に並んでいてほしい
       //  - Time
+      //    - Period
+      //      - 両方あるなら
+      //        - 処理日時が開始日時を超えていたら、終了の方を使う
+      //      - 片方しかないならそれを使う
       //    - On
       //      - 時分指定がないものは1日の開始時間が指定されているものとして扱う
       //        - 期間の終了の場合は翌日の開始時間の1分前として扱う
@@ -29,6 +31,7 @@ void main() => group(_name, () {
       //      - 最新のActから考える
       //        - repeatByDayやrepeatByWeekOfDayなど
       //  - ↑で決まらずAfterActStartedがあるもの
+      //    - 時間指定はないけど繰り返しやるもの
       //  - Plain
       //  - Done, Archived
       //    - 完了しているものやアーカイブしたものは下位
@@ -71,18 +74,15 @@ void main() => group(_name, () {
       ];
       final results = [
         // plain
-        0, -1, -1, 0,
-        // FIXME 期間なしとありで差がないのはおかしい
-        //  期間の比較がMemNotificationsがないと実施されないようになっていておかしい
-        0,
+        0, -1, -1, 1, 1,
         // is archived
         1, 0, 1, 1, 1,
         // is done
         1, -1, 0, 1, 1,
         // has mem notifications
-        0, -1, -1, 0, 0,
+        -1, -1, -1, 0, 1,
         // has period start
-        0, -1, -1, 0, 0,
+        -1, -1, -1, -1, 0,
       ];
 
       for (final a in mems) {
@@ -90,15 +90,16 @@ void main() => group(_name, () {
           test(
             "${(a[mem] as Mem).name} compareTo ${(b[mem] as Mem).name}.",
             () {
-              final result = (a[mem] as Mem).compareTo((b[mem] as Mem),
-                  latestActOfThis: (a[latestAct] as Act?),
-                  latestActOfOther: (b[latestAct] as Act?),
-                  memNotificationsOfThis:
-                      (a[memNotifications] as Iterable<MemNotification>?),
-                  memNotificationsOfOther:
-                      (b[memNotifications] as Iterable<MemNotification>?),
-                  startOfDay: startOfDay,
-                  now: now);
+              final result = (a[mem] as Mem).compareTo(
+                (b[mem] as Mem),
+                now,
+                latestActOfThis: (a[latestAct] as Act?),
+                latestActOfOther: (b[latestAct] as Act?),
+                memNotificationsOfThis:
+                    (a[memNotifications] as Iterable<MemNotification>?),
+                memNotificationsOfOther:
+                    (b[memNotifications] as Iterable<MemNotification>?),
+              );
 
               expect(result, equals(results.removeAt(0)));
             },
