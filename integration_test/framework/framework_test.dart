@@ -12,7 +12,7 @@ const _name = "Framework test";
 void main() => group(
       _name,
       () {
-        LogService.initialize(
+        LogService(
           level: Level.verbose,
           enableSimpleLog:
               const bool.fromEnvironment('CICD', defaultValue: false),

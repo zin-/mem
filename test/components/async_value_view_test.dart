@@ -11,7 +11,7 @@ void main() {
   testWidgets(
     'throw',
     (widgetTester) async {
-      LogService.initialize(
+      LogService(
         level: Level.verbose,
         enableSimpleLog:
             const bool.fromEnvironment('CICD', defaultValue: false),

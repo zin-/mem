@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/android_alarm_manager_wrapper.dart';
@@ -72,6 +73,8 @@ class ScheduleClient extends Repository<Schedule> {
 @pragma('vm:entry-point')
 Future<void> scheduleCallback(int id, Map<String, dynamic> params) => i(
       () async {
+        WidgetsFlutterBinding.ensureInitialized();
+
         await NotificationClient().show(
           NotificationType.values.singleWhere(
             (element) => element.name == params[notificationTypeKey],

@@ -15,7 +15,7 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   const onCICD = bool.fromEnvironment('CICD', defaultValue: false);
-  LogService.initialize(
+  LogService(
     level: Level.verbose,
     enableSimpleLog: onCICD,
   );

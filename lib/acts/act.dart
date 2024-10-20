@@ -12,22 +12,40 @@ class Act {
 
   bool get isActive => period.start != null && period.end == null;
 
-  static int activeCompare(Act? a, Act? b) => v(
+  static int compare(
+    Act? a,
+    Act? b, {
+    bool onlyActive = false,
+  }) =>
+      v(
         () {
-          final aIsActive = a?.isActive;
-          final bIsActive = b?.isActive;
+          final aIsActive = a?.isActive ?? false;
+          final bIsActive = b?.isActive ?? false;
 
-          if ((aIsActive == null && bIsActive == null) ||
-              (aIsActive == false && bIsActive == false) ||
-              (aIsActive == null && bIsActive == false) ||
-              (aIsActive == false && bIsActive == null)) {
-            return 0;
+          if (aIsActive == false && bIsActive == false) {
+            if (onlyActive) {
+              return 0;
+            } else {
+              if (a == null || b == null) {
+                return a == null && b == null
+                    ? 0
+                    : a == null
+                        ? -1
+                        : 1;
+              }
+
+              return a.period.end!.compareTo(b.period.end!);
+            }
           } else if (aIsActive == true && bIsActive == true) {
             return b!.period.start!.compareTo(a!.period.start as DateTime);
           } else {
-            return (aIsActive == null || aIsActive == false) ? 1 : -1;
+            return aIsActive == false ? 1 : -1;
           }
         },
-        {'a': a, 'b': b},
+        {
+          'a': a,
+          'b': b,
+          'onlyActive': onlyActive,
+        },
       );
 }
