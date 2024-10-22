@@ -9,16 +9,14 @@ import 'package:mem/router.dart';
 
 import 'application.dart';
 
-Future<void> main({String? languageCode}) => i(
-      () async {
-        WidgetsFlutterBinding.ensureInitialized();
+Future<void> main({String? languageCode}) async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-        await NotificationRepository().ship();
+  LogService(enableErrorReport: true);
+  await NotificationRepository().ship();
 
-        return _runApplication(languageCode: languageCode);
-      },
-      {'languageCode': languageCode},
-    );
+  return _runApplication(languageCode: languageCode);
+}
 
 Future<void> launchMemDetailPage(int memId) => i(
       () {
@@ -85,9 +83,7 @@ Future<void> _runApplication({
 }) =>
     i(
       () async {
-        await LogService(
-          enableErrorReport: true,
-        ).init(
+        await LogService().init(
           () => runApp(
             MemApplication(
               initialPath: initialPath,
