@@ -35,7 +35,7 @@ class ApplicationDrawer extends StatelessWidget {
       (AppLocalizations l10n) => l10n.devPageTitle,
       (BuildContext context) => () => v(
 // coverage:ignore-start
-            () => context.go(devPath),
+            () => context.push('/$devPath'),
 // coverage:ignore-end
           ),
     ),
