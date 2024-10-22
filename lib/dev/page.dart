@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mem/dev/awesome_notifications_wrapper.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/logger/sentry_wrapper.dart';
 import 'package:mem/notifications/notification/channel.dart';
 import 'package:mem/permissions/permission.dart';
 import 'package:mem/permissions/permission_handler_wrapper.dart';
@@ -55,6 +56,15 @@ class DevPage extends StatelessWidget {
                         },
                       ),
                     ),
+                    SettingsTile.navigation(
+                      title: const Text('Test send to Sentry'),
+                      onPressed: (context) async {
+                        await SentryWrapper().captureException(
+                          "Test send to Sentry",
+                          StackTrace.current,
+                        );
+                      },
+                    )
                   ],
                 )
               ],
