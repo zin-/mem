@@ -41,41 +41,42 @@ Future<void> launchActCounterConfigure() => i(
     );
 
 @pragma('vm:entry-point')
-Future<void> onNotificationResponseReceived(dynamic details) => i(
-      () async {
-        WidgetsFlutterBinding.ensureInitialized();
+Future<void> onNotificationResponseReceived(dynamic details) async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-        await onDidReceiveNotificationResponse(
-          details,
-          (memId) => v(
-            () async {
-              if (memId is int) {
-                await launchMemDetailPage(memId);
-              }
-            },
-            {
-              'memId': memId,
-            },
-          ),
-          (actionId, memId) => v(
-            () async {
-              if (actionId is String && memId is int) {
-                await buildNotificationActions()
-                    .singleWhere(
-                      (e) => e.id == actionId,
-                    )
-                    .onTapped(memId);
-              }
-            },
-            {
-              'actionId': actionId,
-              'memId': memId,
-            },
-          ),
-        );
-      },
-      {'details': details},
-    );
+  LogService(enableErrorReport: true).init(
+    () async {
+      await onDidReceiveNotificationResponse(
+        details,
+        (memId) => v(
+          () async {
+            if (memId is int) {
+              await launchMemDetailPage(memId);
+            }
+          },
+          {
+            'memId': memId,
+          },
+        ),
+        (actionId, memId) => v(
+          () async {
+            if (actionId is String && memId is int) {
+              await buildNotificationActions()
+                  .singleWhere(
+                    (e) => e.id == actionId,
+                  )
+                  .onTapped(memId);
+            }
+          },
+          {
+            'actionId': actionId,
+            'memId': memId,
+          },
+        ),
+      );
+    },
+  );
+}
 
 Future<void> _runApplication({
   String? initialPath,
@@ -105,22 +106,23 @@ const actCounter = 'act_counters';
 const memIdParamName = 'mem_id';
 
 @pragma('vm:entry-point')
-Future<void> backgroundCallback(Uri? uri) => i(
-      () async {
-        WidgetsFlutterBinding.ensureInitialized();
+Future<void> backgroundCallback(Uri? uri) async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-        if (uri != null && uri.scheme == uriSchema && uri.host == appId) {
-          if (uri.pathSegments.contains(actCounter)) {
-            final memId = uri.queryParameters[memIdParamName];
+  await LogService(enableErrorReport: true).init(
+    () async {
+      if (uri != null && uri.scheme == uriSchema && uri.host == appId) {
+        if (uri.pathSegments.contains(actCounter)) {
+          final memId = uri.queryParameters[memIdParamName];
 
-            if (memId != null) {
-              await ActCounterClient().increment(
-                int.parse(memId),
-                DateAndTime.now(),
-              );
-            }
+          if (memId != null) {
+            await ActCounterClient().increment(
+              int.parse(memId),
+              DateAndTime.now(),
+            );
           }
         }
-      },
-      {'uri': uri},
-    );
+      }
+    },
+  );
+}
