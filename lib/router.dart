@@ -9,7 +9,7 @@ const _memIdKey = 'memId';
 const _homePath = '/';
 const _memDetailPath = 'mems/:$_memIdKey';
 const newActCountersPath = '${_homePath}act_counters/new';
-const devPath = '${_homePath}dev';
+const devPath = 'dev';
 
 String buildMemDetailPath(int memId) => '${_homePath}mems/$memId';
 
@@ -26,17 +26,17 @@ GoRouter buildRouter([String? initialPath = _homePath]) => GoRouter(
                 int.parse(state.pathParameters[_memIdKey]!),
               ),
             ),
+            GoRoute(
+              path: devPath,
+// coverage:ignore-start
+              builder: (_, __) => const DevPage(),
+// coverage:ignore-end
+            ),
           ],
         ),
         GoRoute(
           path: newActCountersPath,
           builder: (_, __) => const ActCounterConfigure(),
-        ),
-        GoRoute(
-          path: devPath,
-// coverage:ignore-start
-          builder: (_, __) => const DevPage(),
-// coverage:ignore-end
         ),
       ],
     );
