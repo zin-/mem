@@ -44,7 +44,7 @@ Future<void> launchActCounterConfigure() => i(
 Future<void> onNotificationResponseReceived(dynamic details) async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  LogService(enableErrorReport: true).init(
+  await LogService(enableErrorReport: true).init(
     () async {
       await onDidReceiveNotificationResponse(
         details,

@@ -39,6 +39,7 @@ void testNotificationScenario() => group(
           level: Level.verbose,
           enableSimpleLog:
               const bool.fromEnvironment('CICD', defaultValue: false),
+          enableErrorReport: false,
         );
 
         const insertedMemName = "$_scenarioName - mem name - inserted";
@@ -310,7 +311,7 @@ void testNotificationScenario() => group(
               });
 
               testWidgets(
-                ": test.",
+                ': test.',
                 (widgetTester) async {
                   final details = NotificationResponse(
                     notificationResponseType:
