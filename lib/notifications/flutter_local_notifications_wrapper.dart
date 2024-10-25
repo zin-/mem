@@ -67,13 +67,6 @@ class FlutterLocalNotificationsWrapper {
     _instance = null;
   }
 
-  // FIXME 不要だった場合削除する
-  // Future<bool?> _requestPermission() =>
-  //     v(() async => await (await _flutterLocalNotificationsPlugin)
-  //         .resolvePlatformSpecificImplementation<
-  //             AndroidFlutterLocalNotificationsPlugin>()
-  //         ?.requestNotificationsPermission());
-
   Future<void> show(
     int id,
     String title,
@@ -83,8 +76,6 @@ class FlutterLocalNotificationsWrapper {
   ) =>
       v(
         () async {
-          // 不要かもしれない
-          // if (await _requestPermission() == true) {
           return await (await _flutterLocalNotificationsPlugin).show(
             id,
             title,
@@ -94,7 +85,6 @@ class FlutterLocalNotificationsWrapper {
             ),
             payload: jsonEncode(payload),
           );
-          // }
         },
 // coverage:ignore-start
         {

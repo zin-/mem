@@ -345,11 +345,6 @@ void main() => group(': $_name', () {
                   return false;
                 }),
             (message) async {
-              expect(message.method, equals('requestNotificationsPermission'));
-              expect(message.arguments, isNull);
-              return true;
-            },
-            (message) async {
               expect(message.method, equals('show'));
               expect(message.arguments['id'],
                   equals(memRepeatedNotificationId(withoutActMemId)));
@@ -418,11 +413,6 @@ void main() => group(': $_name', () {
                   cancelCount++;
                   return false;
                 }),
-            (message) async {
-              expect(message.method, equals('requestNotificationsPermission'));
-              expect(message.arguments, isNull);
-              return true;
-            },
             (message) async {
               expect(message.method, equals('show'));
               expect(message.arguments['id'],
