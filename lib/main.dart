@@ -10,33 +10,46 @@ import 'package:mem/router.dart';
 import 'application.dart';
 
 Future<void> main({String? languageCode}) async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  LogService(enableErrorReport: true);
-  await NotificationRepository().ship();
-
   return _runApplication(languageCode: languageCode);
 }
 
-Future<void> launchMemDetailPage(int memId) => i(
-      () {
-        WidgetsFlutterBinding.ensureInitialized();
-
-        return _runApplication(
-          initialPath: buildMemDetailPath(memId),
-        );
-      },
-      {'memId': memId},
-    );
+Future<void> launchMemDetailPage(int memId) {
+  return _runApplication(
+    initialPath: buildMemDetailPath(memId),
+  );
+}
 
 @pragma('vm:entry-point')
-Future<void> launchActCounterConfigure() => i(
-      () {
+Future<void> launchActCounterConfigure() {
+  return _runApplication(
+    initialPath: newActCountersPath,
+  );
+}
+
+Future<void> _runApplication({
+  String? initialPath,
+  String? languageCode,
+}) =>
+    i(
+      () async {
         WidgetsFlutterBinding.ensureInitialized();
 
-        return _runApplication(
-          initialPath: newActCountersPath,
+        await LogService(
+          enableErrorReport: true,
+        ).init(
+          () => runApp(
+            MemApplication(
+              initialPath: initialPath,
+              languageCode: languageCode,
+            ),
+          ),
         );
+
+        await NotificationRepository().ship();
+      },
+      {
+        'initialPath': initialPath,
+        'languageCode': languageCode,
       },
     );
 
@@ -77,27 +90,6 @@ Future<void> onNotificationResponseReceived(dynamic details) async {
     },
   );
 }
-
-Future<void> _runApplication({
-  String? initialPath,
-  String? languageCode,
-}) =>
-    i(
-      () async {
-        await LogService().init(
-          () => runApp(
-            MemApplication(
-              initialPath: initialPath,
-              languageCode: languageCode,
-            ),
-          ),
-        );
-      },
-      {
-        'initialPath': initialPath,
-        'languageCode': languageCode,
-      },
-    );
 
 // FIXME HomeWidget関連の処理、場所が適切ではない
 const uriSchema = 'mem';
