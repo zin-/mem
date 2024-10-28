@@ -30,6 +30,9 @@ jobs:
       - name: "Analyze Application code"
         run: flutter analyze lib
 
+      - name: "Analyze Riverpod lints"
+        run: dart run custom_lint
+
       - name: "Build Mocks"
         uses: ./.github/actions/build-mocks
 
