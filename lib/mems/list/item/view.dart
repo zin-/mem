@@ -26,15 +26,11 @@ class MemListItemView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () => _MemListItemView(
+        () => _render(
           ref.watch(memListProvider).firstWhere((mem) => mem.id == _memId),
-          ref.watch(activeActsProvider).singleWhereOrNull(
-                (act) => act.memId == _memId,
-              ),
-          ref.watch(memNotificationsByMemIdProvider(_memId)),
           _onTapped,
-          (bool? value, int memId) async {
-            ref.read(memsProvider.notifier).upsertAll(
+          (bool? value, int memId) => v(
+            () => ref.read(memsProvider.notifier).upsertAll(
               [
                 value == true
                     ? ref.read(doneMem(_memId))
@@ -43,35 +39,60 @@ class MemListItemView extends ConsumerWidget {
               (tmp, item) => tmp is SavedMemEntity && item is SavedMemEntity
                   ? tmp.id == item.id
                   : false,
-            );
-          },
+            ),
+            {
+              'value': value,
+              'memId': memId,
+            },
+          ),
+          ref.watch(
+            activeActsProvider.select(
+              (v) => v.singleWhereOrNull(
+                (e) => e.memId == _memId,
+              ),
+            ),
+          ),
           (activeAct) => v(
-            () async {
-              if (activeAct == null) {
-                ref.read(startActBy(_memId));
-              } else {
-                ref.read(activeActsProvider.notifier).removeWhere(
+            () async => activeAct == null
+                ? ref.read(startActBy(_memId))
+                : ref.read(activeActsProvider.notifier).removeWhere(
                       (act) =>
                           act.id == ref.read(finishActBy(activeAct.memId)).id,
-                    );
-              }
+                    ),
+            {
+              'activeAct': activeAct,
             },
-            activeAct,
           ),
+          ref.watch(memNotificationsByMemIdProvider(_memId)),
         ),
-        _memId,
+        {
+          '_memId': _memId,
+        },
       );
 }
 
-class _MemListItemView extends ListTile {
-  _MemListItemView(
-    SavedMemEntity mem,
-    SavedActEntity? activeAct,
-    Iterable<MemNotification> memNotifications,
-    void Function(int memId) onTap,
-    void Function(bool? value, int memId) onMemDoneCheckboxTapped,
-    void Function(SavedActEntity? act) onActButtonTapped,
-  ) : super(
+ListTile _render(
+  SavedMemEntity mem,
+  void Function(int memId) onTap,
+  void Function(bool? value, int memId) onMemDoneCheckboxTapped,
+  SavedActEntity? activeAct,
+  void Function(SavedActEntity? act) onActButtonTapped,
+  Iterable<MemNotification> memNotifications,
+) =>
+    v(
+      () {
+        return ListTile(
+          title: activeAct == null
+              ? MemNameText(mem)
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(child: MemNameText(mem)),
+                    ElapsedTimeView(activeAct.period.start!),
+                  ],
+                ),
+          onTap: () => onTap(mem.id),
+          // TODO activeActがあったらPauseボタンを表示する
           leading: memNotifications
                       .where((e) =>
                           e is SavedMemNotificationEntity && e.isEnabled())
@@ -82,6 +103,8 @@ class _MemListItemView extends ListTile {
                   (value) => onMemDoneCheckboxTapped(value, mem.id),
                 )
               : null,
+          tileColor: mem.isArchived ? secondaryGreyColor : null,
+          // FIXME isDoneかつmemNotificationsがある場合だけかも
           trailing: mem.isDone
               ? null
               : IconButton(
@@ -89,15 +112,6 @@ class _MemListItemView extends ListTile {
                   icon: activeAct == null
                       ? const Icon(Icons.play_arrow)
                       : const Icon(Icons.stop),
-                ),
-          title: activeAct == null
-              ? MemNameText(mem)
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(child: MemNameText(mem)),
-                    ElapsedTimeView(activeAct.period.start!),
-                  ],
                 ),
           subtitle: mem.period == null &&
                   memNotifications
@@ -111,13 +125,11 @@ class _MemListItemView extends ListTile {
                   .where(
                       (e) => e is SavedMemNotificationEntity && e.isEnabled())
                   .isNotEmpty,
-          tileColor: mem.isArchived ? secondaryGreyColor : null,
-          onTap: () => onTap(mem.id),
-        ) {
-    verbose({
-      'mem': mem,
-      'activeAct': activeAct,
-      'memNotifications': memNotifications,
-    });
-  }
-}
+        );
+      },
+      {
+        'mem': mem,
+        'activeAct': activeAct,
+        'memNotifications': memNotifications,
+      },
+    );
