@@ -81,6 +81,10 @@ ListTile _render(
 ) =>
     v(
       () {
+        final hasEnableMemNotifications = memNotifications
+            .where((e) => e is SavedMemNotificationEntity && e.isEnabled())
+            .isNotEmpty;
+
         return ListTile(
           title: activeAct == null
               ? MemNameText(mem)
@@ -93,38 +97,26 @@ ListTile _render(
                 ),
           onTap: () => onTap(mem.id),
           // TODO activeActがあったらPauseボタンを表示する
-          leading: memNotifications
-                      .where((e) =>
-                          e is SavedMemNotificationEntity && e.isEnabled())
-                      .isEmpty &&
-                  activeAct == null
+          // FIXME memNotificationsがあったら表示するべきじゃないのでは？
+          leading: !hasEnableMemNotifications && activeAct == null
               ? MemDoneCheckbox(
                   mem,
                   (value) => onMemDoneCheckboxTapped(value, mem.id),
                 )
               : null,
           tileColor: mem.isArchived ? secondaryGreyColor : null,
-          // FIXME isDoneかつmemNotificationsがある場合だけかも
-          trailing: mem.isDone
-              ? null
-              : IconButton(
+          trailing: !mem.isDone && hasEnableMemNotifications
+              ? IconButton(
                   onPressed: () => onActButtonTapped(activeAct),
                   icon: activeAct == null
                       ? const Icon(Icons.play_arrow)
                       : const Icon(Icons.stop),
-                ),
-          subtitle: mem.period == null &&
-                  memNotifications
-                      .where((e) =>
-                          e is SavedMemNotificationEntity && e.isEnabled())
-                      .isEmpty
+                )
+              : null,
+          subtitle: mem.period == null && !hasEnableMemNotifications
               ? null
               : MemListItemSubtitle(mem.id),
-          isThreeLine: mem.period != null &&
-              memNotifications
-                  .where(
-                      (e) => e is SavedMemNotificationEntity && e.isEnabled())
-                  .isNotEmpty,
+          isThreeLine: mem.period != null && hasEnableMemNotifications,
         );
       },
       {

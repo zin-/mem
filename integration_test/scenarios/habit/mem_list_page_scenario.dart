@@ -51,10 +51,22 @@ void main() => group(
             },
           );
 
-          await dbA.insert(defTableMems, {
+          final insertedPlainMemId = await dbA.insert(defTableMems, {
             defColMemsName.name: plainMemName,
             defColCreatedAt.name: zeroDate,
           });
+          await dbA.insert(
+            defTableMemNotifications,
+            {
+              defFkMemNotificationsMemId.name: insertedPlainMemId,
+              defColMemNotificationsTime.name: 60,
+              defColMemNotificationsType.name:
+                  MemNotificationType.afterActStarted.name,
+              defColMemNotificationsMessage.name:
+                  '$_name: mem notification message',
+              defColCreatedAt.name: zeroDate,
+            },
+          );
 
           dbA.insert(defTableActs, {
             defFkActsMemId.name: insertedMemId,
