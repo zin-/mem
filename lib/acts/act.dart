@@ -1,8 +1,8 @@
 import 'dart:core';
 
+import 'package:mem/framework/date_and_time/date_and_time.dart';
+import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
-
-import '../framework/date_and_time/date_and_time_period.dart';
 
 class Act {
   final int memId;
@@ -48,4 +48,62 @@ class Act {
           'onlyActive': onlyActive,
         },
       );
+}
+
+abstract class ActV2 {
+  final int memId;
+  final DateAndTimePeriod? period;
+
+  ActV2(this.memId, this.period);
+
+  factory ActV2.by(
+    int memId,
+    DateAndTime startWhen, {
+    DateAndTime? endWhen,
+  }) {
+    if (endWhen == null) {
+      return ActiveAct(memId, startWhen);
+    } else {
+      return FinishedAct(memId, startWhen, endWhen);
+    }
+  }
+
+  bool get isActive => period?.start != null && period?.end == null;
+
+  bool get isFinished => period?.end != null;
+
+  ActV2 finish(DateAndTime when);
+}
+
+class ActiveAct extends ActV2 {
+  @override
+  DateAndTimePeriod get period => super.period!;
+
+  ActiveAct(int memId, DateAndTime startWhen)
+      : super(
+          memId,
+          DateAndTimePeriod(start: startWhen),
+        );
+
+  @override
+  FinishedAct finish(DateAndTime when) =>
+      FinishedAct(memId, period.start!, when);
+}
+
+class FinishedAct extends ActV2 {
+  @override
+  DateAndTimePeriod get period => super.period!;
+
+  FinishedAct(
+    int memId,
+    DateAndTime startWhen,
+    DateAndTime endWhen,
+  ) : super(
+          memId,
+          DateAndTimePeriod(start: startWhen, end: endWhen),
+        );
+
+  @override
+  ActV2 finish(DateAndTime when) =>
+      throw StateError('This act has already been finished.');
 }
