@@ -1,6 +1,5 @@
 import 'package:mem/acts/act.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
-import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:test/test.dart';
 
 const _name = 'Act test: compare';
@@ -16,38 +15,20 @@ void main() => group(
 
             final acts = [
               {name: 'null', act: null},
-              {
-                name: 'active 0',
-                act: Act(0, DateAndTimePeriod(start: DateAndTime(0)))
-              },
-              {
-                name: 'active 1',
-                act: Act(1, DateAndTimePeriod(start: DateAndTime(1)))
-              },
-              {
-                name: 'active 2',
-                act: Act(2, DateAndTimePeriod(start: DateAndTime(2)))
-              },
+              {name: 'active 0', act: Act.by(0, DateAndTime(0))},
+              {name: 'active 1', act: Act.by(1, DateAndTime(1))},
+              {name: 'active 2', act: Act.by(2, DateAndTime(2))},
               {
                 name: 'finished 0',
-                act: Act(
-                    3,
-                    DateAndTimePeriod(
-                        start: DateAndTime(0), end: DateAndTime(0)))
+                act: Act.by(3, DateAndTime(0), endWhen: DateAndTime(0))
               },
               {
                 name: 'finished 1',
-                act: Act(
-                    4,
-                    DateAndTimePeriod(
-                        start: DateAndTime(1), end: DateAndTime(1)))
+                act: Act.by(4, DateAndTime(1), endWhen: DateAndTime(1))
               },
               {
                 name: 'finished 2',
-                act: Act(
-                    5,
-                    DateAndTimePeriod(
-                        start: DateAndTime(2), end: DateAndTime(2)))
+                act: Act.by(5, DateAndTime(2), endWhen: DateAndTime(2))
               },
             ];
             final expectedList = [

@@ -47,6 +47,9 @@ class ActEntity extends Act with Entity, Copyable<ActEntity> {
         defColActsEnd.name: period.end,
         defColActsEndIsAllDay.name: period.end?.isAllDay,
       };
+
+  @override
+  Act finish(DateAndTime when) => throw StateError('実装する気はない');
 }
 
 class SavedActEntity extends ActEntity with DatabaseTupleEntity<int> {

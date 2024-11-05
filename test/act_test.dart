@@ -13,7 +13,7 @@ void main() => group(
             test(
               ': ActiveAct',
               () {
-                final act = ActV2.by(0, DateAndTime(0));
+                final act = Act.by(0, DateAndTime(0));
 
                 expect(act, isA<ActiveAct>());
               },
@@ -21,7 +21,7 @@ void main() => group(
             test(
               ': FinishedAct',
               () {
-                final act = ActV2.by(
+                final act = Act.by(
                   0,
                   DateAndTime(0),
                   endWhen: DateAndTime(0),
@@ -39,7 +39,7 @@ void main() => group(
             test(
               ': ActiveAct',
               () {
-                final act = ActV2.by(0, DateAndTime(0));
+                final act = Act.by(0, DateAndTime(0));
 
                 expect(act.isActive, isTrue);
               },
@@ -47,7 +47,7 @@ void main() => group(
             test(
               ': FinishedAct',
               () {
-                final act = ActV2.by(
+                final act = Act.by(
                   0,
                   DateAndTime(0),
                   endWhen: DateAndTime(0),
@@ -65,26 +65,24 @@ void main() => group(
             test(
               ': ActiveAct',
               () {
-                final activeAct = ActV2.by(0, DateAndTime(0));
+                final activeAct = Act.by(0, DateAndTime(0));
 
                 expect(activeAct.isActive, isTrue);
 
                 final finishedAct = activeAct.finish(DateAndTime(1));
 
-                expect(finishedAct.isFinished, isTrue);
+                expect(finishedAct, isA<FinishedAct>());
               },
             );
             test(
               ': FinishedAct',
               () {
-                final finishedAct = ActV2.by(
+                final finishedAct = Act.by(
                   0,
                   DateAndTime(0),
                   endWhen: DateAndTime(1),
                 );
 
-                expect(finishedAct.isActive, isFalse);
-                expect(finishedAct.isFinished, isTrue);
                 expect(
                   () => finishedAct.finish(DateAndTime(1)),
                   throwsA(isA<StateError>()),
