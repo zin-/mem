@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:mem/acts/act.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/acts/act_entity.dart';
 import 'package:mem/mems/mem_entity.dart';
@@ -9,11 +8,11 @@ import 'total_act_time_item.dart';
 import 'view.dart';
 
 class ActListItemBuilder {
-  final MapEntry<DateTime, List<Act>> _actListWithDatetime;
+  final MapEntry<DateTime, List<SavedActEntity>> _actListWithDatetime;
   final List<SavedMemEntity> _memList;
   final bool _isTimeView;
 
-  late final Map _actListGroupedByMemId;
+  late final Map<int, List<SavedActEntity>> _actListGroupedByMemId;
 
   ActListItemBuilder(
     this._actListWithDatetime,
@@ -21,8 +20,8 @@ class ActListItemBuilder {
     this._isTimeView,
   ) {
     if (_isTimeView) {
-      _actListGroupedByMemId =
-          _actListWithDatetime.value.groupListsBy((element) => element.memId);
+      _actListGroupedByMemId = _actListWithDatetime.value
+          .groupListsBy((element) => element.value.memId);
     }
   }
 
@@ -32,21 +31,17 @@ class ActListItemBuilder {
             final entry = _actListGroupedByMemId.entries.toList()[index];
 
             return TotalActTimeListItem(
-              entry.value,
+              entry.value.map((e) => e.value).toList(),
               _memList.singleWhereOrNull((element) => element.id == entry.key),
             );
           } else {
             final act = _actListWithDatetime.value[index];
-            if (act is SavedActEntity) {
-              return ActListItemView(
-                act,
-                _memList
-                    .singleWhereOrNull((element) => element.id == act.memId)
-                    ?.name,
-              );
-            } else {
-              return null;
-            }
+            return ActListItemView(
+              act,
+              _memList
+                  .singleWhereOrNull((element) => element.id == act.value.memId)
+                  ?.name,
+            );
           }
         },
         {

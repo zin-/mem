@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/acts/act.dart';
 import 'package:mem/acts/actions.dart';
 import 'package:mem/mems/list/states.dart';
 import 'package:mem/mems/mem_done_checkbox.dart';
@@ -11,7 +12,6 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/list/item/subtitle.dart';
 import 'package:mem/mems/states.dart';
-import 'package:mem/acts/act_entity.dart';
 import 'package:mem/mems/mem_entity.dart';
 import 'package:mem/mems/mem_notification_entity.dart';
 import 'package:mem/values/colors.dart';
@@ -47,18 +47,24 @@ class MemListItemView extends ConsumerWidget {
           ),
           ref.watch(
             activeActsProvider.select(
-              (v) => v.singleWhereOrNull(
-                (e) => e.memId == _memId,
-              ),
+              (v) => v
+                  .singleWhereOrNull(
+                    (e) => e.value.memId == _memId,
+                  )
+                  ?.value,
             ),
           ),
           (activeAct) => v(
-            () async => activeAct == null
-                ? ref.read(startActBy(_memId))
-                : ref.read(activeActsProvider.notifier).removeWhere(
-                      (act) =>
-                          act.id == ref.read(finishActBy(activeAct.memId)).id,
-                    ),
+            () async {
+              if (activeAct == null) {
+                ref.read(startActBy(_memId));
+              } else {
+                final finishedActId = ref.read(finishActBy(_memId));
+                ref.read(activeActsProvider.notifier).removeWhere(
+                      (act) => act.id == finishedActId,
+                    );
+              }
+            },
             {
               'activeAct': activeAct,
             },
@@ -75,8 +81,8 @@ ListTile _render(
   SavedMemEntity mem,
   void Function(int memId) onTap,
   void Function(bool? value, int memId) onMemDoneCheckboxTapped,
-  SavedActEntity? activeAct,
-  void Function(SavedActEntity? act) onActButtonTapped,
+  Act? activeAct,
+  void Function(Act? act) onActButtonTapped,
   Iterable<MemNotification> memNotifications,
 ) =>
     v(

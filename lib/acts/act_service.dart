@@ -22,16 +22,12 @@ class ActService {
   ) =>
       v(
         () async => ListWithTotalCount(
-          (await _actRepository
-              .ship(
-                memId: memId,
-                actOrderBy: ActOrderBy.descStart,
-                offset: offset,
-                limit: limit,
-              )
-              .then(
-                (value) => value.map((e) => e.toV1()).toList(),
-              )),
+          await _actRepository.ship(
+            memId: memId,
+            actOrderBy: ActOrderBy.descStart,
+            offset: offset,
+            limit: limit,
+          ),
           await _actRepository.count(memId: memId),
         ),
         {
@@ -46,11 +42,9 @@ class ActService {
     DateAndTime when,
   ) =>
       i(
-        () async => await _actRepository
-            .receive(
-              ActEntityV2(Act.by(memId, when)),
-            )
-            .then((v) => v.toV1()),
+        () async => await _actRepository.receive(
+          ActEntity(Act.by(memId, when)),
+        ),
         {
           'memId': memId,
           'when': when,
@@ -75,19 +69,15 @@ class ActService {
               );
 
           if (active == null) {
-            return await _actRepository
-                .receive(
-                  ActEntityV2(Act.by(memId, when, endWhen: when)),
-                )
-                .then((v) => v.toV1());
+            return await _actRepository.receive(
+              ActEntity(Act.by(memId, when, endWhen: when)),
+            );
           } else {
-            return await _actRepository
-                .replace(
-                  active.copiedWith(
-                    end: () => when,
-                  ),
-                )
-                .then((v) => v.toV1());
+            return await _actRepository.replace(
+              active.copiedWith(
+                end: () => when,
+              ),
+            );
           }
         },
         {
@@ -97,17 +87,14 @@ class ActService {
       );
 
   Future<SavedActEntity> edit(SavedActEntity savedAct) => i(
-        () async => await _actRepository
-            .replace(SavedActEntityV2(savedAct.toMap))
-            .then((value) => value.toV1()),
+        () async => await _actRepository.replace(savedAct),
         {
           'savedAct': savedAct,
         },
       );
 
   Future<SavedActEntity> delete(int actId) => i(
-        () async =>
-            await _actRepository.waste(id: actId).then((v) => v.single.toV1()),
+        () async => await _actRepository.waste(id: actId).then((v) => v.single),
         {
           'actId': actId,
         },

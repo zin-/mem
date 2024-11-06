@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/acts/act.dart';
 import 'package:mem/acts/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period_view.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/acts/act_entity.dart';
 
 import 'actions.dart';
 import 'states.dart';
@@ -16,33 +16,32 @@ class EditingActDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final editingAct = ref.watch(editingActProvider(_actId));
+    final editingActEntity = ref.watch(editingActProvider(_actId));
 
     return _EditingActDialogComponent(
-      editingAct,
+      editingActEntity.value,
       (pickedPeriod) => v(
         () => ref.read(editingActProvider(_actId).notifier).updatedBy(
-              editingAct.copiedWith(
-                period: pickedPeriod == null ? null : () => pickedPeriod,
+              editingActEntity.copiedWith(
+                start: pickedPeriod == null ? null : () => pickedPeriod.start!,
+                end: pickedPeriod == null ? null : () => pickedPeriod.end,
               ),
             ),
         pickedPeriod,
       ),
       () => v(() => ref.read(deleteAct(_actId))),
-      () => v(
-          () => ref.read(actListProvider(editingAct.memId).notifier).upsertAll(
-                [ref.read(editAct(_actId))],
-                (tmp, item) =>
-                    tmp is SavedActEntity &&
-                    item is SavedActEntity &&
-                    tmp.id == item.id,
-              )),
+      () => v(() => ref
+              .read(actListProvider(editingActEntity.value.memId).notifier)
+              .upsertAll(
+            [ref.read(editAct(_actId))],
+            (tmp, item) => tmp.id == item.id,
+          )),
     );
   }
 }
 
 class _EditingActDialogComponent extends StatelessWidget {
-  final SavedActEntity _editingAct;
+  final Act _editingAct;
   final Function(DateAndTimePeriod? picked) _onPeriodChanged;
   final Function() _onDeleteTapped;
   final Function() _onSaveTapped;
@@ -85,6 +84,8 @@ class _EditingActDialogComponent extends StatelessWidget {
             ],
           );
         },
-        _editingAct,
+        {
+          '_editingAct': _editingAct,
+        },
       );
 }

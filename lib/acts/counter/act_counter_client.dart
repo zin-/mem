@@ -19,12 +19,10 @@ class ActCounterClient {
           await _actCounterRepository.receive(
             ActCounterEntity.from(
               await _memRepository.ship(id: memId).then((v) => v.single),
-              await _actRepository
-                  .ship(
-                    memId: memId,
-                    period: ActCounter.period(DateAndTime.now()),
-                  )
-                  .then((v) => v.map((e) => e.toV1())),
+              await _actRepository.ship(
+                memId: memId,
+                period: ActCounter.period(DateAndTime.now()),
+              ),
             ),
           );
         },
@@ -47,12 +45,10 @@ class ActCounterClient {
           await _actCounterRepository.replace(
             ActCounterEntity.from(
               await _memRepository.ship(id: memId).then((v) => v.single),
-              await _actRepository
-                  .ship(
-                    memId: memId,
-                    period: ActCounter.period(when),
-                  )
-                  .then((v) => v.map((e) => e.toV1())),
+              await _actRepository.ship(
+                memId: memId,
+                period: ActCounter.period(when),
+              ),
             ),
           );
         },

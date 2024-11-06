@@ -68,10 +68,10 @@ class ActsClient {
         () async {
           final replaced = await _actService.edit(savedAct);
 
-          if (replaced.isActive) {
-            _notificationClient.startActNotifications(replaced.memId);
+          if (replaced.value.isActive) {
+            _notificationClient.startActNotifications(replaced.value.memId);
           } else {
-            _notificationClient.cancelActNotification(replaced.memId);
+            _notificationClient.cancelActNotification(replaced.value.memId);
           }
 
           return replaced;
@@ -89,7 +89,7 @@ class ActsClient {
         () async {
           final finished = await _actService.finish(memId, when);
 
-          await _notificationClient.pauseActNotification(finished.memId);
+          await _notificationClient.pauseActNotification(finished.value.memId);
         },
         {
           "memId": memId,
@@ -105,7 +105,7 @@ class ActsClient {
         () async {
           final finished = await _actService.finish(memId, when);
 
-          _notificationClient.cancelActNotification(finished.memId);
+          _notificationClient.cancelActNotification(finished.value.memId);
 
           // ISSUE #226
 
@@ -121,7 +121,7 @@ class ActsClient {
         () async {
           final deleted = await _actService.delete(actId);
 
-          _notificationClient.cancelActNotification(deleted.memId);
+          _notificationClient.cancelActNotification(deleted.value.memId);
 
           return deleted;
         },

@@ -146,17 +146,17 @@ final memListProvider = StateNotifierProvider.autoDispose<
   );
 });
 
-final latestActsByMemProvider = StateNotifierProvider.autoDispose<
-    ListValueStateNotifier<SavedActEntity>, List<SavedActEntity>>(
+final latestActsByMemProvider =
+    StateNotifierProvider.autoDispose<ListValueStateNotifier<Act>, List<Act>>(
   (ref) => v(
     () => ListValueStateNotifier(
       ref.watch(
         actsProvider.select(
           (value) => value
-              .sorted((a, b) => b.period.compareTo(a.period))
-              .groupListsBy((element) => element.memId)
+              .sorted((a, b) => b.value.period.compareTo(a.value.period))
+              .groupListsBy((e) => e.value.memId)
               .values
-              .map((e) => e[0])
+              .map((e) => e[0].value)
               .toList(),
         ),
       ),
@@ -164,15 +164,13 @@ final latestActsByMemProvider = StateNotifierProvider.autoDispose<
         () async {
           if (current.isEmpty) {
             ref.read(actsProvider.notifier).addAll(
-                  await ActRepository()
-                      .ship(
-                        memIdsIn: ref
-                            .read(memsProvider)
-                            .whereType<SavedMemEntity>()
-                            .map((e) => e.id),
-                        latestByMemIds: true,
-                      )
-                      .then((v) => v.map((e) => e.toV1())),
+                  await ActRepository().ship(
+                    memIdsIn: ref
+                        .read(memsProvider)
+                        .whereType<SavedMemEntity>()
+                        .map((e) => e.id),
+                    latestByMemIds: true,
+                  ),
                 );
           }
         },
@@ -221,7 +219,7 @@ final activeActsProvider = StateNotifierProvider.autoDispose<
     ListValueStateNotifier<SavedActEntity>, List<SavedActEntity>>(
   (ref) => v(
     () => ListValueStateNotifier(
-      ref.watch(actsProvider).where((act) => act.isActive).toList(),
+      ref.watch(actsProvider).where((act) => act.value.isActive).toList(),
     ),
   ),
 );
