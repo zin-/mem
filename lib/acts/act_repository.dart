@@ -25,11 +25,12 @@ extension _ActOrderByExt on ActOrderBy {
   }
 }
 
-class ActRepository extends DatabaseTupleRepository<ActEntity, SavedActEntity> {
+class ActRepository
+    extends DatabaseTupleRepositoryV2<ActEntityV2, SavedActEntityV2> {
   ActRepository() : super(databaseDefinition, defTableActs);
 
   @override
-  SavedActEntity pack(Map<String, dynamic> map) => SavedActEntity.fromMap(map);
+  SavedActEntityV2 pack(Map<String, dynamic> map) => SavedActEntityV2(map);
 
   @override
   Future<int> count({
@@ -52,7 +53,7 @@ class ActRepository extends DatabaseTupleRepository<ActEntity, SavedActEntity> {
       );
 
   @override
-  Future<List<SavedActEntity>> ship({
+  Future<List<SavedActEntityV2>> ship({
     int? memId,
     Iterable<int>? memIdsIn,
     DateAndTimePeriod? period,
@@ -107,7 +108,7 @@ class ActRepository extends DatabaseTupleRepository<ActEntity, SavedActEntity> {
       );
 
   @override
-  Future<List<SavedActEntity>> waste({int? id, Condition? condition}) => v(
+  Future<List<SavedActEntityV2>> waste({int? id, Condition? condition}) => v(
         () => super.waste(
           condition: And(
             [

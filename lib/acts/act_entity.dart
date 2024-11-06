@@ -70,3 +70,79 @@ class SavedActEntity extends ActEntity with DatabaseTupleEntity<int> {
       SavedActEntity.fromMap(
           toMap..addAll(super.copiedWith(memId: memId, period: period).toMap));
 }
+
+class ActEntityV2 with EntityV2<Act>, CopyableV2 {
+  ActEntityV2(Act value) {
+    this.value = value;
+  }
+
+  @override
+  Map<String, Object?> get toMap => {
+        defFkActsMemId.name: value.memId,
+        defColActsStart.name: value.period.start,
+        defColActsStartIsAllDay.name: value.period.start?.isAllDay,
+        defColActsEnd.name: value.period.end,
+        defColActsEndIsAllDay.name: value.period.end?.isAllDay,
+      };
+
+  @override
+  EntityV2<Act> copiedWith({
+    int Function()? memId,
+    DateAndTime Function()? start,
+    DateAndTime? Function()? end,
+  }) =>
+      ActEntityV2(
+        Act.by(
+          memId == null ? value.memId : memId(),
+          start == null ? value.period.start! : start(),
+          endWhen: end == null ? value.period.end : end(),
+        ),
+      );
+}
+
+class SavedActEntityV2 extends ActEntityV2
+    with DatabaseTupleEntityV2<int, Act> {
+  SavedActEntityV2(Map<String, dynamic> map)
+      : super(
+          Act.by(
+            map[defFkActsMemId.name],
+            DateAndTime.from(
+              map[defColActsStart.name],
+              timeOfDay: map[defColActsStartIsAllDay.name]
+                  ? null
+                  : map[defColActsStart.name],
+            ),
+            endWhen: map[defColActsEnd.name] == null
+                ? null
+                : DateAndTime.from(
+                    map[defColActsEnd.name],
+                    timeOfDay: map[defColActsEndIsAllDay.name]
+                        ? null
+                        : map[defColActsEnd.name],
+                  ),
+          ),
+        ) {
+    withMap(map);
+  }
+
+  @override
+  SavedActEntityV2 copiedWith({
+    int Function()? memId,
+    DateAndTime Function()? start,
+    DateAndTime? Function()? end,
+  }) =>
+      SavedActEntityV2(
+        toMap
+          ..addAll(
+            super
+                .copiedWith(
+                  memId: memId,
+                  start: start,
+                  end: end,
+                )
+                .toMap,
+          ),
+      );
+
+  SavedActEntity toV1() => SavedActEntity.fromMap(toMap);
+}

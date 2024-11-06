@@ -88,9 +88,12 @@ class NotificationClient {
           }
 
           if (notificationType == NotificationType.startMem) {
-            final latestAct =
-                (await ActRepository().ship(memId: memId, latestByMemIds: true))
-                    .singleOrNull;
+            final latestAct = await ActRepository()
+                .ship(memId: memId, latestByMemIds: true)
+                .then((v) => v.map((e) => e.toV1()))
+                .then(
+                  (v) => v.singleOrNull,
+                );
             if (latestAct != null && latestAct.isActive) {
               return;
             }
@@ -147,7 +150,10 @@ class NotificationClient {
                   memId: memId,
                   latestByMemIds: true,
                 )
-                .then((value) => value.singleOrNull);
+                .then((v) => v.map((e) => e.toV1()))
+                .then(
+                  (v) => v.singleOrNull,
+                );
             final startOfDay =
                 (await _preferenceClientRepository.shipByKey(startOfDayKey))
                         .value ??
@@ -279,10 +285,11 @@ class NotificationClient {
           );
           final lastActTime = await ActRepository()
               .ship(memId: memId, latestByMemIds: true)
-              .then((value) =>
-                  value.singleOrNull?.period.end ??
+              .then((v) => v.map((e) => e.toV1()))
+              .then((v) =>
+                  v.singleOrNull?.period.end ??
                   // FIXME 永続化されている時点でstartは必ずあるので型で表現する
-                  value.singleOrNull?.period.start!);
+                  v.singleOrNull?.period.start!);
 
           if (lastActTime != null) {
             if (Duration(

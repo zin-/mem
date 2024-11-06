@@ -164,13 +164,15 @@ final latestActsByMemProvider = StateNotifierProvider.autoDispose<
         () async {
           if (current.isEmpty) {
             ref.read(actsProvider.notifier).addAll(
-                  await ActRepository().ship(
-                    memIdsIn: ref
-                        .read(memsProvider)
-                        .whereType<SavedMemEntity>()
-                        .map((e) => e.id),
-                    latestByMemIds: true,
-                  ),
+                  await ActRepository()
+                      .ship(
+                        memIdsIn: ref
+                            .read(memsProvider)
+                            .whereType<SavedMemEntity>()
+                            .map((e) => e.id),
+                        latestByMemIds: true,
+                      )
+                      .then((v) => v.map((e) => e.toV1())),
                 );
           }
         },

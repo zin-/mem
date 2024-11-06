@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
+import 'package:mem/acts/act.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
-import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/acts/act_entity.dart';
 import 'package:mem/acts/act_repository.dart';
@@ -22,12 +22,16 @@ class ActService {
   ) =>
       v(
         () async => ListWithTotalCount(
-          (await _actRepository.ship(
-            memId: memId,
-            actOrderBy: ActOrderBy.descStart,
-            offset: offset,
-            limit: limit,
-          )),
+          (await _actRepository
+              .ship(
+                memId: memId,
+                actOrderBy: ActOrderBy.descStart,
+                offset: offset,
+                limit: limit,
+              )
+              .then(
+                (value) => value.map((e) => e.toV1()).toList(),
+              )),
           await _actRepository.count(memId: memId),
         ),
         {
@@ -42,9 +46,11 @@ class ActService {
     DateAndTime when,
   ) =>
       i(
-        () async => await _actRepository.receive(
-          ActEntity(memId, DateAndTimePeriod(start: when)),
-        ),
+        () async => await _actRepository
+            .receive(
+              ActEntityV2(Act.by(memId, when)),
+            )
+            .then((v) => v.toV1()),
         {
           'memId': memId,
           'when': when,
@@ -57,29 +63,31 @@ class ActService {
   ) =>
       i(
         () async {
-          final active = (await _actRepository.ship(
-            memId: memId,
-            isActive: true,
-          ))
-              .sorted((a, b) => a.createdAt.compareTo(b.createdAt))
-              .firstOrNull;
+          final active = await _actRepository
+              .ship(
+                memId: memId,
+                isActive: true,
+              )
+              .then(
+                (v) => v
+                    .sorted((a, b) => a.createdAt.compareTo(b.createdAt))
+                    .firstOrNull,
+              );
 
           if (active == null) {
-            return await _actRepository.receive(
-              ActEntity(
-                memId,
-                DateAndTimePeriod(
-                  start: when,
-                  end: when,
-                ),
-              ),
-            );
+            return await _actRepository
+                .receive(
+                  ActEntityV2(Act.by(memId, when, endWhen: when)),
+                )
+                .then((v) => v.toV1());
           } else {
-            return await _actRepository.replace(
-              active.copiedWith(
-                period: () => active.period.copiedWith(when),
-              ),
-            );
+            return await _actRepository
+                .replace(
+                  active.copiedWith(
+                    end: () => when,
+                  ),
+                )
+                .then((v) => v.toV1());
           }
         },
         {
@@ -89,14 +97,17 @@ class ActService {
       );
 
   Future<SavedActEntity> edit(SavedActEntity savedAct) => i(
-        () async => await _actRepository.replace(savedAct),
+        () async => await _actRepository
+            .replace(SavedActEntityV2(savedAct.toMap))
+            .then((value) => value.toV1()),
         {
           'savedAct': savedAct,
         },
       );
 
   Future<SavedActEntity> delete(int actId) => i(
-        () async => (await _actRepository.waste(id: actId)).single,
+        () async =>
+            await _actRepository.waste(id: actId).then((v) => v.single.toV1()),
         {
           'actId': actId,
         },
