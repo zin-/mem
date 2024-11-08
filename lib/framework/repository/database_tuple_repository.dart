@@ -323,58 +323,58 @@ abstract class DatabaseTupleRepositoryV2<ENTITY extends EntityV2,
         },
       );
 
-  Future<SAVED> archive(
-    SAVED savedEntity, {
-    DateTime? archivedAt,
-  }) =>
-      v(
-        () async {
-          final entityMap = savedEntity.toMap;
-
-          entityMap[defColArchivedAt.name] = archivedAt ?? DateTime.now();
-
-          final byId = Equals(defPkId, entityMap[defPkId.name]);
-          await (await _dbA).update(
-            _tableDefinition,
-            entityMap,
-            where: byId.where(),
-            whereArgs: byId.whereArgs(),
-          );
-
-          return pack(entityMap);
-        },
-        {
-          'savedEntity': savedEntity,
-          'archivedAt': archivedAt,
-        },
-      );
-
-  Future<SAVED> unarchive(
-    SAVED savedEntity, {
-    DateTime? updatedAt,
-  }) =>
-      v(
-        () async {
-          final entityMap = savedEntity.toMap;
-
-          entityMap[defColUpdatedAt.name] = updatedAt ?? DateTime.now();
-          entityMap[defColArchivedAt.name] = null;
-
-          final byId = Equals(defPkId, entityMap[defPkId.name]);
-          await (await _dbA).update(
-            _tableDefinition,
-            entityMap,
-            where: byId.where(),
-            whereArgs: byId.whereArgs(),
-          );
-
-          return pack(entityMap);
-        },
-        {
-          'savedEntity': savedEntity,
-          'updatedAt': updatedAt,
-        },
-      );
+  // Future<SAVED> archive(
+  //   SAVED savedEntity, {
+  //   DateTime? archivedAt,
+  // }) =>
+  //     v(
+  //       () async {
+  //         final entityMap = savedEntity.toMap;
+  //
+  //         entityMap[defColArchivedAt.name] = archivedAt ?? DateTime.now();
+  //
+  //         final byId = Equals(defPkId, entityMap[defPkId.name]);
+  //         await (await _dbA).update(
+  //           _tableDefinition,
+  //           entityMap,
+  //           where: byId.where(),
+  //           whereArgs: byId.whereArgs(),
+  //         );
+  //
+  //         return pack(entityMap);
+  //       },
+  //       {
+  //         'savedEntity': savedEntity,
+  //         'archivedAt': archivedAt,
+  //       },
+  //     );
+  //
+  // Future<SAVED> unarchive(
+  //   SAVED savedEntity, {
+  //   DateTime? updatedAt,
+  // }) =>
+  //     v(
+  //       () async {
+  //         final entityMap = savedEntity.toMap;
+  //
+  //         entityMap[defColUpdatedAt.name] = updatedAt ?? DateTime.now();
+  //         entityMap[defColArchivedAt.name] = null;
+  //
+  //         final byId = Equals(defPkId, entityMap[defPkId.name]);
+  //         await (await _dbA).update(
+  //           _tableDefinition,
+  //           entityMap,
+  //           where: byId.where(),
+  //           whereArgs: byId.whereArgs(),
+  //         );
+  //
+  //         return pack(entityMap);
+  //       },
+  //       {
+  //         'savedEntity': savedEntity,
+  //         'updatedAt': updatedAt,
+  //       },
+  //     );
 
   Future<List<SAVED>> waste({
     Condition? condition,

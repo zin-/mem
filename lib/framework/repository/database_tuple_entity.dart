@@ -33,7 +33,7 @@ mixin DatabaseTupleEntityV2<PRIMARY_KEY, T> on EntityV2<T> {
   late DateTime? updatedAt;
   late DateTime? archivedAt;
 
-  bool get isArchived => archivedAt != null;
+  // bool get isArchived => archivedAt != null;
 
   void withMap(Map<String, Object?> map) {
     id = map[defPkId.name] as PRIMARY_KEY;

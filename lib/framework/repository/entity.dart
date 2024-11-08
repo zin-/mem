@@ -35,16 +35,16 @@ mixin EntityV2<VALUE> {
   @override
   String toString() => "${super.toString()}: $toMap";
 
-  @override
-  int get hashCode => toMap.entries.fold(
-        1,
-        (p, e) => p ^ e.key.hashCode ^ e.value.hashCode,
-      );
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (runtimeType == other.runtimeType && hashCode == other.hashCode);
+// @override
+// int get hashCode => toMap.entries.fold(
+//       1,
+//       (p, e) => p ^ e.key.hashCode ^ e.value.hashCode,
+//     );
+//
+// @override
+// bool operator ==(Object other) =>
+//     identical(this, other) ||
+//     (runtimeType == other.runtimeType && hashCode == other.hashCode);
 }
 
 mixin CopyableV2<VALUE> on EntityV2<VALUE> {
