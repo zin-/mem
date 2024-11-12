@@ -29,6 +29,16 @@ class Mem {
   }) =>
       v(
         () {
+          final thisIsActive = latestActOfThis?.isActive ?? false;
+          final otherIsActive = latestActOfOther?.isActive ?? false;
+
+          if (thisIsActive && otherIsActive) {
+            return latestActOfOther!.period.start!
+                .compareTo(latestActOfThis!.period.start as DateTime);
+          } else if (thisIsActive != otherIsActive) {
+            return thisIsActive == false ? 1 : -1;
+          }
+
           if (isArchived != other.isArchived) {
             return isArchived ? 1 : -1;
           }

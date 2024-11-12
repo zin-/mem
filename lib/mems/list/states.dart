@@ -99,15 +99,6 @@ final memListProvider = StateNotifierProvider.autoDispose<
         final latestActOfB =
             latestActsByMem.singleWhereOrNull((act) => act.memId == b.id);
 
-        final comparedByActiveAct = Act.compare(
-          latestActOfA,
-          latestActOfB,
-          onlyActive: true,
-        );
-        if (comparedByActiveAct != 0) {
-          return comparedByActiveAct;
-        }
-
         final memNotificationsOfA =
             savedMemNotifications.where((e) => e.memId == a.id);
         final memNotificationsOfB =
