@@ -336,6 +336,30 @@ void main() => group(_name, () {
             expect(widgetTester.textAt(8).data, equals(timeText(pickedDate)));
           });
 
+          testWidgets(
+            ': cancel.',
+            (widgetTester) async {
+              widgetTester.ignoreMockMethodCallHandler(
+                  MethodChannelMock.flutterLocalNotifications);
+
+              await showActListPage(widgetTester);
+
+              await widgetTester.longPress(find.text(timeText(zeroDate)).at(0));
+              await widgetTester.pumpAndSettle();
+
+              await widgetTester.tap(find.byIcon(Icons.clear));
+              await widgetTester.pumpAndSettle();
+
+              expect(widgetTester.textAt(0).data, equals(insertedMemName));
+              expect(widgetTester.textAt(1).data, equals(dateText(zeroDate)));
+              expect(widgetTester.textAt(2).data, equals("2"));
+              expect(widgetTester.textAt(3).data, equals(oneMin.format()));
+              expect(widgetTester.textAt(4).data, equals(timeText(zeroDate)));
+              expect(widgetTester.textAt(5).data, equals("~"));
+              expect(widgetTester.textAt(4).data, equals(timeText(zeroDate)));
+            },
+          );
+
           testWidgets(': delete.', (widgetTester) async {
             widgetTester.ignoreMockMethodCallHandler(
                 MethodChannelMock.flutterLocalNotifications);

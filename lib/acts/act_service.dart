@@ -57,7 +57,7 @@ class ActService {
   ) =>
       i(
         () async {
-          final active = await _actRepository
+          final latestActiveActEntity = await _actRepository
               .ship(
                 memId: memId,
                 isActive: true,
@@ -68,14 +68,14 @@ class ActService {
                     .firstOrNull,
               );
 
-          if (active == null) {
+          if (latestActiveActEntity == null) {
             return await _actRepository.receive(
               ActEntity(Act.by(memId, when, endWhen: when)),
             );
           } else {
             return await _actRepository.replace(
-              active.copiedWith(
-                end: () => when,
+              latestActiveActEntity.updatedBy(
+                latestActiveActEntity.value.finish(when),
               ),
             );
           }

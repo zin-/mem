@@ -4,7 +4,7 @@ import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
 
-class ActEntity with EntityV2<Act>, CopyableV2 {
+class ActEntity with EntityV2<Act> {
   ActEntity(Act value) {
     this.value = value;
   }
@@ -19,18 +19,7 @@ class ActEntity with EntityV2<Act>, CopyableV2 {
       };
 
   @override
-  EntityV2<Act> copiedWith({
-    int Function()? memId,
-    DateAndTime Function()? start,
-    DateAndTime? Function()? end,
-  }) =>
-      ActEntity(
-        Act.by(
-          memId == null ? value.memId : memId(),
-          start == null ? value.period.start! : start(),
-          endWhen: end == null ? value.period.end : end(),
-        ),
-      );
+  EntityV2<Act> updatedBy(Act value) => ActEntity(value);
 }
 
 class SavedActEntity extends ActEntity with DatabaseTupleEntityV2<int, Act> {
@@ -58,21 +47,6 @@ class SavedActEntity extends ActEntity with DatabaseTupleEntityV2<int, Act> {
   }
 
   @override
-  SavedActEntity copiedWith({
-    int Function()? memId,
-    DateAndTime Function()? start,
-    DateAndTime? Function()? end,
-  }) =>
-      SavedActEntity(
-        toMap
-          ..addAll(
-            super
-                .copiedWith(
-                  memId: memId,
-                  start: start,
-                  end: end,
-                )
-                .toMap,
-          ),
-      );
+  SavedActEntity updatedBy(Act value) =>
+      SavedActEntity(toMap..addAll(super.updatedBy(value).toMap));
 }

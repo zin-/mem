@@ -32,6 +32,8 @@ mixin EntityV2<VALUE> {
 
   Map<String, Object?> get toMap;
 
+  EntityV2<VALUE> updatedBy(VALUE value);
+
   @override
   String toString() => "${super.toString()}: $toMap";
 

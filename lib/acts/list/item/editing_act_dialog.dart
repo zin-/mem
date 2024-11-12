@@ -22,9 +22,16 @@ class EditingActDialog extends ConsumerWidget {
       editingActEntity.value,
       (pickedPeriod) => v(
         () => ref.read(editingActProvider(_actId).notifier).updatedBy(
-              editingActEntity.copiedWith(
-                start: pickedPeriod == null ? null : () => pickedPeriod.start!,
-                end: pickedPeriod == null ? null : () => pickedPeriod.end,
+              editingActEntity.updatedBy(
+                Act.by(
+                  editingActEntity.value.memId,
+                  pickedPeriod == null
+                      ? editingActEntity.value.period.start!
+                      : pickedPeriod.start!,
+                  endWhen: pickedPeriod == null
+                      ? editingActEntity.value.period.end
+                      : pickedPeriod.end,
+                ),
               ),
             ),
         pickedPeriod,
