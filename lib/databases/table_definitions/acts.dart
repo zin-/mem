@@ -7,8 +7,9 @@ import 'package:mem/framework/database/definition/table_definition.dart';
 
 const _tableName = "acts";
 
-final defColActsStart = TimestampColumnDefinition('start');
-final defColActsStartIsAllDay = BooleanColumnDefinition('start_is_all_day');
+final defColActsStart = TimestampColumnDefinition('start', notNull: false);
+final defColActsStartIsAllDay =
+    BooleanColumnDefinition('start_is_all_day', notNull: false);
 final defColActsEnd = TimestampColumnDefinition('end', notNull: false);
 final defColActsEndIsAllDay =
     BooleanColumnDefinition('end_is_all_day', notNull: false);

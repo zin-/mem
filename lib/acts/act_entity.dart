@@ -27,12 +27,14 @@ class SavedActEntity extends ActEntity with DatabaseTupleEntityV2<int, Act> {
       : super(
           Act.by(
             map[defFkActsMemId.name],
-            DateAndTime.from(
-              map[defColActsStart.name],
-              timeOfDay: map[defColActsStartIsAllDay.name]
-                  ? null
-                  : map[defColActsStart.name],
-            ),
+            map[defColActsStart.name] == null
+                ? null
+                : DateAndTime.from(
+                    map[defColActsStart.name],
+                    timeOfDay: map[defColActsStartIsAllDay.name]
+                        ? null
+                        : map[defColActsStart.name],
+                  ),
             endWhen: map[defColActsEnd.name] == null
                 ? null
                 : DateAndTime.from(
