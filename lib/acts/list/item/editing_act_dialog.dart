@@ -26,10 +26,10 @@ class EditingActDialog extends ConsumerWidget {
                 Act.by(
                   editingActEntity.value.memId,
                   pickedPeriod == null
-                      ? editingActEntity.value.period.start!
+                      ? editingActEntity.value.period?.start
                       : pickedPeriod.start!,
                   endWhen: pickedPeriod == null
-                      ? editingActEntity.value.period.end
+                      ? editingActEntity.value.period?.end
                       : pickedPeriod.end,
                 ),
               ),

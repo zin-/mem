@@ -98,7 +98,7 @@ ListTile _render(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(child: MemNameText(mem)),
-                    ElapsedTimeView(activeAct.period.start!),
+                    ElapsedTimeView(activeAct.period!.start!),
                   ],
                 ),
           onTap: () => onTap(mem.id),

@@ -87,11 +87,14 @@ class _ActList extends StatelessWidget {
               _memId,
             ),
             ..._actList
+                .where(
+                  (e) => e.value.period != null,
+                )
                 .groupListsBy(
                   (element) => DateTime(
-                    element.value.period.start!.year,
-                    element.value.period.start!.month,
-                    _isDateView ? element.value.period.start!.day : 1,
+                    element.value.period!.start!.year,
+                    element.value.period!.start!.month,
+                    _isDateView ? element.value.period!.start!.day : 1,
                   ),
                 )
                 .entries

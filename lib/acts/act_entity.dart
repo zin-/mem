@@ -12,10 +12,10 @@ class ActEntity with EntityV2<Act> {
   @override
   Map<String, Object?> get toMap => {
         defFkActsMemId.name: value.memId,
-        defColActsStart.name: value.period.start,
-        defColActsStartIsAllDay.name: value.period.start?.isAllDay,
-        defColActsEnd.name: value.period.end,
-        defColActsEndIsAllDay.name: value.period.end?.isAllDay,
+        defColActsStart.name: value.period?.start,
+        defColActsStartIsAllDay.name: value.period?.start?.isAllDay,
+        defColActsEnd.name: value.period?.end,
+        defColActsEndIsAllDay.name: value.period?.end?.isAllDay,
       };
 
   @override

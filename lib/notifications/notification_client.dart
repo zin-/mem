@@ -284,9 +284,8 @@ class NotificationClient {
           final lastActTime = await ActRepository()
               .ship(memId: memId, latestByMemIds: true)
               .then((v) =>
-                  v.singleOrNull?.value.period.end ??
-                  // FIXME 永続化されている時点でstartは必ずあるので型で表現する
-                  v.singleOrNull?.value.period.start!);
+                  v.singleOrNull?.value.period?.end ??
+                  v.singleOrNull?.value.period?.start!);
 
           if (lastActTime != null) {
             if (Duration(

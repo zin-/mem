@@ -37,7 +37,7 @@ class ActCounter implements HomeWidget {
                 .lastOrNull
                 ?.value
                 .period
-                .end ??
+                ?.end ??
             savedActs
                 .sorted(
                   (a, b) => (a.updatedAt ?? a.createdAt)
@@ -46,7 +46,7 @@ class ActCounter implements HomeWidget {
                 .lastOrNull
                 ?.value
                 .period
-                .start;
+                ?.start;
 
   static DateAndTimePeriod period(DateAndTime startDate) {
     int startHour = 5;

@@ -42,8 +42,8 @@ final maxPage =
   ),
 );
 
-final actListProvider = StateNotifierProvider.autoDispose.family<
-    ListValueStateNotifier<SavedActEntity>, List<SavedActEntity>, int?>(
+final actListProvider = StateNotifierProvider.autoDispose
+    .family<ListValueStateNotifier<SavedActEntity>, List<SavedActEntity>, int?>(
   (ref, memId) => v(
     () {
       if (ref.read(isUpdating(memId))) {
@@ -77,7 +77,10 @@ final actListProvider = StateNotifierProvider.autoDispose.family<
         ref
             .watch(actsProvider)
             .where((act) => memId == null || act.value.memId == memId)
-            .sorted((a, b) => b.value.period.compareTo(a.value.period)),
+            .where(
+              (e) => e.value.period != null,
+            )
+            .sorted((a, b) => b.value.period!.compareTo(a.value.period!)),
       );
     },
     {

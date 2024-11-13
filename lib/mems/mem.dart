@@ -33,8 +33,8 @@ class Mem {
           final otherIsActive = latestActOfOther?.isActive ?? false;
 
           if (thisIsActive && otherIsActive) {
-            return latestActOfOther!.period.start!
-                .compareTo(latestActOfThis!.period.start as DateTime);
+            return latestActOfOther!.period!.start!
+                .compareTo(latestActOfThis!.period!.start as DateTime);
           } else if (thisIsActive != otherIsActive) {
             return thisIsActive == false ? 1 : -1;
           }

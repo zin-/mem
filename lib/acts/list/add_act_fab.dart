@@ -11,7 +11,7 @@ class ActFab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final activeActList = (ref.watch(actListProvider(_memId)))
-        .where((element) => element.value.period.end == null);
+        .where((element) => element.value.period?.end == null);
 
     if (activeActList.isEmpty) {
       return _StartActFab(

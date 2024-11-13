@@ -5,23 +5,27 @@ import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 
 abstract class Act {
   final int memId;
-  final DateAndTimePeriod period;
+  final DateAndTimePeriod? period;
 
   Act(this.memId, this.period);
 
   factory Act.by(
     int memId,
-    DateAndTime startWhen, {
+    DateAndTime? startWhen, {
     DateAndTime? endWhen,
   }) {
-    if (endWhen == null) {
+    if (startWhen == null) {
+      throw UnimplementedError();
+    } else if (endWhen == null) {
       return ActiveAct(memId, startWhen);
     } else {
       return FinishedAct(memId, startWhen, endWhen);
     }
   }
 
-  bool get isActive => period.start != null && period.end == null;
+  bool get isActive => period?.start != null && period?.end == null;
+
+  bool get isFinished => period?.start != null && period?.end != null;
 
   Act finish(DateAndTime when);
 }
@@ -35,7 +39,7 @@ class ActiveAct extends Act {
 
   @override
   FinishedAct finish(DateAndTime when) =>
-      FinishedAct(memId, period.start!, when);
+      FinishedAct(memId, period?.start ?? when, when);
 }
 
 class FinishedAct extends Act {

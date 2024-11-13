@@ -30,7 +30,7 @@ void main() {
 
       final actCounter = ActCounter.from(savedMem, acts);
 
-      expect(actCounter.updatedAt, equals(acts[0].value.period.start));
+      expect(actCounter.updatedAt, equals(acts[0].value.period?.start));
     });
     test(": updatedAt is last act end.", () {
       const memId = 1;
@@ -39,14 +39,14 @@ void main() {
 
       final savedMem = SavedMemEntity("constructor", null, null)..id = memId;
       final acts = [
-        SavedActEntity(ActEntity(
-                Act.by(memId, DateAndTime(0), endWhen: DateAndTime.now()))
-            .toMap
-          ..addAll({
-            defPkId.name: 3,
-            defColCreatedAt.name: zeroDate,
-            defColUpdatedAt.name: oneDate,
-          })),
+        SavedActEntity(
+            ActEntity(Act.by(memId, DateAndTime(0), endWhen: DateAndTime.now()))
+                .toMap
+              ..addAll({
+                defPkId.name: 3,
+                defColCreatedAt.name: zeroDate,
+                defColUpdatedAt.name: oneDate,
+              })),
         SavedActEntity(
           ActEntity(Act.by(memId, DateAndTime.now())).toMap
             ..addAll({defPkId.name: 4, defColCreatedAt.name: zeroDate}),
@@ -55,7 +55,7 @@ void main() {
 
       final actCounter = ActCounter.from(savedMem, acts);
 
-      expect(actCounter.updatedAt, equals(acts[0].value.period.end));
+      expect(actCounter.updatedAt, equals(acts[0].value.period?.end));
     });
   });
 
