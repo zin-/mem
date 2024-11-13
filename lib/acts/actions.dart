@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/mems/list/states.dart';
 import 'package:mem/acts/act.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/logger/log_service.dart';
@@ -71,13 +70,10 @@ final startActBy = Provider.autoDispose.family<Act, int>(
   ),
 );
 
-final finishActBy = Provider.autoDispose.family<int, int>(
+final finishActBy = Provider.autoDispose.family<void, int>(
   (ref, memId) => v(
     () {
       final now = DateAndTime.now();
-      final finishingAct = ref.read(activeActsProvider).singleWhere(
-            (act) => act.value.memId == memId,
-          );
 
       _actsClient
           .finish(
@@ -91,8 +87,6 @@ final finishActBy = Provider.autoDispose.family<int, int>(
                 ),
                 finishedAct,
               ));
-
-      return finishingAct.id;
     },
     memId,
   ),

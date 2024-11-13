@@ -46,23 +46,18 @@ class MemListItemView extends ConsumerWidget {
             },
           ),
           ref.watch(
-            activeActsProvider.select(
-              (v) => v
-                  .singleWhereOrNull(
-                    (e) => e.value.memId == _memId,
-                  )
-                  ?.value,
+            latestActsByMemProvider.select(
+              (v) => v.singleWhereOrNull(
+                (e) => e.memId == _memId,
+              ),
             ),
           ),
           (activeAct) => v(
             () async {
-              if (activeAct == null) {
+              if (activeAct == null || activeAct.isFinished) {
                 ref.read(startActBy(_memId));
               } else {
-                final finishedActId = ref.read(finishActBy(_memId));
-                ref.read(activeActsProvider.notifier).removeWhere(
-                      (act) => act.id == finishedActId,
-                    );
+                ref.read(finishActBy(_memId));
               }
             },
             {
@@ -81,40 +76,46 @@ ListTile _render(
   SavedMemEntity mem,
   void Function(int memId) onTap,
   void Function(bool? value, int memId) onMemDoneCheckboxTapped,
-  Act? activeAct,
+  Act? latestActByMem,
   void Function(Act? act) onActButtonTapped,
   Iterable<MemNotification> memNotifications,
 ) =>
     v(
       () {
+        final hasActiveAct = latestActByMem != null && latestActByMem.isActive;
         final hasEnableMemNotifications = memNotifications
             .where((e) => e is SavedMemNotificationEntity && e.isEnabled())
             .isNotEmpty;
 
         return ListTile(
-          title: activeAct == null
+          title: !hasActiveAct
               ? MemNameText(mem)
               : Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(child: MemNameText(mem)),
-                    ElapsedTimeView(activeAct.period!.start!),
+                    ElapsedTimeView(latestActByMem.period!.start!),
                   ],
                 ),
           onTap: () => onTap(mem.id),
-          // TODO activeActがあったらPauseボタンを表示する
-          // FIXME memNotificationsがあったら表示するべきじゃないのでは？
-          leading: !hasEnableMemNotifications && activeAct == null
+          leading: !hasEnableMemNotifications
               ? MemDoneCheckbox(
                   mem,
                   (value) => onMemDoneCheckboxTapped(value, mem.id),
                 )
-              : null,
+              : !hasActiveAct
+                  ? null
+                  : IconButton(
+                      onPressed: () {
+                        // TODO pause
+                      },
+                      icon: const Icon(Icons.pause),
+                    ),
           tileColor: mem.isArchived ? secondaryGreyColor : null,
           trailing: !mem.isDone && hasEnableMemNotifications
               ? IconButton(
-                  onPressed: () => onActButtonTapped(activeAct),
-                  icon: activeAct == null
+                  onPressed: () => onActButtonTapped(latestActByMem),
+                  icon: !hasActiveAct
                       ? const Icon(Icons.play_arrow)
                       : const Icon(Icons.stop),
                 )
@@ -127,7 +128,7 @@ ListTile _render(
       },
       {
         'mem': mem,
-        'activeAct': activeAct,
+        'activeAct': latestActByMem,
         'memNotifications': memNotifications,
       },
     );

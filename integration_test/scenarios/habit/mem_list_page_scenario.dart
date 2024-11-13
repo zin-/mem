@@ -50,6 +50,12 @@ void main() => group(
               defColCreatedAt.name: zeroDate,
             },
           );
+          await dbA.insert(defTableActs, {
+            defFkActsMemId.name: insertedMemId,
+            defColActsStart.name: zeroDate,
+            defColActsStartIsAllDay.name: false,
+            defColCreatedAt.name: zeroDate,
+          });
 
           final insertedPlainMemId = await dbA.insert(defTableMems, {
             defColMemsName.name: plainMemName,
@@ -67,11 +73,12 @@ void main() => group(
               defColCreatedAt.name: zeroDate,
             },
           );
-
-          dbA.insert(defTableActs, {
-            defFkActsMemId.name: insertedMemId,
+          await dbA.insert(defTableActs, {
+            defFkActsMemId.name: insertedPlainMemId,
             defColActsStart.name: zeroDate,
             defColActsStartIsAllDay.name: false,
+            defColActsEnd.name: zeroDate,
+            defColActsEndIsAllDay.name: false,
             defColCreatedAt.name: zeroDate,
           });
         });

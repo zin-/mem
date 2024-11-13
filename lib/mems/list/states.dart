@@ -8,7 +8,6 @@ import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/states.dart';
-import 'package:mem/acts/act_entity.dart';
 import 'package:mem/acts/act_repository.dart';
 import 'package:mem/mems/mem_entity.dart';
 import 'package:mem/mems/mem_notification_entity.dart';
@@ -216,15 +215,6 @@ final savedMemNotificationsProvider = StateNotifierProvider.autoDispose<
         },
         {'current': current},
       ),
-    ),
-  ),
-);
-
-final activeActsProvider = StateNotifierProvider.autoDispose<
-    ListValueStateNotifier<SavedActEntity>, List<SavedActEntity>>(
-  (ref) => v(
-    () => ListValueStateNotifier(
-      ref.watch(actsProvider).where((act) => act.value.isActive).toList(),
     ),
   ),
 );

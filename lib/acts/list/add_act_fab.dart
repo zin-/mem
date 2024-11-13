@@ -19,10 +19,9 @@ class ActFab extends ConsumerWidget {
       );
     } else {
       return _FinishActFab(
-        () => ref.read(actListProvider(_memId).notifier).removeWhere(
-              (e) =>
-                  e.id == ref.read(finishActBy(activeActList.last.value.memId)),
-            ),
+        () => ref.read(finishActBy(
+          activeActList.last.value.memId,
+        )),
       );
     }
   }
