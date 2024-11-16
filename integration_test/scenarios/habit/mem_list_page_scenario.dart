@@ -84,47 +84,157 @@ void main() => group(
         });
 
         group(
-          'act',
+          ': act',
           () {
-            testWidgets(
-              'start.',
-              // 時間に関するテストなのでリトライ可能とする
-              retry: maxRetryCount,
-              (widgetTester) async {
-                widgetTester.ignoreMockMethodCallHandler(
-                    MethodChannelMock.flutterLocalNotifications);
+            group(
+              ': show',
+              () {
+                testWidgets(
+                  ': plain.',
+                  (widgetTester) async {
+                    await runApplication();
+                    await widgetTester.pumpAndSettle();
 
-                await runApplication();
-                await widgetTester.pumpAndSettle();
+                    final memListItemFinder = find.byType(ListTile).at(1);
 
-                await widgetTester.tap(startIconFinder);
-                await widgetTester.pumpAndSettle();
+                    expect(
+                      widgetTester
+                          .widgetList<Text>(
+                            find.descendant(
+                              of: memListItemFinder,
+                              matching: find.byType(Text),
+                            ),
+                          )
+                          .first
+                          .data,
+                      plainMemName,
+                    );
+                    expect(
+                      find.descendant(
+                        of: memListItemFinder,
+                        matching: find.byIcon(Icons.play_arrow),
+                      ),
+                      findsOneWidget,
+                    );
 
-                expect(widgetTester.widget<Text>(find.byType(Text).at(1)).data,
-                    "00:00:00");
+                    expect(
+                      find.descendant(
+                        of: memListItemFinder,
+                        matching: find.byIcon(Icons.stop),
+                      ),
+                      findsNothing,
+                    );
+                    expect(
+                      find.descendant(
+                        of: memListItemFinder,
+                        matching: find.byIcon(Icons.pause),
+                      ),
+                      findsNothing,
+                    );
+                  },
+                );
 
-                expect(startIconFinder, findsNothing);
-                expect(stopIconFinder, findsNWidgets(2));
-                await widgetTester.pumpAndSettle(elapsePeriod * 2);
+                testWidgets(
+                  ': active.',
+                  (widgetTester) async {
+                    await runApplication();
+                    await widgetTester.pumpAndSettle();
 
-                expect(find.text("00:00:00"), findsNothing);
+                    final memListItemFinder = find.byType(ListTile).at(0);
+
+                    expect(
+                      widgetTester
+                          .widgetList<Text>(
+                            find.descendant(
+                              of: memListItemFinder,
+                              matching: find.byType(Text),
+                            ),
+                          )
+                          .first
+                          .data,
+                      memWithActiveName,
+                    );
+                    expect(
+                      find.descendant(
+                        of: memListItemFinder,
+                        matching: find.byIcon(Icons.stop),
+                      ),
+                      findsOneWidget,
+                    );
+                    expect(
+                      find.descendant(
+                        of: memListItemFinder,
+                        matching: find.byIcon(Icons.pause),
+                      ),
+                      findsOneWidget,
+                    );
+
+                    expect(
+                      find.descendant(
+                        of: memListItemFinder,
+                        matching: find.byIcon(Icons.play_arrow),
+                      ),
+                      findsNothing,
+                    );
+                  },
+                );
               },
             );
 
-            testWidgets(
-              'finish.',
-              (widgetTester) async {
-                widgetTester.ignoreMockMethodCallHandler(
-                    MethodChannelMock.flutterLocalNotifications);
+            group(
+              ': actions',
+              () {
+                testWidgets(
+                  'start.',
+                  // 時間に関するテストなのでリトライ可能とする
+                  retry: maxRetryCount,
+                  (widgetTester) async {
+                    widgetTester.ignoreMockMethodCallHandler(
+                      MethodChannelMock.permissionHandler,
+                    );
+                    widgetTester.ignoreMockMethodCallHandler(
+                      MethodChannelMock.flutterLocalNotifications,
+                    );
 
-                await runApplication();
-                await widgetTester.pumpAndSettle();
+                    await runApplication();
+                    await widgetTester.pumpAndSettle();
 
-                await widgetTester.tap(stopIconFinder);
-                await widgetTester.pump(waitSideEffectDuration);
+                    await widgetTester.tap(startIconFinder);
+                    await widgetTester.pumpAndSettle();
 
-                expect(startIconFinder, findsNWidgets(2));
-                expect(stopIconFinder, findsNothing);
+                    expect(
+                      widgetTester.widget<Text>(find.byType(Text).at(1)).data,
+                      "00:00:00",
+                    );
+
+                    expect(startIconFinder, findsNothing);
+                    expect(stopIconFinder, findsNWidgets(2));
+                    await widgetTester.pumpAndSettle(elapsePeriod * 2);
+
+                    expect(find.text("00:00:00"), findsNothing);
+                  },
+                );
+
+                testWidgets(
+                  'finish.',
+                  (widgetTester) async {
+                    widgetTester.ignoreMockMethodCallHandler(
+                      MethodChannelMock.permissionHandler,
+                    );
+                    widgetTester.ignoreMockMethodCallHandler(
+                      MethodChannelMock.flutterLocalNotifications,
+                    );
+
+                    await runApplication();
+                    await widgetTester.pumpAndSettle();
+
+                    await widgetTester.tap(stopIconFinder);
+                    await widgetTester.pump(waitSideEffectDuration);
+
+                    expect(startIconFinder, findsNWidgets(2));
+                    expect(stopIconFinder, findsNothing);
+                  },
+                );
               },
             );
           },
