@@ -3,11 +3,18 @@ import 'dart:core';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 
+enum ActState {
+  active,
+  paused,
+  finished,
+}
+
 abstract class Act {
   final int memId;
   final DateAndTimePeriod? period;
+  final ActState state;
 
-  Act(this.memId, this.period);
+  Act(this.memId, this.period, this.state);
 
   factory Act.by(
     int memId,
@@ -15,7 +22,7 @@ abstract class Act {
     DateAndTime? endWhen,
   }) {
     if (startWhen == null) {
-      throw UnimplementedError();
+      return PausedAct(memId);
     } else if (endWhen == null) {
       return ActiveAct(memId, startWhen);
     } else {
@@ -27,7 +34,9 @@ abstract class Act {
 
   bool get isFinished => period?.start != null && period?.end != null;
 
-  Act finish(DateAndTime when);
+  FinishedAct finish(DateAndTime when);
+
+  ActiveAct start(DateAndTime when);
 }
 
 class ActiveAct extends Act {
@@ -35,11 +44,16 @@ class ActiveAct extends Act {
       : super(
           memId,
           DateAndTimePeriod(start: startWhen),
+          ActState.active,
         );
 
   @override
   FinishedAct finish(DateAndTime when) =>
       FinishedAct(memId, period?.start ?? when, when);
+
+  @override
+  ActiveAct start(DateAndTime when) =>
+      throw StateError('This act has already been started.');
 }
 
 class FinishedAct extends Act {
@@ -50,9 +64,29 @@ class FinishedAct extends Act {
   ) : super(
           memId,
           DateAndTimePeriod(start: startWhen, end: endWhen),
+          ActState.finished,
         );
 
   @override
-  Act finish(DateAndTime when) =>
+  FinishedAct finish(DateAndTime when) =>
       throw StateError('This act has already been finished.');
+
+  @override
+  ActiveAct start(DateAndTime when) =>
+      throw StateError('This act has already been finished.');
+}
+
+class PausedAct extends Act {
+  PausedAct(int memId)
+      : super(
+          memId,
+          null,
+          ActState.paused,
+        );
+
+  @override
+  FinishedAct finish(DateAndTime when) => FinishedAct(memId, when, when);
+
+  @override
+  ActiveAct start(DateAndTime when) => ActiveAct(memId, when);
 }

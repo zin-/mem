@@ -52,18 +52,8 @@ class MemListItemView extends ConsumerWidget {
               ),
             ),
           ),
-          (activeAct) => v(
-            () async {
-              if (activeAct == null || activeAct.isFinished) {
-                ref.read(startActBy(_memId));
-              } else {
-                ref.read(finishActBy(_memId));
-              }
-            },
-            {
-              'activeAct': activeAct,
-            },
-          ),
+          () => ref.read(startActBy(_memId)),
+          () => ref.read(finishActBy(_memId)),
           ref.watch(memNotificationsByMemIdProvider(_memId)),
         ),
         {
@@ -77,15 +67,34 @@ ListTile _render(
   void Function(int memId) onTap,
   void Function(bool? value, int memId) onMemDoneCheckboxTapped,
   Act? latestActByMem,
-  void Function(Act? act) onActButtonTapped,
+  void Function() startAct,
+  void Function() finishAct,
   Iterable<MemNotification> memNotifications,
 ) =>
     v(
       () {
-        final hasActiveAct = latestActByMem != null && latestActByMem.isActive;
+        final hasActiveAct =
+            latestActByMem != null && latestActByMem is ActiveAct;
+        final hasPausedAct =
+            latestActByMem != null && latestActByMem is PausedAct;
         final hasEnableMemNotifications = memNotifications
             .where((e) => e is SavedMemNotificationEntity && e.isEnabled())
             .isNotEmpty;
+
+        final startIconButton = IconButton(
+          onPressed: () => startAct(),
+          icon: const Icon(Icons.play_arrow),
+        );
+        final stopIconButton = IconButton(
+          onPressed: () => finishAct(),
+          icon: const Icon(Icons.stop),
+        );
+        final pauseIconButton = IconButton(
+          onPressed: () {
+            // TODO pause
+          },
+          icon: const Icon(Icons.pause),
+        );
 
         return ListTile(
           title: !hasActiveAct
@@ -98,27 +107,21 @@ ListTile _render(
                   ],
                 ),
           onTap: () => onTap(mem.id),
-          leading: !hasEnableMemNotifications
-              ? MemDoneCheckbox(
+          leading: hasEnableMemNotifications
+              ? hasActiveAct
+                  ? pauseIconButton
+                  : hasPausedAct
+                      ? stopIconButton
+                      : null
+              : MemDoneCheckbox(
                   mem,
                   (value) => onMemDoneCheckboxTapped(value, mem.id),
-                )
-              : !hasActiveAct
-                  ? null
-                  : IconButton(
-                      onPressed: () {
-                        // TODO pause
-                      },
-                      icon: const Icon(Icons.pause),
-                    ),
+                ),
           tileColor: mem.isArchived ? secondaryGreyColor : null,
           trailing: !mem.isDone && hasEnableMemNotifications
-              ? IconButton(
-                  onPressed: () => onActButtonTapped(latestActByMem),
-                  icon: !hasActiveAct
-                      ? const Icon(Icons.play_arrow)
-                      : const Icon(Icons.stop),
-                )
+              ? hasActiveAct
+                  ? stopIconButton
+                  : startIconButton
               : null,
           subtitle: mem.period == null && !hasEnableMemNotifications
               ? null

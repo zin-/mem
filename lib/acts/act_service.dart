@@ -42,9 +42,27 @@ class ActService {
     DateAndTime when,
   ) =>
       i(
-        () async => await _actRepository.receive(
-          ActEntity(Act.by(memId, when)),
-        ),
+        () async {
+          final latestActEntity = await _actRepository
+              .ship(
+                memId: memId,
+                actOrderBy: ActOrderBy.descStart,
+                limit: 1,
+              )
+              .then((v) => v.singleOrNull);
+
+          if (latestActEntity == null || latestActEntity.value is FinishedAct) {
+            return await _actRepository.receive(
+              ActEntity(Act.by(memId, when)),
+            );
+          } else {
+            return await _actRepository.replace(
+              latestActEntity.updatedBy(
+                latestActEntity.value.start(when),
+              ),
+            );
+          }
+        },
         {
           'memId': memId,
           'when': when,
@@ -60,13 +78,10 @@ class ActService {
           final latestActiveActEntity = await _actRepository
               .ship(
                 memId: memId,
-                isActive: true,
+                actOrderBy: ActOrderBy.descStart,
+                limit: 1,
               )
-              .then(
-                (v) => v
-                    .sorted((a, b) => a.createdAt.compareTo(b.createdAt))
-                    .firstOrNull,
-              );
+              .then((v) => v.singleOrNull);
 
           if (latestActiveActEntity == null) {
             return await _actRepository.receive(
