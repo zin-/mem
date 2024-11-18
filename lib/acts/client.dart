@@ -81,15 +81,17 @@ class ActsClient {
         },
       );
 
-  Future<void> pause(
+  Future<Iterable<SavedActEntity>> pause(
     int memId,
     DateAndTime when,
   ) =>
       i(
         () async {
-          final finished = await _actService.finish(memId, when);
+          final updatedList = await _actService.pause(memId, when);
 
-          await _notificationClient.pauseActNotification(finished.value.memId);
+          await _notificationClient.pauseActNotification(memId);
+
+          return updatedList;
         },
         {
           "memId": memId,

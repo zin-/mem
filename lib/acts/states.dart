@@ -1,10 +1,14 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/client.dart';
+import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/acts/act_entity.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'states.g.dart';
 
 final _actsClient = ActsClient();
 
@@ -12,6 +16,34 @@ final actsProvider = StateNotifierProvider<
     ListValueStateNotifier<SavedActEntity>, List<SavedActEntity>>(
   (ref) => v(() => ListValueStateNotifier([])),
 );
+
+@riverpod
+class ActsV2 extends _$ActsV2 {
+  final _actsClient = ActsClient();
+
+  @override
+  Future<Iterable<SavedActEntity>> build() async {
+    // ignore: avoid_manual_providers_as_generated_provider_dependency
+    return ref.watch(actsProvider);
+  }
+
+  Future<void> pause(int memId) => v(
+        () async {
+          final now = DateAndTime.now();
+
+          final updatedEntities = await _actsClient.pause(memId, now);
+
+          // ignore: avoid_manual_providers_as_generated_provider_dependency
+          ref.read(actsProvider.notifier).upsertAll(
+                updatedEntities,
+                (c, u) => c.id == u.id,
+              );
+        },
+        {
+          'memId': memId,
+        },
+      );
+}
 
 final isLoading = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<bool>, bool, int?>(

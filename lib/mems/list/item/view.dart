@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/act.dart';
 import 'package:mem/acts/actions.dart';
+import 'package:mem/acts/states.dart';
 import 'package:mem/mems/list/states.dart';
 import 'package:mem/mems/mem_done_checkbox.dart';
 import 'package:mem/mems/mem_name.dart';
@@ -54,6 +55,7 @@ class MemListItemView extends ConsumerWidget {
           ),
           () => ref.read(startActBy(_memId)),
           () => ref.read(finishActBy(_memId)),
+          () => ref.read(actsV2Provider.notifier).pause(_memId),
           ref.watch(memNotificationsByMemIdProvider(_memId)),
         ),
         {
@@ -69,6 +71,7 @@ ListTile _render(
   Act? latestActByMem,
   void Function() startAct,
   void Function() finishAct,
+  void Function() pauseAct,
   Iterable<MemNotification> memNotifications,
 ) =>
     v(
@@ -90,9 +93,7 @@ ListTile _render(
           icon: const Icon(Icons.stop),
         );
         final pauseIconButton = IconButton(
-          onPressed: () {
-            // TODO pause
-          },
+          onPressed: pauseAct,
           icon: const Icon(Icons.pause),
         );
 

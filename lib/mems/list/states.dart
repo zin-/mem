@@ -143,24 +143,14 @@ final latestActsByMemProvider =
       ref.watch(
         actsProvider.select(
           (value) => value
-              .sorted((a, b) {
-                if (b.value.period == null) {
-                  if (a.value.period == null) {
-                    return 0;
-                  } else {
-                    return 1;
-                  }
-                } else {
-                  if (a.value.period == null) {
-                    return -1;
-                  } else {
-                    return b.value.period!.compareTo(a.value.period!);
-                  }
-                }
-              })
               .groupListsBy((e) => e.value.memId)
               .values
-              .map((e) => e[0].value)
+              .map((e) => e
+                  .sorted(
+                    (a, b) => (b.value.period?.start ?? b.createdAt)
+                        .compareTo(a.value.period?.start ?? a.createdAt),
+                  )[0]
+                  .value)
               .toList(),
         ),
       ),

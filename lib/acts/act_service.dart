@@ -83,7 +83,8 @@ class ActService {
               )
               .then((v) => v.singleOrNull);
 
-          if (latestActiveActEntity == null) {
+          if (latestActiveActEntity == null ||
+              latestActiveActEntity.value is FinishedAct) {
             return await _actRepository.receive(
               ActEntity(Act.by(memId, when, endWhen: when)),
             );
@@ -94,6 +95,38 @@ class ActService {
               ),
             );
           }
+        },
+        {
+          'memId': memId,
+          'when': when,
+        },
+      );
+
+  Future<Iterable<SavedActEntity>> pause(
+    int memId,
+    DateAndTime when,
+  ) =>
+      i(
+        () async {
+          final latestActiveActEntity = await _actRepository
+              .ship(
+                memId: memId,
+                actOrderBy: ActOrderBy.descStart,
+                limit: 1,
+              )
+              .then((v) => v.singleOrNull);
+
+          return [
+            if (latestActiveActEntity != null)
+              await _actRepository.replace(
+                latestActiveActEntity.updatedBy(
+                  latestActiveActEntity.value.finish(when),
+                ),
+              ),
+            await _actRepository.receive(
+              ActEntity(Act.by(memId, null)),
+            ),
+          ];
         },
         {
           'memId': memId,

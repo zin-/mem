@@ -87,7 +87,7 @@ class MemNotifications {
                   millisecond: 0,
                   microsecond: 0);
             } else {
-              notifyAt = latestAct.period!.end!
+              notifyAt = (latestAct.period?.end ?? now)
                   .copyWith(
                       hour: timeOfDay.hour,
                       minute: timeOfDay.minute,

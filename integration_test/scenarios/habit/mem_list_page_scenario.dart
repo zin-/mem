@@ -217,12 +217,10 @@ void main() => group(
                     await runApplication();
                     await widgetTester.pumpAndSettle();
 
-                    await widgetTester.tap(
-                      find.descendant(
-                        of: find.byType(ListTile).at(targetAt),
-                        matching: find.byIcon(Icons.play_arrow),
-                      ),
-                    );
+                    await widgetTester.tap(find.descendant(
+                      of: find.byType(ListTile).at(targetAt),
+                      matching: find.byIcon(Icons.play_arrow),
+                    ));
                     await widgetTester.pumpAndSettle();
 
                     widgetTester.expectMemListItem(
@@ -280,12 +278,10 @@ void main() => group(
                     await runApplication();
                     await widgetTester.pumpAndSettle();
 
-                    await widgetTester.tap(
-                      find.descendant(
-                        of: find.byType(ListTile).at(targetAt),
-                        matching: find.byIcon(Icons.stop),
-                      ),
-                    );
+                    await widgetTester.tap(find.descendant(
+                      of: find.byType(ListTile).at(targetAt),
+                      matching: find.byIcon(Icons.stop),
+                    ));
                     await widgetTester.pumpAndSettle();
 
                     widgetTester.expectMemListItem(
@@ -306,7 +302,6 @@ void main() => group(
 
                 testWidgets(
                   ': pause.',
-                  skip: true,
                   (widgetTester) async {
                     widgetTester.ignoreMockMethodCallHandler(
                       MethodChannelMock.permissionHandler,
@@ -318,19 +313,17 @@ void main() => group(
                     await runApplication();
                     await widgetTester.pumpAndSettle();
 
-                    await widgetTester.tap(
-                      find.descendant(
-                        of: find.byType(ListTile).at(targetAt),
-                        matching: find.byIcon(Icons.pause),
-                      ),
-                    );
+                    await widgetTester.tap(find.descendant(
+                      of: find.byType(ListTile).at(targetAt),
+                      matching: find.byIcon(Icons.pause),
+                    ));
                     await widgetTester.pumpAndSettle();
 
                     widgetTester.expectMemListItem(
                       0,
                       [memWithActiveActName, null],
-                      [Icons.play_arrow],
-                      [Icons.stop, Icons.pause],
+                      [Icons.stop, Icons.play_arrow],
+                      [Icons.pause],
                     );
 
                     final acts = await dbA.select(
@@ -338,7 +331,7 @@ void main() => group(
                       where: '${defFkActsMemId.name} = ?',
                       whereArgs: [memWithActiveActId],
                     );
-                    expect(acts, hasLength(1));
+                    expect(acts, hasLength(2));
                   },
                 );
               },
@@ -379,12 +372,10 @@ void main() => group(
                     await runApplication();
                     await widgetTester.pumpAndSettle();
 
-                    await widgetTester.tap(
-                      find.descendant(
-                        of: find.byType(ListTile).at(targetAt),
-                        matching: find.byIcon(Icons.play_arrow),
-                      ),
-                    );
+                    await widgetTester.tap(find.descendant(
+                      of: find.byType(ListTile).at(targetAt),
+                      matching: find.byIcon(Icons.play_arrow),
+                    ));
                     await widgetTester.pumpAndSettle();
 
                     widgetTester.expectMemListItem(
@@ -397,44 +388,6 @@ void main() => group(
                     await widgetTester.pumpAndSettle(elapsePeriod * 2);
 
                     expect(find.text("00:00:00"), findsNothing);
-
-                    final acts = await dbA.select(
-                      defTableActs,
-                      where: '${defFkActsMemId.name} = ?',
-                      whereArgs: [memWithFinishedActId],
-                    );
-                    expect(acts, hasLength(2));
-                  },
-                );
-
-                testWidgets(
-                  ': pause.',
-                  skip: true,
-                  (widgetTester) async {
-                    widgetTester.ignoreMockMethodCallHandler(
-                      MethodChannelMock.permissionHandler,
-                    );
-                    widgetTester.ignoreMockMethodCallHandler(
-                      MethodChannelMock.flutterLocalNotifications,
-                    );
-
-                    await runApplication();
-                    await widgetTester.pumpAndSettle();
-
-                    await widgetTester.tap(
-                      find.descendant(
-                        of: find.byType(ListTile).at(targetAt),
-                        matching: find.byIcon(Icons.pause),
-                      ),
-                    );
-                    await widgetTester.pumpAndSettle();
-
-                    widgetTester.expectMemListItem(
-                      0,
-                      [memWithActiveActName, null],
-                      [Icons.play_arrow],
-                      [Icons.stop, Icons.pause],
-                    );
 
                     final acts = await dbA.select(
                       defTableActs,
@@ -482,12 +435,10 @@ void main() => group(
                     await runApplication();
                     await widgetTester.pumpAndSettle();
 
-                    await widgetTester.tap(
-                      find.descendant(
-                        of: find.byType(ListTile).at(targetAt),
-                        matching: find.byIcon(Icons.play_arrow),
-                      ),
-                    );
+                    await widgetTester.tap(find.descendant(
+                      of: find.byType(ListTile).at(targetAt),
+                      matching: find.byIcon(Icons.play_arrow),
+                    ));
                     await widgetTester.pumpAndSettle();
 
                     widgetTester.expectMemListItem(

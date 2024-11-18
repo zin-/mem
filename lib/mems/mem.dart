@@ -38,6 +38,9 @@ class Mem {
               latestActOfThis is! FinishedAct &&
               latestActOfOther != null &&
               latestActOfOther is! FinishedAct) {
+            if (latestActOfOther is PausedAct && latestActOfThis is PausedAct) {
+              return 0;
+            }
             return latestActOfOther.period!.start!
                 .compareTo(latestActOfThis.period!.start!);
           }
