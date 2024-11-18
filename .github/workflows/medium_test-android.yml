@@ -34,7 +34,7 @@ jobs:
           # - os: macos-latest
           # FIXME macos-14とreactivecircusでエラーになるため、バージョンを指定している
           # https://github.com/ReactiveCircus/android-emulator-runner/issues/350
-          - os: macos-12
+          - os: macos-13
             java-version: 17
             experimental: false
             android-api-level: 33
