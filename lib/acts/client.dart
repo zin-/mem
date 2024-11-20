@@ -68,10 +68,10 @@ class ActsClient {
         () async {
           final replaced = await _actService.edit(savedAct);
 
-          if (replaced.value.isActive) {
-            _notificationClient.startActNotifications(replaced.value.memId);
+          if (replaced.isActive) {
+            _notificationClient.startActNotifications(replaced.memId);
           } else {
-            _notificationClient.cancelActNotification(replaced.value.memId);
+            _notificationClient.cancelActNotification(replaced.memId);
           }
 
           return replaced;
@@ -81,17 +81,15 @@ class ActsClient {
         },
       );
 
-  Future<Iterable<SavedActEntity>> pause(
+  Future<void> pause(
     int memId,
     DateAndTime when,
   ) =>
       i(
         () async {
-          final updatedList = await _actService.pause(memId, when);
+          final finished = await _actService.finish(memId, when);
 
-          await _notificationClient.pauseActNotification(memId);
-
-          return updatedList;
+          await _notificationClient.pauseActNotification(finished.memId);
         },
         {
           "memId": memId,
@@ -107,7 +105,7 @@ class ActsClient {
         () async {
           final finished = await _actService.finish(memId, when);
 
-          _notificationClient.cancelActNotification(finished.value.memId);
+          _notificationClient.cancelActNotification(finished.memId);
 
           // ISSUE #226
 
@@ -123,7 +121,7 @@ class ActsClient {
         () async {
           final deleted = await _actService.delete(actId);
 
-          _notificationClient.cancelActNotification(deleted.value.memId);
+          _notificationClient.cancelActNotification(deleted.memId);
 
           return deleted;
         },

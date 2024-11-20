@@ -24,7 +24,7 @@ import '../helpers.dart';
 const _scenarioName = 'Repeat by day of week scenario';
 
 void main() => group(
-      ': $_scenarioName',
+      _scenarioName,
       () {
         const baseMemName = "$_scenarioName - mem - name";
         const insertedMemName = "$baseMemName - inserted";
@@ -88,21 +88,18 @@ void main() => group(
         });
 
         group(
-          ': show',
+          'show',
           () {
             testWidgets(
-              ': initial.',
+              'initial.',
               (widgetTester) async {
                 await runApplication();
                 await widgetTester.pump();
                 await widgetTester.tap(newMemFabFinder);
                 await widgetTester.pumpAndSettle();
-                final notificationAddFinder = find.descendant(
+                await widgetTester.tap(find.descendant(
                     of: find.byKey(keyMemNotificationsView),
-                    matching: find.byIcon(Icons.notification_add));
-                await widgetTester.dragUntilVisible(notificationAddFinder,
-                    find.byType(SingleChildScrollView), const Offset(0, 50));
-                await widgetTester.tap(notificationAddFinder);
+                    matching: find.byIcon(Icons.notification_add)));
                 await widgetTester.pumpAndSettle();
 
                 for (var dayOfWeek in [
@@ -171,21 +168,18 @@ void main() => group(
         );
 
         group(
-          ': change',
+          'change',
           () {
             testWidgets(
-              ': select Mon, Fri.',
+              'select Mon, Fri.',
               (widgetTester) async {
                 await runApplication();
-                await widgetTester.pumpAndSettle();
+                await widgetTester.pump();
                 await widgetTester.tap(newMemFabFinder);
                 await widgetTester.pumpAndSettle();
-                final notificationAddFinder = find.descendant(
+                await widgetTester.tap(find.descendant(
                     of: find.byKey(keyMemNotificationsView),
-                    matching: find.byIcon(Icons.notification_add));
-                await widgetTester.dragUntilVisible(notificationAddFinder,
-                    find.byType(SingleChildScrollView), const Offset(0, 50));
-                await widgetTester.tap(notificationAddFinder);
+                    matching: find.byIcon(Icons.notification_add)));
                 await widgetTester.pumpAndSettle();
 
                 await widgetTester.tap(find.text('Mon'));
