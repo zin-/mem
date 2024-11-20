@@ -1,5 +1,6 @@
 import 'package:mem/acts/act.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
+import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/mems/mem_notification.dart';
 import 'package:test/test.dart';
 
@@ -28,23 +29,23 @@ void main() => group(_name, () {
 
           final acts = {
             'no act': null,
-            'day before yesterday act': Act.by(
-              0,
-              DateAndTime.from(startOfToday).subtract(const Duration(days: 2)),
-              endWhen: DateAndTime.from(startOfToday),
-            ),
-            'yesterday act': Act.by(
-              0,
-              DateAndTime.from(startOfToday).subtract(
-                const Duration(days: 1),
-              ),
-              endWhen: DateAndTime.from(startOfToday),
-            ),
-            'today act': Act.by(
-              0,
-              DateAndTime.from(startOfToday),
-              endWhen: DateAndTime.from(startOfToday),
-            ),
+            'day before yesterday act': Act(
+                0,
+                DateAndTimePeriod(
+                    start: DateAndTime.from(startOfToday)
+                        .subtract(const Duration(days: 2)),
+                    end: DateAndTime.from(startOfToday))),
+            'yesterday act': Act(
+                0,
+                DateAndTimePeriod(
+                    start: DateAndTime.from(startOfToday)
+                        .subtract(const Duration(days: 1)),
+                    end: DateAndTime.from(startOfToday))),
+            'today act': Act(
+                0,
+                DateAndTimePeriod(
+                    start: DateAndTime.from(startOfToday),
+                    end: DateAndTime.from(startOfToday))),
           };
 
           final nextSaturday = DateTime(

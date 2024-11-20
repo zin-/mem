@@ -18,7 +18,7 @@ class ActListItemView extends StatelessWidget {
         () {
           return ListTile(
             title: DateAndTimePeriodTexts(
-              _act.value.period!,
+              _act.period,
               showDate: false,
             ),
             subtitle: _memName == null ? null : Text(_memName),

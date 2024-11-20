@@ -25,12 +25,11 @@ extension _ActOrderByExt on ActOrderBy {
   }
 }
 
-class ActRepository
-    extends DatabaseTupleRepositoryV2<ActEntity, SavedActEntity> {
+class ActRepository extends DatabaseTupleRepository<ActEntity, SavedActEntity> {
   ActRepository() : super(databaseDefinition, defTableActs);
 
   @override
-  SavedActEntity pack(Map<String, dynamic> map) => SavedActEntity(map);
+  SavedActEntity pack(Map<String, dynamic> map) => SavedActEntity.fromMap(map);
 
   @override
   Future<int> count({
@@ -58,6 +57,7 @@ class ActRepository
     Iterable<int>? memIdsIn,
     DateAndTimePeriod? period,
     bool? latestByMemIds,
+    bool? isActive,
     Condition? condition,
     GroupBy? groupBy,
     ActOrderBy? actOrderBy,
@@ -74,6 +74,7 @@ class ActRepository
               if (period != null)
                 GraterThanOrEqual(defColActsStart, period.start),
               if (period != null) LessThan(defColActsStart, period.end),
+              if (isActive != null) IsNull(defColActsEnd.name),
               if (condition != null) condition,
             ],
           ),
@@ -95,6 +96,7 @@ class ActRepository
           'memIds': memIdsIn,
           'period': period,
           'latestByMemIds': latestByMemIds,
+          'isActive': isActive,
           'condition': condition,
           'groupBy': groupBy,
           'actOrderBy': actOrderBy,

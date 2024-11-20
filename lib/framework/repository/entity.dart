@@ -26,33 +26,6 @@ mixin Entity {
 mixin Copyable<T> on Entity {
   T copiedWith();
 }
-
-mixin EntityV2<VALUE> {
-  late VALUE value;
-
-  Map<String, Object?> get toMap;
-
-  EntityV2<VALUE> updatedBy(VALUE value);
-
-  @override
-  String toString() => "${super.toString()}: $toMap";
-
-// @override
-// int get hashCode => toMap.entries.fold(
-//       1,
-//       (p, e) => p ^ e.key.hashCode ^ e.value.hashCode,
-//     );
-//
-// @override
-// bool operator ==(Object other) =>
-//     identical(this, other) ||
-//     (runtimeType == other.runtimeType && hashCode == other.hashCode);
-}
-
-mixin CopyableV2<VALUE> on EntityV2<VALUE> {
-  EntityV2<VALUE> copiedWith();
-}
-
 // memo
 // - view, domain, dataのそれぞれの領域で似た内容でも型が変わることになるはず
 // これをしっかりと定義したい

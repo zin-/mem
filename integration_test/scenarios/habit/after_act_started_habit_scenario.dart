@@ -19,7 +19,7 @@ import '../helpers.dart';
 const _name = 'After act started habit scenario';
 
 void main() => group(
-      ': $_name',
+      _name,
       () {
         late final DatabaseAccessor dbA;
         setUpAll(() async {
@@ -105,7 +105,7 @@ void main() => group(
         );
 
         testWidgets(
-          ': save.',
+          'save.',
           (widgetTester) async {
             widgetTester.ignoreMockMethodCallHandler(
                 MethodChannelMock.flutterLocalNotifications);
