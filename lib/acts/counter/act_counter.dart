@@ -35,18 +35,16 @@ class ActCounter implements HomeWidget {
                       .compareTo(b.updatedAt ?? b.createdAt),
                 )
                 .lastOrNull
-                ?.value
-                .period
-                ?.end ??
+                ?.period
+                .end ??
             savedActs
                 .sorted(
                   (a, b) => (a.updatedAt ?? a.createdAt)
                       .compareTo(b.updatedAt ?? b.createdAt),
                 )
                 .lastOrNull
-                ?.value
-                .period
-                ?.start;
+                ?.period
+                .start;
 
   static DateAndTimePeriod period(DateAndTime startDate) {
     int startHour = 5;

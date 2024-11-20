@@ -14,26 +14,14 @@ import '../helpers.dart';
 
 const _name = "ActListPage scenario";
 
-extension _ShowActListPageV2 on WidgetTester {
-  Future<void> showActListPageOf(String memName) async {
-    await tap(find.text(memName));
-    await pumpAndSettle();
-
-    await tap(startIconFinder);
-    await pumpAndSettle();
-  }
-}
-
 void main() => group(_name, () {
       const oneMin = Duration(minutes: 1);
       const insertedMemName = '$_name: inserted mem - name';
-      const insertedMemWithActiveActName = '$insertedMemName - with active act';
 
       final oneMinDate = zeroDate.add(oneMin);
 
       late final DatabaseAccessor dbA;
       late final int insertedMemId;
-      late final int insertedMemWithActiveActId;
 
       setUpAll(() async {
         dbA = await openTestDatabase(databaseDefinition);
@@ -41,10 +29,6 @@ void main() => group(_name, () {
 
         insertedMemId = await dbA.insert(defTableMems, {
           defColMemsName.name: insertedMemName,
-          defColCreatedAt.name: zeroDate
-        });
-        insertedMemWithActiveActId = await dbA.insert(defTableMems, {
-          defColMemsName.name: insertedMemWithActiveActName,
           defColCreatedAt.name: zeroDate
         });
       });
@@ -57,15 +41,6 @@ void main() => group(_name, () {
           defColActsStartIsAllDay.name: 0,
           defColActsEnd.name: oneMinDate,
           defColActsEndIsAllDay.name: 0,
-          defColCreatedAt.name: zeroDate
-        });
-
-        await dbA.insert(defTableActs, {
-          defFkActsMemId.name: insertedMemWithActiveActId,
-          defColActsStart.name: zeroDate,
-          defColActsStartIsAllDay.name: 0,
-          defColActsEnd.name: null,
-          defColActsEndIsAllDay.name: null,
           defColCreatedAt.name: zeroDate
         });
       });
@@ -107,20 +82,11 @@ void main() => group(_name, () {
               expect(stopIconFinder, findsNothing);
               expect(widgetTester.textAt(0).data, equals("All"));
               expect(widgetTester.textAt(1).data, equals(dateText(zeroDate)));
-              expect(widgetTester.textAt(2).data, equals("2"));
+              expect(widgetTester.textAt(2).data, equals("1"));
               expect(widgetTester.textAt(3).data, equals(oneMin.format()));
-              expect(
-                widgetTester.textAt(4).data,
-                equals(Duration.zero.format()),
-              );
+              expect(widgetTester.textAt(4).data, equals(oneMin.format()));
               expect(widgetTester.textAt(5).data, equals("1"));
-              expect(
-                widgetTester.textAt(6).data,
-                equals(insertedMemWithActiveActName),
-              );
-              expect(widgetTester.textAt(7).data, equals(oneMin.format()));
-              expect(widgetTester.textAt(8).data, equals("1"));
-              expect(widgetTester.textAt(9).data, equals(insertedMemName));
+              expect(widgetTester.textAt(6).data, equals(insertedMemName));
             });
 
             testWidgets(': count.', (widgetTester) async {
@@ -137,18 +103,12 @@ void main() => group(_name, () {
               expect(find.byIcon(Icons.access_time), findsOneWidget);
               expect(widgetTester.textAt(0).data, equals("All"));
               expect(widgetTester.textAt(1).data, equals(dateText(zeroDate)));
-              expect(widgetTester.textAt(2).data, equals("2"));
+              expect(widgetTester.textAt(2).data, equals("1"));
               expect(widgetTester.textAt(3).data, equals(oneMin.format()));
               expect(widgetTester.textAt(4).data, equals(timeText(zeroDate)));
               expect(widgetTester.textAt(5).data, equals("~"));
-              expect(
-                widgetTester.textAt(6).data,
-                equals(insertedMemWithActiveActName),
-              );
-              expect(widgetTester.textAt(7).data, equals(timeText(zeroDate)));
-              expect(widgetTester.textAt(8).data, equals("~"));
-              expect(widgetTester.textAt(9).data, equals(timeText(oneMinDate)));
-              expect(widgetTester.textAt(10).data, equals(insertedMemName));
+              expect(widgetTester.textAt(6).data, equals(timeText(oneMinDate)));
+              expect(widgetTester.textAt(7).data, equals(insertedMemName));
             });
 
             testWidgets(': month view.', (widgetTester) async {
@@ -162,20 +122,11 @@ void main() => group(_name, () {
 
               expect(widgetTester.textAt(0).data, equals("All"));
               expect(widgetTester.textAt(1).data, equals("January 0"));
-              expect(widgetTester.textAt(2).data, equals("2"));
+              expect(widgetTester.textAt(2).data, equals("1"));
               expect(widgetTester.textAt(3).data, equals(oneMin.format()));
-              expect(
-                widgetTester.textAt(4).data,
-                equals(Duration.zero.format()),
-              );
+              expect(widgetTester.textAt(4).data, equals(oneMin.format()));
               expect(widgetTester.textAt(5).data, equals("1"));
-              expect(
-                widgetTester.textAt(6).data,
-                equals(insertedMemWithActiveActName),
-              );
-              expect(widgetTester.textAt(7).data, equals(oneMin.format()));
-              expect(widgetTester.textAt(8).data, equals("1"));
-              expect(widgetTester.textAt(9).data, equals(insertedMemName));
+              expect(widgetTester.textAt(6).data, equals(insertedMemName));
             });
           },
         );
@@ -235,9 +186,13 @@ void main() => group(_name, () {
       });
 
       group(": by Mem", () {
-        Future<void> showActListPage(WidgetTester widgetTester) async {
+        Future<void> showMemListPage(WidgetTester widgetTester) async {
           await runApplication();
           await widgetTester.pumpAndSettle();
+        }
+
+        Future<void> showActListPage(WidgetTester widgetTester) async {
+          await showMemListPage(widgetTester);
 
           await widgetTester.tap(find.text(insertedMemName));
           await widgetTester.pumpAndSettle();
@@ -249,84 +204,77 @@ void main() => group(_name, () {
           await widgetTester.pumpAndSettle();
         }
 
-        group(
-          ': actions',
-          () {
-            testWidgets(
-              ': start.',
-              (widgetTester) async {
-                widgetTester.ignoreMockMethodCallHandler(
-                    MethodChannelMock.permissionHandler);
+        testWidgets(': start & finish act.',
+            // 時間に関するテストなのでリトライ可能とする
+            retry: maxRetryCount, (widgetTester) async {
+          widgetTester
+              .ignoreMockMethodCallHandler(MethodChannelMock.permissionHandler);
+          widgetTester.ignoreMockMethodCallHandler(
+              MethodChannelMock.flutterLocalNotifications);
 
-                await runApplication();
-                await widgetTester.pumpAndSettle();
+          await showActListPage(widgetTester);
 
-                await widgetTester.showActListPageOf(insertedMemName);
+          expect(stopIconFinder, findsNothing);
+          final startTime = DateTime.now();
+          await widgetTester.tap(startIconFinder);
+          await Future.delayed(defaultTransitionDuration);
+          await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
-                await widgetTester.tap(find.byIcon(Icons.numbers));
-                await widgetTester.pump();
+          expect(startIconFinder, findsNothing);
+          expect(widgetTester.textAt(0).data, equals(insertedMemName));
+          expect(widgetTester.textAt(1).data, equals(dateText(startTime)));
+          expect(widgetTester.textAt(2).data, equals("1"));
+          expect(widgetTester.textAt(3).data, equals(Duration.zero.format()));
+          expect(widgetTester.textAt(4).data, equals(timeText(startTime)));
+          expect(widgetTester.textAt(5).data, equals("~"));
+          expect(widgetTester.textAt(6).data, equals(dateText(zeroDate)));
+          expect(widgetTester.textAt(7).data, equals("1"));
+          expect(widgetTester.textAt(8).data, equals(oneMin.format()));
+          expect(widgetTester.textAt(9).data, equals(timeText(zeroDate)));
+          expect(widgetTester.textAt(10).data, equals("~"));
+          expect(widgetTester.textAt(11).data, equals(timeText(oneMinDate)));
 
-                final startTime = DateTime.now();
-                await widgetTester.tap(startIconFinder);
-                await widgetTester.pumpAndSettle();
+          final stopTime = DateTime.now();
+          await widgetTester.tap(stopIconFinder);
+          await Future.delayed(defaultTransitionDuration);
+          await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
-                expect(startIconFinder, findsNothing);
-                expect(stopIconFinder, findsOneWidget);
-                expect(
-                  widgetTester.textAt(4).data,
-                  equals(timeText(startTime)),
-                );
+          expect(widgetTester.textAt(0).data, equals(insertedMemName));
+          expect(widgetTester.textAt(1).data, equals(dateText(startTime)));
+          expect(widgetTester.textAt(2).data, equals("1"));
+          expect(widgetTester.textAt(3).data, isNotNull);
+          expect(widgetTester.textAt(4).data, equals(timeText(startTime)));
+          expect(widgetTester.textAt(5).data, equals("~"));
+          expect(widgetTester.textAt(6).data, equals(timeText(stopTime)));
+          expect(widgetTester.textAt(7).data, equals(dateText(zeroDate)));
+          expect(widgetTester.textAt(8).data, equals("1"));
+          expect(widgetTester.textAt(9).data, equals(oneMin.format()));
+          expect(widgetTester.textAt(10).data, equals(timeText(zeroDate)));
+          expect(widgetTester.textAt(11).data, equals("~"));
+          expect(widgetTester.textAt(12).data, equals(timeText(oneMinDate)));
+          expect(stopIconFinder, findsNothing);
 
-                final acts = await dbA.select(
-                  defTableActs,
-                  where: 'mems_id = ?',
-                  whereArgs: [insertedMemId],
-                );
-                expect(acts, hasLength(2));
-                expect(acts[1][defColActsEnd.name], isNull);
-                expect(acts[1][defColActsEndIsAllDay.name], isNull);
-              },
-            );
+          final startTime2 = DateTime.now();
+          await widgetTester.tap(startIconFinder);
+          await Future.delayed(defaultTransitionDuration);
+          await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
-            testWidgets(
-              ': finish.',
-              (widgetTester) async {
-                widgetTester.ignoreMockMethodCallHandler(
-                    MethodChannelMock.permissionHandler);
-
-                await runApplication();
-                await widgetTester.pumpAndSettle();
-
-                await widgetTester.showActListPageOf(
-                  insertedMemWithActiveActName,
-                );
-
-                await widgetTester.tap(find.byIcon(Icons.numbers));
-                await widgetTester.pump();
-
-                final stopTime = DateTime.now();
-                await widgetTester.tap(stopIconFinder);
-                await widgetTester.pumpAndSettle();
-
-                expect(stopIconFinder, findsNothing);
-                expect(startIconFinder, findsOneWidget);
-                expect(
-                  widgetTester.textAt(6).data,
-                  equals(timeText(stopTime)),
-                );
-
-                final acts = await dbA.select(
-                  defTableActs,
-                  where: 'mems_id = ?',
-                  whereArgs: [insertedMemWithActiveActId],
-                );
-                expect(acts, hasLength(1));
-                expect(acts[0][defColActsEnd.name], isNotNull);
-                expect(acts[0][defColActsEndIsAllDay.name], isNotNull);
-              },
-            );
-          },
-        );
+          expect(widgetTester.textAt(0).data, equals(insertedMemName));
+          expect(widgetTester.textAt(1).data, equals(dateText(startTime2)));
+          expect(widgetTester.textAt(2).data, equals("2"));
+          expect(widgetTester.textAt(3).data, isNotNull);
+          expect(widgetTester.textAt(4).data, equals(timeText(startTime2)));
+          expect(widgetTester.textAt(5).data, equals("~"));
+          expect(widgetTester.textAt(6).data, equals(timeText(startTime)));
+          expect(widgetTester.textAt(7).data, equals("~"));
+          expect(widgetTester.textAt(8).data, equals(timeText(stopTime)));
+          expect(widgetTester.textAt(9).data, equals(dateText(zeroDate)));
+          expect(widgetTester.textAt(10).data, equals("1"));
+          expect(widgetTester.textAt(11).data, equals(oneMin.format()));
+          expect(widgetTester.textAt(12).data, equals(timeText(zeroDate)));
+          expect(widgetTester.textAt(13).data, equals("~"));
+          expect(widgetTester.textAt(14).data, equals(timeText(oneMinDate)));
+        });
 
         group(': Edit act', () {
           setUp(() async {
@@ -388,30 +336,6 @@ void main() => group(_name, () {
             expect(widgetTester.textAt(8).data, equals(timeText(pickedDate)));
           });
 
-          testWidgets(
-            ': cancel.',
-            (widgetTester) async {
-              widgetTester.ignoreMockMethodCallHandler(
-                  MethodChannelMock.flutterLocalNotifications);
-
-              await showActListPage(widgetTester);
-
-              await widgetTester.longPress(find.text(timeText(zeroDate)).at(0));
-              await widgetTester.pumpAndSettle();
-
-              await widgetTester.tap(find.byIcon(Icons.clear));
-              await widgetTester.pumpAndSettle();
-
-              expect(widgetTester.textAt(0).data, equals(insertedMemName));
-              expect(widgetTester.textAt(1).data, equals(dateText(zeroDate)));
-              expect(widgetTester.textAt(2).data, equals("2"));
-              expect(widgetTester.textAt(3).data, equals(oneMin.format()));
-              expect(widgetTester.textAt(4).data, equals(timeText(zeroDate)));
-              expect(widgetTester.textAt(5).data, equals("~"));
-              expect(widgetTester.textAt(4).data, equals(timeText(zeroDate)));
-            },
-          );
-
           testWidgets(': delete.', (widgetTester) async {
             widgetTester.ignoreMockMethodCallHandler(
                 MethodChannelMock.flutterLocalNotifications);
@@ -435,26 +359,22 @@ void main() => group(_name, () {
         });
       });
 
-      testWidgets(
-        ": show MemDetailPage.",
-        (widgetTester) async {
-          widgetTester.ignoreMockMethodCallHandler(
-              MethodChannelMock.flutterLocalNotifications);
+      testWidgets(": show MemDetailPage.", (widgetTester) async {
+        widgetTester.ignoreMockMethodCallHandler(
+            MethodChannelMock.flutterLocalNotifications);
 
-          await runApplication();
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(find.byIcon(Icons.playlist_play));
-          await widgetTester.pumpAndSettle();
+        await runApplication();
+        await widgetTester.pumpAndSettle();
+        await widgetTester.tap(find.byIcon(Icons.playlist_play));
+        await widgetTester.pumpAndSettle();
 
-          await widgetTester.tap(find.byIcon(Icons.arrow_forward).at(1));
-          await widgetTester.pumpAndSettle();
+        await widgetTester.tap(find.byIcon(Icons.arrow_forward));
+        await widgetTester.pumpAndSettle();
 
-          expect(
+        expect(
             widgetTester
                 .widget<TextFormField>(find.byKey(keyMemName))
                 .initialValue,
-            insertedMemName,
-          );
-        },
-      );
+            insertedMemName);
+      });
     });

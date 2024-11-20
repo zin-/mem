@@ -17,11 +17,10 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
 # FIXME https://github.com/zin-/mem/issues/321
-version: 0.5.10
+version: 0.5.9
 
 environment:
-  sdk: ">=3.5.0 <4.0.0"
-  flutter: ">=3.0.0"
+  sdk: ^3.5.0
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -49,8 +48,7 @@ dependencies:
   settings_ui: ^2.0.2
 
   ## for View state management
-  flutter_riverpod: ^2.6.1
-  riverpod_annotation: ^2.6.1
+  flutter_riverpod:
 
   ## for Chart
   fl_chart: ^0.68.0
@@ -103,13 +101,7 @@ dev_dependencies:
   mockito:
   build_runner: ^2.4.12
 
-  # for Lint
   flutter_lints: ^4.0.0
-  custom_lint:
-
-  # for Riverpod
-  riverpod_generator: ^2.6.1
-  riverpod_lint: ^2.6.1
 
   # for Icon
   flutter_launcher_icons:

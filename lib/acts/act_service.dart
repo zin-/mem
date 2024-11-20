@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
-import 'package:mem/acts/act.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
+import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/acts/act_entity.dart';
 import 'package:mem/acts/act_repository.dart';
@@ -22,12 +22,12 @@ class ActService {
   ) =>
       v(
         () async => ListWithTotalCount(
-          await _actRepository.ship(
+          (await _actRepository.ship(
             memId: memId,
             actOrderBy: ActOrderBy.descStart,
             offset: offset,
             limit: limit,
-          ),
+          )),
           await _actRepository.count(memId: memId),
         ),
         {
@@ -42,27 +42,9 @@ class ActService {
     DateAndTime when,
   ) =>
       i(
-        () async {
-          final latestActEntity = await _actRepository
-              .ship(
-                memId: memId,
-                actOrderBy: ActOrderBy.descStart,
-                limit: 1,
-              )
-              .then((v) => v.singleOrNull);
-
-          if (latestActEntity == null || latestActEntity.value is FinishedAct) {
-            return await _actRepository.receive(
-              ActEntity(Act.by(memId, when)),
-            );
-          } else {
-            return await _actRepository.replace(
-              latestActEntity.updatedBy(
-                latestActEntity.value.start(when),
-              ),
-            );
-          }
-        },
+        () async => await _actRepository.receive(
+          ActEntity(memId, DateAndTimePeriod(start: when)),
+        ),
         {
           'memId': memId,
           'when': when,
@@ -75,58 +57,30 @@ class ActService {
   ) =>
       i(
         () async {
-          final latestActiveActEntity = await _actRepository
-              .ship(
-                memId: memId,
-                actOrderBy: ActOrderBy.descStart,
-                limit: 1,
-              )
-              .then((v) => v.singleOrNull);
+          final active = (await _actRepository.ship(
+            memId: memId,
+            isActive: true,
+          ))
+              .sorted((a, b) => a.createdAt.compareTo(b.createdAt))
+              .firstOrNull;
 
-          if (latestActiveActEntity == null ||
-              latestActiveActEntity.value is FinishedAct) {
+          if (active == null) {
             return await _actRepository.receive(
-              ActEntity(Act.by(memId, when, endWhen: when)),
+              ActEntity(
+                memId,
+                DateAndTimePeriod(
+                  start: when,
+                  end: when,
+                ),
+              ),
             );
           } else {
             return await _actRepository.replace(
-              latestActiveActEntity.updatedBy(
-                latestActiveActEntity.value.finish(when),
+              active.copiedWith(
+                period: () => active.period.copiedWith(when),
               ),
             );
           }
-        },
-        {
-          'memId': memId,
-          'when': when,
-        },
-      );
-
-  Future<Iterable<SavedActEntity>> pause(
-    int memId,
-    DateAndTime when,
-  ) =>
-      i(
-        () async {
-          final latestActiveActEntity = await _actRepository
-              .ship(
-                memId: memId,
-                actOrderBy: ActOrderBy.descStart,
-                limit: 1,
-              )
-              .then((v) => v.singleOrNull);
-
-          return [
-            if (latestActiveActEntity != null)
-              await _actRepository.replace(
-                latestActiveActEntity.updatedBy(
-                  latestActiveActEntity.value.finish(when),
-                ),
-              ),
-            await _actRepository.receive(
-              ActEntity(Act.by(memId, null)),
-            ),
-          ];
         },
         {
           'memId': memId,
@@ -142,7 +96,7 @@ class ActService {
       );
 
   Future<SavedActEntity> delete(int actId) => i(
-        () async => await _actRepository.waste(id: actId).then((v) => v.single),
+        () async => (await _actRepository.waste(id: actId)).single,
         {
           'actId': actId,
         },

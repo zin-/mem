@@ -22,8 +22,7 @@ class TotalActTimeListItem extends StatelessWidget {
                     .fold<Duration>(
                       Duration.zero,
                       (previousValue, element) =>
-                          previousValue +
-                          (element.period?.duration ?? Duration.zero),
+                          previousValue + element.period.duration,
                     )
                     .format()),
                 Text(_actList.length.toString()),
