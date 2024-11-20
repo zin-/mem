@@ -8,18 +8,48 @@ void main() => group(
       _name,
       () {
         group(
-          ': constructor',
+          ': ActiveAct',
           () {
             test(
-              ': ActiveAct',
+              ': new.',
               () {
                 final act = Act.by(0, DateAndTime(0));
 
                 expect(act, isA<ActiveAct>());
+                expect(act.isActive, isTrue);
+                expect(act.isFinished, isFalse);
+              },
+            );
+
+            test(
+              ': finish.',
+              () {
+                final activeAct = Act.by(0, DateAndTime(0));
+
+                final finishedAct = activeAct.finish(DateAndTime(1));
+
+                expect(finishedAct, isA<FinishedAct>());
               },
             );
             test(
-              ': FinishedAct',
+              ': start.',
+              () {
+                final activeAct = Act.by(0, DateAndTime(0));
+
+                expect(
+                  () => activeAct.start(DateAndTime(1)),
+                  throwsA(isA<StateError>()),
+                );
+              },
+            );
+          },
+        );
+
+        group(
+          ': FinishedAct',
+          () {
+            test(
+              ': new.',
               () {
                 final act = Act.by(
                   0,
@@ -28,54 +58,13 @@ void main() => group(
                 );
 
                 expect(act, isA<FinishedAct>());
-              },
-            );
-          },
-        );
-
-        group(
-          ': isActive',
-          () {
-            test(
-              ': ActiveAct',
-              () {
-                final act = Act.by(0, DateAndTime(0));
-
-                expect(act.isActive, isTrue);
-              },
-            );
-            test(
-              ': FinishedAct',
-              () {
-                final act = Act.by(
-                  0,
-                  DateAndTime(0),
-                  endWhen: DateAndTime(0),
-                );
-
                 expect(act.isActive, isFalse);
+                expect(act.isFinished, isTrue);
               },
             );
-          },
-        );
 
-        group(
-          ': finish',
-          () {
             test(
-              ': ActiveAct',
-              () {
-                final activeAct = Act.by(0, DateAndTime(0));
-
-                expect(activeAct.isActive, isTrue);
-
-                final finishedAct = activeAct.finish(DateAndTime(1));
-
-                expect(finishedAct, isA<FinishedAct>());
-              },
-            );
-            test(
-              ': FinishedAct',
+              ': finish.',
               () {
                 final finishedAct = Act.by(
                   0,
@@ -87,6 +76,58 @@ void main() => group(
                   () => finishedAct.finish(DateAndTime(1)),
                   throwsA(isA<StateError>()),
                 );
+              },
+            );
+            test(
+              ': start.',
+              () {
+                final finishedAct = Act.by(
+                  0,
+                  DateAndTime(0),
+                  endWhen: DateAndTime(1),
+                );
+
+                expect(
+                  () => finishedAct.start(DateAndTime(1)),
+                  throwsA(isA<StateError>()),
+                );
+              },
+            );
+          },
+        );
+
+        group(
+          ': PausedAct',
+          () {
+            test(
+              ': new.',
+              () {
+                final act = Act.by(0, null);
+
+                expect(act, isA<PausedAct>());
+                expect(act.isActive, isFalse);
+                expect(act.isFinished, isFalse);
+              },
+            );
+
+            test(
+              ': finish.',
+              () {
+                final pausedAct = Act.by(0, null);
+
+                final finishedAct = pausedAct.finish(DateAndTime(1));
+
+                expect(finishedAct, isA<FinishedAct>());
+              },
+            );
+            test(
+              ': start.',
+              () {
+                final pausedAct = Act.by(0, null);
+
+                final finishedAct = pausedAct.start(DateAndTime(1));
+
+                expect(finishedAct, isA<ActiveAct>());
               },
             );
           },
