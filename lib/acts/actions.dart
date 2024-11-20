@@ -1,22 +1,23 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/mems/list/states.dart';
 import 'package:mem/acts/act.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
+import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/acts/act_entity.dart';
 import 'package:mem/acts/act_repository.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'client.dart';
 import 'states.dart';
 
-part 'actions.g.dart';
-
 final _actsClient = ActsClient();
 final _actRepository = ActRepository();
 
-final loadActList = FutureProvider.autoDispose.family<void, int>(
+final loadActList =
+    FutureProvider.autoDispose.family<List<SavedActEntity>, int?>(
   (ref, memId) => v(
     () async {
-      // FIXME 全件取得する場合、件数的な不安がある
+      // TODO 全件取得する場合、件数的な不安がある
       //  1週間分とかにしとくか？
       final acts = await _actRepository.ship(memId: memId);
 
@@ -24,30 +25,14 @@ final loadActList = FutureProvider.autoDispose.family<void, int>(
             acts,
             (tmp, item) => tmp.id == item.id,
           );
+
+      return acts;
     },
     {
       'memId': memId,
     },
   ),
 );
-
-@riverpod
-Future<void> startActByV2(Ref ref, int memId) => v(
-      () async {
-        final now = DateAndTime.now();
-
-        final startedAct = await _actsClient.start(memId, now);
-
-        // ignore: avoid_manual_providers_as_generated_provider_dependency
-        ref.read(actsProvider.notifier).upsertAll(
-          [startedAct],
-          (tmp, item) => tmp.id == item.id,
-        );
-      },
-      {
-        'memId': memId,
-      },
-    );
 
 final startActBy = Provider.autoDispose.family<Act, int>(
   (ref, memId) => v(
@@ -64,16 +49,19 @@ final startActBy = Provider.autoDispose.family<Act, int>(
             ),
           );
 
-      return Act.by(memId, now);
+      return Act(memId, DateAndTimePeriod(start: now));
     },
     memId,
   ),
 );
 
-final finishActBy = Provider.autoDispose.family<void, int>(
+final finishActBy = Provider.autoDispose.family<SavedActEntity, int>(
   (ref, memId) => v(
     () {
       final now = DateAndTime.now();
+      final finishingAct = ref.read(activeActsProvider).singleWhere(
+            (act) => act.memId == memId,
+          );
 
       _actsClient
           .finish(
@@ -87,6 +75,8 @@ final finishActBy = Provider.autoDispose.family<void, int>(
                 ),
                 finishedAct,
               ));
+
+      return finishingAct;
     },
     memId,
   ),

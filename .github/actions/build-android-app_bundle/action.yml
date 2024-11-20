@@ -32,10 +32,6 @@ runs:
         flutter-channel: ${{ inputs.flutter-channel }}
         flutter-version: ${{ inputs.flutter-version }}
 
-    - name: "Run build_runner"
-      run: dart run build_runner build --delete-conflicting-outputs
-      shell: bash
-
     - name: "Create jks"
       run: echo -n ${{ inputs.ANDROID_KEY_JKS }} | base64 -d > android/mem.jks
       shell: bash

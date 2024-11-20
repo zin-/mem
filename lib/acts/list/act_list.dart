@@ -2,9 +2,9 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
-import 'package:mem/acts/act_entity.dart';
 import 'package:mem/acts/states.dart';
 import 'package:mem/mems/list/states.dart';
+import 'package:mem/acts/act.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_entity.dart';
 
@@ -65,7 +65,7 @@ class _ActList extends StatelessWidget {
   final int? _memId;
   final bool _isDateView;
   final bool _isTimeView;
-  final List<SavedActEntity> _actList;
+  final List<Act> _actList;
   final List<SavedMemEntity> _memList;
   final ScrollController? _scrollController;
 
@@ -87,25 +87,17 @@ class _ActList extends StatelessWidget {
               _memId,
             ),
             ..._actList
-                .where(
-                  (e) => e.value.period != null,
-                )
                 .groupListsBy(
                   (element) => DateTime(
-                    element.value.period!.start!.year,
-                    element.value.period!.start!.month,
-                    _isDateView ? element.value.period!.start!.day : 1,
+                    element.period.start!.year,
+                    element.period.start!.month,
+                    _isDateView ? element.period.start!.day : 1,
                   ),
                 )
                 .entries
                 .map(
                   (e) => SliverStickyHeader(
-                    header: ActListSubHeader(
-                        MapEntry(
-                          e.key,
-                          e.value.map((e) => e.value).toList(),
-                        ),
-                        _isDateView),
+                    header: ActListSubHeader(e, _isDateView),
                     sliver: SliverList(
                       delegate: () {
                         final builder = ActListItemBuilder(

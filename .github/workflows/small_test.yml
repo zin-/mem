@@ -31,8 +31,8 @@ jobs:
       - name: "Install Dependencies"
         uses: ./.github/actions/install-dependencies
 
-      - name: "Run build_runner"
-        run: dart run build_runner build --delete-conflicting-outputs
+      - name: "Build Mocks"
+        uses: ./.github/actions/build-mocks
 
       - name: "Generate l10n"
         uses: ./.github/actions/generate-l10n

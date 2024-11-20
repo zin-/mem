@@ -31,8 +31,8 @@ abstract class DateAndTimePeriod implements Comparable<DateAndTimePeriod> {
   @override
   String toString() => {'start': start, 'end': end}.toString();
 
-  // DateAndTimePeriod copiedWith(DateAndTime? end) =>
-  //     DateAndTimePeriod(start: start, end: end);
+  DateAndTimePeriod copiedWith(DateAndTime? end) =>
+      DateAndTimePeriod(start: start, end: end);
 
   static int compare(DateAndTimePeriod? a, DateAndTimePeriod? b) {
     if (a != null && b != null) {

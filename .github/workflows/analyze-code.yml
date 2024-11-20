@@ -27,14 +27,11 @@ jobs:
       - name: "Install Dependencies"
         uses: ./.github/actions/install-dependencies
 
-      - name: "Run build_runner"
-        run: dart run build_runner build --delete-conflicting-outputs
-
       - name: "Analyze Application code"
         run: flutter analyze lib
 
-      - name: "Analyze Riverpod lints"
-        run: dart run custom_lint
+      - name: "Build Mocks"
+        uses: ./.github/actions/build-mocks
 
       - name: "Analyze Test code"
         run: flutter analyze test integration_test

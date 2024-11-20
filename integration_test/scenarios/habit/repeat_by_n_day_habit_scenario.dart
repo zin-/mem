@@ -250,11 +250,6 @@ void main() => group(': $_name', () {
         final notificationAddFinder = find.descendant(
             of: find.byKey(keyMemNotificationsView),
             matching: find.byIcon(Icons.notification_add));
-        await widgetTester.dragUntilVisible(
-          notificationAddFinder,
-          find.byType(SingleChildScrollView),
-          const Offset(0, 50),
-        );
         await widgetTester.tap(notificationAddFinder);
         await widgetTester.pumpAndSettle(defaultTransitionDuration);
 

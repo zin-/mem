@@ -41,16 +41,14 @@ class _MemNotificationsPage extends StatelessWidget {
           appBar: AppBar(
             title: Text(_memName),
           ),
-          body: SingleChildScrollView(
-            child: Flex(
-              direction: Axis.vertical,
-              children: [
-                MemRepeatedNotificationView(_memId),
-                MemRepeatByNDayNotificationView(_memId),
-                MemRepeatByDaysOfWeekNotificationView(_memId),
-                AfterActStartedNotificationView(_memId),
-              ],
-            ),
+          body: Flex(
+            direction: Axis.vertical,
+            children: [
+              MemRepeatedNotificationView(_memId),
+              MemRepeatByNDayNotificationView(_memId),
+              MemRepeatByDaysOfWeekNotificationView(_memId),
+              AfterActStartedNotificationView(_memId),
+            ],
           ),
         ),
         {

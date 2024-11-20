@@ -24,13 +24,9 @@ class ActsSummary {
 
   Map<DateAndTime, List<Act>> _groupListByDate() => v(
         () {
-          final groupedListByDate = _acts
-              .where(
-                (e) => e.period?.start != null,
-              )
-              .groupListsBy(
-                (e) => DateAndTime.from(e.period!.start!),
-              );
+          final groupedListByDate = _acts.groupListsBy(
+            (element) => DateAndTime.from(element.period.start!),
+          );
 
           final fillElements = <MapEntry<DateAndTime, List<Act>>>[];
           groupedListByDate.entries.forEachIndexed((index, element) {
