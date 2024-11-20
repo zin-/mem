@@ -18,7 +18,7 @@ void main() => group(_name, () {
         {
           mem: Mem("plain", null, null),
           latestAct: null,
-          memNotifications: null
+          memNotifications: null,
         },
         {
           mem: SavedMemEntity("is archived", null, null)
@@ -27,38 +27,60 @@ void main() => group(_name, () {
             ..updatedAt = null
             ..archivedAt = DateTime(0),
           latestAct: null,
-          memNotifications: null
+          memNotifications: null,
         },
         {
           mem: Mem("is done", DateAndTime(0), null),
           latestAct: null,
-          memNotifications: null
+          memNotifications: null,
         },
         {
           mem: Mem("has mem notifications", null, null),
           latestAct: null,
           memNotifications: [
-            MemNotification(0, MemNotificationType.repeat, 0, "message")
-          ]
+            MemNotification(
+              0,
+              MemNotificationType.repeat,
+              0,
+              "repeat",
+            )
+          ],
         },
         {
-          mem: Mem("has period start", null,
-              DateAndTimePeriod(start: DateAndTime(0))),
+          mem: Mem(
+            "has period start",
+            null,
+            DateAndTimePeriod(start: DateAndTime(0)),
+          ),
           latestAct: null,
-          memNotifications: null
+          memNotifications: null,
+        },
+        {
+          mem: Mem("has after act started", null, null),
+          latestAct: null,
+          memNotifications: [
+            MemNotification(
+              0,
+              MemNotificationType.afterActStarted,
+              1,
+              "afterActStarted",
+            )
+          ],
         },
       ];
       final results = [
         // plain
-        0, -1, -1, 1, 1,
+        0, -1, -1, 1, 1, 1,
         // is archived
-        1, 0, 1, 1, 1,
+        1, 0, 1, 1, 1, 1,
         // is done
-        1, -1, 0, 1, 1,
+        1, -1, 0, 1, 1, 1,
         // has mem notifications
-        -1, -1, -1, 0, 1,
+        -1, -1, -1, 0, 1, -1,
         // has period start
-        -1, -1, -1, -1, 0,
+        -1, -1, -1, -1, 0, -1,
+        // has after act started
+        -1, -1, -1, 1, 1, 0,
       ];
 
       for (final a in mems) {

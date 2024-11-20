@@ -40,7 +40,8 @@ class ActListSubHeader extends StatelessWidget {
                     .fold<Duration>(
                         Duration.zero,
                         (previousValue, element) =>
-                            previousValue + element.period.duration)
+                            previousValue +
+                            (element.period?.duration ?? Duration.zero))
                     .format(),
                 style: _subHeaderTextStyle,
               ),

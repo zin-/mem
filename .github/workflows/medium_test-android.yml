@@ -34,7 +34,7 @@ jobs:
           # - os: macos-latest
           # FIXME macos-14とreactivecircusでエラーになるため、バージョンを指定している
           # https://github.com/ReactiveCircus/android-emulator-runner/issues/350
-          - os: macos-12
+          - os: macos-13
             java-version: 17
             experimental: false
             android-api-level: 33
@@ -71,6 +71,9 @@ jobs:
 
       - name: "Install Dependencies"
         uses: ./.github/actions/install-dependencies
+
+      - name: "Run build_runner"
+        run: dart run build_runner build --delete-conflicting-outputs
 
       - name: "Build APK"
         run: flutter build apk --debug

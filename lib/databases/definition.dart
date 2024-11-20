@@ -5,7 +5,7 @@ import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/definition/database_definition.dart';
 
 const _dbName = 'mem.db';
-const _dbVersion = 7;
+const _dbVersion = 8;
 
 final databaseDefinition = DatabaseDefinition(
   _dbName,

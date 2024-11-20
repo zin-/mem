@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/counter/act_counter_client.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/logger/log_service.dart';
@@ -38,9 +39,11 @@ Future<void> _runApplication({
           enableErrorReport: true,
         ).init(
           () => runApp(
-            MemApplication(
-              initialPath: initialPath,
-              languageCode: languageCode,
+            ProviderScope(
+              child: MemApplication(
+                initialPath: initialPath,
+                languageCode: languageCode,
+              ),
             ),
           ),
         );

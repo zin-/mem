@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/actions.dart';
 import 'package:mem/acts/states.dart';
-import 'package:mem/acts/act_entity.dart';
 
 class ActFab extends ConsumerWidget {
   final int _memId;
@@ -12,28 +11,17 @@ class ActFab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final activeActList = (ref.watch(actListProvider(_memId)))
-        .where((element) => element.period.end == null);
+        .where((element) => element.value.period?.end == null);
 
     if (activeActList.isEmpty) {
       return _StartActFab(
-        () => ref.read(actListProvider(_memId).notifier).upsertAll(
-          [ref.read(startActBy(_memId))],
-          (tmp, item) =>
-              tmp is SavedActEntity &&
-              item is SavedActEntity &&
-// coverage:ignore-start
-              tmp.id == item.id,
-// coverage:ignore-end
-        ),
+        () => ref.read(startActByV2Provider(_memId)),
       );
     } else {
       return _FinishActFab(
-        () => ref.read(actListProvider(_memId).notifier).removeWhere(
-              (element) =>
-                  element is SavedActEntity &&
-                  element.id ==
-                      ref.read(finishActBy(activeActList.last.memId)).id,
-            ),
+        () => ref.read(finishActBy(
+          activeActList.last.value.memId,
+        )),
       );
     }
   }

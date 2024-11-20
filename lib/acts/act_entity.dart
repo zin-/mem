@@ -1,24 +1,41 @@
 import 'package:mem/acts/act.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
-import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
 
-class ActEntity extends Act with Entity, Copyable<ActEntity> {
-  ActEntity(super.memId, super.period);
+class ActEntity with EntityV2<Act> {
+  ActEntity(Act value) {
+    this.value = value;
+  }
 
-  ActEntity.fromMap(Map<String, dynamic> map)
+  @override
+  Map<String, Object?> get toMap => {
+        defFkActsMemId.name: value.memId,
+        defColActsStart.name: value.period?.start,
+        defColActsStartIsAllDay.name: value.period?.start?.isAllDay,
+        defColActsEnd.name: value.period?.end,
+        defColActsEndIsAllDay.name: value.period?.end?.isAllDay,
+      };
+
+  @override
+  EntityV2<Act> updatedBy(Act value) => ActEntity(value);
+}
+
+class SavedActEntity extends ActEntity with DatabaseTupleEntityV2<int, Act> {
+  SavedActEntity(Map<String, dynamic> map)
       : super(
-          map[defFkActsMemId.name],
-          DateAndTimePeriod(
-            start: DateAndTime.from(
-              map[defColActsStart.name],
-              timeOfDay: map[defColActsStartIsAllDay.name]
-                  ? null
-                  : map[defColActsStart.name],
-            ),
-            end: map[defColActsEnd.name] == null
+          Act.by(
+            map[defFkActsMemId.name],
+            map[defColActsStart.name] == null
+                ? null
+                : DateAndTime.from(
+                    map[defColActsStart.name],
+                    timeOfDay: map[defColActsStartIsAllDay.name]
+                        ? null
+                        : map[defColActsStart.name],
+                  ),
+            endWhen: map[defColActsEnd.name] == null
                 ? null
                 : DateAndTime.from(
                     map[defColActsEnd.name],
@@ -27,43 +44,11 @@ class ActEntity extends Act with Entity, Copyable<ActEntity> {
                         : map[defColActsEnd.name],
                   ),
           ),
-        );
-
-  @override
-  ActEntity copiedWith({
-    int Function()? memId,
-    DateAndTimePeriod Function()? period,
-  }) =>
-      ActEntity(
-        memId == null ? this.memId : memId(),
-        period == null ? this.period : period(),
-      );
-
-  @override
-  Map<String, dynamic> get toMap => {
-        defFkActsMemId.name: memId,
-        defColActsStart.name: period.start,
-        defColActsStartIsAllDay.name: period.start?.isAllDay,
-        defColActsEnd.name: period.end,
-        defColActsEndIsAllDay.name: period.end?.isAllDay,
-      };
-}
-
-class SavedActEntity extends ActEntity with DatabaseTupleEntity<int> {
-  SavedActEntity(super.memId, super.period, Map<String, dynamic> map)
-      : super() {
-    withMap(map);
-  }
-
-  SavedActEntity.fromMap(Map<String, dynamic> map) : super.fromMap(map) {
+        ) {
     withMap(map);
   }
 
   @override
-  SavedActEntity copiedWith({
-    int Function()? memId,
-    DateAndTimePeriod Function()? period,
-  }) =>
-      SavedActEntity.fromMap(
-          toMap..addAll(super.copiedWith(memId: memId, period: period).toMap));
+  SavedActEntity updatedBy(Act value) =>
+      SavedActEntity(toMap..addAll(super.updatedBy(value).toMap));
 }
