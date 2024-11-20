@@ -47,6 +47,8 @@ app.*.map.json
 /android/app/release
 
 # Generated code
+## Riverpod
+*.g.dart
 ## Mockito
 *.mocks.dart
 
