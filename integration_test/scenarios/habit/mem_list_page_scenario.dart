@@ -319,7 +319,7 @@ void main() => group(
                       of: find.byType(ListTile).at(targetAt),
                       matching: find.byIcon(Icons.pause),
                     ));
-                    await widgetTester.pumpAndSettle();
+                    await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
                     widgetTester.expectMemListItem(
                       0,
