@@ -19,7 +19,7 @@ import '../helpers.dart';
 
 const _name = 'Repeated habit scenario';
 
-void main() => group(_name, () {
+void main() => group(': $_name', () {
       late final DatabaseAccessor dbA;
       setUpAll(() async {
         dbA = await openTestDatabase(databaseDefinition);
@@ -150,7 +150,7 @@ void main() => group(_name, () {
         );
       });
 
-      group('save', () {
+      group(': save', () {
         setUp(() async {
           await dbA.insert(defTableActs, {
             defFkActsMemId.name: insertedMemId,
@@ -160,7 +160,7 @@ void main() => group(_name, () {
           });
         });
 
-        testWidgets('create.', (widgetTester) async {
+        testWidgets(': create.', (widgetTester) async {
           widgetTester
               .ignoreMockMethodCallHandler(MethodChannelMock.permissionHandler);
 
@@ -174,6 +174,8 @@ void main() => group(_name, () {
           final notificationAddFinder = find.descendant(
               of: find.byKey(keyMemNotificationsView),
               matching: find.byIcon(Icons.notification_add));
+          await widgetTester.dragUntilVisible(notificationAddFinder,
+              find.byType(SingleChildScrollView), const Offset(0, 50));
           await widgetTester.tap(notificationAddFinder);
           await widgetTester.pumpAndSettle(defaultTransitionDuration);
 

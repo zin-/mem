@@ -29,6 +29,22 @@ class Mem {
   }) =>
       v(
         () {
+          final comparedActState = (latestActOfThis?.state ?? ActState.finished)
+              .index
+              .compareTo((latestActOfOther?.state ?? ActState.finished).index);
+          if (comparedActState != 0) {
+            return comparedActState;
+          } else if (latestActOfThis != null &&
+              latestActOfThis is! FinishedAct &&
+              latestActOfOther != null &&
+              latestActOfOther is! FinishedAct) {
+            if (latestActOfOther is PausedAct && latestActOfThis is PausedAct) {
+              return 0;
+            }
+            return latestActOfOther.period!.start!
+                .compareTo(latestActOfThis.period!.start!);
+          }
+
           if (isArchived != other.isArchived) {
             return isArchived ? 1 : -1;
           }

@@ -132,7 +132,8 @@ class DatabaseFactory {
                 }
               }
 
-              final upgradedOrTmpTables = await _getCurrentTables(db);
+              final upgradedOrTmpTables =
+                  await _getCurrentTables(db, asc: true);
               for (final upgradedOrTmpTable in upgradedOrTmpTables) {
                 if (databaseDefinition.tableDefinitions
                     .where((tableDefinition) =>
@@ -158,12 +159,13 @@ class DatabaseFactory {
   }
 
   static Future<List<Map<String, Object?>>> _getCurrentTables(
-    sqflite.Database db,
-  ) =>
+    sqflite.Database db, {
+    bool asc = false,
+  }) =>
       db.query(
         "sqlite_master",
         where: "NOT(name = ?) AND NOT(name = ?)",
         whereArgs: ["android_metadata", "sqlite_sequence"],
-        orderBy: "rootpage DESC",
+        orderBy: asc ? "rootpage ASC" : "rootpage DESC",
       );
 }
