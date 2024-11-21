@@ -95,7 +95,7 @@ class _MemRepeatByDaysOfWeekNotificationView extends StatelessWidget {
                       isSelected: _repeatByDaysOfWeek.contains(index + 1)))
                   .toList(growable: false),
               backgroundColor: theme.canvasColor,
-              daysFillColor: theme.primaryColor,
+              selectedDaysFillColor: theme.primaryColor,
               selectedDayTextColor: theme.indicatorColor,
               unSelectedDayTextColor: theme.unselectedWidgetColor,
               border: false,

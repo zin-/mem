@@ -40,7 +40,7 @@ dependencies:
 
   # for View
   flutter_picker_plus: ^1.1.3
-  flutter_sticky_header: ^0.6.5
+  flutter_sticky_header: ^0.7.0
 
   ## for Transition
   go_router: ^14.2.1
@@ -53,10 +53,10 @@ dependencies:
   riverpod_annotation: ^2.6.1
 
   ## for Chart
-  fl_chart: ^0.68.0
+  fl_chart: ^0.69.1
 
   # for Notification
-  flutter_local_notifications: ^17.2.3
+  flutter_local_notifications: ^18.0.1
   timezone:
   android_alarm_manager_plus: ^4.0.3
   # awesome_notifications: ^0.9.3+1
@@ -70,7 +70,7 @@ dependencies:
   idb_shim:
 
   ## for File
-  share_plus: ^7.2.2
+  share_plus: ^10.1.2
 
   ## for Logger
   logger:
@@ -82,7 +82,7 @@ dependencies:
   collection:
 
   # for Home widgets
-  home_widget: ^0.6.0
+  home_widget: ^0.7.0
   workmanager: ^0.5.2
   day_picker: ^2.2.0
   file_picker: ^8.0.5
@@ -104,7 +104,7 @@ dev_dependencies:
   build_runner: ^2.4.12
 
   # for Lint
-  flutter_lints: ^4.0.0
+  flutter_lints: ^5.0.0
   custom_lint:
 
   # for Riverpod
