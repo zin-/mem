@@ -57,29 +57,29 @@ dependencies:
 
   # for Notification
   flutter_local_notifications: ^18.0.1
-  timezone:
+  timezone: ^0.10.0
   android_alarm_manager_plus: ^4.0.3
   # awesome_notifications: ^0.9.3+1
 
   # for Persistence
   ## for Database
-  sqflite:
-  path:
-  sqflite_common_ffi:
-  path_provider:
-  idb_shim:
+  sqflite: ^2.4.1
+  path: ^1.9.0
+  sqflite_common_ffi: ^2.3.4
+  path_provider: ^2.1.5
+  idb_shim: ^2.6.1
 
   ## for File
   share_plus: ^10.1.2
 
   ## for Logger
-  logger:
+  logger: ^2.5.0
 
   ## for Preferences
   shared_preferences: ^2.2.2
 
   # for basic operations
-  collection:
+  collection: ^1.18.0
 
   # for Home widgets
   home_widget: ^0.7.0
@@ -97,22 +97,22 @@ dev_dependencies:
   # for Test mock
   flutter_test:
     sdk: flutter
-  test:
+  test: ^1.25.7
   integration_test:
     sdk: flutter
-  mockito:
+  mockito: ^5.4.4
   build_runner: ^2.4.12
 
   # for Lint
   flutter_lints: ^5.0.0
-  custom_lint:
+  custom_lint: ^0.7.0
 
   # for Riverpod
   riverpod_generator: ^2.6.1
   riverpod_lint: ^2.6.1
 
   # for Icon
-  flutter_launcher_icons:
+  flutter_launcher_icons: ^0.14.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
