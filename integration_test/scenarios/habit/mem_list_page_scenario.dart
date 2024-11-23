@@ -75,7 +75,7 @@ extension on WidgetTester {
 }
 
 void main() => group(
-      _name,
+      ': $_name',
       () {
         const insertedMemNameBase = '$_name: inserted mem - name';
         const memWithNoActName = "no act - $insertedMemNameBase";
@@ -319,7 +319,8 @@ void main() => group(
                       of: find.byType(ListTile).at(targetAt),
                       matching: find.byIcon(Icons.pause),
                     ));
-                    await widgetTester.pumpAndSettle(const Duration(seconds: 1));
+                    await widgetTester
+                        .pumpAndSettle(const Duration(seconds: 3));
 
                     widgetTester.expectMemListItem(
                       0,

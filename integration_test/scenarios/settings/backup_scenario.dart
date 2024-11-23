@@ -16,7 +16,7 @@ import '../helpers.dart';
 const _scenarioName = 'Backup scenario';
 
 void main() => group(
-      _scenarioName,
+      ': $_scenarioName',
       () {
         const numberOfMem = 100;
         const baseInsertedMemName = '$_scenarioName - mem name - inserted';
@@ -48,7 +48,7 @@ void main() => group(
         });
 
         testWidgets(
-          "create.",
+          ': create.',
           retry: maxRetryCount,
           (widgetTester) async {
             String? result;
@@ -60,7 +60,7 @@ void main() => group(
                     .setMockMethodCallHandler(MethodChannelMock.sharePlus, [
                   (message) async {
                     await Future.delayed(const Duration(milliseconds: 500));
-                    expect(message.method, equals("shareFilesWithResult"));
+                    expect(message.method, equals("shareFiles"));
                     return result = "Success.";
                   }
                 ]);
@@ -98,10 +98,10 @@ void main() => group(
 
         if (defaultTargetPlatform != TargetPlatform.windows) {
           group(
-            'restore',
+            ': restore',
             () {
               testWidgets(
-                'pick nothing.',
+                ': pick nothing.',
                 (widgetTester) async {
                   widgetTester.ignoreMockMethodCallHandler(
                       MethodChannelMock.flutterLocalNotifications);
@@ -124,14 +124,14 @@ void main() => group(
                   await widgetTester.pumpAndSettle();
 
                   await widgetTester.tap(find.text(l10n.restoreBackupLabel));
-                  await widgetTester.pump();
+                  await widgetTester.pumpAndSettle();
 
                   expect(find.text(l10n.canceledRestoreBackup), findsOneWidget);
                 },
               );
 
               testWidgets(
-                'pick backup file.',
+                ': pick backup file.',
                 (widgetTester) async {
                   final current = (await DatabaseRepository()
                       .shipFileByNameIs(databaseDefinition.name))!;
