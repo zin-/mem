@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/framework/view/async_value_view.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 import 'package:mem/l10n/l10n.dart';
@@ -7,7 +8,6 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/notification_client.dart';
 import 'package:mem/values/constants.dart';
 
-import 'actions.dart';
 import 'backup_section.dart';
 import 'preference/keys.dart';
 import 'states.dart';
@@ -17,20 +17,24 @@ class SettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => i(
-        () => _SettingsPage(
-          startOfDay: ref.watch(startOfDayProvider),
-          onStartOfDayChanged: (TimeOfDay? picked) => v(
-            () async {
-              await update(startOfDayKey, picked);
-              ref
-                  .read(startOfDayProvider.notifier)
-                  .updatedBy(picked ?? defaultStartOfDay);
+        () {
+          return AsyncValueView(
+            preferencesProvider,
+            (loaded) {
+              return _SettingsPage(
+                startOfDay: loaded[startOfDayKey] ?? defaultStartOfDay,
+                onStartOfDayChanged: (TimeOfDay? picked) => v(
+                  () async => await ref
+                      .read(preferencesProvider.notifier)
+                      .replace(startOfDayKey, picked),
+                  {
+                    'picked': picked,
+                  },
+                ),
+              );
             },
-            {
-              'picked': picked,
-            },
-          ),
-        ),
+          );
+        },
       );
 }
 

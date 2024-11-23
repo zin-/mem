@@ -86,14 +86,14 @@ void main() => group(
         );
 
         group(
-          "Start of day",
+          ': Start of day',
           () {
             setUp(() async {
               await PreferenceClientRepository().discard(startOfDayKey);
             });
 
             testWidgets(
-              "pick start of day.",
+              ': pick.',
               (widgetTester) async {
                 await runApplication();
                 await widgetTester.pumpAndSettle();
@@ -106,6 +106,13 @@ void main() => group(
                 await widgetTester.tap(find.text(l10n.startOfDayLabel));
                 await widgetTester.pumpAndSettle();
 
+                final rect =
+                    widgetTester.getRect(find.byKey(Key('time-picker-dial')));
+                final tapPosition = Offset(
+                  rect.left + rect.width / 2,
+                  rect.top + rect.height / 2,
+                );
+                await widgetTester.tapAt(tapPosition);
                 await widgetTester.tap(okFinder);
                 await widgetTester.pumpAndSettle();
 
@@ -118,12 +125,12 @@ void main() => group(
                           )
                           .at(1))
                       .data,
-                  timeText(zeroDate),
+                  "6:00 AM",
                 );
                 expect(
                   (await PreferenceClientRepository().shipByKey(startOfDayKey))
                       .value,
-                  TimeOfDay.fromDateTime(zeroDate),
+                  TimeOfDay(hour: 6, minute: 0),
                 );
               },
             );
