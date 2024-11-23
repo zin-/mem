@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/framework/date_and_time/time_of_day_view.dart';
+import 'package:mem/framework/view/async_value_view.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/mem_notification_entity.dart';
+import 'package:mem/settings/preference/keys.dart';
 import 'package:mem/settings/states.dart';
 import 'package:mem/values/constants.dart';
 
@@ -25,18 +27,21 @@ class MemRepeatedNotificationView extends ConsumerWidget {
             ),
           );
 
-          return _MemRepeatedNotificationView(
-            memRepeatNotification.time,
-            ref.read(startOfDayProvider) ?? defaultStartOfDay,
-            (picked) => ref
-                .read(memNotificationsByMemIdProvider(_memId).notifier)
-                .upsertAll(
-              [
-                (memRepeatNotification as MemNotificationEntity).copiedWith(
-                  time: () => picked,
-                )
-              ],
-              (current, updating) => current.type == updating.type,
+          return AsyncValueView(
+            preferencesProvider,
+            (loaded) => _MemRepeatedNotificationView(
+              memRepeatNotification.time,
+              loaded[startOfDayKey] ?? defaultStartOfDay,
+              (picked) => ref
+                  .read(memNotificationsByMemIdProvider(_memId).notifier)
+                  .upsertAll(
+                [
+                  (memRepeatNotification as MemNotificationEntity).copiedWith(
+                    time: () => picked,
+                  )
+                ],
+                (current, updating) => current.type == updating.type,
+              ),
             ),
           );
         },
