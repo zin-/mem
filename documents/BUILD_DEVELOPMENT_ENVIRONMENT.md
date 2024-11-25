@@ -1,5 +1,11 @@
 # DEVELOPMENT_ENVIRONMENT
 
+## Run scripts
+
+```shell
+dart pub global activate rps
+```
+
 ## For test
 
 ### For integration test on Chrome

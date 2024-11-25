@@ -1,4 +1,4 @@
-name: "Flutter doctor"
+name: "Install flutter"
 description: "Flutterを実行可能状態にし、doctorを使って状態を確認する"
 
 inputs:
@@ -20,4 +20,7 @@ runs:
         cache: true
 
     - run: flutter doctor -v
+      shell: bash
+
+    - run: dart pub global activate rps
       shell: bash

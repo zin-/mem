@@ -19,6 +19,13 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # FIXME https://github.com/zin-/mem/issues/321
 version: 0.5.10
 
+scripts:
+  gen:
+    build: flutter pub run build_runner build --delete-conflicting-outputs
+    watch: flutter pub run build_runner watch --delete-conflicting-outputs
+    l10n: flutter gen-l10n
+    icon: flutter pub run flutter_launcher_icons:main
+
 environment:
   sdk: ">=3.5.0 <4.0.0"
   flutter: ">=3.0.0"
@@ -113,6 +120,7 @@ dev_dependencies:
 
   # for Icon
   flutter_launcher_icons: ^0.14.1
+  rps: ^0.7.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

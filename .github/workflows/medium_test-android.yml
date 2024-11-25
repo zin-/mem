@@ -64,7 +64,7 @@ jobs:
           java-version: ${{ matrix.java-version }}
 
       - name: "Flutter doctor"
-        uses: ./.github/actions/flutter-doctor
+        uses: ./.github/actions/install-flutter
         with:
           flutter-channel: ${{ inputs.flutter-channel }}
           flutter-version: ${{ inputs.flutter-version }}
