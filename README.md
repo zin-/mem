@@ -4,4 +4,9 @@
 
 Manage all.
 
+## Build Development Environment
+
+See [開発環境構築](documents/BUILD_DEVELOPMENT_ENVIRONMENT.md).
+
 ## [開発ロードマップ](documents/load_map.md)
+FIXME あんまり機能してないしいらないかも
