@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/acts/act.dart';
 import 'package:mem/acts/client.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
@@ -120,3 +121,38 @@ final actListProvider = StateNotifierProvider.autoDispose
     },
   ),
 );
+
+@riverpod
+Map<int, Act?>? latestActsByMemV2(Ref ref) => v(
+      () => ref.watch(
+        actsV2Provider.select(
+          (value) => value.value
+              ?.groupListsBy(
+                (element) => element.value.memId,
+              )
+              .map(
+                (key, value) => MapEntry(
+                  key,
+                  value
+                      .sorted(
+                        (a, b) => b.createdAt.compareTo(a.createdAt),
+                      )
+                      .firstOrNull
+                      ?.value,
+                ),
+              ),
+        ),
+      ),
+    );
+
+@riverpod
+Act? latestActByMem(Ref ref, int memId) => v(
+      () => ref.watch(
+        latestActsByMemV2Provider.select(
+          (value) => value?[memId],
+        ),
+      ),
+      {
+        'memId': memId,
+      },
+    );
