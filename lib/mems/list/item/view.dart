@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/act.dart';
@@ -46,13 +45,7 @@ class MemListItemView extends ConsumerWidget {
               'memId': memId,
             },
           ),
-          ref.watch(
-            latestActsByMemProvider.select(
-              (v) => v.singleWhereOrNull(
-                (e) => e.memId == _memId,
-              ),
-            ),
-          ),
+          ref.watch(latestActByMemProvider(_memId)),
           () => ref.read(startActBy(_memId)),
           () => ref.read(finishActBy(_memId)),
           () => ref.read(actsV2Provider.notifier).pause(_memId),
