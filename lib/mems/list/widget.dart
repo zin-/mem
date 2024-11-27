@@ -14,23 +14,25 @@ class MemListWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () => _MemListBodyComponent(
+        () => _render(
           _scrollController,
           (memId) => showMemDetailPage(context, ref, memId),
         ),
       );
 }
 
-class _MemListBodyComponent extends StatelessWidget {
-  final ScrollController _scrollController;
-  final void Function(int memId) _onItemTapped;
-
-  const _MemListBodyComponent(this._scrollController, this._onItemTapped);
-
-  @override
-  Widget build(BuildContext context) => MemListView(
+Widget _render(
+  ScrollController scrollController,
+  void Function(int memId) onItemTapped,
+) =>
+    v(
+      () => MemListView(
         const MemListAppBar(),
-        (memId) => MemListItemView(memId, _onItemTapped),
-        scrollController: _scrollController,
-      );
-}
+        (memId) => MemListItemView(memId, onItemTapped),
+        scrollController: scrollController,
+      ),
+      {
+        'scrollController': scrollController,
+        'onItemTapped': onItemTapped,
+      },
+    );
