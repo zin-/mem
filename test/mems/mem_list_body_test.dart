@@ -31,7 +31,7 @@ void main() {
 
     await widgetTester.pumpWidget(ProviderScope(
       overrides: [
-        loadMemList.overrideWith((ref) => null),
+        loadMemList.overrideWith((ref) => []),
         latestActsByMemProvider
             .overrideWith((ref) => ListValueStateNotifier([])),
         savedMemNotificationsProvider

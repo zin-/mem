@@ -43,6 +43,8 @@ final loadMemList = FutureProvider(
                   current.id == updating.id,
             );
       }
+
+      return mems;
     },
   ),
 );
