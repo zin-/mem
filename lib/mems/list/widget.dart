@@ -7,10 +7,10 @@ import 'package:mem/mems/transitions.dart';
 
 import 'item/view.dart';
 
-class MemListBody extends ConsumerWidget {
+class MemListWidget extends ConsumerWidget {
   final ScrollController _scrollController;
 
-  const MemListBody(this._scrollController, {super.key});
+  const MemListWidget(this._scrollController, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(

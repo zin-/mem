@@ -6,7 +6,7 @@ import 'package:mem/mems/list/actions.dart';
 import 'package:mem/mems/list/states.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/mems/detail/states.dart';
-import 'package:mem/mems/list/body.dart';
+import 'package:mem/mems/list/widget.dart';
 import 'package:mem/mems/list/show_new_mem_fab.dart';
 import 'package:mem/mems/states.dart';
 import 'package:mem/mems/mem_entity.dart';
@@ -44,7 +44,7 @@ void main() {
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
-          body: MemListBody(scrollController),
+          body: MemListWidget(scrollController),
           floatingActionButton: ShowNewMemFab(scrollController),
         ),
       ),
