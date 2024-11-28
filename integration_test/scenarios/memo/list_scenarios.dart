@@ -61,7 +61,9 @@ void main() => group(
                 unarchivedMemName,
               ].forEachIndexed((index, element) {
                 expect(
-                  widgetTester.widget<Text>(find.byType(Text).at(index)).data,
+                  widgetTester
+                      .widget<Text>(find.byType(Text).at(index + 1))
+                      .data,
                   element,
                   reason: "Index is $index.",
                 );
@@ -99,76 +101,81 @@ void main() => group(
             },
           );
 
-          group(": Search", () {
-            const insertedSearchTargetMemName =
-                "$_scenarioName - mem name - search target";
+          group(
+            ": Search",
+            () {
+              const insertedSearchTargetMemName =
+                  "$_scenarioName - mem name - search target";
 
-            setUp(() async {
-              dbA.insert(defTableMems, {
-                defColMemsName.name: insertedSearchTargetMemName,
-                defColCreatedAt.name: zeroDate,
+              setUp(() async {
+                dbA.insert(defTableMems, {
+                  defColMemsName.name: insertedSearchTargetMemName,
+                  defColCreatedAt.name: zeroDate,
+                });
               });
-            });
 
-            testWidgets(": toggle search mode.", (widgetTester) async {
-              await runApplication();
-              await widgetTester.pumpAndSettle();
+              testWidgets(": toggle search mode.", (widgetTester) async {
+                await runApplication();
+                await widgetTester.pumpAndSettle();
 
-              await widgetTester.tap(searchIconFinder);
-              await widgetTester.pump();
+                await widgetTester.tap(searchIconFinder);
+                await widgetTester.pump();
 
-              expect(searchIconFinder, findsOneWidget);
-              expect(filterListIconFinder, findsNothing);
-              expect(closeIconFinder, findsOneWidget);
-              expect(
-                widgetTester
-                    .widget<TextFormField>(find.byType(TextFormField))
-                    .initialValue,
-                isEmpty,
-              );
-
-              await widgetTester.tap(closeIconFinder);
-              await widgetTester.pump();
-
-              expect(searchIconFinder, findsOneWidget);
-              expect(filterListIconFinder, findsOneWidget);
-              expect(closeIconFinder, findsNothing);
-            });
-
-            testWidgets(": enter search text.", (widgetTester) async {
-              await runApplication();
-              await widgetTester.pumpAndSettle();
-
-              await widgetTester.tap(searchIconFinder);
-              await widgetTester.pump();
-
-              [
-                unarchivedMemName,
-                insertedSearchTargetMemName,
-              ].forEachIndexed((index, element) {
+                expect(searchIconFinder, findsOneWidget);
+                expect(filterListIconFinder, findsNothing);
+                expect(closeIconFinder, findsOneWidget);
                 expect(
-                  widgetTester.widget<Text>(find.byType(Text).at(index)).data,
-                  element,
-                  reason: "Index is $index.",
+                  widgetTester
+                      .widget<TextFormField>(find.byType(TextFormField))
+                      .initialValue,
+                  isEmpty,
                 );
+
+                await widgetTester.tap(closeIconFinder);
+                await widgetTester.pump();
+
+                expect(searchIconFinder, findsOneWidget);
+                expect(filterListIconFinder, findsOneWidget);
+                expect(closeIconFinder, findsNothing);
               });
 
-              await widgetTester.enterText(
-                find.byType(TextFormField),
-                "search",
-              );
-              await widgetTester.pump();
+              testWidgets(": enter search text.", (widgetTester) async {
+                await runApplication();
+                await widgetTester.pumpAndSettle();
 
-              expect(find.text(unarchivedMemName), findsNothing);
-              expect(find.text(insertedSearchTargetMemName), findsOneWidget);
+                await widgetTester.tap(searchIconFinder);
+                await widgetTester.pump();
 
-              await widgetTester.tap(closeIconFinder);
-              await widgetTester.pump();
+                [
+                  unarchivedMemName,
+                  insertedSearchTargetMemName,
+                ].forEachIndexed((index, element) {
+                  expect(
+                    widgetTester
+                        .widget<Text>(find.byType(Text).at(index + 1))
+                        .data,
+                    element,
+                    reason: "Index is $index.",
+                  );
+                });
 
-              expect(find.text(unarchivedMemName), findsOneWidget);
-              expect(find.text(insertedSearchTargetMemName), findsOneWidget);
-            });
-          });
+                await widgetTester.enterText(
+                  find.byType(TextFormField),
+                  "search",
+                );
+                await widgetTester.pump();
+
+                expect(find.text(unarchivedMemName), findsNothing);
+                expect(find.text(insertedSearchTargetMemName), findsOneWidget);
+
+                await widgetTester.tap(closeIconFinder);
+                await widgetTester.pump();
+
+                expect(find.text(unarchivedMemName), findsOneWidget);
+                expect(find.text(insertedSearchTargetMemName), findsOneWidget);
+              });
+            }
+          );
         });
 
         group(

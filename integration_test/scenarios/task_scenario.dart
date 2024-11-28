@@ -125,14 +125,17 @@ void testTaskScenario() => group(': $_scenarioName', () {
               await widgetTester.pumpAndSettle();
 
               final expectedList = [
+                dateText(insertedMemPeriodStart),
                 insertedMemHasPeriodStart,
                 dateText(insertedMemPeriodStart),
                 "~",
+                dateText(insertedMemPeriodEnd),
                 insertedMemHasPeriodEnd,
                 "~",
                 dateText(insertedMemPeriodEnd),
                 " ",
                 timeText(insertedMemPeriodEnd),
+                dateText(insertedMemPeriod.end),
                 insertedMemHasPeriod,
                 dateText(insertedMemPeriod.start),
                 " ",

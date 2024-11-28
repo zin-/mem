@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart'; // FIXME coreからflutterへの依存は排除したい
 
 import 'package:mem/acts/act.dart';
+import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_notification.dart';
@@ -18,6 +19,31 @@ class Mem {
   bool get isArchived => false;
 
   bool get isDone => doneAt != null;
+
+  // TODO latestActやmemNotificationsを含めて導出する
+  DateAndTime? nextNotifyAt(
+    DateTime now,
+  ) =>
+      v(
+        () {
+          if (period?.start != null) {
+            if (period!.start!.compareTo(now) < 1 && period?.end != null) {
+              return period?.end;
+            }
+
+            return period!.start;
+          }
+          if (period?.end != null) {
+            return period?.end;
+          }
+
+          return null;
+        },
+        {
+          'this': this,
+          'now': now,
+        },
+      );
 
   int compareTo(
     Mem other,
