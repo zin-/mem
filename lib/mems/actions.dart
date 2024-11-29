@@ -1,9 +1,9 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/mem_service.dart';
-import 'package:mem/mems/states.dart';
-import 'package:mem/mems/mem_entity.dart';
-import 'package:mem/mems/mem_item_entity.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import 'mem_item_entity.dart';
+import 'mem_service.dart';
+import 'states.dart';
 
 final undoRemoveMem = FutureProvider.autoDispose.family<void, int>(
   (ref, memId) => v(
@@ -13,21 +13,18 @@ final undoRemoveMem = FutureProvider.autoDispose.family<void, int>(
       if (removedMemDetail != null) {
         final removeUndone =
             await MemService().save(removedMemDetail, undo: true);
-        final removeUndoneMem = removeUndone.mem;
 
-        if (removeUndoneMem is SavedMemEntity) {
-          ref.read(memsProvider.notifier).add(removeUndoneMem);
-          for (var element in removeUndone.memItems) {
-            ref.read(memItemsProvider.notifier).upsertAll(
-              [
-                element,
-              ],
-              (current, updating) =>
-                  current is SavedMemItemEntity &&
-                  updating is SavedMemItemEntity &&
-                  current.id == updating.id,
-            );
-          }
+        ref.read(memsProvider.notifier).add(removeUndone.mem);
+        for (var element in removeUndone.memItems) {
+          ref.read(memItemsProvider.notifier).upsertAll(
+            [
+              element,
+            ],
+            (current, updating) =>
+                current is SavedMemItemEntity &&
+                updating is SavedMemItemEntity &&
+                current.id == updating.id,
+          );
         }
       }
     },

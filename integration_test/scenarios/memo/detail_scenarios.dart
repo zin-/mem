@@ -84,48 +84,53 @@ void main() => group(': $_scenarioName', () {
         const saveMemName = "$baseMemName: Save";
         const saveMemMemo = "$baseMemMemo: Save";
 
-        testWidgets(": create.", (widgetTester) async {
-          widgetTester
-              .ignoreMockMethodCallHandler(MethodChannelMock.permissionHandler);
-          widgetTester.ignoreMockMethodCallHandler(
-              MethodChannelMock.flutterLocalNotifications);
+        testWidgets(
+          ': create.',
+          (widgetTester) async {
+            widgetTester.ignoreMockMethodCallHandler(
+                MethodChannelMock.permissionHandler);
+            widgetTester.ignoreMockMethodCallHandler(
+                MethodChannelMock.flutterLocalNotifications);
 
-          await runApplication();
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(newMemFabFinder);
-          await widgetTester.pumpAndSettle();
+            await runApplication();
+            await widgetTester.pumpAndSettle();
+            await widgetTester.tap(newMemFabFinder);
+            await widgetTester.pumpAndSettle();
 
-          const enteringMemName = "$saveMemName: create - entering";
-          const enteringMemMemo = "$saveMemMemo: create - entering";
-          await widgetTester.enterText(find.byKey(keyMemName), enteringMemName);
-          await widgetTester.enterText(find.byKey(keyMemMemo), enteringMemMemo);
-          await widgetTester.tap(find.byKey(keySaveMemFab));
-          await widgetTester.pump(const Duration(seconds: 5));
+            const enteringMemName = "$saveMemName: create - entering";
+            const enteringMemMemo = "$saveMemMemo: create - entering";
+            await widgetTester.enterText(
+                find.byKey(keyMemName), enteringMemName);
+            await widgetTester.enterText(
+                find.byKey(keyMemMemo), enteringMemMemo);
+            await widgetTester.tap(find.byKey(keySaveMemFab));
+            await widgetTester.pump(const Duration(seconds: 5));
 
-          expect(find.text(l10n.saveMemSuccessMessage(enteringMemName)),
-              findsOneWidget);
+            expect(find.text(l10n.saveMemSuccessMessage(enteringMemName)),
+                findsOneWidget);
 
-          await widgetTester.pageBack();
-          await widgetTester.pumpAndSettle(defaultTransitionDuration);
+            await widgetTester.pageBack();
+            await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-          expect(find.text(enteringMemName), findsOneWidget);
-          expect(find.text(enteringMemMemo), findsNothing);
+            expect(find.text(enteringMemName), findsOneWidget);
+            expect(find.text(enteringMemMemo), findsNothing);
 
-          final getCreatedMem = Equals(defColMemsName, enteringMemName);
-          final mems = await dbA.select(defTableMems,
-              where: getCreatedMem.where(),
-              whereArgs: getCreatedMem.whereArgs());
-          expect(mems.length, 1);
-          final getCreatedMemItem = And([
-            Equals(defFkMemItemsMemId, mems[0][defPkId.name]),
-            Equals(defColMemItemsType, MemItemType.memo.name),
-            Equals(defColMemItemsValue, enteringMemMemo)
-          ]);
-          final memItems = await dbA.select(defTableMemItems,
-              where: getCreatedMemItem.where(),
-              whereArgs: getCreatedMemItem.whereArgs());
-          expect(memItems.length, 1);
-        });
+            final getCreatedMem = Equals(defColMemsName, enteringMemName);
+            final mems = await dbA.select(defTableMems,
+                where: getCreatedMem.where(),
+                whereArgs: getCreatedMem.whereArgs());
+            expect(mems.length, 1);
+            final getCreatedMemItem = And([
+              Equals(defFkMemItemsMemId, mems[0][defPkId.name]),
+              Equals(defColMemItemsType, MemItemType.memo.name),
+              Equals(defColMemItemsValue, enteringMemMemo)
+            ]);
+            final memItems = await dbA.select(defTableMemItems,
+                where: getCreatedMemItem.where(),
+                whereArgs: getCreatedMemItem.whereArgs());
+            expect(memItems.length, 1);
+          },
+        );
 
         testWidgets(
           ': update.',

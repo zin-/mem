@@ -19,7 +19,7 @@ class MemListItemSubtitle extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemListItemSubtitle(
           _memId,
-          ref.watch(memByMemIdProvider(_memId))?.period,
+          ref.watch(memByMemIdProvider(_memId))?.value.period,
           ref.watch(
             memNotificationsByMemIdProvider(_memId).select(
               (v) => v.whereType<SavedMemNotificationEntity>(),

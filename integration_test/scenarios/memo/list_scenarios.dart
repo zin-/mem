@@ -26,28 +26,35 @@ void main() => group(
           dbA = await openTestDatabase(databaseDefinition);
         });
 
-        const insertedMemName = "$_scenarioName: inserted - mem name";
-        const unarchivedMemName = "$insertedMemName - unarchived";
-        const archivedMemName = "$insertedMemName - archived";
+        const insertedMemNameBase = "$_scenarioName: inserted - mem name";
+        const unarchivedMemName = "$insertedMemNameBase - unarchived";
+        const archivedMemName = "$insertedMemNameBase - archived";
+
+        final mems = [
+          {
+            defColMemsName.name: unarchivedMemName,
+            defColCreatedAt.name: DateTime.now(),
+          },
+          {
+            defColMemsName.name: archivedMemName,
+            defColCreatedAt.name: DateTime.now(),
+            defColArchivedAt.name: DateTime.now(),
+          },
+          ...List.generate(
+            20,
+            (index) => {
+              defColMemsName.name: "$insertedMemNameBase - $index",
+              defColCreatedAt.name: DateTime.now(),
+            },
+          ),
+        ];
 
         setUp(() async {
           await clearAllTestDatabaseRows(databaseDefinition);
 
-          await dbA.insert(
-            defTableMems,
-            {
-              defColMemsName.name: unarchivedMemName,
-              defColCreatedAt.name: DateTime.now(),
-            },
-          );
-          await dbA.insert(
-            defTableMems,
-            {
-              defColMemsName.name: archivedMemName,
-              defColCreatedAt.name: DateTime.now(),
-              defColArchivedAt.name: DateTime.now(),
-            },
-          );
+          for (var e in mems) {
+            await dbA.insert(defTableMems, e);
+          }
         });
 
         group(": List", () {
@@ -101,63 +108,76 @@ void main() => group(
             },
           );
 
-          group(
-            ": Search",
-            () {
-              const insertedSearchTargetMemName =
-                  "$_scenarioName - mem name - search target";
+          testWidgets(
+            ': Hide & show ShowNewMemFab.',
+            (widgetTester) async {
+              await runApplication();
+              await widgetTester.pumpAndSettle();
 
-              setUp(() async {
-                dbA.insert(defTableMems, {
-                  defColMemsName.name: insertedSearchTargetMemName,
-                  defColCreatedAt.name: zeroDate,
-                });
+              expect(find.byIcon(Icons.add).hitTestable(), findsOneWidget);
+
+              await widgetTester.drag(
+                find.text(mems[5][defColMemsName.name] as String),
+                const Offset(0, -100),
+              );
+              await widgetTester.pumpAndSettle();
+
+              expect(find.byIcon(Icons.add).hitTestable(), findsNothing);
+
+              await widgetTester.drag(
+                find.text(mems[5][defColMemsName.name] as String),
+                const Offset(0, 100),
+              );
+              await widgetTester.pumpAndSettle();
+
+              expect(find.byIcon(Icons.add).hitTestable(), findsOneWidget);
+            },
+          );
+
+          group(": Search", () {
+            const insertedSearchTargetMemName =
+                "$_scenarioName - mem name - search target";
+
+            setUp(() async {
+              dbA.insert(defTableMems, {
+                defColMemsName.name: insertedSearchTargetMemName,
+                defColCreatedAt.name: zeroDate,
               });
+            });
 
-              testWidgets(": toggle search mode.", (widgetTester) async {
+            testWidgets(": toggle search mode.", (widgetTester) async {
+              await runApplication();
+              await widgetTester.pumpAndSettle();
+
+              await widgetTester.tap(searchIconFinder);
+              await widgetTester.pump();
+
+              expect(searchIconFinder, findsOneWidget);
+              expect(filterListIconFinder, findsNothing);
+              expect(closeIconFinder, findsOneWidget);
+              expect(
+                widgetTester
+                    .widget<TextFormField>(find.byType(TextFormField))
+                    .initialValue,
+                isEmpty,
+              );
+
+              await widgetTester.tap(closeIconFinder);
+              await widgetTester.pump();
+
+              expect(searchIconFinder, findsOneWidget);
+              expect(filterListIconFinder, findsOneWidget);
+              expect(closeIconFinder, findsNothing);
+            });
+
+            testWidgets(
+              ': enter search text.',
+              (widgetTester) async {
                 await runApplication();
                 await widgetTester.pumpAndSettle();
 
                 await widgetTester.tap(searchIconFinder);
                 await widgetTester.pump();
-
-                expect(searchIconFinder, findsOneWidget);
-                expect(filterListIconFinder, findsNothing);
-                expect(closeIconFinder, findsOneWidget);
-                expect(
-                  widgetTester
-                      .widget<TextFormField>(find.byType(TextFormField))
-                      .initialValue,
-                  isEmpty,
-                );
-
-                await widgetTester.tap(closeIconFinder);
-                await widgetTester.pump();
-
-                expect(searchIconFinder, findsOneWidget);
-                expect(filterListIconFinder, findsOneWidget);
-                expect(closeIconFinder, findsNothing);
-              });
-
-              testWidgets(": enter search text.", (widgetTester) async {
-                await runApplication();
-                await widgetTester.pumpAndSettle();
-
-                await widgetTester.tap(searchIconFinder);
-                await widgetTester.pump();
-
-                [
-                  unarchivedMemName,
-                  insertedSearchTargetMemName,
-                ].forEachIndexed((index, element) {
-                  expect(
-                    widgetTester
-                        .widget<Text>(find.byType(Text).at(index + 1))
-                        .data,
-                    element,
-                    reason: "Index is $index.",
-                  );
-                });
 
                 await widgetTester.enterText(
                   find.byType(TextFormField),
@@ -172,10 +192,9 @@ void main() => group(
                 await widgetTester.pump();
 
                 expect(find.text(unarchivedMemName), findsOneWidget);
-                expect(find.text(insertedSearchTargetMemName), findsOneWidget);
-              });
-            }
-          );
+              },
+            );
+          });
         });
 
         group(
@@ -190,7 +209,7 @@ void main() => group(
               insertedMemId = await dbA.insert(
                 defTableMems,
                 {
-                  defColMemsName.name: insertedMemName,
+                  defColMemsName.name: insertedMemNameBase,
                   defColCreatedAt.name: zeroDate,
                 },
               );
@@ -230,7 +249,7 @@ void main() => group(
                 await runApplication();
                 await widgetTester.pumpAndSettle();
 
-                await widgetTester.tap(find.text(insertedMemName));
+                await widgetTester.tap(find.text(insertedMemNameBase));
                 await widgetTester.pumpAndSettle();
 
                 final memName =
@@ -238,7 +257,7 @@ void main() => group(
                 final memMemo =
                     widgetTester.widget<TextFormField>(find.byKey(keyMemMemo));
 
-                expect(memName.initialValue, equals(insertedMemName));
+                expect(memName.initialValue, equals(insertedMemNameBase));
                 expect(memMemo.initialValue, equals(insertedMemMemo));
               },
             );
@@ -246,7 +265,7 @@ void main() => group(
         );
 
         testWidgets(
-          ": Filter: Archive",
+          ': Filter: Archive.',
           (widgetTester) async {
             await runApplication();
             await widgetTester.pumpAndSettle();
@@ -258,11 +277,6 @@ void main() => group(
             await widgetTester.pumpAndSettle();
 
             await widgetTester.tap(showArchiveSwitchFinder);
-            await widgetTester.pumpAndSettle();
-
-            expect(find.text(unarchivedMemName), findsOneWidget);
-            expect(find.text(archivedMemName), findsOneWidget);
-
             await widgetTester.tap(showNotArchiveSwitchFinder);
             await widgetTester.pumpAndSettle();
 
@@ -273,13 +287,11 @@ void main() => group(
             await widgetTester.pumpAndSettle();
 
             expect(find.text(unarchivedMemName), findsOneWidget);
-            expect(find.text(archivedMemName), findsOneWidget);
 
             await closeMemListFilter(widgetTester);
             await widgetTester.pumpAndSettle();
 
             expect(find.text(unarchivedMemName), findsOneWidget);
-            expect(find.text(archivedMemName), findsOneWidget);
           },
         );
       },

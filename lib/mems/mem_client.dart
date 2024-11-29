@@ -1,4 +1,3 @@
-import 'package:mem/mems/mem.dart';
 import 'package:mem/mems/mem_detail.dart';
 import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
@@ -14,7 +13,7 @@ class MemClient {
   final NotificationClient _notificationClient;
 
   Future<MemDetail> save(
-    MemEntity mem,
+    MemEntityV2 mem,
     List<MemItemEntity> memItemList,
     List<MemNotification> memNotificationList,
   ) =>
@@ -29,8 +28,8 @@ class MemClient {
           );
 
           _notificationClient.registerMemNotifications(
-            (saved.mem as SavedMemEntity).id,
-            savedMem: saved.mem as SavedMemEntity,
+            (saved.mem as SavedMemEntityV2).id,
+            savedMem: saved.mem as SavedMemEntityV2,
             savedMemNotifications:
                 saved.notifications?.whereType<SavedMemNotificationEntity>(),
           );
@@ -44,55 +43,35 @@ class MemClient {
         },
       );
 
-  Future<MemDetail> archive(MemEntity mem) => v(
+  Future<MemDetail> archive(SavedMemEntityV2 memEntity) => v(
         () async {
-          // FIXME MemServiceの責務
-          if (mem is SavedMemEntity) {
-            final archived = await _memService.archive(mem);
+          final archived = await _memService.archive(memEntity);
 
-            final archivedMem = archived.mem;
-            // FIXME archive後のMemDetailなので、必ずSavedMemのはず
-            if (archivedMem is SavedMemEntity) {
-              _notificationClient.cancelMemNotifications(archivedMem.id);
-            }
+          _notificationClient
+              .cancelMemNotifications((archived.mem as SavedMemEntityV2).id);
 
-            return archived;
-            // } else {
-            //   // FIXME Memしかないので、子の状態が分からない
-            //   _memService.save();
-          }
-
-          throw Error(); // coverage:ignore-line
+          return archived;
         },
         {
-          "mem": mem,
+          'memEntity': memEntity,
         },
       );
 
-  Future<MemDetail> unarchive(Mem mem) => v(
+  Future<MemDetail> unarchive(SavedMemEntityV2 memEntity) => v(
         () async {
-          // FIXME 保存済みかどうかを判定するのはMemServiceの責務？
-          //  Client sideで判定できるものではない気がする
-          if (mem is SavedMemEntity) {
-            final unarchived = await _memService.unarchive(mem);
+          final unarchived = await _memService.unarchive(memEntity);
 
-            _notificationClient.registerMemNotifications(
-              (unarchived.mem as SavedMemEntity).id,
-              savedMem: unarchived.mem as SavedMemEntity,
-              savedMemNotifications: unarchived.notifications
-                  ?.whereType<SavedMemNotificationEntity>(),
-            );
+          _notificationClient.registerMemNotifications(
+            (unarchived.mem as SavedMemEntityV2).id,
+            savedMem: unarchived.mem as SavedMemEntityV2,
+            savedMemNotifications: unarchived.notifications
+                ?.whereType<SavedMemNotificationEntity>(),
+          );
 
-            return unarchived;
-            // } else {
-            //   // FIXME Memしかないので、子の状態が分からない
-            //   _memService.save();
-          }
-
-          throw Error(); // coverage:ignore-line
+          return unarchived;
         },
         {
-          "mem": mem,
+          'memEntity': memEntity,
         },
       );
 

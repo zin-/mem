@@ -27,7 +27,7 @@ class MemListWidget extends ConsumerWidget {
           loadMemList,
           (loaded) => _MemListWidget(
             _scrollController,
-            ref.watch(memListProvider),
+            ref.watch(memListProvider).toList(),
             (memId) => showMemDetailPage(context, ref, memId),
           ),
         ),
@@ -36,7 +36,7 @@ class MemListWidget extends ConsumerWidget {
 
 class _MemListWidget extends StatelessWidget {
   final ScrollController _scrollController;
-  final List<SavedMemEntity> _memList;
+  final List<SavedMemEntityV2> _memList;
   final void Function(int memId) _onItemTapped;
 
   const _MemListWidget(
@@ -58,7 +58,7 @@ class _MemListWidget extends StatelessWidget {
               ..._memList
                   .groupListsBy(
                     (element) {
-                      final nextNotifyAt = element.nextNotifyAt(now);
+                      final nextNotifyAt = element.value.nextNotifyAt(now);
 
                       return nextNotifyAt == null
                           ? null

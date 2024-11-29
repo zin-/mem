@@ -130,7 +130,7 @@ class NotificationClient {
 
   Future<void> registerMemNotifications(
     int memId, {
-    SavedMemEntity? savedMem,
+    SavedMemEntityV2? savedMem,
     Iterable<SavedMemNotificationEntity>? savedMemNotifications,
   }) =>
       v(
@@ -141,9 +141,9 @@ class NotificationClient {
                     id: memId,
                   )
                   .then(
-                    (v) => v.single.toV1(),
+                    (v) => v.single,
                   );
-          if (mem!.isDone || mem.isArchived) {
+          if (mem!.value.isDone || mem.isArchived) {
             cancelMemNotifications(memId);
           } else {
             final latestAct = await ActRepository()

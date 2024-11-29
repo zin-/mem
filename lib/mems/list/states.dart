@@ -40,9 +40,9 @@ final showDoneProvider = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
   ),
 );
 final _filteredMemsProvider = StateNotifierProvider.autoDispose<
-    ListValueStateNotifier<SavedMemEntity>, List<SavedMemEntity>>(
+    ListValueStateNotifier<SavedMemEntityV2>, List<SavedMemEntityV2>>(
   (ref) {
-    final savedMems = ref.watch(memsProvider).whereType<SavedMemEntity>();
+    final savedMems = ref.watch(memsProvider).whereType<SavedMemEntityV2>();
 
     final showNotArchived = ref.watch(showNotArchivedProvider);
     final showArchived = ref.watch(showArchivedProvider);
@@ -62,14 +62,14 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
           if (showNotDone == showDone) {
             return true;
           } else {
-            return showDone ? mem.isDone : !mem.isDone;
+            return showDone ? mem.value.isDone : !mem.value.isDone;
           }
         }).where((mem) {
           // FIXME searchTextがある場合、Memの状態に関わらずsearchTextだけでフィルターした方が良いかも
           if (searchText == null || searchText.isEmpty) {
             return true;
           } else {
-            return mem.name.contains(searchText);
+            return mem.value.name.contains(searchText);
           }
         }).toList(),
         {
@@ -86,7 +86,7 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
 );
 
 final memListProvider = StateNotifierProvider.autoDispose<
-    ValueStateNotifier<List<SavedMemEntity>>, List<SavedMemEntity>>((ref) {
+    ValueStateNotifier<List<SavedMemEntityV2>>, List<SavedMemEntityV2>>((ref) {
   final filtered = ref.watch(_filteredMemsProvider);
   final latestActsByMem = ref.watch(latestActsByMemProvider);
   final savedMemNotifications = ref.watch(savedMemNotificationsProvider);
@@ -117,8 +117,8 @@ final memListProvider = StateNotifierProvider.autoDispose<
           startOfDay.minute,
         );
 
-        final compared = a.compareTo(
-          b,
+        final compared = a.value.compareTo(
+          b.toV1(),
           startOfToday,
           latestActOfThis: latestActOfA,
           latestActOfOther: latestActOfB,
@@ -165,7 +165,7 @@ final latestActsByMemProvider =
                   await ActRepository().ship(
                     memIdsIn: ref
                         .read(memsProvider)
-                        .whereType<SavedMemEntity>()
+                        .whereType<SavedMemEntityV2>()
                         .map((e) => e.id),
                     latestByMemIds: true,
                   ),
@@ -191,7 +191,7 @@ final savedMemNotificationsProvider = StateNotifierProvider.autoDispose<
           if (current.isEmpty) {
             final memIds = ref
                 .read(memsProvider)
-                .whereType<SavedMemEntity>()
+                .whereType<SavedMemEntityV2>()
                 .map((e) => e.id);
 
             final actsByMemIds = await MemNotificationRepository().ship(

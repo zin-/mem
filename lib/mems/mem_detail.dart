@@ -8,7 +8,7 @@ import 'package:mem/mems/mem_item_entity.dart';
 //      - DBのFK制約が絡むしEntityかも
 //      - Repositoryも絡んでいくはず
 class MemDetail {
-  final MemEntity mem;
+  final MemEntityV2 mem;
   final List<MemItemEntity> memItems;
   final List<MemNotification>? notifications;
 

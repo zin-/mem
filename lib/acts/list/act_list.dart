@@ -56,7 +56,7 @@ class ActList extends ConsumerWidget {
           );
         },
         {
-          "_memId": _memId,
+          '_memId': _memId,
         },
       );
 }
@@ -66,7 +66,7 @@ class _ActList extends StatelessWidget {
   final bool _isDateView;
   final bool _isTimeView;
   final List<SavedActEntity> _actList;
-  final List<SavedMemEntity> _memList;
+  final List<SavedMemEntityV2> _memList;
   final ScrollController? _scrollController;
 
   const _ActList(
@@ -125,11 +125,11 @@ class _ActList extends StatelessWidget {
           ],
         ),
         {
-          "_memId": _memId,
-          "_isDateView": _isDateView,
-          "_isTimeView": _isTimeView,
-          "_actList": _actList,
-          "_memList": _memList,
+          '_memId': _memId,
+          '_isDateView': _isDateView,
+          '_isTimeView': _isTimeView,
+          '_actList': _actList,
+          '_memList': _memList,
         },
       );
 }

@@ -1,9 +1,13 @@
+import 'package:flutter/material.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
+import 'package:mem/notifications/notification/type.dart';
+import 'package:mem/notifications/schedule.dart';
 
 class MemEntity extends Mem with Entity, Copyable<MemEntity> {
   MemEntity(super.name, super.doneAt, super.period);
@@ -50,8 +54,6 @@ class MemEntity extends Mem with Entity, Copyable<MemEntity> {
         defColMemsEndAt.name:
             period?.end?.isAllDay == true ? null : period?.end,
       };
-
-  MemEntityV2 toV2() => MemEntityV2(this);
 }
 
 class MemEntityV2 with EntityV2<Mem> {
@@ -77,7 +79,21 @@ class MemEntityV2 with EntityV2<Mem> {
     // TODO: implement updatedBy
     throw UnimplementedError();
   }
+
 // coverage:ignore-end
+
+  MemEntityV2 updateWith(Mem Function(Mem mem) update) =>
+      MemEntityV2(update(value));
+
+  factory MemEntityV2.fromV1(MemEntity entity) {
+    if (entity is SavedMemEntity) {
+      return SavedMemEntityV2(entity.toMap);
+    } else {
+      return MemEntityV2(entity);
+    }
+  }
+
+  MemEntity toV1() => MemEntity(value.name, value.doneAt, value.period);
 }
 
 class SavedMemEntity extends MemEntity with DatabaseTupleEntity<int> {
@@ -107,9 +123,6 @@ class SavedMemEntity extends MemEntity with DatabaseTupleEntity<int> {
                 .toMap,
           ),
       );
-
-  @override
-  SavedMemEntityV2 toV2() => SavedMemEntityV2(toMap);
 }
 
 class SavedMemEntityV2 extends MemEntityV2
@@ -137,8 +150,56 @@ class SavedMemEntityV2 extends MemEntityV2
     withMap(map);
   }
 
+  @override
   SavedMemEntityV2 updateWith(Mem Function(Mem mem) update) =>
       SavedMemEntityV2(toMap..addAll(MemEntityV2(update(value)).toMap));
 
+  Iterable<Schedule> periodSchedules(
+    TimeOfDay startOfDay,
+  ) =>
+      v(
+        () {
+          return [
+            Schedule.of(
+              id,
+              value.period?.start?.isAllDay == true
+                  ? DateTime(
+                      value.period!.start!.year,
+                      value.period!.start!.month,
+                      value.period!.start!.day,
+                      startOfDay.hour,
+                      startOfDay.minute,
+                    )
+                  : value.period?.start,
+              NotificationType.startMem,
+            ),
+            Schedule.of(
+              id,
+              value.period?.end?.isAllDay == true
+                  ? DateTime(
+                      value.period!.end!.year,
+                      value.period!.end!.month,
+                      value.period!.end!.day,
+                      startOfDay.hour,
+                      startOfDay.minute,
+                    )
+                      .add(const Duration(days: 1))
+                      .subtract(const Duration(minutes: 1))
+                  : value.period?.end,
+              NotificationType.endMem,
+            ),
+          ];
+        },
+        {
+          'this': this,
+          'startOfDay': startOfDay,
+        },
+      );
+
+  @override
   SavedMemEntity toV1() => SavedMemEntity.fromMap(toMap);
+
+  factory SavedMemEntityV2.fromV1(SavedMemEntity entity) {
+    return SavedMemEntityV2(entity.toMap);
+  }
 }

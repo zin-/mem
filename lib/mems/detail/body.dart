@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/framework/date_and_time/created_and_updated_at_texts.dart';
-import 'package:mem/mems/mem.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/detail/notifications/mem_notifications_view.dart';
 import 'package:mem/mems/mem_done_checkbox.dart';
-import 'package:mem/mems/detail/states.dart';
+import 'package:mem/mems/mem_entity.dart';
 import 'package:mem/mems/mem_name.dart';
 import 'package:mem/mems/mem_period.dart';
 import 'package:mem/values/dimens.dart';
 
 import 'mem_items_view.dart';
+import 'notifications/mem_notifications_view.dart';
+import 'states.dart';
 
 class MemDetailBody extends ConsumerWidget {
   final int? _memId;
@@ -25,11 +25,14 @@ class MemDetailBody extends ConsumerWidget {
           return _MemDetailBodyComponent(
             _memId,
             editingMem,
-            (value) =>
-                ref.read(editingMemByMemIdProvider(_memId).notifier).updatedBy(
-                      editingMem.copiedWith(
-                          doneAt: () => value == true ? DateTime.now() : null),
-                    ),
+            (value) => ref
+                .read(editingMemByMemIdProvider(_memId).notifier)
+                .updatedBy(
+                  editingMem.updateWith(
+                    (mem) =>
+                        value == true ? mem.done(DateTime.now()) : mem.undone(),
+                  ),
+                ),
           );
         },
         _memId.toString(),
@@ -38,7 +41,7 @@ class MemDetailBody extends ConsumerWidget {
 
 class _MemDetailBodyComponent extends StatelessWidget {
   final int? _memId;
-  final Mem _mem;
+  final MemEntityV2 _mem;
   final Function(bool? memDone) _onMemDoneChanged;
 
   const _MemDetailBodyComponent(
@@ -72,15 +75,13 @@ class _MemDetailBodyComponent extends StatelessWidget {
             ),
             Padding(
               padding: pageBottomPadding,
-              child: CreatedAndUpdatedAtTexts(
-                _mem,
-              ),
+              child: CreatedAndUpdatedAtTexts(_mem),
             ),
           ],
         ),
         {
-          "_memId": _memId,
-          "_mem": _mem,
+          '_memId': _memId,
+          '_mem': _mem,
         },
       );
 }

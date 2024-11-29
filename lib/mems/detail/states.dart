@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/mems/mem.dart';
 import 'package:mem/mems/mem_item.dart';
 import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
@@ -13,12 +14,12 @@ import 'package:mem/mems/mem_notification_entity.dart';
 import 'package:mem/mems/mem_notification_repository.dart';
 
 final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
-    .family<ValueStateNotifier<MemEntity>, MemEntity, int?>(
+    .family<ValueStateNotifier<MemEntityV2>, MemEntityV2, int?>(
   (ref, memId) => v(
     () {
       final mem = ref.watch(memByMemIdProvider(memId));
       return ValueStateNotifier(
-        mem ?? MemEntity("", null, null),
+        mem ?? MemEntityV2(Mem("", null, null)),
       );
     },
     {"memId": memId},

@@ -20,7 +20,7 @@ class MemService {
   }) =>
       i(
         () async {
-          final mem = memDetail.mem.toV2();
+          final mem = memDetail.mem;
 
           final savedMem = (mem is SavedMemEntityV2 && !undo
               ? await _memRepository.replace(mem)
@@ -85,7 +85,7 @@ class MemService {
           }
 
           return MemDetail(
-            savedMem.toV1(),
+            savedMem,
             savedMemItems,
             returnMemNotifications
                 .whereType<SavedMemNotificationEntity>()
@@ -105,11 +105,9 @@ class MemService {
         () async => save(
           MemDetail(
             await _memRepository.ship(id: memId).then(
-                  (v) => v.single
-                      .updateWith(
-                        (mem) => mem.done(DateTime.now()),
-                      )
-                      .toV1(),
+                  (v) => v.single.updateWith(
+                    (mem) => mem.done(DateTime.now()),
+                  ),
                 ),
             [],
           ),
@@ -126,11 +124,9 @@ class MemService {
         () async => save(
           MemDetail(
             await _memRepository.ship(id: memId).then(
-                  (v) => v.single
-                      .updateWith(
-                        (mem) => mem.undone(),
-                      )
-                      .toV1(),
+                  (v) => v.single.updateWith(
+                    (mem) => mem.undone(),
+                  ),
                 ),
             [],
           ),
@@ -140,16 +136,16 @@ class MemService {
         },
       );
 
-  Future<MemDetail> archive(SavedMemEntity mem) => i(
+  Future<MemDetail> archive(SavedMemEntityV2 mem) => i(
         () async {
-          final archivedMem = await _memRepository.archive(mem.toV2());
+          final archivedMem = await _memRepository.archive(mem);
           final archivedMemItems =
               await _memItemRepository.archiveBy(memId: archivedMem.id);
           final archivedMemNotifications =
               await _memNotificationRepository.archiveBy(memId: archivedMem.id);
 
           return MemDetail(
-            archivedMem.toV1(),
+            archivedMem,
             archivedMemItems.toList(),
             archivedMemNotifications.toList(),
           );
@@ -159,16 +155,16 @@ class MemService {
         },
       );
 
-  Future<MemDetail> unarchive(SavedMemEntity mem) => i(
+  Future<MemDetail> unarchive(SavedMemEntityV2 mem) => i(
         () async {
-          final unarchivedMem = await _memRepository.unarchive(mem.toV2());
+          final unarchivedMem = await _memRepository.unarchive(mem);
           final unarchivedMemItems =
               await _memItemRepository.unarchiveBy(memId: unarchivedMem.id);
           final unarchivedMemNotifications = await _memNotificationRepository
               .unarchiveBy(memId: unarchivedMem.id);
 
           return MemDetail(
-            unarchivedMem.toV1(),
+            unarchivedMem,
             unarchivedMemItems.toList(growable: false),
             unarchivedMemNotifications.toList(growable: false),
           );

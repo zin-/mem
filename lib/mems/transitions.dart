@@ -67,7 +67,7 @@ void handleRemoved(
             scaffoldMessengerState.showSnackBar(
               SnackBar(
                 content: Text(
-                  l10n.removeMemSuccessMessage(removed.name),
+                  l10n.removeMemSuccessMessage(removed.value.name),
                 ),
                 duration: infiniteDismissDuration,
                 dismissDirection: DismissDirection.horizontal,
@@ -80,7 +80,7 @@ void handleRemoved(
                     scaffoldMessengerState.showSnackBar(
                       SnackBar(
                         content: Text(
-                          l10n.undoMemSuccessMessage(removed.name),
+                          l10n.undoMemSuccessMessage(removed.value.name),
                         ),
                         duration: defaultDismissDuration,
                         dismissDirection: DismissDirection.horizontal,

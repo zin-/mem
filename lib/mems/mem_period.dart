@@ -7,6 +7,7 @@ import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
+import 'package:mem/mems/mem.dart';
 import 'package:mem/settings/preference/keys.dart';
 import 'package:mem/settings/states.dart';
 import 'package:mem/values/colors.dart';
@@ -23,6 +24,7 @@ class MemPeriodTexts extends ConsumerWidget {
           preferencesProvider,
           (loaded) => _MemPeriodTexts(
             (ref.watch(memListProvider).firstWhere((mem) => mem.id == _memId))
+                .value
                 .period!,
             loaded[startOfDayKey] ?? defaultStartOfDay,
           ),
@@ -70,15 +72,17 @@ class MemPeriodTextFormFields extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
-          final mem = ref.watch(editingMemByMemIdProvider(_memId));
+          final memEntity = ref.watch(editingMemByMemIdProvider(_memId));
 
           return _MemPeriodTextFormFieldsComponent(
-            mem.period,
+            memEntity.value.period,
             (pickedPeriod) => v(
               () => ref
                   .read(editingMemByMemIdProvider(_memId).notifier)
                   .updatedBy(
-                    mem.copiedWith(period: () => pickedPeriod),
+                    memEntity.updateWith(
+                      (mem) => Mem(mem.name, mem.doneAt, pickedPeriod),
+                    ),
                   ),
               pickedPeriod,
             ),

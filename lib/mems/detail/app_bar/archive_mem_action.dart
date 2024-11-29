@@ -37,7 +37,7 @@ class ArchiveMemAction extends AppBarActionBuilder {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(buildL10n(context).unarchiveMemSuccessMessage(
-                      mem.name,
+                      mem.value.name,
                     )),
                     duration: defaultDismissDuration,
                     dismissDirection: DismissDirection.horizontal,
@@ -61,7 +61,7 @@ class ArchiveMemAction extends AppBarActionBuilder {
                   SnackBar(
                     content: Text(
                       buildL10n(context).archiveMemSuccessMessage(
-                        mem.name,
+                        mem.value.name,
                       ),
                     ),
                     duration: defaultDismissDuration,

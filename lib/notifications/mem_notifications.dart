@@ -15,7 +15,7 @@ const memIdKey = 'memId';
 
 class MemNotifications {
   static Schedule periodicScheduleOf(
-    SavedMemEntity savedMem,
+    SavedMemEntityV2 savedMemEntity,
     TimeOfDay startOfDay,
     Iterable<SavedMemNotificationEntity> memNotifications,
     Act? latestAct,
@@ -31,9 +31,9 @@ class MemNotifications {
                           e.isRepeatByDayOfWeek()),
                 )
                 .isEmpty
-            ? CancelSchedule(memRepeatedNotificationId(savedMem.id))
+            ? CancelSchedule(memRepeatedNotificationId(savedMemEntity.id))
             : PeriodicSchedule(
-                memRepeatedNotificationId(savedMem.id),
+                memRepeatedNotificationId(savedMemEntity.id),
                 nextRepeatNotifyAt(
                       memNotifications,
                       startOfDay,
@@ -43,12 +43,12 @@ class MemNotifications {
                     now,
                 const Duration(days: 1),
                 {
-                  memIdKey: savedMem.id,
+                  memIdKey: savedMemEntity.id,
                   notificationTypeKey: NotificationType.repeat.name,
                 },
               ),
         {
-          'savedMem': savedMem,
+          'savedMemEntity': savedMemEntity,
           'startOfDay': startOfDay,
           'memNotifications': memNotifications,
           'latestAct': latestAct,

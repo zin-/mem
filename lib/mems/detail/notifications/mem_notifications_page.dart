@@ -19,7 +19,7 @@ class MemNotificationsPage extends ConsumerWidget {
           _memId,
           ref.watch(
             editingMemByMemIdProvider(_memId).select(
-              (value) => value.name,
+              (v) => v.value.name,
             ),
           ),
         ),
