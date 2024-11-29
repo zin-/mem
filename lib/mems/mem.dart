@@ -20,6 +20,10 @@ class Mem {
 
   bool get isDone => doneAt != null;
 
+  Mem done(DateTime when) => Mem(name, when, period);
+
+  Mem undone() => Mem(name, null, period);
+
   // TODO latestActやmemNotificationsを含めて導出する
   DateAndTime? nextNotifyAt(
     DateTime now,

@@ -50,6 +50,34 @@ class MemEntity extends Mem with Entity, Copyable<MemEntity> {
         defColMemsEndAt.name:
             period?.end?.isAllDay == true ? null : period?.end,
       };
+
+  MemEntityV2 toV2() => MemEntityV2(this);
+}
+
+class MemEntityV2 with EntityV2<Mem> {
+  MemEntityV2(Mem value) {
+    this.value = value;
+  }
+
+  @override
+  Map<String, Object?> get toMap => {
+        defColMemsName.name: value.name,
+        defColMemsDoneAt.name: value.doneAt,
+        defColMemsStartOn.name: value.period?.start,
+        defColMemsStartAt.name:
+            value.period?.start?.isAllDay == true ? null : value.period?.start,
+        defColMemsEndOn.name: value.period?.end,
+        defColMemsEndAt.name:
+            value.period?.end?.isAllDay == true ? null : value.period?.end,
+      };
+
+// coverage:ignore-start
+  @override
+  EntityV2<Mem> updatedBy(Mem value) {
+    // TODO: implement updatedBy
+    throw UnimplementedError();
+  }
+// coverage:ignore-end
 }
 
 class SavedMemEntity extends MemEntity with DatabaseTupleEntity<int> {
@@ -79,4 +107,38 @@ class SavedMemEntity extends MemEntity with DatabaseTupleEntity<int> {
                 .toMap,
           ),
       );
+
+  @override
+  SavedMemEntityV2 toV2() => SavedMemEntityV2(toMap);
+}
+
+class SavedMemEntityV2 extends MemEntityV2
+    with DatabaseTupleEntityV2<int, Mem> {
+  SavedMemEntityV2(Map<String, dynamic> map)
+      : super(
+          Mem(
+            map[defColMemsName.name],
+            map[defColMemsDoneAt.name],
+            map[defColMemsStartOn.name] == null &&
+                    map[defColMemsEndOn.name] == null
+                ? null
+                : DateAndTimePeriod(
+                    start: map[defColMemsStartOn.name] == null
+                        ? null
+                        : DateAndTime.from(map[defColMemsStartOn.name],
+                            timeOfDay: map[defColMemsStartAt.name]),
+                    end: map[defColMemsEndOn.name] == null
+                        ? null
+                        : DateAndTime.from(map[defColMemsEndOn.name],
+                            timeOfDay: map[defColMemsEndAt.name]),
+                  ),
+          ),
+        ) {
+    withMap(map);
+  }
+
+  SavedMemEntityV2 updateWith(Mem Function(Mem mem) update) =>
+      SavedMemEntityV2(toMap..addAll(MemEntityV2(update(value)).toMap));
+
+  SavedMemEntity toV1() => SavedMemEntity.fromMap(toMap);
 }

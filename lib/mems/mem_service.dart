@@ -10,7 +10,7 @@ import 'package:mem/mems/mem_notification_repository.dart';
 import 'package:mem/mems/mem_repository.dart';
 
 class MemService {
-  final MemRepository _memRepository;
+  final MemRepositoryV2 _memRepository;
   final MemItemRepository _memItemRepository;
   final MemNotificationRepository _memNotificationRepository;
 
@@ -20,9 +20,9 @@ class MemService {
   }) =>
       i(
         () async {
-          final mem = memDetail.mem;
+          final mem = memDetail.mem.toV2();
 
-          final savedMem = (mem is SavedMemEntity && !undo
+          final savedMem = (mem is SavedMemEntityV2 && !undo
               ? await _memRepository.replace(mem)
               : await _memRepository.receive(mem));
 
@@ -85,7 +85,7 @@ class MemService {
           }
 
           return MemDetail(
-            savedMem,
+            savedMem.toV1(),
             savedMemItems,
             returnMemNotifications
                 .whereType<SavedMemNotificationEntity>()
@@ -98,36 +98,58 @@ class MemService {
         },
       );
 
-  Future<MemDetail> doneByMemId(int memId) => i(
-        () async {
-          final done =
-              (await _memRepository.ship(id: memId).then((v) => v.single))
-                  .copiedWith(doneAt: () => DateTime.now());
-          return save(MemDetail(done, []));
+  Future<MemDetail> doneByMemId(
+    int memId,
+  ) =>
+      i(
+        () async => save(
+          MemDetail(
+            await _memRepository.ship(id: memId).then(
+                  (v) => v.single
+                      .updateWith(
+                        (mem) => mem.done(DateTime.now()),
+                      )
+                      .toV1(),
+                ),
+            [],
+          ),
+        ),
+        {
+          'memId': memId,
         },
-        {'memId': memId},
       );
 
-  Future<MemDetail> undoneByMemId(int memId) => i(
-        () async {
-          final undone =
-              (await _memRepository.ship(id: memId).then((v) => v.single))
-                  .copiedWith(doneAt: () => null);
-          return save(MemDetail(undone, []));
+  Future<MemDetail> undoneByMemId(
+    int memId,
+  ) =>
+      i(
+        () async => save(
+          MemDetail(
+            await _memRepository.ship(id: memId).then(
+                  (v) => v.single
+                      .updateWith(
+                        (mem) => mem.undone(),
+                      )
+                      .toV1(),
+                ),
+            [],
+          ),
+        ),
+        {
+          'memId': memId,
         },
-        {'memId': memId},
       );
 
   Future<MemDetail> archive(SavedMemEntity mem) => i(
         () async {
-          final archivedMem = await _memRepository.archive(mem);
+          final archivedMem = await _memRepository.archive(mem.toV2());
           final archivedMemItems =
               await _memItemRepository.archiveBy(memId: archivedMem.id);
           final archivedMemNotifications =
               await _memNotificationRepository.archiveBy(memId: archivedMem.id);
 
           return MemDetail(
-            archivedMem,
+            archivedMem.toV1(),
             archivedMemItems.toList(),
             archivedMemNotifications.toList(),
           );
@@ -139,14 +161,14 @@ class MemService {
 
   Future<MemDetail> unarchive(SavedMemEntity mem) => i(
         () async {
-          final unarchivedMem = await _memRepository.unarchive(mem);
+          final unarchivedMem = await _memRepository.unarchive(mem.toV2());
           final unarchivedMemItems =
               await _memItemRepository.unarchiveBy(memId: unarchivedMem.id);
           final unarchivedMemNotifications = await _memNotificationRepository
               .unarchiveBy(memId: unarchivedMem.id);
 
           return MemDetail(
-            unarchivedMem,
+            unarchivedMem.toV1(),
             unarchivedMemItems.toList(growable: false),
             unarchivedMemNotifications.toList(growable: false),
           );
@@ -176,7 +198,7 @@ class MemService {
 
   factory MemService() => i(
         () => _instance ??= MemService._(
-          MemRepository(),
+          MemRepositoryV2(),
           MemItemRepository(),
           MemNotificationRepository(),
         ),

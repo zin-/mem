@@ -4,18 +4,18 @@ import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
-import 'package:mem/logger/log_service.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/mems/mem_entity.dart';
 
-class MemRepository extends DatabaseTupleRepository<MemEntity, SavedMemEntity> {
-  MemRepository() : super(databaseDefinition, defTableMems);
+class MemRepositoryV2
+    extends DatabaseTupleRepositoryV2<MemEntityV2, SavedMemEntityV2> {
+  MemRepositoryV2() : super(databaseDefinition, defTableMems);
 
   @override
-  SavedMemEntity pack(Map<String, dynamic> map) => SavedMemEntity.fromMap(map);
+  SavedMemEntityV2 pack(Map<String, dynamic> map) => SavedMemEntityV2(map);
 
   @override
-  Future<List<SavedMemEntity>> ship({
+  Future<List<SavedMemEntityV2>> ship({
     int? id,
     bool? archived,
     bool? done,
@@ -25,58 +25,40 @@ class MemRepository extends DatabaseTupleRepository<MemEntity, SavedMemEntity> {
     int? offset,
     int? limit,
   }) =>
-      v(
-        () => super.ship(
-          condition: And(
-            [
-              if (id != null) Equals(defPkId, id),
-              if (archived != null)
-                archived
-                    ? IsNotNull(defColArchivedAt.name)
-                    : IsNull(defColArchivedAt.name),
-              if (done != null)
-                done
-                    ? IsNotNull(defColMemsDoneAt.name)
-                    : IsNull(defColMemsDoneAt.name),
-              if (condition != null) condition,
-            ],
-          ),
-          groupBy: groupBy,
-          orderBy: orderBy,
-          offset: offset,
-          limit: limit,
+      super.ship(
+        condition: And(
+          [
+            if (id != null) Equals(defPkId, id),
+            if (archived != null)
+              archived
+                  ? IsNotNull(defColArchivedAt.name)
+                  : IsNull(defColArchivedAt.name),
+            if (done != null)
+              done
+                  ? IsNotNull(defColMemsDoneAt.name)
+                  : IsNull(defColMemsDoneAt.name),
+            if (condition != null) condition,
+          ],
         ),
-        {
-          'id': id,
-          'archived': archived,
-          'done': done,
-          'condition': condition,
-          'groupBy': groupBy,
-          'orderBy': orderBy,
-          'offset': offset,
-          'limit': limit,
-        },
+        groupBy: groupBy,
+        orderBy: orderBy,
+        offset: offset,
+        limit: limit,
       );
 
   @override
-  Future<List<SavedMemEntity>> waste({
+  Future<List<SavedMemEntityV2>> waste({
     int? id,
     Condition? condition,
   }) =>
-      v(
-        () => super.waste(
-          condition: And(
-            [
-              if (id != null) Equals(defPkId, id),
+      super.waste(
+        condition: And(
+          [
+            if (id != null) Equals(defPkId, id),
 // coverage:ignore-start
-              if (condition != null) condition,
+            if (condition != null) condition,
 // coverage:ignore-end
-            ],
-          ),
+          ],
         ),
-        {
-          'id': id,
-          'condition': condition,
-        },
       );
 }

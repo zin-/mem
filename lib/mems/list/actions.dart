@@ -16,10 +16,12 @@ final loadMemList = FutureProvider(
       final showDone = ref.watch(showDoneProvider);
 
       final mems = await v(
-        () => MemRepository().ship(
-          archived: showNotArchived == showArchived ? null : showArchived,
-          done: showNotDone == showDone ? null : showDone,
-        ),
+        () => MemRepositoryV2()
+            .ship(
+              archived: showNotArchived == showArchived ? null : showArchived,
+              done: showNotDone == showDone ? null : showDone,
+            )
+            .then((v) => v.map((e) => e.toV1())),
         {
           'showNotArchived': showNotArchived,
           'showArchived': showArchived,
