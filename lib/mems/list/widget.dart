@@ -76,11 +76,31 @@ class _MemListWidget extends StatelessWidget {
           );
           final l10n = buildL10n(context);
 
+          final hasActMemList = _memList.groupListsBy(
+            (mem) {
+              final latestAct = _latestActsByMem.singleWhereOrNull(
+                (act) => act.memId == mem.id,
+              );
+              return latestAct is ActiveAct || latestAct is PausedAct;
+            },
+          );
+
           return CustomScrollView(
             controller: _scrollController,
             slivers: [
               const MemListAppBar(),
-              ..._memList
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    return MemListItemView(
+                      hasActMemList[true]![index].id,
+                      _onItemTapped,
+                    );
+                  },
+                  childCount: hasActMemList[true]?.length ?? 0,
+                ),
+              ),
+              ...(hasActMemList[false] ?? [])
                   .groupListsBy(
                     (element) {
                       final nextNotifyAt = element.value.notifyAt(
