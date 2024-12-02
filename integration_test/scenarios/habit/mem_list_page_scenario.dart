@@ -82,6 +82,8 @@ void main() => group(
         const memWithActiveActName = "active act - $insertedMemNameBase";
         const memWithFinishedActName = "finished act - $insertedMemNameBase";
         const memWithPausedActName = "paused act - $insertedMemNameBase";
+        const memWithNoNotificationName =
+            "no notification - $insertedMemNameBase";
 
         late final DatabaseAccessor dbA;
         late final int memWithNoActId;
@@ -150,6 +152,11 @@ void main() => group(
               defColCreatedAt.name: zeroDate,
             },
           );
+
+          await dbA.insert(defTableMems, {
+            defColMemsName.name: memWithNoNotificationName,
+            defColCreatedAt.name: zeroDate,
+          });
         });
 
         setUp(() async {

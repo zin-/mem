@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/mems/list/states.dart';
 import 'package:mem/mems/mem_name.dart';
-import 'package:mem/mems/mem_period.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_entity.dart';
 
@@ -36,9 +35,6 @@ class _SingleSelectableMemListItemComponent extends ListTile {
     void Function(int? memId) onSelected,
   ) : super(
           title: MemNameText(memEntity),
-          subtitle: memEntity.value.period == null
-              ? null
-              : MemPeriodTexts(memEntity.id),
           trailing: Radio<int>(
             value: memEntity.id,
             groupValue: isSelected ? memEntity.id : null,
