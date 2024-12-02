@@ -100,6 +100,23 @@ final memListProvider = StateNotifierProvider.autoDispose<
         final latestActOfB =
             latestActsByMem.singleWhereOrNull((act) => act.memId == b.id);
 
+        final comparedActState = (latestActOfA?.state ?? ActState.finished)
+            .index
+            .compareTo((latestActOfB?.state ?? ActState.finished).index);
+        if (comparedActState != 0) {
+          return comparedActState;
+        } else if (latestActOfA is ActiveAct && latestActOfB is ActiveAct) {
+          return latestActOfB.period!.start!
+              .compareTo(latestActOfA.period!.start!);
+        }
+
+        if (a.isArchived != b.isArchived) {
+          return a.isArchived ? 1 : -1;
+        }
+        if (a.value.isDone != b.value.isDone) {
+          return a.value.isDone ? 1 : -1;
+        }
+
         final memNotificationsOfA =
             savedMemNotifications.where((e) => e.memId == a.id);
         final memNotificationsOfB =
@@ -117,16 +134,33 @@ final memListProvider = StateNotifierProvider.autoDispose<
           startOfDay.minute,
         );
 
-        final compared = a.value.compareTo(
-          b.toV1(),
+        final timeOfThis = a.value.notifyAt(
           startOfToday,
-          latestActOfThis: latestActOfA,
-          latestActOfOther: latestActOfB,
-          memNotificationsOfThis: memNotificationsOfA,
-          memNotificationsOfOther: memNotificationsOfB,
+          memNotificationsOfA,
+          latestActOfA,
         );
-        if (compared != 0) {
-          return compared;
+        final timeOfOther = b.value.notifyAt(
+          startOfToday,
+          memNotificationsOfB,
+          latestActOfB,
+        );
+
+        if (timeOfThis != null || timeOfOther != null) {
+          if (timeOfThis == null) {
+            return 1;
+          } else if (timeOfOther == null) {
+            return -1;
+          } else {
+            return timeOfThis.compareTo(timeOfOther);
+          }
+        }
+
+        final thisHasAfterActStarted =
+            memNotificationsOfA.where((e) => e.isAfterActStarted()).isNotEmpty;
+        final otherHasAfterActStarted =
+            memNotificationsOfB.where((e) => e.isAfterActStarted()).isNotEmpty;
+        if (thisHasAfterActStarted != otherHasAfterActStarted) {
+          return thisHasAfterActStarted ? -1 : 1;
         }
 
         return a.id.compareTo(b.id);
