@@ -23,8 +23,9 @@ class MemDetailFab extends ConsumerWidget {
         () => _MemDetailFabComponent(
           _formKey,
           () => ref.read(saveMem(_memId)),
-          ref.watch(
-              editingMemByMemIdProvider(_memId).select((value) => value.name)),
+          ref.watch(editingMemByMemIdProvider(_memId).select(
+            (v) => v.value.name,
+          )),
         ),
         {
           "_memId": _memId,

@@ -10,7 +10,7 @@ import 'act_counter_repository.dart';
 
 class ActCounterClient {
   final ActsClient _actsClient;
-  final MemRepository _memRepository;
+  final MemRepositoryV2 _memRepository;
   final ActRepository _actRepository;
   final ActCounterRepository _actCounterRepository;
 
@@ -69,7 +69,7 @@ class ActCounterClient {
 
   factory ActCounterClient() => _instance ??= ActCounterClient._(
         ActsClient(),
-        MemRepository(),
+        MemRepositoryV2(),
         ActRepository(),
         ActCounterRepository(),
       );

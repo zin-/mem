@@ -27,7 +27,7 @@ class NotificationClient {
   final ScheduleClient _scheduleClient;
   final NotificationRepository _notificationRepository;
   final PreferenceClientRepository _preferenceClientRepository;
-  final MemRepository _memRepository;
+  final MemRepositoryV2 _memRepository;
   final MemNotificationRepository _memNotificationRepository;
 
   NotificationClient._(
@@ -47,7 +47,7 @@ class NotificationClient {
           ScheduleClient(),
           NotificationRepository(),
           PreferenceClientRepository(),
-          MemRepository(),
+          MemRepositoryV2(),
           MemNotificationRepository(),
         ),
         {
@@ -76,7 +76,9 @@ class NotificationClient {
           final savedMem =
               await _memRepository.ship(id: memId).then((v) => v.singleOrNull);
 
-          if (savedMem == null || savedMem.isDone || savedMem.isArchived) {
+          if (savedMem == null ||
+              savedMem.value.isDone ||
+              savedMem.value.isArchived) {
             await cancelMemNotifications(memId);
             return;
           }
@@ -128,7 +130,7 @@ class NotificationClient {
 
   Future<void> registerMemNotifications(
     int memId, {
-    SavedMemEntity? savedMem,
+    SavedMemEntityV2? savedMem,
     Iterable<SavedMemNotificationEntity>? savedMemNotifications,
   }) =>
       v(
@@ -141,7 +143,7 @@ class NotificationClient {
                   .then(
                     (v) => v.single,
                   );
-          if (mem!.isDone || mem.isArchived) {
+          if (mem!.value.isDone || mem.isArchived) {
             cancelMemNotifications(memId);
           } else {
             final latestAct = await ActRepository()

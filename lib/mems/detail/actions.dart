@@ -19,10 +19,8 @@ final saveMem =
             );
 
             ref.read(memsProvider.notifier).upsertAll(
-              [
-                saved.mem,
-              ],
-              (tmp, item) => tmp is SavedMemEntity && item is SavedMemEntity
+              [saved.mem],
+              (tmp, item) => tmp is SavedMemEntityV2 && item is SavedMemEntityV2
                   ? tmp.id == item.id
                   : false,
             );
@@ -53,17 +51,16 @@ final saveMem =
 final archiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
   (ref, memId) => v(
     () async {
-      final mem = ref.read(memByMemIdProvider(memId));
+      final archived = await _memClient.archive(
+        ref.read(memByMemIdProvider(memId))!,
+      );
 
-      final archived = await _memClient.archive(mem!);
       ref
           .read(editingMemByMemIdProvider(memId).notifier)
           .updatedBy(archived.mem);
       ref.read(memsProvider.notifier).upsertAll(
-          [
-            archived.mem,
-          ],
-          (tmp, item) => tmp is SavedMemEntity && item is SavedMemEntity
+          [archived.mem],
+          (tmp, item) => tmp is SavedMemEntityV2 && item is SavedMemEntityV2
               ? tmp.id == item.id
               : false);
 
@@ -77,19 +74,15 @@ final unarchiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
   (ref, memId) => v(
     () async {
       final unarchived = await _memClient.unarchive(
-        ref.read(
-          memByMemIdProvider(memId),
-        )!,
+        ref.read(memByMemIdProvider(memId))!,
       );
 
       ref
           .read(editingMemByMemIdProvider(memId).notifier)
           .updatedBy(unarchived.mem);
       ref.read(memsProvider.notifier).upsertAll(
-          [
-            unarchived.mem,
-          ],
-          (tmp, item) => tmp is SavedMemEntity && item is SavedMemEntity
+          [unarchived.mem],
+          (tmp, item) => tmp is SavedMemEntityV2 && item is SavedMemEntityV2
               ? tmp.id == item.id
               : false);
 
@@ -106,16 +99,15 @@ final removeMem = Provider.autoDispose.family<Future<bool>, int?>(
         final removeSuccess = await _memClient.remove(memId);
 
         final mem = ref.read(memByMemIdProvider(memId));
-        ref.read(removedMemProvider(memId).notifier).updatedBy(
-              mem,
-            );
+        ref.read(removedMemProvider(memId).notifier).updatedBy(mem);
         ref.read(removedMemItemsProvider(memId).notifier).updatedBy(
               ref.read(memItemsByMemIdProvider(memId)),
             );
         // TODO mem notificationsにも同様の処理が必要では？
 
         ref.read(memsProvider.notifier).removeWhere(
-            (element) => element is SavedMemEntity && element.id == memId);
+              (element) => element is SavedMemEntityV2 && element.id == memId,
+            );
 
         return removeSuccess;
       }

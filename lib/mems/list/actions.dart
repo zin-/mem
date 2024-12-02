@@ -16,7 +16,7 @@ final loadMemList = FutureProvider(
       final showDone = ref.watch(showDoneProvider);
 
       final mems = await v(
-        () => MemRepository().ship(
+        () => MemRepositoryV2().ship(
           archived: showNotArchived == showArchived ? null : showArchived,
           done: showNotDone == showDone ? null : showDone,
         ),
@@ -30,7 +30,7 @@ final loadMemList = FutureProvider(
 
       ref.read(memsProvider.notifier).upsertAll(
             mems,
-            (tmp, item) => tmp is SavedMemEntity && item is SavedMemEntity
+            (tmp, item) => tmp is SavedMemEntityV2 && item is SavedMemEntityV2
                 ? tmp.id == item.id
                 : false,
           );
@@ -43,6 +43,8 @@ final loadMemList = FutureProvider(
                   current.id == updating.id,
             );
       }
+
+      return mems;
     },
   ),
 );

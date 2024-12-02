@@ -40,9 +40,9 @@ final showDoneProvider = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
   ),
 );
 final _filteredMemsProvider = StateNotifierProvider.autoDispose<
-    ListValueStateNotifier<SavedMemEntity>, List<SavedMemEntity>>(
+    ListValueStateNotifier<SavedMemEntityV2>, List<SavedMemEntityV2>>(
   (ref) {
-    final savedMems = ref.watch(memsProvider).whereType<SavedMemEntity>();
+    final savedMems = ref.watch(memsProvider).whereType<SavedMemEntityV2>();
 
     final showNotArchived = ref.watch(showNotArchivedProvider);
     final showArchived = ref.watch(showArchivedProvider);
@@ -62,14 +62,14 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
           if (showNotDone == showDone) {
             return true;
           } else {
-            return showDone ? mem.isDone : !mem.isDone;
+            return showDone ? mem.value.isDone : !mem.value.isDone;
           }
         }).where((mem) {
           // FIXME searchTextがある場合、Memの状態に関わらずsearchTextだけでフィルターした方が良いかも
           if (searchText == null || searchText.isEmpty) {
             return true;
           } else {
-            return mem.name.contains(searchText);
+            return mem.value.name.contains(searchText);
           }
         }).toList(),
         {
@@ -86,7 +86,7 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
 );
 
 final memListProvider = StateNotifierProvider.autoDispose<
-    ValueStateNotifier<List<SavedMemEntity>>, List<SavedMemEntity>>((ref) {
+    ValueStateNotifier<List<SavedMemEntityV2>>, List<SavedMemEntityV2>>((ref) {
   final filtered = ref.watch(_filteredMemsProvider);
   final latestActsByMem = ref.watch(latestActsByMemProvider);
   final savedMemNotifications = ref.watch(savedMemNotificationsProvider);
@@ -99,6 +99,23 @@ final memListProvider = StateNotifierProvider.autoDispose<
             latestActsByMem.singleWhereOrNull((act) => act.memId == a.id);
         final latestActOfB =
             latestActsByMem.singleWhereOrNull((act) => act.memId == b.id);
+
+        final comparedActState = (latestActOfA?.state ?? ActState.finished)
+            .index
+            .compareTo((latestActOfB?.state ?? ActState.finished).index);
+        if (comparedActState != 0) {
+          return comparedActState;
+        } else if (latestActOfA is ActiveAct && latestActOfB is ActiveAct) {
+          return latestActOfB.period!.start!
+              .compareTo(latestActOfA.period!.start!);
+        }
+
+        if (a.isArchived != b.isArchived) {
+          return a.isArchived ? 1 : -1;
+        }
+        if (a.value.isDone != b.value.isDone) {
+          return a.value.isDone ? 1 : -1;
+        }
 
         final memNotificationsOfA =
             savedMemNotifications.where((e) => e.memId == a.id);
@@ -117,16 +134,33 @@ final memListProvider = StateNotifierProvider.autoDispose<
           startOfDay.minute,
         );
 
-        final compared = a.compareTo(
-          b,
+        final timeOfThis = a.value.notifyAt(
           startOfToday,
-          latestActOfThis: latestActOfA,
-          latestActOfOther: latestActOfB,
-          memNotificationsOfThis: memNotificationsOfA,
-          memNotificationsOfOther: memNotificationsOfB,
+          memNotificationsOfA,
+          latestActOfA,
         );
-        if (compared != 0) {
-          return compared;
+        final timeOfOther = b.value.notifyAt(
+          startOfToday,
+          memNotificationsOfB,
+          latestActOfB,
+        );
+
+        if (timeOfThis != null || timeOfOther != null) {
+          if (timeOfThis == null) {
+            return 1;
+          } else if (timeOfOther == null) {
+            return -1;
+          } else {
+            return timeOfThis.compareTo(timeOfOther);
+          }
+        }
+
+        final thisHasAfterActStarted =
+            memNotificationsOfA.where((e) => e.isAfterActStarted()).isNotEmpty;
+        final otherHasAfterActStarted =
+            memNotificationsOfB.where((e) => e.isAfterActStarted()).isNotEmpty;
+        if (thisHasAfterActStarted != otherHasAfterActStarted) {
+          return thisHasAfterActStarted ? -1 : 1;
         }
 
         return a.id.compareTo(b.id);
@@ -165,7 +199,7 @@ final latestActsByMemProvider =
                   await ActRepository().ship(
                     memIdsIn: ref
                         .read(memsProvider)
-                        .whereType<SavedMemEntity>()
+                        .whereType<SavedMemEntityV2>()
                         .map((e) => e.id),
                     latestByMemIds: true,
                   ),
@@ -191,7 +225,7 @@ final savedMemNotificationsProvider = StateNotifierProvider.autoDispose<
           if (current.isEmpty) {
             final memIds = ref
                 .read(memsProvider)
-                .whereType<SavedMemEntity>()
+                .whereType<SavedMemEntityV2>()
                 .map((e) => e.id);
 
             final actsByMemIds = await MemNotificationRepository().ship(

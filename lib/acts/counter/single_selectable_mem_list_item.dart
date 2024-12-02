@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/mems/list/states.dart';
 import 'package:mem/mems/mem_name.dart';
-import 'package:mem/mems/mem_period.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_entity.dart';
 
@@ -31,21 +30,20 @@ class SingleSelectableMemListItem extends ConsumerWidget {
 
 class _SingleSelectableMemListItemComponent extends ListTile {
   _SingleSelectableMemListItemComponent(
-    SavedMemEntity mem,
+    SavedMemEntityV2 memEntity,
     bool isSelected,
     void Function(int? memId) onSelected,
   ) : super(
-          title: MemNameText(mem),
-          subtitle: mem.period == null ? null : MemPeriodTexts(mem.id),
+          title: MemNameText(memEntity),
           trailing: Radio<int>(
-            value: mem.id,
-            groupValue: isSelected ? mem.id : null,
+            value: memEntity.id,
+            groupValue: isSelected ? memEntity.id : null,
             onChanged: onSelected,
           ),
-          onTap: () => onSelected(mem.id),
+          onTap: () => onSelected(memEntity.id),
         ) {
     verbose({
-      'mem': mem,
+      'mem': memEntity,
       'isSelected': isSelected,
     });
   }

@@ -20,7 +20,7 @@ class ActLineChartPage extends ConsumerWidget {
           appBar: AppBar(
             title: Text(
               ref.read(
-                editingMemByMemIdProvider(_memId).select((value) => value.name),
+                editingMemByMemIdProvider(_memId).select((v) => v.value.name),
               ),
             ),
           ),

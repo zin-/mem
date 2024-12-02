@@ -21,13 +21,13 @@ class MemDetailPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemDetailPage(
           ref.watch(editingMemByMemIdProvider(_memId).select(
-            (value) => value is SavedMemEntity ? value.id : null,
+            (value) => value is SavedMemEntityV2 ? value.id : null,
           )),
           ref.watch(editingMemByMemIdProvider(_memId).select(
-            (value) => value is SavedMemEntity,
+            (value) => value is SavedMemEntityV2,
           )),
           ref.watch(editingMemByMemIdProvider(_memId).select(
-            (value) => value is SavedMemEntity ? value.isArchived : false,
+            (value) => value is SavedMemEntityV2 ? value.isArchived : false,
           )),
         ),
         {

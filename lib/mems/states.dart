@@ -9,9 +9,9 @@ import 'package:mem/mems/mem_entity.dart';
 import 'package:mem/mems/mem_item_entity.dart';
 import 'package:mem/mems/mem_repository.dart';
 
-final memsProvider =
-    StateNotifierProvider<ListValueStateNotifier<MemEntity>, List<MemEntity>>(
-  (ref) => v(() => ListValueStateNotifier<MemEntity>([])),
+final memsProvider = StateNotifierProvider<ListValueStateNotifier<MemEntityV2>,
+    List<MemEntityV2>>(
+  (ref) => v(() => ListValueStateNotifier<MemEntityV2>([])),
 );
 final memItemsProvider = StateNotifierProvider<
     ListValueStateNotifier<MemItemEntity>, List<MemItemEntity>>(
@@ -25,32 +25,40 @@ final memNotificationsProvider = StateNotifierProvider<
 );
 
 final memByMemIdProvider = StateNotifierProvider.autoDispose
-    .family<ValueStateNotifier<SavedMemEntity?>, SavedMemEntity?, int?>(
+    .family<ValueStateNotifier<SavedMemEntityV2?>, SavedMemEntityV2?, int?>(
   (ref, memId) => v(
-    () => ValueStateNotifier(
-      ref.watch(memsProvider).singleWhereOrNull(
-            (element) =>
-                element is SavedMemEntity ? element.id == memId : false,
-          ) as SavedMemEntity?,
-      initializer: (current, notifier) => v(
-        () async {
-          if (memId != null) {
-            final savedMem = await MemRepository()
-                .ship(id: memId)
-                .then((value) => value.singleOrNull);
-            ref.read(memsProvider.notifier).upsertAll(
-              [if (savedMem != null) savedMem],
-              (current, updating) =>
-                  (current is SavedMemEntity && updating is SavedMemEntity)
-                      ? current.id == updating.id
-                      : true,
-            );
-          }
-        },
-        {'current': current, 'notifier': notifier},
-      ),
-    ),
-    {"memId": memId},
+    () {
+      final mem = ref.watch(memsProvider).singleWhereOrNull(
+            (e) => e is SavedMemEntityV2 ? e.id == memId : false,
+          );
+
+      return ValueStateNotifier(
+        mem == null ? null : mem as SavedMemEntityV2,
+        initializer: (current, notifier) => v(
+          () async {
+            if (memId != null) {
+              final savedMem = await MemRepositoryV2()
+                  .ship(id: memId)
+                  .then((value) => value.singleOrNull);
+              ref.read(memsProvider.notifier).upsertAll(
+                [if (savedMem != null) savedMem],
+                (current, updating) => (current is SavedMemEntityV2 &&
+                        updating is SavedMemEntityV2)
+                    ? current.id == updating.id
+                    : true,
+              );
+            }
+          },
+          {
+            'current': current,
+            'notifier': notifier,
+          },
+        ),
+      );
+    },
+    {
+      'memId': memId,
+    },
   ),
 );
 
@@ -77,9 +85,9 @@ final removedMemDetailProvider = StateNotifierProvider.autoDispose
   ),
 );
 final removedMemProvider = StateNotifierProvider.family<
-    ValueStateNotifier<MemEntity?>, MemEntity?, int>(
+    ValueStateNotifier<MemEntityV2?>, MemEntityV2?, int>(
   (ref, memId) => v(
-    () => ValueStateNotifier<MemEntity?>(null),
+    () => ValueStateNotifier<MemEntityV2?>(null),
     memId,
   ),
 );

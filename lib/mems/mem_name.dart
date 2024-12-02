@@ -4,6 +4,7 @@ import 'package:mem/framework/view/hero_view.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
+import 'package:mem/mems/mem.dart';
 import 'package:mem/mems/mem_entity.dart';
 
 Key keyMemName = const Key("mem-name");
@@ -11,25 +12,27 @@ Key keyMemName = const Key("mem-name");
 String _memNameTag(int? memId) => heroTag('mem-name', memId);
 
 class MemNameText extends StatelessWidget {
-  final SavedMemEntity _mem;
+  final SavedMemEntityV2 _memEntity;
 
-  const MemNameText(this._mem, {super.key});
+  const MemNameText(this._memEntity, {super.key});
 
   @override
   Widget build(BuildContext context) => v(
         () => HeroView(
-          _memNameTag(_mem.id),
+          _memNameTag(_memEntity.id),
           Text(
             key: keyMemName,
-            _mem.name,
+            _memEntity.value.name,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: _mem.isDone
+            style: _memEntity.value.isDone
                 ? const TextStyle(decoration: TextDecoration.lineThrough)
                 : null,
           ),
         ),
-        _mem,
+        {
+          '_memEntity': _memEntity,
+        },
       );
 }
 
@@ -45,13 +48,18 @@ class MemNameTextFormField extends ConsumerWidget {
 
           return _MemNameTextFormField(
             _memId,
-            editingMem.name,
-            (value) => ref
-                .read(editingMemByMemIdProvider(_memId).notifier)
-                .updatedBy(editingMem.copiedWith(name: () => value)),
+            editingMem.value.name,
+            (value) =>
+                ref.read(editingMemByMemIdProvider(_memId).notifier).updatedBy(
+                      editingMem.updateWith(
+                        (mem) => Mem(value, mem.doneAt, mem.period),
+                      ),
+                    ),
           );
         },
-        {"_memId": _memId},
+        {
+          '_memId': _memId,
+        },
       );
 }
 
@@ -82,6 +90,9 @@ class _MemNameTextFormField extends StatelessWidget {
             ),
           );
         },
-        {"_memId": _memId, "_memName": _memName},
+        {
+          '_memId': _memId,
+          '_memName': _memName,
+        },
       );
 }

@@ -36,7 +36,7 @@ class MemListItemView extends ConsumerWidget {
                     ? ref.read(doneMem(_memId))
                     : ref.read(undoneMem(_memId))
               ],
-              (tmp, item) => tmp is SavedMemEntity && item is SavedMemEntity
+              (tmp, item) => tmp is SavedMemEntityV2 && item is SavedMemEntityV2
                   ? tmp.id == item.id
                   : false,
             ),
@@ -58,7 +58,7 @@ class MemListItemView extends ConsumerWidget {
 }
 
 ListTile _render(
-  SavedMemEntity mem,
+  SavedMemEntityV2 mem,
   void Function(int memId) onTap,
   void Function(bool? value, int memId) onMemDoneCheckboxTapped,
   Act? latestActByMem,
@@ -112,15 +112,15 @@ ListTile _render(
                   (value) => onMemDoneCheckboxTapped(value, mem.id),
                 ),
           tileColor: mem.isArchived ? secondaryGreyColor : null,
-          trailing: !mem.isDone && hasEnableMemNotifications
+          trailing: !mem.value.isDone && hasEnableMemNotifications
               ? hasActiveAct
                   ? stopIconButton
                   : startIconButton
               : null,
-          subtitle: mem.period == null && !hasEnableMemNotifications
+          subtitle: mem.value.period == null && !hasEnableMemNotifications
               ? null
               : MemListItemSubtitle(mem.id),
-          isThreeLine: mem.period != null && hasEnableMemNotifications,
+          isThreeLine: mem.value.period != null && hasEnableMemNotifications,
         );
       },
       {

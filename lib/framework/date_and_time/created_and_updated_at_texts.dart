@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:mem/framework/date_and_time/date_and_time_view.dart';
-import 'package:mem/framework/date_and_time/date_and_time.dart';
-import 'package:mem/mems/mem.dart';
+import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/mem_entity.dart';
 import 'package:mem/values/colors.dart';
 
+import 'date_and_time.dart';
+import 'date_and_time_view.dart';
+
 class CreatedAndUpdatedAtTexts extends StatelessWidget {
-  final Mem _entity;
+  final Object _entity;
 
   const CreatedAndUpdatedAtTexts(this._entity, {super.key});
 
   @override
   Widget build(BuildContext context) => v(
         () {
-          if (_entity is SavedMemEntity) {
+          if (_entity is DatabaseTupleEntityV2) {
             return Wrap(
               direction: Axis.horizontal,
               children: [
@@ -60,6 +60,8 @@ class CreatedAndUpdatedAtTexts extends StatelessWidget {
             return const SizedBox.shrink();
           }
         },
-        _entity,
+        {
+          '_entity': _entity,
+        },
       );
 }

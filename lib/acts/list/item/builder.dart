@@ -9,7 +9,7 @@ import 'view.dart';
 
 class ActListItemBuilder {
   final MapEntry<DateTime, List<SavedActEntity>> _actListWithDatetime;
-  final List<SavedMemEntity> _memList;
+  final List<SavedMemEntityV2> _memList;
   final bool _isTimeView;
 
   late final Map<int, List<SavedActEntity>> _actListGroupedByMemId;
@@ -40,13 +40,14 @@ class ActListItemBuilder {
               act,
               _memList
                   .singleWhereOrNull((element) => element.id == act.value.memId)
-                  ?.name,
+                  ?.value
+                  .name,
             );
           }
         },
         {
-          "context": context,
-          "index": index,
+          'context': context,
+          'index': index,
         },
       );
 
