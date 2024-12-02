@@ -9,53 +9,6 @@ import 'package:mem/framework/repository/entity.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/notifications/schedule.dart';
 
-class MemEntity extends Mem with Entity, Copyable<MemEntity> {
-  MemEntity(super.name, super.doneAt, super.period);
-
-  MemEntity.fromMap(Map<String, dynamic> map)
-      : super(
-          map[defColMemsName.name],
-          map[defColMemsDoneAt.name],
-          map[defColMemsStartOn.name] == null &&
-                  map[defColMemsEndOn.name] == null
-              ? null
-              : DateAndTimePeriod(
-                  start: map[defColMemsStartOn.name] == null
-                      ? null
-                      : DateAndTime.from(map[defColMemsStartOn.name],
-                          timeOfDay: map[defColMemsStartAt.name]),
-                  end: map[defColMemsEndOn.name] == null
-                      ? null
-                      : DateAndTime.from(map[defColMemsEndOn.name],
-                          timeOfDay: map[defColMemsEndAt.name]),
-                ),
-        );
-
-  @override
-  MemEntity copiedWith({
-    String Function()? name,
-    DateTime? Function()? doneAt,
-    DateAndTimePeriod? Function()? period,
-  }) =>
-      MemEntity(
-        name == null ? this.name : name(),
-        doneAt == null ? this.doneAt : doneAt(),
-        period == null ? this.period : period(),
-      );
-
-  @override
-  Map<String, dynamic> get toMap => {
-        defColMemsName.name: name,
-        defColMemsDoneAt.name: doneAt,
-        defColMemsStartOn.name: period?.start,
-        defColMemsStartAt.name:
-            period?.start?.isAllDay == true ? null : period?.start,
-        defColMemsEndOn.name: period?.end,
-        defColMemsEndAt.name:
-            period?.end?.isAllDay == true ? null : period?.end,
-      };
-}
-
 class MemEntityV2 with EntityV2<Mem> {
   MemEntityV2(Mem value) {
     this.value = value;
@@ -84,45 +37,6 @@ class MemEntityV2 with EntityV2<Mem> {
 
   MemEntityV2 updateWith(Mem Function(Mem mem) update) =>
       MemEntityV2(update(value));
-
-  factory MemEntityV2.fromV1(MemEntity entity) {
-    if (entity is SavedMemEntity) {
-      return SavedMemEntityV2(entity.toMap);
-    } else {
-      return MemEntityV2(entity);
-    }
-  }
-
-  MemEntity toV1() => MemEntity(value.name, value.doneAt, value.period);
-}
-
-class SavedMemEntity extends MemEntity with DatabaseTupleEntity<int> {
-  SavedMemEntity(super.name, super.doneAt, super.period);
-
-  SavedMemEntity.fromMap(
-    Map<String, dynamic> map,
-  ) : super.fromMap(map) {
-    withMap(map);
-  }
-
-  @override
-  SavedMemEntity copiedWith({
-    String Function()? name,
-    DateTime? Function()? doneAt,
-    DateAndTimePeriod? Function()? period,
-  }) =>
-      SavedMemEntity.fromMap(
-        toMap
-          ..addAll(
-            super
-                .copiedWith(
-                  name: name,
-                  doneAt: doneAt,
-                  period: period,
-                )
-                .toMap,
-          ),
-      );
 }
 
 class SavedMemEntityV2 extends MemEntityV2
@@ -195,11 +109,4 @@ class SavedMemEntityV2 extends MemEntityV2
           'startOfDay': startOfDay,
         },
       );
-
-  @override
-  SavedMemEntity toV1() => SavedMemEntity.fromMap(toMap);
-
-  factory SavedMemEntityV2.fromV1(SavedMemEntity entity) {
-    return SavedMemEntityV2(entity.toMap);
-  }
 }
