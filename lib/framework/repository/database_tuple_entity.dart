@@ -7,8 +7,6 @@ mixin DatabaseTupleEntity<PrimaryKey> on Entity {
   late DateTime? updatedAt;
   late DateTime? archivedAt;
 
-  bool get isArchived => archivedAt != null;
-
   DatabaseTupleEntity<PrimaryKey> withMap(Map<String, dynamic> map) {
     id = map[defPkId.name];
     createdAt = map[defColCreatedAt.name];
