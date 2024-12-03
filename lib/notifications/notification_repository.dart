@@ -36,7 +36,8 @@ class NotificationRepository extends KeyWithValueRepository<Notification, int>
 
   Future<bool?> ship() => v(
         () async =>
-            await _flutterLocalNotificationsWrapper?.handleAppLaunchDetails(),
+            await _flutterLocalNotificationsWrapper?.handleAppLaunchDetails() ??
+            false,
       );
 
   @override

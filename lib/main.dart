@@ -11,12 +11,12 @@ import 'notifications/notification_repository.dart';
 import 'router.dart';
 
 Future<void> main({String? languageCode}) async {
-  return _runApplication(languageCode: languageCode);
+  return await _runApplication(languageCode: languageCode);
 }
 
 @pragma('vm:entry-point')
-Future<void> launchActCounterConfigure() {
-  return _runApplication(
+Future<void> launchActCounterConfigure() async {
+  return await _runApplication(
     initialPath: newActCountersPath,
   );
 }
@@ -27,14 +27,14 @@ Future<void> _runApplication({
 }) =>
     i(
       () async {
-        await LogService(
+        return await LogService(
           enableErrorReport: true,
         ).init(
           () async {
             WidgetsFlutterBinding.ensureInitialized();
             if (initialPath != null ||
                 await NotificationRepository().ship() == false) {
-              runApp(
+              return runApp(
                 ProviderScope(
                   child: MemApplication(
                     initialPath: initialPath,
