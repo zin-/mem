@@ -14,12 +14,6 @@ Future<void> main({String? languageCode}) async {
   return _runApplication(languageCode: languageCode);
 }
 
-Future<void> launchMemDetailPage(int memId) {
-  return _runApplication(
-    initialPath: buildMemDetailPath(memId),
-  );
-}
-
 @pragma('vm:entry-point')
 Future<void> launchActCounterConfigure() {
   return _runApplication(
@@ -67,7 +61,9 @@ Future<void> onNotificationResponseReceived(dynamic details) async {
         (memId) => v(
           () async {
             if (memId is int) {
-              await launchMemDetailPage(memId);
+              await _runApplication(
+                initialPath: buildMemDetailPath(memId),
+              );
             }
           },
           {
