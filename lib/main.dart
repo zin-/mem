@@ -27,22 +27,24 @@ Future<void> _runApplication({
 }) =>
     i(
       () async {
-        WidgetsFlutterBinding.ensureInitialized();
-
         await LogService(
           enableErrorReport: true,
         ).init(
-          () => runApp(
-            ProviderScope(
-              child: MemApplication(
-                initialPath: initialPath,
-                languageCode: languageCode,
-              ),
-            ),
-          ),
+          () async {
+            WidgetsFlutterBinding.ensureInitialized();
+            if (initialPath != null ||
+                await NotificationRepository().ship() == false) {
+              runApp(
+                ProviderScope(
+                  child: MemApplication(
+                    initialPath: initialPath,
+                    languageCode: languageCode,
+                  ),
+                ),
+              );
+            }
+          },
         );
-
-        await NotificationRepository().ship();
       },
       {
         'initialPath': initialPath,
@@ -52,9 +54,9 @@ Future<void> _runApplication({
 
 @pragma('vm:entry-point')
 Future<void> onNotificationResponseReceived(dynamic details) async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  await LogService(enableErrorReport: true).init(
+  await LogService(
+    enableErrorReport: true,
+  ).init(
     () async {
       await onDidReceiveNotificationResponse(
         details,
@@ -98,8 +100,6 @@ const memIdParamName = 'mem_id';
 
 @pragma('vm:entry-point')
 Future<void> backgroundCallback(Uri? uri) async {
-  WidgetsFlutterBinding.ensureInitialized();
-
   await LogService(enableErrorReport: true).init(
     () async {
       if (uri != null && uri.scheme == uriSchema && uri.host == appId) {
