@@ -1,28 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/acts/counter/act_counter_client.dart';
-import 'package:mem/framework/date_and_time/date_and_time.dart';
-import 'package:mem/logger/log_service.dart';
-import 'package:mem/notifications/flutter_local_notifications_wrapper.dart';
-import 'package:mem/notifications/notification_actions.dart';
-import 'package:mem/notifications/notification_repository.dart';
-import 'package:mem/router.dart';
 
+import 'acts/counter/act_counter_client.dart';
 import 'application.dart';
+import 'framework/date_and_time/date_and_time.dart';
+import 'logger/log_service.dart';
+import 'notifications/flutter_local_notifications_wrapper.dart';
+import 'notifications/notification_actions.dart';
+import 'notifications/notification_repository.dart';
+import 'router.dart';
 
 Future<void> main({String? languageCode}) async {
-  return _runApplication(languageCode: languageCode);
-}
-
-Future<void> launchMemDetailPage(int memId) {
-  return _runApplication(
-    initialPath: buildMemDetailPath(memId),
-  );
+  return await _runApplication(languageCode: languageCode);
 }
 
 @pragma('vm:entry-point')
-Future<void> launchActCounterConfigure() {
-  return _runApplication(
+Future<void> launchActCounterConfigure() async {
+  return await _runApplication(
     initialPath: newActCountersPath,
   );
 }
@@ -33,22 +27,24 @@ Future<void> _runApplication({
 }) =>
     i(
       () async {
-        WidgetsFlutterBinding.ensureInitialized();
-
-        await LogService(
+        return await LogService(
           enableErrorReport: true,
         ).init(
-          () => runApp(
-            ProviderScope(
-              child: MemApplication(
-                initialPath: initialPath,
-                languageCode: languageCode,
-              ),
-            ),
-          ),
+          () async {
+            WidgetsFlutterBinding.ensureInitialized();
+            if (initialPath != null ||
+                await NotificationRepository().ship() == false) {
+              return runApp(
+                ProviderScope(
+                  child: MemApplication(
+                    initialPath: initialPath,
+                    languageCode: languageCode,
+                  ),
+                ),
+              );
+            }
+          },
         );
-
-        await NotificationRepository().ship();
       },
       {
         'initialPath': initialPath,
@@ -58,16 +54,18 @@ Future<void> _runApplication({
 
 @pragma('vm:entry-point')
 Future<void> onNotificationResponseReceived(dynamic details) async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  await LogService(enableErrorReport: true).init(
+  await LogService(
+    enableErrorReport: true,
+  ).init(
     () async {
       await onDidReceiveNotificationResponse(
         details,
         (memId) => v(
           () async {
             if (memId is int) {
-              await launchMemDetailPage(memId);
+              await _runApplication(
+                initialPath: buildMemDetailPath(memId),
+              );
             }
           },
           {
@@ -102,8 +100,6 @@ const memIdParamName = 'mem_id';
 
 @pragma('vm:entry-point')
 Future<void> backgroundCallback(Uri? uri) async {
-  WidgetsFlutterBinding.ensureInitialized();
-
   await LogService(enableErrorReport: true).init(
     () async {
       if (uri != null && uri.scheme == uriSchema && uri.host == appId) {
