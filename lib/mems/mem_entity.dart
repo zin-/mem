@@ -26,16 +26,8 @@ class MemEntityV2 with EntityV2<Mem> {
             value.period?.end?.isAllDay == true ? null : value.period?.end,
       };
 
-// coverage:ignore-start
   @override
-  EntityV2<Mem> updatedBy(Mem value) {
-    // TODO: implement updatedBy
-    throw UnimplementedError();
-  }
-
-// coverage:ignore-end
-
-  MemEntityV2 updateWith(Mem Function(Mem mem) update) =>
+  MemEntityV2 updatedWith(Mem Function(Mem mem) update) =>
       MemEntityV2(update(value));
 }
 
@@ -65,7 +57,7 @@ class SavedMemEntityV2 extends MemEntityV2
   }
 
   @override
-  SavedMemEntityV2 updateWith(Mem Function(Mem mem) update) =>
+  SavedMemEntityV2 updatedWith(Mem Function(Mem mem) update) =>
       SavedMemEntityV2(toMap..addAll(MemEntityV2(update(value)).toMap));
 
   Iterable<Schedule> periodSchedules(

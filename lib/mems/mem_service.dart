@@ -105,7 +105,7 @@ class MemService {
         () async => save(
           MemDetail(
             await _memRepository.ship(id: memId).then(
-                  (v) => v.single.updateWith(
+                  (v) => v.single.updatedWith(
                     (mem) => mem.done(DateTime.now()),
                   ),
                 ),
@@ -124,7 +124,7 @@ class MemService {
         () async => save(
           MemDetail(
             await _memRepository.ship(id: memId).then(
-                  (v) => v.single.updateWith(
+                  (v) => v.single.updatedWith(
                     (mem) => mem.undone(),
                   ),
                 ),
