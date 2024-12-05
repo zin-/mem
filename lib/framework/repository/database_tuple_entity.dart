@@ -1,3 +1,4 @@
+
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/framework/repository/entity.dart';
 

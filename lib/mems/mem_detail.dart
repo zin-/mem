@@ -9,7 +9,7 @@ import 'package:mem/mems/mem_item_entity.dart';
 //      - Repositoryも絡んでいくはず
 class MemDetail {
   final MemEntityV2 mem;
-  final List<MemItemEntity> memItems;
+  final List<MemItemEntityV2> memItems;
   final List<MemNotification>? notifications;
 
   MemDetail(this.mem, this.memItems, [this.notifications]);

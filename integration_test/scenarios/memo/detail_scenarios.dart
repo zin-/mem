@@ -133,7 +133,7 @@ void main() => group(': $_scenarioName', () {
         );
 
         testWidgets(
-          ': update.',
+          'Update.',
           (widgetTester) async {
             widgetTester.ignoreMockMethodCallHandler(
                 MethodChannelMock.permissionHandler);

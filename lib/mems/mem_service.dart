@@ -11,7 +11,7 @@ import 'package:mem/mems/mem_repository.dart';
 
 class MemService {
   final MemRepositoryV2 _memRepository;
-  final MemItemRepository _memItemRepository;
+  final MemItemRepositoryV2 _memItemRepository;
   final MemNotificationRepository _memNotificationRepository;
 
   Future<MemDetail> save(
@@ -27,14 +27,16 @@ class MemService {
               : await _memRepository.receive(mem));
 
           final savedMemItems = await Future.wait(
-            memDetail.memItems.map((e) => (e is SavedMemItemEntity && !undo
-                ? _memItemRepository.replace(
-                    e.copiedWith(memId: () => savedMem.id)
-                        as SavedMemItemEntity,
-                  )
-                : _memItemRepository.receive(
-                    e.copiedWith(memId: () => savedMem.id),
-                  ))),
+            memDetail.memItems.map(
+              (e) => (e is SavedMemItemEntityV2 && !undo
+                  ? _memItemRepository.replace(
+                      e.copiedWith(memId: () => savedMem.id)
+                          as SavedMemItemEntityV2,
+                    )
+                  : _memItemRepository.receive(
+                      e.copiedWith(memId: () => savedMem.id),
+                    )),
+            ),
           );
 
           final memNotifications = memDetail.notifications;
@@ -146,7 +148,7 @@ class MemService {
 
           return MemDetail(
             archivedMem,
-            archivedMemItems.toList(),
+            archivedMemItems.toList(growable: false),
             archivedMemNotifications.toList(),
           );
         },
@@ -195,7 +197,7 @@ class MemService {
   factory MemService() => i(
         () => _instance ??= MemService._(
           MemRepositoryV2(),
-          MemItemRepository(),
+          MemItemRepositoryV2(),
           MemNotificationRepository(),
         ),
       );

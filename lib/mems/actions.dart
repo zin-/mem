@@ -15,17 +15,13 @@ final undoRemoveMem = FutureProvider.autoDispose.family<void, int>(
             await MemService().save(removedMemDetail, undo: true);
 
         ref.read(memsProvider.notifier).add(removeUndone.mem);
-        for (var element in removeUndone.memItems) {
-          ref.read(memItemsProvider.notifier).upsertAll(
-            [
-              element,
-            ],
-            (current, updating) =>
-                current is SavedMemItemEntity &&
-                updating is SavedMemItemEntity &&
-                current.id == updating.id,
-          );
-        }
+        ref.read(memItemsProvider.notifier).upsertAll(
+              removeUndone.memItems,
+              (current, updating) =>
+                  current is SavedMemItemEntityV2 &&
+                  updating is SavedMemItemEntityV2 &&
+                  current.id == updating.id,
+            );
       }
     },
     memId,

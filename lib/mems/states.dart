@@ -14,7 +14,7 @@ final memsProvider = StateNotifierProvider<ListValueStateNotifier<MemEntityV2>,
   (ref) => v(() => ListValueStateNotifier<MemEntityV2>([])),
 );
 final memItemsProvider = StateNotifierProvider<
-    ListValueStateNotifier<MemItemEntity>, List<MemItemEntity>>(
+    ListValueStateNotifier<MemItemEntityV2>, List<MemItemEntityV2>>(
   (ref) => v(
     () => ListValueStateNotifier([]),
   ),
@@ -92,7 +92,7 @@ final removedMemProvider = StateNotifierProvider.family<
   ),
 );
 final removedMemItemsProvider = StateNotifierProvider.family<
-    ValueStateNotifier<List<MemItemEntity>?>, List<MemItemEntity>?, int>(
+    ValueStateNotifier<List<MemItemEntityV2>?>, List<MemItemEntityV2>?, int>(
   (ref, memId) => v(
     () => ValueStateNotifier(null),
     memId,

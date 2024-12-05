@@ -14,7 +14,7 @@ class MemClient {
 
   Future<MemDetail> save(
     MemEntityV2 mem,
-    List<MemItemEntity> memItemList,
+    List<MemItemEntityV2> memItemList,
     List<MemNotification> memNotificationList,
   ) =>
       v(

@@ -19,11 +19,12 @@ class MemItemsFormFields extends ConsumerWidget {
           (entered, previous) => v(
             () => ref.read(memItemsByMemIdProvider(_memId).notifier).upsertAll(
               [previous.copiedWith(value: () => entered)],
-              (current, updating) => current.type == updating.type &&
-                      (current is SavedMemItemEntity &&
-                          updating is SavedMemItemEntity)
-                  ? current.id == updating.id
-                  : true,
+              (current, updating) =>
+                  current.value.type == updating.value.type &&
+                          (current is SavedMemItemEntityV2 &&
+                              updating is SavedMemItemEntityV2)
+                      ? current.id == updating.id
+                      : true,
             ),
             {"entered": entered, "previous": previous},
           ),
@@ -35,8 +36,8 @@ class MemItemsFormFields extends ConsumerWidget {
 }
 
 class _MemItemsFormFields extends StatelessWidget {
-  final List<MemItemEntity> _memItems;
-  final void Function(dynamic entered, MemItemEntity previous) _onChanged;
+  final List<MemItemEntityV2> _memItems;
+  final void Function(dynamic entered, MemItemEntityV2 previous) _onChanged;
 
   const _MemItemsFormFields(this._memItems, this._onChanged);
 
@@ -52,7 +53,7 @@ class _MemItemsFormFields extends StatelessWidget {
                   labelText: buildL10n(context).memMemoLabel,
                 ),
                 maxLines: null,
-                initialValue: memItem.value,
+                initialValue: memItem.value.value,
                 onChanged: (value) => _onChanged(value, memItem),
               ),
             ),
