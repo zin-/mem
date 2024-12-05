@@ -22,7 +22,7 @@ class MemClient {
           final saved = await _memService.save(
             MemDetail(
               mem,
-              memItemList,
+              memItemList.map((e) => MemItemEntityV2.fromV1(e)).toList(),
               memNotificationList,
             ),
           );

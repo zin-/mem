@@ -73,7 +73,11 @@ final removedMemDetailProvider = StateNotifierProvider.autoDispose
       if (removedMem != null && removedMemItems != null) {
         removedMemDetail = MemDetail(
           removedMem,
-          removedMemItems,
+          removedMemItems
+              .map(
+                (e) => MemItemEntityV2.fromV1(e),
+              )
+              .toList(),
         );
       } else {
         removedMemDetail = null;

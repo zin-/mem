@@ -32,7 +32,7 @@ mixin EntityV2<VALUE> {
 
   Map<String, Object?> get toMap;
 
-  EntityV2<VALUE> updatedBy(VALUE value);
+  EntityV2<VALUE> updatedWith(VALUE Function(VALUE v) update);
 
   @override
   String toString() => "${super.toString()}: $toMap";
