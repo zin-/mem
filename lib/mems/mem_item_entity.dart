@@ -70,10 +70,10 @@ class MemItemEntityV2 with EntityV2<MemItem> {
       };
 
   @override
-  EntityV2<MemItem> updatedWith(MemItem Function(MemItem v) update) =>
+  MemItemEntityV2 updatedWith(MemItem Function(MemItem v) update) =>
       MemItemEntityV2(update(value));
 
-  EntityV2<MemItem> copiedWith({
+  MemItemEntityV2 copiedWith({
     int Function()? memId,
     dynamic Function()? value,
   }) =>
@@ -85,7 +85,15 @@ class MemItemEntityV2 with EntityV2<MemItem> {
         ),
       );
 
-  factory MemItemEntityV2.fromV1(MemItemEntity v1) => MemItemEntityV2(v1);
+  factory MemItemEntityV2.fromV1(MemItemEntity v1) {
+    if (v1 is SavedMemItemEntity) {
+      return SavedMemItemEntityV2.fromV1(v1);
+    } else {
+      return MemItemEntityV2(v1);
+    }
+  }
+
+  MemItemEntity toV1() => MemItemEntity(value.memId, value.type, value.value);
 }
 
 class SavedMemItemEntityV2 extends MemItemEntityV2
@@ -100,11 +108,15 @@ class SavedMemItemEntityV2 extends MemItemEntityV2
           ),
         ) {
     withMap(map);
-
   }
+
+  @override
+  SavedMemItemEntityV2 updatedWith(MemItem Function(MemItem v) update) =>
+      SavedMemItemEntityV2(toMap..addAll(super.updatedWith(update).toMap));
 
   factory SavedMemItemEntityV2.fromV1(SavedMemItemEntity v1) =>
       SavedMemItemEntityV2(v1.toMap);
 
+  @override
   SavedMemItemEntity toV1() => SavedMemItemEntity.fromMap(toMap);
 }

@@ -29,17 +29,13 @@ class MemService {
 
           final savedMemItems = await Future.wait(
             memDetail.memItems.map(
-              (e) => (e is SavedMemItemEntity && !undo
+              (e) => (e is SavedMemItemEntityV2 && !undo
                   ? _memItemRepository.replace(
-                      SavedMemItemEntityV2.fromV1(
-                        e.copiedWith(memId: () => savedMem.id)
-                            as SavedMemItemEntity,
-                      ),
+                      e.copiedWith(memId: () => savedMem.id)
+                          as SavedMemItemEntityV2,
                     )
                   : _memItemRepository.receive(
-                      MemItemEntityV2.fromV1(
-                        e.copiedWith(memId: () => savedMem.id),
-                      ),
+                      e.copiedWith(memId: () => savedMem.id),
                     )),
             ),
           );
@@ -93,7 +89,7 @@ class MemService {
 
           return MemDetail(
             savedMem,
-            savedMemItems.map((e) => e.toV1()).toList(),
+            savedMemItems,
             returnMemNotifications
                 .whereType<SavedMemNotificationEntity>()
                 .toList(),
@@ -153,7 +149,11 @@ class MemService {
 
           return MemDetail(
             archivedMem,
-            archivedMemItems.toList(),
+            archivedMemItems
+                .map(
+                  (e) => MemItemEntityV2.fromV1(e),
+                )
+                .toList(),
             archivedMemNotifications.toList(),
           );
         },
@@ -172,7 +172,11 @@ class MemService {
 
           return MemDetail(
             unarchivedMem,
-            unarchivedMemItems.toList(growable: false),
+            unarchivedMemItems
+                .map(
+                  (e) => MemItemEntityV2.fromV1(e),
+                )
+                .toList(growable: false),
             unarchivedMemNotifications.toList(growable: false),
           );
         },
