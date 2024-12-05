@@ -56,3 +56,55 @@ class SavedMemItemEntity extends MemItemEntity with DatabaseTupleEntity<int> {
           ),
       );
 }
+
+class MemItemEntityV2 with EntityV2<MemItem> {
+  MemItemEntityV2(MemItem value) {
+    this.value = value;
+  }
+
+  @override
+  Map<String, Object?> get toMap => {
+        defFkMemItemsMemId.name: value.memId,
+        defColMemItemsType.name: value.type.name,
+        defColMemItemsValue.name: value.value,
+      };
+
+  @override
+  EntityV2<MemItem> updatedWith(MemItem Function(MemItem v) update) =>
+      MemItemEntityV2(update(value));
+
+  EntityV2<MemItem> copiedWith({
+    int Function()? memId,
+    dynamic Function()? value,
+  }) =>
+      updatedWith(
+        (v) => MemItem(
+          memId == null ? v.memId : memId(),
+          v.type,
+          value == null ? v.value : value(),
+        ),
+      );
+
+  factory MemItemEntityV2.fromV1(MemItemEntity v1) => MemItemEntityV2(v1);
+}
+
+class SavedMemItemEntityV2 extends MemItemEntityV2
+    with DatabaseTupleEntityV2<int, MemItem> {
+  SavedMemItemEntityV2(Map<String, dynamic> map)
+      : super(
+          MemItem(
+            map[defFkMemItemsMemId.name],
+            MemItemType.values.firstWhere(
+                (element) => element.name == map[defColMemItemsType.name]),
+            map[defColMemItemsValue.name],
+          ),
+        ) {
+    withMap(map);
+
+  }
+
+  factory SavedMemItemEntityV2.fromV1(SavedMemItemEntity v1) =>
+      SavedMemItemEntityV2(v1.toMap);
+
+  SavedMemItemEntity toV1() => SavedMemItemEntity.fromMap(toMap);
+}

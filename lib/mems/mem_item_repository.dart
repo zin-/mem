@@ -116,3 +116,12 @@ class MemItemRepository
         },
       );
 }
+
+class MemItemRepositoryV2
+    extends DatabaseTupleRepositoryV2<MemItemEntityV2, SavedMemItemEntityV2> {
+  MemItemRepositoryV2() : super(databaseDefinition, defTableMemItems);
+
+  @override
+  SavedMemItemEntityV2 pack(Map<String, dynamic> map) =>
+      SavedMemItemEntityV2(map);
+}

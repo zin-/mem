@@ -11,7 +11,8 @@ import 'package:mem/mems/mem_repository.dart';
 
 class MemService {
   final MemRepositoryV2 _memRepository;
-  final MemItemRepository _memItemRepository;
+  final MemItemRepository _memItemRepositoryV1;
+  final MemItemRepositoryV2 _memItemRepository;
   final MemNotificationRepository _memNotificationRepository;
 
   Future<MemDetail> save(
@@ -27,14 +28,20 @@ class MemService {
               : await _memRepository.receive(mem));
 
           final savedMemItems = await Future.wait(
-            memDetail.memItems.map((e) => (e is SavedMemItemEntity && !undo
-                ? _memItemRepository.replace(
-                    e.copiedWith(memId: () => savedMem.id)
-                        as SavedMemItemEntity,
-                  )
-                : _memItemRepository.receive(
-                    e.copiedWith(memId: () => savedMem.id),
-                  ))),
+            memDetail.memItems.map(
+              (e) => (e is SavedMemItemEntity && !undo
+                  ? _memItemRepository.replace(
+                      SavedMemItemEntityV2.fromV1(
+                        e.copiedWith(memId: () => savedMem.id)
+                            as SavedMemItemEntity,
+                      ),
+                    )
+                  : _memItemRepository.receive(
+                      MemItemEntityV2.fromV1(
+                        e.copiedWith(memId: () => savedMem.id),
+                      ),
+                    )),
+            ),
           );
 
           final memNotifications = memDetail.notifications;
@@ -86,7 +93,7 @@ class MemService {
 
           return MemDetail(
             savedMem,
-            savedMemItems,
+            savedMemItems.map((e) => e.toV1()).toList(),
             returnMemNotifications
                 .whereType<SavedMemNotificationEntity>()
                 .toList(),
@@ -140,7 +147,7 @@ class MemService {
         () async {
           final archivedMem = await _memRepository.archive(mem);
           final archivedMemItems =
-              await _memItemRepository.archiveBy(memId: archivedMem.id);
+              await _memItemRepositoryV1.archiveBy(memId: archivedMem.id);
           final archivedMemNotifications =
               await _memNotificationRepository.archiveBy(memId: archivedMem.id);
 
@@ -159,7 +166,7 @@ class MemService {
         () async {
           final unarchivedMem = await _memRepository.unarchive(mem);
           final unarchivedMemItems =
-              await _memItemRepository.unarchiveBy(memId: unarchivedMem.id);
+              await _memItemRepositoryV1.unarchiveBy(memId: unarchivedMem.id);
           final unarchivedMemNotifications = await _memNotificationRepository
               .unarchiveBy(memId: unarchivedMem.id);
 
@@ -176,7 +183,7 @@ class MemService {
         () async {
           // TODO https://github.com/zin-/mem/issues/284
           await _memNotificationRepository.waste(memId: memId);
-          await _memItemRepository.waste(memId: memId);
+          await _memItemRepositoryV1.waste(memId: memId);
           await _memRepository.waste(id: memId);
 
           return true;
@@ -186,6 +193,7 @@ class MemService {
 
   MemService._(
     this._memRepository,
+    this._memItemRepositoryV1,
     this._memItemRepository,
     this._memNotificationRepository,
   );
@@ -196,6 +204,7 @@ class MemService {
         () => _instance ??= MemService._(
           MemRepositoryV2(),
           MemItemRepository(),
+          MemItemRepositoryV2(),
           MemNotificationRepository(),
         ),
       );
