@@ -11,7 +11,7 @@ import 'package:mem/framework/view/async_value_view.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_entity.dart';
-import 'package:mem/mems/mem_notification.dart';
+import 'package:mem/mems/mem_notification_entity.dart';
 import 'package:mem/mems/states.dart';
 import 'package:mem/mems/transitions.dart';
 import 'package:mem/settings/preference/keys.dart';
@@ -49,7 +49,7 @@ class _MemListWidget extends StatelessWidget {
   final ScrollController _scrollController;
   final List<SavedMemEntityV2> _memList;
   final TimeOfDay _startOfDay;
-  final Iterable<MemNotification> _memNotifications;
+  final Iterable<MemNotificationEntityV2> _memNotifications;
   final Iterable<Act> _latestActsByMem;
   final void Function(int memId) _onItemTapped;
 
@@ -105,10 +105,14 @@ class _MemListWidget extends StatelessWidget {
                     (element) {
                       final nextNotifyAt = element.value.notifyAt(
                         startOfToday,
-                        _memNotifications.where(
-                          (memNotification) =>
-                              memNotification.memId == element.id,
-                        ),
+                        _memNotifications
+                            .where(
+                              (memNotification) =>
+                                  memNotification.value.memId == element.id,
+                            )
+                            .map(
+                              (e) => e.value,
+                            ),
                         _latestActsByMem.singleWhereOrNull(
                           (act) => act.memId == element.id,
                         ),

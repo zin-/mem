@@ -12,7 +12,7 @@ import 'package:mem/mems/mem_repository.dart';
 class MemService {
   final MemRepositoryV2 _memRepository;
   final MemItemRepositoryV2 _memItemRepository;
-  final MemNotificationRepository _memNotificationRepository;
+  final MemNotificationRepositoryV2 _memNotificationRepository;
 
   Future<MemDetail> save(
     MemDetail memDetail, {
@@ -41,28 +41,28 @@ class MemService {
 
           final memNotifications = memDetail.notifications;
           final returnMemNotifications =
-              List<SavedMemNotificationEntity?>.empty(growable: true);
+              List<SavedMemNotificationEntityV2?>.empty(growable: true);
           if (memNotifications == null) {
             await _memNotificationRepository.waste(memId: savedMem.id);
           } else {
             returnMemNotifications.addAll(await Future.wait(memNotifications
-                .where((e) => !e.isRepeatByDayOfWeek())
+                .where((e) => !e.value.isRepeatByDayOfWeek())
                 .map((e) {
-              if (e.isEnabled()) {
-                return (e is SavedMemNotificationEntity && !undo
-                    ? _memNotificationRepository.replace((e).copiedWith(
-                        memId: () => savedMem.id,
+              if (e.value.isEnabled()) {
+                return (e is SavedMemNotificationEntityV2 && !undo
+                    ? _memNotificationRepository.replace(e.updatedWith(
+                        (v) => MemNotification(
+                            savedMem.id, v.type, v.time, v.message),
                       ))
-                    : _memNotificationRepository.receive(
-                        (e as MemNotificationEntity).copiedWith(
-                          memId: () => savedMem.id,
-                        ),
-                      ));
+                    : _memNotificationRepository.receive(e.updatedWith(
+                        (v) => MemNotification(
+                            savedMem.id, v.type, v.time, v.message),
+                      )));
               } else {
                 return _memNotificationRepository
                     .waste(
                       memId: savedMem.id,
-                      type: e.type,
+                      type: e.value.type,
                     )
                     .then((v) => null);
               }
@@ -73,13 +73,18 @@ class MemService {
               type: MemNotificationType.repeatByDayOfWeek,
             );
             for (var entry in memNotifications
-                .where((e) => e.isRepeatByDayOfWeek())
-                .groupListsBy((e) => e.time)
+                .where((e) => e.value.isRepeatByDayOfWeek())
+                .groupListsBy((e) => e.value.time)
                 .entries) {
               returnMemNotifications.add(
                 await _memNotificationRepository.receive(
-                  (entry.value.first as MemNotificationEntity).copiedWith(
-                    memId: () => savedMem.id,
+                  entry.value.single.updatedWith(
+                    (v) => MemNotification(
+                      savedMem.id,
+                      v.type,
+                      v.time,
+                      v.message,
+                    ),
                   ),
                 ),
               );
@@ -89,9 +94,7 @@ class MemService {
           return MemDetail(
             savedMem,
             savedMemItems,
-            returnMemNotifications
-                .whereType<SavedMemNotificationEntity>()
-                .toList(),
+            returnMemNotifications.nonNulls.toList(growable: false),
           );
         },
         {
@@ -149,11 +152,11 @@ class MemService {
           return MemDetail(
             archivedMem,
             archivedMemItems.toList(growable: false),
-            archivedMemNotifications.toList(),
+            archivedMemNotifications.toList(growable: false),
           );
         },
         {
-          "mem": mem,
+          'mem': mem,
         },
       );
 
@@ -171,7 +174,9 @@ class MemService {
             unarchivedMemNotifications.toList(growable: false),
           );
         },
-        mem,
+        {
+          'mem': mem,
+        },
       );
 
   Future<bool> remove(int memId) => v(
@@ -183,7 +188,9 @@ class MemService {
 
           return true;
         },
-        {'memId': memId},
+        {
+          'memId': memId,
+        },
       );
 
   MemService._(
@@ -198,7 +205,7 @@ class MemService {
         () => _instance ??= MemService._(
           MemRepositoryV2(),
           MemItemRepositoryV2(),
-          MemNotificationRepository(),
+          MemNotificationRepositoryV2(),
         ),
       );
 }

@@ -22,7 +22,7 @@ class MemListItemSubtitle extends ConsumerWidget {
           ref.watch(memByMemIdProvider(_memId))?.value.period,
           ref.watch(
             memNotificationsByMemIdProvider(_memId).select(
-              (v) => v.whereType<SavedMemNotificationEntity>(),
+              (v) => v.whereType<SavedMemNotificationEntityV2>(),
             ),
           ),
         ),
@@ -35,12 +35,12 @@ class MemListItemSubtitle extends ConsumerWidget {
 class _MemListItemSubtitle extends StatelessWidget {
   final int _memId;
   final DateAndTimePeriod? _memPeriod;
-  final Iterable<MemNotification> _savedMemNotifications;
+  final Iterable<SavedMemNotificationEntityV2> _savedMemNotificationEntities;
 
   const _MemListItemSubtitle(
     this._memId,
     this._memPeriod,
-    this._savedMemNotifications,
+    this._savedMemNotificationEntities,
   );
 
   @override
@@ -49,7 +49,7 @@ class _MemListItemSubtitle extends StatelessWidget {
           final l10n = buildL10n(context);
 
           final memNotificationOneLine = MemNotification.toOneLine(
-            _savedMemNotifications,
+            _savedMemNotificationEntities.map((e) => e.value),
             l10n.repeatedNotificationText,
             l10n.repeatEveryNDayNotificationText,
             l10n.afterActStartedNotificationText,
@@ -66,7 +66,7 @@ class _MemListItemSubtitle extends StatelessWidget {
         },
         {
           '_memPeriod': _memPeriod,
-          '_savedMemNotifications': _savedMemNotifications,
+          '_savedMemNotificationEntities': _savedMemNotificationEntities,
         },
       );
 }

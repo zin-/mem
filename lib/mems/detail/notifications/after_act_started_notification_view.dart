@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/framework/date_and_time/time_text_form_field.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
-import 'package:mem/mems/mem_notification_entity.dart';
+import 'package:mem/mems/mem_notification.dart';
 
 const keyMemAfterActStartedNotification =
     Key("mem-after-act-started-notification");
@@ -16,41 +16,46 @@ class AfterActStartedNotificationView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
-          final time = ref.watch(
-              memAfterActStartedNotificationByMemIdProvider(_memId)
-                  .select((value) => value.time));
-          final message = ref.watch(
-              memAfterActStartedNotificationByMemIdProvider(_memId)
-                  .select((value) => value.message));
-
           final notification =
               ref.watch(memAfterActStartedNotificationByMemIdProvider(_memId));
 
           return _AfterActStartedNotificationView(
-            time,
-            message,
+            notification.value.time,
+            notification.value.message,
             onTimeChanged: (picked) => ref
                 .read(memNotificationsByMemIdProvider(_memId).notifier)
                 .upsertAll(
               [
-                (notification as MemNotificationEntity)
-                    .copiedWith(time: () => picked)
+                notification.updatedWith(
+                  (v) => MemNotification(
+                    v.memId,
+                    v.type,
+                    picked,
+                    v.message,
+                  ),
+                ),
               ],
-              (current, updating) => current.type == updating.type,
+              (current, updating) => current.value.type == updating.value.type,
             ),
             onMessageChanged: (value) => ref
                 .read(memNotificationsByMemIdProvider(_memId).notifier)
                 .upsertAll(
               [
-                (notification as MemNotificationEntity)
-                    .copiedWith(message: () => value)
+                notification.updatedWith(
+                  (v) => MemNotification(
+                    v.memId,
+                    v.type,
+                    v.time,
+                    value,
+                  ),
+                ),
               ],
-              (current, updating) => current.type == updating.type,
+              (current, updating) => current.value.type == updating.value.type,
             ),
           );
         },
         {
-          "_memId": _memId,
+          '_memId': _memId,
         },
       );
 }
@@ -101,8 +106,8 @@ class _AfterActStartedNotificationView extends StatelessWidget {
           ],
         ),
         {
-          "_time": _time,
-          "_message": _message,
+          '_time': _time,
+          '_message': _message,
         },
       );
 }

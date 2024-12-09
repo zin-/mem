@@ -105,7 +105,7 @@ void main() => group(
         );
 
         testWidgets(
-          ': save.',
+          'Save.',
           (widgetTester) async {
             widgetTester.ignoreMockMethodCallHandler(
                 MethodChannelMock.flutterLocalNotifications);
