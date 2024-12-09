@@ -35,7 +35,7 @@ final saveMem =
                       current.value.type == updating.value.type,
                 );
             ref.read(memNotificationsProvider.notifier).upsertAll(
-                  saved.notifications ?? [],
+                  saved.notifications?.map((e) => e.toV1()) ?? [],
                   (tmp, item) =>
                       tmp is SavedMemNotificationEntity &&
                       item is SavedMemNotificationEntity &&

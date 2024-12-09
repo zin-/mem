@@ -46,23 +46,23 @@ class MemService {
             await _memNotificationRepository.waste(memId: savedMem.id);
           } else {
             returnMemNotifications.addAll(await Future.wait(memNotifications
-                .where((e) => !e.isRepeatByDayOfWeek())
+                .where((e) => !e.value.isRepeatByDayOfWeek())
                 .map((e) {
-              if (e.isEnabled()) {
-                return (e is SavedMemNotificationEntity && !undo
-                    ? _memNotificationRepository.replace((e).copiedWith(
-                        memId: () => savedMem.id,
-                      ))
-                    : _memNotificationRepository.receive(
-                        (e as MemNotificationEntity).copiedWith(
+              if (e.value.isEnabled()) {
+                return (e is SavedMemNotificationEntityV2 && !undo
+                    ? _memNotificationRepository.replace(e.toV1().copiedWith(
                           memId: () => savedMem.id,
-                        ),
+                        ))
+                    : _memNotificationRepository.receive(
+                        e.toV1().copiedWith(
+                              memId: () => savedMem.id,
+                            ),
                       ));
               } else {
                 return _memNotificationRepository
                     .waste(
                       memId: savedMem.id,
-                      type: e.type,
+                      type: e.value.type,
                     )
                     .then((v) => null);
               }
@@ -73,14 +73,14 @@ class MemService {
               type: MemNotificationType.repeatByDayOfWeek,
             );
             for (var entry in memNotifications
-                .where((e) => e.isRepeatByDayOfWeek())
-                .groupListsBy((e) => e.time)
+                .where((e) => e.value.isRepeatByDayOfWeek())
+                .groupListsBy((e) => e.value.time)
                 .entries) {
               returnMemNotifications.add(
                 await _memNotificationRepository.receive(
-                  (entry.value.first as MemNotificationEntity).copiedWith(
-                    memId: () => savedMem.id,
-                  ),
+                  entry.value.single.toV1().copiedWith(
+                        memId: () => savedMem.id,
+                      ),
                 ),
               );
             }
@@ -91,6 +91,7 @@ class MemService {
             savedMemItems,
             returnMemNotifications
                 .whereType<SavedMemNotificationEntity>()
+                .map((e) => MemNotificationEntityV2.fromV1(e))
                 .toList(),
           );
         },
@@ -149,7 +150,9 @@ class MemService {
           return MemDetail(
             archivedMem,
             archivedMemItems.toList(growable: false),
-            archivedMemNotifications.toList(),
+            archivedMemNotifications
+                .map((e) => MemNotificationEntityV2.fromV1(e))
+                .toList(),
           );
         },
         {
@@ -168,7 +171,9 @@ class MemService {
           return MemDetail(
             unarchivedMem,
             unarchivedMemItems.toList(growable: false),
-            unarchivedMemNotifications.toList(growable: false),
+            unarchivedMemNotifications
+                .map((e) => MemNotificationEntityV2.fromV1(e))
+                .toList(growable: false),
           );
         },
         mem,

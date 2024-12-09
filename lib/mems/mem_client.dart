@@ -23,15 +23,18 @@ class MemClient {
             MemDetail(
               mem,
               memItemList,
-              memNotificationList,
+              memNotificationList
+                  .map((e) => MemNotificationEntityV2.fromV1(e))
+                  .toList(),
             ),
           );
 
           _notificationClient.registerMemNotifications(
             (saved.mem as SavedMemEntityV2).id,
             savedMem: saved.mem as SavedMemEntityV2,
-            savedMemNotifications:
-                saved.notifications?.whereType<SavedMemNotificationEntity>(),
+            savedMemNotifications: saved.notifications
+                ?.whereType<SavedMemNotificationEntityV2>()
+                .map((e) => e.toV1()),
           );
 
           return saved;
