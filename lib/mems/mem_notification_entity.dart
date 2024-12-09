@@ -124,4 +124,8 @@ class SavedMemNotificationEntityV2 extends MemNotificationEntityV2
   @override
   SavedMemNotificationEntity toV1() =>
       SavedMemNotificationEntity.fromMap(toMap);
+
+  factory SavedMemNotificationEntityV2.fromV1(SavedMemNotificationEntity v1) {
+    return SavedMemNotificationEntityV2(v1.toMap);
+  }
 }

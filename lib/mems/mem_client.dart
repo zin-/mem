@@ -32,9 +32,8 @@ class MemClient {
           _notificationClient.registerMemNotifications(
             (saved.mem as SavedMemEntityV2).id,
             savedMem: saved.mem as SavedMemEntityV2,
-            savedMemNotifications: saved.notifications
-                ?.whereType<SavedMemNotificationEntityV2>()
-                .map((e) => e.toV1()),
+            savedMemNotifications:
+                saved.notifications?.whereType<SavedMemNotificationEntityV2>(),
           );
 
           return saved;
@@ -68,7 +67,7 @@ class MemClient {
             (unarchived.mem as SavedMemEntityV2).id,
             savedMem: unarchived.mem as SavedMemEntityV2,
             savedMemNotifications: unarchived.notifications
-                ?.whereType<SavedMemNotificationEntity>(),
+                ?.whereType<SavedMemNotificationEntityV2>(),
           );
 
           return unarchived;
