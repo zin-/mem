@@ -163,7 +163,7 @@ class NotificationClient {
               MemNotifications.periodicScheduleOf(
                 mem,
                 startOfDay,
-                savedMemNotifications?.map((e) => e.toV1()) ??
+                savedMemNotifications?.map((e) => e.value) ??
                     await _memNotificationRepository.ship(memId: memId),
                 latestAct,
                 DateTime.now(),
