@@ -41,7 +41,7 @@ class MemService {
 
           final memNotifications = memDetail.notifications;
           final returnMemNotifications =
-              List<SavedMemNotificationEntity?>.empty(growable: true);
+              List<SavedMemNotificationEntityV2?>.empty(growable: true);
           if (memNotifications == null) {
             await _memNotificationRepository.waste(memId: savedMem.id);
           } else {
@@ -50,14 +50,18 @@ class MemService {
                 .map((e) {
               if (e.value.isEnabled()) {
                 return (e is SavedMemNotificationEntityV2 && !undo
-                    ? _memNotificationRepository.replace(e.toV1().copiedWith(
-                          memId: () => savedMem.id,
-                        ))
-                    : _memNotificationRepository.receive(
-                        e.toV1().copiedWith(
-                              memId: () => savedMem.id,
-                            ),
-                      ));
+                        ? _memNotificationRepository
+                            .replace(e.toV1().copiedWith(
+                                  memId: () => savedMem.id,
+                                ))
+                        : _memNotificationRepository.receive(
+                            e.toV1().copiedWith(
+                                  memId: () => savedMem.id,
+                                ),
+                          ))
+                    .then(
+                  (v) => SavedMemNotificationEntityV2.fromV1(v),
+                );
               } else {
                 return _memNotificationRepository
                     .waste(
@@ -77,11 +81,13 @@ class MemService {
                 .groupListsBy((e) => e.value.time)
                 .entries) {
               returnMemNotifications.add(
-                await _memNotificationRepository.receive(
-                  entry.value.single.toV1().copiedWith(
-                        memId: () => savedMem.id,
-                      ),
-                ),
+                await _memNotificationRepository
+                    .receive(
+                      entry.value.single.toV1().copiedWith(
+                            memId: () => savedMem.id,
+                          ),
+                    )
+                    .then((v) => SavedMemNotificationEntityV2.fromV1(v)),
               );
             }
           }
@@ -89,10 +95,7 @@ class MemService {
           return MemDetail(
             savedMem,
             savedMemItems,
-            returnMemNotifications
-                .whereType<SavedMemNotificationEntity>()
-                .map((e) => MemNotificationEntityV2.fromV1(e))
-                .toList(),
+            returnMemNotifications.nonNulls.toList(growable: false),
           );
         },
         {
