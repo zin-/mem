@@ -27,26 +27,26 @@ final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
 );
 
 final memItemsByMemIdProvider = StateNotifierProvider.family<
-    ListValueStateNotifier<MemItemEntity>, List<MemItemEntity>, int?>(
+    ListValueStateNotifier<MemItemEntityV2>, List<MemItemEntityV2>, int?>(
   (ref, memId) => v(
     () => ListValueStateNotifier(
       [
         ref.watch(
               memItemsProvider.select(
                 (value) => value.singleWhereOrNull(
-                  (element) => element.memId == memId,
+                  (element) => element.value.memId == memId,
                 ),
               ),
             ) ??
-            MemItemEntity(memId, MemItemType.memo, "")
+            MemItemEntityV2(MemItem(memId, MemItemType.memo, ""))
       ],
       initializer: (current, notifier) async {
         if (memId != null) {
           ref.read(memItemsProvider.notifier).upsertAll(
-                await MemItemRepository().ship(memId: memId),
+                await MemItemRepositoryV2().ship(memId: memId),
                 (current, updating) =>
-                    current is SavedMemItemEntity &&
-                    updating is SavedMemItemEntity &&
+                    current is SavedMemItemEntityV2 &&
+                    updating is SavedMemItemEntityV2 &&
                     current.id == updating.id,
               );
         }

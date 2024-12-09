@@ -74,3 +74,58 @@ class SavedMemNotificationEntity extends MemNotificationEntity
           ),
       );
 }
+
+class MemNotificationEntityV2 with EntityV2<MemNotification> {
+  MemNotificationEntityV2(MemNotification value) {
+    this.value = value;
+  }
+
+  @override
+  Map<String, Object?> get toMap => {
+        defFkMemNotificationsMemId.name: value.memId,
+        defColMemNotificationsType.name: value.type.name,
+        defColMemNotificationsTime.name: value.time,
+        defColMemNotificationsMessage.name: value.message,
+      };
+
+  @override
+  EntityV2<MemNotification> updatedWith(
+      MemNotification Function(MemNotification v) update) {
+    // TODO: implement updatedWith
+    throw UnimplementedError();
+  }
+
+  factory MemNotificationEntityV2.fromV1(MemNotification v1) {
+    if (v1 is SavedMemNotificationEntity) {
+      return SavedMemNotificationEntityV2(v1.toMap);
+    } else {
+      return MemNotificationEntityV2(v1);
+    }
+  }
+
+  MemNotificationEntity toV1() =>
+      MemNotificationEntity(value.memId, value.type, value.time, value.message);
+}
+
+class SavedMemNotificationEntityV2 extends MemNotificationEntityV2
+    with DatabaseTupleEntityV2<int, MemNotification> {
+  SavedMemNotificationEntityV2(Map<String, dynamic> map)
+      : super(
+          MemNotification(
+            map[defFkMemNotificationsMemId.name],
+            MemNotificationType.fromName(map[defColMemNotificationsType.name]),
+            map[defColMemNotificationsTime.name],
+            map[defColMemNotificationsMessage.name],
+          ),
+        ) {
+    withMap(map);
+  }
+
+  @override
+  SavedMemNotificationEntity toV1() =>
+      SavedMemNotificationEntity.fromMap(toMap);
+
+  factory SavedMemNotificationEntityV2.fromV1(SavedMemNotificationEntity v1) {
+    return SavedMemNotificationEntityV2(v1.toMap);
+  }
+}

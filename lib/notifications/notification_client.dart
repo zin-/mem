@@ -131,7 +131,7 @@ class NotificationClient {
   Future<void> registerMemNotifications(
     int memId, {
     SavedMemEntityV2? savedMem,
-    Iterable<SavedMemNotificationEntity>? savedMemNotifications,
+    Iterable<SavedMemNotificationEntityV2>? savedMemNotifications,
   }) =>
       v(
         () async {
@@ -163,7 +163,7 @@ class NotificationClient {
               MemNotifications.periodicScheduleOf(
                 mem,
                 startOfDay,
-                savedMemNotifications ??
+                savedMemNotifications?.map((e) => e.value) ??
                     await _memNotificationRepository.ship(memId: memId),
                 latestAct,
                 DateTime.now(),
@@ -220,7 +220,8 @@ class NotificationClient {
 
           await registerMemNotifications(
             memId,
-            savedMemNotifications: memNotifications,
+            savedMemNotifications: memNotifications
+                .map((e) => SavedMemNotificationEntityV2.fromV1(e)),
           );
         },
         {

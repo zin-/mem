@@ -36,10 +36,10 @@ final loadMemList = FutureProvider(
           );
       for (var mem in mems) {
         ref.read(memItemsProvider.notifier).upsertAll(
-              await MemItemRepository().ship(memId: mem.id),
+              await MemItemRepositoryV2().ship(memId: mem.id),
               (current, updating) =>
-                  current is SavedMemItemEntity &&
-                  updating is SavedMemItemEntity &&
+                  current is SavedMemItemEntityV2 &&
+                  updating is SavedMemItemEntityV2 &&
                   current.id == updating.id,
             );
       }
