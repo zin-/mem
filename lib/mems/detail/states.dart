@@ -65,11 +65,11 @@ final memRepeatByNDayNotificationByMemIdProvider =
     () => ValueStateNotifier(
       ref.watch(
         memNotificationsByMemIdProvider(memId).select(
-          (value) => MemNotificationEntityV2.fromV1(value
+          (value) => value
               .where(
-                (element) => element.isRepeatByNDay(),
+                (element) => element.value.isRepeatByNDay(),
               )
-              .single),
+              .single,
         ),
       ),
     ),
@@ -86,11 +86,11 @@ final memAfterActStartedNotificationByMemIdProvider =
     () => ValueStateNotifier(
       ref.watch(
         memNotificationsByMemIdProvider(memId).select(
-          (value) => MemNotificationEntityV2.fromV1(value
+          (value) => value
               .where(
-                (element) => element.isAfterActStarted(),
+                (element) => element.value.isAfterActStarted(),
               )
-              .single),
+              .single,
         ),
       ),
     ),
@@ -99,28 +99,33 @@ final memAfterActStartedNotificationByMemIdProvider =
 );
 
 final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
-    .family<ListValueStateNotifier<MemNotification>, List<MemNotification>,
-        int?>(
+    .family<ListValueStateNotifier<MemNotificationEntityV2>,
+        List<MemNotificationEntityV2>, int?>(
   (ref, memId) => v(
     () {
-      final memNotificationsByMemId = ref.watch(memNotificationsProvider.select(
-          (memNotifications) => memNotifications
-              .where((memNotification) => memNotification.memId == memId)));
+      final memNotificationsByMemId = ref
+          .watch(memNotificationsProvider.select((memNotifications) =>
+              memNotifications
+                  .where((memNotification) => memNotification.memId == memId)))
+          .map(
+            (e) => MemNotificationEntityV2.fromV1(e),
+          );
 
       return ListValueStateNotifier(
         [
           ...memNotificationsByMemId,
-          if (memNotificationsByMemId.every((element) => !element.isRepeated()))
-            MemNotificationEntity.initialByType(
-                memId, MemNotificationType.repeat),
           if (memNotificationsByMemId
-              .every((element) => !element.isRepeatByNDay()))
-            MemNotificationEntity.initialByType(
-                memId, MemNotificationType.repeatByNDay),
+              .every((element) => !element.value.isRepeated()))
+            MemNotificationEntityV2(MemNotification.initialByType(
+                memId, MemNotificationType.repeat)),
           if (memNotificationsByMemId
-              .every((element) => !element.isAfterActStarted()))
-            MemNotificationEntity.initialByType(
-                memId, MemNotificationType.afterActStarted),
+              .every((element) => !element.value.isRepeatByNDay()))
+            MemNotificationEntityV2(MemNotification.initialByType(
+                memId, MemNotificationType.repeatByNDay)),
+          if (memNotificationsByMemId
+              .every((element) => !element.value.isAfterActStarted()))
+            MemNotificationEntityV2(MemNotification.initialByType(
+                memId, MemNotificationType.afterActStarted)),
         ],
         initializer: (current, notifier) => v(
           () async {

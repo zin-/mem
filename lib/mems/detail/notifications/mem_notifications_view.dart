@@ -22,7 +22,9 @@ class MemNotificationsView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemNotificationsView(
           _memId,
-          ref.watch(memNotificationsByMemIdProvider(_memId)),
+          ref
+              .watch(memNotificationsByMemIdProvider(_memId))
+              .map((e) => e.value),
         ),
         {
           '_memId': _memId,

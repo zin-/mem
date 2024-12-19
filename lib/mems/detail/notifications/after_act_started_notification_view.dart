@@ -26,35 +26,31 @@ class AfterActStartedNotificationView extends ConsumerWidget {
                 .read(memNotificationsByMemIdProvider(_memId).notifier)
                 .upsertAll(
               [
-                notification
-                    .updatedWith(
-                      (v) => MemNotificationEntity(
-                        v.memId,
-                        v.type,
-                        picked,
-                        v.message,
-                      ),
-                    )
-                    .toV1()
+                notification.updatedWith(
+                  (v) => MemNotificationEntity(
+                    v.memId,
+                    v.type,
+                    picked,
+                    v.message,
+                  ),
+                ),
               ],
-              (current, updating) => current.type == updating.type,
+              (current, updating) => current.value.type == updating.value.type,
             ),
             onMessageChanged: (value) => ref
                 .read(memNotificationsByMemIdProvider(_memId).notifier)
                 .upsertAll(
               [
-                notification
-                    .updatedWith(
-                      (v) => MemNotificationEntity(
-                        v.memId,
-                        v.type,
-                        v.time,
-                        value,
-                      ),
-                    )
-                    .toV1(),
+                notification.updatedWith(
+                  (v) => MemNotificationEntity(
+                    v.memId,
+                    v.type,
+                    v.time,
+                    value,
+                  ),
+                ),
               ],
-              (current, updating) => current.type == updating.type,
+              (current, updating) => current.value.type == updating.value.type,
             ),
           );
         },

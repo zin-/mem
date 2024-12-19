@@ -37,9 +37,9 @@ class MemRepeatByNDayNotificationView extends ConsumerWidget {
                           v.message,
                         ),
                       )
-                      .toV1(),
                 ],
-                (current, updating) => current.type == updating.type,
+                (current, updating) => current.value.type == updating.value
+                    .type,
               );
             },
           );
