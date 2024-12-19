@@ -15,7 +15,10 @@ final saveMem =
             final saved = await _memClient.save(
               ref.read(editingMemByMemIdProvider(memId)),
               ref.read(memItemsByMemIdProvider(memId)),
-              ref.read(memNotificationsByMemIdProvider(memId)),
+              ref
+                  .read(memNotificationsByMemIdProvider(memId))
+                  .map((e) => e.toV1())
+                  .toList(),
             );
 
             ref.read(memsProvider.notifier).upsertAll(
@@ -31,11 +34,11 @@ final saveMem =
             ref.read(memItemsProvider.notifier).upsertAll(
                   saved.memItems,
                   (current, updating) =>
-                      current.memId == updating.memId &&
-                      current.type == updating.type,
+                      current.value.memId == updating.value.memId &&
+                      current.value.type == updating.value.type,
                 );
             ref.read(memNotificationsProvider.notifier).upsertAll(
-                  saved.notifications ?? [],
+                  saved.notifications?.map((e) => e.toV1()) ?? [],
                   (tmp, item) =>
                       tmp is SavedMemNotificationEntity &&
                       item is SavedMemNotificationEntity &&

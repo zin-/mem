@@ -14,7 +14,7 @@ class MemClient {
 
   Future<MemDetail> save(
     MemEntityV2 mem,
-    List<MemItemEntity> memItemList,
+    List<MemItemEntityV2> memItemList,
     List<MemNotification> memNotificationList,
   ) =>
       v(
@@ -23,7 +23,9 @@ class MemClient {
             MemDetail(
               mem,
               memItemList,
-              memNotificationList,
+              memNotificationList
+                  .map((e) => MemNotificationEntityV2.fromV1(e))
+                  .toList(),
             ),
           );
 
@@ -31,7 +33,7 @@ class MemClient {
             (saved.mem as SavedMemEntityV2).id,
             savedMem: saved.mem as SavedMemEntityV2,
             savedMemNotifications:
-                saved.notifications?.whereType<SavedMemNotificationEntity>(),
+                saved.notifications?.whereType<SavedMemNotificationEntityV2>(),
           );
 
           return saved;
@@ -65,7 +67,7 @@ class MemClient {
             (unarchived.mem as SavedMemEntityV2).id,
             savedMem: unarchived.mem as SavedMemEntityV2,
             savedMemNotifications: unarchived.notifications
-                ?.whereType<SavedMemNotificationEntity>(),
+                ?.whereType<SavedMemNotificationEntityV2>(),
           );
 
           return unarchived;

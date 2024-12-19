@@ -28,7 +28,7 @@ class MemDetailBody extends ConsumerWidget {
             (value) => ref
                 .read(editingMemByMemIdProvider(_memId).notifier)
                 .updatedBy(
-                  editingMem.updateWith(
+                  editingMem.updatedWith(
                     (mem) =>
                         value == true ? mem.done(DateTime.now()) : mem.undone(),
                   ),

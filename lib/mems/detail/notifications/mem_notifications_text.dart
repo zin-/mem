@@ -17,9 +17,11 @@ class MemNotificationText extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemNotificationText(
-          ref.watch(
-            memNotificationsByMemIdProvider(_memId),
-          ),
+          ref
+              .watch(
+                memNotificationsByMemIdProvider(_memId),
+              )
+              .map((e) => e.value),
         ),
         {
           '_memId': _memId,

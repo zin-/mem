@@ -118,9 +118,9 @@ final memListProvider = StateNotifierProvider.autoDispose<
         }
 
         final memNotificationsOfA =
-            savedMemNotifications.where((e) => e.memId == a.id);
+            savedMemNotifications.where((e) => e.value.memId == a.id);
         final memNotificationsOfB =
-            savedMemNotifications.where((e) => e.memId == b.id);
+            savedMemNotifications.where((e) => e.value.memId == b.id);
 
         final TimeOfDay startOfDay =
             ref.watch(preferencesProvider).value?[startOfDayKey] ??
@@ -136,12 +136,12 @@ final memListProvider = StateNotifierProvider.autoDispose<
 
         final timeOfThis = a.value.notifyAt(
           startOfToday,
-          memNotificationsOfA,
+          memNotificationsOfA.map((e) => e.toV1()),
           latestActOfA,
         );
         final timeOfOther = b.value.notifyAt(
           startOfToday,
-          memNotificationsOfB,
+          memNotificationsOfB.map((e) => e.toV1()),
           latestActOfB,
         );
 
@@ -155,10 +155,12 @@ final memListProvider = StateNotifierProvider.autoDispose<
           }
         }
 
-        final thisHasAfterActStarted =
-            memNotificationsOfA.where((e) => e.isAfterActStarted()).isNotEmpty;
-        final otherHasAfterActStarted =
-            memNotificationsOfB.where((e) => e.isAfterActStarted()).isNotEmpty;
+        final thisHasAfterActStarted = memNotificationsOfA
+            .where((e) => e.value.isAfterActStarted())
+            .isNotEmpty;
+        final otherHasAfterActStarted = memNotificationsOfB
+            .where((e) => e.value.isAfterActStarted())
+            .isNotEmpty;
         if (thisHasAfterActStarted != otherHasAfterActStarted) {
           return thisHasAfterActStarted ? -1 : 1;
         }
@@ -212,14 +214,17 @@ final latestActsByMemProvider =
   ),
 );
 final savedMemNotificationsProvider = StateNotifierProvider.autoDispose<
-    ListValueStateNotifier<SavedMemNotificationEntity>,
-    List<SavedMemNotificationEntity>>(
+    ListValueStateNotifier<SavedMemNotificationEntityV2>,
+    List<SavedMemNotificationEntityV2>>(
   (ref) => v(
     () => ListValueStateNotifier(
-      ref.watch(
-        memNotificationsProvider.select(
-            (value) => value.whereType<SavedMemNotificationEntity>().toList()),
-      ),
+      ref
+          .watch(
+            memNotificationsProvider.select((value) =>
+                value.whereType<SavedMemNotificationEntity>().toList()),
+          )
+          .map((e) => SavedMemNotificationEntityV2.fromV1(e))
+          .toList(),
       initializer: (current, notifier) => v(
         () async {
           if (current.isEmpty) {
@@ -228,12 +233,13 @@ final savedMemNotificationsProvider = StateNotifierProvider.autoDispose<
                 .whereType<SavedMemEntityV2>()
                 .map((e) => e.id);
 
-            final actsByMemIds = await MemNotificationRepository().ship(
+            final memNotificationsByMemIds =
+                await MemNotificationRepository().ship(
               memIdsIn: memIds,
             );
 
             ref.read(memNotificationsProvider.notifier).upsertAll(
-                  actsByMemIds,
+                  memNotificationsByMemIds,
                   (current, updating) =>
                       current is SavedMemNotificationEntity &&
                       updating is SavedMemNotificationEntity &&
