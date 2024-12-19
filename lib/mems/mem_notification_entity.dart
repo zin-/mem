@@ -89,11 +89,9 @@ class MemNotificationEntityV2 with EntityV2<MemNotification> {
       };
 
   @override
-  EntityV2<MemNotification> updatedWith(
-      MemNotification Function(MemNotification v) update) {
-    // TODO: implement updatedWith
-    throw UnimplementedError();
-  }
+  MemNotificationEntityV2 updatedWith(
+          MemNotification Function(MemNotification v) update) =>
+      MemNotificationEntityV2(update(value));
 
   factory MemNotificationEntityV2.fromV1(MemNotification v1) {
     if (v1 is SavedMemNotificationEntity) {

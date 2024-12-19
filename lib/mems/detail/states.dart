@@ -56,18 +56,20 @@ final memItemsByMemIdProvider = StateNotifierProvider.family<
   ),
 );
 
-final memRepeatByNDayNotificationByMemIdProvider = StateNotifierProvider
-    .autoDispose
-    .family<ValueStateNotifier<MemNotification>, MemNotification, int?>(
+final memRepeatByNDayNotificationByMemIdProvider =
+    StateNotifierProvider.autoDispose.family<
+        ValueStateNotifier<MemNotificationEntityV2>,
+        MemNotificationEntityV2,
+        int?>(
   (ref, memId) => v(
     () => ValueStateNotifier(
       ref.watch(
         memNotificationsByMemIdProvider(memId).select(
-          (value) => value
+          (value) => MemNotificationEntityV2.fromV1(value
               .where(
                 (element) => element.isRepeatByNDay(),
               )
-              .single,
+              .single),
         ),
       ),
     ),
