@@ -16,25 +16,26 @@ class AfterActStartedNotificationView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
-          final time = ref.watch(
-              memAfterActStartedNotificationByMemIdProvider(_memId)
-                  .select((value) => value.time));
-          final message = ref.watch(
-              memAfterActStartedNotificationByMemIdProvider(_memId)
-                  .select((value) => value.message));
-
           final notification =
               ref.read(memAfterActStartedNotificationByMemIdProvider(_memId));
 
           return _AfterActStartedNotificationView(
-            time,
-            message,
+            notification.value.time,
+            notification.value.message,
             onTimeChanged: (picked) => ref
                 .read(memNotificationsByMemIdProvider(_memId).notifier)
                 .upsertAll(
               [
-                (notification as MemNotificationEntity)
-                    .copiedWith(time: () => picked)
+                notification
+                    .updatedWith(
+                      (v) => MemNotificationEntity(
+                        v.memId,
+                        v.type,
+                        picked,
+                        v.message,
+                      ),
+                    )
+                    .toV1()
               ],
               (current, updating) => current.type == updating.type,
             ),
@@ -42,15 +43,23 @@ class AfterActStartedNotificationView extends ConsumerWidget {
                 .read(memNotificationsByMemIdProvider(_memId).notifier)
                 .upsertAll(
               [
-                (notification as MemNotificationEntity)
-                    .copiedWith(message: () => value)
+                notification
+                    .updatedWith(
+                      (v) => MemNotificationEntity(
+                        v.memId,
+                        v.type,
+                        v.time,
+                        value,
+                      ),
+                    )
+                    .toV1(),
               ],
               (current, updating) => current.type == updating.type,
             ),
           );
         },
         {
-          "_memId": _memId,
+          '_memId': _memId,
         },
       );
 }
@@ -101,8 +110,8 @@ class _AfterActStartedNotificationView extends StatelessWidget {
           ],
         ),
         {
-          "_time": _time,
-          "_message": _message,
+          '_time': _time,
+          '_message': _message,
         },
       );
 }

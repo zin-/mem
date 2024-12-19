@@ -120,6 +120,12 @@ class SavedMemNotificationEntityV2 extends MemNotificationEntityV2
   }
 
   @override
+  SavedMemNotificationEntityV2 updatedWith(
+          MemNotification Function(MemNotification v) update) =>
+      SavedMemNotificationEntityV2(
+          toMap..addAll(super.updatedWith(update).toMap));
+
+  @override
   SavedMemNotificationEntity toV1() =>
       SavedMemNotificationEntity.fromMap(toMap);
 
