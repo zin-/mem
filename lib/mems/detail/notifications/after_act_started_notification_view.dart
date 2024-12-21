@@ -24,7 +24,7 @@ class AfterActStartedNotificationView extends ConsumerWidget {
                   .select((value) => value.message));
 
           final notification =
-              ref.read(memAfterActStartedNotificationByMemIdProvider(_memId));
+              ref.watch(memAfterActStartedNotificationByMemIdProvider(_memId));
 
           return _AfterActStartedNotificationView(
             time,
