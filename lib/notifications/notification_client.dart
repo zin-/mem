@@ -28,7 +28,7 @@ class NotificationClient {
   final NotificationRepository _notificationRepository;
   final PreferenceClientRepository _preferenceClientRepository;
   final MemRepositoryV2 _memRepository;
-  final MemNotificationRepository _memNotificationRepository;
+  final MemNotificationRepositoryV2 _memNotificationRepository;
 
   NotificationClient._(
     this.notificationChannels,
@@ -48,7 +48,7 @@ class NotificationClient {
           NotificationRepository(),
           PreferenceClientRepository(),
           MemRepositoryV2(),
-          MemNotificationRepository(),
+          MemNotificationRepositoryV2(),
         ),
         {
           'context': context,
@@ -131,7 +131,7 @@ class NotificationClient {
   Future<void> registerMemNotifications(
     int memId, {
     SavedMemEntityV2? savedMem,
-    Iterable<SavedMemNotificationEntity>? savedMemNotifications,
+    Iterable<SavedMemNotificationEntityV2>? savedMemNotifications,
   }) =>
       v(
         () async {
@@ -163,8 +163,9 @@ class NotificationClient {
               MemNotifications.periodicScheduleOf(
                 mem,
                 startOfDay,
-                savedMemNotifications ??
-                    await _memNotificationRepository.ship(memId: memId),
+                (savedMemNotifications ??
+                        await _memNotificationRepository.ship(memId: memId))
+                    .map((e) => e.value),
                 latestAct,
                 DateTime.now(),
               )
@@ -207,12 +208,12 @@ class NotificationClient {
           final now = DateTime.now();
           final memNotifications =
               await _memNotificationRepository.ship(memId: memId);
-          for (var notification in memNotifications.where((element) =>
-              element.isEnabled() && element.isAfterActStarted())) {
+          for (var notification in memNotifications.where(
+              (e) => e.value.isEnabled() && e.value.isAfterActStarted())) {
             await _scheduleClient.receive(
               Schedule.of(
                 memId,
-                now.add(Duration(seconds: notification.time!)),
+                now.add(Duration(seconds: notification.value.time!)),
                 NotificationType.afterActStarted,
               ),
             );
@@ -224,7 +225,7 @@ class NotificationClient {
           );
         },
         {
-          "memId": memId,
+          'memId': memId,
         },
       );
 
@@ -267,13 +268,13 @@ class NotificationClient {
           final savedMemNotifications =
               await _memNotificationRepository.ship(memId: memId);
           final repeatByDayOfWeekMemNotifications = savedMemNotifications.where(
-            (element) => element.isEnabled() && element.isRepeatByDayOfWeek(),
+            (e) => e.value.isEnabled() && e.value.isRepeatByDayOfWeek(),
           );
 
           if (repeatByDayOfWeekMemNotifications.isNotEmpty) {
             final now = DateTime.now();
             if (!repeatByDayOfWeekMemNotifications
-                .map((e) => e.time)
+                .map((e) => e.value.time)
                 .contains(now.weekday)) {
               return false;
             }
@@ -281,7 +282,7 @@ class NotificationClient {
 
           final repeatByNDayMemNotification =
               savedMemNotifications.singleWhereOrNull(
-            (element) => element.isEnabled() && element.isRepeatByNDay(),
+            (e) => e.value.isEnabled() && e.value.isRepeatByNDay(),
           );
           final lastActTime = await ActRepository()
               .ship(memId: memId, latestByMemIds: true)
@@ -294,7 +295,7 @@ class NotificationClient {
                     days:
                         // FIXME 永続化されている時点でtimeは必ずあるので型で表現する
                         //  repeatByNDayMemNotification自体がないのは別の話
-                        repeatByNDayMemNotification?.time! ?? 1) >
+                        repeatByNDayMemNotification?.value.time! ?? 1) >
                 DateTime.now().difference(lastActTime)) {
               return false;
             }

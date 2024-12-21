@@ -44,7 +44,6 @@ class DatabaseRepository extends Repository<DatabaseDefinition> {
 
   Future<void> replace(String name, File backup) => v(
         () async {
-          await DatabaseTupleRepository.close();
           await DatabaseTupleRepositoryV2.close();
 
           final current = (await shipFileByNameIs(name))!;

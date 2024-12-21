@@ -23,16 +23,12 @@ mixin Entity {
       (runtimeType == other.runtimeType && hashCode == other.hashCode);
 }
 
-mixin Copyable<T> on Entity {
-  T copiedWith();
-}
-
 mixin EntityV2<VALUE> {
   late VALUE value;
 
   Map<String, Object?> get toMap;
 
-  EntityV2<VALUE> updatedBy(VALUE value);
+  EntityV2<VALUE> updatedWith(VALUE Function(VALUE v) update);
 
   @override
   String toString() => "${super.toString()}: $toMap";
@@ -47,10 +43,6 @@ mixin EntityV2<VALUE> {
 // bool operator ==(Object other) =>
 //     identical(this, other) ||
 //     (runtimeType == other.runtimeType && hashCode == other.hashCode);
-}
-
-mixin CopyableV2<VALUE> on EntityV2<VALUE> {
-  EntityV2<VALUE> copiedWith();
 }
 
 // memo

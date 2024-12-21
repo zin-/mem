@@ -21,11 +21,14 @@ class MemRepeatByDaysOfWeekNotificationView extends ConsumerWidget {
         () {
           final daysOfWeek =
               ref.watch(memNotificationsByMemIdProvider(_memId).select(
-            (value) => value.where((element) => element.isRepeatByDayOfWeek()),
+            (value) =>
+                value.where((element) => element.value.isRepeatByDayOfWeek()),
           ));
 
           return _MemRepeatByDaysOfWeekNotificationView(
-            daysOfWeek.map((e) => e.time!).sorted((a, b) => a.compareTo(b)),
+            daysOfWeek
+                .map((e) => e.value.time!)
+                .sorted((a, b) => a.compareTo(b)),
             (selected) => v(
               () => ref
                   .read(memNotificationsByMemIdProvider(_memId).notifier)
@@ -33,20 +36,23 @@ class MemRepeatByDaysOfWeekNotificationView extends ConsumerWidget {
                     selected.map(
                       (e) =>
                           daysOfWeek.singleWhereOrNull(
-                              (element) => element.time == e) ??
-                          MemNotificationEntity.initialByType(
-                            _memId,
-                            MemNotificationType.repeatByDayOfWeek,
-                            time: () => e,
+                              (element) => element.value.time == e) ??
+                          MemNotificationEntityV2(
+                            MemNotification.initialByType(
+                              _memId,
+                              MemNotificationType.repeatByDayOfWeek,
+                              time: () => e,
+                            ),
                           ),
                     ),
                     (current, updating) =>
-                        current.type == updating.type &&
-                        current.time == updating.time,
+                        current.value.type == updating.value.type &&
+                        current.value.time == updating.value.time,
                     removeWhere: (current) =>
-                        current.type == MemNotificationType.repeatByDayOfWeek &&
-                        current.memId == _memId &&
-                        !selected.contains(current.time),
+                        current.value.type ==
+                            MemNotificationType.repeatByDayOfWeek &&
+                        current.value.memId == _memId &&
+                        !selected.contains(current.value.time),
                   ),
 // coverage:ignore-start
               {

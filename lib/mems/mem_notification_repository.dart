@@ -1,25 +1,26 @@
-import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
+import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/condition/in.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/framework/repository/condition/conditions.dart';
-import 'package:mem/mems/mem_notification_entity.dart';
 
-class MemNotificationRepository extends DatabaseTupleRepository<
-    MemNotificationEntity, SavedMemNotificationEntity> {
-  MemNotificationRepository()
+import 'mem_notification.dart';
+import 'mem_notification_entity.dart';
+
+class MemNotificationRepositoryV2 extends DatabaseTupleRepositoryV2<
+    MemNotificationEntityV2, SavedMemNotificationEntityV2> {
+  MemNotificationRepositoryV2()
       : super(databaseDefinition, defTableMemNotifications);
 
   @override
-  SavedMemNotificationEntity pack(Map<String, dynamic> map) =>
-      SavedMemNotificationEntity.fromMap(map);
+  SavedMemNotificationEntityV2 pack(Map<String, dynamic> map) =>
+      SavedMemNotificationEntityV2(map);
 
   @override
-  Future<List<SavedMemNotificationEntity>> ship({
+  Future<List<SavedMemNotificationEntityV2>> ship({
     int? memId,
     Iterable<int>? memIdsIn,
     Condition? condition,
@@ -28,33 +29,21 @@ class MemNotificationRepository extends DatabaseTupleRepository<
     int? offset,
     int? limit,
   }) =>
-      v(
-        () => super.ship(
-          condition: And(
-            [
-              if (memId != null) Equals(defFkMemNotificationsMemId, memId),
-              if (memIdsIn != null)
-                In(defFkMemNotificationsMemId.name, memIdsIn),
-              if (condition != null) condition, // coverage:ignore-line
-            ],
-          ),
-          groupBy: groupBy,
-          orderBy: orderBy,
-          offset: offset,
-          limit: limit,
+      super.ship(
+        condition: And(
+          [
+            if (memId != null) Equals(defFkMemNotificationsMemId, memId),
+            if (memIdsIn != null) In(defFkMemNotificationsMemId.name, memIdsIn),
+            if (condition != null) condition, // coverage:ignore-line
+          ],
         ),
-        {
-          'memId': memId,
-          'memIdsIn': memIdsIn,
-          'condition': condition,
-          'groupBy': groupBy,
-          'orderBy': orderBy,
-          'offset': offset,
-          'limit': limit,
-        },
+        groupBy: groupBy,
+        orderBy: orderBy,
+        offset: offset,
+        limit: limit,
       );
 
-  Future<Iterable<SavedMemNotificationEntity>> archiveBy({
+  Future<Iterable<SavedMemNotificationEntityV2>> archiveBy({
     int? memId,
     Condition? condition,
     DateTime? archivedAt,
@@ -69,7 +58,7 @@ class MemNotificationRepository extends DatabaseTupleRepository<
         },
       );
 
-  Future<Iterable<SavedMemNotificationEntity>> unarchiveBy({
+  Future<Iterable<SavedMemNotificationEntityV2>> unarchiveBy({
     int? memId,
     Condition? condition,
     DateTime? updatedAt,
@@ -85,25 +74,18 @@ class MemNotificationRepository extends DatabaseTupleRepository<
       );
 
   @override
-  Future<List<SavedMemNotificationEntity>> waste({
+  Future<List<SavedMemNotificationEntityV2>> waste({
     int? memId,
     MemNotificationType? type,
     Condition? condition,
   }) =>
-      v(
-        () => super.waste(
-          condition: And(
-            [
-              if (memId != null) Equals(defFkMemNotificationsMemId, memId),
-              if (type != null) Equals(defColMemNotificationsType, type.name),
-              if (condition != null) condition, // coverage:ignore-line
-            ],
-          ),
+      super.waste(
+        condition: And(
+          [
+            if (memId != null) Equals(defFkMemNotificationsMemId, memId),
+            if (type != null) Equals(defColMemNotificationsType, type.name),
+            if (condition != null) condition, // coverage:ignore-line
+          ],
         ),
-        {
-          'memId': memId,
-          'type': type,
-          'condition': condition,
-        },
       );
 }

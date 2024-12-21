@@ -15,18 +15,18 @@ import '../../test/framework/repository/entity_test.dart';
 
 const _name = "DatabaseTupleRepository tests";
 
-final _defColA = BooleanColumnDefinition(TestObjectEntity.fieldNames[0]);
+final _defColA = BooleanColumnDefinition(TestSampleEntity.fieldNames[0]);
 final _defTableTestObject =
     TableDefinition('test_object', [_defColA, ...defColsBase]);
 final _defDbTest = DatabaseDefinition('test_db', 1, [_defTableTestObject]);
 
-class _TestObjectRepository extends DatabaseTupleRepository<TestObjectEntity,
-    TestObjectDatabaseTupleEntity> {
+class _TestObjectRepository extends DatabaseTupleRepositoryV2<TestSampleEntity,
+    TestSampleDatabaseTupleEntity> {
   _TestObjectRepository() : super(_defDbTest, _defTableTestObject);
 
   @override
-  TestObjectDatabaseTupleEntity pack(Map<String, dynamic> map) =>
-      TestObjectDatabaseTupleEntity.fromMap(map);
+  TestSampleDatabaseTupleEntity pack(Map<String, dynamic> map) =>
+      TestSampleDatabaseTupleEntity(map);
 }
 
 void main() => group(
@@ -69,8 +69,8 @@ void main() => group(
               () {
                 setUpAll(
                   () async {
-                    final falseSample = TestObjectEntity(false);
-                    final trueSample = TestObjectEntity(true);
+                    final falseSample = TestSampleEntity(TestSample(false));
+                    final trueSample = TestSampleEntity(TestSample(true));
                     final now = DateTime.now();
 
                     final dbA = await DatabaseFactory.open(_defDbTest);
@@ -86,7 +86,7 @@ void main() => group(
                 );
 
                 test(
-                  ': all.',
+                  'All.',
                   () async {
                     final count = await repository.count();
 
@@ -94,7 +94,7 @@ void main() => group(
                   },
                 );
                 test(
-                  ': condition.',
+                  'Condition.',
                   () async {
                     final count = await repository.count(
                         condition: Equals(_defColA, false));
@@ -117,18 +117,24 @@ void main() => group(
                 );
 
                 test(
-                  ': received.',
+                  'Received.',
                   () async {
                     final now = DateTime.now();
-                    final entity = TestObjectEntity(false);
+                    final entity = TestSampleEntity(TestSample(false));
 
                     final received =
                         await repository.receive(entity, createdAt: now);
 
                     expect(
-                        received,
-                        equals(TestObjectDatabaseTupleEntity(entity.a).withMap(
-                            {defPkId.name: 1, defColCreatedAt.name: now})));
+                      received.toMap,
+                      equals({
+                        'a': entity.value.a,
+                        defPkId.name: 1,
+                        defColCreatedAt.name: now,
+                        defColUpdatedAt.name: null,
+                        defColArchivedAt.name: null,
+                      }),
+                    );
                   },
                 );
               },
@@ -137,8 +143,8 @@ void main() => group(
             group(
               '#ship',
               () {
-                final falseSample = TestObjectEntity(false);
-                final trueSample = TestObjectEntity(true);
+                final falseSample = TestSampleEntity(TestSample(false));
+                final trueSample = TestSampleEntity(TestSample(true));
                 final now = DateTime.now();
                 final later = now.add(const Duration(seconds: 1));
 
@@ -162,7 +168,7 @@ void main() => group(
                 );
 
                 test(
-                  ': all.',
+                  'All.',
                   () async {
                     final shipped = await repository.ship();
 
@@ -172,7 +178,7 @@ void main() => group(
                   },
                 );
                 test(
-                  ': condition.',
+                  'Condition.',
                   () async {
                     final shipped = await repository.ship(
                       condition: Equals(_defColA, false),
@@ -182,7 +188,7 @@ void main() => group(
                   },
                 );
                 test(
-                  ': groupBy.',
+                  'GroupBy.',
                   () async {
                     final shipped = await repository.ship(
                         groupBy: GroupBy([_defColA],
@@ -194,7 +200,7 @@ void main() => group(
                   },
                 );
                 test(
-                  ': orderBy.',
+                  'OrderBy.',
                   () async {
                     final shipped =
                         await repository.ship(orderBy: [Descending(defPkId)]);
@@ -204,7 +210,7 @@ void main() => group(
                   },
                 );
                 test(
-                  ': offset.',
+                  'Offset.',
                   () async {
                     final shipped = await repository.ship(offset: 1);
 
@@ -213,7 +219,7 @@ void main() => group(
                   },
                 );
                 test(
-                  ': limit.',
+                  'Limit.',
                   () async {
                     final shipped = await repository.ship(limit: 2);
 
@@ -227,17 +233,17 @@ void main() => group(
             group(
               '#replace',
               () {
-                late TestObjectDatabaseTupleEntity savedFalseSample;
+                late TestSampleDatabaseTupleEntity savedFalseSample;
                 setUpAll(
                   () async {
-                    final falseSample = TestObjectEntity(false);
+                    final falseSample = TestSampleEntity(TestSample(false));
                     final now = DateTime.now();
 
                     final dbA = await DatabaseFactory.open(_defDbTest);
 
                     await dbA.delete(_defTableTestObject);
                     savedFalseSample =
-                        TestObjectDatabaseTupleEntity.fromMap(falseSample.toMap
+                        TestSampleDatabaseTupleEntity(falseSample.toMap
                           ..addAll({
                             defPkId.name: await dbA.insert(
                                 _defTableTestObject,
@@ -248,17 +254,17 @@ void main() => group(
                   },
                 );
 
-                test(': updated.', () async {
+                test('Updated.', () async {
                   final updatedAt = DateTime.now();
-                  final updating = TestObjectDatabaseTupleEntity.fromMap(
+                  final updating = TestSampleDatabaseTupleEntity(
                       savedFalseSample.toMap
                         ..update(
-                            TestObjectEntity.fieldNames[0], (value) => false));
+                            TestSampleEntity.fieldNames[0], (value) => false));
 
                   final updated =
                       await repository.replace(updating, updatedAt: updatedAt);
 
-                  expect(updated.a, equals(updating.a));
+                  expect(updated.value.a, equals(updating.value.a));
                   expect(updated.updatedAt, equals(updatedAt));
                 });
               },
@@ -267,17 +273,17 @@ void main() => group(
             group(
               '#archive',
               () {
-                late TestObjectDatabaseTupleEntity savedFalseSample;
+                late TestSampleDatabaseTupleEntity savedFalseSample;
                 setUpAll(
                   () async {
-                    final falseSample = TestObjectEntity(false);
+                    final falseSample = TestSampleEntity(TestSample(false));
                     final now = DateTime.now();
 
                     final dbA = await DatabaseFactory.open(_defDbTest);
 
                     await dbA.delete(_defTableTestObject);
                     savedFalseSample =
-                        TestObjectDatabaseTupleEntity.fromMap(falseSample.toMap
+                        TestSampleDatabaseTupleEntity(falseSample.toMap
                           ..addAll({
                             defPkId.name: await dbA.insert(
                                 _defTableTestObject,
@@ -289,7 +295,7 @@ void main() => group(
                 );
 
                 test(
-                  ': archived.',
+                  'Archived.',
                   () async {
                     final archivedAt = DateTime.now();
 
@@ -305,17 +311,17 @@ void main() => group(
             group(
               '#unarchive',
               () {
-                late TestObjectDatabaseTupleEntity savedArchivedSample;
+                late TestSampleDatabaseTupleEntity savedArchivedSample;
                 setUpAll(
                   () async {
-                    final falseSample = TestObjectEntity(false);
+                    final falseSample = TestSampleEntity(TestSample(false));
                     final now = DateTime.now();
 
                     final dbA = await DatabaseFactory.open(_defDbTest);
 
                     await dbA.delete(_defTableTestObject);
                     savedArchivedSample =
-                        TestObjectDatabaseTupleEntity.fromMap(falseSample.toMap
+                        TestSampleDatabaseTupleEntity(falseSample.toMap
                           ..addAll({
                             defPkId.name: await dbA.insert(
                                 _defTableTestObject,
@@ -331,7 +337,7 @@ void main() => group(
                 );
 
                 test(
-                  ': unarchived.',
+                  'Unarchived.',
                   () async {
                     final updatedAt = DateTime.now();
 
@@ -348,17 +354,17 @@ void main() => group(
             group(
               '#waste',
               () {
-                late TestObjectDatabaseTupleEntity savedFalseSample;
+                late TestSampleDatabaseTupleEntity savedFalseSample;
                 setUpAll(
                   () async {
-                    final falseSample = TestObjectEntity(false);
+                    final falseSample = TestSampleEntity(TestSample(false));
                     final now = DateTime.now();
 
                     final dbA = await DatabaseFactory.open(_defDbTest);
 
                     await dbA.delete(_defTableTestObject);
                     savedFalseSample =
-                        TestObjectDatabaseTupleEntity.fromMap(falseSample.toMap
+                        TestSampleDatabaseTupleEntity(falseSample.toMap
                           ..addAll({
                             defPkId.name: await dbA.insert(
                                 _defTableTestObject,
@@ -370,13 +376,13 @@ void main() => group(
                 );
 
                 test(
-                  ': wasted.',
+                  'Wasted.',
                   () async {
                     final wastedList = await repository.waste(
                         condition: Equals(defPkId, savedFalseSample.id));
 
                     expect(wastedList, hasLength(equals(1)));
-                    expect(wastedList[0], equals(savedFalseSample));
+                    expect(wastedList[0].toMap, equals(savedFalseSample.toMap));
                   },
                 );
               },

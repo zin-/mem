@@ -1,76 +1,45 @@
-import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
 
-class MemNotificationEntity extends MemNotification
-    with Entity, Copyable<MemNotificationEntity> {
-  MemNotificationEntity(super.memId, super.type, super.time, super.message)
-      : super();
+import 'mem_notification.dart';
 
-  MemNotificationEntity.fromMap(Map<String, dynamic> map)
-      : super(
-          map[defFkMemNotificationsMemId.name],
-          MemNotificationType.fromName(map[defColMemNotificationsType.name]),
-          map[defColMemNotificationsTime.name],
-          map[defColMemNotificationsMessage.name],
-        );
-
-  static MemNotificationEntity initialByType(
-    int? memId,
-    MemNotificationType type, {
-    int? Function()? time,
-  }) {
-    final core = MemNotification.initialByType(memId, type, time: time);
-    return MemNotificationEntity(memId, type, core.time, core.message);
+class MemNotificationEntityV2 with EntityV2<MemNotification> {
+  MemNotificationEntityV2(MemNotification value) {
+    this.value = value;
   }
 
   @override
-  Map<String, dynamic> get toMap => {
-        defFkMemNotificationsMemId.name: memId,
-        defColMemNotificationsType.name: type.name,
-        defColMemNotificationsTime.name: time,
-        defColMemNotificationsMessage.name: message,
+  Map<String, Object?> get toMap => {
+        defFkMemNotificationsMemId.name: value.memId,
+        defColMemNotificationsType.name: value.type.name,
+        defColMemNotificationsTime.name: value.time,
+        defColMemNotificationsMessage.name: value.message,
       };
 
   @override
-  MemNotificationEntity copiedWith({
-    int? Function()? memId,
-    int? Function()? time,
-    String Function()? message,
-  }) =>
-      MemNotificationEntity(
-        memId == null ? this.memId : memId(),
-        type,
-        time == null ? this.time : time(),
-        message == null ? this.message : message(),
-      );
+  MemNotificationEntityV2 updatedWith(
+          MemNotification Function(MemNotification v) update) =>
+      MemNotificationEntityV2(update(value));
 }
 
-class SavedMemNotificationEntity extends MemNotificationEntity
-    with DatabaseTupleEntity<int> {
-  SavedMemNotificationEntity.fromMap(
-    Map<String, dynamic> map,
-  ) : super.fromMap(map) {
+class SavedMemNotificationEntityV2 extends MemNotificationEntityV2
+    with DatabaseTupleEntityV2<int, MemNotification> {
+  SavedMemNotificationEntityV2(Map<String, dynamic> map)
+      : super(
+          MemNotification(
+            map[defFkMemNotificationsMemId.name],
+            MemNotificationType.fromName(map[defColMemNotificationsType.name]),
+            map[defColMemNotificationsTime.name],
+            map[defColMemNotificationsMessage.name],
+          ),
+        ) {
     withMap(map);
   }
 
   @override
-  SavedMemNotificationEntity copiedWith({
-    int? Function()? memId,
-    int? Function()? time,
-    String Function()? message,
-  }) =>
-      SavedMemNotificationEntity.fromMap(
-        toMap
-          ..addAll(
-            super
-                .copiedWith(
-                  memId: memId,
-                  time: time,
-                  message: message,
-                )
-                .toMap,
-          ),
-      );
+  SavedMemNotificationEntityV2 updatedWith(
+          MemNotification Function(MemNotification v) update) =>
+      SavedMemNotificationEntityV2(
+          toMap..addAll(super.updatedWith(update).toMap));
 }

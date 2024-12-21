@@ -1,11 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/mems/mem_detail.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/mem_client.dart';
-import 'package:mem/mems/states.dart';
+import 'package:mem/mems/mem_detail.dart';
 import 'package:mem/mems/mem_entity.dart';
 import 'package:mem/mems/mem_notification_entity.dart';
+import 'package:mem/mems/states.dart';
+
+import 'states.dart';
 
 final _memClient = MemClient();
 
@@ -31,16 +32,16 @@ final saveMem =
             ref.read(memItemsProvider.notifier).upsertAll(
                   saved.memItems,
                   (current, updating) =>
-                      current.memId == updating.memId &&
-                      current.type == updating.type,
+                      current.value.memId == updating.value.memId &&
+                      current.value.type == updating.value.type,
                 );
             ref.read(memNotificationsProvider.notifier).upsertAll(
                   saved.notifications ?? [],
                   (tmp, item) =>
-                      tmp is SavedMemNotificationEntity &&
-                      item is SavedMemNotificationEntity &&
+                      tmp is SavedMemNotificationEntityV2 &&
+                      item is SavedMemNotificationEntityV2 &&
                       tmp.id == item.id,
-                  removeWhere: (current) => current.isRepeatByDayOfWeek(),
+                  removeWhere: (current) => current.value.isRepeatByDayOfWeek(),
                 );
 
             return saved;
