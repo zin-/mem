@@ -23,10 +23,6 @@ mixin Entity {
       (runtimeType == other.runtimeType && hashCode == other.hashCode);
 }
 
-mixin Copyable<T> on Entity {
-  T copiedWith();
-}
-
 mixin EntityV2<VALUE> {
   late VALUE value;
 
@@ -47,10 +43,6 @@ mixin EntityV2<VALUE> {
 // bool operator ==(Object other) =>
 //     identical(this, other) ||
 //     (runtimeType == other.runtimeType && hashCode == other.hashCode);
-}
-
-mixin CopyableV2<VALUE> on EntityV2<VALUE> {
-  EntityV2<VALUE> copiedWith();
 }
 
 // memo
