@@ -46,6 +46,8 @@ class SavedActEntity extends ActEntity with DatabaseTupleEntityV2<int, Act> {
           ),
         ) {
     withMap(map);
+
+    entityTableRelations[ActEntity] ??= defTableActs;
   }
 
   @override

@@ -35,6 +35,8 @@ class SavedMemNotificationEntityV2 extends MemNotificationEntityV2
           ),
         ) {
     withMap(map);
+
+    entityTableRelations[MemNotificationEntityV2] ??= defTableMemNotifications;
   }
 
   @override

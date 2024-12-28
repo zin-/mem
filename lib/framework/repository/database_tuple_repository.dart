@@ -3,6 +3,7 @@ import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/definition/database_definition.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
+import 'package:mem/framework/repository/condition/in.dart';
 import 'package:mem/framework/repository/database_repository.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
@@ -18,21 +19,35 @@ abstract class DatabaseTupleRepositoryV2<ENTITY extends EntityV2,
 
   final DatabaseDefinition _databaseDefinition;
   final TableDefinition _tableDefinition;
-  final Map<TableDefinition, RepositoryV2?> _childRepositories = {};
 
   // FIXME DatabaseDefinitionの中にTableDefinitionがあるのでEから取得できるのでは？
   DatabaseTupleRepositoryV2(this._databaseDefinition, this._tableDefinition) {
     _repositories[_tableDefinition] = this;
 
-    for (var defTable in _databaseDefinition.tableDefinitions) {
-      if (defTable.foreignKeyDefinitions
-          .where(
-            (defFk) => defFk.parentTableDefinition == _tableDefinition,
-          )
-          .isNotEmpty) {
-        _childRepositories[defTable] = _repositories[defTable];
-      }
-    }
+    childRepositories.updateAll(
+      (childEntity, value) {
+        final childTableDefinition = entityTableRelations[childEntity];
+
+        if (childTableDefinition == null) {
+          return value;
+        } else {
+          return value
+            ..updateAll(
+              (childRepository, value) {
+                if (childRepository is DatabaseTupleRepositoryV2) {
+                  final fk =
+                      childTableDefinition.foreignKeyDefinitions.singleWhere(
+                    (defFk) => defFk.parentTableDefinition == _tableDefinition,
+                  );
+                  return fk;
+                } else {
+                  return value;
+                }
+              },
+            );
+        }
+      },
+    );
   }
 
   late final Future<DatabaseAccessor> _dbA = (() async => _databaseAccessor ??=
@@ -206,12 +221,13 @@ abstract class DatabaseTupleRepositoryV2<ENTITY extends EntityV2,
             condition: condition,
           );
 
-          for (final a in _childRepositories.entries) {
-            final fk = a.key.foreignKeyDefinitions.singleWhere(
-              (element) => element.parentTableDefinition == _tableDefinition,
-            );
-            for (var element in targets) {
-              await a.value?.waste(condition: Equals(fk, element.id));
+          for (final a in childRepositories.entries) {
+            for (final b in a.value.entries) {
+              if (b.key != null && b.value != null) {
+                await b.key!.waste(
+                  condition: In(b.value!.name, targets.map((e) => e.id)),
+                );
+              }
             }
           }
 

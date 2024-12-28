@@ -1,3 +1,5 @@
+import 'package:mem/framework/database/definition/column/column_definition.dart';
+
 import 'condition/conditions.dart';
 import 'entity.dart';
 
@@ -23,5 +25,19 @@ import 'entity.dart';
 abstract class Repository<ENTITY extends Entity> {}
 
 abstract class RepositoryV2<ENTITY extends EntityV2> {
+  static final Map<Type, RepositoryV2> _allRepositories = {};
+
+  RepositoryV2() {
+    _allRepositories[ENTITY] ??= this;
+
+    entityChildrenRelation[ENTITY]?.forEach(
+      (childEntity) => childRepositories[childEntity] ??= {
+        _allRepositories[childEntity]: null
+      },
+    );
+  }
+
+  final Map<Type, Map<RepositoryV2?, ColumnDefinition?>> childRepositories = {};
+
   waste({Condition? condition});
 }

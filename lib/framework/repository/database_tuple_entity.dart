@@ -1,4 +1,5 @@
 import 'package:mem/databases/table_definitions/base.dart';
+import 'package:mem/framework/database/definition/table_definition.dart';
 import 'package:mem/framework/repository/entity.dart';
 
 mixin DatabaseTupleEntityV2<PRIMARY_KEY, T> on EntityV2<T> {
@@ -25,3 +26,5 @@ mixin DatabaseTupleEntityV2<PRIMARY_KEY, T> on EntityV2<T> {
       defColArchivedAt.name: archivedAt,
     });
 }
+
+final Map<Type, TableDefinition> entityTableRelations = {};
