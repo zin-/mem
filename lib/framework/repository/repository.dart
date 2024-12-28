@@ -1,4 +1,5 @@
-import 'package:mem/framework/repository/entity.dart';
+import 'condition/conditions.dart';
+import 'entity.dart';
 
 /// # Repositoryとは
 ///
@@ -21,4 +22,6 @@ import 'package:mem/framework/repository/entity.dart';
 //  よって、ここでは`receive`（受け取る）、`replace`（置き換える）などの荷物や事物を扱う際の単語を採用する
 abstract class Repository<ENTITY extends Entity> {}
 
-abstract class RepositoryV2<ENTITY extends EntityV2> {}
+abstract class RepositoryV2<ENTITY extends EntityV2> {
+  waste({Condition? condition});
+}

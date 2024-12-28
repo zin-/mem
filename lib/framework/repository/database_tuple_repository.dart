@@ -13,13 +13,27 @@ import 'package:mem/logger/log_service.dart';
 
 abstract class DatabaseTupleRepositoryV2<ENTITY extends EntityV2,
     SAVED extends DatabaseTupleEntityV2> extends RepositoryV2<ENTITY> {
+  static DatabaseAccessor? _databaseAccessor;
+  static final Map<TableDefinition, RepositoryV2> _repositories = {};
+
   final DatabaseDefinition _databaseDefinition;
   final TableDefinition _tableDefinition;
+  final Map<TableDefinition, RepositoryV2?> _childRepositories = {};
 
   // FIXME DatabaseDefinitionの中にTableDefinitionがあるのでEから取得できるのでは？
-  DatabaseTupleRepositoryV2(this._databaseDefinition, this._tableDefinition);
+  DatabaseTupleRepositoryV2(this._databaseDefinition, this._tableDefinition) {
+    _repositories[_tableDefinition] = this;
 
-  static DatabaseAccessor? _databaseAccessor;
+    for (var defTable in _databaseDefinition.tableDefinitions) {
+      if (defTable.foreignKeyDefinitions
+          .where(
+            (defFk) => defFk.parentTableDefinition == _tableDefinition,
+          )
+          .isNotEmpty) {
+        _childRepositories[defTable] = _repositories[defTable];
+      }
+    }
+  }
 
   late final Future<DatabaseAccessor> _dbA = (() async => _databaseAccessor ??=
       await DatabaseRepository().receive(_databaseDefinition))();
@@ -182,6 +196,7 @@ abstract class DatabaseTupleRepositoryV2<ENTITY extends EntityV2,
         },
       );
 
+  @override
   Future<List<SAVED>> waste({
     Condition? condition,
   }) =>
@@ -191,10 +206,21 @@ abstract class DatabaseTupleRepositoryV2<ENTITY extends EntityV2,
             condition: condition,
           );
 
-          await _databaseAccessor!.delete(
-            _tableDefinition,
-            where: condition?.where(),
-            whereArgs: condition?.whereArgs(),
+          for (final a in _childRepositories.entries) {
+            final fk = a.key.foreignKeyDefinitions.singleWhere(
+              (element) => element.parentTableDefinition == _tableDefinition,
+            );
+            for (var element in targets) {
+              await a.value?.waste(condition: Equals(fk, element.id));
+            }
+          }
+
+          await _dbA.then(
+            (dbA) async => await dbA.delete(
+              _tableDefinition,
+              where: condition?.where(),
+              whereArgs: condition?.whereArgs(),
+            ),
           );
 
           return targets;

@@ -181,9 +181,6 @@ class MemService {
 
   Future<bool> remove(int memId) => v(
         () async {
-          // TODO https://github.com/zin-/mem/issues/284
-          await _memNotificationRepository.waste(memId: memId);
-          await _memItemRepository.waste(memId: memId);
           await _memRepository.waste(id: memId);
 
           return true;

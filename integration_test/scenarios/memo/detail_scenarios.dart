@@ -295,7 +295,7 @@ void main() => group(': $_scenarioName', () {
       });
 
       group(
-        ": Remove",
+        'Remove',
         () {
           Future<List<Map<String, Object?>>> selectFromMemsWhereName(
             String name,
@@ -309,7 +309,7 @@ void main() => group(': $_scenarioName', () {
           }
 
           testWidgets(
-            ": undo.",
+            'Undo.',
             (widgetTester) async {
               await runApplication();
               await widgetTester.pumpAndSettle();
@@ -329,7 +329,9 @@ void main() => group(': $_scenarioName', () {
               );
               expect(find.text(insertedMemName), findsNothing);
               expect(
-                  (await selectFromMemsWhereName(insertedMemName)).length, 0);
+                (await selectFromMemsWhereName(insertedMemName)).length,
+                0,
+              );
 
               await widgetTester.tap(find.byKey(keyUndo));
               await widgetTester.pumpAndSettle();
@@ -341,7 +343,9 @@ void main() => group(': $_scenarioName', () {
               expect(find.text(insertedMemName), findsOneWidget);
 
               expect(
-                  (await selectFromMemsWhereName(insertedMemName)).length, 1);
+                (await selectFromMemsWhereName(insertedMemName)).length,
+                1,
+              );
 
               await widgetTester.tap(find.text(insertedMemName));
               await widgetTester.pumpAndSettle();
