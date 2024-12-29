@@ -9,22 +9,6 @@ mixin Entity {
 
   @override
   String toString() => "${super.toString()}: $toMap";
-
-  @override
-  int get hashCode => toMap.entries.fold(
-        0,
-        (value, element) =>
-            value ^ element.key.hashCode ^ element.value.hashCode,
-      );
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (runtimeType == other.runtimeType && hashCode == other.hashCode);
-}
-
-mixin Copyable<T> on Entity {
-  T copiedWith();
 }
 
 mixin EntityV2<VALUE> {
@@ -32,7 +16,7 @@ mixin EntityV2<VALUE> {
 
   Map<String, Object?> get toMap;
 
-  EntityV2<VALUE> updatedBy(VALUE value);
+  EntityV2<VALUE> updatedWith(VALUE Function(VALUE v) update);
 
   @override
   String toString() => "${super.toString()}: $toMap";
@@ -49,10 +33,7 @@ mixin EntityV2<VALUE> {
 //     (runtimeType == other.runtimeType && hashCode == other.hashCode);
 }
 
-mixin CopyableV2<VALUE> on EntityV2<VALUE> {
-  EntityV2<VALUE> copiedWith();
-}
-
+final Map<Type, Set<Type>> entityChildrenRelation = {};
 // memo
 // - view, domain, dataのそれぞれの領域で似た内容でも型が変わることになるはず
 // これをしっかりと定義したい

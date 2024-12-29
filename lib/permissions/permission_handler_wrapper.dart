@@ -9,7 +9,9 @@ class PermissionHandlerWrapper {
           final p = permission.convert();
           return await p.isGranted ? true : await p.request().isGranted;
         },
-        {'permission': permission},
+        {
+          'permission': permission,
+        },
       );
 }
 
@@ -18,11 +20,6 @@ extension on Permission {
     switch (this) {
       case Permission.notification:
         return permission_handler.Permission.notification;
-
-// coverage:ignore-start
-      default:
-        throw UnimplementedError(toString());
-// coverage:ignore-end
     }
   }
 }

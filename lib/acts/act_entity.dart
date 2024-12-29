@@ -19,7 +19,7 @@ class ActEntity with EntityV2<Act> {
       };
 
   @override
-  EntityV2<Act> updatedBy(Act value) => ActEntity(value);
+  ActEntity updatedWith(Act Function(Act v) update) => ActEntity(update(value));
 }
 
 class SavedActEntity extends ActEntity with DatabaseTupleEntityV2<int, Act> {
@@ -46,9 +46,11 @@ class SavedActEntity extends ActEntity with DatabaseTupleEntityV2<int, Act> {
           ),
         ) {
     withMap(map);
+
+    entityTableRelations[ActEntity] ??= defTableActs;
   }
 
   @override
-  SavedActEntity updatedBy(Act value) =>
-      SavedActEntity(toMap..addAll(super.updatedBy(value).toMap));
+  SavedActEntity updatedWith(Act Function(Act v) update) =>
+      SavedActEntity(toMap..addAll(super.updatedWith(update).toMap));
 }

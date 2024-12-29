@@ -7,7 +7,7 @@ extension Seconds on TimeOfDay {
 extension Comparable on TimeOfDay {
   int compareTo(TimeOfDay other) => seconds.compareTo(other.seconds);
 
-  bool graterThan(TimeOfDay other) => compareTo(other) > 0;
+  // bool graterThan(TimeOfDay other) => compareTo(other) > 0;
 
   bool lessThan(TimeOfDay other) => compareTo(other) < 0;
 }

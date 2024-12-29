@@ -4,7 +4,7 @@ import 'package:mem/framework/date_and_time/time_of_day_view.dart';
 import 'package:mem/framework/view/async_value_view.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
-import 'package:mem/mems/mem_notification_entity.dart';
+import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/settings/preference/keys.dart';
 import 'package:mem/settings/states.dart';
 import 'package:mem/values/constants.dart';
@@ -22,7 +22,7 @@ class MemRepeatedNotificationView extends ConsumerWidget {
           final memRepeatNotification = ref.watch(
             memNotificationsByMemIdProvider(_memId).select(
               (v) => v.singleWhere(
-                (element) => element.isRepeated(),
+                (e) => e.value.isRepeated(),
               ),
             ),
           );
@@ -30,17 +30,18 @@ class MemRepeatedNotificationView extends ConsumerWidget {
           return AsyncValueView(
             preferencesProvider,
             (loaded) => _MemRepeatedNotificationView(
-              memRepeatNotification.time,
+              memRepeatNotification.value.time,
               loaded[startOfDayKey] ?? defaultStartOfDay,
               (picked) => ref
                   .read(memNotificationsByMemIdProvider(_memId).notifier)
                   .upsertAll(
                 [
-                  (memRepeatNotification as MemNotificationEntity).copiedWith(
-                    time: () => picked,
-                  )
+                  memRepeatNotification.updatedWith(
+                    (v) => MemNotification(v.memId, v.type, picked, v.message),
+                  ),
                 ],
-                (current, updating) => current.type == updating.type,
+                (current, updating) =>
+                    current.value.type == updating.value.type,
               ),
             ),
           );

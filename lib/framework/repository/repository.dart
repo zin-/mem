@@ -1,4 +1,7 @@
-import 'package:mem/framework/repository/entity.dart';
+import 'package:mem/framework/database/definition/column/column_definition.dart';
+
+import 'condition/conditions.dart';
+import 'entity.dart';
 
 /// # Repositoryとは
 ///
@@ -21,4 +24,20 @@ import 'package:mem/framework/repository/entity.dart';
 //  よって、ここでは`receive`（受け取る）、`replace`（置き換える）などの荷物や事物を扱う際の単語を採用する
 abstract class Repository<ENTITY extends Entity> {}
 
-abstract class RepositoryV2<ENTITY extends EntityV2> {}
+abstract class RepositoryV2<ENTITY extends EntityV2> {
+  static final Map<Type, RepositoryV2> _allRepositories = {};
+
+  RepositoryV2() {
+    _allRepositories[ENTITY] ??= this;
+
+    entityChildrenRelation[ENTITY]?.forEach(
+      (childEntity) => childRepositories[childEntity] ??= {
+        _allRepositories[childEntity]: null
+      },
+    );
+  }
+
+  final Map<Type, Map<RepositoryV2?, ColumnDefinition?>> childRepositories = {};
+
+  waste({Condition? condition});
+}

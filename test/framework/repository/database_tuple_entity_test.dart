@@ -6,12 +6,10 @@ import 'entity_test.dart';
 
 const _name = 'DatabaseTupleEntity test';
 
-class TestObjectDatabaseTupleEntity extends TestObjectEntity
-    with DatabaseTupleEntity<int> {
-  TestObjectDatabaseTupleEntity(super.a);
-
-  TestObjectDatabaseTupleEntity.fromMap(Map<String, dynamic> map)
-      : super.fromMap(map) {
+class TestSampleDatabaseTupleEntity extends TestSampleEntity
+    with DatabaseTupleEntityV2<int, TestSample> {
+  TestSampleDatabaseTupleEntity(Map<String, dynamic> map)
+      : super(TestSample(map['a'])) {
     withMap(map);
   }
 }
@@ -22,28 +20,17 @@ void main() => group(
         test(
           '#new',
           () {
-            const a = false;
-
-            final testObject = TestObjectDatabaseTupleEntity(a);
-
-            expect(testObject.a, equals(a));
-          },
-        );
-
-        test(
-          '#fromMap',
-          () {
             final map = {
-              TestObjectEntity.fieldNames[0]: false,
+              TestSampleEntity.fieldNames[0]: false,
               defPkId.name: 1,
               defColCreatedAt.name: DateTime.now(),
               defColUpdatedAt.name: DateTime.now(),
               defColArchivedAt.name: null
             };
 
-            final testObject = TestObjectDatabaseTupleEntity.fromMap(map);
+            final testObject = TestSampleDatabaseTupleEntity(map);
 
-            expect(testObject.a, map[TestObjectEntity.fieldNames[0]]);
+            expect(testObject.value.a, map[TestSampleEntity.fieldNames[0]]);
           },
         );
 
@@ -51,14 +38,14 @@ void main() => group(
           '#toMap',
           () {
             final map = {
-              TestObjectEntity.fieldNames[0]: false,
+              TestSampleEntity.fieldNames[0]: false,
               defPkId.name: 1,
               defColCreatedAt.name: DateTime.now(),
               defColUpdatedAt.name: DateTime.now(),
               defColArchivedAt.name: null
             };
 
-            final testObject = TestObjectDatabaseTupleEntity.fromMap(map);
+            final testObject = TestSampleDatabaseTupleEntity(map);
 
             expect(testObject.toMap, map);
           },

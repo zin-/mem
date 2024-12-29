@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mem/acts/act_entity.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
@@ -6,12 +7,20 @@ import 'package:mem/mems/mem.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
+import 'package:mem/mems/mem_item_entity.dart';
+import 'package:mem/mems/mem_notification_entity.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/notifications/schedule.dart';
 
 class MemEntityV2 with EntityV2<Mem> {
   MemEntityV2(Mem value) {
     this.value = value;
+
+    entityChildrenRelation[MemEntityV2] ??= {
+      MemItemEntityV2,
+      ActEntity,
+      MemNotificationEntityV2,
+    };
   }
 
   @override
@@ -26,16 +35,8 @@ class MemEntityV2 with EntityV2<Mem> {
             value.period?.end?.isAllDay == true ? null : value.period?.end,
       };
 
-// coverage:ignore-start
   @override
-  EntityV2<Mem> updatedBy(Mem value) {
-    // TODO: implement updatedBy
-    throw UnimplementedError();
-  }
-
-// coverage:ignore-end
-
-  MemEntityV2 updateWith(Mem Function(Mem mem) update) =>
+  MemEntityV2 updatedWith(Mem Function(Mem mem) update) =>
       MemEntityV2(update(value));
 }
 
@@ -62,10 +63,12 @@ class SavedMemEntityV2 extends MemEntityV2
           ),
         ) {
     withMap(map);
+
+    entityTableRelations[MemEntityV2] ??= defTableMems;
   }
 
   @override
-  SavedMemEntityV2 updateWith(Mem Function(Mem mem) update) =>
+  SavedMemEntityV2 updatedWith(Mem Function(Mem mem) update) =>
       SavedMemEntityV2(toMap..addAll(MemEntityV2(update(value)).toMap));
 
   Iterable<Schedule> periodSchedules(

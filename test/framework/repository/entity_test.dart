@@ -3,22 +3,27 @@ import 'package:mem/framework/repository/entity.dart';
 
 const _name = 'Entity test';
 
-class _TestObject {
+class TestSample {
   final bool a;
 
-  _TestObject(this.a);
+  TestSample(this.a);
 }
 
-class TestObjectEntity extends _TestObject with Entity {
+class TestSampleEntity with EntityV2<TestSample> {
   static List<String> fieldNames = ['a'];
 
-  TestObjectEntity(super.a);
-
-  TestObjectEntity.fromMap(Map<String, dynamic> map)
-      : super(map[TestObjectEntity.fieldNames[0]]);
+  TestSampleEntity(TestSample value) {
+    this.value = value;
+  }
 
   @override
-  Map<String, dynamic> get toMap => {fieldNames[0]: a};
+  Map<String, dynamic> get toMap => {
+        fieldNames[0]: value.a,
+      };
+
+  @override
+  EntityV2<TestSample> updatedWith(TestSample Function(TestSample v) update) =>
+      TestSampleEntity(update(value));
 }
 
 void main() => group(
@@ -29,20 +34,9 @@ void main() => group(
           () {
             const a = false;
 
-            final testObject = TestObjectEntity(a);
+            final testObject = TestSampleEntity(TestSample(a));
 
-            expect(testObject.a, equals(a));
-          },
-        );
-
-        test(
-          '#fromMap',
-          () {
-            final map = {TestObjectEntity.fieldNames[0]: false};
-
-            final testObject = TestObjectEntity.fromMap(map);
-
-            expect(testObject.a, equals(map[TestObjectEntity.fieldNames[0]]));
+            expect(testObject.value.a, equals(a));
           },
         );
 
@@ -51,23 +45,10 @@ void main() => group(
           () {
             const a = false;
 
-            final testObject = TestObjectEntity(a);
+            final testObject = TestSampleEntity(TestSample(a));
 
             expect(
-                testObject.toMap, equals({TestObjectEntity.fieldNames[0]: a}));
-          },
-        );
-
-        test(
-          '#==',
-          () {
-            const a = false;
-            const b = false;
-
-            final testObjectA = TestObjectEntity(a);
-            final testObjectB = TestObjectEntity(b);
-
-            expect(testObjectA, equals(testObjectB));
+                testObject.toMap, equals({TestSampleEntity.fieldNames[0]: a}));
           },
         );
       },

@@ -3,20 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/act.dart';
 import 'package:mem/acts/actions.dart';
 import 'package:mem/acts/states.dart';
-import 'package:mem/mems/list/states.dart';
-import 'package:mem/mems/mem_done_checkbox.dart';
-import 'package:mem/mems/mem_name.dart';
 import 'package:mem/framework/view/timer.dart';
-import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
-import 'package:mem/mems/list/item/subtitle.dart';
-import 'package:mem/mems/states.dart';
+import 'package:mem/mems/list/states.dart';
+import 'package:mem/mems/mem_done_checkbox.dart';
 import 'package:mem/mems/mem_entity.dart';
+import 'package:mem/mems/mem_name.dart';
 import 'package:mem/mems/mem_notification_entity.dart';
+import 'package:mem/mems/states.dart';
 import 'package:mem/values/colors.dart';
 
 import 'actions.dart';
+import 'subtitle.dart';
 
 class MemListItemView extends ConsumerWidget {
   final int _memId;
@@ -58,14 +57,14 @@ class MemListItemView extends ConsumerWidget {
 }
 
 ListTile _render(
-  SavedMemEntityV2 mem,
+  SavedMemEntityV2 memEntity,
   void Function(int memId) onTap,
   void Function(bool? value, int memId) onMemDoneCheckboxTapped,
   Act? latestActByMem,
   void Function() startAct,
   void Function() finishAct,
   void Function() pauseAct,
-  Iterable<MemNotification> memNotifications,
+  Iterable<MemNotificationEntityV2> memNotificationEntities,
 ) =>
     v(
       () {
@@ -73,8 +72,10 @@ ListTile _render(
             latestActByMem != null && latestActByMem is ActiveAct;
         final hasPausedAct =
             latestActByMem != null && latestActByMem is PausedAct;
-        final hasEnableMemNotifications = memNotifications
-            .where((e) => e is SavedMemNotificationEntity && e.isEnabled())
+        final hasEnableMemNotifications = memNotificationEntities
+            .where(
+              (e) => e is SavedMemNotificationEntityV2 && e.value.isEnabled(),
+            )
             .isNotEmpty;
 
         final startIconButton = IconButton(
@@ -92,15 +93,15 @@ ListTile _render(
 
         return ListTile(
           title: !hasActiveAct
-              ? MemNameText(mem)
+              ? MemNameText(memEntity)
               : Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(child: MemNameText(mem)),
+                    Expanded(child: MemNameText(memEntity)),
                     ElapsedTimeView(latestActByMem.period!.start!),
                   ],
                 ),
-          onTap: () => onTap(mem.id),
+          onTap: () => onTap(memEntity.id),
           leading: hasEnableMemNotifications
               ? hasActiveAct
                   ? pauseIconButton
@@ -108,24 +109,25 @@ ListTile _render(
                       ? stopIconButton
                       : null
               : MemDoneCheckbox(
-                  mem,
-                  (value) => onMemDoneCheckboxTapped(value, mem.id),
+                  memEntity,
+                  (value) => onMemDoneCheckboxTapped(value, memEntity.id),
                 ),
-          tileColor: mem.isArchived ? secondaryGreyColor : null,
-          trailing: !mem.value.isDone && hasEnableMemNotifications
+          tileColor: memEntity.isArchived ? secondaryGreyColor : null,
+          trailing: !memEntity.value.isDone && hasEnableMemNotifications
               ? hasActiveAct
                   ? stopIconButton
                   : startIconButton
               : null,
-          subtitle: mem.value.period == null && !hasEnableMemNotifications
+          subtitle: memEntity.value.period == null && !hasEnableMemNotifications
               ? null
-              : MemListItemSubtitle(mem.id),
-          isThreeLine: mem.value.period != null && hasEnableMemNotifications,
+              : MemListItemSubtitle(memEntity.id),
+          isThreeLine:
+              memEntity.value.period != null && hasEnableMemNotifications,
         );
       },
       {
-        'mem': mem,
-        'activeAct': latestActByMem,
-        'memNotifications': memNotifications,
+        'memEntity': memEntity,
+        'latestActByMem': latestActByMem,
+        'memNotificationEntities': memNotificationEntities,
       },
     );

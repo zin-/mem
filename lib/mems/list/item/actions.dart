@@ -16,7 +16,7 @@ final doneMem = Provider.autoDispose.family<SavedMemEntityV2, int>(
             ),
           );
 
-      return ref.read(memByMemIdProvider(memId))!.updateWith(
+      return ref.read(memByMemIdProvider(memId))!.updatedWith(
             (mem) => mem.done(DateTime.now()),
           );
     },
@@ -38,7 +38,7 @@ final undoneMem = Provider.autoDispose.family<SavedMemEntityV2, int>(
             ),
           );
 
-      return ref.read(memByMemIdProvider(memId))!.updateWith(
+      return ref.read(memByMemIdProvider(memId))!.updatedWith(
             (mem) => mem.undone(),
           );
     },

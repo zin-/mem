@@ -57,8 +57,8 @@ class ActService {
             );
           } else {
             return await _actRepository.replace(
-              latestActEntity.updatedBy(
-                latestActEntity.value.start(when),
+              latestActEntity.updatedWith(
+                (v) => v.start(when),
               ),
             );
           }
@@ -90,8 +90,8 @@ class ActService {
             );
           } else {
             return await _actRepository.replace(
-              latestActiveActEntity.updatedBy(
-                latestActiveActEntity.value.finish(when),
+              latestActiveActEntity.updatedWith(
+                (v) => v.finish(when),
               ),
             );
           }
@@ -119,8 +119,8 @@ class ActService {
           return [
             if (latestActiveActEntity != null)
               await _actRepository.replace(
-                latestActiveActEntity.updatedBy(
-                  latestActiveActEntity.value.finish(when),
+                latestActiveActEntity.updatedWith(
+                  (v) => v.finish(when),
                 ),
               ),
             await _actRepository.receive(

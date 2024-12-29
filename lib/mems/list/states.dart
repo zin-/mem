@@ -2,16 +2,16 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/act.dart';
+import 'package:mem/acts/act_repository.dart';
 import 'package:mem/acts/states.dart';
 import 'package:mem/framework/date_and_time/time_of_day.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/states.dart';
-import 'package:mem/acts/act_repository.dart';
 import 'package:mem/mems/mem_entity.dart';
 import 'package:mem/mems/mem_notification_entity.dart';
 import 'package:mem/mems/mem_notification_repository.dart';
+import 'package:mem/mems/states.dart';
 import 'package:mem/settings/preference/keys.dart';
 import 'package:mem/settings/states.dart';
 import 'package:mem/values/constants.dart';
@@ -118,9 +118,9 @@ final memListProvider = StateNotifierProvider.autoDispose<
         }
 
         final memNotificationsOfA =
-            savedMemNotifications.where((e) => e.memId == a.id);
+            savedMemNotifications.where((e) => e.value.memId == a.id);
         final memNotificationsOfB =
-            savedMemNotifications.where((e) => e.memId == b.id);
+            savedMemNotifications.where((e) => e.value.memId == b.id);
 
         final TimeOfDay startOfDay =
             ref.watch(preferencesProvider).value?[startOfDayKey] ??
@@ -136,12 +136,12 @@ final memListProvider = StateNotifierProvider.autoDispose<
 
         final timeOfThis = a.value.notifyAt(
           startOfToday,
-          memNotificationsOfA,
+          memNotificationsOfA.map((e) => e.value),
           latestActOfA,
         );
         final timeOfOther = b.value.notifyAt(
           startOfToday,
-          memNotificationsOfB,
+          memNotificationsOfB.map((e) => e.value),
           latestActOfB,
         );
 
@@ -155,10 +155,12 @@ final memListProvider = StateNotifierProvider.autoDispose<
           }
         }
 
-        final thisHasAfterActStarted =
-            memNotificationsOfA.where((e) => e.isAfterActStarted()).isNotEmpty;
-        final otherHasAfterActStarted =
-            memNotificationsOfB.where((e) => e.isAfterActStarted()).isNotEmpty;
+        final thisHasAfterActStarted = memNotificationsOfA
+            .where((e) => e.value.isAfterActStarted())
+            .isNotEmpty;
+        final otherHasAfterActStarted = memNotificationsOfB
+            .where((e) => e.value.isAfterActStarted())
+            .isNotEmpty;
         if (thisHasAfterActStarted != otherHasAfterActStarted) {
           return thisHasAfterActStarted ? -1 : 1;
         }
@@ -212,31 +214,28 @@ final latestActsByMemProvider =
   ),
 );
 final savedMemNotificationsProvider = StateNotifierProvider.autoDispose<
-    ListValueStateNotifier<SavedMemNotificationEntity>,
-    List<SavedMemNotificationEntity>>(
+    ListValueStateNotifier<SavedMemNotificationEntityV2>,
+    List<SavedMemNotificationEntityV2>>(
   (ref) => v(
     () => ListValueStateNotifier(
       ref.watch(
         memNotificationsProvider.select(
-            (value) => value.whereType<SavedMemNotificationEntity>().toList()),
+          (v) => v.whereType<SavedMemNotificationEntityV2>().toList(),
+        ),
       ),
       initializer: (current, notifier) => v(
         () async {
           if (current.isEmpty) {
-            final memIds = ref
-                .read(memsProvider)
-                .whereType<SavedMemEntityV2>()
-                .map((e) => e.id);
-
-            final actsByMemIds = await MemNotificationRepository().ship(
-              memIdsIn: memIds,
-            );
-
             ref.read(memNotificationsProvider.notifier).upsertAll(
-                  actsByMemIds,
+                  await MemNotificationRepositoryV2().ship(
+                    memIdsIn: ref
+                        .read(memsProvider)
+                        .whereType<SavedMemEntityV2>()
+                        .map((e) => e.id),
+                  ),
                   (current, updating) =>
-                      current is SavedMemNotificationEntity &&
-                      updating is SavedMemNotificationEntity &&
+                      current is SavedMemNotificationEntityV2 &&
+                      updating is SavedMemNotificationEntityV2 &&
                       current.id == updating.id,
                 );
           }

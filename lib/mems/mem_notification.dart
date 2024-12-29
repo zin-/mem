@@ -117,15 +117,9 @@ class MemNotification {
 
             // repeatByDayOfWeek
             final repeatByDayOfWeekList = memNotifications
-                .where(
-                  (element) => element.isRepeatByDayOfWeek(),
-                )
-                .map(
-                  (e) => e.time,
-                )
-                .sorted(
-                  (a, b) => a!.compareTo(b!),
-                );
+                .where((e) => e.isRepeatByDayOfWeek())
+                .map((e) => e.time)
+                .sorted((a, b) => a!.compareTo(b!));
             if (repeatByDayOfWeekList.isNotEmpty) {
               while (!repeatByDayOfWeekList.contains(notifyAt.weekday)) {
                 notifyAt = notifyAt.add(const Duration(days: 1));

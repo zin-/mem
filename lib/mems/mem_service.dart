@@ -11,8 +11,8 @@ import 'package:mem/mems/mem_repository.dart';
 
 class MemService {
   final MemRepositoryV2 _memRepository;
-  final MemItemRepository _memItemRepository;
-  final MemNotificationRepository _memNotificationRepository;
+  final MemItemRepositoryV2 _memItemRepository;
+  final MemNotificationRepositoryV2 _memNotificationRepository;
 
   Future<MemDetail> save(
     MemDetail memDetail, {
@@ -27,40 +27,42 @@ class MemService {
               : await _memRepository.receive(mem));
 
           final savedMemItems = await Future.wait(
-            memDetail.memItems.map((e) => (e is SavedMemItemEntity && !undo
-                ? _memItemRepository.replace(
-                    e.copiedWith(memId: () => savedMem.id)
-                        as SavedMemItemEntity,
-                  )
-                : _memItemRepository.receive(
-                    e.copiedWith(memId: () => savedMem.id),
-                  ))),
+            memDetail.memItems.map(
+              (e) => (e is SavedMemItemEntityV2 && !undo
+                  ? _memItemRepository.replace(
+                      e.copiedWith(memId: () => savedMem.id)
+                          as SavedMemItemEntityV2,
+                    )
+                  : _memItemRepository.receive(
+                      e.copiedWith(memId: () => savedMem.id),
+                    )),
+            ),
           );
 
           final memNotifications = memDetail.notifications;
           final returnMemNotifications =
-              List<SavedMemNotificationEntity?>.empty(growable: true);
+              List<SavedMemNotificationEntityV2?>.empty(growable: true);
           if (memNotifications == null) {
             await _memNotificationRepository.waste(memId: savedMem.id);
           } else {
             returnMemNotifications.addAll(await Future.wait(memNotifications
-                .where((e) => !e.isRepeatByDayOfWeek())
+                .where((e) => !e.value.isRepeatByDayOfWeek())
                 .map((e) {
-              if (e.isEnabled()) {
-                return (e is SavedMemNotificationEntity && !undo
-                    ? _memNotificationRepository.replace((e).copiedWith(
-                        memId: () => savedMem.id,
+              if (e.value.isEnabled()) {
+                return (e is SavedMemNotificationEntityV2 && !undo
+                    ? _memNotificationRepository.replace(e.updatedWith(
+                        (v) => MemNotification(
+                            savedMem.id, v.type, v.time, v.message),
                       ))
-                    : _memNotificationRepository.receive(
-                        (e as MemNotificationEntity).copiedWith(
-                          memId: () => savedMem.id,
-                        ),
-                      ));
+                    : _memNotificationRepository.receive(e.updatedWith(
+                        (v) => MemNotification(
+                            savedMem.id, v.type, v.time, v.message),
+                      )));
               } else {
                 return _memNotificationRepository
                     .waste(
                       memId: savedMem.id,
-                      type: e.type,
+                      type: e.value.type,
                     )
                     .then((v) => null);
               }
@@ -71,13 +73,18 @@ class MemService {
               type: MemNotificationType.repeatByDayOfWeek,
             );
             for (var entry in memNotifications
-                .where((e) => e.isRepeatByDayOfWeek())
-                .groupListsBy((e) => e.time)
+                .where((e) => e.value.isRepeatByDayOfWeek())
+                .groupListsBy((e) => e.value.time)
                 .entries) {
               returnMemNotifications.add(
                 await _memNotificationRepository.receive(
-                  (entry.value.first as MemNotificationEntity).copiedWith(
-                    memId: () => savedMem.id,
+                  entry.value.single.updatedWith(
+                    (v) => MemNotification(
+                      savedMem.id,
+                      v.type,
+                      v.time,
+                      v.message,
+                    ),
                   ),
                 ),
               );
@@ -87,9 +94,7 @@ class MemService {
           return MemDetail(
             savedMem,
             savedMemItems,
-            returnMemNotifications
-                .whereType<SavedMemNotificationEntity>()
-                .toList(),
+            returnMemNotifications.nonNulls.toList(growable: false),
           );
         },
         {
@@ -105,7 +110,7 @@ class MemService {
         () async => save(
           MemDetail(
             await _memRepository.ship(id: memId).then(
-                  (v) => v.single.updateWith(
+                  (v) => v.single.updatedWith(
                     (mem) => mem.done(DateTime.now()),
                   ),
                 ),
@@ -124,7 +129,7 @@ class MemService {
         () async => save(
           MemDetail(
             await _memRepository.ship(id: memId).then(
-                  (v) => v.single.updateWith(
+                  (v) => v.single.updatedWith(
                     (mem) => mem.undone(),
                   ),
                 ),
@@ -146,12 +151,12 @@ class MemService {
 
           return MemDetail(
             archivedMem,
-            archivedMemItems.toList(),
-            archivedMemNotifications.toList(),
+            archivedMemItems.toList(growable: false),
+            archivedMemNotifications.toList(growable: false),
           );
         },
         {
-          "mem": mem,
+          'mem': mem,
         },
       );
 
@@ -169,19 +174,20 @@ class MemService {
             unarchivedMemNotifications.toList(growable: false),
           );
         },
-        mem,
+        {
+          'mem': mem,
+        },
       );
 
   Future<bool> remove(int memId) => v(
         () async {
-          // TODO https://github.com/zin-/mem/issues/284
-          await _memNotificationRepository.waste(memId: memId);
-          await _memItemRepository.waste(memId: memId);
           await _memRepository.waste(id: memId);
 
           return true;
         },
-        {'memId': memId},
+        {
+          'memId': memId,
+        },
       );
 
   MemService._(
@@ -195,8 +201,8 @@ class MemService {
   factory MemService() => i(
         () => _instance ??= MemService._(
           MemRepositoryV2(),
-          MemItemRepository(),
-          MemNotificationRepository(),
+          MemItemRepositoryV2(),
+          MemNotificationRepositoryV2(),
         ),
       );
 }

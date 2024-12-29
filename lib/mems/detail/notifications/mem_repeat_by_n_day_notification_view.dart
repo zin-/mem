@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
-import 'package:mem/mems/mem_notification_entity.dart';
+import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/values/dimens.dart';
 
 const keyMemRepeatByNDayNotification = Key("mem-repeat-by-n-day-notification");
@@ -20,7 +20,7 @@ class MemRepeatByNDayNotificationView extends ConsumerWidget {
               ref.watch(memRepeatByNDayNotificationByMemIdProvider(_memId));
 
           return _MemRepeatByNDayNotificationView(
-            notification.time,
+            notification.value.time,
             (value) {
               ref
                   .read(
@@ -28,17 +28,24 @@ class MemRepeatByNDayNotificationView extends ConsumerWidget {
               )
                   .upsertAll(
                 [
-                  (notification as MemNotificationEntity).copiedWith(
-                    time: () => value == 0 ? null : value,
-                  ),
+                  notification
+                      .updatedWith(
+                        (v) => MemNotification(
+                          v.memId,
+                          v.type,
+                          value == 0 ? null : value,
+                          v.message,
+                        ),
+                      )
                 ],
-                (current, updating) => current.type == updating.type,
+                (current, updating) => current.value.type == updating.value
+                    .type,
               );
             },
           );
         },
         {
-          "_memId": _memId,
+          '_memId': _memId,
         },
       );
 }
@@ -90,7 +97,7 @@ class _MemRepeatByNDayNotificationView extends StatelessWidget {
           );
         },
         {
-          "nDay": nDay,
+          'nDay': nDay,
         },
       );
 }
