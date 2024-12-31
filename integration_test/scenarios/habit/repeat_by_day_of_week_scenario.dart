@@ -24,7 +24,7 @@ import '../helpers.dart';
 const _scenarioName = 'Repeat by day of week scenario';
 
 void main() => group(
-      ': $_scenarioName',
+      _scenarioName,
       () {
         const baseMemName = "$_scenarioName - mem - name";
         const insertedMemName = "$baseMemName - inserted";
@@ -88,10 +88,10 @@ void main() => group(
         });
 
         group(
-          ': show',
+          'Show',
           () {
             testWidgets(
-              ': initial.',
+              'No selected.',
               (widgetTester) async {
                 await runApplication();
                 await widgetTester.pump();
@@ -112,21 +112,22 @@ void main() => group(
                   'Thu',
                   'Fri',
                   'Sat',
-                  'Sun'
+                  'Sun',
                 ]) {
                   expect(find.text(dayOfWeek), findsOneWidget);
                 }
                 expect(
-                    widgetTester
-                        .widget<SelectWeekDays>(find.byType(SelectWeekDays))
-                        .days
-                        .map((e) => e.isSelected),
-                    everyElement(false));
+                  widgetTester
+                      .widget<SelectWeekDays>(find.byType(SelectWeekDays))
+                      .days
+                      .map((e) => e.isSelected),
+                  everyElement(false),
+                );
               },
             );
 
             testWidgets(
-              'saved.',
+              'Week day of yesterday is selected.',
               (widgetTester) async {
                 final repeatText =
                     DateFormat.E().format(insertedMemNotificationTime);
@@ -139,12 +140,13 @@ void main() => group(
                 await widgetTester.pumpAndSettle();
 
                 expect(
-                    widgetTester
-                        .widget<Text>(find.descendant(
-                            of: find.byKey(keyMemNotificationsView),
-                            matching: find.byType(Text)))
-                        .data,
-                    equals(repeatText));
+                  widgetTester
+                      .widget<Text>(find.descendant(
+                          of: find.byKey(keyMemNotificationsView),
+                          matching: find.byType(Text)))
+                      .data,
+                  equals(repeatText),
+                );
 
                 await widgetTester.tap(find.descendant(
                     of: find.byKey(keyMemNotificationsView),
@@ -152,29 +154,31 @@ void main() => group(
                 await widgetTester.pumpAndSettle();
 
                 expect(
-                    widgetTester
-                        .widget<SelectWeekDays>(find.byType(SelectWeekDays))
-                        .days[insertedMemNotificationTime.weekday - 1]
-                        .isSelected,
-                    isTrue);
+                  widgetTester
+                      .widget<SelectWeekDays>(find.byType(SelectWeekDays))
+                      .days[insertedMemNotificationTime.weekday - 1]
+                      .isSelected,
+                  isTrue,
+                );
                 expect(
-                    widgetTester
-                        .widget<SelectWeekDays>(find.byType(SelectWeekDays))
-                        .days
-                        .whereIndexed((index, element) =>
-                            index != insertedMemNotificationTime.weekday - 1)
-                        .map((e) => e.isSelected),
-                    everyElement(isFalse));
+                  widgetTester
+                      .widget<SelectWeekDays>(find.byType(SelectWeekDays))
+                      .days
+                      .whereIndexed((index, element) =>
+                          index != insertedMemNotificationTime.weekday - 1)
+                      .map((e) => e.isSelected),
+                  everyElement(isFalse),
+                );
               },
             );
           },
         );
 
         group(
-          ': change',
+          'Change',
           () {
             testWidgets(
-              ': select Mon, Fri.',
+              'Select Mon, Fri.',
               (widgetTester) async {
                 await runApplication();
                 await widgetTester.pumpAndSettle();
@@ -194,30 +198,33 @@ void main() => group(
                 await widgetTester.pump();
 
                 expect(
-                    widgetTester
-                        .widget<SelectWeekDays>(find.byType(SelectWeekDays))
-                        .days[0]
-                        .isSelected,
-                    isTrue);
+                  widgetTester
+                      .widget<SelectWeekDays>(find.byType(SelectWeekDays))
+                      .days[0]
+                      .isSelected,
+                  isTrue,
+                );
                 expect(
-                    widgetTester
-                        .widget<SelectWeekDays>(find.byType(SelectWeekDays))
-                        .days[4]
-                        .isSelected,
-                    isTrue);
+                  widgetTester
+                      .widget<SelectWeekDays>(find.byType(SelectWeekDays))
+                      .days[4]
+                      .isSelected,
+                  isTrue,
+                );
                 expect(
-                    widgetTester
-                        .widget<SelectWeekDays>(find.byType(SelectWeekDays))
-                        .days
-                        .whereIndexed(
-                            (index, element) => index != 0 && index != 4)
-                        .map((e) => e.isSelected),
-                    everyElement(isFalse));
+                  widgetTester
+                      .widget<SelectWeekDays>(find.byType(SelectWeekDays))
+                      .days
+                      .whereIndexed(
+                          (index, element) => index != 0 && index != 4)
+                      .map((e) => e.isSelected),
+                  everyElement(isFalse),
+                );
               },
             );
 
             testWidgets(
-              'unselect selected.',
+              'Unselect selected.',
               (widgetTester) async {
                 await runApplication();
                 await widgetTester.pumpAndSettle();
@@ -232,11 +239,12 @@ void main() => group(
                     .text(DateFormat.E().format(insertedMemNotificationTime)));
 
                 expect(
-                    widgetTester
-                        .widget<SelectWeekDays>(find.byType(SelectWeekDays))
-                        .days
-                        .map((e) => e.isSelected),
-                    everyElement(false));
+                  widgetTester
+                      .widget<SelectWeekDays>(find.byType(SelectWeekDays))
+                      .days
+                      .map((e) => e.isSelected),
+                  everyElement(false),
+                );
               },
             );
           },
@@ -272,32 +280,33 @@ void main() => group(
             await widgetTester.pumpAndSettle();
 
             expect(
-                widgetTester
-                    .widget<SelectWeekDays>(find.byType(SelectWeekDays))
-                    .days[6]
-                    .isSelected,
-                isTrue);
+              widgetTester
+                  .widget<SelectWeekDays>(find.byType(SelectWeekDays))
+                  .days[6]
+                  .isSelected,
+              isTrue,
+            );
             expect(
-                widgetTester
-                    .widget<SelectWeekDays>(find.byType(SelectWeekDays))
-                    .days
-                    .whereIndexed((i, e) => i != 6)
-                    .map((e) => e.isSelected),
-                everyElement(isFalse));
+              widgetTester
+                  .widget<SelectWeekDays>(find.byType(SelectWeekDays))
+                  .days
+                  .whereIndexed((i, e) => i != 6)
+                  .map((e) => e.isSelected),
+              everyElement(isFalse),
+            );
 
-            final savedMemNotifications = await dbA.select(
-                defTableMemNotifications,
-                where: "${defFkMemNotificationsMemId.name} = ?",
-                whereArgs: [insertedMemId],
-                orderBy: "id ASC");
-            expect(savedMemNotifications, hasLength(1));
+            final savedMemNotifications =
+                await dbA.select(defTableMemNotifications);
+            expect(savedMemNotifications, hasLength(3));
             expect(
-                savedMemNotifications.singleWhere(
-                  (e) =>
-                      e[defColMemNotificationsType.name] ==
-                      MemNotificationType.repeatByDayOfWeek.name,
-                )[defColMemNotificationsTime.name],
-                equals(7));
+              savedMemNotifications.singleWhere(
+                (e) =>
+                    e[defFkMemNotificationsMemId.name] == insertedMemId &&
+                    e[defColMemNotificationsType.name] ==
+                        MemNotificationType.repeatByDayOfWeek.name,
+              )[defColMemNotificationsTime.name],
+              equals(7),
+            );
           },
         );
 
