@@ -31,7 +31,7 @@ Future<void> clearAllTestDatabaseRows(
 }
 
 // Application operations
-Future<void> runApplication() => main(languageCode: 'en');
+Future<void> runApplication() async => await main(languageCode: 'en');
 
 Future closeMemListFilter(WidgetTester widgetTester) async =>
     await widgetTester.tapAt(const Offset(0, 0));

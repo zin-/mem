@@ -10,9 +10,8 @@ import 'notifications/notification_actions.dart';
 import 'notifications/notification_repository.dart';
 import 'router.dart';
 
-Future<void> main({String? languageCode}) async {
-  return await _runApplication(languageCode: languageCode);
-}
+Future<void> main({String? languageCode}) async =>
+    await _runApplication(languageCode: languageCode);
 
 @pragma('vm:entry-point')
 Future<void> launchActCounterConfigure() async {
