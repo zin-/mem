@@ -140,7 +140,7 @@ void main() => group(
                     MemNotification.initialByType(
                       savedMem.id,
                       MemNotificationType.repeat,
-                      time: () => 0,
+                      time: () => 60,
                     ),
                   ),
                 );
@@ -178,7 +178,7 @@ void main() => group(
               });
 
               testWidgets(
-                "Today",
+                "Before start of tomorrow is today's habit.",
                 (widgetTester) async {
                   await runApplication();
                   await widgetTester.pumpAndSettle();
