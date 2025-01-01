@@ -66,6 +66,7 @@ class _MemListWidget extends StatelessWidget {
   Widget build(BuildContext context) => v(
         () {
           final now = DateTime.now();
+          // FIXME 今日の始まりじゃなくね？
           final startOfToday = DateTime(
             now.year,
             now.month,
@@ -118,13 +119,23 @@ class _MemListWidget extends StatelessWidget {
                         ),
                       );
 
-                      return nextNotifyAt == null
-                          ? null
-                          : DateAndTime(
-                              nextNotifyAt.year,
-                              nextNotifyAt.month,
-                              nextNotifyAt.day,
-                            );
+                      if (nextNotifyAt == null) {
+                        return null;
+                      } else {
+                        if (nextNotifyAt.isBefore(startOfToday)) {
+                          return DateAndTime(
+                            nextNotifyAt.year,
+                            nextNotifyAt.month,
+                            nextNotifyAt.day,
+                          ).subtract(Duration(days: 1));
+                        } else {
+                          return DateAndTime(
+                            nextNotifyAt.year,
+                            nextNotifyAt.month,
+                            nextNotifyAt.day,
+                          );
+                        }
+                      }
                     },
                   )
                   .entries
