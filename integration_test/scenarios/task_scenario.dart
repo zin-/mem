@@ -120,7 +120,7 @@ void testTaskScenario() => group(': $_scenarioName', () {
           });
 
           group(": inserted Mem", () {
-            testWidgets(": on MemList", (widgetTester) async {
+            testWidgets("On MemList", (widgetTester) async {
               await runApplication();
               await widgetTester.pumpAndSettle();
 

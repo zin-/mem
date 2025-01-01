@@ -104,16 +104,12 @@ class _MemListWidget extends StatelessWidget {
               ...(hasActMemList[false] ?? [])
                   .groupListsBy(
                     (element) {
+                      final memNotifications = _memNotifications
+                          .where((e) => e.value.memId == element.id)
+                          .map((e) => e.value);
                       final nextNotifyAt = element.value.notifyAt(
                         startOfToday,
-                        _memNotifications
-                            .where(
-                              (memNotification) =>
-                                  memNotification.value.memId == element.id,
-                            )
-                            .map(
-                              (e) => e.value,
-                            ),
+                        memNotifications,
                         _latestActsByMem.singleWhereOrNull(
                           (act) => act.memId == element.id,
                         ),
@@ -122,19 +118,22 @@ class _MemListWidget extends StatelessWidget {
                       if (nextNotifyAt == null) {
                         return null;
                       } else {
-                        if (nextNotifyAt.isBefore(startOfToday)) {
+                        if (memNotifications
+                                .where((e) => !e.isAfterActStarted())
+                                .isNotEmpty &&
+                            nextNotifyAt.isBefore(startOfToday)) {
                           return DateAndTime(
                             nextNotifyAt.year,
                             nextNotifyAt.month,
                             nextNotifyAt.day,
-                          ).subtract(Duration(days: 1));
-                        } else {
-                          return DateAndTime(
-                            nextNotifyAt.year,
-                            nextNotifyAt.month,
-                            nextNotifyAt.day,
-                          );
+                          ).add(Duration(days: 1));
                         }
+
+                        return DateAndTime(
+                          nextNotifyAt.year,
+                          nextNotifyAt.month,
+                          nextNotifyAt.day,
+                        );
                       }
                     },
                   )
