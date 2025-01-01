@@ -8,6 +8,12 @@ import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/logger/log.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/mems/mem.dart';
+import 'package:mem/mems/mem_entity.dart';
+import 'package:mem/mems/mem_notification.dart';
+import 'package:mem/mems/mem_notification_entity.dart';
+import 'package:mem/mems/mem_notification_repository.dart';
+import 'package:mem/mems/mem_repository.dart';
 import 'package:mem/notifications/notification_client.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/notifications/notification_ids.dart';
@@ -72,7 +78,7 @@ void main() => group(
         );
 
         group(
-          ': Start of day',
+          'Start of day',
           () {
             setUp(() async {
               await PreferenceClientRepository().discard(startOfDayKey);
@@ -121,11 +127,34 @@ void main() => group(
               },
             );
 
-            group('with saved', () {
+            group('With saved', () {
               final now = DateTime.now();
               setUp(() async {
                 await PreferenceClientRepository().receive(PreferenceEntity(
                     startOfDayKey, TimeOfDay.fromDateTime(now)));
+
+                final savedMem = await MemRepositoryV2().receive(MemEntityV2(
+                    Mem("$insertedMemName - Start of day", null, null)));
+                await MemNotificationRepositoryV2().receive(
+                  MemNotificationEntityV2(
+                    MemNotification.initialByType(
+                      savedMem.id,
+                      MemNotificationType.repeat,
+                      time: () => 0,
+                    ),
+                  ),
+                );
+                final savedMem2 = await MemRepositoryV2().receive(MemEntityV2(
+                    Mem("$insertedMemName - Start of day", null, null)));
+                await MemNotificationRepositoryV2().receive(
+                  MemNotificationEntityV2(
+                    MemNotification.initialByType(
+                      savedMem2.id,
+                      MemNotificationType.repeat,
+                      time: () => 60 * 60 * 24 - 60,
+                    ),
+                  ),
+                );
               });
 
               testWidgets('show saved.', (widgetTester) async {
@@ -147,6 +176,20 @@ void main() => group(
                         .data,
                     timeText(now));
               });
+
+              testWidgets(
+                "Today",
+                (widgetTester) async {
+                  await runApplication();
+                  await widgetTester.pumpAndSettle();
+
+                  expect(find.text(dateText(now)), findsOneWidget);
+                  expect(
+                    find.text(dateText(now.add(Duration(days: 1)))),
+                    findsOneWidget,
+                  );
+                },
+              );
             });
           },
         );
