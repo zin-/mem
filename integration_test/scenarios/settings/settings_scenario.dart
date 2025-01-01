@@ -21,7 +21,7 @@ import '../helpers.dart';
 const _scenarioName = "Settings test";
 
 void main() => group(
-      ": $_scenarioName",
+      _scenarioName,
       () {
         LogService(
           level: Level.verbose,
@@ -31,8 +31,6 @@ void main() => group(
 
         const numberOfMem = 100;
         const insertedMemName = '$_scenarioName: inserted - mem name';
-
-        final insertedMemIds = List<int>.empty(growable: true);
 
         late final DatabaseAccessor dbA;
 
@@ -44,18 +42,6 @@ void main() => group(
           NotificationClient.resetSingleton();
 
           await clearAllTestDatabaseRows(databaseDefinition);
-
-          for (var i = 0; i < numberOfMem; i++) {
-            insertedMemIds.add(
-              await dbA.insert(
-                defTableMems,
-                {
-                  defColMemsName.name: "$insertedMemName: $i",
-                  defColCreatedAt.name: zeroDate,
-                },
-              ),
-            );
-          }
         });
 
         testWidgets(
@@ -165,114 +151,140 @@ void main() => group(
           },
         );
 
-        testWidgets(
-          'Reset Notification',
-          (widgetTester) async {
-            widgetTester.ignoreMockMethodCallHandler(
-                MethodChannelMock.permissionHandler);
-            int alarmServiceStartCount = 0;
-            int alarmCancelCount = 0;
-            final cancelIds = insertedMemIds
-                .map(
-                  (e) => [
-                    memStartNotificationId(e),
-                    memEndNotificationId(e),
-                    memRepeatedNotificationId(e),
-                  ],
-                )
-                .flattened;
-            widgetTester.setMockMethodCallHandler(
-                MethodChannelMock.androidAlarmManager, [
-              (m) async {
-                expect(m.method, equals('AlarmService.start'));
-                alarmServiceStartCount++;
-                return true;
+        group(
+          "Reset Notification",
+          () {
+            final insertedMemIds = List<int>.empty(growable: true);
+
+            setUp(
+              () async {
+                for (var i = 0; i < numberOfMem; i++) {
+                  insertedMemIds.add(
+                    await dbA.insert(
+                      defTableMems,
+                      {
+                        defColMemsName.name: "$insertedMemName: $i",
+                        defColCreatedAt.name: zeroDate,
+                      },
+                    ),
+                  );
+                }
               },
-              ...cancelIds.map((e) => (m) async {
-                    expect(m.method, equals('Alarm.cancel'));
-                    alarmCancelCount++;
-                    return false;
-                  }),
-            ]);
+            );
 
-            int initializeCount = 0;
-            int getNotificationAppLaunchDetailsCount = 0;
-            int cancelAllCount = 0;
-            int deleteNotificationChannelCount = 0;
-            widgetTester.setMockMethodCallHandler(
-                MethodChannelMock.flutterLocalNotifications, [
-              (m) async {
-                expect(m.method, equals('initialize'));
-                initializeCount++;
-                return true;
+            testWidgets(
+              "Execute.",
+              (widgetTester) async {
+                widgetTester.ignoreMockMethodCallHandler(
+                    MethodChannelMock.permissionHandler);
+                int alarmServiceStartCount = 0;
+                int alarmCancelCount = 0;
+                final cancelIds = insertedMemIds
+                    .map(
+                      (e) => [
+                        memStartNotificationId(e),
+                        memEndNotificationId(e),
+                        memRepeatedNotificationId(e),
+                      ],
+                    )
+                    .flattened;
+                widgetTester.setMockMethodCallHandler(
+                    MethodChannelMock.androidAlarmManager, [
+                  (m) async {
+                    expect(m.method, equals('AlarmService.start'));
+                    alarmServiceStartCount++;
+                    return true;
+                  },
+                  ...cancelIds.map((e) => (m) async {
+                        expect(m.method, equals('Alarm.cancel'));
+                        alarmCancelCount++;
+                        return false;
+                      }),
+                ]);
+
+                int initializeCount = 0;
+                int getNotificationAppLaunchDetailsCount = 0;
+                int cancelAllCount = 0;
+                int deleteNotificationChannelCount = 0;
+                widgetTester.setMockMethodCallHandler(
+                    MethodChannelMock.flutterLocalNotifications, [
+                  (m) async {
+                    expect(m.method, equals('initialize'));
+                    initializeCount++;
+                    return true;
+                  },
+                  (m) async {
+                    expect(m.method, equals('getNotificationAppLaunchDetails'));
+                    getNotificationAppLaunchDetailsCount++;
+                    return null;
+                  },
+                  (m) async {
+                    expect(m.method, equals('cancelAll'));
+                    cancelAllCount++;
+                    return null;
+                  },
+                  ...NotificationType.values.map(
+                    (e) => (m) async {
+                      expect(m.method, equals('deleteNotificationChannel'));
+                      deleteNotificationChannelCount++;
+                      return null;
+                    },
+                  ),
+                ]);
+
+                await runApplication();
+                await widgetTester.pumpAndSettle();
+
+                await widgetTester.tap(drawerIconFinder);
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(find.text(l10n.settingsPageTitle));
+                await widgetTester.pumpAndSettle();
+
+                await widgetTester.tap(find.text(l10n.resetNotificationLabel));
+                await widgetTester.pump();
+
+                expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+                var indicator = widgetTester
+                    .elementList(find.byType(CircularProgressIndicator));
+                while (indicator.length == 1) {
+                  await widgetTester.pump();
+                  indicator = widgetTester
+                      .elementList(find.byType(CircularProgressIndicator));
+                }
+
+                expect(find.byType(CircularProgressIndicator), findsNothing);
+                expect(
+                    find.text(l10n.completeResetNotification), findsOneWidget);
+
+                if (defaultTargetPlatform == TargetPlatform.android) {
+                  expect(alarmServiceStartCount, equals(1),
+                      reason: 'alarmServiceStartCount');
+                  expect(alarmCancelCount, equals(300),
+                      reason: 'alarmCancelCount');
+                  expect(initializeCount, equals(1), reason: 'initializeCount');
+                  expect(getNotificationAppLaunchDetailsCount, equals(1),
+                      reason: 'getNotificationAppLaunchDetailsCount');
+                  expect(cancelAllCount, equals(1), reason: 'cancelAllCount');
+                  expect(deleteNotificationChannelCount,
+                      equals(NotificationType.values.length),
+                      reason: 'deleteNotificationChannelCount');
+                } else {
+                  expect(alarmServiceStartCount, equals(0),
+                      reason: 'alarmServiceStartCount');
+                  expect(alarmCancelCount, equals(0),
+                      reason: 'alarmCancelCount');
+                  expect(initializeCount, equals(0), reason: 'initializeCount');
+                  expect(getNotificationAppLaunchDetailsCount, equals(0),
+                      reason: 'getNotificationAppLaunchDetailsCount');
+                  expect(cancelAllCount, equals(0), reason: 'cancelAllCount');
+                  expect(deleteNotificationChannelCount, equals(0),
+                      reason: 'deleteNotificationChannelCount');
+                }
+
+                widgetTester.clearAllMockMethodCallHandler();
               },
-              (m) async {
-                expect(m.method, equals('getNotificationAppLaunchDetails'));
-                getNotificationAppLaunchDetailsCount++;
-                return null;
-              },
-              (m) async {
-                expect(m.method, equals('cancelAll'));
-                cancelAllCount++;
-                return null;
-              },
-              ...NotificationType.values.map(
-                (e) => (m) async {
-                  expect(m.method, equals('deleteNotificationChannel'));
-                  deleteNotificationChannelCount++;
-                  return null;
-                },
-              ),
-            ]);
-
-            await runApplication();
-            await widgetTester.pumpAndSettle();
-
-            await widgetTester.tap(drawerIconFinder);
-            await widgetTester.pumpAndSettle();
-            await widgetTester.tap(find.text(l10n.settingsPageTitle));
-            await widgetTester.pumpAndSettle();
-
-            await widgetTester.tap(find.text(l10n.resetNotificationLabel));
-            await widgetTester.pump();
-
-            expect(find.byType(CircularProgressIndicator), findsOneWidget);
-
-            var indicator = widgetTester
-                .elementList(find.byType(CircularProgressIndicator));
-            while (indicator.length == 1) {
-              await widgetTester.pump();
-              indicator = widgetTester
-                  .elementList(find.byType(CircularProgressIndicator));
-            }
-
-            expect(find.byType(CircularProgressIndicator), findsNothing);
-            expect(find.text(l10n.completeResetNotification), findsOneWidget);
-
-            if (defaultTargetPlatform == TargetPlatform.android) {
-              expect(alarmServiceStartCount, equals(1),
-                  reason: 'alarmServiceStartCount');
-              expect(alarmCancelCount, equals(300), reason: 'alarmCancelCount');
-              expect(initializeCount, equals(1), reason: 'initializeCount');
-              expect(getNotificationAppLaunchDetailsCount, equals(1),
-                  reason: 'getNotificationAppLaunchDetailsCount');
-              expect(cancelAllCount, equals(1), reason: 'cancelAllCount');
-              expect(deleteNotificationChannelCount,
-                  equals(NotificationType.values.length),
-                  reason: 'deleteNotificationChannelCount');
-            } else {
-              expect(alarmServiceStartCount, equals(0),
-                  reason: 'alarmServiceStartCount');
-              expect(alarmCancelCount, equals(0), reason: 'alarmCancelCount');
-              expect(initializeCount, equals(0), reason: 'initializeCount');
-              expect(getNotificationAppLaunchDetailsCount, equals(0),
-                  reason: 'getNotificationAppLaunchDetailsCount');
-              expect(cancelAllCount, equals(0), reason: 'cancelAllCount');
-              expect(deleteNotificationChannelCount, equals(0),
-                  reason: 'deleteNotificationChannelCount');
-            }
-
-            widgetTester.clearAllMockMethodCallHandler();
+            );
           },
         );
       },
