@@ -183,16 +183,7 @@ void main() => group(
                   "Before start of tomorrow is today's habit.",
                   (widgetTester) async {
                     await runApplication();
-                    await widgetTester.pump();
-                    await widgetTester.pump();
-                    await widgetTester.pump();
-                    await widgetTester.pump();
-                    await widgetTester.pump();
-                    await widgetTester.pump();
-                    await widgetTester.pumpAndSettle(waitSideEffectDuration);
-                    await widgetTester.pumpAndSettle(waitSideEffectDuration);
-                    await widgetTester.pumpAndSettle(waitSideEffectDuration);
-                    await widgetTester.pumpAndSettle(waitSideEffectDuration);
+                    await widgetTester.pumpAndSettle(Duration(seconds: 10));
 
                     expect(find.text(dateText(now)), findsOneWidget);
                     expect(
