@@ -184,6 +184,9 @@ void main() => group(
                   (widgetTester) async {
                     await runApplication();
                     await widgetTester.pumpAndSettle(waitSideEffectDuration);
+                    await widgetTester.pumpAndSettle(waitSideEffectDuration);
+                    await widgetTester.pumpAndSettle(waitSideEffectDuration);
+                    await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
                     expect(find.text(dateText(now)), findsOneWidget);
                     expect(
