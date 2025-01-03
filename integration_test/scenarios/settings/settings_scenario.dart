@@ -127,70 +127,73 @@ void main() => group(
               },
             );
 
-            group('With saved', () {
-              final now = DateTime.now();
-              setUp(() async {
-                await PreferenceClientRepository().receive(PreferenceEntity(
-                    startOfDayKey, TimeOfDay.fromDateTime(now)));
+            group(
+              'With saved',
+              () {
+                final now = DateTime.now();
+                setUp(() async {
+                  await PreferenceClientRepository().receive(PreferenceEntity(
+                      startOfDayKey, TimeOfDay.fromDateTime(now)));
 
-                final savedMem = await MemRepositoryV2().receive(MemEntityV2(
-                    Mem("$insertedMemName - Start of day", null, null)));
-                await MemNotificationRepositoryV2().receive(
-                  MemNotificationEntityV2(
-                    MemNotification.initialByType(
-                      savedMem.id,
-                      MemNotificationType.repeat,
-                      time: () => 60,
+                  final savedMem = await MemRepositoryV2().receive(MemEntityV2(
+                      Mem("$insertedMemName - Start of day", null, null)));
+                  await MemNotificationRepositoryV2().receive(
+                    MemNotificationEntityV2(
+                      MemNotification.initialByType(
+                        savedMem.id,
+                        MemNotificationType.repeat,
+                        time: () => 60,
+                      ),
                     ),
-                  ),
-                );
-                final savedMem2 = await MemRepositoryV2().receive(MemEntityV2(
-                    Mem("$insertedMemName - Start of day", null, null)));
-                await MemNotificationRepositoryV2().receive(
-                  MemNotificationEntityV2(
-                    MemNotification.initialByType(
-                      savedMem2.id,
-                      MemNotificationType.repeat,
-                      time: () => 60 * 60 * 24 - 60,
+                  );
+                  final savedMem2 = await MemRepositoryV2().receive(MemEntityV2(
+                      Mem("$insertedMemName - Start of day", null, null)));
+                  await MemNotificationRepositoryV2().receive(
+                    MemNotificationEntityV2(
+                      MemNotification.initialByType(
+                        savedMem2.id,
+                        MemNotificationType.repeat,
+                        time: () => 60 * 60 * 24 - 60,
+                      ),
                     ),
-                  ),
-                );
-              });
+                  );
+                });
 
-              testWidgets('show saved.', (widgetTester) async {
-                await runApplication();
-                await widgetTester.pumpAndSettle();
-
-                await widgetTester.tap(drawerIconFinder);
-                await widgetTester.pumpAndSettle();
-                await widgetTester.tap(find.text(l10n.settingsPageTitle));
-                await widgetTester.pumpAndSettle();
-
-                expect(
-                    widgetTester
-                        .widget<Text>(find
-                            .descendant(
-                                of: find.byType(SettingsTile),
-                                matching: find.byType(Text))
-                            .at(1))
-                        .data,
-                    timeText(now));
-              });
-
-              testWidgets(
-                "Before start of tomorrow is today's habit.",
-                (widgetTester) async {
+                testWidgets('show saved.', (widgetTester) async {
                   await runApplication();
                   await widgetTester.pumpAndSettle();
 
-                  expect(find.text(dateText(now)), findsOneWidget);
+                  await widgetTester.tap(drawerIconFinder);
+                  await widgetTester.pumpAndSettle();
+                  await widgetTester.tap(find.text(l10n.settingsPageTitle));
+                  await widgetTester.pumpAndSettle();
+
                   expect(
-                    find.text(dateText(now.add(Duration(days: 1)))),
-                    findsOneWidget,
-                  );
-                },
-              );
-            });
+                      widgetTester
+                          .widget<Text>(find
+                              .descendant(
+                                  of: find.byType(SettingsTile),
+                                  matching: find.byType(Text))
+                              .at(1))
+                          .data,
+                      timeText(now));
+                });
+
+                testWidgets(
+                  "Before start of tomorrow is today's habit.",
+                  (widgetTester) async {
+                    await runApplication();
+                    await widgetTester.pumpAndSettle(waitSideEffectDuration);
+
+                    expect(find.text(dateText(now)), findsOneWidget);
+                    expect(
+                      find.text(dateText(now.add(Duration(days: 1)))),
+                      findsOneWidget,
+                    );
+                  },
+                );
+              },
+            );
           },
         );
 
