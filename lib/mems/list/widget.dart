@@ -69,11 +69,12 @@ class _MemListWidget extends StatelessWidget {
           final startOfToday = DateTime(
             now.year,
             now.month,
-            now.day +
-                (_startOfDay.lessThan(TimeOfDay.fromDateTime(now)) ? 0 : 1),
+            now.day,
             _startOfDay.hour,
             _startOfDay.minute,
-          );
+          ).add(Duration(
+            days: _startOfDay.lessThan(TimeOfDay.fromDateTime(now)) ? 0 : 1,
+          ));
           final l10n = buildL10n(context);
 
           final hasActMemList = _memList.groupListsBy(
@@ -103,28 +104,35 @@ class _MemListWidget extends StatelessWidget {
               ...(hasActMemList[false] ?? [])
                   .groupListsBy(
                     (element) {
+                      final memNotifications = _memNotifications
+                          .where((e) => e.value.memId == element.id)
+                          .map((e) => e.value);
                       final nextNotifyAt = element.value.notifyAt(
                         startOfToday,
-                        _memNotifications
-                            .where(
-                              (memNotification) =>
-                                  memNotification.value.memId == element.id,
-                            )
-                            .map(
-                              (e) => e.value,
-                            ),
+                        memNotifications,
                         _latestActsByMem.singleWhereOrNull(
                           (act) => act.memId == element.id,
                         ),
                       );
 
-                      return nextNotifyAt == null
-                          ? null
-                          : DateAndTime(
-                              nextNotifyAt.year,
-                              nextNotifyAt.month,
-                              nextNotifyAt.day,
-                            );
+                      if (nextNotifyAt == null) {
+                        return null;
+                      } else if (memNotifications
+                              .where((e) => !e.isAfterActStarted())
+                              .isNotEmpty &&
+                          nextNotifyAt.isBefore(startOfToday)) {
+                        return DateAndTime(
+                          nextNotifyAt.year,
+                          nextNotifyAt.month,
+                          nextNotifyAt.day,
+                        ).add(Duration(days: 1));
+                      } else {
+                        return DateAndTime(
+                          nextNotifyAt.year,
+                          nextNotifyAt.month,
+                          nextNotifyAt.day,
+                        );
+                      }
                     },
                   )
                   .entries
