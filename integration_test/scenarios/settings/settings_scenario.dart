@@ -197,6 +197,24 @@ void main() => group(
           },
         );
 
+        testWidgets(
+          "Notify after inactivity",
+          (widgetTester) async {
+            await runApplication();
+            await widgetTester.pumpAndSettle();
+            await widgetTester.tap(drawerIconFinder);
+            await widgetTester.pumpAndSettle();
+            await widgetTester.tap(find.text(l10n.settingsPageTitle));
+            await widgetTester.pumpAndSettle();
+
+            final texts = widgetTester.widgetList<Text>(find.byType(Text));
+            expect(
+              texts.elementAt(2).data,
+              equals(l10n.notifyAfterInactivityLabel),
+            );
+          },
+        );
+
         group(
           "Reset Notification",
           () {

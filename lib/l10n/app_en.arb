@@ -68,6 +68,7 @@
   "startLabel": "Start",
 
   "startOfDayLabel": "Start of day",
+  "notifyAfterInactivityLabel": "Notify after inactivity",
   "backupLabel": "Backup",
   "createBackupLabel": "Create",
   "restoreBackupLabel": "Restore",

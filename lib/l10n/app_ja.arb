@@ -68,6 +68,7 @@
   "startLabel": "開始",
 
   "startOfDayLabel": "1日の開始時間",
+  "notifyAfterInactivityLabel": "何もしていなかったら通知する",
   "backupLabel": "バックアップ",
   "createBackupLabel": "作成",
   "restoreBackupLabel": "復元",
