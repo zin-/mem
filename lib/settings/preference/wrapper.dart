@@ -24,6 +24,12 @@ class SharedPreferencesWrapper {
                   value as String,
                 );
 
+              case const (int):
+                return await sharedPreferences.setInt(
+                  key,
+                  value as int,
+                );
+
               default:
                 throw UnimplementedError(); // coverage:ignore-line
             }

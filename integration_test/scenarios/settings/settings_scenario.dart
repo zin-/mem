@@ -6,6 +6,7 @@ import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
+import 'package:mem/framework/date_and_time/seconds_of_time_picker.dart';
 import 'package:mem/logger/log.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem.dart';
@@ -197,20 +198,72 @@ void main() => group(
           },
         );
 
-        testWidgets(
+        group(
           "Notify after inactivity",
-          (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
-            await widgetTester.tap(drawerIconFinder);
-            await widgetTester.pumpAndSettle();
-            await widgetTester.tap(find.text(l10n.settingsPageTitle));
-            await widgetTester.pumpAndSettle();
+          () {
+            setUp(
+              () async {
+                await PreferenceClientRepository()
+                    .discard(notifyAfterInactivity);
+              },
+            );
 
-            final texts = widgetTester.widgetList<Text>(find.byType(Text));
-            expect(
-              texts.elementAt(2).data,
-              equals(l10n.notifyAfterInactivityLabel),
+            testWidgets(
+              "Show.",
+              (widgetTester) async {
+                await runApplication();
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(drawerIconFinder);
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(find.text(l10n.settingsPageTitle));
+                await widgetTester.pumpAndSettle();
+
+                final texts = widgetTester.widgetList<Text>(find.byType(Text));
+                expect(
+                  texts.elementAt(2).data,
+                  equals(l10n.notifyAfterInactivityLabel),
+                );
+              },
+            );
+
+            testWidgets(
+              "Save.",
+              (widgetTester) async {
+                await runApplication();
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(drawerIconFinder);
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(find.text(l10n.settingsPageTitle));
+                await widgetTester.pumpAndSettle();
+
+                const secondsOfHour = 3600;
+                final texts = widgetTester.widgetList<Text>(find.byType(Text));
+                expect(
+                  texts.elementAt(3).data,
+                  isNot(equals(formatSecondsOfTime(secondsOfHour))),
+                );
+
+                await widgetTester
+                    .tap(find.text(l10n.notifyAfterInactivityLabel));
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(find.text(l10n.okAction));
+                await widgetTester.pumpAndSettle();
+
+                final texts2 = widgetTester.widgetList<Text>(find.byType(Text));
+                expect(
+                  texts2.elementAt(3).data,
+                  equals(formatSecondsOfTime(secondsOfHour)),
+                );
+
+                expect(
+                  await PreferenceClientRepository()
+                      .shipByKey(notifyAfterInactivity)
+                      .then(
+                        (v) => v.value,
+                      ),
+                  equals(secondsOfHour),
+                );
+              },
             );
           },
         );

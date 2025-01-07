@@ -15,16 +15,9 @@ class TimeTextFormField extends StatelessWidget {
   @override
   Widget build(BuildContext context) => v(
         () {
-          int? hours;
-          int? minutes;
-          if (secondsOfTime != null) {
-            hours = (secondsOfTime! ~/ 60 ~/ 60);
-            minutes = (secondsOfTime! ~/ 60 % 60);
-          }
           return TextFormField(
             controller: TextEditingController(
-              text:
-                  hours != null && minutes != null ? '$hours h $minutes m' : '',
+              text: formatSecondsOfTime(secondsOfTime),
             ),
             decoration: InputDecoration(
               hintText: 'h:m',

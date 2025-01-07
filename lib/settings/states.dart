@@ -18,15 +18,22 @@ class Preferences extends _$Preferences {
           startOfDayKey: await _client.shipByKey(startOfDayKey).then(
                 (v) => v.value,
               ),
+          notifyAfterInactivity:
+              await _client.shipByKey(notifyAfterInactivity).then(
+                    (v) => v.value,
+                  )
         },
       );
 
   Future<void> replace(PreferenceKey key, Object? value) => v(
         () async {
-          if (value != null) {
+          if (value == null) {
+            await _client.discard(key);
+          } else {
             await _client.receive(PreferenceEntity(key, value));
-            state = AsyncData(state.value!..update(key, (v) => value));
           }
+
+          state = AsyncData(state.value!..update(key, (v) => value));
         },
         {
           'key': key,

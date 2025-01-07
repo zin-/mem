@@ -49,3 +49,16 @@ Future<int?> showSecondsOfTimePicker(
         'secondsOfTime': secondsOfTime,
       },
     );
+
+String formatSecondsOfTime(int? secondsOfTime) => v(
+      () {
+        if (secondsOfTime == null) {
+          return "";
+        } else {
+          return '${secondsOfTime ~/ 60 ~/ 60} h ${secondsOfTime ~/ 60 % 60} m';
+        }
+      },
+      {
+        'secondsOfTime': secondsOfTime,
+      },
+    );
