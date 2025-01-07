@@ -265,6 +265,47 @@ void main() => group(
                 );
               },
             );
+
+            testWidgets(
+              "Remove.",
+              (widgetTester) async {
+                await runApplication();
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(drawerIconFinder);
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(find.text(l10n.settingsPageTitle));
+                await widgetTester.pumpAndSettle();
+                await widgetTester
+                    .tap(find.text(l10n.notifyAfterInactivityLabel));
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(find.text(l10n.okAction));
+                await widgetTester.pumpAndSettle();
+
+                expect(
+                  await PreferenceClientRepository()
+                      .shipByKey(notifyAfterInactivity)
+                      .then(
+                        (v) => v.value,
+                      ),
+                  isNotNull,
+                );
+
+                await widgetTester
+                    .tap(find.text(l10n.notifyAfterInactivityLabel));
+                await widgetTester.pumpAndSettle();
+                await widgetTester.tap(find.text(l10n.cancelAction));
+                await widgetTester.pumpAndSettle();
+
+                expect(
+                  await PreferenceClientRepository()
+                      .shipByKey(notifyAfterInactivity)
+                      .then(
+                        (v) => v.value,
+                      ),
+                  isNull,
+                );
+              },
+            );
           },
         );
 
