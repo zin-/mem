@@ -8,15 +8,8 @@ Future<int?> showSecondsOfTimePicker(
 ) =>
     v(
       () async {
-        int hours;
-        int minutes;
-        if (secondsOfTime == null) {
-          hours = 1;
-          minutes = 0;
-        } else {
-          hours = (secondsOfTime ~/ 60 ~/ 60);
-          minutes = (secondsOfTime ~/ 60 % 60);
-        }
+        final hours = ((secondsOfTime ?? 3600) ~/ 60 ~/ 60);
+        final minutes = ((secondsOfTime ?? 0) ~/ 60 % 60);
 
         final picked = await Picker(
           confirmText: 'OK',
