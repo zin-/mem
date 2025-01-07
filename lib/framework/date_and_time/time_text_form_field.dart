@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mem/framework/date_and_time/time_picker.dart';
+import 'package:mem/framework/date_and_time/seconds_of_time_picker.dart';
 import 'package:mem/logger/log_service.dart';
 
 class TimeTextFormField extends StatelessWidget {
@@ -37,7 +37,7 @@ class TimeTextFormField extends StatelessWidget {
                   );
 
                   if (picked != null) {
-                    _onChanged(((picked[0] * 60) + picked[1]) * 60);
+                    _onChanged(picked);
                   }
                 },
               ),
