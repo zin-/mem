@@ -1,6 +1,7 @@
 import 'package:mem/logger/log_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import 'preference/client.dart';
 import 'preference/repository.dart';
 import 'preference/keys.dart';
 import 'preference/preference.dart';
@@ -10,6 +11,7 @@ part 'states.g.dart';
 
 @riverpod
 class Preferences extends _$Preferences {
+  final _client = PreferenceClient();
   final _repository = PreferenceRepository();
 
   @override
@@ -27,10 +29,14 @@ class Preferences extends _$Preferences {
 
   Future<void> replace(PreferenceKey key, Object? value) => v(
         () async {
-          if (value == null) {
-            await _repository.discard(key);
+          if (key == notifyAfterInactivity) {
+            await _client.updateNotifyAfterInactivity(value as int?);
           } else {
-            await _repository.receive(PreferenceEntity(key, value));
+            if (value == null) {
+              await _repository.discard(key);
+            } else {
+              await _repository.receive(PreferenceEntity(key, value));
+            }
           }
 
           state = AsyncData(state.value!..update(key, (v) => value));
