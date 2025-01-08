@@ -9,7 +9,7 @@ import 'package:mem/mems/mem_entity.dart';
 import 'package:mem/mems/mem_notification_entity.dart';
 import 'package:mem/mems/mem_notification_repository.dart';
 import 'package:mem/mems/mem_repository.dart';
-import 'package:mem/settings/preference/client.dart';
+import 'package:mem/settings/preference/repository.dart';
 import 'package:mem/settings/preference/keys.dart';
 import 'package:mem/values/constants.dart';
 
@@ -26,7 +26,7 @@ class NotificationClient {
 
   final ScheduleClient _scheduleClient;
   final NotificationRepository _notificationRepository;
-  final PreferenceClientRepository _preferenceClientRepository;
+  final PreferenceRepository _preferenceClientRepository;
   final MemRepositoryV2 _memRepository;
   final MemNotificationRepositoryV2 _memNotificationRepository;
 
@@ -46,7 +46,7 @@ class NotificationClient {
           NotificationChannels(buildL10n(context)),
           ScheduleClient(),
           NotificationRepository(),
-          PreferenceClientRepository(),
+          PreferenceRepository(),
           MemRepositoryV2(),
           MemNotificationRepositoryV2(),
         ),

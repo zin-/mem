@@ -18,7 +18,7 @@ import 'package:mem/mems/mem_repository.dart';
 import 'package:mem/notifications/notification_client.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/notifications/notification_ids.dart';
-import 'package:mem/settings/preference/client.dart';
+import 'package:mem/settings/preference/repository.dart';
 import 'package:mem/settings/preference/preference.dart';
 import 'package:mem/settings/preference/keys.dart';
 import 'package:settings_ui/settings_ui.dart';
@@ -82,7 +82,7 @@ void main() => group(
           'Start of day',
           () {
             setUp(() async {
-              await PreferenceClientRepository().discard(startOfDayKey);
+              await PreferenceRepository().discard(startOfDayKey);
             });
 
             testWidgets(
@@ -121,8 +121,7 @@ void main() => group(
                   "6:00 AM",
                 );
                 expect(
-                  (await PreferenceClientRepository().shipByKey(startOfDayKey))
-                      .value,
+                  (await PreferenceRepository().shipByKey(startOfDayKey)).value,
                   TimeOfDay(hour: 6, minute: 0),
                 );
               },
@@ -133,7 +132,7 @@ void main() => group(
               () {
                 final now = DateTime.now();
                 setUp(() async {
-                  await PreferenceClientRepository().receive(PreferenceEntity(
+                  await PreferenceRepository().receive(PreferenceEntity(
                       startOfDayKey, TimeOfDay.fromDateTime(now)));
 
                   final savedMem = await MemRepositoryV2().receive(MemEntityV2(
@@ -203,8 +202,7 @@ void main() => group(
           () {
             setUp(
               () async {
-                await PreferenceClientRepository()
-                    .discard(notifyAfterInactivity);
+                await PreferenceRepository().discard(notifyAfterInactivity);
               },
             );
 
@@ -256,7 +254,7 @@ void main() => group(
                 );
 
                 expect(
-                  await PreferenceClientRepository()
+                  await PreferenceRepository()
                       .shipByKey(notifyAfterInactivity)
                       .then(
                         (v) => v.value,
@@ -282,7 +280,7 @@ void main() => group(
                 await widgetTester.pumpAndSettle();
 
                 expect(
-                  await PreferenceClientRepository()
+                  await PreferenceRepository()
                       .shipByKey(notifyAfterInactivity)
                       .then(
                         (v) => v.value,
@@ -297,7 +295,7 @@ void main() => group(
                 await widgetTester.pumpAndSettle();
 
                 expect(
-                  await PreferenceClientRepository()
+                  await PreferenceRepository()
                       .shipByKey(notifyAfterInactivity)
                       .then(
                         (v) => v.value,

@@ -5,7 +5,7 @@ import 'preference.dart';
 import 'preference_key.dart';
 import 'wrapper.dart';
 
-class PreferenceClientRepository
+class PreferenceRepository
     extends KeyWithValueRepository<PreferenceEntity, PreferenceKey> {
   final _sharedPreferencesWrapper = SharedPreferencesWrapper();
 
