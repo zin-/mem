@@ -69,50 +69,56 @@ class NotificationClient {
 
   Future<void> show(
     NotificationType notificationType,
-    int memId,
+    int? memId,
   ) =>
       v(
         () async {
-          final savedMem =
-              await _memRepository.ship(id: memId).then((v) => v.singleOrNull);
+          if (memId != null) {
+            final savedMem = await _memRepository
+                .ship(id: memId)
+                .then((v) => v.singleOrNull);
 
-          if (savedMem == null ||
-              savedMem.value.isDone ||
-              savedMem.value.isArchived) {
-            await cancelMemNotifications(memId);
-            return;
-          }
-
-          if (notificationType == NotificationType.repeat) {
-            if (!await _shouldNotify(memId)) {
+            if (savedMem == null ||
+                savedMem.value.isDone ||
+                savedMem.value.isArchived) {
+              await cancelMemNotifications(memId);
               return;
             }
-          }
 
-          if (notificationType == NotificationType.startMem) {
-            final latestAct = await ActRepository()
-                .ship(memId: memId, latestByMemIds: true)
-                .then(
-                  (v) => v.singleOrNull?.value,
-                );
-            if (latestAct != null && latestAct.isActive) {
-              return;
+            if (notificationType == NotificationType.repeat) {
+              if (!await _shouldNotify(memId)) {
+                return;
+              }
             }
-          }
 
-          await Future.wait(NotificationType.values
-              .where(
-                (e) => e != NotificationType.activeAct && e != notificationType,
-              )
-              .map(
-                (e) => _notificationRepository
-                    .discard(e.buildNotificationId(memId)),
-              ));
-          if (notificationType == NotificationType.activeAct ||
-              notificationType == NotificationType.pausedAct ||
-              notificationType == NotificationType.afterActStarted) {
-            await _notificationRepository
-                .discard(NotificationType.activeAct.buildNotificationId(memId));
+            if (notificationType == NotificationType.startMem) {
+              final latestAct = await ActRepository()
+                  .ship(memId: memId, latestByMemIds: true)
+                  .then(
+                    (v) => v.singleOrNull?.value,
+                  );
+              if (latestAct != null && latestAct.isActive) {
+                return;
+              }
+            }
+
+            await Future.wait(NotificationType.values
+                .where(
+                  (e) =>
+                      e != NotificationType.activeAct &&
+                      e != NotificationType.notifyAfterInactivity &&
+                      e != notificationType,
+                )
+                .map(
+                  (e) => _notificationRepository
+                      .discard(e.buildNotificationId(memId)),
+                ));
+            if (notificationType == NotificationType.activeAct ||
+                notificationType == NotificationType.pausedAct ||
+                notificationType == NotificationType.afterActStarted) {
+              await _notificationRepository.discard(
+                  NotificationType.activeAct.buildNotificationId(memId));
+            }
           }
 
           await _notificationRepository.receive(

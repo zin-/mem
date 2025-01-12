@@ -74,4 +74,14 @@ class PreferenceClient {
           'scheduleClient': scheduleClient,
         },
       );
+
+  static void resetSingleton() => v(
+        () {
+          ScheduleClient.resetSingleton();
+          _instance = null;
+        },
+        {
+          '_instance': _instance,
+        },
+      );
 }
