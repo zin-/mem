@@ -32,11 +32,7 @@ class Preferences extends _$Preferences {
           if (key == notifyAfterInactivity) {
             await _client.updateNotifyAfterInactivity(value as int?);
           } else {
-            if (value == null) {
-              await _repository.discard(key);
-            } else {
-              await _repository.receive(PreferenceEntity(key, value));
-            }
+            await _repository.receive(PreferenceEntity(key, value));
           }
 
           state = AsyncData(state.value!..update(key, (v) => value));
