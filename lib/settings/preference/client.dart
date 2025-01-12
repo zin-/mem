@@ -1,5 +1,7 @@
 import 'package:mem/acts/act_repository.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/notifications/notification/type.dart';
+import 'package:mem/notifications/schedule.dart';
 import 'package:mem/notifications/schedule_client.dart';
 
 import 'keys.dart';
@@ -32,26 +34,21 @@ class PreferenceClient {
 
             final activeActCount = await _actRepository.count(isActive: true);
             if (activeActCount == 0) {
-              // 現座時刻から指定時間後に
-              // TODO 通知されるように設定する
-              // await
-              info(_scheduleClient.receive);
-              //     (
-              // TimedSchedule(
-              //   0,
-              info(DateTime.now().add(Duration(seconds: secondsOfTime)))
-                  //   ,
-                  //   {},
-                  // )
-                  // )
-                  ;
+              await _scheduleClient.receive(
+                Schedule.of(
+                  null,
+                  DateTime.now().add(Duration(seconds: secondsOfTime)),
+                  NotificationType.notifyAfterInactivity,
+                ),
+              );
               return;
             }
           }
 
           await _repository.discard(notifyAfterInactivity);
-          // TODO 通知をキャンセルする
-          info(_scheduleClient.discard);
+          await _scheduleClient.discard(
+            NotificationType.notifyAfterInactivity.buildNotificationId(),
+          );
         },
         {
           'secondsOfTime': secondsOfTime,

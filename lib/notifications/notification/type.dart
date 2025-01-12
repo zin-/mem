@@ -16,24 +16,27 @@ enum NotificationType {
   activeAct,
   pausedAct,
   afterActStarted,
+  notifyAfterInactivity,
 }
 
 extension NotificationChannelBuilder on NotificationType {
-  int buildNotificationId(int memId) => v(
+  int buildNotificationId([int? memId]) => v(
         () {
           switch (this) {
             case NotificationType.startMem:
-              return memStartNotificationId(memId);
+              return memStartNotificationId(memId!);
             case NotificationType.endMem:
-              return memEndNotificationId(memId);
+              return memEndNotificationId(memId!);
             case NotificationType.repeat:
-              return memRepeatedNotificationId(memId);
+              return memRepeatedNotificationId(memId!);
             case NotificationType.activeAct:
-              return activeActNotificationId(memId);
+              return activeActNotificationId(memId!);
             case NotificationType.pausedAct:
-              return pausedActNotificationId(memId);
+              return pausedActNotificationId(memId!);
             case NotificationType.afterActStarted:
-              return afterActStartedNotificationId(memId);
+              return afterActStartedNotificationId(memId!);
+            case NotificationType.notifyAfterInactivity:
+              return notifyAfterInactivityNotificationId();
           }
         },
         {
@@ -112,6 +115,15 @@ extension NotificationChannelBuilder on NotificationType {
                   notificationActionMap[finishActiveActNotificationActionId]!,
                   notificationActionMap[pauseActNotificationActionId]!,
                 ],
+                usesChronometer: true,
+                autoCancel: false,
+              );
+            case NotificationType.notifyAfterInactivity:
+              return NotificationChannel(
+                notifyAfterInactivityNotificationChannelId,
+                l10n?.notifyAfterInactivityNotification ?? "",
+                l10n?.notifyAfterInactivityNotificationDescription ?? "",
+                [],
                 usesChronometer: true,
                 autoCancel: false,
               );

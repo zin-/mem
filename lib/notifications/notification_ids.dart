@@ -12,11 +12,14 @@ int pausedActNotificationId(int memId) => (memId * _seed) + 6;
 
 int afterActStartedNotificationId(int memId) => (memId * _seed) + 5;
 
+int notifyAfterInactivityNotificationId() => 7;
+
 const reminderNotificationChannelId = 'reminder';
 const repeatReminderNotificationChannelId = 'repeat-reminder';
 const activeActNotificationChannelId = 'active-act';
 const pausedActNotificationChannelId = 'paused-act';
 const afterActStartedNotificationChannelId = 'after-act-started';
+const notifyAfterInactivityNotificationChannelId = 'notify-after-inactivity';
 
 const doneMemNotificationActionId = 'done-mem';
 const startActNotificationActionId = 'start-act';

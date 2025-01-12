@@ -53,6 +53,9 @@ class NotificationChannels {
             case NotificationType.pausedAct:
               body = pauseActNotificationBody;
               break;
+            case NotificationType.notifyAfterInactivity:
+              // TODO: Handle this case.
+              throw UnimplementedError();
           }
 
           return Notification(

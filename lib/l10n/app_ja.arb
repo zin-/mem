@@ -87,6 +87,8 @@
   "pausedActNotificationDescription": "素早く再開するために一時停止中のActを表示します。",
   "afterActStartedNotification": "Act開始後の通知",
   "afterActStartedNotificationDescription": "Act開始の指定時間後に通知します。",
+  "notifyAfterInactivityNotification": "一定時間操作がない場合の通知",
+  "notifyAfterInactivityNotificationDescription": "一定時間何もしていない場合に通知します。",
 
   "noNotifications": "通知しない",
   "repeatedNotificationText": "毎日{notifyAt}",

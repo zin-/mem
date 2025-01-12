@@ -87,6 +87,8 @@
   "pausedActNotificationDescription": "To start again act.",
   "afterActStartedNotification": "After act started",
   "afterActStartedNotificationDescription": "To remind specific amount of time after act started.",
+  "notifyAfterInactivityNotification": "Notify after inactivity",
+  "notifyAfterInactivityNotificationDescription": "Notify when no activity is detected for a certain period of time.",
 
   "noNotifications": "No notifications",
   "repeatedNotificationText": "{notifyAt} every day",

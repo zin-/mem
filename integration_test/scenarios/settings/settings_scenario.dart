@@ -227,6 +227,18 @@ void main() => group(
             testWidgets(
               "Save.",
               (widgetTester) async {
+                int alarmServiceStartCount = 0;
+                widgetTester.setMockMethodCallHandler(
+                  MethodChannelMock.androidAlarmManager,
+                  [
+                    (m) async {
+                      expect(m.method, equals('AlarmService.start'));
+                      alarmServiceStartCount++;
+                      return true;
+                    },
+                  ],
+                );
+
                 await runApplication();
                 await widgetTester.pumpAndSettle();
                 await widgetTester.tap(drawerIconFinder);
@@ -261,12 +273,32 @@ void main() => group(
                       ),
                   equals(secondsOfHour),
                 );
+
+                expect(
+                  alarmServiceStartCount,
+                  equals(
+                    defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
+                  ),
+                  reason: 'alarmServiceStartCount',
+                );
               },
             );
 
             testWidgets(
               "Remove.",
               (widgetTester) async {
+                int alarmServiceStartCount = 0;
+                widgetTester.setMockMethodCallHandler(
+                  MethodChannelMock.androidAlarmManager,
+                  [
+                    (m) async {
+                      expect(m.method, equals('AlarmService.start'));
+                      alarmServiceStartCount++;
+                      return true;
+                    },
+                  ],
+                );
+
                 await runApplication();
                 await widgetTester.pumpAndSettle();
                 await widgetTester.tap(drawerIconFinder);
@@ -301,6 +333,14 @@ void main() => group(
                         (v) => v.value,
                       ),
                   isNull,
+                );
+
+                expect(
+                  alarmServiceStartCount,
+                  equals(
+                    defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
+                  ),
+                  reason: 'alarmServiceStartCount',
                 );
               },
             );
