@@ -29,6 +29,7 @@ class NotificationClient {
   final PreferenceRepository _preferenceClientRepository;
   final MemRepositoryV2 _memRepository;
   final MemNotificationRepositoryV2 _memNotificationRepository;
+  final ActRepository _actRepository;
 
   NotificationClient._(
     this.notificationChannels,
@@ -37,6 +38,7 @@ class NotificationClient {
     this._preferenceClientRepository,
     this._memRepository,
     this._memNotificationRepository,
+    this._actRepository,
   );
 
   static NotificationClient? _instance;
@@ -49,6 +51,7 @@ class NotificationClient {
           PreferenceRepository(),
           MemRepositoryV2(),
           MemNotificationRepositoryV2(),
+          ActRepository(),
         ),
         {
           'context': context,
@@ -229,6 +232,7 @@ class NotificationClient {
             memId,
             savedMemNotifications: memNotifications,
           );
+          await setNotificationAfterInactivity();
         },
         {
           'memId': memId,
@@ -266,6 +270,40 @@ class NotificationClient {
         },
         {
           "memId": memId,
+        },
+      );
+
+  Future<void> setNotificationAfterInactivity() => v(
+        () async {
+          final timeOfSeconds = await PreferenceRepository()
+              .shipByKey(notifyAfterInactivity)
+              .then((v) => v.value);
+
+          if (timeOfSeconds != null) {
+            final activeActCount = await _actRepository.count(isActive: true);
+
+            if (activeActCount == 0) {
+              await _scheduleClient.receive(
+                Schedule.of(
+                  null,
+                  DateTime.now().add(
+                    Duration(
+                      seconds: timeOfSeconds,
+                    ),
+                  ),
+                  NotificationType.notifyAfterInactivity,
+                ),
+              );
+            } else {
+              await _scheduleClient.discard(
+                NotificationType.notifyAfterInactivity.buildNotificationId(),
+              );
+            }
+          } else {
+            await _scheduleClient.discard(
+              NotificationType.notifyAfterInactivity.buildNotificationId(),
+            );
+          }
         },
       );
 

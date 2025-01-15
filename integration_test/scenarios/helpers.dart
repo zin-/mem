@@ -51,6 +51,7 @@ final filterListIconFinder = find.byIcon(Icons.filter_list);
 final menuButtonIconFinder = find.byIcon(Icons.more_vert);
 final startIconFinder = find.byIcon(Icons.play_arrow);
 final stopIconFinder = find.byIcon(Icons.stop);
+final pauseIconFinder = find.byIcon(Icons.pause);
 final okFinder = find.text('OK');
 final cancelFinder = find.text('Cancel');
 final drawerIconFinder = find.descendant(
@@ -74,6 +75,7 @@ final memMemoOnDetailPageFinder = find.byType(TextFormField).at(6);
 // Constants
 const waitShowSoftwareKeyboardDuration = Duration(milliseconds: 400);
 const waitSideEffectDuration = Duration(milliseconds: 700);
+const waitLongSideEffectDuration = Duration(milliseconds: 3000);
 final zeroDate = DateTime(0);
 const datePlaceHolder = "M/d/y";
 const maxRetryCount = 5;

@@ -1,7 +1,5 @@
-import 'package:mem/acts/act_repository.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/notifications/notification/type.dart';
-import 'package:mem/notifications/schedule.dart';
+import 'package:mem/notifications/notification_client.dart';
 import 'package:mem/notifications/schedule_client.dart';
 
 import 'keys.dart';
@@ -10,16 +8,14 @@ import 'repository.dart';
 
 class PreferenceClient {
   final PreferenceRepository _repository;
-  final ActRepository _actRepository;
-  final ScheduleClient _scheduleClient;
+  final NotificationClient _notificationClient;
 
   PreferenceClient._(
     this._repository,
-    this._actRepository,
-    this._scheduleClient,
+    this._notificationClient,
   );
 
-  Future updateNotifyAfterInactivity(
+  Future<void> updateNotifyAfterInactivity(
     int? secondsOfTime,
   ) =>
       v(
@@ -31,24 +27,11 @@ class PreferenceClient {
                 secondsOfTime,
               ),
             );
-
-            final activeActCount = await _actRepository.count(isActive: true);
-            if (activeActCount == 0) {
-              await _scheduleClient.receive(
-                Schedule.of(
-                  null,
-                  DateTime.now().add(Duration(seconds: secondsOfTime)),
-                  NotificationType.notifyAfterInactivity,
-                ),
-              );
-              return;
-            }
+          } else {
+            await _repository.discard(notifyAfterInactivity);
           }
 
-          await _repository.discard(notifyAfterInactivity);
-          await _scheduleClient.discard(
-            NotificationType.notifyAfterInactivity.buildNotificationId(),
-          );
+          await _notificationClient.setNotificationAfterInactivity();
         },
         {
           'secondsOfTime': secondsOfTime,
@@ -59,19 +42,16 @@ class PreferenceClient {
 
   factory PreferenceClient({
     PreferenceRepository? repository,
-    ActRepository? actRepository,
-    ScheduleClient? scheduleClient,
+    NotificationClient? notificationClient,
   }) =>
       i(
         () => _instance ??= PreferenceClient._(
           repository ?? PreferenceRepository(),
-          actRepository ?? ActRepository(),
-          scheduleClient ?? ScheduleClient(),
+          notificationClient ?? NotificationClient(),
         ),
         {
           'repository': repository,
-          'actRepository': actRepository,
-          'scheduleClient': scheduleClient,
+          'notificationClient': notificationClient,
         },
       );
 
