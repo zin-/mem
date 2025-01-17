@@ -254,6 +254,7 @@ class NotificationClient {
           await registerMemNotifications(
             memId,
           );
+          await setNotificationAfterInactivity();
         },
         {
           "memId": memId,

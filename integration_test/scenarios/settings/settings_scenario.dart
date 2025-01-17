@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/acts/act.dart';
 import 'package:mem/acts/act_entity.dart';
 import 'package:mem/acts/act_repository.dart';
+import 'package:mem/acts/client.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
@@ -332,6 +333,10 @@ void main() => group(
                       alarmCancelCount++;
                       return true;
                     },
+                    (m) async {
+                      expect(m.method, equals('Alarm.oneShotAt'));
+                      return true;
+                    },
                   ],
                 );
 
@@ -378,6 +383,9 @@ void main() => group(
               () {
                 setUp(
                   () async {
+                    ActsClient.resetSingleton();
+                    NotificationClient.resetSingleton();
+
                     final savedMemWithNoAct = await MemRepositoryV2().receive(
                         MemEntityV2(Mem(
                             "$_scenarioName - With habit operation - with no act",
@@ -408,6 +416,10 @@ void main() => group(
 
                 testWidgets("Cancel when start act.", (widgetTester) async {
                   widgetTester.clearAllMockMethodCallHandler();
+                  widgetTester.ignoreMockMethodCallHandler(
+                      MethodChannelMock.permissionHandler);
+                  widgetTester.ignoreMockMethodCallHandler(
+                      MethodChannelMock.flutterLocalNotifications);
 
                   int alarmServiceStartCount = 0;
                   int alarmCancelCount = 0;
@@ -445,6 +457,139 @@ void main() => group(
                       defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
                     ),
                     reason: 'alarmCancelCount',
+                  );
+                });
+
+                testWidgets("Set when finish act.", (widgetTester) async {
+                  widgetTester.clearAllMockMethodCallHandler();
+                  widgetTester.ignoreMockMethodCallHandler(
+                      MethodChannelMock.permissionHandler);
+                  widgetTester.ignoreMockMethodCallHandler(
+                      MethodChannelMock.flutterLocalNotifications);
+
+                  int alarmServiceStartCount = 0;
+                  int alarmCancelCount = 0;
+                  int alarmOneShotAtCount = 0;
+                  widgetTester.setMockMethodCallHandler(
+                    MethodChannelMock.androidAlarmManager,
+                    [
+                      (m) async {
+                        expect(m.method, equals('AlarmService.start'));
+                        alarmServiceStartCount++;
+                        return true;
+                      },
+                      (m) async {
+                        expect(m.method, equals('Alarm.cancel'));
+                        alarmCancelCount++;
+                        return true;
+                      },
+                      (m) async {
+                        expect(m.method, equals('Alarm.oneShotAt'));
+                        alarmOneShotAtCount++;
+                        return true;
+                      },
+                    ],
+                  );
+
+                  await runApplication();
+                  await widgetTester.pumpAndSettle();
+                  await widgetTester.tap(stopIconFinder);
+                  await widgetTester.pumpAndSettle();
+
+                  expect(
+                    alarmServiceStartCount,
+                    equals(
+                      defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
+                    ),
+                    reason: 'alarmServiceStartCount',
+                  );
+                  expect(
+                    alarmCancelCount,
+                    equals(
+                      defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
+                    ),
+                    reason: 'alarmCancelCount',
+                  );
+                  expect(
+                    alarmOneShotAtCount,
+                    equals(
+                      defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
+                    ),
+                    reason: 'alarmOneShotAtCount',
+                  );
+                });
+
+                testWidgets("Set when pause act.", (widgetTester) async {
+                  widgetTester.clearAllMockMethodCallHandler();
+                  widgetTester.ignoreMockMethodCallHandler(
+                      MethodChannelMock.permissionHandler);
+                  widgetTester.ignoreMockMethodCallHandler(
+                      MethodChannelMock.flutterLocalNotifications);
+
+                  int alarmServiceStartCount = 0;
+                  int alarmCancelCount = 0;
+                  int alarmOneShotAtCount = 0;
+                  widgetTester.setMockMethodCallHandler(
+                    MethodChannelMock.androidAlarmManager,
+                    [
+                      (m) async {
+                        expect(m.method, equals('AlarmService.start'));
+                        alarmServiceStartCount++;
+                        return true;
+                      },
+                      (m) async {
+                        expect(m.method, equals('Alarm.cancel'));
+                        alarmCancelCount++;
+                        return true;
+                      },
+                      (m) async {
+                        expect(m.method, equals('Alarm.cancel'));
+                        alarmCancelCount++;
+                        return true;
+                      },
+                      (m) async {
+                        expect(m.method, equals('Alarm.cancel'));
+                        alarmCancelCount++;
+                        return true;
+                      },
+                      (m) async {
+                        expect(m.method, equals('Alarm.cancel'));
+                        alarmCancelCount++;
+                        return true;
+                      },
+                      (m) async {
+                        expect(m.method, equals('Alarm.oneShotAt'));
+                        alarmOneShotAtCount++;
+                        return true;
+                      },
+                    ],
+                  );
+
+                  await runApplication();
+                  await widgetTester.pumpAndSettle();
+                  await widgetTester.tap(pauseIconFinder);
+                  await widgetTester.pumpAndSettle(waitLongSideEffectDuration);
+
+                  expect(
+                    alarmServiceStartCount,
+                    equals(
+                      defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
+                    ),
+                    reason: 'alarmServiceStartCount',
+                  );
+                  expect(
+                    alarmCancelCount,
+                    equals(
+                      defaultTargetPlatform == TargetPlatform.android ? 4 : 0,
+                    ),
+                    reason: 'alarmCancelCount',
+                  );
+                  expect(
+                    alarmOneShotAtCount,
+                    equals(
+                      defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
+                    ),
+                    reason: 'alarmOneShotAtCount',
                   );
                 });
               },
