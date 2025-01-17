@@ -48,8 +48,7 @@ class ActRepository
                   IsNotNull(defColActsStart.name),
                   IsNull(defColActsEnd.name),
                 ]),
-              if (condition != null) condition,
-              // coverage:ignore-line
+              if (condition != null) condition, // coverage:ignore-line
             ],
           ),
         ),
@@ -66,7 +65,6 @@ class ActRepository
     Iterable<int>? memIdsIn,
     DateAndTimePeriod? period,
     bool? latestByMemIds,
-    bool? isActive,
     Condition? condition,
     GroupBy? groupBy,
     ActOrderBy? actOrderBy,
@@ -83,11 +81,6 @@ class ActRepository
               if (period != null)
                 GraterThanOrEqual(defColActsStart, period.start),
               if (period != null) LessThan(defColActsStart, period.end),
-              if (isActive != null)
-                And([
-                  IsNotNull(defColActsStart.name),
-                  IsNull(defColActsEnd.name),
-                ]),
               if (condition != null) condition,
             ],
           ),
@@ -109,7 +102,6 @@ class ActRepository
           'memIds': memIdsIn,
           'period': period,
           'latestByMemIds': latestByMemIds,
-          'isActive': isActive,
           'condition': condition,
           'groupBy': groupBy,
           'actOrderBy': actOrderBy,
