@@ -14,6 +14,16 @@ abstract class PreferenceKey<T> {
   String toString() => value;
 }
 
+class IntPreferenceKey extends PreferenceKey<int> {
+  IntPreferenceKey(super.value);
+
+  @override
+  int? deserialize(serialized) => serialized;
+
+  @override
+  int? serialize(int? deserialized) => deserialized;
+}
+
 class TimeOfDayPreferenceKey extends PreferenceKey<TimeOfDay> {
   TimeOfDayPreferenceKey(super.value);
 
@@ -35,7 +45,7 @@ class TimeOfDayPreferenceKey extends PreferenceKey<TimeOfDay> {
       );
 
   @override
-  serialize(TimeOfDay? deserialized) => v(
+  String? serialize(TimeOfDay? deserialized) => v(
         () => deserialized == null
             ? null
             : "${deserialized.hour}:${deserialized.minute}",

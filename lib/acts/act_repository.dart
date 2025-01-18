@@ -35,6 +35,7 @@ class ActRepository
   @override
   Future<int> count({
     int? memId,
+    bool? isActive,
     Condition? condition,
   }) =>
       v(
@@ -42,12 +43,18 @@ class ActRepository
           condition: And(
             [
               if (memId != null) Equals(defFkActsMemId, memId),
+              if (isActive == true)
+                And([
+                  IsNotNull(defColActsStart.name),
+                  IsNull(defColActsEnd.name),
+                ]),
               if (condition != null) condition, // coverage:ignore-line
             ],
           ),
         ),
         {
           'memId': memId,
+          'isActive': isActive,
           'condition': condition,
         },
       );

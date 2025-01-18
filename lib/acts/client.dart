@@ -107,7 +107,8 @@ class ActsClient {
         () async {
           final finished = await _actService.finish(memId, when);
 
-          _notificationClient.cancelActNotification(finished.value.memId);
+          await _notificationClient.cancelActNotification(finished.value.memId);
+          await _notificationClient.setNotificationAfterInactivity();
 
           // ISSUE #226
 
@@ -143,4 +144,8 @@ class ActsClient {
         ActService(),
         NotificationClient(),
       );
+
+  static void resetSingleton() {
+    _instance = null;
+  }
 }

@@ -10,7 +10,7 @@ abstract class Schedule with Entity {
   Schedule(this.id);
 
   factory Schedule.of(
-    int memId,
+    int? memId,
     DateTime? at,
     NotificationType notificationType,
   ) =>
@@ -23,12 +23,12 @@ abstract class Schedule with Entity {
                 notificationType.buildNotificationId(memId),
                 at,
                 {
-                  memIdKey: memId,
+                  if (memId != null) memIdKey: memId,
                   notificationTypeKey: notificationType.name,
                 },
               ),
         {
-          'id': memId,
+          'memId': memId,
           'at': at,
           'notificationType': notificationType,
         },

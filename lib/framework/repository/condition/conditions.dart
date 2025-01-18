@@ -25,6 +25,8 @@ class Equals extends Condition {
 
 class IsNull extends Condition {
   static const _operator = 'IS NULL';
+
+  // TODO ColumnDefinitionに変更する
   final String _key;
 
   IsNull(this._key);
@@ -43,6 +45,8 @@ class IsNull extends Condition {
 
 class IsNotNull extends Condition {
   static const _operator = 'IS NOT NULL';
+
+  // TODO ColumnDefinitionに変更する
   final String _key;
 
   IsNotNull(this._key);

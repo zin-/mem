@@ -13,7 +13,7 @@ import 'package:mem/logger/log.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/notification_client.dart';
 import 'package:mem/notifications/notification/type.dart';
-import 'package:mem/settings/preference/client.dart';
+import 'package:mem/settings/preference/repository.dart';
 import 'package:mem/settings/preference/keys.dart';
 import 'package:mem/settings/preference/preference.dart';
 
@@ -349,7 +349,7 @@ void testTaskScenario() => group(': $_scenarioName', () {
             widgetTester.ignoreMockMethodCallHandler(
                 MethodChannelMock.permissionHandler);
 
-            await PreferenceClientRepository().receive(PreferenceEntity(
+            await PreferenceRepository().receive(PreferenceEntity(
                 startOfDayKey, const TimeOfDay(hour: 1, minute: 0)));
 
             await runApplication();
@@ -393,7 +393,7 @@ void testTaskScenario() => group(': $_scenarioName', () {
             await widgetTester.tap(saveMemFabFinder);
             await widgetTester.pumpAndSettle();
 
-            await PreferenceClientRepository().discard(startOfDayKey);
+            await PreferenceRepository().discard(startOfDayKey);
 
             final savedMems = (await dbA.select(defTableMems,
                 where: "${defColMemsName.name} = ?",

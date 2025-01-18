@@ -79,8 +79,11 @@ Future<void> scheduleCallback(int id, Map<String, dynamic> params) => i(
           NotificationType.values.singleWhere(
             (element) => element.name == params[notificationTypeKey],
           ),
-          params[memIdKey] as int,
+          params[memIdKey] as int?,
         );
       },
-      {"id": id, "params": params},
+      {
+        'id': id,
+        'params': params,
+      },
     );

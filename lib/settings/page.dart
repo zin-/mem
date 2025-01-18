@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/framework/view/async_value_view.dart';
+import 'package:mem/settings/notify_after_inactivity.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 import 'package:mem/l10n/l10n.dart';
@@ -22,11 +23,22 @@ class SettingsPage extends ConsumerWidget {
             preferencesProvider,
             (loaded) {
               return _SettingsPage(
-                startOfDay: loaded[startOfDayKey] ?? defaultStartOfDay,
-                onStartOfDayChanged: (TimeOfDay? picked) => v(
+                loaded[startOfDayKey] ?? defaultStartOfDay,
+                (TimeOfDay? picked) => v(
                   () async => await ref
                       .read(preferencesProvider.notifier)
                       .replace(startOfDayKey, picked),
+                  {
+                    'picked': picked,
+                  },
+                ),
+                loaded[notifyAfterInactivity],
+                (picked) => v(
+                  () {
+                    ref
+                        .read(preferencesProvider.notifier)
+                        .replace(notifyAfterInactivity, picked);
+                  },
                   {
                     'picked': picked,
                   },
@@ -41,12 +53,15 @@ class SettingsPage extends ConsumerWidget {
 class _SettingsPage extends StatelessWidget {
   final TimeOfDay _startOfDay;
   final void Function(TimeOfDay? picked) _onStartOfDayChanged;
+  final int? _notifyAfterInactivity;
+  final void Function(int? picked) _onNotifyAfterInactivityChanged;
 
-  const _SettingsPage({
-    required TimeOfDay startOfDay,
-    required onStartOfDayChanged,
-  })  : _startOfDay = startOfDay,
-        _onStartOfDayChanged = onStartOfDayChanged;
+  const _SettingsPage(
+    this._startOfDay,
+    this._onStartOfDayChanged,
+    this._notifyAfterInactivity,
+    this._onNotifyAfterInactivityChanged,
+  );
 
   @override
   Widget build(BuildContext context) => v(
@@ -68,6 +83,11 @@ class _SettingsPage extends StatelessWidget {
                         _startOfDay,
                         _onStartOfDayChanged,
                       ),
+                      buildNotifyAfterInactivity(
+                        context,
+                        _notifyAfterInactivity,
+                        _onNotifyAfterInactivityChanged,
+                      ),
                       _buildResetNotification(l10n.resetNotificationLabel),
                     ],
                   ),
@@ -77,7 +97,10 @@ class _SettingsPage extends StatelessWidget {
             ),
           );
         },
-        {"_startOfDay": _startOfDay},
+        {
+          '_startOfDay': _startOfDay,
+          '_notifyAfterInactivity': _notifyAfterInactivity,
+        },
       );
 }
 

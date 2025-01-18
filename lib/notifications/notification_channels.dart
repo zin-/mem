@@ -18,13 +18,19 @@ class NotificationChannels {
 
   Future<Notification> buildNotification(
     NotificationType notificationType,
-    int memId,
+    int? memId,
   ) =>
       v(
         () async {
-          final title = await MemRepositoryV2()
-              .ship(id: memId)
-              .then((value) => value.single.value.name);
+          String title;
+          if (memId == null) {
+            title = "Want to do something?";
+          } else {
+            title = await MemRepositoryV2()
+                .ship(id: memId)
+                .then((value) => value.single.value.name);
+          }
+
           String body;
           switch (notificationType) {
             case NotificationType.startMem:
@@ -53,6 +59,8 @@ class NotificationChannels {
             case NotificationType.pausedAct:
               body = pauseActNotificationBody;
               break;
+            case NotificationType.notifyAfterInactivity:
+              body = "The specified time has passed without any activity.";
           }
 
           return Notification(
@@ -60,12 +68,14 @@ class NotificationChannels {
             title,
             body,
             notificationType.buildNotificationChannel(_l10n),
-            {memIdKey: memId},
+            {
+              if (memId != null) memIdKey: memId,
+            },
           );
         },
         {
-          "notificationType": notificationType,
-          "memId": memId,
+          'notificationType': notificationType,
+          'memId': memId,
         },
       );
 

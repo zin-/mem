@@ -33,7 +33,7 @@ void main() {
 const _scenarioName = "Notification scenario";
 
 void testNotificationScenario() => group(
-      ": $_scenarioName",
+      _scenarioName,
       () {
         LogService(
           level: Level.verbose,
@@ -78,9 +78,11 @@ void testNotificationScenario() => group(
         });
 
         group(
-          ": scheduleCallback",
+          "ScheduleCallback",
           () {
-            for (var element in NotificationType.values) {
+            for (var element in NotificationType.values.where(
+              (e) => e != NotificationType.notifyAfterInactivity,
+            )) {
               testWidgets(
                 ": ${element.name}.",
                 (widgetTester) async {
@@ -108,6 +110,36 @@ void testNotificationScenario() => group(
                 },
               );
             }
+
+            testWidgets(
+              ": ${NotificationType.notifyAfterInactivity.name}.",
+              (widgetTester) async {
+                final notificationType = NotificationType.notifyAfterInactivity;
+
+                widgetTester.ignoreMockMethodCallHandler(
+                    MethodChannelMock.flutterLocalNotifications);
+                int checkPermissionStatusCount = 0;
+                widgetTester.setMockMethodCallHandler(
+                    MethodChannelMock.permissionHandler, [
+                  (m) async {
+                    expect(m.method, 'checkPermissionStatus');
+                    checkPermissionStatusCount++;
+                    return 1;
+                  }
+                ]);
+
+                final params = {
+                  notificationTypeKey: notificationType.name,
+                };
+
+                await scheduleCallback(
+                  notificationType.buildNotificationId(),
+                  params,
+                );
+
+                expect(checkPermissionStatusCount, 1);
+              },
+            );
           },
         );
 

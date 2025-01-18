@@ -46,6 +46,9 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# Windows related
+/Microsoft.Windows.CppWinRT.2.0.210806.1
+
 # Generated code
 ## Riverpod
 *.g.dart
