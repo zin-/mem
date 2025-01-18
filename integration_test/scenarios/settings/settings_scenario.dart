@@ -397,7 +397,6 @@ void main() => group(
                             MemNotificationType.afterActStarted,
                             1,
                             "with no act")));
-
                     final savedMemWithActiveAct = await MemRepositoryV2()
                         .receive(MemEntityV2(Mem(
                             "$_scenarioName - With habit operation - with active act",
@@ -423,6 +422,7 @@ void main() => group(
 
                   int alarmServiceStartCount = 0;
                   int alarmCancelCount = 0;
+                  int alarmOneShotAtCount = 0;
                   widgetTester.setMockMethodCallHandler(
                     MethodChannelMock.androidAlarmManager,
                     [
@@ -434,6 +434,41 @@ void main() => group(
                       (m) async {
                         expect(m.method, equals('Alarm.cancel'));
                         alarmCancelCount++;
+                        return true;
+                      },
+                      (m) async {
+                        expect(m.method, equals('Alarm.oneShotAt'));
+                        alarmOneShotAtCount++;
+                        return true;
+                      },
+                      (m) async {
+                        expect(m.method, equals('Alarm.cancel'));
+                        alarmCancelCount++;
+                        return true;
+                      },
+                      (m) async {
+                        expect(m.method, equals('Alarm.cancel'));
+                        alarmCancelCount++;
+                        return true;
+                      },
+                      (m) async {
+                        expect(m.method, equals('Alarm.cancel'));
+                        alarmCancelCount++;
+                        return true;
+                      },
+                      (m) async {
+                        expect(m.method, equals('Alarm.cancel'));
+                        expect(m.arguments, [
+                          NotificationType.notifyAfterInactivity
+                              .buildNotificationId()
+                        ]);
+                        alarmCancelCount++;
+                        return true;
+                      },
+                      (m) async {
+                        alarmServiceStartCount++;
+                        alarmCancelCount++;
+                        alarmOneShotAtCount++;
                         return true;
                       },
                     ],
@@ -454,9 +489,16 @@ void main() => group(
                   expect(
                     alarmCancelCount,
                     equals(
-                      defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
+                      defaultTargetPlatform == TargetPlatform.android ? 5 : 0,
                     ),
                     reason: 'alarmCancelCount',
+                  );
+                  expect(
+                    alarmOneShotAtCount,
+                    equals(
+                      defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
+                    ),
+                    reason: 'alarmOneShotAtCount',
                   );
                 });
 
@@ -485,6 +527,16 @@ void main() => group(
                       },
                       (m) async {
                         expect(m.method, equals('Alarm.oneShotAt'));
+                        expect(
+                            m.arguments[0],
+                            NotificationType.notifyAfterInactivity
+                                .buildNotificationId());
+                        alarmOneShotAtCount++;
+                        return true;
+                      },
+                      (m) async {
+                        alarmServiceStartCount++;
+                        alarmCancelCount++;
                         alarmOneShotAtCount++;
                         return true;
                       },
@@ -559,6 +611,16 @@ void main() => group(
                       },
                       (m) async {
                         expect(m.method, equals('Alarm.oneShotAt'));
+                        expect(
+                            m.arguments[0],
+                            NotificationType.notifyAfterInactivity
+                                .buildNotificationId());
+                        alarmOneShotAtCount++;
+                        return true;
+                      },
+                      (m) async {
+                        alarmServiceStartCount++;
+                        alarmCancelCount++;
                         alarmOneShotAtCount++;
                         return true;
                       },

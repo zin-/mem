@@ -295,16 +295,13 @@ class NotificationClient {
                   NotificationType.notifyAfterInactivity,
                 ),
               );
-            } else {
-              await _scheduleClient.discard(
-                NotificationType.notifyAfterInactivity.buildNotificationId(),
-              );
+              return;
             }
-          } else {
-            await _scheduleClient.discard(
-              NotificationType.notifyAfterInactivity.buildNotificationId(),
-            );
           }
+
+          await _scheduleClient.discard(
+            NotificationType.notifyAfterInactivity.buildNotificationId(),
+          );
         },
       );
 
