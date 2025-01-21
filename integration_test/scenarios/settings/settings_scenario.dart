@@ -12,6 +12,7 @@ import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/seconds_of_time_picker.dart';
+import 'package:mem/framework/date_and_time/time_of_day.dart';
 import 'package:mem/logger/log.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem.dart';
@@ -84,124 +85,120 @@ void main() => group(
           },
         );
 
-        group(
-          'Start of day',
-          () {
+        group('Start of day', () {
+          setUp(() async {
+            await PreferenceRepository().discard(startOfDayKey);
+          });
+
+          testWidgets(
+            ': pick.',
+            (widgetTester) async {
+              await runApplication();
+              await widgetTester.pumpAndSettle();
+
+              await widgetTester.tap(drawerIconFinder);
+              await widgetTester.pumpAndSettle();
+              await widgetTester.tap(find.text(l10n.settingsPageTitle));
+              await widgetTester.pumpAndSettle();
+
+              await widgetTester.tap(find.text(l10n.startOfDayLabel));
+              await widgetTester.pumpAndSettle();
+
+              final rect =
+                  widgetTester.getRect(find.byKey(Key('time-picker-dial')));
+              final tapPosition = Offset(
+                rect.left + rect.width / 2,
+                rect.top + rect.height / 2,
+              );
+              await widgetTester.tapAt(tapPosition);
+              await widgetTester.tap(okFinder);
+              await widgetTester.pumpAndSettle();
+
+              expect(
+                widgetTester
+                    .widget<Text>(find
+                        .descendant(
+                          of: find.byType(SettingsTile),
+                          matching: find.byType(Text),
+                        )
+                        .at(1))
+                    .data,
+                "6:00 AM",
+              );
+              expect(
+                (await PreferenceRepository().shipByKey(startOfDayKey)).value,
+                TimeOfDay(hour: 6, minute: 0),
+              );
+            },
+          );
+
+          group('With saved', () {
+            final startOfDay = TimeOfDay(hour: 5, minute: 0);
+            final now = DateTime.now();
             setUp(() async {
-              await PreferenceRepository().discard(startOfDayKey);
+              await PreferenceRepository()
+                  .receive(PreferenceEntity(startOfDayKey, startOfDay));
+
+              final savedMem = await MemRepositoryV2().receive(MemEntityV2(
+                  Mem("$insertedMemName - Start of day", null, null)));
+              await MemNotificationRepositoryV2().receive(
+                MemNotificationEntityV2(
+                  MemNotification.initialByType(
+                    savedMem.id,
+                    MemNotificationType.repeat,
+                    time: () => 60, // 00:01
+                  ),
+                ),
+              );
+              final savedMem2 = await MemRepositoryV2().receive(MemEntityV2(
+                  Mem("$insertedMemName - Start of day - 2", null, null)));
+              await MemNotificationRepositoryV2().receive(
+                MemNotificationEntityV2(
+                  MemNotification.initialByType(
+                    savedMem2.id,
+                    MemNotificationType.repeat,
+                    time: () => 60 * 60 * 24 - 60, // 23:59
+                  ),
+                ),
+              );
             });
 
-            testWidgets(
-              ': pick.',
-              (widgetTester) async {
-                await runApplication();
-                await widgetTester.pumpAndSettle();
+            testWidgets('show saved.', (widgetTester) async {
+              await runApplication();
+              await widgetTester.pumpAndSettle();
 
-                await widgetTester.tap(drawerIconFinder);
-                await widgetTester.pumpAndSettle();
-                await widgetTester.tap(find.text(l10n.settingsPageTitle));
-                await widgetTester.pumpAndSettle();
+              await widgetTester.tap(drawerIconFinder);
+              await widgetTester.pumpAndSettle();
+              await widgetTester.tap(find.text(l10n.settingsPageTitle));
+              await widgetTester.pumpAndSettle();
 
-                await widgetTester.tap(find.text(l10n.startOfDayLabel));
-                await widgetTester.pumpAndSettle();
-
-                final rect =
-                    widgetTester.getRect(find.byKey(Key('time-picker-dial')));
-                final tapPosition = Offset(
-                  rect.left + rect.width / 2,
-                  rect.top + rect.height / 2,
-                );
-                await widgetTester.tapAt(tapPosition);
-                await widgetTester.tap(okFinder);
-                await widgetTester.pumpAndSettle();
-
-                expect(
+              expect(
                   widgetTester
                       .widget<Text>(find
                           .descendant(
-                            of: find.byType(SettingsTile),
-                            matching: find.byType(Text),
-                          )
+                              of: find.byType(SettingsTile),
+                              matching: find.byType(Text))
                           .at(1))
                       .data,
-                  "6:00 AM",
-                );
-                expect(
-                  (await PreferenceRepository().shipByKey(startOfDayKey)).value,
-                  TimeOfDay(hour: 6, minute: 0),
-                );
-              },
-            );
+                  "5:00 AM");
+            });
 
-            group(
-              'With saved',
-              () {
-                final now = DateTime.now();
-                setUp(() async {
-                  await PreferenceRepository().receive(PreferenceEntity(
-                      startOfDayKey, TimeOfDay.fromDateTime(now)));
+            testWidgets("Before start of tomorrow is today's habit.",
+                (widgetTester) async {
+              await runApplication();
+              await widgetTester.pumpAndSettle(waitLongSideEffectDuration);
 
-                  final savedMem = await MemRepositoryV2().receive(MemEntityV2(
-                      Mem("$insertedMemName - Start of day", null, null)));
-                  await MemNotificationRepositoryV2().receive(
-                    MemNotificationEntityV2(
-                      MemNotification.initialByType(
-                        savedMem.id,
-                        MemNotificationType.repeat,
-                        time: () => 60,
-                      ),
-                    ),
-                  );
-                  final savedMem2 = await MemRepositoryV2().receive(MemEntityV2(
-                      Mem("$insertedMemName - Start of day - 2", null, null)));
-                  await MemNotificationRepositoryV2().receive(
-                    MemNotificationEntityV2(
-                      MemNotification.initialByType(
-                        savedMem2.id,
-                        MemNotificationType.repeat,
-                        time: () => 60 * 60 * 24 - 60,
-                      ),
-                    ),
-                  );
-                });
-
-                testWidgets('show saved.', (widgetTester) async {
-                  await runApplication();
-                  await widgetTester.pumpAndSettle();
-
-                  await widgetTester.tap(drawerIconFinder);
-                  await widgetTester.pumpAndSettle();
-                  await widgetTester.tap(find.text(l10n.settingsPageTitle));
-                  await widgetTester.pumpAndSettle();
-
-                  expect(
-                      widgetTester
-                          .widget<Text>(find
-                              .descendant(
-                                  of: find.byType(SettingsTile),
-                                  matching: find.byType(Text))
-                              .at(1))
-                          .data,
-                      timeText(now));
-                });
-
-                testWidgets(
-                  "Before start of tomorrow is today's habit.",
-                  (widgetTester) async {
-                    await runApplication();
-                    await widgetTester.pumpAndSettle(Duration(seconds: 10));
-
-                    final texts =
-                        widgetTester.widgetList<Text>(find.byType(Text));
-                    expect(texts.elementAt(0).data, equals(dateText(now)));
-                    expect(texts.elementAt(3).data,
-                        equals(dateText(now.add(Duration(days: 1)))));
-                  },
-                );
-              },
-            );
-          },
-        );
+              final date = now.subtract(Duration(
+                  days: TimeOfDay.fromDateTime(now).lessThan(startOfDay)
+                      ? 1
+                      : 0));
+              expect(widgetTester.widget<Text>(find.byType(Text).at(0)).data,
+                  equals(dateText(date)));
+              expect(find.text(dateText(date.add(Duration(days: 1)))),
+                  findsNothing);
+            });
+          });
+        });
 
         group("Notify after inactivity", () {
           setUp(
