@@ -91,6 +91,9 @@ class MemNotification {
                 hours,
                 minutes,
               );
+              if (notifyAt.compareTo(startOfToday) < 0) {
+                notifyAt = notifyAt.add(Duration(days: 1));
+              }
             }
 
             // repeatByNDay

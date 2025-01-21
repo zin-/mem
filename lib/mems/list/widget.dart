@@ -72,7 +72,7 @@ class _MemListWidget extends StatelessWidget {
             now.day,
             _startOfDay.hour,
             _startOfDay.minute,
-          ).add(Duration(
+          ).subtract(Duration(
             days: _startOfDay.lessThan(TimeOfDay.fromDateTime(now)) ? 0 : 1,
           ));
           final l10n = buildL10n(context);
@@ -120,12 +120,13 @@ class _MemListWidget extends StatelessWidget {
                       } else if (memNotifications
                               .where((e) => !e.isAfterActStarted())
                               .isNotEmpty &&
-                          nextNotifyAt.isBefore(startOfToday)) {
+                          TimeOfDay.fromDateTime(nextNotifyAt)
+                              .isBefore(TimeOfDay.fromDateTime(startOfToday))) {
                         return DateAndTime(
                           nextNotifyAt.year,
                           nextNotifyAt.month,
                           nextNotifyAt.day,
-                        ).add(Duration(days: 1));
+                        ).subtract(Duration(days: 1));
                       } else {
                         return DateAndTime(
                           nextNotifyAt.year,
