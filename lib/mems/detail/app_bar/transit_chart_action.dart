@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:mem/acts/line_chart/line_chart_page.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mem/framework/view/app_bar_actions_builder.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/logger/log_service.dart';
+import 'package:mem/router.dart';
 
 class TransitChartAction extends AppBarActionBuilder {
   TransitChartAction(BuildContext context, int memId)
@@ -10,12 +11,7 @@ class TransitChartAction extends AppBarActionBuilder {
           icon: const Icon(Icons.show_chart),
           name: buildL10n(context).actChartPageTitle,
           onPressed: () => v(
-            () => Navigator.of(context).push(
-              PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    ActLineChartPage(memId),
-              ),
-            ),
+            () => context.push(buildMemChartPath(memId)),
           ),
         );
 }
