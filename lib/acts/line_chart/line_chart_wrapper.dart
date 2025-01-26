@@ -84,7 +84,7 @@ class LineChartWrapper extends StatelessWidget {
                 .map(
                   (e) => FlSpot(
                     e.key.millisecondsSinceEpoch.toDouble(),
-                    e.value,
+                    double.parse(e.value.toStringAsPrecision(3)),
                   ),
                 )
                 .toList(),
@@ -97,7 +97,7 @@ class LineChartWrapper extends StatelessWidget {
                 .map(
                   (e) => FlSpot(
                     e.key.millisecondsSinceEpoch.toDouble(),
-                    e.value,
+                    double.parse(e.value.toStringAsPrecision(3)),
                   ),
                 )
                 .toList(),
@@ -107,6 +107,9 @@ class LineChartWrapper extends StatelessWidget {
           ),
           actCount,
         ],
+        lineTouchData: LineTouchData(
+          enabled: true,
+        ),
       ),
     );
   }
