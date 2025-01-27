@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -20,13 +21,7 @@ class LineChartWrapper extends StatelessWidget {
         interval: 1,
       ),
     );
-    final min = _actsSummary.min;
-    final max = _actsSummary.max;
 
-    final gridData = FlGridData(
-      drawVerticalLine: false,
-      horizontalInterval: max == min ? 1 : ((max - min) / 4).ceilToDouble(),
-    );
     final titlesData = FlTitlesData(
       topTitles: const AxisTitles(),
       leftTitles: yAxisTitles,
@@ -68,48 +63,53 @@ class LineChartWrapper extends StatelessWidget {
               ))
           .toList(),
     );
-    final sma = LineChartBarData(
-      spots: _actsSummary
-          .simpleMovingAverage(5)
-          .entries
-          .map(
-            (e) => FlSpot(
-              e.key.millisecondsSinceEpoch.toDouble(),
-              e.value,
-            ),
-          )
-          .toList(),
-      isCurved: true,
-      dotData: const FlDotData(show: false),
-      color: Colors.teal,
-    );
-    final lwma = LineChartBarData(
-      spots: _actsSummary
-          .linearWeightedMovingAverage(5)
-          .entries
-          .map(
-            (e) => FlSpot(
-              e.key.millisecondsSinceEpoch.toDouble(),
-              e.value,
-            ),
-          )
-          .toList(),
-      isCurved: true,
-      dotData: const FlDotData(show: false),
-      color: Colors.tealAccent,
-    );
+    final sma5 = _actsSummary.simpleMovingAverage(5);
+    final lwma5 = _actsSummary.linearWeightedMovingAverage(5);
+
+    final min = _actsSummary.min;
+    final max = [_actsSummary.max, sma5.values.max, lwma5.values.max].max;
 
     return LineChart(
       LineChartData(
-        gridData: gridData,
+        gridData: FlGridData(
+          drawVerticalLine: false,
+          horizontalInterval: max == min ? 1 : ((max - min) / 4).ceilToDouble(),
+        ),
         minY: min > 0 ? min - 1 : 0,
         maxY: max + 1,
         titlesData: titlesData,
         lineBarsData: [
-          sma,
-          lwma,
+          LineChartBarData(
+            spots: sma5.entries
+                .map(
+                  (e) => FlSpot(
+                    e.key.millisecondsSinceEpoch.toDouble(),
+                    double.parse(e.value.toStringAsPrecision(3)),
+                  ),
+                )
+                .toList(),
+            isCurved: true,
+            dotData: const FlDotData(show: false),
+            color: Colors.teal,
+          ),
+          LineChartBarData(
+            spots: lwma5.entries
+                .map(
+                  (e) => FlSpot(
+                    e.key.millisecondsSinceEpoch.toDouble(),
+                    double.parse(e.value.toStringAsPrecision(3)),
+                  ),
+                )
+                .toList(),
+            isCurved: true,
+            dotData: const FlDotData(show: false),
+            color: Colors.tealAccent,
+          ),
           actCount,
         ],
+        lineTouchData: LineTouchData(
+          enabled: true,
+        ),
       ),
     );
   }

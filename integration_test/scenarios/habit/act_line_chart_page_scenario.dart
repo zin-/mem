@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/acts/line_chart/line_chart_wrapper.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/base.dart';
@@ -65,23 +66,34 @@ void main() => group(
           }
         });
 
-        testWidgets(
-          ": show chart",
-          (widgetTester) async {
-            widgetTester.ignoreMockMethodCallHandler(
-                MethodChannelMock.flutterLocalNotifications);
+        testWidgets("Show chart.", (widgetTester) async {
+          widgetTester.ignoreMockMethodCallHandler(
+              MethodChannelMock.flutterLocalNotifications);
 
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+          await runApplication();
+          await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.text(insertedMemName));
-            await widgetTester.pumpAndSettle();
+          await widgetTester.tap(find.text(insertedMemName));
+          await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.byIcon(Icons.show_chart));
-            await widgetTester.pumpAndSettle();
+          await widgetTester.tap(find.byIcon(Icons.show_chart));
+          await widgetTester.pumpAndSettle();
 
-            expect(true, isTrue);
-          },
-        );
+          expect(find.byType(LineChartWrapper), findsOneWidget);
+        });
+
+        testWidgets("Show statistics.", (widgetTester) async {
+          await runApplication();
+          await widgetTester.pumpAndSettle();
+          await widgetTester.tap(find.text(insertedMemName));
+          await widgetTester.pumpAndSettle();
+          await widgetTester.tap(find.byIcon(Icons.show_chart));
+          await widgetTester.pumpAndSettle();
+
+          final texts = widgetTester.widgetList<Text>(find.byType(Text));
+          expect(texts.elementAt(0).data, equals("Min : "));
+          expect(texts.elementAt(2).data, equals("Max : "));
+          expect(texts.elementAt(4).data, equals("Avg : "));
+        });
       },
     );
