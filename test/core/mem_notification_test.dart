@@ -26,16 +26,19 @@ void main() {
           "repeat at $at by $nDay";
       String buildAfterActStartedNotificationText(String at) =>
           "after act at $at";
-      String formatToTimeOfDay(DateAndTime dateAndTime) =>
-          "${dateAndTime.hour}:${dateAndTime.minute}";
 
       test('no enables.', () {
         const memId = 1;
 
-        final oneLine = MemNotification.toOneLine([
-          MemNotification.by(memId, MemNotificationType.repeat, null, "repeat")
-        ], (at) => fail("no call"), (nDay, at) => fail("no call"),
-            (a) => fail("no call"), (dateAndTime) => fail("no call"));
+        final oneLine = MemNotification.toOneLine(
+          [
+            MemNotification.by(
+                memId, MemNotificationType.repeat, null, "repeat")
+          ],
+          (at) => fail("no call"),
+          (nDay, at) => fail("no call"),
+          (a) => fail("no call"),
+        );
 
         expect(oneLine, isNull);
       });
@@ -45,15 +48,17 @@ void main() {
           const memId = 1;
           const repeatAt = 0;
 
-          final oneLine = MemNotification.toOneLine([
-            MemNotification.by(memId, MemNotificationType.repeat, repeatAt, "")
-          ], buildRepeatedNotificationText, (nDay, at) => fail("no call"),
-              (a) => fail("no call"), formatToTimeOfDay);
+          final oneLine = MemNotification.toOneLine(
+            [
+              MemNotification.by(
+                  memId, MemNotificationType.repeat, repeatAt, "")
+            ],
+            buildRepeatedNotificationText,
+            (nDay, at) => fail("no call"),
+            (a) => fail("no call"),
+          );
 
-          expect(
-              oneLine,
-              equals(buildRepeatedNotificationText(
-                  formatToTimeOfDay(DateAndTime(0, 0, 0, 0, 0, repeatAt)))));
+          expect(oneLine, isNull);
         });
 
         test('repeat at 05:00 by 2 day.', () {
@@ -61,18 +66,19 @@ void main() {
           const repeatAt = (5 * 60) * 60;
           const repeatByNDay = 2;
 
-          final oneLine = MemNotification.toOneLine([
-            MemNotification.by(memId, MemNotificationType.repeat, repeatAt, ""),
-            MemNotification.by(
-                memId, MemNotificationType.repeatByNDay, repeatByNDay, "")
-          ], (at) => fail("no call"), buildRepeatEveryNDayNotificationText,
-              (at) => fail("no call"), formatToTimeOfDay);
+          final oneLine = MemNotification.toOneLine(
+            [
+              MemNotification.by(
+                  memId, MemNotificationType.repeat, repeatAt, ""),
+              MemNotification.by(
+                  memId, MemNotificationType.repeatByNDay, repeatByNDay, "")
+            ],
+            (at) => fail("no call"),
+            buildRepeatEveryNDayNotificationText,
+            (at) => fail("no call"),
+          );
 
-          expect(
-              oneLine,
-              equals(buildRepeatEveryNDayNotificationText(
-                  repeatByNDay.toString(),
-                  formatToTimeOfDay(DateAndTime(0, 0, 0, 0, 0, repeatAt)))));
+          expect(oneLine, isNull);
         });
 
         test('repeat at 12:00 by 3 day on Mon.', () {
@@ -80,32 +86,36 @@ void main() {
           const repeatAt = (5 * 60) * 60;
           const repeatByNDay = 2;
 
-          final oneLine = MemNotification.toOneLine([
-            MemNotification.by(memId, MemNotificationType.repeat, repeatAt, ""),
-            MemNotification.by(
-                memId, MemNotificationType.repeatByNDay, repeatByNDay, ""),
-            MemNotification.by(
-                memId, MemNotificationType.repeatByDayOfWeek, 1, "")
-          ], (at) => fail("no call"), buildRepeatEveryNDayNotificationText,
-              (at) => fail("no call"), formatToTimeOfDay);
+          final oneLine = MemNotification.toOneLine(
+            [
+              MemNotification.by(
+                  memId, MemNotificationType.repeat, repeatAt, ""),
+              MemNotification.by(
+                  memId, MemNotificationType.repeatByNDay, repeatByNDay, ""),
+              MemNotification.by(
+                  memId, MemNotificationType.repeatByDayOfWeek, 1, "")
+            ],
+            (at) => fail("no call"),
+            buildRepeatEveryNDayNotificationText,
+            (at) => fail("no call"),
+          );
 
-          expect(
-              oneLine,
-              equals("${buildRepeatEveryNDayNotificationText(
-                repeatByNDay.toString(),
-                formatToTimeOfDay(DateAndTime(0, 0, 0, 0, 0, repeatAt)),
-              )}, Mon"));
+          expect(oneLine, equals("Mon"));
         });
       });
 
       test('repeat by Tue.', () {
         const memId = 1;
 
-        final oneLine = MemNotification.toOneLine([
-          MemNotification.by(memId, MemNotificationType.repeatByDayOfWeek, 2,
-              "repeatByDayOfWeek")
-        ], buildRepeatedNotificationText, (a, b) => "$a, $b", (a) => a,
-            formatToTimeOfDay);
+        final oneLine = MemNotification.toOneLine(
+          [
+            MemNotification.by(memId, MemNotificationType.repeatByDayOfWeek, 2,
+                "repeatByDayOfWeek")
+          ],
+          buildRepeatedNotificationText,
+          (a, b) => "$a, $b",
+          (a) => a,
+        );
 
         expect(oneLine, equals("Tue"));
       });
@@ -113,11 +123,15 @@ void main() {
       test('after act', () {
         const memId = 1;
         const time = 2;
-        final oneLine = MemNotification.toOneLine([
-          MemNotification.by(
-              memId, MemNotificationType.afterActStarted, time, "")
-        ], (a) => fail("no call"), (a, b) => fail("no call"),
-            buildAfterActStartedNotificationText, formatToTimeOfDay);
+        final oneLine = MemNotification.toOneLine(
+          [
+            MemNotification.by(
+                memId, MemNotificationType.afterActStarted, time, "")
+          ],
+          (a) => fail("no call"),
+          (a, b) => fail("no call"),
+          buildAfterActStartedNotificationText,
+        );
 
         expect(
             oneLine,

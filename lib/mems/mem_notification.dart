@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mem/acts/act.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
@@ -42,11 +43,9 @@ class MemNotification {
         () {
           switch (type) {
             case MemNotificationType.repeat:
-              return MemNotification(
-                  memId, type, time, message ?? _repeatedMessage);
+              return RepeatMemNotification(memId, time, message);
             case MemNotificationType.repeatByNDay:
-              return MemNotification(
-                  memId, type, time, message ?? _repeatedMessage);
+              return RepeatByNDayMemNotification(memId, time, message);
             case MemNotificationType.repeatByDayOfWeek:
               return MemNotification(
                   memId, type, time, message ?? _repeatByDayOfWeekMessage);
@@ -90,14 +89,13 @@ class MemNotification {
               (e) => e.isRepeated(),
             );
             if (repeat != null) {
-              final hours = (repeat.time! / 60 / 60).floor();
-              final minutes = ((repeat.time! - hours * 60 * 60) / 60).floor();
+              final timeOfDay = (repeat as RepeatMemNotification).timeOfDay;
               notifyAt = DateTime(
                 notifyAt.year,
                 notifyAt.month,
                 notifyAt.day,
-                hours,
-                minutes,
+                timeOfDay!.hour,
+                timeOfDay.minute,
               );
               if (notifyAt.compareTo(startOfToday) < 0) {
                 notifyAt = notifyAt.add(Duration(days: 1));
@@ -153,7 +151,6 @@ class MemNotification {
     String Function(String nDay, String at)
         buildRepeatEveryNDayNotificationText,
     String Function(String at) buildAfterActStartedNotificationText,
-    String Function(DateAndTime dateAndTime) formatToTimeOfDay,
   ) =>
       v(
         () {
@@ -163,24 +160,12 @@ class MemNotification {
           if (enables.isEmpty) {
             return null;
           } else {
-            final repeat =
-                enables.singleWhereOrNull((element) => element.isRepeated());
-            final repeatByNDay = enables
-                .singleWhereOrNull((element) => element.isRepeatByNDay());
             final repeatByDayOfWeeks =
                 enables.where((element) => element.isRepeatByDayOfWeek());
             final afterActStarted = enables
                 .singleWhereOrNull((element) => element.isAfterActStarted());
 
             final text = [
-              if (repeat != null)
-                _oneLineRepeat(
-                  repeat,
-                  repeatByNDay,
-                  buildRepeatedNotificationText,
-                  buildRepeatEveryNDayNotificationText,
-                  formatToTimeOfDay,
-                ),
               if (repeatByDayOfWeeks.isNotEmpty)
                 _oneLineRepeatByDaysOfWeek(repeatByDayOfWeeks),
               if (afterActStarted != null)
@@ -195,35 +180,6 @@ class MemNotification {
         },
         {
           'memNotifications': memNotifications,
-        },
-      );
-
-  static String _oneLineRepeat(
-    MemNotification repeat,
-    MemNotification? repeatByNDay,
-    String Function(String at) buildRepeatedNotificationText,
-    String Function(String nDay, String at)
-        buildRepeatEveryNDayNotificationText,
-    String Function(DateAndTime dateAndTime) formatToTimeOfDay,
-  ) =>
-      v(
-        () {
-          if (repeatByNDay != null && (repeatByNDay.time ?? 0) > 1) {
-            return buildRepeatEveryNDayNotificationText(
-              repeatByNDay.time.toString(),
-              formatToTimeOfDay(
-                DateAndTime(0, 0, 0, 0, 0, repeat.time),
-              ),
-            );
-          } else {
-            return buildRepeatedNotificationText(formatToTimeOfDay(
-              DateAndTime(0, 0, 0, 0, 0, repeat.time),
-            ));
-          }
-        },
-        {
-          'repeat': repeat,
-          'repeatByNDay': repeatByNDay,
         },
       );
 
@@ -260,4 +216,34 @@ class MemNotification {
         'time': time,
         'message': message,
       }}";
+}
+
+extension TimeOfDayExt on TimeOfDay {
+  static TimeOfDay fromSeconds(int seconds) {
+    final hours = (seconds / 60 / 60).floor();
+    return TimeOfDay(
+      hour: hours,
+      minute: ((seconds - hours * 60 * 60) / 60).floor(),
+    );
+  }
+}
+
+class RepeatMemNotification extends MemNotification {
+  RepeatMemNotification(int? memId, int? time, String? message)
+      : super(memId, MemNotificationType.repeat, time,
+            message ?? _repeatedMessage);
+
+  TimeOfDay? get timeOfDay {
+    if (time == null) {
+      return null;
+    } else {
+      return TimeOfDayExt.fromSeconds(time!);
+    }
+  }
+}
+
+class RepeatByNDayMemNotification extends MemNotification {
+  RepeatByNDayMemNotification(int? memId, int? time, String? message)
+      : super(memId, MemNotificationType.repeatByNDay, time,
+            message ?? _repeatedMessage);
 }

@@ -37,24 +37,80 @@ class _MemNotificationText extends StatelessWidget {
   Widget build(BuildContext context) => v(
         () {
           final l10n = buildL10n(context);
+
+          final enables =
+              _memNotificationEntities.where((e) => e.value.isEnabled());
+
           final oneLine = MemNotification.toOneLine(
-            _memNotificationEntities.map((e) => e.value),
+            enables.map((e) => e.value),
             l10n.repeatedNotificationText,
             l10n.repeatEveryNDayNotificationText,
             l10n.afterActStartedNotificationText,
-            (dataAndTime) =>
-                TimeOfDay.fromDateTime(dataAndTime).format(context),
           );
+          final nDayMemNotification = enables
+              .map((e) => e.value)
+              .whereType<RepeatByNDayMemNotification>()
+              .singleOrNull;
+          final repeatMemNotifications = enables
+              .map((e) => e.value)
+              .whereType<RepeatMemNotification>()
+              .map((e) => renderRepeatMemNotification(
+                    context,
+                    e,
+                    nDayMemNotification,
+                  ));
 
-          return Text(
-            oneLine ?? l10n.noNotifications,
-            style: TextStyle(
-              color: oneLine == null ? secondaryGreyColor : null,
-            ),
-          );
+          return enables.isEmpty
+              ? Text(
+                  l10n.noNotifications,
+                  style: TextStyle(
+                    color: secondaryGreyColor,
+                  ),
+                )
+              : Wrap(
+                  children: [
+                    ...repeatMemNotifications,
+                    if (oneLine != null)
+                      Text(
+                        oneLine,
+                        style: TextStyle(
+                          color: null,
+                        ),
+                      )
+                  ],
+                );
         },
         {
           '_memNotificationEntities': _memNotificationEntities,
         },
       );
 }
+
+Widget renderRepeatMemNotification(
+  BuildContext context,
+  RepeatMemNotification repeat,
+  RepeatByNDayMemNotification? repeatByNDay,
+) =>
+    v(
+      () {
+        final l10n = buildL10n(context);
+
+        if (repeatByNDay != null && (repeatByNDay.time ?? 0) > 1) {
+          return Text(
+            l10n.repeatEveryNDayNotificationText(
+              repeatByNDay.time.toString(),
+              repeat.timeOfDay!.format(context),
+            ),
+          );
+        } else {
+          return Text(
+            l10n.repeatedNotificationText(repeat.timeOfDay!.format(context)),
+          );
+        }
+      },
+      {
+        'context': context,
+        'repeatMemNotification': repeat,
+        'nDayMemNotification': repeatByNDay,
+      },
+    );
