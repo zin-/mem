@@ -30,7 +30,7 @@ class MemRepeatByNDayNotificationView extends ConsumerWidget {
                 [
                   notification
                       .updatedWith(
-                        (v) => MemNotification(
+                        (v) => MemNotification.by(
                           v.memId,
                           v.type,
                           value == 0 ? null : value,

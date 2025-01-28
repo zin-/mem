@@ -11,7 +11,7 @@ void main() {
         const memId = 1;
         const time = 2;
 
-        final repeatByDayOfWeek = MemNotification(memId,
+        final repeatByDayOfWeek = MemNotification.by(memId,
             MemNotificationType.repeatByDayOfWeek, time, "repeatByDayOfWeek");
 
         expect(repeatByDayOfWeek.isRepeatByDayOfWeek(), isTrue);
@@ -33,7 +33,7 @@ void main() {
         const memId = 1;
 
         final oneLine = MemNotification.toOneLine([
-          MemNotification(memId, MemNotificationType.repeat, null, "repeat")
+          MemNotification.by(memId, MemNotificationType.repeat, null, "repeat")
         ], (at) => fail("no call"), (nDay, at) => fail("no call"),
             (a) => fail("no call"), (dateAndTime) => fail("no call"));
 
@@ -46,7 +46,7 @@ void main() {
           const repeatAt = 0;
 
           final oneLine = MemNotification.toOneLine([
-            MemNotification(memId, MemNotificationType.repeat, repeatAt, "")
+            MemNotification.by(memId, MemNotificationType.repeat, repeatAt, "")
           ], buildRepeatedNotificationText, (nDay, at) => fail("no call"),
               (a) => fail("no call"), formatToTimeOfDay);
 
@@ -62,8 +62,8 @@ void main() {
           const repeatByNDay = 2;
 
           final oneLine = MemNotification.toOneLine([
-            MemNotification(memId, MemNotificationType.repeat, repeatAt, ""),
-            MemNotification(
+            MemNotification.by(memId, MemNotificationType.repeat, repeatAt, ""),
+            MemNotification.by(
                 memId, MemNotificationType.repeatByNDay, repeatByNDay, "")
           ], (at) => fail("no call"), buildRepeatEveryNDayNotificationText,
               (at) => fail("no call"), formatToTimeOfDay);
@@ -81,10 +81,11 @@ void main() {
           const repeatByNDay = 2;
 
           final oneLine = MemNotification.toOneLine([
-            MemNotification(memId, MemNotificationType.repeat, repeatAt, ""),
-            MemNotification(
+            MemNotification.by(memId, MemNotificationType.repeat, repeatAt, ""),
+            MemNotification.by(
                 memId, MemNotificationType.repeatByNDay, repeatByNDay, ""),
-            MemNotification(memId, MemNotificationType.repeatByDayOfWeek, 1, "")
+            MemNotification.by(
+                memId, MemNotificationType.repeatByDayOfWeek, 1, "")
           ], (at) => fail("no call"), buildRepeatEveryNDayNotificationText,
               (at) => fail("no call"), formatToTimeOfDay);
 
@@ -101,7 +102,7 @@ void main() {
         const memId = 1;
 
         final oneLine = MemNotification.toOneLine([
-          MemNotification(memId, MemNotificationType.repeatByDayOfWeek, 2,
+          MemNotification.by(memId, MemNotificationType.repeatByDayOfWeek, 2,
               "repeatByDayOfWeek")
         ], buildRepeatedNotificationText, (a, b) => "$a, $b", (a) => a,
             formatToTimeOfDay);
@@ -113,7 +114,8 @@ void main() {
         const memId = 1;
         const time = 2;
         final oneLine = MemNotification.toOneLine([
-          MemNotification(memId, MemNotificationType.afterActStarted, time, "")
+          MemNotification.by(
+              memId, MemNotificationType.afterActStarted, time, "")
         ], (a) => fail("no call"), (a, b) => fail("no call"),
             buildAfterActStartedNotificationText, formatToTimeOfDay);
 

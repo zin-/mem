@@ -116,16 +116,28 @@ final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
           ...memNotificationsByMemId,
           if (memNotificationsByMemId
               .every((element) => !element.value.isRepeated()))
-            MemNotificationEntityV2(MemNotification.initialByType(
-                memId, MemNotificationType.repeat)),
+            MemNotificationEntityV2(MemNotification.by(
+              memId,
+              MemNotificationType.repeat,
+              null,
+              null,
+            )),
           if (memNotificationsByMemId
               .every((element) => !element.value.isRepeatByNDay()))
-            MemNotificationEntityV2(MemNotification.initialByType(
-                memId, MemNotificationType.repeatByNDay)),
+            MemNotificationEntityV2(MemNotification.by(
+              memId,
+              MemNotificationType.repeatByNDay,
+              null,
+              null,
+            )),
           if (memNotificationsByMemId
               .every((element) => !element.value.isAfterActStarted()))
-            MemNotificationEntityV2(MemNotification.initialByType(
-                memId, MemNotificationType.afterActStarted)),
+            MemNotificationEntityV2(MemNotification.by(
+              memId,
+              MemNotificationType.afterActStarted,
+              null,
+              null,
+            )),
         ],
         initializer: (current, notifier) => v(
           () async {

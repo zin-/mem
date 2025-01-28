@@ -12,17 +12,17 @@ void main() => group(_name, () {
         group(': repeat', () {
           final memRepeatNotifications = [
             null,
-            MemNotification(
+            MemNotification.by(
                 0, MemNotificationType.repeat, 3600 + 120, "repeat at 01:02"),
           ];
           final memRepeatByNDayNotifications = [
             null,
-            MemNotification(
+            MemNotification.by(
                 0, MemNotificationType.repeatByNDay, 2, "repeat by 2 day"),
           ];
           final memRepeatByDayOfWeekNotifications = [
             null,
-            MemNotification(
+            MemNotification.by(
                 0, MemNotificationType.repeatByDayOfWeek, 6, "repeat on Sat"),
           ];
 

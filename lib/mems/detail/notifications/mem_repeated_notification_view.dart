@@ -37,7 +37,12 @@ class MemRepeatedNotificationView extends ConsumerWidget {
                   .upsertAll(
                 [
                   memRepeatNotification.updatedWith(
-                    (v) => MemNotification(v.memId, v.type, picked, v.message),
+                    (v) => MemNotification.by(
+                      v.memId,
+                      v.type,
+                      picked,
+                      v.message,
+                    ),
                   ),
                 ],
                 (current, updating) =>

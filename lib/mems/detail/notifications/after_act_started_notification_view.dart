@@ -27,7 +27,7 @@ class AfterActStartedNotificationView extends ConsumerWidget {
                 .upsertAll(
               [
                 notification.updatedWith(
-                  (v) => MemNotification(
+                  (v) => MemNotification.by(
                     v.memId,
                     v.type,
                     picked,
@@ -42,7 +42,7 @@ class AfterActStartedNotificationView extends ConsumerWidget {
                 .upsertAll(
               [
                 notification.updatedWith(
-                  (v) => MemNotification(
+                  (v) => MemNotification.by(
                     v.memId,
                     v.type,
                     v.time,

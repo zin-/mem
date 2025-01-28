@@ -27,7 +27,7 @@ class SavedMemNotificationEntityV2 extends MemNotificationEntityV2
     with DatabaseTupleEntityV2<int, MemNotification> {
   SavedMemNotificationEntityV2(Map<String, dynamic> map)
       : super(
-          MemNotification(
+          MemNotification.by(
             map[defFkMemNotificationsMemId.name],
             MemNotificationType.fromName(map[defColMemNotificationsType.name]),
             map[defColMemNotificationsTime.name],

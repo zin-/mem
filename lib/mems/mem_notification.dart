@@ -32,28 +32,36 @@ class MemNotification {
 
   MemNotification(this.memId, this.type, this.time, this.message);
 
-  static MemNotification initialByType(
+  static MemNotification by(
     int? memId,
-    MemNotificationType type, {
-    int? Function()? time,
-  }) {
-    switch (type) {
-// coverage:ignore-start
-      case MemNotificationType.repeat:
-        return MemNotification(
-            memId, type, time == null ? null : time(), _repeatedMessage);
-      case MemNotificationType.repeatByNDay:
-        return MemNotification(
-            memId, type, time == null ? null : time(), _repeatedMessage);
-      case MemNotificationType.repeatByDayOfWeek:
-        return MemNotification(memId, type, time == null ? null : time(),
-            _repeatByDayOfWeekMessage);
-      case MemNotificationType.afterActStarted:
-        return MemNotification(
-            memId, type, time == null ? null : time(), _afterActStartedMessage);
-// coverage:ignore-end
-    }
-  }
+    MemNotificationType type,
+    int? time,
+    String? message,
+  ) =>
+      v(
+        () {
+          switch (type) {
+            case MemNotificationType.repeat:
+              return MemNotification(
+                  memId, type, time, message ?? _repeatedMessage);
+            case MemNotificationType.repeatByNDay:
+              return MemNotification(
+                  memId, type, time, message ?? _repeatedMessage);
+            case MemNotificationType.repeatByDayOfWeek:
+              return MemNotification(
+                  memId, type, time, message ?? _repeatByDayOfWeekMessage);
+            case MemNotificationType.afterActStarted:
+              return MemNotification(
+                  memId, type, time, message ?? _afterActStartedMessage);
+          }
+        },
+        {
+          'memId': memId,
+          'type': type,
+          'time': time,
+          'message': message,
+        },
+      );
 
   bool isEnabled() => time != null;
 
@@ -247,6 +255,7 @@ class MemNotification {
 
   @override
   String toString() => "${super.toString()}: ${{
+        'memId': memId,
         'type': type,
         'time': time,
         'message': message,

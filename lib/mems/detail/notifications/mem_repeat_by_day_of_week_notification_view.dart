@@ -38,10 +38,11 @@ class MemRepeatByDaysOfWeekNotificationView extends ConsumerWidget {
                           daysOfWeek.singleWhereOrNull(
                               (element) => element.value.time == e) ??
                           MemNotificationEntityV2(
-                            MemNotification.initialByType(
+                            MemNotification.by(
                               _memId,
                               MemNotificationType.repeatByDayOfWeek,
-                              time: () => e,
+                              e,
+                              null,
                             ),
                           ),
                     ),
