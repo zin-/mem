@@ -5,7 +5,10 @@ import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/mem_notification_entity.dart';
+import 'package:mem/settings/preference/keys.dart';
+import 'package:mem/settings/states.dart';
 import 'package:mem/values/colors.dart';
+import 'package:mem/values/constants.dart';
 
 class MemNotificationText extends ConsumerWidget {
   final int? _memId;
@@ -17,9 +20,12 @@ class MemNotificationText extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () => _MemNotificationText(ref.watch(
-          memNotificationsByMemIdProvider(_memId),
-        )),
+        () => _MemNotificationText(
+          ref.watch(memNotificationsByMemIdProvider(_memId)),
+          ref.read(preferencesProvider.select(
+            (v) => (v.value?[startOfDayKey] ?? defaultStartOfDay) as TimeOfDay,
+          )),
+        ),
         {
           '_memId': _memId,
         },
@@ -28,9 +34,11 @@ class MemNotificationText extends ConsumerWidget {
 
 class _MemNotificationText extends StatelessWidget {
   final Iterable<MemNotificationEntityV2> _memNotificationEntities;
+  final TimeOfDay _startOfDay;
 
   const _MemNotificationText(
     this._memNotificationEntities,
+    this._startOfDay,
   );
 
   @override
@@ -58,6 +66,7 @@ class _MemNotificationText extends StatelessWidget {
                     context,
                     e,
                     nDayMemNotification,
+                    _startOfDay,
                   ));
 
           return enables.isEmpty
@@ -82,6 +91,7 @@ class _MemNotificationText extends StatelessWidget {
         },
         {
           '_memNotificationEntities': _memNotificationEntities,
+          '_startOfDay': _startOfDay,
         },
       );
 }
@@ -90,10 +100,20 @@ Widget renderRepeatMemNotification(
   BuildContext context,
   RepeatMemNotification repeat,
   RepeatByNDayMemNotification? repeatByNDay,
+  TimeOfDay startOfDay,
 ) =>
     v(
       () {
+        final now = TimeOfDay.now();
         final l10n = buildL10n(context);
+
+        final style = TextStyle(
+          color: now.isAfter(repeat.timeOfDay!)
+              ? warningColor
+              : startOfDay.isBefore(repeat.timeOfDay!)
+                  ? warningColor
+                  : null,
+        );
 
         if (repeatByNDay != null && (repeatByNDay.time ?? 0) > 1) {
           return Text(
@@ -101,10 +121,12 @@ Widget renderRepeatMemNotification(
               repeatByNDay.time.toString(),
               repeat.timeOfDay!.format(context),
             ),
+            style: style,
           );
         } else {
           return Text(
             l10n.repeatedNotificationText(repeat.timeOfDay!.format(context)),
+            style: style,
           );
         }
       },
@@ -112,5 +134,6 @@ Widget renderRepeatMemNotification(
         'context': context,
         'repeatMemNotification': repeat,
         'nDayMemNotification': repeatByNDay,
+        'startOfDay': startOfDay,
       },
     );
