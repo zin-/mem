@@ -244,4 +244,11 @@ class MemNotification {
   ) =>
       buildAfterActStartedNotificationText(DateFormat(DateFormat.HOUR24_MINUTE)
           .format(DateAndTime(0, 0, 0, 0, 0, afterActStarted.time)));
+
+  @override
+  String toString() => "${super.toString()}: ${{
+        'type': type,
+        'time': time,
+        'message': message,
+      }}";
 }

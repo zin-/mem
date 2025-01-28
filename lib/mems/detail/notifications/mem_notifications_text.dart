@@ -4,6 +4,7 @@ import 'package:mem/l10n/l10n.dart';
 import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
+import 'package:mem/mems/mem_notification_entity.dart';
 import 'package:mem/values/colors.dart';
 
 class MemNotificationText extends ConsumerWidget {
@@ -16,13 +17,9 @@ class MemNotificationText extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () => _MemNotificationText(
-          ref
-              .watch(
-                memNotificationsByMemIdProvider(_memId),
-              )
-              .map((e) => e.value),
-        ),
+        () => _MemNotificationText(ref.watch(
+          memNotificationsByMemIdProvider(_memId),
+        )),
         {
           '_memId': _memId,
         },
@@ -30,10 +27,10 @@ class MemNotificationText extends ConsumerWidget {
 }
 
 class _MemNotificationText extends StatelessWidget {
-  final Iterable<MemNotification> _memNotifications;
+  final Iterable<MemNotificationEntityV2> _memNotificationEntities;
 
   const _MemNotificationText(
-    this._memNotifications,
+    this._memNotificationEntities,
   );
 
   @override
@@ -41,7 +38,7 @@ class _MemNotificationText extends StatelessWidget {
         () {
           final l10n = buildL10n(context);
           final oneLine = MemNotification.toOneLine(
-            _memNotifications,
+            _memNotificationEntities.map((e) => e.value),
             l10n.repeatedNotificationText,
             l10n.repeatEveryNDayNotificationText,
             l10n.afterActStartedNotificationText,
@@ -57,7 +54,7 @@ class _MemNotificationText extends StatelessWidget {
           );
         },
         {
-          '_memNotifications': _memNotifications,
+          '_memNotificationEntities': _memNotificationEntities,
         },
       );
 }
