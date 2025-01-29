@@ -37,7 +37,12 @@ class MemRepeatedNotificationView extends ConsumerWidget {
                   .upsertAll(
                 [
                   memRepeatNotification.updatedWith(
-                    (v) => MemNotification(v.memId, v.type, picked, v.message),
+                    (v) => MemNotification.by(
+                      v.memId,
+                      v.type,
+                      picked,
+                      v.message,
+                    ),
                   ),
                 ],
                 (current, updating) =>
@@ -68,13 +73,8 @@ class _MemRepeatedNotificationView extends StatelessWidget {
         () => ListTile(
           key: keyMemRepeatedNotification,
           title: TimeOfDayTextFormField(
-            timeOfDay: _time == null
-                ? _defaultTime
-                : () {
-                    final hours = (_time / 60 / 60).floor();
-                    final minutes = ((_time - hours * 60 * 60) / 60).floor();
-                    return TimeOfDay(hour: hours, minute: minutes);
-                  }(),
+            timeOfDay:
+                _time == null ? _defaultTime : TimeOfDayExt.fromSeconds(_time),
             onChanged: (pickedTimeOfDay) => _onTimeChanged(
               pickedTimeOfDay == null
                   ? null

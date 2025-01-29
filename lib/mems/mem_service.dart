@@ -51,11 +51,11 @@ class MemService {
               if (e.value.isEnabled()) {
                 return (e is SavedMemNotificationEntityV2 && !undo
                     ? _memNotificationRepository.replace(e.updatedWith(
-                        (v) => MemNotification(
+                        (v) => MemNotification.by(
                             savedMem.id, v.type, v.time, v.message),
                       ))
                     : _memNotificationRepository.receive(e.updatedWith(
-                        (v) => MemNotification(
+                        (v) => MemNotification.by(
                             savedMem.id, v.type, v.time, v.message),
                       )));
               } else {
@@ -79,7 +79,7 @@ class MemService {
               returnMemNotifications.add(
                 await _memNotificationRepository.receive(
                   entry.value.single.updatedWith(
-                    (v) => MemNotification(
+                    (v) => MemNotification.by(
                       savedMem.id,
                       v.type,
                       v.time,

@@ -143,10 +143,12 @@ void main() => group(
                   Mem("$insertedMemName - Start of day", null, null)));
               await MemNotificationRepositoryV2().receive(
                 MemNotificationEntityV2(
-                  MemNotification.initialByType(
+                  MemNotification.by(
                     savedMem.id,
                     MemNotificationType.repeat,
-                    time: () => 60, // 00:01
+                    // 00:01
+                    60,
+                    null,
                   ),
                 ),
               );
@@ -154,10 +156,12 @@ void main() => group(
                   Mem("$insertedMemName - Start of day - 2", null, null)));
               await MemNotificationRepositoryV2().receive(
                 MemNotificationEntityV2(
-                  MemNotification.initialByType(
+                  MemNotification.by(
                     savedMem2.id,
                     MemNotificationType.repeat,
-                    time: () => 60 * 60 * 24 - 60, // 23:59
+                    // 23:59
+                    60 * 60 * 24 - 60,
+                    null,
                   ),
                 ),
               );
@@ -389,7 +393,7 @@ void main() => group(
                             null,
                             null)));
                     await MemNotificationRepositoryV2().receive(
-                        MemNotificationEntityV2(MemNotification(
+                        MemNotificationEntityV2(MemNotification.by(
                             savedMemWithNoAct.id,
                             MemNotificationType.afterActStarted,
                             1,
@@ -400,7 +404,7 @@ void main() => group(
                             null,
                             null)));
                     await MemNotificationRepositoryV2().receive(
-                        MemNotificationEntityV2(MemNotification(
+                        MemNotificationEntityV2(MemNotification.by(
                             savedMemWithActiveAct.id,
                             MemNotificationType.afterActStarted,
                             1,
