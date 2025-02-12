@@ -147,9 +147,6 @@ class MemNotification {
 
   static String? toOneLine(
     Iterable<MemNotification> memNotifications,
-    String Function(String at) buildRepeatedNotificationText,
-    String Function(String nDay, String at)
-        buildRepeatEveryNDayNotificationText,
     String Function(String at) buildAfterActStartedNotificationText,
   ) =>
       v(

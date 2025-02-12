@@ -51,23 +51,20 @@ class _MemNotificationText extends StatelessWidget {
 
           final oneLine = MemNotification.toOneLine(
             enables.map((e) => e.value),
-            l10n.repeatedNotificationText,
-            l10n.repeatEveryNDayNotificationText,
             l10n.afterActStartedNotificationText,
           );
-          final nDayMemNotification = enables
-              .map((e) => e.value)
-              .whereType<RepeatByNDayMemNotification>()
-              .singleOrNull;
           final repeatMemNotifications = enables
               .map((e) => e.value)
               .whereType<RepeatMemNotification>()
               .map((e) => renderRepeatMemNotification(
                     context,
                     e,
-                    nDayMemNotification,
                     _startOfDay,
                   ));
+          final nDayMemNotification = enables
+              .map((e) => e.value)
+              .whereType<RepeatByNDayMemNotification>()
+              .singleOrNull;
 
           return enables.isEmpty
               ? Text(
@@ -77,8 +74,14 @@ class _MemNotificationText extends StatelessWidget {
                   ),
                 )
               : Wrap(
+                  spacing: 4.0,
                   children: [
                     ...repeatMemNotifications,
+                    if (nDayMemNotification != null)
+                      renderRepeatByNDayMemNotification(
+                        context,
+                        nDayMemNotification,
+                      ),
                     if (oneLine != null)
                       Text(
                         oneLine,
@@ -99,41 +102,50 @@ class _MemNotificationText extends StatelessWidget {
 Widget renderRepeatMemNotification(
   BuildContext context,
   RepeatMemNotification repeat,
-  RepeatByNDayMemNotification? repeatByNDay,
   TimeOfDay startOfDay,
 ) =>
     v(
       () {
         final now = TimeOfDay.now();
-        final l10n = buildL10n(context);
 
         final style = TextStyle(
-          color: now.isAfter(repeat.timeOfDay!)
-              ? warningColor
-              : startOfDay.isBefore(repeat.timeOfDay!)
-                  ? warningColor
-                  : null,
+          color: repeat.timeOfDay!.isAfter(now)
+              ? null
+              : repeat.timeOfDay!.isBefore(startOfDay)
+                  ? null
+                  : warningColor,
         );
 
-        if (repeatByNDay != null && (repeatByNDay.time ?? 0) > 1) {
-          return Text(
-            l10n.repeatEveryNDayNotificationText(
-              repeatByNDay.time.toString(),
-              repeat.timeOfDay!.format(context),
-            ),
-            style: style,
-          );
+        return Text(
+          repeat.timeOfDay!.format(context),
+          style: style,
+        );
+      },
+      {
+        'context': context,
+        'repeatMemNotification': repeat,
+        'startOfDay': startOfDay,
+      },
+    );
+
+Widget renderRepeatByNDayMemNotification(
+  BuildContext context,
+  RepeatByNDayMemNotification repeatByNDay,
+) =>
+    v(
+      () {
+        final l10n = buildL10n(context);
+
+        if (repeatByNDay.time == 1) {
+          return Text(l10n.repeatEverydayNotificationText);
         } else {
           return Text(
-            l10n.repeatedNotificationText(repeat.timeOfDay!.format(context)),
-            style: style,
+            l10n.repeatEveryNDayNotificationText(repeatByNDay.time.toString()),
           );
         }
       },
       {
         'context': context,
-        'repeatMemNotification': repeat,
-        'nDayMemNotification': repeatByNDay,
-        'startOfDay': startOfDay,
+        'repeatMemNotification': repeatByNDay,
       },
     );

@@ -91,8 +91,8 @@
   "notifyAfterInactivityNotificationDescription": "一定時間何もしていない場合に通知します。",
 
   "noNotifications": "通知しない",
-  "repeatedNotificationText": "毎日{notifyAt}",
-  "repeatEveryNDayNotificationText": "{nDay}日ごとの{notifyAt}",
+  "repeatEveryNDayNotificationText": "{nDay}日ごと",
+  "repeatEverydayNotificationText": "毎日",
   "repeatByNDayPrefix": "",
   "repeatByNDaySuffix": "日ごと",
   "afterActStartedNotificationText": "開始{notifyAt}後",

@@ -129,31 +129,39 @@ void main() => group(': $_name', () {
       });
 
       testWidgets(
-        'show saved.',
+        'Show saved.',
         (widgetTester) async {
           widgetTester.ignoreMockMethodCallHandler(
               MethodChannelMock.flutterLocalNotifications);
 
-          const repeatText = "12:00 AM every $insertedMemRepeatByNDay days";
+          const repeatByNDayText = "every $insertedMemRepeatByNDay days";
 
           await runApplication();
           await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-          expect(find.text(repeatText), findsOneWidget);
+          expect(find.text(repeatByNDayText), findsOneWidget);
           await widgetTester.tap(find.text(insertedMemName));
           await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
           expect(
-              widgetTester
-                  .widget<Text>(find.descendant(
-                      of: find.byKey(keyMemNotificationsView),
-                      matching: find.byType(Text)))
-                  .data,
-              repeatText);
+            widgetTester
+                .widget<Text>(
+                  find
+                      .descendant(
+                        of: find.byKey(keyMemNotificationsView),
+                        matching: find.byType(Text),
+                      )
+                      .at(1),
+                )
+                .data,
+            repeatByNDayText,
+          );
 
-          await widgetTester.tap(find.descendant(
-              of: find.byKey(keyMemNotificationsView),
-              matching: find.byIcon(Icons.edit)));
+          await widgetTester.tap(
+            find.descendant(
+                of: find.byKey(keyMemNotificationsView),
+                matching: find.byIcon(Icons.edit)),
+          );
           await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
           expect(
@@ -267,10 +275,12 @@ void main() => group(': $_name', () {
 
           const enteringNDay = 3;
           await widgetTester.enterText(
-              find.descendant(
-                  of: find.byKey(keyMemRepeatByNDayNotification),
-                  matching: find.byType(TextFormField)),
-              enteringNDay.toString());
+            find.descendant(
+              of: find.byKey(keyMemRepeatByNDayNotification),
+              matching: find.byType(TextFormField),
+            ),
+            enteringNDay.toString(),
+          );
 
           await widgetTester.pageBack();
           await widgetTester.pumpAndSettle();

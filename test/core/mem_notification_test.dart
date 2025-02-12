@@ -21,9 +21,6 @@ void main() {
     );
 
     group('toOneLine', () {
-      String buildRepeatedNotificationText(String at) => "repeat at $at";
-      String buildRepeatEveryNDayNotificationText(String nDay, String at) =>
-          "repeat at $at by $nDay";
       String buildAfterActStartedNotificationText(String at) =>
           "after act at $at";
 
@@ -35,8 +32,6 @@ void main() {
             MemNotification.by(
                 memId, MemNotificationType.repeat, null, "repeat")
           ],
-          (at) => fail("no call"),
-          (nDay, at) => fail("no call"),
           (a) => fail("no call"),
         );
 
@@ -53,8 +48,6 @@ void main() {
               MemNotification.by(
                   memId, MemNotificationType.repeat, repeatAt, "")
             ],
-            buildRepeatedNotificationText,
-            (nDay, at) => fail("no call"),
             (a) => fail("no call"),
           );
 
@@ -73,8 +66,6 @@ void main() {
               MemNotification.by(
                   memId, MemNotificationType.repeatByNDay, repeatByNDay, "")
             ],
-            (at) => fail("no call"),
-            buildRepeatEveryNDayNotificationText,
             (at) => fail("no call"),
           );
 
@@ -96,8 +87,6 @@ void main() {
                   memId, MemNotificationType.repeatByDayOfWeek, 1, "")
             ],
             (at) => fail("no call"),
-            buildRepeatEveryNDayNotificationText,
-            (at) => fail("no call"),
           );
 
           expect(oneLine, equals("Mon"));
@@ -112,8 +101,6 @@ void main() {
             MemNotification.by(memId, MemNotificationType.repeatByDayOfWeek, 2,
                 "repeatByDayOfWeek")
           ],
-          buildRepeatedNotificationText,
-          (a, b) => "$a, $b",
           (a) => a,
         );
 
@@ -128,8 +115,6 @@ void main() {
             MemNotification.by(
                 memId, MemNotificationType.afterActStarted, time, "")
           ],
-          (a) => fail("no call"),
-          (a, b) => fail("no call"),
           buildAfterActStartedNotificationText,
         );
 

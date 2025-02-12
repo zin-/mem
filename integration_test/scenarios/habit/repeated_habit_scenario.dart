@@ -109,9 +109,9 @@ void main() => group(': $_name', () {
         });
 
         testWidgets(
-          'saved.',
+          'Saved.',
           (widgetTester) async {
-            const repeatText = "12:00 AM every day";
+            const repeatText = "12:00 AM";
 
             await runApplication();
             await widgetTester.pumpAndSettle();
@@ -122,12 +122,18 @@ void main() => group(': $_name', () {
             await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
             expect(
-                widgetTester
-                    .widget<Text>(find.descendant(
-                        of: find.byKey(keyMemNotificationsView),
-                        matching: find.byType(Text)))
-                    .data,
-                repeatText);
+              widgetTester
+                  .widget<Text>(
+                    find
+                        .descendant(
+                          of: find.byKey(keyMemNotificationsView),
+                          matching: find.byType(Text),
+                        )
+                        .at(0),
+                  )
+                  .data,
+              repeatText,
+            );
 
             await widgetTester.tap(find.descendant(
                 of: find.byKey(keyMemNotificationsView),
