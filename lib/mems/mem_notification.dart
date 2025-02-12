@@ -223,6 +223,18 @@ extension TimeOfDayExt on TimeOfDay {
       minute: ((seconds - hours * 60 * 60) / 60).floor(),
     );
   }
+
+  bool isAfterWithStartOfDay(TimeOfDay other, TimeOfDay startOfDay) => v(
+        () => isAfter(other)
+            ? true
+            : isBefore(startOfDay)
+                ? true
+                : false,
+        {
+          'other': other,
+          'startOfDay': startOfDay,
+        },
+      );
 }
 
 class RepeatMemNotification extends MemNotification {

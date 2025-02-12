@@ -109,11 +109,9 @@ Widget renderRepeatMemNotification(
         final now = TimeOfDay.now();
 
         final style = TextStyle(
-          color: repeat.timeOfDay!.isAfter(now)
+          color: repeat.timeOfDay!.isAfterWithStartOfDay(now, startOfDay)
               ? null
-              : repeat.timeOfDay!.isBefore(startOfDay)
-                  ? null
-                  : warningColor,
+              : warningColor,
         );
 
         return Text(
