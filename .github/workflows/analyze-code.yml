@@ -30,6 +30,9 @@ jobs:
       - name: "Run build_runner"
         run: dart run build_runner build --delete-conflicting-outputs
 
+      - name: "Generate l10n"
+        uses: ./.github/actions/generate-l10n
+
       - name: "Analyze Application code"
         run: flutter analyze lib
 
