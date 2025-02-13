@@ -5,7 +5,6 @@ import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:mem/acts/act.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_view.dart';
-import 'package:mem/framework/date_and_time/time_of_day.dart';
 import 'package:mem/framework/nullable.dart';
 import 'package:mem/framework/view/async_value_view.dart';
 import 'package:mem/l10n/l10n.dart';
@@ -73,7 +72,7 @@ class _MemListWidget extends StatelessWidget {
             _startOfDay.hour,
             _startOfDay.minute,
           ).subtract(Duration(
-            days: _startOfDay.lessThan(TimeOfDay.fromDateTime(now)) ? 0 : 1,
+            days: _startOfDay.isBefore(TimeOfDay.fromDateTime(now)) ? 0 : 1,
           ));
           final l10n = buildL10n(context);
 

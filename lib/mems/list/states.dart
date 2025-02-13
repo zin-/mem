@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/act.dart';
 import 'package:mem/acts/act_repository.dart';
 import 'package:mem/acts/states.dart';
-import 'package:mem/framework/date_and_time/time_of_day.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
@@ -129,7 +128,7 @@ final memListProvider = StateNotifierProvider.autoDispose<
         final startOfToday = DateTime(
           now.year,
           now.month,
-          now.day + (startOfDay.lessThan(nowTime) ? 0 : 1),
+          now.day + (startOfDay.isBefore(nowTime) ? 0 : 1),
           startOfDay.hour,
           startOfDay.minute,
         );

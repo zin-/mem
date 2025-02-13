@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mem/acts/act.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
+import 'package:mem/framework/date_and_time/time_of_day.dart';
 import 'package:mem/logger/log_service.dart';
 
 const _repeatedMessage = "Repeat";
@@ -213,28 +214,6 @@ class MemNotification {
         'time': time,
         'message': message,
       }}";
-}
-
-extension TimeOfDayExt on TimeOfDay {
-  static TimeOfDay fromSeconds(int seconds) {
-    final hours = (seconds / 60 / 60).floor();
-    return TimeOfDay(
-      hour: hours,
-      minute: ((seconds - hours * 60 * 60) / 60).floor(),
-    );
-  }
-
-  bool isAfterWithStartOfDay(TimeOfDay other, TimeOfDay startOfDay) => v(
-        () => isAfter(other)
-            ? true
-            : isBefore(startOfDay)
-                ? true
-                : false,
-        {
-          'other': other,
-          'startOfDay': startOfDay,
-        },
-      );
 }
 
 class RepeatMemNotification extends MemNotification {
