@@ -18,20 +18,26 @@
   "saveMemSuccessMessage": "\"{memName}\"の保存に成功しました。",
   "@saveMemSuccessMessage": {
     "placeholders": {
-      "memName": {}
+      "memName": {
+        "type": "Object"
+      }
     }
   },
   "requiredError": "Error: required",
   "archiveMemSuccessMessage": "Archive success. {memName}",
   "@archiveMemSuccessMessage": {
     "placeholders": {
-      "memName": {}
+      "memName": {
+        "type": "Object"
+      }
     }
   },
   "unarchiveMemSuccessMessage": "Unarchive success. {memName}",
   "@unarchiveMemSuccessMessage": {
     "placeholders": {
-      "memName": {}
+      "memName": {
+        "type": "Object"
+      }
     }
   },
   "removeAction": "Remove",
@@ -39,14 +45,18 @@
   "removeMemSuccessMessage": "Remove success. {memName}",
   "@removeMemSuccessMessage": {
     "placeholders": {
-      "memName": {}
+      "memName": {
+        "type": "Object"
+      }
     }
   },
   "undoAction": "Undo",
   "undoMemSuccessMessage": "\"{memName}\"の削除取り消しが完了しました。",
   "@undoMemSuccessMessage": {
     "placeholders": {
-      "memName": {}
+      "memName": {
+        "type": "Object"
+      }
     }
   },
   "okAction": "OK",

@@ -5,6 +5,7 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mockito/mockito.dart';
 
 import '../helpers.dart';
+import '../helpers.mocks.dart';
 
 void main() {
   final mockedLoggerWrapper = MockLoggerWrapper();

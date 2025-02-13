@@ -1,14 +1,14 @@
+import 'package:mem/generated/l10n/app_localizations.dart';
+import 'package:mem/logger/log_service.dart';
+import 'package:mem/notifications/notification_actions.dart';
+import 'package:mem/notifications/notification_ids.dart';
+
+import 'channel.dart';
+
 // FIXME 通知種別としては、NotificationChannelとほぼ同じ概念なのでは？
 //  微妙に異なる
 //    NotificationChannelではその挙動について定義される
 //      具体的にはstartMemとendMemは同じChannel
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
-import 'package:mem/logger/log_service.dart';
-import 'package:mem/notifications/notification/channel.dart';
-import 'package:mem/notifications/notification_actions.dart';
-import 'package:mem/notifications/notification_ids.dart';
-
 enum NotificationType {
   startMem,
   endMem,
