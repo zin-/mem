@@ -73,7 +73,7 @@ class MemNotification {
 
   bool isAfterActStarted() => type == MemNotificationType.afterActStarted;
 
-  static nextNotifyAt(
+  static DateTime? nextNotifyAt(
     Iterable<MemNotification> memNotifications,
     DateTime startOfToday,
     Act? latestAct,

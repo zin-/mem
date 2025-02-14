@@ -8,11 +8,4 @@ extension TimeOfDayExt on TimeOfDay {
       minute: ((seconds - hours * 60 * 60) / 60).floor(),
     );
   }
-
-  bool isAfterWithStartOfDay(TimeOfDay other, TimeOfDay startOfDay) =>
-      isAfter(other)
-          ? true
-          : isBefore(startOfDay)
-              ? true
-              : false;
 }

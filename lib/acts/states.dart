@@ -146,12 +146,14 @@ Map<int, Act?>? latestActsByMemV2(Ref ref) => v(
     );
 
 @riverpod
-Act? latestActByMem(Ref ref, int memId) => v(
-      () => ref.watch(
-        latestActsByMemV2Provider.select(
-          (value) => value?[memId],
-        ),
-      ),
+Act? latestActByMem(Ref ref, int? memId) => v(
+      () => memId == null
+          ? null
+          : ref.watch(
+              latestActsByMemV2Provider.select(
+                (value) => value?[memId],
+              ),
+            ),
       {
         'memId': memId,
       },
