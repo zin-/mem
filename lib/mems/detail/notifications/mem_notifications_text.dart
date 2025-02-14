@@ -54,14 +54,10 @@ class _MemNotificationText extends StatelessWidget {
             enables.map((e) => e.value),
             l10n.afterActStartedNotificationText,
           );
-          final repeatMemNotifications = enables
+          final repeatMemNotification = enables
               .map((e) => e.value)
               .whereType<RepeatMemNotification>()
-              .map((e) => renderRepeatMemNotification(
-                    context,
-                    e,
-                    _startOfDay,
-                  ));
+              .singleOrNull;
           final nDayMemNotification = enables
               .map((e) => e.value)
               .whereType<RepeatByNDayMemNotification>()
@@ -77,7 +73,12 @@ class _MemNotificationText extends StatelessWidget {
               : Wrap(
                   spacing: 4.0,
                   children: [
-                    ...repeatMemNotifications,
+                    if (repeatMemNotification != null)
+                      renderRepeatMemNotification(
+                        context,
+                        repeatMemNotification,
+                        _startOfDay,
+                      ),
                     if (nDayMemNotification != null)
                       renderRepeatByNDayMemNotification(
                         context,
