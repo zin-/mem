@@ -1,10 +1,9 @@
 import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/act.dart';
 import 'package:mem/acts/act_repository.dart';
 import 'package:mem/acts/states.dart';
-import 'package:mem/framework/date_and_time/time_of_day.dart';
+import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
@@ -91,7 +90,10 @@ final memListProvider = StateNotifierProvider.autoDispose<
   final latestActsByMem = ref.watch(latestActsByMemProvider);
   final savedMemNotifications = ref.watch(savedMemNotificationsProvider);
 
-  final now = DateTime.now();
+  final startOfToday = DateTimeExt.startOfToday(
+    ref.watch(preferencesProvider).value?[startOfDayKey] ?? defaultStartOfDay,
+  );
+
   return ValueStateNotifier(
     v(
       () => filtered.sorted((a, b) {
@@ -121,18 +123,6 @@ final memListProvider = StateNotifierProvider.autoDispose<
             savedMemNotifications.where((e) => e.value.memId == a.id);
         final memNotificationsOfB =
             savedMemNotifications.where((e) => e.value.memId == b.id);
-
-        final TimeOfDay startOfDay =
-            ref.watch(preferencesProvider).value?[startOfDayKey] ??
-                defaultStartOfDay;
-        final nowTime = TimeOfDay.fromDateTime(now);
-        final startOfToday = DateTime(
-          now.year,
-          now.month,
-          now.day + (startOfDay.lessThan(nowTime) ? 0 : 1),
-          startOfDay.hour,
-          startOfDay.minute,
-        );
 
         final timeOfThis = a.value.notifyAt(
           startOfToday,

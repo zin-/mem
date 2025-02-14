@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mem/acts/act.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
+import 'package:mem/framework/date_and_time/time_of_day.dart';
 import 'package:mem/logger/log_service.dart';
 
 const _repeatedMessage = "Repeat";
@@ -72,7 +73,7 @@ class MemNotification {
 
   bool isAfterActStarted() => type == MemNotificationType.afterActStarted;
 
-  static nextNotifyAt(
+  static DateTime? nextNotifyAt(
     Iterable<MemNotification> memNotifications,
     DateTime startOfToday,
     Act? latestAct,
@@ -147,9 +148,6 @@ class MemNotification {
 
   static String? toOneLine(
     Iterable<MemNotification> memNotifications,
-    String Function(String at) buildRepeatedNotificationText,
-    String Function(String nDay, String at)
-        buildRepeatEveryNDayNotificationText,
     String Function(String at) buildAfterActStartedNotificationText,
   ) =>
       v(
@@ -216,16 +214,6 @@ class MemNotification {
         'time': time,
         'message': message,
       }}";
-}
-
-extension TimeOfDayExt on TimeOfDay {
-  static TimeOfDay fromSeconds(int seconds) {
-    final hours = (seconds / 60 / 60).floor();
-    return TimeOfDay(
-      hour: hours,
-      minute: ((seconds - hours * 60 * 60) / 60).floor(),
-    );
-  }
 }
 
 class RepeatMemNotification extends MemNotification {

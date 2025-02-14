@@ -50,6 +50,7 @@ app.*.map.json
 /Microsoft.Windows.CppWinRT.2.0.210806.1
 
 # Generated code
+/lib/generated
 ## Riverpod
 *.g.dart
 ## Mockito

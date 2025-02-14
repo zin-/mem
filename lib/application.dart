@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:mem/l10n/l10n.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:mem/logger/log_service.dart';
-import 'package:mem/router.dart';
+
+import 'generated/l10n/app_localizations.dart';
+import 'l10n/l10n.dart';
+import 'logger/log_service.dart';
+import 'router.dart';
 
 class MemApplication extends StatelessWidget {
   final String? _initialPath;

@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 
-extension Seconds on TimeOfDay {
-  int get seconds => ((hour * 60) + minute) * 60;
-}
-
-extension Comparable on TimeOfDay {
-  int compareTo(TimeOfDay other) => seconds.compareTo(other.seconds);
-
-  // bool greaterThan(TimeOfDay other) => compareTo(other) > 0;
-
-  bool lessThan(TimeOfDay other) => compareTo(other) < 0;
+extension TimeOfDayExt on TimeOfDay {
+  static TimeOfDay fromSeconds(int seconds) {
+    final hours = (seconds / 60 / 60).floor();
+    return TimeOfDay(
+      hour: hours,
+      minute: ((seconds - hours * 60 * 60) / 60).floor(),
+    );
+  }
 }

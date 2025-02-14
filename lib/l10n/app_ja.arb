@@ -18,20 +18,26 @@
   "saveMemSuccessMessage": "\"{memName}\"の保存に成功しました。",
   "@saveMemSuccessMessage": {
     "placeholders": {
-      "memName": {}
+      "memName": {
+        "type": "Object"
+      }
     }
   },
   "requiredError": "Error: required",
   "archiveMemSuccessMessage": "Archive success. {memName}",
   "@archiveMemSuccessMessage": {
     "placeholders": {
-      "memName": {}
+      "memName": {
+        "type": "Object"
+      }
     }
   },
   "unarchiveMemSuccessMessage": "Unarchive success. {memName}",
   "@unarchiveMemSuccessMessage": {
     "placeholders": {
-      "memName": {}
+      "memName": {
+        "type": "Object"
+      }
     }
   },
   "removeAction": "Remove",
@@ -39,14 +45,18 @@
   "removeMemSuccessMessage": "Remove success. {memName}",
   "@removeMemSuccessMessage": {
     "placeholders": {
-      "memName": {}
+      "memName": {
+        "type": "Object"
+      }
     }
   },
   "undoAction": "Undo",
   "undoMemSuccessMessage": "\"{memName}\"の削除取り消しが完了しました。",
   "@undoMemSuccessMessage": {
     "placeholders": {
-      "memName": {}
+      "memName": {
+        "type": "Object"
+      }
     }
   },
   "okAction": "OK",
@@ -91,8 +101,8 @@
   "notifyAfterInactivityNotificationDescription": "一定時間何もしていない場合に通知します。",
 
   "noNotifications": "通知しない",
-  "repeatedNotificationText": "毎日{notifyAt}",
-  "repeatEveryNDayNotificationText": "{nDay}日ごとの{notifyAt}",
+  "repeatEveryNDayNotificationText": "{nDay}日ごと",
+  "repeatEverydayNotificationText": "毎日",
   "repeatByNDayPrefix": "",
   "repeatByNDaySuffix": "日ごと",
   "afterActStartedNotificationText": "開始{notifyAt}後",

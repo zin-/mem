@@ -18,20 +18,26 @@
   "saveMemSuccessMessage": "Save success. {memName}",
   "@saveMemSuccessMessage": {
     "placeholders": {
-      "memName": {}
+      "memName": {
+        "type": "Object"
+      }
     }
   },
   "requiredError": "Error: required",
   "archiveMemSuccessMessage": "Archive success. {memName}",
   "@archiveMemSuccessMessage": {
     "placeholders": {
-      "memName": {}
+      "memName": {
+        "type": "Object"
+      }
     }
   },
   "unarchiveMemSuccessMessage": "Unarchive success. {memName}",
   "@unarchiveMemSuccessMessage": {
     "placeholders": {
-      "memName": {}
+      "memName": {
+        "type": "Object"
+      }
     }
   },
   "removeAction": "Remove",
@@ -39,14 +45,18 @@
   "removeMemSuccessMessage": "Remove success. {memName}",
   "@removeMemSuccessMessage": {
     "placeholders": {
-      "memName": {}
+      "memName": {
+        "type": "Object"
+      }
     }
   },
   "undoAction": "Undo",
   "undoMemSuccessMessage": "Undo success. {memName}",
   "@undoMemSuccessMessage": {
     "placeholders": {
-      "memName": {}
+      "memName": {
+        "type": "Object"
+      }
     }
   },
   "okAction": "OK",
@@ -91,8 +101,8 @@
   "notifyAfterInactivityNotificationDescription": "Notify when no activity is detected for a certain period of time.",
 
   "noNotifications": "No notifications",
-  "repeatedNotificationText": "{notifyAt} every day",
-  "repeatEveryNDayNotificationText": "{notifyAt} every {nDay} days",
+  "repeatEveryNDayNotificationText": "every {nDay} days",
+  "repeatEverydayNotificationText": "every day",
   "repeatByNDayPrefix": "by",
   "repeatByNDaySuffix": "day",
   "afterActStartedNotificationText": "{notifyAt} after started",

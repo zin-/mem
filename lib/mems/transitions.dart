@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/generated/l10n/app_localizations.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/actions.dart';
-import 'package:mem/mems/detail/page.dart';
-import 'package:mem/mems/states.dart';
 import 'package:mem/values/durations.dart';
+
+import 'actions.dart';
+import 'detail/page.dart';
+import 'states.dart';
 
 // FIXME 使い勝手が悪いので改修する
 void showMemDetailPage(BuildContext context, WidgetRef? ref, int? memId) => v(

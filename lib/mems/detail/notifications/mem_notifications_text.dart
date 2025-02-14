@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/acts/act.dart';
+import 'package:mem/acts/states.dart';
+import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
@@ -25,6 +28,7 @@ class MemNotificationText extends ConsumerWidget {
           ref.read(preferencesProvider.select(
             (v) => (v.value?[startOfDayKey] ?? defaultStartOfDay) as TimeOfDay,
           )),
+          ref.watch(latestActByMemProvider(_memId)),
         ),
         {
           '_memId': _memId,
@@ -35,10 +39,12 @@ class MemNotificationText extends ConsumerWidget {
 class _MemNotificationText extends StatelessWidget {
   final Iterable<MemNotificationEntityV2> _memNotificationEntities;
   final TimeOfDay _startOfDay;
+  final Act? _latestAct;
 
   const _MemNotificationText(
     this._memNotificationEntities,
     this._startOfDay,
+    this._latestAct,
   );
 
   @override
@@ -51,23 +57,21 @@ class _MemNotificationText extends StatelessWidget {
 
           final oneLine = MemNotification.toOneLine(
             enables.map((e) => e.value),
-            l10n.repeatedNotificationText,
-            l10n.repeatEveryNDayNotificationText,
             l10n.afterActStartedNotificationText,
           );
+          final nextNotifyAt = MemNotification.nextNotifyAt(
+            enables.map((e) => e.value),
+            DateTimeExt.startOfToday(_startOfDay),
+            _latestAct,
+          );
+          final repeatMemNotification = enables
+              .map((e) => e.value)
+              .whereType<RepeatMemNotification>()
+              .singleOrNull;
           final nDayMemNotification = enables
               .map((e) => e.value)
               .whereType<RepeatByNDayMemNotification>()
               .singleOrNull;
-          final repeatMemNotifications = enables
-              .map((e) => e.value)
-              .whereType<RepeatMemNotification>()
-              .map((e) => renderRepeatMemNotification(
-                    context,
-                    e,
-                    nDayMemNotification,
-                    _startOfDay,
-                  ));
 
           return enables.isEmpty
               ? Text(
@@ -77,8 +81,19 @@ class _MemNotificationText extends StatelessWidget {
                   ),
                 )
               : Wrap(
+                  spacing: 4.0,
                   children: [
-                    ...repeatMemNotifications,
+                    if (repeatMemNotification != null && nextNotifyAt != null)
+                      renderRepeatMemNotification(
+                        context,
+                        repeatMemNotification,
+                        nextNotifyAt,
+                      ),
+                    if (nDayMemNotification != null)
+                      renderRepeatByNDayMemNotification(
+                        context,
+                        nDayMemNotification,
+                      ),
                     if (oneLine != null)
                       Text(
                         oneLine,
@@ -99,41 +114,40 @@ class _MemNotificationText extends StatelessWidget {
 Widget renderRepeatMemNotification(
   BuildContext context,
   RepeatMemNotification repeat,
-  RepeatByNDayMemNotification? repeatByNDay,
-  TimeOfDay startOfDay,
+  DateTime startOfToday,
+) =>
+    v(
+      () => Text(
+        repeat.timeOfDay!.format(context),
+        style: TextStyle(
+          color: DateTime.now().isAfter(startOfToday) ? warningColor : null,
+        ),
+      ),
+      {
+        'context': context,
+        'repeatMemNotification': repeat,
+        'startOfToday': startOfToday,
+      },
+    );
+
+Widget renderRepeatByNDayMemNotification(
+  BuildContext context,
+  RepeatByNDayMemNotification repeatByNDay,
 ) =>
     v(
       () {
-        final now = TimeOfDay.now();
         final l10n = buildL10n(context);
 
-        final style = TextStyle(
-          color: now.isAfter(repeat.timeOfDay!)
-              ? warningColor
-              : startOfDay.isBefore(repeat.timeOfDay!)
-                  ? warningColor
-                  : null,
-        );
-
-        if (repeatByNDay != null && (repeatByNDay.time ?? 0) > 1) {
-          return Text(
-            l10n.repeatEveryNDayNotificationText(
-              repeatByNDay.time.toString(),
-              repeat.timeOfDay!.format(context),
-            ),
-            style: style,
-          );
+        if (repeatByNDay.time == 1) {
+          return Text(l10n.repeatEverydayNotificationText);
         } else {
           return Text(
-            l10n.repeatedNotificationText(repeat.timeOfDay!.format(context)),
-            style: style,
+            l10n.repeatEveryNDayNotificationText(repeatByNDay.time.toString()),
           );
         }
       },
       {
         'context': context,
-        'repeatMemNotification': repeat,
-        'nDayMemNotification': repeatByNDay,
-        'startOfDay': startOfDay,
+        'repeatMemNotification': repeatByNDay,
       },
     );

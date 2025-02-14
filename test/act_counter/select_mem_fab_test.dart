@@ -7,6 +7,7 @@ import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mockito/mockito.dart';
 
 import '../helpers.dart';
+import '../helpers.mocks.dart';
 
 void main() {
   group('Appearance', () {
