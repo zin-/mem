@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/framework/workmanager_wrapper.dart';
+import 'package:mem/notifications/mem_notifications.dart';
+import 'package:mem/notifications/notification/type.dart';
+import 'package:mem/notifications/notification_client.dart';
 
 import 'acts/counter/act_counter_client.dart';
 import 'application.dart';
@@ -31,6 +35,10 @@ Future<void> _runApplication({
         ).init(
           () async {
             WidgetsFlutterBinding.ensureInitialized();
+            WorkmanagerWrapper(
+              callbackDispatcher: workmanagerCallbackDispatcher,
+            );
+
             if (initialPath != null ||
                 await NotificationRepository().ship() == false) {
               return runApp(
@@ -116,3 +124,18 @@ Future<void> backgroundCallback(Uri? uri) async {
     },
   );
 }
+
+@pragma('vm:entry-point')
+void workmanagerCallbackDispatcher() =>
+    LogService(enableErrorReport: true).init(
+      () => WorkmanagerWrapper().executeTask(
+        (inputData) async {
+          await NotificationClient().show(
+            NotificationType.values.singleWhere(
+              (element) => element.name == inputData![notificationTypeKey],
+            ),
+            inputData![memIdKey] as int?,
+          );
+        },
+      ),
+    );
