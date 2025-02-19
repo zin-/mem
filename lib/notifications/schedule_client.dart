@@ -1,4 +1,5 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/framework/workmanager_wrapper.dart';
 import 'package:mem/logger/log_service.dart';
@@ -15,7 +16,10 @@ class ScheduleClient extends Repository<Schedule> {
   final AndroidAlarmManagerWrapper _androidAlarmManagerWrapper;
   final Future<void> Function(int id, Map<String, dynamic> params)
       _scheduleCallback;
-  final WorkmanagerWrapper _workmanagerWrapper = WorkmanagerWrapper();
+  final WorkmanagerWrapper? _workmanagerWrapper =
+      defaultTargetPlatform == TargetPlatform.android
+          ? WorkmanagerWrapper()
+          : null;
 
   ScheduleClient._(
     this._androidAlarmManagerWrapper,
@@ -55,7 +59,7 @@ class ScheduleClient extends Repository<Schedule> {
           } else if (entity is TimedSchedule) {
             if (await PermissionHandlerWrapper()
                 .grant(Permission.notification)) {
-              await _workmanagerWrapper.registerOneOffTask(
+              await _workmanagerWrapper?.registerOneOffTask(
                 Task.notify,
                 entity.startAt,
                 entity.id,
@@ -74,7 +78,7 @@ class ScheduleClient extends Repository<Schedule> {
   Future<void> discard(int id) => v(
         () async {
           await _androidAlarmManagerWrapper.cancel(id);
-          await _workmanagerWrapper.cancel(id);
+          await _workmanagerWrapper?.cancel(id);
         },
         {"id": id},
       );
