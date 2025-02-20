@@ -449,23 +449,23 @@ void main() => group(
                 await runApplication();
                 await widgetTester.pumpAndSettle();
                 await widgetTester.tap(startIconFinder);
-                await widgetTester.pumpAndSettle(waitSideEffectDuration);
+                await widgetTester.pumpAndSettle(waitLongSideEffectDuration);
 
-                await expectLater(
+                expect(
                   initializeCount,
                   equals(
                     defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
                   ),
                   reason: 'initializeCount',
                 );
-                await expectLater(
+                expect(
                   cancelTaskByUniqueNameCount,
                   equals(
                     defaultTargetPlatform == TargetPlatform.android ? 5 : 0,
                   ),
                   reason: 'cancelTaskByUniqueName',
                 );
-                await expectLater(
+                expect(
                   registerOneOffTaskCount,
                   equals(
                     defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
@@ -509,23 +509,23 @@ void main() => group(
                 await runApplication();
                 await widgetTester.pumpAndSettle();
                 await widgetTester.tap(stopIconFinder);
-                await widgetTester.pumpAndSettle(waitSideEffectDuration);
+                await widgetTester.pumpAndSettle(waitLongSideEffectDuration);
 
-                await expectLater(
+                expect(
                   initializeCount,
                   equals(
                     defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
                   ),
                   reason: 'initializeCount',
                 );
-                await expectLater(
+                expect(
                   cancelTaskByUniqueNameCount,
                   equals(
                     defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
                   ),
                   reason: 'cancelTaskByUniqueNameCount',
                 );
-                await expectLater(
+                expect(
                   registerOneOffTaskCount,
                   equals(
                     defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
@@ -584,23 +584,23 @@ void main() => group(
                 await runApplication();
                 await widgetTester.pumpAndSettle();
                 await widgetTester.tap(pauseIconFinder);
-                await widgetTester.pumpAndSettle(waitSideEffectDuration);
+                await widgetTester.pumpAndSettle(waitLongSideEffectDuration);
 
-                await expectLater(
+                expect(
                   initializeCount,
                   equals(
                     defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
                   ),
                   reason: 'initializeCount',
                 );
-                await expectLater(
+                expect(
                   cancelTaskByUniqueNameCount,
                   equals(
                     defaultTargetPlatform == TargetPlatform.android ? 4 : 0,
                   ),
                   reason: 'cancelTaskByUniqueNameCount',
                 );
-                await expectLater(
+                expect(
                   registerOneOffTaskCount,
                   equals(
                     defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
