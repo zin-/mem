@@ -8,12 +8,10 @@ import 'package:mem/mems/states.dart';
 
 import 'states.dart';
 
-final _memClient = MemClient();
-
 final saveMem =
     Provider.autoDispose.family<Future<MemDetail>, int?>((ref, memId) => v(
           () async {
-            final saved = await _memClient.save(
+            final saved = await MemClient().save(
               ref.read(editingMemByMemIdProvider(memId)),
               ref.read(memItemsByMemIdProvider(memId)),
               ref.read(memNotificationsByMemIdProvider(memId)),
@@ -54,7 +52,7 @@ final saveMem =
 final archiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
   (ref, memId) => v(
     () async {
-      final archived = await _memClient.archive(
+      final archived = await MemClient().archive(
         ref.read(memByMemIdProvider(memId))!,
       );
 
@@ -76,7 +74,7 @@ final archiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
 final unarchiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
   (ref, memId) => v(
     () async {
-      final unarchived = await _memClient.unarchive(
+      final unarchived = await MemClient().unarchive(
         ref.read(memByMemIdProvider(memId))!,
       );
 
@@ -99,7 +97,7 @@ final removeMem = Provider.autoDispose.family<Future<bool>, int?>(
   (ref, memId) => v(
     () async {
       if (memId != null) {
-        final removeSuccess = await _memClient.remove(memId);
+        final removeSuccess = await MemClient().remove(memId);
 
         final mem = ref.read(memByMemIdProvider(memId));
         ref.read(removedMemProvider(memId).notifier).updatedBy(mem);

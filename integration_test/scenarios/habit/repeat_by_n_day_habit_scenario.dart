@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/mems/mem_client.dart';
 import 'package:mem/mems/mem_name.dart';
 import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/databases/definition.dart';
@@ -124,7 +125,7 @@ void main() => group(': $_name', () {
       });
 
       setUp(() async {
-        NotificationClient.resetSingleton();
+        MemClient.resetSingleton();
       });
 
       testWidgets(

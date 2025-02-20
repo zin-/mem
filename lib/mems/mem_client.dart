@@ -102,4 +102,14 @@ class MemClient {
           NotificationClient(),
         ),
       );
+
+  static void resetSingleton() => v(
+        () {
+          NotificationClient.resetSingleton();
+          _instance = null;
+        },
+        {
+          '_instance': _instance,
+        },
+      );
 }
