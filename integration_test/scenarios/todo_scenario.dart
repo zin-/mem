@@ -214,7 +214,7 @@ void testTodoScenario() => group(': $_scenarioName', () {
           int workmanagerInitializeCount = 0;
           int cancelTaskByUniqueNameCount = 0;
           widgetTester.setMockMethodCallHandler(
-            MethodChannelMock.workmanager,
+            MethodChannelMock.workmanagerForeground,
             [
               (message) async {
                 expect(message.method, equals('initialize'));

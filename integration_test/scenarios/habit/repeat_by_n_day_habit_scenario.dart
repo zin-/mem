@@ -187,7 +187,7 @@ void main() => group(': $_name', () {
         int cancelTaskByUniqueNameCount = 0;
         int registerPeriodicTaskCount = 0;
         widgetTester.setMockMethodCallHandler(
-          MethodChannelMock.workmanager,
+          MethodChannelMock.workmanagerForeground,
           [
             (message) async {
               expect(message.method, equals('initialize'));

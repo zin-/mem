@@ -231,7 +231,7 @@ void main() => group(
             int initializeCount = 0;
             int registerOneOffTaskCount = 0;
             widgetTester.setMockMethodCallHandler(
-              MethodChannelMock.workmanager,
+              MethodChannelMock.workmanagerForeground,
               [
                 (m) async {
                   expect(m.method, equals('initialize'));
@@ -311,7 +311,7 @@ void main() => group(
               int initializeCount = 0;
               int cancelTaskByUniqueNameCount = 0;
               widgetTester.setMockMethodCallHandler(
-                MethodChannelMock.workmanager,
+                MethodChannelMock.workmanagerForeground,
                 [
                   (m) async {
                     expect(m.method, equals('initialize'));
@@ -405,7 +405,7 @@ void main() => group(
                 int cancelTaskByUniqueNameCount = 0;
                 int registerOneOffTaskCount = 0;
                 widgetTester.setMockMethodCallHandler(
-                  MethodChannelMock.workmanager,
+                  MethodChannelMock.workmanagerForeground,
                   [
                     (m) async {
                       expect(m.method, equals('initialize'));
@@ -485,7 +485,7 @@ void main() => group(
                 int cancelTaskByUniqueNameCount = 0;
                 int registerOneOffTaskCount = 0;
                 widgetTester.setMockMethodCallHandler(
-                  MethodChannelMock.workmanager,
+                  MethodChannelMock.workmanagerForeground,
                   [
                     (m) async {
                       expect(m.method, equals('initialize'));
@@ -545,7 +545,7 @@ void main() => group(
                 int cancelTaskByUniqueNameCount = 0;
                 int registerOneOffTaskCount = 0;
                 widgetTester.setMockMethodCallHandler(
-                  MethodChannelMock.workmanager,
+                  MethodChannelMock.workmanagerForeground,
                   [
                     (m) async {
                       expect(m.method, equals('initialize'));
@@ -651,7 +651,7 @@ void main() => group(
                     )
                     .flattened;
                 widgetTester.setMockMethodCallHandler(
-                  MethodChannelMock.workmanager,
+                  MethodChannelMock.workmanagerForeground,
                   [
                     (m) async {
                       expect(m.method, equals('initialize'));

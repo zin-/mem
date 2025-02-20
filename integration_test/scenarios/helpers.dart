@@ -105,7 +105,8 @@ enum MethodChannelMock {
   sharePlus,
   filePicker,
   permissionHandler,
-  workmanager,
+  workmanagerForeground,
+  workmanagerBackground,
 }
 
 extension Method on MethodChannelMock {
@@ -126,9 +127,12 @@ extension Method on MethodChannelMock {
         );
       case MethodChannelMock.permissionHandler:
         return const MethodChannel('flutter.baseflow.com/permissions/methods');
-      case MethodChannelMock.workmanager:
+      case MethodChannelMock.workmanagerForeground:
         return const MethodChannel(
             "be.tramckrijte.workmanager/foreground_channel_work_manager");
+      case MethodChannelMock.workmanagerBackground:
+        return const MethodChannel(
+            "be.tramckrijte.workmanager/background_channel_work_manager");
     }
   }
 }
@@ -187,8 +191,11 @@ extension HandleMockMethodCallHandler on WidgetTester {
                         case 'checkPermissionStatus':
                           return 1;
                       }
-                    case MethodChannelMock.workmanager:
+                    case MethodChannelMock.workmanagerForeground:
                       return true;
+                    case MethodChannelMock.workmanagerBackground:
+                      // TODO: Handle this case.
+                      throw UnimplementedError();
                   }
 
                   return false;
