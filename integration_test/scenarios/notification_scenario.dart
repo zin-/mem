@@ -171,7 +171,7 @@ void testNotificationScenario() => group(
           },
         );
 
-        group(': notification actions', () {
+        group('Notification actions', () {
           testWidgets(
             ': done Mem.',
             (widgetTester) async {
@@ -225,55 +225,56 @@ void testNotificationScenario() => group(
             },
           );
 
-          testWidgets(
-            ': start Act.',
-            (widgetTester) async {
-              final details = NotificationResponse(
-                notificationResponseType:
-                    NotificationResponseType.selectedNotificationAction,
-                id: memRepeatedNotificationId(insertedMemId!),
-                payload: json.encode({memIdKey: insertedMemId}),
-                actionId: buildNotificationActions()
-                    .singleWhere((e) => e.id == startActNotificationActionId)
-                    .id,
+          testWidgets('Start Act.', (widgetTester) async {
+            widgetTester.ignoreMockMethodCallHandler(
+              MethodChannelMock.permissionHandler,
+            );
+            widgetTester.ignoreMockMethodCallHandler(
+              MethodChannelMock.workmanager,
+            );
+
+            final details = NotificationResponse(
+              notificationResponseType:
+                  NotificationResponseType.selectedNotificationAction,
+              id: memRepeatedNotificationId(insertedMemId!),
+              payload: json.encode({memIdKey: insertedMemId}),
+              actionId: buildNotificationActions()
+                  .singleWhere((e) => e.id == startActNotificationActionId)
+                  .id,
+            );
+
+            await onNotificationResponseReceived(details);
+
+            await Future.delayed(waitSideEffectDuration, () async {
+              final acts = await dbA.select(defTableActs);
+
+              expect(acts.length, 1);
+              expect(
+                [
+                  acts[0][defColActsStart.name],
+                  acts[0][defColActsStartIsAllDay.name],
+                  acts[0][defColActsEnd.name],
+                  acts[0][defColActsEndIsAllDay.name],
+                  acts[0][defPkId.name],
+                  acts[0][defColCreatedAt.name],
+                  acts[0][defColUpdatedAt.name],
+                  acts[0][defColArchivedAt.name],
+                  acts[0][defFkActsMemId.name],
+                ],
+                [
+                  isNotNull,
+                  isFalse,
+                  isNull,
+                  isNull,
+                  isNotNull,
+                  isNotNull,
+                  isNull,
+                  isNull,
+                  insertedMemId,
+                ],
               );
-
-              await onNotificationResponseReceived(details);
-
-              await Future.delayed(
-                waitSideEffectDuration,
-                () async {
-                  final acts = await dbA.select(defTableActs);
-
-                  expect(acts.length, 1);
-                  expect(
-                    [
-                      acts[0][defColActsStart.name],
-                      acts[0][defColActsStartIsAllDay.name],
-                      acts[0][defColActsEnd.name],
-                      acts[0][defColActsEndIsAllDay.name],
-                      acts[0][defPkId.name],
-                      acts[0][defColCreatedAt.name],
-                      acts[0][defColUpdatedAt.name],
-                      acts[0][defColArchivedAt.name],
-                      acts[0][defFkActsMemId.name],
-                    ],
-                    [
-                      isNotNull,
-                      isFalse,
-                      isNull,
-                      isNull,
-                      isNotNull,
-                      isNotNull,
-                      isNull,
-                      isNull,
-                      insertedMemId,
-                    ],
-                  );
-                },
-              );
-            },
-          );
+            });
+          });
 
           group(": finish active Act", () {
             testWidgets(
@@ -414,21 +415,28 @@ void testNotificationScenario() => group(
             });
           });
 
-          group(": pause act", () {
-            testWidgets(": no active act.", (widgetTester) async {
+          group("Pause act", () {
+            testWidgets("No active act.", (widgetTester) async {
               widgetTester.ignoreMockMethodCallHandler(
                   MethodChannelMock.flutterLocalNotifications);
+              widgetTester
+                  .ignoreMockMethodCallHandler(MethodChannelMock.workmanager);
+
               int checkPermissionStatusCount = 0;
               widgetTester.setMockMethodCallHandler(
-                  MethodChannelMock.permissionHandler,
-                  List.generate(
-                    4,
+                MethodChannelMock.permissionHandler,
+                [
+                  ...List.generate(
+                    2,
                     (i) => (m) async {
                       expect(m.method, 'checkPermissionStatus');
                       checkPermissionStatusCount++;
                       return 1;
                     },
-                  ));
+                  ),
+                  (m) => fail("Too many call."),
+                ],
+              );
 
               final details = NotificationResponse(
                 notificationResponseType:
@@ -442,7 +450,11 @@ void testNotificationScenario() => group(
 
               await onNotificationResponseReceived(details);
 
-              expect(checkPermissionStatusCount, 1);
+              expect(
+                checkPermissionStatusCount,
+                equals(2),
+                reason: 'checkPermissionStatusCount',
+              );
             });
 
             group(": 2 active acts", () {
@@ -461,20 +473,24 @@ void testNotificationScenario() => group(
                 });
               });
 
-              testWidgets(": no thrown.", (widgetTester) async {
+              testWidgets("No thrown.", (widgetTester) async {
                 widgetTester.ignoreMockMethodCallHandler(
                     MethodChannelMock.flutterLocalNotifications);
                 int checkPermissionStatusCount = 0;
                 widgetTester.setMockMethodCallHandler(
-                    MethodChannelMock.permissionHandler,
-                    List.generate(
-                      4,
+                  MethodChannelMock.permissionHandler,
+                  [
+                    ...List.generate(
+                      2,
                       (i) => (m) async {
                         expect(m.method, 'checkPermissionStatus');
                         checkPermissionStatusCount++;
                         return 1;
                       },
-                    ));
+                    ),
+                    (m) => fail("Too many call."),
+                  ],
+                );
 
                 final details = NotificationResponse(
                   notificationResponseType:
@@ -488,7 +504,11 @@ void testNotificationScenario() => group(
 
                 await onNotificationResponseReceived(details);
 
-                expect(checkPermissionStatusCount, 1);
+                expect(
+                  checkPermissionStatusCount,
+                  equals(2),
+                  reason: 'checkPermissionStatusCount',
+                );
               });
             });
           });

@@ -194,8 +194,7 @@ extension HandleMockMethodCallHandler on WidgetTester {
                           return 1;
                       }
                     case MethodChannelMock.workmanager:
-                      // TODO: Handle this case.
-                      throw UnimplementedError();
+                      return true;
                   }
 
                   return false;

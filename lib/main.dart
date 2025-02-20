@@ -65,6 +65,8 @@ Future<void> onNotificationResponseReceived(dynamic details) async {
     enableErrorReport: true,
   ).init(
     () async {
+      WorkmanagerWrapper(callbackDispatcher: workmanagerCallbackDispatcher);
+
       await onDidReceiveNotificationResponse(
         details,
         (memId) => v(
