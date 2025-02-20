@@ -10,15 +10,12 @@ import 'states.dart';
 
 part 'actions.g.dart';
 
-final _actsClient = ActsClient();
-final _actRepository = ActRepository();
-
 final loadActList = FutureProvider.autoDispose.family<void, int>(
   (ref, memId) => v(
     () async {
       // FIXME 全件取得する場合、件数的な不安がある
       //  1週間分とかにしとくか？
-      final acts = await _actRepository.ship(memId: memId);
+      final acts = await ActRepository().ship(memId: memId);
 
       ref.watch(actsProvider.notifier).upsertAll(
             acts,
@@ -36,7 +33,7 @@ Future<void> startActByV2(Ref ref, int memId) => v(
       () async {
         final now = DateAndTime.now();
 
-        final startedAct = await _actsClient.start(memId, now);
+        final startedAct = await ActsClient().start(memId, now);
 
         // ignore: avoid_manual_providers_as_generated_provider_dependency
         ref.read(actsProvider.notifier).upsertAll(
@@ -54,7 +51,7 @@ final startActBy = Provider.autoDispose.family<Act, int>(
     () {
       final now = DateAndTime.now();
 
-      _actsClient.start(memId, now).then(
+      ActsClient().start(memId, now).then(
             (startedAct) => v(
               () => ref.read(actsProvider.notifier).upsertAll(
                 [startedAct],
@@ -75,7 +72,7 @@ final finishActBy = Provider.autoDispose.family<void, int>(
     () {
       final now = DateAndTime.now();
 
-      _actsClient
+      ActsClient()
           .finish(
             memId,
             now,

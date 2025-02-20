@@ -20,16 +20,18 @@ class WorkmanagerWrapper {
   final Function? _callbackDispatcher;
   final bool _isInDebugMode;
 
-  late final Workmanager _workmanager = () {
-    final workmanager = Workmanager();
-    if (_callbackDispatcher != null) {
-      workmanager.initialize(
-        _callbackDispatcher,
-        isInDebugMode: _isInDebugMode,
-      );
-    }
-    return workmanager;
-  }();
+  late final Workmanager _workmanager = v(
+    () {
+      final workmanager = Workmanager();
+      if (_callbackDispatcher != null) {
+        workmanager.initialize(
+          _callbackDispatcher,
+          isInDebugMode: _isInDebugMode,
+        );
+      }
+      return workmanager;
+    },
+  );
 
   WorkmanagerWrapper._(
     Function? callbackDispatcher,
@@ -82,5 +84,14 @@ class WorkmanagerWrapper {
             'inputData': inputData,
           },
         ),
+      );
+
+  static void resetSingleton() => v(
+        () {
+          _instance = null;
+        },
+        {
+          '_instance': _instance,
+        },
       );
 }

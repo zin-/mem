@@ -145,7 +145,13 @@ class ActsClient {
         NotificationClient(),
       );
 
-  static void resetSingleton() {
-    _instance = null;
-  }
+  static void resetSingleton() => v(
+        () {
+          NotificationClient.resetSingleton();
+          _instance = null;
+        },
+        {
+          '_instance': _instance,
+        },
+      );
 }

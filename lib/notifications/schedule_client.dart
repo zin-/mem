@@ -16,10 +16,11 @@ class ScheduleClient extends Repository<Schedule> {
   final AndroidAlarmManagerWrapper _androidAlarmManagerWrapper;
   final Future<void> Function(int id, Map<String, dynamic> params)
       _scheduleCallback;
-  final WorkmanagerWrapper? _workmanagerWrapper =
-      defaultTargetPlatform == TargetPlatform.android
-          ? WorkmanagerWrapper()
-          : null;
+  late final WorkmanagerWrapper? _workmanagerWrapper = v(
+    () => defaultTargetPlatform == TargetPlatform.android
+        ? WorkmanagerWrapper()
+        : null,
+  );
 
   ScheduleClient._(
     this._androidAlarmManagerWrapper,
@@ -39,6 +40,7 @@ class ScheduleClient extends Repository<Schedule> {
   static void resetSingleton() => v(
         () {
           AndroidAlarmManagerWrapper.resetSingleton();
+          WorkmanagerWrapper.resetSingleton();
           _instance = null;
         },
         {
