@@ -60,6 +60,30 @@ class WorkmanagerWrapper {
         },
       );
 
+  Future<void> registerPeriodicTask(
+    Task task,
+    DateTime at,
+    int id,
+    Map<String, Object?>? inputData,
+    Duration frequency,
+  ) =>
+      v(
+        () async => await _workmanager.registerPeriodicTask(
+          id.toString(),
+          task.name,
+          initialDelay: at.difference(DateTime.now()),
+          inputData: inputData,
+          frequency: frequency,
+        ),
+        {
+          'task': task,
+          'at': at,
+          'id': id,
+          'inputData': inputData,
+          'frequency': frequency,
+        },
+      );
+
   Future<void> cancel(int id) => v(
         () async {
           await _workmanager.cancelByUniqueName(id.toString());
