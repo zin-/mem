@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -102,7 +101,6 @@ extension TextAt on WidgetTester {
 }
 
 enum MethodChannelMock {
-  androidAlarmManager,
   flutterLocalNotifications,
   sharePlus,
   filePicker,
@@ -113,8 +111,6 @@ enum MethodChannelMock {
 extension Method on MethodChannelMock {
   MethodChannel get channel {
     switch (this) {
-      case MethodChannelMock.androidAlarmManager:
-        return AndroidAlarmManager.channel;
       case MethodChannelMock.flutterLocalNotifications:
         return const MethodChannel('dexterous.com/flutter/local_notifications');
       case MethodChannelMock.sharePlus:
@@ -169,8 +165,6 @@ extension HandleMockMethodCallHandler on WidgetTester {
             300,
             (index) => (m) async {
                   switch (methodChannelMock) {
-                    case MethodChannelMock.androidAlarmManager:
-                    // TODO: Handle this case.
                     case MethodChannelMock.flutterLocalNotifications:
                       switch (m.method) {
                         case 'initialize':

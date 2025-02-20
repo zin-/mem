@@ -182,8 +182,6 @@ void main() => group(': $_name', () {
             .ignoreMockMethodCallHandler(MethodChannelMock.permissionHandler);
         widgetTester.ignoreMockMethodCallHandler(
             MethodChannelMock.flutterLocalNotifications);
-        widgetTester
-            .ignoreMockMethodCallHandler(MethodChannelMock.androidAlarmManager);
 
         int initializeCount = 0;
         int cancelTaskByUniqueNameCount = 0;

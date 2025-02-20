@@ -227,8 +227,6 @@ void main() => group(
             widgetTester.clearAllMockMethodCallHandler();
             widgetTester.ignoreMockMethodCallHandler(
                 MethodChannelMock.permissionHandler);
-            widgetTester.ignoreMockMethodCallHandler(
-                MethodChannelMock.androidAlarmManager);
 
             int initializeCount = 0;
             int registerOneOffTaskCount = 0;
@@ -309,8 +307,6 @@ void main() => group(
 
             testWidgets("Remove.", (widgetTester) async {
               widgetTester.clearAllMockMethodCallHandler();
-              widgetTester.ignoreMockMethodCallHandler(
-                  MethodChannelMock.androidAlarmManager);
 
               int initializeCount = 0;
               int cancelTaskByUniqueNameCount = 0;
@@ -404,8 +400,6 @@ void main() => group(
                     MethodChannelMock.permissionHandler);
                 widgetTester.ignoreMockMethodCallHandler(
                     MethodChannelMock.flutterLocalNotifications);
-                widgetTester.ignoreMockMethodCallHandler(
-                    MethodChannelMock.androidAlarmManager);
 
                 int initializeCount = 0;
                 int cancelTaskByUniqueNameCount = 0;
@@ -486,8 +480,6 @@ void main() => group(
                     MethodChannelMock.permissionHandler);
                 widgetTester.ignoreMockMethodCallHandler(
                     MethodChannelMock.flutterLocalNotifications);
-                widgetTester.ignoreMockMethodCallHandler(
-                    MethodChannelMock.androidAlarmManager);
 
                 int initializeCount = 0;
                 int cancelTaskByUniqueNameCount = 0;
@@ -548,8 +540,6 @@ void main() => group(
                     MethodChannelMock.permissionHandler);
                 widgetTester.ignoreMockMethodCallHandler(
                     MethodChannelMock.flutterLocalNotifications);
-                widgetTester.ignoreMockMethodCallHandler(
-                    MethodChannelMock.androidAlarmManager);
 
                 int initializeCount = 0;
                 int cancelTaskByUniqueNameCount = 0;
