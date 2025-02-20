@@ -6,6 +6,7 @@ import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/databases/definition.dart';
+import 'package:mem/framework/workmanager_wrapper.dart';
 import 'package:mem/logger/log.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/notification_client.dart';
@@ -189,14 +190,14 @@ void testTodoScenario() => group(': $_scenarioName', () {
       testWidgets(
         'not notify on done mem.',
         (widgetTester) async {
-          int initializeCount = 0;
+          int flutterLocalNotificationsInitializeCount = 0;
           int cancelCount = 0;
           widgetTester.setMockMethodCallHandler(
             MethodChannelMock.flutterLocalNotifications,
             [
               (message) async {
                 expect(message.method, equals('initialize'));
-                initializeCount++;
+                flutterLocalNotificationsInitializeCount++;
                 return true;
               },
               ...AllMemNotificationsId.of(insertedMemDoneId!).map(
@@ -210,46 +211,53 @@ void testTodoScenario() => group(': $_scenarioName', () {
             ],
           );
 
-          int alarmServiceStartCount = 0;
-          int alarmCancelCount = 0;
-          widgetTester
-              .setMockMethodCallHandler(MethodChannelMock.androidAlarmManager, [
-            (message) async {
-              expect(message.method, equals('AlarmService.start'));
-              expect(
-                  message.arguments,
-                  orderedEquals([
-                    isNotNull,
-                  ]));
-              alarmServiceStartCount++;
-              return true;
-            },
-            ...AllMemNotificationsId.of(insertedMemDoneId!).map(
-              (e) => (message) async {
-                expect(message.method, equals('Alarm.cancel'));
-                expect(message.arguments, orderedEquals([equals(e)]));
-                alarmCancelCount++;
-                return false;
+          int workmanagerInitializeCount = 0;
+          int cancelTaskByUniqueNameCount = 0;
+          widgetTester.setMockMethodCallHandler(
+            MethodChannelMock.workmanager,
+            [
+              (message) async {
+                expect(message.method, equals('initialize'));
+                workmanagerInitializeCount++;
+                return true;
               },
-            ),
-          ]);
+              ...AllMemNotificationsId.of(insertedMemDoneId!).map(
+                (e) => (message) async {
+                  expect(message.method, equals('cancelTaskByUniqueName'));
+                  cancelTaskByUniqueNameCount++;
+                  return false;
+                },
+              ),
+              (m) => fail("Too many call."),
+            ],
+          );
 
+          WorkmanagerWrapper(callbackDispatcher: helperCallback);
           await NotificationClient().show(
             NotificationType.startMem,
             insertedMemDoneId!,
           );
 
-          if (defaultTargetPlatform == TargetPlatform.android) {
-            expect(initializeCount, equals(1));
-            expect(cancelCount, equals(6));
-            expect(alarmServiceStartCount, equals(1));
-            expect(alarmCancelCount, equals(6));
-          } else {
-            expect(initializeCount, equals(0));
-            expect(cancelCount, equals(0));
-            expect(alarmServiceStartCount, equals(0));
-            expect(alarmCancelCount, equals(0));
-          }
+          expect(
+            flutterLocalNotificationsInitializeCount,
+            equals(defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
+            reason: 'flutterLocalNotificationsInitializeCount',
+          );
+          expect(
+            cancelCount,
+            equals(defaultTargetPlatform == TargetPlatform.android ? 6 : 0),
+            reason: 'cancelCount',
+          );
+          expect(
+            workmanagerInitializeCount,
+            equals(defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
+            reason: 'workmanagerInitializeCount',
+          );
+          expect(
+            cancelTaskByUniqueNameCount,
+            equals(defaultTargetPlatform == TargetPlatform.android ? 6 : 0),
+            reason: 'alarmCancelCount',
+          );
 
           widgetTester.clearAllMockMethodCallHandler();
         },

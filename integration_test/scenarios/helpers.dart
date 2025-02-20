@@ -9,6 +9,7 @@ import 'package:mem/l10n/l10n.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/definition/database_definition.dart';
 import 'package:mem/framework/database/factory.dart';
+import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
 import 'package:mem/framework/repository/database_repository.dart';
 
@@ -201,3 +202,5 @@ extension HandleMockMethodCallHandler on WidgetTester {
                 }));
   }
 }
+
+void helperCallback() => v(() {});
