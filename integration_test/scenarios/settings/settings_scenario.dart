@@ -648,8 +648,9 @@ void main() => group(
               (widgetTester) async {
                 widgetTester.ignoreMockMethodCallHandler(
                     MethodChannelMock.permissionHandler);
-                int alarmServiceStartCount = 0;
-                int alarmCancelCount = 0;
+
+                int workmanagerInitializeCount = 0;
+                int cancelTaskByUniqueNameCount = 0;
                 final cancelIds = insertedMemIds
                     .map(
                       (e) => [
@@ -660,20 +661,22 @@ void main() => group(
                     )
                     .flattened;
                 widgetTester.setMockMethodCallHandler(
-                    MethodChannelMock.androidAlarmManager, [
-                  (m) async {
-                    expect(m.method, equals('AlarmService.start'));
-                    alarmServiceStartCount++;
-                    return true;
-                  },
-                  ...cancelIds.map((e) => (m) async {
-                        expect(m.method, equals('Alarm.cancel'));
-                        alarmCancelCount++;
-                        return false;
-                      }),
-                ]);
+                  MethodChannelMock.workmanager,
+                  [
+                    (m) async {
+                      expect(m.method, equals('initialize'));
+                      workmanagerInitializeCount++;
+                      return true;
+                    },
+                    ...cancelIds.map((e) => (m) async {
+                          expect(m.method, equals('cancelTaskByUniqueName'));
+                          cancelTaskByUniqueNameCount++;
+                          return false;
+                        }),
+                  ],
+                );
 
-                int initializeCount = 0;
+                int flutterLocalNotificationsInitializeCount = 0;
                 int getNotificationAppLaunchDetailsCount = 0;
                 int cancelAllCount = 0;
                 int deleteNotificationChannelCount = 0;
@@ -681,7 +684,7 @@ void main() => group(
                     MethodChannelMock.flutterLocalNotifications, [
                   (m) async {
                     expect(m.method, equals('initialize'));
-                    initializeCount++;
+                    flutterLocalNotificationsInitializeCount++;
                     return true;
                   },
                   (m) async {
@@ -728,30 +731,44 @@ void main() => group(
                 expect(
                     find.text(l10n.completeResetNotification), findsOneWidget);
 
-                if (defaultTargetPlatform == TargetPlatform.android) {
-                  expect(alarmServiceStartCount, equals(1),
-                      reason: 'alarmServiceStartCount');
-                  expect(alarmCancelCount, equals(300),
-                      reason: 'alarmCancelCount');
-                  expect(initializeCount, equals(1), reason: 'initializeCount');
-                  expect(getNotificationAppLaunchDetailsCount, equals(1),
-                      reason: 'getNotificationAppLaunchDetailsCount');
-                  expect(cancelAllCount, equals(1), reason: 'cancelAllCount');
-                  expect(deleteNotificationChannelCount,
-                      equals(NotificationType.values.length),
-                      reason: 'deleteNotificationChannelCount');
-                } else {
-                  expect(alarmServiceStartCount, equals(0),
-                      reason: 'alarmServiceStartCount');
-                  expect(alarmCancelCount, equals(0),
-                      reason: 'alarmCancelCount');
-                  expect(initializeCount, equals(0), reason: 'initializeCount');
-                  expect(getNotificationAppLaunchDetailsCount, equals(0),
-                      reason: 'getNotificationAppLaunchDetailsCount');
-                  expect(cancelAllCount, equals(0), reason: 'cancelAllCount');
-                  expect(deleteNotificationChannelCount, equals(0),
-                      reason: 'deleteNotificationChannelCount');
-                }
+                expect(
+                  workmanagerInitializeCount,
+                  equals(
+                      defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
+                  reason: 'workmanagerInitializeCount',
+                );
+                expect(
+                  cancelTaskByUniqueNameCount,
+                  equals(defaultTargetPlatform == TargetPlatform.android
+                      ? 300
+                      : 0),
+                  reason: 'cancelTaskByUniqueNameCount',
+                );
+                expect(
+                  flutterLocalNotificationsInitializeCount,
+                  equals(
+                      defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
+                  reason: 'flutterLocalNotificationsInitializeCount',
+                );
+                expect(
+                  getNotificationAppLaunchDetailsCount,
+                  equals(
+                      defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
+                  reason: 'getNotificationAppLaunchDetailsCount',
+                );
+                expect(
+                  cancelAllCount,
+                  equals(
+                      defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
+                  reason: 'cancelAllCount',
+                );
+                expect(
+                  deleteNotificationChannelCount,
+                  equals(defaultTargetPlatform == TargetPlatform.android
+                      ? NotificationType.values.length
+                      : 0),
+                  reason: 'deleteNotificationChannelCount',
+                );
 
                 widgetTester.clearAllMockMethodCallHandler();
               },
