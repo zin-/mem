@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools">
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
   <uses-permission android:name="android.permission.VIBRATE"/>
   <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
@@ -81,9 +82,11 @@
     />
 
     <!-- for workmanager -->
-    <receiver
+    <service
         android:name="androidx.work.impl.background.systemjob.SystemJobService"
         android:permission="android.permission.BIND_JOB_SERVICE"
+        android:exported="false"
+        tools:replace="android:exported"
     />
 
     <!-- Don't delete the meta-data below.
