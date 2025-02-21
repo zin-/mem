@@ -131,13 +131,27 @@ Future<void> backgroundCallback(Uri? uri) async {
 void workmanagerCallbackDispatcher() =>
     LogService(enableErrorReport: true).init(
       () => WorkmanagerWrapper().executeTask(
-        (inputData) async {
-          await NotificationClient().show(
-            NotificationType.values.singleWhere(
-              (element) => element.name == inputData![notificationTypeKey],
-            ),
-            inputData![memIdKey] as int?,
-          );
-        },
+        (inputData) => v(
+          () async {
+            final notificationTypeName = inputData?[notificationTypeKey];
+            final memId = inputData?[memIdKey] as int?;
+
+            if (notificationTypeName == null) {
+              return false;
+            } else {
+              await NotificationClient().show(
+                NotificationType.values.singleWhere(
+                  (element) => element.name == notificationTypeName,
+                ),
+                memId,
+              );
+
+              return true;
+            }
+          },
+          {
+            'inputData': inputData,
+          },
+        ),
       ),
     );

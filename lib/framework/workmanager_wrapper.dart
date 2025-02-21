@@ -94,14 +94,12 @@ class WorkmanagerWrapper {
       );
 
   void executeTask(
-    Future<void> Function(Map<String, Object?>? inputData) notifyCallback,
+    Future<bool> Function(Map<String, Object?>? inputData) notifyCallback,
   ) =>
       _workmanager.executeTask(
         (task, inputData) => i(
           () async {
-            await notifyCallback(inputData);
-
-            return true;
+            return await notifyCallback(inputData);
           },
           {
             'task': task,
