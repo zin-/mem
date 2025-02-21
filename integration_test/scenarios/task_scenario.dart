@@ -260,8 +260,6 @@ void testTaskScenario() => group(': $_scenarioName', () {
             (widgetTester) async {
               widgetTester.ignoreMockMethodCallHandler(
                   MethodChannelMock.permissionHandler);
-              widgetTester.ignoreMockMethodCallHandler(
-                  MethodChannelMock.androidAlarmManager);
 
               await runApplication();
               await widgetTester.pumpAndSettle();

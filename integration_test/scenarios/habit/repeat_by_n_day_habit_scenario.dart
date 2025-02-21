@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/mems/mem_client.dart';
 import 'package:mem/mems/mem_name.dart';
 import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/databases/definition.dart';
@@ -18,7 +19,6 @@ import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/notifications/notification_ids.dart';
 import 'package:mem/notifications/schedule_client.dart';
-import 'package:mem/values/constants.dart';
 import 'package:mem/values/durations.dart';
 
 import '../helpers.dart';
@@ -125,7 +125,7 @@ void main() => group(': $_name', () {
       });
 
       setUp(() async {
-        NotificationClient.resetSingleton();
+        MemClient.resetSingleton();
       });
 
       testWidgets(
@@ -177,160 +177,119 @@ void main() => group(': $_name', () {
         },
       );
 
-      testWidgets(
-        'Save.',
-        (widgetTester) async {
-          widgetTester.ignoreMockMethodCallHandler(
-              MethodChannelMock.flutterLocalNotifications);
+      testWidgets('Save.', (widgetTester) async {
+        widgetTester
+            .ignoreMockMethodCallHandler(MethodChannelMock.permissionHandler);
+        widgetTester.ignoreMockMethodCallHandler(
+            MethodChannelMock.flutterLocalNotifications);
 
-          final testStart = DateTime.now();
-          var expectedSavedMemId =
-              ((await dbA.select(defTableMems, orderBy: "id DESC", limit: 1))
-                      .single[defPkId.name] as int) +
-                  1;
-
-          int alarmServiceStartCount = 0;
-          int alarmCancelCount = 0;
-          int alarmPeriodicCount = 0;
-          widgetTester
-              .setMockMethodCallHandler(MethodChannelMock.androidAlarmManager, [
+        int initializeCount = 0;
+        int cancelTaskByUniqueNameCount = 0;
+        int registerPeriodicTaskCount = 0;
+        widgetTester.setMockMethodCallHandler(
+          MethodChannelMock.workmanagerForeground,
+          [
             (message) async {
-              expect(message.method, equals('AlarmService.start'));
-              expect(message.arguments, orderedEquals([isNotNull]));
-              alarmServiceStartCount++;
+              expect(message.method, equals('initialize'));
+              initializeCount++;
               return true;
             },
             (message) async {
-              expect(message.method, equals('Alarm.cancel'));
-              expect(
-                  message.arguments,
-                  orderedEquals(
-                      [equals(memStartNotificationId(expectedSavedMemId))]));
-              alarmCancelCount++;
+              expect(message.method, equals('cancelTaskByUniqueName'));
+              cancelTaskByUniqueNameCount++;
               return false;
             },
             (message) async {
-              expect(message.method, equals('Alarm.cancel'));
-              expect(
-                  message.arguments,
-                  orderedEquals(
-                      [equals(memEndNotificationId(expectedSavedMemId))]));
-              alarmCancelCount++;
+              expect(message.method, equals('cancelTaskByUniqueName'));
+              cancelTaskByUniqueNameCount++;
               return false;
             },
             (message) async {
-              expect(message.method, equals('Alarm.periodic'));
-              expect(message.arguments[0],
-                  equals(memRepeatedNotificationId(expectedSavedMemId)));
-              expect(message.arguments[1], isFalse);
-              expect(message.arguments[2], isFalse);
-              expect(message.arguments[3], isFalse);
-              expect(
-                  DateTime.fromMillisecondsSinceEpoch(message.arguments[4]),
-                  equals(testStart
-                      .copyWith(
-                          hour: defaultStartOfDay.hour,
-                          minute: defaultStartOfDay.minute,
-                          second: 0,
-                          millisecond: 0,
-                          microsecond: 0)
-                      .add(const Duration(days: 1))));
-              expect(
-                  message.arguments[5], const Duration(days: 1).inMilliseconds);
-              expect(message.arguments[6], isFalse);
-              expect(message.arguments[7], isNotNull);
-              expect(
-                  message.arguments[8],
-                  equals({
-                    memIdKey: expectedSavedMemId,
-                    notificationTypeKey: NotificationType.repeat.name
-                  }));
-              alarmPeriodicCount++;
+              expect(message.method, equals('registerPeriodicTask'));
+              registerPeriodicTaskCount++;
               return false;
             },
-          ]);
+          ],
+        );
 
-          await runApplication();
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(newMemFabFinder);
-          await widgetTester.pumpAndSettle();
-          const enteringMemName = "$_name: Save - entering - mem name";
-          await widgetTester.enterText(find.byKey(keyMemName), enteringMemName);
+        await runApplication();
+        await widgetTester.pumpAndSettle();
+        await widgetTester.tap(newMemFabFinder);
+        await widgetTester.pumpAndSettle();
+        const enteringMemName = "$_name: Save - entering - mem name";
+        await widgetTester.enterText(find.byKey(keyMemName), enteringMemName);
 
-          final notificationAddFinder = find.descendant(
-              of: find.byKey(keyMemNotificationsView),
-              matching: find.byIcon(Icons.notification_add));
-          await widgetTester.dragUntilVisible(
-            notificationAddFinder,
-            find.byType(SingleChildScrollView),
-            const Offset(0, 50),
+        final notificationAddFinder = find.descendant(
+            of: find.byKey(keyMemNotificationsView),
+            matching: find.byIcon(Icons.notification_add));
+        await widgetTester.dragUntilVisible(
+          notificationAddFinder,
+          find.byType(SingleChildScrollView),
+          const Offset(0, 50),
+        );
+        await widgetTester.tap(notificationAddFinder);
+        await widgetTester.pumpAndSettle(defaultTransitionDuration);
+
+        await widgetTester.tap(timeIconFinder);
+        await widgetTester.pump();
+        await widgetTester.tap(okFinder);
+        await widgetTester.pump();
+
+        const enteringNDay = 3;
+        await widgetTester.enterText(
+          find.descendant(
+            of: find.byKey(keyMemRepeatByNDayNotification),
+            matching: find.byType(TextFormField),
+          ),
+          enteringNDay.toString(),
+        );
+
+        await widgetTester.pageBack();
+        await widgetTester.pumpAndSettle();
+        await widgetTester.tap(find.byKey(keySaveMemFab));
+        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
+
+        await widgetTester.runAsync(() async {
+          final savedMem = (await dbA.select(
+            defTableMems,
+            where: "${defColMemsName.name} = ?",
+            whereArgs: [enteringMemName],
+          ))
+              .single;
+          final savedMemNotification = (await dbA.select(
+                  defTableMemNotifications,
+                  where: "${defFkMemNotificationsMemId.name} = ?"
+                      " AND ${defColMemNotificationsType.name} = ?"
+                      " AND ${defColMemNotificationsTime.name} = ?",
+                  whereArgs: [
+                savedMem[defPkId.name],
+                MemNotificationType.repeatByNDay.name,
+                enteringNDay
+              ]))
+              .single;
+          expect(savedMemNotification[defColMemNotificationsTime.name],
+              equals(enteringNDay),
+              reason: 'enteringNDay');
+
+          expect(
+            initializeCount,
+            equals(defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
+            reason: 'initializeCount',
           );
-          await widgetTester.tap(notificationAddFinder);
-          await widgetTester.pumpAndSettle(defaultTransitionDuration);
-
-          await widgetTester.tap(timeIconFinder);
-          await widgetTester.pump();
-          await widgetTester.tap(okFinder);
-          await widgetTester.pump();
-
-          const enteringNDay = 3;
-          await widgetTester.enterText(
-            find.descendant(
-              of: find.byKey(keyMemRepeatByNDayNotification),
-              matching: find.byType(TextFormField),
-            ),
-            enteringNDay.toString(),
+          expect(
+            cancelTaskByUniqueNameCount,
+            equals(defaultTargetPlatform == TargetPlatform.android ? 2 : 0),
+            reason: 'cancelTaskByUniqueNameCount',
+          );
+          expect(
+            registerPeriodicTaskCount,
+            equals(defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
+            reason: 'registerPeriodicTaskCount',
           );
 
-          await widgetTester.pageBack();
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(find.byKey(keySaveMemFab));
-          await widgetTester.pumpAndSettle(const Duration(seconds: 1));
-
-          await widgetTester.runAsync(
-            () async {
-              final savedMem = (await dbA.select(
-                defTableMems,
-                where: "${defColMemsName.name} = ?",
-                whereArgs: [enteringMemName],
-              ))
-                  .single;
-              final savedMemNotification = (await dbA.select(
-                      defTableMemNotifications,
-                      where: "${defFkMemNotificationsMemId.name} = ?"
-                          " AND ${defColMemNotificationsType.name} = ?"
-                          " AND ${defColMemNotificationsTime.name} = ?",
-                      whereArgs: [
-                    savedMem[defPkId.name],
-                    MemNotificationType.repeatByNDay.name,
-                    enteringNDay
-                  ]))
-                  .single;
-              expect(savedMemNotification[defColMemNotificationsTime.name],
-                  equals(enteringNDay),
-                  reason: 'enteringNDay');
-
-              if (defaultTargetPlatform == TargetPlatform.android) {
-                await expectLater(alarmServiceStartCount, equals(1),
-                    reason: 'alarmServiceStartCount');
-                await expectLater(alarmCancelCount, equals(2),
-                    reason: 'alarmCancelCount');
-                await expectLater(alarmPeriodicCount, equals(1),
-                    reason: 'alarmPeriodicCount');
-              } else {
-                await expectLater(alarmServiceStartCount, equals(0),
-                    reason: 'alarmServiceStartCount');
-                await expectLater(alarmCancelCount, equals(0),
-                    reason: 'alarmCancelCount');
-                await expectLater(alarmPeriodicCount, equals(0),
-                    reason: 'alarmPeriodicCount');
-              }
-
-              widgetTester.clearAllMockMethodCallHandler();
-            },
-          );
-        },
-      );
+          widgetTester.clearAllMockMethodCallHandler();
+        });
+      });
 
       group('notify repeatByNDay', () {
         testWidgets('withoutAct.', (widgetTester) async {
