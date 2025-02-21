@@ -55,6 +55,7 @@ app.*.map.json
 *.g.dart
 ## Mockito
 *.mocks.dart
-
+## Workmanager
+/android/app/.cxx
 # Coverage
 /coverage

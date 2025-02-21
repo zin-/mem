@@ -6,7 +6,7 @@ plugins {
 }
 
 def flutterCompileSdkVersion = flutter.compileSdkVersion
-def flutterNdkVersion = '26.1.10909125'
+def flutterNdkVersion = '26.3.11579264'
 //println("flutter.ndkVersion: $flutter.ndkVersion") // => 23.1.7779620
 //def flutterNdkVersion = flutter.ndkVersion
 def flutterMinSdkVersion = flutter.minSdkVersion
