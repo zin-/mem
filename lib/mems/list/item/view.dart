@@ -70,8 +70,6 @@ ListTile _render(
       () {
         final hasActiveAct =
             latestActByMem != null && latestActByMem is ActiveAct;
-        final hasPausedAct =
-            latestActByMem != null && latestActByMem is PausedAct;
         final hasEnableMemNotifications = memNotificationEntities
             .where(
               (e) => e is SavedMemNotificationEntityV2 && e.value.isEnabled(),
@@ -105,9 +103,7 @@ ListTile _render(
           leading: hasEnableMemNotifications
               ? hasActiveAct
                   ? pauseIconButton
-                  : hasPausedAct
-                      ? stopIconButton
-                      : null
+                  : stopIconButton
               : MemDoneCheckbox(
                   memEntity,
                   (value) => onMemDoneCheckboxTapped(value, memEntity.id),

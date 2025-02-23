@@ -508,7 +508,7 @@ void main() => group(
 
                 await runApplication();
                 await widgetTester.pumpAndSettle();
-                await widgetTester.tap(stopIconFinder);
+                await widgetTester.tap(stopIconFinder.at(0));
                 await widgetTester.pumpAndSettle(waitLongSideEffectDuration);
 
                 expect(
