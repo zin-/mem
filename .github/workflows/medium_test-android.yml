@@ -29,7 +29,11 @@ jobs:
         # 複数のAndroid Emulator Runnerを使う
         #   パフォーマンスチェックのため
         #   Github actionsの実行時間制限とかが出始めたらやめる
-        android-emulator-runner: [ reactivecircus, native ]
+        android-emulator-runner: [
+          reactivecircus-macos,
+          reactivecircus-linux,
+          native
+        ]
         include:
           # - os: macos-latest
           # FIXME macos-14とreactivecircusでエラーになるため、バージョンを指定している
@@ -39,12 +43,15 @@ jobs:
             experimental: false
             android-api-level: 33
             android-arch: x86_64
+          - android-emulator-runner: reactivecircus-linux
+            os: ubuntu-latest
+            experimental: true
           - android-emulator-runner: native
             os: ubuntu-latest
             experimental: true
       fail-fast: false
 
-    name: "Medium test (${{ matrix.android-emulator-runner }}) (Android) (${{ inputs.target }})"
+    name: "Medium test (Android) (${{ matrix.android-emulator-runner }}) (${{ inputs.target }})"
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
     timeout-minutes: ${{ inputs.timeout-minutes }}
