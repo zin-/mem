@@ -200,7 +200,7 @@ void main() => group(_name, () {
             );
           });
 
-          testWidgets(': start.',
+          testWidgets('Start.',
               // 時間に関するテストなのでリトライ可能とする
               retry: maxRetryCount, (widgetTester) async {
             widgetTester.ignoreMockMethodCallHandler(
@@ -221,9 +221,7 @@ void main() => group(_name, () {
 
             widgetTester.expectMemListItem(
               0,
-              // FIXME "00:00:00"を検出したいが、難しそう
-              // [memWithNoActName, "00:00:00", null],
-              [memWithNoActName, null, null],
+              [memWithNoActName, "00:00:00", null],
               [Icons.pause, Icons.stop],
               [Icons.play_arrow],
             );
@@ -357,9 +355,7 @@ void main() => group(_name, () {
 
             widgetTester.expectMemListItem(
               0,
-              // FIXME "00:00:00"を検出したいが、難しそう
-              // [memWithFinishedActName, "00:00:00", null],
-              [memWithFinishedActName, null, null],
+              [memWithFinishedActName, "00:00:00", null],
               [Icons.pause, Icons.stop],
               [Icons.play_arrow],
             );
@@ -413,9 +409,7 @@ void main() => group(_name, () {
 
             widgetTester.expectMemListItem(
               0,
-              // FIXME "00:00:00"を検出したいが、難しそう
-              // [memWithPausedActName, "00:00:00", null],
-              [memWithPausedActName, null, null],
+              [memWithPausedActName, "00:00:00", null],
               [Icons.pause, Icons.stop],
               [Icons.play_arrow],
             );
