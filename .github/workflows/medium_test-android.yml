@@ -29,10 +29,7 @@ jobs:
         # 複数のAndroid Emulator Runnerを使う
         #   パフォーマンスチェックのため
         #   Github actionsの実行時間制限とかが出始めたらやめる
-        android-emulator-runner: [
-          reactivecircus-linux,
-          native
-        ]
+        android-emulator-runner: [ reactivecircus-linux ]
         include:
           # - os: macos-latest
           # FIXME macos-14とreactivecircusでエラーになるため、バージョンを指定している
