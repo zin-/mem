@@ -63,7 +63,7 @@ jobs:
         with:
           script: ${{ inputs.script }}
           android-api-level: 33
-          android-target: ${{ inputs.android-target }}
+          android-target: default
           android-arch: x86_64
           #          android-device-profile: Pixel 5
 
