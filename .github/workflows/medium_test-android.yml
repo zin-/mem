@@ -24,29 +24,8 @@ on:
 
 jobs:
   medium_test-android:
-    strategy:
-      matrix:
-        # 複数のAndroid Emulator Runnerを使う
-        #   パフォーマンスチェックのため
-        #   Github actionsの実行時間制限とかが出始めたらやめる
-        android-emulator-runner: [ reactivecircus, native ]
-        include:
-          # - os: macos-latest
-          # FIXME macos-14とreactivecircusでエラーになるため、バージョンを指定している
-          # https://github.com/ReactiveCircus/android-emulator-runner/issues/350
-          - os: macos-13
-            java-version: 17
-            experimental: false
-            android-api-level: 33
-            android-arch: x86_64
-          - android-emulator-runner: native
-            os: ubuntu-latest
-            experimental: true
-      fail-fast: false
-
-    name: "Medium test (${{ matrix.android-emulator-runner }}) (Android) (${{ inputs.target }})"
-    runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.experimental }}
+    name: "Medium test (Android) (${{ inputs.target }})"
+    runs-on: ubuntu-latest
     timeout-minutes: ${{ inputs.timeout-minutes }}
 
     # TODO 画面サイズ
@@ -61,7 +40,7 @@ jobs:
         uses: ./.github/actions/set_up-java-and-gradle
         with:
           java-distribution: zulu
-          java-version: ${{ matrix.java-version }}
+          java-version: 17
 
       - name: "Flutter doctor"
         uses: ./.github/actions/install-flutter
@@ -80,31 +59,27 @@ jobs:
 
       - id: run-android-medium_test
         name: "Run Android Medium test"
-        uses: ./.github/actions/run-android-medium_test
+        uses: ./.github/actions/run-android-medium_test-via-reactivecircus-linux
         with:
-          android-emulator-runner: ${{ matrix.android-emulator-runner }}
           script: ${{ inputs.test-script }}
-          android-api-level: ${{ matrix.android-api-level }}
+          android-api-level: 33
           android-target: default
-          android-arch: ${{ matrix.android-arch }} # FIXME これandroidのarchじゃなくて動かす側のcpu archだ
-          experimental: ${{ matrix.experimental }}
-        continue-on-error: ${{ matrix.experimental == true }}
+          android-arch: x86_64
+          #          android-device-profile: Pixel 5
 
       - if: always()
         name: "Report"
         uses: dorny/test-reporter@v1
         with:
-          name: "Report (Medium test (Android) (${{ inputs.target }})) (${{ matrix.android-emulator-runner }})"
+          name: "Report (Medium test (Android) (${{ inputs.target }}))"
           path: "reports/test_report.log"
           reporter: "flutter-json"
           fail-on-error: true
           fail-on-empty: true
-        continue-on-error: ${{ matrix.experimental == true }}
       - if: always()
         name: "Upload coverage"
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
-          flags: medium_test-android-${{ inputs.target }}-${{ matrix.android-emulator-runner }}
-        continue-on-error: ${{ matrix.experimental == true }}
+          flags: medium_test-android-${{ inputs.target }}
