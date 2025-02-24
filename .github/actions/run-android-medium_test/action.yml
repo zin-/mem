@@ -25,17 +25,6 @@ runs:
   using: "composite"
 
   steps:
-    - if: inputs.android-emulator-runner == 'reactivecircus-macos'
-      id: run-android-medium_test-via-reactivecircus-macos
-      name: "Run Android Medium Test via reactivecircus macos"
-      uses: ./.github/actions/run-android-medium_test-via-reactivecircus-macos
-      with:
-        script: ${{ inputs.script }}
-        android-api-level: ${{ inputs.android-api-level }}
-        android-target: ${{ inputs.android-target }}
-        android-arch: ${{ inputs.android-arch }}
-      #          android-device-profile: Pixel 5
-
     - if: inputs.android-emulator-runner == 'reactivecircus-linux'
       id: run-android-medium_test-via-reactivecircus-linux
       name: "Run Android Medium Test via reactivecircus linux"

@@ -30,7 +30,6 @@ jobs:
         #   パフォーマンスチェックのため
         #   Github actionsの実行時間制限とかが出始めたらやめる
         android-emulator-runner: [
-          reactivecircus-macos,
           reactivecircus-linux,
           native
         ]
@@ -38,16 +37,12 @@ jobs:
           # - os: macos-latest
           # FIXME macos-14とreactivecircusでエラーになるため、バージョンを指定している
           # https://github.com/ReactiveCircus/android-emulator-runner/issues/350
-          - os: macos-13
+          - os: ubuntu-latest
             java-version: 17
             experimental: false
             android-api-level: 33
             android-arch: x86_64
-          - android-emulator-runner: reactivecircus-linux
-            os: ubuntu-latest
-            experimental: true
           - android-emulator-runner: native
-            os: ubuntu-latest
             experimental: true
       fail-fast: false
 
