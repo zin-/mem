@@ -61,7 +61,7 @@ jobs:
         name: "Run Android Medium test"
         uses: ./.github/actions/run-android-medium_test-via-reactivecircus-linux
         with:
-          script: ${{ inputs.script }}
+          script: ${{ inputs.test-script }}
           android-api-level: 33
           android-target: default
           android-arch: x86_64
