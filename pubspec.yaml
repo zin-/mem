@@ -105,6 +105,7 @@ dependencies:
 
   # for Error report
   sentry_flutter: ^8.9.0
+  flutter_foreground_task: ^8.17.0
 
 dev_dependencies:
   # for Test mock
