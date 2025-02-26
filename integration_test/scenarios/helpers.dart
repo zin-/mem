@@ -11,6 +11,7 @@ import 'package:mem/framework/database/factory.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
 import 'package:mem/framework/repository/database_repository.dart';
+import 'package:mem/values/constants.dart';
 
 // Database(DB) operations
 Future<DatabaseAccessor> openTestDatabase(
@@ -101,6 +102,7 @@ extension TextAt on WidgetTester {
 }
 
 enum MethodChannelMock {
+  mem,
   flutterLocalNotifications,
   sharePlus,
   filePicker,
@@ -112,6 +114,8 @@ enum MethodChannelMock {
 extension Method on MethodChannelMock {
   MethodChannel get channel {
     switch (this) {
+      case MethodChannelMock.mem:
+        return methodChannel;
       case MethodChannelMock.flutterLocalNotifications:
         return const MethodChannel('dexterous.com/flutter/local_notifications');
       case MethodChannelMock.sharePlus:
@@ -169,6 +173,14 @@ extension HandleMockMethodCallHandler on WidgetTester {
             300,
             (index) => (m) async {
                   switch (methodChannelMock) {
+                    case MethodChannelMock.mem:
+                      switch (m.method) {
+                        case requestPermissions:
+                          return true;
+
+                        default:
+                          throw UnimplementedError();
+                      }
                     case MethodChannelMock.flutterLocalNotifications:
                       switch (m.method) {
                         case 'initialize':

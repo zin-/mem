@@ -255,6 +255,7 @@ void main() => group(_name, () {
             testWidgets(
               ': start.',
               (widgetTester) async {
+                widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
                 widgetTester.ignoreMockMethodCallHandler(
                     MethodChannelMock.permissionHandler);
 
@@ -291,6 +292,7 @@ void main() => group(_name, () {
             testWidgets(
               ': finish.',
               (widgetTester) async {
+                widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
                 widgetTester.ignoreMockMethodCallHandler(
                     MethodChannelMock.permissionHandler);
 
