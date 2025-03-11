@@ -4,6 +4,8 @@ class NotificationChannel {
   final String id;
   final String name;
   final String description;
+  final Importance importance;
+  final String? groupKey;
   final List<NotificationAction> actionList;
   final bool usesChronometer;
   final bool ongoing;
@@ -16,6 +18,8 @@ class NotificationChannel {
     this.name,
     this.description,
     this.actionList, {
+    this.importance = Importance.mid,
+    this.groupKey,
     this.usesChronometer = false,
     this.ongoing = false,
     this.autoCancel = true,
@@ -34,3 +38,6 @@ class NotificationChannel {
         "autoCancel": autoCancel,
       }}";
 }
+
+enum Importance { mid, high }
+
