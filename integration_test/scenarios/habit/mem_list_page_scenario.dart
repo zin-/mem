@@ -203,6 +203,7 @@ void main() => group(_name, () {
           testWidgets('Start.',
               // 時間に関するテストなのでリトライ可能とする
               retry: maxRetryCount, (widgetTester) async {
+            widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
             widgetTester.ignoreMockMethodCallHandler(
               MethodChannelMock.permissionHandler,
             );
@@ -255,6 +256,7 @@ void main() => group(_name, () {
           });
 
           testWidgets('Finish.', (widgetTester) async {
+            widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
             widgetTester.ignoreMockMethodCallHandler(
               MethodChannelMock.permissionHandler,
             );
@@ -287,6 +289,7 @@ void main() => group(_name, () {
           });
 
           testWidgets(': pause.', (widgetTester) async {
+            widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
             widgetTester.ignoreMockMethodCallHandler(
               MethodChannelMock.permissionHandler,
             );
@@ -337,6 +340,7 @@ void main() => group(_name, () {
           testWidgets(': start.',
               // 時間に関するテストなのでリトライ可能とする
               retry: maxRetryCount, (widgetTester) async {
+            widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
             widgetTester.ignoreMockMethodCallHandler(
               MethodChannelMock.permissionHandler,
             );
@@ -427,6 +431,7 @@ void main() => group(_name, () {
           });
 
           testWidgets(': finish.', (widgetTester) async {
+            widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
             widgetTester.ignoreMockMethodCallHandler(
               MethodChannelMock.permissionHandler,
             );

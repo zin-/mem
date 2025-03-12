@@ -19,6 +19,7 @@ import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/notifications/notification_ids.dart';
 import 'package:mem/notifications/schedule_client.dart';
+import 'package:mem/values/constants.dart';
 import 'package:mem/values/durations.dart';
 
 import '../helpers.dart';
@@ -178,6 +179,7 @@ void main() => group(': $_name', () {
       );
 
       testWidgets('Save.', (widgetTester) async {
+        widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
         widgetTester
             .ignoreMockMethodCallHandler(MethodChannelMock.permissionHandler);
         widgetTester.ignoreMockMethodCallHandler(
@@ -292,14 +294,13 @@ void main() => group(': $_name', () {
       });
 
       group('notify repeatByNDay', () {
-        testWidgets('withoutAct.', (widgetTester) async {
-          int checkPermissionStatusCount = 0;
-          widgetTester
-              .setMockMethodCallHandler(MethodChannelMock.permissionHandler, [
+        testWidgets('WithoutAct.', (widgetTester) async {
+          int requestPermissionsCount = 0;
+          widgetTester.setMockMethodCallHandler(MethodChannelMock.mem, [
             (m) async {
-              expect(m.method, 'checkPermissionStatus');
-              checkPermissionStatusCount++;
-              return 1;
+              expect(m.method, requestPermissions);
+              requestPermissionsCount++;
+              return true;
             }
           ]);
           int initializeCount = 0;
@@ -344,31 +345,28 @@ void main() => group(': $_name', () {
 
           await scheduleCallback(0, params);
 
-          if (defaultTargetPlatform == TargetPlatform.android) {
-            expect(checkPermissionStatusCount, equals(1),
-                reason: 'checkPermissionStatusCount');
-            expect(initializeCount, equals(1), reason: 'initializeCount');
-            expect(cancelCount, equals(4), reason: 'cancelCount');
-            expect(showCount, equals(1), reason: 'showCount');
-          } else {
-            expect(checkPermissionStatusCount, equals(1),
-                reason: 'checkPermissionStatusCount');
-            expect(initializeCount, equals(0), reason: 'initializeCount');
-            expect(cancelCount, equals(0), reason: 'cancelCount');
-            expect(showCount, equals(0), reason: 'showCount');
-          }
+          expect(requestPermissionsCount, equals(1),
+              reason: 'requestPermissionsCount');
+          expect(initializeCount,
+              equals(defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
+              reason: 'initializeCount');
+          expect(cancelCount,
+              equals(defaultTargetPlatform == TargetPlatform.android ? 4 : 0),
+              reason: 'cancelCount');
+          expect(showCount,
+              equals(defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
+              reason: 'showCount');
 
           widgetTester.clearAllMockMethodCallHandler();
         });
 
-        testWidgets('withOldAct', (widgetTester) async {
-          int checkPermissionStatusCount = 0;
-          widgetTester
-              .setMockMethodCallHandler(MethodChannelMock.permissionHandler, [
+        testWidgets('WithOldAct.', (widgetTester) async {
+          int requestPermissionsCount = 0;
+          widgetTester.setMockMethodCallHandler(MethodChannelMock.mem, [
             (m) async {
-              expect(m.method, 'checkPermissionStatus');
-              checkPermissionStatusCount++;
-              return 1;
+              expect(m.method, requestPermissions);
+              requestPermissionsCount++;
+              return true;
             }
           ]);
           int initializeCount = 0;
@@ -413,19 +411,17 @@ void main() => group(': $_name', () {
 
           await scheduleCallback(0, params);
 
-          if (defaultTargetPlatform == TargetPlatform.android) {
-            expect(checkPermissionStatusCount, equals(1),
-                reason: 'checkPermissionStatusCount');
-            expect(initializeCount, equals(1), reason: 'initializeCount');
-            expect(cancelCount, equals(4), reason: 'cancelCount');
-            expect(showCount, equals(1), reason: 'showCount');
-          } else {
-            expect(checkPermissionStatusCount, equals(1),
-                reason: 'checkPermissionStatusCount');
-            expect(initializeCount, equals(0), reason: 'initializeCount');
-            expect(cancelCount, equals(0), reason: 'cancelCount');
-            expect(showCount, equals(0), reason: 'showCount');
-          }
+          expect(requestPermissionsCount, equals(1),
+              reason: 'requestPermissionsCount');
+          expect(initializeCount,
+              equals(defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
+              reason: 'initializeCount');
+          expect(cancelCount,
+              equals(defaultTargetPlatform == TargetPlatform.android ? 4 : 0),
+              reason: 'cancelCount');
+          expect(showCount,
+              equals(defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
+              reason: 'showCount');
 
           widgetTester.clearAllMockMethodCallHandler();
         });

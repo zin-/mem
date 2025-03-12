@@ -41,8 +41,8 @@ class ScheduleClient extends Repository<Schedule> {
         () async {
           if (entity is CancelSchedule) {
             await discard(entity.id);
-          } else if (await PermissionHandlerWrapper().grant(
-            Permission.notification,
+          } else if (await PermissionHandlerWrapper().request(
+            [Permission.notification],
           )) {
             if (entity is PeriodicSchedule) {
               await _workmanagerWrapper?.registerPeriodicTask(

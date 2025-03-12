@@ -19,6 +19,8 @@ enum NotificationType {
   notifyAfterInactivity,
 }
 
+const actGroupKey = "Act";
+
 extension NotificationChannelBuilder on NotificationType {
   int buildNotificationId([int? memId]) => v(
         () {
@@ -61,6 +63,7 @@ extension NotificationChannelBuilder on NotificationType {
               notificationActionMap[startActNotificationActionId]!,
               notificationActionMap[finishActiveActNotificationActionId]!,
             ],
+            importance: Importance.high,
           );
 
           switch (this) {
@@ -77,6 +80,7 @@ extension NotificationChannelBuilder on NotificationType {
                   notificationActionMap[startActNotificationActionId]!,
                   notificationActionMap[finishActiveActNotificationActionId]!,
                 ],
+                importance: Importance.high,
               );
             case NotificationType.activeAct:
               return NotificationChannel(
@@ -87,6 +91,7 @@ extension NotificationChannelBuilder on NotificationType {
                   notificationActionMap[finishActiveActNotificationActionId]!,
                   notificationActionMap[pauseActNotificationActionId]!,
                 ],
+                groupKey: actGroupKey,
                 usesChronometer: true,
                 ongoing: true,
                 autoCancel: false,
@@ -101,6 +106,7 @@ extension NotificationChannelBuilder on NotificationType {
                 [
                   notificationActionMap[startActNotificationActionId]!,
                 ],
+                groupKey: actGroupKey,
                 usesChronometer: true,
                 autoCancel: false,
                 playSound: false,
@@ -115,6 +121,7 @@ extension NotificationChannelBuilder on NotificationType {
                   notificationActionMap[finishActiveActNotificationActionId]!,
                   notificationActionMap[pauseActNotificationActionId]!,
                 ],
+                groupKey: actGroupKey,
                 usesChronometer: true,
                 autoCancel: false,
               );

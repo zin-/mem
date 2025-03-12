@@ -6,9 +6,9 @@ plugins {
 }
 
 def flutterCompileSdkVersion = flutter.compileSdkVersion
-def flutterNdkVersion = '26.3.11579264'
-//println("flutter.ndkVersion: $flutter.ndkVersion") // => 23.1.7779620
-//def flutterNdkVersion = flutter.ndkVersion
+//println("flutter.ndkVersion: $flutter.ndkVersion")
+def flutterNdkVersion = flutter.ndkVersion
+//println("flutter.minSdkVersion: $flutter.minSdkVersion")
 def flutterMinSdkVersion = flutter.minSdkVersion
 def flutterTargetSdkVersion = flutter.targetSdkVersion
 def javaVersion = JavaVersion.VERSION_1_8

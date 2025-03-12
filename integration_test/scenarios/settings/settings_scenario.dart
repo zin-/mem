@@ -225,6 +225,7 @@ void main() => group(
 
           testWidgets("Save.", (widgetTester) async {
             widgetTester.clearAllMockMethodCallHandler();
+            widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
             widgetTester.ignoreMockMethodCallHandler(
                 MethodChannelMock.permissionHandler);
 
@@ -396,6 +397,7 @@ void main() => group(
 
               testWidgets("Cancel when start act.", (widgetTester) async {
                 widgetTester.clearAllMockMethodCallHandler();
+                widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
                 widgetTester.ignoreMockMethodCallHandler(
                     MethodChannelMock.permissionHandler);
                 widgetTester.ignoreMockMethodCallHandler(
@@ -476,6 +478,7 @@ void main() => group(
 
               testWidgets("Set when finish act.", (widgetTester) async {
                 widgetTester.clearAllMockMethodCallHandler();
+                widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
                 widgetTester.ignoreMockMethodCallHandler(
                     MethodChannelMock.permissionHandler);
                 widgetTester.ignoreMockMethodCallHandler(
@@ -536,6 +539,7 @@ void main() => group(
 
               testWidgets("Set when pause act.", (widgetTester) async {
                 widgetTester.clearAllMockMethodCallHandler();
+                widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
                 widgetTester.ignoreMockMethodCallHandler(
                     MethodChannelMock.permissionHandler);
                 widgetTester.ignoreMockMethodCallHandler(
@@ -636,6 +640,7 @@ void main() => group(
             testWidgets(
               "Execute.",
               (widgetTester) async {
+                widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
                 widgetTester.ignoreMockMethodCallHandler(
                     MethodChannelMock.permissionHandler);
 

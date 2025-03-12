@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -21,6 +22,7 @@ import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/notifications/notification_actions.dart';
 import 'package:mem/notifications/notification_ids.dart';
 import 'package:mem/notifications/schedule_client.dart';
+import 'package:mem/values/constants.dart';
 import 'package:mem/values/durations.dart';
 
 import 'helpers.dart';
@@ -76,47 +78,24 @@ void testNotificationScenario() => group(_scenarioName, () {
         });
       });
 
-      group(
-        "ScheduleCallback",
-        () {
-          for (var element in NotificationType.values.where(
-            (e) => e != NotificationType.notifyAfterInactivity,
-          )) {
-            testWidgets(
-              ": ${element.name}.",
-              (widgetTester) async {
-                widgetTester.ignoreMockMethodCallHandler(
-                    MethodChannelMock.flutterLocalNotifications);
-                int checkPermissionStatusCount = 0;
-                widgetTester.setMockMethodCallHandler(
-                    MethodChannelMock.permissionHandler, [
-                  (m) async {
-                    expect(m.method, 'checkPermissionStatus');
-                    checkPermissionStatusCount++;
-                    return 1;
-                  }
-                ]);
-
-                final id = insertedMemId!;
-                final params = {
-                  memIdKey: insertedMemId,
-                  notificationTypeKey: element.name,
-                };
-
-                await scheduleCallback(id, params);
-
-                expect(checkPermissionStatusCount, 1);
-              },
-            );
-          }
-
+      group("ScheduleCallback", () {
+        for (var element in NotificationType.values.where(
+          (e) => e != NotificationType.notifyAfterInactivity,
+        )) {
           testWidgets(
-            ": ${NotificationType.notifyAfterInactivity.name}.",
+            "${element.name}.",
             (widgetTester) async {
-              final notificationType = NotificationType.notifyAfterInactivity;
-
               widgetTester.ignoreMockMethodCallHandler(
                   MethodChannelMock.flutterLocalNotifications);
+              int requestPermissionsCount = 0;
+              widgetTester.setMockMethodCallHandler(MethodChannelMock.mem, [
+                (m) async {
+                  expect(m.method, requestPermissions);
+                  requestPermissionsCount++;
+                  throw MissingPluginException();
+                },
+                (m) => fail("Too many call."),
+              ]);
               int checkPermissionStatusCount = 0;
               widgetTester.setMockMethodCallHandler(
                   MethodChannelMock.permissionHandler, [
@@ -124,23 +103,123 @@ void testNotificationScenario() => group(_scenarioName, () {
                   expect(m.method, 'checkPermissionStatus');
                   checkPermissionStatusCount++;
                   return 1;
-                }
+                },
+                (m) => fail("Too many call."),
               ]);
 
+              final id = insertedMemId!;
               final params = {
-                notificationTypeKey: notificationType.name,
+                memIdKey: insertedMemId,
+                notificationTypeKey: element.name,
               };
 
-              await scheduleCallback(
-                notificationType.buildNotificationId(),
-                params,
-              );
+              await scheduleCallback(id, params);
 
-              expect(checkPermissionStatusCount, 1);
+              expect(
+                requestPermissionsCount,
+                equals(1),
+                reason: 'requestPermissionsCount',
+              );
+              expect(
+                checkPermissionStatusCount,
+                equals(1),
+                reason: 'checkPermissionStatusCount',
+              );
             },
           );
-        },
-      );
+        }
+
+        testWidgets("${NotificationType.notifyAfterInactivity.name}.",
+            (widgetTester) async {
+          final notificationType = NotificationType.notifyAfterInactivity;
+
+          widgetTester.ignoreMockMethodCallHandler(
+              MethodChannelMock.flutterLocalNotifications);
+          int requestPermissionsCount = 0;
+          widgetTester.setMockMethodCallHandler(MethodChannelMock.mem, [
+            (m) async {
+              expect(m.method, requestPermissions);
+              requestPermissionsCount++;
+              throw MissingPluginException();
+            }
+          ]);
+          int checkPermissionStatusCount = 0;
+          widgetTester
+              .setMockMethodCallHandler(MethodChannelMock.permissionHandler, [
+            (m) async {
+              expect(m.method, 'checkPermissionStatus');
+              checkPermissionStatusCount++;
+              return 1;
+            },
+            (m) => fail("Too many call."),
+          ]);
+
+          final params = {
+            notificationTypeKey: notificationType.name,
+          };
+
+          await scheduleCallback(
+            notificationType.buildNotificationId(),
+            params,
+          );
+
+          expect(
+            requestPermissionsCount,
+            equals(1),
+            reason: 'requestPermissionsCount',
+          );
+          expect(
+            checkPermissionStatusCount,
+            equals(1),
+            reason: 'checkPermissionStatusCount',
+          );
+        });
+
+        testWidgets("PlatformException.", (widgetTester) async {
+          final notificationType = NotificationType.notifyAfterInactivity;
+
+          widgetTester.ignoreMockMethodCallHandler(
+              MethodChannelMock.flutterLocalNotifications);
+          int requestPermissionsCount = 0;
+          widgetTester.setMockMethodCallHandler(MethodChannelMock.mem, [
+            (m) async {
+              expect(m.method, requestPermissions);
+              requestPermissionsCount++;
+              throw PlatformException(code: 'on test code.');
+            }
+          ]);
+          int checkPermissionStatusCount = 0;
+          widgetTester
+              .setMockMethodCallHandler(MethodChannelMock.permissionHandler, [
+            (m) async {
+              expect(m.method, 'checkPermissionStatus');
+              checkPermissionStatusCount++;
+              return 1;
+            },
+            (m) => fail("Too many call."),
+          ]);
+
+          final params = {
+            notificationTypeKey: notificationType.name,
+          };
+
+          await scheduleCallback(
+            notificationType.buildNotificationId(),
+            params,
+          );
+
+          expect(
+            requestPermissionsCount,
+            equals(1),
+            reason: 'requestPermissionsCount',
+          );
+          expect(
+            checkPermissionStatusCount,
+            equals(0),
+            reason: 'checkPermissionStatusCount',
+          );
+        });
+      });
 
       testWidgets(
         ": show MemDetailPage.",
@@ -225,6 +304,7 @@ void testNotificationScenario() => group(_scenarioName, () {
         );
 
         testWidgets('Start Act.', (widgetTester) async {
+          widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
           widgetTester.ignoreMockMethodCallHandler(
             MethodChannelMock.permissionHandler,
           );
@@ -419,17 +499,16 @@ void testNotificationScenario() => group(_scenarioName, () {
                 MethodChannelMock.flutterLocalNotifications);
             widgetTester.ignoreMockMethodCallHandler(
                 MethodChannelMock.workmanagerForeground);
-
-            int checkPermissionStatusCount = 0;
+            int requestPermissionsCount = 0;
             widgetTester.setMockMethodCallHandler(
-              MethodChannelMock.permissionHandler,
+              MethodChannelMock.mem,
               [
                 ...List.generate(
                   2,
                   (i) => (m) async {
-                    expect(m.method, 'checkPermissionStatus');
-                    checkPermissionStatusCount++;
-                    return 1;
+                    expect(m.method, requestPermissions);
+                    requestPermissionsCount++;
+                    return true;
                   },
                 ),
                 (m) => fail("Too many call."),
@@ -449,9 +528,9 @@ void testNotificationScenario() => group(_scenarioName, () {
             await onNotificationResponseReceived(details);
 
             expect(
-              checkPermissionStatusCount,
+              requestPermissionsCount,
               equals(2),
-              reason: 'checkPermissionStatusCount',
+              reason: 'requestPermissionsCount',
             );
           });
 
@@ -474,16 +553,16 @@ void testNotificationScenario() => group(_scenarioName, () {
             testWidgets("No thrown.", (widgetTester) async {
               widgetTester.ignoreMockMethodCallHandler(
                   MethodChannelMock.flutterLocalNotifications);
-              int checkPermissionStatusCount = 0;
+              int requestPermissionsCount = 0;
               widgetTester.setMockMethodCallHandler(
-                MethodChannelMock.permissionHandler,
+                MethodChannelMock.mem,
                 [
                   ...List.generate(
                     2,
                     (i) => (m) async {
-                      expect(m.method, 'checkPermissionStatus');
-                      checkPermissionStatusCount++;
-                      return 1;
+                      expect(m.method, requestPermissions);
+                      requestPermissionsCount++;
+                      return true;
                     },
                   ),
                   (m) => fail("Too many call."),
@@ -503,9 +582,9 @@ void testNotificationScenario() => group(_scenarioName, () {
               await onNotificationResponseReceived(details);
 
               expect(
-                checkPermissionStatusCount,
+                requestPermissionsCount,
                 equals(2),
-                reason: 'checkPermissionStatusCount',
+                reason: 'requestPermissionsCount',
               );
             });
           });

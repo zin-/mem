@@ -19,7 +19,8 @@ class NotificationRepository extends KeyWithValueRepository<Notification, int>
   @override
   Future<void> receive(Notification entity) => v(
         () async {
-          if (await PermissionHandlerWrapper().grant(Permission.notification)) {
+          if (await PermissionHandlerWrapper()
+              .request([Permission.notification])) {
             await _flutterLocalNotificationsWrapper?.show(
               entity.key,
               entity.title,

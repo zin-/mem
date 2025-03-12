@@ -258,6 +258,7 @@ void testTaskScenario() => group(': $_scenarioName', () {
           testWidgets(
             ": start is all day.",
             (widgetTester) async {
+              widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
               widgetTester.ignoreMockMethodCallHandler(
                   MethodChannelMock.permissionHandler);
 
@@ -344,6 +345,7 @@ void testTaskScenario() => group(': $_scenarioName', () {
 
           testWidgets(': start is not all day, end is all day.',
               (widgetTester) async {
+                widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
             widgetTester.ignoreMockMethodCallHandler(
                 MethodChannelMock.permissionHandler);
 

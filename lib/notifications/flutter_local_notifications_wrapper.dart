@@ -1,6 +1,7 @@
 import 'dart:convert';
 
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart'
+    as fln;
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/main.dart';
 
@@ -14,17 +15,17 @@ class FlutterLocalNotificationsWrapper {
 
   final String androidDefaultIconPath;
 
-  Future<FlutterLocalNotificationsPlugin>
+  Future<fln.FlutterLocalNotificationsPlugin>
       get _flutterLocalNotificationsPlugin => v(
             () async {
               final flutterLocalNotificationsPlugin =
-                  FlutterLocalNotificationsPlugin();
+                  fln.FlutterLocalNotificationsPlugin();
               if (!_pluginIsInitializing) {
                 _pluginIsInitializing = true;
                 await flutterLocalNotificationsPlugin.initialize(
-                  InitializationSettings(
-                    android:
-                        AndroidInitializationSettings(androidDefaultIconPath),
+                  fln.InitializationSettings(
+                    android: fln.AndroidInitializationSettings(
+                        androidDefaultIconPath),
                   ),
                   onDidReceiveNotificationResponse:
                       onNotificationResponseReceived,
@@ -80,9 +81,7 @@ class FlutterLocalNotificationsWrapper {
             id,
             title,
             body,
-            _buildNotificationDetails(
-              channel,
-            ),
+            channel.convert(),
             payload: jsonEncode(payload),
           );
         },
@@ -114,7 +113,7 @@ class FlutterLocalNotificationsWrapper {
         () async {
           final p = (await _flutterLocalNotificationsPlugin)
               .resolvePlatformSpecificImplementation<
-                  AndroidFlutterLocalNotificationsPlugin>();
+                  fln.AndroidFlutterLocalNotificationsPlugin>();
 
           for (var e in channelIds) {
             await p?.deleteNotificationChannel(e);
@@ -125,24 +124,6 @@ class FlutterLocalNotificationsWrapper {
 // coverage:ignore-end
           'channelIds': channelIds,
         },
-      );
-
-  NotificationDetails _buildNotificationDetails(
-    NotificationChannel channel,
-  ) =>
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          channel.id,
-          channel.name,
-          channelDescription: channel.description,
-          actions: channel.actionList
-              .map((e) => AndroidNotificationAction(e.id, e.title))
-              .toList(growable: false),
-          usesChronometer: channel.usesChronometer,
-          ongoing: channel.ongoing,
-          autoCancel: channel.autoCancel,
-          playSound: channel.playSound,
-        ),
       );
 
   Future<bool> handleAppLaunchDetails() => v(
@@ -171,7 +152,7 @@ class FlutterLocalNotificationsWrapper {
 }
 
 Future<void> onDidReceiveNotificationResponse(
-  NotificationResponse details,
+  fln.NotificationResponse details,
   Future<void> Function(dynamic memId) onSelected,
   Future<void> Function(
     String? actionId,
@@ -185,13 +166,13 @@ Future<void> onDidReceiveNotificationResponse(
             notificationPayload == null ? {} : json.decode(notificationPayload);
 
         switch (details.notificationResponseType) {
-          case NotificationResponseType.selectedNotification:
+          case fln.NotificationResponseType.selectedNotification:
             if (payload.containsKey(memIdKey)) {
               await onSelected(payload[memIdKey]);
             }
             break;
 
-          case NotificationResponseType.selectedNotificationAction:
+          case fln.NotificationResponseType.selectedNotificationAction:
             await onActionSelected(
               details.actionId,
               payload[memIdKey],
@@ -207,3 +188,29 @@ Future<void> onDidReceiveNotificationResponse(
         'payload': details.payload,
       },
     );
+
+extension on NotificationChannel {
+  fln.NotificationDetails convert() => fln.NotificationDetails(
+        android: fln.AndroidNotificationDetails(
+          id,
+          name,
+          channelDescription: description,
+          importance: importance.convert(),
+          groupKey: groupKey,
+          actions: actionList
+              .map((e) => fln.AndroidNotificationAction(e.id, e.title))
+              .toList(growable: false),
+          usesChronometer: usesChronometer,
+          ongoing: ongoing,
+          autoCancel: autoCancel,
+          playSound: playSound,
+        ),
+      );
+}
+
+extension on Importance {
+  fln.Importance convert() => switch (this) {
+        Importance.mid => fln.Importance.defaultImportance,
+        Importance.high => fln.Importance.high,
+      };
+}
