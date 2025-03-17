@@ -20,9 +20,9 @@ import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/mems/mem_notification_entity.dart';
 import 'package:mem/mems/mem_notification_repository.dart';
 import 'package:mem/mems/mem_repository.dart';
+import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification_client.dart';
 import 'package:mem/notifications/notification/type.dart';
-import 'package:mem/notifications/notification_ids.dart';
 import 'package:mem/settings/preference/client.dart';
 import 'package:mem/settings/preference/repository.dart';
 import 'package:mem/settings/preference/preference.dart';
@@ -556,32 +556,17 @@ void main() => group(
                       initializeCount++;
                       return true;
                     },
-                    (m) async {
+                    ...List.filled(10, (m) async {
                       expect(m.method, equals('cancelTaskByUniqueName'));
                       cancelTaskByUniqueNameCount++;
-                      return true;
-                    },
-                    (m) async {
-                      expect(m.method, equals('cancelTaskByUniqueName'));
-                      cancelTaskByUniqueNameCount++;
-                      return true;
-                    },
-                    (m) async {
-                      expect(m.method, equals('cancelTaskByUniqueName'));
-                      cancelTaskByUniqueNameCount++;
-                      return true;
-                    },
-                    (m) async {
-                      expect(m.method, equals('cancelTaskByUniqueName'));
-                      cancelTaskByUniqueNameCount++;
-                      return true;
-                    },
+                      return false;
+                    }),
                     (m) async {
                       expect(m.method, equals('registerOneOffTask'));
                       registerOneOffTaskCount++;
                       return true;
                     },
-                    (m) async => fail("Too many call."),
+                    (m) => fail("Too many call: { called method: $m}."),
                   ],
                 );
 
@@ -600,7 +585,7 @@ void main() => group(
                 expect(
                   cancelTaskByUniqueNameCount,
                   equals(
-                    defaultTargetPlatform == TargetPlatform.android ? 4 : 0,
+                    defaultTargetPlatform == TargetPlatform.android ? 10 : 0,
                   ),
                   reason: 'cancelTaskByUniqueNameCount',
                 );
@@ -637,137 +622,110 @@ void main() => group(
               },
             );
 
-            testWidgets(
-              "Execute.",
-              (widgetTester) async {
-                widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
-                widgetTester.ignoreMockMethodCallHandler(
-                    MethodChannelMock.permissionHandler);
+            testWidgets('Execute.', (widgetTester) async {
+              widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
+              widgetTester.ignoreMockMethodCallHandler(
+                  MethodChannelMock.permissionHandler);
+              widgetTester.ignoreMockMethodCallHandler(
+                  MethodChannelMock.workmanagerForeground);
 
-                int workmanagerInitializeCount = 0;
-                int cancelTaskByUniqueNameCount = 0;
-                final cancelIds = insertedMemIds
-                    .map(
-                      (e) => [
-                        memStartNotificationId(e),
-                        memEndNotificationId(e),
-                        memRepeatedNotificationId(e),
-                      ],
-                    )
-                    .flattened;
-                widgetTester.setMockMethodCallHandler(
-                  MethodChannelMock.workmanagerForeground,
-                  [
-                    (m) async {
-                      expect(m.method, equals('initialize'));
-                      workmanagerInitializeCount++;
-                      return true;
-                    },
-                    ...cancelIds.map((e) => (m) async {
-                          expect(m.method, equals('cancelTaskByUniqueName'));
-                          cancelTaskByUniqueNameCount++;
-                          return false;
-                        }),
-                  ],
-                );
+              final cancelIds = insertedMemIds
+                  .map(
+                    (e) => AllMemNotificationsId.of(e),
+                  )
+                  .flattened;
 
-                int flutterLocalNotificationsInitializeCount = 0;
-                int getNotificationAppLaunchDetailsCount = 0;
-                int cancelAllCount = 0;
-                int deleteNotificationChannelCount = 0;
-                widgetTester.setMockMethodCallHandler(
-                    MethodChannelMock.flutterLocalNotifications, [
-                  (m) async {
-                    expect(m.method, equals('initialize'));
-                    flutterLocalNotificationsInitializeCount++;
-                    return true;
-                  },
-                  (m) async {
-                    expect(m.method, equals('getNotificationAppLaunchDetails'));
-                    getNotificationAppLaunchDetailsCount++;
+              int flutterLocalNotificationsInitializeCount = 0;
+              int getNotificationAppLaunchDetailsCount = 0;
+              int cancelAllCount = 0;
+              int deleteNotificationChannelCount = 0;
+              int cancelCount = 0;
+              widgetTester.setMockMethodCallHandler(
+                  MethodChannelMock.flutterLocalNotifications, [
+                (m) async {
+                  expect(m.method, equals('initialize'));
+                  flutterLocalNotificationsInitializeCount++;
+                  return true;
+                },
+                (m) async {
+                  expect(m.method, equals('getNotificationAppLaunchDetails'));
+                  getNotificationAppLaunchDetailsCount++;
+                  return null;
+                },
+                (m) async {
+                  expect(m.method, equals('cancelAll'));
+                  cancelAllCount++;
+                  return null;
+                },
+                ...NotificationType.values.map(
+                  (e) => (m) async {
+                    expect(m.method, equals('deleteNotificationChannel'));
+                    deleteNotificationChannelCount++;
                     return null;
                   },
-                  (m) async {
-                    expect(m.method, equals('cancelAll'));
-                    cancelAllCount++;
-                    return null;
-                  },
-                  ...NotificationType.values.map(
-                    (e) => (m) async {
-                      expect(m.method, equals('deleteNotificationChannel'));
-                      deleteNotificationChannelCount++;
-                      return null;
-                    },
-                  ),
-                ]);
+                ),
+                ...cancelIds.map((e) => (m) async {
+                      expect(m.method, equals('cancel'));
+                      cancelCount++;
+                      return false;
+                    }),
+              ]);
 
-                await runApplication();
-                await widgetTester.pumpAndSettle();
+              await runApplication();
+              await widgetTester.pumpAndSettle();
 
-                await widgetTester.tap(drawerIconFinder);
-                await widgetTester.pumpAndSettle();
-                await widgetTester.tap(find.text(l10n.settingsPageTitle));
-                await widgetTester.pumpAndSettle();
+              await widgetTester.tap(drawerIconFinder);
+              await widgetTester.pumpAndSettle();
+              await widgetTester.tap(find.text(l10n.settingsPageTitle));
+              await widgetTester.pumpAndSettle();
 
-                await widgetTester.tap(find.text(l10n.resetNotificationLabel));
+              await widgetTester.tap(find.text(l10n.resetNotificationLabel));
+              await widgetTester.pump();
+
+              expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+              var indicator = widgetTester
+                  .elementList(find.byType(CircularProgressIndicator));
+              while (indicator.length == 1) {
                 await widgetTester.pump();
-
-                expect(find.byType(CircularProgressIndicator), findsOneWidget);
-
-                var indicator = widgetTester
+                indicator = widgetTester
                     .elementList(find.byType(CircularProgressIndicator));
-                while (indicator.length == 1) {
-                  await widgetTester.pump();
-                  indicator = widgetTester
-                      .elementList(find.byType(CircularProgressIndicator));
-                }
+              }
 
-                expect(find.byType(CircularProgressIndicator), findsNothing);
-                expect(
-                    find.text(l10n.completeResetNotification), findsOneWidget);
+              expect(find.byType(CircularProgressIndicator), findsNothing);
+              expect(find.text(l10n.completeResetNotification), findsOneWidget);
 
-                expect(
-                  workmanagerInitializeCount,
-                  equals(
-                      defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
-                  reason: 'workmanagerInitializeCount',
-                );
-                expect(
-                  cancelTaskByUniqueNameCount,
-                  equals(defaultTargetPlatform == TargetPlatform.android
-                      ? 300
-                      : 0),
-                  reason: 'cancelTaskByUniqueNameCount',
-                );
-                expect(
-                  flutterLocalNotificationsInitializeCount,
-                  equals(
-                      defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
-                  reason: 'flutterLocalNotificationsInitializeCount',
-                );
-                expect(
-                  getNotificationAppLaunchDetailsCount,
-                  equals(
-                      defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
-                  reason: 'getNotificationAppLaunchDetailsCount',
-                );
-                expect(
-                  cancelAllCount,
-                  equals(
-                      defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
-                  reason: 'cancelAllCount',
-                );
-                expect(
-                  deleteNotificationChannelCount,
-                  equals(defaultTargetPlatform == TargetPlatform.android
-                      ? NotificationType.values.length
-                      : 0),
-                  reason: 'deleteNotificationChannelCount',
-                );
+              expect(
+                flutterLocalNotificationsInitializeCount,
+                equals(defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
+                reason: 'flutterLocalNotificationsInitializeCount',
+              );
+              expect(
+                getNotificationAppLaunchDetailsCount,
+                equals(defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
+                reason: 'getNotificationAppLaunchDetailsCount',
+              );
+              expect(
+                cancelAllCount,
+                equals(defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
+                reason: 'cancelAllCount',
+              );
+              expect(
+                deleteNotificationChannelCount,
+                equals(defaultTargetPlatform == TargetPlatform.android
+                    ? NotificationType.values.length
+                    : 0),
+                reason: 'deleteNotificationChannelCount',
+              );
+              expect(
+                cancelCount,
+                equals(
+                    defaultTargetPlatform == TargetPlatform.android ? 600 : 0),
+                reason: 'cancelCount',
+              );
 
-                widgetTester.clearAllMockMethodCallHandler();
-              },
-            );
+              widgetTester.clearAllMockMethodCallHandler();
+            });
           },
         );
       },
