@@ -191,26 +191,22 @@ void main() => group(': $_name', () {
         widgetTester.setMockMethodCallHandler(
           MethodChannelMock.workmanagerForeground,
           [
-            (message) async {
-              expect(message.method, equals('initialize'));
+            (m) async {
+              expect(m.method, equals('initialize'));
               initializeCount++;
               return true;
             },
-            (message) async {
-              expect(message.method, equals('cancelTaskByUniqueName'));
+            ...List.filled(8, (m) async {
+              expect(m.method, equals('cancelTaskByUniqueName'));
               cancelTaskByUniqueNameCount++;
               return false;
-            },
-            (message) async {
-              expect(message.method, equals('cancelTaskByUniqueName'));
-              cancelTaskByUniqueNameCount++;
-              return false;
-            },
-            (message) async {
-              expect(message.method, equals('registerPeriodicTask'));
+            }),
+            (m) async {
+              expect(m.method, equals('registerPeriodicTask'));
               registerPeriodicTaskCount++;
               return false;
             },
+            (m) => fail("Too many call: { called method: $m}."),
           ],
         );
 
@@ -280,7 +276,7 @@ void main() => group(': $_name', () {
           );
           expect(
             cancelTaskByUniqueNameCount,
-            equals(defaultTargetPlatform == TargetPlatform.android ? 2 : 0),
+            equals(defaultTargetPlatform == TargetPlatform.android ? 8 : 0),
             reason: 'cancelTaskByUniqueNameCount',
           );
           expect(
