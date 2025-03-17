@@ -170,7 +170,7 @@ extension HandleMockMethodCallHandler on WidgetTester {
     setMockMethodCallHandler(
         methodChannelMock,
         List.generate(
-            300,
+            1000,
             (index) => (m) async {
                   switch (methodChannelMock) {
                     case MethodChannelMock.mem:
