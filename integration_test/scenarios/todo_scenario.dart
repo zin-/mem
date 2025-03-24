@@ -64,202 +64,182 @@ void testTodoScenario() => group(': $_scenarioName', () {
         });
       });
 
-      group(
-        ": show",
-        () {
-          testWidgets(
-            ": list: initial.",
-            (widgetTester) async {
-              await runApplication();
-              await widgetTester.pumpAndSettle();
+      group(": show", () {
+        testWidgets(": list: initial.", (widgetTester) async {
+          await runApplication();
+          await widgetTester.pumpAndSettle();
 
-              expect(find.text(insertedMemName), findsOneWidget);
-              expect(find.text(undoneMemName), findsOneWidget);
-              expect(find.text(doneMemName), findsNothing);
+          expect(find.text(insertedMemName), findsOneWidget);
+          expect(find.text(undoneMemName), findsOneWidget);
+          expect(find.text(doneMemName), findsNothing);
 
-              await widgetTester.tap(filterListIconFinder);
-              await widgetTester.pumpAndSettle();
+          await widgetTester.tap(filterListIconFinder);
+          await widgetTester.pumpAndSettle();
 
-              expect(
-                widgetTester.widget<Switch>(find.byType(Switch).at(2)).value,
-                true,
-              );
-              expect(
-                widgetTester.widget<Switch>(find.byType(Switch).at(3)).value,
-                false,
-              );
-            },
+          expect(
+            widgetTester.widget<Switch>(find.byType(Switch).at(2)).value,
+            true,
           );
-        },
-      );
-
-      group(': done & undone', () {
-        testWidgets(
-          ': MemDetailPage.',
-          (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
-
-            expect(find.text(undoneMemName), findsOneWidget);
-            expect(find.text(doneMemName), findsNothing);
-            await widgetTester.tap(find.text(insertedMemName));
-            await widgetTester.pumpAndSettle();
-            await widgetTester.tap(find.byType(Checkbox));
-            await widgetTester.pumpAndSettle();
-            await widgetTester.tap(saveMemFabFinder);
-            await widgetTester.pumpAndSettle();
-            await widgetTester.pageBack();
-            await widgetTester.pumpAndSettle();
-
-            expect(find.text(insertedMemName), findsNothing);
-            expect(find.text(undoneMemName), findsOneWidget);
-            expect(find.text(doneMemName), findsNothing);
-            await widgetTester.tap(filterListIconFinder);
-            await widgetTester.pumpAndSettle();
-            await widgetTester.tap(find.byType(Switch).at(3));
-            await closeMemListFilter(widgetTester);
-            await widgetTester.pumpAndSettle(defaultTransitionDuration);
-
-            expect(find.text(insertedMemName), findsOneWidget);
-            expect(find.text(undoneMemName), findsOneWidget);
-            expect(find.text(doneMemName), findsOneWidget);
-            await widgetTester.tap(find.text(insertedMemName));
-            await widgetTester.pumpAndSettle();
-            await widgetTester.tap(find.byType(Checkbox));
-            await widgetTester.pumpAndSettle();
-            await widgetTester.tap(saveMemFabFinder);
-            await widgetTester.pumpAndSettle();
-            await widgetTester.pageBack();
-            await widgetTester.pumpAndSettle();
-
-            await widgetTester.tap(filterListIconFinder);
-            await widgetTester.pumpAndSettle();
-            await widgetTester.tap(find.byType(Switch).at(2));
-            await closeMemListFilter(widgetTester);
-            await widgetTester.pumpAndSettle(defaultTransitionDuration);
-
-            expect(find.text(insertedMemName), findsNothing);
-            expect(find.text(undoneMemName), findsNothing);
-            expect(find.text(doneMemName), findsOneWidget);
-          },
-        );
-
-        testWidgets(
-          ': MemListPage.',
-          (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
-
-            expect(find.text(insertedMemName), findsOneWidget);
-            expect(find.text(undoneMemName), findsOneWidget);
-            expect(find.text(doneMemName), findsNothing);
-            await widgetTester.tap(find.byType(Checkbox).at(0));
-            await widgetTester.pumpAndSettle();
-
-            expect(find.text(insertedMemName), findsNothing);
-            expect(find.text(undoneMemName), findsOneWidget);
-            expect(find.text(doneMemName), findsNothing);
-            await widgetTester.tap(filterListIconFinder);
-            await widgetTester.pumpAndSettle();
-            await widgetTester.tap(find.byType(Switch).at(2));
-            await closeMemListFilter(widgetTester);
-            await widgetTester.pumpAndSettle(defaultTransitionDuration);
-
-            expect(find.text(insertedMemName), findsOneWidget);
-            expect(find.text(undoneMemName), findsOneWidget);
-            expect(find.text(doneMemName), findsOneWidget);
-            await widgetTester.tap(find.byType(Checkbox).at(1));
-            await widgetTester.pumpAndSettle();
-
-            expect(find.text(insertedMemName), findsOneWidget);
-            expect(find.text(undoneMemName), findsOneWidget);
-            expect(find.text(doneMemName), findsOneWidget);
-            await widgetTester.tap(filterListIconFinder);
-            await widgetTester.pumpAndSettle();
-            await widgetTester.tap(find.byType(Switch).at(3));
-            await closeMemListFilter(widgetTester);
-            await widgetTester.pumpAndSettle(defaultTransitionDuration);
-
-            expect(find.text(insertedMemName), findsNothing);
-            expect(find.text(undoneMemName), findsNothing);
-            expect(find.text(doneMemName), findsOneWidget);
-          },
-        );
+          expect(
+            widgetTester.widget<Switch>(find.byType(Switch).at(3)).value,
+            false,
+          );
+        });
       });
 
-      testWidgets(
-        'not notify on done mem.',
-        (widgetTester) async {
-          int flutterLocalNotificationsInitializeCount = 0;
-          int cancelCount = 0;
-          widgetTester.setMockMethodCallHandler(
-            MethodChannelMock.flutterLocalNotifications,
-            [
-              (message) async {
-                expect(message.method, equals('initialize'));
-                flutterLocalNotificationsInitializeCount++;
-                return true;
-              },
-              ...AllMemNotificationsId.of(insertedMemDoneId!).map(
-                (e) => (message) async {
-                  expect(message.method, equals('cancel'));
-                  expect(message.arguments['id'], equals(e));
-                  cancelCount++;
-                  return false;
-                },
-              ),
-            ],
-          );
+      group(': done & undone', () {
+        testWidgets(': MemDetailPage.', (widgetTester) async {
+          await runApplication();
+          await widgetTester.pumpAndSettle();
 
-          int workmanagerInitializeCount = 0;
-          int cancelTaskByUniqueNameCount = 0;
-          widgetTester.setMockMethodCallHandler(
-            MethodChannelMock.workmanagerForeground,
-            [
-              (message) async {
-                expect(message.method, equals('initialize'));
-                workmanagerInitializeCount++;
-                return true;
-              },
-              ...AllMemNotificationsId.of(insertedMemDoneId!).map(
-                (e) => (message) async {
-                  expect(message.method, equals('cancelTaskByUniqueName'));
-                  cancelTaskByUniqueNameCount++;
-                  return false;
-                },
-              ),
-              (m) => fail("Too many call."),
-            ],
-          );
+          expect(find.text(undoneMemName), findsOneWidget);
+          expect(find.text(doneMemName), findsNothing);
+          await widgetTester.tap(find.text(insertedMemName));
+          await widgetTester.pumpAndSettle();
+          await widgetTester.tap(find.byType(Checkbox));
+          await widgetTester.pumpAndSettle();
+          await widgetTester.tap(saveMemFabFinder);
+          await widgetTester.pumpAndSettle();
+          await widgetTester.pageBack();
+          await widgetTester.pumpAndSettle();
 
-          WorkmanagerWrapper(callbackDispatcher: helperCallback);
-          await NotificationClient().show(
-            NotificationType.startMem,
-            insertedMemDoneId!,
-          );
+          expect(find.text(insertedMemName), findsNothing);
+          expect(find.text(undoneMemName), findsOneWidget);
+          expect(find.text(doneMemName), findsNothing);
+          await widgetTester.tap(filterListIconFinder);
+          await widgetTester.pumpAndSettle();
+          await widgetTester.tap(find.byType(Switch).at(3));
+          await closeMemListFilter(widgetTester);
+          await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-          expect(
-            flutterLocalNotificationsInitializeCount,
-            equals(defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
-            reason: 'flutterLocalNotificationsInitializeCount',
-          );
-          expect(
-            cancelCount,
-            equals(defaultTargetPlatform == TargetPlatform.android ? 6 : 0),
-            reason: 'cancelCount',
-          );
-          expect(
-            workmanagerInitializeCount,
-            equals(defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
-            reason: 'workmanagerInitializeCount',
-          );
-          expect(
-            cancelTaskByUniqueNameCount,
-            equals(defaultTargetPlatform == TargetPlatform.android ? 6 : 0),
-            reason: 'alarmCancelCount',
-          );
+          expect(find.text(insertedMemName), findsOneWidget);
+          expect(find.text(undoneMemName), findsOneWidget);
+          expect(find.text(doneMemName), findsOneWidget);
+          await widgetTester.tap(find.text(insertedMemName));
+          await widgetTester.pumpAndSettle();
+          await widgetTester.tap(find.byType(Checkbox));
+          await widgetTester.pumpAndSettle();
+          await widgetTester.tap(saveMemFabFinder);
+          await widgetTester.pumpAndSettle();
+          await widgetTester.pageBack();
+          await widgetTester.pumpAndSettle();
 
-          widgetTester.clearAllMockMethodCallHandler();
-        },
-      );
+          await widgetTester.tap(filterListIconFinder);
+          await widgetTester.pumpAndSettle();
+          await widgetTester.tap(find.byType(Switch).at(2));
+          await closeMemListFilter(widgetTester);
+          await widgetTester.pumpAndSettle(defaultTransitionDuration);
+
+          expect(find.text(insertedMemName), findsNothing);
+          expect(find.text(undoneMemName), findsNothing);
+          expect(find.text(doneMemName), findsOneWidget);
+        });
+
+        testWidgets(': MemListPage.', (widgetTester) async {
+          await runApplication();
+          await widgetTester.pumpAndSettle();
+
+          expect(find.text(insertedMemName), findsOneWidget);
+          expect(find.text(undoneMemName), findsOneWidget);
+          expect(find.text(doneMemName), findsNothing);
+          await widgetTester.tap(find.byType(Checkbox).at(0));
+          await widgetTester.pumpAndSettle();
+
+          expect(find.text(insertedMemName), findsNothing);
+          expect(find.text(undoneMemName), findsOneWidget);
+          expect(find.text(doneMemName), findsNothing);
+          await widgetTester.tap(filterListIconFinder);
+          await widgetTester.pumpAndSettle();
+          await widgetTester.tap(find.byType(Switch).at(2));
+          await closeMemListFilter(widgetTester);
+          await widgetTester.pumpAndSettle(defaultTransitionDuration);
+
+          expect(find.text(insertedMemName), findsOneWidget);
+          expect(find.text(undoneMemName), findsOneWidget);
+          expect(find.text(doneMemName), findsOneWidget);
+          await widgetTester.tap(find.byType(Checkbox).at(1));
+          await widgetTester.pumpAndSettle();
+
+          expect(find.text(insertedMemName), findsOneWidget);
+          expect(find.text(undoneMemName), findsOneWidget);
+          expect(find.text(doneMemName), findsOneWidget);
+          await widgetTester.tap(filterListIconFinder);
+          await widgetTester.pumpAndSettle();
+          await widgetTester.tap(find.byType(Switch).at(3));
+          await closeMemListFilter(widgetTester);
+          await widgetTester.pumpAndSettle(defaultTransitionDuration);
+
+          expect(find.text(insertedMemName), findsNothing);
+          expect(find.text(undoneMemName), findsNothing);
+          expect(find.text(doneMemName), findsOneWidget);
+        });
+      });
+
+      testWidgets('not notify on done mem.', (widgetTester) async {
+        int flutterLocalNotificationsInitializeCount = 0;
+        int cancelCount = 0;
+        widgetTester.setMockMethodCallHandler(
+            MethodChannelMock.flutterLocalNotifications, [
+          (message) async {
+            expect(message.method, equals('initialize'));
+            flutterLocalNotificationsInitializeCount++;
+            return true;
+          },
+          ...AllMemNotificationsId.of(insertedMemDoneId!).map(
+            (e) => (message) async {
+              expect(message.method, equals('cancel'));
+              expect(message.arguments['id'], equals(e));
+              cancelCount++;
+              return false;
+            },
+          ),
+        ]);
+
+        int workmanagerInitializeCount = 0;
+        int cancelTaskByUniqueNameCount = 0;
+        widgetTester
+            .setMockMethodCallHandler(MethodChannelMock.workmanagerForeground, [
+          (message) async {
+            expect(message.method, equals('initialize'));
+            workmanagerInitializeCount++;
+            return true;
+          },
+          ...AllMemNotificationsId.of(insertedMemDoneId!).map(
+            (e) => (message) async {
+              expect(message.method, equals('cancelTaskByUniqueName'));
+              cancelTaskByUniqueNameCount++;
+              return false;
+            },
+          ),
+        ]);
+
+        WorkmanagerWrapper(callbackDispatcher: helperCallback);
+        await NotificationClient().show(
+          NotificationType.startMem,
+          insertedMemDoneId!,
+        );
+
+        expect(
+          flutterLocalNotificationsInitializeCount,
+          equals(defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
+          reason: 'flutterLocalNotificationsInitializeCount',
+        );
+        expect(
+          cancelCount,
+          equals(defaultTargetPlatform == TargetPlatform.android ? 6 : 0),
+          reason: 'cancelCount',
+        );
+        expect(
+          workmanagerInitializeCount,
+          equals(defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
+          reason: 'workmanagerInitializeCount',
+        );
+        expect(
+          cancelTaskByUniqueNameCount,
+          equals(defaultTargetPlatform == TargetPlatform.android ? 6 : 0),
+          reason: 'alarmCancelCount',
+        );
+
+        widgetTester.clearAllMockMethodCallHandler();
+      });
     });

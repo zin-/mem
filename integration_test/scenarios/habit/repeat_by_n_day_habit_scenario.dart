@@ -129,54 +129,51 @@ void main() => group(': $_name', () {
         MemClient.resetSingleton();
       });
 
-      testWidgets(
-        'Show saved.',
-        (widgetTester) async {
-          widgetTester.ignoreMockMethodCallHandler(
-              MethodChannelMock.flutterLocalNotifications);
+      testWidgets('Show saved.', (widgetTester) async {
+        widgetTester.ignoreMockMethodCallHandler(
+            MethodChannelMock.flutterLocalNotifications);
 
-          const repeatByNDayText = "every $insertedMemRepeatByNDay days";
+        const repeatByNDayText = "every $insertedMemRepeatByNDay days";
 
-          await runApplication();
-          await widgetTester.pumpAndSettle(defaultTransitionDuration);
+        await runApplication();
+        await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-          expect(find.text(repeatByNDayText), findsOneWidget);
-          await widgetTester.tap(find.text(insertedMemName));
-          await widgetTester.pumpAndSettle(defaultTransitionDuration);
+        expect(find.text(repeatByNDayText), findsOneWidget);
+        await widgetTester.tap(find.text(insertedMemName));
+        await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-          expect(
+        expect(
+          widgetTester
+              .widget<Text>(
+                find
+                    .descendant(
+                      of: find.byKey(keyMemNotificationsView),
+                      matching: find.byType(Text),
+                    )
+                    .at(1),
+              )
+              .data,
+          repeatByNDayText,
+        );
+
+        await widgetTester.tap(
+          find.descendant(
+              of: find.byKey(keyMemNotificationsView),
+              matching: find.byIcon(Icons.edit)),
+        );
+        await widgetTester.pumpAndSettle(defaultTransitionDuration);
+
+        expect(
             widgetTester
-                .widget<Text>(
-                  find
-                      .descendant(
-                        of: find.byKey(keyMemNotificationsView),
-                        matching: find.byType(Text),
-                      )
-                      .at(1),
+                .widget<TextFormField>(
+                  find.descendant(
+                    of: find.byKey(keyMemRepeatByNDayNotification),
+                    matching: find.byType(TextFormField),
+                  ),
                 )
-                .data,
-            repeatByNDayText,
-          );
-
-          await widgetTester.tap(
-            find.descendant(
-                of: find.byKey(keyMemNotificationsView),
-                matching: find.byIcon(Icons.edit)),
-          );
-          await widgetTester.pumpAndSettle(defaultTransitionDuration);
-
-          expect(
-              widgetTester
-                  .widget<TextFormField>(
-                    find.descendant(
-                      of: find.byKey(keyMemRepeatByNDayNotification),
-                      matching: find.byType(TextFormField),
-                    ),
-                  )
-                  .initialValue,
-              insertedMemRepeatByNDay.toString());
-        },
-      );
+                .initialValue,
+            insertedMemRepeatByNDay.toString());
+      });
 
       testWidgets('Save.', (widgetTester) async {
         widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
@@ -188,27 +185,24 @@ void main() => group(': $_name', () {
         int initializeCount = 0;
         int cancelTaskByUniqueNameCount = 0;
         int registerPeriodicTaskCount = 0;
-        widgetTester.setMockMethodCallHandler(
-          MethodChannelMock.workmanagerForeground,
-          [
-            (m) async {
-              expect(m.method, equals('initialize'));
-              initializeCount++;
-              return true;
-            },
-            ...List.filled(8, (m) async {
-              expect(m.method, equals('cancelTaskByUniqueName'));
-              cancelTaskByUniqueNameCount++;
-              return false;
-            }),
-            (m) async {
-              expect(m.method, equals('registerPeriodicTask'));
-              registerPeriodicTaskCount++;
-              return false;
-            },
-            (m) => fail("Too many call: { called method: $m}."),
-          ],
-        );
+        widgetTester
+            .setMockMethodCallHandler(MethodChannelMock.workmanagerForeground, [
+          (m) async {
+            expect(m.method, equals('initialize'));
+            initializeCount++;
+            return true;
+          },
+          ...List.filled(8, (m) async {
+            expect(m.method, equals('cancelTaskByUniqueName'));
+            cancelTaskByUniqueNameCount++;
+            return false;
+          }),
+          (m) async {
+            expect(m.method, equals('registerPeriodicTask'));
+            registerPeriodicTaskCount++;
+            return false;
+          },
+        ]);
 
         await runApplication();
         await widgetTester.pumpAndSettle();

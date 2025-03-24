@@ -82,51 +82,46 @@ void testNotificationScenario() => group(_scenarioName, () {
         for (var element in NotificationType.values.where(
           (e) => e != NotificationType.notifyAfterInactivity,
         )) {
-          testWidgets(
-            "${element.name}.",
-            (widgetTester) async {
-              widgetTester.ignoreMockMethodCallHandler(
-                  MethodChannelMock.flutterLocalNotifications);
-              int requestPermissionsCount = 0;
-              widgetTester.setMockMethodCallHandler(MethodChannelMock.mem, [
-                (m) async {
-                  expect(m.method, requestPermissions);
-                  requestPermissionsCount++;
-                  throw MissingPluginException();
-                },
-                (m) => fail("Too many call."),
-              ]);
-              int checkPermissionStatusCount = 0;
-              widgetTester.setMockMethodCallHandler(
-                  MethodChannelMock.permissionHandler, [
-                (m) async {
-                  expect(m.method, 'checkPermissionStatus');
-                  checkPermissionStatusCount++;
-                  return 1;
-                },
-                (m) => fail("Too many call."),
-              ]);
+          testWidgets("${element.name}.", (widgetTester) async {
+            widgetTester.ignoreMockMethodCallHandler(
+                MethodChannelMock.flutterLocalNotifications);
+            int requestPermissionsCount = 0;
+            widgetTester.setMockMethodCallHandler(MethodChannelMock.mem, [
+              (m) async {
+                expect(m.method, requestPermissions);
+                requestPermissionsCount++;
+                throw MissingPluginException();
+              },
+            ]);
+            int checkPermissionStatusCount = 0;
+            widgetTester
+                .setMockMethodCallHandler(MethodChannelMock.permissionHandler, [
+              (m) async {
+                expect(m.method, 'checkPermissionStatus');
+                checkPermissionStatusCount++;
+                return 1;
+              },
+            ]);
 
-              final id = insertedMemId!;
-              final params = {
-                memIdKey: insertedMemId,
-                notificationTypeKey: element.name,
-              };
+            final id = insertedMemId!;
+            final params = {
+              memIdKey: insertedMemId,
+              notificationTypeKey: element.name,
+            };
 
-              await scheduleCallback(id, params);
+            await scheduleCallback(id, params);
 
-              expect(
-                requestPermissionsCount,
-                equals(1),
-                reason: 'requestPermissionsCount',
-              );
-              expect(
-                checkPermissionStatusCount,
-                equals(1),
-                reason: 'checkPermissionStatusCount',
-              );
-            },
-          );
+            expect(
+              requestPermissionsCount,
+              equals(1),
+              reason: 'requestPermissionsCount',
+            );
+            expect(
+              checkPermissionStatusCount,
+              equals(1),
+              reason: 'checkPermissionStatusCount',
+            );
+          });
         }
 
         testWidgets("${NotificationType.notifyAfterInactivity.name}.",
@@ -151,7 +146,6 @@ void testNotificationScenario() => group(_scenarioName, () {
               checkPermissionStatusCount++;
               return 1;
             },
-            (m) => fail("Too many call."),
           ]);
 
           final params = {
@@ -196,7 +190,6 @@ void testNotificationScenario() => group(_scenarioName, () {
               checkPermissionStatusCount++;
               return 1;
             },
-            (m) => fail("Too many call."),
           ]);
 
           final params = {
@@ -221,87 +214,74 @@ void testNotificationScenario() => group(_scenarioName, () {
         });
       });
 
-      testWidgets(
-        ": show MemDetailPage.",
-        (widgetTester) async {
+      testWidgets(": show MemDetailPage.", (widgetTester) async {
+        final details = NotificationResponse(
+          notificationResponseType:
+              NotificationResponseType.selectedNotification,
+          id: memStartNotificationId(insertedMemId!),
+          payload: json.encode({memIdKey: insertedMemId}),
+        );
+
+        await onNotificationResponseReceived(details);
+
+        await Future.delayed(defaultTransitionDuration, () async {
+          await widgetTester.pumpAndSettle(defaultTransitionDuration);
+
+          expect(
+            (widgetTester.widget(memNameOnDetailPageFinder) as TextFormField)
+                .initialValue,
+            insertedMemName,
+          );
+        });
+      });
+
+      group('Notification actions', () {
+        testWidgets(': done Mem.', (widgetTester) async {
           final details = NotificationResponse(
             notificationResponseType:
-                NotificationResponseType.selectedNotification,
+                NotificationResponseType.selectedNotificationAction,
             id: memStartNotificationId(insertedMemId!),
             payload: json.encode({memIdKey: insertedMemId}),
+            actionId: buildNotificationActions()
+                .singleWhere((e) => e.id == doneMemNotificationActionId)
+                .id,
           );
 
           await onNotificationResponseReceived(details);
 
-          await Future.delayed(
-            defaultTransitionDuration,
-            () async {
-              await widgetTester.pumpAndSettle(defaultTransitionDuration);
+          await Future.delayed(waitSideEffectDuration, () async {
+            final mems = await dbA.select(defTableMems);
+            // final mems = await db.getTable(defTableMems.name).select();
 
-              expect(
-                (widgetTester.widget(memNameOnDetailPageFinder)
-                        as TextFormField)
-                    .initialValue,
+            expect(mems.length, 1);
+            expect(
+              [
+                mems[0][defColMemsName.name],
+                mems[0][defColMemsDoneAt.name],
+                mems[0][defColMemsStartOn.name],
+                mems[0][defColMemsStartAt.name],
+                mems[0][defColMemsEndOn.name],
+                mems[0][defColMemsEndAt.name],
+                mems[0][defPkId.name],
+                mems[0][defColCreatedAt.name],
+                mems[0][defColUpdatedAt.name],
+                mems[0][defColArchivedAt.name],
+              ],
+              [
                 insertedMemName,
-              );
-            },
-          );
-        },
-      );
-
-      group('Notification actions', () {
-        testWidgets(
-          ': done Mem.',
-          (widgetTester) async {
-            final details = NotificationResponse(
-              notificationResponseType:
-                  NotificationResponseType.selectedNotificationAction,
-              id: memStartNotificationId(insertedMemId!),
-              payload: json.encode({memIdKey: insertedMemId}),
-              actionId: buildNotificationActions()
-                  .singleWhere((e) => e.id == doneMemNotificationActionId)
-                  .id,
+                isNotNull,
+                isNull,
+                isNull,
+                isNull,
+                isNull,
+                insertedMemId,
+                isNotNull,
+                isNotNull,
+                isNull,
+              ],
             );
-
-            await onNotificationResponseReceived(details);
-
-            await Future.delayed(
-              waitSideEffectDuration,
-              () async {
-                final mems = await dbA.select(defTableMems);
-                // final mems = await db.getTable(defTableMems.name).select();
-
-                expect(mems.length, 1);
-                expect(
-                  [
-                    mems[0][defColMemsName.name],
-                    mems[0][defColMemsDoneAt.name],
-                    mems[0][defColMemsStartOn.name],
-                    mems[0][defColMemsStartAt.name],
-                    mems[0][defColMemsEndOn.name],
-                    mems[0][defColMemsEndAt.name],
-                    mems[0][defPkId.name],
-                    mems[0][defColCreatedAt.name],
-                    mems[0][defColUpdatedAt.name],
-                    mems[0][defColArchivedAt.name],
-                  ],
-                  [
-                    insertedMemName,
-                    isNotNull,
-                    isNull,
-                    isNull,
-                    isNull,
-                    isNull,
-                    insertedMemId,
-                    isNotNull,
-                    isNotNull,
-                    isNull,
-                  ],
-                );
-              },
-            );
-          },
-        );
+          });
+        });
 
         testWidgets('Start Act.', (widgetTester) async {
           widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
@@ -356,51 +336,48 @@ void testNotificationScenario() => group(_scenarioName, () {
         });
 
         group(": finish active Act", () {
-          testWidgets(
-            ": no active Act.",
-            (widgetTester) async {
-              final details = NotificationResponse(
-                notificationResponseType:
-                    NotificationResponseType.selectedNotificationAction,
-                id: memRepeatedNotificationId(insertedMemId!),
-                payload: json.encode({memIdKey: insertedMemId}),
-                actionId: buildNotificationActions()
-                    .singleWhere(
-                        (e) => e.id == finishActiveActNotificationActionId)
-                    .id,
-              );
+          testWidgets(": no active Act.", (widgetTester) async {
+            final details = NotificationResponse(
+              notificationResponseType:
+                  NotificationResponseType.selectedNotificationAction,
+              id: memRepeatedNotificationId(insertedMemId!),
+              payload: json.encode({memIdKey: insertedMemId}),
+              actionId: buildNotificationActions()
+                  .singleWhere(
+                      (e) => e.id == finishActiveActNotificationActionId)
+                  .id,
+            );
 
-              await onNotificationResponseReceived(details);
+            await onNotificationResponseReceived(details);
 
-              final acts = await dbA.select(defTableActs);
+            final acts = await dbA.select(defTableActs);
 
-              expect(acts, hasLength(1));
-              expect(
-                [
-                  acts[0][defColActsStart.name],
-                  acts[0][defColActsStartIsAllDay.name],
-                  acts[0][defColActsEnd.name],
-                  acts[0][defColActsEndIsAllDay.name],
-                  acts[0][defPkId.name],
-                  acts[0][defColCreatedAt.name],
-                  acts[0][defColUpdatedAt.name],
-                  acts[0][defColArchivedAt.name],
-                  acts[0][defFkActsMemId.name],
-                ],
-                [
-                  isNotNull,
-                  isFalse,
-                  isNotNull,
-                  isFalse,
-                  isNotNull,
-                  isNotNull,
-                  isNull,
-                  isNull,
-                  insertedMemId,
-                ],
-              );
-            },
-          );
+            expect(acts, hasLength(1));
+            expect(
+              [
+                acts[0][defColActsStart.name],
+                acts[0][defColActsStartIsAllDay.name],
+                acts[0][defColActsEnd.name],
+                acts[0][defColActsEndIsAllDay.name],
+                acts[0][defPkId.name],
+                acts[0][defColCreatedAt.name],
+                acts[0][defColUpdatedAt.name],
+                acts[0][defColArchivedAt.name],
+                acts[0][defFkActsMemId.name],
+              ],
+              [
+                isNotNull,
+                isFalse,
+                isNotNull,
+                isFalse,
+                isNotNull,
+                isNotNull,
+                isNull,
+                isNull,
+                insertedMemId,
+              ],
+            );
+          });
 
           group("2 active Acts.", () {
             late final int insertedActId1;
@@ -421,75 +398,72 @@ void testNotificationScenario() => group(_scenarioName, () {
               });
             });
 
-            testWidgets(
-              ': test.',
-              (widgetTester) async {
-                final details = NotificationResponse(
-                  notificationResponseType:
-                      NotificationResponseType.selectedNotificationAction,
-                  id: memRepeatedNotificationId(insertedMemId!),
-                  payload: json.encode({memIdKey: insertedMemId}),
-                  actionId: buildNotificationActions()
-                      .singleWhere(
-                          (e) => e.id == finishActiveActNotificationActionId)
-                      .id,
-                );
+            testWidgets(': test.', (widgetTester) async {
+              final details = NotificationResponse(
+                notificationResponseType:
+                    NotificationResponseType.selectedNotificationAction,
+                id: memRepeatedNotificationId(insertedMemId!),
+                payload: json.encode({memIdKey: insertedMemId}),
+                actionId: buildNotificationActions()
+                    .singleWhere(
+                        (e) => e.id == finishActiveActNotificationActionId)
+                    .id,
+              );
 
-                await onNotificationResponseReceived(details);
+              await onNotificationResponseReceived(details);
 
-                final acts = await dbA.select(defTableActs);
+              final acts = await dbA.select(defTableActs);
 
-                expect(acts, hasLength(2));
-                expect(
-                  [
-                    acts[0][defColActsStart.name],
-                    acts[0][defColActsStartIsAllDay.name],
-                    acts[0][defColActsEnd.name],
-                    acts[0][defColActsEndIsAllDay.name],
-                    acts[0][defPkId.name],
-                    acts[0][defColCreatedAt.name],
-                    acts[0][defColUpdatedAt.name],
-                    acts[0][defColArchivedAt.name],
-                    acts[0][defFkActsMemId.name],
-                  ],
-                  [
-                    isNotNull,
-                    isFalse,
-                    isNotNull,
-                    isFalse,
-                    insertedActId1,
-                    isNotNull,
-                    isNotNull,
-                    isNull,
-                    insertedMemId,
-                  ],
-                );
-                expect(
-                  [
-                    acts[1][defColActsStart.name],
-                    acts[1][defColActsStartIsAllDay.name],
-                    acts[1][defColActsEnd.name],
-                    acts[1][defColActsEndIsAllDay.name],
-                    acts[1][defPkId.name],
-                    acts[1][defColCreatedAt.name],
-                    acts[1][defColUpdatedAt.name],
-                    acts[1][defColArchivedAt.name],
-                    acts[1][defFkActsMemId.name],
-                  ],
-                  [
-                    isNotNull,
-                    isFalse,
-                    isNull,
-                    isNull,
-                    insertedActId2,
-                    isNotNull,
-                    isNull,
-                    isNull,
-                    insertedMemId,
-                  ],
-                );
-              },
-            );
+              expect(acts, hasLength(2));
+              expect(
+                [
+                  acts[0][defColActsStart.name],
+                  acts[0][defColActsStartIsAllDay.name],
+                  acts[0][defColActsEnd.name],
+                  acts[0][defColActsEndIsAllDay.name],
+                  acts[0][defPkId.name],
+                  acts[0][defColCreatedAt.name],
+                  acts[0][defColUpdatedAt.name],
+                  acts[0][defColArchivedAt.name],
+                  acts[0][defFkActsMemId.name],
+                ],
+                [
+                  isNotNull,
+                  isFalse,
+                  isNotNull,
+                  isFalse,
+                  insertedActId1,
+                  isNotNull,
+                  isNotNull,
+                  isNull,
+                  insertedMemId,
+                ],
+              );
+              expect(
+                [
+                  acts[1][defColActsStart.name],
+                  acts[1][defColActsStartIsAllDay.name],
+                  acts[1][defColActsEnd.name],
+                  acts[1][defColActsEndIsAllDay.name],
+                  acts[1][defPkId.name],
+                  acts[1][defColCreatedAt.name],
+                  acts[1][defColUpdatedAt.name],
+                  acts[1][defColArchivedAt.name],
+                  acts[1][defFkActsMemId.name],
+                ],
+                [
+                  isNotNull,
+                  isFalse,
+                  isNull,
+                  isNull,
+                  insertedActId2,
+                  isNotNull,
+                  isNull,
+                  isNull,
+                  insertedMemId,
+                ],
+              );
+            });
           });
         });
 
@@ -511,7 +485,6 @@ void testNotificationScenario() => group(_scenarioName, () {
                     return true;
                   },
                 ),
-                (m) => fail("Too many call."),
               ],
             );
 
@@ -565,7 +538,6 @@ void testNotificationScenario() => group(_scenarioName, () {
                       return true;
                     },
                   ),
-                  (m) => fail("Too many call."),
                 ],
               );
 

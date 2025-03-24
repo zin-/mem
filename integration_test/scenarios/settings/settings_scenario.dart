@@ -33,220 +33,283 @@ import '../helpers.dart';
 
 const _scenarioName = "Settings test";
 
-void main() => group(
-      _scenarioName,
-      () {
-        LogService(
-          level: Level.verbose,
-          enableSimpleLog:
-              const bool.fromEnvironment('CICD', defaultValue: false),
-        );
+void main() => group(_scenarioName, () {
+      LogService(
+        level: Level.verbose,
+        enableSimpleLog:
+            const bool.fromEnvironment('CICD', defaultValue: false),
+      );
 
-        const numberOfMem = 100;
-        const insertedMemName = '$_scenarioName: inserted - mem name';
+      const numberOfMem = 100;
+      const insertedMemName = '$_scenarioName: inserted - mem name';
 
-        late final DatabaseAccessor dbA;
+      late final DatabaseAccessor dbA;
 
-        setUpAll(() async {
-          dbA = await openTestDatabase(databaseDefinition);
-        });
+      setUpAll(() async {
+        dbA = await openTestDatabase(databaseDefinition);
+      });
 
+      setUp(() async {
+        NotificationClient.resetSingleton();
+
+        await clearAllTestDatabaseRows(databaseDefinition);
+      });
+
+      testWidgets('show page.', (widgetTester) async {
+        widgetTester.clearAllMockMethodCallHandler();
+
+        await runApplication();
+        await widgetTester.pumpAndSettle();
+
+        expect(find.byType(AppBar), findsOneWidget);
+
+        await widgetTester.tap(drawerIconFinder);
+        await widgetTester.pumpAndSettle();
+
+        expect(find.byIcon(Icons.settings), findsOneWidget);
+        await widgetTester.tap(find.text(l10n.settingsPageTitle));
+        await widgetTester.pumpAndSettle();
+
+        expect(find.text(l10n.settingsPageTitle), findsOneWidget);
+        expect(find.byIcon(Icons.start), findsOneWidget);
+        expect(find.text(l10n.startOfDayLabel), findsOneWidget);
+        expect(find.byIcon(Icons.backup), findsOneWidget);
+        expect(find.text(l10n.backupLabel), findsOneWidget);
+        expect(find.byIcon(Icons.backup), findsOneWidget);
+        expect(find.text(l10n.resetNotificationLabel), findsOneWidget);
+      });
+
+      group('Start of day', () {
         setUp(() async {
-          NotificationClient.resetSingleton();
-
-          await clearAllTestDatabaseRows(databaseDefinition);
+          await PreferenceRepository().discard(startOfDayKey);
         });
 
-        testWidgets(
-          'show page.',
-          (widgetTester) async {
-            widgetTester.clearAllMockMethodCallHandler();
+        testWidgets(': pick.', (widgetTester) async {
+          await runApplication();
+          await widgetTester.pumpAndSettle();
 
+          await widgetTester.tap(drawerIconFinder);
+          await widgetTester.pumpAndSettle();
+          await widgetTester.tap(find.text(l10n.settingsPageTitle));
+          await widgetTester.pumpAndSettle();
+
+          await widgetTester.tap(find.text(l10n.startOfDayLabel));
+          await widgetTester.pumpAndSettle();
+
+          final rect =
+              widgetTester.getRect(find.byKey(Key('time-picker-dial')));
+          final tapPosition = Offset(
+            rect.left + rect.width / 2,
+            rect.top + rect.height / 2,
+          );
+          await widgetTester.tapAt(tapPosition);
+          await widgetTester.tap(okFinder);
+          await widgetTester.pumpAndSettle();
+
+          expect(
+            widgetTester
+                .widget<Text>(find
+                    .descendant(
+                      of: find.byType(SettingsTile),
+                      matching: find.byType(Text),
+                    )
+                    .at(1))
+                .data,
+            "6:00 AM",
+          );
+          expect(
+            (await PreferenceRepository().shipByKey(startOfDayKey)).value,
+            TimeOfDay(hour: 6, minute: 0),
+          );
+        });
+
+        group('With saved', () {
+          final startOfDay = TimeOfDay(hour: 5, minute: 0);
+          final now = DateTime.now();
+          setUp(() async {
+            await PreferenceRepository()
+                .receive(PreferenceEntity(startOfDayKey, startOfDay));
+
+            final savedMem = await MemRepositoryV2().receive(MemEntityV2(
+                Mem("$insertedMemName - Start of day", null, null)));
+            await MemNotificationRepositoryV2().receive(
+              MemNotificationEntityV2(
+                MemNotification.by(
+                  savedMem.id,
+                  MemNotificationType.repeat,
+                  // 00:01
+                  60,
+                  null,
+                ),
+              ),
+            );
+            final savedMem2 = await MemRepositoryV2().receive(MemEntityV2(
+                Mem("$insertedMemName - Start of day - 2", null, null)));
+            await MemNotificationRepositoryV2().receive(
+              MemNotificationEntityV2(
+                MemNotification.by(
+                  savedMem2.id,
+                  MemNotificationType.repeat,
+                  // 23:59
+                  60 * 60 * 24 - 60,
+                  null,
+                ),
+              ),
+            );
+          });
+
+          testWidgets('show saved.', (widgetTester) async {
             await runApplication();
             await widgetTester.pumpAndSettle();
 
-            expect(find.byType(AppBar), findsOneWidget);
-
             await widgetTester.tap(drawerIconFinder);
             await widgetTester.pumpAndSettle();
-
-            expect(find.byIcon(Icons.settings), findsOneWidget);
             await widgetTester.tap(find.text(l10n.settingsPageTitle));
             await widgetTester.pumpAndSettle();
 
-            expect(find.text(l10n.settingsPageTitle), findsOneWidget);
-            expect(find.byIcon(Icons.start), findsOneWidget);
-            expect(find.text(l10n.startOfDayLabel), findsOneWidget);
-            expect(find.byIcon(Icons.backup), findsOneWidget);
-            expect(find.text(l10n.backupLabel), findsOneWidget);
-            expect(find.byIcon(Icons.backup), findsOneWidget);
-            expect(find.text(l10n.resetNotificationLabel), findsOneWidget);
-          },
-        );
-
-        group('Start of day', () {
-          setUp(() async {
-            await PreferenceRepository().discard(startOfDayKey);
-          });
-
-          testWidgets(
-            ': pick.',
-            (widgetTester) async {
-              await runApplication();
-              await widgetTester.pumpAndSettle();
-
-              await widgetTester.tap(drawerIconFinder);
-              await widgetTester.pumpAndSettle();
-              await widgetTester.tap(find.text(l10n.settingsPageTitle));
-              await widgetTester.pumpAndSettle();
-
-              await widgetTester.tap(find.text(l10n.startOfDayLabel));
-              await widgetTester.pumpAndSettle();
-
-              final rect =
-                  widgetTester.getRect(find.byKey(Key('time-picker-dial')));
-              final tapPosition = Offset(
-                rect.left + rect.width / 2,
-                rect.top + rect.height / 2,
-              );
-              await widgetTester.tapAt(tapPosition);
-              await widgetTester.tap(okFinder);
-              await widgetTester.pumpAndSettle();
-
-              expect(
+            expect(
                 widgetTester
                     .widget<Text>(find
                         .descendant(
-                          of: find.byType(SettingsTile),
-                          matching: find.byType(Text),
-                        )
+                            of: find.byType(SettingsTile),
+                            matching: find.byType(Text))
                         .at(1))
                     .data,
-                "6:00 AM",
-              );
-              expect(
-                (await PreferenceRepository().shipByKey(startOfDayKey)).value,
-                TimeOfDay(hour: 6, minute: 0),
-              );
-            },
-          );
+                "5:00 AM");
+          });
 
-          group('With saved', () {
-            final startOfDay = TimeOfDay(hour: 5, minute: 0);
-            final now = DateTime.now();
-            setUp(() async {
-              await PreferenceRepository()
-                  .receive(PreferenceEntity(startOfDayKey, startOfDay));
+          testWidgets("Before start of tomorrow is today's habit.",
+              (widgetTester) async {
+            await runApplication();
+            await widgetTester.pumpAndSettle(waitLongSideEffectDuration);
 
-              final savedMem = await MemRepositoryV2().receive(MemEntityV2(
-                  Mem("$insertedMemName - Start of day", null, null)));
-              await MemNotificationRepositoryV2().receive(
-                MemNotificationEntityV2(
-                  MemNotification.by(
-                    savedMem.id,
-                    MemNotificationType.repeat,
-                    // 00:01
-                    60,
-                    null,
-                  ),
-                ),
-              );
-              final savedMem2 = await MemRepositoryV2().receive(MemEntityV2(
-                  Mem("$insertedMemName - Start of day - 2", null, null)));
-              await MemNotificationRepositoryV2().receive(
-                MemNotificationEntityV2(
-                  MemNotification.by(
-                    savedMem2.id,
-                    MemNotificationType.repeat,
-                    // 23:59
-                    60 * 60 * 24 - 60,
-                    null,
-                  ),
-                ),
-              );
-            });
-
-            testWidgets('show saved.', (widgetTester) async {
-              await runApplication();
-              await widgetTester.pumpAndSettle();
-
-              await widgetTester.tap(drawerIconFinder);
-              await widgetTester.pumpAndSettle();
-              await widgetTester.tap(find.text(l10n.settingsPageTitle));
-              await widgetTester.pumpAndSettle();
-
-              expect(
-                  widgetTester
-                      .widget<Text>(find
-                          .descendant(
-                              of: find.byType(SettingsTile),
-                              matching: find.byType(Text))
-                          .at(1))
-                      .data,
-                  "5:00 AM");
-            });
-
-            testWidgets("Before start of tomorrow is today's habit.",
-                (widgetTester) async {
-              await runApplication();
-              await widgetTester.pumpAndSettle(waitLongSideEffectDuration);
-
-              final date = now.subtract(Duration(
-                  days: TimeOfDay.fromDateTime(now).isBefore(startOfDay)
-                      ? 1
-                      : 0));
-              expect(widgetTester.widget<Text>(find.byType(Text).at(0)).data,
-                  equals(dateText(date)));
-              expect(find.text(dateText(date.add(Duration(days: 1)))),
-                  findsNothing);
-            });
+            final date = now.subtract(Duration(
+                days:
+                    TimeOfDay.fromDateTime(now).isBefore(startOfDay) ? 1 : 0));
+            expect(widgetTester.widget<Text>(find.byType(Text).at(0)).data,
+                equals(dateText(date)));
+            expect(
+                find.text(dateText(date.add(Duration(days: 1)))), findsNothing);
           });
         });
+      });
 
-        group("Notify after inactivity", () {
+      group("Notify after inactivity", () {
+        setUp(() async {
+          await PreferenceRepository().discard(notifyAfterInactivity);
+        });
+
+        testWidgets("Show.", (widgetTester) async {
+          await runApplication();
+          await widgetTester.pumpAndSettle();
+          await widgetTester.tap(drawerIconFinder);
+          await widgetTester.pumpAndSettle();
+          await widgetTester.tap(find.text(l10n.settingsPageTitle));
+          await widgetTester.pumpAndSettle();
+
+          final texts = widgetTester.widgetList<Text>(find.byType(Text));
+          expect(
+            texts.elementAt(2).data,
+            equals(l10n.notifyAfterInactivityLabel),
+          );
+        });
+
+        testWidgets("Save.", (widgetTester) async {
+          widgetTester.clearAllMockMethodCallHandler();
+          widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
+          widgetTester
+              .ignoreMockMethodCallHandler(MethodChannelMock.permissionHandler);
+
+          int initializeCount = 0;
+          int registerOneOffTaskCount = 0;
+          widgetTester.setMockMethodCallHandler(
+              MethodChannelMock.workmanagerForeground, [
+            (m) async {
+              expect(m.method, equals('initialize'));
+              initializeCount++;
+              return true;
+            },
+            (m) async {
+              expect(m.method, equals('registerOneOffTask'));
+              registerOneOffTaskCount++;
+              return true;
+            },
+          ]);
+
+          await runApplication();
+          await widgetTester.pumpAndSettle();
+          await widgetTester.tap(drawerIconFinder);
+          await widgetTester.pumpAndSettle();
+          await widgetTester.tap(find.text(l10n.settingsPageTitle));
+          await widgetTester.pumpAndSettle();
+
+          const secondsOfHour = 3600;
+          final texts = widgetTester.widgetList<Text>(find.byType(Text));
+          expect(
+            texts.elementAt(3).data,
+            isNot(equals(formatSecondsOfTime(secondsOfHour))),
+          );
+
+          await widgetTester.tap(find.text(l10n.notifyAfterInactivityLabel));
+          await widgetTester.pumpAndSettle();
+          await widgetTester.tap(find.text(l10n.okAction));
+          await widgetTester.pumpAndSettle();
+
+          final texts2 = widgetTester.widgetList<Text>(find.byType(Text));
+          expect(
+            texts2.elementAt(3).data,
+            equals(formatSecondsOfTime(secondsOfHour)),
+          );
+
+          expect(
+            await PreferenceRepository().shipByKey(notifyAfterInactivity).then(
+                  (v) => v.value,
+                ),
+            equals(secondsOfHour),
+          );
+
+          expect(
+            initializeCount,
+            equals(
+              defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
+            ),
+            reason: 'initializeCount',
+          );
+          expect(
+            registerOneOffTaskCount,
+            equals(
+              defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
+            ),
+            reason: 'registerOneOffTask',
+          );
+        });
+
+        group("With saved", () {
           setUp(() async {
-            await PreferenceRepository().discard(notifyAfterInactivity);
+            await PreferenceRepository()
+                .receive(PreferenceEntity(notifyAfterInactivity, 3600));
+
+            PreferenceClient.resetSingleton();
           });
 
-          testWidgets("Show.", (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
-            await widgetTester.tap(drawerIconFinder);
-            await widgetTester.pumpAndSettle();
-            await widgetTester.tap(find.text(l10n.settingsPageTitle));
-            await widgetTester.pumpAndSettle();
-
-            final texts = widgetTester.widgetList<Text>(find.byType(Text));
-            expect(
-              texts.elementAt(2).data,
-              equals(l10n.notifyAfterInactivityLabel),
-            );
-          });
-
-          testWidgets("Save.", (widgetTester) async {
+          testWidgets("Remove.", (widgetTester) async {
             widgetTester.clearAllMockMethodCallHandler();
-            widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
-            widgetTester.ignoreMockMethodCallHandler(
-                MethodChannelMock.permissionHandler);
 
             int initializeCount = 0;
-            int registerOneOffTaskCount = 0;
+            int cancelTaskByUniqueNameCount = 0;
             widgetTester.setMockMethodCallHandler(
-              MethodChannelMock.workmanagerForeground,
-              [
-                (m) async {
-                  expect(m.method, equals('initialize'));
-                  initializeCount++;
-                  return true;
-                },
-                (m) async {
-                  expect(m.method, equals('registerOneOffTask'));
-                  registerOneOffTaskCount++;
-                  return true;
-                },
-                (m) async => fail("Too many call."),
-              ],
-            );
+                MethodChannelMock.workmanagerForeground, [
+              (m) async {
+                expect(m.method, equals('initialize'));
+                initializeCount++;
+                return true;
+              },
+              (m) async {
+                expect(m.method, equals('cancelTaskByUniqueName'));
+                cancelTaskByUniqueNameCount++;
+                return true;
+              },
+            ]);
 
             await runApplication();
             await widgetTester.pumpAndSettle();
@@ -254,24 +317,10 @@ void main() => group(
             await widgetTester.pumpAndSettle();
             await widgetTester.tap(find.text(l10n.settingsPageTitle));
             await widgetTester.pumpAndSettle();
-
-            const secondsOfHour = 3600;
-            final texts = widgetTester.widgetList<Text>(find.byType(Text));
-            expect(
-              texts.elementAt(3).data,
-              isNot(equals(formatSecondsOfTime(secondsOfHour))),
-            );
-
             await widgetTester.tap(find.text(l10n.notifyAfterInactivityLabel));
             await widgetTester.pumpAndSettle();
-            await widgetTester.tap(find.text(l10n.okAction));
+            await widgetTester.tap(find.text(l10n.cancelAction));
             await widgetTester.pumpAndSettle();
-
-            final texts2 = widgetTester.widgetList<Text>(find.byType(Text));
-            expect(
-              texts2.elementAt(3).data,
-              equals(formatSecondsOfTime(secondsOfHour)),
-            );
 
             expect(
               await PreferenceRepository()
@@ -279,7 +328,7 @@ void main() => group(
                   .then(
                     (v) => v.value,
                   ),
-              equals(secondsOfHour),
+              isNull,
             );
 
             expect(
@@ -290,7 +339,7 @@ void main() => group(
               reason: 'initializeCount',
             );
             expect(
-              registerOneOffTaskCount,
+              cancelTaskByUniqueNameCount,
               equals(
                 defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
               ),
@@ -298,19 +347,47 @@ void main() => group(
             );
           });
 
-          group("With saved", () {
+          group("With habit operation", () {
             setUp(() async {
-              await PreferenceRepository()
-                  .receive(PreferenceEntity(notifyAfterInactivity, 3600));
+              ActsClient.resetSingleton();
 
-              PreferenceClient.resetSingleton();
+              final savedMemWithNoAct = await MemRepositoryV2().receive(
+                  MemEntityV2(Mem(
+                      "$_scenarioName - With habit operation - with no act",
+                      null,
+                      null)));
+              await MemNotificationRepositoryV2().receive(
+                  MemNotificationEntityV2(MemNotification.by(
+                      savedMemWithNoAct.id,
+                      MemNotificationType.afterActStarted,
+                      1,
+                      "with no act")));
+              final savedMemWithActiveAct = await MemRepositoryV2().receive(
+                  MemEntityV2(Mem(
+                      "$_scenarioName - With habit operation - with active act",
+                      null,
+                      null)));
+              await MemNotificationRepositoryV2().receive(
+                  MemNotificationEntityV2(MemNotification.by(
+                      savedMemWithActiveAct.id,
+                      MemNotificationType.afterActStarted,
+                      1,
+                      "with active act")));
+              await ActRepository().receive(ActEntity(
+                  Act.by(savedMemWithActiveAct.id, DateAndTime.now())));
             });
 
-            testWidgets("Remove.", (widgetTester) async {
+            testWidgets("Cancel when start act.", (widgetTester) async {
               widgetTester.clearAllMockMethodCallHandler();
+              widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
+              widgetTester.ignoreMockMethodCallHandler(
+                  MethodChannelMock.permissionHandler);
+              widgetTester.ignoreMockMethodCallHandler(
+                  MethodChannelMock.flutterLocalNotifications);
 
               int initializeCount = 0;
               int cancelTaskByUniqueNameCount = 0;
+              int registerOneOffTaskCount = 0;
               widgetTester.setMockMethodCallHandler(
                 MethodChannelMock.workmanagerForeground,
                 [
@@ -324,30 +401,96 @@ void main() => group(
                     cancelTaskByUniqueNameCount++;
                     return true;
                   },
-                  (m) async => fail("Too many call."),
+                  (m) async {
+                    expect(m.method, equals('registerOneOffTask'));
+                    registerOneOffTaskCount++;
+                    return true;
+                  },
+                  (m) async {
+                    expect(m.method, equals('cancelTaskByUniqueName'));
+                    cancelTaskByUniqueNameCount++;
+                    return true;
+                  },
+                  (m) async {
+                    expect(m.method, equals('cancelTaskByUniqueName'));
+                    cancelTaskByUniqueNameCount++;
+                    return true;
+                  },
+                  (m) async {
+                    expect(m.method, equals('cancelTaskByUniqueName'));
+                    cancelTaskByUniqueNameCount++;
+                    return true;
+                  },
+                  (m) async {
+                    expect(m.method, equals('cancelTaskByUniqueName'));
+                    cancelTaskByUniqueNameCount++;
+                    return true;
+                  },
                 ],
               );
 
               await runApplication();
               await widgetTester.pumpAndSettle();
-              await widgetTester.tap(drawerIconFinder);
-              await widgetTester.pumpAndSettle();
-              await widgetTester.tap(find.text(l10n.settingsPageTitle));
-              await widgetTester.pumpAndSettle();
-              await widgetTester
-                  .tap(find.text(l10n.notifyAfterInactivityLabel));
-              await widgetTester.pumpAndSettle();
-              await widgetTester.tap(find.text(l10n.cancelAction));
-              await widgetTester.pumpAndSettle();
+              await widgetTester.tap(startIconFinder);
+              await widgetTester.pumpAndSettle(waitLongSideEffectDuration);
 
               expect(
-                await PreferenceRepository()
-                    .shipByKey(notifyAfterInactivity)
-                    .then(
-                      (v) => v.value,
-                    ),
-                isNull,
+                initializeCount,
+                equals(
+                  defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
+                ),
+                reason: 'initializeCount',
               );
+              expect(
+                cancelTaskByUniqueNameCount,
+                equals(
+                  defaultTargetPlatform == TargetPlatform.android ? 5 : 0,
+                ),
+                reason: 'cancelTaskByUniqueName',
+              );
+              expect(
+                registerOneOffTaskCount,
+                equals(
+                  defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
+                ),
+                reason: 'registerOneOffTaskCount',
+              );
+            });
+
+            testWidgets("Set when finish act.", (widgetTester) async {
+              widgetTester.clearAllMockMethodCallHandler();
+              widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
+              widgetTester.ignoreMockMethodCallHandler(
+                  MethodChannelMock.permissionHandler);
+              widgetTester.ignoreMockMethodCallHandler(
+                  MethodChannelMock.flutterLocalNotifications);
+
+              int initializeCount = 0;
+              int cancelTaskByUniqueNameCount = 0;
+              int registerOneOffTaskCount = 0;
+              widgetTester.setMockMethodCallHandler(
+                  MethodChannelMock.workmanagerForeground, [
+                (m) async {
+                  expect(m.method, equals('initialize'));
+                  initializeCount++;
+                  return true;
+                },
+                (m) async {
+                  expect(m.method, equals('cancelTaskByUniqueName'));
+                  cancelTaskByUniqueNameCount++;
+                  return true;
+                },
+                (m) async {
+                  expect(m.method, equals('registerOneOffTask'));
+                  registerOneOffTaskCount++;
+                  return true;
+                },
+              ]);
+
+              await runApplication();
+              await widgetTester.pumpAndSettle();
+              await widgetTester.tap(stopIconFinder.at(0));
+              await widgetTester.pumpAndSettle(waitLongSideEffectDuration);
 
               expect(
                 initializeCount,
@@ -361,372 +504,197 @@ void main() => group(
                 equals(
                   defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
                 ),
-                reason: 'registerOneOffTask',
+                reason: 'cancelTaskByUniqueNameCount',
+              );
+              expect(
+                registerOneOffTaskCount,
+                equals(
+                  defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
+                ),
+                reason: 'registerOneOffTaskCount',
               );
             });
 
-            group("With habit operation", () {
-              setUp(() async {
-                ActsClient.resetSingleton();
-
-                final savedMemWithNoAct = await MemRepositoryV2().receive(
-                    MemEntityV2(Mem(
-                        "$_scenarioName - With habit operation - with no act",
-                        null,
-                        null)));
-                await MemNotificationRepositoryV2().receive(
-                    MemNotificationEntityV2(MemNotification.by(
-                        savedMemWithNoAct.id,
-                        MemNotificationType.afterActStarted,
-                        1,
-                        "with no act")));
-                final savedMemWithActiveAct = await MemRepositoryV2().receive(
-                    MemEntityV2(Mem(
-                        "$_scenarioName - With habit operation - with active act",
-                        null,
-                        null)));
-                await MemNotificationRepositoryV2().receive(
-                    MemNotificationEntityV2(MemNotification.by(
-                        savedMemWithActiveAct.id,
-                        MemNotificationType.afterActStarted,
-                        1,
-                        "with active act")));
-                await ActRepository().receive(ActEntity(
-                    Act.by(savedMemWithActiveAct.id, DateAndTime.now())));
-              });
-
-              testWidgets("Cancel when start act.", (widgetTester) async {
-                widgetTester.clearAllMockMethodCallHandler();
-                widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
-                widgetTester.ignoreMockMethodCallHandler(
-                    MethodChannelMock.permissionHandler);
-                widgetTester.ignoreMockMethodCallHandler(
-                    MethodChannelMock.flutterLocalNotifications);
-
-                int initializeCount = 0;
-                int cancelTaskByUniqueNameCount = 0;
-                int registerOneOffTaskCount = 0;
-                widgetTester.setMockMethodCallHandler(
-                  MethodChannelMock.workmanagerForeground,
-                  [
-                    (m) async {
-                      expect(m.method, equals('initialize'));
-                      initializeCount++;
-                      return true;
-                    },
-                    (m) async {
-                      expect(m.method, equals('cancelTaskByUniqueName'));
-                      cancelTaskByUniqueNameCount++;
-                      return true;
-                    },
-                    (m) async {
-                      expect(m.method, equals('registerOneOffTask'));
-                      registerOneOffTaskCount++;
-                      return true;
-                    },
-                    (m) async {
-                      expect(m.method, equals('cancelTaskByUniqueName'));
-                      cancelTaskByUniqueNameCount++;
-                      return true;
-                    },
-                    (m) async {
-                      expect(m.method, equals('cancelTaskByUniqueName'));
-                      cancelTaskByUniqueNameCount++;
-                      return true;
-                    },
-                    (m) async {
-                      expect(m.method, equals('cancelTaskByUniqueName'));
-                      cancelTaskByUniqueNameCount++;
-                      return true;
-                    },
-                    (m) async {
-                      expect(m.method, equals('cancelTaskByUniqueName'));
-                      cancelTaskByUniqueNameCount++;
-                      return true;
-                    },
-                    (m) async => fail("Too many call."),
-                  ],
-                );
-
-                await runApplication();
-                await widgetTester.pumpAndSettle();
-                await widgetTester.tap(startIconFinder);
-                await widgetTester.pumpAndSettle(waitLongSideEffectDuration);
-
-                expect(
-                  initializeCount,
-                  equals(
-                    defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
-                  ),
-                  reason: 'initializeCount',
-                );
-                expect(
-                  cancelTaskByUniqueNameCount,
-                  equals(
-                    defaultTargetPlatform == TargetPlatform.android ? 5 : 0,
-                  ),
-                  reason: 'cancelTaskByUniqueName',
-                );
-                expect(
-                  registerOneOffTaskCount,
-                  equals(
-                    defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
-                  ),
-                  reason: 'registerOneOffTaskCount',
-                );
-              });
-
-              testWidgets("Set when finish act.", (widgetTester) async {
-                widgetTester.clearAllMockMethodCallHandler();
-                widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
-                widgetTester.ignoreMockMethodCallHandler(
-                    MethodChannelMock.permissionHandler);
-                widgetTester.ignoreMockMethodCallHandler(
-                    MethodChannelMock.flutterLocalNotifications);
-
-                int initializeCount = 0;
-                int cancelTaskByUniqueNameCount = 0;
-                int registerOneOffTaskCount = 0;
-                widgetTester.setMockMethodCallHandler(
-                  MethodChannelMock.workmanagerForeground,
-                  [
-                    (m) async {
-                      expect(m.method, equals('initialize'));
-                      initializeCount++;
-                      return true;
-                    },
-                    (m) async {
-                      expect(m.method, equals('cancelTaskByUniqueName'));
-                      cancelTaskByUniqueNameCount++;
-                      return true;
-                    },
-                    (m) async {
-                      expect(m.method, equals('registerOneOffTask'));
-                      registerOneOffTaskCount++;
-                      return true;
-                    },
-                    (m) async => fail("Too many call."),
-                  ],
-                );
-
-                await runApplication();
-                await widgetTester.pumpAndSettle();
-                await widgetTester.tap(stopIconFinder.at(0));
-                await widgetTester.pumpAndSettle(waitLongSideEffectDuration);
-
-                expect(
-                  initializeCount,
-                  equals(
-                    defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
-                  ),
-                  reason: 'initializeCount',
-                );
-                expect(
-                  cancelTaskByUniqueNameCount,
-                  equals(
-                    defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
-                  ),
-                  reason: 'cancelTaskByUniqueNameCount',
-                );
-                expect(
-                  registerOneOffTaskCount,
-                  equals(
-                    defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
-                  ),
-                  reason: 'registerOneOffTaskCount',
-                );
-              });
-
-              testWidgets("Set when pause act.", (widgetTester) async {
-                widgetTester.clearAllMockMethodCallHandler();
-                widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
-                widgetTester.ignoreMockMethodCallHandler(
-                    MethodChannelMock.permissionHandler);
-                widgetTester.ignoreMockMethodCallHandler(
-                    MethodChannelMock.flutterLocalNotifications);
-
-                int initializeCount = 0;
-                int cancelTaskByUniqueNameCount = 0;
-                int registerOneOffTaskCount = 0;
-                widgetTester.setMockMethodCallHandler(
-                  MethodChannelMock.workmanagerForeground,
-                  [
-                    (m) async {
-                      expect(m.method, equals('initialize'));
-                      initializeCount++;
-                      return true;
-                    },
-                    ...List.filled(10, (m) async {
-                      expect(m.method, equals('cancelTaskByUniqueName'));
-                      cancelTaskByUniqueNameCount++;
-                      return false;
-                    }),
-                    (m) async {
-                      expect(m.method, equals('registerOneOffTask'));
-                      registerOneOffTaskCount++;
-                      return true;
-                    },
-                    (m) => fail("Too many call: { called method: $m}."),
-                  ],
-                );
-
-                await runApplication();
-                await widgetTester.pumpAndSettle();
-                await widgetTester.tap(pauseIconFinder);
-                await widgetTester.pumpAndSettle(waitLongSideEffectDuration);
-
-                expect(
-                  initializeCount,
-                  equals(
-                    defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
-                  ),
-                  reason: 'initializeCount',
-                );
-                expect(
-                  cancelTaskByUniqueNameCount,
-                  equals(
-                    defaultTargetPlatform == TargetPlatform.android ? 10 : 0,
-                  ),
-                  reason: 'cancelTaskByUniqueNameCount',
-                );
-                expect(
-                  registerOneOffTaskCount,
-                  equals(
-                    defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
-                  ),
-                  reason: 'registerOneOffTaskCount',
-                );
-              });
-            });
-          });
-        });
-
-        group(
-          "Reset Notification",
-          () {
-            final insertedMemIds = List<int>.empty(growable: true);
-
-            setUp(
-              () async {
-                for (var i = 0; i < numberOfMem; i++) {
-                  insertedMemIds.add(
-                    await dbA.insert(
-                      defTableMems,
-                      {
-                        defColMemsName.name: "$insertedMemName: $i",
-                        defColCreatedAt.name: zeroDate,
-                      },
-                    ),
-                  );
-                }
-              },
-            );
-
-            testWidgets('Execute.', (widgetTester) async {
+            testWidgets("Set when pause act.", (widgetTester) async {
+              widgetTester.clearAllMockMethodCallHandler();
               widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
               widgetTester.ignoreMockMethodCallHandler(
                   MethodChannelMock.permissionHandler);
               widgetTester.ignoreMockMethodCallHandler(
-                  MethodChannelMock.workmanagerForeground);
+                  MethodChannelMock.flutterLocalNotifications);
 
-              final cancelIds = insertedMemIds
-                  .map(
-                    (e) => AllMemNotificationsId.of(e),
-                  )
-                  .flattened;
-
-              int flutterLocalNotificationsInitializeCount = 0;
-              int getNotificationAppLaunchDetailsCount = 0;
-              int cancelAllCount = 0;
-              int deleteNotificationChannelCount = 0;
-              int cancelCount = 0;
+              int initializeCount = 0;
+              int cancelTaskByUniqueNameCount = 0;
+              int registerOneOffTaskCount = 0;
               widgetTester.setMockMethodCallHandler(
-                  MethodChannelMock.flutterLocalNotifications, [
+                  MethodChannelMock.workmanagerForeground, [
                 (m) async {
                   expect(m.method, equals('initialize'));
-                  flutterLocalNotificationsInitializeCount++;
+                  initializeCount++;
                   return true;
                 },
+                ...List.filled(10, (m) async {
+                  expect(m.method, equals('cancelTaskByUniqueName'));
+                  cancelTaskByUniqueNameCount++;
+                  return false;
+                }),
                 (m) async {
-                  expect(m.method, equals('getNotificationAppLaunchDetails'));
-                  getNotificationAppLaunchDetailsCount++;
-                  return null;
+                  expect(m.method, equals('registerOneOffTask'));
+                  registerOneOffTaskCount++;
+                  return true;
                 },
-                (m) async {
-                  expect(m.method, equals('cancelAll'));
-                  cancelAllCount++;
-                  return null;
-                },
-                ...NotificationType.values.map(
-                  (e) => (m) async {
-                    expect(m.method, equals('deleteNotificationChannel'));
-                    deleteNotificationChannelCount++;
-                    return null;
-                  },
-                ),
-                ...cancelIds.map((e) => (m) async {
-                      expect(m.method, equals('cancel'));
-                      cancelCount++;
-                      return false;
-                    }),
               ]);
 
               await runApplication();
               await widgetTester.pumpAndSettle();
-
-              await widgetTester.tap(drawerIconFinder);
-              await widgetTester.pumpAndSettle();
-              await widgetTester.tap(find.text(l10n.settingsPageTitle));
-              await widgetTester.pumpAndSettle();
-
-              await widgetTester.tap(find.text(l10n.resetNotificationLabel));
-              await widgetTester.pump();
-
-              expect(find.byType(CircularProgressIndicator), findsOneWidget);
-
-              var indicator = widgetTester
-                  .elementList(find.byType(CircularProgressIndicator));
-              while (indicator.length == 1) {
-                await widgetTester.pump();
-                indicator = widgetTester
-                    .elementList(find.byType(CircularProgressIndicator));
-              }
-
-              expect(find.byType(CircularProgressIndicator), findsNothing);
-              expect(find.text(l10n.completeResetNotification), findsOneWidget);
+              await widgetTester.tap(pauseIconFinder);
+              await widgetTester.pumpAndSettle(waitLongSideEffectDuration);
 
               expect(
-                flutterLocalNotificationsInitializeCount,
-                equals(defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
-                reason: 'flutterLocalNotificationsInitializeCount',
-              );
-              expect(
-                getNotificationAppLaunchDetailsCount,
-                equals(defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
-                reason: 'getNotificationAppLaunchDetailsCount',
-              );
-              expect(
-                cancelAllCount,
-                equals(defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
-                reason: 'cancelAllCount',
-              );
-              expect(
-                deleteNotificationChannelCount,
-                equals(defaultTargetPlatform == TargetPlatform.android
-                    ? NotificationType.values.length
-                    : 0),
-                reason: 'deleteNotificationChannelCount',
-              );
-              expect(
-                cancelCount,
+                initializeCount,
                 equals(
-                    defaultTargetPlatform == TargetPlatform.android ? 600 : 0),
-                reason: 'cancelCount',
+                  defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
+                ),
+                reason: 'initializeCount',
               );
-
-              widgetTester.clearAllMockMethodCallHandler();
+              expect(
+                cancelTaskByUniqueNameCount,
+                equals(
+                  defaultTargetPlatform == TargetPlatform.android ? 10 : 0,
+                ),
+                reason: 'cancelTaskByUniqueNameCount',
+              );
+              expect(
+                registerOneOffTaskCount,
+                equals(
+                  defaultTargetPlatform == TargetPlatform.android ? 1 : 0,
+                ),
+                reason: 'registerOneOffTaskCount',
+              );
             });
-          },
-        );
-      },
-    );
+          });
+        });
+      });
+
+      group("Reset Notification", () {
+        final insertedMemIds = List<int>.empty(growable: true);
+
+        setUp(() async {
+          for (var i = 0; i < numberOfMem; i++) {
+            insertedMemIds.add(
+              await dbA.insert(
+                defTableMems,
+                {
+                  defColMemsName.name: "$insertedMemName: $i",
+                  defColCreatedAt.name: zeroDate,
+                },
+              ),
+            );
+          }
+        });
+
+        testWidgets('Execute.', (widgetTester) async {
+          widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
+          widgetTester
+              .ignoreMockMethodCallHandler(MethodChannelMock.permissionHandler);
+          widgetTester.ignoreMockMethodCallHandler(
+              MethodChannelMock.workmanagerForeground);
+
+          final cancelIds = insertedMemIds
+              .map(
+                (e) => AllMemNotificationsId.of(e),
+              )
+              .flattened;
+
+          int flutterLocalNotificationsInitializeCount = 0;
+          int getNotificationAppLaunchDetailsCount = 0;
+          int cancelAllCount = 0;
+          int deleteNotificationChannelCount = 0;
+          int cancelCount = 0;
+          widgetTester.setMockMethodCallHandler(
+              MethodChannelMock.flutterLocalNotifications, [
+            (m) async {
+              expect(m.method, equals('initialize'));
+              flutterLocalNotificationsInitializeCount++;
+              return true;
+            },
+            (m) async {
+              expect(m.method, equals('getNotificationAppLaunchDetails'));
+              getNotificationAppLaunchDetailsCount++;
+              return null;
+            },
+            (m) async {
+              expect(m.method, equals('cancelAll'));
+              cancelAllCount++;
+              return null;
+            },
+            ...NotificationType.values.map(
+              (e) => (m) async {
+                expect(m.method, equals('deleteNotificationChannel'));
+                deleteNotificationChannelCount++;
+                return null;
+              },
+            ),
+            ...cancelIds.map((e) => (m) async {
+                  expect(m.method, equals('cancel'));
+                  cancelCount++;
+                  return false;
+                }),
+          ]);
+
+          await runApplication();
+          await widgetTester.pumpAndSettle();
+
+          await widgetTester.tap(drawerIconFinder);
+          await widgetTester.pumpAndSettle();
+          await widgetTester.tap(find.text(l10n.settingsPageTitle));
+          await widgetTester.pumpAndSettle();
+
+          await widgetTester.tap(find.text(l10n.resetNotificationLabel));
+          await widgetTester.pump();
+
+          expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+          var indicator =
+              widgetTester.elementList(find.byType(CircularProgressIndicator));
+          while (indicator.length == 1) {
+            await widgetTester.pump();
+            indicator = widgetTester
+                .elementList(find.byType(CircularProgressIndicator));
+          }
+
+          expect(find.byType(CircularProgressIndicator), findsNothing);
+          expect(find.text(l10n.completeResetNotification), findsOneWidget);
+
+          expect(
+            flutterLocalNotificationsInitializeCount,
+            equals(defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
+            reason: 'flutterLocalNotificationsInitializeCount',
+          );
+          expect(
+            getNotificationAppLaunchDetailsCount,
+            equals(defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
+            reason: 'getNotificationAppLaunchDetailsCount',
+          );
+          expect(
+            cancelAllCount,
+            equals(defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
+            reason: 'cancelAllCount',
+          );
+          expect(
+            deleteNotificationChannelCount,
+            equals(defaultTargetPlatform == TargetPlatform.android
+                ? NotificationType.values.length
+                : 0),
+            reason: 'deleteNotificationChannelCount',
+          );
+          expect(
+            cancelCount,
+            equals(defaultTargetPlatform == TargetPlatform.android ? 600 : 0),
+            reason: 'cancelCount',
+          );
+
+          widgetTester.clearAllMockMethodCallHandler();
+        });
+      });
+    });
