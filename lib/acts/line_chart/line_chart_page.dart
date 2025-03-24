@@ -17,52 +17,64 @@ class ActLineChartPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () => Scaffold(
-          appBar: AppBar(
-            title: Text(
-              "${ref.read(
-                editingMemByMemIdProvider(_memId).select((v) => v.value.name),
-              )} : Count",
+        () => AsyncValueView(
+          loadActList(_memId),
+          (loaded) => _ActLineChartScreen(
+            ref.read(
+              editingMemByMemIdProvider(_memId).select((v) => v.value.name),
             ),
-            actions: AppBarActionsBuilder([]).build(context),
-          ),
-          body: Padding(
-            padding: defaultPadding,
-            child: AsyncValueView(
-              loadActList(_memId),
-              (loaded) {
-                final actSummary = ActsSummary(ref
-                    .watch(actListProvider(_memId))
-                    .map((e) => e.value)
-                    .where((element) => element.memId == _memId));
-
-                return Flex(
-                  direction: Axis.vertical,
-                  children: [
-                    Padding(
-                      padding: defaultPadding,
-                      child: Flex(
-                        direction: Axis.horizontal,
-                        spacing: 4.0,
-                        children: [
-                          Text("Min : "),
-                          Text(actSummary.min.toString()),
-                          Text("Max : "),
-                          Text(actSummary.max.toString()),
-                          Text("Avg : "),
-                          Text(actSummary.average.toStringAsPrecision(2)),
-                        ],
-                      ),
-                    ),
-                    Expanded(child: LineChartWrapper(actSummary)),
-                  ],
-                );
-              },
-            ),
+            ActsSummary(ref
+                .watch(actListProvider(_memId))
+                .map((e) => e.value)
+                .where((element) => element.memId == _memId)),
           ),
         ),
         {
-          "_memId": _memId,
+          '_memId': _memId,
+        },
+      );
+}
+
+class _ActLineChartScreen extends StatelessWidget {
+  final String _memName;
+  final ActsSummary _actsSummary;
+
+  const _ActLineChartScreen(this._memName, this._actsSummary);
+
+  @override
+  Widget build(BuildContext context) => v(
+        () => Scaffold(
+          appBar: AppBar(
+            title: Text("$_memName : Count"),
+            actions: AppBarActionsBuilder([]).build(context),
+          ),
+          body: Padding(
+              padding: defaultPadding,
+              child: Flex(
+                direction: Axis.vertical,
+                children: [
+                  Padding(
+                    padding: defaultPadding,
+                    child: Flex(
+                      direction: Axis.horizontal,
+                      spacing: 4.0,
+                      children: [
+                        Text("Min : "),
+                        Text(_actsSummary.min.toString()),
+                        Text("Max : "),
+                        Text(_actsSummary.max.toString()),
+                        Text("Avg : "),
+                        Text(_actsSummary.average.toStringAsPrecision(2)),
+                      ],
+                    ),
+                  ),
+                  Expanded(child: LineChartWrapper(_actsSummary)),
+                ],
+              )),
+        ),
+        {
+          '_memName': _memName,
+          '_actsSummary': _actsSummary,
         },
       );
 }
