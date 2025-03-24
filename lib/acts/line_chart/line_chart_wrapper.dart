@@ -67,7 +67,11 @@ class LineChartWrapper extends StatelessWidget {
     final lwma5 = _actsSummary.linearWeightedMovingAverage(5);
 
     final min = _actsSummary.min;
-    final max = [_actsSummary.max, sma5.values.max, lwma5.values.max].max;
+    final max = [
+      _actsSummary.max,
+      sma5.values.isEmpty ? 0 : sma5.values.max,
+      lwma5.values.isEmpty ? 0 : lwma5.values.max,
+    ].max;
 
     return LineChart(
       LineChartData(

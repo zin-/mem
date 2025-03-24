@@ -21,8 +21,9 @@ class ActsSummary {
         ? element.value.length
         : previousValue,
   );
-  late final double average =
-      groupedListByDate.entries.map((e) => e.value.length).average;
+  late final double average = groupedListByDate.entries.isEmpty
+      ? 0
+      : groupedListByDate.entries.map((e) => e.value.length).average;
 
   Map<DateAndTime, List<Act>> _groupListByDate() => v(
         () {
