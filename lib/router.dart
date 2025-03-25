@@ -36,7 +36,7 @@ GoRouter buildRouter([String? initialPath = _homePath]) => GoRouter(
                   GoRoute(
                     path: _memChartPath,
                     builder: (context, state) => ActLineChartPage(
-                      int.parse(state.pathParameters[_memIdKey]!),
+                      memId: int.parse(state.pathParameters[_memIdKey]!),
                     ),
                   )
                 ]),

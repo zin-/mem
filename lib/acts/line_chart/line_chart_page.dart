@@ -11,55 +11,59 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/values/dimens.dart';
 
-class ActLineChartPage extends ConsumerWidget {
+class ActLineChartPage extends StatefulWidget {
   final int _memId;
 
-  const ActLineChartPage(this._memId, {super.key});
+  const ActLineChartPage({
+    super.key,
+    required int memId,
+  }) : _memId = memId;
+
+  @override
+  State<StatefulWidget> createState() => ActLineChartPageState();
+}
+
+class ActLineChartPageState extends State<ActLineChartPage> {
+  Period _period = Period.aWeek;
+
+  @override
+  Widget build(BuildContext context) => _ActLineChartPage(
+        widget._memId,
+        _period,
+        (selected) => setState(() => _period = selected),
+      );
+}
+
+class _ActLineChartPage extends ConsumerWidget {
+  final int _memId;
+  final Period _period;
+  final void Function(Period selected) _onPeriodSelected;
+
+  const _ActLineChartPage(
+    this._memId,
+    this._period,
+    this._onPeriodSelected,
+  );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => AsyncValueView(
           loadActList(_memId),
-          (loaded) => ActLineChartScreen(
-            memName: ref.read(
+          (loaded) => _ActLineChartScreen(
+            ref.read(
               editingMemByMemIdProvider(_memId).select((v) => v.value.name),
             ),
-            actsSummary: ActsSummary(ref
+            ActsSummary(ref
                 .watch(actListProvider(_memId))
                 .map((e) => e.value)
                 .where((element) => element.memId == _memId)),
+            _period,
+            _onPeriodSelected,
           ),
         ),
         {
           '_memId': _memId,
         },
-      );
-}
-
-class ActLineChartScreen extends StatefulWidget {
-  final String _memName;
-  final ActsSummary _actsSummary;
-
-  const ActLineChartScreen({
-    super.key,
-    required String memName,
-    required ActsSummary actsSummary,
-  })  : _memName = memName,
-        _actsSummary = actsSummary;
-
-  @override
-  State<StatefulWidget> createState() => ActLineChartScreenState();
-}
-
-class ActLineChartScreenState extends State<ActLineChartScreen> {
-  Period _period = Period.aWeek;
-
-  @override
-  Widget build(BuildContext context) => _ActLineChartScreen(
-        widget._memName,
-        widget._actsSummary,
-        _period,
-        (selected) => setState(() => _period = selected),
       );
 }
 
