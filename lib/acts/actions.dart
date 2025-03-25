@@ -10,23 +10,27 @@ import 'states.dart';
 
 part 'actions.g.dart';
 
-final loadActList = FutureProvider.autoDispose.family<void, int>(
-  (ref, memId) => v(
-    () async {
-      // FIXME 全件取得する場合、件数的な不安がある
-      //  1週間分とかにしとくか？
-      final acts = await ActRepository().ship(memId: memId);
+@riverpod
+Future<void> loadActList(Ref ref, int memId) => v(
+      () async {
+        // FIXME 全件取得する場合、件数的な不安がある
+        //  1週間分とかにしとくか？
+        final acts = await ActRepository().ship(memId: memId);
 
-      ref.watch(actsProvider.notifier).upsertAll(
-            acts,
-            (tmp, item) => tmp.id == item.id,
-          );
-    },
-    {
-      'memId': memId,
-    },
-  ),
-);
+        ref
+            .watch(
+              // ignore: avoid_manual_providers_as_generated_provider_dependency
+              actsProvider.notifier,
+            )
+            .upsertAll(
+              acts,
+              (tmp, item) => tmp.id == item.id,
+            );
+      },
+      {
+        'memId': memId,
+      },
+    );
 
 @riverpod
 Future<void> startActByV2(Ref ref, int memId) => v(

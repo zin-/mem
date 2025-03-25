@@ -48,7 +48,7 @@ class _ActLineChartPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => AsyncValueView(
-          loadActList(_memId),
+          loadActListProvider(_memId),
           (loaded) => _ActLineChartScreen(
             ref.read(
               editingMemByMemIdProvider(_memId).select((v) => v.value.name),
