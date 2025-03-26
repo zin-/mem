@@ -13,24 +13,13 @@ extension PeriodExt on Period {
       v(
         () {
           final timeOfNow = TimeOfDay.fromDateTime(now);
-          DateAndTime start;
-          if (timeOfNow.isBefore(startOfDay)) {
-            start = DateAndTime(
-              now.year,
-              now.month,
-              now.day - 1,
-              startOfDay.hour,
-              startOfDay.minute,
-            );
-          } else {
-            start = DateAndTime(
-              now.year,
-              now.month,
-              now.day,
-              startOfDay.hour,
-              startOfDay.minute,
-            );
-          }
+          DateAndTime start = DateAndTime(
+            now.year,
+            now.month,
+            now.day - (timeOfNow.isBefore(startOfDay) ? 1 : 0),
+            startOfDay.hour,
+            startOfDay.minute,
+          );
 
           switch (this) {
             case Period.aWeek:
