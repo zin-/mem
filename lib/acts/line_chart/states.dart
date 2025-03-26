@@ -42,10 +42,12 @@ extension PeriodExt on Period {
                 start = start.subtract(Duration(days: 1));
               }
             case Period.threeMonth:
+              start = start.subtract(Duration(days: DateTime.daysPerWeek * 11));
               while (start.day != 1) {
                 start = start.subtract(Duration(days: 1));
               }
             case Period.aYear:
+              start = start.subtract(Duration(days: DateTime.daysPerWeek * 51));
               while (start.day != 1) {
                 start = start.subtract(Duration(days: 1));
               }

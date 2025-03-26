@@ -60,19 +60,17 @@ class _ActLineChartPage extends ConsumerWidget {
             ActsSummary(
               ref
                   .watch(actListProvider(_memId).select(
-                    (value) => value.where((e) =>
-                        e.value.memId == _memId &&
-                        (_period == Period.all ||
-                            e.value.period?.compareTo(
-                                  _period.toPeriod(
-                                    DateAndTime.now(),
-                                    ref
-                                            .watch(preferencesProvider)
-                                            .value?[startOfDayKey] ??
-                                        defaultStartOfDay,
-                                  )!,
-                                ) ==
-                                1)),
+                    (value) {
+                      final period = _period.toPeriod(
+                        DateAndTime.now(),
+                        ref.watch(preferencesProvider).value?[startOfDayKey] ??
+                            defaultStartOfDay,
+                      );
+                      return value.where((e) =>
+                          e.value.memId == _memId &&
+                          (_period == Period.all ||
+                              e.value.period?.compareTo(period!) == 1));
+                    },
                   ))
                   .map((e) => e.value),
             ),
