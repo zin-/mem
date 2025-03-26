@@ -60,7 +60,7 @@ class ActsSummary {
         },
       );
 
-  Map<DateAndTime, double> simpleMovingAverage(int n) => i(
+  Map<DateAndTime, double> simpleMovingAverage(int n) => v(
         () {
           final sorted = groupedListByDate.entries
               .sorted((a, b) => b.key.compareTo(a.key));
@@ -85,7 +85,7 @@ class ActsSummary {
         n,
       );
 
-  Map<DateAndTime, double> linearWeightedMovingAverage(int n) => i(
+  Map<DateAndTime, double> linearWeightedMovingAverage(int n) => v(
         () {
           final sorted = groupedListByDate.entries
               .sorted((a, b) => b.key.compareTo(a.key));

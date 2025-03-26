@@ -55,14 +55,12 @@ class LineChartWrapper extends StatelessWidget {
         ),
       ),
     );
-    final actCount = LineChartBarData(
-      spots: _actsSummary.groupedListByDate.entries
-          .map((e) => FlSpot(
-                e.key.millisecondsSinceEpoch.toDouble(),
-                e.value.length.toDouble(),
-              ))
-          .toList(),
-    );
+    final actCount = _actsSummary.groupedListByDate.entries
+        .map((e) => FlSpot(
+              e.key.millisecondsSinceEpoch.toDouble(),
+              e.value.length.toDouble(),
+            ))
+        .toList(growable: false);
     final sma5 = _actsSummary.simpleMovingAverage(5);
     final lwma5 = _actsSummary.linearWeightedMovingAverage(5);
 
@@ -109,7 +107,9 @@ class LineChartWrapper extends StatelessWidget {
             dotData: const FlDotData(show: false),
             color: Colors.tealAccent,
           ),
-          actCount,
+          LineChartBarData(
+            spots: actCount,
+          ),
         ],
         lineTouchData: LineTouchData(
           enabled: true,
