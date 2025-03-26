@@ -95,14 +95,24 @@ void main() => group(_name, () {
           }
         });
 
-        testWidgets("Select.", (widgetTester) async {
-          await widgetTester.show(insertedMemName);
+        group("Select", () {
+          Period.values
+              .where(
+            (e) => e != Period.aWeek,
+          )
+              .forEach((target) {
+            testWidgets("${target.name}.", (widgetTester) async {
+              await widgetTester.show(insertedMemName);
 
-          await widgetTester.tap(find.byIcon(Icons.more_vert));
-          await widgetTester.pumpAndSettle();
+              await widgetTester.tap(find.byIcon(Icons.more_vert));
+              await widgetTester.pumpAndSettle();
 
-          await widgetTester.tap(find.text(Period.aMonth.name));
-          await widgetTester.pumpAndSettle();
+              await widgetTester.tap(find.text(target.name));
+              await widgetTester.pumpAndSettle();
+
+              expect(true, isTrue);
+            });
+          });
         });
       });
     });

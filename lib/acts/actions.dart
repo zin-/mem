@@ -1,8 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/act.dart';
+import 'package:mem/acts/line_chart/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/acts/act_repository.dart';
+import 'package:mem/settings/preference/keys.dart';
+import 'package:mem/settings/states.dart';
+import 'package:mem/values/constants.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'client.dart';
@@ -11,11 +15,15 @@ import 'states.dart';
 part 'actions.g.dart';
 
 @riverpod
-Future<void> loadActList(Ref ref, int memId) => v(
+Future<void> loadActList(Ref ref, int memId, Period period) => v(
       () async {
-        // FIXME 全件取得する場合、件数的な不安がある
-        //  1週間分とかにしとくか？
-        final acts = await ActRepository().ship(memId: memId);
+        final acts = await ActRepository().ship(
+          memId: memId,
+          period: period.toPeriod(
+              DateAndTime.now(),
+              ref.watch(preferencesProvider).value?[startOfDayKey] ??
+                  defaultStartOfDay),
+        );
 
         ref
             .watch(
@@ -29,6 +37,7 @@ Future<void> loadActList(Ref ref, int memId) => v(
       },
       {
         'memId': memId,
+        'period': period,
       },
     );
 

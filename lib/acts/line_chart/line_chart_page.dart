@@ -5,10 +5,14 @@ import 'package:mem/acts/acts_summary.dart';
 import 'package:mem/acts/line_chart/line_chart_wrapper.dart';
 import 'package:mem/acts/line_chart/states.dart';
 import 'package:mem/acts/states.dart';
+import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/view/async_value_view.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
+import 'package:mem/settings/preference/keys.dart';
+import 'package:mem/settings/states.dart';
+import 'package:mem/values/constants.dart';
 import 'package:mem/values/dimens.dart';
 
 class ActLineChartPage extends StatefulWidget {
@@ -48,15 +52,30 @@ class _ActLineChartPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => AsyncValueView(
-          loadActListProvider(_memId),
+          loadActListProvider(_memId, _period),
           (loaded) => _ActLineChartScreen(
             ref.read(
               editingMemByMemIdProvider(_memId).select((v) => v.value.name),
             ),
-            ActsSummary(ref
-                .watch(actListProvider(_memId))
-                .map((e) => e.value)
-                .where((element) => element.memId == _memId)),
+            ActsSummary(
+              ref
+                  .watch(actListProvider(_memId).select(
+                    (value) => value.where((e) =>
+                        e.value.memId == _memId &&
+                        (_period == Period.all ||
+                            e.value.period?.compareTo(
+                                  _period.toPeriod(
+                                    DateAndTime.now(),
+                                    ref
+                                            .watch(preferencesProvider)
+                                            .value?[startOfDayKey] ??
+                                        defaultStartOfDay,
+                                  )!,
+                                ) ==
+                                1)),
+                  ))
+                  .map((e) => e.value),
+            ),
             _period,
             _onPeriodSelected,
           ),
