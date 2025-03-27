@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class DateAndTime extends DateTime {
   bool isAllDay = false;
 
@@ -57,6 +59,11 @@ class DateAndTime extends DateTime {
         millisecond,
         microsecond,
       );
+
+  int get weekNumber {
+    int dayOfYear = int.parse(DateFormat("D").format(this));
+    return ((dayOfYear - weekday + 10) / 7).floor();
+  }
 
   @override
   DateAndTime add(Duration duration) {

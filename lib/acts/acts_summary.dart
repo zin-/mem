@@ -54,9 +54,22 @@ class ActsSummary {
           });
           groupedListByDate.addEntries(fillElements);
 
-          return Map.fromEntries(groupedListByDate.entries.sorted(
-            (a, b) => a.key.compareTo(b.key),
-          ));
+          return groupedListByDate.entries
+              .sorted((a, b) => a.key.compareTo(b.key))
+              .groupListsBy(
+                (element) =>
+                    groupedListByDate.length > DateTime.daysPerWeek * 4 * 3
+                        ? element.key.year * 100 + element.key.month
+                        : groupedListByDate.length > DateTime.daysPerWeek * 4
+                            ? element.key.weekNumber
+                            : element.key,
+              )
+              .map(
+                (key, value) => MapEntry(
+                  value.first.key,
+                  value.map((e) => e.value).flattened.toList(),
+                ),
+              );
         },
       );
 

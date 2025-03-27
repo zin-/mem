@@ -22,6 +22,22 @@ class LineChartWrapper extends StatelessWidget {
       ),
     );
 
+    final actCount = _actsSummary.groupedListByDate.entries
+        .map((e) => FlSpot(
+              e.key.millisecondsSinceEpoch.toDouble(),
+              e.value.length.toDouble(),
+            ))
+        .toList(growable: false);
+    final sma5 = _actsSummary.simpleMovingAverage(5);
+    final lwma5 = _actsSummary.linearWeightedMovingAverage(5);
+
+    final min = _actsSummary.min;
+    final max = [
+      _actsSummary.max,
+      sma5.values.isEmpty ? 0 : sma5.values.max,
+      lwma5.values.isEmpty ? 0 : lwma5.values.max,
+    ].max;
+
     final titlesData = FlTitlesData(
       topTitles: const AxisTitles(),
       leftTitles: yAxisTitles,
@@ -29,7 +45,15 @@ class LineChartWrapper extends StatelessWidget {
       bottomTitles: AxisTitles(
         sideTitles: SideTitles(
           showTitles: true,
-          interval: const Duration(days: 1).inMilliseconds.toDouble(),
+          interval: Duration(
+                  days: _actsSummary.groupedListByDate.entries.last.key
+                      .difference(_actsSummary.groupedListByDate.entries
+                          .elementAt(
+                              _actsSummary.groupedListByDate.entries.length - 2)
+                          .key)
+                      .inDays)
+              .inMilliseconds
+              .toDouble(),
           getTitlesWidget: (value, meta) {
             final dateTime = DateTime.fromMillisecondsSinceEpoch(
               value.toInt(),
@@ -54,21 +78,6 @@ class LineChartWrapper extends StatelessWidget {
         ),
       ),
     );
-    final actCount = _actsSummary.groupedListByDate.entries
-        .map((e) => FlSpot(
-              e.key.millisecondsSinceEpoch.toDouble(),
-              e.value.length.toDouble(),
-            ))
-        .toList(growable: false);
-    final sma5 = _actsSummary.simpleMovingAverage(5);
-    final lwma5 = _actsSummary.linearWeightedMovingAverage(5);
-
-    final min = _actsSummary.min;
-    final max = [
-      _actsSummary.max,
-      sma5.values.isEmpty ? 0 : sma5.values.max,
-      lwma5.values.isEmpty ? 0 : lwma5.values.max,
-    ].max;
 
     return LineChart(
       LineChartData(
