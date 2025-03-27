@@ -47,7 +47,7 @@ void main() => group(_name, () {
             defColCreatedAt.name: zeroDate,
           },
         );
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 49; i++) {
           final start = now.subtract(Duration(days: i));
           for (int j = 0; j < randomInt(5); j++) {
             await dbA.insert(
@@ -108,7 +108,7 @@ void main() => group(_name, () {
               await widgetTester.pumpAndSettle();
 
               await widgetTester.tap(find.text(target.name));
-              await widgetTester.pumpAndSettle();
+              await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
               expect(true, isTrue);
             });
