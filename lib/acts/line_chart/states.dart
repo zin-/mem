@@ -53,7 +53,9 @@ extension PeriodExt on Period {
                 Period.aMonth => DateTime.daysPerWeek * 4,
                 Period.threeMonth => DateTime.daysPerWeek * 12,
                 Period.aYear => DateTime.daysPerWeek * 52,
+// coverage:ignore-start
                 Period.all => throw UnimplementedError(),
+// coverage:ignore-end
               }),
             ),
           );
