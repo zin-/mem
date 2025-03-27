@@ -35,21 +35,20 @@ class LineChartWrapper extends StatelessWidget {
               value.toInt(),
             );
 
+            DateFormat? formatter;
+            if (value == meta.min || value == meta.max) {
+              formatter = DateFormat.yMd();
+            } else if (meta.axisPosition < meta.parentAxisSize * 0.1 ||
+                meta.parentAxisSize * 0.9 < meta.axisPosition) {
+              formatter = null;
+            } else if (dateTime.day == 1) {
+              formatter = DateFormat.Md();
+            } else if (dateTime.day == 10 || dateTime.day == 20) {
+              formatter = DateFormat.d();
+            }
+
             return Text(
-              (value == meta.min || value == meta.max || dateTime.month == 1
-                          ? DateFormat.yMd()
-                          : dateTime.day == 1
-                              ? DateFormat.Md()
-                              : dateTime.day == 5 ||
-                                      dateTime.day == 10 ||
-                                      dateTime.day == 15 ||
-                                      dateTime.day == 20 ||
-                                      dateTime.day == 25 ||
-                                      dateTime.day == 30
-                                  ? DateFormat.d()
-                                  : null)
-                      ?.format(dateTime) ??
-                  "",
+              formatter?.format(dateTime) ?? "",
             );
           },
         ),
