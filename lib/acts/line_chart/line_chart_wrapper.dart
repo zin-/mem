@@ -22,6 +22,34 @@ class LineChartWrapper extends StatelessWidget {
       ),
     );
 
+    final actCount = _actsSummary.groupedListByDate.entries
+        .map((e) => FlSpot(
+              e.key.millisecondsSinceEpoch.toDouble(),
+              e.value.length.toDouble(),
+            ))
+        .toList(growable: false);
+    final sma5 = _actsSummary.simpleMovingAverage(5);
+    final lwma5 = _actsSummary.linearWeightedMovingAverage(5);
+
+    final min = _actsSummary.min;
+    final max = [
+      _actsSummary.max,
+      sma5.values.isEmpty ? 0 : sma5.values.max,
+      lwma5.values.isEmpty ? 0 : lwma5.values.max,
+    ].max;
+
+    final interval = Duration(
+            days: _actsSummary.groupedListByDate.entries.length > 1
+                ? _actsSummary.groupedListByDate.entries.last.key
+                    .difference(_actsSummary.groupedListByDate.entries
+                        .elementAt(
+                            _actsSummary.groupedListByDate.entries.length - 2)
+                        .key)
+                    .inDays
+                : 1)
+        .inMilliseconds
+        .toDouble();
+
     final titlesData = FlTitlesData(
       topTitles: const AxisTitles(),
       leftTitles: yAxisTitles,
@@ -29,45 +57,31 @@ class LineChartWrapper extends StatelessWidget {
       bottomTitles: AxisTitles(
         sideTitles: SideTitles(
           showTitles: true,
-          interval: const Duration(days: 1).inMilliseconds.toDouble(),
+          interval: interval,
           getTitlesWidget: (value, meta) {
             final dateTime = DateTime.fromMillisecondsSinceEpoch(
               value.toInt(),
             );
 
+            DateFormat? formatter;
+            if (value == meta.min || value == meta.max) {
+              formatter = DateFormat.yMd();
+            } else if (meta.axisPosition < meta.parentAxisSize * 0.1 ||
+                meta.parentAxisSize * 0.9 < meta.axisPosition) {
+              formatter = null;
+            } else if (dateTime.day == 1) {
+              formatter = DateFormat.Md();
+            } else if (dateTime.day == 10 || dateTime.day == 20) {
+              formatter = DateFormat.d();
+            }
+
             return Text(
-              (value == meta.min || value == meta.max || dateTime.month == 1
-                          ? DateFormat.yMd()
-                          : dateTime.day == 1
-                              ? DateFormat.Md()
-                              : dateTime.day == 5 ||
-                                      dateTime.day == 10 ||
-                                      dateTime.day == 15 ||
-                                      dateTime.day == 20 ||
-                                      dateTime.day == 25 ||
-                                      dateTime.day == 30
-                                  ? DateFormat.d()
-                                  : null)
-                      ?.format(dateTime) ??
-                  "",
+              formatter?.format(dateTime) ?? "",
             );
           },
         ),
       ),
     );
-    final actCount = LineChartBarData(
-      spots: _actsSummary.groupedListByDate.entries
-          .map((e) => FlSpot(
-                e.key.millisecondsSinceEpoch.toDouble(),
-                e.value.length.toDouble(),
-              ))
-          .toList(),
-    );
-    final sma5 = _actsSummary.simpleMovingAverage(5);
-    final lwma5 = _actsSummary.linearWeightedMovingAverage(5);
-
-    final min = _actsSummary.min;
-    final max = [_actsSummary.max, sma5.values.max, lwma5.values.max].max;
 
     return LineChart(
       LineChartData(
@@ -105,7 +119,9 @@ class LineChartWrapper extends StatelessWidget {
             dotData: const FlDotData(show: false),
             color: Colors.tealAccent,
           ),
-          actCount,
+          LineChartBarData(
+            spots: actCount,
+          ),
         ],
         lineTouchData: LineTouchData(
           enabled: true,

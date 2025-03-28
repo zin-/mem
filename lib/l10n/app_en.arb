@@ -3,6 +3,7 @@
   "appTitle": "Mem",
 
   "actChartPageTitle": "Act chart",
+  "timePeriod": "Time period",
 
   "memListDestinationLabel": "List",
   "memListToDoSubHeader": "ToDo",

@@ -21,8 +21,9 @@ class ActsSummary {
         ? element.value.length
         : previousValue,
   );
-  late final double average =
-      groupedListByDate.entries.map((e) => e.value.length).average;
+  late final double average = groupedListByDate.entries.isEmpty
+      ? 0
+      : groupedListByDate.entries.map((e) => e.value.length).average;
 
   Map<DateAndTime, List<Act>> _groupListByDate() => v(
         () {
@@ -53,13 +54,26 @@ class ActsSummary {
           });
           groupedListByDate.addEntries(fillElements);
 
-          return Map.fromEntries(groupedListByDate.entries.sorted(
-            (a, b) => a.key.compareTo(b.key),
-          ));
+          return groupedListByDate.entries
+              .sorted((a, b) => a.key.compareTo(b.key))
+              .groupListsBy(
+                (element) =>
+                    groupedListByDate.length > DateTime.daysPerWeek * 4 * 3
+                        ? element.key.year * 100 + element.key.month
+                        : groupedListByDate.length > DateTime.daysPerWeek * 4
+                            ? element.key.weekNumber
+                            : element.key,
+              )
+              .map(
+                (key, value) => MapEntry(
+                  value.first.key,
+                  value.map((e) => e.value).flattened.toList(),
+                ),
+              );
         },
       );
 
-  Map<DateAndTime, double> simpleMovingAverage(int n) => i(
+  Map<DateAndTime, double> simpleMovingAverage(int n) => v(
         () {
           final sorted = groupedListByDate.entries
               .sorted((a, b) => b.key.compareTo(a.key));
@@ -84,7 +98,7 @@ class ActsSummary {
         n,
       );
 
-  Map<DateAndTime, double> linearWeightedMovingAverage(int n) => i(
+  Map<DateAndTime, double> linearWeightedMovingAverage(int n) => v(
         () {
           final sorted = groupedListByDate.entries
               .sorted((a, b) => b.key.compareTo(a.key));
