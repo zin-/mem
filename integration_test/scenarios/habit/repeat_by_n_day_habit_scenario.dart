@@ -192,7 +192,7 @@ void main() => group(': $_name', () {
             initializeCount++;
             return true;
           },
-          ...List.filled(8, (m) async {
+          ...List.filled(2, (m) async {
             expect(m.method, equals('cancelTaskByUniqueName'));
             cancelTaskByUniqueNameCount++;
             return false;
@@ -270,7 +270,7 @@ void main() => group(': $_name', () {
           );
           expect(
             cancelTaskByUniqueNameCount,
-            equals(defaultTargetPlatform == TargetPlatform.android ? 8 : 0),
+            equals(defaultTargetPlatform == TargetPlatform.android ? 2 : 0),
             reason: 'cancelTaskByUniqueNameCount',
           );
           expect(
