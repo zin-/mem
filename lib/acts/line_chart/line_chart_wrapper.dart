@@ -38,6 +38,18 @@ class LineChartWrapper extends StatelessWidget {
       lwma5.values.isEmpty ? 0 : lwma5.values.max,
     ].max;
 
+    final interval = Duration(
+            days: _actsSummary.groupedListByDate.entries.length > 1
+                ? _actsSummary.groupedListByDate.entries.last.key
+                    .difference(_actsSummary.groupedListByDate.entries
+                        .elementAt(
+                            _actsSummary.groupedListByDate.entries.length - 2)
+                        .key)
+                    .inDays
+                : 1)
+        .inMilliseconds
+        .toDouble();
+
     final titlesData = FlTitlesData(
       topTitles: const AxisTitles(),
       leftTitles: yAxisTitles,
@@ -45,15 +57,7 @@ class LineChartWrapper extends StatelessWidget {
       bottomTitles: AxisTitles(
         sideTitles: SideTitles(
           showTitles: true,
-          interval: Duration(
-                  days: _actsSummary.groupedListByDate.entries.last.key
-                      .difference(_actsSummary.groupedListByDate.entries
-                          .elementAt(
-                              _actsSummary.groupedListByDate.entries.length - 2)
-                          .key)
-                      .inDays)
-              .inMilliseconds
-              .toDouble(),
+          interval: interval,
           getTitlesWidget: (value, meta) {
             final dateTime = DateTime.fromMillisecondsSinceEpoch(
               value.toInt(),
