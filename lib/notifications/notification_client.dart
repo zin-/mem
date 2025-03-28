@@ -142,8 +142,6 @@ class NotificationClient {
   }) =>
       v(
         () async {
-          await cancelMemNotifications(memId);
-
           final mem = savedMem ??
               await _memRepository
                   .ship(
@@ -152,8 +150,9 @@ class NotificationClient {
                   .then(
                     (v) => v.single,
                   );
-
-          if (!mem!.value.isDone && !mem.isArchived) {
+          if (mem!.value.isDone || mem.isArchived) {
+            cancelMemNotifications(memId);
+          } else {
             final latestAct = await ActRepository()
                 .ship(
                   memId: memId,

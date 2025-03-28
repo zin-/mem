@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -20,7 +19,6 @@ import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/mems/mem_notification_entity.dart';
 import 'package:mem/mems/mem_notification_repository.dart';
 import 'package:mem/mems/mem_repository.dart';
-import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification_client.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/settings/preference/client.dart';
@@ -533,7 +531,7 @@ void main() => group(_scenarioName, () {
                   initializeCount++;
                   return true;
                 },
-                ...List.filled(10, (m) async {
+                ...List.filled(4, (m) async {
                   expect(m.method, equals('cancelTaskByUniqueName'));
                   cancelTaskByUniqueNameCount++;
                   return false;
@@ -560,7 +558,7 @@ void main() => group(_scenarioName, () {
               expect(
                 cancelTaskByUniqueNameCount,
                 equals(
-                  defaultTargetPlatform == TargetPlatform.android ? 10 : 0,
+                  defaultTargetPlatform == TargetPlatform.android ? 4 : 0,
                 ),
                 reason: 'cancelTaskByUniqueNameCount',
               );
@@ -600,17 +598,10 @@ void main() => group(_scenarioName, () {
           widgetTester.ignoreMockMethodCallHandler(
               MethodChannelMock.workmanagerForeground);
 
-          final cancelIds = insertedMemIds
-              .map(
-                (e) => AllMemNotificationsId.of(e),
-              )
-              .flattened;
-
           int flutterLocalNotificationsInitializeCount = 0;
           int getNotificationAppLaunchDetailsCount = 0;
           int cancelAllCount = 0;
           int deleteNotificationChannelCount = 0;
-          int cancelCount = 0;
           widgetTester.setMockMethodCallHandler(
               MethodChannelMock.flutterLocalNotifications, [
             (m) async {
@@ -635,11 +626,6 @@ void main() => group(_scenarioName, () {
                 return null;
               },
             ),
-            ...cancelIds.map((e) => (m) async {
-                  expect(m.method, equals('cancel'));
-                  cancelCount++;
-                  return false;
-                }),
           ]);
 
           await runApplication();
@@ -687,11 +673,6 @@ void main() => group(_scenarioName, () {
                 ? NotificationType.values.length
                 : 0),
             reason: 'deleteNotificationChannelCount',
-          );
-          expect(
-            cancelCount,
-            equals(defaultTargetPlatform == TargetPlatform.android ? 600 : 0),
-            reason: 'cancelCount',
           );
 
           widgetTester.clearAllMockMethodCallHandler();
