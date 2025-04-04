@@ -71,13 +71,16 @@ class DatabaseAccessor {
             )
             .then((value) =>
                 value.map((e) => _converter.from(e, tableDefinition)).toList()),
-        [
-          tableDefinition.name,
-          where,
-          whereArgs,
-          orderBy,
-          limit,
-        ],
+        {
+          'tableName': tableDefinition.name,
+          'groupBy': groupBy,
+          'extraColumns': extraColumns,
+          'where': where,
+          'whereArgs': whereArgs,
+          'orderBy': orderBy,
+          'offset': offset,
+          'limit': limit,
+        },
       );
 
   Future<int> update(
