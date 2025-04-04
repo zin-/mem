@@ -13,4 +13,7 @@ class Max extends ExtraColumn {
 
   @override
   String get toQuery => "MAX ( ${column.name} )";
+
+  @override
+  String toString() => toQuery;
 }
