@@ -8,6 +8,7 @@
 
 完了したら
 ```shell
+cd ../
 flutter doctor -v
 ```
 で状況が確認できる
@@ -23,6 +24,7 @@ Android Studio（IntelliJ IDEAでもほぼ同様）からAndroid SDK managerを�
 
 完了したら
 ```shell
+cd ../
 flutter doctor --android-licenses
 ```
 でライセンスに同意したらOK
@@ -44,6 +46,7 @@ Flutter SDKのpathをIDEに教えてあげる必要がある
 
 完了したら
 ```shell
+cd ../
 flutter pub get
 ```
 で依存関係を解決する
@@ -51,6 +54,7 @@ flutter pub get
 ## Run scripts
 
 ```shell
+cd ../
 dart pub global activate rps
 ```
 
