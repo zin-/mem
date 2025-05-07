@@ -27,6 +27,7 @@ scripts:
     watch: dart run build_runner watch --delete-conflicting-outputs
     l10n: flutter gen-l10n
     icon: flutter pub run flutter_launcher_icons:main
+  run: flutter run -d emulator-5554
   clean: flutter clean
 
 environment:
