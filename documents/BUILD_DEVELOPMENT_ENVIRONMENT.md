@@ -1,5 +1,19 @@
 # DEVELOPMENT_ENVIRONMENT
 
+## Install Flutter
+
+基本的には[公式のGet Started](https://docs.flutter.dev/get-started/install)通りで良い
+
+大きく変わっていなければ(macOSでは)、 1.zipファイルのダウンロード、2.解凍、配置、3.PATH追加が必要
+
+完了したら
+```zsh
+flutter doctor -v
+```
+で状況が確認できる
+
+初回実行時は`Android license status unknown.`となっているはずだが、これには`Android sdkmanager`が必要なので、以降の項目で行う
+
 ## Run scripts
 
 ```shell
