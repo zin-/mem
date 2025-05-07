@@ -51,12 +51,31 @@ flutter pub get
 ```
 で依存関係を解決する
 
-## Run scripts
+## Run Pubspec Scripts(RPS)
 
+プロジェクト内のコマンド実行には[RPS](https://pub.dev/packages/rps)を利用している  
+
+まず有効化し
 ```shell
 cd ../
 dart pub global activate rps
 ```
+
+自動生成ファイルを生成する
+```shell
+cd ../
+rps gen build
+```
+ファイルエラーが発生しなくなっていればOK
+
+## 仮想デバイスでの実行
+
+（Androidのemulatorがある前提
+```shell
+cd ../
+rps run
+```
+初回は様々な自動生成ファイルを生成する関係でかなり時間がかかるので注意
 
 ## For test
 
