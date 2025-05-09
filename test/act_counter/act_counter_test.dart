@@ -22,14 +22,15 @@ void main() {
               defColCreatedAt.name: DateTime.now(),
             }));
       final acts = [
-        SavedActEntity(ActEntity(Act.by(memId, DateAndTime.now())).toMap
-          ..addAll({
-            defPkId.name: 1,
-            defColCreatedAt.name: zeroDate,
-            defColUpdatedAt.name: oneDate
-          })),
         SavedActEntity(
-          ActEntity(Act.by(memId, DateAndTime.now())).toMap
+            ActEntity(Act.by(memId, startWhen: DateAndTime.now())).toMap
+              ..addAll({
+                defPkId.name: 1,
+                defColCreatedAt.name: zeroDate,
+                defColUpdatedAt.name: oneDate
+              })),
+        SavedActEntity(
+          ActEntity(Act.by(memId, startWhen: DateAndTime.now())).toMap
             ..addAll({defPkId.name: 2, defColCreatedAt.name: zeroDate}),
         )
       ];
@@ -50,16 +51,16 @@ void main() {
               defColCreatedAt.name: DateTime.now(),
             }));
       final acts = [
+        SavedActEntity(ActEntity(Act.by(memId,
+                startWhen: DateAndTime(0), endWhen: DateAndTime.now()))
+            .toMap
+          ..addAll({
+            defPkId.name: 3,
+            defColCreatedAt.name: zeroDate,
+            defColUpdatedAt.name: oneDate,
+          })),
         SavedActEntity(
-            ActEntity(Act.by(memId, DateAndTime(0), endWhen: DateAndTime.now()))
-                .toMap
-              ..addAll({
-                defPkId.name: 3,
-                defColCreatedAt.name: zeroDate,
-                defColUpdatedAt.name: oneDate,
-              })),
-        SavedActEntity(
-          ActEntity(Act.by(memId, DateAndTime.now())).toMap
+          ActEntity(Act.by(memId, startWhen: DateAndTime.now())).toMap
             ..addAll({defPkId.name: 4, defColCreatedAt.name: zeroDate}),
         )
       ];

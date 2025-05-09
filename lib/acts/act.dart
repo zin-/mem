@@ -17,11 +17,12 @@ abstract class Act {
 
   Act(this.memId, this.period, this.pausedAt, this.state);
 
-  factory Act.by(int memId,
-      DateAndTime? startWhen, {
-        DateAndTime? endWhen,
-        DateTime? pausedAt,
-      }) {
+  factory Act.by(
+    int memId, {
+    DateAndTime? startWhen,
+    DateAndTime? endWhen,
+    DateTime? pausedAt,
+  }) {
     if (startWhen == null) {
       if (pausedAt != null) {
         return PausedAct(memId, pausedAt);
@@ -35,9 +36,11 @@ abstract class Act {
       return FinishedAct(memId, startWhen, endWhen);
     }
 
-    throw ArgumentError(
-        "引数が不足している。${{'startWhen': startWhen, 'endWhen': endWhen,
-          'pausedAt': pausedAt,}}");
+    throw ArgumentError("引数が不足している。${{
+      'startWhen': startWhen,
+      'endWhen': endWhen,
+      'pausedAt': pausedAt,
+    }}");
   }
 
   bool get isActive => period?.start != null && period?.end == null;
@@ -52,11 +55,11 @@ abstract class Act {
 class ActiveAct extends Act {
   ActiveAct(int memId, DateAndTime startWhen)
       : super(
-    memId,
-    DateAndTimePeriod(start: startWhen),
-    null,
-    ActState.active,
-  );
+          memId,
+          DateAndTimePeriod(start: startWhen),
+          null,
+          ActState.active,
+        );
 
   @override
   FinishedAct finish(DateAndTime when) =>
@@ -68,14 +71,16 @@ class ActiveAct extends Act {
 }
 
 class FinishedAct extends Act {
-  FinishedAct(int memId,
-      DateAndTime startWhen,
-      DateAndTime endWhen,) : super(
-    memId,
-    DateAndTimePeriod(start: startWhen, end: endWhen),
-    null,
-    ActState.finished,
-  );
+  FinishedAct(
+    int memId,
+    DateAndTime startWhen,
+    DateAndTime endWhen,
+  ) : super(
+          memId,
+          DateAndTimePeriod(start: startWhen, end: endWhen),
+          null,
+          ActState.finished,
+        );
 
   @override
   FinishedAct finish(DateAndTime when) =>
@@ -89,11 +94,11 @@ class FinishedAct extends Act {
 class PausedAct extends Act {
   PausedAct(int memId, DateTime pausedAt)
       : super(
-    memId,
-    null,
-    pausedAt,
-    ActState.paused,
-  );
+          memId,
+          null,
+          pausedAt,
+          ActState.paused,
+        );
 
   @override
   FinishedAct finish(DateAndTime when) => FinishedAct(memId, when, when);

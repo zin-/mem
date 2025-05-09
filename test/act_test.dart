@@ -13,7 +13,7 @@ void main() => group(
             test(
               ': new.',
               () {
-                final act = Act.by(0, DateAndTime(0));
+                final act = Act.by(0, startWhen: DateAndTime(0));
 
                 expect(act, isA<ActiveAct>());
                 expect(act.isActive, isTrue);
@@ -24,7 +24,7 @@ void main() => group(
             test(
               ': finish.',
               () {
-                final activeAct = Act.by(0, DateAndTime(0));
+                final activeAct = Act.by(0, startWhen: DateAndTime(0));
 
                 final finishedAct = activeAct.finish(DateAndTime(1));
 
@@ -34,7 +34,7 @@ void main() => group(
             test(
               ': start.',
               () {
-                final activeAct = Act.by(0, DateAndTime(0));
+                final activeAct = Act.by(0, startWhen: DateAndTime(0));
 
                 expect(
                   () => activeAct.start(DateAndTime(1)),
@@ -53,7 +53,7 @@ void main() => group(
               () {
                 final act = Act.by(
                   0,
-                  DateAndTime(0),
+                  startWhen: DateAndTime(0),
                   endWhen: DateAndTime(0),
                 );
 
@@ -68,7 +68,7 @@ void main() => group(
               () {
                 final finishedAct = Act.by(
                   0,
-                  DateAndTime(0),
+                  startWhen: DateAndTime(0),
                   endWhen: DateAndTime(1),
                 );
 
@@ -83,7 +83,7 @@ void main() => group(
               () {
                 final finishedAct = Act.by(
                   0,
-                  DateAndTime(0),
+                  startWhen: DateAndTime(0),
                   endWhen: DateAndTime(1),
                 );
 
@@ -102,7 +102,7 @@ void main() => group(
             test(
               ': new.',
               () {
-                final act = Act.by(0, null);
+                final act = Act.by(0, startWhen: null);
 
                 expect(act, isA<PausedAct>());
                 expect(act.isActive, isFalse);
@@ -113,7 +113,7 @@ void main() => group(
             test(
               ': finish.',
               () {
-                final pausedAct = Act.by(0, null);
+                final pausedAct = Act.by(0, startWhen: null);
 
                 final finishedAct = pausedAct.finish(DateAndTime(1));
 
@@ -123,7 +123,7 @@ void main() => group(
             test(
               ': start.',
               () {
-                final pausedAct = Act.by(0, null);
+                final pausedAct = Act.by(0, startWhen: null);
 
                 final finishedAct = pausedAct.start(DateAndTime(1));
 
