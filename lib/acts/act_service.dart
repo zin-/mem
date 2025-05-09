@@ -86,8 +86,7 @@ class ActService {
           if (latestActiveActEntity == null ||
               latestActiveActEntity.value is FinishedAct) {
             return await _actRepository.receive(
-              // TODO endWhenだけでAct側で両方に入れるほうが綺麗かも
-              ActEntity(Act.by(memId, startWhen: when, endWhen: when)),
+              ActEntity(Act.by(memId, endWhen: when)),
             );
           } else {
             return await _actRepository.replace(
