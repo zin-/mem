@@ -4,15 +4,16 @@ import 'package:mem/framework/date_and_time/date_and_time.dart';
 
 const _name = 'Act test';
 
-void main() => group(
+void main() =>
+    group(
       _name,
-      () {
-        group(
-          ': ActiveAct',
           () {
-            test(
-              ': new.',
+        group(
+          'ActiveAct',
               () {
+            test(
+              'New.',
+                  () {
                 final act = Act.by(0, startWhen: DateAndTime(0));
 
                 expect(act, isA<ActiveAct>());
@@ -22,8 +23,8 @@ void main() => group(
             );
 
             test(
-              ': finish.',
-              () {
+              'Finish.',
+                  () {
                 final activeAct = Act.by(0, startWhen: DateAndTime(0));
 
                 final finishedAct = activeAct.finish(DateAndTime(1));
@@ -32,12 +33,12 @@ void main() => group(
               },
             );
             test(
-              ': start.',
-              () {
+              'Start.',
+                  () {
                 final activeAct = Act.by(0, startWhen: DateAndTime(0));
 
                 expect(
-                  () => activeAct.start(DateAndTime(1)),
+                      () => activeAct.start(DateAndTime(1)),
                   throwsA(isA<StateError>()),
                 );
               },
@@ -46,11 +47,11 @@ void main() => group(
         );
 
         group(
-          ': FinishedAct',
-          () {
-            test(
-              ': new.',
+          'FinishedAct',
               () {
+            test(
+              'New.',
+                  () {
                 final act = Act.by(
                   0,
                   startWhen: DateAndTime(0),
@@ -64,8 +65,8 @@ void main() => group(
             );
 
             test(
-              ': finish.',
-              () {
+              'Finish.',
+                  () {
                 final finishedAct = Act.by(
                   0,
                   startWhen: DateAndTime(0),
@@ -73,14 +74,14 @@ void main() => group(
                 );
 
                 expect(
-                  () => finishedAct.finish(DateAndTime(1)),
+                      () => finishedAct.finish(DateAndTime(1)),
                   throwsA(isA<StateError>()),
                 );
               },
             );
             test(
-              ': start.',
-              () {
+              'Start.',
+                  () {
                 final finishedAct = Act.by(
                   0,
                   startWhen: DateAndTime(0),
@@ -88,7 +89,7 @@ void main() => group(
                 );
 
                 expect(
-                  () => finishedAct.start(DateAndTime(1)),
+                      () => finishedAct.start(DateAndTime(1)),
                   throwsA(isA<StateError>()),
                 );
               },
@@ -97,12 +98,12 @@ void main() => group(
         );
 
         group(
-          ': PausedAct',
-          () {
-            test(
-              ': new.',
+          'PausedAct',
               () {
-                final act = Act.by(0, startWhen: null);
+            test(
+              'New.',
+                  () {
+                final act = Act.by(0, pausedAt: DateAndTime(0));
 
                 expect(act, isA<PausedAct>());
                 expect(act.isActive, isFalse);
@@ -111,9 +112,9 @@ void main() => group(
             );
 
             test(
-              ': finish.',
-              () {
-                final pausedAct = Act.by(0, startWhen: null);
+              'Finish.',
+                  () {
+                final pausedAct = Act.by(0, pausedAt: DateAndTime(0));
 
                 final finishedAct = pausedAct.finish(DateAndTime(1));
 
@@ -121,9 +122,9 @@ void main() => group(
               },
             );
             test(
-              ': start.',
-              () {
-                final pausedAct = Act.by(0, startWhen: null);
+              'Start.',
+                  () {
+                final pausedAct = Act.by(0, pausedAt: DateAndTime(0));
 
                 final finishedAct = pausedAct.start(DateAndTime(1));
 
