@@ -16,6 +16,7 @@ class ActEntity with EntityV2<Act> {
         defColActsStartIsAllDay.name: value.period?.start?.isAllDay,
         defColActsEnd.name: value.period?.end,
         defColActsEndIsAllDay.name: value.period?.end?.isAllDay,
+        defColActsPausedAt.name: value.pausedAt,
       };
 
   @override
@@ -43,6 +44,7 @@ class SavedActEntity extends ActEntity with DatabaseTupleEntityV2<int, Act> {
                         ? null
                         : map[defColActsEnd.name],
                   ),
+            pausedAt: map[defColActsPausedAt.name],
           ),
         ) {
     withMap(map);
