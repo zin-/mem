@@ -15,10 +15,12 @@ import '../helpers.dart';
 const _name = "MemListPage scenario";
 
 extension on WidgetTester {
-  void expectMemListItem(int at,
-      List<String?> texts,
-      List<IconData> icons,
-      List<IconData> noIcons,) {
+  void expectMemListItem(
+    int at,
+    List<String?> texts,
+    List<IconData> icons,
+    List<IconData> noIcons,
+  ) {
     final memListItemFinder = find.byType(ListTile).at(at);
 
     final textsFinder = find.descendant(
@@ -52,9 +54,9 @@ extension on WidgetTester {
         widget<Icon>(
           find
               .descendant(
-            of: memListItemFinder,
-            matching: find.byType(Icon),
-          )
+                of: memListItemFinder,
+                matching: find.byType(Icon),
+              )
               .at(index),
         ).icon,
         equals(icon),
@@ -72,8 +74,7 @@ extension on WidgetTester {
   }
 }
 
-void main() =>
-    group(_name, () {
+void main() => group(_name, () {
       const insertedMemNameBase = '$_name: inserted mem - name';
       const memWithNoActName = "no act - $insertedMemNameBase";
       const memWithActiveActName = "active act - $insertedMemNameBase";
@@ -99,9 +100,9 @@ void main() =>
           defFkMemNotificationsMemId.name: memWithNoActId,
           defColMemNotificationsTime.name: 60,
           defColMemNotificationsType.name:
-          MemNotificationType.afterActStarted.name,
+              MemNotificationType.afterActStarted.name,
           defColMemNotificationsMessage.name:
-          '$_name: mem notification message',
+              '$_name: mem notification message',
           defColCreatedAt.name: zeroDate,
         });
 
@@ -113,9 +114,9 @@ void main() =>
           defFkMemNotificationsMemId.name: memWithActiveActId,
           defColMemNotificationsTime.name: 120,
           defColMemNotificationsType.name:
-          MemNotificationType.afterActStarted.name,
+              MemNotificationType.afterActStarted.name,
           defColMemNotificationsMessage.name:
-          '$_name: mem notification message',
+              '$_name: mem notification message',
           defColCreatedAt.name: zeroDate,
         });
 
@@ -127,9 +128,9 @@ void main() =>
           defFkMemNotificationsMemId.name: memWithFinishedActId,
           defColMemNotificationsTime.name: 180,
           defColMemNotificationsType.name:
-          MemNotificationType.afterActStarted.name,
+              MemNotificationType.afterActStarted.name,
           defColMemNotificationsMessage.name:
-          '$_name: mem notification message',
+              '$_name: mem notification message',
           defColCreatedAt.name: zeroDate,
         });
 
@@ -143,9 +144,9 @@ void main() =>
             defFkMemNotificationsMemId.name: memWithPausedActId,
             defColMemNotificationsTime.name: 120,
             defColMemNotificationsType.name:
-            MemNotificationType.afterActStarted.name,
+                MemNotificationType.afterActStarted.name,
             defColMemNotificationsMessage.name:
-            '$_name: mem notification message',
+                '$_name: mem notification message',
             defColCreatedAt.name: zeroDate,
           },
         );
@@ -203,41 +204,41 @@ void main() =>
           testWidgets('Start.',
               // 時間に関するテストなのでリトライ可能とする
               retry: maxRetryCount, (widgetTester) async {
-                widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
-                widgetTester.ignoreMockMethodCallHandler(
-                  MethodChannelMock.permissionHandler,
-                );
-                widgetTester.ignoreMockMethodCallHandler(
-                  MethodChannelMock.flutterLocalNotifications,
-                );
+            widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
+            widgetTester.ignoreMockMethodCallHandler(
+              MethodChannelMock.permissionHandler,
+            );
+            widgetTester.ignoreMockMethodCallHandler(
+              MethodChannelMock.flutterLocalNotifications,
+            );
 
-                await runApplication();
-                await widgetTester.pumpAndSettle();
+            await runApplication();
+            await widgetTester.pumpAndSettle();
 
-                await widgetTester.tap(find.descendant(
-                  of: find.byType(ListTile).at(targetAt),
-                  matching: find.byIcon(Icons.play_arrow),
-                ));
-                await widgetTester.pumpAndSettle();
+            await widgetTester.tap(find.descendant(
+              of: find.byType(ListTile).at(targetAt),
+              matching: find.byIcon(Icons.play_arrow),
+            ));
+            await widgetTester.pumpAndSettle();
 
-                widgetTester.expectMemListItem(
-                  0,
-                  [memWithNoActName, "00:00:00", null],
-                  [Icons.pause, Icons.stop],
-                  [Icons.play_arrow],
-                );
+            widgetTester.expectMemListItem(
+              0,
+              [memWithNoActName, "00:00:00", null],
+              [Icons.pause, Icons.stop],
+              [Icons.play_arrow],
+            );
 
-                await widgetTester.pumpAndSettle(elapsePeriod * 2);
+            await widgetTester.pumpAndSettle(elapsePeriod * 2);
 
-                expect(find.text("00:00:00"), findsNothing);
+            expect(find.text("00:00:00"), findsNothing);
 
-                final acts = await dbA.select(
-                  defTableActs,
-                  where: '${defFkActsMemId.name} = ?',
-                  whereArgs: [memWithNoActId],
-                );
-                expect(acts, hasLength(1));
-              });
+            final acts = await dbA.select(
+              defTableActs,
+              where: '${defFkActsMemId.name} = ?',
+              whereArgs: [memWithNoActId],
+            );
+            expect(acts, hasLength(1));
+          });
         });
 
         group(': active act', () {
@@ -340,41 +341,41 @@ void main() =>
           testWidgets(': start.',
               // 時間に関するテストなのでリトライ可能とする
               retry: maxRetryCount, (widgetTester) async {
-                widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
-                widgetTester.ignoreMockMethodCallHandler(
-                  MethodChannelMock.permissionHandler,
-                );
-                widgetTester.ignoreMockMethodCallHandler(
-                  MethodChannelMock.flutterLocalNotifications,
-                );
+            widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
+            widgetTester.ignoreMockMethodCallHandler(
+              MethodChannelMock.permissionHandler,
+            );
+            widgetTester.ignoreMockMethodCallHandler(
+              MethodChannelMock.flutterLocalNotifications,
+            );
 
-                await runApplication();
-                await widgetTester.pumpAndSettle();
+            await runApplication();
+            await widgetTester.pumpAndSettle();
 
-                await widgetTester.tap(find.descendant(
-                  of: find.byType(ListTile).at(targetAt),
-                  matching: find.byIcon(Icons.play_arrow),
-                ));
-                await widgetTester.pumpAndSettle();
+            await widgetTester.tap(find.descendant(
+              of: find.byType(ListTile).at(targetAt),
+              matching: find.byIcon(Icons.play_arrow),
+            ));
+            await widgetTester.pumpAndSettle();
 
-                widgetTester.expectMemListItem(
-                  0,
-                  [memWithFinishedActName, "00:00:00", null],
-                  [Icons.pause, Icons.stop],
-                  [Icons.play_arrow],
-                );
+            widgetTester.expectMemListItem(
+              0,
+              [memWithFinishedActName, "00:00:00", null],
+              [Icons.pause, Icons.stop],
+              [Icons.play_arrow],
+            );
 
-                await widgetTester.pumpAndSettle(elapsePeriod * 2);
+            await widgetTester.pumpAndSettle(elapsePeriod * 2);
 
-                expect(find.text("00:00:00"), findsNothing);
+            expect(find.text("00:00:00"), findsNothing);
 
-                final acts = await dbA.select(
-                  defTableActs,
-                  where: '${defFkActsMemId.name} = ?',
-                  whereArgs: [memWithFinishedActId],
-                );
-                expect(acts, hasLength(2));
-              });
+            final acts = await dbA.select(
+              defTableActs,
+              where: '${defFkActsMemId.name} = ?',
+              whereArgs: [memWithFinishedActId],
+            );
+            expect(acts, hasLength(2));
+          });
         });
 
         group(': paused act', () {
@@ -395,40 +396,40 @@ void main() =>
           testWidgets(': start.',
               // 時間に関するテストなのでリトライ可能とする
               retry: maxRetryCount, (widgetTester) async {
-                widgetTester.ignoreMockMethodCallHandler(
-                  MethodChannelMock.permissionHandler,
-                );
-                widgetTester.ignoreMockMethodCallHandler(
-                  MethodChannelMock.flutterLocalNotifications,
-                );
+            widgetTester.ignoreMockMethodCallHandler(
+              MethodChannelMock.permissionHandler,
+            );
+            widgetTester.ignoreMockMethodCallHandler(
+              MethodChannelMock.flutterLocalNotifications,
+            );
 
-                await runApplication();
-                await widgetTester.pumpAndSettle();
+            await runApplication();
+            await widgetTester.pumpAndSettle();
 
-                await widgetTester.tap(find.descendant(
-                  of: find.byType(ListTile).at(targetAt),
-                  matching: find.byIcon(Icons.play_arrow),
-                ));
-                await widgetTester.pumpAndSettle();
+            await widgetTester.tap(find.descendant(
+              of: find.byType(ListTile).at(targetAt),
+              matching: find.byIcon(Icons.play_arrow),
+            ));
+            await widgetTester.pumpAndSettle();
 
-                widgetTester.expectMemListItem(
-                  0,
-                  [memWithPausedActName, "00:00:00", null],
-                  [Icons.pause, Icons.stop],
-                  [Icons.play_arrow],
-                );
+            widgetTester.expectMemListItem(
+              0,
+              [memWithPausedActName, "00:00:00", null],
+              [Icons.pause, Icons.stop],
+              [Icons.play_arrow],
+            );
 
-                await widgetTester.pumpAndSettle(elapsePeriod * 2);
+            await widgetTester.pumpAndSettle(elapsePeriod * 2);
 
-                expect(find.text("00:00:00"), findsNothing);
+            expect(find.text("00:00:00"), findsNothing);
 
-                final acts = await dbA.select(
-                  defTableActs,
-                  where: '${defFkActsMemId.name} = ?',
-                  whereArgs: [memWithPausedActId],
-                );
-                expect(acts, hasLength(1));
-              });
+            final acts = await dbA.select(
+              defTableActs,
+              where: '${defFkActsMemId.name} = ?',
+              whereArgs: [memWithPausedActId],
+            );
+            expect(acts, hasLength(1));
+          });
 
           testWidgets(': finish.', (widgetTester) async {
             widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);

@@ -22,21 +22,18 @@ abstract class Act {
     DateAndTime? endWhen,
     DateTime? pausedAt,
   }) {
-    // TODO refactor
-    if (startWhen == null) {
-      if (pausedAt != null) {
-        return PausedAct(memId, pausedAt);
-      } else if (endWhen == null) {
-        throw ArgumentError("引数が不足している。${{
-          'startWhen': startWhen,
-          'endWhen': endWhen,
-          'pausedAt': pausedAt,
-        }}");
+    if (endWhen != null) {
+      if (startWhen == null) {
+        return FinishedAct(memId, endWhen, endWhen);
+      } else {
+        return FinishedAct(memId, startWhen, endWhen);
       }
-    } else if (endWhen == null) {
+    }
+    if (startWhen != null) {
       return ActiveAct(memId, startWhen);
-    } else {
-      return FinishedAct(memId, startWhen, endWhen);
+    }
+    if (pausedAt != null) {
+      return PausedAct(memId, pausedAt);
     }
 
     throw ArgumentError("引数が不足している。${{
