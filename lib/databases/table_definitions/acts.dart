@@ -13,6 +13,8 @@ final defColActsStartIsAllDay =
 final defColActsEnd = TimestampColumnDefinition('end', notNull: false);
 final defColActsEndIsAllDay =
     BooleanColumnDefinition('end_is_all_day', notNull: false);
+final defColActsPausedAt =
+    TimestampColumnDefinition('paused_at', notNull: false);
 final defFkActsMemId = ForeignKeyDefinition(defTableMems);
 
 final defTableActs = TableDefinition(
@@ -22,6 +24,7 @@ final defTableActs = TableDefinition(
     defColActsStartIsAllDay,
     defColActsEnd,
     defColActsEndIsAllDay,
+    defColActsPausedAt,
     ...defColsBase,
     defFkActsMemId,
   ],

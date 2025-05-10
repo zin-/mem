@@ -30,19 +30,20 @@ void main() => group(_name, () {
             'no act': null,
             'day before yesterday act': Act.by(
               0,
-              DateAndTime.from(startOfToday).subtract(const Duration(days: 2)),
+              startWhen: DateAndTime.from(startOfToday)
+                  .subtract(const Duration(days: 2)),
               endWhen: DateAndTime.from(startOfToday),
             ),
             'yesterday act': Act.by(
               0,
-              DateAndTime.from(startOfToday).subtract(
+              startWhen: DateAndTime.from(startOfToday).subtract(
                 const Duration(days: 1),
               ),
               endWhen: DateAndTime.from(startOfToday),
             ),
             'today act': Act.by(
               0,
-              DateAndTime.from(startOfToday),
+              startWhen: DateAndTime.from(startOfToday),
               endWhen: DateAndTime.from(startOfToday),
             ),
           };

@@ -26,7 +26,9 @@ class EditingActDialog extends ConsumerWidget {
             .updatedBy(editingActEntity.updatedWith(
               (v) => Act.by(
                 v.memId,
-                pickedPeriod == null ? v.period?.start : pickedPeriod.start!,
+                startWhen: pickedPeriod == null
+                    ? v.period?.start
+                    : pickedPeriod.start!,
                 endWhen:
                     pickedPeriod == null ? v.period?.end : pickedPeriod.end,
               ),

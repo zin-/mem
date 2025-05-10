@@ -74,7 +74,7 @@ final startActBy = Provider.autoDispose.family<Act, int>(
             ),
           );
 
-      return Act.by(memId, now);
+      return Act.by(memId, startWhen: now);
     },
     memId,
   ),

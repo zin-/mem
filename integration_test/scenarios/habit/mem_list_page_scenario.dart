@@ -180,6 +180,7 @@ void main() => group(_name, () {
           defColActsStartIsAllDay.name: null,
           defColActsEnd.name: null,
           defColActsEndIsAllDay.name: null,
+          defColActsPausedAt.name: zeroDate,
           defColCreatedAt.name: zeroDate,
         });
       });

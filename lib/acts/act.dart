@@ -12,22 +12,35 @@ enum ActState {
 abstract class Act {
   final int memId;
   final DateAndTimePeriod? period;
+  final DateTime? pausedAt;
   final ActState state;
 
-  Act(this.memId, this.period, this.state);
+  Act(this.memId, this.period, this.pausedAt, this.state);
 
-  factory Act.by(
-    int memId,
-    DateAndTime? startWhen, {
+  factory Act.by(int memId, {
+    DateAndTime? startWhen,
     DateAndTime? endWhen,
+    DateTime? pausedAt,
   }) {
-    if (startWhen == null) {
-      return PausedAct(memId);
-    } else if (endWhen == null) {
-      return ActiveAct(memId, startWhen);
-    } else {
-      return FinishedAct(memId, startWhen, endWhen);
+    if (endWhen != null) {
+      if (startWhen == null) {
+        return FinishedAct(memId, endWhen, endWhen);
+      } else {
+        return FinishedAct(memId, startWhen, endWhen);
+      }
     }
+    if (startWhen != null) {
+      return ActiveAct(memId, startWhen);
+    }
+    if (pausedAt != null) {
+      return PausedAct(memId, pausedAt);
+    }
+
+    throw ArgumentError("引数が不足している。${{
+      'startWhen': startWhen,
+      'endWhen': endWhen,
+      'pausedAt': pausedAt,
+    }}");
   }
 
   bool get isActive => period?.start != null && period?.end == null;
@@ -42,10 +55,11 @@ abstract class Act {
 class ActiveAct extends Act {
   ActiveAct(int memId, DateAndTime startWhen)
       : super(
-          memId,
-          DateAndTimePeriod(start: startWhen),
-          ActState.active,
-        );
+    memId,
+    DateAndTimePeriod(start: startWhen),
+    null,
+    ActState.active,
+  );
 
   @override
   FinishedAct finish(DateAndTime when) =>
@@ -57,15 +71,14 @@ class ActiveAct extends Act {
 }
 
 class FinishedAct extends Act {
-  FinishedAct(
-    int memId,
-    DateAndTime startWhen,
-    DateAndTime endWhen,
-  ) : super(
-          memId,
-          DateAndTimePeriod(start: startWhen, end: endWhen),
-          ActState.finished,
-        );
+  FinishedAct(int memId,
+      DateAndTime startWhen,
+      DateAndTime endWhen,) : super(
+    memId,
+    DateAndTimePeriod(start: startWhen, end: endWhen),
+    null,
+    ActState.finished,
+  );
 
   @override
   FinishedAct finish(DateAndTime when) =>
@@ -77,12 +90,13 @@ class FinishedAct extends Act {
 }
 
 class PausedAct extends Act {
-  PausedAct(int memId)
+  PausedAct(int memId, DateTime pausedAt)
       : super(
-          memId,
-          null,
-          ActState.paused,
-        );
+    memId,
+    null,
+    pausedAt,
+    ActState.paused,
+  );
 
   @override
   FinishedAct finish(DateAndTime when) => FinishedAct(memId, when, when);

@@ -371,8 +371,9 @@ void main() => group(_scenarioName, () {
                       MemNotificationType.afterActStarted,
                       1,
                       "with active act")));
-              await ActRepository().receive(ActEntity(
-                  Act.by(savedMemWithActiveAct.id, DateAndTime.now())));
+              await ActRepository().receive(ActEntity(Act.by(
+                  savedMemWithActiveAct.id,
+                  startWhen: DateAndTime.now())));
             });
 
             testWidgets("Cancel when start act.", (widgetTester) async {

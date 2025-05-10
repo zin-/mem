@@ -14,4 +14,8 @@ class GroupBy {
 
   List<String>? get toExtraColumns =>
       _extraColumns?.map((e) => e.toQuery).toList(growable: false);
+
+  @override
+  String toString() =>
+      "${_extraColumns == null ? "" : "$_extraColumns "}GROUP BY $columns";
 }

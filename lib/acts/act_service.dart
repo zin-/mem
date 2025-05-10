@@ -15,6 +15,38 @@ class ListWithTotalCount<T> {
 class ActService {
   final ActRepository _actRepository;
 
+  Future fetchLatestByMemIds(
+    Iterable<int>? memIdsIn,
+  ) =>
+      v(
+        () async {
+          final r = [
+            ...await ActRepository().ship(
+              memIdsIn: memIdsIn,
+              latestByMemIds: true,
+            ),
+            ...await ActRepository().ship(
+              memIdsIn: memIdsIn,
+              paused: true,
+            ),
+          ]
+              .groupListsBy(
+                (element) => element.value.memId,
+              )
+              .values
+              .map(
+                (e) => e.sorted(
+                  (a, b) => (b.value.period?.start ?? b.createdAt)
+                      .compareTo(a.value.period?.start ?? a.createdAt),
+                )[0],
+              );
+          return r;
+        },
+        {
+          'memIdsIn': memIdsIn,
+        },
+      );
+
   Future<ListWithTotalCount<SavedActEntity>> fetch(
     int? memId,
     int offset,
@@ -53,7 +85,7 @@ class ActService {
 
           if (latestActEntity == null || latestActEntity.value is FinishedAct) {
             return await _actRepository.receive(
-              ActEntity(Act.by(memId, when)),
+              ActEntity(Act.by(memId, startWhen: when)),
             );
           } else {
             return await _actRepository.replace(
@@ -86,7 +118,7 @@ class ActService {
           if (latestActiveActEntity == null ||
               latestActiveActEntity.value is FinishedAct) {
             return await _actRepository.receive(
-              ActEntity(Act.by(memId, when, endWhen: when)),
+              ActEntity(Act.by(memId, endWhen: when)),
             );
           } else {
             return await _actRepository.replace(
@@ -124,7 +156,7 @@ class ActService {
                 ),
               ),
             await _actRepository.receive(
-              ActEntity(Act.by(memId, null)),
+              ActEntity(Act.by(memId, pausedAt: when)),
             ),
           ];
         },

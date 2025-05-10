@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/act.dart';
-import 'package:mem/acts/act_repository.dart';
+import 'package:mem/acts/act_service.dart';
 import 'package:mem/acts/states.dart';
 import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
@@ -188,12 +188,11 @@ final latestActsByMemProvider =
         () async {
           if (current.isEmpty) {
             ref.read(actsProvider.notifier).addAll(
-                  await ActRepository().ship(
-                    memIdsIn: ref
+                  await ActService().fetchLatestByMemIds(
+                    ref
                         .read(memsProvider)
                         .whereType<SavedMemEntityV2>()
                         .map((e) => e.id),
-                    latestByMemIds: true,
                   ),
                 );
           }
