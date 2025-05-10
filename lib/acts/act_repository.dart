@@ -65,6 +65,7 @@ class ActRepository
     Iterable<int>? memIdsIn,
     DateAndTimePeriod? period,
     bool? latestByMemIds,
+    bool? paused,
     Condition? condition,
     GroupBy? groupBy,
     ActOrderBy? actOrderBy,
@@ -81,6 +82,7 @@ class ActRepository
               if (period != null)
                 GraterThanOrEqual(defColActsStart, period.start),
               if (period != null) LessThan(defColActsStart, period.end),
+              if (paused != null) IsNotNull(defColActsPausedAt.name),
               if (condition != null) condition,
             ],
           ),
@@ -102,6 +104,7 @@ class ActRepository
           'memIds': memIdsIn,
           'period': period,
           'latestByMemIds': latestByMemIds,
+          'paused': paused,
           'condition': condition,
           'groupBy': groupBy,
           'actOrderBy': actOrderBy,
