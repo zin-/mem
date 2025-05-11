@@ -66,3 +66,5 @@ extension PeriodExt on Period {
         },
       );
 }
+
+enum AggregationType { count, sum }
