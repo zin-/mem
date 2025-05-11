@@ -9,14 +9,13 @@ enum AggregationType {
 }
 
 class ActsSummary extends SummaryStatistics {
-  final Map<DateAndTime, List<Act>> _groupedListByDate;
+  final Iterable<Act> _acts;
   final AggregationType _aggregationType;
 
-  ActsSummary(Iterable<Act> acts, this._aggregationType)
-      : _groupedListByDate = _groupListByDate(acts);
+  ActsSummary(this._acts, this._aggregationType);
 
   @override
-  Map<DateAndTime, List<Act>> get groupedListByDate => _groupedListByDate;
+  Map<DateAndTime, double> get groupedListByDate => _groupListByDate(_acts);
 
   @override
   double getValue(List<dynamic> items) {
@@ -32,7 +31,7 @@ class ActsSummary extends SummaryStatistics {
     }
   }
 
-  static Map<DateAndTime, List<Act>> _groupListByDate(Iterable<Act> acts) {
+  Map<DateAndTime, double> _groupListByDate(Iterable<Act> acts) {
     final groupedListByDate = acts
         .where((e) => e.period?.start != null)
         .groupListsBy((e) => DateAndTime.from(e.period!.start!));
@@ -67,7 +66,9 @@ class ActsSummary extends SummaryStatistics {
         .map(
           (key, value) => MapEntry(
             value.first.key,
-            value.map((e) => e.value).flattened.toList(),
+            getValue(
+              value.map((e) => e.value).toList(growable: false).flattenedToList,
+            ),
           ),
         );
   }

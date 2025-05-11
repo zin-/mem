@@ -25,7 +25,7 @@ class LineChartWrapper extends StatelessWidget {
     final actCount = _actsSummary.groupedListByDate.entries
         .map((e) => FlSpot(
               e.key.millisecondsSinceEpoch.toDouble(),
-              e.value.length.toDouble(),
+              e.value,
             ))
         .toList(growable: false);
     final sma5 = _actsSummary.simpleMovingAverage(5);

@@ -4,7 +4,7 @@ import 'package:mem/logger/log_service.dart';
 
 
 abstract class SummaryStatistics {
-  Map<DateAndTime, List<dynamic>> get groupedListByDate;
+  Map<DateAndTime, double> get groupedListByDate;
 
   SummaryStatistics();
 
@@ -13,22 +13,20 @@ abstract class SummaryStatistics {
   late final double max = groupedListByDate.entries.fold<double>(
     0,
     (previousValue, element) {
-      final value = getValue(element.value);
-      return previousValue <= value ? value : previousValue;
+      return previousValue <= element.value ? element.value : previousValue;
     },
   );
 
   late final double min = groupedListByDate.entries.fold<double>(
     max,
     (previousValue, element) {
-      final value = getValue(element.value);
-      return previousValue >= value ? value : previousValue;
+      return previousValue >= element.value ? element.value : previousValue;
     },
   );
 
   late final double average = groupedListByDate.entries.isEmpty
       ? 0
-      : groupedListByDate.entries.map((e) => getValue(e.value)).average;
+      : groupedListByDate.entries.map((e) => e.value).average;
 
   Map<DateAndTime, double> simpleMovingAverage(int n) => v(
         () {
@@ -44,7 +42,7 @@ abstract class SummaryStatistics {
             final sum = ranged.fold<double>(
               0,
               (previousValue, element) =>
-                  previousValue + getValue(element.value),
+                  previousValue + element.value,
             );
             final ave = sum / ranged.length;
 
@@ -70,7 +68,7 @@ abstract class SummaryStatistics {
             final sum = ranged.foldIndexed<double>(
               0,
               (index, previous, element) =>
-                  previous + (ranged.length - index) * getValue(element.value),
+                  previous + (ranged.length - index) * element.value,
             );
 
             final ave = sum / (ranged.length * (ranged.length + 1) / 2);
