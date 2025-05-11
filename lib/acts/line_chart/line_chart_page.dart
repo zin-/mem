@@ -82,7 +82,7 @@ class _ActLineChartPage extends ConsumerWidget {
                     },
                   ))
                   .map((e) => e.value),
-               _aggregationType,
+              _aggregationType,
             ),
             _period,
             _onPeriodSelected,
@@ -156,15 +156,19 @@ class _ActLineChartScreen extends StatelessWidget {
                       spacing: 4.0,
                       children: [
                         Text("Min : "),
-                        Text(_actsSummary.min.toString()),
+                        Text(_formatValue(_actsSummary.min)),
                         Text("Max : "),
-                        Text(_actsSummary.max.toString()),
+                        Text(_formatValue(_actsSummary.max)),
                         Text("Avg : "),
-                        Text(_actsSummary.average.toStringAsPrecision(2)),
+                        Text(_formatValue(_actsSummary.average)),
                       ],
                     ),
                   ),
-                  Expanded(child: LineChartWrapper(_actsSummary)),
+                  Expanded(
+                      child: LineChartWrapper(
+                    _actsSummary,
+                    _formatValue,
+                  )),
                 ],
               )),
         ),
@@ -174,4 +178,16 @@ class _ActLineChartScreen extends StatelessWidget {
           '_period': _period,
         },
       );
+
+  String _formatValue(double value) {
+    switch (_aggregationType) {
+      case AggregationType.count:
+        return value.toStringAsFixed(1);
+      case AggregationType.sum:
+        final hours = (value / 3600).floor();
+        final minutes = ((value % 3600) / 60).floor();
+        final seconds = (value % 60).floor();
+        return '${hours}h ${minutes}m ${seconds}s';
+    }
+  }
 }

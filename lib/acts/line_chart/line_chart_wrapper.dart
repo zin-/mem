@@ -10,15 +10,20 @@ class LineChartWrapper extends StatelessWidget {
   //  将来的にはActTotalTimeByDateを作る #248
   //  この際にChart用の入力値を作ることになるので、それが汎用的な型になるはず
   final ActsSummary _actsSummary;
+  final String Function(double value) _valueFormatter;
 
-  const LineChartWrapper(this._actsSummary, {super.key});
+  const LineChartWrapper(this._actsSummary, this._valueFormatter, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    const yAxisTitles = AxisTitles(
+    final yAxisTitles = AxisTitles(
       sideTitles: SideTitles(
         showTitles: true,
-        interval: 1,
+        reservedSize: 40,
+        getTitlesWidget: (value, meta) => Text(
+          _valueFormatter(value),
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
       ),
     );
 
@@ -124,7 +129,24 @@ class LineChartWrapper extends StatelessWidget {
           ),
         ],
         lineTouchData: LineTouchData(
-          enabled: true,
+          // enabled: true,
+          touchTooltipData: LineTouchTooltipData(
+            getTooltipItems: (touchedSpots) {
+              return touchedSpots.map((spot) {
+                final textStyle = TextStyle(
+                  color: spot.bar.gradient?.colors.first ??
+                      spot.bar.color ??
+                      Colors.blueGrey,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                );
+                return LineTooltipItem(
+                  _valueFormatter(spot.y),
+                  textStyle,
+                );
+              }).toList();
+            },
+          ),
         ),
       ),
     );
