@@ -3,11 +3,16 @@ import 'package:mem/acts/act.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/statistics/summary_statistics.dart';
 
+enum AggregationType {
+  count,
+  sum,
+}
+
 class ActsSummary extends SummaryStatistics {
   final Map<DateAndTime, List<Act>> _groupedListByDate;
+  final AggregationType _aggregationType;
 
-  ActsSummary(Iterable<Act> acts,
-      {super.aggregationType = AggregationType.count})
+  ActsSummary(Iterable<Act> acts, this._aggregationType)
       : _groupedListByDate = _groupListByDate(acts);
 
   @override
@@ -16,7 +21,7 @@ class ActsSummary extends SummaryStatistics {
   @override
   double getValue(List<dynamic> items) {
     final acts = items as List<Act>;
-    switch (aggregationType) {
+    switch (_aggregationType) {
       case AggregationType.count:
         return acts.length.toDouble();
       case AggregationType.sum:
