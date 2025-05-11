@@ -12,6 +12,7 @@ import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/settings/preference/keys.dart';
 import 'package:mem/settings/states.dart';
+import 'package:mem/statistics/summary_statistics.dart';
 import 'package:mem/values/constants.dart';
 import 'package:mem/values/dimens.dart';
 
@@ -82,6 +83,7 @@ class _ActLineChartPage extends ConsumerWidget {
                     },
                   ))
                   .map((e) => e.value),
+              aggregationType: _aggregationType,
             ),
             _period,
             _onPeriodSelected,

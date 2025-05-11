@@ -2,36 +2,42 @@ import 'package:collection/collection.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/logger/log_service.dart';
 
-class SummaryStatistics {
-  final Map<DateAndTime, List<dynamic>> groupedListByDate;
+enum AggregationType {
+  count,
+  sum,
+}
 
-  SummaryStatistics(this.groupedListByDate);
+abstract class SummaryStatistics {
+  Map<DateAndTime, List<dynamic>> get groupedListByDate;
 
-  late final int max = groupedListByDate.entries.fold<int>(
+  final AggregationType aggregationType;
+
+  SummaryStatistics({this.aggregationType = AggregationType.count});
+
+  double getValue(List<dynamic> items);
+
+  late final double max = groupedListByDate.entries.fold<double>(
     0,
-        (previousValue, element) =>
-    previousValue <= element.value.length
-        ? element.value.length
-        : previousValue,
+    (previousValue, element) {
+      final value = getValue(element.value);
+      return previousValue <= value ? value : previousValue;
+    },
   );
 
-  late final int min = groupedListByDate.entries.fold<int>(
+  late final double min = groupedListByDate.entries.fold<double>(
     max,
-        (previousValue, element) =>
-    previousValue >= element.value.length
-        ? element.value.length
-        : previousValue,
+    (previousValue, element) {
+      final value = getValue(element.value);
+      return previousValue >= value ? value : previousValue;
+    },
   );
 
   late final double average = groupedListByDate.entries.isEmpty
       ? 0
-      : groupedListByDate.entries
-      .map((e) => e.value.length)
-      .average;
+      : groupedListByDate.entries.map((e) => getValue(e.value)).average;
 
-  Map<DateAndTime, double> simpleMovingAverage(int n) =>
-      v(
-            () {
+  Map<DateAndTime, double> simpleMovingAverage(int n) => v(
+        () {
           final sorted = groupedListByDate.entries
               .sorted((a, b) => b.key.compareTo(a.key));
 
@@ -41,10 +47,10 @@ class SummaryStatistics {
             final ranged = end > sorted.length
                 ? sorted.getRange(i, sorted.length)
                 : sorted.getRange(i, end);
-            final sum = ranged.fold<int>(
+            final sum = ranged.fold<double>(
               0,
-                  (previousValue, element) =>
-              previousValue + element.value.length,
+              (previousValue, element) =>
+                  previousValue + getValue(element.value),
             );
             final ave = sum / ranged.length;
 
@@ -56,9 +62,8 @@ class SummaryStatistics {
         n,
       );
 
-  Map<DateAndTime, double> linearWeightedMovingAverage(int n) =>
-      v(
-            () {
+  Map<DateAndTime, double> linearWeightedMovingAverage(int n) => v(
+        () {
           final sorted = groupedListByDate.entries
               .sorted((a, b) => b.key.compareTo(a.key));
 
@@ -68,13 +73,13 @@ class SummaryStatistics {
             final ranged = end > sorted.length
                 ? sorted.getRange(i, sorted.length)
                 : sorted.getRange(i, end);
-            final sum = ranged.foldIndexed<int>(
+            final sum = ranged.foldIndexed<double>(
               0,
-                  (index, previous, element) =>
-              previous + (ranged.length - index) * element.value.length,
+              (index, previous, element) =>
+                  previous + (ranged.length - index) * getValue(element.value),
             );
 
-            final ave = sum / (ranged.length + (ranged.length + 1) / 2);
+            final ave = sum / (ranged.length * (ranged.length + 1) / 2);
 
             result.putIfAbsent(sorted[i].key, () => ave);
           }
@@ -84,4 +89,3 @@ class SummaryStatistics {
         n,
       );
 }
-
