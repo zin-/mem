@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/acts/acts_summary.dart';
 import 'package:mem/acts/line_chart/line_chart_wrapper.dart';
 import 'package:mem/acts/line_chart/states.dart';
 import 'package:mem/databases/definition.dart';
@@ -99,6 +100,39 @@ void main() => group(_name, () {
           Period.values
               .where(
             (e) => e != Period.aWeek,
+          )
+              .forEach((target) {
+            testWidgets("${target.name}.", (widgetTester) async {
+              await widgetTester.show(insertedMemName);
+
+              await widgetTester.tap(find.byIcon(Icons.more_vert));
+              await widgetTester.pumpAndSettle();
+
+              await widgetTester.tap(find.text(target.name));
+              await widgetTester.pumpAndSettle(waitSideEffectDuration);
+
+              expect(true, isTrue);
+            });
+          });
+        });
+      });
+
+      group("Aggregation type", () {
+        testWidgets("Show.", (widgetTester) async {
+          await widgetTester.show(insertedMemName);
+
+          await widgetTester.tap(find.byIcon(Icons.more_vert));
+          await widgetTester.pumpAndSettle();
+
+          for (var aggregationType in AggregationType.values) {
+            expect(find.text(aggregationType.name), findsOneWidget);
+          }
+        });
+
+        group("Select", () {
+          AggregationType.values
+              .where(
+            (e) => e != AggregationType.count,
           )
               .forEach((target) {
             testWidgets("${target.name}.", (widgetTester) async {

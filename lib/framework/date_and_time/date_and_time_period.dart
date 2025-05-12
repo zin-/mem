@@ -5,7 +5,8 @@ abstract class DateAndTimePeriod implements Comparable<DateAndTimePeriod> {
 
   DateAndTime? get end;
 
-  Duration get duration => Duration.zero;
+  Duration get duration =>
+      start != null && end != null ? start!.difference(end!) : Duration.zero;
 
   DateAndTimePeriod._();
 
