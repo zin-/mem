@@ -21,7 +21,7 @@ class LineChartWrapper extends StatelessWidget {
         showTitles: true,
         reservedSize: 40,
         getTitlesWidget: (value, meta) => Text(
-          _valueFormatter(value),
+          _valueFormatter(value).split(" ")[0],
           style: Theme.of(context).textTheme.bodySmall,
         ),
       ),
