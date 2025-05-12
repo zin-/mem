@@ -151,17 +151,20 @@ class _ActLineChartScreen extends StatelessWidget {
                 children: [
                   Padding(
                     padding: defaultPadding,
-                    child: Flex(
-                      direction: Axis.horizontal,
-                      spacing: 4.0,
-                      children: [
-                        Text("Min : "),
-                        Text(_formatValue(_actsSummary.min)),
-                        Text("Max : "),
-                        Text(_formatValue(_actsSummary.max)),
-                        Text("Avg : "),
-                        Text(_formatValue(_actsSummary.average)),
-                      ],
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Flex(
+                        direction: Axis.horizontal,
+                        spacing: 4.0,
+                        children: [
+                          Text("Min : "),
+                          Text(_formatValue(_actsSummary.min)),
+                          Text("Max : "),
+                          Text(_formatValue(_actsSummary.max)),
+                          Text("Avg : "),
+                          Text(_formatValue(_actsSummary.average)),
+                        ],
+                      ),
                     ),
                   ),
                   Expanded(
