@@ -32,6 +32,12 @@ scripts:
   emulator:
     list: flutter emulators
     start: flutter emulators --launch Pixel_9_Pro_XL_API_Baklava
+  test:
+    unit: flutter test
+    integration: flutter test integration_test
+    run: flutter test $1
+    i: rps test integration
+    f: rps run $1
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
