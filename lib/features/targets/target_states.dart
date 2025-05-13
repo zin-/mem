@@ -14,7 +14,7 @@ class TargetState extends _$TargetState {
         memId: memId,
         targetType: TargetType.equalTo,
         targetUnit: TargetUnit.count,
-        value: 10,
+        value: 0,
         period: Period.aDay,
       ),
     );

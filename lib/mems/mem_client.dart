@@ -16,9 +16,9 @@ class MemClient {
     MemEntityV2 mem,
     List<MemItemEntityV2> memItemList,
     List<MemNotificationEntityV2> memNotificationList,
-    TargetEntity target,
+    TargetEntity? target,
   ) =>
-      d(
+      v(
         () async {
           final saved = await _memService.save(
             MemDetail(

@@ -2,6 +2,8 @@ import 'package:collection/collection.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/targets/target_repository.dart';
+import 'package:mem/features/targets/target_table.dart';
+import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/mems/mem_detail.dart';
 import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
@@ -109,6 +111,10 @@ class MemService {
                 period: v.period,
               ),
             ));
+          } else {
+            await _targetRepository.waste(
+              condition: Equals(defFkTargetMemId, savedMem.id),
+            );
           }
 
           return MemDetail(

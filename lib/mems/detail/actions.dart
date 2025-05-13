@@ -12,11 +12,12 @@ import 'states.dart';
 final saveMem =
     Provider.autoDispose.family<Future<MemDetail>, int?>((ref, memId) => v(
           () async {
+            final target = ref.read(targetStateProvider(memId));
             final saved = await MemClient().save(
               ref.read(editingMemByMemIdProvider(memId)),
               ref.read(memItemsByMemIdProvider(memId)),
               ref.read(memNotificationsByMemIdProvider(memId)),
-              ref.read(targetStateProvider(memId)),
+              target.value.hashCode == 0 ? null : target,
             );
 
             ref.read(memsProvider.notifier).upsertAll(
