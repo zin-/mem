@@ -25,32 +25,40 @@ class TargetText extends ConsumerWidget {
         direction: Axis.horizontal,
         spacing: defaultComponentPadding,
         children: [
-          DropdownButton(
-            value: targetEntity.value.targetType.index,
-            items: TargetType.values
-                .map(
-                  (e) => DropdownMenuItem(
-                    value: e.index,
-                    child: Text(e.name),
-                  ),
-                )
-                .toList(),
-            onChanged: (v) => onTargetTypeChanged(
-              targetType: () => TargetType.values[v!],
+          SizedBox(
+            width: 100,
+            child: DropdownButton(
+              isExpanded: true,
+              value: targetEntity.value.targetType.index,
+              items: TargetType.values
+                  .map(
+                    (e) => DropdownMenuItem(
+                      value: e.index,
+                      child: Text(e.name),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (v) => onTargetTypeChanged(
+                targetType: () => TargetType.values[v!],
+              ),
             ),
           ),
-          DropdownButton(
-            value: targetEntity.value.targetUnit.index,
-            items: TargetUnit.values
-                .map(
-                  (e) => DropdownMenuItem(
-                    value: e.index,
-                    child: Text(e.name),
-                  ),
-                )
-                .toList(),
-            onChanged: (v) => onTargetTypeChanged(
-              targetUnit: () => TargetUnit.values[v!],
+          SizedBox(
+            width: 100,
+            child: DropdownButton(
+              isExpanded: true,
+              value: targetEntity.value.targetUnit.index,
+              items: TargetUnit.values
+                  .map(
+                    (e) => DropdownMenuItem(
+                      value: e.index,
+                      child: Text(e.name),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (v) => onTargetTypeChanged(
+                targetUnit: () => TargetUnit.values[v!],
+              ),
             ),
           ),
           Expanded(
@@ -62,19 +70,22 @@ class TargetText extends ConsumerWidget {
             ),
           ),
           Text('/'),
-          DropdownButton(
-            // aDayが欲しい
-            value: targetEntity.value.period.index,
-            items: Period.values
-                .map(
-                  (e) => DropdownMenuItem(
-                    value: e.index,
-                    child: Text(e.name),
-                  ),
-                )
-                .toList(),
-            onChanged: (v) => onTargetTypeChanged(
-              period: () => Period.values[v!],
+          SizedBox(
+            width: 100,
+            child: DropdownButton(
+              isExpanded: true,
+              value: targetEntity.value.period.index,
+              items: Period.values
+                  .map(
+                    (e) => DropdownMenuItem(
+                      value: e.index,
+                      child: Text(e.name),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (v) => onTargetTypeChanged(
+                period: () => Period.values[v!],
+              ),
             ),
           ),
         ],
