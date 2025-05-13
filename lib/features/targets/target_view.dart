@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/acts/line_chart/states.dart';
+import 'package:mem/features/targets/target.dart';
+import 'package:mem/features/targets/target_entity.dart';
+import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/transitions.dart';
 import 'package:mem/values/dimens.dart';
@@ -43,24 +46,35 @@ class MemDetailTargetScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // TODO: implement build
+    final targetEntity = ref.watch(targetStateProvider(_memId));
+
     return _MemDetailTargetScreen(
       ref.watch(
         editingMemByMemIdProvider(_memId).select(
           (value) => value.value.name,
         ),
       ),
+      targetEntity,
+      ref.read(targetStateProvider(_memId).notifier).updatedWith,
     );
   }
 }
 
-enum TargetType { equalTo, lessThan, moreThan }
-
-enum TargetUnit { count, time }
-
 class _MemDetailTargetScreen extends StatelessWidget {
   final String _memName;
+  final TargetEntity _targetEntity;
+  final Function({
+    TargetType? Function()? targetType,
+    TargetUnit? Function()? targetUnit,
+    int? Function()? value,
+    Period? Function()? period,
+  }) _onTargetTypeChanged;
 
-  const _MemDetailTargetScreen(this._memName);
+  const _MemDetailTargetScreen(
+    this._memName,
+    this._targetEntity,
+    this._onTargetTypeChanged,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +90,7 @@ class _MemDetailTargetScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             DropdownButton(
-              value: TargetType.equalTo.index,
+              value: _targetEntity.value.targetType.index,
               items: TargetType.values
                   .map(
                     (e) => DropdownMenuItem(
@@ -85,10 +99,12 @@ class _MemDetailTargetScreen extends StatelessWidget {
                     ),
                   )
                   .toList(),
-              onChanged: (v) {},
+              onChanged: (v) => _onTargetTypeChanged(
+                targetType: () => TargetType.values[v!],
+              ),
             ),
             DropdownButton(
-              value: TargetUnit.count.index,
+              value: _targetEntity.value.targetUnit.index,
               items: TargetUnit.values
                   .map(
                     (e) => DropdownMenuItem(
@@ -97,12 +113,19 @@ class _MemDetailTargetScreen extends StatelessWidget {
                     ),
                   )
                   .toList(),
-              onChanged: (v) {},
+              onChanged: (v) => _onTargetTypeChanged(
+                targetUnit: () => TargetUnit.values[v!],
+              ),
             ),
-            TextFormField(),
+            TextFormField(
+              initialValue: _targetEntity.value.value.toString(),
+              onChanged: (v) => _onTargetTypeChanged(
+                value: () => int.parse(v),
+              ),
+            ),
             DropdownButton(
               // aDayが欲しい
-              value: Period.aWeek.index,
+              value: _targetEntity.value.period.index,
               items: Period.values
                   .map(
                     (e) => DropdownMenuItem(
@@ -111,7 +134,9 @@ class _MemDetailTargetScreen extends StatelessWidget {
                     ),
                   )
                   .toList(),
-              onChanged: (v) {},
+              onChanged: (v) => _onTargetTypeChanged(
+                period: () => Period.values[v!],
+              ),
             ),
           ],
         ),
