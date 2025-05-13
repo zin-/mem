@@ -68,7 +68,7 @@ class _MemDetailBodyComponent extends StatelessWidget {
                       ),
                       MemPeriodTextFormFields(_memId),
                       MemNotificationsView(_memId),
-                      TargetText(),
+                      TargetText(_memId),
                       MemItemsFormFields(_memId),
                     ],
                   ),
