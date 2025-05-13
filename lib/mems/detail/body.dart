@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/framework/date_and_time/created_and_updated_at_texts.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/detail/target.dart';
+import 'package:mem/features/targets/target_view.dart';
 import 'package:mem/mems/mem_done_checkbox.dart';
 import 'package:mem/mems/mem_entity.dart';
 import 'package:mem/mems/mem_name.dart';
