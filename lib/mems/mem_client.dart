@@ -1,3 +1,4 @@
+import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/notification_client.dart';
 
@@ -15,14 +16,16 @@ class MemClient {
     MemEntityV2 mem,
     List<MemItemEntityV2> memItemList,
     List<MemNotificationEntityV2> memNotificationList,
+    TargetEntity target,
   ) =>
-      v(
+      d(
         () async {
           final saved = await _memService.save(
             MemDetail(
               mem,
               memItemList,
               memNotificationList,
+              target,
             ),
           );
 
@@ -39,6 +42,7 @@ class MemClient {
           "mem": mem,
           "memItemList": memItemList,
           "memNotificationList": memNotificationList,
+          "target": target,
         },
       );
 
