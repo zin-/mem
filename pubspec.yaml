@@ -29,6 +29,9 @@ scripts:
     icon: flutter pub run flutter_launcher_icons:main
   run: flutter run -d emulator-5554
   clean: flutter clean
+  emulator:
+    list: flutter emulators
+    start: flutter emulators --launch Pixel_9_Pro_XL_API_Baklava
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
