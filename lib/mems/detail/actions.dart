@@ -17,7 +17,7 @@ final saveMem =
               ref.read(editingMemByMemIdProvider(memId)),
               ref.read(memItemsByMemIdProvider(memId)),
               ref.read(memNotificationsByMemIdProvider(memId)),
-              target.value.hashCode == 0 ? null : target,
+              target.value.hashCode == 0 ? null : target.value,
             );
 
             ref.read(memsProvider.notifier).upsertAll(

@@ -23,90 +23,94 @@ class TargetText extends ConsumerWidget {
       contentPadding: EdgeInsets.zero,
       leading: Icon(Icons.check_circle),
       // 1日20回以下、週40時間以上、1ヶ月に5時間以下みたいな感じ
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+      title: switch (targetEntity) {
+        AsyncData(:final value) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: DropdownButton(
-                  isExpanded: true,
-                  value: targetEntity.value.targetType.index,
-                  items: TargetType.values
-                      .map(
-                        (e) => DropdownMenuItem(
-                          value: e.index,
-                          child: Text(e.name),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (v) => onTargetTypeChanged(
-                    targetType: () => TargetType.values[v!],
+              Row(
+                children: [
+                  Expanded(
+                    child: DropdownButton(
+                      isExpanded: true,
+                      value: value.value.targetType.index,
+                      items: TargetType.values
+                          .map(
+                            (e) => DropdownMenuItem(
+                              value: e.index,
+                              child: Text(e.name),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (v) => onTargetTypeChanged(
+                        targetType: () => TargetType.values[v!],
+                      ),
+                    ),
                   ),
-                ),
+                  SizedBox(width: defaultComponentPadding),
+                  Expanded(
+                    child: DropdownButton(
+                      isExpanded: true,
+                      value: value.value.targetUnit.index,
+                      items: TargetUnit.values
+                          .map(
+                            (e) => DropdownMenuItem(
+                              value: e.index,
+                              child: Text(e.name),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (v) => onTargetTypeChanged(
+                        targetUnit: () => TargetUnit.values[v!],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(width: defaultComponentPadding),
-              Expanded(
-                child: DropdownButton(
-                  isExpanded: true,
-                  value: targetEntity.value.targetUnit.index,
-                  items: TargetUnit.values
-                      .map(
-                        (e) => DropdownMenuItem(
-                          value: e.index,
-                          child: Text(e.name),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (v) => onTargetTypeChanged(
-                    targetUnit: () => TargetUnit.values[v!],
+              SizedBox(height: defaultComponentPadding),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      key: keyTargetValue,
+                      initialValue: value.value.value.toString(),
+                      onChanged: (v) => onTargetTypeChanged(
+                        value: () {
+                          final value = int.tryParse(v);
+                          if (value == null) {
+                            return null;
+                          }
+                          return value;
+                        },
+                      ),
+                    ),
                   ),
-                ),
+                  SizedBox(width: defaultComponentPadding),
+                  Text('/'),
+                  SizedBox(width: defaultComponentPadding),
+                  Expanded(
+                    child: DropdownButton(
+                      isExpanded: true,
+                      value: value.value.period.index,
+                      items: Period.values
+                          .map(
+                            (e) => DropdownMenuItem(
+                              value: e.index,
+                              child: Text(e.name),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (v) => onTargetTypeChanged(
+                        period: () => Period.values[v!],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-          SizedBox(height: defaultComponentPadding),
-          Row(
-            children: [
-              Expanded(
-                child: TextFormField(
-                  key: keyTargetValue,
-                  initialValue: targetEntity.value.value.toString(),
-                  onChanged: (v) => onTargetTypeChanged(
-                    value: () {
-                      final value = int.tryParse(v);
-                      if (value == null) {
-                        return null;
-                      }
-                      return value;
-                    },
-                  ),
-                ),
-              ),
-              SizedBox(width: defaultComponentPadding),
-              Text('/'),
-              SizedBox(width: defaultComponentPadding),
-              Expanded(
-                child: DropdownButton(
-                  isExpanded: true,
-                  value: targetEntity.value.period.index,
-                  items: Period.values
-                      .map(
-                        (e) => DropdownMenuItem(
-                          value: e.index,
-                          child: Text(e.name),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (v) => onTargetTypeChanged(
-                    period: () => Period.values[v!],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+        AsyncError() => const Text('Oops, something unexpected happened'),
+        _ => const CircularProgressIndicator(),
+      },
     );
   }
 }

@@ -11,44 +11,45 @@ part 'target_states.g.dart';
 @riverpod
 class TargetState extends _$TargetState {
   @override
-  TargetEntity build(int? memId) {
+  Future<TargetEntity> build(int? memId) async {
     if (memId != null) {
-      TargetRepository()
-          .ship(condition: Equals(defFkTargetMemId, memId))
-          .then((value) {
-        if (value.isNotEmpty) {
-          state = value.first;
-        }
-      });
+      final targets = await TargetRepository()
+          .ship(condition: Equals(defFkTargetMemId, memId));
+      if (targets.isNotEmpty) {
+        return targets.first;
+      }
     }
 
-    return TargetEntity(
-      Target(
-        memId: memId,
-        targetType: TargetType.equalTo,
-        targetUnit: TargetUnit.count,
-        value: 0,
-        period: Period.aDay,
-      ),
-    );
+    return _initialTarget(memId);
   }
 
-  TargetEntity updatedWith({
+  void updatedWith({
     TargetType? Function()? targetType,
     TargetUnit? Function()? targetUnit,
     int? Function()? value,
     Period? Function()? period,
   }) {
-    state = state.updatedWith(
-      (v) => Target(
-        memId: v.memId,
-        targetType: targetType?.call() ?? v.targetType,
-        targetUnit: targetUnit?.call() ?? v.targetUnit,
-        value: value?.call() ?? v.value,
-        period: period?.call() ?? v.period,
-      ),
+    state = AsyncData(
+      state.value?.updatedWith(
+            (v) => Target(
+              memId: v.memId,
+              targetType: targetType?.call() ?? v.targetType,
+              targetUnit: targetUnit?.call() ?? v.targetUnit,
+              value: value?.call() ?? v.value,
+              period: period?.call() ?? v.period,
+            ),
+          ) ??
+          _initialTarget(memId),
     );
-
-    return state;
   }
+
+  TargetEntity _initialTarget(int? memId) => TargetEntity(
+        Target(
+          memId: memId,
+          targetType: TargetType.equalTo,
+          targetUnit: TargetUnit.count,
+          value: 0,
+          period: Period.aDay,
+        ),
+      );
 }
