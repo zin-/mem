@@ -214,7 +214,7 @@ void testNotificationScenario() => group(_scenarioName, () {
         });
       });
 
-      testWidgets(": show MemDetailPage.", (widgetTester) async {
+      testWidgets("[flaky]Show MemDetailPage.", (widgetTester) async {
         final details = NotificationResponse(
           notificationResponseType:
               NotificationResponseType.selectedNotification,
