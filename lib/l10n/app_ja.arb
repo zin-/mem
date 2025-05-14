@@ -111,5 +111,24 @@
   "addNotification": "通知を追加する",
 
   "dev": "Under development",
-  "test": "Under test"
+  "test": "Under test",
+
+  "targetInputNumberError": "数値を入力してください",
+  "targetInputNegativeError": "0以上の値を入力してください",
+  "targetInputMaxCountError": "{maxCount}以下の値を入力してください",
+  "@targetInputMaxCountError": {
+    "placeholders": {
+      "maxCount": {
+        "type": "int"
+      }
+    }
+  },
+  "targetInputMaxTimeError": "{maxTime}時間以下の値を入力してください",
+  "@targetInputMaxTimeError": {
+    "placeholders": {
+      "maxTime": {
+        "type": "int"
+      }
+    }
+  }
 }

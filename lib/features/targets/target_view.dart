@@ -6,8 +6,12 @@ import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/framework/date_and_time/time_text_form_field.dart';
 import 'package:mem/values/dimens.dart';
+import 'package:mem/generated/l10n/app_localizations.dart';
 
 Key keyTargetValue = const Key('target-value');
+
+const _maxCountValue = 999999;
+const _maxTimeValue = 356400; // 99時間
 
 class TargetText extends ConsumerWidget {
   final int? _memId;
@@ -39,94 +43,119 @@ class TargetText extends ConsumerWidget {
       Period? Function()? period,
     }) onTargetChanged,
   ) =>
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+      Builder(
+        builder: (context) {
+          final l10n = AppLocalizations.of(context)!;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: DropdownButton(
-                  isExpanded: true,
-                  value: targetEntity.value.targetType.index,
-                  items: TargetType.values
-                      .map(
-                        (e) => DropdownMenuItem(
-                          value: e.index,
-                          child: Text(e.name),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (v) => onTargetChanged(
-                    targetType: () => TargetType.values[v!],
-                  ),
-                ),
-              ),
-              Expanded(
-                child: DropdownButton(
-                  isExpanded: true,
-                  value: targetEntity.value.targetUnit.index,
-                  items: TargetUnit.values
-                      .map(
-                        (e) => DropdownMenuItem(
-                          value: e.index,
-                          child: Text(e.name),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (v) => onTargetChanged(
-                    targetUnit: () => TargetUnit.values[v!],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: defaultComponentPadding),
-          Row(
-            children: [
-              Expanded(
-                child: switch (targetEntity.value.targetUnit) {
-                  TargetUnit.count => TextFormField(
-                      key: keyTargetValue,
-                      initialValue: targetEntity.value.value.toString(),
-                      keyboardType: TextInputType.number,
+              Row(
+                children: [
+                  Expanded(
+                    child: DropdownButton(
+                      isExpanded: true,
+                      value: targetEntity.value.targetType.index,
+                      items: TargetType.values
+                          .map(
+                            (e) => DropdownMenuItem(
+                              value: e.index,
+                              child: Text(e.name),
+                            ),
+                          )
+                          .toList(),
                       onChanged: (v) => onTargetChanged(
-                        value: () {
-                          final value = int.tryParse(v);
-                          if (value == null) {
-                            return null;
-                          }
-                          return value;
-                        },
+                        targetType: () => TargetType.values[v!],
                       ),
                     ),
-                  TargetUnit.time => TimeTextFormField(
-                      targetEntity.value.value,
-                      (v) => onTargetChanged(
-                        value: () => v,
-                      ),
-                    ),
-                },
-              ),
-              Text('/'),
-              Expanded(
-                child: DropdownButton(
-                  isExpanded: true,
-                  value: targetEntity.value.period.index,
-                  items: Period.values
-                      .map(
-                        (e) => DropdownMenuItem(
-                          value: e.index,
-                          child: Text(e.name),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (v) => onTargetChanged(
-                    period: () => Period.values[v!],
                   ),
-                ),
+                  Expanded(
+                    child: DropdownButton(
+                      isExpanded: true,
+                      value: targetEntity.value.targetUnit.index,
+                      items: TargetUnit.values
+                          .map(
+                            (e) => DropdownMenuItem(
+                              value: e.index,
+                              child: Text(e.name),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (v) => onTargetChanged(
+                        targetUnit: () => TargetUnit.values[v!],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: defaultComponentPadding),
+              Row(
+                children: [
+                  Expanded(
+                    child: switch (targetEntity.value.targetUnit) {
+                      TargetUnit.count => TextFormField(
+                          key: keyTargetValue,
+                          initialValue: targetEntity.value.value.toString(),
+                          keyboardType: TextInputType.number,
+                          validator: (v) {
+                            if (v == null || v.isEmpty) {
+                              return null;
+                            }
+                            final value = int.tryParse(v);
+                            if (value == null) {
+                              return l10n.targetInputNumberError;
+                            }
+                            if (value < 0) {
+                              return l10n.targetInputNegativeError;
+                            }
+                            if (value > _maxCountValue) {
+                              return l10n
+                                  .targetInputMaxCountError(_maxCountValue);
+                            }
+                            return null;
+                          },
+                          onChanged: (v) => onTargetChanged(
+                            value: () {
+                              final value = int.tryParse(v);
+                              if (value == null ||
+                                  value < 0 ||
+                                  value > _maxCountValue) {
+                                return null;
+                              }
+                              return value;
+                            },
+                          ),
+                        ),
+                      TargetUnit.time => TimeTextFormField(
+                          targetEntity.value.value,
+                          (v) => onTargetChanged(
+                            value: () =>
+                                v == null || v > _maxTimeValue ? null : v,
+                          ),
+                        ),
+                    },
+                  ),
+                  Text('/'),
+                  Expanded(
+                    child: DropdownButton(
+                      isExpanded: true,
+                      value: targetEntity.value.period.index,
+                      items: Period.values
+                          .map(
+                            (e) => DropdownMenuItem(
+                              value: e.index,
+                              child: Text(e.name),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (v) => onTargetChanged(
+                        period: () => Period.values[v!],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
-          ),
-        ],
+          );
+        },
       );
 }
