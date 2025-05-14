@@ -79,6 +79,10 @@ void main() => group(_scenarioName, () {
         // ウィジェットが表示されるまで待機
         await widgetTester.pump(const Duration(seconds: 1));
 
+        // ソフトキーボードを閉じる
+        await widgetTester.testTextInput.receiveAction(TextInputAction.done);
+        await widgetTester.pumpAndSettle();
+
         await widgetTester.tap(find.text(TargetType.equalTo.name));
         await widgetTester.pumpAndSettle(waitShowSoftwareKeyboardDuration);
         await widgetTester.tap(find.text(TargetType.lessThan.name));
