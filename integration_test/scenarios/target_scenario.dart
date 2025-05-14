@@ -26,11 +26,10 @@ void main() => group(_scenarioName, () {
       });
 
       const insertedMemName = '$_scenarioName: inserted - mem name';
-      late int insertedMemId;
       setUp(() async {
         await clearAllTestDatabaseRows(databaseDefinition);
 
-        insertedMemId = await dbA.insert(
+        await dbA.insert(
           defTableMems,
           {
             defColMemsName.name: insertedMemName,

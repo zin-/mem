@@ -73,7 +73,13 @@ class TargetText extends ConsumerWidget {
                   key: keyTargetValue,
                   initialValue: targetEntity.value.value.toString(),
                   onChanged: (v) => onTargetTypeChanged(
-                    value: () => int.parse(v),
+                    value: () {
+                      final value = int.tryParse(v);
+                      if (value == null) {
+                        return null;
+                      }
+                      return value;
+                    },
                   ),
                 ),
               ),
