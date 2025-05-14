@@ -57,9 +57,19 @@ void main() => group(_scenarioName, () {
         await widgetTester.tap(find.byIcon(Icons.add));
         await widgetTester.pumpAndSettle(waitShowSoftwareKeyboardDuration);
 
-        await widgetTester.tap(find.text(TargetType.equalTo.name));
+        // ウィジェットが表示されるまで待機
+        await widgetTester.pump(const Duration(seconds: 1));
+
+        // equalToのタップ
+        final equalToFinder = find.text(TargetType.equalTo.name);
+        expect(equalToFinder, findsOneWidget);
+        await widgetTester.tap(equalToFinder, warnIfMissed: false);
         await widgetTester.pumpAndSettle();
-        await widgetTester.tap(find.text(TargetType.lessThan.name));
+
+        // lessThanのタップ
+        final lessThanFinder = find.text(TargetType.lessThan.name);
+        expect(lessThanFinder, findsOneWidget);
+        await widgetTester.tap(lessThanFinder, warnIfMissed: false);
         await widgetTester.pumpAndSettle();
 
         await widgetTester.tap(find.text(TargetUnit.count.name));
