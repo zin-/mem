@@ -55,7 +55,7 @@ void main() => group(_scenarioName, () {
         await widgetTester.pumpAndSettle();
 
         await widgetTester.tap(find.byIcon(Icons.add));
-        await widgetTester.pumpAndSettle();
+        await widgetTester.pumpAndSettle(waitShowSoftwareKeyboardDuration);
 
         await widgetTester.tap(find.text(TargetType.equalTo.name));
         await widgetTester.pumpAndSettle();
@@ -68,7 +68,6 @@ void main() => group(_scenarioName, () {
         await widgetTester.pumpAndSettle();
 
         await widgetTester.enterText(find.byKey(keyTargetValue), "10");
-        await widgetTester.pump();
         await widgetTester.pumpAndSettle();
 
         await widgetTester.tap(find.text(Period.aDay.name));
