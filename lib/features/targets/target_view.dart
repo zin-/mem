@@ -4,6 +4,7 @@ import 'package:mem/acts/line_chart/states.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/targets/target_states.dart';
+import 'package:mem/framework/date_and_time/time_text_form_field.dart';
 import 'package:mem/values/dimens.dart';
 
 Key keyTargetValue = const Key('target-value');
@@ -83,20 +84,28 @@ class TargetText extends ConsumerWidget {
           Row(
             children: [
               Expanded(
-                child: TextFormField(
-                  key: keyTargetValue,
-                  initialValue: targetEntity.value.value.toString(),
-                  keyboardType: TextInputType.number,
-                  onChanged: (v) => onTargetChanged(
-                    value: () {
-                      final value = int.tryParse(v);
-                      if (value == null) {
-                        return null;
-                      }
-                      return value;
-                    },
-                  ),
-                ),
+                child: switch (targetEntity.value.targetUnit) {
+                  TargetUnit.count => TextFormField(
+                      key: keyTargetValue,
+                      initialValue: targetEntity.value.value.toString(),
+                      keyboardType: TextInputType.number,
+                      onChanged: (v) => onTargetChanged(
+                        value: () {
+                          final value = int.tryParse(v);
+                          if (value == null) {
+                            return null;
+                          }
+                          return value;
+                        },
+                      ),
+                    ),
+                  TargetUnit.time => TimeTextFormField(
+                      targetEntity.value.value,
+                      (v) => onTargetChanged(
+                        value: () => v,
+                      ),
+                    ),
+                },
               ),
               Text('/'),
               Expanded(

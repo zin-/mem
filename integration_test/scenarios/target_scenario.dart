@@ -95,7 +95,11 @@ void main() => group(_scenarioName, () {
         await widgetTester.tap(find.text(TargetUnit.time.name));
         await widgetTester.pumpAndSettle();
 
-        await widgetTester.enterText(find.byKey(keyTargetValue), "2");
+        await widgetTester.tap(find.byIcon(Icons.add));
+        await widgetTester.pumpAndSettle();
+        await widgetTester.tap(find.text("h").at(1));
+        await widgetTester.pumpAndSettle();
+        await widgetTester.tap(find.text("OK"));
         await widgetTester.pumpAndSettle();
 
         await widgetTester.tap(find.text(Period.aDay.name));
@@ -122,7 +126,7 @@ void main() => group(_scenarioName, () {
         expect(targets.length, 1);
         expect(targets[0][defColTargetType.name], TargetType.lessThan.name);
         expect(targets[0][defColTargetUnit.name], TargetUnit.time.name);
-        expect(targets[0][defColTargetValue.name], 2);
+        expect(targets[0][defColTargetValue.name], 3600);
         expect(targets[0][defColTargetPeriod.name], Period.aWeek.name);
       });
 
