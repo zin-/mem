@@ -29,10 +29,22 @@ void main() => group(_scenarioName, () {
       setUp(() async {
         await clearAllTestDatabaseRows(databaseDefinition);
 
-        await dbA.insert(
+        final insertedMemId = await dbA.insert(
           defTableMems,
           {
             defColMemsName.name: insertedMemName,
+            defColCreatedAt.name: zeroDate,
+          },
+        );
+
+        await dbA.insert(
+          defTableTargets,
+          {
+            defFkTargetMemId.name: insertedMemId,
+            defColTargetType.name: TargetType.moreThan.name,
+            defColTargetUnit.name: TargetUnit.time.name,
+            defColTargetValue.name: 1,
+            defColTargetPeriod.name: Period.all.name,
             defColCreatedAt.name: zeroDate,
           },
         );
@@ -45,9 +57,16 @@ void main() => group(_scenarioName, () {
         await widgetTester.tap(find.text(insertedMemName));
         await widgetTester.pumpAndSettle();
 
-        expect(find.text(TargetType.equalTo.name), findsOneWidget);
-        expect(find.text(TargetUnit.count.name), findsOneWidget);
-        expect(find.text(Period.aDay.name), findsOneWidget);
+        expect(find.text(TargetType.moreThan.name), findsOneWidget);
+        expect(find.text(TargetUnit.time.name), findsOneWidget);
+        expect(
+            widgetTester
+                .widget<TextFormField>(
+                  find.byKey(keyTargetValue),
+                )
+                .initialValue,
+            "1");
+        expect(find.text(Period.all.name), findsOneWidget);
       });
 
       testWidgets("Create target.", (widgetTester) async {
@@ -60,28 +79,21 @@ void main() => group(_scenarioName, () {
         // ウィジェットが表示されるまで待機
         await widgetTester.pump(const Duration(seconds: 1));
 
-        // equalToのタップ
-        final equalToFinder = find.text(TargetType.equalTo.name);
-        expect(equalToFinder, findsOneWidget);
-        await widgetTester.tap(equalToFinder, warnIfMissed: false);
-        await widgetTester.pumpAndSettle();
-
-        // lessThanのタップ
-        final lessThanFinder = find.text(TargetType.lessThan.name);
-        expect(lessThanFinder, findsOneWidget);
-        await widgetTester.tap(lessThanFinder, warnIfMissed: false);
+        await widgetTester.tap(find.text(TargetType.equalTo.name));
+        await widgetTester.pumpAndSettle(waitShowSoftwareKeyboardDuration);
+        await widgetTester.tap(find.text(TargetType.lessThan.name));
         await widgetTester.pumpAndSettle();
 
         await widgetTester.tap(find.text(TargetUnit.count.name));
-        await widgetTester.pumpAndSettle();
+        await widgetTester.pumpAndSettle(waitShowSoftwareKeyboardDuration);
         await widgetTester.tap(find.text(TargetUnit.time.name));
         await widgetTester.pumpAndSettle();
 
-        await widgetTester.enterText(find.byKey(keyTargetValue), "10");
+        await widgetTester.enterText(find.byKey(keyTargetValue), "2");
         await widgetTester.pumpAndSettle();
 
         await widgetTester.tap(find.text(Period.aDay.name));
-        await widgetTester.pumpAndSettle();
+        await widgetTester.pumpAndSettle(waitShowSoftwareKeyboardDuration);
         await widgetTester.tap(find.text(Period.aWeek.name));
         await widgetTester.pumpAndSettle();
 
@@ -104,7 +116,32 @@ void main() => group(_scenarioName, () {
         expect(targets.length, 1);
         expect(targets[0][defColTargetType.name], TargetType.lessThan.name);
         expect(targets[0][defColTargetUnit.name], TargetUnit.time.name);
-        expect(targets[0][defColTargetValue.name], 10);
+        expect(targets[0][defColTargetValue.name], 2);
         expect(targets[0][defColTargetPeriod.name], Period.aWeek.name);
+      });
+
+      testWidgets("Clear target.", (widgetTester) async {
+        await runApplication();
+        await widgetTester.pumpAndSettle();
+        await widgetTester.tap(find.text(insertedMemName));
+        await widgetTester.pumpAndSettle();
+
+        await widgetTester.enterText(find.byKey(keyTargetValue), "0");
+        await widgetTester.pumpAndSettle();
+        await widgetTester.pump();
+        await widgetTester.tap(find.byKey(keySaveMemFab));
+        await widgetTester.pumpAndSettle(waitSideEffectDuration);
+
+        final getCreatedMem = Equals(defColMemsName, insertedMemName);
+        final mems = await dbA.select(defTableMems,
+            where: getCreatedMem.where(), whereArgs: getCreatedMem.whereArgs());
+        expect(mems.length, 1);
+        final getCreatedTarget = And([
+          Equals(defFkTargetMemId, mems[0][defPkId.name]),
+        ]);
+        final targets = await dbA.select(defTableTargets,
+            where: getCreatedTarget.where(),
+            whereArgs: getCreatedTarget.whereArgs());
+        expect(targets, isEmpty);
       });
     });

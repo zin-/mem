@@ -99,9 +99,13 @@ class MemService {
 
           SavedTargetEntity? savedTarget;
           final target = memDetail.target;
-          if (target is SavedTargetEntity) {
+          if (target == null || target.value.value == 0) {
+            await _targetRepository.waste(
+              condition: Equals(defFkTargetMemId, savedMem.id),
+            );
+          } else if (target is SavedTargetEntity) {
             savedTarget = await _targetRepository.replace(target);
-          } else if (target != null) {
+          } else {
             savedTarget = await _targetRepository.receive(target.updatedWith(
               (v) => Target(
                 memId: savedMem.id,
@@ -111,10 +115,6 @@ class MemService {
                 period: v.period,
               ),
             ));
-          } else {
-            await _targetRepository.waste(
-              condition: Equals(defFkTargetMemId, savedMem.id),
-            );
           }
 
           return MemDetail(
