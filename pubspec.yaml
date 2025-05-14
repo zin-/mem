@@ -32,6 +32,7 @@ scripts:
   emulator:
     list: flutter emulators
     start: flutter emulators --launch Pixel_9_Pro_XL_API_Baklava
+  e: rps emulator
   test:
     unit: flutter test
     integration: flutter test integration_test

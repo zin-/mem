@@ -5,6 +5,8 @@ import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/values/dimens.dart';
 
+Key keyTargetValue = const Key('target-value');
+
 class TargetText extends ConsumerWidget {
   final int? _memId;
 
@@ -68,6 +70,7 @@ class TargetText extends ConsumerWidget {
             children: [
               Expanded(
                 child: TextFormField(
+                  key: keyTargetValue,
                   initialValue: targetEntity.value.value.toString(),
                   onChanged: (v) => onTargetTypeChanged(
                     value: () => int.parse(v),
