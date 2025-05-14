@@ -4,7 +4,6 @@ import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/targets/target_repository.dart';
 import 'package:mem/features/targets/target_table.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
-import 'package:mem/logger/log_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'target_states.g.dart';
