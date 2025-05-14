@@ -42,7 +42,7 @@ void main() => group(_scenarioName, () {
           {
             defFkTargetMemId.name: insertedMemId,
             defColTargetType.name: TargetType.moreThan.name,
-            defColTargetUnit.name: TargetUnit.time.name,
+            defColTargetUnit.name: TargetUnit.count.name,
             defColTargetValue.name: 1,
             defColTargetPeriod.name: Period.all.name,
             defColCreatedAt.name: zeroDate,
@@ -58,7 +58,7 @@ void main() => group(_scenarioName, () {
         await widgetTester.pumpAndSettle();
 
         expect(find.text(TargetType.moreThan.name), findsOneWidget);
-        expect(find.text(TargetUnit.time.name), findsOneWidget);
+        expect(find.text(TargetUnit.count.name), findsOneWidget);
         expect(
             widgetTester
                 .widget<TextFormField>(
