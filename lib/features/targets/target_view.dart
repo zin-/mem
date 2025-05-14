@@ -60,7 +60,6 @@ class TargetText extends ConsumerWidget {
                   ),
                 ),
               ),
-              SizedBox(width: defaultComponentPadding),
               Expanded(
                 child: DropdownButton(
                   isExpanded: true,
@@ -87,6 +86,7 @@ class TargetText extends ConsumerWidget {
                 child: TextFormField(
                   key: keyTargetValue,
                   initialValue: targetEntity.value.value.toString(),
+                  keyboardType: TextInputType.number,
                   onChanged: (v) => onTargetChanged(
                     value: () {
                       final value = int.tryParse(v);
@@ -98,9 +98,7 @@ class TargetText extends ConsumerWidget {
                   ),
                 ),
               ),
-              SizedBox(width: defaultComponentPadding),
               Text('/'),
-              SizedBox(width: defaultComponentPadding),
               Expanded(
                 child: DropdownButton(
                   isExpanded: true,
