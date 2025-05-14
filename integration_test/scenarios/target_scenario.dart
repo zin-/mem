@@ -67,6 +67,8 @@ void main() => group(_scenarioName, () {
                 .initialValue,
             "1");
         expect(find.text(Period.all.name), findsOneWidget);
+
+        await widgetTester.tap(find.byKey(keySaveMemFab));
       });
 
       testWidgets("Create target.", (widgetTester) async {

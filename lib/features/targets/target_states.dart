@@ -30,16 +30,15 @@ class TargetState extends _$TargetState {
     Period? Function()? period,
   }) {
     state = AsyncData(
-      state.value?.updatedWith(
-            (v) => Target(
-              memId: v.memId,
-              targetType: targetType?.call() ?? v.targetType,
-              targetUnit: targetUnit?.call() ?? v.targetUnit,
-              value: value?.call() ?? v.value,
-              period: period?.call() ?? v.period,
-            ),
-          ) ??
-          _initialTarget(memId),
+      state.requireValue.updatedWith(
+        (v) => Target(
+          memId: v.memId,
+          targetType: targetType?.call() ?? v.targetType,
+          targetUnit: targetUnit?.call() ?? v.targetUnit,
+          value: value?.call() ?? v.value,
+          period: period?.call() ?? v.period,
+        ),
+      ),
     );
   }
 
