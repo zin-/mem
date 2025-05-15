@@ -7,11 +7,9 @@ import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/framework/date_and_time/time_text_form_field.dart';
 import 'package:mem/framework/view/integer_text_form_field.dart';
 import 'package:mem/values/dimens.dart';
-import 'package:mem/generated/l10n/app_localizations.dart';
 
 Key keyTargetValue = const Key('target-value');
 
-const _maxCountValue = 999999;
 const _maxTimeValue = 356400; // 99時間
 
 class TargetText extends ConsumerWidget {
@@ -46,7 +44,6 @@ class TargetText extends ConsumerWidget {
   ) =>
       Builder(
         builder: (context) {
-          final l10n = AppLocalizations.of(context)!;
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
