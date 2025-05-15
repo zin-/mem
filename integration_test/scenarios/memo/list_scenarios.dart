@@ -4,13 +4,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
 import 'package:mem/mems/mem_name.dart';
-import 'package:mem/mems/mem_item.dart';
+import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
-import 'package:mem/mems/detail/mem_items_view.dart';
+import 'package:mem/features/mem_items/mem_items_view.dart';
 
 import '../helpers.dart';
 
