@@ -1,6 +1,6 @@
 import 'package:go_router/go_router.dart';
-import 'package:mem/acts/counter/act_counter_configure.dart';
-import 'package:mem/acts/line_chart/line_chart_page.dart';
+import 'package:mem/features/acts/counter/act_counter_configure.dart';
+import 'package:mem/features/acts/line_chart/line_chart_page.dart';
 import 'package:mem/dev/page.dart';
 import 'package:mem/home_screen.dart';
 import 'package:mem/mems/detail/page.dart';

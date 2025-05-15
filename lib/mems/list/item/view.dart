@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/acts/act.dart';
-import 'package:mem/acts/actions.dart';
-import 'package:mem/acts/states.dart';
+import 'package:mem/features/acts/act.dart';
+import 'package:mem/features/acts/actions.dart';
+import 'package:mem/features/acts/states.dart';
 import 'package:mem/framework/view/timer.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';

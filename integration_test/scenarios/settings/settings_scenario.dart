@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/acts/act.dart';
-import 'package:mem/acts/act_entity.dart';
-import 'package:mem/acts/act_repository.dart';
-import 'package:mem/acts/client.dart';
+import 'package:mem/features/acts/act.dart';
+import 'package:mem/features/acts/act_entity.dart';
+import 'package:mem/features/acts/act_repository.dart';
+import 'package:mem/features/acts/client.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';

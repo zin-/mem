@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/acts/actions.dart';
-import 'package:mem/acts/acts_summary.dart';
-import 'package:mem/acts/line_chart/line_chart_wrapper.dart';
-import 'package:mem/acts/line_chart/states.dart';
-import 'package:mem/acts/states.dart';
+import 'package:mem/features/acts/actions.dart';
+import 'package:mem/features/acts/acts_summary.dart';
+import 'package:mem/features/acts/line_chart/line_chart_wrapper.dart';
+import 'package:mem/features/acts/line_chart/states.dart';
+import 'package:mem/features/acts/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/view/async_value_view.dart';
 import 'package:mem/l10n/l10n.dart';

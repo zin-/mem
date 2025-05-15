@@ -1,4 +1,4 @@
-import 'package:mem/acts/counter/act_counter.dart';
+import 'package:mem/features/acts/counter/act_counter.dart';
 import 'package:mem/framework/repository/entity.dart';
 import 'package:mem/framework/repository/home_widget_entity.dart';
 

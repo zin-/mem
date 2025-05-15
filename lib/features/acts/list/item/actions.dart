@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/acts/act_entity.dart';
-import 'package:mem/acts/client.dart';
-import 'package:mem/acts/states.dart';
+import 'package:mem/features/acts/act_entity.dart';
+import 'package:mem/features/acts/client.dart';
+import 'package:mem/features/acts/states.dart';
 import 'package:mem/logger/log_service.dart';
 
 import 'states.dart';

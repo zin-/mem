@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:mem/acts/counter/home_widget_accessor.dart';
+import 'package:mem/features/acts/counter/home_widget_accessor.dart';
 import 'package:mem/framework/repository/home_widget_entity.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/logger/log_service.dart';

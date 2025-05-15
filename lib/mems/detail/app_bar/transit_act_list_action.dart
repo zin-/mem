@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mem/acts/list/page.dart';
+import 'package:mem/features/acts/list/page.dart';
 import 'package:mem/framework/view/app_bar_actions_builder.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/logger/log_service.dart';

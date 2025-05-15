@@ -5,7 +5,7 @@ import 'package:mem/notifications/mem_notifications.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/notifications/notification_client.dart';
 
-import 'acts/counter/act_counter_client.dart';
+import 'features/acts/counter/act_counter_client.dart';
 import 'application.dart';
 import 'framework/date_and_time/date_and_time.dart';
 import 'logger/log_service.dart';

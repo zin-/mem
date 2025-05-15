@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:mem/acts/line_chart/states.dart';
+import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/databases/table_definitions/base.dart';

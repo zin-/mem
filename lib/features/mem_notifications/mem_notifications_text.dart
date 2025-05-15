@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/acts/act.dart';
-import 'package:mem/acts/states.dart';
+import 'package:mem/features/acts/act.dart';
+import 'package:mem/features/acts/states.dart';
 import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';

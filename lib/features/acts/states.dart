@@ -1,12 +1,12 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/acts/act.dart';
-import 'package:mem/acts/client.dart';
+import 'package:mem/features/acts/act.dart';
+import 'package:mem/features/acts/client.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/acts/act_entity.dart';
+import 'package:mem/features/acts/act_entity.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'states.g.dart';

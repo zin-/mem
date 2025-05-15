@@ -1,4 +1,4 @@
-import 'package:mem/acts/act.dart';
+import 'package:mem/features/acts/act.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:test/test.dart';
