@@ -3,7 +3,7 @@ import 'package:mem/features/acts/counter/act_counter_configure.dart';
 import 'package:mem/features/acts/line_chart/line_chart_page.dart';
 import 'package:mem/features/dev/page.dart';
 import 'package:mem/home_screen.dart';
-import 'package:mem/mems/detail/page.dart';
+import 'package:mem/features/mems/detail/page.dart';
 
 const _memIdKey = 'memId';
 

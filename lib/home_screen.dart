@@ -5,8 +5,8 @@ import 'package:mem/l10n/l10n.dart';
 import 'package:mem/framework/view/scroll_controllable_widget.dart';
 import 'package:mem/framework/view/drawer.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/mems/list/widget.dart';
-import 'package:mem/mems/list/show_new_mem_fab.dart';
+import 'package:mem/features/mems/list/widget.dart';
+import 'package:mem/features/mems/list/show_new_mem_fab.dart';
 import 'package:mem/values/dimens.dart';
 import 'package:mem/values/durations.dart';
 

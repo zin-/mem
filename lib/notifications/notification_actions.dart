@@ -2,7 +2,7 @@ import 'package:mem/features/acts/client.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/generated/l10n/app_localizations.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/mems/mem_service.dart';
+import 'package:mem/features/mems/mem_service.dart';
 
 import 'notification/action.dart';
 import 'notification_ids.dart';

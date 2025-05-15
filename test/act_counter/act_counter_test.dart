@@ -5,8 +5,8 @@ import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/features/acts/act_entity.dart';
-import 'package:mem/mems/mem.dart';
-import 'package:mem/mems/mem_entity.dart';
+import 'package:mem/features/mems/mem.dart';
+import 'package:mem/features/mems/mem_entity.dart';
 
 void main() {
   group('ActCounter.from', () {

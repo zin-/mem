@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/mems/mem_name.dart';
+import 'package:mem/features/mems/mem_name.dart';
 
 import 'package:mem/features/acts/list/duration.dart';
 import 'package:mem/databases/definition.dart';

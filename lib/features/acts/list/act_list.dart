@@ -4,9 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/states.dart';
-import 'package:mem/mems/list/states.dart';
+import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/mems/mem_entity.dart';
+import 'package:mem/features/mems/mem_entity.dart';
 
 import 'app_bar.dart';
 import 'item/builder.dart';

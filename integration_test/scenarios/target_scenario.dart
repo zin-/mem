@@ -10,8 +10,8 @@ import 'package:mem/features/targets/target_table.dart';
 import 'package:mem/features/targets/target_view.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
-import 'package:mem/mems/detail/fab.dart';
-import 'package:mem/mems/mem_name.dart';
+import 'package:mem/features/mems/detail/fab.dart';
+import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/framework/view/integer_text_form_field.dart';
 
 import 'helpers.dart';

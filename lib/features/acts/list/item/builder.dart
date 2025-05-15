@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/acts/act_entity.dart';
-import 'package:mem/mems/mem_entity.dart';
+import 'package:mem/features/mems/mem_entity.dart';
 
 import 'total_act_time_item.dart';
 import 'view.dart';

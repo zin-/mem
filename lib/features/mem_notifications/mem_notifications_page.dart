@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/mems/detail/states.dart';
+import 'package:mem/features/mems/detail/states.dart';
 
 import 'after_act_started_notification_view.dart';
 import 'mem_repeat_by_day_of_week_notification_view.dart';

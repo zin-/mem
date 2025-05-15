@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:mem/generated/l10n/app_localizations.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
-import 'package:mem/mems/mem_repository.dart';
+import 'package:mem/features/mems/mem_repository.dart';
 
 import 'mem_notifications.dart';
 import 'notification/action.dart';

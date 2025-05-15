@@ -3,7 +3,7 @@ import 'package:mem/features/acts/client.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/acts/act_repository.dart';
-import 'package:mem/mems/mem_repository.dart';
+import 'package:mem/features/mems/mem_repository.dart';
 
 import 'act_counter.dart';
 import 'act_counter_repository.dart';

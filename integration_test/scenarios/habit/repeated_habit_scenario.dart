@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/framework/date_and_time/time_of_day_view.dart';
-import 'package:mem/mems/mem_name.dart';
+import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
@@ -9,7 +9,7 @@ import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
-import 'package:mem/mems/detail/fab.dart';
+import 'package:mem/features/mems/detail/fab.dart';
 import 'package:mem/features/mem_notifications/mem_notifications_view.dart';
 import 'package:mem/features/mem_notifications/mem_repeated_notification_view.dart';
 import 'package:mem/values/constants.dart';
