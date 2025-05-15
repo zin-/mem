@@ -1,20 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/framework/view/integer_text_form_field.dart';
-import 'package:mem/generated/l10n/app_localizations.dart';
 
 void main() {
-  late AppLocalizations l10n;
-
-  setUpAll(() async {
-    l10n = await AppLocalizations.delegate.load(const Locale('en'));
-  });
-
-  testWidgets('初期値が正しく表示される', (WidgetTester tester) async {
+  testWidgets('displays initial value correctly', (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: IntegerTextFormField(42),
         ),
@@ -24,12 +15,10 @@ void main() {
     expect(find.text('42'), findsOneWidget);
   });
 
-  testWidgets('有効な値を入力できる', (WidgetTester tester) async {
+  testWidgets('can input valid value', (WidgetTester tester) async {
     int? changedValue;
     await tester.pumpWidget(
       MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: IntegerTextFormField(
             0,
@@ -45,11 +34,10 @@ void main() {
     expect(changedValue, 123);
   });
 
-  testWidgets('数値以外の入力をバリデーションできる', (WidgetTester tester) async {
+  testWidgets('validates non-numeric input with default message',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: Form(
             child: IntegerTextFormField(0),
@@ -63,39 +51,91 @@ void main() {
 
     final formField = tester.widget<TextFormField>(find.byType(TextFormField));
     final validator = formField.validator!;
-    expect(validator('abc'), l10n.targetInputNumberError);
+    expect(validator('abc'), 'Please enter a number');
   });
 
-  testWidgets('負の値をバリデーションできる', (WidgetTester tester) async {
+  testWidgets('validates non-numeric input with custom message',
+      (WidgetTester tester) async {
+    const errorMessage = 'Custom error message';
     await tester.pumpWidget(
       MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: Form(
-            child: IntegerTextFormField(0),
+            child: IntegerTextFormField(
+              0,
+              errorMessageBuilder: (_) => errorMessage,
+            ),
           ),
         ),
       ),
     );
 
-    await tester.enterText(find.byType(TextFormField), '-1');
+    await tester.enterText(find.byType(TextFormField), 'abc');
     await tester.pump();
 
     final formField = tester.widget<TextFormField>(find.byType(TextFormField));
     final validator = formField.validator!;
-    expect(validator('-1'), l10n.targetInputNegativeError);
+    expect(validator('abc'), errorMessage);
   });
 
-  testWidgets('最大値を超える値をバリデーションできる', (WidgetTester tester) async {
-    const maxValue = 100;
+  testWidgets('validates value below minimum with default message',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: Form(
-            child: IntegerTextFormField(0, maxValue: maxValue),
+            child: IntegerTextFormField(
+              0,
+              minValue: 10,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.enterText(find.byType(TextFormField), '5');
+    await tester.pump();
+
+    final formField = tester.widget<TextFormField>(find.byType(TextFormField));
+    final validator = formField.validator!;
+    expect(validator('5'), 'Please enter a value greater than or equal to 10');
+  });
+
+  testWidgets('validates value below minimum with custom message',
+      (WidgetTester tester) async {
+    const errorMessage = 'Custom error message';
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Form(
+            child: IntegerTextFormField(
+              0,
+              minValue: 10,
+              errorMessageBuilder: (_) => errorMessage,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.enterText(find.byType(TextFormField), '5');
+    await tester.pump();
+
+    final formField = tester.widget<TextFormField>(find.byType(TextFormField));
+    final validator = formField.validator!;
+    expect(validator('5'), errorMessage);
+  });
+
+  testWidgets('validates value above maximum with default message',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Form(
+            child: IntegerTextFormField(
+              0,
+              maxValue: 100,
+            ),
           ),
         ),
       ),
@@ -106,18 +146,43 @@ void main() {
 
     final formField = tester.widget<TextFormField>(find.byType(TextFormField));
     final validator = formField.validator!;
-    expect(validator('101'), l10n.targetInputMaxCountError(maxValue));
+    expect(validator('101'), 'Please enter a value less than or equal to 100');
   });
 
-  testWidgets('最大値を超える値を入力した場合、onChangedはnullを返す', (WidgetTester tester) async {
+  testWidgets('validates value above maximum with custom message',
+      (WidgetTester tester) async {
+    const errorMessage = 'Custom error message';
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Form(
+            child: IntegerTextFormField(
+              0,
+              maxValue: 100,
+              errorMessageBuilder: (_) => errorMessage,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.enterText(find.byType(TextFormField), '101');
+    await tester.pump();
+
+    final formField = tester.widget<TextFormField>(find.byType(TextFormField));
+    final validator = formField.validator!;
+    expect(validator('101'), errorMessage);
+  });
+
+  testWidgets('returns null when input is out of range',
+      (WidgetTester tester) async {
     int? changedValue;
     await tester.pumpWidget(
       MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: IntegerTextFormField(
             0,
+            minValue: 10,
             maxValue: 100,
             onChanged: (value) => changedValue = value,
           ),
@@ -125,9 +190,31 @@ void main() {
       ),
     );
 
-    await tester.enterText(find.byType(TextFormField), '101');
+    await tester.enterText(find.byType(TextFormField), '5');
     await tester.pump();
 
     expect(changedValue, null);
+  });
+
+  testWidgets('returns value when input is within range',
+      (WidgetTester tester) async {
+    int? changedValue;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: IntegerTextFormField(
+            0,
+            minValue: 10,
+            maxValue: 100,
+            onChanged: (value) => changedValue = value,
+          ),
+        ),
+      ),
+    );
+
+    await tester.enterText(find.byType(TextFormField), '50');
+    await tester.pump();
+
+    expect(changedValue, 50);
   });
 }
