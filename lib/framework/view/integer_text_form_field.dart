@@ -38,7 +38,6 @@ class IntegerTextFormField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      key: key,
       initialValue: initialValue.toString(),
       keyboardType: TextInputType.number,
       autovalidateMode: autovalidateMode,
