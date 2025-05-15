@@ -135,7 +135,7 @@ void testTodoScenario() => group(': $_scenarioName', () {
           expect(find.text(doneMemName), findsOneWidget);
         });
 
-        testWidgets(': MemListPage.', (widgetTester) async {
+        testWidgets('[flaky]MemListPage.', (widgetTester) async {
           await runApplication();
           await widgetTester.pumpAndSettle();
 
