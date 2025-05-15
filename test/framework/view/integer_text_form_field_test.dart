@@ -28,10 +28,64 @@ void main() {
       ),
     );
 
-    await tester.enterText(find.byType(TextFormField), '123');
+    await tester.enterText(find.byType(IntegerTextFormField), '123');
     await tester.pump();
 
     expect(changedValue, 123);
+  });
+
+  testWidgets('validates empty input with default message',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Form(
+            child: IntegerTextFormField(0),
+          ),
+        ),
+      ),
+    );
+
+    await tester.enterText(find.byType(IntegerTextFormField), '');
+    await tester.pump();
+
+    final formField = tester.widget<TextFormField>(find
+        .descendant(
+          of: find.byType(IntegerTextFormField),
+          matching: find.byType(TextFormField),
+        )
+        .first);
+    final validator = formField.validator!;
+    expect(validator(''), 'Please enter a number');
+  });
+
+  testWidgets('validates empty input with custom message',
+      (WidgetTester tester) async {
+    const errorMessage = 'Custom empty error message';
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Form(
+            child: IntegerTextFormField(
+              0,
+              emptyErrorMessage: errorMessage,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.enterText(find.byType(IntegerTextFormField), '');
+    await tester.pump();
+
+    final formField = tester.widget<TextFormField>(find
+        .descendant(
+          of: find.byType(IntegerTextFormField),
+          matching: find.byType(TextFormField),
+        )
+        .first);
+    final validator = formField.validator!;
+    expect(validator(''), errorMessage);
   });
 
   testWidgets('validates non-numeric input with default message',
@@ -46,34 +100,44 @@ void main() {
       ),
     );
 
-    await tester.enterText(find.byType(TextFormField), 'abc');
+    await tester.enterText(find.byType(IntegerTextFormField), 'abc');
     await tester.pump();
 
-    final formField = tester.widget<TextFormField>(find.byType(TextFormField));
+    final formField = tester.widget<TextFormField>(find
+        .descendant(
+          of: find.byType(IntegerTextFormField),
+          matching: find.byType(TextFormField),
+        )
+        .first);
     final validator = formField.validator!;
     expect(validator('abc'), 'Please enter a number');
   });
 
   testWidgets('validates non-numeric input with custom message',
       (WidgetTester tester) async {
-    const errorMessage = 'Custom error message';
+    const errorMessage = 'Custom non-numeric error message';
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
           body: Form(
             child: IntegerTextFormField(
               0,
-              errorMessageBuilder: (_) => errorMessage,
+              nonNumericErrorMessage: errorMessage,
             ),
           ),
         ),
       ),
     );
 
-    await tester.enterText(find.byType(TextFormField), 'abc');
+    await tester.enterText(find.byType(IntegerTextFormField), 'abc');
     await tester.pump();
 
-    final formField = tester.widget<TextFormField>(find.byType(TextFormField));
+    final formField = tester.widget<TextFormField>(find
+        .descendant(
+          of: find.byType(IntegerTextFormField),
+          matching: find.byType(TextFormField),
+        )
+        .first);
     final validator = formField.validator!;
     expect(validator('abc'), errorMessage);
   });
@@ -93,17 +157,22 @@ void main() {
       ),
     );
 
-    await tester.enterText(find.byType(TextFormField), '5');
+    await tester.enterText(find.byType(IntegerTextFormField), '5');
     await tester.pump();
 
-    final formField = tester.widget<TextFormField>(find.byType(TextFormField));
+    final formField = tester.widget<TextFormField>(find
+        .descendant(
+          of: find.byType(IntegerTextFormField),
+          matching: find.byType(TextFormField),
+        )
+        .first);
     final validator = formField.validator!;
     expect(validator('5'), 'Please enter a value greater than or equal to 10');
   });
 
   testWidgets('validates value below minimum with custom message',
       (WidgetTester tester) async {
-    const errorMessage = 'Custom error message';
+    const errorMessage = 'Custom below minimum error message';
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -111,17 +180,22 @@ void main() {
             child: IntegerTextFormField(
               0,
               minValue: 10,
-              errorMessageBuilder: (_) => errorMessage,
+              belowMinErrorMessage: errorMessage,
             ),
           ),
         ),
       ),
     );
 
-    await tester.enterText(find.byType(TextFormField), '5');
+    await tester.enterText(find.byType(IntegerTextFormField), '5');
     await tester.pump();
 
-    final formField = tester.widget<TextFormField>(find.byType(TextFormField));
+    final formField = tester.widget<TextFormField>(find
+        .descendant(
+          of: find.byType(IntegerTextFormField),
+          matching: find.byType(TextFormField),
+        )
+        .first);
     final validator = formField.validator!;
     expect(validator('5'), errorMessage);
   });
@@ -141,17 +215,22 @@ void main() {
       ),
     );
 
-    await tester.enterText(find.byType(TextFormField), '101');
+    await tester.enterText(find.byType(IntegerTextFormField), '101');
     await tester.pump();
 
-    final formField = tester.widget<TextFormField>(find.byType(TextFormField));
+    final formField = tester.widget<TextFormField>(find
+        .descendant(
+          of: find.byType(IntegerTextFormField),
+          matching: find.byType(TextFormField),
+        )
+        .first);
     final validator = formField.validator!;
     expect(validator('101'), 'Please enter a value less than or equal to 100');
   });
 
   testWidgets('validates value above maximum with custom message',
       (WidgetTester tester) async {
-    const errorMessage = 'Custom error message';
+    const errorMessage = 'Custom above maximum error message';
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -159,19 +238,91 @@ void main() {
             child: IntegerTextFormField(
               0,
               maxValue: 100,
-              errorMessageBuilder: (_) => errorMessage,
+              aboveMaxErrorMessage: errorMessage,
             ),
           ),
         ),
       ),
     );
 
-    await tester.enterText(find.byType(TextFormField), '101');
+    await tester.enterText(find.byType(IntegerTextFormField), '101');
     await tester.pump();
 
-    final formField = tester.widget<TextFormField>(find.byType(TextFormField));
+    final formField = tester.widget<TextFormField>(find
+        .descendant(
+          of: find.byType(IntegerTextFormField),
+          matching: find.byType(TextFormField),
+        )
+        .first);
     final validator = formField.validator!;
     expect(validator('101'), errorMessage);
+  });
+
+  testWidgets(
+      'validates on focus change with autovalidateMode.onUserInteraction',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Form(
+            child: IntegerTextFormField(
+              0,
+              minValue: 10,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // フォーカスを当てる
+    await tester.tap(find.byType(IntegerTextFormField));
+    await tester.pump();
+
+    // 無効な値を入力
+    await tester.enterText(find.byType(IntegerTextFormField), '5');
+    await tester.pump();
+
+    // フォーカスを外す
+    await tester.tap(find.byType(Scaffold));
+    await tester.pump();
+
+    // エラーメッセージが表示されていることを確認
+    expect(find.text('Please enter a value greater than or equal to 10'),
+        findsOneWidget);
+  });
+
+  testWidgets('validates on focus change with autovalidateMode.always',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Form(
+            child: IntegerTextFormField(
+              0,
+              minValue: 10,
+              autovalidateMode: AutovalidateMode.always,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // フォーカスを当てる
+    await tester.tap(find.byType(IntegerTextFormField));
+    await tester.pump();
+
+    // 無効な値を入力
+    await tester.enterText(find.byType(IntegerTextFormField), '5');
+    await tester.pump();
+
+    // フォーカスを外す
+    await tester.tap(find.byType(Scaffold));
+    await tester.pump();
+
+    // エラーメッセージが表示されていることを確認
+    expect(find.text('Please enter a value greater than or equal to 10'),
+        findsOneWidget);
   });
 
   testWidgets('returns null when input is out of range',
@@ -190,7 +341,7 @@ void main() {
       ),
     );
 
-    await tester.enterText(find.byType(TextFormField), '5');
+    await tester.enterText(find.byType(IntegerTextFormField), '5');
     await tester.pump();
 
     expect(changedValue, null);
@@ -212,7 +363,7 @@ void main() {
       ),
     );
 
-    await tester.enterText(find.byType(TextFormField), '50');
+    await tester.enterText(find.byType(IntegerTextFormField), '50');
     await tester.pump();
 
     expect(changedValue, 50);

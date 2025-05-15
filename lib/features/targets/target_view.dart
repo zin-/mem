@@ -93,6 +93,8 @@ class TargetText extends ConsumerWidget {
                       TargetUnit.count => IntegerTextFormField(
                           targetEntity.value.value,
                           key: keyTargetValue,
+                          minValue: 0,
+                          maxValue: 999999,
                           onChanged: (v) => onTargetChanged(
                             value: () => v,
                           ),
