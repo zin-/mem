@@ -114,7 +114,14 @@
   "test": "Under test",
 
   "targetInputNumberError": "Please enter a number",
-  "targetInputNegativeError": "Please enter a value greater than or equal to 0",
+  "targetInputNegativeError": "Please enter a value greater than or equal to {min}",
+  "@targetInputNegativeError": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      }
+    }
+  },
   "targetInputMaxCountError": "Please enter a value less than or equal to {maxCount}",
   "@targetInputMaxCountError": {
     "placeholders": {

@@ -102,7 +102,7 @@ class TargetText extends ConsumerWidget {
                           emptyErrorMessage: l10n.requiredError,
                           nonNumericErrorMessage: l10n.targetInputNumberError,
                           belowMinErrorMessage: (min) =>
-                              l10n.targetInputNegativeError,
+                              l10n.targetInputNegativeError(min),
                           aboveMaxErrorMessage: (max) =>
                               l10n.targetInputMaxCountError(max),
                           onChanged: (v) => onTargetChanged(

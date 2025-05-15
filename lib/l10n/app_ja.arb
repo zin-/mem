@@ -114,7 +114,14 @@
   "test": "Under test",
 
   "targetInputNumberError": "数値を入力してください",
-  "targetInputNegativeError": "0以上の値を入力してください",
+  "targetInputNegativeError": "{min}以上の値を入力してください",
+  "@targetInputNegativeError": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      }
+    }
+  },
   "targetInputMaxCountError": "{maxCount}以下の値を入力してください",
   "@targetInputMaxCountError": {
     "placeholders": {
