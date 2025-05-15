@@ -7,8 +7,8 @@ class IntegerTextFormField extends StatelessWidget {
   final int? maxValue;
   final String? emptyErrorMessage;
   final String? nonNumericErrorMessage;
-  final String? belowMinErrorMessage;
-  final String? aboveMaxErrorMessage;
+  final String Function(int)? belowMinErrorMessage;
+  final String Function(int)? aboveMaxErrorMessage;
   final AutovalidateMode autovalidateMode;
 
   const IntegerTextFormField(
@@ -29,9 +29,11 @@ class IntegerTextFormField extends StatelessWidget {
   String _getNonNumericErrorMessage() =>
       nonNumericErrorMessage ?? 'Numbers only';
 
-  String _getBelowMinErrorMessage() => belowMinErrorMessage ?? 'Min: $minValue';
+  String _getBelowMinErrorMessage(int min) =>
+      belowMinErrorMessage?.call(min) ?? 'Min: $min';
 
-  String _getAboveMaxErrorMessage() => aboveMaxErrorMessage ?? 'Max: $maxValue';
+  String _getAboveMaxErrorMessage(int max) =>
+      aboveMaxErrorMessage?.call(max) ?? 'Max: $max';
 
   @override
   Widget build(BuildContext context) {
@@ -70,11 +72,11 @@ class IntegerTextFormField extends StatelessWidget {
         }
 
         if (minValue != null && intValue < minValue!) {
-          return _getBelowMinErrorMessage();
+          return _getBelowMinErrorMessage(minValue!);
         }
 
         if (maxValue != null && intValue > maxValue!) {
-          return _getAboveMaxErrorMessage();
+          return _getAboveMaxErrorMessage(maxValue!);
         }
 
         return null;

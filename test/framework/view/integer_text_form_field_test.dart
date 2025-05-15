@@ -180,7 +180,7 @@ void main() {
             child: IntegerTextFormField(
               0,
               minValue: 10,
-              belowMinErrorMessage: errorMessage,
+              belowMinErrorMessage: (min) => errorMessage,
             ),
           ),
         ),
@@ -238,7 +238,7 @@ void main() {
             child: IntegerTextFormField(
               0,
               maxValue: 100,
-              aboveMaxErrorMessage: errorMessage,
+              aboveMaxErrorMessage: (max) => errorMessage,
             ),
           ),
         ),
