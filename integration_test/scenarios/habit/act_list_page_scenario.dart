@@ -340,7 +340,7 @@ void main() => group(_name, () {
             });
           });
 
-          testWidgets(': save.', (widgetTester) async {
+          testWidgets('[flaky]Save.', (widgetTester) async {
             widgetTester.ignoreMockMethodCallHandler(
                 MethodChannelMock.flutterLocalNotifications);
 

@@ -3,7 +3,7 @@ import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/logger/log_service.dart';
 
-enum Period { aWeek, aMonth, threeMonth, aYear, all }
+enum Period { aDay, aWeek, aMonth, threeMonth, aYear, all }
 
 extension PeriodExt on Period {
   DateAndTimePeriod? toPeriod(
@@ -22,6 +22,11 @@ extension PeriodExt on Period {
           );
 
           switch (this) {
+            case Period.aDay:
+              return DateAndTimePeriod(
+                start: start,
+                end: start.add(Duration(days: 1)),
+              );
             case Period.aWeek:
               while (start.weekday != DateTime.monday) {
                 start = start.subtract(Duration(days: 1));
@@ -49,6 +54,7 @@ extension PeriodExt on Period {
             end: start.add(
               Duration(
                   days: switch (this) {
+                Period.aDay => 1,
                 Period.aWeek => DateTime.daysPerWeek,
                 Period.aMonth => DateTime.daysPerWeek * 4,
                 Period.threeMonth => DateTime.daysPerWeek * 12,

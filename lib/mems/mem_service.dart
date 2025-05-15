@@ -1,4 +1,9 @@
 import 'package:collection/collection.dart';
+import 'package:mem/features/targets/target.dart';
+import 'package:mem/features/targets/target_entity.dart';
+import 'package:mem/features/targets/target_repository.dart';
+import 'package:mem/features/targets/target_table.dart';
+import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/mems/mem_detail.dart';
 import 'package:mem/mems/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
@@ -13,6 +18,7 @@ class MemService {
   final MemRepositoryV2 _memRepository;
   final MemItemRepositoryV2 _memItemRepository;
   final MemNotificationRepositoryV2 _memNotificationRepository;
+  final TargetRepository _targetRepository;
 
   Future<MemDetail> save(
     MemDetail memDetail, {
@@ -91,10 +97,31 @@ class MemService {
             }
           }
 
+          SavedTargetEntity? savedTarget;
+          final target = memDetail.target;
+          if (target == null || target.value.value == 0) {
+            await _targetRepository.waste(
+              condition: Equals(defFkTargetMemId, savedMem.id),
+            );
+          } else if (target is SavedTargetEntity) {
+            savedTarget = await _targetRepository.replace(target);
+          } else {
+            savedTarget = await _targetRepository.receive(target.updatedWith(
+              (v) => Target(
+                memId: savedMem.id,
+                targetType: v.targetType,
+                targetUnit: v.targetUnit,
+                value: v.value,
+                period: v.period,
+              ),
+            ));
+          }
+
           return MemDetail(
             savedMem,
             savedMemItems,
             returnMemNotifications.nonNulls.toList(growable: false),
+            savedTarget,
           );
         },
         {
@@ -194,6 +221,7 @@ class MemService {
     this._memRepository,
     this._memItemRepository,
     this._memNotificationRepository,
+    this._targetRepository,
   );
 
   static MemService? _instance;
@@ -203,6 +231,7 @@ class MemService {
           MemRepositoryV2(),
           MemItemRepositoryV2(),
           MemNotificationRepositoryV2(),
+          TargetRepository(),
         ),
       );
 }

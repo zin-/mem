@@ -8,6 +8,7 @@ import 'edge_scenario.dart';
 import 'memo/memo_test.dart' as memo_test;
 import 'habit/habit_test.dart' as habit_test;
 import 'notification_scenario.dart';
+import 'target_scenario.dart' as target_scenario;
 import 'task_scenario.dart';
 import 'todo_scenario.dart';
 
@@ -29,6 +30,7 @@ void main() {
     testTaskScenario();
 
     testNotificationScenario();
+    target_scenario.main();
     testEdgeScenario();
   });
 }

@@ -290,7 +290,7 @@ void main() => group(_scenarioName, () {
             PreferenceClient.resetSingleton();
           });
 
-          testWidgets("Remove.", (widgetTester) async {
+          testWidgets("[flaky]Remove.", (widgetTester) async {
             widgetTester.clearAllMockMethodCallHandler();
 
             int initializeCount = 0;

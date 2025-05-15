@@ -189,7 +189,7 @@ void main() => group(_name, () {
         group(': no act', () {
           const targetAt = 2;
 
-          testWidgets('Show.', (widgetTester) async {
+          testWidgets('[flaky]Show.', (widgetTester) async {
             await runApplication();
             await widgetTester.pumpAndSettle();
 
@@ -431,7 +431,7 @@ void main() => group(_name, () {
             expect(acts, hasLength(1));
           });
 
-          testWidgets(': finish.', (widgetTester) async {
+          testWidgets('[flaky]Finish.', (widgetTester) async {
             widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
             widgetTester.ignoreMockMethodCallHandler(
               MethodChannelMock.permissionHandler,
