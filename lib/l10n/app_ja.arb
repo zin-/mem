@@ -113,8 +113,8 @@
   "dev": "Under development",
   "test": "Under test",
 
-  "targetInputNumberError": "数値を入力してください",
-  "targetInputNegativeError": "{min}以上の値を入力してください",
+  "targetInputNumberError": "数値のみ",
+  "targetInputNegativeError": "{min}以上",
   "@targetInputNegativeError": {
     "placeholders": {
       "min": {
@@ -122,18 +122,10 @@
       }
     }
   },
-  "targetInputMaxCountError": "{maxCount}以下の値を入力してください",
+  "targetInputMaxCountError": "{maxCount}以下",
   "@targetInputMaxCountError": {
     "placeholders": {
       "maxCount": {
-        "type": "int"
-      }
-    }
-  },
-  "targetInputMaxTimeError": "{maxTime}時間以下の値を入力してください",
-  "@targetInputMaxTimeError": {
-    "placeholders": {
-      "maxTime": {
         "type": "int"
       }
     }

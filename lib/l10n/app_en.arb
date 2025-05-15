@@ -113,8 +113,9 @@
   "dev": "Under development",
   "test": "Under test",
 
-  "targetInputNumberError": "Please enter a number",
-  "targetInputNegativeError": "Please enter a value greater than or equal to {min}",
+  "targetInputNumberError": "Numbers only",
+  "targetInputNegativeError": "Min: {min}",
+  "targetInputMaxCountError": "Max: {maxCount}",
   "@targetInputNegativeError": {
     "placeholders": {
       "min": {
@@ -122,18 +123,9 @@
       }
     }
   },
-  "targetInputMaxCountError": "Please enter a value less than or equal to {maxCount}",
   "@targetInputMaxCountError": {
     "placeholders": {
       "maxCount": {
-        "type": "int"
-      }
-    }
-  },
-  "targetInputMaxTimeError": "Please enter a value less than or equal to {maxTime} hours",
-  "@targetInputMaxTimeError": {
-    "placeholders": {
-      "maxTime": {
         "type": "int"
       }
     }
