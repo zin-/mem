@@ -8,7 +8,7 @@ import 'package:mem/framework/date_and_time/date_and_time_view.dart';
 import 'package:mem/framework/nullable.dart';
 import 'package:mem/framework/view/async_value_view.dart';
 import 'package:mem/l10n/l10n.dart';
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/mems/mem_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/mems/states.dart';

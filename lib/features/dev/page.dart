@@ -1,8 +1,8 @@
 // coverage:ignore-file
 import 'package:flutter/material.dart';
 import 'package:mem/l10n/l10n.dart';
-import 'package:mem/logger/log_service.dart';
-import 'package:mem/logger/sentry_wrapper.dart';
+import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/features/logger/sentry_wrapper.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 class DevPage extends StatelessWidget {

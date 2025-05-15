@@ -1,7 +1,7 @@
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/targets/target_entity.dart';
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/notifications/notification_client.dart';
 
 import 'mem_detail.dart';

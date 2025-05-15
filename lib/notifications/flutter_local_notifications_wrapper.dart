@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart'
     as fln;
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/main.dart';
 
 import 'mem_notifications.dart';

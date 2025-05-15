@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:mem/logger/sentry_wrapper.dart';
+import 'package:mem/features/logger/sentry_wrapper.dart';
 
 import 'log.dart';
 import 'log_repository.dart';

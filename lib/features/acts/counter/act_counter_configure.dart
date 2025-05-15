@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/acts/counter/select_mem_fab.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/mems/list/view.dart';
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log_service.dart';
 
 import 'single_selectable_mem_list_item.dart';
 

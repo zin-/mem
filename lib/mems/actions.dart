@@ -1,5 +1,5 @@
 import 'package:mem/features/mem_items/mem_item_entity.dart';
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'mem_service.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/list/duration.dart';
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/mems/transitions.dart';
 import 'package:mem/mems/mem_entity.dart';
 

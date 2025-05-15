@@ -1,4 +1,4 @@
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'preference/client.dart';

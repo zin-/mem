@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mem/l10n/l10n.dart';
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log_service.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 import 'backup_client.dart';

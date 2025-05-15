@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'generated/l10n/app_localizations.dart';
 import 'l10n/l10n.dart';
-import 'logger/log_service.dart';
+import 'features/logger/log_service.dart';
 import 'router.dart';
 
 class MemApplication extends StatelessWidget {

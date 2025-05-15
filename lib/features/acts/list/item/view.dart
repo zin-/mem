@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period_view.dart';
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/acts/act_entity.dart';
 
 import 'editing_act_dialog.dart';

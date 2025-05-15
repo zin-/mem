@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:mem/framework/repository/key_with_value_repository.dart';
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/notifications/notification/type.dart';
 import 'package:mem/permissions/permission.dart';
 import 'package:mem/permissions/permission_handler_wrapper.dart';

@@ -1,4 +1,4 @@
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log_service.dart';
 import 'package:workmanager/workmanager.dart';
 
 enum Task {

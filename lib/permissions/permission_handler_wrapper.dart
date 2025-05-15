@@ -1,5 +1,5 @@
 import 'package:flutter/services.dart';
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/permissions/permission.dart';
 import 'package:mem/values/constants.dart';
 import 'package:permission_handler/permission_handler.dart'

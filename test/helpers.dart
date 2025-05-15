@@ -7,8 +7,8 @@ import 'package:mem/features/acts/counter/act_counter_client.dart';
 import 'package:mem/features/acts/counter/home_widget_accessor.dart';
 import 'package:mem/generated/l10n/app_localizations.dart';
 import 'package:mem/l10n/l10n.dart';
-import 'package:mem/logger/logger_wrapper.dart';
-import 'package:mem/logger/sentry_wrapper.dart';
+import 'package:mem/features/logger/logger_wrapper.dart';
+import 'package:mem/features/logger/sentry_wrapper.dart';
 import 'package:mem/notifications/flutter_local_notifications_wrapper.dart';
 import 'package:mockito/annotations.dart';
 

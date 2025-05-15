@@ -1,5 +1,5 @@
 import 'package:mem/framework/repository/key_with_value_repository.dart';
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log_service.dart';
 
 import 'preference.dart';
 import 'preference_key.dart';

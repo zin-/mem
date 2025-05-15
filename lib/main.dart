@@ -8,7 +8,7 @@ import 'package:mem/notifications/notification_client.dart';
 import 'features/acts/counter/act_counter_client.dart';
 import 'application.dart';
 import 'framework/date_and_time/date_and_time.dart';
-import 'logger/log_service.dart';
+import 'features/logger/log_service.dart';
 import 'notifications/flutter_local_notifications_wrapper.dart';
 import 'notifications/notification_actions.dart';
 import 'notifications/notification_repository.dart';

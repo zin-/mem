@@ -3,7 +3,7 @@ import 'package:mem/framework/date_and_time/date_and_time_view.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/features/acts/list/duration.dart';
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/values/colors.dart';
 import 'package:mem/values/dimens.dart';
 

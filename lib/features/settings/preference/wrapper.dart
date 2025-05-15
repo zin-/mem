@@ -1,6 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log_service.dart';
 
 class SharedPreferencesWrapper {
   late final Future<SharedPreferences> _sharedPreferencesFuture = _initialize();

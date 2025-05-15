@@ -1,7 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
-import 'package:mem/logger/log_service.dart';
-
+import 'package:mem/features/logger/log_service.dart';
 
 abstract class SummaryStatistics {
   Map<DateAndTime, double> get groupedListByDate;
@@ -41,8 +40,7 @@ abstract class SummaryStatistics {
                 : sorted.getRange(i, end);
             final sum = ranged.fold<double>(
               0,
-              (previousValue, element) =>
-                  previousValue + element.value,
+              (previousValue, element) => previousValue + element.value,
             );
             final ave = sum / ranged.length;
 

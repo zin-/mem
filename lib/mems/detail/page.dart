@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/framework/view/app_bar_actions_builder.dart';
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/mems/detail/app_bar/archive_mem_action.dart';
 import 'package:mem/mems/detail/body.dart';
 import 'package:mem/mems/detail/fab.dart';

@@ -5,7 +5,7 @@ import 'package:mem/features/settings/notify_after_inactivity.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 import 'package:mem/l10n/l10n.dart';
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/notifications/notification_client.dart';
 import 'package:mem/values/constants.dart';
 
