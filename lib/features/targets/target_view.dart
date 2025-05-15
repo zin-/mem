@@ -5,6 +5,7 @@ import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/framework/date_and_time/time_text_form_field.dart';
+import 'package:mem/framework/view/integer_text_form_field.dart';
 import 'package:mem/values/dimens.dart';
 import 'package:mem/generated/l10n/app_localizations.dart';
 
@@ -92,37 +93,11 @@ class TargetText extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: switch (targetEntity.value.targetUnit) {
-                      TargetUnit.count => TextFormField(
+                      TargetUnit.count => IntegerTextFormField(
+                          targetEntity.value.value,
                           key: keyTargetValue,
-                          initialValue: targetEntity.value.value.toString(),
-                          keyboardType: TextInputType.number,
-                          validator: (v) {
-                            if (v == null || v.isEmpty) {
-                              return null;
-                            }
-                            final value = int.tryParse(v);
-                            if (value == null) {
-                              return l10n.targetInputNumberError;
-                            }
-                            if (value < 0) {
-                              return l10n.targetInputNegativeError;
-                            }
-                            if (value > _maxCountValue) {
-                              return l10n
-                                  .targetInputMaxCountError(_maxCountValue);
-                            }
-                            return null;
-                          },
                           onChanged: (v) => onTargetChanged(
-                            value: () {
-                              final value = int.tryParse(v);
-                              if (value == null ||
-                                  value < 0 ||
-                                  value > _maxCountValue) {
-                                return null;
-                              }
-                              return value;
-                            },
+                            value: () => v,
                           ),
                         ),
                       TargetUnit.time => TimeTextFormField(
