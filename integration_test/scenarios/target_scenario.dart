@@ -27,10 +27,11 @@ void main() => group(_scenarioName, () {
       });
 
       const insertedMemName = '$_scenarioName: inserted - mem name';
+      late int insertedMemId;
       setUp(() async {
         await clearAllTestDatabaseRows(databaseDefinition);
 
-        final insertedMemId = await dbA.insert(
+        insertedMemId = await dbA.insert(
           defTableMems,
           {
             defColMemsName.name: insertedMemName,
@@ -70,6 +71,17 @@ void main() => group(_scenarioName, () {
         expect(find.text(Period.all.name), findsOneWidget);
 
         await widgetTester.tap(find.byKey(keySaveMemFab));
+        await widgetTester.pumpAndSettle();
+
+        final getCreatedTarget = And([
+          Equals(defFkTargetMemId, insertedMemId),
+        ]);
+        final targets = await dbA.select(defTableTargets,
+            where: getCreatedTarget.where(),
+            whereArgs: getCreatedTarget.whereArgs());
+        expect(targets.length, 1);
+        expect(targets[0][defColCreatedAt.name],
+            isNot(targets[0][defColUpdatedAt.name]));
       });
 
       testWidgets("Create target.", (widgetTester) async {
