@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/framework/view/async_value_view.dart';
-import 'package:mem/settings/notify_after_inactivity.dart';
+import 'package:mem/features/settings/notify_after_inactivity.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 import 'package:mem/l10n/l10n.dart';

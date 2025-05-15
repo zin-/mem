@@ -7,8 +7,8 @@ import 'package:mem/mems/mem_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
 import 'package:mem/mems/mem_repository.dart';
-import 'package:mem/settings/preference/keys.dart';
-import 'package:mem/settings/preference/repository.dart';
+import 'package:mem/features/settings/preference/keys.dart';
+import 'package:mem/features/settings/preference/repository.dart';
 import 'package:mem/values/constants.dart';
 
 import 'mem_notifications.dart';

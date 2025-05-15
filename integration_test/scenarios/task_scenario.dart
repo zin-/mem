@@ -13,9 +13,9 @@ import 'package:mem/logger/log.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/notifications/notification_client.dart';
 import 'package:mem/notifications/notification/type.dart';
-import 'package:mem/settings/preference/repository.dart';
-import 'package:mem/settings/preference/keys.dart';
-import 'package:mem/settings/preference/preference.dart';
+import 'package:mem/features/settings/preference/repository.dart';
+import 'package:mem/features/settings/preference/keys.dart';
+import 'package:mem/features/settings/preference/preference.dart';
 
 import 'helpers.dart';
 
@@ -345,7 +345,7 @@ void testTaskScenario() => group(': $_scenarioName', () {
 
           testWidgets(': start is not all day, end is all day.',
               (widgetTester) async {
-                widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
+            widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
             widgetTester.ignoreMockMethodCallHandler(
                 MethodChannelMock.permissionHandler);
 

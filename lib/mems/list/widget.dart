@@ -13,8 +13,8 @@ import 'package:mem/mems/mem_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/mems/states.dart';
 import 'package:mem/mems/transitions.dart';
-import 'package:mem/settings/preference/keys.dart';
-import 'package:mem/settings/states.dart';
+import 'package:mem/features/settings/preference/keys.dart';
+import 'package:mem/features/settings/states.dart';
 import 'package:mem/values/constants.dart';
 
 import 'actions.dart';

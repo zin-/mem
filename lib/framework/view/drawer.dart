@@ -4,7 +4,7 @@ import 'package:mem/generated/l10n/app_localizations.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/router.dart';
-import 'package:mem/settings/page.dart';
+import 'package:mem/features/settings/page.dart';
 
 class _DrawerItem {
   final IconData _icon;

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:mem/settings/files_client.dart';
+import 'package:mem/features/settings/files_client.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/framework/repository/database_repository.dart';
 import 'package:mem/logger/log_service.dart';
