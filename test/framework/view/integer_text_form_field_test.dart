@@ -56,7 +56,7 @@ void main() {
         )
         .first);
     final validator = formField.validator!;
-    expect(validator(''), 'Please enter a number');
+    expect(validator(''), 'Required');
   });
 
   testWidgets('validates empty input with custom message',
@@ -110,7 +110,7 @@ void main() {
         )
         .first);
     final validator = formField.validator!;
-    expect(validator('abc'), 'Please enter a number');
+    expect(validator('abc'), 'Numbers only');
   });
 
   testWidgets('validates non-numeric input with custom message',
@@ -167,7 +167,7 @@ void main() {
         )
         .first);
     final validator = formField.validator!;
-    expect(validator('5'), 'Please enter a value greater than or equal to 10');
+    expect(validator('5'), 'Min: 10');
   });
 
   testWidgets('validates value below minimum with custom message',
@@ -225,7 +225,7 @@ void main() {
         )
         .first);
     final validator = formField.validator!;
-    expect(validator('101'), 'Please enter a value less than or equal to 100');
+    expect(validator('101'), 'Max: 100');
   });
 
   testWidgets('validates value above maximum with custom message',
@@ -288,8 +288,7 @@ void main() {
     await tester.pump();
 
     // エラーメッセージが表示されていることを確認
-    expect(find.text('Please enter a value greater than or equal to 10'),
-        findsOneWidget);
+    expect(find.text('Min: 10'), findsOneWidget);
   });
 
   testWidgets('validates on focus change with autovalidateMode.always',
@@ -321,8 +320,7 @@ void main() {
     await tester.pump();
 
     // エラーメッセージが表示されていることを確認
-    expect(find.text('Please enter a value greater than or equal to 10'),
-        findsOneWidget);
+    expect(find.text('Min: 10'), findsOneWidget);
   });
 
   testWidgets('returns null when input is out of range',

@@ -9,7 +9,7 @@ class IntegerTextFormField extends StatelessWidget {
   final String? nonNumericErrorMessage;
   final String? belowMinErrorMessage;
   final String? aboveMaxErrorMessage;
-  final AutovalidateMode? autovalidateMode;
+  final AutovalidateMode autovalidateMode;
 
   const IntegerTextFormField(
     this.initialValue, {
@@ -24,19 +24,14 @@ class IntegerTextFormField extends StatelessWidget {
     this.autovalidateMode = AutovalidateMode.onUserInteraction,
   });
 
-  String _getEmptyErrorMessage() =>
-      emptyErrorMessage ?? 'Please enter a number';
+  String _getEmptyErrorMessage() => emptyErrorMessage ?? 'Required';
 
   String _getNonNumericErrorMessage() =>
-      nonNumericErrorMessage ?? 'Please enter a number';
+      nonNumericErrorMessage ?? 'Numbers only';
 
-  String _getBelowMinErrorMessage() =>
-      belowMinErrorMessage ??
-      'Please enter a value greater than or equal to $minValue';
+  String _getBelowMinErrorMessage() => belowMinErrorMessage ?? 'Min: $minValue';
 
-  String _getAboveMaxErrorMessage() =>
-      aboveMaxErrorMessage ??
-      'Please enter a value less than or equal to $maxValue';
+  String _getAboveMaxErrorMessage() => aboveMaxErrorMessage ?? 'Max: $maxValue';
 
   @override
   Widget build(BuildContext context) {
