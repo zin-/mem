@@ -12,6 +12,7 @@ import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/mems/detail/fab.dart';
 import 'package:mem/mems/mem_name.dart';
+import 'package:mem/framework/view/integer_text_form_field.dart';
 
 import 'helpers.dart';
 
@@ -61,11 +62,11 @@ void main() => group(_scenarioName, () {
         expect(find.text(TargetUnit.count.name), findsOneWidget);
         expect(
             widgetTester
-                .widget<TextFormField>(
+                .widget<IntegerTextFormField>(
                   find.byKey(keyTargetValue),
                 )
                 .initialValue,
-            "1");
+            1);
         expect(find.text(Period.all.name), findsOneWidget);
 
         await widgetTester.tap(find.byKey(keySaveMemFab));
