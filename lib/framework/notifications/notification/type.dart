@@ -1,7 +1,7 @@
 import 'package:mem/generated/l10n/app_localizations.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/notifications/notification_actions.dart';
-import 'package:mem/notifications/notification_ids.dart';
+import 'package:mem/framework/notifications/notification_actions.dart';
+import 'package:mem/framework/notifications/notification_ids.dart';
 
 import 'channel.dart';
 

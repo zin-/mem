@@ -1,8 +1,8 @@
 import 'package:mem/framework/repository/entity.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/notifications/notification_client.dart';
-import 'package:mem/notifications/mem_notifications.dart';
-import 'package:mem/notifications/notification/type.dart';
+import 'package:mem/framework/notifications/notification_client.dart';
+import 'package:mem/framework/notifications/mem_notifications.dart';
+import 'package:mem/framework/notifications/notification/type.dart';
 
 abstract class Schedule with Entity {
   final int id;

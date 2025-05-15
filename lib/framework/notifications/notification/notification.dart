@@ -1,6 +1,6 @@
 import 'package:mem/framework/repository/entity.dart';
 import 'package:mem/framework/repository/key_with_value.dart';
-import 'package:mem/notifications/notification/channel.dart';
+import 'package:mem/framework/notifications/notification/channel.dart';
 
 class Notification with Entity, KeyWithValue<int, Map<String, dynamic>> {
   final String title;

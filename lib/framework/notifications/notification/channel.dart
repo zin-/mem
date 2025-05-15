@@ -1,4 +1,4 @@
-import 'package:mem/notifications/notification/action.dart';
+import 'package:mem/framework/notifications/notification/action.dart';
 
 class NotificationChannel {
   final String id;
@@ -40,4 +40,3 @@ class NotificationChannel {
 }
 
 enum Importance { mid, high }
-

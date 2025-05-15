@@ -9,9 +9,9 @@ import 'package:mem/databases/definition.dart';
 import 'package:mem/framework/workmanager_wrapper.dart';
 import 'package:mem/features/logger/log.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/notifications/notification_client.dart';
-import 'package:mem/notifications/mem_notifications.dart';
-import 'package:mem/notifications/notification/type.dart';
+import 'package:mem/framework/notifications/notification_client.dart';
+import 'package:mem/framework/notifications/mem_notifications.dart';
+import 'package:mem/framework/notifications/notification/type.dart';
 import 'package:mem/values/durations.dart';
 
 import 'helpers.dart';

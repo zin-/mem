@@ -11,7 +11,7 @@ import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/features/mems/detail/fab.dart';
 import 'package:mem/features/mem_notifications/after_act_started_notification_view.dart';
 import 'package:mem/features/mem_notifications/mem_notifications_view.dart';
-import 'package:mem/notifications/notification/type.dart';
+import 'package:mem/framework/notifications/notification/type.dart';
 import 'package:mem/values/durations.dart';
 
 import '../helpers.dart';

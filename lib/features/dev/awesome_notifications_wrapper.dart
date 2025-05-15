@@ -3,7 +3,7 @@
 
 import 'package:mem/generated/l10n/app_localizations.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/notifications/notification/channel.dart';
+import 'package:mem/framework/notifications/notification/channel.dart';
 
 class AwesomeNotificationsWrapper {
   // late final Future<an.AwesomeNotifications> _awesomeNotificationsFuture =

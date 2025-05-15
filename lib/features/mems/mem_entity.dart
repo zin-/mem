@@ -10,8 +10,8 @@ import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
-import 'package:mem/notifications/notification/type.dart';
-import 'package:mem/notifications/schedule.dart';
+import 'package:mem/framework/notifications/notification/type.dart';
+import 'package:mem/framework/notifications/schedule.dart';
 
 class MemEntityV2 with EntityV2<Mem> {
   MemEntityV2(Mem value) {

@@ -9,7 +9,7 @@ import 'package:mem/generated/l10n/app_localizations.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/logger_wrapper.dart';
 import 'package:mem/features/logger/sentry_wrapper.dart';
-import 'package:mem/notifications/flutter_local_notifications_wrapper.dart';
+import 'package:mem/framework/notifications/flutter_local_notifications_wrapper.dart';
 import 'package:mockito/annotations.dart';
 
 bool randomBool() => Random().nextBool();

@@ -12,11 +12,11 @@ import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/features/mems/detail/fab.dart';
 import 'package:mem/features/mem_notifications/mem_notifications_view.dart';
-import 'package:mem/notifications/notification_client.dart';
-import 'package:mem/notifications/mem_notifications.dart';
-import 'package:mem/notifications/notification/type.dart';
-import 'package:mem/notifications/notification_ids.dart';
-import 'package:mem/notifications/schedule_client.dart';
+import 'package:mem/framework/notifications/notification_client.dart';
+import 'package:mem/framework/notifications/mem_notifications.dart';
+import 'package:mem/framework/notifications/notification/type.dart';
+import 'package:mem/framework/notifications/notification_ids.dart';
+import 'package:mem/framework/notifications/schedule_client.dart';
 import 'package:mem/values/constants.dart';
 import 'package:mem/values/durations.dart';
 
