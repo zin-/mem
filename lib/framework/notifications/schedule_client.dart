@@ -7,8 +7,8 @@ import 'package:mem/framework/notifications/notification_client.dart';
 import 'package:mem/framework/notifications/mem_notifications.dart';
 import 'package:mem/framework/notifications/notification/type.dart';
 import 'package:mem/framework/notifications/schedule.dart';
-import 'package:mem/permissions/permission.dart';
-import 'package:mem/permissions/permission_handler_wrapper.dart';
+import 'package:mem/framework/permissions/permission.dart';
+import 'package:mem/framework/permissions/permission_handler_wrapper.dart';
 
 class ScheduleClient extends Repository<Schedule> {
   static ScheduleClient? _instance;
