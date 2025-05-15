@@ -6,6 +6,8 @@ import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/framework/date_and_time/time_text_form_field.dart';
 import 'package:mem/framework/view/integer_text_form_field.dart';
+import 'package:mem/generated/l10n/app_localizations.dart';
+import 'package:mem/l10n/l10n.dart';
 import 'package:mem/values/dimens.dart';
 
 Key keyTargetValue = const Key('target-value');
@@ -20,13 +22,14 @@ class TargetText extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final targetEntity = ref.watch(targetStateProvider(_memId));
+    final l10n = buildL10n(context);
 
     return ListTile(
       contentPadding: EdgeInsets.zero,
       leading: Icon(Icons.check_circle),
       title: switch (targetEntity) {
-        AsyncData(:final value) => _build(
-            value, ref.read(targetStateProvider(_memId).notifier).updatedWith),
+        AsyncData(:final value) => _build(value,
+            ref.read(targetStateProvider(_memId).notifier).updatedWith, l10n),
         AsyncError() => const Text('Oops, something unexpected happened'),
         _ => const CircularProgressIndicator(),
       },
@@ -41,6 +44,7 @@ class TargetText extends ConsumerWidget {
       int? Function()? value,
       Period? Function()? period,
     }) onTargetChanged,
+    AppLocalizations l10n,
   ) =>
       Builder(
         builder: (context) {
@@ -95,6 +99,12 @@ class TargetText extends ConsumerWidget {
                           key: keyTargetValue,
                           minValue: 0,
                           maxValue: 999999,
+                          emptyErrorMessage: l10n.requiredError,
+                          nonNumericErrorMessage: l10n.targetInputNumberError,
+                          belowMinErrorMessage: (min) =>
+                              l10n.targetInputNegativeError,
+                          aboveMaxErrorMessage: (max) =>
+                              l10n.targetInputMaxCountError(max),
                           onChanged: (v) => onTargetChanged(
                             value: () => v,
                           ),

@@ -1,15 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/framework/view/integer_text_form_field.dart';
+import 'package:mem/generated/l10n/app_localizations.dart';
+import 'package:mem/l10n/l10n.dart';
 
 void main() {
-  testWidgets('displays initial value correctly', (WidgetTester tester) async {
+  Future pumpIntegerTextFormField(
+    WidgetTester tester,
+    IntegerTextFormField formField,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        onGenerateTitle: (context) => buildL10n(context).test,
         home: Scaffold(
-          body: IntegerTextFormField(42),
+          body: Form(
+            child: formField,
+          ),
         ),
       ),
+    );
+  }
+
+  testWidgets('displays initial value correctly', (WidgetTester tester) async {
+    await pumpIntegerTextFormField(
+      tester,
+      IntegerTextFormField(42),
     );
 
     expect(find.text('42'), findsOneWidget);
@@ -17,14 +34,11 @@ void main() {
 
   testWidgets('can input valid value', (WidgetTester tester) async {
     int? changedValue;
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: IntegerTextFormField(
-            0,
-            onChanged: (value) => changedValue = value,
-          ),
-        ),
+    await pumpIntegerTextFormField(
+      tester,
+      IntegerTextFormField(
+        0,
+        onChanged: (value) => changedValue = value,
       ),
     );
 
@@ -36,14 +50,9 @@ void main() {
 
   testWidgets('validates empty input with default message',
       (WidgetTester tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Form(
-            child: IntegerTextFormField(0),
-          ),
-        ),
-      ),
+    await pumpIntegerTextFormField(
+      tester,
+      IntegerTextFormField(0),
     );
 
     await tester.enterText(find.byType(IntegerTextFormField), '');
@@ -62,16 +71,11 @@ void main() {
   testWidgets('validates empty input with custom message',
       (WidgetTester tester) async {
     const errorMessage = 'Custom empty error message';
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Form(
-            child: IntegerTextFormField(
-              0,
-              emptyErrorMessage: errorMessage,
-            ),
-          ),
-        ),
+    await pumpIntegerTextFormField(
+      tester,
+      IntegerTextFormField(
+        0,
+        emptyErrorMessage: errorMessage,
       ),
     );
 
@@ -90,14 +94,9 @@ void main() {
 
   testWidgets('validates non-numeric input with default message',
       (WidgetTester tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Form(
-            child: IntegerTextFormField(0),
-          ),
-        ),
-      ),
+    await pumpIntegerTextFormField(
+      tester,
+      IntegerTextFormField(0),
     );
 
     await tester.enterText(find.byType(IntegerTextFormField), 'abc');
@@ -116,16 +115,11 @@ void main() {
   testWidgets('validates non-numeric input with custom message',
       (WidgetTester tester) async {
     const errorMessage = 'Custom non-numeric error message';
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Form(
-            child: IntegerTextFormField(
-              0,
-              nonNumericErrorMessage: errorMessage,
-            ),
-          ),
-        ),
+    await pumpIntegerTextFormField(
+      tester,
+      IntegerTextFormField(
+        0,
+        nonNumericErrorMessage: errorMessage,
       ),
     );
 
@@ -144,16 +138,11 @@ void main() {
 
   testWidgets('validates value below minimum with default message',
       (WidgetTester tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Form(
-            child: IntegerTextFormField(
-              0,
-              minValue: 10,
-            ),
-          ),
-        ),
+    await pumpIntegerTextFormField(
+      tester,
+      IntegerTextFormField(
+        0,
+        minValue: 10,
       ),
     );
 
@@ -173,17 +162,12 @@ void main() {
   testWidgets('validates value below minimum with custom message',
       (WidgetTester tester) async {
     const errorMessage = 'Custom below minimum error message';
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Form(
-            child: IntegerTextFormField(
-              0,
-              minValue: 10,
-              belowMinErrorMessage: (min) => errorMessage,
-            ),
-          ),
-        ),
+    await pumpIntegerTextFormField(
+      tester,
+      IntegerTextFormField(
+        0,
+        minValue: 10,
+        belowMinErrorMessage: (min) => errorMessage,
       ),
     );
 
@@ -202,16 +186,11 @@ void main() {
 
   testWidgets('validates value above maximum with default message',
       (WidgetTester tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Form(
-            child: IntegerTextFormField(
-              0,
-              maxValue: 100,
-            ),
-          ),
-        ),
+    await pumpIntegerTextFormField(
+      tester,
+      IntegerTextFormField(
+        0,
+        maxValue: 100,
       ),
     );
 
@@ -231,17 +210,12 @@ void main() {
   testWidgets('validates value above maximum with custom message',
       (WidgetTester tester) async {
     const errorMessage = 'Custom above maximum error message';
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Form(
-            child: IntegerTextFormField(
-              0,
-              maxValue: 100,
-              aboveMaxErrorMessage: (max) => errorMessage,
-            ),
-          ),
-        ),
+    await pumpIntegerTextFormField(
+      tester,
+      IntegerTextFormField(
+        0,
+        maxValue: 100,
+        aboveMaxErrorMessage: (max) => errorMessage,
       ),
     );
 
@@ -261,17 +235,12 @@ void main() {
   testWidgets(
       'validates on focus change with autovalidateMode.onUserInteraction',
       (WidgetTester tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Form(
-            child: IntegerTextFormField(
-              0,
-              minValue: 10,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-            ),
-          ),
-        ),
+    await pumpIntegerTextFormField(
+      tester,
+      IntegerTextFormField(
+        0,
+        minValue: 10,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
       ),
     );
 
@@ -293,17 +262,12 @@ void main() {
 
   testWidgets('validates on focus change with autovalidateMode.always',
       (WidgetTester tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Form(
-            child: IntegerTextFormField(
-              0,
-              minValue: 10,
-              autovalidateMode: AutovalidateMode.always,
-            ),
-          ),
-        ),
+    await pumpIntegerTextFormField(
+      tester,
+      IntegerTextFormField(
+        0,
+        minValue: 10,
+        autovalidateMode: AutovalidateMode.always,
       ),
     );
 
@@ -326,16 +290,13 @@ void main() {
   testWidgets('returns null when input is out of range',
       (WidgetTester tester) async {
     int? changedValue;
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: IntegerTextFormField(
-            0,
-            minValue: 10,
-            maxValue: 100,
-            onChanged: (value) => changedValue = value,
-          ),
-        ),
+    await pumpIntegerTextFormField(
+      tester,
+      IntegerTextFormField(
+        0,
+        minValue: 10,
+        maxValue: 100,
+        onChanged: (value) => changedValue = value,
       ),
     );
 
@@ -348,16 +309,13 @@ void main() {
   testWidgets('returns value when input is within range',
       (WidgetTester tester) async {
     int? changedValue;
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: IntegerTextFormField(
-            0,
-            minValue: 10,
-            maxValue: 100,
-            onChanged: (value) => changedValue = value,
-          ),
-        ),
+    await pumpIntegerTextFormField(
+      tester,
+      IntegerTextFormField(
+        0,
+        minValue: 10,
+        maxValue: 100,
+        onChanged: (value) => changedValue = value,
       ),
     );
 
