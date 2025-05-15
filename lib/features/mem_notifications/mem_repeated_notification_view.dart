@@ -5,7 +5,7 @@ import 'package:mem/framework/date_and_time/time_of_day_view.dart';
 import 'package:mem/framework/view/async_value_view.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
-import 'package:mem/mems/mem_notification.dart';
+import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/settings/preference/keys.dart';
 import 'package:mem/settings/states.dart';
 import 'package:mem/values/constants.dart';

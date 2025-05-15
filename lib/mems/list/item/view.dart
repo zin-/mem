@@ -10,7 +10,7 @@ import 'package:mem/mems/list/states.dart';
 import 'package:mem/mems/mem_done_checkbox.dart';
 import 'package:mem/mems/mem_entity.dart';
 import 'package:mem/mems/mem_name.dart';
-import 'package:mem/mems/mem_notification_entity.dart';
+import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/mems/states.dart';
 import 'package:mem/values/colors.dart';
 

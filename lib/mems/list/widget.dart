@@ -10,7 +10,7 @@ import 'package:mem/framework/view/async_value_view.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/mem_entity.dart';
-import 'package:mem/mems/mem_notification_entity.dart';
+import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/mems/states.dart';
 import 'package:mem/mems/transitions.dart';
 import 'package:mem/settings/preference/keys.dart';

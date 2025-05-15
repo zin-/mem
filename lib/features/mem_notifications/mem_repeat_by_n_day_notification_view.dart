@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
-import 'package:mem/mems/mem_notification.dart';
+import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/values/dimens.dart';
 
 const keyMemRepeatByNDayNotification = Key("mem-repeat-by-n-day-notification");
@@ -28,18 +28,17 @@ class MemRepeatByNDayNotificationView extends ConsumerWidget {
               )
                   .upsertAll(
                 [
-                  notification
-                      .updatedWith(
-                        (v) => MemNotification.by(
-                          v.memId,
-                          v.type,
-                          value == 0 ? null : value,
-                          v.message,
-                        ),
-                      )
+                  notification.updatedWith(
+                    (v) => MemNotification.by(
+                      v.memId,
+                      v.type,
+                      value == 0 ? null : value,
+                      v.message,
+                    ),
+                  )
                 ],
-                (current, updating) => current.value.type == updating.value
-                    .type,
+                (current, updating) =>
+                    current.value.type == updating.value.type,
               );
             },
           );

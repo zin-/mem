@@ -5,13 +5,13 @@ import 'package:mem/features/targets/target_repository.dart';
 import 'package:mem/features/targets/target_table.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/mems/mem_detail.dart';
-import 'package:mem/mems/mem_notification.dart';
+import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/features/mem_items/mem_item_repository.dart';
 import 'package:mem/mems/mem_entity.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
-import 'package:mem/mems/mem_notification_entity.dart';
-import 'package:mem/mems/mem_notification_repository.dart';
+import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
+import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
 import 'package:mem/mems/mem_repository.dart';
 
 class MemService {

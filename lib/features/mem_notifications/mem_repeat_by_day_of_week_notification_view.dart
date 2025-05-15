@@ -3,10 +3,10 @@ import 'package:day_picker/day_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:mem/mems/mem_notification.dart';
+import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
 import 'package:mem/mems/detail/states.dart';
-import 'package:mem/mems/mem_notification_entity.dart';
+import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 
 const keyMemRepeatByDaysOfWeekNotification =
     Key('mem-repeat-by-days-of-week-notification');

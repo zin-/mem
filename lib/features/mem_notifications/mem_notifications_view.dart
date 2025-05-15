@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/l10n/l10n.dart';
-import 'package:mem/mems/mem_notification.dart';
+import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/logger/log_service.dart';
-import 'package:mem/mems/detail/notifications/mem_notifications_text.dart';
+import 'package:mem/features/mem_notifications/mem_notifications_text.dart';
 import 'package:mem/mems/detail/states.dart';
 import 'package:mem/mems/transitions.dart';
 import 'package:mem/values/colors.dart';

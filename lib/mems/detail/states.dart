@@ -8,9 +8,9 @@ import 'package:mem/mems/mem_entity.dart';
 import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_items/mem_item_repository.dart';
-import 'package:mem/mems/mem_notification.dart';
-import 'package:mem/mems/mem_notification_entity.dart';
-import 'package:mem/mems/mem_notification_repository.dart';
+import 'package:mem/features/mem_notifications/mem_notification.dart';
+import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
+import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
 import 'package:mem/mems/states.dart';
 
 final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
