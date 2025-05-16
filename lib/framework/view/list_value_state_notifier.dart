@@ -20,17 +20,6 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
     }
   }
 
-  void add(T item, {int? index}) => v(
-        () {
-          final tmp = List.of(state);
-
-          tmp.insert(index ?? tmp.length, item);
-
-          updatedBy(tmp);
-        },
-        {'item': item},
-      );
-
   List<T> addAll(Iterable<T> items) => v(
         () {
           final tmp = List.of(state);

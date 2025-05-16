@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/actions.dart';
 import 'package:mem/features/acts/states.dart';
+import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/framework/view/timer.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/detail/states.dart';
@@ -11,7 +12,6 @@ import 'package:mem/features/mems/mem_done_checkbox.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
-import 'package:mem/features/mems/states.dart';
 import 'package:mem/values/colors.dart';
 
 import 'actions.dart';
@@ -29,15 +29,12 @@ class MemListItemView extends ConsumerWidget {
           ref.watch(memListProvider).firstWhere((mem) => mem.id == _memId),
           _onTapped,
           (bool? value, int memId) => v(
-            () => ref.read(memsProvider.notifier).upsertAll(
+            () => ref.read(memEntitiesProvider.notifier).upsert(
               [
                 value == true
                     ? ref.read(doneMem(_memId))
                     : ref.read(undoneMem(_memId))
               ],
-              (tmp, item) => tmp is SavedMemEntityV2 && item is SavedMemEntityV2
-                  ? tmp.id == item.id
-                  : false,
             ),
             {
               'value': value,

@@ -30,25 +30,25 @@ final memByMemIdProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<SavedMemEntityV2?>, SavedMemEntityV2?, int?>(
   (ref, memId) => v(
     () {
-      final mem = ref.watch(memEntitiesProvider).singleWhereOrNull(
+      final mem = ref.watch(
+        memEntitiesProvider.select(
+          (v) => v.singleWhereOrNull(
             (e) => e.id == memId,
-          );
+          ),
+        ),
+      );
 
       return ValueStateNotifier(
         mem,
         initializer: (current, notifier) => v(
           () async {
-            if (memId != null) {
+            if (mem == null && memId != null) {
               final savedMem = await MemRepositoryV2()
                   .ship(id: memId)
                   .then((value) => value.singleOrNull);
-              ref.read(memsProvider.notifier).upsertAll(
-                [if (savedMem != null) savedMem],
-                (current, updating) => (current is SavedMemEntityV2 &&
-                        updating is SavedMemEntityV2)
-                    ? current.id == updating.id
-                    : true,
-              );
+              ref.read(memEntitiesProvider.notifier).upsert([
+                if (savedMem != null) savedMem,
+              ]);
             }
           },
           {

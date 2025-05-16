@@ -8,14 +8,16 @@ part 'mems_state.g.dart';
 class MemEntities extends _$MemEntities {
   @override
   Iterable<SavedMemEntityV2> build() {
+    // tmp
     // ignore: avoid_manual_providers_as_generated_provider_dependency
     return ref.watch(memsProvider).whereType<SavedMemEntityV2>();
   }
 
   void upsert(Iterable<SavedMemEntityV2> mems) {
-    state = state
-        .map((e) => mems.firstWhere((m) => m.id == e.id, orElse: () => e))
-        .toList();
+    state = [
+      ...state.where((e) => !mems.any((m) => m.id == e.id)),
+      ...mems,
+    ];
 
     // tmp
     // ignore: avoid_manual_providers_as_generated_provider_dependency

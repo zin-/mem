@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_service.dart';
 import 'package:mem/features/acts/states.dart';
+import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
@@ -41,7 +42,7 @@ final showDoneProvider = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
 final _filteredMemsProvider = StateNotifierProvider.autoDispose<
     ListValueStateNotifier<SavedMemEntityV2>, List<SavedMemEntityV2>>(
   (ref) {
-    final savedMems = ref.watch(memsProvider).whereType<SavedMemEntityV2>();
+    final savedMems = ref.watch(memEntitiesProvider);
 
     final showNotArchived = ref.watch(showNotArchivedProvider);
     final showArchived = ref.watch(showArchivedProvider);
@@ -189,10 +190,7 @@ final latestActsByMemProvider =
           if (current.isEmpty) {
             ref.read(actsProvider.notifier).addAll(
                   await ActService().fetchLatestByMemIds(
-                    ref
-                        .read(memsProvider)
-                        .whereType<SavedMemEntityV2>()
-                        .map((e) => e.id),
+                    ref.read(memEntitiesProvider).map((e) => e.id),
                   ),
                 );
           }
@@ -217,10 +215,7 @@ final savedMemNotificationsProvider = StateNotifierProvider.autoDispose<
           if (current.isEmpty) {
             ref.read(memNotificationsProvider.notifier).upsertAll(
                   await MemNotificationRepositoryV2().ship(
-                    memIdsIn: ref
-                        .read(memsProvider)
-                        .whereType<SavedMemEntityV2>()
-                        .map((e) => e.id),
+                    memIdsIn: ref.read(memEntitiesProvider).map((e) => e.id),
                   ),
                   (current, updating) =>
                       current is SavedMemNotificationEntityV2 &&
