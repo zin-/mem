@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/features/mems/mem_detail.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
@@ -29,12 +30,12 @@ final memByMemIdProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<SavedMemEntityV2?>, SavedMemEntityV2?, int?>(
   (ref, memId) => v(
     () {
-      final mem = ref.watch(memsProvider).singleWhereOrNull(
-            (e) => e is SavedMemEntityV2 ? e.id == memId : false,
+      final mem = ref.watch(memEntitiesProvider).singleWhereOrNull(
+            (e) => e.id == memId,
           );
 
       return ValueStateNotifier(
-        mem == null ? null : mem as SavedMemEntityV2,
+        mem,
         initializer: (current, notifier) => v(
           () async {
             if (memId != null) {

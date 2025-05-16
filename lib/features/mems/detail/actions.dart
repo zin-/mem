@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_client.dart';
@@ -20,11 +21,8 @@ final saveMem =
               target.value.hashCode == 0 ? null : target.value,
             );
 
-            ref.read(memsProvider.notifier).upsertAll(
-              [saved.mem],
-              (tmp, item) => tmp is SavedMemEntityV2 && item is SavedMemEntityV2
-                  ? tmp.id == item.id
-                  : false,
+            ref.read(memEntitiesProvider.notifier).upsert(
+              [saved.mem as SavedMemEntityV2],
             );
 
             ref
@@ -62,11 +60,9 @@ final archiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
       ref
           .read(editingMemByMemIdProvider(memId).notifier)
           .updatedBy(archived.mem);
-      ref.read(memsProvider.notifier).upsertAll(
-          [archived.mem],
-          (tmp, item) => tmp is SavedMemEntityV2 && item is SavedMemEntityV2
-              ? tmp.id == item.id
-              : false);
+      ref.read(memEntitiesProvider.notifier).upsert(
+        [archived.mem as SavedMemEntityV2],
+      );
 
       return archived;
     },
@@ -84,11 +80,9 @@ final unarchiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
       ref
           .read(editingMemByMemIdProvider(memId).notifier)
           .updatedBy(unarchived.mem);
-      ref.read(memsProvider.notifier).upsertAll(
-          [unarchived.mem],
-          (tmp, item) => tmp is SavedMemEntityV2 && item is SavedMemEntityV2
-              ? tmp.id == item.id
-              : false);
+      ref.read(memEntitiesProvider.notifier).upsert(
+        [unarchived.mem as SavedMemEntityV2],
+      );
 
       return unarchived;
     },
@@ -109,9 +103,7 @@ final removeMem = Provider.autoDispose.family<Future<bool>, int?>(
             );
         // TODO mem notificationsにも同様の処理が必要では？
 
-        ref.read(memsProvider.notifier).removeWhere(
-              (element) => element is SavedMemEntityV2 && element.id == memId,
-            );
+        ref.read(memEntitiesProvider.notifier).remove([memId]);
 
         return removeSuccess;
       }

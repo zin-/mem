@@ -1,5 +1,40 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/framework/view/value_state_notifier.dart';
+import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/mems/states.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final initialized = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
-    (ref) => ValueStateNotifier(false));
+part 'mems_state.g.dart';
+
+@riverpod
+class MemEntities extends _$MemEntities {
+  @override
+  Iterable<SavedMemEntityV2> build() {
+    // ignore: avoid_manual_providers_as_generated_provider_dependency
+    return ref.watch(memsProvider).whereType<SavedMemEntityV2>();
+  }
+
+  void upsert(Iterable<SavedMemEntityV2> mems) {
+    state = state
+        .map((e) => mems.firstWhere((m) => m.id == e.id, orElse: () => e))
+        .toList();
+
+    // tmp
+    // ignore: avoid_manual_providers_as_generated_provider_dependency
+    ref.read(memsProvider.notifier).upsertAll(
+          mems,
+          (current, updating) =>
+              current is SavedMemEntityV2 &&
+              updating is SavedMemEntityV2 &&
+              current.id == updating.id,
+        );
+  }
+
+  void remove(Iterable<int> ids) {
+    state = state.where((e) => !ids.contains(e.id)).toList();
+
+    // tmp
+    // ignore: avoid_manual_providers_as_generated_provider_dependency
+    ref.read(memsProvider.notifier).removeWhere(
+          (element) => element is SavedMemEntityV2 && ids.contains(element.id),
+        );
+  }
+}
