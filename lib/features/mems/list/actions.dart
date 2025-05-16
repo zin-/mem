@@ -28,7 +28,7 @@ final loadMemList = FutureProvider(
         },
       );
 
-      ref.read(memEntitiesProvider.notifier).upsert(mems);
+      ref.watch(memEntitiesProvider.notifier).upsert(mems);
 
       for (var mem in mems) {
         ref.read(memItemsProvider.notifier).upsertAll(

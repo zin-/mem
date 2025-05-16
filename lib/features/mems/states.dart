@@ -10,10 +10,6 @@ import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 
-final memsProvider = StateNotifierProvider<ListValueStateNotifier<MemEntityV2>,
-    List<MemEntityV2>>(
-  (ref) => v(() => ListValueStateNotifier<MemEntityV2>([])),
-);
 final memItemsProvider = StateNotifierProvider<
     ListValueStateNotifier<MemItemEntityV2>, List<MemItemEntityV2>>(
   (ref) => v(

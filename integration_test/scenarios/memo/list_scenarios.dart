@@ -57,84 +57,76 @@ void main() => group(
           }
         });
 
-        group(": List", () {
-          testWidgets(
-            ': Show elements.',
-            (widgetTester) async {
-              await runApplication();
-              await widgetTester.pumpAndSettle();
+        group("List", () {
+          testWidgets('Show elements.', (widgetTester) async {
+            await runApplication();
+            await widgetTester.pumpAndSettle();
 
-              [
-                unarchivedMemName,
-              ].forEachIndexed((index, element) {
+            [
+              unarchivedMemName,
+            ].forEachIndexed((index, element) {
+              expect(
+                widgetTester.widget<Text>(find.byType(Text).at(index + 1)).data,
+                element,
+                reason: "Index is $index.",
+              );
+            });
+            expect(
+              (widgetTester
+                      .widget<FloatingActionButton>(
+                          find.byType(FloatingActionButton))
+                      .child as Icon)
+                  .icon,
+              Icons.add,
+            );
+            final iconButtons =
+                widgetTester.widgetList<IconButton>(find.byType(IconButton));
+            [
+              DrawerButtonIcon,
+              Icons.search,
+              Icons.filter_list,
+            ].forEachIndexed((index, expected) {
+              final icon = iconButtons.elementAt(index).icon;
+              if (icon is Icon) {
                 expect(
-                  widgetTester
-                      .widget<Text>(find.byType(Text).at(index + 1))
-                      .data,
-                  element,
+                  icon.icon,
+                  expected,
                   reason: "Index is $index.",
                 );
-              });
-              expect(
-                (widgetTester
-                        .widget<FloatingActionButton>(
-                            find.byType(FloatingActionButton))
-                        .child as Icon)
-                    .icon,
-                Icons.add,
-              );
-              final iconButtons =
-                  widgetTester.widgetList<IconButton>(find.byType(IconButton));
-              [
-                DrawerButtonIcon,
-                Icons.search,
-                Icons.filter_list,
-              ].forEachIndexed((index, expected) {
-                final icon = iconButtons.elementAt(index).icon;
-                if (icon is Icon) {
-                  expect(
-                    icon.icon,
-                    expected,
-                    reason: "Index is $index.",
-                  );
-                } else {
-                  expect(
-                    icon.runtimeType,
-                    expected,
-                    reason: "Index is $index.",
-                  );
-                }
-              });
-            },
-          );
+              } else {
+                expect(
+                  icon.runtimeType,
+                  expected,
+                  reason: "Index is $index.",
+                );
+              }
+            });
+          });
 
-          testWidgets(
-            ': Hide & show ShowNewMemFab.',
-            (widgetTester) async {
-              await runApplication();
-              await widgetTester.pumpAndSettle();
+          testWidgets(': Hide & show ShowNewMemFab.', (widgetTester) async {
+            await runApplication();
+            await widgetTester.pumpAndSettle();
 
-              expect(find.byIcon(Icons.add).hitTestable(), findsOneWidget);
+            expect(find.byIcon(Icons.add).hitTestable(), findsOneWidget);
 
-              await widgetTester.drag(
-                find.text(mems[5][defColMemsName.name] as String),
-                const Offset(0, -100),
-              );
-              await widgetTester.pumpAndSettle();
+            await widgetTester.drag(
+              find.text(mems[5][defColMemsName.name] as String),
+              const Offset(0, -100),
+            );
+            await widgetTester.pumpAndSettle();
 
-              expect(find.byIcon(Icons.add).hitTestable(), findsNothing);
+            expect(find.byIcon(Icons.add).hitTestable(), findsNothing);
 
-              await widgetTester.drag(
-                find.text(mems[5][defColMemsName.name] as String),
-                const Offset(0, 100),
-              );
-              await widgetTester.pumpAndSettle();
+            await widgetTester.drag(
+              find.text(mems[5][defColMemsName.name] as String),
+              const Offset(0, 100),
+            );
+            await widgetTester.pumpAndSettle();
 
-              expect(find.byIcon(Icons.add).hitTestable(), findsOneWidget);
-            },
-          );
+            expect(find.byIcon(Icons.add).hitTestable(), findsOneWidget);
+          });
 
-          group(": Search", () {
+          group("Search", () {
             const insertedSearchTargetMemName =
                 "$_scenarioName - mem name - search target";
 
@@ -145,7 +137,7 @@ void main() => group(
               });
             });
 
-            testWidgets(": toggle search mode.", (widgetTester) async {
+            testWidgets("Toggle search mode.", (widgetTester) async {
               await runApplication();
               await widgetTester.pumpAndSettle();
 
@@ -170,129 +162,114 @@ void main() => group(
               expect(closeIconFinder, findsNothing);
             });
 
-            testWidgets(
-              ': enter search text.',
-              (widgetTester) async {
-                await runApplication();
-                await widgetTester.pumpAndSettle();
+            testWidgets('Enter search text.', (widgetTester) async {
+              await runApplication();
+              await widgetTester.pumpAndSettle();
 
-                await widgetTester.tap(searchIconFinder);
-                await widgetTester.pump();
+              await widgetTester.tap(searchIconFinder);
+              await widgetTester.pump();
 
-                await widgetTester.enterText(
-                  find.byType(TextFormField),
-                  "search",
-                );
-                await widgetTester.pump();
+              await widgetTester.enterText(
+                find.byType(TextFormField),
+                "search",
+              );
+              await widgetTester.pump();
 
-                expect(find.text(unarchivedMemName), findsNothing);
-                expect(find.text(insertedSearchTargetMemName), findsOneWidget);
+              expect(find.text(unarchivedMemName), findsNothing);
+              expect(find.text(insertedSearchTargetMemName), findsOneWidget);
 
-                await widgetTester.tap(closeIconFinder);
-                await widgetTester.pump();
+              await widgetTester.tap(closeIconFinder);
+              await widgetTester.pump();
 
-                expect(find.text(unarchivedMemName), findsOneWidget);
-              },
-            );
+              expect(find.text(unarchivedMemName), findsOneWidget);
+            });
           });
         });
 
-        group(
-          ": Transit",
-          () {
-            const insertedMemMemo = "$_scenarioName: inserted - mem memo";
-            late int insertedMemId;
+        group("Transit", () {
+          const insertedMemMemo = "$_scenarioName: inserted - mem memo";
+          late int insertedMemId;
 
-            setUp(() async {
-              await clearAllTestDatabaseRows(databaseDefinition);
+          setUp(() async {
+            await clearAllTestDatabaseRows(databaseDefinition);
 
-              insertedMemId = await dbA.insert(
-                defTableMems,
-                {
-                  defColMemsName.name: insertedMemNameBase,
-                  defColCreatedAt.name: zeroDate,
-                },
-              );
-              await dbA.insert(
-                defTableMemItems,
-                {
-                  defFkMemItemsMemId.name: insertedMemId,
-                  defColMemItemsType.name: MemItemType.memo.name,
-                  defColMemItemsValue.name: insertedMemMemo,
-                  defColCreatedAt.name: zeroDate,
-                },
-              );
-            });
-
-            testWidgets(
-              ": new.",
-              (widgetTester) async {
-                await runApplication();
-                await widgetTester.pumpAndSettle();
-
-                await widgetTester.tap(newMemFabFinder);
-                await widgetTester.pumpAndSettle();
-
-                final memName =
-                    widgetTester.widget<TextFormField>(find.byKey(keyMemName));
-                final memMemo =
-                    widgetTester.widget<TextFormField>(find.byKey(keyMemMemo));
-
-                expect(memName.initialValue, isEmpty);
-                expect(memMemo.initialValue, isEmpty);
+            insertedMemId = await dbA.insert(
+              defTableMems,
+              {
+                defColMemsName.name: insertedMemNameBase,
+                defColCreatedAt.name: zeroDate,
               },
             );
-
-            testWidgets(
-              ": saved.",
-              (widgetTester) async {
-                await runApplication();
-                await widgetTester.pumpAndSettle();
-
-                await widgetTester.tap(find.text(insertedMemNameBase));
-                await widgetTester.pumpAndSettle();
-
-                final memName =
-                    widgetTester.widget<TextFormField>(find.byKey(keyMemName));
-                final memMemo =
-                    widgetTester.widget<TextFormField>(find.byKey(keyMemMemo));
-
-                expect(memName.initialValue, equals(insertedMemNameBase));
-                expect(memMemo.initialValue, equals(insertedMemMemo));
+            await dbA.insert(
+              defTableMemItems,
+              {
+                defFkMemItemsMemId.name: insertedMemId,
+                defColMemItemsType.name: MemItemType.memo.name,
+                defColMemItemsValue.name: insertedMemMemo,
+                defColCreatedAt.name: zeroDate,
               },
             );
-          },
-        );
+          });
 
-        testWidgets(
-          ': Filter: Archive.',
-          (widgetTester) async {
+          testWidgets("New.", (widgetTester) async {
             await runApplication();
             await widgetTester.pumpAndSettle();
 
-            expect(find.text(unarchivedMemName), findsOneWidget);
-            expect(find.text(archivedMemName), findsNothing);
-
-            await widgetTester.tap(filterListIconFinder);
+            await widgetTester.tap(newMemFabFinder);
             await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(showArchiveSwitchFinder);
-            await widgetTester.tap(showNotArchiveSwitchFinder);
+            final memName =
+                widgetTester.widget<TextFormField>(find.byKey(keyMemName));
+            final memMemo =
+                widgetTester.widget<TextFormField>(find.byKey(keyMemMemo));
+
+            expect(memName.initialValue, isEmpty);
+            expect(memMemo.initialValue, isEmpty);
+          });
+
+          testWidgets("Saved.", (widgetTester) async {
+            await runApplication();
             await widgetTester.pumpAndSettle();
 
-            expect(find.text(unarchivedMemName), findsNothing);
-            expect(find.text(archivedMemName), findsOneWidget);
-
-            await widgetTester.tap(showArchiveSwitchFinder);
+            await widgetTester.tap(find.text(insertedMemNameBase));
             await widgetTester.pumpAndSettle();
 
-            expect(find.text(unarchivedMemName), findsOneWidget);
+            final memName =
+                widgetTester.widget<TextFormField>(find.byKey(keyMemName));
+            final memMemo =
+                widgetTester.widget<TextFormField>(find.byKey(keyMemMemo));
 
-            await closeMemListFilter(widgetTester);
-            await widgetTester.pumpAndSettle();
+            expect(memName.initialValue, equals(insertedMemNameBase));
+            expect(memMemo.initialValue, equals(insertedMemMemo));
+          });
+        });
 
-            expect(find.text(unarchivedMemName), findsOneWidget);
-          },
-        );
+        testWidgets('Filter Archive.', (widgetTester) async {
+          await runApplication();
+          await widgetTester.pumpAndSettle();
+
+          expect(find.text(unarchivedMemName), findsOneWidget);
+          expect(find.text(archivedMemName), findsNothing);
+
+          await widgetTester.tap(filterListIconFinder);
+          await widgetTester.pumpAndSettle();
+
+          await widgetTester.tap(showArchiveSwitchFinder);
+          await widgetTester.tap(showNotArchiveSwitchFinder);
+          await widgetTester.pumpAndSettle();
+
+          expect(find.text(unarchivedMemName), findsNothing);
+          expect(find.text(archivedMemName), findsOneWidget);
+
+          await widgetTester.tap(showArchiveSwitchFinder);
+          await widgetTester.pumpAndSettle();
+
+          expect(find.text(unarchivedMemName), findsOneWidget);
+
+          await closeMemListFilter(widgetTester);
+          await widgetTester.pumpAndSettle();
+
+          expect(find.text(unarchivedMemName), findsOneWidget);
+        });
       },
     );
