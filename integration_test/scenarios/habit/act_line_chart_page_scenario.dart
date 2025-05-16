@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/acts/acts_summary.dart';
-import 'package:mem/acts/line_chart/line_chart_wrapper.dart';
-import 'package:mem/acts/line_chart/states.dart';
+import 'package:mem/features/acts/acts_summary.dart';
+import 'package:mem/features/acts/line_chart/line_chart_wrapper.dart';
+import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/base.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log_service.dart';
 
 class AsyncValueView<D> extends ConsumerWidget {
   final ProviderListenable<AsyncValue<D>> _asyncValueProvider;

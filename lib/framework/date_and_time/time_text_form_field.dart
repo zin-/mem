@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mem/framework/date_and_time/seconds_of_time_picker.dart';
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log_service.dart';
 
 // TODO: 以下の改善を検討
 // - 数値キーボードの表示（keyboardType: TextInputType.number）

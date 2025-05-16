@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/framework/workmanager_wrapper.dart';
-import 'package:mem/notifications/mem_notifications.dart';
-import 'package:mem/notifications/notification/type.dart';
-import 'package:mem/notifications/notification_client.dart';
+import 'package:mem/framework/notifications/mem_notifications.dart';
+import 'package:mem/framework/notifications/notification/type.dart';
+import 'package:mem/framework/notifications/notification_client.dart';
 
-import 'acts/counter/act_counter_client.dart';
+import 'features/acts/counter/act_counter_client.dart';
 import 'application.dart';
 import 'framework/date_and_time/date_and_time.dart';
-import 'logger/log_service.dart';
-import 'notifications/flutter_local_notifications_wrapper.dart';
-import 'notifications/notification_actions.dart';
-import 'notifications/notification_repository.dart';
+import 'features/logger/log_service.dart';
+import 'framework/notifications/flutter_local_notifications_wrapper.dart';
+import 'framework/notifications/notification_actions.dart';
+import 'framework/notifications/notification_repository.dart';
 import 'router.dart';
 
 Future<void> main({String? languageCode}) async =>
