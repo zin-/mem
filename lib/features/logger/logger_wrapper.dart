@@ -26,7 +26,7 @@ class LoggerWrapper {
 }
 
 const lineBreak = '\n';
-const loggerPackagePath = 'package:mem/logger';
+const loggerPackagePath = 'package:mem/features/logger';
 
 class _LogPrinter extends PrettyPrinter {
   _LogPrinter()
