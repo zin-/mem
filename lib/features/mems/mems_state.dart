@@ -80,7 +80,7 @@ class MemEntities extends _$MemEntities {
         {'id': id},
       );
 
-  void doneMem(int memId) => d(
+  void doneMem(int memId) => v(
         () async {
           final doneMemDetail = await MemService().doneByMemId(memId);
 
@@ -89,7 +89,7 @@ class MemEntities extends _$MemEntities {
         {'memId': memId},
       );
 
-  void undoneMem(int memId) => d(
+  void undoneMem(int memId) => v(
         () async {
           final undoneMemDetail = await MemService().undoneByMemId(memId);
 
