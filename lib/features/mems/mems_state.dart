@@ -57,6 +57,17 @@ class MemEntities extends _$MemEntities {
         },
       );
 
+  Future<SavedMemEntityV2?> loadByMemId(int memId) => v(
+        () async {
+          final mem = await MemRepositoryV2().ship(id: memId);
+
+          upsert(mem);
+
+          return mem.singleOrNull;
+        },
+        {'memId': memId},
+      );
+
   Future<MemDetail?> undoRemove(int id) => v(
         () async {
           // ignore: avoid_manual_providers_as_generated_provider_dependency
