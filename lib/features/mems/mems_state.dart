@@ -1,6 +1,4 @@
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/features/mems/list/states.dart';
-import 'package:mem/features/mems/mem_client.dart';
 import 'package:mem/features/mems/mem_detail.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
