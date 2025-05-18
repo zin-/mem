@@ -1,6 +1,9 @@
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/features/mems/list/states.dart';
+import 'package:mem/features/mems/mem_client.dart';
 import 'package:mem/features/mems/mem_detail.dart';
 import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/mems/mem_service.dart';
 import 'package:mem/features/mems/states.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -31,6 +34,31 @@ class MemEntities extends _$MemEntities {
         {'ids': ids},
       );
 
+  Future<List<SavedMemEntityV2>> loadMemList(
+    bool showArchived,
+    bool showNotArchived,
+    bool showDone,
+    bool showNotDone,
+  ) =>
+      v(
+        () async {
+          final mems = await MemRepositoryV2().ship(
+            archived: showNotArchived == showArchived ? null : showArchived,
+            done: showNotDone == showDone ? null : showDone,
+          );
+
+          upsert(mems);
+
+          return mems;
+        },
+        {
+          'showArchived': showArchived,
+          'showNotArchived': showNotArchived,
+          'showDone': showDone,
+          'showNotDone': showNotDone,
+        },
+      );
+
   Future<MemDetail?> undoRemove(int id) => v(
         () async {
           // ignore: avoid_manual_providers_as_generated_provider_dependency
@@ -44,10 +72,7 @@ class MemEntities extends _$MemEntities {
             final undoneRemovedMemDetail =
                 await MemService().save(removedMemDetail, undo: true);
 
-            state = [
-              ...state,
-              undoneRemovedMemDetail.mem as SavedMemEntityV2,
-            ];
+            upsert([undoneRemovedMemDetail.mem as SavedMemEntityV2]);
 
             return undoneRemovedMemDetail;
           }
