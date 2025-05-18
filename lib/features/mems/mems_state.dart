@@ -79,4 +79,22 @@ class MemEntities extends _$MemEntities {
         },
         {'id': id},
       );
+
+  void doneMem(int memId) => d(
+        () async {
+          final doneMemDetail = await MemService().doneByMemId(memId);
+
+          upsert([doneMemDetail.mem as SavedMemEntityV2]);
+        },
+        {'memId': memId},
+      );
+
+  void undoneMem(int memId) => d(
+        () async {
+          final undoneMemDetail = await MemService().undoneByMemId(memId);
+
+          upsert([undoneMemDetail.mem as SavedMemEntityV2]);
+        },
+        {'memId': memId},
+      );
 }

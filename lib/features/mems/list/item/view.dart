@@ -14,7 +14,6 @@ import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/values/colors.dart';
 
-import 'actions.dart';
 import 'subtitle.dart';
 
 class MemListItemView extends ConsumerWidget {
@@ -29,13 +28,9 @@ class MemListItemView extends ConsumerWidget {
           ref.watch(memListProvider).firstWhere((mem) => mem.id == _memId),
           _onTapped,
           (bool? value, int memId) => v(
-            () => ref.read(memEntitiesProvider.notifier).upsert(
-              [
-                value == true
-                    ? ref.read(doneMem(_memId))
-                    : ref.read(undoneMem(_memId))
-              ],
-            ),
+            () => value == true
+                ? ref.read(memEntitiesProvider.notifier).doneMem(_memId)
+                : ref.read(memEntitiesProvider.notifier).undoneMem(_memId),
             {
               'value': value,
               'memId': memId,
