@@ -8,7 +8,6 @@ import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
-import 'package:mem/features/mems/mem_repository.dart';
 
 final memItemsProvider = StateNotifierProvider<
     ListValueStateNotifier<MemItemEntityV2>, List<MemItemEntityV2>>(
