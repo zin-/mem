@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/framework/view/app_bar_actions_builder.dart';
 import 'package:mem/l10n/l10n.dart';
-import 'package:mem/features/mems/detail/actions.dart';
 import 'package:mem/features/mems/states.dart';
 import 'package:mem/values/durations.dart';
 
@@ -31,7 +30,7 @@ class ArchiveMemAction extends AppBarActionBuilder {
               icon: () => const Icon(Icons.unarchive),
               name: () => buildL10n(context).unarchiveAction,
               onPressed: () => () {
-                ref.read(unarchiveMem(mem.id));
+                ref.read(memEntitiesProvider.notifier).unarchive(mem.id);
 
                 Navigator.of(context).pop(null);
 

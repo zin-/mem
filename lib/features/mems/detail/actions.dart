@@ -48,26 +48,6 @@ final saveMem =
           memId,
         ));
 
-final unarchiveMem = Provider.autoDispose.family<Future<MemDetail?>, int?>(
-  (ref, memId) => v(
-    () async {
-      final unarchived = await MemClient().unarchive(
-        ref.read(memByMemIdProvider(memId))!,
-      );
-
-      ref
-          .read(editingMemByMemIdProvider(memId).notifier)
-          .updatedBy(unarchived.mem);
-      ref.read(memEntitiesProvider.notifier).upsert(
-        [unarchived.mem as SavedMemEntityV2],
-      );
-
-      return unarchived;
-    },
-    {'memId': memId},
-  ),
-);
-
 final removeMem = Provider.autoDispose.family<Future<bool>, int?>(
   (ref, memId) => v(
     () async {

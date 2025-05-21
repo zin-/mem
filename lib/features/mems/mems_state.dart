@@ -155,4 +155,18 @@ class MemEntities extends _$MemEntities {
         },
         {'memId': memId},
       );
+
+  void unarchive(int? memId) => v(
+        () async {
+          final targetMem = state.singleWhereOrNull((e) => e.id == memId);
+
+          if (targetMem == null) {
+            return;
+          }
+
+          final unarchived = await MemClient().unarchive(targetMem);
+
+          upsert([unarchived.mem as SavedMemEntityV2]);
+        },
+      );
 }
