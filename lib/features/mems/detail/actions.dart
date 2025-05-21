@@ -13,21 +13,19 @@ import 'states.dart';
 final saveMem =
     Provider.autoDispose.family<Future<MemDetail>, int?>((ref, memId) => v(
           () async {
-            final target = ref.read(targetStateProvider(memId));
-            final saved = await MemClient().save(
-              ref.read(editingMemByMemIdProvider(memId)),
-              ref.read(memItemsByMemIdProvider(memId)),
-              ref.read(memNotificationsByMemIdProvider(memId)),
-              target.value.hashCode == 0 ? null : target.value,
-            );
+            final saved = await ref.read(memEntitiesProvider.notifier).save(
+                  ref.read(editingMemByMemIdProvider(memId)),
+                  ref.read(memItemsByMemIdProvider(memId)),
+                  ref.read(memNotificationsByMemIdProvider(memId)),
+                  ref.read(targetStateProvider(memId)).value,
+                );
 
-            ref.read(memEntitiesProvider.notifier).upsert(
-              [saved.mem as SavedMemEntityV2],
-            );
+            if (memId == null) {
+              ref
+                  .read(editingMemByMemIdProvider(memId).notifier)
+                  .updatedBy(saved.mem);
+            }
 
-            ref
-                .read(editingMemByMemIdProvider(memId).notifier)
-                .updatedBy(saved.mem);
             ref.read(memItemsProvider.notifier).upsertAll(
                   saved.memItems,
                   (current, updating) =>

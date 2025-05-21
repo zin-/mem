@@ -1,9 +1,13 @@
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/features/mem_items/mem_item_entity.dart';
+import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
+import 'package:mem/features/mems/mem_client.dart';
 import 'package:mem/features/mems/mem_detail.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/mems/mem_service.dart';
 import 'package:mem/features/mems/states.dart';
+import 'package:mem/features/targets/target_entity.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'mems_state.g.dart';
@@ -66,6 +70,33 @@ class MemEntities extends _$MemEntities {
           return mem.singleOrNull;
         },
         {'memId': memId},
+      );
+
+  Future<MemDetail> save(
+    MemEntityV2 memEntity,
+    Iterable<MemItemEntityV2> memItemEntities,
+    Iterable<MemNotificationEntityV2> memNotificationEntities,
+    TargetEntity? targetEntity,
+  ) =>
+      v(
+        () async {
+          final saved = await MemClient().save(
+            memEntity,
+            memItemEntities.toList(),
+            memNotificationEntities.toList(),
+            targetEntity,
+          );
+
+          upsert([saved.mem as SavedMemEntityV2]);
+
+          return saved;
+        },
+        {
+          'memEntity': memEntity,
+          'memItemEntities': memItemEntities,
+          'memNotificationEntities': memNotificationEntities,
+          'targetEntity': targetEntity,
+        },
       );
 
   Future<MemDetail?> undoRemove(int id) => v(
