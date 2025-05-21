@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/framework/view/app_bar_actions_builder.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/mems/detail/actions.dart';
@@ -51,7 +52,7 @@ class ArchiveMemAction extends AppBarActionBuilder {
               icon: () => const Icon(Icons.archive),
               name: () => buildL10n(context).archiveFilterTitle,
               onPressed: () => () {
-                ref.read(archiveMem(mem.id));
+                ref.read(memEntitiesProvider.notifier).archive(mem.id);
 
                 Navigator.of(context)
                   ..pop(null)

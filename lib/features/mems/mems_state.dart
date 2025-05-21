@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
@@ -136,6 +137,21 @@ class MemEntities extends _$MemEntities {
           final undoneMemDetail = await MemService().undoneByMemId(memId);
 
           upsert([undoneMemDetail.mem as SavedMemEntityV2]);
+        },
+        {'memId': memId},
+      );
+
+  void archive(int? memId) => v(
+        () async {
+          final targetMem = state.singleWhereOrNull((e) => e.id == memId);
+
+          if (targetMem == null) {
+            return;
+          }
+
+          final archived = await MemClient().archive(targetMem);
+
+          upsert([archived.mem as SavedMemEntityV2]);
         },
         {'memId': memId},
       );
