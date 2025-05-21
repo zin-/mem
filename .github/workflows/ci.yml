@@ -6,7 +6,7 @@ on:
 
 env:
   flutter-channel: stable
-#  flutter-version: 3.27.4
+  flutter-version: 3.29.4
 
 jobs:
   set_up-env:
