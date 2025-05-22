@@ -185,7 +185,7 @@ void main() => group(_name, () {
         });
       });
 
-      group(': act', () {
+      group('Act', () {
         group(': no act', () {
           const targetAt = 2;
 
@@ -241,7 +241,7 @@ void main() => group(_name, () {
           });
         });
 
-        group(': active act', () {
+        group('Active act', () {
           const targetAt = 0;
 
           testWidgets(': show.', (widgetTester) async {
@@ -256,7 +256,7 @@ void main() => group(_name, () {
             );
           });
 
-          testWidgets('Finish.', (widgetTester) async {
+          testWidgets('[flaky]Finish.', (widgetTester) async {
             widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
             widgetTester.ignoreMockMethodCallHandler(
               MethodChannelMock.permissionHandler,
