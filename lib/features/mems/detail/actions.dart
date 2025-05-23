@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/features/mems/mem_client.dart';
 import 'package:mem/features/mems/mem_detail.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/states.dart';
