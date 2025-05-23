@@ -30,9 +30,14 @@ class MemEntities extends _$MemEntities {
         {'mems': mems},
       );
 
-  void remove(Iterable<int> ids) => v(
-        () {
+  Future<Iterable<SavedMemEntityV2>> remove(Iterable<int> ids) => v(
+        () async {
+          await Future.wait(ids.map((id) => MemClient().remove(id)));
+
+          final removed = state.where((e) => ids.contains(e.id));
           state = state.where((e) => !ids.contains(e.id)).toList();
+
+          return removed;
         },
         {'ids': ids},
       );

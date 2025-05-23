@@ -51,18 +51,18 @@ final removeMem = Provider.autoDispose.family<Future<bool>, int?>(
   (ref, memId) => v(
     () async {
       if (memId != null) {
-        final removeSuccess = await MemClient().remove(memId);
+        final removedMemEntities =
+            await ref.read(memEntitiesProvider.notifier).remove([memId]);
 
-        final mem = ref.read(memByMemIdProvider(memId));
-        ref.read(removedMemProvider(memId).notifier).updatedBy(mem);
-        ref.read(removedMemItemsProvider(memId).notifier).updatedBy(
-              ref.read(memItemsByMemIdProvider(memId)),
-            );
-        // TODO mem notificationsにも同様の処理が必要では？
+        for (var e in removedMemEntities) {
+          ref.read(removedMemProvider(e.id).notifier).updatedBy(e);
+          ref.read(removedMemItemsProvider(e.id).notifier).updatedBy(
+                ref.read(memItemsByMemIdProvider(e.id)),
+              );
+          // TODO mem notificationsにも同様の処理が必要では？
+        }
 
-        ref.read(memEntitiesProvider.notifier).remove([memId]);
-
-        return removeSuccess;
+        return true;
       }
 
       return false;
