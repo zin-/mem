@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/logger/log.dart';
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log.dart';
+import 'package:mem/features/logger/log_service.dart';
 
 import 'act_counter_scenario.dart' as act_counter_scenario;
 import 'after_act_started_habit_scenario.dart'

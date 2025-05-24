@@ -1,4 +1,4 @@
-import 'package:mem/acts/line_chart/states.dart';
+import 'package:mem/features/acts/line_chart/states.dart';
 
 enum TargetType { equalTo, lessThan, moreThan }
 

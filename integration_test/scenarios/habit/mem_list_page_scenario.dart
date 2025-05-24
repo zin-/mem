@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/framework/view/timer.dart';
-import 'package:mem/mems/mem_notification.dart';
+import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/base.dart';
@@ -185,7 +185,7 @@ void main() => group(_name, () {
         });
       });
 
-      group(': act', () {
+      group('Act', () {
         group(': no act', () {
           const targetAt = 2;
 
@@ -241,7 +241,7 @@ void main() => group(_name, () {
           });
         });
 
-        group(': active act', () {
+        group('Active act', () {
           const targetAt = 0;
 
           testWidgets(': show.', (widgetTester) async {
@@ -256,7 +256,7 @@ void main() => group(_name, () {
             );
           });
 
-          testWidgets('Finish.', (widgetTester) async {
+          testWidgets('[flaky]Finish.', (widgetTester) async {
             widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
             widgetTester.ignoreMockMethodCallHandler(
               MethodChannelMock.permissionHandler,

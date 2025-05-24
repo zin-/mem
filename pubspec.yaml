@@ -17,7 +17,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
 # FIXME https://github.com/zin-/mem/issues/321
-version: 0.5.27
+version: 0.5.28
 
 scripts:
   dep:
@@ -125,12 +125,12 @@ dev_dependencies:
   test: ^1.25.7
   integration_test:
     sdk: flutter
-  mockito: ^5.4.4
+  mockito: ^5.4.6
   build_runner: ^2.4.12
 
   # for Lint
   flutter_lints: ^5.0.0
-  custom_lint: ^0.7.0
+  custom_lint: ^0.7.5
 
   # for Riverpod
   riverpod_generator: ^2.6.1

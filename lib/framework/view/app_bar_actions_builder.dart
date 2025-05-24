@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log_service.dart';
 
 class AppBarActionsBuilder {
   /// [https://m3.material.io/components/top-app-bar/guidelines#b1b64842-7d88-4c3f-8ffb-4183fe648c9e]

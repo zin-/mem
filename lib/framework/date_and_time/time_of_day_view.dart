@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log_service.dart';
 
 class TimeOfDayText extends StatelessWidget {
   final TimeOfDay _timeOfDay;

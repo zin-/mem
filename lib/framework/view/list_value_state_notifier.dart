@@ -1,5 +1,5 @@
 import 'package:mem/framework/view/value_state_notifier.dart';
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log_service.dart';
 
 class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
   ListValueStateNotifier(
@@ -19,17 +19,6 @@ class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
       }
     }
   }
-
-  void add(T item, {int? index}) => v(
-        () {
-          final tmp = List.of(state);
-
-          tmp.insert(index ?? tmp.length, item);
-
-          updatedBy(tmp);
-        },
-        {'item': item},
-      );
 
   List<T> addAll(Iterable<T> items) => v(
         () {

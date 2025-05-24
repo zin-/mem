@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/logger/log.dart';
-import 'package:mem/logger/log_repository.dart';
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log.dart';
+import 'package:mem/features/logger/log_repository.dart';
+import 'package:mem/features/logger/log_service.dart';
 import 'package:mockito/mockito.dart';
 
 import '../helpers.dart';
