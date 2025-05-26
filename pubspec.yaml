@@ -140,6 +140,9 @@ dev_dependencies:
   flutter_launcher_icons: ^0.14.1
   rps: ^0.7.0
 
+dependency_overrides:
+  analyzer: ^7.3.0
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
