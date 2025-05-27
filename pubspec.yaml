@@ -17,7 +17,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
 # FIXME https://github.com/zin-/mem/issues/321
-version: 0.5.27
+version: 0.5.28
 
 scripts:
   dep:
@@ -125,12 +125,12 @@ dev_dependencies:
   test: ^1.25.7
   integration_test:
     sdk: flutter
-  mockito: ^5.4.4
+  mockito: ^5.4.6
   build_runner: ^2.4.12
 
   # for Lint
   flutter_lints: ^5.0.0
-  custom_lint: ^0.7.0
+  custom_lint: ^0.7.5
 
   # for Riverpod
   riverpod_generator: ^2.6.1
@@ -139,6 +139,12 @@ dev_dependencies:
   # for Icon
   flutter_launcher_icons: ^0.14.1
   rps: ^0.7.0
+
+dependency_overrides:
+  # TODO https://github.com/dart-lang/sdk/issues/60784 が解決したら削除する
+  analyzer: '7.3.0'
+  custom_lint_visitor: '1.0.0+7.3.0' # analyzer 7.3.0 と互換性のあるバージョン
+  analyzer_plugin: '0.12.0' # analyzer 7.3.0 と互換性のあるバージョン
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

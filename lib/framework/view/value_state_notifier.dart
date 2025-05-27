@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log_service.dart';
 
 const _jsonEncoderIndent = '  ';
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mem/framework/date_and_time/date_and_time_text_form_field.dart';
 import 'package:mem/framework/date_and_time/date_and_time_view.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log_service.dart';
 
 class DateAndTimePeriodTexts extends StatelessWidget {
   final DateAndTimePeriod _dateAndTimePeriod;

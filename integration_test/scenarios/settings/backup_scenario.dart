@@ -6,8 +6,8 @@ import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/repository/database_repository.dart';
-import 'package:mem/logger/log.dart';
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log.dart';
+import 'package:mem/features/logger/log_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 

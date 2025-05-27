@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
-import 'package:mem/logger/log_service.dart';
+import 'package:mem/features/logger/log_service.dart';
 import 'package:path/path.dart' as path;
 import 'package:sqflite/sqlite_api.dart' as sqflite_api;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite;

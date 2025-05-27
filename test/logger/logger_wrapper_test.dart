@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/logger/log.dart';
-import 'package:mem/logger/logger_wrapper.dart';
+import 'package:mem/features/logger/log.dart';
+import 'package:mem/features/logger/logger_wrapper.dart';
 
 void main() {
   final loggerWrapper = LoggerWrapper();
