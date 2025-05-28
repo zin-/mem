@@ -166,6 +166,30 @@ class ActService {
         },
       );
 
+  Future<SavedActEntity?> close(int memId) => i(
+        () async {
+          final latestPausedActEntity = await _actRepository
+              .ship(
+                memId: memId,
+                paused: true,
+                actOrderBy: ActOrderBy.descStart,
+                limit: 1,
+              )
+              .then((v) => v.singleOrNull);
+
+          if (latestPausedActEntity == null) {
+            return null;
+          }
+
+          return await _actRepository
+              .waste(id: latestPausedActEntity.id)
+              .then((v) => v.single);
+        },
+        {
+          'memId': memId,
+        },
+      );
+
   Future<SavedActEntity> edit(SavedActEntity savedAct) => i(
         () async => await _actRepository.replace(savedAct),
         {
