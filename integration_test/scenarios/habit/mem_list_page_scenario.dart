@@ -289,7 +289,7 @@ void main() => group(_name, () {
             expect(acts, hasLength(1));
           });
 
-          testWidgets(': pause.', (widgetTester) async {
+          testWidgets(':Pause.', (widgetTester) async {
             widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
             widgetTester.ignoreMockMethodCallHandler(
               MethodChannelMock.permissionHandler,
@@ -310,8 +310,8 @@ void main() => group(_name, () {
             widgetTester.expectMemListItem(
               0,
               [memWithActiveActName, null],
-              [Icons.stop, Icons.play_arrow],
-              [Icons.pause],
+              [Icons.close, Icons.play_arrow],
+              [Icons.pause, Icons.stop],
             );
 
             final acts = await dbA.select(
@@ -378,18 +378,18 @@ void main() => group(_name, () {
           });
         });
 
-        group(': paused act', () {
+        group('Paused act', () {
           const targetAt = 1;
 
-          testWidgets(': show.', (widgetTester) async {
+          testWidgets('Show.', (widgetTester) async {
             await runApplication();
             await widgetTester.pumpAndSettle();
 
             widgetTester.expectMemListItem(
               targetAt,
               [memWithPausedActName, null],
-              [Icons.stop, Icons.play_arrow],
-              [Icons.pause],
+              [Icons.close, Icons.play_arrow],
+              [Icons.pause, Icons.stop],
             );
           });
 
@@ -431,7 +431,7 @@ void main() => group(_name, () {
             expect(acts, hasLength(1));
           });
 
-          testWidgets('[flaky]Finish.', (widgetTester) async {
+          testWidgets('Close.', (widgetTester) async {
             widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
             widgetTester.ignoreMockMethodCallHandler(
               MethodChannelMock.permissionHandler,
@@ -446,7 +446,7 @@ void main() => group(_name, () {
             await widgetTester.tap(
               find.descendant(
                 of: find.byType(ListTile).at(targetAt),
-                matching: find.byIcon(Icons.stop),
+                matching: find.byIcon(Icons.close),
               ),
             );
             await widgetTester.pumpAndSettle();
@@ -463,7 +463,7 @@ void main() => group(_name, () {
               where: '${defFkActsMemId.name} = ?',
               whereArgs: [memWithPausedActId],
             );
-            expect(acts, hasLength(1));
+            expect(acts, isEmpty);
           });
         });
       });

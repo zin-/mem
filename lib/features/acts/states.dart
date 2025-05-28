@@ -53,6 +53,7 @@ class ActsV2 extends _$ActsV2 {
 
           if (closed != null) {
             final latestActs = await _actService.fetchLatestByMemIds([memId]);
+            // ignore: avoid_manual_providers_as_generated_provider_dependency
             ref.read(actsProvider.notifier).upsertAll(
                   latestActs,
                   (c, u) => c.id == u.id,
