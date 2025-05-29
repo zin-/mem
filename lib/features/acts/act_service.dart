@@ -15,7 +15,7 @@ class ListWithTotalCount<T> {
 class ActService {
   final ActRepository _actRepository;
 
-  Future fetchLatestByMemIds(
+  Future<Iterable<SavedActEntity>> fetchLatestByMemIds(
     Iterable<int>? memIdsIn,
   ) =>
       v(
@@ -75,13 +75,8 @@ class ActService {
   ) =>
       i(
         () async {
-          final latestActEntity = await _actRepository
-              .ship(
-                memId: memId,
-                actOrderBy: ActOrderBy.descStart,
-                limit: 1,
-              )
-              .then((v) => v.singleOrNull);
+          final latestActEntity =
+              await fetchLatestByMemIds([memId]).then((v) => v.firstOrNull);
 
           if (latestActEntity == null || latestActEntity.value is FinishedAct) {
             return await _actRepository.receive(

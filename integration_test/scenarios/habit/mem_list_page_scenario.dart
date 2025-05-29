@@ -176,12 +176,21 @@ void main() => group(_name, () {
         });
         await dbA.insert(defTableActs, {
           defFkActsMemId.name: memWithPausedActId,
+          defColActsStart.name: zeroDate,
+          defColActsStartIsAllDay.name: false,
+          defColActsEnd.name: zeroDate,
+          defColActsEndIsAllDay.name: false,
+          defColActsPausedAt.name: null,
+          defColCreatedAt.name: zeroDate,
+        });
+        await dbA.insert(defTableActs, {
+          defFkActsMemId.name: memWithPausedActId,
           defColActsStart.name: null,
           defColActsStartIsAllDay.name: null,
           defColActsEnd.name: null,
           defColActsEndIsAllDay.name: null,
           defColActsPausedAt.name: zeroDate,
-          defColCreatedAt.name: zeroDate,
+          defColCreatedAt.name: zeroDate.add(const Duration(seconds: 1)),
         });
       });
 
@@ -393,7 +402,7 @@ void main() => group(_name, () {
             );
           });
 
-          testWidgets(': start.',
+          testWidgets('Start.',
               // 時間に関するテストなのでリトライ可能とする
               retry: maxRetryCount, (widgetTester) async {
             widgetTester.ignoreMockMethodCallHandler(
@@ -428,7 +437,7 @@ void main() => group(_name, () {
               where: '${defFkActsMemId.name} = ?',
               whereArgs: [memWithPausedActId],
             );
-            expect(acts, hasLength(1));
+            expect(acts, hasLength(2));
           });
 
           testWidgets('Close.', (widgetTester) async {
@@ -463,7 +472,7 @@ void main() => group(_name, () {
               where: '${defFkActsMemId.name} = ?',
               whereArgs: [memWithPausedActId],
             );
-            expect(acts, isEmpty);
+            expect(acts, hasLength(1));
           });
         });
       });
