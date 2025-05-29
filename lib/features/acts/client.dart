@@ -120,6 +120,21 @@ class ActsClient {
         },
       );
 
+  Future<SavedActEntity?> close(int memId) => v(
+        () async {
+          final closed = await _actService.close(memId);
+
+          if (closed != null) {
+            _notificationClient.cancelActNotification(closed.value.memId);
+          }
+
+          return closed;
+        },
+        {
+          "memId": memId,
+        },
+      );
+
   Future<SavedActEntity> delete(int actId) => i(
         () async {
           final deleted = await _actService.delete(actId);

@@ -40,6 +40,7 @@ class MemListItemView extends ConsumerWidget {
           () => ref.read(startActBy(_memId)),
           () => ref.read(finishActBy(_memId)),
           () => ref.read(actsV2Provider.notifier).pause(_memId),
+          () => ref.read(actsV2Provider.notifier).close(_memId),
           ref.watch(memNotificationsByMemIdProvider(_memId)),
         ),
         {
@@ -56,12 +57,15 @@ ListTile _render(
   void Function() startAct,
   void Function() finishAct,
   void Function() pauseAct,
+  void Function() closeAct,
   Iterable<MemNotificationEntityV2> memNotificationEntities,
 ) =>
     v(
       () {
         final hasActiveAct =
             latestActByMem != null && latestActByMem is ActiveAct;
+        final hasPausedAct =
+            latestActByMem != null && latestActByMem is PausedAct;
         final hasEnableMemNotifications = memNotificationEntities
             .where(
               (e) => e is SavedMemNotificationEntityV2 && e.value.isEnabled(),
@@ -80,6 +84,10 @@ ListTile _render(
           onPressed: pauseAct,
           icon: const Icon(Icons.pause),
         );
+        final closeIconButton = IconButton(
+          onPressed: closeAct,
+          icon: const Icon(Icons.close),
+        );
 
         return ListTile(
           title: !hasActiveAct
@@ -95,7 +103,9 @@ ListTile _render(
           leading: hasEnableMemNotifications
               ? hasActiveAct
                   ? pauseIconButton
-                  : stopIconButton
+                  : hasPausedAct
+                      ? closeIconButton
+                      : stopIconButton
               : MemDoneCheckbox(
                   memEntity,
                   (value) => onMemDoneCheckboxTapped(value, memEntity.id),

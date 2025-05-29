@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/acts/act.dart';
+import 'package:mem/features/acts/act_service.dart';
 import 'package:mem/features/acts/client.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
@@ -21,6 +22,7 @@ final actsProvider = StateNotifierProvider<
 @riverpod
 class ActsV2 extends _$ActsV2 {
   final _actsClient = ActsClient();
+  final _actService = ActService();
 
   @override
   Future<Iterable<SavedActEntity>> build() async {
@@ -43,6 +45,23 @@ class ActsV2 extends _$ActsV2 {
         {
           'memId': memId,
         },
+      );
+
+  Future<void> close(int memId) => v(
+        () async {
+          final closed = await _actsClient.close(memId);
+
+          if (closed != null) {
+            final latestActs = await _actService.fetchLatestByMemIds([memId]);
+            // ignore: avoid_manual_providers_as_generated_provider_dependency
+            ref.read(actsProvider.notifier).upsertAll(
+                  latestActs,
+                  (c, u) => c.id == u.id,
+                  removeWhere: (e) => e.id == closed.id,
+                );
+          }
+        },
+        {'memId': memId},
       );
 }
 
