@@ -6,6 +6,7 @@ on:
 
 env:
   flutter-channel: stable
+  # 変更する場合はcd.ymlも同時に変更すること
   flutter-version: 3.29.3
 
 jobs:
