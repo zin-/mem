@@ -9,7 +9,7 @@ echo "Running pre-push checks via Task..."
 # ルートディレクトリで task を実行するように変更
 cd "$(git rev-parse --show-toplevel)"
 
-task flutter:pre-push-checks
+task pre-push-checks
 
 # task の終了コードをフックの終了コードとして使用
 exit $?
