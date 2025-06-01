@@ -1,5 +1,5 @@
 #!/bin/sh
-# scripts/git-hooks/pre-push.sh
+# tools/git-hooks/pre-push.sh
 
 # Taskコマンドがパスに通っているか、またはプロジェクトローカルにインストールされていることを想定
 

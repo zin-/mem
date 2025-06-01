@@ -4,17 +4,27 @@
 
 ## Task Runner
 
+タスクランナー、ビルドツール、コマンドランナー
+
 ローカルでの依存関係解決から、lint、CI上でのビルドまでを行うツール
 
 ```bash
 brew install go-task/tap/go-task
 ```
 
-これ以降は[Taskfile.yml](../Taskfile.yml)に定義する
+See [Taskfile.yml](../Taskfile.yml)に
 
-タスクランナー
+
+## Checks
 
 # Memo
+
+## Checks
+
+開発時に必要な何度も実行するタスクは、自動化する
+
+
+
 
 ## Task Runner
 

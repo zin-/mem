@@ -17,23 +17,23 @@ tasks:
   # flutter-analyze, flutter-test, pre-push-checks は tools/flutter.Taskfile.yml に移動しました
 
   setup-hooks:
-    desc: "Set up Git hooks by symlinking them from scripts/git-hooks to .git/hooks"
+    desc: "Set up Git hooks by symlinking them from tools/git-hooks to .git/hooks"
     cmds:
       - |
         #!/bin/sh
         HOOK_DIR=$(git rev-parse --git-dir)/hooks
-        SCRIPT_DIR=$(git rev-parse --show-toplevel)/scripts/git-hooks
+        SCRIPT_DIR=$(git rev-parse --show-toplevel)/tools/git-hooks
         echo "Hook dir: $HOOK_DIR"
         echo "Script dir: $SCRIPT_DIR"
         mkdir -p "$HOOK_DIR"
         echo "Setting up pre-push hook..."
         if [ -f "$SCRIPT_DIR/pre-push.sh" ]; then
-          ln -sf "../../scripts/git-hooks/pre-push.sh" "$HOOK_DIR/pre-push"
+          ln -sf "../../tools/git-hooks/pre-push.sh" "$HOOK_DIR/pre-push"
           chmod +x "$HOOK_DIR/pre-push"
           chmod +x "$SCRIPT_DIR/pre-push.sh"
           echo "Pre-push hook set up."
         else
-          echo "Error: scripts/git-hooks/pre-push.sh not found."
+          echo "Error: tools/git-hooks/pre-push.sh not found."
           exit 1
         fi
     silent: false
@@ -41,6 +41,6 @@ tasks:
     # まずは Unix ライクな環境を対象とします。
     #  - For Windows, you might need to copy instead of symlink, or ensure symlinks are enabled.
     #    Example (requires admin or developer mode on Windows):
-    #    - cmd: mklink .git\hooks\pre-push scripts\git-hooks\pre-push.sh
+    #    - cmd: mklink .git\hooks\pre-push tools\git-hooks\pre-push.sh
     #    Or copy:
-    #    - cmd: copy scripts\git-hooks\pre-push.sh .git\hooks\pre-push.sh /Y
+    #    - cmd: copy tools\git-hooks\pre-push.sh .git\hooks\pre-push.sh /Y
