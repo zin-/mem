@@ -10,6 +10,8 @@
 brew install go-task/tap/go-task
 ```
 
+これ以降は[Taskfile.yml](../Taskfile.yml)に定義する
+
 タスクランナー
 
 # Memo
