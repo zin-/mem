@@ -5,18 +5,16 @@ version: '3'
 includes:
   flutter: ./tools/flutter.Taskfile.yml
 
-vars:
-  GREETING: Hello, World!
-
 tasks:
   default:
+    desc: "利用可能なタスク一覧を表示します"
     cmds:
-      - echo "{{.GREETING}}"
+      - task --list
     silent: true
 
   # flutter-analyze, flutter-test, pre-push-checks は tools/flutter.Taskfile.yml に移動しました
 
-  setup-hooks:
+  setup-git-hooks:
     desc: "Set up Git hooks by symlinking them from tools/git-hooks to .git/hooks"
     cmds:
       - |

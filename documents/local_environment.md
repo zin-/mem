@@ -2,6 +2,9 @@
 
 ローカル環境、ローカル開発環境
 
+Devlopper（開発者）が開発を行う環境  
+(Public)Development environment（公開開発環境）と区別するために"ローカル"をつけている
+
 ## Task Runner
 
 タスクランナー、ビルドツール、コマンドランナー
@@ -12,19 +15,9 @@
 brew install go-task/tap/go-task
 ```
 
-See [Taskfile.yml](../Taskfile.yml)に
-
-
-## Checks
+詳細な実行内容は[Taskfile.yml](../Taskfile.yml)を参照すること
 
 # Memo
-
-## Checks
-
-開発時に必要な何度も実行するタスクは、自動化する
-
-
-
 
 ## Task Runner
 
