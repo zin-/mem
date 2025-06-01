@@ -1,0 +1,20 @@
+version: '3'
+
+tasks:
+  flutter-analyze:
+    desc: "Run Flutter static analysis"
+    cmds:
+      - flutter analyze
+    silent: false
+
+  flutter-test:
+    desc: "Run Flutter tests"
+    cmds:
+      - flutter test
+    silent: false
+
+  pre-push-checks:
+    desc: "Run all checks required before pushing (from tools/flutter.Taskfile.yml)"
+    cmds:
+      - task: flutter-analyze
+      - task: flutter-test 
