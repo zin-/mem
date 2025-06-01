@@ -42,3 +42,9 @@ tasks:
     #    - cmd: mklink .git\hooks\pre-push tools\git-hooks\pre-push.sh
     #    Or copy:
     #    - cmd: copy tools\git-hooks\pre-push.sh .git\hooks\pre-push.sh /Y
+
+  pre-push-checks:
+    desc: "Run all checks required before pushing (from tools/flutter.Taskfile.yml)"
+    cmds:
+      - task: flutter:analyze
+      - task: flutter:test 
