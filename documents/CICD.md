@@ -1,18 +1,18 @@
 # CI/CD
 
-Continuous Integration and Continuous Delivery(/Deployment)
+Continuous Integration（継続的インテグレーション） and Continuous Delivery(/Deployment)（継続的デリバリー/デプロイメント）
 
 ## CI
 
 変更を統合(Integrate)する際に、継続的(Continuous)に品質を担保するための仕組み
 
-## Integrate
+### Integrate
 
 ~~統合は、基本的にはコードやスクリプトの定義になるためgitの機能で達成される~~
 競合(Conflict)が発生した際に、人が解決した場合達成されない可能性がある  
 これを達成するために、コードチェックやテストの実行が必要
 
-## Continuous
+### Continuous
 
 継続的に行なうには、人が関わるべきではないため自動化する
 
@@ -23,9 +23,9 @@ Continuous Integration and Continuous Delivery(/Deployment)
 
 問題を検知した際の報告も必要
 
-## 必要な処理
+### 必要な処理
 
-### コードチェック
+#### コードチェック
 
 - コードの依存解決
   - 依存ライブラリの解決
@@ -38,7 +38,7 @@ Continuous Integration and Continuous Delivery(/Deployment)
   - アプリケーションコード
   - テストコード
 
-### テスト
+#### テスト
 
 - 端末に閉じたテスト
   - Medium test
@@ -52,7 +52,7 @@ Continuous Integration and Continuous Delivery(/Deployment)
   - 現時点では、プラットフォームに閉じたDBやAPIへのアクセスしか行っていないため実装しない
     - 端末外のシステムにアクセスするように拡張したら検討する
 
-### バージョンチェック
+#### バージョンチェック
 
 依存ライブラリや、実行環境のバージョンが更新されていることがあるはず
 これらを検知して更新することを促したい
@@ -60,7 +60,7 @@ Continuous Integration and Continuous Delivery(/Deployment)
 現状では実装していない
 https://github.com/zin-/mem/issues/273
 
-### 環境
+#### 環境
 
 コードチェックもテストも同じ環境でそれぞれ行い、環境は複数用意したい
 それぞれにバージョンなどを定義することは避けなければならない
