@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/list/duration.dart';
@@ -13,30 +14,32 @@ class TotalActTimeListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => v(
-        () => ListTile(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(_actList
-                  .fold<Duration>(
-                    Duration.zero,
-                    (previousValue, element) =>
-                        previousValue +
-                        (element.value.period?.duration ?? Duration.zero),
-                  )
-                  .format()),
-              Text(_actList.length.toString()),
-            ],
-          ),
-          subtitle: _memEntity == null ? null : Text(_memEntity.value.name),
-          trailing: _memEntity == null
-              ? null
-              : IconButton(
-                  onPressed: () =>
-                      showMemDetailPage(context, null, _memEntity.id),
-                  icon: const Icon(Icons.arrow_forward),
-                ),
-        ),
+        () {
+          return ListTile(
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(_actList
+                    .fold<Duration>(
+                      Duration.zero,
+                      (previousValue, element) =>
+                          previousValue +
+                          (element.value.period?.duration ?? Duration.zero),
+                    )
+                    .format()),
+                Text(_actList.length.toString()),
+              ],
+            ),
+            subtitle: _memEntity == null ? null : Text(_memEntity.value.name),
+            trailing: _memEntity == null
+                ? null
+                : IconButton(
+                    onPressed: () =>
+                        showMemDetailPage(context, null, _memEntity.id),
+                    icon: const Icon(Icons.arrow_forward),
+                  ),
+          );
+        },
         {
           '_actList': _actList,
           '_mem': _memEntity,
