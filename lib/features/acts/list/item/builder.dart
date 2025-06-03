@@ -31,7 +31,7 @@ class ActListItemBuilder {
             final entry = _actListGroupedByMemId.entries.toList()[index];
 
             return TotalActTimeListItem(
-              entry.value.map((e) => e.value).toList(),
+              entry.value,
               _memList.singleWhereOrNull((element) => element.id == entry.key),
             );
           } else {

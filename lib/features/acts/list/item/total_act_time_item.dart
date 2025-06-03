@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:mem/features/acts/act.dart';
+import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/list/duration.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/transitions.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 
 class TotalActTimeListItem extends StatelessWidget {
-  final List<Act> _actList;
+  final List<SavedActEntity> _actList;
   final SavedMemEntityV2? _memEntity;
 
   const TotalActTimeListItem(this._actList, this._memEntity, {super.key});
@@ -22,7 +22,7 @@ class TotalActTimeListItem extends StatelessWidget {
                     Duration.zero,
                     (previousValue, element) =>
                         previousValue +
-                        (element.period?.duration ?? Duration.zero),
+                        (element.value.period?.duration ?? Duration.zero),
                   )
                   .format()),
               Text(_actList.length.toString()),
