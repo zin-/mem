@@ -15,18 +15,45 @@ class TotalActTimeListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) => v(
         () {
+          final active = _actList.firstWhereOrNull(
+            (e) => e.value.isActive,
+          );
+
           return ListTile(
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(_actList
-                    .fold<Duration>(
-                      Duration.zero,
-                      (previousValue, element) =>
-                          previousValue +
-                          (element.value.period?.duration ?? Duration.zero),
-                    )
-                    .format()),
+                active == null
+                    ? Text(_actList
+                        .fold<Duration>(
+                          Duration.zero,
+                          (previousValue, element) =>
+                              previousValue +
+                              (element.value.period?.duration ?? Duration.zero),
+                        )
+                        .format())
+                    : Wrap(children: [
+                        Text((_actList.fold<Duration>(
+                                  Duration.zero,
+                                  (previousValue, element) =>
+                                      previousValue +
+                                      (element.value.period?.duration ??
+                                          Duration.zero),
+                                ) +
+                                DateTime.now()
+                                    .difference(active.value.period!.start!))
+                            .format()),
+                        Text(" / "),
+                        Text(_actList
+                            .fold<Duration>(
+                              Duration.zero,
+                              (previousValue, element) =>
+                                  previousValue +
+                                  (element.value.period?.duration ??
+                                      Duration.zero),
+                            )
+                            .format())
+                      ]),
                 Text(_actList.length.toString()),
               ],
             ),
