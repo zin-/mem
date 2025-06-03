@@ -29,9 +29,6 @@ scripts:
     icon: flutter pub run flutter_launcher_icons:main
   run: flutter run -d emulator-5554
   clean: flutter clean
-  emulator:
-    list: flutter emulators
-  e: rps emulator
   test:
     unit: flutter test
     integration: flutter test integration_test

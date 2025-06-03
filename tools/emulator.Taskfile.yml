@@ -1,6 +1,11 @@
 version: '3'
 
 tasks:
+  list:
+    desc: "List available emulators"
+    cmds:
+      - flutter emulators
+
   start:
     desc: "Start emulator"
     cmds:
