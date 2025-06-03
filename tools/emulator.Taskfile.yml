@@ -1,0 +1,7 @@
+version: '3'
+
+tasks:
+  start:
+    desc: "Start emulator"
+    cmds:
+      - flutter emulators --launch Pixel_9_Pro_XL_API_Baklava 
