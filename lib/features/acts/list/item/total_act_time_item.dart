@@ -58,7 +58,7 @@ class TotalActTimeListItem extends StatelessWidget {
                   if (_targetEntity != null &&
                       _targetEntity.value.targetUnit == TargetUnit.time)
                     Text(
-                      _targetEntity.value.value.toString(),
+                      Duration(seconds: _targetEntity.value.value).formatHHmm(),
                     ),
                 ]),
                 Wrap(
