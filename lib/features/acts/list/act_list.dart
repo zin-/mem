@@ -7,6 +7,8 @@ import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/targets/target_entity.dart';
+import 'package:mem/features/targets/target_states.dart';
 
 import 'app_bar.dart';
 import 'item/builder.dart';
@@ -46,12 +48,21 @@ class ActList extends ConsumerWidget {
             }
           }
 
+          if (_memId == null) {
+            ref
+                .read(targetsProvider.notifier)
+                .fetchByMemIds(ref.watch(memListProvider).map((e) => e.id));
+          } else {
+            ref.read(targetsProvider.notifier).fetchByMemIds([_memId]);
+          }
+
           return _ActList(
             _memId,
             ref.watch(dateViewProvider),
             ref.watch(timeViewProvider),
             ref.watch(actListProvider(_memId)),
             (_memId == null ? ref.watch(memListProvider) : []),
+            ref.watch(targetsProvider),
             _scrollController,
           );
         },
@@ -67,6 +78,7 @@ class _ActList extends StatelessWidget {
   final bool _isTimeView;
   final List<SavedActEntity> _actList;
   final List<SavedMemEntityV2> _memList;
+  final List<SavedTargetEntity> _targetList;
   final ScrollController? _scrollController;
 
   const _ActList(
@@ -75,6 +87,7 @@ class _ActList extends StatelessWidget {
     this._isTimeView,
     this._actList,
     this._memList,
+    this._targetList,
     this._scrollController,
   );
 
@@ -130,6 +143,7 @@ class _ActList extends StatelessWidget {
           '_isTimeView': _isTimeView,
           '_actList': _actList,
           '_memList': _memList,
+          '_targetList': _targetList,
         },
       );
 }
