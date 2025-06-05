@@ -5,12 +5,20 @@ import 'package:mem/features/acts/list/duration.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/transitions.dart';
 import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/targets/target.dart';
+import 'package:mem/features/targets/target_entity.dart';
 
 class TotalActTimeListItem extends StatelessWidget {
   final List<SavedActEntity> _actList;
   final SavedMemEntityV2? _memEntity;
+  final SavedTargetEntity? _targetEntity;
 
-  const TotalActTimeListItem(this._actList, this._memEntity, {super.key});
+  const TotalActTimeListItem(
+    this._actList,
+    this._memEntity,
+    this._targetEntity, {
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) => v(
@@ -23,38 +31,47 @@ class TotalActTimeListItem extends StatelessWidget {
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                active == null
-                    ? Text(_actList
-                        .fold<Duration>(
-                          Duration.zero,
-                          (previousValue, element) =>
-                              previousValue +
-                              (element.value.period?.duration ?? Duration.zero),
-                        )
-                        .format())
-                    : Wrap(children: [
-                        Text((_actList.fold<Duration>(
-                                  Duration.zero,
-                                  (previousValue, element) =>
-                                      previousValue +
-                                      (element.value.period?.duration ??
-                                          Duration.zero),
-                                ) +
-                                DateTime.now()
-                                    .difference(active.value.period!.start!))
-                            .format()),
-                        Text(" / "),
-                        Text(_actList
-                            .fold<Duration>(
+                Wrap(children: [
+                  if (active != null)
+                    Text((_actList.fold<Duration>(
                               Duration.zero,
                               (previousValue, element) =>
                                   previousValue +
                                   (element.value.period?.duration ??
                                       Duration.zero),
-                            )
-                            .format())
-                      ]),
-                Text(_actList.length.toString()),
+                            ) +
+                            DateTime.now()
+                                .difference(active.value.period!.start!))
+                        .formatHHmm()),
+                  if (active != null) Text(" / "),
+                  Text(_actList
+                      .fold<Duration>(
+                        Duration.zero,
+                        (previousValue, element) =>
+                            previousValue +
+                            (element.value.period?.duration ?? Duration.zero),
+                      )
+                      .formatHHmm()),
+                  if (_targetEntity != null &&
+                      _targetEntity.value.targetUnit == TargetUnit.time)
+                    Text(" / "),
+                  if (_targetEntity != null &&
+                      _targetEntity.value.targetUnit == TargetUnit.time)
+                    Text(
+                      _targetEntity.value.value.toString(),
+                    ),
+                ]),
+                Wrap(
+                  children: [
+                    Text(_actList.length.toString()),
+                    if (_targetEntity != null &&
+                        _targetEntity.value.targetUnit == TargetUnit.count)
+                      Text(" / "),
+                    if (_targetEntity != null &&
+                        _targetEntity.value.targetUnit == TargetUnit.count)
+                      Text(_targetEntity.value.value.toString()),
+                  ],
+                ),
               ],
             ),
             subtitle: _memEntity == null ? null : Text(_memEntity.value.name),
