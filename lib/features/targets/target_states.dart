@@ -17,7 +17,7 @@ class Targets extends _$Targets {
         () => [],
       );
 
-  fetchByMemIds(Iterable<int> memIds) => d(
+  fetchByMemIds(Iterable<int> memIds) => v(
         () async {
           final newMemIds =
               memIds.where((e) => !state.map((e) => e.value.memId).contains(e));
