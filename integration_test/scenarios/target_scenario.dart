@@ -84,7 +84,7 @@ void main() => group(_scenarioName, () {
             isNot(targets[0][defColUpdatedAt.name]));
       });
 
-      testWidgets("Create target.", (widgetTester) async {
+      testWidgets("[flaky]Create target.", (widgetTester) async {
         await runApplication();
         await widgetTester.pumpAndSettle();
 

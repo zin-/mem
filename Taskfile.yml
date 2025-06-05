@@ -4,6 +4,8 @@ version: '3'
 
 includes:
   flutter: ./tools/flutter.Taskfile.yml
+  emulator: ./tools/emulator.Taskfile.yml
+  e: ./tools/emulator.Taskfile.yml
 
 tasks:
   default:
@@ -47,4 +49,4 @@ tasks:
     desc: "Run all checks required before pushing (from tools/flutter.Taskfile.yml)"
     cmds:
       - task: flutter:analyze
-      - task: flutter:test 
+      - task: flutter:test
