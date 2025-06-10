@@ -112,14 +112,14 @@ void main() => group(_name, () {
             expect(widgetTester.textAt(5).data, equals(" / "));
             expect(
               widgetTester.textAt(6).data,
-              equals(Duration.zero.format()),
+              equals(Duration.zero.formatHHmm()),
             );
             expect(widgetTester.textAt(7).data, equals("1"));
             expect(
               widgetTester.textAt(8).data,
               equals(insertedMemWithActiveActName),
             );
-            expect(widgetTester.textAt(9).data, equals(oneMin.format()));
+            expect(widgetTester.textAt(9).data, equals(oneMin.formatHHmm()));
             expect(widgetTester.textAt(10).data, equals("1"));
             expect(widgetTester.textAt(11).data, equals(insertedMemName));
           });
@@ -170,14 +170,14 @@ void main() => group(_name, () {
             expect(widgetTester.textAt(5).data, equals(" / "));
             expect(
               widgetTester.textAt(6).data,
-              equals(Duration.zero.format()),
+              equals(Duration.zero.formatHHmm()),
             );
             expect(widgetTester.textAt(7).data, equals("1"));
             expect(
               widgetTester.textAt(8).data,
               equals(insertedMemWithActiveActName),
             );
-            expect(widgetTester.textAt(9).data, equals(oneMin.format()));
+            expect(widgetTester.textAt(9).data, equals(oneMin.formatHHmm()));
             expect(widgetTester.textAt(10).data, equals("1"));
             expect(widgetTester.textAt(11).data, equals(insertedMemName));
           });
