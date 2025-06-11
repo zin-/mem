@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/mems/mem_name.dart';
 
 import 'package:mem/features/acts/list/duration.dart';
@@ -7,6 +8,8 @@ import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
+import 'package:mem/features/targets/target.dart';
+import 'package:mem/features/targets/target_table.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/values/durations.dart';
 
@@ -45,6 +48,23 @@ void main() => group(_name, () {
         });
         insertedMemWithActiveActId = await dbA.insert(defTableMems, {
           defColMemsName.name: insertedMemWithActiveActName,
+          defColCreatedAt.name: zeroDate
+        });
+
+        await dbA.insert(defTableTargets, {
+          defFkTargetMemId.name: insertedMemId,
+          defColTargetType.name: TargetType.equalTo.name,
+          defColTargetUnit.name: TargetUnit.count.name,
+          defColTargetValue.name: 1,
+          defColTargetPeriod.name: Period.aDay.name,
+          defColCreatedAt.name: zeroDate
+        });
+        await dbA.insert(defTableTargets, {
+          defFkTargetMemId.name: insertedMemWithActiveActId,
+          defColTargetType.name: TargetType.lessThan.name,
+          defColTargetUnit.name: TargetUnit.time.name,
+          defColTargetValue.name: oneMin.inSeconds,
+          defColTargetPeriod.name: Period.all.name,
           defColCreatedAt.name: zeroDate
         });
       });
@@ -114,14 +134,18 @@ void main() => group(_name, () {
               widgetTester.textAt(6).data,
               equals(Duration.zero.formatHHmm()),
             );
-            expect(widgetTester.textAt(7).data, equals("1"));
+            expect(widgetTester.textAt(7).data, equals(" / "));
+            expect(widgetTester.textAt(8).data, equals("0:01"));
+            expect(widgetTester.textAt(9).data, equals("1"));
             expect(
-              widgetTester.textAt(8).data,
+              widgetTester.textAt(10).data,
               equals(insertedMemWithActiveActName),
             );
-            expect(widgetTester.textAt(9).data, equals(oneMin.formatHHmm()));
-            expect(widgetTester.textAt(10).data, equals("1"));
-            expect(widgetTester.textAt(11).data, equals(insertedMemName));
+            expect(widgetTester.textAt(11).data, equals(oneMin.formatHHmm()));
+            expect(widgetTester.textAt(12).data, equals("1"));
+            expect(widgetTester.textAt(13).data, equals(" / "));
+            expect(widgetTester.textAt(14).data, equals("1"));
+            expect(widgetTester.textAt(15).data, equals(insertedMemName));
           });
 
           testWidgets('Count.', (widgetTester) async {
@@ -172,14 +196,18 @@ void main() => group(_name, () {
               widgetTester.textAt(6).data,
               equals(Duration.zero.formatHHmm()),
             );
-            expect(widgetTester.textAt(7).data, equals("1"));
+            expect(widgetTester.textAt(7).data, equals(" / "));
+            expect(widgetTester.textAt(8).data, equals("0:01"));
+            expect(widgetTester.textAt(9).data, equals("1"));
             expect(
-              widgetTester.textAt(8).data,
+              widgetTester.textAt(10).data,
               equals(insertedMemWithActiveActName),
             );
-            expect(widgetTester.textAt(9).data, equals(oneMin.formatHHmm()));
-            expect(widgetTester.textAt(10).data, equals("1"));
-            expect(widgetTester.textAt(11).data, equals(insertedMemName));
+            expect(widgetTester.textAt(11).data, equals(oneMin.formatHHmm()));
+            expect(widgetTester.textAt(12).data, equals("1"));
+            expect(widgetTester.textAt(13).data, equals(" / "));
+            expect(widgetTester.textAt(14).data, equals("1"));
+            expect(widgetTester.textAt(15).data, equals(insertedMemName));
           });
         });
 
