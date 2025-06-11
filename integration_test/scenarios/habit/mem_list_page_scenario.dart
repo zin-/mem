@@ -390,7 +390,7 @@ void main() => group(_name, () {
         group('Paused act', () {
           const targetAt = 1;
 
-          testWidgets('Show.', (widgetTester) async {
+          testWidgets('[flaky]Show.', (widgetTester) async {
             await runApplication();
             await widgetTester.pumpAndSettle();
 
