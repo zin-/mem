@@ -3,10 +3,10 @@
 version: '3'
 
 includes:
-  flutter: ./tools/task/flutter.Taskfile.yml
-  f: ./tools/task/flutter.Taskfile.yml
-  emulator: ./tools/task/emulator.Taskfile.yml
-  e: ./tools/task/emulator.Taskfile.yml
+  flutter: ./tools/task/flutter.taskfile.yml
+  f: ./tools/task/flutter.taskfile.yml
+  emulator: ./tools/task/emulator.taskfile.yml
+  e: ./tools/task/emulator.taskfile.yml
 
 tasks:
   default:
