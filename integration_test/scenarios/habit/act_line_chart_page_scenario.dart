@@ -86,7 +86,7 @@ void main() => group(_name, () {
         expect(find.byType(LineChartWrapper), findsOneWidget);
       });
 
-      testWidgets("Show statistics.", (widgetTester) async {
+      testWidgets("[flaky]Show statistics.", (widgetTester) async {
         await widgetTester.show(insertedMemName);
 
         final texts = widgetTester.widgetList<Text>(find.byType(Text));
