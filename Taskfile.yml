@@ -4,6 +4,7 @@ version: '3'
 
 includes:
   flutter: ./tools/task/flutter.Taskfile.yml
+  f: ./tools/task/flutter.Taskfile.yml
   emulator: ./tools/task/emulator.Taskfile.yml
   e: ./tools/task/emulator.Taskfile.yml
 
@@ -14,7 +15,11 @@ tasks:
       - task --list
     silent: true
 
-  # flutter-analyze, flutter-test, pre-push-checks は tools/flutter.Taskfile.yml に移動しました
+  build:
+    desc: "ビルドを実行します。"
+    cmds:
+      - task: f:gen
+    silent: false
 
   setup-git-hooks:
     desc: "Set up Git hooks by symlinking them from tools/git-hooks to .git/hooks"

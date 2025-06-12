@@ -7,6 +7,17 @@ tasks:
       - flutter analyze
     silent: false
 
+  gen:
+    desc: "build_runner を実行します。mode=build (デフォルト) または mode=watch を指定します。"
+    vars:
+      MODE: '{{.MODE | default "build"}}'
+    preconditions:
+      - sh: '[[ "{{.MODE}}" == "build" || "{{.MODE}}" == "watch" ]]'
+        msg: "MODEには 'build' または 'watch' を指定してください。"
+    cmds:
+      - dart run build_runner {{.MODE}} --delete-conflicting-outputs
+    silent: false
+
   test:
     desc: "Run Flutter tests"
     cmds:
