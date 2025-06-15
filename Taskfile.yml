@@ -18,7 +18,7 @@ tasks:
   build:
     desc: "ビルドを実行します。"
     cmds:
-      - task: f:gen
+      - task: flutter:gen
     silent: false
 
   setup-git-hooks:
