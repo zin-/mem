@@ -16,8 +16,8 @@ tasks:
       - task --list
     silent: true
 
-  build:
-    desc: "ビルドを実行します。"
+  gen:
+    desc: "コード生成を実行します。"
     cmds:
       - task: flutter:gen
     silent: false
