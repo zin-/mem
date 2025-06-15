@@ -7,8 +7,8 @@ import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/acts/act_entity.dart';
+import 'package:mem/widgets/infinite_scroll.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:mem/features/acts/list/infinite_scroll_states.dart';
 
 part 'states.g.dart';
 
