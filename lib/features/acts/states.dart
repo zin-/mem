@@ -5,10 +5,10 @@ import 'package:mem/features/acts/act_service.dart';
 import 'package:mem/features/acts/client.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
-import 'package:mem/framework/view/value_state_notifier.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:mem/features/acts/list/infinite_scroll_states.dart';
 
 part 'states.g.dart';
 
@@ -64,35 +64,6 @@ class ActsV2 extends _$ActsV2 {
         {'memId': memId},
       );
 }
-
-final isLoading = StateNotifierProvider.autoDispose
-    .family<ValueStateNotifier<bool>, bool, int?>(
-  (ref, memId) => v(
-    () => ValueStateNotifier(false),
-    {"memId": memId},
-  ),
-);
-final isUpdating = StateNotifierProvider.autoDispose
-    .family<ValueStateNotifier<bool>, bool, int?>(
-  (ref, memId) => v(
-    () => ValueStateNotifier(false),
-    {"memId": memId},
-  ),
-);
-final currentPage =
-    StateNotifierProvider.family<ValueStateNotifier<int>, int, int?>(
-  (ref, memId) => v(
-    () => ValueStateNotifier(1),
-    {"memId": memId},
-  ),
-);
-final maxPage =
-    StateNotifierProvider.family<ValueStateNotifier<int>, int, int?>(
-  (ref, memId) => v(
-    () => ValueStateNotifier(0),
-    {"memId": memId},
-  ),
-);
 
 final actListProvider = StateNotifierProvider.autoDispose
     .family<ListValueStateNotifier<SavedActEntity>, List<SavedActEntity>, int?>(
