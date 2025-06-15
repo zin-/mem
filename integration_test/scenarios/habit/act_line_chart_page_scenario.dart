@@ -96,7 +96,7 @@ void main() => group(_name, () {
       });
 
       group("Time period", () {
-        testWidgets("Show.", (widgetTester) async {
+        testWidgets("[flaky]Show.", (widgetTester) async {
           await widgetTester.show(insertedMemName);
 
           await widgetTester.tap(find.byIcon(Icons.more_vert));
