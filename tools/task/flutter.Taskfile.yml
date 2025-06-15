@@ -8,7 +8,7 @@ tasks:
     silent: false
 
   gen:
-    desc: "build_runner を実行します。mode=build (デフォルト) または mode=watch を指定します。"
+    desc: "build_runner を実行します。MODE=build (デフォルト) または MODE=watch を指定します。"
     vars:
       MODE: '{{.MODE | default "build"}}'
     preconditions:
