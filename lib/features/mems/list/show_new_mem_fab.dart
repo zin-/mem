@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/framework/view/scroll_controllable_widget.dart';
+import 'package:mem/widgets/scroll_controllable_widget.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/transitions.dart';
 import 'package:mem/values/durations.dart';

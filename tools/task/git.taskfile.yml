@@ -1,0 +1,31 @@
+version: '3'
+
+tasks:
+  setup-git-hooks:
+    desc: "Set up Git hooks by symlinking them from tools/git-hooks to .git/hooks"
+    cmds:
+      - |
+        #!/bin/sh
+        HOOK_DIR=$(git rev-parse --git-dir)/hooks
+        SCRIPT_DIR=$(git rev-parse --show-toplevel)/tools/git-hooks
+        echo "Hook dir: $HOOK_DIR"
+        echo "Script dir: $SCRIPT_DIR"
+        mkdir -p "$HOOK_DIR"
+        echo "Setting up pre-push hook..."
+        if [ -f "$SCRIPT_DIR/pre-push.sh" ]; then
+          ln -sf "../../tools/git-hooks/pre-push.sh" "$HOOK_DIR/pre-push"
+          chmod +x "$HOOK_DIR/pre-push"
+          chmod +x "$SCRIPT_DIR/pre-push.sh"
+          echo "Pre-push hook set up."
+        else
+          echo "Error: tools/git-hooks/pre-push.sh not found."
+          exit 1
+        fi
+    silent: false
+    # Windows ユーザー向けに、シンボリックリンクが使えない場合の代替コピーコマンドも考慮するとより親切ですが、
+    # まずは Unix ライクな環境を対象とします。
+    #  - For Windows, you might need to copy instead of symlink, or ensure symlinks are enabled.
+    #    Example (requires admin or developer mode on Windows):
+    #    - cmd: mklink .git\hooks\pre-push tools\git-hooks\pre-push.sh
+    #    Or copy:
+    #    - cmd: copy tools\git-hooks\pre-push.sh .git\hooks\pre-push.sh /Y

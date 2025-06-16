@@ -9,65 +9,71 @@ import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/targets/target_states.dart';
+import 'package:mem/widgets/infinite_scroll.dart';
 
 import 'app_bar.dart';
 import 'item/builder.dart';
 import 'states.dart';
 import 'sub_header.dart';
 
-class ActList extends ConsumerWidget {
-  final int? _memId;
-  final ScrollController? _scrollController;
+class ActList extends ConsumerStatefulWidget {
+  final int? memId;
+  final ScrollController? scrollController;
 
   const ActList(
-    this._memId,
-    this._scrollController, {
+    this.memId,
+    this.scrollController, {
     super.key,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => v(
+  ConsumerState<ActList> createState() => _ActListState();
+}
+
+class _ActListState extends ConsumerState<ActList> {
+  InfiniteScrollController? _infiniteScrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.scrollController != null) {
+      _infiniteScrollController = InfiniteScrollController(
+        scrollController: widget.scrollController!,
+        ref: ref,
+        memId: widget.memId,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _infiniteScrollController?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => v(
         () {
-          final scrollController = _scrollController;
-          if (scrollController != null && scrollController.hasClients) {
-            if (scrollController.position.maxScrollExtent == 0.0 ||
-                scrollController.position.pixels >
-                    scrollController.position.maxScrollExtent * 0.6) {
-              final c = ref.read(currentPage(_memId));
-
-              if (c < ref.read(maxPage(_memId))) {
-                Future.microtask(() {
-                  if (ref.read(isLoading(_memId))) {
-                    ref.watch(isLoading(_memId)); // coverage:ignore-line
-                  } else {
-                    ref.read(currentPage(_memId).notifier).updatedBy(c + 1);
-                    ref.read(isUpdating(_memId).notifier).updatedBy(false);
-                  }
-                });
-              }
-            }
-          }
-
-          if (_memId == null) {
+          if (widget.memId == null) {
             ref
                 .read(targetsProvider.notifier)
                 .fetchByMemIds(ref.watch(memListProvider).map((e) => e.id));
           } else {
-            ref.read(targetsProvider.notifier).fetchByMemIds([_memId]);
+            ref.read(targetsProvider.notifier).fetchByMemIds([widget.memId!]);
           }
 
           return _ActList(
-            _memId,
+            widget.memId,
             ref.watch(dateViewProvider),
             ref.watch(timeViewProvider),
-            ref.watch(actListProvider(_memId)),
-            (_memId == null ? ref.watch(memListProvider) : []),
+            ref.watch(actListProvider(widget.memId)),
+            (widget.memId == null ? ref.watch(memListProvider) : []),
             ref.watch(targetsProvider),
-            _scrollController,
+            widget.scrollController,
           );
         },
         {
-          '_memId': _memId,
+          'memId': widget.memId,
         },
       );
 }
