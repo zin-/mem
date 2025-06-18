@@ -9,38 +9,18 @@ import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/mems/mem_service.dart';
 import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/targets/target_entity.dart';
+import 'package:mem/shared/entities_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'mems_state.g.dart';
 
 @riverpod
-class MemEntities extends _$MemEntities {
+class MemEntities extends _$MemEntities
+    with EntitiesStateMixin<SavedMemEntityV2, int> {
   @override
   Iterable<SavedMemEntityV2> build() {
     return [];
   }
-
-  void upsert(Iterable<SavedMemEntityV2> mems) => v(
-        () {
-          state = [
-            ...state.where((e) => !mems.any((m) => m.id == e.id)),
-            ...mems,
-          ];
-        },
-        {'mems': mems},
-      );
-
-  Future<Iterable<SavedMemEntityV2>> remove(Iterable<int> ids) => v(
-        () async {
-          await Future.wait(ids.map((id) => MemClient().remove(id)));
-
-          final removed = state.where((e) => ids.contains(e.id));
-          state = state.where((e) => !ids.contains(e.id)).toList();
-
-          return removed;
-        },
-        {'ids': ids},
-      );
 
   Future<List<SavedMemEntityV2>> loadMemList(
     bool showArchived,
@@ -103,6 +83,16 @@ class MemEntities extends _$MemEntities {
           'memNotificationEntities': memNotificationEntities,
           'targetEntity': targetEntity,
         },
+      );
+
+  @override
+  Iterable<SavedMemEntityV2> remove(Iterable<int> ids) => v(
+        () {
+          ids.map((id) => MemClient().remove(id));
+
+          return super.remove(ids);
+        },
+        {'ids': ids},
       );
 
   Future<MemDetail?> undoRemove(int id) => v(
