@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/acts/act.dart';
-import 'package:mem/features/acts/actions.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/framework/view/timer.dart';
@@ -37,8 +36,8 @@ class MemListItemView extends ConsumerWidget {
             },
           ),
           ref.watch(latestActByMemProvider(_memId)),
-          () => ref.read(startActBy(_memId)),
-          () => ref.read(finishActBy(_memId)),
+          () => ref.read(actEntitiesProvider.notifier).startActby(_memId),
+          () => ref.read(actEntitiesProvider.notifier).finishActby(_memId),
           () => ref.read(actsV2Provider.notifier).pause(_memId),
           () => ref.read(actsV2Provider.notifier).close(_memId),
           ref.watch(memNotificationsByMemIdProvider(_memId)),

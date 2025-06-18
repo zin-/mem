@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/features/acts/actions.dart';
 import 'package:mem/features/acts/states.dart';
 
 class ActFab extends ConsumerWidget {
@@ -15,13 +14,13 @@ class ActFab extends ConsumerWidget {
 
     if (activeActList.isEmpty) {
       return _StartActFab(
-        () => ref.read(startActByV2Provider(_memId)),
+        () => ref.read(actEntitiesProvider.notifier).startActby(_memId),
       );
     } else {
       return _FinishActFab(
-        () => ref.read(finishActBy(
-          activeActList.last.value.memId,
-        )),
+        () => ref.read(actEntitiesProvider.notifier).finishActby(
+              activeActList.last.value.memId,
+            ),
       );
     }
   }

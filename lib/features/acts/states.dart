@@ -25,6 +25,23 @@ class ActEntities extends _$ActEntities
   // ignore: avoid_manual_providers_as_generated_provider_dependency
   Iterable<SavedActEntity> build() => ref.watch(actsProvider);
 
+  // TODO actsProviderから脱却したら削除する
+  @override
+  Iterable<SavedActEntity> upsert(Iterable<SavedActEntity> entities) => v(
+        () {
+          // ignore: avoid_manual_providers_as_generated_provider_dependency
+          ref.read(actsProvider.notifier).upsertAll(
+                entities,
+                (c, u) => c.id == u.id,
+              );
+
+          return entities;
+        },
+        {
+          'entities': entities,
+        },
+      );
+
   Future<Iterable<SavedActEntity>> fetch(int memId, Period period) => v(
         () async {
           final acts = await ActRepository().ship(
@@ -42,6 +59,32 @@ class ActEntities extends _$ActEntities
         {
           'memId': memId,
           'period': period,
+        },
+      );
+
+  Future<void> startActby(int memId) => v(
+        () async {
+          final now = DateAndTime.now();
+
+          final startedAct = await ActsClient().start(memId, now);
+
+          upsert([startedAct]);
+        },
+        {
+          'memId': memId,
+        },
+      );
+
+  Future<void> finishActby(int memId) => v(
+        () async {
+          final now = DateAndTime.now();
+
+          final finishedAct = await ActsClient().finish(memId, now);
+
+          upsert([finishedAct]);
+        },
+        {
+          'memId': memId,
         },
       );
 }
