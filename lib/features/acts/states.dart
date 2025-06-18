@@ -87,6 +87,17 @@ class ActEntities extends _$ActEntities
           'memId': memId,
         },
       );
+
+  Future<void> edit(SavedActEntity act) => v(
+        () async {
+          final editedAct = await ActsClient().edit(act);
+
+          upsert([editedAct]);
+        },
+        {
+          'act': act,
+        },
+      );
 }
 
 @riverpod
