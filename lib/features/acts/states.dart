@@ -1,16 +1,61 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/acts/act.dart';
+import 'package:mem/features/acts/act_repository.dart';
 import 'package:mem/features/acts/act_service.dart';
 import 'package:mem/features/acts/client.dart';
+import 'package:mem/features/acts/line_chart/states.dart';
+import 'package:mem/features/settings/preference/keys.dart';
+import 'package:mem/features/settings/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/acts/act_entity.dart';
+import 'package:mem/values/constants.dart';
 import 'package:mem/widgets/infinite_scroll.dart';
+import 'package:mem/shared/entities_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'states.g.dart';
+
+@riverpod
+class ActEntities extends _$ActEntities
+    with EntitiesStateMixin<SavedActEntity, int> {
+  @override
+  // ignore: avoid_manual_providers_as_generated_provider_dependency
+  Iterable<SavedActEntity> build() => ref.watch(actsProvider);
+
+  Future<Iterable<SavedActEntity>> fetch(int memId, Period period) => v(
+        () async {
+          final acts = await ActRepository().ship(
+            memId: memId,
+            period: period.toPeriod(
+                DateAndTime.now(),
+                ref.watch(preferencesProvider).value?[startOfDayKey] ??
+                    defaultStartOfDay),
+          );
+
+          upsert(acts);
+
+          return acts;
+        },
+        {
+          'memId': memId,
+          'period': period,
+        },
+      );
+}
+
+@riverpod
+Future<void> loadActListV2(Ref ref, int memId, Period period) => v(
+      () async {
+        await ref.watch(actEntitiesProvider.notifier).fetch(memId, period);
+      },
+      {
+        'memId': memId,
+        'period': period,
+      },
+    );
 
 final _actsClient = ActsClient();
 

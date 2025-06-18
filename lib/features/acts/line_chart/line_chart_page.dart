@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/features/acts/actions.dart';
 import 'package:mem/features/acts/acts_summary.dart';
 import 'package:mem/features/acts/line_chart/line_chart_wrapper.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
@@ -61,7 +60,7 @@ class _ActLineChartPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => AsyncValueView(
-          loadActListProvider(_memId, _period),
+          loadActListV2Provider(_memId, _period),
           (loaded) => _ActLineChartScreen(
             ref.read(
               editingMemByMemIdProvider(_memId).select((v) => v.value.name),

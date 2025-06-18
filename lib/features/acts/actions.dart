@@ -1,45 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/acts/act.dart';
-import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/features/acts/act_repository.dart';
-import 'package:mem/features/settings/preference/keys.dart';
-import 'package:mem/features/settings/states.dart';
-import 'package:mem/values/constants.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'client.dart';
 import 'states.dart';
 
 part 'actions.g.dart';
-
-@riverpod
-Future<void> loadActList(Ref ref, int memId, Period period) => v(
-      () async {
-        final acts = await ActRepository().ship(
-          memId: memId,
-          period: period.toPeriod(
-              DateAndTime.now(),
-              ref.watch(preferencesProvider).value?[startOfDayKey] ??
-                  defaultStartOfDay),
-        );
-
-        ref
-            .watch(
-              // ignore: avoid_manual_providers_as_generated_provider_dependency
-              actsProvider.notifier,
-            )
-            .upsertAll(
-              acts,
-              (tmp, item) => tmp.id == item.id,
-            );
-      },
-      {
-        'memId': memId,
-        'period': period,
-      },
-    );
 
 @riverpod
 Future<void> startActByV2(Ref ref, int memId) => v(
