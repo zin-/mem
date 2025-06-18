@@ -47,7 +47,7 @@ class ActEntities extends _$ActEntities
 }
 
 @riverpod
-Future<void> loadActListV2(Ref ref, int memId, Period period) => v(
+Future<void> loadActList(Ref ref, int memId, Period period) => v(
       () async {
         await ref.watch(actEntitiesProvider.notifier).fetch(memId, period);
       },
