@@ -46,26 +46,26 @@ final saveMem =
           memId,
         ));
 
-final removeMem = Provider.autoDispose.family<Future<bool>, int?>(
-  (ref, memId) => v(
-    () async {
-      if (memId != null) {
-        final removedMemEntities =
-            ref.read(memEntitiesProvider.notifier).remove([memId]);
+final removeMem = Provider.autoDispose.family<Future<bool> Function(), int?>(
+  (ref, memId) => () => v(
+        () async {
+          if (memId != null) {
+            final removedMemEntities =
+                ref.read(memEntitiesProvider.notifier).remove([memId]);
 
-        for (var e in removedMemEntities) {
-          ref.read(removedMemProvider(e.id).notifier).updatedBy(e);
-          ref.read(removedMemItemsProvider(e.id).notifier).updatedBy(
-                ref.read(memItemsByMemIdProvider(e.id)),
-              );
-          // TODO mem notificationsにも同様の処理が必要では？
-        }
+            for (var e in removedMemEntities) {
+              ref.read(removedMemProvider(e.id).notifier).updatedBy(e);
+              ref.read(removedMemItemsProvider(e.id).notifier).updatedBy(
+                    ref.read(memItemsByMemIdProvider(e.id)),
+                  );
+              // TODO mem notificationsにも同様の処理が必要では？
+            }
 
-        return true;
-      }
+            return true;
+          }
 
-      return false;
-    },
-    memId,
-  ),
+          return false;
+        },
+        memId,
+      ),
 );
