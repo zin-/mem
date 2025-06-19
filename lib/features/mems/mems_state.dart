@@ -95,6 +95,15 @@ class MemEntities extends _$MemEntities
         {'ids': ids},
       );
 
+  Future<Iterable<SavedMemEntityV2>> removeAsync(Iterable<int> ids) => v(
+        () async {
+          await Future.wait(ids.map((id) => MemClient().remove(id)));
+
+          return super.remove(ids);
+        },
+        {'ids': ids},
+      );
+
   Future<MemDetail?> undoRemove(int id) => v(
         () async {
           // ignore: avoid_manual_providers_as_generated_provider_dependency

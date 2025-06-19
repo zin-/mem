@@ -50,8 +50,9 @@ final removeMem = Provider.autoDispose.family<Future<bool> Function(), int?>(
   (ref, memId) => () => v(
         () async {
           if (memId != null) {
-            final removedMemEntities =
-                ref.read(memEntitiesProvider.notifier).remove([memId]);
+            final removedMemEntities = await ref
+                .read(memEntitiesProvider.notifier)
+                .removeAsync([memId]);
 
             for (var e in removedMemEntities) {
               ref.read(removedMemProvider(e.id).notifier).updatedBy(e);
