@@ -85,21 +85,11 @@ class MemEntities extends _$MemEntities
         },
       );
 
-  @override
-  Iterable<SavedMemEntityV2> remove(Iterable<int> ids) => v(
-        () {
-          ids.map((id) => MemClient().remove(id));
-
-          return super.remove(ids);
-        },
-        {'ids': ids},
-      );
-
   Future<Iterable<SavedMemEntityV2>> removeAsync(Iterable<int> ids) => v(
         () async {
           await Future.wait(ids.map((id) => MemClient().remove(id)));
 
-          return super.remove(ids);
+          return remove(ids);
         },
         {'ids': ids},
       );
