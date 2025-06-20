@@ -6,7 +6,6 @@ import 'package:mem/framework/date_and_time/date_and_time_period_view.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/features/logger/log_service.dart';
 
-import 'actions.dart';
 import 'states.dart';
 
 class EditingActDialog extends ConsumerWidget {
@@ -35,7 +34,9 @@ class EditingActDialog extends ConsumerWidget {
             )),
         pickedPeriod,
       ),
-      () => v(() => ref.read(deleteAct(_actId))),
+      () => v(() async {
+        await ref.read(actEntitiesProvider.notifier).removeAsync([_actId]);
+      }),
       () => v(() => ref.read(actEntitiesProvider.notifier).edit(
             editingActEntity,
           )),
@@ -69,8 +70,8 @@ class _EditingActDialogComponent extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    onPressed: () {
-                      _onDeleteTapped();
+                    onPressed: () async {
+                      await _onDeleteTapped();
                       Navigator.pop(context);
                     },
                     icon: const Icon(Icons.delete),

@@ -361,7 +361,7 @@ void main() => group(_name, () {
           },
         );
 
-        group(': Edit act', () {
+        group('Edit act', () {
           setUp(() async {
             await dbA.insert(defTableActs, {
               defFkActsMemId.name: insertedMemId,
@@ -445,7 +445,7 @@ void main() => group(_name, () {
             },
           );
 
-          testWidgets(': delete.', (widgetTester) async {
+          testWidgets('Delete.', (widgetTester) async {
             widgetTester.ignoreMockMethodCallHandler(
                 MethodChannelMock.flutterLocalNotifications);
 

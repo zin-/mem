@@ -29,8 +29,12 @@ class ActEntities extends _$ActEntities
   @override
   Iterable<SavedActEntity> upsert(Iterable<SavedActEntity> entities) => v(
         () {
-          // ignore: avoid_manual_providers_as_generated_provider_dependency
-          ref.read(actsProvider.notifier).upsertAll(
+          ref
+              .read(
+                // ignore: avoid_manual_providers_as_generated_provider_dependency
+                actsProvider.notifier,
+              )
+              .upsertAll(
                 entities,
                 (c, u) => c.id == u.id,
               );
@@ -40,6 +44,22 @@ class ActEntities extends _$ActEntities
         {
           'entities': entities,
         },
+      );
+
+  // TODO actsProviderから脱却したら削除する
+  @override
+  Iterable<SavedActEntity> remove(Iterable<int> ids) => v(
+        () {
+          ref
+              .read(
+                // ignore: avoid_manual_providers_as_generated_provider_dependency
+                actsProvider.notifier,
+              )
+              .removeWhere((e) => ids.contains(e.id));
+
+          return super.remove(ids);
+        },
+        {'ids': ids},
       );
 
   Future<Iterable<SavedActEntity>> fetch(int memId, Period period) => v(
@@ -97,6 +117,15 @@ class ActEntities extends _$ActEntities
         {
           'act': act,
         },
+      );
+
+  Future<Iterable<SavedActEntity>> removeAsync(Iterable<int> ids) => v(
+        () async {
+          await Future.wait(ids.map((id) => _actsClient.delete(id)));
+
+          return remove(ids);
+        },
+        {'ids': ids},
       );
 }
 
