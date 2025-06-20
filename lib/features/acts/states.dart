@@ -22,44 +22,45 @@ class ActEntities extends _$ActEntities
     with EntitiesStateMixin<SavedActEntity, int> {
   @override
   // ignore: avoid_manual_providers_as_generated_provider_dependency
-  Iterable<SavedActEntity> build() => ref.watch(actsProvider);
+  Iterable<SavedActEntity> build() => [];
+  // ref.watch([actsProvider]);
 
-  // TODO actsProviderから脱却したら削除する
-  @override
-  Iterable<SavedActEntity> upsert(Iterable<SavedActEntity> entities) => v(
-        () {
-          ref
-              .read(
-                // ignore: avoid_manual_providers_as_generated_provider_dependency
-                actsProvider.notifier,
-              )
-              .upsertAll(
-                entities,
-                (c, u) => c.id == u.id,
-              );
+  // // TODO actsProviderから脱却したら削除する
+  // @override
+  // Iterable<SavedActEntity> upsert(Iterable<SavedActEntity> entities) => v(
+  //       () {
+  //         ref
+  //             .read(
+  //               // ignore: avoid_manual_providers_as_generated_provider_dependency
+  //               actsProvider.notifier,
+  //             )
+  //             .upsertAll(
+  //               entities,
+  //               (c, u) => c.id == u.id,
+  //             );
 
-          return entities;
-        },
-        {
-          'entities': entities,
-        },
-      );
+  //         return entities;
+  //       },
+  //       {
+  //         'entities': entities,
+  //       },
+  //     );
 
-  // TODO actsProviderから脱却したら削除する
-  @override
-  Iterable<SavedActEntity> remove(Iterable<int> ids) => v(
-        () {
-          ref
-              .read(
-                // ignore: avoid_manual_providers_as_generated_provider_dependency
-                actsProvider.notifier,
-              )
-              .removeWhere((e) => ids.contains(e.id));
+  // // TODO actsProviderから脱却したら削除する
+  // @override
+  // Iterable<SavedActEntity> remove(Iterable<int> ids) => v(
+  //       () {
+  //         ref
+  //             .read(
+  //               // ignore: avoid_manual_providers_as_generated_provider_dependency
+  //               actsProvider.notifier,
+  //             )
+  //             .removeWhere((e) => ids.contains(e.id));
 
-          return super.remove(ids);
-        },
-        {'ids': ids},
-      );
+  //         return super.remove(ids);
+  //       },
+  //       {'ids': ids},
+  //     );
 
   Future<Iterable<SavedActEntity>> fetch(int memId, Period period) => v(
         () async {
@@ -165,20 +166,6 @@ Future<void> loadActList(Ref ref, int memId, Period period) => v(
 
 final _actsClient = ActsClient();
 
-final actsProvider = StateNotifierProvider<
-    ListValueStateNotifier<SavedActEntity>, List<SavedActEntity>>(
-  (ref) => v(() => ListValueStateNotifier([])),
-);
-
-@riverpod
-class ActsV2 extends _$ActsV2 {
-  @override
-  Future<Iterable<SavedActEntity>> build() async {
-    // ignore: avoid_manual_providers_as_generated_provider_dependency
-    return ref.watch(actsProvider);
-  }
-}
-
 final actListProvider = StateNotifierProvider.autoDispose
     .family<ListValueStateNotifier<SavedActEntity>, List<SavedActEntity>, int?>(
   (ref, memId) => v(
@@ -211,12 +198,16 @@ final actListProvider = StateNotifierProvider.autoDispose
 
       return ListValueStateNotifier(
         ref
-            .watch(actsProvider)
-            .where((act) => memId == null || act.value.memId == memId)
+            .watch(actEntitiesProvider)
             .where(
-              (e) => e.value.period != null,
+              (actEntity) => memId == null || actEntity.value.memId == memId,
             )
-            .sorted((a, b) => b.value.period!.compareTo(a.value.period!)),
+            .where(
+              (actEntity) => actEntity.value.period != null,
+            )
+            .sorted(
+              (a, b) => b.value.period!.compareTo(a.value.period!),
+            ),
       );
     },
     {
@@ -228,9 +219,9 @@ final actListProvider = StateNotifierProvider.autoDispose
 @riverpod
 Map<int, Act?>? latestActsByMemV2(Ref ref) => v(
       () => ref.watch(
-        actsV2Provider.select(
-          (value) => value.value
-              ?.groupListsBy(
+        actEntitiesProvider.select(
+          (value) => value
+              .groupListsBy(
                 (element) => element.value.memId,
               )
               .map(
