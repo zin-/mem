@@ -72,7 +72,9 @@ class _EditingActDialogComponent extends StatelessWidget {
                   IconButton(
                     onPressed: () async {
                       await _onDeleteTapped();
-                      Navigator.pop(context);
+                      if (context.mounted) {
+                        Navigator.pop(context);
+                      }
                     },
                     icon: const Icon(Icons.delete),
                   ),
