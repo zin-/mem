@@ -35,7 +35,11 @@ class MemListItemView extends ConsumerWidget {
               'memId': memId,
             },
           ),
-          ref.watch(latestActByMemProvider(_memId)),
+          ref.watch(
+            latestActsByMemV2Provider.select(
+              (value) => value?[_memId],
+            ),
+          ),
           () => ref.read(actEntitiesProvider.notifier).startActby(_memId),
           () => ref.read(actEntitiesProvider.notifier).finishActby(_memId),
           () => ref.read(actEntitiesProvider.notifier).pauseByMemId(_memId),
