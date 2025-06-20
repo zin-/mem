@@ -95,6 +95,19 @@ class ActEntities extends _$ActEntities
         },
       );
 
+  Future<void> pauseByMemId(int memId) => v(
+        () async {
+          final now = DateAndTime.now();
+
+          final updatedEntities = await _actsClient.pause(memId, now);
+
+          upsert(updatedEntities);
+        },
+        {
+          'memId': memId,
+        },
+      );
+
   Future<void> finishActby(int memId) => v(
         () async {
           final now = DateAndTime.now();
@@ -157,23 +170,6 @@ class ActsV2 extends _$ActsV2 {
     // ignore: avoid_manual_providers_as_generated_provider_dependency
     return ref.watch(actsProvider);
   }
-
-  Future<void> pause(int memId) => v(
-        () async {
-          final now = DateAndTime.now();
-
-          final updatedEntities = await _actsClient.pause(memId, now);
-
-          // ignore: avoid_manual_providers_as_generated_provider_dependency
-          ref.read(actsProvider.notifier).upsertAll(
-                updatedEntities,
-                (c, u) => c.id == u.id,
-              );
-        },
-        {
-          'memId': memId,
-        },
-      );
 
   Future<void> close(int memId) => v(
         () async {
