@@ -108,6 +108,17 @@ class ActEntities extends _$ActEntities
         },
       );
 
+  Future<void> closeByMemId(int memId) => v(
+        () async {
+          final closed = await _actsClient.close(memId);
+
+          if (closed != null) {
+            remove([closed.id]);
+          }
+        },
+        {'memId': memId},
+      );
+
   Future<void> finishActby(int memId) => v(
         () async {
           final now = DateAndTime.now();
@@ -162,31 +173,11 @@ final actsProvider = StateNotifierProvider<
 
 @riverpod
 class ActsV2 extends _$ActsV2 {
-  final _actsClient = ActsClient();
-  final _actService = ActService();
-
   @override
   Future<Iterable<SavedActEntity>> build() async {
     // ignore: avoid_manual_providers_as_generated_provider_dependency
     return ref.watch(actsProvider);
   }
-
-  Future<void> close(int memId) => v(
-        () async {
-          final closed = await _actsClient.close(memId);
-
-          if (closed != null) {
-            final latestActs = await _actService.fetchLatestByMemIds([memId]);
-            // ignore: avoid_manual_providers_as_generated_provider_dependency
-            ref.read(actsProvider.notifier).upsertAll(
-                  latestActs,
-                  (c, u) => c.id == u.id,
-                  removeWhere: (e) => e.id == closed.id,
-                );
-          }
-        },
-        {'memId': memId},
-      );
 }
 
 final actListProvider = StateNotifierProvider.autoDispose
