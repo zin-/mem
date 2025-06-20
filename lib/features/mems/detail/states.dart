@@ -42,13 +42,16 @@ final memItemsByMemIdProvider = StateNotifierProvider.family<
       ],
       initializer: (current, notifier) async {
         if (memId != null) {
-          ref.read(memItemsProvider.notifier).upsertAll(
-                await MemItemRepositoryV2().ship(memId: memId),
-                (current, updating) =>
-                    current is SavedMemItemEntityV2 &&
-                    updating is SavedMemItemEntityV2 &&
-                    current.id == updating.id,
-              );
+          final items = await MemItemRepositoryV2().ship(memId: memId);
+          if (notifier.mounted) {
+            ref.read(memItemsProvider.notifier).upsertAll(
+                  items,
+                  (current, updating) =>
+                      current is SavedMemItemEntityV2 &&
+                      updating is SavedMemItemEntityV2 &&
+                      current.id == updating.id,
+                );
+          }
         }
       },
     ),
@@ -143,15 +146,20 @@ final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
           () async {
             if (memId != null &&
                 current.whereType<SavedMemNotificationEntityV2>().isEmpty) {
-              ref.read(memNotificationsProvider.notifier).upsertAll(
-                    await MemNotificationRepositoryV2().ship(memId: memId),
-                    (current, updating) => updating.value.isRepeatByDayOfWeek()
-                        ? current.value.memId == updating.value.memId &&
-                            current.value.type == updating.value.type &&
-                            current.value.time == updating.value.time
-                        : current.value.memId == updating.value.memId &&
-                            current.value.type == updating.value.type,
-                  );
+              final notifications =
+                  await MemNotificationRepositoryV2().ship(memId: memId);
+              if (notifier.mounted) {
+                ref.read(memNotificationsProvider.notifier).upsertAll(
+                      notifications,
+                      (current, updating) =>
+                          updating.value.isRepeatByDayOfWeek()
+                              ? current.value.memId == updating.value.memId &&
+                                  current.value.type == updating.value.type &&
+                                  current.value.time == updating.value.time
+                              : current.value.memId == updating.value.memId &&
+                                  current.value.type == updating.value.type,
+                    );
+              }
             }
           },
           {'current': current},

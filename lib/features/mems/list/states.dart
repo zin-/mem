@@ -172,7 +172,7 @@ final latestActsByMemProvider =
   (ref) => v(
     () => ListValueStateNotifier(
       ref.watch(
-        actsProvider.select(
+        actEntitiesProvider.select(
           (value) => value
               .groupListsBy((e) => e.value.memId)
               .values
@@ -188,7 +188,7 @@ final latestActsByMemProvider =
       initializer: (current, notifier) => v(
         () async {
           if (current.isEmpty) {
-            ref.read(actsProvider.notifier).addAll(
+            ref.read(actEntitiesProvider.notifier).upsert(
                   await ActService().fetchLatestByMemIds(
                     ref.read(memEntitiesProvider).map((e) => e.id),
                   ),
