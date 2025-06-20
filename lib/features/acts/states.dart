@@ -21,46 +21,7 @@ part 'states.g.dart';
 class ActEntities extends _$ActEntities
     with EntitiesStateMixin<SavedActEntity, int> {
   @override
-  // ignore: avoid_manual_providers_as_generated_provider_dependency
   Iterable<SavedActEntity> build() => [];
-  // ref.watch([actsProvider]);
-
-  // // TODO actsProviderから脱却したら削除する
-  // @override
-  // Iterable<SavedActEntity> upsert(Iterable<SavedActEntity> entities) => v(
-  //       () {
-  //         ref
-  //             .read(
-  //               // ignore: avoid_manual_providers_as_generated_provider_dependency
-  //               actsProvider.notifier,
-  //             )
-  //             .upsertAll(
-  //               entities,
-  //               (c, u) => c.id == u.id,
-  //             );
-
-  //         return entities;
-  //       },
-  //       {
-  //         'entities': entities,
-  //       },
-  //     );
-
-  // // TODO actsProviderから脱却したら削除する
-  // @override
-  // Iterable<SavedActEntity> remove(Iterable<int> ids) => v(
-  //       () {
-  //         ref
-  //             .read(
-  //               // ignore: avoid_manual_providers_as_generated_provider_dependency
-  //               actsProvider.notifier,
-  //             )
-  //             .removeWhere((e) => ids.contains(e.id));
-
-  //         return super.remove(ids);
-  //       },
-  //       {'ids': ids},
-  //     );
 
   Future<Iterable<SavedActEntity>> fetch(int memId, Period period) => v(
         () async {
