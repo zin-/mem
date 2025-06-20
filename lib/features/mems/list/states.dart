@@ -167,39 +167,6 @@ final memListProvider = StateNotifierProvider.autoDispose<
   );
 });
 
-final latestActsByMemProvider =
-    StateNotifierProvider.autoDispose<ListValueStateNotifier<Act>, List<Act>>(
-  (ref) => v(
-    () => ListValueStateNotifier(
-      ref.watch(
-        actEntitiesProvider.select(
-          (value) => value
-              .groupListsBy((e) => e.value.memId)
-              .values
-              .map((e) => e
-                  .sorted(
-                    (a, b) => (b.value.period?.start ?? b.createdAt)
-                        .compareTo(a.value.period?.start ?? a.createdAt),
-                  )[0]
-                  .value)
-              .toList(),
-        ),
-      ),
-      initializer: (current, notifier) => v(
-        () async {
-          if (current.isEmpty) {
-            ref.read(actEntitiesProvider.notifier).upsert(
-                  await ActService().fetchLatestByMemIds(
-                    ref.read(memEntitiesProvider).map((e) => e.id),
-                  ),
-                );
-          }
-        },
-        {'current': current},
-      ),
-    ),
-  ),
-);
 final savedMemNotificationsProvider = StateNotifierProvider.autoDispose<
     ListValueStateNotifier<SavedMemNotificationEntityV2>,
     List<SavedMemNotificationEntityV2>>(
