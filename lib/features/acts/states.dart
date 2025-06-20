@@ -200,12 +200,11 @@ final actListProvider = StateNotifierProvider.autoDispose
           ref.read(isLoading(memId).notifier).updatedBy(false);
           ref.read(isUpdating(memId).notifier).updatedBy(true);
           ref.read(maxPage(memId).notifier).updatedBy(latest.totalPage);
-          ref.read(actsProvider.notifier).upsertAll(
+          ref.read(actEntitiesProvider.notifier).upsert(
             [
               ...latest.list,
               if (byPage != null) ...byPage.list,
             ],
-            (current, updating) => current.id == updating.id,
           );
         });
       }
