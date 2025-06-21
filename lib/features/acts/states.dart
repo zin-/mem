@@ -45,6 +45,22 @@ class ActEntities extends _$ActEntities
         },
       );
 
+  Future<Iterable<SavedActEntity>> fetchLatestByMemIds(
+    Iterable<int> memIds,
+  ) =>
+      v(
+        () async {
+          final latestActs = await ActService().fetchLatestByMemIds(memIds);
+
+          upsert(latestActs);
+
+          return latestActs;
+        },
+        {
+          'memIds': memIds,
+        },
+      );
+
   Future<void> startActby(int memId) => v(
         () async {
           final now = DateAndTime.now();
@@ -215,10 +231,8 @@ final latestActsByMemProvider =
       initializer: (current, notifier) => v(
         () async {
           if (current.isEmpty) {
-            ref.read(actEntitiesProvider.notifier).upsert(
-                  await ActService().fetchLatestByMemIds(
-                    ref.read(memEntitiesProvider).map((e) => e.id),
-                  ),
+            await ref.read(actEntitiesProvider.notifier).fetchLatestByMemIds(
+                  ref.read(memEntitiesProvider).map((e) => e.id),
                 );
           }
         },
