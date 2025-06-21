@@ -218,26 +218,3 @@ Map<int, Act?>? latestActsByMemV2(Ref ref) => v(
         ),
       ),
     );
-
-final latestActsByMemProvider =
-    StateNotifierProvider.autoDispose<ListValueStateNotifier<Act>, List<Act>>(
-  (ref) => v(
-    () => ListValueStateNotifier(
-      ref.watch(
-        latestActsByMemV2Provider.select(
-          (value) => value?.values.whereType<Act>().toList() ?? [],
-        ),
-      ),
-      initializer: (current, notifier) => v(
-        () async {
-          if (current.isEmpty) {
-            await ref.read(actEntitiesProvider.notifier).fetchLatestByMemIds(
-                  ref.read(memEntitiesProvider).map((e) => e.id),
-                );
-          }
-        },
-        {'current': current},
-      ),
-    ),
-  ),
-);
