@@ -192,7 +192,8 @@ Map<int, Act?>? latestActsByMemV2(Ref ref) => v(
                   key,
                   value
                       .sorted(
-                        (a, b) => b.createdAt.compareTo(a.createdAt),
+                        (a, b) => (b.value.period?.start ?? b.createdAt)
+                            .compareTo(a.value.period?.start ?? a.createdAt),
                       )
                       .firstOrNull
                       ?.value,
@@ -207,17 +208,8 @@ final latestActsByMemProvider =
   (ref) => v(
     () => ListValueStateNotifier(
       ref.watch(
-        actEntitiesProvider.select(
-          (value) => value
-              .groupListsBy((e) => e.value.memId)
-              .values
-              .map((e) => e
-                  .sorted(
-                    (a, b) => (b.value.period?.start ?? b.createdAt)
-                        .compareTo(a.value.period?.start ?? a.createdAt),
-                  )[0]
-                  .value)
-              .toList(),
+        latestActsByMemV2Provider.select(
+          (value) => value?.values.whereType<Act>().toList() ?? [],
         ),
       ),
       initializer: (current, notifier) => v(
