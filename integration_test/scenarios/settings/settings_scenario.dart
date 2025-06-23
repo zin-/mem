@@ -430,7 +430,7 @@ void main() => group(_scenarioName, () {
 
               await runApplication();
               await widgetTester.pumpAndSettle();
-              await widgetTester.tap(startIconFinder);
+              await widgetTester.tap(startIconFinder.at(0));
               await widgetTester.pumpAndSettle(waitLongSideEffectDuration);
 
               expect(
