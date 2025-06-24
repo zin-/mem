@@ -77,7 +77,7 @@ class ActEntities extends _$ActEntities
         () async {
           final now = DateAndTime.now();
 
-          final updatedEntities = await _actsClient.pause(memId, now);
+          final updatedEntities = await ActsClient().pause(memId, now);
 
           upsert(updatedEntities);
         },
@@ -88,7 +88,7 @@ class ActEntities extends _$ActEntities
 
   Future<void> closeByMemId(int memId) => v(
         () async {
-          final closed = await _actsClient.close(memId);
+          final closed = await ActsClient().close(memId);
 
           if (closed != null) {
             remove([closed.id]);
@@ -123,7 +123,7 @@ class ActEntities extends _$ActEntities
 
   Future<Iterable<SavedActEntity>> removeAsync(Iterable<int> ids) => v(
         () async {
-          await Future.wait(ids.map((id) => _actsClient.delete(id)));
+          await Future.wait(ids.map((id) => ActsClient().delete(id)));
 
           return remove(ids);
         },
@@ -142,8 +142,6 @@ Future<void> loadActList(Ref ref, int memId, Period period) => v(
       },
     );
 
-final _actsClient = ActsClient();
-
 final actListProvider = StateNotifierProvider.autoDispose
     .family<ListValueStateNotifier<SavedActEntity>, List<SavedActEntity>, int?>(
   (ref, memId) => v(
@@ -154,12 +152,12 @@ final actListProvider = StateNotifierProvider.autoDispose
         Future.microtask(() async {
           ref.read(isLoading(memId).notifier).updatedBy(true);
 
-          final latest = await _actsClient.fetch(memId, 1);
+          final latest = await ActsClient().fetch(memId, 1);
           final c = ref.read(currentPage(memId));
 
           ListWithTotalPage<SavedActEntity>? byPage;
           if (c != 1) {
-            byPage = await _actsClient.fetch(memId, c);
+            byPage = await ActsClient().fetch(memId, c);
           }
 
           ref.read(isLoading(memId).notifier).updatedBy(false);
