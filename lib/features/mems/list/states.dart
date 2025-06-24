@@ -87,7 +87,7 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
 final memListProvider = StateNotifierProvider.autoDispose<
     ValueStateNotifier<List<SavedMemEntityV2>>, List<SavedMemEntityV2>>((ref) {
   final filtered = ref.watch(_filteredMemsProvider);
-  final latestActsByMem = ref.watch(latestActsByMemV2Provider.select(
+  final latestActsByMem = ref.watch(latestActsByMemProvider.select(
     (value) => value?.values.whereType<Act>().toList() ?? [],
   ));
   final savedMemNotifications = ref.watch(savedMemNotificationsProvider);

@@ -38,7 +38,7 @@ class MemListWidget extends ConsumerWidget {
             ref.watch(preferencesProvider).value?[startOfDayKey] ??
                 defaultStartOfDay,
             ref.watch(memNotificationsProvider),
-            ref.watch(latestActsByMemV2Provider.select(
+            ref.watch(latestActsByMemProvider.select(
               (value) => value?.values.whereType<Act>().toList() ?? [],
             )),
             (memId) => showMemDetailPage(context, ref, memId),
