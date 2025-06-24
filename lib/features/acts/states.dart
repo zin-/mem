@@ -142,38 +142,51 @@ Future<void> loadActList(Ref ref, int memId, Period period) => v(
       },
     );
 
-final actListProvider = StateNotifierProvider.autoDispose
-    .family<ListValueStateNotifier<SavedActEntity>, List<SavedActEntity>, int?>(
-  (ref, memId) => v(
-    () {
-      if (ref.read(isUpdating(memId))) {
-        ref.watch(isUpdating(memId));
-      } else {
-        Future.microtask(() async {
-          ref.read(isLoading(memId).notifier).updatedBy(true);
+@riverpod
+List<SavedActEntity> actList(Ref ref, int? memId) => d(
+      () {
+        if (ref.read(
+            // ignore: avoid_manual_providers_as_generated_provider_dependency
+            isUpdating(memId))) {
+          ref.watch(
+              // ignore: avoid_manual_providers_as_generated_provider_dependency
+              isUpdating(memId));
+        } else {
+          Future.microtask(() async {
+            ref.read(
+                // ignore: avoid_manual_providers_as_generated_provider_dependency
+                isLoading(memId).notifier).updatedBy(true);
 
-          final latest = await ActsClient().fetch(memId, 1);
-          final c = ref.read(currentPage(memId));
+            final latest = await ActsClient().fetch(memId, 1);
+            final c = ref.read(
+                // ignore: avoid_manual_providers_as_generated_provider_dependency
+                currentPage(memId));
 
-          ListWithTotalPage<SavedActEntity>? byPage;
-          if (c != 1) {
-            byPage = await ActsClient().fetch(memId, c);
-          }
+            ListWithTotalPage<SavedActEntity>? byPage;
+            if (c != 1) {
+              byPage = await ActsClient().fetch(memId, c);
+            }
 
-          ref.read(isLoading(memId).notifier).updatedBy(false);
-          ref.read(isUpdating(memId).notifier).updatedBy(true);
-          ref.read(maxPage(memId).notifier).updatedBy(latest.totalPage);
-          ref.read(actEntitiesProvider.notifier).upsert(
-            [
-              ...latest.list,
-              if (byPage != null) ...byPage.list,
-            ],
-          );
-        });
-      }
+            ref.read(
+                // ignore: avoid_manual_providers_as_generated_provider_dependency
+                isLoading(memId).notifier).updatedBy(false);
+            ref.read(
+                // ignore: avoid_manual_providers_as_generated_provider_dependency
+                isUpdating(memId).notifier).updatedBy(true);
+            ref.read(
+                // ignore: avoid_manual_providers_as_generated_provider_dependency
+                maxPage(memId).notifier).updatedBy(latest.totalPage);
 
-      return ListValueStateNotifier(
-        ref
+            ref.read(actEntitiesProvider.notifier).upsert(
+              [
+                ...latest.list,
+                if (byPage != null) ...byPage.list,
+              ],
+            );
+          });
+        }
+
+        return ref
             .watch(actEntitiesProvider)
             .where(
               (actEntity) => memId == null || actEntity.value.memId == memId,
@@ -183,14 +196,12 @@ final actListProvider = StateNotifierProvider.autoDispose
             )
             .sorted(
               (a, b) => b.value.period!.compareTo(a.value.period!),
-            ),
-      );
-    },
-    {
-      "memId": memId,
-    },
-  ),
-);
+            );
+      },
+      {
+        'memId': memId,
+      },
+    );
 
 @riverpod
 Map<int, Act?>? latestActsByMem(Ref ref) => v(
