@@ -36,7 +36,7 @@ class MemListItemView extends ConsumerWidget {
             },
           ),
           ref.watch(
-            latestActsByMemV2Provider.select(
+            latestActsByMemProvider.select(
               (value) => value?[_memId],
             ),
           ),

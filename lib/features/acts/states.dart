@@ -193,7 +193,7 @@ final actListProvider = StateNotifierProvider.autoDispose
 );
 
 @riverpod
-Map<int, Act?>? latestActsByMemV2(Ref ref) => v(
+Map<int, Act?>? latestActsByMem(Ref ref) => v(
       () => ref.watch(
         actEntitiesProvider.select(
           (value) => value
