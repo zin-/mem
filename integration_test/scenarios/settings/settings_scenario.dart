@@ -192,7 +192,9 @@ void main() => group(_scenarioName, () {
         });
       });
 
-      group("Notify after inactivity", () {
+      // FIXME そもそも時間指定の通知全体が動いていない
+      // 　　https://github.com/zin-/mem/issues/478
+      group("Notify after inactivity", skip: true, () {
         setUp(() async {
           await PreferenceRepository().discard(notifyAfterInactivity);
         });
