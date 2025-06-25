@@ -195,10 +195,10 @@ void main() => group(_name, () {
       });
 
       group('Act', () {
-        group(': no act', () {
+        group('No act', () {
           const targetAt = 2;
 
-          testWidgets('[flaky]Show.', (widgetTester) async {
+          testWidgets('Show.', (widgetTester) async {
             await runApplication();
             await widgetTester.pumpAndSettle();
 
@@ -265,7 +265,7 @@ void main() => group(_name, () {
             );
           });
 
-          testWidgets('[flaky]Finish.', (widgetTester) async {
+          testWidgets('Finish.', (widgetTester) async {
             widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
             widgetTester.ignoreMockMethodCallHandler(
               MethodChannelMock.permissionHandler,
@@ -390,7 +390,7 @@ void main() => group(_name, () {
         group('Paused act', () {
           const targetAt = 1;
 
-          testWidgets('[flaky]Show.', (widgetTester) async {
+          testWidgets('Show.', (widgetTester) async {
             await runApplication();
             await widgetTester.pumpAndSettle();
 

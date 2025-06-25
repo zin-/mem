@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_items/mem_item_repository.dart';
@@ -24,6 +25,9 @@ final loadMemList = FutureProvider(
                   current.id == updating.id,
             );
       }
+      await ref.watch(actEntitiesProvider.notifier).fetchLatestByMemIds(
+            mems.map((mem) => mem.id).toList(),
+          );
 
       return mems;
     },
