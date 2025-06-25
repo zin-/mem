@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_items/mem_item_repository.dart';
@@ -15,15 +16,18 @@ final loadMemList = FutureProvider(
             ref.watch(showDoneProvider),
             ref.watch(showNotDoneProvider),
           );
-      for (var mem in mems) {
-        ref.read(memItemsProvider.notifier).upsertAll(
-              await MemItemRepositoryV2().ship(memId: mem.id),
-              (current, updating) =>
-                  current is SavedMemItemEntityV2 &&
-                  updating is SavedMemItemEntityV2 &&
-                  current.id == updating.id,
-            );
-      }
+
+      ref.watch(memItemsProvider.notifier).upsertAll(
+            await MemItemRepositoryV2()
+                .ship(memIdsIn: mems.map((mem) => mem.id).toList()),
+            (current, updating) =>
+                current is SavedMemItemEntityV2 &&
+                updating is SavedMemItemEntityV2 &&
+                current.id == updating.id,
+          );
+      await ref.watch(actEntitiesProvider.notifier).fetchLatestByMemIds(
+            mems.map((mem) => mem.id).toList(),
+          );
 
       return mems;
     },

@@ -28,7 +28,11 @@ class MemNotificationText extends ConsumerWidget {
           ref.read(preferencesProvider.select(
             (v) => (v.value?[startOfDayKey] ?? defaultStartOfDay) as TimeOfDay,
           )),
-          ref.watch(latestActByMemProvider(_memId)),
+          ref.watch(
+            latestActsByMemProvider.select(
+              (value) => value?[_memId],
+            ),
+          ),
         ),
         {
           '_memId': _memId,

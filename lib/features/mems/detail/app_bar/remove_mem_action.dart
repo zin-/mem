@@ -30,8 +30,7 @@ class RemoveMemAction extends AppBarActionBuilder {
             showDialog(
               context: context,
               builder: (context) => _RemoveMemAlertDialog(
-                () => ref
-                    .read(removeMem(ref.watch(memByMemIdProvider(_memId))!.id)),
+                ref.read(removeMem(ref.watch(memByMemIdProvider(_memId))!.id)),
               ),
             );
           },

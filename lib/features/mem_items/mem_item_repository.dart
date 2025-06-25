@@ -1,6 +1,7 @@
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
+import 'package:mem/framework/repository/condition/in.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
@@ -18,6 +19,7 @@ class MemItemRepositoryV2
   @override
   Future<List<SavedMemItemEntityV2>> ship({
     int? memId,
+    Iterable<int>? memIdsIn,
     Condition? condition,
     GroupBy? groupBy,
     List<OrderBy>? orderBy,
@@ -28,6 +30,7 @@ class MemItemRepositoryV2
         condition: And(
           [
             if (memId != null) Equals(defFkMemItemsMemId, memId),
+            if (memIdsIn != null) In(defFkMemItemsMemId.name, memIdsIn),
             if (condition != null) condition,
           ],
         ),

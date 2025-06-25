@@ -1,7 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/acts/act.dart';
-import 'package:mem/features/acts/act_service.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/framework/date_and_time/date_time_ext.dart';
@@ -88,7 +87,9 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
 final memListProvider = StateNotifierProvider.autoDispose<
     ValueStateNotifier<List<SavedMemEntityV2>>, List<SavedMemEntityV2>>((ref) {
   final filtered = ref.watch(_filteredMemsProvider);
-  final latestActsByMem = ref.watch(latestActsByMemProvider);
+  final latestActsByMem = ref.watch(latestActsByMemProvider.select(
+    (value) => value?.values.whereType<Act>().toList() ?? [],
+  ));
   final savedMemNotifications = ref.watch(savedMemNotificationsProvider);
 
   final startOfToday = DateTimeExt.startOfToday(
@@ -167,39 +168,6 @@ final memListProvider = StateNotifierProvider.autoDispose<
   );
 });
 
-final latestActsByMemProvider =
-    StateNotifierProvider.autoDispose<ListValueStateNotifier<Act>, List<Act>>(
-  (ref) => v(
-    () => ListValueStateNotifier(
-      ref.watch(
-        actsProvider.select(
-          (value) => value
-              .groupListsBy((e) => e.value.memId)
-              .values
-              .map((e) => e
-                  .sorted(
-                    (a, b) => (b.value.period?.start ?? b.createdAt)
-                        .compareTo(a.value.period?.start ?? a.createdAt),
-                  )[0]
-                  .value)
-              .toList(),
-        ),
-      ),
-      initializer: (current, notifier) => v(
-        () async {
-          if (current.isEmpty) {
-            ref.read(actsProvider.notifier).addAll(
-                  await ActService().fetchLatestByMemIds(
-                    ref.read(memEntitiesProvider).map((e) => e.id),
-                  ),
-                );
-          }
-        },
-        {'current': current},
-      ),
-    ),
-  ),
-);
 final savedMemNotificationsProvider = StateNotifierProvider.autoDispose<
     ListValueStateNotifier<SavedMemNotificationEntityV2>,
     List<SavedMemNotificationEntityV2>>(

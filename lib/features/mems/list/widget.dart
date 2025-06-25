@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:mem/features/acts/act.dart';
+import 'package:mem/features/acts/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_view.dart';
 import 'package:mem/framework/nullable.dart';
@@ -37,7 +38,9 @@ class MemListWidget extends ConsumerWidget {
             ref.watch(preferencesProvider).value?[startOfDayKey] ??
                 defaultStartOfDay,
             ref.watch(memNotificationsProvider),
-            ref.watch(latestActsByMemProvider),
+            ref.watch(latestActsByMemProvider.select(
+              (value) => value?.values.whereType<Act>().toList() ?? [],
+            )),
             (memId) => showMemDetailPage(context, ref, memId),
           ),
         ),
