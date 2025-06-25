@@ -16,15 +16,15 @@ final loadMemList = FutureProvider(
             ref.watch(showDoneProvider),
             ref.watch(showNotDoneProvider),
           );
-      for (var mem in mems) {
-        ref.read(memItemsProvider.notifier).upsertAll(
-              await MemItemRepositoryV2().ship(memId: mem.id),
-              (current, updating) =>
-                  current is SavedMemItemEntityV2 &&
-                  updating is SavedMemItemEntityV2 &&
-                  current.id == updating.id,
-            );
-      }
+
+      ref.watch(memItemsProvider.notifier).upsertAll(
+            await MemItemRepositoryV2()
+                .ship(memIdsIn: mems.map((mem) => mem.id).toList()),
+            (current, updating) =>
+                current is SavedMemItemEntityV2 &&
+                updating is SavedMemItemEntityV2 &&
+                current.id == updating.id,
+          );
       await ref.watch(actEntitiesProvider.notifier).fetchLatestByMemIds(
             mems.map((mem) => mem.id).toList(),
           );
