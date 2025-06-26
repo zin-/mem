@@ -68,7 +68,7 @@ void main() {
       throwsA(
         (e) {
           expect(e, isA<TableDefinitionException>());
-          expect(e.message, 'Duplicate column name.');
+          expect(e.message, 'Duplicate column name: same_name.');
           return true;
         },
       ),
