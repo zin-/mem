@@ -4,8 +4,10 @@ import 'package:mem/framework/database/definition/column/foreign_key_definition.
 import 'package:mem/framework/database/definition/column/text_column_definition.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
 
-final defColMemRelationsSourceMemId = ForeignKeyDefinition(defTableMems);
-final defColMemRelationsTargetMemId = ForeignKeyDefinition(defTableMems);
+final defColMemRelationsSourceMemId =
+    ForeignKeyDefinition(defTableMems, prefix: "source");
+final defColMemRelationsTargetMemId =
+    ForeignKeyDefinition(defTableMems, prefix: "target");
 final defColMemRelationsType = TextColumnDefinition('type');
 
 final defTableMemRelations = TableDefinition(
