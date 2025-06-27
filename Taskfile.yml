@@ -27,8 +27,12 @@ tasks:
     cmds:
       - task: git:setup-git-hooks
 
+  pre-commit-checks:
+    desc: "Run all checks required before committing (from tools/flutter.Taskfile.yml)"
+    cmds:
+      - task: flutter:analyze
+
   pre-push-checks:
     desc: "Run all checks required before pushing (from tools/flutter.Taskfile.yml)"
     cmds:
-      - task: flutter:analyze
       - task: flutter:test
