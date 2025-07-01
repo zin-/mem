@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
+import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/features/mems/mem_client.dart';
 import 'package:mem/features/mems/mem_detail.dart';
 import 'package:mem/features/mems/mem_entity.dart';
@@ -63,6 +64,7 @@ class MemEntities extends _$MemEntities
     Iterable<MemItemEntityV2> memItemEntities,
     Iterable<MemNotificationEntityV2> memNotificationEntities,
     TargetEntity? targetEntity,
+    Iterable<MemRelationEntity>? memRelationEntities,
   ) =>
       v(
         () async {
@@ -71,6 +73,7 @@ class MemEntities extends _$MemEntities
             memItemEntities.toList(),
             memNotificationEntities.toList(),
             targetEntity,
+            memRelationEntities?.toList(),
           );
 
           upsert([saved.mem as SavedMemEntityV2]);
@@ -82,6 +85,7 @@ class MemEntities extends _$MemEntities
           'memItemEntities': memItemEntities,
           'memNotificationEntities': memNotificationEntities,
           'targetEntity': targetEntity,
+          'memRelationEntities': memRelationEntities,
         },
       );
 
