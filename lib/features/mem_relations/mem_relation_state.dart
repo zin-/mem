@@ -11,3 +11,19 @@ class MemRelationEntities extends _$MemRelationEntities
   @override
   Iterable<SavedMemRelationEntity> build() => v(() => []);
 }
+
+@riverpod
+class MemRelationEntitiesByMemId extends _$MemRelationEntitiesByMemId {
+  @override
+  Iterable<MemRelationEntity> build(int? memId) => v(
+        () {
+          if (memId == null) {
+            return [];
+          }
+
+          return ref.read(memRelationEntitiesProvider
+              .select((v) => v.where((e) => e.value.sourceMemId == memId)));
+        },
+        {'memId': memId},
+      );
+}
