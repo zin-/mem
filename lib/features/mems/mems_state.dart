@@ -3,6 +3,7 @@ import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
+import 'package:mem/features/mem_relations/mem_relation_state.dart';
 import 'package:mem/features/mems/mem_client.dart';
 import 'package:mem/features/mems/mem_detail.dart';
 import 'package:mem/features/mems/mem_entity.dart';
@@ -77,6 +78,9 @@ class MemEntities extends _$MemEntities
           );
 
           upsert([saved.mem as SavedMemEntityV2]);
+
+          ref.read(memRelationEntitiesProvider.notifier).upsert(
+              saved.memRelations?.whereType<SavedMemRelationEntity>() ?? []);
 
           return saved;
         },
