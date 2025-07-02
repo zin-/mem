@@ -8,6 +8,19 @@ class MemRelationEntity with EntityV2<MemRelation> {
     this.value = value;
   }
 
+  factory MemRelationEntity.by(
+    int? sourceMemId,
+    int targetMemId,
+    MemRelationType type,
+  ) =>
+      MemRelationEntity(
+        MemRelation.by(
+          sourceMemId ?? 0,
+          targetMemId,
+          type,
+        ),
+      );
+
   @override
   Map<String, Object?> get toMap => {
         defFkMemRelationsSourceMemId.name: value.sourceMemId,
