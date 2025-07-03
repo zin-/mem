@@ -8,48 +8,12 @@ import 'package:mem/features/mem_relations/mem_relation_state.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mems_state.dart';
 
-class MemRelationListConsumer extends ConsumerWidget {
-  final int? sourceMemId;
-
-  const MemRelationListConsumer({super.key, this.sourceMemId});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final memRelationEntities =
-        ref.watch(memRelationEntitiesByMemIdProvider(sourceMemId));
-    final memEntities = ref.watch(memEntitiesProvider.select((v) => v.where(
-        (e) => memRelationEntities
-            .map((e) => e.value.targetMemId)
-            .contains(e.id))));
-
-    return MemRelationListStateful(
-      memRelationEntities: memRelationEntities,
-      memEntities: memEntities,
-      showDialog: (onSubmit) {
-        showDialog(
-          context: context,
-          builder: (context) => MemRelationDialogStateful(
-            sourceMemId: sourceMemId,
-            selectedIds:
-                memRelationEntities.map((e) => e.value.targetMemId).toList(),
-            onSubmit: onSubmit,
-          ),
-        );
-      },
-    );
-  }
-}
-
 class MemRelationListStateful extends StatefulWidget {
-  final Iterable<MemRelationEntity> memRelationEntities;
-  final Iterable<SavedMemEntityV2> memEntities;
-  final void Function(Function(List<int>) onSubmit) showDialog;
+  final int? sourceMemId;
 
   const MemRelationListStateful({
     super.key,
-    required this.memRelationEntities,
-    required this.memEntities,
-    required this.showDialog,
+    required this.sourceMemId,
   });
 
   @override
@@ -58,20 +22,63 @@ class MemRelationListStateful extends StatefulWidget {
 }
 
 class _MemRelationListStatefulState extends State<MemRelationListStateful> {
-  Iterable<int> targetMemIds = [];
+  // 未保存も含む選択されているMemのid
+  Iterable<int> selectedMemIds = [];
 
   @override
   Widget build(BuildContext context) {
+    return _MemRelationListConsumer(
+      sourceMemId: widget.sourceMemId,
+      selectedMemIds: selectedMemIds,
+      onSelectedMemIdsChanged: (selectedMemIds) {
+        setState(() {
+          this.selectedMemIds = selectedMemIds;
+        });
+      },
+    );
+  }
+}
+
+class _MemRelationListConsumer extends ConsumerWidget {
+  final int? sourceMemId;
+  final Iterable<int> selectedMemIds;
+  final void Function(Iterable<int>) onSelectedMemIdsChanged;
+
+  const _MemRelationListConsumer({
+    required this.sourceMemId,
+    required this.selectedMemIds,
+    required this.onSelectedMemIdsChanged,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final memRelationEntities =
+        ref.watch(memRelationEntitiesByMemIdProvider(sourceMemId));
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => onSelectedMemIdsChanged(
+        memRelationEntities.map((e) => e.value.targetMemId),
+      ),
+    );
+
+    final memEntities = ref.watch(memEntitiesProvider.select(
+      (v) => v.where((e) =>
+          memRelationEntities.map((e) => e.value.targetMemId).contains(e.id)),
+    ));
+
     return _MemRelationList(
-      memRelationEntities: widget.memRelationEntities,
-      memEntities: widget.memEntities,
+      memRelationEntities: memRelationEntities,
+      memEntities: memEntities,
       showDialog: () {
-        widget.showDialog(
-          (selectedIds) {
-            setState(() {
-              targetMemIds = selectedIds;
-            });
-          },
+        showDialog(
+          context: context,
+          builder: (context) => MemRelationDialogStateful(
+            sourceMemId: sourceMemId,
+            selectedIds:
+                memRelationEntities.map((e) => e.value.targetMemId).toList(),
+            onSubmit: (selectedIds) {
+              onSelectedMemIdsChanged(selectedIds);
+            },
+          ),
         );
       },
     );
