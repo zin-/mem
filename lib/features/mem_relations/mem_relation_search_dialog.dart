@@ -6,11 +6,13 @@ import 'package:mem/features/mems/mems_state.dart';
 class MemRelationDialogStateful extends StatefulWidget {
   final int? sourceMemId;
   final List<int> selectedIds;
+  final void Function(List<int>) onSubmit;
 
   const MemRelationDialogStateful({
     super.key,
     required this.sourceMemId,
     required this.selectedIds,
+    required this.onSubmit,
   });
 
   @override
@@ -32,6 +34,7 @@ class _MemRelationDialogStatefulState extends State<MemRelationDialogStateful> {
       selectedIds: selectedIds,
       onSelectedIdsChanged: (selectedIds) =>
           setState(() => this.selectedIds = selectedIds),
+      onSubmit: widget.onSubmit,
     );
   }
 }
@@ -42,6 +45,7 @@ class MemRelationDialogConsumer extends ConsumerWidget {
   final void Function(String) onSearchTextChanged;
   final List<int> selectedIds;
   final void Function(List<int>) onSelectedIdsChanged;
+  final void Function(List<int>) onSubmit;
 
   const MemRelationDialogConsumer({
     super.key,
@@ -50,6 +54,7 @@ class MemRelationDialogConsumer extends ConsumerWidget {
     required this.onSearchTextChanged,
     required this.selectedIds,
     required this.onSelectedIdsChanged,
+    required this.onSubmit,
   });
 
   @override
@@ -70,8 +75,7 @@ class MemRelationDialogConsumer extends ConsumerWidget {
       selectedIds: selectedIds,
       onSelectedIdsChanged: onSelectedIdsChanged,
       onAddPressed: () {
-        // TODO: リレーション追加の実装
-        Navigator.of(context).pop();
+        onSubmit(selectedIds);
       },
     );
   }
@@ -147,7 +151,10 @@ class MemRelationDialog extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton(
-                  onPressed: onAddPressed,
+                  onPressed: () {
+                    onAddPressed();
+                    Navigator.of(context).pop();
+                  },
                   child: const Text("追加"),
                 ),
               ],

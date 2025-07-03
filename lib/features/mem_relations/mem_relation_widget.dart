@@ -25,13 +25,14 @@ class MemRelationListConsumer extends ConsumerWidget {
     return MemRelationListStateful(
       memRelationEntities: memRelationEntities,
       memEntities: memEntities,
-      showDialog: () {
+      showDialog: (onSubmit) {
         showDialog(
           context: context,
           builder: (context) => MemRelationDialogStateful(
             sourceMemId: sourceMemId,
             selectedIds:
                 memRelationEntities.map((e) => e.value.targetMemId).toList(),
+            onSubmit: onSubmit,
           ),
         );
       },
@@ -42,7 +43,7 @@ class MemRelationListConsumer extends ConsumerWidget {
 class MemRelationListStateful extends StatefulWidget {
   final Iterable<MemRelationEntity> memRelationEntities;
   final Iterable<SavedMemEntityV2> memEntities;
-  final void Function() showDialog;
+  final void Function(Function(List<int>) onSubmit) showDialog;
 
   const MemRelationListStateful({
     super.key,
@@ -57,14 +58,22 @@ class MemRelationListStateful extends StatefulWidget {
 }
 
 class _MemRelationListStatefulState extends State<MemRelationListStateful> {
-  Iterable<SavedMemEntityV2> targetMems = [];
+  Iterable<int> targetMemIds = [];
 
   @override
   Widget build(BuildContext context) {
-    return MemRelationList(
+    return _MemRelationList(
       memRelationEntities: widget.memRelationEntities,
       memEntities: widget.memEntities,
-      showDialog: widget.showDialog,
+      showDialog: () {
+        widget.showDialog(
+          (selectedIds) {
+            setState(() {
+              targetMemIds = selectedIds;
+            });
+          },
+        );
+      },
     );
   }
 }
@@ -72,13 +81,12 @@ class _MemRelationListStatefulState extends State<MemRelationListStateful> {
 const itemHeight = 60.0;
 const maxHeight = itemHeight * 3;
 
-class MemRelationList extends StatelessWidget {
+class _MemRelationList extends StatelessWidget {
   final Iterable<MemRelationEntity> memRelationEntities;
   final Iterable<SavedMemEntityV2> memEntities;
   final void Function() showDialog;
 
-  const MemRelationList({
-    super.key,
+  const _MemRelationList({
     required this.memRelationEntities,
     required this.memEntities,
     required this.showDialog,
@@ -128,7 +136,7 @@ class MemRelationItem extends StatelessWidget {
     return Row(
       children: [
         Text(memEntity.value.name),
-        Text(memRelationEntity.toString()),
+        Text(memRelationEntity.value.type.toString()),
       ],
     );
   }
