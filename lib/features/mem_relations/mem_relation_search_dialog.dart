@@ -5,8 +5,13 @@ import 'package:mem/features/mems/mems_state.dart';
 
 class MemRelationDialogStateful extends StatefulWidget {
   final int? sourceMemId;
+  final List<int> selectedIds;
 
-  const MemRelationDialogStateful({super.key, this.sourceMemId});
+  const MemRelationDialogStateful({
+    super.key,
+    required this.sourceMemId,
+    required this.selectedIds,
+  });
 
   @override
   State<MemRelationDialogStateful> createState() =>
@@ -20,6 +25,7 @@ class _MemRelationDialogStatefulState extends State<MemRelationDialogStateful> {
   @override
   Widget build(BuildContext context) {
     return MemRelationDialogConsumer(
+      sourceMemId: widget.sourceMemId,
       searchText: searchText,
       onSearchTextChanged: (searchText) =>
           setState(() => this.searchText = searchText),
@@ -48,17 +54,19 @@ class MemRelationDialogConsumer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final memEntities = ref
-        .watch(memEntitiesProvider.select((v) => v.where((e) =>
-            searchText.isEmpty ||
-            e.value.name.contains(searchText) ||
-            selectedIds.contains(e.id))))
+    final candidates = ref
+        .watch(memEntitiesProvider.select((v) => v
+            .where((e) =>
+                searchText.isEmpty ||
+                e.value.name.contains(searchText) ||
+                selectedIds.contains(e.id))
+            .where((e) => e.id != sourceMemId)))
         .toList();
 
     return MemRelationDialog(
       searchText: searchText,
       onSearchTextChanged: onSearchTextChanged,
-      candidates: memEntities,
+      candidates: candidates,
       selectedIds: selectedIds,
       onSelectedIdsChanged: onSelectedIdsChanged,
       onAddPressed: () {

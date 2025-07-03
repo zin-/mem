@@ -25,7 +25,16 @@ class MemRelationListConsumer extends ConsumerWidget {
     return MemRelationListStateful(
       memRelationEntities: memRelationEntities,
       memEntities: memEntities,
-      sourceMemId: sourceMemId,
+      showDialog: () {
+        showDialog(
+          context: context,
+          builder: (context) => MemRelationDialogStateful(
+            sourceMemId: sourceMemId,
+            selectedIds:
+                memRelationEntities.map((e) => e.value.targetMemId).toList(),
+          ),
+        );
+      },
     );
   }
 }
@@ -33,13 +42,13 @@ class MemRelationListConsumer extends ConsumerWidget {
 class MemRelationListStateful extends StatefulWidget {
   final Iterable<MemRelationEntity> memRelationEntities;
   final Iterable<SavedMemEntityV2> memEntities;
-  final int? sourceMemId;
+  final void Function() showDialog;
 
   const MemRelationListStateful({
     super.key,
     required this.memRelationEntities,
     required this.memEntities,
-    this.sourceMemId,
+    required this.showDialog,
   });
 
   @override
@@ -55,7 +64,7 @@ class _MemRelationListStatefulState extends State<MemRelationListStateful> {
     return MemRelationList(
       memRelationEntities: widget.memRelationEntities,
       memEntities: widget.memEntities,
-      sourceMemId: widget.sourceMemId,
+      showDialog: widget.showDialog,
     );
   }
 }
@@ -66,13 +75,13 @@ const maxHeight = itemHeight * 3;
 class MemRelationList extends StatelessWidget {
   final Iterable<MemRelationEntity> memRelationEntities;
   final Iterable<SavedMemEntityV2> memEntities;
-  final int? sourceMemId;
+  final void Function() showDialog;
 
   const MemRelationList({
     super.key,
     required this.memRelationEntities,
     required this.memEntities,
-    this.sourceMemId,
+    required this.showDialog,
   });
 
   @override
@@ -95,14 +104,7 @@ class MemRelationList extends StatelessWidget {
           ),
         ),
         TextButton.icon(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) => MemRelationDialogStateful(
-                sourceMemId: sourceMemId,
-              ),
-            );
-          },
+          onPressed: showDialog,
           icon: const Icon(Icons.add),
           label: const Text("Add Relation"),
         ),
