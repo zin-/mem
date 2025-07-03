@@ -103,7 +103,7 @@ class _MemRelationList extends StatelessWidget {
             itemCount: memRelationEntities.length,
             itemBuilder: (context, index) {
               final memRelationEntity = memRelationEntities.elementAt(index);
-              return MemRelationItem(
+              return _MemRelationItem(
                 memRelationEntity: memRelationEntity,
                 memEntity: memEntities.singleWhere(
                     (e) => e.id == memRelationEntity.value.targetMemId),
@@ -121,12 +121,11 @@ class _MemRelationList extends StatelessWidget {
   }
 }
 
-class MemRelationItem extends StatelessWidget {
+class _MemRelationItem extends StatelessWidget {
   final MemRelationEntity memRelationEntity;
   final MemEntityV2 memEntity;
 
-  const MemRelationItem({
-    super.key,
+  const _MemRelationItem({
     required this.memRelationEntity,
     required this.memEntity,
   });
