@@ -89,6 +89,30 @@ class And extends Condition {
   String toString() => _conditions.map((e) => e.toString()).join(_operator);
 }
 
+class Or extends Condition {
+  static const _operator = ' OR ';
+
+  final Iterable<Condition> _conditions;
+
+  Or(this._conditions) : super();
+
+  @override
+  String? where() => _conditions.isEmpty
+      ? null
+      : _conditions.map((e) => '( ${e.where()} )').join(_operator);
+
+  @override
+  List<Object?>? whereArgs() => _conditions.isEmpty
+      ? null
+      : _conditions
+          .map((e) => e.whereArgs())
+          .expand((element) => element ?? [])
+          .toList();
+
+  @override
+  String toString() => _conditions.map((e) => e.toString()).join(_operator);
+}
+
 class GraterThanOrEqual extends Condition {
   final ColumnDefinition _columnDefinition;
   final Object? _value;
