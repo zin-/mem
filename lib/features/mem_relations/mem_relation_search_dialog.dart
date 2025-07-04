@@ -6,13 +6,13 @@ import 'package:mem/features/mems/mems_state.dart';
 
 class MemRelationDialogStateful extends StatefulWidget {
   final int? sourceMemId;
-  final List<int> selectedIds;
+  final List<int> selectedMemIds;
   final void Function(List<int>) onSubmit;
 
   const MemRelationDialogStateful({
     super.key,
     required this.sourceMemId,
-    required this.selectedIds,
+    required this.selectedMemIds,
     required this.onSubmit,
   });
 
@@ -23,7 +23,7 @@ class MemRelationDialogStateful extends StatefulWidget {
 
 class _MemRelationDialogStatefulState extends State<MemRelationDialogStateful> {
   String searchText = "";
-  List<int> selectedIds = [];
+  List<int> selectedMemIds = [];
 
   @override
   Widget build(BuildContext context) => v(
@@ -33,15 +33,15 @@ class _MemRelationDialogStatefulState extends State<MemRelationDialogStateful> {
             searchText: searchText,
             onSearchTextChanged: (searchText) =>
                 setState(() => this.searchText = searchText),
-            selectedIds: selectedIds,
-            onSelectedIdsChanged: (selectedIds) =>
-                setState(() => this.selectedIds = selectedIds),
+            selectedMemIds: selectedMemIds,
+            onSelectedIdsChanged: (selectedMemIds) =>
+                setState(() => this.selectedMemIds = selectedMemIds),
             onSubmit: widget.onSubmit,
           );
         },
         {
           "widget.sourceMemId": widget.sourceMemId,
-          "selectedIds": selectedIds,
+          "selectedMemIds": selectedMemIds,
         },
       );
 }
@@ -50,7 +50,7 @@ class MemRelationDialogConsumer extends ConsumerWidget {
   final int? sourceMemId;
   final String searchText;
   final void Function(String) onSearchTextChanged;
-  final List<int> selectedIds;
+  final List<int> selectedMemIds;
   final void Function(List<int>) onSelectedIdsChanged;
   final void Function(List<int>) onSubmit;
 
@@ -59,7 +59,7 @@ class MemRelationDialogConsumer extends ConsumerWidget {
     this.sourceMemId,
     required this.searchText,
     required this.onSearchTextChanged,
-    required this.selectedIds,
+    required this.selectedMemIds,
     required this.onSelectedIdsChanged,
     required this.onSubmit,
   });
@@ -72,7 +72,7 @@ class MemRelationDialogConsumer extends ConsumerWidget {
                   .where((e) =>
                       searchText.isEmpty ||
                       e.value.name.contains(searchText) ||
-                      selectedIds.contains(e.id))
+                      selectedMemIds.contains(e.id))
                   .where((e) => e.id != sourceMemId)))
               .toList();
 
@@ -80,17 +80,17 @@ class MemRelationDialogConsumer extends ConsumerWidget {
             searchText: searchText,
             onSearchTextChanged: onSearchTextChanged,
             candidates: candidates,
-            selectedIds: selectedIds,
+            selectedMemIds: selectedMemIds,
             onSelectedIdsChanged: onSelectedIdsChanged,
             onAddPressed: () {
-              onSubmit(selectedIds);
+              onSubmit(selectedMemIds);
             },
           );
         },
         {
           "sourceMemId": sourceMemId,
           "searchText": searchText,
-          "selectedIds": selectedIds,
+          "selectedMemIds": selectedMemIds,
         },
       );
 }
@@ -99,7 +99,7 @@ class MemRelationDialog extends StatelessWidget {
   final String searchText;
   final void Function(String) onSearchTextChanged;
   final List<SavedMemEntityV2> candidates;
-  final List<int> selectedIds;
+  final List<int> selectedMemIds;
   final void Function(List<int>) onSelectedIdsChanged;
   final void Function() onAddPressed;
 
@@ -108,7 +108,7 @@ class MemRelationDialog extends StatelessWidget {
     required this.searchText,
     required this.onSearchTextChanged,
     required this.candidates,
-    required this.selectedIds,
+    required this.selectedMemIds,
     required this.onSelectedIdsChanged,
     required this.onAddPressed,
   });
@@ -140,16 +140,16 @@ class MemRelationDialog extends StatelessWidget {
                       itemCount: candidates.length,
                       itemBuilder: (context, index) {
                         final mem = candidates[index];
-                        final isSelected = selectedIds.contains(mem.id);
+                        final isSelected = selectedMemIds.contains(mem.id);
 
                         return CheckboxListTile(
                           title: Text(mem.value.name),
                           value: isSelected,
                           onChanged: (checked) {
                             if (checked == true) {
-                              onSelectedIdsChanged([...selectedIds, mem.id]);
+                              onSelectedIdsChanged([...selectedMemIds, mem.id]);
                             } else {
-                              onSelectedIdsChanged(selectedIds
+                              onSelectedIdsChanged(selectedMemIds
                                   .where((id) => id != mem.id)
                                   .toList());
                             }
@@ -184,7 +184,7 @@ class MemRelationDialog extends StatelessWidget {
         {
           "searchText": searchText,
           "candidates": candidates,
-          "selectedIds": selectedIds,
+          "selectedMemIds": selectedMemIds,
         },
       );
 }
