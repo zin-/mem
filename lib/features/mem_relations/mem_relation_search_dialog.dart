@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mems_state.dart';
 
@@ -25,18 +26,24 @@ class _MemRelationDialogStatefulState extends State<MemRelationDialogStateful> {
   List<int> selectedIds = [];
 
   @override
-  Widget build(BuildContext context) {
-    return MemRelationDialogConsumer(
-      sourceMemId: widget.sourceMemId,
-      searchText: searchText,
-      onSearchTextChanged: (searchText) =>
-          setState(() => this.searchText = searchText),
-      selectedIds: selectedIds,
-      onSelectedIdsChanged: (selectedIds) =>
-          setState(() => this.selectedIds = selectedIds),
-      onSubmit: widget.onSubmit,
-    );
-  }
+  Widget build(BuildContext context) => v(
+        () {
+          return MemRelationDialogConsumer(
+            sourceMemId: widget.sourceMemId,
+            searchText: searchText,
+            onSearchTextChanged: (searchText) =>
+                setState(() => this.searchText = searchText),
+            selectedIds: selectedIds,
+            onSelectedIdsChanged: (selectedIds) =>
+                setState(() => this.selectedIds = selectedIds),
+            onSubmit: widget.onSubmit,
+          );
+        },
+        {
+          "widget.sourceMemId": widget.sourceMemId,
+          "selectedIds": selectedIds,
+        },
+      );
 }
 
 class MemRelationDialogConsumer extends ConsumerWidget {
@@ -58,27 +65,34 @@ class MemRelationDialogConsumer extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final candidates = ref
-        .watch(memEntitiesProvider.select((v) => v
-            .where((e) =>
-                searchText.isEmpty ||
-                e.value.name.contains(searchText) ||
-                selectedIds.contains(e.id))
-            .where((e) => e.id != sourceMemId)))
-        .toList();
+  Widget build(BuildContext context, WidgetRef ref) => v(
+        () {
+          final candidates = ref
+              .watch(memEntitiesProvider.select((v) => v
+                  .where((e) =>
+                      searchText.isEmpty ||
+                      e.value.name.contains(searchText) ||
+                      selectedIds.contains(e.id))
+                  .where((e) => e.id != sourceMemId)))
+              .toList();
 
-    return MemRelationDialog(
-      searchText: searchText,
-      onSearchTextChanged: onSearchTextChanged,
-      candidates: candidates,
-      selectedIds: selectedIds,
-      onSelectedIdsChanged: onSelectedIdsChanged,
-      onAddPressed: () {
-        onSubmit(selectedIds);
-      },
-    );
-  }
+          return MemRelationDialog(
+            searchText: searchText,
+            onSearchTextChanged: onSearchTextChanged,
+            candidates: candidates,
+            selectedIds: selectedIds,
+            onSelectedIdsChanged: onSelectedIdsChanged,
+            onAddPressed: () {
+              onSubmit(selectedIds);
+            },
+          );
+        },
+        {
+          "sourceMemId": sourceMemId,
+          "searchText": searchText,
+          "selectedIds": selectedIds,
+        },
+      );
 }
 
 class MemRelationDialog extends StatelessWidget {
@@ -100,68 +114,77 @@ class MemRelationDialog extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      child: Container(
-        width: 400,
-        height: 500,
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            const Text("Add Relation",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            TextField(
-              decoration: const InputDecoration(
-                hintText: "memを検索...",
-                prefixIcon: Icon(Icons.search),
-              ),
-              onChanged: onSearchTextChanged,
-            ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: ListView.builder(
-                itemCount: candidates.length,
-                itemBuilder: (context, index) {
-                  final mem = candidates[index];
-                  final isSelected = selectedIds.contains(mem.id);
+  Widget build(BuildContext context) => v(
+        () {
+          return Dialog(
+            child: Container(
+              width: 400,
+              height: 500,
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  const Text("Add Relation",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 16),
+                  TextField(
+                    decoration: const InputDecoration(
+                      hintText: "memを検索...",
+                      prefixIcon: Icon(Icons.search),
+                    ),
+                    onChanged: onSearchTextChanged,
+                  ),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: candidates.length,
+                      itemBuilder: (context, index) {
+                        final mem = candidates[index];
+                        final isSelected = selectedIds.contains(mem.id);
 
-                  return CheckboxListTile(
-                    title: Text(mem.value.name),
-                    value: isSelected,
-                    onChanged: (checked) {
-                      if (checked == true) {
-                        onSelectedIdsChanged([...selectedIds, mem.id]);
-                      } else {
-                        onSelectedIdsChanged(
-                            selectedIds.where((id) => id != mem.id).toList());
-                      }
-                    },
-                  );
-                },
+                        return CheckboxListTile(
+                          title: Text(mem.value.name),
+                          value: isSelected,
+                          onChanged: (checked) {
+                            if (checked == true) {
+                              onSelectedIdsChanged([...selectedIds, mem.id]);
+                            } else {
+                              onSelectedIdsChanged(selectedIds
+                                  .where((id) => id != mem.id)
+                                  .toList());
+                            }
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text("キャンセル"),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () {
+                          onAddPressed();
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text("追加"),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text("キャンセル"),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () {
-                    onAddPressed();
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text("追加"),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+          );
+        },
+        {
+          "searchText": searchText,
+          "candidates": candidates,
+          "selectedIds": selectedIds,
+        },
+      );
 }

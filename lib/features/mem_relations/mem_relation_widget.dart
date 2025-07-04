@@ -1,7 +1,9 @@
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation_search_dialog.dart';
 import 'package:mem/features/mem_relations/mem_relation_state.dart';
@@ -26,17 +28,28 @@ class _MemRelationListStatefulState extends State<MemRelationListStateful> {
   Iterable<int> selectedMemIds = [];
 
   @override
-  Widget build(BuildContext context) {
-    return _MemRelationListConsumer(
-      sourceMemId: widget.sourceMemId,
-      selectedMemIds: selectedMemIds,
-      onSelectedMemIdsChanged: (selectedMemIds) {
-        setState(() {
-          this.selectedMemIds = selectedMemIds;
-        });
-      },
-    );
-  }
+  Widget build(BuildContext context) => v(
+        () {
+          return _MemRelationListConsumer(
+            sourceMemId: widget.sourceMemId,
+            selectedMemIds: selectedMemIds,
+            onSelectedMemIdsChanged: (selectedMemIds) => v(
+              () {
+                if (SetEquality().equals(
+                    this.selectedMemIds.toSet(), selectedMemIds.toSet())) {
+                  return;
+                }
+                setState(() => this.selectedMemIds = selectedMemIds);
+              },
+              {"selectedMemIds": selectedMemIds},
+            ),
+          );
+        },
+        {
+          "widget.sourceMemId": widget.sourceMemId,
+          "selectedMemIds": selectedMemIds,
+        },
+      );
 }
 
 class _MemRelationListConsumer extends ConsumerWidget {
@@ -51,38 +64,46 @@ class _MemRelationListConsumer extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final memRelationEntities =
-        ref.watch(memRelationEntitiesByMemIdProvider(sourceMemId));
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => onSelectedMemIdsChanged(
-        memRelationEntities.map((e) => e.value.targetMemId),
-      ),
-    );
+  Widget build(BuildContext context, WidgetRef ref) => v(
+        () {
+          final memRelationEntities =
+              ref.watch(memRelationEntitiesByMemIdProvider(sourceMemId));
+          WidgetsBinding.instance.addPostFrameCallback(
+            (_) => onSelectedMemIdsChanged(
+              memRelationEntities.map((e) => e.value.targetMemId),
+            ),
+          );
 
-    final memEntities = ref.watch(memEntitiesProvider.select(
-      (v) => v.where((e) =>
-          memRelationEntities.map((e) => e.value.targetMemId).contains(e.id)),
-    ));
+          final memEntities = ref.watch(memEntitiesProvider.select(
+            (v) => v.where((e) => memRelationEntities
+                .map((e) => e.value.targetMemId)
+                .contains(e.id)),
+          ));
 
-    return _MemRelationList(
-      memRelationEntities: memRelationEntities,
-      memEntities: memEntities,
-      showDialog: () {
-        showDialog(
-          context: context,
-          builder: (context) => MemRelationDialogStateful(
-            sourceMemId: sourceMemId,
-            selectedIds:
-                memRelationEntities.map((e) => e.value.targetMemId).toList(),
-            onSubmit: (selectedIds) {
-              onSelectedMemIdsChanged(selectedIds);
-            },
-          ),
-        );
-      },
-    );
-  }
+          return _MemRelationList(
+            memRelationEntities: memRelationEntities,
+            memEntities: memEntities,
+            showDialog: v(
+              () => () => showDialog(
+                    context: context,
+                    builder: (context) => MemRelationDialogStateful(
+                      sourceMemId: sourceMemId,
+                      selectedIds: memRelationEntities
+                          .map((e) => e.value.targetMemId)
+                          .toList(),
+                      onSubmit: (selectedIds) {
+                        onSelectedMemIdsChanged(selectedIds);
+                      },
+                    ),
+                  ),
+            ),
+          );
+        },
+        {
+          "sourceMemId": sourceMemId,
+          "selectedMemIds": selectedMemIds,
+        },
+      );
 }
 
 const itemHeight = 60.0;
@@ -100,32 +121,39 @@ class _MemRelationList extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text("Relations"),
-        SizedBox(
-          height: min(memRelationEntities.length * itemHeight, maxHeight),
-          child: ListView.builder(
-            itemCount: memRelationEntities.length,
-            itemBuilder: (context, index) {
-              final memRelationEntity = memRelationEntities.elementAt(index);
-              return _MemRelationItem(
-                memRelationEntity: memRelationEntity,
-                memEntity: memEntities.singleWhere(
-                    (e) => e.id == memRelationEntity.value.targetMemId),
-              );
-            },
-          ),
-        ),
-        TextButton.icon(
-          onPressed: showDialog,
-          icon: const Icon(Icons.add),
-          label: const Text("Add Relation"),
-        ),
-      ],
-    );
-  }
+  Widget build(BuildContext context) => v(
+        () {
+          return Column(
+            children: [
+              Text("Relations"),
+              SizedBox(
+                height: min(memRelationEntities.length * itemHeight, maxHeight),
+                child: ListView.builder(
+                  itemCount: memRelationEntities.length,
+                  itemBuilder: (context, index) {
+                    final memRelationEntity =
+                        memRelationEntities.elementAt(index);
+                    return _MemRelationItem(
+                      memRelationEntity: memRelationEntity,
+                      memEntity: memEntities.singleWhere(
+                          (e) => e.id == memRelationEntity.value.targetMemId),
+                    );
+                  },
+                ),
+              ),
+              TextButton.icon(
+                onPressed: showDialog,
+                icon: const Icon(Icons.add),
+                label: const Text("Add Relation"),
+              ),
+            ],
+          );
+        },
+        {
+          "memRelationEntities": memRelationEntities,
+          "memEntities": memEntities,
+        },
+      );
 }
 
 class _MemRelationItem extends StatelessWidget {
@@ -138,12 +166,18 @@ class _MemRelationItem extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text(memEntity.value.name),
-        Text(memRelationEntity.value.type.toString()),
-      ],
-    );
-  }
+  Widget build(BuildContext context) => v(
+        () {
+          return Row(
+            children: [
+              Text(memEntity.value.name),
+              Text(memRelationEntity.value.type.toString()),
+            ],
+          );
+        },
+        {
+          "memRelationEntity": memRelationEntity,
+          "memEntity": memEntity,
+        },
+      );
 }
