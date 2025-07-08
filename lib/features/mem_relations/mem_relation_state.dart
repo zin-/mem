@@ -37,4 +37,19 @@ class MemRelationEntitiesByMemId extends _$MemRelationEntitiesByMemId {
         },
         {'memId': memId},
       );
+
+  Future<Iterable<MemRelationEntity>> upsert(
+          Iterable<MemRelationEntity> entities) async =>
+      v(
+        () async {
+          state = [
+            ...state.where((e) => !entities.any((newEntity) =>
+                newEntity.value.sourceMemId == e.value.sourceMemId &&
+                newEntity.value.targetMemId == e.value.targetMemId)),
+            ...entities,
+          ];
+          return state;
+        },
+        {'entities': entities},
+      );
 }
