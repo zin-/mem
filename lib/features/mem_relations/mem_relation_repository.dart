@@ -4,6 +4,8 @@ import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/framework/repository/group_by.dart';
+import 'package:mem/framework/repository/order_by.dart';
 
 class MemRelationRepository extends DatabaseTupleRepositoryV2<MemRelationEntity,
     SavedMemRelationEntity> {
@@ -12,6 +14,26 @@ class MemRelationRepository extends DatabaseTupleRepositoryV2<MemRelationEntity,
   @override
   SavedMemRelationEntity pack(Map<String, dynamic> map) =>
       SavedMemRelationEntity(map);
+
+  @override
+  Future<List<SavedMemRelationEntity>> ship({
+    int? sourceMemId,
+    Condition? condition,
+    GroupBy? groupBy,
+    List<OrderBy>? orderBy,
+    int? offset,
+    int? limit,
+  }) =>
+      v(
+        () async => await super.ship(
+          condition: And([
+            if (sourceMemId != null)
+              Equals(defFkMemRelationsSourceMemId, sourceMemId),
+            if (condition != null) condition,
+          ]),
+        ),
+        {'sourceMemId': sourceMemId},
+      );
 
   Future<Iterable<SavedMemRelationEntity>> archiveBy({
     int? sourceMemId,

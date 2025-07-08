@@ -156,16 +156,6 @@ void main() => group(': $_scenarioName', () {
         });
 
         testWidgets("Show existing relations.", (widgetTester) async {
-          await dbA.insert(
-            defTableMemRelations,
-            {
-              defFkMemRelationsSourceMemId.name: sourceMemId,
-              defFkMemRelationsTargetMemId.name: targetMemId,
-              defColMemRelationsType.name: MemRelationType.prePost.name,
-              defColCreatedAt.name: zeroDate,
-            },
-          );
-
           await runApplication();
           await widgetTester.pumpAndSettle();
           await widgetTester.tap(find.text(sourceMemName));

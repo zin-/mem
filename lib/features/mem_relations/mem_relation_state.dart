@@ -1,5 +1,6 @@
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
+import 'package:mem/features/mem_relations/mem_relation_repository.dart';
 import 'package:mem/shared/entities_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -21,8 +22,18 @@ class MemRelationEntitiesByMemId extends _$MemRelationEntitiesByMemId {
             return [];
           }
 
-          return ref.read(memRelationEntitiesProvider
+          return ref.watch(memRelationEntitiesProvider
               .select((v) => v.where((e) => e.value.sourceMemId == memId)));
+        },
+        {'memId': memId},
+      );
+
+  Future<void> fetch(int memId) async => v(
+        () async {
+          final entities =
+              await MemRelationRepository().ship(sourceMemId: memId);
+
+          ref.watch(memRelationEntitiesProvider.notifier).upsert(entities);
         },
         {'memId': memId},
       );

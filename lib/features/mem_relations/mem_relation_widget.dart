@@ -68,6 +68,11 @@ class _MemRelationListConsumer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
+          if (sourceMemId != null) {
+            ref
+                .watch(memRelationEntitiesByMemIdProvider(sourceMemId).notifier)
+                .fetch(sourceMemId!);
+          }
           final memRelationEntities =
               ref.watch(memRelationEntitiesByMemIdProvider(sourceMemId));
           WidgetsBinding.instance.addPostFrameCallback(
