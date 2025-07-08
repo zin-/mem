@@ -95,6 +95,9 @@ class MemRelationDialogConsumer extends ConsumerWidget {
       );
 }
 
+const searchMemRelationDialogSearchFieldKey =
+    Key("search_mem_relation_dialog_search_field");
+
 class MemRelationDialog extends StatelessWidget {
   final String searchText;
   final void Function(String) onSearchTextChanged;
@@ -128,6 +131,7 @@ class MemRelationDialog extends StatelessWidget {
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 16),
                   TextField(
+                    key: searchMemRelationDialogSearchFieldKey,
                     decoration: const InputDecoration(
                       hintText: "memを検索...",
                       prefixIcon: Icon(Icons.search),
