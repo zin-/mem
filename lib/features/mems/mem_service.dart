@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:mem/features/mem_relations/mem_relation.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/targets/target_repository.dart';
@@ -125,21 +126,25 @@ class MemService {
           final memRelations = memDetail.memRelations;
           final returnMemRelations =
               List<SavedMemRelationEntity?>.empty(growable: true);
-          if (memRelations == null) {
-            await _memRelationRepository.waste(
-              condition: Or([
-                Equals(defFkMemRelationsSourceMemId, savedMem.id),
-                Equals(defFkMemRelationsTargetMemId, savedMem.id),
-              ]),
-            );
-          } else {
-            returnMemRelations.addAll(await Future.wait(memRelations.map((e) {
-              if (e is SavedMemRelationEntity && !undo) {
-                return _memRelationRepository.replace(e);
-              } else {
-                return _memRelationRepository.receive(e);
-              }
-            })));
+          if (memRelations != null) {
+            if (memRelations.isEmpty) {
+              await _memRelationRepository.waste(
+                condition: Equals(defFkMemRelationsSourceMemId, savedMem.id),
+              );
+            } else {
+              returnMemRelations.addAll(await Future.wait(memRelations
+                  .map((e) => e.updatedWith(
+                        (v) =>
+                            MemRelation.by(savedMem.id, v.targetMemId, v.type),
+                      ))
+                  .map((e) {
+                if (e is SavedMemRelationEntity && !undo) {
+                  return _memRelationRepository.replace(e);
+                } else {
+                  return _memRelationRepository.receive(e);
+                }
+              })));
+            }
           }
 
           return MemDetail(
