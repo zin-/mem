@@ -22,7 +22,7 @@ class MemRelationList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
           return ref
-              .watch(memRelationEntitiesByMemIdV2Provider(sourceMemId))
+              .watch(memRelationEntitiesByMemIdProvider(sourceMemId))
               .when(
             data: (entities) {
               final selectedMemIds = entities.map((e) => e.value.targetMemId);
@@ -41,7 +41,7 @@ class MemRelationList extends ConsumerWidget {
                               selectedMemEntities.map((e) => e.id).toList(),
                           onSubmit: (selectedIds) {
                             ref
-                                .watch(memRelationEntitiesByMemIdV2Provider(
+                                .watch(memRelationEntitiesByMemIdProvider(
                                         sourceMemId)
                                     .notifier)
                                 .upsert(selectedIds
