@@ -14,6 +14,34 @@ class MemRelationEntities extends _$MemRelationEntities
 }
 
 @riverpod
+class MemRelationEntitiesByMemIdV2 extends _$MemRelationEntitiesByMemIdV2 {
+  @override
+  Future<Iterable<MemRelationEntity>> build(int? memId) => v(
+        () async {
+          if (memId == null) {
+            return [];
+          }
+
+          final entities =
+              await MemRelationRepository().ship(sourceMemId: memId);
+
+          return entities;
+        },
+        {'memId': memId},
+      );
+
+  Future<Iterable<MemRelationEntity>> upsert(
+          Iterable<MemRelationEntity> entities) async =>
+      v(
+        () async {
+          state = AsyncValue.data([...state.valueOrNull ?? [], ...entities]);
+          return state.valueOrNull ?? [];
+        },
+        {'entities': entities},
+      );
+}
+
+@riverpod
 class MemRelationEntitiesByMemId extends _$MemRelationEntitiesByMemId {
   @override
   Iterable<MemRelationEntity> build(int? memId) => v(
