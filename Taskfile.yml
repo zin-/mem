@@ -22,6 +22,14 @@ tasks:
       - task: flutter:gen
     silent: false
 
+  watch:
+    desc: "コード生成を実行のため、ソースコードを監視します。"
+    cmds:
+      - task: flutter:gen
+        vars:
+          MODE: watch
+    silent: false
+
   init:
     desc: "初期化を実行します。"
     cmds:
