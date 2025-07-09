@@ -17,7 +17,7 @@ final saveMem =
                   ref.read(memItemsByMemIdProvider(memId)),
                   ref.read(memNotificationsByMemIdProvider(memId)),
                   ref.read(targetStateProvider(memId)).value,
-                  ref.read(memRelationEntitiesByMemIdProvider(memId)),
+                  ref.read(memRelationEntitiesByMemIdV2Provider(memId)).value,
                 );
 
             if (memId == null) {
