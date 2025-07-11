@@ -36,25 +36,24 @@ class MemRelationRepository extends DatabaseTupleRepositoryV2<MemRelationEntity,
       );
 
   Future<Iterable<SavedMemRelationEntity>> archiveBy({
-    int? sourceMemId,
-    int? targetMemId,
+    int? relatedMemId,
     Condition? condition,
     DateTime? archivedAt,
   }) =>
       v(
         () async => await ship(
           condition: And([
-            if (sourceMemId != null)
-              Equals(defFkMemRelationsSourceMemId, sourceMemId),
-            if (targetMemId != null)
-              Equals(defFkMemRelationsTargetMemId, targetMemId),
+            if (relatedMemId != null)
+              Or([
+                Equals(defFkMemRelationsSourceMemId, relatedMemId),
+                Equals(defFkMemRelationsTargetMemId, relatedMemId),
+              ]),
             if (condition != null) condition,
           ]),
         ).then((v) =>
             Future.wait(v.map((e) => archive(e, archivedAt: archivedAt)))),
         {
-          'sourceMemId': sourceMemId,
-          'targetMemId': targetMemId,
+          'relatedMemId': relatedMemId,
           'condition': condition,
           'archivedAt': archivedAt,
         },

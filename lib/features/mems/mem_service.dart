@@ -213,10 +213,7 @@ class MemService {
           final archivedMemNotifications =
               await _memNotificationRepository.archiveBy(memId: archivedMem.id);
           final archivedMemRelations = await _memRelationRepository.archiveBy(
-            condition: Or([
-              Equals(defFkMemRelationsSourceMemId, archivedMem.id),
-              Equals(defFkMemRelationsTargetMemId, archivedMem.id),
-            ]),
+            relatedMemId: archivedMem.id,
           );
 
           return MemDetail(
