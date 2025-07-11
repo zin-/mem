@@ -9,6 +9,8 @@ import 'package:mem/features/logger/log_service.dart';
 // - エラーメッセージのローカライズ対応
 // - 最小値・最大値のバリデーション追加
 // - エラーメッセージのカスタマイズ機能追加
+const keyTimeTextFormField = Key("time_text_form_field");
+
 class TimeTextFormField extends StatelessWidget {
   final int? secondsOfTime;
   final void Function(int? pickedSecondsOfTime) _onChanged;
@@ -23,6 +25,7 @@ class TimeTextFormField extends StatelessWidget {
   Widget build(BuildContext context) => v(
         () {
           return TextFormField(
+            key: keyTimeTextFormField,
             controller: TextEditingController(
               text: formatSecondsOfTime(secondsOfTime),
             ),

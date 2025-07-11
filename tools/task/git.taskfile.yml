@@ -11,6 +11,8 @@ tasks:
         echo "Hook dir: $HOOK_DIR"
         echo "Script dir: $SCRIPT_DIR"
         mkdir -p "$HOOK_DIR"
+
+        # pre-push hook
         echo "Setting up pre-push hook..."
         if [ -f "$SCRIPT_DIR/pre-push.sh" ]; then
           ln -sf "../../tools/git-hooks/pre-push.sh" "$HOOK_DIR/pre-push"
@@ -20,6 +22,17 @@ tasks:
         else
           echo "Error: tools/git-hooks/pre-push.sh not found."
           exit 1
+        fi
+
+        # pre-commit hook
+        echo "Setting up pre-commit hook..."
+        if [ -f "$SCRIPT_DIR/pre-commit.sh" ]; then
+          ln -sf "../../tools/git-hooks/pre-commit.sh" "$HOOK_DIR/pre-commit"
+          chmod +x "$HOOK_DIR/pre-commit"
+          chmod +x "$SCRIPT_DIR/pre-commit.sh"
+          echo "Pre-commit hook set up."
+        else
+          echo "Warning: tools/git-hooks/pre-commit.sh not found. Skipping."
         fi
     silent: false
     # Windows ユーザー向けに、シンボリックリンクが使えない場合の代替コピーコマンドも考慮するとより親切ですが、

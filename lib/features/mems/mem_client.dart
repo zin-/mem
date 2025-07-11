@@ -3,6 +3,7 @@ import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/framework/notifications/notification_client.dart';
+import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 
 import 'mem_detail.dart';
 import 'mem_entity.dart';
@@ -17,6 +18,7 @@ class MemClient {
     List<MemItemEntityV2> memItemList,
     List<MemNotificationEntityV2> memNotificationList,
     TargetEntity? target,
+    List<MemRelationEntity>? memRelations,
   ) =>
       v(
         () async {
@@ -26,6 +28,7 @@ class MemClient {
               memItemList,
               memNotificationList,
               target,
+              memRelations,
             ),
           );
 
@@ -43,6 +46,7 @@ class MemClient {
           "memItemList": memItemList,
           "memNotificationList": memNotificationList,
           "target": target,
+          "memRelations": memRelations,
         },
       );
 
