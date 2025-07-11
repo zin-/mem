@@ -12,12 +12,14 @@ class MemRelationEntity with EntityV2<MemRelation> {
     int? sourceMemId,
     int targetMemId,
     MemRelationType type,
+    int value,
   ) =>
       MemRelationEntity(
         MemRelation.by(
           sourceMemId ?? 0,
           targetMemId,
           type,
+          value,
         ),
       );
 
@@ -26,6 +28,7 @@ class MemRelationEntity with EntityV2<MemRelation> {
         defFkMemRelationsSourceMemId.name: value.sourceMemId,
         defFkMemRelationsTargetMemId.name: value.targetMemId,
         defColMemRelationsType.name: value.type.name,
+        defColMemRelationsValue.name: value.value,
       };
 
   @override
@@ -41,6 +44,7 @@ class SavedMemRelationEntity extends MemRelationEntity
             map[defFkMemRelationsSourceMemId.name],
             map[defFkMemRelationsTargetMemId.name],
             MemRelationType.values.byName(map[defColMemRelationsType.name]),
+            map[defColMemRelationsValue.name],
           ),
         ) {
     withMap(map);

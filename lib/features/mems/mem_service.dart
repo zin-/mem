@@ -133,10 +133,12 @@ class MemService {
               );
             } else {
               returnMemRelations.addAll(await Future.wait(memRelations
-                  .map((e) => e.updatedWith(
-                        (v) =>
-                            MemRelation.by(savedMem.id, v.targetMemId, v.type),
-                      ))
+                  .map((e) => e.updatedWith((v) => MemRelation.by(
+                        savedMem.id,
+                        v.targetMemId,
+                        v.type,
+                        v.value,
+                      )))
                   .map((e) {
                 if (e is SavedMemRelationEntity && !undo) {
                   return _memRelationRepository.replace(e);
