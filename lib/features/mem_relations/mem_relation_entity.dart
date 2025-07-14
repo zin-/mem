@@ -44,7 +44,7 @@ class SavedMemRelationEntity extends MemRelationEntity
             map[defFkMemRelationsSourceMemId.name],
             map[defFkMemRelationsTargetMemId.name],
             MemRelationType.values.byName(map[defColMemRelationsType.name]),
-            map[defColMemRelationsValue.name],
+            map[defColMemRelationsValue.name] ?? 0,
           ),
         ) {
     withMap(map);
