@@ -25,6 +25,8 @@ class MemRelationEntitiesByMemId extends _$MemRelationEntitiesByMemId {
           final entities =
               await MemRelationRepository().ship(sourceMemId: memId);
 
+          ref.watch(memRelationEntitiesProvider.notifier).upsert(entities);
+
           return entities;
         },
         {'memId': memId},

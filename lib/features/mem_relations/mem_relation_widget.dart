@@ -29,9 +29,13 @@ class MemRelationList extends ConsumerWidget {
               final selectedMemEntities = ref.watch(memEntitiesProvider.select(
                 (v) => v.where((e) => selectedMemIds.contains(e.id)),
               ));
+              final memRelationEntities = ref.watch(
+                  memRelationEntitiesProvider.select((v) =>
+                      v.where((e) => e.value.sourceMemId == sourceMemId)));
 
               return _MemRelationList(
                 selectedMemEntities: selectedMemEntities,
+                memRelationEntities: memRelationEntities,
                 showDialog: v(
                   () => () => showDialog(
                         context: context,
@@ -77,10 +81,12 @@ const maxHeight = itemHeight * 3;
 
 class _MemRelationList extends StatelessWidget {
   final Iterable<SavedMemEntityV2> selectedMemEntities;
+  final Iterable<SavedMemRelationEntity> memRelationEntities;
   final void Function() showDialog;
 
   const _MemRelationList({
     required this.selectedMemEntities,
+    required this.memRelationEntities,
     required this.showDialog,
   });
 
@@ -96,8 +102,13 @@ class _MemRelationList extends StatelessWidget {
                   itemCount: selectedMemEntities.length,
                   itemBuilder: (context, index) {
                     final memEntity = selectedMemEntities.elementAt(index);
+                    final memRelationEntity = memRelationEntities.firstWhere(
+                      (e) => e.value.targetMemId == memEntity.id,
+                    );
+
                     return _MemRelationItem(
                       memEntity: memEntity,
+                      memRelationEntity: memRelationEntity,
                     );
                   },
                 ),
@@ -112,15 +123,18 @@ class _MemRelationList extends StatelessWidget {
         },
         {
           "selectedMemEntities": selectedMemEntities,
+          "memRelationEntities": memRelationEntities,
         },
       );
 }
 
 class _MemRelationItem extends StatelessWidget {
   final MemEntityV2 memEntity;
+  final SavedMemRelationEntity memRelationEntity;
 
   const _MemRelationItem({
     required this.memEntity,
+    required this.memRelationEntity,
   });
 
   @override
@@ -128,10 +142,13 @@ class _MemRelationItem extends StatelessWidget {
         () {
           return ListTile(
             title: Text(memEntity.value.name),
+            subtitle: Text(memRelationEntity.value.type.name),
+            trailing: Text(memRelationEntity.value.value.toString()),
           );
         },
         {
           "memEntity": memEntity,
+          "memRelationEntity": memRelationEntity,
         },
       );
 }
