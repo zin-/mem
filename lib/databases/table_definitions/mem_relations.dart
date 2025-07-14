@@ -10,7 +10,8 @@ final defFkMemRelationsSourceMemId =
 final defFkMemRelationsTargetMemId =
     ForeignKeyDefinition(defTableMems, prefix: "target");
 final defColMemRelationsType = TextColumnDefinition('type');
-final defColMemRelationsValue = IntegerColumnDefinition('value');
+final defColMemRelationsValue =
+    IntegerColumnDefinition('value', notNull: false);
 
 final defTableMemRelations = TableDefinition(
   "mem_relations",

@@ -22,6 +22,8 @@ abstract class MemRelation {
 }
 
 class PrePostMemRelation extends MemRelation {
+  int get minutes => value;
+
   PrePostMemRelation(int sourceMemId, int targetMemId, int value)
       : super(sourceMemId, targetMemId, MemRelationType.prePost, value);
 }

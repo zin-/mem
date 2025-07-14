@@ -8,7 +8,7 @@ import 'package:mem/framework/database/definition/database_definition.dart';
 
 final databaseDefinition = DatabaseDefinition(
   'mem.db',
-  11,
+  12,
   [
     defTableMems,
     defTableMemItems,
