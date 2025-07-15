@@ -9,6 +9,7 @@ import 'package:mem/features/mem_relations/mem_relation_search_dialog.dart';
 import 'package:mem/features/mem_relations/mem_relation_state.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mems_state.dart';
+import 'package:mem/framework/date_and_time/time_text_form_field.dart';
 
 class MemRelationList extends ConsumerWidget {
   final int? sourceMemId;
@@ -29,13 +30,22 @@ class MemRelationList extends ConsumerWidget {
               final selectedMemEntities = ref.watch(memEntitiesProvider.select(
                 (v) => v.where((e) => selectedMemIds.contains(e.id)),
               ));
-              final memRelationEntities = ref.watch(
-                  memRelationEntitiesProvider.select((v) =>
-                      v.where((e) => e.value.sourceMemId == sourceMemId)));
+
+              void onChanged(int targetMemId, int value) => ref
+                      .watch(memRelationEntitiesByMemIdProvider(sourceMemId)
+                          .notifier)
+                      .upsert([
+                    MemRelationEntity.by(
+                      sourceMemId,
+                      targetMemId,
+                      MemRelationType.prePost,
+                      value,
+                    )
+                  ]);
 
               return _MemRelationList(
                 selectedMemEntities: selectedMemEntities,
-                memRelationEntities: memRelationEntities,
+                memRelationEntities: entities,
                 showDialog: v(
                   () => () => showDialog(
                         context: context,
@@ -44,22 +54,14 @@ class MemRelationList extends ConsumerWidget {
                           selectedMemIds:
                               selectedMemEntities.map((e) => e.id).toList(),
                           onSubmit: (selectedIds) {
-                            ref
-                                .watch(memRelationEntitiesByMemIdProvider(
-                                        sourceMemId)
-                                    .notifier)
-                                .upsert(selectedIds
-                                    .map((selectedId) => MemRelationEntity.by(
-                                          sourceMemId,
-                                          selectedId,
-                                          MemRelationType.prePost,
-                                          // TODO
-                                          Random().nextInt(100),
-                                        )));
+                            for (var selectedId in selectedIds) {
+                              onChanged(selectedId, 0);
+                            }
                           },
                         ),
                       ),
                 ),
+                onChanged: onChanged,
               );
             },
             loading: () {
@@ -81,13 +83,15 @@ const maxHeight = itemHeight * 3;
 
 class _MemRelationList extends StatelessWidget {
   final Iterable<SavedMemEntityV2> selectedMemEntities;
-  final Iterable<SavedMemRelationEntity> memRelationEntities;
+  final Iterable<MemRelationEntity> memRelationEntities;
   final void Function() showDialog;
+  final void Function(int targetMemId, int value) onChanged;
 
   const _MemRelationList({
     required this.selectedMemEntities,
     required this.memRelationEntities,
     required this.showDialog,
+    required this.onChanged,
   });
 
   @override
@@ -102,13 +106,15 @@ class _MemRelationList extends StatelessWidget {
                   itemCount: selectedMemEntities.length,
                   itemBuilder: (context, index) {
                     final memEntity = selectedMemEntities.elementAt(index);
-                    final memRelationEntity = memRelationEntities.firstWhere(
-                      (e) => e.value.targetMemId == memEntity.id,
-                    );
 
                     return _MemRelationItem(
                       memEntity: memEntity,
-                      memRelationEntity: memRelationEntity,
+                      value: memRelationEntities
+                          .firstWhere(
+                              (e) => e.value.targetMemId == memEntity.id)
+                          .value
+                          .value,
+                      onChanged: (value) => onChanged(memEntity.id, value ?? 0),
                     );
                   },
                 ),
@@ -130,11 +136,13 @@ class _MemRelationList extends StatelessWidget {
 
 class _MemRelationItem extends StatelessWidget {
   final MemEntityV2 memEntity;
-  final SavedMemRelationEntity memRelationEntity;
+  final int? value;
+  final void Function(int? value) onChanged;
 
   const _MemRelationItem({
     required this.memEntity,
-    required this.memRelationEntity,
+    required this.value,
+    required this.onChanged,
   });
 
   @override
@@ -142,13 +150,20 @@ class _MemRelationItem extends StatelessWidget {
         () {
           return ListTile(
             title: Text(memEntity.value.name),
-            subtitle: Text(memRelationEntity.value.type.name),
-            trailing: Text(memRelationEntity.value.value.toString()),
+            trailing: SizedBox(
+              // FIXME 固定にすると画面サイズに依存してしまう
+              width: 120,
+              child: TimeTextFormField(
+                value,
+                onChanged,
+              ),
+            ),
+            // trailing: Text(memRelationEntity.value.value.toString()),
           );
         },
         {
           "memEntity": memEntity,
-          "memRelationEntity": memRelationEntity,
+          "value": value,
         },
       );
 }
