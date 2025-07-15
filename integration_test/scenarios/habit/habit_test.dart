@@ -12,6 +12,7 @@ import 'repeat_by_n_day_habit_scenario.dart' as repeat_by_n_day_habit_scenario;
 import 'act_list_page_scenario.dart' as act_list_page_scenario;
 import 'act_line_chart_page_scenario.dart' as act_line_chart_page_scenario;
 import 'mem_list_page_scenario.dart' as mem_list_page_scenario;
+import 'mem_relations_scenarios.dart' as mem_relations_scenarios;
 
 const _name = "Habit scenario";
 
@@ -36,5 +37,6 @@ void main() => group(
           repeat_by_day_of_week_scenario.main();
         }
         repeated_habit_scenario.main();
+        mem_relations_scenarios.main();
       },
     );
