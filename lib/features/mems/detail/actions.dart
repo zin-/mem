@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/features/mem_relations/mem_relation_state.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -16,6 +17,7 @@ final saveMem =
                   ref.read(memItemsByMemIdProvider(memId)),
                   ref.read(memNotificationsByMemIdProvider(memId)),
                   ref.read(targetStateProvider(memId)).value,
+                  ref.read(memRelationEntitiesByMemIdProvider(memId)).value,
                 );
 
             if (memId == null) {

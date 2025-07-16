@@ -9,6 +9,7 @@ import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/targets/target_table.dart';
 import 'package:mem/features/targets/target_view.dart';
 import 'package:mem/framework/database/accessor.dart';
+import 'package:mem/framework/date_and_time/time_text_form_field.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/features/mems/detail/fab.dart';
 import 'package:mem/features/mems/mem_name.dart';
@@ -108,7 +109,11 @@ void main() => group(_scenarioName, () {
         await widgetTester.tap(find.text(TargetUnit.time.name));
         await widgetTester.pumpAndSettle();
 
-        await widgetTester.tap(find.byIcon(Icons.add));
+        await widgetTester.tap(
+          find.descendant(
+              of: find.byKey(keyTimeTextFormField),
+              matching: find.byIcon(Icons.add)),
+        );
         await widgetTester.pumpAndSettle();
         await widgetTester.tap(find.text("h").at(1));
         await widgetTester.pumpAndSettle();

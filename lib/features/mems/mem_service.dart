@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:mem/features/mem_relations/mem_relation.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/targets/target_repository.dart';
@@ -13,12 +14,16 @@ import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
 import 'package:mem/features/mems/mem_repository.dart';
+import 'package:mem/features/mem_relations/mem_relation_repository.dart';
+import 'package:mem/features/mem_relations/mem_relation_entity.dart';
+import 'package:mem/databases/table_definitions/mem_relations.dart';
 
 class MemService {
   final MemRepositoryV2 _memRepository;
   final MemItemRepositoryV2 _memItemRepository;
   final MemNotificationRepositoryV2 _memNotificationRepository;
   final TargetRepository _targetRepository;
+  final MemRelationRepository _memRelationRepository;
 
   Future<MemDetail> save(
     MemDetail memDetail, {
@@ -117,11 +122,39 @@ class MemService {
             ));
           }
 
+          // memRelationsの保存ロジック
+          final memRelations = memDetail.memRelations;
+          final returnMemRelations =
+              List<SavedMemRelationEntity?>.empty(growable: true);
+          if (memRelations != null) {
+            if (memRelations.isEmpty) {
+              await _memRelationRepository.waste(
+                condition: Equals(defFkMemRelationsSourceMemId, savedMem.id),
+              );
+            } else {
+              returnMemRelations.addAll(await Future.wait(memRelations
+                  .map((e) => e.updatedWith((v) => MemRelation.by(
+                        savedMem.id,
+                        v.targetMemId,
+                        v.type,
+                        v.value,
+                      )))
+                  .map((e) {
+                if (e is SavedMemRelationEntity && !undo) {
+                  return _memRelationRepository.replace(e);
+                } else {
+                  return _memRelationRepository.receive(e);
+                }
+              })));
+            }
+          }
+
           return MemDetail(
             savedMem,
             savedMemItems,
             returnMemNotifications.nonNulls.toList(growable: false),
             savedTarget,
+            returnMemRelations.nonNulls.toList(growable: false),
           );
         },
         {
@@ -142,6 +175,9 @@ class MemService {
                   ),
                 ),
             [],
+            null,
+            null,
+            null,
           ),
         ),
         {
@@ -161,6 +197,9 @@ class MemService {
                   ),
                 ),
             [],
+            null,
+            null,
+            null,
           ),
         ),
         {
@@ -175,11 +214,16 @@ class MemService {
               await _memItemRepository.archiveBy(memId: archivedMem.id);
           final archivedMemNotifications =
               await _memNotificationRepository.archiveBy(memId: archivedMem.id);
+          final archivedMemRelations = await _memRelationRepository.archiveBy(
+            relatedMemId: archivedMem.id,
+          );
 
           return MemDetail(
             archivedMem,
             archivedMemItems.toList(growable: false),
             archivedMemNotifications.toList(growable: false),
+            null,
+            archivedMemRelations.toList(growable: false),
           );
         },
         {
@@ -194,11 +238,20 @@ class MemService {
               await _memItemRepository.unarchiveBy(memId: unarchivedMem.id);
           final unarchivedMemNotifications = await _memNotificationRepository
               .unarchiveBy(memId: unarchivedMem.id);
+          final unarchivedMemRelations =
+              await _memRelationRepository.unarchiveBy(
+            condition: Or([
+              Equals(defFkMemRelationsSourceMemId, unarchivedMem.id),
+              Equals(defFkMemRelationsTargetMemId, unarchivedMem.id),
+            ]),
+          );
 
           return MemDetail(
             unarchivedMem,
             unarchivedMemItems.toList(growable: false),
             unarchivedMemNotifications.toList(growable: false),
+            null,
+            unarchivedMemRelations.toList(growable: false),
           );
         },
         {
@@ -222,6 +275,7 @@ class MemService {
     this._memItemRepository,
     this._memNotificationRepository,
     this._targetRepository,
+    this._memRelationRepository,
   );
 
   static MemService? _instance;
@@ -232,6 +286,7 @@ class MemService {
           MemItemRepositoryV2(),
           MemNotificationRepositoryV2(),
           TargetRepository(),
+          MemRelationRepository(),
         ),
       );
 }

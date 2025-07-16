@@ -20,9 +20,16 @@ class TableDefinition {
 
     if (columnDefinitions.isEmpty) {
       throw TableDefinitionException('ColumnDefinitions are empty.');
-    } else if (columnDefinitions.groupListsBy((c) => c.name).length !=
-        columnDefinitions.length) {
-      throw TableDefinitionException('Duplicate column name.');
+    }
+    final nameGrouped = columnDefinitions.groupListsBy((c) => c.name);
+    if (nameGrouped.length != columnDefinitions.length) {
+      final duplicateNames = nameGrouped.entries
+          .where((e) => e.value.length > 1)
+          .map((e) => e.value.first.name)
+          .join(', ');
+      throw TableDefinitionException(
+        'Duplicate column name: $duplicateNames.',
+      );
     }
   }
 
