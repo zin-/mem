@@ -2,7 +2,7 @@ import 'package:mem/features/acts/counter/act_counter.dart';
 import 'package:mem/framework/repository/entity.dart';
 import 'package:mem/framework/repository/home_widget_entity.dart';
 
-class ActCounterEntity extends ActCounter with Entity, HomeWidgetEntity {
+class ActCounterEntity extends ActCounter with EntityV1, HomeWidgetEntity {
   ActCounterEntity(super.memId, super.name, super.actCount, super.updatedAt)
       : super();
 

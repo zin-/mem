@@ -4,7 +4,7 @@ import 'package:mem/framework/notifications/notification_client.dart';
 import 'package:mem/framework/notifications/mem_notifications.dart';
 import 'package:mem/framework/notifications/notification/type.dart';
 
-abstract class Schedule with Entity {
+abstract class Schedule with EntityV1 {
   final int id;
 
   Schedule(this.id);

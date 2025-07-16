@@ -4,7 +4,7 @@
 // # 語源
 //
 // 「存在するもの」、「実体」
-mixin Entity {
+mixin EntityV1 {
   Map<String, dynamic> get toMap;
 
   @override
