@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/framework/workmanager_wrapper.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -10,7 +11,7 @@ import 'package:mem/framework/notifications/schedule.dart';
 import 'package:mem/framework/permissions/permission.dart';
 import 'package:mem/framework/permissions/permission_handler_wrapper.dart';
 
-class ScheduleClient extends Repository<Schedule> {
+class ScheduleClient extends RepositoryV2<Schedule> {
   static ScheduleClient? _instance;
   late final WorkmanagerWrapper? _workmanagerWrapper = v(
     () => defaultTargetPlatform == TargetPlatform.android
@@ -73,6 +74,12 @@ class ScheduleClient extends Repository<Schedule> {
         },
         {"id": id},
       );
+
+  @override
+  waste({Condition? condition}) {
+    // TODO: implement waste
+    throw UnimplementedError();
+  }
 }
 
 @pragma('vm:entry-point')

@@ -4,7 +4,7 @@ import 'package:mem/framework/notifications/notification_client.dart';
 import 'package:mem/framework/notifications/mem_notifications.dart';
 import 'package:mem/framework/notifications/notification/type.dart';
 
-abstract class Schedule with EntityV1 {
+abstract class Schedule with EntityV2 {
   final int id;
 
   Schedule(this.id);
@@ -38,6 +38,12 @@ abstract class Schedule with EntityV1 {
   Map<String, dynamic> get toMap => {
         'id': id,
       };
+
+  @override
+  EntityV2 updatedWith(Function(dynamic v) update) {
+    // TODO: implement updatedWith
+    throw UnimplementedError();
+  }
 }
 
 class CancelSchedule extends Schedule {
