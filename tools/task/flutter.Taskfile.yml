@@ -18,8 +18,15 @@ tasks:
       - dart run build_runner {{.MODE}} --delete-conflicting-outputs
     silent: false
 
+  run:
+    desc: "アプリを実行します。"
+    cmds:
+      - flutter run -d emulator-5554
+    silent: false
+
   test:
     desc: "Run Flutter tests"
     cmds:
       - flutter test
     silent: false
+  
