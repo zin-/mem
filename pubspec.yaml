@@ -96,11 +96,7 @@ dependencies:
 
   # for Home widgets
   home_widget: ^0.7.0
-  workmanager:
-      git:
-        url: https://github.com/fluttercommunity/flutter_workmanager.git
-        path: workmanager
-        ref: main
+  workmanager: ^0.8.0
   day_picker: ^2.2.0
   file_picker: ^8.0.5
 
