@@ -27,4 +27,10 @@ class DatabaseDefinition with Entity {
         'version': version,
         'tableDefinitions': tableDefinitions.map((e) => e.toString())
       };
+
+  @override
+  Entity updatedWith(Function(dynamic v) update) {
+    // TODO: implement updatedWith
+    throw UnimplementedError();
+  }
 }

@@ -4,7 +4,7 @@ import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
 
-class ActEntity with EntityV2<Act> {
+class ActEntity with Entity<Act> {
   ActEntity(Act value) {
     this.value = value;
   }

@@ -38,6 +38,12 @@ abstract class Schedule with Entity {
   Map<String, dynamic> get toMap => {
         'id': id,
       };
+
+  @override
+  Entity updatedWith(Function(dynamic v) update) {
+    // TODO: implement updatedWith
+    throw UnimplementedError();
+  }
 }
 
 class CancelSchedule extends Schedule {

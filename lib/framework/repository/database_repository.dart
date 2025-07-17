@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:path/path.dart';
 
@@ -61,4 +62,10 @@ class DatabaseRepository extends Repository<DatabaseDefinition> {
           'backup': backup,
         },
       );
+
+  @override
+  waste({Condition? condition}) {
+    // TODO: implement waste
+    throw UnimplementedError();
+  }
 }

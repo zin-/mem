@@ -17,7 +17,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
 # FIXME https://github.com/zin-/mem/issues/321
-version: 0.5.31
+version: 0.5.32
 
 scripts:
   dep:
@@ -25,7 +25,6 @@ scripts:
   gen:
     l10n: flutter gen-l10n
     icon: flutter pub run flutter_launcher_icons:main
-  run: flutter run -d emulator-5554
   clean: flutter clean
   test:
     unit: flutter test

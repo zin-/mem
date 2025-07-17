@@ -108,6 +108,12 @@ class Log with Entity {
   // TODO: implement toMap
   Map<String, dynamic> get toMap => throw UnimplementedError();
 // coverage:ignore-end
+
+  @override
+  Entity updatedWith(Function(dynamic v) update) {
+    // TODO: implement updatedWith
+    throw UnimplementedError();
+  }
 }
 
 enum Level {

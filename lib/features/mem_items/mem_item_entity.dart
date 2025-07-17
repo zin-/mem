@@ -3,7 +3,7 @@ import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
 
-class MemItemEntityV2 with EntityV2<MemItem> {
+class MemItemEntityV2 with Entity<MemItem> {
   MemItemEntityV2(MemItem value) {
     this.value = value;
   }

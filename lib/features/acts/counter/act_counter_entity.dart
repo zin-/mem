@@ -25,6 +25,12 @@ class ActCounterEntity extends ActCounter with Entity, HomeWidgetEntity {
       };
 
   ActCounterEntity.from(super.savedMem, super.savedActs) : super.from();
+
+  @override
+  Entity updatedWith(Function(dynamic v) update) {
+    // TODO: implement updatedWith
+    throw UnimplementedError();
+  }
 }
 
 class SavedActCounterEntity extends ActCounterEntity

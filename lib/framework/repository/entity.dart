@@ -4,19 +4,12 @@
 // # 語源
 //
 // 「存在するもの」、「実体」
-mixin Entity {
-  Map<String, dynamic> get toMap;
-
-  @override
-  String toString() => "${super.toString()}: $toMap";
-}
-
-mixin EntityV2<VALUE> {
+mixin Entity<VALUE> {
   late VALUE value;
 
   Map<String, Object?> get toMap;
 
-  EntityV2<VALUE> updatedWith(VALUE Function(VALUE v) update);
+  Entity<VALUE> updatedWith(VALUE Function(VALUE v) update);
 
   @override
   String toString() => "${super.toString()}: $toMap";

@@ -1,3 +1,4 @@
+import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/key_with_value_repository.dart';
 import 'package:mem/features/logger/log_service.dart';
 
@@ -45,4 +46,10 @@ class PreferenceRepository
           'key': key,
         },
       );
+
+  @override
+  waste({Condition? condition}) {
+    // TODO: implement waste
+    throw UnimplementedError();
+  }
 }
