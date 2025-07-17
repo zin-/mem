@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/key_with_value_repository.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/framework/notifications/notification/type.dart';
@@ -65,4 +66,10 @@ class NotificationRepository extends KeyWithValueRepository<Notification, int>
           FlutterLocalNotificationsWrapper.resetSingleton();
         },
       );
+
+  @override
+  waste({Condition? condition}) {
+    // TODO: implement waste
+    throw UnimplementedError();
+  }
 }
