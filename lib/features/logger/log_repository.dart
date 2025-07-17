@@ -1,12 +1,13 @@
 import 'dart:async';
 
+import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/features/logger/sentry_wrapper.dart';
 
 import 'log.dart';
 import 'logger_wrapper.dart';
 
-class LogRepository extends Repository<Log> {
+class LogRepository extends RepositoryV2<Log> {
   final LoggerWrapper _loggerWrapper;
   final SentryWrapper? _sentryWrapper;
 
@@ -50,4 +51,10 @@ class LogRepository extends Repository<Log> {
         loggerWrapper,
         sentryWrapper,
       );
+
+  @override
+  waste({Condition? condition}) {
+    // TODO: implement waste
+    throw UnimplementedError();
+  }
 }
