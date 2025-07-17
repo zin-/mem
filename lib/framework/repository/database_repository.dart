@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:path/path.dart';
 
@@ -8,7 +9,7 @@ import 'package:mem/framework/database/factory.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/features/logger/log_service.dart';
 
-class DatabaseRepository extends Repository<DatabaseDefinition> {
+class DatabaseRepository extends RepositoryV2<DatabaseDefinition> {
   static DatabaseRepository? _instance;
 
   final _cache = <String, DatabaseAccessor>{};
@@ -61,4 +62,10 @@ class DatabaseRepository extends Repository<DatabaseDefinition> {
           'backup': backup,
         },
       );
+
+  @override
+  waste({Condition? condition}) {
+    // TODO: implement waste
+    throw UnimplementedError();
+  }
 }
