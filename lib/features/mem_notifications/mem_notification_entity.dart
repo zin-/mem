@@ -4,7 +4,7 @@ import 'package:mem/framework/repository/entity.dart';
 
 import 'mem_notification.dart';
 
-class MemNotificationEntityV2 with EntityV2<MemNotification> {
+class MemNotificationEntityV2 with Entity<MemNotification> {
   MemNotificationEntityV2(MemNotification value) {
     this.value = value;
   }

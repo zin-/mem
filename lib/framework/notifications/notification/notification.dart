@@ -3,9 +3,7 @@ import 'package:mem/framework/repository/key_with_value.dart';
 import 'package:mem/framework/notifications/notification/channel.dart';
 
 class Notification
-    with
-        EntityV2<Map<String, dynamic>>,
-        KeyWithValue<int, Map<String, dynamic>> {
+    with Entity<Map<String, dynamic>>, KeyWithValue<int, Map<String, dynamic>> {
   final String title;
   final String body;
   final NotificationChannel channel;
@@ -28,7 +26,7 @@ class Notification
   }
 
   @override
-  EntityV2<Map<String, dynamic>> updatedWith(
+  Entity<Map<String, dynamic>> updatedWith(
       Map<String, dynamic> Function(Map<String, dynamic> v) update) {
     // TODO: implement updatedWith
     throw UnimplementedError();

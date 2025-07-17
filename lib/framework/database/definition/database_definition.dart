@@ -2,7 +2,7 @@ import 'package:mem/framework/database/definition/exceptions.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
 import 'package:mem/framework/repository/entity.dart';
 
-class DatabaseDefinition with EntityV2 {
+class DatabaseDefinition with Entity {
   final String name;
   final int version;
   final List<TableDefinition> tableDefinitions;
@@ -29,7 +29,7 @@ class DatabaseDefinition with EntityV2 {
       };
 
   @override
-  EntityV2 updatedWith(Function(dynamic v) update) {
+  Entity updatedWith(Function(dynamic v) update) {
     // TODO: implement updatedWith
     throw UnimplementedError();
   }

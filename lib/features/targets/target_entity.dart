@@ -5,7 +5,7 @@ import 'package:mem/framework/repository/entity.dart';
 import 'target.dart';
 import 'target_table.dart';
 
-class TargetEntity with EntityV2<Target> {
+class TargetEntity with Entity<Target> {
   TargetEntity(Target value) {
     this.value = value;
   }

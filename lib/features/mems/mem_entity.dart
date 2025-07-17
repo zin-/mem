@@ -13,7 +13,7 @@ import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/framework/notifications/notification/type.dart';
 import 'package:mem/framework/notifications/schedule.dart';
 
-class MemEntityV2 with EntityV2<Mem> {
+class MemEntityV2 with Entity<Mem> {
   MemEntityV2(Mem value) {
     this.value = value;
 

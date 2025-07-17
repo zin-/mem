@@ -1,7 +1,7 @@
 import 'package:mem/framework/repository/entity.dart';
 
 // FIXME IdWithValueの方が命名として適切なのでは？
-mixin KeyWithValue<KEY, VALUE> on EntityV2<VALUE> {
+mixin KeyWithValue<KEY, VALUE> on Entity<VALUE> {
   late final KEY key;
 
   @override

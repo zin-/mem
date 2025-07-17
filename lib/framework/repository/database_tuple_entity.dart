@@ -2,7 +2,7 @@ import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
 import 'package:mem/framework/repository/entity.dart';
 
-mixin DatabaseTupleEntityV2<PRIMARY_KEY, T> on EntityV2<T> {
+mixin DatabaseTupleEntityV2<PRIMARY_KEY, T> on Entity<T> {
   late PRIMARY_KEY id;
   late DateTime createdAt;
   late DateTime? updatedAt;

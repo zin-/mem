@@ -12,10 +12,10 @@ import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/features/logger/log_service.dart';
 
-abstract class DatabaseTupleRepositoryV2<ENTITY extends EntityV2,
-    SAVED extends DatabaseTupleEntityV2> extends RepositoryV2<ENTITY> {
+abstract class DatabaseTupleRepositoryV2<ENTITY extends Entity,
+    SAVED extends DatabaseTupleEntityV2> extends Repository<ENTITY> {
   static DatabaseAccessor? _databaseAccessor;
-  static final Map<TableDefinition, RepositoryV2> _repositories = {};
+  static final Map<TableDefinition, Repository> _repositories = {};
 
   final DatabaseDefinition _databaseDefinition;
   final TableDefinition _tableDefinition;

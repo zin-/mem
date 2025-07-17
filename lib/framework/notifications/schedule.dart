@@ -4,7 +4,7 @@ import 'package:mem/framework/notifications/notification_client.dart';
 import 'package:mem/framework/notifications/mem_notifications.dart';
 import 'package:mem/framework/notifications/notification/type.dart';
 
-abstract class Schedule with EntityV2 {
+abstract class Schedule with Entity {
   final int id;
 
   Schedule(this.id);
@@ -40,7 +40,7 @@ abstract class Schedule with EntityV2 {
       };
 
   @override
-  EntityV2 updatedWith(Function(dynamic v) update) {
+  Entity updatedWith(Function(dynamic v) update) {
     // TODO: implement updatedWith
     throw UnimplementedError();
   }

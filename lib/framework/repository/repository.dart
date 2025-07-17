@@ -22,10 +22,10 @@ import 'entity.dart';
 //  抽象的には得ると捉える事もできるだろうが、では`update`（更新する）ことはあるだろうか？
 //  更新することはないように感じる
 //  よって、ここでは`receive`（受け取る）、`replace`（置き換える）などの荷物や事物を扱う際の単語を採用する
-abstract class RepositoryV2<ENTITY extends EntityV2> {
-  static final Map<Type, RepositoryV2> _allRepositories = {};
+abstract class Repository<ENTITY extends Entity> {
+  static final Map<Type, Repository> _allRepositories = {};
 
-  RepositoryV2() {
+  Repository() {
     _allRepositories[ENTITY] ??= this;
 
     entityChildrenRelation[ENTITY]?.forEach(
@@ -35,7 +35,7 @@ abstract class RepositoryV2<ENTITY extends EntityV2> {
     );
   }
 
-  final Map<Type, Map<RepositoryV2?, ColumnDefinition?>> childRepositories = {};
+  final Map<Type, Map<Repository?, ColumnDefinition?>> childRepositories = {};
 
   waste({Condition? condition});
 }

@@ -9,7 +9,7 @@ import 'package:mem/framework/database/factory.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/features/logger/log_service.dart';
 
-class DatabaseRepository extends RepositoryV2<DatabaseDefinition> {
+class DatabaseRepository extends Repository<DatabaseDefinition> {
   static DatabaseRepository? _instance;
 
   final _cache = <String, DatabaseAccessor>{};

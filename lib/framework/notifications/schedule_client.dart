@@ -11,7 +11,7 @@ import 'package:mem/framework/notifications/schedule.dart';
 import 'package:mem/framework/permissions/permission.dart';
 import 'package:mem/framework/permissions/permission_handler_wrapper.dart';
 
-class ScheduleClient extends RepositoryV2<Schedule> {
+class ScheduleClient extends Repository<Schedule> {
   static ScheduleClient? _instance;
   late final WorkmanagerWrapper? _workmanagerWrapper = v(
     () => defaultTargetPlatform == TargetPlatform.android

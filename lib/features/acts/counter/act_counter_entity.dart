@@ -2,7 +2,7 @@ import 'package:mem/features/acts/counter/act_counter.dart';
 import 'package:mem/framework/repository/entity.dart';
 import 'package:mem/framework/repository/home_widget_entity.dart';
 
-class ActCounterEntity extends ActCounter with EntityV2, HomeWidgetEntity {
+class ActCounterEntity extends ActCounter with Entity, HomeWidgetEntity {
   ActCounterEntity(super.memId, super.name, super.actCount, super.updatedAt)
       : super();
 
@@ -27,7 +27,7 @@ class ActCounterEntity extends ActCounter with EntityV2, HomeWidgetEntity {
   ActCounterEntity.from(super.savedMem, super.savedActs) : super.from();
 
   @override
-  EntityV2 updatedWith(Function(dynamic v) update) {
+  Entity updatedWith(Function(dynamic v) update) {
     // TODO: implement updatedWith
     throw UnimplementedError();
   }
