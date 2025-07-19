@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:mem/features/logger/log_service.dart';
 import 'package:workmanager/workmanager.dart';
 
@@ -20,16 +22,19 @@ class WorkmanagerWrapper {
   final Function? _callbackDispatcher;
   final bool _isInDebugMode;
 
-  late final Workmanager _workmanager = v(
+  late final Workmanager? _workmanager = v(
     () {
-      final workmanager = Workmanager();
-      if (_callbackDispatcher != null) {
-        workmanager.initialize(
-          _callbackDispatcher,
-          isInDebugMode: _isInDebugMode,
-        );
+      if (Platform.isAndroid || Platform.isIOS) {
+        final workmanager = Workmanager();
+        if (_callbackDispatcher != null) {
+          workmanager.initialize(
+            _callbackDispatcher,
+            isInDebugMode: _isInDebugMode,
+          );
+        }
+        return workmanager;
       }
-      return workmanager;
+      return null;
     },
   );
 
@@ -46,7 +51,7 @@ class WorkmanagerWrapper {
     Map<String, Object?>? inputData,
   ) =>
       v(
-        () async => await _workmanager.registerOneOffTask(
+        () async => await _workmanager?.registerOneOffTask(
           id.toString(),
           task.name,
           initialDelay: at.difference(DateTime.now()),
@@ -68,7 +73,7 @@ class WorkmanagerWrapper {
     Duration frequency,
   ) =>
       v(
-        () async => await _workmanager.registerPeriodicTask(
+        () async => await _workmanager?.registerPeriodicTask(
           id.toString(),
           task.name,
           initialDelay: at.difference(DateTime.now()),
@@ -86,7 +91,7 @@ class WorkmanagerWrapper {
 
   Future<void> cancel(int id) => v(
         () async {
-          await _workmanager.cancelByUniqueName(id.toString());
+          await _workmanager?.cancelByUniqueName(id.toString());
         },
         {
           'id': id,
@@ -96,7 +101,7 @@ class WorkmanagerWrapper {
   void executeTask(
     Future<bool> Function(Map<String, Object?>? inputData) notifyCallback,
   ) =>
-      _workmanager.executeTask(
+      _workmanager?.executeTask(
         (task, inputData) => i(
           () async {
             return await notifyCallback(inputData);
