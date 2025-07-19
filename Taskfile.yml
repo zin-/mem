@@ -35,6 +35,22 @@ tasks:
     cmds:
       - task: git:setup-git-hooks
 
+  dep:
+    desc: "依存関係を更新します。"
+    cmds:
+      - task: flutter:dep
+
+  dep:check:
+    desc: "依存関係を更新します。"
+    cmds:
+      - task: flutter:dep:check
+        silent: true
+
+  dep:update:
+    desc: "依存関係を更新します。"
+    cmds:
+      - task: flutter:dep:update
+
   run:
     desc: "アプリを実行します。"
     cmds:
