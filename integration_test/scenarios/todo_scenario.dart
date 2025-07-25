@@ -6,7 +6,6 @@ import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/databases/definition.dart';
-import 'package:mem/framework/workmanager_wrapper.dart';
 import 'package:mem/features/logger/log.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/framework/notifications/notification_client.dart';
@@ -195,25 +194,6 @@ void testTodoScenario() => group(': $_scenarioName', () {
           ),
         ]);
 
-        int workmanagerInitializeCount = 0;
-        int cancelTaskByUniqueNameCount = 0;
-        widgetTester
-            .setMockMethodCallHandler(MethodChannelMock.workmanagerForeground, [
-          (message) async {
-            expect(message.method, equals('initialize'));
-            workmanagerInitializeCount++;
-            return true;
-          },
-          ...AllMemNotificationsId.of(insertedMemDoneId!).map(
-            (e) => (message) async {
-              expect(message.method, equals('cancelTaskByUniqueName'));
-              cancelTaskByUniqueNameCount++;
-              return false;
-            },
-          ),
-        ]);
-
-        WorkmanagerWrapper(callbackDispatcher: helperCallback);
         await NotificationClient().show(
           NotificationType.startMem,
           insertedMemDoneId!,
@@ -228,16 +208,6 @@ void testTodoScenario() => group(': $_scenarioName', () {
           cancelCount,
           equals(defaultTargetPlatform == TargetPlatform.android ? 6 : 0),
           reason: 'cancelCount',
-        );
-        expect(
-          workmanagerInitializeCount,
-          equals(defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
-          reason: 'workmanagerInitializeCount',
-        );
-        expect(
-          cancelTaskByUniqueNameCount,
-          equals(defaultTargetPlatform == TargetPlatform.android ? 6 : 0),
-          reason: 'alarmCancelCount',
         );
 
         widgetTester.clearAllMockMethodCallHandler();

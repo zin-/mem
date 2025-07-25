@@ -1,6 +1,22 @@
 version: '3'
 
 tasks:
+  dep:
+    desc: "依存関係を更新します。"
+    cmds:
+      - flutter pub get
+    silent: false
+
+  dep:check:
+    desc: "依存関係を更新します。"
+    cmds:
+      - flutter pub outdated
+
+  dep:update:
+    desc: "依存関係を更新します。"
+    cmds:
+      - flutter pub upgrade
+
   analyze:
     desc: "Run Flutter static analysis"
     cmds:

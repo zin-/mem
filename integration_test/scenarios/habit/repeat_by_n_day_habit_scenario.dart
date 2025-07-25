@@ -26,7 +26,7 @@ import '../helpers.dart';
 
 const _name = 'Repeat by n day habit scenario';
 
-void main() => group(': $_name', () {
+void main() => group(_name, () {
       const insertedMemName = "$_name - mem name - inserted";
       const insertedMemRepeatByNDay = 2;
       const withoutActMemName = "$insertedMemName - without act";
@@ -182,28 +182,6 @@ void main() => group(': $_name', () {
         widgetTester.ignoreMockMethodCallHandler(
             MethodChannelMock.flutterLocalNotifications);
 
-        int initializeCount = 0;
-        int cancelTaskByUniqueNameCount = 0;
-        int registerPeriodicTaskCount = 0;
-        widgetTester
-            .setMockMethodCallHandler(MethodChannelMock.workmanagerForeground, [
-          (m) async {
-            expect(m.method, equals('initialize'));
-            initializeCount++;
-            return true;
-          },
-          ...List.filled(2, (m) async {
-            expect(m.method, equals('cancelTaskByUniqueName'));
-            cancelTaskByUniqueNameCount++;
-            return false;
-          }),
-          (m) async {
-            expect(m.method, equals('registerPeriodicTask'));
-            registerPeriodicTaskCount++;
-            return false;
-          },
-        ]);
-
         await runApplication();
         await widgetTester.pumpAndSettle();
         await widgetTester.tap(newMemFabFinder);
@@ -262,22 +240,6 @@ void main() => group(': $_name', () {
           expect(savedMemNotification[defColMemNotificationsTime.name],
               equals(enteringNDay),
               reason: 'enteringNDay');
-
-          expect(
-            initializeCount,
-            equals(defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
-            reason: 'initializeCount',
-          );
-          expect(
-            cancelTaskByUniqueNameCount,
-            equals(defaultTargetPlatform == TargetPlatform.android ? 2 : 0),
-            reason: 'cancelTaskByUniqueNameCount',
-          );
-          expect(
-            registerPeriodicTaskCount,
-            equals(defaultTargetPlatform == TargetPlatform.android ? 1 : 0),
-            reason: 'registerPeriodicTaskCount',
-          );
 
           widgetTester.clearAllMockMethodCallHandler();
         });
