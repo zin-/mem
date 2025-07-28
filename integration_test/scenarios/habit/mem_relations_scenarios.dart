@@ -166,7 +166,7 @@ void main() => group(': $_scenarioName', () {
         });
       });
 
-      testWidgets("Save relation.", (widgetTester) async {
+      testWidgets("[flaky]Save relation.", (widgetTester) async {
         await runApplication();
         await widgetTester.pumpAndSettle();
         await widgetTester.tap(find.text(sourceMemName));
