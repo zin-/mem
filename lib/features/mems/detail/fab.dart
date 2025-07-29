@@ -62,7 +62,7 @@ class _MemDetailFabComponent extends StatelessWidget {
                             nextNotifyAt,
                           ),
                   ),
-                  duration: defaultDismissDuration,
+                  duration: infiniteDismissDuration,
                   dismissDirection: DismissDirection.horizontal,
                 ),
               );
