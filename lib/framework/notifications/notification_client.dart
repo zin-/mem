@@ -185,7 +185,8 @@ class NotificationClient {
 
             return atList
                 .whereType<DateTime>()
-                .reduce((a, b) => a.isAfter(b) ? a : b);
+                .sorted((a, b) => a.compareTo(b))
+                .firstOrNull;
           }
         },
         {
