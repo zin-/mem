@@ -24,6 +24,22 @@
       }
     }
   },
+  "saveMemSuccessMessage2": "Save success. {memName}, {nextNotifyOn} {nextNotifyAt}",
+  "@saveMemSuccessMessage2": {
+    "placeholders": {
+      "memName": {
+        "type": "Object"
+      },
+      "nextNotifyOn": {
+        "type": "DateTime",
+        "format": "yMd"
+      },
+      "nextNotifyAt": {
+        "type": "DateTime",
+        "format": "Hms"
+      }
+    }
+  },
   "requiredError": "Error: required",
   "archiveMemSuccessMessage": "Archive success. {memName}",
   "@archiveMemSuccessMessage": {

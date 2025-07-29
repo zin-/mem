@@ -24,6 +24,22 @@
       }
     }
   },
+  "saveMemSuccessMessage2": "\"{memName}\"の保存に成功しました。{nextNotifyOn} {nextNotifyAt}",
+  "@saveMemSuccessMessage2": {
+    "placeholders": {
+      "memName": {
+        "type": "Object"
+      },
+      "nextNotifyOn": {
+        "type": "DateTime",
+        "format": "yMd"
+      },
+      "nextNotifyAt": {
+        "type": "DateTime",
+        "format": "Hms"
+      }
+    }
+  },
   "requiredError": "Error: required",
   "archiveMemSuccessMessage": "Archive success. {memName}",
   "@archiveMemSuccessMessage": {

@@ -13,7 +13,7 @@ class MemClient {
   final MemService _memService;
   final NotificationClient _notificationClient;
 
-  Future<MemDetail> save(
+  Future<(MemDetail, DateTime?)> save(
     MemEntityV2 mem,
     List<MemItemEntityV2> memItemList,
     List<MemNotificationEntityV2> memNotificationList,
@@ -32,14 +32,15 @@ class MemClient {
             ),
           );
 
-          _notificationClient.registerMemNotifications(
+          final nextNotifyAt =
+              await _notificationClient.registerMemNotifications(
             (saved.mem as SavedMemEntityV2).id,
             savedMem: saved.mem as SavedMemEntityV2,
             savedMemNotifications:
                 saved.notifications?.whereType<SavedMemNotificationEntityV2>(),
           );
 
-          return saved;
+          return (saved, nextNotifyAt);
         },
         {
           "mem": mem,

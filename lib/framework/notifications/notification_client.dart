@@ -135,7 +135,7 @@ class NotificationClient {
         },
       );
 
-  Future<void> registerMemNotifications(
+  Future<DateTime?> registerMemNotifications(
     int memId, {
     SavedMemEntityV2? savedMem,
     Iterable<SavedMemNotificationEntityV2>? savedMemNotifications,
@@ -152,6 +152,7 @@ class NotificationClient {
                   );
           if (mem!.value.isDone || mem.isArchived) {
             cancelMemNotifications(memId);
+            return null;
           } else {
             final latestAct = await ActRepository()
                 .ship(
@@ -165,7 +166,8 @@ class NotificationClient {
                 (await _preferenceClientRepository.shipByKey(startOfDayKey))
                         .value ??
                     defaultStartOfDay;
-            for (var schedule in [
+
+            final atList = [
               ...mem.periodSchedules(startOfDay),
               MemNotifications.periodicScheduleOf(
                 mem,
@@ -176,9 +178,15 @@ class NotificationClient {
                 latestAct,
                 DateTime.now(),
               )
-            ]) {
-              await _scheduleClient.receive(schedule);
-            }
+            ].map((e) {
+              _scheduleClient.receive(e);
+              return e is TimedSchedule ? e.startAt : null;
+            });
+
+            return atList
+                .whereType<DateTime>()
+                .sorted((a, b) => a.compareTo(b))
+                .firstOrNull;
           }
         },
         {

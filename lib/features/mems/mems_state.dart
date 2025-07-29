@@ -60,7 +60,7 @@ class MemEntities extends _$MemEntities
         {'memId': memId},
       );
 
-  Future<MemDetail> save(
+  Future<(MemDetail, DateTime?)> save(
     MemEntityV2 memEntity,
     Iterable<MemItemEntityV2> memItemEntities,
     Iterable<MemNotificationEntityV2> memNotificationEntities,
@@ -69,7 +69,7 @@ class MemEntities extends _$MemEntities
   ) =>
       v(
         () async {
-          final saved = await MemClient().save(
+          final (saved, nextNotifyAt) = await MemClient().save(
             memEntity,
             memItemEntities.toList(),
             memNotificationEntities.toList(),
@@ -82,7 +82,7 @@ class MemEntities extends _$MemEntities
           ref.read(memRelationEntitiesProvider.notifier).upsert(
               saved.memRelations?.whereType<SavedMemRelationEntity>() ?? []);
 
-          return saved;
+          return (saved, nextNotifyAt);
         },
         {
           'memEntity': memEntity,

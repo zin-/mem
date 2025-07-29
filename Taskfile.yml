@@ -20,6 +20,7 @@ tasks:
     desc: "コード生成を実行します。"
     cmds:
       - task: flutter:gen
+      - task: flutter:gen:l10n
     silent: false
 
   watch:
