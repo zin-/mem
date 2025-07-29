@@ -9,16 +9,17 @@ import 'package:mem/features/mems/states.dart';
 
 import 'states.dart';
 
-final saveMem =
-    Provider.autoDispose.family<Future<MemDetail>, int?>((ref, memId) => v(
+final saveMem = Provider.autoDispose
+    .family<Future<(MemDetail, DateTime?)>, int?>((ref, memId) => v(
           () async {
-            final saved = await ref.read(memEntitiesProvider.notifier).save(
-                  ref.read(editingMemByMemIdProvider(memId)),
-                  ref.read(memItemsByMemIdProvider(memId)),
-                  ref.read(memNotificationsByMemIdProvider(memId)),
-                  ref.read(targetStateProvider(memId)).value,
-                  ref.read(memRelationEntitiesByMemIdProvider(memId)).value,
-                );
+            final (saved, nextNotifyAt) =
+                await ref.read(memEntitiesProvider.notifier).save(
+                      ref.read(editingMemByMemIdProvider(memId)),
+                      ref.read(memItemsByMemIdProvider(memId)),
+                      ref.read(memNotificationsByMemIdProvider(memId)),
+                      ref.read(targetStateProvider(memId)).value,
+                      ref.read(memRelationEntitiesByMemIdProvider(memId)).value,
+                    );
 
             if (memId == null) {
               ref
@@ -43,7 +44,7 @@ final saveMem =
                       current.value.isRepeatByDayOfWeek(),
                 );
 
-            return saved;
+            return (saved, nextNotifyAt);
           },
           memId,
         ));
