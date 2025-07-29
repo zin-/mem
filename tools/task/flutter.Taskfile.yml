@@ -34,6 +34,12 @@ tasks:
       - dart run build_runner {{.MODE}} --delete-conflicting-outputs
     silent: false
 
+  gen:l10n:
+    desc: "l10n を生成します。"
+    cmds:
+      - flutter gen-l10n
+    silent: false
+
   run:
     desc: "アプリを実行します。"
     cmds:
