@@ -35,7 +35,7 @@ class MemDetailFab extends ConsumerWidget {
 
 class _MemDetailFabComponent extends StatelessWidget {
   final GlobalKey<FormState> _formKey;
-  final Future<void> Function() _saveMem;
+  final Future<(Object, DateTime?)> Function() _saveMem;
   final String _memName;
 
   const _MemDetailFabComponent(this._formKey, this._saveMem, this._memName);
@@ -45,16 +45,22 @@ class _MemDetailFabComponent extends StatelessWidget {
         () => FloatingActionButton(
           key: keySaveMemFab,
           child: const Icon(Icons.save_alt),
-          onPressed: () => v(() {
+          onPressed: () => v(() async {
             if (_formKey.currentState?.validate() ?? false) {
-              _saveMem();
+              final (_, nextNotifyAt) = await _saveMem();
 
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    buildL10n(context).saveMemSuccessMessage(
-                      _memName,
-                    ),
+                    nextNotifyAt == null
+                        ? buildL10n(context).saveMemSuccessMessage(
+                            _memName,
+                          )
+                        : buildL10n(context).saveMemSuccessMessage2(
+                            _memName,
+                            nextNotifyAt,
+                            nextNotifyAt,
+                          ),
                   ),
                   duration: defaultDismissDuration,
                   dismissDirection: DismissDirection.horizontal,
