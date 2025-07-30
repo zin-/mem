@@ -112,8 +112,15 @@ class MemEntities extends _$MemEntities
             // FIXME ここでserviceの初期化をしているが、stateをbuildしたタイミングでseviceの初期化もしたい
             //   repositoryの親子関係解決を確定するタイミングの問題で、現時点ではここで初期化する必要がある
             //   https://github.com/zin-/mem/issues/472
-            final undoneRemovedMemDetail =
-                await MemService().save(removedMemDetail, undo: true);
+            final undoneRemovedMemDetail = await MemService().save(
+                MemDetail(
+                  removedMemDetail.$1,
+                  removedMemDetail.$2,
+                  removedMemDetail.$3,
+                  removedMemDetail.$4,
+                  removedMemDetail.$5,
+                ),
+                undo: true);
 
             upsert([undoneRemovedMemDetail.mem as SavedMemEntityV2]);
 
