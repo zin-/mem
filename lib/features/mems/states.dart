@@ -1,8 +1,10 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/features/mem_relations/mem_relation_state.dart';
+import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/mems_state.dart';
+import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
-import 'package:mem/features/mems/mem_detail.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_entity.dart';
@@ -77,27 +79,22 @@ final removedMemDetailProvider = StateNotifierProvider.autoDispose.family<
     () {
       final removedMem = ref.watch(removedMemProvider(memId));
       final removedMemItems = ref.watch(removedMemItemsProvider(memId));
-
-      MemDetail? removedMemDetail;
-      if (removedMem != null && removedMemItems != null) {
-        removedMemDetail = MemDetail(
-          removedMem,
-          removedMemItems,
-        );
-      } else {
-        removedMemDetail = null;
-      }
+      final removedMemNotifications =
+          ref.watch(memNotificationsByMemIdProvider(memId));
+      final target = ref.watch(targetStateProvider(memId)).valueOrNull;
+      final removedMemRelations =
+          ref.watch(memRelationEntitiesByMemIdProvider(memId)).valueOrNull;
 
       return ValueStateNotifier(
-        removedMemDetail == null
-            ? null
-            : (
-                removedMemDetail.mem,
-                removedMemDetail.memItems,
-                removedMemDetail.notifications,
-                removedMemDetail.target,
-                removedMemDetail.memRelations,
-              ),
+        removedMem != null
+            ? (
+                removedMem,
+                removedMemItems ?? [],
+                removedMemNotifications,
+                target,
+                removedMemRelations?.toList(),
+              )
+            : null,
       );
     },
     memId,
