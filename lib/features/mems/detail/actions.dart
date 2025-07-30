@@ -3,14 +3,13 @@ import 'package:mem/features/mem_relations/mem_relation_state.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/features/mems/mem_detail.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/states.dart';
 
 import 'states.dart';
 
-final saveMem = Provider.autoDispose
-    .family<Future<(MemDetail, DateTime?)>, int?>((ref, memId) => v(
+final saveMem =
+    Provider.autoDispose.family<Future<DateTime?>, int?>((ref, memId) => v(
           () async {
             final (saved, nextNotifyAt) =
                 await ref.read(memEntitiesProvider.notifier).save(
@@ -44,7 +43,7 @@ final saveMem = Provider.autoDispose
                       current.value.isRepeatByDayOfWeek(),
                 );
 
-            return (saved, nextNotifyAt);
+            return nextNotifyAt;
           },
           memId,
         ));

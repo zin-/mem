@@ -35,7 +35,7 @@ class MemDetailFab extends ConsumerWidget {
 
 class _MemDetailFabComponent extends StatelessWidget {
   final GlobalKey<FormState> _formKey;
-  final Future<(Object, DateTime?)> Function() _saveMem;
+  final Future<DateTime?> Function() _saveMem;
   final String _memName;
 
   const _MemDetailFabComponent(this._formKey, this._saveMem, this._memName);
@@ -47,16 +47,19 @@ class _MemDetailFabComponent extends StatelessWidget {
           child: const Icon(Icons.save_alt),
           onPressed: () => v(() async {
             if (_formKey.currentState?.validate() ?? false) {
-              final (_, nextNotifyAt) = await _saveMem();
+              final scaffoldMessenger = ScaffoldMessenger.of(context);
+              final l10n = buildL10n(context);
 
-              ScaffoldMessenger.of(context).showSnackBar(
+              final nextNotifyAt = await _saveMem();
+
+              scaffoldMessenger.showSnackBar(
                 SnackBar(
                   content: Text(
                     nextNotifyAt == null
-                        ? buildL10n(context).saveMemSuccessMessage(
+                        ? l10n.saveMemSuccessMessage(
                             _memName,
                           )
-                        : buildL10n(context).saveMemSuccessMessage2(
+                        : l10n.saveMemSuccessMessage2(
                             _memName,
                             nextNotifyAt,
                             nextNotifyAt,
