@@ -26,19 +26,25 @@ class MemService {
   final MemRelationRepository _memRelationRepository;
 
   Future<MemDetail> save(
-    MemDetail memDetail, {
+    (
+      MemEntityV2,
+      List<MemItemEntityV2>,
+      List<MemNotificationEntityV2>?,
+      TargetEntity?,
+      List<MemRelationEntity>?
+    ) memDetail, {
     bool undo = false,
   }) =>
       i(
         () async {
-          final mem = memDetail.mem;
+          final mem = memDetail.$1;
 
           final savedMem = (mem is SavedMemEntityV2 && !undo
               ? await _memRepository.replace(mem)
               : await _memRepository.receive(mem));
 
           final savedMemItems = await Future.wait(
-            memDetail.memItems.map(
+            memDetail.$2.map(
               (e) => (e is SavedMemItemEntityV2 && !undo
                   ? _memItemRepository.replace(
                       e.copiedWith(memId: () => savedMem.id)
@@ -50,7 +56,7 @@ class MemService {
             ),
           );
 
-          final memNotifications = memDetail.notifications;
+          final memNotifications = memDetail.$3;
           final returnMemNotifications =
               List<SavedMemNotificationEntityV2?>.empty(growable: true);
           if (memNotifications == null) {
@@ -103,7 +109,7 @@ class MemService {
           }
 
           SavedTargetEntity? savedTarget;
-          final target = memDetail.target;
+          final target = memDetail.$4;
           if (target == null || target.value.value == 0) {
             await _targetRepository.waste(
               condition: Equals(defFkTargetMemId, savedMem.id),
@@ -123,7 +129,7 @@ class MemService {
           }
 
           // memRelationsの保存ロジック
-          final memRelations = memDetail.memRelations;
+          final memRelations = memDetail.$5;
           final returnMemRelations =
               List<SavedMemRelationEntity?>.empty(growable: true);
           if (memRelations != null) {
@@ -168,7 +174,7 @@ class MemService {
   ) =>
       i(
         () async => save(
-          MemDetail(
+          (
             await _memRepository.ship(id: memId).then(
                   (v) => v.single.updatedWith(
                     (mem) => mem.done(DateTime.now()),
@@ -190,7 +196,7 @@ class MemService {
   ) =>
       i(
         () async => save(
-          MemDetail(
+          (
             await _memRepository.ship(id: memId).then(
                   (v) => v.single.updatedWith(
                     (mem) => mem.undone(),

@@ -23,7 +23,7 @@ class MemClient {
       v(
         () async {
           final saved = await _memService.save(
-            MemDetail(
+            (
               mem,
               memItemList,
               memNotificationList,
