@@ -25,7 +25,14 @@ class MemService {
   final TargetRepository _targetRepository;
   final MemRelationRepository _memRelationRepository;
 
-  Future<MemDetail> save(
+  Future<
+      (
+        MemEntityV2,
+        List<MemItemEntityV2>,
+        List<MemNotificationEntityV2>?,
+        TargetEntity?,
+        List<MemRelationEntity>?
+      )> save(
     (
       MemEntityV2,
       List<MemItemEntityV2>,
@@ -155,12 +162,12 @@ class MemService {
             }
           }
 
-          return MemDetail(
+          return (
             savedMem,
             savedMemItems,
             returnMemNotifications.nonNulls.toList(growable: false),
             savedTarget,
-            returnMemRelations.nonNulls.toList(growable: false),
+            returnMemRelations.nonNulls.toList(growable: false)
           );
         },
         {
@@ -169,7 +176,14 @@ class MemService {
         },
       );
 
-  Future<MemDetail> doneByMemId(
+  Future<
+      (
+        MemEntityV2,
+        List<MemItemEntityV2>,
+        List<MemNotificationEntityV2>?,
+        TargetEntity?,
+        List<MemRelationEntity>?
+      )> doneByMemId(
     int memId,
   ) =>
       i(
@@ -191,7 +205,14 @@ class MemService {
         },
       );
 
-  Future<MemDetail> undoneByMemId(
+  Future<
+      (
+        MemEntityV2,
+        List<MemItemEntityV2>,
+        List<MemNotificationEntityV2>?,
+        TargetEntity?,
+        List<MemRelationEntity>?
+      )> undoneByMemId(
     int memId,
   ) =>
       i(

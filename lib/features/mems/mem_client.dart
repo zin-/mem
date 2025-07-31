@@ -43,22 +43,13 @@ class MemClient {
 
           final nextNotifyAt =
               await _notificationClient.registerMemNotifications(
-            (saved.mem as SavedMemEntityV2).id,
-            savedMem: saved.mem as SavedMemEntityV2,
+            (saved.$1 as SavedMemEntityV2).id,
+            savedMem: saved.$1 as SavedMemEntityV2,
             savedMemNotifications:
-                saved.notifications?.whereType<SavedMemNotificationEntityV2>(),
+                saved.$3?.whereType<SavedMemNotificationEntityV2>(),
           );
 
-          return (
-            (
-              saved.mem,
-              saved.memItems,
-              saved.notifications,
-              saved.target,
-              saved.memRelations
-            ),
-            nextNotifyAt
-          );
+          return (saved, nextNotifyAt);
         },
         {
           "mem": mem,
