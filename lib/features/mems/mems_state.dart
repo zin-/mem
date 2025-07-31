@@ -5,7 +5,6 @@ import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation_state.dart';
 import 'package:mem/features/mems/mem_client.dart';
-import 'package:mem/features/mems/mem_detail.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/mems/mem_service.dart';
@@ -121,7 +120,14 @@ class MemEntities extends _$MemEntities
         {'ids': ids},
       );
 
-  Future<MemDetail?> undoRemove(int id) => v(
+  Future<
+      (
+        MemEntityV2,
+        List<MemItemEntityV2>,
+        List<MemNotificationEntityV2>?,
+        TargetEntity?,
+        List<MemRelationEntity>?
+      )?> undoRemove(int id) => v(
         () async {
           // ignore: avoid_manual_providers_as_generated_provider_dependency
           final removedMemDetail = ref.read(removedMemDetailProvider(id));
@@ -136,7 +142,13 @@ class MemEntities extends _$MemEntities
 
             upsert([undoneRemovedMemDetail.mem as SavedMemEntityV2]);
 
-            return undoneRemovedMemDetail;
+            return (
+              undoneRemovedMemDetail.mem,
+              undoneRemovedMemDetail.memItems,
+              undoneRemovedMemDetail.notifications,
+              undoneRemovedMemDetail.target,
+              undoneRemovedMemDetail.memRelations
+            );
           }
 
           return null;
