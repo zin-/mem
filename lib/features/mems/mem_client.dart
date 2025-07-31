@@ -72,15 +72,9 @@ class MemClient {
           final archived = await _memService.archive(memEntity);
 
           _notificationClient
-              .cancelMemNotifications((archived.mem as SavedMemEntityV2).id);
+              .cancelMemNotifications((archived.$1 as SavedMemEntityV2).id);
 
-          return (
-            archived.mem,
-            archived.memItems,
-            archived.notifications,
-            archived.target,
-            archived.memRelations
-          );
+          return archived;
         },
         {
           'memEntity': memEntity,
@@ -99,19 +93,13 @@ class MemClient {
           final unarchived = await _memService.unarchive(memEntity);
 
           _notificationClient.registerMemNotifications(
-            (unarchived.mem as SavedMemEntityV2).id,
-            savedMem: unarchived.mem as SavedMemEntityV2,
-            savedMemNotifications: unarchived.notifications
-                ?.whereType<SavedMemNotificationEntityV2>(),
+            (unarchived.$1 as SavedMemEntityV2).id,
+            savedMem: unarchived.$1 as SavedMemEntityV2,
+            savedMemNotifications:
+                unarchived.$3?.whereType<SavedMemNotificationEntityV2>(),
           );
 
-          return (
-            unarchived.mem,
-            unarchived.memItems,
-            unarchived.notifications,
-            unarchived.target,
-            unarchived.memRelations
-          );
+          return unarchived;
         },
         {
           'memEntity': memEntity,

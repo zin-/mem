@@ -5,7 +5,6 @@ import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/targets/target_repository.dart';
 import 'package:mem/features/targets/target_table.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
-import 'package:mem/features/mems/mem_detail.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_items/mem_item_repository.dart';
@@ -234,7 +233,14 @@ class MemService {
         },
       );
 
-  Future<MemDetail> archive(SavedMemEntityV2 mem) => i(
+  Future<
+      (
+        MemEntityV2,
+        List<MemItemEntityV2>,
+        List<MemNotificationEntityV2>?,
+        TargetEntity?,
+        List<MemRelationEntity>?
+      )> archive(SavedMemEntityV2 mem) => i(
         () async {
           final archivedMem = await _memRepository.archive(mem);
           final archivedMemItems =
@@ -245,7 +251,7 @@ class MemService {
             relatedMemId: archivedMem.id,
           );
 
-          return MemDetail(
+          return (
             archivedMem,
             archivedMemItems.toList(growable: false),
             archivedMemNotifications.toList(growable: false),
@@ -258,7 +264,14 @@ class MemService {
         },
       );
 
-  Future<MemDetail> unarchive(SavedMemEntityV2 mem) => i(
+  Future<
+      (
+        MemEntityV2,
+        List<MemItemEntityV2>,
+        List<MemNotificationEntityV2>?,
+        TargetEntity?,
+        List<MemRelationEntity>?
+      )> unarchive(SavedMemEntityV2 mem) => i(
         () async {
           final unarchivedMem = await _memRepository.unarchive(mem);
           final unarchivedMemItems =
@@ -273,7 +286,7 @@ class MemService {
             ]),
           );
 
-          return MemDetail(
+          return (
             unarchivedMem,
             unarchivedMemItems.toList(growable: false),
             unarchivedMemNotifications.toList(growable: false),
