@@ -86,21 +86,13 @@ class MemEntities extends _$MemEntities
             memRelationEntities?.toList(),
           );
 
-          upsert([saved.mem as SavedMemEntityV2]);
+          upsert([saved.$1 as SavedMemEntityV2]);
 
-          ref.read(memRelationEntitiesProvider.notifier).upsert(
-              saved.memRelations?.whereType<SavedMemRelationEntity>() ?? []);
+          ref
+              .read(memRelationEntitiesProvider.notifier)
+              .upsert(saved.$5?.whereType<SavedMemRelationEntity>() ?? []);
 
-          return (
-            (
-              saved.mem,
-              saved.memItems,
-              saved.notifications,
-              saved.target,
-              saved.memRelations
-            ),
-            nextNotifyAt
-          );
+          return (saved, nextNotifyAt);
         },
         {
           'memEntity': memEntity,
