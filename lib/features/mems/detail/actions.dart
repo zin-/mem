@@ -3,14 +3,13 @@ import 'package:mem/features/mem_relations/mem_relation_state.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/features/mems/mem_detail.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/states.dart';
 
 import 'states.dart';
 
-final saveMem = Provider.autoDispose
-    .family<Future<(MemDetail, DateTime?)>, int?>((ref, memId) => v(
+final saveMem =
+    Provider.autoDispose.family<Future<DateTime?>, int?>((ref, memId) => v(
           () async {
             final (saved, nextNotifyAt) =
                 await ref.read(memEntitiesProvider.notifier).save(
@@ -24,17 +23,17 @@ final saveMem = Provider.autoDispose
             if (memId == null) {
               ref
                   .read(editingMemByMemIdProvider(memId).notifier)
-                  .updatedBy(saved.mem);
+                  .updatedBy(saved.$1);
             }
 
             ref.read(memItemsProvider.notifier).upsertAll(
-                  saved.memItems,
+                  saved.$2,
                   (current, updating) =>
                       current.value.memId == updating.value.memId &&
                       current.value.type == updating.value.type,
                 );
             ref.read(memNotificationsProvider.notifier).upsertAll(
-                  saved.notifications ?? [],
+                  saved.$3 ?? [],
                   (tmp, item) =>
                       tmp is SavedMemNotificationEntityV2 &&
                       item is SavedMemNotificationEntityV2 &&
@@ -44,7 +43,7 @@ final saveMem = Provider.autoDispose
                       current.value.isRepeatByDayOfWeek(),
                 );
 
-            return (saved, nextNotifyAt);
+            return nextNotifyAt;
           },
           memId,
         ));

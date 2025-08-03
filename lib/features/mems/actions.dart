@@ -12,7 +12,7 @@ final undoRemoveMem = FutureProvider.autoDispose.family<void, int>(
           await ref.read(memEntitiesProvider.notifier).undoRemove(memId);
       if (removeUndone != null) {
         ref.read(memItemsProvider.notifier).upsertAll(
-              removeUndone.memItems,
+              removeUndone.$2,
               (current, updating) =>
                   current is SavedMemItemEntityV2 &&
                   updating is SavedMemItemEntityV2 &&

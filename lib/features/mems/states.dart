@@ -1,13 +1,17 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/features/mem_relations/mem_relation_state.dart';
+import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/mems_state.dart';
+import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
-import 'package:mem/features/mems/mem_detail.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
+import 'package:mem/features/targets/target_entity.dart';
+import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 
 final memItemsProvider = StateNotifierProvider<
     ListValueStateNotifier<MemItemEntityV2>, List<MemItemEntityV2>>(
@@ -54,24 +58,44 @@ final memByMemIdProvider = StateNotifierProvider.autoDispose
   ),
 );
 
-final removedMemDetailProvider = StateNotifierProvider.autoDispose
-    .family<ValueStateNotifier<MemDetail?>, MemDetail?, int>(
+final removedMemDetailProvider = StateNotifierProvider.autoDispose.family<
+    ValueStateNotifier<
+        (
+          MemEntityV2,
+          List<MemItemEntityV2>,
+          List<MemNotificationEntityV2>?,
+          TargetEntity?,
+          List<MemRelationEntity>?
+        )?>,
+    (
+      MemEntityV2,
+      List<MemItemEntityV2>,
+      List<MemNotificationEntityV2>?,
+      TargetEntity?,
+      List<MemRelationEntity>?
+    )?,
+    int>(
   (ref, memId) => v(
     () {
       final removedMem = ref.watch(removedMemProvider(memId));
       final removedMemItems = ref.watch(removedMemItemsProvider(memId));
+      final removedMemNotifications =
+          ref.watch(memNotificationsByMemIdProvider(memId));
+      final target = ref.watch(targetStateProvider(memId)).valueOrNull;
+      final removedMemRelations =
+          ref.watch(memRelationEntitiesByMemIdProvider(memId)).valueOrNull;
 
-      MemDetail? removedMemDetail;
-      if (removedMem != null && removedMemItems != null) {
-        removedMemDetail = MemDetail(
-          removedMem,
-          removedMemItems,
-        );
-      } else {
-        removedMemDetail = null;
-      }
-
-      return ValueStateNotifier(removedMemDetail);
+      return ValueStateNotifier(
+        removedMem != null
+            ? (
+                removedMem,
+                removedMemItems ?? [],
+                removedMemNotifications,
+                target,
+                removedMemRelations?.toList(),
+              )
+            : null,
+      );
     },
     memId,
   ),
