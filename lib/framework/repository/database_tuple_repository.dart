@@ -35,11 +35,11 @@ abstract class DatabaseTupleRepositoryV2<ENTITY extends Entity,
             ..updateAll(
               (childRepository, value) {
                 if (childRepository is DatabaseTupleRepositoryV2) {
-                  final fk =
-                      childTableDefinition.foreignKeyDefinitions.singleWhere(
-                    (defFk) => defFk.parentTableDefinition == _tableDefinition,
-                  );
-                  return fk;
+                  final fks = childTableDefinition.foreignKeyDefinitions.where(
+                      (defFk) =>
+                          defFk.parentTableDefinition == _tableDefinition);
+                  // debug(fks);
+                  return fks.first;
                 } else {
                   return value;
                 }
