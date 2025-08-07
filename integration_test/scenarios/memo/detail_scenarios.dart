@@ -19,7 +19,7 @@ import '../helpers.dart';
 
 const _scenarioName = 'Memo detail scenario';
 
-void main() => group(': $_scenarioName', () {
+void main() => group(_scenarioName, () {
       IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
       late final DatabaseAccessor dbA;
