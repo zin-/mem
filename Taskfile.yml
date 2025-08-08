@@ -56,7 +56,7 @@ tasks:
     desc: "lintを実行します。"
     cmds:
       - task: flutter:analyze:app
-      # - task: flutter:analyze:generated
+      - task: flutter:analyze:generated
       - task: flutter:analyze:test
 
   run:
