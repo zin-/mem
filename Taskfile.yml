@@ -52,6 +52,13 @@ tasks:
     cmds:
       - task: flutter:dep:update
 
+  lint:
+    desc: "lintを実行します。"
+    cmds:
+      - task: flutter:analyze:app
+      - task: flutter:analyze:generated
+      - task: flutter:analyze:test
+
   run:
     desc: "アプリを実行します。"
     cmds:
@@ -60,7 +67,7 @@ tasks:
   pre-commit-checks:
     desc: "Run all checks required before committing (from tools/flutter.Taskfile.yml)"
     cmds:
-      - task: flutter:analyze
+      - task: lint
 
   pre-push-checks:
     desc: "Run all checks required before pushing (from tools/flutter.Taskfile.yml)"

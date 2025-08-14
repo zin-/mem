@@ -35,7 +35,8 @@ abstract class Repository<ENTITY extends Entity> {
     );
   }
 
-  final Map<Type, Map<Repository?, ColumnDefinition?>> childRepositories = {};
+  final Map<Type, Map<Repository?, Iterable<ColumnDefinition>?>>
+      childRepositories = {};
 
   waste({Condition? condition});
 }
