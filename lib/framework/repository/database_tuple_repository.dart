@@ -27,7 +27,6 @@ abstract class DatabaseTupleRepositoryV2<ENTITY extends Entity,
     childRepositories.updateAll(
       (childEntity, value) {
         final childTableDefinition = entityTableRelations[childEntity];
-
         if (childTableDefinition == null) {
           return value;
         } else {

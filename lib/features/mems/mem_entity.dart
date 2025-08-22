@@ -67,8 +67,6 @@ class SavedMemEntityV2 extends MemEntityV2
           ),
         ) {
     withMap(map);
-
-    entityTableRelations[MemEntityV2] ??= defTableMems;
   }
 
   @override

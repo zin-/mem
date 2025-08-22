@@ -1,4 +1,14 @@
 import 'package:mem/databases/table_definitions/base.dart';
+import 'package:mem/databases/table_definitions/mem_items.dart';
+import 'package:mem/databases/table_definitions/mem_notifications.dart';
+import 'package:mem/databases/table_definitions/mem_relations.dart';
+import 'package:mem/databases/table_definitions/mems.dart';
+import 'package:mem/features/mem_items/mem_item_entity.dart';
+import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
+import 'package:mem/features/targets/target_entity.dart';
+import 'package:mem/features/mem_relations/mem_relation_entity.dart';
+import 'package:mem/features/targets/target_table.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
 import 'package:mem/framework/repository/entity.dart';
 
@@ -27,4 +37,10 @@ mixin DatabaseTupleEntityV2<PRIMARY_KEY, T> on Entity<T> {
     });
 }
 
-final Map<Type, TableDefinition> entityTableRelations = {};
+final Map<Type, TableDefinition> entityTableRelations = {
+  MemEntityV2: defTableMems,
+  MemItemEntityV2: defTableMemItems,
+  MemNotificationEntityV2: defTableMemNotifications,
+  TargetEntity: defTableTargets,
+  MemRelationEntity: defTableMemRelations,
+};

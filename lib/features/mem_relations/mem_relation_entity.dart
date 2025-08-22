@@ -48,7 +48,5 @@ class SavedMemRelationEntity extends MemRelationEntity
           ),
         ) {
     withMap(map);
-
-    entityTableRelations[MemRelationEntity] ??= defTableMemRelations;
   }
 }
