@@ -146,40 +146,40 @@ void main() => group(
               'Select target',
             );
             expect(
-              (widgetTester.widget(find.byType(Radio<int>).at(0)) as Radio)
-                  .groupValue,
-              null,
+              (widgetTester.widget(find.byType(Checkbox).at(0)) as Checkbox)
+                  .value,
+              false,
             );
             expect(
-              (widgetTester.widget(find.byType(Radio<int>).at(1)) as Radio)
-                  .groupValue,
-              null,
+              (widgetTester.widget(find.byType(Checkbox).at(1)) as Checkbox)
+                  .value,
+              false,
             );
             await widgetTester.tap(find.text(insertedMemName2));
             await widgetTester.pumpAndSettle();
 
             expect(
-              (widgetTester.widget(find.byType(Radio<int>).at(0)) as Radio)
-                  .groupValue,
-              null,
+              (widgetTester.widget(find.byType(Checkbox).at(0)) as Checkbox)
+                  .value,
+              false,
             );
             expect(
-              (widgetTester.widget(find.byType(Radio<int>).at(1)) as Radio)
-                  .groupValue,
-              insertedMemId2,
+              (widgetTester.widget(find.byType(Checkbox).at(1)) as Checkbox)
+                  .value,
+              true,
             );
             await widgetTester.tap(find.text(insertedMemName));
             await widgetTester.pumpAndSettle();
 
             expect(
-              (widgetTester.widget(find.byType(Radio<int>).at(0)) as Radio)
-                  .groupValue,
-              insertedMemId,
+              (widgetTester.widget(find.byType(Checkbox).at(0)) as Checkbox)
+                  .value,
+              true,
             );
             expect(
-              (widgetTester.widget(find.byType(Radio<int>).at(1)) as Radio)
-                  .groupValue,
-              null,
+              (widgetTester.widget(find.byType(Checkbox).at(1)) as Checkbox)
+                  .value,
+              false,
             );
             await widgetTester.tap(find.byIcon(Icons.check));
             await widgetTester.pumpAndSettle();
