@@ -20,7 +20,6 @@ void main() => group(
         const insertedMemName = '$_name: inserted - mem name';
         const insertedMemName2 = '$_name: inserted - mem name - 2';
         late int insertedMemId;
-        late int insertedMemId2;
         late DateTime actStart;
 
         late final DatabaseAccessor dbA;
@@ -35,13 +34,6 @@ void main() => group(
             defTableMems,
             {
               defColMemsName.name: insertedMemName,
-              defColCreatedAt.name: zeroDate,
-            },
-          );
-          insertedMemId2 = await dbA.insert(
-            defTableMems,
-            {
-              defColMemsName.name: insertedMemName2,
               defColCreatedAt.name: zeroDate,
             },
           );
