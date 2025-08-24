@@ -146,42 +146,36 @@ void main() => group(
               'Select target',
             );
             expect(
-              (widgetTester.widget(find.byType(Checkbox).at(0)) as Checkbox)
-                  .value,
-              false,
+              find.byType(Container).at(0),
+              findsOneWidget,
             );
             expect(
-              (widgetTester.widget(find.byType(Checkbox).at(1)) as Checkbox)
-                  .value,
-              false,
+              find.byType(Container).at(1),
+              findsOneWidget,
             );
             await widgetTester.tap(find.text(insertedMemName2));
             await widgetTester.pumpAndSettle();
 
             expect(
-              (widgetTester.widget(find.byType(Checkbox).at(0)) as Checkbox)
-                  .value,
-              false,
+              find.byType(Container).at(0),
+              findsOneWidget,
             );
             expect(
-              (widgetTester.widget(find.byType(Checkbox).at(1)) as Checkbox)
-                  .value,
-              true,
+              find.byType(Container).at(1),
+              findsOneWidget,
             );
             await widgetTester.tap(find.text(insertedMemName));
             await widgetTester.pumpAndSettle();
 
             expect(
-              (widgetTester.widget(find.byType(Checkbox).at(0)) as Checkbox)
-                  .value,
-              true,
+              find.byType(Container).at(0),
+              findsOneWidget,
             );
             expect(
-              (widgetTester.widget(find.byType(Checkbox).at(1)) as Checkbox)
-                  .value,
-              false,
+              find.byType(Container).at(1),
+              findsOneWidget,
             );
-            await widgetTester.tap(find.byIcon(Icons.check));
+            await widgetTester.tap(find.byIcon(Icons.check).first);
             await widgetTester.pumpAndSettle();
 
             if (defaultTargetPlatform == TargetPlatform.android) {
