@@ -187,7 +187,7 @@ void main() => group(
                   .groupValue,
               null,
             );
-            await widgetTester.tap(find.byIcon(Icons.check));
+            await widgetTester.tap(find.byIcon(Icons.check).first);
             await widgetTester.pumpAndSettle();
 
             if (defaultTargetPlatform == TargetPlatform.android) {

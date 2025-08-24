@@ -50,3 +50,43 @@ class _SingleSelectableMemListItemComponent extends ListTile {
     });
   }
 }
+
+class _SingleSelectIndicator extends StatelessWidget {
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _SingleSelectIndicator({
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // FIXME　RadioGroupとRadioListTileを使うべき
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 20,
+        height: 20,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: isSelected
+                ? Theme.of(context).primaryColor
+                : Theme.of(context).dividerColor,
+            width: 2,
+          ),
+          color:
+              isSelected ? Theme.of(context).primaryColor : Colors.transparent,
+        ),
+        child: isSelected
+            ? Icon(
+                Icons.check,
+                size: 14,
+                color: Colors.white,
+              )
+            : null,
+      ),
+    );
+  }
+}
