@@ -20,7 +20,7 @@ void main() => group(
         const insertedMemName = '$_name: inserted - mem name';
         const insertedMemName2 = '$_name: inserted - mem name - 2';
         late int insertedMemId;
-        late DateTime actStart;
+        // late DateTime actStart;
 
         late final DatabaseAccessor dbA;
 
@@ -57,7 +57,7 @@ void main() => group(
             defTableActs,
             {
               defFkActsMemId.name: insertedMemId,
-              defColActsStart.name: actStart = DateTime.now(),
+              defColActsStart.name: DateTime.now(),
               defColActsStartIsAllDay.name: 0,
               defColCreatedAt.name: zeroDate,
             },
