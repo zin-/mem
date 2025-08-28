@@ -50,6 +50,7 @@ runs:
         force-avd-creation: false
         emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot -partition-size 512
         disable-animations: false
+        disk-size: 512
         script: echo "Generated AVD snapshot for caching."
 
     - uses: reactivecircus/android-emulator-runner@v2
@@ -61,4 +62,5 @@ runs:
         force-avd-creation: false
         emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot -partition-size 512
         disable-animations: true
+        disk-size: 512
         script: ${{ inputs.script }}
