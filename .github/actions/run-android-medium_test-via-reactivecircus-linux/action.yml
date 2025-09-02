@@ -39,6 +39,20 @@ runs:
         sudo udevadm trigger --name-match=kvm
       shell: bash
 
+    - name: Move AVD storage to /tmp
+      run: |
+        # /tmp にディレクトリを作る
+        mkdir -p /tmp/android-avd
+
+        # 既存の ~/.android/avd を削除 or バックアップ
+        rm -rf ~/.android/avd
+
+        # シンボリックリンクを作る
+        ln -s /tmp/android-avd ~/.android/avd
+
+        # 権限を確認（念のため）
+        chmod -R 777 /tmp/android-avd
+
     - name: "Create Android virtual device"
       if: steps.avd-cache.outputs.cache-hit != 'true'
       uses: reactivecircus/android-emulator-runner@v2
