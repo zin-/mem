@@ -35,10 +35,12 @@ class _SingleSelectableMemListItemComponent extends ListTile {
     void Function(int? memId) onSelected,
   ) : super(
           title: MemNameText(memEntity),
-          trailing: Radio<int>(
-            value: memEntity.id,
+          trailing: RadioGroup<int>(
             groupValue: isSelected ? memEntity.id : null,
-            onChanged: onSelected,
+            onChanged: (value) => onSelected(value),
+            child: Radio<int>(
+              value: memEntity.id,
+            ),
           ),
           onTap: () => onSelected(memEntity.id),
         ) {
