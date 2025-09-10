@@ -100,41 +100,32 @@ void main() => group(_scenarioName, () {
           await widgetTester.tap(find.text(l10n.startOfDayLabel));
           await widgetTester.pumpAndSettle();
 
-          // TimePickerが表示されるのを待つ
-          await widgetTester.pumpAndSettle();
+          final rect =
+              widgetTester.getRect(find.byKey(Key('time-picker-dial')));
+          final tapPosition = Offset(
+            rect.left + rect.width / 2,
+            rect.top + rect.height / 2,
+          );
+          await widgetTester.tapAt(tapPosition);
 
-          // TimePickerで6時の位置をタップ
-          final timePickerFinder = find.byType(TimePickerDialog);
-          if (timePickerFinder.evaluate().isNotEmpty) {
-            final rect = widgetTester.getRect(timePickerFinder);
-            // 6時の位置（時計の下側中央）
-            final sixOClockPosition = Offset(
-              rect.left + rect.width * 0.5,
-              rect.top + rect.height * 0.8,
-            );
-            await widgetTester.tapAt(sixOClockPosition);
-            await widgetTester.pumpAndSettle();
-          }
-
-          // OKボタンをタップ
           await widgetTester.tap(okFinder);
           await widgetTester.pumpAndSettle();
 
-          // UI操作の結果が永続層に反映されたことを確認
-          final savedTime =
-              await PreferenceRepository().shipByKey(startOfDayKey);
-          expect(savedTime.value, TimeOfDay(hour: 6, minute: 0));
-
-          // UIに表示されるテキストも確認
-          final displayedText = widgetTester
-              .widget<Text>(find
-                  .descendant(
-                    of: find.byType(SettingsTile),
-                    matching: find.byType(Text),
-                  )
-                  .at(1))
-              .data;
-          expect(displayedText, "6:00 AM");
+          expect(
+            widgetTester
+                .widget<Text>(find
+                    .descendant(
+                      of: find.byType(SettingsTile),
+                      matching: find.byType(Text),
+                    )
+                    .at(1))
+                .data,
+            "6:00 AM",
+          );
+          expect(
+            (await PreferenceRepository().shipByKey(startOfDayKey)).value,
+            TimeOfDay(hour: 6, minute: 0),
+          );
         });
 
         group('With saved', () {
