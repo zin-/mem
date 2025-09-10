@@ -94,13 +94,20 @@ void main() => group(_scenarioName, () {
           await widgetTester.tap(find.text(l10n.startOfDayLabel));
           await widgetTester.pumpAndSettle();
 
-          final rect =
-              widgetTester.getRect(find.byKey(Key('time-picker-dial')));
-          final tapPosition = Offset(
-            rect.left + rect.width / 2,
-            rect.top + rect.height / 2,
-          );
-          await widgetTester.tapAt(tapPosition);
+          await widgetTester.pumpAndSettle();
+
+          final timePickerFinder = find.byType(TimePickerDialog);
+
+          if (timePickerFinder.evaluate().isNotEmpty) {
+            final rect = widgetTester.getRect(timePickerFinder);
+            final tapPosition = Offset(
+              rect.left + rect.width / 2,
+              rect.bottom - rect.height * 0.3,
+            );
+            await widgetTester.tapAt(tapPosition);
+            await widgetTester.pumpAndSettle();
+          }
+
           await widgetTester.tap(okFinder);
           await widgetTester.pumpAndSettle();
 
