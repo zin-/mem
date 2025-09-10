@@ -107,7 +107,6 @@ void main() => group(_scenarioName, () {
             rect.top + rect.height / 2,
           );
           await widgetTester.tapAt(tapPosition);
-
           await widgetTester.tap(okFinder);
           await widgetTester.pumpAndSettle();
 
