@@ -1,5 +1,5 @@
-name: "Run Android Medium test via reactivecircus"
-description: "Run Android Medium test via reactivecircus."
+name: "Run Android Medium test via direct AVD management"
+description: "Run Android Medium test via direct AVD management without reactivecircus."
 
 inputs:
   script:
@@ -14,10 +14,6 @@ inputs:
   android-arch:
     description: "android-arch"
     required: true
-# TODO 有効なProfileを見つける
-#   画面サイズなどのバラエティを増やす際に検討する
-#  android-device-profile:
-#    required: true
 
 runs:
   using: "composite"
@@ -30,11 +26,11 @@ runs:
         path: |
           ~/.android/avd/*
           ~/.android/adb*
-        key: avd-${{ inputs.android-api-level }}-${{ inputs.android-target }}-${{ inputs.android-arch }}-reactivecircus-v2
+        key: avd-${{ inputs.android-api-level }}-${{ inputs.android-target }}-${{ inputs.android-arch }}-direct-v3
         restore-keys: |
-          avd-${{ inputs.android-api-level }}-${{ inputs.android-target }}-${{ inputs.android-arch }}-reactivecircus-
-          avd-${{ inputs.android-api-level }}-${{ inputs.android-target }}-reactivecircus-
-          avd-${{ inputs.android-api-level }}-reactivecircus-
+          avd-${{ inputs.android-api-level }}-${{ inputs.android-target }}-${{ inputs.android-arch }}-direct-
+          avd-${{ inputs.android-api-level }}-${{ inputs.android-target }}-direct-
+          avd-${{ inputs.android-api-level }}-direct-
 
     - name: Enable KVM
       run: |
@@ -43,7 +39,7 @@ runs:
         sudo udevadm trigger --name-match=kvm
       shell: bash
 
-    - name: Clean up disk space
+    - name: Clean up disk space aggressively
       run: |
         # 不要なファイルを削除してディスク容量を確保
         sudo apt-get clean
@@ -51,45 +47,132 @@ runs:
         sudo rm -rf /tmp/*
         # 古いDockerイメージを削除（もしあれば）
         docker system prune -af 2>/dev/null || true
+        # 追加のクリーンアップ
+        sudo rm -rf /var/cache/apt/archives/*
+        sudo rm -rf /var/log/*.log
+        sudo rm -rf /var/log/*.gz
+        # ホームディレクトリの不要ファイルを削除
+        rm -rf ~/.cache/*
+        rm -rf ~/.gradle/caches/*
+        rm -rf ~/.android/cache/*
+        # より積極的なクリーンアップ
+        sudo rm -rf /usr/share/doc/*
+        sudo rm -rf /usr/share/man/*
+        sudo rm -rf /usr/share/locale/*
+        # ディスク使用量を確認
+        df -h
       shell: bash
 
-    - name: Move AVD storage to /tmp
-      run: |
-        # /tmp にディレクトリを作る
-        mkdir -p /tmp/android-avd
-
-        # 既存の ~/.android/avd を削除 or バックアップ
-        rm -rf ~/.android/avd
-
-        # シンボリックリンクを作る
-        ln -s /tmp/android-avd ~/.android/avd
-
-        # 権限を確認（念のため）
-        chmod -R 777 /tmp/android-avd
-      shell: bash
-
-    - name: "Create Android virtual device"
+    - name: Set up Android SDK and tools
       if: steps.avd-cache.outputs.cache-hit != 'true'
-      uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: ${{ inputs.android-api-level }}
-        target: ${{ inputs.android-target }}
-        arch: ${{ inputs.android-arch }}
-        #        profile: ${{ inputs.android-device-profile }}
-        force-avd-creation: false
-        emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot -partition-size 256 -memory 1024 -cores 2
-        disable-animations: false
-        disk-size: 256
-        script: echo "Generated AVD snapshot for caching."
+      run: |
+        # Android SDKの環境変数を設定
+        echo "ANDROID_HOME=$HOME/Android/Sdk" >> $GITHUB_ENV
+        echo "ANDROID_SDK_ROOT=$HOME/Android/Sdk" >> $GITHUB_ENV
+        echo "$HOME/Android/Sdk/platform-tools" >> $GITHUB_PATH
+        echo "$HOME/Android/Sdk/emulator" >> $GITHUB_PATH
+        echo "$HOME/Android/Sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
+        
+        # 必要なSDKコンポーネントをインストール
+        echo "y" | sdkmanager --install "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-target }};${{ inputs.android-arch }}"
+        echo "y" | sdkmanager --install "platform-tools"
+        echo "y" | sdkmanager --install "platforms;android-${{ inputs.android-api-level }}"
+        echo "y" | sdkmanager --install "emulator"
+        echo "y" | sdkmanager --install "build-tools;33.0.0"
+      shell: bash
 
-    - uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: ${{ inputs.android-api-level }}
-        target: ${{ inputs.android-target }}
-        arch: ${{ inputs.android-arch }}
-        #        profile: ${{ inputs.android-device-profile }}
-        force-avd-creation: false
-        emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot -partition-size 256 -memory 1024 -cores 2
-        disable-animations: true
-        disk-size: 256
-        script: ${{ inputs.script }}
+    - name: Create minimal AVD
+      if: steps.avd-cache.outputs.cache-hit != 'true'
+      run: |
+        # 最小限のAVDを作成
+        echo "no" | avdmanager create avd \
+          -n test \
+          -k "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-target }};${{ inputs.android-arch }}" \
+          --force \
+          --device "pixel_4" \
+          --sdcard 32M
+        
+        # AVD設定を最小限に調整
+        cat > ~/.android/avd/test.avd/config.ini << EOF
+avd.ini.encoding=UTF-8
+avd.ini.displayname=test
+abi.type=${{ inputs.android-arch }}
+hw.accelerometer=no
+hw.audioInput=no
+hw.audioOutput=no
+hw.battery=no
+hw.camera.back=none
+hw.camera.front=none
+hw.cpu.arch=${{ inputs.android-arch }}
+hw.cpu.ncore=2
+hw.dPad=no
+hw.device.hash2=MD5:1be89bc42ec964eb8e4d871d6556dc1e
+hw.device.manufacturer=Google
+hw.device.name=pixel_4
+hw.gps=no
+hw.gpu.enabled=yes
+hw.gpu.mode=swiftshader_indirect
+hw.initialOrientation=Portrait
+hw.keyboard=no
+hw.lcd.density=420
+hw.lcd.height=2280
+hw.lcd.width=1080
+hw.mainKeys=no
+hw.ramSize=1024
+hw.screen=no
+hw.sdCard=yes
+hw.sensors.orientation=no
+hw.sensors.proximity=no
+hw.trackBall=no
+image.sysdir.1=system-images/android-${{ inputs.android-api-level }}/${{ inputs.android-target }}/${{ inputs.android-arch }}/
+sdcard.size=32M
+showDeviceFrame=no
+skin.dynamic=no
+skin.name=pixel_4
+skin.path=devices/pixel_4.png
+tag.display=Google APIs
+tag.id=google_apis
+vm.heapSize=128
+EOF
+      shell: bash
+
+    - name: Start emulator with minimal resources
+      run: |
+        # エミュレーターを最小限のリソースで起動
+        emulator -avd test \
+          -no-window \
+          -no-audio \
+          -no-boot-anim \
+          -gpu swiftshader_indirect \
+          -memory 1024 \
+          -cores 2 \
+          -partition-size 64 \
+          -cache-size 16 \
+          -data-partition-size 64 \
+          -no-snapshot \
+          -no-snapshot-save \
+          -wipe-data \
+          -no-snapshot-load \
+          -camera-back none \
+          -camera-front none \
+          -netdelay none \
+          -netspeed full &
+        
+        # エミュレーターの起動を待機
+        adb wait-for-device
+        adb shell input keyevent 82
+        
+        # エミュレーターが完全に起動するまで待機
+        timeout 300 bash -c 'until adb shell getprop sys.boot_completed | grep -q 1; do sleep 5; done'
+      shell: bash
+
+    - name: Run test script
+      run: ${{ inputs.script }}
+      shell: bash
+
+    - name: Stop emulator
+      if: always()
+      run: |
+        adb emu kill || true
+        pkill -f emulator || true
+      shell: bash
