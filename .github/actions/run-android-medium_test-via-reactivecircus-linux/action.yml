@@ -39,29 +39,6 @@ runs:
         sudo udevadm trigger --name-match=kvm
       shell: bash
 
-    - name: Clean up disk space aggressively
-      run: |
-        # 不要なファイルを削除してディスク容量を確保
-        sudo apt-get clean
-        sudo rm -rf /var/lib/apt/lists/*
-        sudo rm -rf /tmp/*
-        # 古いDockerイメージを削除（もしあれば）
-        docker system prune -af 2>/dev/null || true
-        # 追加のクリーンアップ
-        sudo rm -rf /var/cache/apt/archives/*
-        sudo rm -rf /var/log/*.log
-        sudo rm -rf /var/log/*.gz
-        # ホームディレクトリの不要ファイルを削除
-        rm -rf ~/.cache/*
-        rm -rf ~/.gradle/caches/*
-        rm -rf ~/.android/cache/*
-        # より積極的なクリーンアップ
-        sudo rm -rf /usr/share/doc/*
-        sudo rm -rf /usr/share/man/*
-        sudo rm -rf /usr/share/locale/*
-        # ディスク使用量を確認
-        df -h
-      shell: bash
 
     - name: Set up Android SDK and tools
       if: steps.avd-cache.outputs.cache-hit != 'true'
@@ -81,82 +58,20 @@ runs:
         echo "y" | sdkmanager --install "build-tools;33.0.0"
       shell: bash
 
-    - name: Create minimal AVD
+    - name: Create AVD
       if: steps.avd-cache.outputs.cache-hit != 'true'
       run: |
-        # 最小限のAVDを作成
+        # シンプルにAVDを作成
         echo "no" | avdmanager create avd \
           -n test \
           -k "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-target }};${{ inputs.android-arch }}" \
-          --force \
-          --device "pixel_4" \
-          --sdcard 32M
-        
-        # AVD設定を最小限に調整
-        cat > ~/.android/avd/test.avd/config.ini << EOF
-avd.ini.encoding=UTF-8
-avd.ini.displayname=test
-abi.type=${{ inputs.android-arch }}
-hw.accelerometer=no
-hw.audioInput=no
-hw.audioOutput=no
-hw.battery=no
-hw.camera.back=none
-hw.camera.front=none
-hw.cpu.arch=${{ inputs.android-arch }}
-hw.cpu.ncore=2
-hw.dPad=no
-hw.device.hash2=MD5:1be89bc42ec964eb8e4d871d6556dc1e
-hw.device.manufacturer=Google
-hw.device.name=pixel_4
-hw.gps=no
-hw.gpu.enabled=yes
-hw.gpu.mode=swiftshader_indirect
-hw.initialOrientation=Portrait
-hw.keyboard=no
-hw.lcd.density=420
-hw.lcd.height=2280
-hw.lcd.width=1080
-hw.mainKeys=no
-hw.ramSize=1024
-hw.screen=no
-hw.sdCard=yes
-hw.sensors.orientation=no
-hw.sensors.proximity=no
-hw.trackBall=no
-image.sysdir.1=system-images/android-${{ inputs.android-api-level }}/${{ inputs.android-target }}/${{ inputs.android-arch }}/
-sdcard.size=32M
-showDeviceFrame=no
-skin.dynamic=no
-skin.name=pixel_4
-skin.path=devices/pixel_4.png
-tag.display=Google APIs
-tag.id=google_apis
-vm.heapSize=128
-EOF
+          --force
       shell: bash
 
-    - name: Start emulator with minimal resources
+    - name: Start emulator
       run: |
-        # エミュレーターを最小限のリソースで起動
-        emulator -avd test \
-          -no-window \
-          -no-audio \
-          -no-boot-anim \
-          -gpu swiftshader_indirect \
-          -memory 1024 \
-          -cores 2 \
-          -partition-size 64 \
-          -cache-size 16 \
-          -data-partition-size 64 \
-          -no-snapshot \
-          -no-snapshot-save \
-          -wipe-data \
-          -no-snapshot-load \
-          -camera-back none \
-          -camera-front none \
-          -netdelay none \
-          -netspeed full &
+        # エミュレーターを起動
+        emulator -avd test -no-window -no-audio -gpu swiftshader_indirect &
         
         # エミュレーターの起動を待機
         adb wait-for-device
