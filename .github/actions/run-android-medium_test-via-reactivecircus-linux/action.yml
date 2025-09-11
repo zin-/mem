@@ -39,6 +39,16 @@ runs:
         sudo udevadm trigger --name-match=kvm
       shell: bash
 
+    - name: Clean up disk space
+      run: |
+        # 不要なファイルを削除してディスク容量を確保
+        sudo apt-get clean
+        sudo rm -rf /var/lib/apt/lists/*
+        sudo rm -rf /tmp/*
+        # 古いDockerイメージを削除（もしあれば）
+        docker system prune -af 2>/dev/null || true
+      shell: bash
+
     - name: Move AVD storage to /tmp
       run: |
         # /tmp にディレクトリを作る
@@ -63,9 +73,9 @@ runs:
         arch: ${{ inputs.android-arch }}
         #        profile: ${{ inputs.android-device-profile }}
         force-avd-creation: false
-        emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot -partition-size 512
+        emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot -partition-size 256 -memory 1024 -cores 2
         disable-animations: false
-        disk-size: 512
+        disk-size: 256
         script: echo "Generated AVD snapshot for caching."
 
     - uses: reactivecircus/android-emulator-runner@v2
@@ -75,7 +85,7 @@ runs:
         arch: ${{ inputs.android-arch }}
         #        profile: ${{ inputs.android-device-profile }}
         force-avd-creation: false
-        emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot -partition-size 512
+        emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot -partition-size 256 -memory 1024 -cores 2
         disable-animations: true
-        disk-size: 512
+        disk-size: 256
         script: ${{ inputs.script }}
