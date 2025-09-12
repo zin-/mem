@@ -61,15 +61,30 @@ runs:
     - name: Create AVD
       if: steps.avd-cache.outputs.cache-hit != 'true'
       run: |
+        # AVDディレクトリを作成
+        mkdir -p ~/.android/avd
+        
         # シンプルにAVDを作成
         echo "no" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/avdmanager create avd \
           -n test \
           -k "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-target }};${{ inputs.android-arch }}" \
           --force
+        
+        # AVDが作成されたか確認
+        ls -la ~/.android/avd/
+        /usr/local/lib/android/sdk/cmdline-tools/latest/bin/avdmanager list avd
       shell: bash
 
     - name: Start emulator
       run: |
+        # AVDの存在を確認
+        echo "Available AVDs:"
+        /usr/local/lib/android/sdk/cmdline-tools/latest/bin/avdmanager list avd
+        
+        # AVDディレクトリの内容を確認
+        echo "AVD directory contents:"
+        ls -la ~/.android/avd/
+        
         # エミュレーターを起動
         /usr/local/lib/android/sdk/emulator/emulator -avd test -no-window -no-audio -gpu swiftshader_indirect &
         
