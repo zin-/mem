@@ -43,26 +43,26 @@ runs:
     - name: Set up Android SDK and tools
       if: steps.avd-cache.outputs.cache-hit != 'true'
       run: |
-        # Android SDKの環境変数を設定
-        echo "ANDROID_HOME=$HOME/Android/Sdk" >> $GITHUB_ENV
-        echo "ANDROID_SDK_ROOT=$HOME/Android/Sdk" >> $GITHUB_ENV
-        echo "$HOME/Android/Sdk/platform-tools" >> $GITHUB_PATH
-        echo "$HOME/Android/Sdk/emulator" >> $GITHUB_PATH
-        echo "$HOME/Android/Sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
+        # GitHub ActionsのAndroid SDKパスを使用
+        echo "ANDROID_HOME=/usr/local/lib/android/sdk" >> $GITHUB_ENV
+        echo "ANDROID_SDK_ROOT=/usr/local/lib/android/sdk" >> $GITHUB_ENV
+        echo "/usr/local/lib/android/sdk/platform-tools" >> $GITHUB_PATH
+        echo "/usr/local/lib/android/sdk/emulator" >> $GITHUB_PATH
+        echo "/usr/local/lib/android/sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
         
         # 必要なSDKコンポーネントをインストール
-        echo "y" | sdkmanager --install "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-target }};${{ inputs.android-arch }}"
-        echo "y" | sdkmanager --install "platform-tools"
-        echo "y" | sdkmanager --install "platforms;android-${{ inputs.android-api-level }}"
-        echo "y" | sdkmanager --install "emulator"
-        echo "y" | sdkmanager --install "build-tools;33.0.0"
+        echo "y" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --install "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-target }};${{ inputs.android-arch }}"
+        echo "y" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --install "platform-tools"
+        echo "y" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --install "platforms;android-${{ inputs.android-api-level }}"
+        echo "y" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --install "emulator"
+        echo "y" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --install "build-tools;33.0.0"
       shell: bash
 
     - name: Create AVD
       if: steps.avd-cache.outputs.cache-hit != 'true'
       run: |
         # シンプルにAVDを作成
-        echo "no" | avdmanager create avd \
+        echo "no" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/avdmanager create avd \
           -n test \
           -k "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-target }};${{ inputs.android-arch }}" \
           --force
@@ -71,14 +71,14 @@ runs:
     - name: Start emulator
       run: |
         # エミュレーターを起動
-        emulator -avd test -no-window -no-audio -gpu swiftshader_indirect &
+        /usr/local/lib/android/sdk/emulator/emulator -avd test -no-window -no-audio -gpu swiftshader_indirect &
         
         # エミュレーターの起動を待機
-        adb wait-for-device
-        adb shell input keyevent 82
+        /usr/local/lib/android/sdk/platform-tools/adb wait-for-device
+        /usr/local/lib/android/sdk/platform-tools/adb shell input keyevent 82
         
         # エミュレーターが完全に起動するまで待機
-        timeout 300 bash -c 'until adb shell getprop sys.boot_completed | grep -q 1; do sleep 5; done'
+        timeout 300 bash -c 'until /usr/local/lib/android/sdk/platform-tools/adb shell getprop sys.boot_completed | grep -q 1; do sleep 5; done'
       shell: bash
 
     - name: Run test script
@@ -88,6 +88,6 @@ runs:
     - name: Stop emulator
       if: always()
       run: |
-        adb emu kill || true
+        /usr/local/lib/android/sdk/platform-tools/adb emu kill || true
         pkill -f emulator || true
       shell: bash
