@@ -68,11 +68,29 @@ runs:
         # 環境変数を設定
         export ANDROID_AVD_HOME=/tmp/android-avd
         
-        # シンプルにAVDを作成
+        # シンプルにAVDを作成（容量制限付き）
         echo "no" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/avdmanager create avd \
           -n test \
           -k "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-target }};${{ inputs.android-arch }}" \
+          -d "pixel_3a" \
           --force
+        
+        # AVD設定ファイルを編集してuserdataパーティションサイズを制限
+        if [ -f /tmp/android-avd/test.avd/config.ini ]; then
+          echo "Editing AVD config to limit userdata partition size..."
+          # userdataパーティションサイズを3GBに制限（より小さく）
+          sed -i 's/disk.dataPartition.size=.*/disk.dataPartition.size=3GB/' /tmp/android-avd/test.avd/config.ini
+          # SDカードサイズも制限
+          sed -i 's/sdcard.size=.*/sdcard.size=128MB/' /tmp/android-avd/test.avd/config.ini
+          # RAMサイズも制限
+          sed -i 's/hw.ramSize=.*/hw.ramSize=1024/' /tmp/android-avd/test.avd/config.ini
+          # 追加の容量制限設定
+          echo "disk.dataPartition.size=3GB" >> /tmp/android-avd/test.avd/config.ini
+          echo "sdcard.size=128MB" >> /tmp/android-avd/test.avd/config.ini
+          echo "hw.ramSize=1024" >> /tmp/android-avd/test.avd/config.ini
+          echo "AVD config updated:"
+          cat /tmp/android-avd/test.avd/config.ini
+        fi
         
         # AVDが作成されたか確認
         echo "AVD directory contents:"
