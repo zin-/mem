@@ -46,6 +46,7 @@ runs:
         # GitHub ActionsのAndroid SDKパスを使用
         echo "ANDROID_HOME=/usr/local/lib/android/sdk" >> $GITHUB_ENV
         echo "ANDROID_SDK_ROOT=/usr/local/lib/android/sdk" >> $GITHUB_ENV
+        echo "ANDROID_AVD_HOME=$HOME/.android/avd" >> $GITHUB_ENV
         echo "/usr/local/lib/android/sdk/platform-tools" >> $GITHUB_PATH
         echo "/usr/local/lib/android/sdk/emulator" >> $GITHUB_PATH
         echo "/usr/local/lib/android/sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
@@ -64,6 +65,9 @@ runs:
         # AVDディレクトリを作成
         mkdir -p ~/.android/avd
         
+        # 環境変数を設定
+        export ANDROID_AVD_HOME=$HOME/.android/avd
+        
         # シンプルにAVDを作成
         echo "no" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/avdmanager create avd \
           -n test \
@@ -71,12 +75,25 @@ runs:
           --force
         
         # AVDが作成されたか確認
+        echo "AVD directory contents:"
         ls -la ~/.android/avd/
+        echo "Available AVDs:"
         /usr/local/lib/android/sdk/cmdline-tools/latest/bin/avdmanager list avd
+        
+        # AVD設定ファイルの内容を確認
+        if [ -f ~/.android/avd/test.ini ]; then
+          echo "test.ini contents:"
+          cat ~/.android/avd/test.ini
+        else
+          echo "test.ini not found in ~/.android/avd/"
+        fi
       shell: bash
 
     - name: Start emulator
       run: |
+        # 環境変数を設定
+        export ANDROID_AVD_HOME=$HOME/.android/avd
+        
         # AVDの存在を確認
         echo "Available AVDs:"
         /usr/local/lib/android/sdk/cmdline-tools/latest/bin/avdmanager list avd
@@ -84,6 +101,19 @@ runs:
         # AVDディレクトリの内容を確認
         echo "AVD directory contents:"
         ls -la ~/.android/avd/
+        
+        # test.iniファイルの存在確認
+        if [ -f ~/.android/avd/test.ini ]; then
+          echo "test.ini found:"
+          cat ~/.android/avd/test.ini
+        else
+          echo "ERROR: test.ini not found in ~/.android/avd/"
+          echo "Creating test.ini manually..."
+          echo "avd.ini.encoding=UTF-8" > ~/.android/avd/test.ini
+          echo "path=$HOME/.android/avd/test.avd" >> ~/.android/avd/test.ini
+          echo "path.rel=test.avd" >> ~/.android/avd/test.ini
+          echo "target=android-${{ inputs.android-api-level }}" >> ~/.android/avd/test.ini
+        fi
         
         # エミュレーターを起動
         /usr/local/lib/android/sdk/emulator/emulator -avd test -no-window -no-audio -gpu swiftshader_indirect &
