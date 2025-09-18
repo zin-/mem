@@ -142,10 +142,12 @@ runs:
         
         # エミュレーターの起動を待機
         /usr/local/lib/android/sdk/platform-tools/adb wait-for-device
-        /usr/local/lib/android/sdk/platform-tools/adb shell input keyevent 82
         
         # エミュレーターが完全に起動するまで待機
         timeout 300 bash -c 'until /usr/local/lib/android/sdk/platform-tools/adb shell getprop sys.boot_completed | grep -q 1; do sleep 5; done'
+        
+        # エミュレーターが完全に起動した後にキーイベントを送信
+        /usr/local/lib/android/sdk/platform-tools/adb shell input keyevent 82
       shell: bash
 
     - name: Run test script
