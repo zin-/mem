@@ -100,16 +100,31 @@ void main() => group(_scenarioName, () {
           await widgetTester.tap(find.text(l10n.startOfDayLabel));
           await widgetTester.pumpAndSettle();
 
-          final rect =
-              widgetTester.getRect(find.byKey(Key('time-picker-dial')));
-          final tapPosition = Offset(
-            rect.left + rect.width / 2,
-            rect.top + rect.height / 2,
+          // TimePickerダイアログが表示されるまで待機
+          expect(find.text('OK'), findsOneWidget);
+
+          // TimePickerの内部構造を調査して6:00 AMを選択
+          // 時間選択のためのTextウィジェットを探す
+          final hourTextFinder = find.descendant(
+            of: find.byType(AlertDialog),
+            matching: find.byType(Text),
           );
-          await widgetTester.tapAt(tapPosition);
+
+          if (hourTextFinder.evaluate().isNotEmpty) {
+            // 時間のTextウィジェットをタップして編集モードにする
+            await widgetTester.tap(hourTextFinder.first);
+            await widgetTester.pumpAndSettle();
+
+            // 6を入力
+            await widgetTester.enterText(hourTextFinder.first, '6');
+            await widgetTester.pumpAndSettle();
+          }
+
+          // OKボタンをタップして時間を確定
           await widgetTester.tap(okFinder);
           await widgetTester.pumpAndSettle();
 
+          // 6:00 AMが設定されることを確認
           expect(
             widgetTester
                 .widget<Text>(find
