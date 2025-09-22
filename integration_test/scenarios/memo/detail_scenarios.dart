@@ -143,7 +143,16 @@ void main() => group(': $_scenarioName', () {
               "$_scenarioName: Save: Update - mem name - entering";
           await widgetTester.enterText(
               memNameOnDetailPageFinder, enteringMemNameText);
+          // Androidエミュレーターでのテキスト入力反映を確実にするため、追加の待機時間を設ける
+          await widgetTester.pump(const Duration(milliseconds: 500));
           await widgetTester.pumpAndSettle();
+          // テキストが表示されるまで最大5秒待機（Androidエミュレーター対応）
+          for (int i = 0; i < 50; i++) {
+            await widgetTester.pump(const Duration(milliseconds: 100));
+            if (find.text(enteringMemNameText).evaluate().isNotEmpty) {
+              break;
+            }
+          }
           expect(find.text(enteringMemNameText), findsOneWidget);
 
           await widgetTester.tap(saveMemFabFinder);
