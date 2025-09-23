@@ -66,10 +66,18 @@ runs:
           echo "y" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --install "platform-tools"
         fi
         
-        # 必要なSDKコンポーネントをインストール（キャッシュヒット時はスキップ）
-        if [ "${{ steps.avd-cache.outputs.cache-hit }}" != "true" ]; then
-          echo "Installing Android SDK components..."
+        # システムイメージの存在確認とインストール（常に実行）
+        SYSTEM_IMAGE_PATH="/usr/local/lib/android/sdk/system-images/android-${{ inputs.android-api-level }}/${{ inputs.android-target }}/${{ inputs.android-arch }}"
+        if [ ! -d "$SYSTEM_IMAGE_PATH" ]; then
+          echo "System image not found at $SYSTEM_IMAGE_PATH, installing..."
           echo "y" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --install "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-target }};${{ inputs.android-arch }}"
+        else
+          echo "System image already exists at $SYSTEM_IMAGE_PATH"
+        fi
+        
+        # その他のSDKコンポーネントをインストール（キャッシュヒット時はスキップ）
+        if [ "${{ steps.avd-cache.outputs.cache-hit }}" != "true" ]; then
+          echo "Installing other Android SDK components..."
           echo "y" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --install "platforms;android-${{ inputs.android-api-level }}"
           echo "y" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --install "build-tools;33.0.0"
         fi
@@ -81,7 +89,6 @@ runs:
       shell: bash
 
     - name: Create AVD
-      if: steps.avd-cache.outputs.cache-hit != 'true'
       run: |
         # AVDディレクトリを作成
         mkdir -p /tmp/android-avd
@@ -89,12 +96,42 @@ runs:
         # 環境変数を設定
         export ANDROID_AVD_HOME=/tmp/android-avd
         
-        # シンプルにAVDを作成（容量制限付き）
-        echo "no" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/avdmanager create avd \
-          -n test \
-          -k "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-target }};${{ inputs.android-arch }}" \
-          -d "pixel_3a" \
-          --force
+        # システムイメージの存在確認
+        SYSTEM_IMAGE_PATH="/usr/local/lib/android/sdk/system-images/android-${{ inputs.android-api-level }}/${{ inputs.android-target }}/${{ inputs.android-arch }}"
+        echo "Checking system image at: $SYSTEM_IMAGE_PATH"
+        if [ ! -d "$SYSTEM_IMAGE_PATH" ]; then
+          echo "ERROR: System image not found at $SYSTEM_IMAGE_PATH"
+          echo "Available system images:"
+          find /usr/local/lib/android/sdk/system-images -type d -name "*${{ inputs.android-arch }}" 2>/dev/null || echo "No system images found"
+          exit 1
+        fi
+        
+        echo "System image found, checking AVD status..."
+        
+        # 既存のAVDを確認
+        if [ -f "/tmp/android-avd/test.ini" ] && [ -d "/tmp/android-avd/test.avd" ]; then
+          echo "AVD already exists, checking if it's valid..."
+          # AVDの有効性を確認
+          if /usr/local/lib/android/sdk/cmdline-tools/latest/bin/avdmanager list avd | grep -q "test"; then
+            echo "AVD 'test' is valid and ready"
+          else
+            echo "AVD 'test' exists but is invalid, recreating..."
+            rm -rf /tmp/android-avd/test.ini /tmp/android-avd/test.avd
+          fi
+        else
+          echo "AVD does not exist, creating new AVD..."
+        fi
+        
+        # AVDが存在しない場合は作成
+        if [ ! -f "/tmp/android-avd/test.ini" ] || [ ! -d "/tmp/android-avd/test.avd" ]; then
+          echo "Creating AVD..."
+          # シンプルにAVDを作成（容量制限付き）
+          echo "no" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/avdmanager create avd \
+            -n test \
+            -k "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-target }};${{ inputs.android-arch }}" \
+            -d "pixel_3a" \
+            --force
+        fi
         
         # AVD設定ファイルを編集してuserdataパーティションサイズを制限
         if [ -f /tmp/android-avd/test.avd/config.ini ]; then
