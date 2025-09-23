@@ -46,7 +46,6 @@ runs:
 
 
     - name: Set up Android SDK and tools
-      if: steps.avd-cache.outputs.cache-hit != 'true'
       run: |
         # GitHub ActionsのAndroid SDKパスを使用
         echo "ANDROID_HOME=/usr/local/lib/android/sdk" >> $GITHUB_ENV
@@ -56,12 +55,29 @@ runs:
         echo "/usr/local/lib/android/sdk/emulator" >> $GITHUB_PATH
         echo "/usr/local/lib/android/sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
         
-        # 必要なSDKコンポーネントをインストール
-        echo "y" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --install "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-target }};${{ inputs.android-arch }}"
-        echo "y" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --install "platform-tools"
-        echo "y" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --install "platforms;android-${{ inputs.android-api-level }}"
-        echo "y" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --install "emulator"
-        echo "y" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --install "build-tools;33.0.0"
+        # SDKの存在確認とインストール
+        if [ ! -f "/usr/local/lib/android/sdk/emulator/emulator" ]; then
+          echo "Android SDK emulator not found, installing..."
+          echo "y" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --install "emulator"
+        fi
+        
+        if [ ! -f "/usr/local/lib/android/sdk/platform-tools/adb" ]; then
+          echo "Android SDK platform-tools not found, installing..."
+          echo "y" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --install "platform-tools"
+        fi
+        
+        # 必要なSDKコンポーネントをインストール（キャッシュヒット時はスキップ）
+        if [ "${{ steps.avd-cache.outputs.cache-hit }}" != "true" ]; then
+          echo "Installing Android SDK components..."
+          echo "y" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --install "system-images;android-${{ inputs.android-api-level }};${{ inputs.android-target }};${{ inputs.android-arch }}"
+          echo "y" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --install "platforms;android-${{ inputs.android-api-level }}"
+          echo "y" | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --install "build-tools;33.0.0"
+        fi
+        
+        # SDKの状態を確認
+        echo "Android SDK status:"
+        ls -la /usr/local/lib/android/sdk/emulator/ || echo "Emulator directory not found"
+        ls -la /usr/local/lib/android/sdk/platform-tools/ || echo "Platform-tools directory not found"
       shell: bash
 
     - name: Create AVD
@@ -116,6 +132,22 @@ runs:
         # 環境変数を設定
         export ANDROID_AVD_HOME=/tmp/android-avd
         
+        # SDKツールの存在確認
+        echo "Checking Android SDK tools..."
+        if [ ! -f "/usr/local/lib/android/sdk/emulator/emulator" ]; then
+          echo "ERROR: Android emulator not found at /usr/local/lib/android/sdk/emulator/emulator"
+          echo "Available files in emulator directory:"
+          ls -la /usr/local/lib/android/sdk/emulator/ || echo "Emulator directory does not exist"
+          exit 1
+        fi
+        
+        if [ ! -f "/usr/local/lib/android/sdk/platform-tools/adb" ]; then
+          echo "ERROR: ADB not found at /usr/local/lib/android/sdk/platform-tools/adb"
+          echo "Available files in platform-tools directory:"
+          ls -la /usr/local/lib/android/sdk/platform-tools/ || echo "Platform-tools directory does not exist"
+          exit 1
+        fi
+        
         # AVDの存在を確認
         echo "Available AVDs:"
         /usr/local/lib/android/sdk/cmdline-tools/latest/bin/avdmanager list avd
@@ -138,16 +170,23 @@ runs:
         fi
         
         # エミュレーターを起動
+        echo "Starting Android emulator..."
         /usr/local/lib/android/sdk/emulator/emulator -avd test -no-window -no-audio -gpu swiftshader_indirect &
+        EMULATOR_PID=$!
         
         # エミュレーターの起動を待機
+        echo "Waiting for emulator to start..."
         /usr/local/lib/android/sdk/platform-tools/adb wait-for-device
         
         # エミュレーターが完全に起動するまで待機
+        echo "Waiting for emulator to fully boot..."
         timeout 300 bash -c 'until /usr/local/lib/android/sdk/platform-tools/adb shell getprop sys.boot_completed | grep -q 1; do sleep 5; done'
         
         # エミュレーターが完全に起動した後にキーイベントを送信
+        echo "Emulator is ready, sending key event..."
         /usr/local/lib/android/sdk/platform-tools/adb shell input keyevent 82
+        
+        echo "Emulator started successfully with PID: $EMULATOR_PID"
       shell: bash
 
     - name: Run test script
