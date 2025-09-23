@@ -146,13 +146,52 @@ void main() => group(': $_scenarioName', () {
           // Androidエミュレーターでのテキスト入力反映を確実にするため、追加の待機時間を設ける
           await widgetTester.pump(const Duration(milliseconds: 500));
           await widgetTester.pumpAndSettle();
-          // テキストが表示されるまで最大5秒待機（Androidエミュレーター対応）
-          for (int i = 0; i < 50; i++) {
+
+          // キーボードを閉じる（Androidエミュレーター対応）
+          await widgetTester.testTextInput.receiveAction(TextInputAction.done);
+          await widgetTester.pump(const Duration(milliseconds: 200));
+          await widgetTester.pumpAndSettle();
+
+          // テキストが表示されるまで最大10秒待機（Androidエミュレーター対応）
+          bool textFound = false;
+          for (int i = 0; i < 100; i++) {
             await widgetTester.pump(const Duration(milliseconds: 100));
             if (find.text(enteringMemNameText).evaluate().isNotEmpty) {
+              textFound = true;
               break;
             }
+            // デバッグ用：現在のテキストフィールドの内容を確認
+            if (i % 20 == 0) {
+              // ignore: avoid_print
+              print(
+                  "Waiting for text '$enteringMemNameText' to appear... (attempt ${i + 1}/100)");
+              // 現在のテキストフィールドの内容を確認
+              final textFieldFinder = find.byType(TextField);
+              if (textFieldFinder.evaluate().isNotEmpty) {
+                final textField =
+                    widgetTester.widget<TextField>(textFieldFinder.first);
+                // ignore: avoid_print
+                print(
+                    "Current TextField value: '${textField.controller?.text}'");
+              }
+            }
           }
+
+          if (!textFound) {
+            // ignore: avoid_print
+            print(
+                "ERROR: Text '$enteringMemNameText' not found after 10 seconds");
+            // ignore: avoid_print
+            print("Available text widgets:");
+            final allTextWidgets = find.byType(Text);
+            for (int i = 0; i < allTextWidgets.evaluate().length; i++) {
+              final textWidget =
+                  widgetTester.widget<Text>(allTextWidgets.at(i));
+              // ignore: avoid_print
+              print("  - '${textWidget.data}'");
+            }
+          }
+
           expect(find.text(enteringMemNameText), findsOneWidget);
 
           await widgetTester.tap(saveMemFabFinder);
