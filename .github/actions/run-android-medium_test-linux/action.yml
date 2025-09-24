@@ -1,5 +1,5 @@
-name: "Run Android Medium test via direct AVD management"
-description: "Run Android Medium test via direct AVD management without reactivecircus."
+name: "Run Android Medium test"
+description: "Run Android Medium test on Android emulator."
 
 inputs:
   script:
@@ -31,11 +31,11 @@ runs:
         path: |
           /tmp/android-avd/*
           ~/.android/adb*
-        key: avd-${{ inputs.android-api-level }}-${{ inputs.android-target }}-${{ inputs.android-arch }}-direct-v3
+        key: avd-${{ inputs.android-api-level }}-${{ inputs.android-target }}-${{ inputs.android-arch }}
         restore-keys: |
-          avd-${{ inputs.android-api-level }}-${{ inputs.android-target }}-${{ inputs.android-arch }}-direct-
-          avd-${{ inputs.android-api-level }}-${{ inputs.android-target }}-direct-
-          avd-${{ inputs.android-api-level }}-direct-
+          avd-${{ inputs.android-api-level }}-${{ inputs.android-target }}-${{ inputs.android-arch }}-
+          avd-${{ inputs.android-api-level }}-${{ inputs.android-target }}-
+          avd-${{ inputs.android-api-level }}-
 
     - name: Enable KVM
       run: |
