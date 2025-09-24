@@ -146,12 +146,14 @@ void main() => group(
               'Select target',
             );
             expect(
-              (widgetTester.widget(find.byType(Radio<int>).at(0)) as Radio)
+              (widgetTester.widget(find.byType(RadioGroup<int>).at(0))
+                      as RadioGroup)
                   .groupValue,
               null,
             );
             expect(
-              (widgetTester.widget(find.byType(Radio<int>).at(1)) as Radio)
+              (widgetTester.widget(find.byType(RadioGroup<int>).at(1))
+                      as RadioGroup)
                   .groupValue,
               null,
             );
@@ -159,12 +161,14 @@ void main() => group(
             await widgetTester.pumpAndSettle();
 
             expect(
-              (widgetTester.widget(find.byType(Radio<int>).at(0)) as Radio)
+              (widgetTester.widget(find.byType(RadioGroup<int>).at(0))
+                      as RadioGroup)
                   .groupValue,
               null,
             );
             expect(
-              (widgetTester.widget(find.byType(Radio<int>).at(1)) as Radio)
+              (widgetTester.widget(find.byType(RadioGroup<int>).at(1))
+                      as RadioGroup)
                   .groupValue,
               insertedMemId2,
             );
@@ -172,12 +176,14 @@ void main() => group(
             await widgetTester.pumpAndSettle();
 
             expect(
-              (widgetTester.widget(find.byType(Radio<int>).at(0)) as Radio)
+              (widgetTester.widget(find.byType(RadioGroup<int>).at(0))
+                      as RadioGroup)
                   .groupValue,
               insertedMemId,
             );
             expect(
-              (widgetTester.widget(find.byType(Radio<int>).at(1)) as Radio)
+              (widgetTester.widget(find.byType(RadioGroup<int>).at(1))
+                      as RadioGroup)
                   .groupValue,
               null,
             );
