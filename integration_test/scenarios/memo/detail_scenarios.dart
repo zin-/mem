@@ -19,7 +19,7 @@ import '../helpers.dart';
 
 const _scenarioName = 'Memo detail scenario';
 
-void main() => group(': $_scenarioName', () {
+void main() => group(_scenarioName, () {
       IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
       late final DatabaseAccessor dbA;
@@ -196,8 +196,8 @@ void main() => group(': $_scenarioName', () {
 
           await widgetTester.tap(saveMemFabFinder);
           await widgetTester.pumpAndSettle();
-          const saveSuccessText = "Save success. $enteringMemNameText";
-          expect(find.text(saveSuccessText), findsOneWidget);
+          expect(find.text(l10n.saveMemSuccessMessage(enteringMemNameText)),
+              findsOneWidget);
 
           await widgetTester.pageBack();
           await widgetTester.pumpAndSettle();

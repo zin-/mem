@@ -17,10 +17,22 @@ tasks:
     cmds:
       - flutter pub upgrade
 
-  analyze:
+  analyze:app:
     desc: "Run Flutter static analysis"
     cmds:
-      - flutter analyze
+      - flutter analyze lib
+    silent: false
+
+  analyze:generated:
+    desc: "Run Flutter static analysis"
+    cmds:
+      - dart run custom_lint
+    silent: false
+
+  analyze:test:
+    desc: "Run Flutter static analysis"
+    cmds:
+      - flutter analyze test
     silent: false
 
   gen:

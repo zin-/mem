@@ -27,7 +27,6 @@ abstract class DatabaseTupleRepositoryV2<ENTITY extends Entity,
     childRepositories.updateAll(
       (childEntity, value) {
         final childTableDefinition = entityTableRelations[childEntity];
-
         if (childTableDefinition == null) {
           return value;
         } else {
@@ -35,11 +34,9 @@ abstract class DatabaseTupleRepositoryV2<ENTITY extends Entity,
             ..updateAll(
               (childRepository, value) {
                 if (childRepository is DatabaseTupleRepositoryV2) {
-                  final fk =
-                      childTableDefinition.foreignKeyDefinitions.singleWhere(
-                    (defFk) => defFk.parentTableDefinition == _tableDefinition,
-                  );
-                  return fk;
+                  return childTableDefinition.foreignKeyDefinitions.where(
+                      (defFk) =>
+                          defFk.parentTableDefinition == _tableDefinition);
                 } else {
                   return value;
                 }
@@ -221,12 +218,15 @@ abstract class DatabaseTupleRepositoryV2<ENTITY extends Entity,
             condition: condition,
           );
 
-          for (final a in childRepositories.entries) {
-            for (final b in a.value.entries) {
-              if (b.key != null && b.value != null) {
-                await b.key!.waste(
-                  condition: In(b.value!.name, targets.map((e) => e.id)),
-                );
+          for (final byChild in childRepositories.entries) {
+            for (final repositoryWithFks in byChild.value.entries) {
+              if (repositoryWithFks.key != null &&
+                  repositoryWithFks.value != null) {
+                for (final fk in repositoryWithFks.value!) {
+                  await repositoryWithFks.key!.waste(
+                    condition: In(fk.name, targets.map((e) => e.id)),
+                  );
+                }
               }
             }
           }

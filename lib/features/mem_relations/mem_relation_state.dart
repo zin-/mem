@@ -22,12 +22,19 @@ class MemRelationEntitiesByMemId extends _$MemRelationEntitiesByMemId {
             return [];
           }
 
-          final entities =
+          final currentEntities = ref.watch(memRelationEntitiesProvider);
+          final fetchedEntities =
               await MemRelationRepository().ship(sourceMemId: memId);
 
-          ref.watch(memRelationEntitiesProvider.notifier).upsert(entities);
+          if (fetchedEntities.isNotEmpty &&
+              !currentEntities
+                  .every((e) => fetchedEntities.any((ee) => ee.id == e.id))) {
+            ref
+                .watch(memRelationEntitiesProvider.notifier)
+                .upsert(fetchedEntities);
+          }
 
-          return entities;
+          return [...currentEntities, ...fetchedEntities];
         },
         {'memId': memId},
       );

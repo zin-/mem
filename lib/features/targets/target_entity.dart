@@ -43,8 +43,6 @@ class SavedTargetEntity extends TargetEntity
           ),
         ) {
     withMap(map);
-
-    entityTableRelations[TargetEntity] ??= defTableTargets;
   }
 
   @override
