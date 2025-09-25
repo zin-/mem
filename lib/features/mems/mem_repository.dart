@@ -8,7 +8,7 @@ import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 
 class MemRepositoryV2
-    extends DatabaseTupleRepositoryV2<MemEntityV2, SavedMemEntityV2> {
+    extends DatabaseTupleRepository<MemEntityV2, SavedMemEntityV2> {
   MemRepositoryV2() : super(databaseDefinition, defTableMems);
 
   @override

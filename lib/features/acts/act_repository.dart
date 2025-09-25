@@ -27,8 +27,7 @@ extension _ActOrderByExt on ActOrderBy {
 
 // @Deprecated('ActRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
 // lintエラーになるためコメントアウト
-class ActRepository
-    extends DatabaseTupleRepositoryV2<ActEntity, SavedActEntity> {
+class ActRepository extends DatabaseTupleRepository<ActEntity, SavedActEntity> {
   ActRepository() : super(databaseDefinition, defTableActs);
 
   @override

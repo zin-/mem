@@ -12,7 +12,7 @@ import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/features/logger/log_service.dart';
 
-abstract class DatabaseTupleRepositoryV2<ENTITY extends Entity,
+abstract class DatabaseTupleRepository<ENTITY extends Entity,
     SAVED extends DatabaseTupleEntity> extends Repository<ENTITY> {
   static DatabaseAccessor? _databaseAccessor;
   static final Map<TableDefinition, Repository> _repositories = {};
@@ -21,7 +21,7 @@ abstract class DatabaseTupleRepositoryV2<ENTITY extends Entity,
   final TableDefinition _tableDefinition;
 
   // FIXME DatabaseDefinitionの中にTableDefinitionがあるのでEから取得できるのでは？
-  DatabaseTupleRepositoryV2(this._databaseDefinition, this._tableDefinition) {
+  DatabaseTupleRepository(this._databaseDefinition, this._tableDefinition) {
     _repositories[_tableDefinition] = this;
 
     childRepositories.updateAll(
@@ -33,7 +33,7 @@ abstract class DatabaseTupleRepositoryV2<ENTITY extends Entity,
           return value
             ..updateAll(
               (childRepository, value) {
-                if (childRepository is DatabaseTupleRepositoryV2) {
+                if (childRepository is DatabaseTupleRepository) {
                   return childTableDefinition.foreignKeyDefinitions.where(
                       (defFk) =>
                           defFk.parentTableDefinition == _tableDefinition);
