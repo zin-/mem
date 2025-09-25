@@ -10,6 +10,8 @@ import 'package:mem/features/logger/log_service.dart';
 import 'mem_notification.dart';
 import 'mem_notification_entity.dart';
 
+// @Deprecated('MemNotificationRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
+// lintエラーになるためコメントアウト
 class MemNotificationRepositoryV2 extends DatabaseTupleRepositoryV2<
     MemNotificationEntity, SavedMemNotificationEntityV2> {
   MemNotificationRepositoryV2()
