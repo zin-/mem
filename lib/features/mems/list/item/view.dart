@@ -61,7 +61,7 @@ ListTile _render(
   void Function() finishAct,
   void Function() pauseAct,
   void Function() closeAct,
-  Iterable<MemNotificationEntityV2> memNotificationEntities,
+  Iterable<MemNotificationEntity> memNotificationEntities,
 ) =>
     v(
       () {

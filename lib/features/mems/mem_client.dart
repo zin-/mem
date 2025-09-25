@@ -17,7 +17,7 @@ class MemClient {
         (
           MemEntityV2,
           List<MemItemEntityV2>,
-          List<MemNotificationEntityV2>?,
+          List<MemNotificationEntity>?,
           TargetEntity?,
           List<MemRelationEntity>?
         ),
@@ -25,7 +25,7 @@ class MemClient {
       )> save(
     MemEntityV2 mem,
     List<MemItemEntityV2> memItemList,
-    List<MemNotificationEntityV2> memNotificationList,
+    List<MemNotificationEntity> memNotificationList,
     TargetEntity? target,
     List<MemRelationEntity>? memRelations,
   ) =>
@@ -64,7 +64,7 @@ class MemClient {
       (
         MemEntityV2,
         List<MemItemEntityV2>,
-        List<MemNotificationEntityV2>?,
+        List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?
       )> archive(SavedMemEntityV2 memEntity) => v(
@@ -85,7 +85,7 @@ class MemClient {
       (
         MemEntityV2,
         List<MemItemEntityV2>,
-        List<MemNotificationEntityV2>?,
+        List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?
       )> unarchive(SavedMemEntityV2 memEntity) => v(

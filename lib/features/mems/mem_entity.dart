@@ -21,7 +21,7 @@ class MemEntityV2 with Entity<Mem> {
     entityChildrenRelation[MemEntityV2] ??= {
       MemItemEntityV2,
       ActEntity,
-      MemNotificationEntityV2,
+      MemNotificationEntity,
       TargetEntity,
       MemRelationEntity,
     };

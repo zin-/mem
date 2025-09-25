@@ -28,14 +28,14 @@ class MemService {
       (
         MemEntityV2,
         List<MemItemEntityV2>,
-        List<MemNotificationEntityV2>?,
+        List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?
       )> save(
     (
       MemEntityV2,
       List<MemItemEntityV2>,
-      List<MemNotificationEntityV2>?,
+      List<MemNotificationEntity>?,
       TargetEntity?,
       List<MemRelationEntity>?
     ) memDetail, {
@@ -179,7 +179,7 @@ class MemService {
       (
         MemEntityV2,
         List<MemItemEntityV2>,
-        List<MemNotificationEntityV2>?,
+        List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?
       )> doneByMemId(
@@ -208,7 +208,7 @@ class MemService {
       (
         MemEntityV2,
         List<MemItemEntityV2>,
-        List<MemNotificationEntityV2>?,
+        List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?
       )> undoneByMemId(
@@ -237,7 +237,7 @@ class MemService {
       (
         MemEntityV2,
         List<MemItemEntityV2>,
-        List<MemNotificationEntityV2>?,
+        List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?
       )> archive(SavedMemEntityV2 mem) => i(
@@ -268,7 +268,7 @@ class MemService {
       (
         MemEntityV2,
         List<MemItemEntityV2>,
-        List<MemNotificationEntityV2>?,
+        List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?
       )> unarchive(SavedMemEntityV2 mem) => i(

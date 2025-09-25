@@ -11,7 +11,7 @@ import 'mem_notification.dart';
 import 'mem_notification_entity.dart';
 
 class MemNotificationRepositoryV2 extends DatabaseTupleRepositoryV2<
-    MemNotificationEntityV2, SavedMemNotificationEntityV2> {
+    MemNotificationEntity, SavedMemNotificationEntityV2> {
   MemNotificationRepositoryV2()
       : super(databaseDefinition, defTableMemNotifications);
 

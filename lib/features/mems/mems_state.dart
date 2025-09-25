@@ -64,7 +64,7 @@ class MemEntities extends _$MemEntities
         (
           MemEntityV2,
           List<MemItemEntityV2>,
-          List<MemNotificationEntityV2>?,
+          List<MemNotificationEntity>?,
           TargetEntity?,
           List<MemRelationEntity>?
         ),
@@ -72,7 +72,7 @@ class MemEntities extends _$MemEntities
       )> save(
     MemEntityV2 memEntity,
     Iterable<MemItemEntityV2> memItemEntities,
-    Iterable<MemNotificationEntityV2> memNotificationEntities,
+    Iterable<MemNotificationEntity> memNotificationEntities,
     TargetEntity? targetEntity,
     Iterable<MemRelationEntity>? memRelationEntities,
   ) =>
@@ -116,7 +116,7 @@ class MemEntities extends _$MemEntities
       (
         MemEntityV2,
         List<MemItemEntityV2>,
-        List<MemNotificationEntityV2>?,
+        List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?
       )?> undoRemove(int id) => v(

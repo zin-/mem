@@ -51,7 +51,7 @@ class _MemListWidget extends StatelessWidget {
   final ScrollController _scrollController;
   final List<SavedMemEntityV2> _memList;
   final TimeOfDay _startOfDay;
-  final Iterable<MemNotificationEntityV2> _memNotifications;
+  final Iterable<MemNotificationEntity> _memNotifications;
   final Iterable<Act> _latestActsByMem;
   final void Function(int memId) _onItemTapped;
 
