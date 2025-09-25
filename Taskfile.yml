@@ -11,20 +11,17 @@ includes:
 
 tasks:
   default:
-    desc: "利用可能なタスク一覧を表示します"
     cmds:
       - task --list
     silent: true
 
   gen:
-    desc: "コード生成を実行します。"
     cmds:
       - task: flutter:gen
       - task: flutter:gen:l10n
     silent: false
 
   watch:
-    desc: "コード生成を実行のため、ソースコードを監視します。"
     cmds:
       - task: flutter:gen
         vars:
@@ -32,35 +29,29 @@ tasks:
     silent: false
 
   init:
-    desc: "初期化を実行します。"
     cmds:
       - task: git:setup-git-hooks
 
   dep:
-    desc: "依存関係を更新します。"
     cmds:
       - task: flutter:dep
 
   dep:check:
-    desc: "依存関係を更新します。"
     cmds:
       - task: flutter:dep:check
         silent: true
 
   dep:update:
-    desc: "依存関係を更新します。"
     cmds:
       - task: flutter:dep:update
 
   lint:
-    desc: "lintを実行します。"
     cmds:
       - task: flutter:analyze:app
       - task: flutter:analyze:generated
       - task: flutter:analyze:test
 
   run:
-    desc: "アプリを実行します。"
     cmds:
       - task: flutter:run
   
@@ -70,11 +61,9 @@ tasks:
       - task: flutter:test:integration
 
   pre-commit-checks:
-    desc: "Run all checks required before committing (from tools/flutter.Taskfile.yml)"
     cmds:
       - task: lint
 
   pre-push-checks:
-    desc: "Run all checks required before pushing (from tools/flutter.Taskfile.yml)"
     cmds:
       - task: flutter:test

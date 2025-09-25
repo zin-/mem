@@ -2,7 +2,6 @@ version: '3'
 
 tasks:
   setup-git-hooks:
-    desc: "Set up Git hooks by symlinking them from tools/git-hooks to .git/hooks"
     cmds:
       - |
         #!/bin/sh
