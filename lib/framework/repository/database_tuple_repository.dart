@@ -13,7 +13,7 @@ import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/features/logger/log_service.dart';
 
 abstract class DatabaseTupleRepositoryV2<ENTITY extends Entity,
-    SAVED extends DatabaseTupleEntityV2> extends Repository<ENTITY> {
+    SAVED extends DatabaseTupleEntity> extends Repository<ENTITY> {
   static DatabaseAccessor? _databaseAccessor;
   static final Map<TableDefinition, Repository> _repositories = {};
 

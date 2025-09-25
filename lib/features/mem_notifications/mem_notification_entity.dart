@@ -24,7 +24,7 @@ class MemNotificationEntity with Entity<MemNotification> {
 }
 
 class SavedMemNotificationEntityV2 extends MemNotificationEntity
-    with DatabaseTupleEntityV2<int, MemNotification> {
+    with DatabaseTupleEntity<int, MemNotification> {
   SavedMemNotificationEntityV2(Map<String, dynamic> map)
       : super(
           MemNotification.by(
