@@ -16,7 +16,7 @@ class MemNotificationsPage extends StatelessWidget {
   Widget build(BuildContext context) => v(
         () => Scaffold(
           appBar: AppBar(
-            title: MemNameTextV2(_memId),
+            title: MemNameText(_memId),
           ),
           body: SingleChildScrollView(
             child: Flex(

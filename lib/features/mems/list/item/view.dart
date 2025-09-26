@@ -94,11 +94,11 @@ ListTile _render(
 
         return ListTile(
           title: !hasActiveAct
-              ? MemNameTextV2(memEntity.id)
+              ? MemNameText(memEntity.id)
               : Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(child: MemNameTextV2(memEntity.id)),
+                    Expanded(child: MemNameText(memEntity.id)),
                     ElapsedTimeView(latestActByMem.period!.start!),
                   ],
                 ),

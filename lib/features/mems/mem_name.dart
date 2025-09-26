@@ -71,14 +71,14 @@ class _MemNameTextFormField extends StatelessWidget {
       );
 }
 
-class MemNameTextV2 extends ConsumerWidget {
+class MemNameText extends ConsumerWidget {
   final int? _memId;
 
-  const MemNameTextV2(this._memId, {super.key});
+  const MemNameText(this._memId, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () => _MemNameTextV2(
+        () => _MemNameText(
           ref.watch(MemStateProvider(_memId)).valueOrNull?.name ?? '',
           _memNameTag(_memId),
           ref.watch(MemStateProvider(_memId)).valueOrNull?.isDone ?? false,
@@ -89,12 +89,12 @@ class MemNameTextV2 extends ConsumerWidget {
       );
 }
 
-class _MemNameTextV2 extends StatelessWidget {
+class _MemNameText extends StatelessWidget {
   final String _memName;
   final String _memNameTag;
   final bool _isDone;
 
-  const _MemNameTextV2(this._memName, this._memNameTag, this._isDone);
+  const _MemNameText(this._memName, this._memNameTag, this._isDone);
 
   @override
   Widget build(BuildContext context) => v(
