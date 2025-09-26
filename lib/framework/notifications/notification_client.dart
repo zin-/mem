@@ -25,7 +25,7 @@ class NotificationClient {
   final ScheduleClient _scheduleClient;
   final NotificationRepository _notificationRepository;
   final PreferenceRepository _preferenceClientRepository;
-  final MemRepositoryV2 _memRepository;
+  final MemRepository _memRepository;
   final MemNotificationRepository _memNotificationRepository;
   final ActRepository _actRepository;
 
@@ -47,7 +47,7 @@ class NotificationClient {
           ScheduleClient(),
           NotificationRepository(),
           PreferenceRepository(),
-          MemRepositoryV2(),
+          MemRepository(),
           MemNotificationRepository(),
           ActRepository(),
         ),

@@ -31,7 +31,7 @@ class MemEntities extends _$MemEntities
   ) =>
       v(
         () async {
-          final mems = await MemRepositoryV2().ship(
+          final mems = await MemRepository().ship(
             archived: showNotArchived == showArchived ? null : showArchived,
             done: showNotDone == showDone ? null : showDone,
           );
@@ -50,7 +50,7 @@ class MemEntities extends _$MemEntities
 
   Future<SavedMemEntityV2?> loadByMemId(int memId) => v(
         () async {
-          final mem = await MemRepositoryV2().ship(id: memId);
+          final mem = await MemRepository().ship(id: memId);
 
           upsert(mem);
 

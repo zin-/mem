@@ -26,7 +26,7 @@ class NotificationChannels {
           if (memId == null) {
             title = "Want to do something?";
           } else {
-            title = await MemRepositoryV2()
+            title = await MemRepository()
                 .ship(id: memId)
                 .then((value) => value.single.value.name);
           }
