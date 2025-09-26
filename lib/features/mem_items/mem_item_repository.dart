@@ -11,7 +11,7 @@ import 'package:mem/features/mem_items/mem_item_entity.dart';
 // @Deprecated('MemItemRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
 // lintエラーになるためコメントアウト
 class MemItemRepositoryV2
-    extends DatabaseTupleRepository<MemItemEntityV2, SavedMemItemEntityV2> {
+    extends DatabaseTupleRepository<MemItemEntity, SavedMemItemEntityV2> {
   MemItemRepositoryV2() : super(databaseDefinition, defTableMemItems);
 
   @override

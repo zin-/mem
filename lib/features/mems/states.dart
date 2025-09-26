@@ -14,7 +14,7 @@ import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 
 final memItemsProvider = StateNotifierProvider<
-    ListValueStateNotifier<MemItemEntityV2>, List<MemItemEntityV2>>(
+    ListValueStateNotifier<MemItemEntity>, List<MemItemEntity>>(
   (ref) => v(
     () => ListValueStateNotifier([]),
   ),
@@ -61,14 +61,14 @@ final removedMemDetailProvider = StateNotifierProvider.autoDispose.family<
     ValueStateNotifier<
         (
           MemEntityV2,
-          List<MemItemEntityV2>,
+          List<MemItemEntity>,
           List<MemNotificationEntity>?,
           TargetEntity?,
           List<MemRelationEntity>?
         )?>,
     (
       MemEntityV2,
-      List<MemItemEntityV2>,
+      List<MemItemEntity>,
       List<MemNotificationEntity>?,
       TargetEntity?,
       List<MemRelationEntity>?
@@ -107,7 +107,7 @@ final removedMemProvider = StateNotifierProvider.family<
   ),
 );
 final removedMemItemsProvider = StateNotifierProvider.family<
-    ValueStateNotifier<List<MemItemEntityV2>?>, List<MemItemEntityV2>?, int>(
+    ValueStateNotifier<List<MemItemEntity>?>, List<MemItemEntity>?, int>(
   (ref, memId) => v(
     () => ValueStateNotifier(null),
     memId,

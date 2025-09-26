@@ -16,7 +16,7 @@ class MemClient {
       (
         (
           MemEntityV2,
-          List<MemItemEntityV2>,
+          List<MemItemEntity>,
           List<MemNotificationEntity>?,
           TargetEntity?,
           List<MemRelationEntity>?
@@ -24,7 +24,7 @@ class MemClient {
         DateTime?
       )> save(
     MemEntityV2 mem,
-    List<MemItemEntityV2> memItemList,
+    List<MemItemEntity> memItemList,
     List<MemNotificationEntity> memNotificationList,
     TargetEntity? target,
     List<MemRelationEntity>? memRelations,
@@ -63,7 +63,7 @@ class MemClient {
   Future<
       (
         MemEntityV2,
-        List<MemItemEntityV2>,
+        List<MemItemEntity>,
         List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?
@@ -84,7 +84,7 @@ class MemClient {
   Future<
       (
         MemEntityV2,
-        List<MemItemEntityV2>,
+        List<MemItemEntity>,
         List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?

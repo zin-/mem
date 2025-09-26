@@ -63,7 +63,7 @@ class MemEntities extends _$MemEntities
       (
         (
           MemEntityV2,
-          List<MemItemEntityV2>,
+          List<MemItemEntity>,
           List<MemNotificationEntity>?,
           TargetEntity?,
           List<MemRelationEntity>?
@@ -71,7 +71,7 @@ class MemEntities extends _$MemEntities
         DateTime?
       )> save(
     MemEntityV2 memEntity,
-    Iterable<MemItemEntityV2> memItemEntities,
+    Iterable<MemItemEntity> memItemEntities,
     Iterable<MemNotificationEntity> memNotificationEntities,
     TargetEntity? targetEntity,
     Iterable<MemRelationEntity>? memRelationEntities,
@@ -115,7 +115,7 @@ class MemEntities extends _$MemEntities
   Future<
       (
         MemEntityV2,
-        List<MemItemEntityV2>,
+        List<MemItemEntity>,
         List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?

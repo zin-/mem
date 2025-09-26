@@ -3,8 +3,8 @@ import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
 
-class MemItemEntityV2 with Entity<MemItem> {
-  MemItemEntityV2(MemItem value) {
+class MemItemEntity with Entity<MemItem> {
+  MemItemEntity(MemItem value) {
     this.value = value;
   }
 
@@ -16,10 +16,10 @@ class MemItemEntityV2 with Entity<MemItem> {
       };
 
   @override
-  MemItemEntityV2 updatedWith(MemItem Function(MemItem v) update) =>
-      MemItemEntityV2(update(value));
+  MemItemEntity updatedWith(MemItem Function(MemItem v) update) =>
+      MemItemEntity(update(value));
 
-  MemItemEntityV2 copiedWith({
+  MemItemEntity copiedWith({
     int Function()? memId,
     dynamic Function()? value,
   }) =>
@@ -32,7 +32,7 @@ class MemItemEntityV2 with Entity<MemItem> {
       );
 }
 
-class SavedMemItemEntityV2 extends MemItemEntityV2
+class SavedMemItemEntityV2 extends MemItemEntity
     with DatabaseTupleEntity<int, MemItem> {
   SavedMemItemEntityV2(Map<String, dynamic> map)
       : super(

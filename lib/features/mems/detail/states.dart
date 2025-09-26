@@ -27,7 +27,7 @@ final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
 );
 
 final memItemsByMemIdProvider = StateNotifierProvider.family<
-    ListValueStateNotifier<MemItemEntityV2>, List<MemItemEntityV2>, int?>(
+    ListValueStateNotifier<MemItemEntity>, List<MemItemEntity>, int?>(
   (ref, memId) => v(
     () => ListValueStateNotifier(
       [
@@ -38,7 +38,7 @@ final memItemsByMemIdProvider = StateNotifierProvider.family<
                 ),
               ),
             ) ??
-            MemItemEntityV2(MemItem(memId, MemItemType.memo, ""))
+            MemItemEntity(MemItem(memId, MemItemType.memo, ""))
       ],
       initializer: (current, notifier) async {
         if (memId != null) {
