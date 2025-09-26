@@ -58,4 +58,3 @@ tasks:
     cmds:
       - flutter test integration_test
     silent: false
-  
