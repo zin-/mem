@@ -5,36 +5,10 @@ import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/mem.dart';
-import 'package:mem/features/mems/mem_entity.dart';
 
 Key keyMemName = const Key("mem-name");
 
 String _memNameTag(int? memId) => heroTag('mem-name', memId);
-
-class MemNameText extends StatelessWidget {
-  final SavedMemEntity _memEntity;
-
-  const MemNameText(this._memEntity, {super.key});
-
-  @override
-  Widget build(BuildContext context) => v(
-        () => HeroView(
-          _memNameTag(_memEntity.id),
-          Text(
-            key: keyMemName,
-            _memEntity.value.name,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: _memEntity.value.isDone
-                ? const TextStyle(decoration: TextDecoration.lineThrough)
-                : null,
-          ),
-        ),
-        {
-          '_memEntity': _memEntity,
-        },
-      );
-}
 
 class MemNameTextFormField extends ConsumerWidget {
   final int? _memId;

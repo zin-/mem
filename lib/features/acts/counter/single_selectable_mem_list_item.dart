@@ -34,7 +34,7 @@ class _SingleSelectableMemListItemComponent extends ListTile {
     bool isSelected,
     void Function(int? memId) onSelected,
   ) : super(
-          title: MemNameText(memEntity),
+          title: MemNameTextV2(memEntity.id),
           trailing: RadioGroup<int>(
             groupValue: isSelected ? memEntity.id : null,
             onChanged: (value) => onSelected(value),
