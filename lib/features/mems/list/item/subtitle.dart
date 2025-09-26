@@ -20,7 +20,7 @@ class MemListItemSubtitle extends ConsumerWidget {
           ref.watch(memByMemIdProvider(_memId))?.value.period,
           ref.watch(
             memNotificationsByMemIdProvider(_memId).select(
-              (v) => v.whereType<SavedMemNotificationEntityV2>(),
+              (v) => v.whereType<SavedMemNotificationEntity>(),
             ),
           ),
         ),
@@ -33,7 +33,7 @@ class MemListItemSubtitle extends ConsumerWidget {
 class _MemListItemSubtitle extends StatelessWidget {
   final int _memId;
   final DateAndTimePeriod? _memPeriod;
-  final Iterable<SavedMemNotificationEntityV2> _savedMemNotificationEntities;
+  final Iterable<SavedMemNotificationEntity> _savedMemNotificationEntities;
 
   const _MemListItemSubtitle(
     this._memId,

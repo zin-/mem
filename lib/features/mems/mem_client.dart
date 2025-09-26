@@ -46,7 +46,7 @@ class MemClient {
             (saved.$1 as SavedMemEntityV2).id,
             savedMem: saved.$1 as SavedMemEntityV2,
             savedMemNotifications:
-                saved.$3?.whereType<SavedMemNotificationEntityV2>(),
+                saved.$3?.whereType<SavedMemNotificationEntity>(),
           );
 
           return (saved, nextNotifyAt);
@@ -96,7 +96,7 @@ class MemClient {
             (unarchived.$1 as SavedMemEntityV2).id,
             savedMem: unarchived.$1 as SavedMemEntityV2,
             savedMemNotifications:
-                unarchived.$3?.whereType<SavedMemNotificationEntityV2>(),
+                unarchived.$3?.whereType<SavedMemNotificationEntity>(),
           );
 
           return unarchived;

@@ -169,13 +169,13 @@ final memListProvider = StateNotifierProvider.autoDispose<
 });
 
 final savedMemNotificationsProvider = StateNotifierProvider.autoDispose<
-    ListValueStateNotifier<SavedMemNotificationEntityV2>,
-    List<SavedMemNotificationEntityV2>>(
+    ListValueStateNotifier<SavedMemNotificationEntity>,
+    List<SavedMemNotificationEntity>>(
   (ref) => v(
     () => ListValueStateNotifier(
       ref.watch(
         memNotificationsProvider.select(
-          (v) => v.whereType<SavedMemNotificationEntityV2>().toList(),
+          (v) => v.whereType<SavedMemNotificationEntity>().toList(),
         ),
       ),
       initializer: (current, notifier) => v(
@@ -186,8 +186,8 @@ final savedMemNotificationsProvider = StateNotifierProvider.autoDispose<
                     memIdsIn: ref.read(memEntitiesProvider).map((e) => e.id),
                   ),
                   (current, updating) =>
-                      current is SavedMemNotificationEntityV2 &&
-                      updating is SavedMemNotificationEntityV2 &&
+                      current is SavedMemNotificationEntity &&
+                      updating is SavedMemNotificationEntity &&
                       current.id == updating.id,
                 );
           }

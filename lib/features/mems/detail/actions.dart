@@ -35,8 +35,8 @@ final saveMem =
             ref.read(memNotificationsProvider.notifier).upsertAll(
                   saved.$3 ?? [],
                   (tmp, item) =>
-                      tmp is SavedMemNotificationEntityV2 &&
-                      item is SavedMemNotificationEntityV2 &&
+                      tmp is SavedMemNotificationEntity &&
+                      item is SavedMemNotificationEntity &&
                       tmp.id == item.id,
                   removeWhere: (current) =>
                       current.value.memId == memId &&

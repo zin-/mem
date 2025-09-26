@@ -64,7 +64,7 @@ class MemService {
 
           final memNotifications = memDetail.$3;
           final returnMemNotifications =
-              List<SavedMemNotificationEntityV2?>.empty(growable: true);
+              List<SavedMemNotificationEntity?>.empty(growable: true);
           if (memNotifications == null) {
             await _memNotificationRepository.waste(memId: savedMem.id);
           } else {
@@ -72,7 +72,7 @@ class MemService {
                 .where((e) => !e.value.isRepeatByDayOfWeek())
                 .map((e) {
               if (e.value.isEnabled()) {
-                return (e is SavedMemNotificationEntityV2 && !undo
+                return (e is SavedMemNotificationEntity && !undo
                     ? _memNotificationRepository.replace(e.updatedWith(
                         (v) => MemNotification.by(
                             savedMem.id, v.type, v.time, v.message),

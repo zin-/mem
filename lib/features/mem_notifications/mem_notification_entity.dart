@@ -23,9 +23,9 @@ class MemNotificationEntity with Entity<MemNotification> {
       MemNotificationEntity(update(value));
 }
 
-class SavedMemNotificationEntityV2 extends MemNotificationEntity
+class SavedMemNotificationEntity extends MemNotificationEntity
     with DatabaseTupleEntity<int, MemNotification> {
-  SavedMemNotificationEntityV2(Map<String, dynamic> map)
+  SavedMemNotificationEntity(Map<String, dynamic> map)
       : super(
           MemNotification.by(
             map[defFkMemNotificationsMemId.name],
@@ -38,8 +38,8 @@ class SavedMemNotificationEntityV2 extends MemNotificationEntity
   }
 
   @override
-  SavedMemNotificationEntityV2 updatedWith(
+  SavedMemNotificationEntity updatedWith(
           MemNotification Function(MemNotification v) update) =>
-      SavedMemNotificationEntityV2(
+      SavedMemNotificationEntity(
           toMap..addAll(super.updatedWith(update).toMap));
 }

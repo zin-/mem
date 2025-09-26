@@ -71,7 +71,7 @@ ListTile _render(
             latestActByMem != null && latestActByMem is PausedAct;
         final hasEnableMemNotifications = memNotificationEntities
             .where(
-              (e) => e is SavedMemNotificationEntityV2 && e.value.isEnabled(),
+              (e) => e is SavedMemNotificationEntity && e.value.isEnabled(),
             )
             .isNotEmpty;
 

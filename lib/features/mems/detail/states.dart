@@ -141,7 +141,7 @@ final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
         initializer: (current, notifier) => v(
           () async {
             if (memId != null &&
-                current.whereType<SavedMemNotificationEntityV2>().isEmpty) {
+                current.whereType<SavedMemNotificationEntity>().isEmpty) {
               final notifications =
                   await MemNotificationRepository().ship(memId: memId);
               if (notifier.mounted) {
