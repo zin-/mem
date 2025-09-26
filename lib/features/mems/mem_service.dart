@@ -45,7 +45,7 @@ class MemService {
         () async {
           final mem = memDetail.$1;
 
-          final savedMem = (mem is SavedMemEntityV2 && !undo
+          final savedMem = (mem is SavedMemEntity && !undo
               ? await _memRepository.replace(mem)
               : await _memRepository.receive(mem));
 
@@ -240,7 +240,7 @@ class MemService {
         List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?
-      )> archive(SavedMemEntityV2 mem) => i(
+      )> archive(SavedMemEntity mem) => i(
         () async {
           final archivedMem = await _memRepository.archive(mem);
           final archivedMemItems =
@@ -271,7 +271,7 @@ class MemService {
         List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?
-      )> unarchive(SavedMemEntityV2 mem) => i(
+      )> unarchive(SavedMemEntity mem) => i(
         () async {
           final unarchivedMem = await _memRepository.unarchive(mem);
           final unarchivedMemItems =

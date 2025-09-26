@@ -44,8 +44,8 @@ class MemEntity with Entity<Mem> {
       MemEntity(update(value));
 }
 
-class SavedMemEntityV2 extends MemEntity with DatabaseTupleEntity<int, Mem> {
-  SavedMemEntityV2(Map<String, dynamic> map)
+class SavedMemEntity extends MemEntity with DatabaseTupleEntity<int, Mem> {
+  SavedMemEntity(Map<String, dynamic> map)
       : super(
           Mem(
             map[defColMemsName.name],
@@ -69,8 +69,8 @@ class SavedMemEntityV2 extends MemEntity with DatabaseTupleEntity<int, Mem> {
   }
 
   @override
-  SavedMemEntityV2 updatedWith(Mem Function(Mem mem) update) =>
-      SavedMemEntityV2(toMap..addAll(MemEntity(update(value)).toMap));
+  SavedMemEntity updatedWith(Mem Function(Mem mem) update) =>
+      SavedMemEntity(toMap..addAll(MemEntity(update(value)).toMap));
 
   Iterable<Schedule> periodSchedules(
     TimeOfDay startOfDay,

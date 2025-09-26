@@ -53,7 +53,7 @@ class MemListItemView extends ConsumerWidget {
 }
 
 ListTile _render(
-  SavedMemEntityV2 memEntity,
+  SavedMemEntity memEntity,
   void Function(int memId) onTap,
   void Function(bool? value, int memId) onMemDoneCheckboxTapped,
   Act? latestActByMem,

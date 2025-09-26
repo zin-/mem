@@ -12,7 +12,7 @@ Key keyMemName = const Key("mem-name");
 String _memNameTag(int? memId) => heroTag('mem-name', memId);
 
 class MemNameText extends StatelessWidget {
-  final SavedMemEntityV2 _memEntity;
+  final SavedMemEntity _memEntity;
 
   const MemNameText(this._memEntity, {super.key});
 
