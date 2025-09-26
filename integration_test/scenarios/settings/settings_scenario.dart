@@ -134,7 +134,7 @@ void main() => group(_scenarioName, () {
 
             final savedMem = await MemRepositoryV2().receive(MemEntityV2(
                 Mem("$insertedMemName - Start of day", null, null)));
-            await MemNotificationRepositoryV2().receive(
+            await MemNotificationRepository().receive(
               MemNotificationEntity(
                 MemNotification.by(
                   savedMem.id,
@@ -147,7 +147,7 @@ void main() => group(_scenarioName, () {
             );
             final savedMem2 = await MemRepositoryV2().receive(MemEntityV2(
                 Mem("$insertedMemName - Start of day - 2", null, null)));
-            await MemNotificationRepositoryV2().receive(
+            await MemNotificationRepository().receive(
               MemNotificationEntity(
                 MemNotification.by(
                   savedMem2.id,
@@ -360,7 +360,7 @@ void main() => group(_scenarioName, () {
                       "$_scenarioName - With habit operation - with no act",
                       null,
                       null)));
-              await MemNotificationRepositoryV2().receive(MemNotificationEntity(
+              await MemNotificationRepository().receive(MemNotificationEntity(
                   MemNotification.by(savedMemWithNoAct.id,
                       MemNotificationType.afterActStarted, 1, "with no act")));
               final savedMemWithActiveAct = await MemRepositoryV2().receive(
@@ -368,7 +368,7 @@ void main() => group(_scenarioName, () {
                       "$_scenarioName - With habit operation - with active act",
                       null,
                       null)));
-              await MemNotificationRepositoryV2().receive(MemNotificationEntity(
+              await MemNotificationRepository().receive(MemNotificationEntity(
                   MemNotification.by(
                       savedMemWithActiveAct.id,
                       MemNotificationType.afterActStarted,

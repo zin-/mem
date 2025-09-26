@@ -20,7 +20,7 @@ import 'package:mem/databases/table_definitions/mem_relations.dart';
 class MemService {
   final MemRepositoryV2 _memRepository;
   final MemItemRepositoryV2 _memItemRepository;
-  final MemNotificationRepositoryV2 _memNotificationRepository;
+  final MemNotificationRepository _memNotificationRepository;
   final TargetRepository _targetRepository;
   final MemRelationRepository _memRelationRepository;
 
@@ -324,7 +324,7 @@ class MemService {
         () => _instance ??= MemService._(
           MemRepositoryV2(),
           MemItemRepositoryV2(),
-          MemNotificationRepositoryV2(),
+          MemNotificationRepository(),
           TargetRepository(),
           MemRelationRepository(),
         ),

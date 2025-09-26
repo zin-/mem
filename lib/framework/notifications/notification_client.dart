@@ -26,7 +26,7 @@ class NotificationClient {
   final NotificationRepository _notificationRepository;
   final PreferenceRepository _preferenceClientRepository;
   final MemRepositoryV2 _memRepository;
-  final MemNotificationRepositoryV2 _memNotificationRepository;
+  final MemNotificationRepository _memNotificationRepository;
   final ActRepository _actRepository;
 
   NotificationClient._(
@@ -48,7 +48,7 @@ class NotificationClient {
           NotificationRepository(),
           PreferenceRepository(),
           MemRepositoryV2(),
-          MemNotificationRepositoryV2(),
+          MemNotificationRepository(),
           ActRepository(),
         ),
         {
