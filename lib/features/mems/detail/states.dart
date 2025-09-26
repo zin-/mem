@@ -42,7 +42,7 @@ final memItemsByMemIdProvider = StateNotifierProvider.family<
       ],
       initializer: (current, notifier) async {
         if (memId != null) {
-          final items = await MemItemRepositoryV2().ship(memId: memId);
+          final items = await MemItemRepository().ship(memId: memId);
           if (notifier.mounted) {
             ref.read(memItemsProvider.notifier).upsertAll(
                   items,

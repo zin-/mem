@@ -18,7 +18,7 @@ final loadMemList = FutureProvider(
           );
 
       ref.watch(memItemsProvider.notifier).upsertAll(
-            await MemItemRepositoryV2()
+            await MemItemRepository()
                 .ship(memIdsIn: mems.map((mem) => mem.id).toList()),
             (current, updating) =>
                 current is SavedMemItemEntity &&
