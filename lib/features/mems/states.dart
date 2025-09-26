@@ -60,14 +60,14 @@ final memByMemIdProvider = StateNotifierProvider.autoDispose
 final removedMemDetailProvider = StateNotifierProvider.autoDispose.family<
     ValueStateNotifier<
         (
-          MemEntityV2,
+          MemEntity,
           List<MemItemEntity>,
           List<MemNotificationEntity>?,
           TargetEntity?,
           List<MemRelationEntity>?
         )?>,
     (
-      MemEntityV2,
+      MemEntity,
       List<MemItemEntity>,
       List<MemNotificationEntity>?,
       TargetEntity?,
@@ -100,9 +100,9 @@ final removedMemDetailProvider = StateNotifierProvider.autoDispose.family<
   ),
 );
 final removedMemProvider = StateNotifierProvider.family<
-    ValueStateNotifier<MemEntityV2?>, MemEntityV2?, int>(
+    ValueStateNotifier<MemEntity?>, MemEntity?, int>(
   (ref, memId) => v(
-    () => ValueStateNotifier<MemEntityV2?>(null),
+    () => ValueStateNotifier<MemEntity?>(null),
     memId,
   ),
 );

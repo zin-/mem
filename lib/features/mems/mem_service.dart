@@ -26,14 +26,14 @@ class MemService {
 
   Future<
       (
-        MemEntityV2,
+        MemEntity,
         List<MemItemEntity>,
         List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?
       )> save(
     (
-      MemEntityV2,
+      MemEntity,
       List<MemItemEntity>,
       List<MemNotificationEntity>?,
       TargetEntity?,
@@ -177,7 +177,7 @@ class MemService {
 
   Future<
       (
-        MemEntityV2,
+        MemEntity,
         List<MemItemEntity>,
         List<MemNotificationEntity>?,
         TargetEntity?,
@@ -206,7 +206,7 @@ class MemService {
 
   Future<
       (
-        MemEntityV2,
+        MemEntity,
         List<MemItemEntity>,
         List<MemNotificationEntity>?,
         TargetEntity?,
@@ -235,7 +235,7 @@ class MemService {
 
   Future<
       (
-        MemEntityV2,
+        MemEntity,
         List<MemItemEntity>,
         List<MemNotificationEntity>?,
         TargetEntity?,
@@ -266,7 +266,7 @@ class MemService {
 
   Future<
       (
-        MemEntityV2,
+        MemEntity,
         List<MemItemEntity>,
         List<MemNotificationEntity>?,
         TargetEntity?,

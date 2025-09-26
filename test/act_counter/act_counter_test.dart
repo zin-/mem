@@ -16,7 +16,7 @@ void main() {
       final oneDate = DateTime(1);
 
       final savedMem =
-          SavedMemEntityV2(MemEntityV2(Mem("constructor", null, null)).toMap
+          SavedMemEntityV2(MemEntity(Mem("constructor", null, null)).toMap
             ..addAll({
               defPkId.name: memId,
               defColCreatedAt.name: DateTime.now(),
@@ -45,7 +45,7 @@ void main() {
       final oneDate = DateTime(1);
 
       final savedMem =
-          SavedMemEntityV2(MemEntityV2(Mem("constructor", null, null)).toMap
+          SavedMemEntityV2(MemEntity(Mem("constructor", null, null)).toMap
             ..addAll({
               defPkId.name: memId,
               defColCreatedAt.name: DateTime.now(),

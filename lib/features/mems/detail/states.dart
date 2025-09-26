@@ -14,12 +14,12 @@ import 'package:mem/features/mem_notifications/mem_notification_repository.dart'
 import 'package:mem/features/mems/states.dart';
 
 final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
-    .family<ValueStateNotifier<MemEntityV2>, MemEntityV2, int?>(
+    .family<ValueStateNotifier<MemEntity>, MemEntity, int?>(
   (ref, memId) => v(
     () {
       final mem = ref.watch(memByMemIdProvider(memId));
       return ValueStateNotifier(
-        mem ?? MemEntityV2(Mem("", null, null)),
+        mem ?? MemEntity(Mem("", null, null)),
       );
     },
     {"memId": memId},

@@ -14,11 +14,11 @@ import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/framework/notifications/notification/type.dart';
 import 'package:mem/framework/notifications/schedule.dart';
 
-class MemEntityV2 with Entity<Mem> {
-  MemEntityV2(Mem value) {
+class MemEntity with Entity<Mem> {
+  MemEntity(Mem value) {
     this.value = value;
 
-    entityChildrenRelation[MemEntityV2] ??= {
+    entityChildrenRelation[MemEntity] ??= {
       MemItemEntity,
       ActEntity,
       MemNotificationEntity,
@@ -40,11 +40,11 @@ class MemEntityV2 with Entity<Mem> {
       };
 
   @override
-  MemEntityV2 updatedWith(Mem Function(Mem mem) update) =>
-      MemEntityV2(update(value));
+  MemEntity updatedWith(Mem Function(Mem mem) update) =>
+      MemEntity(update(value));
 }
 
-class SavedMemEntityV2 extends MemEntityV2 with DatabaseTupleEntity<int, Mem> {
+class SavedMemEntityV2 extends MemEntity with DatabaseTupleEntity<int, Mem> {
   SavedMemEntityV2(Map<String, dynamic> map)
       : super(
           Mem(
@@ -70,7 +70,7 @@ class SavedMemEntityV2 extends MemEntityV2 with DatabaseTupleEntity<int, Mem> {
 
   @override
   SavedMemEntityV2 updatedWith(Mem Function(Mem mem) update) =>
-      SavedMemEntityV2(toMap..addAll(MemEntityV2(update(value)).toMap));
+      SavedMemEntityV2(toMap..addAll(MemEntity(update(value)).toMap));
 
   Iterable<Schedule> periodSchedules(
     TimeOfDay startOfDay,

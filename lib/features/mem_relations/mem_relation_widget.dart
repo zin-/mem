@@ -135,7 +135,7 @@ class _MemRelationList extends StatelessWidget {
 }
 
 class _MemRelationItem extends StatelessWidget {
-  final MemEntityV2 memEntity;
+  final MemEntity memEntity;
   final int? value;
   final void Function(int? value) onChanged;
 

@@ -132,8 +132,8 @@ void main() => group(_scenarioName, () {
             await PreferenceRepository()
                 .receive(PreferenceEntity(startOfDayKey, startOfDay));
 
-            final savedMem = await MemRepository().receive(MemEntityV2(
-                Mem("$insertedMemName - Start of day", null, null)));
+            final savedMem = await MemRepository().receive(
+                MemEntity(Mem("$insertedMemName - Start of day", null, null)));
             await MemNotificationRepository().receive(
               MemNotificationEntity(
                 MemNotification.by(
@@ -145,7 +145,7 @@ void main() => group(_scenarioName, () {
                 ),
               ),
             );
-            final savedMem2 = await MemRepository().receive(MemEntityV2(
+            final savedMem2 = await MemRepository().receive(MemEntity(
                 Mem("$insertedMemName - Start of day - 2", null, null)));
             await MemNotificationRepository().receive(
               MemNotificationEntity(
@@ -355,16 +355,14 @@ void main() => group(_scenarioName, () {
             setUp(() async {
               ActsClient.resetSingleton();
 
-              final savedMemWithNoAct = await MemRepository().receive(
-                  MemEntityV2(Mem(
-                      "$_scenarioName - With habit operation - with no act",
-                      null,
-                      null)));
+              final savedMemWithNoAct = await MemRepository().receive(MemEntity(
+                  Mem("$_scenarioName - With habit operation - with no act",
+                      null, null)));
               await MemNotificationRepository().receive(MemNotificationEntity(
                   MemNotification.by(savedMemWithNoAct.id,
                       MemNotificationType.afterActStarted, 1, "with no act")));
               final savedMemWithActiveAct = await MemRepository().receive(
-                  MemEntityV2(Mem(
+                  MemEntity(Mem(
                       "$_scenarioName - With habit operation - with active act",
                       null,
                       null)));
