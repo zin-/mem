@@ -1,5 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/features/mems/mem_store.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -12,6 +14,8 @@ import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
 import 'package:mem/features/mems/states.dart';
+
+part 'states.g.dart';
 
 final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<MemEntity>, MemEntity, int?>(
@@ -165,3 +169,12 @@ final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
     {"memId": memId},
   ),
 );
+
+@riverpod
+class MemState extends _$MemState {
+  @override
+  Future<Mem> build(int? memId) async => v(
+        () async => await MemStore().serveOneBy(memId),
+        {'memId': memId},
+      );
+}

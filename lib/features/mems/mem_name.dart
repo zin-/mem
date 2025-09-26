@@ -96,3 +96,49 @@ class _MemNameTextFormField extends StatelessWidget {
         },
       );
 }
+
+class MemNameTextV2 extends ConsumerWidget {
+  final int? _memId;
+
+  const MemNameTextV2(this._memId, {super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => v(
+        () => _MemNameTextV2(
+          ref.watch(MemStateProvider(_memId)).valueOrNull?.name ?? '',
+          _memNameTag(_memId),
+          ref.watch(MemStateProvider(_memId)).valueOrNull?.isDone ?? false,
+        ),
+        {
+          '_memId': _memId,
+        },
+      );
+}
+
+class _MemNameTextV2 extends StatelessWidget {
+  final String _memName;
+  final String _memNameTag;
+  final bool _isDone;
+
+  const _MemNameTextV2(this._memName, this._memNameTag, this._isDone);
+
+  @override
+  Widget build(BuildContext context) => v(
+        () => HeroView(
+          _memNameTag,
+          Text(
+            _memName,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: _isDone
+                ? const TextStyle(decoration: TextDecoration.lineThrough)
+                : null,
+          ),
+        ),
+        {
+          '_memName': _memName,
+          '_memNameTag': _memNameTag,
+          '_isDone': _isDone,
+        },
+      );
+}
