@@ -47,8 +47,8 @@ final memItemsByMemIdProvider = StateNotifierProvider.family<
             ref.read(memItemsProvider.notifier).upsertAll(
                   items,
                   (current, updating) =>
-                      current is SavedMemItemEntityV2 &&
-                      updating is SavedMemItemEntityV2 &&
+                      current is SavedMemItemEntity &&
+                      updating is SavedMemItemEntity &&
                       current.id == updating.id,
                 );
           }

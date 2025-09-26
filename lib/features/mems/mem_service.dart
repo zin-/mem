@@ -51,10 +51,10 @@ class MemService {
 
           final savedMemItems = await Future.wait(
             memDetail.$2.map(
-              (e) => (e is SavedMemItemEntityV2 && !undo
+              (e) => (e is SavedMemItemEntity && !undo
                   ? _memItemRepository.replace(
                       e.copiedWith(memId: () => savedMem.id)
-                          as SavedMemItemEntityV2,
+                          as SavedMemItemEntity,
                     )
                   : _memItemRepository.receive(
                       e.copiedWith(memId: () => savedMem.id),

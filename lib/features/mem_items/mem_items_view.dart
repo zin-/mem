@@ -21,8 +21,8 @@ class MemItemsFormFields extends ConsumerWidget {
               [previous.copiedWith(value: () => entered)],
               (current, updating) =>
                   current.value.type == updating.value.type &&
-                          (current is SavedMemItemEntityV2 &&
-                              updating is SavedMemItemEntityV2)
+                          (current is SavedMemItemEntity &&
+                              updating is SavedMemItemEntity)
                       ? current.id == updating.id
                       : true,
             ),

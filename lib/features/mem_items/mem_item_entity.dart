@@ -32,9 +32,9 @@ class MemItemEntity with Entity<MemItem> {
       );
 }
 
-class SavedMemItemEntityV2 extends MemItemEntity
+class SavedMemItemEntity extends MemItemEntity
     with DatabaseTupleEntity<int, MemItem> {
-  SavedMemItemEntityV2(Map<String, dynamic> map)
+  SavedMemItemEntity(Map<String, dynamic> map)
       : super(
           MemItem(
             map[defFkMemItemsMemId.name],
@@ -47,6 +47,6 @@ class SavedMemItemEntityV2 extends MemItemEntity
   }
 
   @override
-  SavedMemItemEntityV2 updatedWith(MemItem Function(MemItem v) update) =>
-      SavedMemItemEntityV2(toMap..addAll(super.updatedWith(update).toMap));
+  SavedMemItemEntity updatedWith(MemItem Function(MemItem v) update) =>
+      SavedMemItemEntity(toMap..addAll(super.updatedWith(update).toMap));
 }

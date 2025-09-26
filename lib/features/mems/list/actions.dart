@@ -21,8 +21,8 @@ final loadMemList = FutureProvider(
             await MemItemRepositoryV2()
                 .ship(memIdsIn: mems.map((mem) => mem.id).toList()),
             (current, updating) =>
-                current is SavedMemItemEntityV2 &&
-                updating is SavedMemItemEntityV2 &&
+                current is SavedMemItemEntity &&
+                updating is SavedMemItemEntity &&
                 current.id == updating.id,
           );
       await ref.watch(actEntitiesProvider.notifier).fetchLatestByMemIds(
