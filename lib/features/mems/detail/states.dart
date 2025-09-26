@@ -172,6 +172,8 @@ final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
 
 @riverpod
 class MemState extends _$MemState {
+  // TODO Mem自体がMemNotificaitonなどを持つようになったら
+  // そこへのアクセスを持って取得しに行くようにする
   @override
   Future<Mem> build(int? memId) async => v(
         () async => await MemStore().serveOneBy(memId),
