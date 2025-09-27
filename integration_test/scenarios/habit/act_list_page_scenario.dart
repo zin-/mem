@@ -17,15 +17,15 @@ import '../helpers.dart';
 
 const _name = "ActListPage scenario";
 
-extension _ShowActListPageV2 on WidgetTester {
-  Future<void> showActListPageOf(String memName) async {
-    await tap(find.text(memName));
-    await pumpAndSettle();
+// extension _ShowActListPageV2 on WidgetTester {
+//   Future<void> showActListPageOf(String memName) async {
+//     await tap(find.text(memName));
+//     await pumpAndSettle();
 
-    await tap(startIconFinder);
-    await pumpAndSettle();
-  }
-}
+//     await tap(startIconFinder);
+//     await pumpAndSettle();
+//   }
+// }
 
 void main() => group(_name, () {
       const oneMin = Duration(minutes: 1);

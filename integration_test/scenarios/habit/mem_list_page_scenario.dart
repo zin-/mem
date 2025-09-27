@@ -250,87 +250,87 @@ void main() => group(_name, () {
         //   // });
         // });
 
-        group('Active act', () {
-          const targetAt = 0;
+        // group('Active act', () {
+        //   // const targetAt = 0;
 
-          // testWidgets(': show.', (widgetTester) async {
-          //   await runApplication();
-          //   await widgetTester.pumpAndSettle();
+        //   // testWidgets(': show.', (widgetTester) async {
+        //   //   await runApplication();
+        //   //   await widgetTester.pumpAndSettle();
 
-          //   widgetTester.expectMemListItem(
-          //     targetAt,
-          //     [memWithActiveActName, null, null],
-          //     [Icons.pause, Icons.stop],
-          //     [Icons.play_arrow],
-          //   );
-          // });
+        //   //   widgetTester.expectMemListItem(
+        //   //     targetAt,
+        //   //     [memWithActiveActName, null, null],
+        //   //     [Icons.pause, Icons.stop],
+        //   //     [Icons.play_arrow],
+        //   //   );
+        //   // });
 
-          // testWidgets('Finish.', (widgetTester) async {
-          //   widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
-          //   widgetTester.ignoreMockMethodCallHandler(
-          //     MethodChannelMock.permissionHandler,
-          //   );
-          //   widgetTester.ignoreMockMethodCallHandler(
-          //     MethodChannelMock.flutterLocalNotifications,
-          //   );
+        //   // testWidgets('Finish.', (widgetTester) async {
+        //   //   widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
+        //   //   widgetTester.ignoreMockMethodCallHandler(
+        //   //     MethodChannelMock.permissionHandler,
+        //   //   );
+        //   //   widgetTester.ignoreMockMethodCallHandler(
+        //   //     MethodChannelMock.flutterLocalNotifications,
+        //   //   );
 
-          //   await runApplication();
-          //   await widgetTester.pumpAndSettle();
+        //   //   await runApplication();
+        //   //   await widgetTester.pumpAndSettle();
 
-          //   await widgetTester.tap(find.descendant(
-          //     of: find.byType(ListTile).at(targetAt),
-          //     matching: find.byIcon(Icons.stop),
-          //   ));
-          //   await widgetTester.pumpAndSettle();
+        //   //   await widgetTester.tap(find.descendant(
+        //   //     of: find.byType(ListTile).at(targetAt),
+        //   //     matching: find.byIcon(Icons.stop),
+        //   //   ));
+        //   //   await widgetTester.pumpAndSettle();
 
-          //   widgetTester.expectMemListItem(
-          //     2,
-          //     [memWithActiveActName, null],
-          //     [Icons.stop, Icons.play_arrow],
-          //     [Icons.pause],
-          //   );
+        //   //   widgetTester.expectMemListItem(
+        //   //     2,
+        //   //     [memWithActiveActName, null],
+        //   //     [Icons.stop, Icons.play_arrow],
+        //   //     [Icons.pause],
+        //   //   );
 
-          //   final acts = await dbA.select(
-          //     defTableActs,
-          //     where: '${defFkActsMemId.name} = ?',
-          //     whereArgs: [memWithActiveActId],
-          //   );
-          //   expect(acts, hasLength(1));
-          // });
+        //   //   final acts = await dbA.select(
+        //   //     defTableActs,
+        //   //     where: '${defFkActsMemId.name} = ?',
+        //   //     whereArgs: [memWithActiveActId],
+        //   //   );
+        //   //   expect(acts, hasLength(1));
+        //   // });
 
-          // testWidgets(':Pause.', (widgetTester) async {
-          //   widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
-          //   widgetTester.ignoreMockMethodCallHandler(
-          //     MethodChannelMock.permissionHandler,
-          //   );
-          //   widgetTester.ignoreMockMethodCallHandler(
-          //     MethodChannelMock.flutterLocalNotifications,
-          //   );
+        //   // testWidgets(':Pause.', (widgetTester) async {
+        //   //   widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
+        //   //   widgetTester.ignoreMockMethodCallHandler(
+        //   //     MethodChannelMock.permissionHandler,
+        //   //   );
+        //   //   widgetTester.ignoreMockMethodCallHandler(
+        //   //     MethodChannelMock.flutterLocalNotifications,
+        //   //   );
 
-          //   await runApplication();
-          //   await widgetTester.pumpAndSettle();
+        //   //   await runApplication();
+        //   //   await widgetTester.pumpAndSettle();
 
-          //   await widgetTester.tap(find.descendant(
-          //     of: find.byType(ListTile).at(targetAt),
-          //     matching: find.byIcon(Icons.pause),
-          //   ));
-          //   await widgetTester.pumpAndSettle(const Duration(seconds: 3));
+        //   //   await widgetTester.tap(find.descendant(
+        //   //     of: find.byType(ListTile).at(targetAt),
+        //   //     matching: find.byIcon(Icons.pause),
+        //   //   ));
+        //   //   await widgetTester.pumpAndSettle(const Duration(seconds: 3));
 
-          //   widgetTester.expectMemListItem(
-          //     0,
-          //     [memWithActiveActName, null],
-          //     [Icons.close, Icons.play_arrow],
-          //     [Icons.pause, Icons.stop],
-          //   );
+        //   //   widgetTester.expectMemListItem(
+        //   //     0,
+        //   //     [memWithActiveActName, null],
+        //   //     [Icons.close, Icons.play_arrow],
+        //   //     [Icons.pause, Icons.stop],
+        //   //   );
 
-          //   final acts = await dbA.select(
-          //     defTableActs,
-          //     where: '${defFkActsMemId.name} = ?',
-          //     whereArgs: [memWithActiveActId],
-          //   );
-          //   expect(acts, hasLength(2));
-          // });
-        });
+        //   //   final acts = await dbA.select(
+        //   //     defTableActs,
+        //   //     where: '${defFkActsMemId.name} = ?',
+        //   //     whereArgs: [memWithActiveActId],
+        //   //   );
+        //   //   expect(acts, hasLength(2));
+        //   // });
+        // });
 
         // group(': finished act', () {
         //   const targetAt = 3;
