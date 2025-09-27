@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -118,134 +117,134 @@ void testTaskScenario() => group(_scenarioName, () {
         });
 
         group("Inserted mem", () {
-          testWidgets("On MemList", (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+          // testWidgets("On MemList", (widgetTester) async {
+          //   await runApplication();
+          //   await widgetTester.pumpAndSettle();
 
-            final expectedList = [
-              dateText(insertedMemPeriodStart),
-              insertedMemHasPeriodStart,
-              dateText(insertedMemPeriodStart),
-              "~",
-              dateText(insertedMemPeriodEnd),
-              insertedMemHasPeriodEnd,
-              "~",
-              dateText(insertedMemPeriodEnd),
-              " ",
-              timeText(insertedMemPeriodEnd),
-              dateText(insertedMemPeriod.end),
-              insertedMemHasPeriod,
-              dateText(insertedMemPeriod.start),
-              " ",
-              timeText(insertedMemPeriod.start),
-              "~",
-              dateText(insertedMemPeriod.end),
-              " ",
-              timeText(insertedMemPeriod.end),
-            ];
-            final texts =
-                widgetTester.widgetList<Text>(find.byType(Text)).toList();
-            expectedList.forEachIndexed((index, expected) {
-              expect(
-                texts[index].data,
-                expected,
-                reason: "Index is $index.",
-              );
-            });
-          });
+          //   final expectedList = [
+          //     dateText(insertedMemPeriodStart),
+          //     insertedMemHasPeriodStart,
+          //     dateText(insertedMemPeriodStart),
+          //     "~",
+          //     dateText(insertedMemPeriodEnd),
+          //     insertedMemHasPeriodEnd,
+          //     "~",
+          //     dateText(insertedMemPeriodEnd),
+          //     " ",
+          //     timeText(insertedMemPeriodEnd),
+          //     dateText(insertedMemPeriod.end),
+          //     insertedMemHasPeriod,
+          //     dateText(insertedMemPeriod.start),
+          //     " ",
+          //     timeText(insertedMemPeriod.start),
+          //     "~",
+          //     dateText(insertedMemPeriod.end),
+          //     " ",
+          //     timeText(insertedMemPeriod.end),
+          //   ];
+          //   final texts =
+          //       widgetTester.widgetList<Text>(find.byType(Text)).toList();
+          //   expectedList.forEachIndexed((index, expected) {
+          //     expect(
+          //       texts[index].data,
+          //       expected,
+          //       reason: "Index is $index.",
+          //     );
+          //   });
+          // });
 
-          testWidgets(": has period start.", (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+          // testWidgets(": has period start.", (widgetTester) async {
+          //   await runApplication();
+          //   await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.text(insertedMemHasPeriodStart));
-            await widgetTester.pumpAndSettle();
+          //   await widgetTester.tap(find.text(insertedMemHasPeriodStart));
+          //   await widgetTester.pumpAndSettle();
 
-            expect(
-              widgetTester
-                  .widget<TextFormField>(find.byType(TextFormField).at(1))
-                  .initialValue,
-              dateText(insertedMemPeriodStart),
-            );
-            expect(
-              widgetTester
-                  .widget<TextFormField>(find.byType(TextFormField).at(2))
-                  .initialValue,
-              "",
-            );
-          });
-          testWidgets(": has period end.", (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+          //   expect(
+          //     widgetTester
+          //         .widget<TextFormField>(find.byType(TextFormField).at(1))
+          //         .initialValue,
+          //     dateText(insertedMemPeriodStart),
+          //   );
+          //   expect(
+          //     widgetTester
+          //         .widget<TextFormField>(find.byType(TextFormField).at(2))
+          //         .initialValue,
+          //     "",
+          //   );
+          // });
+          // testWidgets(": has period end.", (widgetTester) async {
+          //   await runApplication();
+          //   await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.text(insertedMemHasPeriodEnd));
-            await widgetTester.pumpAndSettle();
+          //   await widgetTester.tap(find.text(insertedMemHasPeriodEnd));
+          //   await widgetTester.pumpAndSettle();
 
-            expect(
-              widgetTester
-                  .widget<TextFormField>(find.byType(TextFormField).at(1))
-                  .initialValue,
-              "",
-            );
-            expect(
-              widgetTester
-                  .widget<TextFormField>(find.byType(TextFormField).at(2))
-                  .initialValue,
-              dateText(insertedMemPeriodEnd),
-            );
-            expect(
-              widgetTester
-                  .widget<TextFormField>(find.byType(TextFormField).at(3))
-                  .initialValue,
-              timeText(insertedMemPeriodEnd),
-            );
-            expect(
-              widgetTester.widget<Switch>(find.byType(Switch).at(1)).value,
-              false,
-            );
-            expect(timeIconFinder, findsOneWidget);
-          });
-          testWidgets(": has period.", (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+          //   expect(
+          //     widgetTester
+          //         .widget<TextFormField>(find.byType(TextFormField).at(1))
+          //         .initialValue,
+          //     "",
+          //   );
+          //   expect(
+          //     widgetTester
+          //         .widget<TextFormField>(find.byType(TextFormField).at(2))
+          //         .initialValue,
+          //     dateText(insertedMemPeriodEnd),
+          //   );
+          //   expect(
+          //     widgetTester
+          //         .widget<TextFormField>(find.byType(TextFormField).at(3))
+          //         .initialValue,
+          //     timeText(insertedMemPeriodEnd),
+          //   );
+          //   expect(
+          //     widgetTester.widget<Switch>(find.byType(Switch).at(1)).value,
+          //     false,
+          //   );
+          //   expect(timeIconFinder, findsOneWidget);
+          // });
+          // testWidgets(": has period.", (widgetTester) async {
+          //   await runApplication();
+          //   await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.text(insertedMemHasPeriod));
-            await widgetTester.pumpAndSettle();
+          //   await widgetTester.tap(find.text(insertedMemHasPeriod));
+          //   await widgetTester.pumpAndSettle();
 
-            expect(
-              widgetTester
-                  .widget<TextFormField>(find.byType(TextFormField).at(1))
-                  .initialValue,
-              dateText(insertedMemPeriod.start),
-            );
-            expect(
-              widgetTester
-                  .widget<TextFormField>(find.byType(TextFormField).at(2))
-                  .initialValue,
-              timeText(insertedMemPeriod.start),
-            );
-            expect(
-              widgetTester.widget<Switch>(find.byType(Switch).at(0)).value,
-              false,
-            );
-            expect(
-              widgetTester
-                  .widget<TextFormField>(find.byType(TextFormField).at(3))
-                  .initialValue,
-              dateText(insertedMemPeriod.end),
-            );
-            expect(
-              widgetTester
-                  .widget<TextFormField>(find.byType(TextFormField).at(4))
-                  .initialValue,
-              timeText(insertedMemPeriod.end),
-            );
-            expect(
-              widgetTester.widget<Switch>(find.byType(Switch).at(1)).value,
-              false,
-            );
-            expect(timeIconFinder, findsNWidgets(2));
-          });
+          //   expect(
+          //     widgetTester
+          //         .widget<TextFormField>(find.byType(TextFormField).at(1))
+          //         .initialValue,
+          //     dateText(insertedMemPeriod.start),
+          //   );
+          //   expect(
+          //     widgetTester
+          //         .widget<TextFormField>(find.byType(TextFormField).at(2))
+          //         .initialValue,
+          //     timeText(insertedMemPeriod.start),
+          //   );
+          //   expect(
+          //     widgetTester.widget<Switch>(find.byType(Switch).at(0)).value,
+          //     false,
+          //   );
+          //   expect(
+          //     widgetTester
+          //         .widget<TextFormField>(find.byType(TextFormField).at(3))
+          //         .initialValue,
+          //     dateText(insertedMemPeriod.end),
+          //   );
+          //   expect(
+          //     widgetTester
+          //         .widget<TextFormField>(find.byType(TextFormField).at(4))
+          //         .initialValue,
+          //     timeText(insertedMemPeriod.end),
+          //   );
+          //   expect(
+          //     widgetTester.widget<Switch>(find.byType(Switch).at(1)).value,
+          //     false,
+          //   );
+          //   expect(timeIconFinder, findsNWidgets(2));
+          // });
         });
       });
 

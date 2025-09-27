@@ -4,8 +4,8 @@ import 'package:mem/framework/repository/entity.dart';
 
 import 'mem_notification.dart';
 
-class MemNotificationEntityV2 with Entity<MemNotification> {
-  MemNotificationEntityV2(MemNotification value) {
+class MemNotificationEntity with Entity<MemNotification> {
+  MemNotificationEntity(MemNotification value) {
     this.value = value;
   }
 
@@ -18,14 +18,14 @@ class MemNotificationEntityV2 with Entity<MemNotification> {
       };
 
   @override
-  MemNotificationEntityV2 updatedWith(
+  MemNotificationEntity updatedWith(
           MemNotification Function(MemNotification v) update) =>
-      MemNotificationEntityV2(update(value));
+      MemNotificationEntity(update(value));
 }
 
-class SavedMemNotificationEntityV2 extends MemNotificationEntityV2
-    with DatabaseTupleEntityV2<int, MemNotification> {
-  SavedMemNotificationEntityV2(Map<String, dynamic> map)
+class SavedMemNotificationEntity extends MemNotificationEntity
+    with DatabaseTupleEntity<int, MemNotification> {
+  SavedMemNotificationEntity(Map<String, dynamic> map)
       : super(
           MemNotification.by(
             map[defFkMemNotificationsMemId.name],
@@ -38,8 +38,8 @@ class SavedMemNotificationEntityV2 extends MemNotificationEntityV2
   }
 
   @override
-  SavedMemNotificationEntityV2 updatedWith(
+  SavedMemNotificationEntity updatedWith(
           MemNotification Function(MemNotification v) update) =>
-      SavedMemNotificationEntityV2(
+      SavedMemNotificationEntity(
           toMap..addAll(super.updatedWith(update).toMap));
 }

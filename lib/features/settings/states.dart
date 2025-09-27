@@ -11,28 +11,27 @@ part 'states.g.dart';
 
 @riverpod
 class Preferences extends _$Preferences {
-  final _client = PreferenceClient();
-  final _repository = PreferenceRepository();
-
   @override
   Future<Map<PreferenceKey, dynamic>> build() => v(
         () async => {
-          startOfDayKey: await _repository.shipByKey(startOfDayKey).then(
-                (v) => v.value,
-              ),
-          notifyAfterInactivity:
-              await _repository.shipByKey(notifyAfterInactivity).then(
+          startOfDayKey:
+              await PreferenceRepository().shipByKey(startOfDayKey).then(
                     (v) => v.value,
-                  )
+                  ),
+          notifyAfterInactivity: await PreferenceRepository()
+              .shipByKey(notifyAfterInactivity)
+              .then(
+                (v) => v.value,
+              )
         },
       );
 
   Future<void> replace(PreferenceKey key, Object? value) => v(
         () async {
           if (key == notifyAfterInactivity) {
-            await _client.updateNotifyAfterInactivity(value as int?);
+            await PreferenceClient().updateNotifyAfterInactivity(value as int?);
           } else {
-            await _repository.receive(PreferenceEntity(key, value));
+            await PreferenceRepository().receive(PreferenceEntity(key, value));
           }
 
           state = AsyncData(state.value!..update(key, (v) => value));

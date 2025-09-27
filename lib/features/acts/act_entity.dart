@@ -23,7 +23,7 @@ class ActEntity with Entity<Act> {
   ActEntity updatedWith(Act Function(Act v) update) => ActEntity(update(value));
 }
 
-class SavedActEntity extends ActEntity with DatabaseTupleEntityV2<int, Act> {
+class SavedActEntity extends ActEntity with DatabaseTupleEntity<int, Act> {
   SavedActEntity(Map<String, dynamic> map)
       : super(
           Act.by(

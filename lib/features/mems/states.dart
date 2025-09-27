@@ -14,19 +14,18 @@ import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 
 final memItemsProvider = StateNotifierProvider<
-    ListValueStateNotifier<MemItemEntityV2>, List<MemItemEntityV2>>(
+    ListValueStateNotifier<MemItemEntity>, List<MemItemEntity>>(
   (ref) => v(
     () => ListValueStateNotifier([]),
   ),
 );
 final memNotificationsProvider = StateNotifierProvider<
-    ListValueStateNotifier<MemNotificationEntityV2>,
-    List<MemNotificationEntityV2>>(
+    ListValueStateNotifier<MemNotificationEntity>, List<MemNotificationEntity>>(
   (ref) => v(() => ListValueStateNotifier([])),
 );
 
 final memByMemIdProvider = StateNotifierProvider.autoDispose
-    .family<ValueStateNotifier<SavedMemEntityV2?>, SavedMemEntityV2?, int?>(
+    .family<ValueStateNotifier<SavedMemEntity?>, SavedMemEntity?, int?>(
   (ref, memId) => v(
     () {
       final mem = ref.watch(
@@ -61,16 +60,16 @@ final memByMemIdProvider = StateNotifierProvider.autoDispose
 final removedMemDetailProvider = StateNotifierProvider.autoDispose.family<
     ValueStateNotifier<
         (
-          MemEntityV2,
-          List<MemItemEntityV2>,
-          List<MemNotificationEntityV2>?,
+          MemEntity,
+          List<MemItemEntity>,
+          List<MemNotificationEntity>?,
           TargetEntity?,
           List<MemRelationEntity>?
         )?>,
     (
-      MemEntityV2,
-      List<MemItemEntityV2>,
-      List<MemNotificationEntityV2>?,
+      MemEntity,
+      List<MemItemEntity>,
+      List<MemNotificationEntity>?,
       TargetEntity?,
       List<MemRelationEntity>?
     )?,
@@ -101,14 +100,14 @@ final removedMemDetailProvider = StateNotifierProvider.autoDispose.family<
   ),
 );
 final removedMemProvider = StateNotifierProvider.family<
-    ValueStateNotifier<MemEntityV2?>, MemEntityV2?, int>(
+    ValueStateNotifier<MemEntity?>, MemEntity?, int>(
   (ref, memId) => v(
-    () => ValueStateNotifier<MemEntityV2?>(null),
+    () => ValueStateNotifier<MemEntity?>(null),
     memId,
   ),
 );
 final removedMemItemsProvider = StateNotifierProvider.family<
-    ValueStateNotifier<List<MemItemEntityV2>?>, List<MemItemEntityV2>?, int>(
+    ValueStateNotifier<List<MemItemEntity>?>, List<MemItemEntity>?, int>(
   (ref, memId) => v(
     () => ValueStateNotifier(null),
     memId,

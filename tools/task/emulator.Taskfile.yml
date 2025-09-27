@@ -2,16 +2,13 @@ version: '3'
 
 tasks:
   default:
-    desc: "Default to list emulators"
     cmds:
       - task: list
 
   list:
-    desc: "List available emulators"
     cmds:
       - flutter emulators
 
   start:
-    desc: "Start emulator"
     cmds:
       - flutter emulators --launch Pixel_9_Pro_XL_API_Baklava 

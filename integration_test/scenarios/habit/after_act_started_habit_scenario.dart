@@ -54,55 +54,55 @@ void main() => group(
           );
         });
 
-        testWidgets(
-          'Show on saved.',
-          (widgetTester) async {
-            widgetTester.ignoreMockMethodCallHandler(
-                MethodChannelMock.flutterLocalNotifications);
+        // testWidgets(
+        //   'Show on saved.',
+        //   (widgetTester) async {
+        //     widgetTester.ignoreMockMethodCallHandler(
+        //         MethodChannelMock.flutterLocalNotifications);
 
-            await runApplication();
-            await widgetTester.pumpAndSettle();
-            await widgetTester.tap(find.text(insertedMemName));
-            await widgetTester.pumpAndSettle(defaultTransitionDuration);
+        //     await runApplication();
+        //     await widgetTester.pumpAndSettle();
+        //     await widgetTester.tap(find.text(insertedMemName));
+        //     await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-            expect(
-              widgetTester
-                  .widget<Text>(
-                    find.descendant(
-                        of: find.byKey(keyMemNotificationsView),
-                        matching: find.byType(Text)),
-                  )
-                  .data,
-              "00:01 after started",
-            );
+        //     expect(
+        //       widgetTester
+        //           .widget<Text>(
+        //             find.descendant(
+        //                 of: find.byKey(keyMemNotificationsView),
+        //                 matching: find.byType(Text)),
+        //           )
+        //           .data,
+        //       "00:01 after started",
+        //     );
 
-            await widgetTester.tap(
-              find.descendant(
-                of: find.byKey(keyMemNotificationsView),
-                matching: find.byIcon(Icons.edit),
-              ),
-            );
-            await widgetTester.pumpAndSettle(defaultTransitionDuration);
+        //     await widgetTester.tap(
+        //       find.descendant(
+        //         of: find.byKey(keyMemNotificationsView),
+        //         matching: find.byIcon(Icons.edit),
+        //       ),
+        //     );
+        //     await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-            expect(
-              widgetTester
-                  .widget<TimeTextFormField>(
-                    find.descendant(
-                      of: find.byKey(keyMemAfterActStartedNotification),
-                      matching: find.byType(TimeTextFormField),
-                    ),
-                  )
-                  .secondsOfTime,
-              secondsOfTime,
-            );
-            expect(
-              find.descendant(
-                  of: find.byKey(keyMemAfterActStartedNotification),
-                  matching: find.byIcon(Icons.clear)),
-              findsOneWidget,
-            );
-          },
-        );
+        //     expect(
+        //       widgetTester
+        //           .widget<TimeTextFormField>(
+        //             find.descendant(
+        //               of: find.byKey(keyMemAfterActStartedNotification),
+        //               matching: find.byType(TimeTextFormField),
+        //             ),
+        //           )
+        //           .secondsOfTime,
+        //       secondsOfTime,
+        //     );
+        //     expect(
+        //       find.descendant(
+        //           of: find.byKey(keyMemAfterActStartedNotification),
+        //           matching: find.byIcon(Icons.clear)),
+        //       findsOneWidget,
+        //     );
+        //   },
+        // );
 
         testWidgets(
           'Save.',

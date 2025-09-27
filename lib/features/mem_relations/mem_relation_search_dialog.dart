@@ -101,7 +101,7 @@ const searchMemRelationDialogSearchFieldKey =
 class MemRelationDialog extends StatelessWidget {
   final String searchText;
   final void Function(String) onSearchTextChanged;
-  final List<SavedMemEntityV2> candidates;
+  final List<SavedMemEntity> candidates;
   final List<int> selectedMemIds;
   final void Function(List<int>) onSelectedIdsChanged;
   final void Function() onAddPressed;

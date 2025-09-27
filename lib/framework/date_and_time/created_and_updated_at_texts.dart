@@ -14,7 +14,7 @@ class CreatedAndUpdatedAtTexts extends StatelessWidget {
   @override
   Widget build(BuildContext context) => v(
         () {
-          if (_entity is DatabaseTupleEntityV2) {
+          if (_entity is DatabaseTupleEntity) {
             return Wrap(
               direction: Axis.horizontal,
               children: [

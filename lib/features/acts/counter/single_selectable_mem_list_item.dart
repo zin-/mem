@@ -30,11 +30,11 @@ class SingleSelectableMemListItem extends ConsumerWidget {
 
 class _SingleSelectableMemListItemComponent extends ListTile {
   _SingleSelectableMemListItemComponent(
-    SavedMemEntityV2 memEntity,
+    SavedMemEntity memEntity,
     bool isSelected,
     void Function(int? memId) onSelected,
   ) : super(
-          title: MemNameText(memEntity),
+          title: MemNameText(memEntity.id),
           trailing: RadioGroup<int>(
             groupValue: isSelected ? memEntity.id : null,
             onChanged: (value) => onSelected(value),

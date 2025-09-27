@@ -39,7 +39,7 @@ final showDoneProvider = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
   ),
 );
 final _filteredMemsProvider = StateNotifierProvider.autoDispose<
-    ListValueStateNotifier<SavedMemEntityV2>, List<SavedMemEntityV2>>(
+    ListValueStateNotifier<SavedMemEntity>, List<SavedMemEntity>>(
   (ref) {
     final savedMems = ref.watch(memEntitiesProvider);
 
@@ -85,7 +85,7 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
 );
 
 final memListProvider = StateNotifierProvider.autoDispose<
-    ValueStateNotifier<List<SavedMemEntityV2>>, List<SavedMemEntityV2>>((ref) {
+    ValueStateNotifier<List<SavedMemEntity>>, List<SavedMemEntity>>((ref) {
   final filtered = ref.watch(_filteredMemsProvider);
   final latestActsByMem = ref.watch(latestActsByMemProvider.select(
     (value) => value?.values.whereType<Act>().toList() ?? [],
@@ -169,25 +169,25 @@ final memListProvider = StateNotifierProvider.autoDispose<
 });
 
 final savedMemNotificationsProvider = StateNotifierProvider.autoDispose<
-    ListValueStateNotifier<SavedMemNotificationEntityV2>,
-    List<SavedMemNotificationEntityV2>>(
+    ListValueStateNotifier<SavedMemNotificationEntity>,
+    List<SavedMemNotificationEntity>>(
   (ref) => v(
     () => ListValueStateNotifier(
       ref.watch(
         memNotificationsProvider.select(
-          (v) => v.whereType<SavedMemNotificationEntityV2>().toList(),
+          (v) => v.whereType<SavedMemNotificationEntity>().toList(),
         ),
       ),
       initializer: (current, notifier) => v(
         () async {
           if (current.isEmpty) {
             ref.read(memNotificationsProvider.notifier).upsertAll(
-                  await MemNotificationRepositoryV2().ship(
+                  await MemNotificationRepository().ship(
                     memIdsIn: ref.read(memEntitiesProvider).map((e) => e.id),
                   ),
                   (current, updating) =>
-                      current is SavedMemNotificationEntityV2 &&
-                      updating is SavedMemNotificationEntityV2 &&
+                      current is SavedMemNotificationEntity &&
+                      updating is SavedMemNotificationEntity &&
                       current.id == updating.id,
                 );
           }

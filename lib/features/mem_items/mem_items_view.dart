@@ -21,8 +21,8 @@ class MemItemsFormFields extends ConsumerWidget {
               [previous.copiedWith(value: () => entered)],
               (current, updating) =>
                   current.value.type == updating.value.type &&
-                          (current is SavedMemItemEntityV2 &&
-                              updating is SavedMemItemEntityV2)
+                          (current is SavedMemItemEntity &&
+                              updating is SavedMemItemEntity)
                       ? current.id == updating.id
                       : true,
             ),
@@ -36,8 +36,8 @@ class MemItemsFormFields extends ConsumerWidget {
 }
 
 class _MemItemsFormFields extends StatelessWidget {
-  final List<MemItemEntityV2> _memItems;
-  final void Function(dynamic entered, MemItemEntityV2 previous) _onChanged;
+  final List<MemItemEntity> _memItems;
+  final void Function(dynamic entered, MemItemEntity previous) _onChanged;
 
   const _MemItemsFormFields(this._memItems, this._onChanged);
 

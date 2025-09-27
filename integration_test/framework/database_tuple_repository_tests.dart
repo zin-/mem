@@ -20,7 +20,7 @@ final _defTableTestObject =
     TableDefinition('test_object', [_defColA, ...defColsBase]);
 final _defDbTest = DatabaseDefinition('test_db', 1, [_defTableTestObject]);
 
-class _TestObjectRepository extends DatabaseTupleRepositoryV2<TestSampleEntity,
+class _TestObjectRepository extends DatabaseTupleRepository<TestSampleEntity,
     TestSampleDatabaseTupleEntity> {
   _TestObjectRepository() : super(_defDbTest, _defTableTestObject);
 

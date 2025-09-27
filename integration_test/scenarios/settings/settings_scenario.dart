@@ -132,10 +132,10 @@ void main() => group(_scenarioName, () {
             await PreferenceRepository()
                 .receive(PreferenceEntity(startOfDayKey, startOfDay));
 
-            final savedMem = await MemRepositoryV2().receive(MemEntityV2(
-                Mem("$insertedMemName - Start of day", null, null)));
-            await MemNotificationRepositoryV2().receive(
-              MemNotificationEntityV2(
+            final savedMem = await MemRepository().receive(
+                MemEntity(Mem("$insertedMemName - Start of day", null, null)));
+            await MemNotificationRepository().receive(
+              MemNotificationEntity(
                 MemNotification.by(
                   savedMem.id,
                   MemNotificationType.repeat,
@@ -145,10 +145,10 @@ void main() => group(_scenarioName, () {
                 ),
               ),
             );
-            final savedMem2 = await MemRepositoryV2().receive(MemEntityV2(
+            final savedMem2 = await MemRepository().receive(MemEntity(
                 Mem("$insertedMemName - Start of day - 2", null, null)));
-            await MemNotificationRepositoryV2().receive(
-              MemNotificationEntityV2(
+            await MemNotificationRepository().receive(
+              MemNotificationEntity(
                 MemNotification.by(
                   savedMem2.id,
                   MemNotificationType.repeat,
@@ -355,24 +355,19 @@ void main() => group(_scenarioName, () {
             setUp(() async {
               ActsClient.resetSingleton();
 
-              final savedMemWithNoAct = await MemRepositoryV2().receive(
-                  MemEntityV2(Mem(
-                      "$_scenarioName - With habit operation - with no act",
-                      null,
-                      null)));
-              await MemNotificationRepositoryV2().receive(
-                  MemNotificationEntityV2(MemNotification.by(
-                      savedMemWithNoAct.id,
-                      MemNotificationType.afterActStarted,
-                      1,
-                      "with no act")));
-              final savedMemWithActiveAct = await MemRepositoryV2().receive(
-                  MemEntityV2(Mem(
+              final savedMemWithNoAct = await MemRepository().receive(MemEntity(
+                  Mem("$_scenarioName - With habit operation - with no act",
+                      null, null)));
+              await MemNotificationRepository().receive(MemNotificationEntity(
+                  MemNotification.by(savedMemWithNoAct.id,
+                      MemNotificationType.afterActStarted, 1, "with no act")));
+              final savedMemWithActiveAct = await MemRepository().receive(
+                  MemEntity(Mem(
                       "$_scenarioName - With habit operation - with active act",
                       null,
                       null)));
-              await MemNotificationRepositoryV2().receive(
-                  MemNotificationEntityV2(MemNotification.by(
+              await MemNotificationRepository().receive(MemNotificationEntity(
+                  MemNotification.by(
                       savedMemWithActiveAct.id,
                       MemNotificationType.afterActStarted,
                       1,

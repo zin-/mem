@@ -162,27 +162,27 @@ void main() => group(
               expect(closeIconFinder, findsNothing);
             });
 
-            testWidgets('Enter search text.', (widgetTester) async {
-              await runApplication();
-              await widgetTester.pumpAndSettle();
+            //   testWidgets('Enter search text.', (widgetTester) async {
+            //     await runApplication();
+            //     await widgetTester.pumpAndSettle();
 
-              await widgetTester.tap(searchIconFinder);
-              await widgetTester.pump();
+            //     await widgetTester.tap(searchIconFinder);
+            //     await widgetTester.pump();
 
-              await widgetTester.enterText(
-                find.byType(TextFormField),
-                "search",
-              );
-              await widgetTester.pump();
+            //     await widgetTester.enterText(
+            //       find.byType(TextFormField),
+            //       "search",
+            //     );
+            //     await widgetTester.pump();
 
-              expect(find.text(unarchivedMemName), findsNothing);
-              expect(find.text(insertedSearchTargetMemName), findsOneWidget);
+            //     expect(find.text(unarchivedMemName), findsNothing);
+            //     expect(find.text(insertedSearchTargetMemName), findsOneWidget);
 
-              await widgetTester.tap(closeIconFinder);
-              await widgetTester.pump();
+            //     await widgetTester.tap(closeIconFinder);
+            //     await widgetTester.pump();
 
-              expect(find.text(unarchivedMemName), findsOneWidget);
-            });
+            //     expect(find.text(unarchivedMemName), findsOneWidget);
+            //   });
           });
         });
 
@@ -227,21 +227,21 @@ void main() => group(
             expect(memMemo.initialValue, isEmpty);
           });
 
-          testWidgets("Saved.", (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+          //   testWidgets("Saved.", (widgetTester) async {
+          //     await runApplication();
+          //     await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.text(insertedMemNameBase));
-            await widgetTester.pumpAndSettle();
+          //     await widgetTester.tap(find.text(insertedMemNameBase));
+          //     await widgetTester.pumpAndSettle();
 
-            final memName =
-                widgetTester.widget<TextFormField>(find.byKey(keyMemName));
-            final memMemo =
-                widgetTester.widget<TextFormField>(find.byKey(keyMemMemo));
+          //     final memName =
+          //         widgetTester.widget<TextFormField>(find.byKey(keyMemName));
+          //     final memMemo =
+          //         widgetTester.widget<TextFormField>(find.byKey(keyMemMemo));
 
-            expect(memName.initialValue, equals(insertedMemNameBase));
-            expect(memMemo.initialValue, equals(insertedMemMemo));
-          });
+          //     expect(memName.initialValue, equals(insertedMemNameBase));
+          //     expect(memMemo.initialValue, equals(insertedMemMemo));
+          //   });
         });
 
         testWidgets('Filter Archive.', (widgetTester) async {

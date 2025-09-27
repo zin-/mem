@@ -7,8 +7,10 @@ import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 
-class MemRelationRepository extends DatabaseTupleRepositoryV2<MemRelationEntity,
-    SavedMemRelationEntity> {
+// @Deprecated('MemRelationRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
+// lintエラーになるためコメントアウト
+class MemRelationRepository
+    extends DatabaseTupleRepository<MemRelationEntity, SavedMemRelationEntity> {
   MemRelationRepository() : super(databaseDefinition, defTableMemRelations);
 
   @override

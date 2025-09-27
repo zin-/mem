@@ -15,17 +15,17 @@ class MemClient {
   Future<
       (
         (
-          MemEntityV2,
-          List<MemItemEntityV2>,
-          List<MemNotificationEntityV2>?,
+          MemEntity,
+          List<MemItemEntity>,
+          List<MemNotificationEntity>?,
           TargetEntity?,
           List<MemRelationEntity>?
         ),
         DateTime?
       )> save(
-    MemEntityV2 mem,
-    List<MemItemEntityV2> memItemList,
-    List<MemNotificationEntityV2> memNotificationList,
+    MemEntity mem,
+    List<MemItemEntity> memItemList,
+    List<MemNotificationEntity> memNotificationList,
     TargetEntity? target,
     List<MemRelationEntity>? memRelations,
   ) =>
@@ -43,10 +43,10 @@ class MemClient {
 
           final nextNotifyAt =
               await _notificationClient.registerMemNotifications(
-            (saved.$1 as SavedMemEntityV2).id,
-            savedMem: saved.$1 as SavedMemEntityV2,
+            (saved.$1 as SavedMemEntity).id,
+            savedMem: saved.$1 as SavedMemEntity,
             savedMemNotifications:
-                saved.$3?.whereType<SavedMemNotificationEntityV2>(),
+                saved.$3?.whereType<SavedMemNotificationEntity>(),
           );
 
           return (saved, nextNotifyAt);
@@ -62,17 +62,17 @@ class MemClient {
 
   Future<
       (
-        MemEntityV2,
-        List<MemItemEntityV2>,
-        List<MemNotificationEntityV2>?,
+        MemEntity,
+        List<MemItemEntity>,
+        List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?
-      )> archive(SavedMemEntityV2 memEntity) => v(
+      )> archive(SavedMemEntity memEntity) => v(
         () async {
           final archived = await _memService.archive(memEntity);
 
           _notificationClient
-              .cancelMemNotifications((archived.$1 as SavedMemEntityV2).id);
+              .cancelMemNotifications((archived.$1 as SavedMemEntity).id);
 
           return archived;
         },
@@ -83,20 +83,20 @@ class MemClient {
 
   Future<
       (
-        MemEntityV2,
-        List<MemItemEntityV2>,
-        List<MemNotificationEntityV2>?,
+        MemEntity,
+        List<MemItemEntity>,
+        List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?
-      )> unarchive(SavedMemEntityV2 memEntity) => v(
+      )> unarchive(SavedMemEntity memEntity) => v(
         () async {
           final unarchived = await _memService.unarchive(memEntity);
 
           _notificationClient.registerMemNotifications(
-            (unarchived.$1 as SavedMemEntityV2).id,
-            savedMem: unarchived.$1 as SavedMemEntityV2,
+            (unarchived.$1 as SavedMemEntity).id,
+            savedMem: unarchived.$1 as SavedMemEntity,
             savedMemNotifications:
-                unarchived.$3?.whereType<SavedMemNotificationEntityV2>(),
+                unarchived.$3?.whereType<SavedMemNotificationEntity>(),
           );
 
           return unarchived;

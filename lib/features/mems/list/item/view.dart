@@ -53,7 +53,7 @@ class MemListItemView extends ConsumerWidget {
 }
 
 ListTile _render(
-  SavedMemEntityV2 memEntity,
+  SavedMemEntity memEntity,
   void Function(int memId) onTap,
   void Function(bool? value, int memId) onMemDoneCheckboxTapped,
   Act? latestActByMem,
@@ -61,7 +61,7 @@ ListTile _render(
   void Function() finishAct,
   void Function() pauseAct,
   void Function() closeAct,
-  Iterable<MemNotificationEntityV2> memNotificationEntities,
+  Iterable<MemNotificationEntity> memNotificationEntities,
 ) =>
     v(
       () {
@@ -71,7 +71,7 @@ ListTile _render(
             latestActByMem != null && latestActByMem is PausedAct;
         final hasEnableMemNotifications = memNotificationEntities
             .where(
-              (e) => e is SavedMemNotificationEntityV2 && e.value.isEnabled(),
+              (e) => e is SavedMemNotificationEntity && e.value.isEnabled(),
             )
             .isNotEmpty;
 
@@ -94,11 +94,11 @@ ListTile _render(
 
         return ListTile(
           title: !hasActiveAct
-              ? MemNameText(memEntity)
+              ? MemNameText(memEntity.id)
               : Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(child: MemNameText(memEntity)),
+                    Expanded(child: MemNameText(memEntity.id)),
                     ElapsedTimeView(latestActByMem.period!.start!),
                   ],
                 ),

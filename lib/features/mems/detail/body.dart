@@ -43,7 +43,7 @@ class MemDetailBody extends ConsumerWidget {
 
 class _MemDetailBodyComponent extends StatelessWidget {
   final int? _memId;
-  final MemEntityV2 _mem;
+  final MemEntity _mem;
   final Function(bool? memDone) _onMemDoneChanged;
 
   const _MemDetailBodyComponent(

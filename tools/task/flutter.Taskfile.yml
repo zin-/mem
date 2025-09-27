@@ -2,41 +2,34 @@ version: '3'
 
 tasks:
   dep:
-    desc: "依存関係を更新します。"
     cmds:
       - flutter pub get
     silent: false
 
   dep:check:
-    desc: "依存関係を更新します。"
     cmds:
       - flutter pub outdated
 
   dep:update:
-    desc: "依存関係を更新します。"
     cmds:
       - flutter pub upgrade
 
   analyze:app:
-    desc: "Run Flutter static analysis"
     cmds:
       - flutter analyze lib
     silent: false
 
   analyze:generated:
-    desc: "Run Flutter static analysis"
     cmds:
       - dart run custom_lint
     silent: false
 
   analyze:test:
-    desc: "Run Flutter static analysis"
     cmds:
       - flutter analyze test
     silent: false
 
   gen:
-    desc: "build_runner を実行します。MODE=build (デフォルト) または MODE=watch を指定します。"
     vars:
       MODE: '{{.MODE | default "build"}}'
     preconditions:
@@ -47,20 +40,21 @@ tasks:
     silent: false
 
   gen:l10n:
-    desc: "l10n を生成します。"
     cmds:
       - flutter gen-l10n
     silent: false
 
   run:
-    desc: "アプリを実行します。"
     cmds:
       - flutter run -d emulator-5554
     silent: false
 
   test:
-    desc: "Run Flutter tests"
     cmds:
       - flutter test
     silent: false
-  
+
+  test:integration:
+    cmds:
+      - flutter test integration_test
+    silent: false

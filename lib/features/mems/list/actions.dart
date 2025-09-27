@@ -18,11 +18,11 @@ final loadMemList = FutureProvider(
           );
 
       ref.watch(memItemsProvider.notifier).upsertAll(
-            await MemItemRepositoryV2()
+            await MemItemRepository()
                 .ship(memIdsIn: mems.map((mem) => mem.id).toList()),
             (current, updating) =>
-                current is SavedMemItemEntityV2 &&
-                updating is SavedMemItemEntityV2 &&
+                current is SavedMemItemEntity &&
+                updating is SavedMemItemEntity &&
                 current.id == updating.id,
           );
       await ref.watch(actEntitiesProvider.notifier).fetchLatestByMemIds(

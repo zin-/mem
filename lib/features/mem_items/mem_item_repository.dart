@@ -8,16 +8,17 @@ import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 
-class MemItemRepositoryV2
-    extends DatabaseTupleRepositoryV2<MemItemEntityV2, SavedMemItemEntityV2> {
-  MemItemRepositoryV2() : super(databaseDefinition, defTableMemItems);
+// @Deprecated('MemItemRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
+// lintエラーになるためコメントアウト
+class MemItemRepository
+    extends DatabaseTupleRepository<MemItemEntity, SavedMemItemEntity> {
+  MemItemRepository() : super(databaseDefinition, defTableMemItems);
 
   @override
-  SavedMemItemEntityV2 pack(Map<String, dynamic> map) =>
-      SavedMemItemEntityV2(map);
+  SavedMemItemEntity pack(Map<String, dynamic> map) => SavedMemItemEntity(map);
 
   @override
-  Future<List<SavedMemItemEntityV2>> ship({
+  Future<List<SavedMemItemEntity>> ship({
     int? memId,
     Iterable<int>? memIdsIn,
     Condition? condition,
@@ -40,7 +41,7 @@ class MemItemRepositoryV2
         limit: limit,
       );
 
-  Future<Iterable<SavedMemItemEntityV2>> archiveBy({
+  Future<Iterable<SavedMemItemEntity>> archiveBy({
     int? memId,
     DateTime? archivedAt,
   }) =>
@@ -64,7 +65,7 @@ class MemItemRepositoryV2
         },
       );
 
-  Future<Iterable<SavedMemItemEntityV2>> unarchiveBy({
+  Future<Iterable<SavedMemItemEntity>> unarchiveBy({
     int? memId,
     DateTime? updatedAt,
   }) =>
@@ -89,7 +90,7 @@ class MemItemRepositoryV2
       );
 
   @override
-  Future<List<SavedMemItemEntityV2>> waste({
+  Future<List<SavedMemItemEntity>> waste({
     Condition? condition,
   }) =>
       super.waste(

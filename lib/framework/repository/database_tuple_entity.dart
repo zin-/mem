@@ -12,7 +12,7 @@ import 'package:mem/features/targets/target_table.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
 import 'package:mem/framework/repository/entity.dart';
 
-mixin DatabaseTupleEntityV2<PRIMARY_KEY, T> on Entity<T> {
+mixin DatabaseTupleEntity<PRIMARY_KEY, T> on Entity<T> {
   late PRIMARY_KEY id;
   late DateTime createdAt;
   late DateTime? updatedAt;
@@ -38,9 +38,9 @@ mixin DatabaseTupleEntityV2<PRIMARY_KEY, T> on Entity<T> {
 }
 
 final Map<Type, TableDefinition> entityTableRelations = {
-  MemEntityV2: defTableMems,
-  MemItemEntityV2: defTableMemItems,
-  MemNotificationEntityV2: defTableMemNotifications,
+  MemEntity: defTableMems,
+  MemItemEntity: defTableMemItems,
+  MemNotificationEntity: defTableMemNotifications,
   TargetEntity: defTableTargets,
   MemRelationEntity: defTableMemRelations,
 };

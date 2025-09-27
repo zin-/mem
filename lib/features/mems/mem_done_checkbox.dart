@@ -4,7 +4,7 @@ import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 
 class MemDoneCheckbox extends StatelessWidget {
-  final MemEntityV2 _memEntity;
+  final MemEntity _memEntity;
   final Function(bool? value) _onChanged;
 
   const MemDoneCheckbox(
@@ -18,12 +18,12 @@ class MemDoneCheckbox extends StatelessWidget {
         () => HeroView(
           heroTag(
             'mem-done',
-            _memEntity is SavedMemEntityV2 ? _memEntity.id : null,
+            _memEntity is SavedMemEntity ? _memEntity.id : null,
           ),
           Checkbox(
             value: _memEntity.value.isDone,
             onChanged:
-                (_memEntity is SavedMemEntityV2 ? _memEntity.isArchived : false)
+                (_memEntity is SavedMemEntity ? _memEntity.isArchived : false)
                     ? null
                     : _onChanged,
           ),

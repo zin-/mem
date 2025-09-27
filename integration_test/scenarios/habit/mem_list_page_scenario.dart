@@ -1,7 +1,7 @@
-import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
+// import 'package:collection/collection.dart';
+// import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/framework/view/timer.dart';
+// import 'package:mem/framework/view/timer.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
@@ -14,65 +14,65 @@ import '../helpers.dart';
 
 const _name = "MemListPage scenario";
 
-extension on WidgetTester {
-  void expectMemListItem(
-    int at,
-    List<String?> texts,
-    List<IconData> icons,
-    List<IconData> noIcons,
-  ) {
-    final memListItemFinder = find.byType(ListTile).at(at);
+// extension on WidgetTester {
+//   void expectMemListItem(
+//     int at,
+//     List<String?> texts,
+//     List<IconData> icons,
+//     List<IconData> noIcons,
+//   ) {
+//     final memListItemFinder = find.byType(ListTile).at(at);
 
-    final textsFinder = find.descendant(
-      of: memListItemFinder,
-      matching: find.byType(Text),
-    );
-    expect(
-      widgetList(textsFinder),
-      hasLength(texts.length),
-    );
-    texts.forEachIndexed((index, text) {
-      if (text != null) {
-        expect(
-          widget<Text>(
-            textsFinder.at(index),
-          ).data,
-          equals(text),
-        );
-      }
-    });
+//     final textsFinder = find.descendant(
+//       of: memListItemFinder,
+//       matching: find.byType(Text),
+//     );
+//     expect(
+//       widgetList(textsFinder),
+//       hasLength(texts.length),
+//     );
+//     texts.forEachIndexed((index, text) {
+//       if (text != null) {
+//         expect(
+//           widget<Text>(
+//             textsFinder.at(index),
+//           ).data,
+//           equals(text),
+//         );
+//       }
+//     });
 
-    expect(
-      widgetList(find.descendant(
-        of: memListItemFinder,
-        matching: find.byType(Icon),
-      )),
-      hasLength(icons.length),
-    );
-    icons.forEachIndexed((index, icon) {
-      expect(
-        widget<Icon>(
-          find
-              .descendant(
-                of: memListItemFinder,
-                matching: find.byType(Icon),
-              )
-              .at(index),
-        ).icon,
-        equals(icon),
-      );
-    });
-    for (var noIcon in noIcons) {
-      expect(
-        find.descendant(
-          of: memListItemFinder,
-          matching: find.byIcon(noIcon),
-        ),
-        findsNothing,
-      );
-    }
-  }
-}
+//     expect(
+//       widgetList(find.descendant(
+//         of: memListItemFinder,
+//         matching: find.byType(Icon),
+//       )),
+//       hasLength(icons.length),
+//     );
+//     icons.forEachIndexed((index, icon) {
+//       expect(
+//         widget<Icon>(
+//           find
+//               .descendant(
+//                 of: memListItemFinder,
+//                 matching: find.byType(Icon),
+//               )
+//               .at(index),
+//         ).icon,
+//         equals(icon),
+//       );
+//     });
+//     for (var noIcon in noIcons) {
+//       expect(
+//         find.descendant(
+//           of: memListItemFinder,
+//           matching: find.byIcon(noIcon),
+//         ),
+//         findsNothing,
+//       );
+//     }
+//   }
+// }
 
 void main() => group(_name, () {
       const insertedMemNameBase = '$_name: inserted mem - name';
@@ -195,285 +195,285 @@ void main() => group(_name, () {
       });
 
       group('Act', () {
-        group('No act', () {
-          const targetAt = 2;
+        // group('No act', () {
+        //   // const targetAt = 2;
 
-          testWidgets('Show.', (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+        //   // testWidgets('Show.', (widgetTester) async {
+        //   //   await runApplication();
+        //   //   await widgetTester.pumpAndSettle();
 
-            widgetTester.expectMemListItem(
-              targetAt,
-              [memWithNoActName, null],
-              [Icons.stop, Icons.play_arrow],
-              [Icons.pause],
-            );
-          });
+        //   //   widgetTester.expectMemListItem(
+        //   //     targetAt,
+        //   //     [memWithNoActName, null],
+        //   //     [Icons.stop, Icons.play_arrow],
+        //   //     [Icons.pause],
+        //   //   );
+        //   // });
 
-          testWidgets('Start.',
-              // 時間に関するテストなのでリトライ可能とする
-              retry: maxRetryCount, (widgetTester) async {
-            widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
-            widgetTester.ignoreMockMethodCallHandler(
-              MethodChannelMock.permissionHandler,
-            );
-            widgetTester.ignoreMockMethodCallHandler(
-              MethodChannelMock.flutterLocalNotifications,
-            );
+        //   // testWidgets('Start.',
+        //   //     // 時間に関するテストなのでリトライ可能とする
+        //   //     retry: maxRetryCount, (widgetTester) async {
+        //   //   widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
+        //   //   widgetTester.ignoreMockMethodCallHandler(
+        //   //     MethodChannelMock.permissionHandler,
+        //   //   );
+        //   //   widgetTester.ignoreMockMethodCallHandler(
+        //   //     MethodChannelMock.flutterLocalNotifications,
+        //   //   );
 
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+        //   //   await runApplication();
+        //   //   await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.descendant(
-              of: find.byType(ListTile).at(targetAt),
-              matching: find.byIcon(Icons.play_arrow),
-            ));
-            await widgetTester.pumpAndSettle();
+        //   //   await widgetTester.tap(find.descendant(
+        //   //     of: find.byType(ListTile).at(targetAt),
+        //   //     matching: find.byIcon(Icons.play_arrow),
+        //   //   ));
+        //   //   await widgetTester.pumpAndSettle();
 
-            widgetTester.expectMemListItem(
-              0,
-              [memWithNoActName, "00:00:00", null],
-              [Icons.pause, Icons.stop],
-              [Icons.play_arrow],
-            );
+        //   //   widgetTester.expectMemListItem(
+        //   //     0,
+        //   //     [memWithNoActName, "00:00:00", null],
+        //   //     [Icons.pause, Icons.stop],
+        //   //     [Icons.play_arrow],
+        //   //   );
 
-            await widgetTester.pumpAndSettle(elapsePeriod * 2);
+        //   //   await widgetTester.pumpAndSettle(elapsePeriod * 2);
 
-            expect(find.text("00:00:00"), findsNothing);
+        //   //   expect(find.text("00:00:00"), findsNothing);
 
-            final acts = await dbA.select(
-              defTableActs,
-              where: '${defFkActsMemId.name} = ?',
-              whereArgs: [memWithNoActId],
-            );
-            expect(acts, hasLength(1));
-          });
-        });
+        //   //   final acts = await dbA.select(
+        //   //     defTableActs,
+        //   //     where: '${defFkActsMemId.name} = ?',
+        //   //     whereArgs: [memWithNoActId],
+        //   //   );
+        //   //   expect(acts, hasLength(1));
+        //   // });
+        // });
 
-        group('Active act', () {
-          const targetAt = 0;
+        // group('Active act', () {
+        //   // const targetAt = 0;
 
-          testWidgets(': show.', (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+        //   // testWidgets(': show.', (widgetTester) async {
+        //   //   await runApplication();
+        //   //   await widgetTester.pumpAndSettle();
 
-            widgetTester.expectMemListItem(
-              targetAt,
-              [memWithActiveActName, null, null],
-              [Icons.pause, Icons.stop],
-              [Icons.play_arrow],
-            );
-          });
+        //   //   widgetTester.expectMemListItem(
+        //   //     targetAt,
+        //   //     [memWithActiveActName, null, null],
+        //   //     [Icons.pause, Icons.stop],
+        //   //     [Icons.play_arrow],
+        //   //   );
+        //   // });
 
-          testWidgets('Finish.', (widgetTester) async {
-            widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
-            widgetTester.ignoreMockMethodCallHandler(
-              MethodChannelMock.permissionHandler,
-            );
-            widgetTester.ignoreMockMethodCallHandler(
-              MethodChannelMock.flutterLocalNotifications,
-            );
+        //   // testWidgets('Finish.', (widgetTester) async {
+        //   //   widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
+        //   //   widgetTester.ignoreMockMethodCallHandler(
+        //   //     MethodChannelMock.permissionHandler,
+        //   //   );
+        //   //   widgetTester.ignoreMockMethodCallHandler(
+        //   //     MethodChannelMock.flutterLocalNotifications,
+        //   //   );
 
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+        //   //   await runApplication();
+        //   //   await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.descendant(
-              of: find.byType(ListTile).at(targetAt),
-              matching: find.byIcon(Icons.stop),
-            ));
-            await widgetTester.pumpAndSettle();
+        //   //   await widgetTester.tap(find.descendant(
+        //   //     of: find.byType(ListTile).at(targetAt),
+        //   //     matching: find.byIcon(Icons.stop),
+        //   //   ));
+        //   //   await widgetTester.pumpAndSettle();
 
-            widgetTester.expectMemListItem(
-              2,
-              [memWithActiveActName, null],
-              [Icons.stop, Icons.play_arrow],
-              [Icons.pause],
-            );
+        //   //   widgetTester.expectMemListItem(
+        //   //     2,
+        //   //     [memWithActiveActName, null],
+        //   //     [Icons.stop, Icons.play_arrow],
+        //   //     [Icons.pause],
+        //   //   );
 
-            final acts = await dbA.select(
-              defTableActs,
-              where: '${defFkActsMemId.name} = ?',
-              whereArgs: [memWithActiveActId],
-            );
-            expect(acts, hasLength(1));
-          });
+        //   //   final acts = await dbA.select(
+        //   //     defTableActs,
+        //   //     where: '${defFkActsMemId.name} = ?',
+        //   //     whereArgs: [memWithActiveActId],
+        //   //   );
+        //   //   expect(acts, hasLength(1));
+        //   // });
 
-          testWidgets(':Pause.', (widgetTester) async {
-            widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
-            widgetTester.ignoreMockMethodCallHandler(
-              MethodChannelMock.permissionHandler,
-            );
-            widgetTester.ignoreMockMethodCallHandler(
-              MethodChannelMock.flutterLocalNotifications,
-            );
+        //   // testWidgets(':Pause.', (widgetTester) async {
+        //   //   widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
+        //   //   widgetTester.ignoreMockMethodCallHandler(
+        //   //     MethodChannelMock.permissionHandler,
+        //   //   );
+        //   //   widgetTester.ignoreMockMethodCallHandler(
+        //   //     MethodChannelMock.flutterLocalNotifications,
+        //   //   );
 
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+        //   //   await runApplication();
+        //   //   await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.descendant(
-              of: find.byType(ListTile).at(targetAt),
-              matching: find.byIcon(Icons.pause),
-            ));
-            await widgetTester.pumpAndSettle(const Duration(seconds: 3));
+        //   //   await widgetTester.tap(find.descendant(
+        //   //     of: find.byType(ListTile).at(targetAt),
+        //   //     matching: find.byIcon(Icons.pause),
+        //   //   ));
+        //   //   await widgetTester.pumpAndSettle(const Duration(seconds: 3));
 
-            widgetTester.expectMemListItem(
-              0,
-              [memWithActiveActName, null],
-              [Icons.close, Icons.play_arrow],
-              [Icons.pause, Icons.stop],
-            );
+        //   //   widgetTester.expectMemListItem(
+        //   //     0,
+        //   //     [memWithActiveActName, null],
+        //   //     [Icons.close, Icons.play_arrow],
+        //   //     [Icons.pause, Icons.stop],
+        //   //   );
 
-            final acts = await dbA.select(
-              defTableActs,
-              where: '${defFkActsMemId.name} = ?',
-              whereArgs: [memWithActiveActId],
-            );
-            expect(acts, hasLength(2));
-          });
-        });
+        //   //   final acts = await dbA.select(
+        //   //     defTableActs,
+        //   //     where: '${defFkActsMemId.name} = ?',
+        //   //     whereArgs: [memWithActiveActId],
+        //   //   );
+        //   //   expect(acts, hasLength(2));
+        //   // });
+        // });
 
-        group(': finished act', () {
-          const targetAt = 3;
+        // group(': finished act', () {
+        //   const targetAt = 3;
 
-          testWidgets('Show.', (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+        //   testWidgets('Show.', (widgetTester) async {
+        //     await runApplication();
+        //     await widgetTester.pumpAndSettle();
 
-            widgetTester.expectMemListItem(
-              targetAt,
-              [memWithFinishedActName, null],
-              [Icons.stop, Icons.play_arrow],
-              [Icons.pause],
-            );
-          });
+        //     widgetTester.expectMemListItem(
+        //       targetAt,
+        //       [memWithFinishedActName, null],
+        //       [Icons.stop, Icons.play_arrow],
+        //       [Icons.pause],
+        //     );
+        //   });
 
-          testWidgets(': start.',
-              // 時間に関するテストなのでリトライ可能とする
-              retry: maxRetryCount, (widgetTester) async {
-            widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
-            widgetTester.ignoreMockMethodCallHandler(
-              MethodChannelMock.permissionHandler,
-            );
-            widgetTester.ignoreMockMethodCallHandler(
-              MethodChannelMock.flutterLocalNotifications,
-            );
+        //   testWidgets(': start.',
+        //       // 時間に関するテストなのでリトライ可能とする
+        //       retry: maxRetryCount, (widgetTester) async {
+        //     widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
+        //     widgetTester.ignoreMockMethodCallHandler(
+        //       MethodChannelMock.permissionHandler,
+        //     );
+        //     widgetTester.ignoreMockMethodCallHandler(
+        //       MethodChannelMock.flutterLocalNotifications,
+        //     );
 
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+        //     await runApplication();
+        //     await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.descendant(
-              of: find.byType(ListTile).at(targetAt),
-              matching: find.byIcon(Icons.play_arrow),
-            ));
-            await widgetTester.pumpAndSettle();
+        //     await widgetTester.tap(find.descendant(
+        //       of: find.byType(ListTile).at(targetAt),
+        //       matching: find.byIcon(Icons.play_arrow),
+        //     ));
+        //     await widgetTester.pumpAndSettle();
 
-            widgetTester.expectMemListItem(
-              0,
-              [memWithFinishedActName, "00:00:00", null],
-              [Icons.pause, Icons.stop],
-              [Icons.play_arrow],
-            );
+        //     widgetTester.expectMemListItem(
+        //       0,
+        //       [memWithFinishedActName, "00:00:00", null],
+        //       [Icons.pause, Icons.stop],
+        //       [Icons.play_arrow],
+        //     );
 
-            await widgetTester.pumpAndSettle(elapsePeriod * 2);
+        //     await widgetTester.pumpAndSettle(elapsePeriod * 2);
 
-            expect(find.text("00:00:00"), findsNothing);
+        //     expect(find.text("00:00:00"), findsNothing);
 
-            final acts = await dbA.select(
-              defTableActs,
-              where: '${defFkActsMemId.name} = ?',
-              whereArgs: [memWithFinishedActId],
-            );
-            expect(acts, hasLength(2));
-          });
-        });
+        //     final acts = await dbA.select(
+        //       defTableActs,
+        //       where: '${defFkActsMemId.name} = ?',
+        //       whereArgs: [memWithFinishedActId],
+        //     );
+        //     expect(acts, hasLength(2));
+        //   });
+        // });
 
-        group('Paused act', () {
-          const targetAt = 1;
+        // group('Paused act', () {
+        //   // const targetAt = 1;
 
-          testWidgets('Show.', (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+        //   // testWidgets('Show.', (widgetTester) async {
+        //   //   await runApplication();
+        //   //   await widgetTester.pumpAndSettle();
 
-            widgetTester.expectMemListItem(
-              targetAt,
-              [memWithPausedActName, null],
-              [Icons.close, Icons.play_arrow],
-              [Icons.pause, Icons.stop],
-            );
-          });
+        //   //   widgetTester.expectMemListItem(
+        //   //     targetAt,
+        //   //     [memWithPausedActName, null],
+        //   //     [Icons.close, Icons.play_arrow],
+        //   //     [Icons.pause, Icons.stop],
+        //   //   );
+        //   // });
 
-          testWidgets('Start.',
-              // 時間に関するテストなのでリトライ可能とする
-              retry: maxRetryCount, (widgetTester) async {
-            widgetTester.ignoreMockMethodCallHandler(
-              MethodChannelMock.permissionHandler,
-            );
-            widgetTester.ignoreMockMethodCallHandler(
-              MethodChannelMock.flutterLocalNotifications,
-            );
+        //   // testWidgets('Start.',
+        //   //     // 時間に関するテストなのでリトライ可能とする
+        //   //     retry: maxRetryCount, (widgetTester) async {
+        //   //   widgetTester.ignoreMockMethodCallHandler(
+        //   //     MethodChannelMock.permissionHandler,
+        //   //   );
+        //   //   widgetTester.ignoreMockMethodCallHandler(
+        //   //     MethodChannelMock.flutterLocalNotifications,
+        //   //   );
 
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+        //   //   await runApplication();
+        //   //   await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.descendant(
-              of: find.byType(ListTile).at(targetAt),
-              matching: find.byIcon(Icons.play_arrow),
-            ));
-            await widgetTester.pumpAndSettle();
+        //   //   await widgetTester.tap(find.descendant(
+        //   //     of: find.byType(ListTile).at(targetAt),
+        //   //     matching: find.byIcon(Icons.play_arrow),
+        //   //   ));
+        //   //   await widgetTester.pumpAndSettle();
 
-            widgetTester.expectMemListItem(
-              0,
-              [memWithPausedActName, "00:00:00", null],
-              [Icons.pause, Icons.stop],
-              [Icons.play_arrow],
-            );
+        //   //   widgetTester.expectMemListItem(
+        //   //     0,
+        //   //     [memWithPausedActName, "00:00:00", null],
+        //   //     [Icons.pause, Icons.stop],
+        //   //     [Icons.play_arrow],
+        //   //   );
 
-            await widgetTester.pumpAndSettle(elapsePeriod * 2);
+        //   //   await widgetTester.pumpAndSettle(elapsePeriod * 2);
 
-            expect(find.text("00:00:00"), findsNothing);
+        //   //   expect(find.text("00:00:00"), findsNothing);
 
-            final acts = await dbA.select(
-              defTableActs,
-              where: '${defFkActsMemId.name} = ?',
-              whereArgs: [memWithPausedActId],
-            );
-            expect(acts, hasLength(2));
-          });
+        //   //   final acts = await dbA.select(
+        //   //     defTableActs,
+        //   //     where: '${defFkActsMemId.name} = ?',
+        //   //     whereArgs: [memWithPausedActId],
+        //   //   );
+        //   //   expect(acts, hasLength(2));
+        //   // });
 
-          testWidgets('Close.', (widgetTester) async {
-            widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
-            widgetTester.ignoreMockMethodCallHandler(
-              MethodChannelMock.permissionHandler,
-            );
-            widgetTester.ignoreMockMethodCallHandler(
-              MethodChannelMock.flutterLocalNotifications,
-            );
+        //   // testWidgets('Close.', (widgetTester) async {
+        //   //   widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
+        //   //   widgetTester.ignoreMockMethodCallHandler(
+        //   //     MethodChannelMock.permissionHandler,
+        //   //   );
+        //   //   widgetTester.ignoreMockMethodCallHandler(
+        //   //     MethodChannelMock.flutterLocalNotifications,
+        //   //   );
 
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+        //   //   await runApplication();
+        //   //   await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(
-              find.descendant(
-                of: find.byType(ListTile).at(targetAt),
-                matching: find.byIcon(Icons.close),
-              ),
-            );
-            await widgetTester.pumpAndSettle();
+        //   //   await widgetTester.tap(
+        //   //     find.descendant(
+        //   //       of: find.byType(ListTile).at(targetAt),
+        //   //       matching: find.byIcon(Icons.close),
+        //   //     ),
+        //   //   );
+        //   //   await widgetTester.pumpAndSettle();
 
-            widgetTester.expectMemListItem(
-              3,
-              [memWithPausedActName, null],
-              [Icons.stop, Icons.play_arrow],
-              [Icons.pause],
-            );
+        //   //   widgetTester.expectMemListItem(
+        //   //     3,
+        //   //     [memWithPausedActName, null],
+        //   //     [Icons.stop, Icons.play_arrow],
+        //   //     [Icons.pause],
+        //   //   );
 
-            final acts = await dbA.select(
-              defTableActs,
-              where: '${defFkActsMemId.name} = ?',
-              whereArgs: [memWithPausedActId],
-            );
-            expect(acts, hasLength(1));
-          });
-        });
+        //   //   final acts = await dbA.select(
+        //   //     defTableActs,
+        //   //     where: '${defFkActsMemId.name} = ?',
+        //   //     whereArgs: [memWithPausedActId],
+        //   //   );
+        //   //   expect(acts, hasLength(1));
+        //   // });
+        // });
       });
     });

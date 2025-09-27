@@ -5,36 +5,10 @@ import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/mem.dart';
-import 'package:mem/features/mems/mem_entity.dart';
 
 Key keyMemName = const Key("mem-name");
 
 String _memNameTag(int? memId) => heroTag('mem-name', memId);
-
-class MemNameText extends StatelessWidget {
-  final SavedMemEntityV2 _memEntity;
-
-  const MemNameText(this._memEntity, {super.key});
-
-  @override
-  Widget build(BuildContext context) => v(
-        () => HeroView(
-          _memNameTag(_memEntity.id),
-          Text(
-            key: keyMemName,
-            _memEntity.value.name,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: _memEntity.value.isDone
-                ? const TextStyle(decoration: TextDecoration.lineThrough)
-                : null,
-          ),
-        ),
-        {
-          '_memEntity': _memEntity,
-        },
-      );
-}
 
 class MemNameTextFormField extends ConsumerWidget {
   final int? _memId;
@@ -93,6 +67,52 @@ class _MemNameTextFormField extends StatelessWidget {
         {
           '_memId': _memId,
           '_memName': _memName,
+        },
+      );
+}
+
+class MemNameText extends ConsumerWidget {
+  final int? _memId;
+
+  const MemNameText(this._memId, {super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => v(
+        () => _MemNameText(
+          ref.watch(MemStateProvider(_memId)).valueOrNull?.name ?? '',
+          _memNameTag(_memId),
+          ref.watch(MemStateProvider(_memId)).valueOrNull?.isDone ?? false,
+        ),
+        {
+          '_memId': _memId,
+        },
+      );
+}
+
+class _MemNameText extends StatelessWidget {
+  final String _memName;
+  final String _memNameTag;
+  final bool _isDone;
+
+  const _MemNameText(this._memName, this._memNameTag, this._isDone);
+
+  @override
+  Widget build(BuildContext context) => v(
+        () => HeroView(
+          _memNameTag,
+          Text(
+            _memName,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: _isDone
+                ? const TextStyle(decoration: TextDecoration.lineThrough)
+                : null,
+          ),
+        ),
+        {
+          '_memName': _memName,
+          '_memNameTag': _memNameTag,
+          '_isDone': _isDone,
         },
       );
 }

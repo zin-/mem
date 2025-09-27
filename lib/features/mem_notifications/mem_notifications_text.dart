@@ -41,7 +41,7 @@ class MemNotificationText extends ConsumerWidget {
 }
 
 class _MemNotificationText extends StatelessWidget {
-  final Iterable<MemNotificationEntityV2> _memNotificationEntities;
+  final Iterable<MemNotificationEntity> _memNotificationEntities;
   final TimeOfDay _startOfDay;
   final Act? _latestAct;
 
