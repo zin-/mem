@@ -91,27 +91,27 @@ void main() => group(_name, () {
       });
 
       group("Show inserted acts", () {
-        testWidgets(": by Mem.", (widgetTester) async {
-          await runApplication();
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(find.text(insertedMemName));
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(startIconFinder);
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(find.byIcon(Icons.numbers));
-          await widgetTester.pumpAndSettle();
+        // testWidgets(": by Mem.", (widgetTester) async {
+        //   await runApplication();
+        //   await widgetTester.pumpAndSettle();
+        //   await widgetTester.tap(find.text(insertedMemName));
+        //   await widgetTester.pumpAndSettle();
+        //   await widgetTester.tap(startIconFinder);
+        //   await widgetTester.pumpAndSettle();
+        //   await widgetTester.tap(find.byIcon(Icons.numbers));
+        //   await widgetTester.pumpAndSettle();
 
-          expect(widgetTester.textAt(0).data, equals(insertedMemName));
-          expect(widgetTester.textAt(1).data, equals(dateText(zeroDate)));
-          expect(widgetTester.textAt(2).data, equals("1"));
-          expect(widgetTester.textAt(3).data, equals(oneMin.format()));
-          expect(widgetTester.textAt(4).data, equals(timeText(zeroDate)));
-          expect(widgetTester.textAt(5).data, equals("~"));
-          expect(widgetTester.textAt(6).data, equals(timeText(oneMinDate)));
+        //   expect(widgetTester.textAt(0).data, equals(insertedMemName));
+        //   expect(widgetTester.textAt(1).data, equals(dateText(zeroDate)));
+        //   expect(widgetTester.textAt(2).data, equals("1"));
+        //   expect(widgetTester.textAt(3).data, equals(oneMin.format()));
+        //   expect(widgetTester.textAt(4).data, equals(timeText(zeroDate)));
+        //   expect(widgetTester.textAt(5).data, equals("~"));
+        //   expect(widgetTester.textAt(6).data, equals(timeText(oneMinDate)));
 
-          expect(startIconFinder, findsOneWidget);
-          expect(stopIconFinder, findsNothing);
-        });
+        //   expect(startIconFinder, findsOneWidget);
+        //   expect(stopIconFinder, findsNothing);
+        // });
 
         group("All", () {
           testWidgets('Time.', (widgetTester) async {

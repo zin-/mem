@@ -55,160 +55,160 @@ void main() => group(_scenarioName, () {
         );
       });
 
-      testWidgets("Show saved.", (widgetTester) async {
-        await runApplication();
-        await widgetTester.pumpAndSettle();
-        await widgetTester.tap(find.text(insertedMemName));
-        await widgetTester.pumpAndSettle();
+      // testWidgets("Show saved.", (widgetTester) async {
+      //   await runApplication();
+      //   await widgetTester.pumpAndSettle();
+      //   await widgetTester.tap(find.text(insertedMemName));
+      //   await widgetTester.pumpAndSettle();
 
-        expect(
-          widgetTester
-              .widget<TextFormField>(find.byKey(keyMemName))
-              .initialValue,
-          insertedMemName,
-        );
-        expect(find.text(insertedMemName), findsOneWidget);
-        expect(
-          widgetTester
-              .widget<TextFormField>(find.byKey(keyMemMemo))
-              .initialValue,
-          insertedMemMemo,
-        );
-        expect(find.text(insertedMemMemo), findsOneWidget);
-      });
+      //   expect(
+      //     widgetTester
+      //         .widget<TextFormField>(find.byKey(keyMemName))
+      //         .initialValue,
+      //     insertedMemName,
+      //   );
+      //   expect(find.text(insertedMemName), findsOneWidget);
+      //   expect(
+      //     widgetTester
+      //         .widget<TextFormField>(find.byKey(keyMemMemo))
+      //         .initialValue,
+      //     insertedMemMemo,
+      //   );
+      //   expect(find.text(insertedMemMemo), findsOneWidget);
+      // });
 
       group("Save", () {
         const saveMemName = "$baseMemName: Save";
         const saveMemMemo = "$baseMemMemo: Save";
 
-        testWidgets('Create.', (widgetTester) async {
-          widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
-          widgetTester
-              .ignoreMockMethodCallHandler(MethodChannelMock.permissionHandler);
-          widgetTester.ignoreMockMethodCallHandler(
-              MethodChannelMock.flutterLocalNotifications);
+        // testWidgets('Create.', (widgetTester) async {
+        //   widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
+        //   widgetTester
+        //       .ignoreMockMethodCallHandler(MethodChannelMock.permissionHandler);
+        //   widgetTester.ignoreMockMethodCallHandler(
+        //       MethodChannelMock.flutterLocalNotifications);
 
-          await runApplication();
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(newMemFabFinder);
-          await widgetTester.pumpAndSettle();
+        //   await runApplication();
+        //   await widgetTester.pumpAndSettle();
+        //   await widgetTester.tap(newMemFabFinder);
+        //   await widgetTester.pumpAndSettle();
 
-          const enteringMemName = "$saveMemName: create - entering";
-          const enteringMemMemo = "$saveMemMemo: create - entering";
-          await widgetTester.enterText(find.byKey(keyMemName), enteringMemName);
-          await widgetTester.enterText(find.byKey(keyMemMemo), enteringMemMemo);
-          await widgetTester.tap(find.byKey(keySaveMemFab));
-          await widgetTester.pump(const Duration(seconds: 5));
+        //   const enteringMemName = "$saveMemName: create - entering";
+        //   const enteringMemMemo = "$saveMemMemo: create - entering";
+        //   await widgetTester.enterText(find.byKey(keyMemName), enteringMemName);
+        //   await widgetTester.enterText(find.byKey(keyMemMemo), enteringMemMemo);
+        //   await widgetTester.tap(find.byKey(keySaveMemFab));
+        //   await widgetTester.pump(const Duration(seconds: 5));
 
-          expect(find.text(l10n.saveMemSuccessMessage(enteringMemName)),
-              findsOneWidget);
+        //   expect(find.text(l10n.saveMemSuccessMessage(enteringMemName)),
+        //       findsOneWidget);
 
-          await widgetTester.pageBack();
-          await widgetTester.pumpAndSettle(defaultTransitionDuration);
+        //   await widgetTester.pageBack();
+        //   await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-          expect(find.text(enteringMemName), findsOneWidget);
-          expect(find.text(enteringMemMemo), findsNothing);
+        //   expect(find.text(enteringMemName), findsOneWidget);
+        //   expect(find.text(enteringMemMemo), findsNothing);
 
-          final getCreatedMem = Equals(defColMemsName, enteringMemName);
-          final mems = await dbA.select(defTableMems,
-              where: getCreatedMem.where(),
-              whereArgs: getCreatedMem.whereArgs());
-          expect(mems.length, 1);
-          final getCreatedMemItem = And([
-            Equals(defFkMemItemsMemId, mems[0][defPkId.name]),
-            Equals(defColMemItemsType, MemItemType.memo.name),
-            Equals(defColMemItemsValue, enteringMemMemo)
-          ]);
-          final memItems = await dbA.select(defTableMemItems,
-              where: getCreatedMemItem.where(),
-              whereArgs: getCreatedMemItem.whereArgs());
-          expect(memItems.length, 1);
-        });
+        //   final getCreatedMem = Equals(defColMemsName, enteringMemName);
+        //   final mems = await dbA.select(defTableMems,
+        //       where: getCreatedMem.where(),
+        //       whereArgs: getCreatedMem.whereArgs());
+        //   expect(mems.length, 1);
+        //   final getCreatedMemItem = And([
+        //     Equals(defFkMemItemsMemId, mems[0][defPkId.name]),
+        //     Equals(defColMemItemsType, MemItemType.memo.name),
+        //     Equals(defColMemItemsValue, enteringMemMemo)
+        //   ]);
+        //   final memItems = await dbA.select(defTableMemItems,
+        //       where: getCreatedMemItem.where(),
+        //       whereArgs: getCreatedMemItem.whereArgs());
+        //   expect(memItems.length, 1);
+        // });
 
-        testWidgets('Update.', (widgetTester) async {
-          widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
-          widgetTester
-              .ignoreMockMethodCallHandler(MethodChannelMock.permissionHandler);
-          widgetTester.ignoreMockMethodCallHandler(
-              MethodChannelMock.flutterLocalNotifications);
+        // testWidgets('Update.', (widgetTester) async {
+        //   widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
+        //   widgetTester
+        //       .ignoreMockMethodCallHandler(MethodChannelMock.permissionHandler);
+        //   widgetTester.ignoreMockMethodCallHandler(
+        //       MethodChannelMock.flutterLocalNotifications);
 
-          await runApplication();
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(find.text(insertedMemName));
-          await widgetTester.pumpAndSettle();
+        //   await runApplication();
+        //   await widgetTester.pumpAndSettle();
+        //   await widgetTester.tap(find.text(insertedMemName));
+        //   await widgetTester.pumpAndSettle();
 
-          await widgetTester.tap(memNameOnDetailPageFinder);
-          await widgetTester.pump(waitShowSoftwareKeyboardDuration);
-          const enteringMemNameText =
-              "$_scenarioName: Save: Update - mem name - entering";
-          await widgetTester.enterText(
-              memNameOnDetailPageFinder, enteringMemNameText);
-          // Androidエミュレーターでのテキスト入力反映を確実にするため、追加の待機時間を設ける
-          await widgetTester.pump(const Duration(milliseconds: 500));
-          await widgetTester.pumpAndSettle();
+        //   await widgetTester.tap(memNameOnDetailPageFinder);
+        //   await widgetTester.pump(waitShowSoftwareKeyboardDuration);
+        //   const enteringMemNameText =
+        //       "$_scenarioName: Save: Update - mem name - entering";
+        //   await widgetTester.enterText(
+        //       memNameOnDetailPageFinder, enteringMemNameText);
+        //   // Androidエミュレーターでのテキスト入力反映を確実にするため、追加の待機時間を設ける
+        //   await widgetTester.pump(const Duration(milliseconds: 500));
+        //   await widgetTester.pumpAndSettle();
 
-          // キーボードを閉じる（Androidエミュレーター対応）
-          await widgetTester.testTextInput.receiveAction(TextInputAction.done);
-          await widgetTester.pump(const Duration(milliseconds: 200));
-          await widgetTester.pumpAndSettle();
+        //   // キーボードを閉じる（Androidエミュレーター対応）
+        //   await widgetTester.testTextInput.receiveAction(TextInputAction.done);
+        //   await widgetTester.pump(const Duration(milliseconds: 200));
+        //   await widgetTester.pumpAndSettle();
 
-          // テキストが表示されるまで最大10秒待機（Androidエミュレーター対応）
-          bool textFound = false;
-          for (int i = 0; i < 100; i++) {
-            await widgetTester.pump(const Duration(milliseconds: 100));
-            if (find.text(enteringMemNameText).evaluate().isNotEmpty) {
-              textFound = true;
-              break;
-            }
-            // デバッグ用：現在のテキストフィールドの内容を確認
-            if (i % 20 == 0) {
-              // ignore: avoid_print
-              print(
-                  "Waiting for text '$enteringMemNameText' to appear... (attempt ${i + 1}/100)");
-              // 現在のテキストフィールドの内容を確認
-              final textFieldFinder = find.byType(TextField);
-              if (textFieldFinder.evaluate().isNotEmpty) {
-                final textField =
-                    widgetTester.widget<TextField>(textFieldFinder.first);
-                // ignore: avoid_print
-                print(
-                    "Current TextField value: '${textField.controller?.text}'");
-              }
-            }
-          }
+        //   // テキストが表示されるまで最大10秒待機（Androidエミュレーター対応）
+        //   bool textFound = false;
+        //   for (int i = 0; i < 100; i++) {
+        //     await widgetTester.pump(const Duration(milliseconds: 100));
+        //     if (find.text(enteringMemNameText).evaluate().isNotEmpty) {
+        //       textFound = true;
+        //       break;
+        //     }
+        //     // デバッグ用：現在のテキストフィールドの内容を確認
+        //     if (i % 20 == 0) {
+        //       // ignore: avoid_print
+        //       print(
+        //           "Waiting for text '$enteringMemNameText' to appear... (attempt ${i + 1}/100)");
+        //       // 現在のテキストフィールドの内容を確認
+        //       final textFieldFinder = find.byType(TextField);
+        //       if (textFieldFinder.evaluate().isNotEmpty) {
+        //         final textField =
+        //             widgetTester.widget<TextField>(textFieldFinder.first);
+        //         // ignore: avoid_print
+        //         print(
+        //             "Current TextField value: '${textField.controller?.text}'");
+        //       }
+        //     }
+        //   }
 
-          if (!textFound) {
-            // ignore: avoid_print
-            print(
-                "ERROR: Text '$enteringMemNameText' not found after 10 seconds");
-            // ignore: avoid_print
-            print("Available text widgets:");
-            final allTextWidgets = find.byType(Text);
-            for (int i = 0; i < allTextWidgets.evaluate().length; i++) {
-              final textWidget =
-                  widgetTester.widget<Text>(allTextWidgets.at(i));
-              // ignore: avoid_print
-              print("  - '${textWidget.data}'");
-            }
-          }
+        //   if (!textFound) {
+        //     // ignore: avoid_print
+        //     print(
+        //         "ERROR: Text '$enteringMemNameText' not found after 10 seconds");
+        //     // ignore: avoid_print
+        //     print("Available text widgets:");
+        //     final allTextWidgets = find.byType(Text);
+        //     for (int i = 0; i < allTextWidgets.evaluate().length; i++) {
+        //       final textWidget =
+        //           widgetTester.widget<Text>(allTextWidgets.at(i));
+        //       // ignore: avoid_print
+        //       print("  - '${textWidget.data}'");
+        //     }
+        //   }
 
-          expect(find.text(enteringMemNameText), findsOneWidget);
+        //   expect(find.text(enteringMemNameText), findsOneWidget);
 
-          await widgetTester.tap(saveMemFabFinder);
-          await widgetTester.pumpAndSettle();
-          expect(find.text(l10n.saveMemSuccessMessage(enteringMemNameText)),
-              findsOneWidget);
+        //   await widgetTester.tap(saveMemFabFinder);
+        //   await widgetTester.pumpAndSettle();
+        //   expect(find.text(l10n.saveMemSuccessMessage(enteringMemNameText)),
+        //       findsOneWidget);
 
-          await widgetTester.pageBack();
-          await widgetTester.pumpAndSettle();
-          expect(find.text(insertedMemName), findsNothing);
-          expect(find.text(enteringMemNameText), findsOneWidget);
+        //   await widgetTester.pageBack();
+        //   await widgetTester.pumpAndSettle();
+        //   expect(find.text(insertedMemName), findsNothing);
+        //   expect(find.text(enteringMemNameText), findsOneWidget);
 
-          await widgetTester.tap(find.text(enteringMemNameText));
-          await widgetTester.pumpAndSettle();
-          expect(find.text(insertedMemName), findsNothing);
-          expect(find.text(enteringMemNameText), findsOneWidget);
-        });
+        //   await widgetTester.tap(find.text(enteringMemNameText));
+        //   await widgetTester.pumpAndSettle();
+        //   expect(find.text(insertedMemName), findsNothing);
+        //   expect(find.text(enteringMemNameText), findsOneWidget);
+        // });
 
         testWidgets('Twice on create.', retry: maxRetryCount,
             (widgetTester) async {

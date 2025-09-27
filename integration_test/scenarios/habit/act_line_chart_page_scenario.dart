@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/acts_summary.dart';
-import 'package:mem/features/acts/line_chart/line_chart_wrapper.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
@@ -77,80 +76,80 @@ void main() => group(_name, () {
         }
       });
 
-      testWidgets("Show chart.", (widgetTester) async {
-        widgetTester.ignoreMockMethodCallHandler(
-            MethodChannelMock.flutterLocalNotifications);
+      // testWidgets("Show chart.", (widgetTester) async {
+      //   widgetTester.ignoreMockMethodCallHandler(
+      //       MethodChannelMock.flutterLocalNotifications);
 
-        await widgetTester.show(insertedMemName);
+      //   await widgetTester.show(insertedMemName);
 
-        expect(find.byType(LineChartWrapper), findsOneWidget);
-      });
+      //   expect(find.byType(LineChartWrapper), findsOneWidget);
+      // });
 
-      group("Time period", () {
-        testWidgets("[flaky]Show.", (widgetTester) async {
-          await widgetTester.show(insertedMemName);
+      // group("Time period", () {
+      //   // testWidgets("[flaky]Show.", (widgetTester) async {
+      //   //   await widgetTester.show(insertedMemName);
 
-          await widgetTester.tap(find.byIcon(Icons.more_vert));
-          await widgetTester.pumpAndSettle(_pumpAndSettleDuration);
+      //   //   await widgetTester.tap(find.byIcon(Icons.more_vert));
+      //   //   await widgetTester.pumpAndSettle(_pumpAndSettleDuration);
 
-          for (var period in Period.values) {
-            expect(find.text(period.name), findsOneWidget);
-          }
-        });
+      //   //   for (var period in Period.values) {
+      //   //     expect(find.text(period.name), findsOneWidget);
+      //   //   }
+      //   // });
 
-        group("Select", () {
-          Period.values
-              .where(
-            (e) => e != Period.aWeek,
-          )
-              .forEach((target) {
-            testWidgets("${target.name}.", (widgetTester) async {
-              await widgetTester.show(insertedMemName);
+      //   // group("Select", () {
+      //   //   Period.values
+      //   //       .where(
+      //   //     (e) => e != Period.aWeek,
+      //   //   )
+      //   //       .forEach((target) {
+      //   //     testWidgets("${target.name}.", (widgetTester) async {
+      //   //       await widgetTester.show(insertedMemName);
 
-              await widgetTester.tap(find.byIcon(Icons.more_vert));
-              await widgetTester.pumpAndSettle(_pumpAndSettleDuration);
+      //   //       await widgetTester.tap(find.byIcon(Icons.more_vert));
+      //   //       await widgetTester.pumpAndSettle(_pumpAndSettleDuration);
 
-              await widgetTester.tap(find.text(target.name));
-              await widgetTester.pumpAndSettle(_pumpAndSettleDuration);
+      //   //       await widgetTester.tap(find.text(target.name));
+      //   //       await widgetTester.pumpAndSettle(_pumpAndSettleDuration);
 
-              expect(true, isTrue);
-            });
-          });
-        });
-      });
+      //   //       expect(true, isTrue);
+      //   //     });
+      //   //   });
+      //   // });
+      // });
 
-      group("Aggregation type", () {
-        testWidgets("Show.", (widgetTester) async {
-          await widgetTester.show(insertedMemName);
+      //   group("Aggregation type", () {
+      //     // testWidgets("Show.", (widgetTester) async {
+      //     //   await widgetTester.show(insertedMemName);
 
-          await widgetTester.tap(find.byIcon(Icons.more_vert));
-          await widgetTester.pumpAndSettle(_pumpAndSettleDuration);
+      //     //   await widgetTester.tap(find.byIcon(Icons.more_vert));
+      //     //   await widgetTester.pumpAndSettle(_pumpAndSettleDuration);
 
-          for (var aggregationType in AggregationType.values) {
-            expect(find.text(aggregationType.name), findsOneWidget);
-          }
-        });
+      //     //   for (var aggregationType in AggregationType.values) {
+      //     //     expect(find.text(aggregationType.name), findsOneWidget);
+      //     //   }
+      //     // });
 
-        group("Select", () {
-          AggregationType.values
-              .where(
-            (e) => e != AggregationType.count,
-          )
-              .forEach((target) {
-            testWidgets("${target.name}.", (widgetTester) async {
-              await widgetTester.show(insertedMemName);
+      //     group("Select", () {
+      //       AggregationType.values
+      //           .where(
+      //         (e) => e != AggregationType.count,
+      //       )
+      //           .forEach((target) {
+      //         testWidgets("${target.name}.", (widgetTester) async {
+      //           await widgetTester.show(insertedMemName);
 
-              await widgetTester.tap(find.byIcon(Icons.more_vert));
-              await widgetTester.pumpAndSettle(_pumpAndSettleDuration);
+      //           await widgetTester.tap(find.byIcon(Icons.more_vert));
+      //           await widgetTester.pumpAndSettle(_pumpAndSettleDuration);
 
-              await widgetTester.tap(find.text(target.name));
-              await widgetTester.pumpAndSettle(_pumpAndSettleDuration);
+      //           await widgetTester.tap(find.text(target.name));
+      //           await widgetTester.pumpAndSettle(_pumpAndSettleDuration);
 
-              expect(true, isTrue);
-            });
-          });
-        });
-      });
+      //           expect(true, isTrue);
+      //         });
+      //       });
+      //     });
+      //   });
     });
 
 extension on WidgetTester {

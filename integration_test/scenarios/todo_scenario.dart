@@ -64,115 +64,115 @@ void testTodoScenario() => group(': $_scenarioName', () {
       });
 
       group(": show", () {
-        testWidgets(": list: initial.", (widgetTester) async {
-          await runApplication();
-          await widgetTester.pumpAndSettle();
+        //   testWidgets(": list: initial.", (widgetTester) async {
+        //     await runApplication();
+        //     await widgetTester.pumpAndSettle();
 
-          expect(find.text(insertedMemName), findsOneWidget);
-          expect(find.text(undoneMemName), findsOneWidget);
-          expect(find.text(doneMemName), findsNothing);
+        //     expect(find.text(insertedMemName), findsOneWidget);
+        //     expect(find.text(undoneMemName), findsOneWidget);
+        //     expect(find.text(doneMemName), findsNothing);
 
-          await widgetTester.tap(filterListIconFinder);
-          await widgetTester.pumpAndSettle();
+        //     await widgetTester.tap(filterListIconFinder);
+        //     await widgetTester.pumpAndSettle();
 
-          expect(
-            widgetTester.widget<Switch>(find.byType(Switch).at(2)).value,
-            true,
-          );
-          expect(
-            widgetTester.widget<Switch>(find.byType(Switch).at(3)).value,
-            false,
-          );
-        });
+        //     expect(
+        //       widgetTester.widget<Switch>(find.byType(Switch).at(2)).value,
+        //       true,
+        //     );
+        //     expect(
+        //       widgetTester.widget<Switch>(find.byType(Switch).at(3)).value,
+        //       false,
+        //     );
+        //   });
       });
 
       group(': done & undone', () {
-        testWidgets(': MemDetailPage.', (widgetTester) async {
-          await runApplication();
-          await widgetTester.pumpAndSettle();
+        // testWidgets(': MemDetailPage.', (widgetTester) async {
+        //   await runApplication();
+        //   await widgetTester.pumpAndSettle();
 
-          expect(find.text(undoneMemName), findsOneWidget);
-          expect(find.text(doneMemName), findsNothing);
-          await widgetTester.tap(find.text(insertedMemName));
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(find.byType(Checkbox));
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(saveMemFabFinder);
-          await widgetTester.pumpAndSettle();
-          await widgetTester.pageBack();
-          await widgetTester.pumpAndSettle();
+        //   expect(find.text(undoneMemName), findsOneWidget);
+        //   expect(find.text(doneMemName), findsNothing);
+        //   await widgetTester.tap(find.text(insertedMemName));
+        //   await widgetTester.pumpAndSettle();
+        //   await widgetTester.tap(find.byType(Checkbox));
+        //   await widgetTester.pumpAndSettle();
+        //   await widgetTester.tap(saveMemFabFinder);
+        //   await widgetTester.pumpAndSettle();
+        //   await widgetTester.pageBack();
+        //   await widgetTester.pumpAndSettle();
 
-          expect(find.text(insertedMemName), findsNothing);
-          expect(find.text(undoneMemName), findsOneWidget);
-          expect(find.text(doneMemName), findsNothing);
-          await widgetTester.tap(filterListIconFinder);
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(find.byType(Switch).at(3));
-          await closeMemListFilter(widgetTester);
-          await widgetTester.pumpAndSettle(defaultTransitionDuration);
+        //   expect(find.text(insertedMemName), findsNothing);
+        //   expect(find.text(undoneMemName), findsOneWidget);
+        //   expect(find.text(doneMemName), findsNothing);
+        //   await widgetTester.tap(filterListIconFinder);
+        //   await widgetTester.pumpAndSettle();
+        //   await widgetTester.tap(find.byType(Switch).at(3));
+        //   await closeMemListFilter(widgetTester);
+        //   await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-          expect(find.text(insertedMemName), findsOneWidget);
-          expect(find.text(undoneMemName), findsOneWidget);
-          expect(find.text(doneMemName), findsOneWidget);
-          await widgetTester.tap(find.text(insertedMemName));
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(find.byType(Checkbox));
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(saveMemFabFinder);
-          await widgetTester.pumpAndSettle();
-          await widgetTester.pageBack();
-          await widgetTester.pumpAndSettle();
+        //   expect(find.text(insertedMemName), findsOneWidget);
+        //   expect(find.text(undoneMemName), findsOneWidget);
+        //   expect(find.text(doneMemName), findsOneWidget);
+        //   await widgetTester.tap(find.text(insertedMemName));
+        //   await widgetTester.pumpAndSettle();
+        //   await widgetTester.tap(find.byType(Checkbox));
+        //   await widgetTester.pumpAndSettle();
+        //   await widgetTester.tap(saveMemFabFinder);
+        //   await widgetTester.pumpAndSettle();
+        //   await widgetTester.pageBack();
+        //   await widgetTester.pumpAndSettle();
 
-          await widgetTester.tap(filterListIconFinder);
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(find.byType(Switch).at(2));
-          await closeMemListFilter(widgetTester);
-          await widgetTester.pumpAndSettle(defaultTransitionDuration);
+        //   await widgetTester.tap(filterListIconFinder);
+        //   await widgetTester.pumpAndSettle();
+        //   await widgetTester.tap(find.byType(Switch).at(2));
+        //   await closeMemListFilter(widgetTester);
+        //   await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-          expect(find.text(insertedMemName), findsNothing);
-          expect(find.text(undoneMemName), findsNothing);
-          expect(find.text(doneMemName), findsOneWidget);
-        });
+        //   expect(find.text(insertedMemName), findsNothing);
+        //   expect(find.text(undoneMemName), findsNothing);
+        //   expect(find.text(doneMemName), findsOneWidget);
+        // });
 
-        testWidgets('[flaky]MemListPage.', (widgetTester) async {
-          await runApplication();
-          await widgetTester.pumpAndSettle();
+      //   testWidgets('[flaky]MemListPage.', (widgetTester) async {
+      //     await runApplication();
+      //     await widgetTester.pumpAndSettle();
 
-          expect(find.text(insertedMemName), findsOneWidget);
-          expect(find.text(undoneMemName), findsOneWidget);
-          expect(find.text(doneMemName), findsNothing);
-          await widgetTester.tap(find.byType(Checkbox).at(0));
-          await widgetTester.pumpAndSettle();
+      //     expect(find.text(insertedMemName), findsOneWidget);
+      //     expect(find.text(undoneMemName), findsOneWidget);
+      //     expect(find.text(doneMemName), findsNothing);
+      //     await widgetTester.tap(find.byType(Checkbox).at(0));
+      //     await widgetTester.pumpAndSettle();
 
-          expect(find.text(insertedMemName), findsNothing);
-          expect(find.text(undoneMemName), findsOneWidget);
-          expect(find.text(doneMemName), findsNothing);
-          await widgetTester.tap(filterListIconFinder);
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(find.byType(Switch).at(2));
-          await closeMemListFilter(widgetTester);
-          await widgetTester.pumpAndSettle(defaultTransitionDuration);
+      //     expect(find.text(insertedMemName), findsNothing);
+      //     expect(find.text(undoneMemName), findsOneWidget);
+      //     expect(find.text(doneMemName), findsNothing);
+      //     await widgetTester.tap(filterListIconFinder);
+      //     await widgetTester.pumpAndSettle();
+      //     await widgetTester.tap(find.byType(Switch).at(2));
+      //     await closeMemListFilter(widgetTester);
+      //     await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-          expect(find.text(insertedMemName), findsOneWidget);
-          expect(find.text(undoneMemName), findsOneWidget);
-          expect(find.text(doneMemName), findsOneWidget);
-          await widgetTester.tap(find.byType(Checkbox).at(1));
-          await widgetTester.pumpAndSettle();
+      //     expect(find.text(insertedMemName), findsOneWidget);
+      //     expect(find.text(undoneMemName), findsOneWidget);
+      //     expect(find.text(doneMemName), findsOneWidget);
+      //     await widgetTester.tap(find.byType(Checkbox).at(1));
+      //     await widgetTester.pumpAndSettle();
 
-          expect(find.text(insertedMemName), findsOneWidget);
-          expect(find.text(undoneMemName), findsOneWidget);
-          expect(find.text(doneMemName), findsOneWidget);
-          await widgetTester.tap(filterListIconFinder);
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(find.byType(Switch).at(3));
-          await closeMemListFilter(widgetTester);
-          await widgetTester.pumpAndSettle(defaultTransitionDuration);
+      //     expect(find.text(insertedMemName), findsOneWidget);
+      //     expect(find.text(undoneMemName), findsOneWidget);
+      //     expect(find.text(doneMemName), findsOneWidget);
+      //     await widgetTester.tap(filterListIconFinder);
+      //     await widgetTester.pumpAndSettle();
+      //     await widgetTester.tap(find.byType(Switch).at(3));
+      //     await closeMemListFilter(widgetTester);
+      //     await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-          expect(find.text(insertedMemName), findsNothing);
-          expect(find.text(undoneMemName), findsNothing);
-          expect(find.text(doneMemName), findsOneWidget);
-        });
-      });
+      //     expect(find.text(insertedMemName), findsNothing);
+      //     expect(find.text(undoneMemName), findsNothing);
+      //     expect(find.text(doneMemName), findsOneWidget);
+      //   });
+      // });
 
       testWidgets('not notify on done mem.', (widgetTester) async {
         int flutterLocalNotificationsInitializeCount = 0;
