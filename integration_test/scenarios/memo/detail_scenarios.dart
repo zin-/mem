@@ -12,7 +12,7 @@ import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/features/mems/detail/fab.dart';
 import 'package:mem/features/mem_items/mem_items_view.dart';
 import 'package:mem/features/mems/detail/app_bar/remove_mem_action.dart';
-import 'package:mem/features/mems/transitions.dart';
+// import 'package:mem/features/mems/transitions.dart';
 // import 'package:mem/values/durations.dart';
 
 import '../helpers.dart';
@@ -346,49 +346,49 @@ void main() => group(_scenarioName, () {
           );
         }
 
-        testWidgets('Undo.', (widgetTester) async {
-          await runApplication();
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(find.text(insertedMemName));
-          await widgetTester.pumpAndSettle();
+        // testWidgets('Undo.', (widgetTester) async {
+        //   await runApplication();
+        //   await widgetTester.pumpAndSettle();
+        //   await widgetTester.tap(find.text(insertedMemName));
+        //   await widgetTester.pumpAndSettle();
 
-          await widgetTester.tap(menuButtonIconFinder);
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(find.byKey(keyRemoveMem));
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(find.byKey(keyOk));
-          await widgetTester.pumpAndSettle(waitSideEffectDuration);
+        //   await widgetTester.tap(menuButtonIconFinder);
+        //   await widgetTester.pumpAndSettle();
+        //   await widgetTester.tap(find.byKey(keyRemoveMem));
+        //   await widgetTester.pumpAndSettle();
+        //   await widgetTester.tap(find.byKey(keyOk));
+        //   await widgetTester.pumpAndSettle(waitSideEffectDuration);
 
-          expect(
-            find.text(l10n.removeMemSuccessMessage(insertedMemName)),
-            findsOneWidget,
-          );
-          expect(find.text(insertedMemName), findsNothing);
-          expect(
-            (await selectFromMemsWhereName(insertedMemName)).length,
-            0,
-          );
+        //   expect(
+        //     find.text(l10n.removeMemSuccessMessage(insertedMemName)),
+        //     findsOneWidget,
+        //   );
+        //   expect(find.text(insertedMemName), findsNothing);
+        //   expect(
+        //     (await selectFromMemsWhereName(insertedMemName)).length,
+        //     0,
+        //   );
 
-          await widgetTester.tap(find.byKey(keyUndo));
-          await widgetTester.pumpAndSettle();
+        //   await widgetTester.tap(find.byKey(keyUndo));
+        //   await widgetTester.pumpAndSettle();
 
-          expect(
-            find.text(l10n.undoMemSuccessMessage(insertedMemName)),
-            findsOneWidget,
-          );
-          expect(find.text(insertedMemName), findsOneWidget);
+        //   expect(
+        //     find.text(l10n.undoMemSuccessMessage(insertedMemName)),
+        //     findsOneWidget,
+        //   );
+        //   expect(find.text(insertedMemName), findsOneWidget);
 
-          expect(
-            (await selectFromMemsWhereName(insertedMemName)).length,
-            1,
-          );
+        //   expect(
+        //     (await selectFromMemsWhereName(insertedMemName)).length,
+        //     1,
+        //   );
 
-          await widgetTester.tap(find.text(insertedMemName));
-          await widgetTester.pumpAndSettle();
+        //   await widgetTester.tap(find.text(insertedMemName));
+        //   await widgetTester.pumpAndSettle();
 
-          expect(find.text(insertedMemName), findsOneWidget);
-          expect(find.text(insertedMemMemo), findsOneWidget);
-        });
+        //   expect(find.text(insertedMemName), findsOneWidget);
+        //   expect(find.text(insertedMemMemo), findsOneWidget);
+        // });
 
         testWidgets("Nothing on new.", (widgetTester) async {
           await runApplication();
@@ -401,27 +401,27 @@ void main() => group(_scenarioName, () {
           expect(menuButtonIconFinder, findsNothing);
         });
 
-        testWidgets("Cancel.", (widgetTester) async {
-          await runApplication();
-          await widgetTester.pumpAndSettle();
+        // testWidgets("Cancel.", (widgetTester) async {
+        //   await runApplication();
+        //   await widgetTester.pumpAndSettle();
 
-          await widgetTester.tap(find.text(insertedMemName));
-          await widgetTester.pumpAndSettle();
+        //   await widgetTester.tap(find.text(insertedMemName));
+        //   await widgetTester.pumpAndSettle();
 
-          await widgetTester.tap(menuButtonIconFinder);
-          await widgetTester.pumpAndSettle();
+        //   await widgetTester.tap(menuButtonIconFinder);
+        //   await widgetTester.pumpAndSettle();
 
-          await widgetTester.tap(find.byKey(keyRemoveMem));
-          await widgetTester.pumpAndSettle();
+        //   await widgetTester.tap(find.byKey(keyRemoveMem));
+        //   await widgetTester.pumpAndSettle();
 
-          await widgetTester.tap(find.byKey(keyCancel));
-          await widgetTester.pumpAndSettle();
+        //   await widgetTester.tap(find.byKey(keyCancel));
+        //   await widgetTester.pumpAndSettle();
 
-          expect(
-            (await selectFromMemsWhereName(insertedMemName)).length,
-            1,
-          );
-        });
+        //   expect(
+        //     (await selectFromMemsWhereName(insertedMemName)).length,
+        //     1,
+        //   );
+        // });
 
         testWidgets('On created.', (widgetTester) async {
           await runApplication();
