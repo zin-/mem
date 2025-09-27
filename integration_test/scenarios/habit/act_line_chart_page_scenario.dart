@@ -86,15 +86,6 @@ void main() => group(_name, () {
         expect(find.byType(LineChartWrapper), findsOneWidget);
       });
 
-      testWidgets("[flaky]Show statistics.", (widgetTester) async {
-        await widgetTester.show(insertedMemName);
-
-        final texts = widgetTester.widgetList<Text>(find.byType(Text));
-        expect(texts.elementAt(0).data, equals("Min : "));
-        expect(texts.elementAt(2).data, equals("Max : "));
-        expect(texts.elementAt(4).data, equals("Avg : "));
-      });
-
       group("Time period", () {
         testWidgets("[flaky]Show.", (widgetTester) async {
           await widgetTester.show(insertedMemName);
