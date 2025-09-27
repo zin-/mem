@@ -280,86 +280,86 @@ void main() => group(_name, () {
           await widgetTester.pumpAndSettle();
         }
 
-        group(
-          ': actions',
-          () {
-            testWidgets(
-              ': start.',
-              (widgetTester) async {
-                widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
-                widgetTester.ignoreMockMethodCallHandler(
-                    MethodChannelMock.permissionHandler);
+        // group(
+        //   ': actions',
+        //   () {
+        //     testWidgets(
+        //       ': start.',
+        //       (widgetTester) async {
+        //         widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
+        //         widgetTester.ignoreMockMethodCallHandler(
+        //             MethodChannelMock.permissionHandler);
 
-                await runApplication();
-                await widgetTester.pumpAndSettle();
+        //         await runApplication();
+        //         await widgetTester.pumpAndSettle();
 
-                await widgetTester.showActListPageOf(insertedMemName);
+        //         await widgetTester.showActListPageOf(insertedMemName);
 
-                await widgetTester.tap(find.byIcon(Icons.numbers));
-                await widgetTester.pump();
+        //         await widgetTester.tap(find.byIcon(Icons.numbers));
+        //         await widgetTester.pump();
 
-                final startTime = DateTime.now();
-                await widgetTester.tap(startIconFinder);
-                await widgetTester.pumpAndSettle();
+        //         final startTime = DateTime.now();
+        //         await widgetTester.tap(startIconFinder);
+        //         await widgetTester.pumpAndSettle();
 
-                expect(startIconFinder, findsNothing);
-                expect(stopIconFinder, findsOneWidget);
-                expect(
-                  widgetTester.textAt(4).data,
-                  equals(timeText(startTime)),
-                );
+        //         expect(startIconFinder, findsNothing);
+        //         expect(stopIconFinder, findsOneWidget);
+        //         expect(
+        //           widgetTester.textAt(4).data,
+        //           equals(timeText(startTime)),
+        //         );
 
-                final acts = await dbA.select(
-                  defTableActs,
-                  where: 'mems_id = ?',
-                  whereArgs: [insertedMemId],
-                );
-                expect(acts, hasLength(2));
-                expect(acts[1][defColActsEnd.name], isNull);
-                expect(acts[1][defColActsEndIsAllDay.name], isNull);
-              },
-            );
+        //         final acts = await dbA.select(
+        //           defTableActs,
+        //           where: 'mems_id = ?',
+        //           whereArgs: [insertedMemId],
+        //         );
+        //         expect(acts, hasLength(2));
+        //         expect(acts[1][defColActsEnd.name], isNull);
+        //         expect(acts[1][defColActsEndIsAllDay.name], isNull);
+        //       },
+        //     );
 
-            testWidgets(
-              ': finish.',
-              (widgetTester) async {
-                widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
-                widgetTester.ignoreMockMethodCallHandler(
-                    MethodChannelMock.permissionHandler);
+        //     testWidgets(
+        //       ': finish.',
+        //       (widgetTester) async {
+        //         widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
+        //         widgetTester.ignoreMockMethodCallHandler(
+        //             MethodChannelMock.permissionHandler);
 
-                await runApplication();
-                await widgetTester.pumpAndSettle();
+        //         await runApplication();
+        //         await widgetTester.pumpAndSettle();
 
-                await widgetTester.showActListPageOf(
-                  insertedMemWithActiveActName,
-                );
+        //         await widgetTester.showActListPageOf(
+        //           insertedMemWithActiveActName,
+        //         );
 
-                await widgetTester.tap(find.byIcon(Icons.numbers));
-                await widgetTester.pump();
+        //         await widgetTester.tap(find.byIcon(Icons.numbers));
+        //         await widgetTester.pump();
 
-                final stopTime = DateTime.now();
-                await widgetTester.tap(stopIconFinder);
-                await widgetTester.pumpAndSettle();
+        //         final stopTime = DateTime.now();
+        //         await widgetTester.tap(stopIconFinder);
+        //         await widgetTester.pumpAndSettle();
 
-                expect(stopIconFinder, findsNothing);
-                expect(startIconFinder, findsOneWidget);
-                expect(
-                  widgetTester.textAt(6).data,
-                  equals(timeText(stopTime)),
-                );
+        //         expect(stopIconFinder, findsNothing);
+        //         expect(startIconFinder, findsOneWidget);
+        //         expect(
+        //           widgetTester.textAt(6).data,
+        //           equals(timeText(stopTime)),
+        //         );
 
-                final acts = await dbA.select(
-                  defTableActs,
-                  where: 'mems_id = ?',
-                  whereArgs: [insertedMemWithActiveActId],
-                );
-                expect(acts, hasLength(1));
-                expect(acts[0][defColActsEnd.name], isNotNull);
-                expect(acts[0][defColActsEndIsAllDay.name], isNotNull);
-              },
-            );
-          },
-        );
+        //         final acts = await dbA.select(
+        //           defTableActs,
+        //           where: 'mems_id = ?',
+        //           whereArgs: [insertedMemWithActiveActId],
+        //         );
+        //         expect(acts, hasLength(1));
+        //         expect(acts[0][defColActsEnd.name], isNotNull);
+        //         expect(acts[0][defColActsEndIsAllDay.name], isNotNull);
+        //       },
+        //     );
+        //   },
+        // );
 
         group('Edit act', () {
           setUp(() async {

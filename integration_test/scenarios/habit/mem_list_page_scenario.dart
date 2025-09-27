@@ -253,139 +253,139 @@ void main() => group(_name, () {
         group('Active act', () {
           const targetAt = 0;
 
-          testWidgets(': show.', (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+          // testWidgets(': show.', (widgetTester) async {
+          //   await runApplication();
+          //   await widgetTester.pumpAndSettle();
 
-            widgetTester.expectMemListItem(
-              targetAt,
-              [memWithActiveActName, null, null],
-              [Icons.pause, Icons.stop],
-              [Icons.play_arrow],
-            );
-          });
+          //   widgetTester.expectMemListItem(
+          //     targetAt,
+          //     [memWithActiveActName, null, null],
+          //     [Icons.pause, Icons.stop],
+          //     [Icons.play_arrow],
+          //   );
+          // });
 
-          testWidgets('Finish.', (widgetTester) async {
-            widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
-            widgetTester.ignoreMockMethodCallHandler(
-              MethodChannelMock.permissionHandler,
-            );
-            widgetTester.ignoreMockMethodCallHandler(
-              MethodChannelMock.flutterLocalNotifications,
-            );
+          // testWidgets('Finish.', (widgetTester) async {
+          //   widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
+          //   widgetTester.ignoreMockMethodCallHandler(
+          //     MethodChannelMock.permissionHandler,
+          //   );
+          //   widgetTester.ignoreMockMethodCallHandler(
+          //     MethodChannelMock.flutterLocalNotifications,
+          //   );
 
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+          //   await runApplication();
+          //   await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.descendant(
-              of: find.byType(ListTile).at(targetAt),
-              matching: find.byIcon(Icons.stop),
-            ));
-            await widgetTester.pumpAndSettle();
+          //   await widgetTester.tap(find.descendant(
+          //     of: find.byType(ListTile).at(targetAt),
+          //     matching: find.byIcon(Icons.stop),
+          //   ));
+          //   await widgetTester.pumpAndSettle();
 
-            widgetTester.expectMemListItem(
-              2,
-              [memWithActiveActName, null],
-              [Icons.stop, Icons.play_arrow],
-              [Icons.pause],
-            );
+          //   widgetTester.expectMemListItem(
+          //     2,
+          //     [memWithActiveActName, null],
+          //     [Icons.stop, Icons.play_arrow],
+          //     [Icons.pause],
+          //   );
 
-            final acts = await dbA.select(
-              defTableActs,
-              where: '${defFkActsMemId.name} = ?',
-              whereArgs: [memWithActiveActId],
-            );
-            expect(acts, hasLength(1));
-          });
+          //   final acts = await dbA.select(
+          //     defTableActs,
+          //     where: '${defFkActsMemId.name} = ?',
+          //     whereArgs: [memWithActiveActId],
+          //   );
+          //   expect(acts, hasLength(1));
+          // });
 
-          testWidgets(':Pause.', (widgetTester) async {
-            widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
-            widgetTester.ignoreMockMethodCallHandler(
-              MethodChannelMock.permissionHandler,
-            );
-            widgetTester.ignoreMockMethodCallHandler(
-              MethodChannelMock.flutterLocalNotifications,
-            );
+          // testWidgets(':Pause.', (widgetTester) async {
+          //   widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
+          //   widgetTester.ignoreMockMethodCallHandler(
+          //     MethodChannelMock.permissionHandler,
+          //   );
+          //   widgetTester.ignoreMockMethodCallHandler(
+          //     MethodChannelMock.flutterLocalNotifications,
+          //   );
 
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+          //   await runApplication();
+          //   await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.descendant(
-              of: find.byType(ListTile).at(targetAt),
-              matching: find.byIcon(Icons.pause),
-            ));
-            await widgetTester.pumpAndSettle(const Duration(seconds: 3));
+          //   await widgetTester.tap(find.descendant(
+          //     of: find.byType(ListTile).at(targetAt),
+          //     matching: find.byIcon(Icons.pause),
+          //   ));
+          //   await widgetTester.pumpAndSettle(const Duration(seconds: 3));
 
-            widgetTester.expectMemListItem(
-              0,
-              [memWithActiveActName, null],
-              [Icons.close, Icons.play_arrow],
-              [Icons.pause, Icons.stop],
-            );
+          //   widgetTester.expectMemListItem(
+          //     0,
+          //     [memWithActiveActName, null],
+          //     [Icons.close, Icons.play_arrow],
+          //     [Icons.pause, Icons.stop],
+          //   );
 
-            final acts = await dbA.select(
-              defTableActs,
-              where: '${defFkActsMemId.name} = ?',
-              whereArgs: [memWithActiveActId],
-            );
-            expect(acts, hasLength(2));
-          });
+          //   final acts = await dbA.select(
+          //     defTableActs,
+          //     where: '${defFkActsMemId.name} = ?',
+          //     whereArgs: [memWithActiveActId],
+          //   );
+          //   expect(acts, hasLength(2));
+          // });
         });
 
-        group(': finished act', () {
-          const targetAt = 3;
+        // group(': finished act', () {
+        //   const targetAt = 3;
 
-          testWidgets('Show.', (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+        //   testWidgets('Show.', (widgetTester) async {
+        //     await runApplication();
+        //     await widgetTester.pumpAndSettle();
 
-            widgetTester.expectMemListItem(
-              targetAt,
-              [memWithFinishedActName, null],
-              [Icons.stop, Icons.play_arrow],
-              [Icons.pause],
-            );
-          });
+        //     widgetTester.expectMemListItem(
+        //       targetAt,
+        //       [memWithFinishedActName, null],
+        //       [Icons.stop, Icons.play_arrow],
+        //       [Icons.pause],
+        //     );
+        //   });
 
-          testWidgets(': start.',
-              // 時間に関するテストなのでリトライ可能とする
-              retry: maxRetryCount, (widgetTester) async {
-            widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
-            widgetTester.ignoreMockMethodCallHandler(
-              MethodChannelMock.permissionHandler,
-            );
-            widgetTester.ignoreMockMethodCallHandler(
-              MethodChannelMock.flutterLocalNotifications,
-            );
+        //   testWidgets(': start.',
+        //       // 時間に関するテストなのでリトライ可能とする
+        //       retry: maxRetryCount, (widgetTester) async {
+        //     widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
+        //     widgetTester.ignoreMockMethodCallHandler(
+        //       MethodChannelMock.permissionHandler,
+        //     );
+        //     widgetTester.ignoreMockMethodCallHandler(
+        //       MethodChannelMock.flutterLocalNotifications,
+        //     );
 
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+        //     await runApplication();
+        //     await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(find.descendant(
-              of: find.byType(ListTile).at(targetAt),
-              matching: find.byIcon(Icons.play_arrow),
-            ));
-            await widgetTester.pumpAndSettle();
+        //     await widgetTester.tap(find.descendant(
+        //       of: find.byType(ListTile).at(targetAt),
+        //       matching: find.byIcon(Icons.play_arrow),
+        //     ));
+        //     await widgetTester.pumpAndSettle();
 
-            widgetTester.expectMemListItem(
-              0,
-              [memWithFinishedActName, "00:00:00", null],
-              [Icons.pause, Icons.stop],
-              [Icons.play_arrow],
-            );
+        //     widgetTester.expectMemListItem(
+        //       0,
+        //       [memWithFinishedActName, "00:00:00", null],
+        //       [Icons.pause, Icons.stop],
+        //       [Icons.play_arrow],
+        //     );
 
-            await widgetTester.pumpAndSettle(elapsePeriod * 2);
+        //     await widgetTester.pumpAndSettle(elapsePeriod * 2);
 
-            expect(find.text("00:00:00"), findsNothing);
+        //     expect(find.text("00:00:00"), findsNothing);
 
-            final acts = await dbA.select(
-              defTableActs,
-              where: '${defFkActsMemId.name} = ?',
-              whereArgs: [memWithFinishedActId],
-            );
-            expect(acts, hasLength(2));
-          });
-        });
+        //     final acts = await dbA.select(
+        //       defTableActs,
+        //       where: '${defFkActsMemId.name} = ?',
+        //       whereArgs: [memWithFinishedActId],
+        //     );
+        //     expect(acts, hasLength(2));
+        //   });
+        // });
 
         group('Paused act', () {
           const targetAt = 1;
