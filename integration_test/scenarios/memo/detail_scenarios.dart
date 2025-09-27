@@ -13,7 +13,7 @@ import 'package:mem/features/mems/detail/fab.dart';
 import 'package:mem/features/mem_items/mem_items_view.dart';
 import 'package:mem/features/mems/detail/app_bar/remove_mem_action.dart';
 import 'package:mem/features/mems/transitions.dart';
-import 'package:mem/values/durations.dart';
+// import 'package:mem/values/durations.dart';
 
 import '../helpers.dart';
 

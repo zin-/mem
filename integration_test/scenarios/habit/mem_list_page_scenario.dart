@@ -195,60 +195,60 @@ void main() => group(_name, () {
       });
 
       group('Act', () {
-        group('No act', () {
-          const targetAt = 2;
+        // group('No act', () {
+        //   // const targetAt = 2;
 
-          // testWidgets('Show.', (widgetTester) async {
-          //   await runApplication();
-          //   await widgetTester.pumpAndSettle();
+        //   // testWidgets('Show.', (widgetTester) async {
+        //   //   await runApplication();
+        //   //   await widgetTester.pumpAndSettle();
 
-          //   widgetTester.expectMemListItem(
-          //     targetAt,
-          //     [memWithNoActName, null],
-          //     [Icons.stop, Icons.play_arrow],
-          //     [Icons.pause],
-          //   );
-          // });
+        //   //   widgetTester.expectMemListItem(
+        //   //     targetAt,
+        //   //     [memWithNoActName, null],
+        //   //     [Icons.stop, Icons.play_arrow],
+        //   //     [Icons.pause],
+        //   //   );
+        //   // });
 
-          // testWidgets('Start.',
-          //     // 時間に関するテストなのでリトライ可能とする
-          //     retry: maxRetryCount, (widgetTester) async {
-          //   widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
-          //   widgetTester.ignoreMockMethodCallHandler(
-          //     MethodChannelMock.permissionHandler,
-          //   );
-          //   widgetTester.ignoreMockMethodCallHandler(
-          //     MethodChannelMock.flutterLocalNotifications,
-          //   );
+        //   // testWidgets('Start.',
+        //   //     // 時間に関するテストなのでリトライ可能とする
+        //   //     retry: maxRetryCount, (widgetTester) async {
+        //   //   widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
+        //   //   widgetTester.ignoreMockMethodCallHandler(
+        //   //     MethodChannelMock.permissionHandler,
+        //   //   );
+        //   //   widgetTester.ignoreMockMethodCallHandler(
+        //   //     MethodChannelMock.flutterLocalNotifications,
+        //   //   );
 
-          //   await runApplication();
-          //   await widgetTester.pumpAndSettle();
+        //   //   await runApplication();
+        //   //   await widgetTester.pumpAndSettle();
 
-          //   await widgetTester.tap(find.descendant(
-          //     of: find.byType(ListTile).at(targetAt),
-          //     matching: find.byIcon(Icons.play_arrow),
-          //   ));
-          //   await widgetTester.pumpAndSettle();
+        //   //   await widgetTester.tap(find.descendant(
+        //   //     of: find.byType(ListTile).at(targetAt),
+        //   //     matching: find.byIcon(Icons.play_arrow),
+        //   //   ));
+        //   //   await widgetTester.pumpAndSettle();
 
-          //   widgetTester.expectMemListItem(
-          //     0,
-          //     [memWithNoActName, "00:00:00", null],
-          //     [Icons.pause, Icons.stop],
-          //     [Icons.play_arrow],
-          //   );
+        //   //   widgetTester.expectMemListItem(
+        //   //     0,
+        //   //     [memWithNoActName, "00:00:00", null],
+        //   //     [Icons.pause, Icons.stop],
+        //   //     [Icons.play_arrow],
+        //   //   );
 
-          //   await widgetTester.pumpAndSettle(elapsePeriod * 2);
+        //   //   await widgetTester.pumpAndSettle(elapsePeriod * 2);
 
-          //   expect(find.text("00:00:00"), findsNothing);
+        //   //   expect(find.text("00:00:00"), findsNothing);
 
-          //   final acts = await dbA.select(
-          //     defTableActs,
-          //     where: '${defFkActsMemId.name} = ?',
-          //     whereArgs: [memWithNoActId],
-          //   );
-          //   expect(acts, hasLength(1));
-          // });
-        });
+        //   //   final acts = await dbA.select(
+        //   //     defTableActs,
+        //   //     where: '${defFkActsMemId.name} = ?',
+        //   //     whereArgs: [memWithNoActId],
+        //   //   );
+        //   //   expect(acts, hasLength(1));
+        //   // });
+        // });
 
         group('Active act', () {
           const targetAt = 0;

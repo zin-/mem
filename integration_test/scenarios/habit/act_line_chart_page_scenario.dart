@@ -1,7 +1,4 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/features/acts/acts_summary.dart';
-import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/base.dart';
@@ -11,7 +8,7 @@ import 'package:mem/framework/database/accessor.dart';
 import '../helpers.dart';
 
 const _name = "ActLineChartPage scenario";
-const _pumpAndSettleDuration = Duration(seconds: 2);
+// const _pumpAndSettleDuration = Duration(seconds: 2);
 
 void main() => group(_name, () {
       const insertedMemName = '$_name: inserted mem - name';
@@ -152,13 +149,13 @@ void main() => group(_name, () {
       //   });
     });
 
-extension on WidgetTester {
-  Future<void> show(String targetMemName) async {
-    await runApplication();
-    await pumpAndSettle(_pumpAndSettleDuration);
-    await tap(find.text(targetMemName));
-    await pumpAndSettle(_pumpAndSettleDuration);
-    await tap(find.byIcon(Icons.show_chart));
-    await pumpAndSettle(_pumpAndSettleDuration);
-  }
-}
+// extension on WidgetTester {
+//   Future<void> show(String targetMemName) async {
+//     await runApplication();
+//     await pumpAndSettle(_pumpAndSettleDuration);
+//     await tap(find.text(targetMemName));
+//     await pumpAndSettle(_pumpAndSettleDuration);
+//     await tap(find.byIcon(Icons.show_chart));
+//     await pumpAndSettle(_pumpAndSettleDuration);
+//   }
+// }
