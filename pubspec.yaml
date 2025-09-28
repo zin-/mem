@@ -57,7 +57,7 @@ dependencies:
   flutter_sticky_header: ^0.8.0
 
   ## for Transition
-  go_router: ^14.2.1
+  go_router: any
 
   ## for SettingsPage
   settings_ui: ^2.0.2
