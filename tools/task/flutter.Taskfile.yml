@@ -1,14 +1,19 @@
 version: '3'
 
 tasks:
-  dep:
+  pub:outdated:
+    vars:
+      PACKAGE: '{{.PACKAGE | default ""}}'
     cmds:
-      - flutter pub get
-    silent: false
+      - |
+        if [ "{{.PACKAGE}}" = "" ]; then
+          flutter pub outdated
+        else
+          flutter pub outdated | GREP_COLOR='1;32' grep --color=always -E "{{.PACKAGE}}\s.*|$"
+        fi
+    silent: true
 
-  dep:check:
-    cmds:
-      - flutter pub outdated
+
 
   dep:update:
     cmds:

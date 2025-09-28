@@ -8,12 +8,22 @@ includes:
   emulator: ./tools/task/emulator.taskfile.yml
   e: ./tools/task/emulator.taskfile.yml
   git: ./tools/task/git.taskfile.yml
+  dependency: ./tools/task/dependency.taskfile.yml
 
 tasks:
   default:
     cmds:
       - task --list
     silent: true
+
+  dep:status:
+    vars:
+      p: '{{.p | default ""}}'
+    cmds:
+      - task: dependency:status
+        vars:
+          PACKAGE: '{{.p}}'
+    silent: false
 
   gen:
     cmds:
@@ -31,15 +41,6 @@ tasks:
   init:
     cmds:
       - task: git:setup-git-hooks
-
-  dep:
-    cmds:
-      - task: flutter:dep
-
-  dep:check:
-    cmds:
-      - task: flutter:dep:check
-        silent: true
 
   dep:update:
     cmds:
