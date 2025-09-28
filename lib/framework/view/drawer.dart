@@ -4,7 +4,6 @@ import 'package:mem/generated/l10n/app_localizations.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/router.dart';
-import 'package:mem/features/settings/page.dart';
 
 class _DrawerItem {
   final IconData _icon;
@@ -20,12 +19,7 @@ class ApplicationDrawer extends StatelessWidget {
       Icons.settings,
       (AppLocalizations l10n) => l10n.settingsPageTitle,
       (BuildContext context) => () => v(
-            () => Navigator.of(context).push(
-              PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    const SettingsPage(),
-              ),
-            ),
+            () => context.goNamed(settingsPath),
           ),
     ),
     _DrawerItem(
