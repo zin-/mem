@@ -16,7 +16,6 @@ import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/mems/transitions.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
-import 'package:mem/values/constants.dart';
 
 import 'actions.dart';
 import 'app_bar.dart';
@@ -35,8 +34,7 @@ class MemListWidget extends ConsumerWidget {
           (loaded) => _MemListWidget(
             _scrollController,
             ref.watch(memListProvider).toList(),
-            ref.watch(preferencesProvider).value?[startOfDayKey] ??
-                defaultStartOfDay,
+            ref.watch(preferenceProvider(startOfDayKey)) as TimeOfDay,
             ref.watch(memNotificationsProvider),
             ref.watch(latestActsByMemProvider.select(
               (value) => value?.values.whereType<Act>().toList() ?? [],

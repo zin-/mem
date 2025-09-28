@@ -11,7 +11,6 @@ import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
 import 'package:mem/values/colors.dart';
-import 'package:mem/values/constants.dart';
 
 class MemPeriodTexts extends ConsumerWidget {
   final int _memId;
@@ -26,7 +25,7 @@ class MemPeriodTexts extends ConsumerWidget {
             (ref.watch(memListProvider).firstWhere((mem) => mem.id == _memId))
                 .value
                 .period!,
-            loaded[startOfDayKey] ?? defaultStartOfDay,
+            ref.watch(preferenceProvider(startOfDayKey)) as TimeOfDay,
           ),
         ),
       );

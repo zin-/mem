@@ -22,21 +22,21 @@ class SettingsPage extends ConsumerWidget {
             preferencesProvider,
             (loaded) {
               return _SettingsPage(
-                ref.watch(PreferenceProvider(startOfDayKey)) as TimeOfDay,
+                ref.watch(preferenceProvider(startOfDayKey)) as TimeOfDay,
                 (TimeOfDay? picked) => v(
                   () => ref
-                      .read(PreferenceProvider(startOfDayKey).notifier)
+                      .read(preferenceProvider(startOfDayKey).notifier)
                       .replace(picked),
                   {
                     'picked': picked,
                   },
                 ),
-                ref.watch(PreferenceProvider(notifyAfterInactivity)) as int?,
+                ref.watch(preferenceProvider(notifyAfterInactivity)) as int?,
                 (picked) => v(
                   () {
                     ref
                         .read(
-                          PreferenceProvider(notifyAfterInactivity).notifier,
+                          preferenceProvider(notifyAfterInactivity).notifier,
                         )
                         .replace(picked);
                   },

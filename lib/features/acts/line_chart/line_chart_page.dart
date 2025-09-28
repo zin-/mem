@@ -11,7 +11,6 @@ import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
-import 'package:mem/values/constants.dart';
 import 'package:mem/values/dimens.dart';
 
 class ActLineChartPage extends StatefulWidget {
@@ -71,8 +70,8 @@ class _ActLineChartPage extends ConsumerWidget {
                     (value) {
                       final period = _period.toPeriod(
                         DateAndTime.now(),
-                        ref.watch(preferencesProvider).value?[startOfDayKey] ??
-                            defaultStartOfDay,
+                        ref.watch(preferenceProvider(startOfDayKey))
+                            as TimeOfDay,
                       );
                       return value.where((e) =>
                           e.value.memId == _memId &&

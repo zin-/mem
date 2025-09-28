@@ -8,7 +8,6 @@ import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
-import 'package:mem/values/constants.dart';
 
 const keyMemRepeatedNotification = Key('mem-repeated-notification');
 
@@ -32,7 +31,7 @@ class MemRepeatedNotificationView extends ConsumerWidget {
             preferencesProvider,
             (loaded) => _MemRepeatedNotificationView(
               memRepeatNotification.value.time,
-              loaded[startOfDayKey] ?? defaultStartOfDay,
+              ref.watch(preferenceProvider(startOfDayKey)) as TimeOfDay,
               (picked) => ref
                   .read(memNotificationsByMemIdProvider(_memId).notifier)
                   .upsertAll(
