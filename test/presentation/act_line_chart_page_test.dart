@@ -13,12 +13,12 @@ import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/states.dart';
+import 'package:mem/features/settings/constants.dart';
 import 'package:mem/features/settings/preference/preference_key.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/features/acts/line_chart/line_chart_wrapper.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
-import 'package:mem/values/constants.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
 
 const _name = 'ActLineChartPage test';

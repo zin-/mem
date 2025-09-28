@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mem/features/acts/act_repository.dart';
+import 'package:mem/features/settings/constants.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_entity.dart';
@@ -9,7 +10,6 @@ import 'package:mem/features/mem_notifications/mem_notification_repository.dart'
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/preference/repository.dart';
-import 'package:mem/values/constants.dart';
 
 import 'mem_notifications.dart';
 import 'notification/type.dart';
