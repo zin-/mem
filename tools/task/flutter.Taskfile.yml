@@ -13,11 +13,18 @@ tasks:
         fi
     silent: true
 
-
-
-  dep:update:
+  pub:upgrade:
+    vars:
+      PACKAGE: '{{.PACKAGE | default ""}}'
     cmds:
-      - flutter pub upgrade
+      - |
+        if [ "{{.PACKAGE}}" = "" ]; then
+          flutter pub upgrade
+        else
+          flutter pub upgrade {{.PACKAGE}}
+        fi
+    silent: true
+
 
   analyze:app:
     cmds:

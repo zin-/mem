@@ -19,3 +19,12 @@ tasks:
         vars:
           PACKAGE: '{{.PACKAGE}}'
     silent: false
+
+  upgrade:
+    vars:
+      PACKAGE: '{{.PACKAGE}}'
+    cmds:
+      - task: f:pub:upgrade
+        vars:
+          PACKAGE: '{{.PACKAGE}}'
+    silent: false

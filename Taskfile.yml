@@ -24,6 +24,16 @@ tasks:
         vars:
           PACKAGE: '{{.p}}'
     silent: false
+  
+  dep:upgrade:
+    vars:
+      p: '{{.p}}'
+    cmds:
+      - task: dependency:upgrade
+        vars:
+          PACKAGE: '{{.p}}'
+    silent: false
+
 
   gen:
     cmds:
@@ -41,10 +51,6 @@ tasks:
   init:
     cmds:
       - task: git:setup-git-hooks
-
-  dep:update:
-    cmds:
-      - task: flutter:dep:update
 
   lint:
     cmds:
