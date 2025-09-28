@@ -1,4 +1,5 @@
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/features/settings/constants.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'preference/client.dart';
@@ -41,4 +42,25 @@ class Preferences extends _$Preferences {
           'value': value,
         },
       );
+}
+
+@riverpod
+class Preference extends _$Preference {
+  @override
+  dynamic build(PreferenceKey key) => v(
+        () {
+          PreferenceRepository().shipByKey(key).then((v) {
+            if (v.value != null) {
+              state = v.value;
+            }
+          });
+          return defaultPreferences[key];
+        },
+        {"key": key},
+      );
+
+  Future<void> replace(dynamic updating) async {
+    state = updating;
+    await PreferenceRepository().receive(PreferenceEntity(key, updating));
+  }
 }

@@ -7,7 +7,6 @@ import 'package:settings_ui/settings_ui.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/framework/notifications/notification_client.dart';
-import 'package:mem/values/constants.dart';
 
 import 'backup_section.dart';
 import 'preference/keys.dart';
@@ -23,21 +22,23 @@ class SettingsPage extends ConsumerWidget {
             preferencesProvider,
             (loaded) {
               return _SettingsPage(
-                loaded[startOfDayKey] ?? defaultStartOfDay,
+                ref.watch(PreferenceProvider(startOfDayKey)) as TimeOfDay,
                 (TimeOfDay? picked) => v(
-                  () async => await ref
-                      .read(preferencesProvider.notifier)
-                      .replace(startOfDayKey, picked),
+                  () => ref
+                      .read(PreferenceProvider(startOfDayKey).notifier)
+                      .replace(picked),
                   {
                     'picked': picked,
                   },
                 ),
-                loaded[notifyAfterInactivity],
+                ref.watch(PreferenceProvider(notifyAfterInactivity)) as int?,
                 (picked) => v(
                   () {
                     ref
-                        .read(preferencesProvider.notifier)
-                        .replace(notifyAfterInactivity, picked);
+                        .read(
+                          PreferenceProvider(notifyAfterInactivity).notifier,
+                        )
+                        .replace(picked);
                   },
                   {
                     'picked': picked,
