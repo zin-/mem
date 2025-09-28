@@ -59,8 +59,13 @@ class Preference extends _$Preference {
         {"key": key},
       );
 
-  Future<void> replace(dynamic updating) async {
-    state = updating;
-    await PreferenceRepository().receive(PreferenceEntity(key, updating));
-  }
+  Future<void> replace(dynamic updating) => v(
+        () async {
+          state = updating;
+          await PreferenceRepository().receive(PreferenceEntity(key, updating));
+        },
+        {
+          "updating": updating,
+        },
+      );
 }

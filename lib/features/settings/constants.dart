@@ -3,4 +3,5 @@ import 'package:mem/values/constants.dart';
 
 final defaultPreferences = {
   startOfDayKey: defaultStartOfDay,
+  notifyAfterInactivity: 3600,
 };
