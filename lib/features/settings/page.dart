@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/framework/view/async_value_view.dart';
 import 'package:mem/features/settings/notify_after_inactivity.dart';
 import 'package:settings_ui/settings_ui.dart';
 
@@ -17,37 +16,30 @@ class SettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => i(
-        () {
-          return AsyncValueView(
-            preferencesProvider,
-            (loaded) {
-              return _SettingsPage(
-                ref.watch(preferenceProvider(startOfDayKey)) as TimeOfDay,
-                (TimeOfDay? picked) => v(
-                  () => ref
-                      .read(preferenceProvider(startOfDayKey).notifier)
-                      .replace(picked),
-                  {
-                    'picked': picked,
-                  },
-                ),
-                ref.watch(preferenceProvider(notifyAfterInactivity)) as int?,
-                (picked) => v(
-                  () {
-                    ref
-                        .read(
-                          preferenceProvider(notifyAfterInactivity).notifier,
-                        )
-                        .replace(picked);
-                  },
-                  {
-                    'picked': picked,
-                  },
-                ),
-              );
+        () => _SettingsPage(
+          ref.watch(preferenceProvider(startOfDayKey)) as TimeOfDay,
+          (TimeOfDay? picked) => v(
+            () => ref
+                .read(preferenceProvider(startOfDayKey).notifier)
+                .replace(picked),
+            {
+              'picked': picked,
             },
-          );
-        },
+          ),
+          ref.watch(preferenceProvider(notifyAfterInactivity)) as int?,
+          (picked) => v(
+            () {
+              ref
+                  .read(
+                    preferenceProvider(notifyAfterInactivity).notifier,
+                  )
+                  .replace(picked);
+            },
+            {
+              'picked': picked,
+            },
+          ),
+        ),
       );
 }
 
