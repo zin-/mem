@@ -18,6 +18,7 @@ import 'package:mem/features/acts/line_chart/line_chart_wrapper.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
 
 const _name = 'ActLineChartPage test';
+
 void main() {
   group(_name, () {
     testWidgets(
