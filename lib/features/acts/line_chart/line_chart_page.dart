@@ -60,7 +60,7 @@ class _ActLineChartPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => AsyncValueView(
           loadActListProvider(_memId, _period),
-          (loaded) => _ActLineChartScreen(
+          (_) => _ActLineChartScreen(
             ref.read(
               editingMemByMemIdProvider(_memId).select((v) => v.value.name),
             ),

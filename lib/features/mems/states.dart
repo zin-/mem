@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:mem/features/mem_relations/mem_relation_state.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/mems_state.dart';
@@ -80,9 +81,9 @@ final removedMemDetailProvider = StateNotifierProvider.autoDispose.family<
       final removedMemItems = ref.watch(removedMemItemsProvider(memId));
       final removedMemNotifications =
           ref.watch(memNotificationsByMemIdProvider(memId));
-      final target = ref.watch(targetStateProvider(memId)).valueOrNull;
+      final target = ref.watch(targetStateProvider(memId)).value;
       final removedMemRelations =
-          ref.watch(memRelationEntitiesByMemIdProvider(memId)).valueOrNull;
+          ref.watch(memRelationEntitiesByMemIdProvider(memId)).value;
 
       return ValueStateNotifier(
         removedMem != null
