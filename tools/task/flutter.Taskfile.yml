@@ -12,6 +12,11 @@ tasks:
           flutter pub outdated | GREP_COLOR='1;32' grep --color=always -E "{{.PACKAGE}}\s.*|$"
         fi
     silent: true
+  
+  pub:get:
+    cmds:
+      - flutter pub get
+    silent: false
 
   pub:upgrade:
     vars:

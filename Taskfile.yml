@@ -9,14 +9,15 @@ includes:
   e: ./tools/task/emulator.taskfile.yml
   git: ./tools/task/git.taskfile.yml
   dependency: ./tools/task/dependency.taskfile.yml
+  dep: ./tools/task/dependency.taskfile.yml
 
 tasks:
   default:
     cmds:
-      - task --list
+      - task --list-all
     silent: true
 
-  dep:status:
+  d:s:
     vars:
       p: '{{.p | default ""}}'
     cmds:
@@ -25,7 +26,12 @@ tasks:
           PACKAGE: '{{.p}}'
     silent: false
   
-  dep:upgrade:
+  d:g:
+    cmds:
+      - task: dependency:get
+    silent: false
+
+  d:u:
     vars:
       p: '{{.p}}'
     cmds:
