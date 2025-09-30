@@ -1,5 +1,4 @@
 import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:mem/features/acts/act.dart';
@@ -94,7 +93,7 @@ final memListProvider = StateNotifierProvider.autoDispose<
   final savedMemNotifications = ref.watch(savedMemNotificationsProvider);
 
   final startOfToday = DateTimeExt.startOfToday(
-    ref.watch(preferenceProvider(startOfDayKey)) as TimeOfDay,
+    ref.watch(preferenceProvider(startOfDayKey)),
   );
 
   return ValueStateNotifier(

@@ -22,7 +22,7 @@ class MemPeriodTexts extends ConsumerWidget {
           (ref.watch(memListProvider).firstWhere((mem) => mem.id == _memId))
               .value
               .period!,
-          ref.watch(preferenceProvider(startOfDayKey)) as TimeOfDay,
+          ref.watch(preferenceProvider(startOfDayKey)),
         ),
       );
 }

@@ -17,24 +17,26 @@ class SettingsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => i(
         () => _SettingsPage(
-          ref.watch(preferenceProvider(startOfDayKey)) as TimeOfDay,
+          ref.watch(preferenceProvider(startOfDayKey)),
           (TimeOfDay? picked) => v(
-            () => ref
-                .read(preferenceProvider(startOfDayKey).notifier)
-                .replace(picked),
+            () => picked == null
+                ? ref.read(preferenceProvider(startOfDayKey).notifier).remove()
+                : ref
+                    .read(preferenceProvider(startOfDayKey).notifier)
+                    .replace(picked),
             {
               'picked': picked,
             },
           ),
-          ref.watch(preferenceProvider(notifyAfterInactivity)) as int?,
+          ref.watch(preferenceProvider(notifyAfterInactivity)),
           (picked) => v(
-            () {
-              ref
-                  .read(
-                    preferenceProvider(notifyAfterInactivity).notifier,
-                  )
-                  .replace(picked);
-            },
+            () => picked == null
+                ? ref
+                    .read(preferenceProvider(notifyAfterInactivity).notifier)
+                    .remove()
+                : ref
+                    .read(preferenceProvider(notifyAfterInactivity).notifier)
+                    .replace(picked),
             {
               'picked': picked,
             },

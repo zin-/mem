@@ -28,7 +28,7 @@ class MemRepeatedNotificationView extends ConsumerWidget {
 
           return _MemRepeatedNotificationView(
             memRepeatNotification.value.time,
-            ref.watch(preferenceProvider(startOfDayKey)) as TimeOfDay,
+            ref.watch(preferenceProvider(startOfDayKey)),
             (picked) => ref
                 .read(memNotificationsByMemIdProvider(_memId).notifier)
                 .upsertAll(

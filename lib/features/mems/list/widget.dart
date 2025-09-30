@@ -34,7 +34,7 @@ class MemListWidget extends ConsumerWidget {
           (loaded) => _MemListWidget(
             _scrollController,
             ref.watch(memListProvider).toList(),
-            ref.watch(preferenceProvider(startOfDayKey)) as TimeOfDay,
+            ref.watch(preferenceProvider(startOfDayKey)),
             ref.watch(memNotificationsProvider),
             ref.watch(latestActsByMemProvider.select(
               (value) => value?.values.whereType<Act>().toList() ?? [],

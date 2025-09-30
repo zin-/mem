@@ -39,7 +39,7 @@ void main() {
   });
 }
 
-class _FakePreference extends Preference {
+class _FakePreference<T> extends Preference<T> {
   @override
-  dynamic build(PreferenceKey key) => defaultPreferences[key];
+  T build(PreferenceKey<T> key) => defaultPreferences[key] as T;
 }

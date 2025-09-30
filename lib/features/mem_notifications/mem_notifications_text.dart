@@ -24,7 +24,7 @@ class MemNotificationText extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemNotificationText(
           ref.watch(memNotificationsByMemIdProvider(_memId)),
-          ref.watch(preferenceProvider(startOfDayKey)) as TimeOfDay,
+          ref.watch(preferenceProvider(startOfDayKey)),
           ref.watch(
             latestActsByMemProvider.select(
               (value) => value?[_memId],

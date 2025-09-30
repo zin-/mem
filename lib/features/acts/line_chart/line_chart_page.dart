@@ -70,8 +70,7 @@ class _ActLineChartPage extends ConsumerWidget {
                     (value) {
                       final period = _period.toPeriod(
                         DateAndTime.now(),
-                        ref.watch(preferenceProvider(startOfDayKey))
-                            as TimeOfDay,
+                        ref.watch(preferenceProvider(startOfDayKey)),
                       );
                       return value.where((e) =>
                           e.value.memId == _memId &&

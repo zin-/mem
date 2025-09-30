@@ -9,21 +9,21 @@ import 'preference/preference_key.dart';
 part 'states.g.dart';
 
 @riverpod
-class Preference extends _$Preference {
+class Preference<T> extends _$Preference<T> {
   @override
-  dynamic build(PreferenceKey key) => v(
+  T build(PreferenceKey<T> key) => v(
         () {
           PreferenceRepository().shipByKey(key).then((v) {
             if (v.value != null) {
-              state = v.value;
+              state = v.value as T;
             }
           });
-          return defaultPreferences[key];
+          return defaultPreferences[key] as T;
         },
         {"key": key},
       );
 
-  Future<void> replace(dynamic updating) => v(
+  Future<void> replace(T updating) => v(
         () async {
           state = updating;
           await PreferenceRepository().receive(PreferenceEntity(key, updating));
@@ -31,5 +31,13 @@ class Preference extends _$Preference {
         {
           "updating": updating,
         },
+      );
+
+  Future<void> remove() => v(
+        () async {
+          state = defaultPreferences[key] as T;
+          await PreferenceRepository().discard(key);
+        },
+        {"key": key},
       );
 }
