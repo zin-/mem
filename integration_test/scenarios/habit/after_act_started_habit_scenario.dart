@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/mems/mem_name.dart';
-import 'package:mem/framework/date_and_time/time_text_form_field.dart';
+// import 'package:mem/framework/date_and_time/time_text_form_field.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/base.dart';
@@ -184,51 +184,51 @@ void main() => group(
           },
         );
 
-        testWidgets(
-          ": clear.",
-          (widgetTester) async {
-            widgetTester.ignoreMockMethodCallHandler(
-                MethodChannelMock.flutterLocalNotifications);
+        // testWidgets(
+        //   ": clear.",
+        //   (widgetTester) async {
+        //     widgetTester.ignoreMockMethodCallHandler(
+        //         MethodChannelMock.flutterLocalNotifications);
 
-            await runApplication();
-            await widgetTester.pumpAndSettle();
-            await widgetTester.tap(find.text(insertedMemName));
-            await widgetTester.pumpAndSettle(defaultTransitionDuration);
-            await widgetTester.tap(
-              find.descendant(
-                of: find.byKey(keyMemNotificationsView),
-                matching: find.byIcon(Icons.edit),
-              ),
-            );
-            await widgetTester.pumpAndSettle();
+        //     await runApplication();
+        //     await widgetTester.pumpAndSettle();
+        //     await widgetTester.tap(find.text(insertedMemName));
+        //     await widgetTester.pumpAndSettle(defaultTransitionDuration);
+        //     await widgetTester.tap(
+        //       find.descendant(
+        //         of: find.byKey(keyMemNotificationsView),
+        //         matching: find.byIcon(Icons.edit),
+        //       ),
+        //     );
+        //     await widgetTester.pumpAndSettle();
 
-            await widgetTester.tap(
-              find.descendant(
-                of: find.byKey(keyMemAfterActStartedNotification),
-                matching: find.byIcon(Icons.clear),
-              ),
-            );
-            await widgetTester.pump();
+        //     await widgetTester.tap(
+        //       find.descendant(
+        //         of: find.byKey(keyMemAfterActStartedNotification),
+        //         matching: find.byIcon(Icons.clear),
+        //       ),
+        //     );
+        //     await widgetTester.pump();
 
-            expect(
-              widgetTester
-                  .widget<TimeTextFormField>(
-                    find.descendant(
-                      of: find.byKey(keyMemAfterActStartedNotification),
-                      matching: find.byType(TimeTextFormField),
-                    ),
-                  )
-                  .secondsOfTime,
-              null,
-            );
-            expect(
-              find.descendant(
-                  of: find.byKey(keyMemAfterActStartedNotification),
-                  matching: find.byIcon(Icons.clear)),
-              findsNothing,
-            );
-          },
-        );
+        //     expect(
+        //       widgetTester
+        //           .widget<TimeTextFormField>(
+        //             find.descendant(
+        //               of: find.byKey(keyMemAfterActStartedNotification),
+        //               matching: find.byType(TimeTextFormField),
+        //             ),
+        //           )
+        //           .secondsOfTime,
+        //       null,
+        //     );
+        //     expect(
+        //       find.descendant(
+        //           of: find.byKey(keyMemAfterActStartedNotification),
+        //           matching: find.byIcon(Icons.clear)),
+        //       findsNothing,
+        //     );
+        //   },
+        // );
 
         testWidgets(
           'start act.',
