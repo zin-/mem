@@ -45,70 +45,106 @@ void _verifyMultipleTextWidgets(WidgetTester tester, List<int> indices) {
 
 void main() {
   group(_name, () {
-    testWidgets(
-      'should display basic structure',
-      (tester) async {
-        final l10n = buildL10n();
-        await _pumpAndSettle(tester);
+    group('should display', () {
+      testWidgets(
+        'basic structure.',
+        (tester) async {
+          final l10n = buildL10n();
+          await _pumpAndSettle(tester);
 
-        final textWidgets = find.byType(Text);
+          final textWidgets = find.byType(Text);
 
-        expect(
-          tester
-              .widget<Text>(textWidgets.at(_TestConstants.startOfDayLabelIndex))
-              .data,
-          equals(l10n.startOfDayLabel),
-        );
+          expect(
+            tester
+                .widget<Text>(
+                    textWidgets.at(_TestConstants.startOfDayLabelIndex))
+                .data,
+            equals(l10n.startOfDayLabel),
+          );
 
-        expect(
-          tester
+          expect(
+            tester
+                .widget<Text>(textWidgets
+                    .at(_TestConstants.notifyAfterInactivityLabelIndex))
+                .data,
+            equals(l10n.notifyAfterInactivityLabel),
+          );
+
+          expect(
+            tester
+                .widget<Text>(
+                    textWidgets.at(_TestConstants.resetNotificationLabelIndex))
+                .data,
+            equals(l10n.resetNotificationLabel),
+          );
+
+          expect(
+            tester
+                .widget<Text>(textWidgets.at(_TestConstants.appBarTitleIndex))
+                .data,
+            equals(l10n.settingsPageTitle),
+          );
+
+          _verifyMultipleTextWidgets(tester, [
+            _TestConstants.startOfDayValueIndex,
+            _TestConstants.notifyAfterInactivityValueIndex,
+          ]);
+        },
+      );
+
+      testWidgets(
+        'correct values.',
+        (tester) async {
+          await _pumpAndSettle(tester);
+
+          final textWidgets = find.byType(Text);
+
+          final startOfDayValue = tester
+              .widget<Text>(textWidgets.at(_TestConstants.startOfDayValueIndex))
+              .data;
+          expect(startOfDayValue, equals('12:00 AM'));
+
+          final notifyAfterInactivityValue = tester
               .widget<Text>(textWidgets
-                  .at(_TestConstants.notifyAfterInactivityLabelIndex))
-              .data,
-          equals(l10n.notifyAfterInactivityLabel),
-        );
+                  .at(_TestConstants.notifyAfterInactivityValueIndex))
+              .data;
+          expect(notifyAfterInactivityValue, equals('1 h 0 m'));
+        },
+      );
+    });
 
-        expect(
-          tester
-              .widget<Text>(
-                  textWidgets.at(_TestConstants.resetNotificationLabelIndex))
-              .data,
-          equals(l10n.resetNotificationLabel),
-        );
+    group('should change', () {
+      testWidgets(
+        'start of day value.',
+        (tester) async {
+          await _pumpAndSettle(tester);
 
-        expect(
-          tester
-              .widget<Text>(textWidgets.at(_TestConstants.appBarTitleIndex))
-              .data,
-          equals(l10n.settingsPageTitle),
-        );
+          final textWidgets = find.byType(Text);
+          final startOfDayValue = tester
+              .widget<Text>(textWidgets.at(_TestConstants.startOfDayValueIndex))
+              .data;
+          expect(startOfDayValue, equals('12:00 AM'));
 
-        _verifyMultipleTextWidgets(tester, [
-          _TestConstants.startOfDayValueIndex,
-          _TestConstants.notifyAfterInactivityValueIndex,
-        ]);
-      },
-    );
+          // TODO: 時間ピッカーを開いて値を変更するテストを実装
+        },
+      );
 
-    testWidgets(
-      'should display correct values',
-      (tester) async {
-        await _pumpAndSettle(tester);
+      testWidgets(
+        'notify after inactivity value.',
+        (tester) async {
+          await _pumpAndSettle(tester);
 
-        final textWidgets = find.byType(Text);
+          final textWidgets = find.byType(Text);
+          final notifyAfterInactivityValue = tester
+              .widget<Text>(textWidgets
+                  .at(_TestConstants.notifyAfterInactivityValueIndex))
+              .data;
+          expect(notifyAfterInactivityValue, equals('1 h 0 m'));
 
-        final startOfDayValue = tester
-            .widget<Text>(textWidgets.at(_TestConstants.startOfDayValueIndex))
-            .data;
-        expect(startOfDayValue, equals('12:00 AM'));
-
-        final notifyAfterInactivityValue = tester
-            .widget<Text>(
-                textWidgets.at(_TestConstants.notifyAfterInactivityValueIndex))
-            .data;
-        expect(notifyAfterInactivityValue, equals('1 h 0 m'));
-      },
-    );
+          // TODO: 通知設定を変更するテストを実装
+        },
+      );
+    });
   });
 }
 
