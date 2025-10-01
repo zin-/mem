@@ -7,11 +7,9 @@ import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/preference/preference_key.dart';
 import 'package:mem/features/settings/states.dart';
 import 'package:mem/l10n/l10n.dart';
-import 'package:settings_ui/settings_ui.dart';
 
 const _name = 'SettingsPage test';
 
-// テスト用の定数
 class _TestConstants {
   static const int startOfDayLabelIndex = 0;
   static const int startOfDayValueIndex = 1;
@@ -19,12 +17,8 @@ class _TestConstants {
   static const int notifyAfterInactivityValueIndex = 3;
   static const int resetNotificationLabelIndex = 4;
   static const int appBarTitleIndex = 8;
-
-  static const int startOfDayTileIndex = 0;
-  static const int notifyAfterInactivityTileIndex = 1;
 }
 
-// ヘルパー関数
 Widget _createTestWidget() {
   return ProviderScope(
     overrides: [
@@ -46,17 +40,6 @@ void _verifyMultipleTextWidgets(WidgetTester tester, List<int> indices) {
     final textWidget = tester.widget<Text>(find.byType(Text).at(index));
     expect(textWidget.data, isNotNull);
     expect(textWidget.data, isNotEmpty);
-  }
-}
-
-void _verifyMultipleSettingsTiles(WidgetTester tester, List<int> indices) {
-  for (final index in indices) {
-    final tile =
-        tester.widget<SettingsTile>(find.byType(SettingsTile).at(index));
-    expect(tile.value, isA<Text>());
-    final valueText = tile.value as Text;
-    expect(valueText.data, isNotNull);
-    expect(valueText.data, isNotEmpty);
   }
 }
 
@@ -103,18 +86,6 @@ void main() {
         _verifyMultipleTextWidgets(tester, [
           _TestConstants.startOfDayValueIndex,
           _TestConstants.notifyAfterInactivityValueIndex,
-        ]);
-      },
-    );
-
-    testWidgets(
-      'should display correct values in SettingsTile',
-      (tester) async {
-        await _pumpAndSettle(tester);
-
-        _verifyMultipleSettingsTiles(tester, [
-          _TestConstants.startOfDayTileIndex,
-          _TestConstants.notifyAfterInactivityTileIndex,
         ]);
       },
     );
