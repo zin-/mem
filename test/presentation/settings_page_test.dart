@@ -11,97 +11,118 @@ import 'package:settings_ui/settings_ui.dart';
 
 const _name = 'SettingsPage test';
 
+// テスト用の定数
+class _TestConstants {
+  static const int startOfDayLabelIndex = 0;
+  static const int startOfDayValueIndex = 1;
+  static const int notifyAfterInactivityLabelIndex = 2;
+  static const int notifyAfterInactivityValueIndex = 3;
+  static const int resetNotificationLabelIndex = 4;
+  static const int appBarTitleIndex = 8;
+
+  static const int startOfDayTileIndex = 0;
+  static const int notifyAfterInactivityTileIndex = 1;
+}
+
+// ヘルパー関数
+Widget _createTestWidget() {
+  return ProviderScope(
+    overrides: [
+      preferenceProvider(startOfDayKey).overrideWith(
+        () => _FakePreference(),
+      ),
+    ],
+    child: MaterialApp(home: SettingsPage()),
+  );
+}
+
+Future<void> _pumpAndSettle(WidgetTester tester) async {
+  await tester.pumpWidget(_createTestWidget());
+  await tester.pumpAndSettle();
+}
+
+Text _getTextWidget(WidgetTester tester, int index) {
+  final textWidgets = find.byType(Text);
+  return tester.widget<Text>(textWidgets.at(index));
+}
+
+SettingsTile _getSettingsTile(WidgetTester tester, int index) {
+  final settingsTiles = find.byType(SettingsTile);
+  return tester.widget<SettingsTile>(settingsTiles.at(index));
+}
+
+void _verifyTextContent(Text textWidget, String expectedContent) {
+  expect(textWidget.data, equals(expectedContent));
+}
+
+void _verifyTextIsNotEmpty(Text textWidget) {
+  expect(textWidget.data, isNotNull);
+  expect(textWidget.data, isNotEmpty);
+}
+
+void _verifyMultipleTextWidgets(WidgetTester tester, List<int> indices) {
+  for (final index in indices) {
+    _verifyTextIsNotEmpty(_getTextWidget(tester, index));
+  }
+}
+
+void _verifySettingsTileValue(SettingsTile tile) {
+  expect(tile.value, isA<Text>());
+  final valueText = tile.value as Text;
+  _verifyTextIsNotEmpty(valueText);
+}
+
+void _verifyMultipleSettingsTiles(WidgetTester tester, List<int> indices) {
+  for (final index in indices) {
+    _verifySettingsTileValue(_getSettingsTile(tester, index));
+  }
+}
+
 void main() {
   group(_name, () {
     testWidgets(
       'should display basic structure',
       (tester) async {
         final l10n = buildL10n();
+        await _pumpAndSettle(tester);
 
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: [
-              preferenceProvider(startOfDayKey).overrideWith(
-                () => _FakePreference(),
-              ),
-            ],
-            child: MaterialApp(home: SettingsPage()),
-          ),
+        _verifyTextContent(
+          _getTextWidget(tester, _TestConstants.startOfDayLabelIndex),
+          l10n.startOfDayLabel,
         );
 
-        await tester.pumpAndSettle();
+        _verifyTextContent(
+          _getTextWidget(
+              tester, _TestConstants.notifyAfterInactivityLabelIndex),
+          l10n.notifyAfterInactivityLabel,
+        );
 
-        // Textウィジェットの順番で内容を検証
-        final textWidgets = find.byType(Text);
-        // 0番目: 開始時刻のラベル
-        final startOfDayText = tester.widget<Text>(textWidgets.at(0));
-        expect(startOfDayText.data, equals(l10n.startOfDayLabel));
+        _verifyTextContent(
+          _getTextWidget(tester, _TestConstants.resetNotificationLabelIndex),
+          l10n.resetNotificationLabel,
+        );
 
-        // 1番目: 開始時刻の値（時間表示）
-        final startOfDayValueText = tester.widget<Text>(textWidgets.at(1));
-        expect(startOfDayValueText.data, isNotNull);
-        expect(startOfDayValueText.data, isNotEmpty);
+        _verifyTextContent(
+          _getTextWidget(tester, _TestConstants.appBarTitleIndex),
+          l10n.settingsPageTitle,
+        );
 
-        // 2番目: 非アクティブ通知のラベル
-        final notifyAfterInactivityText =
-            tester.widget<Text>(textWidgets.at(2));
-        expect(notifyAfterInactivityText.data,
-            equals(l10n.notifyAfterInactivityLabel));
-
-        // 3番目: 非アクティブ通知の値
-        final notifyAfterInactivityValueText =
-            tester.widget<Text>(textWidgets.at(3));
-        expect(notifyAfterInactivityValueText.data, isNotNull);
-        expect(notifyAfterInactivityValueText.data, isNotEmpty);
-
-        // 4番目: リセット通知のラベル
-        final resetNotificationText = tester.widget<Text>(textWidgets.at(4));
-        expect(resetNotificationText.data, equals(l10n.resetNotificationLabel));
-
-        // 8番目: AppBarのタイトル（最後）
-        final titleText = tester.widget<Text>(textWidgets.at(8));
-        expect(titleText.data, equals(l10n.settingsPageTitle));
+        _verifyMultipleTextWidgets(tester, [
+          _TestConstants.startOfDayValueIndex,
+          _TestConstants.notifyAfterInactivityValueIndex,
+        ]);
       },
     );
 
     testWidgets(
       'should display correct values in SettingsTile',
       (tester) async {
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: [
-              preferenceProvider(startOfDayKey).overrideWith(
-                () => _FakePreference(),
-              ),
-            ],
-            child: MaterialApp(home: SettingsPage()),
-          ),
-        );
+        await _pumpAndSettle(tester);
 
-        await tester.pumpAndSettle();
-
-        // SettingsTileの順番でvalueプロパティの内容を検証
-        final settingsTiles = find.byType(SettingsTile);
-
-        // 1番目のSettingsTile（開始時刻）のvalueプロパティを検証
-        final startOfDayTile = tester.widget<SettingsTile>(settingsTiles.at(0));
-        expect(startOfDayTile.value, isA<Text>());
-
-        // 実際の時間表示を検証
-        final startOfDayValueText = startOfDayTile.value as Text;
-        expect(startOfDayValueText.data, isNotNull);
-        expect(startOfDayValueText.data, isNotEmpty);
-
-        // 2番目のSettingsTile（非アクティブ通知）のvalueプロパティを検証
-        final notifyAfterInactivityTile =
-            tester.widget<SettingsTile>(settingsTiles.at(1));
-        expect(notifyAfterInactivityTile.value, isA<Text>());
-
-        // 実際の通知設定表示を検証
-        final notifyAfterInactivityValueText =
-            notifyAfterInactivityTile.value as Text;
-        expect(notifyAfterInactivityValueText.data, isNotNull);
-        expect(notifyAfterInactivityValueText.data, isNotEmpty);
+        _verifyMultipleSettingsTiles(tester, [
+          _TestConstants.startOfDayTileIndex,
+          _TestConstants.notifyAfterInactivityTileIndex,
+        ]);
       },
     );
   });
