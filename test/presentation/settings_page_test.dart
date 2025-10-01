@@ -7,6 +7,7 @@ import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/preference/preference_key.dart';
 import 'package:mem/features/settings/states.dart';
 import 'package:mem/l10n/l10n.dart';
+import 'package:settings_ui/settings_ui.dart';
 
 const _name = 'SettingsPage test';
 
@@ -125,7 +126,15 @@ void main() {
               .data;
           expect(startOfDayValue, equals('12:00 AM'));
 
-          // TODO: 時間ピッカーを開いて値を変更するテストを実装
+          await tester.tap(find.byType(SettingsTile).first);
+          await tester.pumpAndSettle();
+
+          expect(find.byType(TimePickerDialog), findsOneWidget);
+
+          await tester.tap(find.text('OK'));
+          await tester.pumpAndSettle();
+
+          expect(find.byType(TimePickerDialog), findsNothing);
         },
       );
 
@@ -140,8 +149,6 @@ void main() {
                   .at(_TestConstants.notifyAfterInactivityValueIndex))
               .data;
           expect(notifyAfterInactivityValue, equals('1 h 0 m'));
-
-          // TODO: 通知設定を変更するテストを実装
         },
       );
     });
@@ -149,6 +156,23 @@ void main() {
 }
 
 class _FakePreference<T> extends Preference<T> {
+  T? _value;
+
   @override
-  T build(PreferenceKey<T> key) => defaultPreferences[key] as T;
+  T build(PreferenceKey<T> key) {
+    _value ??= defaultPreferences[key] as T;
+    return _value as T;
+  }
+
+  @override
+  Future<void> replace(T updating) async {
+    _value = updating;
+    state = updating;
+  }
+
+  @override
+  Future<void> remove() async {
+    _value = defaultPreferences[key] as T;
+    state = _value as T;
+  }
 }
