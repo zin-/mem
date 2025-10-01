@@ -89,6 +89,26 @@ void main() {
         ]);
       },
     );
+
+    testWidgets(
+      'should display correct values',
+      (tester) async {
+        await _pumpAndSettle(tester);
+
+        final textWidgets = find.byType(Text);
+
+        final startOfDayValue = tester
+            .widget<Text>(textWidgets.at(_TestConstants.startOfDayValueIndex))
+            .data;
+        expect(startOfDayValue, equals('12:00 AM'));
+
+        final notifyAfterInactivityValue = tester
+            .widget<Text>(
+                textWidgets.at(_TestConstants.notifyAfterInactivityValueIndex))
+            .data;
+        expect(notifyAfterInactivityValue, equals('1 h 0 m'));
+      },
+    );
   });
 }
 
