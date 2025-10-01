@@ -41,40 +41,22 @@ Future<void> _pumpAndSettle(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
-Text _getTextWidget(WidgetTester tester, int index) {
-  final textWidgets = find.byType(Text);
-  return tester.widget<Text>(textWidgets.at(index));
-}
-
-SettingsTile _getSettingsTile(WidgetTester tester, int index) {
-  final settingsTiles = find.byType(SettingsTile);
-  return tester.widget<SettingsTile>(settingsTiles.at(index));
-}
-
-void _verifyTextContent(Text textWidget, String expectedContent) {
-  expect(textWidget.data, equals(expectedContent));
-}
-
-void _verifyTextIsNotEmpty(Text textWidget) {
-  expect(textWidget.data, isNotNull);
-  expect(textWidget.data, isNotEmpty);
-}
-
 void _verifyMultipleTextWidgets(WidgetTester tester, List<int> indices) {
   for (final index in indices) {
-    _verifyTextIsNotEmpty(_getTextWidget(tester, index));
+    final textWidget = tester.widget<Text>(find.byType(Text).at(index));
+    expect(textWidget.data, isNotNull);
+    expect(textWidget.data, isNotEmpty);
   }
-}
-
-void _verifySettingsTileValue(SettingsTile tile) {
-  expect(tile.value, isA<Text>());
-  final valueText = tile.value as Text;
-  _verifyTextIsNotEmpty(valueText);
 }
 
 void _verifyMultipleSettingsTiles(WidgetTester tester, List<int> indices) {
   for (final index in indices) {
-    _verifySettingsTileValue(_getSettingsTile(tester, index));
+    final tile =
+        tester.widget<SettingsTile>(find.byType(SettingsTile).at(index));
+    expect(tile.value, isA<Text>());
+    final valueText = tile.value as Text;
+    expect(valueText.data, isNotNull);
+    expect(valueText.data, isNotEmpty);
   }
 }
 
@@ -86,25 +68,36 @@ void main() {
         final l10n = buildL10n();
         await _pumpAndSettle(tester);
 
-        _verifyTextContent(
-          _getTextWidget(tester, _TestConstants.startOfDayLabelIndex),
-          l10n.startOfDayLabel,
+        final textWidgets = find.byType(Text);
+
+        expect(
+          tester
+              .widget<Text>(textWidgets.at(_TestConstants.startOfDayLabelIndex))
+              .data,
+          equals(l10n.startOfDayLabel),
         );
 
-        _verifyTextContent(
-          _getTextWidget(
-              tester, _TestConstants.notifyAfterInactivityLabelIndex),
-          l10n.notifyAfterInactivityLabel,
+        expect(
+          tester
+              .widget<Text>(textWidgets
+                  .at(_TestConstants.notifyAfterInactivityLabelIndex))
+              .data,
+          equals(l10n.notifyAfterInactivityLabel),
         );
 
-        _verifyTextContent(
-          _getTextWidget(tester, _TestConstants.resetNotificationLabelIndex),
-          l10n.resetNotificationLabel,
+        expect(
+          tester
+              .widget<Text>(
+                  textWidgets.at(_TestConstants.resetNotificationLabelIndex))
+              .data,
+          equals(l10n.resetNotificationLabel),
         );
 
-        _verifyTextContent(
-          _getTextWidget(tester, _TestConstants.appBarTitleIndex),
-          l10n.settingsPageTitle,
+        expect(
+          tester
+              .widget<Text>(textWidgets.at(_TestConstants.appBarTitleIndex))
+              .data,
+          equals(l10n.settingsPageTitle),
         );
 
         _verifyMultipleTextWidgets(tester, [
