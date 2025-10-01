@@ -26,6 +26,9 @@ Widget _createTestWidget() {
       preferenceProvider(startOfDayKey).overrideWith(
         () => _FakePreference(),
       ),
+      preferenceProvider(notifyAfterInactivity).overrideWith(
+        () => _FakePreference(),
+      ),
     ],
     child: MaterialApp(home: SettingsPage()),
   );
@@ -149,6 +152,16 @@ void main() {
                   .at(_TestConstants.notifyAfterInactivityValueIndex))
               .data;
           expect(notifyAfterInactivityValue, equals('1 h 0 m'));
+
+          await tester.tap(find.byType(SettingsTile).at(1));
+          await tester.pumpAndSettle();
+
+          expect(find.byType(BottomSheet), findsOneWidget);
+
+          await tester.tap(find.text('OK'));
+          await tester.pumpAndSettle();
+
+          expect(find.byType(BottomSheet), findsNothing);
         },
       );
     });
