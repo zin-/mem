@@ -1,4 +1,5 @@
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/features/settings/setting_store.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'preference/repository.dart';
@@ -12,14 +13,7 @@ part 'states.g.dart';
 class Preference<T> extends _$Preference<T> {
   @override
   T build(PreferenceKey<T> key) => v(
-        () {
-          PreferenceRepository().shipByKey(key).then((v) {
-            if (v.value != null) {
-              state = v.value as T;
-            }
-          });
-          return defaultPreferences[key] as T;
-        },
+        () => ref.watch(settingStoreProvider.notifier).serveOneBy(key),
         {"key": key},
       );
 
