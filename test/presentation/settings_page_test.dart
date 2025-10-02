@@ -152,6 +152,50 @@ void main() {
         expect(find.byType(BottomSheet), findsNothing);
       });
     });
+
+    group('should delete', () {
+      testWidgets('start of day value when cancelled.', (tester) async {
+        await _pumpAndSettle(tester);
+
+        final textWidgets = find.byType(Text);
+        final startOfDayValue = tester
+            .widget<Text>(textWidgets.at(_TestConstants.startOfDayValueIndex))
+            .data;
+        expect(startOfDayValue, equals('12:00 AM'));
+
+        await tester.tap(find.byType(SettingsTile).first);
+        await tester.pumpAndSettle();
+
+        expect(find.byType(TimePickerDialog), findsOneWidget);
+
+        await tester.tap(find.text('Cancel'));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(TimePickerDialog), findsNothing);
+      });
+
+      testWidgets('notify after inactivity value when set to null.',
+          (tester) async {
+        await _pumpAndSettle(tester);
+
+        final textWidgets = find.byType(Text);
+        final notifyAfterInactivityValue = tester
+            .widget<Text>(
+                textWidgets.at(_TestConstants.notifyAfterInactivityValueIndex))
+            .data;
+        expect(notifyAfterInactivityValue, equals('1 h 0 m'));
+
+        await tester.tap(find.byType(SettingsTile).at(1));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(BottomSheet), findsOneWidget);
+
+        await tester.tap(find.text('Cancel'));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(BottomSheet), findsNothing);
+      });
+    });
   });
 }
 
