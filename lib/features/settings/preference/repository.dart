@@ -52,4 +52,13 @@ class PreferenceRepository
     // TODO: implement waste
     throw UnimplementedError();
   }
+
+  PreferenceRepository._();
+
+  static PreferenceRepository? _instance;
+
+  factory PreferenceRepository({
+    PreferenceRepository? mock,
+  }) =>
+      _instance ??= mock ?? PreferenceRepository._();
 }
