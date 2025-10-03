@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/features/settings/constants.dart';
 import 'package:mem/features/settings/page.dart';
-import 'package:mem/features/settings/preference/keys.dart';
-import 'package:mem/features/settings/preference/preference_key.dart';
-import 'package:mem/features/settings/states.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:settings_ui/settings_ui.dart';
 
@@ -22,14 +18,6 @@ class _TestConstants {
 
 Widget _createTestWidget() {
   return ProviderScope(
-    overrides: [
-      preferenceProvider(startOfDayKey).overrideWith(
-        () => _FakePreference(),
-      ),
-      preferenceProvider(notifyAfterInactivity).overrideWith(
-        () => _FakePreference(),
-      ),
-    ],
     child: MaterialApp(home: SettingsPage()),
   );
 }
@@ -197,26 +185,4 @@ void main() {
       });
     });
   });
-}
-
-class _FakePreference<T> extends Preference<T> {
-  T? _value;
-
-  @override
-  T build(PreferenceKey<T> key) {
-    _value ??= defaultPreferences[key] as T;
-    return _value as T;
-  }
-
-  @override
-  Future<void> replace(T updating) async {
-    _value = updating;
-    state = updating;
-  }
-
-  @override
-  Future<void> remove() async {
-    _value = defaultPreferences[key] as T;
-    state = _value as T;
-  }
 }
