@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-const _name = 'MemDetailPage test';
-
 class _TestConstants {
   static const int testMemId = 1;
 }
@@ -37,7 +35,7 @@ Future<void> _pumpAndSettle(
 }
 
 void main() {
-  group(_name, () {
+  group('MemDetailPage test', () {
     group('should display', () {
       testWidgets('basic structure for new mem.', (tester) async {
         await _pumpAndSettle(tester, memId: null);
