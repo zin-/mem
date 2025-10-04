@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/features/mems/detail/actions.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mem/features/mems/detail/page.dart';
 import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mems/detail/fab.dart';
+import 'package:mem/features/mems/mem_client.dart';
+import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/mems/mem.dart';
+import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/l10n/l10n.dart';
+
+import 'mem_detail_page_test.mocks.dart';
 
 class _TestConstants {
   static const int testMemId = 1;
@@ -40,7 +47,16 @@ Future<void> _pumpAndSettle(
   await tester.pumpAndSettle();
 }
 
+@GenerateMocks([MemClient])
 void main() {
+  final mockMemClient = MockMemClient();
+
+  MemClient(mock: mockMemClient);
+
+  tearDown(() {
+    reset(mockMemClient);
+  });
+
   group('MemDetailPage test', () {
     group('should display', () {
       testWidgets('basic structure for new mem.', (tester) async {
@@ -100,19 +116,27 @@ void main() {
     group('should save', () {
       testWidgets('mem when save FAB is tapped with valid input.',
           (tester) async {
-        bool saveMemCalled = false;
         const testMemName = 'Test Mem';
+
+        when(mockMemClient.save(
+          any,
+          any,
+          any,
+          any,
+          any,
+        )).thenAnswer((_) async => (
+              (
+                MemEntity(Mem("", null, null)),
+                <MemItemEntity>[],
+                null,
+                null,
+                null
+              ),
+              null,
+            ));
 
         await tester.pumpWidget(
           ProviderScope(
-            overrides: [
-              saveMem.overrideWith(
-                (ref, memId) async {
-                  saveMemCalled = true;
-                  return null;
-                },
-              ),
-            ],
             child: MaterialApp(
               home: const MemDetailPage(null),
             ),
@@ -132,7 +156,13 @@ void main() {
         await tester.tap(saveFab);
         await tester.pumpAndSettle();
 
-        expect(saveMemCalled, isTrue);
+        verify(mockMemClient.save(
+          any,
+          any,
+          any,
+          any,
+          any,
+        )).called(1);
         expect(find.byType(SnackBar), findsOneWidget);
 
         final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));

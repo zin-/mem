@@ -128,11 +128,12 @@ class MemClient {
 
   static MemClient? _instance;
 
-  factory MemClient() => v(
-        () => _instance ??= MemClient._(
-          MemService(),
-          NotificationClient(),
-        ),
+  factory MemClient({MemClient? mock}) => v(
+        () => _instance ??= mock ??
+            MemClient._(
+              MemService(),
+              NotificationClient(),
+            ),
       );
 
   static void resetSingleton() => v(
