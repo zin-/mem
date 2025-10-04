@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/features/mems/detail/actions.dart';
+import 'package:mem/features/mems/detail/page.dart';
+import 'package:mem/features/mems/mem_name.dart';
+import 'package:mem/features/mems/detail/fab.dart';
+import 'package:mem/l10n/l10n.dart';
 
 class _TestConstants {
   static const int testMemId = 1;
@@ -88,6 +94,51 @@ void main() {
 
         final appBar = tester.widget<AppBar>(appBarFinder);
         expect(appBar.actions, isNull);
+      });
+    });
+
+    group('should save', () {
+      testWidgets('mem when save FAB is tapped with valid input.',
+          (tester) async {
+        bool saveMemCalled = false;
+        const testMemName = 'Test Mem';
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              saveMem.overrideWith(
+                (ref, memId) async {
+                  saveMemCalled = true;
+                  return null;
+                },
+              ),
+            ],
+            child: MaterialApp(
+              home: const MemDetailPage(null),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final nameField = find.byKey(keyMemName);
+        expect(nameField, findsOneWidget);
+
+        await tester.enterText(nameField, testMemName);
+        await tester.pumpAndSettle();
+
+        final saveFab = find.byKey(keySaveMemFab);
+        expect(saveFab, findsOneWidget);
+
+        await tester.tap(saveFab);
+        await tester.pumpAndSettle();
+
+        expect(saveMemCalled, isTrue);
+        expect(find.byType(SnackBar), findsOneWidget);
+
+        final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
+        final expectedMessage = buildL10n().saveMemSuccessMessage(testMemName);
+        expect(snackBar.content, isA<Text>());
+        expect((snackBar.content as Text).data, equals(expectedMessage));
       });
     });
   });
