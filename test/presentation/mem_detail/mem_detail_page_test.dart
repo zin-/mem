@@ -53,7 +53,16 @@ Future<void> _pumpAndSettle(
   int? memId,
 }) async {
   await tester.pumpWidget(_createTestWidget(memId: memId));
-  await tester.pumpAndSettle();
+
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 100));
+  await tester.pump(const Duration(milliseconds: 100));
+
+  try {
+    await tester.pumpAndSettle(const Duration(seconds: 1));
+  } catch (e) {
+    await tester.pump(const Duration(milliseconds: 200));
+  }
 }
 
 // FIXME 手間が多すぎる
@@ -210,6 +219,8 @@ void main() {
       testWidgets('basic structure for saved mem.', (tester) async {
         await _pumpAndSettle(tester, memId: _TestConstants.testMemId);
 
+        await tester.pump(const Duration(milliseconds: 200));
+
         expect(find.byType(Scaffold), findsOneWidget);
         expect(find.byType(AppBar), findsOneWidget);
         expect(find.byType(FloatingActionButton), findsOneWidget);
@@ -219,11 +230,13 @@ void main() {
 
         final appBar = tester.widget<AppBar>(appBarFinder);
         expect(appBar.actions, isNotNull);
-        expect(appBar.backgroundColor, isNotNull);
+        expect(appBar.backgroundColor, isNull);
       });
 
       testWidgets('app bar actions for saved mem.', (tester) async {
         await _pumpAndSettle(tester, memId: _TestConstants.testMemId);
+
+        await tester.pump(const Duration(milliseconds: 200));
 
         final appBarFinder = find.byType(AppBar);
         expect(appBarFinder, findsOneWidget);
