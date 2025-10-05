@@ -12,8 +12,6 @@ import 'package:mem/features/mem_items/mem_item_entity.dart';
 // lintエラーになるためコメントアウト
 class MemItemRepository
     extends DatabaseTupleRepository<MemItemEntity, SavedMemItemEntity> {
-  MemItemRepository() : super(databaseDefinition, defTableMemItems);
-
   @override
   SavedMemItemEntity pack(Map<String, dynamic> map) => SavedMemItemEntity(map);
 
@@ -100,4 +98,9 @@ class MemItemRepository
           ],
         ),
       );
+
+  static MemItemRepository? _instance;
+  factory MemItemRepository({MemItemRepository? mock}) =>
+      _instance ??= mock ?? MemItemRepository._();
+  MemItemRepository._() : super(databaseDefinition, defTableMemItems);
 }

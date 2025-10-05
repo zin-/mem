@@ -8,8 +8,6 @@ import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 
 class MemRepository extends DatabaseTupleRepository<MemEntity, SavedMemEntity> {
-  MemRepository() : super(databaseDefinition, defTableMems);
-
   @override
   SavedMemEntity pack(Map<String, dynamic> map) => SavedMemEntity(map);
 
@@ -60,4 +58,9 @@ class MemRepository extends DatabaseTupleRepository<MemEntity, SavedMemEntity> {
           ],
         ),
       );
+
+  static MemRepository? _instance;
+  factory MemRepository({MemRepository? mock}) =>
+      _instance ??= mock ?? MemRepository._();
+  MemRepository._() : super(databaseDefinition, defTableMems);
 }

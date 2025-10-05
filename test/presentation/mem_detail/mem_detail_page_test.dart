@@ -1,6 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/databases/table_definitions/base.dart';
+import 'package:mem/databases/table_definitions/mem_items.dart';
+import 'package:mem/databases/table_definitions/mem_notifications.dart';
+import 'package:mem/databases/table_definitions/mem_relations.dart';
+import 'package:mem/databases/table_definitions/mems.dart';
+import 'package:mem/features/acts/line_chart/states.dart';
+import 'package:mem/features/mem_items/mem_item.dart';
+import 'package:mem/features/mem_items/mem_item_repository.dart';
+import 'package:mem/features/mem_notifications/mem_notification.dart';
+import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
+import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
+import 'package:mem/features/mem_relations/mem_relation.dart';
+import 'package:mem/features/mem_relations/mem_relation_entity.dart';
+import 'package:mem/features/mem_relations/mem_relation_repository.dart';
+import 'package:mem/features/mems/mem_repository.dart';
+import 'package:mem/features/targets/target.dart';
+import 'package:mem/features/targets/target_entity.dart';
+import 'package:mem/features/targets/target_repository.dart';
+import 'package:mem/features/targets/target_table.dart';
+import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mem/features/mems/detail/page.dart';
@@ -21,20 +41,9 @@ class _TestConstants {
 Widget _createTestWidget({
   int? memId,
 }) {
-  return MaterialApp(
-    home: Scaffold(
-      appBar: AppBar(
-        title: const Text('Test App'),
-        actions: memId != null ? [const Icon(Icons.more_vert)] : null,
-        backgroundColor: memId != null ? Colors.grey : null,
-      ),
-      body: const Center(
-        child: Text('Test Body'),
-      ),
-      floatingActionButton: const FloatingActionButton(
-        onPressed: null,
-        child: Icon(Icons.add),
-      ),
+  return ProviderScope(
+    child: MaterialApp(
+      home: MemDetailPage(memId),
     ),
   );
 }
@@ -47,14 +56,39 @@ Future<void> _pumpAndSettle(
   await tester.pumpAndSettle();
 }
 
-@GenerateMocks([MemClient])
+// FIXME 手間が多すぎる
+//   MemStoreに統合することで解消する
+//   そもそもRepositoryは集約するべきなのに、テーブルごとに実装したのが誤り
+@GenerateMocks([
+  MemClient,
+  MemRepository,
+  MemNotificationRepository,
+  TargetRepository,
+  MemItemRepository,
+  MemRelationRepository,
+])
 void main() {
   final mockMemClient = MockMemClient();
+  final mockMemRepository = MockMemRepository();
+  final mockMemNotificationRepository = MockMemNotificationRepository();
+  final mockMemItemRepository = MockMemItemRepository();
+  final mockMemRelationRepository = MockMemRelationRepository();
+  final mockTargetRepository = MockTargetRepository();
 
   MemClient(mock: mockMemClient);
+  MemRepository(mock: mockMemRepository);
+  MemNotificationRepository(mock: mockMemNotificationRepository);
+  MemItemRepository(mock: mockMemItemRepository);
+  MemRelationRepository(mock: mockMemRelationRepository);
+  TargetRepository(mock: mockTargetRepository);
 
   tearDown(() {
     reset(mockMemClient);
+    reset(mockMemRepository);
+    reset(mockMemNotificationRepository);
+    reset(mockMemItemRepository);
+    reset(mockMemRelationRepository);
+    reset(mockTargetRepository);
   });
 
   group('MemDetailPage test', () {
@@ -74,6 +108,105 @@ void main() {
         expect(appBar.backgroundColor, isNull);
       });
 
+      testWidgets('no app bar actions for new mem.', (tester) async {
+        await _pumpAndSettle(tester, memId: null);
+
+        final appBarFinder = find.byType(AppBar);
+        expect(appBarFinder, findsOneWidget);
+
+        final appBar = tester.widget<AppBar>(appBarFinder);
+        expect(appBar.actions, isNull);
+      });
+    });
+
+    group('should show', () {
+      setUp(() {
+        when(mockMemRepository.ship(id: _TestConstants.testMemId))
+            .thenAnswer((_) async => [
+                  SavedMemEntity(
+                    {
+                      defPkId.name: _TestConstants.testMemId,
+                      defColMemsName.name: 'Test Mem',
+                      defColMemsDoneAt.name: null,
+                      defColMemsStartOn.name: null,
+                      defColMemsEndOn.name: null,
+                      defColMemsStartAt.name: null,
+                      defColMemsEndAt.name: null,
+                      defColCreatedAt.name: DateTime.now(),
+                      defColUpdatedAt.name: null,
+                      defColArchivedAt.name: null,
+                    },
+                  ),
+                ]);
+        when(mockMemNotificationRepository.ship(
+                memId: _TestConstants.testMemId))
+            .thenAnswer((_) async => [
+                  SavedMemNotificationEntity(
+                    {
+                      defPkId.name: _TestConstants.testMemId,
+                      defFkMemNotificationsMemId.name: _TestConstants.testMemId,
+                      defColMemNotificationsType.name:
+                          MemNotificationType.repeat.name,
+                      defColMemNotificationsTime.name: 10,
+                      defColMemNotificationsMessage.name: 'Test Mem',
+                      defColCreatedAt.name: DateTime.now(),
+                      defColUpdatedAt.name: null,
+                      defColArchivedAt.name: null,
+                    },
+                  ),
+                ]);
+
+        when(mockMemItemRepository.ship(memId: _TestConstants.testMemId))
+            .thenAnswer((_) async => [
+                  SavedMemItemEntity(
+                    {
+                      defPkId.name: _TestConstants.testMemId,
+                      defFkMemItemsMemId.name: _TestConstants.testMemId,
+                      defColMemItemsType.name: MemItemType.memo.name,
+                      defColMemItemsValue.name: 'Test Mem',
+                      defColCreatedAt.name: DateTime.now(),
+                      defColUpdatedAt.name: null,
+                      defColArchivedAt.name: null,
+                    },
+                  ),
+                ]);
+
+        when(mockTargetRepository.ship(
+                condition: Equals(defFkTargetMemId, _TestConstants.testMemId)))
+            .thenAnswer((_) async => [
+                  SavedTargetEntity(
+                    {
+                      defPkId.name: _TestConstants.testMemId,
+                      defFkTargetMemId.name: _TestConstants.testMemId,
+                      defColTargetType.name: TargetType.equalTo.name,
+                      defColTargetUnit.name: TargetUnit.count.name,
+                      defColTargetValue.name: 10,
+                      defColTargetPeriod.name: Period.aDay.name,
+                      defColCreatedAt.name: DateTime.now(),
+                      defColUpdatedAt.name: null,
+                      defColArchivedAt.name: null,
+                    },
+                  ),
+                ]);
+
+        when(mockMemRelationRepository.ship(
+          sourceMemId: _TestConstants.testMemId,
+        )).thenAnswer((_) async => [
+              SavedMemRelationEntity(
+                {
+                  defPkId.name: _TestConstants.testMemId,
+                  defFkMemRelationsSourceMemId.name: _TestConstants.testMemId,
+                  defFkMemRelationsTargetMemId.name: _TestConstants.testMemId,
+                  defColMemRelationsType.name: MemRelationType.prePost.name,
+                  defColMemRelationsValue.name: 10,
+                  defColCreatedAt.name: DateTime.now(),
+                  defColUpdatedAt.name: null,
+                  defColArchivedAt.name: null,
+                },
+              ),
+            ]);
+      });
+
       testWidgets('basic structure for saved mem.', (tester) async {
         await _pumpAndSettle(tester, memId: _TestConstants.testMemId);
 
@@ -88,9 +221,7 @@ void main() {
         expect(appBar.actions, isNotNull);
         expect(appBar.backgroundColor, isNotNull);
       });
-    });
 
-    group('should show', () {
       testWidgets('app bar actions for saved mem.', (tester) async {
         await _pumpAndSettle(tester, memId: _TestConstants.testMemId);
 
@@ -100,16 +231,6 @@ void main() {
         final appBar = tester.widget<AppBar>(appBarFinder);
         expect(appBar.actions, isNotNull);
         expect(appBar.actions!.length, greaterThan(0));
-      });
-
-      testWidgets('no app bar actions for new mem.', (tester) async {
-        await _pumpAndSettle(tester, memId: null);
-
-        final appBarFinder = find.byType(AppBar);
-        expect(appBarFinder, findsOneWidget);
-
-        final appBar = tester.widget<AppBar>(appBarFinder);
-        expect(appBar.actions, isNull);
       });
     });
 
