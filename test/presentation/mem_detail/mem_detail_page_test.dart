@@ -31,6 +31,7 @@ import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/l10n/l10n.dart';
+import 'package:mem/features/mems/detail/app_bar/remove_mem_action.dart';
 
 import 'mem_detail_page_test.mocks.dart';
 
@@ -303,6 +304,147 @@ void main() {
         final expectedMessage = buildL10n().saveMemSuccessMessage(testMemName);
         expect(snackBar.content, isA<Text>());
         expect((snackBar.content as Text).data, equals(expectedMessage));
+      });
+    });
+
+    group('should delete', () {
+      setUp(() {
+        when(mockMemRepository.ship(id: _TestConstants.testMemId))
+            .thenAnswer((_) async => [
+                  SavedMemEntity(
+                    {
+                      defPkId.name: _TestConstants.testMemId,
+                      defColMemsName.name: 'Test Mem',
+                      defColMemsDoneAt.name: null,
+                      defColMemsStartOn.name: null,
+                      defColMemsEndOn.name: null,
+                      defColMemsStartAt.name: null,
+                      defColMemsEndAt.name: null,
+                      defColCreatedAt.name: DateTime.now(),
+                      defColUpdatedAt.name: null,
+                      defColArchivedAt.name: null,
+                    },
+                  ),
+                ]);
+        when(mockMemNotificationRepository.ship(
+                memId: _TestConstants.testMemId))
+            .thenAnswer((_) async => [
+                  SavedMemNotificationEntity(
+                    {
+                      defPkId.name: _TestConstants.testMemId,
+                      defFkMemNotificationsMemId.name: _TestConstants.testMemId,
+                      defColMemNotificationsType.name:
+                          MemNotificationType.repeat.name,
+                      defColMemNotificationsTime.name: 10,
+                      defColMemNotificationsMessage.name: 'Test Mem',
+                      defColCreatedAt.name: DateTime.now(),
+                      defColUpdatedAt.name: null,
+                      defColArchivedAt.name: null,
+                    },
+                  ),
+                ]);
+
+        when(mockMemItemRepository.ship(memId: _TestConstants.testMemId))
+            .thenAnswer((_) async => [
+                  SavedMemItemEntity(
+                    {
+                      defPkId.name: _TestConstants.testMemId,
+                      defFkMemItemsMemId.name: _TestConstants.testMemId,
+                      defColMemItemsType.name: MemItemType.memo.name,
+                      defColMemItemsValue.name: 'Test Mem',
+                      defColCreatedAt.name: DateTime.now(),
+                      defColUpdatedAt.name: null,
+                      defColArchivedAt.name: null,
+                    },
+                  ),
+                ]);
+
+        when(mockTargetRepository.ship(
+                condition: Equals(defFkTargetMemId, _TestConstants.testMemId)))
+            .thenAnswer((_) async => [
+                  SavedTargetEntity(
+                    {
+                      defPkId.name: _TestConstants.testMemId,
+                      defFkTargetMemId.name: _TestConstants.testMemId,
+                      defColTargetType.name: TargetType.equalTo.name,
+                      defColTargetUnit.name: TargetUnit.count.name,
+                      defColTargetValue.name: 10,
+                      defColTargetPeriod.name: Period.aDay.name,
+                      defColCreatedAt.name: DateTime.now(),
+                      defColUpdatedAt.name: null,
+                      defColArchivedAt.name: null,
+                    },
+                  ),
+                ]);
+
+        when(mockMemRelationRepository.ship(
+          sourceMemId: _TestConstants.testMemId,
+        )).thenAnswer((_) async => [
+              SavedMemRelationEntity(
+                {
+                  defPkId.name: _TestConstants.testMemId,
+                  defFkMemRelationsSourceMemId.name: _TestConstants.testMemId,
+                  defFkMemRelationsTargetMemId.name: _TestConstants.testMemId,
+                  defColMemRelationsType.name: MemRelationType.prePost.name,
+                  defColMemRelationsValue.name: 10,
+                  defColCreatedAt.name: DateTime.now(),
+                  defColUpdatedAt.name: null,
+                  defColArchivedAt.name: null,
+                },
+              ),
+            ]);
+      });
+
+      testWidgets('mem when delete action is tapped.', (tester) async {
+        when(mockMemClient.remove(_TestConstants.testMemId))
+            .thenAnswer((_) async => true);
+
+        await _pumpAndSettle(tester, memId: _TestConstants.testMemId);
+        await tester.pump(const Duration(milliseconds: 200));
+
+        // AppBarのアクションが表示されることを確認
+        final appBarFinder = find.byType(AppBar);
+        expect(appBarFinder, findsOneWidget);
+
+        final appBar = tester.widget<AppBar>(appBarFinder);
+        expect(appBar.actions, isNotNull);
+        expect(appBar.actions!.length, greaterThan(0));
+
+        // 削除アクションを直接探す（PopupMenuButtonの中にある場合）
+        final removeAction = find.byKey(keyRemoveMem);
+        if (removeAction.evaluate().isEmpty) {
+          // PopupMenuButtonを探してタップ
+          final menuButton = find.byType(PopupMenuButton);
+          if (menuButton.evaluate().isNotEmpty) {
+            await tester.tap(menuButton);
+            await tester.pump(const Duration(milliseconds: 200));
+          }
+        }
+
+        // 削除アクションをタップ
+        expect(removeAction, findsOneWidget);
+
+        // ListTileのonTapを直接呼び出す
+        final listTile = tester.widget<ListTile>(removeAction);
+        if (listTile.onTap != null) {
+          listTile.onTap!();
+          await tester.pump(const Duration(milliseconds: 200));
+        } else {
+          await tester.tap(removeAction, warnIfMissed: false);
+          await tester.pump(const Duration(milliseconds: 200));
+        }
+
+        // 確認ダイアログが表示されることを確認
+        expect(find.byType(AlertDialog), findsOneWidget);
+        expect(find.text('Can I remove this?'), findsOneWidget);
+
+        // OKボタンをタップして削除を実行
+        final okButton = find.byKey(keyOk);
+        expect(okButton, findsOneWidget);
+        await tester.tap(okButton);
+        await tester.pump(const Duration(milliseconds: 200));
+
+        verify(mockMemClient.remove(_TestConstants.testMemId)).called(1);
       });
     });
   });
