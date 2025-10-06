@@ -6,20 +6,8 @@ import 'package:mem/framework/repository/database_repository.dart';
 import 'package:mem/features/logger/log_service.dart';
 
 class BackupClient {
-  static BackupClient? _instance;
-
   final DatabaseRepository _databaseRepository;
   final FilesClient _filesClient;
-
-  BackupClient._(
-    this._databaseRepository,
-    this._filesClient,
-  );
-
-  factory BackupClient() => _instance ??= BackupClient._(
-        DatabaseRepository(),
-        FilesClient(),
-      );
 
   Future<String> createBackup() => v(
         () async => await _filesClient.saveOrShare((await _databaseRepository
@@ -43,5 +31,16 @@ class BackupClient {
 
           return null;
         },
+      );
+
+  BackupClient._(
+    this._databaseRepository,
+    this._filesClient,
+  );
+  static BackupClient? _instance;
+  factory BackupClient({BackupClient? mock}) => _instance ??= mock ??
+      BackupClient._(
+        DatabaseRepository(),
+        FilesClient(),
       );
 }

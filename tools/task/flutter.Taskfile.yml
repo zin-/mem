@@ -60,6 +60,11 @@ tasks:
     cmds:
       - flutter gen-l10n
     silent: false
+  
+  gen:icon:
+    cmds:
+      - flutter pub run flutter_launcher_icons:main
+    silent: false
 
   run:
     cmds:
@@ -74,4 +79,9 @@ tasks:
   test:integration:
     cmds:
       - flutter test integration_test
+    silent: false
+  
+  clean:
+    cmds:
+      - flutter clean
     silent: false

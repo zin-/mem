@@ -10,7 +10,7 @@ import 'package:mem/l10n/l10n.dart';
 import 'package:mockito/mockito.dart';
 import 'package:settings_ui/settings_ui.dart';
 
-import '../helpers.mocks.dart';
+import '../../helpers.mocks.dart';
 
 class _TestConstants {
   static const int startOfDayLabelIndex = 0;
