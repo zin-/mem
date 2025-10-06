@@ -39,80 +39,80 @@ dependencies:
   intl: any
 
   # for View
-  flutter_picker_plus: ^1.1.3
-  flutter_sticky_header: ^0.8.0
+  flutter_picker_plus: any
+  flutter_sticky_header: any
 
   ## for Transition
   go_router: any
 
   ## for SettingsPage
-  settings_ui: ^2.0.2
+  settings_ui: any
 
   ## for View state management
-  flutter_riverpod: ^3.0.0-dev.0
-  riverpod_annotation: ^3.0.0-dev.0
+  flutter_riverpod: any
+  riverpod_annotation: any
 
   ## for Chart
-  fl_chart: ^0.69.1
+  fl_chart: any
 
   # for Notification
-  flutter_local_notifications: ^19.3.0
-  timezone: ^0.10.0
+  flutter_local_notifications: any
+  timezone: any
   # awesome_notifications: ^0.9.3+1
 
   # for Persistence
   ## for Database
-  sqflite: ^2.4.1
-  path: ^1.9.0
-  sqflite_common_ffi: ^2.3.4
-  path_provider: ^2.1.5
-  idb_shim: ^2.6.1
+  sqflite: any
+  path: any
+  sqflite_common_ffi: any
+  path_provider: any
+  idb_shim: any
 
   ## for File
-  share_plus: ^10.1.2
+  share_plus: any
 
   ## for Logger
-  logger: ^2.5.0
+  logger: any
 
   ## for Preferences
-  shared_preferences: ^2.2.2
+  shared_preferences: any
 
   # for basic operations
-  collection: ^1.18.0
+  collection: any
 
   # for Home widgets
-  home_widget: ^0.7.0
-  workmanager: ^0.8.0
-  day_picker: ^2.2.0
-  file_picker: ^8.0.5
+  home_widget: any
+  workmanager: any
+  day_picker: any
+  file_picker: any
 
   # for Permissions
-  permission_handler: ^11.3.1
+  permission_handler: any
 
   # for Error report
-  sentry_flutter: ^8.9.0
-  flutter_foreground_task: ^8.17.0
+  sentry_flutter: any
+  flutter_foreground_task: any
 
 dev_dependencies:
   # for Test mock
   flutter_test:
     sdk: flutter
-  test: ^1.25.7
+  test: any
   integration_test:
     sdk: flutter
-  mockito: ^5.4.6
-  build_runner: ^2.4.8
+  mockito: any
+  build_runner: any
 
   # for Lint
-  flutter_lints: ^5.0.0
-  custom_lint: ^0.7.5
+  flutter_lints: any
+  custom_lint: any
 
   # for Riverpod
-  riverpod_generator: ^3.0.0-dev.0
-  riverpod_lint: ^3.0.0-dev.0
+  riverpod_generator: any
+  riverpod_lint: any
 
   # for Icon
-  flutter_launcher_icons: ^0.14.1
+  flutter_launcher_icons: any
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
