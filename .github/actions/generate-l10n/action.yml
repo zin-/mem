@@ -15,5 +15,5 @@ runs:
     #        key: l10n-${{ hashFiles('lib/l10n/**') }}
     - name: "Generate l10n"
       #      if: steps.cache.outputs.cache-hit != 'true'
-      run: rps gen l10n
+      run: flutter gen-l10n
       shell: bash

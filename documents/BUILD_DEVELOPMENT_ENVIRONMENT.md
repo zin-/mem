@@ -67,7 +67,7 @@ dart pub global activate rps
 自動生成ファイルを生成する
 ```shell
 cd ../
-rps gen build
+task gen
 ```
 ファイルエラーが発生しなくなっていればOK
 
@@ -76,7 +76,7 @@ rps gen build
 （Androidのemulatorがある前提
 ```shell
 cd ../
-rps run
+task run
 ```
 初回は様々な自動生成ファイルを生成する関係でかなり時間がかかるので注意
 
