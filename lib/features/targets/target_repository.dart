@@ -7,8 +7,11 @@ import 'package:mem/framework/repository/database_tuple_repository.dart';
 // lintエラーになるためコメントアウト
 class TargetRepository
     extends DatabaseTupleRepository<TargetEntity, SavedTargetEntity> {
-  TargetRepository() : super(databaseDefinition, defTableTargets);
-
   @override
   SavedTargetEntity pack(Map<String, dynamic> map) => SavedTargetEntity(map);
+
+  static TargetRepository? _instance;
+  factory TargetRepository({TargetRepository? mock}) =>
+      _instance ??= mock ?? TargetRepository._();
+  TargetRepository._() : super(databaseDefinition, defTableTargets);
 }

@@ -45,11 +45,11 @@ class MemRelationEntitiesByMemId extends _$MemRelationEntitiesByMemId {
       v(
         () async {
           state = AsyncValue.data([
-            ...(state.valueOrNull ?? []).where(
+            ...(state.value ?? []).where(
                 (e) => e.value.targetMemId != entities.first.value.targetMemId),
             ...entities,
           ]);
-          return state.valueOrNull ?? [];
+          return state.value ?? [];
         },
         {'entities': entities},
       );

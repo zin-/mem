@@ -2,9 +2,11 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/counter/act_counter_client.dart';
 import 'package:mem/features/acts/counter/home_widget_accessor.dart';
+import 'package:mem/features/settings/preference/repository.dart';
 import 'package:mem/generated/l10n/app_localizations.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/logger_wrapper.dart';
@@ -24,6 +26,7 @@ int randomInt([int max = 42949671]) => Random().nextInt(max);
   //  Repositoryはシステム固有の処理であるのに対して、Tableは永続仮想をラップする役割を持つため
   ActCounterClient,
   SentryWrapper,
+  PreferenceRepository,
 ])
 void main() {}
 

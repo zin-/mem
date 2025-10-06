@@ -5,45 +5,55 @@ import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/states.dart';
+import 'package:mem/features/mems/mem_client.dart';
 
 import 'states.dart';
 
 final saveMem =
     Provider.autoDispose.family<Future<DateTime?>, int?>((ref, memId) => v(
           () async {
-            final (saved, nextNotifyAt) =
-                await ref.read(memEntitiesProvider.notifier).save(
-                      ref.read(editingMemByMemIdProvider(memId)),
-                      ref.read(memItemsByMemIdProvider(memId)),
-                      ref.read(memNotificationsByMemIdProvider(memId)),
-                      ref.read(targetStateProvider(memId)).value,
-                      ref.read(memRelationEntitiesByMemIdProvider(memId)).value,
-                    );
+            final link = ref.keepAlive();
+            try {
+              final (saved, nextNotifyAt) = await MemClient().save(
+                ref.read(editingMemByMemIdProvider(memId)),
+                ref.read(memItemsByMemIdProvider(memId)),
+                ref.read(memNotificationsByMemIdProvider(memId)),
+                ref.read(targetStateProvider(memId)).value,
+                ref
+                    .read(memRelationEntitiesByMemIdProvider(memId))
+                    .value
+                    ?.toList(),
+              );
 
-            if (memId == null) {
-              ref
-                  .read(editingMemByMemIdProvider(memId).notifier)
-                  .updatedBy(saved.$1);
+              if (!ref.mounted) return nextNotifyAt;
+
+              if (memId == null) {
+                ref
+                    .read(editingMemByMemIdProvider(memId).notifier)
+                    .updatedBy(saved.$1);
+              }
+
+              ref.read(memItemsProvider.notifier).upsertAll(
+                    saved.$2,
+                    (current, updating) =>
+                        current.value.memId == updating.value.memId &&
+                        current.value.type == updating.value.type,
+                  );
+              ref.read(memNotificationsProvider.notifier).upsertAll(
+                    saved.$3 ?? [],
+                    (tmp, item) =>
+                        tmp is SavedMemNotificationEntity &&
+                        item is SavedMemNotificationEntity &&
+                        tmp.id == item.id,
+                    removeWhere: (current) =>
+                        current.value.memId == memId &&
+                        current.value.isRepeatByDayOfWeek(),
+                  );
+
+              return nextNotifyAt;
+            } finally {
+              link.close();
             }
-
-            ref.read(memItemsProvider.notifier).upsertAll(
-                  saved.$2,
-                  (current, updating) =>
-                      current.value.memId == updating.value.memId &&
-                      current.value.type == updating.value.type,
-                );
-            ref.read(memNotificationsProvider.notifier).upsertAll(
-                  saved.$3 ?? [],
-                  (tmp, item) =>
-                      tmp is SavedMemNotificationEntity &&
-                      item is SavedMemNotificationEntity &&
-                      tmp.id == item.id,
-                  removeWhere: (current) =>
-                      current.value.memId == memId &&
-                      current.value.isRepeatByDayOfWeek(),
-                );
-
-            return nextNotifyAt;
           },
           memId,
         ));

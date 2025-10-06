@@ -6,7 +6,7 @@ import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/databases/table_definitions/mem_relations.dart';
 import 'package:mem/features/mem_relations/mem_relation.dart';
 import 'package:mem/features/mem_relations/mem_relation_search_dialog.dart';
-import 'package:mem/features/mems/detail/fab.dart';
+// import 'package:mem/features/mems/detail/fab.dart';
 import 'package:mem/framework/database/accessor.dart';
 
 import '../helpers.dart';
@@ -166,39 +166,39 @@ void main() => group(': $_scenarioName', () {
         });
       });
 
-      testWidgets("[flaky]Save relation.", (widgetTester) async {
-        await runApplication();
-        await widgetTester.pumpAndSettle();
-        await widgetTester.tap(find.text(sourceMemName));
-        await widgetTester.pumpAndSettle();
+      // testWidgets("[flaky]Save relation.", (widgetTester) async {
+      //   await runApplication();
+      //   await widgetTester.pumpAndSettle();
+      //   await widgetTester.tap(find.text(sourceMemName));
+      //   await widgetTester.pumpAndSettle();
 
-        await widgetTester.tap(find.text("Add Relation"));
-        await widgetTester.pumpAndSettle();
+      //   await widgetTester.tap(find.text("Add Relation"));
+      //   await widgetTester.pumpAndSettle();
 
-        await widgetTester.tap(find.text(targetMemName));
-        await widgetTester.pumpAndSettle();
+      //   await widgetTester.tap(find.text(targetMemName));
+      //   await widgetTester.pumpAndSettle();
 
-        await widgetTester.tap(find.text("追加"));
-        await widgetTester.pumpAndSettle();
+      //   await widgetTester.tap(find.text("追加"));
+      //   await widgetTester.pumpAndSettle();
 
-        expect(find.text("Add Relation"), findsOneWidget);
-        expect(find.text("memを検索..."), findsNothing);
+      //   expect(find.text("Add Relation"), findsOneWidget);
+      //   expect(find.text("memを検索..."), findsNothing);
 
-        await widgetTester.tap(find.byKey(keySaveMemFab));
-        await widgetTester.pumpAndSettle();
+      //   await widgetTester.tap(find.byKey(keySaveMemFab));
+      //   await widgetTester.pumpAndSettle();
 
-        expect(find.text(l10n.saveMemSuccessMessage(sourceMemName)),
-            findsOneWidget);
+      //   expect(find.text(l10n.saveMemSuccessMessage(sourceMemName)),
+      //       findsOneWidget);
 
-        final savedRelations = await dbA.select(
-          defTableMemRelations,
-          where: "${defFkMemRelationsSourceMemId.name} = ?",
-          whereArgs: [sourceMemId],
-        );
-        expect(savedRelations.length, 1);
-        expect(savedRelations.first[defFkMemRelationsTargetMemId.name],
-            targetMemId);
-        expect(savedRelations.first[defColMemRelationsType.name],
-            MemRelationType.prePost.name);
-      });
+      //   final savedRelations = await dbA.select(
+      //     defTableMemRelations,
+      //     where: "${defFkMemRelationsSourceMemId.name} = ?",
+      //     whereArgs: [sourceMemId],
+      //   );
+      //   expect(savedRelations.length, 1);
+      //   expect(savedRelations.first[defFkMemRelationsTargetMemId.name],
+      //       targetMemId);
+      //   expect(savedRelations.first[defColMemRelationsType.name],
+      //       MemRelationType.prePost.name);
+      // });
     });

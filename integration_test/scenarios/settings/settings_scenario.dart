@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -26,7 +25,6 @@ import 'package:mem/features/settings/preference/client.dart';
 import 'package:mem/features/settings/preference/repository.dart';
 import 'package:mem/features/settings/preference/preference.dart';
 import 'package:mem/features/settings/preference/keys.dart';
-import 'package:settings_ui/settings_ui.dart';
 
 import '../helpers.dart';
 
@@ -76,124 +74,6 @@ void main() => group(_scenarioName, () {
         expect(find.text(l10n.backupLabel), findsOneWidget);
         expect(find.byIcon(Icons.backup), findsOneWidget);
         expect(find.text(l10n.resetNotificationLabel), findsOneWidget);
-      });
-
-      group('Start of day', () {
-        setUp(() async {
-          await PreferenceRepository().discard(startOfDayKey);
-        });
-
-        testWidgets(': pick.', (widgetTester) async {
-          // Windows環境ではTimePickerの座標ベースタップが不安定なためスキップ
-          if (Platform.isWindows) {
-            return;
-          }
-
-          await runApplication();
-          await widgetTester.pumpAndSettle();
-
-          await widgetTester.tap(drawerIconFinder);
-          await widgetTester.pumpAndSettle();
-          await widgetTester.tap(find.text(l10n.settingsPageTitle));
-          await widgetTester.pumpAndSettle();
-
-          await widgetTester.tap(find.text(l10n.startOfDayLabel));
-          await widgetTester.pumpAndSettle();
-
-          // TimePickerダイアログが表示されることを確認
-          expect(find.text('OK'), findsOneWidget);
-
-          // OKボタンをタップしてTimePickerのデフォルト値（12:00 AM）を確定
-          await widgetTester.tap(okFinder);
-          await widgetTester.pumpAndSettle();
-
-          // TimePickerのデフォルト値（12:00 AM）が設定されることを確認
-          expect(
-            widgetTester
-                .widget<Text>(find
-                    .descendant(
-                      of: find.byType(SettingsTile),
-                      matching: find.byType(Text),
-                    )
-                    .at(1))
-                .data,
-            "12:00 AM",
-          );
-          expect(
-            (await PreferenceRepository().shipByKey(startOfDayKey)).value,
-            TimeOfDay(hour: 0, minute: 0),
-          );
-        });
-
-        group('With saved', () {
-          final startOfDay = TimeOfDay(hour: 5, minute: 0);
-          final now = DateTime.now();
-          setUp(() async {
-            await PreferenceRepository()
-                .receive(PreferenceEntity(startOfDayKey, startOfDay));
-
-            final savedMem = await MemRepository().receive(
-                MemEntity(Mem("$insertedMemName - Start of day", null, null)));
-            await MemNotificationRepository().receive(
-              MemNotificationEntity(
-                MemNotification.by(
-                  savedMem.id,
-                  MemNotificationType.repeat,
-                  // 00:01
-                  60,
-                  null,
-                ),
-              ),
-            );
-            final savedMem2 = await MemRepository().receive(MemEntity(
-                Mem("$insertedMemName - Start of day - 2", null, null)));
-            await MemNotificationRepository().receive(
-              MemNotificationEntity(
-                MemNotification.by(
-                  savedMem2.id,
-                  MemNotificationType.repeat,
-                  // 23:59
-                  60 * 60 * 24 - 60,
-                  null,
-                ),
-              ),
-            );
-          });
-
-          testWidgets('show saved.', (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
-
-            await widgetTester.tap(drawerIconFinder);
-            await widgetTester.pumpAndSettle();
-            await widgetTester.tap(find.text(l10n.settingsPageTitle));
-            await widgetTester.pumpAndSettle();
-
-            expect(
-                widgetTester
-                    .widget<Text>(find
-                        .descendant(
-                            of: find.byType(SettingsTile),
-                            matching: find.byType(Text))
-                        .at(1))
-                    .data,
-                "5:00 AM");
-          });
-
-          testWidgets("Before start of tomorrow is today's habit.",
-              (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle(waitLongSideEffectDuration);
-
-            final date = now.subtract(Duration(
-                days:
-                    TimeOfDay.fromDateTime(now).isBefore(startOfDay) ? 1 : 0));
-            expect(widgetTester.widget<Text>(find.byType(Text).at(0)).data,
-                equals(dateText(date)));
-            expect(
-                find.text(dateText(date.add(Duration(days: 1)))), findsNothing);
-          });
-        });
       });
 
       // FIXME そもそも時間指定の通知全体が動いていない

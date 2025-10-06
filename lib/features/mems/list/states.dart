@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mems/mems_state.dart';
@@ -13,7 +14,6 @@ import 'package:mem/features/mem_notifications/mem_notification_repository.dart'
 import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
-import 'package:mem/values/constants.dart';
 
 final showNotArchivedProvider =
     StateNotifierProvider<ValueStateNotifier<bool>, bool>(
@@ -93,7 +93,7 @@ final memListProvider = StateNotifierProvider.autoDispose<
   final savedMemNotifications = ref.watch(savedMemNotificationsProvider);
 
   final startOfToday = DateTimeExt.startOfToday(
-    ref.watch(preferencesProvider).value?[startOfDayKey] ?? defaultStartOfDay,
+    ref.watch(preferenceProvider(startOfDayKey)),
   );
 
   return ValueStateNotifier(

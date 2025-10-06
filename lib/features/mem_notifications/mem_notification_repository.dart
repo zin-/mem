@@ -14,9 +14,6 @@ import 'mem_notification_entity.dart';
 // lintエラーになるためコメントアウト
 class MemNotificationRepository extends DatabaseTupleRepository<
     MemNotificationEntity, SavedMemNotificationEntity> {
-  MemNotificationRepository()
-      : super(databaseDefinition, defTableMemNotifications);
-
   @override
   SavedMemNotificationEntity pack(Map<String, dynamic> map) =>
       SavedMemNotificationEntity(map);
@@ -90,4 +87,10 @@ class MemNotificationRepository extends DatabaseTupleRepository<
           ],
         ),
       );
+
+  static MemNotificationRepository? _instance;
+  factory MemNotificationRepository({MemNotificationRepository? mock}) =>
+      _instance ??= mock ?? MemNotificationRepository._();
+  MemNotificationRepository._()
+      : super(databaseDefinition, defTableMemNotifications);
 }

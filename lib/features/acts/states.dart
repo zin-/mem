@@ -10,7 +10,6 @@ import 'package:mem/features/settings/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/acts/act_entity.dart';
-import 'package:mem/values/constants.dart';
 import 'package:mem/widgets/infinite_scroll.dart';
 import 'package:mem/shared/entities_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -28,9 +27,9 @@ class ActEntities extends _$ActEntities
           final acts = await ActRepository().ship(
             memId: memId,
             period: period.toPeriod(
-                DateAndTime.now(),
-                ref.watch(preferencesProvider).value?[startOfDayKey] ??
-                    defaultStartOfDay),
+              DateAndTime.now(),
+              ref.watch(preferenceProvider(startOfDayKey)),
+            ),
           );
 
           upsert(acts);

@@ -11,8 +11,6 @@ import 'package:mem/framework/repository/order_by.dart';
 // lintエラーになるためコメントアウト
 class MemRelationRepository
     extends DatabaseTupleRepository<MemRelationEntity, SavedMemRelationEntity> {
-  MemRelationRepository() : super(databaseDefinition, defTableMemRelations);
-
   @override
   SavedMemRelationEntity pack(Map<String, dynamic> map) =>
       SavedMemRelationEntity(map);
@@ -82,4 +80,9 @@ class MemRelationRepository
           'condition': condition,
         },
       );
+
+  static MemRelationRepository? _instance;
+  factory MemRelationRepository({MemRelationRepository? mock}) =>
+      _instance ??= mock ?? MemRelationRepository._();
+  MemRelationRepository._() : super(databaseDefinition, defTableMemRelations);
 }

@@ -79,9 +79,9 @@ class MemNameText extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemNameText(
-          ref.watch(MemStateProvider(_memId)).valueOrNull?.name ?? '',
+          ref.watch(memStateProvider(_memId)).value?.name ?? '',
           _memNameTag(_memId),
-          ref.watch(MemStateProvider(_memId)).valueOrNull?.isDone ?? false,
+          ref.watch(memStateProvider(_memId)).value?.isDone ?? false,
         ),
         {
           '_memId': _memId,

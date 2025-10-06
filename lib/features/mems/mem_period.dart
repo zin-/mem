@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period_view.dart';
-import 'package:mem/framework/view/async_value_view.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
@@ -11,7 +10,6 @@ import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
 import 'package:mem/values/colors.dart';
-import 'package:mem/values/constants.dart';
 
 class MemPeriodTexts extends ConsumerWidget {
   final int _memId;
@@ -20,14 +18,11 @@ class MemPeriodTexts extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () => AsyncValueView(
-          preferencesProvider,
-          (loaded) => _MemPeriodTexts(
-            (ref.watch(memListProvider).firstWhere((mem) => mem.id == _memId))
-                .value
-                .period!,
-            loaded[startOfDayKey] ?? defaultStartOfDay,
-          ),
+        () => _MemPeriodTexts(
+          (ref.watch(memListProvider).firstWhere((mem) => mem.id == _memId))
+              .value
+              .period!,
+          ref.watch(preferenceProvider(startOfDayKey)),
         ),
       );
 }

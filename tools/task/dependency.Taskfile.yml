@@ -1,0 +1,35 @@
+# https://taskfile.dev
+
+version: '3'
+
+includes:
+  f: ./flutter.Taskfile.yml
+
+tasks:
+  default:
+    cmds:
+      - task: status
+    silent: true
+
+  status:
+    vars:
+      PACKAGE: '{{.PACKAGE}}'
+    cmds:
+      - task: f:pub:outdated
+        vars:
+          PACKAGE: '{{.PACKAGE}}'
+    silent: false
+  
+  get:
+    cmds:
+      - task: f:pub:get
+    silent: false
+
+  upgrade:
+    vars:
+      PACKAGE: '{{.PACKAGE}}'
+    cmds:
+      - task: f:pub:upgrade
+        vars:
+          PACKAGE: '{{.PACKAGE}}'
+    silent: false

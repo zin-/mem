@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:mem/features/mems/mem_store.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';

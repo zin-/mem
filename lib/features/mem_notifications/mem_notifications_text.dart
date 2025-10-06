@@ -11,7 +11,6 @@ import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
 import 'package:mem/values/colors.dart';
-import 'package:mem/values/constants.dart';
 
 class MemNotificationText extends ConsumerWidget {
   final int? _memId;
@@ -25,9 +24,7 @@ class MemNotificationText extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemNotificationText(
           ref.watch(memNotificationsByMemIdProvider(_memId)),
-          ref.read(preferencesProvider.select(
-            (v) => (v.value?[startOfDayKey] ?? defaultStartOfDay) as TimeOfDay,
-          )),
+          ref.watch(preferenceProvider(startOfDayKey)),
           ref.watch(
             latestActsByMemProvider.select(
               (value) => value?[_memId],

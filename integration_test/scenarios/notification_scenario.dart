@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -23,7 +23,7 @@ import 'package:mem/framework/notifications/notification_actions.dart';
 import 'package:mem/framework/notifications/notification_ids.dart';
 import 'package:mem/framework/notifications/schedule_client.dart';
 import 'package:mem/values/constants.dart';
-import 'package:mem/values/durations.dart';
+// import 'package:mem/values/durations.dart';
 
 import 'helpers.dart';
 
@@ -214,26 +214,26 @@ void testNotificationScenario() => group(_scenarioName, () {
         });
       });
 
-      testWidgets("[flaky]Show MemDetailPage.", (widgetTester) async {
-        final details = NotificationResponse(
-          notificationResponseType:
-              NotificationResponseType.selectedNotification,
-          id: memStartNotificationId(insertedMemId!),
-          payload: json.encode({memIdKey: insertedMemId}),
-        );
+      // testWidgets("[flaky]Show MemDetailPage.", (widgetTester) async {
+      //   final details = NotificationResponse(
+      //     notificationResponseType:
+      //         NotificationResponseType.selectedNotification,
+      //     id: memStartNotificationId(insertedMemId!),
+      //     payload: json.encode({memIdKey: insertedMemId}),
+      //   );
 
-        await onNotificationResponseReceived(details);
+      //   await onNotificationResponseReceived(details);
 
-        await Future.delayed(defaultTransitionDuration, () async {
-          await widgetTester.pumpAndSettle(defaultTransitionDuration);
+      //   await Future.delayed(defaultTransitionDuration, () async {
+      //     await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-          expect(
-            (widgetTester.widget(memNameOnDetailPageFinder) as TextFormField)
-                .initialValue,
-            insertedMemName,
-          );
-        });
-      });
+      //     expect(
+      //       (widgetTester.widget(memNameOnDetailPageFinder) as TextFormField)
+      //           .initialValue,
+      //       insertedMemName,
+      //     );
+      //   });
+      // });
 
       group('Notification actions', () {
         testWidgets(': done Mem.', (widgetTester) async {

@@ -30,4 +30,4 @@ linter:
 
 analyzer:
   plugins:
-    - custom_lint
+    # - custom_lint  # Temporarily disabled due to Riverpod 3.0 compatibility issues

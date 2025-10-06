@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mem/features/acts/counter/act_counter_configure.dart';
 import 'package:mem/features/acts/line_chart/line_chart_page.dart';
 import 'package:mem/features/dev/page.dart';
+import 'package:mem/features/settings/page.dart';
 import 'package:mem/home_screen.dart';
 import 'package:mem/features/mems/detail/page.dart';
 
@@ -12,6 +13,7 @@ const _memDetailPath = 'mems/:$_memIdKey';
 const _memChartPath = 'chart';
 const newActCountersPath = '${_homePath}act_counters/new';
 const devPath = 'dev';
+const settingsPath = 'settings';
 
 String buildMemDetailPath(int memId) => '${_homePath}mems/$memId';
 
@@ -40,6 +42,11 @@ GoRouter buildRouter([String? initialPath = _homePath]) => GoRouter(
                     ),
                   )
                 ]),
+            GoRoute(
+              path: settingsPath,
+              name: settingsPath,
+              builder: (_, __) => const SettingsPage(),
+            ),
             GoRoute(
               path: devPath,
 // coverage:ignore-start

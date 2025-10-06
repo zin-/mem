@@ -1,0 +1,68 @@
+---
+alwaysApply: true
+---
+
+# Principals(開発原則)
+
+以下の原則は、必ず遵守すること
+
+## Dry(Don't Repeat Yourself)
+
+同じことを複数記述・定義してはならない
+
+### Example(具体例)
+
+#### 同様の実装
+
+ドメインが異なっている場合を除き、コードの重複はするべきではない
+
+#### 実装とコメント
+
+**❌ 不要なコメント（書いてはいけない）:**
+```dart
+// ユーザー情報を取得する
+final user = getUser();
+// データベースに保存する
+await saveToDatabase(user);
+```
+
+**✅ 必要なコメント（書くべき）:**
+```dart
+// パフォーマンスのため、バッチ処理で一括更新
+// 個別更新だとN+1問題が発生するため
+await batchUpdate(users);
+```
+
+**原則**: コードが「何をしているか」は自明。コメントは「なぜそうしたか」のみ書く
+
+**テストコードでの注意:**
+```dart
+// ❌ 不要: 何をテストしているかの説明
+// Textウィジェットの内容を検証
+expect(textWidget.data, equals(expectedText));
+
+// ❌ 不要: 何をしているかの説明
+// 開始時刻の値がデフォルト値（12:00 AM）であることを確認
+final startOfDayValue = tester.widget<Text>(textWidgets.at(index)).data;
+
+// ✅ 必要: なぜその順番で検証するかの理由
+// AppBarのタイトルが最後（8番目）に来るため
+final titleText = _getTextWidget(tester, _TestConstants.appBarTitleIndex);
+```
+
+**コメント禁止パターン:**
+- `// 〜を取得する`
+- `// 〜を検証する`
+- `// 〜を確認する`
+- `// 〜を設定する`
+- `// 〜を表示する`
+
+**コメント許可パターン:**
+- `// なぜその実装にしたか`
+- `// なぜその順番なのか`
+- `// なぜその値なのか`
+- `// なぜその処理が必要なのか`
+
+### Relations(関連)
+
+- SSOT(Single Source Of Trues)

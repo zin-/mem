@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/framework/view/async_value_view.dart';
 import 'package:mem/features/settings/notify_after_inactivity.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/framework/notifications/notification_client.dart';
-import 'package:mem/values/constants.dart';
 
 import 'backup_section.dart';
 import 'preference/keys.dart';
@@ -18,35 +16,32 @@ class SettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => i(
-        () {
-          return AsyncValueView(
-            preferencesProvider,
-            (loaded) {
-              return _SettingsPage(
-                loaded[startOfDayKey] ?? defaultStartOfDay,
-                (TimeOfDay? picked) => v(
-                  () async => await ref
-                      .read(preferencesProvider.notifier)
-                      .replace(startOfDayKey, picked),
-                  {
-                    'picked': picked,
-                  },
-                ),
-                loaded[notifyAfterInactivity],
-                (picked) => v(
-                  () {
-                    ref
-                        .read(preferencesProvider.notifier)
-                        .replace(notifyAfterInactivity, picked);
-                  },
-                  {
-                    'picked': picked,
-                  },
-                ),
-              );
+        () => _SettingsPage(
+          ref.watch(preferenceProvider(startOfDayKey)),
+          (TimeOfDay? picked) => v(
+            () => picked == null
+                ? ref.read(preferenceProvider(startOfDayKey).notifier).remove()
+                : ref
+                    .read(preferenceProvider(startOfDayKey).notifier)
+                    .replace(picked),
+            {
+              'picked': picked,
             },
-          );
-        },
+          ),
+          ref.watch(preferenceProvider(notifyAfterInactivity)),
+          (picked) => v(
+            () => picked == null
+                ? ref
+                    .read(preferenceProvider(notifyAfterInactivity).notifier)
+                    .remove()
+                : ref
+                    .read(preferenceProvider(notifyAfterInactivity).notifier)
+                    .replace(picked),
+            {
+              'picked': picked,
+            },
+          ),
+        ),
       );
 }
 

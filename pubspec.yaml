@@ -57,14 +57,14 @@ dependencies:
   flutter_sticky_header: ^0.8.0
 
   ## for Transition
-  go_router: ^14.2.1
+  go_router: any
 
   ## for SettingsPage
   settings_ui: ^2.0.2
 
   ## for View state management
-  flutter_riverpod: ^2.6.1
-  riverpod_annotation: ^2.6.1
+  flutter_riverpod: ^3.0.0-dev.0
+  riverpod_annotation: ^3.0.0-dev.0
 
   ## for Chart
   fl_chart: ^0.69.1
@@ -115,15 +115,15 @@ dev_dependencies:
   integration_test:
     sdk: flutter
   mockito: ^5.4.6
-  build_runner: ^2.4.12
+  build_runner: ^2.4.8
 
   # for Lint
   flutter_lints: ^5.0.0
   custom_lint: ^0.7.5
 
   # for Riverpod
-  riverpod_generator: ^2.6.1
-  riverpod_lint: ^2.6.1
+  riverpod_generator: ^3.0.0-dev.0
+  riverpod_lint: ^3.0.0-dev.0
 
   # for Icon
   flutter_launcher_icons: ^0.14.1

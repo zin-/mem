@@ -13,15 +13,16 @@ import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/states.dart';
+import 'package:mem/features/settings/constants.dart';
+import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/preference/preference_key.dart';
+import 'package:mem/features/settings/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/features/acts/line_chart/line_chart_wrapper.dart';
-import 'package:mem/features/settings/preference/keys.dart';
-import 'package:mem/features/settings/states.dart';
-import 'package:mem/values/constants.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
 
 const _name = 'ActLineChartPage test';
+
 void main() {
   group(_name, () {
     testWidgets(
@@ -59,6 +60,9 @@ void main() {
                   defColArchivedAt.name: null,
                 })),
               ),
+              preferenceProvider(startOfDayKey).overrideWith(
+                () => _FakePreference(),
+              ),
               actListProvider(memId).overrideWith(
                 (ref) => acts
                     .mapIndexed((index, act) => SavedActEntity({
@@ -75,9 +79,6 @@ void main() {
                           defColArchivedAt.name: null,
                         }))
                     .toList(),
-              ),
-              preferencesProvider.overrideWith(
-                () => _FakePreferences(),
               ),
             ],
             child: MaterialApp(
@@ -103,12 +104,24 @@ void main() {
   });
 }
 
-class _FakePreferences extends Preferences {
+class _FakePreference<T> extends Preference<T> {
+  T? _value;
+
   @override
-  Future<Map<PreferenceKey, dynamic>> build() async {
-    return {
-      startOfDayKey: defaultStartOfDay,
-      notifyAfterInactivity: 10,
-    };
+  T build(PreferenceKey<T> key) {
+    _value ??= defaultPreferences[key] as T;
+    return _value as T;
+  }
+
+  @override
+  Future<void> replace(T updating) async {
+    _value = updating;
+    state = updating;
+  }
+
+  @override
+  Future<void> remove() async {
+    _value = defaultPreferences[key] as T;
+    state = _value as T;
   }
 }

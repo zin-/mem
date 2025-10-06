@@ -3,7 +3,7 @@ import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 
 mixin EntitiesStateMixin<T extends DatabaseTupleEntity<PK, dynamic>, PK>
-    on AutoDisposeNotifier<Iterable<T>> {
+    on AnyNotifier<Iterable<T>, Iterable<T>> {
   Iterable<T> upsert(Iterable<T> entities) => v(
         () {
           state = [
