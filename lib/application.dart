@@ -26,6 +26,8 @@ class MemApplication extends StatelessWidget {
           // ローカルでWindows向けにテストするときに必要
           locale: _languageCode == null ? null : Locale(_languageCode),
           theme: ThemeData.light(useMaterial3: true),
+          darkTheme: ThemeData.dark(useMaterial3: true),
+          themeMode: ThemeMode.system,
         ),
         {
           'initialPath': _initialPath,
