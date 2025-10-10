@@ -195,6 +195,52 @@ void main() {
             tester.widget<DropdownButton<int>>(secondDropdown);
         expect(updatedDropdown.value, equals(TargetUnit.time.index));
       });
+
+      testWidgets('should update display when target period changes',
+          (tester) async {
+        final targetEntity = TargetEntity(
+          Target(
+            memId: 1,
+            targetType: TargetType.equalTo,
+            targetUnit: TargetUnit.count,
+            value: 10,
+            period: Period.aDay,
+          ),
+        );
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              targetStateProvider(1).overrideWith(
+                () => _FakeTargetState(targetEntity),
+              ),
+            ],
+            child: MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(
+                body: TargetText(1),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final dropdownButtons = find.byType(DropdownButton<int>);
+        expect(dropdownButtons, findsNWidgets(3));
+
+        final thirdDropdown = dropdownButtons.at(2);
+        await tester.tap(thirdDropdown);
+        await tester.pumpAndSettle();
+
+        final weekMenuItem = find.text('aWeek').last;
+        await tester.tap(weekMenuItem);
+        await tester.pumpAndSettle();
+
+        final updatedDropdown =
+            tester.widget<DropdownButton<int>>(thirdDropdown);
+        expect(updatedDropdown.value, equals(Period.aWeek.index));
+      });
     });
   });
 }
