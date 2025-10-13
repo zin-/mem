@@ -8,6 +8,7 @@ import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/generated/l10n/app_localizations.dart';
 import 'package:mem/framework/view/integer_text_form_field.dart';
+import 'package:mem/framework/date_and_time/time_text_form_field.dart';
 
 class _FakeTargetState extends TargetState {
   final TargetEntity _entity;
@@ -55,6 +56,40 @@ void main() {
         expect(find.byType(TargetText), findsOneWidget);
         expect(find.byType(ListTile), findsOneWidget);
         expect(find.byIcon(Icons.check_circle), findsOneWidget);
+      });
+
+      testWidgets('should display TimeTextFormField when targetUnit is time',
+          (tester) async {
+        final targetEntity = TargetEntity(
+          Target(
+            memId: 1,
+            targetType: TargetType.equalTo,
+            targetUnit: TargetUnit.time,
+            value: 3600,
+            period: Period.aDay,
+          ),
+        );
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              targetStateProvider(1).overrideWith(
+                () => _FakeTargetState(targetEntity),
+              ),
+            ],
+            child: MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(
+                body: TargetText(1),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byType(TimeTextFormField), findsOneWidget);
+        expect(find.byType(IntegerTextFormField), findsNothing);
       });
     });
 
@@ -240,6 +275,98 @@ void main() {
         final updatedDropdown =
             tester.widget<DropdownButton<int>>(thirdDropdown);
         expect(updatedDropdown.value, equals(Period.aWeek.index));
+      });
+
+      testWidgets('should update display when time value changes',
+          (tester) async {
+        final targetEntity = TargetEntity(
+          Target(
+            memId: 1,
+            targetType: TargetType.equalTo,
+            targetUnit: TargetUnit.time,
+            value: 3600,
+            period: Period.aDay,
+          ),
+        );
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              targetStateProvider(1).overrideWith(
+                () => _FakeTargetState(targetEntity),
+              ),
+            ],
+            child: MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(
+                body: TargetText(1),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final timeField = find.byType(TimeTextFormField);
+        expect(timeField, findsOneWidget);
+
+        final textFormField = find.descendant(
+          of: timeField,
+          matching: find.byType(TextFormField),
+        );
+        expect(textFormField, findsOneWidget);
+
+        await tester.enterText(textFormField, '02:30:00');
+        await tester.pumpAndSettle();
+
+        expect(find.text('02:30:00'), findsOneWidget);
+      });
+
+      testWidgets('should handle time value validation with max limit',
+          (tester) async {
+        final targetEntity = TargetEntity(
+          Target(
+            memId: 1,
+            targetType: TargetType.equalTo,
+            targetUnit: TargetUnit.time,
+            value: 3600,
+            period: Period.aDay,
+          ),
+        );
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              targetStateProvider(1).overrideWith(
+                () => _FakeTargetState(targetEntity),
+              ),
+            ],
+            child: MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(
+                body: TargetText(1),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final timeField = find.byType(TimeTextFormField);
+        expect(timeField, findsOneWidget);
+
+        final textFormField = find.descendant(
+          of: timeField,
+          matching: find.byType(TextFormField),
+        );
+        expect(textFormField, findsOneWidget);
+
+        // 99時間を超える値を入力（100時間 = 360000秒）
+        await tester.enterText(textFormField, '100:00:00');
+        await tester.pumpAndSettle();
+
+        // 値がnullになることを確認（バリデーションで除外される）
+        expect(find.text('100:00:00'), findsOneWidget);
       });
     });
   });
