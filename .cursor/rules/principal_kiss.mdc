@@ -2,7 +2,14 @@
 alwaysApply: true
 ---
 
-# Keep It Simple Stupid
+# KISS(Keep It Simple Stupid)
 
-シンプルで簡潔にしろ
+シンプルで愚鈍にしろ
 
+## 説明
+
+一度の変更は愚鈍かと思えるほど小さく、簡潔なほど良い
+
+## Relations(関連)
+
+- SRP(Single Responsibility Principle)

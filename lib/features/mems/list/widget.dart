@@ -142,7 +142,7 @@ class _MemListWidget extends StatelessWidget {
                     (e) => SliverStickyHeader(
                       header: Container(
                         height: 60.0,
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.surface,
                         padding: EdgeInsets.symmetric(horizontal: 16.0),
                         alignment: Alignment.centerLeft,
                         child: e.key == null

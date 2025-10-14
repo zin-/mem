@@ -2,21 +2,17 @@
 alwaysApply: true
 ---
 
-# Principals(開発原則)
-
-以下の原則は、必ず遵守すること
-
-## Dry(Don't Repeat Yourself)
+# Dry(Don't Repeat Yourself)
 
 同じことを複数記述・定義してはならない
 
-### Example(具体例)
+## Example(具体例)
 
-#### 同様の実装
+### 同様の実装
 
 ドメインが異なっている場合を除き、コードの重複はするべきではない
 
-#### 実装とコメント
+### 実装とコメント
 
 **❌ 不要なコメント（書いてはいけない）:**
 ```dart
@@ -63,6 +59,6 @@ final titleText = _getTextWidget(tester, _TestConstants.appBarTitleIndex);
 - `// なぜその値なのか`
 - `// なぜその処理が必要なのか`
 
-### Relations(関連)
+## Relations(関連)
 
 - SSOT(Single Source Of Trues)
