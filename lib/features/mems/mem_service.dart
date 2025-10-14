@@ -320,13 +320,19 @@ class MemService {
 
   static MemService? _instance;
 
-  factory MemService() => i(
+  factory MemService(
+          {MemRepository? memRepository,
+          MemItemRepository? memItemRepository,
+          MemNotificationRepository? memNotificationRepository,
+          TargetRepository? targetRepository,
+          MemRelationRepository? memRelationRepository}) =>
+      i(
         () => _instance ??= MemService._(
-          MemRepository(),
-          MemItemRepository(),
-          MemNotificationRepository(),
-          TargetRepository(),
-          MemRelationRepository(),
+          memRepository ?? MemRepository(),
+          memItemRepository ?? MemItemRepository(),
+          memNotificationRepository ?? MemNotificationRepository(),
+          targetRepository ?? TargetRepository(),
+          memRelationRepository ?? MemRelationRepository(),
         ),
       );
 }
