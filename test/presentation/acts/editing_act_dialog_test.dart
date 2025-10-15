@@ -19,84 +19,85 @@ class _FakeActEntities extends ActEntities {
 
 void main() {
   group('EditingActDialog test', () {
-    testWidgets('should show dialog.', (tester) async {
-      final targetActEntity = SavedActEntity({
-        defPkId.name: 1,
-        defFkActsMemId.name: 1,
-        defColActsStart.name: DateTime.now(),
-        defColActsStartIsAllDay.name: false,
-        defColActsEnd.name: null,
-        defColActsEndIsAllDay.name: null,
-        defColActsPausedAt.name: null,
-        defColCreatedAt.name: DateTime.now(),
-        defColUpdatedAt.name: DateTime.now(),
-        defColArchivedAt.name: null,
+    group('should show', () {
+      testWidgets('dialog.', (tester) async {
+        final targetActEntity = SavedActEntity({
+          defPkId.name: 1,
+          defFkActsMemId.name: 1,
+          defColActsStart.name: DateTime.now(),
+          defColActsStartIsAllDay.name: false,
+          defColActsEnd.name: null,
+          defColActsEndIsAllDay.name: null,
+          defColActsPausedAt.name: null,
+          defColCreatedAt.name: DateTime.now(),
+          defColUpdatedAt.name: DateTime.now(),
+          defColArchivedAt.name: null,
+        });
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              actEntitiesProvider
+                  .overrideWith(() => _FakeActEntities([targetActEntity])),
+            ],
+            child: MaterialApp(
+              home: Scaffold(
+                body: Builder(
+                  builder: (context) => TextButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) =>
+                            EditingActDialog(targetActEntity.id),
+                      );
+                    },
+                    child: const Text('Show Dialog'),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        await tester.tap(find.text('Show Dialog'));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(AlertDialog), findsOneWidget);
+        expect(find.byType(DateAndTimePeriodTextFormFields), findsOneWidget);
+        expect(find.byIcon(Icons.delete), findsOneWidget);
+        expect(find.byIcon(Icons.save_alt), findsOneWidget);
       });
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            actEntitiesProvider
-                .overrideWith(() => _FakeActEntities([targetActEntity])),
-          ],
-          child: MaterialApp(
-            home: Scaffold(
-              body: Builder(
-                builder: (context) => TextButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) =>
-                          EditingActDialog(targetActEntity.id),
-                    );
-                  },
-                  child: const Text('Show Dialog'),
+      testWidgets('no dialog when target act is not found.', (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              actEntitiesProvider.overrideWith(() => _FakeActEntities([])),
+            ],
+            child: MaterialApp(
+              home: Scaffold(
+                body: Builder(
+                  builder: (context) => TextButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => const EditingActDialog(1),
+                      );
+                    },
+                    child: const Text('Show Dialog'),
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      );
+        );
 
-      await tester.tap(find.text('Show Dialog'));
-      await tester.pumpAndSettle();
+        await tester.tap(find.text('Show Dialog'));
+        await tester.pumpAndSettle();
 
-      expect(find.byType(AlertDialog), findsOneWidget);
-      expect(find.byType(DateAndTimePeriodTextFormFields), findsOneWidget);
-      expect(find.byIcon(Icons.delete), findsOneWidget);
-      expect(find.byIcon(Icons.save_alt), findsOneWidget);
-    });
-
-    testWidgets('should not show dialog when target act is not found.',
-        (tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            actEntitiesProvider.overrideWith(() => _FakeActEntities([])),
-          ],
-          child: MaterialApp(
-            home: Scaffold(
-              body: Builder(
-                builder: (context) => TextButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => const EditingActDialog(1),
-                    );
-                  },
-                  child: const Text('Show Dialog'),
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      await tester.tap(find.text('Show Dialog'));
-      await tester.pumpAndSettle();
-
-      expect(find.byType(AlertDialog), findsNothing);
-      expect(find.text('Show Dialog'), findsOneWidget);
+        expect(find.byType(AlertDialog), findsNothing);
+        expect(find.text('Show Dialog'), findsOneWidget);
+      });
     });
   });
 }
