@@ -10,7 +10,8 @@ import 'package:mem/framework/date_and_time/date_and_time_period_view.dart';
 
 class _FakeActEntities extends ActEntities {
   final Iterable<SavedActEntity> _state;
-  int _editCallCount = 0;
+  int editCallCount = 0;
+  int removeCallCount = 0;
 
   _FakeActEntities(this._state);
 
@@ -19,7 +20,13 @@ class _FakeActEntities extends ActEntities {
 
   @override
   Future<void> edit(SavedActEntity act) async {
-    _editCallCount++;
+    editCallCount++;
+  }
+
+  @override
+  Future<Iterable<SavedActEntity>> removeAsync(Iterable<int> ids) async {
+    removeCallCount++;
+    return _state.where((e) => !ids.contains(e.id));
   }
 }
 
@@ -150,7 +157,54 @@ void main() {
       await tester.tap(find.byIcon(Icons.save_alt));
       await tester.pumpAndSettle();
 
-      expect(fakeActEntities._editCallCount, 1);
+      expect(fakeActEntities.editCallCount, 1);
+    });
+
+    testWidgets('should remove.', (tester) async {
+      final targetActEntity = SavedActEntity({
+        defPkId.name: 1,
+        defFkActsMemId.name: 1,
+        defColActsStart.name: DateTime.now(),
+        defColActsStartIsAllDay.name: false,
+        defColActsEnd.name: null,
+        defColActsEndIsAllDay.name: null,
+        defColActsPausedAt.name: null,
+        defColCreatedAt.name: DateTime.now(),
+        defColUpdatedAt.name: DateTime.now(),
+        defColArchivedAt.name: null,
+      });
+      final fakeActEntities = _FakeActEntities([targetActEntity]);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            actEntitiesProvider.overrideWith(() => fakeActEntities),
+          ],
+          child: MaterialApp(
+            home: Scaffold(
+              body: Builder(
+                builder: (context) => TextButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => const EditingActDialog(1),
+                    );
+                  },
+                  child: const Text('Show Dialog'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Show Dialog'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.delete));
+      await tester.pumpAndSettle();
+
+      expect(fakeActEntities.removeCallCount, 1);
     });
   });
 }
