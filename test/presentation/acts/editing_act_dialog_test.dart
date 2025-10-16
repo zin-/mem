@@ -114,7 +114,7 @@ void main() {
     });
 
     group('action', () {
-      testWidgets('should save.', (tester) async {
+      testWidgets('save.', (tester) async {
         final targetActEntity = SavedActEntity({
           defPkId.name: 1,
           defFkActsMemId.name: 1,
@@ -161,7 +161,7 @@ void main() {
         expect(fakeActEntities.editCallCount, 1);
       });
 
-      testWidgets('should remove.', (tester) async {
+      testWidgets('remove.', (tester) async {
         final targetActEntity = SavedActEntity({
           defPkId.name: 1,
           defFkActsMemId.name: 1,

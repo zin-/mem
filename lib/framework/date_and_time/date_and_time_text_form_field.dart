@@ -5,6 +5,8 @@ import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/features/logger/log_service.dart';
 
+const clearIcon = Icons.clear;
+
 class DateAndTimeTextFormField extends StatelessWidget {
   final DateAndTime? _dateAndTime;
   final void Function(DateAndTime? pickedDateAndTime) _onChanged;
@@ -107,7 +109,7 @@ class DateAndTimeTextFormField extends StatelessWidget {
                   ? const SizedBox.shrink()
                   : IconButton(
                       onPressed: () => _onChanged(null),
-                      icon: const Icon(Icons.clear),
+                      icon: const Icon(clearIcon),
                     ),
             ],
           );
