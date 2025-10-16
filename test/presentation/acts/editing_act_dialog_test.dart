@@ -10,7 +10,7 @@ import 'package:mem/framework/date_and_time/date_and_time_period_view.dart';
 
 class _FakeActEntities extends ActEntities {
   final Iterable<SavedActEntity> _state;
-  int editCallCount = 0;
+  int _editCallCount = 0;
 
   _FakeActEntities(this._state);
 
@@ -19,7 +19,7 @@ class _FakeActEntities extends ActEntities {
 
   @override
   Future<void> edit(SavedActEntity act) async {
-    editCallCount++;
+    _editCallCount++;
   }
 }
 
@@ -150,7 +150,7 @@ void main() {
       await tester.tap(find.byIcon(Icons.save_alt));
       await tester.pumpAndSettle();
 
-      expect(fakeActEntities.editCallCount, 1);
+      expect(fakeActEntities._editCallCount, 1);
     });
   });
 }
