@@ -32,7 +32,7 @@ class _FakeActEntities extends ActEntities {
 
 void main() {
   group('EditingActDialog test', () {
-    group('should show', () {
+    group('show', () {
       testWidgets('dialog.', (tester) async {
         final targetActEntity = SavedActEntity({
           defPkId.name: 1,
@@ -113,98 +113,100 @@ void main() {
       });
     });
 
-    testWidgets('should save.', (tester) async {
-      final targetActEntity = SavedActEntity({
-        defPkId.name: 1,
-        defFkActsMemId.name: 1,
-        defColActsStart.name: DateTime.now(),
-        defColActsStartIsAllDay.name: false,
-        defColActsEnd.name: null,
-        defColActsEndIsAllDay.name: null,
-        defColActsPausedAt.name: null,
-        defColCreatedAt.name: DateTime.now(),
-        defColUpdatedAt.name: DateTime.now(),
-        defColArchivedAt.name: null,
-      });
-      final fakeActEntities = _FakeActEntities([targetActEntity]);
+    group('action', () {
+      testWidgets('should save.', (tester) async {
+        final targetActEntity = SavedActEntity({
+          defPkId.name: 1,
+          defFkActsMemId.name: 1,
+          defColActsStart.name: DateTime.now(),
+          defColActsStartIsAllDay.name: false,
+          defColActsEnd.name: null,
+          defColActsEndIsAllDay.name: null,
+          defColActsPausedAt.name: null,
+          defColCreatedAt.name: DateTime.now(),
+          defColUpdatedAt.name: DateTime.now(),
+          defColArchivedAt.name: null,
+        });
+        final fakeActEntities = _FakeActEntities([targetActEntity]);
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            actEntitiesProvider.overrideWith(() => fakeActEntities),
-          ],
-          child: MaterialApp(
-            home: Scaffold(
-              body: Builder(
-                builder: (context) => TextButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => const EditingActDialog(1),
-                    );
-                  },
-                  child: const Text('Show Dialog'),
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              actEntitiesProvider.overrideWith(() => fakeActEntities),
+            ],
+            child: MaterialApp(
+              home: Scaffold(
+                body: Builder(
+                  builder: (context) => TextButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => const EditingActDialog(1),
+                      );
+                    },
+                    child: const Text('Show Dialog'),
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      );
+        );
 
-      await tester.tap(find.text('Show Dialog'));
-      await tester.pumpAndSettle();
+        await tester.tap(find.text('Show Dialog'));
+        await tester.pumpAndSettle();
 
-      await tester.tap(find.byIcon(Icons.save_alt));
-      await tester.pumpAndSettle();
+        await tester.tap(find.byIcon(Icons.save_alt));
+        await tester.pumpAndSettle();
 
-      expect(fakeActEntities.editCallCount, 1);
-    });
-
-    testWidgets('should remove.', (tester) async {
-      final targetActEntity = SavedActEntity({
-        defPkId.name: 1,
-        defFkActsMemId.name: 1,
-        defColActsStart.name: DateTime.now(),
-        defColActsStartIsAllDay.name: false,
-        defColActsEnd.name: null,
-        defColActsEndIsAllDay.name: null,
-        defColActsPausedAt.name: null,
-        defColCreatedAt.name: DateTime.now(),
-        defColUpdatedAt.name: DateTime.now(),
-        defColArchivedAt.name: null,
+        expect(fakeActEntities.editCallCount, 1);
       });
-      final fakeActEntities = _FakeActEntities([targetActEntity]);
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            actEntitiesProvider.overrideWith(() => fakeActEntities),
-          ],
-          child: MaterialApp(
-            home: Scaffold(
-              body: Builder(
-                builder: (context) => TextButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => const EditingActDialog(1),
-                    );
-                  },
-                  child: const Text('Show Dialog'),
+      testWidgets('should remove.', (tester) async {
+        final targetActEntity = SavedActEntity({
+          defPkId.name: 1,
+          defFkActsMemId.name: 1,
+          defColActsStart.name: DateTime.now(),
+          defColActsStartIsAllDay.name: false,
+          defColActsEnd.name: null,
+          defColActsEndIsAllDay.name: null,
+          defColActsPausedAt.name: null,
+          defColCreatedAt.name: DateTime.now(),
+          defColUpdatedAt.name: DateTime.now(),
+          defColArchivedAt.name: null,
+        });
+        final fakeActEntities = _FakeActEntities([targetActEntity]);
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              actEntitiesProvider.overrideWith(() => fakeActEntities),
+            ],
+            child: MaterialApp(
+              home: Scaffold(
+                body: Builder(
+                  builder: (context) => TextButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => const EditingActDialog(1),
+                      );
+                    },
+                    child: const Text('Show Dialog'),
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      );
+        );
 
-      await tester.tap(find.text('Show Dialog'));
-      await tester.pumpAndSettle();
+        await tester.tap(find.text('Show Dialog'));
+        await tester.pumpAndSettle();
 
-      await tester.tap(find.byIcon(Icons.delete));
-      await tester.pumpAndSettle();
+        await tester.tap(find.byIcon(Icons.delete));
+        await tester.pumpAndSettle();
 
-      expect(fakeActEntities.removeCallCount, 1);
+        expect(fakeActEntities.removeCallCount, 1);
+      });
     });
   });
 }
