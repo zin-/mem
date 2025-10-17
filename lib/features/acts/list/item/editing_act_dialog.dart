@@ -10,19 +10,20 @@ const saveIcon = Icons.save_alt;
 const deleteIcon = Icons.delete;
 
 class EditingActDialog extends ConsumerWidget {
-  final int _actId;
+  final int actId;
 
-  const EditingActDialog(this._actId, {super.key});
+  const EditingActDialog(this.actId, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final editingActEntity = ref.watch(
+    final actEntity = ref.watch(
       actEntitiesProvider.select(
-        (e) => e.where((e) => e.id == _actId).firstOrNull,
+        (entities) =>
+            entities.where((entity) => entity.id == actId).firstOrNull,
       ),
     );
 
-    if (editingActEntity == null) {
+    if (actEntity == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (context.mounted) {
           Navigator.pop(context);
@@ -31,38 +32,36 @@ class EditingActDialog extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
-    return _EditingActDialogStateful(
-      initialAct: editingActEntity.value,
+    return _EditingActDialogContent(
+      initialAct: actEntity.value,
       onDelete: () => v(() async {
-        await ref.read(actEntitiesProvider.notifier).removeAsync([_actId]);
+        await ref.read(actEntitiesProvider.notifier).removeAsync([actId]);
       }),
       onSave: (editedAct) => v(() {
-        final updatedEntity = editingActEntity.updatedWith(
-          (v) => editedAct,
-        );
+        final updatedEntity = actEntity.updatedWith((_) => editedAct);
         ref.read(actEntitiesProvider.notifier).edit(updatedEntity);
       }),
     );
   }
 }
 
-class _EditingActDialogStateful extends StatefulWidget {
+class _EditingActDialogContent extends StatefulWidget {
   final Act initialAct;
   final VoidCallback onDelete;
   final Function(Act) onSave;
 
-  const _EditingActDialogStateful({
+  const _EditingActDialogContent({
     required this.initialAct,
     required this.onDelete,
     required this.onSave,
   });
 
   @override
-  State<_EditingActDialogStateful> createState() =>
-      _EditingActDialogStatefulState();
+  State<_EditingActDialogContent> createState() =>
+      _EditingActDialogContentState();
 }
 
-class _EditingActDialogStatefulState extends State<_EditingActDialogStateful> {
+class _EditingActDialogContentState extends State<_EditingActDialogContent> {
   late Act _editingAct;
 
   @override
@@ -71,77 +70,43 @@ class _EditingActDialogStatefulState extends State<_EditingActDialogStateful> {
     _editingAct = widget.initialAct;
   }
 
+  void _onPeriodChanged(DateAndTimePeriod? pickedPeriod) {
+    setState(() {
+      _editingAct = Act.by(
+        _editingAct.memId,
+        startWhen: pickedPeriod?.start ?? _editingAct.period?.start,
+        endWhen: pickedPeriod?.end ?? _editingAct.period?.end,
+      );
+    });
+  }
+
+  void _onSave() {
+    widget.onSave(_editingAct);
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return _EditingActDialogComponent(
-      _editingAct,
-      (pickedPeriod) => v(
-        () {
-          setState(() {
-            _editingAct = Act.by(
-              _editingAct.memId,
-              startWhen: pickedPeriod == null
-                  ? _editingAct.period?.start
-                  : pickedPeriod.start!,
-              endWhen: pickedPeriod == null
-                  ? _editingAct.period?.end
-                  : pickedPeriod.end,
-            );
-          });
-        },
-        pickedPeriod,
+    return AlertDialog(
+      content: DateAndTimePeriodTextFormFields(
+        _editingAct.period,
+        _onPeriodChanged,
       ),
-      widget.onDelete,
-      () => v(() => widget.onSave(_editingAct)),
+      actions: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              onPressed: widget.onDelete,
+              icon: const Icon(deleteIcon),
+            ),
+            IconButton(
+              onPressed: _onSave,
+              icon: const Icon(saveIcon),
+            ),
+          ],
+        )
+      ],
     );
   }
-}
-
-class _EditingActDialogComponent extends StatelessWidget {
-  final Act _editingAct;
-  final Function(DateAndTimePeriod? picked) _onPeriodChanged;
-  final Function() _onDeleteTapped;
-  final Function() _onSaveTapped;
-
-  const _EditingActDialogComponent(
-    this._editingAct,
-    this._onPeriodChanged,
-    this._onDeleteTapped,
-    this._onSaveTapped,
-  );
-
-  @override
-  Widget build(BuildContext context) => v(
-        () {
-          return AlertDialog(
-            content: DateAndTimePeriodTextFormFields(
-              _editingAct.period,
-              _onPeriodChanged,
-            ),
-            actions: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    onPressed: () async {
-                      await _onDeleteTapped();
-                    },
-                    icon: const Icon(deleteIcon),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      _onSaveTapped();
-                      Navigator.pop(context);
-                    },
-                    icon: const Icon(saveIcon),
-                  ),
-                ],
-              )
-            ],
-          );
-        },
-        {
-          '_editingAct': _editingAct,
-        },
-      );
 }
