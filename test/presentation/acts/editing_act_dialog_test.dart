@@ -155,7 +155,7 @@ void main() {
         await tester.tap(find.text('Show Dialog'));
         await tester.pumpAndSettle();
 
-        await tester.tap(find.byIcon(Icons.save_alt));
+        await tester.tap(find.byIcon(saveIcon));
         await tester.pumpAndSettle();
 
         expect(fakeActEntities.editCallCount, 1);
@@ -202,7 +202,7 @@ void main() {
         await tester.tap(find.text('Show Dialog'));
         await tester.pumpAndSettle();
 
-        await tester.tap(find.byIcon(Icons.delete));
+        await tester.tap(find.byIcon(deleteIcon));
         await tester.pumpAndSettle();
 
         expect(fakeActEntities.removeCallCount, 1);

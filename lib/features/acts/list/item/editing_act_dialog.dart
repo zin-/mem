@@ -6,6 +6,9 @@ import 'package:mem/framework/date_and_time/date_and_time_period_view.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/features/logger/log_service.dart';
 
+const saveIcon = Icons.save_alt;
+const deleteIcon = Icons.delete;
+
 class EditingActDialog extends ConsumerWidget {
   final int _actId;
 
@@ -123,14 +126,14 @@ class _EditingActDialogComponent extends StatelessWidget {
                     onPressed: () async {
                       await _onDeleteTapped();
                     },
-                    icon: const Icon(Icons.delete),
+                    icon: const Icon(deleteIcon),
                   ),
                   IconButton(
                     onPressed: () {
                       _onSaveTapped();
                       Navigator.pop(context);
                     },
-                    icon: const Icon(Icons.save_alt),
+                    icon: const Icon(saveIcon),
                   ),
                 ],
               )
