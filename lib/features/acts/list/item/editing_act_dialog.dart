@@ -74,8 +74,8 @@ class _EditingActDialogContentState extends State<_EditingActDialogContent> {
     setState(() {
       _editingAct = Act.by(
         _editingAct.memId,
-        startWhen: pickedPeriod?.start ?? _editingAct.period?.start,
-        endWhen: pickedPeriod?.end ?? _editingAct.period?.end,
+        startWhen: pickedPeriod?.start,
+        endWhen: pickedPeriod?.end,
       );
     });
   }
