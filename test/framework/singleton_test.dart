@@ -6,7 +6,7 @@ import 'package:mockito/mockito.dart';
 import 'singleton_test.mocks.dart';
 
 class TestSample {
-  TestSample._(); // private
+  TestSample._();
 
   factory TestSample() => Singleton.of(() => TestSample._());
 
