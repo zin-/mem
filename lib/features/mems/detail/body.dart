@@ -64,7 +64,7 @@ class _MemDetailBodyComponent extends StatelessWidget {
                     children: [
                       MemNameTextFormField(_memId),
                       MemDoneCheckbox(
-                        _mem,
+                        _mem.value,
                         _onMemDoneChanged,
                       ),
                       MemPeriodTextFormFields(_memId),
