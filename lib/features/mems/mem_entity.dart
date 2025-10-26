@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
@@ -48,6 +49,7 @@ class SavedMemEntity extends MemEntity with DatabaseTupleEntity<int, Mem> {
   SavedMemEntity(Map<String, dynamic> map)
       : super(
           Mem(
+            map[defPkId.name],
             map[defColMemsName.name],
             map[defColMemsDoneAt.name],
             map[defColMemsStartOn.name] == null &&

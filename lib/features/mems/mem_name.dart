@@ -26,7 +26,7 @@ class MemNameTextFormField extends ConsumerWidget {
             (value) =>
                 ref.read(editingMemByMemIdProvider(_memId).notifier).updatedBy(
                       editingMem.updatedWith(
-                        (mem) => Mem(value, mem.doneAt, mem.period),
+                        (mem) => Mem(mem.id, value, mem.doneAt, mem.period),
                       ),
                     ),
           );

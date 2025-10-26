@@ -18,7 +18,7 @@ class MemStore {
                 _memStock.add(savedMem);
                 return savedMem.value;
               }
-              return Mem("", null, null);
+              return Mem(null, "", null, null);
             }),
         {
           'memId': memId,

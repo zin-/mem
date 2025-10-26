@@ -76,7 +76,7 @@ class MemPeriodTextFormFields extends ConsumerWidget {
                   .read(editingMemByMemIdProvider(_memId).notifier)
                   .updatedBy(
                     memEntity.updatedWith(
-                      (mem) => Mem(mem.name, mem.doneAt, pickedPeriod),
+                      (mem) => Mem(mem.id, mem.name, mem.doneAt, pickedPeriod),
                     ),
                   ),
               pickedPeriod,

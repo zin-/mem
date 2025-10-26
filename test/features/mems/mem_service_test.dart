@@ -56,7 +56,7 @@ void main() {
           () async {
         // Arrange
         const testMemId = 1;
-        final mem = MemEntity(Mem('Test Mem', null, null));
+        final mem = MemEntity(Mem(null, 'Test Mem', null, null));
         final memItems = <MemItemEntity>[];
         final memNotifications = <MemNotificationEntity>[];
         final target = TargetEntity(
@@ -134,7 +134,7 @@ void main() {
           () async {
         // Arrange
         const testMemId = 1;
-        final mem = MemEntity(Mem('Test Mem', null, null));
+        final mem = MemEntity(Mem(null, 'Test Mem', null, null));
         final memItems = <MemItemEntity>[];
         final memNotifications = <MemNotificationEntity>[];
         final target = null;
@@ -181,7 +181,7 @@ void main() {
           () async {
         // Arrange
         const testMemId = 1;
-        final mem = MemEntity(Mem('Test Mem', null, null));
+        final mem = MemEntity(Mem(null, 'Test Mem', null, null));
         final memItems = <MemItemEntity>[];
         final memNotifications = <MemNotificationEntity>[];
         final target = TargetEntity(
