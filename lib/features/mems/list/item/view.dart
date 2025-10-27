@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/states.dart';
-import 'package:mem/features/mems/list/item/mem_list_item_state.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mems_state.dart';
+import 'package:mem/features/mems/transitions.dart';
 import 'package:mem/framework/view/timer.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/detail/states.dart';
@@ -16,20 +16,21 @@ import 'package:mem/values/colors.dart';
 import 'subtitle.dart';
 
 class MemListItemView extends ConsumerWidget {
-  final int _memId;
-  final void Function(int memId) _onTapped;
+  final Mem _mem;
 
-  const MemListItemView(this._memId, this._onTapped, {super.key});
+  const MemListItemView(this._mem, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _render(
-          ref.watch(memListItemProvider(_memId as MemId)),
-          _onTapped,
+          _mem,
+          () => showMemDetailPage(context, ref, _mem.id as int),
           (bool? value, int memId) => v(
             () => value == true
-                ? ref.read(memEntitiesProvider.notifier).doneMem(_memId)
-                : ref.read(memEntitiesProvider.notifier).undoneMem(_memId),
+                ? ref.read(memEntitiesProvider.notifier).doneMem(_mem.id as int)
+                : ref
+                    .read(memEntitiesProvider.notifier)
+                    .undoneMem(_mem.id as int),
             {
               'value': value,
               'memId': memId,
@@ -37,24 +38,31 @@ class MemListItemView extends ConsumerWidget {
           ),
           ref.watch(
             latestActsByMemProvider.select(
-              (value) => value?[_memId],
+              (value) => value?[_mem.id as int],
             ),
           ),
-          () => ref.read(actEntitiesProvider.notifier).startActby(_memId),
-          () => ref.read(actEntitiesProvider.notifier).finishActby(_memId),
-          () => ref.read(actEntitiesProvider.notifier).pauseByMemId(_memId),
-          () => ref.read(actEntitiesProvider.notifier).closeByMemId(_memId),
-          ref.watch(memNotificationsByMemIdProvider(_memId)),
+          () =>
+              ref.read(actEntitiesProvider.notifier).startActby(_mem.id as int),
+          () => ref
+              .read(actEntitiesProvider.notifier)
+              .finishActby(_mem.id as int),
+          () => ref
+              .read(actEntitiesProvider.notifier)
+              .pauseByMemId(_mem.id as int),
+          () => ref
+              .read(actEntitiesProvider.notifier)
+              .closeByMemId(_mem.id as int),
+          ref.watch(memNotificationsByMemIdProvider(_mem.id as int)),
         ),
         {
-          '_memId': _memId,
+          '_mem': _mem,
         },
       );
 }
 
 ListTile _render(
   Mem mem,
-  void Function(int memId) onTap,
+  void Function() onTap,
   void Function(bool? value, int memId) onMemDoneCheckboxTapped,
   Act? latestActByMem,
   void Function() startAct,
@@ -102,7 +110,7 @@ ListTile _render(
                     ElapsedTimeView(latestActByMem.period!.start!),
                   ],
                 ),
-          onTap: () => onTap(mem.id as int),
+          onTap: onTap,
           leading: hasEnableMemNotifications
               ? hasActiveAct
                   ? pauseIconButton
