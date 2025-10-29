@@ -30,6 +30,8 @@ class MemListWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => AsyncValueView(
+          // TODO この先のRepositoryの使い方を変更する
+          // ここが一番最初に発生するDBアクセス
           loadMemList,
           (loaded) => _MemListWidget(
             _scrollController,
