@@ -7,7 +7,6 @@ import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/list/item/view.dart';
 import 'package:mem/features/mems/list/item/subtitle.dart';
-import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_done_checkbox.dart';
