@@ -52,7 +52,7 @@ void main() {
         ProviderScope(
           overrides: [
             latestActsByMemProvider.overrideWith((ref) => {memId: null}),
-            memNotificationsProvider.overrideWith(
+            memNotificationsByMemIdProvider(memId).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntity>([])),
             // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
@@ -104,7 +104,7 @@ void main() {
         ProviderScope(
           overrides: [
             latestActsByMemProvider.overrideWith((ref) => {memId: activeAct}),
-            memNotificationsProvider.overrideWith(
+            memNotificationsByMemIdProvider(memId).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntity>([])),
             // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
@@ -149,7 +149,7 @@ void main() {
         ProviderScope(
           overrides: [
             latestActsByMemProvider.overrideWith((ref) => {memId: pausedAct}),
-            memNotificationsProvider.overrideWith(
+            memNotificationsByMemIdProvider(memId).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntity>([])),
             // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
@@ -203,7 +203,7 @@ void main() {
         ProviderScope(
           overrides: [
             latestActsByMemProvider.overrideWith((ref) => {memId: null}),
-            memNotificationsProvider.overrideWith((ref) =>
+            memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                 ListValueStateNotifier<MemNotificationEntity>([notification])),
             // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
@@ -243,7 +243,7 @@ void main() {
         ProviderScope(
           overrides: [
             latestActsByMemProvider.overrideWith((ref) => {memId: null}),
-            memNotificationsProvider.overrideWith(
+            memNotificationsByMemIdProvider(memId).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntity>([])),
             // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
@@ -283,7 +283,7 @@ void main() {
         ProviderScope(
           overrides: [
             latestActsByMemProvider.overrideWith((ref) => {memId: null}),
-            memNotificationsProvider.overrideWith(
+            memNotificationsByMemIdProvider(memId).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntity>([])),
             // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
@@ -324,7 +324,7 @@ void main() {
         ProviderScope(
           overrides: [
             latestActsByMemProvider.overrideWith((ref) => {memId: null}),
-            memNotificationsProvider.overrideWith(
+            memNotificationsByMemIdProvider(memId).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntity>([])),
             // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
@@ -377,7 +377,7 @@ void main() {
         ProviderScope(
           overrides: [
             latestActsByMemProvider.overrideWith((ref) => {memId: null}),
-            memNotificationsProvider.overrideWith((ref) =>
+            memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                 ListValueStateNotifier<MemNotificationEntity>([notification])),
             // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
@@ -429,7 +429,7 @@ void main() {
         ProviderScope(
           overrides: [
             latestActsByMemProvider.overrideWith((ref) => {memId: null}),
-            memNotificationsProvider.overrideWith((ref) =>
+            memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                 ListValueStateNotifier<MemNotificationEntity>([notification])),
             // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
@@ -480,7 +480,7 @@ void main() {
         ProviderScope(
           overrides: [
             latestActsByMemProvider.overrideWith((ref) => {memId: null}),
-            memNotificationsProvider.overrideWith((ref) =>
+            memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                 ListValueStateNotifier<MemNotificationEntity>([notification])),
             // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
@@ -519,7 +519,7 @@ void main() {
         ProviderScope(
           overrides: [
             latestActsByMemProvider.overrideWith((ref) => {memId: null}),
-            memNotificationsProvider.overrideWith(
+            memNotificationsByMemIdProvider(memId).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntity>([])),
             // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
@@ -551,6 +551,252 @@ void main() {
       final listTile = tester.widget<ListTile>(find.byType(ListTile));
       expect(listTile.subtitle, isNull);
       expect(listTile.isThreeLine, isFalse);
+    });
+
+    testWidgets(
+        'displays active act with timer in title and pause/stop buttons',
+        (tester) async {
+      final activeAct = ActiveAct(
+          memId,
+          DateAndTime.from(
+              DateTime.now().subtract(const Duration(minutes: 5))));
+      final now = DateTime.now();
+      final notification = SavedMemNotificationEntity({
+        defPkId.name: 1,
+        defFkMemNotificationsMemId.name: memId,
+        defColMemNotificationsType.name: 'repeat',
+        defColMemNotificationsTime.name: 9 * 60 * 60,
+        defColMemNotificationsMessage.name: 'Repeat',
+        defColCreatedAt.name: now,
+        defColUpdatedAt.name: now,
+        defColArchivedAt.name: null,
+      });
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            latestActsByMemProvider.overrideWith((ref) => {memId: activeAct}),
+            memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
+                ListValueStateNotifier<MemNotificationEntity>([notification])),
+            memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
+            memEntitiesProvider.overrideWith(() => _FakeMemEntities([
+                  SavedMemEntity({
+                    'id': baseMem.id,
+                    'name': baseMem.name,
+                    'doneAt': baseMem.doneAt,
+                    'notifyOn': null,
+                    'notifyAt': null,
+                    'endOn': null,
+                    'endAt': null,
+                    'createdAt': DateTime.now(),
+                    'updatedAt': DateTime.now(),
+                    'archivedAt': null,
+                  })
+                ])),
+          ],
+          child: MaterialApp(
+            home: Scaffold(
+              body: MemListItemView(baseMem),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // アクティブなアクトがある場合、タイトルにElapsedTimeViewが表示される
+      expect(find.byType(ElapsedTimeView), findsOneWidget);
+      // leadingにpauseボタンが表示される
+      expect(find.byIcon(Icons.pause), findsOneWidget);
+      // trailingにstopボタンが表示される
+      expect(find.byIcon(Icons.stop), findsOneWidget);
+      // subtitleが表示される
+      expect(find.byType(MemListItemSubtitle), findsOneWidget);
+      final listTile = tester.widget<ListTile>(find.byType(ListTile));
+      expect(listTile.isThreeLine, isFalse); // mem.periodがnullなのでfalse
+    });
+
+    testWidgets(
+        'displays paused act with close button in leading and play button in trailing',
+        (tester) async {
+      final pausedAct =
+          PausedAct(memId, DateTime.now().subtract(const Duration(minutes: 5)));
+      final now = DateTime.now();
+      final notification = SavedMemNotificationEntity({
+        defPkId.name: 1,
+        defFkMemNotificationsMemId.name: memId,
+        defColMemNotificationsType.name: 'repeat',
+        defColMemNotificationsTime.name: 9 * 60 * 60,
+        defColMemNotificationsMessage.name: 'Repeat',
+        defColCreatedAt.name: now,
+        defColUpdatedAt.name: now,
+        defColArchivedAt.name: null,
+      });
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            latestActsByMemProvider.overrideWith((ref) => {memId: pausedAct}),
+            memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
+                ListValueStateNotifier<MemNotificationEntity>([notification])),
+            memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
+            memEntitiesProvider.overrideWith(() => _FakeMemEntities([
+                  SavedMemEntity({
+                    'id': baseMem.id,
+                    'name': baseMem.name,
+                    'doneAt': baseMem.doneAt,
+                    'notifyOn': null,
+                    'notifyAt': null,
+                    'endOn': null,
+                    'endAt': null,
+                    'createdAt': DateTime.now(),
+                    'updatedAt': DateTime.now(),
+                    'archivedAt': null,
+                  })
+                ])),
+          ],
+          child: MaterialApp(
+            home: Scaffold(
+              body: MemListItemView(baseMem),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // leadingにcloseボタンが表示される
+      expect(find.byIcon(Icons.close), findsOneWidget);
+      // trailingにplayボタンが表示される
+      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+      // subtitleが表示される
+      expect(find.byType(MemListItemSubtitle), findsOneWidget);
+      final listTile = tester.widget<ListTile>(find.byType(ListTile));
+      expect(listTile.isThreeLine, isFalse); // mem.periodがnullなのでfalse
+    });
+
+    testWidgets(
+        'displays active act with period and notifications enabled - isThreeLine true',
+        (tester) async {
+      final memWithPeriod = Mem(memId, 'Mem with Period', null,
+          DateAndTimePeriod(start: DateAndTime.now()));
+      final activeAct = ActiveAct(
+          memId,
+          DateAndTime.from(
+              DateTime.now().subtract(const Duration(minutes: 5))));
+      final now = DateTime.now();
+      final notification = SavedMemNotificationEntity({
+        defPkId.name: 1,
+        defFkMemNotificationsMemId.name: memId,
+        defColMemNotificationsType.name: 'repeat',
+        defColMemNotificationsTime.name: 9 * 60 * 60,
+        defColMemNotificationsMessage.name: 'Repeat',
+        defColCreatedAt.name: now,
+        defColUpdatedAt.name: now,
+        defColArchivedAt.name: null,
+      });
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            latestActsByMemProvider.overrideWith((ref) => {memId: activeAct}),
+            memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
+                ListValueStateNotifier<MemNotificationEntity>([notification])),
+            memStateProvider(memId)
+                .overrideWith(() => _FakeMemState(memWithPeriod)),
+            memEntitiesProvider.overrideWith(() => _FakeMemEntities([
+                  SavedMemEntity({
+                    'id': memWithPeriod.id,
+                    'name': memWithPeriod.name,
+                    'doneAt': memWithPeriod.doneAt,
+                    'notifyOn': null,
+                    'notifyAt': null,
+                    'endOn': memWithPeriod.period?.end?.toIso8601String(),
+                    'endAt': memWithPeriod.period?.end?.toIso8601String(),
+                    'createdAt': DateTime.now(),
+                    'updatedAt': DateTime.now(),
+                    'archivedAt': null,
+                  })
+                ])),
+          ],
+          child: MaterialApp(
+            home: Scaffold(
+              body: MemListItemView(memWithPeriod),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // アクティブなアクトがある場合、タイトルにElapsedTimeViewが表示される
+      expect(find.byType(ElapsedTimeView), findsOneWidget);
+      // leadingにpauseボタンが表示される
+      expect(find.byIcon(Icons.pause), findsOneWidget);
+      // trailingにstopボタンが表示される
+      expect(find.byIcon(Icons.stop), findsOneWidget);
+      // subtitleが表示される
+      expect(find.byType(MemListItemSubtitle), findsOneWidget);
+      final listTile = tester.widget<ListTile>(find.byType(ListTile));
+      expect(listTile.isThreeLine, isTrue); // mem.periodがnullでないのでtrue
+    });
+
+    testWidgets(
+        'displays paused act with period and notifications enabled - isThreeLine true',
+        (tester) async {
+      final memWithPeriod = Mem(memId, 'Mem with Period', null,
+          DateAndTimePeriod(start: DateAndTime.now()));
+      final pausedAct =
+          PausedAct(memId, DateTime.now().subtract(const Duration(minutes: 5)));
+      final now = DateTime.now();
+      final notification = SavedMemNotificationEntity({
+        defPkId.name: 1,
+        defFkMemNotificationsMemId.name: memId,
+        defColMemNotificationsType.name: 'repeat',
+        defColMemNotificationsTime.name: 9 * 60 * 60,
+        defColMemNotificationsMessage.name: 'Repeat',
+        defColCreatedAt.name: now,
+        defColUpdatedAt.name: now,
+        defColArchivedAt.name: null,
+      });
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            latestActsByMemProvider.overrideWith((ref) => {memId: pausedAct}),
+            memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
+                ListValueStateNotifier<MemNotificationEntity>([notification])),
+            memStateProvider(memId)
+                .overrideWith(() => _FakeMemState(memWithPeriod)),
+            memEntitiesProvider.overrideWith(() => _FakeMemEntities([
+                  SavedMemEntity({
+                    'id': memWithPeriod.id,
+                    'name': memWithPeriod.name,
+                    'doneAt': memWithPeriod.doneAt,
+                    'notifyOn': null,
+                    'notifyAt': null,
+                    'endOn': memWithPeriod.period?.end?.toIso8601String(),
+                    'endAt': memWithPeriod.period?.end?.toIso8601String(),
+                    'createdAt': DateTime.now(),
+                    'updatedAt': DateTime.now(),
+                    'archivedAt': null,
+                  })
+                ])),
+          ],
+          child: MaterialApp(
+            home: Scaffold(
+              body: MemListItemView(memWithPeriod),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // leadingにcloseボタンが表示される
+      expect(find.byIcon(Icons.close), findsOneWidget);
+      // trailingにplayボタンが表示される
+      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+      // subtitleが表示される
+      expect(find.byType(MemListItemSubtitle), findsOneWidget);
+      final listTile = tester.widget<ListTile>(find.byType(ListTile));
+      expect(listTile.isThreeLine, isTrue); // mem.periodがnullでないのでtrue
     });
   });
 }
