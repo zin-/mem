@@ -4,10 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/states.dart';
+import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_view.dart';
 import 'package:mem/framework/nullable.dart';
-import 'package:mem/framework/view/async_value_view.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_entity.dart';
@@ -17,10 +17,8 @@ import 'package:mem/features/mems/transitions.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
 
-import 'actions.dart';
 import 'app_bar.dart';
 import 'item/view.dart';
-import 'states.dart';
 
 class MemListWidget extends ConsumerWidget {
   final ScrollController _scrollController;
@@ -29,20 +27,15 @@ class MemListWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () => AsyncValueView(
-          // TODO この先のRepositoryの使い方を変更する
-          // ここが一番最初に発生するDBアクセス
-          loadMemList,
-          (loaded) => _MemListWidget(
-            _scrollController,
-            ref.watch(memListProvider).toList(),
-            ref.watch(preferenceProvider(startOfDayKey)),
-            ref.watch(memNotificationsProvider),
-            ref.watch(latestActsByMemProvider.select(
-              (value) => value?.values.whereType<Act>().toList() ?? [],
-            )),
-            (memId) => showMemDetailPage(context, ref, memId),
-          ),
+        () => _MemListWidget(
+          _scrollController,
+          ref.watch(memEntitiesProvider).toList(),
+          ref.watch(preferenceProvider(startOfDayKey)),
+          ref.watch(memNotificationsProvider),
+          ref.watch(latestActsByMemProvider.select(
+            (value) => value?.values.whereType<Act>().toList() ?? [],
+          )),
+          (memId) => showMemDetailPage(context, ref, memId),
         ),
       );
 }

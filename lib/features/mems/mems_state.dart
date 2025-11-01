@@ -4,6 +4,7 @@ import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation_state.dart';
+import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/mems/mem_client.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
@@ -15,36 +16,36 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'mems_state.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class MemEntities extends _$MemEntities
     with EntitiesStateMixin<SavedMemEntity, int> {
   @override
-  Iterable<SavedMemEntity> build() {
-    return [];
-  }
+  Iterable<SavedMemEntity> build() => v(
+        () {
+          ref.listen<bool>(showNotArchivedProvider, (_, __) => loadMemList());
+          ref.listen<bool>(showArchivedProvider, (_, __) => loadMemList());
+          ref.listen<bool>(showNotDoneProvider, (_, __) => loadMemList());
+          ref.listen<bool>(showDoneProvider, (_, __) => loadMemList());
 
-  Future<List<SavedMemEntity>> loadMemList(
-    bool showArchived,
-    bool showNotArchived,
-    bool showDone,
-    bool showNotDone,
-  ) =>
-      v(
+          loadMemList();
+
+          return [];
+        },
+      );
+
+  Future<void> loadMemList() => v(
         () async {
+          final showNotArchived = ref.read(showNotArchivedProvider);
+          final showArchived = ref.read(showArchivedProvider);
+          final showNotDone = ref.read(showNotDoneProvider);
+          final showDone = ref.read(showDoneProvider);
+
           final mems = await MemRepository().ship(
             archived: showNotArchived == showArchived ? null : showArchived,
             done: showNotDone == showDone ? null : showDone,
           );
 
           upsert(mems);
-
-          return mems;
-        },
-        {
-          'showArchived': showArchived,
-          'showNotArchived': showNotArchived,
-          'showDone': showDone,
-          'showNotDone': showNotDone,
         },
       );
 

@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/framework/view/async_value_view.dart';
+import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_entity.dart';
-
-import 'actions.dart';
-import 'states.dart';
 
 class MemListView extends ConsumerWidget {
   final Widget _appBar;
@@ -20,10 +17,9 @@ class MemListView extends ConsumerWidget {
   }) : _scrollController = scrollController;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => AsyncValueView(
-        loadMemList,
-        (data) => _MemListViewComponent(
-          ref.watch(memListProvider),
+  Widget build(BuildContext context, WidgetRef ref) => v(
+        () => _MemListViewComponent(
+          ref.watch(memEntitiesProvider).toList(),
           _appBar,
           _itemBuilder,
           _scrollController,
