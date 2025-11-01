@@ -13,7 +13,6 @@ import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/states.dart';
-import 'package:mem/features/mems/transitions.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
 
@@ -35,7 +34,6 @@ class MemListWidget extends ConsumerWidget {
           ref.watch(latestActsByMemProvider.select(
             (value) => value?.values.whereType<Act>().toList() ?? [],
           )),
-          (memId) => showMemDetailPage(context, ref, memId),
         ),
       );
 }
@@ -46,7 +44,6 @@ class _MemListWidget extends StatelessWidget {
   final TimeOfDay _startOfDay;
   final Iterable<MemNotificationEntity> _memNotifications;
   final Iterable<Act> _latestActsByMem;
-  final void Function(int memId) _onItemTapped;
 
   const _MemListWidget(
     this._scrollController,
@@ -54,7 +51,6 @@ class _MemListWidget extends StatelessWidget {
     this._startOfDay,
     this._memNotifications,
     this._latestActsByMem,
-    this._onItemTapped,
   );
 
   @override
@@ -159,7 +155,6 @@ class _MemListWidget extends StatelessWidget {
         {
           '_scrollController': _scrollController,
           '_memList': _memList,
-          '_onItemTapped': _onItemTapped,
         },
       );
 }
