@@ -9,6 +9,7 @@ import 'package:mem/features/mems/mem_client.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/mems/mem_service.dart';
+import 'package:mem/features/mems/mem_store.dart';
 import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/shared/entities_state.dart';
@@ -40,7 +41,7 @@ class MemEntities extends _$MemEntities
           final showNotDone = ref.read(showNotDoneProvider);
           final showDone = ref.read(showDoneProvider);
 
-          final mems = await MemRepository().ship(
+          final mems = await MemStore().serve(
             archived: showNotArchived == showArchived ? null : showArchived,
             done: showNotDone == showDone ? null : showDone,
           );
