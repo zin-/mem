@@ -255,12 +255,19 @@ void main() => group(
           await widgetTester.pumpAndSettle();
 
           await widgetTester.tap(showArchiveSwitchFinder);
+          await widgetTester.pumpAndSettle(waitSideEffectDuration);
+
           await widgetTester.tap(showNotArchiveSwitchFinder);
-          await widgetTester.pumpAndSettle();
+          await widgetTester.pumpAndSettle(waitLongSideEffectDuration);
 
           expect(find.text(unarchivedMemName), findsNothing);
           expect(find.text(archivedMemName), findsOneWidget);
 
+          await closeMemListFilter(widgetTester);
+          await widgetTester.pumpAndSettle(waitSideEffectDuration);
+
+          await widgetTester.tap(filterListIconFinder);
+          await widgetTester.pumpAndSettle();
           await widgetTester.tap(showArchiveSwitchFinder);
           await widgetTester.pumpAndSettle();
 
