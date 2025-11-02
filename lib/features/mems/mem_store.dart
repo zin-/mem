@@ -4,7 +4,11 @@ import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 
-// FIXME MemsStoreの方が適切か？
+// BEとの連携は全てStoreを通じて行う
+// - TODO FEで保持される情報はどうする？
+//   - ユーザーだけの設定とか
+//   ここで混ぜる　べき？もう一層あるべき？
+// - FIXME MemsStoreの方が適切か？
 class MemStore {
   final MemRepository _memRepository;
 
