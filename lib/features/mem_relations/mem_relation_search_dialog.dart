@@ -22,8 +22,15 @@ class MemRelationDialogStateful extends StatefulWidget {
 }
 
 class _MemRelationDialogStatefulState extends State<MemRelationDialogStateful> {
-  String searchText = "";
-  List<int> selectedMemIds = [];
+  late String searchText;
+  late List<int> selectedMemIds;
+
+  @override
+  void initState() {
+    super.initState();
+    searchText = "";
+    selectedMemIds = List.from(widget.selectedMemIds);
+  }
 
   @override
   Widget build(BuildContext context) => v(
