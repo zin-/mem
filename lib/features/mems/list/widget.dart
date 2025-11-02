@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/states.dart';
-import 'package:mem/features/mems/mems_state.dart';
+import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_view.dart';
 import 'package:mem/framework/nullable.dart';
@@ -28,7 +28,7 @@ class MemListWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemListWidget(
           _scrollController,
-          ref.watch(memEntitiesProvider).toList(),
+          ref.watch(memListProvider),
           ref.watch(preferenceProvider(startOfDayKey)),
           ref.watch(memNotificationsProvider),
           ref.watch(latestActsByMemProvider.select(
