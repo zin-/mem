@@ -41,7 +41,7 @@ final showDoneProvider = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
 final _filteredMemsProvider = StateNotifierProvider.autoDispose<
     ListValueStateNotifier<SavedMemEntity>, List<SavedMemEntity>>(
   (ref) {
-    final savedMems = ref.watch(memEntitiesProvider);
+    final savedMemEntities = ref.watch(memEntitiesProvider);
 
     final showNotArchived = ref.watch(showNotArchivedProvider);
     final showArchived = ref.watch(showArchivedProvider);
@@ -51,7 +51,7 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
 
     return ListValueStateNotifier(
       v(
-        () => savedMems.where((mem) {
+        () => savedMemEntities.where((mem) {
           if (showNotArchived == showArchived) {
             return true;
           } else {
@@ -72,7 +72,7 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
           }
         }).toList(),
         {
-          'savedMems': savedMems,
+          'savedMemEntities': savedMemEntities,
           'showNotArchived': showNotArchived,
           'showArchived': showArchived,
           'showNotDone': showNotDone,
