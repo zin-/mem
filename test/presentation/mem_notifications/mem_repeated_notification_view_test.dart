@@ -69,7 +69,8 @@ void main() {
       expect(find.byIcon(Icons.clear), findsOneWidget);
     });
 
-    testWidgets('displays TimeOfDayTextFormField with defaultTime when time is null',
+    testWidgets(
+        'displays TimeOfDayTextFormField with defaultTime when time is null',
         (tester) async {
       const memId = 1;
       final now = DateTime.now();
@@ -118,7 +119,8 @@ void main() {
         defColArchivedAt.name: null,
       });
 
-      final notifier = ListValueStateNotifier<MemNotificationEntity>([notification]);
+      final notifier =
+          ListValueStateNotifier<MemNotificationEntity>([notification]);
 
       await tester.pumpWidget(
         _buildTestApp(
@@ -160,7 +162,8 @@ void main() {
         defColArchivedAt.name: null,
       });
 
-      final notifier = ListValueStateNotifier<MemNotificationEntity>([notification]);
+      final notifier =
+          ListValueStateNotifier<MemNotificationEntity>([notification]);
 
       await tester.pumpWidget(
         _buildTestApp(
@@ -183,7 +186,8 @@ void main() {
       expect(updatedNotification.value.time, null);
     });
 
-    testWidgets('calls onTimeChanged with null when TimeOfDayTextFormField returns null',
+    testWidgets(
+        'calls onTimeChanged with null when TimeOfDayTextFormField returns null',
         (tester) async {
       const memId = 1;
       final now = DateTime.now();
@@ -198,7 +202,8 @@ void main() {
         defColArchivedAt.name: null,
       });
 
-      final notifier = ListValueStateNotifier<MemNotificationEntity>([notification]);
+      final notifier =
+          ListValueStateNotifier<MemNotificationEntity>([notification]);
 
       await tester.pumpWidget(
         _buildTestApp(
@@ -258,4 +263,3 @@ void main() {
     });
   });
 }
-
