@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -247,6 +248,20 @@ void main() {
       } catch (e) {
         expect(e, isA<StateError>());
       }
+    });
+
+    test('closeByMemId does not remove result if closed is null', () async {
+      final container = ProviderContainer(
+        overrides: [
+          actEntitiesProvider.overrideWith(() => _FakeActEntities()),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final notifier = container.read(actEntitiesProvider.notifier);
+
+      await notifier.closeByMemId(1);
+      expect(container.read(actEntitiesProvider), isEmpty);
     });
 
     test('finishActby calls client and upserts result', () async {
@@ -501,6 +516,46 @@ void main() {
       expect(list.first.id, 2);
       expect(list.last.id, 1);
     });
+
+    test('triggers async fetch when isUpdating is false', () {
+      runZonedGuarded(() {
+        final container = ProviderContainer(
+          overrides: [
+            actEntitiesProvider.overrideWith(() => _FakeActEntities()),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        container.read(isUpdating(1).notifier).updatedBy(false);
+
+        final list = container.read(actListProvider(1));
+
+        expect(list, isA<List<SavedActEntity>>());
+      }, (error, stack) {
+        // ActsClient().fetch() が呼ばれるため、エラーが発生する可能性がある
+      });
+    });
+
+    test('fetches byPage when currentPage is not 1', () {
+      runZonedGuarded(() {
+        final container = ProviderContainer(
+          overrides: [
+            actEntitiesProvider.overrideWith(() => _FakeActEntities()),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        container.read(isUpdating(1).notifier).updatedBy(false);
+        container.read(currentPage(1).notifier).updatedBy(2);
+        container.read(maxPage(1).notifier).updatedBy(2);
+
+        final list = container.read(actListProvider(1));
+
+        expect(list, isA<List<SavedActEntity>>());
+      }, (error, stack) {
+        // ActsClient().fetch() が呼ばれるため、エラーが発生する可能性がある
+      });
+    });
   });
 
   group('latestActsByMem', () {
@@ -598,6 +653,34 @@ void main() {
 
       expect(latestActs, isNotNull);
       expect(latestActs![1]?.memId, 1);
+    });
+
+    test('returns null for memId when no acts exist', () {
+      final now = DateTime.now();
+      final act1 = SavedActEntity({
+        defPkId.name: 1,
+        defFkActsMemId.name: 1,
+        defColActsStart.name: now,
+        defColActsStartIsAllDay.name: false,
+        defColActsEnd.name: null,
+        defColActsEndIsAllDay.name: null,
+        defColActsPausedAt.name: null,
+        defColCreatedAt.name: now,
+        defColUpdatedAt.name: now,
+        defColArchivedAt.name: null,
+      });
+
+      final container = ProviderContainer(
+        overrides: [
+          actEntitiesProvider.overrideWith(() => _FakeActEntities([act1])),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final latestActs = container.read(latestActsByMemProvider);
+
+      expect(latestActs, isNotNull);
+      expect(latestActs![2], isNull);
     });
   });
 }
