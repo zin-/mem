@@ -4,23 +4,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/states.dart';
+import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_view.dart';
 import 'package:mem/framework/nullable.dart';
-import 'package:mem/framework/view/async_value_view.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/states.dart';
-import 'package:mem/features/mems/transitions.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
 
-import 'actions.dart';
 import 'app_bar.dart';
 import 'item/view.dart';
-import 'states.dart';
 
 class MemListWidget extends ConsumerWidget {
   final ScrollController _scrollController;
@@ -29,18 +26,14 @@ class MemListWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () => AsyncValueView(
-          loadMemList,
-          (loaded) => _MemListWidget(
-            _scrollController,
-            ref.watch(memListProvider).toList(),
-            ref.watch(preferenceProvider(startOfDayKey)),
-            ref.watch(memNotificationsProvider),
-            ref.watch(latestActsByMemProvider.select(
-              (value) => value?.values.whereType<Act>().toList() ?? [],
-            )),
-            (memId) => showMemDetailPage(context, ref, memId),
-          ),
+        () => _MemListWidget(
+          _scrollController,
+          ref.watch(memListProvider),
+          ref.watch(preferenceProvider(startOfDayKey)),
+          ref.watch(memNotificationsProvider),
+          ref.watch(latestActsByMemProvider.select(
+            (value) => value?.values.whereType<Act>().toList() ?? [],
+          )),
         ),
       );
 }
@@ -51,7 +44,6 @@ class _MemListWidget extends StatelessWidget {
   final TimeOfDay _startOfDay;
   final Iterable<MemNotificationEntity> _memNotifications;
   final Iterable<Act> _latestActsByMem;
-  final void Function(int memId) _onItemTapped;
 
   const _MemListWidget(
     this._scrollController,
@@ -59,7 +51,6 @@ class _MemListWidget extends StatelessWidget {
     this._startOfDay,
     this._memNotifications,
     this._latestActsByMem,
-    this._onItemTapped,
   );
 
   @override
@@ -94,8 +85,7 @@ class _MemListWidget extends StatelessWidget {
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
                     return MemListItemView(
-                      hasActMemList[true]![index].id,
-                      _onItemTapped,
+                      hasActMemList[true]![index].value,
                     );
                   },
                   childCount: hasActMemList[true]?.length ?? 0,
@@ -152,8 +142,7 @@ class _MemListWidget extends StatelessWidget {
                       sliver: SliverList(
                         delegate: SliverChildBuilderDelegate(
                           (context, index) => MemListItemView(
-                            e.value[index].id,
-                            _onItemTapped,
+                            e.value[index].value,
                           ),
                           childCount: e.value.length,
                         ),
@@ -166,7 +155,6 @@ class _MemListWidget extends StatelessWidget {
         {
           '_scrollController': _scrollController,
           '_memList': _memList,
-          '_onItemTapped': _onItemTapped,
         },
       );
 }

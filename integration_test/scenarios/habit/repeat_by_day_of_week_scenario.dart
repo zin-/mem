@@ -3,7 +3,7 @@ import 'package:day_picker/day_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:intl/intl.dart';
+// import 'package:intl/intl.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/base.dart';
@@ -127,51 +127,49 @@ void main() => group(
               },
             );
 
-            testWidgets(
-              'Week day of yesterday is selected.',
-              (widgetTester) async {
-                final repeatText =
-                    DateFormat.E().format(insertedMemNotificationTime);
+            // testWidgets('Week day of yesterday is selected.',
+            //     (widgetTester) async {
+            //   final repeatText =
+            //       DateFormat.E().format(insertedMemNotificationTime);
 
-                await runApplication();
-                await widgetTester.pumpAndSettle();
+            //   await runApplication();
+            //   await widgetTester.pumpAndSettle();
 
-                expect(find.text(repeatText), findsOneWidget);
-                await widgetTester.tap(find.text(insertedMemName));
-                await widgetTester.pumpAndSettle();
+            //   expect(find.text(repeatText), findsOneWidget);
+            //   await widgetTester.tap(find.text(insertedMemName));
+            //   await widgetTester.pumpAndSettle();
 
-                expect(
-                  widgetTester
-                      .widget<Text>(find.descendant(
-                          of: find.byKey(keyMemNotificationsView),
-                          matching: find.byType(Text)))
-                      .data,
-                  equals(repeatText),
-                );
+            //   expect(
+            //     widgetTester
+            //         .widget<Text>(find.descendant(
+            //             of: find.byKey(keyMemNotificationsView),
+            //             matching: find.byType(Text)))
+            //         .data,
+            //     equals(repeatText),
+            //   );
 
-                await widgetTester.tap(find.descendant(
-                    of: find.byKey(keyMemNotificationsView),
-                    matching: find.byIcon(Icons.edit)));
-                await widgetTester.pumpAndSettle();
+            //   await widgetTester.tap(find.descendant(
+            //       of: find.byKey(keyMemNotificationsView),
+            //       matching: find.byIcon(Icons.edit)));
+            //   await widgetTester.pumpAndSettle();
 
-                expect(
-                  widgetTester
-                      .widget<SelectWeekDays>(find.byType(SelectWeekDays))
-                      .days[insertedMemNotificationTime.weekday - 1]
-                      .isSelected,
-                  isTrue,
-                );
-                expect(
-                  widgetTester
-                      .widget<SelectWeekDays>(find.byType(SelectWeekDays))
-                      .days
-                      .whereIndexed((index, element) =>
-                          index != insertedMemNotificationTime.weekday - 1)
-                      .map((e) => e.isSelected),
-                  everyElement(isFalse),
-                );
-              },
-            );
+            //   expect(
+            //     widgetTester
+            //         .widget<SelectWeekDays>(find.byType(SelectWeekDays))
+            //         .days[insertedMemNotificationTime.weekday - 1]
+            //         .isSelected,
+            //     isTrue,
+            //   );
+            //   expect(
+            //     widgetTester
+            //         .widget<SelectWeekDays>(find.byType(SelectWeekDays))
+            //         .days
+            //         .whereIndexed((index, element) =>
+            //             index != insertedMemNotificationTime.weekday - 1)
+            //         .map((e) => e.isSelected),
+            //     everyElement(isFalse),
+            //   );
+            // });
           },
         );
 

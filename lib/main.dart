@@ -43,6 +43,7 @@ Future<void> _runApplication({
                 await NotificationRepository().ship() == false) {
               return runApp(
                 ProviderScope(
+                  // observers: [DebugObserver()],
                   child: MemApplication(
                     initialPath: initialPath,
                     languageCode: languageCode,
@@ -155,3 +156,21 @@ void workmanagerCallbackDispatcher() =>
         ),
       ),
     );
+
+// class DebugObserver extends ProviderObserver {
+//   @override
+//   void didDisposeProvider(ProviderObserverContext context) {
+//     debugPrint('Disposed provider: ${context.provider.name}');
+//   }
+
+//   @override
+//   void didAddProvider(ProviderObserverContext context, Object? value) {
+//     debugPrint('Added provider: ${context.provider.name}');
+//   }
+
+//   @override
+//   void didUpdateProvider(ProviderObserverContext context, Object? previousValue,
+//       Object? newValue) {
+//     debugPrint('Updated: ${context.provider.name}');
+//   }
+// }

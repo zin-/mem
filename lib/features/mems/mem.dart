@@ -3,20 +3,25 @@ import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 
+// FIXME uuidとかにする
+typedef MemId = int?;
+
 class Mem {
+  final MemId id;
+
   final String name;
   final DateTime? doneAt;
   final DateAndTimePeriod? period;
 
-  Mem(this.name, this.doneAt, this.period);
+  Mem(this.id, this.name, this.doneAt, this.period);
 
   bool get isArchived => false;
 
   bool get isDone => doneAt != null;
 
-  Mem done(DateTime when) => Mem(name, when, period);
+  Mem done(DateTime when) => Mem(id, name, when, period);
 
-  Mem undone() => Mem(name, null, period);
+  Mem undone() => Mem(id, name, null, period);
 
   DateTime? notifyAt(
     DateTime startOfToday,

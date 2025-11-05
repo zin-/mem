@@ -236,13 +236,17 @@ void main() => group(_scenarioName, () {
               ActsClient.resetSingleton();
 
               final savedMemWithNoAct = await MemRepository().receive(MemEntity(
-                  Mem("$_scenarioName - With habit operation - with no act",
-                      null, null)));
+                  Mem(
+                      null,
+                      "$_scenarioName - With habit operation - with no act",
+                      null,
+                      null)));
               await MemNotificationRepository().receive(MemNotificationEntity(
                   MemNotification.by(savedMemWithNoAct.id,
                       MemNotificationType.afterActStarted, 1, "with no act")));
               final savedMemWithActiveAct = await MemRepository().receive(
                   MemEntity(Mem(
+                      null,
                       "$_scenarioName - With habit operation - with active act",
                       null,
                       null)));

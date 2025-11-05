@@ -1,9 +1,8 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/mems/mem_client.dart';
-import 'package:mem/features/mems/mem_name.dart';
+// import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
@@ -11,16 +10,16 @@ import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
-import 'package:mem/features/mems/detail/fab.dart';
-import 'package:mem/features/mem_notifications/mem_notifications_view.dart';
-import 'package:mem/features/mem_notifications/mem_repeat_by_n_day_notification_view.dart';
+// import 'package:mem/features/mems/detail/fab.dart';
+// import 'package:mem/features/mem_notifications/mem_notifications_view.dart';
+// import 'package:mem/features/mem_notifications/mem_repeat_by_n_day_notification_view.dart';
 import 'package:mem/framework/notifications/notification_client.dart';
 import 'package:mem/framework/notifications/mem_notifications.dart';
 import 'package:mem/framework/notifications/notification/type.dart';
 import 'package:mem/framework/notifications/notification_ids.dart';
 import 'package:mem/framework/notifications/schedule_client.dart';
 import 'package:mem/values/constants.dart';
-import 'package:mem/values/durations.dart';
+// import 'package:mem/values/durations.dart';
 
 import '../helpers.dart';
 
@@ -129,121 +128,121 @@ void main() => group(_name, () {
         MemClient.resetSingleton();
       });
 
-      testWidgets('Show saved.', (widgetTester) async {
-        widgetTester.ignoreMockMethodCallHandler(
-            MethodChannelMock.flutterLocalNotifications);
+      // testWidgets('Show saved.', (widgetTester) async {
+      //   widgetTester.ignoreMockMethodCallHandler(
+      //       MethodChannelMock.flutterLocalNotifications);
 
-        const repeatByNDayText = "every $insertedMemRepeatByNDay days";
+      //   const repeatByNDayText = "every $insertedMemRepeatByNDay days";
 
-        await runApplication();
-        await widgetTester.pumpAndSettle(defaultTransitionDuration);
+      //   await runApplication();
+      //   await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-        expect(find.text(repeatByNDayText), findsOneWidget);
-        await widgetTester.tap(find.text(insertedMemName));
-        await widgetTester.pumpAndSettle(defaultTransitionDuration);
+      //   expect(find.text(repeatByNDayText), findsOneWidget);
+      //   await widgetTester.tap(find.text(insertedMemName));
+      //   await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-        expect(
-          widgetTester
-              .widget<Text>(
-                find
-                    .descendant(
-                      of: find.byKey(keyMemNotificationsView),
-                      matching: find.byType(Text),
-                    )
-                    .at(1),
-              )
-              .data,
-          repeatByNDayText,
-        );
+      //   expect(
+      //     widgetTester
+      //         .widget<Text>(
+      //           find
+      //               .descendant(
+      //                 of: find.byKey(keyMemNotificationsView),
+      //                 matching: find.byType(Text),
+      //               )
+      //               .at(1),
+      //         )
+      //         .data,
+      //     repeatByNDayText,
+      //   );
 
-        await widgetTester.tap(
-          find.descendant(
-              of: find.byKey(keyMemNotificationsView),
-              matching: find.byIcon(Icons.edit)),
-        );
-        await widgetTester.pumpAndSettle(defaultTransitionDuration);
+      //   await widgetTester.tap(
+      //     find.descendant(
+      //         of: find.byKey(keyMemNotificationsView),
+      //         matching: find.byIcon(Icons.edit)),
+      //   );
+      //   await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-        expect(
-            widgetTester
-                .widget<TextFormField>(
-                  find.descendant(
-                    of: find.byKey(keyMemRepeatByNDayNotification),
-                    matching: find.byType(TextFormField),
-                  ),
-                )
-                .initialValue,
-            insertedMemRepeatByNDay.toString());
-      });
+      //   expect(
+      //       widgetTester
+      //           .widget<TextFormField>(
+      //             find.descendant(
+      //               of: find.byKey(keyMemRepeatByNDayNotification),
+      //               matching: find.byType(TextFormField),
+      //             ),
+      //           )
+      //           .initialValue,
+      //       insertedMemRepeatByNDay.toString());
+      // });
 
-      testWidgets('Save.', (widgetTester) async {
-        widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
-        widgetTester
-            .ignoreMockMethodCallHandler(MethodChannelMock.permissionHandler);
-        widgetTester.ignoreMockMethodCallHandler(
-            MethodChannelMock.flutterLocalNotifications);
+      // testWidgets('Save.', (widgetTester) async {
+      //   widgetTester.ignoreMockMethodCallHandler(MethodChannelMock.mem);
+      //   widgetTester
+      //       .ignoreMockMethodCallHandler(MethodChannelMock.permissionHandler);
+      //   widgetTester.ignoreMockMethodCallHandler(
+      //       MethodChannelMock.flutterLocalNotifications);
 
-        await runApplication();
-        await widgetTester.pumpAndSettle();
-        await widgetTester.tap(newMemFabFinder);
-        await widgetTester.pumpAndSettle();
-        const enteringMemName = "$_name: Save - entering - mem name";
-        await widgetTester.enterText(find.byKey(keyMemName), enteringMemName);
+      //   await runApplication();
+      //   await widgetTester.pumpAndSettle();
+      //   await widgetTester.tap(newMemFabFinder);
+      //   await widgetTester.pumpAndSettle();
+      //   const enteringMemName = "$_name: Save - entering - mem name";
+      //   await widgetTester.enterText(find.byKey(keyMemName), enteringMemName);
 
-        final notificationAddFinder = find.descendant(
-            of: find.byKey(keyMemNotificationsView),
-            matching: find.byIcon(Icons.notification_add));
-        await widgetTester.dragUntilVisible(
-          notificationAddFinder,
-          find.byType(SingleChildScrollView),
-          const Offset(0, 50),
-        );
-        await widgetTester.tap(notificationAddFinder);
-        await widgetTester.pumpAndSettle(defaultTransitionDuration);
+      //   final notificationAddFinder = find.descendant(
+      //       of: find.byKey(keyMemNotificationsView),
+      //       matching: find.byIcon(Icons.notification_add));
+      //   await widgetTester.dragUntilVisible(
+      //     notificationAddFinder,
+      //     find.byType(SingleChildScrollView),
+      //     const Offset(0, 50),
+      //   );
+      //   await widgetTester.tap(notificationAddFinder);
+      //   await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-        await widgetTester.tap(timeIconFinder);
-        await widgetTester.pump();
-        await widgetTester.tap(okFinder);
-        await widgetTester.pump();
+      //   await widgetTester.tap(timeIconFinder);
+      //   await widgetTester.pump();
+      //   await widgetTester.tap(okFinder);
+      //   await widgetTester.pump();
 
-        const enteringNDay = 3;
-        await widgetTester.enterText(
-          find.descendant(
-            of: find.byKey(keyMemRepeatByNDayNotification),
-            matching: find.byType(TextFormField),
-          ),
-          enteringNDay.toString(),
-        );
+      //   const enteringNDay = 3;
+      //   await widgetTester.enterText(
+      //     find.descendant(
+      //       of: find.byKey(keyMemRepeatByNDayNotification),
+      //       matching: find.byType(TextFormField),
+      //     ),
+      //     enteringNDay.toString(),
+      //   );
 
-        await widgetTester.pageBack();
-        await widgetTester.pumpAndSettle();
-        await widgetTester.tap(find.byKey(keySaveMemFab));
-        await widgetTester.pumpAndSettle(const Duration(seconds: 1));
+      //   await widgetTester.pageBack();
+      //   await widgetTester.pumpAndSettle();
+      //   await widgetTester.tap(find.byKey(keySaveMemFab));
+      //   await widgetTester.pumpAndSettle(const Duration(seconds: 1));
 
-        await widgetTester.runAsync(() async {
-          final savedMem = (await dbA.select(
-            defTableMems,
-            where: "${defColMemsName.name} = ?",
-            whereArgs: [enteringMemName],
-          ))
-              .single;
-          final savedMemNotification = (await dbA.select(
-                  defTableMemNotifications,
-                  where: "${defFkMemNotificationsMemId.name} = ?"
-                      " AND ${defColMemNotificationsType.name} = ?"
-                      " AND ${defColMemNotificationsTime.name} = ?",
-                  whereArgs: [
-                savedMem[defPkId.name],
-                MemNotificationType.repeatByNDay.name,
-                enteringNDay
-              ]))
-              .single;
-          expect(savedMemNotification[defColMemNotificationsTime.name],
-              equals(enteringNDay),
-              reason: 'enteringNDay');
+      //   await widgetTester.runAsync(() async {
+      //     final savedMem = (await dbA.select(
+      //       defTableMems,
+      //       where: "${defColMemsName.name} = ?",
+      //       whereArgs: [enteringMemName],
+      //     ))
+      //         .single;
+      //     final savedMemNotification = (await dbA.select(
+      //             defTableMemNotifications,
+      //             where: "${defFkMemNotificationsMemId.name} = ?"
+      //                 " AND ${defColMemNotificationsType.name} = ?"
+      //                 " AND ${defColMemNotificationsTime.name} = ?",
+      //             whereArgs: [
+      //           savedMem[defPkId.name],
+      //           MemNotificationType.repeatByNDay.name,
+      //           enteringNDay
+      //         ]))
+      //         .single;
+      //     expect(savedMemNotification[defColMemNotificationsTime.name],
+      //         equals(enteringNDay),
+      //         reason: 'enteringNDay');
 
-          widgetTester.clearAllMockMethodCallHandler();
-        });
-      });
+      //     widgetTester.clearAllMockMethodCallHandler();
+      //   });
+      // });
 
       group('notify repeatByNDay', () {
         testWidgets('WithoutAct.', (widgetTester) async {

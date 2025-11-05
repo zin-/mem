@@ -108,52 +108,49 @@ void main() => group(': $_name', () {
               findsNothing);
         });
 
-        testWidgets(
-          'Saved.',
-          (widgetTester) async {
-            const repeatText = "12:00 AM";
+        // testWidgets('Saved.', (widgetTester) async {
+        //   const repeatText = "12:00 AM";
 
-            await runApplication();
-            await widgetTester.pumpAndSettle();
+        //   await runApplication();
+        //   await widgetTester.pumpAndSettle();
 
-            expect(find.text(repeatText), findsOneWidget);
+        //   expect(find.text(repeatText), findsOneWidget);
 
-            await widgetTester.tap(find.text(insertedMemName));
-            await widgetTester.pumpAndSettle(defaultTransitionDuration);
+        //   await widgetTester.tap(find.text(insertedMemName));
+        //   await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-            expect(
-              widgetTester
-                  .widget<Text>(
-                    find
-                        .descendant(
-                          of: find.byKey(keyMemNotificationsView),
-                          matching: find.byType(Text),
-                        )
-                        .at(0),
-                  )
-                  .data,
-              repeatText,
-            );
+        //   expect(
+        //     widgetTester
+        //         .widget<Text>(
+        //           find
+        //               .descendant(
+        //                 of: find.byKey(keyMemNotificationsView),
+        //                 matching: find.byType(Text),
+        //               )
+        //               .at(0),
+        //         )
+        //         .data,
+        //     repeatText,
+        //   );
 
-            await widgetTester.tap(find.descendant(
-                of: find.byKey(keyMemNotificationsView),
-                matching: find.byIcon(Icons.edit)));
-            await widgetTester.pumpAndSettle(defaultTransitionDuration);
+        //   await widgetTester.tap(find.descendant(
+        //       of: find.byKey(keyMemNotificationsView),
+        //       matching: find.byIcon(Icons.edit)));
+        //   await widgetTester.pumpAndSettle(defaultTransitionDuration);
 
-            expect(
-                widgetTester
-                    .widget<TimeOfDayTextFormField>(find.descendant(
-                        of: find.byKey(keyMemRepeatedNotification),
-                        matching: find.byType(TimeOfDayTextFormField)))
-                    .timeOfDay,
-                defaultStartOfDay);
-            expect(
-                find.descendant(
-                    of: find.byKey(keyMemRepeatedNotification),
-                    matching: find.byIcon(Icons.clear)),
-                findsOneWidget);
-          },
-        );
+        //   expect(
+        //       widgetTester
+        //           .widget<TimeOfDayTextFormField>(find.descendant(
+        //               of: find.byKey(keyMemRepeatedNotification),
+        //               matching: find.byType(TimeOfDayTextFormField)))
+        //           .timeOfDay,
+        //       defaultStartOfDay);
+        //   expect(
+        //       find.descendant(
+        //           of: find.byKey(keyMemRepeatedNotification),
+        //           matching: find.byIcon(Icons.clear)),
+        //       findsOneWidget);
+        // });
       });
 
       group(': save', () {

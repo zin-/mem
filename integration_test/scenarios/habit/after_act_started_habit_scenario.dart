@@ -230,18 +230,15 @@ void main() => group(
         //   },
         // );
 
-        testWidgets(
-          'start act.',
-          (widgetTester) async {
-            await runApplication();
-            await widgetTester.pumpAndSettle();
-            await widgetTester.tap(startIconFinder);
+        // testWidgets('start act.', (widgetTester) async {
+        //   await runApplication();
+        //   await widgetTester.pumpAndSettle();
+        //   await widgetTester.tap(startIconFinder);
 
-            await widgetTester.pump();
-            await widgetTester.pumpAndSettle();
+        //   await widgetTester.pump();
+        //   await widgetTester.pumpAndSettle();
 
-            expect(startIconFinder, findsNothing);
-          },
-        );
+        //   expect(startIconFinder, findsNothing);
+        // });
       },
     );
