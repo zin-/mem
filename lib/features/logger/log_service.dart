@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:mem/features/logger/sentry_wrapper.dart';
+import 'package:mem/framework/singleton.dart';
 
 import 'log.dart';
 import 'log_repository.dart';
@@ -144,21 +145,31 @@ class LogService {
   bool _shouldLog(Level level) =>
       _DebugLoggableFunction._debug || level.index >= _level.index;
 
-  LogService._(this._repository, this._level);
-
-  static LogService? _instance;
+  LogService._(this._repository, this._level) {
+    // LogServiceの初期化中なので、通常のログ出力とは別に実装する必要がある
+    // 他の初期化処理と統一感がある感じにしたいけど現状他に利用している箇所がないのでどうなるのかよく分からない
+    _repository.receive(Log(
+      Level.info,
+      [],
+      'new LogService: level=$_level',
+      null,
+      null,
+    ));
+  }
 
   factory LogService({
     Level level = Level.info,
     bool enableSimpleLog = false,
     bool enableErrorReport = false,
   }) =>
-      _instance ??= LogService._(
-        LogRepository(
-          LoggerWrapper(enableSimpleLog),
-          enableErrorReport ? SentryWrapper() : null, // coverage:ignore-line
+      Singleton.of(
+        () => LogService._(
+          LogRepository(
+            LoggerWrapper(enableSimpleLog),
+            enableErrorReport ? SentryWrapper() : null, // coverage:ignore-line
+          ),
+          level,
         ),
-        level,
       );
 }
 
