@@ -27,34 +27,26 @@ Future<void> launchActCounterConfigure() async {
 Future<void> _runApplication({
   String? initialPath,
   String? languageCode,
-}) =>
-    i(
+}) async =>
+    await LogService().init(
       () async {
-        return await LogService().init(
-          () async {
-            WidgetsFlutterBinding.ensureInitialized();
-            WorkmanagerWrapper(
-              callbackDispatcher: workmanagerCallbackDispatcher,
-            );
-
-            if (initialPath != null ||
-                await NotificationRepository().ship() == false) {
-              return runApp(
-                ProviderScope(
-                  // observers: [DebugObserver()],
-                  child: MemApplication(
-                    initialPath: initialPath,
-                    languageCode: languageCode,
-                  ),
-                ),
-              );
-            }
-          },
+        WidgetsFlutterBinding.ensureInitialized();
+        WorkmanagerWrapper(
+          callbackDispatcher: workmanagerCallbackDispatcher,
         );
-      },
-      {
-        'initialPath': initialPath,
-        'languageCode': languageCode,
+
+        if (initialPath != null ||
+            await NotificationRepository().ship() == false) {
+          return runApp(
+            ProviderScope(
+              // observers: [DebugObserver()],
+              child: MemApplication(
+                initialPath: initialPath,
+                languageCode: languageCode,
+              ),
+            ),
+          );
+        }
       },
     );
 
