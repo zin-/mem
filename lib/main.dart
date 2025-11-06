@@ -30,9 +30,7 @@ Future<void> _runApplication({
 }) =>
     i(
       () async {
-        return await LogService(
-          enableErrorReport: true,
-        ).init(
+        return await LogService().init(
           () async {
             WidgetsFlutterBinding.ensureInitialized();
             WorkmanagerWrapper(
@@ -62,9 +60,7 @@ Future<void> _runApplication({
 
 @pragma('vm:entry-point')
 Future<void> onNotificationResponseReceived(dynamic details) async {
-  await LogService(
-    enableErrorReport: true,
-  ).init(
+  await LogService().init(
     () async {
       WorkmanagerWrapper(callbackDispatcher: workmanagerCallbackDispatcher);
 
@@ -110,7 +106,7 @@ const memIdParamName = 'mem_id';
 
 @pragma('vm:entry-point')
 Future<void> backgroundCallback(Uri? uri) async {
-  await LogService(enableErrorReport: true).init(
+  await LogService().init(
     () async {
       if (uri != null && uri.scheme == uriSchema && uri.host == appId) {
         if (uri.pathSegments.contains(actCounter)) {
@@ -129,8 +125,7 @@ Future<void> backgroundCallback(Uri? uri) async {
 }
 
 @pragma('vm:entry-point')
-void workmanagerCallbackDispatcher() =>
-    LogService(enableErrorReport: true).init(
+void workmanagerCallbackDispatcher() => LogService().init(
       () => WorkmanagerWrapper().executeTask(
         (inputData) => v(
           () async {

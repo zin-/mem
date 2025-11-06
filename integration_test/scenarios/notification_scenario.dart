@@ -40,7 +40,7 @@ void testNotificationScenario() => group(_scenarioName, () {
         level: Level.verbose,
         enableSimpleLog:
             const bool.fromEnvironment('CICD', defaultValue: false),
-        enableErrorReport: false,
+        disableErrorReport: true,
       );
 
       const insertedMemName = "$_scenarioName - mem name - inserted";

@@ -160,13 +160,13 @@ class LogService {
   factory LogService({
     Level level = Level.info,
     bool enableSimpleLog = false,
-    bool enableErrorReport = false,
+    bool disableErrorReport = false,
   }) =>
       Singleton.of(
         () => LogService._(
           LogRepository(
             LoggerWrapper(enableSimpleLog),
-            enableErrorReport ? SentryWrapper() : null, // coverage:ignore-line
+            disableErrorReport ? null : SentryWrapper(), // coverage:ignore-line
           ),
           level,
         ),
