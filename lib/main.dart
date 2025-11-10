@@ -27,44 +27,32 @@ Future<void> launchActCounterConfigure() async {
 Future<void> _runApplication({
   String? initialPath,
   String? languageCode,
-}) =>
-    i(
+}) async =>
+    await LogService().init(
       () async {
-        return await LogService(
-          enableErrorReport: true,
-        ).init(
-          () async {
-            WidgetsFlutterBinding.ensureInitialized();
-            WorkmanagerWrapper(
-              callbackDispatcher: workmanagerCallbackDispatcher,
-            );
-
-            if (initialPath != null ||
-                await NotificationRepository().ship() == false) {
-              return runApp(
-                ProviderScope(
-                  // observers: [DebugObserver()],
-                  child: MemApplication(
-                    initialPath: initialPath,
-                    languageCode: languageCode,
-                  ),
-                ),
-              );
-            }
-          },
+        WidgetsFlutterBinding.ensureInitialized();
+        WorkmanagerWrapper(
+          callbackDispatcher: workmanagerCallbackDispatcher,
         );
-      },
-      {
-        'initialPath': initialPath,
-        'languageCode': languageCode,
+
+        if (initialPath != null ||
+            await NotificationRepository().ship() == false) {
+          return runApp(
+            ProviderScope(
+              // observers: [DebugObserver()],
+              child: MemApplication(
+                initialPath: initialPath,
+                languageCode: languageCode,
+              ),
+            ),
+          );
+        }
       },
     );
 
 @pragma('vm:entry-point')
 Future<void> onNotificationResponseReceived(dynamic details) async {
-  await LogService(
-    enableErrorReport: true,
-  ).init(
+  await LogService().init(
     () async {
       WorkmanagerWrapper(callbackDispatcher: workmanagerCallbackDispatcher);
 
@@ -110,7 +98,7 @@ const memIdParamName = 'mem_id';
 
 @pragma('vm:entry-point')
 Future<void> backgroundCallback(Uri? uri) async {
-  await LogService(enableErrorReport: true).init(
+  await LogService().init(
     () async {
       if (uri != null && uri.scheme == uriSchema && uri.host == appId) {
         if (uri.pathSegments.contains(actCounter)) {
@@ -129,8 +117,7 @@ Future<void> backgroundCallback(Uri? uri) async {
 }
 
 @pragma('vm:entry-point')
-void workmanagerCallbackDispatcher() =>
-    LogService(enableErrorReport: true).init(
+void workmanagerCallbackDispatcher() => LogService().init(
       () => WorkmanagerWrapper().executeTask(
         (inputData) => v(
           () async {
