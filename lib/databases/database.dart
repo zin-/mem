@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:mem/databases/migration.dart';
+import 'package:mem/framework/singleton.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 
@@ -87,7 +89,9 @@ class MemRelations extends Table {
   MemRelations,
 ])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(_openConnection());
+  AppDatabase._() : super(_openConnection());
+
+  factory AppDatabase() => Singleton.of<AppDatabase>(() => AppDatabase._());
 
   @override
   int get schemaVersion => 1;
@@ -97,12 +101,16 @@ class AppDatabase extends _$AppDatabase {
     return MigrationStrategy(
       onCreate: (Migrator m) async {
         await m.createAll();
-        // TODO: 独自実装からデータを移行する
+        await migrateFromSqflite(this);
       },
       onUpgrade: (Migrator m, int from, int to) async {
         // TODO: マイグレーション処理を実装
       },
     );
+  }
+
+  Future<List<Mem>> devSelect() async {
+    return await select(mems).get();
   }
 }
 
