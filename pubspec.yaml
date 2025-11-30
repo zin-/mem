@@ -32,69 +32,38 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-  # for l10n
   flutter_localizations:
     sdk: flutter
   intl: any
-
-  # for View
   flutter_picker_plus: any
   flutter_sticky_header: any
-
-  ## for Transition
   go_router: any
-
-  ## for SettingsPage
   settings_ui: any
-
-  ## for View state management
   flutter_riverpod: any
   riverpod_annotation: any
-
-  ## for Chart
   fl_chart: any
-
-  # for Notification
   flutter_local_notifications: any
   timezone: any
-  # awesome_notifications: ^0.9.3+1
-
-  # for Persistence
-  ## for Database
   sqflite: any
   path: any
   sqflite_common_ffi: any
   path_provider: any
   idb_shim: any
-
-  ## for File
+  drift: any
+  drift_flutter: any
   share_plus: any
-
-  ## for Logger
   logger: any
-
-  ## for Preferences
   shared_preferences: any
-
-  # for basic operations
   collection: any
-
-  # for Home widgets
   home_widget: any
   workmanager: any
   day_picker: any
   file_picker: any
-
-  # for Permissions
   permission_handler: any
-
-  # for Error report
   sentry_flutter: any
   flutter_foreground_task: any
 
 dev_dependencies:
-  # for Test mock
   flutter_test:
     sdk: flutter
   test: any
@@ -102,17 +71,12 @@ dev_dependencies:
     sdk: flutter
   mockito: any
   build_runner: any
-
-  # for Lint
   flutter_lints: any
   custom_lint: any
-
-  # for Riverpod
   riverpod_generator: any
   riverpod_lint: any
-
-  # for Icon
   flutter_launcher_icons: any
+  drift_dev: any
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
