@@ -7,6 +7,10 @@ part 'mems_dao.g.dart';
 class MemsDao extends DatabaseAccessor<AppDatabase> with _$MemsDaoMixin {
   MemsDao(super.database);
 
+  Future<int> insert(MemsCompanion mem) async {
+    return await into(mems).insert(mem);
+  }
+
   Future<List<Mem>> getMems() async {
     return await select(mems).get();
   }
