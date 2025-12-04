@@ -11,6 +11,11 @@ class MemsDao extends DatabaseAccessor<AppDatabase> with _$MemsDaoMixin {
     return await into(mems).insert(mem);
   }
 
+  Future<int> updateOne(MemsCompanion mem) async {
+    return await (update(mems)..where((t) => t.id.equals(mem.id.value)))
+        .write(mem);
+  }
+
   Future<List<Mem>> getMems() async {
     return await select(mems).get();
   }

@@ -136,6 +136,31 @@ class MemRepository extends DatabaseTupleRepository<MemEntity, SavedMemEntity> {
     return oldSavedMem;
   }
 
+  @override
+  Future<SavedMemEntity> replace(
+    SavedMemEntity savedEntity, {
+    DateTime? updatedAt,
+  }) async {
+    await _memsDao.updateOne(MemsCompanion(
+      id: Value(savedEntity.id),
+      name: Value(savedEntity.value.name),
+      doneAt: Value(savedEntity.value.doneAt),
+      notifyOn: Value(savedEntity.value.period?.start),
+      notifyAt: Value(savedEntity.value.period?.start?.isAllDay == true
+          ? null
+          : savedEntity.value.period?.start),
+      endOn: Value(savedEntity.value.period?.end),
+      endAt: Value(savedEntity.value.period?.end?.isAllDay == true
+          ? null
+          : savedEntity.value.period?.end),
+      updatedAt: Value(updatedAt ?? DateTime.now()),
+    ));
+
+    super.replace(savedEntity, updatedAt: updatedAt);
+
+    return savedEntity;
+  }
+
   static MemRepository? _instance;
   factory MemRepository({MemRepository? mock}) =>
       _instance ??= mock ?? MemRepository._();
