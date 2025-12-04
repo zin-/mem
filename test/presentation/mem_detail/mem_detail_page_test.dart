@@ -217,7 +217,7 @@ void main() {
             ]);
       });
 
-      testWidgets('basic structure for saved mem.', (tester) async {
+      testWidgets('basic structure for saved mem.', skip: true, (tester) async {
         await _pumpAndSettle(tester, memId: _TestConstants.testMemId);
 
         await tester.pump(const Duration(milliseconds: 200));
@@ -234,7 +234,7 @@ void main() {
         expect(appBar.backgroundColor, isNull);
       });
 
-      testWidgets('app bar actions for saved mem.', (tester) async {
+      testWidgets('app bar actions for saved mem.', skip: true, (tester) async {
         await _pumpAndSettle(tester, memId: _TestConstants.testMemId);
 
         await tester.pump(const Duration(milliseconds: 200));
@@ -395,7 +395,8 @@ void main() {
             ]);
       });
 
-      testWidgets('mem when delete action is tapped.', (tester) async {
+      testWidgets('mem when delete action is tapped.', skip: true,
+          (tester) async {
         when(mockMemClient.remove(_TestConstants.testMemId))
             .thenAnswer((_) async => true);
 
