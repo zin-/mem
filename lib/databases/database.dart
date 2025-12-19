@@ -6,7 +6,13 @@ import 'package:path/path.dart' as path;
 
 part 'database.g.dart';
 
-class Mems extends Table {
+mixin BaseColumns on Table {
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime().nullable()();
+  DateTimeColumn get archivedAt => dateTime().nullable()();
+}
+
+class Mems extends Table with BaseColumns {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text()();
   DateTimeColumn get doneAt => dateTime().nullable()();
@@ -14,22 +20,16 @@ class Mems extends Table {
   DateTimeColumn get notifyAt => dateTime().nullable()();
   DateTimeColumn get endOn => dateTime().nullable()();
   DateTimeColumn get endAt => dateTime().nullable()();
-  DateTimeColumn get createdAt => dateTime()();
-  DateTimeColumn get updatedAt => dateTime().nullable()();
-  DateTimeColumn get archivedAt => dateTime().nullable()();
 }
 
-class MemItems extends Table {
+class MemItems extends Table with BaseColumns {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get type => text()();
   TextColumn get value => text()();
   IntColumn get memId => integer().references(Mems, #id)();
-  DateTimeColumn get createdAt => dateTime()();
-  DateTimeColumn get updatedAt => dateTime().nullable()();
-  DateTimeColumn get archivedAt => dateTime().nullable()();
 }
 
-class Acts extends Table {
+class Acts extends Table with BaseColumns {
   IntColumn get id => integer().autoIncrement()();
   DateTimeColumn get start => dateTime().nullable()();
   BoolColumn get startIsAllDay => boolean().nullable()();
@@ -37,35 +37,26 @@ class Acts extends Table {
   BoolColumn get endIsAllDay => boolean().nullable()();
   DateTimeColumn get pausedAt => dateTime().nullable()();
   IntColumn get memId => integer().references(Mems, #id)();
-  DateTimeColumn get createdAt => dateTime()();
-  DateTimeColumn get updatedAt => dateTime().nullable()();
-  DateTimeColumn get archivedAt => dateTime().nullable()();
 }
 
-class MemRepeatedNotifications extends Table {
+class MemRepeatedNotifications extends Table with BaseColumns {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get timeOfDaySeconds => integer()();
   TextColumn get type => text()();
   TextColumn get message => text()();
   IntColumn get memId => integer().references(Mems, #id)();
-  DateTimeColumn get createdAt => dateTime()();
-  DateTimeColumn get updatedAt => dateTime().nullable()();
-  DateTimeColumn get archivedAt => dateTime().nullable()();
 }
 
-class Targets extends Table {
+class Targets extends Table with BaseColumns {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get type => text()();
   TextColumn get unit => text()();
   IntColumn get value => integer()();
   TextColumn get period => text()();
   IntColumn get memId => integer().references(Mems, #id)();
-  DateTimeColumn get createdAt => dateTime()();
-  DateTimeColumn get updatedAt => dateTime().nullable()();
-  DateTimeColumn get archivedAt => dateTime().nullable()();
 }
 
-class MemRelations extends Table {
+class MemRelations extends Table with BaseColumns {
   IntColumn get id => integer().autoIncrement()();
   @ReferenceName('sourceMem')
   IntColumn get sourceMemId => integer().references(Mems, #id)();
@@ -73,9 +64,6 @@ class MemRelations extends Table {
   IntColumn get targetMemId => integer().references(Mems, #id)();
   TextColumn get type => text()();
   IntColumn get value => integer().nullable()();
-  DateTimeColumn get createdAt => dateTime()();
-  DateTimeColumn get updatedAt => dateTime().nullable()();
-  DateTimeColumn get archivedAt => dateTime().nullable()();
 }
 
 @DriftDatabase(tables: [
