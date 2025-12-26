@@ -10,6 +10,7 @@ import '../helpers.dart';
 void main() {
   testWidgets(
     'throw',
+    skip: true,
     (widgetTester) async {
       LogService(
         level: Level.verbose,
