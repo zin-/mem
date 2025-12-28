@@ -23,3 +23,13 @@ final defTableMemRelations = TableDefinition(
     ...defColsBase,
   ],
 );
+
+// class MemRelations extends Table with BaseColumns {
+//   IntColumn get id => integer().autoIncrement()();
+//   @ReferenceName('sourceMem')
+//   IntColumn get sourceMemId => integer().references(Mems, #id)();
+//   @ReferenceName('targetMem')
+//   IntColumn get targetMemId => integer().references(Mems, #id)();
+//   TextColumn get type => text()();
+//   IntColumn get value => integer().nullable()();
+// }

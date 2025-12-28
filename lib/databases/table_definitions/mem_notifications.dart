@@ -27,3 +27,11 @@ final defTableMemNotifications = TableDefinition(
     defFkMemNotificationsMemId,
   ],
 );
+
+// class MemRepeatedNotifications extends Table with BaseColumns {
+//   IntColumn get id => integer().autoIncrement()();
+//   IntColumn get timeOfDaySeconds => integer()();
+//   TextColumn get type => text()();
+//   TextColumn get message => text()();
+//   IntColumn get memId => integer().references(Mems, #id)();
+// }

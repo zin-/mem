@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import 'package:mem/framework/database/definition/column/integer_column_definition.dart';
 import 'package:mem/framework/database/definition/column/timestamp_column_definition.dart';
 
@@ -13,3 +14,9 @@ final defColsBase = [
   defColUpdatedAt,
   defColArchivedAt,
 ];
+
+mixin BaseColumns on Table {
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime().nullable()();
+  DateTimeColumn get archivedAt => dateTime().nullable()();
+}

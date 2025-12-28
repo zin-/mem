@@ -29,3 +29,13 @@ final defTableActs = TableDefinition(
     defFkActsMemId,
   ],
 );
+
+// class Acts extends Table with BaseColumns {
+//   IntColumn get id => integer().autoIncrement()();
+//   DateTimeColumn get start => dateTime().nullable()();
+//   BoolColumn get startIsAllDay => boolean().nullable()();
+//   DateTimeColumn get end => dateTime().nullable()();
+//   BoolColumn get endIsAllDay => boolean().nullable()();
+//   DateTimeColumn get pausedAt => dateTime().nullable()();
+//   IntColumn get memId => integer().references(Mems, #id)();
+// }
