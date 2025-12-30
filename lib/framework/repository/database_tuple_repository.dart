@@ -1,3 +1,5 @@
+import 'package:drift/drift.dart' as drift;
+import 'package:mem/databases/database.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/definition/database_definition.dart';
@@ -14,6 +16,8 @@ import 'package:mem/features/logger/log_service.dart';
 
 abstract class DatabaseTupleRepository<ENTITY extends Entity,
     SAVED extends DatabaseTupleEntity> extends Repository<ENTITY> {
+  static final driftDatabase = AppDatabase();
+
   static DatabaseAccessor? _databaseAccessor;
   static final Map<TableDefinition, Repository> _repositories = {};
 
@@ -106,20 +110,45 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
     int? limit,
   }) =>
       v(
-        () async => (await (await _dbA).select(
-          _tableDefinition,
-          groupBy: groupBy?.toQuery,
-          extraColumns: groupBy?.toExtraColumns,
-          where: condition?.where(),
-          whereArgs: condition?.whereArgs(),
-          orderBy: orderBy?.isEmpty != false
-              ? null
-              : orderBy?.map((e) => e.toQuery()).join(", "),
-          offset: offset,
-          limit: limit,
-        ))
-            .map((e) => pack(e))
-            .toList(),
+        () async {
+          final fromNative = (await (await _dbA).select(
+            _tableDefinition,
+            groupBy: groupBy?.toQuery,
+            extraColumns: groupBy?.toExtraColumns,
+            where: condition?.where(),
+            whereArgs: condition?.whereArgs(),
+            orderBy: orderBy?.isEmpty != false
+                ? null
+                : orderBy?.map((e) => e.toQuery()).join(", "),
+            offset: offset,
+            limit: limit,
+          ))
+              .map((e) => pack(e))
+              .toList();
+          warn("fromNative(${_tableDefinition.name}): $fromNative");
+
+          // final fromDrift =
+          //     (await driftDatabase.select(tableInfo(_tableDefinition)).get())
+          //         .map((e) {
+          //   final map = e.toJson();
+
+          //   map[defColCreatedAt.name] =
+          //       DateTime.fromMillisecondsSinceEpoch(map[defColCreatedAt.name]);
+          //   map[defColUpdatedAt.name] = map[defColUpdatedAt.name] == null
+          //       ? null
+          //       : DateTime.fromMillisecondsSinceEpoch(
+          //           map[defColUpdatedAt.name]);
+          //   map[defColArchivedAt.name] = map[defColArchivedAt.name] == null
+          //       ? null
+          //       : DateTime.fromMillisecondsSinceEpoch(
+          //           map[defColArchivedAt.name]);
+
+          //   return pack(map);
+          // });
+          // warn("fromDrift(${_tableDefinition.name}}: $fromDrift");
+
+          return fromNative;
+        },
         {
           'condition': condition,
           'groupBy': groupBy,
@@ -245,4 +274,8 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
           'condition': condition,
         },
       );
+
+  drift.TableInfo tableInfo(TableDefinition tableDefinition) =>
+      driftDatabase.allTables
+          .firstWhere((e) => e.actualTableName == tableDefinition.name);
 }

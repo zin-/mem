@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:mem/databases/migrations/native_to_drift.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
@@ -31,7 +32,8 @@ class AppDatabase extends _$AppDatabase {
     return MigrationStrategy(
       onCreate: (Migrator m) async {
         await m.createAll();
-        // TODO: 独自実装からデータを移行する
+
+        await migrateNativeToDrift(this);
       },
       onUpgrade: (Migrator m, int from, int to) async {
         // TODO: マイグレーション処理を実装
