@@ -1,7 +1,12 @@
 import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:mem/databases/table_definitions/acts.dart';
+import 'package:mem/databases/table_definitions/mem_items.dart';
+import 'package:mem/databases/table_definitions/mem_notifications.dart';
+import 'package:mem/databases/table_definitions/mem_relations.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
+import 'package:mem/features/targets/target_table.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 
@@ -9,11 +14,11 @@ part 'database.g.dart';
 
 @DriftDatabase(tables: [
   Mems,
-  // MemItems,
-  // Acts,
-  // MemRepeatedNotifications,
-  // Targets,
-  // MemRelations,
+  MemItems,
+  Acts,
+  MemRepeatedNotifications,
+  Targets,
+  MemRelations,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());

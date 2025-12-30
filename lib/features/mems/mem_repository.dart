@@ -21,27 +21,30 @@ class MemRepository extends DatabaseTupleRepository<MemEntity, SavedMemEntity> {
     List<OrderBy>? orderBy,
     int? offset,
     int? limit,
-  }) =>
-      super.ship(
-        condition: And(
-          [
-            if (id != null) Equals(defPkId, id),
-            if (archived != null)
-              archived
-                  ? IsNotNull(defColArchivedAt.name)
-                  : IsNull(defColArchivedAt.name),
-            if (done != null)
-              done
-                  ? IsNotNull(defColMemsDoneAt.name)
-                  : IsNull(defColMemsDoneAt.name),
-            if (condition != null) condition,
-          ],
-        ),
-        groupBy: groupBy,
-        orderBy: orderBy,
-        offset: offset,
-        limit: limit,
-      );
+  }) {
+    final native = super.ship(
+      condition: And(
+        [
+          if (id != null) Equals(defPkId, id),
+          if (archived != null)
+            archived
+                ? IsNotNull(defColArchivedAt.name)
+                : IsNull(defColArchivedAt.name),
+          if (done != null)
+            done
+                ? IsNotNull(defColMemsDoneAt.name)
+                : IsNull(defColMemsDoneAt.name),
+          if (condition != null) condition,
+        ],
+      ),
+      groupBy: groupBy,
+      orderBy: orderBy,
+      offset: offset,
+      limit: limit,
+    );
+
+    return native;
+  }
 
   @override
   Future<List<SavedMemEntity>> waste({
