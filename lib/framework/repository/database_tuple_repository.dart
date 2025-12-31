@@ -127,25 +127,25 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
               .toList();
           warn("fromNative(${_tableDefinition.name}): $fromNative");
 
-          // final fromDrift =
-          //     (await driftDatabase.select(tableInfo(_tableDefinition)).get())
-          //         .map((e) {
-          //   final map = e.toJson();
+          final fromDrift =
+              (await driftDatabase.select(tableInfo(_tableDefinition)).get())
+                  .map((e) {
+            final Map<String, dynamic> jsonMap = (e).toJson(
+                serializer: drift.ValueSerializer.defaults(
+              serializeDateTimeValuesAsString: true,
+            ));
 
-          //   map[defColCreatedAt.name] =
-          //       DateTime.fromMillisecondsSinceEpoch(map[defColCreatedAt.name]);
-          //   map[defColUpdatedAt.name] = map[defColUpdatedAt.name] == null
-          //       ? null
-          //       : DateTime.fromMillisecondsSinceEpoch(
-          //           map[defColUpdatedAt.name]);
-          //   map[defColArchivedAt.name] = map[defColArchivedAt.name] == null
-          //       ? null
-          //       : DateTime.fromMillisecondsSinceEpoch(
-          //           map[defColArchivedAt.name]);
+            final converted = Map.fromEntries(jsonMap.entries.map((e) {
+              try {
+                return MapEntry(e.key, DateTime.parse(e.value as String));
+              } catch (erorr) {
+                return MapEntry(e.key, e.value);
+              }
+            }));
 
-          //   return pack(map);
-          // });
-          // warn("fromDrift(${_tableDefinition.name}}: $fromDrift");
+            return pack(converted);
+          }).toList();
+          warn("fromDrift(${_tableDefinition.name}}: $fromDrift");
 
           return fromNative;
         },
