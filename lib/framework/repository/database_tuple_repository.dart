@@ -125,11 +125,19 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
           ))
               .map((e) => pack(e))
               .toList();
-          warn("fromNative(${_tableDefinition.name}): $fromNative");
+          // debug("fromNative(${_tableDefinition.name}): $fromNative");
 
-          final fromDrift =
-              (await driftDatabase.select(tableInfo(_tableDefinition)).get())
-                  .map((e) {
+          final tableInfo = getTableInfo(_tableDefinition);
+          final query = driftDatabase.select(tableInfo);
+
+          if (condition != null) {
+            final driftExpression = condition.toDriftExpression(tableInfo);
+            if (driftExpression != null) {
+              query.where((tbl) => driftExpression);
+            }
+          }
+
+          final fromDrift = (await query.get()).map((e) {
             final Map<String, dynamic> jsonMap = (e).toJson(
                 serializer: drift.ValueSerializer.defaults(
               serializeDateTimeValuesAsString: true,
@@ -145,8 +153,11 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
 
             return pack(converted);
           }).toList();
-          warn("fromDrift(${_tableDefinition.name}}: $fromDrift");
+          // debug("fromDrift(${_tableDefinition.name}}: $fromDrift");
 
+          warn(
+            "same?(${_tableDefinition.name}): ${fromNative.map((e) => e.value).toString() == fromDrift.map((e) => e.value).toString()}",
+          );
           return fromNative;
         },
         {
@@ -275,7 +286,7 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
         },
       );
 
-  drift.TableInfo tableInfo(TableDefinition tableDefinition) =>
+  drift.TableInfo getTableInfo(TableDefinition tableDefinition) =>
       driftDatabase.allTables
           .firstWhere((e) => e.actualTableName == tableDefinition.name);
 }
