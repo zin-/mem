@@ -16,7 +16,7 @@ import 'package:mem/features/logger/log_service.dart';
 
 abstract class DatabaseTupleRepository<ENTITY extends Entity,
     SAVED extends DatabaseTupleEntity> extends Repository<ENTITY> {
-  static final driftDatabase = AppDatabase();
+  static final driftDatabaseAccessor = DriftDatabaseAccessor();
 
   static DatabaseAccessor? _databaseAccessor;
   static final Map<TableDefinition, Repository> _repositories = {};
@@ -127,44 +127,17 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
               .toList();
           // debug("fromNative(${_tableDefinition.name}): $fromNative");
 
-          final tableInfo = getTableInfo(_tableDefinition);
-          final query = driftDatabase.select(tableInfo);
+          final fromDrift = await driftDatabaseAccessor.select(
+            _getTableInfo(
+                driftDatabaseAccessor.driftDatabase, _tableDefinition),
+            condition: condition,
+            groupBy: groupBy,
+            orderBy: orderBy,
+            offset: offset,
+            limit: limit,
+          );
 
-          if (condition != null) {
-            final driftExpression = condition.toDriftExpression(tableInfo);
-            if (driftExpression != null) {
-              query.where((tbl) => driftExpression);
-            }
-          }
-
-          // TODO: groupBy support for drift
-          // if (groupBy != null) {
-          //   final columns = groupBy.columns
-          //       .map((colDef) => _getColumn(tableInfo, colDef.name))
-          //       .whereType<drift.GeneratedColumn>()
-          //       .toList();
-          //   if (columns.isNotEmpty) {
-          //     query.groupBy((tbl) => columns);
-          //   }
-          // }
-
-          if (orderBy != null && orderBy.isNotEmpty) {
-            query.orderBy(
-              orderBy
-                  .map((orderByItem) => _toOrderClauseGenerator(
-                        tableInfo,
-                        orderByItem,
-                      ))
-                  .whereType<drift.OrderClauseGenerator>()
-                  .toList(),
-            );
-          }
-
-          if (limit != null || offset != null) {
-            query.limit(limit ?? 999999999, offset: offset ?? 0);
-          }
-
-          final fromDrift = (await query.get()).map((e) {
+          final coverted = fromDrift.map((e) {
             final Map<String, dynamic> jsonMap = (e).toJson(
                 serializer: drift.ValueSerializer.defaults(
               serializeDateTimeValuesAsString: true,
@@ -183,7 +156,7 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
           // debug("fromDrift(${_tableDefinition.name}}: $fromDrift");
 
           warn(
-            "same?(${_tableDefinition.name}): ${fromNative.map((e) => e.value).toString() == fromDrift.map((e) => e.value).toString()}",
+            "same?(${_tableDefinition.name}): ${fromNative.map((e) => e.value).toString() == coverted.map((e) => e.value).toString()}",
           );
           return fromNative;
         },
@@ -313,62 +286,10 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
         },
       );
 
-  drift.TableInfo getTableInfo(TableDefinition tableDefinition) =>
-      driftDatabase.allTables
+  drift.TableInfo _getTableInfo(
+    AppDatabase appDatabase,
+    TableDefinition tableDefinition,
+  ) =>
+      appDatabase.allTables
           .firstWhere((e) => e.actualTableName == tableDefinition.name);
-
-  drift.GeneratedColumn? _getColumn(
-      drift.TableInfo tableInfo, String columnName) {
-    try {
-      final table = tableInfo as dynamic;
-      final columns = table.$columns as List<drift.GeneratedColumn>;
-      final column = columns.firstWhere(
-        (col) {
-          final actualName = _getColumnName(col);
-          return actualName == columnName ||
-              actualName == _toSnakeCase(columnName);
-        },
-        orElse: () => throw StateError('Column not found: $columnName'),
-      );
-      return column;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  String _getColumnName(drift.GeneratedColumn column) {
-    try {
-      final col = column as dynamic;
-      return col.name as String? ?? '';
-    } catch (e) {
-      return '';
-    }
-  }
-
-  String _toSnakeCase(String camelCase) {
-    return camelCase.replaceAllMapped(
-      RegExp(r'[A-Z]'),
-      (match) => '_${match.group(0)!.toLowerCase()}',
-    );
-  }
-
-  drift.OrderClauseGenerator? _toOrderClauseGenerator(
-      drift.TableInfo tableInfo, OrderBy orderBy) {
-    final column = _getColumn(tableInfo, orderBy.columnDefinition.name);
-    if (column == null) return null;
-
-    return (tbl) {
-      if (orderBy is Descending) {
-        return drift.OrderingTerm(
-          expression: column,
-          mode: drift.OrderingMode.desc,
-        );
-      } else {
-        return drift.OrderingTerm(
-          expression: column,
-          mode: drift.OrderingMode.asc,
-        );
-      }
-    };
-  }
 }

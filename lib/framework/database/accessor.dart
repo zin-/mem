@@ -1,4 +1,10 @@
+import 'package:drift/drift.dart' as drift;
+import 'package:mem/databases/database.dart';
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/framework/repository/condition/conditions.dart';
+import 'package:mem/framework/repository/group_by.dart';
+import 'package:mem/framework/repository/order_by.dart';
+import 'package:mem/framework/singleton.dart';
 import 'package:sqflite/sqlite_api.dart';
 
 import 'converter.dart';
@@ -127,4 +133,125 @@ class DatabaseAccessor {
       );
 
   DatabaseAccessor(this._nativeDatabase);
+}
+
+class DriftDatabaseAccessor {
+  final AppDatabase driftDatabase;
+
+  DriftDatabaseAccessor._(this.driftDatabase);
+
+  select(
+    drift.TableInfo tableInfo, {
+    Condition? condition,
+    GroupBy? groupBy,
+    List<OrderBy>? orderBy,
+    int? offset,
+    int? limit,
+  }) =>
+      v(
+        () async {
+          final query = driftDatabase.select(tableInfo);
+
+          if (condition != null) {
+            final driftExpression = condition.toDriftExpression(tableInfo);
+            if (driftExpression != null) {
+              query.where((tbl) => driftExpression);
+            }
+          }
+
+          // TODO: groupBy support for drift
+          // if (groupBy != null) {
+          //   final columns = groupBy.columns
+          //       .map((colDef) => _getColumn(tableInfo, colDef.name))
+          //       .whereType<drift.GeneratedColumn>()
+          //       .toList();
+          //   if (columns.isNotEmpty) {
+          //     query.groupBy((tbl) => columns);
+          //   }
+          // }
+
+          if (orderBy != null && orderBy.isNotEmpty) {
+            query.orderBy(
+              orderBy
+                  .map((orderByItem) => _toOrderClauseGenerator(
+                        tableInfo,
+                        orderByItem,
+                      ))
+                  .whereType<drift.OrderClauseGenerator>()
+                  .toList(),
+            );
+          }
+
+          if (limit != null || offset != null) {
+            query.limit(limit ?? 999999999, offset: offset ?? 0);
+          }
+
+          return await query.get();
+        },
+        {
+          'tableInfo': tableInfo,
+          'groupBy': groupBy,
+          'orderBy': orderBy,
+          'offset': offset,
+          'limit': limit,
+        },
+      );
+
+  drift.OrderClauseGenerator? _toOrderClauseGenerator(
+      drift.TableInfo tableInfo, OrderBy orderBy) {
+    final column = _getColumn(tableInfo, orderBy.columnDefinition.name);
+    if (column == null) return null;
+
+    return (tbl) {
+      if (orderBy is Descending) {
+        return drift.OrderingTerm(
+          expression: column,
+          mode: drift.OrderingMode.desc,
+        );
+      } else {
+        return drift.OrderingTerm(
+          expression: column,
+          mode: drift.OrderingMode.asc,
+        );
+      }
+    };
+  }
+
+  String _getColumnName(drift.GeneratedColumn column) {
+    try {
+      final col = column as dynamic;
+      return col.name as String? ?? '';
+    } catch (e) {
+      return '';
+    }
+  }
+
+  drift.GeneratedColumn? _getColumn(
+      drift.TableInfo tableInfo, String columnName) {
+    try {
+      final table = tableInfo as dynamic;
+      final columns = table.$columns as List<drift.GeneratedColumn>;
+      final column = columns.firstWhere(
+        (col) {
+          final actualName = _getColumnName(col);
+          return actualName == columnName ||
+              actualName == _toSnakeCase(columnName);
+        },
+        orElse: () => throw StateError('Column not found: $columnName'),
+      );
+      return column;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  String _toSnakeCase(String camelCase) {
+    return camelCase.replaceAllMapped(
+      RegExp(r'[A-Z]'),
+      (match) => '_${match.group(0)!.toLowerCase()}',
+    );
+  }
+
+  factory DriftDatabaseAccessor() =>
+      Singleton.of(() => DriftDatabaseAccessor._(AppDatabase()));
 }
