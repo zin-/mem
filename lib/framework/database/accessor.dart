@@ -141,7 +141,7 @@ class DriftDatabaseAccessor {
   DriftDatabaseAccessor._(this.driftDatabase);
 
   select(
-    drift.TableInfo tableInfo, {
+    TableDefinition tableDefinition, {
     Condition? condition,
     GroupBy? groupBy,
     List<OrderBy>? orderBy,
@@ -150,6 +150,7 @@ class DriftDatabaseAccessor {
   }) =>
       v(
         () async {
+          final tableInfo = _getTableInfo(tableDefinition);
           final query = driftDatabase.select(tableInfo);
 
           if (condition != null) {
@@ -189,13 +190,19 @@ class DriftDatabaseAccessor {
           return await query.get();
         },
         {
-          'tableInfo': tableInfo,
+          'tableDefinition': tableDefinition,
+          'condition': condition,
           'groupBy': groupBy,
           'orderBy': orderBy,
           'offset': offset,
           'limit': limit,
         },
       );
+  drift.TableInfo _getTableInfo(
+    TableDefinition tableDefinition,
+  ) =>
+      driftDatabase.allTables
+          .firstWhere((e) => e.actualTableName == tableDefinition.name);
 
   drift.OrderClauseGenerator? _toOrderClauseGenerator(
       drift.TableInfo tableInfo, OrderBy orderBy) {

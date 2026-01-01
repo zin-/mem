@@ -1,5 +1,4 @@
 import 'package:drift/drift.dart' as drift;
-import 'package:mem/databases/database.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/definition/database_definition.dart';
@@ -16,7 +15,9 @@ import 'package:mem/features/logger/log_service.dart';
 
 abstract class DatabaseTupleRepository<ENTITY extends Entity,
     SAVED extends DatabaseTupleEntity> extends Repository<ENTITY> {
-  static final driftDatabaseAccessor = DriftDatabaseAccessor();
+  static final DriftDatabaseAccessor? _driftDatabaseAccessor =
+      // DriftDatabaseAccessor();
+      null;
 
   static DatabaseAccessor? _databaseAccessor;
   static final Map<TableDefinition, Repository> _repositories = {};
@@ -127,9 +128,8 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
               .toList();
           // debug("fromNative(${_tableDefinition.name}): $fromNative");
 
-          final fromDrift = await driftDatabaseAccessor.select(
-            _getTableInfo(
-                driftDatabaseAccessor.driftDatabase, _tableDefinition),
+          final fromDrift = await _driftDatabaseAccessor?.select(
+            _tableDefinition,
             condition: condition,
             groupBy: groupBy,
             orderBy: orderBy,
@@ -137,7 +137,7 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
             limit: limit,
           );
 
-          final coverted = fromDrift.map((e) {
+          final coverted = fromDrift?.map((e) {
             final Map<String, dynamic> jsonMap = (e).toJson(
                 serializer: drift.ValueSerializer.defaults(
               serializeDateTimeValuesAsString: true,
@@ -156,7 +156,7 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
           // debug("fromDrift(${_tableDefinition.name}}: $fromDrift");
 
           warn(
-            "same?(${_tableDefinition.name}): ${fromNative.map((e) => e.value).toString() == coverted.map((e) => e.value).toString()}",
+            "same?(${_tableDefinition.name}): ${fromNative.map((e) => e.value).toString() == coverted?.map((e) => e.value).toString()}",
           );
           return fromNative;
         },
@@ -285,11 +285,4 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
           'condition': condition,
         },
       );
-
-  drift.TableInfo _getTableInfo(
-    AppDatabase appDatabase,
-    TableDefinition tableDefinition,
-  ) =>
-      appDatabase.allTables
-          .firstWhere((e) => e.actualTableName == tableDefinition.name);
 }
