@@ -137,6 +137,33 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
             }
           }
 
+          // TODO: groupBy support for drift
+          // if (groupBy != null) {
+          //   final columns = groupBy.columns
+          //       .map((colDef) => _getColumn(tableInfo, colDef.name))
+          //       .whereType<drift.GeneratedColumn>()
+          //       .toList();
+          //   if (columns.isNotEmpty) {
+          //     query.groupBy((tbl) => columns);
+          //   }
+          // }
+
+          if (orderBy != null && orderBy.isNotEmpty) {
+            query.orderBy(
+              orderBy
+                  .map((orderByItem) => _toOrderClauseGenerator(
+                        tableInfo,
+                        orderByItem,
+                      ))
+                  .whereType<drift.OrderClauseGenerator>()
+                  .toList(),
+            );
+          }
+
+          if (limit != null || offset != null) {
+            query.limit(limit ?? 999999999, offset: offset ?? 0);
+          }
+
           final fromDrift = (await query.get()).map((e) {
             final Map<String, dynamic> jsonMap = (e).toJson(
                 serializer: drift.ValueSerializer.defaults(
@@ -289,4 +316,59 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
   drift.TableInfo getTableInfo(TableDefinition tableDefinition) =>
       driftDatabase.allTables
           .firstWhere((e) => e.actualTableName == tableDefinition.name);
+
+  drift.GeneratedColumn? _getColumn(
+      drift.TableInfo tableInfo, String columnName) {
+    try {
+      final table = tableInfo as dynamic;
+      final columns = table.$columns as List<drift.GeneratedColumn>;
+      final column = columns.firstWhere(
+        (col) {
+          final actualName = _getColumnName(col);
+          return actualName == columnName ||
+              actualName == _toSnakeCase(columnName);
+        },
+        orElse: () => throw StateError('Column not found: $columnName'),
+      );
+      return column;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  String _getColumnName(drift.GeneratedColumn column) {
+    try {
+      final col = column as dynamic;
+      return col.name as String? ?? '';
+    } catch (e) {
+      return '';
+    }
+  }
+
+  String _toSnakeCase(String camelCase) {
+    return camelCase.replaceAllMapped(
+      RegExp(r'[A-Z]'),
+      (match) => '_${match.group(0)!.toLowerCase()}',
+    );
+  }
+
+  drift.OrderClauseGenerator? _toOrderClauseGenerator(
+      drift.TableInfo tableInfo, OrderBy orderBy) {
+    final column = _getColumn(tableInfo, orderBy.columnDefinition.name);
+    if (column == null) return null;
+
+    return (tbl) {
+      if (orderBy is Descending) {
+        return drift.OrderingTerm(
+          expression: column,
+          mode: drift.OrderingMode.desc,
+        );
+      } else {
+        return drift.OrderingTerm(
+          expression: column,
+          mode: drift.OrderingMode.asc,
+        );
+      }
+    };
+  }
 }
