@@ -242,7 +242,7 @@ class DriftDatabaseAccessor {
         (col) {
           final actualName = _getColumnName(col);
           return actualName == columnName ||
-              actualName == _toSnakeCase(columnName);
+              actualName == toSnakeCase(columnName);
         },
         orElse: () => throw StateError('Column not found: $columnName'),
       );
@@ -252,13 +252,13 @@ class DriftDatabaseAccessor {
     }
   }
 
-  String _toSnakeCase(String camelCase) {
-    return camelCase.replaceAllMapped(
-      RegExp(r'[A-Z]'),
-      (match) => '_${match.group(0)!.toLowerCase()}',
-    );
-  }
-
   factory DriftDatabaseAccessor() =>
       Singleton.of(() => DriftDatabaseAccessor._(AppDatabase()));
+}
+
+String toSnakeCase(String camelCase) {
+  return camelCase.replaceAllMapped(
+    RegExp(r'[A-Z]'),
+    (match) => '_${match.group(0)!.toLowerCase()}',
+  );
 }

@@ -15,9 +15,10 @@ import 'package:mem/features/logger/log_service.dart';
 
 abstract class DatabaseTupleRepository<ENTITY extends Entity,
     SAVED extends DatabaseTupleEntity> extends Repository<ENTITY> {
+  // ignore: unnecessary_nullable_for_final_variable_declarations
   static final DriftDatabaseAccessor? _driftDatabaseAccessor =
-      // DriftDatabaseAccessor();
-      null;
+      DriftDatabaseAccessor();
+  // null;
 
   static DatabaseAccessor? _databaseAccessor;
   static final Map<TableDefinition, Repository> _repositories = {};
@@ -145,9 +146,22 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
 
             final converted = Map.fromEntries(jsonMap.entries.map((e) {
               try {
-                return MapEntry(e.key, DateTime.parse(e.value as String));
+                DateTime? value = DateTime.parse(e.value as String);
+                if (e.key == "createdAt" ||
+                    e.key == "updatedAt" ||
+                    e.key == "archivedAt") {
+                  return MapEntry(e.key, value);
+                } else {
+                  return MapEntry(toSnakeCase(e.key), value);
+                }
               } catch (erorr) {
-                return MapEntry(e.key, e.value);
+                if (e.key == "memId") {
+                  return MapEntry("mems_id", e.value);
+                } else if (e.key.contains("IsAllDay")) {
+                  return MapEntry(toSnakeCase(e.key), e.value == null);
+                } else {
+                  return MapEntry(toSnakeCase(e.key), e.value);
+                }
               }
             }));
 
