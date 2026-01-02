@@ -93,10 +93,23 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
             _tableDefinition,
             entityMap,
           );
+          // debug("fromNative: $id");
 
           entityMap[defPkId.name] = id;
 
-          return pack(entityMap);
+          final fromNative = pack(entityMap);
+
+          final fromDrift = await _driftDatabaseAccessor?.insert(
+            _tableDefinition,
+            entityMap,
+          );
+          // debug("fromDrift: $fromDrift");
+
+          if (id != fromDrift) {
+            warn("id != fromDrift: $id != $fromDrift");
+          }
+
+          return fromNative;
         },
         {
           'entity': entity,
@@ -159,6 +172,10 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
                   return MapEntry("mems_id", e.value);
                 } else if (e.key.contains("IsAllDay")) {
                   return MapEntry(toSnakeCase(e.key), e.value == null);
+                } else if (e.key == "sourceMemId") {
+                  return MapEntry("source_mems_id", e.value);
+                } else if (e.key == "targetMemId") {
+                  return MapEntry("target_mems_id", e.value);
                 } else {
                   return MapEntry(toSnakeCase(e.key), e.value);
                 }
@@ -169,9 +186,12 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
           }).toList();
           // debug("fromDrift(${_tableDefinition.name}}: $fromDrift");
 
-          warn(
-            "same?(${_tableDefinition.name}): ${fromNative.map((e) => e.value).toString() == coverted?.map((e) => e.value).toString()}",
-          );
+          if (fromNative.map((e) => e.value).toString() !=
+              coverted?.map((e) => e.value).toString()) {
+            warn(
+                "fromNative != coverted: ${fromNative.map((e) => e.value).toString()} != ${coverted?.map((e) => e.value).toString()}");
+          }
+
           return fromNative;
         },
         {

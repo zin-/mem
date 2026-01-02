@@ -198,6 +198,22 @@ class DriftDatabaseAccessor {
           'limit': limit,
         },
       );
+
+  insert(
+    TableDefinition tableDefinition,
+    Map<String, Object?> values,
+  ) =>
+      v(
+        () async {
+          final tableInfo = _getTableInfo(tableDefinition);
+          final insertable = _createCompanionForTable(
+            tableDefinition.name,
+            values,
+          );
+          return await driftDatabase.into(tableInfo).insert(insertable);
+        },
+      );
+
   drift.TableInfo _getTableInfo(
     TableDefinition tableDefinition,
   ) =>
@@ -249,6 +265,80 @@ class DriftDatabaseAccessor {
       return column;
     } catch (e) {
       return null;
+    }
+  }
+
+  dynamic _createCompanionForTable(
+    String tableName,
+    Map<String, Object?> values,
+  ) {
+    switch (tableName) {
+      case 'mems':
+        return MemsCompanion.insert(
+          name: values['name'] as String,
+          doneAt: drift.Value(values['doneAt'] as DateTime?),
+          notifyOn: drift.Value(values['notifyOn'] as DateTime?),
+          notifyAt: drift.Value(values['notifyAt'] as DateTime?),
+          endOn: drift.Value(values['endOn'] as DateTime?),
+          endAt: drift.Value(values['endAt'] as DateTime?),
+          createdAt: values['createdAt'] as DateTime,
+          updatedAt: drift.Value(values['updatedAt'] as DateTime?),
+          archivedAt: drift.Value(values['archivedAt'] as DateTime?),
+        );
+      case 'mem_items':
+        return MemItemsCompanion.insert(
+          type: values['type'] as String,
+          value: values['value'] as String,
+          memId: (values['memId'] as int?) ?? 0,
+          createdAt: values['createdAt'] as DateTime,
+          updatedAt: drift.Value(values['updatedAt'] as DateTime?),
+          archivedAt: drift.Value(values['archivedAt'] as DateTime?),
+        );
+      case 'acts':
+        return ActsCompanion.insert(
+          start: drift.Value(values['start'] as DateTime?),
+          startIsAllDay: drift.Value(values['startIsAllDay'] as bool?),
+          end: drift.Value(values['end'] as DateTime?),
+          endIsAllDay: drift.Value(values['endIsAllDay'] as bool?),
+          pausedAt: drift.Value(values['pausedAt'] as DateTime?),
+          memId: (values['memId'] as int?) ?? 0,
+          createdAt: values['createdAt'] as DateTime,
+          updatedAt: drift.Value(values['updatedAt'] as DateTime?),
+          archivedAt: drift.Value(values['archivedAt'] as DateTime?),
+        );
+      case 'mem_repeated_notifications':
+        return MemRepeatedNotificationsCompanion.insert(
+          timeOfDaySeconds: (values['timeOfDaySeconds'] as int?) ?? 0,
+          type: values['type'] as String,
+          message: values['message'] as String,
+          memId: (values['memId'] as int?) ?? 0,
+          createdAt: values['createdAt'] as DateTime,
+          updatedAt: drift.Value(values['updatedAt'] as DateTime?),
+          archivedAt: drift.Value(values['archivedAt'] as DateTime?),
+        );
+      case 'targets':
+        return TargetsCompanion.insert(
+          type: values['type'] as String,
+          unit: values['unit'] as String,
+          value: (values['value'] as int?) ?? 0,
+          period: values['period'] as String,
+          memId: (values['memId'] as int?) ?? 0,
+          createdAt: values['createdAt'] as DateTime,
+          updatedAt: drift.Value(values['updatedAt'] as DateTime?),
+          archivedAt: drift.Value(values['archivedAt'] as DateTime?),
+        );
+      case 'mem_relations':
+        return MemRelationsCompanion.insert(
+          sourceMemId: (values['sourceMemId'] as int?) ?? 0,
+          targetMemId: (values['targetMemId'] as int?) ?? 0,
+          type: values['type'] as String,
+          value: drift.Value(values['value'] as int?),
+          createdAt: values['createdAt'] as DateTime,
+          updatedAt: drift.Value(values['updatedAt'] as DateTime?),
+          archivedAt: drift.Value(values['archivedAt'] as DateTime?),
+        );
+      default:
+        throw StateError('Unknown table: $tableName');
     }
   }
 
