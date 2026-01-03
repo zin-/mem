@@ -232,6 +232,27 @@ class DriftDatabaseAccessor {
         },
       );
 
+  delete(
+    TableDefinition tableDefinition,
+    Condition? condition,
+  ) =>
+      v(
+        () async {
+          final tableInfo = _getTableInfo(tableDefinition);
+
+          final query = driftDatabase.delete(tableInfo);
+
+          if (condition != null) {
+            final driftExpression = condition.toDriftExpression(tableInfo);
+            if (driftExpression != null) {
+              query.where((tbl) => driftExpression);
+            }
+          }
+
+          return await query.go();
+        },
+      );
+
   drift.TableInfo _getTableInfo(
     TableDefinition tableDefinition,
   ) =>

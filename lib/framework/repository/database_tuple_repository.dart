@@ -17,8 +17,8 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
     SAVED extends DatabaseTupleEntity> extends Repository<ENTITY> {
   // ignore: unnecessary_nullable_for_final_variable_declarations
   static final DriftDatabaseAccessor? _driftDatabaseAccessor =
-      // DriftDatabaseAccessor();
-      null;
+      DriftDatabaseAccessor();
+  // null;
 
   static DatabaseAccessor? _databaseAccessor;
   static final Map<TableDefinition, Repository> _repositories = {};
@@ -335,13 +335,22 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
             }
           }
 
-          await _dbA.then(
+          final fromNative = await _dbA.then(
             (dbA) async => await dbA.delete(
               _tableDefinition,
               where: condition?.where(),
               whereArgs: condition?.whereArgs(),
             ),
           );
+
+          final fromDrift = await _driftDatabaseAccessor?.delete(
+            _tableDefinition,
+            condition,
+          );
+
+          if (fromNative != fromDrift) {
+            warn("waste: fromNative != fromDrift: $fromNative != $fromDrift");
+          }
 
           return targets;
         },
