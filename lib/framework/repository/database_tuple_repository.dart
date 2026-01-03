@@ -252,12 +252,21 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
           entityMap[defColArchivedAt.name] = archivedAt ?? DateTime.now();
 
           final byId = Equals(defPkId, entityMap[defPkId.name]);
-          await (await _dbA).update(
+          final fromNative = await (await _dbA).update(
             _tableDefinition,
             entityMap,
             where: byId.where(),
             whereArgs: byId.whereArgs(),
           );
+
+          final fromDrift = await _driftDatabaseAccessor?.update(
+            _tableDefinition,
+            entityMap,
+          );
+
+          if (fromNative != fromDrift) {
+            warn("archive: fromNative != fromDrift: $fromNative != $fromDrift");
+          }
 
           return pack(entityMap);
         },
@@ -279,13 +288,22 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
           entityMap[defColArchivedAt.name] = null;
 
           final byId = Equals(defPkId, entityMap[defPkId.name]);
-          await (await _dbA).update(
+          final fromNative = await (await _dbA).update(
             _tableDefinition,
             entityMap,
             where: byId.where(),
             whereArgs: byId.whereArgs(),
           );
 
+          final fromDrift = await _driftDatabaseAccessor?.update(
+            _tableDefinition,
+            entityMap,
+          );
+
+          if (fromNative != fromDrift) {
+            warn(
+                "unarchive: fromNative != fromDrift: $fromNative != $fromDrift");
+          }
           return pack(entityMap);
         },
         {
