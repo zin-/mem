@@ -214,6 +214,24 @@ class DriftDatabaseAccessor {
         },
       );
 
+  update(
+    TableDefinition tableDefinition,
+    Map<String, Object?> values,
+  ) =>
+      v(
+        () async {
+          final tableInfo = _getTableInfo(tableDefinition);
+
+          final query = driftDatabase.update(tableInfo)
+            ..where((t) => (t as dynamic).id.equals(values['id']));
+
+          return await query.write(_createCompanionForTable(
+            tableDefinition.name,
+            values,
+          ));
+        },
+      );
+
   drift.TableInfo _getTableInfo(
     TableDefinition tableDefinition,
   ) =>

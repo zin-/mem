@@ -17,8 +17,8 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
     SAVED extends DatabaseTupleEntity> extends Repository<ENTITY> {
   // ignore: unnecessary_nullable_for_final_variable_declarations
   static final DriftDatabaseAccessor? _driftDatabaseAccessor =
-      DriftDatabaseAccessor();
-  // null;
+      // DriftDatabaseAccessor();
+      null;
 
   static DatabaseAccessor? _databaseAccessor;
   static final Map<TableDefinition, Repository> _repositories = {};
@@ -106,7 +106,7 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
           // debug("fromDrift: $fromDrift");
 
           if (id != fromDrift) {
-            warn("id != fromDrift: $id != $fromDrift");
+            warn("receive: id != fromDrift: $id != $fromDrift");
           }
 
           return fromNative;
@@ -189,7 +189,7 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
           if (fromNative.map((e) => e.value).toString() !=
               coverted?.map((e) => e.value).toString()) {
             warn(
-                "fromNative != coverted: ${fromNative.map((e) => e.value).toString()} != ${coverted?.map((e) => e.value).toString()}");
+                "ship: fromNative != coverted: ${fromNative.map((e) => e.value).toString()} != ${coverted?.map((e) => e.value).toString()}");
           }
 
           return fromNative;
@@ -221,7 +221,19 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
             whereArgs: byId.whereArgs(),
           );
 
-          return pack(entityMap);
+          final fromNative = pack(entityMap);
+
+          final fromDrift = await _driftDatabaseAccessor?.update(
+            _tableDefinition,
+            entityMap,
+          );
+
+          if (fromNative.id != fromDrift) {
+            warn(
+                "replace: fromNative.id != fromDrift: ${fromNative.id} != $fromDrift");
+          }
+
+          return fromNative;
         },
         {
           'savedEntity': savedEntity,
