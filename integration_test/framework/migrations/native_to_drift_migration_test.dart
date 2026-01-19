@@ -28,7 +28,7 @@ import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 
-const _name = "Native to Drift migration test";
+const _name = "Migrations tests Native to Drift";
 
 void main() => group(
       _name,
