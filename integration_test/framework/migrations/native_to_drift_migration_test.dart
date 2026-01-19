@@ -21,14 +21,16 @@ import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/targets/target_repository.dart';
+import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/factory.dart';
+import 'package:mem/framework/singleton.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 
-const _name = "Migrations tests Native to Drift";
+const _name = "Native to Drift test";
 
 void main() => group(
       _name,
@@ -41,6 +43,12 @@ void main() => group(
         setUp(() async {
           await DatabaseTupleRepository.close();
 
+          if (Singleton.exists<DriftDatabaseAccessor>()) {
+            final driftAccessor = DriftDatabaseAccessor();
+            await driftAccessor.close();
+          }
+          DriftDatabaseAccessor.reset();
+
           final nativeDbPath =
               await DatabaseFactory.buildDatabasePath('mem.db');
           await DatabaseFactory
@@ -52,21 +60,33 @@ void main() => group(
           final driftDbPath = path.join(dbFolder.path, 'test_mem_drift.db');
           final driftDbFile = File(driftDbPath);
           if (await driftDbFile.exists()) {
-            await driftDbFile.delete();
+            try {
+              await driftDbFile.delete(recursive: false);
+            } catch (e) {
+              // ファイルが使用中の場合は無視
+            }
           }
 
           final driftDbWalPath =
               path.join(dbFolder.path, 'test_mem_drift.db-wal');
           final driftDbWalFile = File(driftDbWalPath);
           if (await driftDbWalFile.exists()) {
-            await driftDbWalFile.delete();
+            try {
+              await driftDbWalFile.delete(recursive: false);
+            } catch (e) {
+              // ファイルが使用中の場合は無視
+            }
           }
 
           final driftDbShmPath =
               path.join(dbFolder.path, 'test_mem_drift.db-shm');
           final driftDbShmFile = File(driftDbShmPath);
           if (await driftDbShmFile.exists()) {
-            await driftDbShmFile.delete();
+            try {
+              await driftDbShmFile.delete(recursive: false);
+            } catch (e) {
+              // ファイルが使用中の場合は無視
+            }
           }
         });
 
@@ -184,47 +204,61 @@ void main() => group(
             expect(nativeTargets.length, 1);
             expect(nativeRelations.length, 1);
 
-            final driftDatabase = AppDatabase();
-
-            await driftDatabase.close();
+            if (Singleton.exists<DriftDatabaseAccessor>()) {
+              final existingAccessor = DriftDatabaseAccessor();
+              await existingAccessor.close();
+            }
+            DriftDatabaseAccessor.reset();
 
             final dbFolder = await getApplicationDocumentsDirectory();
             final driftDbPath = path.join(dbFolder.path, 'test_mem_drift.db');
             final driftDbFile = File(driftDbPath);
             if (await driftDbFile.exists()) {
-              await driftDbFile.delete();
+              try {
+                await driftDbFile.delete(recursive: false);
+              } catch (e) {
+                // ファイルが使用中の場合は無視
+              }
             }
 
             final driftDbWalPath =
                 path.join(dbFolder.path, 'test_mem_drift.db-wal');
             final driftDbWalFile = File(driftDbWalPath);
             if (await driftDbWalFile.exists()) {
-              await driftDbWalFile.delete();
+              try {
+                await driftDbWalFile.delete(recursive: false);
+              } catch (e) {
+                // ファイルが使用中の場合は無視
+              }
             }
 
             final driftDbShmPath =
                 path.join(dbFolder.path, 'test_mem_drift.db-shm');
             final driftDbShmFile = File(driftDbShmPath);
             if (await driftDbShmFile.exists()) {
-              await driftDbShmFile.delete();
+              try {
+                await driftDbShmFile.delete(recursive: false);
+              } catch (e) {
+                // ファイルが使用中の場合は無視
+              }
             }
 
-            final newDriftDatabase = AppDatabase();
+            final driftAccessor = DriftDatabaseAccessor();
+            final driftDatabase = driftAccessor.driftDatabase;
 
             final driftMems =
-                await newDriftDatabase.select(newDriftDatabase.mems).get();
+                await driftDatabase.select(driftDatabase.mems).get();
             final driftMemItems =
-                await newDriftDatabase.select(newDriftDatabase.memItems).get();
+                await driftDatabase.select(driftDatabase.memItems).get();
             final driftActs =
-                await newDriftDatabase.select(newDriftDatabase.acts).get();
-            final driftNotifications = await newDriftDatabase
-                .select(newDriftDatabase.memRepeatedNotifications)
+                await driftDatabase.select(driftDatabase.acts).get();
+            final driftNotifications = await driftDatabase
+                .select(driftDatabase.memRepeatedNotifications)
                 .get();
             final driftTargets =
-                await newDriftDatabase.select(newDriftDatabase.targets).get();
-            final driftRelations = await newDriftDatabase
-                .select(newDriftDatabase.memRelations)
-                .get();
+                await driftDatabase.select(driftDatabase.targets).get();
+            final driftRelations =
+                await driftDatabase.select(driftDatabase.memRelations).get();
 
             expect(driftMems.length, nativeMems.length);
             expect(driftMemItems.length, nativeMemItems.length);
@@ -338,7 +372,7 @@ void main() => group(
             expect(driftRelation1.createdAt.millisecondsSinceEpoch ~/ 1000,
                 nativeRelation1.createdAt.millisecondsSinceEpoch ~/ 1000);
 
-            await newDriftDatabase.close();
+            await driftAccessor.close();
           },
         );
       },

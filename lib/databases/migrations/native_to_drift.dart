@@ -1,19 +1,43 @@
 import 'package:drift/drift.dart';
 import 'package:mem/databases/database.dart';
-import 'package:mem/features/acts/act_repository.dart';
-import 'package:mem/features/mem_items/mem_item_repository.dart';
-import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
-import 'package:mem/features/mem_relations/mem_relation_repository.dart';
-import 'package:mem/features/mems/mem_repository.dart';
-import 'package:mem/features/targets/target_repository.dart';
+import 'package:mem/databases/definition.dart';
+import 'package:mem/databases/table_definitions/acts.dart';
+import 'package:mem/databases/table_definitions/mem_items.dart';
+import 'package:mem/databases/table_definitions/mem_notifications.dart';
+import 'package:mem/databases/table_definitions/mem_relations.dart';
+import 'package:mem/databases/table_definitions/mems.dart';
+import 'package:mem/features/targets/target_table.dart';
+import 'package:mem/features/acts/act_entity.dart';
+import 'package:mem/features/mem_items/mem_item_entity.dart';
+import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
+import 'package:mem/features/mem_relations/mem_relation_entity.dart';
+import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/targets/target_entity.dart';
+import 'package:mem/framework/database/factory.dart';
 
 Future migrateNativeToDrift(AppDatabase database) async {
-  final allMems = await MemRepository().ship();
-  final allMemItems = await MemItemRepository().ship();
-  final allActs = await ActRepository().ship();
-  final allMemNotifications = await MemNotificationRepository().ship();
-  final allTargets = await TargetRepository().ship();
-  final allMemRelations = await MemRelationRepository().ship();
+  final dbAccessor = await DatabaseFactory.open(databaseDefinition);
+
+  final allMemsRaw = await dbAccessor.select(defTableMems);
+  final allMems = allMemsRaw.map((e) => SavedMemEntity(e)).toList();
+
+  final allMemItemsRaw = await dbAccessor.select(defTableMemItems);
+  final allMemItems = allMemItemsRaw.map((e) => SavedMemItemEntity(e)).toList();
+
+  final allActsRaw = await dbAccessor.select(defTableActs);
+  final allActs = allActsRaw.map((e) => SavedActEntity(e)).toList();
+
+  final allMemNotificationsRaw =
+      await dbAccessor.select(defTableMemNotifications);
+  final allMemNotifications =
+      allMemNotificationsRaw.map((e) => SavedMemNotificationEntity(e)).toList();
+
+  final allTargetsRaw = await dbAccessor.select(defTableTargets);
+  final allTargets = allTargetsRaw.map((e) => SavedTargetEntity(e)).toList();
+
+  final allMemRelationsRaw = await dbAccessor.select(defTableMemRelations);
+  final allMemRelations =
+      allMemRelationsRaw.map((e) => SavedMemRelationEntity(e)).toList();
 
   await database.batch((batch) async {
     batch.insertAll(

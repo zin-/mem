@@ -403,6 +403,14 @@ class DriftDatabaseAccessor {
 
   factory DriftDatabaseAccessor() =>
       Singleton.of(() => DriftDatabaseAccessor._(AppDatabase()));
+
+  Future<void> close() async {
+    await driftDatabase.close();
+  }
+
+  static void reset() {
+    Singleton.reset<DriftDatabaseAccessor>();
+  }
 }
 
 String toSnakeCase(String camelCase) {
