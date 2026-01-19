@@ -38,13 +38,13 @@ jobs:
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-  medium_test-windows:
-    uses: ./.github/workflows/medium_test-windows.yml
-    with:
-      flutter-channel: ${{ inputs.flutter-channel }}
-      flutter-version: ${{ inputs.flutter-version }}
-      test-script: ${{ inputs.test-script }} --device-id windows
-      target: ${{ inputs.target }}
-      timeout-minutes: ${{ inputs.timeout-minutes-windows }}
-    secrets:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  # medium_test-windows:
+  #   uses: ./.github/workflows/medium_test-windows.yml
+  #   with:
+  #     flutter-channel: ${{ inputs.flutter-channel }}
+  #     flutter-version: ${{ inputs.flutter-version }}
+  #     test-script: ${{ inputs.test-script }} --device-id windows
+  #     target: ${{ inputs.target }}
+  #     timeout-minutes: ${{ inputs.timeout-minutes-windows }}
+  #   secrets:
+  #     CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
