@@ -150,7 +150,12 @@ class DriftDatabaseAccessor {
   }) =>
       v(
         () async {
-          final tableInfo = _getTableInfo(tableDefinition);
+          final drift.TableInfo tableInfo;
+          try {
+            tableInfo = _getTableInfo(tableDefinition);
+          } catch (e) {
+            return <Map<String, dynamic>>[];
+          }
           final query = driftDatabase.select(tableInfo);
 
           if (condition != null) {
@@ -205,7 +210,12 @@ class DriftDatabaseAccessor {
   ) =>
       v(
         () async {
-          final tableInfo = _getTableInfo(tableDefinition);
+          final drift.TableInfo tableInfo;
+          try {
+            tableInfo = _getTableInfo(tableDefinition);
+          } catch (e) {
+            return 0;
+          }
           final insertable = _createCompanionForTable(
             tableDefinition.name,
             values,
@@ -220,7 +230,12 @@ class DriftDatabaseAccessor {
   ) =>
       v(
         () async {
-          final tableInfo = _getTableInfo(tableDefinition);
+          final drift.TableInfo tableInfo;
+          try {
+            tableInfo = _getTableInfo(tableDefinition);
+          } catch (e) {
+            return 0;
+          }
 
           final query = driftDatabase.update(tableInfo)
             ..where((t) => (t as dynamic).id.equals(values['id']));
@@ -238,7 +253,12 @@ class DriftDatabaseAccessor {
   ) =>
       v(
         () async {
-          final tableInfo = _getTableInfo(tableDefinition);
+          final drift.TableInfo tableInfo;
+          try {
+            tableInfo = _getTableInfo(tableDefinition);
+          } catch (e) {
+            return 0;
+          }
 
           final query = driftDatabase.delete(tableInfo);
 
