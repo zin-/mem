@@ -1,7 +1,13 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/databases/database.dart' hide Mem, MemItem, Act, Target;
+import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/base.dart';
+import 'package:mem/databases/table_definitions/mem_items.dart';
+import 'package:mem/databases/table_definitions/mem_notifications.dart';
+import 'package:mem/databases/table_definitions/mem_relations.dart';
+import 'package:mem/databases/table_definitions/mems.dart';
+import 'package:mem/features/targets/target_table.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_repository.dart';
@@ -185,6 +191,581 @@ void main() => group(
                 savedMem.createdAt.millisecondsSinceEpoch ~/ 1000);
             expect(driftMem.updatedAt, savedMem.updatedAt);
             expect(driftMem.archivedAt, savedMem.archivedAt);
+
+            await driftDatabase.close();
+          },
+        );
+
+        test(
+          'migrates mem_items data from native to drift database using migrateNativeToDrift',
+          () async {
+            final now = DateTime.now();
+            final createdAt = now.subtract(const Duration(days: 1));
+
+            final mem = MemEntity(
+              Mem(
+                null,
+                'Test Mem for MemItem',
+                null,
+                null,
+              ),
+            );
+            final savedMem =
+                await MemRepository().receive(mem, createdAt: createdAt);
+
+            final memItem = MemItemEntity(
+              MemItem(savedMem.id, MemItemType.memo, 'Test memo'),
+            );
+            final savedMemItem = await MemItemRepository()
+                .receive(memItem, createdAt: createdAt);
+
+            expect(savedMemItem.id, isNotNull);
+            expect(savedMemItem.value.memId, savedMem.id);
+            expect(savedMemItem.value.type, MemItemType.memo);
+            expect(savedMemItem.value.value, 'Test memo');
+
+            if (Singleton.exists<DriftDatabaseAccessor>()) {
+              final existingAccessor = DriftDatabaseAccessor();
+              await existingAccessor.close();
+            }
+            DriftDatabaseAccessor.reset();
+
+            final testDbFolder = await getApplicationDocumentsDirectory();
+            final testDriftDbPath =
+                path.join(testDbFolder.path, 'test_mem_drift.db');
+            final testDriftDbFile = File(testDriftDbPath);
+            if (await testDriftDbFile.exists()) {
+              try {
+                await testDriftDbFile.delete(recursive: false);
+              } catch (e) {
+                // ファイルが使用中の場合は無視
+              }
+            }
+
+            final testDriftDbWalPath =
+                path.join(testDbFolder.path, 'test_mem_drift.db-wal');
+            final testDriftDbWalFile = File(testDriftDbWalPath);
+            if (await testDriftDbWalFile.exists()) {
+              try {
+                await testDriftDbWalFile.delete(recursive: false);
+              } catch (e) {
+                // ファイルが使用中の場合は無視
+              }
+            }
+
+            final testDriftDbShmPath =
+                path.join(testDbFolder.path, 'test_mem_drift.db-shm');
+            final testDriftDbShmFile = File(testDriftDbShmPath);
+            if (await testDriftDbShmFile.exists()) {
+              try {
+                await testDriftDbShmFile.delete(recursive: false);
+              } catch (e) {
+                // ファイルが使用中の場合は無視
+              }
+            }
+
+            final driftDatabase = AppDatabase();
+
+            final driftMemItemsBeforeMigration =
+                await driftDatabase.select(driftDatabase.memItems).get();
+
+            if (driftMemItemsBeforeMigration.isEmpty) {
+              await driftDatabase.customStatement('PRAGMA foreign_keys = ON');
+              await driftDatabase
+                  .customStatement(defTableMems.buildCreateTableSql());
+              await driftDatabase
+                  .customStatement(defTableMemItems.buildCreateTableSql());
+
+              final driftMemItemsBefore =
+                  await driftDatabase.select(driftDatabase.memItems).get();
+              expect(driftMemItemsBefore.length, 0);
+
+              await migrateNativeToDrift(driftDatabase);
+            }
+
+            final driftMemItems =
+                await driftDatabase.select(driftDatabase.memItems).get();
+
+            expect(driftMemItems.length, 1);
+
+            final driftMemItem = driftMemItems.first;
+            expect(driftMemItem.id, savedMemItem.id);
+            expect(driftMemItem.memId, savedMemItem.value.memId);
+            expect(driftMemItem.type, savedMemItem.value.type.name);
+            expect(driftMemItem.value, savedMemItem.value.value);
+            expect(driftMemItem.createdAt.millisecondsSinceEpoch ~/ 1000,
+                savedMemItem.createdAt.millisecondsSinceEpoch ~/ 1000);
+            expect(driftMemItem.updatedAt, savedMemItem.updatedAt);
+            expect(driftMemItem.archivedAt, savedMemItem.archivedAt);
+
+            await driftDatabase.close();
+          },
+        );
+
+        test(
+          'migrates acts data from native to drift database using migrateNativeToDrift',
+          () async {
+            final now = DateTime.now();
+            final createdAt = now.subtract(const Duration(days: 1));
+
+            final mem = MemEntity(
+              Mem(
+                null,
+                'Test Mem for Act',
+                null,
+                null,
+              ),
+            );
+            final savedMem =
+                await MemRepository().receive(mem, createdAt: createdAt);
+
+            final act = ActEntity(
+              Act.by(
+                savedMem.id,
+                startWhen:
+                    DateAndTime.from(now.subtract(const Duration(hours: 2))),
+                endWhen:
+                    DateAndTime.from(now.subtract(const Duration(hours: 1))),
+              ),
+            );
+            final savedAct =
+                await ActRepository().receive(act, createdAt: createdAt);
+
+            expect(savedAct.id, isNotNull);
+            expect(savedAct.value.memId, savedMem.id);
+
+            if (Singleton.exists<DriftDatabaseAccessor>()) {
+              final existingAccessor = DriftDatabaseAccessor();
+              await existingAccessor.close();
+            }
+            DriftDatabaseAccessor.reset();
+
+            final testDbFolder = await getApplicationDocumentsDirectory();
+            final testDriftDbPath =
+                path.join(testDbFolder.path, 'test_mem_drift.db');
+            final testDriftDbFile = File(testDriftDbPath);
+            if (await testDriftDbFile.exists()) {
+              try {
+                await testDriftDbFile.delete(recursive: false);
+              } catch (e) {
+                // ファイルが使用中の場合は無視
+              }
+            }
+
+            final testDriftDbWalPath =
+                path.join(testDbFolder.path, 'test_mem_drift.db-wal');
+            final testDriftDbWalFile = File(testDriftDbWalPath);
+            if (await testDriftDbWalFile.exists()) {
+              try {
+                await testDriftDbWalFile.delete(recursive: false);
+              } catch (e) {
+                // ファイルが使用中の場合は無視
+              }
+            }
+
+            final testDriftDbShmPath =
+                path.join(testDbFolder.path, 'test_mem_drift.db-shm');
+            final testDriftDbShmFile = File(testDriftDbShmPath);
+            if (await testDriftDbShmFile.exists()) {
+              try {
+                await testDriftDbShmFile.delete(recursive: false);
+              } catch (e) {
+                // ファイルが使用中の場合は無視
+              }
+            }
+
+            final driftDatabase = AppDatabase();
+
+            final driftActsBeforeMigration =
+                await driftDatabase.select(driftDatabase.acts).get();
+
+            if (driftActsBeforeMigration.isEmpty) {
+              await driftDatabase.customStatement('PRAGMA foreign_keys = ON');
+              await driftDatabase
+                  .customStatement(defTableMems.buildCreateTableSql());
+              await driftDatabase
+                  .customStatement(defTableActs.buildCreateTableSql());
+
+              final driftActsBefore =
+                  await driftDatabase.select(driftDatabase.acts).get();
+              expect(driftActsBefore.length, 0);
+
+              await migrateNativeToDrift(driftDatabase);
+            }
+
+            final driftActs =
+                await driftDatabase.select(driftDatabase.acts).get();
+
+            expect(driftActs.length, 1);
+
+            final driftAct = driftActs.first;
+            expect(driftAct.id, savedAct.id);
+            expect(driftAct.memId, savedAct.value.memId);
+            expect(driftAct.start, savedAct.value.period?.start);
+            expect(
+                driftAct.startIsAllDay, savedAct.value.period?.start?.isAllDay);
+            expect(driftAct.end, savedAct.value.period?.end);
+            expect(driftAct.endIsAllDay, savedAct.value.period?.end?.isAllDay);
+            expect(driftAct.createdAt.millisecondsSinceEpoch ~/ 1000,
+                savedAct.createdAt.millisecondsSinceEpoch ~/ 1000);
+            expect(driftAct.updatedAt, savedAct.updatedAt);
+            expect(driftAct.archivedAt, savedAct.archivedAt);
+
+            await driftDatabase.close();
+          },
+        );
+
+        test(
+          'migrates mem_notifications data from native to drift database using migrateNativeToDrift',
+          () async {
+            final now = DateTime.now();
+            final createdAt = now.subtract(const Duration(days: 1));
+
+            final mem = MemEntity(
+              Mem(
+                null,
+                'Test Mem for Notification',
+                null,
+                null,
+              ),
+            );
+            final savedMem =
+                await MemRepository().receive(mem, createdAt: createdAt);
+
+            final notification = MemNotificationEntity(
+              MemNotification.by(
+                savedMem.id,
+                MemNotificationType.repeat,
+                const Duration(hours: 9).inSeconds,
+                'Test notification',
+              ),
+            );
+            final savedNotification = await MemNotificationRepository()
+                .receive(notification, createdAt: createdAt);
+
+            expect(savedNotification.id, isNotNull);
+            expect(savedNotification.value.memId, savedMem.id);
+            expect(savedNotification.value.type, MemNotificationType.repeat);
+            expect(savedNotification.value.time,
+                const Duration(hours: 9).inSeconds);
+            expect(savedNotification.value.message, 'Test notification');
+
+            if (Singleton.exists<DriftDatabaseAccessor>()) {
+              final existingAccessor = DriftDatabaseAccessor();
+              await existingAccessor.close();
+            }
+            DriftDatabaseAccessor.reset();
+
+            final testDbFolder = await getApplicationDocumentsDirectory();
+            final testDriftDbPath =
+                path.join(testDbFolder.path, 'test_mem_drift.db');
+            final testDriftDbFile = File(testDriftDbPath);
+            if (await testDriftDbFile.exists()) {
+              try {
+                await testDriftDbFile.delete(recursive: false);
+              } catch (e) {
+                // ファイルが使用中の場合は無視
+              }
+            }
+
+            final testDriftDbWalPath =
+                path.join(testDbFolder.path, 'test_mem_drift.db-wal');
+            final testDriftDbWalFile = File(testDriftDbWalPath);
+            if (await testDriftDbWalFile.exists()) {
+              try {
+                await testDriftDbWalFile.delete(recursive: false);
+              } catch (e) {
+                // ファイルが使用中の場合は無視
+              }
+            }
+
+            final testDriftDbShmPath =
+                path.join(testDbFolder.path, 'test_mem_drift.db-shm');
+            final testDriftDbShmFile = File(testDriftDbShmPath);
+            if (await testDriftDbShmFile.exists()) {
+              try {
+                await testDriftDbShmFile.delete(recursive: false);
+              } catch (e) {
+                // ファイルが使用中の場合は無視
+              }
+            }
+
+            final driftDatabase = AppDatabase();
+
+            final driftNotificationsBeforeMigration = await driftDatabase
+                .select(driftDatabase.memRepeatedNotifications)
+                .get();
+
+            if (driftNotificationsBeforeMigration.isEmpty) {
+              await driftDatabase.customStatement('PRAGMA foreign_keys = ON');
+              await driftDatabase
+                  .customStatement(defTableMems.buildCreateTableSql());
+              await driftDatabase.customStatement(
+                  defTableMemNotifications.buildCreateTableSql());
+
+              final driftNotificationsBefore = await driftDatabase
+                  .select(driftDatabase.memRepeatedNotifications)
+                  .get();
+              expect(driftNotificationsBefore.length, 0);
+
+              await migrateNativeToDrift(driftDatabase);
+            }
+
+            final driftNotifications = await driftDatabase
+                .select(driftDatabase.memRepeatedNotifications)
+                .get();
+
+            expect(driftNotifications.length, 1);
+
+            final driftNotification = driftNotifications.first;
+            expect(driftNotification.id, savedNotification.id);
+            expect(driftNotification.memId, savedNotification.value.memId);
+            expect(driftNotification.type, savedNotification.value.type.name);
+            expect(driftNotification.timeOfDaySeconds,
+                savedNotification.value.time);
+            expect(driftNotification.message, savedNotification.value.message);
+            expect(driftNotification.createdAt.millisecondsSinceEpoch ~/ 1000,
+                savedNotification.createdAt.millisecondsSinceEpoch ~/ 1000);
+            expect(driftNotification.updatedAt, savedNotification.updatedAt);
+            expect(driftNotification.archivedAt, savedNotification.archivedAt);
+
+            await driftDatabase.close();
+          },
+        );
+
+        test(
+          'migrates targets data from native to drift database using migrateNativeToDrift',
+          () async {
+            final now = DateTime.now();
+            final createdAt = now.subtract(const Duration(days: 1));
+
+            final mem = MemEntity(
+              Mem(
+                null,
+                'Test Mem for Target',
+                null,
+                null,
+              ),
+            );
+            final savedMem =
+                await MemRepository().receive(mem, createdAt: createdAt);
+
+            final target = TargetEntity(
+              Target(
+                memId: savedMem.id,
+                targetType: TargetType.equalTo,
+                targetUnit: TargetUnit.count,
+                value: 10,
+                period: Period.aDay,
+              ),
+            );
+            final savedTarget =
+                await TargetRepository().receive(target, createdAt: createdAt);
+
+            expect(savedTarget.id, isNotNull);
+            expect(savedTarget.value.memId, savedMem.id);
+            expect(savedTarget.value.targetType, TargetType.equalTo);
+            expect(savedTarget.value.targetUnit, TargetUnit.count);
+            expect(savedTarget.value.value, 10);
+            expect(savedTarget.value.period, Period.aDay);
+
+            if (Singleton.exists<DriftDatabaseAccessor>()) {
+              final existingAccessor = DriftDatabaseAccessor();
+              await existingAccessor.close();
+            }
+            DriftDatabaseAccessor.reset();
+
+            final testDbFolder = await getApplicationDocumentsDirectory();
+            final testDriftDbPath =
+                path.join(testDbFolder.path, 'test_mem_drift.db');
+            final testDriftDbFile = File(testDriftDbPath);
+            if (await testDriftDbFile.exists()) {
+              try {
+                await testDriftDbFile.delete(recursive: false);
+              } catch (e) {
+                // ファイルが使用中の場合は無視
+              }
+            }
+
+            final testDriftDbWalPath =
+                path.join(testDbFolder.path, 'test_mem_drift.db-wal');
+            final testDriftDbWalFile = File(testDriftDbWalPath);
+            if (await testDriftDbWalFile.exists()) {
+              try {
+                await testDriftDbWalFile.delete(recursive: false);
+              } catch (e) {
+                // ファイルが使用中の場合は無視
+              }
+            }
+
+            final testDriftDbShmPath =
+                path.join(testDbFolder.path, 'test_mem_drift.db-shm');
+            final testDriftDbShmFile = File(testDriftDbShmPath);
+            if (await testDriftDbShmFile.exists()) {
+              try {
+                await testDriftDbShmFile.delete(recursive: false);
+              } catch (e) {
+                // ファイルが使用中の場合は無視
+              }
+            }
+
+            final driftDatabase = AppDatabase();
+
+            final driftTargetsBeforeMigration =
+                await driftDatabase.select(driftDatabase.targets).get();
+
+            if (driftTargetsBeforeMigration.isEmpty) {
+              await driftDatabase.customStatement('PRAGMA foreign_keys = ON');
+              await driftDatabase
+                  .customStatement(defTableMems.buildCreateTableSql());
+              await driftDatabase
+                  .customStatement(defTableTargets.buildCreateTableSql());
+
+              final driftTargetsBefore =
+                  await driftDatabase.select(driftDatabase.targets).get();
+              expect(driftTargetsBefore.length, 0);
+
+              await migrateNativeToDrift(driftDatabase);
+            }
+
+            final driftTargets =
+                await driftDatabase.select(driftDatabase.targets).get();
+
+            expect(driftTargets.length, 1);
+
+            final driftTarget = driftTargets.first;
+            expect(driftTarget.id, savedTarget.id);
+            expect(driftTarget.memId, savedTarget.value.memId);
+            expect(driftTarget.type, savedTarget.value.targetType.name);
+            expect(driftTarget.unit, savedTarget.value.targetUnit.name);
+            expect(driftTarget.value, savedTarget.value.value);
+            expect(driftTarget.period, savedTarget.value.period.name);
+            expect(driftTarget.createdAt.millisecondsSinceEpoch ~/ 1000,
+                savedTarget.createdAt.millisecondsSinceEpoch ~/ 1000);
+            expect(driftTarget.updatedAt, savedTarget.updatedAt);
+            expect(driftTarget.archivedAt, savedTarget.archivedAt);
+
+            await driftDatabase.close();
+          },
+        );
+
+        test(
+          'migrates mem_relations data from native to drift database using migrateNativeToDrift',
+          () async {
+            final now = DateTime.now();
+            final createdAt = now.subtract(const Duration(days: 1));
+
+            final mem1 = MemEntity(
+              Mem(
+                null,
+                'Test Mem 1 for Relation',
+                null,
+                null,
+              ),
+            );
+            final savedMem1 =
+                await MemRepository().receive(mem1, createdAt: createdAt);
+
+            final mem2 = MemEntity(
+              Mem(
+                null,
+                'Test Mem 2 for Relation',
+                null,
+                null,
+              ),
+            );
+            final savedMem2 =
+                await MemRepository().receive(mem2, createdAt: createdAt);
+
+            final relation = MemRelationEntity.by(
+              savedMem1.id,
+              savedMem2.id,
+              MemRelationType.prePost,
+              0,
+            );
+            final savedRelation = await MemRelationRepository()
+                .receive(relation, createdAt: createdAt);
+
+            expect(savedRelation.id, isNotNull);
+            expect(savedRelation.value.sourceMemId, savedMem1.id);
+            expect(savedRelation.value.targetMemId, savedMem2.id);
+            expect(savedRelation.value.type, MemRelationType.prePost);
+            expect(savedRelation.value.value, 0);
+
+            if (Singleton.exists<DriftDatabaseAccessor>()) {
+              final existingAccessor = DriftDatabaseAccessor();
+              await existingAccessor.close();
+            }
+            DriftDatabaseAccessor.reset();
+
+            final testDbFolder = await getApplicationDocumentsDirectory();
+            final testDriftDbPath =
+                path.join(testDbFolder.path, 'test_mem_drift.db');
+            final testDriftDbFile = File(testDriftDbPath);
+            if (await testDriftDbFile.exists()) {
+              try {
+                await testDriftDbFile.delete(recursive: false);
+              } catch (e) {
+                // ファイルが使用中の場合は無視
+              }
+            }
+
+            final testDriftDbWalPath =
+                path.join(testDbFolder.path, 'test_mem_drift.db-wal');
+            final testDriftDbWalFile = File(testDriftDbWalPath);
+            if (await testDriftDbWalFile.exists()) {
+              try {
+                await testDriftDbWalFile.delete(recursive: false);
+              } catch (e) {
+                // ファイルが使用中の場合は無視
+              }
+            }
+
+            final testDriftDbShmPath =
+                path.join(testDbFolder.path, 'test_mem_drift.db-shm');
+            final testDriftDbShmFile = File(testDriftDbShmPath);
+            if (await testDriftDbShmFile.exists()) {
+              try {
+                await testDriftDbShmFile.delete(recursive: false);
+              } catch (e) {
+                // ファイルが使用中の場合は無視
+              }
+            }
+
+            final driftDatabase = AppDatabase();
+
+            final driftRelationsBeforeMigration =
+                await driftDatabase.select(driftDatabase.memRelations).get();
+
+            if (driftRelationsBeforeMigration.isEmpty) {
+              await driftDatabase.customStatement('PRAGMA foreign_keys = ON');
+              await driftDatabase
+                  .customStatement(defTableMems.buildCreateTableSql());
+              await driftDatabase
+                  .customStatement(defTableMemRelations.buildCreateTableSql());
+
+              final driftRelationsBefore =
+                  await driftDatabase.select(driftDatabase.memRelations).get();
+              expect(driftRelationsBefore.length, 0);
+
+              await migrateNativeToDrift(driftDatabase);
+            }
+
+            final driftRelations =
+                await driftDatabase.select(driftDatabase.memRelations).get();
+
+            expect(driftRelations.length, 1);
+
+            final driftRelation = driftRelations.first;
+            expect(driftRelation.id, savedRelation.id);
+            expect(driftRelation.sourceMemId, savedRelation.value.sourceMemId);
+            expect(driftRelation.targetMemId, savedRelation.value.targetMemId);
+            expect(driftRelation.type, savedRelation.value.type.name);
+            expect(driftRelation.value, savedRelation.value.value);
+            expect(driftRelation.createdAt.millisecondsSinceEpoch ~/ 1000,
+                savedRelation.createdAt.millisecondsSinceEpoch ~/ 1000);
+            expect(driftRelation.updatedAt, savedRelation.updatedAt);
+            expect(driftRelation.archivedAt, savedRelation.archivedAt);
 
             await driftDatabase.close();
           },
