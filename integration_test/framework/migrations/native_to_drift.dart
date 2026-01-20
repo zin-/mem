@@ -4,11 +4,33 @@ import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/migrations/native_to_drift.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
-import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/factory.dart';
 
 const _name = "Native to Drift tests";
+
+void compareNullableDateTime(
+  Map<String, dynamic> nativeMem,
+  Map<String, dynamic> driftMemMap,
+  String key,
+) {
+  final nativeValue = nativeMem[key];
+  final driftValue = driftMemMap[key];
+  if (nativeValue == null) {
+    expect(driftValue, isNull);
+  } else {
+    final nativeDateTime = nativeValue as DateTime;
+    final nativeValueString = DateTime(
+      nativeDateTime.year,
+      nativeDateTime.month,
+      nativeDateTime.day,
+      nativeDateTime.hour,
+      nativeDateTime.minute,
+      nativeDateTime.second,
+    ).toIso8601String();
+    expect(driftValue, equals(nativeValueString));
+  }
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -62,33 +84,14 @@ void main() {
           expect(driftMemMap['id'], equals(nativeMem['id']));
           expect(driftMemMap['name'], equals(nativeMem['name']));
 
-          void compareNullableDateTime(String key) {
-            final nativeValue = nativeMem[key];
-            final driftValue = driftMemMap[key];
-            if (nativeValue == null) {
-              expect(driftValue, isNull);
-            } else {
-              final nativeDateTime = nativeValue as DateTime;
-              final nativeValueString = DateTime(
-                nativeDateTime.year,
-                nativeDateTime.month,
-                nativeDateTime.day,
-                nativeDateTime.hour,
-                nativeDateTime.minute,
-                nativeDateTime.second,
-              ).toIso8601String();
-              expect(driftValue, equals(nativeValueString));
-            }
-          }
-
-          compareNullableDateTime('doneAt');
-          compareNullableDateTime('notifyOn');
-          compareNullableDateTime('notifyAt');
-          compareNullableDateTime('endOn');
-          compareNullableDateTime('endAt');
-          compareNullableDateTime('createdAt');
-          compareNullableDateTime('updatedAt');
-          compareNullableDateTime('archivedAt');
+          compareNullableDateTime(nativeMem, driftMemMap, 'doneAt');
+          compareNullableDateTime(nativeMem, driftMemMap, 'notifyOn');
+          compareNullableDateTime(nativeMem, driftMemMap, 'notifyAt');
+          compareNullableDateTime(nativeMem, driftMemMap, 'endOn');
+          compareNullableDateTime(nativeMem, driftMemMap, 'endAt');
+          compareNullableDateTime(nativeMem, driftMemMap, 'createdAt');
+          compareNullableDateTime(nativeMem, driftMemMap, 'updatedAt');
+          compareNullableDateTime(nativeMem, driftMemMap, 'archivedAt');
         }
       });
     });
