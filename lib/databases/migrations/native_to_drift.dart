@@ -39,11 +39,12 @@ Future migrateNativeToDrift(AppDatabase database) async {
   final allMemRelations =
       allMemRelationsRaw.map((e) => SavedMemRelationEntity(e)).toList();
 
-  await database.batch((batch) async {
-    batch.insertAll(
-        database.mems,
-        allMems.map(
-          (e) => MemsCompanion.insert(
+  try {
+    await database.batch((batch) async {
+      for (final e in allMems) {
+        batch.insert(
+          database.mems,
+          MemsCompanion.insert(
             name: e.value.name,
             doneAt: Value(e.value.doneAt),
             notifyOn: Value(e.value.period?.start),
@@ -59,12 +60,14 @@ Future migrateNativeToDrift(AppDatabase database) async {
             updatedAt: Value(e.updatedAt),
             archivedAt: Value(e.archivedAt),
           ),
-        ));
+          mode: InsertMode.replace,
+        );
+      }
 
-    batch.insertAll(
-        database.memItems,
-        allMemItems.map(
-          (e) => MemItemsCompanion.insert(
+      for (final e in allMemItems) {
+        batch.insert(
+          database.memItems,
+          MemItemsCompanion.insert(
             type: e.value.type.name,
             value: e.value.value,
             memId: e.value.memId!,
@@ -73,12 +76,14 @@ Future migrateNativeToDrift(AppDatabase database) async {
             updatedAt: Value(e.updatedAt),
             archivedAt: Value(e.archivedAt),
           ),
-        ));
+          mode: InsertMode.replace,
+        );
+      }
 
-    batch.insertAll(
-        database.acts,
-        allActs.map(
-          (e) => ActsCompanion.insert(
+      for (final e in allActs) {
+        batch.insert(
+          database.acts,
+          ActsCompanion.insert(
             start: Value(e.value.period?.start),
             startIsAllDay: Value(e.value.period?.start?.isAllDay),
             end: Value(e.value.period?.end),
@@ -90,12 +95,14 @@ Future migrateNativeToDrift(AppDatabase database) async {
             updatedAt: Value(e.updatedAt),
             archivedAt: Value(e.archivedAt),
           ),
-        ));
+          mode: InsertMode.replace,
+        );
+      }
 
-    batch.insertAll(
-        database.memRepeatedNotifications,
-        allMemNotifications.map(
-          (e) => MemRepeatedNotificationsCompanion.insert(
+      for (final e in allMemNotifications) {
+        batch.insert(
+          database.memRepeatedNotifications,
+          MemRepeatedNotificationsCompanion.insert(
             timeOfDaySeconds: e.value.time ?? 0,
             type: e.value.type.name,
             message: e.value.message,
@@ -105,12 +112,14 @@ Future migrateNativeToDrift(AppDatabase database) async {
             updatedAt: Value(e.updatedAt),
             archivedAt: Value(e.archivedAt),
           ),
-        ));
+          mode: InsertMode.replace,
+        );
+      }
 
-    batch.insertAll(
-        database.targets,
-        allTargets.map(
-          (e) => TargetsCompanion.insert(
+      for (final e in allTargets) {
+        batch.insert(
+          database.targets,
+          TargetsCompanion.insert(
             type: e.value.targetType.name,
             unit: e.value.targetUnit.name,
             value: e.value.value,
@@ -121,12 +130,14 @@ Future migrateNativeToDrift(AppDatabase database) async {
             updatedAt: Value(e.updatedAt),
             archivedAt: Value(e.archivedAt),
           ),
-        ));
+          mode: InsertMode.replace,
+        );
+      }
 
-    batch.insertAll(
-        database.memRelations,
-        allMemRelations.map(
-          (e) => MemRelationsCompanion.insert(
+      for (final e in allMemRelations) {
+        batch.insert(
+          database.memRelations,
+          MemRelationsCompanion.insert(
             sourceMemId: e.value.sourceMemId,
             targetMemId: e.value.targetMemId,
             type: e.value.type.name,
@@ -136,6 +147,20 @@ Future migrateNativeToDrift(AppDatabase database) async {
             updatedAt: Value(e.updatedAt),
             archivedAt: Value(e.archivedAt),
           ),
-        ));
-  });
+          mode: InsertMode.replace,
+        );
+      }
+    });
+  } catch (e, stackTrace) {
+    throw Exception(
+      'Migration failed: $e\n'
+      'Stack trace: $stackTrace\n'
+      'Mems count: ${allMems.length}\n'
+      'MemItems count: ${allMemItems.length}\n'
+      'Acts count: ${allActs.length}\n'
+      'MemNotifications count: ${allMemNotifications.length}\n'
+      'Targets count: ${allTargets.length}\n'
+      'MemRelations count: ${allMemRelations.length}',
+    );
+  }
 }
