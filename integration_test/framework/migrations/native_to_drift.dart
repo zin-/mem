@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart' as drift;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/migrations/native_to_drift.dart';
@@ -43,10 +44,52 @@ void main() {
         await migrateNativeToDrift(driftDatabaseAccessor.driftDatabase);
 
         final nativeMems = await nativeDatabaseAccessor.select(defTableMems);
-        debug("nativeMems: $nativeMems");
 
         final driftMems = await driftDatabaseAccessor.select(defTableMems);
-        debug("driftMems: $driftMems");
+
+        expect(nativeMems.length, equals(driftMems.length));
+
+        for (var i = 0; i < nativeMems.length; i++) {
+          final nativeMem = nativeMems[i];
+          final driftMem = driftMems[i];
+
+          final driftMemMap = (driftMem as dynamic).toJson(
+            serializer: drift.ValueSerializer.defaults(
+              serializeDateTimeValuesAsString: true,
+            ),
+          ) as Map<String, dynamic>;
+
+          expect(driftMemMap['id'], equals(nativeMem['id']));
+          expect(driftMemMap['name'], equals(nativeMem['name']));
+
+          void compareNullableDateTime(String key) {
+            final nativeValue = nativeMem[key];
+            final driftValue = driftMemMap[key];
+            if (nativeValue == null) {
+              expect(driftValue, isNull);
+            } else {
+              final nativeDateTime = nativeValue as DateTime;
+              final nativeValueString = DateTime(
+                nativeDateTime.year,
+                nativeDateTime.month,
+                nativeDateTime.day,
+                nativeDateTime.hour,
+                nativeDateTime.minute,
+                nativeDateTime.second,
+              ).toIso8601String();
+              expect(driftValue, equals(nativeValueString));
+            }
+          }
+
+          compareNullableDateTime('doneAt');
+          compareNullableDateTime('notifyOn');
+          compareNullableDateTime('notifyAt');
+          compareNullableDateTime('endOn');
+          compareNullableDateTime('endAt');
+          compareNullableDateTime('createdAt');
+          compareNullableDateTime('updatedAt');
+          compareNullableDateTime('archivedAt');
+        }
       });
     });
   });
