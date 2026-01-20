@@ -21,6 +21,11 @@ void main() {
     for (var tableDefinition in databaseDefinition.tableDefinitions) {
       await nativeDatabaseAccessor.delete(tableDefinition);
     }
+
+    final driftDatabaseAccessor = DriftDatabaseAccessor();
+    for (var tableDefinition in databaseDefinition.tableDefinitions) {
+      await driftDatabaseAccessor.delete(tableDefinition, null);
+    }
   });
 
   group(_name, () {
@@ -39,6 +44,9 @@ void main() {
 
         final nativeMems = await nativeDatabaseAccessor.select(defTableMems);
         debug("nativeMems: $nativeMems");
+
+        final driftMems = await driftDatabaseAccessor.select(defTableMems);
+        debug("driftMems: $driftMems");
       });
     });
   });
