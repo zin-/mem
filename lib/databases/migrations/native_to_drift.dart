@@ -40,7 +40,7 @@ Future migrateNativeToDrift(AppDatabase database) async {
       allMemRelationsRaw.map((e) => SavedMemRelationEntity(e)).toList();
 
   try {
-    await database.batch((batch) async {
+    await database.batch((batch) {
       for (final e in allMems) {
         batch.insert(
           database.mems,
