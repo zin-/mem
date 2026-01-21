@@ -5,4 +5,8 @@ class Singleton {
       _instances.putIfAbsent(T, creator) as T;
 
   static void override<T>(T instance) => _instances[T] = instance;
+
+  static void reset<T>() => _instances.remove(T);
+
+  static bool exists<T>() => _instances.containsKey(T);
 }

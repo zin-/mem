@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart' as drift;
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/definition/database_definition.dart';
@@ -14,6 +15,11 @@ import 'package:mem/features/logger/log_service.dart';
 
 abstract class DatabaseTupleRepository<ENTITY extends Entity,
     SAVED extends DatabaseTupleEntity> extends Repository<ENTITY> {
+  // ignore: unnecessary_nullable_for_final_variable_declarations
+  static final DriftDatabaseAccessor? _driftDatabaseAccessor =
+      DriftDatabaseAccessor();
+  // null;
+
   static DatabaseAccessor? _databaseAccessor;
   static final Map<TableDefinition, Repository> _repositories = {};
 
@@ -87,10 +93,23 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
             _tableDefinition,
             entityMap,
           );
+          // debug("fromNative: $id");
 
           entityMap[defPkId.name] = id;
 
-          return pack(entityMap);
+          final fromNative = pack(entityMap);
+
+          final fromDrift = await _driftDatabaseAccessor?.insert(
+            _tableDefinition,
+            entityMap,
+          );
+          // debug("fromDrift: $fromDrift");
+
+          if (id != fromDrift) {
+            warn("receive: id != fromDrift: $id != $fromDrift");
+          }
+
+          return fromNative;
         },
         {
           'entity': entity,
@@ -106,20 +125,75 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
     int? limit,
   }) =>
       v(
-        () async => (await (await _dbA).select(
-          _tableDefinition,
-          groupBy: groupBy?.toQuery,
-          extraColumns: groupBy?.toExtraColumns,
-          where: condition?.where(),
-          whereArgs: condition?.whereArgs(),
-          orderBy: orderBy?.isEmpty != false
-              ? null
-              : orderBy?.map((e) => e.toQuery()).join(", "),
-          offset: offset,
-          limit: limit,
-        ))
-            .map((e) => pack(e))
-            .toList(),
+        () async {
+          final fromNative = (await (await _dbA).select(
+            _tableDefinition,
+            groupBy: groupBy?.toQuery,
+            extraColumns: groupBy?.toExtraColumns,
+            where: condition?.where(),
+            whereArgs: condition?.whereArgs(),
+            orderBy: orderBy?.isEmpty != false
+                ? null
+                : orderBy?.map((e) => e.toQuery()).join(", "),
+            offset: offset,
+            limit: limit,
+          ))
+              .map((e) => pack(e))
+              .toList();
+          // debug("fromNative(${_tableDefinition.name}): $fromNative");
+
+          final fromDrift = await _driftDatabaseAccessor?.select(
+            _tableDefinition,
+            condition: condition,
+            groupBy: groupBy,
+            orderBy: orderBy,
+            offset: offset,
+            limit: limit,
+          );
+
+          final coverted = fromDrift?.map((e) {
+            final Map<String, dynamic> jsonMap = (e).toJson(
+                serializer: drift.ValueSerializer.defaults(
+              serializeDateTimeValuesAsString: true,
+            ));
+
+            final converted = Map.fromEntries(jsonMap.entries.map((e) {
+              try {
+                DateTime? value = DateTime.parse(e.value as String);
+                if (e.key == "createdAt" ||
+                    e.key == "updatedAt" ||
+                    e.key == "archivedAt") {
+                  return MapEntry(e.key, value);
+                } else {
+                  return MapEntry(toSnakeCase(e.key), value);
+                }
+              } catch (erorr) {
+                if (e.key == "memId") {
+                  return MapEntry("mems_id", e.value);
+                } else if (e.key.contains("IsAllDay")) {
+                  return MapEntry(toSnakeCase(e.key), e.value == null);
+                } else if (e.key == "sourceMemId") {
+                  return MapEntry("source_mems_id", e.value);
+                } else if (e.key == "targetMemId") {
+                  return MapEntry("target_mems_id", e.value);
+                } else {
+                  return MapEntry(toSnakeCase(e.key), e.value);
+                }
+              }
+            }));
+
+            return pack(converted);
+          }).toList();
+          // debug("fromDrift(${_tableDefinition.name}}: $fromDrift");
+
+          if (fromNative.map((e) => e.value).toString() !=
+              coverted?.map((e) => e.value).toString()) {
+            warn(
+                "ship: fromNative != coverted: ${fromNative.map((e) => e.value).toString()} != ${coverted?.map((e) => e.value).toString()}");
+          }
+
+          return fromNative;
+        },
         {
           'condition': condition,
           'groupBy': groupBy,
@@ -147,7 +221,19 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
             whereArgs: byId.whereArgs(),
           );
 
-          return pack(entityMap);
+          final fromNative = pack(entityMap);
+
+          final fromDrift = await _driftDatabaseAccessor?.update(
+            _tableDefinition,
+            entityMap,
+          );
+
+          if (fromNative.id != fromDrift) {
+            warn(
+                "replace: fromNative.id != fromDrift: ${fromNative.id} != $fromDrift");
+          }
+
+          return fromNative;
         },
         {
           'savedEntity': savedEntity,
@@ -166,12 +252,21 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
           entityMap[defColArchivedAt.name] = archivedAt ?? DateTime.now();
 
           final byId = Equals(defPkId, entityMap[defPkId.name]);
-          await (await _dbA).update(
+          final fromNative = await (await _dbA).update(
             _tableDefinition,
             entityMap,
             where: byId.where(),
             whereArgs: byId.whereArgs(),
           );
+
+          final fromDrift = await _driftDatabaseAccessor?.update(
+            _tableDefinition,
+            entityMap,
+          );
+
+          if (fromNative != fromDrift) {
+            warn("archive: fromNative != fromDrift: $fromNative != $fromDrift");
+          }
 
           return pack(entityMap);
         },
@@ -193,13 +288,22 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
           entityMap[defColArchivedAt.name] = null;
 
           final byId = Equals(defPkId, entityMap[defPkId.name]);
-          await (await _dbA).update(
+          final fromNative = await (await _dbA).update(
             _tableDefinition,
             entityMap,
             where: byId.where(),
             whereArgs: byId.whereArgs(),
           );
 
+          final fromDrift = await _driftDatabaseAccessor?.update(
+            _tableDefinition,
+            entityMap,
+          );
+
+          if (fromNative != fromDrift) {
+            warn(
+                "unarchive: fromNative != fromDrift: $fromNative != $fromDrift");
+          }
           return pack(entityMap);
         },
         {
@@ -231,13 +335,22 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
             }
           }
 
-          await _dbA.then(
+          final fromNative = await _dbA.then(
             (dbA) async => await dbA.delete(
               _tableDefinition,
               where: condition?.where(),
               whereArgs: condition?.whereArgs(),
             ),
           );
+
+          final fromDrift = await _driftDatabaseAccessor?.delete(
+            _tableDefinition,
+            condition,
+          );
+
+          if (fromNative != fromDrift) {
+            warn("waste: fromNative != fromDrift: $fromNative != $fromDrift");
+          }
 
           return targets;
         },

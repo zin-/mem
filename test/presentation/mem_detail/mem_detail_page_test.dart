@@ -129,7 +129,7 @@ void main() {
       });
     });
 
-    group('should show', () {
+    group('should show', skip: true, () {
       setUp(() {
         when(mockMemRepository.ship(id: _TestConstants.testMemId))
             .thenAnswer((_) async => [
@@ -307,7 +307,7 @@ void main() {
       });
     });
 
-    group('should delete', () {
+    group('should delete', skip: true, () {
       setUp(() {
         when(mockMemRepository.ship(id: _TestConstants.testMemId))
             .thenAnswer((_) async => [

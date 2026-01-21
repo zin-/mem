@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/definition/column/foreign_key_definition.dart';
@@ -27,3 +28,11 @@ final defTableMemNotifications = TableDefinition(
     defFkMemNotificationsMemId,
   ],
 );
+
+class MemRepeatedNotifications extends Table with BaseColumns {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get timeOfDaySeconds => integer()();
+  TextColumn get type => text()();
+  TextColumn get message => text()();
+  IntColumn get memId => integer().references(Mems, #id)();
+}
