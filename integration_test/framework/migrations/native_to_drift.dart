@@ -47,6 +47,8 @@ void main() {
   setUp(() async {
     final nativeDatabaseAccessor =
         await DatabaseFactory.open(databaseDefinition);
+    final driftDatabaseAccessor = DriftDatabaseAccessor();
+
     final tablesToDelete = databaseDefinition.tableDefinitions.toList();
     tablesToDelete.sort((a, b) {
       final aHasFk = a.columnDefinitions.any((c) => c is ForeignKeyDefinition);
@@ -55,21 +57,10 @@ void main() {
       if (!aHasFk && bHasFk) return 1;
       return 0;
     });
-    for (var tableDefinition in tablesToDelete) {
-      try {
-        await nativeDatabaseAccessor.delete(tableDefinition);
-      } catch (e) {
-        // Ignore foreign key constraint errors during cleanup
-      }
-    }
 
-    final driftDatabaseAccessor = DriftDatabaseAccessor();
     for (var tableDefinition in tablesToDelete) {
-      try {
-        await driftDatabaseAccessor.delete(tableDefinition, null);
-      } catch (e) {
-        // Ignore foreign key constraint errors during cleanup
-      }
+      await nativeDatabaseAccessor.delete(tableDefinition);
+      await driftDatabaseAccessor.delete(tableDefinition, null);
     }
   });
 
