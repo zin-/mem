@@ -44,9 +44,7 @@ dependencies:
   fl_chart: any
   flutter_local_notifications: any
   timezone: any
-  sqflite: any
   path: any
-  sqflite_common_ffi: any
   path_provider: any
   idb_shim: any
   drift: any

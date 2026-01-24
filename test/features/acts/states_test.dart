@@ -13,7 +13,6 @@ import 'package:mem/features/settings/preference/preference_key.dart';
 import 'package:mem/features/settings/states.dart';
 import 'package:mem/databases/database.dart';
 import 'package:mem/widgets/infinite_scroll.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
 
 class _FakePreference extends Preference<TimeOfDay> {
   _FakePreference();
@@ -138,7 +137,6 @@ class _FakeActEntities extends ActEntities {
 void main() {
   setUpAll(() {
     setOnTest(true);
-    sqflite_ffi.sqfliteFfiInit();
   });
 
   tearDownAll(() {
