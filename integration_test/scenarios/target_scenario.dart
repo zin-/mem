@@ -19,7 +19,7 @@ const _scenarioName = "Target scenario";
 void main() => group(_scenarioName, () {
       IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-      late final DatabaseAccessor dbA;
+      late final DriftDatabaseAccessor dbA;
       setUpAll(() async {
         dbA = await openTestDatabase(databaseDefinition);
       });

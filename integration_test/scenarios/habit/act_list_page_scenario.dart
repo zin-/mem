@@ -24,7 +24,7 @@ void main() => group(_name, () {
 
       final oneMinDate = zeroDate.add(oneMin);
 
-      late final DatabaseAccessor dbA;
+      late final DriftDatabaseAccessor dbA;
       late final int insertedMemId;
       late final int insertedMemWithActiveActId;
 

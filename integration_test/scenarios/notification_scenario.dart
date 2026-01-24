@@ -45,7 +45,7 @@ void testNotificationScenario() => group(_scenarioName, () {
 
       const insertedMemName = "$_scenarioName - mem name - inserted";
 
-      late final DatabaseAccessor dbA;
+      late final DriftDatabaseAccessor dbA;
       int? insertedMemId;
 
       setUpAll(() async {

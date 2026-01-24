@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
-import 'package:mem/databases/migrations/native_to_drift.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
@@ -32,8 +31,6 @@ class AppDatabase extends _$AppDatabase {
     return MigrationStrategy(
       onCreate: (Migrator m) async {
         await m.createAll();
-
-        await migrateNativeToDrift(this);
       },
       onUpgrade: (Migrator m, int from, int to) async {
         // TODO: マイグレーション処理を実装
@@ -48,11 +45,21 @@ void setOnTest(bool value) {
   _onTest = value;
 }
 
+Future<String> getDatabaseFilePath() async {
+  final dbFolder = await getApplicationDocumentsDirectory();
+  final dbName = _onTest ? 'test_mem_drift.db' : 'mem_drift.db';
+  return path.join(dbFolder.path, dbName);
+}
+
+Future<File?> getDatabaseFile() async {
+  final p = await getDatabaseFilePath();
+  final f = File(p);
+  return (await f.exists()) ? f : null;
+}
+
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
-    final dbFolder = await getApplicationDocumentsDirectory();
-    final dbName = _onTest ? 'test_mem_drift.db' : 'mem_drift.db';
-    final file = File(path.join(dbFolder.path, dbName));
-    return NativeDatabase(file);
+    final p = await getDatabaseFilePath();
+    return NativeDatabase(File(p));
   });
 }

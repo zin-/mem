@@ -206,6 +206,12 @@ class LessThan extends Condition {
   String toString() => '${_columnDefinition.name} < $_value';
 }
 
+const _tableDefToDriftColumn = {
+  'mems_id': 'mem_id',
+  'source_mems_id': 'source_mem_id',
+  'target_mems_id': 'target_mem_id',
+};
+
 drift.GeneratedColumn? _getColumn(
     drift.TableInfo tableInfo, String columnName) {
   try {
@@ -215,7 +221,9 @@ drift.GeneratedColumn? _getColumn(
       (col) {
         final actualName = _getColumnName(col);
         return actualName == columnName ||
-            actualName == _toSnakeCase(columnName);
+            actualName == _toSnakeCase(columnName) ||
+            ( _tableDefToDriftColumn[columnName] != null &&
+                actualName == _tableDefToDriftColumn[columnName]);
       },
       orElse: () => throw StateError('Column not found: $columnName'),
     );

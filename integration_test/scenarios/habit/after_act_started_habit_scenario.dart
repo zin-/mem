@@ -21,7 +21,7 @@ const _name = 'After act started habit scenario';
 void main() => group(
       _name,
       () {
-        late final DatabaseAccessor dbA;
+        late final DriftDatabaseAccessor dbA;
         setUpAll(() async {
           dbA = await openTestDatabase(databaseDefinition);
         });

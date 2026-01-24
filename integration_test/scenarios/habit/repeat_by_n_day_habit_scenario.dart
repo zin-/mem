@@ -34,7 +34,7 @@ void main() => group(_name, () {
       const insertedRepeatNotificationMessage =
           "$_name - inserted - mem notification message - repeat";
 
-      late final DatabaseAccessor dbA;
+      late final DriftDatabaseAccessor dbA;
 
       int insertedMemId = 0;
       int withoutActMemId = 0;

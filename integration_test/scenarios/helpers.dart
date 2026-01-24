@@ -4,30 +4,29 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/l10n/l10n.dart';
+import 'package:mem/databases/database.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/definition/database_definition.dart';
-import 'package:mem/framework/database/factory.dart';
-import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/main.dart';
 import 'package:mem/framework/repository/database_repository.dart';
+import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/l10n/l10n.dart';
+import 'package:mem/main.dart';
 import 'package:mem/values/constants.dart';
 
-// Database(DB) operations
-Future<DatabaseAccessor> openTestDatabase(
+Future<DriftDatabaseAccessor> openTestDatabase(
   DatabaseDefinition databaseDefinition, {
   bool onTest = true,
 }) async {
-  DatabaseFactory.onTest = onTest;
+  setOnTest(onTest);
   return await DatabaseRepository().receive(databaseDefinition);
 }
 
 Future<void> clearAllTestDatabaseRows(
   DatabaseDefinition databaseDefinition,
 ) async {
-  final databaseAccessor = await openTestDatabase(databaseDefinition);
+  final accessor = await openTestDatabase(databaseDefinition);
   for (var tableDefinition in databaseDefinition.tableDefinitions.reversed) {
-    await databaseAccessor.delete(tableDefinition);
+    await accessor.delete(tableDefinition);
   }
 }
 

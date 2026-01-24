@@ -33,7 +33,7 @@ void testTodoScenario() => group(': $_scenarioName', () {
       const undoneMemName = '$_scenarioName - mem name - inserted - undone';
       const doneMemName = '$_scenarioName - mem name - inserted - done';
 
-      late final DatabaseAccessor dbA;
+      late final DriftDatabaseAccessor dbA;
 
       setUpAll(() async {
         dbA = await openTestDatabase(databaseDefinition);

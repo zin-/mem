@@ -40,7 +40,7 @@ void main() => group(_scenarioName, () {
       const numberOfMem = 100;
       const insertedMemName = '$_scenarioName: inserted - mem name';
 
-      late final DatabaseAccessor dbA;
+      late final DriftDatabaseAccessor dbA;
 
       setUpAll(() async {
         dbA = await openTestDatabase(databaseDefinition);

@@ -83,7 +83,7 @@ void main() => group(_name, () {
       const memWithNoNotificationName =
           "no notification - $insertedMemNameBase";
 
-      late final DatabaseAccessor dbA;
+      late final DriftDatabaseAccessor dbA;
       late final int memWithNoActId;
       late final int memWithActiveActId;
       late final int memWithFinishedActId;

@@ -33,7 +33,7 @@ void main() => group(
         final insertedMemNotificationTime =
             DateTime.now().subtract(const Duration(days: 1));
 
-        late final DatabaseAccessor dbA;
+        late final DriftDatabaseAccessor dbA;
 
         int? insertedMemId;
         int? notifyTodayMemId;

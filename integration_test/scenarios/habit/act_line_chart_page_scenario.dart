@@ -13,7 +13,7 @@ const _name = "ActLineChartPage scenario";
 void main() => group(_name, () {
       const insertedMemName = '$_name: inserted mem - name';
 
-      late final DatabaseAccessor dbA;
+      late final DriftDatabaseAccessor dbA;
       late final int insertedMemId;
 
       setUpAll(() async {

@@ -60,7 +60,7 @@ void main() {
 
     for (var tableDefinition in tablesToDelete) {
       await nativeDatabaseAccessor.delete(tableDefinition);
-      await driftDatabaseAccessor.delete(tableDefinition, null);
+      await driftDatabaseAccessor.delete(tableDefinition);
     }
   });
 

@@ -20,7 +20,7 @@ import '../helpers.dart';
 const _name = 'Repeated habit scenario';
 
 void main() => group(': $_name', () {
-      late final DatabaseAccessor dbA;
+      late final DriftDatabaseAccessor dbA;
       setUpAll(() async {
         dbA = await openTestDatabase(databaseDefinition);
       });

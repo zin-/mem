@@ -10,6 +10,8 @@ class GroupBy {
     List<ExtraColumn>? extraColumns,
   }) : _extraColumns = extraColumns;
 
+  List<ExtraColumn>? get extraColumns => _extraColumns;
+
   String get toQuery => columns.map((e) => e.name).join(", ");
 
   List<String>? get toExtraColumns =>

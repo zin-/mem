@@ -22,7 +22,7 @@ void main() => group(
         // late int insertedMemId2;
         // late DateTime actStart;
 
-        late final DatabaseAccessor dbA;
+        late final DriftDatabaseAccessor dbA;
 
         setUpAll(() async {
           dbA = await openTestDatabase(databaseDefinition);

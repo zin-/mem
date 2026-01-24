@@ -27,7 +27,7 @@ void main() => group(
               const bool.fromEnvironment('CICD', defaultValue: false),
         );
 
-        late final DatabaseAccessor dbA;
+        late final DriftDatabaseAccessor dbA;
         final insertedMemIds = List<int>.empty(growable: true);
         setUpAll(() async {
           dbA = await openTestDatabase(databaseDefinition);

@@ -56,7 +56,7 @@ void testTaskScenario() => group(_scenarioName, () {
         ),
       );
 
-      late final DatabaseAccessor dbA;
+      late final DriftDatabaseAccessor dbA;
       setUpAll(() async {
         dbA = await openTestDatabase(databaseDefinition);
       });
