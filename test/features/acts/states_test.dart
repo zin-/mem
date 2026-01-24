@@ -11,7 +11,7 @@ import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/preference/preference_key.dart';
 import 'package:mem/features/settings/states.dart';
-import 'package:mem/framework/database/factory.dart';
+import 'package:mem/databases/database.dart';
 import 'package:mem/widgets/infinite_scroll.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart' as sqflite_ffi;
 
@@ -137,12 +137,12 @@ class _FakeActEntities extends ActEntities {
 
 void main() {
   setUpAll(() {
-    DatabaseFactory.onTest = true;
+    setOnTest(true);
     sqflite_ffi.sqfliteFfiInit();
   });
 
   tearDownAll(() {
-    DatabaseFactory.onTest = false;
+    setOnTest(false);
   });
 
   group('ActEntities', () {

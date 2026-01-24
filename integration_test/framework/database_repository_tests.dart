@@ -1,5 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/framework/database/factory.dart';
+import 'package:mem/databases/database.dart';
 import 'package:mem/framework/repository/database_repository.dart';
 
 import 'database_definitions.dart';
@@ -10,11 +12,10 @@ void main() => group(
       _name,
       () {
         setUpAll(() async {
-          await DatabaseFactory
-              // ignore: deprecated_member_use_from_same_package
-              .nativeFactory
-              .deleteDatabase(
-                  await DatabaseFactory.buildDatabasePath(sampleDefDb.name));
+          setOnTest(true);
+          final p = await getDatabaseFilePath();
+          final f = File(p);
+          if (await f.exists()) await f.delete();
         });
 
         test(
@@ -26,10 +27,6 @@ void main() => group(
         group(
           ".shipFileByNameIs",
           () {
-            setUpAll(() async {
-              await DatabaseRepository().receive(sampleDefDb);
-            });
-
             test(
               " on no receive.",
               () async {
@@ -45,6 +42,12 @@ void main() => group(
             test(
               " received.",
               () async {
+                final accessor =
+                    await DatabaseRepository().receive(sampleDefDb);
+                await accessor.driftDatabase
+                    .select(accessor.driftDatabase.mems)
+                    .get();
+
                 final databaseFile =
                     await DatabaseRepository().shipFileByNameIs(
                   sampleDefDb.name,

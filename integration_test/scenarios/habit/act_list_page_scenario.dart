@@ -59,7 +59,7 @@ void main() => group(_name, () {
         });
       });
       setUp(() async {
-        await dbA.delete(defTableActs);
+        await dbA.delete(defTableActs, null);
 
         await dbA.insert(defTableActs, {
           defFkActsMemId.name: insertedMemId,
@@ -206,7 +206,7 @@ void main() => group(_name, () {
           const numberOfActsByDate = 3;
 
           setUp(() async {
-            await dbA.delete(defTableActs);
+            await dbA.delete(defTableActs, null);
 
             for (var j = 0; j < days; j++) {
               for (var i = 0; i < numberOfActsByDate; i++) {

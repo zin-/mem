@@ -26,7 +26,7 @@ Future<void> clearAllTestDatabaseRows(
 ) async {
   final accessor = await openTestDatabase(databaseDefinition);
   for (var tableDefinition in databaseDefinition.tableDefinitions.reversed) {
-    await accessor.delete(tableDefinition);
+    await accessor.delete(tableDefinition, null);
   }
 }
 

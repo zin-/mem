@@ -8,6 +8,7 @@ import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/database/accessor.dart';
+import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/features/mems/detail/fab.dart';
 import 'package:mem/features/mem_notifications/after_act_started_notification_view.dart';
 import 'package:mem/features/mem_notifications/mem_notifications_view.dart';
@@ -167,13 +168,11 @@ void main() => group(
             await widgetTester.pump(waitSideEffectDuration);
 
             final savedMem = (await dbA.select(defTableMems,
-                    where: "${defColMemsName.name} = ?",
-                    whereArgs: [enteringMemName]))
+                    condition: Equals(defColMemsName, enteringMemName)))
                 .single;
-            final savedMemNotifications = (await dbA.select(
+            final savedMemNotifications = await dbA.select(
                 defTableMemNotifications,
-                where: "${defFkMemNotificationsMemId.name} = ?",
-                whereArgs: [savedMem[defPkId.name]]));
+                condition: Equals(defFkMemNotificationsMemId, savedMem[defPkId.name]));
             final afterActStarted = savedMemNotifications.singleWhere((e) =>
                 e[defColMemNotificationsType.name] ==
                 NotificationType.afterActStarted.name);

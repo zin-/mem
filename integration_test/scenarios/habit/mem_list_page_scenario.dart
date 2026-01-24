@@ -158,7 +158,7 @@ void main() => group(_name, () {
       });
 
       setUp(() async {
-        await dbA.delete(defTableActs);
+        await dbA.delete(defTableActs, null);
 
         await dbA.insert(defTableActs, {
           defFkActsMemId.name: memWithActiveActId,

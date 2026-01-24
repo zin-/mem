@@ -297,8 +297,6 @@ void testTaskScenario() => group(_scenarioName, () {
 
             final savedMems = await dbA.select(
               defTableMems,
-              where: "${defColMemsName.name} = ?",
-              whereArgs: [enteringMemName],
             );
             expect(savedMems, hasLength(1));
             expect(savedMems.single[defColMemsStartOn.name], equals(start));
@@ -330,8 +328,6 @@ void testTaskScenario() => group(_scenarioName, () {
 
             final savedMems = await dbA.select(
               defTableMems,
-              where: "${defColMemsName.name} = ?",
-              whereArgs: [enteringMemName],
             );
             expect(savedMems, hasLength(1));
           },
@@ -389,9 +385,9 @@ void testTaskScenario() => group(_scenarioName, () {
 
           await PreferenceRepository().discard(startOfDayKey);
 
-          final savedMems = (await dbA.select(defTableMems,
-              where: "${defColMemsName.name} = ?",
-              whereArgs: [enteringMemName]));
+          final savedMems = (await dbA.select(
+            defTableMems,
+          ));
           expect(savedMems, hasLength(1));
           expect(savedMems.single[defColMemsEndOn.name], equals(endDate));
         });

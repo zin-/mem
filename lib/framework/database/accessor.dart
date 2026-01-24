@@ -5,115 +5,8 @@ import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/framework/singleton.dart';
-import 'package:sqflite/sqlite_api.dart';
 
-import 'converter.dart';
 import 'definition/table_definition.dart';
-
-@Deprecated('Use DriftDatabaseAccessor. Only for tests or migration.')
-class DatabaseAccessor {
-  final Database _nativeDatabase;
-  final DatabaseConverter _converter = DatabaseConverter();
-
-  Database get nativeDatabase => _nativeDatabase;
-
-  Future<int> insert(
-    TableDefinition tableDefinition,
-    Map<String, Object?> values,
-  ) =>
-      v(
-        () => _nativeDatabase.insert(
-          tableDefinition.name,
-          values.map((key, value) => MapEntry(key, _converter.to(value))),
-        ),
-        [tableDefinition.name, values],
-      );
-
-  Future<int> count(
-    TableDefinition tableDefinition, {
-    String? where,
-    List<Object?>? whereArgs,
-  }) =>
-      v(
-        () async => (await _nativeDatabase.query(
-          tableDefinition.name,
-          columns: ["COUNT(*)"],
-          where: where,
-          whereArgs: whereArgs,
-        ))[0].values.elementAt(0) as int,
-        {"tableDefinition": tableDefinition, "where": where, "whereArgs": whereArgs},
-      );
-
-  Future<List<Map<String, Object?>>> select(
-    TableDefinition tableDefinition, {
-    String? groupBy,
-    List<String>? extraColumns,
-    String? where,
-    List<Object?>? whereArgs,
-    String? orderBy,
-    int? offset,
-    int? limit,
-  }) =>
-      v(
-        () => _nativeDatabase
-            .query(
-              tableDefinition.name,
-              columns: extraColumns == null ? null : ['*', ...extraColumns],
-              where: where,
-              whereArgs: whereArgs?.map((e) => _converter.to(e)).toList(),
-              groupBy: groupBy,
-              orderBy: orderBy,
-              offset: offset,
-              limit: limit,
-            )
-            .then((value) =>
-                value.map((e) => _converter.from(e, tableDefinition)).toList()),
-        {
-          'tableName': tableDefinition.name,
-          'groupBy': groupBy,
-          'extraColumns': extraColumns,
-          'where': where,
-          'whereArgs': whereArgs,
-          'orderBy': orderBy,
-          'offset': offset,
-          'limit': limit,
-        },
-      );
-
-  Future<int> update(
-    TableDefinition tableDefinition,
-    Map<String, Object?> values, {
-    String? where,
-    List<Object?>? whereArgs,
-  }) =>
-      v(
-        () => _nativeDatabase.update(
-          tableDefinition.name,
-          values.map((key, value) => MapEntry(key, _converter.to(value))),
-          where: where,
-          whereArgs: whereArgs?.map((e) => _converter.to(e)).toList(),
-        ),
-        [tableDefinition.name, values, where, whereArgs],
-      );
-
-  Future<int> delete(
-    TableDefinition tableDefinition, {
-    String? where,
-    List<Object?>? whereArgs,
-  }) =>
-      v(
-        () => _nativeDatabase.delete(
-          tableDefinition.name,
-          where: where,
-          whereArgs: whereArgs?.map((e) => _converter.to(e)).toList(),
-        ),
-        [tableDefinition.name, where, whereArgs],
-      );
-
-  Future<void> close() => v(() async => await _nativeDatabase.close());
-
-  DatabaseAccessor(this._nativeDatabase);
-}
 
 Object? _valueFromMap(Map<String, Object?> m, List<String> keys) {
   for (final k in keys) {
@@ -246,10 +139,7 @@ class DriftDatabaseAccessor {
               if (!seen.containsKey(k)) seen[k] = r;
             }
             rows = seen.values.toList();
-            rows = rows
-                .skip(offset ?? 0)
-                .take(limit ?? 999999999)
-                .toList();
+            rows = rows.skip(offset ?? 0).take(limit ?? 999999999).toList();
           }
 
           return rows
@@ -401,8 +291,7 @@ class DriftDatabaseAccessor {
     String tableName,
     Map<String, Object?> values,
   ) {
-    T? val<T>(List<String> keys) =>
-        _valueFromMap(values, keys) as T?;
+    T? val<T>(List<String> keys) => _valueFromMap(values, keys) as T?;
 
     switch (tableName) {
       case 'mems':
@@ -429,9 +318,11 @@ class DriftDatabaseAccessor {
       case 'acts':
         return ActsCompanion.insert(
           start: drift.Value(values['start'] as DateTime?),
-          startIsAllDay: drift.Value(val<bool>(['start_is_all_day', 'startIsAllDay'])),
+          startIsAllDay:
+              drift.Value(val<bool>(['start_is_all_day', 'startIsAllDay'])),
           end: drift.Value(values['end'] as DateTime?),
-          endIsAllDay: drift.Value(val<bool>(['end_is_all_day', 'endIsAllDay'])),
+          endIsAllDay:
+              drift.Value(val<bool>(['end_is_all_day', 'endIsAllDay'])),
           pausedAt: drift.Value(val<DateTime>(['paused_at', 'pausedAt'])),
           memId: (val<int>(['mems_id', 'memId']) ?? 0),
           createdAt: values['createdAt'] as DateTime,
@@ -440,7 +331,8 @@ class DriftDatabaseAccessor {
         );
       case 'mem_repeated_notifications':
         return MemRepeatedNotificationsCompanion.insert(
-          timeOfDaySeconds: (val<int>(['time_of_day_seconds', 'timeOfDaySeconds']) ?? 0),
+          timeOfDaySeconds:
+              (val<int>(['time_of_day_seconds', 'timeOfDaySeconds']) ?? 0),
           type: values['type'] as String,
           message: values['message'] as String,
           memId: (val<int>(['mems_id', 'memId']) ?? 0),
