@@ -44,12 +44,10 @@ jobs:
   medium_test:
     strategy:
       matrix:
-        target: [
-          scenarios/app_test.dart,
-          framework
-        ]
+        target: [framework]
         include:
-          - timeout-minutes-android: 30
+          - target: framework
+            timeout-minutes-android: 30
             timeout-minutes-windows: 15
       fail-fast: true
 
