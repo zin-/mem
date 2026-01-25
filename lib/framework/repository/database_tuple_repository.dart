@@ -103,7 +103,9 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
             offset: offset,
             limit: limit,
           );
-          return rows.map((e) => pack(e)).toList();
+          return rows
+              .map<SAVED>((e) => pack(e as Map<String, dynamic>))
+              .toList();
         },
         {
           'condition': condition,
