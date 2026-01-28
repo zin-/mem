@@ -1,71 +1,47 @@
 import 'dart:io';
-import 'package:mem/framework/repository/condition/conditions.dart';
-import 'package:mem/framework/repository/database_tuple_repository.dart';
-import 'package:path/path.dart';
-
+import 'package:mem/databases/database.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/definition/database_definition.dart';
-import 'package:mem/framework/database/factory.dart';
+import 'package:mem/framework/repository/condition/conditions.dart';
+import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/features/logger/log_service.dart';
+import 'package:path/path.dart' as path;
 
 class DatabaseRepository extends Repository<DatabaseDefinition> {
   static DatabaseRepository? _instance;
-
-  final _cache = <String, DatabaseAccessor>{};
 
   DatabaseRepository._();
 
   factory DatabaseRepository() => _instance ??= DatabaseRepository._();
 
-  Future<DatabaseAccessor> receive(DatabaseDefinition entity) => v(
-        () async =>
-            _cache[entity.name] ??
-            await () async {
-              final opened = await DatabaseFactory.open(entity);
-              return _cache.putIfAbsent(entity.name, () => opened);
-            }(),
-        {
-          "entity": entity,
-        },
+  Future<DriftDatabaseAccessor> receive(DatabaseDefinition entity) => v(
+        () async => DriftDatabaseAccessor(),
+        {"entity": entity},
       );
 
   Future<File?> shipFileByNameIs(String name) => v(
-        () async {
-          final databaseFile = File(
-            await DatabaseFactory.buildDatabasePath(name),
-          );
-
-          return await databaseFile.exists() ? databaseFile : null;
-        },
-        {
-          "name": name,
-        },
+        () async => getDatabaseFile(),
+        {"name": name},
       );
 
   Future<void> replace(String name, File backup) => v(
         () async {
           await DatabaseTupleRepository.close();
 
-          final current = (await shipFileByNameIs(name))!;
-
-          final currentName = basename(current.path);
+          final current = (await getDatabaseFile())!;
+          final originalPath = current.path;
+          final currentName = path.basename(originalPath);
           await current.rename(
-              current.path.replaceFirst(currentName, "past-$currentName"));
+              originalPath.replaceFirst(currentName, "past-$currentName"));
 
-          await backup.copy(current.path);
+          await backup.copy(originalPath);
         },
-// coverage:ignore-start
-        {
-// coverage:ignore-end
-          'name': name,
-          'backup': backup,
-        },
+        {'name': name, 'backup': backup},
       );
 
   @override
   waste({Condition? condition}) {
-    // TODO: implement waste
     throw UnimplementedError();
   }
 }

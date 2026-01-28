@@ -5,140 +5,76 @@ import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/framework/singleton.dart';
-import 'package:sqflite/sqlite_api.dart';
 
-import 'converter.dart';
 import 'definition/table_definition.dart';
 
-class DatabaseAccessor {
-  final Database _nativeDatabase;
-  final DatabaseConverter _converter = DatabaseConverter();
-
-  @Deprecated("Use only for developing or test.")
-  Database get nativeDatabase => _nativeDatabase;
-
-  Future<int> insert(
-    TableDefinition tableDefinition,
-    Map<String, Object?> values,
-  ) =>
-      v(
-        () => _nativeDatabase.insert(
-          tableDefinition.name,
-          values.map((key, value) => MapEntry(key, _converter.to(value))),
-        ),
-        [
-          tableDefinition.name,
-          values,
-        ],
-      );
-
-  Future<int> count(
-    TableDefinition tableDefinition, {
-    String? where,
-    List<Object?>? whereArgs,
-  }) =>
-      v(
-        () async => (await _nativeDatabase.query(
-          tableDefinition.name,
-          columns: ["COUNT(*)"],
-          where: where,
-          whereArgs: whereArgs,
-        ))[0]
-            .values
-            .elementAt(0) as int,
-        {
-          "tableDefinition": tableDefinition,
-          "where": where,
-          "whereArgs": whereArgs,
-        },
-      );
-
-  Future<List<Map<String, Object?>>> select(
-    TableDefinition tableDefinition, {
-    String? groupBy,
-    List<String>? extraColumns,
-    String? where,
-    List<Object?>? whereArgs,
-    String? orderBy,
-    int? offset,
-    int? limit,
-  }) =>
-      v(
-        () => _nativeDatabase
-            .query(
-              tableDefinition.name,
-              columns: extraColumns == null ? null : ['*', ...extraColumns],
-              where: where,
-              whereArgs: whereArgs?.map((e) => _converter.to(e)).toList(),
-              groupBy: groupBy,
-              orderBy: orderBy,
-              offset: offset,
-              limit: limit,
-            )
-            .then((value) =>
-                value.map((e) => _converter.from(e, tableDefinition)).toList()),
-        {
-          'tableName': tableDefinition.name,
-          'groupBy': groupBy,
-          'extraColumns': extraColumns,
-          'where': where,
-          'whereArgs': whereArgs,
-          'orderBy': orderBy,
-          'offset': offset,
-          'limit': limit,
-        },
-      );
-
-  Future<int> update(
-    TableDefinition tableDefinition,
-    Map<String, Object?> values, {
-    String? where,
-    List<Object?>? whereArgs,
-  }) =>
-      v(
-        () => _nativeDatabase.update(
-          tableDefinition.name,
-          values.map((key, value) => MapEntry(key, _converter.to(value))),
-          where: where,
-          whereArgs: whereArgs?.map((e) => _converter.to(e)).toList(),
-        ),
-        [
-          tableDefinition.name,
-          values,
-          where,
-          whereArgs,
-        ],
-      );
-
-  Future<int> delete(
-    TableDefinition tableDefinition, {
-    String? where,
-    List<Object?>? whereArgs,
-  }) =>
-      v(
-        () => _nativeDatabase.delete(
-          tableDefinition.name,
-          where: where,
-          whereArgs: whereArgs?.map((e) => _converter.to(e)).toList(),
-        ),
-        [
-          tableDefinition.name,
-          where,
-          whereArgs,
-        ],
-      );
-
-  Future<void> close() => v(
-        () async => await _nativeDatabase.close(),
-      );
-
-  DatabaseAccessor(this._nativeDatabase);
+Object? _valueFromMap(Map<String, Object?> m, List<String> keys) {
+  for (final k in keys) {
+    final v = m[k];
+    if (v != null) return v;
+  }
+  return null;
 }
+
+const _driftToTableDefKey = {
+  'memId': 'mems_id',
+  'sourceMemId': 'source_mems_id',
+  'targetMemId': 'target_mems_id',
+  'startIsAllDay': 'start_is_all_day',
+  'endIsAllDay': 'end_is_all_day',
+  'timeOfDaySeconds': 'time_of_day_seconds',
+  'pausedAt': 'paused_at',
+};
+
+Map<String, Object?> _driftRowToEntityMap(dynamic row, String tableName) {
+  final json = (row as dynamic).toJson(
+    serializer: drift.ValueSerializer.defaults(
+      serializeDateTimeValuesAsString: true,
+    ),
+  ) as Map<String, dynamic>;
+  return Map.fromEntries(json.entries.map((e) {
+    final key = _driftToTableDefKey[e.key] ?? e.key;
+    Object? value = e.value;
+    if (value is String) {
+      try {
+        value = DateTime.parse(value);
+      } catch (_) {}
+    }
+    return MapEntry(key, value);
+  }));
+}
+
+const _tableDefToDriftKey = {
+  'mems_id': 'memId',
+  'source_mems_id': 'sourceMemId',
+  'target_mems_id': 'targetMemId',
+};
 
 class DriftDatabaseAccessor {
   final AppDatabase driftDatabase;
 
   DriftDatabaseAccessor._(this.driftDatabase);
+
+  Future<int> count(
+    TableDefinition tableDefinition, {
+    Condition? condition,
+  }) =>
+      v(
+        () async {
+          try {
+            final tableInfo = _getTableInfo(tableDefinition);
+            var query = driftDatabase.select(tableInfo);
+            if (condition != null) {
+              final exp = condition.toDriftExpression(tableInfo);
+              if (exp != null) query = query..where((_) => exp);
+            }
+            return (await query.get()).length;
+          } catch (_) {
+            return 0;
+          }
+        },
+        {'tableDefinition': tableDefinition, 'condition': condition},
+      );
 
   select(
     TableDefinition tableDefinition, {
@@ -165,20 +101,17 @@ class DriftDatabaseAccessor {
             }
           }
 
-          // TODO: groupBy support for drift
-          // if (groupBy != null) {
-          //   final columns = groupBy.columns
-          //       .map((colDef) => _getColumn(tableInfo, colDef.name))
-          //       .whereType<drift.GeneratedColumn>()
-          //       .toList();
-          //   if (columns.isNotEmpty) {
-          //     query.groupBy((tbl) => columns);
-          //   }
-          // }
+          final hasGroupByWithExtra = groupBy?.extraColumns != null &&
+              groupBy!.extraColumns!.isNotEmpty;
+          final effectiveOrderBy = [
+            if (hasGroupByWithExtra)
+              for (final e in groupBy.extraColumns!) Descending(e.column),
+            ...?orderBy,
+          ];
 
-          if (orderBy != null && orderBy.isNotEmpty) {
+          if (effectiveOrderBy.isNotEmpty) {
             query.orderBy(
-              orderBy
+              effectiveOrderBy
                   .map((orderByItem) => _toOrderClauseGenerator(
                         tableInfo,
                         orderByItem,
@@ -189,10 +122,29 @@ class DriftDatabaseAccessor {
           }
 
           if (limit != null || offset != null) {
-            query.limit(limit ?? 999999999, offset: offset ?? 0);
+            if (hasGroupByWithExtra) {
+              query.limit(100000, offset: 0);
+            } else {
+              query.limit(limit ?? 999999999, offset: offset ?? 0);
+            }
           }
 
-          return await query.get();
+          var rows = await query.get();
+          if (hasGroupByWithExtra && groupBy.columns.isNotEmpty) {
+            final seen = <Object?, dynamic>{};
+            final keyCol = groupBy.columns.first.name;
+            final driftKey = _tableDefToDriftKey[keyCol] ?? keyCol;
+            for (final r in rows) {
+              final k = (r as dynamic).toJson()[driftKey];
+              if (!seen.containsKey(k)) seen[k] = r;
+            }
+            rows = seen.values.toList();
+            rows = rows.skip(offset ?? 0).take(limit ?? 999999999).toList();
+          }
+
+          return rows
+              .map((r) => _driftRowToEntityMap(r, tableDefinition.name))
+              .toList();
         },
         {
           'tableDefinition': tableDefinition,
@@ -308,6 +260,12 @@ class DriftDatabaseAccessor {
     }
   }
 
+  static const _tableDefToDriftColumn = {
+    'mems_id': 'mem_id',
+    'source_mems_id': 'source_mem_id',
+    'target_mems_id': 'target_mem_id',
+  };
+
   drift.GeneratedColumn? _getColumn(
       drift.TableInfo tableInfo, String columnName) {
     try {
@@ -317,7 +275,9 @@ class DriftDatabaseAccessor {
         (col) {
           final actualName = _getColumnName(col);
           return actualName == columnName ||
-              actualName == toSnakeCase(columnName);
+              actualName == toSnakeCase(columnName) ||
+              (_tableDefToDriftColumn[columnName] != null &&
+                  actualName == _tableDefToDriftColumn[columnName]);
         },
         orElse: () => throw StateError('Column not found: $columnName'),
       );
@@ -331,6 +291,8 @@ class DriftDatabaseAccessor {
     String tableName,
     Map<String, Object?> values,
   ) {
+    T? val<T>(List<String> keys) => _valueFromMap(values, keys) as T?;
+
     switch (tableName) {
       case 'mems':
         return MemsCompanion.insert(
@@ -348,7 +310,7 @@ class DriftDatabaseAccessor {
         return MemItemsCompanion.insert(
           type: values['type'] as String,
           value: values['value'] as String,
-          memId: (values['memId'] as int?) ?? 0,
+          memId: (val<int>(['mems_id', 'memId']) ?? 0),
           createdAt: values['createdAt'] as DateTime,
           updatedAt: drift.Value(values['updatedAt'] as DateTime?),
           archivedAt: drift.Value(values['archivedAt'] as DateTime?),
@@ -356,21 +318,24 @@ class DriftDatabaseAccessor {
       case 'acts':
         return ActsCompanion.insert(
           start: drift.Value(values['start'] as DateTime?),
-          startIsAllDay: drift.Value(values['startIsAllDay'] as bool?),
+          startIsAllDay:
+              drift.Value(val<bool>(['start_is_all_day', 'startIsAllDay'])),
           end: drift.Value(values['end'] as DateTime?),
-          endIsAllDay: drift.Value(values['endIsAllDay'] as bool?),
-          pausedAt: drift.Value(values['pausedAt'] as DateTime?),
-          memId: (values['memId'] as int?) ?? 0,
+          endIsAllDay:
+              drift.Value(val<bool>(['end_is_all_day', 'endIsAllDay'])),
+          pausedAt: drift.Value(val<DateTime>(['paused_at', 'pausedAt'])),
+          memId: (val<int>(['mems_id', 'memId']) ?? 0),
           createdAt: values['createdAt'] as DateTime,
           updatedAt: drift.Value(values['updatedAt'] as DateTime?),
           archivedAt: drift.Value(values['archivedAt'] as DateTime?),
         );
       case 'mem_repeated_notifications':
         return MemRepeatedNotificationsCompanion.insert(
-          timeOfDaySeconds: (values['timeOfDaySeconds'] as int?) ?? 0,
+          timeOfDaySeconds:
+              (val<int>(['time_of_day_seconds', 'timeOfDaySeconds']) ?? 0),
           type: values['type'] as String,
           message: values['message'] as String,
-          memId: (values['memId'] as int?) ?? 0,
+          memId: (val<int>(['mems_id', 'memId']) ?? 0),
           createdAt: values['createdAt'] as DateTime,
           updatedAt: drift.Value(values['updatedAt'] as DateTime?),
           archivedAt: drift.Value(values['archivedAt'] as DateTime?),
@@ -381,15 +346,15 @@ class DriftDatabaseAccessor {
           unit: values['unit'] as String,
           value: (values['value'] as int?) ?? 0,
           period: values['period'] as String,
-          memId: (values['memId'] as int?) ?? 0,
+          memId: (val<int>(['mems_id', 'memId']) ?? 0),
           createdAt: values['createdAt'] as DateTime,
           updatedAt: drift.Value(values['updatedAt'] as DateTime?),
           archivedAt: drift.Value(values['archivedAt'] as DateTime?),
         );
       case 'mem_relations':
         return MemRelationsCompanion.insert(
-          sourceMemId: (values['sourceMemId'] as int?) ?? 0,
-          targetMemId: (values['targetMemId'] as int?) ?? 0,
+          sourceMemId: (val<int>(['source_mems_id', 'sourceMemId']) ?? 0),
+          targetMemId: (val<int>(['target_mems_id', 'targetMemId']) ?? 0),
           type: values['type'] as String,
           value: drift.Value(values['value'] as int?),
           createdAt: values['createdAt'] as DateTime,

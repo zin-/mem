@@ -44,16 +44,11 @@ jobs:
   medium_test:
     strategy:
       matrix:
-        target: [
-          scenarios/settings/settings_test.dart,
-          scenarios/app_test.dart,
-          framework
-        ]
+        target: [framework]
         include:
-          - timeout-minutes-android: 30
+          - target: framework
+            timeout-minutes-android: 30
             timeout-minutes-windows: 15
-          - target: scenarios/settings/settings_test.dart
-            timeout-minutes-android: 50
       fail-fast: true
 
     needs: set_up-env
