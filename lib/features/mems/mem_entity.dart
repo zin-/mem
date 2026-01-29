@@ -15,7 +15,7 @@ import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/framework/notifications/notification/type.dart';
 import 'package:mem/framework/notifications/schedule.dart';
 
-class MemEntityV1 with Entity<Mem> {
+class MemEntityV1 with EntityV1<Mem> {
   MemEntityV1(Mem value) {
     this.value = value;
 

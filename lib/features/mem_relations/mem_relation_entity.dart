@@ -3,7 +3,7 @@ import 'package:mem/features/mem_relations/mem_relation.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
 
-class MemRelationEntity with Entity<MemRelation> {
+class MemRelationEntity with EntityV1<MemRelation> {
   MemRelationEntity(MemRelation value) {
     this.value = value;
   }

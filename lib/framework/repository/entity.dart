@@ -1,15 +1,18 @@
 /// # Entityとは
 ///
-/// システムから見た外部データを表す
+/// システムが扱うデータとしての実体を表現する
 // # 語源
 //
 // 「存在するもの」、「実体」
-mixin Entity<VALUE> {
+// # Domainとの違い
+// Domainと違い、Entityは具体的なデータとの繋がりがあるためいくつかの制約を持ち、持たせることができる
+// 具体的には、そのデータを一意に定める識別子(id)を持ったり、作成日時などのmetadataを持つ
+mixin EntityV1<VALUE> {
   late VALUE value;
 
   Map<String, Object?> get toMap;
 
-  Entity<VALUE> updatedWith(VALUE Function(VALUE v) update);
+  EntityV1<VALUE> updatedWith(VALUE Function(VALUE v) update);
 
   @override
   String toString() => "${super.toString()}: $toMap";
