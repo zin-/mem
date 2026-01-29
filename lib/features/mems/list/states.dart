@@ -39,7 +39,7 @@ final showDoneProvider = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
   ),
 );
 final _filteredMemsProvider = StateNotifierProvider.autoDispose<
-    ListValueStateNotifier<SavedMemEntity>, List<SavedMemEntity>>(
+    ListValueStateNotifier<SavedMemEntityV1>, List<SavedMemEntityV1>>(
   (ref) {
     final savedMemEntities = ref.watch(memEntitiesProvider);
 
@@ -85,7 +85,7 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
 );
 
 final memListProvider = StateNotifierProvider.autoDispose<
-    ValueStateNotifier<List<SavedMemEntity>>, List<SavedMemEntity>>((ref) {
+    ValueStateNotifier<List<SavedMemEntityV1>>, List<SavedMemEntityV1>>((ref) {
   final filtered = ref.watch(_filteredMemsProvider);
   final latestActsByMem = ref.watch(latestActsByMemProvider.select(
     (value) => value?.values.whereType<Act>().toList() ?? [],

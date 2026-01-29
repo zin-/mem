@@ -38,7 +38,7 @@ mixin DatabaseTupleEntity<PRIMARY_KEY, T> on Entity<T> {
 }
 
 final Map<Type, TableDefinition> entityTableRelations = {
-  MemEntity: defTableMems,
+  MemEntityV1: defTableMems,
   MemItemEntity: defTableMemItems,
   MemNotificationEntity: defTableMemNotifications,
   TargetEntity: defTableTargets,

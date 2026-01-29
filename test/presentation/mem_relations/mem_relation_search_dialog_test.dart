@@ -8,12 +8,12 @@ import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mems_state.dart';
 
 class _FakeMemEntities extends MemEntities {
-  final Iterable<SavedMemEntity> _state;
+  final Iterable<SavedMemEntityV1> _state;
 
   _FakeMemEntities(this._state);
 
   @override
-  Iterable<SavedMemEntity> build() => _state;
+  Iterable<SavedMemEntityV1> build() => _state;
 }
 
 Widget _buildTestApp(Widget child, {List<Override>? overrides}) {
@@ -32,7 +32,7 @@ Widget _buildTestApp(Widget child, {List<Override>? overrides}) {
 void main() {
   group('MemRelationDialogStateful', () {
     testWidgets('initializes with selectedMemIds', (tester) async {
-      final mem1 = SavedMemEntity({
+      final mem1 = SavedMemEntityV1({
         defPkId.name: 1,
         'name': 'Mem 1',
         'doneAt': null,
@@ -44,7 +44,7 @@ void main() {
         'updatedAt': DateTime.now(),
         'archivedAt': null,
       });
-      final mem2 = SavedMemEntity({
+      final mem2 = SavedMemEntityV1({
         defPkId.name: 2,
         'name': 'Mem 2',
         'doneAt': null,
@@ -96,7 +96,7 @@ void main() {
     });
 
     testWidgets('updates searchText when typing', (tester) async {
-      final mem1 = SavedMemEntity({
+      final mem1 = SavedMemEntityV1({
         defPkId.name: 1,
         'name': 'Apple',
         'doneAt': null,
@@ -108,7 +108,7 @@ void main() {
         'updatedAt': DateTime.now(),
         'archivedAt': null,
       });
-      final mem2 = SavedMemEntity({
+      final mem2 = SavedMemEntityV1({
         defPkId.name: 2,
         'name': 'Banana',
         'doneAt': null,
@@ -162,7 +162,7 @@ void main() {
 
     testWidgets('updates selectedMemIds when checkbox is toggled',
         (tester) async {
-      final mem1 = SavedMemEntity({
+      final mem1 = SavedMemEntityV1({
         defPkId.name: 1,
         'name': 'Mem 1',
         'doneAt': null,
@@ -217,7 +217,7 @@ void main() {
 
     testWidgets('submits selectedMemIds when add button is pressed',
         (tester) async {
-      final mem1 = SavedMemEntity({
+      final mem1 = SavedMemEntityV1({
         defPkId.name: 1,
         'name': 'Mem 1',
         'doneAt': null,
@@ -269,7 +269,7 @@ void main() {
     });
 
     testWidgets('closes dialog when cancel button is pressed', (tester) async {
-      final mem1 = SavedMemEntity({
+      final mem1 = SavedMemEntityV1({
         defPkId.name: 1,
         'name': 'Mem 1',
         'doneAt': null,
@@ -319,7 +319,7 @@ void main() {
 
   group('MemRelationDialogConsumer', () {
     testWidgets('filters candidates by searchText', (tester) async {
-      final mem1 = SavedMemEntity({
+      final mem1 = SavedMemEntityV1({
         defPkId.name: 1,
         'name': 'Apple',
         'doneAt': null,
@@ -331,7 +331,7 @@ void main() {
         'updatedAt': DateTime.now(),
         'archivedAt': null,
       });
-      final mem2 = SavedMemEntity({
+      final mem2 = SavedMemEntityV1({
         defPkId.name: 2,
         'name': 'Banana',
         'doneAt': null,
@@ -343,7 +343,7 @@ void main() {
         'updatedAt': DateTime.now(),
         'archivedAt': null,
       });
-      final mem3 = SavedMemEntity({
+      final mem3 = SavedMemEntityV1({
         defPkId.name: 3,
         'name': 'Cherry',
         'doneAt': null,
@@ -397,7 +397,7 @@ void main() {
 
     testWidgets('includes selected mems even if searchText does not match',
         (tester) async {
-      final mem1 = SavedMemEntity({
+      final mem1 = SavedMemEntityV1({
         defPkId.name: 1,
         'name': 'Apple',
         'doneAt': null,
@@ -409,7 +409,7 @@ void main() {
         'updatedAt': DateTime.now(),
         'archivedAt': null,
       });
-      final mem2 = SavedMemEntity({
+      final mem2 = SavedMemEntityV1({
         defPkId.name: 2,
         'name': 'Banana',
         'doneAt': null,
@@ -461,7 +461,7 @@ void main() {
     });
 
     testWidgets('excludes sourceMemId from candidates', (tester) async {
-      final mem1 = SavedMemEntity({
+      final mem1 = SavedMemEntityV1({
         defPkId.name: 1,
         'name': 'Mem 1',
         'doneAt': null,
@@ -473,7 +473,7 @@ void main() {
         'updatedAt': DateTime.now(),
         'archivedAt': null,
       });
-      final mem2 = SavedMemEntity({
+      final mem2 = SavedMemEntityV1({
         defPkId.name: 2,
         'name': 'Mem 2',
         'doneAt': null,
@@ -520,7 +520,7 @@ void main() {
 
     testWidgets('shows all candidates when searchText is empty',
         (tester) async {
-      final mem1 = SavedMemEntity({
+      final mem1 = SavedMemEntityV1({
         defPkId.name: 1,
         'name': 'Mem 1',
         'doneAt': null,
@@ -532,7 +532,7 @@ void main() {
         'updatedAt': DateTime.now(),
         'archivedAt': null,
       });
-      final mem2 = SavedMemEntity({
+      final mem2 = SavedMemEntityV1({
         defPkId.name: 2,
         'name': 'Mem 2',
         'doneAt': null,
@@ -612,7 +612,7 @@ void main() {
     });
 
     testWidgets('displays candidates in list', (tester) async {
-      final mem1 = SavedMemEntity({
+      final mem1 = SavedMemEntityV1({
         defPkId.name: 1,
         'name': 'Mem 1',
         'doneAt': null,
@@ -624,7 +624,7 @@ void main() {
         'updatedAt': DateTime.now(),
         'archivedAt': null,
       });
-      final mem2 = SavedMemEntity({
+      final mem2 = SavedMemEntityV1({
         defPkId.name: 2,
         'name': 'Mem 2',
         'doneAt': null,
@@ -669,7 +669,7 @@ void main() {
     });
 
     testWidgets('toggles checkbox when tapped', (tester) async {
-      final mem1 = SavedMemEntity({
+      final mem1 = SavedMemEntityV1({
         defPkId.name: 1,
         'name': 'Mem 1',
         'doneAt': null,
@@ -731,7 +731,7 @@ void main() {
     });
 
     testWidgets('unchecks checkbox when already selected', (tester) async {
-      final mem1 = SavedMemEntity({
+      final mem1 = SavedMemEntityV1({
         defPkId.name: 1,
         'name': 'Mem 1',
         'doneAt': null,

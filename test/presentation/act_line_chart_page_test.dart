@@ -47,7 +47,7 @@ void main() {
                 (ref) => AsyncValue.data(acts),
               ),
               memByMemIdProvider(memId).overrideWith(
-                (ref) => ValueStateNotifier(SavedMemEntity({
+                (ref) => ValueStateNotifier(SavedMemEntityV1({
                   defPkId.name: memId,
                   defColMemsName.name: memName,
                   defColMemsDoneAt.name: null,

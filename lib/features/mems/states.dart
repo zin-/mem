@@ -26,7 +26,7 @@ final memNotificationsProvider = StateNotifierProvider<
 );
 
 final memByMemIdProvider = StateNotifierProvider.autoDispose
-    .family<ValueStateNotifier<SavedMemEntity?>, SavedMemEntity?, int?>(
+    .family<ValueStateNotifier<SavedMemEntityV1?>, SavedMemEntityV1?, int?>(
   (ref, memId) => v(
     () {
       final mem = ref.watch(
@@ -61,14 +61,14 @@ final memByMemIdProvider = StateNotifierProvider.autoDispose
 final removedMemDetailProvider = StateNotifierProvider.autoDispose.family<
     ValueStateNotifier<
         (
-          MemEntity,
+          MemEntityV1,
           List<MemItemEntity>,
           List<MemNotificationEntity>?,
           TargetEntity?,
           List<MemRelationEntity>?
         )?>,
     (
-      MemEntity,
+      MemEntityV1,
       List<MemItemEntity>,
       List<MemNotificationEntity>?,
       TargetEntity?,
@@ -101,9 +101,9 @@ final removedMemDetailProvider = StateNotifierProvider.autoDispose.family<
   ),
 );
 final removedMemProvider = StateNotifierProvider.family<
-    ValueStateNotifier<MemEntity?>, MemEntity?, int>(
+    ValueStateNotifier<MemEntityV1?>, MemEntityV1?, int>(
   (ref, memId) => v(
-    () => ValueStateNotifier<MemEntity?>(null),
+    () => ValueStateNotifier<MemEntityV1?>(null),
     memId,
   ),
 );

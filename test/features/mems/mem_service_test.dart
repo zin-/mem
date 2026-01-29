@@ -56,7 +56,7 @@ void main() {
           () async {
         // Arrange
         const testMemId = 1;
-        final mem = MemEntity(Mem(null, 'Test Mem', null, null));
+        final mem = MemEntityV1(Mem(null, 'Test Mem', null, null));
         final memItems = <MemItemEntity>[];
         final memNotifications = <MemNotificationEntity>[];
         final target = TargetEntity(
@@ -70,7 +70,7 @@ void main() {
         );
         final memRelations = <MemRelationEntity>[];
 
-        final savedMem = SavedMemEntity({
+        final savedMem = SavedMemEntityV1({
           'id': testMemId,
           'name': 'Test Mem',
           'doneAt': null,
@@ -134,13 +134,13 @@ void main() {
           () async {
         // Arrange
         const testMemId = 1;
-        final mem = MemEntity(Mem(null, 'Test Mem', null, null));
+        final mem = MemEntityV1(Mem(null, 'Test Mem', null, null));
         final memItems = <MemItemEntity>[];
         final memNotifications = <MemNotificationEntity>[];
         final target = null;
         final memRelations = <MemRelationEntity>[];
 
-        final savedMem = SavedMemEntity({
+        final savedMem = SavedMemEntityV1({
           'id': testMemId,
           'name': 'Test Mem',
           'doneAt': null,
@@ -181,7 +181,7 @@ void main() {
           () async {
         // Arrange
         const testMemId = 1;
-        final mem = MemEntity(Mem(null, 'Test Mem', null, null));
+        final mem = MemEntityV1(Mem(null, 'Test Mem', null, null));
         final memItems = <MemItemEntity>[];
         final memNotifications = <MemNotificationEntity>[];
         final target = TargetEntity(
@@ -195,7 +195,7 @@ void main() {
         );
         final memRelations = <MemRelationEntity>[];
 
-        final savedMem = SavedMemEntity({
+        final savedMem = SavedMemEntityV1({
           'id': testMemId,
           'name': 'Test Mem',
           'doneAt': null,

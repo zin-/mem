@@ -12,20 +12,20 @@ import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/framework/date_and_time/time_text_form_field.dart';
 
 class _FakeMemEntities extends MemEntities {
-  final Iterable<SavedMemEntity> _state;
+  final Iterable<SavedMemEntityV1> _state;
 
   _FakeMemEntities(this._state);
 
   @override
-  Iterable<SavedMemEntity> build() => _state;
+  Iterable<SavedMemEntityV1> build() => _state;
 }
 
-class _FakeMemRelationEntitiesByMemId
-    extends MemRelationEntitiesByMemId {
+class _FakeMemRelationEntitiesByMemId extends MemRelationEntitiesByMemId {
   final Future<Iterable<MemRelationEntity>> Function(int?) _buildFn;
   final List<MemRelationEntity> _upsertedEntities = [];
 
-  _FakeMemRelationEntitiesByMemId(Future<Iterable<MemRelationEntity>> Function(int?) buildFn)
+  _FakeMemRelationEntitiesByMemId(
+      Future<Iterable<MemRelationEntity>> Function(int?) buildFn)
       : _buildFn = buildFn;
 
   @override
@@ -64,7 +64,7 @@ void main() {
         (tester) async {
       const sourceMemId = 1;
       final now = DateTime.now();
-      final mem1 = SavedMemEntity({
+      final mem1 = SavedMemEntityV1({
         defPkId.name: 1,
         'name': 'Mem 1',
         'doneAt': null,
@@ -76,7 +76,7 @@ void main() {
         'updatedAt': now,
         'archivedAt': null,
       });
-      final mem2 = SavedMemEntity({
+      final mem2 = SavedMemEntityV1({
         defPkId.name: 2,
         'name': 'Mem 2',
         'doneAt': null,
@@ -111,7 +111,8 @@ void main() {
                 (memId) async => [relation1, relation2],
               ),
             ),
-            memEntitiesProvider.overrideWith(() => _FakeMemEntities([mem1, mem2])),
+            memEntitiesProvider
+                .overrideWith(() => _FakeMemEntities([mem1, mem2])),
           ],
         ),
       );
@@ -149,7 +150,7 @@ void main() {
       await tester.pump();
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
-      
+
       await tester.pump(const Duration(seconds: 1));
       await tester.pumpAndSettle();
     });
@@ -225,7 +226,7 @@ void main() {
         (tester) async {
       const sourceMemId = 1;
       final now = DateTime.now();
-      final mem1 = SavedMemEntity({
+      final mem1 = SavedMemEntityV1({
         defPkId.name: 1,
         'name': 'Mem 1',
         'doneAt': null,
@@ -270,7 +271,7 @@ void main() {
     testWidgets('calls onChanged when value is changed', (tester) async {
       const sourceMemId = 1;
       final now = DateTime.now();
-      final mem1 = SavedMemEntity({
+      final mem1 = SavedMemEntityV1({
         defPkId.name: 1,
         'name': 'Mem 1',
         'doneAt': null,
@@ -319,25 +320,29 @@ void main() {
         (tester) async {
       const sourceMemId = 1;
       final now = DateTime.now();
-      final mems = List.generate(4, (index) => SavedMemEntity({
-            defPkId.name: index + 1,
-            'name': 'Mem ${index + 1}',
-            'doneAt': null,
-            'notifyOn': null,
-            'notifyAt': null,
-            'endOn': null,
-            'endAt': null,
-            'createdAt': now,
-            'updatedAt': now,
-            'archivedAt': null,
-          }));
+      final mems = List.generate(
+          4,
+          (index) => SavedMemEntityV1({
+                defPkId.name: index + 1,
+                'name': 'Mem ${index + 1}',
+                'doneAt': null,
+                'notifyOn': null,
+                'notifyAt': null,
+                'endOn': null,
+                'endAt': null,
+                'createdAt': now,
+                'updatedAt': now,
+                'archivedAt': null,
+              }));
 
-      final relations = mems.map((mem) => MemRelationEntity.by(
-            sourceMemId,
-            mem.id,
-            MemRelationType.prePost,
-            30,
-          )).toList();
+      final relations = mems
+          .map((mem) => MemRelationEntity.by(
+                sourceMemId,
+                mem.id,
+                MemRelationType.prePost,
+                30,
+              ))
+          .toList();
 
       await tester.pumpWidget(
         _buildTestApp(
@@ -360,7 +365,7 @@ void main() {
 
       final sizedBoxes = find.byType(SizedBox);
       expect(sizedBoxes, findsWidgets);
-      
+
       final sizedBox = tester.widget<SizedBox>(sizedBoxes.first);
       expect(sizedBox.height, 180.0);
     });
@@ -369,25 +374,29 @@ void main() {
         (tester) async {
       const sourceMemId = 1;
       final now = DateTime.now();
-      final mems = List.generate(2, (index) => SavedMemEntity({
-            defPkId.name: index + 1,
-            'name': 'Mem ${index + 1}',
-            'doneAt': null,
-            'notifyOn': null,
-            'notifyAt': null,
-            'endOn': null,
-            'endAt': null,
-            'createdAt': now,
-            'updatedAt': now,
-            'archivedAt': null,
-          }));
+      final mems = List.generate(
+          2,
+          (index) => SavedMemEntityV1({
+                defPkId.name: index + 1,
+                'name': 'Mem ${index + 1}',
+                'doneAt': null,
+                'notifyOn': null,
+                'notifyAt': null,
+                'endOn': null,
+                'endAt': null,
+                'createdAt': now,
+                'updatedAt': now,
+                'archivedAt': null,
+              }));
 
-      final relations = mems.map((mem) => MemRelationEntity.by(
-            sourceMemId,
-            mem.id,
-            MemRelationType.prePost,
-            30,
-          )).toList();
+      final relations = mems
+          .map((mem) => MemRelationEntity.by(
+                sourceMemId,
+                mem.id,
+                MemRelationType.prePost,
+                30,
+              ))
+          .toList();
 
       await tester.pumpWidget(
         _buildTestApp(
@@ -410,7 +419,7 @@ void main() {
 
       final sizedBoxes = find.byType(SizedBox);
       expect(sizedBoxes, findsWidgets);
-      
+
       final sizedBox = tester.widget<SizedBox>(sizedBoxes.first);
       expect(sizedBox.height, 120.0);
     });
@@ -418,7 +427,7 @@ void main() {
     testWidgets('calls onChanged with 0 when value is null', (tester) async {
       const sourceMemId = 1;
       final now = DateTime.now();
-      final mem1 = SavedMemEntity({
+      final mem1 = SavedMemEntityV1({
         defPkId.name: 1,
         'name': 'Mem 1',
         'doneAt': null,
@@ -461,4 +470,3 @@ void main() {
     });
   });
 }
-

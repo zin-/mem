@@ -19,9 +19,9 @@ part 'mems_state.g.dart';
 
 @Riverpod(keepAlive: true)
 class MemEntities extends _$MemEntities
-    with EntitiesStateMixin<SavedMemEntity, int> {
+    with EntitiesStateMixin<SavedMemEntityV1, int> {
   @override
-  Iterable<SavedMemEntity> build() => v(
+  Iterable<SavedMemEntityV1> build() => v(
         () {
           ref.listen<bool>(showNotArchivedProvider, (_, __) => loadMemList());
           ref.listen<bool>(showArchivedProvider, (_, __) => loadMemList());
@@ -50,7 +50,7 @@ class MemEntities extends _$MemEntities
         },
       );
 
-  Future<SavedMemEntity?> loadByMemId(int memId) => v(
+  Future<SavedMemEntityV1?> loadByMemId(int memId) => v(
         () async {
           final mem = await MemRepository().ship(id: memId);
 
@@ -64,7 +64,7 @@ class MemEntities extends _$MemEntities
   Future<
       (
         (
-          MemEntity,
+          MemEntityV1,
           List<MemItemEntity>,
           List<MemNotificationEntity>?,
           TargetEntity?,
@@ -72,7 +72,7 @@ class MemEntities extends _$MemEntities
         ),
         DateTime?
       )> save(
-    MemEntity memEntity,
+    MemEntityV1 memEntity,
     Iterable<MemItemEntity> memItemEntities,
     Iterable<MemNotificationEntity> memNotificationEntities,
     TargetEntity? targetEntity,
@@ -88,7 +88,7 @@ class MemEntities extends _$MemEntities
             memRelationEntities?.toList(),
           );
 
-          upsert([saved.$1 as SavedMemEntity]);
+          upsert([saved.$1 as SavedMemEntityV1]);
 
           ref
               .read(memRelationEntitiesProvider.notifier)
@@ -105,7 +105,7 @@ class MemEntities extends _$MemEntities
         },
       );
 
-  Future<Iterable<SavedMemEntity>> removeAsync(Iterable<int> ids) => v(
+  Future<Iterable<SavedMemEntityV1>> removeAsync(Iterable<int> ids) => v(
         () async {
           await Future.wait(ids.map((id) => MemClient().remove(id)));
 
@@ -116,7 +116,7 @@ class MemEntities extends _$MemEntities
 
   Future<
       (
-        MemEntity,
+        MemEntityV1,
         List<MemItemEntity>,
         List<MemNotificationEntity>?,
         TargetEntity?,
@@ -134,7 +134,7 @@ class MemEntities extends _$MemEntities
             final undoneRemovedMemDetail =
                 await MemService().save(removedMemDetail, undo: true);
 
-            upsert([undoneRemovedMemDetail.$1 as SavedMemEntity]);
+            upsert([undoneRemovedMemDetail.$1 as SavedMemEntityV1]);
 
             return undoneRemovedMemDetail;
           }
@@ -148,7 +148,7 @@ class MemEntities extends _$MemEntities
         () async {
           final doneMemDetail = await MemService().doneByMemId(memId);
 
-          upsert([doneMemDetail.$1 as SavedMemEntity]);
+          upsert([doneMemDetail.$1 as SavedMemEntityV1]);
         },
         {'memId': memId},
       );
@@ -157,7 +157,7 @@ class MemEntities extends _$MemEntities
         () async {
           final undoneMemDetail = await MemService().undoneByMemId(memId);
 
-          upsert([undoneMemDetail.$1 as SavedMemEntity]);
+          upsert([undoneMemDetail.$1 as SavedMemEntityV1]);
         },
         {'memId': memId},
       );
@@ -172,7 +172,7 @@ class MemEntities extends _$MemEntities
 
           final archived = await MemClient().archive(targetMem);
 
-          upsert([archived.$1 as SavedMemEntity]);
+          upsert([archived.$1 as SavedMemEntityV1]);
         },
         {'memId': memId},
       );
@@ -187,7 +187,7 @@ class MemEntities extends _$MemEntities
 
           final unarchived = await MemClient().unarchive(targetMem);
 
-          upsert([unarchived.$1 as SavedMemEntity]);
+          upsert([unarchived.$1 as SavedMemEntityV1]);
         },
       );
 }

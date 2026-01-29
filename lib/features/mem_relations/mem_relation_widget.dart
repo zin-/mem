@@ -82,7 +82,7 @@ const itemHeight = 60.0;
 const maxHeight = itemHeight * 3;
 
 class _MemRelationList extends StatelessWidget {
-  final Iterable<SavedMemEntity> selectedMemEntities;
+  final Iterable<SavedMemEntityV1> selectedMemEntities;
   final Iterable<MemRelationEntity> memRelationEntities;
   final void Function() showDialog;
   final void Function(int targetMemId, int value) onChanged;
@@ -135,7 +135,7 @@ class _MemRelationList extends StatelessWidget {
 }
 
 class _MemRelationItem extends StatelessWidget {
-  final MemEntity memEntity;
+  final MemEntityV1 memEntity;
   final int? value;
   final void Function(int? value) onChanged;
 

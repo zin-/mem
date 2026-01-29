@@ -10,7 +10,7 @@ import 'view.dart';
 
 class ActListItemBuilder {
   final MapEntry<DateTime, List<SavedActEntity>> _actListWithDatetime;
-  final List<SavedMemEntity> _memList;
+  final List<SavedMemEntityV1> _memList;
   final bool _isTimeView;
   final List<SavedTargetEntity> _targetList;
 

@@ -24,7 +24,7 @@ class ActCounter implements HomeWidget {
   ActCounter(this.memId, this.name, this.actCount, this.updatedAt);
 
   ActCounter.from(
-    SavedMemEntity savedMem,
+    SavedMemEntityV1 savedMem,
     Iterable<SavedActEntity> savedActs,
   )   : memId = savedMem.id,
         name = savedMem.value.name,

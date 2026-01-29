@@ -26,14 +26,14 @@ class MemService {
 
   Future<
       (
-        MemEntity,
+        MemEntityV1,
         List<MemItemEntity>,
         List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?
       )> save(
     (
-      MemEntity,
+      MemEntityV1,
       List<MemItemEntity>,
       List<MemNotificationEntity>?,
       TargetEntity?,
@@ -45,7 +45,7 @@ class MemService {
         () async {
           final mem = memDetail.$1;
 
-          final savedMem = (mem is SavedMemEntity && !undo
+          final savedMem = (mem is SavedMemEntityV1 && !undo
               ? await _memRepository.replace(mem)
               : await _memRepository.receive(mem));
 
@@ -177,7 +177,7 @@ class MemService {
 
   Future<
       (
-        MemEntity,
+        MemEntityV1,
         List<MemItemEntity>,
         List<MemNotificationEntity>?,
         TargetEntity?,
@@ -206,7 +206,7 @@ class MemService {
 
   Future<
       (
-        MemEntity,
+        MemEntityV1,
         List<MemItemEntity>,
         List<MemNotificationEntity>?,
         TargetEntity?,
@@ -235,12 +235,12 @@ class MemService {
 
   Future<
       (
-        MemEntity,
+        MemEntityV1,
         List<MemItemEntity>,
         List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?
-      )> archive(SavedMemEntity mem) => i(
+      )> archive(SavedMemEntityV1 mem) => i(
         () async {
           final archivedMem = await _memRepository.archive(mem);
           final archivedMemItems =
@@ -266,12 +266,12 @@ class MemService {
 
   Future<
       (
-        MemEntity,
+        MemEntityV1,
         List<MemItemEntity>,
         List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?
-      )> unarchive(SavedMemEntity mem) => i(
+      )> unarchive(SavedMemEntityV1 mem) => i(
         () async {
           final unarchivedMem = await _memRepository.unarchive(mem);
           final unarchivedMemItems =

@@ -28,7 +28,7 @@ class MemListView extends ConsumerWidget {
 }
 
 class _MemListViewComponent extends StatelessWidget {
-  final List<SavedMemEntity> _memList;
+  final List<SavedMemEntityV1> _memList;
   final Widget _appBar;
   final Widget Function(int memId) _itemBuilder;
   final ScrollController? _scrollController;

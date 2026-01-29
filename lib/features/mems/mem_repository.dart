@@ -7,12 +7,13 @@ import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 
-class MemRepository extends DatabaseTupleRepository<MemEntity, SavedMemEntity> {
+class MemRepository
+    extends DatabaseTupleRepository<MemEntityV1, SavedMemEntityV1> {
   @override
-  SavedMemEntity pack(Map<String, dynamic> map) => SavedMemEntity(map);
+  SavedMemEntityV1 pack(Map<String, dynamic> map) => SavedMemEntityV1(map);
 
   @override
-  Future<List<SavedMemEntity>> ship({
+  Future<List<SavedMemEntityV1>> ship({
     int? id,
     bool? archived,
     bool? done,
@@ -44,7 +45,7 @@ class MemRepository extends DatabaseTupleRepository<MemEntity, SavedMemEntity> {
       );
 
   @override
-  Future<List<SavedMemEntity>> waste({
+  Future<List<SavedMemEntityV1>> waste({
     int? id,
     Condition? condition,
   }) =>

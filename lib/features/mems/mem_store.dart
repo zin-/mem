@@ -12,9 +12,9 @@ import 'package:mem/features/mems/mem_repository.dart';
 class MemStore {
   final MemRepository _memRepository;
 
-  final List<SavedMemEntity> _memStock = [];
+  final List<SavedMemEntityV1> _memStock = [];
 
-  Future<List<SavedMemEntity>> serve({bool? archived, bool? done}) => v(
+  Future<List<SavedMemEntityV1>> serve({bool? archived, bool? done}) => v(
         () async {
           final mems = await _memRepository.ship(
             archived: archived,

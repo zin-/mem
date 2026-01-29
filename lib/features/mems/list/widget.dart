@@ -40,7 +40,7 @@ class MemListWidget extends ConsumerWidget {
 
 class _MemListWidget extends StatelessWidget {
   final ScrollController _scrollController;
-  final List<SavedMemEntity> _memList;
+  final List<SavedMemEntityV1> _memList;
   final TimeOfDay _startOfDay;
   final Iterable<MemNotificationEntity> _memNotifications;
   final Iterable<Act> _latestActsByMem;
