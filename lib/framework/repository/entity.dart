@@ -39,3 +39,8 @@ final Map<Type, Set<Type>> entityChildrenRelation = {};
 //  domain領域では、nullの場合はそもそも実行する必要がないはずなのでnot nullになっている
 //  data領域ではさらに厳しく、データとして存在しているはずのものしかなくなるのでidなどの情報が付与されているはず
 //  など
+
+// Entityを定義したくなるが、保存された際に同一性が発生するためより抽象的で何も振る舞いを持たないEntityを定義する意味がない
+abstract interface class SavedEntity<ID> {
+  ID get id;
+}
