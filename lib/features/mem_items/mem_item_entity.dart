@@ -33,7 +33,7 @@ class MemItemEntity with EntityV1<MemItem> {
 }
 
 class SavedMemItemEntity extends MemItemEntity
-    with DatabaseTupleEntity<int, MemItem> {
+    with DatabaseTupleEntityV1<int, MemItem> {
   SavedMemItemEntity(Map<String, dynamic> map)
       : super(
           MemItem(

@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 
-mixin EntitiesStateMixin<T extends DatabaseTupleEntity<PK, dynamic>, PK>
+mixin EntitiesStateMixin<T extends DatabaseTupleEntityV1<PK, dynamic>, PK>
     on AnyNotifier<Iterable<T>, Iterable<T>> {
   Iterable<T> upsert(Iterable<T> entities) => v(
         () {

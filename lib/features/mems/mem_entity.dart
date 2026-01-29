@@ -45,7 +45,8 @@ class MemEntityV1 with EntityV1<Mem> {
       MemEntityV1(update(value));
 }
 
-class SavedMemEntityV1 extends MemEntityV1 with DatabaseTupleEntity<int, Mem> {
+class SavedMemEntityV1 extends MemEntityV1
+    with DatabaseTupleEntityV1<int, Mem> {
   SavedMemEntityV1(Map<String, dynamic> map)
       : super(
           Mem(

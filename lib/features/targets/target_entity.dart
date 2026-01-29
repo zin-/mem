@@ -25,7 +25,7 @@ class TargetEntity with EntityV1<Target> {
 }
 
 class SavedTargetEntity extends TargetEntity
-    with DatabaseTupleEntity<int, Target> {
+    with DatabaseTupleEntityV1<int, Target> {
   SavedTargetEntity(Map<String, dynamic> map)
       : super(
           Target(

@@ -37,7 +37,7 @@ class MemRelationEntity with EntityV1<MemRelation> {
 }
 
 class SavedMemRelationEntity extends MemRelationEntity
-    with DatabaseTupleEntity<int, MemRelation> {
+    with DatabaseTupleEntityV1<int, MemRelation> {
   SavedMemRelationEntity(Map<String, dynamic> map)
       : super(
           MemRelation.by(
