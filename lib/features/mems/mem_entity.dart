@@ -117,3 +117,13 @@ class SavedMemEntityV1 extends MemEntityV1
         },
       );
 }
+
+class MemEntity implements Entity<int> {
+  @override
+  final int id;
+  final String name;
+  final DateTime? doneAt;
+  final DateAndTimePeriod? period;
+
+  MemEntity(this.id, this.name, this.doneAt, this.period);
+}
