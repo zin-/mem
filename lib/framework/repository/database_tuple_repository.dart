@@ -11,8 +11,10 @@ import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/features/logger/log_service.dart';
 
-abstract class DatabaseTupleRepository<ENTITY extends EntityV1,
-    SAVED extends DatabaseTupleEntityV1> extends Repository<ENTITY> {
+abstract class DatabaseTupleRepository<
+    ENTITY extends EntityV1,
+    SAVED extends DatabaseTupleEntityV1,
+    DOMAIN> extends Repository<ENTITY, DOMAIN> {
   static final _driftAccessor = DriftDatabaseAccessor();
   static final Map<TableDefinition, Repository> _repositories = {};
 

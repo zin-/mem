@@ -13,7 +13,7 @@ import 'mem_notification_entity.dart';
 // @Deprecated('MemNotificationRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
 // lintエラーになるためコメントアウト
 class MemNotificationRepository extends DatabaseTupleRepository<
-    MemNotificationEntity, SavedMemNotificationEntity> {
+    MemNotificationEntity, SavedMemNotificationEntity, MemNotification> {
   @override
   SavedMemNotificationEntity pack(Map<String, dynamic> map) =>
       SavedMemNotificationEntity(map);

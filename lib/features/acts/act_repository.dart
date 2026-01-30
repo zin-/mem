@@ -1,3 +1,4 @@
+import 'package:mem/features/acts/act.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
@@ -27,7 +28,8 @@ extension _ActOrderByExt on ActOrderBy {
 
 // @Deprecated('ActRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
 // lintエラーになるためコメントアウト
-class ActRepository extends DatabaseTupleRepository<ActEntity, SavedActEntity> {
+class ActRepository
+    extends DatabaseTupleRepository<ActEntity, SavedActEntity, Act> {
   ActRepository() : super(databaseDefinition, defTableActs);
 
   @override

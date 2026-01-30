@@ -153,9 +153,11 @@ class MemService {
                       )))
                   .map((e) {
                 if (e is SavedMemRelationEntity && !undo) {
-                  return _memRelationRepository.replace(e);
+                  return _memRelationRepository.replace(e)
+                      as Future<SavedMemRelationEntity?>;
                 } else {
-                  return _memRelationRepository.receive(e);
+                  return _memRelationRepository.receive(e)
+                      as Future<SavedMemRelationEntity?>;
                 }
               })));
             }

@@ -1,6 +1,7 @@
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
+import 'package:mem/features/mems/mem.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
@@ -8,7 +9,7 @@ import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 
 class MemRepository
-    extends DatabaseTupleRepository<MemEntityV1, SavedMemEntityV1> {
+    extends DatabaseTupleRepository<MemEntityV1, SavedMemEntityV1, Mem> {
   @override
   SavedMemEntityV1 pack(Map<String, dynamic> map) => SavedMemEntityV1(map);
 
