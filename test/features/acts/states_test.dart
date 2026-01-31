@@ -136,6 +136,7 @@ class _FakeActEntities extends ActEntities {
 
 void main() {
   setUpAll(() {
+    TestWidgetsFlutterBinding.ensureInitialized();
     setOnTest(true);
   });
 

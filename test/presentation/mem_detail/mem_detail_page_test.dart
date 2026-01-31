@@ -92,6 +92,19 @@ void main() {
   MemRelationRepository(mock: mockMemRelationRepository);
   TargetRepository(mock: mockTargetRepository);
 
+  setUp(() {
+    when(mockMemRepository.ship(
+      id: anyNamed('id'),
+      archived: anyNamed('archived'),
+      done: anyNamed('done'),
+      condition: anyNamed('condition'),
+      groupBy: anyNamed('groupBy'),
+      orderBy: anyNamed('orderBy'),
+      offset: anyNamed('offset'),
+      limit: anyNamed('limit'),
+    )).thenAnswer((_) async => []);
+  });
+
   tearDown(() {
     reset(mockMemClient);
     reset(mockMemRepository);
