@@ -22,9 +22,24 @@ mixin DatabaseTupleEntityV1<PRIMARY_KEY, T> on EntityV1<T> {
 
   void withMap(Map<String, Object?> map) {
     id = map[defPkId.name] as PRIMARY_KEY;
-    createdAt = map[defColCreatedAt.name] as DateTime;
-    updatedAt = map[defColUpdatedAt.name] as DateTime?;
-    archivedAt = map[defColArchivedAt.name] as DateTime?;
+    final rawCreatedAt = map[defColCreatedAt.name];
+    if (rawCreatedAt is int) {
+      createdAt = DateTime.fromMillisecondsSinceEpoch(rawCreatedAt);
+    } else {
+      createdAt = map[defColCreatedAt.name] as DateTime;
+    }
+    final rawUpdatedAt = map[defColUpdatedAt.name];
+    if (rawUpdatedAt is int) {
+      updatedAt = DateTime.fromMillisecondsSinceEpoch(rawUpdatedAt);
+    } else {
+      updatedAt = map[defColUpdatedAt.name] as DateTime?;
+    }
+    final rawArchivedAt = map[defColArchivedAt.name];
+    if (rawArchivedAt is int) {
+      archivedAt = DateTime.fromMillisecondsSinceEpoch(rawArchivedAt);
+    } else {
+      archivedAt = map[defColArchivedAt.name] as DateTime?;
+    }
   }
 
   @override

@@ -47,7 +47,7 @@ class MemService {
 
           final savedMem = (mem is SavedMemEntityV1 && !undo
               ? await _memRepository.replace(mem)
-              : await _memRepository.receive(mem));
+              : await _memRepository.receiveV2(mem.value));
 
           final savedMemItems = await Future.wait(
             memDetail.$2.map(

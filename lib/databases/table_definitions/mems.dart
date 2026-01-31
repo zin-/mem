@@ -1,5 +1,7 @@
 import 'package:drift/drift.dart';
+import 'package:mem/databases/database.dart' as drift_database;
 import 'package:mem/databases/table_definitions/base.dart';
+import 'package:mem/features/mems/mem.dart';
 import 'package:mem/framework/database/definition/column/text_column_definition.dart';
 import 'package:mem/framework/database/definition/column/timestamp_column_definition.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
@@ -36,3 +38,16 @@ class Mems extends Table with BaseColumns {
   DateTimeColumn get endOn => dateTime().nullable()();
   DateTimeColumn get endAt => dateTime().nullable()();
 }
+
+convertIntoMemsInsertable(Mem domain, DateTime createdAt) =>
+    drift_database.MemsCompanion.insert(
+      name: domain.name,
+      doneAt: Value(domain.doneAt),
+      notifyOn: Value(domain.period?.start),
+      notifyAt: Value(
+          domain.period?.start?.isAllDay == true ? null : domain.period?.start),
+      endOn: Value(domain.period?.end),
+      endAt: Value(
+          domain.period?.end?.isAllDay == true ? null : domain.period?.end),
+      createdAt: createdAt,
+    );

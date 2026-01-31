@@ -1,5 +1,7 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:mem/databases/database.dart';
+import 'package:mem/databases/table_definitions/mems.dart';
+import 'package:mem/features/mems/mem.dart' as mem_domain;
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/group_by.dart';
@@ -176,6 +178,22 @@ class DriftDatabaseAccessor {
         },
       );
 
+  Future insertV2(
+    dynamic domain,
+// TODO createdAtを受け取るべきかも
+  ) =>
+      v(
+        () async {
+          final tableInfo = _getTableInfoV2(domain);
+          final insertable = convertIntoDriftInsertable(domain);
+
+          return await driftDatabase
+              .into(tableInfo)
+              .insertReturning(insertable);
+        },
+        {'domain': domain},
+      );
+
   update(
     TableDefinition tableDefinition,
     Map<String, Object?> values,
@@ -230,6 +248,15 @@ class DriftDatabaseAccessor {
   ) =>
       driftDatabase.allTables
           .firstWhere((e) => e.actualTableName == tableDefinition.name);
+
+  drift.TableInfo _getTableInfoV2(dynamic domain) {
+    switch (domain) {
+      case mem_domain.Mem _:
+        return driftDatabase.mems;
+      default:
+        throw StateError('Unknown domain: ${domain.runtimeType}');
+    }
+  }
 
   drift.OrderClauseGenerator? _toOrderClauseGenerator(
       drift.TableInfo tableInfo, OrderBy orderBy) {
@@ -383,4 +410,13 @@ String toSnakeCase(String camelCase) {
     RegExp(r'[A-Z]'),
     (match) => '_${match.group(0)!.toLowerCase()}',
   );
+}
+
+convertIntoDriftInsertable(dynamic domain) {
+  switch (domain) {
+    case mem_domain.Mem _:
+      return convertIntoMemsInsertable(domain, DateTime.now());
+    default:
+      throw StateError('Unknown domain: ${domain.runtimeType}');
+  }
 }

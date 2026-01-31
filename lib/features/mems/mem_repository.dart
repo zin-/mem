@@ -2,6 +2,8 @@ import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/features/mems/mem.dart';
+import 'package:mem/framework/date_and_time/date_and_time.dart';
+import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
@@ -12,6 +14,33 @@ class MemRepository
     extends DatabaseTupleRepository<MemEntityV1, SavedMemEntityV1, Mem> {
   @override
   SavedMemEntityV1 pack(Map<String, dynamic> map) => SavedMemEntityV1(map);
+
+  @override
+  MemEntity packV2(dynamic domain) => MemEntity(
+        domain.id,
+        domain.name,
+        domain.doneAt,
+        domain.notifyOn == null && domain.endOn == null
+            ? null
+            : DateAndTimePeriod(
+                start: domain.notifyOn == null
+                    ? null
+                    : DateAndTime.from(
+                        domain.notifyOn,
+                        timeOfDay: domain.notifyAt == null
+                            ? null
+                            : DateAndTime.from(domain.notifyAt),
+                      ),
+                end: domain.endOn == null
+                    ? null
+                    : DateAndTime.from(
+                        domain.endOn,
+                        timeOfDay: domain.endAt == null
+                            ? null
+                            : DateAndTime.from(domain.endAt),
+                      ),
+              ),
+      );
 
   @override
   Future<List<SavedMemEntityV1>> ship({

@@ -67,6 +67,8 @@ abstract class DatabaseTupleRepository<
       );
 
   SAVED pack(Map<String, dynamic> map);
+  packV2(dynamic domain) => throw UnimplementedError();
+  convert(DOMAIN domain) => throw UnimplementedError();
 
   Future<SAVED> receive(
     ENTITY entity, {
@@ -86,6 +88,20 @@ abstract class DatabaseTupleRepository<
           return pack(entityMap);
         },
         {'entity': entity, 'createdAt': createdAt},
+      );
+
+  // TODO SAVEDを新しいEntityに置き換える
+  Future<SAVED> receiveV2(DOMAIN domain) => v(
+        () async {
+          final inserted = await _driftAccessor.insertV2(domain);
+
+          final saved = pack(inserted.toJson());
+          // final saved = packV2(inserted);
+          // debug('saved=$saved');
+
+          return saved;
+        },
+        {'domain': domain},
       );
 
   Future<List<SAVED>> ship({
