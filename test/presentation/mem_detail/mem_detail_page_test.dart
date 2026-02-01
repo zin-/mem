@@ -278,7 +278,8 @@ void main() {
                 <MemItemEntity>[],
                 null,
                 null,
-                null
+                null,
+                MemEntity(1, "", null, null),
               ),
               null,
             ));

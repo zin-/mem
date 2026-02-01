@@ -30,14 +30,15 @@ class MemService {
         List<MemItemEntity>,
         List<MemNotificationEntity>?,
         TargetEntity?,
-        List<MemRelationEntity>?
+        List<MemRelationEntity>?,
+        MemEntity,
       )> save(
     (
       MemEntityV1,
       List<MemItemEntity>,
       List<MemNotificationEntity>?,
       TargetEntity?,
-      List<MemRelationEntity>?
+      List<MemRelationEntity>?,
     ) memDetail, {
     bool undo = false,
   }) =>
@@ -168,7 +169,8 @@ class MemService {
             savedMemItems,
             returnMemNotifications.nonNulls.toList(growable: false),
             savedTarget,
-            returnMemRelations.nonNulls.toList(growable: false)
+            returnMemRelations.nonNulls.toList(growable: false),
+            savedMem.toEntityV2(),
           );
         },
         {
@@ -183,7 +185,8 @@ class MemService {
         List<MemItemEntity>,
         List<MemNotificationEntity>?,
         TargetEntity?,
-        List<MemRelationEntity>?
+        List<MemRelationEntity>?,
+        MemEntity,
       )> doneByMemId(
     int memId,
   ) =>
@@ -212,7 +215,8 @@ class MemService {
         List<MemItemEntity>,
         List<MemNotificationEntity>?,
         TargetEntity?,
-        List<MemRelationEntity>?
+        List<MemRelationEntity>?,
+        MemEntity,
       )> undoneByMemId(
     int memId,
   ) =>

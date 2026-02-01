@@ -19,7 +19,8 @@ class MemClient {
           List<MemItemEntity>,
           List<MemNotificationEntity>?,
           TargetEntity?,
-          List<MemRelationEntity>?
+          List<MemRelationEntity>?,
+          MemEntity,
         ),
         DateTime?
       )> save(

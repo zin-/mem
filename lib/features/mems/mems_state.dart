@@ -68,7 +68,8 @@ class MemEntities extends _$MemEntities
           List<MemItemEntity>,
           List<MemNotificationEntity>?,
           TargetEntity?,
-          List<MemRelationEntity>?
+          List<MemRelationEntity>?,
+          MemEntity,
         ),
         DateTime?
       )> save(
@@ -120,7 +121,8 @@ class MemEntities extends _$MemEntities
         List<MemItemEntity>,
         List<MemNotificationEntity>?,
         TargetEntity?,
-        List<MemRelationEntity>?
+        List<MemRelationEntity>?,
+        MemEntity,
       )?> undoRemove(int id) => v(
         () async {
           // ignore: avoid_manual_providers_as_generated_provider_dependency
