@@ -136,6 +136,7 @@ abstract class DatabaseTupleRepository<
         },
       );
 
+  // TODO SAVEDを新しいEntityに置き換える
   Future<SAVEDV1> replace(
     SAVEDV1 savedEntity, {
     DateTime? updatedAt,
@@ -155,8 +156,12 @@ abstract class DatabaseTupleRepository<
         {'savedEntity': savedEntity, 'updatedAt': updatedAt},
       );
 
-  replaceV2(ENTITY entity) => v(
-        () async {},
+  Future<SAVEDV1> replaceV2(ENTITY entity) => v(
+        () async {
+          final updated = await _driftAccessor.updateV2(entity);
+
+          return pack(updated.toJson());
+        },
         {'entity': entity},
       );
 

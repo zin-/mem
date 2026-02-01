@@ -116,6 +116,13 @@ class SavedMemEntityV1 extends MemEntityV1
           'startOfDay': startOfDay,
         },
       );
+
+  toEntityV2() => MemEntity(
+        id,
+        value.name,
+        value.doneAt,
+        value.period,
+      );
 }
 
 class MemEntity implements Entity<int> {

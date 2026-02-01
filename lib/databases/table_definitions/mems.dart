@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:mem/databases/database.dart' as drift_database;
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/features/mems/mem.dart';
+import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/framework/database/definition/column/text_column_definition.dart';
 import 'package:mem/framework/database/definition/column/timestamp_column_definition.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
@@ -50,4 +51,17 @@ convertIntoMemsInsertable(Mem domain, DateTime createdAt) =>
       endAt: Value(
           domain.period?.end?.isAllDay == true ? null : domain.period?.end),
       createdAt: createdAt,
+    );
+
+convertIntoMemsUpdateable(MemEntity entity, {DateTime? updatedAt}) =>
+    drift_database.MemsCompanion(
+      name: Value(entity.name),
+      doneAt: Value(entity.doneAt),
+      notifyOn: Value(entity.period?.start),
+      notifyAt: Value(
+          entity.period?.start?.isAllDay == true ? null : entity.period?.start),
+      endOn: Value(entity.period?.end),
+      endAt: Value(
+          entity.period?.end?.isAllDay == true ? null : entity.period?.end),
+      updatedAt: Value(updatedAt ?? DateTime.now()),
     );
