@@ -117,7 +117,7 @@ class SavedMemEntityV1 extends MemEntityV1
         },
       );
 
-  toEntityV2() => MemEntity(
+  MemEntity toEntityV2() => MemEntity(
         id,
         value.name,
         value.doneAt,
