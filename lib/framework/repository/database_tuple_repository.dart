@@ -14,7 +14,9 @@ import 'package:mem/features/logger/log_service.dart';
 abstract class DatabaseTupleRepository<
     ENTITYV1 extends EntityV1,
     SAVEDV1 extends DatabaseTupleEntityV1,
-    DOMAIN> extends Repository<ENTITYV1, DOMAIN> {
+    DOMAIN,
+    ID,
+    ENTITY extends Entity<ID>> extends Repository<ENTITYV1, DOMAIN> {
   static final _driftAccessor = DriftDatabaseAccessor();
   static final Map<TableDefinition, Repository> _repositories = {};
 
@@ -151,6 +153,11 @@ abstract class DatabaseTupleRepository<
           return pack(entityMap);
         },
         {'savedEntity': savedEntity, 'updatedAt': updatedAt},
+      );
+
+  replaceV2(ENTITY entity) => v(
+        () async {},
+        {'entity': entity},
       );
 
   Future<SAVEDV1> archive(
