@@ -12,9 +12,9 @@ import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/features/logger/log_service.dart';
 
 abstract class DatabaseTupleRepository<
-    ENTITY extends EntityV1,
-    SAVED extends DatabaseTupleEntityV1,
-    DOMAIN> extends Repository<ENTITY, DOMAIN> {
+    ENTITYV1 extends EntityV1,
+    SAVEDV1 extends DatabaseTupleEntityV1,
+    DOMAIN> extends Repository<ENTITYV1, DOMAIN> {
   static final _driftAccessor = DriftDatabaseAccessor();
   static final Map<TableDefinition, Repository> _repositories = {};
 
@@ -66,12 +66,12 @@ abstract class DatabaseTupleRepository<
         {'condition': condition},
       );
 
-  SAVED pack(Map<String, dynamic> map);
+  SAVEDV1 pack(Map<String, dynamic> map);
   packV2(dynamic domain) => throw UnimplementedError();
   convert(DOMAIN domain) => throw UnimplementedError();
 
-  Future<SAVED> receive(
-    ENTITY entity, {
+  Future<SAVEDV1> receive(
+    ENTITYV1 entity, {
     DateTime? createdAt,
   }) =>
       v(
@@ -91,7 +91,7 @@ abstract class DatabaseTupleRepository<
       );
 
   // TODO SAVEDを新しいEntityに置き換える
-  Future<SAVED> receiveV2(DOMAIN domain) => v(
+  Future<SAVEDV1> receiveV2(DOMAIN domain) => v(
         () async {
           final inserted = await _driftAccessor.insertV2(domain);
 
@@ -104,7 +104,7 @@ abstract class DatabaseTupleRepository<
         {'domain': domain},
       );
 
-  Future<List<SAVED>> ship({
+  Future<List<SAVEDV1>> ship({
     Condition? condition,
     GroupBy? groupBy,
     List<OrderBy>? orderBy,
@@ -122,7 +122,7 @@ abstract class DatabaseTupleRepository<
             limit: limit,
           );
           return rows
-              .map<SAVED>((e) => pack(e as Map<String, dynamic>))
+              .map<SAVEDV1>((e) => pack(e as Map<String, dynamic>))
               .toList();
         },
         {
@@ -134,8 +134,8 @@ abstract class DatabaseTupleRepository<
         },
       );
 
-  Future<SAVED> replace(
-    SAVED savedEntity, {
+  Future<SAVEDV1> replace(
+    SAVEDV1 savedEntity, {
     DateTime? updatedAt,
   }) =>
       v(
@@ -153,8 +153,8 @@ abstract class DatabaseTupleRepository<
         {'savedEntity': savedEntity, 'updatedAt': updatedAt},
       );
 
-  Future<SAVED> archive(
-    SAVED savedEntity, {
+  Future<SAVEDV1> archive(
+    SAVEDV1 savedEntity, {
     DateTime? archivedAt,
   }) =>
       v(
@@ -172,8 +172,8 @@ abstract class DatabaseTupleRepository<
         {'savedEntity': savedEntity, 'archivedAt': archivedAt},
       );
 
-  Future<SAVED> unarchive(
-    SAVED savedEntity, {
+  Future<SAVEDV1> unarchive(
+    SAVEDV1 savedEntity, {
     DateTime? updatedAt,
   }) =>
       v(
@@ -193,7 +193,7 @@ abstract class DatabaseTupleRepository<
       );
 
   @override
-  Future<List<SAVED>> waste({
+  Future<List<SAVEDV1>> waste({
     Condition? condition,
   }) =>
       v(
