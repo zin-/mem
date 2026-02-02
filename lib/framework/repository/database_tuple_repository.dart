@@ -69,7 +69,7 @@ abstract class DatabaseTupleRepository<
       );
 
   SAVEDV1 pack(Map<String, dynamic> map);
-  packV2(dynamic domain) => throw UnimplementedError();
+  ENTITY packV2(dynamic tuple) => throw UnimplementedError();
   convert(DOMAIN domain) => throw UnimplementedError();
 
   Future<SAVEDV1> receive(

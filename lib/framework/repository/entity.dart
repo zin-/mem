@@ -42,4 +42,7 @@ final Map<Type, Set<Type>> entityChildrenRelation = {};
 
 abstract interface class Entity<ID> {
   ID get id;
+  DateTime get createdAt;
+  DateTime? get updatedAt;
+  DateTime? get archivedAt;
 }

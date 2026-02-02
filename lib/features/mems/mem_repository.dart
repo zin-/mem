@@ -16,30 +16,33 @@ class MemRepository extends DatabaseTupleRepository<MemEntityV1,
   SavedMemEntityV1 pack(Map<String, dynamic> map) => SavedMemEntityV1(map);
 
   @override
-  MemEntity packV2(dynamic domain) => MemEntity(
-        domain.id,
-        domain.name,
-        domain.doneAt,
-        domain.notifyOn == null && domain.endOn == null
+  MemEntity packV2(dynamic tuple) => MemEntity(
+        tuple.id,
+        tuple.name,
+        tuple.doneAt,
+        tuple.notifyOn == null && tuple.endOn == null
             ? null
             : DateAndTimePeriod(
-                start: domain.notifyOn == null
+                start: tuple.notifyOn == null
                     ? null
                     : DateAndTime.from(
-                        domain.notifyOn,
-                        timeOfDay: domain.notifyAt == null
+                        tuple.notifyOn,
+                        timeOfDay: tuple.notifyAt == null
                             ? null
-                            : DateAndTime.from(domain.notifyAt),
+                            : DateAndTime.from(tuple.notifyAt),
                       ),
-                end: domain.endOn == null
+                end: tuple.endOn == null
                     ? null
                     : DateAndTime.from(
-                        domain.endOn,
-                        timeOfDay: domain.endAt == null
+                        tuple.endOn,
+                        timeOfDay: tuple.endAt == null
                             ? null
-                            : DateAndTime.from(domain.endAt),
+                            : DateAndTime.from(tuple.endAt),
                       ),
               ),
+        tuple.createdAt,
+        tuple.updatedAt,
+        tuple.archivedAt,
       );
 
   @override
