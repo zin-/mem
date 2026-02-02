@@ -92,16 +92,11 @@ abstract class DatabaseTupleRepository<
         {'entity': entity, 'createdAt': createdAt},
       );
 
-  // TODO SAVEDを新しいEntityに置き換える
-  Future<SAVEDV1> receiveV2(DOMAIN domain) => v(
+  Future<ENTITY> receiveV2(DOMAIN domain) => v(
         () async {
           final inserted = await _driftAccessor.insertV2(domain);
 
-          final saved = pack(inserted.toJson());
-          // final saved = packV2(inserted);
-          // debug('saved=$saved');
-
-          return saved;
+          return packV2(inserted);
         },
         {'domain': domain},
       );

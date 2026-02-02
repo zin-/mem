@@ -126,6 +126,24 @@ class SavedMemEntityV1 extends MemEntityV1
         updatedAt,
         archivedAt,
       );
+
+  factory SavedMemEntityV1.fromEntityV2(MemEntity entity) => SavedMemEntityV1(
+        {
+          defPkId.name: entity.id,
+          defColMemsName.name: entity.name,
+          defColMemsDoneAt.name: entity.doneAt,
+          defColMemsStartOn.name: entity.period?.start,
+          defColMemsStartAt.name: entity.period?.start?.isAllDay == true
+              ? null
+              : entity.period?.start,
+          defColMemsEndOn.name: entity.period?.end,
+          defColMemsEndAt.name:
+              entity.period?.end?.isAllDay == true ? null : entity.period?.end,
+          defColCreatedAt.name: entity.createdAt,
+          defColUpdatedAt.name: entity.updatedAt,
+          defColArchivedAt.name: entity.archivedAt,
+        },
+      );
 }
 
 class MemEntity implements Entity<int> {

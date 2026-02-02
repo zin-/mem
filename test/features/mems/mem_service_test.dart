@@ -95,7 +95,8 @@ void main() {
           'archivedAt': null,
         });
 
-        when(mockMemRepository.receiveV2(any)).thenAnswer((_) async => savedMem);
+        when(mockMemRepository.receiveV2(any))
+            .thenAnswer((_) async => savedMem.toEntityV2());
         when(mockMemNotificationRepository.waste(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
@@ -153,7 +154,8 @@ void main() {
           'archivedAt': null,
         });
 
-        when(mockMemRepository.receiveV2(any)).thenAnswer((_) async => savedMem);
+        when(mockMemRepository.receiveV2(any))
+            .thenAnswer((_) async => savedMem.toEntityV2());
         when(mockMemNotificationRepository.waste(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
@@ -208,7 +210,8 @@ void main() {
           'archivedAt': null,
         });
 
-        when(mockMemRepository.receiveV2(any)).thenAnswer((_) async => savedMem);
+        when(mockMemRepository.receiveV2(any))
+            .thenAnswer((_) async => savedMem.toEntityV2());
         when(mockMemNotificationRepository.waste(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
