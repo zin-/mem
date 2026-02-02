@@ -151,11 +151,11 @@ abstract class DatabaseTupleRepository<
       );
 
   // TODO SAVEDを新しいEntityに置き換える
-  Future<SAVEDV1> replaceV2(ENTITY entity) => v(
+  Future<ENTITY> replaceV2(ENTITY entity) => v(
         () async {
           final updated = await _driftAccessor.updateV2(entity);
 
-          return pack(updated.toJson());
+          return packV2(updated);
         },
         {'entity': entity},
       );
