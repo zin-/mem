@@ -139,6 +139,7 @@ class NotificationClient {
     int memId, {
     SavedMemEntityV1? savedMem,
     Iterable<SavedMemNotificationEntity>? savedMemNotifications,
+    MemEntity? memEntity,
   }) =>
       v(
         () async {

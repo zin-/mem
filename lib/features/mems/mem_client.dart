@@ -48,6 +48,7 @@ class MemClient {
             savedMem: saved.$1 as SavedMemEntityV1,
             savedMemNotifications:
                 saved.$3?.whereType<SavedMemNotificationEntity>(),
+            memEntity: saved.$6,
           );
 
           return (saved, nextNotifyAt);
