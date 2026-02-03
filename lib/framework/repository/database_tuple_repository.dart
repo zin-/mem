@@ -150,7 +150,6 @@ abstract class DatabaseTupleRepository<
         {'savedEntity': savedEntity, 'updatedAt': updatedAt},
       );
 
-  // TODO SAVEDを新しいEntityに置き換える
   Future<ENTITY> replaceV2(ENTITY entity) => v(
         () async {
           final updated = await _driftAccessor.updateV2(entity);
