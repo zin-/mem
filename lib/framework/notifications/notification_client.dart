@@ -5,7 +5,6 @@ import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/settings/constants.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
 import 'package:mem/features/mems/mem_repository.dart';
@@ -137,30 +136,18 @@ class NotificationClient {
       );
 
   Future<DateTime?> registerMemNotifications(
-    int memId, {
-    SavedMemEntityV1? savedMem,
+    Mem mem, {
     Iterable<SavedMemNotificationEntity>? savedMemNotifications,
-    Mem? mem,
   }) =>
       v(
         () async {
-          final memEntityV1 = savedMem ??
-              await _memRepository
-                  .ship(
-                    id: memId,
-                  )
-                  .then(
-                    (v) => v.single,
-                  );
-          final memV2 = memEntityV1?.value ?? mem;
-
-          if (memV2!.isDone || memV2.isArchived) {
-            cancelMemNotifications(memId);
+          if (mem.isDone || mem.isArchived) {
+            cancelMemNotifications(mem.id!);
             return null;
           } else {
             final latestAct = await ActRepository()
                 .ship(
-                  memId: memId,
+                  memId: mem.id,
                   latestByMemIds: true,
                 )
                 .then(
@@ -172,12 +159,12 @@ class NotificationClient {
                     defaultStartOfDay;
 
             final atList = [
-              ...memV2.periodSchedules(startOfDay),
+              ...mem.periodSchedules(startOfDay),
               MemNotifications.periodicScheduleOf(
-                memV2,
+                mem,
                 startOfDay,
                 (savedMemNotifications ??
-                        await _memNotificationRepository.ship(memId: memId))
+                        await _memNotificationRepository.ship(memId: mem.id!))
                     .map((e) => e.value),
                 latestAct,
                 DateTime.now(),
@@ -194,10 +181,8 @@ class NotificationClient {
           }
         },
         {
-          "memId": memId,
-          "savedMem": savedMem,
-          "savedMemNotifications": savedMemNotifications,
           "mem": mem,
+          "savedMemNotifications": savedMemNotifications,
         },
       );
 
@@ -243,9 +228,8 @@ class NotificationClient {
               .then((v) => v.singleOrNull?.value);
 
           await registerMemNotifications(
-            memId,
+            mem!,
             savedMemNotifications: memNotifications,
-            mem: mem,
           );
           await setNotificationAfterInactivity();
         },
@@ -270,8 +254,7 @@ class NotificationClient {
               .then((v) => v.singleOrNull?.value);
 
           await registerMemNotifications(
-            memId,
-            mem: mem,
+            mem!,
           );
           await setNotificationAfterInactivity();
         },
@@ -377,8 +360,7 @@ class NotificationClient {
 
           for (final mem in allSavedMems) {
             await registerMemNotifications(
-              mem.id,
-              mem: mem.value,
+              mem.value,
             );
           }
         },

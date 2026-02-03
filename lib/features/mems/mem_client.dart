@@ -45,11 +45,9 @@ class MemClient {
 
           final nextNotifyAt =
               await _notificationClient.registerMemNotifications(
-            saved.$6.id,
-            savedMem: saved.$1 as SavedMemEntityV1,
+            saved.$6.toDomain(),
             savedMemNotifications:
                 saved.$3?.whereType<SavedMemNotificationEntity>(),
-            mem: saved.$6.toDomain(),
           );
 
           return (saved, nextNotifyAt);
@@ -97,11 +95,9 @@ class MemClient {
           final unarchived = await _memService.unarchive(memEntity);
 
           _notificationClient.registerMemNotifications(
-            (unarchived.$1 as SavedMemEntityV1).id,
-            savedMem: unarchived.$1 as SavedMemEntityV1,
+            unarchived.$6,
             savedMemNotifications:
                 unarchived.$3?.whereType<SavedMemNotificationEntity>(),
-            mem: unarchived.$6,
           );
 
           return unarchived;
