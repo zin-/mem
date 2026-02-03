@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 
 import 'notification_client.dart';
@@ -14,7 +14,7 @@ const memIdKey = 'memId';
 
 class MemNotifications {
   static Schedule periodicScheduleOf(
-    SavedMemEntityV1 savedMemEntity,
+    Mem mem,
     TimeOfDay startOfDay,
     Iterable<MemNotification> memNotifications,
     Act? latestAct,
@@ -30,9 +30,9 @@ class MemNotifications {
                           e.isRepeatByDayOfWeek()),
                 )
                 .isEmpty
-            ? CancelSchedule(memRepeatedNotificationId(savedMemEntity.id))
+            ? CancelSchedule(memRepeatedNotificationId(mem.id!))
             : PeriodicSchedule(
-                memRepeatedNotificationId(savedMemEntity.id),
+                memRepeatedNotificationId(mem.id!),
                 nextRepeatNotifyAt(
                       memNotifications,
                       startOfDay,
@@ -42,12 +42,12 @@ class MemNotifications {
                     now,
                 const Duration(days: 1),
                 {
-                  memIdKey: savedMemEntity.id,
+                  memIdKey: mem.id,
                   notificationTypeKey: NotificationType.repeat.name,
                 },
               ),
         {
-          'savedMemEntity': savedMemEntity,
+          'mem': mem,
           'startOfDay': startOfDay,
           'memNotifications': memNotifications,
           'latestAct': latestAct,

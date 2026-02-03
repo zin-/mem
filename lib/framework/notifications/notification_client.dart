@@ -143,7 +143,7 @@ class NotificationClient {
   }) =>
       v(
         () async {
-          final mem = savedMem ??
+          final memEntityV1 = savedMem ??
               await _memRepository
                   .ship(
                     id: memId,
@@ -151,7 +151,9 @@ class NotificationClient {
                   .then(
                     (v) => v.single,
                   );
-          if (mem!.value.isDone || mem.isArchived) {
+          final memV2 = memEntityV1?.value ?? memEntity?.toDomain();
+
+          if (memV2!.isDone || memV2.isArchived) {
             cancelMemNotifications(memId);
             return null;
           } else {
@@ -169,9 +171,9 @@ class NotificationClient {
                     defaultStartOfDay;
 
             final atList = [
-              ...mem.periodSchedules(startOfDay),
+              ...memV2.periodSchedules(startOfDay),
               MemNotifications.periodicScheduleOf(
-                mem,
+                memV2,
                 startOfDay,
                 (savedMemNotifications ??
                         await _memNotificationRepository.ship(memId: memId))
@@ -194,6 +196,7 @@ class NotificationClient {
           "memId": memId,
           "savedMem": savedMem,
           "savedMemNotifications": savedMemNotifications,
+          "memEntity": memEntity,
         },
       );
 

@@ -1,10 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
-import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
@@ -12,8 +10,6 @@ import 'package:mem/framework/repository/entity.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
-import 'package:mem/framework/notifications/notification/type.dart';
-import 'package:mem/framework/notifications/schedule.dart';
 
 class MemEntityV1 with EntityV1<Mem> {
   MemEntityV1(Mem value) {
@@ -75,48 +71,6 @@ class SavedMemEntityV1 extends MemEntityV1
   SavedMemEntityV1 updatedWith(Mem Function(Mem mem) update) =>
       SavedMemEntityV1(toMap..addAll(MemEntityV1(update(value)).toMap));
 
-  Iterable<Schedule> periodSchedules(
-    TimeOfDay startOfDay,
-  ) =>
-      v(
-        () {
-          return [
-            Schedule.of(
-              id,
-              value.period?.start?.isAllDay == true
-                  ? DateTime(
-                      value.period!.start!.year,
-                      value.period!.start!.month,
-                      value.period!.start!.day,
-                      startOfDay.hour,
-                      startOfDay.minute,
-                    )
-                  : value.period?.start,
-              NotificationType.startMem,
-            ),
-            Schedule.of(
-              id,
-              value.period?.end?.isAllDay == true
-                  ? DateTime(
-                      value.period!.end!.year,
-                      value.period!.end!.month,
-                      value.period!.end!.day,
-                      startOfDay.hour,
-                      startOfDay.minute,
-                    )
-                      .add(const Duration(days: 1))
-                      .subtract(const Duration(minutes: 1))
-                  : value.period?.end,
-              NotificationType.endMem,
-            ),
-          ];
-        },
-        {
-          'this': this,
-          'startOfDay': startOfDay,
-        },
-      );
-
   MemEntity toEntityV2() => MemEntity(
         id,
         value.name,
@@ -168,4 +122,11 @@ class MemEntity implements Entity<int> {
     this.updatedAt,
     this.archivedAt,
   );
+
+  Mem toDomain() => Mem(
+        id,
+        name,
+        doneAt,
+        period,
+      );
 }
