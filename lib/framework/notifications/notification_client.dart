@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mem/features/acts/act_repository.dart';
+import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/settings/constants.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -139,7 +140,7 @@ class NotificationClient {
     int memId, {
     SavedMemEntityV1? savedMem,
     Iterable<SavedMemNotificationEntity>? savedMemNotifications,
-    MemEntity? memEntity,
+    Mem? mem,
   }) =>
       v(
         () async {
@@ -151,7 +152,7 @@ class NotificationClient {
                   .then(
                     (v) => v.single,
                   );
-          final memV2 = memEntityV1?.value ?? memEntity?.toDomain();
+          final memV2 = memEntityV1?.value ?? mem;
 
           if (memV2!.isDone || memV2.isArchived) {
             cancelMemNotifications(memId);
@@ -196,7 +197,7 @@ class NotificationClient {
           "memId": memId,
           "savedMem": savedMem,
           "savedMemNotifications": savedMemNotifications,
-          "memEntity": memEntity,
+          "mem": mem,
         },
       );
 
