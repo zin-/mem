@@ -238,10 +238,14 @@ class NotificationClient {
               ),
             );
           }
+          final mem = await _memRepository
+              .ship(id: memId)
+              .then((v) => v.singleOrNull?.value);
 
           await registerMemNotifications(
             memId,
             savedMemNotifications: memNotifications,
+            mem: mem,
           );
           await setNotificationAfterInactivity();
         },
@@ -261,9 +265,13 @@ class NotificationClient {
             NotificationType.pausedAct,
             memId,
           );
+          final mem = await _memRepository
+              .ship(id: memId)
+              .then((v) => v.singleOrNull?.value);
 
           await registerMemNotifications(
             memId,
+            mem: mem,
           );
           await setNotificationAfterInactivity();
         },
@@ -370,6 +378,7 @@ class NotificationClient {
           for (final mem in allSavedMems) {
             await registerMemNotifications(
               mem.id,
+              mem: mem.value,
             );
           }
         },

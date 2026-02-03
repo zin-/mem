@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:mem/features/mem_relations/mem_relation.dart';
+import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/targets/target_repository.dart';
@@ -277,7 +278,8 @@ class MemService {
         List<MemItemEntity>,
         List<MemNotificationEntity>?,
         TargetEntity?,
-        List<MemRelationEntity>?
+        List<MemRelationEntity>?,
+        Mem,
       )> unarchive(SavedMemEntityV1 mem) => i(
         () async {
           final unarchivedMem = await _memRepository.unarchive(mem);
@@ -299,6 +301,7 @@ class MemService {
             unarchivedMemNotifications.toList(growable: false),
             null,
             unarchivedMemRelations.toList(growable: false),
+            unarchivedMem.toEntityV2().toDomain(),
           );
         },
         {

@@ -1,5 +1,6 @@
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
+import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/framework/notifications/notification_client.dart';
@@ -89,7 +90,8 @@ class MemClient {
         List<MemItemEntity>,
         List<MemNotificationEntity>?,
         TargetEntity?,
-        List<MemRelationEntity>?
+        List<MemRelationEntity>?,
+        Mem,
       )> unarchive(SavedMemEntityV1 memEntity) => v(
         () async {
           final unarchived = await _memService.unarchive(memEntity);
@@ -99,6 +101,7 @@ class MemClient {
             savedMem: unarchived.$1 as SavedMemEntityV1,
             savedMemNotifications:
                 unarchived.$3?.whereType<SavedMemNotificationEntity>(),
+            mem: unarchived.$6,
           );
 
           return unarchived;
