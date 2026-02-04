@@ -24,7 +24,7 @@ class ActCounterEntity extends ActCounter with EntityV1, HomeWidgetEntity {
             updatedAt?.millisecondsSinceEpoch.toDouble(),
       };
 
-  ActCounterEntity.from(super.savedMem, super.savedActs) : super.from();
+  ActCounterEntity.from(super.mem, super.savedActs) : super.from();
 
   @override
   EntityV1 updatedWith(Function(dynamic v) update) {

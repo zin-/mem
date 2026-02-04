@@ -6,7 +6,6 @@ import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/mems/mem.dart';
-import 'package:mem/features/mems/mem_entity.dart';
 
 void main() {
   group('ActCounter.from', () {
@@ -15,12 +14,7 @@ void main() {
       final zeroDate = DateTime(0);
       final oneDate = DateTime(1);
 
-      final savedMem = SavedMemEntityV1(
-          MemEntityV1(Mem(memId, "constructor", null, null)).toMap
-            ..addAll({
-              defPkId.name: memId,
-              defColCreatedAt.name: DateTime.now(),
-            }));
+      final savedMem = Mem(memId, "constructor", null, null);
       final acts = [
         SavedActEntity(
             ActEntity(Act.by(memId, startWhen: DateAndTime.now())).toMap
@@ -44,12 +38,7 @@ void main() {
       final zeroDate = DateTime(0);
       final oneDate = DateTime(1);
 
-      final savedMem = SavedMemEntityV1(
-          MemEntityV1(Mem(memId, "constructor", null, null)).toMap
-            ..addAll({
-              defPkId.name: memId,
-              defColCreatedAt.name: DateTime.now(),
-            }));
+      final savedMem = Mem(memId, "constructor", null, null);
       final acts = [
         SavedActEntity(ActEntity(Act.by(memId,
                 startWhen: DateAndTime(0), endWhen: DateAndTime.now()))

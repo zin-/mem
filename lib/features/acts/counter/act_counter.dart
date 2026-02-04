@@ -1,10 +1,10 @@
 import 'package:collection/collection.dart';
 import 'package:mem/features/acts/counter/home_widget.dart';
+import 'package:mem/features/mems/mem.dart';
 
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/features/acts/act_entity.dart';
-import 'package:mem/features/mems/mem_entity.dart';
 
 class ActCounter implements HomeWidget {
   @override
@@ -24,10 +24,10 @@ class ActCounter implements HomeWidget {
   ActCounter(this.memId, this.name, this.actCount, this.updatedAt);
 
   ActCounter.from(
-    SavedMemEntityV1 savedMem,
+    Mem mem,
     Iterable<SavedActEntity> savedActs,
-  )   : memId = savedMem.id,
-        name = savedMem.value.name,
+  )   : memId = mem.id!,
+        name = mem.name,
         actCount = savedActs.length,
         updatedAt = savedActs
                 .sorted(
