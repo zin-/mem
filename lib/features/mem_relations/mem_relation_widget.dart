@@ -7,7 +7,7 @@ import 'package:mem/features/mem_relations/mem_relation.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation_search_dialog.dart';
 import 'package:mem/features/mem_relations/mem_relation_state.dart';
-import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/framework/date_and_time/time_text_form_field.dart';
 
@@ -27,9 +27,11 @@ class MemRelationList extends ConsumerWidget {
               .when(
             data: (entities) {
               final selectedMemIds = entities.map((e) => e.value.targetMemId);
-              final selectedMemEntities = ref.watch(memEntitiesProvider.select(
-                (v) => v.where((e) => selectedMemIds.contains(e.id)),
-              ));
+              final selectedMems = ref
+                  .watch(memEntitiesProvider.select(
+                    (v) => v.where((e) => selectedMemIds.contains(e.id)),
+                  ))
+                  .map((e) => e.value);
 
               void onChanged(int targetMemId, int value) => ref
                       .watch(memRelationEntitiesByMemIdProvider(sourceMemId)
@@ -44,7 +46,7 @@ class MemRelationList extends ConsumerWidget {
                   ]);
 
               return _MemRelationList(
-                selectedMemEntities: selectedMemEntities,
+                selectedMems: selectedMems,
                 memRelationEntities: entities,
                 showDialog: v(
                   () => () => showDialog(
@@ -52,7 +54,7 @@ class MemRelationList extends ConsumerWidget {
                         builder: (context) => MemRelationDialogStateful(
                           sourceMemId: sourceMemId,
                           selectedMemIds:
-                              selectedMemEntities.map((e) => e.id).toList(),
+                              selectedMems.map((e) => e.id!).toList(),
                           onSubmit: (selectedIds) {
                             for (var selectedId in selectedIds) {
                               onChanged(selectedId, 0);
@@ -82,13 +84,13 @@ const itemHeight = 60.0;
 const maxHeight = itemHeight * 3;
 
 class _MemRelationList extends StatelessWidget {
-  final Iterable<SavedMemEntityV1> selectedMemEntities;
+  final Iterable<Mem> selectedMems;
   final Iterable<MemRelationEntity> memRelationEntities;
   final void Function() showDialog;
   final void Function(int targetMemId, int value) onChanged;
 
   const _MemRelationList({
-    required this.selectedMemEntities,
+    required this.selectedMems,
     required this.memRelationEntities,
     required this.showDialog,
     required this.onChanged,
@@ -101,20 +103,19 @@ class _MemRelationList extends StatelessWidget {
             children: [
               Text("Relations"),
               SizedBox(
-                height: min(selectedMemEntities.length * itemHeight, maxHeight),
+                height: min(selectedMems.length * itemHeight, maxHeight),
                 child: ListView.builder(
-                  itemCount: selectedMemEntities.length,
+                  itemCount: selectedMems.length,
                   itemBuilder: (context, index) {
-                    final memEntity = selectedMemEntities.elementAt(index);
+                    final mem = selectedMems.elementAt(index);
 
                     return _MemRelationItem(
-                      memEntity: memEntity,
+                      mem: mem,
                       value: memRelationEntities
-                          .firstWhere(
-                              (e) => e.value.targetMemId == memEntity.id)
+                          .firstWhere((e) => e.value.targetMemId == mem.id)
                           .value
                           .value,
-                      onChanged: (value) => onChanged(memEntity.id, value ?? 0),
+                      onChanged: (value) => onChanged(mem.id!, value ?? 0),
                     );
                   },
                 ),
@@ -128,19 +129,19 @@ class _MemRelationList extends StatelessWidget {
           );
         },
         {
-          "selectedMemEntities": selectedMemEntities,
+          "selectedMemEntities": selectedMems,
           "memRelationEntities": memRelationEntities,
         },
       );
 }
 
 class _MemRelationItem extends StatelessWidget {
-  final MemEntityV1 memEntity;
+  final Mem mem;
   final int? value;
   final void Function(int? value) onChanged;
 
   const _MemRelationItem({
-    required this.memEntity,
+    required this.mem,
     required this.value,
     required this.onChanged,
   });
@@ -149,7 +150,7 @@ class _MemRelationItem extends StatelessWidget {
   Widget build(BuildContext context) => v(
         () {
           return ListTile(
-            title: Text(memEntity.value.name),
+            title: Text(mem.name),
             trailing: SizedBox(
               // FIXME 固定にすると画面サイズに依存してしまう
               width: 120,
@@ -162,7 +163,7 @@ class _MemRelationItem extends StatelessWidget {
           );
         },
         {
-          "memEntity": memEntity,
+          "mem": mem,
           "value": value,
         },
       );
