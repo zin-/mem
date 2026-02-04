@@ -103,6 +103,32 @@ void main() {
       offset: anyNamed('offset'),
       limit: anyNamed('limit'),
     )).thenAnswer((_) async => []);
+    when(mockMemItemRepository.ship(
+      memId: anyNamed('memId'),
+      memIdsIn: anyNamed('memIdsIn'),
+      condition: anyNamed('condition'),
+      groupBy: anyNamed('groupBy'),
+      orderBy: anyNamed('orderBy'),
+      offset: anyNamed('offset'),
+      limit: anyNamed('limit'),
+    )).thenAnswer((_) async => []);
+    when(mockMemNotificationRepository.ship(
+      memId: anyNamed('memId'),
+      memIdsIn: anyNamed('memIdsIn'),
+      condition: anyNamed('condition'),
+      groupBy: anyNamed('groupBy'),
+      orderBy: anyNamed('orderBy'),
+      offset: anyNamed('offset'),
+      limit: anyNamed('limit'),
+    )).thenAnswer((_) async => []);
+    when(mockMemRelationRepository.ship(
+      sourceMemId: anyNamed('sourceMemId'),
+      condition: anyNamed('condition'),
+      groupBy: anyNamed('groupBy'),
+      orderBy: anyNamed('orderBy'),
+      offset: anyNamed('offset'),
+      limit: anyNamed('limit'),
+    )).thenAnswer((_) async => []);
   });
 
   tearDown(() {
