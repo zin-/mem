@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mems_state.dart';
 
 class MemRelationDialogStateful extends StatefulWidget {
@@ -81,6 +81,7 @@ class MemRelationDialogConsumer extends ConsumerWidget {
                       e.value.name.contains(searchText) ||
                       selectedMemIds.contains(e.id))
                   .where((e) => e.id != sourceMemId)))
+              .map((e) => e.value)
               .toList();
 
           return MemRelationDialog(
@@ -108,7 +109,7 @@ const searchMemRelationDialogSearchFieldKey =
 class MemRelationDialog extends StatelessWidget {
   final String searchText;
   final void Function(String) onSearchTextChanged;
-  final List<SavedMemEntityV1> candidates;
+  final List<Mem> candidates;
   final List<int> selectedMemIds;
   final void Function(List<int>) onSelectedIdsChanged;
   final void Function() onAddPressed;
@@ -154,11 +155,12 @@ class MemRelationDialog extends StatelessWidget {
                         final isSelected = selectedMemIds.contains(mem.id);
 
                         return CheckboxListTile(
-                          title: Text(mem.value.name),
+                          title: Text(mem.name),
                           value: isSelected,
                           onChanged: (checked) {
                             if (checked == true) {
-                              onSelectedIdsChanged([...selectedMemIds, mem.id]);
+                              onSelectedIdsChanged(
+                                  [...selectedMemIds, mem.id!]);
                             } else {
                               onSelectedIdsChanged(selectedMemIds
                                   .where((id) => id != mem.id)
