@@ -3,19 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/list/duration.dart';
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/transitions.dart';
-import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/targets/target_entity.dart';
 
 class TotalActTimeListItem extends StatelessWidget {
   final List<SavedActEntity> _actList;
-  final SavedMemEntityV1? _memEntity;
+  final Mem? _mem;
   final SavedTargetEntity? _targetEntity;
 
   const TotalActTimeListItem(
     this._actList,
-    this._memEntity,
+    this._mem,
     this._targetEntity, {
     super.key,
   });
@@ -74,19 +74,18 @@ class TotalActTimeListItem extends StatelessWidget {
                 ),
               ],
             ),
-            subtitle: _memEntity == null ? null : Text(_memEntity.value.name),
-            trailing: _memEntity == null
+            subtitle: _mem == null ? null : Text(_mem.name),
+            trailing: _mem == null
                 ? null
                 : IconButton(
-                    onPressed: () =>
-                        showMemDetailPage(context, null, _memEntity.id),
+                    onPressed: () => showMemDetailPage(context, null, _mem.id),
                     icon: const Icon(Icons.arrow_forward),
                   ),
           );
         },
         {
           '_actList': _actList,
-          '_mem': _memEntity,
+          '_mem': _mem,
         },
       );
 }

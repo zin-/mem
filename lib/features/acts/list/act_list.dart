@@ -6,7 +6,7 @@ import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/widgets/infinite_scroll.dart';
@@ -67,7 +67,9 @@ class _ActListState extends ConsumerState<ActList> {
             ref.watch(dateViewProvider),
             ref.watch(timeViewProvider),
             ref.watch(actListProvider(widget.memId)),
-            (widget.memId == null ? ref.watch(memListProvider) : []),
+            (widget.memId == null
+                ? ref.watch(memListProvider).map((e) => e.value).toList()
+                : []),
             ref.watch(targetsProvider),
             widget.scrollController,
           );
@@ -83,7 +85,7 @@ class _ActList extends StatelessWidget {
   final bool _isDateView;
   final bool _isTimeView;
   final List<SavedActEntity> _actList;
-  final List<SavedMemEntityV1> _memList;
+  final List<Mem> _memList;
   final List<SavedTargetEntity> _targetList;
   final ScrollController? _scrollController;
 
