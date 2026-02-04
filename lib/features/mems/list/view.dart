@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/features/mems/mem_entity.dart';
 
 class MemListView extends ConsumerWidget {
   final Widget _appBar;
@@ -19,7 +19,7 @@ class MemListView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemListViewComponent(
-          ref.watch(memEntitiesProvider).toList(),
+          ref.watch(memEntitiesProvider).map((e) => e.value).toList(),
           _appBar,
           _itemBuilder,
           _scrollController,
@@ -28,7 +28,7 @@ class MemListView extends ConsumerWidget {
 }
 
 class _MemListViewComponent extends StatelessWidget {
-  final List<SavedMemEntityV1> _memList;
+  final List<Mem> _memList;
   final Widget _appBar;
   final Widget Function(int memId) _itemBuilder;
   final ScrollController? _scrollController;
@@ -48,7 +48,7 @@ class _MemListViewComponent extends StatelessWidget {
             _appBar,
             SliverList(
               delegate: SliverChildBuilderDelegate(
-                (context, index) => _itemBuilder(_memList[index].id),
+                (context, index) => _itemBuilder(_memList[index].id!),
                 childCount: _memList.length,
               ),
             ),
