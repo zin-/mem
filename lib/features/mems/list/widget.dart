@@ -5,12 +5,12 @@ import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mems/list/states.dart';
+import 'package:mem/features/mems/mem.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_view.dart';
 import 'package:mem/framework/nullable.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/settings/preference/keys.dart';
@@ -28,7 +28,7 @@ class MemListWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemListWidget(
           _scrollController,
-          ref.watch(memListProvider),
+          ref.watch(memListProvider).map((e) => e.value).toList(),
           ref.watch(preferenceProvider(startOfDayKey)),
           ref.watch(memNotificationsProvider),
           ref.watch(latestActsByMemProvider.select(
@@ -40,7 +40,7 @@ class MemListWidget extends ConsumerWidget {
 
 class _MemListWidget extends StatelessWidget {
   final ScrollController _scrollController;
-  final List<SavedMemEntityV1> _memList;
+  final List<Mem> _memList;
   final TimeOfDay _startOfDay;
   final Iterable<MemNotificationEntity> _memNotifications;
   final Iterable<Act> _latestActsByMem;
@@ -85,7 +85,7 @@ class _MemListWidget extends StatelessWidget {
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
                     return MemListItemView(
-                      hasActMemList[true]![index].value,
+                      hasActMemList[true]![index],
                     );
                   },
                   childCount: hasActMemList[true]?.length ?? 0,
@@ -97,7 +97,7 @@ class _MemListWidget extends StatelessWidget {
                       final memNotifications = _memNotifications
                           .where((e) => e.value.memId == element.id)
                           .map((e) => e.value);
-                      final nextNotifyAt = element.value.notifyAt(
+                      final nextNotifyAt = element.notifyAt(
                         startOfToday,
                         memNotifications,
                         _latestActsByMem.singleWhereOrNull(
@@ -142,7 +142,7 @@ class _MemListWidget extends StatelessWidget {
                       sliver: SliverList(
                         delegate: SliverChildBuilderDelegate(
                           (context, index) => MemListItemView(
-                            e.value[index].value,
+                            e.value[index],
                           ),
                           childCount: e.value.length,
                         ),
