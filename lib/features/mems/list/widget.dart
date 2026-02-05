@@ -28,7 +28,7 @@ class MemListWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemListWidget(
           _scrollController,
-          ref.watch(memListProvider).map((e) => e.value).toList(),
+          ref.watch(memListProvider).map((e) => e.toDomain()).toList(),
           ref.watch(preferenceProvider(startOfDayKey)),
           ref.watch(memNotificationsProvider),
           ref.watch(latestActsByMemProvider.select(

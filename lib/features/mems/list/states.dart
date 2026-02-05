@@ -39,7 +39,7 @@ final showDoneProvider = StateNotifierProvider<ValueStateNotifier<bool>, bool>(
   ),
 );
 final _filteredMemsProvider = StateNotifierProvider.autoDispose<
-    ListValueStateNotifier<SavedMemEntityV1>, List<SavedMemEntityV1>>(
+    ListValueStateNotifier<MemEntity>, List<MemEntity>>(
   (ref) {
     final savedMemEntities = ref.watch(memEntitiesProvider);
 
@@ -51,26 +51,31 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
 
     return ListValueStateNotifier(
       v(
-        () => savedMemEntities.where((mem) {
-          if (showNotArchived == showArchived) {
-            return true;
-          } else {
-            return showArchived ? mem.isArchived : !mem.isArchived;
-          }
-        }).where((mem) {
-          if (showNotDone == showDone) {
-            return true;
-          } else {
-            return showDone ? mem.value.isDone : !mem.value.isDone;
-          }
-        }).where((mem) {
-          // FIXME searchTextがある場合、Memの状態に関わらずsearchTextだけでフィルターした方が良いかも
-          if (searchText == null || searchText.isEmpty) {
-            return true;
-          } else {
-            return mem.value.name.contains(searchText);
-          }
-        }).toList(),
+        () => savedMemEntities
+            .where((mem) {
+              if (showNotArchived == showArchived) {
+                return true;
+              } else {
+                return showArchived ? mem.isArchived : !mem.isArchived;
+              }
+            })
+            .where((mem) {
+              if (showNotDone == showDone) {
+                return true;
+              } else {
+                return showDone ? mem.value.isDone : !mem.value.isDone;
+              }
+            })
+            .where((mem) {
+              // FIXME searchTextがある場合、Memの状態に関わらずsearchTextだけでフィルターした方が良いかも
+              if (searchText == null || searchText.isEmpty) {
+                return true;
+              } else {
+                return mem.value.name.contains(searchText);
+              }
+            })
+            .map((e) => e.toEntityV2())
+            .toList(),
         {
           'savedMemEntities': savedMemEntities,
           'showNotArchived': showNotArchived,
@@ -85,7 +90,7 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
 );
 
 final memListProvider = StateNotifierProvider.autoDispose<
-    ValueStateNotifier<List<SavedMemEntityV1>>, List<SavedMemEntityV1>>((ref) {
+    ValueStateNotifier<List<MemEntity>>, List<MemEntity>>((ref) {
   final filtered = ref.watch(_filteredMemsProvider);
   final latestActsByMem = ref.watch(latestActsByMemProvider.select(
     (value) => value?.values.whereType<Act>().toList() ?? [],
@@ -114,11 +119,12 @@ final memListProvider = StateNotifierProvider.autoDispose<
               .compareTo(latestActOfA.period!.start!);
         }
 
-        if (a.isArchived != b.isArchived) {
-          return a.isArchived ? 1 : -1;
+        if ((a.archivedAt != null) != (b.archivedAt != null)) {
+          return a.archivedAt != null ? 1 : -1;
         }
-        if (a.value.isDone != b.value.isDone) {
-          return a.value.isDone ? 1 : -1;
+
+        if ((a.doneAt != null) != (b.doneAt != null)) {
+          return a.doneAt != null ? 1 : -1;
         }
 
         final memNotificationsOfA =
@@ -126,16 +132,16 @@ final memListProvider = StateNotifierProvider.autoDispose<
         final memNotificationsOfB =
             savedMemNotifications.where((e) => e.value.memId == b.id);
 
-        final timeOfThis = a.value.notifyAt(
-          startOfToday,
-          memNotificationsOfA.map((e) => e.value),
-          latestActOfA,
-        );
-        final timeOfOther = b.value.notifyAt(
-          startOfToday,
-          memNotificationsOfB.map((e) => e.value),
-          latestActOfB,
-        );
+        final timeOfThis = a.toDomain().notifyAt(
+              startOfToday,
+              memNotificationsOfA.map((e) => e.value),
+              latestActOfA,
+            );
+        final timeOfOther = b.toDomain().notifyAt(
+              startOfToday,
+              memNotificationsOfB.map((e) => e.value),
+              latestActOfB,
+            );
 
         if (timeOfThis != null || timeOfOther != null) {
           if (timeOfThis == null) {

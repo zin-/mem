@@ -68,7 +68,7 @@ class _ActListState extends ConsumerState<ActList> {
             ref.watch(timeViewProvider),
             ref.watch(actListProvider(widget.memId)),
             (widget.memId == null
-                ? ref.watch(memListProvider).map((e) => e.value).toList()
+                ? ref.watch(memListProvider).map((e) => e.toDomain()).toList()
                 : []),
             ref.watch(targetsProvider),
             widget.scrollController,
