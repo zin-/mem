@@ -101,11 +101,12 @@ class SavedMemEntityV1 extends MemEntityV1
 }
 
 class MemEntity implements Entity<int> {
-  @override
-  final int id;
   final String name;
   final DateTime? doneAt;
   final DateAndTimePeriod? period;
+
+  @override
+  final int id;
   @override
   final DateTime createdAt;
   @override

@@ -26,7 +26,7 @@ final memNotificationsProvider = StateNotifierProvider<
 );
 
 final memByMemIdProvider = StateNotifierProvider.autoDispose
-    .family<ValueStateNotifier<SavedMemEntityV1?>, SavedMemEntityV1?, int?>(
+    .family<ValueStateNotifier<MemEntity?>, MemEntity?, int?>(
   (ref, memId) => v(
     () {
       final mem = ref.watch(
@@ -38,7 +38,7 @@ final memByMemIdProvider = StateNotifierProvider.autoDispose
       );
 
       return ValueStateNotifier(
-        mem,
+        mem?.toEntityV2(),
         initializer: (current, notifier) => v(
           () async {
             if (mem == null && memId != null) {

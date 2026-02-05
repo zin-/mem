@@ -24,7 +24,9 @@ final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
     () {
       final mem = ref.watch(memByMemIdProvider(memId));
       return ValueStateNotifier(
-        mem ?? MemEntityV1(Mem(null, "", null, null)),
+        mem == null
+            ? MemEntityV1(Mem(null, "", null, null))
+            : SavedMemEntityV1.fromEntityV2(mem),
       );
     },
     {"memId": memId},

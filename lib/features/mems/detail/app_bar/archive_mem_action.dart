@@ -24,7 +24,7 @@ class ArchiveMemAction extends AppBarActionBuilder {
       Consumer(
         builder: (context, ref, child) {
           final mem = ref.read(memByMemIdProvider(_memId))!;
-          if (mem.isArchived) {
+          if (mem.archivedAt != null) {
             return super.popupMenuItemChildBuilder(
               key: () => keyUnarchiveMem,
               icon: () => const Icon(Icons.unarchive),
@@ -37,7 +37,7 @@ class ArchiveMemAction extends AppBarActionBuilder {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(buildL10n(context).unarchiveMemSuccessMessage(
-                      mem.value.name,
+                      mem.name,
                     )),
                     duration: defaultDismissDuration,
                     dismissDirection: DismissDirection.horizontal,
@@ -61,7 +61,7 @@ class ArchiveMemAction extends AppBarActionBuilder {
                   SnackBar(
                     content: Text(
                       buildL10n(context).archiveMemSuccessMessage(
-                        mem.value.name,
+                        mem.name,
                       ),
                     ),
                     duration: defaultDismissDuration,
