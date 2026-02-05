@@ -18,7 +18,7 @@ part 'states.g.dart';
 
 @riverpod
 class ActEntities extends _$ActEntities
-    with EntitiesStateMixin<SavedActEntity, int> {
+    with EntitiesStateMixinV1<SavedActEntity, int> {
   @override
   Iterable<SavedActEntity> build() => [];
 

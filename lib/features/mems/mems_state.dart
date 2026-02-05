@@ -19,7 +19,7 @@ part 'mems_state.g.dart';
 
 @Riverpod(keepAlive: true)
 class MemEntities extends _$MemEntities
-    with EntitiesStateMixin<SavedMemEntityV1, int> {
+    with EntitiesStateMixinV1<SavedMemEntityV1, int> {
   @override
   Iterable<SavedMemEntityV1> build() => v(
         () {
