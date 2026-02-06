@@ -311,7 +311,7 @@ class MemService {
 
   Future<bool> remove(int memId) => v(
         () async {
-          await _memRepository.waste(id: memId);
+          await _memRepository.wasteV2(id: memId);
 
           return true;
         },

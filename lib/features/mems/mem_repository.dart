@@ -78,11 +78,11 @@ class MemRepository extends DatabaseTupleRepository<MemEntityV1,
       );
 
   @override
-  Future<List<SavedMemEntityV1>> waste({
+  Future<MemEntity> wasteV2({
     int? id,
     Condition? condition,
   }) =>
-      super.waste(
+      super.wasteV2(
         condition: And(
           [
             if (id != null) Equals(defPkId, id),

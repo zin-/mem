@@ -257,6 +257,28 @@ class DriftDatabaseAccessor {
         },
       );
 
+  Future<List<dynamic>> deleteV2(dynamic domain, {Condition? condition}) => v(
+        () async {
+          final tableInfo = _getTableInfoV2(domain);
+
+          final query = driftDatabase.delete(tableInfo)
+            ..where((t) => (t as dynamic).id.equals(domain.id));
+
+          if (condition != null) {
+            final driftExpression = condition.toDriftExpression(tableInfo);
+            if (driftExpression != null) {
+              query.where((tbl) => driftExpression);
+            }
+          }
+
+          return await query.goAndReturn();
+        },
+        {
+          'domain': domain,
+          'condition': condition,
+        },
+      );
+
   drift.TableInfo _getTableInfo(
     TableDefinition tableDefinition,
   ) =>
