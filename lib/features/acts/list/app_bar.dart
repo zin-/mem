@@ -20,8 +20,7 @@ class ActListAppBar extends ConsumerWidget {
         () => _ActListAppBar(
           _memId == null
               ? buildL10n(context).defaultActListPageTitle
-              : ref.read(memByMemIdProvider(_memId))?.value.name ??
-                  somethingWrong,
+              : ref.read(memByMemIdProvider(_memId))?.name ?? somethingWrong,
           ref.watch(dateViewProvider),
           (bool changed) =>
               ref.read(dateViewProvider.notifier).updatedBy(changed),

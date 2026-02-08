@@ -12,7 +12,7 @@ import 'package:mem/features/targets/target_table.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
 import 'package:mem/framework/repository/entity.dart';
 
-mixin DatabaseTupleEntity<PRIMARY_KEY, T> on Entity<T> {
+mixin DatabaseTupleEntityV1<PRIMARY_KEY, T> on EntityV1<T> {
   late PRIMARY_KEY id;
   late DateTime createdAt;
   late DateTime? updatedAt;
@@ -22,9 +22,24 @@ mixin DatabaseTupleEntity<PRIMARY_KEY, T> on Entity<T> {
 
   void withMap(Map<String, Object?> map) {
     id = map[defPkId.name] as PRIMARY_KEY;
-    createdAt = map[defColCreatedAt.name] as DateTime;
-    updatedAt = map[defColUpdatedAt.name] as DateTime?;
-    archivedAt = map[defColArchivedAt.name] as DateTime?;
+    final rawCreatedAt = map[defColCreatedAt.name];
+    if (rawCreatedAt is int) {
+      createdAt = DateTime.fromMillisecondsSinceEpoch(rawCreatedAt);
+    } else {
+      createdAt = map[defColCreatedAt.name] as DateTime;
+    }
+    final rawUpdatedAt = map[defColUpdatedAt.name];
+    if (rawUpdatedAt is int) {
+      updatedAt = DateTime.fromMillisecondsSinceEpoch(rawUpdatedAt);
+    } else {
+      updatedAt = map[defColUpdatedAt.name] as DateTime?;
+    }
+    final rawArchivedAt = map[defColArchivedAt.name];
+    if (rawArchivedAt is int) {
+      archivedAt = DateTime.fromMillisecondsSinceEpoch(rawArchivedAt);
+    } else {
+      archivedAt = map[defColArchivedAt.name] as DateTime?;
+    }
   }
 
   @override
@@ -38,7 +53,7 @@ mixin DatabaseTupleEntity<PRIMARY_KEY, T> on Entity<T> {
 }
 
 final Map<Type, TableDefinition> entityTableRelations = {
-  MemEntity: defTableMems,
+  MemEntityV1: defTableMems,
   MemItemEntity: defTableMemItems,
   MemNotificationEntity: defTableMemNotifications,
   TargetEntity: defTableTargets,

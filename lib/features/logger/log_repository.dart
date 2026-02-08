@@ -7,7 +7,7 @@ import 'package:mem/features/logger/sentry_wrapper.dart';
 import 'log.dart';
 import 'logger_wrapper.dart';
 
-class LogRepository extends Repository<Log> {
+class LogRepository extends Repository<Log, Log> {
   final LoggerWrapper _loggerWrapper;
   final SentryWrapper? _sentryWrapper;
 

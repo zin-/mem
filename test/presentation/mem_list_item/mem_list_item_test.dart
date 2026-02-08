@@ -32,7 +32,7 @@ class _FakeMemState extends MemState {
 }
 
 class _FakeMemEntities extends MemEntities {
-  final Iterable<SavedMemEntity> _state;
+  final Iterable<SavedMemEntityV1> _state;
   int doneMemCallCount = 0;
   int undoneMemCallCount = 0;
   int? lastDoneMemId;
@@ -41,7 +41,7 @@ class _FakeMemEntities extends MemEntities {
   _FakeMemEntities(this._state);
 
   @override
-  Iterable<SavedMemEntity> build() => _state;
+  Iterable<SavedMemEntityV1> build() => _state;
 
   @override
   void doneMem(int memId) {
@@ -112,7 +112,7 @@ void main() {
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntity({
+                  SavedMemEntityV1({
                     'id': baseMem.id,
                     'name': baseMem.name,
                     'doneAt': baseMem.doneAt,
@@ -164,7 +164,7 @@ void main() {
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntity({
+                  SavedMemEntityV1({
                     'id': baseMem.id,
                     'name': baseMem.name,
                     'doneAt': baseMem.doneAt,
@@ -209,7 +209,7 @@ void main() {
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntity({
+                  SavedMemEntityV1({
                     'id': baseMem.id,
                     'name': baseMem.name,
                     'doneAt': baseMem.doneAt,
@@ -263,7 +263,7 @@ void main() {
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntity({
+                  SavedMemEntityV1({
                     'id': baseMem.id,
                     'name': baseMem.name,
                     'doneAt': baseMem.doneAt,
@@ -303,7 +303,7 @@ void main() {
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntity({
+                  SavedMemEntityV1({
                     'id': baseMem.id,
                     'name': baseMem.name,
                     'doneAt': baseMem.doneAt,
@@ -343,7 +343,7 @@ void main() {
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntity({
+                  SavedMemEntityV1({
                     'id': baseMem.id,
                     'name': baseMem.name,
                     'doneAt': baseMem.doneAt,
@@ -384,7 +384,7 @@ void main() {
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntity({
+                  SavedMemEntityV1({
                     'id': baseMem.id,
                     'name': baseMem.name,
                     'doneAt': baseMem.doneAt,
@@ -437,7 +437,7 @@ void main() {
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntity({
+                  SavedMemEntityV1({
                     'id': baseMem.id,
                     'name': baseMem.name,
                     'doneAt': baseMem.doneAt,
@@ -489,7 +489,7 @@ void main() {
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntity({
+                  SavedMemEntityV1({
                     'id': baseMem.id,
                     'name': baseMem.name,
                     'doneAt': baseMem.doneAt,
@@ -540,7 +540,7 @@ void main() {
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntity({
+                  SavedMemEntityV1({
                     'id': baseMem.id,
                     'name': baseMem.name,
                     'doneAt': baseMem.doneAt,
@@ -579,7 +579,7 @@ void main() {
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntity({
+                  SavedMemEntityV1({
                     'id': baseMem.id,
                     'name': baseMem.name,
                     'doneAt': baseMem.doneAt,
@@ -634,7 +634,7 @@ void main() {
                 ListValueStateNotifier<MemNotificationEntity>([notification])),
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntity({
+                  SavedMemEntityV1({
                     'id': baseMem.id,
                     'name': baseMem.name,
                     'doneAt': baseMem.doneAt,
@@ -694,7 +694,7 @@ void main() {
                 ListValueStateNotifier<MemNotificationEntity>([notification])),
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntity({
+                  SavedMemEntityV1({
                     'id': baseMem.id,
                     'name': baseMem.name,
                     'doneAt': baseMem.doneAt,
@@ -757,7 +757,7 @@ void main() {
             memStateProvider(memId)
                 .overrideWith(() => _FakeMemState(memWithPeriod)),
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntity({
+                  SavedMemEntityV1({
                     'id': memWithPeriod.id,
                     'name': memWithPeriod.name,
                     'doneAt': memWithPeriod.doneAt,
@@ -820,7 +820,7 @@ void main() {
             memStateProvider(memId)
                 .overrideWith(() => _FakeMemState(memWithPeriod)),
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntity({
+                  SavedMemEntityV1({
                     'id': memWithPeriod.id,
                     'name': memWithPeriod.name,
                     'doneAt': memWithPeriod.doneAt,
@@ -856,7 +856,7 @@ void main() {
     group('callbacks', () {
       testWidgets('calls doneMem when checkbox is checked', (tester) async {
         final fakeMemEntities = _FakeMemEntities([
-          SavedMemEntity({
+          SavedMemEntityV1({
             'id': baseMem.id,
             'name': baseMem.name,
             'doneAt': null,
@@ -876,7 +876,8 @@ void main() {
               latestActsByMemProvider.overrideWith((ref) => {memId: null}),
               memNotificationsByMemIdProvider(memId).overrideWith(
                   (ref) => ListValueStateNotifier<MemNotificationEntity>([])),
-              memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
+              memStateProvider(memId)
+                  .overrideWith(() => _FakeMemState(baseMem)),
               memEntitiesProvider.overrideWith(() => fakeMemEntities),
             ],
             child: MaterialApp(
@@ -899,7 +900,7 @@ void main() {
       testWidgets('calls undoneMem when checkbox is unchecked', (tester) async {
         final doneMem = Mem(memId, 'Done Mem', DateTime.now(), null);
         final fakeMemEntities = _FakeMemEntities([
-          SavedMemEntity({
+          SavedMemEntityV1({
             'id': doneMem.id,
             'name': doneMem.name,
             'doneAt': doneMem.doneAt,
@@ -919,7 +920,8 @@ void main() {
               latestActsByMemProvider.overrideWith((ref) => {memId: null}),
               memNotificationsByMemIdProvider(memId).overrideWith(
                   (ref) => ListValueStateNotifier<MemNotificationEntity>([])),
-              memStateProvider(memId).overrideWith(() => _FakeMemState(doneMem)),
+              memStateProvider(memId)
+                  .overrideWith(() => _FakeMemState(doneMem)),
               memEntitiesProvider.overrideWith(() => fakeMemEntities),
             ],
             child: MaterialApp(
@@ -959,10 +961,12 @@ void main() {
             overrides: [
               latestActsByMemProvider.overrideWith((ref) => {memId: null}),
               memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
-                  ListValueStateNotifier<MemNotificationEntity>([notification])),
-              memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
+                  ListValueStateNotifier<MemNotificationEntity>(
+                      [notification])),
+              memStateProvider(memId)
+                  .overrideWith(() => _FakeMemState(baseMem)),
               memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                    SavedMemEntity({
+                    SavedMemEntityV1({
                       'id': baseMem.id,
                       'name': baseMem.name,
                       'doneAt': baseMem.doneAt,
@@ -1017,10 +1021,12 @@ void main() {
             overrides: [
               latestActsByMemProvider.overrideWith((ref) => {memId: activeAct}),
               memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
-                  ListValueStateNotifier<MemNotificationEntity>([notification])),
-              memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
+                  ListValueStateNotifier<MemNotificationEntity>(
+                      [notification])),
+              memStateProvider(memId)
+                  .overrideWith(() => _FakeMemState(baseMem)),
               memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                    SavedMemEntity({
+                    SavedMemEntityV1({
                       'id': baseMem.id,
                       'name': baseMem.name,
                       'doneAt': baseMem.doneAt,
@@ -1075,10 +1081,12 @@ void main() {
             overrides: [
               latestActsByMemProvider.overrideWith((ref) => {memId: activeAct}),
               memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
-                  ListValueStateNotifier<MemNotificationEntity>([notification])),
-              memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
+                  ListValueStateNotifier<MemNotificationEntity>(
+                      [notification])),
+              memStateProvider(memId)
+                  .overrideWith(() => _FakeMemState(baseMem)),
               memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                    SavedMemEntity({
+                    SavedMemEntityV1({
                       'id': baseMem.id,
                       'name': baseMem.name,
                       'doneAt': baseMem.doneAt,
@@ -1111,8 +1119,8 @@ void main() {
 
       testWidgets('calls closeByMemId when close button is tapped',
           (tester) async {
-        final pausedAct =
-            PausedAct(memId, DateTime.now().subtract(const Duration(minutes: 5)));
+        final pausedAct = PausedAct(
+            memId, DateTime.now().subtract(const Duration(minutes: 5)));
         final now = DateTime.now();
         final notification = SavedMemNotificationEntity({
           defPkId.name: 1,
@@ -1131,10 +1139,12 @@ void main() {
             overrides: [
               latestActsByMemProvider.overrideWith((ref) => {memId: pausedAct}),
               memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
-                  ListValueStateNotifier<MemNotificationEntity>([notification])),
-              memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
+                  ListValueStateNotifier<MemNotificationEntity>(
+                      [notification])),
+              memStateProvider(memId)
+                  .overrideWith(() => _FakeMemState(baseMem)),
               memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                    SavedMemEntity({
+                    SavedMemEntityV1({
                       'id': baseMem.id,
                       'name': baseMem.name,
                       'doneAt': baseMem.doneAt,
@@ -1172,9 +1182,10 @@ void main() {
               latestActsByMemProvider.overrideWith((ref) => {memId: null}),
               memNotificationsByMemIdProvider(memId).overrideWith(
                   (ref) => ListValueStateNotifier<MemNotificationEntity>([])),
-              memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
+              memStateProvider(memId)
+                  .overrideWith(() => _FakeMemState(baseMem)),
               memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                    SavedMemEntity({
+                    SavedMemEntityV1({
                       'id': baseMem.id,
                       'name': baseMem.name,
                       'doneAt': baseMem.doneAt,

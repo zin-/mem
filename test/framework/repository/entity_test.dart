@@ -9,7 +9,7 @@ class TestSample {
   TestSample(this.a);
 }
 
-class TestSampleEntity with Entity<TestSample> {
+class TestSampleEntity with EntityV1<TestSample> {
   static List<String> fieldNames = ['a'];
 
   TestSampleEntity(TestSample value) {
@@ -22,7 +22,7 @@ class TestSampleEntity with Entity<TestSample> {
       };
 
   @override
-  Entity<TestSample> updatedWith(TestSample Function(TestSample v) update) =>
+  EntityV1<TestSample> updatedWith(TestSample Function(TestSample v) update) =>
       TestSampleEntity(update(value));
 }
 

@@ -7,7 +7,7 @@ import 'entity_test.dart';
 const _name = 'DatabaseTupleEntity test';
 
 class TestSampleDatabaseTupleEntity extends TestSampleEntity
-    with DatabaseTupleEntity<int, TestSample> {
+    with DatabaseTupleEntityV1<int, TestSample> {
   TestSampleDatabaseTupleEntity(Map<String, dynamic> map)
       : super(TestSample(map['a'])) {
     withMap(map);

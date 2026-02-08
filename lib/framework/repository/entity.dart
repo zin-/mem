@@ -1,15 +1,18 @@
 /// # Entityとは
 ///
-/// システムから見た外部データを表す
+/// システムが扱うデータとしての実体を表現する
 // # 語源
 //
 // 「存在するもの」、「実体」
-mixin Entity<VALUE> {
+// # Domainとの違い
+// Domainと違い、Entityは具体的なデータとの繋がりがあるためいくつかの制約を持ち、持たせることができる
+// 具体的には、そのデータを一意に定める識別子(id)を持ったり、作成日時などのmetadataを持つ
+mixin EntityV1<VALUE> {
   late VALUE value;
 
   Map<String, Object?> get toMap;
 
-  Entity<VALUE> updatedWith(VALUE Function(VALUE v) update);
+  EntityV1<VALUE> updatedWith(VALUE Function(VALUE v) update);
 
   @override
   String toString() => "${super.toString()}: $toMap";
@@ -36,3 +39,10 @@ final Map<Type, Set<Type>> entityChildrenRelation = {};
 //  domain領域では、nullの場合はそもそも実行する必要がないはずなのでnot nullになっている
 //  data領域ではさらに厳しく、データとして存在しているはずのものしかなくなるのでidなどの情報が付与されているはず
 //  など
+
+abstract interface class Entity<ID> {
+  ID get id;
+  DateTime get createdAt;
+  DateTime? get updatedAt;
+  DateTime? get archivedAt;
+}

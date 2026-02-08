@@ -56,7 +56,7 @@ void main() {
           () async {
         // Arrange
         const testMemId = 1;
-        final mem = MemEntity(Mem(null, 'Test Mem', null, null));
+        final mem = MemEntityV1(Mem(null, 'Test Mem', null, null));
         final memItems = <MemItemEntity>[];
         final memNotifications = <MemNotificationEntity>[];
         final target = TargetEntity(
@@ -70,7 +70,7 @@ void main() {
         );
         final memRelations = <MemRelationEntity>[];
 
-        final savedMem = SavedMemEntity({
+        final savedMem = SavedMemEntityV1({
           'id': testMemId,
           'name': 'Test Mem',
           'doneAt': null,
@@ -95,7 +95,8 @@ void main() {
           'archivedAt': null,
         });
 
-        when(mockMemRepository.receive(any)).thenAnswer((_) async => savedMem);
+        when(mockMemRepository.receiveV2(any))
+            .thenAnswer((_) async => savedMem.toEntityV2());
         when(mockMemNotificationRepository.waste(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
@@ -134,13 +135,13 @@ void main() {
           () async {
         // Arrange
         const testMemId = 1;
-        final mem = MemEntity(Mem(null, 'Test Mem', null, null));
+        final mem = MemEntityV1(Mem(null, 'Test Mem', null, null));
         final memItems = <MemItemEntity>[];
         final memNotifications = <MemNotificationEntity>[];
         final target = null;
         final memRelations = <MemRelationEntity>[];
 
-        final savedMem = SavedMemEntity({
+        final savedMem = SavedMemEntityV1({
           'id': testMemId,
           'name': 'Test Mem',
           'doneAt': null,
@@ -153,7 +154,8 @@ void main() {
           'archivedAt': null,
         });
 
-        when(mockMemRepository.receive(any)).thenAnswer((_) async => savedMem);
+        when(mockMemRepository.receiveV2(any))
+            .thenAnswer((_) async => savedMem.toEntityV2());
         when(mockMemNotificationRepository.waste(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
@@ -181,7 +183,7 @@ void main() {
           () async {
         // Arrange
         const testMemId = 1;
-        final mem = MemEntity(Mem(null, 'Test Mem', null, null));
+        final mem = MemEntityV1(Mem(null, 'Test Mem', null, null));
         final memItems = <MemItemEntity>[];
         final memNotifications = <MemNotificationEntity>[];
         final target = TargetEntity(
@@ -195,7 +197,7 @@ void main() {
         );
         final memRelations = <MemRelationEntity>[];
 
-        final savedMem = SavedMemEntity({
+        final savedMem = SavedMemEntityV1({
           'id': testMemId,
           'name': 'Test Mem',
           'doneAt': null,
@@ -208,7 +210,8 @@ void main() {
           'archivedAt': null,
         });
 
-        when(mockMemRepository.receive(any)).thenAnswer((_) async => savedMem);
+        when(mockMemRepository.receiveV2(any))
+            .thenAnswer((_) async => savedMem.toEntityV2());
         when(mockMemNotificationRepository.waste(
           memId: anyNamed('memId'),
           type: anyNamed('type'),

@@ -92,6 +92,45 @@ void main() {
   MemRelationRepository(mock: mockMemRelationRepository);
   TargetRepository(mock: mockTargetRepository);
 
+  setUp(() {
+    when(mockMemRepository.ship(
+      id: anyNamed('id'),
+      archived: anyNamed('archived'),
+      done: anyNamed('done'),
+      condition: anyNamed('condition'),
+      groupBy: anyNamed('groupBy'),
+      orderBy: anyNamed('orderBy'),
+      offset: anyNamed('offset'),
+      limit: anyNamed('limit'),
+    )).thenAnswer((_) async => []);
+    when(mockMemItemRepository.ship(
+      memId: anyNamed('memId'),
+      memIdsIn: anyNamed('memIdsIn'),
+      condition: anyNamed('condition'),
+      groupBy: anyNamed('groupBy'),
+      orderBy: anyNamed('orderBy'),
+      offset: anyNamed('offset'),
+      limit: anyNamed('limit'),
+    )).thenAnswer((_) async => []);
+    when(mockMemNotificationRepository.ship(
+      memId: anyNamed('memId'),
+      memIdsIn: anyNamed('memIdsIn'),
+      condition: anyNamed('condition'),
+      groupBy: anyNamed('groupBy'),
+      orderBy: anyNamed('orderBy'),
+      offset: anyNamed('offset'),
+      limit: anyNamed('limit'),
+    )).thenAnswer((_) async => []);
+    when(mockMemRelationRepository.ship(
+      sourceMemId: anyNamed('sourceMemId'),
+      condition: anyNamed('condition'),
+      groupBy: anyNamed('groupBy'),
+      orderBy: anyNamed('orderBy'),
+      offset: anyNamed('offset'),
+      limit: anyNamed('limit'),
+    )).thenAnswer((_) async => []);
+  });
+
   tearDown(() {
     reset(mockMemClient);
     reset(mockMemRepository);
@@ -133,7 +172,7 @@ void main() {
       setUp(() {
         when(mockMemRepository.ship(id: _TestConstants.testMemId))
             .thenAnswer((_) async => [
-                  SavedMemEntity(
+                  SavedMemEntityV1(
                     {
                       defPkId.name: _TestConstants.testMemId,
                       defColMemsName.name: 'Test Mem',
@@ -261,11 +300,12 @@ void main() {
           any,
         )).thenAnswer((_) async => (
               (
-                MemEntity(Mem(1, "", null, null)),
+                MemEntityV1(Mem(1, "", null, null)),
                 <MemItemEntity>[],
                 null,
                 null,
-                null
+                null,
+                MemEntity(1, "", null, null, DateTime.now(), null, null),
               ),
               null,
             ));
@@ -311,7 +351,7 @@ void main() {
       setUp(() {
         when(mockMemRepository.ship(id: _TestConstants.testMemId))
             .thenAnswer((_) async => [
-                  SavedMemEntity(
+                  SavedMemEntityV1(
                     {
                       defPkId.name: _TestConstants.testMemId,
                       defColMemsName.name: 'Test Mem',

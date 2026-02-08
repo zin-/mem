@@ -5,7 +5,7 @@ import 'package:mem/framework/repository/entity.dart';
 import 'target.dart';
 import 'target_table.dart';
 
-class TargetEntity with Entity<Target> {
+class TargetEntity with EntityV1<Target> {
   TargetEntity(Target value) {
     this.value = value;
   }
@@ -25,7 +25,7 @@ class TargetEntity with Entity<Target> {
 }
 
 class SavedTargetEntity extends TargetEntity
-    with DatabaseTupleEntity<int, Target> {
+    with DatabaseTupleEntityV1<int, Target> {
   SavedTargetEntity(Map<String, dynamic> map)
       : super(
           Target(

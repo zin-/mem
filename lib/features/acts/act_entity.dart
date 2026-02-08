@@ -4,7 +4,7 @@ import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
 
-class ActEntity with Entity<Act> {
+class ActEntity with EntityV1<Act> {
   ActEntity(Act value) {
     this.value = value;
   }
@@ -23,7 +23,7 @@ class ActEntity with Entity<Act> {
   ActEntity updatedWith(Act Function(Act v) update) => ActEntity(update(value));
 }
 
-class SavedActEntity extends ActEntity with DatabaseTupleEntity<int, Act> {
+class SavedActEntity extends ActEntity with DatabaseTupleEntityV1<int, Act> {
   SavedActEntity(Map<String, dynamic> map)
       : super(
           Act.by(

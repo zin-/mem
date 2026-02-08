@@ -1,5 +1,8 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:mem/databases/database.dart';
+import 'package:mem/databases/table_definitions/mems.dart';
+import 'package:mem/features/mems/mem.dart' as mem_domain;
+import 'package:mem/features/mems/mem_entity.dart' as mem_entity;
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/group_by.dart';
@@ -176,6 +179,22 @@ class DriftDatabaseAccessor {
         },
       );
 
+  Future insertV2(
+    dynamic domain,
+// TODO createdAtを受け取るべきかも
+  ) =>
+      v(
+        () async {
+          final tableInfo = _getTableInfoV2(domain);
+          final insertable = convertIntoDriftInsertable(domain);
+
+          return await driftDatabase
+              .into(tableInfo)
+              .insertReturning(insertable);
+        },
+        {'domain': domain},
+      );
+
   update(
     TableDefinition tableDefinition,
     Map<String, Object?> values,
@@ -197,6 +216,19 @@ class DriftDatabaseAccessor {
             values,
           ));
         },
+      );
+
+  Future updateV2(dynamic entity, {DateTime? updatedAt}) => v(
+        () async {
+          final query = driftDatabase.update(_getTableInfoV2(entity))
+            ..where((t) => (t as dynamic).id.equals(entity.id));
+
+          final updateable =
+              convertIntoDriftUpdateable(entity, updatedAt: updatedAt);
+
+          return (await query.writeReturning(updateable)).first;
+        },
+        {'entity': entity},
       );
 
   delete(
@@ -225,11 +257,43 @@ class DriftDatabaseAccessor {
         },
       );
 
+  Future<List<dynamic>> deleteV2(dynamic domain, {Condition? condition}) => v(
+        () async {
+          final tableInfo = _getTableInfoV2(domain);
+
+          final query = driftDatabase.delete(tableInfo)
+            ..where((t) => (t as dynamic).id.equals(domain.id));
+
+          if (condition != null) {
+            final driftExpression = condition.toDriftExpression(tableInfo);
+            if (driftExpression != null) {
+              query.where((tbl) => driftExpression);
+            }
+          }
+
+          return await query.goAndReturn();
+        },
+        {
+          'domain': domain,
+          'condition': condition,
+        },
+      );
+
   drift.TableInfo _getTableInfo(
     TableDefinition tableDefinition,
   ) =>
       driftDatabase.allTables
           .firstWhere((e) => e.actualTableName == tableDefinition.name);
+
+  drift.TableInfo _getTableInfoV2(dynamic domain) {
+    switch (domain) {
+      case mem_domain.Mem _:
+      case mem_entity.MemEntity _:
+        return driftDatabase.mems;
+      default:
+        throw StateError('Unknown domain: ${domain.runtimeType}');
+    }
+  }
 
   drift.OrderClauseGenerator? _toOrderClauseGenerator(
       drift.TableInfo tableInfo, OrderBy orderBy) {
@@ -383,4 +447,22 @@ String toSnakeCase(String camelCase) {
     RegExp(r'[A-Z]'),
     (match) => '_${match.group(0)!.toLowerCase()}',
   );
+}
+
+convertIntoDriftInsertable(dynamic domain) {
+  switch (domain) {
+    case mem_domain.Mem _:
+      return convertIntoMemsInsertable(domain, DateTime.now());
+    default:
+      throw StateError('Unknown domain: ${domain.runtimeType}');
+  }
+}
+
+convertIntoDriftUpdateable(dynamic entity, {DateTime? updatedAt}) {
+  switch (entity) {
+    case mem_entity.MemEntity _:
+      return convertIntoMemsUpdateable(entity, updatedAt: updatedAt);
+    default:
+      throw StateError('Unknown entity: ${entity.runtimeType}');
+  }
 }

@@ -5,7 +5,7 @@ import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/features/logger/log_service.dart';
 
 abstract class HomeWidgetRepository<ENTITY extends HomeWidgetEntity,
-    SAVED extends SavedHomeWidgetEntity> extends Repository<ENTITY> {
+    SAVED extends SavedHomeWidgetEntity> extends Repository<ENTITY, SAVED> {
   static final _homeWidgetAccessor =
       defaultTargetPlatform == TargetPlatform.android
           ? HomeWidgetAccessor()

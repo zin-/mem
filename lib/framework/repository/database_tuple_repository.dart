@@ -11,8 +11,12 @@ import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/features/logger/log_service.dart';
 
-abstract class DatabaseTupleRepository<ENTITY extends Entity,
-    SAVED extends DatabaseTupleEntity> extends Repository<ENTITY> {
+abstract class DatabaseTupleRepository<
+    ENTITYV1 extends EntityV1,
+    SAVEDV1 extends DatabaseTupleEntityV1,
+    DOMAIN,
+    ID,
+    ENTITY extends Entity<ID>> extends Repository<ENTITYV1, DOMAIN> {
   static final _driftAccessor = DriftDatabaseAccessor();
   static final Map<TableDefinition, Repository> _repositories = {};
 
@@ -64,10 +68,12 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
         {'condition': condition},
       );
 
-  SAVED pack(Map<String, dynamic> map);
+  SAVEDV1 pack(Map<String, dynamic> map);
+  ENTITY packV2(dynamic tuple) => throw UnimplementedError();
+  convert(DOMAIN domain) => throw UnimplementedError();
 
-  Future<SAVED> receive(
-    ENTITY entity, {
+  Future<SAVEDV1> receive(
+    ENTITYV1 entity, {
     DateTime? createdAt,
   }) =>
       v(
@@ -86,7 +92,16 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
         {'entity': entity, 'createdAt': createdAt},
       );
 
-  Future<List<SAVED>> ship({
+  Future<ENTITY> receiveV2(DOMAIN domain) => v(
+        () async {
+          final inserted = await _driftAccessor.insertV2(domain);
+
+          return packV2(inserted);
+        },
+        {'domain': domain},
+      );
+
+  Future<List<SAVEDV1>> ship({
     Condition? condition,
     GroupBy? groupBy,
     List<OrderBy>? orderBy,
@@ -104,7 +119,7 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
             limit: limit,
           );
           return rows
-              .map<SAVED>((e) => pack(e as Map<String, dynamic>))
+              .map<SAVEDV1>((e) => pack(e as Map<String, dynamic>))
               .toList();
         },
         {
@@ -116,8 +131,8 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
         },
       );
 
-  Future<SAVED> replace(
-    SAVED savedEntity, {
+  Future<SAVEDV1> replace(
+    SAVEDV1 savedEntity, {
     DateTime? updatedAt,
   }) =>
       v(
@@ -135,8 +150,17 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
         {'savedEntity': savedEntity, 'updatedAt': updatedAt},
       );
 
-  Future<SAVED> archive(
-    SAVED savedEntity, {
+  Future<ENTITY> replaceV2(ENTITY entity) => v(
+        () async {
+          final updated = await _driftAccessor.updateV2(entity);
+
+          return packV2(updated);
+        },
+        {'entity': entity},
+      );
+
+  Future<SAVEDV1> archive(
+    SAVEDV1 savedEntity, {
     DateTime? archivedAt,
   }) =>
       v(
@@ -154,8 +178,8 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
         {'savedEntity': savedEntity, 'archivedAt': archivedAt},
       );
 
-  Future<SAVED> unarchive(
-    SAVED savedEntity, {
+  Future<SAVEDV1> unarchive(
+    SAVEDV1 savedEntity, {
     DateTime? updatedAt,
   }) =>
       v(
@@ -175,7 +199,7 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
       );
 
   @override
-  Future<List<SAVED>> waste({
+  Future<List<SAVEDV1>> waste({
     Condition? condition,
   }) =>
       v(
@@ -201,6 +225,33 @@ abstract class DatabaseTupleRepository<ENTITY extends Entity,
           );
 
           return targets;
+        },
+        {'condition': condition},
+      );
+
+  Future<ENTITY> wasteV2({Condition? condition}) => v(
+        () async {
+          final targets = await ship(condition: condition);
+
+          for (final byChild in childRepositories.entries) {
+            for (final repositoryWithFks in byChild.value.entries) {
+              if (repositoryWithFks.key != null &&
+                  repositoryWithFks.value != null) {
+                for (final fk in repositoryWithFks.value!) {
+                  await repositoryWithFks.key!.waste(
+                    condition: In(fk.name, targets.map((e) => e.id)),
+                  );
+                }
+              }
+            }
+          }
+
+          final deleted = await _driftAccessor.deleteV2(
+            targets,
+            condition: condition,
+          );
+
+          return packV2(deleted.firstOrNull);
         },
         {'condition': condition},
       );

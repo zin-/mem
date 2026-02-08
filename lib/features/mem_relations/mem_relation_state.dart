@@ -8,7 +8,7 @@ part 'mem_relation_state.g.dart';
 
 @riverpod
 class MemRelationEntities extends _$MemRelationEntities
-    with EntitiesStateMixin<SavedMemRelationEntity, int> {
+    with EntitiesStateMixinV1<SavedMemRelationEntity, int> {
   @override
   Iterable<SavedMemRelationEntity> build() => v(() => []);
 }

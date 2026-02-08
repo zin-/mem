@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/base.dart';
-import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/features/acts/acts_summary.dart';
 import 'package:mem/features/acts/line_chart/line_chart_page.dart';
 import 'package:mem/features/acts/act.dart';
@@ -47,18 +46,15 @@ void main() {
                 (ref) => AsyncValue.data(acts),
               ),
               memByMemIdProvider(memId).overrideWith(
-                (ref) => ValueStateNotifier(SavedMemEntity({
-                  defPkId.name: memId,
-                  defColMemsName.name: memName,
-                  defColMemsDoneAt.name: null,
-                  defColMemsStartOn.name: null,
-                  defColMemsStartAt.name: null,
-                  defColMemsEndOn.name: null,
-                  defColMemsEndAt.name: null,
-                  defColCreatedAt.name: DateTime.now(),
-                  defColUpdatedAt.name: DateTime.now(),
-                  defColArchivedAt.name: null,
-                })),
+                (ref) => ValueStateNotifier(MemEntity(
+                  memId,
+                  memName,
+                  null,
+                  null,
+                  DateTime.now(),
+                  DateTime.now(),
+                  null,
+                )),
               ),
               preferenceProvider(startOfDayKey).overrideWith(
                 () => _FakePreference(),

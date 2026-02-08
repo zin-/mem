@@ -1,10 +1,10 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mem/features/acts/act_repository.dart';
+import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/settings/constants.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
 import 'package:mem/features/mems/mem_repository.dart';
@@ -136,27 +136,18 @@ class NotificationClient {
       );
 
   Future<DateTime?> registerMemNotifications(
-    int memId, {
-    SavedMemEntity? savedMem,
+    Mem mem, {
     Iterable<SavedMemNotificationEntity>? savedMemNotifications,
   }) =>
       v(
         () async {
-          final mem = savedMem ??
-              await _memRepository
-                  .ship(
-                    id: memId,
-                  )
-                  .then(
-                    (v) => v.single,
-                  );
-          if (mem!.value.isDone || mem.isArchived) {
-            cancelMemNotifications(memId);
+          if (mem.isDone || mem.isArchived) {
+            cancelMemNotifications(mem.id!);
             return null;
           } else {
             final latestAct = await ActRepository()
                 .ship(
-                  memId: memId,
+                  memId: mem.id,
                   latestByMemIds: true,
                 )
                 .then(
@@ -173,7 +164,7 @@ class NotificationClient {
                 mem,
                 startOfDay,
                 (savedMemNotifications ??
-                        await _memNotificationRepository.ship(memId: memId))
+                        await _memNotificationRepository.ship(memId: mem.id!))
                     .map((e) => e.value),
                 latestAct,
                 DateTime.now(),
@@ -190,8 +181,7 @@ class NotificationClient {
           }
         },
         {
-          "memId": memId,
-          "savedMem": savedMem,
+          "mem": mem,
           "savedMemNotifications": savedMemNotifications,
         },
       );
@@ -233,9 +223,12 @@ class NotificationClient {
               ),
             );
           }
+          final mem = await _memRepository
+              .ship(id: memId)
+              .then((v) => v.singleOrNull?.value);
 
           await registerMemNotifications(
-            memId,
+            mem!,
             savedMemNotifications: memNotifications,
           );
           await setNotificationAfterInactivity();
@@ -256,9 +249,12 @@ class NotificationClient {
             NotificationType.pausedAct,
             memId,
           );
+          final mem = await _memRepository
+              .ship(id: memId)
+              .then((v) => v.singleOrNull?.value);
 
           await registerMemNotifications(
-            memId,
+            mem!,
           );
           await setNotificationAfterInactivity();
         },
@@ -364,7 +360,7 @@ class NotificationClient {
 
           for (final mem in allSavedMems) {
             await registerMemNotifications(
-              mem.id,
+              mem.value,
             );
           }
         },

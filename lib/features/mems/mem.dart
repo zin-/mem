@@ -1,7 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
+import 'package:mem/framework/notifications/notification/type.dart';
+import 'package:mem/framework/notifications/schedule.dart';
 
 // FIXME uuidとかにする
 typedef MemId = int?;
@@ -80,6 +83,48 @@ class Mem {
         {
           'a': a,
           'b': b,
+        },
+      );
+
+  Iterable<Schedule> periodSchedules(
+    TimeOfDay startOfDay,
+  ) =>
+      v(
+        () {
+          return [
+            Schedule.of(
+              id,
+              period?.start?.isAllDay == true
+                  ? DateTime(
+                      period!.start!.year,
+                      period!.start!.month,
+                      period!.start!.day,
+                      startOfDay.hour,
+                      startOfDay.minute,
+                    )
+                  : period?.start,
+              NotificationType.startMem,
+            ),
+            Schedule.of(
+              id,
+              period?.end?.isAllDay == true
+                  ? DateTime(
+                      period!.end!.year,
+                      period!.end!.month,
+                      period!.end!.day,
+                      startOfDay.hour,
+                      startOfDay.minute,
+                    )
+                      .add(const Duration(days: 1))
+                      .subtract(const Duration(minutes: 1))
+                  : period?.end,
+              NotificationType.endMem,
+            ),
+          ];
+        },
+        {
+          'this': this,
+          'startOfDay': startOfDay,
         },
       );
 }

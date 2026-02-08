@@ -1,6 +1,6 @@
 import 'package:mem/framework/repository/entity.dart';
 
-mixin HomeWidgetEntity on Entity {
+mixin HomeWidgetEntity on EntityV1 {
   String get methodChannelName;
 
   String get initializeMethodName;

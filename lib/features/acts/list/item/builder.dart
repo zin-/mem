@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/acts/act_entity.dart';
-import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/targets/target_entity.dart';
 
 import 'total_act_time_item.dart';
@@ -10,7 +10,7 @@ import 'view.dart';
 
 class ActListItemBuilder {
   final MapEntry<DateTime, List<SavedActEntity>> _actListWithDatetime;
-  final List<SavedMemEntity> _memList;
+  final List<Mem> _memList;
   final bool _isTimeView;
   final List<SavedTargetEntity> _targetList;
 
@@ -35,7 +35,7 @@ class ActListItemBuilder {
 
             return TotalActTimeListItem(
               entry.value,
-              _memList.singleWhereOrNull((element) => element.id == entry.key),
+              _memList.singleWhereOrNull((mem) => mem.id! == entry.key),
               _targetList.singleWhereOrNull((e) => e.value.memId == entry.key),
             );
           } else {
@@ -43,9 +43,8 @@ class ActListItemBuilder {
             return ActListItemView(
               act,
               _memList
-                  .singleWhereOrNull((element) => element.id == act.value.memId)
-                  ?.value
-                  .name,
+                  .singleWhereOrNull((mem) => mem.id! == act.value.memId)
+                  ?.name,
             );
           }
         },

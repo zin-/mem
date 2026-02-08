@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mem/features/mems/list/states.dart';
+import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/features/mems/mem_entity.dart';
 
 import 'states.dart';
 
@@ -15,7 +14,7 @@ class SingleSelectableMemListItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _SingleSelectableMemListItemComponent(
-          ref.watch(memListProvider).firstWhere((mem) => mem.id == _memId),
+          _memId,
           ref.watch(selectedMemIdsProvider).contains(_memId),
           (memId) => v(
             () => ref
@@ -30,22 +29,22 @@ class SingleSelectableMemListItem extends ConsumerWidget {
 
 class _SingleSelectableMemListItemComponent extends ListTile {
   _SingleSelectableMemListItemComponent(
-    SavedMemEntity memEntity,
+    MemId memId,
     bool isSelected,
     void Function(int? memId) onSelected,
   ) : super(
-          title: MemNameText(memEntity.id),
+          title: MemNameText(memId),
           trailing: RadioGroup<int>(
-            groupValue: isSelected ? memEntity.id : null,
+            groupValue: isSelected ? memId : null,
             onChanged: (value) => onSelected(value),
             child: Radio<int>(
-              value: memEntity.id,
+              value: memId!,
             ),
           ),
-          onTap: () => onSelected(memEntity.id),
+          onTap: () => onSelected(memId),
         ) {
     verbose({
-      'mem': memEntity,
+      'memId': memId,
       'isSelected': isSelected,
     });
   }
