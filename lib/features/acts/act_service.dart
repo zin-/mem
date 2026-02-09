@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:mem/features/acts/act.dart';
+import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/acts/act_entity.dart';
@@ -14,6 +15,7 @@ class ListWithTotalCount<T> {
 
 class ActService {
   final ActRepository _actRepository;
+  final ActQueryService _actQueryService;
 
   Future<Iterable<SavedActEntityV1>> fetchLatestByMemIds(
     Iterable<int>? memIdsIn,
@@ -60,7 +62,7 @@ class ActService {
             offset: offset,
             limit: limit,
           ),
-          await _actRepository.count(memId: memId),
+          await _actQueryService.countByMemIdIs(memId),
         ),
         {
           'memId': memId,
@@ -201,6 +203,7 @@ class ActService {
 
   ActService._(
     this._actRepository,
+    this._actQueryService,
   );
 
   static ActService? _instance;
@@ -208,6 +211,7 @@ class ActService {
   factory ActService() => i(
         () => _instance ??= ActService._(
           ActRepository(),
+          ActQueryService(),
         ),
       );
 }

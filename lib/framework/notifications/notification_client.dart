@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/acts/act_repository.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/settings/constants.dart';
@@ -27,7 +28,7 @@ class NotificationClient {
   final PreferenceRepository _preferenceClientRepository;
   final MemRepository _memRepository;
   final MemNotificationRepository _memNotificationRepository;
-  final ActRepository _actRepository;
+  final ActQueryService _actQueryService;
 
   NotificationClient._(
     this.notificationChannels,
@@ -36,7 +37,7 @@ class NotificationClient {
     this._preferenceClientRepository,
     this._memRepository,
     this._memNotificationRepository,
-    this._actRepository,
+    this._actQueryService,
   );
 
   static NotificationClient? _instance;
@@ -49,7 +50,7 @@ class NotificationClient {
           PreferenceRepository(),
           MemRepository(),
           MemNotificationRepository(),
-          ActRepository(),
+          ActQueryService(),
         ),
         {
           'context': context,
@@ -283,7 +284,7 @@ class NotificationClient {
               .then((v) => v.value);
 
           if (timeOfSeconds != null) {
-            final activeActCount = await _actRepository.count(isActive: true);
+            final activeActCount = await _actQueryService.activeCount();
 
             if (activeActCount == 0) {
               await _scheduleClient.receive(
