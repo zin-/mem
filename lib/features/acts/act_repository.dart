@@ -1,5 +1,5 @@
 import 'package:mem/features/acts/act.dart';
-import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
@@ -29,17 +29,34 @@ extension _ActOrderByExt on ActOrderBy {
 
 // @Deprecated('ActRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
 // lintエラーになるためコメントアウト
-class ActRepository extends DatabaseTupleRepository<
-    ActEntityV1,
-    SavedActEntityV1,
-    Act,
-    int,
-    // FIXME Actentityを定義して置き換える
-    MemEntity> {
+class ActRepository extends DatabaseTupleRepository<ActEntityV1,
+    SavedActEntityV1, Act, int, ActEntity> {
   ActRepository() : super(databaseDefinition, defTableActs);
 
   @override
   SavedActEntityV1 pack(Map<String, dynamic> map) => SavedActEntityV1(map);
+
+  @override
+  ActEntity packV2(dynamic tuple) => ActEntity(
+        tuple.memId,
+        tuple.start == null
+            ? null
+            : DateAndTime.from(
+                tuple.start,
+                timeOfDay: tuple.startIsAllDay == true ? null : tuple.start,
+              ),
+        tuple.end == null
+            ? null
+            : DateAndTime.from(
+                tuple.end,
+                timeOfDay: tuple.endIsAllDay == true ? null : tuple.end,
+              ),
+        tuple.pausedAt,
+        tuple.id,
+        tuple.createdAt,
+        tuple.updatedAt,
+        tuple.archivedAt,
+      );
 
   @override
   Future<int> count({

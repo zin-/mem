@@ -2,7 +2,6 @@ import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
-import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
 
@@ -61,9 +60,9 @@ class SavedActEntityV1 extends ActEntityV1
 
 class ActEntity implements Entity<int> {
   final MemId memId;
-  final DateAndTimePeriod? period;
+  final DateAndTime? start;
+  final DateAndTime? end;
   final DateTime? pausedAt;
-  final ActState state;
 
   @override
   final int id;
@@ -76,9 +75,9 @@ class ActEntity implements Entity<int> {
 
   ActEntity(
     this.memId,
-    this.period,
+    this.start,
+    this.end,
     this.pausedAt,
-    this.state,
     this.id,
     this.createdAt,
     this.updatedAt,
@@ -87,8 +86,8 @@ class ActEntity implements Entity<int> {
 
   Act toDomain() => Act.by(
         memId!,
-        startWhen: period?.start,
-        endWhen: period?.end,
+        startWhen: start,
+        endWhen: end,
         pausedAt: pausedAt,
       );
 }
