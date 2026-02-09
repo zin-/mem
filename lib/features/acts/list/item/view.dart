@@ -6,7 +6,7 @@ import 'package:mem/features/acts/act_entity.dart';
 import 'editing_act_dialog.dart';
 
 class ActListItemView extends StatelessWidget {
-  final SavedActEntity _act;
+  final SavedActEntityV1 _act;
 
   // Act一覧の要素に対してMemがあったら名前を表示するという実装は合っているだろうか？
   final String? _memName;

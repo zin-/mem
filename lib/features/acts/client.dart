@@ -16,7 +16,7 @@ class ActsClient {
 
   final NotificationClient _notificationClient;
 
-  Future<ListWithTotalPage<SavedActEntity>> fetch(
+  Future<ListWithTotalPage<SavedActEntityV1>> fetch(
     int? memId,
     int page,
   ) =>
@@ -43,7 +43,7 @@ class ActsClient {
         },
       );
 
-  Future<SavedActEntity> start(
+  Future<SavedActEntityV1> start(
     int memId,
     DateAndTime when,
   ) =>
@@ -61,8 +61,8 @@ class ActsClient {
         },
       );
 
-  Future<SavedActEntity> edit(
-    SavedActEntity savedAct,
+  Future<SavedActEntityV1> edit(
+    SavedActEntityV1 savedAct,
   ) =>
       i(
         () async {
@@ -81,7 +81,7 @@ class ActsClient {
         },
       );
 
-  Future<Iterable<SavedActEntity>> pause(
+  Future<Iterable<SavedActEntityV1>> pause(
     int memId,
     DateAndTime when,
   ) =>
@@ -99,7 +99,7 @@ class ActsClient {
         },
       );
 
-  Future<SavedActEntity> finish(
+  Future<SavedActEntityV1> finish(
     int memId,
     DateAndTime when,
   ) =>
@@ -120,7 +120,7 @@ class ActsClient {
         },
       );
 
-  Future<SavedActEntity?> close(int memId) => v(
+  Future<SavedActEntityV1?> close(int memId) => v(
         () async {
           final closed = await _actService.close(memId);
 
@@ -135,7 +135,7 @@ class ActsClient {
         },
       );
 
-  Future<SavedActEntity> delete(int actId) => i(
+  Future<SavedActEntityV1> delete(int actId) => i(
         () async {
           final deleted = await _actService.delete(actId);
 

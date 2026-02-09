@@ -30,8 +30,8 @@ extension _ActOrderByExt on ActOrderBy {
 // @Deprecated('ActRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
 // lintエラーになるためコメントアウト
 class ActRepository extends DatabaseTupleRepository<
-    ActEntity,
-    SavedActEntity,
+    ActEntityV1,
+    SavedActEntityV1,
     Act,
     int,
     // FIXME Actentityを定義して置き換える
@@ -39,7 +39,7 @@ class ActRepository extends DatabaseTupleRepository<
   ActRepository() : super(databaseDefinition, defTableActs);
 
   @override
-  SavedActEntity pack(Map<String, dynamic> map) => SavedActEntity(map);
+  SavedActEntityV1 pack(Map<String, dynamic> map) => SavedActEntityV1(map);
 
   @override
   Future<int> count({
@@ -69,7 +69,7 @@ class ActRepository extends DatabaseTupleRepository<
       );
 
   @override
-  Future<List<SavedActEntity>> ship({
+  Future<List<SavedActEntityV1>> ship({
     int? memId,
     Iterable<int>? memIdsIn,
     DateAndTimePeriod? period,
@@ -124,7 +124,7 @@ class ActRepository extends DatabaseTupleRepository<
       );
 
   @override
-  Future<List<SavedActEntity>> waste({int? id, Condition? condition}) => v(
+  Future<List<SavedActEntityV1>> waste({int? id, Condition? condition}) => v(
         () => super.waste(
           condition: And(
             [

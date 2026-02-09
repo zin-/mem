@@ -16,15 +16,15 @@ void main() {
 
       final savedMem = Mem(memId, "constructor", null, null);
       final acts = [
-        SavedActEntity(
-            ActEntity(Act.by(memId, startWhen: DateAndTime.now())).toMap
+        SavedActEntityV1(
+            ActEntityV1(Act.by(memId, startWhen: DateAndTime.now())).toMap
               ..addAll({
                 defPkId.name: 1,
                 defColCreatedAt.name: zeroDate,
                 defColUpdatedAt.name: oneDate
               })),
-        SavedActEntity(
-          ActEntity(Act.by(memId, startWhen: DateAndTime.now())).toMap
+        SavedActEntityV1(
+          ActEntityV1(Act.by(memId, startWhen: DateAndTime.now())).toMap
             ..addAll({defPkId.name: 2, defColCreatedAt.name: zeroDate}),
         )
       ];
@@ -40,7 +40,7 @@ void main() {
 
       final savedMem = Mem(memId, "constructor", null, null);
       final acts = [
-        SavedActEntity(ActEntity(Act.by(memId,
+        SavedActEntityV1(ActEntityV1(Act.by(memId,
                 startWhen: DateAndTime(0), endWhen: DateAndTime.now()))
             .toMap
           ..addAll({
@@ -48,8 +48,8 @@ void main() {
             defColCreatedAt.name: zeroDate,
             defColUpdatedAt.name: oneDate,
           })),
-        SavedActEntity(
-          ActEntity(Act.by(memId, startWhen: DateAndTime.now())).toMap
+        SavedActEntityV1(
+          ActEntityV1(Act.by(memId, startWhen: DateAndTime.now())).toMap
             ..addAll({defPkId.name: 4, defColCreatedAt.name: zeroDate}),
         )
       ];

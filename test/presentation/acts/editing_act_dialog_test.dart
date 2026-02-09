@@ -10,22 +10,22 @@ import 'package:mem/framework/date_and_time/date_and_time_period_view.dart';
 import 'package:mem/framework/date_and_time/date_and_time_text_form_field.dart';
 
 class _FakeActEntities extends ActEntities {
-  final Iterable<SavedActEntity> _state;
+  final Iterable<SavedActEntityV1> _state;
   int editCallCount = 0;
   int removeCallCount = 0;
 
   _FakeActEntities(this._state);
 
   @override
-  Iterable<SavedActEntity> build() => _state;
+  Iterable<SavedActEntityV1> build() => _state;
 
   @override
-  Future<void> edit(SavedActEntity act) async {
+  Future<void> edit(SavedActEntityV1 act) async {
     editCallCount++;
   }
 
   @override
-  Future<Iterable<SavedActEntity>> removeAsync(Iterable<int> ids) async {
+  Future<Iterable<SavedActEntityV1>> removeAsync(Iterable<int> ids) async {
     removeCallCount++;
     return _state.where((e) => !ids.contains(e.id));
   }
@@ -35,7 +35,7 @@ void main() {
   group('EditingActDialog test', () {
     group('show', () {
       testWidgets('dialog.', (tester) async {
-        final targetActEntity = SavedActEntity({
+        final targetActEntity = SavedActEntityV1({
           defPkId.name: 1,
           defFkActsMemId.name: 1,
           defColActsStart.name: DateTime.now(),
@@ -116,7 +116,7 @@ void main() {
 
     group('action', () {
       testWidgets('change period.', (tester) async {
-        final targetActEntity = SavedActEntity({
+        final targetActEntity = SavedActEntityV1({
           defPkId.name: 1,
           defFkActsMemId.name: 1,
           defColActsStart.name: DateTime.now(),
@@ -164,7 +164,7 @@ void main() {
       });
 
       testWidgets('save.', (tester) async {
-        final targetActEntity = SavedActEntity({
+        final targetActEntity = SavedActEntityV1({
           defPkId.name: 1,
           defFkActsMemId.name: 1,
           defColActsStart.name: DateTime.now(),
@@ -211,7 +211,7 @@ void main() {
       });
 
       testWidgets('remove.', (tester) async {
-        final targetActEntity = SavedActEntity({
+        final targetActEntity = SavedActEntityV1({
           defPkId.name: 1,
           defFkActsMemId.name: 1,
           defColActsStart.name: DateTime.now(),

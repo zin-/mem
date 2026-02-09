@@ -9,12 +9,12 @@ import 'total_act_time_item.dart';
 import 'view.dart';
 
 class ActListItemBuilder {
-  final MapEntry<DateTime, List<SavedActEntity>> _actListWithDatetime;
+  final MapEntry<DateTime, List<SavedActEntityV1>> _actListWithDatetime;
   final List<Mem> _memList;
   final bool _isTimeView;
   final List<SavedTargetEntity> _targetList;
 
-  late final Map<int, List<SavedActEntity>> _actListGroupedByMemId;
+  late final Map<int, List<SavedActEntityV1>> _actListGroupedByMemId;
 
   ActListItemBuilder(
     this._actListWithDatetime,

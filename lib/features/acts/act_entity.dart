@@ -4,8 +4,8 @@ import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
 
-class ActEntity with EntityV1<Act> {
-  ActEntity(Act value) {
+class ActEntityV1 with EntityV1<Act> {
+  ActEntityV1(Act value) {
     this.value = value;
   }
 
@@ -20,11 +20,13 @@ class ActEntity with EntityV1<Act> {
       };
 
   @override
-  ActEntity updatedWith(Act Function(Act v) update) => ActEntity(update(value));
+  ActEntityV1 updatedWith(Act Function(Act v) update) =>
+      ActEntityV1(update(value));
 }
 
-class SavedActEntity extends ActEntity with DatabaseTupleEntityV1<int, Act> {
-  SavedActEntity(Map<String, dynamic> map)
+class SavedActEntityV1 extends ActEntityV1
+    with DatabaseTupleEntityV1<int, Act> {
+  SavedActEntityV1(Map<String, dynamic> map)
       : super(
           Act.by(
             map[defFkActsMemId.name],
@@ -51,6 +53,6 @@ class SavedActEntity extends ActEntity with DatabaseTupleEntityV1<int, Act> {
   }
 
   @override
-  SavedActEntity updatedWith(Act Function(Act v) update) =>
-      SavedActEntity(toMap..addAll(super.updatedWith(update).toMap));
+  SavedActEntityV1 updatedWith(Act Function(Act v) update) =>
+      SavedActEntityV1(toMap..addAll(super.updatedWith(update).toMap));
 }

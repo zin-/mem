@@ -61,7 +61,7 @@ void main() {
               ),
               actListProvider(memId).overrideWith(
                 (ref) => acts
-                    .mapIndexed((index, act) => SavedActEntity({
+                    .mapIndexed((index, act) => SavedActEntityV1({
                           defPkId.name: index + 1,
                           defFkActsMemId.name: act.memId,
                           defColActsStart.name: act.period?.start,

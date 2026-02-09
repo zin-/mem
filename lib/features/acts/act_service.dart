@@ -15,7 +15,7 @@ class ListWithTotalCount<T> {
 class ActService {
   final ActRepository _actRepository;
 
-  Future<Iterable<SavedActEntity>> fetchLatestByMemIds(
+  Future<Iterable<SavedActEntityV1>> fetchLatestByMemIds(
     Iterable<int>? memIdsIn,
   ) =>
       v(
@@ -47,7 +47,7 @@ class ActService {
         },
       );
 
-  Future<ListWithTotalCount<SavedActEntity>> fetch(
+  Future<ListWithTotalCount<SavedActEntityV1>> fetch(
     int? memId,
     int offset,
     int limit,
@@ -69,7 +69,7 @@ class ActService {
         },
       );
 
-  Future<SavedActEntity> start(
+  Future<SavedActEntityV1> start(
     int memId,
     DateAndTime when,
   ) =>
@@ -80,7 +80,7 @@ class ActService {
 
           if (latestActEntity == null || latestActEntity.value is FinishedAct) {
             return await _actRepository.receive(
-              ActEntity(Act.by(memId, startWhen: when)),
+              ActEntityV1(Act.by(memId, startWhen: when)),
             );
           } else {
             return await _actRepository.replace(
@@ -96,7 +96,7 @@ class ActService {
         },
       );
 
-  Future<SavedActEntity> finish(
+  Future<SavedActEntityV1> finish(
     int memId,
     DateAndTime when,
   ) =>
@@ -113,7 +113,7 @@ class ActService {
           if (latestActiveActEntity == null ||
               latestActiveActEntity.value is FinishedAct) {
             return await _actRepository.receive(
-              ActEntity(Act.by(memId, endWhen: when)),
+              ActEntityV1(Act.by(memId, endWhen: when)),
             );
           } else {
             return await _actRepository.replace(
@@ -129,7 +129,7 @@ class ActService {
         },
       );
 
-  Future<Iterable<SavedActEntity>> pause(
+  Future<Iterable<SavedActEntityV1>> pause(
     int memId,
     DateAndTime when,
   ) =>
@@ -151,7 +151,7 @@ class ActService {
                 ),
               ),
             await _actRepository.receive(
-              ActEntity(Act.by(memId, pausedAt: when)),
+              ActEntityV1(Act.by(memId, pausedAt: when)),
             ),
           ];
         },
@@ -161,7 +161,7 @@ class ActService {
         },
       );
 
-  Future<SavedActEntity?> close(int memId) => i(
+  Future<SavedActEntityV1?> close(int memId) => i(
         () async {
           final latestPausedActEntity = await _actRepository
               .ship(
@@ -185,14 +185,14 @@ class ActService {
         },
       );
 
-  Future<SavedActEntity> edit(SavedActEntity savedAct) => i(
+  Future<SavedActEntityV1> edit(SavedActEntityV1 savedAct) => i(
         () async => await _actRepository.replace(savedAct),
         {
           'savedAct': savedAct,
         },
       );
 
-  Future<SavedActEntity> delete(int actId) => i(
+  Future<SavedActEntityV1> delete(int actId) => i(
         () async => await _actRepository.waste(id: actId).then((v) => v.single),
         {
           'actId': actId,
