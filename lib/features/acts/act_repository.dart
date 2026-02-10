@@ -128,6 +128,18 @@ class ActRepository extends DatabaseTupleRepository<ActEntityV1,
         },
       );
 
+  Future<List<ActEntity>> wastePausedAct(int memId) => v(
+        () async => await super.wasteV2(
+          condition: And(
+            [
+              Equals(defFkActsMemId, memId),
+              IsNotNull(defColActsPausedAt.name),
+            ],
+          ),
+        ),
+        {'memId': memId},
+      );
+
   ActRepository._() : super(databaseDefinition, defTableActs);
   factory ActRepository() => Singleton.of(() => ActRepository._());
 }

@@ -163,28 +163,9 @@ class ActService {
         },
       );
 
-  Future<SavedActEntityV1?> close(int memId) => i(
-        () async {
-          final latestPausedActEntity = await _actRepository
-              .ship(
-                memId: memId,
-                paused: true,
-                actOrderBy: ActOrderBy.descStart,
-                limit: 1,
-              )
-              .then((v) => v.singleOrNull);
-
-          if (latestPausedActEntity == null) {
-            return null;
-          }
-
-          return await _actRepository
-              .waste(id: latestPausedActEntity.id)
-              .then((v) => v.single);
-        },
-        {
-          'memId': memId,
-        },
+  Future<List<ActEntity>> closePausedByMemIdIs(int memId) => i(
+        () async => await _actRepository.wastePausedAct(memId),
+        {'memId': memId},
       );
 
   Future<SavedActEntityV1> edit(SavedActEntityV1 savedAct) => i(

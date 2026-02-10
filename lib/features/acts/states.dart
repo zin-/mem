@@ -86,10 +86,10 @@ class ActEntities extends _$ActEntities
 
   Future<void> closeByMemId(int memId) => v(
         () async {
-          final closed = await ActsClient().close(memId);
+          final closedActEntities = await ActsClient().close(memId);
 
-          if (closed != null) {
-            remove([closed.id]);
+          if (closedActEntities.isNotEmpty) {
+            remove(closedActEntities.map((e) => e.id));
           }
         },
         {'memId': memId},

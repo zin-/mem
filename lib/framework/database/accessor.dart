@@ -1,9 +1,11 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:mem/databases/database.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
+import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/mems/mem.dart' as mem_domain;
 import 'package:mem/features/mems/mem_entity.dart' as mem_entity;
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
@@ -261,8 +263,11 @@ class DriftDatabaseAccessor {
         () async {
           final tableInfo = _getTableInfoV2(domain);
 
-          final query = driftDatabase.delete(tableInfo)
-            ..where((t) => (t as dynamic).id.equals(domain.id));
+          final query = driftDatabase.delete(tableInfo);
+
+          if (domain is Mem || domain is MemEntity) {
+            query.where((t) => (t as dynamic).id.equals(domain.id));
+          }
 
           if (condition != null) {
             final driftExpression = condition.toDriftExpression(tableInfo);
@@ -290,6 +295,10 @@ class DriftDatabaseAccessor {
       case mem_domain.Mem _:
       case mem_entity.MemEntity _:
         return driftDatabase.mems;
+
+      case List<SavedActEntityV1> _:
+        return driftDatabase.acts;
+
       default:
         throw StateError('Unknown domain: ${domain.runtimeType}');
     }

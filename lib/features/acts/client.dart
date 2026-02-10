@@ -120,15 +120,14 @@ class ActsClient {
         },
       );
 
-  Future<SavedActEntityV1?> close(int memId) => v(
+  Future<List<ActEntity>> close(int memId) => v(
         () async {
-          final closed = await _actService.close(memId);
+          final closedActEntities =
+              await _actService.closePausedByMemIdIs(memId);
 
-          if (closed != null) {
-            _notificationClient.cancelActNotification(closed.value.memId);
-          }
+          _notificationClient.cancelActNotification(memId);
 
-          return closed;
+          return closedActEntities;
         },
         {
           "memId": memId,
