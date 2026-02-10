@@ -12,6 +12,7 @@ import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/acts/act_entity.dart';
+import 'package:mem/framework/singleton.dart';
 
 enum ActOrderBy { descStart }
 
@@ -31,8 +32,6 @@ extension _ActOrderByExt on ActOrderBy {
 // lintエラーになるためコメントアウト
 class ActRepository extends DatabaseTupleRepository<ActEntityV1,
     SavedActEntityV1, Act, int, ActEntity> {
-  ActRepository() : super(databaseDefinition, defTableActs);
-
   @override
   SavedActEntityV1 pack(Map<String, dynamic> map) => SavedActEntityV1(map);
 
@@ -128,4 +127,7 @@ class ActRepository extends DatabaseTupleRepository<ActEntityV1,
           'condition': condition,
         },
       );
+  ActRepository._() : super(databaseDefinition, defTableActs);
+
+  factory ActRepository() => Singleton.of(() => ActRepository._());
 }
