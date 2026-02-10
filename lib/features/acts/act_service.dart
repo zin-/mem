@@ -170,13 +170,6 @@ class ActService {
         },
       );
 
-  Future<SavedActEntityV1> delete(int actId) => i(
-        () async => await _actRepository.waste(id: actId).then((v) => v.single),
-        {
-          'actId': actId,
-        },
-      );
-
   ActService._(
     this._actRepository,
     this._actQueryService,
