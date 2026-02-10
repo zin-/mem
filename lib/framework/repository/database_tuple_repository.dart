@@ -229,7 +229,7 @@ abstract class DatabaseTupleRepository<
         {'condition': condition},
       );
 
-  Future<ENTITY> wasteV2({Condition? condition}) => v(
+  Future<List<ENTITY>> wasteV2({Condition? condition}) => v(
         () async {
           final targets = await ship(condition: condition);
 
@@ -251,7 +251,7 @@ abstract class DatabaseTupleRepository<
             condition: condition,
           );
 
-          return packV2(deleted.firstOrNull);
+          return deleted.map<ENTITY>((e) => packV2(e)).toList();
         },
         {'condition': condition},
       );
