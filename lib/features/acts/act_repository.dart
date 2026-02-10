@@ -113,22 +113,6 @@ class ActRepository extends DatabaseTupleRepository<ActEntityV1,
       );
 
   @override
-  Future<List<SavedActEntityV1>> waste({int? id, Condition? condition}) => v(
-        () => super.waste(
-          condition: And(
-            [
-              if (id != null) Equals(defPkId, id),
-              if (condition != null) condition, // coverage:ignore-line
-            ],
-          ),
-        ),
-        {
-          'id': id,
-          'condition': condition,
-        },
-      );
-
-  @override
   Future<List<ActEntity>> wasteV2({int? id, Condition? condition}) => v(
         () => super.wasteV2(
           condition: And(
