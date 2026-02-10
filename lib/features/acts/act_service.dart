@@ -163,11 +163,6 @@ class ActService {
         },
       );
 
-  Future<List<ActEntity>> closePausedByMemIdIs(int memId) => i(
-        () async => await _actRepository.wastePausedAct(memId),
-        {'memId': memId},
-      );
-
   Future<SavedActEntityV1> edit(SavedActEntityV1 savedAct) => i(
         () async => await _actRepository.replace(savedAct),
         {

@@ -1,4 +1,5 @@
 import 'package:mem/features/acts/act_service.dart';
+import 'package:mem/features/acts/act_repository.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/framework/notifications/notification_client.dart';
@@ -13,6 +14,7 @@ class ListWithTotalPage<T> {
 
 class ActsClient {
   final ActService _actService;
+  final ActRepository _actRepository;
 
   final NotificationClient _notificationClient;
 
@@ -122,8 +124,7 @@ class ActsClient {
 
   Future<List<ActEntity>> close(int memId) => v(
         () async {
-          final closedActEntities =
-              await _actService.closePausedByMemIdIs(memId);
+          final closedActEntities = await _actRepository.wastePausedAct(memId);
 
           _notificationClient.cancelActNotification(memId);
 
@@ -149,6 +150,7 @@ class ActsClient {
 
   ActsClient._(
     this._actService,
+    this._actRepository,
     this._notificationClient,
   );
 
@@ -156,6 +158,7 @@ class ActsClient {
 
   factory ActsClient() => _instance ??= ActsClient._(
         ActService(),
+        ActRepository(),
         NotificationClient(),
       );
 
