@@ -127,7 +127,7 @@ class ActRepository extends DatabaseTupleRepository<ActEntityV1,
           'condition': condition,
         },
       );
-  ActRepository._() : super(databaseDefinition, defTableActs);
 
+  ActRepository._() : super(databaseDefinition, defTableActs);
   factory ActRepository() => Singleton.of(() => ActRepository._());
 }
