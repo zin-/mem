@@ -111,10 +111,20 @@ class ActEntity implements Entity<int> {
         tuple[defFkActsMemId.name],
         tuple[defColActsStart.name] == null
             ? null
-            : DateAndTime.from(tuple[defColActsStart.name]),
+            : DateAndTime.from(
+                tuple[defColActsStart.name],
+                timeOfDay: tuple[defColActsStartIsAllDay.name] == true
+                    ? null
+                    : tuple[defColActsStart.name],
+              ),
         tuple[defColActsEnd.name] == null
             ? null
-            : DateAndTime.from(tuple[defColActsEnd.name]),
+            : DateAndTime.from(
+                tuple[defColActsEnd.name],
+                timeOfDay: tuple[defColActsEndIsAllDay.name] == true
+                    ? null
+                    : tuple[defColActsEnd.name],
+              ),
         tuple[defColActsPausedAt.name],
         tuple[defPkId.name],
         tuple[defColCreatedAt.name],
