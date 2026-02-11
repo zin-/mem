@@ -4,6 +4,7 @@ import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/framework/notifications/notification_client.dart';
 import 'package:mem/features/acts/act_entity.dart';
+import 'package:mem/features/acts/act_query_service.dart';
 
 class ListWithTotalPage<T> {
   final List<T> list;
@@ -15,7 +16,7 @@ class ListWithTotalPage<T> {
 class ActsClient {
   final ActService _actService;
   final ActRepository _actRepository;
-
+  final ActQueryService _actQueryService;
   final NotificationClient _notificationClient;
 
   Future<ListWithTotalPage<SavedActEntityV1>> fetch(
@@ -28,14 +29,16 @@ class ActsClient {
           const limit = 50;
           final offset = (page - 1) * limit;
 
-          final actListWithTotalCount = await _actService.fetch(
+          final actListWithTotalCount = await _actQueryService.fetchPaging(
             memId,
             offset,
             limit,
           );
 
           return ListWithTotalPage(
-            actListWithTotalCount.list,
+            actListWithTotalCount.list
+                .map((e) => SavedActEntityV1.fromEntityV2(e))
+                .toList(),
             (actListWithTotalCount.totalCount / limit).ceil(),
           );
         },
@@ -152,6 +155,7 @@ class ActsClient {
   ActsClient._(
     this._actService,
     this._actRepository,
+    this._actQueryService,
     this._notificationClient,
   );
 
@@ -160,6 +164,7 @@ class ActsClient {
   factory ActsClient() => _instance ??= ActsClient._(
         ActService(),
         ActRepository(),
+        ActQueryService(),
         NotificationClient(),
       );
 

@@ -5,7 +5,6 @@ import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
-import 'package:mem/framework/repository/condition/in.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/extra_column.dart';
 import 'package:mem/framework/repository/group_by.dart';
@@ -60,7 +59,6 @@ class ActRepository extends DatabaseTupleRepository<ActEntityV1,
   @override
   Future<List<SavedActEntityV1>> ship({
     int? memId,
-    Iterable<int>? memIdsIn,
     DateAndTimePeriod? period,
     bool? latestByMemIds,
     Condition? condition,
@@ -75,7 +73,6 @@ class ActRepository extends DatabaseTupleRepository<ActEntityV1,
           condition: And(
             [
               if (memId != null) Equals(defFkActsMemId, memId),
-              if (memIdsIn != null) In(defFkActsMemId.name, memIdsIn),
               if (period != null)
                 GraterThanOrEqual(defColActsStart, period.start),
               if (period != null) LessThan(defColActsStart, period.end),
@@ -97,7 +94,6 @@ class ActRepository extends DatabaseTupleRepository<ActEntityV1,
         ),
         {
           'memId': memId,
-          'memIds': memIdsIn,
           'period': period,
           'latestByMemIds': latestByMemIds,
           'condition': condition,

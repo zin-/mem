@@ -17,28 +17,6 @@ class ActService {
   final ActRepository _actRepository;
   final ActQueryService _actQueryService;
 
-  Future<ListWithTotalCount<SavedActEntityV1>> fetch(
-    int? memId,
-    int offset,
-    int limit,
-  ) =>
-      v(
-        () async => ListWithTotalCount(
-          await _actRepository.ship(
-            memId: memId,
-            actOrderBy: ActOrderBy.descStart,
-            offset: offset,
-            limit: limit,
-          ),
-          await _actQueryService.countByMemIdIs(memId),
-        ),
-        {
-          'memId': memId,
-          'offset': offset,
-          'limit': limit,
-        },
-      );
-
   Future<SavedActEntityV1> start(
     int memId,
     DateAndTime when,
