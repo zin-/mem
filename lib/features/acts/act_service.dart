@@ -23,11 +23,11 @@ class ActService {
       v(
         () async {
           final r = [
-            ...await ActRepository().ship(
+            ...await _actRepository.ship(
               memIdsIn: memIdsIn,
               latestByMemIds: true,
             ),
-            ...await ActRepository().ship(
+            ...await _actRepository.ship(
               memIdsIn: memIdsIn,
               paused: true,
             ),
