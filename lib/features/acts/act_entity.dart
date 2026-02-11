@@ -1,3 +1,5 @@
+import 'package:drift/drift.dart';
+import 'package:mem/databases/database.dart' as drift_database;
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/mems/mem.dart';
@@ -72,6 +74,17 @@ class SavedActEntityV1 extends ActEntityV1
           defColArchivedAt.name: entity.archivedAt,
         },
       );
+
+  ActEntity toEntityV2() => ActEntity(
+        value.memId,
+        value.period?.start,
+        value.period?.end,
+        value.pausedAt,
+        id,
+        createdAt,
+        updatedAt,
+        archivedAt,
+      );
 }
 
 class ActEntity implements Entity<int> {
@@ -132,3 +145,13 @@ class ActEntity implements Entity<int> {
         tuple[defColArchivedAt.name],
       );
 }
+
+convertIntoActsUpdateable(ActEntity entity, {DateTime? updatedAt}) =>
+    drift_database.ActsCompanion(
+      start: Value(entity.start),
+      startIsAllDay: Value(entity.start?.isAllDay),
+      end: Value(entity.end),
+      endIsAllDay: Value(entity.end?.isAllDay),
+      pausedAt: Value(entity.pausedAt),
+      updatedAt: Value(updatedAt ?? DateTime.now()),
+    );

@@ -296,6 +296,7 @@ class DriftDatabaseAccessor {
       case mem_entity.MemEntity _:
         return driftDatabase.mems;
 
+      case ActEntity _:
       case List<SavedActEntityV1> _:
         return driftDatabase.acts;
 
@@ -471,6 +472,8 @@ convertIntoDriftUpdateable(dynamic entity, {DateTime? updatedAt}) {
   switch (entity) {
     case mem_entity.MemEntity _:
       return convertIntoMemsUpdateable(entity, updatedAt: updatedAt);
+    case ActEntity _:
+      return convertIntoActsUpdateable(entity, updatedAt: updatedAt);
     default:
       throw StateError('Unknown entity: ${entity.runtimeType}');
   }
