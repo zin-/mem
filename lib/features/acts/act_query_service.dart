@@ -4,6 +4,7 @@ import 'package:mem/features/acts/act_service.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/framework/database/accessor.dart';
+import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/condition/in.dart';
 import 'package:mem/framework/repository/extra_column.dart';
@@ -109,6 +110,29 @@ class ActQueryService {
           'memId': memId,
           'offset': offset,
           'limit': limit,
+        },
+      );
+
+  fetchByMemIdAndPeriod(
+    int memId,
+    DateAndTimePeriod period,
+  ) =>
+      v(
+        () async {
+          return await _driftAccessor.select(
+            defTableActs,
+            condition: And(
+              [
+                Equals(defFkActsMemId, memId),
+                GraterThanOrEqual(defColActsStart, period.start),
+                LessThan(defColActsStart, period.end),
+              ],
+            ),
+          );
+        },
+        {
+          'memId': memId,
+          'period': period,
         },
       );
 
