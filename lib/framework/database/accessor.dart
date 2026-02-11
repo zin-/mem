@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:mem/databases/database.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
+import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/mems/mem.dart' as mem_domain;
 import 'package:mem/features/mems/mem_entity.dart' as mem_entity;
@@ -296,6 +297,7 @@ class DriftDatabaseAccessor {
       case mem_entity.MemEntity _:
         return driftDatabase.mems;
 
+      case ActiveAct _:
       case ActEntity _:
       case List<SavedActEntityV1> _:
         return driftDatabase.acts;
@@ -463,6 +465,8 @@ convertIntoDriftInsertable(dynamic domain) {
   switch (domain) {
     case mem_domain.Mem _:
       return convertIntoMemsInsertable(domain, DateTime.now());
+    case ActiveAct _:
+      return convertIntoActsInsertable(domain, createdAt: DateTime.now());
     default:
       throw StateError('Unknown domain: ${domain.runtimeType}');
   }

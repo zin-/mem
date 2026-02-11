@@ -146,6 +146,16 @@ class ActEntity implements Entity<int> {
       );
 }
 
+convertIntoActsInsertable(ActiveAct entity, {DateTime? createdAt}) =>
+    drift_database.ActsCompanion(
+      memId: Value(entity.memId),
+      start: Value(entity.period?.start),
+      startIsAllDay: Value(entity.period?.start?.isAllDay),
+      end: Value(entity.period?.end),
+      endIsAllDay: Value(entity.period?.end?.isAllDay),
+      pausedAt: Value(entity.pausedAt),
+      createdAt: Value(createdAt ?? DateTime.now()),
+    );
 convertIntoActsUpdateable(ActEntity entity, {DateTime? updatedAt}) =>
     drift_database.ActsCompanion(
       start: Value(entity.start),
