@@ -58,7 +58,7 @@ class ActsClient {
 
           _notificationClient.startActNotifications(memId);
 
-          return startedAct;
+          return SavedActEntityV1.fromEntityV2(startedAct);
         },
         {
           "memId": memId,

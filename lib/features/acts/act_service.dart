@@ -17,7 +17,7 @@ class ActService {
   final ActRepository _actRepository;
   final ActQueryService _actQueryService;
 
-  Future<SavedActEntityV1> start(
+  Future<ActEntity> start(
     int memId,
     DateAndTime when,
   ) =>
@@ -43,21 +43,17 @@ class ActService {
               .then((v) => v.firstOrNull);
 
           if (latestActEntity == null || latestActEntity.value is FinishedAct) {
-            return await _actRepository
-                .receiveV2(
-                  Act.by(memId, startWhen: when),
-                )
-                .then((v) => SavedActEntityV1.fromEntityV2(v));
+            return await _actRepository.receiveV2(
+              Act.by(memId, startWhen: when),
+            );
           } else {
-            return await _actRepository
-                .replaceV2(
-                  latestActEntity
-                      .updatedWith(
-                        (v) => v.start(when),
-                      )
-                      .toEntityV2(),
-                )
-                .then((v) => SavedActEntityV1.fromEntityV2(v));
+            return await _actRepository.replaceV2(
+              latestActEntity
+                  .updatedWith(
+                    (v) => v.start(when),
+                  )
+                  .toEntityV2(),
+            );
           }
         },
         {
