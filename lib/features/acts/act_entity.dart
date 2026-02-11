@@ -106,4 +106,19 @@ class ActEntity implements Entity<int> {
         endWhen: end,
         pausedAt: pausedAt,
       );
+
+  factory ActEntity.fromTuple(dynamic tuple) => ActEntity(
+        tuple[defFkActsMemId.name],
+        tuple[defColActsStart.name] == null
+            ? null
+            : DateAndTime.from(tuple[defColActsStart.name]),
+        tuple[defColActsEnd.name] == null
+            ? null
+            : DateAndTime.from(tuple[defColActsEnd.name]),
+        tuple[defColActsPausedAt.name],
+        tuple[defPkId.name],
+        tuple[defColCreatedAt.name],
+        tuple[defColUpdatedAt.name],
+        tuple[defColArchivedAt.name],
+      );
 }

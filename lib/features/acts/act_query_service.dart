@@ -1,11 +1,9 @@
 import 'package:mem/databases/table_definitions/acts.dart';
-import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_service.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/framework/database/accessor.dart';
-import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/condition/in.dart';
 import 'package:mem/framework/repository/extra_column.dart';
@@ -56,20 +54,7 @@ class ActQueryService {
             )
             .then(
               (v) => v.map((e) {
-                return ActEntity(
-                  e[defFkActsMemId.name],
-                  e[defColActsStart.name] == null
-                      ? null
-                      : DateAndTime.from(e[defColActsStart.name]),
-                  e[defColActsEnd.name] == null
-                      ? null
-                      : DateAndTime.from(e[defColActsEnd.name]),
-                  e[defColActsPausedAt.name],
-                  e[defPkId.name],
-                  e[defColCreatedAt.name],
-                  e[defColUpdatedAt.name],
-                  e[defColArchivedAt.name],
-                );
+                return ActEntity.fromTuple(e);
               }).toList(),
             ),
         {'memIds': memIds},
@@ -90,20 +75,7 @@ class ActQueryService {
             if (act == null) {
               return null;
             } else {
-              return ActEntity(
-                act[defFkActsMemId.name],
-                act[defColActsStart.name] == null
-                    ? null
-                    : DateAndTime.from(act[defColActsStart.name]),
-                act[defColActsEnd.name] == null
-                    ? null
-                    : DateAndTime.from(act[defColActsEnd.name]),
-                act[defColActsPausedAt.name],
-                act[defPkId.name],
-                act[defColCreatedAt.name],
-                act[defColUpdatedAt.name],
-                act[defColArchivedAt.name],
-              );
+              return ActEntity.fromTuple(act);
             }
           });
         },
@@ -128,20 +100,7 @@ class ActQueryService {
                   limit: limit,
                 )
                 .then((v) => v.map((e) {
-                      return ActEntity(
-                        e[defFkActsMemId.name],
-                        e[defColActsStart.name] == null
-                            ? null
-                            : DateAndTime.from(e[defColActsStart.name]),
-                        e[defColActsEnd.name] == null
-                            ? null
-                            : DateAndTime.from(e[defColActsEnd.name]),
-                        e[defColActsPausedAt.name],
-                        e[defPkId.name],
-                        e[defColCreatedAt.name],
-                        e[defColUpdatedAt.name],
-                        e[defColArchivedAt.name],
-                      );
+                      return ActEntity.fromTuple(e);
                     }).toList()),
             await countByMemIdIs(memId),
           );
