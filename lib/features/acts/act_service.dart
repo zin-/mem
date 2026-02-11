@@ -76,7 +76,7 @@ class ActService {
               await _actQueryService.fetchLatestByMemIds(memId);
 
           if (latestActiveActEntity == null ||
-              latestActiveActEntity is FinishedAct) {
+              latestActiveActEntity.end != null) {
             return await _actRepository.receive(
               ActEntityV1(Act.by(memId, endWhen: when)),
             );
