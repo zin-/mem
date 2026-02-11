@@ -1,3 +1,4 @@
+import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
@@ -56,6 +57,21 @@ class SavedActEntityV1 extends ActEntityV1
   @override
   SavedActEntityV1 updatedWith(Act Function(Act v) update) =>
       SavedActEntityV1(toMap..addAll(super.updatedWith(update).toMap));
+
+  factory SavedActEntityV1.fromEntityV2(ActEntity entity) => SavedActEntityV1(
+        {
+          defFkActsMemId.name: entity.memId,
+          defColActsStart.name: entity.start,
+          defColActsStartIsAllDay.name: entity.start?.isAllDay,
+          defColActsEnd.name: entity.end,
+          defColActsEndIsAllDay.name: entity.end?.isAllDay,
+          defColActsPausedAt.name: entity.pausedAt,
+          defPkId.name: entity.id,
+          defColCreatedAt.name: entity.createdAt,
+          defColUpdatedAt.name: entity.updatedAt,
+          defColArchivedAt.name: entity.archivedAt,
+        },
+      );
 }
 
 class ActEntity implements Entity<int> {

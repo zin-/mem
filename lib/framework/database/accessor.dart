@@ -81,7 +81,7 @@ class DriftDatabaseAccessor {
         {'tableDefinition': tableDefinition, 'condition': condition},
       );
 
-  select(
+  Future<List<dynamic>> select(
     TableDefinition tableDefinition, {
     Condition? condition,
     GroupBy? groupBy,

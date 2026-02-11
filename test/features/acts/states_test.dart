@@ -27,7 +27,6 @@ class _FakeActEntities extends ActEntities {
   final List<SavedActEntityV1> _upserted = [];
   final List<int> _removed = [];
   int _fetchCallCount = 0;
-  int _fetchLatestByMemIdsCallCount = 0;
   int _startActbyCallCount = 0;
   int _pauseByMemIdCallCount = 0;
   int _closeByMemIdCallCount = 0;
@@ -44,15 +43,6 @@ class _FakeActEntities extends ActEntities {
   @override
   Future<Iterable<SavedActEntityV1>> fetch(int memId, Period period) async {
     _fetchCallCount++;
-    await Future.microtask(() => upsert(_initialState));
-    return _initialState;
-  }
-
-  @override
-  Future<Iterable<SavedActEntityV1>> fetchLatestByMemIds(
-    Iterable<int> memIds,
-  ) async {
-    _fetchLatestByMemIdsCallCount++;
     await Future.microtask(() => upsert(_initialState));
     return _initialState;
   }
@@ -125,7 +115,6 @@ class _FakeActEntities extends ActEntities {
   List<SavedActEntityV1> get upserted => _upserted;
   List<int> get removed => _removed;
   int get fetchCallCount => _fetchCallCount;
-  int get fetchLatestByMemIdsCallCount => _fetchLatestByMemIdsCallCount;
   int get startActbyCallCount => _startActbyCallCount;
   int get pauseByMemIdCallCount => _pauseByMemIdCallCount;
   int get closeByMemIdCallCount => _closeByMemIdCallCount;
@@ -170,20 +159,6 @@ void main() {
       final notifier = container.read(actEntitiesProvider.notifier);
 
       final result = await notifier.fetch(1, Period.aDay);
-      expect(result, isA<Iterable<SavedActEntityV1>>());
-    });
-
-    test('fetchLatestByMemIds calls service and upserts results', () async {
-      final container = ProviderContainer(
-        overrides: [
-          actEntitiesProvider.overrideWith(() => _FakeActEntities()),
-        ],
-      );
-      addTearDown(container.dispose);
-
-      final notifier = container.read(actEntitiesProvider.notifier);
-
-      final result = await notifier.fetchLatestByMemIds([1, 2]);
       expect(result, isA<Iterable<SavedActEntityV1>>());
     });
 

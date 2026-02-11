@@ -17,38 +17,6 @@ class ActService {
   final ActRepository _actRepository;
   final ActQueryService _actQueryService;
 
-  Future<Iterable<SavedActEntityV1>> fetchLatestByMemIds(
-    Iterable<int>? memIdsIn,
-  ) =>
-      v(
-        () async {
-          final r = [
-            ...await _actRepository.ship(
-              memIdsIn: memIdsIn,
-              latestByMemIds: true,
-            ),
-            ...await _actRepository.ship(
-              memIdsIn: memIdsIn,
-              paused: true,
-            ),
-          ]
-              .groupListsBy(
-                (element) => element.value.memId,
-              )
-              .values
-              .map(
-                (e) => e.sorted(
-                  (a, b) => (b.value.period?.start ?? b.createdAt)
-                      .compareTo(a.value.period?.start ?? a.createdAt),
-                )[0],
-              );
-          return r;
-        },
-        {
-          'memIdsIn': memIdsIn,
-        },
-      );
-
   Future<ListWithTotalCount<SavedActEntityV1>> fetch(
     int? memId,
     int offset,
@@ -77,8 +45,24 @@ class ActService {
   ) =>
       i(
         () async {
-          final latestActEntity =
-              await fetchLatestByMemIds([memId]).then((v) => v.firstOrNull);
+          final latestActEntity = await _actQueryService
+              .fetchLatestAndPausedByMemIds([memId])
+              .then(
+                (v) => v
+                    .groupListsBy(
+                      (element) => element.memId,
+                    )
+                    .values
+                    .map(
+                      (e) => e.sorted(
+                        (a, b) => (b.start ?? b.createdAt)
+                            .compareTo(a.start ?? a.createdAt),
+                      )[0],
+                    )
+                    .map((e) => SavedActEntityV1.fromEntityV2(e))
+                    .toList(),
+              )
+              .then((v) => v.firstOrNull);
 
           if (latestActEntity == null || latestActEntity.value is FinishedAct) {
             return await _actRepository.receive(
