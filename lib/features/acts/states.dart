@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/acts/act.dart';
-import 'package:mem/features/acts/act_repository.dart';
+import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/acts/client.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/settings/preference/keys.dart';
@@ -18,22 +18,28 @@ part 'states.g.dart';
 @riverpod
 class ActEntities extends _$ActEntities
     with EntitiesStateMixinV1<SavedActEntityV1, int> {
+  final ActQueryService _actQueryService = ActQueryService();
+
   @override
   Iterable<SavedActEntityV1> build() => [];
 
   Future<Iterable<SavedActEntityV1>> fetch(int memId, Period period) => v(
         () async {
-          final acts = await ActRepository().ship(
-            memId: memId,
-            period: period.toPeriod(
-              DateAndTime.now(),
-              ref.watch(preferenceProvider(startOfDayKey)),
-            ),
-          );
+          final actEntities = await _actQueryService
+              .fetchByMemIdAndPeriod(
+                memId,
+                period.toPeriod(
+                  DateAndTime.now(),
+                  ref.watch(preferenceProvider(startOfDayKey)),
+                )!,
+              )
+              .then(
+                (v) => v.map((e) => SavedActEntityV1.fromEntityV2(e)).toList(),
+              );
 
-          upsert(acts);
+          upsert(actEntities);
 
-          return acts;
+          return actEntities;
         },
         {
           'memId': memId,

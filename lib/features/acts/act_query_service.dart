@@ -113,22 +113,28 @@ class ActQueryService {
         },
       );
 
-  fetchByMemIdAndPeriod(
+  Future<List<ActEntity>> fetchByMemIdAndPeriod(
     int memId,
     DateAndTimePeriod period,
   ) =>
       v(
         () async {
-          return await _driftAccessor.select(
-            defTableActs,
-            condition: And(
-              [
-                Equals(defFkActsMemId, memId),
-                GraterThanOrEqual(defColActsStart, period.start),
-                LessThan(defColActsStart, period.end),
-              ],
-            ),
-          );
+          return await _driftAccessor
+              .select(
+                defTableActs,
+                condition: And(
+                  [
+                    Equals(defFkActsMemId, memId),
+                    GraterThanOrEqual(defColActsStart, period.start),
+                    LessThan(defColActsStart, period.end),
+                  ],
+                ),
+              )
+              .then(
+                (v) => v.map((e) {
+                  return ActEntity.fromTuple(e);
+                }).toList(),
+              );
         },
         {
           'memId': memId,
