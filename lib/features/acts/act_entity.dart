@@ -146,7 +146,7 @@ class ActEntity implements Entity<int> {
       );
 }
 
-convertIntoActsInsertable(ActiveAct entity, {DateTime? createdAt}) =>
+convertIntoActsInsertable(Act entity, {DateTime? createdAt}) =>
     drift_database.ActsCompanion(
       memId: Value(entity.memId),
       start: Value(entity.period?.start),

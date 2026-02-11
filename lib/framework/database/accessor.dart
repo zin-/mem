@@ -298,6 +298,8 @@ class DriftDatabaseAccessor {
         return driftDatabase.mems;
 
       case ActiveAct _:
+      case FinishedAct _:
+      case PausedAct _:
       case ActEntity _:
       case List<SavedActEntityV1> _:
         return driftDatabase.acts;
@@ -466,6 +468,8 @@ convertIntoDriftInsertable(dynamic domain) {
     case mem_domain.Mem _:
       return convertIntoMemsInsertable(domain, DateTime.now());
     case ActiveAct _:
+    case FinishedAct _:
+    case PausedAct _:
       return convertIntoActsInsertable(domain, createdAt: DateTime.now());
     default:
       throw StateError('Unknown domain: ${domain.runtimeType}');

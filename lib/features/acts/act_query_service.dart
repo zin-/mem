@@ -62,8 +62,8 @@ class ActQueryService {
       );
 
   Future<ActEntity?> fetchLatestByMemIds(int memId) => v(
-        () {
-          return _driftAccessor
+        () async {
+          return await _driftAccessor
               .select(
             defTableActs,
             condition: Equals(defFkActsMemId, memId),
