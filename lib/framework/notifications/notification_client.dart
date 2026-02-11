@@ -1,7 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mem/features/acts/act_query_service.dart';
-import 'package:mem/features/acts/act_repository.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/settings/constants.dart';
 import 'package:mem/l10n/l10n.dart';
@@ -94,11 +93,9 @@ class NotificationClient {
             }
 
             if (notificationType == NotificationType.startMem) {
-              final latestAct = await ActRepository()
-                  .ship(memId: memId, latestByMemIds: true)
-                  .then(
-                    (v) => v.singleOrNull?.value,
-                  );
+              final latestAct = await _actQueryService
+                  .fetchLatestByMemIds(memId)
+                  .then((v) => v?.toDomain());
               if (latestAct != null && latestAct.isActive) {
                 return;
               }
@@ -146,14 +143,9 @@ class NotificationClient {
             cancelMemNotifications(mem.id!);
             return null;
           } else {
-            final latestAct = await ActRepository()
-                .ship(
-                  memId: mem.id,
-                  latestByMemIds: true,
-                )
-                .then(
-                  (v) => v.singleOrNull?.value,
-                );
+            final latestAct = await _actQueryService
+                .fetchLatestByMemIds(mem.id!)
+                .then((v) => v?.toDomain());
             final startOfDay =
                 (await _preferenceClientRepository.shipByKey(startOfDayKey))
                         .value ??
@@ -329,11 +321,9 @@ class NotificationClient {
               savedMemNotifications.singleWhereOrNull(
             (e) => e.value.isEnabled() && e.value.isRepeatByNDay(),
           );
-          final lastActTime = await ActRepository()
-              .ship(memId: memId, latestByMemIds: true)
-              .then((v) =>
-                  v.singleOrNull?.value.period?.end ??
-                  v.singleOrNull?.value.period?.start!);
+          final lastActTime = await _actQueryService
+              .fetchLatestByMemIds(memId)
+              .then((v) => v?.end ?? v?.start!);
 
           if (lastActTime != null) {
             if (Duration(
