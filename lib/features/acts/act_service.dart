@@ -66,22 +66,17 @@ class ActService {
   ) =>
       i(
         () async {
-          final latestActiveActEntity = await _actRepository
-              .ship(
-                memId: memId,
-                actOrderBy: ActOrderBy.descStart,
-                limit: 1,
-              )
-              .then((v) => v.singleOrNull);
+          final latestActiveActEntity =
+              await _actQueryService.fetchLatestByMemIds(memId);
 
           if (latestActiveActEntity == null ||
-              latestActiveActEntity.value is FinishedAct) {
+              latestActiveActEntity is FinishedAct) {
             return await _actRepository.receive(
               ActEntityV1(Act.by(memId, endWhen: when)),
             );
           } else {
             return await _actRepository.replace(
-              latestActiveActEntity.updatedWith(
+              SavedActEntityV1.fromEntityV2(latestActiveActEntity).updatedWith(
                 (v) => v.finish(when),
               ),
             );
@@ -99,18 +94,14 @@ class ActService {
   ) =>
       i(
         () async {
-          final latestActiveActEntity = await _actRepository
-              .ship(
-                memId: memId,
-                actOrderBy: ActOrderBy.descStart,
-                limit: 1,
-              )
-              .then((v) => v.singleOrNull);
+          final latestActiveActEntity =
+              await _actQueryService.fetchLatestByMemIds(memId);
 
           return [
             if (latestActiveActEntity != null)
               await _actRepository.replace(
-                latestActiveActEntity.updatedWith(
+                SavedActEntityV1.fromEntityV2(latestActiveActEntity)
+                    .updatedWith(
                   (v) => v.finish(when),
                 ),
               ),

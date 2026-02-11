@@ -75,6 +75,41 @@ class ActQueryService {
         {'memIds': memIds},
       );
 
+  Future<ActEntity?> fetchLatestByMemIds(int memId) => v(
+        () {
+          return _driftAccessor
+              .select(
+            defTableActs,
+            condition: Equals(defFkActsMemId, memId),
+            orderBy: [Descending(defColActsStart)],
+            limit: 1,
+          )
+              .then((v) {
+            final act = v.singleOrNull;
+
+            if (act == null) {
+              return null;
+            } else {
+              return ActEntity(
+                act[defFkActsMemId.name],
+                act[defColActsStart.name] == null
+                    ? null
+                    : DateAndTime.from(act[defColActsStart.name]),
+                act[defColActsEnd.name] == null
+                    ? null
+                    : DateAndTime.from(act[defColActsEnd.name]),
+                act[defColActsPausedAt.name],
+                act[defPkId.name],
+                act[defColCreatedAt.name],
+                act[defColUpdatedAt.name],
+                act[defColArchivedAt.name],
+              );
+            }
+          });
+        },
+        {'memId': memId},
+      );
+
   Future<ListWithTotalCount<ActEntity>> fetchPaging(
     int? memId,
     int offset,
