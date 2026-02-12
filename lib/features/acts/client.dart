@@ -71,15 +71,15 @@ class ActsClient {
   ) =>
       i(
         () async {
-          final replaced = await _actService.edit(savedAct);
+          final replaced = await _actService.edit(savedAct.toEntityV2());
 
-          if (replaced.value.isActive) {
-            _notificationClient.startActNotifications(replaced.value.memId);
+          if (replaced.toDomain().isActive) {
+            _notificationClient.startActNotifications(replaced.memId!);
           } else {
-            _notificationClient.cancelActNotification(replaced.value.memId);
+            _notificationClient.cancelActNotification(replaced.memId!);
           }
 
-          return replaced;
+          return SavedActEntityV1.fromEntityV2(replaced);
         },
         {
           "savedAct": savedAct,
@@ -96,7 +96,9 @@ class ActsClient {
 
           await _notificationClient.pauseActNotification(memId);
 
-          return updatedList;
+          return updatedList
+              .map((e) => SavedActEntityV1.fromEntityV2(e))
+              .toList();
         },
         {
           "memId": memId,
@@ -112,12 +114,12 @@ class ActsClient {
         () async {
           final finished = await _actService.finish(memId, when);
 
-          await _notificationClient.cancelActNotification(finished.value.memId);
+          await _notificationClient.cancelActNotification(memId);
           await _notificationClient.setNotificationAfterInactivity();
 
           // ISSUE #226
 
-          return finished;
+          return SavedActEntityV1.fromEntityV2(finished);
         },
         {
           "memId": memId,

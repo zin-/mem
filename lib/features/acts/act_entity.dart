@@ -144,6 +144,17 @@ class ActEntity implements Entity<int> {
         tuple[defColUpdatedAt.name],
         tuple[defColArchivedAt.name],
       );
+
+  ActEntity updatedWith(Act act) => ActEntity(
+        memId,
+        act.period?.start,
+        act.period?.end,
+        act.pausedAt,
+        id,
+        createdAt,
+        updatedAt,
+        archivedAt,
+      );
 }
 
 convertIntoActsInsertable(Act entity, {DateTime? createdAt}) =>
