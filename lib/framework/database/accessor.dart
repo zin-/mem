@@ -304,6 +304,11 @@ class DriftDatabaseAccessor {
       case List<SavedActEntityV1> _:
         return driftDatabase.acts;
 
+      case TableDefinition _:
+        return driftDatabase.allTables.firstWhere(
+          (e) => e.actualTableName == domain.name,
+        );
+
       default:
         throw StateError('Unknown domain: ${domain.runtimeType}');
     }
