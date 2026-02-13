@@ -8,7 +8,7 @@ class Dummy {
 }
 
 class DummyEntity with EntityV1<Dummy> {
-  DummyEntity(Dummy value) {
+  DummyEntity() {
     throw UnimplementedError();
   }
 
@@ -22,7 +22,7 @@ class DummyEntity with EntityV1<Dummy> {
 
 class SavedDummyEntity extends DummyEntity
     with DatabaseTupleEntityV1<int, Dummy> {
-  SavedDummyEntity(Map<String, dynamic> map) : super(Dummy()) {
+  SavedDummyEntity() : super() {
     throw UnimplementedError();
   }
 
