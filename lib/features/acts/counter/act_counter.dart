@@ -25,7 +25,7 @@ class ActCounter implements HomeWidget {
 
   ActCounter.from(
     Mem mem,
-    Iterable<SavedActEntity> savedActs,
+    Iterable<ActEntity> savedActs,
   )   : memId = mem.id!,
         name = mem.name,
         actCount = savedActs.length,
@@ -35,7 +35,7 @@ class ActCounter implements HomeWidget {
                       .compareTo(b.updatedAt ?? b.createdAt),
                 )
                 .lastOrNull
-                ?.value
+                ?.toDomain()
                 .period
                 ?.end ??
             savedActs
@@ -44,7 +44,7 @@ class ActCounter implements HomeWidget {
                       .compareTo(b.updatedAt ?? b.createdAt),
                 )
                 .lastOrNull
-                ?.value
+                ?.toDomain()
                 .period
                 ?.start;
 

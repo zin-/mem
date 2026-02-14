@@ -67,7 +67,7 @@ class _FakeActEntities extends ActEntities {
   int? lastCloseByMemId;
 
   @override
-  Iterable<SavedActEntity> build() => [];
+  Iterable<SavedActEntityV1> build() => [];
 
   @override
   Future<void> startActby(int memId) async {

@@ -2,7 +2,7 @@ import 'package:mem/features/acts/counter/act_counter_entity.dart';
 import 'package:mem/features/acts/client.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/features/acts/act_repository.dart';
+import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 
 import 'act_counter.dart';
@@ -11,7 +11,7 @@ import 'act_counter_repository.dart';
 class ActCounterClient {
   final ActsClient _actsClient;
   final MemRepository _memRepository;
-  final ActRepository _actRepository;
+  final ActQueryService _actQueryService;
   final ActCounterRepository _actCounterRepository;
 
   Future<void> createNew(int memId) => v(
@@ -21,9 +21,9 @@ class ActCounterClient {
               (await _memRepository
                   .ship(id: memId)
                   .then((v) => v.singleOrNull?.value))!,
-              await _actRepository.ship(
-                memId: memId,
-                period: ActCounter.period(DateAndTime.now()),
+              await _actQueryService.fetchByMemIdAndPeriod(
+                memId,
+                ActCounter.period(DateAndTime.now()),
               ),
             ),
           );
@@ -49,9 +49,9 @@ class ActCounterClient {
               (await _memRepository
                   .ship(id: memId)
                   .then((v) => v.singleOrNull?.value))!,
-              await _actRepository.ship(
-                memId: memId,
-                period: ActCounter.period(when),
+              await _actQueryService.fetchByMemIdAndPeriod(
+                memId,
+                ActCounter.period(when),
               ),
             ),
           );
@@ -65,7 +65,7 @@ class ActCounterClient {
   ActCounterClient._(
     this._actsClient,
     this._memRepository,
-    this._actRepository,
+    this._actQueryService,
     this._actCounterRepository,
   );
 
@@ -74,7 +74,7 @@ class ActCounterClient {
   factory ActCounterClient() => _instance ??= ActCounterClient._(
         ActsClient(),
         MemRepository(),
-        ActRepository(),
+        ActQueryService(),
         ActCounterRepository(),
       );
 

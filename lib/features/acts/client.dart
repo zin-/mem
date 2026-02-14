@@ -1,8 +1,10 @@
 import 'package:mem/features/acts/act_service.dart';
+import 'package:mem/features/acts/act_repository.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/framework/notifications/notification_client.dart';
 import 'package:mem/features/acts/act_entity.dart';
+import 'package:mem/features/acts/act_query_service.dart';
 
 class ListWithTotalPage<T> {
   final List<T> list;
@@ -13,10 +15,11 @@ class ListWithTotalPage<T> {
 
 class ActsClient {
   final ActService _actService;
-
+  final ActRepository _actRepository;
+  final ActQueryService _actQueryService;
   final NotificationClient _notificationClient;
 
-  Future<ListWithTotalPage<SavedActEntity>> fetch(
+  Future<ListWithTotalPage<SavedActEntityV1>> fetch(
     int? memId,
     int page,
   ) =>
@@ -26,14 +29,16 @@ class ActsClient {
           const limit = 50;
           final offset = (page - 1) * limit;
 
-          final actListWithTotalCount = await _actService.fetch(
+          final actListWithTotalCount = await _actQueryService.fetchPaging(
             memId,
             offset,
             limit,
           );
 
           return ListWithTotalPage(
-            actListWithTotalCount.list,
+            actListWithTotalCount.list
+                .map((e) => SavedActEntityV1.fromEntityV2(e))
+                .toList(),
             (actListWithTotalCount.totalCount / limit).ceil(),
           );
         },
@@ -43,7 +48,7 @@ class ActsClient {
         },
       );
 
-  Future<SavedActEntity> start(
+  Future<SavedActEntityV1> start(
     int memId,
     DateAndTime when,
   ) =>
@@ -53,7 +58,7 @@ class ActsClient {
 
           _notificationClient.startActNotifications(memId);
 
-          return startedAct;
+          return SavedActEntityV1.fromEntityV2(startedAct);
         },
         {
           "memId": memId,
@@ -61,27 +66,27 @@ class ActsClient {
         },
       );
 
-  Future<SavedActEntity> edit(
-    SavedActEntity savedAct,
+  Future<SavedActEntityV1> edit(
+    SavedActEntityV1 savedAct,
   ) =>
       i(
         () async {
-          final replaced = await _actService.edit(savedAct);
+          final replaced = await _actService.edit(savedAct.toEntityV2());
 
-          if (replaced.value.isActive) {
-            _notificationClient.startActNotifications(replaced.value.memId);
+          if (replaced.toDomain().isActive) {
+            _notificationClient.startActNotifications(replaced.memId!);
           } else {
-            _notificationClient.cancelActNotification(replaced.value.memId);
+            _notificationClient.cancelActNotification(replaced.memId!);
           }
 
-          return replaced;
+          return SavedActEntityV1.fromEntityV2(replaced);
         },
         {
           "savedAct": savedAct,
         },
       );
 
-  Future<Iterable<SavedActEntity>> pause(
+  Future<Iterable<SavedActEntityV1>> pause(
     int memId,
     DateAndTime when,
   ) =>
@@ -91,7 +96,9 @@ class ActsClient {
 
           await _notificationClient.pauseActNotification(memId);
 
-          return updatedList;
+          return updatedList
+              .map((e) => SavedActEntityV1.fromEntityV2(e))
+              .toList();
         },
         {
           "memId": memId,
@@ -99,7 +106,7 @@ class ActsClient {
         },
       );
 
-  Future<SavedActEntity> finish(
+  Future<SavedActEntityV1> finish(
     int memId,
     DateAndTime when,
   ) =>
@@ -107,12 +114,12 @@ class ActsClient {
         () async {
           final finished = await _actService.finish(memId, when);
 
-          await _notificationClient.cancelActNotification(finished.value.memId);
+          await _notificationClient.cancelActNotification(memId);
           await _notificationClient.setNotificationAfterInactivity();
 
           // ISSUE #226
 
-          return finished;
+          return SavedActEntityV1.fromEntityV2(finished);
         },
         {
           "memId": memId,
@@ -120,26 +127,25 @@ class ActsClient {
         },
       );
 
-  Future<SavedActEntity?> close(int memId) => v(
+  Future<List<ActEntity>> close(int memId) => v(
         () async {
-          final closed = await _actService.close(memId);
+          final closedActEntities = await _actRepository.wastePausedAct(memId);
 
-          if (closed != null) {
-            _notificationClient.cancelActNotification(closed.value.memId);
-          }
+          _notificationClient.cancelActNotification(memId);
 
-          return closed;
+          return closedActEntities;
         },
         {
           "memId": memId,
         },
       );
 
-  Future<SavedActEntity> delete(int actId) => i(
+  Future<ActEntity> delete(int actId) => i(
         () async {
-          final deleted = await _actService.delete(actId);
+          final deleted =
+              await _actRepository.wasteV2(id: actId).then((v) => v.single);
 
-          _notificationClient.cancelActNotification(deleted.value.memId);
+          _notificationClient.cancelActNotification(deleted.memId!);
 
           return deleted;
         },
@@ -150,6 +156,8 @@ class ActsClient {
 
   ActsClient._(
     this._actService,
+    this._actRepository,
+    this._actQueryService,
     this._notificationClient,
   );
 
@@ -157,6 +165,8 @@ class ActsClient {
 
   factory ActsClient() => _instance ??= ActsClient._(
         ActService(),
+        ActRepository(),
+        ActQueryService(),
         NotificationClient(),
       );
 

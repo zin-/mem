@@ -229,29 +229,37 @@ abstract class DatabaseTupleRepository<
         {'condition': condition},
       );
 
-  Future<ENTITY> wasteV2({Condition? condition}) => v(
+  Future<List<ENTITY>> wasteV2({Condition? condition}) => v(
         () async {
-          final targets = await ship(condition: condition);
+          // FIXME 別で対処する
+          // final targets = await _driftAccessor
+          //     .select(
+          //       _tableDefinition,
+          //       condition: condition,
+          //     )
+          //     .then((value) => value.map((e) {
+          //           return packV2(e);
+          //         }).toList());
 
-          for (final byChild in childRepositories.entries) {
-            for (final repositoryWithFks in byChild.value.entries) {
-              if (repositoryWithFks.key != null &&
-                  repositoryWithFks.value != null) {
-                for (final fk in repositoryWithFks.value!) {
-                  await repositoryWithFks.key!.waste(
-                    condition: In(fk.name, targets.map((e) => e.id)),
-                  );
-                }
-              }
-            }
-          }
+          // for (final byChild in childRepositories.entries) {
+          //   for (final repositoryWithFks in byChild.value.entries) {
+          //     if (repositoryWithFks.key != null &&
+          //         repositoryWithFks.value != null) {
+          //       for (final fk in repositoryWithFks.value!) {
+          //         await repositoryWithFks.key!.waste(
+          //           condition: In(fk.name, targets.map((e) => e.id)),
+          //         );
+          //       }
+          //     }
+          //   }
+          // }
 
           final deleted = await _driftAccessor.deleteV2(
-            targets,
+            _tableDefinition,
             condition: condition,
           );
 
-          return packV2(deleted.firstOrNull);
+          return deleted.map<ENTITY>((e) => packV2(e)).toList();
         },
         {'condition': condition},
       );

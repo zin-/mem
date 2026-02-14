@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:mem/features/acts/act.dart';
+import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/acts/act_entity.dart';
@@ -14,78 +15,41 @@ class ListWithTotalCount<T> {
 
 class ActService {
   final ActRepository _actRepository;
+  final ActQueryService _actQueryService;
 
-  Future<Iterable<SavedActEntity>> fetchLatestByMemIds(
-    Iterable<int>? memIdsIn,
-  ) =>
-      v(
-        () async {
-          final r = [
-            ...await ActRepository().ship(
-              memIdsIn: memIdsIn,
-              latestByMemIds: true,
-            ),
-            ...await ActRepository().ship(
-              memIdsIn: memIdsIn,
-              paused: true,
-            ),
-          ]
-              .groupListsBy(
-                (element) => element.value.memId,
-              )
-              .values
-              .map(
-                (e) => e.sorted(
-                  (a, b) => (b.value.period?.start ?? b.createdAt)
-                      .compareTo(a.value.period?.start ?? a.createdAt),
-                )[0],
-              );
-          return r;
-        },
-        {
-          'memIdsIn': memIdsIn,
-        },
-      );
-
-  Future<ListWithTotalCount<SavedActEntity>> fetch(
-    int? memId,
-    int offset,
-    int limit,
-  ) =>
-      v(
-        () async => ListWithTotalCount(
-          await _actRepository.ship(
-            memId: memId,
-            actOrderBy: ActOrderBy.descStart,
-            offset: offset,
-            limit: limit,
-          ),
-          await _actRepository.count(memId: memId),
-        ),
-        {
-          'memId': memId,
-          'offset': offset,
-          'limit': limit,
-        },
-      );
-
-  Future<SavedActEntity> start(
+  Future<ActEntity> start(
     int memId,
     DateAndTime when,
   ) =>
       i(
         () async {
-          final latestActEntity =
-              await fetchLatestByMemIds([memId]).then((v) => v.firstOrNull);
+          final latestActEntity = await _actQueryService
+              .fetchLatestAndPausedByMemIds([memId])
+              .then(
+                (v) => v
+                    .groupListsBy(
+                      (element) => element.memId,
+                    )
+                    .values
+                    .map(
+                      (e) => e.sorted(
+                        (a, b) => (b.start ?? b.createdAt)
+                            .compareTo(a.start ?? a.createdAt),
+                      )[0],
+                    )
+                    .toList(),
+              )
+              .then((v) => v.firstOrNull);
 
-          if (latestActEntity == null || latestActEntity.value is FinishedAct) {
-            return await _actRepository.receive(
-              ActEntity(Act.by(memId, startWhen: when)),
+          if (latestActEntity == null ||
+              latestActEntity.toDomain().state == ActState.finished) {
+            return await _actRepository.receiveV2(
+              Act.by(memId, startWhen: when),
             );
           } else {
-            return await _actRepository.replace(
+            return await _actRepository.replaceV2(
               latestActEntity.updatedWith(
-                (v) => v.start(when),
+                latestActEntity.toDomain().start(when),
               ),
             );
           }
@@ -96,29 +60,24 @@ class ActService {
         },
       );
 
-  Future<SavedActEntity> finish(
+  Future<ActEntity> finish(
     int memId,
     DateAndTime when,
   ) =>
       i(
         () async {
-          final latestActiveActEntity = await _actRepository
-              .ship(
-                memId: memId,
-                actOrderBy: ActOrderBy.descStart,
-                limit: 1,
-              )
-              .then((v) => v.singleOrNull);
+          final latestActiveActEntity =
+              await _actQueryService.fetchLatestByMemIds(memId);
 
           if (latestActiveActEntity == null ||
-              latestActiveActEntity.value is FinishedAct) {
-            return await _actRepository.receive(
-              ActEntity(Act.by(memId, endWhen: when)),
+              latestActiveActEntity.end != null) {
+            return await _actRepository.receiveV2(
+              Act.by(memId, endWhen: when),
             );
           } else {
-            return await _actRepository.replace(
+            return await _actRepository.replaceV2(
               latestActiveActEntity.updatedWith(
-                (v) => v.finish(when),
+                latestActiveActEntity.toDomain().finish(when),
               ),
             );
           }
@@ -129,29 +88,24 @@ class ActService {
         },
       );
 
-  Future<Iterable<SavedActEntity>> pause(
+  Future<Iterable<ActEntity>> pause(
     int memId,
     DateAndTime when,
   ) =>
       i(
         () async {
-          final latestActiveActEntity = await _actRepository
-              .ship(
-                memId: memId,
-                actOrderBy: ActOrderBy.descStart,
-                limit: 1,
-              )
-              .then((v) => v.singleOrNull);
+          final latestActiveActEntity =
+              await _actQueryService.fetchLatestByMemIds(memId);
 
           return [
             if (latestActiveActEntity != null)
-              await _actRepository.replace(
+              await _actRepository.replaceV2(
                 latestActiveActEntity.updatedWith(
-                  (v) => v.finish(when),
+                  latestActiveActEntity.toDomain().finish(when),
                 ),
               ),
-            await _actRepository.receive(
-              ActEntity(Act.by(memId, pausedAt: when)),
+            await _actRepository.receiveV2(
+              Act.by(memId, pausedAt: when),
             ),
           ];
         },
@@ -161,46 +115,16 @@ class ActService {
         },
       );
 
-  Future<SavedActEntity?> close(int memId) => i(
-        () async {
-          final latestPausedActEntity = await _actRepository
-              .ship(
-                memId: memId,
-                paused: true,
-                actOrderBy: ActOrderBy.descStart,
-                limit: 1,
-              )
-              .then((v) => v.singleOrNull);
-
-          if (latestPausedActEntity == null) {
-            return null;
-          }
-
-          return await _actRepository
-              .waste(id: latestPausedActEntity.id)
-              .then((v) => v.single);
-        },
-        {
-          'memId': memId,
-        },
-      );
-
-  Future<SavedActEntity> edit(SavedActEntity savedAct) => i(
-        () async => await _actRepository.replace(savedAct),
+  Future<ActEntity> edit(ActEntity savedAct) => i(
+        () async => await _actRepository.replaceV2(savedAct),
         {
           'savedAct': savedAct,
         },
       );
 
-  Future<SavedActEntity> delete(int actId) => i(
-        () async => await _actRepository.waste(id: actId).then((v) => v.single),
-        {
-          'actId': actId,
-        },
-      );
-
   ActService._(
     this._actRepository,
+    this._actQueryService,
   );
 
   static ActService? _instance;
@@ -208,6 +132,7 @@ class ActService {
   factory ActService() => i(
         () => _instance ??= ActService._(
           ActRepository(),
+          ActQueryService(),
         ),
       );
 }

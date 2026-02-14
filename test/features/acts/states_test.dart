@@ -23,11 +23,10 @@ class _FakePreference extends Preference<TimeOfDay> {
 }
 
 class _FakeActEntities extends ActEntities {
-  final Iterable<SavedActEntity> _initialState;
-  final List<SavedActEntity> _upserted = [];
+  final Iterable<SavedActEntityV1> _initialState;
+  final List<SavedActEntityV1> _upserted = [];
   final List<int> _removed = [];
   int _fetchCallCount = 0;
-  int _fetchLatestByMemIdsCallCount = 0;
   int _startActbyCallCount = 0;
   int _pauseByMemIdCallCount = 0;
   int _closeByMemIdCallCount = 0;
@@ -35,24 +34,15 @@ class _FakeActEntities extends ActEntities {
   int _editCallCount = 0;
   int _removeAsyncCallCount = 0;
 
-  _FakeActEntities([Iterable<SavedActEntity>? initialState])
+  _FakeActEntities([Iterable<SavedActEntityV1>? initialState])
       : _initialState = initialState ?? [];
 
   @override
-  Iterable<SavedActEntity> build() => _initialState;
+  Iterable<SavedActEntityV1> build() => _initialState;
 
   @override
-  Future<Iterable<SavedActEntity>> fetch(int memId, Period period) async {
+  Future<Iterable<SavedActEntityV1>> fetch(int memId, Period period) async {
     _fetchCallCount++;
-    await Future.microtask(() => upsert(_initialState));
-    return _initialState;
-  }
-
-  @override
-  Future<Iterable<SavedActEntity>> fetchLatestByMemIds(
-    Iterable<int> memIds,
-  ) async {
-    _fetchLatestByMemIdsCallCount++;
     await Future.microtask(() => upsert(_initialState));
     return _initialState;
   }
@@ -61,7 +51,7 @@ class _FakeActEntities extends ActEntities {
   Future<void> startActby(int memId) async {
     _startActbyCallCount++;
     final now = DateTime.now();
-    final act = SavedActEntity({
+    final act = SavedActEntityV1({
       defPkId.name: 1,
       defFkActsMemId.name: memId,
       defColActsStart.name: now,
@@ -94,7 +84,7 @@ class _FakeActEntities extends ActEntities {
   Future<void> finishActby(int memId) async {
     _finishActbyCallCount++;
     final now = DateTime.now();
-    final act = SavedActEntity({
+    final act = SavedActEntityV1({
       defPkId.name: 1,
       defFkActsMemId.name: memId,
       defColActsStart.name: now,
@@ -110,22 +100,21 @@ class _FakeActEntities extends ActEntities {
   }
 
   @override
-  Future<void> edit(SavedActEntity act) async {
+  Future<void> edit(SavedActEntityV1 act) async {
     _editCallCount++;
     upsert([act]);
   }
 
   @override
-  Future<Iterable<SavedActEntity>> removeAsync(Iterable<int> ids) async {
+  Future<Iterable<SavedActEntityV1>> removeAsync(Iterable<int> ids) async {
     _removeAsyncCallCount++;
     _removed.addAll(ids);
     return remove(ids);
   }
 
-  List<SavedActEntity> get upserted => _upserted;
+  List<SavedActEntityV1> get upserted => _upserted;
   List<int> get removed => _removed;
   int get fetchCallCount => _fetchCallCount;
-  int get fetchLatestByMemIdsCallCount => _fetchLatestByMemIdsCallCount;
   int get startActbyCallCount => _startActbyCallCount;
   int get pauseByMemIdCallCount => _pauseByMemIdCallCount;
   int get closeByMemIdCallCount => _closeByMemIdCallCount;
@@ -170,21 +159,7 @@ void main() {
       final notifier = container.read(actEntitiesProvider.notifier);
 
       final result = await notifier.fetch(1, Period.aDay);
-      expect(result, isA<Iterable<SavedActEntity>>());
-    });
-
-    test('fetchLatestByMemIds calls service and upserts results', () async {
-      final container = ProviderContainer(
-        overrides: [
-          actEntitiesProvider.overrideWith(() => _FakeActEntities()),
-        ],
-      );
-      addTearDown(container.dispose);
-
-      final notifier = container.read(actEntitiesProvider.notifier);
-
-      final result = await notifier.fetchLatestByMemIds([1, 2]);
-      expect(result, isA<Iterable<SavedActEntity>>());
+      expect(result, isA<Iterable<SavedActEntityV1>>());
     });
 
     test('startActby calls client and upserts result', () async {
@@ -212,13 +187,13 @@ void main() {
       final notifier = container.read(actEntitiesProvider.notifier);
 
       await notifier.pauseByMemId(1);
-      expect(
-          container.read(actEntitiesProvider), isA<Iterable<SavedActEntity>>());
+      expect(container.read(actEntitiesProvider),
+          isA<Iterable<SavedActEntityV1>>());
     });
 
     test('closeByMemId calls client and removes result if closed', () async {
       final now = DateTime.now();
-      final act = SavedActEntity({
+      final act = SavedActEntityV1({
         defPkId.name: 1,
         defFkActsMemId.name: 1,
         defColActsStart.name: now,
@@ -243,7 +218,7 @@ void main() {
       try {
         await notifier.closeByMemId(1);
         expect(container.read(actEntitiesProvider),
-            isA<Iterable<SavedActEntity>>());
+            isA<Iterable<SavedActEntityV1>>());
       } catch (e) {
         expect(e, isA<StateError>());
       }
@@ -279,7 +254,7 @@ void main() {
 
     test('edit calls client and upserts result', () async {
       final now = DateTime.now();
-      final act = SavedActEntity({
+      final act = SavedActEntityV1({
         defPkId.name: 1,
         defFkActsMemId.name: 1,
         defColActsStart.name: now,
@@ -302,13 +277,13 @@ void main() {
       final notifier = container.read(actEntitiesProvider.notifier);
 
       await notifier.edit(act);
-      expect(
-          container.read(actEntitiesProvider), isA<Iterable<SavedActEntity>>());
+      expect(container.read(actEntitiesProvider),
+          isA<Iterable<SavedActEntityV1>>());
     });
 
     test('removeAsync calls client and removes results', () async {
       final now = DateTime.now();
-      final act1 = SavedActEntity({
+      final act1 = SavedActEntityV1({
         defPkId.name: 1,
         defFkActsMemId.name: 1,
         defColActsStart.name: now,
@@ -320,7 +295,7 @@ void main() {
         defColUpdatedAt.name: now,
         defColArchivedAt.name: null,
       });
-      final act2 = SavedActEntity({
+      final act2 = SavedActEntityV1({
         defPkId.name: 2,
         defFkActsMemId.name: 1,
         defColActsStart.name: now,
@@ -345,7 +320,7 @@ void main() {
 
       try {
         final result = await notifier.removeAsync([1]);
-        expect(result, isA<Iterable<SavedActEntity>>());
+        expect(result, isA<Iterable<SavedActEntityV1>>());
         expect(result.length, 1);
       } catch (e) {
         expect(e, isA<StateError>());
@@ -365,8 +340,8 @@ void main() {
       addTearDown(container.dispose);
 
       await container.read(loadActListProvider(1, Period.aDay).future);
-      expect(
-          container.read(actEntitiesProvider), isA<Iterable<SavedActEntity>>());
+      expect(container.read(actEntitiesProvider),
+          isA<Iterable<SavedActEntityV1>>());
     });
   });
 
@@ -388,7 +363,7 @@ void main() {
 
     test('returns filtered and sorted acts for memId', () async {
       final now = DateTime.now();
-      final act1 = SavedActEntity({
+      final act1 = SavedActEntityV1({
         defPkId.name: 1,
         defFkActsMemId.name: 1,
         defColActsStart.name: now,
@@ -400,7 +375,7 @@ void main() {
         defColUpdatedAt.name: now,
         defColArchivedAt.name: null,
       });
-      final act2 = SavedActEntity({
+      final act2 = SavedActEntityV1({
         defPkId.name: 2,
         defFkActsMemId.name: 2,
         defColActsStart.name: now,
@@ -431,7 +406,7 @@ void main() {
 
     test('filters out acts without period', () {
       final now = DateTime.now();
-      final act1 = SavedActEntity({
+      final act1 = SavedActEntityV1({
         defPkId.name: 1,
         defFkActsMemId.name: 1,
         defColActsStart.name: now,
@@ -443,7 +418,7 @@ void main() {
         defColUpdatedAt.name: now,
         defColArchivedAt.name: null,
       });
-      final act2 = SavedActEntity({
+      final act2 = SavedActEntityV1({
         defPkId.name: 2,
         defFkActsMemId.name: 1,
         defColActsStart.name: null,
@@ -474,7 +449,7 @@ void main() {
 
     test('sorts acts by period descending', () {
       final now = DateTime.now();
-      final act1 = SavedActEntity({
+      final act1 = SavedActEntityV1({
         defPkId.name: 1,
         defFkActsMemId.name: 1,
         defColActsStart.name: now,
@@ -486,7 +461,7 @@ void main() {
         defColUpdatedAt.name: now,
         defColArchivedAt.name: null,
       });
-      final act2 = SavedActEntity({
+      final act2 = SavedActEntityV1({
         defPkId.name: 2,
         defFkActsMemId.name: 1,
         defColActsStart.name: now.add(const Duration(hours: 2)),
@@ -529,7 +504,7 @@ void main() {
 
         final list = container.read(actListProvider(1));
 
-        expect(list, isA<List<SavedActEntity>>());
+        expect(list, isA<List<SavedActEntityV1>>());
       }, (error, stack) {
         // ActsClient().fetch() が呼ばれるため、エラーが発生する可能性がある
       });
@@ -550,7 +525,7 @@ void main() {
 
         final list = container.read(actListProvider(1));
 
-        expect(list, isA<List<SavedActEntity>>());
+        expect(list, isA<List<SavedActEntityV1>>());
       }, (error, stack) {
         // ActsClient().fetch() が呼ばれるため、エラーが発生する可能性がある
       });
@@ -560,7 +535,7 @@ void main() {
   group('latestActsByMem', () {
     test('returns map of memId to latest act', () {
       final now = DateTime.now();
-      final act1 = SavedActEntity({
+      final act1 = SavedActEntityV1({
         defPkId.name: 1,
         defFkActsMemId.name: 1,
         defColActsStart.name: now,
@@ -572,7 +547,7 @@ void main() {
         defColUpdatedAt.name: now,
         defColArchivedAt.name: null,
       });
-      final act2 = SavedActEntity({
+      final act2 = SavedActEntityV1({
         defPkId.name: 2,
         defFkActsMemId.name: 2,
         defColActsStart.name: now,
@@ -615,7 +590,7 @@ void main() {
 
     test('returns latest act when multiple acts for same memId', () {
       final now = DateTime.now();
-      final act1 = SavedActEntity({
+      final act1 = SavedActEntityV1({
         defPkId.name: 1,
         defFkActsMemId.name: 1,
         defColActsStart.name: now,
@@ -627,7 +602,7 @@ void main() {
         defColUpdatedAt.name: now,
         defColArchivedAt.name: null,
       });
-      final act2 = SavedActEntity({
+      final act2 = SavedActEntityV1({
         defPkId.name: 2,
         defFkActsMemId.name: 1,
         defColActsStart.name: now.add(const Duration(hours: 1)),
@@ -656,7 +631,7 @@ void main() {
 
     test('returns null for memId when no acts exist', () {
       final now = DateTime.now();
-      final act1 = SavedActEntity({
+      final act1 = SavedActEntityV1({
         defPkId.name: 1,
         defFkActsMemId.name: 1,
         defColActsStart.name: now,

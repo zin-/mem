@@ -1,8 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/acts/act.dart';
-import 'package:mem/features/acts/act_repository.dart';
-import 'package:mem/features/acts/act_service.dart';
+import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/acts/client.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/settings/preference/keys.dart';
@@ -18,43 +17,33 @@ part 'states.g.dart';
 
 @riverpod
 class ActEntities extends _$ActEntities
-    with EntitiesStateMixinV1<SavedActEntity, int> {
+    with EntitiesStateMixinV1<SavedActEntityV1, int> {
+  final ActQueryService _actQueryService = ActQueryService();
+
   @override
-  Iterable<SavedActEntity> build() => [];
+  Iterable<SavedActEntityV1> build() => [];
 
-  Future<Iterable<SavedActEntity>> fetch(int memId, Period period) => v(
+  Future<Iterable<SavedActEntityV1>> fetch(int memId, Period period) => v(
         () async {
-          final acts = await ActRepository().ship(
-            memId: memId,
-            period: period.toPeriod(
-              DateAndTime.now(),
-              ref.watch(preferenceProvider(startOfDayKey)),
-            ),
-          );
+          final actEntities = await _actQueryService
+              .fetchByMemIdAndPeriod(
+                memId,
+                period.toPeriod(
+                  DateAndTime.now(),
+                  ref.watch(preferenceProvider(startOfDayKey)),
+                )!,
+              )
+              .then(
+                (v) => v.map((e) => SavedActEntityV1.fromEntityV2(e)).toList(),
+              );
 
-          upsert(acts);
+          upsert(actEntities);
 
-          return acts;
+          return actEntities;
         },
         {
           'memId': memId,
           'period': period,
-        },
-      );
-
-  Future<Iterable<SavedActEntity>> fetchLatestByMemIds(
-    Iterable<int> memIds,
-  ) =>
-      v(
-        () async {
-          final latestActs = await ActService().fetchLatestByMemIds(memIds);
-
-          upsert(latestActs);
-
-          return latestActs;
-        },
-        {
-          'memIds': memIds,
         },
       );
 
@@ -86,10 +75,10 @@ class ActEntities extends _$ActEntities
 
   Future<void> closeByMemId(int memId) => v(
         () async {
-          final closed = await ActsClient().close(memId);
+          final closedActEntities = await ActsClient().close(memId);
 
-          if (closed != null) {
-            remove([closed.id]);
+          if (closedActEntities.isNotEmpty) {
+            remove(closedActEntities.map((e) => e.id));
           }
         },
         {'memId': memId},
@@ -108,7 +97,7 @@ class ActEntities extends _$ActEntities
         },
       );
 
-  Future<void> edit(SavedActEntity act) => v(
+  Future<void> edit(SavedActEntityV1 act) => v(
         () async {
           final editedAct = await ActsClient().edit(act);
 
@@ -119,7 +108,7 @@ class ActEntities extends _$ActEntities
         },
       );
 
-  Future<Iterable<SavedActEntity>> removeAsync(Iterable<int> ids) => v(
+  Future<Iterable<SavedActEntityV1>> removeAsync(Iterable<int> ids) => v(
         () async {
           await Future.wait(ids.map((id) => ActsClient().delete(id)));
 
@@ -141,7 +130,7 @@ Future<void> loadActList(Ref ref, int memId, Period period) => v(
     );
 
 @riverpod
-List<SavedActEntity> actList(Ref ref, int? memId) => v(
+List<SavedActEntityV1> actList(Ref ref, int? memId) => v(
       () {
         if (ref.read(
             // ignore: avoid_manual_providers_as_generated_provider_dependency
@@ -160,7 +149,7 @@ List<SavedActEntity> actList(Ref ref, int? memId) => v(
                 // ignore: avoid_manual_providers_as_generated_provider_dependency
                 currentPage(memId));
 
-            ListWithTotalPage<SavedActEntity>? byPage;
+            ListWithTotalPage<SavedActEntityV1>? byPage;
             if (c != 1) {
               byPage = await ActsClient().fetch(memId, c);
             }
