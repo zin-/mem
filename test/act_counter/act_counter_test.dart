@@ -1,9 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/counter/act_counter.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
-import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/mems/mem.dart';
 
@@ -16,22 +14,15 @@ void main() {
 
       final savedMem = Mem(memId, "constructor", null, null);
       final acts = [
-        SavedActEntityV1(
-            ActEntityV1(Act.by(memId, startWhen: DateAndTime.now())).toMap
-              ..addAll({
-                defPkId.name: 1,
-                defColCreatedAt.name: zeroDate,
-                defColUpdatedAt.name: oneDate
-              })),
-        SavedActEntityV1(
-          ActEntityV1(Act.by(memId, startWhen: DateAndTime.now())).toMap
-            ..addAll({defPkId.name: 2, defColCreatedAt.name: zeroDate}),
-        )
+        ActEntity(
+            memId, DateAndTime.now(), null, null, 1, zeroDate, oneDate, null),
+        ActEntity(
+            memId, DateAndTime.now(), null, null, 2, zeroDate, null, null),
       ];
 
       final actCounter = ActCounter.from(savedMem, acts);
 
-      expect(actCounter.updatedAt, equals(acts[0].value.period?.start));
+      expect(actCounter.updatedAt, equals(acts[0].start));
     });
     test(": updatedAt is last act end.", () {
       const memId = 1;
@@ -40,23 +31,15 @@ void main() {
 
       final savedMem = Mem(memId, "constructor", null, null);
       final acts = [
-        SavedActEntityV1(ActEntityV1(Act.by(memId,
-                startWhen: DateAndTime(0), endWhen: DateAndTime.now()))
-            .toMap
-          ..addAll({
-            defPkId.name: 3,
-            defColCreatedAt.name: zeroDate,
-            defColUpdatedAt.name: oneDate,
-          })),
-        SavedActEntityV1(
-          ActEntityV1(Act.by(memId, startWhen: DateAndTime.now())).toMap
-            ..addAll({defPkId.name: 4, defColCreatedAt.name: zeroDate}),
-        )
+        ActEntity(memId, DateAndTime(0), DateAndTime.now(), null, 3, zeroDate,
+            oneDate, null),
+        ActEntity(
+            memId, DateAndTime.now(), null, null, 4, zeroDate, null, null),
       ];
 
       final actCounter = ActCounter.from(savedMem, acts);
 
-      expect(actCounter.updatedAt, equals(acts[0].value.period?.end));
+      expect(actCounter.updatedAt, equals(acts[0].end));
     });
   });
 

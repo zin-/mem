@@ -1,4 +1,3 @@
-import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/counter/act_counter_entity.dart';
 import 'package:mem/features/acts/client.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
@@ -22,13 +21,10 @@ class ActCounterClient {
               (await _memRepository
                   .ship(id: memId)
                   .then((v) => v.singleOrNull?.value))!,
-              await _actQueryService
-                  .fetchByMemIdAndPeriod(
-                    memId,
-                    ActCounter.period(DateAndTime.now()),
-                  )
-                  .then((v) =>
-                      v.map((e) => SavedActEntityV1.fromEntityV2(e)).toList()),
+              await _actQueryService.fetchByMemIdAndPeriod(
+                memId,
+                ActCounter.period(DateAndTime.now()),
+              ),
             ),
           );
         },
@@ -53,13 +49,10 @@ class ActCounterClient {
               (await _memRepository
                   .ship(id: memId)
                   .then((v) => v.singleOrNull?.value))!,
-              await _actQueryService
-                  .fetchByMemIdAndPeriod(
-                    memId,
-                    ActCounter.period(when),
-                  )
-                  .then((v) =>
-                      v.map((e) => SavedActEntityV1.fromEntityV2(e)).toList()),
+              await _actQueryService.fetchByMemIdAndPeriod(
+                memId,
+                ActCounter.period(when),
+              ),
             ),
           );
         },
