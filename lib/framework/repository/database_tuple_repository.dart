@@ -69,7 +69,10 @@ abstract class DatabaseTupleRepository<
       );
 
   SAVEDV1 pack(Map<String, dynamic> map);
-  ENTITY packV2(dynamic tuple) => throw UnimplementedError();
+  ENTITY packV2(
+          // FIXME 自動生成されるDataClassを使うべきかも
+          dynamic tuple) =>
+      throw UnimplementedError();
   convert(DOMAIN domain) => throw UnimplementedError();
 
   Future<SAVEDV1> receive(

@@ -1,13 +1,11 @@
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
-import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/condition/in.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/features/logger/log_service.dart';
-
 import 'mem_notification.dart';
 import 'mem_notification_entity.dart';
 
@@ -18,11 +16,22 @@ class MemNotificationRepository extends DatabaseTupleRepository<
     SavedMemNotificationEntityV1,
     MemNotification,
     int,
-    // FIXME MemNotificationentityを定義して置き換える
-    MemEntity> {
+    MemNotificationEntity> {
   @override
   SavedMemNotificationEntityV1 pack(Map<String, dynamic> map) =>
       SavedMemNotificationEntityV1(map);
+
+  @override
+  MemNotificationEntity packV2(dynamic tuple) => MemNotificationEntity(
+        tuple.memId,
+        MemNotificationType.fromName(tuple.type),
+        tuple.time,
+        tuple.message,
+        tuple.id,
+        tuple.createdAt,
+        tuple.updatedAt,
+        tuple.archivedAt,
+      );
 
   @override
   Future<List<SavedMemNotificationEntityV1>> ship({
