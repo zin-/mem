@@ -135,7 +135,7 @@ class NotificationClient {
 
   Future<DateTime?> registerMemNotifications(
     Mem mem, {
-    Iterable<SavedMemNotificationEntity>? savedMemNotifications,
+    Iterable<SavedMemNotificationEntityV1>? savedMemNotifications,
   }) =>
       v(
         () async {

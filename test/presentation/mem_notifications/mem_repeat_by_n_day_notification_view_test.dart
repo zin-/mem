@@ -32,7 +32,7 @@ void main() {
         (tester) async {
       const memId = 1;
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntity({
+      final notification = SavedMemNotificationEntityV1({
         defPkId.name: 1,
         defFkMemNotificationsMemId.name: memId,
         defColMemNotificationsType.name: 'repeatByNDay',
@@ -43,17 +43,17 @@ void main() {
         defColArchivedAt.name: null,
       });
 
-      final listNotifier = ListValueStateNotifier<MemNotificationEntity>([
-        notification
-      ]);
+      final listNotifier =
+          ListValueStateNotifier<MemNotificationEntityV1>([notification]);
       final valueNotifier =
-          ValueStateNotifier<MemNotificationEntity>(notification);
+          ValueStateNotifier<MemNotificationEntityV1>(notification);
 
       await tester.pumpWidget(
         _buildTestApp(
           const MemRepeatByNDayNotificationView(1),
           overrides: [
-            memNotificationsByMemIdProvider(1).overrideWith((ref) => listNotifier),
+            memNotificationsByMemIdProvider(1)
+                .overrideWith((ref) => listNotifier),
             memRepeatByNDayNotificationByMemIdProvider(1).overrideWith(
               (ref) => valueNotifier,
             ),
@@ -66,7 +66,8 @@ void main() {
       expect(find.byKey(keyMemRepeatByNDayNotification), findsOneWidget);
       expect(find.byType(TextFormField), findsOneWidget);
 
-      final textField = tester.widget<TextFormField>(find.byType(TextFormField));
+      final textField =
+          tester.widget<TextFormField>(find.byType(TextFormField));
       expect(textField.initialValue, '3');
     });
 
@@ -74,7 +75,7 @@ void main() {
         (tester) async {
       const memId = 1;
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntity({
+      final notification = SavedMemNotificationEntityV1({
         defPkId.name: 1,
         defFkMemNotificationsMemId.name: memId,
         defColMemNotificationsType.name: 'repeatByNDay',
@@ -85,17 +86,17 @@ void main() {
         defColArchivedAt.name: null,
       });
 
-      final listNotifier = ListValueStateNotifier<MemNotificationEntity>([
-        notification
-      ]);
+      final listNotifier =
+          ListValueStateNotifier<MemNotificationEntityV1>([notification]);
       final valueNotifier =
-          ValueStateNotifier<MemNotificationEntity>(notification);
+          ValueStateNotifier<MemNotificationEntityV1>(notification);
 
       await tester.pumpWidget(
         _buildTestApp(
           const MemRepeatByNDayNotificationView(1),
           overrides: [
-            memNotificationsByMemIdProvider(1).overrideWith((ref) => listNotifier),
+            memNotificationsByMemIdProvider(1)
+                .overrideWith((ref) => listNotifier),
             memRepeatByNDayNotificationByMemIdProvider(1).overrideWith(
               (ref) => valueNotifier,
             ),
@@ -108,14 +109,15 @@ void main() {
       expect(find.byKey(keyMemRepeatByNDayNotification), findsOneWidget);
       expect(find.byType(TextFormField), findsOneWidget);
 
-      final textField = tester.widget<TextFormField>(find.byType(TextFormField));
+      final textField =
+          tester.widget<TextFormField>(find.byType(TextFormField));
       expect(textField.initialValue, '0');
     });
 
     testWidgets('calls onNDayChanged when value is entered', (tester) async {
       const memId = 1;
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntity({
+      final notification = SavedMemNotificationEntityV1({
         defPkId.name: 1,
         defFkMemNotificationsMemId.name: memId,
         defColMemNotificationsType.name: 'repeatByNDay',
@@ -126,17 +128,17 @@ void main() {
         defColArchivedAt.name: null,
       });
 
-      final listNotifier = ListValueStateNotifier<MemNotificationEntity>([
-        notification
-      ]);
+      final listNotifier =
+          ListValueStateNotifier<MemNotificationEntityV1>([notification]);
       final valueNotifier =
-          ValueStateNotifier<MemNotificationEntity>(notification);
+          ValueStateNotifier<MemNotificationEntityV1>(notification);
 
       await tester.pumpWidget(
         _buildTestApp(
           const MemRepeatByNDayNotificationView(1),
           overrides: [
-            memNotificationsByMemIdProvider(1).overrideWith((ref) => listNotifier),
+            memNotificationsByMemIdProvider(1)
+                .overrideWith((ref) => listNotifier),
             memRepeatByNDayNotificationByMemIdProvider(1).overrideWith(
               (ref) => valueNotifier,
             ),
@@ -149,7 +151,8 @@ void main() {
       expect(find.byKey(keyMemRepeatByNDayNotification), findsOneWidget);
       expect(find.byType(TextFormField), findsOneWidget);
 
-      final initialTextField = tester.widget<TextFormField>(find.byType(TextFormField));
+      final initialTextField =
+          tester.widget<TextFormField>(find.byType(TextFormField));
       expect(initialTextField.initialValue, '3');
 
       await tester.enterText(find.byType(TextFormField), '5');
@@ -160,7 +163,7 @@ void main() {
         (tester) async {
       const memId = 1;
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntity({
+      final notification = SavedMemNotificationEntityV1({
         defPkId.name: 1,
         defFkMemNotificationsMemId.name: memId,
         defColMemNotificationsType.name: 'repeatByNDay',
@@ -171,17 +174,17 @@ void main() {
         defColArchivedAt.name: null,
       });
 
-      final listNotifier = ListValueStateNotifier<MemNotificationEntity>([
-        notification
-      ]);
+      final listNotifier =
+          ListValueStateNotifier<MemNotificationEntityV1>([notification]);
       final valueNotifier =
-          ValueStateNotifier<MemNotificationEntity>(notification);
+          ValueStateNotifier<MemNotificationEntityV1>(notification);
 
       await tester.pumpWidget(
         _buildTestApp(
           const MemRepeatByNDayNotificationView(1),
           overrides: [
-            memNotificationsByMemIdProvider(1).overrideWith((ref) => listNotifier),
+            memNotificationsByMemIdProvider(1)
+                .overrideWith((ref) => listNotifier),
             memRepeatByNDayNotificationByMemIdProvider(1).overrideWith(
               (ref) => valueNotifier,
             ),
@@ -201,7 +204,7 @@ void main() {
         (tester) async {
       const memId = 1;
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntity({
+      final notification = SavedMemNotificationEntityV1({
         defPkId.name: 1,
         defFkMemNotificationsMemId.name: memId,
         defColMemNotificationsType.name: 'repeatByNDay',
@@ -212,17 +215,17 @@ void main() {
         defColArchivedAt.name: null,
       });
 
-      final listNotifier = ListValueStateNotifier<MemNotificationEntity>([
-        notification
-      ]);
+      final listNotifier =
+          ListValueStateNotifier<MemNotificationEntityV1>([notification]);
       final valueNotifier =
-          ValueStateNotifier<MemNotificationEntity>(notification);
+          ValueStateNotifier<MemNotificationEntityV1>(notification);
 
       await tester.pumpWidget(
         _buildTestApp(
           const MemRepeatByNDayNotificationView(1),
           overrides: [
-            memNotificationsByMemIdProvider(1).overrideWith((ref) => listNotifier),
+            memNotificationsByMemIdProvider(1)
+                .overrideWith((ref) => listNotifier),
             memRepeatByNDayNotificationByMemIdProvider(1).overrideWith(
               (ref) => valueNotifier,
             ),
@@ -240,7 +243,7 @@ void main() {
 
     testWidgets('handles memId null', (tester) async {
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntity({
+      final notification = SavedMemNotificationEntityV1({
         defPkId.name: 1,
         defFkMemNotificationsMemId.name: null,
         defColMemNotificationsType.name: 'repeatByNDay',
@@ -251,11 +254,10 @@ void main() {
         defColArchivedAt.name: null,
       });
 
-      final listNotifier = ListValueStateNotifier<MemNotificationEntity>([
-        notification
-      ]);
+      final listNotifier =
+          ListValueStateNotifier<MemNotificationEntityV1>([notification]);
       final valueNotifier =
-          ValueStateNotifier<MemNotificationEntity>(notification);
+          ValueStateNotifier<MemNotificationEntityV1>(notification);
 
       await tester.pumpWidget(
         _buildTestApp(
@@ -277,4 +279,3 @@ void main() {
     });
   });
 }
-

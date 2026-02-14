@@ -107,7 +107,7 @@ void main() {
           overrides: [
             latestActsByMemProvider.overrideWith((ref) => {memId: null}),
             memNotificationsByMemIdProvider(memId).overrideWith(
-                (ref) => ListValueStateNotifier<MemNotificationEntity>([])),
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
             // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
@@ -159,7 +159,7 @@ void main() {
           overrides: [
             latestActsByMemProvider.overrideWith((ref) => {memId: activeAct}),
             memNotificationsByMemIdProvider(memId).overrideWith(
-                (ref) => ListValueStateNotifier<MemNotificationEntity>([])),
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
             // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
@@ -204,7 +204,7 @@ void main() {
           overrides: [
             latestActsByMemProvider.overrideWith((ref) => {memId: pausedAct}),
             memNotificationsByMemIdProvider(memId).overrideWith(
-                (ref) => ListValueStateNotifier<MemNotificationEntity>([])),
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
             // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
@@ -242,7 +242,7 @@ void main() {
     testWidgets('displays notification icon when notifications exist',
         (tester) async {
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntity({
+      final notification = SavedMemNotificationEntityV1({
         defPkId.name: 1,
         defFkMemNotificationsMemId.name: memId,
         defColMemNotificationsType.name: 'repeat',
@@ -258,7 +258,8 @@ void main() {
           overrides: [
             latestActsByMemProvider.overrideWith((ref) => {memId: null}),
             memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
-                ListValueStateNotifier<MemNotificationEntity>([notification])),
+                ListValueStateNotifier<MemNotificationEntityV1>(
+                    [notification])),
             // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
@@ -298,7 +299,7 @@ void main() {
           overrides: [
             latestActsByMemProvider.overrideWith((ref) => {memId: null}),
             memNotificationsByMemIdProvider(memId).overrideWith(
-                (ref) => ListValueStateNotifier<MemNotificationEntity>([])),
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
             // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
@@ -338,7 +339,7 @@ void main() {
           overrides: [
             latestActsByMemProvider.overrideWith((ref) => {memId: null}),
             memNotificationsByMemIdProvider(memId).overrideWith(
-                (ref) => ListValueStateNotifier<MemNotificationEntity>([])),
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
             // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
@@ -379,7 +380,7 @@ void main() {
           overrides: [
             latestActsByMemProvider.overrideWith((ref) => {memId: null}),
             memNotificationsByMemIdProvider(memId).overrideWith(
-                (ref) => ListValueStateNotifier<MemNotificationEntity>([])),
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
             // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
@@ -416,7 +417,7 @@ void main() {
       final memWithPeriod = Mem(memId, 'Mem with Period', null,
           DateAndTimePeriod(start: DateAndTime.now()));
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntity({
+      final notification = SavedMemNotificationEntityV1({
         defPkId.name: 1,
         defFkMemNotificationsMemId.name: memId,
         defColMemNotificationsType.name: 'repeat',
@@ -432,7 +433,8 @@ void main() {
           overrides: [
             latestActsByMemProvider.overrideWith((ref) => {memId: null}),
             memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
-                ListValueStateNotifier<MemNotificationEntity>([notification])),
+                ListValueStateNotifier<MemNotificationEntityV1>(
+                    [notification])),
             // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
@@ -468,7 +470,7 @@ void main() {
     testWidgets('displays mem with notifications but no active act',
         (tester) async {
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntity({
+      final notification = SavedMemNotificationEntityV1({
         defPkId.name: 1,
         defFkMemNotificationsMemId.name: memId,
         defColMemNotificationsType.name: 'repeat',
@@ -484,7 +486,8 @@ void main() {
           overrides: [
             latestActsByMemProvider.overrideWith((ref) => {memId: null}),
             memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
-                ListValueStateNotifier<MemNotificationEntity>([notification])),
+                ListValueStateNotifier<MemNotificationEntityV1>(
+                    [notification])),
             // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
@@ -519,7 +522,7 @@ void main() {
     testWidgets('displays done mem without trailing button', (tester) async {
       final doneMem = Mem(memId, 'Done Mem', DateTime.now(), null);
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntity({
+      final notification = SavedMemNotificationEntityV1({
         defPkId.name: 1,
         defFkMemNotificationsMemId.name: memId,
         defColMemNotificationsType.name: 'repeat',
@@ -535,7 +538,8 @@ void main() {
           overrides: [
             latestActsByMemProvider.overrideWith((ref) => {memId: null}),
             memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
-                ListValueStateNotifier<MemNotificationEntity>([notification])),
+                ListValueStateNotifier<MemNotificationEntityV1>(
+                    [notification])),
             // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
@@ -574,7 +578,7 @@ void main() {
           overrides: [
             latestActsByMemProvider.overrideWith((ref) => {memId: null}),
             memNotificationsByMemIdProvider(memId).overrideWith(
-                (ref) => ListValueStateNotifier<MemNotificationEntity>([])),
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
             // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
@@ -615,7 +619,7 @@ void main() {
           DateAndTime.from(
               DateTime.now().subtract(const Duration(minutes: 5))));
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntity({
+      final notification = SavedMemNotificationEntityV1({
         defPkId.name: 1,
         defFkMemNotificationsMemId.name: memId,
         defColMemNotificationsType.name: 'repeat',
@@ -631,7 +635,8 @@ void main() {
           overrides: [
             latestActsByMemProvider.overrideWith((ref) => {memId: activeAct}),
             memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
-                ListValueStateNotifier<MemNotificationEntity>([notification])),
+                ListValueStateNotifier<MemNotificationEntityV1>(
+                    [notification])),
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
                   SavedMemEntityV1({
@@ -675,7 +680,7 @@ void main() {
       final pausedAct =
           PausedAct(memId, DateTime.now().subtract(const Duration(minutes: 5)));
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntity({
+      final notification = SavedMemNotificationEntityV1({
         defPkId.name: 1,
         defFkMemNotificationsMemId.name: memId,
         defColMemNotificationsType.name: 'repeat',
@@ -691,7 +696,8 @@ void main() {
           overrides: [
             latestActsByMemProvider.overrideWith((ref) => {memId: pausedAct}),
             memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
-                ListValueStateNotifier<MemNotificationEntity>([notification])),
+                ListValueStateNotifier<MemNotificationEntityV1>(
+                    [notification])),
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
                   SavedMemEntityV1({
@@ -737,7 +743,7 @@ void main() {
           DateAndTime.from(
               DateTime.now().subtract(const Duration(minutes: 5))));
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntity({
+      final notification = SavedMemNotificationEntityV1({
         defPkId.name: 1,
         defFkMemNotificationsMemId.name: memId,
         defColMemNotificationsType.name: 'repeat',
@@ -753,7 +759,8 @@ void main() {
           overrides: [
             latestActsByMemProvider.overrideWith((ref) => {memId: activeAct}),
             memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
-                ListValueStateNotifier<MemNotificationEntity>([notification])),
+                ListValueStateNotifier<MemNotificationEntityV1>(
+                    [notification])),
             memStateProvider(memId)
                 .overrideWith(() => _FakeMemState(memWithPeriod)),
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
@@ -800,7 +807,7 @@ void main() {
       final pausedAct =
           PausedAct(memId, DateTime.now().subtract(const Duration(minutes: 5)));
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntity({
+      final notification = SavedMemNotificationEntityV1({
         defPkId.name: 1,
         defFkMemNotificationsMemId.name: memId,
         defColMemNotificationsType.name: 'repeat',
@@ -816,7 +823,8 @@ void main() {
           overrides: [
             latestActsByMemProvider.overrideWith((ref) => {memId: pausedAct}),
             memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
-                ListValueStateNotifier<MemNotificationEntity>([notification])),
+                ListValueStateNotifier<MemNotificationEntityV1>(
+                    [notification])),
             memStateProvider(memId)
                 .overrideWith(() => _FakeMemState(memWithPeriod)),
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
@@ -875,7 +883,7 @@ void main() {
             overrides: [
               latestActsByMemProvider.overrideWith((ref) => {memId: null}),
               memNotificationsByMemIdProvider(memId).overrideWith(
-                  (ref) => ListValueStateNotifier<MemNotificationEntity>([])),
+                  (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
               memStateProvider(memId)
                   .overrideWith(() => _FakeMemState(baseMem)),
               memEntitiesProvider.overrideWith(() => fakeMemEntities),
@@ -919,7 +927,7 @@ void main() {
             overrides: [
               latestActsByMemProvider.overrideWith((ref) => {memId: null}),
               memNotificationsByMemIdProvider(memId).overrideWith(
-                  (ref) => ListValueStateNotifier<MemNotificationEntity>([])),
+                  (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
               memStateProvider(memId)
                   .overrideWith(() => _FakeMemState(doneMem)),
               memEntitiesProvider.overrideWith(() => fakeMemEntities),
@@ -944,7 +952,7 @@ void main() {
       testWidgets('calls startActby when start button is tapped',
           (tester) async {
         final now = DateTime.now();
-        final notification = SavedMemNotificationEntity({
+        final notification = SavedMemNotificationEntityV1({
           defPkId.name: 1,
           defFkMemNotificationsMemId.name: memId,
           defColMemNotificationsType.name: 'repeat',
@@ -961,7 +969,7 @@ void main() {
             overrides: [
               latestActsByMemProvider.overrideWith((ref) => {memId: null}),
               memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
-                  ListValueStateNotifier<MemNotificationEntity>(
+                  ListValueStateNotifier<MemNotificationEntityV1>(
                       [notification])),
               memStateProvider(memId)
                   .overrideWith(() => _FakeMemState(baseMem)),
@@ -1004,7 +1012,7 @@ void main() {
             DateAndTime.from(
                 DateTime.now().subtract(const Duration(minutes: 5))));
         final now = DateTime.now();
-        final notification = SavedMemNotificationEntity({
+        final notification = SavedMemNotificationEntityV1({
           defPkId.name: 1,
           defFkMemNotificationsMemId.name: memId,
           defColMemNotificationsType.name: 'repeat',
@@ -1021,7 +1029,7 @@ void main() {
             overrides: [
               latestActsByMemProvider.overrideWith((ref) => {memId: activeAct}),
               memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
-                  ListValueStateNotifier<MemNotificationEntity>(
+                  ListValueStateNotifier<MemNotificationEntityV1>(
                       [notification])),
               memStateProvider(memId)
                   .overrideWith(() => _FakeMemState(baseMem)),
@@ -1064,7 +1072,7 @@ void main() {
             DateAndTime.from(
                 DateTime.now().subtract(const Duration(minutes: 5))));
         final now = DateTime.now();
-        final notification = SavedMemNotificationEntity({
+        final notification = SavedMemNotificationEntityV1({
           defPkId.name: 1,
           defFkMemNotificationsMemId.name: memId,
           defColMemNotificationsType.name: 'repeat',
@@ -1081,7 +1089,7 @@ void main() {
             overrides: [
               latestActsByMemProvider.overrideWith((ref) => {memId: activeAct}),
               memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
-                  ListValueStateNotifier<MemNotificationEntity>(
+                  ListValueStateNotifier<MemNotificationEntityV1>(
                       [notification])),
               memStateProvider(memId)
                   .overrideWith(() => _FakeMemState(baseMem)),
@@ -1122,7 +1130,7 @@ void main() {
         final pausedAct = PausedAct(
             memId, DateTime.now().subtract(const Duration(minutes: 5)));
         final now = DateTime.now();
-        final notification = SavedMemNotificationEntity({
+        final notification = SavedMemNotificationEntityV1({
           defPkId.name: 1,
           defFkMemNotificationsMemId.name: memId,
           defColMemNotificationsType.name: 'repeat',
@@ -1139,7 +1147,7 @@ void main() {
             overrides: [
               latestActsByMemProvider.overrideWith((ref) => {memId: pausedAct}),
               memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
-                  ListValueStateNotifier<MemNotificationEntity>(
+                  ListValueStateNotifier<MemNotificationEntityV1>(
                       [notification])),
               memStateProvider(memId)
                   .overrideWith(() => _FakeMemState(baseMem)),
@@ -1181,7 +1189,7 @@ void main() {
             overrides: [
               latestActsByMemProvider.overrideWith((ref) => {memId: null}),
               memNotificationsByMemIdProvider(memId).overrideWith(
-                  (ref) => ListValueStateNotifier<MemNotificationEntity>([])),
+                  (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
               memStateProvider(memId)
                   .overrideWith(() => _FakeMemState(baseMem)),
               memEntitiesProvider.overrideWith(() => _FakeMemEntities([

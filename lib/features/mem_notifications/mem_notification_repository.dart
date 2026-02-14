@@ -14,18 +14,18 @@ import 'mem_notification_entity.dart';
 // @Deprecated('MemNotificationRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
 // lintエラーになるためコメントアウト
 class MemNotificationRepository extends DatabaseTupleRepository<
-    MemNotificationEntity,
-    SavedMemNotificationEntity,
+    MemNotificationEntityV1,
+    SavedMemNotificationEntityV1,
     MemNotification,
     int,
     // FIXME MemNotificationentityを定義して置き換える
     MemEntity> {
   @override
-  SavedMemNotificationEntity pack(Map<String, dynamic> map) =>
-      SavedMemNotificationEntity(map);
+  SavedMemNotificationEntityV1 pack(Map<String, dynamic> map) =>
+      SavedMemNotificationEntityV1(map);
 
   @override
-  Future<List<SavedMemNotificationEntity>> ship({
+  Future<List<SavedMemNotificationEntityV1>> ship({
     int? memId,
     Iterable<int>? memIdsIn,
     Condition? condition,
@@ -48,7 +48,7 @@ class MemNotificationRepository extends DatabaseTupleRepository<
         limit: limit,
       );
 
-  Future<Iterable<SavedMemNotificationEntity>> archiveBy({
+  Future<Iterable<SavedMemNotificationEntityV1>> archiveBy({
     int? memId,
     Condition? condition,
     DateTime? archivedAt,
@@ -63,7 +63,7 @@ class MemNotificationRepository extends DatabaseTupleRepository<
         },
       );
 
-  Future<Iterable<SavedMemNotificationEntity>> unarchiveBy({
+  Future<Iterable<SavedMemNotificationEntityV1>> unarchiveBy({
     int? memId,
     Condition? condition,
     DateTime? updatedAt,
@@ -79,7 +79,7 @@ class MemNotificationRepository extends DatabaseTupleRepository<
       );
 
   @override
-  Future<List<SavedMemNotificationEntity>> waste({
+  Future<List<SavedMemNotificationEntityV1>> waste({
     int? memId,
     MemNotificationType? type,
     Condition? condition,

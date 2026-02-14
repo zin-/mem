@@ -18,7 +18,7 @@ class MemClient {
         (
           MemEntityV1,
           List<MemItemEntity>,
-          List<MemNotificationEntity>?,
+          List<MemNotificationEntityV1>?,
           TargetEntity?,
           List<MemRelationEntity>?,
           MemEntity,
@@ -27,7 +27,7 @@ class MemClient {
       )> save(
     MemEntityV1 mem,
     List<MemItemEntity> memItemList,
-    List<MemNotificationEntity> memNotificationList,
+    List<MemNotificationEntityV1> memNotificationList,
     TargetEntity? target,
     List<MemRelationEntity>? memRelations,
   ) =>
@@ -47,7 +47,7 @@ class MemClient {
               await _notificationClient.registerMemNotifications(
             saved.$6.toDomain(),
             savedMemNotifications:
-                saved.$3?.whereType<SavedMemNotificationEntity>(),
+                saved.$3?.whereType<SavedMemNotificationEntityV1>(),
           );
 
           return (saved, nextNotifyAt);
@@ -65,7 +65,7 @@ class MemClient {
       (
         MemEntityV1,
         List<MemItemEntity>,
-        List<MemNotificationEntity>?,
+        List<MemNotificationEntityV1>?,
         TargetEntity?,
         List<MemRelationEntity>?
       )> archive(SavedMemEntityV1 memEntity) => v(
@@ -86,7 +86,7 @@ class MemClient {
       (
         MemEntityV1,
         List<MemItemEntity>,
-        List<MemNotificationEntity>?,
+        List<MemNotificationEntityV1>?,
         TargetEntity?,
         List<MemRelationEntity>?,
         Mem,
@@ -97,7 +97,7 @@ class MemClient {
           _notificationClient.registerMemNotifications(
             unarchived.$6,
             savedMemNotifications:
-                unarchived.$3?.whereType<SavedMemNotificationEntity>(),
+                unarchived.$3?.whereType<SavedMemNotificationEntityV1>(),
           );
 
           return unarchived;

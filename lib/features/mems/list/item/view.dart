@@ -69,7 +69,7 @@ ListTile _render(
   void Function() finishAct,
   void Function() pauseAct,
   void Function() closeAct,
-  Iterable<MemNotificationEntity> memNotificationEntities,
+  Iterable<MemNotificationEntityV1> memNotificationEntities,
 ) =>
     v(
       () {
@@ -79,7 +79,7 @@ ListTile _render(
             latestActByMem != null && latestActByMem is PausedAct;
         final hasEnableMemNotifications = memNotificationEntities
             .where(
-              (e) => e is SavedMemNotificationEntity && e.value.isEnabled(),
+              (e) => e is SavedMemNotificationEntityV1 && e.value.isEnabled(),
             )
             .isNotEmpty;
 

@@ -29,7 +29,7 @@ class MemService {
       (
         MemEntityV1,
         List<MemItemEntity>,
-        List<MemNotificationEntity>?,
+        List<MemNotificationEntityV1>?,
         TargetEntity?,
         List<MemRelationEntity>?,
         MemEntity,
@@ -37,7 +37,7 @@ class MemService {
     (
       MemEntityV1,
       List<MemItemEntity>,
-      List<MemNotificationEntity>?,
+      List<MemNotificationEntityV1>?,
       TargetEntity?,
       List<MemRelationEntity>?,
     ) memDetail, {
@@ -66,7 +66,7 @@ class MemService {
 
           final memNotifications = memDetail.$3;
           final returnMemNotifications =
-              List<SavedMemNotificationEntity?>.empty(growable: true);
+              List<SavedMemNotificationEntityV1?>.empty(growable: true);
           if (memNotifications == null) {
             await _memNotificationRepository.waste(memId: savedMemEntity.id);
           } else {
@@ -74,7 +74,7 @@ class MemService {
                 .where((e) => !e.value.isRepeatByDayOfWeek())
                 .map((e) {
               if (e.value.isEnabled()) {
-                return (e is SavedMemNotificationEntity && !undo
+                return (e is SavedMemNotificationEntityV1 && !undo
                     ? _memNotificationRepository.replace(e.updatedWith(
                         (v) => MemNotification.by(
                             savedMemEntity.id, v.type, v.time, v.message),
@@ -185,7 +185,7 @@ class MemService {
       (
         MemEntityV1,
         List<MemItemEntity>,
-        List<MemNotificationEntity>?,
+        List<MemNotificationEntityV1>?,
         TargetEntity?,
         List<MemRelationEntity>?,
         MemEntity,
@@ -215,7 +215,7 @@ class MemService {
       (
         MemEntityV1,
         List<MemItemEntity>,
-        List<MemNotificationEntity>?,
+        List<MemNotificationEntityV1>?,
         TargetEntity?,
         List<MemRelationEntity>?,
         MemEntity,
@@ -245,7 +245,7 @@ class MemService {
       (
         MemEntityV1,
         List<MemItemEntity>,
-        List<MemNotificationEntity>?,
+        List<MemNotificationEntityV1>?,
         TargetEntity?,
         List<MemRelationEntity>?
       )> archive(SavedMemEntityV1 mem) => i(
@@ -276,7 +276,7 @@ class MemService {
       (
         MemEntityV1,
         List<MemItemEntity>,
-        List<MemNotificationEntity>?,
+        List<MemNotificationEntityV1>?,
         TargetEntity?,
         List<MemRelationEntity>?,
         Mem,

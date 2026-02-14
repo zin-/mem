@@ -38,7 +38,7 @@ void main() {
         (tester) async {
       const memId = 1;
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntity({
+      final notification = SavedMemNotificationEntityV1({
         defPkId.name: 1,
         defFkMemNotificationsMemId.name: memId,
         defColMemNotificationsType.name: 'repeat',
@@ -54,7 +54,8 @@ void main() {
           const MemRepeatedNotificationView(1),
           overrides: [
             memNotificationsByMemIdProvider(1).overrideWith((ref) =>
-                ListValueStateNotifier<MemNotificationEntity>([notification])),
+                ListValueStateNotifier<MemNotificationEntityV1>(
+                    [notification])),
             preferenceProvider(startOfDayKey).overrideWith(
               () => _FakePreference(),
             ),
@@ -74,7 +75,7 @@ void main() {
         (tester) async {
       const memId = 1;
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntity({
+      final notification = SavedMemNotificationEntityV1({
         defPkId.name: 1,
         defFkMemNotificationsMemId.name: memId,
         defColMemNotificationsType.name: 'repeat',
@@ -90,7 +91,8 @@ void main() {
           const MemRepeatedNotificationView(1),
           overrides: [
             memNotificationsByMemIdProvider(1).overrideWith((ref) =>
-                ListValueStateNotifier<MemNotificationEntity>([notification])),
+                ListValueStateNotifier<MemNotificationEntityV1>(
+                    [notification])),
             preferenceProvider(startOfDayKey).overrideWith(
               () => _FakePreference(),
             ),
@@ -108,7 +110,7 @@ void main() {
     testWidgets('calls onTimeChanged when time is changed', (tester) async {
       const memId = 1;
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntity({
+      final notification = SavedMemNotificationEntityV1({
         defPkId.name: 1,
         defFkMemNotificationsMemId.name: memId,
         defColMemNotificationsType.name: 'repeat',
@@ -120,7 +122,7 @@ void main() {
       });
 
       final notifier =
-          ListValueStateNotifier<MemNotificationEntity>([notification]);
+          ListValueStateNotifier<MemNotificationEntityV1>([notification]);
 
       await tester.pumpWidget(
         _buildTestApp(
@@ -151,7 +153,7 @@ void main() {
         (tester) async {
       const memId = 1;
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntity({
+      final notification = SavedMemNotificationEntityV1({
         defPkId.name: 1,
         defFkMemNotificationsMemId.name: memId,
         defColMemNotificationsType.name: 'repeat',
@@ -163,7 +165,7 @@ void main() {
       });
 
       final notifier =
-          ListValueStateNotifier<MemNotificationEntity>([notification]);
+          ListValueStateNotifier<MemNotificationEntityV1>([notification]);
 
       await tester.pumpWidget(
         _buildTestApp(
@@ -191,7 +193,7 @@ void main() {
         (tester) async {
       const memId = 1;
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntity({
+      final notification = SavedMemNotificationEntityV1({
         defPkId.name: 1,
         defFkMemNotificationsMemId.name: memId,
         defColMemNotificationsType.name: 'repeat',
@@ -203,7 +205,7 @@ void main() {
       });
 
       final notifier =
-          ListValueStateNotifier<MemNotificationEntity>([notification]);
+          ListValueStateNotifier<MemNotificationEntityV1>([notification]);
 
       await tester.pumpWidget(
         _buildTestApp(
@@ -232,7 +234,7 @@ void main() {
 
     testWidgets('handles memId null', (tester) async {
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntity({
+      final notification = SavedMemNotificationEntityV1({
         defPkId.name: 1,
         defFkMemNotificationsMemId.name: null,
         defColMemNotificationsType.name: 'repeat',
@@ -248,7 +250,8 @@ void main() {
           const MemRepeatedNotificationView(null),
           overrides: [
             memNotificationsByMemIdProvider(null).overrideWith((ref) =>
-                ListValueStateNotifier<MemNotificationEntity>([notification])),
+                ListValueStateNotifier<MemNotificationEntityV1>(
+                    [notification])),
             preferenceProvider(startOfDayKey).overrideWith(
               () => _FakePreference(),
             ),

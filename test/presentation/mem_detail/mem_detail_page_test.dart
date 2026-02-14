@@ -190,7 +190,7 @@ void main() {
         when(mockMemNotificationRepository.ship(
                 memId: _TestConstants.testMemId))
             .thenAnswer((_) async => [
-                  SavedMemNotificationEntity(
+                  SavedMemNotificationEntityV1(
                     {
                       defPkId.name: _TestConstants.testMemId,
                       defFkMemNotificationsMemId.name: _TestConstants.testMemId,
@@ -369,7 +369,7 @@ void main() {
         when(mockMemNotificationRepository.ship(
                 memId: _TestConstants.testMemId))
             .thenAnswer((_) async => [
-                  SavedMemNotificationEntity(
+                  SavedMemNotificationEntityV1(
                     {
                       defPkId.name: _TestConstants.testMemId,
                       defFkMemNotificationsMemId.name: _TestConstants.testMemId,
