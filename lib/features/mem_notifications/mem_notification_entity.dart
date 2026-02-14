@@ -1,4 +1,5 @@
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
+import 'package:mem/features/mems/mem.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
 
@@ -42,4 +43,31 @@ class SavedMemNotificationEntityV1 extends MemNotificationEntityV1
           MemNotification Function(MemNotification v) update) =>
       SavedMemNotificationEntityV1(
           toMap..addAll(super.updatedWith(update).toMap));
+}
+
+class MemNotificationEntity implements Entity<int> {
+  final MemId memId;
+  final MemNotificationType type;
+  final int? time;
+  final String message;
+
+  @override
+  final int id;
+  @override
+  final DateTime createdAt;
+  @override
+  final DateTime? updatedAt;
+  @override
+  final DateTime? archivedAt;
+
+  MemNotificationEntity(
+    this.memId,
+    this.type,
+    this.time,
+    this.message,
+    this.id,
+    this.createdAt,
+    this.updatedAt,
+    this.archivedAt,
+  );
 }
