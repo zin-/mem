@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_items.dart';
-import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/table_definitions/mem_relations.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
@@ -183,23 +182,20 @@ void main() {
                     },
                   ),
                 ]);
-        when(mockMemNotificationRepository.ship(
-                memId: _TestConstants.testMemId))
-            .thenAnswer((_) async => [
-                  SavedMemNotificationEntityV1(
-                    {
-                      defPkId.name: _TestConstants.testMemId,
-                      defFkMemNotificationsMemId.name: _TestConstants.testMemId,
-                      defColMemNotificationsType.name:
-                          MemNotificationType.repeat.name,
-                      defColMemNotificationsTime.name: 10,
-                      defColMemNotificationsMessage.name: 'Test Mem',
-                      defColCreatedAt.name: DateTime.now(),
-                      defColUpdatedAt.name: null,
-                      defColArchivedAt.name: null,
-                    },
-                  ),
-                ]);
+        when(mockMemNotificationRepository.shipV2(
+          memId: _TestConstants.testMemId,
+        )).thenAnswer((_) async => [
+              MemNotificationEntity(
+                _TestConstants.testMemId,
+                MemNotificationType.repeat,
+                10,
+                'Test Mem',
+                1,
+                DateTime.now(),
+                DateTime.now(),
+                null,
+              ),
+            ]);
 
         when(mockMemItemRepository.ship(memId: _TestConstants.testMemId))
             .thenAnswer((_) async => [
@@ -362,23 +358,20 @@ void main() {
                     },
                   ),
                 ]);
-        when(mockMemNotificationRepository.ship(
-                memId: _TestConstants.testMemId))
-            .thenAnswer((_) async => [
-                  SavedMemNotificationEntityV1(
-                    {
-                      defPkId.name: _TestConstants.testMemId,
-                      defFkMemNotificationsMemId.name: _TestConstants.testMemId,
-                      defColMemNotificationsType.name:
-                          MemNotificationType.repeat.name,
-                      defColMemNotificationsTime.name: 10,
-                      defColMemNotificationsMessage.name: 'Test Mem',
-                      defColCreatedAt.name: DateTime.now(),
-                      defColUpdatedAt.name: null,
-                      defColArchivedAt.name: null,
-                    },
-                  ),
-                ]);
+        when(mockMemNotificationRepository.shipV2(
+          memId: _TestConstants.testMemId,
+        )).thenAnswer((_) async => [
+              MemNotificationEntity(
+                _TestConstants.testMemId,
+                MemNotificationType.repeat,
+                10,
+                'Test Mem',
+                1,
+                DateTime.now(),
+                null,
+                null,
+              ),
+            ]);
 
         when(mockMemItemRepository.ship(memId: _TestConstants.testMemId))
             .thenAnswer((_) async => [
