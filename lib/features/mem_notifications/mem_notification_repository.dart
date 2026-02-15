@@ -16,7 +16,7 @@ class MemNotificationRepository extends DatabaseTupleRepository<
     MemNotificationEntity> {
   @override
   SavedMemNotificationEntityV1 pack(Map<String, dynamic> map) =>
-      SavedMemNotificationEntityV1(map);
+      throw UnimplementedError();
 
   @override
   MemNotificationEntity packV2(dynamic tuple) => MemNotificationEntity(

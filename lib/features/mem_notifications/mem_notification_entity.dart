@@ -1,5 +1,8 @@
+import 'package:drift/drift.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
+import 'package:mem/databases/database.dart' as drift_database;
+
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
@@ -59,6 +62,17 @@ class SavedMemNotificationEntityV1 extends MemNotificationEntityV1
           defColArchivedAt.name: entity.archivedAt,
         },
       );
+
+  MemNotificationEntity toEntityV2() => MemNotificationEntity(
+        value.memId,
+        value.type,
+        value.time,
+        value.message,
+        id,
+        createdAt,
+        updatedAt,
+        archivedAt,
+      );
 }
 
 class MemNotificationEntity implements Entity<int> {
@@ -94,3 +108,22 @@ class MemNotificationEntity implements Entity<int> {
         message,
       );
 }
+
+convertIntoMemRepeatedNotificationsInsertable(MemNotification entity,
+        {DateTime? createdAt}) =>
+    drift_database.MemRepeatedNotificationsCompanion(
+      memId: Value(entity.memId ?? 0),
+      timeOfDaySeconds: Value(entity.time ?? 0),
+      type: Value(entity.type.name),
+      message: Value(entity.message),
+      createdAt: Value(createdAt ?? DateTime.now()),
+    );
+convertIntoMemRepeatedNotificationsUpdateable(MemNotificationEntity entity,
+        {DateTime? updatedAt}) =>
+    drift_database.MemRepeatedNotificationsCompanion(
+      memId: Value(entity.memId ?? 0),
+      timeOfDaySeconds: Value(entity.time ?? 0),
+      type: Value(entity.type.name),
+      message: Value(entity.message),
+      updatedAt: Value(updatedAt ?? DateTime.now()),
+    );

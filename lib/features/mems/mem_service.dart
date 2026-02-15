@@ -75,14 +75,25 @@ class MemService {
                 .map((e) {
               if (e.value.isEnabled()) {
                 return (e is SavedMemNotificationEntityV1 && !undo
-                    ? _memNotificationRepository.replace(e.updatedWith(
-                        (v) => MemNotification.by(
-                            savedMemEntity.id, v.type, v.time, v.message),
-                      ))
-                    : _memNotificationRepository.receive(e.updatedWith(
-                        (v) => MemNotification.by(
-                            savedMemEntity.id, v.type, v.time, v.message),
-                      )));
+                        ? _memNotificationRepository.replaceV2(
+                            e
+                                .updatedWith(
+                                  (v) => MemNotification.by(savedMemEntity.id,
+                                      v.type, v.time, v.message),
+                                )
+                                .toEntityV2(),
+                          )
+                        : _memNotificationRepository.receiveV2(
+                            MemNotification.by(
+                              savedMemEntity.id,
+                              e.value.type,
+                              e.value.time,
+                              e.value.message,
+                            ),
+                          ))
+                    .then(
+                  (v) => SavedMemNotificationEntityV1.fromEntityV2(v),
+                );
               } else {
                 return _memNotificationRepository
                     .wasteV2(
@@ -102,16 +113,18 @@ class MemService {
                 .groupListsBy((e) => e.value.time)
                 .entries) {
               returnMemNotifications.add(
-                await _memNotificationRepository.receive(
-                  entry.value.single.updatedWith(
-                    (v) => MemNotification.by(
-                      savedMemEntity.id,
-                      v.type,
-                      v.time,
-                      v.message,
+                await _memNotificationRepository
+                    .receiveV2(
+                      MemNotification.by(
+                        savedMemEntity.id,
+                        entry.value.single.value.type,
+                        entry.value.single.value.time,
+                        entry.value.single.value.message,
+                      ),
+                    )
+                    .then(
+                      (v) => SavedMemNotificationEntityV1.fromEntityV2(v),
                     ),
-                  ),
-                ),
               );
             }
           }
