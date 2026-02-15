@@ -241,36 +241,28 @@ class MemService {
         },
       );
 
-  Future<
-      (
-        MemEntityV1,
-        List<MemItemEntity>,
-        List<MemNotificationEntityV1>?,
-        TargetEntity?,
-        List<MemRelationEntity>?
-      )> archive(SavedMemEntityV1 mem) => i(
-        () async {
-          final archivedMem = await _memRepository.archive(mem);
-          final archivedMemItems =
-              await _memItemRepository.archiveBy(memId: archivedMem.id);
-          final archivedMemNotifications =
-              await _memNotificationRepository.archiveBy(memId: archivedMem.id);
-          final archivedMemRelations = await _memRelationRepository.archiveBy(
-            relatedMemId: archivedMem.id,
-          );
+  Future<(MemEntityV1, List<MemItemEntity>, TargetEntity?, List<MemRelationEntity>?)>
+      archive(SavedMemEntityV1 mem) => i(
+            () async {
+              final archivedMem = await _memRepository.archive(mem);
+              final archivedMemItems =
+                  await _memItemRepository.archiveBy(memId: archivedMem.id);
+              final archivedMemRelations =
+                  await _memRelationRepository.archiveBy(
+                relatedMemId: archivedMem.id,
+              );
 
-          return (
-            archivedMem,
-            archivedMemItems.toList(growable: false),
-            archivedMemNotifications.toList(growable: false),
-            null,
-            archivedMemRelations.toList(growable: false),
+              return (
+                archivedMem,
+                archivedMemItems.toList(growable: false),
+                null,
+                archivedMemRelations.toList(growable: false),
+              );
+            },
+            {
+              'mem': mem,
+            },
           );
-        },
-        {
-          'mem': mem,
-        },
-      );
 
   Future<
       (

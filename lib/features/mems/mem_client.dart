@@ -61,26 +61,20 @@ class MemClient {
         },
       );
 
-  Future<
-      (
-        MemEntityV1,
-        List<MemItemEntity>,
-        List<MemNotificationEntityV1>?,
-        TargetEntity?,
-        List<MemRelationEntity>?
-      )> archive(SavedMemEntityV1 memEntity) => v(
-        () async {
-          final archived = await _memService.archive(memEntity);
+  Future<(MemEntityV1, List<MemItemEntity>, TargetEntity?, List<MemRelationEntity>?)>
+      archive(SavedMemEntityV1 memEntity) => v(
+            () async {
+              final archived = await _memService.archive(memEntity);
 
-          _notificationClient
-              .cancelMemNotifications((archived.$1 as SavedMemEntityV1).id);
+              _notificationClient
+                  .cancelMemNotifications((archived.$1 as SavedMemEntityV1).id);
 
-          return archived;
-        },
-        {
-          'memEntity': memEntity,
-        },
-      );
+              return archived;
+            },
+            {
+              'memEntity': memEntity,
+            },
+          );
 
   Future<
       (

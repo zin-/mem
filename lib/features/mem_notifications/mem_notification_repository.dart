@@ -57,21 +57,6 @@ class MemNotificationRepository extends DatabaseTupleRepository<
         limit: limit,
       );
 
-  Future<Iterable<SavedMemNotificationEntityV1>> archiveBy({
-    int? memId,
-    Condition? condition,
-    DateTime? archivedAt,
-  }) =>
-      v(
-        () async => await ship(memId: memId, condition: condition).then((v) =>
-            Future.wait(v.map((e) => archive(e, archivedAt: archivedAt)))),
-        {
-          'memId': memId,
-          'condition': condition,
-          'archivedAt': archivedAt,
-        },
-      );
-
   Future<Iterable<SavedMemNotificationEntityV1>> unarchiveBy({
     int? memId,
     Condition? condition,
