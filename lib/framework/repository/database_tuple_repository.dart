@@ -134,6 +134,20 @@ abstract class DatabaseTupleRepository<
         },
       );
 
+  Future<List<ENTITY>> shipV2({
+    Condition? condition,
+  }) =>
+      v(
+        () async {
+          final rows = await _driftAccessor.selectV2(
+            _tableDefinition,
+            condition: condition,
+          );
+          return rows.map<ENTITY>((e) => packV2(e)).toList();
+        },
+        {'condition': condition},
+      );
+
   Future<SAVEDV1> replace(
     SAVEDV1 savedEntity, {
     DateTime? updatedAt,

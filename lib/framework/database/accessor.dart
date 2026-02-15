@@ -161,6 +161,24 @@ class DriftDatabaseAccessor {
           'limit': limit,
         },
       );
+  Future<List<dynamic>> selectV2(
+    TableDefinition tableDefinition, {
+    Condition? condition,
+  }) =>
+      v(
+        () async {
+          final tableInfo = _getTableInfoV2(tableDefinition);
+          final query = driftDatabase.select(tableInfo);
+          if (condition != null) {
+            final driftExpression = condition.toDriftExpression(tableInfo);
+            if (driftExpression != null) {
+              query.where((tbl) => driftExpression);
+            }
+          }
+          return await query.get();
+        },
+        {'tableDefinition': tableDefinition, 'condition': condition},
+      );
 
   insert(
     TableDefinition tableDefinition,

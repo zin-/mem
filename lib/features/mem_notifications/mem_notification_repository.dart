@@ -57,6 +57,20 @@ class MemNotificationRepository extends DatabaseTupleRepository<
       );
 
   @override
+  Future<List<MemNotificationEntity>> shipV2({
+    int? memId,
+    Condition? condition,
+  }) =>
+      super.shipV2(
+        condition: And(
+          [
+            if (memId != null) Equals(defFkMemNotificationsMemId, memId),
+            if (condition != null) condition, // coverage:ignore-line
+          ],
+        ),
+      );
+
+  @override
   Future<List<MemNotificationEntity>> wasteV2({
     int? memId,
     MemNotificationType? type,
