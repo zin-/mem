@@ -112,14 +112,10 @@ void main() {
       offset: anyNamed('offset'),
       limit: anyNamed('limit'),
     )).thenAnswer((_) async => []);
-    when(mockMemNotificationRepository.ship(
+    when(mockMemNotificationRepository.shipV2(
       memId: anyNamed('memId'),
       memIdsIn: anyNamed('memIdsIn'),
       condition: anyNamed('condition'),
-      groupBy: anyNamed('groupBy'),
-      orderBy: anyNamed('orderBy'),
-      offset: anyNamed('offset'),
-      limit: anyNamed('limit'),
     )).thenAnswer((_) async => []);
     when(mockMemRelationRepository.ship(
       sourceMemId: anyNamed('sourceMemId'),

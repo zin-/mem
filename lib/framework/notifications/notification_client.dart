@@ -294,15 +294,16 @@ class NotificationClient {
   Future<bool> _shouldNotify(int memId) => v(
         () async {
           final savedMemNotifications =
-              await _memNotificationRepository.ship(memId: memId);
+              await _memNotificationRepository.shipV2(memId: memId);
           final repeatByDayOfWeekMemNotifications = savedMemNotifications.where(
-            (e) => e.value.isEnabled() && e.value.isRepeatByDayOfWeek(),
+            (e) =>
+                e.toDomain().isEnabled() && e.toDomain().isRepeatByDayOfWeek(),
           );
 
           if (repeatByDayOfWeekMemNotifications.isNotEmpty) {
             final now = DateTime.now();
             if (!repeatByDayOfWeekMemNotifications
-                .map((e) => e.value.time)
+                .map((e) => e.toDomain().time)
                 .contains(now.weekday)) {
               return false;
             }
@@ -310,7 +311,7 @@ class NotificationClient {
 
           final repeatByNDayMemNotification =
               savedMemNotifications.singleWhereOrNull(
-            (e) => e.value.isEnabled() && e.value.isRepeatByNDay(),
+            (e) => e.toDomain().isEnabled() && e.toDomain().isRepeatByNDay(),
           );
           final lastActTime = await _actQueryService
               .fetchLatestByMemIds(memId)
@@ -321,7 +322,7 @@ class NotificationClient {
                     days:
                         // FIXME 永続化されている時点でtimeは必ずあるので型で表現する
                         //  repeatByNDayMemNotification自体がないのは別の話
-                        repeatByNDayMemNotification?.value.time! ?? 1) >
+                        repeatByNDayMemNotification?.toDomain().time! ?? 1) >
                 DateTime.now().difference(lastActTime)) {
               return false;
             }
