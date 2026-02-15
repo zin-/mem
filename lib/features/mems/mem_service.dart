@@ -68,7 +68,7 @@ class MemService {
           final returnMemNotifications =
               List<SavedMemNotificationEntityV1?>.empty(growable: true);
           if (memNotifications == null) {
-            await _memNotificationRepository.waste(memId: savedMemEntity.id);
+            await _memNotificationRepository.wasteV2(memId: savedMemEntity.id);
           } else {
             returnMemNotifications.addAll(await Future.wait(memNotifications
                 .where((e) => !e.value.isRepeatByDayOfWeek())
@@ -85,7 +85,7 @@ class MemService {
                       )));
               } else {
                 return _memNotificationRepository
-                    .waste(
+                    .wasteV2(
                       memId: savedMemEntity.id,
                       type: e.value.type,
                     )
@@ -93,7 +93,7 @@ class MemService {
               }
             })));
 
-            await _memNotificationRepository.waste(
+            await _memNotificationRepository.wasteV2(
               memId: savedMemEntity.id,
               type: MemNotificationType.repeatByDayOfWeek,
             );

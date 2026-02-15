@@ -24,7 +24,7 @@ class MemNotificationRepository extends DatabaseTupleRepository<
   MemNotificationEntity packV2(dynamic tuple) => MemNotificationEntity(
         tuple.memId,
         MemNotificationType.fromName(tuple.type),
-        tuple.time,
+        tuple.timeOfDaySeconds,
         tuple.message,
         tuple.id,
         tuple.createdAt,
@@ -57,12 +57,12 @@ class MemNotificationRepository extends DatabaseTupleRepository<
       );
 
   @override
-  Future<List<SavedMemNotificationEntityV1>> waste({
+  Future<List<MemNotificationEntity>> wasteV2({
     int? memId,
     MemNotificationType? type,
     Condition? condition,
   }) =>
-      super.waste(
+      super.wasteV2(
         condition: And(
           [
             if (memId != null) Equals(defFkMemNotificationsMemId, memId),

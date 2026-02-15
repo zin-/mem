@@ -97,7 +97,7 @@ void main() {
 
         when(mockMemRepository.receiveV2(any))
             .thenAnswer((_) async => savedMem.toEntityV2());
-        when(mockMemNotificationRepository.waste(
+        when(mockMemNotificationRepository.wasteV2(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
           condition: anyNamed('condition'),
@@ -106,7 +106,7 @@ void main() {
             .thenAnswer((_) async => []);
         when(mockTargetRepository.waste(condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
-        when(mockMemNotificationRepository.waste(
+        when(mockMemNotificationRepository.wasteV2(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
           condition: anyNamed('condition'),
@@ -156,7 +156,7 @@ void main() {
 
         when(mockMemRepository.receiveV2(any))
             .thenAnswer((_) async => savedMem.toEntityV2());
-        when(mockMemNotificationRepository.waste(
+        when(mockMemNotificationRepository.wasteV2(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
           condition: anyNamed('condition'),
@@ -212,7 +212,7 @@ void main() {
 
         when(mockMemRepository.receiveV2(any))
             .thenAnswer((_) async => savedMem.toEntityV2());
-        when(mockMemNotificationRepository.waste(
+        when(mockMemNotificationRepository.wasteV2(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
           condition: anyNamed('condition'),
