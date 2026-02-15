@@ -5,7 +5,6 @@ import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/settings/constants.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/settings/preference/keys.dart';
@@ -133,11 +132,7 @@ class NotificationClient {
         },
       );
 
-  Future<DateTime?> registerMemNotifications(
-    Mem mem, {
-    Iterable<SavedMemNotificationEntityV1>? savedMemNotifications,
-  }) =>
-      v(
+  Future<DateTime?> registerMemNotifications(Mem mem) => v(
         () async {
           if (mem.isDone || mem.isArchived) {
             cancelMemNotifications(mem.id!);
@@ -156,9 +151,9 @@ class NotificationClient {
               MemNotifications.periodicScheduleOf(
                 mem,
                 startOfDay,
-                (savedMemNotifications ??
-                        await _memNotificationRepository.ship(memId: mem.id!))
-                    .map((e) => e.value),
+                await _memNotificationRepository
+                    .ship(memId: mem.id!)
+                    .then((v) => v.map((e) => e.value)),
                 latestAct,
                 DateTime.now(),
               )
@@ -175,7 +170,6 @@ class NotificationClient {
         },
         {
           "mem": mem,
-          "savedMemNotifications": savedMemNotifications,
         },
       );
 
@@ -220,10 +214,7 @@ class NotificationClient {
               .ship(id: memId)
               .then((v) => v.singleOrNull?.value);
 
-          await registerMemNotifications(
-            mem!,
-            savedMemNotifications: memNotifications,
-          );
+          await registerMemNotifications(mem!);
           await setNotificationAfterInactivity();
         },
         {

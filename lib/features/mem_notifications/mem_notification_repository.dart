@@ -5,7 +5,6 @@ import 'package:mem/framework/repository/condition/in.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
-import 'package:mem/features/logger/log_service.dart';
 import 'mem_notification.dart';
 import 'mem_notification_entity.dart';
 
@@ -55,21 +54,6 @@ class MemNotificationRepository extends DatabaseTupleRepository<
         orderBy: orderBy,
         offset: offset,
         limit: limit,
-      );
-
-  Future<Iterable<SavedMemNotificationEntityV1>> unarchiveBy({
-    int? memId,
-    Condition? condition,
-    DateTime? updatedAt,
-  }) =>
-      v(
-        () async => await ship(memId: memId, condition: condition).then((v) =>
-            Future.wait(v.map((e) => unarchive(e, updatedAt: updatedAt)))),
-        {
-          'memId': memId,
-          'condition': condition,
-          'updatedAt': updatedAt,
-        },
       );
 
   @override

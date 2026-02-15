@@ -268,7 +268,6 @@ class MemService {
       (
         MemEntityV1,
         List<MemItemEntity>,
-        List<MemNotificationEntityV1>?,
         TargetEntity?,
         List<MemRelationEntity>?,
         Mem,
@@ -277,8 +276,6 @@ class MemService {
           final unarchivedMem = await _memRepository.unarchive(mem);
           final unarchivedMemItems =
               await _memItemRepository.unarchiveBy(memId: unarchivedMem.id);
-          final unarchivedMemNotifications = await _memNotificationRepository
-              .unarchiveBy(memId: unarchivedMem.id);
           final unarchivedMemRelations =
               await _memRelationRepository.unarchiveBy(
             condition: Or([
@@ -290,7 +287,6 @@ class MemService {
           return (
             unarchivedMem,
             unarchivedMemItems.toList(growable: false),
-            unarchivedMemNotifications.toList(growable: false),
             null,
             unarchivedMemRelations.toList(growable: false),
             unarchivedMem.toEntityV2().toDomain(),
