@@ -152,8 +152,8 @@ class NotificationClient {
                 mem,
                 startOfDay,
                 await _memNotificationRepository
-                    .ship(memId: mem.id!)
-                    .then((v) => v.map((e) => e.value)),
+                    .shipV2(memId: mem.id!)
+                    .then((v) => v.map((e) => e.toDomain())),
                 latestAct,
                 DateTime.now(),
               )
@@ -199,13 +199,13 @@ class NotificationClient {
 
           final now = DateTime.now();
           final memNotifications =
-              await _memNotificationRepository.ship(memId: memId);
-          for (var notification in memNotifications.where(
-              (e) => e.value.isEnabled() && e.value.isAfterActStarted())) {
+              await _memNotificationRepository.shipV2(memId: memId);
+          for (var notification in memNotifications.where((e) =>
+              e.toDomain().isEnabled() && e.toDomain().isAfterActStarted())) {
             await _scheduleClient.receive(
               Schedule.of(
                 memId,
-                now.add(Duration(seconds: notification.value.time!)),
+                now.add(Duration(seconds: notification.toDomain().time!)),
                 NotificationType.afterActStarted,
               ),
             );

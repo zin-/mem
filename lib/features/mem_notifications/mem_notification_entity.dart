@@ -86,4 +86,11 @@ class MemNotificationEntity implements Entity<int> {
     this.updatedAt,
     this.archivedAt,
   );
+
+  toDomain() => MemNotification(
+        memId,
+        type,
+        time,
+        message,
+      );
 }

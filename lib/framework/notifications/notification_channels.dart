@@ -40,17 +40,18 @@ class NotificationChannels {
               body = "end";
               break;
             case NotificationType.repeat:
-              body = ((await MemNotificationRepository().ship(memId: memId)))
+              body = ((await MemNotificationRepository().shipV2(memId: memId)))
                       .singleWhereOrNull(
-                          (element) => element.value.isRepeated())
-                      ?.value
-                      .message ??
+                        (element) => element.toDomain().isRepeated(),
+                      )
+                      ?.message ??
                   "Repeat";
               break;
             case NotificationType.afterActStarted:
-              body = ((await MemNotificationRepository().ship(memId: memId)))
-                  .singleWhere((element) => element.value.isAfterActStarted())
-                  .value
+              body = ((await MemNotificationRepository().shipV2(memId: memId)))
+                  .singleWhere(
+                    (element) => element.toDomain().isAfterActStarted(),
+                  )
                   .message;
               break;
             case NotificationType.activeAct:
