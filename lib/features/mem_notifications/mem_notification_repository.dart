@@ -3,20 +3,16 @@ import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/condition/in.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
+import 'package:mem/framework/repository/dummy.dart';
 import 'mem_notification.dart';
 import 'mem_notification_entity.dart';
 
 // @Deprecated('MemNotificationRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
 // lintエラーになるためコメントアウト
-class MemNotificationRepository extends DatabaseTupleRepository<
-    MemNotificationEntityV1,
-    SavedMemNotificationEntityV1,
-    MemNotification,
-    int,
-    MemNotificationEntity> {
+class MemNotificationRepository extends DatabaseTupleRepository<DummyEntity,
+    SavedDummyEntity, MemNotification, int, MemNotificationEntity> {
   @override
-  SavedMemNotificationEntityV1 pack(Map<String, dynamic> map) =>
-      throw UnimplementedError();
+  SavedDummyEntity pack(Map<String, dynamic> map) => throw UnimplementedError();
 
   @override
   MemNotificationEntity packV2(dynamic tuple) => MemNotificationEntity(
