@@ -18,7 +18,7 @@ class MemClient {
         (
           MemEntityV1,
           List<MemItemEntity>,
-          List<MemNotificationEntityV1>?,
+          List<MemNotificationEntity>?,
           TargetEntity?,
           List<MemRelationEntity>?,
           MemEntity,

@@ -29,7 +29,7 @@ class MemService {
       (
         MemEntityV1,
         List<MemItemEntity>,
-        List<MemNotificationEntityV1>?,
+        List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?,
         MemEntity,
@@ -66,7 +66,7 @@ class MemService {
 
           final memNotifications = memDetail.$3;
           final returnMemNotifications =
-              List<SavedMemNotificationEntityV1?>.empty(growable: true);
+              List<MemNotificationEntity?>.empty(growable: true);
           if (memNotifications == null) {
             await _memNotificationRepository.wasteV2(memId: savedMemEntity.id);
           } else {
@@ -75,25 +75,22 @@ class MemService {
                 .map((e) {
               if (e.value.isEnabled()) {
                 return (e is SavedMemNotificationEntityV1 && !undo
-                        ? _memNotificationRepository.replaceV2(
-                            e
-                                .updatedWith(
-                                  (v) => MemNotification.by(savedMemEntity.id,
-                                      v.type, v.time, v.message),
-                                )
-                                .toEntityV2(),
-                          )
-                        : _memNotificationRepository.receiveV2(
-                            MemNotification.by(
-                              savedMemEntity.id,
-                              e.value.type,
-                              e.value.time,
-                              e.value.message,
-                            ),
-                          ))
-                    .then(
-                  (v) => SavedMemNotificationEntityV1.fromEntityV2(v),
-                );
+                    ? _memNotificationRepository.replaceV2(
+                        e
+                            .updatedWith(
+                              (v) => MemNotification.by(
+                                  savedMemEntity.id, v.type, v.time, v.message),
+                            )
+                            .toEntityV2(),
+                      )
+                    : _memNotificationRepository.receiveV2(
+                        MemNotification.by(
+                          savedMemEntity.id,
+                          e.value.type,
+                          e.value.time,
+                          e.value.message,
+                        ),
+                      ));
               } else {
                 return _memNotificationRepository
                     .wasteV2(
@@ -113,18 +110,14 @@ class MemService {
                 .groupListsBy((e) => e.value.time)
                 .entries) {
               returnMemNotifications.add(
-                await _memNotificationRepository
-                    .receiveV2(
-                      MemNotification.by(
-                        savedMemEntity.id,
-                        entry.value.single.value.type,
-                        entry.value.single.value.time,
-                        entry.value.single.value.message,
-                      ),
-                    )
-                    .then(
-                      (v) => SavedMemNotificationEntityV1.fromEntityV2(v),
-                    ),
+                await _memNotificationRepository.receiveV2(
+                  MemNotification.by(
+                    savedMemEntity.id,
+                    entry.value.single.value.type,
+                    entry.value.single.value.time,
+                    entry.value.single.value.message,
+                  ),
+                ),
               );
             }
           }
@@ -198,7 +191,7 @@ class MemService {
       (
         MemEntityV1,
         List<MemItemEntity>,
-        List<MemNotificationEntityV1>?,
+        List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?,
         MemEntity,
@@ -228,7 +221,7 @@ class MemService {
       (
         MemEntityV1,
         List<MemItemEntity>,
-        List<MemNotificationEntityV1>?,
+        List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?,
         MemEntity,
