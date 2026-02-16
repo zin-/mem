@@ -175,25 +175,29 @@ final memListProvider = StateNotifierProvider.autoDispose<
 });
 
 final savedMemNotificationsProvider = StateNotifierProvider.autoDispose<
-    ListValueStateNotifier<SavedMemNotificationEntity>,
-    List<SavedMemNotificationEntity>>(
+    ListValueStateNotifier<SavedMemNotificationEntityV1>,
+    List<SavedMemNotificationEntityV1>>(
   (ref) => v(
     () => ListValueStateNotifier(
       ref.watch(
         memNotificationsProvider.select(
-          (v) => v.whereType<SavedMemNotificationEntity>().toList(),
+          (v) => v.whereType<SavedMemNotificationEntityV1>().toList(),
         ),
       ),
       initializer: (current, notifier) => v(
         () async {
           if (current.isEmpty) {
             ref.read(memNotificationsProvider.notifier).upsertAll(
-                  await MemNotificationRepository().ship(
-                    memIdsIn: ref.read(memEntitiesProvider).map((e) => e.id),
-                  ),
+                  await MemNotificationRepository()
+                      .shipV2(
+                        memIdsIn:
+                            ref.read(memEntitiesProvider).map((e) => e.id),
+                      )
+                      .then((v) => v.map(
+                          (e) => SavedMemNotificationEntityV1.fromEntityV2(e))),
                   (current, updating) =>
-                      current is SavedMemNotificationEntity &&
-                      updating is SavedMemNotificationEntity &&
+                      current is SavedMemNotificationEntityV1 &&
+                      updating is SavedMemNotificationEntityV1 &&
                       current.id == updating.id,
                 );
           }

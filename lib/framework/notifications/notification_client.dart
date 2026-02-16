@@ -5,7 +5,6 @@ import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/settings/constants.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/settings/preference/keys.dart';
@@ -133,11 +132,7 @@ class NotificationClient {
         },
       );
 
-  Future<DateTime?> registerMemNotifications(
-    Mem mem, {
-    Iterable<SavedMemNotificationEntity>? savedMemNotifications,
-  }) =>
-      v(
+  Future<DateTime?> registerMemNotifications(Mem mem) => v(
         () async {
           if (mem.isDone || mem.isArchived) {
             cancelMemNotifications(mem.id!);
@@ -156,9 +151,9 @@ class NotificationClient {
               MemNotifications.periodicScheduleOf(
                 mem,
                 startOfDay,
-                (savedMemNotifications ??
-                        await _memNotificationRepository.ship(memId: mem.id!))
-                    .map((e) => e.value),
+                await _memNotificationRepository
+                    .shipV2(memId: mem.id!)
+                    .then((v) => v.map((e) => e.toDomain())),
                 latestAct,
                 DateTime.now(),
               )
@@ -175,7 +170,6 @@ class NotificationClient {
         },
         {
           "mem": mem,
-          "savedMemNotifications": savedMemNotifications,
         },
       );
 
@@ -205,13 +199,13 @@ class NotificationClient {
 
           final now = DateTime.now();
           final memNotifications =
-              await _memNotificationRepository.ship(memId: memId);
-          for (var notification in memNotifications.where(
-              (e) => e.value.isEnabled() && e.value.isAfterActStarted())) {
+              await _memNotificationRepository.shipV2(memId: memId);
+          for (var notification in memNotifications.where((e) =>
+              e.toDomain().isEnabled() && e.toDomain().isAfterActStarted())) {
             await _scheduleClient.receive(
               Schedule.of(
                 memId,
-                now.add(Duration(seconds: notification.value.time!)),
+                now.add(Duration(seconds: notification.toDomain().time!)),
                 NotificationType.afterActStarted,
               ),
             );
@@ -220,10 +214,7 @@ class NotificationClient {
               .ship(id: memId)
               .then((v) => v.singleOrNull?.value);
 
-          await registerMemNotifications(
-            mem!,
-            savedMemNotifications: memNotifications,
-          );
+          await registerMemNotifications(mem!);
           await setNotificationAfterInactivity();
         },
         {
@@ -303,15 +294,16 @@ class NotificationClient {
   Future<bool> _shouldNotify(int memId) => v(
         () async {
           final savedMemNotifications =
-              await _memNotificationRepository.ship(memId: memId);
+              await _memNotificationRepository.shipV2(memId: memId);
           final repeatByDayOfWeekMemNotifications = savedMemNotifications.where(
-            (e) => e.value.isEnabled() && e.value.isRepeatByDayOfWeek(),
+            (e) =>
+                e.toDomain().isEnabled() && e.toDomain().isRepeatByDayOfWeek(),
           );
 
           if (repeatByDayOfWeekMemNotifications.isNotEmpty) {
             final now = DateTime.now();
             if (!repeatByDayOfWeekMemNotifications
-                .map((e) => e.value.time)
+                .map((e) => e.toDomain().time)
                 .contains(now.weekday)) {
               return false;
             }
@@ -319,7 +311,7 @@ class NotificationClient {
 
           final repeatByNDayMemNotification =
               savedMemNotifications.singleWhereOrNull(
-            (e) => e.value.isEnabled() && e.value.isRepeatByNDay(),
+            (e) => e.toDomain().isEnabled() && e.toDomain().isRepeatByNDay(),
           );
           final lastActTime = await _actQueryService
               .fetchLatestByMemIds(memId)
@@ -330,7 +322,7 @@ class NotificationClient {
                     days:
                         // FIXME 永続化されている時点でtimeは必ずあるので型で表現する
                         //  repeatByNDayMemNotification自体がないのは別の話
-                        repeatByNDayMemNotification?.value.time! ?? 1) >
+                        repeatByNDayMemNotification?.toDomain().time! ?? 1) >
                 DateTime.now().difference(lastActTime)) {
               return false;
             }

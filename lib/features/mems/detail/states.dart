@@ -68,7 +68,9 @@ final memItemsByMemIdProvider = StateNotifierProvider.family<
 
 final memRepeatByNDayNotificationByMemIdProvider =
     StateNotifierProvider.autoDispose.family<
-        ValueStateNotifier<MemNotificationEntity>, MemNotificationEntity, int?>(
+        ValueStateNotifier<MemNotificationEntityV1>,
+        MemNotificationEntityV1,
+        int?>(
   (ref, memId) => v(
     () => ValueStateNotifier(
       ref.watch(
@@ -87,7 +89,9 @@ final memRepeatByNDayNotificationByMemIdProvider =
 
 final memAfterActStartedNotificationByMemIdProvider =
     StateNotifierProvider.autoDispose.family<
-        ValueStateNotifier<MemNotificationEntity>, MemNotificationEntity, int?>(
+        ValueStateNotifier<MemNotificationEntityV1>,
+        MemNotificationEntityV1,
+        int?>(
   (ref, memId) => v(
     () => ValueStateNotifier(
       ref.watch(
@@ -105,8 +109,8 @@ final memAfterActStartedNotificationByMemIdProvider =
 );
 
 final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
-    .family<ListValueStateNotifier<MemNotificationEntity>,
-        List<MemNotificationEntity>, int?>(
+    .family<ListValueStateNotifier<MemNotificationEntityV1>,
+        List<MemNotificationEntityV1>, int?>(
   (ref, memId) => v(
     () {
       final memNotificationsByMemId = ref.watch(
@@ -122,7 +126,7 @@ final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
           ...memNotificationsByMemId,
           if (memNotificationsByMemId
               .every((element) => !element.value.isRepeated()))
-            MemNotificationEntity(MemNotification.by(
+            MemNotificationEntityV1(MemNotification.by(
               memId,
               MemNotificationType.repeat,
               null,
@@ -130,7 +134,7 @@ final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
             )),
           if (memNotificationsByMemId
               .every((element) => !element.value.isRepeatByNDay()))
-            MemNotificationEntity(MemNotification.by(
+            MemNotificationEntityV1(MemNotification.by(
               memId,
               MemNotificationType.repeatByNDay,
               null,
@@ -138,7 +142,7 @@ final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
             )),
           if (memNotificationsByMemId
               .every((element) => !element.value.isAfterActStarted()))
-            MemNotificationEntity(MemNotification.by(
+            MemNotificationEntityV1(MemNotification.by(
               memId,
               MemNotificationType.afterActStarted,
               null,
@@ -148,12 +152,15 @@ final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
         initializer: (current, notifier) => v(
           () async {
             if (memId != null &&
-                current.whereType<SavedMemNotificationEntity>().isEmpty) {
+                current.whereType<SavedMemNotificationEntityV1>().isEmpty) {
               final notifications =
-                  await MemNotificationRepository().ship(memId: memId);
+                  await MemNotificationRepository().shipV2(memId: memId);
               if (notifier.mounted) {
                 ref.read(memNotificationsProvider.notifier).upsertAll(
-                      notifications,
+                      notifications
+                          .map((e) =>
+                              SavedMemNotificationEntityV1.fromEntityV2(e))
+                          .toList(),
                       (current, updating) =>
                           updating.value.isRepeatByDayOfWeek()
                               ? current.value.memId == updating.value.memId &&

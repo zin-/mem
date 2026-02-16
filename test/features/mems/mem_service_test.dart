@@ -58,7 +58,7 @@ void main() {
         const testMemId = 1;
         final mem = MemEntityV1(Mem(null, 'Test Mem', null, null));
         final memItems = <MemItemEntity>[];
-        final memNotifications = <MemNotificationEntity>[];
+        final memNotifications = <MemNotificationEntityV1>[];
         final target = TargetEntity(
           Target(
             memId: null,
@@ -97,7 +97,7 @@ void main() {
 
         when(mockMemRepository.receiveV2(any))
             .thenAnswer((_) async => savedMem.toEntityV2());
-        when(mockMemNotificationRepository.waste(
+        when(mockMemNotificationRepository.wasteV2(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
           condition: anyNamed('condition'),
@@ -106,7 +106,7 @@ void main() {
             .thenAnswer((_) async => []);
         when(mockTargetRepository.waste(condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
-        when(mockMemNotificationRepository.waste(
+        when(mockMemNotificationRepository.wasteV2(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
           condition: anyNamed('condition'),
@@ -137,7 +137,7 @@ void main() {
         const testMemId = 1;
         final mem = MemEntityV1(Mem(null, 'Test Mem', null, null));
         final memItems = <MemItemEntity>[];
-        final memNotifications = <MemNotificationEntity>[];
+        final memNotifications = <MemNotificationEntityV1>[];
         final target = null;
         final memRelations = <MemRelationEntity>[];
 
@@ -156,7 +156,7 @@ void main() {
 
         when(mockMemRepository.receiveV2(any))
             .thenAnswer((_) async => savedMem.toEntityV2());
-        when(mockMemNotificationRepository.waste(
+        when(mockMemNotificationRepository.wasteV2(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
           condition: anyNamed('condition'),
@@ -185,7 +185,7 @@ void main() {
         const testMemId = 1;
         final mem = MemEntityV1(Mem(null, 'Test Mem', null, null));
         final memItems = <MemItemEntity>[];
-        final memNotifications = <MemNotificationEntity>[];
+        final memNotifications = <MemNotificationEntityV1>[];
         final target = TargetEntity(
           Target(
             memId: null,
@@ -212,7 +212,7 @@ void main() {
 
         when(mockMemRepository.receiveV2(any))
             .thenAnswer((_) async => savedMem.toEntityV2());
-        when(mockMemNotificationRepository.waste(
+        when(mockMemNotificationRepository.wasteV2(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
           condition: anyNamed('condition'),

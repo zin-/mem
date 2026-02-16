@@ -27,7 +27,7 @@ class MemClient {
       )> save(
     MemEntityV1 mem,
     List<MemItemEntity> memItemList,
-    List<MemNotificationEntity> memNotificationList,
+    List<MemNotificationEntityV1> memNotificationList,
     TargetEntity? target,
     List<MemRelationEntity>? memRelations,
   ) =>
@@ -46,8 +46,6 @@ class MemClient {
           final nextNotifyAt =
               await _notificationClient.registerMemNotifications(
             saved.$6.toDomain(),
-            savedMemNotifications:
-                saved.$3?.whereType<SavedMemNotificationEntity>(),
           );
 
           return (saved, nextNotifyAt);
@@ -61,32 +59,25 @@ class MemClient {
         },
       );
 
-  Future<
-      (
-        MemEntityV1,
-        List<MemItemEntity>,
-        List<MemNotificationEntity>?,
-        TargetEntity?,
-        List<MemRelationEntity>?
-      )> archive(SavedMemEntityV1 memEntity) => v(
-        () async {
-          final archived = await _memService.archive(memEntity);
+  Future<(MemEntityV1, List<MemItemEntity>, TargetEntity?, List<MemRelationEntity>?)>
+      archive(SavedMemEntityV1 memEntity) => v(
+            () async {
+              final archived = await _memService.archive(memEntity);
 
-          _notificationClient
-              .cancelMemNotifications((archived.$1 as SavedMemEntityV1).id);
+              _notificationClient
+                  .cancelMemNotifications((archived.$1 as SavedMemEntityV1).id);
 
-          return archived;
-        },
-        {
-          'memEntity': memEntity,
-        },
-      );
+              return archived;
+            },
+            {
+              'memEntity': memEntity,
+            },
+          );
 
   Future<
       (
         MemEntityV1,
         List<MemItemEntity>,
-        List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?,
         Mem,
@@ -94,11 +85,7 @@ class MemClient {
         () async {
           final unarchived = await _memService.unarchive(memEntity);
 
-          _notificationClient.registerMemNotifications(
-            unarchived.$6,
-            savedMemNotifications:
-                unarchived.$3?.whereType<SavedMemNotificationEntity>(),
-          );
+          _notificationClient.registerMemNotifications(unarchived.$5);
 
           return unarchived;
         },

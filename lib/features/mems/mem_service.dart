@@ -37,7 +37,7 @@ class MemService {
     (
       MemEntityV1,
       List<MemItemEntity>,
-      List<MemNotificationEntity>?,
+      List<MemNotificationEntityV1>?,
       TargetEntity?,
       List<MemRelationEntity>?,
     ) memDetail, {
@@ -66,26 +66,34 @@ class MemService {
 
           final memNotifications = memDetail.$3;
           final returnMemNotifications =
-              List<SavedMemNotificationEntity?>.empty(growable: true);
+              List<MemNotificationEntity?>.empty(growable: true);
           if (memNotifications == null) {
-            await _memNotificationRepository.waste(memId: savedMemEntity.id);
+            await _memNotificationRepository.wasteV2(memId: savedMemEntity.id);
           } else {
             returnMemNotifications.addAll(await Future.wait(memNotifications
                 .where((e) => !e.value.isRepeatByDayOfWeek())
                 .map((e) {
               if (e.value.isEnabled()) {
-                return (e is SavedMemNotificationEntity && !undo
-                    ? _memNotificationRepository.replace(e.updatedWith(
-                        (v) => MemNotification.by(
-                            savedMemEntity.id, v.type, v.time, v.message),
-                      ))
-                    : _memNotificationRepository.receive(e.updatedWith(
-                        (v) => MemNotification.by(
-                            savedMemEntity.id, v.type, v.time, v.message),
-                      )));
+                return (e is SavedMemNotificationEntityV1 && !undo
+                    ? _memNotificationRepository.replaceV2(
+                        e
+                            .updatedWith(
+                              (v) => MemNotification.by(
+                                  savedMemEntity.id, v.type, v.time, v.message),
+                            )
+                            .toEntityV2(),
+                      )
+                    : _memNotificationRepository.receiveV2(
+                        MemNotification.by(
+                          savedMemEntity.id,
+                          e.value.type,
+                          e.value.time,
+                          e.value.message,
+                        ),
+                      ));
               } else {
                 return _memNotificationRepository
-                    .waste(
+                    .wasteV2(
                       memId: savedMemEntity.id,
                       type: e.value.type,
                     )
@@ -93,7 +101,7 @@ class MemService {
               }
             })));
 
-            await _memNotificationRepository.waste(
+            await _memNotificationRepository.wasteV2(
               memId: savedMemEntity.id,
               type: MemNotificationType.repeatByDayOfWeek,
             );
@@ -102,14 +110,12 @@ class MemService {
                 .groupListsBy((e) => e.value.time)
                 .entries) {
               returnMemNotifications.add(
-                await _memNotificationRepository.receive(
-                  entry.value.single.updatedWith(
-                    (v) => MemNotification.by(
-                      savedMemEntity.id,
-                      v.type,
-                      v.time,
-                      v.message,
-                    ),
+                await _memNotificationRepository.receiveV2(
+                  MemNotification.by(
+                    savedMemEntity.id,
+                    entry.value.single.value.type,
+                    entry.value.single.value.time,
+                    entry.value.single.value.message,
                   ),
                 ),
               );
@@ -241,42 +247,33 @@ class MemService {
         },
       );
 
-  Future<
-      (
-        MemEntityV1,
-        List<MemItemEntity>,
-        List<MemNotificationEntity>?,
-        TargetEntity?,
-        List<MemRelationEntity>?
-      )> archive(SavedMemEntityV1 mem) => i(
-        () async {
-          final archivedMem = await _memRepository.archive(mem);
-          final archivedMemItems =
-              await _memItemRepository.archiveBy(memId: archivedMem.id);
-          final archivedMemNotifications =
-              await _memNotificationRepository.archiveBy(memId: archivedMem.id);
-          final archivedMemRelations = await _memRelationRepository.archiveBy(
-            relatedMemId: archivedMem.id,
-          );
+  Future<(MemEntityV1, List<MemItemEntity>, TargetEntity?, List<MemRelationEntity>?)>
+      archive(SavedMemEntityV1 mem) => i(
+            () async {
+              final archivedMem = await _memRepository.archive(mem);
+              final archivedMemItems =
+                  await _memItemRepository.archiveBy(memId: archivedMem.id);
+              final archivedMemRelations =
+                  await _memRelationRepository.archiveBy(
+                relatedMemId: archivedMem.id,
+              );
 
-          return (
-            archivedMem,
-            archivedMemItems.toList(growable: false),
-            archivedMemNotifications.toList(growable: false),
-            null,
-            archivedMemRelations.toList(growable: false),
+              return (
+                archivedMem,
+                archivedMemItems.toList(growable: false),
+                null,
+                archivedMemRelations.toList(growable: false),
+              );
+            },
+            {
+              'mem': mem,
+            },
           );
-        },
-        {
-          'mem': mem,
-        },
-      );
 
   Future<
       (
         MemEntityV1,
         List<MemItemEntity>,
-        List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?,
         Mem,
@@ -285,8 +282,6 @@ class MemService {
           final unarchivedMem = await _memRepository.unarchive(mem);
           final unarchivedMemItems =
               await _memItemRepository.unarchiveBy(memId: unarchivedMem.id);
-          final unarchivedMemNotifications = await _memNotificationRepository
-              .unarchiveBy(memId: unarchivedMem.id);
           final unarchivedMemRelations =
               await _memRelationRepository.unarchiveBy(
             condition: Or([
@@ -298,7 +293,6 @@ class MemService {
           return (
             unarchivedMem,
             unarchivedMemItems.toList(growable: false),
-            unarchivedMemNotifications.toList(growable: false),
             null,
             unarchivedMemRelations.toList(growable: false),
             unarchivedMem.toEntityV2().toDomain(),

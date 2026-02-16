@@ -66,7 +66,7 @@ class MemEntities extends _$MemEntities
         (
           MemEntityV1,
           List<MemItemEntity>,
-          List<MemNotificationEntity>?,
+          List<MemNotificationEntityV1>?,
           TargetEntity?,
           List<MemRelationEntity>?,
           MemEntity,
@@ -75,7 +75,7 @@ class MemEntities extends _$MemEntities
       )> save(
     MemEntityV1 memEntity,
     Iterable<MemItemEntity> memItemEntities,
-    Iterable<MemNotificationEntity> memNotificationEntities,
+    Iterable<MemNotificationEntityV1> memNotificationEntities,
     TargetEntity? targetEntity,
     Iterable<MemRelationEntity>? memRelationEntities,
   ) =>
@@ -95,7 +95,19 @@ class MemEntities extends _$MemEntities
               .read(memRelationEntitiesProvider.notifier)
               .upsert(saved.$5?.whereType<SavedMemRelationEntity>() ?? []);
 
-          return (saved, nextNotifyAt);
+          return (
+            (
+              saved.$1,
+              saved.$2,
+              saved.$3
+                  ?.map((e) => SavedMemNotificationEntityV1.fromEntityV2(e))
+                  .toList(),
+              saved.$4,
+              saved.$5,
+              saved.$6,
+            ),
+            nextNotifyAt
+          );
         },
         {
           'memEntity': memEntity,
@@ -119,7 +131,7 @@ class MemEntities extends _$MemEntities
       (
         MemEntityV1,
         List<MemItemEntity>,
-        List<MemNotificationEntity>?,
+        List<MemNotificationEntityV1>?,
         TargetEntity?,
         List<MemRelationEntity>?,
         MemEntity,
@@ -138,7 +150,16 @@ class MemEntities extends _$MemEntities
 
             upsert([undoneRemovedMemDetail.$1 as SavedMemEntityV1]);
 
-            return undoneRemovedMemDetail;
+            return (
+              undoneRemovedMemDetail.$1,
+              undoneRemovedMemDetail.$2,
+              undoneRemovedMemDetail.$3
+                  ?.map((e) => SavedMemNotificationEntityV1.fromEntityV2(e))
+                  .toList(),
+              undoneRemovedMemDetail.$4,
+              undoneRemovedMemDetail.$5,
+              undoneRemovedMemDetail.$6,
+            );
           }
 
           return null;

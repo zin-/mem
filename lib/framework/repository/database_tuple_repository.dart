@@ -69,7 +69,10 @@ abstract class DatabaseTupleRepository<
       );
 
   SAVEDV1 pack(Map<String, dynamic> map);
-  ENTITY packV2(dynamic tuple) => throw UnimplementedError();
+  ENTITY packV2(
+          // FIXME 自動生成されるDataClassを使うべきかも
+          dynamic tuple) =>
+      throw UnimplementedError();
   convert(DOMAIN domain) => throw UnimplementedError();
 
   Future<SAVEDV1> receive(
@@ -129,6 +132,20 @@ abstract class DatabaseTupleRepository<
           'offset': offset,
           'limit': limit,
         },
+      );
+
+  Future<List<ENTITY>> shipV2({
+    Condition? condition,
+  }) =>
+      v(
+        () async {
+          final rows = await _driftAccessor.selectV2(
+            _tableDefinition,
+            condition: condition,
+          );
+          return rows.map<ENTITY>((e) => packV2(e)).toList();
+        },
+        {'condition': condition},
       );
 
   Future<SAVEDV1> replace(

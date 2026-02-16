@@ -1,11 +1,16 @@
+import 'package:drift/drift.dart';
+import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
+import 'package:mem/databases/database.dart' as drift_database;
+
+import 'package:mem/features/mems/mem.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
 
 import 'mem_notification.dart';
 
-class MemNotificationEntity with EntityV1<MemNotification> {
-  MemNotificationEntity(MemNotification value) {
+class MemNotificationEntityV1 with EntityV1<MemNotification> {
+  MemNotificationEntityV1(MemNotification value) {
     this.value = value;
   }
 
@@ -18,14 +23,14 @@ class MemNotificationEntity with EntityV1<MemNotification> {
       };
 
   @override
-  MemNotificationEntity updatedWith(
+  MemNotificationEntityV1 updatedWith(
           MemNotification Function(MemNotification v) update) =>
-      MemNotificationEntity(update(value));
+      MemNotificationEntityV1(update(value));
 }
 
-class SavedMemNotificationEntity extends MemNotificationEntity
+class SavedMemNotificationEntityV1 extends MemNotificationEntityV1
     with DatabaseTupleEntityV1<int, MemNotification> {
-  SavedMemNotificationEntity(Map<String, dynamic> map)
+  SavedMemNotificationEntityV1(Map<String, dynamic> map)
       : super(
           MemNotification.by(
             map[defFkMemNotificationsMemId.name],
@@ -38,8 +43,87 @@ class SavedMemNotificationEntity extends MemNotificationEntity
   }
 
   @override
-  SavedMemNotificationEntity updatedWith(
+  SavedMemNotificationEntityV1 updatedWith(
           MemNotification Function(MemNotification v) update) =>
-      SavedMemNotificationEntity(
+      SavedMemNotificationEntityV1(
           toMap..addAll(super.updatedWith(update).toMap));
+
+  factory SavedMemNotificationEntityV1.fromEntityV2(
+          MemNotificationEntity entity) =>
+      SavedMemNotificationEntityV1(
+        {
+          defFkMemNotificationsMemId.name: entity.memId,
+          defColMemNotificationsType.name: entity.type.name,
+          defColMemNotificationsTime.name: entity.time,
+          defColMemNotificationsMessage.name: entity.message,
+          defPkId.name: entity.id,
+          defColCreatedAt.name: entity.createdAt,
+          defColUpdatedAt.name: entity.updatedAt,
+          defColArchivedAt.name: entity.archivedAt,
+        },
+      );
+
+  MemNotificationEntity toEntityV2() => MemNotificationEntity(
+        value.memId,
+        value.type,
+        value.time,
+        value.message,
+        id,
+        createdAt,
+        updatedAt,
+        archivedAt,
+      );
 }
+
+class MemNotificationEntity implements Entity<int> {
+  final MemId memId;
+  final MemNotificationType type;
+  final int? time;
+  final String message;
+
+  @override
+  final int id;
+  @override
+  final DateTime createdAt;
+  @override
+  final DateTime? updatedAt;
+  @override
+  final DateTime? archivedAt;
+
+  MemNotificationEntity(
+    this.memId,
+    this.type,
+    this.time,
+    this.message,
+    this.id,
+    this.createdAt,
+    this.updatedAt,
+    this.archivedAt,
+  );
+
+  toDomain() => MemNotification(
+        memId,
+        type,
+        time,
+        message,
+      );
+}
+
+convertIntoMemRepeatedNotificationsInsertable(MemNotification entity,
+        {DateTime? createdAt}) =>
+    drift_database.MemRepeatedNotificationsCompanion(
+      memId: Value(entity.memId ?? 0),
+      timeOfDaySeconds: Value(entity.time ?? 0),
+      type: Value(entity.type.name),
+      message: Value(entity.message),
+      createdAt: Value(createdAt ?? DateTime.now()),
+    );
+convertIntoMemRepeatedNotificationsUpdateable(MemNotificationEntity entity,
+        {DateTime? updatedAt}) =>
+    drift_database.MemRepeatedNotificationsCompanion(
+      memId: Value(entity.memId ?? 0),
+      timeOfDaySeconds: Value(entity.time ?? 0),
+      type: Value(entity.type.name),
+      message: Value(entity.message),
+      updatedAt: Value(updatedAt ?? DateTime.now()),
+    );

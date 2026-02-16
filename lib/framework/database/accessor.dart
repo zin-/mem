@@ -3,6 +3,8 @@ import 'package:mem/databases/database.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
+import 'package:mem/features/mem_notifications/mem_notification.dart';
+import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/mem.dart' as mem_domain;
 import 'package:mem/features/mems/mem_entity.dart' as mem_entity;
 import 'package:mem/features/logger/log_service.dart';
@@ -161,6 +163,24 @@ class DriftDatabaseAccessor {
           'limit': limit,
         },
       );
+  Future<List<dynamic>> selectV2(
+    TableDefinition tableDefinition, {
+    Condition? condition,
+  }) =>
+      v(
+        () async {
+          final tableInfo = _getTableInfoV2(tableDefinition);
+          final query = driftDatabase.select(tableInfo);
+          if (condition != null) {
+            final driftExpression = condition.toDriftExpression(tableInfo);
+            if (driftExpression != null) {
+              query.where((tbl) => driftExpression);
+            }
+          }
+          return await query.get();
+        },
+        {'tableDefinition': tableDefinition, 'condition': condition},
+      );
 
   insert(
     TableDefinition tableDefinition,
@@ -303,6 +323,10 @@ class DriftDatabaseAccessor {
       case ActEntity _:
       case List<SavedActEntityV1> _:
         return driftDatabase.acts;
+
+      case MemNotification _:
+      case MemNotificationEntity _:
+        return driftDatabase.memRepeatedNotifications;
 
       case TableDefinition _:
         return driftDatabase.allTables.firstWhere(
@@ -472,10 +496,18 @@ convertIntoDriftInsertable(dynamic domain) {
   switch (domain) {
     case mem_domain.Mem _:
       return convertIntoMemsInsertable(domain, DateTime.now());
+
     case ActiveAct _:
     case FinishedAct _:
     case PausedAct _:
       return convertIntoActsInsertable(domain, createdAt: DateTime.now());
+
+    case MemNotification _:
+      return convertIntoMemRepeatedNotificationsInsertable(
+        domain,
+        createdAt: DateTime.now(),
+      );
+
     default:
       throw StateError('Unknown domain: ${domain.runtimeType}');
   }
@@ -487,6 +519,9 @@ convertIntoDriftUpdateable(dynamic entity, {DateTime? updatedAt}) {
       return convertIntoMemsUpdateable(entity, updatedAt: updatedAt);
     case ActEntity _:
       return convertIntoActsUpdateable(entity, updatedAt: updatedAt);
+    case MemNotificationEntity _:
+      return convertIntoMemRepeatedNotificationsUpdateable(entity,
+          updatedAt: updatedAt);
     default:
       throw StateError('Unknown entity: ${entity.runtimeType}');
   }

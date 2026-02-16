@@ -42,7 +42,7 @@ class _MemListWidget extends StatelessWidget {
   final ScrollController _scrollController;
   final List<Mem> _memList;
   final TimeOfDay _startOfDay;
-  final Iterable<MemNotificationEntity> _memNotifications;
+  final Iterable<MemNotificationEntityV1> _memNotifications;
   final Iterable<Act> _latestActsByMem;
 
   const _MemListWidget(
