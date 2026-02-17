@@ -13,17 +13,18 @@ import 'package:mem/features/mem_items/mem_item_entity.dart';
 // @Deprecated('MemItemRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
 // lintエラーになるためコメントアウト
 class MemItemRepository extends DatabaseTupleRepository<
-    MemItemEntity,
-    SavedMemItemEntity,
+    MemItemEntityV1,
+    SavedMemItemEntityV1,
     MemItem,
     int,
     // FIXME MemItementityを定義して置き換える
     MemEntity> {
   @override
-  SavedMemItemEntity pack(Map<String, dynamic> map) => SavedMemItemEntity(map);
+  SavedMemItemEntityV1 pack(Map<String, dynamic> map) =>
+      SavedMemItemEntityV1(map);
 
   @override
-  Future<List<SavedMemItemEntity>> ship({
+  Future<List<SavedMemItemEntityV1>> ship({
     int? memId,
     Iterable<int>? memIdsIn,
     Condition? condition,
@@ -46,7 +47,7 @@ class MemItemRepository extends DatabaseTupleRepository<
         limit: limit,
       );
 
-  Future<Iterable<SavedMemItemEntity>> archiveBy({
+  Future<Iterable<SavedMemItemEntityV1>> archiveBy({
     int? memId,
     DateTime? archivedAt,
   }) =>
@@ -70,7 +71,7 @@ class MemItemRepository extends DatabaseTupleRepository<
         },
       );
 
-  Future<Iterable<SavedMemItemEntity>> unarchiveBy({
+  Future<Iterable<SavedMemItemEntityV1>> unarchiveBy({
     int? memId,
     DateTime? updatedAt,
   }) =>
@@ -95,7 +96,7 @@ class MemItemRepository extends DatabaseTupleRepository<
       );
 
   @override
-  Future<List<SavedMemItemEntity>> waste({
+  Future<List<SavedMemItemEntityV1>> waste({
     Condition? condition,
   }) =>
       super.waste(

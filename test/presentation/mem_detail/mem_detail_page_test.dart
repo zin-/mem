@@ -199,7 +199,7 @@ void main() {
 
         when(mockMemItemRepository.ship(memId: _TestConstants.testMemId))
             .thenAnswer((_) async => [
-                  SavedMemItemEntity(
+                  SavedMemItemEntityV1(
                     {
                       defPkId.name: _TestConstants.testMemId,
                       defFkMemItemsMemId.name: _TestConstants.testMemId,
@@ -293,7 +293,7 @@ void main() {
         )).thenAnswer((_) async => (
               (
                 MemEntityV1(Mem(1, "", null, null)),
-                <MemItemEntity>[],
+                <MemItemEntityV1>[],
                 null,
                 null,
                 null,
@@ -375,7 +375,7 @@ void main() {
 
         when(mockMemItemRepository.ship(memId: _TestConstants.testMemId))
             .thenAnswer((_) async => [
-                  SavedMemItemEntity(
+                  SavedMemItemEntityV1(
                     {
                       defPkId.name: _TestConstants.testMemId,
                       defFkMemItemsMemId.name: _TestConstants.testMemId,

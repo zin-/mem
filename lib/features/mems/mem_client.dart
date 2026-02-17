@@ -17,7 +17,7 @@ class MemClient {
       (
         (
           MemEntityV1,
-          List<MemItemEntity>,
+          List<MemItemEntityV1>,
           List<MemNotificationEntity>?,
           TargetEntity?,
           List<MemRelationEntity>?,
@@ -26,7 +26,7 @@ class MemClient {
         DateTime?
       )> save(
     MemEntityV1 mem,
-    List<MemItemEntity> memItemList,
+    List<MemItemEntityV1> memItemList,
     List<MemNotificationEntityV1> memNotificationList,
     TargetEntity? target,
     List<MemRelationEntity>? memRelations,
@@ -59,7 +59,7 @@ class MemClient {
         },
       );
 
-  Future<(MemEntityV1, List<MemItemEntity>, TargetEntity?, List<MemRelationEntity>?)>
+  Future<(MemEntityV1, List<MemItemEntityV1>, TargetEntity?, List<MemRelationEntity>?)>
       archive(SavedMemEntityV1 memEntity) => v(
             () async {
               final archived = await _memService.archive(memEntity);
@@ -77,7 +77,7 @@ class MemClient {
   Future<
       (
         MemEntityV1,
-        List<MemItemEntity>,
+        List<MemItemEntityV1>,
         TargetEntity?,
         List<MemRelationEntity>?,
         Mem,

@@ -16,7 +16,7 @@ class MemEntityV1 with EntityV1<Mem> {
     this.value = value;
 
     entityChildrenRelation[MemEntityV1] ??= {
-      MemItemEntity,
+      MemItemEntityV1,
       ActEntityV1,
       MemNotificationEntityV1,
       TargetEntity,

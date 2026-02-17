@@ -28,7 +28,7 @@ class MemService {
   Future<
       (
         MemEntityV1,
-        List<MemItemEntity>,
+        List<MemItemEntityV1>,
         List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?,
@@ -36,7 +36,7 @@ class MemService {
       )> save(
     (
       MemEntityV1,
-      List<MemItemEntity>,
+      List<MemItemEntityV1>,
       List<MemNotificationEntityV1>?,
       TargetEntity?,
       List<MemRelationEntity>?,
@@ -53,10 +53,10 @@ class MemService {
 
           final savedMemItems = await Future.wait(
             memDetail.$2.map(
-              (e) => (e is SavedMemItemEntity && !undo
+              (e) => (e is SavedMemItemEntityV1 && !undo
                   ? _memItemRepository.replace(
                       e.copiedWith(memId: () => savedMemEntity.id)
-                          as SavedMemItemEntity,
+                          as SavedMemItemEntityV1,
                     )
                   : _memItemRepository.receive(
                       e.copiedWith(memId: () => savedMemEntity.id),
@@ -190,7 +190,7 @@ class MemService {
   Future<
       (
         MemEntityV1,
-        List<MemItemEntity>,
+        List<MemItemEntityV1>,
         List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?,
@@ -220,7 +220,7 @@ class MemService {
   Future<
       (
         MemEntityV1,
-        List<MemItemEntity>,
+        List<MemItemEntityV1>,
         List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?,
@@ -247,7 +247,7 @@ class MemService {
         },
       );
 
-  Future<(MemEntityV1, List<MemItemEntity>, TargetEntity?, List<MemRelationEntity>?)>
+  Future<(MemEntityV1, List<MemItemEntityV1>, TargetEntity?, List<MemRelationEntity>?)>
       archive(SavedMemEntityV1 mem) => i(
             () async {
               final archivedMem = await _memRepository.archive(mem);
@@ -273,7 +273,7 @@ class MemService {
   Future<
       (
         MemEntityV1,
-        List<MemItemEntity>,
+        List<MemItemEntityV1>,
         TargetEntity?,
         List<MemRelationEntity>?,
         Mem,
