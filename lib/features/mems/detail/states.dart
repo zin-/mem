@@ -49,10 +49,12 @@ final memItemsByMemIdProvider = StateNotifierProvider.family<
       ],
       initializer: (current, notifier) async {
         if (memId != null) {
-          final items = await MemItemRepository().ship(memId: memId);
+          final items = await MemItemRepository().shipV2(memId: memId);
           if (notifier.mounted) {
             ref.read(memItemsProvider.notifier).upsertAll(
-                  items,
+                  items
+                      .map((e) => SavedMemItemEntityV1.fromEntityV2(e))
+                      .toList(),
                   (current, updating) =>
                       current is SavedMemItemEntityV1 &&
                       updating is SavedMemItemEntityV1 &&

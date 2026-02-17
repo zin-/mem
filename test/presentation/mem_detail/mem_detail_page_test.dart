@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/databases/table_definitions/base.dart';
-import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/databases/table_definitions/mem_relations.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
@@ -102,9 +101,8 @@ void main() {
       offset: anyNamed('offset'),
       limit: anyNamed('limit'),
     )).thenAnswer((_) async => []);
-    when(mockMemItemRepository.ship(
+    when(mockMemItemRepository.shipV2(
       memId: anyNamed('memId'),
-      memIdsIn: anyNamed('memIdsIn'),
       condition: anyNamed('condition'),
       groupBy: anyNamed('groupBy'),
       orderBy: anyNamed('orderBy'),
@@ -197,18 +195,16 @@ void main() {
               ),
             ]);
 
-        when(mockMemItemRepository.ship(memId: _TestConstants.testMemId))
+        when(mockMemItemRepository.shipV2(memId: _TestConstants.testMemId))
             .thenAnswer((_) async => [
-                  SavedMemItemEntityV1(
-                    {
-                      defPkId.name: _TestConstants.testMemId,
-                      defFkMemItemsMemId.name: _TestConstants.testMemId,
-                      defColMemItemsType.name: MemItemType.memo.name,
-                      defColMemItemsValue.name: 'Test Mem',
-                      defColCreatedAt.name: DateTime.now(),
-                      defColUpdatedAt.name: null,
-                      defColArchivedAt.name: null,
-                    },
+                  MemItemEntity(
+                    _TestConstants.testMemId,
+                    MemItemType.memo,
+                    'Test Mem',
+                    _TestConstants.testMemId,
+                    DateTime.now(),
+                    null,
+                    null,
                   ),
                 ]);
 
@@ -373,18 +369,16 @@ void main() {
               ),
             ]);
 
-        when(mockMemItemRepository.ship(memId: _TestConstants.testMemId))
+        when(mockMemItemRepository.shipV2(memId: _TestConstants.testMemId))
             .thenAnswer((_) async => [
-                  SavedMemItemEntityV1(
-                    {
-                      defPkId.name: _TestConstants.testMemId,
-                      defFkMemItemsMemId.name: _TestConstants.testMemId,
-                      defColMemItemsType.name: MemItemType.memo.name,
-                      defColMemItemsValue.name: 'Test Mem',
-                      defColCreatedAt.name: DateTime.now(),
-                      defColUpdatedAt.name: null,
-                      defColArchivedAt.name: null,
-                    },
+                  MemItemEntity(
+                    _TestConstants.testMemId,
+                    MemItemType.memo,
+                    'Test Mem',
+                    _TestConstants.testMemId,
+                    DateTime.now(),
+                    null,
+                    null,
                   ),
                 ]);
 

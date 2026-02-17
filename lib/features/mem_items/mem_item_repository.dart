@@ -1,9 +1,7 @@
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/features/mem_items/mem_item.dart';
-import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
-import 'package:mem/framework/repository/condition/in.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
@@ -12,42 +10,42 @@ import 'package:mem/features/mem_items/mem_item_entity.dart';
 
 // @Deprecated('MemItemRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
 // lintエラーになるためコメントアウト
-class MemItemRepository extends DatabaseTupleRepository<
-    MemItemEntityV1,
-    SavedMemItemEntityV1,
-    MemItem,
-    int,
-    // FIXME MemItementityを定義して置き換える
-    MemEntity> {
+class MemItemRepository extends DatabaseTupleRepository<MemItemEntityV1,
+    SavedMemItemEntityV1, MemItem, int, MemItemEntity> {
   @override
   SavedMemItemEntityV1 pack(Map<String, dynamic> map) =>
       SavedMemItemEntityV1(map);
 
   @override
-  Future<List<SavedMemItemEntityV1>> ship({
+  MemItemEntity packV2(dynamic tuple) => MemItemEntity(
+        tuple.memId,
+        MemItemType.values.byName(tuple.type),
+        tuple.value,
+        tuple.id,
+        tuple.createdAt,
+        tuple.updatedAt,
+        tuple.archivedAt,
+      );
+
+  @override
+  Future<List<MemItemEntity>> shipV2({
     int? memId,
-    Iterable<int>? memIdsIn,
     Condition? condition,
     GroupBy? groupBy,
     List<OrderBy>? orderBy,
     int? offset,
     int? limit,
-  }) =>
-      super.ship(
+  }) async =>
+      await super.shipV2(
         condition: And(
           [
             if (memId != null) Equals(defFkMemItemsMemId, memId),
-            if (memIdsIn != null) In(defFkMemItemsMemId.name, memIdsIn),
             if (condition != null) condition,
           ],
         ),
-        groupBy: groupBy,
-        orderBy: orderBy,
-        offset: offset,
-        limit: limit,
       );
 
-  Future<Iterable<SavedMemItemEntityV1>> archiveBy({
+  Future<Iterable<MemItemEntity>> archiveBy({
     int? memId,
     DateTime? archivedAt,
   }) =>
@@ -56,11 +54,19 @@ class MemItemRepository extends DatabaseTupleRepository<
           final time = archivedAt ?? DateTime.now();
 
           return await Future.wait(
-            await ship(
+            await shipV2(
               memId: memId,
             ).then(
               (v) => v.map(
-                (e) => archive(e, archivedAt: time),
+                (e) => super.replaceV2(MemItemEntity(
+                  e.memId,
+                  e.type,
+                  e.value,
+                  e.id,
+                  e.createdAt,
+                  e.updatedAt,
+                  time,
+                )),
               ),
             ),
           );
@@ -71,7 +77,7 @@ class MemItemRepository extends DatabaseTupleRepository<
         },
       );
 
-  Future<Iterable<SavedMemItemEntityV1>> unarchiveBy({
+  Future<Iterable<MemItemEntity>> unarchiveBy({
     int? memId,
     DateTime? updatedAt,
   }) =>
@@ -80,11 +86,19 @@ class MemItemRepository extends DatabaseTupleRepository<
           final time = updatedAt ?? DateTime.now();
 
           return await Future.wait(
-            await ship(
+            await shipV2(
               memId: memId,
             ).then(
               (v) => v.map(
-                (e) => unarchive(e, updatedAt: time),
+                (e) => super.replaceV2(MemItemEntity(
+                  e.memId,
+                  e.type,
+                  e.value,
+                  e.id,
+                  e.createdAt,
+                  time,
+                  null,
+                )),
               ),
             ),
           );

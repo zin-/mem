@@ -1,5 +1,7 @@
+import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/databases/table_definitions/mem_items.dart';
+import 'package:mem/features/mems/mem.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
 
@@ -49,4 +51,42 @@ class SavedMemItemEntityV1 extends MemItemEntityV1
   @override
   SavedMemItemEntityV1 updatedWith(MemItem Function(MemItem v) update) =>
       SavedMemItemEntityV1(toMap..addAll(super.updatedWith(update).toMap));
+
+  factory SavedMemItemEntityV1.fromEntityV2(MemItemEntity entity) =>
+      SavedMemItemEntityV1(
+        {
+          defFkMemItemsMemId.name: entity.memId,
+          defColMemItemsType.name: entity.type.name,
+          defColMemItemsValue.name: entity.value,
+          defPkId.name: entity.id,
+          defColCreatedAt.name: entity.createdAt,
+          defColUpdatedAt.name: entity.updatedAt,
+          defColArchivedAt.name: entity.archivedAt,
+        },
+      );
+}
+
+class MemItemEntity implements Entity<int> {
+  final MemId memId;
+  final MemItemType type;
+  final String value;
+
+  @override
+  final int id;
+  @override
+  final DateTime createdAt;
+  @override
+  final DateTime? updatedAt;
+  @override
+  final DateTime? archivedAt;
+
+  MemItemEntity(
+    this.memId,
+    this.type,
+    this.value,
+    this.id,
+    this.createdAt,
+    this.updatedAt,
+    this.archivedAt,
+  );
 }

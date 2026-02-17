@@ -251,8 +251,11 @@ class MemService {
       archive(SavedMemEntityV1 mem) => i(
             () async {
               final archivedMem = await _memRepository.archive(mem);
-              final archivedMemItems =
-                  await _memItemRepository.archiveBy(memId: archivedMem.id);
+              final archivedMemItems = await _memItemRepository
+                  .archiveBy(memId: archivedMem.id)
+                  .then((v) => v
+                      .map((e) => SavedMemItemEntityV1.fromEntityV2(e))
+                      .toList());
               final archivedMemRelations =
                   await _memRelationRepository.archiveBy(
                 relatedMemId: archivedMem.id,
@@ -280,8 +283,10 @@ class MemService {
       )> unarchive(SavedMemEntityV1 mem) => i(
         () async {
           final unarchivedMem = await _memRepository.unarchive(mem);
-          final unarchivedMemItems =
-              await _memItemRepository.unarchiveBy(memId: unarchivedMem.id);
+          final unarchivedMemItems = await _memItemRepository
+              .unarchiveBy(memId: unarchivedMem.id)
+              .then((v) =>
+                  v.map((e) => SavedMemItemEntityV1.fromEntityV2(e)).toList());
           final unarchivedMemRelations =
               await _memRelationRepository.unarchiveBy(
             condition: Or([
