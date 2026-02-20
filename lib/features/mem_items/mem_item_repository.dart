@@ -14,13 +14,12 @@ import 'package:mem/features/mem_items/mem_item_entity.dart';
 class MemItemRepository extends DatabaseTupleRepository<
 // TODO dummyに置き換える
     DummyEntity,
-    SavedMemItemEntityV1,
+    SavedDummyEntity,
     MemItem,
     int,
     MemItemEntity> {
   @override
-  SavedMemItemEntityV1 pack(Map<String, dynamic> map) =>
-      SavedMemItemEntityV1(map);
+  pack(Map<String, dynamic> map) => throw UnimplementedError();
 
   @override
   MemItemEntity packV2(dynamic tuple) => MemItemEntity(
