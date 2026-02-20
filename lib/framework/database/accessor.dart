@@ -3,10 +3,12 @@ import 'package:mem/databases/database.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
+import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/mem.dart' as mem_domain;
 import 'package:mem/features/mems/mem_entity.dart' as mem_entity;
+import 'package:mem/features/mem_items/mem_item.dart' as mem_item_domain;
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
@@ -317,6 +319,10 @@ class DriftDatabaseAccessor {
       case mem_entity.MemEntity _:
         return driftDatabase.mems;
 
+      case mem_item_domain.MemItem _:
+      case MemItemEntity _:
+        return driftDatabase.memItems;
+
       case ActiveAct _:
       case FinishedAct _:
       case PausedAct _:
@@ -497,6 +503,9 @@ convertIntoDriftInsertable(dynamic domain) {
     case mem_domain.Mem _:
       return convertIntoMemsInsertable(domain, DateTime.now());
 
+    case mem_item_domain.MemItem _:
+      return convertIntoMemItemsInsertable(domain, DateTime.now());
+
     case ActiveAct _:
     case FinishedAct _:
     case PausedAct _:
@@ -517,6 +526,8 @@ convertIntoDriftUpdateable(dynamic entity, {DateTime? updatedAt}) {
   switch (entity) {
     case mem_entity.MemEntity _:
       return convertIntoMemsUpdateable(entity, updatedAt: updatedAt);
+    case MemItemEntity _:
+      return convertIntoMemItemsUpdateable(entity, updatedAt: updatedAt);
     case ActEntity _:
       return convertIntoActsUpdateable(entity, updatedAt: updatedAt);
     case MemNotificationEntity _:

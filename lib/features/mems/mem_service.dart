@@ -54,12 +54,13 @@ class MemService {
           final savedMemItems = await Future.wait(
             memDetail.$2.map(
               (e) => (e is SavedMemItemEntityV1 && !undo
-                  ? _memItemRepository.replace(
-                      e.copiedWith(memId: () => savedMemEntity.id)
-                          as SavedMemItemEntityV1,
+                  ? _memItemRepository.replaceV2(
+                      (e.copiedWith(memId: () => savedMemEntity.id)
+                              as SavedMemItemEntityV1)
+                          .toEntityV2(),
                     )
-                  : _memItemRepository.receive(
-                      e.copiedWith(memId: () => savedMemEntity.id),
+                  : _memItemRepository.receiveV2(
+                      e.copiedWith(memId: () => savedMemEntity.id).toDomain(),
                     )),
             ),
           );
@@ -174,7 +175,9 @@ class MemService {
 
           return (
             SavedMemEntityV1.fromEntityV2(savedMemEntity),
-            savedMemItems,
+            savedMemItems
+                .map((e) => SavedMemItemEntityV1.fromEntityV2(e))
+                .toList(),
             returnMemNotifications.nonNulls.toList(growable: false),
             savedTarget,
             returnMemRelations.nonNulls.toList(growable: false),

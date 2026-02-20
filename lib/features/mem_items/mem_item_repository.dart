@@ -3,6 +3,7 @@ import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
+import 'package:mem/framework/repository/dummy.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -10,8 +11,13 @@ import 'package:mem/features/mem_items/mem_item_entity.dart';
 
 // @Deprecated('MemItemRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
 // lintエラーになるためコメントアウト
-class MemItemRepository extends DatabaseTupleRepository<MemItemEntityV1,
-    SavedMemItemEntityV1, MemItem, int, MemItemEntity> {
+class MemItemRepository extends DatabaseTupleRepository<
+// TODO dummyに置き換える
+    DummyEntity,
+    SavedMemItemEntityV1,
+    MemItem,
+    int,
+    MemItemEntity> {
   @override
   SavedMemItemEntityV1 pack(Map<String, dynamic> map) =>
       SavedMemItemEntityV1(map);
@@ -107,18 +113,6 @@ class MemItemRepository extends DatabaseTupleRepository<MemItemEntityV1,
           'memId': memId,
           'updatedAt': updatedAt,
         },
-      );
-
-  @override
-  Future<List<SavedMemItemEntityV1>> waste({
-    Condition? condition,
-  }) =>
-      super.waste(
-        condition: And(
-          [
-            if (condition != null) condition, // coverage:ignore-line
-          ],
-        ),
       );
 
   static MemItemRepository? _instance;

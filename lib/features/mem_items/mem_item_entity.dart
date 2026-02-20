@@ -1,4 +1,6 @@
+import 'package:drift/drift.dart';
 import 'package:mem/databases/table_definitions/base.dart';
+import 'package:mem/databases/database.dart' as drift_database;
 import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/features/mems/mem.dart';
@@ -32,6 +34,12 @@ class MemItemEntityV1 with EntityV1<MemItem> {
           value == null ? v.value : value(),
         ),
       );
+
+  MemItem toDomain() => MemItem(
+        value.memId,
+        value.type,
+        value.value,
+      );
 }
 
 class SavedMemItemEntityV1 extends MemItemEntityV1
@@ -64,6 +72,16 @@ class SavedMemItemEntityV1 extends MemItemEntityV1
           defColArchivedAt.name: entity.archivedAt,
         },
       );
+
+  MemItemEntity toEntityV2() => MemItemEntity(
+        value.memId,
+        value.type,
+        value.value,
+        id,
+        createdAt,
+        updatedAt,
+        archivedAt,
+      );
 }
 
 class MemItemEntity implements Entity<int> {
@@ -90,3 +108,18 @@ class MemItemEntity implements Entity<int> {
     this.archivedAt,
   );
 }
+
+convertIntoMemItemsInsertable(MemItem domain, DateTime createdAt) =>
+    drift_database.MemItemsCompanion(
+      type: Value(domain.type.name),
+      value: Value(domain.value),
+      memId: Value(domain.memId ?? 0),
+      createdAt: Value(createdAt),
+    );
+convertIntoMemItemsUpdateable(MemItemEntity entity, {DateTime? updatedAt}) =>
+    drift_database.MemItemsCompanion(
+      type: Value(entity.type.name),
+      value: Value(entity.value),
+      memId: Value(entity.memId ?? 0),
+      updatedAt: Value(updatedAt ?? DateTime.now()),
+    );
