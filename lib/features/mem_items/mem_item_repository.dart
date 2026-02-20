@@ -11,13 +11,8 @@ import 'package:mem/features/mem_items/mem_item_entity.dart';
 
 // @Deprecated('MemItemRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
 // lintエラーになるためコメントアウト
-class MemItemRepository extends DatabaseTupleRepository<
-// TODO dummyに置き換える
-    DummyEntity,
-    SavedDummyEntity,
-    MemItem,
-    int,
-    MemItemEntity> {
+class MemItemRepository extends DatabaseTupleRepository<DummyEntity,
+    SavedDummyEntity, MemItem, int, MemItemEntity> {
   @override
   pack(Map<String, dynamic> map) => throw UnimplementedError();
 
