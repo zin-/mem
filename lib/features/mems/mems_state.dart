@@ -148,7 +148,7 @@ class MemEntities extends _$MemEntities
             final undoneRemovedMemDetail =
                 await MemService().save(removedMemDetail, undo: true);
 
-            upsert([undoneRemovedMemDetail.$1 as SavedMemEntityV1]);
+            upsert([undoneRemovedMemDetail.$1]);
 
             return (
               undoneRemovedMemDetail.$1,
@@ -169,9 +169,9 @@ class MemEntities extends _$MemEntities
 
   void doneMem(int memId) => v(
         () async {
-          final doneMemDetail = await MemService().doneByMemId(memId);
+          final doneMem = await MemService().doneByMemId(memId);
 
-          upsert([doneMemDetail.$1 as SavedMemEntityV1]);
+          upsert([doneMem]);
         },
         {'memId': memId},
       );

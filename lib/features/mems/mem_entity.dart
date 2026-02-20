@@ -130,4 +130,17 @@ class MemEntity implements Entity<int> {
         doneAt,
         period,
       );
+
+  MemEntity updatedWith(Mem Function(Mem mem) update) {
+    final updated = update(toDomain());
+    return MemEntity(
+      id,
+      updated.name,
+      updated.doneAt,
+      updated.period,
+      createdAt,
+      updatedAt,
+      archivedAt,
+    );
+  }
 }

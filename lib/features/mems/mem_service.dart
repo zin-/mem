@@ -27,7 +27,7 @@ class MemService {
 
   Future<
       (
-        MemEntityV1,
+        SavedMemEntityV1,
         List<MemItemEntityV1>,
         List<MemNotificationEntity>?,
         TargetEntity?,
@@ -190,31 +190,29 @@ class MemService {
         },
       );
 
-  Future<
-      (
-        MemEntityV1,
-        List<MemItemEntityV1>,
-        List<MemNotificationEntity>?,
-        TargetEntity?,
-        List<MemRelationEntity>?,
-        MemEntity,
-      )> doneByMemId(
+  Future<SavedMemEntityV1> doneByMemId(
     int memId,
   ) =>
       i(
-        () async => save(
-          (
-            await _memRepository.ship(id: memId).then(
-                  (v) => v.single.updatedWith(
-                    (mem) => mem.done(DateTime.now()),
-                  ),
-                ),
-            [],
-            null,
-            null,
-            null,
-          ),
-        ),
+        () async {
+          final memEntity = await _memRepository
+              .ship(id: memId)
+              .then((v) => v.single)
+              .then((v) => v.toEntityV2());
+
+          final doneMem =
+              memEntity.updatedWith((mem) => mem.done(DateTime.now()));
+
+          return save(
+            (
+              SavedMemEntityV1.fromEntityV2(doneMem),
+              [],
+              null,
+              null,
+              null,
+            ),
+          ).then((v) => v.$1);
+        },
         {
           'memId': memId,
         },
