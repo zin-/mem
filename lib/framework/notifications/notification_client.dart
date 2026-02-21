@@ -74,13 +74,9 @@ class NotificationClient {
       v(
         () async {
           if (memId != null) {
-            final savedMem = await _memRepository
-                .ship(id: memId)
-                .then((v) => v.singleOrNull);
+            final savedMem = await _memRepository.shipById(memId);
 
-            if (savedMem == null ||
-                savedMem.value.isDone ||
-                savedMem.value.isArchived) {
+            if (savedMem.toDomain().isDone || savedMem.toDomain().isArchived) {
               await cancelMemNotifications(memId);
               return;
             }
@@ -210,11 +206,10 @@ class NotificationClient {
               ),
             );
           }
-          final mem = await _memRepository
-              .ship(id: memId)
-              .then((v) => v.singleOrNull?.value);
+          final mem =
+              await _memRepository.shipById(memId).then((v) => v.toDomain());
 
-          await registerMemNotifications(mem!);
+          await registerMemNotifications(mem);
           await setNotificationAfterInactivity();
         },
         {
@@ -233,13 +228,10 @@ class NotificationClient {
             NotificationType.pausedAct,
             memId,
           );
-          final mem = await _memRepository
-              .ship(id: memId)
-              .then((v) => v.singleOrNull?.value);
+          final mem =
+              await _memRepository.shipById(memId).then((v) => v.toDomain());
 
-          await registerMemNotifications(
-            mem!,
-          );
+          await registerMemNotifications(mem);
           await setNotificationAfterInactivity();
         },
         {

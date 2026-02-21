@@ -50,13 +50,15 @@ class MemEntities extends _$MemEntities
         },
       );
 
-  Future<SavedMemEntityV1?> loadByMemId(int memId) => v(
+  Future<SavedMemEntityV1> loadByMemId(int memId) => v(
         () async {
-          final mem = await MemRepository().ship(id: memId);
+          final mem = await MemRepository()
+              .shipById(memId)
+              .then((v) => SavedMemEntityV1.fromEntityV2(v));
 
-          upsert(mem);
+          upsert([mem]);
 
-          return mem.singleOrNull;
+          return mem;
         },
         {'memId': memId},
       );
