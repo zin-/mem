@@ -15,7 +15,6 @@ class MemClient {
   Future<
       (
         (
-          MemEntityV1,
           List<MemItemEntityV1>,
           List<MemNotificationEntity>?,
           TargetEntity?,
@@ -32,7 +31,14 @@ class MemClient {
   ) =>
       v(
         () async {
-          final saved = await _memService.save(
+          final (
+            _,
+            savedMemItems,
+            savedMemNotifications,
+            savedTarget,
+            savedMemRelations,
+            memEntityV2
+          ) = await _memService.save(
             (
               mem,
               memItemList,
@@ -42,12 +48,19 @@ class MemClient {
             ),
           );
 
-          final nextNotifyAt =
-              await _notificationClient.registerMemNotifications(
-            saved.$6.toDomain(),
-          );
+          final nextNotifyAt = await _notificationClient
+              .registerMemNotifications(memEntityV2.toDomain());
 
-          return (saved, nextNotifyAt);
+          return (
+            (
+              savedMemItems,
+              savedMemNotifications,
+              savedTarget,
+              savedMemRelations,
+              memEntityV2
+            ),
+            nextNotifyAt
+          );
         },
         {
           "mem": mem,

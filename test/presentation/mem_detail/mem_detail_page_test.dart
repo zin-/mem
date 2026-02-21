@@ -25,7 +25,6 @@ import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mems/detail/fab.dart';
 import 'package:mem/features/mems/mem_client.dart';
 import 'package:mem/features/mems/mem_entity.dart';
-import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/mems/detail/app_bar/remove_mem_action.dart';
@@ -277,7 +276,6 @@ void main() {
           any,
         )).thenAnswer((_) async => (
               (
-                MemEntityV1(Mem(1, "", null, null)),
                 <MemItemEntityV1>[],
                 null,
                 null,
