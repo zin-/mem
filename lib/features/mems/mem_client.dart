@@ -32,7 +32,6 @@ class MemClient {
       v(
         () async {
           final (
-            _,
             savedMemItems,
             savedMemNotifications,
             savedTarget,

@@ -26,7 +26,6 @@ class MemService {
 
   Future<
       (
-        SavedMemEntityV1,
         List<MemItemEntityV1>,
         List<MemNotificationEntity>?,
         TargetEntity?,
@@ -173,7 +172,6 @@ class MemService {
           }
 
           return (
-            SavedMemEntityV1.fromEntityV2(savedMemEntity),
             savedMemItems
                 .map((e) => SavedMemItemEntityV1.fromEntityV2(e))
                 .toList(),
@@ -207,7 +205,7 @@ class MemService {
               null,
               null,
             ),
-          ).then((v) => v.$1);
+          ).then((v) => SavedMemEntityV1.fromEntityV2(v.$5));
         },
         {
           'memId': memId,
@@ -231,7 +229,7 @@ class MemService {
               null,
               null,
             ),
-          ).then((v) => v.$1);
+          ).then((v) => SavedMemEntityV1.fromEntityV2(v.$5));
         },
         {
           'memId': memId,
