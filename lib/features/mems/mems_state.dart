@@ -3,7 +3,6 @@ import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
-import 'package:mem/features/mem_relations/mem_relation_state.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/mems/mem_client.dart';
 import 'package:mem/features/mems/mem_entity.dart';
@@ -61,63 +60,6 @@ class MemEntities extends _$MemEntities
           return mem;
         },
         {'memId': memId},
-      );
-
-  Future<
-      (
-        (
-          MemEntityV1,
-          List<MemItemEntityV1>,
-          List<MemNotificationEntityV1>?,
-          TargetEntity?,
-          List<MemRelationEntity>?,
-          MemEntity,
-        ),
-        DateTime?
-      )> save(
-    MemEntityV1 memEntity,
-    Iterable<MemItemEntityV1> memItemEntities,
-    Iterable<MemNotificationEntityV1> memNotificationEntities,
-    TargetEntity? targetEntity,
-    Iterable<MemRelationEntity>? memRelationEntities,
-  ) =>
-      v(
-        () async {
-          final (saved, nextNotifyAt) = await MemClient().save(
-            memEntity,
-            memItemEntities.toList(),
-            memNotificationEntities.toList(),
-            targetEntity,
-            memRelationEntities?.toList(),
-          );
-
-          upsert([saved.$1 as SavedMemEntityV1]);
-
-          ref
-              .read(memRelationEntitiesProvider.notifier)
-              .upsert(saved.$5?.whereType<SavedMemRelationEntity>() ?? []);
-
-          return (
-            (
-              saved.$1,
-              saved.$2,
-              saved.$3
-                  ?.map((e) => SavedMemNotificationEntityV1.fromEntityV2(e))
-                  .toList(),
-              saved.$4,
-              saved.$5,
-              saved.$6,
-            ),
-            nextNotifyAt
-          );
-        },
-        {
-          'memEntity': memEntity,
-          'memItemEntities': memItemEntities,
-          'memNotificationEntities': memNotificationEntities,
-          'targetEntity': targetEntity,
-          'memRelationEntities': memRelationEntities,
-        },
       );
 
   Future<Iterable<SavedMemEntityV1>> removeAsync(Iterable<int> ids) => v(
