@@ -71,15 +71,7 @@ class MemEntities extends _$MemEntities
         {'ids': ids},
       );
 
-  Future<
-      (
-        MemEntityV1,
-        List<MemItemEntityV1>,
-        List<MemNotificationEntityV1>?,
-        TargetEntity?,
-        List<MemRelationEntity>?,
-        MemEntity,
-      )?> undoRemove(int id) => v(
+  Future<void> undoRemove(int id) => v(
         () async {
           // ignore: avoid_manual_providers_as_generated_provider_dependency
           final removedMemDetail = ref.read(removedMemDetailProvider(id));
@@ -89,24 +81,24 @@ class MemEntities extends _$MemEntities
             // FIXME ここでserviceの初期化をしているが、stateをbuildしたタイミングでseviceの初期化もしたい
             //   repositoryの親子関係解決を確定するタイミングの問題で、現時点ではここで初期化する必要がある
             //   https://github.com/zin-/mem/issues/472
-            final undoneRemovedMemDetail =
-                await MemService().save(removedMemDetail, undo: true);
+            final (
+              undoneRemovedMemEntityV1,
+              undoneRemovedMemItems,
+              undoneRemovedMemNotifications,
+              undoneRemovedTarget,
+              undoneRemovedMemRelations,
+              undoneRemovedMemEntityV2
+            ) = await MemService().save(removedMemDetail, undo: true);
 
-            upsert([undoneRemovedMemDetail.$1]);
-
-            return (
-              undoneRemovedMemDetail.$1,
-              undoneRemovedMemDetail.$2,
-              undoneRemovedMemDetail.$3
-                  ?.map((e) => SavedMemNotificationEntityV1.fromEntityV2(e))
-                  .toList(),
-              undoneRemovedMemDetail.$4,
-              undoneRemovedMemDetail.$5,
-              undoneRemovedMemDetail.$6,
-            );
+            upsert([undoneRemovedMemEntityV1]);
+            ref.read(memItemsProvider.notifier).upsertAll(
+                  undoneRemovedMemItems,
+                  (current, updating) =>
+                      current is SavedMemItemEntityV1 &&
+                      updating is SavedMemItemEntityV1 &&
+                      current.id == updating.id,
+                );
           }
-
-          return null;
         },
         {'id': id},
       );
