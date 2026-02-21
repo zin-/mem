@@ -16,13 +16,7 @@ final saveMem =
             final link = ref.keepAlive();
             try {
               final (
-                (
-                  savedMemItems,
-                  savedMemNotifications,
-                  savedTarget,
-                  savedMemRelations,
-                  memEntityV2
-                ),
+                (savedMemItems, savedMemNotifications, _, _, memEntityV2),
                 nextNotifyAt
               ) = await MemClient().save(
                 ref.read(editingMemByMemIdProvider(memId)),

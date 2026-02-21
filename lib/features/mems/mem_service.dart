@@ -199,7 +199,7 @@ class MemService {
           final doneMem =
               memEntity.updatedWith(update: (mem) => mem.done(DateTime.now()));
 
-          return save(
+          return await save(
             (
               SavedMemEntityV1.fromEntityV2(doneMem),
               [],
