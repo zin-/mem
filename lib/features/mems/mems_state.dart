@@ -74,20 +74,25 @@ class MemEntities extends _$MemEntities
           final removedMemDetail = ref.read(removedMemDetailProvider(id));
 
           if (removedMemDetail != null) {
-            // FIXME serviceを利用しているが、clientを利用するべきでは？
-            // FIXME ここでserviceの初期化をしているが、stateをbuildしたタイミングでseviceの初期化もしたい
-            //   repositoryの親子関係解決を確定するタイミングの問題で、現時点ではここで初期化する必要がある
-            //   https://github.com/zin-/mem/issues/472
             final (
-              undoneRemovedMemEntityV1,
-              undoneRemovedMemItems,
-              undoneRemovedMemNotifications,
-              undoneRemovedTarget,
-              undoneRemovedMemRelations,
-              undoneRemovedMemEntityV2
-            ) = await MemService().save(removedMemDetail, undo: true);
+              (
+                undoneRemovedMemItems,
+                undoneRemovedMemNotifications,
+                undoneRemovedTarget,
+                undoneRemovedMemRelations,
+                undoneRemovedMemEntity,
+              ),
+              undoneRemovedMemEntityV2,
+            ) = await MemClient().save(
+              removedMemDetail.$1,
+              removedMemDetail.$2,
+              removedMemDetail.$3 ?? [],
+              removedMemDetail.$4,
+              removedMemDetail.$5,
+              // undo: true,
+            );
 
-            upsert([undoneRemovedMemEntityV1]);
+            upsert([SavedMemEntityV1.fromEntityV2(undoneRemovedMemEntity)]);
             ref.read(memItemsProvider.notifier).upsertAll(
                   undoneRemovedMemItems,
                   (current, updating) =>
