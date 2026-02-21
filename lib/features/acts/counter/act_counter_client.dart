@@ -18,9 +18,7 @@ class ActCounterClient {
         () async {
           await _actCounterRepository.receive(
             ActCounterEntity.from(
-              (await _memRepository
-                  .ship(id: memId)
-                  .then((v) => v.singleOrNull?.value))!,
+              (await _memRepository.shipById(memId).then((v) => v.toDomain())),
               await _actQueryService.fetchByMemIdAndPeriod(
                 memId,
                 ActCounter.period(DateAndTime.now()),
@@ -46,9 +44,7 @@ class ActCounterClient {
 
           await _actCounterRepository.replace(
             ActCounterEntity.from(
-              (await _memRepository
-                  .ship(id: memId)
-                  .then((v) => v.singleOrNull?.value))!,
+              await _memRepository.shipById(memId).then((v) => v.toDomain()),
               await _actQueryService.fetchByMemIdAndPeriod(
                 memId,
                 ActCounter.period(when),
