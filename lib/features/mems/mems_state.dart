@@ -212,7 +212,7 @@ class MemEntities extends _$MemEntities
 
           final unarchived = await MemClient().unarchive(targetMem);
 
-          upsert([unarchived.$1 as SavedMemEntityV1]);
+          upsert([SavedMemEntityV1.fromEntityV2(unarchived)]);
         },
       );
 }

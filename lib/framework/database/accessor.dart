@@ -243,13 +243,12 @@ class DriftDatabaseAccessor {
         },
       );
 
-  Future updateV2(dynamic entity, {DateTime? updatedAt}) => v(
+  Future updateV2(dynamic entity) => v(
         () async {
           final query = driftDatabase.update(_getTableInfoV2(entity))
             ..where((t) => (t as dynamic).id.equals(entity.id));
 
-          final updateable =
-              convertIntoDriftUpdateable(entity, updatedAt: updatedAt);
+          final updateable = convertIntoDriftUpdateable(entity);
 
           return (await query.writeReturning(updateable)).first;
         },
@@ -522,17 +521,19 @@ convertIntoDriftInsertable(dynamic domain) {
   }
 }
 
-convertIntoDriftUpdateable(dynamic entity, {DateTime? updatedAt}) {
+convertIntoDriftUpdateable(
+  dynamic entity,
+) {
   switch (entity) {
     case mem_entity.MemEntity _:
-      return convertIntoMemsUpdateable(entity, updatedAt: updatedAt);
+      return convertIntoMemsUpdateable(entity);
     case MemItemEntity _:
-      return convertIntoMemItemsUpdateable(entity, updatedAt: updatedAt);
+      return convertIntoMemItemsUpdateable(entity);
     case ActEntity _:
-      return convertIntoActsUpdateable(entity, updatedAt: updatedAt);
+      return convertIntoActsUpdateable(entity);
     case MemNotificationEntity _:
-      return convertIntoMemRepeatedNotificationsUpdateable(entity,
-          updatedAt: updatedAt);
+      return convertIntoMemRepeatedNotificationsUpdateable(entity);
+
     default:
       throw StateError('Unknown entity: ${entity.runtimeType}');
   }

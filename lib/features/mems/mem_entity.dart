@@ -131,16 +131,20 @@ class MemEntity implements Entity<int> {
         period,
       );
 
-  MemEntity updatedWith(Mem Function(Mem mem) update) {
-    final updated = update(toDomain());
+  MemEntity updatedWith({
+    Mem Function(Mem mem)? update,
+    DateTime? Function()? updatedAt,
+    DateTime? Function()? archivedAt,
+  }) {
+    final updated = update == null ? toDomain() : update(toDomain());
     return MemEntity(
       id,
       updated.name,
       updated.doneAt,
       updated.period,
       createdAt,
-      updatedAt,
-      archivedAt,
+      updatedAt == null ? this.updatedAt : updatedAt(),
+      archivedAt == null ? this.archivedAt : archivedAt(),
     );
   }
 }

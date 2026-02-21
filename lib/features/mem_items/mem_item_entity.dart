@@ -116,10 +116,11 @@ convertIntoMemItemsInsertable(MemItem domain, DateTime createdAt) =>
       memId: Value(domain.memId ?? 0),
       createdAt: Value(createdAt),
     );
-convertIntoMemItemsUpdateable(MemItemEntity entity, {DateTime? updatedAt}) =>
+convertIntoMemItemsUpdateable(MemItemEntity entity) =>
     drift_database.MemItemsCompanion(
       type: Value(entity.type.name),
       value: Value(entity.value),
       memId: Value(entity.memId ?? 0),
-      updatedAt: Value(updatedAt ?? DateTime.now()),
+      updatedAt: Value(DateTime.now()),
+      archivedAt: Value(entity.archivedAt),
     );
