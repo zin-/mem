@@ -10,9 +10,9 @@ import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/framework/repository/dummy.dart';
 
 class MemRepository extends DatabaseTupleRepository<DummyEntity,
-    SavedMemEntityV1, Mem, int, MemEntity> {
+    SavedDummyEntity, Mem, int, MemEntity> {
   @override
-  SavedMemEntityV1 pack(Map<String, dynamic> map) => SavedMemEntityV1(map);
+  pack(Map<String, dynamic> map) => throw UnimplementedError();
 
   @override
   MemEntity packV2(dynamic tuple) => MemEntity(
