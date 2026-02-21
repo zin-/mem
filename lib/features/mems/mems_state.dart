@@ -197,7 +197,7 @@ class MemEntities extends _$MemEntities
 
           final archived = await MemClient().archive(targetMem);
 
-          upsert([archived.$1 as SavedMemEntityV1]);
+          upsert([SavedMemEntityV1.fromEntityV2(archived)]);
         },
         {'memId': memId},
       );
