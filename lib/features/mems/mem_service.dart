@@ -195,10 +195,7 @@ class MemService {
   ) =>
       i(
         () async {
-          final memEntity = await _memRepository
-              .ship(id: memId)
-              .then((v) => v.single)
-              .then((v) => v.toEntityV2());
+          final memEntity = await _memRepository.shipById(memId);
 
           final doneMem =
               memEntity.updatedWith((mem) => mem.done(DateTime.now()));

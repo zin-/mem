@@ -148,6 +148,17 @@ abstract class DatabaseTupleRepository<
         {'condition': condition},
       );
 
+  Future<ENTITY> shipById(int id) => v(
+        () async {
+          final row = await _driftAccessor.selectV2(
+            _tableDefinition,
+            condition: Equals(defPkId, id),
+          );
+          return packV2(row.first);
+        },
+        {'id': id},
+      );
+
   Future<SAVEDV1> replace(
     SAVEDV1 savedEntity, {
     DateTime? updatedAt,
