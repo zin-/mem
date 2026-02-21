@@ -78,6 +78,30 @@ class MemRepository extends DatabaseTupleRepository<MemEntityV1,
       );
 
   @override
+  Future<List<MemEntity>> shipV2({
+    int? id,
+    bool? archived,
+    bool? done,
+    Condition? condition,
+  }) =>
+      super.shipV2(
+        condition: And(
+          [
+            if (id != null) Equals(defPkId, id),
+            if (archived != null)
+              archived
+                  ? IsNotNull(defColArchivedAt.name)
+                  : IsNull(defColArchivedAt.name),
+            if (done != null)
+              done
+                  ? IsNotNull(defColMemsDoneAt.name)
+                  : IsNull(defColMemsDoneAt.name),
+            if (condition != null) condition,
+          ],
+        ),
+      );
+
+  @override
   Future<List<MemEntity>> wasteV2({
     int? id,
     Condition? condition,
