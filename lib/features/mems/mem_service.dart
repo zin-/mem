@@ -215,31 +215,24 @@ class MemService {
         },
       );
 
-  Future<
-      (
-        MemEntityV1,
-        List<MemItemEntityV1>,
-        List<MemNotificationEntity>?,
-        TargetEntity?,
-        List<MemRelationEntity>?,
-        MemEntity,
-      )> undoneByMemId(
+  Future<SavedMemEntityV1> undoneByMemId(
     int memId,
   ) =>
       i(
-        () async => save(
-          (
-            await _memRepository.ship(id: memId).then(
-                  (v) => v.single.updatedWith(
-                    (mem) => mem.undone(),
-                  ),
-                ),
-            [],
-            null,
-            null,
-            null,
-          ),
-        ),
+        () async {
+          final memEntity = await _memRepository.shipById(memId);
+          final undoneMem = memEntity.updatedWith((mem) => mem.undone());
+
+          return await save(
+            (
+              SavedMemEntityV1.fromEntityV2(undoneMem),
+              [],
+              null,
+              null,
+              null,
+            ),
+          ).then((v) => v.$1);
+        },
         {
           'memId': memId,
         },

@@ -178,9 +178,9 @@ class MemEntities extends _$MemEntities
 
   void undoneMem(int memId) => v(
         () async {
-          final undoneMemDetail = await MemService().undoneByMemId(memId);
+          final undoneMem = await MemService().undoneByMemId(memId);
 
-          upsert([undoneMemDetail.$1 as SavedMemEntityV1]);
+          upsert([undoneMem]);
         },
         {'memId': memId},
       );
