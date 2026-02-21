@@ -328,15 +328,15 @@ class NotificationClient {
         () async {
           await _notificationRepository.discardAll();
 
-          final allSavedMems = await _memRepository.ship(
-            archived: false,
-            done: false,
-          );
+          final allSavedMems = await _memRepository
+              .shipV2(
+                archived: false,
+                done: false,
+              )
+              .then((v) => v.map((e) => e.toDomain()));
 
           for (final mem in allSavedMems) {
-            await registerMemNotifications(
-              mem.value,
-            );
+            await registerMemNotifications(mem);
           }
         },
       );
