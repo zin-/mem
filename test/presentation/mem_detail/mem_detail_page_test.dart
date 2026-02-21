@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_relations.dart';
-import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/features/mem_items/mem_item_repository.dart';
@@ -91,15 +90,11 @@ void main() {
   TargetRepository(mock: mockTargetRepository);
 
   setUp(() {
-    when(mockMemRepository.ship(
+    when(mockMemRepository.shipV2(
       id: anyNamed('id'),
       archived: anyNamed('archived'),
       done: anyNamed('done'),
       condition: anyNamed('condition'),
-      groupBy: anyNamed('groupBy'),
-      orderBy: anyNamed('orderBy'),
-      offset: anyNamed('offset'),
-      limit: anyNamed('limit'),
     )).thenAnswer((_) async => []);
     when(mockMemItemRepository.shipV2(
       memId: anyNamed('memId'),
@@ -163,23 +158,17 @@ void main() {
 
     group('should show', skip: true, () {
       setUp(() {
-        when(mockMemRepository.ship(id: _TestConstants.testMemId))
-            .thenAnswer((_) async => [
-                  SavedMemEntityV1(
-                    {
-                      defPkId.name: _TestConstants.testMemId,
-                      defColMemsName.name: 'Test Mem',
-                      defColMemsDoneAt.name: null,
-                      defColMemsStartOn.name: null,
-                      defColMemsEndOn.name: null,
-                      defColMemsStartAt.name: null,
-                      defColMemsEndAt.name: null,
-                      defColCreatedAt.name: DateTime.now(),
-                      defColUpdatedAt.name: null,
-                      defColArchivedAt.name: null,
-                    },
-                  ),
-                ]);
+        when(mockMemRepository.shipById(_TestConstants.testMemId)).thenAnswer(
+          (_) async => MemEntity(
+            _TestConstants.testMemId,
+            'Test Mem',
+            null,
+            null,
+            DateTime.now(),
+            null,
+            null,
+          ),
+        );
         when(mockMemNotificationRepository.shipV2(
           memId: _TestConstants.testMemId,
         )).thenAnswer((_) async => [
@@ -337,23 +326,17 @@ void main() {
 
     group('should delete', skip: true, () {
       setUp(() {
-        when(mockMemRepository.ship(id: _TestConstants.testMemId))
-            .thenAnswer((_) async => [
-                  SavedMemEntityV1(
-                    {
-                      defPkId.name: _TestConstants.testMemId,
-                      defColMemsName.name: 'Test Mem',
-                      defColMemsDoneAt.name: null,
-                      defColMemsStartOn.name: null,
-                      defColMemsEndOn.name: null,
-                      defColMemsStartAt.name: null,
-                      defColMemsEndAt.name: null,
-                      defColCreatedAt.name: DateTime.now(),
-                      defColUpdatedAt.name: null,
-                      defColArchivedAt.name: null,
-                    },
-                  ),
-                ]);
+        when(mockMemRepository.shipById(_TestConstants.testMemId)).thenAnswer(
+          (_) async => MemEntity(
+            _TestConstants.testMemId,
+            'Test Mem',
+            null,
+            null,
+            DateTime.now(),
+            null,
+            null,
+          ),
+        );
         when(mockMemNotificationRepository.shipV2(
           memId: _TestConstants.testMemId,
         )).thenAnswer((_) async => [
