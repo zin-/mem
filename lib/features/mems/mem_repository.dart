@@ -5,15 +5,14 @@ import 'package:mem/features/mems/mem.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
-import 'package:mem/framework/repository/group_by.dart';
-import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/framework/repository/dummy.dart';
 
-class MemRepository extends DatabaseTupleRepository<MemEntityV1,
-    SavedMemEntityV1, Mem, int, MemEntity> {
+class MemRepository extends DatabaseTupleRepository<DummyEntity,
+    SavedDummyEntity, Mem, int, MemEntity> {
   @override
-  SavedMemEntityV1 pack(Map<String, dynamic> map) => SavedMemEntityV1(map);
+  pack(Map<String, dynamic> map) => throw UnimplementedError();
 
   @override
   MemEntity packV2(dynamic tuple) => MemEntity(
@@ -46,17 +45,13 @@ class MemRepository extends DatabaseTupleRepository<MemEntityV1,
       );
 
   @override
-  Future<List<SavedMemEntityV1>> ship({
+  Future<List<MemEntity>> shipV2({
     int? id,
     bool? archived,
     bool? done,
     Condition? condition,
-    GroupBy? groupBy,
-    List<OrderBy>? orderBy,
-    int? offset,
-    int? limit,
   }) =>
-      super.ship(
+      super.shipV2(
         condition: And(
           [
             if (id != null) Equals(defPkId, id),
@@ -71,10 +66,6 @@ class MemRepository extends DatabaseTupleRepository<MemEntityV1,
             if (condition != null) condition,
           ],
         ),
-        groupBy: groupBy,
-        orderBy: orderBy,
-        offset: offset,
-        limit: limit,
       );
 
   @override

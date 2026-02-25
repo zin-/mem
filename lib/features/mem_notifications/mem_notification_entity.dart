@@ -118,12 +118,14 @@ convertIntoMemRepeatedNotificationsInsertable(MemNotification entity,
       message: Value(entity.message),
       createdAt: Value(createdAt ?? DateTime.now()),
     );
-convertIntoMemRepeatedNotificationsUpdateable(MemNotificationEntity entity,
-        {DateTime? updatedAt}) =>
+convertIntoMemRepeatedNotificationsUpdateable(
+  MemNotificationEntity entity,
+) =>
     drift_database.MemRepeatedNotificationsCompanion(
       memId: Value(entity.memId ?? 0),
       timeOfDaySeconds: Value(entity.time ?? 0),
       type: Value(entity.type.name),
       message: Value(entity.message),
-      updatedAt: Value(updatedAt ?? DateTime.now()),
+      updatedAt: Value(DateTime.now()),
+      archivedAt: Value(entity.archivedAt),
     );

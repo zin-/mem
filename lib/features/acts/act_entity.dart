@@ -167,12 +167,12 @@ convertIntoActsInsertable(Act entity, {DateTime? createdAt}) =>
       pausedAt: Value(entity.pausedAt),
       createdAt: Value(createdAt ?? DateTime.now()),
     );
-convertIntoActsUpdateable(ActEntity entity, {DateTime? updatedAt}) =>
-    drift_database.ActsCompanion(
+convertIntoActsUpdateable(ActEntity entity) => drift_database.ActsCompanion(
       start: Value(entity.start),
       startIsAllDay: Value(entity.start?.isAllDay),
       end: Value(entity.end),
       endIsAllDay: Value(entity.end?.isAllDay),
       pausedAt: Value(entity.pausedAt),
-      updatedAt: Value(updatedAt ?? DateTime.now()),
+      updatedAt: Value(DateTime.now()),
+      archivedAt: Value(entity.archivedAt),
     );

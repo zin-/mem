@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:mem/features/mem_relations/mem_relation.dart';
-import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/targets/target_repository.dart';
@@ -27,8 +26,8 @@ class MemService {
 
   Future<
       (
-        MemEntityV1,
-        List<MemItemEntity>,
+        SavedMemEntityV1,
+        List<MemItemEntityV1>,
         List<MemNotificationEntity>?,
         TargetEntity?,
         List<MemRelationEntity>?,
@@ -36,7 +35,7 @@ class MemService {
       )> save(
     (
       MemEntityV1,
-      List<MemItemEntity>,
+      List<MemItemEntityV1>,
       List<MemNotificationEntityV1>?,
       TargetEntity?,
       List<MemRelationEntity>?,
@@ -53,13 +52,14 @@ class MemService {
 
           final savedMemItems = await Future.wait(
             memDetail.$2.map(
-              (e) => (e is SavedMemItemEntity && !undo
-                  ? _memItemRepository.replace(
-                      e.copiedWith(memId: () => savedMemEntity.id)
-                          as SavedMemItemEntity,
+              (e) => (e is SavedMemItemEntityV1 && !undo
+                  ? _memItemRepository.replaceV2(
+                      (e.copiedWith(memId: () => savedMemEntity.id)
+                              as SavedMemItemEntityV1)
+                          .toEntityV2(),
                     )
-                  : _memItemRepository.receive(
-                      e.copiedWith(memId: () => savedMemEntity.id),
+                  : _memItemRepository.receiveV2(
+                      e.copiedWith(memId: () => savedMemEntity.id).toDomain(),
                     )),
             ),
           );
@@ -174,7 +174,9 @@ class MemService {
 
           return (
             SavedMemEntityV1.fromEntityV2(savedMemEntity),
-            savedMemItems,
+            savedMemItems
+                .map((e) => SavedMemItemEntityV1.fromEntityV2(e))
+                .toList(),
             returnMemNotifications.nonNulls.toList(growable: false),
             savedTarget,
             returnMemRelations.nonNulls.toList(growable: false),
@@ -187,116 +189,89 @@ class MemService {
         },
       );
 
-  Future<
-      (
-        MemEntityV1,
-        List<MemItemEntity>,
-        List<MemNotificationEntity>?,
-        TargetEntity?,
-        List<MemRelationEntity>?,
-        MemEntity,
-      )> doneByMemId(
+  Future<SavedMemEntityV1> doneByMemId(
     int memId,
   ) =>
       i(
-        () async => save(
-          (
-            await _memRepository.ship(id: memId).then(
-                  (v) => v.single.updatedWith(
-                    (mem) => mem.done(DateTime.now()),
-                  ),
-                ),
-            [],
-            null,
-            null,
-            null,
-          ),
-        ),
-        {
-          'memId': memId,
-        },
-      );
-
-  Future<
-      (
-        MemEntityV1,
-        List<MemItemEntity>,
-        List<MemNotificationEntity>?,
-        TargetEntity?,
-        List<MemRelationEntity>?,
-        MemEntity,
-      )> undoneByMemId(
-    int memId,
-  ) =>
-      i(
-        () async => save(
-          (
-            await _memRepository.ship(id: memId).then(
-                  (v) => v.single.updatedWith(
-                    (mem) => mem.undone(),
-                  ),
-                ),
-            [],
-            null,
-            null,
-            null,
-          ),
-        ),
-        {
-          'memId': memId,
-        },
-      );
-
-  Future<(MemEntityV1, List<MemItemEntity>, TargetEntity?, List<MemRelationEntity>?)>
-      archive(SavedMemEntityV1 mem) => i(
-            () async {
-              final archivedMem = await _memRepository.archive(mem);
-              final archivedMemItems =
-                  await _memItemRepository.archiveBy(memId: archivedMem.id);
-              final archivedMemRelations =
-                  await _memRelationRepository.archiveBy(
-                relatedMemId: archivedMem.id,
-              );
-
-              return (
-                archivedMem,
-                archivedMemItems.toList(growable: false),
-                null,
-                archivedMemRelations.toList(growable: false),
-              );
-            },
-            {
-              'mem': mem,
-            },
-          );
-
-  Future<
-      (
-        MemEntityV1,
-        List<MemItemEntity>,
-        TargetEntity?,
-        List<MemRelationEntity>?,
-        Mem,
-      )> unarchive(SavedMemEntityV1 mem) => i(
         () async {
-          final unarchivedMem = await _memRepository.unarchive(mem);
-          final unarchivedMemItems =
-              await _memItemRepository.unarchiveBy(memId: unarchivedMem.id);
-          final unarchivedMemRelations =
-              await _memRelationRepository.unarchiveBy(
+          final memEntity = await _memRepository.shipById(memId);
+
+          final doneMem =
+              memEntity.updatedWith(update: (mem) => mem.done(DateTime.now()));
+
+          return await save(
+            (
+              SavedMemEntityV1.fromEntityV2(doneMem),
+              [],
+              null,
+              null,
+              null,
+            ),
+          ).then((v) => v.$1);
+        },
+        {
+          'memId': memId,
+        },
+      );
+
+  Future<SavedMemEntityV1> undoneByMemId(
+    int memId,
+  ) =>
+      i(
+        () async {
+          final memEntity = await _memRepository.shipById(memId);
+          final undoneMem =
+              memEntity.updatedWith(update: (mem) => mem.undone());
+
+          return await save(
+            (
+              SavedMemEntityV1.fromEntityV2(undoneMem),
+              [],
+              null,
+              null,
+              null,
+            ),
+          ).then((v) => v.$1);
+        },
+        {
+          'memId': memId,
+        },
+      );
+
+  Future<MemEntity> archive(SavedMemEntityV1 mem) => i(
+        () async {
+          final archivedMem = await _memRepository.replaceV2(
+              mem.toEntityV2().updatedWith(archivedAt: () => DateTime.now()));
+
+          await _memItemRepository.archiveBy(memId: archivedMem.id);
+          await _memRelationRepository.archiveBy(relatedMemId: archivedMem.id);
+
+          return archivedMem;
+        },
+        {
+          'mem': mem,
+        },
+      );
+
+  Future<MemEntity> unarchive(SavedMemEntityV1 mem) => i(
+        () async {
+          final unarchivedMem =
+              await _memRepository.replaceV2(mem.toEntityV2().updatedWith(
+                    updatedAt: () => DateTime.now(),
+                    archivedAt: () => null,
+                  ));
+
+          await _memItemRepository.unarchiveBy(memId: unarchivedMem.id).then(
+              (v) =>
+                  v.map((e) => SavedMemItemEntityV1.fromEntityV2(e)).toList());
+          await _memRelationRepository.unarchiveBy(
             condition: Or([
               Equals(defFkMemRelationsSourceMemId, unarchivedMem.id),
               Equals(defFkMemRelationsTargetMemId, unarchivedMem.id),
             ]),
           );
 
-          return (
-            unarchivedMem,
-            unarchivedMemItems.toList(growable: false),
-            null,
-            unarchivedMemRelations.toList(growable: false),
-            unarchivedMem.toEntityV2().toDomain(),
-          );
+          return unarchivedMem;
         },
         {
           'mem': mem,

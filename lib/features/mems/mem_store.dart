@@ -16,10 +16,13 @@ class MemStore {
 
   Future<List<SavedMemEntityV1>> serve({bool? archived, bool? done}) => v(
         () async {
-          final mems = await _memRepository.ship(
-            archived: archived,
-            done: done,
-          );
+          final mems = await _memRepository
+              .shipV2(
+                archived: archived,
+                done: done,
+              )
+              .then((v) =>
+                  v.map((e) => SavedMemEntityV1.fromEntityV2(e)).toList());
 
           _memStock.addAll(mems);
 
@@ -32,18 +35,22 @@ class MemStore {
       );
 
   Future<Mem> serveOneBy(int? memId) async => v(
-        () async =>
-            _memStock.singleWhereOrNull((e) => e.id == memId)?.value ??
-            await _memRepository.ship(id: memId).then(
-              (v) {
-                final savedMem = v.singleOrNull;
-                if (savedMem != null) {
-                  _memStock.add(savedMem);
-                  return savedMem.value;
-                }
-                return Mem(null, "", null, null);
-              },
-            ),
+        () async {
+          final stock =
+              _memStock.singleWhereOrNull((e) => e.id == memId)?.value;
+          if (stock != null) {
+            return stock;
+          }
+
+          if (memId != null) {
+            final saved = await _memRepository.shipById(memId);
+
+            _memStock.add(SavedMemEntityV1.fromEntityV2(saved));
+            return saved.toDomain();
+          }
+
+          return Mem(null, "", null, null);
+        },
         {
           'memId': memId,
         },

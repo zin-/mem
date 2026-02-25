@@ -3,10 +3,12 @@ import 'package:mem/databases/database.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
+import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/mem.dart' as mem_domain;
 import 'package:mem/features/mems/mem_entity.dart' as mem_entity;
+import 'package:mem/features/mem_items/mem_item.dart' as mem_item_domain;
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
@@ -241,13 +243,12 @@ class DriftDatabaseAccessor {
         },
       );
 
-  Future updateV2(dynamic entity, {DateTime? updatedAt}) => v(
+  Future updateV2(dynamic entity) => v(
         () async {
           final query = driftDatabase.update(_getTableInfoV2(entity))
             ..where((t) => (t as dynamic).id.equals(entity.id));
 
-          final updateable =
-              convertIntoDriftUpdateable(entity, updatedAt: updatedAt);
+          final updateable = convertIntoDriftUpdateable(entity);
 
           return (await query.writeReturning(updateable)).first;
         },
@@ -316,6 +317,10 @@ class DriftDatabaseAccessor {
       case mem_domain.Mem _:
       case mem_entity.MemEntity _:
         return driftDatabase.mems;
+
+      case mem_item_domain.MemItem _:
+      case MemItemEntity _:
+        return driftDatabase.memItems;
 
       case ActiveAct _:
       case FinishedAct _:
@@ -497,6 +502,9 @@ convertIntoDriftInsertable(dynamic domain) {
     case mem_domain.Mem _:
       return convertIntoMemsInsertable(domain, DateTime.now());
 
+    case mem_item_domain.MemItem _:
+      return convertIntoMemItemsInsertable(domain, DateTime.now());
+
     case ActiveAct _:
     case FinishedAct _:
     case PausedAct _:
@@ -513,15 +521,19 @@ convertIntoDriftInsertable(dynamic domain) {
   }
 }
 
-convertIntoDriftUpdateable(dynamic entity, {DateTime? updatedAt}) {
+convertIntoDriftUpdateable(
+  dynamic entity,
+) {
   switch (entity) {
     case mem_entity.MemEntity _:
-      return convertIntoMemsUpdateable(entity, updatedAt: updatedAt);
+      return convertIntoMemsUpdateable(entity);
+    case MemItemEntity _:
+      return convertIntoMemItemsUpdateable(entity);
     case ActEntity _:
-      return convertIntoActsUpdateable(entity, updatedAt: updatedAt);
+      return convertIntoActsUpdateable(entity);
     case MemNotificationEntity _:
-      return convertIntoMemRepeatedNotificationsUpdateable(entity,
-          updatedAt: updatedAt);
+      return convertIntoMemRepeatedNotificationsUpdateable(entity);
+
     default:
       throw StateError('Unknown entity: ${entity.runtimeType}');
   }

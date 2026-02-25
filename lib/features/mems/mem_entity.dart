@@ -16,7 +16,7 @@ class MemEntityV1 with EntityV1<Mem> {
     this.value = value;
 
     entityChildrenRelation[MemEntityV1] ??= {
-      MemItemEntity,
+      MemItemEntityV1,
       ActEntityV1,
       MemNotificationEntityV1,
       TargetEntity,
@@ -130,4 +130,21 @@ class MemEntity implements Entity<int> {
         doneAt,
         period,
       );
+
+  MemEntity updatedWith({
+    Mem Function(Mem mem)? update,
+    DateTime? Function()? updatedAt,
+    DateTime? Function()? archivedAt,
+  }) {
+    final updated = update == null ? toDomain() : update(toDomain());
+    return MemEntity(
+      id,
+      updated.name,
+      updated.doneAt,
+      updated.period,
+      createdAt,
+      updatedAt == null ? this.updatedAt : updatedAt(),
+      archivedAt == null ? this.archivedAt : archivedAt(),
+    );
+  }
 }

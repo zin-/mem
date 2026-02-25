@@ -1,6 +1,5 @@
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
-import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/framework/notifications/notification_client.dart';
@@ -16,8 +15,7 @@ class MemClient {
   Future<
       (
         (
-          MemEntityV1,
-          List<MemItemEntity>,
+          List<MemItemEntityV1>,
           List<MemNotificationEntity>?,
           TargetEntity?,
           List<MemRelationEntity>?,
@@ -26,14 +24,21 @@ class MemClient {
         DateTime?
       )> save(
     MemEntityV1 mem,
-    List<MemItemEntity> memItemList,
+    List<MemItemEntityV1> memItemList,
     List<MemNotificationEntityV1> memNotificationList,
     TargetEntity? target,
     List<MemRelationEntity>? memRelations,
   ) =>
       v(
         () async {
-          final saved = await _memService.save(
+          final (
+            _,
+            savedMemItems,
+            savedMemNotifications,
+            savedTarget,
+            savedMemRelations,
+            memEntityV2
+          ) = await _memService.save(
             (
               mem,
               memItemList,
@@ -43,12 +48,19 @@ class MemClient {
             ),
           );
 
-          final nextNotifyAt =
-              await _notificationClient.registerMemNotifications(
-            saved.$6.toDomain(),
-          );
+          final nextNotifyAt = await _notificationClient
+              .registerMemNotifications(memEntityV2.toDomain());
 
-          return (saved, nextNotifyAt);
+          return (
+            (
+              savedMemItems,
+              savedMemNotifications,
+              savedTarget,
+              savedMemRelations,
+              memEntityV2
+            ),
+            nextNotifyAt
+          );
         },
         {
           "mem": mem,
@@ -59,33 +71,24 @@ class MemClient {
         },
       );
 
-  Future<(MemEntityV1, List<MemItemEntity>, TargetEntity?, List<MemRelationEntity>?)>
-      archive(SavedMemEntityV1 memEntity) => v(
-            () async {
-              final archived = await _memService.archive(memEntity);
+  Future<MemEntity> archive(SavedMemEntityV1 memEntity) => v(
+        () async {
+          final archived = await _memService.archive(memEntity);
 
-              _notificationClient
-                  .cancelMemNotifications((archived.$1 as SavedMemEntityV1).id);
+          _notificationClient.cancelMemNotifications(archived.id);
 
-              return archived;
-            },
-            {
-              'memEntity': memEntity,
-            },
-          );
+          return archived;
+        },
+        {
+          'memEntity': memEntity,
+        },
+      );
 
-  Future<
-      (
-        MemEntityV1,
-        List<MemItemEntity>,
-        TargetEntity?,
-        List<MemRelationEntity>?,
-        Mem,
-      )> unarchive(SavedMemEntityV1 memEntity) => v(
+  Future<MemEntity> unarchive(SavedMemEntityV1 memEntity) => v(
         () async {
           final unarchived = await _memService.unarchive(memEntity);
 
-          _notificationClient.registerMemNotifications(unarchived.$5);
+          _notificationClient.registerMemNotifications(unarchived.toDomain());
 
           return unarchived;
         },

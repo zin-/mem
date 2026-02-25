@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/mem_relations/mem_relation_state.dart';
+import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -14,7 +15,10 @@ final saveMem =
           () async {
             final link = ref.keepAlive();
             try {
-              final (saved, nextNotifyAt) = await MemClient().save(
+              final (
+                (savedMemItems, savedMemNotifications, _, _, memEntityV2),
+                nextNotifyAt
+              ) = await MemClient().save(
                 ref.read(editingMemByMemIdProvider(memId)),
                 ref.read(memItemsByMemIdProvider(memId)),
                 ref.read(memNotificationsByMemIdProvider(memId)),
@@ -30,17 +34,17 @@ final saveMem =
               if (memId == null) {
                 ref
                     .read(editingMemByMemIdProvider(memId).notifier)
-                    .updatedBy(saved.$1);
+                    .updatedBy(SavedMemEntityV1.fromEntityV2(memEntityV2));
               }
 
               ref.read(memItemsProvider.notifier).upsertAll(
-                    saved.$2,
+                    savedMemItems,
                     (current, updating) =>
                         current.value.memId == updating.value.memId &&
                         current.value.type == updating.value.type,
                   );
               ref.read(memNotificationsProvider.notifier).upsertAll(
-                    saved.$3?.map((e) =>
+                    savedMemNotifications?.map((e) =>
                             SavedMemNotificationEntityV1.fromEntityV2(e)) ??
                         [],
                     (tmp, item) =>

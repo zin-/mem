@@ -27,8 +27,8 @@ class NotificationChannels {
             title = "Want to do something?";
           } else {
             title = await MemRepository()
-                .ship(id: memId)
-                .then((value) => value.single.value.name);
+                .shipById(memId)
+                .then((value) => value.name);
           }
 
           String body;

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/generated/l10n/app_localizations.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/values/durations.dart';
 
-import 'actions.dart';
 import 'detail/page.dart';
 import 'states.dart';
 
@@ -75,8 +75,10 @@ void handleRemoved(
                 action: SnackBarAction(
                   key: keyUndo,
                   label: l10n.undoAction,
-                  onPressed: () {
-                    ref.read(undoRemoveMem(memId));
+                  onPressed: () async {
+                    await ref
+                        .read(memEntitiesProvider.notifier)
+                        .undoRemove(memId);
 
                     scaffoldMessengerState.showSnackBar(
                       SnackBar(
