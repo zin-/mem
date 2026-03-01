@@ -2,7 +2,6 @@ import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/mem_relations.dart';
 import 'package:mem/features/mem_relations/mem_relation.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
-import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -11,13 +10,8 @@ import 'package:mem/framework/repository/order_by.dart';
 
 // @Deprecated('MemRelationRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
 // lintエラーになるためコメントアウト
-class MemRelationRepository extends DatabaseTupleRepository<
-    MemRelationEntityV1,
-    SavedMemRelationEntityV1,
-    MemRelation,
-    int,
-    // FIXME MemRelationentityを定義して置き換える
-    MemEntity> {
+class MemRelationRepository extends DatabaseTupleRepository<MemRelationEntityV1,
+    SavedMemRelationEntityV1, MemRelation, int, MemRelationEntity> {
   @override
   SavedMemRelationEntityV1 pack(Map<String, dynamic> map) =>
       SavedMemRelationEntityV1(map);
