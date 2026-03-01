@@ -215,7 +215,7 @@ void main() {
         when(mockMemRelationRepository.ship(
           sourceMemId: _TestConstants.testMemId,
         )).thenAnswer((_) async => [
-              SavedMemRelationEntity(
+              SavedMemRelationEntityV1(
                 {
                   defPkId.name: _TestConstants.testMemId,
                   defFkMemRelationsSourceMemId.name: _TestConstants.testMemId,
@@ -380,7 +380,7 @@ void main() {
         when(mockMemRelationRepository.ship(
           sourceMemId: _TestConstants.testMemId,
         )).thenAnswer((_) async => [
-              SavedMemRelationEntity(
+              SavedMemRelationEntityV1(
                 {
                   defPkId.name: _TestConstants.testMemId,
                   defFkMemRelationsSourceMemId.name: _TestConstants.testMemId,

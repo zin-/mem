@@ -57,5 +57,5 @@ final Map<Type, TableDefinition> entityTableRelations = {
   MemItemEntityV1: defTableMemItems,
   MemNotificationEntityV1: defTableMemNotifications,
   TargetEntityV1: defTableTargets,
-  MemRelationEntity: defTableMemRelations,
+  MemRelationEntityV1: defTableMemRelations,
 };

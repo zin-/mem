@@ -3,18 +3,18 @@ import 'package:mem/features/mem_relations/mem_relation.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
 
-class MemRelationEntity with EntityV1<MemRelation> {
-  MemRelationEntity(MemRelation value) {
+class MemRelationEntityV1 with EntityV1<MemRelation> {
+  MemRelationEntityV1(MemRelation value) {
     this.value = value;
   }
 
-  factory MemRelationEntity.by(
+  factory MemRelationEntityV1.by(
     int? sourceMemId,
     int targetMemId,
     MemRelationType type,
     int value,
   ) =>
-      MemRelationEntity(
+      MemRelationEntityV1(
         MemRelation.by(
           sourceMemId ?? 0,
           targetMemId,
@@ -32,13 +32,13 @@ class MemRelationEntity with EntityV1<MemRelation> {
       };
 
   @override
-  MemRelationEntity updatedWith(MemRelation Function(MemRelation v) update) =>
-      MemRelationEntity(update(value));
+  MemRelationEntityV1 updatedWith(MemRelation Function(MemRelation v) update) =>
+      MemRelationEntityV1(update(value));
 }
 
-class SavedMemRelationEntity extends MemRelationEntity
+class SavedMemRelationEntityV1 extends MemRelationEntityV1
     with DatabaseTupleEntityV1<int, MemRelation> {
-  SavedMemRelationEntity(Map<String, dynamic> map)
+  SavedMemRelationEntityV1(Map<String, dynamic> map)
       : super(
           MemRelation.by(
             map[defFkMemRelationsSourceMemId.name],

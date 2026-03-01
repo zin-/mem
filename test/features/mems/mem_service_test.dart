@@ -68,7 +68,7 @@ void main() {
             period: Period.aDay,
           ),
         );
-        final memRelations = <MemRelationEntity>[];
+        final memRelations = <MemRelationEntityV1>[];
 
         final savedMem = SavedMemEntityV1({
           'id': testMemId,
@@ -139,7 +139,7 @@ void main() {
         final memItems = <MemItemEntityV1>[];
         final memNotifications = <MemNotificationEntityV1>[];
         final target = null;
-        final memRelations = <MemRelationEntity>[];
+        final memRelations = <MemRelationEntityV1>[];
 
         final savedMem = SavedMemEntityV1({
           'id': testMemId,
@@ -195,7 +195,7 @@ void main() {
             period: Period.aDay,
           ),
         );
-        final memRelations = <MemRelationEntity>[];
+        final memRelations = <MemRelationEntityV1>[];
 
         final savedMem = SavedMemEntityV1({
           'id': testMemId,

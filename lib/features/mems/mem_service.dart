@@ -29,7 +29,7 @@ class MemService {
         List<MemItemEntityV1>,
         List<MemNotificationEntity>?,
         TargetEntityV1?,
-        List<MemRelationEntity>?,
+        List<MemRelationEntityV1>?,
         MemEntity,
       )> save(
     (
@@ -37,7 +37,7 @@ class MemService {
       List<MemItemEntityV1>,
       List<MemNotificationEntityV1>?,
       TargetEntityV1?,
-      List<MemRelationEntity>?,
+      List<MemRelationEntityV1>?,
     ) memDetail, {
     bool undo = false,
   }) =>
@@ -152,7 +152,7 @@ class MemService {
           // memRelationsの保存ロジック
           final memRelations = memDetail.$5;
           final returnMemRelations =
-              List<SavedMemRelationEntity?>.empty(growable: true);
+              List<SavedMemRelationEntityV1?>.empty(growable: true);
           if (memRelations != null) {
             if (memRelations.isEmpty) {
               await _memRelationRepository.waste(
@@ -168,12 +168,12 @@ class MemService {
                         v.value,
                       )))
                   .map((e) {
-                if (e is SavedMemRelationEntity && !undo) {
+                if (e is SavedMemRelationEntityV1 && !undo) {
                   return _memRelationRepository.replace(e)
-                      as Future<SavedMemRelationEntity?>;
+                      as Future<SavedMemRelationEntityV1?>;
                 } else {
                   return _memRelationRepository.receive(e)
-                      as Future<SavedMemRelationEntity?>;
+                      as Future<SavedMemRelationEntityV1?>;
                 }
               })));
             }

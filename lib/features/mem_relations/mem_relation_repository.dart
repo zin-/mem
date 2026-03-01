@@ -12,18 +12,18 @@ import 'package:mem/framework/repository/order_by.dart';
 // @Deprecated('MemRelationRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
 // lintエラーになるためコメントアウト
 class MemRelationRepository extends DatabaseTupleRepository<
-    MemRelationEntity,
-    SavedMemRelationEntity,
+    MemRelationEntityV1,
+    SavedMemRelationEntityV1,
     MemRelation,
     int,
     // FIXME MemRelationentityを定義して置き換える
     MemEntity> {
   @override
-  SavedMemRelationEntity pack(Map<String, dynamic> map) =>
-      SavedMemRelationEntity(map);
+  SavedMemRelationEntityV1 pack(Map<String, dynamic> map) =>
+      SavedMemRelationEntityV1(map);
 
   @override
-  Future<List<SavedMemRelationEntity>> ship({
+  Future<List<SavedMemRelationEntityV1>> ship({
     int? sourceMemId,
     Condition? condition,
     GroupBy? groupBy,
@@ -42,7 +42,7 @@ class MemRelationRepository extends DatabaseTupleRepository<
         {'sourceMemId': sourceMemId},
       );
 
-  Future<Iterable<SavedMemRelationEntity>> archiveBy({
+  Future<Iterable<SavedMemRelationEntityV1>> archiveBy({
     int? relatedMemId,
     Condition? condition,
     DateTime? archivedAt,
@@ -66,7 +66,7 @@ class MemRelationRepository extends DatabaseTupleRepository<
         },
       );
 
-  Future<Iterable<SavedMemRelationEntity>> unarchiveBy({
+  Future<Iterable<SavedMemRelationEntityV1>> unarchiveBy({
     int? sourceMemId,
     int? targetMemId,
     Condition? condition,

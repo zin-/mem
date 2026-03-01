@@ -18,7 +18,7 @@ class MemClient {
           List<MemItemEntityV1>,
           List<MemNotificationEntity>?,
           TargetEntityV1?,
-          List<MemRelationEntity>?,
+          List<MemRelationEntityV1>?,
           MemEntity,
         ),
         DateTime?
@@ -27,7 +27,7 @@ class MemClient {
     List<MemItemEntityV1> memItemList,
     List<MemNotificationEntityV1> memNotificationList,
     TargetEntityV1? target,
-    List<MemRelationEntity>? memRelations,
+    List<MemRelationEntityV1>? memRelations,
   ) =>
       v(
         () async {

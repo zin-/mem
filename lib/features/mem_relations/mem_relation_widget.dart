@@ -37,7 +37,7 @@ class MemRelationList extends ConsumerWidget {
                       .watch(memRelationEntitiesByMemIdProvider(sourceMemId)
                           .notifier)
                       .upsert([
-                    MemRelationEntity.by(
+                    MemRelationEntityV1.by(
                       sourceMemId,
                       targetMemId,
                       MemRelationType.prePost,
@@ -85,7 +85,7 @@ const maxHeight = itemHeight * 3;
 
 class _MemRelationList extends StatelessWidget {
   final Iterable<Mem> selectedMems;
-  final Iterable<MemRelationEntity> memRelationEntities;
+  final Iterable<MemRelationEntityV1> memRelationEntities;
   final void Function() showDialog;
   final void Function(int targetMemId, int value) onChanged;
 

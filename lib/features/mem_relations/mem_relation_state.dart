@@ -8,15 +8,15 @@ part 'mem_relation_state.g.dart';
 
 @riverpod
 class MemRelationEntities extends _$MemRelationEntities
-    with EntitiesStateMixinV1<SavedMemRelationEntity, int> {
+    with EntitiesStateMixinV1<SavedMemRelationEntityV1, int> {
   @override
-  Iterable<SavedMemRelationEntity> build() => v(() => []);
+  Iterable<SavedMemRelationEntityV1> build() => v(() => []);
 }
 
 @riverpod
 class MemRelationEntitiesByMemId extends _$MemRelationEntitiesByMemId {
   @override
-  Future<Iterable<MemRelationEntity>> build(int? memId) => v(
+  Future<Iterable<MemRelationEntityV1>> build(int? memId) => v(
         () async {
           if (memId == null) {
             return [];
@@ -39,8 +39,8 @@ class MemRelationEntitiesByMemId extends _$MemRelationEntitiesByMemId {
         {'memId': memId},
       );
 
-  Future<Iterable<MemRelationEntity>> upsert(
-    Iterable<MemRelationEntity> entities,
+  Future<Iterable<MemRelationEntityV1>> upsert(
+    Iterable<MemRelationEntityV1> entities,
   ) async =>
       v(
         () async {
