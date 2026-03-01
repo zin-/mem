@@ -11,12 +11,12 @@ import 'package:mem/framework/view/integer_text_form_field.dart';
 import 'package:mem/framework/date_and_time/time_text_form_field.dart';
 
 class _FakeTargetState extends TargetState {
-  final TargetEntity _entity;
+  final TargetEntityV1 _entity;
 
   _FakeTargetState(this._entity);
 
   @override
-  Future<TargetEntity> build(int? memId) async {
+  Future<TargetEntityV1> build(int? memId) async {
     return _entity;
   }
 }
@@ -25,7 +25,7 @@ void main() {
   group('TargetText test', () {
     group('表示', () {
       testWidgets('should display TargetText widget', (tester) async {
-        final targetEntity = TargetEntity(
+        final targetEntity = TargetEntityV1(
           Target(
             memId: 1,
             targetType: TargetType.equalTo,
@@ -60,7 +60,7 @@ void main() {
 
       testWidgets('should display TimeTextFormField when targetUnit is time',
           (tester) async {
-        final targetEntity = TargetEntity(
+        final targetEntity = TargetEntityV1(
           Target(
             memId: 1,
             targetType: TargetType.equalTo,
@@ -96,7 +96,7 @@ void main() {
     group('変更', () {
       testWidgets('should update display when target value changes',
           (tester) async {
-        final targetEntity = TargetEntity(
+        final targetEntity = TargetEntityV1(
           Target(
             memId: 1,
             targetType: TargetType.equalTo,
@@ -141,7 +141,7 @@ void main() {
 
       testWidgets('should update display when target type changes',
           (tester) async {
-        final targetEntity = TargetEntity(
+        final targetEntity = TargetEntityV1(
           Target(
             memId: 1,
             targetType: TargetType.equalTo,
@@ -187,7 +187,7 @@ void main() {
 
       testWidgets('should update display when target unit changes',
           (tester) async {
-        final targetEntity = TargetEntity(
+        final targetEntity = TargetEntityV1(
           Target(
             memId: 1,
             targetType: TargetType.equalTo,
@@ -233,7 +233,7 @@ void main() {
 
       testWidgets('should update display when target period changes',
           (tester) async {
-        final targetEntity = TargetEntity(
+        final targetEntity = TargetEntityV1(
           Target(
             memId: 1,
             targetType: TargetType.equalTo,
@@ -279,7 +279,7 @@ void main() {
 
       testWidgets('should update display when time value changes',
           (tester) async {
-        final targetEntity = TargetEntity(
+        final targetEntity = TargetEntityV1(
           Target(
             memId: 1,
             targetType: TargetType.equalTo,
@@ -324,7 +324,7 @@ void main() {
 
       testWidgets('should handle time value validation with max limit',
           (tester) async {
-        final targetEntity = TargetEntity(
+        final targetEntity = TargetEntityV1(
           Target(
             memId: 1,
             targetType: TargetType.equalTo,

@@ -28,7 +28,7 @@ class MemService {
       (
         List<MemItemEntityV1>,
         List<MemNotificationEntity>?,
-        TargetEntity?,
+        TargetEntityV1?,
         List<MemRelationEntity>?,
         MemEntity,
       )> save(
@@ -36,7 +36,7 @@ class MemService {
       MemEntityV1,
       List<MemItemEntityV1>,
       List<MemNotificationEntityV1>?,
-      TargetEntity?,
+      TargetEntityV1?,
       List<MemRelationEntity>?,
     ) memDetail, {
     bool undo = false,
@@ -121,13 +121,13 @@ class MemService {
             }
           }
 
-          SavedTargetEntity? savedTarget;
+          SavedTargetEntityV1? savedTarget;
           final target = memDetail.$4;
           if (target == null || target.value.value == 0) {
             await _targetRepository.waste(
               condition: Equals(defFkTargetMemId, savedMemEntity.id),
             );
-          } else if (target is SavedTargetEntity) {
+          } else if (target is SavedTargetEntityV1) {
             savedTarget = await _targetRepository.replace(target);
           } else {
             savedTarget = await _targetRepository.receive(target.updatedWith(

@@ -5,8 +5,8 @@ import 'package:mem/framework/repository/entity.dart';
 import 'target.dart';
 import 'target_table.dart';
 
-class TargetEntity with EntityV1<Target> {
-  TargetEntity(Target value) {
+class TargetEntityV1 with EntityV1<Target> {
+  TargetEntityV1(Target value) {
     this.value = value;
   }
 
@@ -20,13 +20,13 @@ class TargetEntity with EntityV1<Target> {
       };
 
   @override
-  TargetEntity updatedWith(Target Function(Target v) update) =>
-      TargetEntity(update(value));
+  TargetEntityV1 updatedWith(Target Function(Target v) update) =>
+      TargetEntityV1(update(value));
 }
 
-class SavedTargetEntity extends TargetEntity
+class SavedTargetEntityV1 extends TargetEntityV1
     with DatabaseTupleEntityV1<int, Target> {
-  SavedTargetEntity(Map<String, dynamic> map)
+  SavedTargetEntityV1(Map<String, dynamic> map)
       : super(
           Target(
             memId: map[defFkTargetMemId.name],
@@ -46,6 +46,6 @@ class SavedTargetEntity extends TargetEntity
   }
 
   @override
-  SavedTargetEntity updatedWith(Target Function(Target v) update) =>
-      SavedTargetEntity(toMap..addAll(super.updatedWith(update).toMap));
+  SavedTargetEntityV1 updatedWith(Target Function(Target v) update) =>
+      SavedTargetEntityV1(toMap..addAll(super.updatedWith(update).toMap));
 }

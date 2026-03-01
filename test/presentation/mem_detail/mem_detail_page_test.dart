@@ -199,7 +199,7 @@ void main() {
         when(mockTargetRepository.ship(
                 condition: Equals(defFkTargetMemId, _TestConstants.testMemId)))
             .thenAnswer((_) async => [
-                  SavedTargetEntity(
+                  SavedTargetEntityV1(
                     {
                       defPkId.name: _TestConstants.testMemId,
                       defFkTargetMemId.name: _TestConstants.testMemId,
@@ -366,7 +366,7 @@ void main() {
         when(mockTargetRepository.ship(
                 condition: Equals(defFkTargetMemId, _TestConstants.testMemId)))
             .thenAnswer((_) async => [
-                  SavedTargetEntity(
+                  SavedTargetEntityV1(
                     {
                       defPkId.name: _TestConstants.testMemId,
                       defFkTargetMemId.name: _TestConstants.testMemId,

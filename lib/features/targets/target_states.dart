@@ -13,7 +13,7 @@ part 'target_states.g.dart';
 @riverpod
 class Targets extends _$Targets {
   @override
-  List<SavedTargetEntity> build() => v(
+  List<SavedTargetEntityV1> build() => v(
         () => [],
       );
 
@@ -40,7 +40,7 @@ class Targets extends _$Targets {
 @riverpod
 class TargetState extends _$TargetState {
   @override
-  Future<TargetEntity> build(int? memId) async {
+  Future<TargetEntityV1> build(int? memId) async {
     if (memId != null) {
       final targets = await TargetRepository()
           .ship(condition: Equals(defFkTargetMemId, memId));
@@ -71,7 +71,7 @@ class TargetState extends _$TargetState {
     );
   }
 
-  TargetEntity _initialTarget(int? memId) => TargetEntity(
+  TargetEntityV1 _initialTarget(int? memId) => TargetEntityV1(
         Target(
           memId: memId,
           targetType: TargetType.equalTo,

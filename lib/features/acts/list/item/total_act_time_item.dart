@@ -11,7 +11,7 @@ import 'package:mem/features/targets/target_entity.dart';
 class TotalActTimeListItem extends StatelessWidget {
   final List<SavedActEntityV1> _actList;
   final Mem? _mem;
-  final SavedTargetEntity? _targetEntity;
+  final SavedTargetEntityV1? _targetEntity;
 
   const TotalActTimeListItem(
     this._actList,

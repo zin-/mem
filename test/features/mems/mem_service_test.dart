@@ -59,7 +59,7 @@ void main() {
         final mem = MemEntityV1(Mem(null, 'Test Mem', null, null));
         final memItems = <MemItemEntityV1>[];
         final memNotifications = <MemNotificationEntityV1>[];
-        final target = TargetEntity(
+        final target = TargetEntityV1(
           Target(
             memId: null,
             targetType: TargetType.equalTo,
@@ -83,7 +83,7 @@ void main() {
           'archivedAt': null,
         });
 
-        final savedTarget = SavedTargetEntity({
+        final savedTarget = SavedTargetEntityV1({
           'id': 1,
           'memId': testMemId,
           'type': 'equalTo',
@@ -186,7 +186,7 @@ void main() {
         final mem = MemEntityV1(Mem(null, 'Test Mem', null, null));
         final memItems = <MemItemEntityV1>[];
         final memNotifications = <MemNotificationEntityV1>[];
-        final target = TargetEntity(
+        final target = TargetEntityV1(
           Target(
             memId: null,
             targetType: TargetType.equalTo,

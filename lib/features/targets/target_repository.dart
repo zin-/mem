@@ -8,14 +8,15 @@ import 'package:mem/framework/repository/database_tuple_repository.dart';
 // @Deprecated('TargetRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
 // lintエラーになるためコメントアウト
 class TargetRepository extends DatabaseTupleRepository<
-    TargetEntity,
-    SavedTargetEntity,
+    TargetEntityV1,
+    SavedTargetEntityV1,
     Target,
     int,
     // FIXME Targetentityを定義して置き換える
     MemEntity> {
   @override
-  SavedTargetEntity pack(Map<String, dynamic> map) => SavedTargetEntity(map);
+  SavedTargetEntityV1 pack(Map<String, dynamic> map) =>
+      SavedTargetEntityV1(map);
 
   static TargetRepository? _instance;
   factory TargetRepository({TargetRepository? mock}) =>
