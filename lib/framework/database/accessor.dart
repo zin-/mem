@@ -335,6 +335,7 @@ class DriftDatabaseAccessor {
       case MemNotificationEntity _:
         return driftDatabase.memRepeatedNotifications;
 
+      case target_domain.Target _:
       case TargetEntity _:
         return driftDatabase.targets;
 

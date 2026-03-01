@@ -132,15 +132,21 @@ class MemService {
                 .replaceV2(target.toEntityV2())
                 .then((v) => SavedTargetEntityV1.fromEntityV2(v));
           } else {
-            savedTarget = await _targetRepository.receive(target.updatedWith(
-              (v) => Target(
-                memId: savedMemEntity.id,
-                targetType: v.targetType,
-                targetUnit: v.targetUnit,
-                value: v.value,
-                period: v.period,
-              ),
-            ));
+            savedTarget = await _targetRepository
+                .receiveV2(
+                  target
+                      .updatedWith(
+                        (v) => Target(
+                          memId: savedMemEntity.id,
+                          targetType: v.targetType,
+                          targetUnit: v.targetUnit,
+                          value: v.value,
+                          period: v.period,
+                        ),
+                      )
+                      .value,
+                )
+                .then((v) => SavedTargetEntityV1.fromEntityV2(v));
           }
 
           // memRelationsの保存ロジック
