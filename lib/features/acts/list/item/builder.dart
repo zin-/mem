@@ -12,7 +12,7 @@ class ActListItemBuilder {
   final MapEntry<DateTime, List<SavedActEntityV1>> _actListWithDatetime;
   final List<Mem> _memList;
   final bool _isTimeView;
-  final List<SavedTargetEntity> _targetList;
+  final List<SavedTargetEntityV1> _targetList;
 
   late final Map<int, List<SavedActEntityV1>> _actListGroupedByMemId;
 

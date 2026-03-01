@@ -11,10 +11,12 @@ import 'package:mem/features/mems/mem_entity.dart' as mem_entity;
 import 'package:mem/features/mem_items/mem_item.dart' as mem_item_domain;
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/framework/singleton.dart';
+import 'package:mem/features/targets/target.dart' as target_domain;
 
 import 'definition/table_definition.dart';
 
@@ -333,6 +335,10 @@ class DriftDatabaseAccessor {
       case MemNotificationEntity _:
         return driftDatabase.memRepeatedNotifications;
 
+      case target_domain.Target _:
+      case TargetEntity _:
+        return driftDatabase.targets;
+
       case TableDefinition _:
         return driftDatabase.allTables.firstWhere(
           (e) => e.actualTableName == domain.name,
@@ -516,8 +522,11 @@ convertIntoDriftInsertable(dynamic domain) {
         createdAt: DateTime.now(),
       );
 
+    case target_domain.Target _:
+      return convertIntoTargetsInsertable(domain);
+
     default:
-      throw StateError('Unknown domain: ${domain.runtimeType}');
+      throw StateError('入力おかしいかも: ${domain.runtimeType}');
   }
 }
 
@@ -533,8 +542,10 @@ convertIntoDriftUpdateable(
       return convertIntoActsUpdateable(entity);
     case MemNotificationEntity _:
       return convertIntoMemRepeatedNotificationsUpdateable(entity);
+    case TargetEntity _:
+      return convertIntoTargetsUpdateable(entity);
 
     default:
-      throw StateError('Unknown entity: ${entity.runtimeType}');
+      throw StateError('入力おかしいかも: ${entity.runtimeType}');
   }
 }

@@ -37,7 +37,7 @@ class TargetText extends ConsumerWidget {
   }
 
   Widget _build(
-    TargetEntity targetEntity,
+    TargetEntityV1 targetEntity,
     void Function({
       TargetType? Function()? targetType,
       TargetUnit? Function()? targetUnit,

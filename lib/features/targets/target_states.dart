@@ -13,7 +13,7 @@ part 'target_states.g.dart';
 @riverpod
 class Targets extends _$Targets {
   @override
-  List<SavedTargetEntity> build() => v(
+  List<SavedTargetEntityV1> build() => v(
         () => [],
       );
 
@@ -24,10 +24,14 @@ class Targets extends _$Targets {
 
           if (newMemIds.isNotEmpty) {
             final targets = await TargetRepository()
-                .ship(condition: In(defFkTargetMemId.name, newMemIds));
+                .shipV2(condition: In(defFkTargetMemId.name, newMemIds))
+                .then((v) => v.map((e) => SavedTargetEntityV1.fromEntityV2(e)));
 
             if (targets.isNotEmpty) {
-              state = [...state, ...targets];
+              state = [
+                ...state,
+                ...targets,
+              ];
             }
           }
         },
@@ -40,10 +44,11 @@ class Targets extends _$Targets {
 @riverpod
 class TargetState extends _$TargetState {
   @override
-  Future<TargetEntity> build(int? memId) async {
+  Future<TargetEntityV1> build(int? memId) async {
     if (memId != null) {
       final targets = await TargetRepository()
-          .ship(condition: Equals(defFkTargetMemId, memId));
+          .shipV2(condition: Equals(defFkTargetMemId, memId))
+          .then((v) => v.map((e) => SavedTargetEntityV1.fromEntityV2(e)));
       if (targets.isNotEmpty) {
         return targets.first;
       }
@@ -71,7 +76,7 @@ class TargetState extends _$TargetState {
     );
   }
 
-  TargetEntity _initialTarget(int? memId) => TargetEntity(
+  TargetEntityV1 _initialTarget(int? memId) => TargetEntityV1(
         Target(
           memId: memId,
           targetType: TargetType.equalTo,

@@ -17,7 +17,7 @@ class MemClient {
         (
           List<MemItemEntityV1>,
           List<MemNotificationEntity>?,
-          TargetEntity?,
+          TargetEntityV1?,
           List<MemRelationEntity>?,
           MemEntity,
         ),
@@ -26,13 +26,12 @@ class MemClient {
     MemEntityV1 mem,
     List<MemItemEntityV1> memItemList,
     List<MemNotificationEntityV1> memNotificationList,
-    TargetEntity? target,
+    TargetEntityV1? target,
     List<MemRelationEntity>? memRelations,
   ) =>
       v(
         () async {
           final (
-            _,
             savedMemItems,
             savedMemNotifications,
             savedTarget,

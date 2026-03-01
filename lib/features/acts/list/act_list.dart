@@ -86,7 +86,7 @@ class _ActList extends StatelessWidget {
   final bool _isTimeView;
   final List<SavedActEntityV1> _actList;
   final List<Mem> _memList;
-  final List<SavedTargetEntity> _targetList;
+  final List<SavedTargetEntityV1> _targetList;
   final ScrollController? _scrollController;
 
   const _ActList(

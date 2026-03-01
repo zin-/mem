@@ -59,7 +59,7 @@ void main() {
         final mem = MemEntityV1(Mem(null, 'Test Mem', null, null));
         final memItems = <MemItemEntityV1>[];
         final memNotifications = <MemNotificationEntityV1>[];
-        final target = TargetEntity(
+        final target = TargetEntityV1(
           Target(
             memId: null,
             targetType: TargetType.equalTo,
@@ -83,17 +83,17 @@ void main() {
           'archivedAt': null,
         });
 
-        final savedTarget = SavedTargetEntity({
-          'id': 1,
-          'memId': testMemId,
-          'type': 'equalTo',
-          'unit': 'count',
-          'value': 10,
-          'period': 'aDay',
-          'createdAt': DateTime.now(),
-          'updatedAt': null,
-          'archivedAt': null,
-        });
+        final savedTarget = TargetEntity(
+          testMemId,
+          TargetType.equalTo,
+          TargetUnit.count,
+          10,
+          Period.aDay,
+          1,
+          DateTime.now(),
+          null,
+          null,
+        );
 
         when(mockMemRepository.receiveV2(any))
             .thenAnswer((_) async => savedMem.toEntityV2());
@@ -104,7 +104,7 @@ void main() {
         )).thenAnswer((_) async => []);
         when(mockMemRelationRepository.waste(condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
-        when(mockTargetRepository.waste(condition: anyNamed('condition')))
+        when(mockTargetRepository.wasteV2(condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
         when(mockMemNotificationRepository.wasteV2(
           memId: anyNamed('memId'),
@@ -113,9 +113,9 @@ void main() {
         )).thenAnswer((_) async => []);
         when(mockMemRelationRepository.waste(condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
-        when(mockTargetRepository.waste(condition: anyNamed('condition')))
+        when(mockTargetRepository.wasteV2(condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
-        when(mockTargetRepository.receive(any))
+        when(mockTargetRepository.receiveV2(any))
             .thenAnswer((_) async => savedTarget);
 
         // Act
@@ -128,7 +128,7 @@ void main() {
         ));
 
         // Assert
-        verify(mockTargetRepository.receive(any)).called(1);
+        verify(mockTargetRepository.receiveV2(any)).called(1);
       });
 
       test('should not call _targetRepository.receive when target is null',
@@ -186,7 +186,7 @@ void main() {
         final mem = MemEntityV1(Mem(null, 'Test Mem', null, null));
         final memItems = <MemItemEntityV1>[];
         final memNotifications = <MemNotificationEntityV1>[];
-        final target = TargetEntity(
+        final target = TargetEntityV1(
           Target(
             memId: null,
             targetType: TargetType.equalTo,

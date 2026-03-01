@@ -26,10 +26,9 @@ class MemService {
 
   Future<
       (
-        SavedMemEntityV1,
         List<MemItemEntityV1>,
         List<MemNotificationEntity>?,
-        TargetEntity?,
+        TargetEntityV1?,
         List<MemRelationEntity>?,
         MemEntity,
       )> save(
@@ -37,7 +36,7 @@ class MemService {
       MemEntityV1,
       List<MemItemEntityV1>,
       List<MemNotificationEntityV1>?,
-      TargetEntity?,
+      TargetEntityV1?,
       List<MemRelationEntity>?,
     ) memDetail, {
     bool undo = false,
@@ -122,24 +121,32 @@ class MemService {
             }
           }
 
-          SavedTargetEntity? savedTarget;
+          SavedTargetEntityV1? savedTarget;
           final target = memDetail.$4;
           if (target == null || target.value.value == 0) {
-            await _targetRepository.waste(
+            await _targetRepository.wasteV2(
               condition: Equals(defFkTargetMemId, savedMemEntity.id),
             );
-          } else if (target is SavedTargetEntity) {
-            savedTarget = await _targetRepository.replace(target);
+          } else if (target is SavedTargetEntityV1) {
+            savedTarget = await _targetRepository
+                .replaceV2(target.toEntityV2())
+                .then((v) => SavedTargetEntityV1.fromEntityV2(v));
           } else {
-            savedTarget = await _targetRepository.receive(target.updatedWith(
-              (v) => Target(
-                memId: savedMemEntity.id,
-                targetType: v.targetType,
-                targetUnit: v.targetUnit,
-                value: v.value,
-                period: v.period,
-              ),
-            ));
+            savedTarget = await _targetRepository
+                .receiveV2(
+                  target
+                      .updatedWith(
+                        (v) => Target(
+                          memId: savedMemEntity.id,
+                          targetType: v.targetType,
+                          targetUnit: v.targetUnit,
+                          value: v.value,
+                          period: v.period,
+                        ),
+                      )
+                      .value,
+                )
+                .then((v) => SavedTargetEntityV1.fromEntityV2(v));
           }
 
           // memRelationsの保存ロジック
@@ -173,7 +180,6 @@ class MemService {
           }
 
           return (
-            SavedMemEntityV1.fromEntityV2(savedMemEntity),
             savedMemItems
                 .map((e) => SavedMemItemEntityV1.fromEntityV2(e))
                 .toList(),
@@ -207,7 +213,7 @@ class MemService {
               null,
               null,
             ),
-          ).then((v) => v.$1);
+          ).then((v) => SavedMemEntityV1.fromEntityV2(v.$5));
         },
         {
           'memId': memId,
@@ -231,7 +237,7 @@ class MemService {
               null,
               null,
             ),
-          ).then((v) => v.$1);
+          ).then((v) => SavedMemEntityV1.fromEntityV2(v.$5));
         },
         {
           'memId': memId,
@@ -299,12 +305,13 @@ class MemService {
 
   static MemService? _instance;
 
-  factory MemService(
-          {MemRepository? memRepository,
-          MemItemRepository? memItemRepository,
-          MemNotificationRepository? memNotificationRepository,
-          TargetRepository? targetRepository,
-          MemRelationRepository? memRelationRepository}) =>
+  factory MemService({
+    MemRepository? memRepository,
+    MemItemRepository? memItemRepository,
+    MemNotificationRepository? memNotificationRepository,
+    TargetRepository? targetRepository,
+    MemRelationRepository? memRelationRepository,
+  }) =>
       i(
         () => _instance ??= MemService._(
           memRepository ?? MemRepository(),
