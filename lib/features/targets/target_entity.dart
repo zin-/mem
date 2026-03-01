@@ -107,18 +107,6 @@ class TargetEntity implements Entity<int> {
     this.archivedAt,
   );
 
-  factory TargetEntity.fromMap(dynamic map) => TargetEntity(
-        map[defFkTargetMemId.name],
-        map[defColTargetType.name],
-        map[defColTargetUnit.name],
-        map[defColTargetValue.name],
-        map[defColTargetPeriod.name],
-        map[defPkId.name],
-        map[defColCreatedAt.name],
-        map[defColUpdatedAt.name],
-        map[defColArchivedAt.name],
-      );
-
   factory TargetEntity.fromTuple(dynamic tuple) => TargetEntity(
         tuple.memId,
         TargetType.values.firstWhere(
