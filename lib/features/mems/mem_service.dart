@@ -124,11 +124,13 @@ class MemService {
           SavedTargetEntityV1? savedTarget;
           final target = memDetail.$4;
           if (target == null || target.value.value == 0) {
-            await _targetRepository.waste(
+            await _targetRepository.wasteV2(
               condition: Equals(defFkTargetMemId, savedMemEntity.id),
             );
           } else if (target is SavedTargetEntityV1) {
-            savedTarget = await _targetRepository.replace(target);
+            savedTarget = await _targetRepository
+                .replaceV2(target.toEntityV2())
+                .then((v) => SavedTargetEntityV1.fromEntityV2(v));
           } else {
             savedTarget = await _targetRepository.receive(target.updatedWith(
               (v) => Target(

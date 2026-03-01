@@ -1,3 +1,5 @@
+import 'package:drift/drift.dart';
+import 'package:mem/databases/database.dart' as drift_database;
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/mems/mem.dart';
@@ -50,6 +52,32 @@ class SavedTargetEntityV1 extends TargetEntityV1
   @override
   SavedTargetEntityV1 updatedWith(Target Function(Target v) update) =>
       SavedTargetEntityV1(toMap..addAll(super.updatedWith(update).toMap));
+
+  factory SavedTargetEntityV1.fromEntityV2(TargetEntity entity) =>
+      SavedTargetEntityV1(
+        {
+          defFkTargetMemId.name: entity.memId,
+          defColTargetType.name: entity.targetType.name,
+          defColTargetUnit.name: entity.targetUnit.name,
+          defColTargetValue.name: entity.value,
+          defColTargetPeriod.name: entity.period.name,
+          defPkId.name: entity.id,
+          defColCreatedAt.name: entity.createdAt,
+          defColUpdatedAt.name: entity.updatedAt,
+          defColArchivedAt.name: entity.archivedAt,
+        },
+      );
+  TargetEntity toEntityV2() => TargetEntity(
+        value.memId,
+        value.targetType,
+        value.targetUnit,
+        value.value,
+        value.period,
+        id,
+        createdAt,
+        updatedAt,
+        archivedAt,
+      );
 }
 
 class TargetEntity implements Entity<int> {
@@ -90,4 +118,42 @@ class TargetEntity implements Entity<int> {
         map[defColUpdatedAt.name],
         map[defColArchivedAt.name],
       );
+
+  factory TargetEntity.fromTuple(dynamic tuple) => TargetEntity(
+        tuple.memId,
+        TargetType.values.firstWhere(
+          (element) => element.name == tuple.type,
+        ),
+        TargetUnit.values.firstWhere(
+          (element) => element.name == tuple.unit,
+        ),
+        tuple.value,
+        Period.values.firstWhere(
+          (element) => element.name == tuple.period,
+        ),
+        tuple.id,
+        tuple.createdAt,
+        tuple.updatedAt,
+        tuple.archivedAt,
+      );
 }
+
+convertIntoTargetsInsertable(Target entity) => drift_database.TargetsCompanion(
+      type: Value(entity.targetType.name),
+      unit: Value(entity.targetUnit.name),
+      value: Value(entity.value),
+      period: Value(entity.period.name),
+      memId: Value(entity.memId ?? 0),
+      createdAt: Value(DateTime.now()),
+    );
+convertIntoTargetsUpdateable(TargetEntity entity) =>
+    drift_database.TargetsCompanion(
+      id: Value(entity.id),
+      type: Value(entity.targetType.name),
+      unit: Value(entity.targetUnit.name),
+      value: Value(entity.value),
+      period: Value(entity.period.name),
+      memId: Value(entity.memId ?? 0),
+      updatedAt: Value(DateTime.now()),
+      archivedAt: Value(entity.archivedAt),
+    );

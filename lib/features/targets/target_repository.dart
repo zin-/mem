@@ -11,6 +11,8 @@ class TargetRepository extends DatabaseTupleRepository<TargetEntityV1,
   @override
   SavedTargetEntityV1 pack(Map<String, dynamic> map) =>
       SavedTargetEntityV1(map);
+  @override
+  TargetEntity packV2(dynamic tuple) => TargetEntity.fromTuple(tuple);
 
   static TargetRepository? _instance;
   factory TargetRepository({TargetRepository? mock}) =>
