@@ -3,14 +3,14 @@ import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/targets/target_table.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
+import 'package:mem/framework/repository/dummy.dart';
 
 // @Deprecated('TargetRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
 // lintエラーになるためコメントアウト
-class TargetRepository extends DatabaseTupleRepository<TargetEntityV1,
-    SavedTargetEntityV1, Target, int, TargetEntity> {
+class TargetRepository extends DatabaseTupleRepository<DummyEntity,
+    SavedDummyEntity, Target, int, TargetEntity> {
   @override
-  SavedTargetEntityV1 pack(Map<String, dynamic> map) =>
-      SavedTargetEntityV1(map);
+  pack(Map<String, dynamic> map) => throw UnimplementedError();
   @override
   TargetEntity packV2(dynamic tuple) => TargetEntity.fromTuple(tuple);
 

@@ -24,10 +24,14 @@ class Targets extends _$Targets {
 
           if (newMemIds.isNotEmpty) {
             final targets = await TargetRepository()
-                .ship(condition: In(defFkTargetMemId.name, newMemIds));
+                .shipV2(condition: In(defFkTargetMemId.name, newMemIds))
+                .then((v) => v.map((e) => SavedTargetEntityV1.fromEntityV2(e)));
 
             if (targets.isNotEmpty) {
-              state = [...state, ...targets];
+              state = [
+                ...state,
+                ...targets,
+              ];
             }
           }
         },
@@ -43,7 +47,8 @@ class TargetState extends _$TargetState {
   Future<TargetEntityV1> build(int? memId) async {
     if (memId != null) {
       final targets = await TargetRepository()
-          .ship(condition: Equals(defFkTargetMemId, memId));
+          .shipV2(condition: Equals(defFkTargetMemId, memId))
+          .then((v) => v.map((e) => SavedTargetEntityV1.fromEntityV2(e)));
       if (targets.isNotEmpty) {
         return targets.first;
       }

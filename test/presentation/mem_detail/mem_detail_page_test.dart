@@ -196,21 +196,19 @@ void main() {
                   ),
                 ]);
 
-        when(mockTargetRepository.ship(
+        when(mockTargetRepository.shipV2(
                 condition: Equals(defFkTargetMemId, _TestConstants.testMemId)))
             .thenAnswer((_) async => [
-                  SavedTargetEntityV1(
-                    {
-                      defPkId.name: _TestConstants.testMemId,
-                      defFkTargetMemId.name: _TestConstants.testMemId,
-                      defColTargetType.name: TargetType.equalTo.name,
-                      defColTargetUnit.name: TargetUnit.count.name,
-                      defColTargetValue.name: 10,
-                      defColTargetPeriod.name: Period.aDay.name,
-                      defColCreatedAt.name: DateTime.now(),
-                      defColUpdatedAt.name: null,
-                      defColArchivedAt.name: null,
-                    },
+                  TargetEntity(
+                    _TestConstants.testMemId,
+                    TargetType.equalTo,
+                    TargetUnit.count,
+                    10,
+                    Period.aDay,
+                    1,
+                    DateTime.now(),
+                    null,
+                    null,
                   ),
                 ]);
 
@@ -363,21 +361,19 @@ void main() {
                   ),
                 ]);
 
-        when(mockTargetRepository.ship(
+        when(mockTargetRepository.shipV2(
                 condition: Equals(defFkTargetMemId, _TestConstants.testMemId)))
             .thenAnswer((_) async => [
-                  SavedTargetEntityV1(
-                    {
-                      defPkId.name: _TestConstants.testMemId,
-                      defFkTargetMemId.name: _TestConstants.testMemId,
-                      defColTargetType.name: TargetType.equalTo.name,
-                      defColTargetUnit.name: TargetUnit.count.name,
-                      defColTargetValue.name: 10,
-                      defColTargetPeriod.name: Period.aDay.name,
-                      defColCreatedAt.name: DateTime.now(),
-                      defColUpdatedAt.name: null,
-                      defColArchivedAt.name: null,
-                    },
+                  TargetEntity(
+                    _TestConstants.testMemId,
+                    TargetType.equalTo,
+                    TargetUnit.count,
+                    10,
+                    Period.aDay,
+                    1,
+                    DateTime.now(),
+                    null,
+                    null,
                   ),
                 ]);
 
