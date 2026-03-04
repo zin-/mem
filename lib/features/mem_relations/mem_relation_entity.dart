@@ -61,13 +61,12 @@ class SavedMemRelationEntityV1 extends MemRelationEntityV1
           defFkMemRelationsTargetMemId.name: entity.targetMemId,
           defColMemRelationsType.name: entity.type.name,
           defColMemRelationsValue.name: entity.value,
-        },
-      )..withMap({
           defPkId.name: entity.id,
           defColCreatedAt.name: entity.createdAt,
           defColUpdatedAt.name: entity.updatedAt,
           defColArchivedAt.name: entity.archivedAt,
-        });
+        },
+      );
   MemRelationEntity toEntityV2() => MemRelationEntity(
         value.sourceMemId,
         value.targetMemId,

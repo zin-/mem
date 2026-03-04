@@ -5,8 +5,6 @@ import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/framework/repository/group_by.dart';
-import 'package:mem/framework/repository/order_by.dart';
 
 // @Deprecated('MemRelationRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
 // lintエラーになるためコメントアウト
@@ -17,42 +15,49 @@ class MemRelationRepository extends DatabaseTupleRepository<MemRelationEntityV1,
       SavedMemRelationEntityV1(map);
 
   @override
-  Future<List<SavedMemRelationEntityV1>> ship({
-    int? sourceMemId,
-    Condition? condition,
-    GroupBy? groupBy,
-    List<OrderBy>? orderBy,
-    int? offset,
-    int? limit,
-  }) =>
-      v(
-        () async => await super.ship(
-          condition: And([
-            if (sourceMemId != null)
-              Equals(defFkMemRelationsSourceMemId, sourceMemId),
-            if (condition != null) condition,
-          ]),
-        ),
+  MemRelationEntity packV2(dynamic tuple) => MemRelationEntity.fromTuple(tuple);
+
+  Future<List<MemRelationEntity>> shipBySourceMemIdV2(int? sourceMemId) => v(
+        () async => sourceMemId == null
+            ? []
+            : super.shipV2(
+                condition: Equals(defFkMemRelationsSourceMemId, sourceMemId),
+              ),
         {'sourceMemId': sourceMemId},
       );
 
-  Future<Iterable<SavedMemRelationEntityV1>> archiveBy({
+  Future<Iterable<MemRelationEntity>> archiveByV2({
     int? relatedMemId,
     Condition? condition,
     DateTime? archivedAt,
   }) =>
       v(
-        () async => await ship(
-          condition: And([
-            if (relatedMemId != null)
-              Or([
-                Equals(defFkMemRelationsSourceMemId, relatedMemId),
-                Equals(defFkMemRelationsTargetMemId, relatedMemId),
-              ]),
-            if (condition != null) condition,
-          ]),
-        ).then((v) =>
-            Future.wait(v.map((e) => archive(e, archivedAt: archivedAt)))),
+        () async {
+          final entities = await super.shipV2(
+            condition: And([
+              if (relatedMemId != null)
+                Or([
+                  Equals(defFkMemRelationsSourceMemId, relatedMemId),
+                  Equals(defFkMemRelationsTargetMemId, relatedMemId),
+                ]),
+              if (condition != null) condition,
+            ]),
+          );
+          return Future.wait(
+            entities.map(
+              (e) => replaceV2(MemRelationEntity(
+                e.sourceMemId,
+                e.targetMemId,
+                e.type,
+                e.value,
+                e.id,
+                e.createdAt,
+                e.updatedAt ?? DateTime.now(),
+                archivedAt ?? DateTime.now(),
+              )),
+            ),
+          );
+        },
         {
           'relatedMemId': relatedMemId,
           'condition': condition,
@@ -60,21 +65,37 @@ class MemRelationRepository extends DatabaseTupleRepository<MemRelationEntityV1,
         },
       );
 
-  Future<Iterable<SavedMemRelationEntityV1>> unarchiveBy({
+  Future<Iterable<MemRelationEntity>> unarchiveByV2({
     int? sourceMemId,
     int? targetMemId,
     Condition? condition,
   }) =>
       v(
-        () async => await ship(
-          condition: And([
-            if (sourceMemId != null)
-              Equals(defFkMemRelationsSourceMemId, sourceMemId),
-            if (targetMemId != null)
-              Equals(defFkMemRelationsTargetMemId, targetMemId),
-            if (condition != null) condition,
-          ]),
-        ).then((v) => Future.wait(v.map((e) => unarchive(e)))),
+        () async {
+          final entities = await super.shipV2(
+            condition: And([
+              if (sourceMemId != null)
+                Equals(defFkMemRelationsSourceMemId, sourceMemId),
+              if (targetMemId != null)
+                Equals(defFkMemRelationsTargetMemId, targetMemId),
+              if (condition != null) condition,
+            ]),
+          );
+          return Future.wait(
+            entities.map(
+              (e) => replaceV2(MemRelationEntity(
+                e.sourceMemId,
+                e.targetMemId,
+                e.type,
+                e.value,
+                e.id,
+                e.createdAt,
+                DateTime.now(),
+                null,
+              )),
+            ),
+          );
+        },
         {
           'sourceMemId': sourceMemId,
           'targetMemId': targetMemId,

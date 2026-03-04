@@ -23,8 +23,10 @@ class MemRelationEntitiesByMemId extends _$MemRelationEntitiesByMemId {
           }
 
           final currentEntities = ref.watch(memRelationEntitiesProvider);
-          final fetchedEntities =
-              await MemRelationRepository().ship(sourceMemId: memId);
+          final fetchedEntities = (await MemRelationRepository()
+                  .shipBySourceMemIdV2(memId))
+              .map((e) => SavedMemRelationEntityV1.fromEntityV2(e))
+              .toList();
 
           if (fetchedEntities.isNotEmpty &&
               !currentEntities

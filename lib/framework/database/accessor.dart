@@ -11,6 +11,8 @@ import 'package:mem/features/mems/mem_entity.dart' as mem_entity;
 import 'package:mem/features/mem_items/mem_item.dart' as mem_item_domain;
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/mem_relations/mem_relation.dart' as mem_relation_domain;
+import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/group_by.dart';
@@ -339,6 +341,10 @@ class DriftDatabaseAccessor {
       case TargetEntity _:
         return driftDatabase.targets;
 
+      case mem_relation_domain.MemRelation _:
+      case MemRelationEntity _:
+        return driftDatabase.memRelations;
+
       case TableDefinition _:
         return driftDatabase.allTables.firstWhere(
           (e) => e.actualTableName == domain.name,
@@ -525,6 +531,9 @@ convertIntoDriftInsertable(dynamic domain) {
     case target_domain.Target _:
       return convertIntoTargetsInsertable(domain);
 
+    case mem_relation_domain.MemRelation _:
+      return convertIntoMemRelationsInsertable(domain);
+
     default:
       throw StateError('入力おかしいかも: ${domain.runtimeType}');
   }
@@ -544,6 +553,9 @@ convertIntoDriftUpdateable(
       return convertIntoMemRepeatedNotificationsUpdateable(entity);
     case TargetEntity _:
       return convertIntoTargetsUpdateable(entity);
+
+    case MemRelationEntity _:
+      return convertIntoMemRelationsUpdateable(entity);
 
     default:
       throw StateError('入力おかしいかも: ${entity.runtimeType}');
