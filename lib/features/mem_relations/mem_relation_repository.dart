@@ -5,14 +5,14 @@ import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/framework/repository/dummy.dart';
 
 // @Deprecated('MemRelationRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
 // lintエラーになるためコメントアウト
-class MemRelationRepository extends DatabaseTupleRepository<MemRelationEntityV1,
-    SavedMemRelationEntityV1, MemRelation, int, MemRelationEntity> {
+class MemRelationRepository extends DatabaseTupleRepository<DummyEntity,
+    SavedDummyEntity, MemRelation, int, MemRelationEntity> {
   @override
-  SavedMemRelationEntityV1 pack(Map<String, dynamic> map) =>
-      SavedMemRelationEntityV1(map);
+  SavedDummyEntity pack(Map<String, dynamic> map) => throw UnimplementedError();
 
   @override
   MemRelationEntity packV2(dynamic tuple) => MemRelationEntity.fromTuple(tuple);
