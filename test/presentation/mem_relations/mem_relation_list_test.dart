@@ -21,19 +21,19 @@ class _FakeMemEntities extends MemEntities {
 }
 
 class _FakeMemRelationEntitiesByMemId extends MemRelationEntitiesByMemId {
-  final Future<Iterable<MemRelationEntity>> Function(int?) _buildFn;
-  final List<MemRelationEntity> _upsertedEntities = [];
+  final Future<Iterable<MemRelationEntityV1>> Function(int?) _buildFn;
+  final List<MemRelationEntityV1> _upsertedEntities = [];
 
   _FakeMemRelationEntitiesByMemId(
-      Future<Iterable<MemRelationEntity>> Function(int?) buildFn)
+      Future<Iterable<MemRelationEntityV1>> Function(int?) buildFn)
       : _buildFn = buildFn;
 
   @override
-  Future<Iterable<MemRelationEntity>> build(int? memId) => _buildFn(memId);
+  Future<Iterable<MemRelationEntityV1>> build(int? memId) => _buildFn(memId);
 
   @override
-  Future<Iterable<MemRelationEntity>> upsert(
-    Iterable<MemRelationEntity> entities,
+  Future<Iterable<MemRelationEntityV1>> upsert(
+    Iterable<MemRelationEntityV1> entities,
   ) async {
     _upsertedEntities.addAll(entities);
     final current = state.value ?? [];
@@ -89,13 +89,13 @@ void main() {
         'archivedAt': null,
       });
 
-      final relation1 = MemRelationEntity.by(
+      final relation1 = MemRelationEntityV1.by(
         sourceMemId,
         1,
         MemRelationType.prePost,
         30,
       );
-      final relation2 = MemRelationEntity.by(
+      final relation2 = MemRelationEntityV1.by(
         sourceMemId,
         2,
         MemRelationType.prePost,
@@ -138,7 +138,7 @@ void main() {
               () => _FakeMemRelationEntitiesByMemId(
                 (memId) async {
                   await Future.delayed(const Duration(milliseconds: 100));
-                  return <MemRelationEntity>[];
+                  return <MemRelationEntityV1>[];
                 },
               ),
             ),
@@ -186,7 +186,7 @@ void main() {
           overrides: [
             memRelationEntitiesByMemIdProvider(sourceMemId).overrideWith(
               () => _FakeMemRelationEntitiesByMemId(
-                (memId) async => <MemRelationEntity>[],
+                (memId) async => <MemRelationEntityV1>[],
               ),
             ),
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([])),
@@ -208,7 +208,7 @@ void main() {
           overrides: [
             memRelationEntitiesByMemIdProvider(null).overrideWith(
               () => _FakeMemRelationEntitiesByMemId(
-                (memId) async => <MemRelationEntity>[],
+                (memId) async => <MemRelationEntityV1>[],
               ),
             ),
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([])),
@@ -239,7 +239,7 @@ void main() {
         'archivedAt': null,
       });
 
-      final relation1 = MemRelationEntity.by(
+      final relation1 = MemRelationEntityV1.by(
         sourceMemId,
         1,
         MemRelationType.prePost,
@@ -284,7 +284,7 @@ void main() {
         'archivedAt': null,
       });
 
-      final relation1 = MemRelationEntity.by(
+      final relation1 = MemRelationEntityV1.by(
         sourceMemId,
         1,
         MemRelationType.prePost,
@@ -336,7 +336,7 @@ void main() {
               }));
 
       final relations = mems
-          .map((mem) => MemRelationEntity.by(
+          .map((mem) => MemRelationEntityV1.by(
                 sourceMemId,
                 mem.id,
                 MemRelationType.prePost,
@@ -390,7 +390,7 @@ void main() {
               }));
 
       final relations = mems
-          .map((mem) => MemRelationEntity.by(
+          .map((mem) => MemRelationEntityV1.by(
                 sourceMemId,
                 mem.id,
                 MemRelationType.prePost,
@@ -440,7 +440,7 @@ void main() {
         'archivedAt': null,
       });
 
-      final relation1 = MemRelationEntity.by(
+      final relation1 = MemRelationEntityV1.by(
         sourceMemId,
         1,
         MemRelationType.prePost,

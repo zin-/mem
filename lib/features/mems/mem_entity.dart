@@ -20,7 +20,7 @@ class MemEntityV1 with EntityV1<Mem> {
       ActEntityV1,
       MemNotificationEntityV1,
       TargetEntityV1,
-      MemRelationEntity,
+      MemRelationEntityV1,
     };
   }
 

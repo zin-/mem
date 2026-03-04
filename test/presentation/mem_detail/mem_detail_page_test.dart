@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/databases/table_definitions/base.dart';
-import 'package:mem/databases/table_definitions/mem_relations.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/features/mem_items/mem_item_repository.dart';
@@ -108,14 +106,8 @@ void main() {
       memIdsIn: anyNamed('memIdsIn'),
       condition: anyNamed('condition'),
     )).thenAnswer((_) async => []);
-    when(mockMemRelationRepository.ship(
-      sourceMemId: anyNamed('sourceMemId'),
-      condition: anyNamed('condition'),
-      groupBy: anyNamed('groupBy'),
-      orderBy: anyNamed('orderBy'),
-      offset: anyNamed('offset'),
-      limit: anyNamed('limit'),
-    )).thenAnswer((_) async => []);
+    when(mockMemRelationRepository.shipBySourceMemIdV2(any))
+        .thenAnswer((_) async => []);
   });
 
   tearDown(() {
@@ -212,22 +204,20 @@ void main() {
                   ),
                 ]);
 
-        when(mockMemRelationRepository.ship(
-          sourceMemId: _TestConstants.testMemId,
-        )).thenAnswer((_) async => [
-              SavedMemRelationEntity(
-                {
-                  defPkId.name: _TestConstants.testMemId,
-                  defFkMemRelationsSourceMemId.name: _TestConstants.testMemId,
-                  defFkMemRelationsTargetMemId.name: _TestConstants.testMemId,
-                  defColMemRelationsType.name: MemRelationType.prePost.name,
-                  defColMemRelationsValue.name: 10,
-                  defColCreatedAt.name: DateTime.now(),
-                  defColUpdatedAt.name: null,
-                  defColArchivedAt.name: null,
-                },
-              ),
-            ]);
+        when(mockMemRelationRepository.shipBySourceMemIdV2(
+                _TestConstants.testMemId))
+            .thenAnswer((_) async => [
+                  MemRelationEntity(
+                    _TestConstants.testMemId,
+                    _TestConstants.testMemId,
+                    MemRelationType.prePost,
+                    10,
+                    _TestConstants.testMemId,
+                    DateTime.now(),
+                    null,
+                    null,
+                  ),
+                ]);
       });
 
       testWidgets('basic structure for saved mem.', (tester) async {
@@ -377,22 +367,20 @@ void main() {
                   ),
                 ]);
 
-        when(mockMemRelationRepository.ship(
-          sourceMemId: _TestConstants.testMemId,
-        )).thenAnswer((_) async => [
-              SavedMemRelationEntity(
-                {
-                  defPkId.name: _TestConstants.testMemId,
-                  defFkMemRelationsSourceMemId.name: _TestConstants.testMemId,
-                  defFkMemRelationsTargetMemId.name: _TestConstants.testMemId,
-                  defColMemRelationsType.name: MemRelationType.prePost.name,
-                  defColMemRelationsValue.name: 10,
-                  defColCreatedAt.name: DateTime.now(),
-                  defColUpdatedAt.name: null,
-                  defColArchivedAt.name: null,
-                },
-              ),
-            ]);
+        when(mockMemRelationRepository.shipBySourceMemIdV2(
+                _TestConstants.testMemId))
+            .thenAnswer((_) async => [
+                  MemRelationEntity(
+                    _TestConstants.testMemId,
+                    _TestConstants.testMemId,
+                    MemRelationType.prePost,
+                    10,
+                    _TestConstants.testMemId,
+                    DateTime.now(),
+                    null,
+                    null,
+                  ),
+                ]);
       });
 
       testWidgets('mem when delete action is tapped.', (tester) async {

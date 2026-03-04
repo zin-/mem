@@ -29,7 +29,7 @@ class MemService {
         List<MemItemEntityV1>,
         List<MemNotificationEntity>?,
         TargetEntityV1?,
-        List<MemRelationEntity>?,
+        List<MemRelationEntityV1>?,
         MemEntity,
       )> save(
     (
@@ -37,7 +37,7 @@ class MemService {
       List<MemItemEntityV1>,
       List<MemNotificationEntityV1>?,
       TargetEntityV1?,
-      List<MemRelationEntity>?,
+      List<MemRelationEntityV1>?,
     ) memDetail, {
     bool undo = false,
   }) =>
@@ -152,30 +152,30 @@ class MemService {
           // memRelationsの保存ロジック
           final memRelations = memDetail.$5;
           final returnMemRelations =
-              List<SavedMemRelationEntity?>.empty(growable: true);
+              List<SavedMemRelationEntityV1?>.empty(growable: true);
           if (memRelations != null) {
             if (memRelations.isEmpty) {
-              await _memRelationRepository.waste(
+              await _memRelationRepository.wasteV2(
                 condition:
                     Equals(defFkMemRelationsSourceMemId, savedMemEntity.id),
               );
             } else {
-              returnMemRelations.addAll(await Future.wait(memRelations
+              final saved = await Future.wait(memRelations
                   .map((e) => e.updatedWith((v) => MemRelation.by(
                         savedMemEntity.id,
                         v.targetMemId,
                         v.type,
                         v.value,
                       )))
-                  .map((e) {
-                if (e is SavedMemRelationEntity && !undo) {
-                  return _memRelationRepository.replace(e)
-                      as Future<SavedMemRelationEntity?>;
+                  .map((e) async {
+                if (e is SavedMemRelationEntityV1 && !undo) {
+                  return await _memRelationRepository.replaceV2(e.toEntityV2());
                 } else {
-                  return _memRelationRepository.receive(e)
-                      as Future<SavedMemRelationEntity?>;
+                  return await _memRelationRepository.receiveV2(e.value);
                 }
-              })));
+              }));
+              returnMemRelations.addAll(
+                  saved.map((e) => SavedMemRelationEntityV1.fromEntityV2(e)));
             }
           }
 
@@ -250,7 +250,8 @@ class MemService {
               mem.toEntityV2().updatedWith(archivedAt: () => DateTime.now()));
 
           await _memItemRepository.archiveBy(memId: archivedMem.id);
-          await _memRelationRepository.archiveBy(relatedMemId: archivedMem.id);
+          await _memRelationRepository.archiveByV2(
+              relatedMemId: archivedMem.id);
 
           return archivedMem;
         },
@@ -270,7 +271,7 @@ class MemService {
           await _memItemRepository.unarchiveBy(memId: unarchivedMem.id).then(
               (v) =>
                   v.map((e) => SavedMemItemEntityV1.fromEntityV2(e)).toList());
-          await _memRelationRepository.unarchiveBy(
+          await _memRelationRepository.unarchiveByV2(
             condition: Or([
               Equals(defFkMemRelationsSourceMemId, unarchivedMem.id),
               Equals(defFkMemRelationsTargetMemId, unarchivedMem.id),

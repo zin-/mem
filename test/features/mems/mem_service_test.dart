@@ -68,7 +68,7 @@ void main() {
             period: Period.aDay,
           ),
         );
-        final memRelations = <MemRelationEntity>[];
+        final memRelations = <MemRelationEntityV1>[];
 
         final savedMem = SavedMemEntityV1({
           'id': testMemId,
@@ -102,7 +102,7 @@ void main() {
           type: anyNamed('type'),
           condition: anyNamed('condition'),
         )).thenAnswer((_) async => []);
-        when(mockMemRelationRepository.waste(condition: anyNamed('condition')))
+        when(mockMemRelationRepository.wasteV2(condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
         when(mockTargetRepository.wasteV2(condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
@@ -111,7 +111,7 @@ void main() {
           type: anyNamed('type'),
           condition: anyNamed('condition'),
         )).thenAnswer((_) async => []);
-        when(mockMemRelationRepository.waste(condition: anyNamed('condition')))
+        when(mockMemRelationRepository.wasteV2(condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
         when(mockTargetRepository.wasteV2(condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
@@ -139,7 +139,7 @@ void main() {
         final memItems = <MemItemEntityV1>[];
         final memNotifications = <MemNotificationEntityV1>[];
         final target = null;
-        final memRelations = <MemRelationEntity>[];
+        final memRelations = <MemRelationEntityV1>[];
 
         final savedMem = SavedMemEntityV1({
           'id': testMemId,
@@ -161,7 +161,7 @@ void main() {
           type: anyNamed('type'),
           condition: anyNamed('condition'),
         )).thenAnswer((_) async => []);
-        when(mockMemRelationRepository.waste(condition: anyNamed('condition')))
+        when(mockMemRelationRepository.wasteV2(condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
         when(mockTargetRepository.waste(condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
@@ -195,7 +195,7 @@ void main() {
             period: Period.aDay,
           ),
         );
-        final memRelations = <MemRelationEntity>[];
+        final memRelations = <MemRelationEntityV1>[];
 
         final savedMem = SavedMemEntityV1({
           'id': testMemId,
@@ -217,7 +217,7 @@ void main() {
           type: anyNamed('type'),
           condition: anyNamed('condition'),
         )).thenAnswer((_) async => []);
-        when(mockMemRelationRepository.waste(condition: anyNamed('condition')))
+        when(mockMemRelationRepository.wasteV2(condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
         when(mockTargetRepository.waste(condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
