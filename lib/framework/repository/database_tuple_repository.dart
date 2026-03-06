@@ -112,28 +112,7 @@ abstract class DatabaseTupleRepository<ENTITYV1 extends EntityV1, DOMAIN, ID,
 
   Future<List<ENTITY>> wasteV2({Condition? condition}) => v(
         () async {
-          // FIXME 別で対処する
-          // final targets = await _driftAccessor
-          //     .select(
-          //       _tableDefinition,
-          //       condition: condition,
-          //     )
-          //     .then((value) => value.map((e) {
-          //           return packV2(e);
-          //         }).toList());
-
-          // for (final byChild in childRepositories.entries) {
-          //   for (final repositoryWithFks in byChild.value.entries) {
-          //     if (repositoryWithFks.key != null &&
-          //         repositoryWithFks.value != null) {
-          //       for (final fk in repositoryWithFks.value!) {
-          //         await repositoryWithFks.key!.waste(
-          //           condition: In(fk.name, targets.map((e) => e.id)),
-          //         );
-          //       }
-          //     }
-          //   }
-          // }
+          // TODO 子Entityを削除する
 
           final deleted = await _driftAccessor.deleteV2(
             _tableDefinition,
