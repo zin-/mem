@@ -10,7 +10,7 @@ import 'package:mem/framework/repository/dummy.dart';
 // @Deprecated('MemRelationRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
 // lintエラーになるためコメントアウト
 class MemRelationRepository extends DatabaseTupleRepository<DummyEntity,
-    SavedDummyEntity, MemRelation, int, MemRelationEntity> {
+    MemRelation, int, MemRelationEntity> {
   @override
   MemRelationEntity packV2(dynamic tuple) => MemRelationEntity.fromTuple(tuple);
 

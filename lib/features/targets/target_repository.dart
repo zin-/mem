@@ -7,8 +7,8 @@ import 'package:mem/framework/repository/dummy.dart';
 
 // @Deprecated('TargetRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
 // lintエラーになるためコメントアウト
-class TargetRepository extends DatabaseTupleRepository<DummyEntity,
-    SavedDummyEntity, Target, int, TargetEntity> {
+class TargetRepository
+    extends DatabaseTupleRepository<DummyEntity, Target, int, TargetEntity> {
   @override
   TargetEntity packV2(dynamic tuple) => TargetEntity.fromTuple(tuple);
 

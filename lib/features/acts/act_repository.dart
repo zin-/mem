@@ -12,8 +12,8 @@ import 'package:mem/framework/singleton.dart';
 
 // @Deprecated('ActRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
 // lintエラーになるためコメントアウト
-class ActRepository extends DatabaseTupleRepository<DummyEntity,
-    SavedDummyEntity, Act, int, ActEntity> {
+class ActRepository
+    extends DatabaseTupleRepository<DummyEntity, Act, int, ActEntity> {
   @override
   ActEntity packV2(dynamic tuple) => ActEntity(
         tuple.memId,

@@ -9,8 +9,8 @@ import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/framework/repository/dummy.dart';
 
-class MemRepository extends DatabaseTupleRepository<DummyEntity,
-    SavedDummyEntity, Mem, int, MemEntity> {
+class MemRepository
+    extends DatabaseTupleRepository<DummyEntity, Mem, int, MemEntity> {
   @override
   MemEntity packV2(dynamic tuple) => MemEntity(
         tuple.id,
