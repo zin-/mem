@@ -16,7 +16,7 @@ abstract class DatabaseTupleRepository<
     SAVEDV1 extends DatabaseTupleEntityV1,
     DOMAIN,
     ID,
-    ENTITY extends Entity<ID>> extends Repository<ENTITYV1, DOMAIN> {
+    ENTITY extends Entity<ID>> extends Repository<ENTITYV1> {
   static final _driftAccessor = DriftDatabaseAccessor();
   static final Map<TableDefinition, Repository> _repositories = {};
 
