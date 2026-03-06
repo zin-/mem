@@ -7,10 +7,8 @@ import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/features/mems/mem_entity.dart';
-import 'package:mem/framework/repository/dummy.dart';
 
-class MemRepository
-    extends DatabaseTupleRepository<DummyEntity, Mem, int, MemEntity> {
+class MemRepository extends DatabaseTupleRepository<Mem, int, MemEntity> {
   @override
   MemEntity packV2(dynamic tuple) => MemEntity(
         tuple.id,
