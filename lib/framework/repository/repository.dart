@@ -1,6 +1,4 @@
-import 'package:mem/framework/database/definition/column/column_definition.dart';
-
-import 'entity.dart';
+import 'package:mem/framework/repository/entity.dart';
 
 /// # Repositoryとは
 ///
@@ -26,14 +24,5 @@ abstract class Repository<ENTITYV1 extends EntityV1> {
 
   Repository() {
     _allRepositories[ENTITYV1] ??= this;
-
-    entityChildrenRelation[ENTITYV1]?.forEach(
-      (childEntity) => childRepositories[childEntity] ??= {
-        _allRepositories[childEntity]: null
-      },
-    );
   }
-
-  final Map<Type, Map<Repository?, Iterable<ColumnDefinition>?>>
-      childRepositories = {};
 }

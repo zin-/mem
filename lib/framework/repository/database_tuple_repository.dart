@@ -3,7 +3,6 @@ import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/definition/database_definition.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
-import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -19,28 +18,6 @@ abstract class DatabaseTupleRepository<ENTITYV1 extends EntityV1, DOMAIN, ID,
 
   DatabaseTupleRepository(this._databaseDefinition, this._tableDefinition) {
     _repositories[_tableDefinition] = this;
-
-    childRepositories.updateAll(
-      (childEntity, value) {
-        final childTableDefinition = entityTableRelations[childEntity];
-        if (childTableDefinition == null) {
-          return value;
-        } else {
-          return value
-            ..updateAll(
-              (childRepository, value) {
-                if (childRepository is DatabaseTupleRepository) {
-                  return childTableDefinition.foreignKeyDefinitions.where(
-                      (defFk) =>
-                          defFk.parentTableDefinition == _tableDefinition);
-                } else {
-                  return value;
-                }
-              },
-            );
-        }
-      },
-    );
   }
 
   static Future close() => v(
