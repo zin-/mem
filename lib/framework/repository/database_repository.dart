@@ -7,7 +7,7 @@ import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:path/path.dart' as path;
 
-class DatabaseRepository extends Repository<DatabaseDefinition> {
+class DatabaseRepository extends Repository {
   static DatabaseRepository? _instance;
 
   DatabaseRepository._();

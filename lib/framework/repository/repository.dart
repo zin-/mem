@@ -1,5 +1,3 @@
-import 'package:mem/framework/repository/entity.dart';
-
 /// # Repositoryとは
 ///
 /// 集約（Aggregate）単位での永続化・取得を担当する
@@ -19,10 +17,4 @@ import 'package:mem/framework/repository/entity.dart';
 //  抽象的には得ると捉える事もできるだろうが、では`update`（更新する）ことはあるだろうか？
 //  更新することはないように感じる
 //  よって、ここでは`receive`（受け取る）、`replace`（置き換える）などの荷物や事物を扱う際の単語を採用する
-abstract class Repository<ENTITYV1 extends EntityV1> {
-  static final Map<Type, Repository> _allRepositories = {};
-
-  Repository() {
-    _allRepositories[ENTITYV1] ??= this;
-  }
-}
+abstract class Repository {}
