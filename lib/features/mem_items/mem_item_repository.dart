@@ -14,9 +14,6 @@ import 'package:mem/features/mem_items/mem_item_entity.dart';
 class MemItemRepository extends DatabaseTupleRepository<DummyEntity,
     SavedDummyEntity, MemItem, int, MemItemEntity> {
   @override
-  pack(Map<String, dynamic> map) => throw UnimplementedError();
-
-  @override
   MemItemEntity packV2(dynamic tuple) => MemItemEntity(
         tuple.memId,
         MemItemType.values.byName(tuple.type),

@@ -1,6 +1,5 @@
 import 'package:mem/framework/database/definition/column/column_definition.dart';
 
-import 'condition/conditions.dart';
 import 'entity.dart';
 
 /// # Repositoryとは
@@ -37,6 +36,4 @@ abstract class Repository<ENTITYV1 extends EntityV1> {
 
   final Map<Type, Map<Repository?, Iterable<ColumnDefinition>?>>
       childRepositories = {};
-
-  waste({Condition? condition});
 }

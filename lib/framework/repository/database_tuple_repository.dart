@@ -3,11 +3,8 @@ import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/definition/database_definition.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
-import 'package:mem/framework/repository/condition/in.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
-import 'package:mem/framework/repository/group_by.dart';
-import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/features/logger/log_service.dart';
 
@@ -68,32 +65,11 @@ abstract class DatabaseTupleRepository<
         {'condition': condition},
       );
 
-  SAVEDV1 pack(Map<String, dynamic> map);
   ENTITY packV2(
           // FIXME 自動生成されるDataClassを使うべきかも
           dynamic tuple) =>
       throw UnimplementedError();
   convert(DOMAIN domain) => throw UnimplementedError();
-
-  Future<SAVEDV1> receive(
-    ENTITYV1 entity, {
-    DateTime? createdAt,
-  }) =>
-      v(
-        () async {
-          final entityMap = entity.toMap;
-          entityMap[defColCreatedAt.name] = createdAt ?? DateTime.now();
-
-          final id = await _driftAccessor.insert(
-            _tableDefinition,
-            entityMap,
-          );
-          entityMap[defPkId.name] = id;
-
-          return pack(entityMap);
-        },
-        {'entity': entity, 'createdAt': createdAt},
-      );
 
   Future<ENTITY> receiveV2(DOMAIN domain) => v(
         () async {
@@ -102,36 +78,6 @@ abstract class DatabaseTupleRepository<
           return packV2(inserted);
         },
         {'domain': domain},
-      );
-
-  Future<List<SAVEDV1>> ship({
-    Condition? condition,
-    GroupBy? groupBy,
-    List<OrderBy>? orderBy,
-    int? offset,
-    int? limit,
-  }) =>
-      v(
-        () async {
-          final rows = await _driftAccessor.select(
-            _tableDefinition,
-            condition: condition,
-            groupBy: groupBy,
-            orderBy: orderBy,
-            offset: offset,
-            limit: limit,
-          );
-          return rows
-              .map<SAVEDV1>((e) => pack(e as Map<String, dynamic>))
-              .toList();
-        },
-        {
-          'condition': condition,
-          'groupBy': groupBy,
-          'orderBy': orderBy,
-          'offset': offset,
-          'limit': limit,
-        },
       );
 
   Future<List<ENTITY>> shipV2({
@@ -159,25 +105,6 @@ abstract class DatabaseTupleRepository<
         {'id': id},
       );
 
-  Future<SAVEDV1> replace(
-    SAVEDV1 savedEntity, {
-    DateTime? updatedAt,
-  }) =>
-      v(
-        () async {
-          final entityMap = savedEntity.toMap;
-          entityMap[defColUpdatedAt.name] = updatedAt ?? DateTime.now();
-
-          await _driftAccessor.update(
-            _tableDefinition,
-            entityMap,
-          );
-
-          return pack(entityMap);
-        },
-        {'savedEntity': savedEntity, 'updatedAt': updatedAt},
-      );
-
   Future<ENTITY> replaceV2(ENTITY entity) => v(
         () async {
           final updated = await _driftAccessor.updateV2(entity);
@@ -185,76 +112,6 @@ abstract class DatabaseTupleRepository<
           return packV2(updated);
         },
         {'entity': entity},
-      );
-
-  Future<SAVEDV1> archive(
-    SAVEDV1 savedEntity, {
-    DateTime? archivedAt,
-  }) =>
-      v(
-        () async {
-          final entityMap = savedEntity.toMap;
-          entityMap[defColArchivedAt.name] = archivedAt ?? DateTime.now();
-
-          await _driftAccessor.update(
-            _tableDefinition,
-            entityMap,
-          );
-
-          return pack(entityMap);
-        },
-        {'savedEntity': savedEntity, 'archivedAt': archivedAt},
-      );
-
-  Future<SAVEDV1> unarchive(
-    SAVEDV1 savedEntity, {
-    DateTime? updatedAt,
-  }) =>
-      v(
-        () async {
-          final entityMap = savedEntity.toMap;
-          entityMap[defColUpdatedAt.name] = updatedAt ?? DateTime.now();
-          entityMap[defColArchivedAt.name] = null;
-
-          await _driftAccessor.update(
-            _tableDefinition,
-            entityMap,
-          );
-
-          return pack(entityMap);
-        },
-        {'savedEntity': savedEntity, 'updatedAt': updatedAt},
-      );
-
-  @override
-  Future<List<SAVEDV1>> waste({
-    Condition? condition,
-  }) =>
-      v(
-        () async {
-          final targets = await ship(condition: condition);
-
-          for (final byChild in childRepositories.entries) {
-            for (final repositoryWithFks in byChild.value.entries) {
-              if (repositoryWithFks.key != null &&
-                  repositoryWithFks.value != null) {
-                for (final fk in repositoryWithFks.value!) {
-                  await repositoryWithFks.key!.waste(
-                    condition: In(fk.name, targets.map((e) => e.id)),
-                  );
-                }
-              }
-            }
-          }
-
-          await _driftAccessor.delete(
-            _tableDefinition,
-            condition,
-          );
-
-          return targets;
-        },
-        {'condition': condition},
       );
 
   Future<List<ENTITY>> wasteV2({Condition? condition}) => v(

@@ -15,9 +15,6 @@ import 'package:mem/framework/singleton.dart';
 class ActRepository extends DatabaseTupleRepository<DummyEntity,
     SavedDummyEntity, Act, int, ActEntity> {
   @override
-  pack(Map<String, dynamic> map) => throw UnimplementedError();
-
-  @override
   ActEntity packV2(dynamic tuple) => ActEntity(
         tuple.memId,
         tuple.start == null

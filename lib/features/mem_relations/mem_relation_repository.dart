@@ -12,9 +12,6 @@ import 'package:mem/framework/repository/dummy.dart';
 class MemRelationRepository extends DatabaseTupleRepository<DummyEntity,
     SavedDummyEntity, MemRelation, int, MemRelationEntity> {
   @override
-  SavedDummyEntity pack(Map<String, dynamic> map) => throw UnimplementedError();
-
-  @override
   MemRelationEntity packV2(dynamic tuple) => MemRelationEntity.fromTuple(tuple);
 
   Future<List<MemRelationEntity>> shipBySourceMemIdV2(int? sourceMemId) => v(

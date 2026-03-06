@@ -12,9 +12,6 @@ import 'mem_notification_entity.dart';
 class MemNotificationRepository extends DatabaseTupleRepository<DummyEntity,
     SavedDummyEntity, MemNotification, int, MemNotificationEntity> {
   @override
-  SavedDummyEntity pack(Map<String, dynamic> map) => throw UnimplementedError();
-
-  @override
   MemNotificationEntity packV2(dynamic tuple) => MemNotificationEntity(
         tuple.memId,
         MemNotificationType.fromName(tuple.type),
