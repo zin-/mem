@@ -102,7 +102,8 @@ void main() {
           type: anyNamed('type'),
           condition: anyNamed('condition'),
         )).thenAnswer((_) async => []);
-        when(mockMemRelationRepository.wasteV2(condition: anyNamed('condition')))
+        when(mockMemRelationRepository.wasteV2(
+                condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
         when(mockTargetRepository.wasteV2(condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
@@ -111,7 +112,8 @@ void main() {
           type: anyNamed('type'),
           condition: anyNamed('condition'),
         )).thenAnswer((_) async => []);
-        when(mockMemRelationRepository.wasteV2(condition: anyNamed('condition')))
+        when(mockMemRelationRepository.wasteV2(
+                condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
         when(mockTargetRepository.wasteV2(condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
@@ -161,9 +163,10 @@ void main() {
           type: anyNamed('type'),
           condition: anyNamed('condition'),
         )).thenAnswer((_) async => []);
-        when(mockMemRelationRepository.wasteV2(condition: anyNamed('condition')))
+        when(mockMemRelationRepository.wasteV2(
+                condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
-        when(mockTargetRepository.waste(condition: anyNamed('condition')))
+        when(mockTargetRepository.wasteV2(condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
 
         // Act
@@ -176,7 +179,7 @@ void main() {
         ));
 
         // Assert
-        verifyNever(mockTargetRepository.receive(any));
+        verifyNever(mockTargetRepository.receiveV2(any));
       });
 
       test('should not call _targetRepository.receive when target value is 0',
@@ -217,9 +220,10 @@ void main() {
           type: anyNamed('type'),
           condition: anyNamed('condition'),
         )).thenAnswer((_) async => []);
-        when(mockMemRelationRepository.wasteV2(condition: anyNamed('condition')))
+        when(mockMemRelationRepository.wasteV2(
+                condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
-        when(mockTargetRepository.waste(condition: anyNamed('condition')))
+        when(mockTargetRepository.wasteV2(condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
 
         // Act
@@ -232,7 +236,7 @@ void main() {
         ));
 
         // Assert
-        verifyNever(mockTargetRepository.receive(any));
+        verifyNever(mockTargetRepository.receiveV2(any));
       });
     });
   });

@@ -29,7 +29,6 @@ mixin EntityV1<VALUE> {
 //     (runtimeType == other.runtimeType && hashCode == other.hashCode);
 }
 
-final Map<Type, Set<Type>> entityChildrenRelation = {};
 // memo
 // - view, domain, dataのそれぞれの領域で似た内容でも型が変わることになるはず
 // これをしっかりと定義したい

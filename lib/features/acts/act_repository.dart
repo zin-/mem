@@ -7,16 +7,11 @@ import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/acts/act_entity.dart';
-import 'package:mem/framework/repository/dummy.dart';
 import 'package:mem/framework/singleton.dart';
 
 // @Deprecated('ActRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
 // lintエラーになるためコメントアウト
-class ActRepository extends DatabaseTupleRepository<DummyEntity,
-    SavedDummyEntity, Act, int, ActEntity> {
-  @override
-  pack(Map<String, dynamic> map) => throw UnimplementedError();
-
+class ActRepository extends DatabaseTupleRepository<Act, int, ActEntity> {
   @override
   ActEntity packV2(dynamic tuple) => ActEntity(
         tuple.memId,

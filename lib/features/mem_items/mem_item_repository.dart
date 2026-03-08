@@ -3,7 +3,6 @@ import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
-import 'package:mem/framework/repository/dummy.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -11,11 +10,8 @@ import 'package:mem/features/mem_items/mem_item_entity.dart';
 
 // @Deprecated('MemItemRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
 // lintエラーになるためコメントアウト
-class MemItemRepository extends DatabaseTupleRepository<DummyEntity,
-    SavedDummyEntity, MemItem, int, MemItemEntity> {
-  @override
-  pack(Map<String, dynamic> map) => throw UnimplementedError();
-
+class MemItemRepository
+    extends DatabaseTupleRepository<MemItem, int, MemItemEntity> {
   @override
   MemItemEntity packV2(dynamic tuple) => MemItemEntity(
         tuple.memId,

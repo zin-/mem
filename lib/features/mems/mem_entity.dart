@@ -1,27 +1,14 @@
 import 'package:mem/databases/table_definitions/base.dart';
-import 'package:mem/features/acts/act_entity.dart';
-import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
-import 'package:mem/features/mem_items/mem_item_entity.dart';
-import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
-import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 
 class MemEntityV1 with EntityV1<Mem> {
   MemEntityV1(Mem value) {
     this.value = value;
-
-    entityChildrenRelation[MemEntityV1] ??= {
-      MemItemEntityV1,
-      ActEntityV1,
-      MemNotificationEntityV1,
-      TargetEntityV1,
-      MemRelationEntityV1,
-    };
   }
 
   @override

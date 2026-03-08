@@ -1,5 +1,4 @@
 import 'package:mem/features/acts/counter/act_counter_entity.dart';
-import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/home_widget_repository.dart';
 
 class ActCounterRepository
@@ -7,10 +6,4 @@ class ActCounterRepository
   @override
   SavedActCounterEntity pack(Map<String, dynamic> map) =>
       SavedActCounterEntity.fromMap(map)..homeWidgetId = map['homeWidgetId'];
-
-  @override
-  waste({Condition? condition}) {
-    // TODO: implement waste
-    throw UnimplementedError();
-  }
 }

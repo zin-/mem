@@ -2,14 +2,12 @@ import 'dart:io';
 import 'package:mem/databases/database.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/definition/database_definition.dart';
-import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:path/path.dart' as path;
 
-class DatabaseRepository
-    extends Repository<DatabaseDefinition, DatabaseDefinition> {
+class DatabaseRepository extends Repository {
   static DatabaseRepository? _instance;
 
   DatabaseRepository._();
@@ -40,9 +38,4 @@ class DatabaseRepository
         },
         {'name': name, 'backup': backup},
       );
-
-  @override
-  waste({Condition? condition}) {
-    throw UnimplementedError();
-  }
 }

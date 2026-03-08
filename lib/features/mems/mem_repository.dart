@@ -7,13 +7,8 @@ import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/features/mems/mem_entity.dart';
-import 'package:mem/framework/repository/dummy.dart';
 
-class MemRepository extends DatabaseTupleRepository<DummyEntity,
-    SavedDummyEntity, Mem, int, MemEntity> {
-  @override
-  pack(Map<String, dynamic> map) => throw UnimplementedError();
-
+class MemRepository extends DatabaseTupleRepository<Mem, int, MemEntity> {
   @override
   MemEntity packV2(dynamic tuple) => MemEntity(
         tuple.id,
