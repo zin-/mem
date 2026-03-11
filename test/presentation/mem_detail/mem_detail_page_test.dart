@@ -155,6 +155,7 @@ void main() {
             'Test Mem',
             null,
             null,
+            null,
             DateTime.now(),
             null,
             null,
@@ -204,8 +205,8 @@ void main() {
                   ),
                 ]);
 
-        when(mockMemRelationRepository.shipBySourceMemIdV2(
-                _TestConstants.testMemId))
+        when(mockMemRelationRepository
+                .shipBySourceMemIdV2(_TestConstants.testMemId))
             .thenAnswer((_) async => [
                   MemRelationEntity(
                     _TestConstants.testMemId,
@@ -268,7 +269,16 @@ void main() {
                 null,
                 null,
                 null,
-                MemEntity(1, "", null, null, DateTime.now(), null, null),
+                MemEntity(
+                  1,
+                  "",
+                  null,
+                  null,
+                  null,
+                  DateTime.now(),
+                  null,
+                  null,
+                ),
               ),
               null,
             ));
@@ -316,6 +326,7 @@ void main() {
           (_) async => MemEntity(
             _TestConstants.testMemId,
             'Test Mem',
+            null,
             null,
             null,
             DateTime.now(),
@@ -367,8 +378,8 @@ void main() {
                   ),
                 ]);
 
-        when(mockMemRelationRepository.shipBySourceMemIdV2(
-                _TestConstants.testMemId))
+        when(mockMemRelationRepository
+                .shipBySourceMemIdV2(_TestConstants.testMemId))
             .thenAnswer((_) async => [
                   MemRelationEntity(
                     _TestConstants.testMemId,

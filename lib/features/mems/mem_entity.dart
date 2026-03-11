@@ -1,4 +1,5 @@
 import 'package:mem/databases/table_definitions/base.dart';
+import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/features/mems/mem.dart';
@@ -63,6 +64,7 @@ class SavedMemEntityV1 extends MemEntityV1
         value.name,
         value.doneAt,
         value.period,
+        null,
         createdAt,
         updatedAt,
         archivedAt,
@@ -91,6 +93,7 @@ class MemEntity implements Entity<int> {
   final String name;
   final DateTime? doneAt;
   final DateAndTimePeriod? period;
+  final List<MemItemEntity>? items;
 
   @override
   final int id;
@@ -106,6 +109,7 @@ class MemEntity implements Entity<int> {
     this.name,
     this.doneAt,
     this.period,
+    this.items,
     this.createdAt,
     this.updatedAt,
     this.archivedAt,
@@ -120,6 +124,7 @@ class MemEntity implements Entity<int> {
 
   MemEntity updatedWith({
     Mem Function(Mem mem)? update,
+    List<MemItemEntity>? Function()? items,
     DateTime? Function()? updatedAt,
     DateTime? Function()? archivedAt,
   }) {
@@ -129,9 +134,40 @@ class MemEntity implements Entity<int> {
       updated.name,
       updated.doneAt,
       updated.period,
+      items == null ? this.items : items(),
       createdAt,
       updatedAt == null ? this.updatedAt : updatedAt(),
       archivedAt == null ? this.archivedAt : archivedAt(),
     );
   }
+
+  factory MemEntity.fromTuple(dynamic tuple) => MemEntity(
+        tuple.id,
+        tuple.name,
+        tuple.doneAt,
+        tuple.notifyOn == null && tuple.endOn == null
+            ? null
+            : DateAndTimePeriod(
+                start: tuple.notifyOn == null
+                    ? null
+                    : DateAndTime.from(
+                        tuple.notifyOn,
+                        timeOfDay: tuple.notifyAt == null
+                            ? null
+                            : DateAndTime.from(tuple.notifyAt),
+                      ),
+                end: tuple.endOn == null
+                    ? null
+                    : DateAndTime.from(
+                        tuple.endOn,
+                        timeOfDay: tuple.endAt == null
+                            ? null
+                            : DateAndTime.from(tuple.endAt),
+                      ),
+              ),
+        null,
+        tuple.createdAt,
+        tuple.updatedAt,
+        tuple.archivedAt,
+      );
 }
