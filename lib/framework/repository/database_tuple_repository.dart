@@ -55,12 +55,14 @@ abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
 
   Future<List<ENTITY>> shipV2({
     Condition? condition,
+    loadChildren = false,
   }) =>
       v(
         () async {
           final rows = await _driftAccessor.selectV2(
             _tableDefinition,
             condition: condition,
+            loadChildren: loadChildren,
           );
           return rows.map<ENTITY>((e) => packV2(e)).toList();
         },

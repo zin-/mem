@@ -16,6 +16,7 @@ class MemRepository extends DatabaseTupleRepository<Mem, int, MemEntity> {
     bool? archived,
     bool? done,
     Condition? condition,
+    loadChildren = false,
   }) =>
       super.shipV2(
         condition: And(
@@ -32,6 +33,7 @@ class MemRepository extends DatabaseTupleRepository<Mem, int, MemEntity> {
             if (condition != null) condition,
           ],
         ),
+        loadChildren: true,
       );
 
   @override

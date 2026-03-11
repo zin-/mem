@@ -31,6 +31,7 @@ class MemItemRepository
     List<OrderBy>? orderBy,
     int? offset,
     int? limit,
+    loadChildren = false,
   }) async =>
       await super.shipV2(
         condition: And(
@@ -39,6 +40,7 @@ class MemItemRepository
             if (condition != null) condition,
           ],
         ),
+        loadChildren: loadChildren,
       );
 
   Future<Iterable<MemItemEntity>> archiveBy({

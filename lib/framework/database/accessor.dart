@@ -11,7 +11,8 @@ import 'package:mem/features/mems/mem_entity.dart' as mem_entity;
 import 'package:mem/features/mem_items/mem_item.dart' as mem_item_domain;
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_entity.dart';
-import 'package:mem/features/mem_relations/mem_relation.dart' as mem_relation_domain;
+import 'package:mem/features/mem_relations/mem_relation.dart'
+    as mem_relation_domain;
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
@@ -172,6 +173,7 @@ class DriftDatabaseAccessor {
   Future<List<dynamic>> selectV2(
     TableDefinition tableDefinition, {
     Condition? condition,
+    loadChildren = false,
   }) =>
       v(
         () async {
@@ -185,7 +187,11 @@ class DriftDatabaseAccessor {
           }
           return await query.get();
         },
-        {'tableDefinition': tableDefinition, 'condition': condition},
+        {
+          'tableDefinition': tableDefinition,
+          'condition': condition,
+          'loadChildren': loadChildren,
+        },
       );
 
   insert(

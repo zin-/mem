@@ -27,6 +27,7 @@ class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
     int? memId,
     Iterable<int>? memIdsIn,
     Condition? condition,
+    loadChildren = false,
   }) =>
       super.shipV2(
         condition: And(
@@ -36,6 +37,7 @@ class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
             if (condition != null) condition, // coverage:ignore-line
           ],
         ),
+        loadChildren: loadChildren,
       );
 
   @override
