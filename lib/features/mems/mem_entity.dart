@@ -141,33 +141,43 @@ class MemEntity implements Entity<int> {
     );
   }
 
-  factory MemEntity.fromTuple(dynamic tuple) => MemEntity(
-        tuple.id,
-        tuple.name,
-        tuple.doneAt,
-        tuple.notifyOn == null && tuple.endOn == null
-            ? null
-            : DateAndTimePeriod(
-                start: tuple.notifyOn == null
-                    ? null
-                    : DateAndTime.from(
-                        tuple.notifyOn,
-                        timeOfDay: tuple.notifyAt == null
-                            ? null
-                            : DateAndTime.from(tuple.notifyAt),
-                      ),
-                end: tuple.endOn == null
-                    ? null
-                    : DateAndTime.from(
-                        tuple.endOn,
-                        timeOfDay: tuple.endAt == null
-                            ? null
-                            : DateAndTime.from(tuple.endAt),
-                      ),
-              ),
-        null,
-        tuple.createdAt,
-        tuple.updatedAt,
-        tuple.archivedAt,
-      );
+  factory MemEntity.fromTuple(
+    dynamic tuple, {
+    Map<String, dynamic> children = const {},
+  }) {
+    final memItemsRaw = children['mem_items'];
+    final memItems = memItemsRaw == null
+        ? null
+        : List<MemItemEntity>.from(memItemsRaw as List);
+
+    return MemEntity(
+      tuple.id,
+      tuple.name,
+      tuple.doneAt,
+      tuple.notifyOn == null && tuple.endOn == null
+          ? null
+          : DateAndTimePeriod(
+              start: tuple.notifyOn == null
+                  ? null
+                  : DateAndTime.from(
+                      tuple.notifyOn,
+                      timeOfDay: tuple.notifyAt == null
+                          ? null
+                          : DateAndTime.from(tuple.notifyAt),
+                    ),
+              end: tuple.endOn == null
+                  ? null
+                  : DateAndTime.from(
+                      tuple.endOn,
+                      timeOfDay: tuple.endAt == null
+                          ? null
+                          : DateAndTime.from(tuple.endAt),
+                    ),
+            ),
+      memItems,
+      tuple.createdAt,
+      tuple.updatedAt,
+      tuple.archivedAt,
+    );
+  }
 }

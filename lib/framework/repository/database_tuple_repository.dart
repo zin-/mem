@@ -64,7 +64,14 @@ abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
             condition: condition,
             loadChildren: loadChildren,
           );
-          return rows.map<ENTITY>((e) => packV2(e)).toList();
+
+          return rows.map<ENTITY>((e) {
+            // TODO accessorで変換するのであればこちらを主流にする
+            if (loadChildren) {
+              return e;
+            }
+            return packV2(e);
+          }).toList();
         },
         {'condition': condition},
       );

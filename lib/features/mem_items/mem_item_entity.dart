@@ -107,6 +107,18 @@ class MemItemEntity implements Entity<int> {
     this.updatedAt,
     this.archivedAt,
   );
+
+  factory MemItemEntity.fromTuple(dynamic tuple) => MemItemEntity(
+        tuple.memId,
+        MemItemType.values.firstWhere(
+          (element) => element.name == tuple.type,
+        ),
+        tuple.value,
+        tuple.id,
+        tuple.createdAt,
+        tuple.updatedAt,
+        tuple.archivedAt,
+      );
 }
 
 convertIntoMemItemsInsertable(MemItem domain, DateTime createdAt) =>

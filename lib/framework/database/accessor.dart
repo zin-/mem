@@ -179,12 +179,50 @@ class DriftDatabaseAccessor {
         () async {
           final tableInfo = _getTableInfoV2(tableDefinition);
           final query = driftDatabase.select(tableInfo);
+
           if (condition != null) {
             final driftExpression = condition.toDriftExpression(tableInfo);
             if (driftExpression != null) {
               query.where((tbl) => driftExpression);
             }
           }
+
+          if (loadChildren) {
+            final query2 = query.join([
+              drift.leftOuterJoin(
+                driftDatabase.memItems,
+                driftDatabase.memItems.memId.equalsExp(driftDatabase.mems.id),
+              )
+            ]);
+
+            final v2 = await query2.get();
+            // TODO 汎用的にする
+            final mems = <Mem>[];
+            final memItems = <int, List<MemItem>>{};
+            final childTableInfo = driftDatabase.memItems;
+            for (final r in v2) {
+              final mem = r.readTable(tableInfo);
+              mems.add(mem);
+              // TODO 汎用的にする
+              final memItem = r.readTableOrNull(childTableInfo);
+              if (memItem != null) {
+                memItems[memItem.memId] ??= [];
+                memItems[memItem.memId]!.add(memItem);
+              }
+            }
+
+            // TODO 汎用的にする
+            return mems.map((mem) {
+              return _convertToEntity(
+                mem,
+                tableInfo.actualTableName,
+                children: {
+                  childTableInfo.actualTableName: memItems[mem.id] ?? [],
+                },
+              );
+            }).toList();
+          }
+
           return await query.get();
         },
         {
@@ -358,6 +396,33 @@ class DriftDatabaseAccessor {
 
       default:
         throw StateError('Unknown domain: ${domain.runtimeType}');
+    }
+  }
+
+  _convertToEntity(
+    dynamic row,
+    String tableName, {
+    Map<String, dynamic> children = const {},
+  }) {
+    final childEntites = children.map((key, value) {
+      if (value is List) {
+        return MapEntry(
+          key,
+          value.map((e) => _convertToEntity(e, key)).toList(),
+        );
+      } else {
+        return MapEntry(key, _convertToEntity(value, key));
+      }
+    });
+
+    switch (tableName) {
+      case 'mems':
+        return MemEntity.fromTuple(row, children: childEntites);
+      case 'mem_items':
+        return MemItemEntity.fromTuple(row);
+
+      default:
+        throw StateError('Unknown table: $tableName');
     }
   }
 
