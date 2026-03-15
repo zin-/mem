@@ -39,25 +39,22 @@ class ActQueryService {
 
   Future<List<ActEntity>> fetchLatestAndPausedByMemIds(Iterable<int>? memIds) =>
       v(
-        () async => await _driftAccessor
-            .select(
-              defTableActs,
-              condition: And(
-                [
-                  if (memIds != null) In(defFkActsMemId.name, memIds),
-                  IsNotNull(defColActsPausedAt.name),
-                ],
-              ),
-              groupBy: GroupBy(
-                [defFkActsMemId],
-                extraColumns: [Max(defColActsStart)],
-              ),
-            )
-            .then(
-              (v) => v.map((e) {
-                return ActEntity.fromTuple(e);
-              }).toList(),
+        () async {
+          final rows = await _driftAccessor.selectV2(
+            defTableActs,
+            condition: And(
+              [
+                if (memIds != null) In(defFkActsMemId.name, memIds),
+                IsNotNull(defColActsPausedAt.name),
+              ],
             ),
+            groupBy: GroupBy(
+              [defFkActsMemId],
+              extraColumns: [Max(defColActsStart)],
+            ),
+          );
+          return List<ActEntity>.from(rows);
+        },
         {'memIds': memIds},
       );
 
@@ -83,8 +80,7 @@ class ActQueryService {
         () async {
           final rows = await _driftAccessor.selectV2(
             defTableActs,
-            condition:
-                memId == null ? null : Equals(defFkActsMemId, memId),
+            condition: memId == null ? null : Equals(defFkActsMemId, memId),
             orderBy: [Descending(defColActsStart)],
             offset: offset,
             limit: limit,

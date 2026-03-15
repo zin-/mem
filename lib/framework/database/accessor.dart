@@ -23,34 +23,6 @@ import 'package:mem/features/targets/target.dart' as target_domain;
 
 import 'definition/table_definition.dart';
 
-const _driftToTableDefKey = {
-  'memId': 'mems_id',
-  'sourceMemId': 'source_mems_id',
-  'targetMemId': 'target_mems_id',
-  'startIsAllDay': 'start_is_all_day',
-  'endIsAllDay': 'end_is_all_day',
-  'timeOfDaySeconds': 'time_of_day_seconds',
-  'pausedAt': 'paused_at',
-};
-
-Map<String, Object?> _driftRowToEntityMap(dynamic row, String tableName) {
-  final json = (row as dynamic).toJson(
-    serializer: drift.ValueSerializer.defaults(
-      serializeDateTimeValuesAsString: true,
-    ),
-  ) as Map<String, dynamic>;
-  return Map.fromEntries(json.entries.map((e) {
-    final key = _driftToTableDefKey[e.key] ?? e.key;
-    Object? value = e.value;
-    if (value is String) {
-      try {
-        value = DateTime.parse(value);
-      } catch (_) {}
-    }
-    return MapEntry(key, value);
-  }));
-}
-
 const _tableDefToDriftKey = {
   'mems_id': 'memId',
   'source_mems_id': 'sourceMemId',
@@ -83,22 +55,18 @@ class DriftDatabaseAccessor {
         {'tableDefinition': tableDefinition, 'condition': condition},
       );
 
-  Future<List<dynamic>> select(
+  Future<List<dynamic>> selectV2(
     TableDefinition tableDefinition, {
     Condition? condition,
     GroupBy? groupBy,
     List<OrderBy>? orderBy,
     int? offset,
     int? limit,
+    List<TableDefinition>? loadChildren,
   }) =>
       v(
         () async {
-          final drift.TableInfo tableInfo;
-          try {
-            tableInfo = _getTableInfo(tableDefinition);
-          } catch (e) {
-            return <Map<String, dynamic>>[];
-          }
+          final tableInfo = _getTableInfoV2(tableDefinition);
           final query = driftDatabase.select(tableInfo);
 
           if (condition != null) {
@@ -119,10 +87,8 @@ class DriftDatabaseAccessor {
           if (effectiveOrderBy.isNotEmpty) {
             query.orderBy(
               effectiveOrderBy
-                  .map((orderByItem) => _toOrderClauseGenerator(
-                        tableInfo,
-                        orderByItem,
-                      ))
+                  .map((orderByItem) =>
+                      _toOrderClauseGenerator(tableInfo, orderByItem))
                   .whereType<drift.OrderClauseGenerator>()
                   .toList(),
             );
@@ -136,53 +102,7 @@ class DriftDatabaseAccessor {
             }
           }
 
-          var rows = await query.get();
-          if (hasGroupByWithExtra && groupBy.columns.isNotEmpty) {
-            final seen = <Object?, dynamic>{};
-            final keyCol = groupBy.columns.first.name;
-            final driftKey = _tableDefToDriftKey[keyCol] ?? keyCol;
-            for (final r in rows) {
-              final k = (r as dynamic).toJson()[driftKey];
-              if (!seen.containsKey(k)) seen[k] = r;
-            }
-            rows = seen.values.toList();
-            rows = rows.skip(offset ?? 0).take(limit ?? 999999999).toList();
-          }
-
-          return rows
-              .map((r) => _driftRowToEntityMap(r, tableDefinition.name))
-              .toList();
-        },
-        {
-          'tableDefinition': tableDefinition,
-          'condition': condition,
-          'groupBy': groupBy,
-          'orderBy': orderBy,
-          'offset': offset,
-          'limit': limit,
-        },
-      );
-  Future<List<dynamic>> selectV2(
-    TableDefinition tableDefinition, {
-    Condition? condition,
-    List<TableDefinition>? loadChildren,
-    List<OrderBy>? orderBy,
-    int? offset,
-    int? limit,
-  }) =>
-      v(
-        () async {
-          final tableInfo = _getTableInfoV2(tableDefinition);
-          final query = driftDatabase.select(tableInfo);
-
-          if (condition != null) {
-            final driftExpression = condition.toDriftExpression(tableInfo);
-            if (driftExpression != null) {
-              query.where((tbl) => driftExpression);
-            }
-          }
-
-          if (loadChildren?.isNotEmpty == true) {
+          if (loadChildren?.isNotEmpty == true && !hasGroupByWithExtra) {
             final childTableInfo = driftDatabase.memItems;
 
             final query2 = query.join([
@@ -219,21 +139,19 @@ class DriftDatabaseAccessor {
             }).toList();
           }
 
-          if (orderBy?.isNotEmpty == true) {
-            query.orderBy(
-              orderBy!
-                  .map((orderByItem) =>
-                      _toOrderClauseGenerator(tableInfo, orderByItem))
-                  .whereType<drift.OrderClauseGenerator>()
-                  .toList(),
-            );
+          var rows = await query.get();
+          if (hasGroupByWithExtra && groupBy.columns.isNotEmpty) {
+            final seen = <Object?, dynamic>{};
+            final keyCol = groupBy.columns.first.name;
+            final driftKey = _tableDefToDriftKey[keyCol] ?? keyCol;
+            for (final r in rows) {
+              final k = (r as dynamic).toJson()[driftKey];
+              if (!seen.containsKey(k)) seen[k] = r;
+            }
+            rows = seen.values.toList();
+            rows = rows.skip(offset ?? 0).take(limit ?? 999999999).toList();
           }
 
-          if (limit != null || offset != null) {
-            query.limit(limit ?? 999999999, offset: offset ?? 0);
-          }
-
-          final rows = await query.get();
           return rows
               .map((row) => _convertToEntity(row, tableInfo.actualTableName))
               .toList();
@@ -241,6 +159,7 @@ class DriftDatabaseAccessor {
         {
           'tableDefinition': tableDefinition,
           'condition': condition,
+          'groupBy': groupBy,
           'loadChildren': loadChildren,
           'orderBy': orderBy,
           'offset': offset,
