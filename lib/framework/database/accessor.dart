@@ -23,14 +23,6 @@ import 'package:mem/features/targets/target.dart' as target_domain;
 
 import 'definition/table_definition.dart';
 
-Object? _valueFromMap(Map<String, Object?> m, List<String> keys) {
-  for (final k in keys) {
-    final v = m[k];
-    if (v != null) return v;
-  }
-  return null;
-}
-
 const _driftToTableDefKey = {
   'memId': 'mems_id',
   'sourceMemId': 'source_mems_id',
@@ -256,26 +248,6 @@ class DriftDatabaseAccessor {
         },
       );
 
-  insert(
-    TableDefinition tableDefinition,
-    Map<String, Object?> values,
-  ) =>
-      v(
-        () async {
-          final drift.TableInfo tableInfo;
-          try {
-            tableInfo = _getTableInfo(tableDefinition);
-          } catch (e) {
-            return 0;
-          }
-          final insertable = _createCompanionForTable(
-            tableDefinition.name,
-            values,
-          );
-          return await driftDatabase.into(tableInfo).insert(insertable);
-        },
-      );
-
   Future insertV2(
     dynamic domain,
 // TODO createdAtを受け取るべきかも
@@ -292,29 +264,6 @@ class DriftDatabaseAccessor {
         {'domain': domain},
       );
 
-  update(
-    TableDefinition tableDefinition,
-    Map<String, Object?> values,
-  ) =>
-      v(
-        () async {
-          final drift.TableInfo tableInfo;
-          try {
-            tableInfo = _getTableInfo(tableDefinition);
-          } catch (e) {
-            return 0;
-          }
-
-          final query = driftDatabase.update(tableInfo)
-            ..where((t) => (t as dynamic).id.equals(values['id']));
-
-          return await query.write(_createCompanionForTable(
-            tableDefinition.name,
-            values,
-          ));
-        },
-      );
-
   Future updateV2(dynamic entity) => v(
         () async {
           final tableInfo = _getTableInfoV2(entity);
@@ -326,32 +275,6 @@ class DriftDatabaseAccessor {
           return _convertToEntity(updated, tableInfo.actualTableName);
         },
         {'entity': entity},
-      );
-
-  delete(
-    TableDefinition tableDefinition,
-    Condition? condition,
-  ) =>
-      v(
-        () async {
-          final drift.TableInfo tableInfo;
-          try {
-            tableInfo = _getTableInfo(tableDefinition);
-          } catch (e) {
-            return 0;
-          }
-
-          final query = driftDatabase.delete(tableInfo);
-
-          if (condition != null) {
-            final driftExpression = condition.toDriftExpression(tableInfo);
-            if (driftExpression != null) {
-              query.where((tbl) => driftExpression);
-            }
-          }
-
-          return await query.go();
-        },
       );
 
   Future<List<dynamic>> deleteV2(dynamic domain, {Condition? condition}) => v(
@@ -516,85 +439,6 @@ class DriftDatabaseAccessor {
       return column;
     } catch (e) {
       return null;
-    }
-  }
-
-  dynamic _createCompanionForTable(
-    String tableName,
-    Map<String, Object?> values,
-  ) {
-    T? val<T>(List<String> keys) => _valueFromMap(values, keys) as T?;
-
-    switch (tableName) {
-      case 'mems':
-        return MemsCompanion.insert(
-          name: values['name'] as String,
-          doneAt: drift.Value(values['doneAt'] as DateTime?),
-          notifyOn: drift.Value(values['notifyOn'] as DateTime?),
-          notifyAt: drift.Value(values['notifyAt'] as DateTime?),
-          endOn: drift.Value(values['endOn'] as DateTime?),
-          endAt: drift.Value(values['endAt'] as DateTime?),
-          createdAt: values['createdAt'] as DateTime,
-          updatedAt: drift.Value(values['updatedAt'] as DateTime?),
-          archivedAt: drift.Value(values['archivedAt'] as DateTime?),
-        );
-      case 'mem_items':
-        return MemItemsCompanion.insert(
-          type: values['type'] as String,
-          value: values['value'] as String,
-          memId: (val<int>(['mems_id', 'memId']) ?? 0),
-          createdAt: values['createdAt'] as DateTime,
-          updatedAt: drift.Value(values['updatedAt'] as DateTime?),
-          archivedAt: drift.Value(values['archivedAt'] as DateTime?),
-        );
-      case 'acts':
-        return ActsCompanion.insert(
-          start: drift.Value(values['start'] as DateTime?),
-          startIsAllDay:
-              drift.Value(val<bool>(['start_is_all_day', 'startIsAllDay'])),
-          end: drift.Value(values['end'] as DateTime?),
-          endIsAllDay:
-              drift.Value(val<bool>(['end_is_all_day', 'endIsAllDay'])),
-          pausedAt: drift.Value(val<DateTime>(['paused_at', 'pausedAt'])),
-          memId: (val<int>(['mems_id', 'memId']) ?? 0),
-          createdAt: values['createdAt'] as DateTime,
-          updatedAt: drift.Value(values['updatedAt'] as DateTime?),
-          archivedAt: drift.Value(values['archivedAt'] as DateTime?),
-        );
-      case 'mem_repeated_notifications':
-        return MemRepeatedNotificationsCompanion.insert(
-          timeOfDaySeconds:
-              (val<int>(['time_of_day_seconds', 'timeOfDaySeconds']) ?? 0),
-          type: values['type'] as String,
-          message: values['message'] as String,
-          memId: (val<int>(['mems_id', 'memId']) ?? 0),
-          createdAt: values['createdAt'] as DateTime,
-          updatedAt: drift.Value(values['updatedAt'] as DateTime?),
-          archivedAt: drift.Value(values['archivedAt'] as DateTime?),
-        );
-      case 'targets':
-        return TargetsCompanion.insert(
-          type: values['type'] as String,
-          unit: values['unit'] as String,
-          value: (values['value'] as int?) ?? 0,
-          period: values['period'] as String,
-          memId: (val<int>(['mems_id', 'memId']) ?? 0),
-          createdAt: values['createdAt'] as DateTime,
-          updatedAt: drift.Value(values['updatedAt'] as DateTime?),
-          archivedAt: drift.Value(values['archivedAt'] as DateTime?),
-        );
-      case 'mem_relations':
-        return MemRelationsCompanion.insert(
-          sourceMemId: (val<int>(['source_mems_id', 'sourceMemId']) ?? 0),
-          targetMemId: (val<int>(['target_mems_id', 'targetMemId']) ?? 0),
-          type: values['type'] as String,
-          value: drift.Value(values['value'] as int?),
-          createdAt: values['createdAt'] as DateTime,
-          updatedAt: drift.Value(values['updatedAt'] as DateTime?),
-          archivedAt: drift.Value(values['archivedAt'] as DateTime?),
-        );
-      default:
-        throw StateError('Unknown table: $tableName');
     }
   }
 
