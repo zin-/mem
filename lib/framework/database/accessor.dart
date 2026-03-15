@@ -173,7 +173,7 @@ class DriftDatabaseAccessor {
   Future<List<dynamic>> selectV2(
     TableDefinition tableDefinition, {
     Condition? condition,
-    loadChildren = false,
+    List<TableDefinition>? loadChildren,
   }) =>
       v(
         () async {
@@ -187,11 +187,13 @@ class DriftDatabaseAccessor {
             }
           }
 
-          if (loadChildren) {
+          if (loadChildren?.isNotEmpty == true) {
+            final childTableInfo = driftDatabase.memItems;
+
             final query2 = query.join([
               drift.leftOuterJoin(
-                driftDatabase.memItems,
-                driftDatabase.memItems.memId.equalsExp(driftDatabase.mems.id),
+                childTableInfo,
+                childTableInfo.memId.equalsExp(driftDatabase.mems.id),
               )
             ]);
 
@@ -199,7 +201,6 @@ class DriftDatabaseAccessor {
             // TODO 汎用的にする
             final mems = <Mem>[];
             final memItems = <int, List<MemItem>>{};
-            final childTableInfo = driftDatabase.memItems;
             for (final r in v2) {
               final mem = r.readTable(tableInfo);
               mems.add(mem);
@@ -223,7 +224,10 @@ class DriftDatabaseAccessor {
             }).toList();
           }
 
-          return await query.get();
+          final rows = await query.get();
+          return rows
+              .map((row) => _convertToEntity(row, tableInfo.actualTableName))
+              .toList();
         },
         {
           'tableDefinition': tableDefinition,
@@ -261,9 +265,9 @@ class DriftDatabaseAccessor {
           final tableInfo = _getTableInfoV2(domain);
           final insertable = convertIntoDriftInsertable(domain);
 
-          return await driftDatabase
-              .into(tableInfo)
-              .insertReturning(insertable);
+          final inserted =
+              await driftDatabase.into(tableInfo).insertReturning(insertable);
+          return _convertToEntity(inserted, tableInfo.actualTableName);
         },
         {'domain': domain},
       );
@@ -293,12 +297,13 @@ class DriftDatabaseAccessor {
 
   Future updateV2(dynamic entity) => v(
         () async {
-          final query = driftDatabase.update(_getTableInfoV2(entity))
+          final tableInfo = _getTableInfoV2(entity);
+          final query = driftDatabase.update(tableInfo)
             ..where((t) => (t as dynamic).id.equals(entity.id));
 
           final updateable = convertIntoDriftUpdateable(entity);
-
-          return (await query.writeReturning(updateable)).first;
+          final updated = (await query.writeReturning(updateable)).first;
+          return _convertToEntity(updated, tableInfo.actualTableName);
         },
         {'entity': entity},
       );
@@ -346,7 +351,11 @@ class DriftDatabaseAccessor {
             }
           }
 
-          return await query.goAndReturn();
+          final deleted = await query.goAndReturn();
+          final tableName = tableInfo.actualTableName;
+          return deleted
+              .map((row) => _convertToEntity(row, tableName))
+              .toList();
         },
         {
           'domain': domain,
@@ -420,6 +429,14 @@ class DriftDatabaseAccessor {
         return MemEntity.fromTuple(row, children: childEntites);
       case 'mem_items':
         return MemItemEntity.fromTuple(row);
+      case 'mem_repeated_notifications':
+        return MemNotificationEntity.fromTuple(row);
+      case 'acts':
+        return ActEntity.fromTuple(row);
+      case 'targets':
+        return TargetEntity.fromTuple(row);
+      case 'mem_relations':
+        return MemRelationEntity.fromTuple(row);
 
       default:
         throw StateError('Unknown table: $tableName');

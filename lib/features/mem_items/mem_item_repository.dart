@@ -1,6 +1,7 @@
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/features/mem_items/mem_item.dart';
+import 'package:mem/framework/database/definition/table_definition.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/group_by.dart';
@@ -13,17 +14,6 @@ import 'package:mem/features/mem_items/mem_item_entity.dart';
 class MemItemRepository
     extends DatabaseTupleRepository<MemItem, int, MemItemEntity> {
   @override
-  MemItemEntity packV2(dynamic tuple) => MemItemEntity(
-        tuple.memId,
-        MemItemType.values.byName(tuple.type),
-        tuple.value,
-        tuple.id,
-        tuple.createdAt,
-        tuple.updatedAt,
-        tuple.archivedAt,
-      );
-
-  @override
   Future<List<MemItemEntity>> shipV2({
     int? memId,
     Condition? condition,
@@ -31,7 +21,7 @@ class MemItemRepository
     List<OrderBy>? orderBy,
     int? offset,
     int? limit,
-    loadChildren = false,
+    List<TableDefinition>? loadChildren,
   }) async =>
       await super.shipV2(
         condition: And(

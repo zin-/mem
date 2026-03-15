@@ -1,5 +1,6 @@
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
+import 'package:mem/framework/database/definition/table_definition.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/condition/in.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
@@ -11,23 +12,11 @@ import 'mem_notification_entity.dart';
 class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
     int, MemNotificationEntity> {
   @override
-  MemNotificationEntity packV2(dynamic tuple) => MemNotificationEntity(
-        tuple.memId,
-        MemNotificationType.fromName(tuple.type),
-        tuple.timeOfDaySeconds,
-        tuple.message,
-        tuple.id,
-        tuple.createdAt,
-        tuple.updatedAt,
-        tuple.archivedAt,
-      );
-
-  @override
   Future<List<MemNotificationEntity>> shipV2({
     int? memId,
     Iterable<int>? memIdsIn,
     Condition? condition,
-    loadChildren = false,
+    List<TableDefinition>? loadChildren,
   }) =>
       super.shipV2(
         condition: And(

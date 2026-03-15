@@ -38,24 +38,19 @@ abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
         {'condition': condition},
       );
 
-  ENTITY packV2(
-          // FIXME 自動生成されるDataClassを使うべきかも
-          dynamic tuple) =>
-      throw UnimplementedError();
   convert(DOMAIN domain) => throw UnimplementedError();
 
   Future<ENTITY> receiveV2(DOMAIN domain) => v(
         () async {
           final inserted = await _driftAccessor.insertV2(domain);
-
-          return packV2(inserted);
+          return List<ENTITY>.from([inserted]).single;
         },
         {'domain': domain},
       );
 
   Future<List<ENTITY>> shipV2({
     Condition? condition,
-    loadChildren = false,
+    List<TableDefinition>? loadChildren,
   }) =>
       v(
         () async {
@@ -64,14 +59,7 @@ abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
             condition: condition,
             loadChildren: loadChildren,
           );
-
-          return rows.map<ENTITY>((e) {
-            // TODO accessorで変換するのであればこちらを主流にする
-            if (loadChildren) {
-              return e;
-            }
-            return packV2(e);
-          }).toList();
+          return List<ENTITY>.from(rows);
         },
         {'condition': condition},
       );
@@ -82,7 +70,7 @@ abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
             _tableDefinition,
             condition: Equals(defPkId, id),
           );
-          return packV2(row.first);
+          return List<ENTITY>.from(row).first;
         },
         {'id': id},
       );
@@ -90,8 +78,7 @@ abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
   Future<ENTITY> replaceV2(ENTITY entity) => v(
         () async {
           final updated = await _driftAccessor.updateV2(entity);
-
-          return packV2(updated);
+          return List<ENTITY>.from([updated]).single;
         },
         {'entity': entity},
       );
@@ -104,8 +91,7 @@ abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
             _tableDefinition,
             condition: condition,
           );
-
-          return deleted.map<ENTITY>((e) => packV2(e)).toList();
+          return List<ENTITY>.from(deleted);
         },
         {'condition': condition},
       );

@@ -2,21 +2,19 @@ import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/features/mems/mem.dart';
+import 'package:mem/framework/database/definition/table_definition.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 
 class MemRepository extends DatabaseTupleRepository<Mem, int, MemEntity> {
   @override
-  MemEntity packV2(dynamic tuple) => MemEntity.fromTuple(tuple);
-
-  @override
   Future<List<MemEntity>> shipV2({
     int? id,
     bool? archived,
     bool? done,
     Condition? condition,
-    loadChildren = false,
+    List<TableDefinition>? loadChildren,
   }) =>
       super.shipV2(
         condition: And(
@@ -33,7 +31,7 @@ class MemRepository extends DatabaseTupleRepository<Mem, int, MemEntity> {
             if (condition != null) condition,
           ],
         ),
-        loadChildren: true,
+        loadChildren: [],
       );
 
   @override
