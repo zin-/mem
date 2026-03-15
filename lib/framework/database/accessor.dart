@@ -174,6 +174,9 @@ class DriftDatabaseAccessor {
     TableDefinition tableDefinition, {
     Condition? condition,
     List<TableDefinition>? loadChildren,
+    List<OrderBy>? orderBy,
+    int? offset,
+    int? limit,
   }) =>
       v(
         () async {
@@ -224,6 +227,20 @@ class DriftDatabaseAccessor {
             }).toList();
           }
 
+          if (orderBy?.isNotEmpty == true) {
+            query.orderBy(
+              orderBy!
+                  .map((orderByItem) =>
+                      _toOrderClauseGenerator(tableInfo, orderByItem))
+                  .whereType<drift.OrderClauseGenerator>()
+                  .toList(),
+            );
+          }
+
+          if (limit != null || offset != null) {
+            query.limit(limit ?? 999999999, offset: offset ?? 0);
+          }
+
           final rows = await query.get();
           return rows
               .map((row) => _convertToEntity(row, tableInfo.actualTableName))
@@ -233,6 +250,9 @@ class DriftDatabaseAccessor {
           'tableDefinition': tableDefinition,
           'condition': condition,
           'loadChildren': loadChildren,
+          'orderBy': orderBy,
+          'offset': offset,
+          'limit': limit,
         },
       );
 

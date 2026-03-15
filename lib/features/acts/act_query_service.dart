@@ -63,22 +63,13 @@ class ActQueryService {
 
   Future<ActEntity?> fetchLatestByMemIds(int memId) => v(
         () async {
-          return await _driftAccessor
-              .select(
+          final rows = await _driftAccessor.selectV2(
             defTableActs,
             condition: Equals(defFkActsMemId, memId),
             orderBy: [Descending(defColActsStart)],
             limit: 1,
-          )
-              .then((v) {
-            final act = v.singleOrNull;
-
-            if (act == null) {
-              return null;
-            } else {
-              return ActEntity.fromTuple(act);
-            }
-          });
+          );
+          return rows.isEmpty ? null : rows.first as ActEntity;
         },
         {'memId': memId},
       );
@@ -90,19 +81,16 @@ class ActQueryService {
   ) =>
       v(
         () async {
+          final rows = await _driftAccessor.selectV2(
+            defTableActs,
+            condition:
+                memId == null ? null : Equals(defFkActsMemId, memId),
+            orderBy: [Descending(defColActsStart)],
+            offset: offset,
+            limit: limit,
+          );
           return ListWithTotalCount(
-            await _driftAccessor
-                .select(
-                  defTableActs,
-                  condition:
-                      memId == null ? null : Equals(defFkActsMemId, memId),
-                  orderBy: [Descending(defColActsStart)],
-                  offset: offset,
-                  limit: limit,
-                )
-                .then((v) => v.map((e) {
-                      return ActEntity.fromTuple(e);
-                    }).toList()),
+            List<ActEntity>.from(rows),
             await countByMemIdIs(memId),
           );
         },
@@ -119,22 +107,17 @@ class ActQueryService {
   ) =>
       v(
         () async {
-          return await _driftAccessor
-              .select(
-                defTableActs,
-                condition: And(
-                  [
-                    Equals(defFkActsMemId, memId),
-                    GraterThanOrEqual(defColActsStart, period.start),
-                    LessThan(defColActsStart, period.end),
-                  ],
-                ),
-              )
-              .then(
-                (v) => v.map((e) {
-                  return ActEntity.fromTuple(e);
-                }).toList(),
-              );
+          final rows = await _driftAccessor.selectV2(
+            defTableActs,
+            condition: And(
+              [
+                Equals(defFkActsMemId, memId),
+                GraterThanOrEqual(defColActsStart, period.start),
+                LessThan(defColActsStart, period.end),
+              ],
+            ),
+          );
+          return List<ActEntity>.from(rows);
         },
         {
           'memId': memId,
