@@ -38,8 +38,6 @@ abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
         {'condition': condition},
       );
 
-  convert(DOMAIN domain) => throw UnimplementedError();
-
   Future<ENTITY> receiveV2(DOMAIN domain) => v(
         () async {
           final inserted = await _driftAccessor.insertV2(domain);
