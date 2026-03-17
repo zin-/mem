@@ -31,7 +31,7 @@ class MemRepository extends DatabaseTupleRepository<Mem, int, MemEntity> {
             if (condition != null) condition,
           ],
         ),
-        loadChildren: [],
+        loadChildren: loadChildren,
       );
 
   @override
