@@ -42,12 +42,14 @@ class DriftDatabaseAccessor {
         () async {
           try {
             final tableInfo = _getTableInfo(tableDefinition);
-            var query = driftDatabase.select(tableInfo);
+            final countExpr = drift.countAll();
+            final query = driftDatabase.selectOnly(tableInfo)..addColumns([countExpr]);
             if (condition != null) {
               final exp = condition.toDriftExpression(tableInfo);
-              if (exp != null) query = query..where((_) => exp);
+              if (exp != null) query.where(exp);
             }
-            return (await query.get()).length;
+            final row = await query.getSingle();
+            return row.read(countExpr) ?? 0;
           } catch (_) {
             return 0;
           }
