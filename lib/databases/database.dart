@@ -23,6 +23,9 @@ part 'database.g.dart';
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
+  /// 永続ファイルを使わない SQLite。単体テストで本番 DB と干渉しないようにするため。
+  AppDatabase.memory() : super(NativeDatabase.memory());
+
   @override
   int get schemaVersion => 1;
 

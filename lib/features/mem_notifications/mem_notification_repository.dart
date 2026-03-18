@@ -1,6 +1,6 @@
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
-import 'package:mem/framework/database/definition/table_definition.dart';
+import 'package:mem/framework/repository/load_child_spec.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/condition/in.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
@@ -16,7 +16,7 @@ class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
     int? memId,
     Iterable<int>? memIdsIn,
     Condition? condition,
-    List<TableDefinition>? loadChildren,
+    List<LoadChildSpec>? loadChildren,
   }) =>
       super.shipV2(
         condition: And(

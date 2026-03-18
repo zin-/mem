@@ -4,12 +4,13 @@ import 'package:mem/framework/database/definition/database_definition.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/entity.dart';
+import 'package:mem/framework/repository/load_child_spec.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/features/logger/log_service.dart';
 
 abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
     extends Repository {
-  static final _driftAccessor = DriftDatabaseAccessor();
+  static DriftDatabaseAccessor get _driftAccessor => DriftDatabaseAccessor();
   static final Map<TableDefinition, Repository> _repositories = {};
 
   // ignore: unused_field
@@ -48,7 +49,7 @@ abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
 
   Future<List<ENTITY>> shipV2({
     Condition? condition,
-    List<TableDefinition>? loadChildren,
+    List<LoadChildSpec>? loadChildren,
   }) =>
       v(
         () async {
@@ -59,7 +60,7 @@ abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
           );
           return List<ENTITY>.from(rows);
         },
-        {'condition': condition},
+        {'condition': condition, 'loadChildren': loadChildren},
       );
 
   Future<ENTITY> shipById(int id) => v(

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:drift/drift.dart' as drift;
 import 'package:mem/databases/database.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
@@ -15,8 +17,10 @@ import 'package:mem/features/mem_relations/mem_relation.dart'
     as mem_relation_domain;
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/features/targets/target_entity.dart';
+import 'package:mem/framework/database/definition/column/foreign_key_definition.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/group_by.dart';
+import 'package:mem/framework/repository/load_child_spec.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/framework/singleton.dart';
 import 'package:mem/features/targets/target.dart' as target_domain;
@@ -29,10 +33,15 @@ const _tableDefToDriftKey = {
   'target_mems_id': 'targetMemId',
 };
 
+const _loadChildInChunkSize = 900;
+
 class DriftDatabaseAccessor {
   final AppDatabase driftDatabase;
 
   DriftDatabaseAccessor._(this.driftDatabase);
+
+  factory DriftDatabaseAccessor.withDatabase(AppDatabase database) =>
+      DriftDatabaseAccessor._(database);
 
   Future<int> count(
     TableDefinition tableDefinition, {
@@ -64,7 +73,7 @@ class DriftDatabaseAccessor {
     List<OrderBy>? orderBy,
     int? offset,
     int? limit,
-    List<TableDefinition>? loadChildren,
+    List<LoadChildSpec>? loadChildren,
   }) =>
       v(
         () async {
@@ -104,43 +113,6 @@ class DriftDatabaseAccessor {
             }
           }
 
-          if (loadChildren?.isNotEmpty == true && !hasGroupByWithExtra) {
-            final childTableInfo = driftDatabase.memItems;
-
-            final query2 = query.join([
-              drift.leftOuterJoin(
-                childTableInfo,
-                childTableInfo.memId.equalsExp(driftDatabase.mems.id),
-              )
-            ]);
-
-            final v2 = await query2.get();
-            // TODO 汎用的にする
-            final mems = <Mem>[];
-            final memItems = <int, List<MemItem>>{};
-            for (final r in v2) {
-              final mem = r.readTable(tableInfo);
-              mems.add(mem);
-              // TODO 汎用的にする
-              final memItem = r.readTableOrNull(childTableInfo);
-              if (memItem != null) {
-                memItems[memItem.memId] ??= [];
-                memItems[memItem.memId]!.add(memItem);
-              }
-            }
-
-            // TODO 汎用的にする
-            return mems.map((mem) {
-              return _convertToEntity(
-                mem,
-                tableInfo.actualTableName,
-                children: {
-                  childTableInfo.actualTableName: memItems[mem.id] ?? [],
-                },
-              );
-            }).toList();
-          }
-
           var rows = await query.get();
           if (hasGroupByWithExtra && groupBy.columns.isNotEmpty) {
             final seen = <Object?, dynamic>{};
@@ -152,6 +124,46 @@ class DriftDatabaseAccessor {
             }
             rows = seen.values.toList();
             rows = rows.skip(offset ?? 0).take(limit ?? 999999999).toList();
+          }
+
+          if (loadChildren?.isNotEmpty == true && !hasGroupByWithExtra) {
+            final specs = loadChildren!;
+            final usedKeys = <String>{};
+            for (final s in specs) {
+              if (!usedKeys.add(s.resultKey)) {
+                throw ArgumentError(
+                  'Duplicate loadChildren.resultKey: ${s.resultKey}',
+                );
+              }
+            }
+            final parentIds =
+                rows.map((r) => (r as dynamic).id as int).toSet();
+            final childrenByParentId = <int, Map<String, List<dynamic>>>{};
+            for (final id in parentIds) {
+              childrenByParentId[id] = {};
+            }
+            for (final spec in specs) {
+              final fk = LoadChildSpec.resolveFkToParent(
+                spec.table,
+                tableDefinition,
+                spec.fkToParent,
+              );
+              final grouped =
+                  await _loadChildRowsGrouped(spec, fk, parentIds);
+              for (final e in grouped.entries) {
+                childrenByParentId[e.key]![spec.resultKey] = e.value;
+              }
+            }
+            return rows
+                .map(
+                  (row) => _convertToEntity(
+                    row,
+                    tableInfo.actualTableName,
+                    children:
+                        childrenByParentId[(row as dynamic).id as int] ?? {},
+                  ),
+                )
+                .toList();
           }
 
           return rows
@@ -269,6 +281,107 @@ class DriftDatabaseAccessor {
 
       default:
         throw StateError('Unknown domain: ${domain.runtimeType}');
+    }
+  }
+
+  Future<Map<int, List<dynamic>>> _loadChildRowsGrouped(
+    LoadChildSpec spec,
+    ForeignKeyDefinition fk,
+    Set<int> parentIds,
+  ) async {
+    final childInfo = _getTableInfoV2(spec.table);
+    final out = <int, List<dynamic>>{};
+    if (parentIds.isEmpty) return out;
+    final list = parentIds.toList();
+    for (var i = 0; i < list.length; i += _loadChildInChunkSize) {
+      final end = math.min(i + _loadChildInChunkSize, list.length);
+      final chunk = list.sublist(i, end);
+      final rows = await _selectChildChunk(childInfo, fk, chunk, spec.condition);
+      for (final row in rows) {
+        final pid = _parentIdFromChildRow(row, fk);
+        out.putIfAbsent(pid, () => []).add(row);
+      }
+    }
+    return out;
+  }
+
+  Future<List<dynamic>> _selectChildChunk(
+    drift.TableInfo childInfo,
+    ForeignKeyDefinition fk,
+    List<int> parentIdsChunk,
+    Condition? condition,
+  ) async {
+    final name = childInfo.actualTableName;
+    switch (name) {
+      case 'mem_items':
+        var q = driftDatabase.select(driftDatabase.memItems);
+        q.where((t) => t.memId.isIn(parentIdsChunk));
+        if (condition != null) {
+          final exp = condition.toDriftExpression(childInfo);
+          if (exp != null) q.where((t) => exp);
+        }
+        return await q.get();
+      case 'mem_repeated_notifications':
+        var q = driftDatabase.select(driftDatabase.memRepeatedNotifications);
+        q.where((t) => t.memId.isIn(parentIdsChunk));
+        if (condition != null) {
+          final exp = condition.toDriftExpression(childInfo);
+          if (exp != null) q.where((t) => exp);
+        }
+        return await q.get();
+      case 'acts':
+        var q = driftDatabase.select(driftDatabase.acts);
+        q.where((t) => t.memId.isIn(parentIdsChunk));
+        if (condition != null) {
+          final exp = condition.toDriftExpression(childInfo);
+          if (exp != null) q.where((t) => exp);
+        }
+        return await q.get();
+      case 'targets':
+        var q = driftDatabase.select(driftDatabase.targets);
+        q.where((t) => t.memId.isIn(parentIdsChunk));
+        if (condition != null) {
+          final exp = condition.toDriftExpression(childInfo);
+          if (exp != null) q.where((t) => exp);
+        }
+        return await q.get();
+      case 'mem_relations':
+        if (fk.name == 'source_mems_id') {
+          var q = driftDatabase.select(driftDatabase.memRelations);
+          q.where((t) => t.sourceMemId.isIn(parentIdsChunk));
+          if (condition != null) {
+            final exp = condition.toDriftExpression(childInfo);
+            if (exp != null) q.where((t) => exp);
+          }
+          return await q.get();
+        }
+        if (fk.name == 'target_mems_id') {
+          var q = driftDatabase.select(driftDatabase.memRelations);
+          q.where((t) => t.targetMemId.isIn(parentIdsChunk));
+          if (condition != null) {
+            final exp = condition.toDriftExpression(childInfo);
+            if (exp != null) q.where((t) => exp);
+          }
+          return await q.get();
+        }
+        throw StateError(
+          'mem_relations loadChildren requires fkToParent source_mems_id or target_mems_id',
+        );
+      default:
+        throw StateError('loadChildren not supported for table: $name');
+    }
+  }
+
+  int _parentIdFromChildRow(dynamic row, ForeignKeyDefinition fk) {
+    switch (fk.name) {
+      case 'mems_id':
+        return row.memId as int;
+      case 'source_mems_id':
+        return row.sourceMemId as int;
+      case 'target_mems_id':
+        return row.targetMemId as int;
+      default:
+        throw StateError('Unsupported FK ${fk.name} for loadChildren');
     }
   }
 

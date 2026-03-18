@@ -2,7 +2,7 @@ import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/features/mems/mem.dart';
-import 'package:mem/framework/database/definition/table_definition.dart';
+import 'package:mem/framework/repository/load_child_spec.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/features/mems/mem_entity.dart';
@@ -14,7 +14,7 @@ class MemRepository extends DatabaseTupleRepository<Mem, int, MemEntity> {
     bool? archived,
     bool? done,
     Condition? condition,
-    List<TableDefinition>? loadChildren,
+    List<LoadChildSpec>? loadChildren,
   }) =>
       super.shipV2(
         condition: And(

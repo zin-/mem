@@ -1,5 +1,7 @@
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
+import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
+import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/features/mems/mem.dart';
@@ -68,6 +70,8 @@ class SavedMemEntityV1 extends MemEntityV1
         createdAt,
         updatedAt,
         archivedAt,
+        repeatedNotifications: null,
+        memRelations: null,
       );
 
   factory SavedMemEntityV1.fromEntityV2(MemEntity entity) => SavedMemEntityV1(
@@ -94,6 +98,8 @@ class MemEntity implements Entity<int> {
   final DateTime? doneAt;
   final DateAndTimePeriod? period;
   final List<MemItemEntity>? items;
+  final List<MemNotificationEntity>? repeatedNotifications;
+  final List<MemRelationEntity>? memRelations;
 
   @override
   final int id;
@@ -112,8 +118,10 @@ class MemEntity implements Entity<int> {
     this.items,
     this.createdAt,
     this.updatedAt,
-    this.archivedAt,
-  );
+    this.archivedAt, {
+    this.repeatedNotifications,
+    this.memRelations,
+  });
 
   Mem toDomain() => Mem(
         id,
@@ -125,6 +133,8 @@ class MemEntity implements Entity<int> {
   MemEntity updatedWith({
     Mem Function(Mem mem)? update,
     List<MemItemEntity>? Function()? items,
+    List<MemNotificationEntity>? Function()? repeatedNotifications,
+    List<MemRelationEntity>? Function()? memRelations,
     DateTime? Function()? updatedAt,
     DateTime? Function()? archivedAt,
   }) {
@@ -138,6 +148,11 @@ class MemEntity implements Entity<int> {
       createdAt,
       updatedAt == null ? this.updatedAt : updatedAt(),
       archivedAt == null ? this.archivedAt : archivedAt(),
+      repeatedNotifications: repeatedNotifications == null
+          ? this.repeatedNotifications
+          : repeatedNotifications(),
+      memRelations:
+          memRelations == null ? this.memRelations : memRelations(),
     );
   }
 
@@ -149,6 +164,14 @@ class MemEntity implements Entity<int> {
     final memItems = memItemsRaw == null
         ? null
         : List<MemItemEntity>.from(memItemsRaw as List);
+    final notifRaw = children['mem_repeated_notifications'];
+    final repeatedNotifications = notifRaw == null
+        ? null
+        : List<MemNotificationEntity>.from(notifRaw as List);
+    final relRaw = children['mem_relations'];
+    final memRelations = relRaw == null
+        ? null
+        : List<MemRelationEntity>.from(relRaw as List);
 
     return MemEntity(
       tuple.id,
@@ -178,6 +201,8 @@ class MemEntity implements Entity<int> {
       tuple.createdAt,
       tuple.updatedAt,
       tuple.archivedAt,
+      repeatedNotifications: repeatedNotifications,
+      memRelations: memRelations,
     );
   }
 }

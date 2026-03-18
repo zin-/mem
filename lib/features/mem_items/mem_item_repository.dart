@@ -1,7 +1,7 @@
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/features/mem_items/mem_item.dart';
-import 'package:mem/framework/database/definition/table_definition.dart';
+import 'package:mem/framework/repository/load_child_spec.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/group_by.dart';
@@ -21,7 +21,7 @@ class MemItemRepository
     List<OrderBy>? orderBy,
     int? offset,
     int? limit,
-    List<TableDefinition>? loadChildren,
+    List<LoadChildSpec>? loadChildren,
   }) async =>
       await super.shipV2(
         condition: And(
