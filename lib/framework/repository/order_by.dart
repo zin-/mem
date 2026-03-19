@@ -21,3 +21,13 @@ class Descending extends OrderBy {
   @override
   String toQuery() => "${columnDefinition.name} DESC";
 }
+
+class DescendingCoalesce extends OrderBy {
+  final ColumnDefinition secondary;
+
+  DescendingCoalesce(super.columnDefinition, this.secondary);
+
+  @override
+  String toQuery() =>
+      'COALESCE(${columnDefinition.name}, ${secondary.name}) DESC';
+}

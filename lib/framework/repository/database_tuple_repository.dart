@@ -63,15 +63,20 @@ abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
         {'condition': condition, 'loadChildren': loadChildren},
       );
 
-  Future<ENTITY> shipById(int id) => v(
+  Future<ENTITY> shipById(
+    int id, {
+    List<LoadChildSpec>? loadChildren,
+  }) =>
+      v(
         () async {
           final row = await _driftAccessor.selectV2(
             _tableDefinition,
             condition: Equals(defPkId, id),
+            loadChildren: loadChildren,
           );
           return List<ENTITY>.from(row).first;
         },
-        {'id': id},
+        {'id': id, 'loadChildren': loadChildren},
       );
 
   Future<ENTITY> replaceV2(ENTITY entity) => v(

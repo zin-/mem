@@ -9,6 +9,7 @@ import 'package:mem/features/settings/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/acts/act_entity.dart';
+import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/widgets/infinite_scroll.dart';
 import 'package:mem/shared/entities_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -54,6 +55,9 @@ class ActEntities extends _$ActEntities
           final startedAct = await ActsClient().start(memId, now);
 
           upsert([startedAct]);
+          await ref
+              .read(memEntitiesProvider.notifier)
+              .refreshLatestActForMem(memId);
         },
         {
           'memId': memId,
@@ -67,6 +71,9 @@ class ActEntities extends _$ActEntities
           final updatedEntities = await ActsClient().pause(memId, now);
 
           upsert(updatedEntities);
+          await ref
+              .read(memEntitiesProvider.notifier)
+              .refreshLatestActForMem(memId);
         },
         {
           'memId': memId,
@@ -80,6 +87,9 @@ class ActEntities extends _$ActEntities
           if (closedActEntities.isNotEmpty) {
             remove(closedActEntities.map((e) => e.id));
           }
+          await ref
+              .read(memEntitiesProvider.notifier)
+              .refreshLatestActForMem(memId);
         },
         {'memId': memId},
       );
@@ -91,6 +101,9 @@ class ActEntities extends _$ActEntities
           final finishedAct = await ActsClient().finish(memId, now);
 
           upsert([finishedAct]);
+          await ref
+              .read(memEntitiesProvider.notifier)
+              .refreshLatestActForMem(memId);
         },
         {
           'memId': memId,
@@ -102,6 +115,9 @@ class ActEntities extends _$ActEntities
           final editedAct = await ActsClient().edit(act);
 
           upsert([editedAct]);
+          await ref
+              .read(memEntitiesProvider.notifier)
+              .refreshLatestActForMem(act.value.memId);
         },
         {
           'act': act,
@@ -110,9 +126,21 @@ class ActEntities extends _$ActEntities
 
   Future<Iterable<SavedActEntityV1>> removeAsync(Iterable<int> ids) => v(
         () async {
+          final memIds = ref
+              .read(actEntitiesProvider)
+              .where((e) => ids.contains(e.id))
+              .map((e) => e.value.memId)
+              .whereType<int>()
+              .toSet();
           await Future.wait(ids.map((id) => ActsClient().delete(id)));
 
-          return remove(ids);
+          final removed = remove(ids);
+          for (final memId in memIds) {
+            await ref
+                .read(memEntitiesProvider.notifier)
+                .refreshLatestActForMem(memId);
+          }
+          return removed;
         },
         {'ids': ids},
       );

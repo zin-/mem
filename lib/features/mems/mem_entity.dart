@@ -1,4 +1,6 @@
 import 'package:mem/databases/table_definitions/base.dart';
+import 'package:mem/features/acts/act.dart';
+import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
@@ -33,8 +35,12 @@ class MemEntityV1 with EntityV1<Mem> {
 
 class SavedMemEntityV1 extends MemEntityV1
     with DatabaseTupleEntityV1<int, Mem> {
-  SavedMemEntityV1(Map<String, dynamic> map)
-      : super(
+  final Act? latestAct;
+
+  SavedMemEntityV1(
+    Map<String, dynamic> map, {
+    this.latestAct,
+  }) : super(
           Mem(
             map[defPkId.name],
             map[defColMemsName.name],
@@ -59,7 +65,10 @@ class SavedMemEntityV1 extends MemEntityV1
 
   @override
   SavedMemEntityV1 updatedWith(Mem Function(Mem mem) update) =>
-      SavedMemEntityV1(toMap..addAll(MemEntityV1(update(value)).toMap));
+      SavedMemEntityV1(
+        toMap..addAll(MemEntityV1(update(value)).toMap),
+        latestAct: latestAct,
+      );
 
   MemEntity toEntityV2() => MemEntity(
         id,
@@ -70,6 +79,7 @@ class SavedMemEntityV1 extends MemEntityV1
         createdAt,
         updatedAt,
         archivedAt,
+        latestAct: latestAct,
         repeatedNotifications: null,
         memRelations: null,
       );
@@ -90,6 +100,7 @@ class SavedMemEntityV1 extends MemEntityV1
           defColUpdatedAt.name: entity.updatedAt,
           defColArchivedAt.name: entity.archivedAt,
         },
+        latestAct: entity.latestAct,
       );
 }
 
@@ -100,6 +111,7 @@ class MemEntity implements Entity<int> {
   final List<MemItemEntity>? items;
   final List<MemNotificationEntity>? repeatedNotifications;
   final List<MemRelationEntity>? memRelations;
+  final Act? latestAct;
 
   @override
   final int id;
@@ -121,6 +133,7 @@ class MemEntity implements Entity<int> {
     this.archivedAt, {
     this.repeatedNotifications,
     this.memRelations,
+    this.latestAct,
   });
 
   Mem toDomain() => Mem(
@@ -128,6 +141,7 @@ class MemEntity implements Entity<int> {
         name,
         doneAt,
         period,
+        latestAct: latestAct,
       );
 
   MemEntity updatedWith({
@@ -135,6 +149,7 @@ class MemEntity implements Entity<int> {
     List<MemItemEntity>? Function()? items,
     List<MemNotificationEntity>? Function()? repeatedNotifications,
     List<MemRelationEntity>? Function()? memRelations,
+    Act? Function()? latestAct,
     DateTime? Function()? updatedAt,
     DateTime? Function()? archivedAt,
   }) {
@@ -151,8 +166,8 @@ class MemEntity implements Entity<int> {
       repeatedNotifications: repeatedNotifications == null
           ? this.repeatedNotifications
           : repeatedNotifications(),
-      memRelations:
-          memRelations == null ? this.memRelations : memRelations(),
+      memRelations: memRelations == null ? this.memRelations : memRelations(),
+      latestAct: latestAct == null ? this.latestAct : latestAct(),
     );
   }
 
@@ -169,9 +184,14 @@ class MemEntity implements Entity<int> {
         ? null
         : List<MemNotificationEntity>.from(notifRaw as List);
     final relRaw = children['mem_relations'];
-    final memRelations = relRaw == null
-        ? null
-        : List<MemRelationEntity>.from(relRaw as List);
+    final memRelations =
+        relRaw == null ? null : List<MemRelationEntity>.from(relRaw as List);
+    final latestActRaw = children['latest_act'];
+    Act? latestAct;
+    final latestList = latestActRaw as List?;
+    if (latestList != null && latestList.isNotEmpty) {
+      latestAct = (latestList.first as ActEntity).toDomain();
+    }
 
     return MemEntity(
       tuple.id,
@@ -203,6 +223,7 @@ class MemEntity implements Entity<int> {
       tuple.archivedAt,
       repeatedNotifications: repeatedNotifications,
       memRelations: memRelations,
+      latestAct: latestAct,
     );
   }
 }

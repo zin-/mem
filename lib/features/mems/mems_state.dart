@@ -49,12 +49,27 @@ class MemEntities extends _$MemEntities
   Future<SavedMemEntityV1> loadByMemId(int memId) => v(
         () async {
           final mem = await MemRepository()
-              .shipById(memId)
+              .shipById(
+                memId,
+                loadChildren: MemRepository.loadLatestActChild,
+              )
               .then((v) => SavedMemEntityV1.fromEntityV2(v));
 
           upsert([mem]);
 
           return mem;
+        },
+        {'memId': memId},
+      );
+
+  Future<void> refreshLatestActForMem(int memId) => v(
+        () async {
+          final rows = await MemRepository().shipV2(
+            id: memId,
+            loadChildren: MemRepository.loadLatestActChild,
+          );
+          if (rows.isEmpty) return;
+          upsert([SavedMemEntityV1.fromEntityV2(rows.single)]);
         },
         {'memId': memId},
       );

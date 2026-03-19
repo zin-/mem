@@ -17,8 +17,11 @@ import 'package:mem/features/mem_relations/mem_relation.dart'
     as mem_relation_domain;
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/features/targets/target_entity.dart';
+import 'package:mem/databases/database.dart' as drift_schema;
+import 'package:mem/framework/database/definition/column/column_definition.dart';
 import 'package:mem/framework/database/definition/column/foreign_key_definition.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
+import 'package:mem/framework/repository/entity.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/load_child_spec.dart';
 import 'package:mem/framework/repository/order_by.dart';
@@ -151,7 +154,11 @@ class DriftDatabaseAccessor {
               final grouped =
                   await _loadChildRowsGrouped(spec, fk, parentIds);
               for (final e in grouped.entries) {
-                childrenByParentId[e.key]![spec.resultKey] = e.value;
+                childrenByParentId[e.key]![spec.resultKey] = e.value
+                    .map(
+                      (row) => _convertToEntity(row, spec.table.name),
+                    )
+                    .toList();
               }
             }
             return rows
@@ -296,7 +303,7 @@ class DriftDatabaseAccessor {
     for (var i = 0; i < list.length; i += _loadChildInChunkSize) {
       final end = math.min(i + _loadChildInChunkSize, list.length);
       final chunk = list.sublist(i, end);
-      final rows = await _selectChildChunk(childInfo, fk, chunk, spec.condition);
+      final rows = await _selectChildChunk(childInfo, fk, chunk, spec);
       for (final row in rows) {
         final pid = _parentIdFromChildRow(row, fk);
         out.putIfAbsent(pid, () => []).add(row);
@@ -305,13 +312,169 @@ class DriftDatabaseAccessor {
     return out;
   }
 
+  static String _actsSqlColumn(ColumnDefinition c) => switch (c.name) {
+        'createdAt' => 'created_at',
+        'updatedAt' => 'updated_at',
+        'archivedAt' => 'archived_at',
+        'id' => 'id',
+        'start' => 'start',
+        'start_is_all_day' => 'start_is_all_day',
+        'end' => 'end',
+        'end_is_all_day' => 'end_is_all_day',
+        'paused_at' => 'paused_at',
+        _ => c.name,
+      };
+
+  static String _actsPartitionOrderBySql(List<OrderBy>? orderBy) {
+    if (orderBy == null || orderBy.isEmpty) {
+      return 'id DESC';
+    }
+    final parts = <String>[];
+    for (final o in orderBy) {
+      if (o is DescendingCoalesce) {
+        parts.add(
+          'COALESCE(${_actsSqlColumn(o.columnDefinition)}, '
+          '${_actsSqlColumn(o.secondary)}) DESC',
+        );
+      } else if (o is Descending) {
+        parts.add('${_actsSqlColumn(o.columnDefinition)} DESC');
+      } else {
+        throw UnsupportedError(
+          'loadChildren acts: unsupported OrderBy ${o.runtimeType}',
+        );
+      }
+    }
+    return parts.join(', ');
+  }
+
+  static int _compareActsForPartition(
+    drift_schema.Act a,
+    drift_schema.Act b,
+    List<OrderBy>? orderBy,
+  ) {
+    if (orderBy == null || orderBy.isEmpty) {
+      return b.id.compareTo(a.id);
+    }
+    for (final o in orderBy) {
+      if (o is DescendingCoalesce) {
+        final va = a.start ?? a.createdAt;
+        final vb = b.start ?? b.createdAt;
+        final c = vb.compareTo(va);
+        if (c != 0) return c;
+      } else if (o is Descending) {
+        final name = o.columnDefinition.name;
+        if (name == 'id') {
+          final c = b.id.compareTo(a.id);
+          if (c != 0) return c;
+        } else {
+          throw UnsupportedError(
+            'loadChildren acts in-memory: column $name',
+          );
+        }
+      }
+    }
+    return b.id.compareTo(a.id);
+  }
+
+  Future<List<dynamic>> _selectActsPartitioned(
+    List<int> parentIdsChunk,
+    LoadChildSpec spec,
+  ) async {
+    if (parentIdsChunk.isEmpty) return [];
+    final offset = spec.offset ?? 0;
+    final orderSql = _actsPartitionOrderBySql(spec.orderBy);
+    if (spec.condition != null) {
+      var q = driftDatabase.select(driftDatabase.acts);
+      q.where((t) => t.memId.isIn(parentIdsChunk));
+      final exp = spec.condition!.toDriftExpression(driftDatabase.acts);
+      if (exp != null) q.where((t) => exp);
+      final all = await q.get();
+      final byMem = <int, List<drift_schema.Act>>{};
+      for (final row in all) {
+        byMem.putIfAbsent(row.memId, () => []).add(row);
+      }
+      final out = <drift_schema.Act>[];
+      for (final entry in byMem.entries) {
+        final sorted = [...entry.value]
+          ..sort(
+            (x, y) => _compareActsForPartition(x, y, spec.orderBy),
+          );
+        final lim = spec.limit;
+        final slice = sorted.skip(offset);
+        out.addAll(
+          lim == null ? slice : slice.take(lim),
+        );
+      }
+      return out;
+    }
+
+    final placeholders = List.filled(parentIdsChunk.length, '?').join(',');
+    final vars = <drift.Variable<Object>>[
+      ...parentIdsChunk.map((id) => drift.Variable<int>(id)),
+    ];
+    final low = offset;
+    final high = spec.limit == null ? null : offset + spec.limit!;
+    final rnPredicate = high == null
+        ? 'r._rn > $low'
+        : 'r._rn > $low AND r._rn <= $high';
+
+    final sql = '''
+WITH ranked AS (
+  SELECT
+    created_at AS created_at,
+    updated_at AS updated_at,
+    archived_at AS archived_at,
+    id AS id,
+    start AS start,
+    start_is_all_day AS start_is_all_day,
+    end AS end,
+    end_is_all_day AS end_is_all_day,
+    paused_at AS paused_at,
+    mem_id AS mem_id,
+    ROW_NUMBER() OVER (PARTITION BY mem_id ORDER BY $orderSql) AS _rn
+  FROM acts
+  WHERE mem_id IN ($placeholders)
+)
+SELECT
+  created_at, updated_at, archived_at, id, start, start_is_all_day,
+  end, end_is_all_day, paused_at, mem_id
+FROM ranked r
+WHERE $rnPredicate
+''';
+
+    final rawRows = await driftDatabase.customSelect(
+      sql,
+      variables: vars,
+    ).get();
+
+    final ids = rawRows.map((row) => row.read<int>('id')).toList();
+    if (ids.isEmpty) return [];
+    final byId = {
+      for (final a in await (driftDatabase.select(driftDatabase.acts)
+            ..where((t) => t.id.isIn(ids)))
+          .get())
+        a.id: a,
+    };
+    return ids.map((id) => byId[id]!).toList();
+  }
+
   Future<List<dynamic>> _selectChildChunk(
     drift.TableInfo childInfo,
     ForeignKeyDefinition fk,
     List<int> parentIdsChunk,
-    Condition? condition,
+    LoadChildSpec spec,
   ) async {
     final name = childInfo.actualTableName;
+    if (name == 'acts' && spec.usesPerParentOrdering) {
+      return _selectActsPartitioned(parentIdsChunk, spec);
+    }
+    if (spec.usesPerParentOrdering) {
+      throw StateError(
+        'loadChildren orderBy/limit/offset only implemented for acts; '
+        'table: $name',
+      );
+    }
+    final condition = spec.condition;
     switch (name) {
       case 'mem_items':
         var q = driftDatabase.select(driftDatabase.memItems);
@@ -394,11 +557,19 @@ class DriftDatabaseAccessor {
       if (value is List) {
         return MapEntry(
           key,
-          value.map((e) => _convertToEntity(e, key)).toList(),
+          value
+              .map(
+                (e) => e is Entity<int>
+                    ? e
+                    : _convertToEntity(e, key),
+              )
+              .toList(),
         );
-      } else {
-        return MapEntry(key, _convertToEntity(value, key));
       }
+      return MapEntry(
+        key,
+        value is Entity<int> ? value : _convertToEntity(value, key),
+      );
     });
 
     switch (tableName) {
