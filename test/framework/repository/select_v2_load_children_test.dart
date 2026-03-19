@@ -1,4 +1,4 @@
-import 'package:drift/drift.dart';
+import 'package:drift/drift.dart' hide isNull;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/databases/database.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
@@ -213,7 +213,7 @@ void main() {
       final mem2 = rows.cast<MemEntity>().singleWhere((e) => e.id == m2.id);
       expect(mem1.latestAct?.memId, m1.id);
       expect(mem1.latestAct?.period?.start?.day, now.day);
-      expect(mem2.latestAct?.memId, m2.id);
+      expect(mem2.latestAct, isNull);
       expect(actOlder.id, lessThan(actNewer.id));
     });
 
