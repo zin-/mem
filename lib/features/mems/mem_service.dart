@@ -200,12 +200,15 @@ class MemService {
   ) =>
       i(
         () async {
-          final memEntity = await _memRepository.shipById(memId);
+          final memEntity = await _memRepository.shipById(
+            memId,
+            loadChildren: MemRepository.loadLatestActChild,
+          );
 
           final doneMem =
               memEntity.updatedWith(update: (mem) => mem.done(DateTime.now()));
 
-          return await save(
+          await save(
             (
               SavedMemEntityV1.fromEntityV2(doneMem),
               [],
@@ -213,7 +216,12 @@ class MemService {
               null,
               null,
             ),
-          ).then((v) => SavedMemEntityV1.fromEntityV2(v.$5));
+          );
+          final reloaded = await _memRepository.shipById(
+            memId,
+            loadChildren: MemRepository.loadLatestActChild,
+          );
+          return SavedMemEntityV1.fromEntityV2(reloaded);
         },
         {
           'memId': memId,
@@ -225,11 +233,14 @@ class MemService {
   ) =>
       i(
         () async {
-          final memEntity = await _memRepository.shipById(memId);
+          final memEntity = await _memRepository.shipById(
+            memId,
+            loadChildren: MemRepository.loadLatestActChild,
+          );
           final undoneMem =
               memEntity.updatedWith(update: (mem) => mem.undone());
 
-          return await save(
+          await save(
             (
               SavedMemEntityV1.fromEntityV2(undoneMem),
               [],
@@ -237,7 +248,12 @@ class MemService {
               null,
               null,
             ),
-          ).then((v) => SavedMemEntityV1.fromEntityV2(v.$5));
+          );
+          final reloaded = await _memRepository.shipById(
+            memId,
+            loadChildren: MemRepository.loadLatestActChild,
+          );
+          return SavedMemEntityV1.fromEntityV2(reloaded);
         },
         {
           'memId': memId,
@@ -253,7 +269,10 @@ class MemService {
           await _memRelationRepository.archiveByV2(
               relatedMemId: archivedMem.id);
 
-          return archivedMem;
+          return await _memRepository.shipById(
+            archivedMem.id,
+            loadChildren: MemRepository.loadLatestActChild,
+          );
         },
         {
           'mem': mem,
@@ -278,7 +297,10 @@ class MemService {
             ]),
           );
 
-          return unarchivedMem;
+          return await _memRepository.shipById(
+            unarchivedMem.id,
+            loadChildren: MemRepository.loadLatestActChild,
+          );
         },
         {
           'mem': mem,

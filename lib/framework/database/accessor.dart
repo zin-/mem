@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:drift/drift.dart' as drift;
 import 'package:mem/databases/database.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
@@ -11,52 +13,22 @@ import 'package:mem/features/mems/mem_entity.dart' as mem_entity;
 import 'package:mem/features/mem_items/mem_item.dart' as mem_item_domain;
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_entity.dart';
-import 'package:mem/features/mem_relations/mem_relation.dart' as mem_relation_domain;
+import 'package:mem/features/mem_relations/mem_relation.dart'
+    as mem_relation_domain;
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/features/targets/target_entity.dart';
+import 'package:mem/databases/database.dart' as drift_schema;
+import 'package:mem/framework/database/definition/column/column_definition.dart';
+import 'package:mem/framework/database/definition/column/foreign_key_definition.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
+import 'package:mem/framework/repository/entity.dart';
 import 'package:mem/framework/repository/group_by.dart';
+import 'package:mem/framework/repository/load_child_spec.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/framework/singleton.dart';
 import 'package:mem/features/targets/target.dart' as target_domain;
 
 import 'definition/table_definition.dart';
-
-Object? _valueFromMap(Map<String, Object?> m, List<String> keys) {
-  for (final k in keys) {
-    final v = m[k];
-    if (v != null) return v;
-  }
-  return null;
-}
-
-const _driftToTableDefKey = {
-  'memId': 'mems_id',
-  'sourceMemId': 'source_mems_id',
-  'targetMemId': 'target_mems_id',
-  'startIsAllDay': 'start_is_all_day',
-  'endIsAllDay': 'end_is_all_day',
-  'timeOfDaySeconds': 'time_of_day_seconds',
-  'pausedAt': 'paused_at',
-};
-
-Map<String, Object?> _driftRowToEntityMap(dynamic row, String tableName) {
-  final json = (row as dynamic).toJson(
-    serializer: drift.ValueSerializer.defaults(
-      serializeDateTimeValuesAsString: true,
-    ),
-  ) as Map<String, dynamic>;
-  return Map.fromEntries(json.entries.map((e) {
-    final key = _driftToTableDefKey[e.key] ?? e.key;
-    Object? value = e.value;
-    if (value is String) {
-      try {
-        value = DateTime.parse(value);
-      } catch (_) {}
-    }
-    return MapEntry(key, value);
-  }));
-}
 
 const _tableDefToDriftKey = {
   'mems_id': 'memId',
@@ -64,10 +36,15 @@ const _tableDefToDriftKey = {
   'target_mems_id': 'targetMemId',
 };
 
+const _loadChildInChunkSize = 900;
+
 class DriftDatabaseAccessor {
   final AppDatabase driftDatabase;
 
   DriftDatabaseAccessor._(this.driftDatabase);
+
+  factory DriftDatabaseAccessor.withDatabase(AppDatabase database) =>
+      DriftDatabaseAccessor._(database);
 
   Future<int> count(
     TableDefinition tableDefinition, {
@@ -77,12 +54,14 @@ class DriftDatabaseAccessor {
         () async {
           try {
             final tableInfo = _getTableInfo(tableDefinition);
-            var query = driftDatabase.select(tableInfo);
+            final countExpr = drift.countAll();
+            final query = driftDatabase.selectOnly(tableInfo)..addColumns([countExpr]);
             if (condition != null) {
               final exp = condition.toDriftExpression(tableInfo);
-              if (exp != null) query = query..where((_) => exp);
+              if (exp != null) query.where(exp);
             }
-            return (await query.get()).length;
+            final row = await query.getSingle();
+            return row.read(countExpr) ?? 0;
           } catch (_) {
             return 0;
           }
@@ -90,22 +69,18 @@ class DriftDatabaseAccessor {
         {'tableDefinition': tableDefinition, 'condition': condition},
       );
 
-  Future<List<dynamic>> select(
+  Future<List<dynamic>> selectV2(
     TableDefinition tableDefinition, {
     Condition? condition,
     GroupBy? groupBy,
     List<OrderBy>? orderBy,
     int? offset,
     int? limit,
+    List<LoadChildSpec>? loadChildren,
   }) =>
       v(
         () async {
-          final drift.TableInfo tableInfo;
-          try {
-            tableInfo = _getTableInfo(tableDefinition);
-          } catch (e) {
-            return <Map<String, dynamic>>[];
-          }
+          final tableInfo = _getTableInfoV2(tableDefinition);
           final query = driftDatabase.select(tableInfo);
 
           if (condition != null) {
@@ -126,10 +101,8 @@ class DriftDatabaseAccessor {
           if (effectiveOrderBy.isNotEmpty) {
             query.orderBy(
               effectiveOrderBy
-                  .map((orderByItem) => _toOrderClauseGenerator(
-                        tableInfo,
-                        orderByItem,
-                      ))
+                  .map((orderByItem) =>
+                      _toOrderClauseGenerator(tableInfo, orderByItem))
                   .whereType<drift.OrderClauseGenerator>()
                   .toList(),
             );
@@ -156,55 +129,62 @@ class DriftDatabaseAccessor {
             rows = rows.skip(offset ?? 0).take(limit ?? 999999999).toList();
           }
 
+          if (loadChildren?.isNotEmpty == true && !hasGroupByWithExtra) {
+            final specs = loadChildren!;
+            final usedKeys = <String>{};
+            for (final s in specs) {
+              if (!usedKeys.add(s.resultKey)) {
+                throw ArgumentError(
+                  'Duplicate loadChildren.resultKey: ${s.resultKey}',
+                );
+              }
+            }
+            final parentIds =
+                rows.map((r) => (r as dynamic).id as int).toSet();
+            final childrenByParentId = <int, Map<String, List<dynamic>>>{};
+            for (final id in parentIds) {
+              childrenByParentId[id] = {};
+            }
+            for (final spec in specs) {
+              final fk = LoadChildSpec.resolveFkToParent(
+                spec.table,
+                tableDefinition,
+                spec.fkToParent,
+              );
+              final grouped =
+                  await _loadChildRowsGrouped(spec, fk, parentIds);
+              for (final e in grouped.entries) {
+                childrenByParentId[e.key]![spec.resultKey] = e.value
+                    .map(
+                      (row) => _convertToEntity(row, spec.table.name),
+                    )
+                    .toList();
+              }
+            }
+            return rows
+                .map(
+                  (row) => _convertToEntity(
+                    row,
+                    tableInfo.actualTableName,
+                    children:
+                        childrenByParentId[(row as dynamic).id as int] ?? {},
+                  ),
+                )
+                .toList();
+          }
+
           return rows
-              .map((r) => _driftRowToEntityMap(r, tableDefinition.name))
+              .map((row) => _convertToEntity(row, tableInfo.actualTableName))
               .toList();
         },
         {
           'tableDefinition': tableDefinition,
           'condition': condition,
           'groupBy': groupBy,
+          'loadChildren': loadChildren,
           'orderBy': orderBy,
           'offset': offset,
           'limit': limit,
-        },
-      );
-  Future<List<dynamic>> selectV2(
-    TableDefinition tableDefinition, {
-    Condition? condition,
-  }) =>
-      v(
-        () async {
-          final tableInfo = _getTableInfoV2(tableDefinition);
-          final query = driftDatabase.select(tableInfo);
-          if (condition != null) {
-            final driftExpression = condition.toDriftExpression(tableInfo);
-            if (driftExpression != null) {
-              query.where((tbl) => driftExpression);
-            }
-          }
-          return await query.get();
-        },
-        {'tableDefinition': tableDefinition, 'condition': condition},
-      );
-
-  insert(
-    TableDefinition tableDefinition,
-    Map<String, Object?> values,
-  ) =>
-      v(
-        () async {
-          final drift.TableInfo tableInfo;
-          try {
-            tableInfo = _getTableInfo(tableDefinition);
-          } catch (e) {
-            return 0;
-          }
-          final insertable = _createCompanionForTable(
-            tableDefinition.name,
-            values,
-          );
-          return await driftDatabase.into(tableInfo).insert(insertable);
         },
       );
 
@@ -217,72 +197,24 @@ class DriftDatabaseAccessor {
           final tableInfo = _getTableInfoV2(domain);
           final insertable = convertIntoDriftInsertable(domain);
 
-          return await driftDatabase
-              .into(tableInfo)
-              .insertReturning(insertable);
+          final inserted =
+              await driftDatabase.into(tableInfo).insertReturning(insertable);
+          return _convertToEntity(inserted, tableInfo.actualTableName);
         },
         {'domain': domain},
       );
 
-  update(
-    TableDefinition tableDefinition,
-    Map<String, Object?> values,
-  ) =>
-      v(
-        () async {
-          final drift.TableInfo tableInfo;
-          try {
-            tableInfo = _getTableInfo(tableDefinition);
-          } catch (e) {
-            return 0;
-          }
-
-          final query = driftDatabase.update(tableInfo)
-            ..where((t) => (t as dynamic).id.equals(values['id']));
-
-          return await query.write(_createCompanionForTable(
-            tableDefinition.name,
-            values,
-          ));
-        },
-      );
-
   Future updateV2(dynamic entity) => v(
         () async {
-          final query = driftDatabase.update(_getTableInfoV2(entity))
+          final tableInfo = _getTableInfoV2(entity);
+          final query = driftDatabase.update(tableInfo)
             ..where((t) => (t as dynamic).id.equals(entity.id));
 
           final updateable = convertIntoDriftUpdateable(entity);
-
-          return (await query.writeReturning(updateable)).first;
+          final updated = (await query.writeReturning(updateable)).first;
+          return _convertToEntity(updated, tableInfo.actualTableName);
         },
         {'entity': entity},
-      );
-
-  delete(
-    TableDefinition tableDefinition,
-    Condition? condition,
-  ) =>
-      v(
-        () async {
-          final drift.TableInfo tableInfo;
-          try {
-            tableInfo = _getTableInfo(tableDefinition);
-          } catch (e) {
-            return 0;
-          }
-
-          final query = driftDatabase.delete(tableInfo);
-
-          if (condition != null) {
-            final driftExpression = condition.toDriftExpression(tableInfo);
-            if (driftExpression != null) {
-              query.where((tbl) => driftExpression);
-            }
-          }
-
-          return await query.go();
-        },
       );
 
   Future<List<dynamic>> deleteV2(dynamic domain, {Condition? condition}) => v(
@@ -302,7 +234,11 @@ class DriftDatabaseAccessor {
             }
           }
 
-          return await query.goAndReturn();
+          final deleted = await query.goAndReturn();
+          final tableName = tableInfo.actualTableName;
+          return deleted
+              .map((row) => _convertToEntity(row, tableName))
+              .toList();
         },
         {
           'domain': domain,
@@ -352,6 +288,306 @@ class DriftDatabaseAccessor {
 
       default:
         throw StateError('Unknown domain: ${domain.runtimeType}');
+    }
+  }
+
+  Future<Map<int, List<dynamic>>> _loadChildRowsGrouped(
+    LoadChildSpec spec,
+    ForeignKeyDefinition fk,
+    Set<int> parentIds,
+  ) async {
+    final childInfo = _getTableInfoV2(spec.table);
+    final out = <int, List<dynamic>>{};
+    if (parentIds.isEmpty) return out;
+    final list = parentIds.toList();
+    for (var i = 0; i < list.length; i += _loadChildInChunkSize) {
+      final end = math.min(i + _loadChildInChunkSize, list.length);
+      final chunk = list.sublist(i, end);
+      final rows = await _selectChildChunk(childInfo, fk, chunk, spec);
+      for (final row in rows) {
+        final pid = _parentIdFromChildRow(row, fk);
+        out.putIfAbsent(pid, () => []).add(row);
+      }
+    }
+    return out;
+  }
+
+  static String _actsSqlColumn(ColumnDefinition c) => switch (c.name) {
+        'createdAt' => 'created_at',
+        'updatedAt' => 'updated_at',
+        'archivedAt' => 'archived_at',
+        'id' => 'id',
+        'start' => 'start',
+        'start_is_all_day' => 'start_is_all_day',
+        'end' => 'end',
+        'end_is_all_day' => 'end_is_all_day',
+        'paused_at' => 'paused_at',
+        _ => c.name,
+      };
+
+  static String _actsPartitionOrderBySql(List<OrderBy>? orderBy) {
+    if (orderBy == null || orderBy.isEmpty) {
+      return 'id DESC';
+    }
+    final parts = <String>[];
+    for (final o in orderBy) {
+      if (o is DescendingCoalesce) {
+        parts.add(
+          'COALESCE(${_actsSqlColumn(o.columnDefinition)}, '
+          '${_actsSqlColumn(o.secondary)}) DESC',
+        );
+      } else if (o is Descending) {
+        parts.add('${_actsSqlColumn(o.columnDefinition)} DESC');
+      } else {
+        throw UnsupportedError(
+          'loadChildren acts: unsupported OrderBy ${o.runtimeType}',
+        );
+      }
+    }
+    return parts.join(', ');
+  }
+
+  static int _compareActsForPartition(
+    drift_schema.Act a,
+    drift_schema.Act b,
+    List<OrderBy>? orderBy,
+  ) {
+    if (orderBy == null || orderBy.isEmpty) {
+      return b.id.compareTo(a.id);
+    }
+    for (final o in orderBy) {
+      if (o is DescendingCoalesce) {
+        final va = a.start ?? a.createdAt;
+        final vb = b.start ?? b.createdAt;
+        final c = vb.compareTo(va);
+        if (c != 0) return c;
+      } else if (o is Descending) {
+        final name = o.columnDefinition.name;
+        if (name == 'id') {
+          final c = b.id.compareTo(a.id);
+          if (c != 0) return c;
+        } else {
+          throw UnsupportedError(
+            'loadChildren acts in-memory: column $name',
+          );
+        }
+      }
+    }
+    return b.id.compareTo(a.id);
+  }
+
+  Future<List<dynamic>> _selectActsPartitioned(
+    List<int> parentIdsChunk,
+    LoadChildSpec spec,
+  ) async {
+    if (parentIdsChunk.isEmpty) return [];
+    final offset = spec.offset ?? 0;
+    final orderSql = _actsPartitionOrderBySql(spec.orderBy);
+    if (spec.condition != null) {
+      var q = driftDatabase.select(driftDatabase.acts);
+      q.where((t) => t.memId.isIn(parentIdsChunk));
+      final exp = spec.condition!.toDriftExpression(driftDatabase.acts);
+      if (exp != null) q.where((t) => exp);
+      final all = await q.get();
+      final byMem = <int, List<drift_schema.Act>>{};
+      for (final row in all) {
+        byMem.putIfAbsent(row.memId, () => []).add(row);
+      }
+      final out = <drift_schema.Act>[];
+      for (final entry in byMem.entries) {
+        final sorted = [...entry.value]
+          ..sort(
+            (x, y) => _compareActsForPartition(x, y, spec.orderBy),
+          );
+        final lim = spec.limit;
+        final slice = sorted.skip(offset);
+        out.addAll(
+          lim == null ? slice : slice.take(lim),
+        );
+      }
+      return out;
+    }
+
+    final placeholders = List.filled(parentIdsChunk.length, '?').join(',');
+    final vars = <drift.Variable<Object>>[
+      ...parentIdsChunk.map((id) => drift.Variable<int>(id)),
+    ];
+    final low = offset;
+    final high = spec.limit == null ? null : offset + spec.limit!;
+    final rnPredicate = high == null
+        ? 'r._rn > $low'
+        : 'r._rn > $low AND r._rn <= $high';
+
+    final sql = '''
+WITH ranked AS (
+  SELECT
+    created_at AS created_at,
+    updated_at AS updated_at,
+    archived_at AS archived_at,
+    id AS id,
+    start AS start,
+    start_is_all_day AS start_is_all_day,
+    end AS end,
+    end_is_all_day AS end_is_all_day,
+    paused_at AS paused_at,
+    mem_id AS mem_id,
+    ROW_NUMBER() OVER (PARTITION BY mem_id ORDER BY $orderSql) AS _rn
+  FROM acts
+  WHERE mem_id IN ($placeholders)
+)
+SELECT
+  created_at, updated_at, archived_at, id, start, start_is_all_day,
+  end, end_is_all_day, paused_at, mem_id
+FROM ranked r
+WHERE $rnPredicate
+''';
+
+    final rawRows = await driftDatabase.customSelect(
+      sql,
+      variables: vars,
+    ).get();
+
+    final ids = rawRows.map((row) => row.read<int>('id')).toList();
+    if (ids.isEmpty) return [];
+    final byId = {
+      for (final a in await (driftDatabase.select(driftDatabase.acts)
+            ..where((t) => t.id.isIn(ids)))
+          .get())
+        a.id: a,
+    };
+    return ids.map((id) => byId[id]!).toList();
+  }
+
+  Future<List<dynamic>> _selectChildChunk(
+    drift.TableInfo childInfo,
+    ForeignKeyDefinition fk,
+    List<int> parentIdsChunk,
+    LoadChildSpec spec,
+  ) async {
+    final name = childInfo.actualTableName;
+    if (name == 'acts' && spec.usesPerParentOrdering) {
+      return _selectActsPartitioned(parentIdsChunk, spec);
+    }
+    if (spec.usesPerParentOrdering) {
+      throw StateError(
+        'loadChildren orderBy/limit/offset only implemented for acts; '
+        'table: $name',
+      );
+    }
+    final condition = spec.condition;
+    switch (name) {
+      case 'mem_items':
+        var q = driftDatabase.select(driftDatabase.memItems);
+        q.where((t) => t.memId.isIn(parentIdsChunk));
+        if (condition != null) {
+          final exp = condition.toDriftExpression(childInfo);
+          if (exp != null) q.where((t) => exp);
+        }
+        return await q.get();
+      case 'mem_repeated_notifications':
+        var q = driftDatabase.select(driftDatabase.memRepeatedNotifications);
+        q.where((t) => t.memId.isIn(parentIdsChunk));
+        if (condition != null) {
+          final exp = condition.toDriftExpression(childInfo);
+          if (exp != null) q.where((t) => exp);
+        }
+        return await q.get();
+      case 'acts':
+        var q = driftDatabase.select(driftDatabase.acts);
+        q.where((t) => t.memId.isIn(parentIdsChunk));
+        if (condition != null) {
+          final exp = condition.toDriftExpression(childInfo);
+          if (exp != null) q.where((t) => exp);
+        }
+        return await q.get();
+      case 'targets':
+        var q = driftDatabase.select(driftDatabase.targets);
+        q.where((t) => t.memId.isIn(parentIdsChunk));
+        if (condition != null) {
+          final exp = condition.toDriftExpression(childInfo);
+          if (exp != null) q.where((t) => exp);
+        }
+        return await q.get();
+      case 'mem_relations':
+        if (fk.name == 'source_mems_id') {
+          var q = driftDatabase.select(driftDatabase.memRelations);
+          q.where((t) => t.sourceMemId.isIn(parentIdsChunk));
+          if (condition != null) {
+            final exp = condition.toDriftExpression(childInfo);
+            if (exp != null) q.where((t) => exp);
+          }
+          return await q.get();
+        }
+        if (fk.name == 'target_mems_id') {
+          var q = driftDatabase.select(driftDatabase.memRelations);
+          q.where((t) => t.targetMemId.isIn(parentIdsChunk));
+          if (condition != null) {
+            final exp = condition.toDriftExpression(childInfo);
+            if (exp != null) q.where((t) => exp);
+          }
+          return await q.get();
+        }
+        throw StateError(
+          'mem_relations loadChildren requires fkToParent source_mems_id or target_mems_id',
+        );
+      default:
+        throw StateError('loadChildren not supported for table: $name');
+    }
+  }
+
+  int _parentIdFromChildRow(dynamic row, ForeignKeyDefinition fk) {
+    switch (fk.name) {
+      case 'mems_id':
+        return row.memId as int;
+      case 'source_mems_id':
+        return row.sourceMemId as int;
+      case 'target_mems_id':
+        return row.targetMemId as int;
+      default:
+        throw StateError('Unsupported FK ${fk.name} for loadChildren');
+    }
+  }
+
+  _convertToEntity(
+    dynamic row,
+    String tableName, {
+    Map<String, dynamic> children = const {},
+  }) {
+    final childEntites = children.map((key, value) {
+      if (value is List) {
+        return MapEntry(
+          key,
+          value
+              .map(
+                (e) => e is Entity<int>
+                    ? e
+                    : _convertToEntity(e, key),
+              )
+              .toList(),
+        );
+      }
+      return MapEntry(
+        key,
+        value is Entity<int> ? value : _convertToEntity(value, key),
+      );
+    });
+
+    switch (tableName) {
+      case 'mems':
+        return MemEntity.fromTuple(row, children: childEntites);
+      case 'mem_items':
+        return MemItemEntity.fromTuple(row);
+      case 'mem_repeated_notifications':
+        return MemNotificationEntity.fromTuple(row);
+      case 'acts':
+        return ActEntity.fromTuple(row);
+      case 'targets':
+        return TargetEntity.fromTuple(row);
+      case 'mem_relations':
+        return MemRelationEntity.fromTuple(row);
+
+      default:
+        throw StateError('Unknown table: $tableName');
     }
   }
 
@@ -408,85 +644,6 @@ class DriftDatabaseAccessor {
       return column;
     } catch (e) {
       return null;
-    }
-  }
-
-  dynamic _createCompanionForTable(
-    String tableName,
-    Map<String, Object?> values,
-  ) {
-    T? val<T>(List<String> keys) => _valueFromMap(values, keys) as T?;
-
-    switch (tableName) {
-      case 'mems':
-        return MemsCompanion.insert(
-          name: values['name'] as String,
-          doneAt: drift.Value(values['doneAt'] as DateTime?),
-          notifyOn: drift.Value(values['notifyOn'] as DateTime?),
-          notifyAt: drift.Value(values['notifyAt'] as DateTime?),
-          endOn: drift.Value(values['endOn'] as DateTime?),
-          endAt: drift.Value(values['endAt'] as DateTime?),
-          createdAt: values['createdAt'] as DateTime,
-          updatedAt: drift.Value(values['updatedAt'] as DateTime?),
-          archivedAt: drift.Value(values['archivedAt'] as DateTime?),
-        );
-      case 'mem_items':
-        return MemItemsCompanion.insert(
-          type: values['type'] as String,
-          value: values['value'] as String,
-          memId: (val<int>(['mems_id', 'memId']) ?? 0),
-          createdAt: values['createdAt'] as DateTime,
-          updatedAt: drift.Value(values['updatedAt'] as DateTime?),
-          archivedAt: drift.Value(values['archivedAt'] as DateTime?),
-        );
-      case 'acts':
-        return ActsCompanion.insert(
-          start: drift.Value(values['start'] as DateTime?),
-          startIsAllDay:
-              drift.Value(val<bool>(['start_is_all_day', 'startIsAllDay'])),
-          end: drift.Value(values['end'] as DateTime?),
-          endIsAllDay:
-              drift.Value(val<bool>(['end_is_all_day', 'endIsAllDay'])),
-          pausedAt: drift.Value(val<DateTime>(['paused_at', 'pausedAt'])),
-          memId: (val<int>(['mems_id', 'memId']) ?? 0),
-          createdAt: values['createdAt'] as DateTime,
-          updatedAt: drift.Value(values['updatedAt'] as DateTime?),
-          archivedAt: drift.Value(values['archivedAt'] as DateTime?),
-        );
-      case 'mem_repeated_notifications':
-        return MemRepeatedNotificationsCompanion.insert(
-          timeOfDaySeconds:
-              (val<int>(['time_of_day_seconds', 'timeOfDaySeconds']) ?? 0),
-          type: values['type'] as String,
-          message: values['message'] as String,
-          memId: (val<int>(['mems_id', 'memId']) ?? 0),
-          createdAt: values['createdAt'] as DateTime,
-          updatedAt: drift.Value(values['updatedAt'] as DateTime?),
-          archivedAt: drift.Value(values['archivedAt'] as DateTime?),
-        );
-      case 'targets':
-        return TargetsCompanion.insert(
-          type: values['type'] as String,
-          unit: values['unit'] as String,
-          value: (values['value'] as int?) ?? 0,
-          period: values['period'] as String,
-          memId: (val<int>(['mems_id', 'memId']) ?? 0),
-          createdAt: values['createdAt'] as DateTime,
-          updatedAt: drift.Value(values['updatedAt'] as DateTime?),
-          archivedAt: drift.Value(values['archivedAt'] as DateTime?),
-        );
-      case 'mem_relations':
-        return MemRelationsCompanion.insert(
-          sourceMemId: (val<int>(['source_mems_id', 'sourceMemId']) ?? 0),
-          targetMemId: (val<int>(['target_mems_id', 'targetMemId']) ?? 0),
-          type: values['type'] as String,
-          value: drift.Value(values['value'] as int?),
-          createdAt: values['createdAt'] as DateTime,
-          updatedAt: drift.Value(values['updatedAt'] as DateTime?),
-          archivedAt: drift.Value(values['archivedAt'] as DateTime?),
-        );
-      default:
-        throw StateError('Unknown table: $tableName');
     }
   }
 

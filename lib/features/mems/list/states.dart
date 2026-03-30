@@ -2,7 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:mem/features/acts/act.dart';
-import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
@@ -92,9 +91,6 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
 final memListProvider = StateNotifierProvider.autoDispose<
     ValueStateNotifier<List<MemEntity>>, List<MemEntity>>((ref) {
   final filtered = ref.watch(_filteredMemsProvider);
-  final latestActsByMem = ref.watch(latestActsByMemProvider.select(
-    (value) => value?.values.whereType<Act>().toList() ?? [],
-  ));
   final savedMemNotifications = ref.watch(savedMemNotificationsProvider);
 
   final startOfToday = DateTimeExt.startOfToday(
@@ -104,10 +100,8 @@ final memListProvider = StateNotifierProvider.autoDispose<
   return ValueStateNotifier(
     v(
       () => filtered.sorted((a, b) {
-        final latestActOfA =
-            latestActsByMem.singleWhereOrNull((act) => act.memId == a.id);
-        final latestActOfB =
-            latestActsByMem.singleWhereOrNull((act) => act.memId == b.id);
+        final latestActOfA = a.latestAct;
+        final latestActOfB = b.latestAct;
 
         final comparedActState = (latestActOfA?.state ?? ActState.finished)
             .index
@@ -167,7 +161,6 @@ final memListProvider = StateNotifierProvider.autoDispose<
       }).toList(),
       {
         'filtered': filtered,
-        'latestActsByMem': latestActsByMem,
         'savedMemNotifications': savedMemNotifications,
       },
     ),

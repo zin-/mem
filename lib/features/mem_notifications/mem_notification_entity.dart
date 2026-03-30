@@ -101,6 +101,17 @@ class MemNotificationEntity implements Entity<int> {
     this.archivedAt,
   );
 
+  factory MemNotificationEntity.fromTuple(dynamic tuple) => MemNotificationEntity(
+        tuple.memId,
+        MemNotificationType.fromName(tuple.type),
+        tuple.timeOfDaySeconds,
+        tuple.message,
+        tuple.id,
+        tuple.createdAt,
+        tuple.updatedAt,
+        tuple.archivedAt,
+      );
+
   toDomain() => MemNotification(
         memId,
         type,

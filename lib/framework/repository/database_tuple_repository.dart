@@ -4,12 +4,13 @@ import 'package:mem/framework/database/definition/database_definition.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/entity.dart';
+import 'package:mem/framework/repository/load_child_spec.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/features/logger/log_service.dart';
 
 abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
     extends Repository {
-  static final _driftAccessor = DriftDatabaseAccessor();
+  static DriftDatabaseAccessor get _driftAccessor => DriftDatabaseAccessor();
   static final Map<TableDefinition, Repository> _repositories = {};
 
   // ignore: unused_field
@@ -38,51 +39,50 @@ abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
         {'condition': condition},
       );
 
-  ENTITY packV2(
-          // FIXME 自動生成されるDataClassを使うべきかも
-          dynamic tuple) =>
-      throw UnimplementedError();
-  convert(DOMAIN domain) => throw UnimplementedError();
-
   Future<ENTITY> receiveV2(DOMAIN domain) => v(
         () async {
           final inserted = await _driftAccessor.insertV2(domain);
-
-          return packV2(inserted);
+          return List<ENTITY>.from([inserted]).single;
         },
         {'domain': domain},
       );
 
   Future<List<ENTITY>> shipV2({
     Condition? condition,
+    List<LoadChildSpec>? loadChildren,
   }) =>
       v(
         () async {
           final rows = await _driftAccessor.selectV2(
             _tableDefinition,
             condition: condition,
+            loadChildren: loadChildren,
           );
-          return rows.map<ENTITY>((e) => packV2(e)).toList();
+          return List<ENTITY>.from(rows);
         },
-        {'condition': condition},
+        {'condition': condition, 'loadChildren': loadChildren},
       );
 
-  Future<ENTITY> shipById(int id) => v(
+  Future<ENTITY> shipById(
+    int id, {
+    List<LoadChildSpec>? loadChildren,
+  }) =>
+      v(
         () async {
           final row = await _driftAccessor.selectV2(
             _tableDefinition,
             condition: Equals(defPkId, id),
+            loadChildren: loadChildren,
           );
-          return packV2(row.first);
+          return List<ENTITY>.from(row).first;
         },
-        {'id': id},
+        {'id': id, 'loadChildren': loadChildren},
       );
 
   Future<ENTITY> replaceV2(ENTITY entity) => v(
         () async {
           final updated = await _driftAccessor.updateV2(entity);
-
-          return packV2(updated);
+          return List<ENTITY>.from([updated]).single;
         },
         {'entity': entity},
       );
@@ -95,8 +95,7 @@ abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
             _tableDefinition,
             condition: condition,
           );
-
-          return deleted.map<ENTITY>((e) => packV2(e)).toList();
+          return List<ENTITY>.from(deleted);
         },
         {'condition': condition},
       );

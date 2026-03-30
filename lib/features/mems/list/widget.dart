@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:mem/features/acts/act.dart';
-import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
@@ -31,9 +30,6 @@ class MemListWidget extends ConsumerWidget {
           ref.watch(memListProvider).map((e) => e.toDomain()).toList(),
           ref.watch(preferenceProvider(startOfDayKey)),
           ref.watch(memNotificationsProvider),
-          ref.watch(latestActsByMemProvider.select(
-            (value) => value?.values.whereType<Act>().toList() ?? [],
-          )),
         ),
       );
 }
@@ -43,14 +39,12 @@ class _MemListWidget extends StatelessWidget {
   final List<Mem> _memList;
   final TimeOfDay _startOfDay;
   final Iterable<MemNotificationEntityV1> _memNotifications;
-  final Iterable<Act> _latestActsByMem;
 
   const _MemListWidget(
     this._scrollController,
     this._memList,
     this._startOfDay,
     this._memNotifications,
-    this._latestActsByMem,
   );
 
   @override
@@ -70,9 +64,7 @@ class _MemListWidget extends StatelessWidget {
 
           final hasActMemList = _memList.groupListsBy(
             (mem) {
-              final latestAct = _latestActsByMem.singleWhereOrNull(
-                (act) => act.memId == mem.id,
-              );
+              final latestAct = mem.latestAct;
               return latestAct is ActiveAct || latestAct is PausedAct;
             },
           );
@@ -100,9 +92,7 @@ class _MemListWidget extends StatelessWidget {
                       final nextNotifyAt = element.notifyAt(
                         startOfToday,
                         memNotifications,
-                        _latestActsByMem.singleWhereOrNull(
-                          (act) => act.memId == element.id,
-                        ),
+                        element.latestAct,
                       );
 
                       if (nextNotifyAt == null) {

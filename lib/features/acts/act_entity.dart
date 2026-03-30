@@ -120,7 +120,9 @@ class ActEntity implements Entity<int> {
         pausedAt: pausedAt,
       );
 
-  factory ActEntity.fromTuple(dynamic tuple) => ActEntity(
+  factory ActEntity.fromTuple(dynamic tuple) {
+    if (tuple is Map) {
+      return ActEntity(
         tuple[defFkActsMemId.name],
         tuple[defColActsStart.name] == null
             ? null
@@ -144,6 +146,28 @@ class ActEntity implements Entity<int> {
         tuple[defColUpdatedAt.name],
         tuple[defColArchivedAt.name],
       );
+    }
+    return ActEntity(
+      tuple.memId,
+      tuple.start == null
+          ? null
+          : DateAndTime.from(
+              tuple.start,
+              timeOfDay: tuple.startIsAllDay == true ? null : tuple.start,
+            ),
+      tuple.end == null
+          ? null
+          : DateAndTime.from(
+              tuple.end,
+              timeOfDay: tuple.endIsAllDay == true ? null : tuple.end,
+            ),
+      tuple.pausedAt,
+      tuple.id,
+      tuple.createdAt,
+      tuple.updatedAt,
+      tuple.archivedAt,
+    );
+  }
 
   ActEntity updatedWith(Act act) => ActEntity(
         memId,

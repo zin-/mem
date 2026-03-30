@@ -10,9 +10,6 @@ import 'package:mem/features/logger/log_service.dart';
 // lintエラーになるためコメントアウト
 class MemRelationRepository
     extends DatabaseTupleRepository<MemRelation, int, MemRelationEntity> {
-  @override
-  MemRelationEntity packV2(dynamic tuple) => MemRelationEntity.fromTuple(tuple);
-
   Future<List<MemRelationEntity>> shipBySourceMemIdV2(int? sourceMemId) => v(
         () async => sourceMemId == null
             ? []

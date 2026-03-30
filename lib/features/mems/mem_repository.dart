@@ -1,43 +1,26 @@
 import 'package:mem/databases/definition.dart';
+import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/features/mems/mem.dart';
-import 'package:mem/framework/date_and_time/date_and_time.dart';
-import 'package:mem/framework/date_and_time/date_and_time_period.dart';
+import 'package:mem/framework/repository/load_child_spec.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
+import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 
 class MemRepository extends DatabaseTupleRepository<Mem, int, MemEntity> {
-  @override
-  MemEntity packV2(dynamic tuple) => MemEntity(
-        tuple.id,
-        tuple.name,
-        tuple.doneAt,
-        tuple.notifyOn == null && tuple.endOn == null
-            ? null
-            : DateAndTimePeriod(
-                start: tuple.notifyOn == null
-                    ? null
-                    : DateAndTime.from(
-                        tuple.notifyOn,
-                        timeOfDay: tuple.notifyAt == null
-                            ? null
-                            : DateAndTime.from(tuple.notifyAt),
-                      ),
-                end: tuple.endOn == null
-                    ? null
-                    : DateAndTime.from(
-                        tuple.endOn,
-                        timeOfDay: tuple.endAt == null
-                            ? null
-                            : DateAndTime.from(tuple.endAt),
-                      ),
-              ),
-        tuple.createdAt,
-        tuple.updatedAt,
-        tuple.archivedAt,
-      );
+  static List<LoadChildSpec> get loadLatestActChild => [
+        LoadChildSpec(
+          table: defTableActs,
+          resultKey: 'latest_act',
+          orderBy: [
+            DescendingCoalesce(defColActsStart, defColCreatedAt),
+            Descending(defPkId),
+          ],
+          limit: 1,
+        ),
+      ];
 
   @override
   Future<List<MemEntity>> shipV2({
@@ -45,6 +28,7 @@ class MemRepository extends DatabaseTupleRepository<Mem, int, MemEntity> {
     bool? archived,
     bool? done,
     Condition? condition,
+    List<LoadChildSpec>? loadChildren,
   }) =>
       super.shipV2(
         condition: And(
@@ -61,6 +45,7 @@ class MemRepository extends DatabaseTupleRepository<Mem, int, MemEntity> {
             if (condition != null) condition,
           ],
         ),
+        loadChildren: loadChildren,
       );
 
   @override

@@ -8,9 +8,6 @@ import 'package:mem/framework/repository/database_tuple_repository.dart';
 // lintエラーになるためコメントアウト
 class TargetRepository
     extends DatabaseTupleRepository<Target, int, TargetEntity> {
-  @override
-  TargetEntity packV2(dynamic tuple) => TargetEntity.fromTuple(tuple);
-
   static TargetRepository? _instance;
   factory TargetRepository({TargetRepository? mock}) =>
       _instance ??= mock ?? TargetRepository._();

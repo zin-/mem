@@ -1,5 +1,4 @@
 import 'package:mem/features/acts/act.dart';
-import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/databases/definition.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/base.dart';
@@ -12,28 +11,6 @@ import 'package:mem/framework/singleton.dart';
 // @Deprecated('ActRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
 // lintエラーになるためコメントアウト
 class ActRepository extends DatabaseTupleRepository<Act, int, ActEntity> {
-  @override
-  ActEntity packV2(dynamic tuple) => ActEntity(
-        tuple.memId,
-        tuple.start == null
-            ? null
-            : DateAndTime.from(
-                tuple.start,
-                timeOfDay: tuple.startIsAllDay == true ? null : tuple.start,
-              ),
-        tuple.end == null
-            ? null
-            : DateAndTime.from(
-                tuple.end,
-                timeOfDay: tuple.endIsAllDay == true ? null : tuple.end,
-              ),
-        tuple.pausedAt,
-        tuple.id,
-        tuple.createdAt,
-        tuple.updatedAt,
-        tuple.archivedAt,
-      );
-
   @override
   Future<List<ActEntity>> wasteV2({int? id, Condition? condition}) => v(
         () => super.wasteV2(

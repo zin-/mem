@@ -15,16 +15,24 @@ class Mem {
   final String name;
   final DateTime? doneAt;
   final DateAndTimePeriod? period;
+  final Act? latestAct;
 
-  Mem(this.id, this.name, this.doneAt, this.period);
+  Mem(
+    this.id,
+    this.name,
+    this.doneAt,
+    this.period, {
+    this.latestAct,
+  });
 
   bool get isArchived => false;
 
   bool get isDone => doneAt != null;
 
-  Mem done(DateTime when) => Mem(id, name, when, period);
+  Mem done(DateTime when) =>
+      Mem(id, name, when, period, latestAct: latestAct);
 
-  Mem undone() => Mem(id, name, null, period);
+  Mem undone() => Mem(id, name, null, period, latestAct: latestAct);
 
   DateTime? notifyAt(
     DateTime startOfToday,
