@@ -5,7 +5,7 @@ import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/mems/transitions.dart';
-import 'package:mem/framework/view/timer.dart';
+import 'package:mem/modules/live_elapsed_time_text.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/mem_done_checkbox.dart';
@@ -107,7 +107,7 @@ ListTile _render(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(child: MemNameText(mem.id)),
-                    ElapsedTimeView(latestActByMem.period!.start!),
+                    LiveElapsedTimeText(latestActByMem.period!.start!),
                   ],
                 ),
           onTap: onTap,

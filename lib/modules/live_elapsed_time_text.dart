@@ -3,18 +3,18 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:mem/features/logger/log_service.dart';
 
-const elapsePeriod = Duration(seconds: 1);
+const _tickInterval = Duration(seconds: 1);
 
-class ElapsedTimeView extends StatefulWidget {
+class LiveElapsedTimeText extends StatefulWidget {
   final DateTime _start;
 
-  const ElapsedTimeView(this._start, {super.key});
+  const LiveElapsedTimeText(this._start, {super.key});
 
   @override
-  State<StatefulWidget> createState() => _ElapsedTimeState();
+  State<StatefulWidget> createState() => _LiveElapsedTimeTextState();
 }
 
-class _ElapsedTimeState extends State<ElapsedTimeView> {
+class _LiveElapsedTimeTextState extends State<LiveElapsedTimeText> {
   Timer? _timer;
   Duration? elapsedTime;
 
@@ -22,13 +22,23 @@ class _ElapsedTimeState extends State<ElapsedTimeView> {
   void initState() {
     super.initState();
     _timer = Timer.periodic(
-      elapsePeriod,
+      _tickInterval,
       (timer) {
         setState(() {
           elapsedTime = DateTime.now().difference(widget._start);
         });
       },
     );
+  }
+
+  @override
+  void didUpdateWidget(covariant LiveElapsedTimeText oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget._start != widget._start) {
+      setState(() {
+        elapsedTime = null;
+      });
+    }
   }
 
   @override
