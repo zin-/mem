@@ -13,6 +13,7 @@ import 'package:mem/features/mems/list/item/view.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/mems/list/widget.dart';
 import 'package:mem/features/mems/mem.dart';
+import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/mems/states.dart';
@@ -204,6 +205,55 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.byType(DateAndTimeText), findsOneWidget);
+        expect(find.byType(MemListItemView), findsOneWidget);
+      });
+
+      testWidgets(
+          'sticky header shows ToDo subheader when next notify time is absent',
+          (tester) async {
+        final saved = _savedMem(1, 'No schedule');
+        final entity = saved.toEntityV2();
+        final scrollController = ScrollController();
+        addTearDown(scrollController.dispose);
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              preferenceProvider(startOfDayKey).overrideWith(
+                () => _FakePreference(),
+              ),
+              memEntitiesProvider.overrideWith(
+                () => _FakeMemEntities([saved]),
+              ),
+              memListProvider.overrideWith(
+                (ref) => ValueStateNotifier<List<MemEntity>>([entity]),
+              ),
+              memNotificationsProvider.overrideWith(
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>([]),
+              ),
+              memNotificationsByMemIdProvider(1).overrideWith(
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>([]),
+              ),
+              memStateProvider(1)
+                  .overrideWith(() => _FakeMemState(saved.value)),
+              latestActsByMemProvider.overrideWith(
+                (ref) => {1: null},
+              ),
+              actEntitiesProvider.overrideWith(() => _FakeActEntities()),
+            ],
+            child: MaterialApp(
+              home: Scaffold(
+                body: MemListWidget(scrollController),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text(buildL10n().memListToDoSubHeader),
+          findsOneWidget,
+        );
         expect(find.byType(MemListItemView), findsOneWidget);
       });
     });
