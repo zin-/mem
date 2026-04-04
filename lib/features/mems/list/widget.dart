@@ -76,8 +76,10 @@ class _MemListWidget extends StatelessWidget {
               SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
+                    final mem = hasActMemList[true]![index];
                     return MemListItemView(
-                      hasActMemList[true]![index],
+                      mem,
+                      key: ValueKey(mem.id),
                     );
                   },
                   childCount: hasActMemList[true]?.length ?? 0,
@@ -131,9 +133,13 @@ class _MemListWidget extends StatelessWidget {
                       ),
                       sliver: SliverList(
                         delegate: SliverChildBuilderDelegate(
-                          (context, index) => MemListItemView(
-                            e.value[index],
-                          ),
+                          (context, index) {
+                            final mem = e.value[index];
+                            return MemListItemView(
+                              mem,
+                              key: ValueKey(mem.id),
+                            );
+                          },
                           childCount: e.value.length,
                         ),
                       ),
