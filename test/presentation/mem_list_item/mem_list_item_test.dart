@@ -15,7 +15,7 @@ import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
-import 'package:mem/framework/view/timer.dart';
+import 'package:mem/modules/live_elapsed_time_text.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/features/acts/act_entity.dart';
@@ -187,7 +187,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byType(ElapsedTimeView), findsOneWidget);
+      expect(find.byType(LiveElapsedTimeText), findsOneWidget);
       expect(find.byIcon(Icons.stop), findsNothing);
       expect(find.byIcon(Icons.pause), findsNothing);
       expect(find.byIcon(Icons.close), findsNothing);
@@ -662,8 +662,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // アクティブなアクトがある場合、タイトルにElapsedTimeViewが表示される
-      expect(find.byType(ElapsedTimeView), findsOneWidget);
+      // アクティブなアクトがある場合、タイトルにLiveElapsedTimeTextが表示される
+      expect(find.byType(LiveElapsedTimeText), findsOneWidget);
       // leadingにpauseボタンが表示される
       expect(find.byIcon(Icons.pause), findsOneWidget);
       // trailingにstopボタンが表示される
@@ -787,8 +787,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // アクティブなアクトがある場合、タイトルにElapsedTimeViewが表示される
-      expect(find.byType(ElapsedTimeView), findsOneWidget);
+      // アクティブなアクトがある場合、タイトルにLiveElapsedTimeTextが表示される
+      expect(find.byType(LiveElapsedTimeText), findsOneWidget);
       // leadingにpauseボタンが表示される
       expect(find.byIcon(Icons.pause), findsOneWidget);
       // trailingにstopボタンが表示される

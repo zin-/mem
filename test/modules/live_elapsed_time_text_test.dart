@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/framework/view/timer.dart';
+import 'package:mem/modules/live_elapsed_time_text.dart';
 
 void main() {
   testWidgets(
@@ -24,7 +24,7 @@ void main() {
     final longElapsed = tester
         .widget<Text>(
           find.descendant(
-            of: find.byType(ElapsedTimeView),
+            of: find.byType(LiveElapsedTimeText),
             matching: find.byType(Text),
           ),
         )
@@ -45,7 +45,7 @@ void main() {
     final shortElapsed = tester
         .widget<Text>(
           find.descendant(
-            of: find.byType(ElapsedTimeView),
+            of: find.byType(LiveElapsedTimeText),
             matching: find.byType(Text),
           ),
         )
@@ -67,5 +67,5 @@ class _StartController extends StatefulWidget {
 
 class _StartControllerState extends State<_StartController> {
   @override
-  Widget build(BuildContext context) => ElapsedTimeView(widget.start);
+  Widget build(BuildContext context) => LiveElapsedTimeText(widget.start);
 }
