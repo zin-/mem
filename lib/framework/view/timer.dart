@@ -32,6 +32,16 @@ class _ElapsedTimeState extends State<ElapsedTimeView> {
   }
 
   @override
+  void didUpdateWidget(covariant ElapsedTimeView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget._start != widget._start) {
+      setState(() {
+        elapsedTime = null;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) => v(
         () => Text(
           (elapsedTime ?? DateTime.now().difference(widget._start)).format(),
