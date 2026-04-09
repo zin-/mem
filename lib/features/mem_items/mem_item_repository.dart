@@ -30,6 +30,10 @@ class MemItemRepository
             if (condition != null) condition,
           ],
         ),
+        groupBy: groupBy,
+        orderBy: orderBy,
+        offset: offset,
+        limit: limit,
         loadChildren: loadChildren,
       );
 

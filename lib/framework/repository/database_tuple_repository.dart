@@ -7,7 +7,9 @@ import 'package:mem/framework/database/definition/table_definition.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/condition/in.dart';
 import 'package:mem/framework/repository/entity.dart';
+import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/load_child_spec.dart';
+import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/features/logger/log_service.dart';
 
@@ -54,6 +56,10 @@ abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
 
   Future<List<ENTITY>> shipV2({
     Condition? condition,
+    GroupBy? groupBy,
+    List<OrderBy>? orderBy,
+    int? offset,
+    int? limit,
     List<LoadChildSpec>? loadChildren,
   }) =>
       v(
@@ -61,11 +67,22 @@ abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
           final rows = await _driftAccessor.selectV2(
             _tableDefinition,
             condition: condition,
+            groupBy: groupBy,
+            orderBy: orderBy,
+            offset: offset,
+            limit: limit,
             loadChildren: loadChildren,
           );
           return List<ENTITY>.from(rows);
         },
-        {'condition': condition, 'loadChildren': loadChildren},
+        {
+          'condition': condition,
+          'groupBy': groupBy,
+          'orderBy': orderBy,
+          'offset': offset,
+          'limit': limit,
+          'loadChildren': loadChildren,
+        },
       );
 
   Future<ENTITY> shipById(

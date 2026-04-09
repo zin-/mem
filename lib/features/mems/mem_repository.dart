@@ -6,6 +6,7 @@ import 'package:mem/features/mems/mem.dart';
 import 'package:mem/framework/repository/load_child_spec.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
+import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 
@@ -28,6 +29,10 @@ class MemRepository extends DatabaseTupleRepository<Mem, int, MemEntity> {
     bool? archived,
     bool? done,
     Condition? condition,
+    GroupBy? groupBy,
+    List<OrderBy>? orderBy,
+    int? offset,
+    int? limit,
     List<LoadChildSpec>? loadChildren,
   }) =>
       super.shipV2(
@@ -45,6 +50,10 @@ class MemRepository extends DatabaseTupleRepository<Mem, int, MemEntity> {
             if (condition != null) condition,
           ],
         ),
+        groupBy: groupBy,
+        orderBy: orderBy,
+        offset: offset,
+        limit: limit,
         loadChildren: loadChildren,
       );
 
