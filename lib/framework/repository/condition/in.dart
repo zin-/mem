@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:mem/framework/repository/condition/conditions.dart';
+import 'package:mem/framework/repository/condition/fk_definition_to_drift_column_name.dart';
 
 class In extends Condition {
   final String _key;
@@ -31,7 +32,11 @@ drift.GeneratedColumn? _getColumn(drift.TableInfo tableInfo, String columnName) 
     final column = columns.firstWhere(
       (col) {
         final actualName = _getColumnName(col);
-        return actualName == columnName || actualName == _toSnakeCase(columnName);
+        return actualName == columnName ||
+            actualName == _toSnakeCase(columnName) ||
+            (fkDefinitionNameToDriftColumnName[columnName] != null &&
+                actualName ==
+                    fkDefinitionNameToDriftColumnName[columnName]);
       },
       orElse: () => throw StateError('Column not found: $columnName'),
     );
@@ -44,7 +49,7 @@ drift.GeneratedColumn? _getColumn(drift.TableInfo tableInfo, String columnName) 
 String _getColumnName(drift.GeneratedColumn column) {
   try {
     final col = column as dynamic;
-    return col.actualColumnName as String? ?? col.name as String? ?? '';
+    return col.name as String? ?? '';
   } catch (e) {
     return '';
   }

@@ -21,6 +21,7 @@ import 'package:mem/databases/database.dart' as drift_schema;
 import 'package:mem/framework/database/definition/column/column_definition.dart';
 import 'package:mem/framework/database/definition/column/foreign_key_definition.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
+import 'package:mem/framework/repository/condition/fk_definition_to_drift_column_name.dart';
 import 'package:mem/framework/repository/entity.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/load_child_spec.dart';
@@ -245,6 +246,14 @@ class DriftDatabaseAccessor {
           'condition': condition,
         },
       );
+
+  bool conditionDriftResolvable(
+    TableDefinition tableDefinition,
+    Condition condition,
+  ) {
+    final tableInfo = _getTableInfo(tableDefinition);
+    return condition.toDriftExpression(tableInfo) != null;
+  }
 
   drift.TableInfo _getTableInfo(
     TableDefinition tableDefinition,
@@ -620,12 +629,6 @@ WHERE $rnPredicate
     }
   }
 
-  static const _tableDefToDriftColumn = {
-    'mems_id': 'mem_id',
-    'source_mems_id': 'source_mem_id',
-    'target_mems_id': 'target_mem_id',
-  };
-
   drift.GeneratedColumn? _getColumn(
       drift.TableInfo tableInfo, String columnName) {
     try {
@@ -636,8 +639,9 @@ WHERE $rnPredicate
           final actualName = _getColumnName(col);
           return actualName == columnName ||
               actualName == toSnakeCase(columnName) ||
-              (_tableDefToDriftColumn[columnName] != null &&
-                  actualName == _tableDefToDriftColumn[columnName]);
+              (fkDefinitionNameToDriftColumnName[columnName] != null &&
+                  actualName ==
+                      fkDefinitionNameToDriftColumnName[columnName]);
         },
         orElse: () => throw StateError('Column not found: $columnName'),
       );

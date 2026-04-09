@@ -1,12 +1,17 @@
+import 'dart:math' as math;
+
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/definition/database_definition.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
+import 'package:mem/framework/repository/condition/in.dart';
 import 'package:mem/framework/repository/entity.dart';
 import 'package:mem/framework/repository/load_child_spec.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/features/logger/log_service.dart';
+
+const _cascadeChunkSize = 900;
 
 abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
     extends Repository {
@@ -89,7 +94,7 @@ abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
 
   Future<List<ENTITY>> wasteV2({Condition? condition}) => v(
         () async {
-          // TODO 子Entityを削除する
+          await _wasteChildRowsReferencingParent(condition);
 
           final deleted = await _driftAccessor.deleteV2(
             _tableDefinition,
@@ -99,4 +104,46 @@ abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
         },
         {'condition': condition},
       );
+
+  // TODO: wasteだけでなく、archiveでも使えるようにする
+  Future<void> _wasteChildRowsReferencingParent(
+    Condition? parentCondition,
+  ) async {
+    final parentTable = _tableDefinition;
+
+    final parentIds = await _driftAccessor
+        .selectV2(
+          parentTable,
+          condition: parentCondition,
+        )
+        .then((rows) => rows.map((row) => (row as dynamic).id as int).toList());
+
+    if (parentIds.isEmpty) return;
+
+    for (var i = 0; i < parentIds.length; i += _cascadeChunkSize) {
+      final end = math.min(
+        i + _cascadeChunkSize,
+        parentIds.length,
+      );
+      final chunk = parentIds.sublist(i, end);
+      for (final childTable in _databaseDefinition.tableDefinitions) {
+        if (childTable.name == parentTable.name) continue;
+        for (final fk in childTable.foreignKeyDefinitions) {
+          if (fk.parentTableDefinition.name != parentTable.name) continue;
+          final inCondition = In(fk.name, chunk);
+          if (!_driftAccessor.conditionDriftResolvable(
+              childTable, inCondition)) {
+            throw StateError(
+              'wasteV2 cascade: cannot resolve In(${fk.name}) on '
+              '${childTable.name}',
+            );
+          }
+          await _driftAccessor.deleteV2(
+            childTable,
+            condition: inCondition,
+          );
+        }
+      }
+    }
+  }
 }

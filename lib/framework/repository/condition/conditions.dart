@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:mem/framework/database/converter.dart';
 import 'package:mem/framework/database/definition/column/column_definition.dart';
+import 'package:mem/framework/repository/condition/fk_definition_to_drift_column_name.dart';
 
 abstract class Condition {
   String? where();
@@ -206,12 +207,6 @@ class LessThan extends Condition {
   String toString() => '${_columnDefinition.name} < $_value';
 }
 
-const _tableDefToDriftColumn = {
-  'mems_id': 'mem_id',
-  'source_mems_id': 'source_mem_id',
-  'target_mems_id': 'target_mem_id',
-};
-
 drift.GeneratedColumn? _getColumn(
     drift.TableInfo tableInfo, String columnName) {
   try {
@@ -222,8 +217,9 @@ drift.GeneratedColumn? _getColumn(
         final actualName = _getColumnName(col);
         return actualName == columnName ||
             actualName == _toSnakeCase(columnName) ||
-            ( _tableDefToDriftColumn[columnName] != null &&
-                actualName == _tableDefToDriftColumn[columnName]);
+            (fkDefinitionNameToDriftColumnName[columnName] != null &&
+                actualName ==
+                    fkDefinitionNameToDriftColumnName[columnName]);
       },
       orElse: () => throw StateError('Column not found: $columnName'),
     );
