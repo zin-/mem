@@ -18,15 +18,12 @@ const _cascadeChunkSize = 900;
 abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
     extends Repository {
   static DriftDatabaseAccessor get _driftAccessor => DriftDatabaseAccessor();
-  static final Map<TableDefinition, Repository> _repositories = {};
 
   // ignore: unused_field
   final DatabaseDefinition _databaseDefinition;
   final TableDefinition _tableDefinition;
 
-  DatabaseTupleRepository(this._databaseDefinition, this._tableDefinition) {
-    _repositories[_tableDefinition] = this;
-  }
+  DatabaseTupleRepository(this._databaseDefinition, this._tableDefinition);
 
   static Future close() => v(
         () async {
