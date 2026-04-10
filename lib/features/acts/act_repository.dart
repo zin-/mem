@@ -40,5 +40,12 @@ class ActRepository extends DatabaseTupleRepository<Act, int, ActEntity> {
       );
 
   ActRepository._() : super(databaseDefinition, defTableActs);
-  factory ActRepository() => Singleton.of(() => ActRepository._());
+
+  factory ActRepository({ActRepository? mock}) {
+    if (mock != null) {
+      Singleton.override<ActRepository>(mock);
+      return mock;
+    }
+    return Singleton.of(() => ActRepository._());
+  }
 }

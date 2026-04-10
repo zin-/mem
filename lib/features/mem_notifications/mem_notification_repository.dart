@@ -4,6 +4,7 @@ import 'package:mem/framework/repository/load_child_spec.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/condition/in.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
+import 'package:mem/framework/singleton.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'mem_notification.dart';
@@ -55,9 +56,14 @@ class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
         ),
       );
 
-  static MemNotificationRepository? _instance;
-  factory MemNotificationRepository({MemNotificationRepository? mock}) =>
-      _instance ??= mock ?? MemNotificationRepository._();
   MemNotificationRepository._()
       : super(databaseDefinition, defTableMemNotifications);
+
+  factory MemNotificationRepository({MemNotificationRepository? mock}) {
+    if (mock != null) {
+      Singleton.override<MemNotificationRepository>(mock);
+      return mock;
+    }
+    return Singleton.of(() => MemNotificationRepository._());
+  }
 }

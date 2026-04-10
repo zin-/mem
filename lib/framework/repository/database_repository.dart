@@ -4,15 +4,15 @@ import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/definition/database_definition.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/repository.dart';
+import 'package:mem/framework/singleton.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:path/path.dart' as path;
 
 class DatabaseRepository extends Repository {
-  static DatabaseRepository? _instance;
-
   DatabaseRepository._();
 
-  factory DatabaseRepository() => _instance ??= DatabaseRepository._();
+  factory DatabaseRepository() =>
+      Singleton.of(() => DatabaseRepository._());
 
   Future<DriftDatabaseAccessor> receive(DatabaseDefinition entity) => v(
         () async => DriftDatabaseAccessor(),

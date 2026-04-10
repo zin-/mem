@@ -1,4 +1,5 @@
 import 'package:mem/framework/repository/key_with_value_repository.dart';
+import 'package:mem/framework/singleton.dart';
 import 'package:mem/features/logger/log_service.dart';
 
 import 'preference.dart';
@@ -48,10 +49,13 @@ class PreferenceRepository
 
   PreferenceRepository._();
 
-  static PreferenceRepository? _instance;
-
   factory PreferenceRepository({
     PreferenceRepository? mock,
-  }) =>
-      _instance ??= mock ?? PreferenceRepository._();
+  }) {
+    if (mock != null) {
+      Singleton.override<PreferenceRepository>(mock);
+      return mock;
+    }
+    return Singleton.of(() => PreferenceRepository._());
+  }
 }

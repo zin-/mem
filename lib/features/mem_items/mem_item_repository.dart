@@ -4,6 +4,7 @@ import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/framework/repository/load_child_spec.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
+import 'package:mem/framework/singleton.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -101,8 +102,13 @@ class MemItemRepository
         },
       );
 
-  static MemItemRepository? _instance;
-  factory MemItemRepository({MemItemRepository? mock}) =>
-      _instance ??= mock ?? MemItemRepository._();
   MemItemRepository._() : super(databaseDefinition, defTableMemItems);
+
+  factory MemItemRepository({MemItemRepository? mock}) {
+    if (mock != null) {
+      Singleton.override<MemItemRepository>(mock);
+      return mock;
+    }
+    return Singleton.of(() => MemItemRepository._());
+  }
 }

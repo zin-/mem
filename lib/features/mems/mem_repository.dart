@@ -8,6 +8,7 @@ import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
+import 'package:mem/framework/singleton.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 
 class MemRepository extends DatabaseTupleRepository<Mem, int, MemEntity> {
@@ -73,8 +74,13 @@ class MemRepository extends DatabaseTupleRepository<Mem, int, MemEntity> {
         ),
       );
 
-  static MemRepository? _instance;
-  factory MemRepository({MemRepository? mock}) =>
-      _instance ??= mock ?? MemRepository._();
   MemRepository._() : super(databaseDefinition, defTableMems);
+
+  factory MemRepository({MemRepository? mock}) {
+    if (mock != null) {
+      Singleton.override<MemRepository>(mock);
+      return mock;
+    }
+    return Singleton.of(() => MemRepository._());
+  }
 }
