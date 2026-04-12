@@ -4,6 +4,9 @@ import 'package:mem/framework/repository/load_child_spec.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/condition/in.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
+import 'package:mem/framework/singleton.dart';
+import 'package:mem/framework/repository/group_by.dart';
+import 'package:mem/framework/repository/order_by.dart';
 import 'mem_notification.dart';
 import 'mem_notification_entity.dart';
 
@@ -12,13 +15,17 @@ import 'mem_notification_entity.dart';
 class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
     int, MemNotificationEntity> {
   @override
-  Future<List<MemNotificationEntity>> shipV2({
+  Future<List<MemNotificationEntity>> ship({
     int? memId,
     Iterable<int>? memIdsIn,
     Condition? condition,
+    GroupBy? groupBy,
+    List<OrderBy>? orderBy,
+    int? offset,
+    int? limit,
     List<LoadChildSpec>? loadChildren,
   }) =>
-      super.shipV2(
+      super.ship(
         condition: And(
           [
             if (memId != null) Equals(defFkMemNotificationsMemId, memId),
@@ -26,16 +33,20 @@ class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
             if (condition != null) condition, // coverage:ignore-line
           ],
         ),
+        groupBy: groupBy,
+        orderBy: orderBy,
+        offset: offset,
+        limit: limit,
         loadChildren: loadChildren,
       );
 
   @override
-  Future<List<MemNotificationEntity>> wasteV2({
+  Future<List<MemNotificationEntity>> waste({
     int? memId,
     MemNotificationType? type,
     Condition? condition,
   }) =>
-      super.wasteV2(
+      super.waste(
         condition: And(
           [
             if (memId != null) Equals(defFkMemNotificationsMemId, memId),
@@ -45,9 +56,14 @@ class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
         ),
       );
 
-  static MemNotificationRepository? _instance;
-  factory MemNotificationRepository({MemNotificationRepository? mock}) =>
-      _instance ??= mock ?? MemNotificationRepository._();
   MemNotificationRepository._()
       : super(databaseDefinition, defTableMemNotifications);
+
+  factory MemNotificationRepository({MemNotificationRepository? mock}) {
+    if (mock != null) {
+      Singleton.override<MemNotificationRepository>(mock);
+      return mock;
+    }
+    return Singleton.of(() => MemNotificationRepository._());
+  }
 }

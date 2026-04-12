@@ -14,7 +14,7 @@ import 'package:mem/framework/repository/load_child_spec.dart';
 import 'package:mem/framework/repository/order_by.dart';
 
 void main() {
-  group('selectV2 loadChildren', () {
+  group('selectEntities loadChildren', () {
     late AppDatabase db;
     late DriftDatabaseAccessor accessor;
 
@@ -50,7 +50,7 @@ void main() {
             ),
           );
 
-      final rows = await accessor.selectV2(
+      final rows = await accessor.selectEntities(
         defTableMems,
         loadChildren: [
           LoadChildSpec(
@@ -88,7 +88,7 @@ void main() {
             ),
           );
 
-      final rows = await accessor.selectV2(
+      final rows = await accessor.selectEntities(
         defTableMems,
         loadChildren: [
           LoadChildSpec(table: defTableMemItems),
@@ -120,7 +120,7 @@ void main() {
             ),
           );
 
-      final rows = await accessor.selectV2(
+      final rows = await accessor.selectEntities(
         defTableMems,
         condition: Equals(defPkId, a.id),
         loadChildren: [
@@ -154,7 +154,7 @@ void main() {
             ),
           );
 
-      final rows = await accessor.selectV2(
+      final rows = await accessor.selectEntities(
         defTableMems,
         condition: Equals(defPkId, b.id),
         loadChildren: [
@@ -193,7 +193,7 @@ void main() {
             ),
           );
 
-      final rows = await accessor.selectV2(
+      final rows = await accessor.selectEntities(
         defTableMems,
         loadChildren: [
           LoadChildSpec(
@@ -224,7 +224,7 @@ void main() {
           );
 
       await expectLater(
-        accessor.selectV2(
+        accessor.selectEntities(
           defTableMems,
           loadChildren: [
             LoadChildSpec(table: defTableMemItems),

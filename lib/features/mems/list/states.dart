@@ -182,7 +182,7 @@ final savedMemNotificationsProvider = StateNotifierProvider.autoDispose<
           if (current.isEmpty) {
             ref.read(memNotificationsProvider.notifier).upsertAll(
                   await MemNotificationRepository()
-                      .shipV2(
+                      .ship(
                         memIdsIn:
                             ref.read(memEntitiesProvider).map((e) => e.id),
                       )

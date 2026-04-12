@@ -21,6 +21,7 @@ import 'package:mem/databases/database.dart' as drift_schema;
 import 'package:mem/framework/database/definition/column/column_definition.dart';
 import 'package:mem/framework/database/definition/column/foreign_key_definition.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
+import 'package:mem/framework/repository/condition/fk_definition_to_drift_column_name.dart';
 import 'package:mem/framework/repository/entity.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/load_child_spec.dart';
@@ -53,7 +54,7 @@ class DriftDatabaseAccessor {
       v(
         () async {
           try {
-            final tableInfo = _getTableInfo(tableDefinition);
+            final tableInfo = _resolveTableInfo(tableDefinition);
             final countExpr = drift.countAll();
             final query = driftDatabase.selectOnly(tableInfo)..addColumns([countExpr]);
             if (condition != null) {
@@ -69,7 +70,7 @@ class DriftDatabaseAccessor {
         {'tableDefinition': tableDefinition, 'condition': condition},
       );
 
-  Future<List<dynamic>> selectV2(
+  Future<List<dynamic>> selectEntities(
     TableDefinition tableDefinition, {
     Condition? condition,
     GroupBy? groupBy,
@@ -80,7 +81,7 @@ class DriftDatabaseAccessor {
   }) =>
       v(
         () async {
-          final tableInfo = _getTableInfoV2(tableDefinition);
+          final tableInfo = _resolveTableInfo(tableDefinition);
           final query = driftDatabase.select(tableInfo);
 
           if (condition != null) {
@@ -188,13 +189,13 @@ class DriftDatabaseAccessor {
         },
       );
 
-  Future insertV2(
+  Future insertEntity(
     dynamic domain,
 // TODO createdAtを受け取るべきかも
   ) =>
       v(
         () async {
-          final tableInfo = _getTableInfoV2(domain);
+          final tableInfo = _resolveTableInfo(domain);
           final insertable = convertIntoDriftInsertable(domain);
 
           final inserted =
@@ -204,9 +205,9 @@ class DriftDatabaseAccessor {
         {'domain': domain},
       );
 
-  Future updateV2(dynamic entity) => v(
+  Future updateEntity(dynamic entity) => v(
         () async {
-          final tableInfo = _getTableInfoV2(entity);
+          final tableInfo = _resolveTableInfo(entity);
           final query = driftDatabase.update(tableInfo)
             ..where((t) => (t as dynamic).id.equals(entity.id));
 
@@ -217,9 +218,11 @@ class DriftDatabaseAccessor {
         {'entity': entity},
       );
 
-  Future<List<dynamic>> deleteV2(dynamic domain, {Condition? condition}) => v(
+  Future<List<dynamic>> deleteEntities(dynamic domain,
+          {Condition? condition}) =>
+      v(
         () async {
-          final tableInfo = _getTableInfoV2(domain);
+          final tableInfo = _resolveTableInfo(domain);
 
           final query = driftDatabase.delete(tableInfo);
 
@@ -246,13 +249,15 @@ class DriftDatabaseAccessor {
         },
       );
 
-  drift.TableInfo _getTableInfo(
+  bool conditionDriftResolvable(
     TableDefinition tableDefinition,
-  ) =>
-      driftDatabase.allTables
-          .firstWhere((e) => e.actualTableName == tableDefinition.name);
+    Condition condition,
+  ) {
+    final tableInfo = _resolveTableInfo(tableDefinition);
+    return condition.toDriftExpression(tableInfo) != null;
+  }
 
-  drift.TableInfo _getTableInfoV2(dynamic domain) {
+  drift.TableInfo _resolveTableInfo(dynamic domain) {
     switch (domain) {
       case mem_domain.Mem _:
       case mem_entity.MemEntity _:
@@ -296,7 +301,7 @@ class DriftDatabaseAccessor {
     ForeignKeyDefinition fk,
     Set<int> parentIds,
   ) async {
-    final childInfo = _getTableInfoV2(spec.table);
+    final childInfo = _resolveTableInfo(spec.table);
     final out = <int, List<dynamic>>{};
     if (parentIds.isEmpty) return out;
     final list = parentIds.toList();
@@ -620,12 +625,6 @@ WHERE $rnPredicate
     }
   }
 
-  static const _tableDefToDriftColumn = {
-    'mems_id': 'mem_id',
-    'source_mems_id': 'source_mem_id',
-    'target_mems_id': 'target_mem_id',
-  };
-
   drift.GeneratedColumn? _getColumn(
       drift.TableInfo tableInfo, String columnName) {
     try {
@@ -636,8 +635,9 @@ WHERE $rnPredicate
           final actualName = _getColumnName(col);
           return actualName == columnName ||
               actualName == toSnakeCase(columnName) ||
-              (_tableDefToDriftColumn[columnName] != null &&
-                  actualName == _tableDefToDriftColumn[columnName]);
+              (fkDefinitionNameToDriftColumnName[columnName] != null &&
+                  actualName ==
+                      fkDefinitionNameToDriftColumnName[columnName]);
         },
         orElse: () => throw StateError('Column not found: $columnName'),
       );

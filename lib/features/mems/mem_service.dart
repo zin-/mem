@@ -46,18 +46,18 @@ class MemService {
           final mem = memDetail.$1;
 
           final savedMemEntity = (mem is SavedMemEntityV1 && !undo
-              ? await _memRepository.replaceV2(mem.toEntityV2())
-              : await _memRepository.receiveV2(mem.value));
+              ? await _memRepository.replace(mem.toEntityV2())
+              : await _memRepository.receive(mem.value));
 
           final savedMemItems = await Future.wait(
             memDetail.$2.map(
               (e) => (e is SavedMemItemEntityV1 && !undo
-                  ? _memItemRepository.replaceV2(
+                  ? _memItemRepository.replace(
                       (e.copiedWith(memId: () => savedMemEntity.id)
                               as SavedMemItemEntityV1)
                           .toEntityV2(),
                     )
-                  : _memItemRepository.receiveV2(
+                  : _memItemRepository.receive(
                       e.copiedWith(memId: () => savedMemEntity.id).toDomain(),
                     )),
             ),
@@ -67,14 +67,14 @@ class MemService {
           final returnMemNotifications =
               List<MemNotificationEntity?>.empty(growable: true);
           if (memNotifications == null) {
-            await _memNotificationRepository.wasteV2(memId: savedMemEntity.id);
+            await _memNotificationRepository.waste(memId: savedMemEntity.id);
           } else {
             returnMemNotifications.addAll(await Future.wait(memNotifications
                 .where((e) => !e.value.isRepeatByDayOfWeek())
                 .map((e) {
               if (e.value.isEnabled()) {
                 return (e is SavedMemNotificationEntityV1 && !undo
-                    ? _memNotificationRepository.replaceV2(
+                    ? _memNotificationRepository.replace(
                         e
                             .updatedWith(
                               (v) => MemNotification.by(
@@ -82,7 +82,7 @@ class MemService {
                             )
                             .toEntityV2(),
                       )
-                    : _memNotificationRepository.receiveV2(
+                    : _memNotificationRepository.receive(
                         MemNotification.by(
                           savedMemEntity.id,
                           e.value.type,
@@ -92,7 +92,7 @@ class MemService {
                       ));
               } else {
                 return _memNotificationRepository
-                    .wasteV2(
+                    .waste(
                       memId: savedMemEntity.id,
                       type: e.value.type,
                     )
@@ -100,7 +100,7 @@ class MemService {
               }
             })));
 
-            await _memNotificationRepository.wasteV2(
+            await _memNotificationRepository.waste(
               memId: savedMemEntity.id,
               type: MemNotificationType.repeatByDayOfWeek,
             );
@@ -109,7 +109,7 @@ class MemService {
                 .groupListsBy((e) => e.value.time)
                 .entries) {
               returnMemNotifications.add(
-                await _memNotificationRepository.receiveV2(
+                await _memNotificationRepository.receive(
                   MemNotification.by(
                     savedMemEntity.id,
                     entry.value.single.value.type,
@@ -124,16 +124,16 @@ class MemService {
           SavedTargetEntityV1? savedTarget;
           final target = memDetail.$4;
           if (target == null || target.value.value == 0) {
-            await _targetRepository.wasteV2(
+            await _targetRepository.waste(
               condition: Equals(defFkTargetMemId, savedMemEntity.id),
             );
           } else if (target is SavedTargetEntityV1) {
             savedTarget = await _targetRepository
-                .replaceV2(target.toEntityV2())
+                .replace(target.toEntityV2())
                 .then((v) => SavedTargetEntityV1.fromEntityV2(v));
           } else {
             savedTarget = await _targetRepository
-                .receiveV2(
+                .receive(
                   target
                       .updatedWith(
                         (v) => Target(
@@ -155,7 +155,7 @@ class MemService {
               List<SavedMemRelationEntityV1?>.empty(growable: true);
           if (memRelations != null) {
             if (memRelations.isEmpty) {
-              await _memRelationRepository.wasteV2(
+              await _memRelationRepository.waste(
                 condition:
                     Equals(defFkMemRelationsSourceMemId, savedMemEntity.id),
               );
@@ -169,9 +169,9 @@ class MemService {
                       )))
                   .map((e) async {
                 if (e is SavedMemRelationEntityV1 && !undo) {
-                  return await _memRelationRepository.replaceV2(e.toEntityV2());
+                  return await _memRelationRepository.replace(e.toEntityV2());
                 } else {
-                  return await _memRelationRepository.receiveV2(e.value);
+                  return await _memRelationRepository.receive(e.value);
                 }
               }));
               returnMemRelations.addAll(
@@ -262,11 +262,11 @@ class MemService {
 
   Future<MemEntity> archive(SavedMemEntityV1 mem) => i(
         () async {
-          final archivedMem = await _memRepository.replaceV2(
+          final archivedMem = await _memRepository.replace(
               mem.toEntityV2().updatedWith(archivedAt: () => DateTime.now()));
 
           await _memItemRepository.archiveBy(memId: archivedMem.id);
-          await _memRelationRepository.archiveByV2(
+          await _memRelationRepository.archiveBy(
               relatedMemId: archivedMem.id);
 
           return await _memRepository.shipById(
@@ -282,7 +282,7 @@ class MemService {
   Future<MemEntity> unarchive(SavedMemEntityV1 mem) => i(
         () async {
           final unarchivedMem =
-              await _memRepository.replaceV2(mem.toEntityV2().updatedWith(
+              await _memRepository.replace(mem.toEntityV2().updatedWith(
                     updatedAt: () => DateTime.now(),
                     archivedAt: () => null,
                   ));
@@ -290,7 +290,7 @@ class MemService {
           await _memItemRepository.unarchiveBy(memId: unarchivedMem.id).then(
               (v) =>
                   v.map((e) => SavedMemItemEntityV1.fromEntityV2(e)).toList());
-          await _memRelationRepository.unarchiveByV2(
+          await _memRelationRepository.unarchiveBy(
             condition: Or([
               Equals(defFkMemRelationsSourceMemId, unarchivedMem.id),
               Equals(defFkMemRelationsTargetMemId, unarchivedMem.id),
@@ -309,7 +309,7 @@ class MemService {
 
   Future<bool> remove(int memId) => v(
         () async {
-          await _memRepository.wasteV2(id: memId);
+          await _memRepository.waste(id: memId);
 
           return true;
         },

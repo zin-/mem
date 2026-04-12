@@ -3,6 +3,7 @@ import 'package:mem/databases/table_definitions/mem_relations.dart';
 import 'package:mem/features/mem_relations/mem_relation.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
+import 'package:mem/framework/singleton.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/features/logger/log_service.dart';
 
@@ -10,23 +11,23 @@ import 'package:mem/features/logger/log_service.dart';
 // lintエラーになるためコメントアウト
 class MemRelationRepository
     extends DatabaseTupleRepository<MemRelation, int, MemRelationEntity> {
-  Future<List<MemRelationEntity>> shipBySourceMemIdV2(int? sourceMemId) => v(
+  Future<List<MemRelationEntity>> shipBySourceMemId(int? sourceMemId) => v(
         () async => sourceMemId == null
             ? []
-            : super.shipV2(
+            : super.ship(
                 condition: Equals(defFkMemRelationsSourceMemId, sourceMemId),
               ),
         {'sourceMemId': sourceMemId},
       );
 
-  Future<Iterable<MemRelationEntity>> archiveByV2({
+  Future<Iterable<MemRelationEntity>> archiveBy({
     int? relatedMemId,
     Condition? condition,
     DateTime? archivedAt,
   }) =>
       v(
         () async {
-          final entities = await super.shipV2(
+          final entities = await super.ship(
             condition: And([
               if (relatedMemId != null)
                 Or([
@@ -38,7 +39,7 @@ class MemRelationRepository
           );
           return Future.wait(
             entities.map(
-              (e) => replaceV2(MemRelationEntity(
+              (e) => replace(MemRelationEntity(
                 e.sourceMemId,
                 e.targetMemId,
                 e.type,
@@ -58,14 +59,14 @@ class MemRelationRepository
         },
       );
 
-  Future<Iterable<MemRelationEntity>> unarchiveByV2({
+  Future<Iterable<MemRelationEntity>> unarchiveBy({
     int? sourceMemId,
     int? targetMemId,
     Condition? condition,
   }) =>
       v(
         () async {
-          final entities = await super.shipV2(
+          final entities = await super.ship(
             condition: And([
               if (sourceMemId != null)
                 Equals(defFkMemRelationsSourceMemId, sourceMemId),
@@ -76,7 +77,7 @@ class MemRelationRepository
           );
           return Future.wait(
             entities.map(
-              (e) => replaceV2(MemRelationEntity(
+              (e) => replace(MemRelationEntity(
                 e.sourceMemId,
                 e.targetMemId,
                 e.type,
@@ -96,8 +97,13 @@ class MemRelationRepository
         },
       );
 
-  static MemRelationRepository? _instance;
-  factory MemRelationRepository({MemRelationRepository? mock}) =>
-      _instance ??= mock ?? MemRelationRepository._();
   MemRelationRepository._() : super(databaseDefinition, defTableMemRelations);
+
+  factory MemRelationRepository({MemRelationRepository? mock}) {
+    if (mock != null) {
+      Singleton.override<MemRelationRepository>(mock);
+      return mock;
+    }
+    return Singleton.of(() => MemRelationRepository._());
+  }
 }

@@ -49,7 +49,7 @@ final memItemsByMemIdProvider = StateNotifierProvider.family<
       ],
       initializer: (current, notifier) async {
         if (memId != null) {
-          final items = await MemItemRepository().shipV2(memId: memId);
+          final items = await MemItemRepository().ship(memId: memId);
           if (notifier.mounted) {
             ref.read(memItemsProvider.notifier).upsertAll(
                   items
@@ -156,7 +156,7 @@ final memNotificationsByMemIdProvider = StateNotifierProvider.autoDispose
             if (memId != null &&
                 current.whereType<SavedMemNotificationEntityV1>().isEmpty) {
               final notifications =
-                  await MemNotificationRepository().shipV2(memId: memId);
+                  await MemNotificationRepository().ship(memId: memId);
               if (notifier.mounted) {
                 ref.read(memNotificationsProvider.notifier).upsertAll(
                       notifications

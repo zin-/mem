@@ -64,7 +64,7 @@ class MemEntities extends _$MemEntities
 
   Future<void> refreshLatestActForMem(int memId) => v(
         () async {
-          final rows = await MemRepository().shipV2(
+          final rows = await MemRepository().ship(
             id: memId,
             loadChildren: MemRepository.loadLatestActChild,
           );

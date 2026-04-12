@@ -4,6 +4,7 @@ import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/framework/repository/load_child_spec.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
+import 'package:mem/framework/singleton.dart';
 import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -14,7 +15,7 @@ import 'package:mem/features/mem_items/mem_item_entity.dart';
 class MemItemRepository
     extends DatabaseTupleRepository<MemItem, int, MemItemEntity> {
   @override
-  Future<List<MemItemEntity>> shipV2({
+  Future<List<MemItemEntity>> ship({
     int? memId,
     Condition? condition,
     GroupBy? groupBy,
@@ -23,13 +24,17 @@ class MemItemRepository
     int? limit,
     List<LoadChildSpec>? loadChildren,
   }) async =>
-      await super.shipV2(
+      await super.ship(
         condition: And(
           [
             if (memId != null) Equals(defFkMemItemsMemId, memId),
             if (condition != null) condition,
           ],
         ),
+        groupBy: groupBy,
+        orderBy: orderBy,
+        offset: offset,
+        limit: limit,
         loadChildren: loadChildren,
       );
 
@@ -42,11 +47,11 @@ class MemItemRepository
           final time = archivedAt ?? DateTime.now();
 
           return await Future.wait(
-            await shipV2(
+            await ship(
               memId: memId,
             ).then(
               (v) => v.map(
-                (e) => super.replaceV2(MemItemEntity(
+                (e) => super.replace(MemItemEntity(
                   e.memId,
                   e.type,
                   e.value,
@@ -74,11 +79,11 @@ class MemItemRepository
           final time = updatedAt ?? DateTime.now();
 
           return await Future.wait(
-            await shipV2(
+            await ship(
               memId: memId,
             ).then(
               (v) => v.map(
-                (e) => super.replaceV2(MemItemEntity(
+                (e) => super.replace(MemItemEntity(
                   e.memId,
                   e.type,
                   e.value,
@@ -97,8 +102,13 @@ class MemItemRepository
         },
       );
 
-  static MemItemRepository? _instance;
-  factory MemItemRepository({MemItemRepository? mock}) =>
-      _instance ??= mock ?? MemItemRepository._();
   MemItemRepository._() : super(databaseDefinition, defTableMemItems);
+
+  factory MemItemRepository({MemItemRepository? mock}) {
+    if (mock != null) {
+      Singleton.override<MemItemRepository>(mock);
+      return mock;
+    }
+    return Singleton.of(() => MemItemRepository._());
+  }
 }

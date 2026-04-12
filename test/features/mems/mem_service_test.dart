@@ -95,29 +95,29 @@ void main() {
           null,
         );
 
-        when(mockMemRepository.receiveV2(any))
+        when(mockMemRepository.receive(any))
             .thenAnswer((_) async => savedMem.toEntityV2());
-        when(mockMemNotificationRepository.wasteV2(
+        when(mockMemNotificationRepository.waste(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
           condition: anyNamed('condition'),
         )).thenAnswer((_) async => []);
-        when(mockMemRelationRepository.wasteV2(
+        when(mockMemRelationRepository.waste(
                 condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
-        when(mockTargetRepository.wasteV2(condition: anyNamed('condition')))
+        when(mockTargetRepository.waste(condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
-        when(mockMemNotificationRepository.wasteV2(
+        when(mockMemNotificationRepository.waste(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
           condition: anyNamed('condition'),
         )).thenAnswer((_) async => []);
-        when(mockMemRelationRepository.wasteV2(
+        when(mockMemRelationRepository.waste(
                 condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
-        when(mockTargetRepository.wasteV2(condition: anyNamed('condition')))
+        when(mockTargetRepository.waste(condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
-        when(mockTargetRepository.receiveV2(any))
+        when(mockTargetRepository.receive(any))
             .thenAnswer((_) async => savedTarget);
 
         // Act
@@ -130,7 +130,7 @@ void main() {
         ));
 
         // Assert
-        verify(mockTargetRepository.receiveV2(any)).called(1);
+        verify(mockTargetRepository.receive(any)).called(1);
       });
 
       test('should not call _targetRepository.receive when target is null',
@@ -156,17 +156,17 @@ void main() {
           'archivedAt': null,
         });
 
-        when(mockMemRepository.receiveV2(any))
+        when(mockMemRepository.receive(any))
             .thenAnswer((_) async => savedMem.toEntityV2());
-        when(mockMemNotificationRepository.wasteV2(
+        when(mockMemNotificationRepository.waste(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
           condition: anyNamed('condition'),
         )).thenAnswer((_) async => []);
-        when(mockMemRelationRepository.wasteV2(
+        when(mockMemRelationRepository.waste(
                 condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
-        when(mockTargetRepository.wasteV2(condition: anyNamed('condition')))
+        when(mockTargetRepository.waste(condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
 
         // Act
@@ -179,7 +179,7 @@ void main() {
         ));
 
         // Assert
-        verifyNever(mockTargetRepository.receiveV2(any));
+        verifyNever(mockTargetRepository.receive(any));
       });
 
       test('should not call _targetRepository.receive when target value is 0',
@@ -213,17 +213,17 @@ void main() {
           'archivedAt': null,
         });
 
-        when(mockMemRepository.receiveV2(any))
+        when(mockMemRepository.receive(any))
             .thenAnswer((_) async => savedMem.toEntityV2());
-        when(mockMemNotificationRepository.wasteV2(
+        when(mockMemNotificationRepository.waste(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
           condition: anyNamed('condition'),
         )).thenAnswer((_) async => []);
-        when(mockMemRelationRepository.wasteV2(
+        when(mockMemRelationRepository.waste(
                 condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
-        when(mockTargetRepository.wasteV2(condition: anyNamed('condition')))
+        when(mockTargetRepository.waste(condition: anyNamed('condition')))
             .thenAnswer((_) async => []);
 
         // Act
@@ -236,7 +236,7 @@ void main() {
         ));
 
         // Assert
-        verifyNever(mockTargetRepository.receiveV2(any));
+        verifyNever(mockTargetRepository.receive(any));
       });
     });
   });

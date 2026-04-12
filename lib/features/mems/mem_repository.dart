@@ -6,7 +6,9 @@ import 'package:mem/features/mems/mem.dart';
 import 'package:mem/framework/repository/load_child_spec.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
+import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
+import 'package:mem/framework/singleton.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 
 class MemRepository extends DatabaseTupleRepository<Mem, int, MemEntity> {
@@ -23,14 +25,18 @@ class MemRepository extends DatabaseTupleRepository<Mem, int, MemEntity> {
       ];
 
   @override
-  Future<List<MemEntity>> shipV2({
+  Future<List<MemEntity>> ship({
     int? id,
     bool? archived,
     bool? done,
     Condition? condition,
+    GroupBy? groupBy,
+    List<OrderBy>? orderBy,
+    int? offset,
+    int? limit,
     List<LoadChildSpec>? loadChildren,
   }) =>
-      super.shipV2(
+      super.ship(
         condition: And(
           [
             if (id != null) Equals(defPkId, id),
@@ -45,15 +51,19 @@ class MemRepository extends DatabaseTupleRepository<Mem, int, MemEntity> {
             if (condition != null) condition,
           ],
         ),
+        groupBy: groupBy,
+        orderBy: orderBy,
+        offset: offset,
+        limit: limit,
         loadChildren: loadChildren,
       );
 
   @override
-  Future<List<MemEntity>> wasteV2({
+  Future<List<MemEntity>> waste({
     int? id,
     Condition? condition,
   }) =>
-      super.wasteV2(
+      super.waste(
         condition: And(
           [
             if (id != null) Equals(defPkId, id),
@@ -64,8 +74,13 @@ class MemRepository extends DatabaseTupleRepository<Mem, int, MemEntity> {
         ),
       );
 
-  static MemRepository? _instance;
-  factory MemRepository({MemRepository? mock}) =>
-      _instance ??= mock ?? MemRepository._();
   MemRepository._() : super(databaseDefinition, defTableMems);
+
+  factory MemRepository({MemRepository? mock}) {
+    if (mock != null) {
+      Singleton.override<MemRepository>(mock);
+      return mock;
+    }
+    return Singleton.of(() => MemRepository._());
+  }
 }

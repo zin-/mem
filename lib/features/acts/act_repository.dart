@@ -12,8 +12,8 @@ import 'package:mem/framework/singleton.dart';
 // lintエラーになるためコメントアウト
 class ActRepository extends DatabaseTupleRepository<Act, int, ActEntity> {
   @override
-  Future<List<ActEntity>> wasteV2({int? id, Condition? condition}) => v(
-        () => super.wasteV2(
+  Future<List<ActEntity>> waste({int? id, Condition? condition}) => v(
+        () => super.waste(
           condition: And(
             [
               if (id != null) Equals(defPkId, id),
@@ -28,7 +28,7 @@ class ActRepository extends DatabaseTupleRepository<Act, int, ActEntity> {
       );
 
   Future<List<ActEntity>> wastePausedAct(int memId) => v(
-        () async => await super.wasteV2(
+        () async => await super.waste(
           condition: And(
             [
               Equals(defFkActsMemId, memId),
@@ -40,5 +40,12 @@ class ActRepository extends DatabaseTupleRepository<Act, int, ActEntity> {
       );
 
   ActRepository._() : super(databaseDefinition, defTableActs);
-  factory ActRepository() => Singleton.of(() => ActRepository._());
+
+  factory ActRepository({ActRepository? mock}) {
+    if (mock != null) {
+      Singleton.override<ActRepository>(mock);
+      return mock;
+    }
+    return Singleton.of(() => ActRepository._());
+  }
 }
