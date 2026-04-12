@@ -54,7 +54,7 @@ class DriftDatabaseAccessor {
       v(
         () async {
           try {
-            final tableInfo = _getTableInfo(tableDefinition);
+            final tableInfo = _resolveTableInfo(tableDefinition);
             final countExpr = drift.countAll();
             final query = driftDatabase.selectOnly(tableInfo)..addColumns([countExpr]);
             if (condition != null) {
@@ -70,7 +70,7 @@ class DriftDatabaseAccessor {
         {'tableDefinition': tableDefinition, 'condition': condition},
       );
 
-  Future<List<dynamic>> selectV2(
+  Future<List<dynamic>> selectEntities(
     TableDefinition tableDefinition, {
     Condition? condition,
     GroupBy? groupBy,
@@ -81,7 +81,7 @@ class DriftDatabaseAccessor {
   }) =>
       v(
         () async {
-          final tableInfo = _getTableInfoV2(tableDefinition);
+          final tableInfo = _resolveTableInfo(tableDefinition);
           final query = driftDatabase.select(tableInfo);
 
           if (condition != null) {
@@ -189,13 +189,13 @@ class DriftDatabaseAccessor {
         },
       );
 
-  Future insertV2(
+  Future insertEntity(
     dynamic domain,
 // TODO createdAtを受け取るべきかも
   ) =>
       v(
         () async {
-          final tableInfo = _getTableInfoV2(domain);
+          final tableInfo = _resolveTableInfo(domain);
           final insertable = convertIntoDriftInsertable(domain);
 
           final inserted =
@@ -205,9 +205,9 @@ class DriftDatabaseAccessor {
         {'domain': domain},
       );
 
-  Future updateV2(dynamic entity) => v(
+  Future updateEntity(dynamic entity) => v(
         () async {
-          final tableInfo = _getTableInfoV2(entity);
+          final tableInfo = _resolveTableInfo(entity);
           final query = driftDatabase.update(tableInfo)
             ..where((t) => (t as dynamic).id.equals(entity.id));
 
@@ -218,9 +218,11 @@ class DriftDatabaseAccessor {
         {'entity': entity},
       );
 
-  Future<List<dynamic>> deleteV2(dynamic domain, {Condition? condition}) => v(
+  Future<List<dynamic>> deleteEntities(dynamic domain,
+          {Condition? condition}) =>
+      v(
         () async {
-          final tableInfo = _getTableInfoV2(domain);
+          final tableInfo = _resolveTableInfo(domain);
 
           final query = driftDatabase.delete(tableInfo);
 
@@ -251,17 +253,11 @@ class DriftDatabaseAccessor {
     TableDefinition tableDefinition,
     Condition condition,
   ) {
-    final tableInfo = _getTableInfo(tableDefinition);
+    final tableInfo = _resolveTableInfo(tableDefinition);
     return condition.toDriftExpression(tableInfo) != null;
   }
 
-  drift.TableInfo _getTableInfo(
-    TableDefinition tableDefinition,
-  ) =>
-      driftDatabase.allTables
-          .firstWhere((e) => e.actualTableName == tableDefinition.name);
-
-  drift.TableInfo _getTableInfoV2(dynamic domain) {
+  drift.TableInfo _resolveTableInfo(dynamic domain) {
     switch (domain) {
       case mem_domain.Mem _:
       case mem_entity.MemEntity _:
@@ -305,7 +301,7 @@ class DriftDatabaseAccessor {
     ForeignKeyDefinition fk,
     Set<int> parentIds,
   ) async {
-    final childInfo = _getTableInfoV2(spec.table);
+    final childInfo = _resolveTableInfo(spec.table);
     final out = <int, List<dynamic>>{};
     if (parentIds.isEmpty) return out;
     final list = parentIds.toList();

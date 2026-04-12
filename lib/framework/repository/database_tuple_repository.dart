@@ -15,6 +15,10 @@ import 'package:mem/features/logger/log_service.dart';
 
 const _cascadeChunkSize = 900;
 
+/// Drift（SQLite）経由でテーブル行を [Entity] として読み書きするリポジトリの基底。
+///
+/// [receive]・[ship]・[shipById]・[replace]・[waste] は、ルートの [Repository] で説明した
+/// 「倉庫」に合わせた動詞である（ドメイン値の受け取り・送り出し・置き換え・廃棄）。
 abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
     extends Repository {
   static DriftDatabaseAccessor get _driftAccessor => DriftDatabaseAccessor();
@@ -43,15 +47,15 @@ abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
         {'condition': condition},
       );
 
-  Future<ENTITY> receiveV2(DOMAIN domain) => v(
+  Future<ENTITY> receive(DOMAIN domain) => v(
         () async {
-          final inserted = await _driftAccessor.insertV2(domain);
+          final inserted = await _driftAccessor.insertEntity(domain);
           return List<ENTITY>.from([inserted]).single;
         },
         {'domain': domain},
       );
 
-  Future<List<ENTITY>> shipV2({
+  Future<List<ENTITY>> ship({
     Condition? condition,
     GroupBy? groupBy,
     List<OrderBy>? orderBy,
@@ -61,7 +65,7 @@ abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
   }) =>
       v(
         () async {
-          final rows = await _driftAccessor.selectV2(
+          final rows = await _driftAccessor.selectEntities(
             _tableDefinition,
             condition: condition,
             groupBy: groupBy,
@@ -88,7 +92,7 @@ abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
   }) =>
       v(
         () async {
-          final row = await _driftAccessor.selectV2(
+          final row = await _driftAccessor.selectEntities(
             _tableDefinition,
             condition: Equals(defPkId, id),
             loadChildren: loadChildren,
@@ -98,19 +102,19 @@ abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
         {'id': id, 'loadChildren': loadChildren},
       );
 
-  Future<ENTITY> replaceV2(ENTITY entity) => v(
+  Future<ENTITY> replace(ENTITY entity) => v(
         () async {
-          final updated = await _driftAccessor.updateV2(entity);
+          final updated = await _driftAccessor.updateEntity(entity);
           return List<ENTITY>.from([updated]).single;
         },
         {'entity': entity},
       );
 
-  Future<List<ENTITY>> wasteV2({Condition? condition}) => v(
+  Future<List<ENTITY>> waste({Condition? condition}) => v(
         () async {
           await _wasteChildRowsReferencingParent(condition);
 
-          final deleted = await _driftAccessor.deleteV2(
+          final deleted = await _driftAccessor.deleteEntities(
             _tableDefinition,
             condition: condition,
           );
@@ -126,7 +130,7 @@ abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
     final parentTable = _tableDefinition;
 
     final parentIds = await _driftAccessor
-        .selectV2(
+        .selectEntities(
           parentTable,
           condition: parentCondition,
         )
@@ -148,11 +152,11 @@ abstract class DatabaseTupleRepository<DOMAIN, ID, ENTITY extends Entity<ID>>
           if (!_driftAccessor.conditionDriftResolvable(
               childTable, inCondition)) {
             throw StateError(
-              'wasteV2 cascade: cannot resolve In(${fk.name}) on '
+              'waste cascade: cannot resolve In(${fk.name}) on '
               '${childTable.name}',
             );
           }
-          await _driftAccessor.deleteV2(
+          await _driftAccessor.deleteEntities(
             childTable,
             condition: inCondition,
           );

@@ -15,7 +15,7 @@ import 'mem_notification_entity.dart';
 class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
     int, MemNotificationEntity> {
   @override
-  Future<List<MemNotificationEntity>> shipV2({
+  Future<List<MemNotificationEntity>> ship({
     int? memId,
     Iterable<int>? memIdsIn,
     Condition? condition,
@@ -25,7 +25,7 @@ class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
     int? limit,
     List<LoadChildSpec>? loadChildren,
   }) =>
-      super.shipV2(
+      super.ship(
         condition: And(
           [
             if (memId != null) Equals(defFkMemNotificationsMemId, memId),
@@ -41,12 +41,12 @@ class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
       );
 
   @override
-  Future<List<MemNotificationEntity>> wasteV2({
+  Future<List<MemNotificationEntity>> waste({
     int? memId,
     MemNotificationType? type,
     Condition? condition,
   }) =>
-      super.wasteV2(
+      super.waste(
         condition: And(
           [
             if (memId != null) Equals(defFkMemNotificationsMemId, memId),

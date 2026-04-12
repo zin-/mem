@@ -87,13 +87,13 @@ void main() {
   TargetRepository(mock: mockTargetRepository);
 
   setUp(() {
-    when(mockMemRepository.shipV2(
+    when(mockMemRepository.ship(
       id: anyNamed('id'),
       archived: anyNamed('archived'),
       done: anyNamed('done'),
       condition: anyNamed('condition'),
     )).thenAnswer((_) async => []);
-    when(mockMemItemRepository.shipV2(
+    when(mockMemItemRepository.ship(
       memId: anyNamed('memId'),
       condition: anyNamed('condition'),
       groupBy: anyNamed('groupBy'),
@@ -101,12 +101,12 @@ void main() {
       offset: anyNamed('offset'),
       limit: anyNamed('limit'),
     )).thenAnswer((_) async => []);
-    when(mockMemNotificationRepository.shipV2(
+    when(mockMemNotificationRepository.ship(
       memId: anyNamed('memId'),
       memIdsIn: anyNamed('memIdsIn'),
       condition: anyNamed('condition'),
     )).thenAnswer((_) async => []);
-    when(mockMemRelationRepository.shipBySourceMemIdV2(any))
+    when(mockMemRelationRepository.shipBySourceMemId(any))
         .thenAnswer((_) async => []);
   });
 
@@ -161,7 +161,7 @@ void main() {
             null,
           ),
         );
-        when(mockMemNotificationRepository.shipV2(
+        when(mockMemNotificationRepository.ship(
           memId: _TestConstants.testMemId,
         )).thenAnswer((_) async => [
               MemNotificationEntity(
@@ -176,7 +176,7 @@ void main() {
               ),
             ]);
 
-        when(mockMemItemRepository.shipV2(memId: _TestConstants.testMemId))
+        when(mockMemItemRepository.ship(memId: _TestConstants.testMemId))
             .thenAnswer((_) async => [
                   MemItemEntity(
                     _TestConstants.testMemId,
@@ -189,7 +189,7 @@ void main() {
                   ),
                 ]);
 
-        when(mockTargetRepository.shipV2(
+        when(mockTargetRepository.ship(
                 condition: Equals(defFkTargetMemId, _TestConstants.testMemId)))
             .thenAnswer((_) async => [
                   TargetEntity(
@@ -206,7 +206,7 @@ void main() {
                 ]);
 
         when(mockMemRelationRepository
-                .shipBySourceMemIdV2(_TestConstants.testMemId))
+                .shipBySourceMemId(_TestConstants.testMemId))
             .thenAnswer((_) async => [
                   MemRelationEntity(
                     _TestConstants.testMemId,
@@ -334,7 +334,7 @@ void main() {
             null,
           ),
         );
-        when(mockMemNotificationRepository.shipV2(
+        when(mockMemNotificationRepository.ship(
           memId: _TestConstants.testMemId,
         )).thenAnswer((_) async => [
               MemNotificationEntity(
@@ -349,7 +349,7 @@ void main() {
               ),
             ]);
 
-        when(mockMemItemRepository.shipV2(memId: _TestConstants.testMemId))
+        when(mockMemItemRepository.ship(memId: _TestConstants.testMemId))
             .thenAnswer((_) async => [
                   MemItemEntity(
                     _TestConstants.testMemId,
@@ -362,7 +362,7 @@ void main() {
                   ),
                 ]);
 
-        when(mockTargetRepository.shipV2(
+        when(mockTargetRepository.ship(
                 condition: Equals(defFkTargetMemId, _TestConstants.testMemId)))
             .thenAnswer((_) async => [
                   TargetEntity(
@@ -379,7 +379,7 @@ void main() {
                 ]);
 
         when(mockMemRelationRepository
-                .shipBySourceMemIdV2(_TestConstants.testMemId))
+                .shipBySourceMemId(_TestConstants.testMemId))
             .thenAnswer((_) async => [
                   MemRelationEntity(
                     _TestConstants.testMemId,

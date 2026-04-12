@@ -40,7 +40,7 @@ class ActQueryService {
   Future<List<ActEntity>> fetchLatestAndPausedByMemIds(Iterable<int>? memIds) =>
       v(
         () async {
-          final rows = await _driftAccessor.selectV2(
+          final rows = await _driftAccessor.selectEntities(
             defTableActs,
             condition: And(
               [
@@ -60,7 +60,7 @@ class ActQueryService {
 
   Future<ActEntity?> fetchLatestByMemIds(int memId) => v(
         () async {
-          final rows = await _driftAccessor.selectV2(
+          final rows = await _driftAccessor.selectEntities(
             defTableActs,
             condition: Equals(defFkActsMemId, memId),
             orderBy: [Descending(defColActsStart)],
@@ -78,7 +78,7 @@ class ActQueryService {
   ) =>
       v(
         () async {
-          final rows = await _driftAccessor.selectV2(
+          final rows = await _driftAccessor.selectEntities(
             defTableActs,
             condition: memId == null ? null : Equals(defFkActsMemId, memId),
             orderBy: [Descending(defColActsStart)],
@@ -103,7 +103,7 @@ class ActQueryService {
   ) =>
       v(
         () async {
-          final rows = await _driftAccessor.selectV2(
+          final rows = await _driftAccessor.selectEntities(
             defTableActs,
             condition: And(
               [

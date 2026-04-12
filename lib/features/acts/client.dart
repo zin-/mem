@@ -143,7 +143,7 @@ class ActsClient {
   Future<ActEntity> delete(int actId) => i(
         () async {
           final deleted =
-              await _actRepository.wasteV2(id: actId).then((v) => v.single);
+              await _actRepository.waste(id: actId).then((v) => v.single);
 
           _notificationClient.cancelActNotification(deleted.memId!);
 

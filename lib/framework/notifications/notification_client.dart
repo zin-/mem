@@ -148,7 +148,7 @@ class NotificationClient {
                 mem,
                 startOfDay,
                 await _memNotificationRepository
-                    .shipV2(memId: mem.id!)
+                    .ship(memId: mem.id!)
                     .then((v) => v.map((e) => e.toDomain())),
                 latestAct,
                 DateTime.now(),
@@ -195,7 +195,7 @@ class NotificationClient {
 
           final now = DateTime.now();
           final memNotifications =
-              await _memNotificationRepository.shipV2(memId: memId);
+              await _memNotificationRepository.ship(memId: memId);
           for (var notification in memNotifications.where((e) =>
               e.toDomain().isEnabled() && e.toDomain().isAfterActStarted())) {
             await _scheduleClient.receive(
@@ -286,7 +286,7 @@ class NotificationClient {
   Future<bool> _shouldNotify(int memId) => v(
         () async {
           final savedMemNotifications =
-              await _memNotificationRepository.shipV2(memId: memId);
+              await _memNotificationRepository.ship(memId: memId);
           final repeatByDayOfWeekMemNotifications = savedMemNotifications.where(
             (e) =>
                 e.toDomain().isEnabled() && e.toDomain().isRepeatByDayOfWeek(),
@@ -329,7 +329,7 @@ class NotificationClient {
           await _notificationRepository.discardAll();
 
           final allSavedMems = await _memRepository
-              .shipV2(
+              .ship(
                 archived: false,
                 done: false,
               )

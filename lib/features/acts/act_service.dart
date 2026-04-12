@@ -43,11 +43,11 @@ class ActService {
 
           if (latestActEntity == null ||
               latestActEntity.toDomain().state == ActState.finished) {
-            return await _actRepository.receiveV2(
+            return await _actRepository.receive(
               Act.by(memId, startWhen: when),
             );
           } else {
-            return await _actRepository.replaceV2(
+            return await _actRepository.replace(
               latestActEntity.updatedWith(
                 latestActEntity.toDomain().start(when),
               ),
@@ -71,11 +71,11 @@ class ActService {
 
           if (latestActiveActEntity == null ||
               latestActiveActEntity.end != null) {
-            return await _actRepository.receiveV2(
+            return await _actRepository.receive(
               Act.by(memId, endWhen: when),
             );
           } else {
-            return await _actRepository.replaceV2(
+            return await _actRepository.replace(
               latestActiveActEntity.updatedWith(
                 latestActiveActEntity.toDomain().finish(when),
               ),
@@ -99,12 +99,12 @@ class ActService {
 
           return [
             if (latestActiveActEntity != null)
-              await _actRepository.replaceV2(
+              await _actRepository.replace(
                 latestActiveActEntity.updatedWith(
                   latestActiveActEntity.toDomain().finish(when),
                 ),
               ),
-            await _actRepository.receiveV2(
+            await _actRepository.receive(
               Act.by(memId, pausedAt: when),
             ),
           ];
@@ -116,7 +116,7 @@ class ActService {
       );
 
   Future<ActEntity> edit(ActEntity savedAct) => i(
-        () async => await _actRepository.replaceV2(savedAct),
+        () async => await _actRepository.replace(savedAct),
         {
           'savedAct': savedAct,
         },

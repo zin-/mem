@@ -25,7 +25,7 @@ class MemRepository extends DatabaseTupleRepository<Mem, int, MemEntity> {
       ];
 
   @override
-  Future<List<MemEntity>> shipV2({
+  Future<List<MemEntity>> ship({
     int? id,
     bool? archived,
     bool? done,
@@ -36,7 +36,7 @@ class MemRepository extends DatabaseTupleRepository<Mem, int, MemEntity> {
     int? limit,
     List<LoadChildSpec>? loadChildren,
   }) =>
-      super.shipV2(
+      super.ship(
         condition: And(
           [
             if (id != null) Equals(defPkId, id),
@@ -59,11 +59,11 @@ class MemRepository extends DatabaseTupleRepository<Mem, int, MemEntity> {
       );
 
   @override
-  Future<List<MemEntity>> wasteV2({
+  Future<List<MemEntity>> waste({
     int? id,
     Condition? condition,
   }) =>
-      super.wasteV2(
+      super.waste(
         condition: And(
           [
             if (id != null) Equals(defPkId, id),

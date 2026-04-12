@@ -17,7 +17,7 @@ class MemStore {
   Future<List<SavedMemEntityV1>> serve({bool? archived, bool? done}) => v(
         () async {
           final mems = await _memRepository
-              .shipV2(
+              .ship(
                 archived: archived,
                 done: done,
                 loadChildren: MemRepository.loadLatestActChild,

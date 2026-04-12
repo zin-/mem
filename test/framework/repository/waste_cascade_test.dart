@@ -20,7 +20,7 @@ class _TestMemRepo extends DatabaseTupleRepository<Mem, int, MemEntity> {
 }
 
 void main() {
-  group('wasteV2 child cascade', () {
+  group('waste child cascade', () {
     late AppDatabase db;
 
     setUp(() async {
@@ -86,7 +86,7 @@ void main() {
             ),
           );
 
-      await _TestMemRepo().wasteV2(condition: Equals(defPkId, m1.id));
+      await _TestMemRepo().waste(condition: Equals(defPkId, m1.id));
 
       expect(await db.select(db.mems).get(), hasLength(1));
       expect((await db.select(db.mems).get()).single.id, m2.id);
