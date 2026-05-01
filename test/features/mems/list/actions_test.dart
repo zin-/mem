@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
+import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
@@ -42,7 +43,9 @@ class _FakeMemEntities extends MemEntities {
 
 class _FakeActEntities extends ActEntities {
   int startActbyCallCount = 0;
+  int resumeActByCallCount = 0;
   int? lastStartActbyMemId;
+  int? lastResumeActByMemId;
 
   @override
   Iterable<SavedActEntityV1> build() => [];
@@ -51,6 +54,12 @@ class _FakeActEntities extends ActEntities {
   Future<void> startActby(int memId) async {
     startActbyCallCount++;
     lastStartActbyMemId = memId;
+  }
+
+  @override
+  Future<void> resumeActBy(int memId) async {
+    resumeActByCallCount++;
+    lastResumeActByMemId = memId;
   }
 }
 
@@ -165,6 +174,82 @@ void main() {
         await tester.tap(find.byIcon(Icons.play_arrow).first);
         await tester.pump();
 
+        expect(fakeAct.startActbyCallCount, 1);
+        expect(fakeAct.lastStartActbyMemId, 2);
+      });
+
+      testWidgets(
+          'play on idle mem starts that mem only when another mem is paused',
+          (tester) async {
+        final saved1 = _savedMem(1, 'First');
+        final saved2 = _savedMem(2, 'Second');
+        final entity1 = saved1.toEntityV2();
+        final entity2 = saved2.toEntityV2();
+        final notification1 = _savedNotification(101, 1);
+        final notification2 = _savedNotification(102, 2);
+        final fakeAct = _FakeActEntities();
+        final scrollController = ScrollController();
+        final paused1 = PausedAct(
+          1,
+          DateTime(2024, 6, 1, 10, 0),
+        );
+
+        addTearDown(scrollController.dispose);
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              preferenceProvider(startOfDayKey).overrideWith(
+                () => _FakePreference(),
+              ),
+              memEntitiesProvider.overrideWith(
+                () => _FakeMemEntities([saved1, saved2]),
+              ),
+              memListProvider.overrideWith(
+                (ref) => ValueStateNotifier<List<MemEntity>>([
+                  entity1,
+                  entity2,
+                ]),
+              ),
+              memNotificationsProvider.overrideWith(
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>([
+                  notification1,
+                  notification2,
+                ]),
+              ),
+              memNotificationsByMemIdProvider(1).overrideWith(
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>(
+                  [notification1],
+                ),
+              ),
+              memNotificationsByMemIdProvider(2).overrideWith(
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>(
+                  [notification2],
+                ),
+              ),
+              memStateProvider(1)
+                  .overrideWith(() => _FakeMemState(saved1.value)),
+              memStateProvider(2)
+                  .overrideWith(() => _FakeMemState(saved2.value)),
+              latestActsByMemProvider.overrideWith(
+                (ref) => {1: paused1, 2: null},
+              ),
+              actEntitiesProvider.overrideWith(() => fakeAct),
+            ],
+            child: MaterialApp(
+              home: Scaffold(
+                body: MemListWidget(scrollController),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byIcon(Icons.play_arrow).at(1));
+        await tester.pump();
+
+        expect(fakeAct.resumeActByCallCount, 0);
+        expect(fakeAct.lastResumeActByMemId, isNull);
         expect(fakeAct.startActbyCallCount, 1);
         expect(fakeAct.lastStartActbyMemId, 2);
       });

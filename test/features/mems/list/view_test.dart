@@ -51,6 +51,9 @@ class _FakeActEntities extends ActEntities {
 
   @override
   Future<void> startActby(int memId) async {}
+
+  @override
+  Future<void> resumeActBy(int memId) async {}
 }
 
 class _FakePreference extends Preference<TimeOfDay> {

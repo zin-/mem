@@ -58,10 +58,12 @@ class _FakeMemEntities extends MemEntities {
 
 class _FakeActEntities extends ActEntities {
   int startActbyCallCount = 0;
+  int resumeActByCallCount = 0;
   int finishActbyCallCount = 0;
   int pauseByMemIdCallCount = 0;
   int closeByMemIdCallCount = 0;
   int? lastStartActbyMemId;
+  int? lastResumeActByMemId;
   int? lastFinishActbyMemId;
   int? lastPauseByMemId;
   int? lastCloseByMemId;
@@ -73,6 +75,12 @@ class _FakeActEntities extends ActEntities {
   Future<void> startActby(int memId) async {
     startActbyCallCount++;
     lastStartActbyMemId = memId;
+  }
+
+  @override
+  Future<void> resumeActBy(int memId) async {
+    resumeActByCallCount++;
+    lastResumeActByMemId = memId;
   }
 
   @override
@@ -1003,6 +1011,65 @@ void main() {
 
         expect(fakeActEntities.startActbyCallCount, 1);
         expect(fakeActEntities.lastStartActbyMemId, memId);
+      });
+
+      testWidgets('calls resumeActBy when play is tapped while paused',
+          (tester) async {
+        final now = DateTime.now();
+        final pausedAct =
+            PausedAct(memId, now.subtract(const Duration(minutes: 5)));
+        final notification = SavedMemNotificationEntityV1({
+          defPkId.name: 1,
+          defFkMemNotificationsMemId.name: memId,
+          defColMemNotificationsType.name: 'repeat',
+          defColMemNotificationsTime.name: 9 * 60 * 60,
+          defColMemNotificationsMessage.name: 'Repeat',
+          defColCreatedAt.name: now,
+          defColUpdatedAt.name: now,
+          defColArchivedAt.name: null,
+        });
+        final fakeActEntities = _FakeActEntities();
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              latestActsByMemProvider.overrideWith((ref) => {memId: pausedAct}),
+              memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
+                  ListValueStateNotifier<MemNotificationEntityV1>(
+                      [notification])),
+              memStateProvider(memId)
+                  .overrideWith(() => _FakeMemState(baseMem)),
+              memEntitiesProvider.overrideWith(() => _FakeMemEntities([
+                    SavedMemEntityV1({
+                      'id': baseMem.id,
+                      'name': baseMem.name,
+                      'doneAt': baseMem.doneAt,
+                      'notifyOn': null,
+                      'notifyAt': null,
+                      'endOn': null,
+                      'endAt': null,
+                      'createdAt': DateTime.now(),
+                      'updatedAt': DateTime.now(),
+                      'archivedAt': null,
+                    })
+                  ])),
+              actEntitiesProvider.overrideWith(() => fakeActEntities),
+            ],
+            child: MaterialApp(
+              home: Scaffold(
+                body: MemListItemView(baseMem),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byIcon(Icons.play_arrow));
+        await tester.pump();
+
+        expect(fakeActEntities.resumeActByCallCount, 1);
+        expect(fakeActEntities.lastResumeActByMemId, memId);
+        expect(fakeActEntities.startActbyCallCount, 0);
       });
 
       testWidgets('calls finishActby when stop button is tapped',
