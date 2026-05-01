@@ -22,6 +22,20 @@ class ActService {
     DateAndTime when,
   ) =>
       i(
+        () async => await _actRepository.receive(
+          Act.by(memId, startWhen: when),
+        ),
+        {
+          'memId': memId,
+          'when': when,
+        },
+      );
+
+  Future<ActEntity> resume(
+    int memId,
+    DateAndTime when,
+  ) =>
+      i(
         () async {
           final latestActEntity = await _actQueryService
               .fetchLatestAndPausedByMemIds([memId])
@@ -46,13 +60,13 @@ class ActService {
             return await _actRepository.receive(
               Act.by(memId, startWhen: when),
             );
-          } else {
-            return await _actRepository.replace(
-              latestActEntity.updatedWith(
-                latestActEntity.toDomain().start(when),
-              ),
-            );
           }
+
+          return await _actRepository.replace(
+            latestActEntity.updatedWith(
+              latestActEntity.toDomain().start(when),
+            ),
+          );
         },
         {
           'memId': memId,
