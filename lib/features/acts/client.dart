@@ -66,6 +66,24 @@ class ActsClient {
         },
       );
 
+  Future<SavedActEntityV1> resume(
+    int memId,
+    DateAndTime when,
+  ) =>
+      v(
+        () async {
+          final resumedAct = await _actService.resume(memId, when);
+
+          _notificationClient.startActNotifications(memId);
+
+          return SavedActEntityV1.fromEntityV2(resumedAct);
+        },
+        {
+          "memId": memId,
+          "when": when,
+        },
+      );
+
   Future<SavedActEntityV1> edit(
     SavedActEntityV1 savedAct,
   ) =>
