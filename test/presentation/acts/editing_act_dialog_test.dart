@@ -29,6 +29,9 @@ class _FakeActEntities extends ActEntities {
     removeCallCount++;
     return _state.where((e) => !ids.contains(e.id));
   }
+
+  @override
+  Future<void> resumeActBy(int memId) async {}
 }
 
 void main() {

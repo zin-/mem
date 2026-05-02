@@ -64,6 +64,22 @@ class ActEntities extends _$ActEntities
         },
       );
 
+  Future<void> resumeActBy(int memId) => v(
+        () async {
+          final now = DateAndTime.now();
+
+          final resumedAct = await ActsClient().resume(memId, now);
+
+          upsert([resumedAct]);
+          await ref
+              .read(memEntitiesProvider.notifier)
+              .refreshLatestActForMem(memId);
+        },
+        {
+          'memId': memId,
+        },
+      );
+
   Future<void> pauseByMemId(int memId) => v(
         () async {
           final now = DateAndTime.now();

@@ -28,6 +28,7 @@ class _FakeActEntities extends ActEntities {
   final List<int> _removed = [];
   int _fetchCallCount = 0;
   int _startActbyCallCount = 0;
+  int _resumeActByCallCount = 0;
   int _pauseByMemIdCallCount = 0;
   int _closeByMemIdCallCount = 0;
   int _finishActbyCallCount = 0;
@@ -53,6 +54,25 @@ class _FakeActEntities extends ActEntities {
     final now = DateTime.now();
     final act = SavedActEntityV1({
       defPkId.name: 1,
+      defFkActsMemId.name: memId,
+      defColActsStart.name: now,
+      defColActsStartIsAllDay.name: false,
+      defColActsEnd.name: null,
+      defColActsEndIsAllDay.name: null,
+      defColActsPausedAt.name: null,
+      defColCreatedAt.name: now,
+      defColUpdatedAt.name: now,
+      defColArchivedAt.name: null,
+    });
+    upsert([act]);
+  }
+
+  @override
+  Future<void> resumeActBy(int memId) async {
+    _resumeActByCallCount++;
+    final now = DateTime.now();
+    final act = SavedActEntityV1({
+      defPkId.name: 2,
       defFkActsMemId.name: memId,
       defColActsStart.name: now,
       defColActsStartIsAllDay.name: false,
@@ -116,6 +136,7 @@ class _FakeActEntities extends ActEntities {
   List<int> get removed => _removed;
   int get fetchCallCount => _fetchCallCount;
   int get startActbyCallCount => _startActbyCallCount;
+  int get resumeActByCallCount => _resumeActByCallCount;
   int get pauseByMemIdCallCount => _pauseByMemIdCallCount;
   int get closeByMemIdCallCount => _closeByMemIdCallCount;
   int get finishActbyCallCount => _finishActbyCallCount;
@@ -174,6 +195,22 @@ void main() {
 
       await notifier.startActby(1);
       expect(container.read(actEntitiesProvider), isNotEmpty);
+    });
+
+    test('resumeActBy calls client and upserts result', () async {
+      final fake = _FakeActEntities();
+      final container = ProviderContainer(
+        overrides: [
+          actEntitiesProvider.overrideWith(() => fake),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final notifier = container.read(actEntitiesProvider.notifier);
+
+      await notifier.resumeActBy(1);
+      expect(container.read(actEntitiesProvider), isNotEmpty);
+      expect(fake.resumeActByCallCount, 1);
     });
 
     test('pauseByMemId calls client and upserts results', () async {

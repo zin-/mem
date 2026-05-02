@@ -43,6 +43,8 @@ class MemListItemView extends ConsumerWidget {
           ),
           () =>
               ref.read(actEntitiesProvider.notifier).startActby(_mem.id as int),
+          () =>
+              ref.read(actEntitiesProvider.notifier).resumeActBy(_mem.id as int),
           () => ref
               .read(actEntitiesProvider.notifier)
               .finishActby(_mem.id as int),
@@ -66,6 +68,7 @@ ListTile _render(
   void Function(bool? value, int memId) onMemDoneCheckboxTapped,
   Act? latestActByMem,
   void Function() startAct,
+  void Function() resumeAct,
   void Function() finishAct,
   void Function() pauseAct,
   void Function() closeAct,
@@ -84,7 +87,8 @@ ListTile _render(
             .isNotEmpty;
 
         final startIconButton = IconButton(
-          onPressed: () => startAct(),
+          onPressed: () =>
+              hasPausedAct ? resumeAct() : startAct(),
           icon: const Icon(Icons.play_arrow),
         );
         final stopIconButton = IconButton(
