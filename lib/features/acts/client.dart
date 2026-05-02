@@ -181,11 +181,17 @@ class ActsClient {
 
   static ActsClient? _instance;
 
-  factory ActsClient() => _instance ??= ActsClient._(
-        ActService(),
-        ActRepository(),
-        ActQueryService(),
-        NotificationClient(),
+  factory ActsClient({
+    ActService? actService,
+    ActRepository? actRepository,
+    ActQueryService? actQueryService,
+    NotificationClient? notificationClient,
+  }) =>
+      _instance ??= ActsClient._(
+        actService ?? ActService(),
+        actRepository ?? ActRepository(),
+        actQueryService ?? ActQueryService(),
+        notificationClient ?? NotificationClient(),
       );
 
   static void resetSingleton() => v(

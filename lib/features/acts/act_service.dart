@@ -143,10 +143,27 @@ class ActService {
 
   static ActService? _instance;
 
-  factory ActService() => i(
+  factory ActService({
+    ActRepository? actRepository,
+    ActQueryService? actQueryService,
+  }) =>
+      i(
         () => _instance ??= ActService._(
-          ActRepository(),
-          ActQueryService(),
+          actRepository ?? ActRepository(),
+          actQueryService ?? ActQueryService(),
         ),
+        {
+          'actRepository': actRepository,
+          'actQueryService': actQueryService,
+        },
+      );
+
+  static void resetSingleton() => v(
+        () {
+          _instance = null;
+        },
+        {
+          '_instance': _instance,
+        },
       );
 }
