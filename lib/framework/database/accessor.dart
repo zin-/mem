@@ -553,7 +553,7 @@ WHERE $rnPredicate
     }
   }
 
-  _convertToEntity(
+  Entity<int> _convertToEntity(
     dynamic row,
     String tableName, {
     Map<String, dynamic> children = const {},
@@ -666,7 +666,7 @@ String toSnakeCase(String camelCase) {
   );
 }
 
-convertIntoDriftInsertable(dynamic domain) {
+dynamic convertIntoDriftInsertable(dynamic domain) {
   switch (domain) {
     case mem_domain.Mem _:
       return convertIntoMemsInsertable(domain, DateTime.now());
@@ -696,7 +696,7 @@ convertIntoDriftInsertable(dynamic domain) {
   }
 }
 
-convertIntoDriftUpdateable(
+dynamic convertIntoDriftUpdateable(
   dynamic entity,
 ) {
   switch (entity) {

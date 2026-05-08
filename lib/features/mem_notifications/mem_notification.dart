@@ -201,7 +201,7 @@ class MemNotification {
       );
 
   static String _oneLineAfterAct(
-    afterActStarted,
+    MemNotification afterActStarted,
     String Function(String at) buildAfterActStartedNotificationText,
   ) =>
       buildAfterActStartedNotificationText(DateFormat(DateFormat.HOUR24_MINUTE)

@@ -56,7 +56,7 @@ dependencies:
   home_widget: any
   workmanager: any
   day_picker: any
-  file_picker: any
+  file_picker: ^11.0.0
   permission_handler: any
   sentry_flutter: any
   flutter_foreground_task: any

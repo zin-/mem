@@ -126,7 +126,7 @@ class LogService {
     }
   }
 
-  _errorLog(
+  dynamic _errorLog(
     dynamic e, [
     StackTrace? stackTrace,
   ]) =>

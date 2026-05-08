@@ -14,15 +14,25 @@ class FilesClient {
 
   factory FilesClient() => _instance ??= FilesClient._();
 
-  Future<List<XFile>?> pick() => v(
-        () async => (await FilePicker.platform.pickFiles())?.xFiles,
-      );
+  Future<List<XFile>?> pick() => v(() async {
+        final result = await FilePicker.pickFiles();
+        if (result == null) return null;
+        return result.files.map((f) {
+          final path = f.path;
+          if (path != null) return XFile(path);
+          final bytes = f.bytes;
+          if (bytes != null) return XFile.fromData(bytes, name: f.name);
+          throw StateError('PlatformFile has no path or bytes: ${f.name}');
+        }).toList();
+      });
 
   Future<String> saveOrShare(File file) => v(
         () async {
           switch (defaultTargetPlatform) {
             case TargetPlatform.android:
-              final result = await Share.shareXFiles([XFile(file.path)]);
+              final result = await SharePlus.instance.share(
+                ShareParams(files: [XFile(file.path)]),
+              );
 
               // 何が返ってくるか憶測しかできないのでrawを返却しておく
               return result.raw;

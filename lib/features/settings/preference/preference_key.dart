@@ -6,9 +6,9 @@ abstract class PreferenceKey<T> {
 
   PreferenceKey(this.value);
 
-  T? deserialize(serialized);
+  T? deserialize(dynamic serialized);
 
-  serialize(T? deserialized);
+  dynamic serialize(T? deserialized);
 
   @override
   String toString() => value;
@@ -18,7 +18,7 @@ class IntPreferenceKey extends PreferenceKey<int> {
   IntPreferenceKey(super.value);
 
   @override
-  int? deserialize(serialized) => serialized;
+  int? deserialize(dynamic serialized) => serialized;
 
   @override
   int? serialize(int? deserialized) => deserialized;
@@ -28,7 +28,7 @@ class TimeOfDayPreferenceKey extends PreferenceKey<TimeOfDay> {
   TimeOfDayPreferenceKey(super.value);
 
   @override
-  TimeOfDay? deserialize(serialized) => v(
+  TimeOfDay? deserialize(dynamic serialized) => v(
         () {
           if (serialized == null) {
             return null;

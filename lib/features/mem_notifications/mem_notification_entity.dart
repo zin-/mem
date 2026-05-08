@@ -112,7 +112,7 @@ class MemNotificationEntity implements Entity<int> {
         tuple.archivedAt,
       );
 
-  toDomain() => MemNotification(
+  MemNotification toDomain() => MemNotification(
         memId,
         type,
         time,
@@ -120,8 +120,11 @@ class MemNotificationEntity implements Entity<int> {
       );
 }
 
-convertIntoMemRepeatedNotificationsInsertable(MemNotification entity,
-        {DateTime? createdAt}) =>
+drift_database.MemRepeatedNotificationsCompanion
+    convertIntoMemRepeatedNotificationsInsertable(
+  MemNotification entity, {
+  DateTime? createdAt,
+}) =>
     drift_database.MemRepeatedNotificationsCompanion(
       memId: Value(entity.memId ?? 0),
       timeOfDaySeconds: Value(entity.time ?? 0),
@@ -129,7 +132,8 @@ convertIntoMemRepeatedNotificationsInsertable(MemNotification entity,
       message: Value(entity.message),
       createdAt: Value(createdAt ?? DateTime.now()),
     );
-convertIntoMemRepeatedNotificationsUpdateable(
+drift_database.MemRepeatedNotificationsCompanion
+    convertIntoMemRepeatedNotificationsUpdateable(
   MemNotificationEntity entity,
 ) =>
     drift_database.MemRepeatedNotificationsCompanion(
