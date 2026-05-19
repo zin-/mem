@@ -3,6 +3,24 @@ import 'dart:core';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 
+enum ActKind {
+  finished,
+  skipped,
+}
+
+ActKind? actKindFromStored(Object? raw) {
+  if (raw == null) return null;
+  if (raw is! String) return null;
+  switch (raw) {
+    case 'finished':
+      return ActKind.finished;
+    case 'skipped':
+      return ActKind.skipped;
+    default:
+      return null;
+  }
+}
+
 enum ActState {
   active,
   paused,
@@ -14,19 +32,40 @@ abstract class Act {
   final DateAndTimePeriod? period;
   final DateTime? pausedAt;
   final ActState state;
+  final ActKind? actKind;
 
-  Act(this.memId, this.period, this.pausedAt, this.state);
+  Act(this.memId, this.period, this.pausedAt, this.state, this.actKind);
 
-  factory Act.by(int memId, {
+  factory Act.by(
+    int memId, {
     DateAndTime? startWhen,
     DateAndTime? endWhen,
     DateTime? pausedAt,
+    ActKind? completionKind,
+    bool completionKindFromRow = false,
   }) {
+    ActKind? resolvedCompletionKind() {
+      if (!completionKindFromRow) {
+        return completionKind ?? ActKind.finished;
+      }
+      return completionKind;
+    }
+
     if (endWhen != null) {
       if (startWhen == null) {
-        return FinishedAct(memId, endWhen, endWhen);
+        return FinishedAct(
+          memId,
+          endWhen,
+          endWhen,
+          actKind: resolvedCompletionKind(),
+        );
       } else {
-        return FinishedAct(memId, startWhen, endWhen);
+        return FinishedAct(
+          memId,
+          startWhen,
+          endWhen,
+          actKind: resolvedCompletionKind(),
+        );
       }
     }
     if (startWhen != null) {
@@ -55,15 +94,16 @@ abstract class Act {
 class ActiveAct extends Act {
   ActiveAct(int memId, DateAndTime startWhen)
       : super(
-    memId,
-    DateAndTimePeriod(start: startWhen),
-    null,
-    ActState.active,
-  );
+          memId,
+          DateAndTimePeriod(start: startWhen),
+          null,
+          ActState.active,
+          null,
+        );
 
   @override
   FinishedAct finish(DateAndTime when) =>
-      FinishedAct(memId, period?.start ?? when, when);
+      FinishedAct(memId, period?.start ?? when, when, actKind: ActKind.finished);
 
   @override
   ActiveAct start(DateAndTime when) =>
@@ -71,14 +111,18 @@ class ActiveAct extends Act {
 }
 
 class FinishedAct extends Act {
-  FinishedAct(int memId,
-      DateAndTime startWhen,
-      DateAndTime endWhen,) : super(
-    memId,
-    DateAndTimePeriod(start: startWhen, end: endWhen),
-    null,
-    ActState.finished,
-  );
+  FinishedAct(
+    int memId,
+    DateAndTime startWhen,
+    DateAndTime endWhen, {
+    ActKind? actKind,
+  }) : super(
+          memId,
+          DateAndTimePeriod(start: startWhen, end: endWhen),
+          null,
+          ActState.finished,
+          actKind,
+        );
 
   @override
   FinishedAct finish(DateAndTime when) =>
@@ -92,14 +136,16 @@ class FinishedAct extends Act {
 class PausedAct extends Act {
   PausedAct(int memId, DateTime pausedAt)
       : super(
-    memId,
-    null,
-    pausedAt,
-    ActState.paused,
-  );
+          memId,
+          null,
+          pausedAt,
+          ActState.paused,
+          null,
+        );
 
   @override
-  FinishedAct finish(DateAndTime when) => FinishedAct(memId, when, when);
+  FinishedAct finish(DateAndTime when) =>
+      FinishedAct(memId, when, when, actKind: ActKind.finished);
 
   @override
   ActiveAct start(DateAndTime when) => ActiveAct(memId, when);

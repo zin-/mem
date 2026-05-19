@@ -76,6 +76,8 @@ class _EditingActDialogContentState extends State<_EditingActDialogContent> {
         _editingAct.memId,
         startWhen: pickedPeriod?.start,
         endWhen: pickedPeriod?.end,
+        completionKind: _editingAct.actKind,
+        completionKindFromRow: true,
       );
     });
   }

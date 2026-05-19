@@ -21,6 +21,7 @@ class ActEntityV1 with EntityV1<Act> {
         defColActsEnd.name: value.period?.end,
         defColActsEndIsAllDay.name: value.period?.end?.isAllDay,
         defColActsPausedAt.name: value.pausedAt,
+        defColActsActKind.name: value.actKind?.name,
       };
 
   @override
@@ -51,6 +52,10 @@ class SavedActEntityV1 extends ActEntityV1
                         : map[defColActsEnd.name],
                   ),
             pausedAt: map[defColActsPausedAt.name],
+            completionKind: map.containsKey(defColActsActKind.name)
+                ? actKindFromStored(map[defColActsActKind.name])
+                : null,
+            completionKindFromRow: map.containsKey(defColActsActKind.name),
           ),
         ) {
     withMap(map);
@@ -68,6 +73,7 @@ class SavedActEntityV1 extends ActEntityV1
           defColActsEnd.name: entity.end,
           defColActsEndIsAllDay.name: entity.end?.isAllDay,
           defColActsPausedAt.name: entity.pausedAt,
+          defColActsActKind.name: entity.actKind?.name,
           defPkId.name: entity.id,
           defColCreatedAt.name: entity.createdAt,
           defColUpdatedAt.name: entity.updatedAt,
@@ -84,6 +90,7 @@ class SavedActEntityV1 extends ActEntityV1
         createdAt,
         updatedAt,
         archivedAt,
+        actKind: value.actKind,
       );
 }
 
@@ -92,6 +99,7 @@ class ActEntity implements Entity<int> {
   final DateAndTime? start;
   final DateAndTime? end;
   final DateTime? pausedAt;
+  final ActKind? actKind;
 
   @override
   final int id;
@@ -110,14 +118,17 @@ class ActEntity implements Entity<int> {
     this.id,
     this.createdAt,
     this.updatedAt,
-    this.archivedAt,
-  );
+    this.archivedAt, {
+    this.actKind,
+  });
 
   Act toDomain() => Act.by(
         memId!,
         startWhen: start,
         endWhen: end,
         pausedAt: pausedAt,
+        completionKind: actKind,
+        completionKindFromRow: true,
       );
 
   factory ActEntity.fromTuple(dynamic tuple) {
@@ -145,6 +156,9 @@ class ActEntity implements Entity<int> {
         tuple[defColCreatedAt.name],
         tuple[defColUpdatedAt.name],
         tuple[defColArchivedAt.name],
+        actKind: tuple.containsKey(defColActsActKind.name)
+            ? actKindFromStored(tuple[defColActsActKind.name])
+            : null,
       );
     }
     return ActEntity(
@@ -166,6 +180,7 @@ class ActEntity implements Entity<int> {
       tuple.createdAt,
       tuple.updatedAt,
       tuple.archivedAt,
+      actKind: actKindFromStored(tuple.actKind),
     );
   }
 
@@ -178,6 +193,7 @@ class ActEntity implements Entity<int> {
         createdAt,
         updatedAt,
         archivedAt,
+        actKind: act.actKind,
       );
 }
 
@@ -192,6 +208,7 @@ drift_database.ActsCompanion convertIntoActsInsertable(
       end: Value(entity.period?.end),
       endIsAllDay: Value(entity.period?.end?.isAllDay),
       pausedAt: Value(entity.pausedAt),
+      actKind: Value(entity.actKind?.name),
       createdAt: Value(createdAt ?? DateTime.now()),
     );
 drift_database.ActsCompanion convertIntoActsUpdateable(ActEntity entity) =>
@@ -201,6 +218,7 @@ drift_database.ActsCompanion convertIntoActsUpdateable(ActEntity entity) =>
       end: Value(entity.end),
       endIsAllDay: Value(entity.end?.isAllDay),
       pausedAt: Value(entity.pausedAt),
+      actKind: Value(entity.actKind?.name),
       updatedAt: Value(DateTime.now()),
       archivedAt: Value(entity.archivedAt),
     );
