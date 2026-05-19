@@ -35,6 +35,30 @@ class Equals extends Condition {
   String toString() => "${_columnDefinition.name} = $_value";
 }
 
+class NotEquals extends Condition {
+  final ColumnDefinition _columnDefinition;
+  final dynamic _value;
+
+  NotEquals(this._columnDefinition, this._value);
+
+  @override
+  String? where() => "${_columnDefinition.name} != ?";
+
+  @override
+  List<Object?>? whereArgs() => [DatabaseConverter().to(_value)];
+
+  @override
+  drift.Expression<bool>? toDriftExpression(drift.TableInfo tableInfo) {
+    final column = _getColumn(tableInfo, _columnDefinition.name);
+    if (column == null) return null;
+    final convertedValue = DatabaseConverter().to(_value);
+    return _notEqualsExpression(column, convertedValue);
+  }
+
+  @override
+  String toString() => "${_columnDefinition.name} != $_value";
+}
+
 class IsNull extends Condition {
   static const _operator = 'IS NULL';
 
@@ -243,6 +267,23 @@ String _toSnakeCase(String camelCase) {
     RegExp(r'[A-Z]'),
     (match) => '_${match.group(0)!.toLowerCase()}',
   );
+}
+
+drift.Expression<bool> _notEqualsExpression(
+  drift.GeneratedColumn column,
+  dynamic value,
+) {
+  if (column is drift.IntColumn) {
+    return column.equals(value as int).not();
+  } else if (column is drift.TextColumn) {
+    return column.equals(value as String).not();
+  } else if (column is drift.DateTimeColumn) {
+    return column.equals(value as DateTime).not();
+  } else if (column is drift.BoolColumn) {
+    return column.equals(value as bool).not();
+  } else {
+    return column.equals(value).not();
+  }
 }
 
 drift.Expression<bool> _equalsExpression(

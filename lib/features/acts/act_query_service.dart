@@ -1,4 +1,5 @@
 import 'package:mem/databases/table_definitions/acts.dart';
+import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_service.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -12,8 +13,15 @@ import 'package:mem/framework/repository/group_by.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/framework/singleton.dart';
 
+Condition excludingSkippedForPerformanceCondition() => Or(
+      [
+        IsNull(defColActsActKind.name),
+        NotEquals(defColActsActKind, ActKind.skipped.name),
+      ],
+    );
+
 class ActQueryService {
-  static final _driftAccessor = DriftDatabaseAccessor();
+  DriftDatabaseAccessor get _driftAccessor => DriftDatabaseAccessor();
 
   Future<int> countByMemIdIs(MemId memId) => v(
         () => _driftAccessor.count(
@@ -110,6 +118,7 @@ class ActQueryService {
                 Equals(defFkActsMemId, memId),
                 GraterThanOrEqual(defColActsStart, period.start),
                 LessThan(defColActsStart, period.end),
+                excludingSkippedForPerformanceCondition(),
               ],
             ),
           );
