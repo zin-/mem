@@ -86,6 +86,10 @@ abstract class Act {
 
   bool get isFinished => period?.start != null && period?.end != null;
 
+  bool get isSkipped => actKind == ActKind.skipped;
+
+  bool get isScheduleAnchor => isActive || isFinished;
+
   FinishedAct finish(DateAndTime when);
 
   ActiveAct start(DateAndTime when);

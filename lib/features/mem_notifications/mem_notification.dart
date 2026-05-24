@@ -107,8 +107,7 @@ class MemNotification {
             final repeatByNDay = memNotifications.singleWhereOrNull(
               (e) => e.isRepeatByNDay(),
             );
-            if (latestAct != null &&
-                (latestAct.isActive || latestAct.isFinished)) {
+            if (latestAct != null && latestAct.isScheduleAnchor) {
               final latestActStartIsLessThanToday = latestAct
                   .period!.start!.dateTime
                   .add(Duration(days: repeatByNDay?.time ?? 1))

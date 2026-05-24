@@ -129,5 +129,50 @@ void main() => group(_name, () {
             }
           }
         });
+
+        test('skipped act anchors repeatByNDay like finished', () {
+          final startOfToday = DateTime(2024, 10, 12);
+          final notifications = [
+            MemNotification.by(
+              0,
+              MemNotificationType.repeatByNDay,
+              2,
+              'repeat by 2 day',
+            ),
+          ];
+          final yesterday = Act.by(
+            0,
+            startWhen: DateAndTime.from(startOfToday).subtract(
+              const Duration(days: 1),
+            ),
+            endWhen: DateAndTime.from(startOfToday),
+            completionKind: ActKind.skipped,
+          );
+          final finishedYesterday = Act.by(
+            0,
+            startWhen: DateAndTime.from(startOfToday).subtract(
+              const Duration(days: 1),
+            ),
+            endWhen: DateAndTime.from(startOfToday),
+            completionKind: ActKind.finished,
+          );
+
+          final skippedResult = MemNotification.nextNotifyAt(
+            notifications,
+            startOfToday,
+            yesterday,
+          );
+          final finishedResult = MemNotification.nextNotifyAt(
+            notifications,
+            startOfToday,
+            finishedYesterday,
+          );
+
+          expect(skippedResult, finishedResult);
+          expect(
+            skippedResult,
+            DateTime(startOfToday.year, startOfToday.month, startOfToday.day + 1),
+          );
+        });
       });
     });
