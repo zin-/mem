@@ -102,6 +102,40 @@ class ActService {
         },
       );
 
+  Future<ActEntity> skip(
+    int memId,
+    DateAndTime when,
+  ) =>
+      i(
+        () async {
+          final latestActiveActEntity =
+              await _actQueryService.fetchLatestByMemIds(memId);
+
+          if (latestActiveActEntity == null ||
+              latestActiveActEntity.end != null) {
+            return await _actRepository.receive(
+              Act.by(
+                memId,
+                endWhen: when,
+                completionKind: ActKind.skipped,
+              ),
+            );
+          }
+
+          final latest = latestActiveActEntity.toDomain();
+          if (latest is! ActiveAct) {
+            throw StateError('Only an active act can be skipped in place.');
+          }
+          return await _actRepository.replace(
+            latestActiveActEntity.updatedWith(latest.skip(when)),
+          );
+        },
+        {
+          'memId': memId,
+          'when': when,
+        },
+      );
+
   Future<Iterable<ActEntity>> pause(
     int memId,
     DateAndTime when,

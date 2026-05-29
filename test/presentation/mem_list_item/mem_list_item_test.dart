@@ -19,6 +19,7 @@ import 'package:mem/modules/live_elapsed_time_text.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/features/acts/act_entity.dart';
+import 'package:mem/l10n/l10n.dart';
 
 class _FakeMemState extends MemState {
   final Mem _mem;
@@ -60,11 +61,13 @@ class _FakeActEntities extends ActEntities {
   int startActbyCallCount = 0;
   int resumeActByCallCount = 0;
   int finishActbyCallCount = 0;
+  int skipActByCallCount = 0;
   int pauseByMemIdCallCount = 0;
   int closeByMemIdCallCount = 0;
   int? lastStartActbyMemId;
   int? lastResumeActByMemId;
   int? lastFinishActbyMemId;
+  int? lastSkipActByMemId;
   int? lastPauseByMemId;
   int? lastCloseByMemId;
 
@@ -87,6 +90,12 @@ class _FakeActEntities extends ActEntities {
   Future<void> finishActby(int memId) async {
     finishActbyCallCount++;
     lastFinishActbyMemId = memId;
+  }
+
+  @override
+  Future<void> skipActBy(int memId) async {
+    skipActByCallCount++;
+    lastSkipActByMemId = memId;
   }
 
   @override
@@ -1130,6 +1139,128 @@ void main() {
 
         expect(fakeActEntities.finishActbyCallCount, 1);
         expect(fakeActEntities.lastFinishActbyMemId, memId);
+      });
+
+      testWidgets(
+          'calls skipActBy when skip is chosen from completion dialog after long press on stop',
+          (tester) async {
+        final now = DateTime.now();
+        final notification = SavedMemNotificationEntityV1({
+          defPkId.name: 1,
+          defFkMemNotificationsMemId.name: memId,
+          defColMemNotificationsType.name: 'repeat',
+          defColMemNotificationsTime.name: 9 * 60 * 60,
+          defColMemNotificationsMessage.name: 'Repeat',
+          defColCreatedAt.name: now,
+          defColUpdatedAt.name: now,
+          defColArchivedAt.name: null,
+        });
+        final fakeActEntities = _FakeActEntities();
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              latestActsByMemProvider.overrideWith((ref) => {memId: null}),
+              memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
+                  ListValueStateNotifier<MemNotificationEntityV1>(
+                      [notification])),
+              memStateProvider(memId)
+                  .overrideWith(() => _FakeMemState(baseMem)),
+              memEntitiesProvider.overrideWith(() => _FakeMemEntities([
+                    SavedMemEntityV1({
+                      'id': baseMem.id,
+                      'name': baseMem.name,
+                      'doneAt': baseMem.doneAt,
+                      'notifyOn': null,
+                      'notifyAt': null,
+                      'endOn': null,
+                      'endAt': null,
+                      'createdAt': DateTime.now(),
+                      'updatedAt': DateTime.now(),
+                      'archivedAt': null,
+                    })
+                  ])),
+              actEntitiesProvider.overrideWith(() => fakeActEntities),
+            ],
+            child: MaterialApp(
+              home: Scaffold(
+                body: MemListItemView(baseMem),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.longPress(find.byIcon(Icons.stop));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text(buildL10n().memListCompletionDialogSkip));
+        await tester.pump();
+
+        expect(fakeActEntities.skipActByCallCount, 1);
+        expect(fakeActEntities.lastSkipActByMemId, memId);
+        expect(fakeActEntities.finishActbyCallCount, 0);
+      });
+
+      testWidgets(
+          'does not open skip dialog when stop is long pressed during active act',
+          (tester) async {
+        final activeAct = ActiveAct(
+            memId,
+            DateAndTime.from(
+                DateTime.now().subtract(const Duration(minutes: 5))));
+        final now = DateTime.now();
+        final notification = SavedMemNotificationEntityV1({
+          defPkId.name: 1,
+          defFkMemNotificationsMemId.name: memId,
+          defColMemNotificationsType.name: 'repeat',
+          defColMemNotificationsTime.name: 9 * 60 * 60,
+          defColMemNotificationsMessage.name: 'Repeat',
+          defColCreatedAt.name: now,
+          defColUpdatedAt.name: now,
+          defColArchivedAt.name: null,
+        });
+        final fakeActEntities = _FakeActEntities();
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              latestActsByMemProvider.overrideWith((ref) => {memId: activeAct}),
+              memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
+                  ListValueStateNotifier<MemNotificationEntityV1>(
+                      [notification])),
+              memStateProvider(memId)
+                  .overrideWith(() => _FakeMemState(baseMem)),
+              memEntitiesProvider.overrideWith(() => _FakeMemEntities([
+                    SavedMemEntityV1({
+                      'id': baseMem.id,
+                      'name': baseMem.name,
+                      'doneAt': baseMem.doneAt,
+                      'notifyOn': null,
+                      'notifyAt': null,
+                      'endOn': null,
+                      'endAt': null,
+                      'createdAt': DateTime.now(),
+                      'updatedAt': DateTime.now(),
+                      'archivedAt': null,
+                    })
+                  ])),
+              actEntitiesProvider.overrideWith(() => fakeActEntities),
+            ],
+            child: MaterialApp(
+              home: Scaffold(
+                body: MemListItemView(baseMem),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.longPress(find.byIcon(Icons.stop));
+        await tester.pumpAndSettle();
+
+        expect(find.text(buildL10n().memListCompletionDialogSkip), findsNothing);
+        expect(fakeActEntities.skipActByCallCount, 0);
       });
 
       testWidgets('calls pauseByMemId when pause button is tapped',

@@ -91,6 +91,10 @@
   "doneLabel": "Done",
   "unarchiveAction": "Unarchive",
   "finishLabel": "終了",
+  "memListCompletionDialogTitle": "今回の対応",
+  "memListCompletionDialogFinish": "実施して完了",
+  "memListCompletionDialogSkip": "今回はスキップ",
+  "actSkippedLabel": "スキップ",
   "pauseActLabel": "一時停止",
   "startLabel": "開始",
 

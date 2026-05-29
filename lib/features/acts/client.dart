@@ -145,6 +145,25 @@ class ActsClient {
         },
       );
 
+  Future<SavedActEntityV1> skip(
+    int memId,
+    DateAndTime when,
+  ) =>
+      v(
+        () async {
+          final skipped = await _actService.skip(memId, when);
+
+          await _notificationClient.cancelActNotification(memId);
+          await _notificationClient.setNotificationAfterInactivity();
+
+          return SavedActEntityV1.fromEntityV2(skipped);
+        },
+        {
+          "memId": memId,
+          "when": when,
+        },
+      );
+
   Future<List<ActEntity>> close(int memId) => v(
         () async {
           final closedActEntities = await _actRepository.wastePausedAct(memId);

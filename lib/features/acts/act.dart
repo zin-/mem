@@ -109,6 +109,9 @@ class ActiveAct extends Act {
   FinishedAct finish(DateAndTime when) =>
       FinishedAct(memId, period?.start ?? when, when, actKind: ActKind.finished);
 
+  FinishedAct skip(DateAndTime when) =>
+      FinishedAct(memId, period?.start ?? when, when, actKind: ActKind.skipped);
+
   @override
   ActiveAct start(DateAndTime when) =>
       throw StateError('This act has already been started.');

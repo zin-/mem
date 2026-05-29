@@ -8,6 +8,7 @@ import 'package:mem/features/mems/transitions.dart';
 import 'package:mem/modules/live_elapsed_time_text.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/detail/states.dart';
+import 'package:mem/features/mems/list/item/completion_dialog.dart';
 import 'package:mem/features/mems/mem_done_checkbox.dart';
 import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
@@ -23,6 +24,7 @@ class MemListItemView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _render(
+          context,
           _mem,
           () => showMemDetailPage(context, ref, _mem.id as int),
           (bool? value, int memId) => v(
@@ -50,6 +52,9 @@ class MemListItemView extends ConsumerWidget {
               .finishActby(_mem.id as int),
           () => ref
               .read(actEntitiesProvider.notifier)
+              .skipActBy(_mem.id as int),
+          () => ref
+              .read(actEntitiesProvider.notifier)
               .pauseByMemId(_mem.id as int),
           () => ref
               .read(actEntitiesProvider.notifier)
@@ -63,6 +68,7 @@ class MemListItemView extends ConsumerWidget {
 }
 
 ListTile _render(
+  BuildContext context,
   Mem mem,
   void Function() onTap,
   void Function(bool? value, int memId) onMemDoneCheckboxTapped,
@@ -70,6 +76,7 @@ ListTile _render(
   void Function() startAct,
   void Function() resumeAct,
   void Function() finishAct,
+  void Function() skipAct,
   void Function() pauseAct,
   void Function() closeAct,
   Iterable<MemNotificationEntityV1> memNotificationEntities,
@@ -85,15 +92,26 @@ ListTile _render(
               (e) => e is SavedMemNotificationEntityV1 && e.value.isEnabled(),
             )
             .isNotEmpty;
+        final enableSkipMenu = hasEnableMemNotifications && !hasActiveAct;
 
+        void showCompletionDialog(BuildContext dialogContext) {
+          showMemListCompletionDialog(
+            dialogContext,
+            onFinish: finishAct,
+            onSkip: skipAct,
+          );
+        }
+
+        final stopIconButton = memListCompletionStopButton(
+          context: context,
+          onFinish: finishAct,
+          enableSkipMenu: enableSkipMenu,
+          onShowCompletionDialog: showCompletionDialog,
+        );
         final startIconButton = IconButton(
           onPressed: () =>
               hasPausedAct ? resumeAct() : startAct(),
           icon: const Icon(Icons.play_arrow),
-        );
-        final stopIconButton = IconButton(
-          onPressed: () => finishAct(),
-          icon: const Icon(Icons.stop),
         );
         final pauseIconButton = IconButton(
           onPressed: pauseAct,

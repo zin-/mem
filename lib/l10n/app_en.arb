@@ -91,6 +91,10 @@
   "doneLabel": "Done",
   "unarchiveAction": "Unarchive",
   "finishLabel": "Finish",
+  "memListCompletionDialogTitle": "Complete this round",
+  "memListCompletionDialogFinish": "Complete with act",
+  "memListCompletionDialogSkip": "Skip this round",
+  "actSkippedLabel": "Skipped",
   "pauseActLabel": "Pause",
   "startLabel": "Start",
 
