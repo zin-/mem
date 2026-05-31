@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/base.dart';
+import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
@@ -32,6 +33,7 @@ class _FakeActEntities extends ActEntities {
   int _pauseByMemIdCallCount = 0;
   int _closeByMemIdCallCount = 0;
   int _finishActbyCallCount = 0;
+  int _skipActByCallCount = 0;
   int _editCallCount = 0;
   int _removeAsyncCallCount = 0;
 
@@ -120,6 +122,26 @@ class _FakeActEntities extends ActEntities {
   }
 
   @override
+  Future<void> skipActBy(int memId) async {
+    _skipActByCallCount++;
+    final now = DateTime.now();
+    final act = SavedActEntityV1({
+      defPkId.name: 3,
+      defFkActsMemId.name: memId,
+      defColActsStart.name: now,
+      defColActsStartIsAllDay.name: false,
+      defColActsEnd.name: now,
+      defColActsEndIsAllDay.name: false,
+      defColActsPausedAt.name: null,
+      defColActsActKind.name: ActKind.skipped.name,
+      defColCreatedAt.name: now,
+      defColUpdatedAt.name: now,
+      defColArchivedAt.name: null,
+    });
+    upsert([act]);
+  }
+
+  @override
   Future<void> edit(SavedActEntityV1 act) async {
     _editCallCount++;
     upsert([act]);
@@ -140,6 +162,7 @@ class _FakeActEntities extends ActEntities {
   int get pauseByMemIdCallCount => _pauseByMemIdCallCount;
   int get closeByMemIdCallCount => _closeByMemIdCallCount;
   int get finishActbyCallCount => _finishActbyCallCount;
+  int get skipActByCallCount => _skipActByCallCount;
   int get editCallCount => _editCallCount;
   int get removeAsyncCallCount => _removeAsyncCallCount;
 }
@@ -287,6 +310,26 @@ void main() {
 
       await notifier.finishActby(1);
       expect(container.read(actEntitiesProvider), isNotEmpty);
+    });
+
+    test('skipActBy calls client and upserts skipped act', () async {
+      final fake = _FakeActEntities();
+      final container = ProviderContainer(
+        overrides: [
+          actEntitiesProvider.overrideWith(() => fake),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final notifier = container.read(actEntitiesProvider.notifier);
+
+      await notifier.skipActBy(1);
+
+      expect(fake.skipActByCallCount, 1);
+      expect(
+        container.read(actEntitiesProvider).single.value.actKind,
+        ActKind.skipped,
+      );
     });
 
     test('edit calls client and upserts result', () async {

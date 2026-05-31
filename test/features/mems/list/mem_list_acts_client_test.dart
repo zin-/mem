@@ -2,6 +2,7 @@
 // play のタップ自体は mem_list_item_test / actions_test で行う。
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/databases/database.dart' show setOnTest;
+import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/acts/act_repository.dart';
@@ -68,6 +69,34 @@ void main() {
       verify(mockActService.resume(8, whenTime)).called(1);
       verify(mockNotification.startActNotifications(8)).called(1);
       expect(saved.value.memId, 8);
+    });
+  });
+
+  group('ActsClient.skip', () {
+    test('calls actService.skip and cancels notifications', () async {
+      final whenTime = DateAndTime(2024, 8, 1, 9, 0);
+      final entity = ActEntity(
+        9,
+        whenTime,
+        whenTime,
+        null,
+        101,
+        DateTime(2024, 8, 1),
+        DateTime(2024, 8, 1),
+        null,
+        actKind: ActKind.skipped,
+      );
+      when(mockActService.skip(any, any)).thenAnswer((_) async => entity);
+      when(mockNotification.cancelActNotification(any)).thenAnswer((_) async {});
+      when(mockNotification.setNotificationAfterInactivity())
+          .thenAnswer((_) async {});
+
+      final saved = await client.skip(9, whenTime);
+
+      verify(mockActService.skip(9, whenTime)).called(1);
+      verify(mockNotification.cancelActNotification(9)).called(1);
+      verify(mockNotification.setNotificationAfterInactivity()).called(1);
+      expect(saved.value.actKind, ActKind.skipped);
     });
   });
 }

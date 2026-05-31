@@ -7,6 +7,8 @@ import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/acts/acts_summary.dart';
 import 'package:mem/framework/database/accessor.dart';
+import 'package:mem/framework/date_and_time/date_and_time.dart';
+import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/framework/singleton.dart';
@@ -152,6 +154,33 @@ void main() {
 
       expect(acts, hasLength(2));
       expect(summary.getValue(acts), 2);
+    });
+
+    test('fetchByMemIdAndPeriod excludes skipped for chart', () async {
+      final memId = await insertMem();
+      await insertAct(memId: memId, start: DateTime(2024, 6, 1, 10));
+      await insertAct(
+        memId: memId,
+        start: DateTime(2024, 6, 2, 10),
+        actKind: 'finished',
+      );
+      await insertAct(
+        memId: memId,
+        start: DateTime(2024, 6, 3, 10),
+        actKind: 'skipped',
+      );
+
+      final period = DateAndTimePeriod(
+        start: DateAndTime(2024, 6, 1),
+        end: DateAndTime(2024, 6, 5),
+      );
+      final rows = await query.fetchByMemIdAndPeriod(memId, period);
+
+      expect(rows, hasLength(2));
+      expect(
+        rows.map((e) => e.actKind).toSet(),
+        {null, ActKind.finished},
+      );
     });
   });
 }

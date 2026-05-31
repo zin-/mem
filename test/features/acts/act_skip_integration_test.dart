@@ -161,5 +161,38 @@ void main() {
       expect(page.list.first.actKind, ActKind.skipped);
       expect(page.list.last.actKind, ActKind.finished);
     });
+
+    test('skip in place replaces active act with skipped', () async {
+      final memId = await insertMem();
+      final start = DateAndTime(2024, 10, 11, 9, 0);
+      final end = DateAndTime(2024, 10, 11, 10, 0);
+
+      await service.start(memId, start);
+      final skipped = await service.skip(memId, end);
+
+      expect(skipped.actKind, ActKind.skipped);
+      expect(skipped.start?.hour, 9);
+      expect(skipped.end?.hour, 10);
+      final latest = await query.fetchLatestByMemIds(memId);
+      expect(latest?.id, skipped.id);
+      expect(latest?.actKind, ActKind.skipped);
+    });
+
+    test('skip throws when latest is paused', () async {
+      final memId = await insertMem();
+      final now = DateTime(2024, 10, 11, 12, 0);
+      await db.into(db.acts).insert(
+            ActsCompanion.insert(
+              memId: memId,
+              createdAt: now,
+              pausedAt: Value(now),
+            ),
+          );
+
+      await expectLater(
+        service.skip(memId, DateAndTime.from(now)),
+        throwsA(isA<StateError>()),
+      );
+    });
   });
 }

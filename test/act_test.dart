@@ -103,5 +103,50 @@ void main() => group(
             throwsA(isA<ArgumentError>()),
           );
         });
+
+        group('ActKind', () {
+          test('actKindFromStored maps known values', () {
+            expect(actKindFromStored('finished'), ActKind.finished);
+            expect(actKindFromStored('skipped'), ActKind.skipped);
+            expect(actKindFromStored(null), isNull);
+            expect(actKindFromStored(1), isNull);
+            expect(actKindFromStored('unknown'), isNull);
+          });
+
+          test('skipped finished act exposes isSkipped and isScheduleAnchor', () {
+            final skipped = Act.by(
+              0,
+              startWhen: DateAndTime(2024, 1, 1),
+              endWhen: DateAndTime(2024, 1, 1, 1),
+              completionKind: ActKind.skipped,
+            );
+
+            expect(skipped.isSkipped, isTrue);
+            expect(skipped.isScheduleAnchor, isTrue);
+            expect(skipped.isFinished, isTrue);
+          });
+
+          test('completionKindFromRow preserves null actKind from row', () {
+            final legacy = Act.by(
+              0,
+              startWhen: DateAndTime(2024, 1, 1),
+              endWhen: DateAndTime(2024, 1, 1, 1),
+              completionKindFromRow: true,
+            );
+
+            expect(legacy.actKind, isNull);
+          });
+        });
+
+        group('ActiveAct skip', () {
+          test('skip produces skipped FinishedAct', () {
+            final active = Act.by(0, startWhen: DateAndTime(2024, 1, 1, 9));
+            final skipped = (active as ActiveAct).skip(DateAndTime(2024, 1, 1, 10));
+
+            expect(skipped.actKind, ActKind.skipped);
+            expect(skipped.period?.start?.hour, 9);
+            expect(skipped.period?.end?.hour, 10);
+          });
+        });
       },
     );

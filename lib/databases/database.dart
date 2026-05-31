@@ -39,20 +39,20 @@ class AppDatabase extends _$AppDatabase {
       onUpgrade: (Migrator m, int from, int to) async {
         if (from < 2) {
           await m.addColumn(acts, acts.actKind);
-          await _backfillFinishedActKind();
+          await backfillFinishedActKind(this);
         }
       },
     );
   }
-
-  Future<void> _backfillFinishedActKind() => (update(acts)
-        ..where(
-          (row) => row.start.isNotNull() & row.end.isNotNull(),
-        ))
-      .write(
-        ActsCompanion(actKind: Value(ActKind.finished.name)),
-      );
 }
+
+Future<void> backfillFinishedActKind(AppDatabase db) => (db.update(db.acts)
+      ..where(
+        (row) => row.start.isNotNull() & row.end.isNotNull(),
+      ))
+    .write(
+      ActsCompanion(actKind: Value(ActKind.finished.name)),
+    );
 
 bool _onTest = false;
 

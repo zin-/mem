@@ -316,6 +316,10 @@ drift.Expression<bool> _greaterThanOrEqualExpression(
   dynamic value,
 ) {
   final col = column as dynamic;
+  if (value is DateTime) {
+    return (column as drift.Expression<DateTime>)
+        .isBiggerOrEqualValue(value);
+  }
   if (column is drift.IntColumn) {
     return (col >= (value as int)) as drift.Expression<bool>;
   } else if (column is drift.DateTimeColumn) {
@@ -330,6 +334,10 @@ drift.Expression<bool> _lessThanExpression(
   dynamic value,
 ) {
   final col = column as dynamic;
+  if (value is DateTime) {
+    return (column as drift.Expression<DateTime>)
+        .isSmallerThanValue(value);
+  }
   if (column is drift.IntColumn) {
     return (col < (value as int)) as drift.Expression<bool>;
   } else if (column is drift.DateTimeColumn) {
