@@ -5,6 +5,7 @@ import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_query_service.dart';
+import 'package:mem/features/acts/acts_summary.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/order_by.dart';
@@ -120,6 +121,37 @@ void main() {
       expect(page.list, hasLength(1));
       expect(page.list.single.actKind, ActKind.skipped);
       expect(page.totalCount, 1);
+    });
+
+    test('chart aggregation excludes skipped acts', () async {
+      final memId = await insertMem();
+      await insertAct(memId: memId, start: DateTime(2024, 6, 1, 10));
+      await insertAct(
+        memId: memId,
+        start: DateTime(2024, 6, 2, 10),
+        actKind: 'finished',
+      );
+      await insertAct(
+        memId: memId,
+        start: DateTime(2024, 6, 3, 10),
+        actKind: 'skipped',
+      );
+
+      final accessor = DriftDatabaseAccessor();
+      final rows = await accessor.selectEntities(
+        defTableActs,
+        condition: And(
+          [
+            Equals(defFkActsMemId, memId),
+            excludingSkippedForPerformanceCondition(),
+          ],
+        ),
+      );
+      final acts = rows.cast<ActEntity>().map((e) => e.toDomain()).toList();
+      final summary = ActsSummary(acts, AggregationType.count);
+
+      expect(acts, hasLength(2));
+      expect(summary.getValue(acts), 2);
     });
   });
 }

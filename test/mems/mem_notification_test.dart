@@ -130,49 +130,98 @@ void main() => group(_name, () {
           }
         });
 
-        test('skipped act anchors repeatByNDay like finished', () {
+        group('skipped act anchors like finished', () {
           final startOfToday = DateTime(2024, 10, 12);
-          final notifications = [
-            MemNotification.by(
-              0,
-              MemNotificationType.repeatByNDay,
-              2,
-              'repeat by 2 day',
-            ),
-          ];
-          final yesterday = Act.by(
-            0,
-            startWhen: DateAndTime.from(startOfToday).subtract(
-              const Duration(days: 1),
-            ),
-            endWhen: DateAndTime.from(startOfToday),
-            completionKind: ActKind.skipped,
+          final anchorStart = DateAndTime.from(startOfToday).subtract(
+            const Duration(days: 1),
           );
-          final finishedYesterday = Act.by(
-            0,
-            startWhen: DateAndTime.from(startOfToday).subtract(
-              const Duration(days: 1),
-            ),
-            endWhen: DateAndTime.from(startOfToday),
-            completionKind: ActKind.finished,
-          );
+          final anchorEnd = DateAndTime.from(startOfToday);
 
-          final skippedResult = MemNotification.nextNotifyAt(
-            notifications,
-            startOfToday,
-            yesterday,
-          );
-          final finishedResult = MemNotification.nextNotifyAt(
-            notifications,
-            startOfToday,
-            finishedYesterday,
-          );
+          Act skippedAct() => Act.by(
+                0,
+                startWhen: anchorStart,
+                endWhen: anchorEnd,
+                completionKind: ActKind.skipped,
+              );
 
-          expect(skippedResult, finishedResult);
-          expect(
-            skippedResult,
-            DateTime(startOfToday.year, startOfToday.month, startOfToday.day + 1),
-          );
+          Act finishedAct() => Act.by(
+                0,
+                startWhen: anchorStart,
+                endWhen: anchorEnd,
+                completionKind: ActKind.finished,
+              );
+
+          void expectSameNextNotifyAt(
+            Iterable<MemNotification> notifications, {
+            DateTime? expected,
+          }) {
+            final skippedResult = MemNotification.nextNotifyAt(
+              notifications,
+              startOfToday,
+              skippedAct(),
+            );
+            final finishedResult = MemNotification.nextNotifyAt(
+              notifications,
+              startOfToday,
+              finishedAct(),
+            );
+
+            expect(skippedResult, finishedResult);
+            if (expected != null) {
+              expect(skippedResult, expected);
+            }
+          }
+
+          test('repeatByNDay', () {
+            expectSameNextNotifyAt(
+              [
+                MemNotification.by(
+                  0,
+                  MemNotificationType.repeatByNDay,
+                  2,
+                  'repeat by 2 day',
+                ),
+              ],
+              expected: DateTime(
+                startOfToday.year,
+                startOfToday.month,
+                startOfToday.day + 1,
+              ),
+            );
+          });
+
+          test('repeat at fixed time', () {
+            expectSameNextNotifyAt(
+              [
+                MemNotification.by(
+                  0,
+                  MemNotificationType.repeat,
+                  3600 + 120,
+                  'repeat at 01:02',
+                ),
+              ],
+              expected: DateTime(
+                startOfToday.year,
+                startOfToday.month,
+                startOfToday.day,
+                1,
+                2,
+              ),
+            );
+          });
+
+          test('repeatByDayOfWeek', () {
+            expectSameNextNotifyAt(
+              [
+                MemNotification.by(
+                  0,
+                  MemNotificationType.repeatByDayOfWeek,
+                  6,
+                  'repeat on Sat',
+                ),
+              ],
+            );
+          });
         });
       });
     });
