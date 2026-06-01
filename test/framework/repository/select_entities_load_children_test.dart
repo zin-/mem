@@ -7,7 +7,9 @@ import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/table_definitions/mem_relations.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
+import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/load_child_spec.dart';
@@ -215,6 +217,40 @@ void main() {
       expect(mem1.latestAct?.period?.start?.day, now.day);
       expect(mem2.latestAct, isNull);
       expect(actOlder.id, lessThan(actNewer.id));
+    });
+
+    test('latest_act includes skipped row when it is the newest', () async {
+      final now = DateTime.now();
+      final mem = await db.into(db.mems).insertReturning(
+            MemsCompanion.insert(name: 'm', createdAt: now),
+          );
+      await db.into(db.acts).insert(
+            ActsCompanion.insert(
+              memId: mem.id,
+              createdAt: now.subtract(const Duration(days: 2)),
+              start: Value(now.subtract(const Duration(days: 2))),
+              end: Value(now.subtract(const Duration(days: 2))),
+              actKind: const Value('finished'),
+            ),
+          );
+      await db.into(db.acts).insert(
+            ActsCompanion.insert(
+              memId: mem.id,
+              createdAt: now,
+              start: Value(now.subtract(const Duration(days: 1))),
+              end: Value(now.subtract(const Duration(days: 1))),
+              actKind: const Value('skipped'),
+            ),
+          );
+
+      final rows = await accessor.selectEntities(
+        defTableMems,
+        loadChildren: MemRepository.loadLatestActChild,
+      );
+
+      final loaded =
+          rows.cast<MemEntity>().singleWhere((e) => e.id == mem.id);
+      expect(loaded.latestAct?.actKind, ActKind.skipped);
     });
 
     test('duplicate resultKey throws', () async {

@@ -40,7 +40,10 @@ class Mems extends Table with BaseColumns {
   DateTimeColumn get endAt => dateTime().nullable()();
 }
 
-convertIntoMemsInsertable(Mem domain, DateTime createdAt) =>
+drift_database.MemsCompanion convertIntoMemsInsertable(
+  Mem domain,
+  DateTime createdAt,
+) =>
     drift_database.MemsCompanion.insert(
       name: domain.name,
       doneAt: Value(domain.doneAt),
@@ -53,7 +56,8 @@ convertIntoMemsInsertable(Mem domain, DateTime createdAt) =>
       createdAt: createdAt,
     );
 
-convertIntoMemsUpdateable(MemEntity entity) => drift_database.MemsCompanion(
+drift_database.MemsCompanion convertIntoMemsUpdateable(MemEntity entity) =>
+    drift_database.MemsCompanion(
       name: Value(entity.name),
       doneAt: Value(entity.doneAt),
       notifyOn: Value(entity.period?.start),

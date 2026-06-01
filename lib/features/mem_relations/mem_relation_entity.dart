@@ -119,7 +119,9 @@ class MemRelationEntity implements Entity<int> {
       );
 }
 
-convertIntoMemRelationsInsertable(MemRelation entity) =>
+drift_database.MemRelationsCompanion convertIntoMemRelationsInsertable(
+  MemRelation entity,
+) =>
     drift_database.MemRelationsCompanion(
       sourceMemId: Value(entity.sourceMemId),
       targetMemId: Value(entity.targetMemId),
@@ -127,7 +129,9 @@ convertIntoMemRelationsInsertable(MemRelation entity) =>
       value: Value(entity.value),
       createdAt: Value(DateTime.now()),
     );
-convertIntoMemRelationsUpdateable(MemRelationEntity entity) =>
+drift_database.MemRelationsCompanion convertIntoMemRelationsUpdateable(
+  MemRelationEntity entity,
+) =>
     drift_database.MemRelationsCompanion(
       sourceMemId: Value(entity.sourceMemId ?? 0),
       targetMemId: Value(entity.targetMemId ?? 0),

@@ -121,14 +121,19 @@ class MemItemEntity implements Entity<int> {
       );
 }
 
-convertIntoMemItemsInsertable(MemItem domain, DateTime createdAt) =>
+drift_database.MemItemsCompanion convertIntoMemItemsInsertable(
+  MemItem domain,
+  DateTime createdAt,
+) =>
     drift_database.MemItemsCompanion(
       type: Value(domain.type.name),
       value: Value(domain.value),
       memId: Value(domain.memId ?? 0),
       createdAt: Value(createdAt),
     );
-convertIntoMemItemsUpdateable(MemItemEntity entity) =>
+drift_database.MemItemsCompanion convertIntoMemItemsUpdateable(
+  MemItemEntity entity,
+) =>
     drift_database.MemItemsCompanion(
       type: Value(entity.type.name),
       value: Value(entity.value),

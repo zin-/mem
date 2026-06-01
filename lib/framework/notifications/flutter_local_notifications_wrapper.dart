@@ -23,7 +23,7 @@ class FlutterLocalNotificationsWrapper {
               if (!_pluginIsInitializing) {
                 _pluginIsInitializing = true;
                 await flutterLocalNotificationsPlugin.initialize(
-                  fln.InitializationSettings(
+                  settings: fln.InitializationSettings(
                     android: fln.AndroidInitializationSettings(
                         androidDefaultIconPath),
                   ),
@@ -78,10 +78,10 @@ class FlutterLocalNotificationsWrapper {
       v(
         () async {
           return await (await _flutterLocalNotificationsPlugin).show(
-            id,
-            title,
-            body,
-            channel.convert(),
+            id: id,
+            title: title,
+            body: body,
+            notificationDetails: channel.convert(),
             payload: jsonEncode(payload),
           );
         },
@@ -98,7 +98,7 @@ class FlutterLocalNotificationsWrapper {
 
   Future<void> cancel(int notificationId) => v(
         () async => await (await _flutterLocalNotificationsPlugin)
-            .cancel(notificationId),
+            .cancel(id: notificationId),
         {'notificationId': notificationId},
       );
 
@@ -116,7 +116,7 @@ class FlutterLocalNotificationsWrapper {
                   fln.AndroidFlutterLocalNotificationsPlugin>();
 
           for (var e in channelIds) {
-            await p?.deleteNotificationChannel(e);
+            await p?.deleteNotificationChannel(channelId: e);
           }
         },
 // coverage:ignore-start

@@ -126,7 +126,8 @@ class TargetEntity implements Entity<int> {
       );
 }
 
-convertIntoTargetsInsertable(Target entity) => drift_database.TargetsCompanion(
+drift_database.TargetsCompanion convertIntoTargetsInsertable(Target entity) =>
+    drift_database.TargetsCompanion(
       type: Value(entity.targetType.name),
       unit: Value(entity.targetUnit.name),
       value: Value(entity.value),
@@ -134,7 +135,9 @@ convertIntoTargetsInsertable(Target entity) => drift_database.TargetsCompanion(
       memId: Value(entity.memId ?? 0),
       createdAt: Value(DateTime.now()),
     );
-convertIntoTargetsUpdateable(TargetEntity entity) =>
+drift_database.TargetsCompanion convertIntoTargetsUpdateable(
+  TargetEntity entity,
+) =>
     drift_database.TargetsCompanion(
       id: Value(entity.id),
       type: Value(entity.targetType.name),

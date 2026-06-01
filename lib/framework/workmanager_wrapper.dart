@@ -12,15 +12,12 @@ class WorkmanagerWrapper {
 
   factory WorkmanagerWrapper({
     Function? callbackDispatcher,
-    bool isInDebugMode = false,
   }) =>
       _instance ??= WorkmanagerWrapper._(
         callbackDispatcher,
-        isInDebugMode,
       );
 
   final Function? _callbackDispatcher;
-  final bool _isInDebugMode;
 
   late final Workmanager? _workmanager = v(
     () {
@@ -29,7 +26,6 @@ class WorkmanagerWrapper {
         if (_callbackDispatcher != null) {
           workmanager.initialize(
             _callbackDispatcher,
-            isInDebugMode: _isInDebugMode,
           );
         }
         return workmanager;
@@ -40,9 +36,7 @@ class WorkmanagerWrapper {
 
   WorkmanagerWrapper._(
     Function? callbackDispatcher,
-    bool isInDebugMode,
-  )   : _callbackDispatcher = callbackDispatcher,
-        _isInDebugMode = isInDebugMode;
+  ) : _callbackDispatcher = callbackDispatcher;
 
   Future<void> registerOneOffTask(
     Task task,

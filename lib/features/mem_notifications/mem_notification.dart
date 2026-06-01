@@ -107,8 +107,7 @@ class MemNotification {
             final repeatByNDay = memNotifications.singleWhereOrNull(
               (e) => e.isRepeatByNDay(),
             );
-            if (latestAct != null &&
-                (latestAct.isActive || latestAct.isFinished)) {
+            if (latestAct != null && latestAct.isScheduleAnchor) {
               final latestActStartIsLessThanToday = latestAct
                   .period!.start!.dateTime
                   .add(Duration(days: repeatByNDay?.time ?? 1))
@@ -201,7 +200,7 @@ class MemNotification {
       );
 
   static String _oneLineAfterAct(
-    afterActStarted,
+    MemNotification afterActStarted,
     String Function(String at) buildAfterActStartedNotificationText,
   ) =>
       buildAfterActStartedNotificationText(DateFormat(DateFormat.HOUR24_MINUTE)

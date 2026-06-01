@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
+import 'package:mem/features/acts/act.dart';
 import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/table_definitions/mem_relations.dart';
@@ -27,7 +28,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.memory() : super(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration {
@@ -36,11 +37,22 @@ class AppDatabase extends _$AppDatabase {
         await m.createAll();
       },
       onUpgrade: (Migrator m, int from, int to) async {
-        // TODO: マイグレーション処理を実装
+        if (from < 2) {
+          await m.addColumn(acts, acts.actKind);
+          await backfillFinishedActKind(this);
+        }
       },
     );
   }
 }
+
+Future<void> backfillFinishedActKind(AppDatabase db) => (db.update(db.acts)
+      ..where(
+        (row) => row.start.isNotNull() & row.end.isNotNull(),
+      ))
+    .write(
+      ActsCompanion(actKind: Value(ActKind.finished.name)),
+    );
 
 bool _onTest = false;
 

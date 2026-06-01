@@ -126,6 +126,22 @@ class ActEntities extends _$ActEntities
         },
       );
 
+  Future<void> skipActBy(int memId) => v(
+        () async {
+          final now = DateAndTime.now();
+
+          final skippedAct = await ActsClient().skip(memId, now);
+
+          upsert([skippedAct]);
+          await ref
+              .read(memEntitiesProvider.notifier)
+              .refreshLatestActForMem(memId);
+        },
+        {
+          'memId': memId,
+        },
+      );
+
   Future<void> edit(SavedActEntityV1 act) => v(
         () async {
           final editedAct = await ActsClient().edit(act);

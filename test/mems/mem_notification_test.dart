@@ -129,5 +129,99 @@ void main() => group(_name, () {
             }
           }
         });
+
+        group('skipped act anchors like finished', () {
+          final startOfToday = DateTime(2024, 10, 12);
+          final anchorStart = DateAndTime.from(startOfToday).subtract(
+            const Duration(days: 1),
+          );
+          final anchorEnd = DateAndTime.from(startOfToday);
+
+          Act skippedAct() => Act.by(
+                0,
+                startWhen: anchorStart,
+                endWhen: anchorEnd,
+                completionKind: ActKind.skipped,
+              );
+
+          Act finishedAct() => Act.by(
+                0,
+                startWhen: anchorStart,
+                endWhen: anchorEnd,
+                completionKind: ActKind.finished,
+              );
+
+          void expectSameNextNotifyAt(
+            Iterable<MemNotification> notifications, {
+            DateTime? expected,
+          }) {
+            final skippedResult = MemNotification.nextNotifyAt(
+              notifications,
+              startOfToday,
+              skippedAct(),
+            );
+            final finishedResult = MemNotification.nextNotifyAt(
+              notifications,
+              startOfToday,
+              finishedAct(),
+            );
+
+            expect(skippedResult, finishedResult);
+            if (expected != null) {
+              expect(skippedResult, expected);
+            }
+          }
+
+          test('repeatByNDay', () {
+            expectSameNextNotifyAt(
+              [
+                MemNotification.by(
+                  0,
+                  MemNotificationType.repeatByNDay,
+                  2,
+                  'repeat by 2 day',
+                ),
+              ],
+              expected: DateTime(
+                startOfToday.year,
+                startOfToday.month,
+                startOfToday.day + 1,
+              ),
+            );
+          });
+
+          test('repeat at fixed time', () {
+            expectSameNextNotifyAt(
+              [
+                MemNotification.by(
+                  0,
+                  MemNotificationType.repeat,
+                  3600 + 120,
+                  'repeat at 01:02',
+                ),
+              ],
+              expected: DateTime(
+                startOfToday.year,
+                startOfToday.month,
+                startOfToday.day,
+                1,
+                2,
+              ),
+            );
+          });
+
+          test('repeatByDayOfWeek', () {
+            expectSameNextNotifyAt(
+              [
+                MemNotification.by(
+                  0,
+                  MemNotificationType.repeatByDayOfWeek,
+                  6,
+                  'repeat on Sat',
+                ),
+              ],
+            );
+          });
+        });
       });
     });

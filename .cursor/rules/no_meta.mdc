@@ -1,0 +1,17 @@
+---
+alwaysApply: true
+---
+
+# meta パッケージ禁止
+
+`package:meta/meta.dart` および `@visibleForTesting` 等の meta アノテーションは使わない。
+
+## 理由
+
+- `meta` を直接依存に足さずに済ませる（transitive のみに留める）
+- テスト用の公開はトップレベル関数の公開や、対象 API の直接テストで足りる
+
+## 代替
+
+- テストから参照したい条件・ヘルパーは、該当ライブラリの公開トップレベル関数にする
+- 本番に出したくない API は、テスト側で `ActQueryService` 経由の振る舞いを検証する

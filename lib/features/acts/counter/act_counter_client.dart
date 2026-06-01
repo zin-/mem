@@ -74,5 +74,5 @@ class ActCounterClient {
         ActCounterRepository(),
       );
 
-  static resetWith(ActCounterClient? instance) => _instance = instance;
+  static void resetWith(ActCounterClient? instance) => _instance = instance;
 }
