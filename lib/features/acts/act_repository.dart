@@ -1,11 +1,13 @@
-import 'package:mem/features/acts/act.dart';
+import 'package:drift/drift.dart';
 import 'package:mem/databases/definition.dart';
+import 'package:mem/features/acts/act.dart';
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/base.dart';
+import 'package:mem/features/acts/act_entity.dart';
+import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/database_tuple_repository.dart';
-import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/framework/singleton.dart';
 
 // @Deprecated('ActRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
@@ -28,14 +30,15 @@ class ActRepository extends DatabaseTupleRepository<Act, int, ActEntity> {
       );
 
   Future<List<ActEntity>> wastePausedAct(int memId) => v(
-        () async => await super.waste(
-          condition: And(
-            [
-              Equals(defFkActsMemId, memId),
-              IsNotNull(defColActsPausedAt.name),
-            ],
-          ),
-        ),
+        () async {
+          final db = DriftDatabaseAccessor().driftDatabase;
+          final deleted = await (db.delete(db.acts)
+                ..where(
+                  (t) => t.memId.equals(memId) & t.pausedAt.isNotNull(),
+                ))
+              .goAndReturn();
+          return deleted.map(ActEntity.fromTuple).toList();
+        },
         {'memId': memId},
       );
 

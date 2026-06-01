@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart' hide isNull;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/databases/database.dart';
-import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_query_service.dart';
@@ -9,8 +8,6 @@ import 'package:mem/features/acts/acts_summary.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
-import 'package:mem/framework/repository/condition/conditions.dart';
-import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/framework/singleton.dart';
 
 void main() {
@@ -36,8 +33,8 @@ void main() {
     Future<int> insertMem() async {
       final now = DateTime.now();
       return (await db.into(db.mems).insertReturning(
-            MemsCompanion.insert(name: 'm', createdAt: now),
-          ))
+                MemsCompanion.insert(name: 'm', createdAt: now),
+              ))
           .id;
     }
 
@@ -58,7 +55,8 @@ void main() {
           );
     }
 
-    test('fetchLatestByMemIds returns latest row regardless of act_kind', () async {
+    test('fetchLatestByMemIds returns latest row regardless of act_kind',
+        () async {
       final memId = await insertMem();
       final base = DateTime(2024, 6, 1, 12);
       await insertAct(
@@ -77,7 +75,7 @@ void main() {
       expect(latest?.actKind, ActKind.skipped);
     });
 
-    test('excludingSkippedForPerformanceCondition omits skipped only', () async {
+    test('actExcludingSkippedForPerformance omits skipped only', () async {
       final memId = await insertMem();
       await insertAct(memId: memId, start: DateTime(2024, 6, 1, 10));
       await insertAct(
@@ -91,21 +89,17 @@ void main() {
         actKind: 'skipped',
       );
 
-      final accessor = DriftDatabaseAccessor();
-      final rows = await accessor.selectEntities(
-        defTableActs,
-        condition: And(
-          [
-            Equals(defFkActsMemId, memId),
-            excludingSkippedForPerformanceCondition(),
-          ],
-        ),
-        orderBy: [Descending(defColActsStart)],
-      );
+      final rows = await (db.select(db.acts)
+            ..where(
+              (t) =>
+                  t.memId.equals(memId) & actExcludingSkippedForPerformance(t),
+            )
+            ..orderBy([(t) => OrderingTerm.desc(t.start)]))
+          .get();
 
       expect(rows, hasLength(2));
       expect(
-        rows.map((e) => (e as ActEntity).actKind).toSet(),
+        rows.map(ActEntity.fromTuple).map((e) => e.actKind).toSet(),
         {null, ActKind.finished},
       );
     });
@@ -139,17 +133,14 @@ void main() {
         actKind: 'skipped',
       );
 
-      final accessor = DriftDatabaseAccessor();
-      final rows = await accessor.selectEntities(
-        defTableActs,
-        condition: And(
-          [
-            Equals(defFkActsMemId, memId),
-            excludingSkippedForPerformanceCondition(),
-          ],
-        ),
-      );
-      final acts = rows.cast<ActEntity>().map((e) => e.toDomain()).toList();
+      final rows = await (db.select(db.acts)
+            ..where(
+              (t) =>
+                  t.memId.equals(memId) & actExcludingSkippedForPerformance(t),
+            ))
+          .get();
+      final acts =
+          rows.map(ActEntity.fromTuple).map((e) => e.toDomain()).toList();
       final summary = ActsSummary(acts, AggregationType.count);
 
       expect(acts, hasLength(2));

@@ -1,3 +1,6 @@
+import 'package:drift/drift.dart';
+import 'package:mem/databases/database.dart';
+import 'package:mem/databases/database.dart' as drift_schema;
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
@@ -6,75 +9,82 @@ import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
-import 'package:mem/framework/repository/condition/conditions.dart';
-import 'package:mem/framework/repository/condition/in.dart';
-import 'package:mem/framework/repository/extra_column.dart';
-import 'package:mem/framework/repository/group_by.dart';
-import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/framework/singleton.dart';
 
-Condition excludingSkippedForPerformanceCondition() => Or(
-      [
-        IsNull(defColActsActKind.name),
-        NotEquals(defColActsActKind, ActKind.skipped.name),
-      ],
-    );
+Expression<bool> actExcludingSkippedForPerformance(Acts t) =>
+    t.actKind.isNull() | t.actKind.equals(ActKind.skipped.name).not();
 
 class ActQueryService {
-  DriftDatabaseAccessor get _driftAccessor => DriftDatabaseAccessor();
+  AppDatabase get _db => DriftDatabaseAccessor().driftDatabase;
 
   Future<int> countByMemIdIs(MemId memId) => v(
-        () => _driftAccessor.count(
-          defTableActs,
-          condition: Equals(defFkActsMemId, memId),
-        ),
+        () async {
+          final countExpr = countAll();
+          final query = _db.selectOnly(_db.acts)..addColumns([countExpr]);
+          if (memId != null) {
+            query.where(_db.acts.memId.equals(memId));
+          }
+          final row = await query.getSingle();
+          return row.read(countExpr) ?? 0;
+        },
         {
           'memId': memId,
         },
       );
 
   Future<int> activeCount() => v(
-        () => _driftAccessor.count(
-          defTableActs,
-          condition: And(
-            [
-              IsNotNull(defColActsStart.name),
-              IsNull(defColActsEnd.name),
-            ],
-          ),
-        ),
+        () async {
+          final countExpr = countAll();
+          final row = await (_db.selectOnly(_db.acts)
+                ..addColumns([countExpr])
+                ..where(
+                  _db.acts.start.isNotNull() & _db.acts.end.isNull(),
+                ))
+              .getSingle();
+          return row.read(countExpr) ?? 0;
+        },
       );
 
   Future<List<ActEntity>> fetchLatestAndPausedByMemIds(Iterable<int>? memIds) =>
       v(
         () async {
-          final rows = await _driftAccessor.selectEntities(
-            defTableActs,
-            condition: And(
-              [
-                if (memIds != null) In(defFkActsMemId.name, memIds),
-                IsNotNull(defColActsPausedAt.name),
-              ],
-            ),
-            groupBy: GroupBy(
-              [defFkActsMemId],
-              extraColumns: [Max(defColActsStart)],
-            ),
-          );
-          return List<ActEntity>.from(rows);
+          var query = _db.select(_db.acts)
+            ..where((t) => t.pausedAt.isNotNull());
+          if (memIds != null) {
+            query = query..where((t) => t.memId.isIn(memIds));
+          }
+          final rows = await query.get();
+          final latestByMemId = <int, drift_schema.Act>{};
+          for (final row in rows) {
+            final existing = latestByMemId[row.memId];
+            final rowStart = row.start;
+            if (existing == null) {
+              latestByMemId[row.memId] = row;
+              continue;
+            }
+            final existingStart = existing.start;
+            if (existingStart == null) {
+              latestByMemId[row.memId] = row;
+              continue;
+            }
+            if (rowStart == null) continue;
+            if (rowStart.isAfter(existingStart)) {
+              latestByMemId[row.memId] = row;
+            }
+          }
+          return latestByMemId.values.map(ActEntity.fromTuple).toList();
         },
         {'memIds': memIds},
       );
 
   Future<ActEntity?> fetchLatestByMemIds(int memId) => v(
         () async {
-          final rows = await _driftAccessor.selectEntities(
-            defTableActs,
-            condition: Equals(defFkActsMemId, memId),
-            orderBy: [Descending(defColActsStart)],
-            limit: 1,
-          );
-          return rows.isEmpty ? null : rows.first as ActEntity;
+          final rows = await (_db.select(_db.acts)
+                ..where((t) => t.memId.equals(memId))
+                ..orderBy([(t) => OrderingTerm.desc(t.start)])
+                ..limit(1))
+              .get();
+          return rows.isEmpty ? null : ActEntity.fromTuple(rows.first);
         },
         {'memId': memId},
       );
@@ -86,15 +96,16 @@ class ActQueryService {
   ) =>
       v(
         () async {
-          final rows = await _driftAccessor.selectEntities(
-            defTableActs,
-            condition: memId == null ? null : Equals(defFkActsMemId, memId),
-            orderBy: [Descending(defColActsStart)],
-            offset: offset,
-            limit: limit,
-          );
+          var query = _db.select(_db.acts);
+          if (memId != null) {
+            query = query..where((t) => t.memId.equals(memId));
+          }
+          final rows = await (query
+                ..orderBy([(t) => OrderingTerm.desc(t.start)])
+                ..limit(limit, offset: offset))
+              .get();
           return ListWithTotalCount(
-            List<ActEntity>.from(rows),
+            rows.map(ActEntity.fromTuple).toList(),
             await countByMemIdIs(memId),
           );
         },
@@ -111,18 +122,16 @@ class ActQueryService {
   ) =>
       v(
         () async {
-          final rows = await _driftAccessor.selectEntities(
-            defTableActs,
-            condition: And(
-              [
-                Equals(defFkActsMemId, memId),
-                GraterThanOrEqual(defColActsStart, period.start),
-                LessThan(defColActsStart, period.end),
-                excludingSkippedForPerformanceCondition(),
-              ],
-            ),
-          );
-          return List<ActEntity>.from(rows);
+          final rows = await (_db.select(_db.acts)
+                ..where(
+                  (t) =>
+                      t.memId.equals(memId) &
+                      t.start.isBiggerOrEqualValue(period.start!) &
+                      t.start.isSmallerThanValue(period.end!) &
+                      actExcludingSkippedForPerformance(t),
+                ))
+              .get();
+          return rows.map(ActEntity.fromTuple).toList();
         },
         {
           'memId': memId,
