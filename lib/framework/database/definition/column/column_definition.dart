@@ -25,12 +25,6 @@ abstract class ColumnDefinition {
     }
   }
 
-  String buildCreateTableSql() => [
-        name,
-        type,
-        notNull ? 'NOT NULL' : null,
-      ].where((element) => element != null).join(' ');
-
   @override
   String toString() => [
         runtimeType.toString(),

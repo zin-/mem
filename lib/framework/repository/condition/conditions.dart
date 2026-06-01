@@ -4,10 +4,6 @@ import 'package:mem/framework/database/definition/column/column_definition.dart'
 import 'package:mem/framework/repository/condition/fk_definition_to_drift_column_name.dart';
 
 abstract class Condition {
-  String? where();
-
-  List<Object?>? whereArgs();
-
   drift.Expression<bool>? toDriftExpression(drift.TableInfo tableInfo);
 }
 
@@ -16,12 +12,6 @@ class Equals extends Condition {
   final dynamic _value;
 
   Equals(this._columnDefinition, this._value);
-
-  @override
-  String? where() => "${_columnDefinition.name} = ?";
-
-  @override
-  List<Object?>? whereArgs() => [DatabaseConverter().to(_value)];
 
   @override
   drift.Expression<bool>? toDriftExpression(drift.TableInfo tableInfo) {
@@ -42,12 +32,6 @@ class NotEquals extends Condition {
   NotEquals(this._columnDefinition, this._value);
 
   @override
-  String? where() => "${_columnDefinition.name} != ?";
-
-  @override
-  List<Object?>? whereArgs() => [DatabaseConverter().to(_value)];
-
-  @override
   drift.Expression<bool>? toDriftExpression(drift.TableInfo tableInfo) {
     final column = _getColumn(tableInfo, _columnDefinition.name);
     if (column == null) return null;
@@ -66,12 +50,6 @@ class IsNull extends Condition {
   final String _key;
 
   IsNull(this._key);
-
-  @override
-  String where() => '$_key $_operator';
-
-  @override
-  List<Object?>? whereArgs() => null;
 
   @override
   drift.Expression<bool>? toDriftExpression(drift.TableInfo tableInfo) {
@@ -95,14 +73,6 @@ class IsNotNull extends Condition {
   IsNotNull(this._key);
 
   @override
-  String where() {
-    return '$_key $_operator';
-  }
-
-  @override
-  List<Object?>? whereArgs() => null;
-
-  @override
   drift.Expression<bool>? toDriftExpression(drift.TableInfo tableInfo) {
     final column = _getColumn(tableInfo, _key);
     if (column == null) return null;
@@ -121,19 +91,6 @@ class And extends Condition {
   final Iterable<Condition> _conditions;
 
   And(this._conditions) : super();
-
-  @override
-  String? where() => _conditions.isEmpty
-      ? null
-      : _conditions.map((e) => '( ${e.where()} )').join(_operator);
-
-  @override
-  List<Object?>? whereArgs() => _conditions.isEmpty
-      ? null
-      : _conditions
-          .map((e) => e.whereArgs())
-          .expand((element) => element ?? [])
-          .toList();
 
   @override
   drift.Expression<bool>? toDriftExpression(drift.TableInfo tableInfo) {
@@ -158,19 +115,6 @@ class Or extends Condition {
   Or(this._conditions) : super();
 
   @override
-  String? where() => _conditions.isEmpty
-      ? null
-      : _conditions.map((e) => '( ${e.where()} )').join(_operator);
-
-  @override
-  List<Object?>? whereArgs() => _conditions.isEmpty
-      ? null
-      : _conditions
-          .map((e) => e.whereArgs())
-          .expand((element) => element ?? [])
-          .toList();
-
-  @override
   drift.Expression<bool>? toDriftExpression(drift.TableInfo tableInfo) {
     if (_conditions.isEmpty) return null;
     final expressions = _conditions
@@ -192,12 +136,6 @@ class GraterThanOrEqual extends Condition {
   GraterThanOrEqual(this._columnDefinition, this._value);
 
   @override
-  String where() => '? <= ${_columnDefinition.name}';
-
-  @override
-  List<Object?>? whereArgs() => [_value];
-
-  @override
   drift.Expression<bool>? toDriftExpression(drift.TableInfo tableInfo) {
     final column = _getColumn(tableInfo, _columnDefinition.name);
     if (column == null) return null;
@@ -213,12 +151,6 @@ class LessThan extends Condition {
   final dynamic _value;
 
   LessThan(this._columnDefinition, this._value);
-
-  @override
-  String where() => '${_columnDefinition.name} < ?';
-
-  @override
-  List<Object?>? whereArgs() => [_value];
 
   @override
   drift.Expression<bool>? toDriftExpression(drift.TableInfo tableInfo) {

@@ -9,12 +9,6 @@ class In extends Condition {
   In(this._key, this._values);
 
   @override
-  String where() => '$_key IN ( ${_values.join(', ')} )';
-
-  @override
-  List<Object?>? whereArgs() => null;
-
-  @override
   drift.Expression<bool>? toDriftExpression(drift.TableInfo tableInfo) {
     final column = _getColumn(tableInfo, _key);
     if (column == null) return null;
@@ -22,7 +16,7 @@ class In extends Condition {
   }
 
   @override
-  String toString() => where();
+  String toString() => '$_key IN ( ${_values.join(', ')} )';
 }
 
 drift.GeneratedColumn? _getColumn(drift.TableInfo tableInfo, String columnName) {

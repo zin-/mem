@@ -9,6 +9,7 @@ import 'package:mem/databases/table_definitions/mem_relations.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/features/targets/target_table.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:mem/databases/database_file_name.dart';
 import 'package:path/path.dart' as path;
 
 part 'database.g.dart';
@@ -62,7 +63,7 @@ void setOnTest(bool value) {
 
 Future<String> getDatabaseFilePath() async {
   final dbFolder = await getApplicationDocumentsDirectory();
-  final dbName = _onTest ? 'test_mem_drift.db' : 'mem_drift.db';
+  final dbName = _onTest ? testDatabaseFileName : databaseFileName;
   return path.join(dbFolder.path, dbName);
 }
 

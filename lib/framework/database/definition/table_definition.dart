@@ -33,26 +33,6 @@ class TableDefinition {
     }
   }
 
-  String buildCreateTableSql() => [
-        'CREATE TABLE',
-        name,
-        '(',
-        [
-          columnDefinitions
-              .map((columnDefinition) => columnDefinition.buildCreateTableSql())
-              .join(', '),
-          primaryKeyDefinitions.isEmpty
-              ? null
-              : 'PRIMARY KEY ( ${primaryKeyDefinitions.map((e) => e.name).join(', ')} )',
-          foreignKeyDefinitions.isEmpty
-              ? null
-              : foreignKeyDefinitions
-                  .map((e) => e.buildForeignKeySql())
-                  .join(', '),
-        ].where((element) => element != null).join(', '),
-        ')',
-      ].join(' ');
-
   Iterable<ColumnDefinition> get primaryKeyDefinitions =>
       columnDefinitions.where((element) => element.isPrimaryKey);
 

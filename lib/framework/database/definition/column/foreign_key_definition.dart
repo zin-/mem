@@ -22,8 +22,4 @@ class ForeignKeyDefinition extends ColumnDefinition {
                 ),
           notNull: true,
         );
-
-  String buildForeignKeySql() => 'FOREIGN KEY ($name)'
-      ' REFERENCES ${parentTableDefinition.name}'
-      '(${parentTableDefinition.primaryKeyDefinitions.single.name})';
 }
