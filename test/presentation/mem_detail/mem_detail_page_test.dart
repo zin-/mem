@@ -89,7 +89,7 @@ void main() {
       id: anyNamed('id'),
       archived: anyNamed('archived'),
       done: anyNamed('done'),
-      loadChildren: anyNamed('loadChildren'),
+      loadLatestAct: anyNamed('loadLatestAct'),
     )).thenAnswer((_) async => []);
     when(mockMemItemRepository.ship(
       memId: anyNamed('memId'),

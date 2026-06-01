@@ -72,7 +72,7 @@ void main() {
     Future<Act?> latestActForMem(int memId) async {
       final rows = await MemRepository().ship(
         id: memId,
-        loadChildren: MemRepository.loadLatestActChild,
+        loadLatestAct: true,
       );
       return rows.single.latestAct;
     }

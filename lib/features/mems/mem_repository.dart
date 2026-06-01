@@ -1,30 +1,23 @@
+import 'dart:math' as math;
+
+import 'package:drift/drift.dart' as drift;
 import 'package:mem/databases/child_fk_cascade.dart';
-import 'package:mem/databases/table_definitions/acts.dart';
+import 'package:mem/databases/database.dart' as drift_schema;
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
+import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/drift_repository.dart';
 import 'package:mem/framework/repository/group_by.dart';
-import 'package:mem/framework/repository/load_child_spec.dart';
 import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/framework/singleton.dart';
 import 'package:mem/features/logger/log_service.dart';
 
-class MemRepository extends DriftRepository {
-  static List<LoadChildSpec> get loadLatestActChild => [
-        LoadChildSpec(
-          table: defTableActs,
-          resultKey: 'latest_act',
-          orderBy: [
-            DescendingCoalesce(defColActsStart, defColCreatedAt),
-            Descending(defPkId),
-          ],
-          limit: 1,
-        ),
-      ];
+const _latestActPerMemChunkSize = 900;
 
+class MemRepository extends DriftRepository {
   Future<List<MemEntity>> ship({
     int? id,
     bool? archived,
@@ -33,14 +26,14 @@ class MemRepository extends DriftRepository {
     List<OrderBy>? orderBy,
     int? offset,
     int? limit,
-    List<LoadChildSpec>? loadChildren,
+    bool loadLatestAct = false,
   }) =>
       v(
         () async {
+          late final List<MemEntity> entities;
           if (_usesAccessorShip(
             groupBy: groupBy,
             orderBy: orderBy,
-            loadChildren: loadChildren,
           )) {
             final rows = await driftAccessor.selectEntities(
               defTableMems,
@@ -53,31 +46,35 @@ class MemRepository extends DriftRepository {
               orderBy: orderBy,
               offset: offset,
               limit: limit,
-              loadChildren: loadChildren,
             );
-            return List<MemEntity>.from(rows);
+            entities = List<MemEntity>.from(rows);
+          } else {
+            var query = driftDb.select(driftDb.mems);
+            if (id != null) {
+              query = query..where((t) => t.id.equals(id));
+            }
+            if (archived == true) {
+              query = query..where((t) => t.archivedAt.isNotNull());
+            } else if (archived == false) {
+              query = query..where((t) => t.archivedAt.isNull());
+            }
+            if (done == true) {
+              query = query..where((t) => t.doneAt.isNotNull());
+            } else if (done == false) {
+              query = query..where((t) => t.doneAt.isNull());
+            }
+            if (limit != null || offset != null) {
+              query = query
+                ..limit(limit ?? 999999999, offset: offset ?? 0);
+            }
+            final rows = await query.get();
+            entities = rows.map(MemEntity.fromTuple).toList();
           }
 
-          var query = driftDb.select(driftDb.mems);
-          if (id != null) {
-            query = query..where((t) => t.id.equals(id));
+          if (!loadLatestAct || entities.isEmpty) {
+            return entities;
           }
-          if (archived == true) {
-            query = query..where((t) => t.archivedAt.isNotNull());
-          } else if (archived == false) {
-            query = query..where((t) => t.archivedAt.isNull());
-          }
-          if (done == true) {
-            query = query..where((t) => t.doneAt.isNotNull());
-          } else if (done == false) {
-            query = query..where((t) => t.doneAt.isNull());
-          }
-          if (limit != null || offset != null) {
-            query = query
-              ..limit(limit ?? 999999999, offset: offset ?? 0);
-          }
-          final rows = await query.get();
-          return rows.map(MemEntity.fromTuple).toList();
+          return _attachLatestActs(entities);
         },
         {
           'id': id,
@@ -87,23 +84,23 @@ class MemRepository extends DriftRepository {
           'orderBy': orderBy,
           'offset': offset,
           'limit': limit,
-          'loadChildren': loadChildren,
+          'loadLatestAct': loadLatestAct,
         },
       );
 
   Future<MemEntity> shipById(
     int id, {
-    List<LoadChildSpec>? loadChildren,
+    bool loadLatestAct = false,
   }) =>
       v(
         () async {
           final rows = await ship(
             id: id,
-            loadChildren: loadChildren,
+            loadLatestAct: loadLatestAct,
           );
           return rows.single;
         },
-        {'id': id, 'loadChildren': loadChildren},
+        {'id': id, 'loadLatestAct': loadLatestAct},
       );
 
   Future<MemEntity> receive(Mem domain) => v(
@@ -148,11 +145,8 @@ class MemRepository extends DriftRepository {
   static bool _usesAccessorShip({
     GroupBy? groupBy,
     List<OrderBy>? orderBy,
-    List<LoadChildSpec>? loadChildren,
   }) =>
-      loadChildren != null && loadChildren.isNotEmpty ||
-      groupBy != null ||
-      (orderBy != null && orderBy.isNotEmpty);
+      groupBy != null || (orderBy != null && orderBy.isNotEmpty);
 
   static Condition? _shipCondition({
     int? id,
@@ -172,6 +166,71 @@ class MemRepository extends DriftRepository {
                 : IsNull(defColMemsDoneAt.name),
         ],
       );
+
+  Future<List<MemEntity>> _attachLatestActs(List<MemEntity> mems) async {
+    final latestByMemId = await _latestActRowsByMemId(mems.map((m) => m.id));
+    return mems
+        .map((m) {
+          final row = latestByMemId[m.id];
+          if (row == null) return m;
+          return m.updatedWith(
+            latestAct: () => ActEntity.fromTuple(row).toDomain(),
+          );
+        })
+        .toList();
+  }
+
+  Future<Map<int, drift_schema.Act>> _latestActRowsByMemId(
+    Iterable<int> memIds,
+  ) async {
+    final list = memIds.toSet().toList();
+    if (list.isEmpty) return {};
+    final out = <int, drift_schema.Act>{};
+    for (var i = 0; i < list.length; i += _latestActPerMemChunkSize) {
+      final end = math.min(i + _latestActPerMemChunkSize, list.length);
+      final chunk = list.sublist(i, end);
+      for (final entry in (await _selectLatestActsChunk(chunk)).entries) {
+        out[entry.key] = entry.value;
+      }
+    }
+    return out;
+  }
+
+  Future<Map<int, drift_schema.Act>> _selectLatestActsChunk(
+    List<int> memIdsChunk,
+  ) async {
+    if (memIdsChunk.isEmpty) return {};
+    final placeholders = List.filled(memIdsChunk.length, '?').join(',');
+    final vars = <drift.Variable<Object>>[
+      ...memIdsChunk.map((id) => drift.Variable<int>(id)),
+    ];
+
+    final sql = '''
+WITH ranked AS (
+  SELECT
+    id AS id,
+    mem_id AS mem_id,
+    ROW_NUMBER() OVER (
+      PARTITION BY mem_id
+      ORDER BY COALESCE(start, created_at) DESC, id DESC
+    ) AS _rn
+  FROM acts
+  WHERE mem_id IN ($placeholders)
+)
+SELECT id
+FROM ranked r
+WHERE r._rn = 1
+''';
+
+    final rawRows = await driftDb.customSelect(sql, variables: vars).get();
+    final ids = rawRows.map((row) => row.read<int>('id')).toList();
+    if (ids.isEmpty) return {};
+
+    final acts = await (driftDb.select(driftDb.acts)
+          ..where((t) => t.id.isIn(ids)))
+        .get();
+    return {for (final a in acts) a.memId: a};
+  }
 
   MemRepository._();
 

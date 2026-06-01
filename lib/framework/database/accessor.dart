@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'package:drift/drift.dart' as drift;
 import 'package:mem/databases/database.dart';
-import 'package:mem/databases/database.dart' as drift_schema;
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -18,7 +17,6 @@ import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_entity.dart' as mem_entity;
 import 'package:mem/features/targets/target.dart' as target_domain;
 import 'package:mem/features/targets/target_entity.dart';
-import 'package:mem/framework/database/definition/column/column_definition.dart';
 import 'package:mem/framework/database/definition/column/foreign_key_definition.dart';
 import 'package:mem/framework/database/definition/table_definition.dart';
 import 'package:mem/framework/database/drift_converter.dart';
@@ -316,152 +314,6 @@ class DriftDatabaseAccessor {
     return out;
   }
 
-  static String _actsSqlColumn(ColumnDefinition c) => switch (c.name) {
-        'createdAt' => 'created_at',
-        'updatedAt' => 'updated_at',
-        'archivedAt' => 'archived_at',
-        'id' => 'id',
-        'start' => 'start',
-        'start_is_all_day' => 'start_is_all_day',
-        'end' => 'end',
-        'end_is_all_day' => 'end_is_all_day',
-        'paused_at' => 'paused_at',
-        _ => c.name,
-      };
-
-  static String _actsPartitionOrderBySql(List<OrderBy>? orderBy) {
-    if (orderBy == null || orderBy.isEmpty) {
-      return 'id DESC';
-    }
-    final parts = <String>[];
-    for (final o in orderBy) {
-      if (o is DescendingCoalesce) {
-        parts.add(
-          'COALESCE(${_actsSqlColumn(o.columnDefinition)}, '
-          '${_actsSqlColumn(o.secondary)}) DESC',
-        );
-      } else if (o is Descending) {
-        parts.add('${_actsSqlColumn(o.columnDefinition)} DESC');
-      } else {
-        throw UnsupportedError(
-          'loadChildren acts: unsupported OrderBy ${o.runtimeType}',
-        );
-      }
-    }
-    return parts.join(', ');
-  }
-
-  static int _compareActsForPartition(
-    drift_schema.Act a,
-    drift_schema.Act b,
-    List<OrderBy>? orderBy,
-  ) {
-    if (orderBy == null || orderBy.isEmpty) {
-      return b.id.compareTo(a.id);
-    }
-    for (final o in orderBy) {
-      if (o is DescendingCoalesce) {
-        final va = a.start ?? a.createdAt;
-        final vb = b.start ?? b.createdAt;
-        final c = vb.compareTo(va);
-        if (c != 0) return c;
-      } else if (o is Descending) {
-        final name = o.columnDefinition.name;
-        if (name == 'id') {
-          final c = b.id.compareTo(a.id);
-          if (c != 0) return c;
-        } else {
-          throw UnsupportedError(
-            'loadChildren acts in-memory: column $name',
-          );
-        }
-      }
-    }
-    return b.id.compareTo(a.id);
-  }
-
-  Future<List<dynamic>> _selectActsPartitioned(
-    List<int> parentIdsChunk,
-    LoadChildSpec spec,
-  ) async {
-    if (parentIdsChunk.isEmpty) return [];
-    final offset = spec.offset ?? 0;
-    final orderSql = _actsPartitionOrderBySql(spec.orderBy);
-    if (spec.condition != null) {
-      var q = driftDatabase.select(driftDatabase.acts);
-      q.where((t) => t.memId.isIn(parentIdsChunk));
-      final exp = spec.condition!.toDriftExpression(driftDatabase.acts);
-      if (exp != null) q.where((t) => exp);
-      final all = await q.get();
-      final byMem = <int, List<drift_schema.Act>>{};
-      for (final row in all) {
-        byMem.putIfAbsent(row.memId, () => []).add(row);
-      }
-      final out = <drift_schema.Act>[];
-      for (final entry in byMem.entries) {
-        final sorted = [...entry.value]
-          ..sort(
-            (x, y) => _compareActsForPartition(x, y, spec.orderBy),
-          );
-        final lim = spec.limit;
-        final slice = sorted.skip(offset);
-        out.addAll(
-          lim == null ? slice : slice.take(lim),
-        );
-      }
-      return out;
-    }
-
-    final placeholders = List.filled(parentIdsChunk.length, '?').join(',');
-    final vars = <drift.Variable<Object>>[
-      ...parentIdsChunk.map((id) => drift.Variable<int>(id)),
-    ];
-    final low = offset;
-    final high = spec.limit == null ? null : offset + spec.limit!;
-    final rnPredicate = high == null
-        ? 'r._rn > $low'
-        : 'r._rn > $low AND r._rn <= $high';
-
-    final sql = '''
-WITH ranked AS (
-  SELECT
-    created_at AS created_at,
-    updated_at AS updated_at,
-    archived_at AS archived_at,
-    id AS id,
-    start AS start,
-    start_is_all_day AS start_is_all_day,
-    end AS end,
-    end_is_all_day AS end_is_all_day,
-    paused_at AS paused_at,
-    mem_id AS mem_id,
-    ROW_NUMBER() OVER (PARTITION BY mem_id ORDER BY $orderSql) AS _rn
-  FROM acts
-  WHERE mem_id IN ($placeholders)
-)
-SELECT
-  created_at, updated_at, archived_at, id, start, start_is_all_day,
-  end, end_is_all_day, paused_at, mem_id
-FROM ranked r
-WHERE $rnPredicate
-''';
-
-    final rawRows = await driftDatabase.customSelect(
-      sql,
-      variables: vars,
-    ).get();
-
-    final ids = rawRows.map((row) => row.read<int>('id')).toList();
-    if (ids.isEmpty) return [];
-    final byId = {
-      for (final a in await (driftDatabase.select(driftDatabase.acts)
-            ..where((t) => t.id.isIn(ids)))
-          .get())
-        a.id: a,
-    };
-    return ids.map((id) => byId[id]!).toList();
-  }
-
   Future<List<dynamic>> _selectChildChunk(
     drift.TableInfo childInfo,
     ForeignKeyDefinition fk,
@@ -469,9 +321,6 @@ WHERE $rnPredicate
     LoadChildSpec spec,
   ) async {
     final name = childInfo.actualTableName;
-    if (name == 'acts' && spec.usesPerParentOrdering) {
-      return _selectActsPartitioned(parentIdsChunk, spec);
-    }
     if (spec.usesPerParentOrdering) {
       throw StateError(
         'loadChildren orderBy/limit/offset only implemented for acts; '

@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart' hide isNull;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/databases/database.dart';
-import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/databases/table_definitions/mem_notifications.dart';
@@ -11,9 +10,9 @@ import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/framework/database/accessor.dart';
+import 'package:mem/framework/singleton.dart';
 import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/load_child_spec.dart';
-import 'package:mem/framework/repository/order_by.dart';
 
 void main() {
   group('selectEntities loadChildren', () {
@@ -24,10 +23,15 @@ void main() {
       db = AppDatabase.memory();
       accessor = DriftDatabaseAccessor.withDatabase(db);
       await Migrator(db).createAll();
+      DriftDatabaseAccessor.reset();
+      Singleton.override<DriftDatabaseAccessor>(accessor);
+      Singleton.reset<MemRepository>();
     });
 
     tearDown(() async {
       await db.close();
+      DriftDatabaseAccessor.reset();
+      Singleton.reset<MemRepository>();
     });
 
     test('child condition filters rows', () async {
@@ -172,7 +176,7 @@ void main() {
       expect(memB.memRelations!.single.sourceMemId, a.id);
     });
 
-    test('acts latest_act per mem via orderBy and limit', () async {
+    test('latest_act per mem via MemRepository.loadLatestAct', () async {
       final now = DateTime.now();
       final m1 = await db.into(db.mems).insertReturning(
             MemsCompanion.insert(name: 'a', createdAt: now),
@@ -195,20 +199,7 @@ void main() {
             ),
           );
 
-      final rows = await accessor.selectEntities(
-        defTableMems,
-        loadChildren: [
-          LoadChildSpec(
-            table: defTableActs,
-            resultKey: 'latest_act',
-            orderBy: [
-              DescendingCoalesce(defColActsStart, defColCreatedAt),
-              Descending(defPkId),
-            ],
-            limit: 1,
-          ),
-        ],
-      );
+      final rows = await MemRepository().ship(loadLatestAct: true);
 
       expect(rows, hasLength(2));
       final mem1 = rows.cast<MemEntity>().singleWhere((e) => e.id == m1.id);
@@ -243,13 +234,12 @@ void main() {
             ),
           );
 
-      final rows = await accessor.selectEntities(
-        defTableMems,
-        loadChildren: MemRepository.loadLatestActChild,
+      final rows = await MemRepository().ship(
+        id: mem.id,
+        loadLatestAct: true,
       );
 
-      final loaded =
-          rows.cast<MemEntity>().singleWhere((e) => e.id == mem.id);
+      final loaded = rows.single;
       expect(loaded.latestAct?.actKind, ActKind.skipped);
     });
 

@@ -196,7 +196,7 @@ class MemService {
         () async {
           final memEntity = await _memRepository.shipById(
             memId,
-            loadChildren: MemRepository.loadLatestActChild,
+            loadLatestAct: true,
           );
 
           final doneMem =
@@ -213,7 +213,7 @@ class MemService {
           );
           final reloaded = await _memRepository.shipById(
             memId,
-            loadChildren: MemRepository.loadLatestActChild,
+            loadLatestAct: true,
           );
           return SavedMemEntityV1.fromEntityV2(reloaded);
         },
@@ -229,7 +229,7 @@ class MemService {
         () async {
           final memEntity = await _memRepository.shipById(
             memId,
-            loadChildren: MemRepository.loadLatestActChild,
+            loadLatestAct: true,
           );
           final undoneMem =
               memEntity.updatedWith(update: (mem) => mem.undone());
@@ -245,7 +245,7 @@ class MemService {
           );
           final reloaded = await _memRepository.shipById(
             memId,
-            loadChildren: MemRepository.loadLatestActChild,
+            loadLatestAct: true,
           );
           return SavedMemEntityV1.fromEntityV2(reloaded);
         },
@@ -265,7 +265,7 @@ class MemService {
 
           return await _memRepository.shipById(
             archivedMem.id,
-            loadChildren: MemRepository.loadLatestActChild,
+            loadLatestAct: true,
           );
         },
         {
@@ -290,7 +290,7 @@ class MemService {
 
           return await _memRepository.shipById(
             unarchivedMem.id,
-            loadChildren: MemRepository.loadLatestActChild,
+            loadLatestAct: true,
           );
         },
         {
