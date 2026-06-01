@@ -18,5 +18,5 @@
 //  更新することはないように感じる
 //  よって、ここでは`receive`（受け取る）、`replace`（置き換える）などの荷物や事物を扱う際の単語を採用する
 //
-// SQLite（Drift）で上記の語を実装する具体例は DatabaseTupleRepository を参照。
+// SQLite（Drift）で上記の語を実装する具体例は DriftRepository を継承する各 Repository を参照。
 abstract class Repository {}

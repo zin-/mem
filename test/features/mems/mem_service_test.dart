@@ -100,22 +100,20 @@ void main() {
         when(mockMemNotificationRepository.waste(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
-          condition: anyNamed('condition'),
         )).thenAnswer((_) async => []);
         when(mockMemRelationRepository.waste(
-                condition: anyNamed('condition')))
-            .thenAnswer((_) async => []);
-        when(mockTargetRepository.waste(condition: anyNamed('condition')))
+          sourceMemId: anyNamed('sourceMemId'),
+        )).thenAnswer((_) async => []);
+        when(mockTargetRepository.waste(memId: anyNamed('memId')))
             .thenAnswer((_) async => []);
         when(mockMemNotificationRepository.waste(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
-          condition: anyNamed('condition'),
         )).thenAnswer((_) async => []);
         when(mockMemRelationRepository.waste(
-                condition: anyNamed('condition')))
-            .thenAnswer((_) async => []);
-        when(mockTargetRepository.waste(condition: anyNamed('condition')))
+          sourceMemId: anyNamed('sourceMemId'),
+        )).thenAnswer((_) async => []);
+        when(mockTargetRepository.waste(memId: anyNamed('memId')))
             .thenAnswer((_) async => []);
         when(mockTargetRepository.receive(any))
             .thenAnswer((_) async => savedTarget);
@@ -161,12 +159,11 @@ void main() {
         when(mockMemNotificationRepository.waste(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
-          condition: anyNamed('condition'),
         )).thenAnswer((_) async => []);
         when(mockMemRelationRepository.waste(
-                condition: anyNamed('condition')))
-            .thenAnswer((_) async => []);
-        when(mockTargetRepository.waste(condition: anyNamed('condition')))
+          sourceMemId: anyNamed('sourceMemId'),
+        )).thenAnswer((_) async => []);
+        when(mockTargetRepository.waste(memId: anyNamed('memId')))
             .thenAnswer((_) async => []);
 
         // Act
@@ -218,12 +215,11 @@ void main() {
         when(mockMemNotificationRepository.waste(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
-          condition: anyNamed('condition'),
         )).thenAnswer((_) async => []);
         when(mockMemRelationRepository.waste(
-                condition: anyNamed('condition')))
-            .thenAnswer((_) async => []);
-        when(mockTargetRepository.waste(condition: anyNamed('condition')))
+          sourceMemId: anyNamed('sourceMemId'),
+        )).thenAnswer((_) async => []);
+        when(mockTargetRepository.waste(memId: anyNamed('memId')))
             .thenAnswer((_) async => []);
 
         // Act

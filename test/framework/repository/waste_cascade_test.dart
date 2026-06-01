@@ -1,23 +1,13 @@
 import 'package:drift/drift.dart' show Migrator, Value;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/databases/database.dart' hide Mem;
-import 'package:mem/databases/definition.dart';
-import 'package:mem/databases/table_definitions/base.dart';
-import 'package:mem/databases/table_definitions/mems.dart';
-import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_relations/mem_relation.dart';
-import 'package:mem/features/mems/mem.dart';
-import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/mems/mem_repository.dart';
+import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/framework/database/accessor.dart';
-import 'package:mem/framework/repository/condition/conditions.dart';
-import 'package:mem/framework/repository/database_tuple_repository.dart';
 import 'package:mem/framework/singleton.dart';
-
-class _TestMemRepo extends DatabaseTupleRepository<Mem, int, MemEntity> {
-  _TestMemRepo() : super(databaseDefinition, defTableMems);
-}
 
 void main() {
   group('waste child cascade', () {
@@ -86,7 +76,7 @@ void main() {
             ),
           );
 
-      await _TestMemRepo().waste(condition: Equals(defPkId, m1.id));
+      await MemRepository().waste(id: m1.id);
 
       expect(await db.select(db.mems).get(), hasLength(1));
       expect((await db.select(db.mems).get()).single.id, m2.id);

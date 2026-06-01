@@ -1,63 +1,87 @@
-import 'package:mem/databases/definition.dart';
-import 'package:mem/databases/table_definitions/mem_notifications.dart';
-import 'package:mem/framework/repository/load_child_spec.dart';
-import 'package:mem/framework/repository/condition/conditions.dart';
-import 'package:mem/framework/repository/condition/in.dart';
-import 'package:mem/framework/repository/database_tuple_repository.dart';
+import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/features/mem_notifications/mem_notification.dart';
+import 'package:mem/features/mem_notifications/mem_notification_entity.dart'
+    show
+        MemNotificationEntity,
+        convertIntoMemRepeatedNotificationsInsertable,
+        convertIntoMemRepeatedNotificationsUpdateable;
+import 'package:mem/framework/repository/drift_repository.dart';
 import 'package:mem/framework/singleton.dart';
-import 'package:mem/framework/repository/group_by.dart';
-import 'package:mem/framework/repository/order_by.dart';
-import 'mem_notification.dart';
-import 'mem_notification_entity.dart';
 
 // @Deprecated('MemNotificationRepositoryは集約の単位から外れているためMemRepositoryに集約されるべき')
 // lintエラーになるためコメントアウト
-class MemNotificationRepository extends DatabaseTupleRepository<MemNotification,
-    int, MemNotificationEntity> {
-  @override
+class MemNotificationRepository extends DriftRepository {
   Future<List<MemNotificationEntity>> ship({
     int? memId,
     Iterable<int>? memIdsIn,
-    Condition? condition,
-    GroupBy? groupBy,
-    List<OrderBy>? orderBy,
-    int? offset,
-    int? limit,
-    List<LoadChildSpec>? loadChildren,
   }) =>
-      super.ship(
-        condition: And(
-          [
-            if (memId != null) Equals(defFkMemNotificationsMemId, memId),
-            if (memIdsIn != null) In(defFkMemNotificationsMemId.name, memIdsIn),
-            if (condition != null) condition, // coverage:ignore-line
-          ],
-        ),
-        groupBy: groupBy,
-        orderBy: orderBy,
-        offset: offset,
-        limit: limit,
-        loadChildren: loadChildren,
+      v(
+        () async {
+          var query = driftDb.select(driftDb.memRepeatedNotifications);
+          if (memId != null) {
+            query = query..where((t) => t.memId.equals(memId));
+          } else if (memIdsIn != null) {
+            query = query..where((t) => t.memId.isIn(memIdsIn));
+          }
+          final rows = await query.get();
+          return rows.map(MemNotificationEntity.fromTuple).toList();
+        },
+        {
+          'memId': memId,
+          'memIdsIn': memIdsIn,
+        },
       );
 
-  @override
+  Future<MemNotificationEntity> receive(MemNotification domain) => v(
+        () async {
+          final inserted =
+              await driftDb.into(driftDb.memRepeatedNotifications).insertReturning(
+                    convertIntoMemRepeatedNotificationsInsertable(
+                      domain,
+                      createdAt: DateTime.now(),
+                    ),
+                  );
+          return MemNotificationEntity.fromTuple(inserted);
+        },
+        {'domain': domain},
+      );
+
+  Future<MemNotificationEntity> replace(MemNotificationEntity entity) => v(
+        () async {
+          final updated =
+              await (driftDb.update(driftDb.memRepeatedNotifications)
+                    ..where((t) => t.id.equals(entity.id)))
+                  .writeReturning(
+                    convertIntoMemRepeatedNotificationsUpdateable(entity),
+                  );
+          return MemNotificationEntity.fromTuple(updated.single);
+        },
+        {'entity': entity},
+      );
+
   Future<List<MemNotificationEntity>> waste({
     int? memId,
     MemNotificationType? type,
-    Condition? condition,
   }) =>
-      super.waste(
-        condition: And(
-          [
-            if (memId != null) Equals(defFkMemNotificationsMemId, memId),
-            if (type != null) Equals(defColMemNotificationsType, type.name),
-            if (condition != null) condition, // coverage:ignore-line
-          ],
-        ),
+      v(
+        () async {
+          var query = driftDb.delete(driftDb.memRepeatedNotifications);
+          if (memId != null) {
+            query = query..where((t) => t.memId.equals(memId));
+          }
+          if (type != null) {
+            query = query..where((t) => t.type.equals(type.name));
+          }
+          final deleted = await query.goAndReturn();
+          return deleted.map(MemNotificationEntity.fromTuple).toList();
+        },
+        {
+          'memId': memId,
+          'type': type,
+        },
       );
 
-  MemNotificationRepository._()
-      : super(databaseDefinition, defTableMemNotifications);
+  MemNotificationRepository._();
 
   factory MemNotificationRepository({MemNotificationRepository? mock}) {
     if (mock != null) {

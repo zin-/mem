@@ -3,8 +3,6 @@ import 'package:mem/features/mem_relations/mem_relation.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/targets/target_repository.dart';
-import 'package:mem/features/targets/target_table.dart';
-import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_items/mem_item_repository.dart';
@@ -15,7 +13,6 @@ import 'package:mem/features/mem_notifications/mem_notification_repository.dart'
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/mem_relations/mem_relation_repository.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
-import 'package:mem/databases/table_definitions/mem_relations.dart';
 
 class MemService {
   final MemRepository _memRepository;
@@ -124,9 +121,7 @@ class MemService {
           SavedTargetEntityV1? savedTarget;
           final target = memDetail.$4;
           if (target == null || target.value.value == 0) {
-            await _targetRepository.waste(
-              condition: Equals(defFkTargetMemId, savedMemEntity.id),
-            );
+            await _targetRepository.waste(memId: savedMemEntity.id);
           } else if (target is SavedTargetEntityV1) {
             savedTarget = await _targetRepository
                 .replace(target.toEntityV2())
@@ -156,8 +151,7 @@ class MemService {
           if (memRelations != null) {
             if (memRelations.isEmpty) {
               await _memRelationRepository.waste(
-                condition:
-                    Equals(defFkMemRelationsSourceMemId, savedMemEntity.id),
+                sourceMemId: savedMemEntity.id,
               );
             } else {
               final saved = await Future.wait(memRelations
@@ -291,10 +285,7 @@ class MemService {
               (v) =>
                   v.map((e) => SavedMemItemEntityV1.fromEntityV2(e)).toList());
           await _memRelationRepository.unarchiveBy(
-            condition: Or([
-              Equals(defFkMemRelationsSourceMemId, unarchivedMem.id),
-              Equals(defFkMemRelationsTargetMemId, unarchivedMem.id),
-            ]),
+            relatedMemId: unarchivedMem.id,
           );
 
           return await _memRepository.shipById(

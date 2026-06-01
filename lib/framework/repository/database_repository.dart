@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:mem/databases/database.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/database/definition/database_definition.dart';
-import 'package:mem/framework/repository/database_tuple_repository.dart';
+import 'package:mem/framework/repository/drift_repository.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/framework/singleton.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -26,7 +26,7 @@ class DatabaseRepository extends Repository {
 
   Future<void> replace(String name, File backup) => v(
         () async {
-          await DatabaseTupleRepository.close();
+          await DriftRepository.close();
 
           final current = (await getDatabaseFile())!;
           final originalPath = current.path;
