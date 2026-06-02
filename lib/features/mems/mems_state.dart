@@ -51,7 +51,7 @@ class MemEntities extends _$MemEntities
           final mem = await MemRepository()
               .shipById(
                 memId,
-                loadChildren: MemRepository.loadLatestActChild,
+                loadLatestAct: true,
               )
               .then((v) => SavedMemEntityV1.fromEntityV2(v));
 
@@ -66,7 +66,7 @@ class MemEntities extends _$MemEntities
         () async {
           final rows = await MemRepository().ship(
             id: memId,
-            loadChildren: MemRepository.loadLatestActChild,
+            loadLatestAct: true,
           );
           if (rows.isEmpty) return;
           upsert([SavedMemEntityV1.fromEntityV2(rows.single)]);

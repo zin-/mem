@@ -1,66 +1,42 @@
 import 'package:flutter_test/flutter_test.dart';
+import '../../entity_factories.dart';
 import 'package:mem/databases/database.dart' hide Act;
-import 'package:mem/databases/table_definitions/acts.dart';
-import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 
 void main() {
   group('ActEntity act_kind', () {
-    test('SavedActEntityV1 reads skipped from map', () {
-      final entity = SavedActEntityV1({
-        defPkId.name: 1,
-        defFkActsMemId.name: 2,
-        defColActsStart.name: DateTime(2024, 6, 1, 10),
-        defColActsStartIsAllDay.name: false,
-        defColActsEnd.name: DateTime(2024, 6, 1, 11),
-        defColActsEndIsAllDay.name: false,
-        defColActsPausedAt.name: null,
-        defColActsActKind.name: 'skipped',
-        defColCreatedAt.name: DateTime(2024, 6, 1),
-        defColUpdatedAt.name: DateTime(2024, 6, 1),
-        defColArchivedAt.name: null,
-      });
+    test('SavedActEntityV1 reads skipped from entity factory', () {
+      final entity = savedAct(
+        id: 1,
+        memId: 2,
+        start: DateTime(2024, 6, 1, 10),
+        startIsAllDay: false,
+        end: DateTime(2024, 6, 1, 11),
+        endIsAllDay: false,
+        createdAt: DateTime(2024, 6, 1),
+        updatedAt: DateTime(2024, 6, 1),
+        actKind: ActKind.skipped,
+      );
 
       expect(entity.value.actKind, ActKind.skipped);
       expect(entity.value.isSkipped, isTrue);
-      expect(entity.toMap[defColActsActKind.name], 'skipped');
-    });
-
-    test('ActEntity.fromTuple map includes act_kind', () {
-      final entity = ActEntity.fromTuple({
-        defPkId.name: 3,
-        defFkActsMemId.name: 4,
-        defColActsStart.name: DateTime(2024, 6, 2, 10),
-        defColActsStartIsAllDay.name: false,
-        defColActsEnd.name: DateTime(2024, 6, 2, 11),
-        defColActsEndIsAllDay.name: false,
-        defColActsPausedAt.name: null,
-        defColActsActKind.name: 'finished',
-        defColCreatedAt.name: DateTime(2024, 6, 2),
-        defColUpdatedAt.name: DateTime(2024, 6, 2),
-        defColArchivedAt.name: null,
-      });
-
-      expect(entity.actKind, ActKind.finished);
-      expect(entity.toDomain().actKind, ActKind.finished);
+      expect(entity.toMap['actKind'], 'skipped');
     });
 
     test('SavedActEntityV1.toEntityV2 preserves act_kind', () {
-      final entity = SavedActEntityV1({
-        defPkId.name: 7,
-        defFkActsMemId.name: 8,
-        defColActsStart.name: DateTime(2024, 6, 4, 10),
-        defColActsStartIsAllDay.name: false,
-        defColActsEnd.name: DateTime(2024, 6, 4, 11),
-        defColActsEndIsAllDay.name: false,
-        defColActsPausedAt.name: null,
-        defColActsActKind.name: 'skipped',
-        defColCreatedAt.name: DateTime(2024, 6, 4),
-        defColUpdatedAt.name: DateTime(2024, 6, 4),
-        defColArchivedAt.name: null,
-      });
+      final entity = savedAct(
+        id: 7,
+        memId: 8,
+        start: DateTime(2024, 6, 4, 10),
+        startIsAllDay: false,
+        end: DateTime(2024, 6, 4, 11),
+        endIsAllDay: false,
+        createdAt: DateTime(2024, 6, 4),
+        updatedAt: DateTime(2024, 6, 4),
+        actKind: ActKind.skipped,
+      );
 
       expect(entity.toEntityV2().actKind, ActKind.skipped);
     });

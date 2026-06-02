@@ -20,7 +20,7 @@ class MemStore {
               .ship(
                 archived: archived,
                 done: done,
-                loadChildren: MemRepository.loadLatestActChild,
+                loadLatestAct: true,
               )
               .then((v) =>
                   v.map((e) => SavedMemEntityV1.fromEntityV2(e)).toList());
@@ -46,7 +46,7 @@ class MemStore {
           if (memId != null) {
             final saved = await _memRepository.shipById(
               memId,
-              loadChildren: MemRepository.loadLatestActChild,
+              loadLatestAct: true,
             );
 
             _memStock.add(SavedMemEntityV1.fromEntityV2(saved));

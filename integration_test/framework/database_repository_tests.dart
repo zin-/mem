@@ -2,9 +2,8 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/databases/database.dart';
+import 'package:mem/databases/database_file_name.dart';
 import 'package:mem/framework/repository/database_repository.dart';
-
-import 'database_definitions.dart';
 
 const _name = "DatabaseRepository";
 
@@ -42,15 +41,14 @@ void main() => group(
             test(
               " received.",
               () async {
-                final accessor =
-                    await DatabaseRepository().receive(sampleDefDb);
+                final accessor = await DatabaseRepository().receive();
                 await accessor.driftDatabase
                     .select(accessor.driftDatabase.mems)
                     .get();
 
                 final databaseFile =
                     await DatabaseRepository().shipFileByNameIs(
-                  sampleDefDb.name,
+                  testDatabaseFileName,
                 );
 
                 expect(databaseFile, isNotNull);

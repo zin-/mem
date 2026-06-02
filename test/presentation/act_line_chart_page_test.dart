@@ -1,13 +1,11 @@
 import 'package:collection/collection.dart';
+import '../entity_factories.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/databases/table_definitions/acts.dart';
-import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/features/acts/acts_summary.dart';
 import 'package:mem/features/acts/line_chart/line_chart_page.dart';
 import 'package:mem/features/acts/act.dart';
-import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mems/mem_entity.dart';
@@ -62,19 +60,14 @@ void main() {
               ),
               actListProvider(memId).overrideWith(
                 (ref) => acts
-                    .mapIndexed((index, act) => SavedActEntityV1({
-                          defPkId.name: index + 1,
-                          defFkActsMemId.name: act.memId,
-                          defColActsStart.name: act.period?.start,
-                          defColActsStartIsAllDay.name:
-                              act.period?.start?.isAllDay,
-                          defColActsEnd.name: act.period?.end,
-                          defColActsEndIsAllDay.name: act.period?.end?.isAllDay,
-                          defColActsPausedAt.name: act.pausedAt,
-                          defColCreatedAt.name: DateTime.now(),
-                          defColUpdatedAt.name: DateTime.now(),
-                          defColArchivedAt.name: null,
-                        }))
+                    .mapIndexed(
+                      (index, act) => savedActFromDomain(
+                        act,
+                        id: index + 1,
+                        createdAt: DateTime.now(),
+                        updatedAt: DateTime.now(),
+                      ),
+                    )
                     .toList(),
               ),
             ],

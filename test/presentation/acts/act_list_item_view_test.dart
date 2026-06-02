@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../entity_factories.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/databases/table_definitions/acts.dart';
-import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/list/item/editing_act_dialog.dart';
@@ -17,20 +16,19 @@ void main() {
       ActKind? actKind,
       String? actKindRaw,
     }) {
-      return SavedActEntityV1({
-        defPkId.name: 1,
-        defFkActsMemId.name: 2,
-        defColActsStart.name: DateTime(2024, 6, 1, 10),
-        defColActsStartIsAllDay.name: false,
-        defColActsEnd.name: DateTime(2024, 6, 1, 11),
-        defColActsEndIsAllDay.name: false,
-        defColActsPausedAt.name: null,
-        if (actKindRaw != null) defColActsActKind.name: actKindRaw,
-        if (actKind != null) defColActsActKind.name: actKind.name,
-        defColCreatedAt.name: DateTime(2024, 6, 1),
-        defColUpdatedAt.name: DateTime(2024, 6, 1),
-        defColArchivedAt.name: null,
-      });
+      final resolved = actKind ??
+          (actKindRaw == null ? null : ActKind.values.byName(actKindRaw));
+      return savedAct(
+        id: 1,
+        memId: 2,
+        start: DateTime(2024, 6, 1, 10),
+        startIsAllDay: false,
+        end: DateTime(2024, 6, 1, 11),
+        endIsAllDay: false,
+        createdAt: DateTime(2024, 6, 1),
+        updatedAt: DateTime(2024, 6, 1),
+        actKind: resolved,
+      );
     }
 
     Widget wrap(Widget child) => MaterialApp(

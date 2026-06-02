@@ -14,8 +14,6 @@ import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/targets/target_repository.dart';
-import 'package:mem/features/targets/target_table.dart';
-import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mem/features/mems/detail/page.dart';
@@ -91,20 +89,14 @@ void main() {
       id: anyNamed('id'),
       archived: anyNamed('archived'),
       done: anyNamed('done'),
-      condition: anyNamed('condition'),
+      loadLatestAct: anyNamed('loadLatestAct'),
     )).thenAnswer((_) async => []);
     when(mockMemItemRepository.ship(
       memId: anyNamed('memId'),
-      condition: anyNamed('condition'),
-      groupBy: anyNamed('groupBy'),
-      orderBy: anyNamed('orderBy'),
-      offset: anyNamed('offset'),
-      limit: anyNamed('limit'),
     )).thenAnswer((_) async => []);
     when(mockMemNotificationRepository.ship(
       memId: anyNamed('memId'),
       memIdsIn: anyNamed('memIdsIn'),
-      condition: anyNamed('condition'),
     )).thenAnswer((_) async => []);
     when(mockMemRelationRepository.shipBySourceMemId(any))
         .thenAnswer((_) async => []);
@@ -189,8 +181,7 @@ void main() {
                   ),
                 ]);
 
-        when(mockTargetRepository.ship(
-                condition: Equals(defFkTargetMemId, _TestConstants.testMemId)))
+        when(mockTargetRepository.shipByMemId(_TestConstants.testMemId))
             .thenAnswer((_) async => [
                   TargetEntity(
                     _TestConstants.testMemId,
@@ -362,8 +353,7 @@ void main() {
                   ),
                 ]);
 
-        when(mockTargetRepository.ship(
-                condition: Equals(defFkTargetMemId, _TestConstants.testMemId)))
+        when(mockTargetRepository.shipByMemId(_TestConstants.testMemId))
             .thenAnswer((_) async => [
                   TargetEntity(
                     _TestConstants.testMemId,

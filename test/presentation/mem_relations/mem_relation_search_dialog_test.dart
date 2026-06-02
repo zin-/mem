@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../entity_factories.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/features/mem_relations/mem_relation_search_dialog.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mems_state.dart';
@@ -32,30 +32,8 @@ Widget _buildTestApp(Widget child, {List<Override>? overrides}) {
 void main() {
   group('MemRelationDialogStateful', () {
     testWidgets('initializes with selectedMemIds', (tester) async {
-      final mem1 = SavedMemEntityV1({
-        defPkId.name: 1,
-        'name': 'Mem 1',
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': DateTime.now(),
-        'updatedAt': DateTime.now(),
-        'archivedAt': null,
-      });
-      final mem2 = SavedMemEntityV1({
-        defPkId.name: 2,
-        'name': 'Mem 2',
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': DateTime.now(),
-        'updatedAt': DateTime.now(),
-        'archivedAt': null,
-      });
+      final mem1 = savedMem(id: 1, name: 'Mem 1', createdAt: DateTime.now(), updatedAt: DateTime.now());
+      final mem2 = savedMem(id: 2, name: 'Mem 2', createdAt: DateTime.now(), updatedAt: DateTime.now());
 
       await tester.pumpWidget(
         _buildTestApp(
@@ -96,30 +74,8 @@ void main() {
     });
 
     testWidgets('updates searchText when typing', (tester) async {
-      final mem1 = SavedMemEntityV1({
-        defPkId.name: 1,
-        'name': 'Apple',
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': DateTime.now(),
-        'updatedAt': DateTime.now(),
-        'archivedAt': null,
-      });
-      final mem2 = SavedMemEntityV1({
-        defPkId.name: 2,
-        'name': 'Banana',
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': DateTime.now(),
-        'updatedAt': DateTime.now(),
-        'archivedAt': null,
-      });
+      final mem1 = savedMem(id: 1, name: 'Apple', createdAt: DateTime.now(), updatedAt: DateTime.now());
+      final mem2 = savedMem(id: 2, name: 'Banana', createdAt: DateTime.now(), updatedAt: DateTime.now());
 
       await tester.pumpWidget(
         _buildTestApp(
@@ -162,18 +118,7 @@ void main() {
 
     testWidgets('updates selectedMemIds when checkbox is toggled',
         (tester) async {
-      final mem1 = SavedMemEntityV1({
-        defPkId.name: 1,
-        'name': 'Mem 1',
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': DateTime.now(),
-        'updatedAt': DateTime.now(),
-        'archivedAt': null,
-      });
+      final mem1 = savedMem(id: 1, name: 'Mem 1', createdAt: DateTime.now(), updatedAt: DateTime.now());
 
       await tester.pumpWidget(
         _buildTestApp(
@@ -217,18 +162,7 @@ void main() {
 
     testWidgets('submits selectedMemIds when add button is pressed',
         (tester) async {
-      final mem1 = SavedMemEntityV1({
-        defPkId.name: 1,
-        'name': 'Mem 1',
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': DateTime.now(),
-        'updatedAt': DateTime.now(),
-        'archivedAt': null,
-      });
+      final mem1 = savedMem(id: 1, name: 'Mem 1', createdAt: DateTime.now(), updatedAt: DateTime.now());
 
       List<int>? submittedIds;
 
@@ -269,18 +203,7 @@ void main() {
     });
 
     testWidgets('closes dialog when cancel button is pressed', (tester) async {
-      final mem1 = SavedMemEntityV1({
-        defPkId.name: 1,
-        'name': 'Mem 1',
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': DateTime.now(),
-        'updatedAt': DateTime.now(),
-        'archivedAt': null,
-      });
+      final mem1 = savedMem(id: 1, name: 'Mem 1', createdAt: DateTime.now(), updatedAt: DateTime.now());
 
       await tester.pumpWidget(
         _buildTestApp(
@@ -319,42 +242,9 @@ void main() {
 
   group('MemRelationDialogConsumer', () {
     testWidgets('filters candidates by searchText', (tester) async {
-      final mem1 = SavedMemEntityV1({
-        defPkId.name: 1,
-        'name': 'Apple',
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': DateTime.now(),
-        'updatedAt': DateTime.now(),
-        'archivedAt': null,
-      });
-      final mem2 = SavedMemEntityV1({
-        defPkId.name: 2,
-        'name': 'Banana',
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': DateTime.now(),
-        'updatedAt': DateTime.now(),
-        'archivedAt': null,
-      });
-      final mem3 = SavedMemEntityV1({
-        defPkId.name: 3,
-        'name': 'Cherry',
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': DateTime.now(),
-        'updatedAt': DateTime.now(),
-        'archivedAt': null,
-      });
+      final mem1 = savedMem(id: 1, name: 'Apple', createdAt: DateTime.now(), updatedAt: DateTime.now());
+      final mem2 = savedMem(id: 2, name: 'Banana', createdAt: DateTime.now(), updatedAt: DateTime.now());
+      final mem3 = savedMem(id: 3, name: 'Cherry', createdAt: DateTime.now(), updatedAt: DateTime.now());
 
       await tester.pumpWidget(
         _buildTestApp(
@@ -397,30 +287,8 @@ void main() {
 
     testWidgets('includes selected mems even if searchText does not match',
         (tester) async {
-      final mem1 = SavedMemEntityV1({
-        defPkId.name: 1,
-        'name': 'Apple',
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': DateTime.now(),
-        'updatedAt': DateTime.now(),
-        'archivedAt': null,
-      });
-      final mem2 = SavedMemEntityV1({
-        defPkId.name: 2,
-        'name': 'Banana',
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': DateTime.now(),
-        'updatedAt': DateTime.now(),
-        'archivedAt': null,
-      });
+      final mem1 = savedMem(id: 1, name: 'Apple', createdAt: DateTime.now(), updatedAt: DateTime.now());
+      final mem2 = savedMem(id: 2, name: 'Banana', createdAt: DateTime.now(), updatedAt: DateTime.now());
 
       await tester.pumpWidget(
         _buildTestApp(
@@ -461,30 +329,8 @@ void main() {
     });
 
     testWidgets('excludes sourceMemId from candidates', (tester) async {
-      final mem1 = SavedMemEntityV1({
-        defPkId.name: 1,
-        'name': 'Mem 1',
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': DateTime.now(),
-        'updatedAt': DateTime.now(),
-        'archivedAt': null,
-      });
-      final mem2 = SavedMemEntityV1({
-        defPkId.name: 2,
-        'name': 'Mem 2',
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': DateTime.now(),
-        'updatedAt': DateTime.now(),
-        'archivedAt': null,
-      });
+      final mem1 = savedMem(id: 1, name: 'Mem 1', createdAt: DateTime.now(), updatedAt: DateTime.now());
+      final mem2 = savedMem(id: 2, name: 'Mem 2', createdAt: DateTime.now(), updatedAt: DateTime.now());
 
       await tester.pumpWidget(
         _buildTestApp(
@@ -520,30 +366,8 @@ void main() {
 
     testWidgets('shows all candidates when searchText is empty',
         (tester) async {
-      final mem1 = SavedMemEntityV1({
-        defPkId.name: 1,
-        'name': 'Mem 1',
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': DateTime.now(),
-        'updatedAt': DateTime.now(),
-        'archivedAt': null,
-      });
-      final mem2 = SavedMemEntityV1({
-        defPkId.name: 2,
-        'name': 'Mem 2',
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': DateTime.now(),
-        'updatedAt': DateTime.now(),
-        'archivedAt': null,
-      });
+      final mem1 = savedMem(id: 1, name: 'Mem 1', createdAt: DateTime.now(), updatedAt: DateTime.now());
+      final mem2 = savedMem(id: 2, name: 'Mem 2', createdAt: DateTime.now(), updatedAt: DateTime.now());
 
       await tester.pumpWidget(
         _buildTestApp(
@@ -612,30 +436,8 @@ void main() {
     });
 
     testWidgets('displays candidates in list', (tester) async {
-      final mem1 = SavedMemEntityV1({
-        defPkId.name: 1,
-        'name': 'Mem 1',
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': DateTime.now(),
-        'updatedAt': DateTime.now(),
-        'archivedAt': null,
-      });
-      final mem2 = SavedMemEntityV1({
-        defPkId.name: 2,
-        'name': 'Mem 2',
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': DateTime.now(),
-        'updatedAt': DateTime.now(),
-        'archivedAt': null,
-      });
+      final mem1 = savedMem(id: 1, name: 'Mem 1', createdAt: DateTime.now(), updatedAt: DateTime.now());
+      final mem2 = savedMem(id: 2, name: 'Mem 2', createdAt: DateTime.now(), updatedAt: DateTime.now());
 
       await tester.pumpWidget(
         _buildTestApp(
@@ -669,18 +471,7 @@ void main() {
     });
 
     testWidgets('toggles checkbox when tapped', (tester) async {
-      final mem1 = SavedMemEntityV1({
-        defPkId.name: 1,
-        'name': 'Mem 1',
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': DateTime.now(),
-        'updatedAt': DateTime.now(),
-        'archivedAt': null,
-      });
+      final mem1 = savedMem(id: 1, name: 'Mem 1', createdAt: DateTime.now(), updatedAt: DateTime.now());
 
       await tester.pumpWidget(
         _buildTestApp(
@@ -731,18 +522,7 @@ void main() {
     });
 
     testWidgets('unchecks checkbox when already selected', (tester) async {
-      final mem1 = SavedMemEntityV1({
-        defPkId.name: 1,
-        'name': 'Mem 1',
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': DateTime.now(),
-        'updatedAt': DateTime.now(),
-        'archivedAt': null,
-      });
+      final mem1 = savedMem(id: 1, name: 'Mem 1', createdAt: DateTime.now(), updatedAt: DateTime.now());
 
       await tester.pumpWidget(
         _buildTestApp(

@@ -1,13 +1,11 @@
 import 'package:drift/drift.dart';
 import 'package:mem/databases/database.dart' as drift_database;
-import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
 
 import 'target.dart';
-import 'target_table.dart';
 
 class TargetEntityV1 with EntityV1<Target> {
   TargetEntityV1(Target value) {
@@ -16,11 +14,11 @@ class TargetEntityV1 with EntityV1<Target> {
 
   @override
   Map<String, Object?> get toMap => {
-        defFkTargetMemId.name: value.memId,
-        defColTargetType.name: value.targetType.name,
-        defColTargetUnit.name: value.targetUnit.name,
-        defColTargetValue.name: value.value,
-        defColTargetPeriod.name: value.period.name,
+        'memId': value.memId,
+        'type': value.targetType.name,
+        'unit': value.targetUnit.name,
+        'value': value.value,
+        'period': value.period.name,
       };
 
   @override
@@ -31,42 +29,49 @@ class TargetEntityV1 with EntityV1<Target> {
 class SavedTargetEntityV1 extends TargetEntityV1
     with DatabaseTupleEntityV1<int, Target> {
   SavedTargetEntityV1(Map<String, dynamic> map)
-      : super(
-          Target(
-            memId: map[defFkTargetMemId.name],
-            targetType: TargetType.values.firstWhere(
-              (element) => element.name == map[defColTargetType.name],
-            ),
-            targetUnit: TargetUnit.values.firstWhere(
-              (element) => element.name == map[defColTargetUnit.name],
-            ),
-            value: map[defColTargetValue.name],
-            period: Period.values.firstWhere(
-              (element) => element.name == map[defColTargetPeriod.name],
-            ),
-          ),
-        ) {
-    withMap(map);
+      : super(_targetFromMap(map)) {
+    withBaseColumns(map);
   }
+
+  SavedTargetEntityV1.fromRow(dynamic row) : super(_targetFromRow(row)) {
+    withBaseColumns(row);
+  }
+
+  static Target _targetFromMap(Map<String, dynamic> map) => Target(
+        memId: map['memId'] ?? map['mems_id'],
+        targetType: TargetType.values.firstWhere(
+          (element) => element.name == map['type'],
+        ),
+        targetUnit: TargetUnit.values.firstWhere(
+          (element) => element.name == map['unit'],
+        ),
+        value: map['value'],
+        period: Period.values.firstWhere(
+          (element) => element.name == map['period'],
+        ),
+      );
+
+  static Target _targetFromRow(dynamic row) => Target(
+        memId: row.memId,
+        targetType: TargetType.values.firstWhere(
+          (element) => element.name == row.type,
+        ),
+        targetUnit: TargetUnit.values.firstWhere(
+          (element) => element.name == row.unit,
+        ),
+        value: row.value,
+        period: Period.values.firstWhere(
+          (element) => element.name == row.period,
+        ),
+      );
 
   @override
   SavedTargetEntityV1 updatedWith(Target Function(Target v) update) =>
-      SavedTargetEntityV1(toMap..addAll(super.updatedWith(update).toMap));
+      SavedTargetEntityV1(_savedRowFrom(this, update(value)));
 
   factory SavedTargetEntityV1.fromEntityV2(TargetEntity entity) =>
-      SavedTargetEntityV1(
-        {
-          defFkTargetMemId.name: entity.memId,
-          defColTargetType.name: entity.targetType.name,
-          defColTargetUnit.name: entity.targetUnit.name,
-          defColTargetValue.name: entity.value,
-          defColTargetPeriod.name: entity.period.name,
-          defPkId.name: entity.id,
-          defColCreatedAt.name: entity.createdAt,
-          defColUpdatedAt.name: entity.updatedAt,
-          defColArchivedAt.name: entity.archivedAt,
-        },
-      );
+      SavedTargetEntityV1.fromRow(_TargetEntityRow(entity));
+
   TargetEntity toEntityV2() => TargetEntity(
         value.memId,
         value.targetType,
@@ -79,6 +84,22 @@ class SavedTargetEntityV1 extends TargetEntityV1
         archivedAt,
       );
 }
+
+Map<String, Object?> _savedRowFrom(
+  SavedTargetEntityV1 saved,
+  Target value,
+) =>
+    {
+      'id': saved.id,
+      'memId': value.memId,
+      'type': value.targetType.name,
+      'unit': value.targetUnit.name,
+      'value': value.value,
+      'period': value.period.name,
+      'createdAt': saved.createdAt,
+      'updatedAt': saved.updatedAt,
+      'archivedAt': saved.archivedAt,
+    };
 
 class TargetEntity implements Entity<int> {
   final MemId memId;
@@ -107,22 +128,22 @@ class TargetEntity implements Entity<int> {
     this.archivedAt,
   );
 
-  factory TargetEntity.fromTuple(dynamic tuple) => TargetEntity(
-        tuple.memId,
+  factory TargetEntity.fromTuple(dynamic row) => TargetEntity(
+        row.memId,
         TargetType.values.firstWhere(
-          (element) => element.name == tuple.type,
+          (element) => element.name == row.type,
         ),
         TargetUnit.values.firstWhere(
-          (element) => element.name == tuple.unit,
+          (element) => element.name == row.unit,
         ),
-        tuple.value,
+        row.value,
         Period.values.firstWhere(
-          (element) => element.name == tuple.period,
+          (element) => element.name == row.period,
         ),
-        tuple.id,
-        tuple.createdAt,
-        tuple.updatedAt,
-        tuple.archivedAt,
+        row.id,
+        row.createdAt,
+        row.updatedAt,
+        row.archivedAt,
       );
 }
 
@@ -148,3 +169,19 @@ drift_database.TargetsCompanion convertIntoTargetsUpdateable(
       updatedAt: Value(DateTime.now()),
       archivedAt: Value(entity.archivedAt),
     );
+
+class _TargetEntityRow {
+  final TargetEntity entity;
+
+  _TargetEntityRow(this.entity);
+
+  int get id => entity.id;
+  int get memId => entity.memId!;
+  String get type => entity.targetType.name;
+  String get unit => entity.targetUnit.name;
+  int get value => entity.value;
+  String get period => entity.period.name;
+  DateTime get createdAt => entity.createdAt;
+  DateTime? get updatedAt => entity.updatedAt;
+  DateTime? get archivedAt => entity.archivedAt;
+}

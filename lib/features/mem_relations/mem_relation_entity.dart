@@ -1,6 +1,4 @@
 import 'package:drift/drift.dart';
-import 'package:mem/databases/table_definitions/base.dart';
-import 'package:mem/databases/table_definitions/mem_relations.dart';
 import 'package:mem/features/mem_relations/mem_relation.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
@@ -29,10 +27,10 @@ class MemRelationEntityV1 with EntityV1<MemRelation> {
 
   @override
   Map<String, Object?> get toMap => {
-        defFkMemRelationsSourceMemId.name: value.sourceMemId,
-        defFkMemRelationsTargetMemId.name: value.targetMemId,
-        defColMemRelationsType.name: value.type.name,
-        defColMemRelationsValue.name: value.value,
+        'sourceMemId': value.sourceMemId,
+        'targetMemId': value.targetMemId,
+        'type': value.type.name,
+        'value': value.value,
       };
 
   @override
@@ -43,30 +41,32 @@ class MemRelationEntityV1 with EntityV1<MemRelation> {
 class SavedMemRelationEntityV1 extends MemRelationEntityV1
     with DatabaseTupleEntityV1<int, MemRelation> {
   SavedMemRelationEntityV1(Map<String, dynamic> map)
-      : super(
-          MemRelation.by(
-            map[defFkMemRelationsSourceMemId.name],
-            map[defFkMemRelationsTargetMemId.name],
-            MemRelationType.values.byName(map[defColMemRelationsType.name]),
-            map[defColMemRelationsValue.name] ?? 0,
-          ),
-        ) {
-    withMap(map);
+      : super(_relationFromMap(map)) {
+    withBaseColumns(map);
   }
 
-  factory SavedMemRelationEntityV1.fromEntityV2(MemRelationEntity entity) =>
-      SavedMemRelationEntityV1(
-        {
-          defFkMemRelationsSourceMemId.name: entity.sourceMemId,
-          defFkMemRelationsTargetMemId.name: entity.targetMemId,
-          defColMemRelationsType.name: entity.type.name,
-          defColMemRelationsValue.name: entity.value,
-          defPkId.name: entity.id,
-          defColCreatedAt.name: entity.createdAt,
-          defColUpdatedAt.name: entity.updatedAt,
-          defColArchivedAt.name: entity.archivedAt,
-        },
+  SavedMemRelationEntityV1.fromRow(dynamic row) : super(_relationFromRow(row)) {
+    withBaseColumns(row);
+  }
+
+  static MemRelation _relationFromMap(Map<String, dynamic> map) =>
+      MemRelation.by(
+        map['sourceMemId'] ?? map['source_mems_id'],
+        map['targetMemId'] ?? map['target_mems_id'],
+        MemRelationType.values.byName(map['type']),
+        map['value'] ?? 0,
       );
+
+  static MemRelation _relationFromRow(dynamic row) => MemRelation.by(
+        row.sourceMemId,
+        row.targetMemId,
+        MemRelationType.values.byName(row.type),
+        row.value ?? 0,
+      );
+
+  factory SavedMemRelationEntityV1.fromEntityV2(MemRelationEntity entity) =>
+      SavedMemRelationEntityV1.fromRow(_MemRelationEntityRow(entity));
+
   MemRelationEntity toEntityV2() => MemRelationEntity(
         value.sourceMemId,
         value.targetMemId,
@@ -105,17 +105,17 @@ class MemRelationEntity implements Entity<int> {
     this.archivedAt,
   );
 
-  factory MemRelationEntity.fromTuple(dynamic tuple) => MemRelationEntity(
-        tuple.sourceMemId,
-        tuple.targetMemId,
+  factory MemRelationEntity.fromTuple(dynamic row) => MemRelationEntity(
+        row.sourceMemId,
+        row.targetMemId,
         MemRelationType.values.firstWhere(
-          (element) => element.name == tuple.type,
+          (element) => element.name == row.type,
         ),
-        tuple.value,
-        tuple.id,
-        tuple.createdAt,
-        tuple.updatedAt,
-        tuple.archivedAt,
+        row.value,
+        row.id,
+        row.createdAt,
+        row.updatedAt,
+        row.archivedAt,
       );
 }
 
@@ -140,3 +140,18 @@ drift_database.MemRelationsCompanion convertIntoMemRelationsUpdateable(
       updatedAt: Value(DateTime.now()),
       archivedAt: Value(entity.archivedAt),
     );
+
+class _MemRelationEntityRow {
+  final MemRelationEntity entity;
+
+  _MemRelationEntityRow(this.entity);
+
+  int get id => entity.id;
+  int get sourceMemId => entity.sourceMemId!;
+  int get targetMemId => entity.targetMemId!;
+  String get type => entity.type.name;
+  int get value => entity.value;
+  DateTime get createdAt => entity.createdAt;
+  DateTime? get updatedAt => entity.updatedAt;
+  DateTime? get archivedAt => entity.archivedAt;
+}

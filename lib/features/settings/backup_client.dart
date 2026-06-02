@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:mem/features/settings/files_client.dart';
-import 'package:mem/databases/definition.dart';
+import 'package:mem/databases/database_file_name.dart';
 import 'package:mem/framework/repository/database_repository.dart';
 import 'package:mem/features/logger/log_service.dart';
 
@@ -11,7 +11,7 @@ class BackupClient {
 
   Future<String> createBackup() => v(
         () async => await _filesClient.saveOrShare((await _databaseRepository
-            .shipFileByNameIs(databaseDefinition.name))!),
+            .shipFileByNameIs(databaseFileName))!),
       );
 
   Future<String?> restore() => v(
@@ -24,7 +24,7 @@ class BackupClient {
             //  対象ファイルが不正だった場合などを考慮していない
             //  置き換え後、repositoryなどの再読み込みが必要かもしれないが考慮していない
             await _databaseRepository.replace(
-                databaseDefinition.name, File(pickedFile.path));
+                databaseFileName, File(pickedFile.path));
 
             return pickedFile.name;
           }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../entity_factories.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/features/mem_relations/mem_relation.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation_state.dart';
@@ -64,30 +64,8 @@ void main() {
         (tester) async {
       const sourceMemId = 1;
       final now = DateTime.now();
-      final mem1 = SavedMemEntityV1({
-        defPkId.name: 1,
-        'name': 'Mem 1',
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': now,
-        'updatedAt': now,
-        'archivedAt': null,
-      });
-      final mem2 = SavedMemEntityV1({
-        defPkId.name: 2,
-        'name': 'Mem 2',
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': now,
-        'updatedAt': now,
-        'archivedAt': null,
-      });
+      final mem1 = savedMem(id: 1, name: 'Mem 1', createdAt: now, updatedAt: now);
+      final mem2 = savedMem(id: 2, name: 'Mem 2', createdAt: now, updatedAt: now);
 
       final relation1 = MemRelationEntityV1.by(
         sourceMemId,
@@ -226,18 +204,7 @@ void main() {
         (tester) async {
       const sourceMemId = 1;
       final now = DateTime.now();
-      final mem1 = SavedMemEntityV1({
-        defPkId.name: 1,
-        'name': 'Mem 1',
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': now,
-        'updatedAt': now,
-        'archivedAt': null,
-      });
+      final mem1 = savedMem(id: 1, name: 'Mem 1', createdAt: now, updatedAt: now);
 
       final relation1 = MemRelationEntityV1.by(
         sourceMemId,
@@ -271,18 +238,7 @@ void main() {
     testWidgets('calls onChanged when value is changed', (tester) async {
       const sourceMemId = 1;
       final now = DateTime.now();
-      final mem1 = SavedMemEntityV1({
-        defPkId.name: 1,
-        'name': 'Mem 1',
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': now,
-        'updatedAt': now,
-        'archivedAt': null,
-      });
+      final mem1 = savedMem(id: 1, name: 'Mem 1', createdAt: now, updatedAt: now);
 
       final relation1 = MemRelationEntityV1.by(
         sourceMemId,
@@ -322,18 +278,7 @@ void main() {
       final now = DateTime.now();
       final mems = List.generate(
           4,
-          (index) => SavedMemEntityV1({
-                defPkId.name: index + 1,
-                'name': 'Mem ${index + 1}',
-                'doneAt': null,
-                'notifyOn': null,
-                'notifyAt': null,
-                'endOn': null,
-                'endAt': null,
-                'createdAt': now,
-                'updatedAt': now,
-                'archivedAt': null,
-              }));
+          (index) => savedMem(id: index + 1, name: 'Mem ${index + 1}', createdAt: now, updatedAt: now));
 
       final relations = mems
           .map((mem) => MemRelationEntityV1.by(
@@ -376,18 +321,7 @@ void main() {
       final now = DateTime.now();
       final mems = List.generate(
           2,
-          (index) => SavedMemEntityV1({
-                defPkId.name: index + 1,
-                'name': 'Mem ${index + 1}',
-                'doneAt': null,
-                'notifyOn': null,
-                'notifyAt': null,
-                'endOn': null,
-                'endAt': null,
-                'createdAt': now,
-                'updatedAt': now,
-                'archivedAt': null,
-              }));
+          (index) => savedMem(id: index + 1, name: 'Mem ${index + 1}', createdAt: now, updatedAt: now));
 
       final relations = mems
           .map((mem) => MemRelationEntityV1.by(
@@ -427,18 +361,7 @@ void main() {
     testWidgets('calls onChanged with 0 when value is null', (tester) async {
       const sourceMemId = 1;
       final now = DateTime.now();
-      final mem1 = SavedMemEntityV1({
-        defPkId.name: 1,
-        'name': 'Mem 1',
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': now,
-        'updatedAt': now,
-        'archivedAt': null,
-      });
+      final mem1 = savedMem(id: 1, name: 'Mem 1', createdAt: now, updatedAt: now);
 
       final relation1 = MemRelationEntityV1.by(
         sourceMemId,

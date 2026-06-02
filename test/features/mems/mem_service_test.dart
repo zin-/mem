@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import '../../entity_factories.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_items/mem_item_repository.dart';
@@ -70,18 +71,8 @@ void main() {
         );
         final memRelations = <MemRelationEntityV1>[];
 
-        final savedMem = SavedMemEntityV1({
-          'id': testMemId,
-          'name': 'Test Mem',
-          'doneAt': null,
-          'notifyOn': null,
-          'notifyAt': null,
-          'endOn': null,
-          'endAt': null,
-          'createdAt': DateTime.now(),
-          'updatedAt': null,
-          'archivedAt': null,
-        });
+        final savedMemEntity = savedMem(
+            id: testMemId, name: 'Test Mem', createdAt: DateTime.now());
 
         final savedTarget = TargetEntity(
           testMemId,
@@ -96,26 +87,24 @@ void main() {
         );
 
         when(mockMemRepository.receive(any))
-            .thenAnswer((_) async => savedMem.toEntityV2());
+            .thenAnswer((_) async => savedMemEntity.toEntityV2());
         when(mockMemNotificationRepository.waste(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
-          condition: anyNamed('condition'),
         )).thenAnswer((_) async => []);
         when(mockMemRelationRepository.waste(
-                condition: anyNamed('condition')))
-            .thenAnswer((_) async => []);
-        when(mockTargetRepository.waste(condition: anyNamed('condition')))
+          sourceMemId: anyNamed('sourceMemId'),
+        )).thenAnswer((_) async => []);
+        when(mockTargetRepository.waste(memId: anyNamed('memId')))
             .thenAnswer((_) async => []);
         when(mockMemNotificationRepository.waste(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
-          condition: anyNamed('condition'),
         )).thenAnswer((_) async => []);
         when(mockMemRelationRepository.waste(
-                condition: anyNamed('condition')))
-            .thenAnswer((_) async => []);
-        when(mockTargetRepository.waste(condition: anyNamed('condition')))
+          sourceMemId: anyNamed('sourceMemId'),
+        )).thenAnswer((_) async => []);
+        when(mockTargetRepository.waste(memId: anyNamed('memId')))
             .thenAnswer((_) async => []);
         when(mockTargetRepository.receive(any))
             .thenAnswer((_) async => savedTarget);
@@ -143,30 +132,19 @@ void main() {
         final target = null;
         final memRelations = <MemRelationEntityV1>[];
 
-        final savedMem = SavedMemEntityV1({
-          'id': testMemId,
-          'name': 'Test Mem',
-          'doneAt': null,
-          'notifyOn': null,
-          'notifyAt': null,
-          'endOn': null,
-          'endAt': null,
-          'createdAt': DateTime.now(),
-          'updatedAt': null,
-          'archivedAt': null,
-        });
+        final savedMemEntity = savedMem(
+            id: testMemId, name: 'Test Mem', createdAt: DateTime.now());
 
         when(mockMemRepository.receive(any))
-            .thenAnswer((_) async => savedMem.toEntityV2());
+            .thenAnswer((_) async => savedMemEntity.toEntityV2());
         when(mockMemNotificationRepository.waste(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
-          condition: anyNamed('condition'),
         )).thenAnswer((_) async => []);
         when(mockMemRelationRepository.waste(
-                condition: anyNamed('condition')))
-            .thenAnswer((_) async => []);
-        when(mockTargetRepository.waste(condition: anyNamed('condition')))
+          sourceMemId: anyNamed('sourceMemId'),
+        )).thenAnswer((_) async => []);
+        when(mockTargetRepository.waste(memId: anyNamed('memId')))
             .thenAnswer((_) async => []);
 
         // Act
@@ -200,30 +178,19 @@ void main() {
         );
         final memRelations = <MemRelationEntityV1>[];
 
-        final savedMem = SavedMemEntityV1({
-          'id': testMemId,
-          'name': 'Test Mem',
-          'doneAt': null,
-          'notifyOn': null,
-          'notifyAt': null,
-          'endOn': null,
-          'endAt': null,
-          'createdAt': DateTime.now(),
-          'updatedAt': null,
-          'archivedAt': null,
-        });
+        final savedMemEntity = savedMem(
+            id: testMemId, name: 'Test Mem', createdAt: DateTime.now());
 
         when(mockMemRepository.receive(any))
-            .thenAnswer((_) async => savedMem.toEntityV2());
+            .thenAnswer((_) async => savedMemEntity.toEntityV2());
         when(mockMemNotificationRepository.waste(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
-          condition: anyNamed('condition'),
         )).thenAnswer((_) async => []);
         when(mockMemRelationRepository.waste(
-                condition: anyNamed('condition')))
-            .thenAnswer((_) async => []);
-        when(mockTargetRepository.waste(condition: anyNamed('condition')))
+          sourceMemId: anyNamed('sourceMemId'),
+        )).thenAnswer((_) async => []);
+        when(mockTargetRepository.waste(memId: anyNamed('memId')))
             .thenAnswer((_) async => []);
 
         // Act
