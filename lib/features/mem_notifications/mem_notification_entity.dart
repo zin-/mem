@@ -57,7 +57,7 @@ class SavedMemNotificationEntityV1 extends MemNotificationEntityV1
   @override
   SavedMemNotificationEntityV1 updatedWith(
           MemNotification Function(MemNotification v) update) =>
-      SavedMemNotificationEntityV1.fromRow(_savedRowFrom(this, update(value)));
+      SavedMemNotificationEntityV1(_savedRowFrom(this, update(value)));
 
   factory SavedMemNotificationEntityV1.fromEntityV2(
           MemNotificationEntity entity) =>

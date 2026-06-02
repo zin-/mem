@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/databases/table_definitions/acts.dart';
-import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/features/acts/list/item/editing_act_dialog.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/acts/act_entity.dart';
@@ -39,16 +37,16 @@ void main() {
     group('show', () {
       testWidgets('dialog.', (tester) async {
         final targetActEntity = SavedActEntityV1({
-          defPkId.name: 1,
-          defFkActsMemId.name: 1,
-          defColActsStart.name: DateTime.now(),
-          defColActsStartIsAllDay.name: false,
-          defColActsEnd.name: null,
-          defColActsEndIsAllDay.name: null,
-          defColActsPausedAt.name: null,
-          defColCreatedAt.name: DateTime.now(),
-          defColUpdatedAt.name: DateTime.now(),
-          defColArchivedAt.name: null,
+          'id': 1,
+          'mems_id': 1,
+          'start': DateTime.now(),
+          'start_is_all_day': false,
+          'end': null,
+          'end_is_all_day': null,
+          'paused_at': null,
+          'createdAt': DateTime.now(),
+          'updatedAt': DateTime.now(),
+          'archivedAt': null,
         });
 
         await tester.pumpWidget(
@@ -120,16 +118,16 @@ void main() {
     group('action', () {
       testWidgets('change period.', (tester) async {
         final targetActEntity = SavedActEntityV1({
-          defPkId.name: 1,
-          defFkActsMemId.name: 1,
-          defColActsStart.name: DateTime.now(),
-          defColActsStartIsAllDay.name: false,
-          defColActsEnd.name: DateTime.now(),
-          defColActsEndIsAllDay.name: false,
-          defColActsPausedAt.name: null,
-          defColCreatedAt.name: DateTime.now(),
-          defColUpdatedAt.name: DateTime.now(),
-          defColArchivedAt.name: null,
+          'id': 1,
+          'mems_id': 1,
+          'start': DateTime.now(),
+          'start_is_all_day': false,
+          'end': DateTime.now(),
+          'end_is_all_day': false,
+          'paused_at': null,
+          'createdAt': DateTime.now(),
+          'updatedAt': DateTime.now(),
+          'archivedAt': null,
         });
 
         final fakeActEntities = _FakeActEntities([targetActEntity]);
@@ -168,16 +166,16 @@ void main() {
 
       testWidgets('save.', (tester) async {
         final targetActEntity = SavedActEntityV1({
-          defPkId.name: 1,
-          defFkActsMemId.name: 1,
-          defColActsStart.name: DateTime.now(),
-          defColActsStartIsAllDay.name: false,
-          defColActsEnd.name: null,
-          defColActsEndIsAllDay.name: null,
-          defColActsPausedAt.name: null,
-          defColCreatedAt.name: DateTime.now(),
-          defColUpdatedAt.name: DateTime.now(),
-          defColArchivedAt.name: null,
+          'id': 1,
+          'mems_id': 1,
+          'start': DateTime.now(),
+          'start_is_all_day': false,
+          'end': null,
+          'end_is_all_day': null,
+          'paused_at': null,
+          'createdAt': DateTime.now(),
+          'updatedAt': DateTime.now(),
+          'archivedAt': null,
         });
         final fakeActEntities = _FakeActEntities([targetActEntity]);
 
@@ -215,16 +213,16 @@ void main() {
 
       testWidgets('remove.', (tester) async {
         final targetActEntity = SavedActEntityV1({
-          defPkId.name: 1,
-          defFkActsMemId.name: 1,
-          defColActsStart.name: DateTime.now(),
-          defColActsStartIsAllDay.name: false,
-          defColActsEnd.name: null,
-          defColActsEndIsAllDay.name: null,
-          defColActsPausedAt.name: null,
-          defColCreatedAt.name: DateTime.now(),
-          defColUpdatedAt.name: DateTime.now(),
-          defColArchivedAt.name: null,
+          'id': 1,
+          'mems_id': 1,
+          'start': DateTime.now(),
+          'start_is_all_day': false,
+          'end': null,
+          'end_is_all_day': null,
+          'paused_at': null,
+          'createdAt': DateTime.now(),
+          'updatedAt': DateTime.now(),
+          'archivedAt': null,
         });
         final fakeActEntities = _FakeActEntities([targetActEntity]);
 

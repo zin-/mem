@@ -2,8 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/databases/table_definitions/acts.dart';
-import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/features/acts/acts_summary.dart';
 import 'package:mem/features/acts/line_chart/line_chart_page.dart';
 import 'package:mem/features/acts/act.dart';
@@ -63,17 +61,17 @@ void main() {
               actListProvider(memId).overrideWith(
                 (ref) => acts
                     .mapIndexed((index, act) => SavedActEntityV1({
-                          defPkId.name: index + 1,
-                          defFkActsMemId.name: act.memId,
-                          defColActsStart.name: act.period?.start,
-                          defColActsStartIsAllDay.name:
+                          'id': index + 1,
+                          'mems_id': act.memId,
+                          'start': act.period?.start,
+                          'start_is_all_day':
                               act.period?.start?.isAllDay,
-                          defColActsEnd.name: act.period?.end,
-                          defColActsEndIsAllDay.name: act.period?.end?.isAllDay,
-                          defColActsPausedAt.name: act.pausedAt,
-                          defColCreatedAt.name: DateTime.now(),
-                          defColUpdatedAt.name: DateTime.now(),
-                          defColArchivedAt.name: null,
+                          'end': act.period?.end,
+                          'end_is_all_day': act.period?.end?.isAllDay,
+                          'paused_at': act.pausedAt,
+                          'createdAt': DateTime.now(),
+                          'updatedAt': DateTime.now(),
+                          'archivedAt': null,
                         }))
                     .toList(),
               ),

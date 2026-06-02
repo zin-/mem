@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/databases/table_definitions/base.dart';
-import 'package:mem/databases/table_definitions/mem_notifications.dart';
-import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/states.dart';
@@ -66,46 +63,46 @@ class _FakePreference extends Preference<TimeOfDay> {
 
 SavedMemEntityV1 _savedMem(int id, String name) => SavedMemEntityV1(
       {
-        defPkId.name: id,
-        defColMemsName.name: name,
-        defColMemsDoneAt.name: null,
+        'id': id,
+        'name': name,
+        'doneAt': null,
         'notifyOn': null,
         'notifyAt': null,
         'endOn': null,
         'endAt': null,
-        defColCreatedAt.name: DateTime(2024, 1, id),
-        defColUpdatedAt.name: DateTime(2024, 1, id),
-        defColArchivedAt.name: null,
+        'createdAt': DateTime(2024, 1, id),
+        'updatedAt': DateTime(2024, 1, id),
+        'archivedAt': null,
       },
     );
 
 SavedMemNotificationEntityV1 _savedRepeatAtHour(int id, int memId, int hour) {
   final now = DateTime(2024, 6, 1, 12, 0);
   return SavedMemNotificationEntityV1({
-    defPkId.name: id,
-    defFkMemNotificationsMemId.name: memId,
-    defColMemNotificationsType.name: 'repeat',
-    defColMemNotificationsTime.name: hour * 60 * 60,
-    defColMemNotificationsMessage.name: 'Repeat',
-    defColCreatedAt.name: now,
-    defColUpdatedAt.name: now,
-    defColArchivedAt.name: null,
+    'id': id,
+    'mems_id': memId,
+    'type': 'repeat',
+    'time_of_day_seconds': hour * 60 * 60,
+    'message': 'Repeat',
+    'createdAt': now,
+    'updatedAt': now,
+    'archivedAt': null,
   });
 }
 
 SavedMemEntityV1 _savedMemWithActiveAct(int id, String name) =>
     SavedMemEntityV1(
       {
-        defPkId.name: id,
-        defColMemsName.name: name,
-        defColMemsDoneAt.name: null,
+        'id': id,
+        'name': name,
+        'doneAt': null,
         'notifyOn': null,
         'notifyAt': null,
         'endOn': null,
         'endAt': null,
-        defColCreatedAt.name: DateTime(2024, 1, id),
-        defColUpdatedAt.name: DateTime(2024, 1, id),
-        defColArchivedAt.name: null,
+        'createdAt': DateTime(2024, 1, id),
+        'updatedAt': DateTime(2024, 1, id),
+        'archivedAt': null,
       },
       latestAct: ActiveAct(id, DateAndTime(2024, 1, 1)),
     );

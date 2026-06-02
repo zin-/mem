@@ -16,8 +16,6 @@ import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/modules/live_elapsed_time_text.dart';
-import 'package:mem/databases/table_definitions/base.dart';
-import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/l10n/l10n.dart';
 
@@ -260,14 +258,14 @@ void main() {
         (tester) async {
       final now = DateTime.now();
       final notification = SavedMemNotificationEntityV1({
-        defPkId.name: 1,
-        defFkMemNotificationsMemId.name: memId,
-        defColMemNotificationsType.name: 'repeat',
-        defColMemNotificationsTime.name: 9 * 60 * 60,
-        defColMemNotificationsMessage.name: 'Repeat',
-        defColCreatedAt.name: now,
-        defColUpdatedAt.name: now,
-        defColArchivedAt.name: null,
+        'id': 1,
+        'mems_id': memId,
+        'type': 'repeat',
+        'time_of_day_seconds': 9 * 60 * 60,
+        'message': 'Repeat',
+        'createdAt': now,
+        'updatedAt': now,
+        'archivedAt': null,
       });
 
       await tester.pumpWidget(
@@ -435,14 +433,14 @@ void main() {
           DateAndTimePeriod(start: DateAndTime.now()));
       final now = DateTime.now();
       final notification = SavedMemNotificationEntityV1({
-        defPkId.name: 1,
-        defFkMemNotificationsMemId.name: memId,
-        defColMemNotificationsType.name: 'repeat',
-        defColMemNotificationsTime.name: 9 * 60 * 60,
-        defColMemNotificationsMessage.name: 'Repeat',
-        defColCreatedAt.name: now,
-        defColUpdatedAt.name: now,
-        defColArchivedAt.name: null,
+        'id': 1,
+        'mems_id': memId,
+        'type': 'repeat',
+        'time_of_day_seconds': 9 * 60 * 60,
+        'message': 'Repeat',
+        'createdAt': now,
+        'updatedAt': now,
+        'archivedAt': null,
       });
 
       await tester.pumpWidget(
@@ -488,14 +486,14 @@ void main() {
         (tester) async {
       final now = DateTime.now();
       final notification = SavedMemNotificationEntityV1({
-        defPkId.name: 1,
-        defFkMemNotificationsMemId.name: memId,
-        defColMemNotificationsType.name: 'repeat',
-        defColMemNotificationsTime.name: 9 * 60 * 60,
-        defColMemNotificationsMessage.name: 'Repeat',
-        defColCreatedAt.name: now,
-        defColUpdatedAt.name: now,
-        defColArchivedAt.name: null,
+        'id': 1,
+        'mems_id': memId,
+        'type': 'repeat',
+        'time_of_day_seconds': 9 * 60 * 60,
+        'message': 'Repeat',
+        'createdAt': now,
+        'updatedAt': now,
+        'archivedAt': null,
       });
 
       await tester.pumpWidget(
@@ -540,14 +538,14 @@ void main() {
       final doneMem = Mem(memId, 'Done Mem', DateTime.now(), null);
       final now = DateTime.now();
       final notification = SavedMemNotificationEntityV1({
-        defPkId.name: 1,
-        defFkMemNotificationsMemId.name: memId,
-        defColMemNotificationsType.name: 'repeat',
-        defColMemNotificationsTime.name: 9 * 60 * 60,
-        defColMemNotificationsMessage.name: 'Repeat',
-        defColCreatedAt.name: now,
-        defColUpdatedAt.name: now,
-        defColArchivedAt.name: null,
+        'id': 1,
+        'mems_id': memId,
+        'type': 'repeat',
+        'time_of_day_seconds': 9 * 60 * 60,
+        'message': 'Repeat',
+        'createdAt': now,
+        'updatedAt': now,
+        'archivedAt': null,
       });
 
       await tester.pumpWidget(
@@ -637,14 +635,14 @@ void main() {
               DateTime.now().subtract(const Duration(minutes: 5))));
       final now = DateTime.now();
       final notification = SavedMemNotificationEntityV1({
-        defPkId.name: 1,
-        defFkMemNotificationsMemId.name: memId,
-        defColMemNotificationsType.name: 'repeat',
-        defColMemNotificationsTime.name: 9 * 60 * 60,
-        defColMemNotificationsMessage.name: 'Repeat',
-        defColCreatedAt.name: now,
-        defColUpdatedAt.name: now,
-        defColArchivedAt.name: null,
+        'id': 1,
+        'mems_id': memId,
+        'type': 'repeat',
+        'time_of_day_seconds': 9 * 60 * 60,
+        'message': 'Repeat',
+        'createdAt': now,
+        'updatedAt': now,
+        'archivedAt': null,
       });
 
       await tester.pumpWidget(
@@ -698,14 +696,14 @@ void main() {
           PausedAct(memId, DateTime.now().subtract(const Duration(minutes: 5)));
       final now = DateTime.now();
       final notification = SavedMemNotificationEntityV1({
-        defPkId.name: 1,
-        defFkMemNotificationsMemId.name: memId,
-        defColMemNotificationsType.name: 'repeat',
-        defColMemNotificationsTime.name: 9 * 60 * 60,
-        defColMemNotificationsMessage.name: 'Repeat',
-        defColCreatedAt.name: now,
-        defColUpdatedAt.name: now,
-        defColArchivedAt.name: null,
+        'id': 1,
+        'mems_id': memId,
+        'type': 'repeat',
+        'time_of_day_seconds': 9 * 60 * 60,
+        'message': 'Repeat',
+        'createdAt': now,
+        'updatedAt': now,
+        'archivedAt': null,
       });
 
       await tester.pumpWidget(
@@ -761,14 +759,14 @@ void main() {
               DateTime.now().subtract(const Duration(minutes: 5))));
       final now = DateTime.now();
       final notification = SavedMemNotificationEntityV1({
-        defPkId.name: 1,
-        defFkMemNotificationsMemId.name: memId,
-        defColMemNotificationsType.name: 'repeat',
-        defColMemNotificationsTime.name: 9 * 60 * 60,
-        defColMemNotificationsMessage.name: 'Repeat',
-        defColCreatedAt.name: now,
-        defColUpdatedAt.name: now,
-        defColArchivedAt.name: null,
+        'id': 1,
+        'mems_id': memId,
+        'type': 'repeat',
+        'time_of_day_seconds': 9 * 60 * 60,
+        'message': 'Repeat',
+        'createdAt': now,
+        'updatedAt': now,
+        'archivedAt': null,
       });
 
       await tester.pumpWidget(
@@ -825,14 +823,14 @@ void main() {
           PausedAct(memId, DateTime.now().subtract(const Duration(minutes: 5)));
       final now = DateTime.now();
       final notification = SavedMemNotificationEntityV1({
-        defPkId.name: 1,
-        defFkMemNotificationsMemId.name: memId,
-        defColMemNotificationsType.name: 'repeat',
-        defColMemNotificationsTime.name: 9 * 60 * 60,
-        defColMemNotificationsMessage.name: 'Repeat',
-        defColCreatedAt.name: now,
-        defColUpdatedAt.name: now,
-        defColArchivedAt.name: null,
+        'id': 1,
+        'mems_id': memId,
+        'type': 'repeat',
+        'time_of_day_seconds': 9 * 60 * 60,
+        'message': 'Repeat',
+        'createdAt': now,
+        'updatedAt': now,
+        'archivedAt': null,
       });
 
       await tester.pumpWidget(
@@ -970,14 +968,14 @@ void main() {
           (tester) async {
         final now = DateTime.now();
         final notification = SavedMemNotificationEntityV1({
-          defPkId.name: 1,
-          defFkMemNotificationsMemId.name: memId,
-          defColMemNotificationsType.name: 'repeat',
-          defColMemNotificationsTime.name: 9 * 60 * 60,
-          defColMemNotificationsMessage.name: 'Repeat',
-          defColCreatedAt.name: now,
-          defColUpdatedAt.name: now,
-          defColArchivedAt.name: null,
+          'id': 1,
+          'mems_id': memId,
+          'type': 'repeat',
+          'time_of_day_seconds': 9 * 60 * 60,
+          'message': 'Repeat',
+          'createdAt': now,
+          'updatedAt': now,
+          'archivedAt': null,
         });
         final fakeActEntities = _FakeActEntities();
 
@@ -1028,14 +1026,14 @@ void main() {
         final pausedAct =
             PausedAct(memId, now.subtract(const Duration(minutes: 5)));
         final notification = SavedMemNotificationEntityV1({
-          defPkId.name: 1,
-          defFkMemNotificationsMemId.name: memId,
-          defColMemNotificationsType.name: 'repeat',
-          defColMemNotificationsTime.name: 9 * 60 * 60,
-          defColMemNotificationsMessage.name: 'Repeat',
-          defColCreatedAt.name: now,
-          defColUpdatedAt.name: now,
-          defColArchivedAt.name: null,
+          'id': 1,
+          'mems_id': memId,
+          'type': 'repeat',
+          'time_of_day_seconds': 9 * 60 * 60,
+          'message': 'Repeat',
+          'createdAt': now,
+          'updatedAt': now,
+          'archivedAt': null,
         });
         final fakeActEntities = _FakeActEntities();
 
@@ -1089,14 +1087,14 @@ void main() {
                 DateTime.now().subtract(const Duration(minutes: 5))));
         final now = DateTime.now();
         final notification = SavedMemNotificationEntityV1({
-          defPkId.name: 1,
-          defFkMemNotificationsMemId.name: memId,
-          defColMemNotificationsType.name: 'repeat',
-          defColMemNotificationsTime.name: 9 * 60 * 60,
-          defColMemNotificationsMessage.name: 'Repeat',
-          defColCreatedAt.name: now,
-          defColUpdatedAt.name: now,
-          defColArchivedAt.name: null,
+          'id': 1,
+          'mems_id': memId,
+          'type': 'repeat',
+          'time_of_day_seconds': 9 * 60 * 60,
+          'message': 'Repeat',
+          'createdAt': now,
+          'updatedAt': now,
+          'archivedAt': null,
         });
         final fakeActEntities = _FakeActEntities();
 
@@ -1146,14 +1144,14 @@ void main() {
           (tester) async {
         final now = DateTime.now();
         final notification = SavedMemNotificationEntityV1({
-          defPkId.name: 1,
-          defFkMemNotificationsMemId.name: memId,
-          defColMemNotificationsType.name: 'repeat',
-          defColMemNotificationsTime.name: 9 * 60 * 60,
-          defColMemNotificationsMessage.name: 'Repeat',
-          defColCreatedAt.name: now,
-          defColUpdatedAt.name: now,
-          defColArchivedAt.name: null,
+          'id': 1,
+          'mems_id': memId,
+          'type': 'repeat',
+          'time_of_day_seconds': 9 * 60 * 60,
+          'message': 'Repeat',
+          'createdAt': now,
+          'updatedAt': now,
+          'archivedAt': null,
         });
         final fakeActEntities = _FakeActEntities();
 
@@ -1211,14 +1209,14 @@ void main() {
                 DateTime.now().subtract(const Duration(minutes: 5))));
         final now = DateTime.now();
         final notification = SavedMemNotificationEntityV1({
-          defPkId.name: 1,
-          defFkMemNotificationsMemId.name: memId,
-          defColMemNotificationsType.name: 'repeat',
-          defColMemNotificationsTime.name: 9 * 60 * 60,
-          defColMemNotificationsMessage.name: 'Repeat',
-          defColCreatedAt.name: now,
-          defColUpdatedAt.name: now,
-          defColArchivedAt.name: null,
+          'id': 1,
+          'mems_id': memId,
+          'type': 'repeat',
+          'time_of_day_seconds': 9 * 60 * 60,
+          'message': 'Repeat',
+          'createdAt': now,
+          'updatedAt': now,
+          'archivedAt': null,
         });
         final fakeActEntities = _FakeActEntities();
 
@@ -1271,14 +1269,14 @@ void main() {
                 DateTime.now().subtract(const Duration(minutes: 5))));
         final now = DateTime.now();
         final notification = SavedMemNotificationEntityV1({
-          defPkId.name: 1,
-          defFkMemNotificationsMemId.name: memId,
-          defColMemNotificationsType.name: 'repeat',
-          defColMemNotificationsTime.name: 9 * 60 * 60,
-          defColMemNotificationsMessage.name: 'Repeat',
-          defColCreatedAt.name: now,
-          defColUpdatedAt.name: now,
-          defColArchivedAt.name: null,
+          'id': 1,
+          'mems_id': memId,
+          'type': 'repeat',
+          'time_of_day_seconds': 9 * 60 * 60,
+          'message': 'Repeat',
+          'createdAt': now,
+          'updatedAt': now,
+          'archivedAt': null,
         });
         final fakeActEntities = _FakeActEntities();
 
@@ -1329,14 +1327,14 @@ void main() {
             memId, DateTime.now().subtract(const Duration(minutes: 5)));
         final now = DateTime.now();
         final notification = SavedMemNotificationEntityV1({
-          defPkId.name: 1,
-          defFkMemNotificationsMemId.name: memId,
-          defColMemNotificationsType.name: 'repeat',
-          defColMemNotificationsTime.name: 9 * 60 * 60,
-          defColMemNotificationsMessage.name: 'Repeat',
-          defColCreatedAt.name: now,
-          defColUpdatedAt.name: now,
-          defColArchivedAt.name: null,
+          'id': 1,
+          'mems_id': memId,
+          'type': 'repeat',
+          'time_of_day_seconds': 9 * 60 * 60,
+          'message': 'Repeat',
+          'createdAt': now,
+          'updatedAt': now,
+          'archivedAt': null,
         });
         final fakeActEntities = _FakeActEntities();
 

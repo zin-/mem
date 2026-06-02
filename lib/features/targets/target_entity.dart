@@ -67,7 +67,7 @@ class SavedTargetEntityV1 extends TargetEntityV1
 
   @override
   SavedTargetEntityV1 updatedWith(Target Function(Target v) update) =>
-      SavedTargetEntityV1.fromRow(_savedRowFrom(this, update(value)));
+      SavedTargetEntityV1(_savedRowFrom(this, update(value)));
 
   factory SavedTargetEntityV1.fromEntityV2(TargetEntity entity) =>
       SavedTargetEntityV1.fromRow(_TargetEntityRow(entity));

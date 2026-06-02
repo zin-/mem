@@ -3,15 +3,11 @@ import 'dart:math' as math;
 import 'package:drift/drift.dart' as drift;
 import 'package:mem/databases/child_fk_cascade.dart';
 import 'package:mem/databases/database.dart' as drift_schema;
-import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
-import 'package:mem/framework/repository/condition/conditions.dart';
 import 'package:mem/framework/repository/drift_repository.dart';
-import 'package:mem/framework/repository/group_by.dart';
-import 'package:mem/framework/repository/order_by.dart';
 import 'package:mem/framework/singleton.dart';
 import 'package:mem/features/logger/log_service.dart';
 
@@ -22,54 +18,31 @@ class MemRepository extends DriftRepository {
     int? id,
     bool? archived,
     bool? done,
-    GroupBy? groupBy,
-    List<OrderBy>? orderBy,
     int? offset,
     int? limit,
     bool loadLatestAct = false,
   }) =>
       v(
         () async {
-          late final List<MemEntity> entities;
-          if (_usesAccessorShip(
-            groupBy: groupBy,
-            orderBy: orderBy,
-          )) {
-            final rows = await driftAccessor.selectEntities(
-              defTableMems,
-              condition: _shipCondition(
-                id: id,
-                archived: archived,
-                done: done,
-              ),
-              groupBy: groupBy,
-              orderBy: orderBy,
-              offset: offset,
-              limit: limit,
-            );
-            entities = List<MemEntity>.from(rows);
-          } else {
-            var query = driftDb.select(driftDb.mems);
-            if (id != null) {
-              query = query..where((t) => t.id.equals(id));
-            }
-            if (archived == true) {
-              query = query..where((t) => t.archivedAt.isNotNull());
-            } else if (archived == false) {
-              query = query..where((t) => t.archivedAt.isNull());
-            }
-            if (done == true) {
-              query = query..where((t) => t.doneAt.isNotNull());
-            } else if (done == false) {
-              query = query..where((t) => t.doneAt.isNull());
-            }
-            if (limit != null || offset != null) {
-              query = query
-                ..limit(limit ?? 999999999, offset: offset ?? 0);
-            }
-            final rows = await query.get();
-            entities = rows.map(MemEntity.fromTuple).toList();
+          var query = driftDb.select(driftDb.mems);
+          if (id != null) {
+            query = query..where((t) => t.id.equals(id));
           }
+          if (archived == true) {
+            query = query..where((t) => t.archivedAt.isNotNull());
+          } else if (archived == false) {
+            query = query..where((t) => t.archivedAt.isNull());
+          }
+          if (done == true) {
+            query = query..where((t) => t.doneAt.isNotNull());
+          } else if (done == false) {
+            query = query..where((t) => t.doneAt.isNull());
+          }
+          if (limit != null || offset != null) {
+            query = query..limit(limit ?? 999999999, offset: offset ?? 0);
+          }
+          final rows = await query.get();
+          final entities = rows.map(MemEntity.fromTuple).toList();
 
           if (!loadLatestAct || entities.isEmpty) {
             return entities;
@@ -80,8 +53,6 @@ class MemRepository extends DriftRepository {
           'id': id,
           'archived': archived,
           'done': done,
-          'groupBy': groupBy,
-          'orderBy': orderBy,
           'offset': offset,
           'limit': limit,
           'loadLatestAct': loadLatestAct,
@@ -140,31 +111,6 @@ class MemRepository extends DriftRepository {
           return deleted.map(MemEntity.fromTuple).toList();
         },
         {'id': id},
-      );
-
-  static bool _usesAccessorShip({
-    GroupBy? groupBy,
-    List<OrderBy>? orderBy,
-  }) =>
-      groupBy != null || (orderBy != null && orderBy.isNotEmpty);
-
-  static Condition? _shipCondition({
-    int? id,
-    bool? archived,
-    bool? done,
-  }) =>
-      And(
-        [
-          if (id != null) Equals(defPkId, id),
-          if (archived != null)
-            archived
-                ? IsNotNull(defColArchivedAt.name)
-                : IsNull(defColArchivedAt.name),
-          if (done != null)
-            done
-                ? IsNotNull(defColMemsDoneAt.name)
-                : IsNull(defColMemsDoneAt.name),
-        ],
       );
 
   Future<List<MemEntity>> _attachLatestActs(List<MemEntity> mems) async {

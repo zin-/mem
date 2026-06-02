@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/databases/table_definitions/acts.dart';
-import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/list/item/editing_act_dialog.dart';
@@ -18,18 +16,18 @@ void main() {
       String? actKindRaw,
     }) {
       return SavedActEntityV1({
-        defPkId.name: 1,
-        defFkActsMemId.name: 2,
-        defColActsStart.name: DateTime(2024, 6, 1, 10),
-        defColActsStartIsAllDay.name: false,
-        defColActsEnd.name: DateTime(2024, 6, 1, 11),
-        defColActsEndIsAllDay.name: false,
-        defColActsPausedAt.name: null,
-        if (actKindRaw != null) defColActsActKind.name: actKindRaw,
-        if (actKind != null) defColActsActKind.name: actKind.name,
-        defColCreatedAt.name: DateTime(2024, 6, 1),
-        defColUpdatedAt.name: DateTime(2024, 6, 1),
-        defColArchivedAt.name: null,
+        'id': 1,
+        'mems_id': 2,
+        'start': DateTime(2024, 6, 1, 10),
+        'start_is_all_day': false,
+        'end': DateTime(2024, 6, 1, 11),
+        'end_is_all_day': false,
+        'paused_at': null,
+        if (actKindRaw != null) 'act_kind': actKindRaw,
+        if (actKind != null) 'act_kind': actKind.name,
+        'createdAt': DateTime(2024, 6, 1),
+        'updatedAt': DateTime(2024, 6, 1),
+        'archivedAt': null,
       });
     }
 

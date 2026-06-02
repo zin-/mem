@@ -69,7 +69,7 @@ class SavedMemItemEntityV1 extends MemItemEntityV1
 
   @override
   SavedMemItemEntityV1 updatedWith(MemItem Function(MemItem v) update) =>
-      SavedMemItemEntityV1.fromRow(_savedRowFrom(this, update(value)));
+      SavedMemItemEntityV1(_savedRowFrom(this, update(value)));
 
   factory SavedMemItemEntityV1.fromEntityV2(MemItemEntity entity) =>
       SavedMemItemEntityV1.fromRow(_MemItemEntityRow(entity));

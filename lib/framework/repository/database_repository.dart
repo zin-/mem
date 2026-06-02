@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:mem/databases/database.dart';
 import 'package:mem/framework/database/accessor.dart';
-import 'package:mem/framework/database/definition/database_definition.dart';
 import 'package:mem/framework/repository/drift_repository.dart';
 import 'package:mem/framework/repository/repository.dart';
 import 'package:mem/framework/singleton.dart';
@@ -14,9 +13,9 @@ class DatabaseRepository extends Repository {
   factory DatabaseRepository() =>
       Singleton.of(() => DatabaseRepository._());
 
-  Future<DriftDatabaseAccessor> receive(DatabaseDefinition entity) => v(
+  Future<DriftDatabaseAccessor> receive() => v(
         () async => DriftDatabaseAccessor(),
-        {"entity": entity},
+        {},
       );
 
   Future<File?> shipFileByNameIs(String name) => v(

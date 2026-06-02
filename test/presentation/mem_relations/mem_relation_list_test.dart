@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/features/mem_relations/mem_relation.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation_state.dart';
@@ -65,7 +64,7 @@ void main() {
       const sourceMemId = 1;
       final now = DateTime.now();
       final mem1 = SavedMemEntityV1({
-        defPkId.name: 1,
+        'id': 1,
         'name': 'Mem 1',
         'doneAt': null,
         'notifyOn': null,
@@ -77,7 +76,7 @@ void main() {
         'archivedAt': null,
       });
       final mem2 = SavedMemEntityV1({
-        defPkId.name: 2,
+        'id': 2,
         'name': 'Mem 2',
         'doneAt': null,
         'notifyOn': null,
@@ -227,7 +226,7 @@ void main() {
       const sourceMemId = 1;
       final now = DateTime.now();
       final mem1 = SavedMemEntityV1({
-        defPkId.name: 1,
+        'id': 1,
         'name': 'Mem 1',
         'doneAt': null,
         'notifyOn': null,
@@ -272,7 +271,7 @@ void main() {
       const sourceMemId = 1;
       final now = DateTime.now();
       final mem1 = SavedMemEntityV1({
-        defPkId.name: 1,
+        'id': 1,
         'name': 'Mem 1',
         'doneAt': null,
         'notifyOn': null,
@@ -323,7 +322,7 @@ void main() {
       final mems = List.generate(
           4,
           (index) => SavedMemEntityV1({
-                defPkId.name: index + 1,
+                'id': index + 1,
                 'name': 'Mem ${index + 1}',
                 'doneAt': null,
                 'notifyOn': null,
@@ -377,7 +376,7 @@ void main() {
       final mems = List.generate(
           2,
           (index) => SavedMemEntityV1({
-                defPkId.name: index + 1,
+                'id': index + 1,
                 'name': 'Mem ${index + 1}',
                 'doneAt': null,
                 'notifyOn': null,
@@ -428,7 +427,7 @@ void main() {
       const sourceMemId = 1;
       final now = DateTime.now();
       final mem1 = SavedMemEntityV1({
-        defPkId.name: 1,
+        'id': 1,
         'name': 'Mem 1',
         'doneAt': null,
         'notifyOn': null,

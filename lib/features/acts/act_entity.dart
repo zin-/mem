@@ -91,7 +91,7 @@ class SavedActEntityV1 extends ActEntityV1
 
   @override
   SavedActEntityV1 updatedWith(Act Function(Act v) update) =>
-      SavedActEntityV1.fromRow(_savedRowFrom(this, update(value)));
+      SavedActEntityV1(_savedRowFrom(this, update(value)));
 
   factory SavedActEntityV1.fromEntityV2(ActEntity entity) {
     final saved = SavedActEntityV1.fromRow(_ActEntityRow(entity));
