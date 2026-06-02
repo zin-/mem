@@ -15,7 +15,7 @@ allprojects {
 rootProject.buildDir = "../build"
 subprojects {
   project.buildDir = "${rootProject.buildDir}/${project.name}"
-  // home_widget が glance-appwidget:1.+ を引く。1.3.0-alpha 以降は AGP 9.1+ 必須の compose.remote を含む
+  // home_widget が glance-appwidget:1.+ を引く。1.+ は 1.3.0-alpha01 に解決され AGP 9.2.0+ が必要になるため 1.2.0-rc01 に固定
   project.configurations.configureEach {
     resolutionStrategy.force "androidx.glance:glance-appwidget:1.2.0-rc01"
   }
