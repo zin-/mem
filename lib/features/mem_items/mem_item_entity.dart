@@ -1,8 +1,6 @@
 import 'package:drift/drift.dart';
-import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/databases/database.dart' as drift_database;
 import 'package:mem/features/mem_items/mem_item.dart';
-import 'package:mem/databases/table_definitions/mem_items.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
@@ -14,9 +12,9 @@ class MemItemEntityV1 with EntityV1<MemItem> {
 
   @override
   Map<String, Object?> get toMap => {
-        defFkMemItemsMemId.name: value.memId,
-        defColMemItemsType.name: value.type.name,
-        defColMemItemsValue.name: value.value,
+        'memId': value.memId,
+        'type': value.type.name,
+        'value': value.value,
       };
 
   @override
@@ -45,33 +43,36 @@ class MemItemEntityV1 with EntityV1<MemItem> {
 class SavedMemItemEntityV1 extends MemItemEntityV1
     with DatabaseTupleEntityV1<int, MemItem> {
   SavedMemItemEntityV1(Map<String, dynamic> map)
-      : super(
-          MemItem(
-            map[defFkMemItemsMemId.name],
-            MemItemType.values.firstWhere(
-                (element) => element.name == map[defColMemItemsType.name]),
-            map[defColMemItemsValue.name],
-          ),
-        ) {
-    withMap(map);
+      : super(_memItemFromMap(map)) {
+    withBaseColumns(map);
   }
+
+  SavedMemItemEntityV1.fromRow(dynamic row) : super(_memItemFromRow(row)) {
+    withBaseColumns(row);
+  }
+
+  static MemItem _memItemFromMap(Map<String, dynamic> map) => MemItem(
+        map['memId'] ?? map['mems_id'],
+        MemItemType.values.firstWhere(
+          (element) => element.name == map['type'],
+        ),
+        map['value'],
+      );
+
+  static MemItem _memItemFromRow(dynamic row) => MemItem(
+        row.memId,
+        MemItemType.values.firstWhere(
+          (element) => element.name == row.type,
+        ),
+        row.value,
+      );
 
   @override
   SavedMemItemEntityV1 updatedWith(MemItem Function(MemItem v) update) =>
-      SavedMemItemEntityV1(toMap..addAll(super.updatedWith(update).toMap));
+      SavedMemItemEntityV1.fromRow(_savedRowFrom(this, update(value)));
 
   factory SavedMemItemEntityV1.fromEntityV2(MemItemEntity entity) =>
-      SavedMemItemEntityV1(
-        {
-          defFkMemItemsMemId.name: entity.memId,
-          defColMemItemsType.name: entity.type.name,
-          defColMemItemsValue.name: entity.value,
-          defPkId.name: entity.id,
-          defColCreatedAt.name: entity.createdAt,
-          defColUpdatedAt.name: entity.updatedAt,
-          defColArchivedAt.name: entity.archivedAt,
-        },
-      );
+      SavedMemItemEntityV1.fromRow(_MemItemEntityRow(entity));
 
   MemItemEntity toEntityV2() => MemItemEntity(
         value.memId,
@@ -83,6 +84,20 @@ class SavedMemItemEntityV1 extends MemItemEntityV1
         archivedAt,
       );
 }
+
+Map<String, Object?> _savedRowFrom(
+  SavedMemItemEntityV1 saved,
+  MemItem value,
+) =>
+    {
+      'id': saved.id,
+      'memId': value.memId,
+      'type': value.type.name,
+      'value': value.value,
+      'createdAt': saved.createdAt,
+      'updatedAt': saved.updatedAt,
+      'archivedAt': saved.archivedAt,
+    };
 
 class MemItemEntity implements Entity<int> {
   final MemId memId;
@@ -108,16 +123,16 @@ class MemItemEntity implements Entity<int> {
     this.archivedAt,
   );
 
-  factory MemItemEntity.fromTuple(dynamic tuple) => MemItemEntity(
-        tuple.memId,
+  factory MemItemEntity.fromTuple(dynamic row) => MemItemEntity(
+        row.memId,
         MemItemType.values.firstWhere(
-          (element) => element.name == tuple.type,
+          (element) => element.name == row.type,
         ),
-        tuple.value,
-        tuple.id,
-        tuple.createdAt,
-        tuple.updatedAt,
-        tuple.archivedAt,
+        row.value,
+        row.id,
+        row.createdAt,
+        row.updatedAt,
+        row.archivedAt,
       );
 }
 
@@ -141,3 +156,17 @@ drift_database.MemItemsCompanion convertIntoMemItemsUpdateable(
       updatedAt: Value(DateTime.now()),
       archivedAt: Value(entity.archivedAt),
     );
+
+class _MemItemEntityRow {
+  final MemItemEntity entity;
+
+  _MemItemEntityRow(this.entity);
+
+  int get id => entity.id;
+  int get memId => entity.memId!;
+  String get type => entity.type.name;
+  String get value => entity.value;
+  DateTime get createdAt => entity.createdAt;
+  DateTime? get updatedAt => entity.updatedAt;
+  DateTime? get archivedAt => entity.archivedAt;
+}

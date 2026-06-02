@@ -1,4 +1,3 @@
-import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
@@ -7,7 +6,6 @@ import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/features/mems/mem.dart';
-import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
 
@@ -18,14 +16,13 @@ class MemEntityV1 with EntityV1<Mem> {
 
   @override
   Map<String, Object?> get toMap => {
-        defColMemsName.name: value.name,
-        defColMemsDoneAt.name: value.doneAt,
-        defColMemsStartOn.name: value.period?.start,
-        defColMemsStartAt.name:
+        'name': value.name,
+        'doneAt': value.doneAt,
+        'notifyOn': value.period?.start,
+        'notifyAt':
             value.period?.start?.isAllDay == true ? null : value.period?.start,
-        defColMemsEndOn.name: value.period?.end,
-        defColMemsEndAt.name:
-            value.period?.end?.isAllDay == true ? null : value.period?.end,
+        'endOn': value.period?.end,
+        'endAt': value.period?.end?.isAllDay == true ? null : value.period?.end,
       };
 
   @override
@@ -40,33 +37,69 @@ class SavedMemEntityV1 extends MemEntityV1
   SavedMemEntityV1(
     Map<String, dynamic> map, {
     this.latestAct,
-  }) : super(
-          Mem(
-            map[defPkId.name],
-            map[defColMemsName.name],
-            map[defColMemsDoneAt.name],
-            map[defColMemsStartOn.name] == null &&
-                    map[defColMemsEndOn.name] == null
-                ? null
-                : DateAndTimePeriod(
-                    start: map[defColMemsStartOn.name] == null
-                        ? null
-                        : DateAndTime.from(map[defColMemsStartOn.name],
-                            timeOfDay: map[defColMemsStartAt.name]),
-                    end: map[defColMemsEndOn.name] == null
-                        ? null
-                        : DateAndTime.from(map[defColMemsEndOn.name],
-                            timeOfDay: map[defColMemsEndAt.name]),
-                  ),
-          ),
-        ) {
-    withMap(map);
+  }) : super(_memFromMap(map)) {
+    withBaseColumns(map);
   }
+
+  SavedMemEntityV1.fromRow(
+    dynamic row, {
+    this.latestAct,
+  }) : super(_memFromRow(row)) {
+    withBaseColumns(row);
+  }
+
+  static Mem _memFromMap(Map<String, dynamic> map) => Mem(
+        map['id'],
+        map['name'],
+        map['doneAt'],
+        map['notifyOn'] == null && map['endOn'] == null
+            ? null
+            : DateAndTimePeriod(
+                start: map['notifyOn'] == null
+                    ? null
+                    : DateAndTime.from(
+                        map['notifyOn'],
+                        timeOfDay: map['notifyAt'],
+                      ),
+                end: map['endOn'] == null
+                    ? null
+                    : DateAndTime.from(
+                        map['endOn'],
+                        timeOfDay: map['endAt'],
+                      ),
+              ),
+      );
+
+  static Mem _memFromRow(dynamic row) => Mem(
+        row.id,
+        row.name,
+        row.doneAt,
+        row.notifyOn == null && row.endOn == null
+            ? null
+            : DateAndTimePeriod(
+                start: row.notifyOn == null
+                    ? null
+                    : DateAndTime.from(
+                        row.notifyOn,
+                        timeOfDay: row.notifyAt == null
+                            ? null
+                            : DateAndTime.from(row.notifyAt),
+                      ),
+                end: row.endOn == null
+                    ? null
+                    : DateAndTime.from(
+                        row.endOn,
+                        timeOfDay: row.endAt == null
+                            ? null
+                            : DateAndTime.from(row.endAt),
+                      ),
+              ),
+      );
 
   @override
   SavedMemEntityV1 updatedWith(Mem Function(Mem mem) update) =>
-      SavedMemEntityV1(
-        toMap..addAll(MemEntityV1(update(value)).toMap),
+      SavedMemEntityV1.fromRow(
+        _savedRowFrom(this, update(value)),
         latestAct: latestAct,
       );
 
@@ -84,25 +117,30 @@ class SavedMemEntityV1 extends MemEntityV1
         memRelations: null,
       );
 
-  factory SavedMemEntityV1.fromEntityV2(MemEntity entity) => SavedMemEntityV1(
-        {
-          defPkId.name: entity.id,
-          defColMemsName.name: entity.name,
-          defColMemsDoneAt.name: entity.doneAt,
-          defColMemsStartOn.name: entity.period?.start,
-          defColMemsStartAt.name: entity.period?.start?.isAllDay == true
-              ? null
-              : entity.period?.start,
-          defColMemsEndOn.name: entity.period?.end,
-          defColMemsEndAt.name:
-              entity.period?.end?.isAllDay == true ? null : entity.period?.end,
-          defColCreatedAt.name: entity.createdAt,
-          defColUpdatedAt.name: entity.updatedAt,
-          defColArchivedAt.name: entity.archivedAt,
-        },
+  factory SavedMemEntityV1.fromEntityV2(MemEntity entity) =>
+      SavedMemEntityV1.fromRow(
+        _MemEntityRow(entity),
         latestAct: entity.latestAct,
       );
 }
+
+Map<String, Object?> _savedRowFrom(
+  SavedMemEntityV1 saved,
+  Mem value,
+) =>
+    {
+      'id': saved.id,
+      'name': value.name,
+      'doneAt': value.doneAt,
+      'notifyOn': value.period?.start,
+      'notifyAt':
+          value.period?.start?.isAllDay == true ? null : value.period?.start,
+      'endOn': value.period?.end,
+      'endAt': value.period?.end?.isAllDay == true ? null : value.period?.end,
+      'createdAt': saved.createdAt,
+      'updatedAt': saved.updatedAt,
+      'archivedAt': saved.archivedAt,
+    };
 
 class MemEntity implements Entity<int> {
   final String name;
@@ -172,7 +210,7 @@ class MemEntity implements Entity<int> {
   }
 
   factory MemEntity.fromTuple(
-    dynamic tuple, {
+    dynamic row, {
     Map<String, dynamic> children = const {},
   }) {
     final memItemsRaw = children['mem_items'];
@@ -194,36 +232,55 @@ class MemEntity implements Entity<int> {
     }
 
     return MemEntity(
-      tuple.id,
-      tuple.name,
-      tuple.doneAt,
-      tuple.notifyOn == null && tuple.endOn == null
+      row.id,
+      row.name,
+      row.doneAt,
+      row.notifyOn == null && row.endOn == null
           ? null
           : DateAndTimePeriod(
-              start: tuple.notifyOn == null
+              start: row.notifyOn == null
                   ? null
                   : DateAndTime.from(
-                      tuple.notifyOn,
-                      timeOfDay: tuple.notifyAt == null
+                      row.notifyOn,
+                      timeOfDay: row.notifyAt == null
                           ? null
-                          : DateAndTime.from(tuple.notifyAt),
+                          : DateAndTime.from(row.notifyAt),
                     ),
-              end: tuple.endOn == null
+              end: row.endOn == null
                   ? null
                   : DateAndTime.from(
-                      tuple.endOn,
-                      timeOfDay: tuple.endAt == null
+                      row.endOn,
+                      timeOfDay: row.endAt == null
                           ? null
-                          : DateAndTime.from(tuple.endAt),
+                          : DateAndTime.from(row.endAt),
                     ),
             ),
       memItems,
-      tuple.createdAt,
-      tuple.updatedAt,
-      tuple.archivedAt,
+      row.createdAt,
+      row.updatedAt,
+      row.archivedAt,
       repeatedNotifications: repeatedNotifications,
       memRelations: memRelations,
       latestAct: latestAct,
     );
   }
+}
+
+class _MemEntityRow {
+  final MemEntity entity;
+
+  _MemEntityRow(this.entity);
+
+  int get id => entity.id;
+  String get name => entity.name;
+  DateTime? get doneAt => entity.doneAt;
+  DateTime? get notifyOn => entity.period?.start;
+  DateTime? get notifyAt =>
+      entity.period?.start?.isAllDay == true ? null : entity.period?.start;
+  DateTime? get endOn => entity.period?.end;
+  DateTime? get endAt =>
+      entity.period?.end?.isAllDay == true ? null : entity.period?.end;
+  DateTime get createdAt => entity.createdAt;
+  DateTime? get updatedAt => entity.updatedAt;
+  DateTime? get archivedAt => entity.archivedAt;
 }

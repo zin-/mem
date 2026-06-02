@@ -1,6 +1,4 @@
 import 'package:drift/drift.dart';
-import 'package:mem/databases/table_definitions/base.dart';
-import 'package:mem/databases/table_definitions/mem_notifications.dart';
 import 'package:mem/databases/database.dart' as drift_database;
 
 import 'package:mem/features/mems/mem.dart';
@@ -16,10 +14,10 @@ class MemNotificationEntityV1 with EntityV1<MemNotification> {
 
   @override
   Map<String, Object?> get toMap => {
-        defFkMemNotificationsMemId.name: value.memId,
-        defColMemNotificationsType.name: value.type.name,
-        defColMemNotificationsTime.name: value.time,
-        defColMemNotificationsMessage.name: value.message,
+        'memId': value.memId,
+        'type': value.type.name,
+        'timeOfDaySeconds': value.time,
+        'message': value.message,
       };
 
   @override
@@ -31,37 +29,39 @@ class MemNotificationEntityV1 with EntityV1<MemNotification> {
 class SavedMemNotificationEntityV1 extends MemNotificationEntityV1
     with DatabaseTupleEntityV1<int, MemNotification> {
   SavedMemNotificationEntityV1(Map<String, dynamic> map)
-      : super(
-          MemNotification.by(
-            map[defFkMemNotificationsMemId.name],
-            MemNotificationType.fromName(map[defColMemNotificationsType.name]),
-            map[defColMemNotificationsTime.name],
-            map[defColMemNotificationsMessage.name],
-          ),
-        ) {
-    withMap(map);
+      : super(_notificationFromMap(map)) {
+    withBaseColumns(map);
   }
+
+  SavedMemNotificationEntityV1.fromRow(dynamic row)
+      : super(_notificationFromRow(row)) {
+    withBaseColumns(row);
+  }
+
+  static MemNotification _notificationFromMap(Map<String, dynamic> map) =>
+      MemNotification.by(
+        map['memId'] ?? map['mems_id'],
+        MemNotificationType.fromName(map['type']),
+        map['timeOfDaySeconds'] ?? map['time_of_day_seconds'],
+        map['message'],
+      );
+
+  static MemNotification _notificationFromRow(dynamic row) =>
+      MemNotification.by(
+        row.memId,
+        MemNotificationType.fromName(row.type),
+        row.timeOfDaySeconds,
+        row.message,
+      );
 
   @override
   SavedMemNotificationEntityV1 updatedWith(
           MemNotification Function(MemNotification v) update) =>
-      SavedMemNotificationEntityV1(
-          toMap..addAll(super.updatedWith(update).toMap));
+      SavedMemNotificationEntityV1.fromRow(_savedRowFrom(this, update(value)));
 
   factory SavedMemNotificationEntityV1.fromEntityV2(
           MemNotificationEntity entity) =>
-      SavedMemNotificationEntityV1(
-        {
-          defFkMemNotificationsMemId.name: entity.memId,
-          defColMemNotificationsType.name: entity.type.name,
-          defColMemNotificationsTime.name: entity.time,
-          defColMemNotificationsMessage.name: entity.message,
-          defPkId.name: entity.id,
-          defColCreatedAt.name: entity.createdAt,
-          defColUpdatedAt.name: entity.updatedAt,
-          defColArchivedAt.name: entity.archivedAt,
-        },
-      );
+      SavedMemNotificationEntityV1.fromRow(_MemNotificationEntityRow(entity));
 
   MemNotificationEntity toEntityV2() => MemNotificationEntity(
         value.memId,
@@ -74,6 +74,21 @@ class SavedMemNotificationEntityV1 extends MemNotificationEntityV1
         archivedAt,
       );
 }
+
+Map<String, Object?> _savedRowFrom(
+  SavedMemNotificationEntityV1 saved,
+  MemNotification value,
+) =>
+    {
+      'id': saved.id,
+      'memId': value.memId,
+      'type': value.type.name,
+      'timeOfDaySeconds': value.time,
+      'message': value.message,
+      'createdAt': saved.createdAt,
+      'updatedAt': saved.updatedAt,
+      'archivedAt': saved.archivedAt,
+    };
 
 class MemNotificationEntity implements Entity<int> {
   final MemId memId;
@@ -101,15 +116,16 @@ class MemNotificationEntity implements Entity<int> {
     this.archivedAt,
   );
 
-  factory MemNotificationEntity.fromTuple(dynamic tuple) => MemNotificationEntity(
-        tuple.memId,
-        MemNotificationType.fromName(tuple.type),
-        tuple.timeOfDaySeconds,
-        tuple.message,
-        tuple.id,
-        tuple.createdAt,
-        tuple.updatedAt,
-        tuple.archivedAt,
+  factory MemNotificationEntity.fromTuple(dynamic row) =>
+      MemNotificationEntity(
+        row.memId,
+        MemNotificationType.fromName(row.type),
+        row.timeOfDaySeconds,
+        row.message,
+        row.id,
+        row.createdAt,
+        row.updatedAt,
+        row.archivedAt,
       );
 
   MemNotification toDomain() => MemNotification(
@@ -144,3 +160,18 @@ drift_database.MemRepeatedNotificationsCompanion
       updatedAt: Value(DateTime.now()),
       archivedAt: Value(entity.archivedAt),
     );
+
+class _MemNotificationEntityRow {
+  final MemNotificationEntity entity;
+
+  _MemNotificationEntityRow(this.entity);
+
+  int get id => entity.id;
+  int get memId => entity.memId!;
+  String get type => entity.type.name;
+  int? get timeOfDaySeconds => entity.time;
+  String get message => entity.message;
+  DateTime get createdAt => entity.createdAt;
+  DateTime? get updatedAt => entity.updatedAt;
+  DateTime? get archivedAt => entity.archivedAt;
+}

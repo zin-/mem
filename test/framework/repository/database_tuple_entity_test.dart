@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/databases/table_definitions/base.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 
 import 'entity_test.dart';
@@ -10,7 +9,7 @@ class TestSampleDatabaseTupleEntity extends TestSampleEntity
     with DatabaseTupleEntityV1<int, TestSample> {
   TestSampleDatabaseTupleEntity(Map<String, dynamic> map)
       : super(TestSample(map['a'])) {
-    withMap(map);
+    withBaseColumns(map);
   }
 }
 
@@ -22,10 +21,10 @@ void main() => group(
           () {
             final map = {
               TestSampleEntity.fieldNames[0]: false,
-              defPkId.name: 1,
-              defColCreatedAt.name: DateTime.now(),
-              defColUpdatedAt.name: DateTime.now(),
-              defColArchivedAt.name: null
+              'id': 1,
+              'createdAt': DateTime.now(),
+              'updatedAt': DateTime.now(),
+              'archivedAt': null
             };
 
             final testObject = TestSampleDatabaseTupleEntity(map);
@@ -39,10 +38,10 @@ void main() => group(
           () {
             final map = {
               TestSampleEntity.fieldNames[0]: false,
-              defPkId.name: 1,
-              defColCreatedAt.name: DateTime.now(),
-              defColUpdatedAt.name: DateTime.now(),
-              defColArchivedAt.name: null
+              'id': 1,
+              'createdAt': DateTime.now(),
+              'updatedAt': DateTime.now(),
+              'archivedAt': null
             };
 
             final testObject = TestSampleDatabaseTupleEntity(map);
