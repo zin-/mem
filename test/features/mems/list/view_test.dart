@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import '../../../entity_factories.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/states.dart';
+import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/list/item/view.dart';
@@ -61,49 +63,23 @@ class _FakePreference extends Preference<TimeOfDay> {
       const TimeOfDay(hour: 9, minute: 0);
 }
 
-SavedMemEntityV1 _savedMem(int id, String name) => SavedMemEntityV1(
-      {
-        'id': id,
-        'name': name,
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': DateTime(2024, 1, id),
-        'updatedAt': DateTime(2024, 1, id),
-        'archivedAt': null,
-      },
+SavedMemEntityV1 _savedMem(int id, String name) => savedMem(
+      id: id,
+      name: name,
+      createdAt: DateTime(2024, 1, id),
+      updatedAt: DateTime(2024, 1, id),
     );
 
 SavedMemNotificationEntityV1 _savedRepeatAtHour(int id, int memId, int hour) {
   final now = DateTime(2024, 6, 1, 12, 0);
-  return SavedMemNotificationEntityV1({
-    'id': id,
-    'mems_id': memId,
-    'type': 'repeat',
-    'time_of_day_seconds': hour * 60 * 60,
-    'message': 'Repeat',
-    'createdAt': now,
-    'updatedAt': now,
-    'archivedAt': null,
-  });
+  return savedMemNotification(id: id, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: hour * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
 }
 
-SavedMemEntityV1 _savedMemWithActiveAct(int id, String name) =>
-    SavedMemEntityV1(
-      {
-        'id': id,
-        'name': name,
-        'doneAt': null,
-        'notifyOn': null,
-        'notifyAt': null,
-        'endOn': null,
-        'endAt': null,
-        'createdAt': DateTime(2024, 1, id),
-        'updatedAt': DateTime(2024, 1, id),
-        'archivedAt': null,
-      },
+SavedMemEntityV1 _savedMemWithActiveAct(int id, String name) => savedMem(
+      id: id,
+      name: name,
+      createdAt: DateTime(2024, 1, id),
+      updatedAt: DateTime(2024, 1, id),
       latestAct: ActiveAct(id, DateAndTime(2024, 1, 1)),
     );
 

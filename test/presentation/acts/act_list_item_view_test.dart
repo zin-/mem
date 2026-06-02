@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../entity_factories.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
@@ -15,20 +16,19 @@ void main() {
       ActKind? actKind,
       String? actKindRaw,
     }) {
-      return SavedActEntityV1({
-        'id': 1,
-        'mems_id': 2,
-        'start': DateTime(2024, 6, 1, 10),
-        'start_is_all_day': false,
-        'end': DateTime(2024, 6, 1, 11),
-        'end_is_all_day': false,
-        'paused_at': null,
-        if (actKindRaw != null) 'act_kind': actKindRaw,
-        if (actKind != null) 'act_kind': actKind.name,
-        'createdAt': DateTime(2024, 6, 1),
-        'updatedAt': DateTime(2024, 6, 1),
-        'archivedAt': null,
-      });
+      final resolved = actKind ??
+          (actKindRaw == null ? null : ActKind.values.byName(actKindRaw));
+      return savedAct(
+        id: 1,
+        memId: 2,
+        start: DateTime(2024, 6, 1, 10),
+        startIsAllDay: false,
+        end: DateTime(2024, 6, 1, 11),
+        endIsAllDay: false,
+        createdAt: DateTime(2024, 6, 1),
+        updatedAt: DateTime(2024, 6, 1),
+        actKind: resolved,
+      );
     }
 
     Widget wrap(Widget child) => MaterialApp(

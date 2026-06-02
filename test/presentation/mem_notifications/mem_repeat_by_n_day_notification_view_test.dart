@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../entity_factories.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_notifications/mem_repeat_by_n_day_notification_view.dart';
 import 'package:mem/features/mems/detail/states.dart';
@@ -30,16 +32,7 @@ void main() {
         (tester) async {
       const memId = 1;
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntityV1({
-        'id': 1,
-        'mems_id': memId,
-        'type': 'repeatByNDay',
-        'time_of_day_seconds': 3,
-        'message': 'Repeat by 3 days',
-        'createdAt': now,
-        'updatedAt': now,
-        'archivedAt': null,
-      });
+      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeatByNDay, timeOfDaySeconds: 3, message: 'Repeat by 3 days', createdAt: now, updatedAt: now);
 
       final listNotifier =
           ListValueStateNotifier<MemNotificationEntityV1>([notification]);
@@ -73,16 +66,7 @@ void main() {
         (tester) async {
       const memId = 1;
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntityV1({
-        'id': 1,
-        'mems_id': memId,
-        'type': 'repeatByNDay',
-        'time_of_day_seconds': null,
-        'message': 'Repeat by N days',
-        'createdAt': now,
-        'updatedAt': now,
-        'archivedAt': null,
-      });
+      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeatByNDay, message: 'Repeat by N days', createdAt: now, updatedAt: now);
 
       final listNotifier =
           ListValueStateNotifier<MemNotificationEntityV1>([notification]);
@@ -115,16 +99,7 @@ void main() {
     testWidgets('calls onNDayChanged when value is entered', (tester) async {
       const memId = 1;
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntityV1({
-        'id': 1,
-        'mems_id': memId,
-        'type': 'repeatByNDay',
-        'time_of_day_seconds': 3,
-        'message': 'Repeat by 3 days',
-        'createdAt': now,
-        'updatedAt': now,
-        'archivedAt': null,
-      });
+      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeatByNDay, timeOfDaySeconds: 3, message: 'Repeat by 3 days', createdAt: now, updatedAt: now);
 
       final listNotifier =
           ListValueStateNotifier<MemNotificationEntityV1>([notification]);
@@ -161,16 +136,7 @@ void main() {
         (tester) async {
       const memId = 1;
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntityV1({
-        'id': 1,
-        'mems_id': memId,
-        'type': 'repeatByNDay',
-        'time_of_day_seconds': 3,
-        'message': 'Repeat by 3 days',
-        'createdAt': now,
-        'updatedAt': now,
-        'archivedAt': null,
-      });
+      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeatByNDay, timeOfDaySeconds: 3, message: 'Repeat by 3 days', createdAt: now, updatedAt: now);
 
       final listNotifier =
           ListValueStateNotifier<MemNotificationEntityV1>([notification]);
@@ -202,16 +168,7 @@ void main() {
         (tester) async {
       const memId = 1;
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntityV1({
-        'id': 1,
-        'mems_id': memId,
-        'type': 'repeatByNDay',
-        'time_of_day_seconds': 3,
-        'message': 'Repeat by 3 days',
-        'createdAt': now,
-        'updatedAt': now,
-        'archivedAt': null,
-      });
+      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeatByNDay, timeOfDaySeconds: 3, message: 'Repeat by 3 days', createdAt: now, updatedAt: now);
 
       final listNotifier =
           ListValueStateNotifier<MemNotificationEntityV1>([notification]);
@@ -241,16 +198,7 @@ void main() {
 
     testWidgets('handles memId null', (tester) async {
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntityV1({
-        'id': 1,
-        'mems_id': null,
-        'type': 'repeatByNDay',
-        'time_of_day_seconds': 3,
-        'message': 'Repeat by 3 days',
-        'createdAt': now,
-        'updatedAt': now,
-        'archivedAt': null,
-      });
+      final notification = savedMemNotification(id: 1, memId: null, type: MemNotificationType.repeatByNDay, timeOfDaySeconds: 3, message: 'Repeat by 3 days', createdAt: now, updatedAt: now);
 
       final listNotifier =
           ListValueStateNotifier<MemNotificationEntityV1>([notification]);

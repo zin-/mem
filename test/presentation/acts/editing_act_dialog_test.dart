@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../entity_factories.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/list/item/editing_act_dialog.dart';
@@ -36,18 +37,7 @@ void main() {
   group('EditingActDialog test', () {
     group('show', () {
       testWidgets('dialog.', (tester) async {
-        final targetActEntity = SavedActEntityV1({
-          'id': 1,
-          'mems_id': 1,
-          'start': DateTime.now(),
-          'start_is_all_day': false,
-          'end': null,
-          'end_is_all_day': null,
-          'paused_at': null,
-          'createdAt': DateTime.now(),
-          'updatedAt': DateTime.now(),
-          'archivedAt': null,
-        });
+        final targetActEntity = savedAct(id: 1, memId: 1, start: DateTime.now(), startIsAllDay: false, createdAt: DateTime.now(), updatedAt: DateTime.now());
 
         await tester.pumpWidget(
           ProviderScope(
@@ -117,18 +107,7 @@ void main() {
 
     group('action', () {
       testWidgets('change period.', (tester) async {
-        final targetActEntity = SavedActEntityV1({
-          'id': 1,
-          'mems_id': 1,
-          'start': DateTime.now(),
-          'start_is_all_day': false,
-          'end': DateTime.now(),
-          'end_is_all_day': false,
-          'paused_at': null,
-          'createdAt': DateTime.now(),
-          'updatedAt': DateTime.now(),
-          'archivedAt': null,
-        });
+        final targetActEntity = savedAct(id: 1, memId: 1, start: DateTime.now(), startIsAllDay: false, end: DateTime.now(), endIsAllDay: false, createdAt: DateTime.now(), updatedAt: DateTime.now());
 
         final fakeActEntities = _FakeActEntities([targetActEntity]);
 
@@ -165,18 +144,7 @@ void main() {
       });
 
       testWidgets('save.', (tester) async {
-        final targetActEntity = SavedActEntityV1({
-          'id': 1,
-          'mems_id': 1,
-          'start': DateTime.now(),
-          'start_is_all_day': false,
-          'end': null,
-          'end_is_all_day': null,
-          'paused_at': null,
-          'createdAt': DateTime.now(),
-          'updatedAt': DateTime.now(),
-          'archivedAt': null,
-        });
+        final targetActEntity = savedAct(id: 1, memId: 1, start: DateTime.now(), startIsAllDay: false, createdAt: DateTime.now(), updatedAt: DateTime.now());
         final fakeActEntities = _FakeActEntities([targetActEntity]);
 
         await tester.pumpWidget(
@@ -212,18 +180,7 @@ void main() {
       });
 
       testWidgets('remove.', (tester) async {
-        final targetActEntity = SavedActEntityV1({
-          'id': 1,
-          'mems_id': 1,
-          'start': DateTime.now(),
-          'start_is_all_day': false,
-          'end': null,
-          'end_is_all_day': null,
-          'paused_at': null,
-          'createdAt': DateTime.now(),
-          'updatedAt': DateTime.now(),
-          'archivedAt': null,
-        });
+        final targetActEntity = savedAct(id: 1, memId: 1, start: DateTime.now(), startIsAllDay: false, createdAt: DateTime.now(), updatedAt: DateTime.now());
         final fakeActEntities = _FakeActEntities([targetActEntity]);
 
         await tester.pumpWidget(

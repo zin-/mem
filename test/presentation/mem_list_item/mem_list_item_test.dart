@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../entity_factories.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/states.dart';
+import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/list/item/view.dart';
@@ -127,18 +129,7 @@ void main() {
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntityV1({
-                    'id': baseMem.id,
-                    'name': baseMem.name,
-                    'doneAt': baseMem.doneAt,
-                    'notifyOn': null,
-                    'notifyAt': null,
-                    'endOn': null,
-                    'endAt': null,
-                    'createdAt': DateTime.now(),
-                    'updatedAt': DateTime.now(),
-                    'archivedAt': null,
-                  })
+                  savedMemFromDomain(baseMem)
                 ])),
           ],
           child: MaterialApp(
@@ -179,18 +170,7 @@ void main() {
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntityV1({
-                    'id': baseMem.id,
-                    'name': baseMem.name,
-                    'doneAt': baseMem.doneAt,
-                    'notifyOn': null,
-                    'notifyAt': null,
-                    'endOn': null,
-                    'endAt': null,
-                    'createdAt': DateTime.now(),
-                    'updatedAt': DateTime.now(),
-                    'archivedAt': null,
-                  })
+                  savedMemFromDomain(baseMem)
                 ])),
           ],
           child: MaterialApp(
@@ -224,18 +204,7 @@ void main() {
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntityV1({
-                    'id': baseMem.id,
-                    'name': baseMem.name,
-                    'doneAt': baseMem.doneAt,
-                    'notifyOn': null,
-                    'notifyAt': null,
-                    'endOn': null,
-                    'endAt': null,
-                    'createdAt': DateTime.now(),
-                    'updatedAt': DateTime.now(),
-                    'archivedAt': null,
-                  })
+                  savedMemFromDomain(baseMem)
                 ])),
           ],
           child: MaterialApp(
@@ -257,16 +226,7 @@ void main() {
     testWidgets('displays notification icon when notifications exist',
         (tester) async {
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntityV1({
-        'id': 1,
-        'mems_id': memId,
-        'type': 'repeat',
-        'time_of_day_seconds': 9 * 60 * 60,
-        'message': 'Repeat',
-        'createdAt': now,
-        'updatedAt': now,
-        'archivedAt': null,
-      });
+      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
 
       await tester.pumpWidget(
         ProviderScope(
@@ -279,18 +239,7 @@ void main() {
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntityV1({
-                    'id': baseMem.id,
-                    'name': baseMem.name,
-                    'doneAt': baseMem.doneAt,
-                    'notifyOn': null,
-                    'notifyAt': null,
-                    'endOn': null,
-                    'endAt': null,
-                    'createdAt': DateTime.now(),
-                    'updatedAt': DateTime.now(),
-                    'archivedAt': null,
-                  })
+                  savedMemFromDomain(baseMem)
                 ])),
           ],
           child: MaterialApp(
@@ -319,18 +268,7 @@ void main() {
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntityV1({
-                    'id': baseMem.id,
-                    'name': baseMem.name,
-                    'doneAt': baseMem.doneAt,
-                    'notifyOn': null,
-                    'notifyAt': null,
-                    'endOn': null,
-                    'endAt': null,
-                    'createdAt': DateTime.now(),
-                    'updatedAt': DateTime.now(),
-                    'archivedAt': null,
-                  })
+                  savedMemFromDomain(baseMem)
                 ])),
           ],
           child: MaterialApp(
@@ -359,18 +297,7 @@ void main() {
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntityV1({
-                    'id': baseMem.id,
-                    'name': baseMem.name,
-                    'doneAt': baseMem.doneAt,
-                    'notifyOn': null,
-                    'notifyAt': null,
-                    'endOn': null,
-                    'endAt': null,
-                    'createdAt': DateTime.now(),
-                    'updatedAt': DateTime.now(),
-                    'archivedAt': null,
-                  })
+                  savedMemFromDomain(baseMem)
                 ])),
           ],
           child: MaterialApp(
@@ -400,18 +327,7 @@ void main() {
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntityV1({
-                    'id': baseMem.id,
-                    'name': baseMem.name,
-                    'doneAt': baseMem.doneAt,
-                    'notifyOn': null,
-                    'notifyAt': null,
-                    'endOn': null,
-                    'endAt': null,
-                    'createdAt': DateTime.now(),
-                    'updatedAt': DateTime.now(),
-                    'archivedAt': null,
-                  })
+                  savedMemFromDomain(baseMem)
                 ])),
           ],
           child: MaterialApp(
@@ -432,16 +348,7 @@ void main() {
       final memWithPeriod = Mem(memId, 'Mem with Period', null,
           DateAndTimePeriod(start: DateAndTime.now()));
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntityV1({
-        'id': 1,
-        'mems_id': memId,
-        'type': 'repeat',
-        'time_of_day_seconds': 9 * 60 * 60,
-        'message': 'Repeat',
-        'createdAt': now,
-        'updatedAt': now,
-        'archivedAt': null,
-      });
+      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
 
       await tester.pumpWidget(
         ProviderScope(
@@ -454,18 +361,7 @@ void main() {
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntityV1({
-                    'id': baseMem.id,
-                    'name': baseMem.name,
-                    'doneAt': baseMem.doneAt,
-                    'notifyOn': null,
-                    'notifyAt': null,
-                    'endOn': null,
-                    'endAt': null,
-                    'createdAt': DateTime.now(),
-                    'updatedAt': DateTime.now(),
-                    'archivedAt': null,
-                  })
+                  savedMemFromDomain(baseMem)
                 ])),
           ],
           child: MaterialApp(
@@ -485,16 +381,7 @@ void main() {
     testWidgets('displays mem with notifications but no active act',
         (tester) async {
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntityV1({
-        'id': 1,
-        'mems_id': memId,
-        'type': 'repeat',
-        'time_of_day_seconds': 9 * 60 * 60,
-        'message': 'Repeat',
-        'createdAt': now,
-        'updatedAt': now,
-        'archivedAt': null,
-      });
+      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
 
       await tester.pumpWidget(
         ProviderScope(
@@ -507,18 +394,7 @@ void main() {
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntityV1({
-                    'id': baseMem.id,
-                    'name': baseMem.name,
-                    'doneAt': baseMem.doneAt,
-                    'notifyOn': null,
-                    'notifyAt': null,
-                    'endOn': null,
-                    'endAt': null,
-                    'createdAt': DateTime.now(),
-                    'updatedAt': DateTime.now(),
-                    'archivedAt': null,
-                  })
+                  savedMemFromDomain(baseMem)
                 ])),
           ],
           child: MaterialApp(
@@ -537,16 +413,7 @@ void main() {
     testWidgets('displays done mem without trailing button', (tester) async {
       final doneMem = Mem(memId, 'Done Mem', DateTime.now(), null);
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntityV1({
-        'id': 1,
-        'mems_id': memId,
-        'type': 'repeat',
-        'time_of_day_seconds': 9 * 60 * 60,
-        'message': 'Repeat',
-        'createdAt': now,
-        'updatedAt': now,
-        'archivedAt': null,
-      });
+      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
 
       await tester.pumpWidget(
         ProviderScope(
@@ -559,18 +426,7 @@ void main() {
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntityV1({
-                    'id': baseMem.id,
-                    'name': baseMem.name,
-                    'doneAt': baseMem.doneAt,
-                    'notifyOn': null,
-                    'notifyAt': null,
-                    'endOn': null,
-                    'endAt': null,
-                    'createdAt': DateTime.now(),
-                    'updatedAt': DateTime.now(),
-                    'archivedAt': null,
-                  })
+                  savedMemFromDomain(baseMem)
                 ])),
           ],
           child: MaterialApp(
@@ -598,18 +454,7 @@ void main() {
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntityV1({
-                    'id': baseMem.id,
-                    'name': baseMem.name,
-                    'doneAt': baseMem.doneAt,
-                    'notifyOn': null,
-                    'notifyAt': null,
-                    'endOn': null,
-                    'endAt': null,
-                    'createdAt': DateTime.now(),
-                    'updatedAt': DateTime.now(),
-                    'archivedAt': null,
-                  })
+                  savedMemFromDomain(baseMem)
                 ])),
           ],
           child: MaterialApp(
@@ -634,16 +479,7 @@ void main() {
           DateAndTime.from(
               DateTime.now().subtract(const Duration(minutes: 5))));
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntityV1({
-        'id': 1,
-        'mems_id': memId,
-        'type': 'repeat',
-        'time_of_day_seconds': 9 * 60 * 60,
-        'message': 'Repeat',
-        'createdAt': now,
-        'updatedAt': now,
-        'archivedAt': null,
-      });
+      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
 
       await tester.pumpWidget(
         ProviderScope(
@@ -654,18 +490,7 @@ void main() {
                     [notification])),
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntityV1({
-                    'id': baseMem.id,
-                    'name': baseMem.name,
-                    'doneAt': baseMem.doneAt,
-                    'notifyOn': null,
-                    'notifyAt': null,
-                    'endOn': null,
-                    'endAt': null,
-                    'createdAt': DateTime.now(),
-                    'updatedAt': DateTime.now(),
-                    'archivedAt': null,
-                  })
+                  savedMemFromDomain(baseMem)
                 ])),
           ],
           child: MaterialApp(
@@ -695,16 +520,7 @@ void main() {
       final pausedAct =
           PausedAct(memId, DateTime.now().subtract(const Duration(minutes: 5)));
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntityV1({
-        'id': 1,
-        'mems_id': memId,
-        'type': 'repeat',
-        'time_of_day_seconds': 9 * 60 * 60,
-        'message': 'Repeat',
-        'createdAt': now,
-        'updatedAt': now,
-        'archivedAt': null,
-      });
+      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
 
       await tester.pumpWidget(
         ProviderScope(
@@ -715,18 +531,7 @@ void main() {
                     [notification])),
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntityV1({
-                    'id': baseMem.id,
-                    'name': baseMem.name,
-                    'doneAt': baseMem.doneAt,
-                    'notifyOn': null,
-                    'notifyAt': null,
-                    'endOn': null,
-                    'endAt': null,
-                    'createdAt': DateTime.now(),
-                    'updatedAt': DateTime.now(),
-                    'archivedAt': null,
-                  })
+                  savedMemFromDomain(baseMem)
                 ])),
           ],
           child: MaterialApp(
@@ -758,16 +563,7 @@ void main() {
           DateAndTime.from(
               DateTime.now().subtract(const Duration(minutes: 5))));
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntityV1({
-        'id': 1,
-        'mems_id': memId,
-        'type': 'repeat',
-        'time_of_day_seconds': 9 * 60 * 60,
-        'message': 'Repeat',
-        'createdAt': now,
-        'updatedAt': now,
-        'archivedAt': null,
-      });
+      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
 
       await tester.pumpWidget(
         ProviderScope(
@@ -779,18 +575,7 @@ void main() {
             memStateProvider(memId)
                 .overrideWith(() => _FakeMemState(memWithPeriod)),
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntityV1({
-                    'id': memWithPeriod.id,
-                    'name': memWithPeriod.name,
-                    'doneAt': memWithPeriod.doneAt,
-                    'notifyOn': null,
-                    'notifyAt': null,
-                    'endOn': memWithPeriod.period?.end?.toIso8601String(),
-                    'endAt': memWithPeriod.period?.end?.toIso8601String(),
-                    'createdAt': DateTime.now(),
-                    'updatedAt': DateTime.now(),
-                    'archivedAt': null,
-                  })
+                  savedMemFromDomain(memWithPeriod)
                 ])),
           ],
           child: MaterialApp(
@@ -822,16 +607,7 @@ void main() {
       final pausedAct =
           PausedAct(memId, DateTime.now().subtract(const Duration(minutes: 5)));
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntityV1({
-        'id': 1,
-        'mems_id': memId,
-        'type': 'repeat',
-        'time_of_day_seconds': 9 * 60 * 60,
-        'message': 'Repeat',
-        'createdAt': now,
-        'updatedAt': now,
-        'archivedAt': null,
-      });
+      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
 
       await tester.pumpWidget(
         ProviderScope(
@@ -843,18 +619,7 @@ void main() {
             memStateProvider(memId)
                 .overrideWith(() => _FakeMemState(memWithPeriod)),
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  SavedMemEntityV1({
-                    'id': memWithPeriod.id,
-                    'name': memWithPeriod.name,
-                    'doneAt': memWithPeriod.doneAt,
-                    'notifyOn': null,
-                    'notifyAt': null,
-                    'endOn': memWithPeriod.period?.end?.toIso8601String(),
-                    'endAt': memWithPeriod.period?.end?.toIso8601String(),
-                    'createdAt': DateTime.now(),
-                    'updatedAt': DateTime.now(),
-                    'archivedAt': null,
-                  })
+                  savedMemFromDomain(memWithPeriod)
                 ])),
           ],
           child: MaterialApp(
@@ -879,18 +644,7 @@ void main() {
     group('callbacks', () {
       testWidgets('calls doneMem when checkbox is checked', (tester) async {
         final fakeMemEntities = _FakeMemEntities([
-          SavedMemEntityV1({
-            'id': baseMem.id,
-            'name': baseMem.name,
-            'doneAt': null,
-            'notifyOn': null,
-            'notifyAt': null,
-            'endOn': null,
-            'endAt': null,
-            'createdAt': DateTime.now(),
-            'updatedAt': DateTime.now(),
-            'archivedAt': null,
-          })
+          savedMemFromDomain(baseMem)
         ]);
 
         await tester.pumpWidget(
@@ -923,18 +677,7 @@ void main() {
       testWidgets('calls undoneMem when checkbox is unchecked', (tester) async {
         final doneMem = Mem(memId, 'Done Mem', DateTime.now(), null);
         final fakeMemEntities = _FakeMemEntities([
-          SavedMemEntityV1({
-            'id': doneMem.id,
-            'name': doneMem.name,
-            'doneAt': doneMem.doneAt,
-            'notifyOn': null,
-            'notifyAt': null,
-            'endOn': null,
-            'endAt': null,
-            'createdAt': DateTime.now(),
-            'updatedAt': DateTime.now(),
-            'archivedAt': null,
-          })
+          savedMemFromDomain(doneMem)
         ]);
 
         await tester.pumpWidget(
@@ -967,16 +710,7 @@ void main() {
       testWidgets('calls startActby when start button is tapped',
           (tester) async {
         final now = DateTime.now();
-        final notification = SavedMemNotificationEntityV1({
-          'id': 1,
-          'mems_id': memId,
-          'type': 'repeat',
-          'time_of_day_seconds': 9 * 60 * 60,
-          'message': 'Repeat',
-          'createdAt': now,
-          'updatedAt': now,
-          'archivedAt': null,
-        });
+        final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
         final fakeActEntities = _FakeActEntities();
 
         await tester.pumpWidget(
@@ -989,18 +723,7 @@ void main() {
               memStateProvider(memId)
                   .overrideWith(() => _FakeMemState(baseMem)),
               memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                    SavedMemEntityV1({
-                      'id': baseMem.id,
-                      'name': baseMem.name,
-                      'doneAt': baseMem.doneAt,
-                      'notifyOn': null,
-                      'notifyAt': null,
-                      'endOn': null,
-                      'endAt': null,
-                      'createdAt': DateTime.now(),
-                      'updatedAt': DateTime.now(),
-                      'archivedAt': null,
-                    })
+                    savedMemFromDomain(baseMem)
                   ])),
               actEntitiesProvider.overrideWith(() => fakeActEntities),
             ],
@@ -1025,16 +748,7 @@ void main() {
         final now = DateTime.now();
         final pausedAct =
             PausedAct(memId, now.subtract(const Duration(minutes: 5)));
-        final notification = SavedMemNotificationEntityV1({
-          'id': 1,
-          'mems_id': memId,
-          'type': 'repeat',
-          'time_of_day_seconds': 9 * 60 * 60,
-          'message': 'Repeat',
-          'createdAt': now,
-          'updatedAt': now,
-          'archivedAt': null,
-        });
+        final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
         final fakeActEntities = _FakeActEntities();
 
         await tester.pumpWidget(
@@ -1047,18 +761,7 @@ void main() {
               memStateProvider(memId)
                   .overrideWith(() => _FakeMemState(baseMem)),
               memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                    SavedMemEntityV1({
-                      'id': baseMem.id,
-                      'name': baseMem.name,
-                      'doneAt': baseMem.doneAt,
-                      'notifyOn': null,
-                      'notifyAt': null,
-                      'endOn': null,
-                      'endAt': null,
-                      'createdAt': DateTime.now(),
-                      'updatedAt': DateTime.now(),
-                      'archivedAt': null,
-                    })
+                    savedMemFromDomain(baseMem)
                   ])),
               actEntitiesProvider.overrideWith(() => fakeActEntities),
             ],
@@ -1086,16 +789,7 @@ void main() {
             DateAndTime.from(
                 DateTime.now().subtract(const Duration(minutes: 5))));
         final now = DateTime.now();
-        final notification = SavedMemNotificationEntityV1({
-          'id': 1,
-          'mems_id': memId,
-          'type': 'repeat',
-          'time_of_day_seconds': 9 * 60 * 60,
-          'message': 'Repeat',
-          'createdAt': now,
-          'updatedAt': now,
-          'archivedAt': null,
-        });
+        final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
         final fakeActEntities = _FakeActEntities();
 
         await tester.pumpWidget(
@@ -1108,18 +802,7 @@ void main() {
               memStateProvider(memId)
                   .overrideWith(() => _FakeMemState(baseMem)),
               memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                    SavedMemEntityV1({
-                      'id': baseMem.id,
-                      'name': baseMem.name,
-                      'doneAt': baseMem.doneAt,
-                      'notifyOn': null,
-                      'notifyAt': null,
-                      'endOn': null,
-                      'endAt': null,
-                      'createdAt': DateTime.now(),
-                      'updatedAt': DateTime.now(),
-                      'archivedAt': null,
-                    })
+                    savedMemFromDomain(baseMem)
                   ])),
               actEntitiesProvider.overrideWith(() => fakeActEntities),
             ],
@@ -1143,16 +826,7 @@ void main() {
           'calls skipActBy when skip is chosen from completion dialog after long press on stop',
           (tester) async {
         final now = DateTime.now();
-        final notification = SavedMemNotificationEntityV1({
-          'id': 1,
-          'mems_id': memId,
-          'type': 'repeat',
-          'time_of_day_seconds': 9 * 60 * 60,
-          'message': 'Repeat',
-          'createdAt': now,
-          'updatedAt': now,
-          'archivedAt': null,
-        });
+        final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
         final fakeActEntities = _FakeActEntities();
 
         await tester.pumpWidget(
@@ -1165,18 +839,7 @@ void main() {
               memStateProvider(memId)
                   .overrideWith(() => _FakeMemState(baseMem)),
               memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                    SavedMemEntityV1({
-                      'id': baseMem.id,
-                      'name': baseMem.name,
-                      'doneAt': baseMem.doneAt,
-                      'notifyOn': null,
-                      'notifyAt': null,
-                      'endOn': null,
-                      'endAt': null,
-                      'createdAt': DateTime.now(),
-                      'updatedAt': DateTime.now(),
-                      'archivedAt': null,
-                    })
+                    savedMemFromDomain(baseMem)
                   ])),
               actEntitiesProvider.overrideWith(() => fakeActEntities),
             ],
@@ -1208,16 +871,7 @@ void main() {
             DateAndTime.from(
                 DateTime.now().subtract(const Duration(minutes: 5))));
         final now = DateTime.now();
-        final notification = SavedMemNotificationEntityV1({
-          'id': 1,
-          'mems_id': memId,
-          'type': 'repeat',
-          'time_of_day_seconds': 9 * 60 * 60,
-          'message': 'Repeat',
-          'createdAt': now,
-          'updatedAt': now,
-          'archivedAt': null,
-        });
+        final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
         final fakeActEntities = _FakeActEntities();
 
         await tester.pumpWidget(
@@ -1230,18 +884,7 @@ void main() {
               memStateProvider(memId)
                   .overrideWith(() => _FakeMemState(baseMem)),
               memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                    SavedMemEntityV1({
-                      'id': baseMem.id,
-                      'name': baseMem.name,
-                      'doneAt': baseMem.doneAt,
-                      'notifyOn': null,
-                      'notifyAt': null,
-                      'endOn': null,
-                      'endAt': null,
-                      'createdAt': DateTime.now(),
-                      'updatedAt': DateTime.now(),
-                      'archivedAt': null,
-                    })
+                    savedMemFromDomain(baseMem)
                   ])),
               actEntitiesProvider.overrideWith(() => fakeActEntities),
             ],
@@ -1268,16 +911,7 @@ void main() {
             DateAndTime.from(
                 DateTime.now().subtract(const Duration(minutes: 5))));
         final now = DateTime.now();
-        final notification = SavedMemNotificationEntityV1({
-          'id': 1,
-          'mems_id': memId,
-          'type': 'repeat',
-          'time_of_day_seconds': 9 * 60 * 60,
-          'message': 'Repeat',
-          'createdAt': now,
-          'updatedAt': now,
-          'archivedAt': null,
-        });
+        final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
         final fakeActEntities = _FakeActEntities();
 
         await tester.pumpWidget(
@@ -1290,18 +924,7 @@ void main() {
               memStateProvider(memId)
                   .overrideWith(() => _FakeMemState(baseMem)),
               memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                    SavedMemEntityV1({
-                      'id': baseMem.id,
-                      'name': baseMem.name,
-                      'doneAt': baseMem.doneAt,
-                      'notifyOn': null,
-                      'notifyAt': null,
-                      'endOn': null,
-                      'endAt': null,
-                      'createdAt': DateTime.now(),
-                      'updatedAt': DateTime.now(),
-                      'archivedAt': null,
-                    })
+                    savedMemFromDomain(baseMem)
                   ])),
               actEntitiesProvider.overrideWith(() => fakeActEntities),
             ],
@@ -1326,16 +949,7 @@ void main() {
         final pausedAct = PausedAct(
             memId, DateTime.now().subtract(const Duration(minutes: 5)));
         final now = DateTime.now();
-        final notification = SavedMemNotificationEntityV1({
-          'id': 1,
-          'mems_id': memId,
-          'type': 'repeat',
-          'time_of_day_seconds': 9 * 60 * 60,
-          'message': 'Repeat',
-          'createdAt': now,
-          'updatedAt': now,
-          'archivedAt': null,
-        });
+        final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
         final fakeActEntities = _FakeActEntities();
 
         await tester.pumpWidget(
@@ -1348,18 +962,7 @@ void main() {
               memStateProvider(memId)
                   .overrideWith(() => _FakeMemState(baseMem)),
               memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                    SavedMemEntityV1({
-                      'id': baseMem.id,
-                      'name': baseMem.name,
-                      'doneAt': baseMem.doneAt,
-                      'notifyOn': null,
-                      'notifyAt': null,
-                      'endOn': null,
-                      'endAt': null,
-                      'createdAt': DateTime.now(),
-                      'updatedAt': DateTime.now(),
-                      'archivedAt': null,
-                    })
+                    savedMemFromDomain(baseMem)
                   ])),
               actEntitiesProvider.overrideWith(() => fakeActEntities),
             ],
@@ -1389,18 +992,7 @@ void main() {
               memStateProvider(memId)
                   .overrideWith(() => _FakeMemState(baseMem)),
               memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                    SavedMemEntityV1({
-                      'id': baseMem.id,
-                      'name': baseMem.name,
-                      'doneAt': baseMem.doneAt,
-                      'notifyOn': null,
-                      'notifyAt': null,
-                      'endOn': null,
-                      'endAt': null,
-                      'createdAt': DateTime.now(),
-                      'updatedAt': DateTime.now(),
-                      'archivedAt': null,
-                    })
+                    savedMemFromDomain(baseMem)
                   ])),
             ],
             child: MaterialApp(

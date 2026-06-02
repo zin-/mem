@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import '../../entity_factories.dart';
 import 'package:mem/databases/database.dart' hide Act;
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
@@ -6,20 +7,18 @@ import 'package:mem/framework/date_and_time/date_and_time.dart';
 
 void main() {
   group('ActEntity act_kind', () {
-    test('SavedActEntityV1 reads skipped from map', () {
-      final entity = SavedActEntityV1({
-        'id': 1,
-        'mems_id': 2,
-        'start': DateTime(2024, 6, 1, 10),
-        'start_is_all_day': false,
-        'end': DateTime(2024, 6, 1, 11),
-        'end_is_all_day': false,
-        'paused_at': null,
-        'act_kind': 'skipped',
-        'createdAt': DateTime(2024, 6, 1),
-        'updatedAt': DateTime(2024, 6, 1),
-        'archivedAt': null,
-      });
+    test('SavedActEntityV1 reads skipped from entity factory', () {
+      final entity = savedAct(
+        id: 1,
+        memId: 2,
+        start: DateTime(2024, 6, 1, 10),
+        startIsAllDay: false,
+        end: DateTime(2024, 6, 1, 11),
+        endIsAllDay: false,
+        createdAt: DateTime(2024, 6, 1),
+        updatedAt: DateTime(2024, 6, 1),
+        actKind: ActKind.skipped,
+      );
 
       expect(entity.value.actKind, ActKind.skipped);
       expect(entity.value.isSkipped, isTrue);
@@ -27,19 +26,17 @@ void main() {
     });
 
     test('SavedActEntityV1.toEntityV2 preserves act_kind', () {
-      final entity = SavedActEntityV1({
-        'id': 7,
-        'mems_id': 8,
-        'start': DateTime(2024, 6, 4, 10),
-        'start_is_all_day': false,
-        'end': DateTime(2024, 6, 4, 11),
-        'end_is_all_day': false,
-        'paused_at': null,
-        'act_kind': 'skipped',
-        'createdAt': DateTime(2024, 6, 4),
-        'updatedAt': DateTime(2024, 6, 4),
-        'archivedAt': null,
-      });
+      final entity = savedAct(
+        id: 7,
+        memId: 8,
+        start: DateTime(2024, 6, 4, 10),
+        startIsAllDay: false,
+        end: DateTime(2024, 6, 4, 11),
+        endIsAllDay: false,
+        createdAt: DateTime(2024, 6, 4),
+        updatedAt: DateTime(2024, 6, 4),
+        actKind: ActKind.skipped,
+      );
 
       expect(entity.toEntityV2().actKind, ActKind.skipped);
     });

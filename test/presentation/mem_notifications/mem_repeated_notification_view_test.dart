@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../entity_factories.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_notifications/mem_repeated_notification_view.dart';
 import 'package:mem/features/mems/detail/states.dart';
@@ -36,16 +38,7 @@ void main() {
         (tester) async {
       const memId = 1;
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntityV1({
-        'id': 1,
-        'mems_id': memId,
-        'type': 'repeat',
-        'time_of_day_seconds': 9 * 60 * 60 + 30 * 60,
-        'message': 'Repeat',
-        'createdAt': now,
-        'updatedAt': now,
-        'archivedAt': null,
-      });
+      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60 + 30 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
 
       await tester.pumpWidget(
         _buildTestApp(
@@ -73,16 +66,7 @@ void main() {
         (tester) async {
       const memId = 1;
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntityV1({
-        'id': 1,
-        'mems_id': memId,
-        'type': 'repeat',
-        'time_of_day_seconds': null,
-        'message': 'Repeat',
-        'createdAt': now,
-        'updatedAt': now,
-        'archivedAt': null,
-      });
+      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, message: 'Repeat', createdAt: now, updatedAt: now);
 
       await tester.pumpWidget(
         _buildTestApp(
@@ -108,16 +92,7 @@ void main() {
     testWidgets('calls onTimeChanged when time is changed', (tester) async {
       const memId = 1;
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntityV1({
-        'id': 1,
-        'mems_id': memId,
-        'type': 'repeat',
-        'time_of_day_seconds': 9 * 60 * 60 + 30 * 60,
-        'message': 'Repeat',
-        'createdAt': now,
-        'updatedAt': now,
-        'archivedAt': null,
-      });
+      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60 + 30 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
 
       final notifier =
           ListValueStateNotifier<MemNotificationEntityV1>([notification]);
@@ -151,16 +126,7 @@ void main() {
         (tester) async {
       const memId = 1;
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntityV1({
-        'id': 1,
-        'mems_id': memId,
-        'type': 'repeat',
-        'time_of_day_seconds': 9 * 60 * 60 + 30 * 60,
-        'message': 'Repeat',
-        'createdAt': now,
-        'updatedAt': now,
-        'archivedAt': null,
-      });
+      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60 + 30 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
 
       final notifier =
           ListValueStateNotifier<MemNotificationEntityV1>([notification]);
@@ -191,16 +157,7 @@ void main() {
         (tester) async {
       const memId = 1;
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntityV1({
-        'id': 1,
-        'mems_id': memId,
-        'type': 'repeat',
-        'time_of_day_seconds': 9 * 60 * 60 + 30 * 60,
-        'message': 'Repeat',
-        'createdAt': now,
-        'updatedAt': now,
-        'archivedAt': null,
-      });
+      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60 + 30 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
 
       final notifier =
           ListValueStateNotifier<MemNotificationEntityV1>([notification]);
@@ -232,16 +189,7 @@ void main() {
 
     testWidgets('handles memId null', (tester) async {
       final now = DateTime.now();
-      final notification = SavedMemNotificationEntityV1({
-        'id': 1,
-        'mems_id': null,
-        'type': 'repeat',
-        'time_of_day_seconds': 9 * 60 * 60 + 30 * 60,
-        'message': 'Repeat',
-        'createdAt': now,
-        'updatedAt': now,
-        'archivedAt': null,
-      });
+      final notification = savedMemNotification(id: 1, memId: null, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60 + 30 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
 
       await tester.pumpWidget(
         _buildTestApp(
