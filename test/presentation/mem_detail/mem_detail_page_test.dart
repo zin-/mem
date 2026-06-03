@@ -311,6 +311,62 @@ void main() {
       });
     });
 
+    group('should keep name field after save', () {
+      testWidgets('name field keeps entered text after first save on new mem',
+          (tester) async {
+        const testMemName = 'Test Mem';
+
+        when(mockMemClient.save(
+          any,
+          any,
+          any,
+          any,
+          any,
+        )).thenAnswer((_) async => (
+              (
+                <MemItemEntityV1>[],
+                null,
+                null,
+                null,
+                MemEntity(
+                  1,
+                  testMemName,
+                  null,
+                  null,
+                  null,
+                  DateTime.now(),
+                  null,
+                  null,
+                ),
+              ),
+              null,
+            ));
+
+        await tester.pumpWidget(
+          ProviderScope(
+            child: MaterialApp(
+              home: const MemDetailPage(null),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final nameField = find.byKey(keyMemName);
+        expect(nameField, findsOneWidget);
+
+        await tester.enterText(nameField, testMemName);
+        await tester.pumpAndSettle();
+
+        final saveFab = find.byKey(keySaveMemFab);
+        expect(saveFab, findsOneWidget);
+
+        await tester.tap(saveFab);
+        await tester.pumpAndSettle();
+
+        expect(find.text(testMemName), findsOneWidget);
+      });
+    });
+
     group('should delete', skip: true, () {
       setUp(() {
         when(mockMemRepository.shipById(_TestConstants.testMemId)).thenAnswer(
