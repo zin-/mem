@@ -51,6 +51,8 @@ subprojects { subproject ->
         extension.compileSdk = 36
       }
     }
+    // プラグインごとに Java targetCompatibility と Kotlin jvmTarget がずれる（例: Java 17 / Kotlin 1.8）
+    // 全ライブラリへの Java 17 強制は workmanager_android 等と競合するため行わず、既存 Java 設定に jvmTarget を合わせる
     subproject.afterEvaluate {
       if (!subproject.plugins.hasPlugin("org.jetbrains.kotlin.android")) {
         return
@@ -59,18 +61,8 @@ subprojects { subproject ->
       if (javaTarget == null) {
         return
       }
-      def kotlinJvmTarget
-      if (javaTarget == JavaVersion.VERSION_1_8) {
-        kotlinJvmTarget = "1.8"
-      } else if (javaTarget == JavaVersion.VERSION_11) {
-        kotlinJvmTarget = "11"
-      } else if (javaTarget == JavaVersion.VERSION_17) {
-        kotlinJvmTarget = "17"
-      } else {
-        kotlinJvmTarget = javaTarget.toString()
-      }
       subproject.android.kotlinOptions {
-        jvmTarget = kotlinJvmTarget
+        jvmTarget = javaTarget.toString()
       }
     }
   }
