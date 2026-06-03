@@ -11,7 +11,7 @@ def flutterNdkVersion = flutter.ndkVersion
 //println("flutter.minSdkVersion: $flutter.minSdkVersion")
 def flutterMinSdkVersion = flutter.minSdkVersion
 def flutterTargetSdkVersion = flutter.targetSdkVersion
-def javaVersion = JavaVersion.VERSION_1_8
+def javaVersion = JavaVersion.VERSION_17
 
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties') as File
@@ -44,7 +44,7 @@ android {
   }
 
   kotlinOptions {
-    jvmTarget = javaVersion
+    jvmTarget = javaVersion.toString()
   }
 
   defaultConfig {
@@ -70,7 +70,7 @@ android {
   buildTypes {
     release {
       signingConfig signingConfigs.release
-      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
     }
   }
 }

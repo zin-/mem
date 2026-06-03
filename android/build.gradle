@@ -15,9 +15,56 @@ allprojects {
 rootProject.buildDir = "../build"
 subprojects {
   project.buildDir = "${rootProject.buildDir}/${project.name}"
-  // home_widget が glance-appwidget:1.+ を引く。1.3.0-alpha 以降は AGP 9.1+ 必須の compose.remote を含む
+  // home_widget が glance-appwidget:1.+ を引く。1.+ は 1.3.0-alpha01 に解決され AGP 9.2.0+ が必要になるため 1.2.0-rc01 に固定
   project.configurations.configureEach {
-    resolutionStrategy.force "androidx.glance:glance-appwidget:1.2.0-rc01"
+    resolutionStrategy {
+      force "androidx.glance:glance-appwidget:1.2.0-rc01"
+      // integration_test が Espresso 3.2.x を引くと espresso-core と idling-resource の namespace が重複し AGP 9 でマージ失敗する
+      // runner / rules / monitor / espresso を互換バージョンへ固定（rules は Maven 上 1.6.2 が無いため 1.6.1）
+      force "androidx.test:runner:1.6.2"
+      force "androidx.test:rules:1.6.1"
+      force "androidx.test:monitor:1.7.2"
+      force "androidx.test.espresso:espresso-core:3.6.1"
+      force "androidx.test.espresso:espresso-idling-resource:3.6.1"
+    }
+  }
+  // sentry_flutter が languageVersion 1.6 を指定するが Kotlin 2.1 では 1.8 未満は非対応
+  project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+    compilerOptions {
+      languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_8)
+    }
+  }
+}
+subprojects { subproject ->
+  // file_picker 等は AGP 9+ で kotlin-android を適用しないが、builtInKotlin=false では src の .kt がコンパイルされない
+  subproject.beforeEvaluate {
+    if (!subproject.plugins.hasPlugin("org.jetbrains.kotlin.android")
+        && !subproject.fileTree(dir: "${subproject.projectDir}/src", includes: ["**/*.kt"]).isEmpty()) {
+      subproject.plugins.apply("org.jetbrains.kotlin.android")
+    }
+  }
+  subproject.plugins.withId("com.android.library") {
+    // 一部プラグイン（例: sentry_flutter）が compileSdk 34 のまま。package_info_plus 等は compileSdk 36+ を要求する
+    // afterEvaluate では変更が too late になるため finalizeDsl で引き上げる
+    subproject.androidComponents.finalizeDsl { extension ->
+      if (extension.compileSdk != null && extension.compileSdk < 36) {
+        extension.compileSdk = 36
+      }
+    }
+    // プラグインごとに Java targetCompatibility と Kotlin jvmTarget がずれる（例: Java 17 / Kotlin 1.8）
+    // 全ライブラリへの Java 17 強制は workmanager_android 等と競合するため行わず、既存 Java 設定に jvmTarget を合わせる
+    subproject.afterEvaluate {
+      if (!subproject.plugins.hasPlugin("org.jetbrains.kotlin.android")) {
+        return
+      }
+      def javaTarget = subproject.android.compileOptions.targetCompatibility
+      if (javaTarget == null) {
+        return
+      }
+      subproject.android.kotlinOptions {
+        jvmTarget = javaTarget.toString()
+      }
+    }
   }
 }
 subprojects {
