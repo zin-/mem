@@ -19,7 +19,8 @@ subprojects {
   project.configurations.configureEach {
     resolutionStrategy {
       force "androidx.glance:glance-appwidget:1.2.0-rc01"
-      // integration_test の 3.2.x は espresso と idling-resource で namespace が重複し AGP 9 でマージ失敗する
+      // integration_test が Espresso 3.2.x を引くと espresso-core と idling-resource の namespace が重複し AGP 9 でマージ失敗する
+      // runner / rules / monitor / espresso を互換バージョンへ固定（rules は Maven 上 1.6.2 が無いため 1.6.1）
       force "androidx.test:runner:1.6.2"
       force "androidx.test:rules:1.6.1"
       force "androidx.test:monitor:1.7.2"
