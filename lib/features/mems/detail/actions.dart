@@ -37,6 +37,10 @@ final saveMem =
                     .updatedBy(SavedMemEntityV1.fromEntityV2(memEntityV2));
               }
 
+              ref.read(memEntitiesProvider.notifier).upsert(
+                    [SavedMemEntityV1.fromEntityV2(memEntityV2)],
+                  );
+
               ref.read(memItemsProvider.notifier).upsertAll(
                     savedMemItems,
                     (current, updating) =>
