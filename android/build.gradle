@@ -44,6 +44,8 @@ subprojects { subproject ->
     }
   }
   subproject.plugins.withId("com.android.library") {
+    // 一部プラグイン（例: sentry_flutter）が compileSdk 34 のまま。package_info_plus 等は compileSdk 36+ を要求する
+    // afterEvaluate では変更が too late になるため finalizeDsl で引き上げる
     subproject.androidComponents.finalizeDsl { extension ->
       if (extension.compileSdk != null && extension.compileSdk < 36) {
         extension.compileSdk = 36
