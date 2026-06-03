@@ -36,6 +36,7 @@ subprojects {
   }
 }
 subprojects { subproject ->
+  // file_picker 等は AGP 9+ で kotlin-android を適用しないが、builtInKotlin=false では src の .kt がコンパイルされない
   subproject.beforeEvaluate {
     if (!subproject.plugins.hasPlugin("org.jetbrains.kotlin.android")
         && !subproject.fileTree(dir: "${subproject.projectDir}/src", includes: ["**/*.kt"]).isEmpty()) {
