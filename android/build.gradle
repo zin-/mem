@@ -27,6 +27,7 @@ subprojects {
       force "androidx.test.espresso:espresso-idling-resource:3.6.1"
     }
   }
+  // sentry_flutter が languageVersion 1.6 を指定するが Kotlin 2.1 では 1.8 未満は非対応
   project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
     compilerOptions {
       languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_8)
