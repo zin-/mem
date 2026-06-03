@@ -35,38 +35,44 @@ class MemDetailPage extends ConsumerWidget {
       );
 }
 
-class _MemDetailPage extends StatelessWidget {
-  final _formKey = GlobalKey<FormState>();
+class _MemDetailPage extends StatefulWidget {
   final int? _memId;
   final bool _memIsSaved;
   final bool _memIsArchived;
 
-  _MemDetailPage(this._memId, this._memIsSaved, this._memIsArchived);
+  const _MemDetailPage(this._memId, this._memIsSaved, this._memIsArchived);
+
+  @override
+  State<_MemDetailPage> createState() => _MemDetailPageState();
+}
+
+class _MemDetailPageState extends State<_MemDetailPage> {
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) => v(
         () => Scaffold(
           appBar: AppBar(
-            actions: _memIsSaved
+            actions: widget._memIsSaved
                 ? AppBarActionsBuilder([
-                    TransitChartAction(context, _memId!),
-                    TransitActListAction(context, _memId),
-                    ArchiveMemAction(_memId),
-                    RemoveMemAction(_memId),
+                    TransitChartAction(context, widget._memId!),
+                    TransitActListAction(context, widget._memId!),
+                    ArchiveMemAction(widget._memId!),
+                    RemoveMemAction(widget._memId!),
                   ]).build(context)
                 : null,
-            backgroundColor: _memIsArchived ? secondaryGreyColor : null,
+            backgroundColor: widget._memIsArchived ? secondaryGreyColor : null,
           ),
           body: Form(
             key: _formKey,
-            child: MemDetailBody(_memId),
+            child: MemDetailBody(widget._memId),
           ),
-          floatingActionButton: MemDetailFab(_formKey, _memId),
+          floatingActionButton: MemDetailFab(_formKey, widget._memId),
         ),
         {
-          "_memId": _memId,
-          "_memIsSaved": _memIsSaved,
-          "_memIsArchived": _memIsArchived,
+          "_memId": widget._memId,
+          "_memIsSaved": widget._memIsSaved,
+          "_memIsArchived": widget._memIsArchived,
         },
       );
 }
