@@ -4,6 +4,8 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    labels:
+      - Dependabot
     open-pull-requests-limit: 0
     groups:
       pub-security:
@@ -14,6 +16,8 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    labels:
+      - Dependabot
     open-pull-requests-limit: 0
     groups:
       github-actions-security:
