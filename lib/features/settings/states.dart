@@ -13,13 +13,17 @@ part 'states.g.dart';
 class Preference<T> extends _$Preference<T> {
   @override
   T build(PreferenceKey<T> key) => v(
-        () => ref.watch(settingStoreProvider.notifier).serveOneBy(key),
+        () {
+          ref.read(settingStoreProvider.notifier).serveOneBy(key);
+          final settings = ref.watch(settingStoreProvider);
+          return (settings[key] ?? defaultPreferences[key]) as T;
+        },
         {"key": key},
       );
 
   Future<void> replace(T updating) => v(
         () async {
-          state = updating;
+          ref.read(settingStoreProvider.notifier).put(key, updating);
           await PreferenceRepository().receive(PreferenceEntity(key, updating));
         },
         {
@@ -29,7 +33,8 @@ class Preference<T> extends _$Preference<T> {
 
   Future<void> remove() => v(
         () async {
-          state = defaultPreferences[key] as T;
+          final defaultValue = defaultPreferences[key] as T;
+          ref.read(settingStoreProvider.notifier).put(key, defaultValue);
           await PreferenceRepository().discard(key);
         },
         {"key": key},
