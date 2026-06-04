@@ -1,0 +1,26 @@
+version: 2
+updates:
+  - package-ecosystem: pub
+    directory: /
+    schedule:
+      interval: weekly
+    labels:
+      - Dependabot
+    open-pull-requests-limit: 0
+    groups:
+      pub-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    labels:
+      - Dependabot
+    open-pull-requests-limit: 0
+    groups:
+      github-actions-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
