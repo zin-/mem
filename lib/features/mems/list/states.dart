@@ -111,6 +111,8 @@ final memListProvider = StateNotifierProvider.autoDispose<
         } else if (latestActOfA is ActiveAct && latestActOfB is ActiveAct) {
           return latestActOfB.period!.start!
               .compareTo(latestActOfA.period!.start!);
+        } else if (latestActOfA is PausedAct && latestActOfB is PausedAct) {
+          return latestActOfB.pausedAt!.compareTo(latestActOfA.pausedAt!);
         }
 
         if ((a.archivedAt != null) != (b.archivedAt != null)) {
