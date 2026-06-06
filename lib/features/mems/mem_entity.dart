@@ -238,17 +238,13 @@ class MemEntity implements Entity<int> {
                   ? null
                   : DateAndTime.from(
                       row.notifyOn,
-                      timeOfDay: row.notifyAt == null
-                          ? null
-                          : DateAndTime.from(row.notifyAt),
+                      timeOfDay: row.notifyAt,
                     ),
               end: row.endOn == null
                   ? null
                   : DateAndTime.from(
                       row.endOn,
-                      timeOfDay: row.endAt == null
-                          ? null
-                          : DateAndTime.from(row.endAt),
+                      timeOfDay: row.endAt,
                     ),
             ),
       memItems,
