@@ -18,7 +18,7 @@ class TimeOfDayText extends StatelessWidget {
       );
 }
 
-class TimeOfDayTextFormField extends StatelessWidget {
+class TimeOfDayTextFormField extends StatefulWidget {
   final TimeOfDay? timeOfDay;
   final Function(TimeOfDay? pickedTimeOfDay) onChanged;
   final Widget? icon;
@@ -31,23 +31,61 @@ class TimeOfDayTextFormField extends StatelessWidget {
   });
 
   @override
+  State<TimeOfDayTextFormField> createState() => _TimeOfDayTextFormFieldState();
+}
+
+class _TimeOfDayTextFormFieldState extends State<TimeOfDayTextFormField> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _syncControllerText();
+  }
+
+  @override
+  void didUpdateWidget(covariant TimeOfDayTextFormField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.timeOfDay != widget.timeOfDay) {
+      _syncControllerText();
+    }
+  }
+
+  void _syncControllerText() {
+    final text = widget.timeOfDay?.format(context) ?? '';
+    if (_controller.text != text) {
+      _controller.text = text;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) => v(
         () {
           return TextFormField(
-            controller: TextEditingController(
-              text: timeOfDay?.format(context) ?? '',
-            ),
+            controller: _controller,
             decoration: InputDecoration(
-              icon: icon,
+              icon: widget.icon,
               suffixIcon: IconButton(
                 onPressed: () => v(
                   () async {
                     final pickedTimeOfDay = await showTimePicker(
                       context: context,
-                      initialTime: timeOfDay ?? TimeOfDay.now(),
+                      initialTime: widget.timeOfDay ?? TimeOfDay.now(),
                     );
 
-                    if (pickedTimeOfDay != null) onChanged(pickedTimeOfDay);
+                    if (pickedTimeOfDay != null) widget.onChanged(pickedTimeOfDay);
                   },
                 ),
                 icon: const Icon(Icons.access_time_outlined),
