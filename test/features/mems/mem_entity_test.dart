@@ -1,4 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mem/framework/date_and_time/date_and_time.dart';
+import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
@@ -65,10 +67,40 @@ void main() {
 
       expect(saved.latestAct, latestAct);
       expect(saved.id, 10);
-      expect(
-        () => saved.updatedWith((mem) => Mem(mem.id, 'after', mem.doneAt, mem.period)),
-        throwsA(isA<NoSuchMethodError>()),
+
+      final updated = saved.updatedWith(
+        (mem) => Mem(mem.id, 'after', mem.doneAt, mem.period),
       );
+
+      expect(updated.value.name, 'after');
+      expect(updated.latestAct, latestAct);
+      expect(updated.id, 10);
+    });
+
+    test('SavedMemEntityV1 updatedWith updates period', () {
+      final saved = SavedMemEntityV1({
+        'id': 11,
+        'name': 'period-mem',
+        'doneAt': null,
+        'notifyOn': DateTime(2024, 4, 1),
+        'notifyAt': DateTime(2024, 4, 1, 10),
+        'endOn': DateTime(2024, 4, 2),
+        'endAt': DateTime(2024, 4, 2, 18),
+        'createdAt': DateTime(2024, 4, 1),
+        'updatedAt': null,
+        'archivedAt': null,
+      });
+
+      final newStart = DateAndTime(2024, 5, 1, 9, 0);
+      final newEnd = DateAndTime(2024, 5, 3, 17, 0);
+      final newPeriod = DateAndTimePeriod(start: newStart, end: newEnd);
+
+      final updated = saved.updatedWith(
+        (mem) => Mem(mem.id, mem.name, mem.doneAt, newPeriod),
+      );
+
+      expect(updated.value.period?.start, newStart);
+      expect(updated.value.period?.end, newEnd);
     });
 
     test('fromTuple with children and updatedWith fields', () {
