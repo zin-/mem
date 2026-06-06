@@ -88,7 +88,7 @@ class DateAndTimeTextFormField extends StatelessWidget {
                           timeOfDay: DateAndTime(
                             dateAndTime.year,
                             dateAndTime.month,
-                            dateAndTime.minute,
+                            dateAndTime.day,
                             pickedTimeOfDay.hour,
                             pickedTimeOfDay.minute,
                             dateAndTime.second,
