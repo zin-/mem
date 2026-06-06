@@ -522,4 +522,111 @@ void main() {
       },
     );
   });
+
+  group(': display updates after pick', () {
+    final timeOfDayTextFormFieldFinder = find.byType(TimeOfDayTextFormField);
+
+    String timeOfDayFieldDisplayText(WidgetTester widgetTester) {
+      return widgetTester
+          .widget<EditableText>(
+            find.descendant(
+              of: timeOfDayTextFormFieldFinder,
+              matching: find.byType(EditableText),
+            ),
+          )
+          .controller
+          .text;
+    }
+
+    String formatTimeOfDay(WidgetTester widgetTester, TimeOfDay timeOfDay) {
+      final context = widgetTester.element(timeOfDayTextFormFieldFinder);
+      return timeOfDay.format(context);
+    }
+
+    Future<void> pickTimeInDialog(
+      WidgetTester widgetTester,
+      TimeOfDay timeOfDay,
+    ) async {
+      await widgetTester.tap(find.byIcon(Icons.access_time_outlined));
+      await widgetTester.pumpAndSettle();
+
+      await widgetTester.tap(find.byIcon(Icons.keyboard_outlined));
+      await widgetTester.pumpAndSettle();
+
+      final inputs = find.descendant(
+        of: find.byType(TimePickerDialog),
+        matching: find.byType(TextFormField),
+      );
+      await widgetTester.enterText(inputs.at(0), '${timeOfDay.hour}');
+      await widgetTester.enterText(inputs.at(1), '${timeOfDay.minute}');
+      await widgetTester.tap(find.text('OK'));
+      await widgetTester.pumpAndSettle();
+    }
+
+    testWidgets(
+      ': time field shows new time after parent rebuild.',
+      (widgetTester) async {
+        const initialTime = TimeOfDay(hour: 10, minute: 0);
+        const pickedTime = TimeOfDay(hour: 14, minute: 0);
+        final initialDateAndTime = DateAndTime(
+          2023,
+          5,
+          2,
+          initialTime.hour,
+          initialTime.minute,
+        );
+
+        await widgetTester.pumpWidget(
+          MaterialApp(
+            home: _DateAndTimeHost(initial: initialDateAndTime),
+          ),
+        );
+
+        expect(
+          timeOfDayFieldDisplayText(widgetTester),
+          formatTimeOfDay(widgetTester, initialTime),
+        );
+
+        await pickTimeInDialog(widgetTester, pickedTime);
+
+        expect(
+          timeOfDayFieldDisplayText(widgetTester),
+          formatTimeOfDay(widgetTester, pickedTime),
+        );
+      },
+    );
+  });
+}
+
+class _DateAndTimeHost extends StatefulWidget {
+  const _DateAndTimeHost({required this.initial});
+
+  final DateAndTime initial;
+
+  @override
+  State<_DateAndTimeHost> createState() => _DateAndTimeHostState();
+}
+
+class _DateAndTimeHostState extends State<_DateAndTimeHost> {
+  late DateAndTime _dateAndTime;
+
+  @override
+  void initState() {
+    super.initState();
+    _dateAndTime = widget.initial;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: DateAndTimeTextFormField(
+        _dateAndTime,
+        (pickedDateAndTime) {
+          if (pickedDateAndTime != null) {
+            setState(() => _dateAndTime = pickedDateAndTime);
+          }
+        },
+      ),
+    );
+  }
 }
