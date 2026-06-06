@@ -557,8 +557,11 @@ void main() {
         of: find.byType(TimePickerDialog),
         matching: find.byType(TextFormField),
       );
-      await widgetTester.enterText(inputs.at(0), '${timeOfDay.hour}');
+      final hour12 = timeOfDay.hour % 12 == 0 ? 12 : timeOfDay.hour % 12;
+      await widgetTester.enterText(inputs.at(0), '$hour12');
       await widgetTester.enterText(inputs.at(1), '${timeOfDay.minute}');
+      await widgetTester.tap(find.text(timeOfDay.hour >= 12 ? 'PM' : 'AM'));
+      await widgetTester.pumpAndSettle();
       await widgetTester.tap(find.text('OK'));
       await widgetTester.pumpAndSettle();
     }
