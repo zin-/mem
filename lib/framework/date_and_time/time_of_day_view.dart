@@ -59,10 +59,13 @@ class _TimeOfDayTextFormFieldState extends State<TimeOfDayTextFormField> {
 
   void _syncControllerText() {
     if (!mounted) return;
-    final text = widget.timeOfDay?.format(context) ?? '';
-    if (_controller.text != text) {
-      _controller.text = text;
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final text = widget.timeOfDay?.format(context) ?? '';
+      if (_controller.text != text) {
+        _controller.text = text;
+      }
+    });
   }
 
   @override

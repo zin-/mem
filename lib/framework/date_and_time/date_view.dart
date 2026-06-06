@@ -80,12 +80,16 @@ class _DateTextFormFieldState extends State<DateTextFormField> {
   }
 
   void _syncControllerText() {
-    final text = widget.date == null
-        ? ''
-        : _buildFormatFunction(context, true)(widget.date!);
-    if (_controller.text != text) {
-      _controller.text = text;
-    }
+    if (!mounted) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final text = widget.date == null
+          ? ''
+          : _buildFormatFunction(context, true)(widget.date!);
+      if (_controller.text != text) {
+        _controller.text = text;
+      }
+    });
   }
 
   @override
@@ -121,6 +125,7 @@ class _DateTextFormFieldState extends State<DateTextFormField> {
                           widget._lastDate ?? initialDate.add(widget.maxDuration),
                     );
 
+                    if (!context.mounted) return;
                     widget.onChanged(pickedDate);
                   },
                 ),
