@@ -53,19 +53,26 @@ class _TimeOfDayTextFormFieldState extends State<TimeOfDayTextFormField> {
   void didUpdateWidget(covariant TimeOfDayTextFormField oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.timeOfDay != widget.timeOfDay) {
-      _syncControllerText();
+      _syncControllerText(postFrame: true);
     }
   }
 
-  void _syncControllerText() {
+  void _syncControllerText({bool postFrame = false}) {
     if (!mounted) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+
+    void apply() {
       if (!mounted) return;
       final text = widget.timeOfDay?.format(context) ?? '';
       if (_controller.text != text) {
         _controller.text = text;
       }
-    });
+    }
+
+    if (postFrame) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => apply());
+    } else {
+      apply();
+    }
   }
 
   @override

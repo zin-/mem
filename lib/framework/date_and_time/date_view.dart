@@ -75,13 +75,14 @@ class _DateTextFormFieldState extends State<DateTextFormField> {
   void didUpdateWidget(covariant DateTextFormField oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.date != widget.date) {
-      _syncControllerText();
+      _syncControllerText(postFrame: true);
     }
   }
 
-  void _syncControllerText() {
+  void _syncControllerText({bool postFrame = false}) {
     if (!mounted) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+
+    void apply() {
       if (!mounted) return;
       final text = widget.date == null
           ? ''
@@ -89,7 +90,13 @@ class _DateTextFormFieldState extends State<DateTextFormField> {
       if (_controller.text != text) {
         _controller.text = text;
       }
-    });
+    }
+
+    if (postFrame) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => apply());
+    } else {
+      apply();
+    }
   }
 
   @override
