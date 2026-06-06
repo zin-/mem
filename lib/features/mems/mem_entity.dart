@@ -98,7 +98,7 @@ class SavedMemEntityV1 extends MemEntityV1
 
   @override
   SavedMemEntityV1 updatedWith(Mem Function(Mem mem) update) =>
-      SavedMemEntityV1.fromRow(
+      SavedMemEntityV1(
         _savedRowFrom(this, update(value)),
         latestAct: latestAct,
       );
