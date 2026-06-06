@@ -137,7 +137,7 @@ void main() {
     );
 
     testWidgets(
-      ': time pick after provider autoDispose reports StateError to Sentry.',
+      ': time pick after provider autoDispose does not report to Sentry.',
       (tester) async {
         const memId = 1;
         final mem = savedMem(
@@ -179,16 +179,7 @@ void main() {
         await tester.pumpAndSettle();
         await tester.pump();
 
-        final captured = verify(
-          mockedSentryWrapper.captureException(captureAny, captureAny),
-        ).captured;
-
-        expect(captured, isNotEmpty);
-        expect(captured.first, isA<StateError>());
-        expect(
-          (captured.first as StateError).message,
-          contains('unmounted'),
-        );
+        verifyNever(mockedSentryWrapper.captureException(any, any));
       },
     );
 
@@ -242,25 +233,15 @@ void main() {
   });
 
   group('ValueStateNotifier.updatedBy after dispose', () {
-    test(': throws StateError matching Sentry capture pattern.', () {
-      final notifier = ValueStateNotifier(
-        MemEntityV1(Mem(null, '', null, null)),
-      );
+    test(': returns value without updating state.', () {
+      final initial = MemEntityV1(Mem(null, '', null, null));
+      final notifier = ValueStateNotifier(initial);
       notifier.dispose();
 
-      expect(
-        () => notifier.updatedBy(MemEntityV1(Mem(null, 'x', null, null))),
-        throwsA(
-          isA<StateError>().having(
-            (e) => e.message,
-            'message',
-            allOf(
-              contains('Tried to use'),
-              contains('after `dispose` was called'),
-            ),
-          ),
-        ),
-      );
+      final updating = MemEntityV1(Mem(null, 'x', null, null));
+      final result = notifier.updatedBy(updating);
+
+      expect(result, updating);
     });
   });
 }

@@ -81,6 +81,7 @@ class DateAndTimeTextFormField extends StatelessWidget {
                         initialTime: TimeOfDay.now(),
                       );
 
+                      if (!context.mounted) return;
                       if (pickedTimeOfDay != null) {
                         final dateAndTime = _dateAndTime ?? DateAndTime.now();
                         _onChanged(DateAndTime.from(

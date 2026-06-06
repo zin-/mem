@@ -58,6 +58,7 @@ class _TimeOfDayTextFormFieldState extends State<TimeOfDayTextFormField> {
   }
 
   void _syncControllerText() {
+    if (!mounted) return;
     final text = widget.timeOfDay?.format(context) ?? '';
     if (_controller.text != text) {
       _controller.text = text;
@@ -85,6 +86,7 @@ class _TimeOfDayTextFormFieldState extends State<TimeOfDayTextFormField> {
                       initialTime: widget.timeOfDay ?? TimeOfDay.now(),
                     );
 
+                    if (!mounted) return;
                     if (pickedTimeOfDay != null) widget.onChanged(pickedTimeOfDay);
                   },
                 ),

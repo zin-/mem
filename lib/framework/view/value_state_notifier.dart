@@ -24,7 +24,10 @@ class ValueStateNotifier<StateT> extends StateNotifier<StateT> {
     }
   }
 
-  StateT updatedBy(StateT value) => v(
+  StateT updatedBy(StateT value) {
+    if (!mounted) return value;
+
+    return v(
         () {
           state.toString() == value.toString()
               ? verbose(
@@ -39,6 +42,7 @@ class ValueStateNotifier<StateT> extends StateNotifier<StateT> {
         },
         {'current': state, 'updating': value},
       );
+  }
 
 // coverage:ignore-start
   @override
