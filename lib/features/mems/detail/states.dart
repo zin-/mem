@@ -22,12 +22,23 @@ final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<MemEntityV1>, MemEntityV1, int?>(
   (ref, memId) => v(
     () {
-      final mem = ref.watch(memByMemIdProvider(memId));
-      return ValueStateNotifier(
+      final mem = ref.read(memByMemIdProvider(memId));
+      final notifier = ValueStateNotifier(
         mem == null
             ? MemEntityV1(Mem(null, "", null, null))
             : SavedMemEntityV1.fromEntityV2(mem),
       );
+
+      ref.listen<MemEntity?>(
+        memByMemIdProvider(memId),
+        (prev, next) {
+          if (prev == null && next != null) {
+            notifier.updatedBy(SavedMemEntityV1.fromEntityV2(next));
+          }
+        },
+      );
+
+      return notifier;
     },
     {"memId": memId},
   ),
