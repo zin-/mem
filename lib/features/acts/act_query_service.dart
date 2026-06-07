@@ -169,21 +169,8 @@ class ActQueryService {
         },
       );
 
-  Future<ActEntity?> fetchScheduleAnchorByMemIds(int memId) => v(
-        () async {
-          final rows = await (_db.select(_db.acts)
-                ..where(
-                  (t) =>
-                      t.memId.equals(memId) &
-                      actExcludingSkippedForPerformance(t),
-                )
-                ..orderBy([(t) => OrderingTerm.desc(t.start)])
-                ..limit(1))
-              .get();
-          return rows.isEmpty ? null : ActEntity.fromTuple(rows.first);
-        },
-        {'memId': memId},
-      );
+  Future<ActEntity?> fetchScheduleAnchorByMemIds(int memId) async =>
+      (await fetchScheduleAnchorsByMemIds([memId]))[memId];
 
   Future<Map<int, ActEntity>> fetchScheduleAnchorsByMemIds(
     Iterable<int> memIds,
