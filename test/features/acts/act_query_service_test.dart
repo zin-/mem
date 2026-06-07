@@ -147,6 +147,48 @@ void main() {
       expect(summary.getValue(acts), 2);
     });
 
+    test('fetchScheduleAnchorByMemIds returns latest non-skipped act', () async {
+      final memId = await insertMem();
+      final finishStart = DateTime(2024, 6, 1, 10);
+      final skipStart = DateTime(2024, 6, 3, 10);
+      await insertAct(
+        memId: memId,
+        start: finishStart,
+        actKind: 'finished',
+      );
+      await insertAct(
+        memId: memId,
+        start: skipStart,
+        actKind: 'skipped',
+      );
+
+      final anchor = await query.fetchScheduleAnchorByMemIds(memId);
+
+      expect(anchor?.actKind, ActKind.finished);
+      expect(anchor?.start?.day, finishStart.day);
+    });
+
+    test('fetchScheduleAnchorsByMemIds batch returns anchor per skipped mem',
+        () async {
+      final memId = await insertMem();
+      final finishStart = DateTime(2024, 6, 1, 10);
+      await insertAct(
+        memId: memId,
+        start: finishStart,
+        actKind: 'finished',
+      );
+      await insertAct(
+        memId: memId,
+        start: DateTime(2024, 6, 3, 10),
+        actKind: 'skipped',
+      );
+
+      final anchors = await query.fetchScheduleAnchorsByMemIds([memId]);
+
+      expect(anchors, hasLength(1));
+      expect(anchors[memId]?.actKind, ActKind.finished);
+    });
+
     test('fetchByMemIdAndPeriod excludes skipped for chart', () async {
       final memId = await insertMem();
       await insertAct(memId: memId, start: DateTime(2024, 6, 1, 10));

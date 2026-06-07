@@ -88,7 +88,7 @@ abstract class Act {
 
   bool get isSkipped => actKind == ActKind.skipped;
 
-  bool get isScheduleAnchor => isActive || isFinished;
+  bool get isScheduleAnchor => isActive || (isFinished && !isSkipped);
 
   FinishedAct finish(DateAndTime when);
 
@@ -157,3 +157,10 @@ class PausedAct extends Act {
   @override
   ActiveAct start(DateAndTime when) => ActiveAct(memId, when);
 }
+
+Act? scheduleAnchorForNotifications({
+  required Act? latestAct,
+  Act? scheduleAnchorAct,
+}) =>
+    scheduleAnchorAct ??
+    (latestAct != null && latestAct.isScheduleAnchor ? latestAct : null);

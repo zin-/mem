@@ -73,10 +73,12 @@ class MemEntityV1 with EntityV1<Mem> {
 class SavedMemEntityV1 extends MemEntityV1
     with DatabaseTupleEntityV1<int, Mem> {
   final Act? latestAct;
+  final Act? scheduleAnchorAct;
 
   SavedMemEntityV1(
     Map<String, dynamic> map, {
     this.latestAct,
+    this.scheduleAnchorAct,
   }) : super(_memFromMap(map)) {
     withBaseColumns(map);
   }
@@ -84,6 +86,7 @@ class SavedMemEntityV1 extends MemEntityV1
   SavedMemEntityV1.fromRow(
     dynamic row, {
     this.latestAct,
+    this.scheduleAnchorAct,
   }) : super(_memFromRow(row)) {
     withBaseColumns(row);
   }
@@ -117,6 +120,7 @@ class SavedMemEntityV1 extends MemEntityV1
       SavedMemEntityV1(
         _savedRowFrom(this, update(value)),
         latestAct: latestAct,
+        scheduleAnchorAct: scheduleAnchorAct,
       );
 
   MemEntity toEntityV2() => MemEntity(
@@ -129,6 +133,7 @@ class SavedMemEntityV1 extends MemEntityV1
         updatedAt,
         archivedAt,
         latestAct: latestAct,
+        scheduleAnchorAct: scheduleAnchorAct,
         repeatedNotifications: null,
         memRelations: null,
       );
@@ -137,6 +142,7 @@ class SavedMemEntityV1 extends MemEntityV1
       SavedMemEntityV1.fromRow(
         _MemEntityRow(entity),
         latestAct: entity.latestAct,
+        scheduleAnchorAct: entity.scheduleAnchorAct,
       );
 }
 
@@ -167,6 +173,7 @@ class MemEntity implements Entity<int> {
   final List<MemNotificationEntity>? repeatedNotifications;
   final List<MemRelationEntity>? memRelations;
   final Act? latestAct;
+  final Act? scheduleAnchorAct;
 
   @override
   final int id;
@@ -189,6 +196,7 @@ class MemEntity implements Entity<int> {
     this.repeatedNotifications,
     this.memRelations,
     this.latestAct,
+    this.scheduleAnchorAct,
   });
 
   Mem toDomain() => Mem(
@@ -197,6 +205,7 @@ class MemEntity implements Entity<int> {
         doneAt,
         period,
         latestAct: latestAct,
+        scheduleAnchorAct: scheduleAnchorAct,
       );
 
   MemEntity updatedWith({
@@ -205,6 +214,7 @@ class MemEntity implements Entity<int> {
     List<MemNotificationEntity>? Function()? repeatedNotifications,
     List<MemRelationEntity>? Function()? memRelations,
     Act? Function()? latestAct,
+    Act? Function()? scheduleAnchorAct,
     DateTime? Function()? updatedAt,
     DateTime? Function()? archivedAt,
   }) {
@@ -223,6 +233,8 @@ class MemEntity implements Entity<int> {
           : repeatedNotifications(),
       memRelations: memRelations == null ? this.memRelations : memRelations(),
       latestAct: latestAct == null ? this.latestAct : latestAct(),
+      scheduleAnchorAct:
+          scheduleAnchorAct == null ? this.scheduleAnchorAct : scheduleAnchorAct(),
     );
   }
 

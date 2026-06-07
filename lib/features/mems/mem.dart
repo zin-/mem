@@ -16,6 +16,7 @@ class Mem {
   final DateTime? doneAt;
   final DateAndTimePeriod? period;
   final Act? latestAct;
+  final Act? scheduleAnchorAct;
 
   Mem(
     this.id,
@@ -23,6 +24,7 @@ class Mem {
     this.doneAt,
     this.period, {
     this.latestAct,
+    this.scheduleAnchorAct,
   });
 
   bool get isArchived => false;
@@ -30,12 +32,14 @@ class Mem {
   bool get isDone => doneAt != null;
 
   Mem done(DateTime when) =>
-      Mem(id, name, when, period, latestAct: latestAct);
+      Mem(id, name, when, period,
+          latestAct: latestAct, scheduleAnchorAct: scheduleAnchorAct);
 
-  Mem undone() => Mem(id, name, null, period, latestAct: latestAct);
+  Mem undone() => Mem(id, name, null, period,
+      latestAct: latestAct, scheduleAnchorAct: scheduleAnchorAct);
 
-  Mem withPeriod(DateAndTimePeriod? period) =>
-      Mem(id, name, doneAt, period, latestAct: latestAct);
+  Mem withPeriod(DateAndTimePeriod? period) => Mem(id, name, doneAt, period,
+      latestAct: latestAct, scheduleAnchorAct: scheduleAnchorAct);
 
   DateTime? notifyAt(
     DateTime startOfToday,

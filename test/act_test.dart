@@ -113,7 +113,8 @@ void main() => group(
             expect(actKindFromStored('unknown'), isNull);
           });
 
-          test('skipped finished act exposes isSkipped and isScheduleAnchor', () {
+          test('skipped finished act exposes isSkipped but not isScheduleAnchor',
+              () {
             final skipped = Act.by(
               0,
               startWhen: DateAndTime(2024, 1, 1),
@@ -122,7 +123,7 @@ void main() => group(
             );
 
             expect(skipped.isSkipped, isTrue);
-            expect(skipped.isScheduleAnchor, isTrue);
+            expect(skipped.isScheduleAnchor, isFalse);
             expect(skipped.isFinished, isTrue);
           });
 

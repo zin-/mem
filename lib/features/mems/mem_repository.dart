@@ -5,6 +5,7 @@ import 'package:mem/databases/child_fk_cascade.dart';
 import 'package:mem/databases/database.dart' as drift_schema;
 import 'package:mem/databases/table_definitions/mems.dart';
 import 'package:mem/features/acts/act_entity.dart';
+import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/framework/repository/drift_repository.dart';
@@ -115,12 +116,37 @@ class MemRepository extends DriftRepository {
 
   Future<List<MemEntity>> _attachLatestActs(List<MemEntity> mems) async {
     final latestByMemId = await _latestActRowsByMemId(mems.map((m) => m.id));
-    return mems
+    final withLatest = mems
         .map((m) {
           final row = latestByMemId[m.id];
           if (row == null) return m;
           return m.updatedWith(
             latestAct: () => ActEntity.fromTuple(row).toDomain(),
+          );
+        })
+        .toList();
+    return _attachScheduleAnchorsForSkippedOnly(withLatest);
+  }
+
+  Future<List<MemEntity>> _attachScheduleAnchorsForSkippedOnly(
+    List<MemEntity> mems,
+  ) async {
+    final skippedMemIds = mems
+        .where((m) => m.latestAct?.isSkipped == true)
+        .map((m) => m.id)
+        .toList();
+    if (skippedMemIds.isEmpty) return mems;
+
+    final anchorsByMemId =
+        await ActQueryService().fetchScheduleAnchorsByMemIds(skippedMemIds);
+
+    return mems
+        .map((m) {
+          if (m.latestAct?.isSkipped != true) return m;
+          final anchor = anchorsByMemId[m.id];
+          if (anchor == null) return m;
+          return m.updatedWith(
+            scheduleAnchorAct: () => anchor.toDomain(),
           );
         })
         .toList();

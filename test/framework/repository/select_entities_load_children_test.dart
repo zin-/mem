@@ -93,5 +93,44 @@ void main() {
       final loaded = rows.single;
       expect(loaded.latestAct?.actKind, ActKind.skipped);
     });
+
+    test('attaches scheduleAnchorAct when latest act is skipped', () async {
+      final now = DateTime.now();
+      final mem = await db.into(db.mems).insertReturning(
+            MemsCompanion.insert(name: 'm', createdAt: now),
+          );
+      final finishStart = now.subtract(const Duration(days: 2));
+      await db.into(db.acts).insert(
+            ActsCompanion.insert(
+              memId: mem.id,
+              createdAt: finishStart,
+              start: Value(finishStart),
+              end: Value(finishStart),
+              actKind: const Value('finished'),
+            ),
+          );
+      await db.into(db.acts).insert(
+            ActsCompanion.insert(
+              memId: mem.id,
+              createdAt: now,
+              start: Value(now.subtract(const Duration(days: 1))),
+              end: Value(now.subtract(const Duration(days: 1))),
+              actKind: const Value('skipped'),
+            ),
+          );
+
+      final rows = await MemRepository().ship(
+        id: mem.id,
+        loadLatestAct: true,
+      );
+
+      final loaded = rows.single;
+      expect(loaded.latestAct?.actKind, ActKind.skipped);
+      expect(loaded.scheduleAnchorAct?.actKind, ActKind.finished);
+      expect(
+        loaded.scheduleAnchorAct?.period?.start?.day,
+        finishStart.day,
+      );
+    });
   });
 }
