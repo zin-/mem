@@ -72,10 +72,7 @@ void main() {
       return MemNotification.nextNotifyAt(
         notifications ?? repeatByNDayNotifications,
         startOfToday,
-        scheduleAnchorForNotifications(
-          latestAct: mem.latestAct,
-          scheduleAnchorAct: mem.scheduleAnchorAct,
-        ),
+        mem.resolvedScheduleAnchor,
       );
     }
 
