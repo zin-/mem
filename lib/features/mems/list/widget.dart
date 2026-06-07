@@ -11,7 +11,6 @@ import 'package:mem/framework/nullable.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
-import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
 
@@ -29,7 +28,7 @@ class MemListWidget extends ConsumerWidget {
           _scrollController,
           ref.watch(memListProvider).map((e) => e.toDomain()).toList(),
           ref.watch(preferenceProvider(startOfDayKey)),
-          ref.watch(memNotificationsProvider),
+          ref.watch(savedMemNotificationsProvider),
         ),
       );
 }
