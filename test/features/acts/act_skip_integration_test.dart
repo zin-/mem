@@ -6,6 +6,7 @@ import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/acts/act_repository.dart';
 import 'package:mem/features/acts/act_service.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
+import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
@@ -60,14 +61,16 @@ void main() {
           .id;
     }
 
-    Future<DateTime?> nextNotifyAtForLatest(int memId) async {
-      final mem = (await MemRepository().ship(
-        id: memId,
-        loadLatestAct: true,
-      ))
-          .single;
+    Future<MemEntity> loadMem(int memId) async =>
+        (await MemRepository().ship(id: memId, loadLatestAct: true)).single;
+
+    Future<DateTime?> nextNotifyAtForMem(
+      int memId, {
+      Iterable<MemNotification>? notifications,
+    }) async {
+      final mem = await loadMem(memId);
       return MemNotification.nextNotifyAt(
-        repeatByNDayNotifications,
+        notifications ?? repeatByNDayNotifications,
         startOfToday,
         scheduleAnchorForNotifications(
           latestAct: mem.latestAct,
@@ -76,13 +79,8 @@ void main() {
       );
     }
 
-    Future<Act?> latestActForMem(int memId) async {
-      final rows = await MemRepository().ship(
-        id: memId,
-        loadLatestAct: true,
-      );
-      return rows.single.latestAct;
-    }
+    Future<Act?> latestActForMem(int memId) async =>
+        (await loadMem(memId)).latestAct;
 
     test(
         'skip after weekly finish keeps nextNotifyAt at today not skip plus 7 days',
@@ -105,23 +103,12 @@ void main() {
       final latest = await query.fetchLatestByMemIds(memId);
       expect(latest?.actKind, ActKind.skipped);
 
-      final mem = (await MemRepository().ship(
-        id: memId,
-        loadLatestAct: true,
-      ))
-          .single;
-      final nextNotify = MemNotification.nextNotifyAt(
-        weeklyRepeatNotifications,
-        startOfToday,
-        scheduleAnchorForNotifications(
-          latestAct: mem.latestAct,
-          scheduleAnchorAct: mem.scheduleAnchorAct,
-        ),
-      );
-
       expect(
-        nextNotify,
-        DateTime(startOfToday.year, startOfToday.month, startOfToday.day),
+        await nextNotifyAtForMem(
+          memId,
+          notifications: weeklyRepeatNotifications,
+        ),
+        startOfToday,
       );
     });
 
@@ -134,13 +121,10 @@ void main() {
       await service.skip(skipMemId, when);
       await service.finish(finishMemId, when);
 
+      expect(await nextNotifyAtForMem(skipMemId), startOfToday);
       expect(
-        await nextNotifyAtForLatest(skipMemId),
-        DateTime(startOfToday.year, startOfToday.month, startOfToday.day),
-      );
-      expect(
-        await nextNotifyAtForLatest(finishMemId),
-        DateTime(startOfToday.year, startOfToday.month, startOfToday.day + 1),
+        await nextNotifyAtForMem(finishMemId),
+        startOfToday.add(const Duration(days: 1)),
       );
     });
 
@@ -155,7 +139,7 @@ void main() {
       final latestBeforeDelete = await latestActForMem(memId);
       expect(latestBeforeDelete?.actKind, ActKind.skipped);
       expect(latestBeforeDelete?.period?.start?.day, day2.day);
-      expect(await nextNotifyAtForLatest(memId), isNotNull);
+      expect(await nextNotifyAtForMem(memId), isNotNull);
 
       await repository.waste(id: skipped.id);
 
@@ -165,10 +149,7 @@ void main() {
       final latestAfterDelete = await latestActForMem(memId);
       expect(latestAfterDelete?.actKind, ActKind.finished);
       expect(latestAfterDelete?.period?.start?.day, day1.day);
-      expect(
-        await nextNotifyAtForLatest(memId),
-        DateTime(startOfToday.year, startOfToday.month, startOfToday.day),
-      );
+      expect(await nextNotifyAtForMem(memId), startOfToday);
     });
 
     test('editing skipped act start does not change nextNotifyAt', () async {
@@ -193,10 +174,7 @@ void main() {
       final latest = await query.fetchLatestByMemIds(memId);
       expect(latest?.start?.day, day4.day);
       expect(latest?.actKind, ActKind.skipped);
-      expect(
-        await nextNotifyAtForLatest(memId),
-        DateTime(startOfToday.year, startOfToday.month, startOfToday.day),
-      );
+      expect(await nextNotifyAtForMem(memId), startOfToday);
     });
 
     test('act list paging includes skipped rows', () async {
