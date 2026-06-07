@@ -34,6 +34,9 @@ class Mem {
 
   Mem undone() => Mem(id, name, null, period, latestAct: latestAct);
 
+  Mem withPeriod(DateAndTimePeriod? period) =>
+      Mem(id, name, doneAt, period, latestAct: latestAct);
+
   DateTime? notifyAt(
     DateTime startOfToday,
     Iterable<MemNotification>? memNotifications,

@@ -6,7 +6,6 @@ import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/detail/states.dart';
-import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
 import 'package:mem/values/colors.dart';
@@ -68,37 +67,23 @@ class MemPeriodTextFormFields extends ConsumerWidget {
         () {
           final memEntity = ref.watch(editingMemByMemIdProvider(_memId));
 
-          return _MemPeriodTextFormFieldsComponent(
+          return DateAndTimePeriodTextFormFields(
             memEntity.value.period,
             (pickedPeriod) => v(
-              () => ref
-                  .read(editingMemByMemIdProvider(_memId).notifier)
-                  .updatedBy(
-                    memEntity.updatedWith(
-                      (mem) => Mem(mem.id, mem.name, mem.doneAt, pickedPeriod),
-                    ),
-                  ),
+              () {
+                final latestMemEntity =
+                    ref.read(editingMemByMemIdProvider(_memId));
+                ref
+                    .read(editingMemByMemIdProvider(_memId).notifier)
+                    .updatedBy(
+                      latestMemEntity.updatedWith(
+                        (mem) => mem.withPeriod(pickedPeriod),
+                      ),
+                    );
+              },
               pickedPeriod,
             ),
           );
         },
-      );
-}
-
-class _MemPeriodTextFormFieldsComponent extends StatelessWidget {
-  final DateAndTimePeriod? _dateAndTimePeriod;
-  final Function(DateAndTimePeriod? pickedPeriod) _onPeriodChanged;
-
-  const _MemPeriodTextFormFieldsComponent(
-    this._dateAndTimePeriod,
-    this._onPeriodChanged,
-  );
-
-  @override
-  Widget build(BuildContext context) => v(
-        () => DateAndTimePeriodTextFormFields(
-          _dateAndTimePeriod,
-          _onPeriodChanged,
-        ),
       );
 }

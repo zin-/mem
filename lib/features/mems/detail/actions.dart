@@ -31,15 +31,13 @@ final saveMem =
 
               if (!ref.mounted) return nextNotifyAt;
 
-              if (memId == null) {
-                ref
-                    .read(editingMemByMemIdProvider(memId).notifier)
-                    .updatedBy(SavedMemEntityV1.fromEntityV2(memEntityV2));
-              }
+              final savedMem = SavedMemEntityV1.fromEntityV2(memEntityV2);
 
-              ref.read(memEntitiesProvider.notifier).upsert(
-                    [SavedMemEntityV1.fromEntityV2(memEntityV2)],
-                  );
+              ref.read(memEntitiesProvider.notifier).upsert([savedMem]);
+
+              ref
+                  .read(editingMemByMemIdProvider(memId).notifier)
+                  .updatedBy(savedMem);
 
               ref.read(memItemsProvider.notifier).upsertAll(
                     savedMemItems,

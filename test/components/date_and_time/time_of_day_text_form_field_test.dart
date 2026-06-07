@@ -63,6 +63,48 @@ void main() {
         );
       },
     );
+
+    testWidgets(
+      ': updates display when timeOfDay changes',
+      (widgetTester) async {
+        await pumpTimeOfDayTextFormField(
+          widgetTester,
+          const TimeOfDay(hour: 10, minute: 0),
+          null,
+        );
+
+        final context =
+            widgetTester.element(find.byType(TimeOfDayTextFormField));
+
+        await widgetTester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            onGenerateTitle: (context) => buildL10n(context).test,
+            home: Scaffold(
+              body: TimeOfDayTextFormField(
+                timeOfDay: const TimeOfDay(hour: 13, minute: 30),
+                onChanged: (_) {},
+              ),
+            ),
+          ),
+        );
+        await widgetTester.pump();
+        await widgetTester.pump();
+
+        final editableText = widgetTester.widget<EditableText>(
+          find.descendant(
+            of: find.byType(TimeOfDayTextFormField),
+            matching: find.byType(EditableText),
+          ),
+        );
+
+        expect(
+          editableText.controller.text,
+          const TimeOfDay(hour: 13, minute: 30).format(context),
+        );
+      },
+    );
   });
 
   group('Pick', () {

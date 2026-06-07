@@ -18,16 +18,35 @@ import 'package:mem/features/mems/states.dart';
 
 part 'states.g.dart';
 
+void listenMemInitialLoad(
+  Ref ref,
+  int? memId,
+  ValueStateNotifier<MemEntityV1> notifier,
+) {
+  ref.listen<MemEntity?>(
+    memByMemIdProvider(memId),
+    (prev, next) {
+      if (prev == null && next != null) {
+        notifier.updatedBy(SavedMemEntityV1.fromEntityV2(next));
+      }
+    },
+  );
+}
+
 final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<MemEntityV1>, MemEntityV1, int?>(
   (ref, memId) => v(
     () {
-      final mem = ref.watch(memByMemIdProvider(memId));
-      return ValueStateNotifier(
+      final mem = ref.read(memByMemIdProvider(memId));
+      final notifier = ValueStateNotifier(
         mem == null
             ? MemEntityV1(Mem(null, "", null, null))
             : SavedMemEntityV1.fromEntityV2(mem),
       );
+
+      listenMemInitialLoad(ref, memId, notifier);
+
+      return notifier;
     },
     {"memId": memId},
   ),

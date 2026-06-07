@@ -9,21 +9,61 @@ import 'package:mem/features/mems/mem.dart';
 import 'package:mem/framework/repository/database_tuple_entity.dart';
 import 'package:mem/framework/repository/entity.dart';
 
+DateAndTimePeriod? _periodFromDb({
+  DateTime? notifyOn,
+  DateTime? notifyAt,
+  DateTime? endOn,
+  DateTime? endAt,
+}) {
+  if (notifyOn == null && endOn == null) {
+    return null;
+  }
+  return DateAndTimePeriod(
+    start: notifyOn == null
+        ? null
+        : DateAndTime.from(
+            notifyOn,
+            timeOfDay: notifyAt,
+          ),
+    end: endOn == null
+        ? null
+        : DateAndTime.from(
+            endOn,
+            timeOfDay: endAt,
+          ),
+  );
+}
+
+({
+  DateTime? notifyOn,
+  DateTime? notifyAt,
+  DateTime? endOn,
+  DateTime? endAt,
+}) _periodToDb(DateAndTimePeriod? period) =>
+    (
+      notifyOn: period?.start,
+      notifyAt: period?.start?.isAllDay == true ? null : period?.start,
+      endOn: period?.end,
+      endAt: period?.end?.isAllDay == true ? null : period?.end,
+    );
+
 class MemEntityV1 with EntityV1<Mem> {
   MemEntityV1(Mem value) {
     this.value = value;
   }
 
   @override
-  Map<String, Object?> get toMap => {
-        'name': value.name,
-        'doneAt': value.doneAt,
-        'notifyOn': value.period?.start,
-        'notifyAt':
-            value.period?.start?.isAllDay == true ? null : value.period?.start,
-        'endOn': value.period?.end,
-        'endAt': value.period?.end?.isAllDay == true ? null : value.period?.end,
-      };
+  Map<String, Object?> get toMap {
+    final periodDb = _periodToDb(value.period);
+    return {
+      'name': value.name,
+      'doneAt': value.doneAt,
+      'notifyOn': periodDb.notifyOn,
+      'notifyAt': periodDb.notifyAt,
+      'endOn': periodDb.endOn,
+      'endAt': periodDb.endAt,
+    };
+  }
 
   @override
   MemEntityV1 updatedWith(Mem Function(Mem mem) update) =>
@@ -52,53 +92,29 @@ class SavedMemEntityV1 extends MemEntityV1
         map['id'],
         map['name'],
         map['doneAt'],
-        map['notifyOn'] == null && map['endOn'] == null
-            ? null
-            : DateAndTimePeriod(
-                start: map['notifyOn'] == null
-                    ? null
-                    : DateAndTime.from(
-                        map['notifyOn'],
-                        timeOfDay: map['notifyAt'],
-                      ),
-                end: map['endOn'] == null
-                    ? null
-                    : DateAndTime.from(
-                        map['endOn'],
-                        timeOfDay: map['endAt'],
-                      ),
-              ),
+        _periodFromDb(
+          notifyOn: map['notifyOn'],
+          notifyAt: map['notifyAt'],
+          endOn: map['endOn'],
+          endAt: map['endAt'],
+        ),
       );
 
   static Mem _memFromRow(dynamic row) => Mem(
         row.id,
         row.name,
         row.doneAt,
-        row.notifyOn == null && row.endOn == null
-            ? null
-            : DateAndTimePeriod(
-                start: row.notifyOn == null
-                    ? null
-                    : DateAndTime.from(
-                        row.notifyOn,
-                        timeOfDay: row.notifyAt == null
-                            ? null
-                            : DateAndTime.from(row.notifyAt),
-                      ),
-                end: row.endOn == null
-                    ? null
-                    : DateAndTime.from(
-                        row.endOn,
-                        timeOfDay: row.endAt == null
-                            ? null
-                            : DateAndTime.from(row.endAt),
-                      ),
-              ),
+        _periodFromDb(
+          notifyOn: row.notifyOn,
+          notifyAt: row.notifyAt,
+          endOn: row.endOn,
+          endAt: row.endAt,
+        ),
       );
 
   @override
   SavedMemEntityV1 updatedWith(Mem Function(Mem mem) update) =>
-      SavedMemEntityV1.fromRow(
+      SavedMemEntityV1(
         _savedRowFrom(this, update(value)),
         latestAct: latestAct,
       );
@@ -127,20 +143,21 @@ class SavedMemEntityV1 extends MemEntityV1
 Map<String, Object?> _savedRowFrom(
   SavedMemEntityV1 saved,
   Mem value,
-) =>
-    {
-      'id': saved.id,
-      'name': value.name,
-      'doneAt': value.doneAt,
-      'notifyOn': value.period?.start,
-      'notifyAt':
-          value.period?.start?.isAllDay == true ? null : value.period?.start,
-      'endOn': value.period?.end,
-      'endAt': value.period?.end?.isAllDay == true ? null : value.period?.end,
-      'createdAt': saved.createdAt,
-      'updatedAt': saved.updatedAt,
-      'archivedAt': saved.archivedAt,
-    };
+) {
+  final periodDb = _periodToDb(value.period);
+  return {
+    'id': saved.id,
+    'name': value.name,
+    'doneAt': value.doneAt,
+    'notifyOn': periodDb.notifyOn,
+    'notifyAt': periodDb.notifyAt,
+    'endOn': periodDb.endOn,
+    'endAt': periodDb.endAt,
+    'createdAt': saved.createdAt,
+    'updatedAt': saved.updatedAt,
+    'archivedAt': saved.archivedAt,
+  };
+}
 
 class MemEntity implements Entity<int> {
   final String name;
@@ -235,26 +252,12 @@ class MemEntity implements Entity<int> {
       row.id,
       row.name,
       row.doneAt,
-      row.notifyOn == null && row.endOn == null
-          ? null
-          : DateAndTimePeriod(
-              start: row.notifyOn == null
-                  ? null
-                  : DateAndTime.from(
-                      row.notifyOn,
-                      timeOfDay: row.notifyAt == null
-                          ? null
-                          : DateAndTime.from(row.notifyAt),
-                    ),
-              end: row.endOn == null
-                  ? null
-                  : DateAndTime.from(
-                      row.endOn,
-                      timeOfDay: row.endAt == null
-                          ? null
-                          : DateAndTime.from(row.endAt),
-                    ),
-            ),
+      _periodFromDb(
+        notifyOn: row.notifyOn,
+        notifyAt: row.notifyAt,
+        endOn: row.endOn,
+        endAt: row.endAt,
+      ),
       memItems,
       row.createdAt,
       row.updatedAt,
@@ -274,12 +277,14 @@ class _MemEntityRow {
   int get id => entity.id;
   String get name => entity.name;
   DateTime? get doneAt => entity.doneAt;
-  DateTime? get notifyOn => entity.period?.start;
-  DateTime? get notifyAt =>
-      entity.period?.start?.isAllDay == true ? null : entity.period?.start;
-  DateTime? get endOn => entity.period?.end;
-  DateTime? get endAt =>
-      entity.period?.end?.isAllDay == true ? null : entity.period?.end;
+
+  ({DateTime? notifyOn, DateTime? notifyAt, DateTime? endOn, DateTime? endAt})
+      get _periodDb => _periodToDb(entity.period);
+
+  DateTime? get notifyOn => _periodDb.notifyOn;
+  DateTime? get notifyAt => _periodDb.notifyAt;
+  DateTime? get endOn => _periodDb.endOn;
+  DateTime? get endAt => _periodDb.endAt;
   DateTime get createdAt => entity.createdAt;
   DateTime? get updatedAt => entity.updatedAt;
   DateTime? get archivedAt => entity.archivedAt;

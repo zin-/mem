@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/framework/view/synced_text_editing_controller.dart';
 
 class TimeOfDayText extends StatelessWidget {
   final TimeOfDay _timeOfDay;
@@ -18,7 +19,7 @@ class TimeOfDayText extends StatelessWidget {
       );
 }
 
-class TimeOfDayTextFormField extends StatelessWidget {
+class TimeOfDayTextFormField extends StatefulWidget {
   final TimeOfDay? timeOfDay;
   final Function(TimeOfDay? pickedTimeOfDay) onChanged;
   final Widget? icon;
@@ -31,23 +32,64 @@ class TimeOfDayTextFormField extends StatelessWidget {
   });
 
   @override
+  State<TimeOfDayTextFormField> createState() => _TimeOfDayTextFormFieldState();
+}
+
+class _TimeOfDayTextFormFieldState extends State<TimeOfDayTextFormField> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _syncControllerText();
+  }
+
+  @override
+  void didUpdateWidget(covariant TimeOfDayTextFormField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.timeOfDay != widget.timeOfDay) {
+      _syncControllerText(postFrame: true);
+    }
+  }
+
+  void _syncControllerText({bool postFrame = false}) {
+    syncTextEditingController(
+      controller: _controller,
+      mounted: mounted,
+      postFrame: postFrame,
+      buildText: () => widget.timeOfDay?.format(context) ?? '',
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) => v(
         () {
           return TextFormField(
-            controller: TextEditingController(
-              text: timeOfDay?.format(context) ?? '',
-            ),
+            controller: _controller,
             decoration: InputDecoration(
-              icon: icon,
+              icon: widget.icon,
               suffixIcon: IconButton(
                 onPressed: () => v(
                   () async {
                     final pickedTimeOfDay = await showTimePicker(
                       context: context,
-                      initialTime: timeOfDay ?? TimeOfDay.now(),
+                      initialTime: widget.timeOfDay ?? TimeOfDay.now(),
                     );
 
-                    if (pickedTimeOfDay != null) onChanged(pickedTimeOfDay);
+                    if (!mounted) return;
+                    if (pickedTimeOfDay != null) widget.onChanged(pickedTimeOfDay);
                   },
                 ),
                 icon: const Icon(Icons.access_time_outlined),
