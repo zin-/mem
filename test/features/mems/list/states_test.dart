@@ -6,7 +6,6 @@ import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/list/states.dart';
-import 'package:mem/features/mems/list/widget.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mems_state.dart';
@@ -194,29 +193,27 @@ void main() {
           ),
         ];
 
-    test('matches mem list display before start of day', () {
+    test('before start of day returns previous calendar day at startOfDay', () {
       expect(
         DateTimeExt.startOfToday(startOfDay, now),
-        memListDisplayStartOfToday(startOfDay, now),
+        DateTime(2024, 10, 11, 9, 0),
       );
     });
 
     test('repeat at 8:00 section date uses same startOfToday as sort', () {
       final sortStartOfToday = DateTimeExt.startOfToday(startOfDay, now);
-      final displayStartOfToday = memListDisplayStartOfToday(startOfDay, now);
       final mem = Mem(1, 'Daily repeat', null, null);
       final notifications = repeatAtHourNotifications(1, 8);
 
       expect(
-        mem.memListSectionDate(displayStartOfToday, notifications),
         mem.memListSectionDate(sortStartOfToday, notifications),
+        DateAndTime(2024, 10, 11),
       );
     });
 
     test('memListProvider notifyAt order uses same startOfToday as section date',
         () {
       final sortStartOfToday = DateTimeExt.startOfToday(startOfDay, now);
-      final displayStartOfToday = memListDisplayStartOfToday(startOfDay, now);
       final mem = savedMem(
         id: 1,
         name: 'Daily repeat',
@@ -240,8 +237,8 @@ void main() {
       final notificationsForMem = [notification.value];
 
       expect(
-        sortedMem.memListSectionDate(displayStartOfToday, notificationsForMem),
         sortedMem.memListSectionDate(sortStartOfToday, notificationsForMem),
+        DateAndTime(2024, 10, 11),
       );
       expect(
         sortedMem.notifyAt(sortStartOfToday, notificationsForMem, null),

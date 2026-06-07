@@ -6,6 +6,7 @@ import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/framework/date_and_time/date_and_time_view.dart';
+import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/framework/nullable.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -16,17 +17,6 @@ import 'package:mem/features/settings/states.dart';
 
 import 'app_bar.dart';
 import 'item/view.dart';
-
-DateTime memListDisplayStartOfToday(TimeOfDay startOfDay, DateTime now) =>
-    DateTime(
-      now.year,
-      now.month,
-      now.day,
-      startOfDay.hour,
-      startOfDay.minute,
-    ).subtract(Duration(
-      days: startOfDay.isBefore(TimeOfDay.fromDateTime(now)) ? 0 : 1,
-    ));
 
 class MemListWidget extends ConsumerWidget {
   final ScrollController _scrollController;
@@ -60,8 +50,7 @@ class _MemListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) => v(
         () {
-          final startOfToday =
-              memListDisplayStartOfToday(_startOfDay, DateTime.now());
+          final startOfToday = DateTimeExt.startOfToday(_startOfDay);
           final l10n = buildL10n(context);
 
           final hasActMemList = _memList.groupListsBy(
