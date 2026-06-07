@@ -22,7 +22,7 @@ class _FakePreference extends Preference<TimeOfDay> {
 
   @override
   TimeOfDay build(PreferenceKey<TimeOfDay> key) =>
-      const TimeOfDay(hour: 9, minute: 0);
+      const TimeOfDay(hour: 6, minute: 0);
 }
 
 MemEntity _memEntity(int id, String name) {
