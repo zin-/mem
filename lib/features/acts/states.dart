@@ -158,8 +158,7 @@ class ActEntities extends _$ActEntities
 
   Future<Iterable<SavedActEntityV1>> removeAsync(Iterable<int> ids) => v(
         () async {
-          final memIds = ref
-              .read(actEntitiesProvider)
+          final memIds = state
               .where((e) => ids.contains(e.id))
               .map((e) => e.value.memId)
               .whereType<int>()
