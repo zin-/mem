@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/framework/view/synced_text_editing_controller.dart';
 
 class TimeOfDayText extends StatelessWidget {
   final TimeOfDay _timeOfDay;
@@ -58,21 +59,12 @@ class _TimeOfDayTextFormFieldState extends State<TimeOfDayTextFormField> {
   }
 
   void _syncControllerText({bool postFrame = false}) {
-    if (!mounted) return;
-
-    void apply() {
-      if (!mounted) return;
-      final text = widget.timeOfDay?.format(context) ?? '';
-      if (_controller.text != text) {
-        _controller.text = text;
-      }
-    }
-
-    if (postFrame) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => apply());
-    } else {
-      apply();
-    }
+    syncTextEditingController(
+      controller: _controller,
+      mounted: mounted,
+      postFrame: postFrame,
+      buildText: () => widget.timeOfDay?.format(context) ?? '',
+    );
   }
 
   @override

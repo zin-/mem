@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/framework/view/synced_text_editing_controller.dart';
 
 final DateFormat _dateFormat = DateFormat.yMd();
+
+const _datePickerMaxDuration = Duration(days: 1000000000000000000);
 
 String Function(DateTime dateTime) _buildFormatFunction(
   BuildContext context,
@@ -41,8 +44,6 @@ class DateTextFormField extends StatefulWidget {
   final DateTime? _firstDate;
   final DateTime? _lastDate;
 
-  final maxDuration = const Duration(days: 1000000000000000000);
-
   const DateTextFormField(
     this.date,
     this.onChanged, {
@@ -80,23 +81,14 @@ class _DateTextFormFieldState extends State<DateTextFormField> {
   }
 
   void _syncControllerText({bool postFrame = false}) {
-    if (!mounted) return;
-
-    void apply() {
-      if (!mounted) return;
-      final text = widget.date == null
+    syncTextEditingController(
+      controller: _controller,
+      mounted: mounted,
+      postFrame: postFrame,
+      buildText: () => widget.date == null
           ? ''
-          : _buildFormatFunction(context, true)(widget.date!);
-      if (_controller.text != text) {
-        _controller.text = text;
-      }
-    }
-
-    if (postFrame) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => apply());
-    } else {
-      apply();
-    }
+          : _buildFormatFunction(context, true)(widget.date!),
+    );
   }
 
   @override
@@ -127,9 +119,9 @@ class _DateTextFormFieldState extends State<DateTextFormField> {
                       context: context,
                       initialDate: initialDate,
                       firstDate: widget._firstDate ??
-                          initialDate.subtract(widget.maxDuration),
-                      lastDate:
-                          widget._lastDate ?? initialDate.add(widget.maxDuration),
+                          initialDate.subtract(_datePickerMaxDuration),
+                      lastDate: widget._lastDate ??
+                          initialDate.add(_datePickerMaxDuration),
                     );
 
                     if (!context.mounted) return;
