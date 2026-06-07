@@ -1,60 +1,14 @@
-import 'package:flutter/material.dart';
 import '../../../entity_factories.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'helpers.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
-import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
-import 'package:mem/features/mems/mems_state.dart';
-import 'package:mem/features/mems/states.dart';
-import 'package:mem/features/settings/preference/keys.dart';
-import 'package:mem/features/settings/preference/preference_key.dart';
-import 'package:mem/features/settings/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_time_ext.dart';
-import 'package:mem/framework/view/list_value_state_notifier.dart';
-
-class _FakeMemEntities extends MemEntities {
-  final Iterable<SavedMemEntityV1> _state;
-
-  _FakeMemEntities(this._state);
-
-  @override
-  Iterable<SavedMemEntityV1> build() => _state;
-}
-
-class _FakePreference extends Preference<TimeOfDay> {
-  _FakePreference();
-
-  @override
-  TimeOfDay build(PreferenceKey<TimeOfDay> key) =>
-      const TimeOfDay(hour: 9, minute: 0);
-}
-
-ProviderContainer _memListContainer(
-  Iterable<SavedMemEntityV1> mems, {
-  Iterable<SavedMemNotificationEntityV1> notifications = const [],
-}) {
-  return ProviderContainer(
-    overrides: [
-      preferenceProvider(startOfDayKey).overrideWith(() => _FakePreference()),
-      memEntitiesProvider.overrideWith(() => _FakeMemEntities(mems)),
-      memNotificationsProvider.overrideWith(
-        (ref) => ListValueStateNotifier<MemNotificationEntityV1>(
-          notifications.toList(),
-        ),
-      ),
-      savedMemNotificationsProvider.overrideWith(
-        (ref) => ListValueStateNotifier<SavedMemNotificationEntityV1>(
-          notifications.toList(),
-        ),
-      ),
-    ],
-  );
-}
 
 void main() {
   group('memListProvider', () {
@@ -74,13 +28,10 @@ void main() {
         latestAct: PausedAct(2, DateTime(2024, 6, 1, 12, 0)),
       );
 
-      final container = _memListContainer([olderPaused, newerPaused]);
+      final container = memListTestContainer([olderPaused, newerPaused]);
       addTearDown(container.dispose);
 
-      final sortedIds =
-          container.read(memListProvider).map((mem) => mem.id).toList();
-
-      expect(sortedIds, [2, 1]);
+      expect(sortedMemIds(container), [2, 1]);
     });
 
     test('keeps ActiveAct mem above PausedAct mem', () {
@@ -99,13 +50,10 @@ void main() {
         latestAct: PausedAct(2, DateTime(2024, 6, 1, 12, 0)),
       );
 
-      final container = _memListContainer([paused, active]);
+      final container = memListTestContainer([paused, active]);
       addTearDown(container.dispose);
 
-      final sortedIds =
-          container.read(memListProvider).map((mem) => mem.id).toList();
-
-      expect(sortedIds, [1, 2]);
+      expect(sortedMemIds(container), [1, 2]);
     });
   });
 
@@ -230,7 +178,7 @@ void main() {
         updatedAt: DateTime(2024, 10, 1),
       );
 
-      final container = _memListContainer([mem], notifications: [notification]);
+      final container = memListTestContainer([mem], notifications: [notification]);
       addTearDown(container.dispose);
 
       final sortedMem = container.read(memListProvider).single.toDomain();

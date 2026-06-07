@@ -87,6 +87,74 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
   },
 );
 
+int compareMemListEntries(
+  MemEntity a,
+  MemEntity b, {
+  required DateTime startOfToday,
+  required Iterable<SavedMemNotificationEntityV1> savedMemNotifications,
+}) {
+  final latestActOfA = a.latestAct;
+  final latestActOfB = b.latestAct;
+
+  final comparedActState = (latestActOfA?.state ?? ActState.finished)
+      .index
+      .compareTo((latestActOfB?.state ?? ActState.finished).index);
+  if (comparedActState != 0) {
+    return comparedActState;
+  } else if (latestActOfA is ActiveAct && latestActOfB is ActiveAct) {
+    return latestActOfB.period!.start!
+        .compareTo(latestActOfA.period!.start!);
+  } else if (latestActOfA is PausedAct && latestActOfB is PausedAct) {
+    return latestActOfB.pausedAt!.compareTo(latestActOfA.pausedAt!);
+  }
+
+  if ((a.archivedAt != null) != (b.archivedAt != null)) {
+    return a.archivedAt != null ? 1 : -1;
+  }
+
+  if ((a.doneAt != null) != (b.doneAt != null)) {
+    return a.doneAt != null ? 1 : -1;
+  }
+
+  final memNotificationsOfA =
+      savedMemNotifications.where((e) => e.value.memId == a.id);
+  final memNotificationsOfB =
+      savedMemNotifications.where((e) => e.value.memId == b.id);
+
+  final timeOfThis = a.toDomain().notifyAt(
+        startOfToday,
+        memNotificationsOfA.map((e) => e.value),
+        latestActOfA,
+      );
+  final timeOfOther = b.toDomain().notifyAt(
+        startOfToday,
+        memNotificationsOfB.map((e) => e.value),
+        latestActOfB,
+      );
+
+  if (timeOfThis != null || timeOfOther != null) {
+    if (timeOfThis == null) {
+      return 1;
+    } else if (timeOfOther == null) {
+      return -1;
+    } else {
+      return timeOfThis.compareTo(timeOfOther);
+    }
+  }
+
+  final thisHasAfterActStarted = memNotificationsOfA
+      .where((e) => e.value.isAfterActStarted())
+      .isNotEmpty;
+  final otherHasAfterActStarted = memNotificationsOfB
+      .where((e) => e.value.isAfterActStarted())
+      .isNotEmpty;
+  if (thisHasAfterActStarted != otherHasAfterActStarted) {
+    return thisHasAfterActStarted ? -1 : 1;
+  }
+
+  return a.id.compareTo(b.id);
+}
+
 final memListProvider = StateNotifierProvider.autoDispose<
     ValueStateNotifier<List<MemEntity>>, List<MemEntity>>((ref) {
   final filtered = ref.watch(_filteredMemsProvider);
@@ -98,68 +166,16 @@ final memListProvider = StateNotifierProvider.autoDispose<
 
   return ValueStateNotifier(
     v(
-      () => filtered.sorted((a, b) {
-        final latestActOfA = a.latestAct;
-        final latestActOfB = b.latestAct;
-
-        final comparedActState = (latestActOfA?.state ?? ActState.finished)
-            .index
-            .compareTo((latestActOfB?.state ?? ActState.finished).index);
-        if (comparedActState != 0) {
-          return comparedActState;
-        } else if (latestActOfA is ActiveAct && latestActOfB is ActiveAct) {
-          return latestActOfB.period!.start!
-              .compareTo(latestActOfA.period!.start!);
-        } else if (latestActOfA is PausedAct && latestActOfB is PausedAct) {
-          return latestActOfB.pausedAt!.compareTo(latestActOfA.pausedAt!);
-        }
-
-        if ((a.archivedAt != null) != (b.archivedAt != null)) {
-          return a.archivedAt != null ? 1 : -1;
-        }
-
-        if ((a.doneAt != null) != (b.doneAt != null)) {
-          return a.doneAt != null ? 1 : -1;
-        }
-
-        final memNotificationsOfA =
-            savedMemNotifications.where((e) => e.value.memId == a.id);
-        final memNotificationsOfB =
-            savedMemNotifications.where((e) => e.value.memId == b.id);
-
-        final timeOfThis = a.toDomain().notifyAt(
-              startOfToday,
-              memNotificationsOfA.map((e) => e.value),
-              latestActOfA,
-            );
-        final timeOfOther = b.toDomain().notifyAt(
-              startOfToday,
-              memNotificationsOfB.map((e) => e.value),
-              latestActOfB,
-            );
-
-        if (timeOfThis != null || timeOfOther != null) {
-          if (timeOfThis == null) {
-            return 1;
-          } else if (timeOfOther == null) {
-            return -1;
-          } else {
-            return timeOfThis.compareTo(timeOfOther);
-          }
-        }
-
-        final thisHasAfterActStarted = memNotificationsOfA
-            .where((e) => e.value.isAfterActStarted())
-            .isNotEmpty;
-        final otherHasAfterActStarted = memNotificationsOfB
-            .where((e) => e.value.isAfterActStarted())
-            .isNotEmpty;
-        if (thisHasAfterActStarted != otherHasAfterActStarted) {
-          return thisHasAfterActStarted ? -1 : 1;
-        }
-
-        return a.id.compareTo(b.id);
-      }).toList(),
+      () => filtered
+          .sorted(
+            (a, b) => compareMemListEntries(
+              a,
+              b,
+              startOfToday: startOfToday,
+              savedMemNotifications: savedMemNotifications,
+            ),
+          )
+          .toList(),
       {
         'filtered': filtered,
         'savedMemNotifications': savedMemNotifications,
