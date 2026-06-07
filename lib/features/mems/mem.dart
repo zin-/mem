@@ -41,6 +41,11 @@ class Mem {
   Mem withPeriod(DateAndTimePeriod? period) => Mem(id, name, doneAt, period,
       latestAct: latestAct, scheduleAnchorAct: scheduleAnchorAct);
 
+  Act? get resolvedScheduleAnchor => scheduleAnchorForNotifications(
+        latestAct: latestAct,
+        scheduleAnchorAct: scheduleAnchorAct,
+      );
+
   DateTime? notifyAt(
     DateTime startOfToday,
     Iterable<MemNotification>? memNotifications,
@@ -65,10 +70,7 @@ class Mem {
               : MemNotification.nextNotifyAt(
                   memNotifications!,
                   startOfToday,
-                  scheduleAnchorForNotifications(
-                    latestAct: latestAct,
-                    scheduleAnchorAct: scheduleAnchorAct,
-                  ),
+                  resolvedScheduleAnchor,
                 ),
         ),
         {

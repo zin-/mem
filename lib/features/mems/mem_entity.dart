@@ -91,6 +91,11 @@ class SavedMemEntityV1 extends MemEntityV1
     withBaseColumns(row);
   }
 
+  Act? get resolvedScheduleAnchor => scheduleAnchorForNotifications(
+        latestAct: latestAct,
+        scheduleAnchorAct: scheduleAnchorAct,
+      );
+
   static Mem _memFromMap(Map<String, dynamic> map) => Mem(
         map['id'],
         map['name'],
@@ -204,6 +209,11 @@ class MemEntity implements Entity<int> {
         name,
         doneAt,
         period,
+        latestAct: latestAct,
+        scheduleAnchorAct: scheduleAnchorAct,
+      );
+
+  Act? get resolvedScheduleAnchor => scheduleAnchorForNotifications(
         latestAct: latestAct,
         scheduleAnchorAct: scheduleAnchorAct,
       );

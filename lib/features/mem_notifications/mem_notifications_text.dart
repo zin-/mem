@@ -28,13 +28,9 @@ class MemNotificationText extends ConsumerWidget {
           ref.watch(preferenceProvider(startOfDayKey)),
           ref.watch(
             memEntitiesProvider.select(
-              (mems) {
-                final mem = mems.singleWhereOrNull((e) => e.id == _memId);
-                return scheduleAnchorForNotifications(
-                  latestAct: mem?.latestAct,
-                  scheduleAnchorAct: mem?.scheduleAnchorAct,
-                );
-              },
+              (mems) => mems
+                  .singleWhereOrNull((e) => e.id == _memId)
+                  ?.resolvedScheduleAnchor,
             ),
           ),
         ),

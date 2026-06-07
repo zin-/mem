@@ -38,11 +38,7 @@ class MemNotifications {
                       memNotifications,
                       startOfDay,
                       latestAct,
-                      scheduleAnchor ??
-                          scheduleAnchorForNotifications(
-                            latestAct: latestAct,
-                            scheduleAnchorAct: mem.scheduleAnchorAct,
-                          ),
+                      scheduleAnchor ?? mem.resolvedScheduleAnchor,
                       now,
                     ) ??
                     now,
