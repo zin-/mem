@@ -146,20 +146,14 @@ class ActQueryService {
   }) =>
       v(
         () async {
-          if (latestAct?.isSkipped != true) {
-            return scheduleAnchorForNotifications(
-              latestAct: latestAct,
-              scheduleAnchorAct: scheduleAnchorAct,
-            );
+          var anchor = scheduleAnchorAct;
+          if (latestAct?.isSkipped == true && anchor == null) {
+            anchor =
+                await fetchScheduleAnchorByMemIds(memId).then((v) => v?.toDomain());
           }
-
-          final resolvedScheduleAnchorAct = scheduleAnchorAct ??
-              await fetchScheduleAnchorByMemIds(memId)
-                  .then((v) => v?.toDomain());
-
           return scheduleAnchorForNotifications(
             latestAct: latestAct,
-            scheduleAnchorAct: resolvedScheduleAnchorAct,
+            scheduleAnchorAct: anchor,
           );
         },
         {

@@ -15,33 +15,6 @@ import 'package:mem/features/settings/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 
-DateAndTime? memListSectionDate({
-  required MemEntity mem,
-  required DateTime startOfToday,
-  required Iterable<MemNotification> notifications,
-}) {
-  final nextNotifyAt = mem.toDomain().notifyAt(
-    startOfToday,
-    notifications,
-    mem.latestAct,
-  );
-  if (nextNotifyAt == null) return null;
-  if (notifications.where((e) => !e.isAfterActStarted()).isNotEmpty &&
-      TimeOfDay.fromDateTime(nextNotifyAt)
-          .isBefore(TimeOfDay.fromDateTime(startOfToday))) {
-    return DateAndTime(
-      nextNotifyAt.year,
-      nextNotifyAt.month,
-      nextNotifyAt.day,
-    ).subtract(const Duration(days: 1));
-  }
-  return DateAndTime(
-    nextNotifyAt.year,
-    nextNotifyAt.month,
-    nextNotifyAt.day,
-  );
-}
-
 class _FakeMemEntities extends MemEntities {
   final Iterable<SavedMemEntityV1> _state;
 
@@ -170,11 +143,9 @@ void main() {
         ),
       ];
 
-      final sectionDate = memListSectionDate(
-        mem: memWithSkipped(id: 1, scheduleAnchorAct: anchor),
-        startOfToday: startOfToday,
-        notifications: notifications,
-      );
+      final sectionDate = memWithSkipped(id: 1, scheduleAnchorAct: anchor)
+          .toDomain()
+          .memListSectionDate(startOfToday, notifications);
 
       expect(sectionDate, isNot(DateAndTime(2024, 10, 12)));
       expect(sectionDate, DateAndTime(2024, 10, 19));
@@ -190,11 +161,9 @@ void main() {
         ),
       ];
 
-      final sectionDate = memListSectionDate(
-        mem: memWithSkipped(id: 1),
-        startOfToday: startOfToday,
-        notifications: notifications,
-      );
+      final sectionDate = memWithSkipped(id: 1)
+          .toDomain()
+          .memListSectionDate(startOfToday, notifications);
 
       expect(sectionDate, isNot(DateAndTime(2024, 10, 12)));
       expect(sectionDate, DateAndTime(2024, 10, 14));

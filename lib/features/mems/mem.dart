@@ -1,5 +1,7 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mem/features/acts/act.dart';
+import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
@@ -45,6 +47,36 @@ class Mem {
         latestAct: latestAct,
         scheduleAnchorAct: scheduleAnchorAct,
       );
+
+  DateAndTime? memListSectionDate(
+    DateTime startOfToday,
+    Iterable<MemNotification>? memNotifications,
+  ) {
+    final nextNotifyAt = notifyAt(
+      startOfToday,
+      memNotifications,
+      latestAct,
+    );
+    if (nextNotifyAt == null) return null;
+    final scheduledNotifications = memNotifications?.where(
+      (e) => !e.isAfterActStarted(),
+    );
+    if (scheduledNotifications != null &&
+        scheduledNotifications.isNotEmpty &&
+        TimeOfDay.fromDateTime(nextNotifyAt)
+            .isBefore(TimeOfDay.fromDateTime(startOfToday))) {
+      return DateAndTime(
+        nextNotifyAt.year,
+        nextNotifyAt.month,
+        nextNotifyAt.day,
+      ).subtract(const Duration(days: 1));
+    }
+    return DateAndTime(
+      nextNotifyAt.year,
+      nextNotifyAt.month,
+      nextNotifyAt.day,
+    );
+  }
 
   DateTime? notifyAt(
     DateTime startOfToday,
@@ -110,13 +142,9 @@ class Mem {
     }
 
     var result = notifyAt;
-    MemNotification? repeatByNDay;
-    for (final notification in scheduledNotifications) {
-      if (notification.isRepeatByNDay()) {
-        repeatByNDay = notification;
-        break;
-      }
-    }
+    final repeatByNDay = scheduledNotifications
+        .where((e) => e.isRepeatByNDay())
+        .firstOrNull;
     if (repeatByNDay != null) {
       final nDays = repeatByNDay.time ?? 1;
       while (_dateOnly(result).compareTo(skipDay) <= 0) {
@@ -144,12 +172,9 @@ class Mem {
       return result;
     }
 
-    for (final notification in scheduledNotifications) {
-      if (notification.isRepeated()) {
-        while (_dateOnly(result).compareTo(skipDay) <= 0) {
-          result = result.add(const Duration(days: 1));
-        }
-        return result;
+    if (scheduledNotifications.any((e) => e.isRepeated())) {
+      while (_dateOnly(result).compareTo(skipDay) <= 0) {
+        result = result.add(const Duration(days: 1));
       }
     }
 
@@ -162,18 +187,9 @@ class Mem {
   ) =>
       v(
         () {
-          if (a != null || b != null) {
-            if (a == null) {
-              return b;
-            } else if (b == null) {
-              return a;
-            } else if (a.compareTo(b) > 0) {
-              return a;
-            } else {
-              return b;
-            }
-          }
-          return null;
+          if (a == null) return b;
+          if (b == null) return a;
+          return a.compareTo(b) > 0 ? a : b;
         },
         {
           'a': a,
