@@ -1,6 +1,8 @@
 import 'package:collection/collection.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
+import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
+import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/mems/mem_client.dart';
 import 'package:mem/features/mems/mem_entity.dart';
@@ -43,6 +45,22 @@ class MemEntities extends _$MemEntities
           );
 
           upsert(mems);
+
+          if (mems.isNotEmpty) {
+            ref.read(memNotificationsProvider.notifier).upsertAll(
+                  await MemNotificationRepository()
+                      .ship(memIdsIn: mems.map((e) => e.id))
+                      .then(
+                        (v) => v.map(
+                          (e) => SavedMemNotificationEntityV1.fromEntityV2(e),
+                        ),
+                      ),
+                  (current, updating) =>
+                      current is SavedMemNotificationEntityV1 &&
+                      updating is SavedMemNotificationEntityV1 &&
+                      current.id == updating.id,
+                );
+          }
         },
       );
 

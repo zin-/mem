@@ -111,7 +111,7 @@ void main() {
       verify(mockMemNotificationRepository.ship(
         memId: anyNamed('memId'),
         memIdsIn: argThat(containsAll([1, 2]), named: 'memIdsIn'),
-      )).called(1);
+      )).called(2);
 
       final sortedIds =
           container.read(memListProvider).map((mem) => mem.id).toList();
