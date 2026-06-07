@@ -61,11 +61,18 @@ void main() {
     }
 
     Future<DateTime?> nextNotifyAtForLatest(int memId) async {
-      final latest = await query.fetchLatestByMemIds(memId);
+      final mem = (await MemRepository().ship(
+        id: memId,
+        loadLatestAct: true,
+      ))
+          .single;
       return MemNotification.nextNotifyAt(
         repeatByNDayNotifications,
         startOfToday,
-        latest?.toDomain(),
+        scheduleAnchorForNotifications(
+          latestAct: mem.latestAct,
+          scheduleAnchorAct: mem.scheduleAnchorAct,
+        ),
       );
     }
 
@@ -98,10 +105,18 @@ void main() {
       final latest = await query.fetchLatestByMemIds(memId);
       expect(latest?.actKind, ActKind.skipped);
 
+      final mem = (await MemRepository().ship(
+        id: memId,
+        loadLatestAct: true,
+      ))
+          .single;
       final nextNotify = MemNotification.nextNotifyAt(
         weeklyRepeatNotifications,
         startOfToday,
-        latest?.toDomain(),
+        scheduleAnchorForNotifications(
+          latestAct: mem.latestAct,
+          scheduleAnchorAct: mem.scheduleAnchorAct,
+        ),
       );
 
       expect(
@@ -110,7 +125,8 @@ void main() {
       );
     });
 
-    test('skip and finish at same time yield same nextNotifyAt', () async {
+    test('skip alone uses today while finish uses anchor for nextNotifyAt',
+        () async {
       final when = DateAndTime(2024, 10, 11, 12, 0);
       final skipMemId = await insertMem();
       final finishMemId = await insertMem();
@@ -118,12 +134,12 @@ void main() {
       await service.skip(skipMemId, when);
       await service.finish(finishMemId, when);
 
-      final skippedNotify = await nextNotifyAtForLatest(skipMemId);
-      final finishedNotify = await nextNotifyAtForLatest(finishMemId);
-
-      expect(skippedNotify, finishedNotify);
       expect(
-        skippedNotify,
+        await nextNotifyAtForLatest(skipMemId),
+        DateTime(startOfToday.year, startOfToday.month, startOfToday.day),
+      );
+      expect(
+        await nextNotifyAtForLatest(finishMemId),
         DateTime(startOfToday.year, startOfToday.month, startOfToday.day + 1),
       );
     });
@@ -155,7 +171,7 @@ void main() {
       );
     });
 
-    test('editing skipped act start updates schedule anchor', () async {
+    test('editing skipped act start does not change nextNotifyAt', () async {
       final memId = await insertMem();
       final day1 = DateAndTime(2024, 10, 10, 12, 0);
       final day2 = DateAndTime(2024, 10, 11, 12, 0);
@@ -179,7 +195,7 @@ void main() {
       expect(latest?.actKind, ActKind.skipped);
       expect(
         await nextNotifyAtForLatest(memId),
-        DateTime(2024, 10, 16),
+        DateTime(startOfToday.year, startOfToday.month, startOfToday.day),
       );
     });
 

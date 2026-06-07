@@ -130,7 +130,7 @@ void main() => group(_name, () {
           }
         });
 
-        group('skipped act anchors like finished', () {
+        group('skipped act is not schedule anchor', () {
           final startOfToday = DateTime(2024, 10, 12);
           final anchorStart = DateAndTime.from(startOfToday).subtract(
             const Duration(days: 1),
@@ -151,38 +151,31 @@ void main() => group(_name, () {
                 completionKind: ActKind.finished,
               );
 
-          void expectSameNextNotifyAt(
-            Iterable<MemNotification> notifications, {
-            DateTime? expected,
-          }) {
-            final skippedResult = MemNotification.nextNotifyAt(
-              notifications,
-              startOfToday,
-              skippedAct(),
-            );
-            final finishedResult = MemNotification.nextNotifyAt(
-              notifications,
-              startOfToday,
-              finishedAct(),
-            );
+          test('repeatByNDay ignores skipped act and uses startOfToday', () {
+            final notifications = [
+              MemNotification.by(
+                0,
+                MemNotificationType.repeatByNDay,
+                2,
+                'repeat by 2 day',
+              ),
+            ];
 
-            expect(skippedResult, finishedResult);
-            if (expected != null) {
-              expect(skippedResult, expected);
-            }
-          }
-
-          test('repeatByNDay', () {
-            expectSameNextNotifyAt(
-              [
-                MemNotification.by(
-                  0,
-                  MemNotificationType.repeatByNDay,
-                  2,
-                  'repeat by 2 day',
-                ),
-              ],
-              expected: DateTime(
+            expect(
+              MemNotification.nextNotifyAt(
+                notifications,
+                startOfToday,
+                skippedAct(),
+              ),
+              startOfToday,
+            );
+            expect(
+              MemNotification.nextNotifyAt(
+                notifications,
+                startOfToday,
+                finishedAct(),
+              ),
+              DateTime(
                 startOfToday.year,
                 startOfToday.month,
                 startOfToday.day + 1,
@@ -190,36 +183,62 @@ void main() => group(_name, () {
             );
           });
 
-          test('repeat at fixed time', () {
-            expectSameNextNotifyAt(
-              [
-                MemNotification.by(
-                  0,
-                  MemNotificationType.repeat,
-                  3600 + 120,
-                  'repeat at 01:02',
-                ),
-              ],
-              expected: DateTime(
-                startOfToday.year,
-                startOfToday.month,
-                startOfToday.day,
-                1,
-                2,
+          test('repeat at fixed time matches finished when act is skipped', () {
+            final notifications = [
+              MemNotification.by(
+                0,
+                MemNotificationType.repeat,
+                3600 + 120,
+                'repeat at 01:02',
               ),
+            ];
+            final expected = DateTime(
+              startOfToday.year,
+              startOfToday.month,
+              startOfToday.day,
+              1,
+              2,
+            );
+
+            expect(
+              MemNotification.nextNotifyAt(
+                notifications,
+                startOfToday,
+                skippedAct(),
+              ),
+              expected,
+            );
+            expect(
+              MemNotification.nextNotifyAt(
+                notifications,
+                startOfToday,
+                finishedAct(),
+              ),
+              expected,
             );
           });
 
-          test('repeatByDayOfWeek', () {
-            expectSameNextNotifyAt(
-              [
-                MemNotification.by(
-                  0,
-                  MemNotificationType.repeatByDayOfWeek,
-                  6,
-                  'repeat on Sat',
-                ),
-              ],
+          test('repeatByDayOfWeek matches finished when act is skipped', () {
+            final notifications = [
+              MemNotification.by(
+                0,
+                MemNotificationType.repeatByDayOfWeek,
+                6,
+                'repeat on Sat',
+              ),
+            ];
+
+            expect(
+              MemNotification.nextNotifyAt(
+                notifications,
+                startOfToday,
+                skippedAct(),
+              ),
+              MemNotification.nextNotifyAt(
+                notifications,
+                startOfToday,
+                finishedAct(),
+              ),
             );
           });
         });
