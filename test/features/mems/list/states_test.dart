@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
+import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
@@ -11,6 +12,169 @@ import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_time_ext.dart';
 
 void main() {
+  group('compareMemListEntries', () {
+    final startOfToday = DateTime(2024, 10, 12, 9, 0);
+    const emptyNotifications = <SavedMemNotificationEntityV1>[];
+
+    MemEntity finishedMem({
+      required int id,
+      DateTime? doneAt,
+      DateTime? archivedAt,
+    }) =>
+        savedMem(
+          id: id,
+          name: 'Mem $id',
+          createdAt: DateTime(2024, 6, 1),
+          updatedAt: DateTime(2024, 6, 1),
+          doneAt: doneAt,
+          archivedAt: archivedAt,
+        ).toEntityV2();
+
+    test('sorts two ActiveAct mems by start descending', () {
+      final earlier = savedMem(
+        id: 1,
+        name: 'Earlier',
+        createdAt: DateTime(2024, 6, 1),
+        updatedAt: DateTime(2024, 6, 1),
+        latestAct: ActiveAct(1, DateAndTime(2024, 6, 1, 8, 0)),
+      ).toEntityV2();
+      final later = savedMem(
+        id: 2,
+        name: 'Later',
+        createdAt: DateTime(2024, 6, 1),
+        updatedAt: DateTime(2024, 6, 1),
+        latestAct: ActiveAct(2, DateAndTime(2024, 6, 1, 10, 0)),
+      ).toEntityV2();
+
+      expect(
+        compareMemListEntries(
+          later,
+          earlier,
+          startOfToday: startOfToday,
+          savedMemNotifications: emptyNotifications,
+        ),
+        lessThan(0),
+      );
+    });
+
+    test('sorts archived mem after non-archived', () {
+      final archived = finishedMem(id: 1, archivedAt: DateTime(2024, 6, 1));
+      final normal = finishedMem(id: 2);
+
+      expect(
+        compareMemListEntries(
+          archived,
+          normal,
+          startOfToday: startOfToday,
+          savedMemNotifications: emptyNotifications,
+        ),
+        greaterThan(0),
+      );
+      expect(
+        compareMemListEntries(
+          normal,
+          archived,
+          startOfToday: startOfToday,
+          savedMemNotifications: emptyNotifications,
+        ),
+        lessThan(0),
+      );
+    });
+
+    test('sorts done mem after not-done', () {
+      final done = finishedMem(id: 1, doneAt: DateTime(2024, 6, 1));
+      final notDone = finishedMem(id: 2);
+
+      expect(
+        compareMemListEntries(
+          done,
+          notDone,
+          startOfToday: startOfToday,
+          savedMemNotifications: emptyNotifications,
+        ),
+        greaterThan(0),
+      );
+      expect(
+        compareMemListEntries(
+          notDone,
+          done,
+          startOfToday: startOfToday,
+          savedMemNotifications: emptyNotifications,
+        ),
+        lessThan(0),
+      );
+    });
+
+    test('sorts mem with notifyAt before mem without notifyAt', () {
+      final withNotify = finishedMem(id: 1);
+      final withoutNotify = finishedMem(id: 2);
+      final notifications = [
+        savedRepeatAtHourNotification(id: 1, memId: 1, hour: 10),
+      ];
+
+      expect(
+        compareMemListEntries(
+          withNotify,
+          withoutNotify,
+          startOfToday: startOfToday,
+          savedMemNotifications: notifications,
+        ),
+        lessThan(0),
+      );
+      expect(
+        compareMemListEntries(
+          withoutNotify,
+          withNotify,
+          startOfToday: startOfToday,
+          savedMemNotifications: notifications,
+        ),
+        greaterThan(0),
+      );
+    });
+
+    test('sorts mem with afterActStarted notification before mem without', () {
+      final withAfter = finishedMem(id: 1);
+      final withoutAfter = finishedMem(id: 2);
+      final notifications = [
+        savedAfterActStartedNotification(id: 1, memId: 1),
+      ];
+
+      expect(
+        compareMemListEntries(
+          withAfter,
+          withoutAfter,
+          startOfToday: startOfToday,
+          savedMemNotifications: notifications,
+        ),
+        lessThan(0),
+      );
+      expect(
+        compareMemListEntries(
+          withoutAfter,
+          withAfter,
+          startOfToday: startOfToday,
+          savedMemNotifications: notifications,
+        ),
+        greaterThan(0),
+      );
+    });
+
+    test('falls back to id when sort criteria are equal', () {
+      final memA = finishedMem(id: 1);
+      final memB = finishedMem(id: 2);
+
+      expect(
+        compareMemListEntries(
+          memA,
+          memB,
+          startOfToday: startOfToday,
+          savedMemNotifications: emptyNotifications,
+        ),
+        lessThan(0),
+      );
+    });
+  });
+
   group('memListProvider', () {
     test('sorts PausedAct mems by pausedAt descending', () {
       final olderPaused = savedMem(
@@ -135,6 +299,16 @@ void main() {
       expect(
         DateTimeExt.startOfToday(startOfDay, now),
         DateTime(2024, 10, 11, 9, 0),
+      );
+    });
+
+    test('after start of day returns same calendar day at startOfDay', () {
+      expect(
+        DateTimeExt.startOfToday(
+          startOfDay,
+          DateTime(2024, 10, 12, 15, 0),
+        ),
+        DateTime(2024, 10, 12, 9, 0),
       );
     });
 

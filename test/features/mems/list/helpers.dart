@@ -71,6 +71,22 @@ MemNotification repeatAtHourMemNotification(int memId, int hour) =>
       'repeat at $hour:00',
     );
 
+SavedMemNotificationEntityV1 savedAfterActStartedNotification({
+  required int id,
+  required int memId,
+  DateTime? fixedDate,
+}) {
+  final date = fixedDate ?? DateTime(2024, 10, 1);
+  return savedMemNotification(
+    id: id,
+    memId: memId,
+    type: MemNotificationType.afterActStarted,
+    message: 'after act started',
+    createdAt: date,
+    updatedAt: date,
+  );
+}
+
 ProviderContainer loadMemListTestContainer({
   TimeOfDay startOfDay = const TimeOfDay(hour: 9, minute: 0),
 }) {
