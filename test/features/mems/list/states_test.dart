@@ -6,6 +6,8 @@ import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/list/states.dart';
+import 'package:mem/features/mems/list/widget.dart';
+import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/mems/states.dart';
@@ -13,6 +15,7 @@ import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/preference/preference_key.dart';
 import 'package:mem/features/settings/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
+import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 
 class _FakeMemEntities extends MemEntities {
@@ -32,16 +35,23 @@ class _FakePreference extends Preference<TimeOfDay> {
       const TimeOfDay(hour: 9, minute: 0);
 }
 
-ProviderContainer _memListContainer(Iterable<SavedMemEntityV1> mems) {
+ProviderContainer _memListContainer(
+  Iterable<SavedMemEntityV1> mems, {
+  Iterable<SavedMemNotificationEntityV1> notifications = const [],
+}) {
   return ProviderContainer(
     overrides: [
       preferenceProvider(startOfDayKey).overrideWith(() => _FakePreference()),
       memEntitiesProvider.overrideWith(() => _FakeMemEntities(mems)),
       memNotificationsProvider.overrideWith(
-        (ref) => ListValueStateNotifier<MemNotificationEntityV1>([]),
+        (ref) => ListValueStateNotifier<MemNotificationEntityV1>(
+          notifications.toList(),
+        ),
       ),
       savedMemNotificationsProvider.overrideWith(
-        (ref) => ListValueStateNotifier<SavedMemNotificationEntityV1>([]),
+        (ref) => ListValueStateNotifier<SavedMemNotificationEntityV1>(
+          notifications.toList(),
+        ),
       ),
     ],
   );
@@ -167,6 +177,76 @@ void main() {
 
       expect(sectionDate, isNot(DateAndTime(2024, 10, 12)));
       expect(sectionDate, DateAndTime(2024, 10, 14));
+    });
+  });
+
+  group('startOfToday', () {
+    const startOfDay = TimeOfDay(hour: 9, minute: 0);
+    final now = DateTime(2024, 10, 12, 3, 0);
+
+    Iterable<MemNotification> repeatAtHourNotifications(int memId, int hour) =>
+        [
+          MemNotification.by(
+            memId,
+            MemNotificationType.repeat,
+            hour * 60 * 60,
+            'repeat at $hour:00',
+          ),
+        ];
+
+    test('matches mem list display before start of day', () {
+      expect(
+        DateTimeExt.startOfToday(startOfDay, now),
+        memListDisplayStartOfToday(startOfDay, now),
+      );
+    });
+
+    test('repeat at 8:00 section date uses same startOfToday as sort', () {
+      final sortStartOfToday = DateTimeExt.startOfToday(startOfDay, now);
+      final displayStartOfToday = memListDisplayStartOfToday(startOfDay, now);
+      final mem = Mem(1, 'Daily repeat', null, null);
+      final notifications = repeatAtHourNotifications(1, 8);
+
+      expect(
+        mem.memListSectionDate(displayStartOfToday, notifications),
+        mem.memListSectionDate(sortStartOfToday, notifications),
+      );
+    });
+
+    test('memListProvider notifyAt order uses same startOfToday as section date',
+        () {
+      final sortStartOfToday = DateTimeExt.startOfToday(startOfDay, now);
+      final displayStartOfToday = memListDisplayStartOfToday(startOfDay, now);
+      final mem = savedMem(
+        id: 1,
+        name: 'Daily repeat',
+        createdAt: DateTime(2024, 10, 1),
+        updatedAt: DateTime(2024, 10, 1),
+      );
+      final notification = savedMemNotification(
+        id: 1,
+        memId: 1,
+        type: MemNotificationType.repeat,
+        timeOfDaySeconds: 8 * 60 * 60,
+        message: 'repeat at 8:00',
+        createdAt: DateTime(2024, 10, 1),
+        updatedAt: DateTime(2024, 10, 1),
+      );
+
+      final container = _memListContainer([mem], notifications: [notification]);
+      addTearDown(container.dispose);
+
+      final sortedMem = container.read(memListProvider).single.toDomain();
+      final notificationsForMem = [notification.value];
+
+      expect(
+        sortedMem.memListSectionDate(displayStartOfToday, notificationsForMem),
+        sortedMem.memListSectionDate(sortStartOfToday, notificationsForMem),
+      );
+      expect(
+        sortedMem.notifyAt(sortStartOfToday, notificationsForMem, null),
+        DateTime(2024, 10, 12, 8, 0),
+      );
     });
   });
 }

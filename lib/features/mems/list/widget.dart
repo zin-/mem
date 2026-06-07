@@ -17,6 +17,17 @@ import 'package:mem/features/settings/states.dart';
 import 'app_bar.dart';
 import 'item/view.dart';
 
+DateTime memListDisplayStartOfToday(TimeOfDay startOfDay, DateTime now) =>
+    DateTime(
+      now.year,
+      now.month,
+      now.day,
+      startOfDay.hour,
+      startOfDay.minute,
+    ).subtract(Duration(
+      days: startOfDay.isBefore(TimeOfDay.fromDateTime(now)) ? 0 : 1,
+    ));
+
 class MemListWidget extends ConsumerWidget {
   final ScrollController _scrollController;
 
@@ -49,16 +60,8 @@ class _MemListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) => v(
         () {
-          final now = DateTime.now();
-          final startOfToday = DateTime(
-            now.year,
-            now.month,
-            now.day,
-            _startOfDay.hour,
-            _startOfDay.minute,
-          ).subtract(Duration(
-            days: _startOfDay.isBefore(TimeOfDay.fromDateTime(now)) ? 0 : 1,
-          ));
+          final startOfToday =
+              memListDisplayStartOfToday(_startOfDay, DateTime.now());
           final l10n = buildL10n(context);
 
           final hasActMemList = _memList.groupListsBy(
