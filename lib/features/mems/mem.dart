@@ -65,7 +65,10 @@ class Mem {
               : MemNotification.nextNotifyAt(
                   memNotifications!,
                   startOfToday,
-                  latestAct,
+                  scheduleAnchorForNotifications(
+                    latestAct: latestAct,
+                    scheduleAnchorAct: scheduleAnchorAct,
+                  ),
                 ),
         ),
         {

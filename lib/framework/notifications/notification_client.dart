@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/settings/constants.dart';
@@ -137,6 +138,11 @@ class NotificationClient {
             final latestAct = await _actQueryService
                 .fetchLatestByMemIds(mem.id!)
                 .then((v) => v?.toDomain());
+            final scheduleAnchor = await _scheduleAnchorForMem(
+              mem.id!,
+              latestAct,
+              mem.scheduleAnchorAct,
+            );
             final startOfDay =
                 (await _preferenceClientRepository.shipByKey(startOfDayKey))
                         .value ??
@@ -152,6 +158,7 @@ class NotificationClient {
                     .then((v) => v.map((e) => e.toDomain())),
                 latestAct,
                 DateTime.now(),
+                scheduleAnchor: scheduleAnchor,
               )
             ].map((e) {
               _scheduleClient.receive(e);
@@ -283,6 +290,37 @@ class NotificationClient {
         },
       );
 
+  Future<Act?> _scheduleAnchorForMem(
+    int memId,
+    Act? latestAct,
+    Act? scheduleAnchorAct,
+  ) =>
+      v(
+        () async {
+          if (latestAct?.isSkipped != true) {
+            return scheduleAnchorForNotifications(
+              latestAct: latestAct,
+              scheduleAnchorAct: scheduleAnchorAct,
+            );
+          }
+
+          final resolvedScheduleAnchorAct = scheduleAnchorAct ??
+              await _actQueryService
+                  .fetchScheduleAnchorByMemIds(memId)
+                  .then((v) => v?.toDomain());
+
+          return scheduleAnchorForNotifications(
+            latestAct: latestAct,
+            scheduleAnchorAct: resolvedScheduleAnchorAct,
+          );
+        },
+        {
+          'memId': memId,
+          'latestAct': latestAct,
+          'scheduleAnchorAct': scheduleAnchorAct,
+        },
+      );
+
   Future<bool> _shouldNotify(int memId) => v(
         () async {
           final savedMemNotifications =
@@ -305,9 +343,16 @@ class NotificationClient {
               savedMemNotifications.singleWhereOrNull(
             (e) => e.toDomain().isEnabled() && e.toDomain().isRepeatByNDay(),
           );
-          final lastActTime = await _actQueryService
+          final latestAct = await _actQueryService
               .fetchLatestByMemIds(memId)
-              .then((v) => v?.end ?? v?.start!);
+              .then((v) => v?.toDomain());
+          final scheduleAnchor = await _scheduleAnchorForMem(
+            memId,
+            latestAct,
+            null,
+          );
+          final lastActTime = scheduleAnchor?.period?.end?.dateTime ??
+              scheduleAnchor?.period?.start?.dateTime;
 
           if (lastActTime != null) {
             if (Duration(
