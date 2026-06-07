@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart' hide isNull;
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/databases/database.dart';
+import 'package:mem/databases/database.dart' hide Act;
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_query_service.dart';
@@ -187,6 +187,58 @@ void main() {
 
       expect(anchors, hasLength(1));
       expect(anchors[memId]?.actKind, ActKind.finished);
+    });
+
+    test(
+        'resolveScheduleAnchorForNotifications fetches anchor when latest is skipped',
+        () async {
+      final memId = await insertMem();
+      final finishStart = DateTime(2024, 6, 1, 10);
+      final skipStart = DateTime(2024, 6, 3, 10);
+      await insertAct(
+        memId: memId,
+        start: finishStart,
+        actKind: 'finished',
+      );
+      await insertAct(
+        memId: memId,
+        start: skipStart,
+        actKind: 'skipped',
+      );
+
+      final latest =
+          (await query.fetchLatestByMemIds(memId))?.toDomain();
+
+      final resolved = await query.resolveScheduleAnchorForNotifications(
+        memId: memId,
+        latestAct: latest,
+      );
+
+      expect(resolved?.actKind, ActKind.finished);
+      expect(resolved?.period?.start?.day, finishStart.day);
+    });
+
+    test('resolveScheduleAnchorForNotifications uses provided anchor', () async {
+      final anchor = Act.by(
+        1,
+        startWhen: DateAndTime(2024, 6, 1),
+        endWhen: DateAndTime(2024, 6, 1, 1),
+        completionKind: ActKind.finished,
+      );
+      final latest = Act.by(
+        0,
+        startWhen: DateAndTime(2024, 6, 3),
+        endWhen: DateAndTime(2024, 6, 3, 1),
+        completionKind: ActKind.skipped,
+      );
+
+      final resolved = await query.resolveScheduleAnchorForNotifications(
+        memId: 0,
+        latestAct: latest,
+        scheduleAnchorAct: anchor,
+      );
+
+      expect(resolved, same(anchor));
     });
 
     test('fetchByMemIdAndPeriod excludes skipped for chart', () async {
