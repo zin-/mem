@@ -5,7 +5,6 @@ import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/mems/mem.dart';
-import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_view.dart';
 import 'package:mem/framework/nullable.dart';
 import 'package:mem/l10n/l10n.dart';
@@ -91,31 +90,10 @@ class _MemListWidget extends StatelessWidget {
                       final memNotifications = _memNotifications
                           .where((e) => e.value.memId == element.id)
                           .map((e) => e.value);
-                      final nextNotifyAt = element.notifyAt(
+                      return element.memListSectionDate(
                         startOfToday,
                         memNotifications,
-                        element.latestAct,
                       );
-
-                      if (nextNotifyAt == null) {
-                        return null;
-                      } else if (memNotifications
-                              .where((e) => !e.isAfterActStarted())
-                              .isNotEmpty &&
-                          TimeOfDay.fromDateTime(nextNotifyAt)
-                              .isBefore(TimeOfDay.fromDateTime(startOfToday))) {
-                        return DateAndTime(
-                          nextNotifyAt.year,
-                          nextNotifyAt.month,
-                          nextNotifyAt.day,
-                        ).subtract(Duration(days: 1));
-                      } else {
-                        return DateAndTime(
-                          nextNotifyAt.year,
-                          nextNotifyAt.month,
-                          nextNotifyAt.day,
-                        );
-                      }
                     },
                   )
                   .entries

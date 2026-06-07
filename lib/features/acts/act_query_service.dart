@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:mem/databases/database.dart';
+import 'package:mem/databases/database.dart' hide Act;
 import 'package:mem/databases/database.dart' as drift_schema;
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/features/acts/act.dart';
@@ -137,6 +137,57 @@ class ActQueryService {
           'memId': memId,
           'period': period,
         },
+      );
+
+  Future<Act?> resolveScheduleAnchorForNotifications({
+    required int memId,
+    required Act? latestAct,
+    Act? scheduleAnchorAct,
+  }) =>
+      v(
+        () async {
+          var anchor = scheduleAnchorAct;
+          if (latestAct?.isSkipped == true && anchor == null) {
+            anchor =
+                await fetchScheduleAnchorByMemIds(memId).then((v) => v?.toDomain());
+          }
+          return scheduleAnchorForNotifications(
+            latestAct: latestAct,
+            scheduleAnchorAct: anchor,
+          );
+        },
+        {
+          'memId': memId,
+          'latestAct': latestAct,
+          'scheduleAnchorAct': scheduleAnchorAct,
+        },
+      );
+
+  Future<ActEntity?> fetchScheduleAnchorByMemIds(int memId) async =>
+      (await fetchScheduleAnchorsByMemIds([memId]))[memId];
+
+  Future<Map<int, ActEntity>> fetchScheduleAnchorsByMemIds(
+    Iterable<int> memIds,
+  ) =>
+      v(
+        () async {
+          final list = memIds.toSet().toList();
+          if (list.isEmpty) return {};
+          final rows = await (_db.select(_db.acts)
+                ..where(
+                  (t) =>
+                      t.memId.isIn(list) &
+                      actExcludingSkippedForPerformance(t),
+                )
+                ..orderBy([(t) => OrderingTerm.desc(t.start)]))
+              .get();
+          final out = <int, ActEntity>{};
+          for (final row in rows) {
+            out.putIfAbsent(row.memId, () => ActEntity.fromTuple(row));
+          }
+          return out;
+        },
+        {'memIds': memIds},
       );
 
   ActQueryService._();

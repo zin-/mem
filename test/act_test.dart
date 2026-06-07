@@ -113,7 +113,8 @@ void main() => group(
             expect(actKindFromStored('unknown'), isNull);
           });
 
-          test('skipped finished act exposes isSkipped and isScheduleAnchor', () {
+          test('skipped finished act exposes isSkipped but not isScheduleAnchor',
+              () {
             final skipped = Act.by(
               0,
               startWhen: DateAndTime(2024, 1, 1),
@@ -122,7 +123,7 @@ void main() => group(
             );
 
             expect(skipped.isSkipped, isTrue);
-            expect(skipped.isScheduleAnchor, isTrue);
+            expect(skipped.isScheduleAnchor, isFalse);
             expect(skipped.isFinished, isTrue);
           });
 
@@ -135,6 +136,78 @@ void main() => group(
             );
 
             expect(legacy.actKind, isNull);
+          });
+        });
+
+        group('scheduleAnchorForNotifications', () {
+          final anchorStart = DateAndTime(2024, 1, 1);
+          final anchorEnd = DateAndTime(2024, 1, 1, 1);
+
+          Act skippedLatest() => Act.by(
+                0,
+                startWhen: anchorStart,
+                endWhen: anchorEnd,
+                completionKind: ActKind.skipped,
+              );
+
+          Act finishedLatest() => Act.by(
+                0,
+                startWhen: anchorStart,
+                endWhen: anchorEnd,
+                completionKind: ActKind.finished,
+              );
+
+          Act finishedAnchor() => Act.by(
+                1,
+                startWhen: anchorStart,
+                endWhen: anchorEnd,
+                completionKind: ActKind.finished,
+              );
+
+          Act activeLatest() => Act.by(0, startWhen: anchorStart);
+
+          test('returns latest when latest is finished and anchor is null', () {
+            final latest = finishedLatest();
+            expect(
+              scheduleAnchorForNotifications(
+                latestAct: latest,
+                scheduleAnchorAct: null,
+              ),
+              same(latest),
+            );
+          });
+
+          test('returns anchor when latest is skipped and anchor is finished',
+              () {
+            final anchor = finishedAnchor();
+            expect(
+              scheduleAnchorForNotifications(
+                latestAct: skippedLatest(),
+                scheduleAnchorAct: anchor,
+              ),
+              same(anchor),
+            );
+          });
+
+          test('returns null when latest is skipped and anchor is null', () {
+            expect(
+              scheduleAnchorForNotifications(
+                latestAct: skippedLatest(),
+                scheduleAnchorAct: null,
+              ),
+              isNull,
+            );
+          });
+
+          test('returns latest when latest is active', () {
+            final latest = activeLatest();
+            expect(
+              scheduleAnchorForNotifications(
+                latestAct: latest,
+                scheduleAnchorAct: null,
+              ),
+              same(latest),
+            );
           });
         });
 

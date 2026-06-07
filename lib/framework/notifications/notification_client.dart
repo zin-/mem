@@ -137,6 +137,12 @@ class NotificationClient {
             final latestAct = await _actQueryService
                 .fetchLatestByMemIds(mem.id!)
                 .then((v) => v?.toDomain());
+            final scheduleAnchor =
+                await _actQueryService.resolveScheduleAnchorForNotifications(
+              memId: mem.id!,
+              latestAct: latestAct,
+              scheduleAnchorAct: mem.scheduleAnchorAct,
+            );
             final startOfDay =
                 (await _preferenceClientRepository.shipByKey(startOfDayKey))
                         .value ??
@@ -152,6 +158,7 @@ class NotificationClient {
                     .then((v) => v.map((e) => e.toDomain())),
                 latestAct,
                 DateTime.now(),
+                scheduleAnchor: scheduleAnchor,
               )
             ].map((e) {
               _scheduleClient.receive(e);
@@ -305,9 +312,16 @@ class NotificationClient {
               savedMemNotifications.singleWhereOrNull(
             (e) => e.toDomain().isEnabled() && e.toDomain().isRepeatByNDay(),
           );
-          final lastActTime = await _actQueryService
+          final latestAct = await _actQueryService
               .fetchLatestByMemIds(memId)
-              .then((v) => v?.end ?? v?.start!);
+              .then((v) => v?.toDomain());
+          final scheduleAnchor =
+              await _actQueryService.resolveScheduleAnchorForNotifications(
+            memId: memId,
+            latestAct: latestAct,
+          );
+          final lastActTime = scheduleAnchor?.period?.end?.dateTime ??
+              scheduleAnchor?.period?.start?.dateTime;
 
           if (lastActTime != null) {
             if (Duration(

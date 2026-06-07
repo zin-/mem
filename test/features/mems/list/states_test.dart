@@ -3,6 +3,7 @@ import '../../../entity_factories.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act.dart';
+import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/mems/mem_entity.dart';
@@ -96,6 +97,76 @@ void main() {
           container.read(memListProvider).map((mem) => mem.id).toList();
 
       expect(sortedIds, [1, 2]);
+    });
+  });
+
+  group('memList section date', () {
+    final startOfToday = DateTime(2024, 10, 12, 9, 0);
+    final skipDay = DateAndTime(2024, 10, 12, 12, 0);
+
+    Act skippedOnToday(int memId) => Act.by(
+          memId,
+          startWhen: skipDay,
+          endWhen: skipDay,
+          completionKind: ActKind.skipped,
+        );
+
+    MemEntity memWithSkipped({
+      required int id,
+      Act? scheduleAnchorAct,
+    }) =>
+        savedMem(
+          id: id,
+          name: 'Skipped today',
+          createdAt: DateTime(2024, 10, 1),
+          updatedAt: DateTime(2024, 10, 12),
+          latestAct: skippedOnToday(id),
+        ).toEntityV2().updatedWith(
+              scheduleAnchorAct: () => scheduleAnchorAct,
+            );
+
+    test(
+        'skipped on today with weekly anchor is not grouped under skip day section',
+        () {
+      final anchor = Act.by(
+        1,
+        startWhen: DateAndTime(2024, 10, 5, 12, 0),
+        endWhen: DateAndTime(2024, 10, 5, 12, 0),
+        completionKind: ActKind.finished,
+      );
+      final notifications = [
+        MemNotification.by(
+          0,
+          MemNotificationType.repeatByNDay,
+          7,
+          'repeat by 7 day',
+        ),
+      ];
+
+      final sectionDate = memWithSkipped(id: 1, scheduleAnchorAct: anchor)
+          .toDomain()
+          .memListSectionDate(startOfToday, notifications);
+
+      expect(sectionDate, isNot(DateAndTime(2024, 10, 12)));
+      expect(sectionDate, DateAndTime(2024, 10, 19));
+    });
+
+    test('skip alone on today is not grouped under skip day section', () {
+      final notifications = [
+        MemNotification.by(
+          0,
+          MemNotificationType.repeatByNDay,
+          2,
+          'repeat by 2 day',
+        ),
+      ];
+
+      final sectionDate = memWithSkipped(id: 1)
+          .toDomain()
+          .memListSectionDate(startOfToday, notifications);
+
+      expect(sectionDate, isNot(DateAndTime(2024, 10, 12)));
+      expect(sectionDate, DateAndTime(2024, 10, 14));
     });
   });
 }

@@ -76,7 +76,7 @@ class MemNotification {
   static DateTime? nextNotifyAt(
     Iterable<MemNotification> memNotifications,
     DateTime startOfToday,
-    Act? latestAct,
+    Act? scheduleAnchor,
   ) =>
       v(
         () {
@@ -107,16 +107,16 @@ class MemNotification {
             final repeatByNDay = memNotifications.singleWhereOrNull(
               (e) => e.isRepeatByNDay(),
             );
-            if (latestAct != null && latestAct.isScheduleAnchor) {
-              final latestActStartIsLessThanToday = latestAct
+            if (scheduleAnchor != null && scheduleAnchor.isScheduleAnchor) {
+              final scheduleAnchorStartIsLessThanToday = scheduleAnchor
                   .period!.start!.dateTime
                   .add(Duration(days: repeatByNDay?.time ?? 1))
                   .compareTo(startOfToday);
-              if (latestActStartIsLessThanToday > -1) {
+              if (scheduleAnchorStartIsLessThanToday > -1) {
                 notifyAt = DateTime(
-                  latestAct.period!.start!.dateTime.year,
-                  latestAct.period!.start!.dateTime.month,
-                  latestAct.period!.start!.dateTime.day +
+                  scheduleAnchor.period!.start!.dateTime.year,
+                  scheduleAnchor.period!.start!.dateTime.month,
+                  scheduleAnchor.period!.start!.dateTime.day +
                       (repeatByNDay?.time ?? 1),
                   notifyAt.hour,
                   notifyAt.minute,
@@ -141,7 +141,7 @@ class MemNotification {
         {
           'memNotifications': memNotifications,
           'startOfToday': startOfToday,
-          'latestAct': latestAct,
+          'scheduleAnchor': scheduleAnchor,
         },
       );
 

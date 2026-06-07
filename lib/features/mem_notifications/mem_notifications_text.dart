@@ -28,8 +28,9 @@ class MemNotificationText extends ConsumerWidget {
           ref.watch(preferenceProvider(startOfDayKey)),
           ref.watch(
             memEntitiesProvider.select(
-              (mems) =>
-                  mems.singleWhereOrNull((e) => e.id == _memId)?.latestAct,
+              (mems) => mems
+                  .singleWhereOrNull((e) => e.id == _memId)
+                  ?.resolvedScheduleAnchor,
             ),
           ),
         ),
@@ -42,12 +43,12 @@ class MemNotificationText extends ConsumerWidget {
 class _MemNotificationText extends StatelessWidget {
   final Iterable<MemNotificationEntityV1> _memNotificationEntities;
   final TimeOfDay _startOfDay;
-  final Act? _latestAct;
+  final Act? _scheduleAnchor;
 
   const _MemNotificationText(
     this._memNotificationEntities,
     this._startOfDay,
-    this._latestAct,
+    this._scheduleAnchor,
   );
 
   @override
@@ -65,7 +66,7 @@ class _MemNotificationText extends StatelessWidget {
           final nextNotifyAt = MemNotification.nextNotifyAt(
             enables.map((e) => e.value),
             DateTimeExt.startOfToday(_startOfDay),
-            _latestAct,
+            _scheduleAnchor,
           );
           final repeatMemNotification = enables
               .map((e) => e.value)

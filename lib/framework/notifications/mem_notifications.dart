@@ -18,8 +18,9 @@ class MemNotifications {
     TimeOfDay startOfDay,
     Iterable<MemNotification> memNotifications,
     Act? latestAct,
-    DateTime now,
-  ) =>
+    DateTime now, {
+    Act? scheduleAnchor,
+  }) =>
       v(
         () => memNotifications
                 .where(
@@ -37,6 +38,7 @@ class MemNotifications {
                       memNotifications,
                       startOfDay,
                       latestAct,
+                      scheduleAnchor ?? mem.resolvedScheduleAnchor,
                       now,
                     ) ??
                     now,
@@ -59,6 +61,7 @@ class MemNotifications {
     Iterable<MemNotification> memNotifications,
     TimeOfDay startOfDay,
     Act? latestAct,
+    Act? scheduleAnchor,
     DateTime now,
   ) =>
       v(
@@ -77,7 +80,7 @@ class MemNotifications {
                 ? startOfDay
                 : TimeOfDay(hour: 0, minute: (repeatAt / 60).floor());
 
-            if (latestAct == null) {
+            if (scheduleAnchor == null || !scheduleAnchor.isScheduleAnchor) {
               notifyAt = now.copyWith(
                   hour: timeOfDay.hour,
                   minute: timeOfDay.minute,
@@ -85,7 +88,7 @@ class MemNotifications {
                   millisecond: 0,
                   microsecond: 0);
             } else {
-              notifyAt = (latestAct.period?.end ?? now)
+              notifyAt = (scheduleAnchor.period?.end ?? now)
                   .copyWith(
                       hour: timeOfDay.hour,
                       minute: timeOfDay.minute,
@@ -119,6 +122,7 @@ class MemNotifications {
           'memNotifications': memNotifications,
           'startOfDay': startOfDay,
           'latestAct': latestAct,
+          'scheduleAnchor': scheduleAnchor,
           'now': now,
         },
       );
