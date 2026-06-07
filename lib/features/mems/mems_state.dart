@@ -43,6 +43,11 @@ class MemEntities extends _$MemEntities
           );
 
           upsert(mems);
+
+          await upsertSavedMemNotifications(
+            ref,
+            memIdsIn: mems.map((e) => e.id),
+          );
         },
       );
 

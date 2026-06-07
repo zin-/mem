@@ -1,53 +1,180 @@
-import 'package:flutter/material.dart';
 import '../../../entity_factories.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'helpers.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/list/states.dart';
+import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
-import 'package:mem/features/mems/mems_state.dart';
-import 'package:mem/features/mems/states.dart';
-import 'package:mem/features/settings/preference/keys.dart';
-import 'package:mem/features/settings/preference/preference_key.dart';
-import 'package:mem/features/settings/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
-import 'package:mem/framework/view/list_value_state_notifier.dart';
-
-class _FakeMemEntities extends MemEntities {
-  final Iterable<SavedMemEntityV1> _state;
-
-  _FakeMemEntities(this._state);
-
-  @override
-  Iterable<SavedMemEntityV1> build() => _state;
-}
-
-class _FakePreference extends Preference<TimeOfDay> {
-  _FakePreference();
-
-  @override
-  TimeOfDay build(PreferenceKey<TimeOfDay> key) =>
-      const TimeOfDay(hour: 9, minute: 0);
-}
-
-ProviderContainer _memListContainer(Iterable<SavedMemEntityV1> mems) {
-  return ProviderContainer(
-    overrides: [
-      preferenceProvider(startOfDayKey).overrideWith(() => _FakePreference()),
-      memEntitiesProvider.overrideWith(() => _FakeMemEntities(mems)),
-      memNotificationsProvider.overrideWith(
-        (ref) => ListValueStateNotifier<MemNotificationEntityV1>([]),
-      ),
-      savedMemNotificationsProvider.overrideWith(
-        (ref) => ListValueStateNotifier<SavedMemNotificationEntityV1>([]),
-      ),
-    ],
-  );
-}
+import 'package:mem/framework/date_and_time/date_time_ext.dart';
 
 void main() {
+  group('compareMemListEntries', () {
+    final startOfToday = DateTime(2024, 10, 12, 9, 0);
+    const emptyNotifications = <SavedMemNotificationEntityV1>[];
+
+    MemEntity finishedMem({
+      required int id,
+      DateTime? doneAt,
+      DateTime? archivedAt,
+    }) =>
+        savedMem(
+          id: id,
+          name: 'Mem $id',
+          createdAt: DateTime(2024, 6, 1),
+          updatedAt: DateTime(2024, 6, 1),
+          doneAt: doneAt,
+          archivedAt: archivedAt,
+        ).toEntityV2();
+
+    test('sorts two ActiveAct mems by start descending', () {
+      final earlier = savedMem(
+        id: 1,
+        name: 'Earlier',
+        createdAt: DateTime(2024, 6, 1),
+        updatedAt: DateTime(2024, 6, 1),
+        latestAct: ActiveAct(1, DateAndTime(2024, 6, 1, 8, 0)),
+      ).toEntityV2();
+      final later = savedMem(
+        id: 2,
+        name: 'Later',
+        createdAt: DateTime(2024, 6, 1),
+        updatedAt: DateTime(2024, 6, 1),
+        latestAct: ActiveAct(2, DateAndTime(2024, 6, 1, 10, 0)),
+      ).toEntityV2();
+
+      expect(
+        compareMemListEntries(
+          later,
+          earlier,
+          startOfToday: startOfToday,
+          savedMemNotifications: emptyNotifications,
+        ),
+        lessThan(0),
+      );
+    });
+
+    test('sorts archived mem after non-archived', () {
+      final archived = finishedMem(id: 1, archivedAt: DateTime(2024, 6, 1));
+      final normal = finishedMem(id: 2);
+
+      expect(
+        compareMemListEntries(
+          archived,
+          normal,
+          startOfToday: startOfToday,
+          savedMemNotifications: emptyNotifications,
+        ),
+        greaterThan(0),
+      );
+      expect(
+        compareMemListEntries(
+          normal,
+          archived,
+          startOfToday: startOfToday,
+          savedMemNotifications: emptyNotifications,
+        ),
+        lessThan(0),
+      );
+    });
+
+    test('sorts done mem after not-done', () {
+      final done = finishedMem(id: 1, doneAt: DateTime(2024, 6, 1));
+      final notDone = finishedMem(id: 2);
+
+      expect(
+        compareMemListEntries(
+          done,
+          notDone,
+          startOfToday: startOfToday,
+          savedMemNotifications: emptyNotifications,
+        ),
+        greaterThan(0),
+      );
+      expect(
+        compareMemListEntries(
+          notDone,
+          done,
+          startOfToday: startOfToday,
+          savedMemNotifications: emptyNotifications,
+        ),
+        lessThan(0),
+      );
+    });
+
+    test('sorts mem with notifyAt before mem without notifyAt', () {
+      final withNotify = finishedMem(id: 1);
+      final withoutNotify = finishedMem(id: 2);
+      final notifications = [
+        savedRepeatAtHourNotification(id: 1, memId: 1, hour: 10),
+      ];
+
+      expect(
+        compareMemListEntries(
+          withNotify,
+          withoutNotify,
+          startOfToday: startOfToday,
+          savedMemNotifications: notifications,
+        ),
+        lessThan(0),
+      );
+      expect(
+        compareMemListEntries(
+          withoutNotify,
+          withNotify,
+          startOfToday: startOfToday,
+          savedMemNotifications: notifications,
+        ),
+        greaterThan(0),
+      );
+    });
+
+    test('sorts mem with afterActStarted notification before mem without', () {
+      final withAfter = finishedMem(id: 1);
+      final withoutAfter = finishedMem(id: 2);
+      final notifications = [
+        savedAfterActStartedNotification(id: 1, memId: 1),
+      ];
+
+      expect(
+        compareMemListEntries(
+          withAfter,
+          withoutAfter,
+          startOfToday: startOfToday,
+          savedMemNotifications: notifications,
+        ),
+        lessThan(0),
+      );
+      expect(
+        compareMemListEntries(
+          withoutAfter,
+          withAfter,
+          startOfToday: startOfToday,
+          savedMemNotifications: notifications,
+        ),
+        greaterThan(0),
+      );
+    });
+
+    test('falls back to id when sort criteria are equal', () {
+      final memA = finishedMem(id: 1);
+      final memB = finishedMem(id: 2);
+
+      expect(
+        compareMemListEntries(
+          memA,
+          memB,
+          startOfToday: startOfToday,
+          savedMemNotifications: emptyNotifications,
+        ),
+        lessThan(0),
+      );
+    });
+  });
+
   group('memListProvider', () {
     test('sorts PausedAct mems by pausedAt descending', () {
       final olderPaused = savedMem(
@@ -65,13 +192,10 @@ void main() {
         latestAct: PausedAct(2, DateTime(2024, 6, 1, 12, 0)),
       );
 
-      final container = _memListContainer([olderPaused, newerPaused]);
+      final container = memListTestContainer([olderPaused, newerPaused]);
       addTearDown(container.dispose);
 
-      final sortedIds =
-          container.read(memListProvider).map((mem) => mem.id).toList();
-
-      expect(sortedIds, [2, 1]);
+      expect(sortedMemIds(container), [2, 1]);
     });
 
     test('keeps ActiveAct mem above PausedAct mem', () {
@@ -90,13 +214,10 @@ void main() {
         latestAct: PausedAct(2, DateTime(2024, 6, 1, 12, 0)),
       );
 
-      final container = _memListContainer([paused, active]);
+      final container = memListTestContainer([paused, active]);
       addTearDown(container.dispose);
 
-      final sortedIds =
-          container.read(memListProvider).map((mem) => mem.id).toList();
-
-      expect(sortedIds, [1, 2]);
+      expect(sortedMemIds(container), [1, 2]);
     });
   });
 
@@ -167,6 +288,70 @@ void main() {
 
       expect(sectionDate, isNot(DateAndTime(2024, 10, 12)));
       expect(sectionDate, DateAndTime(2024, 10, 14));
+    });
+  });
+
+  group('startOfToday', () {
+    const startOfDay = TimeOfDay(hour: 9, minute: 0);
+    final now = DateTime(2024, 10, 12, 3, 0);
+
+    test('before start of day returns previous calendar day at startOfDay', () {
+      expect(
+        DateTimeExt.startOfToday(startOfDay, now),
+        DateTime(2024, 10, 11, 9, 0),
+      );
+    });
+
+    test('after start of day returns same calendar day at startOfDay', () {
+      expect(
+        DateTimeExt.startOfToday(
+          startOfDay,
+          DateTime(2024, 10, 12, 15, 0),
+        ),
+        DateTime(2024, 10, 12, 9, 0),
+      );
+    });
+
+    test('repeat at 8:00 section date uses same startOfToday as sort', () {
+      final sortStartOfToday = DateTimeExt.startOfToday(startOfDay, now);
+      final mem = Mem(1, 'Daily repeat', null, null);
+      final notifications = [repeatAtHourMemNotification(1, 8)];
+
+      expect(
+        mem.memListSectionDate(sortStartOfToday, notifications),
+        DateAndTime(2024, 10, 11),
+      );
+    });
+
+    test('memListProvider notifyAt order uses same startOfToday as section date',
+        () {
+      final sortStartOfToday = DateTimeExt.startOfToday(startOfDay, now);
+      final mem = savedMem(
+        id: 1,
+        name: 'Daily repeat',
+        createdAt: DateTime(2024, 10, 1),
+        updatedAt: DateTime(2024, 10, 1),
+      );
+      final notification = savedRepeatAtHourNotification(
+        id: 1,
+        memId: 1,
+        hour: 8,
+      );
+
+      final container = memListTestContainer([mem], notifications: [notification]);
+      addTearDown(container.dispose);
+
+      final sortedMem = container.read(memListProvider).single.toDomain();
+      final notificationsForMem = [notification.value];
+
+      expect(
+        sortedMem.memListSectionDate(sortStartOfToday, notificationsForMem),
+        DateAndTime(2024, 10, 11),
+      );
+      expect(
+        sortedMem.notifyAt(sortStartOfToday, notificationsForMem, null),
+        DateTime(2024, 10, 12, 8, 0),
+      );
     });
   });
 }
