@@ -77,6 +77,39 @@ void main() {
       return rows.single.latestAct;
     }
 
+    test(
+        'skip after weekly finish keeps nextNotifyAt at today not skip plus 7 days',
+        () async {
+      final finishDay = DateAndTime(2024, 10, 5, 12, 0);
+      final skipDay = DateAndTime(2024, 10, 11, 12, 0);
+      final weeklyRepeatNotifications = [
+        MemNotification.by(
+          0,
+          MemNotificationType.repeatByNDay,
+          7,
+          'repeat by 7 day',
+        ),
+      ];
+      final memId = await insertMem();
+
+      await service.finish(memId, finishDay);
+      await service.skip(memId, skipDay);
+
+      final latest = await query.fetchLatestByMemIds(memId);
+      expect(latest?.actKind, ActKind.skipped);
+
+      final nextNotify = MemNotification.nextNotifyAt(
+        weeklyRepeatNotifications,
+        startOfToday,
+        latest?.toDomain(),
+      );
+
+      expect(
+        nextNotify,
+        DateTime(startOfToday.year, startOfToday.month, startOfToday.day),
+      );
+    });
+
     test('skip and finish at same time yield same nextNotifyAt', () async {
       final when = DateAndTime(2024, 10, 11, 12, 0);
       final skipMemId = await insertMem();
