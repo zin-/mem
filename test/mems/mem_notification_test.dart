@@ -131,7 +131,6 @@ void main() => group(_name, () {
         });
 
         group('skipped act is not schedule anchor', () {
-          final startOfToday = DateTime(2024, 10, 12);
           final anchorStart = DateAndTime.from(startOfToday).subtract(
             const Duration(days: 1),
           );
@@ -152,31 +151,53 @@ void main() => group(_name, () {
               );
 
           DateTime? nextNotifyAt(
-            Iterable<MemNotification> notifications,
-            Act? scheduleAnchor,
-          ) =>
+            Iterable<MemNotification> notifications, {
+            required Act? latestAct,
+            Act? scheduleAnchorAct,
+          }) =>
               MemNotification.nextNotifyAt(
                 notifications,
                 startOfToday,
-                scheduleAnchor,
+                scheduleAnchorForNotifications(
+                  latestAct: latestAct,
+                  scheduleAnchorAct: scheduleAnchorAct,
+                ),
               );
 
           void expectNextNotifyAt(
-            Iterable<MemNotification> notifications,
-            Act? scheduleAnchor,
-            DateTime? expected,
-          ) {
-            expect(nextNotifyAt(notifications, scheduleAnchor), expected);
+            Iterable<MemNotification> notifications, {
+            required Act? latestAct,
+            Act? scheduleAnchorAct,
+            required DateTime? expected,
+          }) {
+            expect(
+              nextNotifyAt(
+                notifications,
+                latestAct: latestAct,
+                scheduleAnchorAct: scheduleAnchorAct,
+              ),
+              expected,
+            );
           }
 
           void expectSameNextNotifyAt(
-            Iterable<MemNotification> notifications,
-            Act skipped,
-            Act finished,
-          ) {
+            Iterable<MemNotification> notifications, {
+            required Act? latestActA,
+            Act? scheduleAnchorActA,
+            required Act? latestActB,
+            Act? scheduleAnchorActB,
+          }) {
             expect(
-              nextNotifyAt(notifications, skipped),
-              nextNotifyAt(notifications, finished),
+              nextNotifyAt(
+                notifications,
+                latestAct: latestActA,
+                scheduleAnchorAct: scheduleAnchorActA,
+              ),
+              nextNotifyAt(
+                notifications,
+                latestAct: latestActB,
+                scheduleAnchorAct: scheduleAnchorActB,
+              ),
             );
           }
 
@@ -190,11 +211,23 @@ void main() => group(_name, () {
               ),
             ];
 
-            expectNextNotifyAt(notifications, skippedAct(), startOfToday);
             expectNextNotifyAt(
               notifications,
-              finishedAct(),
-              startOfToday.add(const Duration(days: 1)),
+              latestAct: skippedAct(),
+              scheduleAnchorAct: null,
+              expected: startOfToday,
+            );
+            expectNextNotifyAt(
+              notifications,
+              latestAct: skippedAct(),
+              scheduleAnchorAct: finishedAct(),
+              expected: startOfToday.add(const Duration(days: 1)),
+            );
+            expectNextNotifyAt(
+              notifications,
+              latestAct: finishedAct(),
+              scheduleAnchorAct: null,
+              expected: startOfToday.add(const Duration(days: 1)),
             );
           });
 
@@ -215,8 +248,18 @@ void main() => group(_name, () {
               2,
             );
 
-            expectNextNotifyAt(notifications, skippedAct(), expected);
-            expectNextNotifyAt(notifications, finishedAct(), expected);
+            expectNextNotifyAt(
+              notifications,
+              latestAct: skippedAct(),
+              scheduleAnchorAct: null,
+              expected: expected,
+            );
+            expectNextNotifyAt(
+              notifications,
+              latestAct: finishedAct(),
+              scheduleAnchorAct: null,
+              expected: expected,
+            );
           });
 
           test('repeatByDayOfWeek matches finished when act is skipped', () {
@@ -229,8 +272,10 @@ void main() => group(_name, () {
                   'repeat on Sat',
                 ),
               ],
-              skippedAct(),
-              finishedAct(),
+              latestActA: skippedAct(),
+              scheduleAnchorActA: null,
+              latestActB: finishedAct(),
+              scheduleAnchorActB: null,
             );
           });
         });
