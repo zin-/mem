@@ -9,7 +9,6 @@ import 'package:mem/framework/view/value_state_notifier.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
-import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
 import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
@@ -182,19 +181,10 @@ final savedMemNotificationsProvider = StateNotifierProvider.autoDispose<
       initializer: (current, notifier) => v(
         () async {
           if (current.isEmpty) {
-            ref.read(memNotificationsProvider.notifier).upsertAll(
-                  await MemNotificationRepository()
-                      .ship(
-                        memIdsIn:
-                            ref.read(memEntitiesProvider).map((e) => e.id),
-                      )
-                      .then((v) => v.map(
-                          (e) => SavedMemNotificationEntityV1.fromEntityV2(e))),
-                  (current, updating) =>
-                      current is SavedMemNotificationEntityV1 &&
-                      updating is SavedMemNotificationEntityV1 &&
-                      current.id == updating.id,
-                );
+            await upsertSavedMemNotifications(
+              ref,
+              memIdsIn: ref.read(memEntitiesProvider).map((e) => e.id),
+            );
           }
         },
         {'current': current},

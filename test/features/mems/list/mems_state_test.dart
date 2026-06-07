@@ -1,3 +1,4 @@
+import '../../../entity_factories.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -17,6 +18,11 @@ import 'package:mockito/mockito.dart';
 
 import 'mems_state_test.mocks.dart';
 
+class _MemEntitiesWithoutAutoLoad extends MemEntities {
+  @override
+  Iterable<SavedMemEntityV1> build() => [];
+}
+
 class _FakePreference extends Preference<TimeOfDay> {
   _FakePreference();
 
@@ -25,36 +31,31 @@ class _FakePreference extends Preference<TimeOfDay> {
       const TimeOfDay(hour: 6, minute: 0);
 }
 
-MemEntity _memEntity(int id, String name) {
-  final now = DateTime(2024, 10, 1);
-  return MemEntity(
-    id,
-    name,
-    null,
-    null,
-    null,
-    now,
-    now,
-    null,
-  );
+MemEntity _memEntityV2(int id, String name) {
+  final fixedDate = DateTime(2024, 10, 1);
+  return savedMem(
+    id: id,
+    name: name,
+    createdAt: fixedDate,
+    updatedAt: fixedDate,
+  ).toEntityV2();
 }
 
-MemNotificationEntity _notificationEntity({
+MemNotificationEntity _repeatAtHourEntity({
   required int id,
   required int memId,
   required int hour,
 }) {
-  final now = DateTime(2024, 10, 1);
-  return MemNotificationEntity(
-    memId,
-    MemNotificationType.repeat,
-    hour * 60 * 60,
-    'repeat at $hour:00',
-    id,
-    now,
-    now,
-    null,
-  );
+  final fixedDate = DateTime(2024, 10, 1);
+  return savedMemNotification(
+    id: id,
+    memId: memId,
+    type: MemNotificationType.repeat,
+    timeOfDaySeconds: hour * 60 * 60,
+    message: 'repeat at $hour:00',
+    createdAt: fixedDate,
+    updatedAt: fixedDate,
+  ).toEntityV2();
 }
 
 @GenerateMocks([
@@ -75,10 +76,10 @@ void main() {
 
   group('loadMemList', () {
     test('preloads saved notifications for notifyAt sort', () async {
-      final memA = _memEntity(1, 'Mem A');
-      final memB = _memEntity(2, 'Mem B');
-      final notificationA = _notificationEntity(id: 1, memId: 1, hour: 12);
-      final notificationB = _notificationEntity(id: 2, memId: 2, hour: 8);
+      final memA = _memEntityV2(1, 'Mem A');
+      final memB = _memEntityV2(2, 'Mem B');
+      final notificationA = _repeatAtHourEntity(id: 1, memId: 1, hour: 12);
+      final notificationB = _repeatAtHourEntity(id: 2, memId: 2, hour: 8);
 
       when(mockMemRepository.ship(
         id: anyNamed('id'),
@@ -93,12 +94,13 @@ void main() {
 
       final container = ProviderContainer(
         overrides: [
+          memEntitiesProvider
+              .overrideWith(() => _MemEntitiesWithoutAutoLoad()),
           preferenceProvider(startOfDayKey).overrideWith(() => _FakePreference()),
         ],
       );
       addTearDown(container.dispose);
 
-      container.read(memEntitiesProvider);
       await container.read(memEntitiesProvider.notifier).loadMemList();
 
       expect(
@@ -111,7 +113,7 @@ void main() {
       verify(mockMemNotificationRepository.ship(
         memId: anyNamed('memId'),
         memIdsIn: argThat(containsAll([1, 2]), named: 'memIdsIn'),
-      )).called(2);
+      )).called(1);
 
       final sortedIds =
           container.read(memListProvider).map((mem) => mem.id).toList();

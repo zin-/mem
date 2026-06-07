@@ -11,8 +11,38 @@ import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
+import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
+
+bool isSameSavedMemNotification(
+  MemNotificationEntityV1 current,
+  MemNotificationEntityV1 updating,
+) =>
+    current is SavedMemNotificationEntityV1 &&
+    updating is SavedMemNotificationEntityV1 &&
+    current.id == updating.id;
+
+Future<void> upsertSavedMemNotifications(
+  Ref ref, {
+  int? memId,
+  Iterable<int>? memIdsIn,
+}) async {
+  if (memId == null && (memIdsIn == null || memIdsIn.isEmpty)) {
+    return;
+  }
+
+  ref.read(memNotificationsProvider.notifier).upsertAll(
+        await MemNotificationRepository()
+            .ship(memId: memId, memIdsIn: memIdsIn)
+            .then(
+              (notifications) => notifications.map(
+                SavedMemNotificationEntityV1.fromEntityV2,
+              ),
+            ),
+        isSameSavedMemNotification,
+      );
+}
 
 final memItemsProvider = StateNotifierProvider<
     ListValueStateNotifier<MemItemEntityV1>, List<MemItemEntityV1>>(
