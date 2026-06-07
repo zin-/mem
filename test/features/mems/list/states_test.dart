@@ -131,16 +131,6 @@ void main() {
     const startOfDay = TimeOfDay(hour: 9, minute: 0);
     final now = DateTime(2024, 10, 12, 3, 0);
 
-    Iterable<MemNotification> repeatAtHourNotifications(int memId, int hour) =>
-        [
-          MemNotification.by(
-            memId,
-            MemNotificationType.repeat,
-            hour * 60 * 60,
-            'repeat at $hour:00',
-          ),
-        ];
-
     test('before start of day returns previous calendar day at startOfDay', () {
       expect(
         DateTimeExt.startOfToday(startOfDay, now),
@@ -151,7 +141,7 @@ void main() {
     test('repeat at 8:00 section date uses same startOfToday as sort', () {
       final sortStartOfToday = DateTimeExt.startOfToday(startOfDay, now);
       final mem = Mem(1, 'Daily repeat', null, null);
-      final notifications = repeatAtHourNotifications(1, 8);
+      final notifications = [repeatAtHourMemNotification(1, 8)];
 
       expect(
         mem.memListSectionDate(sortStartOfToday, notifications),
@@ -168,14 +158,10 @@ void main() {
         createdAt: DateTime(2024, 10, 1),
         updatedAt: DateTime(2024, 10, 1),
       );
-      final notification = savedMemNotification(
+      final notification = savedRepeatAtHourNotification(
         id: 1,
         memId: 1,
-        type: MemNotificationType.repeat,
-        timeOfDaySeconds: 8 * 60 * 60,
-        message: 'repeat at 8:00',
-        createdAt: DateTime(2024, 10, 1),
-        updatedAt: DateTime(2024, 10, 1),
+        hour: 8,
       );
 
       final container = memListTestContainer([mem], notifications: [notification]);

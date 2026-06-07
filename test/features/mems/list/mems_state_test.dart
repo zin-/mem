@@ -1,37 +1,16 @@
 import '../../../entity_factories.dart';
 import 'helpers.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/mems/states.dart';
-import 'package:mem/features/settings/preference/keys.dart';
-import 'package:mem/features/settings/states.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
 import 'mems_state_test.mocks.dart';
-
-MemNotificationEntity repeatAtHourNotification({
-  required int id,
-  required int memId,
-  required int hour,
-}) {
-  final fixedDate = DateTime(2024, 10, 1);
-  return savedMemNotification(
-    id: id,
-    memId: memId,
-    type: MemNotificationType.repeat,
-    timeOfDaySeconds: hour * 60 * 60,
-    message: 'repeat at $hour:00',
-    createdAt: fixedDate,
-    updatedAt: fixedDate,
-  ).toEntityV2();
-}
 
 @GenerateMocks([
   MemRepository,
@@ -64,8 +43,18 @@ void main() {
         createdAt: fixedDate,
         updatedAt: fixedDate,
       ).toEntityV2();
-      final notificationA = repeatAtHourNotification(id: 1, memId: 1, hour: 12);
-      final notificationB = repeatAtHourNotification(id: 2, memId: 2, hour: 8);
+      final notificationA = repeatAtHourNotificationEntity(
+        id: 1,
+        memId: 1,
+        hour: 12,
+        fixedDate: fixedDate,
+      );
+      final notificationB = repeatAtHourNotificationEntity(
+        id: 2,
+        memId: 2,
+        hour: 8,
+        fixedDate: fixedDate,
+      );
 
       when(mockMemRepository.ship(
         id: anyNamed('id'),
@@ -78,14 +67,8 @@ void main() {
         memIdsIn: anyNamed('memIdsIn'),
       )).thenAnswer((_) async => [notificationA, notificationB]);
 
-      final container = ProviderContainer(
-        overrides: [
-          memEntitiesProvider.overrideWith(() => FakeMemEntities()),
-          preferenceProvider(startOfDayKey)
-              .overrideWith(() => FakeStartOfDayPreference(
-                    const TimeOfDay(hour: 6, minute: 0),
-                  )),
-        ],
+      final container = loadMemListTestContainer(
+        startOfDay: const TimeOfDay(hour: 6, minute: 0),
       );
       addTearDown(container.dispose);
 
