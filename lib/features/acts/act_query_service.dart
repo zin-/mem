@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:mem/databases/database.dart';
+import 'package:mem/databases/database.dart' hide Act;
 import 'package:mem/databases/database.dart' as drift_schema;
 import 'package:mem/databases/table_definitions/acts.dart';
 import 'package:mem/features/acts/act.dart';
@@ -136,6 +136,36 @@ class ActQueryService {
         {
           'memId': memId,
           'period': period,
+        },
+      );
+
+  Future<Act?> resolveScheduleAnchorForNotifications({
+    required int memId,
+    required Act? latestAct,
+    Act? scheduleAnchorAct,
+  }) =>
+      v(
+        () async {
+          if (latestAct?.isSkipped != true) {
+            return scheduleAnchorForNotifications(
+              latestAct: latestAct,
+              scheduleAnchorAct: scheduleAnchorAct,
+            );
+          }
+
+          final resolvedScheduleAnchorAct = scheduleAnchorAct ??
+              await fetchScheduleAnchorByMemIds(memId)
+                  .then((v) => v?.toDomain());
+
+          return scheduleAnchorForNotifications(
+            latestAct: latestAct,
+            scheduleAnchorAct: resolvedScheduleAnchorAct,
+          );
+        },
+        {
+          'memId': memId,
+          'latestAct': latestAct,
+          'scheduleAnchorAct': scheduleAnchorAct,
         },
       );
 
