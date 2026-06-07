@@ -75,6 +75,16 @@ SavedMemNotificationEntityV1 _savedRepeatAtHour(int id, int memId, int hour) {
   return savedMemNotification(id: id, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: hour * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
 }
 
+MemNotificationEntityV1 _unsavedRepeatAtHour(int memId, int hour) =>
+    MemNotificationEntityV1(
+      MemNotification.by(
+        memId,
+        MemNotificationType.repeat,
+        hour * 60 * 60,
+        'Repeat',
+      ),
+    );
+
 SavedMemEntityV1 _savedMemWithActiveAct(int id, String name) => savedMem(
       id: id,
       name: name,
@@ -181,6 +191,65 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.byType(DateAndTimeText), findsOneWidget);
+        expect(find.byType(MemListItemView), findsOneWidget);
+      });
+
+      testWidgets(
+          'sticky header shows ToDo when only unsaved notifications exist',
+          (tester) async {
+        final saved = _savedMem(1, 'Unsaved notification only');
+        final entity = saved.toEntityV2();
+        final unsavedNotification = _unsavedRepeatAtHour(1, 8);
+        final scrollController = ScrollController();
+        addTearDown(scrollController.dispose);
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              preferenceProvider(startOfDayKey).overrideWith(
+                () => _FakePreference(),
+              ),
+              memEntitiesProvider.overrideWith(
+                () => _FakeMemEntities([saved]),
+              ),
+              memListProvider.overrideWith(
+                (ref) => ValueStateNotifier<List<MemEntity>>([entity]),
+              ),
+              memNotificationsProvider.overrideWith(
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>([
+                  unsavedNotification,
+                ]),
+              ),
+              savedMemNotificationsProvider.overrideWith(
+                (ref) =>
+                    ListValueStateNotifier<SavedMemNotificationEntityV1>([]),
+              ),
+              memNotificationsByMemIdProvider(1).overrideWith(
+                (ref) => ListValueStateNotifier<MemNotificationEntityV1>([
+                  unsavedNotification,
+                ]),
+              ),
+              memStateProvider(1)
+                  .overrideWith(() => _FakeMemState(saved.value)),
+              latestActsByMemProvider.overrideWith(
+                (ref) => {1: null},
+              ),
+              actEntitiesProvider.overrideWith(() => _FakeActEntities()),
+            ],
+            child: MaterialApp(
+              home: Scaffold(
+                body: MemListWidget(scrollController),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text(buildL10n().memListToDoSubHeader),
+          findsOneWidget,
+        );
+        expect(find.byType(DateAndTimeText), findsNothing);
         expect(find.byType(MemListItemView), findsOneWidget);
       });
 
