@@ -49,5 +49,10 @@ runs:
       shell: bash
 
     - name: "Build Android AppBundle"
-      run: flutter build appbundle --build-number ${GITHUB_RUN_NUMBER}
+      run: |
+        SEMVER=$(grep '^version:' pubspec.yaml | sed 's/version: //; s/+.*//')
+        BUILD_NUMBER="${GITHUB_RUN_NUMBER}"
+        flutter build appbundle \
+          --build-name "${SEMVER}+${BUILD_NUMBER}" \
+          --build-number "${BUILD_NUMBER}"
       shell: bash
