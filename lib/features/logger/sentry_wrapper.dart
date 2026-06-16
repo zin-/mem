@@ -6,20 +6,49 @@ import 'package:mem/features/logger/log_service.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 class SentryWrapper {
+  static bool _initialized = false;
+
+  static void _configureOptions(SentryFlutterOptions options) {
+    options.dsn =
+        'https://ebb1b14bba388aa8401cf84de9242a5e@o4508056187830272.ingest.us.sentry.io/4508056200282112';
+    // Set tracesSampleRate to 1.0 to capture 100% of transactions for tracing.
+    // We recommend adjusting this value in production.
+    options.tracesSampleRate = 1.0;
+  }
+
+  Future<void> _ensureInitialized() async {
+    if (_initialized) {
+      return;
+    }
+
+    await SentryFlutter.init(_configureOptions);
+    _initialized = true;
+  }
+
   Future<SentryWrapper> init(AppRunner appRunner) => v(
         () async {
           await SentryFlutter.init(
-            (options) {
-              options.dsn =
-                  'https://ebb1b14bba388aa8401cf84de9242a5e@o4508056187830272.ingest.us.sentry.io/4508056200282112';
-              // Set tracesSampleRate to 1.0 to capture 100% of transactions for tracing.
-              // We recommend adjusting this value in production.
-              options.tracesSampleRate = 1.0;
-            },
+            _configureOptions,
             appRunner: appRunner,
           );
+          _initialized = true;
 
           return SentryWrapper();
+        },
+      );
+
+  Future<String> sendTestException(
+    dynamic throwable,
+    dynamic stackTrace,
+  ) =>
+      v(
+        () async {
+          await _ensureInitialized();
+          return await captureException(throwable, stackTrace);
+        },
+        {
+          'throwable': throwable,
+          'stackTrace': stackTrace,
         },
       );
 

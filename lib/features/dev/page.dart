@@ -24,7 +24,7 @@ class DevPage extends StatelessWidget {
                     SettingsTile.navigation(
                       title: const Text('Test send to Sentry'),
                       onPressed: (context) async {
-                        await SentryWrapper().captureException(
+                        await SentryWrapper().sendTestException(
                           "Test send to Sentry",
                           StackTrace.current,
                         );
