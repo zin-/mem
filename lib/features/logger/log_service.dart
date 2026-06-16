@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:mem/features/logger/sentry_wrapper.dart';
 import 'package:mem/framework/singleton.dart';
 
@@ -40,6 +41,9 @@ T d<T>(
   dynamic args,
 ]) =>
     LogService().functionLog(Level.debug, target, args);
+
+bool sentryErrorReportEnabled({bool disableErrorReport = false}) =>
+    !disableErrorReport && !kDebugMode;
 
 class LogService {
   final LogRepository _repository;
@@ -161,16 +165,20 @@ class LogService {
     Level level = Level.info,
     bool enableSimpleLog = false,
     bool disableErrorReport = false,
-  }) =>
-      Singleton.of(
-        () => LogService._(
-          LogRepository(
-            LoggerWrapper(enableSimpleLog),
-            disableErrorReport ? null : SentryWrapper(), // coverage:ignore-line
-          ),
-          level,
+  }) {
+    final enableSentry =
+        sentryErrorReportEnabled(disableErrorReport: disableErrorReport);
+
+    return Singleton.of(
+      () => LogService._(
+        LogRepository(
+          LoggerWrapper(enableSimpleLog),
+          enableSentry ? SentryWrapper() : null, // coverage:ignore-line
         ),
-      );
+        level,
+      ),
+    );
+  }
 }
 
 extension _DebugLoggableFunction<T> on T Function() {
