@@ -21,15 +21,16 @@ class DevPage extends StatelessWidget {
               sections: [
                 SettingsSection(
                   tiles: [
-                    SettingsTile.navigation(
-                      title: const Text('Test send to Sentry'),
-                      onPressed: (context) async {
-                        await SentryWrapper().sendTestException(
-                          "Test send to Sentry",
-                          StackTrace.current,
-                        );
-                      },
-                    )
+                    if (sentryErrorReportEnabled())
+                      SettingsTile.navigation(
+                        title: const Text('Test send to Sentry'),
+                        onPressed: (context) async {
+                          await SentryWrapper().sendTestException(
+                            "Test send to Sentry",
+                            StackTrace.current,
+                          );
+                        },
+                      )
                   ],
                 )
               ],

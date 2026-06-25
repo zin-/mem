@@ -46,8 +46,12 @@ class SentryWrapper {
   Future<String> sendTestException(
     dynamic throwable,
     dynamic stackTrace,
-  ) =>
-      captureException(throwable, stackTrace);
+  ) async {
+    if (!sentryErrorReportEnabled()) {
+      return '';
+    }
+    return captureException(throwable, stackTrace);
+  }
 
   Future<String> captureException(
     dynamic throwable,
