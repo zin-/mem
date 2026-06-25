@@ -42,8 +42,18 @@ T d<T>(
 ]) =>
     LogService().functionLog(Level.debug, target, args);
 
+/// release / profile（isDebugMode == false）では有効。debug のみ無効。
+bool computeSentryErrorReportEnabled({
+  required bool disableErrorReport,
+  required bool isDebugMode,
+}) =>
+    !disableErrorReport && !isDebugMode;
+
 bool sentryErrorReportEnabled({bool disableErrorReport = false}) =>
-    !disableErrorReport && !kDebugMode;
+    computeSentryErrorReportEnabled(
+      disableErrorReport: disableErrorReport,
+      isDebugMode: kDebugMode,
+    );
 
 class LogService {
   final LogRepository _repository;
