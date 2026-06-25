@@ -17,28 +17,28 @@ class SentryWrapper {
     options.tracesSampleRate = 1.0;
   }
 
-  Future<void> _ensureInitialized() async {
+  Future<void> _ensureInitialized({AppRunner? appRunner}) async {
     if (_initialized) {
+      if (appRunner != null) {
+        await appRunner();
+      }
       return;
     }
-    _initializing ??= SentryFlutter.init(_configureOptions).then((_) {
+    _initializing ??= SentryFlutter.init(
+      _configureOptions,
+      appRunner: appRunner ?? () async {},
+    ).then((_) {
       _initialized = true;
+    }).catchError((Object error, StackTrace stackTrace) {
+      _initializing = null;
+      Error.throwWithStackTrace(error, stackTrace);
     });
     await _initializing;
   }
 
   Future<SentryWrapper> init(AppRunner appRunner) => v(
         () async {
-          if (_initialized) {
-            await appRunner();
-            return SentryWrapper();
-          }
-          await SentryFlutter.init(
-            _configureOptions,
-            appRunner: appRunner,
-          );
-          _initialized = true;
-
+          await _ensureInitialized(appRunner: appRunner);
           return SentryWrapper();
         },
       );
