@@ -7,6 +7,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 
 class SentryWrapper {
   static bool _initialized = false;
+  static Future<void>? _initializing;
 
   static void _configureOptions(SentryFlutterOptions options) {
     options.dsn =
@@ -20,13 +21,18 @@ class SentryWrapper {
     if (_initialized) {
       return;
     }
-
-    await SentryFlutter.init(_configureOptions);
-    _initialized = true;
+    _initializing ??= SentryFlutter.init(_configureOptions).then((_) {
+      _initialized = true;
+    });
+    await _initializing;
   }
 
   Future<SentryWrapper> init(AppRunner appRunner) => v(
         () async {
+          if (_initialized) {
+            await appRunner();
+            return SentryWrapper();
+          }
           await SentryFlutter.init(
             _configureOptions,
             appRunner: appRunner,
@@ -41,28 +47,22 @@ class SentryWrapper {
     dynamic throwable,
     dynamic stackTrace,
   ) =>
-      v(
-        () async {
-          await _ensureInitialized();
-          return await captureException(throwable, stackTrace);
-        },
-        {
-          'throwable': throwable,
-          'stackTrace': stackTrace,
-        },
-      );
+      captureException(throwable, stackTrace);
 
   Future<String> captureException(
     dynamic throwable,
     dynamic stackTrace,
   ) =>
       v(
-        () async => await Sentry.captureException(
-          throwable,
-          stackTrace: stackTrace,
-        ).then(
-          (v) => v.toString(),
-        ),
+        () async {
+          await _ensureInitialized();
+          return await Sentry.captureException(
+            throwable,
+            stackTrace: stackTrace,
+          ).then(
+            (v) => v.toString(),
+          );
+        },
         {
           'throwable': throwable,
           'stackTrace': stackTrace,
