@@ -3,8 +3,8 @@ import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/logger/sentry_wrapper.dart';
 
 void main() {
-  group('computeSentryErrorReportEnabled', () {
-    test(': disableErrorReport false and isDebugMode true returns false.', () {
+  group('computeSentryErrorReportEnabled (#549)', () {
+    test(': debug (isDebugMode true) disables Sentry.', () {
       expect(
         computeSentryErrorReportEnabled(
           disableErrorReport: false,
@@ -24,7 +24,7 @@ void main() {
       );
     });
 
-    test(': disableErrorReport false and isDebugMode false returns true.', () {
+    test(': profile and release (isDebugMode false) enable Sentry.', () {
       expect(
         computeSentryErrorReportEnabled(
           disableErrorReport: false,
