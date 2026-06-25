@@ -2,47 +2,59 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/logger/sentry_wrapper.dart';
 
+import '../helpers.dart';
+
+typedef _SentryEnabledInput = ({
+  bool disableErrorReport,
+  bool isDebugMode,
+});
+
 void main() {
   group('computeSentryErrorReportEnabled (#549)', () {
-    test(': debug (isDebugMode true) disables Sentry.', () {
-      expect(
-        computeSentryErrorReportEnabled(
+    for (final testCase in [
+      TestCase<_SentryEnabledInput, bool>(
+        name: 'debug (isDebugMode true) disables Sentry',
+        (
           disableErrorReport: false,
           isDebugMode: true,
         ),
-        isFalse,
-      );
-    });
-
-    test(': disableErrorReport true and isDebugMode true returns false.', () {
-      expect(
-        computeSentryErrorReportEnabled(
+        false,
+      ),
+      TestCase<_SentryEnabledInput, bool>(
+        name: 'disableErrorReport true and isDebugMode true returns false',
+        (
           disableErrorReport: true,
           isDebugMode: true,
         ),
-        isFalse,
-      );
-    });
-
-    test(': profile and release (isDebugMode false) enable Sentry.', () {
-      expect(
-        computeSentryErrorReportEnabled(
+        false,
+      ),
+      TestCase<_SentryEnabledInput, bool>(
+        name: 'profile and release (isDebugMode false) enable Sentry',
+        (
           disableErrorReport: false,
           isDebugMode: false,
         ),
-        isTrue,
-      );
-    });
-
-    test(': disableErrorReport true and isDebugMode false returns false.', () {
-      expect(
-        computeSentryErrorReportEnabled(
+        true,
+      ),
+      TestCase<_SentryEnabledInput, bool>(
+        name: 'disableErrorReport true and isDebugMode false returns false',
+        (
           disableErrorReport: true,
           isDebugMode: false,
         ),
-        isFalse,
-      );
-    });
+        false,
+      ),
+    ]) {
+      test(': ${testCase.name}.', () {
+        expect(
+          computeSentryErrorReportEnabled(
+            disableErrorReport: testCase.input.disableErrorReport,
+            isDebugMode: testCase.input.isDebugMode,
+          ),
+          testCase.expected,
+        );
+      });
+    }
   });
 
   group('sentryErrorReportEnabled', () {

@@ -60,12 +60,11 @@ class SentryWrapper {
       v(
         () async {
           await _ensureInitialized();
-          return await Sentry.captureException(
+          return (await Sentry.captureException(
             throwable,
             stackTrace: stackTrace,
-          ).then(
-            (v) => v.toString(),
-          );
+          ))
+              .toString();
         },
         {
           'throwable': throwable,
