@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:mem/features/logger/sentry_wrapper.dart';
 import 'package:mem/framework/singleton.dart';
 
@@ -41,24 +40,6 @@ T d<T>(
   dynamic args,
 ]) =>
     LogService().functionLog(Level.debug, target, args);
-
-/// Sentry エラー報告の有効判定（#549）。
-///
-/// [isDebugMode] は通常 [kDebugMode] を渡す。debug（`flutter run`）のみ無効。
-/// profile（`flutter run --profile`）と release は [isDebugMode] が false のため有効。
-/// #549 の「ローカル」は日常の debug 開発を指し、profile は本番相当として送信を維持する。
-bool computeSentryErrorReportEnabled({
-  required bool disableErrorReport,
-  required bool isDebugMode,
-}) =>
-    !disableErrorReport && !isDebugMode;
-
-/// [computeSentryErrorReportEnabled] を [kDebugMode] で評価する。
-bool sentryErrorReportEnabled({bool disableErrorReport = false}) =>
-    computeSentryErrorReportEnabled(
-      disableErrorReport: disableErrorReport,
-      isDebugMode: kDebugMode,
-    );
 
 class LogService {
   final LogRepository _repository;

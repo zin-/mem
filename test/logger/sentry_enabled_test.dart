@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/logger/sentry_wrapper.dart';
 
 import '../helpers.dart';
@@ -67,19 +66,6 @@ void main() {
         sentryErrorReportEnabled(disableErrorReport: true),
         isFalse,
       );
-    });
-  });
-
-  group('SentryWrapper.sendTestException', () {
-    test(': is no-op when sentry error report is disabled.', () async {
-      expect(sentryErrorReportEnabled(), isFalse);
-
-      final result = await SentryWrapper().sendTestException(
-        'test',
-        StackTrace.current,
-      );
-
-      expect(result, '');
     });
   });
 }

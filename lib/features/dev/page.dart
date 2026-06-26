@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/features/logger/sentry_wrapper.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 class DevPage extends StatelessWidget {
@@ -18,22 +17,7 @@ class DevPage extends StatelessWidget {
               title: Text(l10n.devPageTitle),
             ),
             body: SettingsList(
-              sections: [
-                SettingsSection(
-                  tiles: [
-                    if (sentryErrorReportEnabled())
-                      SettingsTile.navigation(
-                        title: const Text('Test send to Sentry'),
-                        onPressed: (context) async {
-                          await SentryWrapper().sendTestException(
-                            "Test send to Sentry",
-                            StackTrace.current,
-                          );
-                        },
-                      )
-                  ],
-                )
-              ],
+              sections: const [],
             ),
           );
         },
