@@ -161,20 +161,18 @@ class LogService {
     Level level = Level.info,
     bool enableSimpleLog = false,
     bool disableErrorReport = false,
-  }) {
-    final enableSentry =
-        sentryErrorReportEnabled(disableErrorReport: disableErrorReport);
-
-    return Singleton.of(
-      () => LogService._(
-        LogRepository(
-          LoggerWrapper(enableSimpleLog),
-          enableSentry ? SentryWrapper() : null, // coverage:ignore-line
+  }) =>
+      Singleton.of(
+        () => LogService._(
+          LogRepository(
+            LoggerWrapper(enableSimpleLog),
+            sentryErrorReportEnabled(disableErrorReport: disableErrorReport)
+                ? SentryWrapper()
+                : null, // coverage:ignore-line
+          ),
+          level,
         ),
-        level,
-      ),
-    );
-  }
+      );
 }
 
 extension _DebugLoggableFunction<T> on T Function() {
