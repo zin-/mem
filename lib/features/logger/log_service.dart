@@ -166,7 +166,9 @@ class LogService {
         () => LogService._(
           LogRepository(
             LoggerWrapper(enableSimpleLog),
-            disableErrorReport ? null : SentryWrapper(), // coverage:ignore-line
+            sentryErrorReportEnabled(disableErrorReport: disableErrorReport)
+                ? SentryWrapper()
+                : null, // coverage:ignore-line
           ),
           level,
         ),
