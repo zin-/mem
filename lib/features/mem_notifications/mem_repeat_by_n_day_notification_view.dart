@@ -4,6 +4,7 @@ import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
+import 'package:mem/framework/view/synced_text_editing_controller.dart';
 import 'package:mem/values/dimens.dart';
 
 const keyMemRepeatByNDayNotification = Key("mem-repeat-by-n-day-notification");
@@ -49,7 +50,7 @@ class MemRepeatByNDayNotificationView extends ConsumerWidget {
       );
 }
 
-class _MemRepeatByNDayNotificationView extends StatelessWidget {
+class _MemRepeatByNDayNotificationView extends StatefulWidget {
   final int? nDay;
   final void Function(int? value) _onNDayChanged;
 
@@ -57,6 +58,63 @@ class _MemRepeatByNDayNotificationView extends StatelessWidget {
     this.nDay,
     this._onNDayChanged,
   );
+
+  @override
+  State<_MemRepeatByNDayNotificationView> createState() =>
+      _MemRepeatByNDayNotificationViewState();
+}
+
+class _MemRepeatByNDayNotificationViewState
+    extends State<_MemRepeatByNDayNotificationView> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _syncControllerText();
+  }
+
+  @override
+  void didUpdateWidget(covariant _MemRepeatByNDayNotificationView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.nDay != widget.nDay) {
+      _syncControllerText(postFrame: true);
+    }
+  }
+
+  void _syncControllerText({bool postFrame = false}) {
+    syncTextEditingController(
+      controller: _controller,
+      mounted: mounted,
+      postFrame: postFrame,
+      buildText: () => (widget.nDay ?? 0).toString(),
+    );
+  }
+
+  void _commitValue(String value) {
+    if (value.isEmpty) {
+      widget._onNDayChanged(1);
+      _syncControllerText(postFrame: true);
+      return;
+    }
+
+    final parsed = int.tryParse(value);
+    if (parsed == null) return;
+
+    widget._onNDayChanged(parsed == 0 ? null : parsed);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) => v(
@@ -70,33 +128,52 @@ class _MemRepeatByNDayNotificationView extends StatelessWidget {
               direction: Axis.horizontal,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                if (prefix.isNotEmpty) Text(prefix),
-                TextFormField(
-                  initialValue: (nDay ?? 0).toString(),
-                  keyboardType: TextInputType.number,
-                  onChanged: (value) => _onNDayChanged(
-                    value.isEmpty ? 1 : int.parse(value),
+                if (prefix.isNotEmpty)
+                  Flexible(
+                    flex: 1,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: defaultComponentPadding,
+                      ),
+                      child: Text(prefix),
+                    ),
+                  ),
+                SizedBox(
+                  width: 56,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: defaultComponentPadding,
+                    ),
+                    child: TextFormField(
+                      controller: _controller,
+                      keyboardType: TextInputType.number,
+                      onChanged: (value) {
+                        if (value.isEmpty) return;
+
+                        final parsed = int.tryParse(value);
+                        if (parsed == null) return;
+
+                        widget._onNDayChanged(parsed == 0 ? null : parsed);
+                      },
+                      onEditingComplete: () => _commitValue(_controller.text),
+                    ),
                   ),
                 ),
-                Text(l10n.repeatByNDaySuffix),
-              ]
-                  .map(
-                    (e) => Flexible(
-                      flex: 1,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: defaultComponentPadding,
-                        ),
-                        child: e,
-                      ),
+                Flexible(
+                  flex: 1,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: defaultComponentPadding,
                     ),
-                  )
-                  .toList(growable: false),
+                    child: Text(l10n.repeatByNDaySuffix),
+                  ),
+                ),
+              ],
             ),
           );
         },
         {
-          'nDay': nDay,
+          'nDay': widget.nDay,
         },
       );
 }

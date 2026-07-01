@@ -59,7 +59,7 @@ void main() {
 
       final textField =
           tester.widget<TextFormField>(find.byType(TextFormField));
-      expect(textField.initialValue, '3');
+      expect(textField.controller!.text, '3');
     });
 
     testWidgets('displays TextFormField with 0 when nDay is null',
@@ -93,7 +93,60 @@ void main() {
 
       final textField =
           tester.widget<TextFormField>(find.byType(TextFormField));
-      expect(textField.initialValue, '0');
+      expect(textField.controller!.text, '0');
+    });
+
+    testWidgets(
+        'keeps cleared field while typing new value through provider rebuild',
+        (tester) async {
+      const memId = 1;
+      final now = DateTime.now();
+      final notification = savedMemNotification(
+        id: 1,
+        memId: memId,
+        type: MemNotificationType.repeatByNDay,
+        timeOfDaySeconds: 3,
+        message: 'Repeat by 3 days',
+        createdAt: now,
+        updatedAt: now,
+      );
+
+      final listNotifier =
+          ListValueStateNotifier<MemNotificationEntityV1>([notification]);
+
+      await tester.pumpWidget(
+        _buildTestApp(
+          const MemRepeatByNDayNotificationView(1),
+          overrides: [
+            memNotificationsByMemIdProvider(1)
+                .overrideWith((ref) => listNotifier),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(TextFormField));
+      await tester.pump();
+
+      tester.testTextInput.updateEditingValue(
+        const TextEditingValue(
+          text: '',
+          selection: TextSelection.collapsed(offset: 0),
+        ),
+      );
+      await tester.pump();
+
+      tester.testTextInput.updateEditingValue(
+        const TextEditingValue(
+          text: '7',
+          selection: TextSelection.collapsed(offset: 1),
+        ),
+      );
+      await tester.pump();
+
+      final textField =
+          tester.widget<TextFormField>(find.byType(TextFormField));
+      expect(textField.controller!.text, '7');
     });
 
     testWidgets('calls onNDayChanged when value is entered', (tester) async {
@@ -126,7 +179,7 @@ void main() {
 
       final initialTextField =
           tester.widget<TextFormField>(find.byType(TextFormField));
-      expect(initialTextField.initialValue, '3');
+      expect(initialTextField.controller!.text, '3');
 
       await tester.enterText(find.byType(TextFormField), '5');
       await tester.pump();
