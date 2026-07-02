@@ -1,0 +1,8 @@
+---
+alwaysApply: false
+---
+
+# Review Rules
+
+## レビュー観点
+単なる構文エラーやスタイルの指摘にとどまらず、`.cursor/rules/principal-*.md`の「原則」についてコードを評価し、懸念があればフィードバックに含める

@@ -1,7 +1,6 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
-
 # Red-Green（失敗テスト先行）
 
 機能追加・バグ修正のデフォルト手順は **Red → Green → Refactor → Lint → Verify** とする。

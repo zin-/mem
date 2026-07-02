@@ -1,7 +1,6 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
-
 # meta パッケージ禁止
 
 `package:meta/meta.dart` および `@visibleForTesting` 等の meta アノテーションは使わない。
