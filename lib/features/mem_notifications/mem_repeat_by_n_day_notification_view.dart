@@ -62,11 +62,14 @@ class _MemRepeatByNDayNotificationView extends StatefulWidget {
 class _MemRepeatByNDayNotificationViewState
     extends State<_MemRepeatByNDayNotificationView> {
   late final TextEditingController _controller;
+  late final FocusNode _focusNode;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController();
+    _focusNode = FocusNode();
+    _focusNode.addListener(_handleFocusChange);
   }
 
   @override
@@ -83,6 +86,12 @@ class _MemRepeatByNDayNotificationViewState
     }
   }
 
+  void _handleFocusChange() {
+    if (!_focusNode.hasFocus) {
+      _commitValue();
+    }
+  }
+
   void _syncControllerText({bool postFrame = false}) {
     syncTextEditingController(
       controller: _controller,
@@ -92,8 +101,26 @@ class _MemRepeatByNDayNotificationViewState
     );
   }
 
+  void _commitValue() {
+    final value = _controller.text;
+    if (value.isEmpty) {
+      widget.onNDayChanged(1);
+      _syncControllerText(postFrame: true);
+      return;
+    }
+
+    final parsed = int.tryParse(value);
+    if (parsed == null) {
+      return;
+    }
+
+    widget.onNDayChanged(parsed == 0 ? null : parsed);
+  }
+
   @override
   void dispose() {
+    _focusNode.removeListener(_handleFocusChange);
+    _focusNode.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -129,6 +156,7 @@ class _MemRepeatByNDayNotificationViewState
                     ),
                     child: TextFormField(
                       controller: _controller,
+                      focusNode: _focusNode,
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
                         if (value.isEmpty) {
@@ -142,20 +170,7 @@ class _MemRepeatByNDayNotificationViewState
 
                         widget.onNDayChanged(parsed == 0 ? null : parsed);
                       },
-                      onEditingComplete: () {
-                        final value = _controller.text;
-                        if (value.isEmpty) {
-                          widget.onNDayChanged(1);
-                          return;
-                        }
-
-                        final parsed = int.tryParse(value);
-                        if (parsed == null) {
-                          return;
-                        }
-
-                        widget.onNDayChanged(parsed == 0 ? null : parsed);
-                      },
+                      onEditingComplete: _commitValue,
                     ),
                   ),
                 ),

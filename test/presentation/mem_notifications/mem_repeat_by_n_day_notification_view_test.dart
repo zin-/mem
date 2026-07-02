@@ -145,15 +145,57 @@ void main() {
       await tester.pump();
     });
 
-    testWidgets('accepts empty input without crashing', (tester) async {
-      await _pumpView(
+    testWidgets('commits 1 when empty input is completed', (tester) async {
+      final listNotifier = await _pumpView(
         tester,
         memId: 1,
         notification: _repeatByNDayNotification(memId: 1, timeOfDaySeconds: 3),
+        linkRepeatProvider: false,
       );
 
       await tester.enterText(find.byType(TextFormField), '');
       await tester.pump();
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+      await tester.pump();
+
+      expect(listNotifier.state.single.value.time, 1);
+      expect(_textField(tester).controller!.text, '1');
+    });
+
+    testWidgets('commits 1 when empty input loses focus', (tester) async {
+      final listNotifier = await _pumpView(
+        tester,
+        memId: 1,
+        notification: _repeatByNDayNotification(memId: 1, timeOfDaySeconds: 3),
+        linkRepeatProvider: false,
+      );
+
+      await tester.enterText(find.byType(TextFormField), '');
+      await tester.pump();
+      FocusManager.instance.primaryFocus?.unfocus();
+      await tester.pump();
+      await tester.pump();
+
+      expect(listNotifier.state.single.value.time, 1);
+      expect(_textField(tester).controller!.text, '1');
+    });
+
+    testWidgets('restores field text when empty input is committed at 1',
+        (tester) async {
+      await _pumpView(
+        tester,
+        memId: 1,
+        notification: _repeatByNDayNotification(memId: 1, timeOfDaySeconds: 1),
+      );
+
+      await tester.enterText(find.byType(TextFormField), '');
+      await tester.pump();
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+      await tester.pump();
+
+      expect(_textField(tester).controller!.text, '1');
     });
 
     testWidgets('accepts 0 input without crashing', (tester) async {
