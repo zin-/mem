@@ -22,26 +22,21 @@ class MemRepeatByNDayNotificationView extends ConsumerWidget {
 
           return _MemRepeatByNDayNotificationView(
             notification.value.time,
-            (value) {
-              ref
-                  .read(
-                memNotificationsByMemIdProvider(_memId).notifier,
-              )
-                  .upsertAll(
-                [
-                  notification.updatedWith(
-                    (v) => MemNotification.by(
-                      v.memId,
-                      v.type,
-                      value == 0 ? null : value,
-                      v.message,
-                    ),
-                  )
-                ],
-                (current, updating) =>
-                    current.value.type == updating.value.type,
-              );
-            },
+            (nDay) => ref
+                .read(memNotificationsByMemIdProvider(_memId).notifier)
+                .upsertAll(
+              [
+                notification.updatedWith(
+                  (v) => MemNotification.by(
+                    v.memId,
+                    v.type,
+                    nDay,
+                    v.message,
+                  ),
+                ),
+              ],
+              (current, updating) => current.value.type == updating.value.type,
+            ),
           );
         },
         {
@@ -52,11 +47,11 @@ class MemRepeatByNDayNotificationView extends ConsumerWidget {
 
 class _MemRepeatByNDayNotificationView extends StatefulWidget {
   final int? nDay;
-  final void Function(int? value) _onNDayChanged;
+  final ValueChanged<int?> onNDayChanged;
 
   const _MemRepeatByNDayNotificationView(
     this.nDay,
-    this._onNDayChanged,
+    this.onNDayChanged,
   );
 
   @override
@@ -97,19 +92,6 @@ class _MemRepeatByNDayNotificationViewState
     );
   }
 
-  void _commitValue(String value) {
-    if (value.isEmpty) {
-      widget._onNDayChanged(1);
-      _syncControllerText(postFrame: true);
-      return;
-    }
-
-    final parsed = int.tryParse(value);
-    if (parsed == null) return;
-
-    widget._onNDayChanged(parsed == 0 ? null : parsed);
-  }
-
   @override
   void dispose() {
     _controller.dispose();
@@ -121,6 +103,7 @@ class _MemRepeatByNDayNotificationViewState
         () {
           final l10n = buildL10n(context);
           final prefix = l10n.repeatByNDayPrefix;
+          final suffix = l10n.repeatByNDaySuffix;
 
           return ListTile(
             key: keyMemRepeatByNDayNotification,
@@ -148,14 +131,31 @@ class _MemRepeatByNDayNotificationViewState
                       controller: _controller,
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
-                        if (value.isEmpty) return;
+                        if (value.isEmpty) {
+                          return;
+                        }
 
                         final parsed = int.tryParse(value);
-                        if (parsed == null) return;
+                        if (parsed == null) {
+                          return;
+                        }
 
-                        widget._onNDayChanged(parsed == 0 ? null : parsed);
+                        widget.onNDayChanged(parsed == 0 ? null : parsed);
                       },
-                      onEditingComplete: () => _commitValue(_controller.text),
+                      onEditingComplete: () {
+                        final value = _controller.text;
+                        if (value.isEmpty) {
+                          widget.onNDayChanged(1);
+                          return;
+                        }
+
+                        final parsed = int.tryParse(value);
+                        if (parsed == null) {
+                          return;
+                        }
+
+                        widget.onNDayChanged(parsed == 0 ? null : parsed);
+                      },
                     ),
                   ),
                 ),
@@ -165,7 +165,7 @@ class _MemRepeatByNDayNotificationViewState
                     padding: const EdgeInsets.symmetric(
                       horizontal: defaultComponentPadding,
                     ),
-                    child: Text(l10n.repeatByNDaySuffix),
+                    child: Text(suffix),
                   ),
                 ),
               ],
