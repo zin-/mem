@@ -26,199 +26,196 @@ Widget _buildTestApp(Widget child, {List<Override>? overrides}) {
   );
 }
 
+SavedMemNotificationEntityV1 _repeatByNDayNotification({
+  required int? memId,
+  int? timeOfDaySeconds,
+}) {
+  final now = DateTime.now();
+  return savedMemNotification(
+    id: 1,
+    memId: memId,
+    type: MemNotificationType.repeatByNDay,
+    timeOfDaySeconds: timeOfDaySeconds,
+    message: 'Repeat by N days',
+    createdAt: now,
+    updatedAt: now,
+  );
+}
+
+Future<ListValueStateNotifier<MemNotificationEntityV1>> _pumpView(
+  WidgetTester tester, {
+  required int? memId,
+  required SavedMemNotificationEntityV1 notification,
+  bool linkRepeatProvider = true,
+}) async {
+  final listNotifier =
+      ListValueStateNotifier<MemNotificationEntityV1>([notification]);
+  final overrides = <Override>[
+    memNotificationsByMemIdProvider(memId).overrideWith((ref) => listNotifier),
+  ];
+
+  if (linkRepeatProvider) {
+    overrides.add(
+      memRepeatByNDayNotificationByMemIdProvider(memId).overrideWith(
+        (ref) => ValueStateNotifier<MemNotificationEntityV1>(notification),
+      ),
+    );
+  }
+
+  await tester.pumpWidget(
+    _buildTestApp(
+      MemRepeatByNDayNotificationView(memId),
+      overrides: overrides,
+    ),
+  );
+  await tester.pumpAndSettle();
+
+  return listNotifier;
+}
+
+TextFormField _textField(WidgetTester tester) =>
+    tester.widget<TextFormField>(find.byType(TextFormField));
+
 void main() {
   group('MemRepeatByNDayNotificationView', () {
-    testWidgets('displays TextFormField with nDay value when nDay is set',
-        (tester) async {
-      const memId = 1;
-      final now = DateTime.now();
-      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeatByNDay, timeOfDaySeconds: 3, message: 'Repeat by 3 days', createdAt: now, updatedAt: now);
-
-      final listNotifier =
-          ListValueStateNotifier<MemNotificationEntityV1>([notification]);
-      final valueNotifier =
-          ValueStateNotifier<MemNotificationEntityV1>(notification);
-
-      await tester.pumpWidget(
-        _buildTestApp(
-          const MemRepeatByNDayNotificationView(1),
-          overrides: [
-            memNotificationsByMemIdProvider(1)
-                .overrideWith((ref) => listNotifier),
-            memRepeatByNDayNotificationByMemIdProvider(1).overrideWith(
-              (ref) => valueNotifier,
-            ),
-          ],
-        ),
+    testWidgets('displays nDay value when set', (tester) async {
+      await _pumpView(
+        tester,
+        memId: 1,
+        notification: _repeatByNDayNotification(memId: 1, timeOfDaySeconds: 3),
       );
 
-      await tester.pumpAndSettle();
-
       expect(find.byKey(keyMemRepeatByNDayNotification), findsOneWidget);
-      expect(find.byType(TextFormField), findsOneWidget);
-
-      final textField =
-          tester.widget<TextFormField>(find.byType(TextFormField));
-      expect(textField.initialValue, '3');
+      expect(_textField(tester).controller!.text, '3');
     });
 
-    testWidgets('displays TextFormField with 0 when nDay is null',
-        (tester) async {
-      const memId = 1;
-      final now = DateTime.now();
-      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeatByNDay, message: 'Repeat by N days', createdAt: now, updatedAt: now);
-
-      final listNotifier =
-          ListValueStateNotifier<MemNotificationEntityV1>([notification]);
-      final valueNotifier =
-          ValueStateNotifier<MemNotificationEntityV1>(notification);
-
-      await tester.pumpWidget(
-        _buildTestApp(
-          const MemRepeatByNDayNotificationView(1),
-          overrides: [
-            memNotificationsByMemIdProvider(1)
-                .overrideWith((ref) => listNotifier),
-            memRepeatByNDayNotificationByMemIdProvider(1).overrideWith(
-              (ref) => valueNotifier,
-            ),
-          ],
-        ),
+    testWidgets('displays 0 when nDay is null', (tester) async {
+      await _pumpView(
+        tester,
+        memId: 1,
+        notification: _repeatByNDayNotification(memId: 1),
       );
 
-      await tester.pumpAndSettle();
-
       expect(find.byKey(keyMemRepeatByNDayNotification), findsOneWidget);
-      expect(find.byType(TextFormField), findsOneWidget);
-
-      final textField =
-          tester.widget<TextFormField>(find.byType(TextFormField));
-      expect(textField.initialValue, '0');
+      expect(_textField(tester).controller!.text, '0');
     });
 
-    testWidgets('calls onNDayChanged when value is entered', (tester) async {
-      const memId = 1;
-      final now = DateTime.now();
-      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeatByNDay, timeOfDaySeconds: 3, message: 'Repeat by 3 days', createdAt: now, updatedAt: now);
-
-      final listNotifier =
-          ListValueStateNotifier<MemNotificationEntityV1>([notification]);
-      final valueNotifier =
-          ValueStateNotifier<MemNotificationEntityV1>(notification);
-
-      await tester.pumpWidget(
-        _buildTestApp(
-          const MemRepeatByNDayNotificationView(1),
-          overrides: [
-            memNotificationsByMemIdProvider(1)
-                .overrideWith((ref) => listNotifier),
-            memRepeatByNDayNotificationByMemIdProvider(1).overrideWith(
-              (ref) => valueNotifier,
-            ),
-          ],
-        ),
+    testWidgets(
+        'keeps cleared field while typing new value through provider rebuild',
+        (tester) async {
+      await _pumpView(
+        tester,
+        memId: 1,
+        notification: _repeatByNDayNotification(memId: 1, timeOfDaySeconds: 3),
+        linkRepeatProvider: false,
       );
 
-      await tester.pumpAndSettle();
+      await tester.tap(find.byType(TextFormField));
+      await tester.pump();
 
-      expect(find.byKey(keyMemRepeatByNDayNotification), findsOneWidget);
-      expect(find.byType(TextFormField), findsOneWidget);
+      tester.testTextInput.updateEditingValue(
+        const TextEditingValue(
+          text: '',
+          selection: TextSelection.collapsed(offset: 0),
+        ),
+      );
+      await tester.pump();
 
-      final initialTextField =
-          tester.widget<TextFormField>(find.byType(TextFormField));
-      expect(initialTextField.initialValue, '3');
+      tester.testTextInput.updateEditingValue(
+        const TextEditingValue(
+          text: '7',
+          selection: TextSelection.collapsed(offset: 1),
+        ),
+      );
+      await tester.pump();
+
+      expect(_textField(tester).controller!.text, '7');
+    });
+
+    testWidgets('accepts entered value', (tester) async {
+      await _pumpView(
+        tester,
+        memId: 1,
+        notification: _repeatByNDayNotification(memId: 1, timeOfDaySeconds: 3),
+      );
+
+      expect(_textField(tester).controller!.text, '3');
 
       await tester.enterText(find.byType(TextFormField), '5');
       await tester.pump();
     });
 
-    testWidgets('calls onNDayChanged with 1 when value is empty',
-        (tester) async {
-      const memId = 1;
-      final now = DateTime.now();
-      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeatByNDay, timeOfDaySeconds: 3, message: 'Repeat by 3 days', createdAt: now, updatedAt: now);
-
-      final listNotifier =
-          ListValueStateNotifier<MemNotificationEntityV1>([notification]);
-      final valueNotifier =
-          ValueStateNotifier<MemNotificationEntityV1>(notification);
-
-      await tester.pumpWidget(
-        _buildTestApp(
-          const MemRepeatByNDayNotificationView(1),
-          overrides: [
-            memNotificationsByMemIdProvider(1)
-                .overrideWith((ref) => listNotifier),
-            memRepeatByNDayNotificationByMemIdProvider(1).overrideWith(
-              (ref) => valueNotifier,
-            ),
-          ],
-        ),
+    testWidgets('commits 1 when empty input is completed', (tester) async {
+      final listNotifier = await _pumpView(
+        tester,
+        memId: 1,
+        notification: _repeatByNDayNotification(memId: 1, timeOfDaySeconds: 3),
+        linkRepeatProvider: false,
       );
-
-      await tester.pumpAndSettle();
-
-      expect(find.byKey(keyMemRepeatByNDayNotification), findsOneWidget);
 
       await tester.enterText(find.byType(TextFormField), '');
       await tester.pump();
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+      await tester.pump();
+
+      expect(listNotifier.state.single.value.time, 1);
+      expect(_textField(tester).controller!.text, '1');
     });
 
-    testWidgets('calls onNDayChanged with null when value is 0',
-        (tester) async {
-      const memId = 1;
-      final now = DateTime.now();
-      final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeatByNDay, timeOfDaySeconds: 3, message: 'Repeat by 3 days', createdAt: now, updatedAt: now);
-
-      final listNotifier =
-          ListValueStateNotifier<MemNotificationEntityV1>([notification]);
-      final valueNotifier =
-          ValueStateNotifier<MemNotificationEntityV1>(notification);
-
-      await tester.pumpWidget(
-        _buildTestApp(
-          const MemRepeatByNDayNotificationView(1),
-          overrides: [
-            memNotificationsByMemIdProvider(1)
-                .overrideWith((ref) => listNotifier),
-            memRepeatByNDayNotificationByMemIdProvider(1).overrideWith(
-              (ref) => valueNotifier,
-            ),
-          ],
-        ),
+    testWidgets('commits 1 when empty input loses focus', (tester) async {
+      final listNotifier = await _pumpView(
+        tester,
+        memId: 1,
+        notification: _repeatByNDayNotification(memId: 1, timeOfDaySeconds: 3),
+        linkRepeatProvider: false,
       );
 
-      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextFormField), '');
+      await tester.pump();
+      FocusManager.instance.primaryFocus?.unfocus();
+      await tester.pump();
+      await tester.pump();
 
-      expect(find.byKey(keyMemRepeatByNDayNotification), findsOneWidget);
+      expect(listNotifier.state.single.value.time, 1);
+      expect(_textField(tester).controller!.text, '1');
+    });
+
+    testWidgets('restores field text when empty input is committed at 1',
+        (tester) async {
+      await _pumpView(
+        tester,
+        memId: 1,
+        notification: _repeatByNDayNotification(memId: 1, timeOfDaySeconds: 1),
+      );
+
+      await tester.enterText(find.byType(TextFormField), '');
+      await tester.pump();
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+      await tester.pump();
+
+      expect(_textField(tester).controller!.text, '1');
+    });
+
+    testWidgets('accepts 0 input without crashing', (tester) async {
+      await _pumpView(
+        tester,
+        memId: 1,
+        notification: _repeatByNDayNotification(memId: 1, timeOfDaySeconds: 3),
+      );
 
       await tester.enterText(find.byType(TextFormField), '0');
       await tester.pump();
     });
 
     testWidgets('handles memId null', (tester) async {
-      final now = DateTime.now();
-      final notification = savedMemNotification(id: 1, memId: null, type: MemNotificationType.repeatByNDay, timeOfDaySeconds: 3, message: 'Repeat by 3 days', createdAt: now, updatedAt: now);
-
-      final listNotifier =
-          ListValueStateNotifier<MemNotificationEntityV1>([notification]);
-      final valueNotifier =
-          ValueStateNotifier<MemNotificationEntityV1>(notification);
-
-      await tester.pumpWidget(
-        _buildTestApp(
-          const MemRepeatByNDayNotificationView(null),
-          overrides: [
-            memNotificationsByMemIdProvider(null)
-                .overrideWith((ref) => listNotifier),
-            memRepeatByNDayNotificationByMemIdProvider(null).overrideWith(
-              (ref) => valueNotifier,
-            ),
-          ],
-        ),
+      await _pumpView(
+        tester,
+        memId: null,
+        notification:
+            _repeatByNDayNotification(memId: null, timeOfDaySeconds: 3),
       );
-
-      await tester.pumpAndSettle();
 
       expect(find.byKey(keyMemRepeatByNDayNotification), findsOneWidget);
       expect(find.byType(TextFormField), findsOneWidget);

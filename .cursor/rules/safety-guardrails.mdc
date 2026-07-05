@@ -1,0 +1,10 @@
+---
+description: 外部への意図しない書き込みや破壊的変更を制限するセキュリティルール
+globs: *
+alwaysApply: true
+---
+
+# Safety & Execution Guardrails
+
+- **外部への自動書き込み禁止:** `gh` や `git` などのコマンドを使用して情報を取得（viewやdiffなど）することは許可するが、外部へのコメント投稿、PRの送信、Approve、プッシュなどの書き込み処理（`gh pr review`, `gh pr comment`, `git push` など）は自動で実行しない
+- 指摘や提案は、すべてCursorのチャットまたはComposerの画面内でのテキスト出力に留める

@@ -1,0 +1,19 @@
+---
+description: レイアウトにピクセル固定幅を使わない（UI 実装時）
+globs: lib/**/*.dart
+alwaysApply: false
+---
+
+# 固定幅の禁止
+
+レイアウトにピクセル固定の幅（`width: 56`、`SizedBox(width: 56)` 等）を使わない。
+
+## 理由
+
+現在はスマホのみだが、将来タブレット・Web・PC ネイティブにも対応予定のため、画面サイズに追従するレイアウトを使う。
+
+## 代替
+
+- `Flexible` / `Expanded` で可用スペースを分配する
+- サイズの下限が必要なら `ConstrainedBox(constraints: BoxConstraints(minWidth: ...))` 等で最小幅を指定する（Material Design の min touch target 等に沿う）
+- ブレークポイントが必要なら `LayoutBuilder` や `MediaQuery` を使う
