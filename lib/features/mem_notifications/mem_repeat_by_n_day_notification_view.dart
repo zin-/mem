@@ -148,29 +148,32 @@ class _MemRepeatByNDayNotificationViewState
                       child: Text(prefix),
                     ),
                   ),
-                SizedBox(
-                  width: 56,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: defaultComponentPadding,
-                    ),
-                    child: TextFormField(
-                      controller: _controller,
-                      focusNode: _focusNode,
-                      keyboardType: TextInputType.number,
-                      onChanged: (value) {
-                        if (value.isEmpty) {
-                          return;
-                        }
+                Flexible(
+                  fit: FlexFit.loose,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minWidth: 56),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: defaultComponentPadding,
+                      ),
+                      child: TextFormField(
+                        controller: _controller,
+                        focusNode: _focusNode,
+                        keyboardType: TextInputType.number,
+                        onChanged: (value) {
+                          if (value.isEmpty) {
+                            return;
+                          }
 
-                        final parsed = int.tryParse(value);
-                        if (parsed == null) {
-                          return;
-                        }
+                          final parsed = int.tryParse(value);
+                          if (parsed == null) {
+                            return;
+                          }
 
-                        widget.onNDayChanged(parsed == 0 ? null : parsed);
-                      },
-                      onEditingComplete: _commitValue,
+                          widget.onNDayChanged(parsed == 0 ? null : parsed);
+                        },
+                        onEditingComplete: _commitValue,
+                      ),
                     ),
                   ),
                 ),
