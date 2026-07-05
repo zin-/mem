@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -162,6 +163,9 @@ class _MemRepeatByNDayNotificationViewState
                         controller: _controller,
                         focusNode: _focusNode,
                         keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
                         onChanged: (value) {
                           if (value.isEmpty) {
                             return;

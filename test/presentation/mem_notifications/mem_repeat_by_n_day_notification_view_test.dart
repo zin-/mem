@@ -145,6 +145,19 @@ void main() {
       await tester.pump();
     });
 
+    testWidgets('rejects non-numeric input', (tester) async {
+      await _pumpView(
+        tester,
+        memId: 1,
+        notification: _repeatByNDayNotification(memId: 1, timeOfDaySeconds: 3),
+      );
+
+      await tester.enterText(find.byType(TextFormField), '1a2b3');
+      await tester.pump();
+
+      expect(_textField(tester).controller!.text, '123');
+    });
+
     testWidgets('commits null when empty input is completed', (tester) async {
       final listNotifier = await _pumpView(
         tester,
