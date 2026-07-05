@@ -181,7 +181,7 @@ void main() {
       expect(_textField(tester).controller!.text, '');
     });
 
-    testWidgets('clears field when 0 is entered', (tester) async {
+    testWidgets('stores null while 0 is being entered', (tester) async {
       final listNotifier = await _pumpView(
         tester,
         memId: 1,
@@ -190,6 +190,47 @@ void main() {
       );
 
       await tester.enterText(find.byType(TextFormField), '0');
+      await tester.pump();
+
+      expect(listNotifier.state.single.value.time, 3);
+      expect(_textField(tester).controller!.text, '0');
+    });
+
+    testWidgets('keeps 0 visible when deleting leading digit from 10',
+        (tester) async {
+      final listNotifier = await _pumpView(
+        tester,
+        memId: 1,
+        notification: _repeatByNDayNotification(memId: 1, timeOfDaySeconds: 10),
+        linkRepeatProvider: false,
+      );
+
+      await tester.tap(find.byType(TextFormField));
+      await tester.pump();
+
+      tester.testTextInput.updateEditingValue(
+        const TextEditingValue(
+          text: '0',
+          selection: TextSelection.collapsed(offset: 1),
+        ),
+      );
+      await tester.pump();
+
+      expect(listNotifier.state.single.value.time, 10);
+      expect(_textField(tester).controller!.text, '0');
+    });
+
+    testWidgets('clears field when 0 input is committed', (tester) async {
+      final listNotifier = await _pumpView(
+        tester,
+        memId: 1,
+        notification: _repeatByNDayNotification(memId: 1, timeOfDaySeconds: 3),
+        linkRepeatProvider: false,
+      );
+
+      await tester.enterText(find.byType(TextFormField), '0');
+      await tester.pump();
+      await tester.testTextInput.receiveAction(TextInputAction.done);
       await tester.pump();
       await tester.pump();
 

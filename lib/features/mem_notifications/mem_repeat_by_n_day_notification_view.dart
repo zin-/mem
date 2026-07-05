@@ -81,7 +81,7 @@ class _MemRepeatByNDayNotificationViewState
   @override
   void didUpdateWidget(covariant _MemRepeatByNDayNotificationView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.nDay != widget.nDay) {
+    if (oldWidget.nDay != widget.nDay && !_focusNode.hasFocus) {
       _syncControllerText(postFrame: true);
     }
   }
@@ -169,8 +169,6 @@ class _MemRepeatByNDayNotificationViewState
 
                           final parsed = int.tryParse(value);
                           if (parsed == null || parsed == 0) {
-                            widget.onNDayChanged(null);
-                            _syncControllerText(postFrame: true);
                             return;
                           }
 
