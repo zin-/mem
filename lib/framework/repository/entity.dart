@@ -1,12 +1,17 @@
-/// # Entityとは
-///
-/// システムが扱うデータとしての実体を表現する
+// # Entityとは
+//
+// システムが扱うデータとしての実体を表現する
 // # 語源
 //
 // 「存在するもの」、「実体」
 // # Domainとの違い
 // Domainと違い、Entityは具体的なデータとの繋がりがあるためいくつかの制約を持ち、持たせることができる
 // 具体的には、そのデータを一意に定める識別子(id)を持ったり、作成日時などのmetadataを持つ
+
+/// View 層の FE 向け immutable データ契約。
+///
+/// Issue 上の「ViewModel」は旧称・暫定呼称であり、
+/// 実装では `ViewData` と呼ぶ。MVVM の ViewModel（Riverpod Notifier 等）ではない。
 mixin EntityV1<VALUE> {
   late VALUE value;
 

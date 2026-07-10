@@ -1,5 +1,9 @@
 import 'package:mem/framework/repository/entity.dart';
 
+/// DB persistence metadata（id, createdAt 等）の暫定拡張。
+///
+/// View 層データ（[EntityV1]）とは責務を分離し、将来廃止予定。
+/// metadata は Data / Repository 層（[Entity]）に属する。
 mixin DatabaseTupleEntityV1<PRIMARY_KEY, T> on EntityV1<T> {
   late PRIMARY_KEY id;
   late DateTime createdAt;
