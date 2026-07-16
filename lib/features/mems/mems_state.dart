@@ -15,9 +15,9 @@ part 'mems_state.g.dart';
 
 @Riverpod(keepAlive: true)
 class MemEntities extends _$MemEntities
-    with EntitiesStateMixinV1<SavedMemEntityV1, int> {
+    with EntitiesStateMixinV1<MemEntity, int> {
   @override
-  Iterable<SavedMemEntityV1> build() => v(
+  Iterable<MemEntity> build() => v(
         () {
           ref.listen<bool>(showNotArchivedProvider, (_, __) => loadMemList());
           ref.listen<bool>(showArchivedProvider, (_, __) => loadMemList());
@@ -51,14 +51,12 @@ class MemEntities extends _$MemEntities
         },
       );
 
-  Future<SavedMemEntityV1> loadByMemId(int memId) => v(
+  Future<MemEntity> loadByMemId(int memId) => v(
         () async {
-          final mem = await MemRepository()
-              .shipById(
-                memId,
-                loadLatestAct: true,
-              )
-              .then((v) => SavedMemEntityV1.fromEntityV2(v));
+          final mem = await MemRepository().shipById(
+            memId,
+            loadLatestAct: true,
+          );
 
           upsert([mem]);
 
@@ -74,12 +72,12 @@ class MemEntities extends _$MemEntities
             loadLatestAct: true,
           );
           if (rows.isEmpty) return;
-          upsert([SavedMemEntityV1.fromEntityV2(rows.single)]);
+          upsert([rows.single]);
         },
         {'memId': memId},
       );
 
-  Future<Iterable<SavedMemEntityV1>> removeAsync(Iterable<int> ids) => v(
+  Future<Iterable<MemEntity>> removeAsync(Iterable<int> ids) => v(
         () async {
           await Future.wait(ids.map((id) => MemClient().remove(id)));
 
@@ -112,7 +110,7 @@ class MemEntities extends _$MemEntities
               // undo: true,
             );
 
-            upsert([SavedMemEntityV1.fromEntityV2(undoneRemovedMemEntity)]);
+            upsert([undoneRemovedMemEntity]);
             ref.read(memItemsProvider.notifier).upsertAll(
                   undoneRemovedMemItems,
                   (current, updating) =>
@@ -153,7 +151,7 @@ class MemEntities extends _$MemEntities
 
           final archived = await MemClient().archive(targetMem);
 
-          upsert([SavedMemEntityV1.fromEntityV2(archived)]);
+          upsert([archived]);
         },
         {'memId': memId},
       );
@@ -168,7 +166,7 @@ class MemEntities extends _$MemEntities
 
           final unarchived = await MemClient().unarchive(targetMem);
 
-          upsert([SavedMemEntityV1.fromEntityV2(unarchived)]);
+          upsert([unarchived]);
         },
       );
 }

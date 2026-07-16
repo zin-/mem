@@ -32,12 +32,12 @@ class _FakeMemState extends MemState {
 }
 
 class _FakeMemEntities extends MemEntities {
-  final Iterable<SavedMemEntityV1> _state;
+  final Iterable<MemEntity> _state;
 
   _FakeMemEntities(this._state);
 
   @override
-  Iterable<SavedMemEntityV1> build() => _state;
+  Iterable<MemEntity> build() => _state;
 }
 
 class _FakeActEntities extends ActEntities {
@@ -70,7 +70,7 @@ class _FakePreference extends Preference<TimeOfDay> {
       const TimeOfDay(hour: 9, minute: 0);
 }
 
-SavedMemEntityV1 _savedMem(int id, String name) => savedMem(
+MemEntity _savedMem(int id, String name) => savedMem(
       id: id,
       name: name,
       createdAt: DateTime(2024, 1, id),
@@ -90,8 +90,8 @@ void main() {
           (tester) async {
         final saved1 = _savedMem(1, 'First');
         final saved2 = _savedMem(2, 'Second');
-        final entity1 = saved1.toEntityV2();
-        final entity2 = saved2.toEntityV2();
+        final entity1 = saved1;
+        final entity2 = saved2;
         final notification1 = _savedNotification(101, 1);
         final notification2 = _savedNotification(102, 2);
         final fakeAct = _FakeActEntities();
@@ -131,9 +131,9 @@ void main() {
                 ),
               ),
               memStateProvider(1)
-                  .overrideWith(() => _FakeMemState(saved1.value)),
+                  .overrideWith(() => _FakeMemState(saved1.toDomain())),
               memStateProvider(2)
-                  .overrideWith(() => _FakeMemState(saved2.value)),
+                  .overrideWith(() => _FakeMemState(saved2.toDomain())),
               latestActsByMemProvider.overrideWith(
                 (ref) => {1: null, 2: null},
               ),
@@ -165,8 +165,8 @@ void main() {
           (tester) async {
         final saved1 = _savedMem(1, 'First');
         final saved2 = _savedMem(2, 'Second');
-        final entity1 = saved1.toEntityV2();
-        final entity2 = saved2.toEntityV2();
+        final entity1 = saved1;
+        final entity2 = saved2;
         final notification1 = _savedNotification(101, 1);
         final notification2 = _savedNotification(102, 2);
         final fakeAct = _FakeActEntities();
@@ -210,9 +210,9 @@ void main() {
                 ),
               ),
               memStateProvider(1)
-                  .overrideWith(() => _FakeMemState(saved1.value)),
+                  .overrideWith(() => _FakeMemState(saved1.toDomain())),
               memStateProvider(2)
-                  .overrideWith(() => _FakeMemState(saved2.value)),
+                  .overrideWith(() => _FakeMemState(saved2.toDomain())),
               latestActsByMemProvider.overrideWith(
                 (ref) => {1: paused1, 2: null},
               ),

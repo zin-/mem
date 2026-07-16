@@ -103,13 +103,13 @@ void main() {
         name: 'Mem A',
         createdAt: fixedDate,
         updatedAt: fixedDate,
-      ).toEntityV2();
+      );
       final memB = savedMem(
         id: 2,
         name: 'Mem B',
         createdAt: fixedDate,
         updatedAt: fixedDate,
-      ).toEntityV2();
+      );
       final notificationA = repeatAtHourNotificationEntity(
         id: 1,
         memId: 1,

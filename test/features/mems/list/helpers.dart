@@ -26,10 +26,10 @@ class FakeStartOfDayPreference extends Preference<TimeOfDay> {
 class FakeMemEntities extends MemEntities {
   FakeMemEntities([this._initialState = const []]);
 
-  final Iterable<SavedMemEntityV1> _initialState;
+  final Iterable<MemEntity> _initialState;
 
   @override
-  Iterable<SavedMemEntityV1> build() => _initialState;
+  Iterable<MemEntity> build() => _initialState;
 }
 
 SavedMemNotificationEntityV1 savedRepeatAtHourNotification({
@@ -100,7 +100,7 @@ ProviderContainer loadMemListTestContainer({
 }
 
 ProviderContainer memListTestContainer(
-  Iterable<SavedMemEntityV1> mems, {
+  Iterable<MemEntity> mems, {
   Iterable<SavedMemNotificationEntityV1> notifications = const [],
   TimeOfDay startOfDay = const TimeOfDay(hour: 9, minute: 0),
 }) {

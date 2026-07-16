@@ -19,12 +19,12 @@ import 'package:mockito/mockito.dart';
 import 'states_test.mocks.dart';
 
 class _FakeMemEntities extends MemEntities {
-  final Iterable<SavedMemEntityV1> _initial;
+  final Iterable<MemEntity> _initial;
 
   _FakeMemEntities(this._initial);
 
   @override
-  Iterable<SavedMemEntityV1> build() => _initial;
+  Iterable<MemEntity> build() => _initial;
 }
 
 SavedMemItemEntityV1 _savedMemItem({
@@ -104,7 +104,7 @@ void main() {
   });
 
   ProviderContainer containerFor({
-    Iterable<SavedMemEntityV1> mems = const [],
+    Iterable<MemEntity> mems = const [],
     List<MemItemEntityV1>? memItems,
     List<MemNotificationEntityV1>? memNotifications,
   }) {

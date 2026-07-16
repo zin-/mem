@@ -33,7 +33,7 @@ class _FakeMemState extends MemState {
 }
 
 class _FakeMemEntities extends MemEntities {
-  final Iterable<SavedMemEntityV1> _state;
+  final Iterable<MemEntity> _state;
   int doneMemCallCount = 0;
   int undoneMemCallCount = 0;
   int? lastDoneMemId;
@@ -42,7 +42,7 @@ class _FakeMemEntities extends MemEntities {
   _FakeMemEntities(this._state);
 
   @override
-  Iterable<SavedMemEntityV1> build() => _state;
+  Iterable<MemEntity> build() => _state;
 
   @override
   void doneMem(int memId) {

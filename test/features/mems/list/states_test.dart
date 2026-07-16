@@ -28,7 +28,7 @@ void main() {
           updatedAt: DateTime(2024, 6, 1),
           doneAt: doneAt,
           archivedAt: archivedAt,
-        ).toEntityV2();
+        );
 
     test('sorts two ActiveAct mems by start descending', () {
       final earlier = savedMem(
@@ -37,14 +37,14 @@ void main() {
         createdAt: DateTime(2024, 6, 1),
         updatedAt: DateTime(2024, 6, 1),
         latestAct: ActiveAct(1, DateAndTime(2024, 6, 1, 8, 0)),
-      ).toEntityV2();
+      );
       final later = savedMem(
         id: 2,
         name: 'Later',
         createdAt: DateTime(2024, 6, 1),
         updatedAt: DateTime(2024, 6, 1),
         latestAct: ActiveAct(2, DateAndTime(2024, 6, 1, 10, 0)),
-      ).toEntityV2();
+      );
 
       expect(
         compareMemListEntries(
@@ -242,7 +242,7 @@ void main() {
           createdAt: DateTime(2024, 10, 1),
           updatedAt: DateTime(2024, 10, 12),
           latestAct: skippedOnToday(id),
-        ).toEntityV2().updatedWith(
+        ).updatedWith(
               scheduleAnchorAct: () => scheduleAnchorAct,
             );
 

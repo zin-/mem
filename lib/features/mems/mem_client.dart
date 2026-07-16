@@ -7,6 +7,7 @@ import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 
 import 'mem_entity.dart';
 import 'mem_service.dart';
+import 'mem_view_data.dart';
 
 class MemClient {
   final MemService _memService;
@@ -23,7 +24,7 @@ class MemClient {
         ),
         DateTime?
       )> save(
-    MemEntityV1 mem,
+    MemViewData mem,
     List<MemItemEntityV1> memItemList,
     List<MemNotificationEntityV1> memNotificationList,
     TargetEntityV1? target,
@@ -70,7 +71,7 @@ class MemClient {
         },
       );
 
-  Future<MemEntity> archive(SavedMemEntityV1 memEntity) => v(
+  Future<MemEntity> archive(MemEntity memEntity) => v(
         () async {
           final archived = await _memService.archive(memEntity);
 
@@ -83,7 +84,7 @@ class MemClient {
         },
       );
 
-  Future<MemEntity> unarchive(SavedMemEntityV1 memEntity) => v(
+  Future<MemEntity> unarchive(MemEntity memEntity) => v(
         () async {
           final unarchived = await _memService.unarchive(memEntity);
 

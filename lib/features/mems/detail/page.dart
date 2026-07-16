@@ -6,6 +6,7 @@ import 'package:mem/features/mems/detail/app_bar/archive_mem_action.dart';
 import 'package:mem/features/mems/detail/body.dart';
 import 'package:mem/features/mems/detail/fab.dart';
 import 'package:mem/features/mems/detail/app_bar/remove_mem_action.dart';
+import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/detail/app_bar/transit_act_list_action.dart';
 import 'package:mem/features/mems/detail/app_bar/transit_chart_action.dart';
@@ -20,13 +21,13 @@ class MemDetailPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemDetailPage(
           ref.watch(editingMemByMemIdProvider(_memId).select(
-            (memEntityV1) => memEntityV1.value.id,
+            (mem) => mem.value.id,
           )),
           ref.watch(editingMemByMemIdProvider(_memId).select(
-            (memEntityV1) => memEntityV1.value.id != null,
+            (mem) => mem.isSaved,
           )),
-          ref.watch(editingMemByMemIdProvider(_memId).select(
-            (memEntityV1) => memEntityV1.value.isArchived,
+          ref.watch(memByMemIdProvider(_memId).select(
+            (mem) => mem?.isArchived ?? false,
           )),
         ),
         {

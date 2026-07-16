@@ -63,7 +63,7 @@ SavedActEntityV1 savedActFromDomain(
   ));
 }
 
-SavedMemEntityV1 savedMem({
+MemEntity savedMem({
   required int id,
   required String name,
   DateTime? doneAt,
@@ -86,7 +86,7 @@ SavedMemEntityV1 savedMem({
       end: endOn == null ? null : DateAndTime.from(endOn, timeOfDay: endAt),
     );
   }
-  return SavedMemEntityV1.fromEntityV2(MemEntity(
+  return MemEntity(
     id,
     name,
     doneAt,
@@ -96,10 +96,10 @@ SavedMemEntityV1 savedMem({
     updatedAt ?? now,
     archivedAt,
     latestAct: latestAct,
-  ));
+  );
 }
 
-SavedMemEntityV1 savedMemFromDomain(
+MemEntity savedMemFromDomain(
   Mem mem, {
   DateTime? createdAt,
   DateTime? updatedAt,

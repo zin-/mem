@@ -9,40 +9,28 @@ import 'package:mem/features/mem_relations/mem_relation.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/mems/mem_view_data.dart';
 
 import '../../entity_factories.dart';
 
 void main() {
   group('MemEntity', () {
-    test('SavedMemEntityV1 map and toEntityV2', () {
-      final createdAt = DateTime(2024, 1, 1);
-      final updatedAt = DateTime(2024, 1, 2);
-      final archivedAt = DateTime(2024, 1, 3);
-      final saved = SavedMemEntityV1({
-        'id': 1,
-        'name': 'm',
-        'doneAt': DateTime(2024, 1, 4),
-        'notifyOn': DateTime(2024, 1, 5),
-        'notifyAt': DateTime(2024, 1, 5, 10),
-        'endOn': DateTime(2024, 1, 6),
-        'endAt': DateTime(2024, 1, 6, 11),
-        'createdAt': createdAt,
-        'updatedAt': updatedAt,
-        'archivedAt': archivedAt,
-      });
+    test('MemViewData toMap for saved mem', () {
+      final period = DateAndTimePeriod(
+        start: DateAndTime(2024, 1, 5, 10, 0),
+        end: DateAndTime(2024, 1, 6, 11, 0),
+      );
+      final viewData = MemViewData(
+        Mem(1, 'm', DateTime(2024, 1, 4), period),
+      );
 
-      expect(saved.toMap, containsPair('name', 'm'));
-      expect(saved.toMap['notifyOn'], isNotNull);
-      expect(saved.toMap['endOn'], isNotNull);
-
-      final entity = saved.toEntityV2();
-      expect(entity.id, 1);
-      expect(entity.name, 'm');
-      expect(entity.period, isNotNull);
-      expect(entity.latestAct, isNull);
+      expect(viewData.toMap, containsPair('name', 'm'));
+      expect(viewData.toMap['notifyOn'], isNotNull);
+      expect(viewData.toMap['endOn'], isNotNull);
+      expect(viewData.isSaved, isTrue);
     });
 
-    test('SavedMemEntityV1 fromEntityV2 keeps latestAct', () {
+    test('MemEntity keeps latestAct through updatedWith', () {
       final latestAct = savedAct(
         id: 5,
         memId: 10,
@@ -51,51 +39,47 @@ void main() {
         end: DateTime(2024, 2, 1, 11),
         endIsAllDay: false,
       ).value;
-      final saved = SavedMemEntityV1.fromEntityV2(
-        MemEntity(
-          10,
-          'before',
-          null,
-          null,
-          null,
-          DateTime(2024, 2, 1),
-          DateTime(2024, 2, 2),
-          null,
-          latestAct: latestAct,
-        ),
+      final entity = MemEntity(
+        10,
+        'before',
+        null,
+        null,
+        null,
+        DateTime(2024, 2, 1),
+        DateTime(2024, 2, 2),
+        null,
+        latestAct: latestAct,
       );
 
-      expect(saved.latestAct, latestAct);
-      expect(saved.id, 10);
+      expect(entity.latestAct, latestAct);
+      expect(entity.id, 10);
 
-      final updated = saved.updatedWith(
-        (mem) => Mem(mem.id, 'after', mem.doneAt, mem.period),
+      final updated = entity.updatedWith(
+        update: (mem) => Mem(mem.id, 'after', mem.doneAt, mem.period),
       );
 
-      expect(updated.value.name, 'after');
+      expect(updated.name, 'after');
       expect(updated.latestAct, latestAct);
       expect(updated.id, 10);
     });
 
-    test('SavedMemEntityV1 updatedWith updates period', () {
-      final saved = SavedMemEntityV1({
-        'id': 11,
-        'name': 'period-mem',
-        'doneAt': null,
-        'notifyOn': DateTime(2024, 4, 1),
-        'notifyAt': DateTime(2024, 4, 1, 10),
-        'endOn': DateTime(2024, 4, 2),
-        'endAt': DateTime(2024, 4, 2, 18),
-        'createdAt': DateTime(2024, 4, 1),
-        'updatedAt': null,
-        'archivedAt': null,
-      });
+    test('MemViewData updatedWith updates period', () {
+      final viewData = MemViewData.fromEntityV2(
+        savedMem(
+          id: 11,
+          name: 'period-mem',
+          notifyOn: DateTime(2024, 4, 1),
+          notifyAt: DateTime(2024, 4, 1, 10),
+          endOn: DateTime(2024, 4, 2),
+          endAt: DateTime(2024, 4, 2, 18),
+        ),
+      );
 
       final newStart = DateAndTime(2024, 5, 1, 9, 0);
       final newEnd = DateAndTime(2024, 5, 3, 17, 0);
       final newPeriod = DateAndTimePeriod(start: newStart, end: newEnd);
 
-      final updated = saved.updatedWith(
+      final updated = viewData.updatedWith(
         (mem) => Mem(mem.id, mem.name, mem.doneAt, newPeriod),
       );
 
