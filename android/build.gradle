@@ -53,6 +53,8 @@ subprojects { subproject ->
     }
     // プラグインごとに Java targetCompatibility と Kotlin jvmTarget がずれる（例: Java 17 / Kotlin 1.8）
     // 全ライブラリへの Java 17 強制は workmanager_android 等と競合するため行わず、既存 Java 設定に jvmTarget を合わせる
+    // home_widget は JVM 1.8 のままだと work-runtime-ktx (JVM 11) のインラインで失敗する
+    // compileOptions は afterEvaluate では finalized 済みのため、home_widget のみタスク側で 11 に揃える
     subproject.afterEvaluate {
       if (!subproject.plugins.hasPlugin("org.jetbrains.kotlin.android")) {
         return
@@ -61,8 +63,16 @@ subprojects { subproject ->
       if (javaTarget == null) {
         return
       }
+      def effectiveTarget = javaTarget
+      if (subproject.name == "home_widget" && javaTarget < JavaVersion.VERSION_11) {
+        effectiveTarget = JavaVersion.VERSION_11
+        subproject.tasks.withType(JavaCompile).configureEach {
+          sourceCompatibility = effectiveTarget.toString()
+          targetCompatibility = effectiveTarget.toString()
+        }
+      }
       subproject.android.kotlinOptions {
-        jvmTarget = javaTarget.toString()
+        jvmTarget = effectiveTarget.toString()
       }
     }
   }

@@ -8,12 +8,12 @@ import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mems_state.dart';
 
 class _FakeMemEntities extends MemEntities {
-  final Iterable<SavedMemEntityV1> _state;
+  final Iterable<MemEntity> _state;
 
   _FakeMemEntities(this._state);
 
   @override
-  Iterable<SavedMemEntityV1> build() => _state;
+  Iterable<MemEntity> build() => _state;
 }
 
 Widget _buildTestApp(Widget child, {List<Override>? overrides}) {

@@ -9,20 +9,21 @@ import 'package:mem/features/logger/log_repository.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/detail/states.dart';
+import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_period.dart';
 import 'package:mem/features/mems/mems_state.dart';
-import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/mems/mem_view_data.dart';
 import 'package:mem/framework/date_and_time/time_of_day_view.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
 import 'package:mockito/mockito.dart';
 
 class _FakeMemEntities extends MemEntities {
-  final Iterable<SavedMemEntityV1> _initial;
+  final Iterable<MemEntity> _initial;
 
   _FakeMemEntities(this._initial);
 
   @override
-  Iterable<SavedMemEntityV1> build() => _initial;
+  Iterable<MemEntity> build() => _initial;
 }
 
 Widget _buildTestApp(
@@ -234,11 +235,11 @@ void main() {
 
   group('ValueStateNotifier.updatedBy after dispose', () {
     test(': returns value without updating state.', () {
-      final initial = MemEntityV1(Mem(null, '', null, null));
+      final initial = MemViewData.newMem();
       final notifier = ValueStateNotifier(initial);
       notifier.dispose();
 
-      final updating = MemEntityV1(Mem(null, 'x', null, null));
+      final updating = MemViewData(Mem(null, 'x', null, null));
       final result = notifier.updatedBy(updating);
 
       expect(result, updating);

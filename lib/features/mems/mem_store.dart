@@ -12,18 +12,15 @@ import 'package:mem/features/mems/mem_repository.dart';
 class MemStore {
   final MemRepository _memRepository;
 
-  final List<SavedMemEntityV1> _memStock = [];
+  final List<MemEntity> _memStock = [];
 
-  Future<List<SavedMemEntityV1>> serve({bool? archived, bool? done}) => v(
+  Future<List<MemEntity>> serve({bool? archived, bool? done}) => v(
         () async {
-          final mems = await _memRepository
-              .ship(
-                archived: archived,
-                done: done,
-                loadLatestAct: true,
-              )
-              .then((v) =>
-                  v.map((e) => SavedMemEntityV1.fromEntityV2(e)).toList());
+          final mems = await _memRepository.ship(
+            archived: archived,
+            done: done,
+            loadLatestAct: true,
+          );
 
           _memStock.addAll(mems);
 
@@ -37,10 +34,9 @@ class MemStore {
 
   Future<Mem> serveOneBy(int? memId) async => v(
         () async {
-          final stock =
-              _memStock.singleWhereOrNull((e) => e.id == memId)?.value;
+          final stock = _memStock.singleWhereOrNull((e) => e.id == memId);
           if (stock != null) {
-            return stock;
+            return stock.toDomain();
           }
 
           if (memId != null) {
@@ -49,7 +45,7 @@ class MemStore {
               loadLatestAct: true,
             );
 
-            _memStock.add(SavedMemEntityV1.fromEntityV2(saved));
+            _memStock.add(saved);
             return saved.toDomain();
           }
 

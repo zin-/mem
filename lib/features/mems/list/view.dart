@@ -19,7 +19,7 @@ class MemListView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () => _MemListViewComponent(
-          ref.watch(memEntitiesProvider).map((e) => e.value).toList(),
+          ref.watch(memEntitiesProvider).map((e) => e.toDomain()).toList(),
           _appBar,
           _itemBuilder,
           _scrollController,

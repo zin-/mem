@@ -8,6 +8,7 @@ import 'package:mem/framework/view/value_state_notifier.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/mems/mem_view_data.dart';
 import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_items/mem_item_repository.dart';
@@ -21,27 +22,27 @@ part 'states.g.dart';
 void listenMemInitialLoad(
   Ref ref,
   int? memId,
-  ValueStateNotifier<MemEntityV1> notifier,
+  ValueStateNotifier<MemViewData> notifier,
 ) {
   ref.listen<MemEntity?>(
     memByMemIdProvider(memId),
     (prev, next) {
       if (prev == null && next != null) {
-        notifier.updatedBy(SavedMemEntityV1.fromEntityV2(next));
+        notifier.updatedBy(MemViewData.fromEntityV2(next));
       }
     },
   );
 }
 
 final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
-    .family<ValueStateNotifier<MemEntityV1>, MemEntityV1, int?>(
+    .family<ValueStateNotifier<MemViewData>, MemViewData, int?>(
   (ref, memId) => v(
     () {
       final mem = ref.read(memByMemIdProvider(memId));
       final notifier = ValueStateNotifier(
         mem == null
-            ? MemEntityV1(Mem(null, "", null, null))
-            : SavedMemEntityV1.fromEntityV2(mem),
+            ? MemViewData.newMem()
+            : MemViewData.fromEntityV2(mem),
       );
 
       listenMemInitialLoad(ref, memId, notifier);

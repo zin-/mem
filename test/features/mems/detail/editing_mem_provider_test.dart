@@ -10,12 +10,12 @@ import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 
 class _FakeMemEntities extends MemEntities {
-  final Iterable<SavedMemEntityV1> _initial;
+  final Iterable<MemEntity> _initial;
 
   _FakeMemEntities(this._initial);
 
   @override
-  Iterable<SavedMemEntityV1> build() => _initial;
+  Iterable<MemEntity> build() => _initial;
 }
 
 void main() {

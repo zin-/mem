@@ -31,7 +31,7 @@ class MemRelationList extends ConsumerWidget {
                   .watch(memEntitiesProvider.select(
                     (v) => v.where((e) => selectedMemIds.contains(e.id)),
                   ))
-                  .map((e) => e.value);
+                  .map((e) => e.toDomain());
 
               void onChanged(int targetMemId, int value) => ref
                       .watch(memRelationEntitiesByMemIdProvider(sourceMemId)

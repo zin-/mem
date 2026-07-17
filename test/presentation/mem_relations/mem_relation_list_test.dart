@@ -12,12 +12,12 @@ import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/framework/date_and_time/time_text_form_field.dart';
 
 class _FakeMemEntities extends MemEntities {
-  final Iterable<SavedMemEntityV1> _state;
+  final Iterable<MemEntity> _state;
 
   _FakeMemEntities(this._state);
 
   @override
-  Iterable<SavedMemEntityV1> build() => _state;
+  Iterable<MemEntity> build() => _state;
 }
 
 class _FakeMemRelationEntitiesByMemId extends MemRelationEntitiesByMemId {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -81,7 +82,7 @@ class _MemRepeatByNDayNotificationViewState
   @override
   void didUpdateWidget(covariant _MemRepeatByNDayNotificationView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.nDay != widget.nDay) {
+    if (oldWidget.nDay != widget.nDay && !_focusNode.hasFocus) {
       _syncControllerText(postFrame: true);
     }
   }
@@ -97,24 +98,26 @@ class _MemRepeatByNDayNotificationViewState
       controller: _controller,
       mounted: mounted,
       postFrame: postFrame,
-      buildText: () => (widget.nDay ?? 0).toString(),
+      buildText: () => widget.nDay?.toString() ?? '',
     );
   }
 
   void _commitValue() {
     final value = _controller.text;
     if (value.isEmpty) {
-      widget.onNDayChanged(1);
+      widget.onNDayChanged(null);
       _syncControllerText(postFrame: true);
       return;
     }
 
     final parsed = int.tryParse(value);
-    if (parsed == null) {
+    if (parsed == null || parsed == 0) {
+      widget.onNDayChanged(null);
+      _syncControllerText(postFrame: true);
       return;
     }
 
-    widget.onNDayChanged(parsed == 0 ? null : parsed);
+    widget.onNDayChanged(parsed);
   }
 
   @override
@@ -160,17 +163,20 @@ class _MemRepeatByNDayNotificationViewState
                         controller: _controller,
                         focusNode: _focusNode,
                         keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
                         onChanged: (value) {
                           if (value.isEmpty) {
                             return;
                           }
 
                           final parsed = int.tryParse(value);
-                          if (parsed == null) {
+                          if (parsed == null || parsed == 0) {
                             return;
                           }
 
-                          widget.onNDayChanged(parsed == 0 ? null : parsed);
+                          widget.onNDayChanged(parsed);
                         },
                         onEditingComplete: _commitValue,
                       ),

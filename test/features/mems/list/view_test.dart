@@ -36,12 +36,12 @@ class _FakeMemState extends MemState {
 }
 
 class _FakeMemEntities extends MemEntities {
-  final Iterable<SavedMemEntityV1> _state;
+  final Iterable<MemEntity> _state;
 
   _FakeMemEntities(this._state);
 
   @override
-  Iterable<SavedMemEntityV1> build() => _state;
+  Iterable<MemEntity> build() => _state;
 }
 
 class _FakeActEntities extends ActEntities {
@@ -63,7 +63,7 @@ class _FakePreference extends Preference<TimeOfDay> {
       const TimeOfDay(hour: 9, minute: 0);
 }
 
-SavedMemEntityV1 _savedMem(int id, String name) => savedMem(
+MemEntity _savedMem(int id, String name) => savedMem(
       id: id,
       name: name,
       createdAt: DateTime(2024, 1, id),
@@ -85,7 +85,7 @@ MemNotificationEntityV1 _unsavedRepeatAtHour(int memId, int hour) =>
       ),
     );
 
-SavedMemEntityV1 _savedMemWithActiveAct(int id, String name) => savedMem(
+MemEntity _savedMemWithActiveAct(int id, String name) => savedMem(
       id: id,
       name: name,
       createdAt: DateTime(2024, 1, id),
@@ -100,7 +100,7 @@ void main() {
           'renders top sliver MemListItemView when mem has active act',
           (tester) async {
         final saved = _savedMemWithActiveAct(1, 'Running');
-        final entity = saved.toEntityV2();
+        final entity = saved;
         final activeAct = ActiveAct(1, DateAndTime(2024, 1, 1));
         final scrollController = ScrollController();
         addTearDown(scrollController.dispose);
@@ -124,7 +124,7 @@ void main() {
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([]),
               ),
               memStateProvider(1)
-                  .overrideWith(() => _FakeMemState(saved.value)),
+                  .overrideWith(() => _FakeMemState(saved.toDomain())),
               latestActsByMemProvider.overrideWith(
                 (ref) => {1: activeAct},
               ),
@@ -147,7 +147,7 @@ void main() {
           'sticky header uses previous day when repeat time is before start-of-day',
           (tester) async {
         final saved = _savedMem(1, 'Repeat before 9');
-        final entity = saved.toEntityV2();
+        final entity = saved;
         final notification = _savedRepeatAtHour(301, 1, 8);
         final scrollController = ScrollController();
         addTearDown(scrollController.dispose);
@@ -175,7 +175,7 @@ void main() {
                 ]),
               ),
               memStateProvider(1)
-                  .overrideWith(() => _FakeMemState(saved.value)),
+                  .overrideWith(() => _FakeMemState(saved.toDomain())),
               latestActsByMemProvider.overrideWith(
                 (ref) => {1: null},
               ),
@@ -198,7 +198,7 @@ void main() {
           'sticky header shows ToDo when only unsaved notifications exist',
           (tester) async {
         final saved = _savedMem(1, 'Unsaved notification only');
-        final entity = saved.toEntityV2();
+        final entity = saved;
         final unsavedNotification = _unsavedRepeatAtHour(1, 8);
         final scrollController = ScrollController();
         addTearDown(scrollController.dispose);
@@ -230,7 +230,7 @@ void main() {
                 ]),
               ),
               memStateProvider(1)
-                  .overrideWith(() => _FakeMemState(saved.value)),
+                  .overrideWith(() => _FakeMemState(saved.toDomain())),
               latestActsByMemProvider.overrideWith(
                 (ref) => {1: null},
               ),
@@ -257,7 +257,7 @@ void main() {
           'sticky header shows ToDo subheader when next notify time is absent',
           (tester) async {
         final saved = _savedMem(1, 'No schedule');
-        final entity = saved.toEntityV2();
+        final entity = saved;
         final scrollController = ScrollController();
         addTearDown(scrollController.dispose);
 
@@ -280,7 +280,7 @@ void main() {
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([]),
               ),
               memStateProvider(1)
-                  .overrideWith(() => _FakeMemState(saved.value)),
+                  .overrideWith(() => _FakeMemState(saved.toDomain())),
               latestActsByMemProvider.overrideWith(
                 (ref) => {1: null},
               ),

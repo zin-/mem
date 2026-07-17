@@ -78,10 +78,10 @@ class MemRelationDialogConsumer extends ConsumerWidget {
               .watch(memEntitiesProvider.select((v) => v
                   .where((e) =>
                       searchText.isEmpty ||
-                      e.value.name.contains(searchText) ||
+                      e.name.contains(searchText) ||
                       selectedMemIds.contains(e.id))
                   .where((e) => e.id != sourceMemId)))
-              .map((e) => e.value)
+              .map((e) => e.toDomain())
               .toList();
 
           return MemRelationDialog(

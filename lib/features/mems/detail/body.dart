@@ -10,6 +10,8 @@ import 'package:mem/features/mems/mem_done_checkbox.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mems/mem_period.dart';
+import 'package:mem/features/mems/mem_view_data.dart';
+import 'package:mem/features/mems/states.dart';
 import 'package:mem/values/dimens.dart';
 
 import 'states.dart';
@@ -23,10 +25,12 @@ class MemDetailBody extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
           final editingMem = ref.watch(editingMemByMemIdProvider(_memId));
+          final savedMem = ref.watch(memByMemIdProvider(_memId));
 
           return _MemDetailBodyComponent(
             _memId,
             editingMem,
+            savedMem,
             (value) => ref
                 .read(editingMemByMemIdProvider(_memId).notifier)
                 .updatedBy(
@@ -43,12 +47,14 @@ class MemDetailBody extends ConsumerWidget {
 
 class _MemDetailBodyComponent extends StatelessWidget {
   final int? _memId;
-  final MemEntityV1 _mem;
+  final MemViewData _mem;
+  final MemEntity? _savedMem;
   final Function(bool? memDone) _onMemDoneChanged;
 
   const _MemDetailBodyComponent(
     this._memId,
     this._mem,
+    this._savedMem,
     this._onMemDoneChanged,
   );
 
@@ -79,13 +85,16 @@ class _MemDetailBodyComponent extends StatelessWidget {
             ),
             Padding(
               padding: pageBottomPadding,
-              child: CreatedAndUpdatedAtTexts(_mem),
+              child: _savedMem == null
+                  ? const SizedBox.shrink()
+                  : CreatedAndUpdatedAtTexts(_savedMem),
             ),
           ],
         ),
         {
           '_memId': _memId,
           '_mem': _mem,
+          '_savedMem': _savedMem,
         },
       );
 }

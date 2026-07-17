@@ -3,174 +3,13 @@ import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
-import 'package:mem/framework/date_and_time/date_and_time.dart';
-import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/features/mems/mem.dart';
-import 'package:mem/framework/repository/database_tuple_entity.dart';
+import 'package:mem/features/mems/mem_period_db.dart';
+import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/repository/entity.dart';
+import 'package:mem/framework/view/identifiable.dart';
 
-DateAndTimePeriod? _periodFromDb({
-  DateTime? notifyOn,
-  DateTime? notifyAt,
-  DateTime? endOn,
-  DateTime? endAt,
-}) {
-  if (notifyOn == null && endOn == null) {
-    return null;
-  }
-  return DateAndTimePeriod(
-    start: notifyOn == null
-        ? null
-        : DateAndTime.from(
-            notifyOn,
-            timeOfDay: notifyAt,
-          ),
-    end: endOn == null
-        ? null
-        : DateAndTime.from(
-            endOn,
-            timeOfDay: endAt,
-          ),
-  );
-}
-
-({
-  DateTime? notifyOn,
-  DateTime? notifyAt,
-  DateTime? endOn,
-  DateTime? endAt,
-}) _periodToDb(DateAndTimePeriod? period) =>
-    (
-      notifyOn: period?.start,
-      notifyAt: period?.start?.isAllDay == true ? null : period?.start,
-      endOn: period?.end,
-      endAt: period?.end?.isAllDay == true ? null : period?.end,
-    );
-
-class MemEntityV1 with EntityV1<Mem> {
-  MemEntityV1(Mem value) {
-    this.value = value;
-  }
-
-  @override
-  Map<String, Object?> get toMap {
-    final periodDb = _periodToDb(value.period);
-    return {
-      'name': value.name,
-      'doneAt': value.doneAt,
-      'notifyOn': periodDb.notifyOn,
-      'notifyAt': periodDb.notifyAt,
-      'endOn': periodDb.endOn,
-      'endAt': periodDb.endAt,
-    };
-  }
-
-  @override
-  MemEntityV1 updatedWith(Mem Function(Mem mem) update) =>
-      MemEntityV1(update(value));
-}
-
-class SavedMemEntityV1 extends MemEntityV1
-    with DatabaseTupleEntityV1<int, Mem> {
-  final Act? latestAct;
-  final Act? scheduleAnchorAct;
-
-  SavedMemEntityV1(
-    Map<String, dynamic> map, {
-    this.latestAct,
-    this.scheduleAnchorAct,
-  }) : super(_memFromMap(map)) {
-    withBaseColumns(map);
-  }
-
-  SavedMemEntityV1.fromRow(
-    dynamic row, {
-    this.latestAct,
-    this.scheduleAnchorAct,
-  }) : super(_memFromRow(row)) {
-    withBaseColumns(row);
-  }
-
-  Act? get resolvedScheduleAnchor => scheduleAnchorForNotifications(
-        latestAct: latestAct,
-        scheduleAnchorAct: scheduleAnchorAct,
-      );
-
-  static Mem _memFromMap(Map<String, dynamic> map) => Mem(
-        map['id'],
-        map['name'],
-        map['doneAt'],
-        _periodFromDb(
-          notifyOn: map['notifyOn'],
-          notifyAt: map['notifyAt'],
-          endOn: map['endOn'],
-          endAt: map['endAt'],
-        ),
-      );
-
-  static Mem _memFromRow(dynamic row) => Mem(
-        row.id,
-        row.name,
-        row.doneAt,
-        _periodFromDb(
-          notifyOn: row.notifyOn,
-          notifyAt: row.notifyAt,
-          endOn: row.endOn,
-          endAt: row.endAt,
-        ),
-      );
-
-  @override
-  SavedMemEntityV1 updatedWith(Mem Function(Mem mem) update) =>
-      SavedMemEntityV1(
-        _savedRowFrom(this, update(value)),
-        latestAct: latestAct,
-        scheduleAnchorAct: scheduleAnchorAct,
-      );
-
-  MemEntity toEntityV2() => MemEntity(
-        id,
-        value.name,
-        value.doneAt,
-        value.period,
-        null,
-        createdAt,
-        updatedAt,
-        archivedAt,
-        latestAct: latestAct,
-        scheduleAnchorAct: scheduleAnchorAct,
-        repeatedNotifications: null,
-        memRelations: null,
-      );
-
-  factory SavedMemEntityV1.fromEntityV2(MemEntity entity) =>
-      SavedMemEntityV1.fromRow(
-        _MemEntityRow(entity),
-        latestAct: entity.latestAct,
-        scheduleAnchorAct: entity.scheduleAnchorAct,
-      );
-}
-
-Map<String, Object?> _savedRowFrom(
-  SavedMemEntityV1 saved,
-  Mem value,
-) {
-  final periodDb = _periodToDb(value.period);
-  return {
-    'id': saved.id,
-    'name': value.name,
-    'doneAt': value.doneAt,
-    'notifyOn': periodDb.notifyOn,
-    'notifyAt': periodDb.notifyAt,
-    'endOn': periodDb.endOn,
-    'endAt': periodDb.endAt,
-    'createdAt': saved.createdAt,
-    'updatedAt': saved.updatedAt,
-    'archivedAt': saved.archivedAt,
-  };
-}
-
-class MemEntity implements Entity<int> {
+class MemEntity implements Entity<int>, Identifiable<int> {
   final String name;
   final DateTime? doneAt;
   final DateAndTimePeriod? period;
@@ -188,6 +27,8 @@ class MemEntity implements Entity<int> {
   final DateTime? updatedAt;
   @override
   final DateTime? archivedAt;
+
+  bool get isArchived => archivedAt != null;
 
   MemEntity(
     this.id,
@@ -274,7 +115,7 @@ class MemEntity implements Entity<int> {
       row.id,
       row.name,
       row.doneAt,
-      _periodFromDb(
+      periodFromDb(
         notifyOn: row.notifyOn,
         notifyAt: row.notifyAt,
         endOn: row.endOn,
@@ -289,25 +130,4 @@ class MemEntity implements Entity<int> {
       latestAct: latestAct,
     );
   }
-}
-
-class _MemEntityRow {
-  final MemEntity entity;
-
-  _MemEntityRow(this.entity);
-
-  int get id => entity.id;
-  String get name => entity.name;
-  DateTime? get doneAt => entity.doneAt;
-
-  ({DateTime? notifyOn, DateTime? notifyAt, DateTime? endOn, DateTime? endAt})
-      get _periodDb => _periodToDb(entity.period);
-
-  DateTime? get notifyOn => _periodDb.notifyOn;
-  DateTime? get notifyAt => _periodDb.notifyAt;
-  DateTime? get endOn => _periodDb.endOn;
-  DateTime? get endAt => _periodDb.endAt;
-  DateTime get createdAt => entity.createdAt;
-  DateTime? get updatedAt => entity.updatedAt;
-  DateTime? get archivedAt => entity.archivedAt;
 }

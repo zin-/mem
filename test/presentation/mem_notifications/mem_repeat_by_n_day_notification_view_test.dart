@@ -89,7 +89,7 @@ void main() {
       expect(_textField(tester).controller!.text, '3');
     });
 
-    testWidgets('displays 0 when nDay is null', (tester) async {
+    testWidgets('displays empty field when nDay is null', (tester) async {
       await _pumpView(
         tester,
         memId: 1,
@@ -97,7 +97,7 @@ void main() {
       );
 
       expect(find.byKey(keyMemRepeatByNDayNotification), findsOneWidget);
-      expect(_textField(tester).controller!.text, '0');
+      expect(_textField(tester).controller!.text, '');
     });
 
     testWidgets(
@@ -145,7 +145,20 @@ void main() {
       await tester.pump();
     });
 
-    testWidgets('commits 1 when empty input is completed', (tester) async {
+    testWidgets('rejects non-numeric input', (tester) async {
+      await _pumpView(
+        tester,
+        memId: 1,
+        notification: _repeatByNDayNotification(memId: 1, timeOfDaySeconds: 3),
+      );
+
+      await tester.enterText(find.byType(TextFormField), '1a2b3');
+      await tester.pump();
+
+      expect(_textField(tester).controller!.text, '123');
+    });
+
+    testWidgets('commits null when empty input is completed', (tester) async {
       final listNotifier = await _pumpView(
         tester,
         memId: 1,
@@ -159,11 +172,11 @@ void main() {
       await tester.pump();
       await tester.pump();
 
-      expect(listNotifier.state.single.value.time, 1);
-      expect(_textField(tester).controller!.text, '1');
+      expect(listNotifier.state.single.value.time, isNull);
+      expect(_textField(tester).controller!.text, '');
     });
 
-    testWidgets('commits 1 when empty input loses focus', (tester) async {
+    testWidgets('commits null when empty input loses focus', (tester) async {
       final listNotifier = await _pumpView(
         tester,
         memId: 1,
@@ -177,36 +190,65 @@ void main() {
       await tester.pump();
       await tester.pump();
 
-      expect(listNotifier.state.single.value.time, 1);
-      expect(_textField(tester).controller!.text, '1');
+      expect(listNotifier.state.single.value.time, isNull);
+      expect(_textField(tester).controller!.text, '');
     });
 
-    testWidgets('restores field text when empty input is committed at 1',
-        (tester) async {
-      await _pumpView(
+    testWidgets('stores null while 0 is being entered', (tester) async {
+      final listNotifier = await _pumpView(
         tester,
         memId: 1,
-        notification: _repeatByNDayNotification(memId: 1, timeOfDaySeconds: 1),
+        notification: _repeatByNDayNotification(memId: 1, timeOfDaySeconds: 3),
+        linkRepeatProvider: false,
       );
 
-      await tester.enterText(find.byType(TextFormField), '');
+      await tester.enterText(find.byType(TextFormField), '0');
+      await tester.pump();
+
+      expect(listNotifier.state.single.value.time, 3);
+      expect(_textField(tester).controller!.text, '0');
+    });
+
+    testWidgets('keeps 0 visible when deleting leading digit from 10',
+        (tester) async {
+      final listNotifier = await _pumpView(
+        tester,
+        memId: 1,
+        notification: _repeatByNDayNotification(memId: 1, timeOfDaySeconds: 10),
+        linkRepeatProvider: false,
+      );
+
+      await tester.tap(find.byType(TextFormField));
+      await tester.pump();
+
+      tester.testTextInput.updateEditingValue(
+        const TextEditingValue(
+          text: '0',
+          selection: TextSelection.collapsed(offset: 1),
+        ),
+      );
+      await tester.pump();
+
+      expect(listNotifier.state.single.value.time, 10);
+      expect(_textField(tester).controller!.text, '0');
+    });
+
+    testWidgets('clears field when 0 input is committed', (tester) async {
+      final listNotifier = await _pumpView(
+        tester,
+        memId: 1,
+        notification: _repeatByNDayNotification(memId: 1, timeOfDaySeconds: 3),
+        linkRepeatProvider: false,
+      );
+
+      await tester.enterText(find.byType(TextFormField), '0');
       await tester.pump();
       await tester.testTextInput.receiveAction(TextInputAction.done);
       await tester.pump();
       await tester.pump();
 
-      expect(_textField(tester).controller!.text, '1');
-    });
-
-    testWidgets('accepts 0 input without crashing', (tester) async {
-      await _pumpView(
-        tester,
-        memId: 1,
-        notification: _repeatByNDayNotification(memId: 1, timeOfDaySeconds: 3),
-      );
-
-      await tester.enterText(find.byType(TextFormField), '0');
-      await tester.pump();
+      expect(listNotifier.state.single.value.time, isNull);
+      expect(_textField(tester).controller!.text, '');
     });
 
     testWidgets('handles memId null', (tester) async {

@@ -15,6 +15,7 @@ import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_client.dart';
 import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/mems/mem_view_data.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/mems/mem_service.dart';
 import 'package:mem/features/mems/mems_state.dart';
@@ -29,12 +30,12 @@ import 'package:mockito/mockito.dart';
 import 'save_mem_period_test.mocks.dart';
 
 class _FakeMemEntities extends MemEntities {
-  final Iterable<SavedMemEntityV1> _initial;
+  final Iterable<MemEntity> _initial;
 
   _FakeMemEntities(this._initial);
 
   @override
-  Iterable<SavedMemEntityV1> build() => _initial;
+  Iterable<MemEntity> build() => _initial;
 }
 
 class _FakeTargetState extends TargetState {
@@ -116,7 +117,7 @@ void main() {
     MemClient.resetSingleton();
   });
 
-  ProviderContainer containerForMem(int memId, SavedMemEntityV1 mem) {
+  ProviderContainer containerForMem(int memId, MemEntity mem) {
     return ProviderContainer(
       overrides: [
         memEntitiesProvider.overrideWith(() => _FakeMemEntities([mem])),
@@ -177,7 +178,7 @@ void main() {
             null,
             null,
             null,
-            _savedMemEntityWithPeriod(memId, mem.value.name, editedPeriod),
+            _savedMemEntityWithPeriod(memId, mem.name, editedPeriod),
           ),
           null,
         );
@@ -191,7 +192,7 @@ void main() {
         any,
         any,
         any,
-      )).captured.single as MemEntityV1;
+      )).captured.single as MemViewData;
 
       expect(capturedMem.value.period?.start?.hour, 14);
       expect(capturedMem.value.period?.start?.minute, 30);
@@ -216,7 +217,7 @@ void main() {
         end: DateAndTime(2024, 6, 2),
       );
       final savedEntity =
-          _savedMemEntityWithPeriod(memId, mem.value.name, savedPeriod);
+          _savedMemEntityWithPeriod(memId, mem.name, savedPeriod);
 
       when(mockMemClient.save(
         any,
@@ -273,20 +274,25 @@ void main() {
         start: DateAndTime(2024, 6, 1, 14, 30),
         end: DateAndTime(2024, 6, 2),
       );
-      final mem = savedMem(
+      final memEntity = savedMem(
         id: memId,
         name: 'Test mem',
         notifyOn: DateTime(2024, 6, 1),
         notifyAt: DateTime(2024, 6, 1, 10, 0),
         endOn: DateTime(2024, 6, 2),
       ).updatedWith(
-        (m) => Mem(m.id, m.name, m.doneAt, editedPeriod),
+        update: (m) => Mem(m.id, m.name, m.doneAt, editedPeriod),
       );
+
+      when(mockMemRepository.shipById(
+        memId,
+        loadLatestAct: true,
+      )).thenAnswer((_) async => memEntity);
 
       stubSaveDependencies();
 
       await memService().save((
-        mem,
+        MemViewData.fromEntityV2(memEntity),
         <MemItemEntityV1>[],
         <MemNotificationEntityV1>[],
         null,
@@ -304,17 +310,22 @@ void main() {
 
     test('all-day period drops notifyAt on replace (12:00 AM path)', () async {
       const memId = 1;
-      final mem = savedMem(
+      final memEntity = savedMem(
         id: memId,
         name: 'Test mem',
         notifyOn: DateTime(2024, 6, 1),
         endOn: DateTime(2024, 6, 2),
       );
 
+      when(mockMemRepository.shipById(
+        memId,
+        loadLatestAct: true,
+      )).thenAnswer((_) async => memEntity);
+
       stubSaveDependencies();
 
       await memService().save((
-        mem,
+        MemViewData.fromEntityV2(memEntity),
         <MemItemEntityV1>[],
         <MemNotificationEntityV1>[],
         null,

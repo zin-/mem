@@ -61,7 +61,7 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
               if (showNotDone == showDone) {
                 return true;
               } else {
-                return showDone ? mem.value.isDone : !mem.value.isDone;
+                return showDone ? mem.doneAt != null : mem.doneAt == null;
               }
             })
             .where((mem) {
@@ -69,10 +69,9 @@ final _filteredMemsProvider = StateNotifierProvider.autoDispose<
               if (searchText == null || searchText.isEmpty) {
                 return true;
               } else {
-                return mem.value.name.contains(searchText);
+                return mem.name.contains(searchText);
               }
             })
-            .map((e) => e.toEntityV2())
             .toList(),
         {
           'savedMemEntities': savedMemEntities,

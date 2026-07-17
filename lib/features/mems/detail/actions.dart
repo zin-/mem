@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/mem_relations/mem_relation_state.dart';
-import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/mems/mem_view_data.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -31,13 +31,11 @@ final saveMem =
 
               if (!ref.mounted) return nextNotifyAt;
 
-              final savedMem = SavedMemEntityV1.fromEntityV2(memEntityV2);
-
-              ref.read(memEntitiesProvider.notifier).upsert([savedMem]);
+              ref.read(memEntitiesProvider.notifier).upsert([memEntityV2]);
 
               ref
                   .read(editingMemByMemIdProvider(memId).notifier)
-                  .updatedBy(savedMem);
+                  .updatedBy(MemViewData.fromEntityV2(memEntityV2));
 
               ref.read(memItemsProvider.notifier).upsertAll(
                     savedMemItems,
@@ -75,7 +73,9 @@ final removeMem = Provider.autoDispose.family<Future<bool> Function(), int?>(
                 .removeAsync([memId]);
 
             for (var e in removedMemEntities) {
-              ref.read(removedMemProvider(e.id).notifier).updatedBy(e);
+              ref
+                  .read(removedMemProvider(e.id).notifier)
+                  .updatedBy(MemViewData.fromEntityV2(e));
               ref.read(removedMemItemsProvider(e.id).notifier).updatedBy(
                     ref.read(memItemsByMemIdProvider(e.id)),
                   );
