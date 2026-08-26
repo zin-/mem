@@ -87,6 +87,11 @@ ListTile _render(
             latestActByMem != null && latestActByMem is ActiveAct;
         final hasPausedAct =
             latestActByMem != null && latestActByMem is PausedAct;
+        final elapsedStart = switch (latestActByMem) {
+          final ActiveAct act => act.period!.start!,
+          final PausedAct act => act.pausedAt!,
+          _ => null,
+        };
         final hasEnableMemNotifications = memNotificationEntities
             .where(
               (e) => e is SavedMemNotificationEntityV1 && e.value.isEnabled(),
@@ -123,13 +128,13 @@ ListTile _render(
         );
 
         return ListTile(
-          title: !hasActiveAct
+          title: elapsedStart == null
               ? MemNameText(mem.id)
               : Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(child: MemNameText(mem.id)),
-                    LiveElapsedTimeText(latestActByMem.period!.start!),
+                    LiveElapsedTimeText(elapsedStart),
                   ],
                 ),
           onTap: onTap,
