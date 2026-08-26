@@ -216,6 +216,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      expect(find.byType(LiveElapsedTimeText), findsOneWidget);
       expect(find.byIcon(Icons.play_arrow), findsNothing);
       expect(find.byIcon(Icons.close), findsNothing);
       expect(find.byIcon(Icons.timer), findsNothing);
