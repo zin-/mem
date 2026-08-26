@@ -29,5 +29,13 @@ linter:
 # https://dart.dev/guides/language/analysis-options
 
 analyzer:
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
   plugins:
     # - custom_lint  # Temporarily disabled due to Riverpod 3.0 compatibility issues
