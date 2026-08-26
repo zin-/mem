@@ -87,11 +87,11 @@ ListTile _render(
             latestActByMem != null && latestActByMem is ActiveAct;
         final hasPausedAct =
             latestActByMem != null && latestActByMem is PausedAct;
-        final elapsedStart = hasActiveAct
-            ? latestActByMem.period!.start!
-            : hasPausedAct
-                ? latestActByMem.pausedAt!
-                : null;
+        final elapsedStart = switch (latestActByMem) {
+          final ActiveAct act => act.period!.start!,
+          final PausedAct act => act.pausedAt!,
+          _ => null,
+        };
         final hasEnableMemNotifications = memNotificationEntities
             .where(
               (e) => e is SavedMemNotificationEntityV1 && e.value.isEnabled(),
