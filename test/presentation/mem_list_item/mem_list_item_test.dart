@@ -122,10 +122,8 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            latestActsByMemProvider.overrideWith((ref) => {memId: null}),
             memNotificationsByMemIdProvider(memId).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
-            // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
@@ -159,23 +157,21 @@ void main() {
           memId,
           DateAndTime.from(
               DateTime.now().subtract(const Duration(minutes: 5))));
+      final mem = Mem(memId, 'Test Mem', null, null, latestAct: activeAct);
 
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            latestActsByMemProvider.overrideWith((ref) => {memId: activeAct}),
             memNotificationsByMemIdProvider(memId).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
-            // MemNameTextをモックする代わりに、MemNameTextを直接モック
-            memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
-            // MemListItemSubtitleが使用するmemByMemIdProviderをモック
+            memStateProvider(memId).overrideWith(() => _FakeMemState(mem)),
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  savedMemFromDomain(baseMem)
+                  savedMemFromDomain(mem)
                 ])),
           ],
           child: MaterialApp(
             home: Scaffold(
-              body: MemListItemView(baseMem),
+              body: MemListItemView(mem),
             ),
           ),
         ),
@@ -193,23 +189,21 @@ void main() {
         (tester) async {
       final pausedAct =
           PausedAct(memId, DateTime.now().subtract(const Duration(minutes: 5)));
+      final mem = Mem(memId, 'Test Mem', null, null, latestAct: pausedAct);
 
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            latestActsByMemProvider.overrideWith((ref) => {memId: pausedAct}),
             memNotificationsByMemIdProvider(memId).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
-            // MemNameTextをモックする代わりに、MemNameTextを直接モック
-            memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
-            // MemListItemSubtitleが使用するmemByMemIdProviderをモック
+            memStateProvider(memId).overrideWith(() => _FakeMemState(mem)),
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  savedMemFromDomain(baseMem)
+                  savedMemFromDomain(mem)
                 ])),
           ],
           child: MaterialApp(
             home: Scaffold(
-              body: MemListItemView(baseMem),
+              body: MemListItemView(mem),
             ),
           ),
         ),
@@ -275,11 +269,9 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            latestActsByMemProvider.overrideWith((ref) => {memId: null}),
             memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                 ListValueStateNotifier<MemNotificationEntityV1>(
                     [notification])),
-            // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
@@ -305,10 +297,8 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            latestActsByMemProvider.overrideWith((ref) => {memId: null}),
             memNotificationsByMemIdProvider(memId).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
-            // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
@@ -334,10 +324,8 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            latestActsByMemProvider.overrideWith((ref) => {memId: null}),
             memNotificationsByMemIdProvider(memId).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
-            // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
@@ -364,10 +352,8 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            latestActsByMemProvider.overrideWith((ref) => {memId: null}),
             memNotificationsByMemIdProvider(memId).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
-            // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
@@ -397,11 +383,9 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            latestActsByMemProvider.overrideWith((ref) => {memId: null}),
             memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                 ListValueStateNotifier<MemNotificationEntityV1>(
                     [notification])),
-            // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
@@ -430,11 +414,9 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            latestActsByMemProvider.overrideWith((ref) => {memId: null}),
             memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                 ListValueStateNotifier<MemNotificationEntityV1>(
                     [notification])),
-            // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
@@ -462,11 +444,9 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            latestActsByMemProvider.overrideWith((ref) => {memId: null}),
             memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                 ListValueStateNotifier<MemNotificationEntityV1>(
                     [notification])),
-            // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
@@ -491,10 +471,8 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            latestActsByMemProvider.overrideWith((ref) => {memId: null}),
             memNotificationsByMemIdProvider(memId).overrideWith(
                 (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
-            // MemNameTextをモックする代わりに、MemNameTextを直接モック
             memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
             // MemListItemSubtitleが使用するmemByMemIdProviderをモック
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
@@ -522,24 +500,24 @@ void main() {
           memId,
           DateAndTime.from(
               DateTime.now().subtract(const Duration(minutes: 5))));
+      final mem = Mem(memId, 'Test Mem', null, null, latestAct: activeAct);
       final now = DateTime.now();
       final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
 
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            latestActsByMemProvider.overrideWith((ref) => {memId: activeAct}),
             memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                 ListValueStateNotifier<MemNotificationEntityV1>(
                     [notification])),
-            memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
+            memStateProvider(memId).overrideWith(() => _FakeMemState(mem)),
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  savedMemFromDomain(baseMem)
+                  savedMemFromDomain(mem)
                 ])),
           ],
           child: MaterialApp(
             home: Scaffold(
-              body: MemListItemView(baseMem),
+              body: MemListItemView(mem),
             ),
           ),
         ),
@@ -563,24 +541,24 @@ void main() {
         (tester) async {
       final pausedAct =
           PausedAct(memId, DateTime.now().subtract(const Duration(minutes: 5)));
+      final mem = Mem(memId, 'Test Mem', null, null, latestAct: pausedAct);
       final now = DateTime.now();
       final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
 
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            latestActsByMemProvider.overrideWith((ref) => {memId: pausedAct}),
             memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                 ListValueStateNotifier<MemNotificationEntityV1>(
                     [notification])),
-            memStateProvider(memId).overrideWith(() => _FakeMemState(baseMem)),
+            memStateProvider(memId).overrideWith(() => _FakeMemState(mem)),
             memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                  savedMemFromDomain(baseMem)
+                  savedMemFromDomain(mem)
                 ])),
           ],
           child: MaterialApp(
             home: Scaffold(
-              body: MemListItemView(baseMem),
+              body: MemListItemView(mem),
             ),
           ),
         ),
@@ -600,19 +578,19 @@ void main() {
     testWidgets(
         'displays active act with period and notifications enabled - isThreeLine true',
         (tester) async {
-      final memWithPeriod = Mem(memId, 'Mem with Period', null,
-          DateAndTimePeriod(start: DateAndTime.now()));
       final activeAct = ActiveAct(
           memId,
           DateAndTime.from(
               DateTime.now().subtract(const Duration(minutes: 5))));
+      final memWithPeriod = Mem(memId, 'Mem with Period', null,
+          DateAndTimePeriod(start: DateAndTime.now()),
+          latestAct: activeAct);
       final now = DateTime.now();
       final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
 
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            latestActsByMemProvider.overrideWith((ref) => {memId: activeAct}),
             memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                 ListValueStateNotifier<MemNotificationEntityV1>(
                     [notification])),
@@ -646,17 +624,17 @@ void main() {
     testWidgets(
         'displays paused act with period and notifications enabled - isThreeLine true',
         (tester) async {
-      final memWithPeriod = Mem(memId, 'Mem with Period', null,
-          DateAndTimePeriod(start: DateAndTime.now()));
       final pausedAct =
           PausedAct(memId, DateTime.now().subtract(const Duration(minutes: 5)));
+      final memWithPeriod = Mem(memId, 'Mem with Period', null,
+          DateAndTimePeriod(start: DateAndTime.now()),
+          latestAct: pausedAct);
       final now = DateTime.now();
       final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
 
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            latestActsByMemProvider.overrideWith((ref) => {memId: pausedAct}),
             memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                 ListValueStateNotifier<MemNotificationEntityV1>(
                     [notification])),
@@ -694,7 +672,6 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              latestActsByMemProvider.overrideWith((ref) => {memId: null}),
               memNotificationsByMemIdProvider(memId).overrideWith(
                   (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
               memStateProvider(memId)
@@ -727,7 +704,6 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              latestActsByMemProvider.overrideWith((ref) => {memId: null}),
               memNotificationsByMemIdProvider(memId).overrideWith(
                   (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
               memStateProvider(memId)
@@ -760,7 +736,6 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              latestActsByMemProvider.overrideWith((ref) => {memId: null}),
               memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                   ListValueStateNotifier<MemNotificationEntityV1>(
                       [notification])),
@@ -792,26 +767,26 @@ void main() {
         final now = DateTime.now();
         final pausedAct =
             PausedAct(memId, now.subtract(const Duration(minutes: 5)));
+        final mem = Mem(memId, 'Test Mem', null, null, latestAct: pausedAct);
         final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
         final fakeActEntities = _FakeActEntities();
 
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              latestActsByMemProvider.overrideWith((ref) => {memId: pausedAct}),
               memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                   ListValueStateNotifier<MemNotificationEntityV1>(
                       [notification])),
               memStateProvider(memId)
-                  .overrideWith(() => _FakeMemState(baseMem)),
+                  .overrideWith(() => _FakeMemState(mem)),
               memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                    savedMemFromDomain(baseMem)
+                    savedMemFromDomain(mem)
                   ])),
               actEntitiesProvider.overrideWith(() => fakeActEntities),
             ],
             child: MaterialApp(
               home: Scaffold(
-                body: MemListItemView(baseMem),
+                body: MemListItemView(mem),
               ),
             ),
           ),
@@ -832,6 +807,7 @@ void main() {
             memId,
             DateAndTime.from(
                 DateTime.now().subtract(const Duration(minutes: 5))));
+        final mem = Mem(memId, 'Test Mem', null, null, latestAct: activeAct);
         final now = DateTime.now();
         final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
         final fakeActEntities = _FakeActEntities();
@@ -839,20 +815,19 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              latestActsByMemProvider.overrideWith((ref) => {memId: activeAct}),
               memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                   ListValueStateNotifier<MemNotificationEntityV1>(
                       [notification])),
               memStateProvider(memId)
-                  .overrideWith(() => _FakeMemState(baseMem)),
+                  .overrideWith(() => _FakeMemState(mem)),
               memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                    savedMemFromDomain(baseMem)
+                    savedMemFromDomain(mem)
                   ])),
               actEntitiesProvider.overrideWith(() => fakeActEntities),
             ],
             child: MaterialApp(
               home: Scaffold(
-                body: MemListItemView(baseMem),
+                body: MemListItemView(mem),
               ),
             ),
           ),
@@ -876,7 +851,6 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              latestActsByMemProvider.overrideWith((ref) => {memId: null}),
               memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                   ListValueStateNotifier<MemNotificationEntityV1>(
                       [notification])),
@@ -914,6 +888,7 @@ void main() {
             memId,
             DateAndTime.from(
                 DateTime.now().subtract(const Duration(minutes: 5))));
+        final mem = Mem(memId, 'Test Mem', null, null, latestAct: activeAct);
         final now = DateTime.now();
         final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
         final fakeActEntities = _FakeActEntities();
@@ -921,20 +896,19 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              latestActsByMemProvider.overrideWith((ref) => {memId: activeAct}),
               memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                   ListValueStateNotifier<MemNotificationEntityV1>(
                       [notification])),
               memStateProvider(memId)
-                  .overrideWith(() => _FakeMemState(baseMem)),
+                  .overrideWith(() => _FakeMemState(mem)),
               memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                    savedMemFromDomain(baseMem)
+                    savedMemFromDomain(mem)
                   ])),
               actEntitiesProvider.overrideWith(() => fakeActEntities),
             ],
             child: MaterialApp(
               home: Scaffold(
-                body: MemListItemView(baseMem),
+                body: MemListItemView(mem),
               ),
             ),
           ),
@@ -954,6 +928,7 @@ void main() {
             memId,
             DateAndTime.from(
                 DateTime.now().subtract(const Duration(minutes: 5))));
+        final mem = Mem(memId, 'Test Mem', null, null, latestAct: activeAct);
         final now = DateTime.now();
         final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
         final fakeActEntities = _FakeActEntities();
@@ -961,20 +936,19 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              latestActsByMemProvider.overrideWith((ref) => {memId: activeAct}),
               memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                   ListValueStateNotifier<MemNotificationEntityV1>(
                       [notification])),
               memStateProvider(memId)
-                  .overrideWith(() => _FakeMemState(baseMem)),
+                  .overrideWith(() => _FakeMemState(mem)),
               memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                    savedMemFromDomain(baseMem)
+                    savedMemFromDomain(mem)
                   ])),
               actEntitiesProvider.overrideWith(() => fakeActEntities),
             ],
             child: MaterialApp(
               home: Scaffold(
-                body: MemListItemView(baseMem),
+                body: MemListItemView(mem),
               ),
             ),
           ),
@@ -992,6 +966,7 @@ void main() {
           (tester) async {
         final pausedAct = PausedAct(
             memId, DateTime.now().subtract(const Duration(minutes: 5)));
+        final mem = Mem(memId, 'Test Mem', null, null, latestAct: pausedAct);
         final now = DateTime.now();
         final notification = savedMemNotification(id: 1, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
         final fakeActEntities = _FakeActEntities();
@@ -999,20 +974,19 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              latestActsByMemProvider.overrideWith((ref) => {memId: pausedAct}),
               memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
                   ListValueStateNotifier<MemNotificationEntityV1>(
                       [notification])),
               memStateProvider(memId)
-                  .overrideWith(() => _FakeMemState(baseMem)),
+                  .overrideWith(() => _FakeMemState(mem)),
               memEntitiesProvider.overrideWith(() => _FakeMemEntities([
-                    savedMemFromDomain(baseMem)
+                    savedMemFromDomain(mem)
                   ])),
               actEntitiesProvider.overrideWith(() => fakeActEntities),
             ],
             child: MaterialApp(
               home: Scaffold(
-                body: MemListItemView(baseMem),
+                body: MemListItemView(mem),
               ),
             ),
           ),
@@ -1030,7 +1004,6 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              latestActsByMemProvider.overrideWith((ref) => {memId: null}),
               memNotificationsByMemIdProvider(memId).overrideWith(
                   (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
               memStateProvider(memId)

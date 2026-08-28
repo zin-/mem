@@ -101,7 +101,6 @@ void main() {
           (tester) async {
         final saved = _savedMemWithActiveAct(1, 'Running');
         final entity = saved;
-        final activeAct = ActiveAct(1, DateAndTime(2024, 1, 1));
         final scrollController = ScrollController();
         addTearDown(scrollController.dispose);
 
@@ -125,9 +124,6 @@ void main() {
               ),
               memStateProvider(1)
                   .overrideWith(() => _FakeMemState(saved.toDomain())),
-              latestActsByMemProvider.overrideWith(
-                (ref) => {1: activeAct},
-              ),
               actEntitiesProvider.overrideWith(() => _FakeActEntities()),
             ],
             child: MaterialApp(
@@ -176,9 +172,6 @@ void main() {
               ),
               memStateProvider(1)
                   .overrideWith(() => _FakeMemState(saved.toDomain())),
-              latestActsByMemProvider.overrideWith(
-                (ref) => {1: null},
-              ),
               actEntitiesProvider.overrideWith(() => _FakeActEntities()),
             ],
             child: MaterialApp(
@@ -231,9 +224,6 @@ void main() {
               ),
               memStateProvider(1)
                   .overrideWith(() => _FakeMemState(saved.toDomain())),
-              latestActsByMemProvider.overrideWith(
-                (ref) => {1: null},
-              ),
               actEntitiesProvider.overrideWith(() => _FakeActEntities()),
             ],
             child: MaterialApp(
@@ -281,9 +271,6 @@ void main() {
               ),
               memStateProvider(1)
                   .overrideWith(() => _FakeMemState(saved.toDomain())),
-              latestActsByMemProvider.overrideWith(
-                (ref) => {1: null},
-              ),
               actEntitiesProvider.overrideWith(() => _FakeActEntities()),
             ],
             child: MaterialApp(
