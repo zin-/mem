@@ -224,6 +224,49 @@ void main() {
       expect(find.byIcon(Icons.pause), findsNothing);
     });
 
+    testWidgets(
+        'displays elapsed time from Mem.latestAct when actEntities is empty',
+        (tester) async {
+      final pausedAct =
+          PausedAct(memId, DateTime.now().subtract(const Duration(minutes: 5)));
+      final pausedMem =
+          Mem(memId, 'Test Mem', null, null, latestAct: pausedAct);
+      final now = DateTime.now();
+      final notification = savedMemNotification(
+          id: 1,
+          memId: memId,
+          type: MemNotificationType.repeat,
+          timeOfDaySeconds: 9 * 60 * 60,
+          message: 'Repeat',
+          createdAt: now,
+          updatedAt: now);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            memNotificationsByMemIdProvider(memId).overrideWith((ref) =>
+                ListValueStateNotifier<MemNotificationEntityV1>(
+                    [notification])),
+            memStateProvider(memId)
+                .overrideWith(() => _FakeMemState(pausedMem)),
+            memEntitiesProvider.overrideWith(
+                () => _FakeMemEntities([savedMemFromDomain(pausedMem)])),
+            actEntitiesProvider.overrideWith(() => _FakeActEntities()),
+          ],
+          child: MaterialApp(
+            home: Scaffold(
+              body: MemListItemView(pausedMem),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(LiveElapsedTimeText), findsOneWidget);
+      expect(find.byIcon(Icons.close), findsOneWidget);
+      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+    });
+
     testWidgets('displays notification icon when notifications exist',
         (tester) async {
       final now = DateTime.now();
