@@ -16,7 +16,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'states.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class ActEntities extends _$ActEntities
     with EntitiesStateMixinV1<SavedActEntityV1, int> {
   final ActQueryService _actQueryService = ActQueryService();
