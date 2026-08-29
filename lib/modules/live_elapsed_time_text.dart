@@ -58,12 +58,12 @@ class _LiveElapsedTimeTextState extends State<LiveElapsedTimeText> {
 
 String formatElapsedTime(Duration elapsed) {
   if (elapsed.inHours < 1) {
-    return '${_two(elapsed.inMinutes)}:${_two(elapsed.inSeconds.remainder(60))}';
+    return '${_two(elapsed.inMinutes)} m ${_two(elapsed.inSeconds.remainder(60))} s';
   }
   if (elapsed.inHours < 24) {
-    return '${_two(elapsed.inHours)}:${_two(elapsed.inMinutes.remainder(60))}';
+    return '${_two(elapsed.inHours)} h ${_two(elapsed.inMinutes.remainder(60))} m';
   }
-  return '${elapsed.inDays}d ${_two(elapsed.inHours.remainder(24))}';
+  return '${elapsed.inDays} d ${_two(elapsed.inHours.remainder(24))} h';
 }
 
 String _two(int n) => n.toString().padLeft(2, '0');

@@ -4,32 +4,32 @@ import 'package:mem/modules/live_elapsed_time_text.dart';
 
 void main() {
   group('formatElapsedTime', () {
-    test('< 1h as mm:ss', () {
+    test('< 1h as mm m ss s', () {
       expect(
         formatElapsedTime(const Duration(minutes: 5, seconds: 3)),
-        '05:03',
+        '05 m 03 s',
       );
     });
 
-    test('1h to 24h as hh:mm', () {
+    test('1h to 24h as hh h mm m', () {
       expect(
         formatElapsedTime(const Duration(hours: 1, minutes: 5)),
-        '01:05',
+        '01 h 05 m',
       );
       expect(
         formatElapsedTime(const Duration(hours: 23, minutes: 59)),
-        '23:59',
+        '23 h 59 m',
       );
     });
 
-    test('>= 24h as {n}d hh', () {
+    test('>= 24h as n d hh h', () {
       expect(
         formatElapsedTime(const Duration(hours: 24)),
-        '1d 00',
+        '1 d 00 h',
       );
       expect(
         formatElapsedTime(const Duration(hours: 25)),
-        '1d 01',
+        '1 d 01 h',
       );
     });
   });
@@ -61,7 +61,7 @@ void main() {
         )
         .data!;
 
-    expect(longElapsed, startsWith('2d 00'));
+    expect(longElapsed, startsWith('2 d 00 h'));
 
     await tester.pumpWidget(
       MaterialApp(
@@ -82,8 +82,8 @@ void main() {
         )
         .data!;
 
-    expect(shortElapsed, isNot(startsWith('2d 00')));
-    expect(shortElapsed, matches(RegExp(r'^00:0[0-9]$')));
+    expect(shortElapsed, isNot(startsWith('2 d 00 h')));
+    expect(shortElapsed, matches(RegExp(r'^00 m 0[0-9] s$')));
   });
 }
 
