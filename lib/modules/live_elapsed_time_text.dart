@@ -56,6 +56,9 @@ class _LiveElapsedTimeTextState extends State<LiveElapsedTimeText> {
   }
 }
 
+String formatElapsedTime(Duration elapsed) =>
+    '$elapsed'.split('.')[0].padLeft(8, '0');
+
 extension on Duration {
-  String format() => '$this'.split('.')[0].padLeft(8, '0');
+  String format() => formatElapsedTime(this);
 }

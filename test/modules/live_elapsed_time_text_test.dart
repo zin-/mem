@@ -3,6 +3,37 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/modules/live_elapsed_time_text.dart';
 
 void main() {
+  group('formatElapsedTime', () {
+    test('< 1h as mm:ss', () {
+      expect(
+        formatElapsedTime(const Duration(minutes: 5, seconds: 3)),
+        '05:03',
+      );
+    });
+
+    test('1h to 24h as hh:mm', () {
+      expect(
+        formatElapsedTime(const Duration(hours: 1, minutes: 5)),
+        '01:05',
+      );
+      expect(
+        formatElapsedTime(const Duration(hours: 23, minutes: 59)),
+        '23:59',
+      );
+    });
+
+    test('>= 24h as {n}d hh', () {
+      expect(
+        formatElapsedTime(const Duration(hours: 24)),
+        '1d 00',
+      );
+      expect(
+        formatElapsedTime(const Duration(hours: 25)),
+        '1d 01',
+      );
+    });
+  });
+
   testWidgets(
       'when start changes, elapsed display uses new start immediately',
       (WidgetTester tester) async {
@@ -30,7 +61,7 @@ void main() {
         )
         .data!;
 
-    expect(longElapsed, startsWith('48:'));
+    expect(longElapsed, startsWith('2d 00'));
 
     await tester.pumpWidget(
       MaterialApp(
@@ -51,8 +82,8 @@ void main() {
         )
         .data!;
 
-    expect(shortElapsed, isNot(startsWith('48:')));
-    expect(shortElapsed, matches(RegExp(r'^0{1,2}:00:0[0-9]$')));
+    expect(shortElapsed, isNot(startsWith('2d 00')));
+    expect(shortElapsed, matches(RegExp(r'^00:0[0-9]$')));
   });
 }
 
