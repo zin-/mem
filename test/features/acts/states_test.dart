@@ -190,6 +190,19 @@ void main() {
       expect(fake.resumeActByCallCount, 1);
     });
 
+    test('upsert after listeners are gone does not throw', () async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      final subscription = container.listen(actEntitiesProvider, (_, __) {});
+      final notifier = container.read(actEntitiesProvider.notifier);
+      subscription.close();
+
+      await Future<void>.delayed(Duration.zero);
+
+      expect(() => notifier.upsert(const []), returnsNormally);
+    });
+
     test('pauseByMemId calls client and upserts results', () async {
       final container = ProviderContainer(
         overrides: [

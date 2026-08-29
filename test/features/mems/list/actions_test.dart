@@ -70,11 +70,12 @@ class _FakePreference extends Preference<TimeOfDay> {
       const TimeOfDay(hour: 9, minute: 0);
 }
 
-MemEntity _savedMem(int id, String name) => savedMem(
+MemEntity _savedMem(int id, String name, {Act? latestAct}) => savedMem(
       id: id,
       name: name,
       createdAt: DateTime(2024, 1, id),
       updatedAt: DateTime(2024, 1, id),
+      latestAct: latestAct,
     );
 
 SavedMemNotificationEntityV1 _savedNotification(int id, int memId) {
@@ -134,9 +135,6 @@ void main() {
                   .overrideWith(() => _FakeMemState(saved1.toDomain())),
               memStateProvider(2)
                   .overrideWith(() => _FakeMemState(saved2.toDomain())),
-              latestActsByMemProvider.overrideWith(
-                (ref) => {1: null, 2: null},
-              ),
               actEntitiesProvider.overrideWith(() => fakeAct),
             ],
             child: MaterialApp(
@@ -163,7 +161,11 @@ void main() {
       testWidgets(
           'play on idle mem starts that mem only when another mem is paused',
           (tester) async {
-        final saved1 = _savedMem(1, 'First');
+        final paused1 = PausedAct(
+          1,
+          DateTime(2024, 6, 1, 10, 0),
+        );
+        final saved1 = _savedMem(1, 'First', latestAct: paused1);
         final saved2 = _savedMem(2, 'Second');
         final entity1 = saved1;
         final entity2 = saved2;
@@ -171,10 +173,6 @@ void main() {
         final notification2 = _savedNotification(102, 2);
         final fakeAct = _FakeActEntities();
         final scrollController = ScrollController();
-        final paused1 = PausedAct(
-          1,
-          DateTime(2024, 6, 1, 10, 0),
-        );
 
         addTearDown(scrollController.dispose);
 
@@ -213,9 +211,6 @@ void main() {
                   .overrideWith(() => _FakeMemState(saved1.toDomain())),
               memStateProvider(2)
                   .overrideWith(() => _FakeMemState(saved2.toDomain())),
-              latestActsByMemProvider.overrideWith(
-                (ref) => {1: paused1, 2: null},
-              ),
               actEntitiesProvider.overrideWith(() => fakeAct),
             ],
             child: MaterialApp(
