@@ -56,8 +56,17 @@ class _LiveElapsedTimeTextState extends State<LiveElapsedTimeText> {
   }
 }
 
-String formatElapsedTime(Duration elapsed) =>
-    '$elapsed'.split('.')[0].padLeft(8, '0');
+String formatElapsedTime(Duration elapsed) {
+  if (elapsed.inHours < 1) {
+    return '${_two(elapsed.inMinutes)}:${_two(elapsed.inSeconds.remainder(60))}';
+  }
+  if (elapsed.inHours < 24) {
+    return '${_two(elapsed.inHours)}:${_two(elapsed.inMinutes.remainder(60))}';
+  }
+  return '${elapsed.inDays}d ${_two(elapsed.inHours.remainder(24))}';
+}
+
+String _two(int n) => n.toString().padLeft(2, '0');
 
 extension on Duration {
   String format() => formatElapsedTime(this);
