@@ -74,7 +74,7 @@ class _MemRepeatByDaysOfWeekNotificationView extends StatelessWidget {
   final List<int> _repeatByDaysOfWeek;
   final void Function(Iterable<int> selected) _onChanged;
 
-  _MemRepeatByDaysOfWeekNotificationView(
+  const _MemRepeatByDaysOfWeekNotificationView(
     this._repeatByDaysOfWeek,
     this._onChanged,
   );
