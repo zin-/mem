@@ -6,6 +6,7 @@ import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
+import 'package:mem/framework/date_and_time/weekday.dart';
 
 const keyMemRepeatByDaysOfWeekNotification =
     Key('mem-repeat-by-days-of-week-notification');
@@ -70,8 +71,6 @@ class MemRepeatByDaysOfWeekNotificationView extends ConsumerWidget {
 }
 
 class _MemRepeatByDaysOfWeekNotificationView extends StatelessWidget {
-  final List<int> _daysOfWeek = [1, 2, 3, 4, 5, 6, 7];
-
   final List<int> _repeatByDaysOfWeek;
   final void Function(Iterable<int> selected) _onChanged;
 
@@ -91,9 +90,9 @@ class _MemRepeatByDaysOfWeekNotificationView extends StatelessWidget {
             child: SelectWeekDays(
               onSelect: (List<String> e) =>
                   _onChanged(e.map((e) => int.parse(e))),
-              days: _daysOfWeek
+              days: weekdaysInLocalizedOrder(localizations)
                   .map((weekday) => DayInWeek(
-                        localizations.narrowWeekdays[weekday % 7],
+                        weekdayLabel(localizations, weekday),
                         dayKey: weekday.toString(),
                         isSelected: _repeatByDaysOfWeek.contains(weekday),
                       ))
