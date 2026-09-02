@@ -2,7 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:day_picker/day_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/detail/states.dart';
@@ -84,9 +83,7 @@ class _MemRepeatByDaysOfWeekNotificationView extends StatelessWidget {
   @override
   Widget build(BuildContext context) => v(
         () {
-          // FIXME ここなんとかならんかな
-          final dateFormat = DateFormat.E();
-          final now = DateTime.now();
+          final localizations = MaterialLocalizations.of(context);
           final theme = Theme.of(context);
 
           return Padding(
@@ -95,11 +92,11 @@ class _MemRepeatByDaysOfWeekNotificationView extends StatelessWidget {
               onSelect: (List<String> e) =>
                   _onChanged(e.map((e) => int.parse(e))),
               days: _daysOfWeek
-                  .map((e) => now.add(Duration(days: e)))
-                  .sorted((a, b) => a.weekday.compareTo(b.weekday))
-                  .mapIndexed((index, e) => DayInWeek(dateFormat.format(e),
-                      dayKey: (index + 1).toString(),
-                      isSelected: _repeatByDaysOfWeek.contains(index + 1)))
+                  .map((weekday) => DayInWeek(
+                        localizations.narrowWeekdays[weekday % 7],
+                        dayKey: weekday.toString(),
+                        isSelected: _repeatByDaysOfWeek.contains(weekday),
+                      ))
                   .toList(growable: false),
               backgroundColor: theme.canvasColor,
               selectedDaysFillColor: theme.primaryColor,

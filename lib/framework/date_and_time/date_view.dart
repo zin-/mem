@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/framework/view/synced_text_editing_controller.dart';
-
-final DateFormat _dateFormat = DateFormat.yMd();
 
 const _datePickerMaxDuration = Duration(days: 1000000000000000000);
 
@@ -103,7 +100,7 @@ class _DateTextFormFieldState extends State<DateTextFormField> {
           return TextFormField(
             controller: _controller,
             decoration: InputDecoration(
-              hintText: _dateFormat.pattern,
+              hintText: MaterialLocalizations.of(context).dateHelpText,
               suffixIcon: IconButton(
                 onPressed: () => v(
                   () async {
