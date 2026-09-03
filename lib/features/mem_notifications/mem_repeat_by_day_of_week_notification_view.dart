@@ -83,6 +83,7 @@ class _MemRepeatByDaysOfWeekNotificationView extends StatelessWidget {
   Widget build(BuildContext context) => v(
         () {
           final localizations = MaterialLocalizations.of(context);
+          final locale = Localizations.localeOf(context);
           final theme = Theme.of(context);
 
           return Padding(
@@ -92,7 +93,7 @@ class _MemRepeatByDaysOfWeekNotificationView extends StatelessWidget {
                   _onChanged(e.map((e) => int.parse(e))),
               days: weekdaysInLocalizedOrder(localizations)
                   .map((weekday) => DayInWeek(
-                        weekdayLabel(localizations, weekday),
+                        weekdayLabel(localizations, locale, weekday),
                         dayKey: weekday.toString(),
                         isSelected: _repeatByDaysOfWeek.contains(weekday),
                       ))

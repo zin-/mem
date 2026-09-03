@@ -48,8 +48,16 @@ void main() {
         ],
       );
       expect(
-        weekdayLabel(localizations, DateTime.monday),
-        localizations.narrowWeekdays[DateTime.monday % 7],
+        weekdayLabel(localizations, const Locale('en'), DateTime.monday),
+        'Mon',
+      );
+      expect(
+        weekdayLabel(localizations, const Locale('en'), DateTime.tuesday),
+        'Tue',
+      );
+      expect(
+        weekdayLabel(localizations, const Locale('en'), DateTime.thursday),
+        'Thu',
       );
     },
   );
@@ -71,6 +79,19 @@ void main() {
           DateTime.saturday,
           DateTime.sunday,
         ],
+      );
+    },
+  );
+
+  testWidgets(
+    'ja uses one-character weekdays',
+    (tester) async {
+      final localizations =
+          await pumpLocalizations(tester, locale: const Locale('ja'));
+
+      expect(
+        weekdayLabel(localizations, const Locale('ja'), DateTime.monday),
+        '月',
       );
     },
   );

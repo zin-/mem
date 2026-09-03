@@ -1,7 +1,26 @@
 import 'package:flutter/material.dart';
 
-String weekdayLabel(MaterialLocalizations localizations, int weekday) =>
-    localizations.narrowWeekdays[weekday % 7];
+const _englishShortWeekdays = [
+  'Sun',
+  'Mon',
+  'Tue',
+  'Wed',
+  'Thu',
+  'Fri',
+  'Sat',
+];
+
+String weekdayLabel(
+  MaterialLocalizations localizations,
+  Locale locale,
+  int weekday,
+) {
+  final index = weekday % 7;
+  if (locale.languageCode == 'en') {
+    return _englishShortWeekdays[index];
+  }
+  return localizations.narrowWeekdays[index];
+}
 
 List<int> weekdaysInLocalizedOrder(MaterialLocalizations localizations) {
   final start = localizations.firstDayOfWeekIndex == 0
