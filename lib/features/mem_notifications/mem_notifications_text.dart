@@ -65,6 +65,7 @@ class _MemNotificationText extends StatelessWidget {
           final oneLine = MemNotification.toOneLine(
             enables.map((e) => e.value),
             (weekday) => weekdayLabel(localizations, locale, weekday),
+            weekdaysInLocalizedOrder(localizations),
             l10n.afterActStartedNotificationText,
             (time) => time.format(context),
           );

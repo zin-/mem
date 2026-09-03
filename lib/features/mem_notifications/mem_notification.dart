@@ -146,6 +146,7 @@ class MemNotification {
   static String? toOneLine(
     Iterable<MemNotification> memNotifications,
     String Function(int weekday) formatWeekday,
+    List<int> weekdayOrder,
     String Function(String at) buildAfterActStartedNotificationText,
     String Function(TimeOfDay time) formatTime,
   ) =>
@@ -164,7 +165,11 @@ class MemNotification {
 
             final text = [
               if (repeatByDayOfWeeks.isNotEmpty)
-                _oneLineRepeatByDaysOfWeek(repeatByDayOfWeeks, formatWeekday),
+                _oneLineRepeatByDaysOfWeek(
+                  repeatByDayOfWeeks,
+                  formatWeekday,
+                  weekdayOrder,
+                ),
               if (afterActStarted != null)
                 _oneLineAfterAct(
                   afterActStarted,
@@ -184,12 +189,13 @@ class MemNotification {
   static String _oneLineRepeatByDaysOfWeek(
     Iterable<MemNotification> repeatByDayOfWeeks,
     String Function(int weekday) formatWeekday,
+    List<int> weekdayOrder,
   ) =>
       v(
         () {
-          return repeatByDayOfWeeks
-              .map((e) => e.time!)
-              .sorted((a, b) => a.compareTo(b))
+          final selected = repeatByDayOfWeeks.map((e) => e.time!).toSet();
+          return weekdayOrder
+              .where(selected.contains)
               .map(formatWeekday)
               .join(", ");
         },
