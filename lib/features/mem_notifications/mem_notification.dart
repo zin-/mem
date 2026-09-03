@@ -1,8 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:mem/features/acts/act.dart';
-import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/time_of_day.dart';
 import 'package:mem/features/logger/log_service.dart';
 
@@ -147,7 +145,10 @@ class MemNotification {
 
   static String? toOneLine(
     Iterable<MemNotification> memNotifications,
+    String Function(int weekday) formatWeekday,
+    List<int> weekdayOrder,
     String Function(String at) buildAfterActStartedNotificationText,
+    String Function(TimeOfDay time) formatTime,
   ) =>
       v(
         () {
@@ -164,11 +165,16 @@ class MemNotification {
 
             final text = [
               if (repeatByDayOfWeeks.isNotEmpty)
-                _oneLineRepeatByDaysOfWeek(repeatByDayOfWeeks),
+                _oneLineRepeatByDaysOfWeek(
+                  repeatByDayOfWeeks,
+                  formatWeekday,
+                  weekdayOrder,
+                ),
               if (afterActStarted != null)
                 _oneLineAfterAct(
                   afterActStarted,
                   buildAfterActStartedNotificationText,
+                  formatTime,
                 ),
             ].join(", ");
 
@@ -182,16 +188,15 @@ class MemNotification {
 
   static String _oneLineRepeatByDaysOfWeek(
     Iterable<MemNotification> repeatByDayOfWeeks,
+    String Function(int weekday) formatWeekday,
+    List<int> weekdayOrder,
   ) =>
       v(
         () {
-          final dateFormat = DateFormat.E();
-          final firstSunday = DateTime(0, 1, 2);
-
-          return repeatByDayOfWeeks
-              .map((e) => firstSunday.add(Duration(days: e.time!)))
-              .sorted((a, b) => a.compareTo(b))
-              .map((e) => dateFormat.format(e))
+          final selected = repeatByDayOfWeeks.map((e) => e.time!).toSet();
+          return weekdayOrder
+              .where(selected.contains)
+              .map(formatWeekday)
               .join(", ");
         },
         {
@@ -202,9 +207,11 @@ class MemNotification {
   static String _oneLineAfterAct(
     MemNotification afterActStarted,
     String Function(String at) buildAfterActStartedNotificationText,
+    String Function(TimeOfDay time) formatTime,
   ) =>
-      buildAfterActStartedNotificationText(DateFormat(DateFormat.HOUR24_MINUTE)
-          .format(DateAndTime(0, 0, 0, 0, 0, afterActStarted.time)));
+      buildAfterActStartedNotificationText(
+        formatTime(TimeOfDayExt.fromSeconds(afterActStarted.time!)),
+      );
 
   @override
   String toString() => "${super.toString()}: ${{

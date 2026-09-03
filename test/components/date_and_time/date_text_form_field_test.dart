@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:intl/intl.dart';
 import 'package:mem/framework/date_and_time/date_view.dart';
 import 'package:mem/generated/l10n/app_localizations.dart';
 import 'package:mem/l10n/l10n.dart';
@@ -58,7 +57,9 @@ void main() {
           widgetTester
               .widget<TextFormField>(find.byType(TextFormField))
               .initialValue,
-          DateFormat.yMd().format(date),
+          MaterialLocalizations.of(
+            widgetTester.element(find.byType(DateTextFormField)),
+          ).formatCompactDate(date),
         );
       },
     );

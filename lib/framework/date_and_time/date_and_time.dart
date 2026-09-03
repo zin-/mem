@@ -1,5 +1,3 @@
-import 'package:intl/intl.dart';
-
 class DateAndTime extends DateTime {
   bool isAllDay = false;
 
@@ -61,7 +59,11 @@ class DateAndTime extends DateTime {
       );
 
   int get weekNumber {
-    int dayOfYear = int.parse(DateFormat("D").format(this));
+    // local 同士の difference だと DST で inDays がずれる
+    final dayOfYear = DateTime.utc(year, month, day)
+            .difference(DateTime.utc(year, 1, 1))
+            .inDays +
+        1;
     return ((dayOfYear - weekday + 10) / 7).floor();
   }
 

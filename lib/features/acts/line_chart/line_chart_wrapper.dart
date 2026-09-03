@@ -1,7 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:mem/features/acts/acts_summary.dart';
 
 class LineChartWrapper extends StatelessWidget {
@@ -67,22 +66,23 @@ class LineChartWrapper extends StatelessWidget {
             final dateTime = DateTime.fromMillisecondsSinceEpoch(
               value.toInt(),
             );
+            final localizations = MaterialLocalizations.of(context);
 
-            DateFormat? formatter;
+            final String text;
             if (value == meta.min || value == meta.max) {
-              formatter = DateFormat.yMd();
+              text = localizations.formatCompactDate(dateTime);
             } else if (meta.axisPosition < meta.parentAxisSize * 0.1 ||
                 meta.parentAxisSize * 0.9 < meta.axisPosition) {
-              formatter = null;
+              text = "";
             } else if (dateTime.day == 1) {
-              formatter = DateFormat.Md();
+              text = localizations.formatShortMonthDay(dateTime);
             } else if (dateTime.day == 10 || dateTime.day == 20) {
-              formatter = DateFormat.d();
+              text = dateTime.day.toString();
+            } else {
+              text = "";
             }
 
-            return Text(
-              formatter?.format(dateTime) ?? "",
-            );
+            return Text(text);
           },
         ),
       ),

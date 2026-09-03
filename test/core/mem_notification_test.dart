@@ -1,7 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:intl/intl.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
-import 'package:mem/framework/date_and_time/date_and_time.dart';
 
 void main() {
   group('MemNotification', () {
@@ -21,8 +20,21 @@ void main() {
     );
 
     group('toOneLine', () {
+      const weekdayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const sundayFirstWeekdays = [
+        DateTime.sunday,
+        DateTime.monday,
+        DateTime.tuesday,
+        DateTime.wednesday,
+        DateTime.thursday,
+        DateTime.friday,
+        DateTime.saturday,
+      ];
+      String formatWeekday(int weekday) => weekdayNames[weekday % 7];
       String buildAfterActStartedNotificationText(String at) =>
           "after act at $at";
+      String formatTime(TimeOfDay time) =>
+          '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 
       test('no enables.', () {
         const memId = 1;
@@ -32,7 +44,10 @@ void main() {
             MemNotification.by(
                 memId, MemNotificationType.repeat, null, "repeat")
           ],
+          (w) => fail("no call"),
+          sundayFirstWeekdays,
           (a) => fail("no call"),
+          (t) => fail("no call"),
         );
 
         expect(oneLine, isNull);
@@ -48,7 +63,10 @@ void main() {
               MemNotification.by(
                   memId, MemNotificationType.repeat, repeatAt, "")
             ],
+            (w) => fail("no call"),
+            sundayFirstWeekdays,
             (a) => fail("no call"),
+            (t) => fail("no call"),
           );
 
           expect(oneLine, isNull);
@@ -66,7 +84,10 @@ void main() {
               MemNotification.by(
                   memId, MemNotificationType.repeatByNDay, repeatByNDay, "")
             ],
+            (w) => fail("no call"),
+            sundayFirstWeekdays,
             (at) => fail("no call"),
+            (t) => fail("no call"),
           );
 
           expect(oneLine, isNull);
@@ -86,7 +107,10 @@ void main() {
               MemNotification.by(
                   memId, MemNotificationType.repeatByDayOfWeek, 1, "")
             ],
+            formatWeekday,
+            sundayFirstWeekdays,
             (at) => fail("no call"),
+            (t) => fail("no call"),
           );
 
           expect(oneLine, equals("Mon"));
@@ -101,10 +125,53 @@ void main() {
             MemNotification.by(memId, MemNotificationType.repeatByDayOfWeek, 2,
                 "repeatByDayOfWeek")
           ],
+          formatWeekday,
+          sundayFirstWeekdays,
           (a) => a,
+          (t) => fail("no call"),
         );
 
         expect(oneLine, equals("Tue"));
+      });
+
+      test('repeat by Sun and Mon follows weekdayOrder.', () {
+        const memId = 1;
+
+        final notifications = [
+          MemNotification.by(memId, MemNotificationType.repeatByDayOfWeek,
+              DateTime.monday, ""),
+          MemNotification.by(memId, MemNotificationType.repeatByDayOfWeek,
+              DateTime.sunday, ""),
+        ];
+
+        expect(
+          MemNotification.toOneLine(
+            notifications,
+            formatWeekday,
+            sundayFirstWeekdays,
+            (a) => fail("no call"),
+            (t) => fail("no call"),
+          ),
+          "Sun, Mon",
+        );
+        expect(
+          MemNotification.toOneLine(
+            notifications,
+            formatWeekday,
+            [
+              DateTime.monday,
+              DateTime.tuesday,
+              DateTime.wednesday,
+              DateTime.thursday,
+              DateTime.friday,
+              DateTime.saturday,
+              DateTime.sunday,
+            ],
+            (a) => fail("no call"),
+            (t) => fail("no call"),
+          ),
+          "Mon, Sun",
+        );
       });
 
       test('after act', () {
@@ -115,14 +182,18 @@ void main() {
             MemNotification.by(
                 memId, MemNotificationType.afterActStarted, time, "")
           ],
+          (w) => fail("no call"),
+          sundayFirstWeekdays,
           buildAfterActStartedNotificationText,
+          formatTime,
         );
 
         expect(
-            oneLine,
-            buildAfterActStartedNotificationText(
-                DateFormat(DateFormat.HOUR24_MINUTE)
-                    .format(DateAndTime(0, 0, 0, 0, 0, time))));
+          oneLine,
+          buildAfterActStartedNotificationText(formatTime(
+            const TimeOfDay(hour: 0, minute: 0),
+          )),
+        );
       });
     });
   });

@@ -54,4 +54,15 @@ void main() {
       );
     },
   );
+
+  group('weekNumber', () {
+    test('uses calendar date, not local duration', () {
+      expect(DateAndTime(2024, 1, 1).weekNumber, 1);
+      expect(DateAndTime(2024, 7, 1).weekNumber, 27);
+      expect(
+        DateAndTime(2024, 7, 1, 23).weekNumber,
+        DateAndTime(2024, 7, 1).weekNumber,
+      );
+    });
+  });
 }
