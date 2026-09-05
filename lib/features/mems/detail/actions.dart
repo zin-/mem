@@ -51,9 +51,7 @@ final saveMem =
                         tmp is SavedMemNotificationEntityV1 &&
                         item is SavedMemNotificationEntityV1 &&
                         tmp.id == item.id,
-                    removeWhere: (current) =>
-                        current.value.memId == memId &&
-                        current.value.isRepeatByDayOfWeek(),
+                    removeWhere: (current) => current.value.memId == memId,
                   );
 
               return nextNotifyAt;
