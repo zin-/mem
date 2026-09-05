@@ -53,7 +53,7 @@ final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
   ),
 );
 
-final memItemsByMemIdProvider = StateNotifierProvider.family<
+final memItemsByMemIdProvider = StateNotifierProvider.autoDispose.family<
     ListValueStateNotifier<MemItemEntityV1>, List<MemItemEntityV1>, int?>(
   (ref, memId) => v(
     () => ListValueStateNotifier(
