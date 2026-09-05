@@ -22,6 +22,7 @@ import 'package:mem/features/mems/detail/fab.dart';
 import 'package:mem/features/mems/mem_client.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
+import 'package:mem/features/mem_items/mem_items_view.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/mems/detail/app_bar/remove_mem_action.dart';
 
@@ -364,6 +365,70 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text(testMemName), findsOneWidget);
+      });
+    });
+
+    group('should not keep memo after save and reopen new mem', () {
+      testWidgets('memo field is empty when opening another new mem',
+          (tester) async {
+        const testMemName = 'Test Mem';
+        const testMemo = 'previous memo';
+
+        when(mockMemClient.save(
+          any,
+          any,
+          any,
+          any,
+          any,
+        )).thenAnswer((_) async => (
+              (
+                <MemItemEntityV1>[],
+                null,
+                null,
+                null,
+                MemEntity(
+                  1,
+                  testMemName,
+                  null,
+                  null,
+                  null,
+                  DateTime.now(),
+                  null,
+                  null,
+                ),
+              ),
+              null,
+            ));
+
+        final container = ProviderContainer();
+        addTearDown(container.dispose);
+
+        Widget app(Widget home) => UncontrolledProviderScope(
+              container: container,
+              child: MaterialApp(home: home),
+            );
+
+        await tester.pumpWidget(app(const MemDetailPage(null)));
+        await tester.pumpAndSettle();
+
+        await tester.enterText(find.byKey(keyMemName), testMemName);
+        await tester.enterText(find.byKey(keyMemMemo), testMemo);
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byKey(keySaveMemFab));
+        await tester.pumpAndSettle();
+
+        await tester.pumpWidget(app(const Scaffold(body: SizedBox.shrink())));
+        await tester.pumpAndSettle();
+
+        await tester.pumpWidget(app(const MemDetailPage(null)));
+        await tester.pumpAndSettle();
+
+        expect(find.text(testMemo), findsNothing);
+        expect(
+          tester.widget<TextFormField>(find.byKey(keyMemMemo)).initialValue,
+          '',
+        );
       });
     });
 
