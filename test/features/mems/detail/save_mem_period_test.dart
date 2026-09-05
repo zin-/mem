@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_items/mem_item_repository.dart';
+import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
@@ -19,6 +20,8 @@ import 'package:mem/features/mems/mem_view_data.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/mems/mem_service.dart';
 import 'package:mem/features/mems/mems_state.dart';
+import 'package:mem/features/mems/states.dart';
+import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/targets/target_states.dart';
@@ -117,10 +120,19 @@ void main() {
     MemClient.resetSingleton();
   });
 
-  ProviderContainer containerForMem(int memId, MemEntity mem) {
+  ProviderContainer containerForMem(
+    int memId,
+    MemEntity mem, {
+    List<MemNotificationEntityV1>? notifications,
+  }) {
     return ProviderContainer(
       overrides: [
         memEntitiesProvider.overrideWith(() => _FakeMemEntities([mem])),
+        if (notifications != null)
+          memNotificationsProvider.overrideWith(
+            (ref) =>
+                ListValueStateNotifier<MemNotificationEntityV1>(notifications),
+          ),
         targetStateProvider(memId).overrideWith(
           () => _FakeTargetState(
             TargetEntityV1(
@@ -246,6 +258,94 @@ void main() {
     });
   });
 
+  group('saveMem notifications', () {
+    test('drops wasted repeatByNDay from memNotificationsProvider', () async {
+      const memId = 1;
+      const otherMemId = 2;
+      final mem = savedMem(id: memId, name: 'Test mem');
+      final now = DateTime(2024, 6, 1);
+      final repeat = savedMemNotification(
+        id: 10,
+        memId: memId,
+        type: MemNotificationType.repeat,
+        timeOfDaySeconds: 9 * 60 * 60,
+        message: 'Repeat',
+        createdAt: now,
+        updatedAt: now,
+      );
+      final nDay = savedMemNotification(
+        id: 11,
+        memId: memId,
+        type: MemNotificationType.repeatByNDay,
+        timeOfDaySeconds: 3,
+        message: 'Repeat by N day',
+        createdAt: now,
+        updatedAt: now,
+      );
+      final otherNDay = savedMemNotification(
+        id: 20,
+        memId: otherMemId,
+        type: MemNotificationType.repeatByNDay,
+        timeOfDaySeconds: 5,
+        message: 'Other mem n-day',
+        createdAt: now,
+        updatedAt: now,
+      );
+      final container = containerForMem(
+        memId,
+        mem,
+        notifications: [repeat, nDay, otherNDay],
+      );
+      addTearDown(container.dispose);
+
+      container.read(memNotificationsByMemIdProvider(memId).notifier).upsertAll(
+        [
+          nDay.updatedWith(
+            (v) => MemNotification.by(v.memId, v.type, null, v.message),
+          ),
+        ],
+        (current, updating) => current.value.type == updating.value.type,
+      );
+
+      when(mockMemClient.save(
+        any,
+        any,
+        any,
+        any,
+        any,
+      )).thenAnswer((_) async => (
+            (
+              <MemItemEntityV1>[],
+              [repeat.toEntityV2()],
+              null,
+              null,
+              mem,
+            ),
+            null,
+          ));
+
+      await container.read(saveMem(memId));
+
+      final notifications = container.read(memNotificationsProvider);
+      expect(
+        notifications.where(
+          (e) => e.value.memId == memId && e.value.isRepeatByNDay(),
+        ),
+        isEmpty,
+      );
+      expect(
+        notifications.where(
+          (e) => e.value.memId == memId && e.value.isRepeated(),
+        ),
+        hasLength(1),
+      );
+      expect(
+        notifications.where((e) => e.value.memId == otherMemId),
+        hasLength(1),
+      );
+    });
+  });
+
   MemService memService() => MemService(
         memRepository: mockMemRepository,
         memItemRepository: mockMemItemRepository,
@@ -339,6 +439,56 @@ void main() {
       expect(replacedEntity.period?.start?.isAllDay, isTrue);
       expect(replacedEntity.period?.start?.hour, 0);
       expect(replacedEntity.period?.start?.minute, 0);
+    });
+
+    test('wastes disabled repeatByNDay', () async {
+      const memId = 1;
+      final memEntity = savedMem(id: memId, name: 'Test mem');
+      final now = DateTime(2024, 6, 1);
+      final repeat = savedMemNotification(
+        id: 10,
+        memId: memId,
+        type: MemNotificationType.repeat,
+        timeOfDaySeconds: 9 * 60 * 60,
+        message: 'Repeat',
+        createdAt: now,
+        updatedAt: now,
+      );
+      final nDay = savedMemNotification(
+        id: 11,
+        memId: memId,
+        type: MemNotificationType.repeatByNDay,
+        timeOfDaySeconds: 3,
+        message: 'Repeat by N day',
+        createdAt: now,
+        updatedAt: now,
+      ).updatedWith(
+        (v) => MemNotification.by(v.memId, v.type, null, v.message),
+      );
+
+      when(mockMemRepository.shipById(
+        memId,
+        loadLatestAct: true,
+      )).thenAnswer((_) async => memEntity);
+      when(mockMemNotificationRepository.replace(any)).thenAnswer(
+        (invocation) async =>
+            invocation.positionalArguments[0] as MemNotificationEntity,
+      );
+
+      stubSaveDependencies();
+
+      await memService().save((
+        MemViewData.fromEntityV2(memEntity),
+        <MemItemEntityV1>[],
+        [repeat, nDay],
+        null,
+        null,
+      ));
+
+      verify(mockMemNotificationRepository.waste(
+        memId: memId,
+        type: MemNotificationType.repeatByNDay,
+      )).called(1);
     });
   });
 }
