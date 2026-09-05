@@ -154,6 +154,31 @@ void main() {
       expect(items.single.value.value, 'existing');
     });
 
+    test('does not keep memo after new mem editing is disposed', () async {
+      final container = containerFor();
+      addTearDown(container.dispose);
+
+      final sub = container.listen(memItemsByMemIdProvider(null), (_, __) {});
+      final current = container.read(memItemsByMemIdProvider(null)).single;
+      container.read(memItemsByMemIdProvider(null).notifier).upsertAll(
+        [current.copiedWith(value: () => 'previous memo')],
+        (a, b) => a.value.type == b.value.type,
+      );
+
+      expect(
+        container.read(memItemsByMemIdProvider(null)).single.value.value,
+        'previous memo',
+      );
+
+      sub.close();
+      await container.pump();
+
+      expect(
+        container.read(memItemsByMemIdProvider(null)).single.value.value,
+        '',
+      );
+    });
+
     test('loads items from repository on init', () async {
       const memId = 1;
       final existing = _savedMemItem(id: 10, memId: memId, value: 'existing');
