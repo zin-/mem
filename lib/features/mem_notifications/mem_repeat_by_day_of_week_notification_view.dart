@@ -85,6 +85,7 @@ class _MemRepeatByDaysOfWeekNotificationView extends StatelessWidget {
           final localizations = MaterialLocalizations.of(context);
           final locale = Localizations.localeOf(context);
           final theme = Theme.of(context);
+          final colorScheme = theme.colorScheme;
 
           return Padding(
             padding: const EdgeInsets.all(0.0),
@@ -99,9 +100,11 @@ class _MemRepeatByDaysOfWeekNotificationView extends StatelessWidget {
                       ))
                   .toList(growable: false),
               backgroundColor: theme.canvasColor,
-              selectedDaysFillColor: theme.primaryColor,
-              selectedDayTextColor: theme.tabBarTheme.indicatorColor,
-              unSelectedDayTextColor: theme.unselectedWidgetColor,
+              selectedDaysFillColor: colorScheme.primary,
+              selectedDayTextColor: colorScheme.onPrimary,
+              unselectedDaysFillColor: Colors.transparent,
+              unSelectedDayTextColor: colorScheme.onSurface,
+              elevation: 0,
               border: false,
             ),
           );

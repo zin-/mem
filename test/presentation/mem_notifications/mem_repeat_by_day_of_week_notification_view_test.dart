@@ -13,7 +13,11 @@ import 'package:mem/l10n/l10n.dart';
 
 import '../../entity_factories.dart';
 
-Widget _buildTestApp(Widget child, {List<Override>? overrides}) {
+Widget _buildTestApp(
+  Widget child, {
+  List<Override>? overrides,
+  ThemeData? theme,
+}) {
   return ProviderScope(
     overrides: overrides ?? [],
     child: MaterialApp(
@@ -21,6 +25,7 @@ Widget _buildTestApp(Widget child, {List<Override>? overrides}) {
       supportedLocales: AppLocalizations.supportedLocales,
       locale: const Locale('en'),
       onGenerateTitle: (context) => buildL10n(context).test,
+      theme: theme,
       home: Scaffold(
         body: child,
       ),
@@ -48,12 +53,14 @@ Future<ListValueStateNotifier<MemNotificationEntityV1>> _pumpView(
   WidgetTester tester, {
   required int? memId,
   required List<SavedMemNotificationEntityV1> notifications,
+  ThemeData? theme,
 }) async {
   final listNotifier =
       ListValueStateNotifier<MemNotificationEntityV1>(notifications);
   await tester.pumpWidget(
     _buildTestApp(
       MemRepeatByDaysOfWeekNotificationView(memId),
+      theme: theme,
       overrides: [
         memNotificationsByMemIdProvider(memId)
             .overrideWith((ref) => listNotifier),
@@ -140,5 +147,38 @@ void main() {
         [DateTime.tuesday],
       );
     });
+
+    for (final theme in [
+      ThemeData.light(useMaterial3: true),
+      ThemeData.dark(useMaterial3: true),
+    ]) {
+      testWidgets(
+        'selected weekday uses onPrimary text on primary fill '
+        '(${theme.brightness.name})',
+        (tester) async {
+          await _pumpView(
+            tester,
+            memId: 1,
+            notifications: [
+              _dayOfWeekNotification(memId: 1, weekday: DateTime.monday),
+            ],
+            theme: theme,
+          );
+
+          final selectWeekDays = tester.widget<SelectWeekDays>(
+            find.byType(SelectWeekDays),
+          );
+          final colorScheme = Theme.of(
+            tester.element(find.byType(SelectWeekDays)),
+          ).colorScheme;
+
+          expect(selectWeekDays.selectedDaysFillColor, colorScheme.primary);
+          expect(selectWeekDays.selectedDayTextColor, colorScheme.onPrimary);
+          expect(selectWeekDays.unSelectedDayTextColor, colorScheme.onSurface);
+          expect(selectWeekDays.unselectedDaysFillColor, Colors.transparent);
+          expect(selectWeekDays.elevation, 0);
+        },
+      );
+    }
   });
 }
