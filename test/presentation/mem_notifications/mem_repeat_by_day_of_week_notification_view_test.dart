@@ -172,6 +172,7 @@ void main() {
             tester.element(find.byType(SelectWeekDays)),
           ).colorScheme;
 
+          expect(selectWeekDays.backgroundColor, colorScheme.surface);
           expect(selectWeekDays.selectedDaysFillColor, colorScheme.primary);
           expect(selectWeekDays.selectedDayTextColor, colorScheme.onPrimary);
           expect(selectWeekDays.unSelectedDayTextColor, colorScheme.onSurface);
