@@ -84,26 +84,24 @@ class _MemRepeatByDaysOfWeekNotificationView extends StatelessWidget {
         () {
           final localizations = MaterialLocalizations.of(context);
           final locale = Localizations.localeOf(context);
-          final theme = Theme.of(context);
+          final colorScheme = Theme.of(context).colorScheme;
 
-          return Padding(
-            padding: const EdgeInsets.all(0.0),
-            child: SelectWeekDays(
-              onSelect: (List<String> e) =>
-                  _onChanged(e.map((e) => int.parse(e))),
-              days: weekdaysInLocalizedOrder(localizations)
-                  .map((weekday) => DayInWeek(
-                        weekdayLabel(localizations, locale, weekday),
-                        dayKey: weekday.toString(),
-                        isSelected: _repeatByDaysOfWeek.contains(weekday),
-                      ))
-                  .toList(growable: false),
-              backgroundColor: theme.canvasColor,
-              selectedDaysFillColor: theme.primaryColor,
-              selectedDayTextColor: theme.tabBarTheme.indicatorColor,
-              unSelectedDayTextColor: theme.unselectedWidgetColor,
-              border: false,
-            ),
+          return SelectWeekDays(
+            onSelect: (days) => _onChanged(days.map(int.parse)),
+            days: weekdaysInLocalizedOrder(localizations)
+                .map((weekday) => DayInWeek(
+                      weekdayLabel(localizations, locale, weekday),
+                      dayKey: weekday.toString(),
+                      isSelected: _repeatByDaysOfWeek.contains(weekday),
+                    ))
+                .toList(growable: false),
+            backgroundColor: colorScheme.surface,
+            selectedDaysFillColor: colorScheme.primary,
+            selectedDayTextColor: colorScheme.onPrimary,
+            unselectedDaysFillColor: Colors.transparent,
+            unSelectedDayTextColor: colorScheme.onSurface,
+            elevation: 0,
+            border: false,
           );
         },
         {
