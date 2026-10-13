@@ -81,4 +81,44 @@ void main() {
       expect(Period.all.toPeriod(now, startOfDay), isNull);
     });
   });
+
+  group('Period.formatRange', () {
+    testWidgets('aDay is a single date', (tester) async {
+      final localizations = await _localizations(tester);
+      final now = DateAndTime(2026, 10, 13, 12, 0);
+      final period = Period.aDay.toPeriod(now, startOfDay)!;
+
+      expect(
+        Period.aDay.formatRange(localizations, period),
+        localizations.formatCompactDate(period.start!),
+      );
+    });
+
+    testWidgets('other periods use inclusive end', (tester) async {
+      final localizations = await _localizations(tester);
+      final now = DateAndTime(2026, 10, 13, 12, 0);
+      final period = Period.aWeek.toPeriod(now, startOfDay)!;
+      final inclusiveEnd = period.end!.subtract(const Duration(days: 1));
+
+      expect(
+        Period.aWeek.formatRange(localizations, period),
+        '${localizations.formatCompactDate(period.start!)} – ${localizations.formatCompactDate(inclusiveEnd)}',
+      );
+    });
+  });
+}
+
+Future<MaterialLocalizations> _localizations(WidgetTester tester) async {
+  late MaterialLocalizations localizations;
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Builder(
+        builder: (context) {
+          localizations = MaterialLocalizations.of(context);
+          return const SizedBox.shrink();
+        },
+      ),
+    ),
+  );
+  return localizations;
 }

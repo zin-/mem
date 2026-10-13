@@ -63,4 +63,17 @@ extension PeriodExt on Period {
           'offset': offset,
         },
       );
+
+  String formatRange(
+    MaterialLocalizations localizations,
+    DateAndTimePeriod period,
+  ) {
+    final start = localizations.formatCompactDate(period.start!);
+    if (this == Period.aDay) {
+      return start;
+    }
+
+    final inclusiveEnd = period.end!.subtract(const Duration(days: 1));
+    return '$start – ${localizations.formatCompactDate(inclusiveEnd)}';
+  }
 }

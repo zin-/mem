@@ -27,7 +27,6 @@ void main() {
       'should display basic structure.',
       (tester) async {
         final memId = 1;
-
         final memName = 'memName - $_name';
         final acts = [
           FinishedAct(1, DateAndTime.from(DateTime(2025, 9, 25)),
@@ -38,18 +37,7 @@ void main() {
               DateAndTime.from(DateTime(2025, 9, 27, 1))),
         ];
 
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: _overrides(memId, memName, acts),
-            child: MaterialApp(
-              home: Scaffold(
-                body: ActLineChartPage(memId: memId),
-              ),
-            ),
-          ),
-        );
-
-        await tester.pumpAndSettle();
+        await _pumpPage(tester, memId: memId, memName: memName, acts: acts);
 
         expect(
           find.text("$memName : ${AggregationType.count.name}"),
@@ -67,52 +55,25 @@ void main() {
     testWidgets(
       'shows period range and navigates previous/next.',
       (tester) async {
-        const memId = 1;
-        const memName = 'memName - period nav';
-
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: _overrides(memId, memName, const []),
-            child: MaterialApp(
-              home: Scaffold(
-                body: ActLineChartPage(memId: memId),
-              ),
-            ),
-          ),
-        );
-        await tester.pumpAndSettle();
-
-        final localizations = MaterialLocalizations.of(
-          tester.element(find.byType(ActLineChartPage)),
+        await _pumpPage(
+          tester,
+          memId: 1,
+          memName: 'memName - period nav',
         );
 
-        String rangeLabel(Period period, {int offset = 0}) {
-          final selected = period.toPeriod(
-            DateAndTime.now(),
-            defaultStartOfDay,
-            offset: offset,
-          )!;
-          final start = localizations.formatCompactDate(selected.start!);
-          if (period == Period.aDay) {
-            return start;
-          }
-          final inclusiveEnd =
-              selected.end!.subtract(const Duration(days: 1));
-          return '$start – ${localizations.formatCompactDate(inclusiveEnd)}';
-        }
-
+        final localizations = _localizations(tester);
         final nextButton = find.widgetWithIcon(IconButton, Icons.chevron_right);
         final previousButton =
             find.widgetWithIcon(IconButton, Icons.chevron_left);
 
-        expect(find.text(rangeLabel(Period.aWeek)), findsOneWidget);
+        expect(find.text(_rangeLabel(localizations)), findsOneWidget);
         expect(tester.widget<IconButton>(nextButton).onPressed, isNull);
 
         await tester.tap(previousButton);
         await tester.pumpAndSettle();
 
         expect(
-          find.text(rangeLabel(Period.aWeek, offset: -1)),
+          find.text(_rangeLabel(localizations, offset: -1)),
           findsOneWidget,
         );
         expect(tester.widget<IconButton>(nextButton).onPressed, isNotNull);
@@ -120,7 +81,7 @@ void main() {
         await tester.tap(nextButton);
         await tester.pumpAndSettle();
 
-        expect(find.text(rangeLabel(Period.aWeek)), findsOneWidget);
+        expect(find.text(_rangeLabel(localizations)), findsOneWidget);
         expect(tester.widget<IconButton>(nextButton).onPressed, isNull);
       },
     );
@@ -128,24 +89,13 @@ void main() {
     testWidgets(
       'resets offset when period type changes.',
       (tester) async {
-        const memId = 1;
-        const memName = 'memName - period reset';
-
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: _overrides(memId, memName, const []),
-            child: MaterialApp(
-              home: Scaffold(
-                body: ActLineChartPage(memId: memId),
-              ),
-            ),
-          ),
+        await _pumpPage(
+          tester,
+          memId: 1,
+          memName: 'memName - period reset',
         );
-        await tester.pumpAndSettle();
 
-        final localizations = MaterialLocalizations.of(
-          tester.element(find.byType(ActLineChartPage)),
-        );
+        final localizations = _localizations(tester);
 
         await tester.tap(find.widgetWithIcon(IconButton, Icons.chevron_left));
         await tester.pumpAndSettle();
@@ -155,14 +105,10 @@ void main() {
         await tester.tap(find.text(Period.aMonth.name));
         await tester.pumpAndSettle();
 
-        final month = Period.aMonth.toPeriod(
-          DateAndTime.now(),
-          defaultStartOfDay,
-        )!;
-        final expected =
-            '${localizations.formatCompactDate(month.start!)} – ${localizations.formatCompactDate(month.end!.subtract(const Duration(days: 1)))}';
-
-        expect(find.text(expected), findsOneWidget);
+        expect(
+          find.text(_rangeLabel(localizations, period: Period.aMonth)),
+          findsOneWidget,
+        );
         expect(
           tester
               .widget<IconButton>(
@@ -177,20 +123,11 @@ void main() {
     testWidgets(
       'hides navigation for Period.all.',
       (tester) async {
-        const memId = 1;
-        const memName = 'memName - period all';
-
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: _overrides(memId, memName, const []),
-            child: MaterialApp(
-              home: Scaffold(
-                body: ActLineChartPage(memId: memId),
-              ),
-            ),
-          ),
+        await _pumpPage(
+          tester,
+          memId: 1,
+          memName: 'memName - period all',
         );
-        await tester.pumpAndSettle();
 
         await tester.tap(find.byIcon(Icons.more_vert));
         await tester.pumpAndSettle();
@@ -203,6 +140,40 @@ void main() {
     );
   });
 }
+
+Future<void> _pumpPage(
+  WidgetTester tester, {
+  required int memId,
+  required String memName,
+  List<Act> acts = const [],
+}) async {
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: _overrides(memId, memName, acts),
+      child: MaterialApp(
+        home: Scaffold(
+          body: ActLineChartPage(memId: memId),
+        ),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+MaterialLocalizations _localizations(WidgetTester tester) =>
+    MaterialLocalizations.of(
+      tester.element(find.byType(ActLineChartPage)),
+    );
+
+String _rangeLabel(
+  MaterialLocalizations localizations, {
+  Period period = Period.aWeek,
+  int offset = 0,
+}) =>
+    period.formatRange(
+      localizations,
+      period.toPeriod(DateAndTime.now(), defaultStartOfDay, offset: offset)!,
+    );
 
 List<Override> _overrides(int memId, String memName, List<Act> acts) => [
       ...Period.values.map(
