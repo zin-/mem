@@ -58,14 +58,13 @@ class ActsSummary extends SummaryStatistics {
 
     _fillMissingDays(groupedListByDate);
 
+    // 1年未満は日ごと。年は点が多いので週にまとめる
     return groupedListByDate.entries
         .sorted((a, b) => a.key.compareTo(b.key))
         .groupListsBy(
-          (element) => groupedListByDate.length > DateTime.daysPerWeek * 4 * 3
-              ? element.key.year * 100 + element.key.month
-              : groupedListByDate.length > DateTime.daysPerWeek * 4
-                  ? element.key.weekNumber
-                  : element.key,
+          (element) => groupedListByDate.length >= 365
+              ? element.key.year * 100 + element.key.weekNumber
+              : element.key,
         )
         .map(
           (key, value) => MapEntry(

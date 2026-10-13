@@ -67,7 +67,7 @@ void main() {
       expect(summary.average, 1);
     });
 
-    test('empty weeks stay 0 after filling days longer than four weeks', () {
+    test('a month stays one point per day', () {
       final summary = ActsSummary(
         [_actOn(2026, 10, 1)],
         AggregationType.count,
@@ -78,10 +78,49 @@ void main() {
       );
 
       final values = summary.groupedListByDate.values.toList();
-      expect(values.length, greaterThan(1));
-      expect(values.length, lessThan(29));
+      expect(values, hasLength(29));
       expect(values.first, 1);
       expect(values.skip(1), everyElement(0));
+    });
+
+    test('a year groups days of the same week', () {
+      final summary = ActsSummary(
+        [
+          _actOn(2025, 10, 1),
+          _actOn(2025, 10, 2),
+          _actOn(2026, 4, 1),
+        ],
+        AggregationType.count,
+        period: DateAndTimePeriod(
+          start: DateAndTime(2025, 10, 1, 5),
+          end: DateAndTime(2026, 10, 1, 5),
+        ),
+      );
+
+      final values = summary.groupedListByDate.values.toList();
+      expect(values.length, lessThan(365));
+      expect(values.length, greaterThan(50));
+      expect(values.first, 2);
+      expect(values.where((value) => value == 1), hasLength(1));
+      expect(values.where((value) => value == 0), hasLength(values.length - 2));
+    });
+
+    test('same week number in another year stays separate', () {
+      final summary = ActsSummary(
+        [
+          _actOn(2025, 10, 14),
+          _actOn(2026, 10, 13),
+        ],
+        AggregationType.count,
+        period: DateAndTimePeriod(
+          start: DateAndTime(2025, 10, 14, 5),
+          end: DateAndTime(2026, 10, 14, 5),
+        ),
+      );
+
+      final values = summary.groupedListByDate.values.toList();
+      expect(values.where((value) => value == 1), hasLength(2));
+      expect(values.where((value) => value > 1), isEmpty);
     });
   });
 }
