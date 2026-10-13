@@ -135,9 +135,8 @@ class _ActLineChartPageState extends ConsumerState<ActLineChartPage> {
   Iterable<Act> _actsInPeriod(DateAndTimePeriod? selectedPeriod) => ref
       .watch(actListProvider(widget.memId).select(
         (value) => value.where((e) =>
-            e.value.memId == widget.memId &&
-            (_period == Period.all ||
-                e.value.period?.compareTo(selectedPeriod!) == 1)),
+            _period == Period.all ||
+            e.value.period?.compareTo(selectedPeriod!) == 1),
       ))
       .map((e) => e.value);
 }
