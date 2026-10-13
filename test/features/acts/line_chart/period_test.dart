@@ -27,53 +27,61 @@ void main() {
       expect(current.end, DateAndTime(2026, 10, 13, 5, 0));
     });
 
-    test('aWeek is Monday-aligned with offset', () {
-      // 2026-10-13 is Tuesday
+    test('aWeek ends on the reference day', () {
       final now = DateAndTime(2026, 10, 13, 12, 0);
 
       final current = Period.aWeek.toPeriod(now, startOfDay)!;
-      expect(current.start, DateAndTime(2026, 10, 12, 5, 0));
-      expect(current.end, DateAndTime(2026, 10, 19, 5, 0));
+      expect(current.start, DateAndTime(2026, 10, 7, 5, 0));
+      expect(current.end, DateAndTime(2026, 10, 14, 5, 0));
 
       final previous = Period.aWeek.toPeriod(now, startOfDay, offset: -1)!;
-      expect(previous.start, DateAndTime(2026, 10, 5, 5, 0));
-      expect(previous.end, DateAndTime(2026, 10, 12, 5, 0));
+      expect(previous.start, DateAndTime(2026, 9, 30, 5, 0));
+      expect(previous.end, DateAndTime(2026, 10, 7, 5, 0));
     });
 
-    test('aMonth is calendar month with offset', () {
+    test('aMonth ends on the reference day', () {
       final now = DateAndTime(2026, 10, 13, 12, 0);
 
       final current = Period.aMonth.toPeriod(now, startOfDay)!;
-      expect(current.start, DateAndTime(2026, 10, 1, 5, 0));
-      expect(current.end, DateAndTime(2026, 11, 1, 5, 0));
+      expect(current.start, DateAndTime(2026, 9, 14, 5, 0));
+      expect(current.end, DateAndTime(2026, 10, 14, 5, 0));
 
       final previous = Period.aMonth.toPeriod(now, startOfDay, offset: -1)!;
-      expect(previous.start, DateAndTime(2026, 9, 1, 5, 0));
-      expect(previous.end, DateAndTime(2026, 10, 1, 5, 0));
+      expect(previous.start, DateAndTime(2026, 8, 14, 5, 0));
+      expect(previous.end, DateAndTime(2026, 9, 14, 5, 0));
     });
 
-    test('threeMonth is last 3 calendar months with offset', () {
+    test('aMonth clamps when the previous month has no such day', () {
+      final now = DateAndTime(2026, 3, 31, 12, 0);
+
+      final current = Period.aMonth.toPeriod(now, startOfDay)!;
+      expect(current.start, DateAndTime(2026, 3, 1, 5, 0));
+      expect(current.end, DateAndTime(2026, 4, 1, 5, 0));
+    });
+
+    test('threeMonth ends on the reference day', () {
       final now = DateAndTime(2026, 10, 13, 12, 0);
 
       final current = Period.threeMonth.toPeriod(now, startOfDay)!;
-      expect(current.start, DateAndTime(2026, 8, 1, 5, 0));
-      expect(current.end, DateAndTime(2026, 11, 1, 5, 0));
+      expect(current.start, DateAndTime(2026, 7, 14, 5, 0));
+      expect(current.end, DateAndTime(2026, 10, 14, 5, 0));
 
-      final previous = Period.threeMonth.toPeriod(now, startOfDay, offset: -1)!;
-      expect(previous.start, DateAndTime(2026, 5, 1, 5, 0));
-      expect(previous.end, DateAndTime(2026, 8, 1, 5, 0));
+      final previous =
+          Period.threeMonth.toPeriod(now, startOfDay, offset: -1)!;
+      expect(previous.start, DateAndTime(2026, 4, 14, 5, 0));
+      expect(previous.end, DateAndTime(2026, 7, 14, 5, 0));
     });
 
-    test('aYear is calendar year with offset', () {
+    test('aYear ends on the reference day', () {
       final now = DateAndTime(2026, 10, 13, 12, 0);
 
       final current = Period.aYear.toPeriod(now, startOfDay)!;
-      expect(current.start, DateAndTime(2026, 1, 1, 5, 0));
-      expect(current.end, DateAndTime(2027, 1, 1, 5, 0));
+      expect(current.start, DateAndTime(2025, 10, 14, 5, 0));
+      expect(current.end, DateAndTime(2026, 10, 14, 5, 0));
 
       final previous = Period.aYear.toPeriod(now, startOfDay, offset: -1)!;
-      expect(previous.start, DateAndTime(2025, 1, 1, 5, 0));
-      expect(previous.end, DateAndTime(2026, 1, 1, 5, 0));
+      expect(previous.start, DateAndTime(2024, 10, 14, 5, 0));
+      expect(previous.end, DateAndTime(2025, 10, 14, 5, 0));
     });
 
     test('all returns null', () {

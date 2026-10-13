@@ -26,34 +26,49 @@ extension PeriodExt on Period {
             base = base.subtract(const Duration(days: 1));
           }
 
-          final DateAndTime start;
-          final DateAndTime end;
+          // 31日など、対象月に無い日は月末に切り詰める
+          DateAndTime shiftMonths(DateAndTime date, int months) {
+            final shifted = DateTime(date.year, date.month + months);
+            final lastDay = DateTime(shifted.year, shifted.month + 1, 0).day;
+            return at(
+              shifted.year,
+              shifted.month,
+              date.day < lastDay ? date.day : lastDay,
+            );
+          }
+
+          DateAndTimePeriod trailingDays(int days) {
+            final inclusiveEnd = base.add(Duration(days: days * offset));
+            final end = inclusiveEnd.add(const Duration(days: 1));
+            return DateAndTimePeriod(
+              start: end.subtract(Duration(days: days)),
+              end: end,
+            );
+          }
+
+          DateAndTimePeriod trailingMonths(int months) {
+            final inclusiveEnd = shiftMonths(base, months * offset);
+            return DateAndTimePeriod(
+              start: shiftMonths(inclusiveEnd, -months)
+                  .add(const Duration(days: 1)),
+              end: inclusiveEnd.add(const Duration(days: 1)),
+            );
+          }
 
           switch (this) {
             case Period.aDay:
-              start = base.add(Duration(days: offset));
-              end = start.add(const Duration(days: 1));
+              return trailingDays(1);
             case Period.aWeek:
-              final monday =
-                  base.subtract(Duration(days: base.weekday - DateTime.monday));
-              start = monday.add(Duration(days: DateTime.daysPerWeek * offset));
-              end = start.add(const Duration(days: DateTime.daysPerWeek));
+              return trailingDays(DateTime.daysPerWeek);
             case Period.aMonth:
-              start = at(base.year, base.month + offset, 1);
-              end = at(base.year, base.month + offset + 1, 1);
+              return trailingMonths(1);
             case Period.threeMonth:
-              // 直近3カレンダー月（例: 10月なら 8/1–11/1）
-              final endMonth = base.month + 1 + offset * 3;
-              start = at(base.year, endMonth - 3, 1);
-              end = at(base.year, endMonth, 1);
+              return trailingMonths(3);
             case Period.aYear:
-              start = at(base.year + offset, 1, 1);
-              end = at(base.year + offset + 1, 1, 1);
+              return trailingMonths(12);
             case Period.all:
               return null;
           }
-
-          return DateAndTimePeriod(start: start, end: end);
         },
         {
           'now': now,
