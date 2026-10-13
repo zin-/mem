@@ -69,17 +69,37 @@ void main() {
 
     test('a month stays one point per day', () {
       final summary = ActsSummary(
-        [_actOn(2026, 10, 1)],
+        [_actOn(2026, 3, 1)],
         AggregationType.count,
         period: DateAndTimePeriod(
-          start: DateAndTime(2026, 10, 1, 5),
-          end: DateAndTime(2026, 10, 30, 5),
+          start: DateAndTime(2026, 3, 1, 5),
+          end: DateAndTime(2026, 4, 1, 5),
         ),
       );
 
       final values = summary.groupedListByDate.values.toList();
-      expect(values, hasLength(29));
+      expect(values, hasLength(31));
       expect(values.first, 1);
+      expect(values.skip(1), everyElement(0));
+    });
+
+    test('three months group days of the same week', () {
+      final summary = ActsSummary(
+        [
+          _actOn(2026, 7, 14),
+          _actOn(2026, 7, 15),
+        ],
+        AggregationType.count,
+        period: DateAndTimePeriod(
+          start: DateAndTime(2026, 7, 14, 5),
+          end: DateAndTime(2026, 10, 14, 5),
+        ),
+      );
+
+      final values = summary.groupedListByDate.values.toList();
+      expect(values.length, lessThan(31));
+      expect(values.length, greaterThan(10));
+      expect(values.first, 2);
       expect(values.skip(1), everyElement(0));
     });
 
