@@ -24,7 +24,12 @@ class ActEntities extends _$ActEntities
   @override
   Iterable<SavedActEntityV1> build() => [];
 
-  Future<Iterable<SavedActEntityV1>> fetch(int memId, Period period) => v(
+  Future<Iterable<SavedActEntityV1>> fetch(
+    int memId,
+    Period period, {
+    int offset = 0,
+  }) =>
+      v(
         () async {
           final actEntities = await _actQueryService
               .fetchByMemIdAndPeriod(
@@ -32,6 +37,7 @@ class ActEntities extends _$ActEntities
                 period.toPeriod(
                   DateAndTime.now(),
                   ref.watch(preferenceProvider(startOfDayKey)),
+                  offset: offset,
                 )!,
               )
               .then(
@@ -45,6 +51,7 @@ class ActEntities extends _$ActEntities
         {
           'memId': memId,
           'period': period,
+          'offset': offset,
         },
       );
 
@@ -178,13 +185,16 @@ class ActEntities extends _$ActEntities
 }
 
 @riverpod
-Future<void> loadActList(Ref ref, int memId, Period period) => v(
+Future<void> loadActList(Ref ref, int memId, Period period, int offset) => v(
       () async {
-        await ref.watch(actEntitiesProvider.notifier).fetch(memId, period);
+        await ref
+            .watch(actEntitiesProvider.notifier)
+            .fetch(memId, period, offset: offset);
       },
       {
         'memId': memId,
         'period': period,
+        'offset': offset,
       },
     );
 

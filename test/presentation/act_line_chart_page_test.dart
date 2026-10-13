@@ -175,11 +175,11 @@ String _rangeLabel(
         .formatCompactRange(localizations);
 
 List<Override> _overrides(int memId, String memName, List<Act> acts) => [
-      ...Period.values.map(
-        (period) => loadActListProvider(memId, period).overrideWith(
-          (ref) => AsyncValue.data(acts),
-        ),
-      ),
+      for (final period in Period.values)
+        for (final offset in const [0, -1])
+          loadActListProvider(memId, period, offset).overrideWith(
+            (ref) => AsyncValue.data(acts),
+          ),
       memByMemIdProvider(memId).overrideWith(
         (ref) => ValueStateNotifier(MemEntity(
           memId,

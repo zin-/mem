@@ -55,7 +55,7 @@ class _ActLineChartPageState extends ConsumerState<ActLineChartPage> {
           );
 
           return AsyncValueView(
-            loadActListProvider(widget.memId, _period),
+            loadActListProvider(widget.memId, _period, _periodOffset),
             (_) => _buildScaffold(context, selectedPeriod),
           );
         },

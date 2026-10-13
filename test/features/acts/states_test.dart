@@ -27,6 +27,7 @@ class _FakeActEntities extends ActEntities {
   final List<SavedActEntityV1> _upserted = [];
   final List<int> _removed = [];
   int _fetchCallCount = 0;
+  int? _lastFetchOffset;
   int _startActbyCallCount = 0;
   int _resumeActByCallCount = 0;
   int _pauseByMemIdCallCount = 0;
@@ -43,8 +44,13 @@ class _FakeActEntities extends ActEntities {
   Iterable<SavedActEntityV1> build() => _initialState;
 
   @override
-  Future<Iterable<SavedActEntityV1>> fetch(int memId, Period period) async {
+  Future<Iterable<SavedActEntityV1>> fetch(
+    int memId,
+    Period period, {
+    int offset = 0,
+  }) async {
     _fetchCallCount++;
+    _lastFetchOffset = offset;
     await Future.microtask(() => upsert(_initialState));
     return _initialState;
   }
@@ -111,6 +117,7 @@ class _FakeActEntities extends ActEntities {
   List<SavedActEntityV1> get upserted => _upserted;
   List<int> get removed => _removed;
   int get fetchCallCount => _fetchCallCount;
+  int? get lastFetchOffset => _lastFetchOffset;
   int get startActbyCallCount => _startActbyCallCount;
   int get resumeActByCallCount => _resumeActByCallCount;
   int get pauseByMemIdCallCount => _pauseByMemIdCallCount;
@@ -342,9 +349,24 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      await container.read(loadActListProvider(1, Period.aDay).future);
+      await container.read(loadActListProvider(1, Period.aDay, 0).future);
       expect(container.read(actEntitiesProvider),
           isA<Iterable<SavedActEntityV1>>());
+    });
+
+    test('passes offset to fetch', () async {
+      final fake = _FakeActEntities();
+      final container = ProviderContainer(
+        overrides: [
+          preferenceProvider(startOfDayKey)
+              .overrideWith(() => _FakePreference()),
+          actEntitiesProvider.overrideWith(() => fake),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(loadActListProvider(1, Period.aWeek, -2).future);
+      expect(fake.lastFetchOffset, -2);
     });
   });
 
