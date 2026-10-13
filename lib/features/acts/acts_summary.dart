@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
+import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/statistics/summary_statistics.dart';
 
 enum AggregationType {
@@ -25,8 +26,13 @@ extension AggregationTypeFormat on AggregationType {
 class ActsSummary extends SummaryStatistics {
   final Iterable<Act> _acts;
   final AggregationType _aggregationType;
+  final DateAndTimePeriod? _period;
 
-  ActsSummary(this._acts, this._aggregationType);
+  ActsSummary(
+    this._acts,
+    this._aggregationType, {
+    DateAndTimePeriod? period,
+  }) : _period = period;
 
   @override
   Map<DateAndTime, double> get groupedListByDate => _groupListByDate(_acts);
@@ -50,23 +56,7 @@ class ActsSummary extends SummaryStatistics {
         .where((e) => e.period?.start != null)
         .groupListsBy((e) => DateAndTime.from(e.period!.start!));
 
-    final fillElements = <MapEntry<DateAndTime, List<Act>>>[];
-    groupedListByDate.entries.forEachIndexed((index, element) {
-      if (index != 0) {
-        final diffInDays = groupedListByDate.entries
-            .elementAt(index - 1)
-            .key
-            .difference(element.key)
-            .inDays;
-        if (diffInDays != 1) {
-          fillElements.addAll(Iterable.generate(
-            diffInDays - 1,
-            (index) => MapEntry(element.key.add(Duration(days: index + 1)), []),
-          ));
-        }
-      }
-    });
-    groupedListByDate.addEntries(fillElements);
+    _fillMissingDays(groupedListByDate);
 
     return groupedListByDate.entries
         .sorted((a, b) => a.key.compareTo(b.key))
@@ -86,4 +76,48 @@ class ActsSummary extends SummaryStatistics {
           ),
         );
   }
+
+  void _fillMissingDays(Map<DateAndTime, List<Act>> grouped) {
+    final start = _period?.start;
+    final end = _period?.end;
+    if (start != null && end != null) {
+      final inclusiveEnd = DateTime(end.year, end.month, end.day - 1);
+      for (final day in _calendarDays(
+        DateAndTime(start.year, start.month, start.day),
+        DateAndTime(
+          inclusiveEnd.year,
+          inclusiveEnd.month,
+          inclusiveEnd.day,
+        ),
+      )) {
+        grouped.putIfAbsent(day, () => []);
+      }
+      return;
+    }
+
+    final sortedKeys = grouped.keys.toList()..sort((a, b) => a.compareTo(b));
+    for (var index = 1; index < sortedKeys.length; index++) {
+      for (final day in _calendarDays(
+        _shiftCalendarDays(sortedKeys[index - 1], 1),
+        _shiftCalendarDays(sortedKeys[index], -1),
+      )) {
+        grouped.putIfAbsent(day, () => []);
+      }
+    }
+  }
+}
+
+// local の Duration 差は DST で暦日がずれるため、日付成分で進める
+Iterable<DateAndTime> _calendarDays(DateAndTime from, DateAndTime to) sync* {
+  var cursor = DateTime(from.year, from.month, from.day);
+  final last = DateTime(to.year, to.month, to.day);
+  while (!cursor.isAfter(last)) {
+    yield DateAndTime(cursor.year, cursor.month, cursor.day);
+    cursor = DateTime(cursor.year, cursor.month, cursor.day + 1);
+  }
+}
+
+DateAndTime _shiftCalendarDays(DateAndTime day, int days) {
+  final shifted = DateTime(day.year, day.month, day.day + days);
+  return DateAndTime(shifted.year, shifted.month, shifted.day);
 }

@@ -74,6 +74,7 @@ class _ActLineChartPageState extends ConsumerState<ActLineChartPage> {
     final actsSummary = ActsSummary(
       _actsInPeriod(selectedPeriod),
       _aggregationType,
+      period: selectedPeriod,
     );
 
     return Scaffold(
