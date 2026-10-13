@@ -5,6 +5,7 @@ import 'package:mem/features/acts/line_chart/line_chart_wrapper.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
+import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/view/async_value_view.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -27,13 +28,24 @@ class ActLineChartPage extends StatefulWidget {
 
 class ActLineChartPageState extends State<ActLineChartPage> {
   Period _period = Period.aWeek;
+  int _periodOffset = 0;
   AggregationType _aggregationType = AggregationType.count;
 
   @override
   Widget build(BuildContext context) => _ActLineChartPage(
         widget._memId,
         _period,
-        (selected) => setState(() => _period = selected),
+        _periodOffset,
+        (selected) => setState(() {
+          _period = selected;
+          _periodOffset = 0;
+        }),
+        () => setState(() => _periodOffset--),
+        () => setState(() {
+          if (_periodOffset < 0) {
+            _periodOffset++;
+          }
+        }),
         _aggregationType,
         (selected) => setState(() => _aggregationType = selected),
       );
@@ -43,7 +55,10 @@ class ActLineChartPageState extends State<ActLineChartPage> {
 class _ActLineChartPage extends ConsumerWidget {
   final int _memId;
   final Period _period;
+  final int _periodOffset;
   final void Function(Period selected) _onPeriodSelected;
+  final VoidCallback _onPreviousPeriod;
+  final VoidCallback _onNextPeriod;
   final AggregationType _aggregationType;
   final void Function(AggregationType aggregationType)
       _onAggregationTypeSelected;
@@ -51,42 +66,52 @@ class _ActLineChartPage extends ConsumerWidget {
   const _ActLineChartPage(
     this._memId,
     this._period,
+    this._periodOffset,
     this._onPeriodSelected,
+    this._onPreviousPeriod,
+    this._onNextPeriod,
     this._aggregationType,
     this._onAggregationTypeSelected,
   );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () => AsyncValueView(
-          loadActListProvider(_memId, _period),
-          (_) => _ActLineChartScreen(
-            ref.read(
-              editingMemByMemIdProvider(_memId).select((v) => v.value.name),
-            ),
-            ActsSummary(
-              ref
-                  .watch(actListProvider(_memId).select(
-                    (value) {
-                      final period = _period.toPeriod(
-                        DateAndTime.now(),
-                        ref.watch(preferenceProvider(startOfDayKey)),
-                      );
-                      return value.where((e) =>
+        () {
+          final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
+          final period = _period.toPeriod(
+            DateAndTime.now(),
+            startOfDay,
+            offset: _periodOffset,
+          );
+
+          return AsyncValueView(
+            loadActListProvider(_memId, _period),
+            (_) => _ActLineChartScreen(
+              ref.read(
+                editingMemByMemIdProvider(_memId).select((v) => v.value.name),
+              ),
+              ActsSummary(
+                ref
+                    .watch(actListProvider(_memId).select(
+                      (value) => value.where((e) =>
                           e.value.memId == _memId &&
                           (_period == Period.all ||
-                              e.value.period?.compareTo(period!) == 1));
-                    },
-                  ))
-                  .map((e) => e.value),
+                              e.value.period?.compareTo(period!) == 1)),
+                    ))
+                    .map((e) => e.value),
+                _aggregationType,
+              ),
+              _period,
+              period,
+              _periodOffset,
+              _onPeriodSelected,
+              _onPreviousPeriod,
+              _onNextPeriod,
               _aggregationType,
+              _onAggregationTypeSelected,
             ),
-            _period,
-            _onPeriodSelected,
-            _aggregationType,
-            _onAggregationTypeSelected,
-          ),
-        ),
+          );
+        },
         {
           '_memId': _memId,
         },
@@ -97,7 +122,11 @@ class _ActLineChartScreen extends StatelessWidget {
   final String _memName;
   final ActsSummary _actsSummary;
   final Period _period;
+  final DateAndTimePeriod? _selectedPeriod;
+  final int _periodOffset;
   final void Function(Period selected) _onPeriodSelected;
+  final VoidCallback _onPreviousPeriod;
+  final VoidCallback _onNextPeriod;
   final AggregationType _aggregationType;
   final void Function(AggregationType aggregationType)
       _onAggregationTypeSelected;
@@ -106,7 +135,11 @@ class _ActLineChartScreen extends StatelessWidget {
     this._memName,
     this._actsSummary,
     this._period,
+    this._selectedPeriod,
+    this._periodOffset,
     this._onPeriodSelected,
+    this._onPreviousPeriod,
+    this._onNextPeriod,
     this._aggregationType,
     this._onAggregationTypeSelected,
   );
@@ -146,6 +179,13 @@ class _ActLineChartScreen extends StatelessWidget {
               child: Flex(
                 direction: Axis.vertical,
                 children: [
+                  if (_period != Period.all)
+                    _PeriodNavigation(
+                      periodLabel: _formatPeriodRange(context),
+                      canGoNext: _periodOffset < 0,
+                      onPrevious: _onPreviousPeriod,
+                      onNext: _onNextPeriod,
+                    ),
                   Padding(
                     padding: defaultPadding,
                     child: SingleChildScrollView(
@@ -176,8 +216,22 @@ class _ActLineChartScreen extends StatelessWidget {
           '_memName': _memName,
           '_actsSummary': _actsSummary,
           '_period': _period,
+          '_periodOffset': _periodOffset,
         },
       );
+
+  String _formatPeriodRange(BuildContext context) {
+    final period = _selectedPeriod!;
+    final localizations = MaterialLocalizations.of(context);
+    final start = localizations.formatCompactDate(period.start!);
+
+    if (_period == Period.aDay) {
+      return start;
+    }
+
+    final inclusiveEnd = period.end!.subtract(const Duration(days: 1));
+    return '$start – ${localizations.formatCompactDate(inclusiveEnd)}';
+  }
 
   String _formatValue(double value) {
     switch (_aggregationType) {
@@ -190,4 +244,39 @@ class _ActLineChartScreen extends StatelessWidget {
         return '${hours}h ${minutes}m ${seconds}s';
     }
   }
+}
+
+class _PeriodNavigation extends StatelessWidget {
+  final String periodLabel;
+  final bool canGoNext;
+  final VoidCallback onPrevious;
+  final VoidCallback onNext;
+
+  const _PeriodNavigation({
+    required this.periodLabel,
+    required this.canGoNext,
+    required this.onPrevious,
+    required this.onNext,
+  });
+
+  @override
+  Widget build(BuildContext context) => Flex(
+        direction: Axis.horizontal,
+        children: [
+          IconButton(
+            onPressed: onPrevious,
+            icon: const Icon(Icons.chevron_left),
+          ),
+          Expanded(
+            child: Text(
+              periodLabel,
+              textAlign: TextAlign.center,
+            ),
+          ),
+          IconButton(
+            onPressed: canGoNext ? onNext : null,
+            icon: const Icon(Icons.chevron_right),
+          ),
+        ],
+      );
 }
