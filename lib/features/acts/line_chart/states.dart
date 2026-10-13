@@ -13,19 +13,21 @@ extension PeriodExt on Period {
   }) =>
       v(
         () {
-          if (this == Period.all) return null;
+          DateAndTime at(int year, int month, int day) => DateAndTime(
+                year,
+                month,
+                day,
+                startOfDay.hour,
+                startOfDay.minute,
+              );
 
-          final timeOfNow = TimeOfDay.fromDateTime(now);
-          final base = DateAndTime(
-            now.year,
-            now.month,
-            now.day - (timeOfNow.isBefore(startOfDay) ? 1 : 0),
-            startOfDay.hour,
-            startOfDay.minute,
-          );
+          var base = at(now.year, now.month, now.day);
+          if (TimeOfDay.fromDateTime(now).isBefore(startOfDay)) {
+            base = base.subtract(const Duration(days: 1));
+          }
 
-          late final DateAndTime start;
-          late final DateAndTime end;
+          final DateAndTime start;
+          final DateAndTime end;
 
           switch (this) {
             case Period.aDay:
@@ -39,56 +41,18 @@ extension PeriodExt on Period {
               start = monday.add(Duration(days: DateTime.daysPerWeek * offset));
               end = start.add(const Duration(days: DateTime.daysPerWeek));
             case Period.aMonth:
-              start = DateAndTime(
-                base.year,
-                base.month + offset,
-                1,
-                startOfDay.hour,
-                startOfDay.minute,
-              );
-              end = DateAndTime(
-                base.year,
-                base.month + offset + 1,
-                1,
-                startOfDay.hour,
-                startOfDay.minute,
-              );
+              start = at(base.year, base.month + offset, 1);
+              end = at(base.year, base.month + offset + 1, 1);
             case Period.threeMonth:
               // 直近3カレンダー月（例: 10月なら 8/1–11/1）
               final endMonth = base.month + 1 + offset * 3;
-              end = DateAndTime(
-                base.year,
-                endMonth,
-                1,
-                startOfDay.hour,
-                startOfDay.minute,
-              );
-              start = DateAndTime(
-                base.year,
-                endMonth - 3,
-                1,
-                startOfDay.hour,
-                startOfDay.minute,
-              );
+              start = at(base.year, endMonth - 3, 1);
+              end = at(base.year, endMonth, 1);
             case Period.aYear:
-              start = DateAndTime(
-                base.year + offset,
-                1,
-                1,
-                startOfDay.hour,
-                startOfDay.minute,
-              );
-              end = DateAndTime(
-                base.year + offset + 1,
-                1,
-                1,
-                startOfDay.hour,
-                startOfDay.minute,
-              );
-// coverage:ignore-start
+              start = at(base.year + offset, 1, 1);
+              end = at(base.year + offset + 1, 1, 1);
             case Period.all:
-              throw UnimplementedError();
-// coverage:ignore-end
+              return null;
           }
 
           return DateAndTimePeriod(start: start, end: end);
