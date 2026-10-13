@@ -80,14 +80,9 @@ class ActsSummary extends SummaryStatistics {
     final start = _period?.start;
     final end = _period?.end;
     if (start != null && end != null) {
-      final inclusiveEnd = DateTime(end.year, end.month, end.day - 1);
       for (final day in _calendarDays(
         DateAndTime(start.year, start.month, start.day),
-        DateAndTime(
-          inclusiveEnd.year,
-          inclusiveEnd.month,
-          inclusiveEnd.day,
-        ),
+        _shiftCalendarDays(DateAndTime(end.year, end.month, end.day), -1),
       )) {
         grouped.putIfAbsent(day, () => []);
       }
@@ -108,11 +103,11 @@ class ActsSummary extends SummaryStatistics {
 
 // local の Duration 差は DST で暦日がずれるため、日付成分で進める
 Iterable<DateAndTime> _calendarDays(DateAndTime from, DateAndTime to) sync* {
-  var cursor = DateTime(from.year, from.month, from.day);
-  final last = DateTime(to.year, to.month, to.day);
+  var cursor = DateAndTime(from.year, from.month, from.day);
+  final last = DateAndTime(to.year, to.month, to.day);
   while (!cursor.isAfter(last)) {
-    yield DateAndTime(cursor.year, cursor.month, cursor.day);
-    cursor = DateTime(cursor.year, cursor.month, cursor.day + 1);
+    yield cursor;
+    cursor = _shiftCalendarDays(cursor, 1);
   }
 }
 

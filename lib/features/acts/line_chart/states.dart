@@ -23,7 +23,7 @@ extension PeriodExt on Period {
 
           var base = at(now.year, now.month, now.day);
           if (TimeOfDay.fromDateTime(now).isBefore(startOfDay)) {
-            base = base.subtract(const Duration(days: 1));
+            base = _shiftCalendarDays(base, -1);
           }
 
           // 31日など、対象月に無い日は月末に切り詰める
@@ -38,10 +38,10 @@ extension PeriodExt on Period {
           }
 
           DateAndTimePeriod trailingDays(int days) {
-            final inclusiveEnd = base.add(Duration(days: days * offset));
-            final end = inclusiveEnd.add(const Duration(days: 1));
+            final inclusiveEnd = _shiftCalendarDays(base, days * offset);
+            final end = _shiftCalendarDays(inclusiveEnd, 1);
             return DateAndTimePeriod(
-              start: end.subtract(Duration(days: days)),
+              start: _shiftCalendarDays(end, -days),
               end: end,
             );
           }
@@ -49,9 +49,8 @@ extension PeriodExt on Period {
           DateAndTimePeriod trailingMonths(int months) {
             final inclusiveEnd = shiftMonths(base, months * offset);
             return DateAndTimePeriod(
-              start: shiftMonths(inclusiveEnd, -months)
-                  .add(const Duration(days: 1)),
-              end: inclusiveEnd.add(const Duration(days: 1)),
+              start: _shiftCalendarDays(shiftMonths(inclusiveEnd, -months), 1),
+              end: _shiftCalendarDays(inclusiveEnd, 1),
             );
           }
 
@@ -81,7 +80,7 @@ extension PeriodExt on Period {
 extension DateAndTimePeriodRangeFormat on DateAndTimePeriod {
   String formatCompactRange(MaterialLocalizations localizations) {
     final startLabel = localizations.formatCompactDate(start!);
-    final inclusiveEnd = end!.subtract(const Duration(days: 1));
+    final inclusiveEnd = _shiftCalendarDays(end!, -1);
     if (start!.year == inclusiveEnd.year &&
         start!.month == inclusiveEnd.month &&
         start!.day == inclusiveEnd.day) {
@@ -89,4 +88,16 @@ extension DateAndTimePeriodRangeFormat on DateAndTimePeriod {
     }
     return '$startLabel – ${localizations.formatCompactDate(inclusiveEnd)}';
   }
+}
+
+// local の Duration 差は DST で暦日がずれるため、日付成分で進める
+DateAndTime _shiftCalendarDays(DateAndTime date, int days) {
+  final shifted = DateTime(date.year, date.month, date.day + days);
+  return DateAndTime(
+    shifted.year,
+    shifted.month,
+    shifted.day,
+    date.isAllDay ? null : date.hour,
+    date.isAllDay ? null : date.minute,
+  );
 }
