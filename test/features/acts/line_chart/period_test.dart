@@ -82,26 +82,30 @@ void main() {
     });
   });
 
-  group('Period.formatRange', () {
-    testWidgets('aDay is a single date', (tester) async {
+  group('DateAndTimePeriod.formatCompactRange', () {
+    testWidgets('single day when start equals inclusive end', (tester) async {
       final localizations = await _localizations(tester);
-      final now = DateAndTime(2026, 10, 13, 12, 0);
-      final period = Period.aDay.toPeriod(now, startOfDay)!;
+      final period = Period.aDay.toPeriod(
+        DateAndTime(2026, 10, 13, 12, 0),
+        startOfDay,
+      )!;
 
       expect(
-        Period.aDay.formatRange(localizations, period),
+        period.formatCompactRange(localizations),
         localizations.formatCompactDate(period.start!),
       );
     });
 
-    testWidgets('other periods use inclusive end', (tester) async {
+    testWidgets('range uses inclusive end', (tester) async {
       final localizations = await _localizations(tester);
-      final now = DateAndTime(2026, 10, 13, 12, 0);
-      final period = Period.aWeek.toPeriod(now, startOfDay)!;
+      final period = Period.aWeek.toPeriod(
+        DateAndTime(2026, 10, 13, 12, 0),
+        startOfDay,
+      )!;
       final inclusiveEnd = period.end!.subtract(const Duration(days: 1));
 
       expect(
-        Period.aWeek.formatRange(localizations, period),
+        period.formatCompactRange(localizations),
         '${localizations.formatCompactDate(period.start!)} – ${localizations.formatCompactDate(inclusiveEnd)}',
       );
     });

@@ -34,10 +34,8 @@ extension PeriodExt on Period {
               start = base.add(Duration(days: offset));
               end = start.add(const Duration(days: 1));
             case Period.aWeek:
-              var monday = base;
-              while (monday.weekday != DateTime.monday) {
-                monday = monday.subtract(const Duration(days: 1));
-              }
+              final monday =
+                  base.subtract(Duration(days: base.weekday - DateTime.monday));
               start = monday.add(Duration(days: DateTime.daysPerWeek * offset));
               end = start.add(const Duration(days: DateTime.daysPerWeek));
             case Period.aMonth:
@@ -63,17 +61,17 @@ extension PeriodExt on Period {
           'offset': offset,
         },
       );
+}
 
-  String formatRange(
-    MaterialLocalizations localizations,
-    DateAndTimePeriod period,
-  ) {
-    final start = localizations.formatCompactDate(period.start!);
-    if (this == Period.aDay) {
-      return start;
+extension DateAndTimePeriodRangeFormat on DateAndTimePeriod {
+  String formatCompactRange(MaterialLocalizations localizations) {
+    final startLabel = localizations.formatCompactDate(start!);
+    final inclusiveEnd = end!.subtract(const Duration(days: 1));
+    if (start!.year == inclusiveEnd.year &&
+        start!.month == inclusiveEnd.month &&
+        start!.day == inclusiveEnd.day) {
+      return startLabel;
     }
-
-    final inclusiveEnd = period.end!.subtract(const Duration(days: 1));
-    return '$start – ${localizations.formatCompactDate(inclusiveEnd)}';
+    return '$startLabel – ${localizations.formatCompactDate(inclusiveEnd)}';
   }
 }

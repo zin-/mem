@@ -8,6 +8,20 @@ enum AggregationType {
   sum,
 }
 
+extension AggregationTypeFormat on AggregationType {
+  String format(double value) {
+    switch (this) {
+      case AggregationType.count:
+        return value.toStringAsFixed(1);
+      case AggregationType.sum:
+        final hours = (value / 3600).floor();
+        final minutes = ((value % 3600) / 60).floor();
+        final seconds = (value % 60).floor();
+        return '${hours}h ${minutes}m ${seconds}s';
+    }
+  }
+}
+
 class ActsSummary extends SummaryStatistics {
   final Iterable<Act> _acts;
   final AggregationType _aggregationType;

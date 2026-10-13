@@ -170,10 +170,9 @@ String _rangeLabel(
   Period period = Period.aWeek,
   int offset = 0,
 }) =>
-    period.formatRange(
-      localizations,
-      period.toPeriod(DateAndTime.now(), defaultStartOfDay, offset: offset)!,
-    );
+    period
+        .toPeriod(DateAndTime.now(), defaultStartOfDay, offset: offset)!
+        .formatCompactRange(localizations);
 
 List<Override> _overrides(int memId, String memName, List<Act> acts) => [
       ...Period.values.map(
