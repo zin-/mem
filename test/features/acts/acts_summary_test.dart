@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/acts_summary.dart';
@@ -141,6 +142,50 @@ void main() {
       final values = summary.groupedListByDate.values.toList();
       expect(values.where((value) => value == 1), hasLength(2));
       expect(values.where((value) => value > 1), isEmpty);
+    });
+
+    test('days in the same week across the new year stay together', () {
+      final summary = ActsSummary(
+        [
+          _actOn(2025, 12, 31),
+          _actOn(2026, 1, 1),
+        ],
+        AggregationType.count,
+        period: DateAndTimePeriod(
+          start: DateAndTime(2025, 12, 1, 5),
+          end: DateAndTime(2026, 2, 1, 5),
+        ),
+      );
+
+      expect(summary.groupedListByDate[DateAndTime(2025, 12, 29)], 2);
+      expect(
+        summary.groupedListByDate.values.where((value) => value > 0),
+        [2],
+      );
+    });
+
+    test('act before startOfDay belongs to the previous day', () {
+      const startOfDay = TimeOfDay(hour: 5, minute: 0);
+      final summary = ActsSummary(
+        [
+          FinishedAct(
+            1,
+            DateAndTime(2026, 10, 14, 3),
+            DateAndTime(2026, 10, 14, 4),
+          ),
+        ],
+        AggregationType.count,
+        period: DateAndTimePeriod(
+          start: DateAndTime(2026, 10, 13, 5),
+          end: DateAndTime(2026, 10, 14, 5),
+        ),
+        startOfDay: startOfDay,
+      );
+
+      expect(summary.groupedListByDate.keys.toList(), [
+        DateAndTime(2026, 10, 13),
+      ]);
+      expect(summary.groupedListByDate.values.toList(), [1]);
     });
   });
 }

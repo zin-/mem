@@ -48,15 +48,16 @@ class _ActLineChartPageState extends ConsumerState<ActLineChartPage> {
   @override
   Widget build(BuildContext context) => v(
         () {
+          final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
           final selectedPeriod = _period.toPeriod(
             DateAndTime.now(),
-            ref.watch(preferenceProvider(startOfDayKey)),
+            startOfDay,
             offset: _periodOffset,
           );
 
           return AsyncValueView(
             loadActListProvider(widget.memId, _period, _periodOffset),
-            (_) => _buildScaffold(context, selectedPeriod),
+            (_) => _buildScaffold(context, selectedPeriod, startOfDay),
           );
         },
         {
@@ -67,6 +68,7 @@ class _ActLineChartPageState extends ConsumerState<ActLineChartPage> {
   Widget _buildScaffold(
     BuildContext context,
     DateAndTimePeriod? selectedPeriod,
+    TimeOfDay startOfDay,
   ) {
     final memName = ref.read(
       editingMemByMemIdProvider(widget.memId).select((v) => v.value.name),
@@ -75,6 +77,7 @@ class _ActLineChartPageState extends ConsumerState<ActLineChartPage> {
       _actsInPeriod(selectedPeriod),
       _aggregationType,
       period: selectedPeriod,
+      startOfDay: startOfDay,
     );
 
     return Scaffold(
@@ -134,9 +137,13 @@ class _ActLineChartPageState extends ConsumerState<ActLineChartPage> {
 
   Iterable<Act> _actsInPeriod(DateAndTimePeriod? selectedPeriod) => ref
       .watch(actListProvider(widget.memId).select(
-        (value) => value.where((e) =>
-            _period == Period.all ||
-            e.value.period?.compareTo(selectedPeriod!) == 1),
+        (value) => value.where((e) {
+          if (_period == Period.all) {
+            return true;
+          }
+          final start = e.value.period?.start;
+          return start != null && selectedPeriod!.includesStart(start);
+        }),
       ))
       .map((e) => e.value);
 }

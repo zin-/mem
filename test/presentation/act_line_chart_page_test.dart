@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import '../entity_factories.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
@@ -136,6 +137,52 @@ void main() {
 
         expect(find.byIcon(Icons.chevron_left), findsNothing);
         expect(find.byIcon(Icons.chevron_right), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'plots acts inside the period and drops the rest',
+      (tester) async {
+        final period = Period.aWeek.toPeriod(
+          DateAndTime.now(),
+          defaultStartOfDay,
+        )!;
+        final insideStart = period.start!;
+        final outsideStart = period.end!;
+
+        await _pumpPage(
+          tester,
+          memId: 1,
+          memName: 'memName - period filter',
+          acts: [
+            FinishedAct(
+              1,
+              insideStart,
+              insideStart.add(const Duration(hours: 1)),
+            ),
+            FinishedAct(
+              1,
+              outsideStart,
+              outsideStart.add(const Duration(hours: 1)),
+            ),
+          ],
+        );
+
+        final spots = tester
+            .widget<LineChart>(find.byType(LineChart))
+            .data
+            .lineBarsData
+            .last
+            .spots
+            .where((spot) => spot.y > 0);
+
+        expect(spots, hasLength(1));
+        expect(
+          spots.single.x,
+          DateAndTime(insideStart.year, insideStart.month, insideStart.day)
+              .millisecondsSinceEpoch
+              .toDouble(),
+        );
       },
     );
   });

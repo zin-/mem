@@ -4,6 +4,7 @@ import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/acts_summary.dart';
 import 'package:mem/features/acts/line_chart/line_chart_wrapper.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
+import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/generated/l10n/app_localizations.dart';
 import 'package:mem/l10n/l10n.dart';
 
@@ -50,6 +51,54 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('10'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'weekly axis labels the first week of each month',
+    (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          onGenerateTitle: (context) => buildL10n(context).test,
+          home: Scaffold(
+            body: SizedBox(
+              width: 800,
+              height: 400,
+              child: LineChartWrapper(
+                ActsSummary(
+                  [
+                    FinishedAct(
+                      1,
+                      DateAndTime(2026, 7, 14, 10),
+                      DateAndTime(2026, 7, 14, 11),
+                    ),
+                  ],
+                  AggregationType.count,
+                  period: DateAndTimePeriod(
+                    start: DateAndTime(2026, 7, 14, 5),
+                    end: DateAndTime(2026, 10, 14, 5),
+                  ),
+                ),
+                (value) => value.toInt().toString(),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final localizations = MaterialLocalizations.of(
+        tester.element(find.byType(LineChartWrapper)),
+      );
+
+      expect(
+        find.text(localizations.formatShortMonthDay(DateTime(2026, 9, 7))),
+        findsOneWidget,
+      );
+      expect(find.text('10'), findsNothing);
     },
   );
 }

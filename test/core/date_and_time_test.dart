@@ -55,6 +55,22 @@ void main() {
     },
   );
 
+  group('shiftCalendarDays', () {
+    test('moves by calendar date and keeps the time', () {
+      final shifted = DateAndTime(2026, 1, 31, 5, 0).shiftCalendarDays(1);
+
+      expect(shifted, DateAndTime(2026, 2, 1, 5, 0));
+      expect(shifted.isAllDay, false);
+    });
+
+    test('all-day stays all-day', () {
+      final shifted = DateAndTime(2026, 10, 13).shiftCalendarDays(-1);
+
+      expect(shifted, DateAndTime(2026, 10, 12));
+      expect(shifted.isAllDay, true);
+    });
+  });
+
   group('weekNumber', () {
     test('uses calendar date, not local duration', () {
       expect(DateAndTime(2024, 1, 1).weekNumber, 1);
