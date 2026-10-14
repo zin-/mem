@@ -67,6 +67,24 @@ class DateAndTime extends DateTime {
     return ((dayOfYear - weekday + 10) / 7).floor();
   }
 
+  // local の Duration 差は DST で暦日がずれるため、日付成分で進める
+  DateAndTime shiftCalendarDays(int days) {
+    final shifted = DateTime(year, month, day + days);
+    return DateAndTime(
+      shifted.year,
+      shifted.month,
+      shifted.day,
+      isAllDay ? null : hour,
+      isAllDay ? null : minute,
+    );
+  }
+
+  int calendarDaysUntil(DateTime other) => DateTime.utc(
+        other.year,
+        other.month,
+        other.day,
+      ).difference(DateTime.utc(year, month, day)).inDays;
+
   @override
   DateAndTime add(Duration duration) {
     final added = super.add(duration);

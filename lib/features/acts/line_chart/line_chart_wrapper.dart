@@ -26,7 +26,12 @@ class LineChartWrapper extends StatelessWidget {
       ),
     );
 
-    final actCount = _actsSummary.groupedListByDate.entries
+    final points = _actsSummary.groupedListByDate.entries
+        .sorted((a, b) => a.key.compareTo(b.key));
+    final dayStep = points.length > 1
+        ? points[points.length - 2].key.calendarDaysUntil(points.last.key)
+        : 1;
+    final actCount = points
         .map((e) => FlSpot(
               e.key.millisecondsSinceEpoch.toDouble(),
               e.value,
@@ -42,17 +47,8 @@ class LineChartWrapper extends StatelessWidget {
       lwma5.values.isEmpty ? 0 : lwma5.values.max,
     ].max;
 
-    final interval = Duration(
-            days: _actsSummary.groupedListByDate.entries.length > 1
-                ? _actsSummary.groupedListByDate.entries.last.key
-                    .difference(_actsSummary.groupedListByDate.entries
-                        .elementAt(
-                            _actsSummary.groupedListByDate.entries.length - 2)
-                        .key)
-                    .inDays
-                : 1)
-        .inMilliseconds
-        .toDouble();
+    final interval = Duration(days: dayStep).inMilliseconds.toDouble();
+    final weekly = dayStep >= DateTime.daysPerWeek;
 
     final titlesData = FlTitlesData(
       topTitles: const AxisTitles(),
@@ -74,6 +70,10 @@ class LineChartWrapper extends StatelessWidget {
             } else if (meta.axisPosition < meta.parentAxisSize * 0.1 ||
                 meta.parentAxisSize * 0.9 < meta.axisPosition) {
               text = "";
+            } else if (weekly) {
+              text = dateTime.day <= DateTime.daysPerWeek
+                  ? localizations.formatShortMonthDay(dateTime)
+                  : "";
             } else if (dateTime.day == 1) {
               text = localizations.formatShortMonthDay(dateTime);
             } else if (dateTime.day == 10 || dateTime.day == 20) {
@@ -90,6 +90,10 @@ class LineChartWrapper extends StatelessWidget {
 
     return LineChart(
       LineChartData(
+        // fl_chart は baseline の倍数で目盛りを打つ。先頭に合わせないと週の月曜に乗らない
+        baselineX: points.isEmpty
+            ? null
+            : points.first.key.millisecondsSinceEpoch.toDouble(),
         gridData: FlGridData(
           drawVerticalLine: false,
           horizontalInterval: max == min ? 1 : ((max - min) / 4).ceilToDouble(),

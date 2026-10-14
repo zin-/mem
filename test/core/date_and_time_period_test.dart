@@ -300,4 +300,26 @@ void main() {
       );
     }
   });
+
+  group('includesStart', () {
+    final period = DateAndTimePeriod(
+      start: DateAndTime(2026, 10, 7, 5),
+      end: DateAndTime(2026, 10, 14, 5),
+    );
+
+    test('includes the start and excludes the end', () {
+      expect(period.includesStart(DateAndTime(2026, 10, 7, 5)), isTrue);
+      expect(period.includesStart(DateAndTime(2026, 10, 13, 12)), isTrue);
+      expect(period.includesStart(DateAndTime(2026, 10, 14, 5)), isFalse);
+      expect(period.includesStart(DateAndTime(2026, 10, 7, 4)), isFalse);
+    });
+
+    test('is false when either bound is missing', () {
+      expect(
+        DateAndTimePeriod(start: DateAndTime(2026, 10, 7, 5))
+            .includesStart(DateAndTime(2026, 10, 7, 5)),
+        isFalse,
+      );
+    });
+  });
 }

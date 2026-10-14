@@ -46,6 +46,16 @@ abstract class DateAndTimePeriod implements Comparable<DateAndTimePeriod> {
   }
 
   int compareWithDateAndTime(DateTime? dateAndTime);
+
+  // 取得クエリと同じ。start は含む、end は含まない
+  bool includesStart(DateTime value) {
+    final periodStart = start;
+    final periodEnd = end;
+    if (periodStart == null || periodEnd == null) {
+      return false;
+    }
+    return !value.isBefore(periodStart) && value.isBefore(periodEnd);
+  }
 }
 
 class _WithStartOnly extends DateAndTimePeriod

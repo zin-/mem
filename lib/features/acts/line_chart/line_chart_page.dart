@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/acts_summary.dart';
 import 'package:mem/features/acts/line_chart/line_chart_wrapper.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
+import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/view/async_value_view.dart';
 import 'package:mem/l10n/l10n.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -13,181 +15,197 @@ import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
 import 'package:mem/values/dimens.dart';
 
-class ActLineChartPage extends StatefulWidget {
-  final int _memId;
+class ActLineChartPage extends ConsumerStatefulWidget {
+  final int memId;
 
   const ActLineChartPage({
     super.key,
-    required int memId,
-  }) : _memId = memId;
+    required this.memId,
+  });
 
   @override
-  State<StatefulWidget> createState() => ActLineChartPageState();
+  ConsumerState<ActLineChartPage> createState() => _ActLineChartPageState();
 }
 
-class ActLineChartPageState extends State<ActLineChartPage> {
+class _ActLineChartPageState extends ConsumerState<ActLineChartPage> {
   Period _period = Period.aWeek;
+  int _periodOffset = 0;
   AggregationType _aggregationType = AggregationType.count;
 
-  @override
-  Widget build(BuildContext context) => _ActLineChartPage(
-        widget._memId,
-        _period,
-        (selected) => setState(() => _period = selected),
-        _aggregationType,
-        (selected) => setState(() => _aggregationType = selected),
-      );
-}
+  void _selectPeriod(Period period) => setState(() {
+        _period = period;
+        _periodOffset = 0;
+      });
 
-// FIXME 先にConsumerの処理をして、子にStatefulを持つべきでは？
-class _ActLineChartPage extends ConsumerWidget {
-  final int _memId;
-  final Period _period;
-  final void Function(Period selected) _onPeriodSelected;
-  final AggregationType _aggregationType;
-  final void Function(AggregationType aggregationType)
-      _onAggregationTypeSelected;
+  void _goPreviousPeriod() => setState(() => _periodOffset--);
 
-  const _ActLineChartPage(
-    this._memId,
-    this._period,
-    this._onPeriodSelected,
-    this._aggregationType,
-    this._onAggregationTypeSelected,
-  );
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) => v(
-        () => AsyncValueView(
-          loadActListProvider(_memId, _period),
-          (_) => _ActLineChartScreen(
-            ref.read(
-              editingMemByMemIdProvider(_memId).select((v) => v.value.name),
-            ),
-            ActsSummary(
-              ref
-                  .watch(actListProvider(_memId).select(
-                    (value) {
-                      final period = _period.toPeriod(
-                        DateAndTime.now(),
-                        ref.watch(preferenceProvider(startOfDayKey)),
-                      );
-                      return value.where((e) =>
-                          e.value.memId == _memId &&
-                          (_period == Period.all ||
-                              e.value.period?.compareTo(period!) == 1));
-                    },
-                  ))
-                  .map((e) => e.value),
-              _aggregationType,
-            ),
-            _period,
-            _onPeriodSelected,
-            _aggregationType,
-            _onAggregationTypeSelected,
-          ),
-        ),
-        {
-          '_memId': _memId,
-        },
-      );
-}
-
-class _ActLineChartScreen extends StatelessWidget {
-  final String _memName;
-  final ActsSummary _actsSummary;
-  final Period _period;
-  final void Function(Period selected) _onPeriodSelected;
-  final AggregationType _aggregationType;
-  final void Function(AggregationType aggregationType)
-      _onAggregationTypeSelected;
-
-  const _ActLineChartScreen(
-    this._memName,
-    this._actsSummary,
-    this._period,
-    this._onPeriodSelected,
-    this._aggregationType,
-    this._onAggregationTypeSelected,
-  );
+  void _goNextPeriod() => setState(() {
+        if (_periodOffset < 0) {
+          _periodOffset++;
+        }
+      });
 
   @override
   Widget build(BuildContext context) => v(
-        () => Scaffold(
-          appBar: AppBar(
-            title: Text("$_memName : ${_aggregationType.name}"),
-            actions: [
-              PopupMenuButton(
-                itemBuilder: (context) => <PopupMenuEntry>[
-                  ...AggregationType.values.map(
-                    (e) => PopupMenuItem(
-                      enabled: e != _aggregationType,
-                      onTap: () => _onAggregationTypeSelected(e),
-                      child: Text(e.name),
-                    ),
-                  ),
-                  PopupMenuDivider(),
-                  ...Period.values.map(
-                    (e) => PopupMenuItem(
-                      enabled: e != _period,
-                      onTap: () => _onPeriodSelected(e),
-                      child: Text(e.name),
-                    ),
-                  ),
-                ].toList(growable: false),
-                tooltip: buildL10n(context).timePeriod,
-                padding: defaultPadding,
-                icon: Icon(Icons.more_vert),
-              )
-            ],
-          ),
-          body: Padding(
-              padding: defaultPadding,
-              child: Flex(
-                direction: Axis.vertical,
-                children: [
-                  Padding(
-                    padding: defaultPadding,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Flex(
-                        direction: Axis.horizontal,
-                        spacing: 4.0,
-                        children: [
-                          Text("Min : "),
-                          Text(_formatValue(_actsSummary.min)),
-                          Text("Max : "),
-                          Text(_formatValue(_actsSummary.max)),
-                          Text("Avg : "),
-                          Text(_formatValue(_actsSummary.average)),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                      child: LineChartWrapper(
-                    _actsSummary,
-                    _formatValue,
-                  )),
-                ],
-              )),
-        ),
+        () {
+          final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
+          final selectedPeriod = _period.toPeriod(
+            DateAndTime.now(),
+            startOfDay,
+            offset: _periodOffset,
+          );
+
+          return AsyncValueView(
+            loadActListProvider(widget.memId, _period, _periodOffset),
+            (_) => _buildScaffold(context, selectedPeriod, startOfDay),
+          );
+        },
         {
-          '_memName': _memName,
-          '_actsSummary': _actsSummary,
-          '_period': _period,
+          'memId': widget.memId,
         },
       );
 
-  String _formatValue(double value) {
-    switch (_aggregationType) {
-      case AggregationType.count:
-        return value.toStringAsFixed(1);
-      case AggregationType.sum:
-        final hours = (value / 3600).floor();
-        final minutes = ((value % 3600) / 60).floor();
-        final seconds = (value % 60).floor();
-        return '${hours}h ${minutes}m ${seconds}s';
-    }
+  Widget _buildScaffold(
+    BuildContext context,
+    DateAndTimePeriod? selectedPeriod,
+    TimeOfDay startOfDay,
+  ) {
+    final memName = ref.read(
+      editingMemByMemIdProvider(widget.memId).select((v) => v.value.name),
+    );
+    final actsSummary = ActsSummary(
+      _actsInPeriod(selectedPeriod),
+      _aggregationType,
+      period: selectedPeriod,
+      startOfDay: startOfDay,
+    );
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('$memName : ${_aggregationType.name}'),
+        actions: [
+          PopupMenuButton(
+            itemBuilder: (context) => <PopupMenuEntry>[
+              ...AggregationType.values.map(
+                (e) => PopupMenuItem(
+                  enabled: e != _aggregationType,
+                  onTap: () => setState(() => _aggregationType = e),
+                  child: Text(e.name),
+                ),
+              ),
+              const PopupMenuDivider(),
+              ...Period.values.map(
+                (e) => PopupMenuItem(
+                  enabled: e != _period,
+                  onTap: () => _selectPeriod(e),
+                  child: Text(e.name),
+                ),
+              ),
+            ],
+            tooltip: buildL10n(context).timePeriod,
+            padding: defaultPadding,
+            icon: const Icon(Icons.more_vert),
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: defaultPadding,
+        child: Flex(
+          direction: Axis.vertical,
+          children: [
+            if (_period != Period.all)
+              _PeriodNavigation(
+                periodLabel: selectedPeriod!.formatCompactRange(
+                  MaterialLocalizations.of(context),
+                ),
+                canGoNext: _periodOffset < 0,
+                onPrevious: _goPreviousPeriod,
+                onNext: _goNextPeriod,
+              ),
+            _SummaryStats(actsSummary, _aggregationType.format),
+            Expanded(
+              child: LineChartWrapper(
+                actsSummary,
+                _aggregationType.format,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
+
+  Iterable<Act> _actsInPeriod(DateAndTimePeriod? selectedPeriod) => ref
+      .watch(actListProvider(widget.memId).select(
+        (value) => value.where((e) {
+          if (_period == Period.all) {
+            return true;
+          }
+          final start = e.value.period?.start;
+          return start != null && selectedPeriod!.includesStart(start);
+        }),
+      ))
+      .map((e) => e.value);
+}
+
+class _PeriodNavigation extends StatelessWidget {
+  final String periodLabel;
+  final bool canGoNext;
+  final VoidCallback onPrevious;
+  final VoidCallback onNext;
+
+  const _PeriodNavigation({
+    required this.periodLabel,
+    required this.canGoNext,
+    required this.onPrevious,
+    required this.onNext,
+  });
+
+  @override
+  Widget build(BuildContext context) => Flex(
+        direction: Axis.horizontal,
+        children: [
+          IconButton(
+            onPressed: onPrevious,
+            icon: const Icon(Icons.chevron_left),
+          ),
+          Expanded(
+            child: Text(
+              periodLabel,
+              textAlign: TextAlign.center,
+            ),
+          ),
+          IconButton(
+            onPressed: canGoNext ? onNext : null,
+            icon: const Icon(Icons.chevron_right),
+          ),
+        ],
+      );
+}
+
+class _SummaryStats extends StatelessWidget {
+  final ActsSummary _actsSummary;
+  final String Function(double) _formatValue;
+
+  const _SummaryStats(this._actsSummary, this._formatValue);
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: defaultPadding,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Flex(
+            direction: Axis.horizontal,
+            spacing: 4.0,
+            children: [
+              const Text('Min : '),
+              Text(_formatValue(_actsSummary.min)),
+              const Text('Max : '),
+              Text(_formatValue(_actsSummary.max)),
+              const Text('Avg : '),
+              Text(_formatValue(_actsSummary.average)),
+            ],
+          ),
+        ),
+      );
 }

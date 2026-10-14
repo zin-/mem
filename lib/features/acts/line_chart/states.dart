@@ -8,67 +8,84 @@ enum Period { aDay, aWeek, aMonth, threeMonth, aYear, all }
 extension PeriodExt on Period {
   DateAndTimePeriod? toPeriod(
     DateAndTime now,
-    TimeOfDay startOfDay,
-  ) =>
+    TimeOfDay startOfDay, {
+    int offset = 0,
+  }) =>
       v(
         () {
-          final timeOfNow = TimeOfDay.fromDateTime(now);
-          DateAndTime start = DateAndTime(
-            now.year,
-            now.month,
-            now.day - (timeOfNow.isBefore(startOfDay) ? 1 : 0),
-            startOfDay.hour,
-            startOfDay.minute,
-          );
+          DateAndTime at(int year, int month, int day) => DateAndTime(
+                year,
+                month,
+                day,
+                startOfDay.hour,
+                startOfDay.minute,
+              );
+
+          var base = at(now.year, now.month, now.day);
+          if (TimeOfDay.fromDateTime(now).isBefore(startOfDay)) {
+            base = base.shiftCalendarDays(-1);
+          }
+
+          // 31日など、対象月に無い日は月末に切り詰める
+          DateAndTime shiftMonths(DateAndTime date, int months) {
+            final shifted = DateTime(date.year, date.month + months);
+            final lastDay = DateTime(shifted.year, shifted.month + 1, 0).day;
+            return at(
+              shifted.year,
+              shifted.month,
+              date.day < lastDay ? date.day : lastDay,
+            );
+          }
+
+          DateAndTimePeriod trailingDays(int days) {
+            final inclusiveEnd = base.shiftCalendarDays(days * offset);
+            final end = inclusiveEnd.shiftCalendarDays(1);
+            return DateAndTimePeriod(
+              start: end.shiftCalendarDays(-days),
+              end: end,
+            );
+          }
+
+          DateAndTimePeriod trailingMonths(int months) {
+            final inclusiveEnd = shiftMonths(base, months * offset);
+            return DateAndTimePeriod(
+              start: shiftMonths(inclusiveEnd, -months).shiftCalendarDays(1),
+              end: inclusiveEnd.shiftCalendarDays(1),
+            );
+          }
 
           switch (this) {
             case Period.aDay:
-              return DateAndTimePeriod(
-                start: start,
-                end: start.add(Duration(days: 1)),
-              );
+              return trailingDays(1);
             case Period.aWeek:
-              while (start.weekday != DateTime.monday) {
-                start = start.subtract(Duration(days: 1));
-              }
+              return trailingDays(DateTime.daysPerWeek);
             case Period.aMonth:
-              while (start.day != 1) {
-                start = start.subtract(Duration(days: 1));
-              }
+              return trailingMonths(1);
             case Period.threeMonth:
-              start = start.subtract(Duration(days: DateTime.daysPerWeek * 11));
-              while (start.day != 1) {
-                start = start.subtract(Duration(days: 1));
-              }
+              return trailingMonths(3);
             case Period.aYear:
-              start = start.subtract(Duration(days: DateTime.daysPerWeek * 51));
-              while (start.day != 1) {
-                start = start.subtract(Duration(days: 1));
-              }
+              return trailingMonths(12);
             case Period.all:
               return null;
           }
-
-          return DateAndTimePeriod(
-            start: start,
-            end: start.add(
-              Duration(
-                  days: switch (this) {
-                Period.aDay => 1,
-                Period.aWeek => DateTime.daysPerWeek,
-                Period.aMonth => DateTime.daysPerWeek * 4,
-                Period.threeMonth => DateTime.daysPerWeek * 12,
-                Period.aYear => DateTime.daysPerWeek * 52,
-// coverage:ignore-start
-                Period.all => throw UnimplementedError(),
-// coverage:ignore-end
-              }),
-            ),
-          );
         },
         {
           'now': now,
           'startOfDay': startOfDay,
+          'offset': offset,
         },
       );
+}
+
+extension DateAndTimePeriodRangeFormat on DateAndTimePeriod {
+  String formatCompactRange(MaterialLocalizations localizations) {
+    final startLabel = localizations.formatCompactDate(start!);
+    final inclusiveEnd = end!.shiftCalendarDays(-1);
+    if (start!.year == inclusiveEnd.year &&
+        start!.month == inclusiveEnd.month &&
+        start!.day == inclusiveEnd.day) {
+      return startLabel;
+    }
+    return '$startLabel – ${localizations.formatCompactDate(inclusiveEnd)}';
+  }
 }
