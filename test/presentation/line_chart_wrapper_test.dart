@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act.dart';
@@ -99,6 +100,86 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('10'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'tooltip text is the formatted spot y',
+    (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          onGenerateTitle: (context) => buildL10n(context).test,
+          home: Scaffold(
+            body: SizedBox(
+              width: 800,
+              height: 400,
+              child: LineChartWrapper(
+                ActsSummary(
+                  [
+                    FinishedAct(
+                      1,
+                      DateAndTime(2024, 1, 1, 0),
+                      DateAndTime(2024, 1, 1, 1),
+                    ),
+                  ],
+                  AggregationType.count,
+                ),
+                (value) => '${value.toInt()} items',
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      const spot = FlSpot(1, 4);
+      final getTooltipItems = tester
+          .widget<LineChart>(find.byType(LineChart))
+          .data
+          .lineTouchData
+          .touchTooltipData
+          .getTooltipItems;
+
+      final items = getTooltipItems([
+        LineBarSpot(
+          LineChartBarData(spots: const [spot], color: Colors.teal),
+          0,
+          spot,
+        ),
+        LineBarSpot(
+          LineChartBarData(
+            spots: const [spot],
+            gradient: const LinearGradient(colors: [Colors.red, Colors.orange]),
+          ),
+          1,
+          spot,
+        ),
+      ]);
+
+      expect(
+        items,
+        [
+          const LineTooltipItem(
+            '4 items',
+            TextStyle(
+              color: Colors.teal,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+          const LineTooltipItem(
+            '4 items',
+            TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+        ],
+      );
     },
   );
 }

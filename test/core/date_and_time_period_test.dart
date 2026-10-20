@@ -301,6 +301,52 @@ void main() {
     }
   });
 
+  group('duration', () {
+    test('is zero when either bound is missing', () {
+      final at = DateAndTime(2024, 1, 1, 1);
+
+      expect(DateAndTimePeriod(start: at).duration, Duration.zero);
+      expect(DateAndTimePeriod(end: at).duration, Duration.zero);
+    });
+
+    test('is the span from start to end', () {
+      final start = DateAndTime(2024, 1, 1, 1);
+      final end = DateAndTime(2024, 1, 1, 2, 3, 4);
+
+      expect(
+        DateAndTimePeriod(start: start, end: end).duration,
+        end.difference(start),
+      );
+    });
+  });
+
+  group('compareWithDateAndTime', () {
+    final start = DateAndTime(2024, 1, 1, 1);
+    final end = DateAndTime(2024, 1, 2, 3);
+    final later = DateTime(2024, 1, 3);
+
+    test('start only treats null as equal and otherwise compares the start', () {
+      final period = DateAndTimePeriod(start: start);
+
+      expect(period.compareWithDateAndTime(null), 0);
+      expect(period.compareWithDateAndTime(later), start.compareTo(later));
+    });
+
+    test('end only treats null as equal and otherwise compares the end', () {
+      final period = DateAndTimePeriod(end: end);
+
+      expect(period.compareWithDateAndTime(null), 0);
+      expect(period.compareWithDateAndTime(later), end.compareTo(later));
+    });
+
+    test('start and end compares by the end', () {
+      final period = DateAndTimePeriod(start: start, end: end);
+
+      expect(period.compareWithDateAndTime(null), 0);
+      expect(period.compareWithDateAndTime(later), end.compareTo(later));
+    });
+  });
+
   group('includesStart', () {
     final period = DateAndTimePeriod(
       start: DateAndTime(2026, 10, 7, 5),
