@@ -267,5 +267,43 @@ void main() {
         {null, ActKind.finished},
       );
     });
+
+    test(
+        'fetchByMemIdAndPeriod with null period returns non-skipped acts regardless of date',
+        () async {
+      final memId = await insertMem();
+      final otherMemId = await insertMem();
+      final early = DateTime(2020, 1, 1, 10);
+      final later = DateTime(2026, 12, 31, 10);
+      await insertAct(memId: memId, start: early);
+      await insertAct(
+        memId: memId,
+        start: later,
+        actKind: 'finished',
+      );
+      await insertAct(
+        memId: memId,
+        start: DateTime(2024, 6, 3, 10),
+        actKind: 'skipped',
+      );
+      await insertAct(
+        memId: otherMemId,
+        start: DateTime(2024, 6, 2, 10),
+        actKind: 'finished',
+      );
+
+      final rows = await query.fetchByMemIdAndPeriod(memId, null);
+
+      expect(rows, hasLength(2));
+      expect(rows.map((e) => e.memId).toSet(), {memId});
+      expect(
+        rows.map((e) => e.actKind).toSet(),
+        {null, ActKind.finished},
+      );
+      expect(
+        rows.map((e) => e.start?.year).toSet(),
+        {early.year, later.year},
+      );
+    });
   });
 }
