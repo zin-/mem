@@ -187,6 +187,21 @@ void main() {
       ]);
       expect(summary.groupedListByDate.values.toList(), [1]);
     });
+
+    test('sums finished durations in seconds and formats them', () {
+      final acts = [
+        FinishedAct(
+          1,
+          DateAndTime(2026, 10, 2, 10),
+          DateAndTime(2026, 10, 2, 11, 2, 3),
+        ),
+        PausedAct(1, DateTime(2026, 10, 2, 12)),
+      ];
+      final summary = ActsSummary(acts, AggregationType.sum);
+
+      expect(summary.getValue(acts), 3723);
+      expect(AggregationType.sum.format(3723), '1h 2m 3s');
+    });
   });
 }
 
