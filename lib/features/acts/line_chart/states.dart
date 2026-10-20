@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
+import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/features/logger/log_service.dart';
 
 enum Period { aDay, aWeek, aMonth, threeMonth, aYear, all }
@@ -21,10 +22,8 @@ extension PeriodExt on Period {
                 startOfDay.minute,
               );
 
-          var base = at(now.year, now.month, now.day);
-          if (TimeOfDay.fromDateTime(now).isBefore(startOfDay)) {
-            base = base.shiftCalendarDays(-1);
-          }
+          final day = now.logicalDay(startOfDay);
+          final base = at(day.year, day.month, day.day);
 
           // 31日など、対象月に無い日は月末に切り詰める
           DateAndTime shiftMonths(DateAndTime date, int months) {
