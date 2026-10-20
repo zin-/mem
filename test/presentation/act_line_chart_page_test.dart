@@ -147,8 +147,8 @@ void main() {
           DateAndTime.now(),
           defaultStartOfDay,
         )!;
-        final insideStart = period.start!;
-        final outsideStart = period.end!;
+        final insideStart = period.start;
+        final outsideStart = period.end;
 
         await _pumpPage(
           tester,

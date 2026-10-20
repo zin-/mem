@@ -7,7 +7,7 @@ import 'package:mem/features/logger/log_service.dart';
 enum Period { aDay, aWeek, aMonth, threeMonth, aYear, all }
 
 extension PeriodExt on Period {
-  DateAndTimePeriod? toPeriod(
+  WithStartAndEnd? toPeriod(
     DateAndTime now,
     TimeOfDay startOfDay, {
     int offset = 0,
@@ -36,20 +36,17 @@ extension PeriodExt on Period {
             );
           }
 
-          DateAndTimePeriod trailingDays(int days) {
+          WithStartAndEnd trailingDays(int days) {
             final inclusiveEnd = base.shiftCalendarDays(days * offset);
             final end = inclusiveEnd.shiftCalendarDays(1);
-            return DateAndTimePeriod(
-              start: end.shiftCalendarDays(-days),
-              end: end,
-            );
+            return WithStartAndEnd(end.shiftCalendarDays(-days), end);
           }
 
-          DateAndTimePeriod trailingMonths(int months) {
+          WithStartAndEnd trailingMonths(int months) {
             final inclusiveEnd = shiftMonths(base, months * offset);
-            return DateAndTimePeriod(
-              start: shiftMonths(inclusiveEnd, -months).shiftCalendarDays(1),
-              end: inclusiveEnd.shiftCalendarDays(1),
+            return WithStartAndEnd(
+              shiftMonths(inclusiveEnd, -months).shiftCalendarDays(1),
+              inclusiveEnd.shiftCalendarDays(1),
             );
           }
 
@@ -76,13 +73,13 @@ extension PeriodExt on Period {
       );
 }
 
-extension DateAndTimePeriodRangeFormat on DateAndTimePeriod {
+extension WithStartAndEndRangeFormat on WithStartAndEnd {
   String formatCompactRange(MaterialLocalizations localizations) {
-    final startLabel = localizations.formatCompactDate(start!);
-    final inclusiveEnd = end!.shiftCalendarDays(-1);
-    if (start!.year == inclusiveEnd.year &&
-        start!.month == inclusiveEnd.month &&
-        start!.day == inclusiveEnd.day) {
+    final startLabel = localizations.formatCompactDate(start);
+    final inclusiveEnd = end.shiftCalendarDays(-1);
+    if (start.year == inclusiveEnd.year &&
+        start.month == inclusiveEnd.month &&
+        start.day == inclusiveEnd.day) {
       return startLabel;
     }
     return '$startLabel – ${localizations.formatCompactDate(inclusiveEnd)}';

@@ -127,12 +127,12 @@ class ActQueryService {
               (t) =>
                   t.memId.equals(memId) & actExcludingSkippedForPerformance(t),
             );
-          if (period != null) {
+          if (period is WithStartAndEnd) {
             query = query
               ..where(
                 (t) =>
-                    t.start.isBiggerOrEqualValue(period.start!) &
-                    t.start.isSmallerThanValue(period.end!),
+                    t.start.isBiggerOrEqualValue(period.start) &
+                    t.start.isSmallerThanValue(period.end),
               );
           }
           final rows = await query.get();

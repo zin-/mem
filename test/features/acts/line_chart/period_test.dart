@@ -100,7 +100,7 @@ void main() {
 
       expect(
         period.formatCompactRange(localizations),
-        localizations.formatCompactDate(period.start!),
+        localizations.formatCompactDate(period.start),
       );
     });
 
@@ -110,11 +110,11 @@ void main() {
         DateAndTime(2026, 10, 13, 12, 0),
         startOfDay,
       )!;
-      final inclusiveEnd = period.end!.subtract(const Duration(days: 1));
+      final inclusiveEnd = period.end.subtract(const Duration(days: 1));
 
       expect(
         period.formatCompactRange(localizations),
-        '${localizations.formatCompactDate(period.start!)} – ${localizations.formatCompactDate(inclusiveEnd)}',
+        '${localizations.formatCompactDate(period.start)} – ${localizations.formatCompactDate(inclusiveEnd)}',
       );
     });
   });

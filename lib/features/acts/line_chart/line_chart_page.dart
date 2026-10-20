@@ -113,9 +113,9 @@ class _ActLineChartPageState extends ConsumerState<ActLineChartPage> {
         child: Flex(
           direction: Axis.vertical,
           children: [
-            if (_period != Period.all)
+            if (selectedPeriod is WithStartAndEnd)
               _PeriodNavigation(
-                periodLabel: selectedPeriod!.formatCompactRange(
+                periodLabel: selectedPeriod.formatCompactRange(
                   MaterialLocalizations.of(context),
                 ),
                 canGoNext: _periodOffset < 0,
@@ -138,11 +138,11 @@ class _ActLineChartPageState extends ConsumerState<ActLineChartPage> {
   Iterable<Act> _actsInPeriod(DateAndTimePeriod? selectedPeriod) => ref
       .watch(actListProvider(widget.memId).select(
         (value) => value.where((e) {
-          if (_period == Period.all) {
+          if (selectedPeriod is! WithStartAndEnd) {
             return true;
           }
           final start = e.value.period?.start;
-          return start != null && selectedPeriod!.includesStart(start);
+          return start != null && selectedPeriod.includesStart(start);
         }),
       ))
       .map((e) => e.value);
