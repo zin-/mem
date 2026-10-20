@@ -122,6 +122,47 @@ void main() {
     );
 
     testWidgets(
+      'selects sum and shows elapsed time.',
+      (tester) async {
+        final memName = 'memName - sum';
+        final start =
+            Period.aWeek.toPeriod(DateAndTime.now(), defaultStartOfDay)!.start;
+
+        await _pumpPage(
+          tester,
+          memId: 1,
+          memName: memName,
+          acts: [
+            FinishedAct(
+              1,
+              start,
+              // add は秒を捨てる
+              DateAndTime(
+                start.year,
+                start.month,
+                start.day,
+                start.hour + 1,
+                2,
+                3,
+              ),
+            ),
+          ],
+        );
+
+        await tester.tap(find.byIcon(Icons.more_vert));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(AggregationType.sum.name));
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text('$memName : ${AggregationType.sum.name}'),
+          findsOneWidget,
+        );
+        expect(find.text('1h 2m 3s'), findsAtLeastNWidgets(1));
+      },
+    );
+
+    testWidgets(
       'hides navigation for Period.all.',
       (tester) async {
         await _pumpPage(
