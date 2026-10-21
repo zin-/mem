@@ -134,6 +134,7 @@ class _ActList extends StatelessWidget {
                           _memList,
                           _isTimeView,
                           _targetList,
+                          _isDateView,
                         );
 
                         return SliverChildBuilderDelegate(

@@ -13,6 +13,7 @@ class ActListItemBuilder {
   final List<Mem> _memList;
   final bool _isTimeView;
   final List<SavedTargetEntityV1> _targetList;
+  final bool _isDateView;
 
   late final Map<int, List<SavedActEntityV1>> _actListGroupedByMemId;
 
@@ -21,6 +22,7 @@ class ActListItemBuilder {
     this._memList,
     this._isTimeView,
     this._targetList,
+    this._isDateView,
   ) {
     if (_isTimeView) {
       _actListGroupedByMemId = _actListWithDatetime.value
@@ -37,6 +39,8 @@ class ActListItemBuilder {
               entry.value,
               _memList.singleWhereOrNull((mem) => mem.id! == entry.key),
               _targetList.singleWhereOrNull((e) => e.value.memId == entry.key),
+              _actListWithDatetime.key,
+              _isDateView,
             );
           } else {
             final act = _actListWithDatetime.value[index];
