@@ -40,107 +40,23 @@ class TotalActTimeListItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
-          final active = _actList.firstWhereOrNull(
-            (e) => e.value.isActive,
-          );
           final actMemId = _actList.first.value.memId;
-          final loadedMem = ref.watch(memByMemIdProvider(_mem?.id ?? actMemId));
-          final int memId = _mem?.id ?? loadedMem?.id ?? actMemId;
+          final loadedMem = ref.watch(
+            memByMemIdProvider(_mem?.id ?? actMemId),
+          );
+          final memId = _mem?.id ?? loadedMem?.id ?? actMemId;
           // 実行中が前日始まりでも、今の行のボタンがずれないように期間内 Act は見ない
           final latestAct =
               loadedMem != null ? loadedMem.latestAct : _mem?.latestAct;
-          final showActions = _isCurrentPeriod(DateTime.now());
-
-          IconButton actionButton(IconData icon, void Function() onPressed) =>
-              IconButton(
-                onPressed: onPressed,
-                icon: Icon(icon),
-              );
-
-          final Widget? leading;
-          final Widget? trailing;
-          if (!showActions) {
-            leading = null;
-            trailing = null;
-          } else if (latestAct is ActiveAct) {
-            leading = actionButton(
-              Icons.pause,
-              () => ref.read(actEntitiesProvider.notifier).pauseByMemId(memId),
-            );
-            trailing = actionButton(
-              Icons.stop,
-              () => ref.read(actEntitiesProvider.notifier).finishActby(memId),
-            );
-          } else if (latestAct is PausedAct) {
-            leading = actionButton(
-              Icons.close,
-              () => ref.read(actEntitiesProvider.notifier).closeByMemId(memId),
-            );
-            trailing = actionButton(
-              Icons.play_arrow,
-              () => ref.read(actEntitiesProvider.notifier).resumeActBy(memId),
-            );
-          } else {
-            leading = actionButton(
-              Icons.stop,
-              () => ref.read(actEntitiesProvider.notifier).finishActby(memId),
-            );
-            trailing = actionButton(
-              Icons.play_arrow,
-              () => ref.read(actEntitiesProvider.notifier).startActby(memId),
-            );
-          }
+          final actions = _isCurrentPeriod(DateTime.now())
+              ? _actions(ref, memId, latestAct)
+              : (leading: null, trailing: null);
 
           return ListTile(
-            leading: leading,
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Wrap(children: [
-                  if (active != null)
-                    Text((_actList.fold<Duration>(
-                              Duration.zero,
-                              (previousValue, element) =>
-                                  previousValue +
-                                  (element.value.period?.duration ??
-                                      Duration.zero),
-                            ) +
-                            DateTime.now()
-                                .difference(active.value.period!.start!))
-                        .formatHHmm()),
-                  if (active != null) Text(" / "),
-                  Text(_actList
-                      .fold<Duration>(
-                        Duration.zero,
-                        (previousValue, element) =>
-                            previousValue +
-                            (element.value.period?.duration ?? Duration.zero),
-                      )
-                      .formatHHmm()),
-                  if (_targetEntity != null &&
-                      _targetEntity.value.targetUnit == TargetUnit.time)
-                    Text(" / "),
-                  if (_targetEntity != null &&
-                      _targetEntity.value.targetUnit == TargetUnit.time)
-                    Text(
-                      Duration(seconds: _targetEntity.value.value).formatHHmm(),
-                    ),
-                ]),
-                Wrap(
-                  children: [
-                    Text(_actList.length.toString()),
-                    if (_targetEntity != null &&
-                        _targetEntity.value.targetUnit == TargetUnit.count)
-                      Text(" / "),
-                    if (_targetEntity != null &&
-                        _targetEntity.value.targetUnit == TargetUnit.count)
-                      Text(_targetEntity.value.value.toString()),
-                  ],
-                ),
-              ],
-            ),
+            leading: actions.leading,
+            title: _title(),
             subtitle: _mem == null ? null : Text(_mem.name),
-            trailing: trailing,
+            trailing: actions.trailing,
             onTap: () => showMemDetailPage(context, ref, memId),
           );
         },
@@ -151,4 +67,81 @@ class TotalActTimeListItem extends ConsumerWidget {
           '_isDateView': _isDateView,
         },
       );
+
+  Widget _title() {
+    final active = _actList.firstWhereOrNull((act) => act.value.isActive);
+    final recorded = _actList.fold<Duration>(
+      Duration.zero,
+      (sum, act) => sum + (act.value.period?.duration ?? Duration.zero),
+    );
+    final elapsed = active == null
+        ? null
+        : recorded + DateTime.now().difference(active.value.period!.start!);
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Wrap(
+          children: [
+            if (elapsed != null) ...[
+              Text(elapsed.formatHHmm()),
+              const Text(" / "),
+            ],
+            Text(recorded.formatHHmm()),
+            ..._targetSuffix(TargetUnit.time),
+          ],
+        ),
+        Wrap(
+          children: [
+            Text(_actList.length.toString()),
+            ..._targetSuffix(TargetUnit.count),
+          ],
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _targetSuffix(TargetUnit unit) {
+    final target = _targetEntity?.value;
+    if (target == null || target.targetUnit != unit) {
+      return const [];
+    }
+
+    final label = switch (unit) {
+      TargetUnit.time => Duration(seconds: target.value).formatHHmm(),
+      TargetUnit.count => target.value.toString(),
+    };
+    return [
+      const Text(" / "),
+      Text(label),
+    ];
+  }
+
+  ({Widget? leading, Widget? trailing}) _actions(
+    WidgetRef ref,
+    int memId,
+    Act? latestAct,
+  ) {
+    IconButton button(IconData icon, void Function() onPressed) => IconButton(
+          onPressed: onPressed,
+          icon: Icon(icon),
+        );
+
+    ActEntities acts() => ref.read(actEntitiesProvider.notifier);
+
+    return switch (latestAct) {
+      ActiveAct() => (
+          leading: button(Icons.pause, () => acts().pauseByMemId(memId)),
+          trailing: button(Icons.stop, () => acts().finishActby(memId)),
+        ),
+      PausedAct() => (
+          leading: button(Icons.close, () => acts().closeByMemId(memId)),
+          trailing: button(Icons.play_arrow, () => acts().resumeActBy(memId)),
+        ),
+      _ => (
+          leading: button(Icons.stop, () => acts().finishActby(memId)),
+          trailing: button(Icons.play_arrow, () => acts().startActby(memId)),
+        ),
+    };
+  }
 }
