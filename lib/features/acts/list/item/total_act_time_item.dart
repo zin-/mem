@@ -1,91 +1,147 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/list/duration.dart';
+import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem.dart';
+import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/mems/transitions.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/targets/target_entity.dart';
 
-class TotalActTimeListItem extends StatelessWidget {
+class TotalActTimeListItem extends ConsumerWidget {
   final List<SavedActEntityV1> _actList;
   final Mem? _mem;
   final SavedTargetEntityV1? _targetEntity;
+  final DateTime _groupDate;
+  final bool _isDateView;
 
   const TotalActTimeListItem(
     this._actList,
     this._mem,
-    this._targetEntity, {
+    this._targetEntity,
+    this._groupDate,
+    this._isDateView, {
     super.key,
   });
 
+  bool _isCurrentPeriod(DateTime now) {
+    final sameMonth =
+        _groupDate.year == now.year && _groupDate.month == now.month;
+    if (!_isDateView) {
+      return sameMonth;
+    }
+    return sameMonth && _groupDate.day == now.day;
+  }
+
   @override
-  Widget build(BuildContext context) => v(
+  Widget build(BuildContext context, WidgetRef ref) => v(
         () {
-          final active = _actList.firstWhereOrNull(
-            (e) => e.value.isActive,
+          final actMemId = _actList.first.value.memId;
+          final loadedMem = ref.watch(
+            memByMemIdProvider(_mem?.id ?? actMemId),
           );
+          final memId = _mem?.id ?? loadedMem?.id ?? actMemId;
+          // 実行中が前日始まりでも、今の行のボタンがずれないように期間内 Act は見ない
+          final latestAct =
+              loadedMem != null ? loadedMem.latestAct : _mem?.latestAct;
+          final actions = _isCurrentPeriod(DateTime.now())
+              ? _actions(ref, memId, latestAct)
+              : (leading: null, trailing: null);
 
           return ListTile(
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Wrap(children: [
-                  if (active != null)
-                    Text((_actList.fold<Duration>(
-                              Duration.zero,
-                              (previousValue, element) =>
-                                  previousValue +
-                                  (element.value.period?.duration ??
-                                      Duration.zero),
-                            ) +
-                            DateTime.now()
-                                .difference(active.value.period!.start!))
-                        .formatHHmm()),
-                  if (active != null) Text(" / "),
-                  Text(_actList
-                      .fold<Duration>(
-                        Duration.zero,
-                        (previousValue, element) =>
-                            previousValue +
-                            (element.value.period?.duration ?? Duration.zero),
-                      )
-                      .formatHHmm()),
-                  if (_targetEntity != null &&
-                      _targetEntity.value.targetUnit == TargetUnit.time)
-                    Text(" / "),
-                  if (_targetEntity != null &&
-                      _targetEntity.value.targetUnit == TargetUnit.time)
-                    Text(
-                      Duration(seconds: _targetEntity.value.value).formatHHmm(),
-                    ),
-                ]),
-                Wrap(
-                  children: [
-                    Text(_actList.length.toString()),
-                    if (_targetEntity != null &&
-                        _targetEntity.value.targetUnit == TargetUnit.count)
-                      Text(" / "),
-                    if (_targetEntity != null &&
-                        _targetEntity.value.targetUnit == TargetUnit.count)
-                      Text(_targetEntity.value.value.toString()),
-                  ],
-                ),
-              ],
-            ),
+            leading: actions.leading,
+            title: _title(),
             subtitle: _mem == null ? null : Text(_mem.name),
-            trailing: _mem == null
-                ? null
-                : IconButton(
-                    onPressed: () => showMemDetailPage(context, null, _mem.id),
-                    icon: const Icon(Icons.arrow_forward),
-                  ),
+            trailing: actions.trailing,
+            onTap: () => showMemDetailPage(context, ref, memId),
           );
         },
         {
           '_actList': _actList,
           '_mem': _mem,
+          '_groupDate': _groupDate,
+          '_isDateView': _isDateView,
         },
       );
+
+  Widget _title() {
+    final active = _actList.firstWhereOrNull((act) => act.value.isActive);
+    final recorded = _actList.fold<Duration>(
+      Duration.zero,
+      (sum, act) => sum + (act.value.period?.duration ?? Duration.zero),
+    );
+    final elapsed = active == null
+        ? null
+        : recorded + DateTime.now().difference(active.value.period!.start!);
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Wrap(
+          children: [
+            if (elapsed != null) ...[
+              Text(elapsed.formatHHmm()),
+              const Text(" / "),
+            ],
+            Text(recorded.formatHHmm()),
+            ..._targetSuffix(TargetUnit.time),
+          ],
+        ),
+        Wrap(
+          children: [
+            Text(_actList.length.toString()),
+            ..._targetSuffix(TargetUnit.count),
+          ],
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _targetSuffix(TargetUnit unit) {
+    final target = _targetEntity?.value;
+    if (target == null || target.targetUnit != unit) {
+      return const [];
+    }
+
+    final label = switch (unit) {
+      TargetUnit.time => Duration(seconds: target.value).formatHHmm(),
+      TargetUnit.count => target.value.toString(),
+    };
+    return [
+      const Text(" / "),
+      Text(label),
+    ];
+  }
+
+  ({Widget? leading, Widget? trailing}) _actions(
+    WidgetRef ref,
+    int memId,
+    Act? latestAct,
+  ) {
+    IconButton button(IconData icon, void Function() onPressed) => IconButton(
+          onPressed: onPressed,
+          icon: Icon(icon),
+        );
+
+    ActEntities acts() => ref.read(actEntitiesProvider.notifier);
+
+    return switch (latestAct) {
+      ActiveAct() => (
+          leading: button(Icons.pause, () => acts().pauseByMemId(memId)),
+          trailing: button(Icons.stop, () => acts().finishActby(memId)),
+        ),
+      PausedAct() => (
+          leading: button(Icons.close, () => acts().closeByMemId(memId)),
+          trailing: button(Icons.play_arrow, () => acts().resumeActBy(memId)),
+        ),
+      _ => (
+          leading: button(Icons.stop, () => acts().finishActby(memId)),
+          trailing: button(Icons.play_arrow, () => acts().startActby(memId)),
+        ),
+    };
+  }
 }
