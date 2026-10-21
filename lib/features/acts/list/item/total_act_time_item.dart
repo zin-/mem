@@ -1,14 +1,16 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/list/duration.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem.dart';
+import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/mems/transitions.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/targets/target_entity.dart';
 
-class TotalActTimeListItem extends StatelessWidget {
+class TotalActTimeListItem extends ConsumerWidget {
   final List<SavedActEntityV1> _actList;
   final Mem? _mem;
   final SavedTargetEntityV1? _targetEntity;
@@ -21,11 +23,15 @@ class TotalActTimeListItem extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => v(
+  Widget build(BuildContext context, WidgetRef ref) => v(
         () {
           final active = _actList.firstWhereOrNull(
             (e) => e.value.isActive,
           );
+          final actMemId = _actList.first.value.memId;
+          final loadedMemId =
+              ref.watch(memByMemIdProvider(_mem?.id ?? actMemId))?.id;
+          final memId = _mem?.id ?? loadedMemId ?? actMemId;
 
           return ListTile(
             title: Row(
@@ -75,12 +81,7 @@ class TotalActTimeListItem extends StatelessWidget {
               ],
             ),
             subtitle: _mem == null ? null : Text(_mem.name),
-            trailing: _mem == null
-                ? null
-                : IconButton(
-                    onPressed: () => showMemDetailPage(context, null, _mem.id),
-                    icon: const Icon(Icons.arrow_forward),
-                  ),
+            onTap: () => showMemDetailPage(context, ref, memId),
           );
         },
         {
