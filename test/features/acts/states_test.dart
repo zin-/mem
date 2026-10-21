@@ -1,17 +1,22 @@
 import 'dart:async';
 import '../../entity_factories.dart';
 import 'package:collection/collection.dart';
+import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
+import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/preference/preference_key.dart';
 import 'package:mem/features/settings/states.dart';
-import 'package:mem/databases/database.dart';
+import 'package:mem/databases/database.dart' hide Act;
+import 'package:mem/framework/database/accessor.dart';
+import 'package:mem/framework/date_and_time/date_and_time.dart';
+import 'package:mem/framework/singleton.dart';
 import 'package:mem/widgets/infinite_scroll.dart';
 
 class _FakePreference extends Preference<TimeOfDay> {
@@ -165,6 +170,63 @@ void main() {
 
       final result = await notifier.fetch(1, Period.aDay);
       expect(result, isA<Iterable<SavedActEntityV1>>());
+    });
+
+    test('fetch returns acts inside the offset week only', () async {
+      final db = AppDatabase.memory();
+      await Migrator(db).createAll();
+      DriftDatabaseAccessor.reset();
+      Singleton.reset<ActQueryService>();
+      Singleton.override<DriftDatabaseAccessor>(
+        DriftDatabaseAccessor.withDatabase(db),
+      );
+      addTearDown(() async {
+        await db.close();
+        DriftDatabaseAccessor.reset();
+        Singleton.reset<ActQueryService>();
+      });
+
+      final container = ProviderContainer(
+        overrides: [
+          preferenceProvider(startOfDayKey)
+              .overrideWith(() => _FakePreference()),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      const offset = -1;
+      final window = Period.aWeek.toPeriod(
+        DateAndTime.now(),
+        container.read(preferenceProvider(startOfDayKey)),
+        offset: offset,
+      )!;
+      final now = DateTime.now();
+      final mem = await db.into(db.mems).insertReturning(
+            MemsCompanion.insert(name: 'm', createdAt: now),
+          );
+
+      Future<int> insertAct(DateTime start) => db.into(db.acts).insert(
+            ActsCompanion.insert(
+              memId: mem.id,
+              createdAt: now,
+              start: Value(start),
+              end: Value(start.add(const Duration(hours: 1))),
+            ),
+          );
+
+      final insideId = await insertAct(window.start);
+      await insertAct(window.start.subtract(const Duration(hours: 1)));
+      await insertAct(now);
+
+      final result = await container
+          .read(actEntitiesProvider.notifier)
+          .fetch(mem.id, Period.aWeek, offset: offset);
+
+      expect(result.map((act) => act.id), [insideId]);
+      expect(
+        container.read(actEntitiesProvider).map((act) => act.id),
+        [insideId],
+      );
     });
 
     test('startActby calls client and upserts result', () async {

@@ -267,5 +267,130 @@ void main() {
         {null, ActKind.finished},
       );
     });
+
+    test('activeCount counts started acts that have no end', () async {
+      final memId = await insertMem();
+
+      expect(await query.activeCount(), 0);
+
+      await insertAct(memId: memId, start: DateTime(2024, 6, 1, 10));
+      await db.into(db.acts).insert(
+            ActsCompanion.insert(
+              memId: memId,
+              createdAt: DateTime.now(),
+            ),
+          );
+      await db.into(db.acts).insert(
+            ActsCompanion.insert(
+              memId: memId,
+              createdAt: DateTime.now(),
+              start: Value(DateTime(2024, 6, 2, 10)),
+            ),
+          );
+      await db.into(db.acts).insert(
+            ActsCompanion.insert(
+              memId: memId,
+              createdAt: DateTime.now(),
+              start: Value(DateTime(2024, 6, 3, 10)),
+            ),
+          );
+
+      expect(await query.activeCount(), 2);
+    });
+
+    test(
+        'fetchLatestAndPausedByMemIds keeps the newest paused start for the given mems',
+        () async {
+      final memId = await insertMem();
+      final otherMemId = await insertMem();
+      final pausedAt = DateTime(2024, 6, 1, 9);
+      final newest = DateTime(2024, 6, 5, 10);
+
+      Future<void> insertPaused({
+        required int memId,
+        DateTime? start,
+      }) =>
+          db.into(db.acts).insert(
+                ActsCompanion.insert(
+                  memId: memId,
+                  createdAt: DateTime.now(),
+                  start: Value(start),
+                  pausedAt: Value(pausedAt),
+                ),
+              );
+
+      await db.into(db.acts).insert(
+            ActsCompanion.insert(
+              memId: memId,
+              createdAt: DateTime.now(),
+              start: Value(DateTime(2024, 6, 9, 10)),
+            ),
+          );
+      await insertPaused(memId: memId);
+      await insertPaused(memId: memId);
+      await insertPaused(memId: memId, start: DateTime(2024, 6, 3, 10));
+      await insertPaused(memId: memId);
+      await insertPaused(memId: memId, start: DateTime(2024, 6, 2, 10));
+      await insertPaused(memId: memId, start: newest);
+      await insertPaused(
+        memId: otherMemId,
+        start: DateTime(2024, 6, 8, 10),
+      );
+
+      final filtered = await query.fetchLatestAndPausedByMemIds([memId]);
+
+      expect(filtered, hasLength(1));
+      expect(filtered.single.memId, memId);
+      expect(
+        filtered.single.start,
+        DateAndTime.from(newest, timeOfDay: newest),
+      );
+
+      final all = await query.fetchLatestAndPausedByMemIds(null);
+
+      expect(all.map((act) => act.memId).toSet(), {memId, otherMemId});
+      expect(
+        all.singleWhere((act) => act.memId == memId).start,
+        DateAndTime.from(newest, timeOfDay: newest),
+      );
+    });
+
+    test(
+        'fetchByMemIdAndPeriod with null period returns non-skipped acts regardless of date',
+        () async {
+      final memId = await insertMem();
+      final otherMemId = await insertMem();
+      final early = DateTime(2020, 1, 1, 10);
+      final later = DateTime(2026, 12, 31, 10);
+      await insertAct(memId: memId, start: early);
+      await insertAct(
+        memId: memId,
+        start: later,
+        actKind: 'finished',
+      );
+      await insertAct(
+        memId: memId,
+        start: DateTime(2024, 6, 3, 10),
+        actKind: 'skipped',
+      );
+      await insertAct(
+        memId: otherMemId,
+        start: DateTime(2024, 6, 2, 10),
+        actKind: 'finished',
+      );
+
+      final rows = await query.fetchByMemIdAndPeriod(memId, null);
+
+      expect(rows, hasLength(2));
+      expect(rows.map((e) => e.memId).toSet(), {memId});
+      expect(
+        rows.map((e) => e.actKind).toSet(),
+        {null, ActKind.finished},
+      );
+      expect(
+        rows.map((e) => e.start?.year).toSet(),
+        {early.year, later.year},
+      );
+    });
   });
 }

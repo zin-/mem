@@ -38,7 +38,7 @@ class ActEntities extends _$ActEntities
                   DateAndTime.now(),
                   ref.watch(preferenceProvider(startOfDayKey)),
                   offset: offset,
-                )!,
+                ),
               )
               .then(
                 (v) => v.map((e) => SavedActEntityV1.fromEntityV2(e)).toList(),

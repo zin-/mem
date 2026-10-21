@@ -118,19 +118,24 @@ class ActQueryService {
 
   Future<List<ActEntity>> fetchByMemIdAndPeriod(
     int memId,
-    DateAndTimePeriod period,
+    DateAndTimePeriod? period,
   ) =>
       v(
         () async {
-          final rows = await (_db.select(_db.acts)
-                ..where(
-                  (t) =>
-                      t.memId.equals(memId) &
-                      t.start.isBiggerOrEqualValue(period.start!) &
-                      t.start.isSmallerThanValue(period.end!) &
-                      actExcludingSkippedForPerformance(t),
-                ))
-              .get();
+          var query = _db.select(_db.acts)
+            ..where(
+              (t) =>
+                  t.memId.equals(memId) & actExcludingSkippedForPerformance(t),
+            );
+          if (period is WithStartAndEnd) {
+            query = query
+              ..where(
+                (t) =>
+                    t.start.isBiggerOrEqualValue(period.start) &
+                    t.start.isSmallerThanValue(period.end),
+              );
+          }
+          final rows = await query.get();
           return rows.map(ActEntity.fromTuple).toList();
         },
         {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
+import 'package:mem/framework/date_and_time/date_time_ext.dart';
 import 'package:mem/framework/statistics/summary_statistics.dart';
 
 enum AggregationType {
@@ -58,7 +59,7 @@ class ActsSummary extends SummaryStatistics {
   Map<DateAndTime, double> _groupListByDate(Iterable<Act> acts) {
     final groupedListByDate = acts
         .where((e) => e.period?.start != null)
-        .groupListsBy((e) => _logicalDay(e.period!.start!));
+        .groupListsBy((e) => e.period!.start!.logicalDay(_startOfDay));
 
     _fillMissingDays(groupedListByDate);
 
@@ -78,15 +79,6 @@ class ActsSummary extends SummaryStatistics {
             ),
           ),
         );
-  }
-
-  DateAndTime _logicalDay(DateAndTime start) {
-    final date = DateAndTime(start.year, start.month, start.day);
-    if (!start.isAllDay &&
-        TimeOfDay.fromDateTime(start).isBefore(_startOfDay)) {
-      return date.shiftCalendarDays(-1);
-    }
-    return date;
   }
 
   DateAndTime _weekStart(DateAndTime day) =>
