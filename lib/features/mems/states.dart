@@ -11,7 +11,7 @@ import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_view_data.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
-import 'package:mem/features/mem_items/mem_item_repository.dart';
+import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
 import 'package:mem/features/targets/target_entity.dart';
@@ -73,7 +73,10 @@ final savedMemItemsByMemIdProvider = StateNotifierProvider.autoDispose.family<
         initializer: (current, notifier) => v(
           () async {
             if (savedItems.isEmpty && memId != null) {
-              final shipped = await MemItemRepository().ship(memId: memId);
+              final mems = await MemRepository().ship(id: memId);
+              final shipped = mems.isEmpty
+                  ? const <MemItemEntity>[]
+                  : mems.single.items ?? const <MemItemEntity>[];
               if (notifier.mounted) {
                 ref.read(memItemsProvider.notifier).upsertAll(
                       shipped.map(SavedMemItemEntityV1.fromEntityV2),

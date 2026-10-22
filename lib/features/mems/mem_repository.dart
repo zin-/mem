@@ -8,7 +8,6 @@ import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
-import 'package:mem/features/mem_items/mem_item_repository.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/framework/repository/drift_repository.dart';
@@ -124,6 +123,42 @@ class MemRepository extends DriftRepository {
         },
       );
 
+  Future<void> archiveItems(
+    int memId, {
+    DateTime? archivedAt,
+  }) =>
+      v(
+        () async {
+          final time = archivedAt ?? DateTime.now();
+          await (driftDb.update(driftDb.memItems)
+                ..where((t) => t.memId.equals(memId)))
+              .write(
+            drift_schema.MemItemsCompanion(
+              updatedAt: drift.Value(time),
+              archivedAt: drift.Value(time),
+            ),
+          );
+        },
+        {
+          'memId': memId,
+          'archivedAt': archivedAt,
+        },
+      );
+
+  Future<void> unarchiveItems(int memId) => v(
+        () async {
+          await (driftDb.update(driftDb.memItems)
+                ..where((t) => t.memId.equals(memId)))
+              .write(
+            drift_schema.MemItemsCompanion(
+              updatedAt: drift.Value(DateTime.now()),
+              archivedAt: const drift.Value(null),
+            ),
+          );
+        },
+        {'memId': memId},
+      );
+
   Future<List<MemEntity>> waste({int? id}) => v(
         () async {
           var selectQuery = driftDb.select(driftDb.mems);
@@ -180,46 +215,53 @@ class MemRepository extends DriftRepository {
     int memId,
     List<MemItemEntity> items,
   ) {
-    if (items.isEmpty) return Future.value([]);
-    final repository = MemItemRepository();
+    if (items.isEmpty) return Future.value(const []);
     return Future.wait(
-      items.map(
-        (item) => repository.replace(
-          MemItemEntity(
-            memId,
-            item.type,
-            item.value,
-            item.id,
-            item.createdAt,
-            item.updatedAt,
-            item.archivedAt,
+      items.map((item) async {
+        final updated = await (driftDb.update(driftDb.memItems)
+              ..where((t) => t.id.equals(item.id)))
+            .writeReturning(
+          convertIntoMemItemsUpdateable(
+            MemItemEntity(
+              memId,
+              item.type,
+              item.value,
+              item.id,
+              item.createdAt,
+              item.updatedAt,
+              item.archivedAt,
+            ),
           ),
-        ),
-      ),
+        );
+        return MemItemEntity.fromTuple(updated.single);
+      }),
     );
   }
 
   Future<List<MemItemEntity>> _insertItems(int memId, List<MemItem> items) {
-    if (items.isEmpty) return Future.value([]);
-    final repository = MemItemRepository();
+    if (items.isEmpty) return Future.value(const []);
     return Future.wait(
-      items.map(
-        (item) => repository.receive(MemItem(memId, item.type, item.value)),
-      ),
+      items.map((item) async {
+        final inserted = await driftDb.into(driftDb.memItems).insertReturning(
+              convertIntoMemItemsInsertable(
+                MemItem(memId, item.type, item.value),
+                DateTime.now(),
+              ),
+            );
+        return MemItemEntity.fromTuple(inserted);
+      }),
     );
   }
 
   Future<List<MemEntity>> _attachLatestActs(List<MemEntity> mems) async {
     final latestByMemId = await _latestActRowsByMemId(mems.map((m) => m.id));
-    final withLatest = mems
-        .map((m) {
-          final row = latestByMemId[m.id];
-          if (row == null) return m;
-          return m.updatedWith(
-            latestAct: () => ActEntity.fromTuple(row).toDomain(),
-          );
-        })
-        .toList();
+    final withLatest = mems.map((m) {
+      final row = latestByMemId[m.id];
+      if (row == null) return m;
+      return m.updatedWith(
+        latestAct: () => ActEntity.fromTuple(row).toDomain(),
+      );
+    }).toList();
     return _attachScheduleAnchorsForSkippedOnly(withLatest);
   }
 
@@ -235,16 +277,14 @@ class MemRepository extends DriftRepository {
     final anchorsByMemId =
         await ActQueryService().fetchScheduleAnchorsByMemIds(skippedMemIds);
 
-    return mems
-        .map((m) {
-          if (m.latestAct?.isSkipped != true) return m;
-          final anchor = anchorsByMemId[m.id];
-          if (anchor == null) return m;
-          return m.updatedWith(
-            scheduleAnchorAct: () => anchor.toDomain(),
-          );
-        })
-        .toList();
+    return mems.map((m) {
+      if (m.latestAct?.isSkipped != true) return m;
+      final anchor = anchorsByMemId[m.id];
+      if (anchor == null) return m;
+      return m.updatedWith(
+        scheduleAnchorAct: () => anchor.toDomain(),
+      );
+    }).toList();
   }
 
   Future<Map<int, drift_schema.Act>> _latestActRowsByMemId(

@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/databases/database.dart' hide Mem, MemItem;
 import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
-import 'package:mem/features/mem_items/mem_item_repository.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
@@ -22,15 +21,16 @@ void main() {
       DriftDatabaseAccessor.withDatabase(db),
     );
     Singleton.reset<MemRepository>();
-    Singleton.reset<MemItemRepository>();
     repository = MemRepository();
   });
 
   tearDown(() async {
     await DriftRepository.close();
     Singleton.reset<MemRepository>();
-    Singleton.reset<MemItemRepository>();
   });
+
+  Future<List<MemItemEntity>> storedItems(int memId) async =>
+      (await repository.shipById(memId)).items!;
 
   MemEntity memEntityFrom(
     MemEntity source, {
@@ -106,7 +106,7 @@ void main() {
       expect(replaced.items!.single.value, 'changed');
       expect(replaced.items!.single.updatedAt, isNotNull);
 
-      final stored = await MemItemRepository().ship(memId: created.id);
+      final stored = await storedItems(created.id);
       expect(stored, hasLength(1));
       expect(stored.single.value, 'changed');
     });
@@ -164,7 +164,7 @@ void main() {
       ]);
       expect(replaced.items!.last.memId, created.id);
 
-      final stored = await MemItemRepository().ship(memId: created.id);
+      final stored = await storedItems(created.id);
       expect(stored, hasLength(3));
       expect(
           stored.map((item) => item.value),
@@ -173,6 +173,25 @@ void main() {
             'second',
             'third',
           ]));
+    });
+
+    test('archiveItems and unarchiveItems update archivedAt', () async {
+      final created = await repository.receive(
+        Mem(null, 'm', null, null),
+        items: [MemItem(null, MemItemType.memo, 'x')],
+      );
+      final archivedAt = DateTime(2024, 1, 2);
+
+      await repository.archiveItems(created.id, archivedAt: archivedAt);
+
+      final archived = await storedItems(created.id);
+      expect(archived.single.archivedAt, archivedAt);
+
+      await repository.unarchiveItems(created.id);
+
+      final unarchived = await storedItems(created.id);
+      expect(unarchived.single.archivedAt, isNull);
+      expect(unarchived.single.updatedAt, isNotNull);
     });
   });
 
@@ -218,7 +237,7 @@ void main() {
       expect((savedItems.single as SavedMemItemEntityV1).id, edited.id);
       expect(savedMem.items!.single.id, edited.id);
 
-      final stored = await MemItemRepository().ship(memId: created.id);
+      final stored = await storedItems(created.id);
       expect(stored, hasLength(1));
       expect(stored.single.value, 'new');
     });
@@ -238,7 +257,7 @@ void main() {
       expect(savedItems.single.value.memId, created.id);
       expect(savedMem.items!.single.value, 'added');
 
-      final stored = await MemItemRepository().ship(memId: created.id);
+      final stored = await storedItems(created.id);
       expect(stored, hasLength(1));
       expect(stored.single.value, 'added');
     });

@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
-import 'package:mem/features/mem_items/mem_item_repository.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
@@ -116,7 +115,6 @@ SavedMemNotificationEntityV1 _savedNotification({
 @GenerateMocks([
   MemClient,
   MemRepository,
-  MemItemRepository,
   MemNotificationRepository,
   TargetRepository,
   MemRelationRepository,
@@ -124,7 +122,6 @@ SavedMemNotificationEntityV1 _savedNotification({
 void main() {
   final mockMemClient = MockMemClient();
   final mockMemRepository = MockMemRepository();
-  final mockMemItemRepository = MockMemItemRepository();
   final mockMemNotificationRepository = MockMemNotificationRepository();
   final mockTargetRepository = MockTargetRepository();
   final mockMemRelationRepository = MockMemRelationRepository();
@@ -132,18 +129,14 @@ void main() {
   setUp(() {
     reset(mockMemClient);
     reset(mockMemRepository);
-    reset(mockMemItemRepository);
     reset(mockMemNotificationRepository);
     reset(mockTargetRepository);
     reset(mockMemRelationRepository);
 
     MemClient(mock: mockMemClient);
     MemRepository(mock: mockMemRepository);
-    MemItemRepository(mock: mockMemItemRepository);
     MemNotificationRepository(mock: mockMemNotificationRepository);
 
-    when(mockMemItemRepository.ship(memId: anyNamed('memId')))
-        .thenAnswer((_) async => []);
     when(mockMemNotificationRepository.ship(
       memId: anyNamed('memId'),
       memIdsIn: anyNamed('memIdsIn'),
@@ -520,7 +513,6 @@ void main() {
 
   MemService memService() => MemService(
         memRepository: mockMemRepository,
-        memItemRepository: mockMemItemRepository,
         memNotificationRepository: mockMemNotificationRepository,
         targetRepository: mockTargetRepository,
         memRelationRepository: mockMemRelationRepository,

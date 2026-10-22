@@ -6,7 +6,6 @@ import 'package:mem/features/targets/target_repository.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_items/mem_item.dart';
-import 'package:mem/features/mem_items/mem_item_repository.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_view_data.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
@@ -18,7 +17,6 @@ import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 
 class MemService {
   final MemRepository _memRepository;
-  final MemItemRepository _memItemRepository;
   final MemNotificationRepository _memNotificationRepository;
   final TargetRepository _targetRepository;
   final MemRelationRepository _memRelationRepository;
@@ -287,7 +285,7 @@ class MemService {
           final archivedMem = await _memRepository
               .replace(mem.updatedWith(archivedAt: () => DateTime.now()));
 
-          await _memItemRepository.archiveBy(memId: archivedMem.id);
+          await _memRepository.archiveItems(archivedMem.id);
           await _memRelationRepository.archiveBy(relatedMemId: archivedMem.id);
 
           return await _memRepository.shipById(
@@ -307,9 +305,7 @@ class MemService {
             archivedAt: () => null,
           ));
 
-          await _memItemRepository.unarchiveBy(memId: unarchivedMem.id).then(
-              (v) =>
-                  v.map((e) => SavedMemItemEntityV1.fromEntityV2(e)).toList());
+          await _memRepository.unarchiveItems(unarchivedMem.id);
           await _memRelationRepository.unarchiveBy(
             relatedMemId: unarchivedMem.id,
           );
@@ -337,7 +333,6 @@ class MemService {
 
   MemService._(
     this._memRepository,
-    this._memItemRepository,
     this._memNotificationRepository,
     this._targetRepository,
     this._memRelationRepository,
@@ -347,7 +342,6 @@ class MemService {
 
   factory MemService({
     MemRepository? memRepository,
-    MemItemRepository? memItemRepository,
     MemNotificationRepository? memNotificationRepository,
     TargetRepository? targetRepository,
     MemRelationRepository? memRelationRepository,
@@ -355,7 +349,6 @@ class MemService {
       i(
         () => _instance ??= MemService._(
           memRepository ?? MemRepository(),
-          memItemRepository ?? MemItemRepository(),
           memNotificationRepository ?? MemNotificationRepository(),
           targetRepository ?? TargetRepository(),
           memRelationRepository ?? MemRelationRepository(),
