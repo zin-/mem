@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:mem/features/mems/mem_store.dart';
@@ -33,6 +32,21 @@ void listenMemInitialLoad(
   );
 }
 
+void listenMemItemsInitialLoad(
+  Ref ref,
+  int? memId,
+  ListValueStateNotifier<MemItemEntityV1> notifier,
+) {
+  ref.listen<List<SavedMemItemEntityV1>>(
+    savedMemItemsByMemIdProvider(memId),
+    (prev, next) {
+      if ((prev == null || prev.isEmpty) && next.isNotEmpty) {
+        notifier.updatedBy(List<MemItemEntityV1>.of(next));
+      }
+    },
+  );
+}
+
 final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<MemViewData>, MemViewData, int?>(
   (ref, memId) => v(
@@ -54,20 +68,16 @@ final memItemsByMemIdProvider = StateNotifierProvider.autoDispose.family<
     ListValueStateNotifier<MemItemEntityV1>, List<MemItemEntityV1>, int?>(
   (ref, memId) => v(
     () {
-      ref.watch(savedMemItemsByMemIdProvider(memId));
-
-      return ListValueStateNotifier(
-        [
-          ref.watch(
-                memItemsProvider.select(
-                  (value) => value.singleWhereOrNull(
-                    (element) => element.value.memId == memId,
-                  ),
-                ),
-              ) ??
-              MemItemEntityV1(MemItem(memId, MemItemType.memo, ""))
-        ],
+      final saved = ref.read(savedMemItemsByMemIdProvider(memId));
+      final notifier = ListValueStateNotifier(
+        saved.isEmpty
+            ? [MemItemEntityV1(MemItem(memId, MemItemType.memo, ""))]
+            : List<MemItemEntityV1>.of(saved),
       );
+
+      listenMemItemsInitialLoad(ref, memId, notifier);
+
+      return notifier;
     },
     {'memId': memId},
   ),
