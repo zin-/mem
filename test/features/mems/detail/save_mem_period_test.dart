@@ -2,8 +2,8 @@ import '../../../entity_factories.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
+import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
-import 'package:mem/features/mem_items/mem_item_repository.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
@@ -75,6 +75,25 @@ MemEntity _savedMemEntityWithPeriod(
       null,
     );
 
+SavedMemItemEntityV1 _savedMemItem({
+  required int id,
+  required int memId,
+  required String value,
+}) {
+  final now = DateTime(2024, 6, 1);
+  return SavedMemItemEntityV1.fromEntityV2(
+    MemItemEntity(
+      memId,
+      MemItemType.memo,
+      value,
+      id,
+      now,
+      now,
+      null,
+    ),
+  );
+}
+
 SavedMemNotificationEntityV1 _savedNotification({
   required int id,
   required int memId,
@@ -96,7 +115,6 @@ SavedMemNotificationEntityV1 _savedNotification({
 @GenerateMocks([
   MemClient,
   MemRepository,
-  MemItemRepository,
   MemNotificationRepository,
   TargetRepository,
   MemRelationRepository,
@@ -104,7 +122,6 @@ SavedMemNotificationEntityV1 _savedNotification({
 void main() {
   final mockMemClient = MockMemClient();
   final mockMemRepository = MockMemRepository();
-  final mockMemItemRepository = MockMemItemRepository();
   final mockMemNotificationRepository = MockMemNotificationRepository();
   final mockTargetRepository = MockTargetRepository();
   final mockMemRelationRepository = MockMemRelationRepository();
@@ -112,25 +129,23 @@ void main() {
   setUp(() {
     reset(mockMemClient);
     reset(mockMemRepository);
-    reset(mockMemItemRepository);
     reset(mockMemNotificationRepository);
     reset(mockTargetRepository);
     reset(mockMemRelationRepository);
 
     MemClient(mock: mockMemClient);
     MemRepository(mock: mockMemRepository);
-    MemItemRepository(mock: mockMemItemRepository);
     MemNotificationRepository(mock: mockMemNotificationRepository);
 
-    when(mockMemItemRepository.ship(memId: anyNamed('memId')))
-        .thenAnswer((_) async => []);
     when(mockMemNotificationRepository.ship(
       memId: anyNamed('memId'),
       memIdsIn: anyNamed('memIdsIn'),
     )).thenAnswer((_) async => []);
-    when(mockMemRepository.replace(any)).thenAnswer(
-      (invocation) async =>
-          invocation.positionalArguments[0] as MemEntity,
+    when(mockMemRepository.replace(
+      any,
+      receivingItems: anyNamed('receivingItems'),
+    )).thenAnswer(
+      (invocation) async => invocation.positionalArguments[0] as MemEntity,
     );
   });
 
@@ -273,6 +288,54 @@ void main() {
       expect(editingMem.value.period?.start?.hour, 14);
       expect(editingMem.value.period?.start?.minute, 30);
       expect(editingMem.value.period?.start?.isAllDay, isFalse);
+    });
+  });
+
+  group('saveMem items', () {
+    test('replaces open item draft with saved result', () async {
+      const memId = 1;
+      final cached = _savedMemItem(id: 10, memId: memId, value: 'cached');
+      final mem = savedMem(id: memId, name: 'Test mem').updatedWith(
+        items: () => [cached.toEntityV2()],
+      );
+      final container = containerForMem(memId, mem);
+      addTearDown(container.dispose);
+
+      final sub = container.listen(memItemsByMemIdProvider(memId), (_, __) {});
+      addTearDown(sub.close);
+
+      container.read(memItemsByMemIdProvider(memId).notifier).updatedBy([
+        MemItemEntityV1(MemItem(memId, MemItemType.memo, 'edited')),
+      ]);
+
+      final saved = _savedMemItem(id: 99, memId: memId, value: 'edited');
+      when(mockMemClient.save(
+        any,
+        any,
+        any,
+        any,
+        any,
+      )).thenAnswer((_) async => (
+            (
+              <MemItemEntityV1>[saved],
+              null,
+              null,
+              null,
+              mem.updatedWith(items: () => [saved.toEntityV2()]),
+            ),
+            null,
+          ));
+
+      await container.read(saveMem(memId));
+
+      expect(
+        container.read(memEntitiesProvider).single.items!.single.value,
+        'edited',
+      );
+      final draft = container.read(memItemsByMemIdProvider(memId)).single;
+      expect(draft, isA<SavedMemItemEntityV1>());
+      expect((draft as SavedMemItemEntityV1).id, saved.id);
+      expect(draft.value.value, 'edited');
     });
   });
 
@@ -447,7 +510,6 @@ void main() {
 
   MemService memService() => MemService(
         memRepository: mockMemRepository,
-        memItemRepository: mockMemItemRepository,
         memNotificationRepository: mockMemNotificationRepository,
         targetRepository: mockTargetRepository,
         memRelationRepository: mockMemRelationRepository,
@@ -498,9 +560,10 @@ void main() {
         null,
       ));
 
-      final replacedEntity = verify(mockMemRepository.replace(captureAny))
-          .captured
-          .single as MemEntity;
+      final replacedEntity = verify(mockMemRepository.replace(
+        captureAny,
+        receivingItems: anyNamed('receivingItems'),
+      )).captured.single as MemEntity;
 
       expect(replacedEntity.period?.start?.hour, 14);
       expect(replacedEntity.period?.start?.minute, 30);
@@ -531,9 +594,10 @@ void main() {
         null,
       ));
 
-      final replacedEntity = verify(mockMemRepository.replace(captureAny))
-          .captured
-          .single as MemEntity;
+      final replacedEntity = verify(mockMemRepository.replace(
+        captureAny,
+        receivingItems: anyNamed('receivingItems'),
+      )).captured.single as MemEntity;
 
       expect(replacedEntity.period?.start?.isAllDay, isTrue);
       expect(replacedEntity.period?.start?.hour, 0);

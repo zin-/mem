@@ -45,12 +45,6 @@ Future<void> upsertSavedMemNotifications(
       );
 }
 
-final memItemsProvider = StateNotifierProvider<
-    ListValueStateNotifier<MemItemEntityV1>, List<MemItemEntityV1>>(
-  (ref) => v(
-    () => ListValueStateNotifier([]),
-  ),
-);
 final memNotificationsProvider = StateNotifierProvider<
     ListValueStateNotifier<MemNotificationEntityV1>,
     List<MemNotificationEntityV1>>(

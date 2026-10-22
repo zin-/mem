@@ -45,9 +45,12 @@ class _MemItemsFormFields extends StatelessWidget {
   Widget build(BuildContext context) => v(
         () => Column(
           children: [
-            ..._memItems.map(
-              (memItem) => TextFormField(
-                key: keyMemMemo,
+            ..._memItems.map((memItem) {
+              final savedId =
+                  memItem is SavedMemItemEntityV1 ? memItem.id : null;
+              return TextFormField(
+                // initialValue は再ビルドでは反映されない。保存済み item に替わったら作り直す
+                key: savedId == null ? keyMemMemo : Key('mem-memo-$savedId'),
                 decoration: InputDecoration(
                   icon: const Icon(Icons.subject),
                   labelText: buildL10n(context).memMemoLabel,
@@ -55,8 +58,8 @@ class _MemItemsFormFields extends StatelessWidget {
                 maxLines: null,
                 initialValue: memItem.value.value,
                 onChanged: (value) => _onChanged(value, memItem),
-              ),
-            ),
+              );
+            }),
           ],
         ),
         {

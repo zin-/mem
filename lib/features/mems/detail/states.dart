@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:mem/features/mems/mem_store.dart';
@@ -11,7 +10,6 @@ import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_view_data.dart';
 import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
-import 'package:mem/features/mem_items/mem_item_repository.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
@@ -34,15 +32,43 @@ void listenMemInitialLoad(
   );
 }
 
+void listenMemItemsInitialLoad(
+  Ref ref,
+  int? memId,
+  ListValueStateNotifier<MemItemEntityV1> notifier,
+) {
+  ref.listen<MemEntity?>(
+    memByMemIdProvider(memId),
+    (prev, next) {
+      final prevItems = prev?.items;
+      final nextItems = next?.items;
+      // 空の下書きへ入力済みなら、後から届いた保存済み item で上書きしない
+      if ((prevItems == null || prevItems.isEmpty) &&
+          nextItems != null &&
+          nextItems.isNotEmpty &&
+          _isUntouchedMemoDraft(notifier.current)) {
+        notifier.updatedBy(_savedMemItemsAsDraft(nextItems));
+      }
+    },
+  );
+}
+
+List<MemItemEntityV1> _savedMemItemsAsDraft(List<MemItemEntity> items) =>
+    items.map<MemItemEntityV1>(SavedMemItemEntityV1.fromEntityV2).toList();
+
+bool _isUntouchedMemoDraft(List<MemItemEntityV1> items) {
+  if (items.length != 1) return false;
+  final item = items.single;
+  return item is! SavedMemItemEntityV1 && item.value.value.isEmpty;
+}
+
 final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<MemViewData>, MemViewData, int?>(
   (ref, memId) => v(
     () {
       final mem = ref.read(memByMemIdProvider(memId));
       final notifier = ValueStateNotifier(
-        mem == null
-            ? MemViewData.newMem()
-            : MemViewData.fromEntityV2(mem),
+        mem == null ? MemViewData.newMem() : MemViewData.fromEntityV2(mem),
       );
 
       listenMemInitialLoad(ref, memId, notifier);
@@ -56,34 +82,18 @@ final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
 final memItemsByMemIdProvider = StateNotifierProvider.autoDispose.family<
     ListValueStateNotifier<MemItemEntityV1>, List<MemItemEntityV1>, int?>(
   (ref, memId) => v(
-    () => ListValueStateNotifier(
-      [
-        ref.watch(
-              memItemsProvider.select(
-                (value) => value.singleWhereOrNull(
-                  (element) => element.value.memId == memId,
-                ),
-              ),
-            ) ??
-            MemItemEntityV1(MemItem(memId, MemItemType.memo, ""))
-      ],
-      initializer: (current, notifier) async {
-        if (memId != null) {
-          final items = await MemItemRepository().ship(memId: memId);
-          if (notifier.mounted) {
-            ref.read(memItemsProvider.notifier).upsertAll(
-                  items
-                      .map((e) => SavedMemItemEntityV1.fromEntityV2(e))
-                      .toList(),
-                  (current, updating) =>
-                      current is SavedMemItemEntityV1 &&
-                      updating is SavedMemItemEntityV1 &&
-                      current.id == updating.id,
-                );
-          }
-        }
-      },
-    ),
+    () {
+      final saved = ref.read(memByMemIdProvider(memId))?.items;
+      final notifier = ListValueStateNotifier(
+        saved == null || saved.isEmpty
+            ? [MemItemEntityV1(MemItem(memId, MemItemType.memo, ""))]
+            : _savedMemItemsAsDraft(saved),
+      );
+
+      listenMemItemsInitialLoad(ref, memId, notifier);
+
+      return notifier;
+    },
     {'memId': memId},
   ),
 );
