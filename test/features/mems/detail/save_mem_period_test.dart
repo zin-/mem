@@ -148,9 +148,11 @@ void main() {
       memId: anyNamed('memId'),
       memIdsIn: anyNamed('memIdsIn'),
     )).thenAnswer((_) async => []);
-    when(mockMemRepository.replace(any)).thenAnswer(
-      (invocation) async =>
-          invocation.positionalArguments[0] as MemEntity,
+    when(mockMemRepository.replace(
+      any,
+      receivingItems: anyNamed('receivingItems'),
+    )).thenAnswer(
+      (invocation) async => invocation.positionalArguments[0] as MemEntity,
     );
   });
 
@@ -569,9 +571,10 @@ void main() {
         null,
       ));
 
-      final replacedEntity = verify(mockMemRepository.replace(captureAny))
-          .captured
-          .single as MemEntity;
+      final replacedEntity = verify(mockMemRepository.replace(
+        captureAny,
+        receivingItems: anyNamed('receivingItems'),
+      )).captured.single as MemEntity;
 
       expect(replacedEntity.period?.start?.hour, 14);
       expect(replacedEntity.period?.start?.minute, 30);
@@ -602,9 +605,10 @@ void main() {
         null,
       ));
 
-      final replacedEntity = verify(mockMemRepository.replace(captureAny))
-          .captured
-          .single as MemEntity;
+      final replacedEntity = verify(mockMemRepository.replace(
+        captureAny,
+        receivingItems: anyNamed('receivingItems'),
+      )).captured.single as MemEntity;
 
       expect(replacedEntity.period?.start?.isAllDay, isTrue);
       expect(replacedEntity.period?.start?.hour, 0);

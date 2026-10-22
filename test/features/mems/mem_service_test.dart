@@ -85,8 +85,10 @@ void main() {
           null,
         );
 
-        when(mockMemRepository.receive(any))
-            .thenAnswer((_) async => savedMemEntity);
+        when(mockMemRepository.receive(
+          any,
+          items: anyNamed('items'),
+        )).thenAnswer((_) async => savedMemEntity);
         when(mockMemNotificationRepository.waste(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
@@ -134,8 +136,10 @@ void main() {
         final savedMemEntity = savedMem(
             id: testMemId, name: 'Test Mem', createdAt: DateTime.now());
 
-        when(mockMemRepository.receive(any))
-            .thenAnswer((_) async => savedMemEntity);
+        when(mockMemRepository.receive(
+          any,
+          items: anyNamed('items'),
+        )).thenAnswer((_) async => savedMemEntity);
         when(mockMemNotificationRepository.waste(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
@@ -180,8 +184,10 @@ void main() {
         final savedMemEntity = savedMem(
             id: testMemId, name: 'Test Mem', createdAt: DateTime.now());
 
-        when(mockMemRepository.receive(any))
-            .thenAnswer((_) async => savedMemEntity);
+        when(mockMemRepository.receive(
+          any,
+          items: anyNamed('items'),
+        )).thenAnswer((_) async => savedMemEntity);
         when(mockMemNotificationRepository.waste(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
