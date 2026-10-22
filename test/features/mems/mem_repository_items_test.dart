@@ -289,4 +289,25 @@ void main() {
       );
     });
   });
+
+  group('MemService archive items', () {
+    test('archive and unarchive the mem and its items', () async {
+      final created = await repository.receive(
+        Mem(null, 'm', null, null),
+        items: [MemItem(null, MemItemType.memo, 'x')],
+      );
+
+      final archived = await MemService().archive(created);
+
+      expect(archived.isArchived, isTrue);
+      expect(archived.items!.single.archivedAt, isNotNull);
+      expect(archived.items!.single.value, 'x');
+
+      final unarchived = await MemService().unarchive(archived);
+
+      expect(unarchived.archivedAt, isNull);
+      expect(unarchived.items!.single.archivedAt, isNull);
+      expect(unarchived.items!.single.value, 'x');
+    });
+  });
 }
