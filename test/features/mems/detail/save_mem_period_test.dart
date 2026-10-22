@@ -510,18 +510,18 @@ void main() {
 
   MemService memService() => MemService(
         memRepository: mockMemRepository,
-        memNotificationRepository: mockMemNotificationRepository,
         targetRepository: mockTargetRepository,
         memRelationRepository: mockMemRelationRepository,
       );
 
   void stubSaveDependencies() {
-    when(mockMemNotificationRepository.waste(
+    when(mockMemRepository.wasteRepeatedNotifications(
       memId: anyNamed('memId'),
       type: anyNamed('type'),
     )).thenAnswer((_) async => []);
-    when(mockMemNotificationRepository.waste(memId: anyNamed('memId')))
-        .thenAnswer((_) async => []);
+    when(mockMemRepository.wasteRepeatedNotifications(
+      memId: anyNamed('memId'),
+    )).thenAnswer((_) async => []);
     when(mockTargetRepository.waste(memId: anyNamed('memId')))
         .thenAnswer((_) async => []);
     when(mockMemRelationRepository.waste(sourceMemId: anyNamed('sourceMemId')))
@@ -626,7 +626,7 @@ void main() {
         memId,
         loadLatestAct: true,
       )).thenAnswer((_) async => memEntity);
-      when(mockMemNotificationRepository.replace(any)).thenAnswer(
+      when(mockMemRepository.replaceRepeatedNotification(any)).thenAnswer(
         (invocation) async =>
             invocation.positionalArguments[0] as MemNotificationEntity,
       );
@@ -641,7 +641,7 @@ void main() {
         null,
       ));
 
-      verify(mockMemNotificationRepository.waste(
+      verify(mockMemRepository.wasteRepeatedNotifications(
         memId: memId,
         type: MemNotificationType.repeatByNDay,
       )).called(1);

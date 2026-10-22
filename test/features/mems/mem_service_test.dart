@@ -3,7 +3,6 @@ import '../../entity_factories.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
-import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation_repository.dart';
 import 'package:mem/features/mems/mem_view_data.dart';
@@ -19,26 +18,22 @@ import 'mem_service_test.mocks.dart';
 
 @GenerateMocks([
   MemRepository,
-  MemNotificationRepository,
   TargetRepository,
   MemRelationRepository,
 ])
 void main() {
   late MockMemRepository mockMemRepository;
-  late MockMemNotificationRepository mockMemNotificationRepository;
   late MockTargetRepository mockTargetRepository;
   late MockMemRelationRepository mockMemRelationRepository;
   late MemService memService;
 
   setUp(() {
     mockMemRepository = MockMemRepository();
-    mockMemNotificationRepository = MockMemNotificationRepository();
     mockTargetRepository = MockTargetRepository();
     mockMemRelationRepository = MockMemRelationRepository();
 
     memService = MemService(
       memRepository: mockMemRepository,
-      memNotificationRepository: mockMemNotificationRepository,
       targetRepository: mockTargetRepository,
       memRelationRepository: mockMemRelationRepository,
     );
@@ -84,7 +79,7 @@ void main() {
           any,
           items: anyNamed('items'),
         )).thenAnswer((_) async => savedMemEntity);
-        when(mockMemNotificationRepository.waste(
+        when(mockMemRepository.wasteRepeatedNotifications(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
         )).thenAnswer((_) async => []);
@@ -93,7 +88,7 @@ void main() {
         )).thenAnswer((_) async => []);
         when(mockTargetRepository.waste(memId: anyNamed('memId')))
             .thenAnswer((_) async => []);
-        when(mockMemNotificationRepository.waste(
+        when(mockMemRepository.wasteRepeatedNotifications(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
         )).thenAnswer((_) async => []);
@@ -135,7 +130,7 @@ void main() {
           any,
           items: anyNamed('items'),
         )).thenAnswer((_) async => savedMemEntity);
-        when(mockMemNotificationRepository.waste(
+        when(mockMemRepository.wasteRepeatedNotifications(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
         )).thenAnswer((_) async => []);
@@ -183,7 +178,7 @@ void main() {
           any,
           items: anyNamed('items'),
         )).thenAnswer((_) async => savedMemEntity);
-        when(mockMemNotificationRepository.waste(
+        when(mockMemRepository.wasteRepeatedNotifications(
           memId: anyNamed('memId'),
           type: anyNamed('type'),
         )).thenAnswer((_) async => []);

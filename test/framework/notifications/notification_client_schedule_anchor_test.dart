@@ -69,7 +69,7 @@ void main() {
               actKind: const Value('skipped'),
             ),
           );
-      await MemNotificationRepository().receive(
+      await MemRepository().receiveRepeatedNotification(
         MemNotification.by(
           memId,
           MemNotificationType.repeatByNDay,
@@ -106,7 +106,7 @@ void main() {
               start: Value(activeStart),
             ),
           );
-      await MemNotificationRepository().receive(
+      await MemRepository().receiveRepeatedNotification(
         MemNotification.by(
           memId,
           MemNotificationType.repeatByNDay,

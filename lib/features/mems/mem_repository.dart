@@ -8,6 +8,8 @@ import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
+import 'package:mem/features/mem_notifications/mem_notification.dart';
+import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/framework/repository/drift_repository.dart';
@@ -159,6 +161,62 @@ class MemRepository extends DriftRepository {
         {'memId': memId},
       );
 
+  Future<MemNotificationEntity> receiveRepeatedNotification(
+    MemNotification domain,
+  ) =>
+      v(
+        () async {
+          final inserted = await driftDb
+              .into(driftDb.memRepeatedNotifications)
+              .insertReturning(
+                convertIntoMemRepeatedNotificationsInsertable(
+                  domain,
+                  createdAt: DateTime.now(),
+                ),
+              );
+          return MemNotificationEntity.fromTuple(inserted);
+        },
+        {'domain': domain},
+      );
+
+  Future<MemNotificationEntity> replaceRepeatedNotification(
+    MemNotificationEntity entity,
+  ) =>
+      v(
+        () async {
+          final updated =
+              await (driftDb.update(driftDb.memRepeatedNotifications)
+                    ..where((t) => t.id.equals(entity.id)))
+                  .writeReturning(
+            convertIntoMemRepeatedNotificationsUpdateable(entity),
+          );
+          return MemNotificationEntity.fromTuple(updated.single);
+        },
+        {'entity': entity},
+      );
+
+  Future<List<MemNotificationEntity>> wasteRepeatedNotifications({
+    int? memId,
+    MemNotificationType? type,
+  }) =>
+      v(
+        () async {
+          var query = driftDb.delete(driftDb.memRepeatedNotifications);
+          if (memId != null) {
+            query = query..where((t) => t.memId.equals(memId));
+          }
+          if (type != null) {
+            query = query..where((t) => t.type.equals(type.name));
+          }
+          final deleted = await query.goAndReturn();
+          return deleted.map(MemNotificationEntity.fromTuple).toList();
+        },
+        {
+          'memId': memId,
+          'type': type,
+        },
+      );
+
   Future<List<MemEntity>> waste({int? id}) => v(
         () async {
           var selectQuery = driftDb.select(driftDb.mems);
@@ -180,13 +238,17 @@ class MemRepository extends DriftRepository {
 
   Future<List<MemEntity>> _attachItems(List<drift_schema.Mem> rows) async {
     if (rows.isEmpty) return [];
-    final itemsByMemId = await _itemsByMemId(rows.map((row) => row.id));
+    final memIds = rows.map((row) => row.id);
+    final itemsByMemId = await _itemsByMemId(memIds);
+    final notificationsByMemId = await _repeatedNotificationsByMemId(memIds);
     return [
       for (final row in rows)
         MemEntity.fromTuple(
           row,
           children: {
             'mem_items': itemsByMemId[row.id] ?? const <MemItemEntity>[],
+            'mem_repeated_notifications':
+                notificationsByMemId[row.id] ?? const <MemNotificationEntity>[],
           },
         ),
     ];
@@ -206,6 +268,25 @@ class MemRepository extends DriftRepository {
           .get();
       for (final row in rows) {
         (out[row.memId] ??= []).add(MemItemEntity.fromTuple(row));
+      }
+    }
+    return out;
+  }
+
+  Future<Map<int, List<MemNotificationEntity>>> _repeatedNotificationsByMemId(
+    Iterable<int> memIds,
+  ) async {
+    final list = memIds.toSet().toList();
+    if (list.isEmpty) return {};
+    final out = <int, List<MemNotificationEntity>>{};
+    for (var i = 0; i < list.length; i += _latestActPerMemChunkSize) {
+      final end = math.min(i + _latestActPerMemChunkSize, list.length);
+      final chunk = list.sublist(i, end);
+      final rows = await (driftDb.select(driftDb.memRepeatedNotifications)
+            ..where((t) => t.memId.isIn(chunk)))
+          .get();
+      for (final row in rows) {
+        (out[row.memId] ??= []).add(MemNotificationEntity.fromTuple(row));
       }
     }
     return out;
