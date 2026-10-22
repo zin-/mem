@@ -282,8 +282,13 @@ class MemService {
 
   Future<MemEntity> archive(MemEntity mem) => i(
         () async {
-          final archivedMem = await _memRepository
-              .replace(mem.updatedWith(archivedAt: () => DateTime.now()));
+          // items を渡すと replace が item 行を書き換える。archive は archiveItems に任せる
+          final archivedMem = await _memRepository.replace(
+            mem.updatedWith(
+              archivedAt: () => DateTime.now(),
+              items: () => null,
+            ),
+          );
 
           await _memRepository.archiveItems(archivedMem.id);
           await _memRelationRepository.archiveBy(relatedMemId: archivedMem.id);
@@ -300,10 +305,13 @@ class MemService {
 
   Future<MemEntity> unarchive(MemEntity mem) => i(
         () async {
-          final unarchivedMem = await _memRepository.replace(mem.updatedWith(
-            updatedAt: () => DateTime.now(),
-            archivedAt: () => null,
-          ));
+          final unarchivedMem = await _memRepository.replace(
+            mem.updatedWith(
+              updatedAt: () => DateTime.now(),
+              archivedAt: () => null,
+              items: () => null,
+            ),
+          );
 
           await _memRepository.unarchiveItems(unarchivedMem.id);
           await _memRelationRepository.unarchiveBy(

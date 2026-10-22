@@ -42,9 +42,11 @@ void listenMemItemsInitialLoad(
     (prev, next) {
       final prevItems = prev?.items;
       final nextItems = next?.items;
+      // 空の下書きへ入力済みなら、後から届いた保存済み item で上書きしない
       if ((prevItems == null || prevItems.isEmpty) &&
           nextItems != null &&
-          nextItems.isNotEmpty) {
+          nextItems.isNotEmpty &&
+          _isUntouchedMemoDraft(notifier.current)) {
         notifier.updatedBy(_savedMemItemsAsDraft(nextItems));
       }
     },
@@ -53,6 +55,12 @@ void listenMemItemsInitialLoad(
 
 List<MemItemEntityV1> _savedMemItemsAsDraft(List<MemItemEntity> items) =>
     items.map<MemItemEntityV1>(SavedMemItemEntityV1.fromEntityV2).toList();
+
+bool _isUntouchedMemoDraft(List<MemItemEntityV1> items) {
+  if (items.length != 1) return false;
+  final item = items.single;
+  return item is! SavedMemItemEntityV1 && item.value.value.isEmpty;
+}
 
 final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<MemViewData>, MemViewData, int?>(

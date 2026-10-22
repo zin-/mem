@@ -296,6 +296,48 @@ void main() {
         loadLatestAct: true,
       )).called(1);
     });
+
+    test('keeps an edited draft when saved items arrive', () async {
+      const memId = 1;
+      final shipped = MemItemEntity(
+        memId,
+        MemItemType.memo,
+        'shipped',
+        10,
+        DateTime(2024, 6, 1),
+        DateTime(2024, 6, 1),
+        null,
+      );
+      when(mockMemRepository.shipById(
+        memId,
+        loadLatestAct: true,
+      )).thenAnswer(
+        (_) async => savedMem(id: memId, name: 'loaded').updatedWith(
+          items: () => [shipped],
+        ),
+      );
+
+      final container = containerFor();
+      addTearDown(container.dispose);
+
+      final sub = container.listen(memItemsByMemIdProvider(memId), (_, __) {});
+      addTearDown(sub.close);
+
+      container.read(memItemsByMemIdProvider(memId).notifier).updatedBy([
+        MemItemEntityV1(MemItem(memId, MemItemType.memo, 'typing')),
+      ]);
+
+      await container.pump();
+
+      expect(
+        container.read(memItemsByMemIdProvider(memId)).single.value.value,
+        'typing',
+      );
+      expect(
+        container.read(memEntitiesProvider).single.items!.single.value,
+        'shipped',
+      );
+    });
   });
 
   group('memNotificationsByMemIdProvider', () {

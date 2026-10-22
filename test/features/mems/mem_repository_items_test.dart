@@ -309,5 +309,51 @@ void main() {
       expect(unarchived.items!.single.archivedAt, isNull);
       expect(unarchived.items!.single.value, 'x');
     });
+
+    test('archive and unarchive keep stored item values', () async {
+      final created = await repository.receive(
+        Mem(null, 'm', null, null),
+        items: [MemItem(null, MemItemType.memo, 'stored')],
+      );
+      final stored = created.items!.single;
+
+      final archived = await MemService().archive(
+        created.updatedWith(
+          items: () => [
+            MemItemEntity(
+              created.id,
+              stored.type,
+              'stale',
+              stored.id,
+              stored.createdAt,
+              stored.updatedAt,
+              stored.archivedAt,
+            ),
+          ],
+        ),
+      );
+
+      expect(archived.items!.single.value, 'stored');
+      expect(archived.items!.single.archivedAt, isNotNull);
+
+      final unarchived = await MemService().unarchive(
+        archived.updatedWith(
+          items: () => [
+            MemItemEntity(
+              archived.id,
+              archived.items!.single.type,
+              'stale-again',
+              archived.items!.single.id,
+              archived.items!.single.createdAt,
+              archived.items!.single.updatedAt,
+              archived.items!.single.archivedAt,
+            ),
+          ],
+        ),
+      );
+
+      expect(unarchived.items!.single.value, 'stored');
+      expect(unarchived.items!.single.archivedAt, isNull);
+    });
   });
 }

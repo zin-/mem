@@ -2,6 +2,8 @@ import 'package:mem/framework/view/value_state_notifier.dart';
 import 'package:mem/features/logger/log_service.dart';
 
 class ListValueStateNotifier<T> extends ValueStateNotifier<List<T>> {
+  List<T> get current => state;
+
   ListValueStateNotifier(
     super.state, {
     void Function(
