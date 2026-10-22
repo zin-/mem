@@ -11,7 +11,6 @@ import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_view_data.dart';
 import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
-import 'package:mem/features/mem_items/mem_item_repository.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
@@ -40,9 +39,7 @@ final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
     () {
       final mem = ref.read(memByMemIdProvider(memId));
       final notifier = ValueStateNotifier(
-        mem == null
-            ? MemViewData.newMem()
-            : MemViewData.fromEntityV2(mem),
+        mem == null ? MemViewData.newMem() : MemViewData.fromEntityV2(mem),
       );
 
       listenMemInitialLoad(ref, memId, notifier);
@@ -56,34 +53,22 @@ final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
 final memItemsByMemIdProvider = StateNotifierProvider.autoDispose.family<
     ListValueStateNotifier<MemItemEntityV1>, List<MemItemEntityV1>, int?>(
   (ref, memId) => v(
-    () => ListValueStateNotifier(
-      [
-        ref.watch(
-              memItemsProvider.select(
-                (value) => value.singleWhereOrNull(
-                  (element) => element.value.memId == memId,
+    () {
+      ref.watch(savedMemItemsByMemIdProvider(memId));
+
+      return ListValueStateNotifier(
+        [
+          ref.watch(
+                memItemsProvider.select(
+                  (value) => value.singleWhereOrNull(
+                    (element) => element.value.memId == memId,
+                  ),
                 ),
-              ),
-            ) ??
-            MemItemEntityV1(MemItem(memId, MemItemType.memo, ""))
-      ],
-      initializer: (current, notifier) async {
-        if (memId != null) {
-          final items = await MemItemRepository().ship(memId: memId);
-          if (notifier.mounted) {
-            ref.read(memItemsProvider.notifier).upsertAll(
-                  items
-                      .map((e) => SavedMemItemEntityV1.fromEntityV2(e))
-                      .toList(),
-                  (current, updating) =>
-                      current is SavedMemItemEntityV1 &&
-                      updating is SavedMemItemEntityV1 &&
-                      current.id == updating.id,
-                );
-          }
-        }
-      },
-    ),
+              ) ??
+              MemItemEntityV1(MemItem(memId, MemItemType.memo, ""))
+        ],
+      );
+    },
     {'memId': memId},
   ),
 );
