@@ -2,6 +2,7 @@ import '../../../entity_factories.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
+import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_items/mem_item_repository.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
@@ -75,6 +76,25 @@ MemEntity _savedMemEntityWithPeriod(
       null,
     );
 
+SavedMemItemEntityV1 _savedMemItem({
+  required int id,
+  required int memId,
+  required String value,
+}) {
+  final now = DateTime(2024, 6, 1);
+  return SavedMemItemEntityV1.fromEntityV2(
+    MemItemEntity(
+      memId,
+      MemItemType.memo,
+      value,
+      id,
+      now,
+      now,
+      null,
+    ),
+  );
+}
+
 SavedMemNotificationEntityV1 _savedNotification({
   required int id,
   required int memId,
@@ -142,6 +162,7 @@ void main() {
     int memId,
     MemEntity mem, {
     List<MemNotificationEntityV1>? notifications,
+    List<MemItemEntityV1>? memItems,
   }) {
     return ProviderContainer(
       overrides: [
@@ -150,6 +171,10 @@ void main() {
           memNotificationsProvider.overrideWith(
             (ref) =>
                 ListValueStateNotifier<MemNotificationEntityV1>(notifications),
+          ),
+        if (memItems != null)
+          memItemsProvider.overrideWith(
+            (ref) => ListValueStateNotifier<MemItemEntityV1>(memItems),
           ),
         targetStateProvider(memId).overrideWith(
           () => _FakeTargetState(
@@ -273,6 +298,52 @@ void main() {
       expect(editingMem.value.period?.start?.hour, 14);
       expect(editingMem.value.period?.start?.minute, 30);
       expect(editingMem.value.period?.start?.isAllDay, isFalse);
+    });
+  });
+
+  group('saveMem items', () {
+    test('replaces open item draft with saved result', () async {
+      const memId = 1;
+      final mem = savedMem(id: memId, name: 'Test mem');
+      final cached = _savedMemItem(id: 10, memId: memId, value: 'cached');
+      final container = containerForMem(
+        memId,
+        mem,
+        memItems: [cached],
+      );
+      addTearDown(container.dispose);
+
+      final sub = container.listen(memItemsByMemIdProvider(memId), (_, __) {});
+      addTearDown(sub.close);
+
+      container.read(memItemsByMemIdProvider(memId).notifier).updatedBy([
+        MemItemEntityV1(MemItem(memId, MemItemType.memo, 'edited')),
+      ]);
+
+      final saved = _savedMemItem(id: 99, memId: memId, value: 'edited');
+      when(mockMemClient.save(
+        any,
+        any,
+        any,
+        any,
+        any,
+      )).thenAnswer((_) async => (
+            (
+              <MemItemEntityV1>[saved],
+              null,
+              null,
+              null,
+              mem,
+            ),
+            null,
+          ));
+
+      await container.read(saveMem(memId));
+
+      final draft = container.read(memItemsByMemIdProvider(memId)).single;
+      expect(draft, isA<SavedMemItemEntityV1>());
+      expect((draft as SavedMemItemEntityV1).id, saved.id);
+      expect(draft.value.value, 'edited');
     });
   });
 
