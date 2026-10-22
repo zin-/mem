@@ -208,9 +208,14 @@ void main() {
         container.read(memItemsProvider).single.value.value,
         'existing',
       );
+      expect(
+        container.read(memItemsByMemIdProvider(memId)).single.value.value,
+        'existing',
+      );
     });
 
-    test('ships items into memItemsProvider when none are cached', () async {
+    test('copies shipped items into the draft once when none are cached',
+        () async {
       const memId = 1;
       final shipped = MemItemEntity(
         memId,
@@ -229,6 +234,12 @@ void main() {
 
       final sub = container.listen(memItemsByMemIdProvider(memId), (_, __) {});
       addTearDown(sub.close);
+
+      expect(
+        container.read(memItemsByMemIdProvider(memId)).single.value.value,
+        '',
+      );
+
       await container.pump();
 
       expect(
@@ -238,7 +249,32 @@ void main() {
             .map((e) => e.value.value),
         ['shipped'],
       );
+      final copied = container.read(memItemsByMemIdProvider(memId)).single;
+      expect(copied, isA<SavedMemItemEntityV1>());
+      expect((copied as SavedMemItemEntityV1).id, shipped.id);
+      expect(copied.value.value, 'shipped');
       verify(mockMemItemRepository.ship(memId: memId)).called(1);
+
+      container.read(memItemsByMemIdProvider(memId).notifier).upsertAll(
+        [copied.copiedWith(value: () => 'editing')],
+        (item, updating) => item.value.type == updating.value.type,
+      );
+      container.read(memItemsProvider.notifier).upsertAll(
+        [_savedMemItem(id: shipped.id, memId: memId, value: 'later')],
+        (item, updating) =>
+            item is SavedMemItemEntityV1 &&
+            updating is SavedMemItemEntityV1 &&
+            item.id == updating.id,
+      );
+
+      expect(
+        container.read(memItemsByMemIdProvider(memId)).single.value.value,
+        'editing',
+      );
+      expect(
+        container.read(memItemsProvider).single.value.value,
+        'later',
+      );
     });
   });
 
