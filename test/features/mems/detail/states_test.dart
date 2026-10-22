@@ -104,16 +104,11 @@ void main() {
 
   ProviderContainer containerFor({
     Iterable<MemEntity> mems = const [],
-    List<MemItemEntityV1>? memItems,
     List<MemNotificationEntityV1>? memNotifications,
   }) {
     return ProviderContainer(
       overrides: [
         memEntitiesProvider.overrideWith(() => _FakeMemEntities(mems)),
-        if (memItems != null)
-          memItemsProvider.overrideWith(
-            (ref) => ListValueStateNotifier<MemItemEntityV1>(memItems),
-          ),
         if (memNotifications != null)
           memNotificationsProvider.overrideWith(
             (ref) => ListValueStateNotifier<MemNotificationEntityV1>(
@@ -142,14 +137,22 @@ void main() {
   });
 
   group('memItemsByMemIdProvider', () {
-    test('uses existing mem item from memItemsProvider', () {
+    test('uses existing mem item from MemEntity.items', () {
       const memId = 1;
       final existing = _savedMemItem(id: 10, memId: memId, value: 'existing');
-      final container = containerFor(memItems: [existing]);
+      final container = containerFor(
+        mems: [
+          savedMem(id: memId, name: 'cached').updatedWith(
+            items: () => [existing.toEntityV2()],
+          ),
+        ],
+      );
       addTearDown(container.dispose);
 
       final items = container.read(memItemsByMemIdProvider(memId));
 
+      expect(items.single, isA<SavedMemItemEntityV1>());
+      expect((items.single as SavedMemItemEntityV1).id, existing.id);
       expect(items.single.value.value, 'existing');
     });
 
@@ -178,29 +181,24 @@ void main() {
       );
     });
 
-    test('does not ship when saved items are already cached', () async {
+    test('does not ship when saved items are already on the mem', () async {
       const memId = 1;
       final existing = _savedMemItem(id: 10, memId: memId, value: 'existing');
-      whenShip(
-        id: memId,
-        mems: [
-          savedMem(id: memId, name: 'cached').updatedWith(
-            items: () => [
-              MemItemEntity(
-                memId,
-                MemItemType.memo,
-                'shipped',
-                10,
-                DateTime(2024, 6, 1),
-                DateTime(2024, 6, 1),
-                null,
-              ),
-            ],
-          ),
+      final mem = savedMem(id: memId, name: 'cached').updatedWith(
+        items: () => [existing.toEntityV2()],
+      );
+      final shipped = savedMem(id: memId, name: 'cached').updatedWith(
+        items: () => [
+          _savedMemItem(id: 10, memId: memId, value: 'shipped').toEntityV2(),
         ],
       );
+      whenShip(id: memId, mems: [shipped]);
+      when(mockMemRepository.shipById(
+        memId,
+        loadLatestAct: anyNamed('loadLatestAct'),
+      )).thenAnswer((_) async => shipped);
 
-      final container = containerFor(memItems: [existing]);
+      final container = containerFor(mems: [mem]);
       addTearDown(container.dispose);
 
       final sub = container.listen(memItemsByMemIdProvider(memId), (_, __) {});
@@ -215,8 +213,12 @@ void main() {
         limit: anyNamed('limit'),
         loadLatestAct: anyNamed('loadLatestAct'),
       ));
+      verifyNever(mockMemRepository.shipById(
+        memId,
+        loadLatestAct: anyNamed('loadLatestAct'),
+      ));
       expect(
-        container.read(memItemsProvider).single.value.value,
+        container.read(memEntitiesProvider).single.items!.single.value,
         'existing',
       );
       expect(
@@ -225,7 +227,7 @@ void main() {
       );
     });
 
-    test('copies shipped items into the draft once when none are cached',
+    test('copies loaded mem items into the draft once when none are cached',
         () async {
       const memId = 1;
       final shipped = MemItemEntity(
@@ -237,13 +239,13 @@ void main() {
         DateTime(2024, 6, 1),
         null,
       );
-      whenShip(
-        id: memId,
-        mems: [
-          savedMem(id: memId, name: 'loaded').updatedWith(
-            items: () => [shipped],
-          ),
-        ],
+      when(mockMemRepository.shipById(
+        memId,
+        loadLatestAct: true,
+      )).thenAnswer(
+        (_) async => savedMem(id: memId, name: 'loaded').updatedWith(
+          items: () => [shipped],
+        ),
       );
 
       final container = containerFor();
@@ -260,45 +262,39 @@ void main() {
       await container.pump();
 
       expect(
-        container
-            .read(memItemsProvider)
-            .whereType<SavedMemItemEntityV1>()
-            .map((e) => e.value.value),
-        ['shipped'],
+        container.read(memEntitiesProvider).single.items!.single.value,
+        'shipped',
       );
       final copied = container.read(memItemsByMemIdProvider(memId)).single;
       expect(copied, isA<SavedMemItemEntityV1>());
       expect((copied as SavedMemItemEntityV1).id, shipped.id);
       expect(copied.value.value, 'shipped');
-      verify(mockMemRepository.ship(
-        id: memId,
-        archived: anyNamed('archived'),
-        done: anyNamed('done'),
-        offset: anyNamed('offset'),
-        limit: anyNamed('limit'),
-        loadLatestAct: anyNamed('loadLatestAct'),
-      )).called(1);
 
       container.read(memItemsByMemIdProvider(memId).notifier).upsertAll(
         [copied.copiedWith(value: () => 'editing')],
         (item, updating) => item.value.type == updating.value.type,
       );
-      container.read(memItemsProvider.notifier).upsertAll(
-        [_savedMemItem(id: shipped.id, memId: memId, value: 'later')],
-        (item, updating) =>
-            item is SavedMemItemEntityV1 &&
-            updating is SavedMemItemEntityV1 &&
-            item.id == updating.id,
-      );
+      container.read(memEntitiesProvider.notifier).upsert([
+        container.read(memEntitiesProvider).single.updatedWith(
+              items: () => [
+                _savedMemItem(id: shipped.id, memId: memId, value: 'later')
+                    .toEntityV2(),
+              ],
+            ),
+      ]);
 
       expect(
         container.read(memItemsByMemIdProvider(memId)).single.value.value,
         'editing',
       );
       expect(
-        container.read(memItemsProvider).single.value.value,
+        container.read(memEntitiesProvider).single.items!.single.value,
         'later',
       );
+      verify(mockMemRepository.shipById(
+        memId,
+        loadLatestAct: true,
+      )).called(1);
     });
   });
 

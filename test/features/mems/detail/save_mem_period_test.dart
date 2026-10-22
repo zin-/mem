@@ -157,7 +157,6 @@ void main() {
     int memId,
     MemEntity mem, {
     List<MemNotificationEntityV1>? notifications,
-    List<MemItemEntityV1>? memItems,
   }) {
     return ProviderContainer(
       overrides: [
@@ -166,10 +165,6 @@ void main() {
           memNotificationsProvider.overrideWith(
             (ref) =>
                 ListValueStateNotifier<MemNotificationEntityV1>(notifications),
-          ),
-        if (memItems != null)
-          memItemsProvider.overrideWith(
-            (ref) => ListValueStateNotifier<MemItemEntityV1>(memItems),
           ),
         targetStateProvider(memId).overrideWith(
           () => _FakeTargetState(
@@ -299,13 +294,11 @@ void main() {
   group('saveMem items', () {
     test('replaces open item draft with saved result', () async {
       const memId = 1;
-      final mem = savedMem(id: memId, name: 'Test mem');
       final cached = _savedMemItem(id: 10, memId: memId, value: 'cached');
-      final container = containerForMem(
-        memId,
-        mem,
-        memItems: [cached],
+      final mem = savedMem(id: memId, name: 'Test mem').updatedWith(
+        items: () => [cached.toEntityV2()],
       );
+      final container = containerForMem(memId, mem);
       addTearDown(container.dispose);
 
       final sub = container.listen(memItemsByMemIdProvider(memId), (_, __) {});
@@ -328,13 +321,17 @@ void main() {
               null,
               null,
               null,
-              mem,
+              mem.updatedWith(items: () => [saved.toEntityV2()]),
             ),
             null,
           ));
 
       await container.read(saveMem(memId));
 
+      expect(
+        container.read(memEntitiesProvider).single.items!.single.value,
+        'edited',
+      );
       final draft = container.read(memItemsByMemIdProvider(memId)).single;
       expect(draft, isA<SavedMemItemEntityV1>());
       expect((draft as SavedMemItemEntityV1).id, saved.id);

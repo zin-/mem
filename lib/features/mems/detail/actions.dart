@@ -38,12 +38,6 @@ final saveMem =
                   .read(editingMemByMemIdProvider(memId).notifier)
                   .updatedBy(MemViewData.fromEntityV2(memEntityV2));
 
-              ref.read(memItemsProvider.notifier).upsertAll(
-                    savedMemItems,
-                    (current, updating) =>
-                        current.value.memId == updating.value.memId &&
-                        current.value.type == updating.value.type,
-                  );
               ref.read(memItemsByMemIdProvider(memId).notifier).updatedBy(
                     List<MemItemEntityV1>.of(savedMemItems),
                   );

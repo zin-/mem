@@ -37,15 +37,22 @@ void listenMemItemsInitialLoad(
   int? memId,
   ListValueStateNotifier<MemItemEntityV1> notifier,
 ) {
-  ref.listen<List<SavedMemItemEntityV1>>(
-    savedMemItemsByMemIdProvider(memId),
+  ref.listen<MemEntity?>(
+    memByMemIdProvider(memId),
     (prev, next) {
-      if ((prev == null || prev.isEmpty) && next.isNotEmpty) {
-        notifier.updatedBy(List<MemItemEntityV1>.of(next));
+      final prevItems = prev?.items;
+      final nextItems = next?.items;
+      if ((prevItems == null || prevItems.isEmpty) &&
+          nextItems != null &&
+          nextItems.isNotEmpty) {
+        notifier.updatedBy(_savedMemItemsAsDraft(nextItems));
       }
     },
   );
 }
+
+List<MemItemEntityV1> _savedMemItemsAsDraft(List<MemItemEntity> items) =>
+    items.map<MemItemEntityV1>(SavedMemItemEntityV1.fromEntityV2).toList();
 
 final editingMemByMemIdProvider = StateNotifierProvider.autoDispose
     .family<ValueStateNotifier<MemViewData>, MemViewData, int?>(
@@ -68,11 +75,11 @@ final memItemsByMemIdProvider = StateNotifierProvider.autoDispose.family<
     ListValueStateNotifier<MemItemEntityV1>, List<MemItemEntityV1>, int?>(
   (ref, memId) => v(
     () {
-      final saved = ref.read(savedMemItemsByMemIdProvider(memId));
+      final saved = ref.read(memByMemIdProvider(memId))?.items;
       final notifier = ListValueStateNotifier(
-        saved.isEmpty
+        saved == null || saved.isEmpty
             ? [MemItemEntityV1(MemItem(memId, MemItemType.memo, ""))]
-            : List<MemItemEntityV1>.of(saved),
+            : _savedMemItemsAsDraft(saved),
       );
 
       listenMemItemsInitialLoad(ref, memId, notifier);

@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:mem/features/logger/log_service.dart';
-import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/mems/mem_client.dart';
 import 'package:mem/features/mems/mem_entity.dart';
@@ -94,7 +93,7 @@ class MemEntities extends _$MemEntities
           if (removedMemDetail != null) {
             final (
               (
-                undoneRemovedMemItems,
+                _,
                 undoneRemovedMemNotifications,
                 undoneRemovedTarget,
                 undoneRemovedMemRelations,
@@ -111,13 +110,6 @@ class MemEntities extends _$MemEntities
             );
 
             upsert([undoneRemovedMemEntity]);
-            ref.read(memItemsProvider.notifier).upsertAll(
-                  undoneRemovedMemItems,
-                  (current, updating) =>
-                      current is SavedMemItemEntityV1 &&
-                      updating is SavedMemItemEntityV1 &&
-                      current.id == updating.id,
-                );
           }
         },
         {'id': id},

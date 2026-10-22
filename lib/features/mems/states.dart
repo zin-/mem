@@ -11,7 +11,6 @@ import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_view_data.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
-import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_repository.dart';
 import 'package:mem/features/targets/target_entity.dart';
@@ -45,59 +44,6 @@ Future<void> upsertSavedMemNotifications(
         isSameSavedMemNotification,
       );
 }
-
-final memItemsProvider = StateNotifierProvider<
-    ListValueStateNotifier<MemItemEntityV1>, List<MemItemEntityV1>>(
-  (ref) => v(
-    () => ListValueStateNotifier([]),
-  ),
-);
-
-final savedMemItemsByMemIdProvider = StateNotifierProvider.autoDispose.family<
-    ListValueStateNotifier<SavedMemItemEntityV1>,
-    List<SavedMemItemEntityV1>,
-    int?>(
-  (ref, memId) => v(
-    () {
-      final savedItems = ref.watch(
-        memItemsProvider.select(
-          (items) => items
-              .whereType<SavedMemItemEntityV1>()
-              .where((item) => item.value.memId == memId)
-              .toList(),
-        ),
-      );
-
-      return ListValueStateNotifier(
-        savedItems,
-        initializer: (current, notifier) => v(
-          () async {
-            if (savedItems.isEmpty && memId != null) {
-              final mems = await MemRepository().ship(id: memId);
-              final shipped = mems.isEmpty
-                  ? const <MemItemEntity>[]
-                  : mems.single.items ?? const <MemItemEntity>[];
-              if (notifier.mounted) {
-                ref.read(memItemsProvider.notifier).upsertAll(
-                      shipped.map(SavedMemItemEntityV1.fromEntityV2),
-                      (current, updating) =>
-                          current is SavedMemItemEntityV1 &&
-                          updating is SavedMemItemEntityV1 &&
-                          current.id == updating.id,
-                    );
-              }
-            }
-          },
-          {
-            'current': current,
-            'notifier': notifier,
-          },
-        ),
-      );
-    },
-    {'memId': memId},
-  ),
-);
 
 final memNotificationsProvider = StateNotifierProvider<
     ListValueStateNotifier<MemNotificationEntityV1>,
