@@ -4,7 +4,6 @@ import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
-import 'package:mem/features/mem_relations/mem_relation_repository.dart';
 import 'package:mem/features/mems/mem_view_data.dart';
 import 'package:mem/features/mems/mem_repository.dart';
 import 'package:mem/features/mems/mem_service.dart';
@@ -19,23 +18,19 @@ import 'mem_service_test.mocks.dart';
 @GenerateMocks([
   MemRepository,
   TargetRepository,
-  MemRelationRepository,
 ])
 void main() {
   late MockMemRepository mockMemRepository;
   late MockTargetRepository mockTargetRepository;
-  late MockMemRelationRepository mockMemRelationRepository;
   late MemService memService;
 
   setUp(() {
     mockMemRepository = MockMemRepository();
     mockTargetRepository = MockTargetRepository();
-    mockMemRelationRepository = MockMemRelationRepository();
 
     memService = MemService(
       memRepository: mockMemRepository,
       targetRepository: mockTargetRepository,
-      memRelationRepository: mockMemRelationRepository,
     );
   });
 
@@ -83,7 +78,7 @@ void main() {
           memId: anyNamed('memId'),
           type: anyNamed('type'),
         )).thenAnswer((_) async => []);
-        when(mockMemRelationRepository.waste(
+        when(mockMemRepository.wasteRelations(
           sourceMemId: anyNamed('sourceMemId'),
         )).thenAnswer((_) async => []);
         when(mockTargetRepository.waste(memId: anyNamed('memId')))
@@ -92,7 +87,7 @@ void main() {
           memId: anyNamed('memId'),
           type: anyNamed('type'),
         )).thenAnswer((_) async => []);
-        when(mockMemRelationRepository.waste(
+        when(mockMemRepository.wasteRelations(
           sourceMemId: anyNamed('sourceMemId'),
         )).thenAnswer((_) async => []);
         when(mockTargetRepository.waste(memId: anyNamed('memId')))
@@ -134,7 +129,7 @@ void main() {
           memId: anyNamed('memId'),
           type: anyNamed('type'),
         )).thenAnswer((_) async => []);
-        when(mockMemRelationRepository.waste(
+        when(mockMemRepository.wasteRelations(
           sourceMemId: anyNamed('sourceMemId'),
         )).thenAnswer((_) async => []);
         when(mockTargetRepository.waste(memId: anyNamed('memId')))
@@ -182,7 +177,7 @@ void main() {
           memId: anyNamed('memId'),
           type: anyNamed('type'),
         )).thenAnswer((_) async => []);
-        when(mockMemRelationRepository.waste(
+        when(mockMemRepository.wasteRelations(
           sourceMemId: anyNamed('sourceMemId'),
         )).thenAnswer((_) async => []);
         when(mockTargetRepository.waste(memId: anyNamed('memId')))

@@ -11,13 +11,11 @@ import 'package:mem/features/mems/mem_view_data.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/mem_repository.dart';
-import 'package:mem/features/mem_relations/mem_relation_repository.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 
 class MemService {
   final MemRepository _memRepository;
   final TargetRepository _targetRepository;
-  final MemRelationRepository _memRelationRepository;
 
   Future<
       (
@@ -172,13 +170,12 @@ class MemService {
                 .then((v) => SavedTargetEntityV1.fromEntityV2(v));
           }
 
-          // memRelationsの保存ロジック
           final memRelations = memDetail.$5;
           final returnMemRelations =
               List<SavedMemRelationEntityV1?>.empty(growable: true);
           if (memRelations != null) {
             if (memRelations.isEmpty) {
-              await _memRelationRepository.waste(
+              await _memRepository.wasteRelations(
                 sourceMemId: savedMemEntity.id,
               );
             } else {
@@ -191,9 +188,9 @@ class MemService {
                       )))
                   .map((e) async {
                 if (e is SavedMemRelationEntityV1 && !undo) {
-                  return await _memRelationRepository.replace(e.toEntityV2());
+                  return await _memRepository.replaceRelation(e.toEntityV2());
                 } else {
-                  return await _memRelationRepository.receive(e.value);
+                  return await _memRepository.receiveRelation(e.value);
                 }
               }));
               returnMemRelations.addAll(
@@ -291,7 +288,7 @@ class MemService {
           );
 
           await _memRepository.archiveItems(archivedMem.id);
-          await _memRelationRepository.archiveBy(relatedMemId: archivedMem.id);
+          await _memRepository.archiveRelations(relatedMemId: archivedMem.id);
 
           return await _memRepository.shipById(
             archivedMem.id,
@@ -314,7 +311,7 @@ class MemService {
           );
 
           await _memRepository.unarchiveItems(unarchivedMem.id);
-          await _memRelationRepository.unarchiveBy(
+          await _memRepository.unarchiveRelations(
             relatedMemId: unarchivedMem.id,
           );
 
@@ -342,7 +339,6 @@ class MemService {
   MemService._(
     this._memRepository,
     this._targetRepository,
-    this._memRelationRepository,
   );
 
   static MemService? _instance;
@@ -350,13 +346,11 @@ class MemService {
   factory MemService({
     MemRepository? memRepository,
     TargetRepository? targetRepository,
-    MemRelationRepository? memRelationRepository,
   }) =>
       i(
         () => _instance ??= MemService._(
           memRepository ?? MemRepository(),
           targetRepository ?? TargetRepository(),
-          memRelationRepository ?? MemRelationRepository(),
         ),
       );
 }
