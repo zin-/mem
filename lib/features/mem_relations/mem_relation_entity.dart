@@ -64,6 +64,12 @@ class SavedMemRelationEntityV1 extends MemRelationEntityV1
         row.value ?? 0,
       );
 
+  @override
+  SavedMemRelationEntityV1 updatedWith(
+    MemRelation Function(MemRelation v) update,
+  ) =>
+      SavedMemRelationEntityV1(_savedRowFrom(this, update(value)));
+
   factory SavedMemRelationEntityV1.fromEntityV2(MemRelationEntity entity) =>
       SavedMemRelationEntityV1.fromRow(_MemRelationEntityRow(entity));
 
@@ -78,6 +84,21 @@ class SavedMemRelationEntityV1 extends MemRelationEntityV1
         archivedAt,
       );
 }
+
+Map<String, Object?> _savedRowFrom(
+  SavedMemRelationEntityV1 saved,
+  MemRelation value,
+) =>
+    {
+      'id': saved.id,
+      'sourceMemId': value.sourceMemId,
+      'targetMemId': value.targetMemId,
+      'type': value.type.name,
+      'value': value.value,
+      'createdAt': saved.createdAt,
+      'updatedAt': saved.updatedAt,
+      'archivedAt': saved.archivedAt,
+    };
 
 class MemRelationEntity implements Entity<int> {
   final MemId sourceMemId;

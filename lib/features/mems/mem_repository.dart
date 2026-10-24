@@ -8,6 +8,10 @@ import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
+import 'package:mem/features/mem_notifications/mem_notification.dart';
+import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
+import 'package:mem/features/mem_relations/mem_relation.dart';
+import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/framework/repository/drift_repository.dart';
@@ -159,6 +163,184 @@ class MemRepository extends DriftRepository {
         {'memId': memId},
       );
 
+  Future<MemNotificationEntity> receiveRepeatedNotification(
+    MemNotification domain,
+  ) =>
+      v(
+        () async {
+          final inserted = await driftDb
+              .into(driftDb.memRepeatedNotifications)
+              .insertReturning(
+                convertIntoMemRepeatedNotificationsInsertable(
+                  domain,
+                  createdAt: DateTime.now(),
+                ),
+              );
+          return MemNotificationEntity.fromTuple(inserted);
+        },
+        {'domain': domain},
+      );
+
+  Future<MemNotificationEntity> replaceRepeatedNotification(
+    MemNotificationEntity entity,
+  ) =>
+      v(
+        () async {
+          final updated =
+              await (driftDb.update(driftDb.memRepeatedNotifications)
+                    ..where((t) => t.id.equals(entity.id)))
+                  .writeReturning(
+            convertIntoMemRepeatedNotificationsUpdateable(entity),
+          );
+          return MemNotificationEntity.fromTuple(updated.single);
+        },
+        {'entity': entity},
+      );
+
+  Future<List<MemNotificationEntity>> wasteRepeatedNotifications({
+    int? memId,
+    MemNotificationType? type,
+  }) =>
+      v(
+        () async {
+          var query = driftDb.delete(driftDb.memRepeatedNotifications);
+          if (memId != null) {
+            query = query..where((t) => t.memId.equals(memId));
+          }
+          if (type != null) {
+            query = query..where((t) => t.type.equals(type.name));
+          }
+          final deleted = await query.goAndReturn();
+          return deleted.map(MemNotificationEntity.fromTuple).toList();
+        },
+        {
+          'memId': memId,
+          'type': type,
+        },
+      );
+
+  Future<MemRelationEntity> receiveRelation(MemRelation domain) => v(
+        () async {
+          final inserted =
+              await driftDb.into(driftDb.memRelations).insertReturning(
+                    convertIntoMemRelationsInsertable(domain),
+                  );
+          return MemRelationEntity.fromTuple(inserted);
+        },
+        {'domain': domain},
+      );
+
+  Future<MemRelationEntity> replaceRelation(MemRelationEntity entity) => v(
+        () async {
+          final updated = await (driftDb.update(driftDb.memRelations)
+                ..where((t) => t.id.equals(entity.id)))
+              .writeReturning(convertIntoMemRelationsUpdateable(entity));
+          return MemRelationEntity.fromTuple(updated.single);
+        },
+        {'entity': entity},
+      );
+
+  Future<List<MemRelationEntity>> wasteRelations({int? sourceMemId}) => v(
+        () async {
+          var query = driftDb.delete(driftDb.memRelations);
+          if (sourceMemId != null) {
+            query = query..where((t) => t.sourceMemId.equals(sourceMemId));
+          }
+          final deleted = await query.goAndReturn();
+          return deleted.map(MemRelationEntity.fromTuple).toList();
+        },
+        {'sourceMemId': sourceMemId},
+      );
+
+  Future<Iterable<MemRelationEntity>> archiveRelations({
+    int? relatedMemId,
+    DateTime? archivedAt,
+  }) =>
+      v(
+        () async {
+          var query = driftDb.select(driftDb.memRelations);
+          if (relatedMemId != null) {
+            query = query
+              ..where(
+                (t) =>
+                    t.sourceMemId.equals(relatedMemId) |
+                    t.targetMemId.equals(relatedMemId),
+              );
+          }
+          final entities =
+              (await query.get()).map(MemRelationEntity.fromTuple).toList();
+          return Future.wait(
+            entities.map(
+              (e) => replaceRelation(
+                MemRelationEntity(
+                  e.sourceMemId,
+                  e.targetMemId,
+                  e.type,
+                  e.value,
+                  e.id,
+                  e.createdAt,
+                  e.updatedAt ?? DateTime.now(),
+                  archivedAt ?? DateTime.now(),
+                ),
+              ),
+            ),
+          );
+        },
+        {
+          'relatedMemId': relatedMemId,
+          'archivedAt': archivedAt,
+        },
+      );
+
+  Future<Iterable<MemRelationEntity>> unarchiveRelations({
+    int? sourceMemId,
+    int? targetMemId,
+    int? relatedMemId,
+  }) =>
+      v(
+        () async {
+          var query = driftDb.select(driftDb.memRelations);
+          if (relatedMemId != null) {
+            query = query
+              ..where(
+                (t) =>
+                    t.sourceMemId.equals(relatedMemId) |
+                    t.targetMemId.equals(relatedMemId),
+              );
+          } else {
+            if (sourceMemId != null) {
+              query = query..where((t) => t.sourceMemId.equals(sourceMemId));
+            }
+            if (targetMemId != null) {
+              query = query..where((t) => t.targetMemId.equals(targetMemId));
+            }
+          }
+          final entities =
+              (await query.get()).map(MemRelationEntity.fromTuple).toList();
+          return Future.wait(
+            entities.map(
+              (e) => replaceRelation(
+                MemRelationEntity(
+                  e.sourceMemId,
+                  e.targetMemId,
+                  e.type,
+                  e.value,
+                  e.id,
+                  e.createdAt,
+                  DateTime.now(),
+                  null,
+                ),
+              ),
+            ),
+          );
+        },
+        {
+          'sourceMemId': sourceMemId,
+          'targetMemId': targetMemId,
+          'relatedMemId': relatedMemId,
+        },
+      );
+
   Future<List<MemEntity>> waste({int? id}) => v(
         () async {
           var selectQuery = driftDb.select(driftDb.mems);
@@ -180,13 +362,20 @@ class MemRepository extends DriftRepository {
 
   Future<List<MemEntity>> _attachItems(List<drift_schema.Mem> rows) async {
     if (rows.isEmpty) return [];
-    final itemsByMemId = await _itemsByMemId(rows.map((row) => row.id));
+    final memIds = rows.map((row) => row.id);
+    final itemsByMemId = await _itemsByMemId(memIds);
+    final notificationsByMemId = await _repeatedNotificationsByMemId(memIds);
+    final relationsBySourceMemId = await _relationsBySourceMemId(memIds);
     return [
       for (final row in rows)
         MemEntity.fromTuple(
           row,
           children: {
             'mem_items': itemsByMemId[row.id] ?? const <MemItemEntity>[],
+            'mem_repeated_notifications':
+                notificationsByMemId[row.id] ?? const <MemNotificationEntity>[],
+            'mem_relations':
+                relationsBySourceMemId[row.id] ?? const <MemRelationEntity>[],
           },
         ),
     ];
@@ -206,6 +395,44 @@ class MemRepository extends DriftRepository {
           .get();
       for (final row in rows) {
         (out[row.memId] ??= []).add(MemItemEntity.fromTuple(row));
+      }
+    }
+    return out;
+  }
+
+  Future<Map<int, List<MemNotificationEntity>>> _repeatedNotificationsByMemId(
+    Iterable<int> memIds,
+  ) async {
+    final list = memIds.toSet().toList();
+    if (list.isEmpty) return {};
+    final out = <int, List<MemNotificationEntity>>{};
+    for (var i = 0; i < list.length; i += _latestActPerMemChunkSize) {
+      final end = math.min(i + _latestActPerMemChunkSize, list.length);
+      final chunk = list.sublist(i, end);
+      final rows = await (driftDb.select(driftDb.memRepeatedNotifications)
+            ..where((t) => t.memId.isIn(chunk)))
+          .get();
+      for (final row in rows) {
+        (out[row.memId] ??= []).add(MemNotificationEntity.fromTuple(row));
+      }
+    }
+    return out;
+  }
+
+  Future<Map<int, List<MemRelationEntity>>> _relationsBySourceMemId(
+    Iterable<int> memIds,
+  ) async {
+    final list = memIds.toSet().toList();
+    if (list.isEmpty) return {};
+    final out = <int, List<MemRelationEntity>>{};
+    for (var i = 0; i < list.length; i += _latestActPerMemChunkSize) {
+      final end = math.min(i + _latestActPerMemChunkSize, list.length);
+      final chunk = list.sublist(i, end);
+      final rows = await (driftDb.select(driftDb.memRelations)
+            ..where((t) => t.sourceMemId.isIn(chunk)))
+          .get();
+      for (final row in rows) {
+        (out[row.sourceMemId] ??= []).add(MemRelationEntity.fromTuple(row));
       }
     }
     return out;
