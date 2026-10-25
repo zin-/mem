@@ -8,6 +8,7 @@ import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/acts/list/item/total_act_time_item.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
+import 'package:mem/framework/date_and_time/date_and_time_view.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
@@ -409,5 +410,131 @@ void main() {
       expect(tile.leading, isNull);
       expect(tile.trailing, isNull);
     });
+
+    testWidgets('shows earliest start and latest end', (tester) async {
+      final early = DateTime(2024, 6, 1, 9);
+      final middle = DateTime(2024, 6, 1, 12);
+      final late = DateTime(2024, 6, 1, 18, 30);
+      await pumpItem(
+        tester,
+        mem,
+        acts: [
+          savedAct(
+            id: 1,
+            memId: _memId,
+            start: middle,
+            end: DateTime(2024, 6, 1, 13),
+            createdAt: DateTime(2024, 6, 1),
+          ),
+          savedAct(
+            id: 2,
+            memId: _memId,
+            start: early,
+            end: DateTime(2024, 6, 1, 10),
+            createdAt: DateTime(2024, 6, 1),
+          ),
+          savedAct(
+            id: 3,
+            memId: _memId,
+            start: DateTime(2024, 6, 1, 15),
+            end: late,
+            actKind: ActKind.skipped,
+            createdAt: DateTime(2024, 6, 1),
+          ),
+        ],
+      );
+
+      expect(find.text(_timeText(tester, early)), findsOneWidget);
+      expect(find.text(_timeText(tester, late)), findsOneWidget);
+      expect(find.text(_timeText(tester, middle)), findsNothing);
+      expect(find.text(_dateText(tester, early)), findsNothing);
+      expect(find.byType(DateAndTimeText), findsNWidgets(2));
+    });
+
+    testWidgets('shows start without end while one act is running',
+        (tester) async {
+      final start = DateTime(2024, 6, 1, 10);
+      await pumpItem(
+        tester,
+        mem,
+        acts: [
+          savedAct(
+            id: 1,
+            memId: _memId,
+            start: start,
+            createdAt: DateTime(2024, 6, 1),
+          ),
+        ],
+      );
+
+      expect(find.text(_timeText(tester, start)), findsOneWidget);
+      expect(find.text('~'), findsOneWidget);
+      expect(find.byType(DateAndTimeText), findsOneWidget);
+    });
+
+    testWidgets('shows the running start after a finished act', (tester) async {
+      final finishedStart = DateTime(2024, 6, 1, 9);
+      final finishedEnd = DateTime(2024, 6, 1, 10);
+      final runningStart = DateTime(2024, 6, 1, 16);
+      await pumpItem(
+        tester,
+        mem,
+        acts: [
+          savedAct(
+            id: 1,
+            memId: _memId,
+            start: finishedStart,
+            end: finishedEnd,
+            createdAt: DateTime(2024, 6, 1),
+          ),
+          savedAct(
+            id: 2,
+            memId: _memId,
+            start: runningStart,
+            createdAt: DateTime(2024, 6, 1),
+          ),
+        ],
+      );
+
+      expect(find.text(_timeText(tester, finishedStart)), findsOneWidget);
+      expect(find.text(_timeText(tester, runningStart)), findsOneWidget);
+      expect(find.text(_timeText(tester, finishedEnd)), findsNothing);
+      expect(find.byType(DateAndTimeText), findsNWidgets(2));
+    });
+
+    testWidgets('shows dates outside date view', (tester) async {
+      final start = DateTime(2024, 6, 2, 9);
+      final end = DateTime(2024, 6, 20, 18, 30);
+      await pumpItem(
+        tester,
+        mem,
+        isDateView: false,
+        groupDate: DateTime(2024, 6, 1),
+        acts: [
+          savedAct(
+            id: 1,
+            memId: _memId,
+            start: start,
+            end: end,
+            createdAt: DateTime(2024, 6, 2),
+          ),
+        ],
+      );
+
+      expect(find.text(_timeText(tester, start)), findsOneWidget);
+      expect(find.text(_timeText(tester, end)), findsOneWidget);
+      expect(find.text(_dateText(tester, start)), findsOneWidget);
+      expect(find.text(_dateText(tester, end)), findsOneWidget);
+    });
   });
 }
+
+String _timeText(WidgetTester tester, DateTime dateTime) =>
+    TimeOfDay.fromDateTime(dateTime).format(
+      tester.element(find.byType(TotalActTimeListItem)),
+    );
+
+String _dateText(WidgetTester tester, DateTime dateTime) =>
+    MaterialLocalizations.of(
+      tester.element(find.byType(TotalActTimeListItem)),
+    ).formatCompactDate(dateTime);

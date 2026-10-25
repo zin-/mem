@@ -26,9 +26,9 @@ class DateAndTimeText extends StatelessWidget {
     if (_dateAndTime.isAllDay) {
       return DateText(_dateAndTime, _showDate, style: _style);
     } else if (_showTime) {
-      return Flex(
-        direction: Axis.horizontal,
-        mainAxisSize: MainAxisSize.min,
+      // 幅が足りないときは日付と時刻を折り返す
+      return Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           DateText(_dateAndTime, _showDate, style: _style),
           const Text(' '),

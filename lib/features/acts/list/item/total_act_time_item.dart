@@ -1,6 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/framework/date_and_time/date_and_time.dart';
+import 'package:mem/framework/date_and_time/date_and_time_period.dart';
+import 'package:mem/framework/date_and_time/date_and_time_period_view.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/list/duration.dart';
@@ -78,27 +81,76 @@ class TotalActTimeListItem extends ConsumerWidget {
         ? null
         : recorded + DateTime.now().difference(active.value.period!.start!);
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    final range = _rangePeriod();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Wrap(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            if (elapsed != null) ...[
-              Text(elapsed.formatHHmm()),
-              const Text(" / "),
-            ],
-            Text(recorded.formatHHmm()),
-            ..._targetSuffix(TargetUnit.time),
+            Wrap(
+              children: [
+                if (elapsed != null) ...[
+                  Text(elapsed.formatHHmm()),
+                  const Text(" / "),
+                ],
+                Text(recorded.formatHHmm()),
+                ..._targetSuffix(TargetUnit.time),
+              ],
+            ),
+            Wrap(
+              children: [
+                Text(_actList.length.toString()),
+                ..._targetSuffix(TargetUnit.count),
+              ],
+            ),
           ],
         ),
-        Wrap(
-          children: [
-            Text(_actList.length.toString()),
-            ..._targetSuffix(TargetUnit.count),
-          ],
-        ),
+        if (range != null)
+          DateAndTimePeriodTexts(
+            range,
+            showDate: !_isDateView,
+          ),
       ],
     );
+  }
+
+  DateAndTimePeriod? _rangePeriod() {
+    DateAndTime? earliestStart;
+    DateAndTime? latestPoint;
+    var latestIsOpenStart = false;
+
+    for (final act in _actList) {
+      final period = act.value.period;
+      final start = period?.start;
+      if (start == null) {
+        continue;
+      }
+      final end = period?.end;
+      final point = end ?? start;
+
+      if (earliestStart == null || start.compareTo(earliestStart) < 0) {
+        earliestStart = start;
+      }
+      if (latestPoint == null || point.compareTo(latestPoint) > 0) {
+        latestPoint = point;
+        latestIsOpenStart = end == null;
+      } else if (point.compareTo(latestPoint) == 0 && end == null) {
+        latestIsOpenStart = true;
+      }
+    }
+
+    if (earliestStart == null || latestPoint == null) {
+      return null;
+    }
+
+    // 実行中の開始が最初と同時なら終了側は空（10:00 ~）
+    if (latestIsOpenStart && latestPoint.compareTo(earliestStart) == 0) {
+      return DateAndTimePeriod(start: earliestStart);
+    }
+    return DateAndTimePeriod(start: earliestStart, end: latestPoint);
   }
 
   List<Widget> _targetSuffix(TargetUnit unit) {
