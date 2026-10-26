@@ -81,7 +81,7 @@ class TotalActTimeListItem extends ConsumerWidget {
         ? null
         : recorded + DateTime.now().difference(active.value.period!.start!);
 
-    final range = _rangePeriod();
+    final range = _actListRange(_actList.map((act) => act.value));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -115,42 +115,6 @@ class TotalActTimeListItem extends ConsumerWidget {
           ),
       ],
     );
-  }
-
-  DateAndTimePeriod? _rangePeriod() {
-    DateAndTime? earliestStart;
-    DateAndTime? latestPoint;
-    var latestIsOpenStart = false;
-
-    for (final act in _actList) {
-      final period = act.value.period;
-      final start = period?.start;
-      if (start == null) {
-        continue;
-      }
-      final end = period?.end;
-      final point = end ?? start;
-
-      if (earliestStart == null || start.compareTo(earliestStart) < 0) {
-        earliestStart = start;
-      }
-      if (latestPoint == null || point.compareTo(latestPoint) > 0) {
-        latestPoint = point;
-        latestIsOpenStart = end == null;
-      } else if (point.compareTo(latestPoint) == 0 && end == null) {
-        latestIsOpenStart = true;
-      }
-    }
-
-    if (earliestStart == null || latestPoint == null) {
-      return null;
-    }
-
-    // 実行中の開始が最初と同時なら終了側は空（10:00 ~）
-    if (latestIsOpenStart && latestPoint.compareTo(earliestStart) == 0) {
-      return DateAndTimePeriod(start: earliestStart);
-    }
-    return DateAndTimePeriod(start: earliestStart, end: latestPoint);
   }
 
   List<Widget> _targetSuffix(TargetUnit unit) {
@@ -196,4 +160,38 @@ class TotalActTimeListItem extends ConsumerWidget {
         ),
     };
   }
+}
+
+({DateAndTime start, DateAndTime point, bool open})? _pointOf(Act act) {
+  final start = act.period?.start;
+  if (start == null) {
+    return null;
+  }
+  final end = act.period?.end;
+  return (start: start, point: end ?? start, open: end == null);
+}
+
+DateAndTimePeriod? _actListRange(Iterable<Act> acts) {
+  final points = acts.map(_pointOf).nonNulls.toList();
+  if (points.isEmpty) {
+    return null;
+  }
+
+  var earliest = points.first.start;
+  var latest = points.first;
+  for (final point in points.skip(1)) {
+    if (point.start.isBefore(earliest)) {
+      earliest = point.start;
+    }
+    if (point.point.isAfter(latest.point) ||
+        (point.point.isAtSameMomentAs(latest.point) && point.open)) {
+      latest = point;
+    }
+  }
+
+  // 実行中の開始が最初と同時なら終了側は空（10:00 ~）
+  if (latest.open && latest.point.isAtSameMomentAs(earliest)) {
+    return DateAndTimePeriod(start: earliest);
+  }
+  return DateAndTimePeriod(start: earliest, end: latest.point);
 }
