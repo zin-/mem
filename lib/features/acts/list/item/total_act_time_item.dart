@@ -1,6 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/framework/date_and_time/date_and_time.dart';
+import 'package:mem/framework/date_and_time/date_and_time_period.dart';
+import 'package:mem/framework/date_and_time/date_and_time_period_view.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/list/duration.dart';
@@ -78,25 +81,38 @@ class TotalActTimeListItem extends ConsumerWidget {
         ? null
         : recorded + DateTime.now().difference(active.value.period!.start!);
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    final range = _actListRange(_actList.map((act) => act.value));
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Wrap(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            if (elapsed != null) ...[
-              Text(elapsed.formatHHmm()),
-              const Text(" / "),
-            ],
-            Text(recorded.formatHHmm()),
-            ..._targetSuffix(TargetUnit.time),
+            Wrap(
+              children: [
+                if (elapsed != null) ...[
+                  Text(elapsed.formatHHmm()),
+                  const Text(" / "),
+                ],
+                Text(recorded.formatHHmm()),
+                ..._targetSuffix(TargetUnit.time),
+              ],
+            ),
+            Wrap(
+              children: [
+                Text(_actList.length.toString()),
+                ..._targetSuffix(TargetUnit.count),
+              ],
+            ),
           ],
         ),
-        Wrap(
-          children: [
-            Text(_actList.length.toString()),
-            ..._targetSuffix(TargetUnit.count),
-          ],
-        ),
+        if (range != null)
+          DateAndTimePeriodTexts(
+            range,
+            showDate: !_isDateView,
+          ),
       ],
     );
   }
@@ -144,4 +160,37 @@ class TotalActTimeListItem extends ConsumerWidget {
         ),
     };
   }
+}
+
+DateAndTimePeriod? _actListRange(Iterable<Act> acts) {
+  final started = [
+    for (final act in acts)
+      if (act.period?.start != null) act,
+  ];
+  if (started.isEmpty) {
+    return null;
+  }
+
+  final earliest = started
+      .map((act) => act.period!.start!)
+      .reduce((a, b) => a.isBefore(b) ? a : b);
+  final latest = started.reduce(_laterEnd);
+  final end = _endCandidate(latest);
+
+  // 実行中の開始が最初と同時なら終了側は空（10:00 ~）
+  if (latest.isActive && !end.isAfter(earliest)) {
+    return DateAndTimePeriod(start: earliest);
+  }
+  return DateAndTimePeriod(start: earliest, end: end);
+}
+
+DateAndTime _endCandidate(Act act) => act.period!.end ?? act.period!.start!;
+
+Act _laterEnd(Act current, Act next) {
+  final compared = _endCandidate(next).compareTo(_endCandidate(current));
+  // 同時刻なら実行中を採用し、終了済みの終了より後の開始として見せる
+  if (compared > 0 || (compared == 0 && next.isActive)) {
+    return next;
+  }
+  return current;
 }
