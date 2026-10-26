@@ -162,36 +162,35 @@ class TotalActTimeListItem extends ConsumerWidget {
   }
 }
 
-({DateAndTime start, DateAndTime point, bool open})? _pointOf(Act act) {
-  final start = act.period?.start;
-  if (start == null) {
-    return null;
-  }
-  final end = act.period?.end;
-  return (start: start, point: end ?? start, open: end == null);
-}
-
 DateAndTimePeriod? _actListRange(Iterable<Act> acts) {
-  final points = acts.map(_pointOf).nonNulls.toList();
-  if (points.isEmpty) {
+  final started = [
+    for (final act in acts)
+      if (act.period?.start != null) act,
+  ];
+  if (started.isEmpty) {
     return null;
   }
 
-  var earliest = points.first.start;
-  var latest = points.first;
-  for (final point in points.skip(1)) {
-    if (point.start.isBefore(earliest)) {
-      earliest = point.start;
-    }
-    if (point.point.isAfter(latest.point) ||
-        (point.point.isAtSameMomentAs(latest.point) && point.open)) {
-      latest = point;
-    }
-  }
+  final earliest = started
+      .map((act) => act.period!.start!)
+      .reduce((a, b) => a.isBefore(b) ? a : b);
+  final latest = started.reduce(_laterEnd);
+  final end = _endCandidate(latest);
 
   // 実行中の開始が最初と同時なら終了側は空（10:00 ~）
-  if (latest.open && latest.point.isAtSameMomentAs(earliest)) {
+  if (latest.isActive && !end.isAfter(earliest)) {
     return DateAndTimePeriod(start: earliest);
   }
-  return DateAndTimePeriod(start: earliest, end: latest.point);
+  return DateAndTimePeriod(start: earliest, end: end);
+}
+
+DateAndTime _endCandidate(Act act) => act.period!.end ?? act.period!.start!;
+
+Act _laterEnd(Act current, Act next) {
+  final compared = _endCandidate(next).compareTo(_endCandidate(current));
+  // 同時刻なら実行中を採用し、終了済みの終了より後の開始として見せる
+  if (compared > 0 || (compared == 0 && next.isActive)) {
+    return next;
+  }
+  return current;
 }
