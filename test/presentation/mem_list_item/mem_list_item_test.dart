@@ -8,6 +8,7 @@ import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/list/item/view.dart';
+import 'package:mem/features/mems/list/period_act_count.dart';
 import 'package:mem/features/mems/list/item/subtitle.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/mems/mem.dart';
@@ -141,6 +142,7 @@ void main() {
 
       expect(find.byType(MemNameText), findsOneWidget);
       expect(find.text('Test Mem'), findsOneWidget);
+      expect(find.text(' / '), findsNothing);
       expect(find.byType(MemDoneCheckbox), findsOneWidget);
       expect(find.byIcon(Icons.play_arrow), findsNothing);
       expect(find.byIcon(Icons.timer), findsNothing);
@@ -1024,6 +1026,37 @@ void main() {
         final listTile = tester.widget<ListTile>(find.byType(ListTile));
         expect(listTile.onTap, isNotNull);
         listTile.onTap?.call();
+      });
+
+      testWidgets('shows done count and target like the act list',
+          (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              memNotificationsByMemIdProvider(memId).overrideWith(
+                  (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
+              memStateProvider(memId)
+                  .overrideWith(() => _FakeMemState(baseMem)),
+              memEntitiesProvider.overrideWith(() => _FakeMemEntities([
+                    savedMemFromDomain(baseMem)
+                  ])),
+              periodActCountProvider(memId).overrideWith(
+                (ref) async => const PeriodActCount(count: 2, target: 3),
+              ),
+            ],
+            child: MaterialApp(
+              home: Scaffold(
+                body: MemListItemView(baseMem),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Test Mem'), findsOneWidget);
+        expect(find.text('2'), findsOneWidget);
+        expect(find.text(' / '), findsOneWidget);
+        expect(find.text('3'), findsOneWidget);
       });
     });
   });

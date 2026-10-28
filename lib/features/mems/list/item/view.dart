@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/acts/act.dart';
+import 'package:mem/features/acts/act_count_label.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mems_state.dart';
@@ -9,10 +10,12 @@ import 'package:mem/modules/live_elapsed_time_text.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/list/item/completion_dialog.dart';
+import 'package:mem/features/mems/list/period_act_count.dart';
 import 'package:mem/features/mems/mem_done_checkbox.dart';
 import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/values/colors.dart';
+import 'package:mem/values/dimens.dart';
 
 import 'subtitle.dart';
 
@@ -56,6 +59,7 @@ class MemListItemView extends ConsumerWidget {
               .read(actEntitiesProvider.notifier)
               .closeByMemId(_mem.id as int),
           ref.watch(memNotificationsByMemIdProvider(_mem.id as int)),
+          ref.watch(periodActCountProvider(_mem.id as int)).value,
         ),
         {
           '_mem': _mem,
@@ -76,6 +80,7 @@ ListTile _render(
   void Function() pauseAct,
   void Function() closeAct,
   Iterable<MemNotificationEntityV1> memNotificationEntities,
+  PeriodActCount? actCount,
 ) =>
     v(
       () {
@@ -123,14 +128,25 @@ ListTile _render(
           icon: const Icon(Icons.close),
         );
 
+        final countLabel = actCount == null
+            ? null
+            : ActCountLabel(actCount.count, actCount.target);
+
         return ListTile(
-          title: elapsedStart == null
+          title: elapsedStart == null && countLabel == null
               ? MemNameText(mem.id)
               : Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(child: MemNameText(mem.id)),
-                    LiveElapsedTimeText(elapsedStart),
+                    Wrap(
+                      spacing: defaultComponentPadding,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        if (countLabel != null) countLabel,
+                        if (elapsedStart != null)
+                          LiveElapsedTimeText(elapsedStart),
+                      ],
+                    ),
                   ],
                 ),
           onTap: onTap,
@@ -160,5 +176,6 @@ ListTile _render(
         'mem': mem,
         'latestActByMem': latestActByMem,
         'memNotificationEntities': memNotificationEntities,
+        'actCount': actCount,
       },
     );

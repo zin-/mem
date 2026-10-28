@@ -116,26 +116,34 @@ class ActQueryService {
         },
       );
 
+  Future<int> countByMemIdAndPeriod(
+    int memId,
+    DateAndTimePeriod? period,
+  ) =>
+      v(
+        () async {
+          final countExpr = countAll();
+          final row = await (_db.selectOnly(_db.acts)
+                ..addColumns([countExpr])
+                ..where(_actsInPeriod(_db.acts, memId, period)))
+              .getSingle();
+          return row.read(countExpr) ?? 0;
+        },
+        {
+          'memId': memId,
+          'period': period,
+        },
+      );
+
   Future<List<ActEntity>> fetchByMemIdAndPeriod(
     int memId,
     DateAndTimePeriod? period,
   ) =>
       v(
         () async {
-          var query = _db.select(_db.acts)
-            ..where(
-              (t) =>
-                  t.memId.equals(memId) & actExcludingSkippedForPerformance(t),
-            );
-          if (period is WithStartAndEnd) {
-            query = query
-              ..where(
-                (t) =>
-                    t.start.isBiggerOrEqualValue(period.start) &
-                    t.start.isSmallerThanValue(period.end),
-              );
-          }
-          final rows = await query.get();
+          final rows = await (_db.select(_db.acts)
+                ..where((t) => _actsInPeriod(t, memId, period)))
+              .get();
           return rows.map(ActEntity.fromTuple).toList();
         },
         {
@@ -143,6 +151,21 @@ class ActQueryService {
           'period': period,
         },
       );
+
+  Expression<bool> _actsInPeriod(
+    Acts table,
+    int memId,
+    DateAndTimePeriod? period,
+  ) {
+    var expression =
+        table.memId.equals(memId) & actExcludingSkippedForPerformance(table);
+    if (period is WithStartAndEnd) {
+      expression = expression &
+          table.start.isBiggerOrEqualValue(period.start) &
+          table.start.isSmallerThanValue(period.end);
+    }
+    return expression;
+  }
 
   Future<Act?> resolveScheduleAnchorForNotifications({
     required int memId,

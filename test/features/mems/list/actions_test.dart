@@ -17,6 +17,8 @@ import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/preference/preference_key.dart';
 import 'package:mem/features/settings/states.dart';
+import 'package:mem/features/targets/target_entity.dart';
+import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
 
@@ -60,6 +62,14 @@ class _FakeActEntities extends ActEntities {
     resumeActByCallCount++;
     lastResumeActByMemId = memId;
   }
+}
+
+class _QuietTargets extends Targets {
+  @override
+  List<SavedTargetEntityV1> build() => [];
+
+  @override
+  Future<void> fetchByMemIds(Iterable<int> memIds) async {}
 }
 
 class _FakePreference extends Preference<TimeOfDay> {
@@ -136,6 +146,7 @@ void main() {
               memStateProvider(2)
                   .overrideWith(() => _FakeMemState(saved2.toDomain())),
               actEntitiesProvider.overrideWith(() => fakeAct),
+              targetsProvider.overrideWith(() => _QuietTargets()),
             ],
             child: MaterialApp(
               home: Scaffold(
@@ -212,6 +223,7 @@ void main() {
               memStateProvider(2)
                   .overrideWith(() => _FakeMemState(saved2.toDomain())),
               actEntitiesProvider.overrideWith(() => fakeAct),
+              targetsProvider.overrideWith(() => _QuietTargets()),
             ],
             child: MaterialApp(
               home: Scaffold(

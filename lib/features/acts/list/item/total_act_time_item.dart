@@ -5,6 +5,7 @@ import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period_view.dart';
 import 'package:mem/features/acts/act.dart';
+import 'package:mem/features/acts/act_count_label.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/list/duration.dart';
 import 'package:mem/features/acts/states.dart';
@@ -97,14 +98,12 @@ class TotalActTimeListItem extends ConsumerWidget {
                   const Text(" / "),
                 ],
                 Text(recorded.formatHHmm()),
-                ..._targetSuffix(TargetUnit.time),
+                ..._timeTargetSuffix(),
               ],
             ),
-            Wrap(
-              children: [
-                Text(_actList.length.toString()),
-                ..._targetSuffix(TargetUnit.count),
-              ],
+            ActCountLabel(
+              _actList.length,
+              _targetAmount(TargetUnit.count),
             ),
           ],
         ),
@@ -117,19 +116,22 @@ class TotalActTimeListItem extends ConsumerWidget {
     );
   }
 
-  List<Widget> _targetSuffix(TargetUnit unit) {
+  int? _targetAmount(TargetUnit unit) {
     final target = _targetEntity?.value;
     if (target == null || target.targetUnit != unit) {
+      return null;
+    }
+    return target.value;
+  }
+
+  List<Widget> _timeTargetSuffix() {
+    final amount = _targetAmount(TargetUnit.time);
+    if (amount == null) {
       return const [];
     }
-
-    final label = switch (unit) {
-      TargetUnit.time => Duration(seconds: target.value).formatHHmm(),
-      TargetUnit.count => target.value.toString(),
-    };
     return [
       const Text(" / "),
-      Text(label),
+      Text(Duration(seconds: amount).formatHHmm()),
     ];
   }
 

@@ -9,31 +9,68 @@ part 'target_states.g.dart';
 
 @riverpod
 class Targets extends _$Targets {
+  final Set<int> _requestedMemIds = {};
+
   @override
   List<SavedTargetEntityV1> build() => v(
-        () => [],
+        () {
+          _requestedMemIds.clear();
+          return [];
+        },
       );
 
   Future<void> fetchByMemIds(Iterable<int> memIds) => v(
         () async {
           final newMemIds =
-              memIds.where((e) => !state.map((e) => e.value.memId).contains(e));
+              memIds.where((id) => !_requestedMemIds.contains(id)).toList();
+          if (newMemIds.isEmpty) return;
 
-          if (newMemIds.isNotEmpty) {
-            final targets = await TargetRepository()
-                .shipByMemIds(newMemIds)
-                .then((v) => v.map((e) => SavedTargetEntityV1.fromEntityV2(e)));
+          final targets = await TargetRepository().shipByMemIds(newMemIds).then(
+                (rows) => rows.map(SavedTargetEntityV1.fromEntityV2).toList(),
+              );
 
-            if (targets.isNotEmpty) {
-              state = [
-                ...state,
-                ...targets,
-              ];
-            }
-          }
+          if (!ref.mounted) return;
+
+          _requestedMemIds.addAll(newMemIds);
+          if (targets.isEmpty) return;
+
+          final loadedMemIds = targets.map((e) => e.value.memId).toSet();
+          state = [
+            ...state.where((e) => !loadedMemIds.contains(e.value.memId)),
+            ...targets,
+          ];
         },
         {
           'memIds': memIds,
+        },
+      );
+
+  void upsert(SavedTargetEntityV1 target) => v(
+        () {
+          final memId = target.value.memId;
+          if (memId != null) {
+            _requestedMemIds.add(memId);
+          }
+          state = [
+            ...state.where((e) => e.value.memId != target.value.memId),
+            target,
+          ];
+        },
+        {
+          'memId': target.value.memId,
+        },
+      );
+
+  void removeByMemId(int memId) => v(
+        () {
+          _requestedMemIds.add(memId);
+          state = [
+            for (final target in state)
+              if (target.value.memId != memId) target,
+          ];
+        },
+        {
+          'memId': memId,
         },
       );
 }

@@ -19,6 +19,8 @@ import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/preference/preference_key.dart';
 import 'package:mem/features/settings/states.dart';
+import 'package:mem/features/targets/target_entity.dart';
+import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_view.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
@@ -53,6 +55,14 @@ class _FakeActEntities extends ActEntities {
 
   @override
   Future<void> resumeActBy(int memId) async {}
+}
+
+class _QuietTargets extends Targets {
+  @override
+  List<SavedTargetEntityV1> build() => [];
+
+  @override
+  Future<void> fetchByMemIds(Iterable<int> memIds) async {}
 }
 
 class _FakePreference extends Preference<TimeOfDay> {
@@ -125,6 +135,7 @@ void main() {
               memStateProvider(1)
                   .overrideWith(() => _FakeMemState(saved.toDomain())),
               actEntitiesProvider.overrideWith(() => _FakeActEntities()),
+              targetsProvider.overrideWith(() => _QuietTargets()),
             ],
             child: MaterialApp(
               home: Scaffold(
@@ -173,6 +184,7 @@ void main() {
               memStateProvider(1)
                   .overrideWith(() => _FakeMemState(saved.toDomain())),
               actEntitiesProvider.overrideWith(() => _FakeActEntities()),
+              targetsProvider.overrideWith(() => _QuietTargets()),
             ],
             child: MaterialApp(
               home: Scaffold(
@@ -225,6 +237,7 @@ void main() {
               memStateProvider(1)
                   .overrideWith(() => _FakeMemState(saved.toDomain())),
               actEntitiesProvider.overrideWith(() => _FakeActEntities()),
+              targetsProvider.overrideWith(() => _QuietTargets()),
             ],
             child: MaterialApp(
               home: Scaffold(
@@ -272,6 +285,7 @@ void main() {
               memStateProvider(1)
                   .overrideWith(() => _FakeMemState(saved.toDomain())),
               actEntitiesProvider.overrideWith(() => _FakeActEntities()),
+              targetsProvider.overrideWith(() => _QuietTargets()),
             ],
             child: MaterialApp(
               home: Scaffold(

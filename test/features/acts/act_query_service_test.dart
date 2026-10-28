@@ -392,5 +392,34 @@ void main() {
         {early.year, later.year},
       );
     });
+
+    test('countByMemIdAndPeriod counts non-skipped acts inside the range',
+        () async {
+      final memId = await insertMem();
+      final otherMemId = await insertMem();
+      await insertAct(memId: memId, start: DateTime(2024, 6, 2, 10));
+      await insertAct(
+        memId: memId,
+        start: DateTime(2024, 6, 2, 12),
+        actKind: 'finished',
+      );
+      await insertAct(
+        memId: memId,
+        start: DateTime(2024, 6, 2, 15),
+        actKind: 'skipped',
+      );
+      await insertAct(memId: memId, start: DateTime(2024, 6, 1, 10));
+      await insertAct(memId: otherMemId, start: DateTime(2024, 6, 2, 11));
+
+      final count = await query.countByMemIdAndPeriod(
+        memId,
+        DateAndTimePeriod(
+          start: DateAndTime(2024, 6, 2),
+          end: DateAndTime(2024, 6, 3),
+        ),
+      );
+
+      expect(count, 2);
+    });
   });
 }
