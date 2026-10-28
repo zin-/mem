@@ -56,7 +56,7 @@ jobs:
     with:
       flutter-channel: ${{ needs.set_up-env.outputs.flutter-channel }}
       flutter-version: ${{ needs.set_up-env.outputs.flutter-version }}
-      test-script: flutter test integration_test/${{ matrix.target }} --dart-define=CICD=true --file-reporter json:reports/test_report.log --coverage
+      test-script: flutter test integration_test/${{ matrix.target }} --dart-define=CICD=true --file-reporter json:reports/test_report.log --coverage --branch-coverage
       target: ${{ matrix.target }}
       timeout-minutes-android: ${{ matrix.timeout-minutes-android }}
       timeout-minutes-windows: ${{ matrix.timeout-minutes-windows }}

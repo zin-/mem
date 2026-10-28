@@ -42,6 +42,7 @@ jobs:
           flutter test
           --file-reporter json:reports/test_report.log
           --coverage
+          --branch-coverage
 
       - if: always()
         name: "Report"
