@@ -60,5 +60,12 @@ class MemStore {
 
   static MemStore? _instance;
 
+  static void resetSingleton() => v(
+        () {
+          _instance = null;
+        },
+        {'_instance': _instance},
+      );
+
   factory MemStore() => _instance ??= MemStore._(MemRepository());
 }

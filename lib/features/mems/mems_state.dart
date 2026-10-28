@@ -103,7 +103,7 @@ class MemEntities extends _$MemEntities
             ) = await MemClient().save(
               removedMemDetail.$1,
               removedMemDetail.$2,
-              removedMemDetail.$3 ?? [],
+              removedMemDetail.$3!,
               removedMemDetail.$4,
               removedMemDetail.$5,
               // undo: true,
@@ -115,7 +115,7 @@ class MemEntities extends _$MemEntities
         {'id': id},
       );
 
-  void doneMem(int memId) => v(
+  Future<void> doneMem(int memId) => v(
         () async {
           final doneMem = await MemService().doneByMemId(memId);
 
@@ -124,7 +124,7 @@ class MemEntities extends _$MemEntities
         {'memId': memId},
       );
 
-  void undoneMem(int memId) => v(
+  Future<void> undoneMem(int memId) => v(
         () async {
           final undoneMem = await MemService().undoneByMemId(memId);
 
@@ -133,7 +133,7 @@ class MemEntities extends _$MemEntities
         {'memId': memId},
       );
 
-  void archive(int? memId) => v(
+  Future<void> archive(int? memId) => v(
         () async {
           final targetMem = state.singleWhereOrNull((e) => e.id == memId);
 
@@ -148,7 +148,7 @@ class MemEntities extends _$MemEntities
         {'memId': memId},
       );
 
-  void unarchive(int? memId) => v(
+  Future<void> unarchive(int? memId) => v(
         () async {
           final targetMem = state.singleWhereOrNull((e) => e.id == memId);
 

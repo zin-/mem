@@ -385,7 +385,6 @@ class MemRepository extends DriftRepository {
     Iterable<int> memIds,
   ) async {
     final list = memIds.toSet().toList();
-    if (list.isEmpty) return {};
     final out = <int, List<MemItemEntity>>{};
     for (var i = 0; i < list.length; i += _latestActPerMemChunkSize) {
       final end = math.min(i + _latestActPerMemChunkSize, list.length);
@@ -404,7 +403,6 @@ class MemRepository extends DriftRepository {
     Iterable<int> memIds,
   ) async {
     final list = memIds.toSet().toList();
-    if (list.isEmpty) return {};
     final out = <int, List<MemNotificationEntity>>{};
     for (var i = 0; i < list.length; i += _latestActPerMemChunkSize) {
       final end = math.min(i + _latestActPerMemChunkSize, list.length);
@@ -423,7 +421,6 @@ class MemRepository extends DriftRepository {
     Iterable<int> memIds,
   ) async {
     final list = memIds.toSet().toList();
-    if (list.isEmpty) return {};
     final out = <int, List<MemRelationEntity>>{};
     for (var i = 0; i < list.length; i += _latestActPerMemChunkSize) {
       final end = math.min(i + _latestActPerMemChunkSize, list.length);
@@ -518,7 +515,6 @@ class MemRepository extends DriftRepository {
     Iterable<int> memIds,
   ) async {
     final list = memIds.toSet().toList();
-    if (list.isEmpty) return {};
     final out = <int, drift_schema.Act>{};
     for (var i = 0; i < list.length; i += _latestActPerMemChunkSize) {
       final end = math.min(i + _latestActPerMemChunkSize, list.length);
@@ -533,7 +529,6 @@ class MemRepository extends DriftRepository {
   Future<Map<int, drift_schema.Act>> _selectLatestActsChunk(
     List<int> memIdsChunk,
   ) async {
-    if (memIdsChunk.isEmpty) return {};
     final placeholders = List.filled(memIdsChunk.length, '?').join(',');
     final vars = <drift.Variable<Object>>[
       ...memIdsChunk.map((id) => drift.Variable<int>(id)),

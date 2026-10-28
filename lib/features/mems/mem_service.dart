@@ -343,6 +343,13 @@ class MemService {
 
   static MemService? _instance;
 
+  static void resetSingleton() => i(
+        () {
+          _instance = null;
+        },
+        {'_instance': _instance},
+      );
+
   factory MemService({
     MemRepository? memRepository,
     TargetRepository? targetRepository,
