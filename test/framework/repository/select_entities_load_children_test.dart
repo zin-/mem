@@ -99,6 +99,9 @@ void main() {
       final mem = await db.into(db.mems).insertReturning(
             MemsCompanion.insert(name: 'm', createdAt: now),
           );
+      final other = await db.into(db.mems).insertReturning(
+            MemsCompanion.insert(name: 'other', createdAt: now),
+          );
       final finishStart = now.subtract(const Duration(days: 2));
       await db.into(db.acts).insert(
             ActsCompanion.insert(
@@ -119,14 +122,14 @@ void main() {
             ),
           );
 
-      final rows = await MemRepository().ship(
-        id: mem.id,
-        loadLatestAct: true,
-      );
+      final rows = await MemRepository().ship(loadLatestAct: true);
 
-      final loaded = rows.single;
+      final loaded = rows.singleWhere((row) => row.id == mem.id);
+      final plain = rows.singleWhere((row) => row.id == other.id);
       expect(loaded.latestAct?.actKind, ActKind.skipped);
       expect(loaded.scheduleAnchorAct?.actKind, ActKind.finished);
+      expect(plain.latestAct, isNull);
+      expect(plain.scheduleAnchorAct, isNull);
       expect(
         loaded.scheduleAnchorAct?.period?.start?.day,
         finishStart.day,
