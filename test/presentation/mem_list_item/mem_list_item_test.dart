@@ -45,13 +45,13 @@ class _FakeMemEntities extends MemEntities {
   Iterable<MemEntity> build() => _state;
 
   @override
-  void doneMem(int memId) {
+  Future<void> doneMem(int memId) async {
     doneMemCallCount++;
     lastDoneMemId = memId;
   }
 
   @override
-  void undoneMem(int memId) {
+  Future<void> undoneMem(int memId) async {
     undoneMemCallCount++;
     lastUndoneMemId = memId;
   }
