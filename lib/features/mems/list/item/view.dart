@@ -128,27 +128,8 @@ ListTile _render(
           icon: const Icon(Icons.close),
         );
 
-        final countLabel = actCount == null
-            ? null
-            : ActCountLabel(actCount.count, actCount.target);
-
         return ListTile(
-          title: elapsedStart == null && countLabel == null
-              ? MemNameText(mem.id)
-              : Row(
-                  children: [
-                    Expanded(child: MemNameText(mem.id)),
-                    Wrap(
-                      spacing: defaultComponentPadding,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        if (countLabel != null) countLabel,
-                        if (elapsedStart != null)
-                          LiveElapsedTimeText(elapsedStart),
-                      ],
-                    ),
-                  ],
-                ),
+          title: _title(mem, elapsedStart, actCount),
           onTap: onTap,
           leading: hasEnableMemNotifications
               ? hasActiveAct
@@ -179,3 +160,23 @@ ListTile _render(
         'actCount': actCount,
       },
     );
+
+Widget _title(Mem mem, DateTime? elapsedStart, PeriodActCount? actCount) {
+  final name = MemNameText(mem.id);
+  if (elapsedStart == null && actCount == null) {
+    return name;
+  }
+  return Row(
+    children: [
+      Expanded(child: name),
+      Wrap(
+        spacing: defaultComponentPadding,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          if (actCount != null) ActCountLabel(actCount.count, actCount.target),
+          if (elapsedStart != null) LiveElapsedTimeText(elapsedStart),
+        ],
+      ),
+    ],
+  );
+}

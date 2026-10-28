@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/features/acts/act_query_service.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/acts/states.dart';
@@ -6,6 +7,7 @@ import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
 import 'package:mem/features/targets/target.dart';
+import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -22,40 +24,53 @@ class PeriodActCount {
 @riverpod
 Future<PeriodActCount?> periodActCount(Ref ref, int memId) => v(
       () async {
-        final target = ref
-            .watch(targetsProvider)
-            .where((e) => e.value.memId == memId)
-            .firstOrNull
-            ?.value;
-        if (target == null ||
-            target.targetUnit != TargetUnit.count ||
-            target.value <= 0) {
+        final target = ref.watch(
+          targetsProvider.select((targets) => _countTarget(targets, memId)),
+        );
+        if (target == null) {
           return null;
         }
 
+        // select は == で間引く。List は毎回別インスタンスなので、
+        // 件数に効く項目だけ hash して int にする
         ref.watch(
-          actEntitiesProvider.select(
-            (acts) => Object.hashAll(
-              acts.where((act) => act.value.memId == memId).map(
-                    (act) => Object.hash(
-                      act.id,
-                      act.value.period?.start,
-                      act.value.period?.end,
-                      act.value.actKind,
-                    ),
-                  ),
-            ),
-          ),
+          actEntitiesProvider.select((acts) => _actRevision(acts, memId)),
         );
 
         final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
-        final range = target.period.toPeriod(DateAndTime.now(), startOfDay);
         return PeriodActCount(
-          count: await ActQueryService().countByMemIdAndPeriod(memId, range),
+          count: await ActQueryService().countByMemIdAndPeriod(
+            memId,
+            target.period.toPeriod(DateAndTime.now(), startOfDay),
+          ),
           target: target.value,
         );
       },
       {
         'memId': memId,
       },
+    );
+
+Target? _countTarget(List<SavedTargetEntityV1> targets, int memId) {
+  final target =
+      targets.where((e) => e.value.memId == memId).firstOrNull?.value;
+  if (target == null ||
+      target.targetUnit != TargetUnit.count ||
+      target.value <= 0) {
+    return null;
+  }
+  return target;
+}
+
+int _actRevision(Iterable<SavedActEntityV1> acts, int memId) => Object.hashAll(
+      [
+        for (final act in acts)
+          if (act.value.memId == memId)
+            Object.hash(
+              act.id,
+              act.value.period?.start,
+              act.value.period?.end,
+              act.value.actKind,
+            ),
+      ],
     );

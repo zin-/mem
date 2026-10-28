@@ -157,14 +157,14 @@ class ActQueryService {
     int memId,
     DateAndTimePeriod? period,
   ) {
-    var expression =
+    final matched =
         table.memId.equals(memId) & actExcludingSkippedForPerformance(table);
-    if (period is WithStartAndEnd) {
-      expression = expression &
-          table.start.isBiggerOrEqualValue(period.start) &
-          table.start.isSmallerThanValue(period.end);
+    if (period is! WithStartAndEnd) {
+      return matched;
     }
-    return expression;
+    return matched &
+        table.start.isBiggerOrEqualValue(period.start) &
+        table.start.isSmallerThanValue(period.end);
   }
 
   Future<Act?> resolveScheduleAnchorForNotifications({
