@@ -278,6 +278,7 @@ List<Override> _overrides(int memId, String memName, List<Act> acts) => [
           DateTime.now(),
           DateTime.now(),
           null,
+          target: null,
         )),
       ),
       preferenceProvider(startOfDayKey).overrideWith(

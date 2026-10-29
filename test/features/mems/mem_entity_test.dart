@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
+import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/mem_items/mem_item.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
@@ -10,6 +11,7 @@ import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_view_data.dart';
+import 'package:mem/features/targets/target.dart';
 
 import '../../entity_factories.dart';
 
@@ -48,6 +50,7 @@ void main() {
         DateTime(2024, 2, 1),
         DateTime(2024, 2, 2),
         null,
+        target: null,
         latestAct: latestAct,
       );
 
@@ -61,6 +64,40 @@ void main() {
       expect(updated.name, 'after');
       expect(updated.latestAct, latestAct);
       expect(updated.id, 10);
+    });
+
+    test('updatedWith keeps target and toDomain leaves it off Mem', () {
+      final target = Target(
+        memId: 10,
+        targetType: TargetType.equalTo,
+        targetUnit: TargetUnit.count,
+        value: 3,
+        period: Period.aDay,
+      );
+      final entity = MemEntity(
+        10,
+        'before',
+        null,
+        null,
+        null,
+        DateTime(2024, 2, 1),
+        DateTime(2024, 2, 2),
+        null,
+        target: target,
+      );
+
+      final updated = entity.updatedWith(
+        update: (mem) => Mem(mem.id, 'after', mem.doneAt, mem.period),
+      );
+
+      expect(updated.target, same(target));
+      final domain = updated.toDomain();
+      expect(domain.id, 10);
+      expect(domain.name, 'after');
+      expect(domain.doneAt, isNull);
+      expect(domain.period, isNull);
+      expect(domain.latestAct, isNull);
+      expect(domain.scheduleAnchorAct, isNull);
     });
 
     test('MemViewData updatedWith updates period', () {
@@ -103,7 +140,8 @@ void main() {
         ),
         children: {
           'mem_items': [
-            MemItemEntity(2, MemItemType.memo, 'item', 1, DateTime(2024, 3, 1), null, null),
+            MemItemEntity(2, MemItemType.memo, 'item', 1, DateTime(2024, 3, 1),
+                null, null),
           ],
           'mem_repeated_notifications': [
             MemNotificationEntity(

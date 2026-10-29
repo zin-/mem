@@ -46,6 +46,7 @@ void main() {
         source.createdAt,
         source.updatedAt,
         source.archivedAt,
+        target: source.target,
       );
 
   group('MemRepository items', () {

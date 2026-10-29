@@ -72,6 +72,7 @@ MemEntity _savedMemEntityWithPeriod(
       DateTime(2024, 6, 1),
       DateTime(2024, 6, 1),
       null,
+      target: null,
     );
 
 SavedMemItemEntityV1 _savedMemItem({

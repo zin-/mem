@@ -145,6 +145,7 @@ void main() {
             DateTime.now(),
             null,
             null,
+            target: null,
           ),
         );
         when(mockMemNotificationRepository.ship(
@@ -250,6 +251,7 @@ void main() {
                   DateTime.now(),
                   null,
                   null,
+                  target: null,
                 ),
               ),
               null,
@@ -318,6 +320,7 @@ void main() {
                   DateTime.now(),
                   null,
                   null,
+                  target: null,
                 ),
               ),
               null,
@@ -375,6 +378,7 @@ void main() {
                   DateTime.now(),
                   null,
                   null,
+                  target: null,
                 ),
               ),
               null,
@@ -424,6 +428,7 @@ void main() {
             DateTime.now(),
             null,
             null,
+            target: null,
           ),
         );
         when(mockMemNotificationRepository.ship(

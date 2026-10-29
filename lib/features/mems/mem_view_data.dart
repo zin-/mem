@@ -58,6 +58,7 @@ class MemViewData with EntityV1<Mem> implements Identifiable<int> {
         createdAt ?? DateTime.now(),
         updatedAt,
         archivedAt,
+        target: null,
         latestAct: value.latestAct,
         scheduleAnchorAct: value.scheduleAnchorAct,
         repeatedNotifications: null,
