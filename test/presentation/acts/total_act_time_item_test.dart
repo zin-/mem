@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_entity.dart';
+import 'package:mem/features/acts/day_act_amount.dart';
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/acts/list/item/total_act_time_item.dart';
 import 'package:mem/features/acts/states.dart';
@@ -18,6 +19,7 @@ import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mem_name.dart';
+import 'package:mem/modules/live_elapsed_time_text.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/preference/preference_key.dart';
@@ -157,13 +159,27 @@ void main() {
     Act? latestAct,
     _FakeActEntities? actEntities,
     List<SavedActEntityV1>? acts,
+    SavedTargetEntityV1? target,
+    DayActAmount? dayAmount,
   }) async {
     await tester.binding.setSurfaceSize(const Size(390, 844));
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
+    final resolvedGroupDate = groupDate ?? DateTime(2024, 6, 1);
     await tester.pumpWidget(
       ProviderScope(
-        overrides: overrides(latestAct: latestAct, actEntities: actEntities),
+        overrides: [
+          ...overrides(latestAct: latestAct, actEntities: actEntities),
+          if (dayAmount != null)
+            viewedDayActAmountProvider(
+              _memId,
+              DateTime(
+                resolvedGroupDate.year,
+                resolvedGroupDate.month,
+                resolvedGroupDate.day,
+              ),
+            ).overrideWith((ref) async => dayAmount),
+        ],
         child: MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
@@ -180,8 +196,8 @@ void main() {
                     ),
                   ],
               mem,
-              null,
-              groupDate ?? DateTime(2024, 6, 1),
+              target,
+              resolvedGroupDate,
               isDateView,
             ),
           ),
@@ -526,8 +542,115 @@ void main() {
       expect(find.text(_dateText(tester, start)), findsOneWidget);
       expect(find.text(_dateText(tester, end)), findsOneWidget);
     });
+
+    testWidgets('shows state time only on today in date view', (tester) async {
+      final running = ActiveAct(_memId, DateAndTime(2026, 10, 20, 9));
+
+      await pumpItem(
+        tester,
+        mem,
+        groupDate: _today(),
+        latestAct: running,
+      );
+      expect(find.byType(LiveElapsedTimeText), findsOneWidget);
+
+      await pumpItem(
+        tester,
+        mem,
+        groupDate: DateTime(2024, 6, 1),
+        latestAct: running,
+        acts: [
+          savedAct(
+            id: 1,
+            memId: _memId,
+            start: DateTime.now().subtract(const Duration(minutes: 30)),
+            createdAt: DateTime.now(),
+          ),
+        ],
+      );
+      expect(find.byType(LiveElapsedTimeText), findsNothing);
+      expect(find.text('0:30'), findsNothing);
+      expect(find.text('0:00'), findsOneWidget);
+
+      await pumpItem(
+        tester,
+        mem,
+        groupDate: DateTime(DateTime.now().year, DateTime.now().month, 1),
+        isDateView: false,
+        latestAct: running,
+      );
+      expect(find.byType(LiveElapsedTimeText), findsNothing);
+    });
+
+    testWidgets('shows paused state time on today', (tester) async {
+      await pumpItem(
+        tester,
+        mem,
+        groupDate: _today(),
+        latestAct: PausedAct(_memId, DateTime(2026, 10, 20, 9)),
+      );
+
+      expect(find.byType(LiveElapsedTimeText), findsOneWidget);
+    });
+
+    testWidgets('shows that day count beside the group total', (tester) async {
+      await pumpItem(
+        tester,
+        mem,
+        groupDate: DateTime(2024, 6, 1),
+        target: _target(TargetUnit.count, 5),
+        dayAmount: const DayActAmount(2, Duration.zero),
+      );
+
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text(' / '), findsOneWidget);
+      expect(find.text('5'), findsOneWidget);
+      expect(find.text('1'), findsOneWidget);
+      expect(find.byType(LiveElapsedTimeText), findsNothing);
+    });
+
+    testWidgets('shows that day recorded time over the time target',
+        (tester) async {
+      await pumpItem(
+        tester,
+        mem,
+        groupDate: DateTime(2024, 6, 1),
+        target: _target(TargetUnit.time, 3 * 60 * 60),
+        dayAmount: const DayActAmount(1, Duration(minutes: 30)),
+      );
+
+      expect(find.text('0:30'), findsOneWidget);
+      expect(find.text('3:00'), findsOneWidget);
+      expect(find.text('1:00'), findsOneWidget);
+    });
+
+    testWidgets('keeps month totals without state time', (tester) async {
+      await pumpItem(
+        tester,
+        mem,
+        groupDate: DateTime(2024, 6, 1),
+        isDateView: false,
+        target: _target(TargetUnit.time, 3 * 60 * 60),
+        latestAct: ActiveAct(_memId, DateAndTime(2026, 10, 20, 9)),
+      );
+
+      expect(find.byType(LiveElapsedTimeText), findsNothing);
+      expect(find.text('1:00'), findsOneWidget);
+      expect(find.text('3:00'), findsOneWidget);
+      expect(find.text('0:30'), findsNothing);
+    });
   });
 }
+
+SavedTargetEntityV1 _target(TargetUnit unit, int value) => SavedTargetEntityV1({
+      'id': 1,
+      'memId': _memId,
+      'type': TargetType.equalTo.name,
+      'unit': unit.name,
+      'value': value,
+      'period': Period.aMonth.name,
+      'createdAt': DateTime(2024, 6, 1),
+    });
 
 String _timeText(WidgetTester tester, DateTime dateTime) =>
     TimeOfDay.fromDateTime(dateTime).format(

@@ -135,6 +135,28 @@ class ActQueryService {
         },
       );
 
+  Future<({int count, Duration recorded})> amountByMemIdAndPeriod(
+    int memId,
+    DateAndTimePeriod? period,
+  ) =>
+      v(
+        () async {
+          final acts = await fetchByMemIdAndPeriod(memId, period);
+          return (
+            count: acts.length,
+            recorded: acts.fold<Duration>(
+              Duration.zero,
+              (sum, act) =>
+                  sum + (act.toDomain().period?.duration ?? Duration.zero),
+            ),
+          );
+        },
+        {
+          'memId': memId,
+          'period': period,
+        },
+      );
+
   Future<List<ActEntity>> fetchByMemIdAndPeriod(
     int memId,
     DateAndTimePeriod? period,
@@ -176,8 +198,8 @@ class ActQueryService {
         () async {
           var anchor = scheduleAnchorAct;
           if (latestAct?.isSkipped == true && anchor == null) {
-            anchor =
-                await fetchScheduleAnchorByMemIds(memId).then((v) => v?.toDomain());
+            anchor = await fetchScheduleAnchorByMemIds(memId)
+                .then((v) => v?.toDomain());
           }
           return scheduleAnchorForNotifications(
             latestAct: latestAct,
@@ -204,8 +226,7 @@ class ActQueryService {
           final rows = await (_db.select(_db.acts)
                 ..where(
                   (t) =>
-                      t.memId.isIn(list) &
-                      actExcludingSkippedForPerformance(t),
+                      t.memId.isIn(list) & actExcludingSkippedForPerformance(t),
                 )
                 ..orderBy([(t) => OrderingTerm.desc(t.start)]))
               .get();

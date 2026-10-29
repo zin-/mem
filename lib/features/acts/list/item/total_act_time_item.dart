@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
@@ -7,14 +6,20 @@ import 'package:mem/framework/date_and_time/date_and_time_period_view.dart';
 import 'package:mem/features/acts/act.dart';
 import 'package:mem/features/acts/act_count_label.dart';
 import 'package:mem/features/acts/act_entity.dart';
+import 'package:mem/features/acts/act_status_labels.dart';
+import 'package:mem/features/acts/day_act_amount.dart';
 import 'package:mem/features/acts/list/duration.dart';
 import 'package:mem/features/acts/states.dart';
+import 'package:mem/features/acts/viewed_day.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/mems/transitions.dart';
+import 'package:mem/features/settings/preference/keys.dart';
+import 'package:mem/features/settings/states.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/targets/target_entity.dart';
+import 'package:mem/values/dimens.dart';
 
 class TotalActTimeListItem extends ConsumerWidget {
   final List<SavedActEntityV1> _actList;
@@ -55,10 +60,19 @@ class TotalActTimeListItem extends ConsumerWidget {
           final actions = _isCurrentPeriod(DateTime.now())
               ? _actions(ref, memId, latestAct)
               : (leading: null, trailing: null);
+          final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
+          final isToday =
+              _isDateView && isViewedDayToday(_groupDate, startOfDay);
+          final target = _targetEntity?.value;
+          final amount = _dayAmount(ref, memId, target);
 
           return ListTile(
             leading: actions.leading,
-            title: _title(),
+            title: _title(
+              // 今日の日表示だけ。月表示と別の日には今の状態を出さない
+              isToday ? latestAct : null,
+              amount,
+            ),
             subtitle: _mem == null ? null : Text(_mem.name),
             trailing: actions.trailing,
             onTap: () => showMemDetailPage(context, ref, memId),
@@ -72,16 +86,20 @@ class TotalActTimeListItem extends ConsumerWidget {
         },
       );
 
-  Widget _title() {
-    final active = _actList.firstWhereOrNull((act) => act.value.isActive);
+  DayActAmount? _dayAmount(WidgetRef ref, int memId, Target? target) {
+    if (!_isDateView || !DayTargetLabel.shows(target)) {
+      return null;
+    }
+    final day = DateTime(_groupDate.year, _groupDate.month, _groupDate.day);
+    return ref.watch(viewedDayActAmountProvider(memId, day)).value;
+  }
+
+  Widget _title(Act? statusAct, DayActAmount? amount) {
     final recorded = _actList.fold<Duration>(
       Duration.zero,
       (sum, act) => sum + (act.value.period?.duration ?? Duration.zero),
     );
-    final elapsed = active == null
-        ? null
-        : recorded + DateTime.now().difference(active.value.period!.start!);
-
+    final target = _targetEntity?.value;
     final range = _actListRange(_actList.map((act) => act.value));
 
     return Column(
@@ -92,18 +110,23 @@ class TotalActTimeListItem extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                if (elapsed != null) ...[
-                  Text(elapsed.formatHHmm()),
-                  const Text(" / "),
-                ],
+                if (_isDateView &&
+                    ActStatusLabels.shows(statusAct, target, amount))
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      right: defaultComponentPadding,
+                    ),
+                    child: ActStatusLabels(statusAct, target, amount),
+                  ),
                 Text(recorded.formatHHmm()),
-                ..._timeTargetSuffix(),
+                if (!_isDateView) ..._timeTargetSuffix(),
               ],
             ),
             ActCountLabel(
               _actList.length,
-              _targetAmount(TargetUnit.count),
+              _isDateView ? null : _targetAmount(TargetUnit.count),
             ),
           ],
         ),

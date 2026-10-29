@@ -29,13 +29,11 @@ class ActEntityV1 with EntityV1<Act> {
 
 class SavedActEntityV1 extends ActEntityV1
     with DatabaseTupleEntityV1<int, Act> {
-  SavedActEntityV1(Map<String, dynamic> map)
-      : super(_actFromMap(map)) {
+  SavedActEntityV1(Map<String, dynamic> map) : super(_actFromMap(map)) {
     withBaseColumns(map);
   }
 
-  SavedActEntityV1.fromRow(dynamic row)
-      : super(_actFromRow(row)) {
+  SavedActEntityV1.fromRow(dynamic row) : super(_actFromRow(row)) {
     withBaseColumns(row);
   }
 
@@ -45,27 +43,26 @@ class SavedActEntityV1 extends ActEntityV1
             ? null
             : DateAndTime.from(
                 map['start'],
-                timeOfDay: (map['startIsAllDay'] ?? map['start_is_all_day']) ==
-                        true
-                    ? null
-                    : map['start'],
+                timeOfDay:
+                    (map['startIsAllDay'] ?? map['start_is_all_day']) == true
+                        ? null
+                        : map['start'],
               ),
         endWhen: map['end'] == null
             ? null
             : DateAndTime.from(
                 map['end'],
-                timeOfDay:
-                    (map['endIsAllDay'] ?? map['end_is_all_day']) == true
-                        ? null
-                        : map['end'],
+                timeOfDay: (map['endIsAllDay'] ?? map['end_is_all_day']) == true
+                    ? null
+                    : map['end'],
               ),
         pausedAt: map['pausedAt'] ?? map['paused_at'],
-        completionKind: map.containsKey('actKind') ||
-                map.containsKey('act_kind')
-            ? actKindFromStored(map['actKind'] ?? map['act_kind'])
-            : null,
-        completionKindFromRow: map.containsKey('actKind') ||
-            map.containsKey('act_kind'),
+        completionKind:
+            map.containsKey('actKind') || map.containsKey('act_kind')
+                ? actKindFromStored(map['actKind'] ?? map['act_kind'])
+                : null,
+        completionKindFromRow:
+            map.containsKey('actKind') || map.containsKey('act_kind'),
       );
 
   static Act _actFromRow(dynamic row) => Act.by(
@@ -83,9 +80,8 @@ class SavedActEntityV1 extends ActEntityV1
                 timeOfDay: row.endIsAllDay == true ? null : row.end,
               ),
         pausedAt: row.pausedAt,
-        completionKind: row.actKind == null
-            ? null
-            : actKindFromStored(row.actKind),
+        completionKind:
+            row.actKind == null ? null : actKindFromStored(row.actKind),
         completionKindFromRow: row.actKind != null,
       );
 
@@ -215,6 +211,20 @@ drift_database.ActsCompanion convertIntoActsInsertable(
       actKind: Value(entity.actKind?.name),
       createdAt: Value(createdAt ?? DateTime.now()),
     );
+int revisionOfMemActs(Iterable<SavedActEntityV1> acts, int memId) =>
+    Object.hashAll(
+      [
+        for (final act in acts)
+          if (act.value.memId == memId)
+            Object.hash(
+              act.id,
+              act.value.period?.start,
+              act.value.period?.end,
+              act.value.actKind,
+            ),
+      ],
+    );
+
 drift_database.ActsCompanion convertIntoActsUpdateable(ActEntity entity) =>
     drift_database.ActsCompanion(
       start: Value(entity.start),

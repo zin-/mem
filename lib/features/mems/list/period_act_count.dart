@@ -32,7 +32,7 @@ Future<CountTarget?> periodActCount(Ref ref, int memId) => v(
         // select は == で間引く。List は毎回別インスタンスなので、
         // 件数に効く項目だけ hash して int にする
         ref.watch(
-          actEntitiesProvider.select((acts) => _actRevision(acts, memId)),
+          actEntitiesProvider.select((acts) => revisionOfMemActs(acts, memId)),
         );
 
         final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
@@ -47,17 +47,4 @@ Future<CountTarget?> periodActCount(Ref ref, int memId) => v(
       {
         'memId': memId,
       },
-    );
-
-int _actRevision(Iterable<SavedActEntityV1> acts, int memId) => Object.hashAll(
-      [
-        for (final act in acts)
-          if (act.value.memId == memId)
-            Object.hash(
-              act.id,
-              act.value.period?.start,
-              act.value.period?.end,
-              act.value.actKind,
-            ),
-      ],
     );
