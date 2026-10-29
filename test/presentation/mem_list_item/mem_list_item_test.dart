@@ -7,8 +7,11 @@ import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/detail/states.dart';
+import 'package:mem/features/acts/line_chart/states.dart';
+import 'package:mem/features/mems/count_target.dart';
 import 'package:mem/features/mems/list/item/view.dart';
 import 'package:mem/features/mems/list/period_act_count.dart';
+import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/mems/list/item/subtitle.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/mems/mem.dart';
@@ -1041,7 +1044,16 @@ void main() {
                     savedMemFromDomain(baseMem)
                   ])),
               periodActCountProvider(memId).overrideWith(
-                (ref) async => const PeriodActCount(count: 2, target: 3),
+                (ref) async => CountTarget.of(
+                  Target(
+                    memId: memId,
+                    targetType: TargetType.equalTo,
+                    targetUnit: TargetUnit.count,
+                    value: 3,
+                    period: Period.aDay,
+                  ),
+                  2,
+                ),
               ),
             ],
             child: MaterialApp(

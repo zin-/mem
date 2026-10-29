@@ -8,6 +8,7 @@ import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/mems/transitions.dart';
 import 'package:mem/modules/live_elapsed_time_text.dart';
 import 'package:mem/features/logger/log_service.dart';
+import 'package:mem/features/mems/count_target.dart';
 import 'package:mem/features/mems/detail/states.dart';
 import 'package:mem/features/mems/list/item/completion_dialog.dart';
 import 'package:mem/features/mems/list/period_act_count.dart';
@@ -80,7 +81,7 @@ ListTile _render(
   void Function() pauseAct,
   void Function() closeAct,
   Iterable<MemNotificationEntityV1> memNotificationEntities,
-  PeriodActCount? actCount,
+  CountTarget? countTarget,
 ) =>
     v(
       () {
@@ -129,7 +130,7 @@ ListTile _render(
         );
 
         return ListTile(
-          title: _title(mem, elapsedStart, actCount),
+          title: _title(mem, elapsedStart, countTarget),
           onTap: onTap,
           leading: hasEnableMemNotifications
               ? hasActiveAct
@@ -157,13 +158,13 @@ ListTile _render(
         'mem': mem,
         'latestActByMem': latestActByMem,
         'memNotificationEntities': memNotificationEntities,
-        'actCount': actCount,
+        'countTarget': countTarget,
       },
     );
 
-Widget _title(Mem mem, DateTime? elapsedStart, PeriodActCount? actCount) {
+Widget _title(Mem mem, DateTime? elapsedStart, CountTarget? countTarget) {
   final name = MemNameText(mem.id);
-  if (elapsedStart == null && actCount == null) {
+  if (elapsedStart == null && countTarget == null) {
     return name;
   }
   return Row(
@@ -173,7 +174,8 @@ Widget _title(Mem mem, DateTime? elapsedStart, PeriodActCount? actCount) {
         spacing: defaultComponentPadding,
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
-          if (actCount != null) ActCountLabel(actCount.count, actCount.target),
+          if (countTarget != null)
+            ActCountLabel(countTarget.count, countTarget.targetValue),
           if (elapsedStart != null) LiveElapsedTimeText(elapsedStart),
         ],
       ),

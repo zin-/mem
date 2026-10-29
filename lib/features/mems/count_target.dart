@@ -1,28 +1,19 @@
-import 'package:mem/features/acts/act.dart';
-import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/targets/target.dart';
 
 class CountTarget {
-  final Mem mem;
   final Target target;
-  final Iterable<Act> actsInPeriod;
+  final int count;
 
-  CountTarget._(this.mem, this.target, this.actsInPeriod);
+  CountTarget._(this.target, this.count);
 
-  static CountTarget? of(
-    Mem mem,
-    Target? target,
-    Iterable<Act> actsInPeriod,
-  ) {
+  static CountTarget? of(Target? target, int count) {
     if (target == null ||
         target.targetUnit != TargetUnit.count ||
         target.value <= 0) {
       return null;
     }
-    return CountTarget._(mem, target, actsInPeriod);
+    return CountTarget._(target, count);
   }
-
-  int get count => actsInPeriod.length;
 
   int get targetValue => target.value;
 }

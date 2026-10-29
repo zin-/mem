@@ -116,7 +116,7 @@ void main() {
       final progress = await scope.read(periodActCountProvider(memId).future);
 
       expect(progress?.count, 2);
-      expect(progress?.target, 3);
+      expect(progress?.targetValue, 3);
     });
 
     test('is null when the target unit is time', () async {
