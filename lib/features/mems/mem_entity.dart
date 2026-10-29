@@ -116,6 +116,8 @@ class MemEntity implements Entity<int>, Identifiable<int> {
     if (latestList != null && latestList.isNotEmpty) {
       latestAct = (latestList.first as ActEntity).toDomain();
     }
+    final targetRaw = children['target'];
+    final target = targetRaw == null ? null : targetRaw as Target;
 
     return MemEntity(
       row.id,
@@ -131,7 +133,7 @@ class MemEntity implements Entity<int>, Identifiable<int> {
       row.createdAt,
       row.updatedAt,
       row.archivedAt,
-      target: null,
+      target: target,
       repeatedNotifications: repeatedNotifications,
       memRelations: memRelations,
       latestAct: latestAct,

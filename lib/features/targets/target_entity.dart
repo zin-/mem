@@ -128,6 +128,14 @@ class TargetEntity implements Entity<int> {
     this.archivedAt,
   );
 
+  Target toDomain() => Target(
+        memId: memId,
+        targetType: targetType,
+        targetUnit: targetUnit,
+        value: value,
+        period: period,
+      );
+
   factory TargetEntity.fromTuple(dynamic row) => TargetEntity(
         row.memId,
         TargetType.values.firstWhere(
