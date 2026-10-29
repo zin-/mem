@@ -101,6 +101,13 @@ Map<String, Object?> _savedRowFrom(
       'archivedAt': saved.archivedAt,
     };
 
+/// Target は Mem の一要素で、単体の入り口にはならない。名前の Entity は仮。
+///
+/// id / createdAt / updatedAt は持つ。archivedAt は親 Mem の archive に従う想定で、
+/// Target 独自には要らないかもしれない。
+///
+/// Act は Mem に紐づいても Act を先に見るし、Mem の削除や archive で
+/// 「した事実」は消えない。だから Act は Entity でよい。
 class TargetEntity implements Entity<int> {
   final MemId memId;
   final TargetType targetType;
