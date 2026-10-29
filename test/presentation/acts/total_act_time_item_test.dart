@@ -159,7 +159,7 @@ void main() {
     Act? latestAct,
     _FakeActEntities? actEntities,
     List<SavedActEntityV1>? acts,
-    SavedTargetEntityV1? target,
+    Target? target,
     DayActAmount? dayAmount,
   }) async {
     await tester.binding.setSurfaceSize(const Size(390, 844));
@@ -642,15 +642,13 @@ void main() {
   });
 }
 
-SavedTargetEntityV1 _target(TargetUnit unit, int value) => SavedTargetEntityV1({
-      'id': 1,
-      'memId': _memId,
-      'type': TargetType.equalTo.name,
-      'unit': unit.name,
-      'value': value,
-      'period': Period.aMonth.name,
-      'createdAt': DateTime(2024, 6, 1),
-    });
+Target _target(TargetUnit unit, int value) => Target(
+      memId: _memId,
+      targetType: TargetType.equalTo,
+      targetUnit: unit,
+      value: value,
+      period: Period.aMonth,
+    );
 
 String _timeText(WidgetTester tester, DateTime dateTime) =>
     TimeOfDay.fromDateTime(dateTime).format(

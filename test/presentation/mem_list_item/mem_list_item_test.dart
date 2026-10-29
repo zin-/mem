@@ -15,8 +15,6 @@ import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/preference/preference_key.dart';
 import 'package:mem/features/settings/states.dart';
 import 'package:mem/features/targets/target.dart';
-import 'package:mem/features/targets/target_entity.dart';
-import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/features/mems/list/item/subtitle.dart';
 import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/mems/mem.dart';
@@ -72,29 +70,13 @@ class _FakeStartOfDay extends Preference<TimeOfDay> {
       const TimeOfDay(hour: 0, minute: 0);
 }
 
-class _FakeTargets extends Targets {
-  final List<SavedTargetEntityV1> _initial;
-
-  _FakeTargets(this._initial);
-
-  @override
-  List<SavedTargetEntityV1> build() => _initial;
-}
-
-SavedTargetEntityV1 _savedTarget({
-  required int memId,
-  required TargetUnit unit,
-  required int value,
-}) =>
-    SavedTargetEntityV1({
-      'id': 1,
-      'memId': memId,
-      'type': TargetType.equalTo.name,
-      'unit': unit.name,
-      'value': value,
-      'period': Period.aWeek.name,
-      'createdAt': DateTime(2024, 6, 1),
-    });
+Target _countTarget(int memId) => Target(
+      memId: memId,
+      targetType: TargetType.equalTo,
+      targetUnit: TargetUnit.count,
+      value: 3,
+      period: Period.aWeek,
+    );
 
 class _FakeActEntities extends ActEntities {
   int startActbyCallCount = 0;
@@ -1150,18 +1132,14 @@ void main() {
               memStateProvider(memId)
                   .overrideWith(() => _FakeMemState(baseMem)),
               memEntitiesProvider.overrideWith(
-                  () => _FakeMemEntities([savedMemFromDomain(baseMem)])),
-              preferenceProvider(startOfDayKey)
-                  .overrideWith(() => _FakeStartOfDay()),
-              targetsProvider.overrideWith(
-                () => _FakeTargets([
-                  _savedTarget(
-                    memId: memId,
-                    unit: TargetUnit.count,
-                    value: 3,
+                () => _FakeMemEntities([
+                  savedMemFromDomain(baseMem).updatedWith(
+                    target: () => _countTarget(memId),
                   ),
                 ]),
               ),
+              preferenceProvider(startOfDayKey)
+                  .overrideWith(() => _FakeStartOfDay()),
               viewedDayActAmountProvider(memId, today).overrideWith(
                 (ref) async => const DayActAmount(2, Duration.zero),
               ),
@@ -1203,19 +1181,14 @@ void main() {
                   (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
               memStateProvider(memId).overrideWith(() => _FakeMemState(mem)),
               memEntitiesProvider.overrideWith(
-                () => _FakeMemEntities([savedMemFromDomain(mem)]),
-              ),
-              preferenceProvider(startOfDayKey)
-                  .overrideWith(() => _FakeStartOfDay()),
-              targetsProvider.overrideWith(
-                () => _FakeTargets([
-                  _savedTarget(
-                    memId: memId,
-                    unit: TargetUnit.count,
-                    value: 3,
+                () => _FakeMemEntities([
+                  savedMemFromDomain(mem).updatedWith(
+                    target: () => _countTarget(memId),
                   ),
                 ]),
               ),
+              preferenceProvider(startOfDayKey)
+                  .overrideWith(() => _FakeStartOfDay()),
               viewedDayActAmountProvider(memId, today).overrideWith(
                 (ref) async => const DayActAmount(2, Duration.zero),
               ),

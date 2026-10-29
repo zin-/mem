@@ -15,7 +15,6 @@ import 'package:mem/features/mems/mem_done_checkbox.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
 import 'package:mem/features/targets/target.dart';
-import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/values/colors.dart';
@@ -31,11 +30,11 @@ class MemListItemView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => v(
         () {
           final target = ref.watch(
-            targetsProvider.select(
-              (targets) => targets
-                  .where((entity) => entity.value.memId == _mem.id)
+            memEntitiesProvider.select(
+              (mems) => mems
+                  .where((entity) => entity.id == _mem.id)
                   .firstOrNull
-                  ?.value,
+                  ?.target,
             ),
           );
           return _render(

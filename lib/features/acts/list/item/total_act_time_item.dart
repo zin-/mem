@@ -18,20 +18,19 @@ import 'package:mem/features/mems/transitions.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
 import 'package:mem/features/targets/target.dart';
-import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/values/dimens.dart';
 
 class TotalActTimeListItem extends ConsumerWidget {
   final List<SavedActEntityV1> _actList;
   final Mem? _mem;
-  final SavedTargetEntityV1? _targetEntity;
+  final Target? _target;
   final DateTime _groupDate;
   final bool _isDateView;
 
   const TotalActTimeListItem(
     this._actList,
     this._mem,
-    this._targetEntity,
+    this._target,
     this._groupDate,
     this._isDateView, {
     super.key,
@@ -63,7 +62,7 @@ class TotalActTimeListItem extends ConsumerWidget {
           final startOfDay = ref.watch(preferenceProvider(startOfDayKey));
           final isToday =
               _isDateView && isViewedDayToday(_groupDate, startOfDay);
-          final target = _targetEntity?.value;
+          final target = _target;
           final amount = _dayAmount(ref, memId, target);
 
           return ListTile(
@@ -99,7 +98,7 @@ class TotalActTimeListItem extends ConsumerWidget {
       Duration.zero,
       (sum, act) => sum + (act.value.period?.duration ?? Duration.zero),
     );
-    final target = _targetEntity?.value;
+    final target = _target;
     final range = _actListRange(_actList.map((act) => act.value));
 
     return Column(
@@ -140,7 +139,7 @@ class TotalActTimeListItem extends ConsumerWidget {
   }
 
   int? _targetAmount(TargetUnit unit) {
-    final target = _targetEntity?.value;
+    final target = _target;
     if (target == null || target.targetUnit != unit) {
       return null;
     }

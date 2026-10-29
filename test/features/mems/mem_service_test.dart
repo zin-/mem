@@ -95,17 +95,20 @@ void main() {
         when(mockTargetRepository.receive(any))
             .thenAnswer((_) async => savedTarget);
 
-        // Act
-        await memService.save((
+        final saved = (await memService.save((
           mem,
           memItems,
           memNotifications,
           target,
           memRelations,
-        ));
+        )))
+            .$5;
 
-        // Assert
         verify(mockTargetRepository.receive(any)).called(1);
+        expect(saved.target?.memId, testMemId);
+        expect(saved.target?.value, 10);
+        expect(saved.target?.targetUnit, TargetUnit.count);
+        expect(saved.target?.period, Period.aDay);
       });
 
       test('should not call _targetRepository.receive when target is null',
@@ -119,7 +122,17 @@ void main() {
         final memRelations = <MemRelationEntityV1>[];
 
         final savedMemEntity = savedMem(
-            id: testMemId, name: 'Test Mem', createdAt: DateTime.now());
+          id: testMemId,
+          name: 'Test Mem',
+          createdAt: DateTime.now(),
+          target: Target(
+            memId: testMemId,
+            targetType: TargetType.equalTo,
+            targetUnit: TargetUnit.count,
+            value: 9,
+            period: Period.aDay,
+          ),
+        );
 
         when(mockMemRepository.receive(
           any,
@@ -135,17 +148,17 @@ void main() {
         when(mockTargetRepository.waste(memId: anyNamed('memId')))
             .thenAnswer((_) async => []);
 
-        // Act
-        await memService.save((
+        final saved = (await memService.save((
           mem,
           memItems,
           memNotifications,
           target,
           memRelations,
-        ));
+        )))
+            .$5;
 
-        // Assert
         verifyNever(mockTargetRepository.receive(any));
+        expect(saved.target, isNull);
       });
 
       test('should not call _targetRepository.receive when target value is 0',
@@ -167,7 +180,17 @@ void main() {
         final memRelations = <MemRelationEntityV1>[];
 
         final savedMemEntity = savedMem(
-            id: testMemId, name: 'Test Mem', createdAt: DateTime.now());
+          id: testMemId,
+          name: 'Test Mem',
+          createdAt: DateTime.now(),
+          target: Target(
+            memId: testMemId,
+            targetType: TargetType.equalTo,
+            targetUnit: TargetUnit.count,
+            value: 9,
+            period: Period.aDay,
+          ),
+        );
 
         when(mockMemRepository.receive(
           any,
@@ -183,17 +206,17 @@ void main() {
         when(mockTargetRepository.waste(memId: anyNamed('memId')))
             .thenAnswer((_) async => []);
 
-        // Act
-        await memService.save((
+        final saved = (await memService.save((
           mem,
           memItems,
           memNotifications,
           target,
           memRelations,
-        ));
+        )))
+            .$5;
 
-        // Assert
         verifyNever(mockTargetRepository.receive(any));
+        expect(saved.target, isNull);
       });
     });
   });

@@ -5,9 +5,9 @@ import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/count_target.dart';
+import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
-import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -18,9 +18,9 @@ Future<CountTarget?> periodActCount(Ref ref, int memId) => v(
       () async {
         // 集計前なので count は仮。正の件数目標のときだけ Target を残す
         final target = ref.watch(
-          targetsProvider.select(
-            (targets) => CountTarget.of(
-              targets.where((e) => e.value.memId == memId).firstOrNull?.value,
+          memEntitiesProvider.select(
+            (mems) => CountTarget.of(
+              mems.where((e) => e.id == memId).firstOrNull?.target,
               0,
             )?.target,
           ),

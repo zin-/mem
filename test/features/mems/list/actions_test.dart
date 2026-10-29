@@ -17,8 +17,6 @@ import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/preference/preference_key.dart';
 import 'package:mem/features/settings/states.dart';
-import 'package:mem/features/targets/target_entity.dart';
-import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/framework/view/value_state_notifier.dart';
 
@@ -64,14 +62,6 @@ class _FakeActEntities extends ActEntities {
   }
 }
 
-class _QuietTargets extends Targets {
-  @override
-  List<SavedTargetEntityV1> build() => [];
-
-  @override
-  Future<void> fetchByMemIds(Iterable<int> memIds) async {}
-}
-
 class _FakePreference extends Preference<TimeOfDay> {
   _FakePreference();
 
@@ -90,7 +80,14 @@ MemEntity _savedMem(int id, String name, {Act? latestAct}) => savedMem(
 
 SavedMemNotificationEntityV1 _savedNotification(int id, int memId) {
   final now = DateTime(2024, 6, 1, 12, 0);
-  return savedMemNotification(id: id, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
+  return savedMemNotification(
+      id: id,
+      memId: memId,
+      type: MemNotificationType.repeat,
+      timeOfDaySeconds: 9 * 60 * 60,
+      message: 'Repeat',
+      createdAt: now,
+      updatedAt: now);
 }
 
 void main() {
@@ -146,7 +143,6 @@ void main() {
               memStateProvider(2)
                   .overrideWith(() => _FakeMemState(saved2.toDomain())),
               actEntitiesProvider.overrideWith(() => fakeAct),
-              targetsProvider.overrideWith(() => _QuietTargets()),
             ],
             child: MaterialApp(
               home: Scaffold(
@@ -223,7 +219,6 @@ void main() {
               memStateProvider(2)
                   .overrideWith(() => _FakeMemState(saved2.toDomain())),
               actEntitiesProvider.overrideWith(() => fakeAct),
-              targetsProvider.overrideWith(() => _QuietTargets()),
             ],
             child: MaterialApp(
               home: Scaffold(

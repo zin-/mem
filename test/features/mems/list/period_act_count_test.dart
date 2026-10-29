@@ -5,11 +5,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mem/databases/database.dart' hide Act;
 import 'package:mem/features/acts/line_chart/states.dart';
 import 'package:mem/features/mems/list/period_act_count.dart';
+import 'package:mem/features/mems/mem_store.dart';
+import 'package:mem/features/mems/mems_state.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/preference/preference_key.dart';
 import 'package:mem/features/settings/states.dart';
 import 'package:mem/features/targets/target.dart';
-import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/framework/database/accessor.dart';
 import 'package:mem/framework/singleton.dart';
 
@@ -33,6 +34,7 @@ void main() {
     });
 
     tearDown(() async {
+      MemStore.resetSingleton();
       await db.close();
       DriftDatabaseAccessor.reset();
     });
@@ -112,9 +114,17 @@ void main() {
       await insertAct(memId: otherMemId, start: noon);
 
       final scope = container();
-      await scope.read(targetsProvider.notifier).fetchByMemIds([memId]);
+      await scope.read(memEntitiesProvider.notifier).loadMemList();
       final progress = await scope.read(periodActCountProvider(memId).future);
 
+      expect(
+        scope
+            .read(memEntitiesProvider)
+            .singleWhere((e) => e.id == memId)
+            .target
+            ?.value,
+        3,
+      );
       expect(progress?.count, 2);
       expect(progress?.targetValue, 3);
     });
@@ -129,7 +139,7 @@ void main() {
       );
 
       final scope = container();
-      await scope.read(targetsProvider.notifier).fetchByMemIds([memId]);
+      await scope.read(memEntitiesProvider.notifier).loadMemList();
       final progress = await scope.read(periodActCountProvider(memId).future);
 
       expect(progress, isNull);

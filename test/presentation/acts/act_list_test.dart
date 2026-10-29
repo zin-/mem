@@ -6,9 +6,6 @@ import 'package:mem/features/acts/list/item/total_act_time_item.dart';
 import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mems/mem_entity.dart';
 import 'package:mem/features/mems/mems_state.dart';
-import 'package:mem/features/targets/target_entity.dart';
-import 'package:mem/features/targets/target_states.dart';
-
 import '../../entity_factories.dart';
 
 const _memId = 2;
@@ -21,14 +18,6 @@ class _FakeMemEntities extends MemEntities {
 
   @override
   Iterable<MemEntity> build() => _initial;
-}
-
-class _QuietTargets extends Targets {
-  @override
-  List<SavedTargetEntityV1> build() => [];
-
-  @override
-  Future<void> fetchByMemIds(Iterable<int> memIds) async {}
 }
 
 DateTime _anotherDayThisMonth() {
@@ -60,7 +49,6 @@ void main() {
                 savedMem(id: _memId, name: _memName),
               ]),
             ),
-            targetsProvider.overrideWith(() => _QuietTargets()),
             actListProvider(_memId).overrideWith((ref) => [act]),
           ],
           child: const MaterialApp(

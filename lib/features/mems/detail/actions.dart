@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mem/features/mem_relations/mem_relation_state.dart';
 import 'package:mem/features/mems/mem_view_data.dart';
 import 'package:mem/features/mems/mems_state.dart';
-import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_items/mem_item_entity.dart';
@@ -18,13 +17,7 @@ final saveMem =
             final link = ref.keepAlive();
             try {
               final (
-                (
-                  savedMemItems,
-                  savedMemNotifications,
-                  savedTarget,
-                  _,
-                  memEntityV2
-                ),
+                (savedMemItems, savedMemNotifications, _, _, memEntityV2),
                 nextNotifyAt
               ) = await MemClient().save(
                 ref.read(editingMemByMemIdProvider(memId)),
@@ -38,12 +31,6 @@ final saveMem =
               );
 
               if (!ref.mounted) return nextNotifyAt;
-
-              if (savedTarget is SavedTargetEntityV1) {
-                ref.read(targetsProvider.notifier).upsert(savedTarget);
-              } else if (memId != null) {
-                ref.read(targetsProvider.notifier).removeByMemId(memId);
-              }
 
               ref.read(memEntitiesProvider.notifier).upsert([memEntityV2]);
 

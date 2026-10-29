@@ -19,8 +19,6 @@ import 'package:mem/features/mems/states.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/preference/preference_key.dart';
 import 'package:mem/features/settings/states.dart';
-import 'package:mem/features/targets/target_entity.dart';
-import 'package:mem/features/targets/target_states.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_view.dart';
 import 'package:mem/framework/view/list_value_state_notifier.dart';
@@ -57,14 +55,6 @@ class _FakeActEntities extends ActEntities {
   Future<void> resumeActBy(int memId) async {}
 }
 
-class _QuietTargets extends Targets {
-  @override
-  List<SavedTargetEntityV1> build() => [];
-
-  @override
-  Future<void> fetchByMemIds(Iterable<int> memIds) async {}
-}
-
 class _FakePreference extends Preference<TimeOfDay> {
   _FakePreference();
 
@@ -82,7 +72,14 @@ MemEntity _savedMem(int id, String name) => savedMem(
 
 SavedMemNotificationEntityV1 _savedRepeatAtHour(int id, int memId, int hour) {
   final now = DateTime(2024, 6, 1, 12, 0);
-  return savedMemNotification(id: id, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: hour * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
+  return savedMemNotification(
+      id: id,
+      memId: memId,
+      type: MemNotificationType.repeat,
+      timeOfDaySeconds: hour * 60 * 60,
+      message: 'Repeat',
+      createdAt: now,
+      updatedAt: now);
 }
 
 MemNotificationEntityV1 _unsavedRepeatAtHour(int memId, int hour) =>
@@ -106,8 +103,7 @@ MemEntity _savedMemWithActiveAct(int id, String name) => savedMem(
 void main() {
   group('MemListWidget', () {
     group('View', () {
-      testWidgets(
-          'renders top sliver MemListItemView when mem has active act',
+      testWidgets('renders top sliver MemListItemView when mem has active act',
           (tester) async {
         final saved = _savedMemWithActiveAct(1, 'Running');
         final entity = saved;
@@ -135,7 +131,6 @@ void main() {
               memStateProvider(1)
                   .overrideWith(() => _FakeMemState(saved.toDomain())),
               actEntitiesProvider.overrideWith(() => _FakeActEntities()),
-              targetsProvider.overrideWith(() => _QuietTargets()),
             ],
             child: MaterialApp(
               home: Scaffold(
@@ -184,7 +179,6 @@ void main() {
               memStateProvider(1)
                   .overrideWith(() => _FakeMemState(saved.toDomain())),
               actEntitiesProvider.overrideWith(() => _FakeActEntities()),
-              targetsProvider.overrideWith(() => _QuietTargets()),
             ],
             child: MaterialApp(
               home: Scaffold(
@@ -237,7 +231,6 @@ void main() {
               memStateProvider(1)
                   .overrideWith(() => _FakeMemState(saved.toDomain())),
               actEntitiesProvider.overrideWith(() => _FakeActEntities()),
-              targetsProvider.overrideWith(() => _QuietTargets()),
             ],
             child: MaterialApp(
               home: Scaffold(
@@ -285,7 +278,6 @@ void main() {
               memStateProvider(1)
                   .overrideWith(() => _FakeMemState(saved.toDomain())),
               actEntitiesProvider.overrideWith(() => _FakeActEntities()),
-              targetsProvider.overrideWith(() => _QuietTargets()),
             ],
             child: MaterialApp(
               home: Scaffold(
