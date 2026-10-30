@@ -19,6 +19,7 @@ class TargetEntityV1 with EntityV1<Target> {
         'unit': value.targetUnit.name,
         'value': value.value,
         'period': value.period.name,
+        'secondsAfterLastAct': value.secondsAfterLastAct,
       };
 
   @override
@@ -28,8 +29,7 @@ class TargetEntityV1 with EntityV1<Target> {
 
 class SavedTargetEntityV1 extends TargetEntityV1
     with DatabaseTupleEntityV1<int, Target> {
-  SavedTargetEntityV1(Map<String, dynamic> map)
-      : super(_targetFromMap(map)) {
+  SavedTargetEntityV1(Map<String, dynamic> map) : super(_targetFromMap(map)) {
     withBaseColumns(map);
   }
 
@@ -49,6 +49,7 @@ class SavedTargetEntityV1 extends TargetEntityV1
         period: Period.values.firstWhere(
           (element) => element.name == map['period'],
         ),
+        secondsAfterLastAct: map['secondsAfterLastAct'],
       );
 
   static Target _targetFromRow(dynamic row) => Target(
@@ -63,6 +64,7 @@ class SavedTargetEntityV1 extends TargetEntityV1
         period: Period.values.firstWhere(
           (element) => element.name == row.period,
         ),
+        secondsAfterLastAct: row.secondsAfterLastAct,
       );
 
   @override
@@ -82,6 +84,7 @@ class SavedTargetEntityV1 extends TargetEntityV1
         createdAt,
         updatedAt,
         archivedAt,
+        secondsAfterLastAct: value.secondsAfterLastAct,
       );
 }
 
@@ -96,6 +99,7 @@ Map<String, Object?> _savedRowFrom(
       'unit': value.targetUnit.name,
       'value': value.value,
       'period': value.period.name,
+      'secondsAfterLastAct': value.secondsAfterLastAct,
       'createdAt': saved.createdAt,
       'updatedAt': saved.updatedAt,
       'archivedAt': saved.archivedAt,
@@ -114,6 +118,7 @@ class TargetEntity implements Entity<int> {
   final TargetUnit targetUnit;
   final int value;
   final Period period;
+  final int? secondsAfterLastAct;
   @override
   final int id;
   @override
@@ -132,8 +137,9 @@ class TargetEntity implements Entity<int> {
     this.id,
     this.createdAt,
     this.updatedAt,
-    this.archivedAt,
-  );
+    this.archivedAt, {
+    this.secondsAfterLastAct,
+  });
 
   Target toDomain() => Target(
         memId: memId,
@@ -141,6 +147,7 @@ class TargetEntity implements Entity<int> {
         targetUnit: targetUnit,
         value: value,
         period: period,
+        secondsAfterLastAct: secondsAfterLastAct,
       );
 
   factory TargetEntity.fromTuple(dynamic row) => TargetEntity(
@@ -159,6 +166,7 @@ class TargetEntity implements Entity<int> {
         row.createdAt,
         row.updatedAt,
         row.archivedAt,
+        secondsAfterLastAct: row.secondsAfterLastAct,
       );
 }
 
@@ -168,6 +176,7 @@ drift_database.TargetsCompanion convertIntoTargetsInsertable(Target entity) =>
       unit: Value(entity.targetUnit.name),
       value: Value(entity.value),
       period: Value(entity.period.name),
+      secondsAfterLastAct: Value(entity.secondsAfterLastAct),
       memId: Value(entity.memId ?? 0),
       createdAt: Value(DateTime.now()),
     );
@@ -180,6 +189,7 @@ drift_database.TargetsCompanion convertIntoTargetsUpdateable(
       unit: Value(entity.targetUnit.name),
       value: Value(entity.value),
       period: Value(entity.period.name),
+      secondsAfterLastAct: Value(entity.secondsAfterLastAct),
       memId: Value(entity.memId ?? 0),
       updatedAt: Value(DateTime.now()),
       archivedAt: Value(entity.archivedAt),
@@ -196,6 +206,7 @@ class _TargetEntityRow {
   String get unit => entity.targetUnit.name;
   int get value => entity.value;
   String get period => entity.period.name;
+  int? get secondsAfterLastAct => entity.secondsAfterLastAct;
   DateTime get createdAt => entity.createdAt;
   DateTime? get updatedAt => entity.updatedAt;
   DateTime? get archivedAt => entity.archivedAt;

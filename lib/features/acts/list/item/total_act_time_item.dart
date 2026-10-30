@@ -108,20 +108,23 @@ class TotalActTimeListItem extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Wrap(
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                if (_isDateView &&
-                    ActStatusLabels.shows(statusAct, target, amount))
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      right: defaultComponentPadding,
+            // 左右の操作ボタンがあると title が狭く、状態時間と合計が 1 行に収まらない
+            Flexible(
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  if (_isDateView &&
+                      ActStatusLabels.shows(statusAct, target, amount))
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        right: defaultComponentPadding,
+                      ),
+                      child: ActStatusLabels(statusAct, target, amount),
                     ),
-                    child: ActStatusLabels(statusAct, target, amount),
-                  ),
-                Text(recorded.formatHHmm()),
-                if (!_isDateView) ..._timeTargetSuffix(),
-              ],
+                  Text(recorded.formatHHmm()),
+                  if (!_isDateView) ..._timeTargetSuffix(),
+                ],
+              ),
             ),
             ActCountLabel(
               _actList.length,

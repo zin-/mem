@@ -163,6 +163,7 @@ class MemService {
                           targetUnit: v.targetUnit,
                           value: v.value,
                           period: v.period,
+                          secondsAfterLastAct: v.secondsAfterLastAct,
                         ),
                       )
                       .value,

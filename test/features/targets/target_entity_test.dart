@@ -80,6 +80,7 @@ void main() {
           unit: TargetUnit.count.name,
           value: 7,
           period: Period.threeMonth.name,
+          secondsAfterLastAct: 90,
           createdAt: now,
           updatedAt: now,
           archivedAt: null,
@@ -89,6 +90,7 @@ void main() {
       expect(entity.targetType, TargetType.equalTo);
       expect(entity.targetUnit, TargetUnit.count);
       expect(entity.period, Period.threeMonth);
+      expect(entity.secondsAfterLastAct, 90);
 
       final insertable = convertIntoTargetsInsertable(
         Target(
@@ -125,6 +127,68 @@ void main() {
       expect(updateable.period.value, Period.all.name);
       expect(updateable.archivedAt.value, now);
       expect(updateable.updatedAt.value, isNotNull);
+      expect(updateable.secondsAfterLastAct.value, isNull);
+    });
+
+    test('secondsAfterLastAct roundtrips and stays null when absent', () {
+      final createdAt = DateTime(2024, 4, 1);
+      final saved = SavedTargetEntityV1({
+        'id': 4,
+        'memId': 11,
+        'type': TargetType.equalTo.name,
+        'unit': TargetUnit.count.name,
+        'value': 2,
+        'period': Period.aDay.name,
+        'secondsAfterLastAct': 5400,
+        'createdAt': createdAt,
+        'updatedAt': null,
+        'archivedAt': null,
+      });
+
+      expect(saved.value.secondsAfterLastAct, 5400);
+      expect(saved.toMap['secondsAfterLastAct'], 5400);
+
+      final kept = saved.updatedWith(
+        (v) => Target(
+          memId: v.memId,
+          targetType: v.targetType,
+          targetUnit: v.targetUnit,
+          value: v.value,
+          period: v.period,
+          secondsAfterLastAct: v.secondsAfterLastAct,
+        ),
+      );
+      expect(kept.value.secondsAfterLastAct, 5400);
+
+      final entity = saved.toEntityV2();
+      expect(entity.secondsAfterLastAct, 5400);
+      expect(entity.toDomain().secondsAfterLastAct, 5400);
+      expect(
+        SavedTargetEntityV1.fromEntityV2(entity).value.secondsAfterLastAct,
+        5400,
+      );
+      expect(
+        convertIntoTargetsInsertable(entity.toDomain())
+            .secondsAfterLastAct
+            .value,
+        5400,
+      );
+      expect(
+        convertIntoTargetsUpdateable(entity).secondsAfterLastAct.value,
+        5400,
+      );
+
+      final absent = SavedTargetEntityV1({
+        'id': 5,
+        'memId': 11,
+        'type': TargetType.equalTo.name,
+        'unit': TargetUnit.count.name,
+        'value': 2,
+        'period': Period.aDay.name,
+        'createdAt': createdAt,
+      });
+      expect(absent.value.secondsAfterLastAct, isNull);
+      expect(absent.toEntityV2().secondsAfterLastAct, isNull);
     });
   });
 }
@@ -136,6 +200,7 @@ class _FakeRow {
   final String unit;
   final int value;
   final String period;
+  final int? secondsAfterLastAct;
   final DateTime createdAt;
   final DateTime? updatedAt;
   final DateTime? archivedAt;
@@ -147,6 +212,7 @@ class _FakeRow {
     required this.unit,
     required this.value,
     required this.period,
+    this.secondsAfterLastAct,
     required this.createdAt,
     required this.updatedAt,
     required this.archivedAt,

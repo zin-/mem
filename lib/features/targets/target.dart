@@ -10,6 +10,7 @@ class Target {
   final TargetUnit targetUnit;
   final int value;
   final Period period;
+  final int? secondsAfterLastAct;
 
   Target({
     required this.memId,
@@ -17,5 +18,6 @@ class Target {
     required this.targetUnit,
     required this.value,
     required this.period,
+    this.secondsAfterLastAct,
   });
 }
