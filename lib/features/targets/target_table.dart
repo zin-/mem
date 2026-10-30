@@ -8,5 +8,6 @@ class Targets extends Table with BaseColumns {
   TextColumn get unit => text()();
   IntColumn get value => integer()();
   TextColumn get period => text()();
+  IntColumn get secondsAfterLastAct => integer().nullable()();
   IntColumn get memId => integer().references(Mems, #id)();
 }

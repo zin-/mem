@@ -36,6 +36,7 @@ class TargetState extends _$TargetState {
           targetUnit: targetUnit?.call() ?? v.targetUnit,
           value: value?.call() ?? v.value,
           period: period?.call() ?? v.period,
+          secondsAfterLastAct: v.secondsAfterLastAct,
         ),
       ),
     );
