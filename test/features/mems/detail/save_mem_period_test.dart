@@ -72,6 +72,7 @@ MemEntity _savedMemEntityWithPeriod(
       DateTime(2024, 6, 1),
       DateTime(2024, 6, 1),
       null,
+      target: null,
     );
 
 SavedMemItemEntityV1 _savedMemItem({
@@ -641,6 +642,78 @@ void main() {
         memId: memId,
         type: MemNotificationType.repeatByNDay,
       )).called(1);
+    });
+  });
+
+  group('saveMem target', () {
+    test('keeps the saved target on memEntities', () async {
+      const memId = 1;
+      final mem = savedMem(id: memId, name: 'Test mem');
+      final container = containerForMem(memId, mem);
+      addTearDown(container.dispose);
+
+      final saved = mem.updatedWith(
+        target: () => Target(
+          memId: memId,
+          targetType: TargetType.equalTo,
+          targetUnit: TargetUnit.count,
+          value: 4,
+          period: Period.aDay,
+        ),
+      );
+      when(mockMemClient.save(any, any, any, any, any)).thenAnswer(
+        (_) async => (
+          (
+            <MemItemEntityV1>[],
+            null,
+            null,
+            null,
+            saved,
+          ),
+          null,
+        ),
+      );
+
+      await container.read(saveMem(memId));
+
+      final stored = container.read(memEntitiesProvider).single.target;
+      expect(stored?.value, 4);
+      expect(stored?.targetUnit, TargetUnit.count);
+      expect(stored?.memId, memId);
+    });
+
+    test('clears memEntities target when the saved result has none', () async {
+      const memId = 1;
+      final mem = savedMem(
+        id: memId,
+        name: 'Test mem',
+        target: Target(
+          memId: memId,
+          targetType: TargetType.equalTo,
+          targetUnit: TargetUnit.count,
+          value: 4,
+          period: Period.aDay,
+        ),
+      );
+      final container = containerForMem(memId, mem);
+      addTearDown(container.dispose);
+
+      when(mockMemClient.save(any, any, any, any, any)).thenAnswer(
+        (_) async => (
+          (
+            <MemItemEntityV1>[],
+            null,
+            null,
+            null,
+            mem.updatedWith(target: () => null),
+          ),
+          null,
+        ),
+      );
+
+      await container.read(saveMem(memId));
+
+      expect(container.read(memEntitiesProvider).single.target, isNull);
     });
   });
 }

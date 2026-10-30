@@ -13,7 +13,6 @@ import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
-
 import 'app_bar.dart';
 import 'item/view.dart';
 
@@ -24,12 +23,16 @@ class MemListWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => v(
-        () => _MemListWidget(
-          _scrollController,
-          ref.watch(memListProvider).map((e) => e.toDomain()).toList(),
-          ref.watch(preferenceProvider(startOfDayKey)),
-          ref.watch(savedMemNotificationsProvider),
-        ),
+        () {
+          final mems = ref.watch(memListProvider);
+
+          return _MemListWidget(
+            _scrollController,
+            mems.map((e) => e.toDomain()).toList(),
+            ref.watch(preferenceProvider(startOfDayKey)),
+            ref.watch(savedMemNotificationsProvider),
+          );
+        },
       );
 }
 

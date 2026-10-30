@@ -1,42 +1,10 @@
 import 'package:mem/features/acts/line_chart/states.dart';
-import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/targets/target_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'target_states.g.dart';
-
-@riverpod
-class Targets extends _$Targets {
-  @override
-  List<SavedTargetEntityV1> build() => v(
-        () => [],
-      );
-
-  Future<void> fetchByMemIds(Iterable<int> memIds) => v(
-        () async {
-          final newMemIds =
-              memIds.where((e) => !state.map((e) => e.value.memId).contains(e));
-
-          if (newMemIds.isNotEmpty) {
-            final targets = await TargetRepository()
-                .shipByMemIds(newMemIds)
-                .then((v) => v.map((e) => SavedTargetEntityV1.fromEntityV2(e)));
-
-            if (targets.isNotEmpty) {
-              state = [
-                ...state,
-                ...targets,
-              ];
-            }
-          }
-        },
-        {
-          'memIds': memIds,
-        },
-      );
-}
 
 @riverpod
 class TargetState extends _$TargetState {

@@ -205,7 +205,9 @@ class MemService {
             returnMemNotifications.nonNulls.toList(growable: false),
             savedTarget,
             returnMemRelations.nonNulls.toList(growable: false),
-            savedMemEntity,
+            savedMemEntity.updatedWith(
+              target: () => savedTarget?.value,
+            ),
           );
         },
         {

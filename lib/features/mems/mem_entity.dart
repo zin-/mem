@@ -5,6 +5,7 @@ import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_period_db.dart';
+import 'package:mem/features/targets/target.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 import 'package:mem/framework/repository/entity.dart';
 import 'package:mem/framework/view/identifiable.dart';
@@ -14,6 +15,7 @@ class MemEntity implements Entity<int>, Identifiable<int> {
   final DateTime? doneAt;
   final DateAndTimePeriod? period;
   final List<MemItemEntity>? items;
+  final Target? target;
   final List<MemNotificationEntity>? repeatedNotifications;
   final List<MemRelationEntity>? memRelations;
   final Act? latestAct;
@@ -39,6 +41,7 @@ class MemEntity implements Entity<int>, Identifiable<int> {
     this.createdAt,
     this.updatedAt,
     this.archivedAt, {
+    required this.target,
     this.repeatedNotifications,
     this.memRelations,
     this.latestAct,
@@ -62,6 +65,7 @@ class MemEntity implements Entity<int>, Identifiable<int> {
   MemEntity updatedWith({
     Mem Function(Mem mem)? update,
     List<MemItemEntity>? Function()? items,
+    Target? Function()? target,
     List<MemNotificationEntity>? Function()? repeatedNotifications,
     List<MemRelationEntity>? Function()? memRelations,
     Act? Function()? latestAct,
@@ -79,13 +83,15 @@ class MemEntity implements Entity<int>, Identifiable<int> {
       createdAt,
       updatedAt == null ? this.updatedAt : updatedAt(),
       archivedAt == null ? this.archivedAt : archivedAt(),
+      target: target == null ? this.target : target(),
       repeatedNotifications: repeatedNotifications == null
           ? this.repeatedNotifications
           : repeatedNotifications(),
       memRelations: memRelations == null ? this.memRelations : memRelations(),
       latestAct: latestAct == null ? this.latestAct : latestAct(),
-      scheduleAnchorAct:
-          scheduleAnchorAct == null ? this.scheduleAnchorAct : scheduleAnchorAct(),
+      scheduleAnchorAct: scheduleAnchorAct == null
+          ? this.scheduleAnchorAct
+          : scheduleAnchorAct(),
     );
   }
 
@@ -110,6 +116,8 @@ class MemEntity implements Entity<int>, Identifiable<int> {
     if (latestList != null && latestList.isNotEmpty) {
       latestAct = (latestList.first as ActEntity).toDomain();
     }
+    final targetRaw = children['target'];
+    final target = targetRaw == null ? null : targetRaw as Target;
 
     return MemEntity(
       row.id,
@@ -125,6 +133,7 @@ class MemEntity implements Entity<int>, Identifiable<int> {
       row.createdAt,
       row.updatedAt,
       row.archivedAt,
+      target: target,
       repeatedNotifications: repeatedNotifications,
       memRelations: memRelations,
       latestAct: latestAct,

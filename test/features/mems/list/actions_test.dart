@@ -80,7 +80,14 @@ MemEntity _savedMem(int id, String name, {Act? latestAct}) => savedMem(
 
 SavedMemNotificationEntityV1 _savedNotification(int id, int memId) {
   final now = DateTime(2024, 6, 1, 12, 0);
-  return savedMemNotification(id: id, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: 9 * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
+  return savedMemNotification(
+      id: id,
+      memId: memId,
+      type: MemNotificationType.repeat,
+      timeOfDaySeconds: 9 * 60 * 60,
+      message: 'Repeat',
+      createdAt: now,
+      updatedAt: now);
 }
 
 void main() {

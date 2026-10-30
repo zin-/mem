@@ -4,6 +4,7 @@ import 'package:mem/features/mem_notifications/mem_notification.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/targets/target.dart';
 import 'package:mem/framework/date_and_time/date_and_time.dart';
 import 'package:mem/framework/date_and_time/date_and_time_period.dart';
 
@@ -72,6 +73,7 @@ MemEntity savedMem({
   DateTime? endOn,
   DateTime? endAt,
   Act? latestAct,
+  Target? target,
   DateTime? createdAt,
   DateTime? updatedAt,
   DateTime? archivedAt,
@@ -95,6 +97,7 @@ MemEntity savedMem({
     now,
     updatedAt ?? now,
     archivedAt,
+    target: target,
     latestAct: latestAct,
   );
 }

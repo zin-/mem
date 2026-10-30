@@ -72,7 +72,14 @@ MemEntity _savedMem(int id, String name) => savedMem(
 
 SavedMemNotificationEntityV1 _savedRepeatAtHour(int id, int memId, int hour) {
   final now = DateTime(2024, 6, 1, 12, 0);
-  return savedMemNotification(id: id, memId: memId, type: MemNotificationType.repeat, timeOfDaySeconds: hour * 60 * 60, message: 'Repeat', createdAt: now, updatedAt: now);
+  return savedMemNotification(
+      id: id,
+      memId: memId,
+      type: MemNotificationType.repeat,
+      timeOfDaySeconds: hour * 60 * 60,
+      message: 'Repeat',
+      createdAt: now,
+      updatedAt: now);
 }
 
 MemNotificationEntityV1 _unsavedRepeatAtHour(int memId, int hour) =>
@@ -96,8 +103,7 @@ MemEntity _savedMemWithActiveAct(int id, String name) => savedMem(
 void main() {
   group('MemListWidget', () {
     group('View', () {
-      testWidgets(
-          'renders top sliver MemListItemView when mem has active act',
+      testWidgets('renders top sliver MemListItemView when mem has active act',
           (tester) async {
         final saved = _savedMemWithActiveAct(1, 'Running');
         final entity = saved;

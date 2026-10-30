@@ -116,26 +116,56 @@ class ActQueryService {
         },
       );
 
+  Future<int> countByMemIdAndPeriod(
+    int memId,
+    DateAndTimePeriod? period,
+  ) =>
+      v(
+        () async {
+          final countExpr = countAll();
+          final row = await (_db.selectOnly(_db.acts)
+                ..addColumns([countExpr])
+                ..where(_actsInPeriod(_db.acts, memId, period)))
+              .getSingle();
+          return row.read(countExpr) ?? 0;
+        },
+        {
+          'memId': memId,
+          'period': period,
+        },
+      );
+
+  Future<({int count, Duration recorded})> amountByMemIdAndPeriod(
+    int memId,
+    DateAndTimePeriod? period,
+  ) =>
+      v(
+        () async {
+          final acts = await fetchByMemIdAndPeriod(memId, period);
+          return (
+            count: acts.length,
+            recorded: acts.fold<Duration>(
+              Duration.zero,
+              (sum, act) =>
+                  sum + (act.toDomain().period?.duration ?? Duration.zero),
+            ),
+          );
+        },
+        {
+          'memId': memId,
+          'period': period,
+        },
+      );
+
   Future<List<ActEntity>> fetchByMemIdAndPeriod(
     int memId,
     DateAndTimePeriod? period,
   ) =>
       v(
         () async {
-          var query = _db.select(_db.acts)
-            ..where(
-              (t) =>
-                  t.memId.equals(memId) & actExcludingSkippedForPerformance(t),
-            );
-          if (period is WithStartAndEnd) {
-            query = query
-              ..where(
-                (t) =>
-                    t.start.isBiggerOrEqualValue(period.start) &
-                    t.start.isSmallerThanValue(period.end),
-              );
-          }
-          final rows = await query.get();
+          final rows = await (_db.select(_db.acts)
+                ..where((t) => _actsInPeriod(t, memId, period)))
+              .get();
           return rows.map(ActEntity.fromTuple).toList();
         },
         {
@@ -143,6 +173,21 @@ class ActQueryService {
           'period': period,
         },
       );
+
+  Expression<bool> _actsInPeriod(
+    Acts table,
+    int memId,
+    DateAndTimePeriod? period,
+  ) {
+    final matched =
+        table.memId.equals(memId) & actExcludingSkippedForPerformance(table);
+    if (period is! WithStartAndEnd) {
+      return matched;
+    }
+    return matched &
+        table.start.isBiggerOrEqualValue(period.start) &
+        table.start.isSmallerThanValue(period.end);
+  }
 
   Future<Act?> resolveScheduleAnchorForNotifications({
     required int memId,
@@ -153,8 +198,8 @@ class ActQueryService {
         () async {
           var anchor = scheduleAnchorAct;
           if (latestAct?.isSkipped == true && anchor == null) {
-            anchor =
-                await fetchScheduleAnchorByMemIds(memId).then((v) => v?.toDomain());
+            anchor = await fetchScheduleAnchorByMemIds(memId)
+                .then((v) => v?.toDomain());
           }
           return scheduleAnchorForNotifications(
             latestAct: latestAct,
@@ -181,8 +226,7 @@ class ActQueryService {
           final rows = await (_db.select(_db.acts)
                 ..where(
                   (t) =>
-                      t.memId.isIn(list) &
-                      actExcludingSkippedForPerformance(t),
+                      t.memId.isIn(list) & actExcludingSkippedForPerformance(t),
                 )
                 ..orderBy([(t) => OrderingTerm.desc(t.start)]))
               .get();

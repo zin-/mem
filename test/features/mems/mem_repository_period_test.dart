@@ -55,6 +55,7 @@ void main() {
           inserted.createdAt,
           inserted.updatedAt,
           inserted.archivedAt,
+          target: null,
         ),
       );
 
@@ -102,6 +103,7 @@ void main() {
           inserted.createdAt,
           inserted.updatedAt,
           inserted.archivedAt,
+          target: null,
         ),
       );
 

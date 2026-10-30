@@ -7,8 +7,8 @@ import 'package:mem/features/acts/states.dart';
 import 'package:mem/features/mems/list/states.dart';
 import 'package:mem/features/logger/log_service.dart';
 import 'package:mem/features/mems/mem.dart';
-import 'package:mem/features/targets/target_entity.dart';
-import 'package:mem/features/targets/target_states.dart';
+import 'package:mem/features/mems/states.dart';
+import 'package:mem/features/targets/target.dart';
 import 'package:mem/widgets/infinite_scroll.dart';
 
 import 'app_bar.dart';
@@ -54,23 +54,24 @@ class _ActListState extends ConsumerState<ActList> {
   @override
   Widget build(BuildContext context) => v(
         () {
-          if (widget.memId == null) {
-            ref
-                .read(targetsProvider.notifier)
-                .fetchByMemIds(ref.watch(memListProvider).map((e) => e.id));
-          } else {
-            ref.read(targetsProvider.notifier).fetchByMemIds([widget.memId!]);
-          }
+          final memId = widget.memId;
+          final listed = memId == null ? ref.watch(memListProvider) : null;
+          final focused =
+              memId == null ? null : ref.watch(memByMemIdProvider(memId));
+          final targets = [
+            if (listed != null)
+              for (final mem in listed)
+                if (mem.target != null) mem.target!,
+            if (focused?.target != null) focused!.target!,
+          ];
 
           return _ActList(
-            widget.memId,
+            memId,
             ref.watch(dateViewProvider),
             ref.watch(timeViewProvider),
-            ref.watch(actListProvider(widget.memId)),
-            (widget.memId == null
-                ? ref.watch(memListProvider).map((e) => e.toDomain()).toList()
-                : []),
-            ref.watch(targetsProvider),
+            ref.watch(actListProvider(memId)),
+            listed?.map((e) => e.toDomain()).toList() ?? const [],
+            targets,
             widget.scrollController,
           );
         },
@@ -86,7 +87,7 @@ class _ActList extends StatelessWidget {
   final bool _isTimeView;
   final List<SavedActEntityV1> _actList;
   final List<Mem> _memList;
-  final List<SavedTargetEntityV1> _targetList;
+  final List<Target> _targetList;
   final ScrollController? _scrollController;
 
   const _ActList(

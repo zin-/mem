@@ -14,6 +14,8 @@ import 'package:mem/features/mem_relations/mem_relation.dart';
 import 'package:mem/features/mem_relations/mem_relation_entity.dart';
 import 'package:mem/features/mems/mem.dart';
 import 'package:mem/features/mems/mem_entity.dart';
+import 'package:mem/features/targets/target.dart';
+import 'package:mem/features/targets/target_entity.dart';
 import 'package:mem/framework/repository/drift_repository.dart';
 import 'package:mem/framework/singleton.dart';
 import 'package:mem/features/logger/log_service.dart';
@@ -366,6 +368,7 @@ class MemRepository extends DriftRepository {
     final itemsByMemId = await _itemsByMemId(memIds);
     final notificationsByMemId = await _repeatedNotificationsByMemId(memIds);
     final relationsBySourceMemId = await _relationsBySourceMemId(memIds);
+    final targetsByMemId = await _targetsByMemId(memIds);
     return [
       for (final row in rows)
         MemEntity.fromTuple(
@@ -376,9 +379,29 @@ class MemRepository extends DriftRepository {
                 notificationsByMemId[row.id] ?? const <MemNotificationEntity>[],
             'mem_relations':
                 relationsBySourceMemId[row.id] ?? const <MemRelationEntity>[],
+            'target': targetsByMemId[row.id],
           },
         ),
     ];
+  }
+
+  Future<Map<int, Target>> _targetsByMemId(Iterable<int> memIds) async {
+    final list = memIds.toSet().toList();
+    final out = <int, Target>{};
+    for (var i = 0; i < list.length; i += _latestActPerMemChunkSize) {
+      final end = math.min(i + _latestActPerMemChunkSize, list.length);
+      final chunk = list.sublist(i, end);
+      final rows = await (driftDb.select(driftDb.targets)
+            ..where((t) => t.memId.isIn(chunk)))
+          .get();
+      for (final row in rows) {
+        out.putIfAbsent(
+          row.memId,
+          () => TargetEntity.fromTuple(row).toDomain(),
+        );
+      }
+    }
+    return out;
   }
 
   Future<Map<int, List<MemItemEntity>>> _itemsByMemId(
