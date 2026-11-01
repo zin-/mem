@@ -27,6 +27,7 @@ import 'package:mem/framework/view/list_value_state_notifier.dart';
 import 'package:mem/modules/live_elapsed_time_text.dart';
 import 'package:mem/features/acts/act_entity.dart';
 import 'package:mem/l10n/l10n.dart';
+import 'package:mem/values/colors.dart';
 
 class _FakeMemState extends MemState {
   final Mem _mem;
@@ -1208,6 +1209,102 @@ void main() {
         expect(
           tester.getTopLeft(find.text('2')).dx,
           lessThan(tester.getTopLeft(find.byType(LiveElapsedTimeText)).dx),
+        );
+      });
+    });
+
+    group('next time after last act', () {
+      const interval = Duration(hours: 2);
+
+      Target intervalTarget() => Target(
+            memId: memId,
+            targetType: TargetType.equalTo,
+            targetUnit: TargetUnit.count,
+            value: 4,
+            period: Period.aDay,
+            secondsAfterLastAct: interval.inSeconds,
+          );
+
+      Mem memEndedAt(DateTime endedAt) {
+        final end = DateAndTime.from(endedAt, timeOfDay: endedAt);
+        return Mem(
+          memId,
+          'Test Mem',
+          null,
+          null,
+          latestAct: Act.by(
+            memId,
+            startWhen: end.subtract(const Duration(minutes: 30)),
+            endWhen: end,
+          ),
+        );
+      }
+
+      Future<void> pump(WidgetTester tester, Mem mem) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              memNotificationsByMemIdProvider(memId).overrideWith(
+                  (ref) => ListValueStateNotifier<MemNotificationEntityV1>([])),
+              memStateProvider(memId).overrideWith(() => _FakeMemState(mem)),
+              memEntitiesProvider.overrideWith(
+                () => _FakeMemEntities([
+                  savedMemFromDomain(mem).updatedWith(
+                    target: () => intervalTarget(),
+                  ),
+                ]),
+              ),
+            ],
+            child: MaterialApp(
+              home: Scaffold(
+                body: MemListItemView(mem),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+      }
+
+      Future<void> expectClock(
+        WidgetTester tester,
+        DateTime endedAt,
+        Matcher color,
+      ) async {
+        final mem = memEndedAt(endedAt);
+        await pump(tester, mem);
+        final next =
+            DateAndTime.from(endedAt, timeOfDay: endedAt).add(interval);
+        final formatted = TimeOfDay.fromDateTime(next).format(
+          tester.element(find.byType(MemListItemSubtitle)),
+        );
+
+        expect(find.byType(MemListItemSubtitle), findsOneWidget);
+        expect(find.text(formatted), findsOneWidget);
+        expect(
+          tester.widget<Text>(find.text(formatted)).style?.color,
+          color,
+        );
+        expect(
+          tester.widget<ListTile>(find.byType(ListTile)).subtitle,
+          isNotNull,
+        );
+      }
+
+      testWidgets('shows the clock in red when the next time has passed',
+          (tester) async {
+        await expectClock(
+          tester,
+          DateTime.now().subtract(const Duration(hours: 3)),
+          equals(warningColor),
+        );
+      });
+
+      testWidgets('shows the clock without red when the next time is ahead',
+          (tester) async {
+        await expectClock(
+          tester,
+          DateTime.now().subtract(const Duration(minutes: 30)),
+          isNot(equals(warningColor)),
         );
       });
     });

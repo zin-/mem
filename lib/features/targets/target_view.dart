@@ -11,6 +11,7 @@ import 'package:mem/l10n/l10n.dart';
 import 'package:mem/values/dimens.dart';
 
 Key keyTargetValue = const Key('target-value');
+Key keyTargetSecondsAfterLastAct = const Key('target-seconds-after-last-act');
 
 const _maxTimeValue = 356400; // 99時間
 
@@ -43,6 +44,7 @@ class TargetText extends ConsumerWidget {
       TargetUnit? Function()? targetUnit,
       int? Function()? value,
       Period? Function()? period,
+      int? Function()? secondsAfterLastAct,
     }) onTargetChanged,
     AppLocalizations l10n,
   ) =>
@@ -136,6 +138,19 @@ class TargetText extends ConsumerWidget {
                   ),
                 ],
               ),
+              if (targetEntity.value.acceptsSecondsAfterLastAct) ...[
+                SizedBox(height: defaultComponentPadding),
+                TimeTextFormField(
+                  key: keyTargetSecondsAfterLastAct,
+                  targetEntity.value.secondsAfterLastAct,
+                  (picked) => onTargetChanged(
+                    secondsAfterLastAct: () =>
+                        picked == null || picked > _maxTimeValue
+                            ? null
+                            : picked,
+                  ),
+                ),
+              ],
             ],
           );
         },

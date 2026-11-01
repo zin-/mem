@@ -14,6 +14,7 @@ import 'package:mem/features/mems/list/item/completion_dialog.dart';
 import 'package:mem/features/mems/mem_done_checkbox.dart';
 import 'package:mem/features/settings/preference/keys.dart';
 import 'package:mem/features/settings/states.dart';
+import 'package:mem/features/targets/next_at_after_last_act.dart';
 import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
@@ -111,6 +112,13 @@ ListTile _render(
               (e) => e is SavedMemNotificationEntityV1 && e.value.isEnabled(),
             )
             .isNotEmpty;
+        final nextAt = target == null
+            ? null
+            : NextAtAfterLastAct.of(
+                target: target,
+                latestAct: latestActByMem,
+                scheduleAnchorAct: mem.scheduleAnchorAct,
+              )?.at;
         final enableSkipMenu = hasEnableMemNotifications && !hasActiveAct;
 
         void showCompletionDialog(BuildContext dialogContext) {
@@ -159,9 +167,10 @@ ListTile _render(
                   ? stopIconButton
                   : startIconButton
               : null,
-          subtitle: mem.period == null && !hasEnableMemNotifications
-              ? null
-              : MemListItemSubtitle(mem.id as int),
+          subtitle:
+              mem.period == null && !hasEnableMemNotifications && nextAt == null
+                  ? null
+                  : MemListItemSubtitle(mem.id as int),
           isThreeLine: mem.period != null && hasEnableMemNotifications,
         );
       },

@@ -20,4 +20,8 @@ class Target {
     required this.period,
     this.secondsAfterLastAct,
   });
+
+  // 1日に2回以上の回数目標だけ、前回の終了からの間隔を持つ
+  bool get acceptsSecondsAfterLastAct =>
+      targetUnit == TargetUnit.count && period == Period.aDay && value >= 2;
 }
