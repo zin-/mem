@@ -19,7 +19,6 @@ import 'package:mem/features/targets/target.dart';
 import 'package:mem/features/mems/mem_name.dart';
 import 'package:mem/features/mem_notifications/mem_notification_entity.dart';
 import 'package:mem/values/colors.dart';
-import 'package:mem/values/dimens.dart';
 
 import 'subtitle.dart';
 
@@ -197,66 +196,10 @@ Widget _title(
   Act? latestAct,
   Target? target,
   DayActAmount? amount,
-) {
-  final name = MemNameText(mem.id);
-  final time = _timeLabel(latestAct, target, amount);
-  final count = _countLabel(latestAct, target, amount);
-  if (time == null && count == null) {
-    return name;
-  }
-  // Act 一覧と同じく時間を件数より前に置く。時間は行の中央、件数は右端
-  if (time == null) {
-    return Row(
-      children: [
-        Expanded(child: name),
-        count!,
-      ],
+) =>
+    ActStatusLabels(
+      latestAct,
+      target,
+      amount,
+      leading: MemNameText(mem.id),
     );
-  }
-  return Row(
-    children: [
-      Expanded(
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: name,
-        ),
-      ),
-      time,
-      Expanded(
-        child: Align(
-          alignment: Alignment.centerRight,
-          child: count ?? const SizedBox.shrink(),
-        ),
-      ),
-    ],
-  );
-}
-
-Widget? _timeLabel(Act? latestAct, Target? target, DayActAmount? amount) {
-  final children = <Widget>[
-    if (target != null &&
-        amount != null &&
-        DayTargetLabel.shows(target) &&
-        target.targetUnit == TargetUnit.time)
-      DayTargetLabel(target, amount, latestAct),
-    if (StateElapsedTime.shows(latestAct)) StateElapsedTime(latestAct),
-  ];
-  if (children.isEmpty) {
-    return null;
-  }
-  return Wrap(
-    spacing: defaultComponentPadding,
-    crossAxisAlignment: WrapCrossAlignment.center,
-    children: children,
-  );
-}
-
-Widget? _countLabel(Act? latestAct, Target? target, DayActAmount? amount) {
-  if (target == null ||
-      amount == null ||
-      !DayTargetLabel.shows(target) ||
-      target.targetUnit != TargetUnit.count) {
-    return null;
-  }
-  return DayTargetLabel(target, amount, latestAct);
-}

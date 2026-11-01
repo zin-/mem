@@ -593,7 +593,8 @@ void main() {
       expect(find.byType(LiveElapsedTimeText), findsOneWidget);
     });
 
-    testWidgets('shows that day count beside the group total', (tester) async {
+    testWidgets('shows that day count to the right of the total',
+        (tester) async {
       await pumpItem(
         tester,
         mem,
@@ -605,8 +606,13 @@ void main() {
       expect(find.text('2'), findsOneWidget);
       expect(find.text(' / '), findsOneWidget);
       expect(find.text('5'), findsOneWidget);
-      expect(find.text('1'), findsOneWidget);
+      expect(find.text('1'), findsNothing);
+      expect(find.text('1:00'), findsOneWidget);
       expect(find.byType(LiveElapsedTimeText), findsNothing);
+      expect(
+        tester.getTopLeft(find.text('1:00')).dx,
+        lessThan(tester.getTopLeft(find.text('2')).dx),
+      );
     });
 
     testWidgets('shows that day recorded time over the time target',

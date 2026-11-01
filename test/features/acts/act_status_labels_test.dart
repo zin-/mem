@@ -66,7 +66,7 @@ void main() {
     expect(find.byType(LiveElapsedTimeText), findsOneWidget);
   });
 
-  testWidgets('shows the day count beside state time', (tester) async {
+  testWidgets('shows the day count to the right of state time', (tester) async {
     await pump(
       tester,
       act: ActiveAct(memId, DateAndTime(2026, 10, 30, 10)),
@@ -78,9 +78,25 @@ void main() {
     expect(find.text(' / '), findsOneWidget);
     expect(find.text('4'), findsOneWidget);
     expect(find.byType(LiveElapsedTimeText), findsOneWidget);
+    final row = tester.getRect(
+      find
+          .ancestor(
+            of: find.byType(LiveElapsedTimeText),
+            matching: find.byType(Row),
+          )
+          .first,
+    );
     expect(
-      tester.getTopLeft(find.text('2')).dx,
-      lessThan(tester.getTopLeft(find.byType(LiveElapsedTimeText)).dx),
+      tester.getCenter(find.byType(LiveElapsedTimeText)).dx,
+      closeTo(row.center.dx, 1),
+    );
+    expect(
+      tester.getTopRight(find.text('4')).dx,
+      closeTo(row.right, 1),
+    );
+    expect(
+      tester.getTopLeft(find.byType(LiveElapsedTimeText)).dx,
+      lessThan(tester.getTopLeft(find.text('2')).dx),
     );
   });
 
